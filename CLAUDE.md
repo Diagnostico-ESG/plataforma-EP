@@ -125,5 +125,21 @@ Se uma regra falhar ou puder melhorar, registre em `.scratch/melhorias-protocolo
 
 ## Ajustes deste Projeto
 
-*(Vazio. Exceções deste projeto às regras acima. Esta seção é preservada ao atualizar o protocolo.)*
+*(Exceções deste projeto às regras acima. Esta seção é preservada ao atualizar o protocolo.)*
+
+### Agent skills
+
+Configuração das skills do Matt Pocock, gravada pelo `setup-matt-pocock-skills` em 2026-10-06 (o bloco fica aqui porque o protocolo só permite alterar esta seção).
+
+#### Issue tracker
+
+Tickets e specs em arquivos markdown locais, em `.scratch/<funcionalidade>/`. See `docs/agents/issue-tracker.md`.
+
+#### Triage labels
+
+Os cinco rótulos padrão (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`), numa linha `Status:` de cada ticket. See `docs/agents/triage-labels.md`.
+
+#### Domain docs
+
+Single-context: um `CONTEXT.md` e `docs/adr/` na raiz. See `docs/agents/domain.md`.
 
