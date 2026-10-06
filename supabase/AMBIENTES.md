@@ -6,3 +6,5 @@
 - última migração publicada em produção: nenhuma
 - último backup de produção: nenhum
 - último teste de restauração: nenhum
+
+Observação (2026-10-06): na rede do escritório, só a porta 443 abre. Migrações e testes de banco vão à mão pelo SQL Editor do painel (ver `.scratch/inicio-projeto.md`).

@@ -32,3 +32,4 @@ Uma linha por item: o que é e onde surgiu.
 - EP depois: integração com caixa de e-mail compartilhada do setor. (especificação, seção 7)
 - EP depois: acesso dos responsáveis dos setores à plataforma (hoje só os 6 integrantes do EP usam). (/projeto, 2026-10-06)
 - EP depois: registrar quem consultou cada dado (abrir processo, baixar arquivo), se jurídico/TI exigirem; v1 registra só alterações. (/projeto, 2026-10-06)
+- Pedir à TI a liberação de saída para `*.pooler.supabase.com` nas portas 5432 e 6543 (necessária para publicar em produção; hoje migrações e testes de banco vão à mão pelo SQL Editor). Surgiu no `/setup`, 2026-10-06.

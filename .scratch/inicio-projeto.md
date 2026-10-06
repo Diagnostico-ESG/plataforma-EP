@@ -19,3 +19,11 @@ Registro das perguntas iniciais do `/setup` (2026-10-06).
 | github (conector) | Nenhum hook. Conector para `api.githubcopilot.com`; falha ao conectar (token mal configurado). | Sim, quando funcionar. | Nenhum. | O que for consultado no GitHub. |
 
 Conclusão: o único plugin que envia conteúdo da sessão para fora é o claude-mem (à Anthropic, para resumir). Os demais trabalham localmente.
+
+## Banco
+
+- banco: remoto de desenvolvimento
+- banco: testes pelo script (sem Docker)
+- banco: login preparado (cadastro aberto desligado no config.toml e no painel; teste de cadastro recusado com signup_disabled em 2026-10-06)
+- banco: arquivos preparados (teste `01_buckets_privados` criado; conferido junto com `00_rls_ligada` pelo SQL Editor em 2026-10-06: 0 tabelas sem RLS, 0 buckets públicos)
+- **Rede bloqueia o banco (2026-10-06):** nesta rede só a porta 443 abre; as portas 5432 e 6543 do Supabase estão fechadas. `npm run test:db`, `npx supabase db push` e `db query --linked` não conectam daqui (o `db:types` funciona, pela 443). **Decisão do usuário:** migrações e testes de banco são aplicados à mão no SQL Editor do painel do projeto dev, com o usuário relatando o resultado. Consequência: as migrações aplicadas assim não entram no histórico da CLI; antes da primeira publicação em produção será preciso registrá-las (`migration repair`) de uma rede com as portas liberadas. Em rede liberada, `npm run test:db` volta a funcionar sem mudança.
