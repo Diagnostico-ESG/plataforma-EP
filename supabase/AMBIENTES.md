@@ -12,3 +12,4 @@ Observação (2026-10-06): na rede do escritório, só a porta 443 abre. Migraç
 Migrações aplicadas à mão no dev pelo SQL Editor (fora do histórico da CLI; registrar com `npx supabase migration repair --status applied <versão>` numa rede liberada, antes da primeira publicação em produção):
 
 - 20261007200505_login_perfis (2026-10-07; testes 02 e 03 passaram pelo SQL Editor)
+- 20261007214206_autorizar_emails (2026-10-07; testes 04, 02 e 03 passaram pelo SQL Editor)

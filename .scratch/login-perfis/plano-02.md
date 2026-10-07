@@ -62,7 +62,7 @@
 
 **Produz:** políticas de `public.autorizacoes`; funções `private.preparar_autorizacao()` e `private.registrar_evento_da_autorizacao()`; recusas `email_fora_do_dominio:<email>`, `email_ja_autorizado:<email>`, `email_ja_e_usuario:<email>` (código `P0001`); evento por ação com `acao` em `autorizar`, `mudar_perfil`, `excluir_autorizacao`, `entidade = 'autorizacao'`, `entidade_ref = email`, `detalhes = {"antes": …, "depois": …}` com `email` e `perfil`.
 
-- [ ] **1.1 Teste que falha.** Criar `supabase/tests/04_autorizacoes.test.sql`:
+- [x] **1.1 Teste que falha.** Criar `supabase/tests/04_autorizacoes.test.sql`:
 
 ```sql
 -- Autorizações: quem pode o quê, regras do e-mail e eventos (login-perfis, ticket 02).
@@ -192,9 +192,9 @@ end $$;
 
   Contagem do `plan(29)`: 3 × 4 (quem não pode) + 4 (visitante) + 9 (administrador) + 4 (eventos) = 29. Se `set local role` dentro da função temporária não funcionar no SQL Editor (erro ao trocar de papel dentro de função), desdobrar a função nos três blocos explícitos, no formato do `03_login_leitura.test.sql`, mantendo os mesmos textos.
 
-- [ ] **1.2 Ver falhar.** Conferir o alvo (linha "vínculo atual" de `supabase/AMBIENTES.md` e `supabase/.temp/project-ref` iguais a `yclkzyoebpsxmgpbcbus`). Pedir ao usuário que cole o arquivo no SQL Editor do projeto dev e relate o resultado. Esperado: relatório com falhas (Administrador recusado pela RLS, e-mail não normalizado, sem eventos, visitante lendo).
+- [x] **1.2 Ver falhar.** (pulado: migração colada antes; ver `desvios.md`) Conferir o alvo (linha "vínculo atual" de `supabase/AMBIENTES.md` e `supabase/.temp/project-ref` iguais a `yclkzyoebpsxmgpbcbus`). Pedir ao usuário que cole o arquivo no SQL Editor do projeto dev e relate o resultado. Esperado: relatório com falhas (Administrador recusado pela RLS, e-mail não normalizado, sem eventos, visitante lendo).
 
-- [ ] **1.3 Migração.** `npx supabase migration new autorizar_emails` e preencher:
+- [x] **1.3 Migração.** `npx supabase migration new autorizar_emails` e preencher:
 
 ```sql
 -- Login e perfis, ticket 02: o administrador autoriza e-mails, muda o perfil da autorização e a exclui.
@@ -271,9 +271,9 @@ create trigger registrar_evento_da_autorizacao after insert or update or delete 
   for each row execute function private.registrar_evento_da_autorizacao();
 ```
 
-- [ ] **1.4 Aplicar e ver passar.** Pedir ao usuário que cole a migração no SQL Editor do dev; depois o `04_autorizacoes.test.sql` (esperado: `ok` 1 a 29) e de novo o `02_login_barreira.test.sql` e o `03_login_leitura.test.sql` (esperado: continuam passando; o primeiro acesso agora passa pelo gatilho de eventos). Se algo falhar, ajustar a migração **antes** de ela ser dada por aplicada (no dev, colar `drop trigger …; drop function …; drop policy …` e reaplicar; regra das 3 tentativas).
-- [ ] **1.5 Tipos e registro.** `npm run db:types` (vínculo conferido). Acrescentar a migração à lista de "Migrações aplicadas à mão" em `supabase/AMBIENTES.md`, com a data e os testes que passaram.
-- [ ] **1.6 Commit:** teste, migração, tipos e `AMBIENTES.md` juntos — `Autoriza e-mails no banco: políticas, recusas e eventos`.
+- [x] **1.4 Aplicar e ver passar.** Pedir ao usuário que cole a migração no SQL Editor do dev; depois o `04_autorizacoes.test.sql` (esperado: `ok` 1 a 29) e de novo o `02_login_barreira.test.sql` e o `03_login_leitura.test.sql` (esperado: continuam passando; o primeiro acesso agora passa pelo gatilho de eventos). Se algo falhar, ajustar a migração **antes** de ela ser dada por aplicada (no dev, colar `drop trigger …; drop function …; drop policy …` e reaplicar; regra das 3 tentativas).
+- [x] **1.5 Tipos e registro.** `npm run db:types` (vínculo conferido). Acrescentar a migração à lista de "Migrações aplicadas à mão" em `supabase/AMBIENTES.md`, com a data e os testes que passaram.
+- [x] **1.6 Commit:** teste, migração, tipos e `AMBIENTES.md` juntos — `Autoriza e-mails no banco: políticas, recusas e eventos`.
 
 ---
 
@@ -281,7 +281,7 @@ create trigger registrar_evento_da_autorizacao after insert or update or delete 
 
 **Produz:** `normalizarEmail(texto: string): string`, `problemaNoEmail(texto: string): string | null`, `motivoDaFalhaDeGravacao(erro: { message: string; code?: string }): string`, `PERFIS: readonly Perfil[]`.
 
-- [ ] **2.1 Testes que falham.** `src/acesso/emailInstitucional.test.ts`:
+- [x] **2.1 Testes que falham.** `src/acesso/emailInstitucional.test.ts`:
 
 ```ts
 import { describe, expect, test } from 'vitest'
@@ -341,8 +341,8 @@ test('os perfis vão do maior para o menor, na ordem do seletor', () => {
 })
 ```
 
-- [ ] **2.2 Ver falhar:** `npx vitest run src/acesso` → falha por módulos e export inexistentes.
-- [ ] **2.3 Implementar.** `src/acesso/emailInstitucional.ts`:
+- [x] **2.2 Ver falhar:** `npx vitest run src/acesso` → falha por módulos e export inexistentes.
+- [x] **2.3 Implementar.** `src/acesso/emailInstitucional.ts`:
 
 ```ts
 const FORMATO_INSTITUCIONAL = /^[a-z0-9._%+-]+@ccivil\.pr\.gov\.br$/
@@ -388,8 +388,8 @@ export function motivoDaFalhaDeGravacao(erro: ErroDoBanco): string {
 export const PERFIS: readonly Perfil[] = ['administrador', 'integrante_ep', 'consulta']
 ```
 
-- [ ] **2.4 Ver passar:** `npx vitest run src/acesso`.
-- [ ] **2.5 Commit:** `Valida o e-mail institucional e traduz as recusas de gravação`.
+- [x] **2.4 Ver passar:** `npx vitest run src/acesso`.
+- [x] **2.5 Commit:** `Valida o e-mail institucional e traduz as recusas de gravação`.
 
 ---
 
@@ -413,7 +413,7 @@ export type LinhaDeUsuario = {
 
 e, no `ModuloDeAcesso`: `listarUsuarios(): Promise<LinhaDeUsuario[]>`, `autorizarEmail(email: string, perfil: Perfil): Promise<void>`, `mudarPerfilDaAutorizacao(email: string, perfil: Perfil): Promise<void>`, `excluirAutorizacao(email: string): Promise<void>`. Falha de gravação: `Error` cuja `message` é o motivo em português (sem o prefixo "A alteração não foi salva"). No `AcessoFalso`: `linhas: LinhaDeUsuario[]`, `falharLista`, `segurarLista`, `falhaDeGravacao: string | null`.
 
-- [ ] **3.1 Teste que falha.** `src/acesso/administracaoSupabase.test.ts`:
+- [x] **3.1 Teste que falha.** `src/acesso/administracaoSupabase.test.ts`:
 
 ```ts
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -505,8 +505,8 @@ describe('criarAdministracaoSupabase', () => {
 })
 ```
 
-- [ ] **3.2 Ver falhar:** `npx vitest run src/acesso/administracaoSupabase.test.ts`.
-- [ ] **3.3 Implementar.** Tipos acima em `src/acesso/tipos.ts` (junto às quatro funções no `ModuloDeAcesso`). `src/acesso/administracaoSupabase.ts`:
+- [x] **3.2 Ver falhar:** `npx vitest run src/acesso/administracaoSupabase.test.ts`.
+- [x] **3.3 Implementar.** Tipos acima em `src/acesso/tipos.ts` (junto às quatro funções no `ModuloDeAcesso`). `src/acesso/administracaoSupabase.ts`:
 
 ```ts
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -607,8 +607,8 @@ function conferirAlteracao({ data, error }: RespostaDeAlteracao, email: string):
   }
 ```
 
-- [ ] **3.4 Ver passar:** `npm test` e `npm run typecheck`.
-- [ ] **3.5 Commit:** `Leva a administração de autorizações ao módulo de acesso`.
+- [x] **3.4 Ver passar:** `npm test` e `npm run typecheck`.
+- [x] **3.5 Commit:** `Leva a administração de autorizações ao módulo de acesso`.
 
 ---
 
@@ -617,7 +617,7 @@ function conferirAlteracao({ data, error }: RespostaDeAlteracao, email: string):
 **Consome:** `ModuloDeAcesso` e `AcessoFalso` (tarefa 3), `rotuloDoPerfil`, `Avatar`, `Pilula`.
 **Produz:** `useAreaAtual(): [AreaComTela, (area: AreaComTela) => void]`; `useUsuarios(acesso)` → `{ lista, tentarDeNovo, gravar }`, com `lista: { tipo: 'carregando' } | { tipo: 'erro' } | { tipo: 'pronta'; linhas: LinhaDeUsuario[] }` e `gravar(alteracao: () => Promise<void>): Promise<void>` (relê a lista no sucesso, repassa a falha); `ListaDeUsuarios` com props `{ lista, aoTentarDeNovo, aoMudarPerfil(email, perfil), aoExcluir(email) }` (os dois últimos usados na tarefa 5).
 
-- [ ] **4.1 Testes que falham.** Em `src/App.test.tsx`, trocar o teste "a navegação lateral tem as seis áreas" (o usuário de teste é Integrante) por:
+- [x] **4.1 Testes que falham.** Em `src/App.test.tsx`, trocar o teste "a navegação lateral tem as seis áreas" (o usuário de teste é Integrante) por:
 
 ```ts
 test('para quem não é administrador, a navegação tem cinco áreas, sem Administração', async () => {
@@ -711,8 +711,8 @@ test('se a lista falha, mostra o erro e recupera com Tentar de novo', async () =
 })
 ```
 
-- [ ] **4.2 Ver falhar:** `npx vitest run src/App`.
-- [ ] **4.3 Implementar a navegação.** `src/components/moldura/areas.ts`:
+- [x] **4.2 Ver falhar:** `npx vitest run src/App`.
+- [x] **4.3 Implementar a navegação.** `src/components/moldura/areas.ts`:
 
 ```ts
 export type AreaDoSistema = 'quadro' | 'lista' | 'setores' | 'reunioes' | 'painel' | 'administracao'
@@ -815,7 +815,7 @@ function App({ acesso }: AppProps) {
 }
 ```
 
-- [ ] **4.4 Implementar a lista.** `src/hooks/useUsuarios.ts`:
+- [x] **4.4 Implementar a lista.** `src/hooks/useUsuarios.ts`:
 
 ```ts
 import { useCallback, useEffect, useState } from 'react'
@@ -1044,8 +1044,8 @@ function LinhaDaTabela({ linha }: { linha: LinhaDeUsuario }) {
 }
 ```
 
-- [ ] **4.5 Ver passar:** `npm test`, `npm run typecheck`, `npm run lint`.
-- [ ] **4.6 Commit:** `Mostra Administração > Usuários só ao administrador`.
+- [x] **4.5 Ver passar:** `npm test`, `npm run typecheck`, `npm run lint`.
+- [x] **4.6 Commit:** `Mostra Administração > Usuários só ao administrador`.
 
 ---
 
@@ -1054,7 +1054,7 @@ function LinhaDaTabela({ linha }: { linha: LinhaDeUsuario }) {
 **Consome:** `useUsuarios().gravar`, `ListaDeUsuarios`, `problemaNoEmail`, `normalizarEmail`, `PERFIS` (tarefas 2 e 4).
 **Produz:** `SeletorDePerfil` (`{ id?: string; rotulo?: string; valor: Perfil; aoMudar(perfil: Perfil): void }`) e `FormularioDeAutorizacao` (`{ aoAutorizar(email: string, perfil: Perfil): Promise<void> }`).
 
-- [ ] **5.1 Testes que falham.** Criar `src/App.autorizacoes.test.tsx`:
+- [x] **5.1 Testes que falham.** Criar `src/App.autorizacoes.test.tsx`:
 
 ```tsx
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
@@ -1158,8 +1158,8 @@ test('usuário que já entrou não tem seletor de perfil nem Excluir neste ticke
 })
 ```
 
-- [ ] **5.2 Ver falhar:** `npx vitest run src/App.autorizacoes.test.tsx`.
-- [ ] **5.3 Implementar.** `src/components/administracao/SeletorDePerfil.tsx`:
+- [x] **5.2 Ver falhar:** `npx vitest run src/App.autorizacoes.test.tsx`.
+- [x] **5.3 Implementar.** `src/components/administracao/SeletorDePerfil.tsx`:
 
 ```tsx
 import { PERFIS, rotuloDoPerfil } from '../../acesso/perfis'
@@ -1323,8 +1323,8 @@ export function AreaDeUsuarios({ acesso }: AreaDeUsuariosProps) {
 }
 ```
 
-- [ ] **5.4 Ver passar:** `npm test`, `npm run typecheck`, `npm run lint`, `npm run check:circular`.
-- [ ] **5.5 Commit:** `Autoriza, muda o perfil e exclui autorizações pela tela`.
+- [x] **5.4 Ver passar:** `npm test`, `npm run typecheck`, `npm run lint`, `npm run check:circular`.
+- [x] **5.5 Commit:** `Autoriza, muda o perfil e exclui autorizações pela tela`.
 
 ---
 
