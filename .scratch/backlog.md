@@ -33,3 +33,4 @@ Uma linha por item: o que é e onde surgiu.
 - EP depois: acesso dos responsáveis dos setores à plataforma (hoje só os 6 integrantes do EP usam). (/projeto, 2026-10-06)
 - EP depois: registrar quem consultou cada dado (abrir processo, baixar arquivo), se jurídico/TI exigirem; v1 registra só alterações. (/projeto, 2026-10-06)
 - Pedir à TI a liberação de saída para `*.pooler.supabase.com` nas portas 5432 e 6543 (necessária para publicar em produção; hoje migrações e testes de banco vão à mão pelo SQL Editor). Surgiu no `/setup`, 2026-10-06.
+- EP v1 (Login e perfis): foto do usuário no perfil, com iniciais quando não houver foto. Foto é dado pessoal (LGPD): bucket privado, URL assinada, envio opcional pelo próprio usuário ou pelo administrador, remoção possível. Responsáveis dos setores (não usuários) só com iniciais. Surgiu na `/concepcao-livre`, 2026-10-07.
