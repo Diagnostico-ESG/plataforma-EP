@@ -47,7 +47,7 @@
 
 **Produz:** tipo `public.perfil`; tabelas `public.usuarios`, `public.usuarios_emails`, `public.autorizacoes`, `public.eventos`; funções `private.perfil_atual()`, `private.usuario_ativo()`, `private.antes_de_criar_usuario(jsonb)`; recusa no formato de texto `motivo:email` (`fora_do_dominio` ou `sem_autorizacao`).
 
-- [ ] **1.1 Relatório dos testes.** O SQL Editor só mostra o último resultado, então os testes novos guardam as linhas do pgTAP numa tabela temporária e terminam com uma exceção que traz todas elas (a exceção também desfaz tudo). Criar `scripts/relatorio-tap.mjs`:
+- [x] **1.1 Relatório dos testes.** O SQL Editor só mostra o último resultado, então os testes novos guardam as linhas do pgTAP numa tabela temporária e terminam com uma exceção que traz todas elas (a exceção também desfaz tudo). Criar `scripts/relatorio-tap.mjs`:
 
 ```js
 // Os testes de banco novos terminam com uma exceção "RESULTADO DOS TESTES" que traz as linhas do pgTAP,
@@ -84,7 +84,7 @@ Rodar `npx vitest run scripts` → falha (módulo ausente), criar o módulo, rod
     return { linhas: [], falhas: [`erro de SQL: ${erro.message}`] }
 ```
 
-- [ ] **1.2 Testes de banco que falham.** Criar `supabase/tests/02_login_barreira.test.sql`:
+- [x] **1.2 Testes de banco que falham.** Criar `supabase/tests/02_login_barreira.test.sql`:
 
 ```sql
 begin;
@@ -183,9 +183,9 @@ O visitante usa `select set_config('request.jwt.claims', '{"role":"anon"}', true
 | 11 | Integrante | `count(*)` de `autorizacoes` | 0 |
 | 12 | Integrante | `count(*)` de `eventos` | 0 |
 
-- [ ] **1.3 Ver os testes falharem.** Conferir o alvo (`supabase/AMBIENTES.md` "vínculo atual" e `supabase/.temp/project-ref` = `yclkzyoebpsxmgpbcbus`). Tentar `npm run test:db -- supabase/tests/02_login_barreira.test.sql`; sem conexão, pedir ao usuário que cole o arquivo no SQL Editor do projeto dev. Esperado: erro `relation "public.autorizacoes" does not exist` (ou `schema "private"`).
+- [x] **1.3 Ver os testes falharem.** Conferir o alvo (`supabase/AMBIENTES.md` "vínculo atual" e `supabase/.temp/project-ref` = `yclkzyoebpsxmgpbcbus`). Tentar `npm run test:db -- supabase/tests/02_login_barreira.test.sql`; sem conexão, pedir ao usuário que cole o arquivo no SQL Editor do projeto dev. Esperado: erro `relation "public.autorizacoes" does not exist` (ou `schema "private"`).
 
-- [ ] **1.4 Migração.** `npx supabase migration new login_perfis` e preencher:
+- [x] **1.4 Migração.** `npx supabase migration new login_perfis` e preencher:
 
 ```sql
 -- Login e perfis, ticket 01: perfis, usuários, e-mails, autorizações, eventos,
@@ -316,20 +316,20 @@ create trigger primeiro_acesso after insert on auth.users
   for each row execute function private.registrar_primeiro_acesso();
 ```
 
-- [ ] **1.5 Aplicar no dev.** Conferir o alvo de novo. Tentar `npx supabase db push`; sem conexão, o usuário cola a migração no SQL Editor do projeto dev (registrar em `supabase/AMBIENTES.md` que ela foi aplicada à mão e precisa de `migration repair` antes da produção).
+- [x] **1.5 Aplicar no dev.** Conferir o alvo de novo. Tentar `npx supabase db push`; sem conexão, o usuário cola a migração no SQL Editor do projeto dev (registrar em `supabase/AMBIENTES.md` que ela foi aplicada à mão e precisa de `migration repair` antes da produção).
 
-- [ ] **1.6 Testes passam.** Rodar (ou colar) `02`, `03`, e `00_rls_ligada` / `01_buckets_privados`. Esperado: só linhas `ok`, nenhuma `not ok`.
+- [x] **1.6 Testes passam.** Rodar (ou colar) `02`, `03`, e `00_rls_ligada` / `01_buckets_privados`. Esperado: só linhas `ok`, nenhuma `not ok`.
 
-- [ ] **1.7 Tipos.** `npm run db:types`; conferir que `src/types/database.ts` traz `Enums: { perfil: … }` e as quatro tabelas. `npm run typecheck`.
+- [x] **1.7 Tipos.** `npm run db:types`; conferir que `src/types/database.ts` traz `Enums: { perfil: … }` e as quatro tabelas. `npm run typecheck`.
 
-- [ ] **1.8 Commit** (migração, testes de banco, scripts e tipos juntos): `Cria tabelas, barreira e primeiro acesso do login`.
+- [x] **1.8 Commit** (migração, testes de banco, scripts e tipos juntos): `Cria tabelas, barreira e primeiro acesso do login`.
 
 ### Tarefa 2: Motivos de recusa e rótulos de perfil (critério 10)
 
 **Consome:** `Database['public']['Enums']['perfil']`.
 **Produz:** `src/acesso/tipos.ts` com `Perfil`, `SessaoAtual`, `UsuarioAtual`, `MotivoDeRecusa`, `RecusaDeEntrada`, `EstadoDaEntrada`, `ModuloDeAcesso`; `lerRecusa(texto: string | null): RecusaDeEntrada | null`, `lerRecusaDaUrl(endereco: string): RecusaDeEntrada | null`, `mensagemDaRecusa(recusa: RecusaDeEntrada): string`, `rotuloDoPerfil(perfil: Perfil): string`.
 
-- [ ] **2.1 Tipos** em `src/acesso/tipos.ts`:
+- [x] **2.1 Tipos** em `src/acesso/tipos.ts`:
 
 ```ts
 import type { Database } from '../types/database'
@@ -356,9 +356,9 @@ export type ModuloDeAcesso = {
 }
 ```
 
-- [ ] **2.2 Teste que falha** `src/acesso/motivos.test.ts`: `lerRecusa('fora_do_dominio:pessoa@gmail.com')` → `{ motivo: 'fora_do_dominio', email: 'pessoa@gmail.com' }`; texto com prefixo do Auth (`'Error running hook: sem_autorizacao:x@ccivil.pr.gov.br'`) → `sem_autorizacao`; texto desconhecido e `null` → `null`; `lerRecusaDaUrl` com `?error_description=sem_autorizacao%3Ax%40ccivil.pr.gov.br` e com o mesmo no `#` → recusa; URL sem erro → `null`; `mensagemDaRecusa` dos três motivos → os textos exatos da spec. `src/acesso/perfis.test.ts`: os três rótulos `Administrador`, `Integrante do EP`, `Consulta`. `npm test` → falha.
+- [x] **2.2 Teste que falha** `src/acesso/motivos.test.ts`: `lerRecusa('fora_do_dominio:pessoa@gmail.com')` → `{ motivo: 'fora_do_dominio', email: 'pessoa@gmail.com' }`; texto com prefixo do Auth (`'Error running hook: sem_autorizacao:x@ccivil.pr.gov.br'`) → `sem_autorizacao`; texto desconhecido e `null` → `null`; `lerRecusaDaUrl` com `?error_description=sem_autorizacao%3Ax%40ccivil.pr.gov.br` e com o mesmo no `#` → recusa; URL sem erro → `null`; `mensagemDaRecusa` dos três motivos → os textos exatos da spec. `src/acesso/perfis.test.ts`: os três rótulos `Administrador`, `Integrante do EP`, `Consulta`. `npm test` → falha.
 
-- [ ] **2.3 Implementar** `src/acesso/motivos.ts`:
+- [x] **2.3 Implementar** `src/acesso/motivos.ts`:
 
 ```ts
 import type { MotivoDeRecusa, RecusaDeEntrada } from './tipos'
@@ -402,14 +402,14 @@ export function rotuloDoPerfil(perfil: Perfil): string {
 }
 ```
 
-- [ ] **2.4** `npm test` passa. **Commit:** `Traduz os motivos de recusa da entrada e os rótulos de perfil`.
+- [x] **2.4** `npm test` passa. **Commit:** `Traduz os motivos de recusa da entrada e os rótulos de perfil`.
 
 ### Tarefa 3: Módulo de acesso (critério 6)
 
 **Consome:** tipos da tarefa 2; `supabase` de `src/lib/supabase.ts` (só no `main.tsx`).
 **Produz:** `criarAcessoSupabase(cliente: SupabaseClient<Database>, urlDeChegada: string): ModuloDeAcesso`; `class AcessoFalso implements ModuloDeAcesso` e `USUARIO_DE_TESTE`; `conferirAcesso(acesso: ModuloDeAcesso): Promise<EstadoDaEntrada>`.
 
-- [ ] **3.1 Falso nomeado** `src/acesso/AcessoFalso.ts`:
+- [x] **3.1 Falso nomeado** `src/acesso/AcessoFalso.ts`:
 
 ```ts
 import type { ModuloDeAcesso, RecusaDeEntrada, SessaoAtual, UsuarioAtual } from './tipos'
@@ -453,7 +453,7 @@ export class AcessoFalso implements ModuloDeAcesso {
 }
 ```
 
-- [ ] **3.2** `src/acesso/conferirAcesso.ts`:
+- [x] **3.2** `src/acesso/conferirAcesso.ts`:
 
 ```ts
 import type { EstadoDaEntrada, ModuloDeAcesso } from './tipos'
@@ -473,9 +473,9 @@ export async function conferirAcesso(acesso: ModuloDeAcesso): Promise<EstadoDaEn
 
 (coberto pelos testes de tela das tarefas 4 e 5).
 
-- [ ] **3.3 Teste que falha** `src/acesso/acessoSupabase.test.ts`, com um `class ClienteSupabaseFalso` nomeado (só `auth.getSession`, `auth.signInWithOAuth`, `auth.signOut` e `from().select().eq().maybeSingle()`), passado com `as unknown as SupabaseClient<Database>`. Casos: sessão com usuário → `{ usuarioId, email }`; sem sessão → `null`; linha de `usuarios` → `UsuarioAtual` com `fotoUrl`; erro do banco → exceção com o id recebido; `entrarComGoogle` pede `provider: 'google'` com `hd: 'ccivil.pr.gov.br'`; `recusaNaChegada` lê a URL de chegada.
+- [x] **3.3 Teste que falha** `src/acesso/acessoSupabase.test.ts`, com um `class ClienteSupabaseFalso` nomeado (só `auth.getSession`, `auth.signInWithOAuth`, `auth.signOut` e `from().select().eq().maybeSingle()`), passado com `as unknown as SupabaseClient<Database>`. Casos: sessão com usuário → `{ usuarioId, email }`; sem sessão → `null`; linha de `usuarios` → `UsuarioAtual` com `fotoUrl`; erro do banco → exceção com o id recebido; `entrarComGoogle` pede `provider: 'google'` com `hd: 'ccivil.pr.gov.br'`; `recusaNaChegada` lê a URL de chegada.
 
-- [ ] **3.4 Implementar** `src/acesso/acessoSupabase.ts`:
+- [x] **3.4 Implementar** `src/acesso/acessoSupabase.ts`:
 
 ```ts
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -527,14 +527,14 @@ async function lerUsuario(cliente: ClienteSupabase, id: string): Promise<Usuario
 }
 ```
 
-- [ ] **3.5** `npm test` e `npm run typecheck` passam. **Commit:** `Cria o módulo de acesso com implementação real e falsa`.
+- [x] **3.5** `npm test` e `npm run typecheck` passam. **Commit:** `Cria o módulo de acesso com implementação real e falsa`.
 
 ### Tarefa 4: Tela de entrada (critérios 7, 8 e 11, parte da entrada)
 
 **Consome:** `ModuloDeAcesso`, `conferirAcesso`, `mensagemDaRecusa`, `AcessoFalso`.
 **Produz:** `useEntrada(acesso)` → `{ estado, entrar, sair, tentarDeNovo }`; `App` com prop `acesso: ModuloDeAcesso`.
 
-- [ ] **4.1 Testes que falham** `src/App.entrada.test.tsx`, renderizando `<App acesso={…} />` com o `AcessoFalso`:
+- [x] **4.1 Testes que falham** `src/App.entrada.test.tsx`, renderizando `<App acesso={…} />` com o `AcessoFalso`:
   - sem sessão: botão "Entrar com a conta institucional"; clicar soma 1 em `chamadas.entrarComGoogle`;
   - `segurarVerificacao`: texto "Verificando seu acesso…";
   - `recusa = { motivo: 'fora_do_dominio', email: 'pessoa@gmail.com' }`: mensagem exata da spec com o e-mail;
@@ -544,7 +544,7 @@ async function lerUsuario(cliente: ClienteSupabase, id: string): Promise<Usuario
 
   Ajustar `src/App.test.tsx`: cada teste usa `AcessoFalso.logadoComo()` e `await screen.findByRole('heading', { name: 'Processos' })` antes das asserções atuais. `npm test` → falha.
 
-- [ ] **4.2 Hook** `src/hooks/useEntrada.ts`:
+- [x] **4.2 Hook** `src/hooks/useEntrada.ts`:
 
 ```ts
 import { useCallback, useEffect, useState } from 'react'
@@ -585,7 +585,7 @@ export function useEntrada(acesso: ModuloDeAcesso) {
 }
 ```
 
-- [ ] **4.3 Tela** `src/components/entrada/TelaDeEntrada.tsx` (estilo em `TelaDeEntrada.css`, só com os tokens de `src/styles/tokens.css` e as classes de `botoes.css`; cartão branco centralizado sobre `--fundo`, marca "EP", mensagem logo abaixo do botão; antes, conferir `.scratch/identidade-visual.md` e `DESIGN.md`):
+- [x] **4.3 Tela** `src/components/entrada/TelaDeEntrada.tsx` (estilo em `TelaDeEntrada.css`, só com os tokens de `src/styles/tokens.css` e as classes de `botoes.css`; cartão branco centralizado sobre `--fundo`, marca "EP", mensagem logo abaixo do botão; antes, conferir `.scratch/identidade-visual.md` e `DESIGN.md`):
 
 ```tsx
 import { mensagemDaRecusa } from '../../acesso/motivos'
@@ -630,7 +630,7 @@ function MensagemDaEntrada({ estado, aoTentarDeNovo }: Omit<TelaDeEntradaProps, 
 }
 ```
 
-- [ ] **4.4 Ligação.** `src/App.tsx`:
+- [x] **4.4 Ligação.** `src/App.tsx`:
 
 ```tsx
 import type { ModuloDeAcesso } from './acesso/tipos'
@@ -668,18 +668,18 @@ const acesso = criarAcessoSupabase(supabase, urlDeChegada)
 
 `Moldura` e `BarraSuperior` passam a receber `usuario: UsuarioAtual` e `aoSair: () => void` (a barra usa na tarefa 5; nesta tarefa só repassa).
 
-- [ ] **4.5** `npm test`, `npm run typecheck`, `npm run lint` passam. **Commit:** `Cria a tela de entrada com os estados de verificação, recusa e falha`.
+- [x] **4.5** `npm test`, `npm run typecheck`, `npm run lint` passam. **Commit:** `Cria a tela de entrada com os estados de verificação, recusa e falha`.
 
 ### Tarefa 5: Avatar e menu da conta (critérios 9 e 11, parte da conta)
 
 **Consome:** `UsuarioAtual`, `rotuloDoPerfil`, `Avatar` (tamanho 32).
 
-- [ ] **5.1 Testes que falham** `src/App.conta.test.tsx` (app inteiro, `AcessoFalso.logadoComo()`):
+- [x] **5.1 Testes que falham** `src/App.conta.test.tsx` (app inteiro, `AcessoFalso.logadoComo()`):
   - o botão "Sua conta" sem avatar não existe mais; existe o avatar `img` "Pessoa de Teste" com "PT" dentro do botão da conta;
   - clicar no botão da conta mostra "Pessoa de Teste", "Integrante do EP" e o botão "Sair"; `Escape` fecha;
   - clicar em "Sair" soma 1 em `chamadas.sair` e mostra o botão "Entrar com a conta institucional".
 
-- [ ] **5.2 Componente** `src/components/moldura/MenuDaConta.tsx` (padrão de divulgação: botão com `aria-expanded` e `aria-controls`, painel ancorado embaixo à direita; estilo em `Moldura.css`, com `--sombra-flutuante`, `--folha`, `--linha`, `--canto`):
+- [x] **5.2 Componente** `src/components/moldura/MenuDaConta.tsx` (padrão de divulgação: botão com `aria-expanded` e `aria-controls`, painel ancorado embaixo à direita; estilo em `Moldura.css`, com `--sombra-flutuante`, `--folha`, `--linha`, `--canto`):
 
 ```tsx
 import { useId, useState } from 'react'
@@ -712,11 +712,11 @@ export function MenuDaConta({ usuario, aoSair }: MenuDaContaProps) {
 
 Em `BarraSuperior.tsx`, trocar o botão "Sua conta" por `<MenuDaConta usuario={usuario} aoSair={aoSair} />` e apagar o comentário "Sem login ainda…".
 
-- [ ] **5.3** `npm test`, `npm run typecheck`, `npm run lint` passam. A conferência visual do avatar fica para a tarefa 7 (sem o Google configurado, a tela real para na entrada). **Commit:** `Mostra o avatar com menu de conta e Sair na barra superior`.
+- [x] **5.3** `npm test`, `npm run typecheck`, `npm run lint` passam. A conferência visual do avatar fica para a tarefa 7 (sem o Google configurado, a tela real para na entrada). **Commit:** `Mostra o avatar com menu de conta e Sair na barra superior`.
 
 ### Tarefa 6: Configuração e guia de implantação (critérios 2 (registro da escolha), 5 e 12)
 
-- [ ] **6.1** `supabase/config.toml` (vale para o Supabase local; o remoto se configura no painel): `[auth] enable_signup = true` com comentário citando o ADR 0001; `[auth.email] enable_signup = false` mantido; `site_url = "http://localhost:5173"` e `additional_redirect_urls = ["http://localhost:5173"]`; bloco
+- [x] **6.1** `supabase/config.toml` (vale para o Supabase local; o remoto se configura no painel): `[auth] enable_signup = true` com comentário citando o ADR 0001; `[auth.email] enable_signup = false` mantido; `site_url = "http://localhost:5173"` e `additional_redirect_urls = ["http://localhost:5173"]`; bloco
 
 ```toml
 # Barreira de entrada (ADR 0001): recusa conta fora do domínio ou sem autorização.
@@ -731,7 +731,7 @@ secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
 skip_nonce_check = true
 ```
 
-- [ ] **6.2** `docs/implantacao-login.md`, em linguagem simples e válido para cada ambiente (dev agora, produção depois):
+- [x] **6.2** `docs/implantacao-login.md`, em linguagem simples e válido para cada ambiente (dev agora, produção depois):
   1. Google Cloud: tela de consentimento com público "Interno" (se a conta da organização permitir; senão "Externo" em teste, só com a própria conta), cliente OAuth "Aplicativo da Web", origem `http://localhost:5173` e URI de retorno `https://<ref>.supabase.co/auth/v1/callback`.
   2. Painel do Supabase, Authentication: provedor Google ligado com o identificador e o segredo colados ali (nunca na conversa nem no git); provedor E-mail desligado; "Allow new users to sign up" ligado; URL Configuration com Site URL e Redirect URL `http://localhost:5173`.
   3. Authentication → Hooks → "Before User Created" → Postgres → `private.antes_de_criar_usuario`. Se o painel não listar o schema `private`, parar e avisar (não mover a função para `public` sem decisão).
@@ -745,7 +745,7 @@ values (lower(btrim('<meu-email>')), 'administrador');
 
   5. Registro da escolha: gancho "antes de criar usuário" (com o gatilho de primeiro acesso como segunda barreira), conferido na documentação do Supabase em 2026-10-07.
 
-- [ ] **6.3 Commit:** `Documenta a configuração do login pelo Google e o primeiro administrador`.
+- [x] **6.3 Commit:** `Documenta a configuração do login pelo Google e o primeiro administrador`.
 
 ### Tarefa 7: Passo do usuário e ponta a ponta (critérios 12 e 13)
 
