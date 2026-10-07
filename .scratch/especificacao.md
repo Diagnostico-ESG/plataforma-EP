@@ -84,6 +84,7 @@ Status possíveis de um processo: em andamento, suspenso (exige motivo), conclu�
 5. **Três arquivos para o setor.** Ao fim da revisão interna, a versão que vai ao setor tem três arquivos: o .bpmn, o .png do fluxo e o relatório.
 6. **PNG gerado pela plataforma.** O .png é obrigatório e pode chegar de dois jeitos: enviado pelo integrante ou gerado pela plataforma a partir do .bpmn. A geração usa a mesma biblioteca do visualizador (bpmn-js, que exporta o desenho, e o navegador converte em PNG) e chega junto com ele; até lá, o envio é manual. Antes de valer, a geração precisa ser testada com arquivos reais do Bizagi, porque o desenho sai com a aparência do bpmn-js, e não com a do Bizagi.
 7. **"Pronto para envio" já fica na etapa 7.** Concluir a revisão interna leva o processo à etapa 7, na situação **"pronto para envio"**. Quando a 1ª rodada é registrada com a data de envio, a situação passa a **"com o setor"**. A situação é calculada a partir das rodadas, não gravada à parte, e o painel separa o tempo "pronto para envio" (espera no EP) do tempo "com o setor".
+8. **Etapas 7 e 8 também são capturadas.** Cada uma começa sem responsável e é capturada por um integrante do EP: a 7 (enviar os documentos ao setor por e-mail e registrar as rodadas) e a 8 (abrir o E-protocolo e registrar a aprovação).
 
 ---
 
@@ -308,5 +309,5 @@ Regras: um macroprocesso tem vários setores, e um setor pode estar em vários m
 7. Macroprocessos: a lista parte da Cadeia de Valor da Casa Civil ou será criada pelo EP? E a categoria (finalístico, apoio, gerencial) será usada?
 8. Arquivo-fonte do Bizagi (.bpm): obrigatório, opcional ou não guardado? O visualizador lê só o .bpmn, e o .bpm não abre no navegador.
 9. ~~O fluxograma piloto entra na numeração de versões (V1) ou fica fora dela?~~ Decidido em 2026-10-07: entra (piloto V6, técnica V7; a revisão interna só gera versão nova se houver alteração). Ver seção 3, "Detalhe das etapas 4 a 7".
-11. Etapas 7 e 8: quem é responsável por cada uma e se elas são capturadas (atribuídas a si mesmo) como a revisão interna. A etapa 7 é enviar os documentos ao setor por e-mail e registrar as rodadas; a 8 é a aprovação com o número do E-protocolo.
+11. ~~Etapas 7 e 8: quem é responsável por cada uma e se elas são capturadas (atribuídas a si mesmo) como a revisão interna.~~ Decidido em 2026-10-07: as duas são capturadas por um integrante, como a revisão interna. Ver seção 3, "Detalhe das etapas 4 a 7", item 8.
 10. Quem mantém o sistema depois de pronto

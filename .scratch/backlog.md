@@ -13,7 +13,8 @@ Uma linha por item: o que é e onde surgiu.
 - Decisão aberta: lista de macroprocessos parte da Cadeia de Valor da Casa Civil ou é criada pelo EP; a categoria (finalístico, apoio, gerencial) será usada? (especificação, item 11.7)
 - Decisão aberta: arquivo-fonte do Bizagi (.bpm) obrigatório, opcional ou não guardado. (especificação, item 11.8)
 - ~~Decisão aberta: o fluxograma piloto entra na numeração de versões (V1) ou fica fora.~~ Resolvida em 2026-10-07: entra (piloto V6, técnica V7). (especificação, item 11.9)
-- Decisão aberta: responsável pelas etapas 7 e 8 e se elas são capturadas como a revisão interna. (especificação, item 11.11)
+- ~~Decisão aberta: responsável pelas etapas 7 e 8 e se elas são capturadas como a revisão interna.~~ Resolvida em 2026-10-07: as duas são capturadas. (especificação, item 11.11)
+- Configuração do administrador: para cada etapa, escolher entre "capturada por qualquer integrante" e "sempre atribuída a um usuário fixo" (todos os processos que chegam nela vão para essa pessoa). (conversa de 2026-10-07 sobre o fluxo das etapas 4 a 8)
 - Revisão interna com opção de devolver ao autor para corrigir (hoje o revisor sempre corrige direto). (conversa de 2026-10-07 sobre o fluxo das etapas 4 a 7)
 - ~~Decisão aberta: quem mantém o sistema depois de pronto.~~ Resolvida no /projeto em 2026-10-06: a manutenção pode passar à TI do CED ou a outra equipe; documentar para isso. (especificação, item 11.10)
 
