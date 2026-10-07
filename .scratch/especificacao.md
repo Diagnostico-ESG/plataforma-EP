@@ -302,7 +302,7 @@ Regras: um macroprocesso tem vários setores, e um setor pode estar em vários m
 
 1. Plano do Supabase (backup diário) e onde o front-end será hospedado
 2. Contrato e LGPD: validação do uso de nuvem externa pelo jurídico e pela TI
-3. Login: e-mail e senha no Supabase Auth, ou integração com algum acesso do governo, se existir e for possível
+3. ~~Login: e-mail e senha no Supabase Auth, ou integração com algum acesso do governo, se existir e for possível~~ Decidido em 2026-10-07: login pela conta Google institucional (`@ccivil.pr.gov.br`) no Supabase Auth, liberado por autorização do administrador. Ver `docs/adr/0001-login-google-institucional-com-autorizacao.md`.
 4. Drive institucional: a cópia dos arquivos entra na v1.5?
 5. Publicação: só interna ou também no site da Casa Civil
 6. Formato e origem dos dados atuais para importação (planilha, base do Power BI). Na importação, o macroprocesso pode ficar em branco e aparece como pendência a preencher.

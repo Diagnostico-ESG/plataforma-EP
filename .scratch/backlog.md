@@ -6,7 +6,7 @@ Uma linha por item: o que é e onde surgiu.
 
 - Decisão aberta: plano do Supabase (backup diário) e onde o front-end será hospedado. (especificação, item 11.1)
 - Decisão aberta: validação do uso de nuvem externa pelo jurídico e pela TI (contrato e LGPD). (especificação, item 11.2)
-- Decisão aberta: login por e-mail e senha no Supabase Auth ou integração com acesso do governo, se existir. (especificação, item 11.3)
+- ~~Decisão aberta: login por e-mail e senha no Supabase Auth ou integração com acesso do governo, se existir.~~ Resolvida em 2026-10-07: conta Google institucional, liberada por autorização (ADR 0001). (especificação, item 11.3)
 - Decisão aberta: a cópia dos arquivos para o Drive institucional entra na v1.5? (especificação, item 11.4)
 - Decisão aberta: publicação só interna ou também no site da Casa Civil. (especificação, item 11.5)
 - Decisão aberta: formato e origem dos dados atuais para importação (planilha, base do Power BI). (especificação, item 11.6)
@@ -36,5 +36,7 @@ Uma linha por item: o que é e onde surgiu.
 - EP depois: acesso dos responsáveis dos setores à plataforma (hoje só os 6 integrantes do EP usam). (/projeto, 2026-10-06)
 - EP depois: registrar quem consultou cada dado (abrir processo, baixar arquivo), se jurídico/TI exigirem; v1 registra só alterações. (/projeto, 2026-10-06)
 - Pedir à TI a liberação de saída para `*.pooler.supabase.com` nas portas 5432 e 6543 (necessária para publicar em produção; hoje migrações e testes de banco vão à mão pelo SQL Editor). Surgiu no `/setup`, 2026-10-06.
-- EP v1 (Login e perfis): foto do usuário no perfil, com iniciais quando não houver foto. Foto é dado pessoal (LGPD): bucket privado, URL assinada, envio opcional pelo próprio usuário ou pelo administrador, remoção possível. Responsáveis dos setores (não usuários) só com iniciais. Surgiu na `/concepcao-livre`, 2026-10-07.
-- EP v1 (Login e perfis): trocar o ícone "Sua conta" da barra superior pelo avatar do usuário logado (foto ou iniciais; componente `Avatar` já existe). Sem login não há usuário a mostrar, e o projeto não inventa pessoas. Surgiu no `/implementar-identidade`, 2026-10-07.
+- EP depois (ajustado na sabatina de login-perfis, 2026-10-07: a v1 mostra a foto da conta Google, sem envio): envio de foto própria do usuário no perfil, com iniciais quando não houver foto. Foto é dado pessoal (LGPD): bucket privado, URL assinada, envio opcional pelo próprio usuário ou pelo administrador, remoção possível. Responsáveis dos setores (não usuários) só com iniciais. Surgiu na `/concepcao-livre`, 2026-10-07.
+- EP v1 (Login e perfis): trocar o ícone "Sua conta" da barra superior pelo avatar do usuário logado (foto ou iniciais; componente `Avatar` já existe). Sem login não há usuário a mostrar, e o projeto não inventa pessoas. Surgiu no `/implementar-identidade`, 2026-10-07. Entra na spec de login-perfis (sabatina de 2026-10-07).
+- EP depois: como atender a um pedido de eliminação de dados pela LGPD de quem já foi usuário (por exemplo, trocar nome e e-mail por "Usuário removido" no histórico), depois de o jurídico dizer se o registro de quem fez o quê precisa ser mantido. Surgiu na sabatina de login-perfis, 2026-10-07 (ADR 0002).
+- EP depois: integrar um login do governo como provedor adicional, se um dia existir e for útil. Surgiu na sabatina de login-perfis, 2026-10-07 (ADR 0001).
