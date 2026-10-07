@@ -12,6 +12,6 @@
 
 - [ ] `eventos`: leitura só para Administrador ativo; ninguém inclui, altera ou apaga pela plataforma (só os gatilhos incluem). Cada célula com teste pgTAP para cada perfil, inativo e visitante.
 - [ ] Módulo de acesso ganha listar histórico (real e falso).
-- [ ] Lista na área Administração com data e hora, autor (nome; "SQL no painel" quando o autor é nulo), ação em texto legível e o antes e depois.
+- [ ] Lista na área Administração com data e hora, autor (nome; "Configuração inicial (direto no banco)" quando o autor é nulo, como na autorização do primeiro administrador), ação em texto legível e o antes e depois.
 - [ ] Estados: "Carregando histórico…", "Nenhuma alteração registrada ainda." e erro com [Tentar de novo].
 - [ ] Testes de interface com o aplicativo inteiro e o módulo falso, cobrindo lista, vazio, erro e a ausência do histórico para quem não é administrador.

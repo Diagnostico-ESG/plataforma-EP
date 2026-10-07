@@ -12,7 +12,7 @@
 
 - [ ] Migração não destrutiva cria o tipo `perfil` e as tabelas `usuarios`, `usuarios_emails`, `autorizacoes` e `eventos`, todas com RLS ligada, e as funções auxiliares (perfil do usuário atual e se está ativo) em schema não exposto com `search_path` vazio.
 - [ ] Barreira antes da criação da conta: e-mail fora de `@ccivil.pr.gov.br` é recusado; e-mail do domínio sem autorização é recusado; cada recusa devolve um código de motivo. Gancho "antes de criar usuário" do Supabase Auth, ou gatilho na tabela de usuários do Auth se o gancho não estiver disponível (conferir na documentação atual e registrar a escolha).
-- [ ] Primeiro acesso: cria a linha em `usuarios` com o perfil da autorização, nome e foto do Google, cria a linha em `usuarios_emails`, remove a autorização e grava o evento `primeiro_acesso`.
+- [ ] Primeiro acesso: cria a linha em `usuarios` com o perfil da autorização, nome e foto do Google, cria a linha em `usuarios_emails`, remove a autorização e grava o evento `primeiro_acesso` com a própria pessoa que entrou como autor (não nulo: autor nulo fica reservado ao que é feito direto no banco).
 - [ ] Políticas de leitura de `usuarios` e `usuarios_emails` conforme a tabela "quem pode o quê" da spec (inativo vê só a própria linha; e-mail só o próprio e o Administrador; visitante nada), cada célula com teste pgTAP; testes da barreira e do primeiro acesso.
 - [ ] Comando SQL do primeiro administrador com o marcador `<meu-email>`, documentado para rodar no SQL Editor de cada ambiente.
 - [ ] Módulo de acesso injetado no aplicativo (sessão atual, entrar com o Google, sair, ler o próprio usuário), com implementação real pela chave publicável e implementação falsa nomeada para os testes.
