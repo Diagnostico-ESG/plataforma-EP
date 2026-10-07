@@ -23,3 +23,5 @@
 - [x] Testes de interface renderizando o aplicativo inteiro com o módulo falso, cobrindo cada estado da tela de entrada, o avatar, o menu e o Sair.
 - [x] Passo do usuário, guiado em linguagem simples: criar o cliente OAuth no Google Cloud (público "Interno", se disponível), colar identificador e segredo no painel do Supabase, cadastrar os endereços de retorno e rodar o SQL do primeiro administrador.
 - [x] Ponta a ponta manual com a conta do próprio usuário: primeiro acesso, avatar, Sair e recusa de uma conta não autorizada.
+
+Concluído em 2026-10-07 (commit 79d5934)
