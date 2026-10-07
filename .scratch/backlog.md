@@ -18,6 +18,7 @@ Uma linha por item: o que é e onde surgiu.
 - Revisão interna com opção de devolver ao autor para corrigir (hoje o revisor sempre corrige direto). (conversa de 2026-10-07 sobre o fluxo das etapas 4 a 7)
 - ~~Decisão aberta: quem mantém o sistema depois de pronto.~~ Resolvida no /projeto em 2026-10-06: a manutenção pode passar à TI do CED ou a outra equipe; documentar para isso. (especificação, item 11.10)
 - Migrar o cliente OAuth do Google da conta pessoal (provisória) para um projeto do Google Cloud na conta institucional, quando a TI liberar; passos em `docs/implantacao-login.md`. Antes da produção, se possível. (login-perfis, ticket 01, 2026-10-07)
+- Bug: se o "Sair" falhar (ex.: sem conexão), nada acontece e nenhuma mensagem aparece; a pessoa continua dentro sem saber por quê (`sair` em `src/hooks/useEntrada.ts` não trata a falha de `acesso.sair()`). Caminho: `/demanda`. (achado na leitura da cobertura, execução do ticket 02 de login-perfis, 2026-10-07)
 
 ## Versões posteriores da especificação
 
