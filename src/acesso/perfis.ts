@@ -6,6 +6,8 @@ const ROTULO_DO_PERFIL: Record<Perfil, string> = {
   consulta: 'Consulta',
 }
 
+export const PERFIS: readonly Perfil[] = ['administrador', 'integrante_ep', 'consulta']
+
 export function rotuloDoPerfil(perfil: Perfil): string {
   return ROTULO_DO_PERFIL[perfil]
 }
