@@ -749,7 +749,7 @@ values (lower(btrim('<meu-email>')), 'administrador');
 
 ### Tarefa 7: Passo do usuário e ponta a ponta (critérios 12 e 13)
 
-- [ ] **7.1** Guiar o usuário pelo `docs/implantacao-login.md`, um passo por vez, esperando a confirmação de cada um. Ele mesmo cola segredos e o próprio e-mail no painel.
-- [ ] **7.2** Com `npm run dev` (em segundo plano) aberto no navegador interno ou no navegador dele, o usuário faz: primeiro acesso com a própria conta → Quadro com o avatar dele; abrir o menu (nome, "Administrador", Sair); Sair → tela de entrada; entrar com uma conta não autorizada (ex.: pessoal) → mensagem de fora do domínio. Conferir, com o usuário, os critérios `[visual]` da tela de entrada e do avatar.
-- [ ] **7.3** Se a recusa chegar sem a mensagem certa (o Auth pode embrulhar o texto do gancho), ajustar `PADRAO_DA_RECUSA` com um teste novo em `motivos.test.ts` que reproduza o texto real (sem e-mail real: trocar pelo fictício).
-- [ ] **7.4** Marcar as caixas dos critérios no ticket e comitar: `Conclui o ticket 01 de login-perfis`.
+- [x] **7.1** Guiar o usuário pelo `docs/implantacao-login.md`, um passo por vez, esperando a confirmação de cada um. Ele mesmo cola segredos e o próprio e-mail no painel.
+- [x] **7.2** Com `npm run dev` (em segundo plano) aberto no navegador interno ou no navegador dele, o usuário faz: primeiro acesso com a própria conta → Quadro com o avatar dele; abrir o menu (nome, "Administrador", Sair); Sair → tela de entrada; entrar com uma conta não autorizada (ex.: pessoal) → mensagem de fora do domínio. Conferir, com o usuário, os critérios `[visual]` da tela de entrada e do avatar.
+- [x] **7.3** (não foi preciso: o texto do gancho chegou intacto) Se a recusa chegar sem a mensagem certa (o Auth pode embrulhar o texto do gancho), ajustar `PADRAO_DA_RECUSA` com um teste novo em `motivos.test.ts` que reproduza o texto real (sem e-mail real: trocar pelo fictício).
+- [x] **7.4** Marcar as caixas dos critérios no ticket e comitar: `Conclui o ticket 01 de login-perfis`.
