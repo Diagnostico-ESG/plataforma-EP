@@ -10,3 +10,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-07 | identidade-visual | polir | US$ 1,34
 2026-10-07 | login-perfis | /situação + /planejar (sabatina e spec) | US$ 2,96
 2026-10-07 | login-perfis | /situação + /planejar (tickets) | US$ 1,46
+2026-10-07 | login-perfis | /executar-complexo (ticket 01) | US$ 8,26
