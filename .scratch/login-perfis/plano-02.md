@@ -1330,7 +1330,15 @@ export function AreaDeUsuarios({ acesso }: AreaDeUsuariosProps) {
 
 ### Tarefa 6: Conferência final
 
-- [ ] **6.1** `npm run test:coverage` (≥ 70%), `npm run typecheck`, `npm run lint`, `npm run check:circular`, todos passando.
+- [x] **6.1** `npm run test:coverage` (≥ 70%), `npm run typecheck`, `npm run lint`, `npm run check:circular`, todos passando.
 - [ ] **6.2 Olhar a tela.** Subir `npm run dev` em segundo plano e abrir no navegador interno só a tela de entrada (entrar pelo Google é do usuário). Pedir ao usuário, logado como administrador no dev: abrir Administração; autorizar um e-mail inventado `@ccivil.pr.gov.br`; mudar o perfil dele; excluí-lo; tentar `pessoa@gmail.com` e um e-mail já autorizado; conferir as pílulas com texto e cor. Depois, no SQL Editor, `select acao, autor_id is not null as tem_autor, detalhes from public.eventos where entidade = 'autorizacao' order by id desc limit 5;` deve mostrar `excluir_autorizacao`, `mudar_perfil`, `autorizar` com autor.
 - [ ] **6.3** Marcar os critérios do ticket que passaram e anotar na spec, se algo mudou na execução (com a data).
 - [ ] **6.4 Commit** do plano e do ticket marcados.
+
+## Retomada (2026-10-07)
+
+Parado no passo 6.2, por decisão do usuário (opção A): o teste na tela espera o usuário estar no computador (a entrada pelo Google é dele; o navegador embutido não tinha sessão). Tarefas 1 a 5 e 6.1 concluídas e commitadas na branch `login-perfis` (não juntada à `main`): 390 testes de tela, cobertura 95%, testes de banco 04 (29/29), 02 (10/10) e 03 (12/12) passando no dev pelo SQL Editor.
+
+Para continuar: `git switch login-perfis`, conferir que o servidor de desenvolvimento atende em `http://localhost:5173` (o retorno do Google está configurado para essa porta), pedir ao usuário os 6 passos do 6.2 e a consulta de eventos, depois 6.3, 6.4 e o passo 4 do `/executar-complexo` (juntar à `main`, `git branch -d`, linha `Concluído em` no ticket 02).
+
+Pendência fora do projeto: um rascunho `tmp_perfis.txt` ficou na raiz do Git Bash; a trava não deixou apagar. Sem conteúdo sensível; o usuário apaga.
