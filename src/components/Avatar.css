@@ -1,0 +1,15 @@
+.avatar {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar-iniciais {
+  background: var(--azul-avatar);
+  color: var(--azul-escuro);
+  font-weight: 600;
+  line-height: 1;
+  user-select: none;
+}

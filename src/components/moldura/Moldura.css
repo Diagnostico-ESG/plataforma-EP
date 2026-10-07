@@ -1,0 +1,147 @@
+.moldura {
+  display: grid;
+  grid-template:
+    'barra barra' auto
+    'faixa trabalho' minmax(0, 1fr)
+    / 56px minmax(0, 1fr);
+  height: 100%;
+}
+
+.area-de-trabalho {
+  grid-area: trabalho;
+  overflow: auto;
+  background: var(--fundo);
+}
+
+/* Faixa lateral de ícones */
+
+.faixa-lateral {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  grid-area: faixa;
+  gap: var(--esp-1);
+  padding-top: var(--esp-3);
+  background: var(--folha);
+  border-right: 1px solid var(--linha);
+}
+
+.faixa-item {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: var(--canto);
+  background: transparent;
+  color: var(--icone-inativo);
+  cursor: pointer;
+  transition:
+    color 150ms var(--curva-saida),
+    background-color 150ms var(--curva-saida);
+}
+
+.faixa-item:hover {
+  color: var(--texto-2);
+  background: var(--fundo);
+}
+
+.faixa-item[aria-current='page'] {
+  color: var(--azul);
+  background: var(--azul-claro);
+}
+
+/* Linha acesa: a área atual ganha o traço azul na borda da faixa. */
+.faixa-item[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: -9px;
+  bottom: 8px;
+  border-right: var(--linha-acesa);
+}
+
+/* Barra superior */
+
+.barra-superior {
+  display: flex;
+  align-items: center;
+  grid-area: barra;
+  gap: var(--esp-4);
+  min-height: 52px;
+  padding-right: var(--esp-4);
+  background: var(--azul);
+  color: var(--folha);
+}
+
+.barra-marca {
+  /* Mesma largura da faixa lateral: o "EP" fica em cima da coluna de ícones. */
+  flex: none;
+  width: 56px;
+  text-align: center;
+  font-size: var(--tam-painel);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.barra-titulo {
+  overflow: hidden;
+  font-size: var(--tam-coluna);
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.alternancia {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 18%);
+}
+
+.alternancia-opcao {
+  padding: 3px var(--esp-3);
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--folha);
+  font-size: var(--tam-secundario);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.alternancia-opcao[aria-pressed='true'] {
+  background: var(--folha);
+  color: var(--azul);
+}
+
+.barra-acoes {
+  display: flex;
+  gap: var(--esp-1);
+  margin-left: auto;
+}
+
+.barra-icone {
+  color: var(--folha);
+}
+
+.barra-icone:hover {
+  background: rgb(255 255 255 / 16%);
+}
+
+/* Na barra azul o contorno azul sumiria: o foco vira branco. */
+.barra-superior :focus-visible {
+  outline-color: var(--folha);
+}
+
+@media (max-width: 480px) {
+  .barra-superior {
+    gap: var(--esp-2);
+    padding-right: var(--esp-2);
+  }
+
+  .barra-titulo {
+    display: none;
+  }
+}

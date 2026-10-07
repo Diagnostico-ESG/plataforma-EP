@@ -1,0 +1,35 @@
+.pilula {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--esp-2);
+  border-radius: 999px;
+  font-size: var(--tam-rotulo);
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.pilula-atraso {
+  background: var(--atraso-fundo);
+  color: var(--atraso-texto);
+}
+
+.pilula-vencendo {
+  background: var(--vencendo-fundo);
+  color: var(--vencendo-texto);
+}
+
+.pilula-informativa {
+  background: var(--informativa-fundo);
+  color: var(--informativa-texto);
+}
+
+.pilula-aprovado {
+  background: var(--aprovado-fundo);
+  color: var(--aprovado-texto);
+}
+
+.pilula-neutra {
+  background: var(--neutra-fundo);
+  color: var(--neutra-texto);
+}

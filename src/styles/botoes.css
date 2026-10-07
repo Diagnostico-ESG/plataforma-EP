@@ -1,0 +1,54 @@
+/* Botões como classes sobre o <button> nativo: não há comportamento próprio que justifique um componente. */
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-2);
+  min-height: 32px;
+  padding: 0 var(--esp-3);
+  border: 1px solid transparent;
+  border-radius: var(--canto-botao);
+  font-size: var(--tam-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 150ms var(--curva-saida),
+    border-color 150ms var(--curva-saida);
+}
+
+.botao:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.botao-principal {
+  background: var(--azul);
+  color: var(--folha);
+}
+
+.botao-principal:hover:not(:disabled) {
+  background: var(--azul-escuro);
+}
+
+.botao-secundario {
+  background: var(--folha);
+  border-color: var(--linha);
+  color: var(--texto);
+}
+
+.botao-secundario:hover:not(:disabled) {
+  border-color: var(--linha-forte);
+}
+
+/* Botão só com ícone: sempre com aria-label. */
+.botao-icone {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--canto-botao);
+  background: transparent;
+  cursor: pointer;
+}
