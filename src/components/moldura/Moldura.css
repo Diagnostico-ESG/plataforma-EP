@@ -52,12 +52,13 @@
   background: var(--azul-claro);
 }
 
-/* Linha acesa: a área atual ganha o traço azul na borda da faixa. */
+/* Linha acesa: a área atual ganha o traço azul na borda da faixa.
+   O recuo é o espaço entre o item e a borda de 1px (7,5px); com -8px o traço caía em meio pixel e borrava. */
 .faixa-item[aria-current='page']::after {
   content: '';
   position: absolute;
   top: 8px;
-  right: -8px;
+  right: calc((var(--largura-faixa) - 1px - 40px) / -2);
   bottom: 8px;
   border-right: var(--linha-acesa);
 }
@@ -114,6 +115,13 @@
 .alternancia-opcao[aria-pressed='true'] {
   background: var(--folha);
   color: var(--azul);
+}
+
+/* No alto contraste do Windows o fundo some e a opção escolhida ficaria igual à outra. */
+@media (forced-colors: active) {
+  .alternancia-opcao[aria-pressed='true'] {
+    outline: 1px solid CanvasText;
+  }
 }
 
 .barra-acoes {
