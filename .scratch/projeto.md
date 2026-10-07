@@ -15,7 +15,7 @@ Plataforma web interna do Centro Estadual de Desburocratização (CED) para cont
 
 ## Funcionalidades da v1, na ordem de planejamento
 
-1. **Login e perfis:** usuários, os três perfis, criação de contas pela plataforma e segurança por perfil no banco.
+1. **Login e perfis** (login-perfis)**:** usuários, os três perfis, criação de contas pela plataforma e segurança por perfil no banco.
 2. **Cadastros básicos:** setores (sigla e responsável), macroprocessos e os setores de cada macroprocesso.
 3. **Processos e etapas:** processos e subprocessos, catálogo de etapas configurável, andamento com dispensa e "realizada anteriormente", reclassificação e o histórico de alterações (que as funcionalidades seguintes também alimentam).
 4. **Reuniões:** de sensibilização e de modelagem, com data, local, participantes e anotações.
