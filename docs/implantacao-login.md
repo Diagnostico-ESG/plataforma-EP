@@ -15,6 +15,16 @@ A migração `supabase/migrations/20261007200505_login_perfis.sql` precisa estar
 
 Escolha registrada em 2026-10-07: gancho do Supabase Auth como barreira principal (devolve a mensagem própria), conferido na documentação atual, e gatilho como segunda barreira.
 
+## Arranjo provisório (2026-10-07): projeto do Google Cloud em conta pessoal
+
+O responsável não consegue criar o projeto do Google Cloud com a conta institucional. Por enquanto, o cliente OAuth fica num projeto criado com a conta Google pessoal dele, sem organização. A conta pessoal só é dona do projeto no Google Cloud e não entra na plataforma; quem entra continua usando a conta `@ccivil.pr.gov.br`, e o banco continua barrando o resto.
+
+Diferenças em relação ao passo 1 abaixo:
+
+- Só existe o público **Externo** (o Interno exige Google Workspace). Escopos: apenas `openid`, `email` e `profile`, que não pedem verificação do Google. Clique em **Enviar para produção**; em "Testando", só entrariam os e-mails da lista de teste.
+- Limitações: o domínio institucional pode bloquear o app ("Entre em contato com o administrador do seu domínio" ou `access_not_configured`), o que só o administrador do domínio resolve; se a conta pessoal for perdida, o login cai; a tela do Google mostra `<ref>.supabase.co`.
+- Migração (backlog): criar o projeto e o cliente OAuth na conta institucional, com o mesmo URI de retorno, e trocar o ID e o segredo no painel do Supabase. Os usuários continuam os mesmos, porque o Supabase os identifica pela conta Google, não pelo cliente.
+
 ## 1. Google Cloud: cliente OAuth
 
 1. Em console.cloud.google.com, com a conta institucional, crie (ou escolha) um projeto para a plataforma.
