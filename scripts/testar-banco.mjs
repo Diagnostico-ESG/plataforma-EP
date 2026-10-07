@@ -8,6 +8,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import pg from 'pg'
+import { linhasDoRelatorio } from './relatorio-tap.mjs'
 
 const PASTA = 'supabase/tests'
 const ARQUIVO_ENV = '.env.banco.local'
@@ -54,6 +55,8 @@ async function rodarArquivo(url, caminho) {
     if (!temPlano) falhas.push('o arquivo não devolveu um plano de testes (falta "select plan(n)" ou "select * from finish()"?)')
     return { linhas, falhas }
   } catch (erro) {
+    const linhas = linhasDoRelatorio(erro.message)
+    if (linhas) return { linhas, falhas: linhas.filter(falhou) }
     return { linhas: [], falhas: [`erro de SQL: ${erro.message}`] }
   } finally {
     await cliente.end() // encerra a sessão; a transação aberta pelo teste é desfeita

@@ -95,7 +95,8 @@ O administrador tem a área Administração > Usuários, onde vê todos os usuá
   - conta fora do domínio: "Use sua conta @ccivil.pr.gov.br. A conta {e-mail} não é institucional.";
   - sem autorização: "A conta {e-mail} ainda não foi autorizada. Peça a um administrador.";
   - inativo: "Seu acesso está inativo. Fale com um administrador.";
-  - falha de conexão: "Não foi possível conectar. Verifique a conexão e tente de novo." com [Tentar de novo].
+  - falha de conexão: "Não foi possível conectar. Verifique a conexão e tente de novo." com [Tentar de novo];
+  - erro do Auth sem motivo conhecido (ex.: cadastro desligado no painel): "Não foi possível entrar com essa conta. Tente de novo ou fale com um administrador." (incluído em 2026-10-07, na execução do ticket 01, por decisão do usuário: o retorno silencioso à tela de entrada confundia).
 - **Barra superior:** o ícone "Sua conta" dá lugar ao avatar do usuário logado (componente Avatar já existente, tamanho 32), que abre um menu com nome, perfil e Sair.
 - **Navegação:** o item Administração da faixa lateral só aparece para o Administrador e leva a Administração > Usuários. Para outro perfil que chegue lá, a área mostra "Seu perfil ({perfil}) não permite administrar usuários. Peça a um administrador para mudar seu perfil."
 - **Administração > Usuários:** tabela compacta (sem cartões) com avatar, nome, e-mail, perfil e situação em pílula (Ativo, Inativo, Aguardando primeiro acesso), e as ações de cada linha conforme a situação. Formulário "Autorizar e-mail" (e-mail + perfil, perfil padrão Consulta). Estados:

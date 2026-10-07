@@ -1,0 +1,58 @@
+.entrada {
+  display: grid;
+  place-items: center;
+  min-height: 100%;
+  padding: var(--esp-4);
+  background: var(--fundo);
+}
+
+/* Folha branca com a linha acesa no topo: a entrada é o único foco da tela. */
+.entrada-cartao {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--esp-4);
+  width: 100%;
+  max-width: 360px;
+  padding: var(--esp-6) var(--esp-5);
+  border: 1px solid var(--linha);
+  border-top: var(--linha-acesa);
+  border-radius: var(--canto);
+  background: var(--folha);
+  text-align: center;
+}
+
+.entrada-marca {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--canto);
+  background: var(--azul);
+  color: var(--folha);
+  font-size: var(--tam-painel);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.entrada-titulo {
+  font-size: var(--tam-pagina);
+  font-weight: 600;
+}
+
+.entrada-mensagem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--esp-3);
+  color: var(--texto-2);
+  text-wrap: pretty;
+}
+
+.entrada-erro {
+  width: 100%;
+  padding: var(--esp-3);
+  border-radius: var(--canto-botao);
+  background: var(--atraso-fundo);
+  color: var(--atraso-texto);
+}

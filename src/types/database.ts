@@ -39,7 +39,123 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      autorizacoes: {
+        Row: {
+          criada_em: string
+          criada_por: string | null
+          email: string
+          perfil: Database["public"]["Enums"]["perfil"]
+        }
+        Insert: {
+          criada_em?: string
+          criada_por?: string | null
+          email: string
+          perfil?: Database["public"]["Enums"]["perfil"]
+        }
+        Update: {
+          criada_em?: string
+          criada_por?: string | null
+          email?: string
+          perfil?: Database["public"]["Enums"]["perfil"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "autorizacoes_criada_por_fkey"
+            columns: ["criada_por"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      eventos: {
+        Row: {
+          acao: string
+          autor_id: string | null
+          detalhes: Json
+          entidade: string
+          entidade_ref: string
+          id: number
+          ocorrido_em: string
+        }
+        Insert: {
+          acao: string
+          autor_id?: string | null
+          detalhes: Json
+          entidade: string
+          entidade_ref: string
+          id?: never
+          ocorrido_em?: string
+        }
+        Update: {
+          acao?: string
+          autor_id?: string | null
+          detalhes?: Json
+          entidade?: string
+          entidade_ref?: string
+          id?: never
+          ocorrido_em?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eventos_autor_id_fkey"
+            columns: ["autor_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      usuarios: {
+        Row: {
+          ativo: boolean
+          foto_url: string | null
+          id: string
+          nome: string
+          perfil: Database["public"]["Enums"]["perfil"]
+          primeiro_acesso_em: string
+        }
+        Insert: {
+          ativo?: boolean
+          foto_url?: string | null
+          id: string
+          nome: string
+          perfil: Database["public"]["Enums"]["perfil"]
+          primeiro_acesso_em?: string
+        }
+        Update: {
+          ativo?: boolean
+          foto_url?: string | null
+          id?: string
+          nome?: string
+          perfil?: Database["public"]["Enums"]["perfil"]
+          primeiro_acesso_em?: string
+        }
+        Relationships: []
+      }
+      usuarios_emails: {
+        Row: {
+          email: string
+          usuario_id: string
+        }
+        Insert: {
+          email: string
+          usuario_id: string
+        }
+        Update: {
+          email?: string
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usuarios_emails_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: true
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -48,7 +164,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      perfil: "administrador" | "integrante_ep" | "consulta"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -178,6 +294,8 @@ export const Constants = {
     Enums: {},
   },
   public: {
-    Enums: {},
+    Enums: {
+      perfil: ["administrador", "integrante_ep", "consulta"],
+    },
   },
 } as const

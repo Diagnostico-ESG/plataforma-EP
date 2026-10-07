@@ -1,11 +1,14 @@
+import type { UsuarioAtual } from '../../acesso/tipos'
 import { Icone } from '../Icone'
+import { MenuDaConta } from './MenuDaConta'
 
 type BarraSuperiorProps = {
   titulo: string
+  usuario: UsuarioAtual
+  aoSair: () => void
 }
 
-// Sem login ainda: o lugar do avatar mostra o ícone de conta até a funcionalidade "Login e perfis".
-export function BarraSuperior({ titulo }: BarraSuperiorProps) {
+export function BarraSuperior({ titulo, usuario, aoSair }: BarraSuperiorProps) {
   return (
     <header className="barra-superior">
       <span className="barra-marca">EP</span>
@@ -22,9 +25,7 @@ export function BarraSuperior({ titulo }: BarraSuperiorProps) {
         <button type="button" className="botao-icone barra-icone" aria-label="Filtrar" title="Filtrar">
           <Icone nome="filtro" />
         </button>
-        <button type="button" className="botao-icone barra-icone" aria-label="Sua conta" title="Sua conta">
-          <Icone nome="conta" />
-        </button>
+        <MenuDaConta usuario={usuario} aoSair={aoSair} />
       </div>
     </header>
   )

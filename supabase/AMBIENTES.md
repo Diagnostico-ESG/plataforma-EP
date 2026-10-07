@@ -8,3 +8,7 @@
 - último teste de restauração: nenhum
 
 Observação (2026-10-06): na rede do escritório, só a porta 443 abre. Migrações e testes de banco vão à mão pelo SQL Editor do painel (ver `.scratch/inicio-projeto.md`).
+
+Migrações aplicadas à mão no dev pelo SQL Editor (fora do histórico da CLI; registrar com `npx supabase migration repair --status applied <versão>` numa rede liberada, antes da primeira publicação em produção):
+
+- 20261007200505_login_perfis (2026-10-07; testes 02 e 03 passaram pelo SQL Editor)
