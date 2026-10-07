@@ -1,8 +1,9 @@
 import { rotuloDoPerfil } from '../../acesso/perfis'
-import type { LinhaDeUsuario, SituacaoDoUsuario } from '../../acesso/tipos'
+import type { LinhaDeUsuario, Perfil, SituacaoDoUsuario } from '../../acesso/tipos'
 import type { EstadoDaLista } from '../../hooks/useUsuarios'
 import { Avatar } from '../Avatar'
 import { Pilula, type SituacaoPilula } from '../Pilula'
+import { SeletorDePerfil } from './SeletorDePerfil'
 
 const ROTULO_DA_SITUACAO: Record<SituacaoDoUsuario, string> = {
   ativo: 'Ativo', inativo: 'Inativo', aguardando: 'Aguardando primeiro acesso',
@@ -12,9 +13,13 @@ const PILULA_DA_SITUACAO: Record<SituacaoDoUsuario, SituacaoPilula> = {
 }
 const LINHAS_FANTASMA = 3
 
-type ListaDeUsuariosProps = { lista: EstadoDaLista; aoTentarDeNovo: () => void }
+type AcoesDaLinha = {
+  aoMudarPerfil: (email: string, perfil: Perfil) => void
+  aoExcluir: (email: string) => void
+}
+type ListaDeUsuariosProps = AcoesDaLinha & { lista: EstadoDaLista; aoTentarDeNovo: () => void }
 
-export function ListaDeUsuarios({ lista, aoTentarDeNovo }: ListaDeUsuariosProps) {
+export function ListaDeUsuarios({ lista, aoTentarDeNovo, ...acoes }: ListaDeUsuariosProps) {
   if (lista.tipo === 'erro') {
     return (
       <div className="administracao-erro" role="alert">
@@ -35,7 +40,7 @@ export function ListaDeUsuarios({ lista, aoTentarDeNovo }: ListaDeUsuariosProps)
       <tbody>
         {lista.tipo === 'carregando'
           ? Array.from({ length: LINHAS_FANTASMA }, (_, i) => <LinhaFantasma key={i} />)
-          : lista.linhas.map((linha) => <LinhaDaTabela key={linha.chave} linha={linha} />)}
+          : lista.linhas.map((linha) => <LinhaDaTabela key={linha.chave} linha={linha} {...acoes} />)}
       </tbody>
     </table>
   )
@@ -49,7 +54,9 @@ function LinhaFantasma() {
   )
 }
 
-function LinhaDaTabela({ linha }: { linha: LinhaDeUsuario }) {
+// Neste ticket só a autorização aguardando tem ações; as de usuário que já entrou vêm no ticket 03.
+function LinhaDaTabela({ linha, aoMudarPerfil, aoExcluir }: AcoesDaLinha & { linha: LinhaDeUsuario }) {
+  const aguardando = linha.situacao === 'aguardando'
   return (
     <tr>
       <td>
@@ -59,9 +66,21 @@ function LinhaDaTabela({ linha }: { linha: LinhaDeUsuario }) {
         </span>
       </td>
       <td>{linha.email}</td>
-      <td>{rotuloDoPerfil(linha.perfil)}</td>
+      <td>
+        {aguardando
+          ? <SeletorDePerfil rotulo={`Perfil de ${linha.email}`} valor={linha.perfil}
+              aoMudar={(perfil) => aoMudarPerfil(linha.email, perfil)} />
+          : rotuloDoPerfil(linha.perfil)}
+      </td>
       <td><Pilula situacao={PILULA_DA_SITUACAO[linha.situacao]}>{ROTULO_DA_SITUACAO[linha.situacao]}</Pilula></td>
-      <td />
+      <td>
+        {aguardando && (
+          <button type="button" className="botao botao-secundario" aria-label={`Excluir autorização de ${linha.email}`}
+            onClick={() => aoExcluir(linha.email)}>
+            Excluir
+          </button>
+        )}
+      </td>
     </tr>
   )
 }

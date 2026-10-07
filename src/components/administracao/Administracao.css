@@ -73,3 +73,38 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+.form-autorizacao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-2) var(--esp-3);
+  padding: var(--esp-4);
+  background: var(--folha);
+  border: 1px solid var(--linha);
+  border-radius: var(--canto);
+}
+
+.form-autorizacao-titulo {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: var(--tam-base);
+}
+
+.form-autorizacao input {
+  min-width: 28ch;
+}
+
+.form-autorizacao input,
+.seletor-perfil {
+  font: inherit;
+  padding: var(--esp-1) var(--esp-2);
+  border: 1px solid var(--linha);
+  border-radius: var(--canto-botao);
+  background: var(--folha);
+  color: var(--texto);
+}
+
+.form-autorizacao .administracao-falha {
+  flex-basis: 100%;
+  margin: 0;
+}
