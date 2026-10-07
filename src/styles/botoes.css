@@ -37,7 +37,7 @@
 }
 
 .botao-secundario:hover:not(:disabled) {
-  border-color: var(--linha-forte);
+  border-color: var(--linha-tracejada);
 }
 
 /* Botão só com ícone: sempre com aria-label. */

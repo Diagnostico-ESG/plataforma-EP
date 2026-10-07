@@ -1,0 +1,786 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-07T15:27:08.688Z",
+  "title": "Design System: Plataforma do EP",
+  "extensions": {
+    "colorMeta": {
+      "azul": {
+        "role": "primary",
+        "displayName": "Azul Elétrico",
+        "canonical": "#3a5afe",
+        "tonalRamp": [
+          "oklch(15% 0.200 268.2)",
+          "oklch(27% 0.200 268.2)",
+          "oklch(39% 0.200 268.2)",
+          "oklch(51% 0.200 268.2)",
+          "oklch(63% 0.200 268.2)",
+          "oklch(75% 0.200 268.2)",
+          "oklch(86% 0.080 268.2)",
+          "oklch(95% 0.080 268.2)"
+        ]
+      },
+      "azul-claro": {
+        "role": "primary",
+        "displayName": "Azul Névoa",
+        "canonical": "#e8edff",
+        "tonalRamp": [
+          "oklch(15% 0.025 273.5)",
+          "oklch(27% 0.025 273.5)",
+          "oklch(39% 0.025 273.5)",
+          "oklch(51% 0.025 273.5)",
+          "oklch(63% 0.025 273.5)",
+          "oklch(75% 0.025 273.5)",
+          "oklch(86% 0.010 273.5)",
+          "oklch(95% 0.010 273.5)"
+        ]
+      },
+      "azul-escuro": {
+        "role": "primary",
+        "displayName": "Azul Tinta",
+        "canonical": "#2a44c9",
+        "tonalRamp": [
+          "oklch(15% 0.200 268.0)",
+          "oklch(27% 0.200 268.0)",
+          "oklch(39% 0.200 268.0)",
+          "oklch(51% 0.200 268.0)",
+          "oklch(63% 0.200 268.0)",
+          "oklch(75% 0.200 268.0)",
+          "oklch(86% 0.080 268.0)",
+          "oklch(95% 0.080 268.0)"
+        ]
+      },
+      "azul-avatar": {
+        "role": "primary",
+        "displayName": "Azul Lavanda",
+        "canonical": "#d9dfff",
+        "tonalRamp": [
+          "oklch(15% 0.044 277.1)",
+          "oklch(27% 0.044 277.1)",
+          "oklch(39% 0.044 277.1)",
+          "oklch(51% 0.044 277.1)",
+          "oklch(63% 0.044 277.1)",
+          "oklch(75% 0.044 277.1)",
+          "oklch(86% 0.018 277.1)",
+          "oklch(95% 0.018 277.1)"
+        ]
+      },
+      "fundo": {
+        "role": "neutral",
+        "displayName": "Papel Frio",
+        "canonical": "#edf1f9",
+        "tonalRamp": [
+          "oklch(15% 0.012 264.5)",
+          "oklch(27% 0.012 264.5)",
+          "oklch(39% 0.012 264.5)",
+          "oklch(51% 0.012 264.5)",
+          "oklch(63% 0.012 264.5)",
+          "oklch(75% 0.012 264.5)",
+          "oklch(86% 0.005 264.5)",
+          "oklch(95% 0.005 264.5)"
+        ]
+      },
+      "folha": {
+        "role": "neutral",
+        "displayName": "Folha",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "oklch(15% 0.000 89.9)",
+          "oklch(27% 0.000 89.9)",
+          "oklch(39% 0.000 89.9)",
+          "oklch(51% 0.000 89.9)",
+          "oklch(63% 0.000 89.9)",
+          "oklch(75% 0.000 89.9)",
+          "oklch(86% 0.000 89.9)",
+          "oklch(95% 0.000 89.9)"
+        ]
+      },
+      "linha": {
+        "role": "neutral",
+        "displayName": "Linha",
+        "canonical": "#e1e6ef",
+        "tonalRamp": [
+          "oklch(15% 0.013 262.4)",
+          "oklch(27% 0.013 262.4)",
+          "oklch(39% 0.013 262.4)",
+          "oklch(51% 0.013 262.4)",
+          "oklch(63% 0.013 262.4)",
+          "oklch(75% 0.013 262.4)",
+          "oklch(86% 0.005 262.4)",
+          "oklch(95% 0.005 262.4)"
+        ]
+      },
+      "linha-tracejada": {
+        "role": "neutral",
+        "displayName": "Linha Tracejada",
+        "canonical": "#c3cad8",
+        "tonalRamp": [
+          "oklch(15% 0.021 264.5)",
+          "oklch(27% 0.021 264.5)",
+          "oklch(39% 0.021 264.5)",
+          "oklch(51% 0.021 264.5)",
+          "oklch(63% 0.021 264.5)",
+          "oklch(75% 0.021 264.5)",
+          "oklch(86% 0.008 264.5)",
+          "oklch(95% 0.008 264.5)"
+        ]
+      },
+      "barra-coluna-trilho": {
+        "role": "neutral",
+        "displayName": "Barra coluna trilho",
+        "canonical": "#d5dbe7",
+        "status": "planned: token defined, component not built",
+        "tonalRamp": [
+          "oklch(15% 0.018 264.5)",
+          "oklch(27% 0.018 264.5)",
+          "oklch(39% 0.018 264.5)",
+          "oklch(51% 0.018 264.5)",
+          "oklch(63% 0.018 264.5)",
+          "oklch(75% 0.018 264.5)",
+          "oklch(86% 0.007 264.5)",
+          "oklch(95% 0.007 264.5)"
+        ]
+      },
+      "barra-coluna": {
+        "role": "neutral",
+        "displayName": "Barra coluna",
+        "canonical": "#9aa6be",
+        "status": "planned: token defined, component not built",
+        "tonalRamp": [
+          "oklch(15% 0.037 264.3)",
+          "oklch(27% 0.037 264.3)",
+          "oklch(39% 0.037 264.3)",
+          "oklch(51% 0.037 264.3)",
+          "oklch(63% 0.037 264.3)",
+          "oklch(75% 0.037 264.3)",
+          "oklch(86% 0.015 264.3)",
+          "oklch(95% 0.015 264.3)"
+        ]
+      },
+      "texto": {
+        "role": "neutral",
+        "displayName": "Tinta",
+        "canonical": "#1e2433",
+        "tonalRamp": [
+          "oklch(15% 0.030 267.5)",
+          "oklch(27% 0.030 267.5)",
+          "oklch(39% 0.030 267.5)",
+          "oklch(51% 0.030 267.5)",
+          "oklch(63% 0.030 267.5)",
+          "oklch(75% 0.030 267.5)",
+          "oklch(86% 0.012 267.5)",
+          "oklch(95% 0.012 267.5)"
+        ]
+      },
+      "texto-2": {
+        "role": "neutral",
+        "displayName": "Tinta Secundária",
+        "canonical": "#5d6577",
+        "tonalRamp": [
+          "oklch(15% 0.030 266.4)",
+          "oklch(27% 0.030 266.4)",
+          "oklch(39% 0.030 266.4)",
+          "oklch(51% 0.030 266.4)",
+          "oklch(63% 0.030 266.4)",
+          "oklch(75% 0.030 266.4)",
+          "oklch(86% 0.012 266.4)",
+          "oklch(95% 0.012 266.4)"
+        ]
+      },
+      "icone-inativo": {
+        "role": "neutral",
+        "displayName": "Ícone em Repouso",
+        "canonical": "#8c93a3",
+        "tonalRamp": [
+          "oklch(15% 0.025 266.8)",
+          "oklch(27% 0.025 266.8)",
+          "oklch(39% 0.025 266.8)",
+          "oklch(51% 0.025 266.8)",
+          "oklch(63% 0.025 266.8)",
+          "oklch(75% 0.025 266.8)",
+          "oklch(86% 0.010 266.8)",
+          "oklch(95% 0.010 266.8)"
+        ]
+      },
+      "branco-sobre-azul-borda": {
+        "role": "neutral",
+        "displayName": "Branco sobre azul borda",
+        "canonical": "rgb(255 255 255 / 45%)"
+      },
+      "branco-sobre-azul-hover": {
+        "role": "neutral",
+        "displayName": "Branco sobre azul hover",
+        "canonical": "rgb(255 255 255 / 16%)"
+      },
+      "atraso-texto": {
+        "role": "secondary",
+        "displayName": "Atraso texto",
+        "canonical": "#a8263a",
+        "tonalRamp": [
+          "oklch(15% 0.165 17.9)",
+          "oklch(27% 0.165 17.9)",
+          "oklch(39% 0.165 17.9)",
+          "oklch(51% 0.165 17.9)",
+          "oklch(63% 0.165 17.9)",
+          "oklch(75% 0.165 17.9)",
+          "oklch(86% 0.066 17.9)",
+          "oklch(95% 0.066 17.9)"
+        ]
+      },
+      "atraso-fundo": {
+        "role": "secondary",
+        "displayName": "Atraso fundo",
+        "canonical": "#fce1e4",
+        "tonalRamp": [
+          "oklch(15% 0.030 10.0)",
+          "oklch(27% 0.030 10.0)",
+          "oklch(39% 0.030 10.0)",
+          "oklch(51% 0.030 10.0)",
+          "oklch(63% 0.030 10.0)",
+          "oklch(75% 0.030 10.0)",
+          "oklch(86% 0.012 10.0)",
+          "oklch(95% 0.012 10.0)"
+        ]
+      },
+      "vencendo-texto": {
+        "role": "secondary",
+        "displayName": "Vencendo texto",
+        "canonical": "#8a5a00",
+        "tonalRamp": [
+          "oklch(15% 0.108 73.3)",
+          "oklch(27% 0.108 73.3)",
+          "oklch(39% 0.108 73.3)",
+          "oklch(51% 0.108 73.3)",
+          "oklch(63% 0.108 73.3)",
+          "oklch(75% 0.108 73.3)",
+          "oklch(86% 0.043 73.3)",
+          "oklch(95% 0.043 73.3)"
+        ]
+      },
+      "vencendo-fundo": {
+        "role": "secondary",
+        "displayName": "Vencendo fundo",
+        "canonical": "#ffe9c7",
+        "tonalRamp": [
+          "oklch(15% 0.050 78.7)",
+          "oklch(27% 0.050 78.7)",
+          "oklch(39% 0.050 78.7)",
+          "oklch(51% 0.050 78.7)",
+          "oklch(63% 0.050 78.7)",
+          "oklch(75% 0.050 78.7)",
+          "oklch(86% 0.020 78.7)",
+          "oklch(95% 0.020 78.7)"
+        ]
+      },
+      "aprovado-texto": {
+        "role": "secondary",
+        "displayName": "Aprovado texto",
+        "canonical": "#22703a",
+        "tonalRamp": [
+          "oklch(15% 0.114 149.9)",
+          "oklch(27% 0.114 149.9)",
+          "oklch(39% 0.114 149.9)",
+          "oklch(51% 0.114 149.9)",
+          "oklch(63% 0.114 149.9)",
+          "oklch(75% 0.114 149.9)",
+          "oklch(86% 0.045 149.9)",
+          "oklch(95% 0.045 149.9)"
+        ]
+      },
+      "aprovado-fundo": {
+        "role": "secondary",
+        "displayName": "Aprovado fundo",
+        "canonical": "#ddf3e1",
+        "tonalRamp": [
+          "oklch(15% 0.033 150.8)",
+          "oklch(27% 0.033 150.8)",
+          "oklch(39% 0.033 150.8)",
+          "oklch(51% 0.033 150.8)",
+          "oklch(63% 0.033 150.8)",
+          "oklch(75% 0.033 150.8)",
+          "oklch(86% 0.013 150.8)",
+          "oklch(95% 0.013 150.8)"
+        ]
+      },
+      "neutra-texto": {
+        "role": "secondary",
+        "displayName": "Neutra texto",
+        "canonical": "#4a5163",
+        "tonalRamp": [
+          "oklch(15% 0.031 268.4)",
+          "oklch(27% 0.031 268.4)",
+          "oklch(39% 0.031 268.4)",
+          "oklch(51% 0.031 268.4)",
+          "oklch(63% 0.031 268.4)",
+          "oklch(75% 0.031 268.4)",
+          "oklch(86% 0.012 268.4)",
+          "oklch(95% 0.012 268.4)"
+        ]
+      },
+      "neutra-fundo": {
+        "role": "secondary",
+        "displayName": "Neutra fundo",
+        "canonical": "#eef0f4",
+        "tonalRamp": [
+          "oklch(15% 0.006 264.5)",
+          "oklch(27% 0.006 264.5)",
+          "oklch(39% 0.006 264.5)",
+          "oklch(51% 0.006 264.5)",
+          "oklch(63% 0.006 264.5)",
+          "oklch(75% 0.006 264.5)",
+          "oklch(86% 0.002 264.5)",
+          "oklch(95% 0.002 264.5)"
+        ]
+      },
+      "ajuda-fundo": {
+        "role": "tertiary",
+        "displayName": "Ajuda fundo",
+        "canonical": "#eef2ff",
+        "status": "planned: token defined, component not built",
+        "tonalRamp": [
+          "oklch(15% 0.018 272.3)",
+          "oklch(27% 0.018 272.3)",
+          "oklch(39% 0.018 272.3)",
+          "oklch(51% 0.018 272.3)",
+          "oklch(63% 0.018 272.3)",
+          "oklch(75% 0.018 272.3)",
+          "oklch(86% 0.007 272.3)",
+          "oklch(95% 0.007 272.3)"
+        ]
+      },
+      "ajuda-borda": {
+        "role": "tertiary",
+        "displayName": "Ajuda borda",
+        "canonical": "#c9d3ff",
+        "status": "planned: token defined, component not built",
+        "tonalRamp": [
+          "oklch(15% 0.062 275.0)",
+          "oklch(27% 0.062 275.0)",
+          "oklch(39% 0.062 275.0)",
+          "oklch(51% 0.062 275.0)",
+          "oklch(63% 0.062 275.0)",
+          "oklch(75% 0.062 275.0)",
+          "oklch(86% 0.025 275.0)",
+          "oklch(95% 0.025 275.0)"
+        ]
+      },
+      "pendencia-fundo": {
+        "role": "tertiary",
+        "displayName": "Pendencia fundo",
+        "canonical": "#fff6e5",
+        "status": "planned: token defined, component not built",
+        "tonalRamp": [
+          "oklch(15% 0.024 83.4)",
+          "oklch(27% 0.024 83.4)",
+          "oklch(39% 0.024 83.4)",
+          "oklch(51% 0.024 83.4)",
+          "oklch(63% 0.024 83.4)",
+          "oklch(75% 0.024 83.4)",
+          "oklch(86% 0.010 83.4)",
+          "oklch(95% 0.010 83.4)"
+        ]
+      },
+      "pendencia-borda": {
+        "role": "tertiary",
+        "displayName": "Pendencia borda",
+        "canonical": "#f3d28f",
+        "status": "planned: token defined, component not built",
+        "tonalRamp": [
+          "oklch(15% 0.092 84.4)",
+          "oklch(27% 0.092 84.4)",
+          "oklch(39% 0.092 84.4)",
+          "oklch(51% 0.092 84.4)",
+          "oklch(63% 0.092 84.4)",
+          "oklch(75% 0.092 84.4)",
+          "oklch(86% 0.037 84.4)",
+          "oklch(95% 0.037 84.4)"
+        ]
+      },
+      "tipo-fluxograma": {
+        "role": "tertiary",
+        "displayName": "Tipo fluxograma",
+        "canonical": "#8cc4ea",
+        "status": "planned: token defined, component not built",
+        "tonalRamp": [
+          "oklch(15% 0.079 238.7)",
+          "oklch(27% 0.079 238.7)",
+          "oklch(39% 0.079 238.7)",
+          "oklch(51% 0.079 238.7)",
+          "oklch(63% 0.079 238.7)",
+          "oklch(75% 0.079 238.7)",
+          "oklch(86% 0.032 238.7)",
+          "oklch(95% 0.032 238.7)"
+        ]
+      },
+      "tipo-relatorio": {
+        "role": "tertiary",
+        "displayName": "Tipo relatorio",
+        "canonical": "#b7a5ec",
+        "status": "planned: token defined, component not built",
+        "tonalRamp": [
+          "oklch(15% 0.102 295.5)",
+          "oklch(27% 0.102 295.5)",
+          "oklch(39% 0.102 295.5)",
+          "oklch(51% 0.102 295.5)",
+          "oklch(63% 0.102 295.5)",
+          "oklch(75% 0.102 295.5)",
+          "oklch(86% 0.041 295.5)",
+          "oklch(95% 0.041 295.5)"
+        ]
+      },
+      "tipo-reuniao": {
+        "role": "tertiary",
+        "displayName": "Tipo reuniao",
+        "canonical": "#e9cf7a",
+        "status": "planned: token defined, component not built",
+        "tonalRamp": [
+          "oklch(15% 0.109 92.9)",
+          "oklch(27% 0.109 92.9)",
+          "oklch(39% 0.109 92.9)",
+          "oklch(51% 0.109 92.9)",
+          "oklch(63% 0.109 92.9)",
+          "oklch(75% 0.109 92.9)",
+          "oklch(86% 0.044 92.9)",
+          "oklch(95% 0.044 92.9)"
+        ]
+      },
+      "tipo-email": {
+        "role": "tertiary",
+        "displayName": "Tipo email",
+        "canonical": "#f2a08c",
+        "status": "planned: token defined, component not built",
+        "tonalRamp": [
+          "oklch(15% 0.103 34.4)",
+          "oklch(27% 0.103 34.4)",
+          "oklch(39% 0.103 34.4)",
+          "oklch(51% 0.103 34.4)",
+          "oklch(63% 0.103 34.4)",
+          "oklch(75% 0.103 34.4)",
+          "oklch(86% 0.041 34.4)",
+          "oklch(95% 0.041 34.4)"
+        ]
+      },
+      "macro-violeta": {
+        "role": "tertiary",
+        "displayName": "Macro violeta",
+        "canonical": "#8e4ec6",
+        "status": "planned: token defined, component not built",
+        "tonalRamp": [
+          "oklch(15% 0.183 305.9)",
+          "oklch(27% 0.183 305.9)",
+          "oklch(39% 0.183 305.9)",
+          "oklch(51% 0.183 305.9)",
+          "oklch(63% 0.183 305.9)",
+          "oklch(75% 0.183 305.9)",
+          "oklch(86% 0.073 305.9)",
+          "oklch(95% 0.073 305.9)"
+        ]
+      },
+      "macro-ciano": {
+        "role": "tertiary",
+        "displayName": "Macro ciano",
+        "canonical": "#0797b9",
+        "status": "planned: token defined, component not built",
+        "tonalRamp": [
+          "oklch(15% 0.114 221.5)",
+          "oklch(27% 0.114 221.5)",
+          "oklch(39% 0.114 221.5)",
+          "oklch(51% 0.114 221.5)",
+          "oklch(63% 0.114 221.5)",
+          "oklch(75% 0.114 221.5)",
+          "oklch(86% 0.046 221.5)",
+          "oklch(95% 0.046 221.5)"
+        ]
+      },
+      "macro-magenta": {
+        "role": "tertiary",
+        "displayName": "Macro magenta",
+        "canonical": "#d6409f",
+        "status": "planned: token defined, component not built",
+        "tonalRamp": [
+          "oklch(15% 0.200 346.0)",
+          "oklch(27% 0.200 346.0)",
+          "oklch(39% 0.200 346.0)",
+          "oklch(51% 0.200 346.0)",
+          "oklch(63% 0.200 346.0)",
+          "oklch(75% 0.200 346.0)",
+          "oklch(86% 0.080 346.0)",
+          "oklch(95% 0.080 346.0)"
+        ]
+      },
+      "macro-indigo": {
+        "role": "tertiary",
+        "displayName": "Macro indigo",
+        "canonical": "#5b5bd6",
+        "status": "planned: token defined, component not built",
+        "tonalRamp": [
+          "oklch(15% 0.184 278.3)",
+          "oklch(27% 0.184 278.3)",
+          "oklch(39% 0.184 278.3)",
+          "oklch(51% 0.184 278.3)",
+          "oklch(63% 0.184 278.3)",
+          "oklch(75% 0.184 278.3)",
+          "oklch(86% 0.074 278.3)",
+          "oklch(95% 0.074 278.3)"
+        ]
+      },
+      "macro-oliva": {
+        "role": "tertiary",
+        "displayName": "Macro oliva",
+        "canonical": "#7a8b2e",
+        "status": "planned: token defined, component not built",
+        "tonalRamp": [
+          "oklch(15% 0.119 119.0)",
+          "oklch(27% 0.119 119.0)",
+          "oklch(39% 0.119 119.0)",
+          "oklch(51% 0.119 119.0)",
+          "oklch(63% 0.119 119.0)",
+          "oklch(75% 0.119 119.0)",
+          "oklch(86% 0.048 119.0)",
+          "oklch(95% 0.048 119.0)"
+        ]
+      },
+      "macro-cobre": {
+        "role": "tertiary",
+        "displayName": "Macro cobre",
+        "canonical": "#a0663a",
+        "status": "planned: token defined, component not built",
+        "tonalRamp": [
+          "oklch(15% 0.096 56.5)",
+          "oklch(27% 0.096 56.5)",
+          "oklch(39% 0.096 56.5)",
+          "oklch(51% 0.096 56.5)",
+          "oklch(63% 0.096 56.5)",
+          "oklch(75% 0.096 56.5)",
+          "oklch(86% 0.038 56.5)",
+          "oklch(95% 0.038 56.5)"
+        ]
+      },
+      "icone-dias": {
+        "role": "tertiary",
+        "displayName": "Âmbar dos Dias",
+        "canonical": "#c77700",
+        "status": "planned: token defined, component not built",
+        "tonalRamp": [
+          "oklch(15% 0.144 65.0)",
+          "oklch(27% 0.144 65.0)",
+          "oklch(39% 0.144 65.0)",
+          "oklch(51% 0.144 65.0)",
+          "oklch(63% 0.144 65.0)",
+          "oklch(75% 0.144 65.0)",
+          "oklch(86% 0.058 65.0)",
+          "oklch(95% 0.058 65.0)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "pagina": {
+        "displayName": "Página",
+        "purpose": "Título de página (setor, administração). Planejado."
+      },
+      "painel": {
+        "displayName": "Painel",
+        "purpose": "\"EP\" na barra superior; título do painel de detalhe (planejado)."
+      },
+      "coluna": {
+        "displayName": "Coluna",
+        "purpose": "Título da barra superior e do estado vazio; título de coluna (planejado)."
+      },
+      "base": {
+        "displayName": "Base",
+        "purpose": "Texto corrente e rótulo de botão (600)."
+      },
+      "secundario": {
+        "displayName": "Secundário",
+        "purpose": "Texto secundário, metadados; opções da alternância em 600."
+      },
+      "rotulo": {
+        "displayName": "Rótulo",
+        "purpose": "Texto das pílulas e rótulo-título de seção; 600, maiúsculas, 0,5px."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Siglas, versões, nomes de arquivo, E-protocolo, datas e contagens, com números tabulares (400/500, 11 a 12px)."
+      }
+    },
+    "shadows": [
+      {
+        "name": "sombra-flutuante",
+        "value": "0 4px 16px rgb(30 36 51 / 12%), 0 1px 3px rgb(30 36 51 / 8%)",
+        "purpose": "Só no que flutua: painel de detalhe, menus, formulário de cadastro. Definida, ainda sem uso."
+      }
+    ],
+    "borders": [
+      {
+        "name": "linha-acesa",
+        "value": "2px solid var(--azul)",
+        "purpose": "Único destaque: o que está em foco ou é atual, um por região."
+      },
+      {
+        "name": "foco",
+        "value": "outline: 2px solid var(--azul); outline-offset: 2px",
+        "purpose": "Foco do teclado; vira branco (var(--folha)) dentro da barra superior azul."
+      }
+    ],
+    "motion": [
+      {
+        "name": "curva-saida",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Curva padrão das transições de estado."
+      },
+      {
+        "name": "estado",
+        "value": "150ms",
+        "purpose": "Hover de cor, fundo e borda (botões, faixa lateral; cartão, planejado)."
+      },
+      {
+        "name": "painel",
+        "value": "200ms",
+        "purpose": "Planejado: painel de detalhe desliza da direita e o quadro esmaece."
+      },
+      {
+        "name": "mudanca-de-etapa",
+        "value": "300ms",
+        "purpose": "Planejado: brilho breve da linha acesa no cartão que mudou de coluna."
+      },
+      {
+        "name": "movimento-reduzido",
+        "value": "0s",
+        "purpose": "Com prefers-reduced-motion, tudo vira troca instantânea."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "estreito",
+        "value": "480px"
+      },
+      {
+        "name": "painel-tela-cheia",
+        "value": "900px (planejado)"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botão principal",
+      "kind": "button",
+      "refersTo": "botao-principal",
+      "description": "Ação principal da tela.",
+      "html": "<button class=\"ds-botao ds-botao-principal\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg>Cadastrar processo</button>",
+      "css": ".ds-botao{display:inline-flex;align-items:center;gap:var(--esp-2);min-height:32px;padding:0 var(--esp-3);border:1px solid transparent;border-radius:var(--canto-botao);font-family:var(--fonte);font-size:var(--tam-base);font-weight:600;cursor:pointer;transition:background-color 150ms var(--curva-saida),border-color 150ms var(--curva-saida)}.ds-botao:focus-visible{outline:2px solid var(--azul);outline-offset:2px}.ds-botao-principal{background:var(--azul);color:var(--folha)}.ds-botao-principal:hover{background:var(--azul-escuro)}"
+    },
+    {
+      "name": "Botão secundário",
+      "kind": "button",
+      "refersTo": "botao-secundario",
+      "description": "Ação de apoio ao lado da principal.",
+      "html": "<button class=\"ds-botao ds-botao-secundario\">Limpar filtros</button>",
+      "css": ".ds-botao{display:inline-flex;align-items:center;gap:var(--esp-2);min-height:32px;padding:0 var(--esp-3);border:1px solid transparent;border-radius:var(--canto-botao);font-family:var(--fonte);font-size:var(--tam-base);font-weight:600;cursor:pointer;transition:background-color 150ms var(--curva-saida),border-color 150ms var(--curva-saida)}.ds-botao:focus-visible{outline:2px solid var(--azul);outline-offset:2px}.ds-botao-secundario{background:var(--folha);border-color:var(--linha);color:var(--texto)}.ds-botao-secundario:hover{border-color:var(--linha-tracejada)}"
+    },
+    {
+      "name": "Pílulas de situação",
+      "kind": "chip",
+      "refersTo": "pilula-atraso",
+      "description": "Situação sempre escrita; cinco pares texto/fundo.",
+      "html": "<span class=\"ds-pilula ds-atraso\">3d atraso</span> <span class=\"ds-pilula ds-vencendo\">vence 2d</span> <span class=\"ds-pilula ds-informativa\">Em andamento</span> <span class=\"ds-pilula ds-aprovado\">Aprovado</span> <span class=\"ds-pilula ds-neutra\">Histórica</span>",
+      "css": ".ds-pilula{display:inline-flex;align-items:center;padding:2px var(--esp-2);border-radius:999px;font-family:var(--fonte);font-size:var(--tam-rotulo);font-weight:600;letter-spacing:.5px;text-transform:uppercase;line-height:1.4;white-space:nowrap}.ds-atraso{background:var(--atraso-fundo);color:var(--atraso-texto)}.ds-vencendo{background:var(--vencendo-fundo);color:var(--vencendo-texto)}.ds-informativa{background:var(--informativa-fundo);color:var(--informativa-texto)}.ds-aprovado{background:var(--aprovado-fundo);color:var(--aprovado-texto)}.ds-neutra{background:var(--neutra-fundo);color:var(--neutra-texto)}"
+    },
+    {
+      "name": "Avatar com iniciais",
+      "kind": "custom",
+      "refersTo": "avatar-iniciais",
+      "description": "Pessoa sem foto: iniciais em azul-escuro sobre azul-avatar; 20, 24 ou 32px.",
+      "html": "<span class=\"ds-avatar\" role=\"img\" aria-label=\"Pessoa Fictícia\" style=\"width:24px;height:24px;font-size:10px\">PF</span> <span class=\"ds-avatar\" role=\"img\" aria-label=\"Pessoa Fictícia\" style=\"width:32px;height:32px;font-size:13.4px\">PF</span>",
+      "css": ".ds-avatar{display:inline-grid;place-items:center;border-radius:50%;background:var(--azul-avatar);color:var(--azul-escuro);font-family:var(--fonte);font-weight:600;line-height:1;user-select:none}"
+    },
+    {
+      "name": "Barra superior com alternância",
+      "kind": "nav",
+      "refersTo": "barra-superior",
+      "description": "Barra azul: marca, título, alternância Quadro | Lista, ícones de filtro e conta; foco branco.",
+      "html": "<header class=\"ds-barra\"><span class=\"ds-marca\">EP</span><span class=\"ds-titulo\">Processos</span><div class=\"ds-alt\" role=\"group\" aria-label=\"Forma de ver os processos\"><button class=\"ds-alt-op\" aria-pressed=\"true\">Quadro</button><button class=\"ds-alt-op\" aria-pressed=\"false\">Lista</button></div><div class=\"ds-acoes\"><button class=\"ds-ico\" aria-label=\"Filtrar\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 5h16l-6 7.5V18l-4 2v-7.5z\"/></svg></button><button class=\"ds-ico\" aria-label=\"Sua conta\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 3.6-6 8-6s8 2 8 6\"/></svg></button></div></header>",
+      "css": ".ds-barra{display:flex;align-items:center;gap:var(--esp-4);min-height:52px;padding-right:var(--esp-4);background:var(--azul);color:var(--folha);font-family:var(--fonte)}.ds-marca{width:var(--largura-faixa);text-align:center;font-size:var(--tam-painel);font-weight:700;letter-spacing:.02em}.ds-titulo{font-size:var(--tam-coluna);font-weight:600}.ds-alt{display:inline-flex;padding:1px;border-radius:999px;border:1px solid var(--branco-sobre-azul-borda)}.ds-alt-op{padding:3px var(--esp-3);border:0;border-radius:999px;background:transparent;color:var(--folha);font:600 var(--tam-secundario) var(--fonte);cursor:pointer}.ds-alt-op[aria-pressed=\"true\"]{background:var(--folha);color:var(--azul)}.ds-acoes{display:flex;gap:var(--esp-1);margin-left:auto}.ds-ico{display:inline-grid;place-items:center;width:32px;height:32px;border:0;border-radius:var(--canto-botao);background:transparent;color:var(--folha);cursor:pointer}.ds-ico:hover{background:var(--branco-sobre-azul-hover)}.ds-barra :focus-visible{outline:2px solid var(--folha);outline-offset:2px}"
+    },
+    {
+      "name": "Faixa lateral com linha acesa",
+      "kind": "nav",
+      "refersTo": "faixa-item-ativo",
+      "description": "Navegação por ícones; a área atual ganha azul-claro e a linha acesa de 2px na borda.",
+      "html": "<nav class=\"ds-faixa\" aria-label=\"Áreas do sistema\"><button class=\"ds-item\" aria-label=\"Quadro\" aria-current=\"page\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"4\" width=\"5\" height=\"16\" rx=\"1.5\"/><rect x=\"10\" y=\"4\" width=\"5\" height=\"11\" rx=\"1.5\"/><rect x=\"17\" y=\"4\" width=\"4\" height=\"7\" rx=\"1.5\"/></svg></button><button class=\"ds-item\" aria-label=\"Lista\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01\"/></svg></button><button class=\"ds-item\" aria-label=\"Reuniões\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"5\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M3 10h18M8 3v4M16 3v4\"/></svg></button></nav>",
+      "css": ".ds-faixa{display:flex;flex-direction:column;align-items:center;gap:var(--esp-1);width:var(--largura-faixa);padding:var(--esp-3) 0;background:var(--folha);border-right:1px solid var(--linha)}.ds-item{position:relative;display:grid;place-items:center;width:40px;height:40px;border:0;border-radius:var(--canto);background:transparent;color:var(--icone-inativo);cursor:pointer;transition:color 150ms var(--curva-saida),background-color 150ms var(--curva-saida)}.ds-item:hover{color:var(--texto-2);background:var(--fundo)}.ds-item[aria-current=\"page\"]{color:var(--azul);background:var(--azul-claro)}.ds-item[aria-current=\"page\"]::after{content:'';position:absolute;top:8px;right:-8px;bottom:8px;border-right:var(--linha-acesa)}.ds-item:focus-visible{outline:2px solid var(--azul);outline-offset:2px}"
+    },
+    {
+      "name": "Bloco tracejado de estado vazio",
+      "kind": "card",
+      "refersTo": "bloco-tracejado",
+      "description": "Espaço vazio que convida a uma ação: o que houve, o que fazer e o botão.",
+      "html": "<section class=\"ds-vazio\"><h2 class=\"ds-vazio-t\">Nenhum processo cadastrado ainda.</h2><p class=\"ds-vazio-p\">Cadastre o primeiro ou importe a planilha atual.</p><button class=\"ds-vazio-b\">Cadastrar processo</button></section>",
+      "css": ".ds-vazio{display:flex;flex-direction:column;align-items:center;gap:var(--esp-2);max-width:420px;padding:var(--esp-6) var(--esp-5);border:1px dashed var(--linha-tracejada);border-radius:var(--canto);background:var(--fundo);text-align:center;font-family:var(--fonte);font-size:var(--tam-base);color:var(--texto)}.ds-vazio-t{margin:0;font-size:var(--tam-coluna);font-weight:600;text-wrap:balance}.ds-vazio-p{margin:0 0 var(--esp-3);color:var(--texto-2)}.ds-vazio-b{min-height:32px;padding:0 var(--esp-3);border:0;border-radius:var(--canto-botao);background:var(--azul);color:var(--folha);font:600 var(--tam-base) var(--fonte);cursor:pointer}.ds-vazio-b:hover{background:var(--azul-escuro)}.ds-vazio-b:focus-visible{outline:2px solid var(--azul);outline-offset:2px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "O Quadro de Etapas com Linha Acesa",
+    "overview": "Ferramenta de trabalho diário para uma equipe pequena que acompanha processos etapa por etapa. O mundo é um quadro calmo: área de trabalho azul-acinzentada clara, folhas brancas com bordas de 1px quase invisíveis e um único traço azul de 2px, a linha acesa, que marca o que está em foco ou é atual (área ativa da faixa lateral hoje; cartão escolhido, etapa atual, aba ativa e campo com foco quando essas peças existirem). Todo o resto fica quieto para que os alertas de prazo saltem.\n\nA densidade é de ferramenta: base de 13px, passos de espaçamento de 4 a 32px, controles de 32px de altura. A cor saturada aparece só onde carrega informação (situação, tipo de registro, macroprocesso); o azul principal fica reservado à barra superior, à ação principal e à linha acesa. Códigos que a equipe confere (siglas, versões, datas, contagens) usam fonte mono com números tabulares.\n\nA direção foi fixada pelo brief aprovado (`.scratch/identidade-visual.md`, 2026-10-07). A inspiração são editores de fluxo e quadros de processo, só em cor e forma. Recusa explícita: o painel administrativo genérico de cartões com sombra e cores espalhadas. Só tema claro.\n\n**Estado da construção.** O que já existe em código: tokens, fontes, ícones SVG próprios, botões, pílulas, avatar, moldura (faixa lateral + barra superior) e o estado vazio do Quadro. Cartões, colunas, painel de detalhe, caminho de etapas, barrinhas de tipo, quadradinhos de macroprocesso, caixas de aviso e animações estão definidos no brief e, em parte, já como tokens; nas seções abaixo aparecem marcados como **(planejado)**.",
+    "keyCharacteristics": [
+      "Um único destaque azul de 2px (linha acesa) acompanha o foco; nada mais compete com ele.",
+      "Folhas brancas planas com borda de 1px em `linha`; sem sombra em nada que não flutue.",
+      "Cor saturada só com significado, e sempre acompanhada de texto ou rótulo acessível.",
+      "Escala de texto fechada em seis tamanhos (11 a 20px), base 13px.",
+      "Ícones desenhados no projeto: traço 1,75 numa grade de 24, cantos e pontas arredondados."
+    ],
+    "rules": [
+      {
+        "name": "A Regra da Linha Acesa",
+        "body": "O traço azul de 2px (`--linha-acesa`) marca só o que está em foco ou é atual, um por região. Ele compensa o respiro para nada \"pular\" de lugar.",
+        "section": "colors"
+      },
+      {
+        "name": "A Regra da Cor com Significado",
+        "body": "Cor saturada só onde diz algo: situação nas pílulas, tipo nas barrinhas, macroprocesso nos quadradinhos, contagens no rodapé do cartão. Vermelho, âmbar e verde ficam com a situação (e com os ícones de dias e versões no rodapé do cartão, que o brief liga a prazo e aprovação); por isso macroprocessos e barrinhas de tipo não usam nenhum deles. A cor nunca fala sozinha: sempre há texto ou rótulo acessível.",
+        "section": "colors"
+      },
+      {
+        "name": "A Regra do Branco Translúcido",
+        "body": "Sobre a barra azul, branco translúcido só em borda e em hover de ícone, nunca como fundo atrás de texto: derrubaria o contraste do texto branco.",
+        "section": "colors"
+      },
+      {
+        "name": "A Regra do Arquivo Único",
+        "body": "Códigos de cor só existem em `src/styles/tokens.css`; todo o resto usa as variáveis.",
+        "section": "colors"
+      },
+      {
+        "name": "A Regra da Escala Fechada",
+        "body": "Seis tamanhos (`--tam-rotulo` a `--tam-pagina`), nenhum fora deles. Hierarquia vem de peso e cor antes de tamanho.",
+        "section": "typography"
+      },
+      {
+        "name": "A Regra do Mono para o que se Confere",
+        "body": "Todo código, versão, data ou contagem vai em IBM Plex Mono com números tabulares; texto corrido nunca.",
+        "section": "typography"
+      },
+      {
+        "name": "A Regra do Plano por Padrão",
+        "body": "Cartões, colunas e faixas não têm sombra. Sombra existe só em superfície que flutua sobre outra.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** usar só as variáveis de `src/styles/tokens.css`; nenhum código de cor fora dele.",
+      "**Do** reservar `azul` para barra superior, ação principal, linha acesa e foco.",
+      "**Do** marcar o que está em foco ou é atual com a linha acesa de 2px em `azul`, uma por região.",
+      "**Do** acompanhar toda cor de significado com texto ou rótulo acessível.",
+      "**Do** escrever siglas, versões, datas e contagens em IBM Plex Mono com números tabulares.",
+      "**Do** usar borda tracejada em `linha-tracejada` para espaço vazio que convida a uma ação.",
+      "**Do** desenhar ícones novos no `Icone.tsx`: SVG em grade de 24, traço 1,75, pontas arredondadas.",
+      "**Do** trocar o contorno de foco para branco sobre fundo `azul`."
+    ],
+    "donts": [
+      "**Don't** pôr sombra em cartões, colunas ou faixas; sombra só no que flutua.",
+      "**Don't** usar vermelho, âmbar ou verde em macroprocessos, barrinhas de tipo ou decoração; esses tons dizem situação.",
+      "**Don't** pôr branco translúcido como fundo atrás de texto na barra azul.",
+      "**Don't** criar tamanhos de texto fora da escala de seis passos.",
+      "**Don't** usar caractere de texto como ícone (✓, →, ★); o ícone é sempre SVG do `Icone.tsx`.",
+      "**Don't** adicionar pacote de ícones ou de fontes sem ADR."
+    ]
+  }
+}

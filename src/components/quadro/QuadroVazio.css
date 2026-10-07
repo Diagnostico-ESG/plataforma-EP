@@ -14,11 +14,13 @@
 .quadro-vazio-titulo {
   font-size: var(--tam-coluna);
   font-weight: 600;
+  text-wrap: balance;
 }
 
 .quadro-vazio-texto {
   margin-bottom: var(--esp-3);
   color: var(--texto-2);
+  text-wrap: pretty;
 }
 
 @media (max-width: 480px) {

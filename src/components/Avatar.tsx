@@ -9,6 +9,7 @@ type AvatarProps = {
 }
 
 export function Avatar({ nome, fotoUrl, tamanho = 24 }: AvatarProps) {
+  // 0,42 do diâmetro: duas iniciais em peso 600 cabem no círculo com folga nos três tamanhos.
   const estilo = { width: tamanho, height: tamanho, fontSize: tamanho * 0.42 }
   if (fotoUrl) {
     return <img className="avatar" style={estilo} src={fotoUrl} alt={nome} />

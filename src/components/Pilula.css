@@ -5,6 +5,8 @@
   border-radius: 999px;
   font-size: var(--tam-rotulo);
   font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
   line-height: 1.4;
   white-space: nowrap;
 }

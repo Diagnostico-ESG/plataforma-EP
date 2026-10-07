@@ -3,7 +3,7 @@
   grid-template:
     'barra barra' auto
     'faixa trabalho' minmax(0, 1fr)
-    / 56px minmax(0, 1fr);
+    / var(--largura-faixa) minmax(0, 1fr);
   height: 100%;
 }
 
@@ -57,7 +57,7 @@
   content: '';
   position: absolute;
   top: 8px;
-  right: -9px;
+  right: -8px;
   bottom: 8px;
   border-right: var(--linha-acesa);
 }
@@ -78,7 +78,7 @@
 .barra-marca {
   /* Mesma largura da faixa lateral: o "EP" fica em cima da coluna de ícones. */
   flex: none;
-  width: 56px;
+  width: var(--largura-faixa);
   text-align: center;
   font-size: var(--tam-painel);
   font-weight: 700;
@@ -95,9 +95,9 @@
 
 .alternancia {
   display: inline-flex;
-  padding: 2px;
+  padding: 1px;
   border-radius: 999px;
-  background: rgb(255 255 255 / 18%);
+  border: 1px solid var(--branco-sobre-azul-borda);
 }
 
 .alternancia-opcao {
@@ -127,7 +127,7 @@
 }
 
 .barra-icone:hover {
-  background: rgb(255 255 255 / 16%);
+  background: var(--branco-sobre-azul-hover);
 }
 
 /* Na barra azul o contorno azul sumiria: o foco vira branco. */
@@ -139,9 +139,5 @@
   .barra-superior {
     gap: var(--esp-2);
     padding-right: var(--esp-2);
-  }
-
-  .barra-titulo {
-    display: none;
   }
 }

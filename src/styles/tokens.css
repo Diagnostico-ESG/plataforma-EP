@@ -33,7 +33,6 @@
   --fundo: #edf1f9;
   --folha: #ffffff;
   --linha: #e1e6ef;
-  --linha-forte: #c9d0dd;
   --linha-tracejada: #c3cad8;
   --barra-coluna-trilho: #d5dbe7;
   --barra-coluna: #9aa6be;
@@ -43,13 +42,17 @@
   --texto-2: #5d6577;
   --icone-inativo: #8c93a3;
 
+  /* Sobre a barra azul: só borda e hover, nunca fundo atrás de texto (derrubaria o contraste do texto branco). */
+  --branco-sobre-azul-borda: rgb(255 255 255 / 45%);
+  --branco-sobre-azul-hover: rgb(255 255 255 / 16%);
+
   /* Pílulas de situação: texto / fundo */
   --atraso-texto: #a8263a;
   --atraso-fundo: #fce1e4;
   --vencendo-texto: #8a5a00;
   --vencendo-fundo: #ffe9c7;
-  --informativa-texto: #2a44c9;
-  --informativa-fundo: #e8edff;
+  --informativa-texto: var(--azul-escuro);
+  --informativa-fundo: var(--azul-claro);
   --aprovado-texto: #22703a;
   --aprovado-fundo: #ddf3e1;
   --neutra-texto: #4a5163;
@@ -66,7 +69,7 @@
   --tipo-relatorio: #b7a5ec;
   --tipo-reuniao: #e9cf7a;
   --tipo-email: #f2a08c;
-  --tipo-historica: #c3cad8;
+  --tipo-historica: var(--linha-tracejada);
 
   /* Macroprocessos (sem vermelho, âmbar ou verde: essas cores já dizem situação) */
   --macro-violeta: #8e4ec6;
@@ -78,8 +81,8 @@
 
   /* Ícones do rodapé do cartão */
   --icone-dias: #c77700;
-  --icone-versoes: #22703a;
-  --icone-rodadas: #3a5afe;
+  --icone-versoes: var(--aprovado-texto);
+  --icone-rodadas: var(--azul);
 
   /* Tipografia */
   --fonte: 'Source Sans 3', system-ui, sans-serif;
@@ -100,6 +103,7 @@
   --esp-6: 32px;
 
   /* Forma */
+  --largura-faixa: 56px;
   --canto: 6px;
   --canto-botao: 4px;
   --canto-macro: 2px;

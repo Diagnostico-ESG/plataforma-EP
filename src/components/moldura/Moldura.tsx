@@ -1,11 +1,10 @@
 import type { ReactNode } from 'react'
-import type { NomeIcone } from '../Icone'
 import { BarraSuperior } from './BarraSuperior'
-import { FaixaLateral } from './FaixaLateral'
+import { FaixaLateral, type AreaDoSistema } from './FaixaLateral'
 import './Moldura.css'
 
 type MolduraProps = {
-  areaAtual: NomeIcone
+  areaAtual: AreaDoSistema
   titulo: string
   children: ReactNode
 }
