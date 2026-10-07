@@ -54,3 +54,16 @@ describe('mensagemDaRecusa', () => {
     )
   })
 })
+
+describe('erro de entrada desconhecido', () => {
+  test('erro do Auth sem motivo conhecido vira recusa desconhecida', () => {
+    const url = 'http://localhost:5173/?error=access_denied&error_code=signup_disabled&error_description=Signups+not+allowed'
+    expect(lerRecusaDaUrl(url)).toEqual({ motivo: 'desconhecido', email: '' })
+  })
+
+  test('a recusa desconhecida tem mensagem própria', () => {
+    expect(mensagemDaRecusa({ motivo: 'desconhecido', email: '' })).toBe(
+      'Não foi possível entrar com essa conta. Tente de novo ou fale com um administrador.',
+    )
+  })
+})

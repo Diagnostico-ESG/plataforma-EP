@@ -10,14 +10,18 @@ export function lerRecusa(texto: string | null): RecusaDeEntrada | null {
 }
 
 // Depois do Google, o Auth volta com o erro na consulta (?) ou no fragmento (#), conforme o fluxo.
+// Erro sem motivo conhecido (ex.: cadastro desligado no painel) não pode voltar em silêncio à tela de entrada.
 export function lerRecusaDaUrl(endereco: string): RecusaDeEntrada | null {
   const url = new URL(endereco)
   const doFragmento = new URLSearchParams(url.hash.slice(1))
-  return lerRecusa(url.searchParams.get('error_description') ?? doFragmento.get('error_description'))
+  const descricao = url.searchParams.get('error_description') ?? doFragmento.get('error_description')
+  if (!descricao) return null
+  return lerRecusa(descricao) ?? { motivo: 'desconhecido', email: '' }
 }
 
 export function mensagemDaRecusa({ motivo, email }: RecusaDeEntrada): string {
   if (motivo === 'fora_do_dominio') return `Use sua conta @ccivil.pr.gov.br. A conta ${email} não é institucional.`
   if (motivo === 'sem_autorizacao') return `A conta ${email} ainda não foi autorizada. Peça a um administrador.`
-  return 'Seu acesso está inativo. Fale com um administrador.'
+  if (motivo === 'inativo') return 'Seu acesso está inativo. Fale com um administrador.'
+  return 'Não foi possível entrar com essa conta. Tente de novo ou fale com um administrador.'
 }
