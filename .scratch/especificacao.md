@@ -75,6 +75,16 @@ Status possíveis de uma etapa: pendente, em andamento, concluída, realizada an
 
 Status possíveis de um processo: em andamento, suspenso (exige motivo), concluído, cancelado (exige motivo).
 
+### Detalhe das etapas 4 a 7 (definido com o usuário em 2026-10-07)
+
+1. **Envio do piloto e atribuição.** Depois da reunião de modelagem, um integrante envia o fluxo piloto (.bpmn + .png) e, no mesmo envio, atribui a etapa 5 a um integrante do EP (o "integrante A"). Pode ser ele mesmo ou qualquer outro integrante. O piloto ganha número de versão (exemplo: V6, depois do histórico V5F).
+2. **Etapa 5.** O integrante A baixa o piloto, remodela o fluxo tecnicamente e elabora o relatório. Ao enviar os dois, nasce uma versão nova (exemplo: V7), e a etapa 5 se conclui.
+3. **Etapa 6: fila de revisão interna.** A etapa 6 começa sem responsável, aguardando revisor. Qualquer integrante pode **capturar** a revisão (atribuí-la a si mesmo), exceto o integrante A (o revisor precisa ser diferente de quem enviou).
+4. **O revisor corrige direto.** O revisor (o "integrante B") faz os ajustes ele mesmo. Se houver alteração, ele envia o fluxo e o relatório corrigidos, e nasce uma versão nova (exemplo: V8, enviada por B). Sem alteração, segue a versão de A. Devolver ao autor para corrigir fica para depois (backlog).
+5. **Três arquivos para o setor.** Ao fim da revisão interna, a versão que vai ao setor tem três arquivos: o .bpmn, o .png do fluxo e o relatório.
+6. **PNG gerado pela plataforma.** O .png é obrigatório e pode chegar de dois jeitos: enviado pelo integrante ou gerado pela plataforma a partir do .bpmn. A geração usa a mesma biblioteca do visualizador (bpmn-js, que exporta o desenho, e o navegador converte em PNG) e chega junto com ele; até lá, o envio é manual. Antes de valer, a geração precisa ser testada com arquivos reais do Bizagi, porque o desenho sai com a aparência do bpmn-js, e não com a do Bizagi.
+7. **"Pronto para envio" já fica na etapa 7.** Concluir a revisão interna leva o processo à etapa 7, na situação **"pronto para envio"**. Quando a 1ª rodada é registrada com a data de envio, a situação passa a **"com o setor"**. A situação é calculada a partir das rodadas, não gravada à parte, e o painel separa o tempo "pronto para envio" (espera no EP) do tempo "com o setor".
+
 ---
 
 ## 4. Modelo de dados
@@ -297,5 +307,6 @@ Regras: um macroprocesso tem vários setores, e um setor pode estar em vários m
 6. Formato e origem dos dados atuais para importação (planilha, base do Power BI). Na importação, o macroprocesso pode ficar em branco e aparece como pendência a preencher.
 7. Macroprocessos: a lista parte da Cadeia de Valor da Casa Civil ou será criada pelo EP? E a categoria (finalístico, apoio, gerencial) será usada?
 8. Arquivo-fonte do Bizagi (.bpm): obrigatório, opcional ou não guardado? O visualizador lê só o .bpmn, e o .bpm não abre no navegador.
-9. O fluxograma piloto entra na numeração de versões (V1) ou fica fora dela? A especificação parte de que entra, e a primeira versão técnica é a seguinte.
+9. ~~O fluxograma piloto entra na numeração de versões (V1) ou fica fora dela?~~ Decidido em 2026-10-07: entra (piloto V6, técnica V7; a revisão interna só gera versão nova se houver alteração). Ver seção 3, "Detalhe das etapas 4 a 7".
+11. Etapas 7 e 8: quem é responsável por cada uma e se elas são capturadas (atribuídas a si mesmo) como a revisão interna. A etapa 7 é enviar os documentos ao setor por e-mail e registrar as rodadas; a 8 é a aprovação com o número do E-protocolo.
 10. Quem mantém o sistema depois de pronto
