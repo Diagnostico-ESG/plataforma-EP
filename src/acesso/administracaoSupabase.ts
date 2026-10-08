@@ -1,25 +1,31 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '../types/database'
-import { motivoDaFalhaDeGravacao } from './falhasDeGravacao'
+import { falhaDeGravacao } from './falhasDeGravacao'
 import type { LinhaDeUsuario, ModuloDeAcesso, Perfil } from './tipos'
 
 type ClienteSupabase = SupabaseClient<Database>
 type FuncoesDeAdministracao = Pick<ModuloDeAcesso,
-  'listarUsuarios' | 'autorizarEmail' | 'mudarPerfilDaAutorizacao' | 'excluirAutorizacao'>
+  'listarUsuarios' | 'autorizarEmail' | 'mudarPerfilDaAutorizacao' | 'excluirAutorizacao'
+  | 'mudarPerfilDoUsuario' | 'desativarUsuario' | 'reativarUsuario' | 'corrigirNome'>
 type UsuarioDoBanco = {
   id: string; nome: string; foto_url: string | null; perfil: Perfil; ativo: boolean
   usuarios_emails: { email: string } | null
 }
+type AlteracaoDoUsuario = Pick<Database['public']['Tables']['usuarios']['Update'], 'nome' | 'perfil' | 'ativo'>
 type RespostaDeAlteracao = { data: unknown[] | null; error: { message: string; code?: string } | null }
 
 export function criarAdministracaoSupabase(cliente: ClienteSupabase): FuncoesDeAdministracao {
   return {
     listarUsuarios: () => listarUsuarios(cliente),
     autorizarEmail: (email, perfil) => autorizarEmail(cliente, email, perfil),
-    mudarPerfilDaAutorizacao: async (email, perfil) =>
-      conferirAlteracao(await cliente.from('autorizacoes').update({ perfil }).eq('email', email).select('email'), email),
-    excluirAutorizacao: async (email) =>
-      conferirAlteracao(await cliente.from('autorizacoes').delete().eq('email', email).select('email'), email),
+    mudarPerfilDaAutorizacao: async (email, perfil) => conferirAlteracao(
+      await cliente.from('autorizacoes').update({ perfil }).eq('email', email).select('email'), naoAchada(email)),
+    excluirAutorizacao: async (email) => conferirAlteracao(
+      await cliente.from('autorizacoes').delete().eq('email', email).select('email'), naoAchada(email)),
+    mudarPerfilDoUsuario: (id, perfil) => alterarUsuario(cliente, id, { perfil }),
+    desativarUsuario: (id) => alterarUsuario(cliente, id, { ativo: false }),
+    reativarUsuario: (id) => alterarUsuario(cliente, id, { ativo: true }),
+    corrigirNome: (id, nome) => alterarUsuario(cliente, id, { nome }),
   }
 }
 
@@ -45,13 +51,20 @@ function linhaDoUsuario(usuario: UsuarioDoBanco): LinhaDeUsuario {
 
 async function autorizarEmail(cliente: ClienteSupabase, email: string, perfil: Perfil): Promise<void> {
   const { error } = await cliente.from('autorizacoes').insert({ email, perfil })
-  if (error) throw new Error(motivoDaFalhaDeGravacao(error))
+  if (error) throw falhaDeGravacao(error)
+}
+
+function naoAchada(email: string): string {
+  return `a autorização de ${email} não foi encontrada (pode já ter sido usada no primeiro acesso)`
+}
+
+async function alterarUsuario(cliente: ClienteSupabase, id: string, alteracao: AlteracaoDoUsuario): Promise<void> {
+  const resposta = await cliente.from('usuarios').update(alteracao).eq('id', id).select('id')
+  conferirAlteracao(resposta, `o usuário ${id} não foi encontrado ou seu perfil não permite alterá-lo`)
 }
 
 // A RLS não acusa erro ao filtrar: nenhuma linha devolvida quer dizer que nada mudou.
-function conferirAlteracao({ data, error }: RespostaDeAlteracao, email: string): void {
-  if (error) throw new Error(motivoDaFalhaDeGravacao(error))
-  if (!data?.length) {
-    throw new Error(`a autorização de ${email} não foi encontrada (pode já ter sido usada no primeiro acesso)`)
-  }
+function conferirAlteracao({ data, error }: RespostaDeAlteracao, naoEncontrado: string): void {
+  if (error) throw falhaDeGravacao(error)
+  if (!data?.length) throw new Error(naoEncontrado)
 }

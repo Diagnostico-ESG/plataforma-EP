@@ -108,3 +108,24 @@
   flex-basis: 100%;
   margin: 0;
 }
+
+.tabela-usuarios-acoes,
+.correcao-de-nome {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-2);
+}
+
+.correcao-de-nome input {
+  padding: var(--esp-1) var(--esp-2);
+  border: 1px solid var(--linha);
+  border-radius: var(--canto-botao);
+  background: var(--folha);
+  color: var(--texto);
+}
+
+.correcao-de-nome .administracao-falha {
+  flex-basis: 100%;
+  margin: 0;
+}

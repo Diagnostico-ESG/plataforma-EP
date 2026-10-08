@@ -13,3 +13,4 @@ Migrações aplicadas à mão no dev pelo SQL Editor (fora do histórico da CLI;
 
 - 20261007200505_login_perfis (2026-10-07; testes 02 e 03 passaram pelo SQL Editor)
 - 20261007214206_autorizar_emails (2026-10-07; testes 04, 02 e 03 passaram pelo SQL Editor)
+- 20261008125853_gerir_usuarios (2026-10-08; testes 05, 02, 03 e 04 passaram pelo SQL Editor)

@@ -36,4 +36,8 @@ export type ModuloDeAcesso = {
   autorizarEmail(email: string, perfil: Perfil): Promise<void>
   mudarPerfilDaAutorizacao(email: string, perfil: Perfil): Promise<void>
   excluirAutorizacao(email: string): Promise<void>
+  mudarPerfilDoUsuario(id: string, perfil: Perfil): Promise<void>
+  desativarUsuario(id: string): Promise<void>
+  reativarUsuario(id: string): Promise<void>
+  corrigirNome(id: string, nome: string): Promise<void>
 }
