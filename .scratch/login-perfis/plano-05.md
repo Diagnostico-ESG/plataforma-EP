@@ -38,7 +38,7 @@
 
 ### Tarefa 1: Banco (critérios 1 a 5)
 
-- [ ] **1.1 Teste que falha.** Criar `supabase/tests/07_foto_google.test.sql`:
+- [x] **1.1 Teste que falha.** Criar `supabase/tests/07_foto_google.test.sql`:
 
 ```sql
 -- Foto acompanha a conta Google a cada entrada (login-perfis, ticket 05; ADR 0003).
@@ -100,8 +100,8 @@ do $$ begin
 end $$;
 ```
 
-- [ ] **1.2 Ver falhar.** Conferir o alvo. Pedir ao usuário que cole **só** o `07_foto_google.test.sql` no SQL Editor do projeto dev. Esperado: 4 de 6 `not ok` (foto nova, inativo, `avatar_url`, sem foto); "nome corrigido" e "não registra evento" já `ok`. Se vier tudo `ok`, parar: o teste não prova nada.
-- [ ] **1.3 Migração.** `npx supabase migration new foto_acompanha_google` e escrever:
+- [x] **1.2 Ver falhar.** Conferir o alvo. Pedir ao usuário que cole **só** o `07_foto_google.test.sql` no SQL Editor do projeto dev. Esperado: 4 de 6 `not ok` (foto nova, inativo, `avatar_url`, sem foto); "nome corrigido" e "não registra evento" já `ok`. Se vier tudo `ok`, parar: o teste não prova nada.
+- [x] **1.3 Migração.** `npx supabase migration new foto_acompanha_google` e escrever:
 
 ```sql
 -- Login e perfis, ticket 05 (ADR 0003): a foto acompanha a conta Google a cada entrada.
@@ -126,9 +126,9 @@ create trigger foto_acompanha_google after update on auth.users
   execute function private.acompanhar_foto_do_google();
 ```
 
-- [ ] **1.4 Aplicar e ver passar.** Pedir ao usuário, um arquivo por vez: (a) a migração (esperado: "Success. No rows returned"); (b) `07_foto_google.test.sql` (esperado: 6 de 6 `ok`); (c) `05_gerir_usuarios.test.sql` (esperado: todos `ok`; ele cobre o critério 4 e simula uma entrada sem foto); (d) `02`, `03`, `04` e `06` (esperado: todos `ok`).
-- [ ] **1.5 Tipos e registro.** `npm run db:types` (esperado: nenhuma diferença em `src/types/database.ts`). Acrescentar em `supabase/AMBIENTES.md`: `- <data>_foto_acompanha_google (2026-10-08; testes 07, 05, 02, 03, 04 e 06 passaram pelo SQL Editor)`.
-- [ ] **1.6 Commit.** `git add supabase/tests/07_foto_google.test.sql supabase/migrations/*_foto_acompanha_google.sql supabase/AMBIENTES.md src/types/database.ts` e `git commit -m "Foto do usuário acompanha a conta Google a cada entrada"`.
+- [x] **1.4 Aplicar e ver passar.** Pedir ao usuário, um arquivo por vez: (a) a migração (esperado: "Success. No rows returned"); (b) `07_foto_google.test.sql` (esperado: 6 de 6 `ok`); (c) `05_gerir_usuarios.test.sql` (esperado: todos `ok`; ele cobre o critério 4 e simula uma entrada sem foto); (d) `02`, `03`, `04` e `06` (esperado: todos `ok`).
+- [x] **1.5 Tipos e registro.** `npm run db:types` (esperado: nenhuma diferença em `src/types/database.ts`). Acrescentar em `supabase/AMBIENTES.md`: `- <data>_foto_acompanha_google (2026-10-08; testes 07, 05, 02, 03, 04 e 06 passaram pelo SQL Editor)`.
+- [x] **1.6 Commit.** `git add supabase/tests/07_foto_google.test.sql supabase/migrations/*_foto_acompanha_google.sql supabase/AMBIENTES.md src/types/database.ts` e `git commit -m "Foto do usuário acompanha a conta Google a cada entrada"`.
 
 ### Tarefa 2: Conferência final
 
