@@ -16,3 +16,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-08 | login-perfis | /situação + /executar-complexo (ticket 04) | US$ 6,10
 2026-10-08 | login-perfis | /polir | US$ 2,36
 2026-10-08 | login-perfis | /demanda + /planejar (ADR 0003) | US$ 3,51
+2026-10-08 | login-perfis | /situação + /executar-complexo (ticket 05) | US$ 5,39
