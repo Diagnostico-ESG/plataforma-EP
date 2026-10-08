@@ -18,3 +18,5 @@
 - [x] Erro ao carregar a lista ou o histórico, erro de gravação e recusas das travas em vermelho (cores de atraso da identidade); a mensagem de perfil sem permissão em amarelo (pendência).
 - [x] Testes de interface com o aplicativo inteiro e o módulo falso cobrindo janelas, Cancelar, Esc, confirmação, falha e Reativar sem janela, e o tipo de cada mensagem.
 - [x] `[visual]` Janela na identidade visual (fundo esmaecido, botão principal azul, Cancelar com foco visível); falhas em vermelho e aviso em amarelo na Administração e na entrada.
+
+Concluído em 2026-10-08 (commit da5a453)

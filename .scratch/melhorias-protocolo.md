@@ -118,3 +118,11 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Conferência na tela pouco clara para quem não é desenvolvedor.** O usuário não achou "o seletor de perfil" pelas instruções do plano. Funcionou depois de explicar o caminho (faixa lateral → Administração → coluna Perfil), qual caixa usar e qual não usar, e como criar uma linha de teste. Sugestão: o plano descrever a conferência a partir da tela inicial, com os nomes que aparecem na tela.
 - **Branch comum, `plano-06.md`, linha `Concluído em`.** Como nos tickets anteriores; linha gravada com o commit da junção. Ticket sem banco: `banco.md` não foi relido.
 - **Observação:** o comando rodou em Opus (o funil recomenda Sonnet na etapa 4), porque o usuário o chamou na sessão do `/situação`.
+
+## 2026-10-08 — /executar-complexo (login-perfis, ticket 07)
+
+- **Branch comum, `plano-07.md`, linha `Concluído em`.** Como nos tickets anteriores; linha gravada com o commit da junção. Ticket sem banco: `banco.md` não foi relido.
+- **Dependência de teste que o plano não previu.** O jsdom não tem `showModal` de `<dialog>`; foi preciso um arquivo de preparação dos testes (`src/configurarTestes.ts`) e, depois, liberar a leitura do CSS no Vitest (`css.include`). O primeiro commit foi barrado pelo pre-commit porque o teste do hook de git roda sem DOM. Sugestão: o plano de ticket com componente nativo do navegador (dialog, popover) listar de antemão o que o jsdom não suporta.
+- **Tropeço meu:** um `sed` marcou as caixas de todas as tarefas do plano, não só as da tarefa concluída; corrigido antes do commit. Sem ação no protocolo.
+- **Conferência na tela.** Instruções escritas a partir da tela inicial, com os nomes que aparecem na tela e pedido de captura recortada (sugestão do ticket 06 aplicada); o usuário confirmou sem dúvidas.
+- **Observação:** o comando rodou em Sonnet, como recomenda o funil.
