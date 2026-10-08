@@ -31,6 +31,10 @@ describe('descreverEstado', () => {
     expect(descreverEstado({ nome: 'Ana Teste', ativo: true })).toBe('Nome: Ana Teste; Situação: Ativo')
   })
 
+  test('campo que a tela não conhece aparece pelo próprio nome, e valor vazio vira travessão', () => {
+    expect(descreverEstado({ setor: null })).toBe('setor: —')
+  })
+
   test('sem estado (antes de autorizar, depois de excluir) vira travessão', () => {
     expect(descreverEstado(null)).toBe('—')
   })

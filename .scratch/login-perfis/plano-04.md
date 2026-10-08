@@ -54,7 +54,7 @@
 
 **Produz:** política `"eventos: administrador ativo lê"`; nenhum privilégio de escrita em `eventos` para `anon` e `authenticated`.
 
-- [ ] **1.1 Teste que falha.** Criar `supabase/tests/06_historico.test.sql`:
+- [x] **1.1 Teste que falha.** Criar `supabase/tests/06_historico.test.sql`:
 
 ```sql
 -- Histórico: só o administrador ativo lê eventos; ninguém grava pela API (login-perfis, ticket 04).
@@ -144,7 +144,7 @@ end $$;
 
 - [ ] **1.2 Ver falhar.** Conferir o alvo (`supabase/AMBIENTES.md` e `supabase/.temp/project-ref` = `yclkzyoebpsxmgpbcbus`). Pedir ao usuário que cole **só** o `06_historico.test.sql` no SQL Editor do projeto dev e devolva o resultado. Esperado: falhas (`not ok`) ao menos em "Administrador lê o histórico", "Visitante não lê", e em "não altera" / "não apaga" (hoje dão 0 linhas sem erro). Se vier tudo `ok`, parar: o teste não prova nada.
 
-- [ ] **1.3 Migração.** `npx supabase migration new historico_usuarios` e escrever:
+- [x] **1.3 Migração.** `npx supabase migration new historico_usuarios` e escrever:
 
 ```sql
 -- Login e perfis, ticket 04: só o administrador ativo lê o histórico; ninguém grava nele pela API.
@@ -195,8 +195,8 @@ export type EventoDoHistorico = {
 
 e em `src/acesso/historico.ts`: `AUTOR_DIRETO_NO_BANCO: string`, `textoDaAcao(acao: string, entidade: string): string`, `descreverEstado(estado: EstadoRegistrado): string`, `formatarMomento(iso: string): string`.
 
-- [ ] **2.1 Tipos.** Acrescentar os dois tipos acima a `src/acesso/tipos.ts` (ainda sem `listarHistorico`).
-- [ ] **2.2 Teste que falha.** Criar `src/acesso/historico.test.ts`:
+- [x] **2.1 Tipos.** Acrescentar os dois tipos acima a `src/acesso/tipos.ts` (ainda sem `listarHistorico`).
+- [x] **2.2 Teste que falha.** Criar `src/acesso/historico.test.ts`:
 
 ```ts
 import { describe, expect, test } from 'vitest'
@@ -242,8 +242,8 @@ test('formatarMomento mostra data e hora de Brasília', () => {
 })
 ```
 
-- [ ] **2.3 Ver falhar.** `npx vitest run src/acesso/historico.test.ts` → falha ("Failed to resolve import ./historico").
-- [ ] **2.4 Implementar.** Criar `src/acesso/historico.ts`:
+- [x] **2.3 Ver falhar.** `npx vitest run src/acesso/historico.test.ts` → falha ("Failed to resolve import ./historico").
+- [x] **2.4 Implementar.** Criar `src/acesso/historico.ts`:
 
 ```ts
 import { rotuloDoPerfil } from './perfis'
@@ -294,8 +294,8 @@ export function formatarMomento(iso: string): string {
 }
 ```
 
-- [ ] **2.5 Ver passar.** `npx vitest run src/acesso/historico.test.ts` → todos passam. (Se `formatarMomento` vier com espaço especial do Intl, ajustar o esperado ao texto real e anotar no teste o porquê.)
-- [ ] **2.6 Commit.** `git add src/acesso/tipos.ts src/acesso/historico.ts src/acesso/historico.test.ts` e `git commit -m "Traduz ação, antes e depois do histórico em texto da tela"`.
+- [x] **2.5 Ver passar.** `npx vitest run src/acesso/historico.test.ts` → todos passam. (Se `formatarMomento` vier com espaço especial do Intl, ajustar o esperado ao texto real e anotar no teste o porquê.)
+- [x] **2.6 Commit.** `git add src/acesso/tipos.ts src/acesso/historico.ts src/acesso/historico.test.ts` e `git commit -m "Traduz ação, antes e depois do histórico em texto da tela"`.
 
 ---
 
@@ -304,7 +304,7 @@ export function formatarMomento(iso: string): string {
 **Consome:** `EventoDoHistorico`, `EstadoRegistrado` (tarefa 2).
 **Produz:** `ModuloDeAcesso.listarHistorico(): Promise<EventoDoHistorico[]>`; no `AcessoFalso`: `historico: EventoDoHistorico[]`, `falharHistorico`, `segurarHistorico`, `chamadas.listarHistorico`.
 
-- [ ] **3.1 Teste que falha.** Em `src/acesso/administracaoSupabase.test.ts`: (a) o cliente falso passa a guardar as ordenações — trocar `order: () => consulta` por `order: (coluna: string, opcoes?: { ascending?: boolean }) => (pedido.ordem ??= []).push([coluna, opcoes?.ascending ?? true]) && consulta` e acrescentar `ordem?: [string, boolean][]` ao tipo `Pedido`; (b) acrescentar ao `describe`:
+- [x] **3.1 Teste que falha.** Em `src/acesso/administracaoSupabase.test.ts`: (a) o cliente falso passa a guardar as ordenações — trocar `order: () => consulta` por `order: (coluna: string, opcoes?: { ascending?: boolean }) => (pedido.ordem ??= []).push([coluna, opcoes?.ascending ?? true]) && consulta` e acrescentar `ordem?: [string, boolean][]` ao tipo `Pedido`; (b) acrescentar ao `describe`:
 
 ```ts
   test('o histórico vem do mais recente ao mais antigo, com autor, ação e o alvo pelo nome', async () => {
@@ -336,9 +336,9 @@ export function formatarMomento(iso: string): string {
   })
 ```
 
-- [ ] **3.2 Ver falhar.** `npx vitest run src/acesso/administracaoSupabase.test.ts` → falha (`listarHistorico` não existe).
-- [ ] **3.3 Interface do módulo.** Em `src/acesso/tipos.ts`, acrescentar ao `ModuloDeAcesso`: `listarHistorico(): Promise<EventoDoHistorico[]>` e mencionar o histórico no comentário do tipo.
-- [ ] **3.4 Implementação real.** Em `src/acesso/administracaoSupabase.ts`: acrescentar `'listarHistorico'` ao `Pick` de `FuncoesDeAdministracao`, `listarHistorico: () => listarHistorico(cliente),` no objeto devolvido, e:
+- [x] **3.2 Ver falhar.** `npx vitest run src/acesso/administracaoSupabase.test.ts` → falha (`listarHistorico` não existe).
+- [x] **3.3 Interface do módulo.** Em `src/acesso/tipos.ts`, acrescentar ao `ModuloDeAcesso`: `listarHistorico(): Promise<EventoDoHistorico[]>` e mencionar o histórico no comentário do tipo.
+- [x] **3.4 Implementação real.** Em `src/acesso/administracaoSupabase.ts`: acrescentar `'listarHistorico'` ao `Pick` de `FuncoesDeAdministracao`, `listarHistorico: () => listarHistorico(cliente),` no objeto devolvido, e:
 
 ```ts
 type EventoDoBanco = {
@@ -364,7 +364,7 @@ async function listarHistorico(cliente: ClienteSupabase): Promise<EventoDoHistor
 ```
 
 (importar `EstadoRegistrado` e `EventoDoHistorico` de `./tipos`). Se `listarHistorico` passar de 20 linhas ou de 10 caminhos no ESLint, extrair `eventoDoHistorico(evento, nomes)` com nome próprio.
-- [ ] **3.5 Implementação falsa.** Em `src/acesso/AcessoFalso.ts`: campos `historico: EventoDoHistorico[] = []`, `falharHistorico = false`, `segurarHistorico = false`; `chamadas` ganha `listarHistorico: 0`; e:
+- [x] **3.5 Implementação falsa.** Em `src/acesso/AcessoFalso.ts`: campos `historico: EventoDoHistorico[] = []`, `falharHistorico = false`, `segurarHistorico = false`; `chamadas` ganha `listarHistorico: 0`; e:
 
 ```ts
   async listarHistorico(): Promise<EventoDoHistorico[]> {
@@ -375,8 +375,8 @@ async function listarHistorico(cliente: ClienteSupabase): Promise<EventoDoHistor
   }
 ```
 
-- [ ] **3.6 Ver passar.** `npm test` e `npm run typecheck` → tudo verde.
-- [ ] **3.7 Commit.** `git commit -am "Acrescenta ao módulo de acesso a leitura do histórico"`.
+- [x] **3.6 Ver passar.** `npm test` e `npm run typecheck` → tudo verde.
+- [x] **3.7 Commit.** `git commit -am "Acrescenta ao módulo de acesso a leitura do histórico"`.
 
 ---
 
@@ -385,7 +385,7 @@ async function listarHistorico(cliente: ClienteSupabase): Promise<EventoDoHistor
 **Consome:** `listarHistorico`, `AcessoFalso.historico/falharHistorico/segurarHistorico/chamadas.listarHistorico` (tarefa 3); `textoDaAcao`, `descreverEstado`, `formatarMomento`, `AUTOR_DIRETO_NO_BANCO` (tarefa 2).
 **Produz:** `useCarregamento<T>(carregar: () => Promise<T>)` → `{ estado: EstadoDoCarregamento<T>, tentarDeNovo, recarregar }`; componente `HistoricoDeUsuarios`.
 
-- [ ] **4.1 Teste que falha.** Criar `src/App.historico.test.tsx`:
+- [x] **4.1 Teste que falha.** Criar `src/App.historico.test.tsx`:
 
 ```tsx
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
@@ -473,8 +473,8 @@ test.each<Perfil>(['integrante_ep', 'consulta'])('perfil %s não vê nem pede o 
 })
 ```
 
-- [ ] **4.2 Ver falhar.** `npx vitest run src/App.historico.test.tsx` → falha (não há região "Histórico de usuários").
-- [ ] **4.3 Hook compartilhado.** Criar `src/hooks/useCarregamento.ts`:
+- [x] **4.2 Ver falhar.** `npx vitest run src/App.historico.test.tsx` → falha (não há região "Histórico de usuários").
+- [x] **4.3 Hook compartilhado.** Criar `src/hooks/useCarregamento.ts`:
 
 ```ts
 import { useCallback, useEffect, useState } from 'react'
@@ -527,8 +527,8 @@ export function useUsuarios(acesso: ModuloDeAcesso, aposGravar: () => void) {
 }
 ```
 
-- [ ] **4.4 Rodar a bateria** (`npm test`): os testes de administração, autorizações e gestão continuam passando (só o hook mudou por dentro).
-- [ ] **4.5 Componente.** Criar `src/components/administracao/HistoricoDeUsuarios.tsx`:
+- [x] **4.4 Rodar a bateria** (`npm test`): os testes de administração, autorizações e gestão continuam passando (só o hook mudou por dentro).
+- [x] **4.5 Componente.** Criar `src/components/administracao/HistoricoDeUsuarios.tsx`:
 
 ```tsx
 import { AUTOR_DIRETO_NO_BANCO, descreverEstado, formatarMomento, textoDaAcao } from '../../acesso/historico'
@@ -576,7 +576,7 @@ function ItemDoHistorico({ evento }: { evento: EventoDoHistorico }) {
 ```
 
 (O texto de erro segue o padrão da spec: "o mesmo padrão de erro com [Tentar de novo]".)
-- [ ] **4.6 Ligar na área.** Em `src/components/administracao/AreaDeUsuarios.tsx`:
+- [x] **4.6 Ligar na área.** Em `src/components/administracao/AreaDeUsuarios.tsx`:
 
 ```tsx
   const listarHistorico = useCallback(() => acesso.listarHistorico(), [acesso])
@@ -585,7 +585,7 @@ function ItemDoHistorico({ evento }: { evento: EventoDoHistorico }) {
 ```
 
 e, depois de `<ListaDeUsuarios … />`, `<HistoricoDeUsuarios historico={historico.estado} aoTentarDeNovo={historico.tentarDeNovo} />` (importar `useCallback`, `useCarregamento` e `HistoricoDeUsuarios`). A área só é montada para o Administrador (`AreaDeAdministracao`), então quem não é administrador não pede o histórico.
-- [ ] **4.7 Estilo.** Acrescentar a `src/components/administracao/Administracao.css`:
+- [x] **4.7 Estilo.** Acrescentar a `src/components/administracao/Administracao.css`:
 
 ```css
 .historico {
@@ -631,14 +631,14 @@ e, depois de `<ListaDeUsuarios … />`, `<HistoricoDeUsuarios historico={histori
 }
 ```
 
-- [ ] **4.8 Ver passar.** `npm test`, `npm run typecheck`, `npm run lint` e `npm run check:circular` → tudo verde.
-- [ ] **4.9 Commit.** `git add` dos arquivos da tarefa e `git commit -m "Mostra o histórico de usuários na área Administração"`.
+- [x] **4.8 Ver passar.** `npm test`, `npm run typecheck`, `npm run lint` e `npm run check:circular` → tudo verde.
+- [x] **4.9 Commit.** `git add` dos arquivos da tarefa e `git commit -m "Mostra o histórico de usuários na área Administração"`.
 
 ---
 
 ### Tarefa 5: Conferência final
 
-- [ ] **5.1 Cobertura.** `npx vitest run --coverage --coverage.reporter=text`; informar o percentual e classificar as linhas novas sem cobertura (comportamento real sem teste / ligação com serviço real / reserva). Comportamento real sem teste ganha teste agora (é deste ticket).
+- [x] **5.1 Cobertura.** `npx vitest run --coverage --coverage.reporter=text`; informar o percentual e classificar as linhas novas sem cobertura (comportamento real sem teste / ligação com serviço real / reserva). Comportamento real sem teste ganha teste agora (é deste ticket).
 - [ ] **5.2 Teste na tela** (servidor na porta 5173; conferir antes quem ocupa a porta). Pedir ao usuário, primeiro, só os passos na tela: (1) entrar como administrador e abrir Administração; (2) ver a seção "Histórico de usuários" com os eventos já gravados (o próprio primeiro acesso, a autorização inicial como "Configuração inicial (direto no banco)", a correção de nome do ticket 03); (3) corrigir o próprio nome de novo e ver o evento novo aparecer no topo; (4) olhar a aparência (alinhamento das colunas, legibilidade de antes e depois). Nenhuma consulta SQL com dado pessoal: o que se confere é a tela.
 - [ ] **5.3 Registros.** Entrada datada no `.scratch/login-perfis/desvios.md` (coluna "Alvo" acrescentada; o que mais divergir do plano). Marcar os critérios do ticket 04.
 - [ ] **5.4 Commit** dos registros.
