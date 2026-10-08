@@ -91,21 +91,24 @@ test('Cancelar e Esc em Desativar não gravam', async () => {
   expect(linhaDe(ANA).getByText('Ativo')).toBeTruthy()
 })
 
-test('falha na gravação confirmada aparece como alerta', async () => {
-  const acesso = await abrirComoAdministrador()
-  acesso.falhaDeGravacao = 'sem conexão'
-  fireEvent.click(screen.getByRole('button', { name: `Desativar ${ANA}` }))
-  fireEvent.click(janelaAberta().getByRole('button', { name: 'Desativar' }))
-  expect(await screen.findByText('A alteração não foi salva: sem conexão.')).toBeTruthy()
-  expect(screen.queryByRole('dialog')).toBeNull()
-})
-
-test('falha ao Desativar confirmado aparece na linha da pessoa', async () => {
+test('falha ao Desativar confirmado fecha a janela e aparece na linha da pessoa', async () => {
   const acesso = await abrirComoAdministrador()
   acesso.falhaDeGravacao = 'sem conexão'
   fireEvent.click(screen.getByRole('button', { name: `Desativar ${ANA}` }))
   fireEvent.click(janelaAberta().getByRole('button', { name: 'Desativar' }))
   expect((await linhaDe(ANA).findByRole('alert')).textContent).toBe('A alteração não foi salva: sem conexão.')
+  expect(screen.queryByRole('dialog')).toBeNull()
+})
+
+test('uma nova tentativa que dá certo tira a falha da linha', async () => {
+  const acesso = await abrirComoAdministrador()
+  acesso.falhaDeGravacao = 'sem conexão'
+  fireEvent.click(screen.getByRole('button', { name: `Reativar ${BETO}` }))
+  await linhaDe(BETO).findByRole('alert')
+  acesso.falhaDeGravacao = null
+  fireEvent.click(screen.getByRole('button', { name: `Reativar ${BETO}` }))
+  await screen.findByRole('button', { name: `Desativar ${BETO}` })
+  expect(linhaDe(BETO).queryByRole('alert')).toBeNull()
 })
 
 test('falha ao Excluir confirmado aparece na linha da autorização', async () => {

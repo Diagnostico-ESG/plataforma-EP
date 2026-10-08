@@ -7,7 +7,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(15);
+insert into _tap (linha) select plan(16);
 
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 inativo.
 insert into public.autorizacoes (email, perfil) values
@@ -21,6 +21,13 @@ insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-0000000000a3', 'consulta.teste@ccivil.pr.gov.br', 'authenticated', 'authenticated'),
   ('00000000-0000-0000-0000-0000000000a4', 'inativo.teste@ccivil.pr.gov.br', 'authenticated', 'authenticated');
 update public.usuarios set ativo = false where id = '00000000-0000-0000-0000-0000000000a4';
+
+-- Sem as linhas, "nenhuma linha alterada" passaria sem provar nada: o gatilho precisa tê-las criado.
+insert into _tap (linha) select is(
+  (select count(*)::int from public.usuarios_emails where usuario_id in (
+    '00000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000a2',
+    '00000000-0000-0000-0000-0000000000a3', '00000000-0000-0000-0000-0000000000a4')), 4,
+  'o primeiro acesso criou os 4 e-mails de teste');
 
 -- Cada um tenta no próprio e-mail, o caso mais permissivo; o visitante tenta no e-mail do administrador.
 create function pg_temp.conferir_que_nao_escreve(claims text, papel text, id_alvo uuid, quem text) returns void
