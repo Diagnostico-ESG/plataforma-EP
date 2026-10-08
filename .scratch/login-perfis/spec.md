@@ -4,7 +4,7 @@ Status: ready-for-agent
 
 **Como resolve o problema.** Hoje qualquer pessoa com o endereço da plataforma veria tudo, e não há como saber quem fez o quê. Com esta funcionalidade, só entra quem tem conta institucional `@ccivil.pr.gov.br` **e** foi autorizado por um administrador. Cada usuário tem um perfil (Administrador, Integrante do EP ou Consulta) que o banco impõe em cada leitura e gravação. O administrador gere tudo pela própria plataforma (autorizar, mudar perfil, desativar, reativar, corrigir nome), e cada uma dessas mudanças fica no histórico. As funcionalidades seguintes se apoiam nisso para saber quem pode editar processos, quem enviou cada versão e quem revisou.
 
-Decisões de origem: `CONTEXT.md` (seção "Acesso"), `docs/adr/0001-login-google-institucional-com-autorizacao.md` e `docs/adr/0002-usuario-que-ja-entrou-nao-se-exclui.md`.
+Decisões de origem: `CONTEXT.md` (seção "Acesso"), `docs/adr/0001-login-google-institucional-com-autorizacao.md`, `docs/adr/0002-usuario-que-ja-entrou-nao-se-exclui.md` e `docs/adr/0003-foto-acompanha-google-e-confirmacao-na-administracao.md` (mudanças de 2026-10-08: foto que acompanha o Google, Salvar/Cancelar no perfil, confirmação de Excluir e Desativar, cores das mensagens).
 
 ## Problema
 
@@ -32,6 +32,9 @@ O administrador tem a área Administração > Usuários, onde vê todos os usuá
 10. Como usuário, quero sair da plataforma e voltar à tela de entrada, para encerrar o uso num computador compartilhado.
 11. Como pessoa que entra pela primeira vez, quero que o meu nome e a minha foto venham da conta Google, para não precisar preencher cadastro.
 12. Como usuário que é desativado enquanto está com a sessão aberta, quero deixar de ver dados assim que a plataforma voltar a consultar o banco, e ser levado à mensagem de acesso inativo.
+44. Como usuário que troca a foto da conta Google, quero ver a foto nova na plataforma a partir da minha próxima entrada, para não ficar com uma foto antiga. (ADR 0003)
+45. Como usuário que tira a foto da conta Google, quero que a plataforma passe a mostrar as minhas iniciais, para que ela não guarde uma foto que eu apaguei. (ADR 0003)
+46. Como usuário cujo nome foi corrigido pelo administrador, quero que a minha próxima entrada não traga de volta o nome do Google, mesmo que a foto seja atualizada. (ADR 0003)
 
 ### Perfis
 
@@ -63,6 +66,14 @@ O administrador tem a área Administração > Usuários, onde vê todos os usuá
 35. Como administrador, quero ver "Carregando usuários…" com linhas-fantasma enquanto a lista carrega, para saber o que está vindo.
 36. Como administrador, quero ver uma mensagem de erro com "Tentar de novo" se a lista não carregar, para recuperar sem recarregar a página.
 37. Como administrador, quero que uma alteração que falhou mostre o motivo e mantenha o que eu digitei no formulário, para não redigitar.
+47. Como administrador, quero que escolher outro perfil no seletor de uma linha não grave nada sozinho e mostre os botões Salvar e Cancelar ao lado, para que percorrer as opções com as setas do teclado não troque o perfil nem encha o histórico. (ADR 0003)
+48. Como administrador, quero gravar o perfil escolhido com Salvar e voltar ao perfil gravado com Cancelar, para decidir antes de mudar o acesso de alguém. (ADR 0003)
+49. Como administrador, quero que, se o Salvar do perfil falhar, o seletor continue com a opção que escolhi e a mensagem apareça na linha, com Salvar e Cancelar ainda disponíveis, para tentar de novo sem refazer a escolha. (ADR 0003)
+50. Como administrador, quero confirmar numa janela antes de excluir uma autorização ("Excluir a autorização de {e-mail}?"), para não excluir por um clique acidental. (ADR 0003)
+51. Como administrador, quero confirmar numa janela antes de desativar um usuário ("Desativar {nome}?"), para não tirar o acesso de alguém por um clique acidental. (ADR 0003)
+52. Como administrador, quero que a janela de confirmação abra com o Cancelar selecionado e feche com Esc sem fazer nada, para que um Enter ou Esc por reflexo não grave nada. (ADR 0003)
+53. Como administrador, quero reativar um usuário com um clique, sem confirmação, porque reativar é o desfazer do desativar. (ADR 0003)
+54. Como usuário, quero ver em vermelho as mensagens de "a ação não aconteceu" (falha ao carregar, falha ao salvar, recusa de uma trava) e em amarelo os avisos (perfil sem permissão), para saber na hora se algo deu errado ou se é só uma orientação. (ADR 0003)
 
 ### Histórico
 
@@ -86,6 +97,7 @@ O administrador tem a área Administração > Usuários, onde vê todos os usuá
 - **Inativo:** depois de entrar, a interface lê a linha do próprio usuário. Se ele está inativo, encerra a sessão e mostra a mensagem. A proteção real é a RLS: nenhum dado é entregue a usuário inativo.
 - O pedido de entrada ao Google indica o domínio institucional, para que a tela de escolha de conta sugira a conta certa. Isso é conveniência; a segurança é a barreira no banco.
 - O nome vem do Google só no primeiro acesso; depois, só o administrador o altera.
+- **Foto que acompanha o Google (ADR 0003):** um gatilho depois de alterar a conta no Auth copia o link da foto dos dados do Google para `usuarios.foto_url` quando ele muda, a cada entrada, também para o usuário inativo. Se o Google deixa de mandar foto, `foto_url` fica nulo e a interface mostra as iniciais. O gatilho não toca no nome e não registra evento (o gatilho de eventos de `usuarios` só olha nome, perfil e situação). Conferir na execução, na documentação atual do Supabase, que os dados do Google na conta do Auth são atualizados a cada entrada.
 
 ### Interface
 
@@ -105,11 +117,19 @@ O administrador tem a área Administração > Usuários, onde vê todos os usuá
   - erro de gravação: "A alteração não foi salva: {motivo}. Seus dados continuam no formulário.";
   - vazio não ocorre (há sempre ao menos o próprio administrador).
 - **Histórico de usuários**, na mesma área, do mais recente para o mais antigo. Estados: "Carregando histórico…", "Nenhuma alteração registrada ainda." e o mesmo padrão de erro com [Tentar de novo].
+- **Mudar perfil numa linha (ADR 0003):** o seletor guarda a escolha só na tela. Quando ela difere do perfil gravado, aparecem ao lado [Salvar] e [Cancelar], no padrão do "Corrigir nome". Salvar grava; Cancelar volta ao perfil gravado. Se Salvar falhar, a escolha fica no seletor, a mensagem aparece na linha e os dois botões continuam. Vale para linhas de usuário e de autorização aguardando; o seletor do formulário "Autorizar e-mail" não muda (já grava pelo botão Autorizar).
+- **Confirmação (ADR 0003):** só Excluir autorização e Desativar pedem confirmação, numa janela nativa do navegador (modal), sem dependência nova. O foco abre no [Cancelar], Esc fecha sem gravar, e o botão de confirmar é o principal (azul) com o verbo da ação. Textos:
+  - Excluir: título "Excluir a autorização de {e-mail}?", texto "A pessoa não conseguirá entrar. Para permitir de novo, autorize o e-mail outra vez.", botões [Excluir autorização] [Cancelar];
+  - Desativar: título "Desativar {nome}?", texto "{nome} perde o acesso à plataforma. O nome e o histórico continuam registrados, e você pode reativar depois.", botões [Desativar] [Cancelar].
+  Reativar e Corrigir nome não pedem confirmação. Se a gravação confirmada falhar, a mensagem aparece na linha, como nas demais ações.
+- **Cores das mensagens (ADR 0003):** vermelho (as cores de "atraso" da identidade, as mesmas da tela de entrada) para tudo que diz "a ação não aconteceu": erro ao carregar a lista ou o histórico, erro de gravação e as recusas das travas. Amarelo (caixa de pendência) só para aviso, como a mensagem de perfil sem permissão.
 - Mensagens das travas, vindas do banco e traduzidas pela interface: "Você não pode desativar a si mesmo.", "Você não pode mudar o seu próprio perfil.", "Não é possível: {nome} é o último administrador ativo.".
 
 ### Modelo de dados
 
 Migração não destrutiva: só cria tabelas, tipos e funções.
+
+Mudança de 2026-10-08 (ADR 0003): migração nova, não destrutiva, que só cria a função e o gatilho da foto; nenhuma tabela ou coluna muda, e a coluna `foto_url` continua fechada para alteração pela API.
 
 **Tipo `perfil`**: `administrador`, `integrante_ep`, `consulta`.
 
@@ -187,7 +207,8 @@ Migração não destrutiva: só cria tabelas, tipos e funções.
 | Ninguém desativa a si mesmo | gatilho antes de alterar `usuarios` | administrador tentando `ativo = falso` em si mesmo é recusado |
 | Ninguém muda o próprio perfil | idem | administrador tentando virar Consulta é recusado |
 | Sempre um administrador ativo | idem | com dois administradores, desativar um passa e o segundo é recusado |
-| Toda mudança em `usuarios` e `autorizacoes` vira evento | gatilhos depois de incluir, alterar e apagar | cada ação gera um evento com autor, antes e depois |
+| Toda mudança de nome, perfil ou situação em `usuarios`, e toda mudança em `autorizacoes`, vira evento | gatilhos depois de incluir, alterar e apagar | cada ação gera um evento com autor, antes e depois |
+| A foto acompanha o Google a cada entrada (ADR 0003) | gatilho depois de alterar a conta no Auth | link novo nos dados do Google → `foto_url` atualizado; dados sem foto → `foto_url` nulo; usuário inativo também atualizado; nome corrigido pelo administrador não muda; nenhum evento novo |
 | Evento não se altera nem se apaga | sem política de alteração e de exclusão, para qualquer perfil | tentativa de alterar e de apagar recusada |
 | E-mail sempre minúsculo e sem espaços | gatilho ou restrição na inclusão | " Fulano@CCivil.pr.gov.br " é guardado como "fulano@ccivil.pr.gov.br" |
 | E-mail único entre autorizações e usuários | verificação na inclusão da autorização | autorizar o e-mail de um usuário existente é recusado |
@@ -206,6 +227,7 @@ Aguardando primeiro acesso → (primeiro acesso) → Ativo ⇄ (desativar / reat
 
 - **Bom teste** confere o que a pessoa vê e consegue fazer (texto, botões, mensagens) ou o que o banco aceita e recusa, nunca detalhes internos.
 - **Interface (ponto de teste: a tela inteira).** Vitest com Testing Library, renderizando o aplicativo inteiro com a implementação falsa nomeada do módulo de acesso, que simula sessão, usuários, autorizações, histórico e falhas. Cobre: cada estado da tela de entrada; avatar e menu com Sair; Administração visível só ao Administrador e a mensagem para os demais perfis; cada ação da administração com sucesso e com falha (incluindo as mensagens das travas e o formulário mantido); estados de carregando, vazio e erro da lista e do histórico. Arte anterior: os testes do aplicativo e dos componentes Avatar e Pílula.
+- **Mudanças do ADR 0003, pela tela inteira:** trocar o perfil no seletor não chama a gravação; Salvar grava e esconde os botões; Cancelar volta ao perfil gravado; Salvar com falha mantém a escolha e mostra a mensagem; Excluir e Desativar abrem a janela com os textos acima, Cancelar e Esc não gravam e o botão da ação grava; Reativar grava sem janela; as mensagens de falha e de aviso aparecem cada uma no seu tipo. Arte anterior: os testes de Administração dos tickets 02 e 03.
 - **Tradução de motivos de recusa** (código do banco → mensagem) e **validação do e-mail** na interface: testes unitários pequenos.
 - **Banco.** pgTAP, um teste por célula da tabela "quem pode o quê" (com um usuário inventado de cada perfil, um inativo e um visitante) e um por regra da tabela de regras. Arte anterior: os testes de RLS ligada e de buckets privados. Nesta rede, rodados pelo SQL Editor; a bateria completa (`npm run test:db`) roda na rede liberada antes do `/ship`.
 - **Ponta a ponta manual.** Entrar com o Google no ambiente de desenvolvimento só com a conta do próprio usuário (ADR 0001): primeiro acesso, avatar, sair, e a recusa de uma conta não autorizada.
@@ -216,6 +238,7 @@ Aguardando primeiro acesso → (primeiro acesso) → Ativo ⇄ (desativar / reat
 - Senha própria, recuperação e troca de senha, servidor de e-mail (SMTP) e convite por e-mail.
 - Chave secreta e Edge Function.
 - Envio de foto própria (backlog; a v1 usa a foto do Google).
+- O nome acompanhar o Google depois do primeiro acesso, e guardar fotos antigas (ADR 0003).
 - Excluir usuário que já entrou e o tratamento de pedido de eliminação pela LGPD (backlog, ADR 0002).
 - Registro de quem consultou cada dado (backlog).
 - Integração com login do governo (backlog).
@@ -230,5 +253,8 @@ Aguardando primeiro acesso → (primeiro acesso) → Ativo ⇄ (desativar / reat
   - `[visual]` O avatar na barra superior aparece com a foto ou as iniciais, no lugar do ícone de conta, e o menu abre ancorado nele.
   - `[visual]` Na lista de usuários, a situação aparece em pílula com cor e texto (nunca só cor).
   - `[visual]` A área Administração não aparece na faixa lateral para Integrante do EP e Consulta.
+  - `[visual]` Os botões Salvar e Cancelar aparecem ao lado do seletor de perfil sem desalinhar a linha da tabela.
+  - `[visual]` A janela de confirmação segue a identidade visual (fundo esmaecido atrás, texto legível, botão principal azul e Cancelar com foco visível).
+  - `[visual]` Mensagens de falha em vermelho e o aviso de perfil sem permissão em amarelo, na Administração e na entrada.
 - Testes de banco nesta rede vão à mão pelo SQL Editor, e as migrações aplicadas assim precisam ser registradas no histórico da CLI antes da primeira publicação em produção (ver `.scratch/inicio-projeto.md`).
 - A especificação geral (`.scratch/especificacao.md`) dizia "o administrador convida os usuários"; a decisão 11.3 foi resolvida e a forma passou a ser a autorização com login Google (ADR 0001).
