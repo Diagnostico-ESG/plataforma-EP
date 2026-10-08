@@ -19,3 +19,5 @@
 - [x] Formulário "Autorizar e-mail" (e-mail + perfil, padrão Consulta) com validação do e-mail na interface (teste unitário) mostrando o valor digitado e o formato esperado.
 - [x] Estados: "Carregando usuários…" com linhas-fantasma; erro com [Tentar de novo]; erro de gravação com o motivo, mantendo o que foi digitado.
 - [x] Testes de interface com o aplicativo inteiro e o módulo falso, cobrindo cada ação com sucesso e com falha e a visibilidade por perfil.
+
+Concluído em 2026-10-08 (commit c55a1c8)
