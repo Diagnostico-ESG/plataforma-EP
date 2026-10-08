@@ -1,14 +1,19 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { textoDaFalha } from '../../acesso/falhasDeGravacao'
 import type { ModuloDeAcesso } from '../../acesso/tipos'
+import { useCarregamento } from '../../hooks/useCarregamento'
 import { useUsuarios } from '../../hooks/useUsuarios'
 import { FormularioDeAutorizacao } from './FormularioDeAutorizacao'
+import { HistoricoDeUsuarios } from './HistoricoDeUsuarios'
 import { ListaDeUsuarios } from './ListaDeUsuarios'
 
 type AreaDeUsuariosProps = { acesso: ModuloDeAcesso }
 
 export function AreaDeUsuarios({ acesso }: AreaDeUsuariosProps) {
-  const { lista, tentarDeNovo, gravar } = useUsuarios(acesso)
+  const listarHistorico = useCallback(() => acesso.listarHistorico(), [acesso])
+  const historico = useCarregamento(listarHistorico)
+  // Cada gravação gera um evento: o histórico é relido junto com a lista.
+  const { lista, tentarDeNovo, gravar } = useUsuarios(acesso, historico.recarregar)
   const [falhaNaLinha, setFalhaNaLinha] = useState<string | null>(null)
 
   // Ações de linha sem formulário: a falha aparece acima da tabela, e a linha continua como estava.
@@ -30,6 +35,7 @@ export function AreaDeUsuarios({ acesso }: AreaDeUsuariosProps) {
         aoDesativar={(id) => gravarNaLinha(() => acesso.desativarUsuario(id))}
         aoReativar={(id) => gravarNaLinha(() => acesso.reativarUsuario(id))}
         aoCorrigirNome={(id, nome) => gravar(() => acesso.corrigirNome(id, nome))} />
+      <HistoricoDeUsuarios historico={historico.estado} aoTentarDeNovo={historico.tentarDeNovo} />
     </section>
   )
 }

@@ -129,3 +129,45 @@
   flex-basis: 100%;
   margin: 0;
 }
+
+.historico {
+  display: grid;
+  gap: var(--esp-2);
+}
+
+.historico-titulo {
+  margin: 0;
+  font-size: var(--tam-base);
+}
+
+.historico-aviso {
+  margin: 0;
+  color: var(--texto-2);
+}
+
+.historico-lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--folha);
+  font-size: var(--tam-secundario);
+}
+
+.historico-item {
+  display: grid;
+  grid-template-columns: 9rem 14rem 1fr;
+  gap: var(--esp-1) var(--esp-3);
+  padding: var(--esp-2) var(--esp-3);
+  border-bottom: 1px solid var(--linha);
+}
+
+.historico-item time {
+  color: var(--texto-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.historico-mudanca {
+  grid-column: 3;
+  display: grid;
+  color: var(--texto-2);
+}
