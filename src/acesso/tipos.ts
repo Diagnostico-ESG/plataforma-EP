@@ -35,7 +35,8 @@ export type EstadoDaEntrada =
   | { tipo: 'dentro'; usuario: UsuarioAtual }
 
 /**
- * Único ponto por onde a interface fala com o Auth e com o banco no login e na administração de usuários.
+ * Único ponto por onde a interface fala com o Auth e com o banco no login, na administração de usuários e no
+ * histórico deles.
  * Falha de gravação chega como Error cuja mensagem é o motivo em português.
  */
 export type ModuloDeAcesso = {
@@ -52,4 +53,5 @@ export type ModuloDeAcesso = {
   desativarUsuario(id: string): Promise<void>
   reativarUsuario(id: string): Promise<void>
   corrigirNome(id: string, nome: string): Promise<void>
+  listarHistorico(): Promise<EventoDoHistorico[]>
 }
