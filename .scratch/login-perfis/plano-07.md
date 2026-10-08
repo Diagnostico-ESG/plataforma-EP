@@ -33,10 +33,10 @@
 
 ### Tarefa 1: Janela de confirmação (componente isolado) — C2, C5
 
-- [ ] **Passo 1: ver se o jsdom já tem `showModal`.** Rode
+- [x] **Passo 1: ver se o jsdom já tem `showModal`.** Rode
   `node -e "const {JSDOM}=require('jsdom');const w=new JSDOM('').window;console.log(typeof w.HTMLDialogElement.prototype.showModal)"`.
   Se imprimir `function`, pule o Passo 2 e o `setupFiles` (nada de `configurarTestes.ts`). Se imprimir `undefined`, siga.
-- [ ] **Passo 2: stub para o jsdom.** Crie `src/configurarTestes.ts`:
+- [x] **Passo 2: stub para o jsdom.** Crie `src/configurarTestes.ts`:
 
 ```ts
 // O jsdom não implementa showModal/close de <dialog>; este é o mínimo para os testes de interface.
@@ -51,7 +51,7 @@ HTMLDialogElement.prototype.close = function close() {
 ```
 
   Em `vite.config.ts`, dentro de `test`, acrescente `setupFiles: ['./src/configurarTestes.ts']`.
-- [ ] **Passo 3: teste que falha.** Crie `src/components/administracao/JanelaDeConfirmacao.test.tsx`:
+- [x] **Passo 3: teste que falha.** Crie `src/components/administracao/JanelaDeConfirmacao.test.tsx`:
 
 ```tsx
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
@@ -105,8 +105,8 @@ test('Esc (o navegador fecha o <dialog>) pede para fechar sem confirmar', () => 
 })
 ```
 
-- [ ] **Passo 4: rodar e ver falhar.** `npx vitest run src/components/administracao/JanelaDeConfirmacao.test.tsx` — esperado: falha por `JanelaDeConfirmacao` não existir.
-- [ ] **Passo 5: implementar.** Crie `src/components/administracao/JanelaDeConfirmacao.tsx`:
+- [x] **Passo 4: rodar e ver falhar.** `npx vitest run src/components/administracao/JanelaDeConfirmacao.test.tsx` — esperado: falha por `JanelaDeConfirmacao` não existir.
+- [x] **Passo 5: implementar.** Crie `src/components/administracao/JanelaDeConfirmacao.tsx`:
 
 ```tsx
 import { useEffect, useId, useRef } from 'react'
@@ -155,7 +155,7 @@ export function JanelaDeConfirmacao({ aberta, titulo, texto, rotuloDaAcao, aoCon
 }
 ```
 
-- [ ] **Passo 6: CSS.** Acrescente ao fim de `Administracao.css`:
+- [x] **Passo 6: CSS.** Acrescente ao fim de `Administracao.css`:
 
 ```css
 .janela-confirmacao {
@@ -184,8 +184,8 @@ export function JanelaDeConfirmacao({ aberta, titulo, texto, rotuloDaAcao, aoCon
 ```
 
   O foco visível do Cancelar vem de `:focus-visible` global em `src/index.css:61`; se na conferência na tela não estiver nítido, ajuste ali na tarefa 4.
-- [ ] **Passo 7: rodar e ver passar.** Mesmo comando do Passo 4. Se `queryByRole('dialog')` fechada ainda achar o elemento (jsdom sem `display: none`), troque o primeiro teste para `expect((document.querySelector('dialog') as HTMLDialogElement).open).toBe(false)` e o `getByRole('dialog')` dos outros por `{ hidden: false }` equivalente — o importante é provar aberto e fechado.
-- [ ] **Passo 8: commit.** `git add src/configurarTestes.ts vite.config.ts src/components/administracao && git commit -m "Janela de confirmação nativa para ações que tiram acesso"`.
+- [x] **Passo 7: rodar e ver passar.** Mesmo comando do Passo 4. Se `queryByRole('dialog')` fechada ainda achar o elemento (jsdom sem `display: none`), troque o primeiro teste para `expect((document.querySelector('dialog') as HTMLDialogElement).open).toBe(false)` e o `getByRole('dialog')` dos outros por `{ hidden: false }` equivalente — o importante é provar aberto e fechado.
+- [x] **Passo 8: commit.** `git add src/configurarTestes.ts vite.config.ts src/components/administracao && git commit -m "Janela de confirmação nativa para ações que tiram acesso"`.
 
 ---
 
