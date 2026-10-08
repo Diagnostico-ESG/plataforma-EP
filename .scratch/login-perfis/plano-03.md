@@ -408,7 +408,7 @@ function mensagemDoErro(erro: unknown): string {
 **Consome:** `falhaDeGravacao`, `TravaDoBanco` (tarefa 2).
 **Produz:** no `ModuloDeAcesso`: `mudarPerfilDoUsuario(id: string, perfil: Perfil): Promise<void>`, `desativarUsuario(id: string): Promise<void>`, `reativarUsuario(id: string): Promise<void>`, `corrigirNome(id: string, nome: string): Promise<void>`. No `AcessoFalso`: as quatro, e `falhaDeGravacao: string | Error | null`.
 
-- [ ] **3.1 Teste que falha.** Acrescentar ao `describe` de `src/acesso/administracaoSupabase.test.ts` (importar `TravaDoBanco` de `./falhasDeGravacao`):
+- [x] **3.1 Teste que falha.** Acrescentar ao `describe` de `src/acesso/administracaoSupabase.test.ts` (importar `TravaDoBanco` de `./falhasDeGravacao`):
 
 ```ts
   test('mudar perfil, desativar, reativar e corrigir nome alteram só a coluna, filtrando pelo id', async () => {
@@ -444,8 +444,8 @@ function mensagemDoErro(erro: unknown): string {
   })
 ```
 
-- [ ] **3.2 Ver falhar:** `npx vitest run src/acesso/administracaoSupabase.test.ts`.
-- [ ] **3.3 Implementar.**
+- [x] **3.2 Ver falhar:** `npx vitest run src/acesso/administracaoSupabase.test.ts`.
+- [x] **3.3 Implementar.**
   - `src/acesso/tipos.ts`: acrescentar ao `ModuloDeAcesso`:
 
     ```ts
@@ -498,8 +498,8 @@ function mensagemDoErro(erro: unknown): string {
       }
     ```
 
-- [ ] **3.4 Ver passar:** `npm test` e `npm run typecheck`, verdes.
-- [ ] **3.5 Commit:** `Acrescenta ao módulo de acesso as alterações de usuário`.
+- [x] **3.4 Ver passar:** `npm test` e `npm run typecheck`, verdes.
+- [x] **3.5 Commit:** `Acrescenta ao módulo de acesso as alterações de usuário`.
 
 ---
 
@@ -538,7 +538,7 @@ async function abrirComoAdministrador() {
   const acesso = AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'administrador' as Perfil })
   acesso.linhas = [...LINHAS]
   render(<App acesso={acesso} />)
-  await screen.findByRole('table')
+  await screen.findByRole('table', { busy: false })
   return acesso
 }
 

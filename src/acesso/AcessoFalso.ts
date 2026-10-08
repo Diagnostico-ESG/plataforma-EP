@@ -19,7 +19,7 @@ export class AcessoFalso implements ModuloDeAcesso {
   linhas: LinhaDeUsuario[] = []
   falharLista = false
   segurarLista = false
-  falhaDeGravacao: string | null = null
+  falhaDeGravacao: string | Error | null = null
 
   static logadoComo(usuario: UsuarioAtual = USUARIO_DE_TESTE): AcessoFalso {
     const acesso = new AcessoFalso()
@@ -72,8 +72,30 @@ export class AcessoFalso implements ModuloDeAcesso {
     this.linhas = this.linhas.filter((linha) => linha.email !== email)
   }
 
-  // A falha simulada traz o motivo já em português, como o módulo real entrega.
+  async mudarPerfilDoUsuario(id: string, perfil: Perfil): Promise<void> {
+    this.alterarLinha(id, { perfil })
+  }
+
+  async desativarUsuario(id: string): Promise<void> {
+    this.alterarLinha(id, { situacao: 'inativo' })
+  }
+
+  async reativarUsuario(id: string): Promise<void> {
+    this.alterarLinha(id, { situacao: 'ativo' })
+  }
+
+  async corrigirNome(id: string, nome: string): Promise<void> {
+    this.alterarLinha(id, { nome })
+  }
+
+  private alterarLinha(chave: string, mudanca: Partial<LinhaDeUsuario>): void {
+    this.conferirGravacao()
+    this.linhas = this.linhas.map((linha) => (linha.chave === chave ? { ...linha, ...mudanca } : linha))
+  }
+
+  // A falha simulada traz o motivo já em português (texto) ou a trava pronta (TravaDoBanco), como o módulo real.
   private conferirGravacao(): void {
-    if (this.falhaDeGravacao) throw new Error(this.falhaDeGravacao)
+    if (this.falhaDeGravacao === null) return
+    throw typeof this.falhaDeGravacao === 'string' ? new Error(this.falhaDeGravacao) : this.falhaDeGravacao
   }
 }

@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { describe, expect, test } from 'vitest'
 import type { Database } from '../types/database'
 import { criarAdministracaoSupabase } from './administracaoSupabase'
+import { TravaDoBanco } from './falhasDeGravacao'
 
 type RespostaDoBanco = { data: unknown; error: { message: string; code?: string } | null }
 type Pedido = { tabela: string; operacao: string; valores?: unknown; filtro?: [string, string] }
@@ -83,5 +84,37 @@ describe('criarAdministracaoSupabase', () => {
     cliente.respostas['autorizacoes.delete'] = { data: [{ email: 'x.teste@ccivil.pr.gov.br' }], error: null }
     await criar(cliente).excluirAutorizacao('x.teste@ccivil.pr.gov.br')
     expect(cliente.pedidos[0]).toMatchObject({ operacao: 'delete', filtro: ['email', 'x.teste@ccivil.pr.gov.br'] })
+  })
+
+  test('mudar perfil, desativar, reativar e corrigir nome alteram só a coluna, filtrando pelo id', async () => {
+    const cliente = new ClienteDeAdministracaoFalso()
+    cliente.respostas['usuarios.update'] = { data: [{ id: 'u1' }], error: null }
+    const administracao = criar(cliente)
+    await administracao.mudarPerfilDoUsuario('u1', 'consulta')
+    await administracao.desativarUsuario('u1')
+    await administracao.reativarUsuario('u1')
+    await administracao.corrigirNome('u1', 'Ana Corrigida')
+    expect(cliente.pedidos.map(({ tabela, operacao, valores, filtro }) => ({ tabela, operacao, valores, filtro })))
+      .toEqual([
+        { tabela: 'usuarios', operacao: 'update', valores: { perfil: 'consulta' }, filtro: ['id', 'u1'] },
+        { tabela: 'usuarios', operacao: 'update', valores: { ativo: false }, filtro: ['id', 'u1'] },
+        { tabela: 'usuarios', operacao: 'update', valores: { ativo: true }, filtro: ['id', 'u1'] },
+        { tabela: 'usuarios', operacao: 'update', valores: { nome: 'Ana Corrigida' }, filtro: ['id', 'u1'] },
+      ])
+  })
+
+  test('alteração de usuário que não muda nenhuma linha vira falha com o id', async () => {
+    const cliente = new ClienteDeAdministracaoFalso()
+    cliente.respostas['usuarios.update'] = { data: [], error: null }
+    await expect(criar(cliente).desativarUsuario('u1')).rejects.toThrow(/usuário u1 não foi encontrado/)
+  })
+
+  test('a trava do banco chega como TravaDoBanco com a frase da tela', async () => {
+    const cliente = new ClienteDeAdministracaoFalso()
+    cliente.respostas['usuarios.update'] = { data: null,
+      error: { message: 'ultimo_administrador:Ana Teste', code: 'P0001' } }
+    const falha = await criar(cliente).desativarUsuario('u1').catch((erro: unknown) => erro)
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect((falha as Error).message).toBe('Não é possível: Ana Teste é o último administrador ativo.')
   })
 })
