@@ -11,4 +11,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-07 | login-perfis | /situação + /planejar (sabatina e spec) | US$ 2,96
 2026-10-07 | login-perfis | /situação + /planejar (tickets) | US$ 1,46
 2026-10-07 | login-perfis | /executar-complexo (ticket 01) | US$ 8,26
-2026-10-07 | login-perfis | /situação + /executar-complexo (ticket 02, até o teste na tela) | 25% da sessão (janela até 23h), 10% da semana (/usage; Opus 96%)
+2026-10-07 | login-perfis | /situação + /executar-complexo (ticket 02, até o teste na tela) | US$ 8,00
