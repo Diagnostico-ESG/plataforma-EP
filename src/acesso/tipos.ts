@@ -13,6 +13,18 @@ export type LinhaDeUsuario = {
   perfil: Perfil
   situacao: SituacaoDoUsuario
 }
+/** Antes ou depois de uma mudança, como o gatilho gravou em eventos.detalhes. */
+export type EstadoRegistrado = Record<string, string | boolean | null> | null
+export type EventoDoHistorico = {
+  id: number
+  ocorridoEm: string
+  autor: string | null
+  acao: string
+  entidade: string
+  alvo: string
+  antes: EstadoRegistrado
+  depois: EstadoRegistrado
+}
 export type MotivoDeRecusa = 'fora_do_dominio' | 'sem_autorizacao' | 'inativo' | 'desconhecido'
 export type RecusaDeEntrada = { motivo: MotivoDeRecusa; email: string }
 
