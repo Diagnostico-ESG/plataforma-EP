@@ -18,3 +18,5 @@
 - [x] O seletor do formulário "Autorizar e-mail" continua como está.
 - [x] Testes de interface com o aplicativo inteiro e o módulo falso cobrindo cada critério acima.
 - [x] `[visual]` Salvar e Cancelar ao lado do seletor sem desalinhar a linha da tabela.
+
+Concluído em 2026-10-08 (commit 6de34b2)

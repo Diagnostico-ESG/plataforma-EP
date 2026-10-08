@@ -111,3 +111,10 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Tropeço: `npx supabase migration new` travou** depois de criar o arquivo vazio (provavelmente no aviso de versão nova da CLI); o comando foi encerrado e o conteúdo escrito direto no arquivo criado. Sugestão: se repetir, atualizar a CLI ou rodar com `--yes`/sem checagem de versão.
 - **Leitura de `banco.md`, conferência do alvo, branch comum, `plano-05.md`, linha `Concluído em`.** Como nos tickets anteriores; linha gravada com o commit da junção.
 - **Observação:** o comando rodou em Opus (o funil recomenda Sonnet na etapa 4), porque o usuário o chamou na sessão do `/situação`.
+
+## 2026-10-08 — /executar-complexo (login-perfis, ticket 06)
+
+- **Aviso de dado pessoal com a pergunta sobre o claude-mem.** Esperado: parar de usar o dado, avisar sem repeti-lo e lembrar do apagamento. Aconteceu: a captura da conferência na tela trouxe nome completo, e-mail e foto do usuário; avisado sem repetir, sem nova pergunta sobre desligar (a decisão de manter o claude-mem é de 2026-10-08), e a captura somada à linha do backlog. Sugestão: o passo de conferência na tela pedir de antemão que a captura use a linha de teste ou seja recortada.
+- **Conferência na tela pouco clara para quem não é desenvolvedor.** O usuário não achou "o seletor de perfil" pelas instruções do plano. Funcionou depois de explicar o caminho (faixa lateral → Administração → coluna Perfil), qual caixa usar e qual não usar, e como criar uma linha de teste. Sugestão: o plano descrever a conferência a partir da tela inicial, com os nomes que aparecem na tela.
+- **Branch comum, `plano-06.md`, linha `Concluído em`.** Como nos tickets anteriores; linha gravada com o commit da junção. Ticket sem banco: `banco.md` não foi relido.
+- **Observação:** o comando rodou em Opus (o funil recomenda Sonnet na etapa 4), porque o usuário o chamou na sessão do `/situação`.
