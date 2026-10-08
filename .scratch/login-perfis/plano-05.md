@@ -129,10 +129,11 @@ create trigger foto_acompanha_google after update on auth.users
 - [x] **1.4 Aplicar e ver passar.** Pedir ao usuário, um arquivo por vez: (a) a migração (esperado: "Success. No rows returned"); (b) `07_foto_google.test.sql` (esperado: 6 de 6 `ok`); (c) `05_gerir_usuarios.test.sql` (esperado: todos `ok`; ele cobre o critério 4 e simula uma entrada sem foto); (d) `02`, `03`, `04` e `06` (esperado: todos `ok`).
 - [x] **1.5 Tipos e registro.** `npm run db:types` (esperado: nenhuma diferença em `src/types/database.ts`). Acrescentar em `supabase/AMBIENTES.md`: `- <data>_foto_acompanha_google (2026-10-08; testes 07, 05, 02, 03, 04 e 06 passaram pelo SQL Editor)`.
 - [x] **1.6 Commit.** `git add supabase/tests/07_foto_google.test.sql supabase/migrations/*_foto_acompanha_google.sql supabase/AMBIENTES.md src/types/database.ts` e `git commit -m "Foto do usuário acompanha a conta Google a cada entrada"`.
+- [x] **1.7 Correção (achada no 2.2).** O ponta a ponta mostrou a foto antiga: os dados novos do Google já estavam no Auth de uma entrada anterior à migração, e a condição `when (old.raw_user_meta_data is distinct from new...)` impediu o gatilho na entrada seguinte, com os mesmos dados. Diagnóstico por consulta sem dado pessoal (`igual_ao_google = false`; gatilho ligado). Caso novo no `07_foto_google.test.sql` (visto falhando, 6 de 7) e migração nova `20261008155748_foto_a_cada_entrada.sql`, que recria o gatilho sem a condição (a função só grava se o link mudou). Depois: 07 com 7 de 7, e 05, 02, 03, 04 e 06 passando; foto nova vista na tela.
 
 ### Tarefa 2: Conferência final
 
-- [ ] **2.1 Testes da interface.** `npm test` (nada mudou em `src/`; esperado: todos passam).
-- [ ] **2.2 Ponta a ponta** (critério 6; servidor na porta 5173, conferir antes quem ocupa a porta). Pedir ao usuário: (1) trocar a foto da conta Google; (2) na plataforma, Sair; (3) entrar de novo e ver a foto nova no avatar da barra superior. O Google pode levar alguns minutos para servir a foto nova. Nenhuma consulta SQL.
+- [x] **2.1 Testes da interface.** `npm test` (nada mudou em `src/`; esperado: todos passam).
+- [x] **2.2 Ponta a ponta** (critério 6; servidor na porta 5173, conferir antes quem ocupa a porta). Pedir ao usuário: (1) trocar a foto da conta Google; (2) na plataforma, Sair; (3) entrar de novo e ver a foto nova no avatar da barra superior. O Google pode levar alguns minutos para servir a foto nova. Nenhuma consulta SQL.
 - [ ] **2.3 Registros.** Entrada datada no `.scratch/login-perfis/desvios.md` com a ressalva da história 45 e a escolha do usuário (ou a padrão, se ele não souber). Marcar os critérios do ticket 05.
 - [ ] **2.4 Commit** dos registros.

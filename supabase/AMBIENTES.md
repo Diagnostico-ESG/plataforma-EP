@@ -16,3 +16,4 @@ Migrações aplicadas à mão no dev pelo SQL Editor (fora do histórico da CLI;
 - 20261008125853_gerir_usuarios (2026-10-08; testes 05, 02, 03 e 04 passaram pelo SQL Editor)
 - 20261008143706_historico_usuarios (2026-10-08; testes 06, 02, 03, 04 e 05 passaram pelo SQL Editor)
 - 20261008154647_foto_acompanha_google (2026-10-08; testes 07, 05, 02, 03, 04 e 06 passaram pelo SQL Editor)
+- 20261008155748_foto_a_cada_entrada (2026-10-08; correção do gatilho da foto; testes 07, 05, 02, 03, 04 e 06 passaram pelo SQL Editor)

@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 -- As linhas do pgTAP vão para _tap e saem na exceção do fim (ver scripts/relatorio-tap.mjs).
 create temp table _tap (n serial, linha text);
-insert into _tap (linha) select plan(6);
+insert into _tap (linha) select plan(7);
 
 -- Usuários inventados: f1 ativo, com o nome corrigido pelo administrador; f2 inativo. Os dois entram com foto.
 insert into public.autorizacoes (email, perfil) values
@@ -43,6 +43,15 @@ select pg_temp.entrar('00000000-0000-0000-0000-0000000000f2',
   '{"avatar_url": "https://exemplo.invalido/f2-avatar.png", "picture": "https://exemplo.invalido/f2-picture.png"}');
 insert into _tap (linha) select is(pg_temp.foto('00000000-0000-0000-0000-0000000000f2'),
   'https://exemplo.invalido/f2-avatar.png', 'avatar_url vale antes de picture, como no primeiro acesso');
+
+-- Dados do Google já novos no Auth antes de o gatilho existir: a entrada seguinte traz os mesmos dados e
+-- ainda assim corrige a foto (achado no teste de ponta a ponta, 2026-10-08).
+update public.usuarios set foto_url = 'https://exemplo.invalido/f2-desatualizada.png'
+  where id = '00000000-0000-0000-0000-0000000000f2';
+select pg_temp.entrar('00000000-0000-0000-0000-0000000000f2',
+  '{"avatar_url": "https://exemplo.invalido/f2-avatar.png", "picture": "https://exemplo.invalido/f2-picture.png"}');
+insert into _tap (linha) select is(pg_temp.foto('00000000-0000-0000-0000-0000000000f2'),
+  'https://exemplo.invalido/f2-avatar.png', 'entrada com os mesmos dados do Google corrige a foto desatualizada');
 
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000f1', '{"full_name": "Nome do Google"}');
 insert into _tap (linha) select is(pg_temp.foto('00000000-0000-0000-0000-0000000000f1'), null::text,
