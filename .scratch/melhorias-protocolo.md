@@ -126,3 +126,11 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Tropeço meu:** um `sed` marcou as caixas de todas as tarefas do plano, não só as da tarefa concluída; corrigido antes do commit. Sem ação no protocolo.
 - **Conferência na tela.** Instruções escritas a partir da tela inicial, com os nomes que aparecem na tela e pedido de captura recortada (sugestão do ticket 06 aplicada); o usuário confirmou sem dúvidas.
 - **Observação:** o comando rodou em Sonnet, como recomenda o funil.
+
+## 2026-10-08 — /demanda, caminho de bug (bug do "Sair", login-perfis)
+
+- **`/demanda` chamado sem demanda descrita (de novo).** Esperado: no máximo duas perguntas antes de classificar. Aconteceu: o `/situação` anterior tinha apontado o bug do "Sair" como próximo passo; em vez de perguntar, a classificação partiu dele e disse a suposição na primeira linha, e o usuário confirmou rodando o `/demanda` com a descrição. Sugestão: o comando prever "sem descrição, use o próximo passo apontado pelo `/situação`, dizendo a suposição".
+- **Caminho de bug: marco.** Esperado: `marco/AAAA-MM-DD-antes-correcao-<nome>`. Aconteceu: `marco/2026-10-08-antes-correcao-sair` criado antes de qualquer mudança.
+- **Caminho de bug: `code-review`.** Esperado: revisão do diff da correção. Aconteceu: a revisão da spec achou que o simulador dos testes (`AcessoFalso`) não imitava a biblioteca real (o `signOut` sem rede apaga o login local antes de devolver o erro), e a opção A escolhida pelo usuário não acontecia de fato. Voltou ao usuário como decisão (opção C), segunda rodada de correção e segunda revisão. Sugestão: no passo 1 do caminho de bug, conferir no código da biblioteca o modo de falha real antes de oferecer as opções de comportamento ao usuário; e a revisão de spec pedir sempre a conferência "o simulador imita o módulo real?".
+- **Caminho de bug: modelo.** Esperado (tabela): bug em Sonnet. Aconteceu: o usuário rodou o caminho de bug na mesma sessão Opus da classificação.
+- **Caminho de bug: relatório e aviso de produção.** Relatório entregue na conversa; sem produção em `AMBIENTES.md`, sem aviso de produção (a correção também não criou migração).
