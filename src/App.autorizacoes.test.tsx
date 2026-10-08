@@ -61,16 +61,19 @@ test('falha ao autorizar mostra o motivo e mantém o que foi digitado', async ()
 test('muda o perfil de uma autorização aguardando', async () => {
   const acesso = await abrirComo()
   fireEvent.change(screen.getByLabelText(`Perfil de ${AGUARDANDO}`), { target: { value: 'integrante_ep' } })
+  fireEvent.click(screen.getByRole('button', { name: `Salvar perfil de ${AGUARDANDO}` }))
+  await waitFor(() => expect(acesso.linhas[0].perfil).toBe('integrante_ep'))
   await screen.findByDisplayValue('Integrante do EP')
-  expect(acesso.linhas[0].perfil).toBe('integrante_ep')
 })
 
-test('falha ao mudar o perfil mostra o motivo e mantém o perfil anterior', async () => {
+test('falha ao mudar o perfil mostra o motivo, mantém a escolha e não grava', async () => {
   const acesso = await abrirComo()
   acesso.falhaDeGravacao = 'seu perfil não permite esta alteração'
   fireEvent.change(screen.getByLabelText(`Perfil de ${AGUARDANDO}`), { target: { value: 'administrador' } })
+  fireEvent.click(screen.getByRole('button', { name: `Salvar perfil de ${AGUARDANDO}` }))
   expect(await screen.findByText('A alteração não foi salva: seu perfil não permite esta alteração.')).toBeTruthy()
-  expect((screen.getByLabelText(`Perfil de ${AGUARDANDO}`) as HTMLSelectElement).value).toBe('consulta')
+  expect((screen.getByLabelText(`Perfil de ${AGUARDANDO}`) as HTMLSelectElement).value).toBe('administrador')
+  expect(acesso.linhas[0].perfil).toBe('consulta')
 })
 
 test('exclui uma autorização aguardando', async () => {

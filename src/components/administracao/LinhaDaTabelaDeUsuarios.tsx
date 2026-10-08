@@ -3,7 +3,7 @@ import type { LinhaDeUsuario, Perfil, SituacaoDoUsuario } from '../../acesso/tip
 import { Avatar } from '../Avatar'
 import { Pilula, type SituacaoPilula } from '../Pilula'
 import { CorrecaoDeNome } from './CorrecaoDeNome'
-import { SeletorDePerfil } from './SeletorDePerfil'
+import { PerfilDaLinha } from './PerfilDaLinha'
 
 const ROTULO_DA_SITUACAO: Record<SituacaoDoUsuario, string> = {
   ativo: 'Ativo', inativo: 'Inativo', aguardando: 'Aguardando primeiro acesso',
@@ -13,7 +13,7 @@ const PILULA_DA_SITUACAO: Record<SituacaoDoUsuario, SituacaoPilula> = {
 }
 
 export type AcoesDaLinha = {
-  aoMudarPerfil: (linha: LinhaDeUsuario, perfil: Perfil) => void
+  aoMudarPerfil: (linha: LinhaDeUsuario, perfil: Perfil) => Promise<void>
   aoExcluir: (email: string) => void
   aoDesativar: (id: string) => void
   aoReativar: (id: string) => void
@@ -37,8 +37,8 @@ export function LinhaDaTabelaDeUsuarios({ linha, ...acoes }: LinhaDaTabelaDeUsua
       </td>
       <td>{linha.email}</td>
       <td>
-        <SeletorDePerfil rotulo={`Perfil de ${linha.email}`} valor={linha.perfil}
-          aoMudar={(perfil) => acoes.aoMudarPerfil(linha, perfil)} />
+        <PerfilDaLinha email={linha.email} perfilGravado={linha.perfil}
+          aoSalvar={(perfil) => acoes.aoMudarPerfil(linha, perfil)} />
       </td>
       <td><Pilula situacao={PILULA_DA_SITUACAO[linha.situacao]}>{ROTULO_DA_SITUACAO[linha.situacao]}</Pilula></td>
       <td><BotoesDaLinha linha={linha} acoes={acoes} aoCorrigirNome={() => setCorrigindo(true)} /></td>
