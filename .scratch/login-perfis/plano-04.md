@@ -142,7 +142,7 @@ do $$ begin
 end $$;
 ```
 
-- [ ] **1.2 Ver falhar.** Conferir o alvo (`supabase/AMBIENTES.md` e `supabase/.temp/project-ref` = `yclkzyoebpsxmgpbcbus`). Pedir ao usuário que cole **só** o `06_historico.test.sql` no SQL Editor do projeto dev e devolva o resultado. Esperado: falhas (`not ok`) ao menos em "Administrador lê o histórico", "Visitante não lê", e em "não altera" / "não apaga" (hoje dão 0 linhas sem erro). Se vier tudo `ok`, parar: o teste não prova nada.
+- [x] **1.2 Ver falhar.** Conferir o alvo (`supabase/AMBIENTES.md` e `supabase/.temp/project-ref` = `yclkzyoebpsxmgpbcbus`). Pedir ao usuário que cole **só** o `06_historico.test.sql` no SQL Editor do projeto dev e devolva o resultado. Esperado: falhas (`not ok`) ao menos em "Administrador lê o histórico", "Visitante não lê", e em "não altera" / "não apaga" (hoje dão 0 linhas sem erro). Se vier tudo `ok`, parar: o teste não prova nada.
 
 - [x] **1.3 Migração.** `npx supabase migration new historico_usuarios` e escrever:
 
@@ -158,7 +158,7 @@ create policy "eventos: administrador ativo lê" on public.eventos
   using ((select private.usuario_ativo()) and (select private.perfil_atual()) = 'administrador');
 ```
 
-- [ ] **1.4 Aplicar e ver passar.** Pedir ao usuário, um arquivo por vez: (a) colar a migração (esperado: "Success. No rows returned"); (b) colar `06_historico.test.sql` (esperado: 25 de 25 `ok`); (c) colar `02`, `03`, `04` e `05` de novo (esperado: todos `ok`, porque os gatilhos continuam gravando eventos).
+- [x] **1.4 Aplicar e ver passar.** Pedir ao usuário, um arquivo por vez: (a) colar a migração (esperado: "Success. No rows returned"); (b) colar `06_historico.test.sql` (esperado: 25 de 25 `ok`); (c) colar `02`, `03`, `04` e `05` de novo (esperado: todos `ok`, porque os gatilhos continuam gravando eventos).
 - [ ] **1.5 Diagnóstico do truncate nas outras tabelas** (só leitura, sem dado pessoal). Pedir ao usuário que rode:
 
 ```sql
@@ -169,8 +169,8 @@ from unnest(array['usuarios', 'usuarios_emails', 'autorizacoes']) as t;
 
 Se alguma coluna vier `true`, acrescentar ao `.scratch/backlog.md` (caminho `/demanda`, antes do `/ship` de login-perfis) e avisar o usuário.
 
-- [ ] **1.6 Tipos e registro.** `npm run db:types` (esperado: nenhuma diferença em `src/types/database.ts`). Acrescentar em `supabase/AMBIENTES.md`, na lista de migrações aplicadas à mão: `- <data>_historico_usuarios (2026-10-08; testes 06, 02, 03, 04 e 05 passaram pelo SQL Editor)`.
-- [ ] **1.7 Commit.** `git add supabase/tests/06_historico.test.sql supabase/migrations/*_historico_usuarios.sql supabase/AMBIENTES.md src/types/database.ts` e `git commit -m "Histórico no banco: só o administrador ativo lê, ninguém grava pela API"`.
+- [x] **1.6 Tipos e registro.** `npm run db:types` (esperado: nenhuma diferença em `src/types/database.ts`). Acrescentar em `supabase/AMBIENTES.md`, na lista de migrações aplicadas à mão: `- <data>_historico_usuarios (2026-10-08; testes 06, 02, 03, 04 e 05 passaram pelo SQL Editor)`.
+- [x] **1.7 Commit.** `git add supabase/tests/06_historico.test.sql supabase/migrations/*_historico_usuarios.sql supabase/AMBIENTES.md src/types/database.ts` e `git commit -m "Histórico no banco: só o administrador ativo lê, ninguém grava pela API"`.
 
 ---
 
