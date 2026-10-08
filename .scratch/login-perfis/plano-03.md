@@ -507,7 +507,7 @@ function mensagemDoErro(erro: unknown): string {
 
 **Consome:** tarefas 2 e 3.
 
-- [ ] **4.1 Teste que falha.** Criar `src/App.gestaoDeUsuarios.test.tsx`:
+- [x] **4.1 Teste que falha.** Criar `src/App.gestaoDeUsuarios.test.tsx`:
 
 ```tsx
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
@@ -655,8 +655,8 @@ test('Salvar fica desligado com o nome vazio', async () => {
 
   Em `src/App.autorizacoes.test.tsx`, apagar o último teste ("usuário que já entrou não tem seletor de perfil nem Excluir neste ticket"): o primeiro teste do arquivo novo o substitui.
 
-- [ ] **4.2 Ver falhar:** `npx vitest run src/App.gestaoDeUsuarios.test.tsx` — falha por não achar os botões.
-- [ ] **4.3 Implementar.**
+- [x] **4.2 Ver falhar:** `npx vitest run src/App.gestaoDeUsuarios.test.tsx` — falha por não achar os botões.
+- [x] **4.3 Implementar.**
   - Criar `src/components/administracao/CorrecaoDeNome.tsx`:
 
     ```tsx
@@ -831,8 +831,8 @@ test('Salvar fica desligado com o nome vazio', async () => {
 
   Se o ESLint recusar o `autoFocus` (regra de acessibilidade), trocar por `useRef` + `useEffect` que dá foco ao campo ao montar.
 
-- [ ] **4.4 Ver passar:** `npm test`, `npm run typecheck`, `npm run lint`, todos verdes.
-- [ ] **4.5 Commit:** `Muda perfil, desativa, reativa e corrige nome na tela de usuários`.
+- [x] **4.4 Ver passar:** `npm test`, `npm run typecheck`, `npm run lint`, todos verdes.
+- [x] **4.5 Commit:** `Muda perfil, desativa, reativa e corrige nome na tela de usuários`.
 
 ---
 

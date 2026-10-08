@@ -1,5 +1,6 @@
 import { type FormEvent, useId, useState } from 'react'
 import { normalizarEmail, problemaNoEmail } from '../../acesso/emailInstitucional'
+import { textoDaFalhaNoFormulario } from '../../acesso/falhasDeGravacao'
 import type { Perfil } from '../../acesso/tipos'
 import { SeletorDePerfil } from './SeletorDePerfil'
 
@@ -25,8 +26,7 @@ export function FormularioDeAutorizacao({ aoAutorizar }: FormularioDeAutorizacao
       setEmail('')
       setPerfil('consulta')
     } catch (erro) {
-      const motivo = erro instanceof Error ? erro.message : String(erro)
-      setAviso(`A alteração não foi salva: ${motivo}. Seus dados continuam no formulário.`)
+      setAviso(textoDaFalhaNoFormulario(erro))
     } finally {
       setEnviando(false)
     }
