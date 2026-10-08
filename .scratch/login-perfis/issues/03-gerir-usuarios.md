@@ -19,3 +19,5 @@
 - [x] Mensagens das travas: "Você não pode desativar a si mesmo.", "Você não pode mudar o seu próprio perfil.", "Não é possível: {nome} é o último administrador ativo."; tradução coberta por teste unitário.
 - [x] Falha de gravação mostra o motivo e mantém o que foi digitado.
 - [x] Testes de interface com o aplicativo inteiro e o módulo falso, cobrindo cada ação com sucesso, com falha e com cada trava.
+
+Concluído em 2026-10-08 (commit 7c5e5af)
