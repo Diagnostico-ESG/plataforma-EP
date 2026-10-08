@@ -85,3 +85,9 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Leitura de `banco.md`, conferência do alvo, TDD de RLS, branch comum, `plano-04.md`, linha `Concluído em`.** Aconteceram como nos tickets anteriores: `banco.md` lido antes do plano; alvo conferido antes do `migration new` e do `db:types`; `06_historico.test.sql` visto falhando (17 de 25) e passando (25 de 25); um arquivo por vez no SQL Editor, com o resultado esperado de cada um (sugestão de 2026-10-08 aplicada; o usuário rodou na ordem certa); branch `login-perfis` sem worktree, merge com `--no-ff`, `git branch -d` aceito; linha gravada com o commit da junção.
 - **Porta do servidor antes do teste na tela.** Conferida: o servidor deste projeto estava na 5173 (e outro projeto na 5174); nada encerrado.
 - **Observação:** o comando rodou em Opus (o funil recomenda Sonnet na etapa 4), porque o usuário o chamou na sessão do `/situação`.
+
+## 2026-10-08 — /polir (login-perfis)
+
+- **Tela que só abre com login real.** Esperado: o Impeccable usar a tela de verdade em computador e celular. Aconteceu: a Administração só abre com o login Google do usuário, e o navegador embutido não tem essa sessão; a auditoria dessa área foi pelo código, e só a entrada foi vista no navegador. Sugestão: o `/polir` prever o caso (pedir ao usuário uma captura da tela, ou um modo de desenvolvimento com o acesso falso dos testes).
+- **Achado que muda comportamento.** O polimento achou um defeito de uso (o seletor de perfil grava a cada seta do teclado) que não é acabamento. Seguido o escopo do `/polir`: foi para o backlog. Sugestão: o comando dizer para onde vai achado do `audit` que muda comportamento.
+- **Observação:** o comando rodou em Opus (o funil recomenda Sonnet), porque o usuário o chamou na sessão do `/situação`.

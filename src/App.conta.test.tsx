@@ -25,6 +25,15 @@ test('o menu da conta mostra nome, perfil e Sair, e fecha com Escape', async () 
   expect(screen.queryByRole('button', { name: 'Sair' })).toBeNull()
 })
 
+test('fechar o menu com Escape devolve o foco ao avatar', async () => {
+  const botaoDaConta = await abrirLogado()
+  fireEvent.click(botaoDaConta)
+  const sair = screen.getByRole('button', { name: 'Sair' })
+  sair.focus()
+  fireEvent.keyDown(sair, { key: 'Escape' })
+  expect(document.activeElement).toBe(botaoDaConta)
+})
+
 test('Sair encerra a sessão e volta à tela de entrada', async () => {
   const acesso = AcessoFalso.logadoComo()
   fireEvent.click(await abrirLogado(acesso))

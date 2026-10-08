@@ -42,6 +42,16 @@ code,
   font-variant-numeric: tabular-nums;
 }
 
+/* Texto só para leitor de tela (ex.: cabeçalho "Ações" da tabela de usuários). */
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 ::selection {
   background: var(--azul-claro);
   color: var(--azul-escuro);

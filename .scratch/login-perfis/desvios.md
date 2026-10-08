@@ -23,3 +23,22 @@ Só entradas novas, datadas; as antigas não se editam.
 - **Teste instável da entrada (fora do escopo, corrigido no ticket):** o primeiro commit da branch foi barrado pelo pre-commit com `App.entrada.test.tsx` falhando ("o botão chama o Google": 0 chamadas). Causa, a mesma do teste corrigido no ticket 03: o botão "Entrar" já existe, desligado, enquanto o acesso é conferido, e numa rodada lenta o clique caía nele. Correção: esperar o botão ligado antes de clicar; 4 de 4 rodadas frias passaram. O plano foi junto no mesmo commit (06ab39c), porque tinha ficado preparado da tentativa barrada.
 - **Arquivo de teste esvaziado por engano:** o usuário esvaziou `supabase/tests/02_login_barreira.test.sql` ao copiá-lo; o conteúdo foi recuperado da versão comitada (`git show HEAD:…`), sem perda.
 - **Achado fora do escopo:** `usuarios`, `usuarios_emails` e `autorizacoes` aceitam `truncate` de `authenticated` (e as duas primeiras, de `anon`). Sem caminho pela API (o PostgREST não oferece `truncate`); registrado no `backlog.md` para o `/demanda` antes do `/ship`.
+
+## 2026-10-08 — /polir (telas de login-perfis: entrada, Administração, menu da conta)
+
+Auditoria do Impeccable: 16/20 (bom). O detector automático não apontou nada. A Administração foi avaliada pelo código, porque só abre com o login Google do usuário; a entrada foi vista no navegador em computador e celular.
+
+Corrigidos:
+- **Esc no menu da conta perdia o foco:** com o foco no "Sair", o Esc fechava o painel e o foco ia para o topo da página. Agora volta ao avatar. Teste de regressão em `App.conta.test.tsx`.
+- **Campos mais baixos que os botões:** e-mail, seletor de perfil e campo de nome passaram a ter 32px, a altura dos botões ao lado (o estilo do campo de nome foi unido ao dos outros).
+- **Datas do histórico em fonte mono,** como o DESIGN.md manda para datas.
+- **Histórico em tela estreita:** abaixo de 640px cada evento vira uma pilha, em vez de três colunas fixas espremidas.
+- **Título da entrada em peso 700,** como a escala "página".
+- **Classe `visualmente-oculto`** passou do CSS da Administração para o `index.css`, porque serve à aplicação inteira.
+
+Deixados de fora:
+- **Seletor de perfil grava a cada seta do teclado (P1):** muda o comportamento da tela (exigiria um botão de confirmar ou gravar só ao sair do campo). Foi para o `backlog.md`.
+- **Excluir e Desativar sem confirmação (P2):** decisão de comportamento, não de acabamento. Foi para o `backlog.md`.
+- **Duas cores de erro (P2):** a falha da Administração usa a caixa amarela de pendência, e a da entrada usa o vermelho de atraso. As duas foram aprovadas na tela, e o DESIGN.md não define a cor de erro de gravação; fica para decidir junto com o item anterior.
+- **Botão "Filtrar" visível na Administração sem função (P2):** vem da identidade visual e está planejado para Processos; esconder fora de Processos cabe à funcionalidade "Processos e etapas".
+- **Cabeçalho da tabela no tamanho de rótulo sem maiúsculas:** o DESIGN.md só pede maiúsculas em pílula e rótulo de seção; não é desvio.

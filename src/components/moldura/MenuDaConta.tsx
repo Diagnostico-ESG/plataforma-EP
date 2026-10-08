@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { type KeyboardEvent, useId, useRef, useState } from 'react'
 import { rotuloDoPerfil } from '../../acesso/perfis'
 import type { UsuarioAtual } from '../../acesso/tipos'
 import { Avatar } from '../Avatar'
@@ -8,9 +8,17 @@ type MenuDaContaProps = { usuario: UsuarioAtual; aoSair: () => void }
 export function MenuDaConta({ usuario, aoSair }: MenuDaContaProps) {
   const [aberto, setAberto] = useState(false)
   const idDoPainel = useId()
+  const botao = useRef<HTMLButtonElement>(null)
+  // O botão que tinha o foco some com o painel; sem devolvê-lo, o teclado volta ao topo da página.
+  const fecharComEscape = (evento: KeyboardEvent) => {
+    if (evento.key !== 'Escape' || !aberto) return
+    setAberto(false)
+    botao.current?.focus()
+  }
   return (
-    <div className="menu-conta" onKeyDown={(evento) => evento.key === 'Escape' && setAberto(false)}>
+    <div className="menu-conta" onKeyDown={fecharComEscape}>
       <button
+        ref={botao}
         type="button"
         className="menu-conta-botao"
         aria-label={`Sua conta: ${usuario.nome}`}
