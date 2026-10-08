@@ -10,9 +10,9 @@
 
 ## Critérios de aceite
 
-- [ ] Conferido na documentação atual do Supabase que os dados do Google na conta do Auth são atualizados a cada entrada; se não forem, parar e mostrar as opções ao usuário.
-- [ ] Migração nova, não destrutiva, com a função (schema não exposto, `search_path` vazio) e o gatilho depois de alterar a conta no Auth; nenhuma tabela ou coluna muda.
-- [ ] Teste pgTAP escrito antes da migração, um caso por linha da regra: link novo → `foto_url` atualizado; dados sem foto → `foto_url` nulo; usuário inativo também atualizado; nome corrigido pelo administrador não muda; nenhum evento novo.
-- [ ] `foto_url` continua fechada para alteração pela API (o teste de "quem pode o quê" de `usuarios` segue passando).
-- [ ] Testes de banco anteriores (02 a 06) seguem passando pelo SQL Editor; migração registrada em `supabase/AMBIENTES.md` na lista das aplicadas à mão.
-- [ ] Ponta a ponta manual, pelo usuário: trocar a foto na conta Google, sair, entrar e ver a foto nova no avatar.
+- [x] Conferido na documentação atual do Supabase que os dados do Google na conta do Auth são atualizados a cada entrada; se não forem, parar e mostrar as opções ao usuário.
+- [x] Migração nova, não destrutiva, com a função (schema não exposto, `search_path` vazio) e o gatilho depois de alterar a conta no Auth; nenhuma tabela ou coluna muda.
+- [x] Teste pgTAP escrito antes da migração, um caso por linha da regra: link novo → `foto_url` atualizado; dados sem foto → `foto_url` nulo; usuário inativo também atualizado; nome corrigido pelo administrador não muda; nenhum evento novo.
+- [x] `foto_url` continua fechada para alteração pela API (o teste de "quem pode o quê" de `usuarios` segue passando).
+- [x] Testes de banco anteriores (02 a 06) seguem passando pelo SQL Editor; migração registrada em `supabase/AMBIENTES.md` na lista das aplicadas à mão.
+- [x] Ponta a ponta manual, pelo usuário: trocar a foto na conta Google, sair, entrar e ver a foto nova no avatar.
