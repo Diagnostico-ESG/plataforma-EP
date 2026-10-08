@@ -1331,9 +1331,9 @@ export function AreaDeUsuarios({ acesso }: AreaDeUsuariosProps) {
 ### Tarefa 6: Conferência final
 
 - [x] **6.1** `npm run test:coverage` (≥ 70%), `npm run typecheck`, `npm run lint`, `npm run check:circular`, todos passando.
-- [ ] **6.2 Olhar a tela.** Subir `npm run dev` em segundo plano e abrir no navegador interno só a tela de entrada (entrar pelo Google é do usuário). Pedir ao usuário, logado como administrador no dev: abrir Administração; autorizar um e-mail inventado `@ccivil.pr.gov.br`; mudar o perfil dele; excluí-lo; tentar `pessoa@gmail.com` e um e-mail já autorizado; conferir as pílulas com texto e cor. Depois, no SQL Editor, `select acao, autor_id is not null as tem_autor, detalhes from public.eventos where entidade = 'autorizacao' order by id desc limit 5;` deve mostrar `excluir_autorizacao`, `mudar_perfil`, `autorizar` com autor.
-- [ ] **6.3** Marcar os critérios do ticket que passaram e anotar na spec, se algo mudou na execução (com a data).
-- [ ] **6.4 Commit** do plano e do ticket marcados.
+- [x] **6.2 Olhar a tela.** Subir `npm run dev` em segundo plano e abrir no navegador interno só a tela de entrada (entrar pelo Google é do usuário). Pedir ao usuário, logado como administrador no dev: abrir Administração; autorizar um e-mail inventado `@ccivil.pr.gov.br`; mudar o perfil dele; excluí-lo; tentar `pessoa@gmail.com` e um e-mail já autorizado; conferir as pílulas com texto e cor. Depois, no SQL Editor, `select acao, autor_id is not null as tem_autor, detalhes from public.eventos where entidade = 'autorizacao' order by id desc limit 5;` deve mostrar `excluir_autorizacao`, `mudar_perfil`, `autorizar` com autor.
+- [x] **6.3** Marcar os critérios do ticket que passaram e anotar na spec, se algo mudou na execução (com a data).
+- [x] **6.4 Commit** do plano e do ticket marcados.
 
 ## Retomada (2026-10-07)
 
@@ -1342,3 +1342,5 @@ Parado no passo 6.2, por decisão do usuário (opção A): o teste na tela esper
 Para continuar: `git switch login-perfis`, conferir que o servidor de desenvolvimento atende em `http://localhost:5173` (o retorno do Google está configurado para essa porta), pedir ao usuário os 6 passos do 6.2 e a consulta de eventos, depois 6.3, 6.4 e o passo 4 do `/executar-complexo` (juntar à `main`, `git branch -d`, linha `Concluído em` no ticket 02).
 
 Pendência fora do projeto: um rascunho `tmp_perfis.txt` ficou na raiz do Git Bash; a trava não deixou apagar. Sem conteúdo sensível; o usuário apaga.
+
+Retomado em 2026-10-08: 6.2 feito pelo usuário em `http://localhost:5173` (passos 1 a 6 passaram; pílulas de situação com cor e texto, perfil em texto simples, como na spec). Consulta de eventos mostrou `excluir_autorizacao`, `mudar_perfil` e `autorizar`, todos com autor e com antes/depois. `npm test` passou em quatro rodadas seguidas (390); a falha intermitente de "Excluir" não se repetiu. Spec sem mudança na execução.
