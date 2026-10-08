@@ -38,7 +38,7 @@
 
 ### Tarefa 1: Perfil com Salvar e Cancelar
 
-- [ ] **1.1 Teste que falha.** Criar `src/App.perfilComSalvar.test.tsx`:
+- [x] **1.1 Teste que falha.** Criar `src/App.perfilComSalvar.test.tsx`:
 
 ```tsx
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
@@ -146,9 +146,9 @@ test.each<[string, string | Error, string]>([
 })
 ```
 
-- [ ] **1.2 Ver falhar.** `npx vitest run src/App.perfilComSalvar.test.tsx`. Esperado: falha (`chamadas.mudarPerfil` indefinido / botões ausentes / gravação imediata).
-- [ ] **1.3 Contador no falso.** Em `src/acesso/AcessoFalso.ts`: `chamadas = { entrarComGoogle: 0, sair: 0, listarHistorico: 0, mudarPerfil: 0 }` e `this.chamadas.mudarPerfil++` na primeira linha de `mudarPerfilDaAutorizacao` e de `mudarPerfilDoUsuario`.
-- [ ] **1.4 Componente.** Criar `src/components/administracao/PerfilDaLinha.tsx`:
+- [x] **1.2 Ver falhar.** `npx vitest run src/App.perfilComSalvar.test.tsx`. Esperado: falha (`chamadas.mudarPerfil` indefinido / botões ausentes / gravação imediata).
+- [x] **1.3 Contador no falso.** Em `src/acesso/AcessoFalso.ts`: `chamadas = { entrarComGoogle: 0, sair: 0, listarHistorico: 0, mudarPerfil: 0 }` e `this.chamadas.mudarPerfil++` na primeira linha de `mudarPerfilDaAutorizacao` e de `mudarPerfilDoUsuario`.
+- [x] **1.4 Componente.** Criar `src/components/administracao/PerfilDaLinha.tsx`:
 
 ```tsx
 import { useState } from 'react'
@@ -199,22 +199,22 @@ export function PerfilDaLinha({ email, perfilGravado, aoSalvar }: PerfilDaLinhaP
 }
 ```
 
-- [ ] **1.5 Ligar na linha.** Em `LinhaDaTabelaDeUsuarios.tsx`: `aoMudarPerfil: (linha: LinhaDeUsuario, perfil: Perfil) => Promise<void>`; trocar o `SeletorDePerfil` da coluna Perfil por `<PerfilDaLinha email={linha.email} perfilGravado={linha.perfil} aoSalvar={(perfil) => acoes.aoMudarPerfil(linha, perfil)} />` e o import correspondente.
-- [ ] **1.6 Ligar na área.** Em `AreaDeUsuarios.tsx`: `aoMudarPerfil={(linha, perfil) => gravar(() => (linha.situacao === 'aguardando' ? acesso.mudarPerfilDaAutorizacao(linha.email, perfil) : acesso.mudarPerfilDoUsuario(linha.chave, perfil)))}`. Se passar de 20 linhas na função, extrair `mudarPerfil(linha, perfil)` como função interna.
-- [ ] **1.7 CSS.** Em `Administracao.css`, acrescentar `.perfil-da-linha` aos seletores de `.tabela-usuarios-acoes, .correcao-de-nome` (inline-flex, quebra, gap) e de `.correcao-de-nome .administracao-falha` (mensagem em linha própria).
-- [ ] **1.8 Ver passar.** `npx vitest run src/App.perfilComSalvar.test.tsx`. Esperado: todos passam.
-- [ ] **1.9 Testes antigos.** `npm test`. Esperado: falham os 4 testes de perfil antigos (gravavam na troca). Atualizar:
+- [x] **1.5 Ligar na linha.** Em `LinhaDaTabelaDeUsuarios.tsx`: `aoMudarPerfil: (linha: LinhaDeUsuario, perfil: Perfil) => Promise<void>`; trocar o `SeletorDePerfil` da coluna Perfil por `<PerfilDaLinha email={linha.email} perfilGravado={linha.perfil} aoSalvar={(perfil) => acoes.aoMudarPerfil(linha, perfil)} />` e o import correspondente.
+- [x] **1.6 Ligar na área.** Em `AreaDeUsuarios.tsx`: `aoMudarPerfil={(linha, perfil) => gravar(() => (linha.situacao === 'aguardando' ? acesso.mudarPerfilDaAutorizacao(linha.email, perfil) : acesso.mudarPerfilDoUsuario(linha.chave, perfil)))}`. Se passar de 20 linhas na função, extrair `mudarPerfil(linha, perfil)` como função interna.
+- [x] **1.7 CSS.** Em `Administracao.css`, acrescentar `.perfil-da-linha` aos seletores de `.tabela-usuarios-acoes, .correcao-de-nome` (inline-flex, quebra, gap) e de `.correcao-de-nome .administracao-falha` (mensagem em linha própria).
+- [x] **1.8 Ver passar.** `npx vitest run src/App.perfilComSalvar.test.tsx`. Esperado: todos passam.
+- [x] **1.9 Testes antigos.** `npm test`. Esperado: falham os 4 testes de perfil antigos (gravavam na troca). Atualizar:
   - `App.gestaoDeUsuarios.test.tsx` "muda o perfil de um usuário": depois do `change`, `fireEvent.click(screen.getByRole('button', { name: \`Salvar perfil de ${ANA}\` }))`.
   - `App.gestaoDeUsuarios.test.tsx` "trava: mudar o próprio perfil…": idem; a última linha passa a esperar `'administrador'` (a escolha fica, critério 5).
   - `App.autorizacoes.test.tsx` "muda o perfil de uma autorização aguardando": clicar em `Salvar perfil de ${AGUARDANDO}`.
   - `App.autorizacoes.test.tsx` "falha ao mudar o perfil…": clicar em Salvar; renomear para "…mantém a escolha" e esperar `'administrador'` no seletor.
   Rodar `npm test` de novo. Esperado: tudo passa, inclusive o teste do formulário "Autorizar e-mail" (critério 6).
-- [ ] **1.10 Lint e tipos.** `npm run lint` e `npx tsc -b` (ou o script de typecheck do `package.json`). Esperado: sem erro.
-- [ ] **1.11 Commit.** `git add` dos arquivos da tabela acima e `git commit -m "Perfil da linha só grava no Salvar, com Cancelar e falha na própria linha"`.
+- [x] **1.10 Lint e tipos.** `npm run lint` e `npx tsc -b` (ou o script de typecheck do `package.json`). Esperado: sem erro.
+- [x] **1.11 Commit.** `git add` dos arquivos da tabela acima e `git commit -m "Perfil da linha só grava no Salvar, com Cancelar e falha na própria linha"`.
 
 ### Tarefa 2: Conferência final
 
-- [ ] **2.1 Cobertura.** `npm test -- --coverage`; informar a cobertura de `PerfilDaLinha.tsx` e revisar o que ficou sem teste.
-- [ ] **2.2 Tela** (critérios 1 e 8; servidor na porta 5173, conferir antes quem ocupa a porta; a entrada pelo Google é do usuário). Pedir ao usuário, na Administração: (1) clicar no seletor de perfil de uma linha e percorrer as opções com as setas: nada é gravado e o histórico não muda; (2) Salvar e Cancelar aparecem ao lado do seletor, sem desalinhar a linha; (3) Salvar: os botões somem e aparece um evento só no histórico; (4) escolher outro e Cancelar: volta ao perfil gravado.
-- [ ] **2.3 Registros.** Marcar os critérios do ticket 06; entrada datada no `.scratch/login-perfis/desvios.md` só se algo fugir do ticket ou da spec.
-- [ ] **2.4 Commit** dos registros.
+- [x] **2.1 Cobertura.** `npm test -- --coverage`; informar a cobertura de `PerfilDaLinha.tsx` e revisar o que ficou sem teste.
+- [x] **2.2 Tela** (critérios 1 e 8; servidor na porta 5173, conferir antes quem ocupa a porta; a entrada pelo Google é do usuário). Pedir ao usuário, na Administração: (1) clicar no seletor de perfil de uma linha e percorrer as opções com as setas: nada é gravado e o histórico não muda; (2) Salvar e Cancelar aparecem ao lado do seletor, sem desalinhar a linha; (3) Salvar: os botões somem e aparece um evento só no histórico; (4) escolher outro e Cancelar: volta ao perfil gravado.
+- [x] **2.3 Registros.** Marcar os critérios do ticket 06; entrada datada no `.scratch/login-perfis/desvios.md` só se algo fugir do ticket ou da spec.
+- [x] **2.4 Commit** dos registros.
