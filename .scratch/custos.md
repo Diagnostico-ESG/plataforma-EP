@@ -21,3 +21,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-08 | login-perfis | /executar-complexo ticket 07 | US$ 2,21
 2026-10-08 | login-perfis | /demanda (bug do Sair) | US$ 5,38
 2026-10-08 | login-perfis | /polir | US$ 2,74
+2026-10-08 | login-perfis | /demanda (bug do truncate) | US$ 3,15
