@@ -15,14 +15,22 @@
 .administracao-falha {
   padding: var(--esp-3) var(--esp-4);
   border-radius: var(--canto);
+}
+
+/* Aviso (amarelo): informa sem dizer que algo falhou. */
+.administracao-sem-permissao {
+  margin: var(--esp-5);
+  max-width: 60ch;
   background: var(--pendencia-fundo);
   border: 1px solid var(--pendencia-borda);
   color: var(--texto);
 }
 
-.administracao-sem-permissao {
-  margin: var(--esp-5);
-  max-width: 60ch;
+/* "A ação não aconteceu" (vermelho): as mesmas cores de atraso da tela de entrada. */
+.administracao-erro,
+.administracao-falha {
+  background: var(--atraso-fundo);
+  color: var(--atraso-texto);
 }
 
 .tabela-usuarios {

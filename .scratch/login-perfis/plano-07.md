@@ -277,14 +277,14 @@ test('Reativar grava com um clique, sem janela', async () => {
 
 ### Tarefa 3: Cores das mensagens — C6, C7
 
-- [ ] **Passo 1: teste que falha.** Crie `src/App.coresDasMensagens.test.tsx`. As classes são o contrato de cor: `administracao-erro` e `administracao-falha` = vermelho, `administracao-sem-permissao` = amarelo. Casos (reaproveite os utilitários de `App.gestaoDeUsuarios.test.tsx`; para os erros de carregamento use os mesmos recursos de falha do `AcessoFalso` que `App.administracao.test.tsx` e `App.historico.test.tsx` já usam — leia esses dois arquivos antes e copie o jeito):
+- [x] **Passo 1: teste que falha.** Crie `src/App.coresDasMensagens.test.tsx`. As classes são o contrato de cor: `administracao-erro` e `administracao-falha` = vermelho, `administracao-sem-permissao` = amarelo. Casos (reaproveite os utilitários de `App.gestaoDeUsuarios.test.tsx`; para os erros de carregamento use os mesmos recursos de falha do `AcessoFalso` que `App.administracao.test.tsx` e `App.historico.test.tsx` já usam — leia esses dois arquivos antes e copie o jeito):
   1. erro ao carregar a lista: o `alert` "Não foi possível carregar os usuários…" tem classe `administracao-erro`;
   2. erro ao carregar o histórico: idem para "Não foi possível carregar o histórico…";
   3. erro de gravação (ex.: `falhaDeGravacao = 'sem conexão'` e Salvar perfil): a mensagem tem classe `administracao-falha`;
   4. recusa de trava (`TravaDoBanco('Você não pode desativar a si mesmo.')`): idem `administracao-falha`;
   5. perfil sem permissão (usuário `integrante_ep` em `#/administracao`): o texto "não permite administrar usuários" tem classe `administracao-sem-permissao`.
   Cada teste: `expect(elemento.className).toContain('…')` (ou `classList.contains`).
-- [ ] **Passo 2: rodar.** Os casos 1 a 5 já podem passar (as classes existem hoje, todas amarelas); o teste prova o contrato. Para cobrir a mudança de cor, acrescente o sexto teste, que lê o CSS:
+- [x] **Passo 2: rodar.** Os casos 1 a 5 já podem passar (as classes existem hoje, todas amarelas); o teste prova o contrato. Para cobrir a mudança de cor, acrescente o sexto teste, que lê o CSS:
 
 ```tsx
 import { readFileSync } from 'node:fs'
@@ -298,7 +298,7 @@ test('o CSS pinta falha e erro com as cores de atraso e deixa o aviso em pendên
 ```
 
   Se o `regra` pegar o bloco errado por causa dos seletores agrupados, separe as regras no CSS (Passo 3) de modo que cada classe tenha o seu bloco. Esperado agora: o sexto teste falha.
-- [ ] **Passo 3: CSS.** Em `Administracao.css`, troque o bloco agrupado por:
+- [x] **Passo 3: CSS.** Em `Administracao.css`, troque o bloco agrupado por:
 
 ```css
 .administracao-sem-permissao,
@@ -326,8 +326,8 @@ test('o CSS pinta falha e erro com as cores de atraso e deixa o aviso em pendên
 ```
 
   Se o teste do Passo 2 não achar `--atraso-fundo` em blocos agrupados, ajuste a função `regra` para procurar o bloco que contém o seletor *e* a propriedade (por exemplo, `css.split('}').filter(...).join()`), sem duplicar CSS só para o teste.
-- [ ] **Passo 4: rodar e ver passar.** `npx vitest run src/App.coresDasMensagens.test.tsx`, depois `npm test`.
-- [ ] **Passo 5: commit.** `git add src && git commit -m "Falhas da Administração em vermelho; aviso de perfil continua amarelo"`.
+- [x] **Passo 4: rodar e ver passar.** `npx vitest run src/App.coresDasMensagens.test.tsx`, depois `npm test`.
+- [x] **Passo 5: commit.** `git add src && git commit -m "Falhas da Administração em vermelho; aviso de perfil continua amarelo"`.
 
 ---
 
