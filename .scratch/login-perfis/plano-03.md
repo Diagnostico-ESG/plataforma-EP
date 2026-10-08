@@ -235,9 +235,9 @@ do $$ begin
 end $$;
 ```
 
-- [ ] **1.2 Ver falhar.** Conferir o alvo (`AMBIENTES.md` e `supabase/.temp/project-ref` = `yclkzyoebpsxmgpbcbus`). Pedir ao usuário que cole o arquivo no SQL Editor do dev e traga o resultado. Esperado: `not ok` nas linhas de criar e apagar (ainda com privilégio), nas alterações do administrador (sem política: 0 linhas), nas travas e nos eventos; `ok` nas de "quem não pode" que dependem só da RLS.
+- [x] **1.2 Ver falhar.** Conferir o alvo (`AMBIENTES.md` e `supabase/.temp/project-ref` = `yclkzyoebpsxmgpbcbus`). Pedir ao usuário que cole o arquivo no SQL Editor do dev e traga o resultado. Esperado: `not ok` nas linhas de criar e apagar (ainda com privilégio), nas alterações do administrador (sem política: 0 linhas), nas travas e nos eventos; `ok` nas de "quem não pode" que dependem só da RLS.
 
-- [ ] **1.3 Migração.** `npx supabase migration new gerir_usuarios` e preencher:
+- [x] **1.3 Migração.** `npx supabase migration new gerir_usuarios` e preencher:
 
 ```sql
 -- Login e perfis, ticket 03: o administrador muda perfil, desativa, reativa e corrige o nome de quem já entrou.
@@ -309,9 +309,9 @@ create trigger registrar_evento_do_usuario after update on public.usuarios
   for each row execute function private.registrar_evento_do_usuario();
 ```
 
-- [ ] **1.4 Aplicar e ver passar.** Pedir ao usuário que cole a migração no SQL Editor do dev; depois o `05_gerir_usuarios.test.sql` (esperado: `ok` 1 a 40) e de novo `02_login_barreira`, `03_login_leitura` e `04_autorizacoes` (esperado: continuam passando; o `update … ativo = false` da preparação deles agora passa pelas travas e grava evento). Se algo falhar, ajustar a migração **antes** de dá-la por aplicada (no dev, colar `drop trigger …; drop function …; drop policy …;` e os `grant` de volta, e reaplicar; regra das 3 tentativas).
-- [ ] **1.5 Tipos e registro.** `npm run db:types` (vínculo conferido). Acrescentar a migração à lista de "Migrações aplicadas à mão" em `supabase/AMBIENTES.md`, com a data e os testes que passaram.
-- [ ] **1.6 Commit:** teste, migração, tipos e `AMBIENTES.md` juntos — `Gere usuários no banco: alteração pelo administrador, travas e eventos`.
+- [x] **1.4 Aplicar e ver passar.** Pedir ao usuário que cole a migração no SQL Editor do dev; depois o `05_gerir_usuarios.test.sql` (esperado: `ok` 1 a 40) e de novo `02_login_barreira`, `03_login_leitura` e `04_autorizacoes` (esperado: continuam passando; o `update … ativo = false` da preparação deles agora passa pelas travas e grava evento). Se algo falhar, ajustar a migração **antes** de dá-la por aplicada (no dev, colar `drop trigger …; drop function …; drop policy …;` e os `grant` de volta, e reaplicar; regra das 3 tentativas).
+- [x] **1.5 Tipos e registro.** `npm run db:types` (vínculo conferido). Acrescentar a migração à lista de "Migrações aplicadas à mão" em `supabase/AMBIENTES.md`, com a data e os testes que passaram.
+- [x] **1.6 Commit:** teste, migração, tipos e `AMBIENTES.md` juntos — `Gere usuários no banco: alteração pelo administrador, travas e eventos`.
 
 ---
 
