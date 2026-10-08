@@ -23,8 +23,14 @@ export function useEntrada(acesso: ModuloDeAcesso) {
     acesso.entrarComGoogle().catch(() => setEstado(FALHA))
   }, [acesso])
 
+  // Sem rede, o signOut do supabase-js apaga o login do navegador e só depois devolve o erro: aí a pessoa já
+  // saiu deste computador. Só quando o login continua guardado a falha sobe (o menu mostra a mensagem).
   const sair = useCallback(async () => {
-    await acesso.sair()
+    try {
+      await acesso.sair()
+    } catch (erro) {
+      if (await acesso.sessaoAtual()) throw erro
+    }
     setEstado({ tipo: 'fora', recusa: null })
   }, [acesso])
 

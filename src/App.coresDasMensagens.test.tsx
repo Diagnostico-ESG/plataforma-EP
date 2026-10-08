@@ -5,6 +5,7 @@ import css from './components/administracao/Administracao.css?raw'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { LinhaDeUsuario, Perfil } from './acesso/tipos'
+import { regrasDaClasse } from './testes/regrasDaClasse'
 
 beforeEach(() => {
   window.location.hash = '#/administracao'
@@ -74,13 +75,9 @@ test('perfil sem permissão é aviso amarelo, não falha', async () => {
 })
 
 test('o CSS pinta falha e erro com as cores de atraso e o aviso com as de pendência', () => {
-  const corDe = (classe: string) => css.split('}')
-    .filter((bloco) => bloco.split('{')[0].includes(classe))
-    .map((bloco) => bloco.split('{')[1] ?? '')
-    .join(';')
-  expect(corDe('.administracao-falha')).toContain('--atraso-fundo')
-  expect(corDe('.administracao-falha')).toContain('--atraso-texto')
-  expect(corDe('.administracao-erro')).toContain('--atraso-fundo')
-  expect(corDe('.administracao-erro')).not.toContain('--pendencia')
-  expect(corDe('.administracao-sem-permissao')).toContain('--pendencia-fundo')
+  expect(regrasDaClasse(css, '.administracao-falha')).toContain('--atraso-fundo')
+  expect(regrasDaClasse(css, '.administracao-falha')).toContain('--atraso-texto')
+  expect(regrasDaClasse(css, '.administracao-erro')).toContain('--atraso-fundo')
+  expect(regrasDaClasse(css, '.administracao-erro')).not.toContain('--pendencia')
+  expect(regrasDaClasse(css, '.administracao-sem-permissao')).toContain('--pendencia-fundo')
 })

@@ -3,6 +3,7 @@ import { afterEach, expect, test } from 'vitest'
 import App from './App'
 import { AcessoFalso } from './acesso/AcessoFalso'
 import css from './components/moldura/Moldura.css?raw'
+import { regrasDaClasse } from './testes/regrasDaClasse'
 
 afterEach(cleanup)
 
@@ -43,32 +44,68 @@ test('Sair encerra a sessão e volta à tela de entrada', async () => {
   expect(acesso.chamadas.sair).toBe(1)
 })
 
-test('Sair com falha mantém a pessoa dentro e mostra a falha em vermelho', async () => {
-  const acesso = AcessoFalso.logadoComo()
-  acesso.falharSair = true
+const FALHA_AO_SAIR = 'Não foi possível sair. Verifique a conexão e tente de novo.'
+const ENTRAR = { name: 'Entrar com a conta institucional' }
+
+async function clicarSair(acesso: AcessoFalso) {
   fireEvent.click(await abrirLogado(acesso))
   fireEvent.click(screen.getByRole('button', { name: 'Sair' }))
-  const falha = await screen.findByRole('alert')
-  expect(falha.textContent).toBe('Não foi possível sair. Verifique a conexão e tente de novo.')
-  expect(falha.className).toContain('menu-conta-falha')
-  expect(screen.getByRole('button', { name: 'Sair' })).toBeTruthy()
-  expect(screen.queryByRole('button', { name: 'Entrar com a conta institucional' })).toBeNull()
+}
+
+// Sem rede, o signOut do supabase-js apaga o login do navegador e só depois devolve o erro.
+test('Sair com falha depois de o navegador esquecer o login volta à tela de entrada', async () => {
+  const acesso = AcessoFalso.logadoComo()
+  acesso.falhaAoSair = 'apaga'
+  await clicarSair(acesso)
+  expect(await screen.findByRole('button', ENTRAR)).toBeTruthy()
+  expect(screen.queryByText(FALHA_AO_SAIR)).toBeNull()
 })
 
-test('Sair de novo depois de uma falha tira a mensagem e encerra a sessão', async () => {
+test('Sair com falha e o login ainda guardado mantém a pessoa dentro e mostra a falha em vermelho', async () => {
   const acesso = AcessoFalso.logadoComo()
-  acesso.falharSair = true
+  acesso.falhaAoSair = 'mantem'
+  await clicarSair(acesso)
+  const falha = await screen.findByRole('alert')
+  expect(falha.textContent).toBe(FALHA_AO_SAIR)
+  expect(falha.className).toContain('menu-conta-falha')
+  expect(screen.queryByRole('button', ENTRAR)).toBeNull()
+})
+
+test('Sair com falha sem conseguir nem reler o login mantém a pessoa dentro com a mensagem', async () => {
+  const acesso = AcessoFalso.logadoComo()
+  acesso.falhaAoSair = 'mantem'
   fireEvent.click(await abrirLogado(acesso))
+  acesso.falharConexao = true
   fireEvent.click(screen.getByRole('button', { name: 'Sair' }))
+  expect((await screen.findByRole('alert')).textContent).toBe(FALHA_AO_SAIR)
+  expect(screen.queryByRole('button', ENTRAR)).toBeNull()
+})
+
+test('um novo Sair tira a mensagem, mostra de novo se falhar outra vez e encerra quando dá certo', async () => {
+  const acesso = AcessoFalso.logadoComo()
+  acesso.falhaAoSair = 'mantem'
+  await clicarSair(acesso)
   await screen.findByRole('alert')
-  acesso.falharSair = false
   fireEvent.click(screen.getByRole('button', { name: 'Sair' }))
-  expect(await screen.findByRole('button', { name: 'Entrar com a conta institucional' })).toBeTruthy()
-  expect(acesso.chamadas.sair).toBe(2)
+  expect(screen.queryByRole('alert')).toBeNull()
+  expect((await screen.findByRole('alert')).textContent).toBe(FALHA_AO_SAIR)
+  acesso.falhaAoSair = null
+  fireEvent.click(screen.getByRole('button', { name: 'Sair' }))
+  expect(await screen.findByRole('button', ENTRAR)).toBeTruthy()
+  expect(acesso.chamadas.sair).toBe(3)
+})
+
+test('o botão Sair fica desativado enquanto a saída está em andamento', async () => {
+  const acesso = AcessoFalso.logadoComo()
+  acesso.segurarSair = true
+  await clicarSair(acesso)
+  const sair = screen.getByRole('button', { name: 'Sair' }) as HTMLButtonElement
+  expect(sair.disabled).toBe(true)
+  fireEvent.click(sair)
+  expect(acesso.chamadas.sair).toBe(1)
 })
 
 test('o CSS pinta a falha do Sair com as cores de atraso (vermelho)', () => {
-  const bloco = css.split('}').find((trecho) => trecho.split('{')[0].includes('.menu-conta-falha')) ?? ''
-  expect(bloco).toContain('--atraso-fundo')
-  expect(bloco).toContain('--atraso-texto')
+  expect(regrasDaClasse(css, '.menu-conta-falha')).toContain('--atraso-fundo')
+  expect(regrasDaClasse(css, '.menu-conta-falha')).toContain('--atraso-texto')
 })
