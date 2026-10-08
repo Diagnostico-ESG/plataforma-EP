@@ -113,8 +113,7 @@
 }
 
 .tabela-usuarios-acoes,
-.correcao-de-nome,
-.perfil-da-linha {
+.correcao-de-nome {
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
@@ -122,9 +121,22 @@
 }
 
 .tabela-usuarios-acoes .administracao-falha,
-.correcao-de-nome .administracao-falha,
-.perfil-da-linha .administracao-falha {
+.correcao-de-nome .administracao-falha {
   flex-basis: 100%;
+  margin: 0;
+}
+
+/* Grade de três colunas: com quebra livre, o Cancelar descia sozinho quando a coluna Perfil ficava estreita.
+   A coluna passa a ter a largura dos três juntos, e só a mensagem de falha ocupa a linha de baixo. */
+.perfil-da-linha {
+  display: inline-grid;
+  grid-template-columns: repeat(3, auto);
+  align-items: center;
+  gap: var(--esp-2);
+}
+
+.perfil-da-linha .administracao-falha {
+  grid-column: 1 / -1;
   margin: 0;
 }
 

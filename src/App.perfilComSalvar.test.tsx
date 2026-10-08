@@ -1,9 +1,11 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import App from './App'
+import css from './components/administracao/Administracao.css?raw'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { LinhaDeUsuario, Perfil } from './acesso/tipos'
+import { regrasDaClasse } from './testes/regrasDaClasse'
 
 beforeEach(() => {
   window.location.hash = '#/administracao'
@@ -100,4 +102,12 @@ test.each<[string, string | Error, string]>([
   expect(perfilNaTela(ANA)).toBe('administrador')
   expect((botoesDoPerfil(ANA).salvar as HTMLButtonElement).disabled).toBe(false)
   expect(botoesDoPerfil(ANA).cancelar).toBeTruthy()
+})
+
+// O jsdom não calcula layout: o teste confere a regra do CSS. Com quebra livre (flex-wrap), o Cancelar descia
+// sozinho para a linha de baixo quando a coluna Perfil ficava estreita (conferência na tela do /ship, 2026-10-08).
+test('seletor, Salvar e Cancelar ficam numa linha só, e só a falha desce', () => {
+  expect(regrasDaClasse(css, '.perfil-da-linha')).toContain('grid-template-columns: repeat(3, auto)')
+  expect(regrasDaClasse(css, '.perfil-da-linha')).not.toContain('flex-wrap')
+  expect(regrasDaClasse(css, '.perfil-da-linha .administracao-falha')).toContain('grid-column: 1 / -1')
 })
