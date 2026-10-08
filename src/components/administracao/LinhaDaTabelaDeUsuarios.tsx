@@ -3,6 +3,7 @@ import type { LinhaDeUsuario, Perfil, SituacaoDoUsuario } from '../../acesso/tip
 import { Avatar } from '../Avatar'
 import { Pilula, type SituacaoPilula } from '../Pilula'
 import { CorrecaoDeNome } from './CorrecaoDeNome'
+import { JanelaDeConfirmacao } from './JanelaDeConfirmacao'
 import { PerfilDaLinha } from './PerfilDaLinha'
 
 const ROTULO_DA_SITUACAO: Record<SituacaoDoUsuario, string> = {
@@ -59,26 +60,53 @@ type BotoesDaLinhaProps = { linha: LinhaDeUsuario; acoes: AcoesDaLinha; aoCorrig
 
 // Quem já entrou não se exclui, só se desativa (ADR 0002).
 function BotoesDaLinha({ linha, acoes, aoCorrigirNome }: BotoesDaLinhaProps) {
-  if (linha.situacao === 'aguardando') {
-    return (
-      <button type="button" className="botao botao-secundario" aria-label={`Excluir autorização de ${linha.email}`}
-        onClick={() => acoes.aoExcluir(linha.email)}>
-        Excluir
-      </button>
-    )
-  }
-  const ativo = linha.situacao === 'ativo'
-  const acao = ativo ? 'Desativar' : 'Reativar'
+  if (linha.situacao === 'aguardando') return <BotaoExcluirAutorizacao email={linha.email} aoExcluir={acoes.aoExcluir} />
   return (
     <span className="tabela-usuarios-acoes">
       <button type="button" className="botao botao-secundario" aria-label={`Corrigir nome de ${linha.email}`}
         onClick={aoCorrigirNome}>
         Corrigir nome
       </button>
-      <button type="button" className="botao botao-secundario" aria-label={`${acao} ${linha.email}`}
-        onClick={() => (ativo ? acoes.aoDesativar(linha.chave) : acoes.aoReativar(linha.chave))}>
-        {acao}
-      </button>
+      {linha.situacao === 'ativo'
+        ? <BotaoDesativar linha={linha} aoDesativar={acoes.aoDesativar} />
+        : (
+          <button type="button" className="botao botao-secundario" aria-label={`Reativar ${linha.email}`}
+            onClick={() => acoes.aoReativar(linha.chave)}>
+            Reativar
+          </button>
+        )}
     </span>
+  )
+}
+
+// Excluir e Desativar tiram acesso: pedem confirmação (ADR 0003). Reativar é o desfazer e vai direto.
+function BotaoExcluirAutorizacao({ email, aoExcluir }: { email: string; aoExcluir: (email: string) => void }) {
+  const [confirmando, setConfirmando] = useState(false)
+  return (
+    <>
+      <button type="button" className="botao botao-secundario" aria-label={`Excluir autorização de ${email}`}
+        onClick={() => setConfirmando(true)}>
+        Excluir
+      </button>
+      <JanelaDeConfirmacao aberta={confirmando} titulo={`Excluir a autorização de ${email}?`}
+        texto="A pessoa não conseguirá entrar. Para permitir de novo, autorize o e-mail outra vez."
+        rotuloDaAcao="Excluir autorização" aoConfirmar={() => aoExcluir(email)} aoFechar={() => setConfirmando(false)} />
+    </>
+  )
+}
+
+function BotaoDesativar({ linha, aoDesativar }: { linha: LinhaDeUsuario; aoDesativar: (id: string) => void }) {
+  const [confirmando, setConfirmando] = useState(false)
+  const nome = linha.nome ?? linha.email
+  return (
+    <>
+      <button type="button" className="botao botao-secundario" aria-label={`Desativar ${linha.email}`}
+        onClick={() => setConfirmando(true)}>
+        Desativar
+      </button>
+      <JanelaDeConfirmacao aberta={confirmando} titulo={`Desativar ${nome}?`}
+        texto={`${nome} perde o acesso à plataforma. O nome e o histórico continuam registrados, e você pode reativar depois.`}
+        rotuloDaAcao="Desativar" aoConfirmar={() => aoDesativar(linha.chave)} aoFechar={() => setConfirmando(false)} />
+    </>
   )
 }

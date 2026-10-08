@@ -191,7 +191,7 @@ export function JanelaDeConfirmacao({ aberta, titulo, texto, rotuloDaAcao, aoCon
 
 ### Tarefa 2: Excluir e Desativar pedem confirmação — C1, C2, C3, C4, C7
 
-- [ ] **Passo 1: testes que falham.** Crie `src/App.confirmacao.test.tsx` (mesmo cenário de `App.gestaoDeUsuarios.test.tsx`: copie `ANA`, `BETO`, `AGUARDANDO`, `LINHAS`, `abrirComoAdministrador` e `linhaDe` de lá, com `beforeEach`/`afterEach` do hash `#/administracao`). Testes:
+- [x] **Passo 1: testes que falham.** Crie `src/App.confirmacao.test.tsx` (mesmo cenário de `App.gestaoDeUsuarios.test.tsx`: copie `ANA`, `BETO`, `AGUARDANDO`, `LINHAS`, `abrirComoAdministrador` e `linhaDe` de lá, com `beforeEach`/`afterEach` do hash `#/administracao`). Testes:
 
 ```tsx
 function janelaAberta() {
@@ -262,16 +262,16 @@ test('Reativar grava com um clique, sem janela', async () => {
 ```
 
   (importar `act` junto com `cleanup, fireEvent, render, screen, waitFor, within`.)
-- [ ] **Passo 2: rodar e ver falhar.** `npx vitest run src/App.confirmacao.test.tsx` — esperado: falha (não há janela).
-- [ ] **Passo 3: implementar em `LinhaDaTabelaDeUsuarios.tsx`.** Em `BotoesDaLinha`, guarde `const [confirmando, setConfirmando] = useState(false)` e troque os dois `onClick` de Excluir e Desativar por `() => setConfirmando(true)`; Reativar continua chamando `acoes.aoReativar` direto. Renderize ao lado do botão uma `JanelaDeConfirmacao` com `aberta={confirmando}`, `aoFechar={() => setConfirmando(false)}` e:
+- [x] **Passo 2: rodar e ver falhar.** `npx vitest run src/App.confirmacao.test.tsx` — esperado: falha (não há janela).
+- [x] **Passo 3: implementar em `LinhaDaTabelaDeUsuarios.tsx`.** Em `BotoesDaLinha`, guarde `const [confirmando, setConfirmando] = useState(false)` e troque os dois `onClick` de Excluir e Desativar por `() => setConfirmando(true)`; Reativar continua chamando `acoes.aoReativar` direto. Renderize ao lado do botão uma `JanelaDeConfirmacao` com `aberta={confirmando}`, `aoFechar={() => setConfirmando(false)}` e:
   - Excluir: `titulo={`Excluir a autorização de ${linha.email}?`}`, `texto` e `rotuloDaAcao="Excluir autorização"` da spec, `aoConfirmar={() => acoes.aoExcluir(linha.email)}`.
   - Desativar (só quando `ativo`): `const nome = linha.nome ?? linha.email`; `titulo={`Desativar ${nome}?`}`, `texto={`${nome} perde o acesso à plataforma. O nome e o histórico continuam registrados, e você pode reativar depois.`}`, `rotuloDaAcao="Desativar"`, `aoConfirmar={() => acoes.aoDesativar(linha.chave)}`.
   Para manter as funções com até 20 linhas, divida `BotoesDaLinha` em `BotaoExcluirAutorizacao` (linha aguardando) e `BotoesDoUsuario` (Corrigir nome + Desativar/Reativar), cada um com seu próprio estado `confirmando`.
-- [ ] **Passo 4: rodar e ver passar.** `npx vitest run src/App.confirmacao.test.tsx`.
-- [ ] **Passo 5: ajustar os testes antigos.** Rode `npx vitest run` e, para cada teste que agora falha por clicar em Excluir ou Desativar sem confirmar (esperados: em `src/App.autorizacoes.test.tsx` "exclui uma autorização aguardando" e "falha ao excluir…"; em `src/App.gestaoDeUsuarios.test.tsx` "desativa um usuário ativo" e as três travas/falhas que clicam em `Desativar`; confira também `App.historico.test.tsx` e `App.administracao.test.tsx` com `grep -n "Excluir\|Desativar"`), acrescente depois do clique a confirmação:
+- [x] **Passo 4: rodar e ver passar.** `npx vitest run src/App.confirmacao.test.tsx`.
+- [x] **Passo 5: ajustar os testes antigos.** Rode `npx vitest run` e, para cada teste que agora falha por clicar em Excluir ou Desativar sem confirmar (esperados: em `src/App.autorizacoes.test.tsx` "exclui uma autorização aguardando" e "falha ao excluir…"; em `src/App.gestaoDeUsuarios.test.tsx` "desativa um usuário ativo" e as três travas/falhas que clicam em `Desativar`; confira também `App.historico.test.tsx` e `App.administracao.test.tsx` com `grep -n "Excluir\|Desativar"`), acrescente depois do clique a confirmação:
   `fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Excluir autorização' }))` (ou `'Desativar'`). Não mude as expectativas.
-- [ ] **Passo 6: rodar tudo.** `npm test` — esperado: tudo verde.
-- [ ] **Passo 7: commit.** `git add src && git commit -m "Excluir autorização e Desativar pedem confirmação em janela"`.
+- [x] **Passo 6: rodar tudo.** `npm test` — esperado: tudo verde.
+- [x] **Passo 7: commit.** `git add src && git commit -m "Excluir autorização e Desativar pedem confirmação em janela"`.
 
 ---
 

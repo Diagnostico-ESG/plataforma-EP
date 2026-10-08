@@ -69,6 +69,7 @@ test('trava: mudar o próprio perfil mostra a regra e não grava', async () => {
 test('desativa um usuário ativo', async () => {
   await abrirComoAdministrador()
   fireEvent.click(screen.getByRole('button', { name: `Desativar ${ANA}` }))
+  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Desativar' }))
   expect(await screen.findByRole('button', { name: `Reativar ${ANA}` })).toBeTruthy()
   expect(linhaDe(ANA).getByText('Inativo')).toBeTruthy()
 })
@@ -77,6 +78,7 @@ test('trava: desativar a si mesmo mostra a regra e mantém a linha', async () =>
   const acesso = await abrirComoAdministrador()
   acesso.falhaDeGravacao = new TravaDoBanco('Você não pode desativar a si mesmo.')
   fireEvent.click(screen.getByRole('button', { name: `Desativar ${ANA}` }))
+  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Desativar' }))
   expect(await screen.findByText('Você não pode desativar a si mesmo.')).toBeTruthy()
   expect(screen.getByRole('button', { name: `Desativar ${ANA}` })).toBeTruthy()
 })
@@ -85,6 +87,7 @@ test('trava: último administrador ativo mostra a regra com o nome', async () =>
   const acesso = await abrirComoAdministrador()
   acesso.falhaDeGravacao = new TravaDoBanco('Não é possível: Ana Teste é o último administrador ativo.')
   fireEvent.click(screen.getByRole('button', { name: `Desativar ${ANA}` }))
+  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Desativar' }))
   expect(await screen.findByText('Não é possível: Ana Teste é o último administrador ativo.')).toBeTruthy()
 })
 

@@ -79,6 +79,7 @@ test('falha ao mudar o perfil mostra o motivo, mantém a escolha e não grava', 
 test('exclui uma autorização aguardando', async () => {
   const acesso = await abrirComo()
   fireEvent.click(screen.getByRole('button', { name: `Excluir autorização de ${AGUARDANDO}` }))
+  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Excluir autorização' }))
   await waitFor(() => expect(screen.queryByText(AGUARDANDO)).toBeNull())
   expect(acesso.linhas).toHaveLength(0)
 })
@@ -87,6 +88,7 @@ test('falha ao excluir mostra o motivo e mantém a linha', async () => {
   const acesso = await abrirComo()
   acesso.falhaDeGravacao = `a autorização de ${AGUARDANDO} não foi encontrada (pode já ter sido usada no primeiro acesso)`
   fireEvent.click(screen.getByRole('button', { name: `Excluir autorização de ${AGUARDANDO}` }))
+  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Excluir autorização' }))
   expect(await screen.findByText(`A alteração não foi salva: ${acesso.falhaDeGravacao}.`)).toBeTruthy()
   expect(screen.getByText(AGUARDANDO)).toBeTruthy()
 })
