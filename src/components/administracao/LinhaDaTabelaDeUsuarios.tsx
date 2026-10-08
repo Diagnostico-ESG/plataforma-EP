@@ -1,4 +1,5 @@
 import { type Ref, useEffect, useRef, useState } from 'react'
+import { textoDaFalha } from '../../acesso/falhasDeGravacao'
 import type { LinhaDeUsuario, Perfil, SituacaoDoUsuario } from '../../acesso/tipos'
 import { Avatar } from '../Avatar'
 import { Pilula, type SituacaoPilula } from '../Pilula'
@@ -15,9 +16,9 @@ const PILULA_DA_SITUACAO: Record<SituacaoDoUsuario, SituacaoPilula> = {
 
 export type AcoesDaLinha = {
   aoMudarPerfil: (linha: LinhaDeUsuario, perfil: Perfil) => Promise<void>
-  aoExcluir: (email: string) => void
-  aoDesativar: (id: string) => void
-  aoReativar: (id: string) => void
+  aoExcluir: (email: string) => Promise<void>
+  aoDesativar: (id: string) => Promise<void>
+  aoReativar: (id: string) => Promise<void>
   aoCorrigirNome: (id: string, nome: string) => Promise<void>
 }
 type LinhaDaTabelaDeUsuariosProps = AcoesDaLinha & { linha: LinhaDeUsuario }
@@ -70,29 +71,48 @@ type BotoesDaLinhaProps = {
   refCorrigir: Ref<HTMLButtonElement>
 }
 
-// Quem já entrou não se exclui, só se desativa (ADR 0002).
-function BotoesDaLinha({ linha, acoes, aoCorrigirNome, refCorrigir }: BotoesDaLinhaProps) {
-  if (linha.situacao === 'aguardando') return <BotaoExcluirAutorizacao email={linha.email} aoExcluir={acoes.aoExcluir} />
+// A falha de Excluir, Desativar ou Reativar aparece na própria linha, junto da pessoa afetada (spec, ADR 0003).
+function BotoesDaLinha(props: BotoesDaLinhaProps) {
+  const [falha, setFalha] = useState<string | null>(null)
+  const executar = (alteracao: () => Promise<void>) => {
+    setFalha(null)
+    alteracao().catch((erro: unknown) => setFalha(textoDaFalha(erro)))
+  }
   return (
     <span className="tabela-usuarios-acoes">
+      <AcoesDaSituacao {...props} executar={executar} />
+      {falha && <p className="administracao-falha" role="alert">{falha}</p>}
+    </span>
+  )
+}
+
+type AcoesDaSituacaoProps = BotoesDaLinhaProps & { executar: (alteracao: () => Promise<void>) => void }
+
+// Quem já entrou não se exclui, só se desativa (ADR 0002).
+function AcoesDaSituacao({ linha, acoes, aoCorrigirNome, refCorrigir, executar }: AcoesDaSituacaoProps) {
+  if (linha.situacao === 'aguardando') {
+    return <BotaoExcluirAutorizacao email={linha.email} aoExcluir={() => executar(() => acoes.aoExcluir(linha.email))} />
+  }
+  return (
+    <>
       <button ref={refCorrigir} type="button" className="botao botao-secundario" aria-label={`Corrigir nome de ${linha.email}`}
         onClick={aoCorrigirNome}>
         Corrigir nome
       </button>
       {linha.situacao === 'ativo'
-        ? <BotaoDesativar linha={linha} aoDesativar={acoes.aoDesativar} />
+        ? <BotaoDesativar linha={linha} aoDesativar={() => executar(() => acoes.aoDesativar(linha.chave))} />
         : (
           <button type="button" className="botao botao-secundario" aria-label={`Reativar ${linha.email}`}
-            onClick={() => acoes.aoReativar(linha.chave)}>
+            onClick={() => executar(() => acoes.aoReativar(linha.chave))}>
             Reativar
           </button>
         )}
-    </span>
+    </>
   )
 }
 
 // Excluir e Desativar tiram acesso: pedem confirmação (ADR 0003). Reativar é o desfazer e vai direto.
-function BotaoExcluirAutorizacao({ email, aoExcluir }: { email: string; aoExcluir: (email: string) => void }) {
+function BotaoExcluirAutorizacao({ email, aoExcluir }: { email: string; aoExcluir: () => void }) {
   const [confirmando, setConfirmando] = useState(false)
   return (
     <>
@@ -102,12 +122,12 @@ function BotaoExcluirAutorizacao({ email, aoExcluir }: { email: string; aoExclui
       </button>
       <JanelaDeConfirmacao aberta={confirmando} titulo={`Excluir a autorização de ${email}?`}
         texto="A pessoa não conseguirá entrar. Para permitir de novo, autorize o e-mail outra vez."
-        rotuloDaAcao="Excluir autorização" aoConfirmar={() => aoExcluir(email)} aoFechar={() => setConfirmando(false)} />
+        rotuloDaAcao="Excluir autorização" aoConfirmar={aoExcluir} aoFechar={() => setConfirmando(false)} />
     </>
   )
 }
 
-function BotaoDesativar({ linha, aoDesativar }: { linha: LinhaDeUsuario; aoDesativar: (id: string) => void }) {
+function BotaoDesativar({ linha, aoDesativar }: { linha: LinhaDeUsuario; aoDesativar: () => void }) {
   const [confirmando, setConfirmando] = useState(false)
   const nome = linha.nome ?? linha.email
   return (
@@ -118,7 +138,7 @@ function BotaoDesativar({ linha, aoDesativar }: { linha: LinhaDeUsuario; aoDesat
       </button>
       <JanelaDeConfirmacao aberta={confirmando} titulo={`Desativar ${nome}?`}
         texto={`${nome} perde o acesso à plataforma. O nome e o histórico continuam registrados, e você pode reativar depois.`}
-        rotuloDaAcao="Desativar" aoConfirmar={() => aoDesativar(linha.chave)} aoFechar={() => setConfirmando(false)} />
+        rotuloDaAcao="Desativar" aoConfirmar={aoDesativar} aoFechar={() => setConfirmando(false)} />
     </>
   )
 }

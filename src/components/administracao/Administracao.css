@@ -121,6 +121,7 @@
   gap: var(--esp-2);
 }
 
+.tabela-usuarios-acoes .administracao-falha,
 .correcao-de-nome .administracao-falha,
 .perfil-da-linha .administracao-falha {
   flex-basis: 100%;
