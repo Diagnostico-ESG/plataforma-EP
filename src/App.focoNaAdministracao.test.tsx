@@ -6,6 +6,7 @@ import type { LinhaDeUsuario, Perfil } from './acesso/tipos'
 
 // Quando o botão em uso some (Salvar, Cancelar, o formulário do nome), o foco precisa de um destino;
 // sem ele, quem usa teclado ou leitor de tela volta ao topo da página.
+// Depois de uma gravação, o foco se move um instante depois de a tela mudar; por isso a conferência espera.
 beforeEach(() => {
   window.location.hash = '#/administracao'
 })
@@ -43,7 +44,7 @@ test('salvar o perfil devolve o foco ao seletor', async () => {
   escolherIntegrante()
   fireEvent.click(screen.getByRole('button', { name: `Salvar perfil de ${ANA}` }))
   await waitFor(() => expect(screen.queryByRole('button', { name: `Salvar perfil de ${ANA}` })).toBeNull())
-  expect(document.activeElement).toBe(screen.getByLabelText(`Perfil de ${ANA}`))
+  await waitFor(() => expect(document.activeElement).toBe(screen.getByLabelText(`Perfil de ${ANA}`)))
 })
 
 test('cancelar a correção do nome devolve o foco ao botão Corrigir nome', async () => {
@@ -59,7 +60,7 @@ test('salvar o nome devolve o foco ao botão Corrigir nome', async () => {
   fireEvent.change(screen.getByLabelText(`Nome de ${ANA}`), { target: { value: 'Ana Corrigida' } })
   fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
   await screen.findByText('Ana Corrigida')
-  expect(document.activeElement).toBe(screen.getByRole('button', { name: `Corrigir nome de ${ANA}` }))
+  await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('button', { name: `Corrigir nome de ${ANA}` })))
 })
 
 test('o aviso do e-mail fica ligado ao campo, para o leitor de tela ler os dois juntos', async () => {

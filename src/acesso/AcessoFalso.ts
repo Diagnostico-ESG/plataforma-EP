@@ -16,6 +16,7 @@ export class AcessoFalso implements ModuloDeAcesso {
   usuarios = new Map<string, UsuarioAtual>()
   recusa: RecusaDeEntrada | null = null
   falharConexao = false
+  falharEntrada = false
   /** 'apaga' imita o signOut do supabase-js sem rede (apaga o login local e devolve erro); 'mantem', a falha ao renovar o login antes de sair. */
   falhaAoSair: 'apaga' | 'mantem' | null = null
   segurarSair = false
@@ -48,6 +49,7 @@ export class AcessoFalso implements ModuloDeAcesso {
 
   async entrarComGoogle(): Promise<void> {
     this.chamadas.entrarComGoogle++
+    if (this.falharEntrada) throw new Error('Falha ao abrir a entrada do Google: falha de conexão simulada')
   }
 
   async sair(): Promise<void> {

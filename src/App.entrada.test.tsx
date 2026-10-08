@@ -42,6 +42,28 @@ test('conta sem autorização vê a mensagem para pedir a um administrador', asy
   )
 })
 
+test('sessão aberta sem cadastro em usuarios é encerrada e mostra que a conta não foi autorizada', async () => {
+  const acesso = new AcessoFalso()
+  acesso.sessao = { usuarioId: 'sem-cadastro', email: 'nova.pessoa@ccivil.pr.gov.br' }
+  render(<App acesso={acesso} />)
+  expect((await screen.findByRole('alert')).textContent).toBe(
+    'A conta nova.pessoa@ccivil.pr.gov.br ainda não foi autorizada. Peça a um administrador.',
+  )
+  expect(acesso.chamadas.sair).toBe(1)
+})
+
+test('falha ao abrir a entrada do Google mostra a falha de conexão', async () => {
+  const acesso = new AcessoFalso()
+  acesso.falharEntrada = true
+  render(<App acesso={acesso} />)
+  const botao = await screen.findByRole('button', BOTAO_ENTRAR)
+  await waitFor(() => expect(botao).toHaveProperty('disabled', false))
+  fireEvent.click(botao)
+  expect((await screen.findByRole('alert')).textContent).toContain(
+    'Não foi possível conectar. Verifique a conexão e tente de novo.',
+  )
+})
+
 test('usuário inativo tem a sessão encerrada e vê o motivo', async () => {
   const acesso = AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, ativo: false })
   render(<App acesso={acesso} />)

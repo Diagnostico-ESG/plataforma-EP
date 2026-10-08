@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, expect, test } from 'vitest'
 import App from './App'
 import { AcessoFalso } from './acesso/AcessoFalso'
@@ -128,7 +128,8 @@ test('depois de uma falha ao sair, o foco volta ao botão Sair', async () => {
   acesso.falhaAoSair = 'mantem'
   await clicarSair(acesso)
   await screen.findByRole('alert')
-  expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Sair' }))
+  // O foco se move num efeito, um instante depois de a mensagem aparecer; sob carga, conferir na hora falha.
+  await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Sair' })))
 })
 
 test('clicar fora do menu da conta fecha o menu', async () => {

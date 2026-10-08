@@ -10,13 +10,16 @@ class ClienteSupabaseFalso {
   sessao: unknown = null
   linhaDoUsuario: RespostaDoBanco = { data: null, error: null }
   pedidoDeEntrada: unknown = null
+  erroDaSessao: { message: string } | null = null
+  erroDaEntrada: { message: string } | null = null
+  erroAoSair: { message: string } | null = null
   auth = {
-    getSession: async () => ({ data: { session: this.sessao }, error: null }),
+    getSession: async () => ({ data: { session: this.sessao }, error: this.erroDaSessao }),
     signInWithOAuth: async (pedido: unknown) => {
       this.pedidoDeEntrada = pedido
-      return { data: {}, error: null }
+      return { data: {}, error: this.erroDaEntrada }
     },
-    signOut: async () => ({ error: null }),
+    signOut: async () => ({ error: this.erroAoSair }),
   }
   from() {
     const consulta = { select: () => consulta, eq: () => consulta, maybeSingle: async () => this.linhaDoUsuario }
@@ -57,6 +60,25 @@ describe('criarAcessoSupabase', () => {
     const cliente = new ClienteSupabaseFalso()
     await criar(cliente).entrarComGoogle()
     expect(cliente.pedidoDeEntrada).toMatchObject({ provider: 'google', options: { queryParams: { hd: 'ccivil.pr.gov.br' } } })
+  })
+
+  test('erro ao ler a sessão vira exceção com o texto do Supabase', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.erroDaSessao = { message: 'sem rede' }
+    await expect(criar(cliente).sessaoAtual()).rejects.toThrow('Falha ao ler a sessão: sem rede')
+  })
+
+  test('erro ao abrir a entrada do Google vira exceção com o texto do Supabase', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.erroDaEntrada = { message: 'sem rede' }
+    await expect(criar(cliente).entrarComGoogle()).rejects.toThrow('Falha ao abrir a entrada do Google: sem rede')
+  })
+
+  test('sair sem erro termina; com erro, vira exceção com o texto do Supabase', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    await expect(criar(cliente).sair()).resolves.toBeUndefined()
+    cliente.erroAoSair = { message: 'sem rede' }
+    await expect(criar(cliente).sair()).rejects.toThrow('Falha ao sair: sem rede')
   })
 
   test('a recusa vem do endereço de chegada', () => {

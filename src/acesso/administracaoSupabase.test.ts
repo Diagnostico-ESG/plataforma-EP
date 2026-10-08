@@ -60,6 +60,22 @@ describe('criarAdministracaoSupabase', () => {
     await expect(criar(cliente).listarUsuarios()).rejects.toThrow(/usuários.*sem rede/)
   })
 
+  test('falha ao listar as autorizações vira exceção com o texto do banco', async () => {
+    const cliente = new ClienteDeAdministracaoFalso()
+    cliente.respostas['autorizacoes.select'] = { data: null, error: { message: 'sem rede' } }
+    await expect(criar(cliente).listarUsuarios()).rejects.toThrow('Falha ao listar as autorizações: sem rede')
+  })
+
+  test('usuário ativo aparece com a situação ativo', async () => {
+    const cliente = new ClienteDeAdministracaoFalso()
+    cliente.respostas['usuarios.select'] = {
+      data: [{ id: 'u1', nome: 'Ana Teste', foto_url: null, perfil: 'consulta', ativo: true,
+        usuarios_emails: { email: 'ana.teste@ccivil.pr.gov.br' } }],
+      error: null,
+    }
+    expect((await criar(cliente).listarUsuarios())[0].situacao).toBe('ativo')
+  })
+
   test('autorizar inclui e-mail e perfil; a recusa do banco vira o motivo', async () => {
     const cliente = new ClienteDeAdministracaoFalso()
     await criar(cliente).autorizarEmail('nova.teste@ccivil.pr.gov.br', 'integrante_ep')
