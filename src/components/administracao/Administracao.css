@@ -135,8 +135,11 @@
   gap: var(--esp-2);
 }
 
+/* width 0 + min-width 100%: a mensagem ocupa a largura dos três sem alargar as colunas; texto longo quebra. */
 .perfil-da-linha .administracao-falha {
   grid-column: 1 / -1;
+  width: 0;
+  min-width: 100%;
   margin: 0;
 }
 

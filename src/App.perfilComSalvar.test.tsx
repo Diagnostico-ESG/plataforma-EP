@@ -111,3 +111,9 @@ test('seletor, Salvar e Cancelar ficam numa linha só, e só a falha desce', () 
   expect(regrasDaClasse(css, '.perfil-da-linha')).not.toContain('flex-wrap')
   expect(regrasDaClasse(css, '.perfil-da-linha .administracao-falha')).toContain('grid-column: 1 / -1')
 })
+
+// Sem isso, uma falha longa (a trava do último administrador traz o nome) alargava as colunas e afastava os botões.
+test('a falha do perfil quebra o texto em vez de alargar as colunas', () => {
+  expect(regrasDaClasse(css, '.perfil-da-linha .administracao-falha')).toContain('width: 0')
+  expect(regrasDaClasse(css, '.perfil-da-linha .administracao-falha')).toContain('min-width: 100%')
+})
