@@ -15,3 +15,5 @@
 - [x] Lista na área Administração com data e hora, autor (nome; "Configuração inicial (direto no banco)" quando o autor é nulo, como na autorização do primeiro administrador), ação em texto legível e o antes e depois.
 - [x] Estados: "Carregando histórico…", "Nenhuma alteração registrada ainda." e erro com [Tentar de novo].
 - [x] Testes de interface com o aplicativo inteiro e o módulo falso, cobrindo lista, vazio, erro e a ausência do histórico para quem não é administrador.
+
+Concluído em 2026-10-08 (commit 4a78100)
