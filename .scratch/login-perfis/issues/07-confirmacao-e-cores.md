@@ -10,11 +10,11 @@
 
 ## Critérios de aceite
 
-- [ ] Excluir abre "Excluir a autorização de {e-mail}?" com o texto e os botões [Excluir autorização] [Cancelar] da spec; Desativar abre "Desativar {nome}?" com o texto e os botões [Desativar] [Cancelar].
-- [ ] A janela abre com o foco no Cancelar; Cancelar e Esc fecham sem gravar; o botão da ação grava e fecha.
-- [ ] Se a gravação confirmada falhar, a mensagem aparece na linha, como nas demais ações.
-- [ ] Reativar grava com um clique, sem janela.
-- [ ] Sem dependência nova; o botão de confirmar usa o estilo principal existente.
-- [ ] Erro ao carregar a lista ou o histórico, erro de gravação e recusas das travas em vermelho (cores de atraso da identidade); a mensagem de perfil sem permissão em amarelo (pendência).
-- [ ] Testes de interface com o aplicativo inteiro e o módulo falso cobrindo janelas, Cancelar, Esc, confirmação, falha e Reativar sem janela, e o tipo de cada mensagem.
-- [ ] `[visual]` Janela na identidade visual (fundo esmaecido, botão principal azul, Cancelar com foco visível); falhas em vermelho e aviso em amarelo na Administração e na entrada.
+- [x] Excluir abre "Excluir a autorização de {e-mail}?" com o texto e os botões [Excluir autorização] [Cancelar] da spec; Desativar abre "Desativar {nome}?" com o texto e os botões [Desativar] [Cancelar].
+- [x] A janela abre com o foco no Cancelar; Cancelar e Esc fecham sem gravar; o botão da ação grava e fecha.
+- [x] Se a gravação confirmada falhar, a mensagem aparece na linha, como nas demais ações.
+- [x] Reativar grava com um clique, sem janela.
+- [x] Sem dependência nova; o botão de confirmar usa o estilo principal existente.
+- [x] Erro ao carregar a lista ou o histórico, erro de gravação e recusas das travas em vermelho (cores de atraso da identidade); a mensagem de perfil sem permissão em amarelo (pendência).
+- [x] Testes de interface com o aplicativo inteiro e o módulo falso cobrindo janelas, Cancelar, Esc, confirmação, falha e Reativar sem janela, e o tipo de cada mensagem.
+- [x] `[visual]` Janela na identidade visual (fundo esmaecido, botão principal azul, Cancelar com foco visível); falhas em vermelho e aviso em amarelo na Administração e na entrada.

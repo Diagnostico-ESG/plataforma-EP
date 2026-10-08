@@ -15,14 +15,22 @@
 .administracao-falha {
   padding: var(--esp-3) var(--esp-4);
   border-radius: var(--canto);
+}
+
+/* Aviso (amarelo): informa sem dizer que algo falhou. */
+.administracao-sem-permissao {
+  margin: var(--esp-5);
+  max-width: 60ch;
   background: var(--pendencia-fundo);
   border: 1px solid var(--pendencia-borda);
   color: var(--texto);
 }
 
-.administracao-sem-permissao {
-  margin: var(--esp-5);
-  max-width: 60ch;
+/* "A ação não aconteceu" (vermelho): as mesmas cores de atraso da tela de entrada. */
+.administracao-erro,
+.administracao-falha {
+  background: var(--atraso-fundo);
+  color: var(--atraso-texto);
 }
 
 .tabela-usuarios {
@@ -171,4 +179,28 @@
   .historico-mudanca {
     grid-column: auto;
   }
+}
+
+.janela-confirmacao {
+  max-width: 44ch;
+  padding: var(--esp-5);
+  border: 1px solid var(--linha);
+  border-radius: var(--canto);
+  background: var(--folha);
+  color: var(--texto);
+}
+
+.janela-confirmacao::backdrop {
+  background: rgb(30 36 51 / 45%);
+}
+
+.janela-confirmacao-titulo {
+  margin: 0 0 var(--esp-2);
+  font-size: var(--tam-base);
+}
+
+.janela-confirmacao-botoes {
+  display: flex;
+  gap: var(--esp-2);
+  margin-top: var(--esp-4);
 }

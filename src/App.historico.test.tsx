@@ -71,6 +71,7 @@ test('depois de uma alteração, o histórico é lido de novo', async () => {
   await screen.findByRole('table', { busy: false })
   await waitFor(() => expect(acesso.chamadas.listarHistorico).toBe(1))
   fireEvent.click(screen.getByRole('button', { name: `Desativar ${BETO}` }))
+  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Desativar' }))
   await waitFor(() => expect(acesso.chamadas.listarHistorico).toBe(2))
 })
 
