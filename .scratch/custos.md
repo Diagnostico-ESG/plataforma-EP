@@ -22,3 +22,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-08 | login-perfis | /demanda (bug do Sair) | US$ 5,38
 2026-10-08 | login-perfis | /polir | US$ 2,74
 2026-10-08 | login-perfis | /demanda (bug do truncate) | US$ 3,15
+2026-10-08 | login-perfis | /demanda (bug: testes de foco instáveis e testes que faltam) | US$ 3,64
