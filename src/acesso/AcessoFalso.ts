@@ -1,4 +1,6 @@
-import type { LinhaDeUsuario, ModuloDeAcesso, Perfil, RecusaDeEntrada, SessaoAtual, UsuarioAtual } from './tipos'
+import type {
+  EventoDoHistorico, LinhaDeUsuario, ModuloDeAcesso, Perfil, RecusaDeEntrada, SessaoAtual, UsuarioAtual,
+} from './tipos'
 
 export const USUARIO_DE_TESTE: UsuarioAtual = {
   id: 'usuario-de-teste',
@@ -15,11 +17,14 @@ export class AcessoFalso implements ModuloDeAcesso {
   recusa: RecusaDeEntrada | null = null
   falharConexao = false
   segurarVerificacao = false
-  chamadas = { entrarComGoogle: 0, sair: 0 }
+  chamadas = { entrarComGoogle: 0, sair: 0, listarHistorico: 0 }
   linhas: LinhaDeUsuario[] = []
   falharLista = false
   segurarLista = false
   falhaDeGravacao: string | Error | null = null
+  historico: EventoDoHistorico[] = []
+  falharHistorico = false
+  segurarHistorico = false
 
   static logadoComo(usuario: UsuarioAtual = USUARIO_DE_TESTE): AcessoFalso {
     const acesso = new AcessoFalso()
@@ -86,6 +91,13 @@ export class AcessoFalso implements ModuloDeAcesso {
 
   async corrigirNome(id: string, nome: string): Promise<void> {
     this.alterarLinha(id, { nome })
+  }
+
+  async listarHistorico(): Promise<EventoDoHistorico[]> {
+    this.chamadas.listarHistorico++
+    if (this.segurarHistorico) return new Promise<never>(() => {})
+    if (this.falharHistorico) throw new Error('falha de conexão simulada')
+    return [...this.historico]
   }
 
   private alterarLinha(chave: string, mudanca: Partial<LinhaDeUsuario>): void {

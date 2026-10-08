@@ -13,6 +13,18 @@ export type LinhaDeUsuario = {
   perfil: Perfil
   situacao: SituacaoDoUsuario
 }
+/** Antes ou depois de uma mudança, como o gatilho gravou em eventos.detalhes. */
+export type EstadoRegistrado = Record<string, string | boolean | null> | null
+export type EventoDoHistorico = {
+  id: number
+  ocorridoEm: string
+  autor: string | null
+  acao: string
+  entidade: string
+  alvo: string
+  antes: EstadoRegistrado
+  depois: EstadoRegistrado
+}
 export type MotivoDeRecusa = 'fora_do_dominio' | 'sem_autorizacao' | 'inativo' | 'desconhecido'
 export type RecusaDeEntrada = { motivo: MotivoDeRecusa; email: string }
 
@@ -23,7 +35,8 @@ export type EstadoDaEntrada =
   | { tipo: 'dentro'; usuario: UsuarioAtual }
 
 /**
- * Único ponto por onde a interface fala com o Auth e com o banco no login e na administração de usuários.
+ * Único ponto por onde a interface fala com o Auth e com o banco no login, na administração de usuários e no
+ * histórico deles.
  * Falha de gravação chega como Error cuja mensagem é o motivo em português.
  */
 export type ModuloDeAcesso = {
@@ -40,4 +53,5 @@ export type ModuloDeAcesso = {
   desativarUsuario(id: string): Promise<void>
   reativarUsuario(id: string): Promise<void>
   corrigirNome(id: string, nome: string): Promise<void>
+  listarHistorico(): Promise<EventoDoHistorico[]>
 }

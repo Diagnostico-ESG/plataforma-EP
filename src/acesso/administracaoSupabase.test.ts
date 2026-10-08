@@ -5,7 +5,9 @@ import { criarAdministracaoSupabase } from './administracaoSupabase'
 import { TravaDoBanco } from './falhasDeGravacao'
 
 type RespostaDoBanco = { data: unknown; error: { message: string; code?: string } | null }
-type Pedido = { tabela: string; operacao: string; valores?: unknown; filtro?: [string, string] }
+type Pedido = {
+  tabela: string; operacao: string; valores?: unknown; filtro?: [string, string]; ordem?: [string, boolean][]
+}
 
 /** Cliente Supabase falso: guarda cada pedido e responde por "tabela.operação". */
 class ClienteDeAdministracaoFalso {
@@ -18,7 +20,8 @@ class ClienteDeAdministracaoFalso {
     const resposta = () => this.respostas[`${tabela}.${pedido.operacao}`] ?? { data: [], error: null }
     const consulta = {
       select: () => consulta,
-      order: () => consulta,
+      order: (coluna: string, opcoes?: { ascending?: boolean }) =>
+        (pedido.ordem ??= []).push([coluna, opcoes?.ascending ?? true]) && consulta,
       insert: (valores: unknown) => Object.assign(pedido, { operacao: 'insert', valores }) && consulta,
       update: (valores: unknown) => Object.assign(pedido, { operacao: 'update', valores }) && consulta,
       delete: () => Object.assign(pedido, { operacao: 'delete' }) && consulta,
@@ -116,5 +119,33 @@ describe('criarAdministracaoSupabase', () => {
     const falha = await criar(cliente).desativarUsuario('u1').catch((erro: unknown) => erro)
     expect(falha).toBeInstanceOf(TravaDoBanco)
     expect((falha as Error).message).toBe('Não é possível: Ana Teste é o último administrador ativo.')
+  })
+
+  test('o histórico vem do mais recente ao mais antigo, com autor, ação e o alvo pelo nome', async () => {
+    const cliente = new ClienteDeAdministracaoFalso()
+    cliente.respostas['eventos.select'] = { data: [
+      { id: 2, ocorrido_em: '2026-10-08T14:05:00Z', acao: 'desativar', entidade: 'usuario', entidade_ref: 'u1',
+        detalhes: { antes: { ativo: true }, depois: { ativo: false } }, autor: { nome: 'Ana Teste' } },
+      { id: 1, ocorrido_em: '2026-10-07T12:00:00Z', acao: 'autorizar', entidade: 'autorizacao',
+        entidade_ref: 'nova.teste@ccivil.pr.gov.br', detalhes: { antes: null, depois: { perfil: 'consulta' } }, autor: null },
+    ], error: null }
+    cliente.respostas['usuarios.select'] = { data: [{ id: 'u1', nome: 'Beto Teste' }], error: null }
+    expect(await criar(cliente).listarHistorico()).toEqual([
+      { id: 2, ocorridoEm: '2026-10-08T14:05:00Z', autor: 'Ana Teste', acao: 'desativar', entidade: 'usuario',
+        alvo: 'Beto Teste', antes: { ativo: true }, depois: { ativo: false } },
+      { id: 1, ocorridoEm: '2026-10-07T12:00:00Z', autor: null, acao: 'autorizar', entidade: 'autorizacao',
+        alvo: 'nova.teste@ccivil.pr.gov.br', antes: null, depois: { perfil: 'consulta' } },
+    ])
+    expect(cliente.pedidos.find((p) => p.tabela === 'eventos')?.ordem)
+      .toEqual([['ocorrido_em', false], ['id', false]])
+  })
+
+  test('usuário que não está mais na lista aparece pelo id; falha ao ler o histórico vira exceção', async () => {
+    const cliente = new ClienteDeAdministracaoFalso()
+    cliente.respostas['eventos.select'] = { data: [{ id: 1, ocorrido_em: '2026-10-08T14:05:00Z', acao: 'reativar',
+      entidade: 'usuario', entidade_ref: 'u9', detalhes: { antes: null, depois: null }, autor: null }], error: null }
+    expect((await criar(cliente).listarHistorico())[0].alvo).toBe('u9')
+    cliente.respostas['eventos.select'] = { data: null, error: { message: 'sem rede' } }
+    await expect(criar(cliente).listarHistorico()).rejects.toThrow(/histórico.*sem rede/)
   })
 })

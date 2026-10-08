@@ -1,12 +1,16 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '../types/database'
 import { falhaDeGravacao } from './falhasDeGravacao'
-import type { LinhaDeUsuario, ModuloDeAcesso, Perfil } from './tipos'
+import type { EstadoRegistrado, EventoDoHistorico, LinhaDeUsuario, ModuloDeAcesso, Perfil } from './tipos'
 
 type ClienteSupabase = SupabaseClient<Database>
 type FuncoesDeAdministracao = Pick<ModuloDeAcesso,
   'listarUsuarios' | 'autorizarEmail' | 'mudarPerfilDaAutorizacao' | 'excluirAutorizacao'
-  | 'mudarPerfilDoUsuario' | 'desativarUsuario' | 'reativarUsuario' | 'corrigirNome'>
+  | 'mudarPerfilDoUsuario' | 'desativarUsuario' | 'reativarUsuario' | 'corrigirNome' | 'listarHistorico'>
+type EventoDoBanco = {
+  id: number; ocorrido_em: string; acao: string; entidade: string; entidade_ref: string
+  detalhes: { antes: EstadoRegistrado; depois: EstadoRegistrado }; autor: { nome: string } | null
+}
 type UsuarioDoBanco = {
   id: string; nome: string; foto_url: string | null; perfil: Perfil; ativo: boolean
   usuarios_emails: { email: string } | null
@@ -26,7 +30,24 @@ export function criarAdministracaoSupabase(cliente: ClienteSupabase): FuncoesDeA
     desativarUsuario: (id) => alterarUsuario(cliente, id, { ativo: false }),
     reativarUsuario: (id) => alterarUsuario(cliente, id, { ativo: true }),
     corrigirNome: (id, nome) => alterarUsuario(cliente, id, { nome }),
+    listarHistorico: () => listarHistorico(cliente),
   }
+}
+
+// O alvo de um evento de usuário é o id; a tela mostra o nome atual (o administrador lê todos os usuários).
+async function listarHistorico(cliente: ClienteSupabase): Promise<EventoDoHistorico[]> {
+  const [eventos, usuarios] = await Promise.all([
+    cliente.from('eventos').select('id, ocorrido_em, acao, entidade, entidade_ref, detalhes, autor:usuarios(nome)')
+      .order('ocorrido_em', { ascending: false }).order('id', { ascending: false }),
+    cliente.from('usuarios').select('id, nome'),
+  ])
+  if (eventos.error) throw new Error(`Falha ao ler o histórico: ${eventos.error.message}`)
+  const nomes = new Map((usuarios.data ?? []).map(({ id, nome }) => [id, nome]))
+  return (eventos.data as unknown as EventoDoBanco[]).map((evento) => ({
+    id: evento.id, ocorridoEm: evento.ocorrido_em, autor: evento.autor?.nome ?? null,
+    acao: evento.acao, entidade: evento.entidade, antes: evento.detalhes.antes, depois: evento.detalhes.depois,
+    alvo: evento.entidade === 'usuario' ? nomes.get(evento.entidade_ref) ?? evento.entidade_ref : evento.entidade_ref,
+  }))
 }
 
 // Aguardando primeiro acesso vêm no topo: são as linhas que pedem ação do administrador.
