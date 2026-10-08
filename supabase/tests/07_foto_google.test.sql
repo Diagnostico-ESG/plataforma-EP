@@ -1,9 +1,12 @@
 -- Foto acompanha a conta Google a cada entrada (login-perfis, ticket 05; ADR 0003).
+-- A foto vem de auth.identities, que só o Auth grava com os dados do Google. raw_user_meta_data, em
+-- auth.users, a própria pessoa altera pela API (auth.updateUser); por ele, qualquer um trocaria a
+-- própria foto por um link qualquer (achado na revisão de segurança do /ship, 2026-10-08).
 begin;
 create extension if not exists pgtap with schema extensions;
 -- As linhas do pgTAP vão para _tap e saem na exceção do fim (ver scripts/relatorio-tap.mjs).
 create temp table _tap (n serial, linha text);
-insert into _tap (linha) select plan(7);
+insert into _tap (linha) select plan(8);
 
 -- Usuários inventados: f1 ativo, com o nome corrigido pelo administrador; f2 inativo. Os dois entram com foto.
 insert into public.autorizacoes (email, perfil) values
@@ -14,13 +17,21 @@ insert into auth.users (id, email, aud, role, raw_user_meta_data) values
    '{"full_name": "Foto Ativo", "picture": "https://exemplo.invalido/f1-antiga.png"}'),
   ('00000000-0000-0000-0000-0000000000f2', 'foto.inativo.teste@ccivil.pr.gov.br', 'authenticated', 'authenticated',
    '{"full_name": "Foto Inativo", "picture": "https://exemplo.invalido/f2-antiga.png"}');
+insert into auth.identities (provider_id, user_id, provider, identity_data) values
+  ('google-f1-teste', '00000000-0000-0000-0000-0000000000f1', 'google',
+   '{"full_name": "Foto Ativo", "picture": "https://exemplo.invalido/f1-antiga.png"}'),
+  ('google-f2-teste', '00000000-0000-0000-0000-0000000000f2', 'google',
+   '{"full_name": "Foto Inativo", "picture": "https://exemplo.invalido/f2-antiga.png"}');
 update public.usuarios set nome = 'Nome Corrigido' where id = '00000000-0000-0000-0000-0000000000f1';
 update public.usuarios set ativo = false where id = '00000000-0000-0000-0000-0000000000f2';
 create temp table _eventos_antes as select count(*) as total from public.eventos;
 
--- Cada entrada simula o Auth: regrava os dados do Google e a hora da entrada.
+-- Cada entrada simula o Auth (internal/api/external.go): regrava os dados do Google na identidade e depois
+-- na conta, com a hora da entrada.
 create function pg_temp.entrar(id_usuario uuid, dados jsonb) returns void
 language sql as $$
+  update auth.identities set identity_data = dados, last_sign_in_at = now()
+    where user_id = id_usuario and provider = 'google';
   update auth.users set raw_user_meta_data = dados, last_sign_in_at = now() where id = id_usuario;
 $$;
 create function pg_temp.foto(id_usuario uuid) returns text
@@ -33,6 +44,13 @@ insert into _tap (linha) select is(pg_temp.foto('00000000-0000-0000-0000-0000000
 insert into _tap (linha) select is(
   (select nome from public.usuarios where id = '00000000-0000-0000-0000-0000000000f1'), 'Nome Corrigido',
   'a entrada não desfaz o nome corrigido pelo administrador');
+
+-- O que auth.updateUser({ data }) faz: altera só raw_user_meta_data, sem passar pelo Google.
+update auth.users set raw_user_meta_data = raw_user_meta_data
+  || '{"avatar_url": "https://exemplo.invalido/escolhida-pela-pessoa.png"}'
+  where id = '00000000-0000-0000-0000-0000000000f1';
+insert into _tap (linha) select is(pg_temp.foto('00000000-0000-0000-0000-0000000000f1'),
+  'https://exemplo.invalido/f1-nova.png', 'a pessoa não troca a própria foto pelos dados da conta');
 
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000f2',
   '{"full_name": "Foto Inativo", "picture": "https://exemplo.invalido/f2-nova.png"}');

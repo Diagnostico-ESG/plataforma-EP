@@ -98,7 +98,7 @@ O administrador tem a área Administração > Usuários, onde vê todos os usuá
 - **Inativo:** depois de entrar, a interface lê a linha do próprio usuário. Se ele está inativo, encerra a sessão e mostra a mensagem. A proteção real é a RLS: nenhum dado é entregue a usuário inativo. A conferência roda ao abrir a página e no "Tentar de novo"; quem é desativado com a página aberta só vê a mensagem ao recarregar (até lá, as listas chegam vazias).
 - O pedido de entrada ao Google indica o domínio institucional, para que a tela de escolha de conta sugira a conta certa. Isso é conveniência; a segurança é a barreira no banco.
 - O nome vem do Google só no primeiro acesso; depois, só o administrador o altera.
-- **Foto que acompanha o Google (ADR 0003):** um gatilho depois de alterar a conta no Auth copia o link da foto dos dados do Google para `usuarios.foto_url` quando ele muda, a cada entrada, também para o usuário inativo. Se o Google deixa de mandar foto, `foto_url` fica nulo e a interface mostra as iniciais. Na prática, o Google manda uma imagem padrão (letra no círculo colorido) para quem não tem foto, e é ela que aparece no lugar das iniciais; aceito pelo usuário em 2026-10-08 (ver `desvios.md`). O gatilho não toca no nome e não registra evento (o gatilho de eventos de `usuarios` só olha nome, perfil e situação). Conferido em 2026-10-08 no código do Supabase Auth: os dados do Google na conta do Auth são regravados a cada entrada (mesclados com os anteriores). O gatilho roda a cada alteração da conta no Auth, não só quando os dados mudam, para corrigir também quem já tinha dados novos de antes do gatilho.
+- **Foto que acompanha o Google (ADR 0003):** um gatilho depois de incluir ou alterar a identidade Google no Auth (`auth.identities`) copia o link da foto dos dados do Google para `usuarios.foto_url` quando ele muda, a cada entrada, também para o usuário inativo. A foto não vem dos dados da conta (`raw_user_meta_data`), porque esses a própria pessoa altera pela API; a identidade só o Auth grava (mudança de 2026-10-08, revisão de segurança do `/ship`). Se o Google deixa de mandar foto, `foto_url` fica nulo e a interface mostra as iniciais. Na prática, o Google manda uma imagem padrão (letra no círculo colorido) para quem não tem foto, e é ela que aparece no lugar das iniciais; aceito pelo usuário em 2026-10-08 (ver `desvios.md`). O gatilho não toca no nome e não registra evento (o gatilho de eventos de `usuarios` só olha nome, perfil e situação). Conferido em 2026-10-08 no código do Supabase Auth: os dados do Google na conta do Auth são regravados a cada entrada (mesclados com os anteriores). O gatilho roda a cada alteração da conta no Auth, não só quando os dados mudam, para corrigir também quem já tinha dados novos de antes do gatilho.
 
 ### Interface
 
@@ -130,7 +130,7 @@ O administrador tem a área Administração > Usuários, onde vê todos os usuá
 
 Migração não destrutiva: só cria tabelas, tipos e funções.
 
-Mudança de 2026-10-08 (ADR 0003): migração nova, não destrutiva, que só cria a função e o gatilho da foto; nenhuma tabela ou coluna muda, e a coluna `foto_url` continua fechada para alteração pela API.
+Mudança de 2026-10-08 (ADR 0003): migração nova, não destrutiva, que só cria a função e o gatilho da foto; nenhuma tabela ou coluna muda, e a coluna `foto_url` continua fechada para alteração pela API. Correção do mesmo dia (revisão de segurança do `/ship`): migração nova que troca esse gatilho e essa função por outros, em `auth.identities`; nenhuma tabela ou coluna muda.
 
 **Tipo `perfil`**: `administrador`, `integrante_ep`, `consulta`.
 
@@ -209,7 +209,7 @@ Mudança de 2026-10-08 (ADR 0003): migração nova, não destrutiva, que só cri
 | Ninguém muda o próprio perfil | idem | administrador tentando virar Consulta é recusado |
 | Sempre um administrador ativo | idem | com dois administradores, desativar um passa e o segundo é recusado |
 | Toda mudança de nome, perfil ou situação em `usuarios`, e toda mudança em `autorizacoes`, vira evento | gatilhos depois de incluir, alterar e apagar | cada ação gera um evento com autor, antes e depois |
-| A foto acompanha o Google a cada entrada (ADR 0003) | gatilho depois de alterar a conta no Auth | link novo nos dados do Google → `foto_url` atualizado; dados sem foto → `foto_url` nulo; usuário inativo também atualizado; nome corrigido pelo administrador não muda; nenhum evento novo |
+| A foto acompanha o Google a cada entrada (ADR 0003) | gatilho depois de incluir ou alterar a identidade Google no Auth | link novo nos dados do Google → `foto_url` atualizado; dados sem foto → `foto_url` nulo; usuário inativo também atualizado; nome corrigido pelo administrador não muda; nenhum evento novo; a pessoa alterar os dados da própria conta pela API não muda a foto |
 | Evento não se altera nem se apaga | sem política de alteração e de exclusão, para qualquer perfil | tentativa de alterar e de apagar recusada |
 | E-mail sempre minúsculo e sem espaços | gatilho ou restrição na inclusão | " Fulano@CCivil.pr.gov.br " é guardado como "fulano@ccivil.pr.gov.br" |
 | E-mail único entre autorizações e usuários | verificação na inclusão da autorização | autorizar o e-mail de um usuário existente é recusado |

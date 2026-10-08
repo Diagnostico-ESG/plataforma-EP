@@ -18,3 +18,4 @@ Migrações aplicadas à mão no dev pelo SQL Editor (fora do histórico da CLI;
 - 20261008154647_foto_acompanha_google (2026-10-08; testes 07, 05, 02, 03, 04 e 06 passaram pelo SQL Editor)
 - 20261008155748_foto_a_cada_entrada (2026-10-08; correção do gatilho da foto; testes 07, 05, 02, 03, 04 e 06 passaram pelo SQL Editor)
 - 20261008193100_sem_truncate (2026-10-08; bug do truncate; teste 08 falhou antes, 5 de 6, e passou depois, 6 de 6, pelo SQL Editor)
+- 20261008205500_foto_pela_identidade (2026-10-08; achado da revisão de segurança do /ship; teste 07 falhou antes, 7 de 8, e passou depois, 8 de 8, pelo SQL Editor)
