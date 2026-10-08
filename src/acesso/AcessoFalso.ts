@@ -17,7 +17,7 @@ export class AcessoFalso implements ModuloDeAcesso {
   recusa: RecusaDeEntrada | null = null
   falharConexao = false
   segurarVerificacao = false
-  chamadas = { entrarComGoogle: 0, sair: 0, listarHistorico: 0 }
+  chamadas = { entrarComGoogle: 0, sair: 0, listarHistorico: 0, mudarPerfil: 0 }
   linhas: LinhaDeUsuario[] = []
   falharLista = false
   segurarLista = false
@@ -68,6 +68,7 @@ export class AcessoFalso implements ModuloDeAcesso {
   }
 
   async mudarPerfilDaAutorizacao(email: string, perfil: Perfil): Promise<void> {
+    this.chamadas.mudarPerfil++
     this.conferirGravacao()
     this.linhas = this.linhas.map((linha) => (linha.email === email ? { ...linha, perfil } : linha))
   }
@@ -78,6 +79,7 @@ export class AcessoFalso implements ModuloDeAcesso {
   }
 
   async mudarPerfilDoUsuario(id: string, perfil: Perfil): Promise<void> {
+    this.chamadas.mudarPerfil++
     this.alterarLinha(id, { perfil })
   }
 

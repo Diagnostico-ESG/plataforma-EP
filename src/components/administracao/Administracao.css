@@ -105,14 +105,16 @@
 }
 
 .tabela-usuarios-acoes,
-.correcao-de-nome {
+.correcao-de-nome,
+.perfil-da-linha {
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--esp-2);
 }
 
-.correcao-de-nome .administracao-falha {
+.correcao-de-nome .administracao-falha,
+.perfil-da-linha .administracao-falha {
   flex-basis: 100%;
   margin: 0;
 }

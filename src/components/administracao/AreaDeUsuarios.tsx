@@ -28,7 +28,7 @@ export function AreaDeUsuarios({ acesso }: AreaDeUsuariosProps) {
       <FormularioDeAutorizacao aoAutorizar={(email, perfil) => gravar(() => acesso.autorizarEmail(email, perfil))} />
       {falhaNaLinha && <p className="administracao-falha" role="alert">{falhaNaLinha}</p>}
       <ListaDeUsuarios lista={lista} aoTentarDeNovo={tentarDeNovo}
-        aoMudarPerfil={(linha, perfil) => gravarNaLinha(() => (linha.situacao === 'aguardando'
+        aoMudarPerfil={(linha, perfil) => gravar(() => (linha.situacao === 'aguardando'
           ? acesso.mudarPerfilDaAutorizacao(linha.email, perfil)
           : acesso.mudarPerfilDoUsuario(linha.chave, perfil)))}
         aoExcluir={(email) => gravarNaLinha(() => acesso.excluirAutorizacao(email))}

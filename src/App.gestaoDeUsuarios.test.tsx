@@ -52,16 +52,18 @@ test('cada linha mostra as ações da sua situação; quem já entrou não tem E
 test('muda o perfil de um usuário', async () => {
   const acesso = await abrirComoAdministrador()
   fireEvent.change(screen.getByLabelText(`Perfil de ${ANA}`), { target: { value: 'integrante_ep' } })
+  fireEvent.click(screen.getByRole('button', { name: `Salvar perfil de ${ANA}` }))
   await waitFor(() => expect(acesso.linhas.find((linha) => linha.email === ANA)?.perfil).toBe('integrante_ep'))
   await waitFor(() => expect(perfilNaTela(ANA)).toBe('integrante_ep'))
 })
 
-test('trava: mudar o próprio perfil mostra a regra e mantém o perfil', async () => {
+test('trava: mudar o próprio perfil mostra a regra e não grava', async () => {
   const acesso = await abrirComoAdministrador()
   acesso.falhaDeGravacao = new TravaDoBanco('Você não pode mudar o seu próprio perfil.')
   fireEvent.change(screen.getByLabelText(`Perfil de ${ANA}`), { target: { value: 'administrador' } })
+  fireEvent.click(screen.getByRole('button', { name: `Salvar perfil de ${ANA}` }))
   expect(await screen.findByText('Você não pode mudar o seu próprio perfil.')).toBeTruthy()
-  expect(perfilNaTela(ANA)).toBe('consulta')
+  expect(acesso.linhas.find((linha) => linha.email === ANA)?.perfil).toBe('consulta')
 })
 
 test('desativa um usuário ativo', async () => {
