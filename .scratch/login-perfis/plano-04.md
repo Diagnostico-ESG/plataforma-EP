@@ -159,7 +159,7 @@ create policy "eventos: administrador ativo lê" on public.eventos
 ```
 
 - [x] **1.4 Aplicar e ver passar.** Pedir ao usuário, um arquivo por vez: (a) colar a migração (esperado: "Success. No rows returned"); (b) colar `06_historico.test.sql` (esperado: 25 de 25 `ok`); (c) colar `02`, `03`, `04` e `05` de novo (esperado: todos `ok`, porque os gatilhos continuam gravando eventos).
-- [ ] **1.5 Diagnóstico do truncate nas outras tabelas** (só leitura, sem dado pessoal). Pedir ao usuário que rode:
+- [x] **1.5 Diagnóstico do truncate nas outras tabelas** (só leitura, sem dado pessoal). Pedir ao usuário que rode:
 
 ```sql
 select t as tabela, has_table_privilege('authenticated', 'public.' || t, 'TRUNCATE') as logado,
@@ -639,6 +639,6 @@ e, depois de `<ListaDeUsuarios … />`, `<HistoricoDeUsuarios historico={histori
 ### Tarefa 5: Conferência final
 
 - [x] **5.1 Cobertura.** `npx vitest run --coverage --coverage.reporter=text`; informar o percentual e classificar as linhas novas sem cobertura (comportamento real sem teste / ligação com serviço real / reserva). Comportamento real sem teste ganha teste agora (é deste ticket).
-- [ ] **5.2 Teste na tela** (servidor na porta 5173; conferir antes quem ocupa a porta). Pedir ao usuário, primeiro, só os passos na tela: (1) entrar como administrador e abrir Administração; (2) ver a seção "Histórico de usuários" com os eventos já gravados (o próprio primeiro acesso, a autorização inicial como "Configuração inicial (direto no banco)", a correção de nome do ticket 03); (3) corrigir o próprio nome de novo e ver o evento novo aparecer no topo; (4) olhar a aparência (alinhamento das colunas, legibilidade de antes e depois). Nenhuma consulta SQL com dado pessoal: o que se confere é a tela.
-- [ ] **5.3 Registros.** Entrada datada no `.scratch/login-perfis/desvios.md` (coluna "Alvo" acrescentada; o que mais divergir do plano). Marcar os critérios do ticket 04.
-- [ ] **5.4 Commit** dos registros.
+- [x] **5.2 Teste na tela** (servidor na porta 5173; conferir antes quem ocupa a porta). Pedir ao usuário, primeiro, só os passos na tela: (1) entrar como administrador e abrir Administração; (2) ver a seção "Histórico de usuários" com os eventos já gravados (o próprio primeiro acesso, a autorização inicial como "Configuração inicial (direto no banco)", a correção de nome do ticket 03); (3) corrigir o próprio nome de novo e ver o evento novo aparecer no topo; (4) olhar a aparência (alinhamento das colunas, legibilidade de antes e depois). Nenhuma consulta SQL com dado pessoal: o que se confere é a tela.
+- [x] **5.3 Registros.** Entrada datada no `.scratch/login-perfis/desvios.md` (coluna "Alvo" acrescentada; o que mais divergir do plano). Marcar os critérios do ticket 04.
+- [x] **5.4 Commit** dos registros.
