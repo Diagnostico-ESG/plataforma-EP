@@ -19,3 +19,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-08 | login-perfis | /situação + /executar-complexo (ticket 05) | US$ 5,39
 2026-10-08 | login-perfis | /executar-complexo (ticket 06) | US$ 2,92
 2026-10-08 | login-perfis | /executar-complexo ticket 07 | US$ 2,21
+2026-10-08 | login-perfis | /demanda (bug do Sair) | US$ 5,38
