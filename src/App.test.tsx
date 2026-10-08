@@ -17,11 +17,11 @@ test('abre no Quadro de processos, marcado na navegação', async () => {
   expect(quadro.getAttribute('aria-current')).toBe('page')
 })
 
-test('a navegação lateral tem as seis áreas do sistema', async () => {
+test('para quem não é administrador, a navegação tem cinco áreas, sem Administração', async () => {
   await abrirLogado()
   const navegacao = screen.getByRole('navigation', { name: 'Áreas do sistema' })
   const rotulos = Array.from(navegacao.querySelectorAll('button')).map((b) => b.getAttribute('aria-label'))
-  expect(rotulos).toEqual(['Quadro', 'Lista', 'Setores', 'Reuniões', 'Painel', 'Administração'])
+  expect(rotulos).toEqual(['Quadro', 'Lista', 'Setores', 'Reuniões', 'Painel'])
 })
 
 test('sem processos, mostra o aviso de vazio com a ação de cadastrar', async () => {

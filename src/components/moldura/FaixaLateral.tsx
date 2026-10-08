@@ -1,6 +1,5 @@
 import { Icone, type NomeIcone } from '../Icone'
-
-export type AreaDoSistema = 'quadro' | 'lista' | 'setores' | 'reunioes' | 'painel' | 'administracao'
+import { temTela, type AreaComTela, type AreaDoSistema } from './areas'
 
 type ItemDaFaixa = { area: AreaDoSistema; icone: NomeIcone; rotulo: string }
 
@@ -15,22 +14,26 @@ const ITENS: ItemDaFaixa[] = [
 
 type FaixaLateralProps = {
   areaAtual: AreaDoSistema
+  mostrarAdministracao: boolean
+  aoIrPara: (area: AreaComTela) => void
 }
 
-// As áreas ainda não levam a lugar nenhum: cada uma ganha tela na sua funcionalidade.
-export function FaixaLateral({ areaAtual }: FaixaLateralProps) {
+// Só Quadro e Administração têm tela por enquanto; as outras áreas ganham tela na sua funcionalidade.
+export function FaixaLateral({ areaAtual, mostrarAdministracao, aoIrPara }: FaixaLateralProps) {
+  const itens = mostrarAdministracao ? ITENS : ITENS.filter((item) => item.area !== 'administracao')
   return (
     <nav className="faixa-lateral" aria-label="Áreas do sistema">
-      {ITENS.map((item) => (
+      {itens.map(({ area, icone, rotulo }) => (
         <button
-          key={item.area}
+          key={area}
           type="button"
           className="faixa-item"
-          aria-label={item.rotulo}
-          title={item.rotulo}
-          aria-current={item.area === areaAtual ? 'page' : undefined}
+          aria-label={rotulo}
+          title={rotulo}
+          aria-current={area === areaAtual ? 'page' : undefined}
+          onClick={temTela(area) ? () => aoIrPara(area) : undefined}
         >
-          <Icone nome={item.icone} />
+          <Icone nome={icone} />
         </button>
       ))}
     </nav>

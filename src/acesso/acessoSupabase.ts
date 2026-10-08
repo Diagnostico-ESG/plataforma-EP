@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '../types/database'
+import { criarAdministracaoSupabase } from './administracaoSupabase'
 import { lerRecusaDaUrl } from './motivos'
 import type { ModuloDeAcesso, SessaoAtual, UsuarioAtual } from './tipos'
 
@@ -15,6 +16,7 @@ export function criarAcessoSupabase(cliente: ClienteSupabase, urlDeChegada: stri
     entrarComGoogle: () => entrarComGoogle(cliente),
     sair: () => sair(cliente),
     lerProprioUsuario: (id) => lerUsuario(cliente, id),
+    ...criarAdministracaoSupabase(cliente),
   }
 }
 
