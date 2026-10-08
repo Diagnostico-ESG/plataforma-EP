@@ -61,3 +61,20 @@ Deixados de fora:
 - **Premissa errada na decisão anterior:** a opção B tinha sido descartada porque "a sessão continua aberta no servidor". Isso é verdade, mas o navegador já não guarda o login, então ninguém naquele computador continua como aquela pessoa.
 - **Decisão do usuário: opção C.** Depois de uma falha no Sair, a plataforma confere se o navegador ainda guarda o login. Se não guarda, vai para a tela de entrada; se guarda (por exemplo, a falha foi ao renovar um login vencido) ou se nem a conferência responde, fica dentro com a mensagem vermelha. A spec (história 55 e regra da barra superior) foi reescrita.
 - **Junto, pontos menores da revisão:** botão Sair desativado durante a saída (clique duplo); teste de que a mensagem some e volta numa nova falha; a lógica do menu foi para `src/hooks/useSaida.ts`; a leitura do CSS dos testes de cor virou a função `src/testes/regrasDaClasse.ts`, usada pelos dois testes. O `AcessoFalso` passou a imitar as duas formas de falha da biblioteca.
+
+## 2026-10-08 — /polir (login-perfis, segunda rodada: tickets 05 a 07 e bug do "Sair")
+
+Auditoria do Impeccable: 17/20 (Bom). O detector automático não achou nada; os achados vieram da leitura do código. Não houve teste na tela: a entrada pelo Google é do usuário, e o navegador embutido não tem sessão. Os achados são de comportamento do foco e foram provados por testes.
+
+Corrigidos (com testes em `src/App.conta.test.tsx` e no novo `src/App.focoNaAdministracao.test.tsx`):
+- **Menu da conta, mensagem antiga (P2, do backlog):** ao fechar o menu, a falha do Sair é esquecida; reabrir não mostra a mensagem velha (`esquecerFalha` em `src/hooks/useSaida.ts`).
+- **Menu da conta, foco depois da falha (P2, do backlog):** o Sair fica desativado durante a tentativa e perdia o foco; na falha, o foco volta a ele.
+- **Menu da conta não fechava com clique fora (P2):** agora fecha (clique dentro do painel continua sem fechar).
+- **Perfil na tabela, foco perdido (P2):** ao salvar ou cancelar, os botões somem; o foco volta ao seletor de perfil.
+- **Corrigir nome, foco perdido (P2):** ao salvar ou cancelar, o formulário some; o foco volta ao botão "Corrigir nome".
+- **Cor fora do arquivo de cores (P3):** o véu atrás da janela de confirmação virou o token `--veu-janela` em `src/styles/tokens.css` (Regra do Arquivo Único).
+- **Aviso do e-mail sem ligação ao campo (P3):** o campo ganhou `aria-describedby` apontando para a mensagem.
+
+Deixados de fora:
+- **Tabela de usuários rola para o lado em tela estreita (P3):** celular é opcional no projeto, e a área de trabalho já rola; não vale um layout próprio agora.
+- **Foco depois de Excluir ou Desativar confirmados:** a linha muda ou some e o navegador devolve o foco ao botão de origem quando ele ainda existe; quando a linha some (Excluir), o foco cai no topo. Resolver pede decidir um destino (por exemplo, o título "Usuários") e entra melhor numa revisão de acessibilidade da tabela inteira; fica registrado aqui para o `/ship`.

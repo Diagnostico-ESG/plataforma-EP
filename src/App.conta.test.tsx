@@ -109,3 +109,36 @@ test('o CSS pinta a falha do Sair com as cores de atraso (vermelho)', () => {
   expect(regrasDaClasse(css, '.menu-conta-falha')).toContain('--atraso-fundo')
   expect(regrasDaClasse(css, '.menu-conta-falha')).toContain('--atraso-texto')
 })
+
+test('fechar e reabrir o menu depois de uma falha não mostra a mensagem antiga', async () => {
+  const acesso = AcessoFalso.logadoComo()
+  acesso.falhaAoSair = 'mantem'
+  await clicarSair(acesso)
+  await screen.findByRole('alert')
+  const botaoDaConta = screen.getByRole('button', { name: 'Sua conta: Pessoa de Teste' })
+  fireEvent.click(botaoDaConta)
+  fireEvent.click(botaoDaConta)
+  expect(screen.getByRole('button', { name: 'Sair' })).toBeTruthy()
+  expect(screen.queryByRole('alert')).toBeNull()
+})
+
+// O botão fica desativado durante a tentativa e perde o foco; sem devolvê-lo, o teclado volta ao topo.
+test('depois de uma falha ao sair, o foco volta ao botão Sair', async () => {
+  const acesso = AcessoFalso.logadoComo()
+  acesso.falhaAoSair = 'mantem'
+  await clicarSair(acesso)
+  await screen.findByRole('alert')
+  expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Sair' }))
+})
+
+test('clicar fora do menu da conta fecha o menu', async () => {
+  fireEvent.click(await abrirLogado())
+  fireEvent.pointerDown(document.body)
+  expect(screen.queryByRole('button', { name: 'Sair' })).toBeNull()
+})
+
+test('clicar dentro do menu da conta não fecha o menu', async () => {
+  fireEvent.click(await abrirLogado())
+  fireEvent.pointerDown(screen.getByText('Integrante do EP'))
+  expect(screen.getByRole('button', { name: 'Sair' })).toBeTruthy()
+})

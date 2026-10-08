@@ -14,6 +14,7 @@ export function FormularioDeAutorizacao({ aoAutorizar }: FormularioDeAutorizacao
   const [enviando, setEnviando] = useState(false)
   const idDoEmail = useId()
   const idDoPerfil = useId()
+  const idDoAviso = useId()
 
   async function enviar(evento: FormEvent) {
     evento.preventDefault()
@@ -37,11 +38,12 @@ export function FormularioDeAutorizacao({ aoAutorizar }: FormularioDeAutorizacao
       <h3 className="form-autorizacao-titulo">Autorizar e-mail</h3>
       <label htmlFor={idDoEmail}>E-mail</label>
       <input id={idDoEmail} type="email" value={email} placeholder="nome@ccivil.pr.gov.br" autoComplete="off"
-        aria-invalid={aviso !== null} onChange={(evento) => setEmail(evento.target.value)} />
+        aria-invalid={aviso !== null} aria-describedby={aviso ? idDoAviso : undefined}
+        onChange={(evento) => setEmail(evento.target.value)} />
       <label htmlFor={idDoPerfil}>Perfil</label>
       <SeletorDePerfil id={idDoPerfil} valor={perfil} aoMudar={setPerfil} />
       <button type="submit" className="botao botao-principal" disabled={enviando}>Autorizar</button>
-      {aviso && <p className="administracao-falha" role="alert">{aviso}</p>}
+      {aviso && <p id={idDoAviso} className="administracao-falha" role="alert">{aviso}</p>}
     </form>
   )
 }

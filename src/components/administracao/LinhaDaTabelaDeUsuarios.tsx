@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { type Ref, useEffect, useRef, useState } from 'react'
 import type { LinhaDeUsuario, Perfil, SituacaoDoUsuario } from '../../acesso/tipos'
 import { Avatar } from '../Avatar'
 import { Pilula, type SituacaoPilula } from '../Pilula'
@@ -24,6 +24,13 @@ type LinhaDaTabelaDeUsuariosProps = AcoesDaLinha & { linha: LinhaDeUsuario }
 
 export function LinhaDaTabelaDeUsuarios({ linha, ...acoes }: LinhaDaTabelaDeUsuariosProps) {
   const [corrigindo, setCorrigindo] = useState(false)
+  const botaoCorrigir = useRef<HTMLButtonElement>(null)
+  const jaCorrigiu = useRef(false)
+  // O formulário do nome some ao salvar ou cancelar; o foco volta ao "Corrigir nome" em vez de cair no topo.
+  useEffect(() => {
+    if (corrigindo) jaCorrigiu.current = true
+    else if (jaCorrigiu.current) botaoCorrigir.current?.focus()
+  }, [corrigindo])
   const salvarNome = async (nome: string) => {
     await acoes.aoCorrigirNome(linha.chave, nome)
     setCorrigindo(false)
@@ -42,7 +49,7 @@ export function LinhaDaTabelaDeUsuarios({ linha, ...acoes }: LinhaDaTabelaDeUsua
           aoSalvar={(perfil) => acoes.aoMudarPerfil(linha, perfil)} />
       </td>
       <td><Pilula situacao={PILULA_DA_SITUACAO[linha.situacao]}>{ROTULO_DA_SITUACAO[linha.situacao]}</Pilula></td>
-      <td><BotoesDaLinha linha={linha} acoes={acoes} aoCorrigirNome={() => setCorrigindo(true)} /></td>
+      <td><BotoesDaLinha linha={linha} acoes={acoes} aoCorrigirNome={() => setCorrigindo(true)} refCorrigir={botaoCorrigir} /></td>
     </tr>
   )
 }
@@ -56,14 +63,19 @@ function NomeDaLinha({ linha }: { linha: LinhaDeUsuario }) {
   )
 }
 
-type BotoesDaLinhaProps = { linha: LinhaDeUsuario; acoes: AcoesDaLinha; aoCorrigirNome: () => void }
+type BotoesDaLinhaProps = {
+  linha: LinhaDeUsuario
+  acoes: AcoesDaLinha
+  aoCorrigirNome: () => void
+  refCorrigir: Ref<HTMLButtonElement>
+}
 
 // Quem já entrou não se exclui, só se desativa (ADR 0002).
-function BotoesDaLinha({ linha, acoes, aoCorrigirNome }: BotoesDaLinhaProps) {
+function BotoesDaLinha({ linha, acoes, aoCorrigirNome, refCorrigir }: BotoesDaLinhaProps) {
   if (linha.situacao === 'aguardando') return <BotaoExcluirAutorizacao email={linha.email} aoExcluir={acoes.aoExcluir} />
   return (
     <span className="tabela-usuarios-acoes">
-      <button type="button" className="botao botao-secundario" aria-label={`Corrigir nome de ${linha.email}`}
+      <button ref={refCorrigir} type="button" className="botao botao-secundario" aria-label={`Corrigir nome de ${linha.email}`}
         onClick={aoCorrigirNome}>
         Corrigir nome
       </button>

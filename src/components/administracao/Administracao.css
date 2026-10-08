@@ -191,7 +191,7 @@
 }
 
 .janela-confirmacao::backdrop {
-  background: rgb(30 36 51 / 45%);
+  background: var(--veu-janela);
 }
 
 .janela-confirmacao-titulo {
