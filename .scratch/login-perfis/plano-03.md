@@ -57,7 +57,7 @@
 
 **Produz:** política `"usuarios: administrador ativo altera"`; funções `private.conferir_alteracao_do_usuario()` e `private.registrar_evento_do_usuario()`; recusas `nao_desativa_a_si_mesmo:<id>`, `nao_muda_o_proprio_perfil:<id>`, `ultimo_administrador:<nome>` (código `P0001`); eventos `corrigir_nome`, `mudar_perfil`, `desativar`, `reativar` com `entidade = 'usuario'`.
 
-- [ ] **1.1 Teste que falha.** Criar `supabase/tests/05_gerir_usuarios.test.sql`:
+- [x] **1.1 Teste que falha.** Criar `supabase/tests/05_gerir_usuarios.test.sql`:
 
 ```sql
 -- Gerir usuários: quem altera, travas, nome que fica e eventos (login-perfis, ticket 03).
@@ -319,7 +319,7 @@ create trigger registrar_evento_do_usuario after update on public.usuarios
 
 **Produz:** em `src/acesso/falhasDeGravacao.ts`: `class TravaDoBanco extends Error`; `falhaDeGravacao(erro: ErroDoBanco): Error`; `textoDaFalha(erro: unknown): string`; `textoDaFalhaNoFormulario(erro: unknown): string`. `motivoDaFalhaDeGravacao` continua exportada.
 
-- [ ] **2.1 Teste que falha.** Acrescentar a `src/acesso/falhasDeGravacao.test.ts` (e importar os nomes novos):
+- [x] **2.1 Teste que falha.** Acrescentar a `src/acesso/falhasDeGravacao.test.ts` (e importar os nomes novos):
 
 ```ts
 describe('falhaDeGravacao', () => {
@@ -356,8 +356,8 @@ describe('texto da falha na tela', () => {
 })
 ```
 
-- [ ] **2.2 Ver falhar:** `npx vitest run src/acesso/falhasDeGravacao.test.ts` — falha por nomes inexistentes.
-- [ ] **2.3 Implementar.** Acrescentar a `src/acesso/falhasDeGravacao.ts`:
+- [x] **2.2 Ver falhar:** `npx vitest run src/acesso/falhasDeGravacao.test.ts` — falha por nomes inexistentes.
+- [x] **2.3 Implementar.** Acrescentar a `src/acesso/falhasDeGravacao.ts`:
 
 ```ts
 type RecusaPorTrava = 'nao_desativa_a_si_mesmo' | 'nao_muda_o_proprio_perfil' | 'ultimo_administrador'
@@ -398,8 +398,8 @@ function mensagemDoErro(erro: unknown): string {
 }
 ```
 
-- [ ] **2.4 Ver passar:** o mesmo comando, verde.
-- [ ] **2.5 Commit:** `Traduz as travas de usuários em frases da tela`.
+- [x] **2.4 Ver passar:** o mesmo comando, verde.
+- [x] **2.5 Commit:** `Traduz as travas de usuários em frases da tela`.
 
 ---
 
