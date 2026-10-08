@@ -3,16 +3,17 @@ import { describe, expect, test } from 'vitest'
 import type { Database } from '../types/database'
 import { criarAcessoSupabase } from './acessoSupabase'
 
-type RespostaDoBanco = { data: unknown; error: { message: string } | null }
+type ErroDoSupabase = { message: string } | null
+type RespostaDoBanco = { data: unknown; error: ErroDoSupabase }
 
 /** Cliente Supabase falso: só as chamadas que o módulo de acesso usa, com respostas configuráveis. */
 class ClienteSupabaseFalso {
   sessao: unknown = null
   linhaDoUsuario: RespostaDoBanco = { data: null, error: null }
   pedidoDeEntrada: unknown = null
-  erroDaSessao: { message: string } | null = null
-  erroDaEntrada: { message: string } | null = null
-  erroAoSair: { message: string } | null = null
+  erroDaSessao: ErroDoSupabase = null
+  erroDaEntrada: ErroDoSupabase = null
+  erroAoSair: ErroDoSupabase = null
   auth = {
     getSession: async () => ({ data: { session: this.sessao }, error: this.erroDaSessao }),
     signInWithOAuth: async (pedido: unknown) => {
@@ -74,9 +75,12 @@ describe('criarAcessoSupabase', () => {
     await expect(criar(cliente).entrarComGoogle()).rejects.toThrow('Falha ao abrir a entrada do Google: sem rede')
   })
 
-  test('sair sem erro termina; com erro, vira exceção com o texto do Supabase', async () => {
+  test('sair sem erro termina sem exceção', async () => {
+    await expect(criar(new ClienteSupabaseFalso()).sair()).resolves.toBeUndefined()
+  })
+
+  test('erro ao sair vira exceção com o texto do Supabase', async () => {
     const cliente = new ClienteSupabaseFalso()
-    await expect(criar(cliente).sair()).resolves.toBeUndefined()
     cliente.erroAoSair = { message: 'sem rede' }
     await expect(criar(cliente).sair()).rejects.toThrow('Falha ao sair: sem rede')
   })

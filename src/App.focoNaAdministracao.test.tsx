@@ -6,7 +6,8 @@ import type { LinhaDeUsuario, Perfil } from './acesso/tipos'
 
 // Quando o botão em uso some (Salvar, Cancelar, o formulário do nome), o foco precisa de um destino;
 // sem ele, quem usa teclado ou leitor de tela volta ao topo da página.
-// Depois de uma gravação, o foco se move um instante depois de a tela mudar; por isso a conferência espera.
+// Depois de uma gravação, o foco se move um instante depois de a tela mudar; nesses testes a conferência espera.
+// Ao cancelar, o foco se move no próprio clique, e a conferência é imediata.
 beforeEach(() => {
   window.location.hash = '#/administracao'
 })

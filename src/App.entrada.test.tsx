@@ -7,13 +7,17 @@ afterEach(cleanup)
 
 const BOTAO_ENTRAR = { name: 'Entrar com a conta institucional' }
 
+// O botão já existe, desligado, enquanto o acesso é conferido; numa rodada lenta o clique cairia nele.
+async function botaoEntrarLiberado(): Promise<HTMLElement> {
+  const botao = await screen.findByRole('button', BOTAO_ENTRAR)
+  await waitFor(() => expect(botao).toHaveProperty('disabled', false))
+  return botao
+}
+
 test('sem sessão, mostra a tela de entrada e o botão chama o Google', async () => {
   const acesso = new AcessoFalso()
   render(<App acesso={acesso} />)
-  // O botão já existe, desligado, enquanto o acesso é conferido; numa rodada lenta o clique cairia nele.
-  const botao = await screen.findByRole('button', BOTAO_ENTRAR)
-  await waitFor(() => expect(botao).toHaveProperty('disabled', false))
-  fireEvent.click(botao)
+  fireEvent.click(await botaoEntrarLiberado())
   expect(acesso.chamadas.entrarComGoogle).toBe(1)
 })
 
@@ -56,9 +60,7 @@ test('falha ao abrir a entrada do Google mostra a falha de conexão', async () =
   const acesso = new AcessoFalso()
   acesso.falharEntrada = true
   render(<App acesso={acesso} />)
-  const botao = await screen.findByRole('button', BOTAO_ENTRAR)
-  await waitFor(() => expect(botao).toHaveProperty('disabled', false))
-  fireEvent.click(botao)
+  fireEvent.click(await botaoEntrarLiberado())
   expect((await screen.findByRole('alert')).textContent).toContain(
     'Não foi possível conectar. Verifique a conexão e tente de novo.',
   )
