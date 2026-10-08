@@ -14,3 +14,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-07 | login-perfis | /situação + /executar-complexo (ticket 02, até o teste na tela) | US$ 8,00
 2026-10-08 | login-perfis | /situação + /executar-complexo (ticket 02, teste na tela e junção) | US$ 1,40
 2026-10-08 | login-perfis | /situação + /executar-complexo (ticket 04) | US$ 6,10
+2026-10-08 | login-perfis | /polir | US$ 2,36
