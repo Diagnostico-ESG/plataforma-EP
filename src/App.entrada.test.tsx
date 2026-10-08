@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, expect, test } from 'vitest'
 import App from './App'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
@@ -10,7 +10,10 @@ const BOTAO_ENTRAR = { name: 'Entrar com a conta institucional' }
 test('sem sessão, mostra a tela de entrada e o botão chama o Google', async () => {
   const acesso = new AcessoFalso()
   render(<App acesso={acesso} />)
-  fireEvent.click(await screen.findByRole('button', BOTAO_ENTRAR))
+  // O botão já existe, desligado, enquanto o acesso é conferido; numa rodada lenta o clique cairia nele.
+  const botao = await screen.findByRole('button', BOTAO_ENTRAR)
+  await waitFor(() => expect(botao).toHaveProperty('disabled', false))
+  fireEvent.click(botao)
   expect(acesso.chamadas.entrarComGoogle).toBe(1)
 })
 
