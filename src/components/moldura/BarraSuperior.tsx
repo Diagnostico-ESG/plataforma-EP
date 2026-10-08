@@ -5,7 +5,7 @@ import { MenuDaConta } from './MenuDaConta'
 type BarraSuperiorProps = {
   titulo: string
   usuario: UsuarioAtual
-  aoSair: () => void
+  aoSair: () => Promise<void>
   /** O Quadro/Lista só faz sentido na área de processos. */
   mostrarAlternancia: boolean
 }

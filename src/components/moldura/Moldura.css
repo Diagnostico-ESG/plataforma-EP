@@ -199,3 +199,14 @@
 .barra-superior .menu-conta-painel :focus-visible {
   outline-color: var(--azul);
 }
+
+/* "A ação não aconteceu" (vermelho), como na Administração e na entrada. */
+.menu-conta-falha {
+  max-width: 28ch;
+  margin-top: var(--esp-2);
+  padding: var(--esp-2) var(--esp-3);
+  border-radius: var(--canto);
+  background: var(--atraso-fundo);
+  color: var(--atraso-texto);
+  font-size: var(--tam-secundario);
+}

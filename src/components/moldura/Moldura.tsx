@@ -10,7 +10,7 @@ type MolduraProps = {
   aoIrPara: (area: AreaComTela) => void
   titulo: string
   usuario: UsuarioAtual
-  aoSair: () => void
+  aoSair: () => Promise<void>
   children: ReactNode
 }
 

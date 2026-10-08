@@ -6,8 +6,8 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
-    // Por padrão o Vitest devolve CSS vazio; este arquivo precisa vir inteiro para o teste das cores das mensagens.
-    css: { include: /Administracao\.css/ },
+    // Por padrão o Vitest devolve CSS vazio; estes arquivos precisam vir inteiros para os testes das cores das mensagens.
+    css: { include: /(Administracao|Moldura)\.css/ },
     setupFiles: ['./src/configurarTestes.ts'],
     exclude: [...configDefaults.exclude, '.claude/worktrees/**'],
     coverage: {

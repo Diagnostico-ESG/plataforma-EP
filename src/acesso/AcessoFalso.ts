@@ -16,6 +16,7 @@ export class AcessoFalso implements ModuloDeAcesso {
   usuarios = new Map<string, UsuarioAtual>()
   recusa: RecusaDeEntrada | null = null
   falharConexao = false
+  falharSair = false
   segurarVerificacao = false
   chamadas = { entrarComGoogle: 0, sair: 0, listarHistorico: 0, mudarPerfil: 0 }
   linhas: LinhaDeUsuario[] = []
@@ -49,6 +50,7 @@ export class AcessoFalso implements ModuloDeAcesso {
 
   async sair(): Promise<void> {
     this.chamadas.sair++
+    if (this.falharSair) throw new Error('Falha ao sair: falha de conexão simulada')
     this.sessao = null
   }
 
