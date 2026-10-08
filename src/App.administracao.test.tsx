@@ -56,7 +56,7 @@ test('enquanto carrega, mostra "Carregando usuários…" com linhas-fantasma', a
 
 test('a tabela mostra nome, e-mail, perfil e situação em pílula com texto', async () => {
   await irParaAdministracao(acessoDoAdministrador())
-  const tabela = await screen.findByRole('table')
+  const tabela = await screen.findByRole('table', { busy: false })
   const linhas = within(tabela).getAllByRole('row').slice(1).map((linha) => linha.textContent)
   expect(linhas[0]).toContain('nova.teste@ccivil.pr.gov.br')
   expect(linhas[0]).toContain('Aguardando primeiro acesso')
@@ -74,5 +74,5 @@ test('se a lista falha, mostra o erro e recupera com Tentar de novo', async () =
   expect(await screen.findByText('Não foi possível carregar os usuários. Verifique a conexão e tente de novo.')).toBeTruthy()
   acesso.falharLista = false
   fireEvent.click(screen.getByRole('button', { name: 'Tentar de novo' }))
-  expect(await screen.findByRole('table')).toBeTruthy()
+  expect(await screen.findByRole('table', { busy: false })).toBeTruthy()
 })
