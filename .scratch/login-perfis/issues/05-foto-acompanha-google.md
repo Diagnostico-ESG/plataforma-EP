@@ -16,3 +16,5 @@
 - [x] `foto_url` continua fechada para alteração pela API (o teste de "quem pode o quê" de `usuarios` segue passando).
 - [x] Testes de banco anteriores (02 a 06) seguem passando pelo SQL Editor; migração registrada em `supabase/AMBIENTES.md` na lista das aplicadas à mão.
 - [x] Ponta a ponta manual, pelo usuário: trocar a foto na conta Google, sair, entrar e ver a foto nova no avatar.
+
+Concluído em 2026-10-08 (commit d7e14a2)
