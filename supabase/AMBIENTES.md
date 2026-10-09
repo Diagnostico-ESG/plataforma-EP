@@ -9,6 +9,8 @@
 
 Observação (2026-10-06): na rede do escritório, só a porta 443 abre. Migrações e testes de banco vão à mão pelo SQL Editor do painel (ver `.scratch/inicio-projeto.md`).
 
+Atualização (2026-10-09): os testes de banco passaram a rodar pelo GitHub Actions (workflow "Testes de banco", botão "Run workflow" ou envio na `main` que mexa em `supabase/`). A cadeia do Session pooler do projeto de desenvolvimento fica no segredo `SUPABASE_DB_URL` do repositório. Migrações continuam sendo aplicadas à mão no SQL Editor.
+
 Migrações aplicadas à mão no dev pelo SQL Editor (fora do histórico da CLI; registrar com `npx supabase migration repair --status applied <versão>` numa rede liberada, antes da primeira publicação em produção):
 
 - 20261007200505_login_perfis (2026-10-07; testes 02 e 03 passaram pelo SQL Editor)

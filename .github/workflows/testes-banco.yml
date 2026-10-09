@@ -32,26 +32,6 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      # TEMPORÁRIO (diagnóstico de "password authentication failed"): mostra só o que não é segredo. Remover depois.
-      - name: Diagnóstico da cadeia (sem senha)
-        run: |
-          node -e "
-          const u = process.env.SUPABASE_DB_URL ?? '';
-          let p;
-          try { p = new URL(u); } catch { console.log('A cadeia nao e uma URL valida (tamanho', u.length + ')'); process.exit(0); }
-          const senha = decodeURIComponent(p.password);
-          console.log({
-            usuario: p.username, porta: p.port, banco: p.pathname,
-            servidorEhPooler: p.hostname.endsWith('pooler.supabase.com'),
-            tamanhoSenha: senha.length,
-            senhaSoLetrasNumeros: /^[A-Za-z0-9]+\$/.test(senha),
-            senhaTemColchetes: /[\[\]]/.test(senha),
-            senhaIgualMarcador: senha === '[YOUR-PASSWORD]',
-            cadeiaTemEspacoOuQuebra: /\s/.test(u),
-          });
-          "
-        env:
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
       - run: npm run test:db
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
