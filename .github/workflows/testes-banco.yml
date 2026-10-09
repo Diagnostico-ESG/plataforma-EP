@@ -1,0 +1,37 @@
+# Roda a bateria de testes de banco (pgTAP) no GitHub, porque a rede do escritório bloqueia a porta 5432.
+# A cadeia de conexão (Session pooler do projeto de desenvolvimento) fica no segredo SUPABASE_DB_URL.
+name: Testes de banco
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/**'
+      - 'scripts/testar-banco.mjs'
+      - 'scripts/relatorio-tap.mjs'
+      - 'package.json'
+      - '.github/workflows/testes-banco.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Uma execução por vez: dois testes ao mesmo tempo mexeriam no mesmo banco.
+concurrency:
+  group: testes-banco
+  cancel-in-progress: false
+
+jobs:
+  testes-banco:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run test:db
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
