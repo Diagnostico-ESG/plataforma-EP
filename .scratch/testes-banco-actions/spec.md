@@ -49,3 +49,5 @@ Sem testes automatizados próprios: o "teste" é a execução real no GitHub (as
 2. No painel do Supabase (projeto dev): Connect → Session pooler → copiar a cadeia (trocando a senha pela real).
 3. No GitHub: Settings → Secrets and variables → Actions → New repository secret → nome `SUPABASE_DB_URL`.
 4. Enviar o código (`git push`) e apertar "Run workflow" em "Testes de banco".
+
+Implementado em 2026-10-09 (commit 2d7f021)
