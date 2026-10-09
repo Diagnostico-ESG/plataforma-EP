@@ -27,3 +27,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-09 | testes-banco-actions | /planejar (modo curto) | 6% da sessão (/usage; plano sem valor em dólar)
 2026-10-09 | testes-banco-actions | /situação, envio ao GitHub e /demanda | 5% da sessão (/usage; plano sem valor em dólar)
 2026-10-09 | testes-banco-actions | /executar-simples | US$ 1,57
+2026-10-09 | testes-banco-actions | /executar-simples (ajuste do segredo e diagnóstico no Actions) | US$ 3,64 acumulado da sessão (já inclui US$ 1,57 da linha anterior; diferença: US$ 2,07)
