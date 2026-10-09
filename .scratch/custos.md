@@ -26,3 +26,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-08 | login-perfis | /ship (passos 0 a 10; parado no passo 7) | US$ 11,40
 2026-10-09 | testes-banco-actions | /planejar (modo curto) | 6% da sessão (/usage; plano sem valor em dólar)
 2026-10-09 | testes-banco-actions | /situação, envio ao GitHub e /demanda | 5% da sessão (/usage; plano sem valor em dólar)
+2026-10-09 | testes-banco-actions | /executar-simples | US$ 1,57
