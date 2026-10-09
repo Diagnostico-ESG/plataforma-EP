@@ -24,3 +24,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-08 | login-perfis | /demanda (bug do truncate) | US$ 3,15
 2026-10-08 | login-perfis | /demanda (bug: testes de foco instáveis e testes que faltam) | US$ 3,64
 2026-10-08 | login-perfis | /ship (passos 0 a 10; parado no passo 7) | US$ 11,40
+2026-10-09 | testes-banco-actions | /planejar (modo curto) | 6% da sessão (/usage; plano sem valor em dólar)
