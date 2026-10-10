@@ -261,3 +261,5 @@ Aguardando primeiro acesso → (primeiro acesso) → Ativo ⇄ (desativar / reat
 - A especificação geral (`.scratch/especificacao.md`) dizia "o administrador convida os usuários"; a decisão 11.3 foi resolvida e a forma passou a ser a autorização com login Google (ADR 0001).
 
 Entregue em 2026-10-09 (commit 2180971)
+
+Entregue em 2026-10-09 (commit 32e1b53)
