@@ -97,3 +97,11 @@ Ponto de partida da revisão: `marco/2026-10-07-inicio-login-perfis`, o mais ant
 - **Passo 7 concluído.** A bateria `npm run test:db` (10 arquivos, de `00` a `09`, incluindo o `09_emails_sem_escrita`, que nunca tinha rodado) passou inteira no GitHub Actions ("Testes de banco", na `main`), confirmado pelo usuário em 2026-10-09. Antes, a porta 5432 da rede do escritório impedia a execução.
 - **Critério `[visual]` conferido na tela real pelo usuário** (Salvar e Cancelar ao lado do seletor de perfil): ok. A marca de entrega sai sem ressalva.
 - Nenhuma mudança em `src/` ou `supabase/` de login-perfis desde o `/ship` de 2026-10-08, então a revisão de código, a de segurança e a cobertura anteriores continuam valendo.
+
+## 2026-10-09 — /ship de login-perfis (entrada por bug: permissões padrão do Supabase)
+
+Ponto de partida da revisão: `2d49a6b` (`marco/2026-10-09-antes-correcao-permissoes-padrao`), o commit anterior à correção.
+
+- **Saída diferente da sugerida no backlog:** o item sugeria `revoke all` e conceder de volta só o necessário, como `eventos` fez; a migração `20261010012539_sem_privilegios_padrao.sql` tira só `references`, `trigger` e `maintain`. Efeito: visitante e logado continuam com os privilégios de tabela de leitura e gravação em `usuarios`, `usuarios_emails` e `autorizacoes`, barrados só pela RLS (já era assim; não é regressão). O `revoke all` foi para o backlog, por decisão do usuário de fechar a entrega só com o que bloqueia (2026-10-09).
+- **Pontos cegos do teste geral `10_privilegios_padrao`, achados no `code-review`:** funções em `public` (execução liberada por padrão), schemas expostos além de `public` e views sem `security_invoker` (nenhum teste confere). Os aceitos antes continuam: permissão por coluna e herdada de outro papel. Todos no backlog.
+- **`/security-review`:** comparou com `origin/main` e viu só o commit do backlog (markdown), sem nenhuma mudança de código; feita a revisão de reserva das mudanças desde `2d49a6b` (uma migração que só retira privilégios e um teste). Nenhum achado.
