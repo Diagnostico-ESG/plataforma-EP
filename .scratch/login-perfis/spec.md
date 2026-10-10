@@ -259,3 +259,5 @@ Aguardando primeiro acesso → (primeiro acesso) → Ativo ⇄ (desativar / reat
   - `[visual]` Mensagens de falha em vermelho e o aviso de perfil sem permissão em amarelo, na Administração e na entrada.
 - Testes de banco nesta rede vão à mão pelo SQL Editor, e as migrações aplicadas assim precisam ser registradas no histórico da CLI antes da primeira publicação em produção (ver `.scratch/inicio-projeto.md`).
 - A especificação geral (`.scratch/especificacao.md`) dizia "o administrador convida os usuários"; a decisão 11.3 foi resolvida e a forma passou a ser a autorização com login Google (ADR 0001).
+
+Entregue em 2026-10-09 (commit 2180971)
