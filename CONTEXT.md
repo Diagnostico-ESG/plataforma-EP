@@ -46,6 +46,30 @@ _Avoid_: excluir, bloquear, banir
 
 ## Setores
 
+**Setor**:
+Unidade da Casa Civil atendida pelo EP, identificada por uma sigla. Existe por conta própria e pode participar de vários macroprocessos.
+_Avoid_: área, departamento, unidade
+
+**Sigla**:
+O identificador curto e único do setor, que entra no nome dos arquivos. Pode mudar; os arquivos já enviados mantêm a sigla antiga no nome.
+_Avoid_: código do setor, abreviação
+
+**Macroprocesso**:
+Grande agrupamento de processos da Cadeia de Valor, identificado por um código. Pode ter uma categoria: finalístico, apoio ou gerencial.
+_Avoid_: área de atuação, eixo
+
+**Setor envolvido**:
+Um setor que participa de um macroprocesso, com uma observação opcional sobre o papel dele ali. Um macroprocesso pode não ter nenhum enquanto o planejamento não termina.
+_Avoid_: setor vinculado, setor do macroprocesso
+
+**Setor inativo / Macroprocesso inativo**:
+Cadastro que não aparece mais nas listas de escolha, mas continua aparecendo, marcado, onde já foi usado. Um setor inativo continua como setor envolvido nos macroprocessos em que estava.
+_Avoid_: arquivado, extinto
+
+**Excluir (setor ou macroprocesso)**:
+Apagar o cadastro de vez, o que só é possível enquanto nenhum processo depende dele. O histórico guarda o que foi apagado. Diferente do usuário, que depois do primeiro acesso só se desativa.
+_Avoid_: remover, deletar
+
 **Responsável do setor**:
 Pessoa de um setor atendido que responde pelo processo mapeado. Não é usuário e não entra na plataforma.
 _Avoid_: dono do processo, usuário do setor
