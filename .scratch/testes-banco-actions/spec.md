@@ -34,11 +34,11 @@ Fora do escopo: cobertura no Actions, build, publicação, banco de produção (
 
 ## Critérios de pronto
 
-- [ ] Os dois arquivos existem, com o disparo e as permissões acima, e o YAML é válido (conferido localmente).
-- [ ] Depois de eu cadastrar o segredo e enviar o código: o botão "Run workflow" de "Testes de banco" roda, e a execução termina verde com os 10 arquivos de teste (`00` a `09`) passando. Verificado pelo usuário na aba Actions (ou pela saída que ele colar).
-- [ ] "Verificação" termina verde no mesmo envio.
+- [x] Os dois arquivos existem (2026-10-09), com o disparo e as permissões acima, e o YAML é válido (conferido localmente).
+- [x] Depois de eu cadastrar o segredo (2026-10-09: 10 de 10 arquivos passaram, 148 verificações, 0 reprovadas; o segredo precisou ser refeito com a senha certa) e enviar o código: o botão "Run workflow" de "Testes de banco" roda, e a execução termina verde com os 10 arquivos de teste (`00` a `09`) passando. Verificado pelo usuário na aba Actions (ou pela saída que ele colar).
+- [x] "Verificação" termina verde (2026-10-09, execuções #1 e #2) no mesmo envio.
 - [ ] Um envio que só altera `src/` não dispara "Testes de banco" (confere o filtro).
-- [ ] Nenhuma cadeia de conexão em arquivo, log ou conversa.
+- [x] Nenhuma cadeia de conexão (2026-10-09; o passo de diagnóstico imprimiu só usuário, porta e formato, e foi removido) em arquivo, log ou conversa.
 - [ ] `[visual]` — nenhum.
 
 Sem testes automatizados próprios: o "teste" é a execução real no GitHub (as duas primeiras caixas acima). Arquivo YAML não tem função de lógica a cobrir.
