@@ -91,3 +91,9 @@ Ponto de partida da revisão: `marco/2026-10-07-inicio-login-perfis`, o mais ant
 - **Conferência na tela (critério `[visual]` do ticket 06):** o Cancelar descia sozinho para a linha de baixo quando a coluna Perfil ficava estreita. Corrigido com uma grade de três colunas (commit 8bf681c); a revisão dessa correção apontou que uma falha longa alargaria as colunas, conferido numa réplica com o CSS real e corrigido (commit 5eda001).
 - **Achados de padrão e de teste deixados para depois** (domínio do e-mail escrito em vários lugares, passo a passo de envio repetido, conferência de administrador copiada em 8 políticas, concessão a `supabase_auth_admin` sem ADR, tipos soltos, lacunas do simulador): no backlog, com origem nesta revisão.
 - **Sem dependência circular, sem migração destrutiva** (a migração nova só troca um gatilho e uma função), **tipos do banco em dia.**
+
+## 2026-10-09 — /ship de login-perfis (retomada: bateria de banco e marca de entrega)
+
+- **Passo 7 concluído.** A bateria `npm run test:db` (10 arquivos, de `00` a `09`, incluindo o `09_emails_sem_escrita`, que nunca tinha rodado) passou inteira no GitHub Actions ("Testes de banco", na `main`), confirmado pelo usuário em 2026-10-09. Antes, a porta 5432 da rede do escritório impedia a execução.
+- **Critério `[visual]` conferido na tela real pelo usuário** (Salvar e Cancelar ao lado do seletor de perfil): ok. A marca de entrega sai sem ressalva.
+- Nenhuma mudança em `src/` ou `supabase/` de login-perfis desde o `/ship` de 2026-10-08, então a revisão de código, a de segurança e a cobertura anteriores continuam valendo.

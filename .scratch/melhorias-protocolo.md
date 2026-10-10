@@ -178,3 +178,9 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Linha `Implementado em` na spec (funcionalidade sem tickets).** Esperado: gravada no fim da spec com o hash do commit. Aconteceu: gravada com o hash do commit dos workflows (2d7f021), em commit separado.
 - **`/planejar` modo curto, perguntas uma a uma.** Esperado: 3 a 5 perguntas diretas, spec curta, aprovação antes do commit. Aconteceu: 4 perguntas; a resposta da pergunta 4 ("sim, tudo") ampliou o escopo além do pedido (segundo workflow de verificação), sem passar pela regra de "demanda virou outra coisa".
 - **`/mattpocock-skills:code-review` por dois subagentes.** Esperado: relatórios separados de padrões e spec. Aconteceu: nenhum achado funcional; sugestões leves (Node via `node-version-file`, CI também em pull request), não aplicadas.
+
+## 2026-10-09 — /ship de login-perfis (retomada em sessão nova)
+
+- **Retomada do `/ship` parado no passo 7.** Esperado: o comando retomar dos passos que faltavam sem refazer os feitos. Aconteceu: o comando não prevê retomada; retomei a partir do handoff e dos commits (nada de `src/` ou `supabase/` mudou desde o fim dos passos 0 a 6 e 8 a 10), confirmando isso com o git antes de aproveitar o resultado. Sugestão: o `/ship` ter uma regra de retomada (como o roteiro de publicação tem) dizendo que os passos já feitos valem enquanto o diff da funcionalidade não mudou.
+- **Passo 7 pelo GitHub Actions.** Esperado: `npm run test:db` rodar na máquina. Aconteceu: rodou pelo workflow "Testes de banco" no GitHub, e o usuário relatou o resultado verde. Sugestão: o passo 7 aceitar "bateria rodada em CI, com resultado confirmado pelo usuário".
+- **Marca sem ressalva depois de `[visual]` conferido pelo usuário na tela real.** Esperado: marca sem ressalva. Aconteceu: gravada sem ressalva.
