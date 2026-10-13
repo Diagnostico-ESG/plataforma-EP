@@ -281,3 +281,12 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Critério "mesma quantidade de testes".** Esperado: os 732 testes de antes continuarem passando. Aconteceu: 732 + 4 novos (peças compartilhadas) = 736, todos verdes.
 - **claude-mem sem cota** desde o início da sessão (provedor esgotou a cota); a sessão seguiu sem ele, como manda o `CLAUDE.md`.
 - **Observação:** rodou em Opus (a tabela recomenda Sonnet), na mesma sessão do `/situação`, por escolha do usuário.
+
+## 2026-10-13 — /executar-complexo do ticket 02 de processos-etapas
+
+- **Tipos do banco e o pre-commit.** Esperado (comando, passo 1): migração, teste de banco e tipos no mesmo commit, e o código da interface depois. Aconteceu: adiantei o módulo de processos enquanto o GitHub Actions rodava; o código dependia das tabelas novas e o `tsc` do pre-commit só passa depois do `db:types`, então guardei os arquivos fora do projeto para comitar a migração e os trouxe de volta em seguida. Como nos tickets anteriores, a migração foi comitada antes dos tipos (o workflow precisa dela na branch). Sugestão: o comando dizer que, sem rede para a porta 5432, a ordem é teste → migração (commit e push) → workflow → `db:types` (commit), e que código que lê tabela nova só se escreve depois dos tipos.
+- **Migração pelo workflow, não por `db push`** (item não testado "migração aplicada com `db push`"): segue a regra de "Ajustes deste Projeto"; o teste 15 falhou antes (tabela inexistente, 15 de 16 arquivos) e passou depois (81 de 81, 16 de 16) na primeira aplicação.
+- **Teste antigo que conta a tabela inteira** (sugestão do `/ship` de cadastros-basicos, já no ticket): `03_login_leitura` passou a contar só `usuario` e `autorizacao`, para não quebrar quando a entidade `andamento` for gravada no desenvolvimento.
+- **Marco por ticket criado no início** (`marco/2026-10-13-inicio-ticket-02-processos-etapas`), como no ticket 01; o comando ainda não pede.
+- **claude-mem sem cota** desde o início da sessão; a sessão seguiu sem ele.
+- **Observação:** rodou em Opus (a tabela recomenda Sonnet), na mesma sessão do `/situação`, por escolha do usuário.

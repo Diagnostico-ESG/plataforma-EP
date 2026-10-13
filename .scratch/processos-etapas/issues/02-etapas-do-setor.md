@@ -19,3 +19,5 @@
 - [ ] Tela do setor: caminho das etapas do setor com status, datas e nota; ações só na etapa que pode andar; estados "Carregando etapas do setor…" e erro com [Tentar de novo]; a Consulta vê sem ações.
 - [ ] Histórico da área Setores mostra os eventos das etapas do setor com os textos da spec e entra no filtro pelo setor.
 - [ ] Testes de interface com o aplicativo inteiro: cada ação com sucesso e com falha, a janela de nota (vazia, Esc), a sequência recusada, a Consulta e os estados.
+
+Concluído em 2026-10-13 (commit c5d091e)
