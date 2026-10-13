@@ -127,6 +127,15 @@ Se uma regra falhar ou puder melhorar, registre em `.scratch/melhorias-protocolo
 
 *(Exceções deste projeto às regras acima. Esta seção é preservada ao atualizar o protocolo.)*
 
+### Testes de banco no GitHub Actions
+
+Decidido em 2026-10-13. Na rede do escritório a porta 5432 fica fechada, então a bateria pgTAP (`npm run test:db`) roda, por regra, no workflow "Testes de banco" do GitHub Actions, nunca na máquina. Para isso, sem me pedir autorização antes:
+
+* `git push` da branch de trabalho (sem `--force`), para levar os testes ao GitHub;
+* disparar o workflow "Testes de banco" na branch (Run workflow) e ler o resultado.
+
+A autorização vale só para esse ciclo de teste. Enviar à `main`, aplicar migração no banco e qualquer passo de produção continuam pedindo minha aprovação. A migração vai à mão pelo SQL Editor, rodada por mim.
+
 ### Agent skills
 
 Configuração das skills do Matt Pocock, gravada pelo `setup-matt-pocock-skills` em 2026-10-06 (o bloco fica aqui porque o protocolo só permite alterar esta seção).
