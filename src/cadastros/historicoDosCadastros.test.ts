@@ -151,3 +151,31 @@ describe('eventosDoItem', () => {
   })
 })
 
+
+const ETAPA_PENDENTE = {
+  setor_id: 's1', setor_sigla: 'TSA', etapa_codigo: 'sensibilizacao', etapa_nome: 'Reunião de sensibilização',
+  status: 'pendente', iniciada_em: null, resolvida_em: null,
+}
+const ETAPA_DISPENSADA: EventoDoCadastro = {
+  id: 20, ocorridoEm: '2026-10-13T15:00:00Z', autor: 'Pessoa Fictícia', acao: 'dispensar', entidade: 'andamento',
+  entidadeRef: 's1:a2', antes: ETAPA_PENDENTE,
+  depois: { ...ETAPA_PENDENTE, status: 'dispensada', resolvida_em: '2026-10-13' }, motivo: 'Setor já conhecido',
+}
+
+describe('etapas do setor no histórico', () => {
+  test('texto de cada ação', () => {
+    expect(['iniciar', 'concluir', 'dispensar', 'registrar_realizada'].map((acao) => textoDaAcaoDoCadastro(acao, 'andamento')))
+      .toEqual(['Iniciou a etapa', 'Concluiu a etapa', 'Dispensou a etapa', 'Registrou a etapa como realizada anteriormente'])
+  })
+
+  test('o item é a etapa e o setor; antes e depois sem código e nome da etapa, com status e datas legíveis', () => {
+    expect(nomeDoItem(ETAPA_DISPENSADA)).toBe('Reunião de sensibilização — TSA')
+    expect(descreverEstadoDoCadastro(ETAPA_DISPENSADA.depois))
+      .toBe('Setor: TSA; Situação da etapa: Dispensada; Início: —; Conclusão: 13/10/2026')
+  })
+
+  test('o evento entra no filtro pelo setor', () => {
+    expect(itensDoFiltro([ETAPA_DISPENSADA])).toEqual([{ id: 's1', nome: 'TSA' }])
+    expect(eventosDoItem([ETAPA_DISPENSADA], 's1')).toEqual([ETAPA_DISPENSADA])
+  })
+})

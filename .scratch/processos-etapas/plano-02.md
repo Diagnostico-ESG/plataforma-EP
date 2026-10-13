@@ -1626,7 +1626,7 @@ export function SetorAberto({ cadastros, processos, podeAlterar, id, aoVoltar }:
 - Consumes: `ROTULO_DO_STATUS`, `formatarData` (Task 3); `StatusDaEtapa` (Task 2); eventos `andamento` da Task 1.
 - Produces: `EventoDoCadastro` com `motivo?: string`; `textoDaAcaoDoCadastro(acao, 'andamento')`, `nomeDoItem` e `descreverEstadoDoCadastro` para etapas do setor.
 
-- [ ] **Step 1: testes (vermelho).** Acrescentar ao fim de `src/cadastros/historicoDosCadastros.test.ts` (ajustar o import do topo para trazer `descreverEstadoDoCadastro, eventosDoItem, itensDoFiltro, nomeDoItem, textoDaAcaoDoCadastro` e o tipo `EventoDoCadastro`, se ainda não vierem):
+- [x] **Step 1: testes (vermelho).** Acrescentar ao fim de `src/cadastros/historicoDosCadastros.test.ts` (ajustar o import do topo para trazer `descreverEstadoDoCadastro, eventosDoItem, itensDoFiltro, nomeDoItem, textoDaAcaoDoCadastro` e o tipo `EventoDoCadastro`, se ainda não vierem):
 
 ```ts
 const ETAPA_PENDENTE = {
@@ -1683,7 +1683,7 @@ Em `src/cadastros/historicoSupabase.test.ts`, ajustar a expectativa do filtro de
 
 Rodar `npx vitest run src/cadastros src/App.historicoDosCadastros.test.tsx`. Esperado: falhas nos testes novos e no filtro de entidades.
 
-- [ ] **Step 2: implementar.**
+- [x] **Step 2: implementar.**
 
 `src/cadastros/tipos.ts`, em `EventoDoCadastro`, acrescentar depois de `depois`:
 
@@ -1744,7 +1744,7 @@ const ENTIDADES_QUE_LIGAM = new Set(['setor_envolvido', 'andamento'])
 
 Se `valorLegivel` ou `nomeDoItem` passar de complexidade 10 no ESLint, extrair o trecho novo numa função com nome próprio (`valorDaEtapa(campo, valor): string | null`, por exemplo), sem juntar instruções.
 
-- [ ] **Step 3: ver passar e comitar.** `npm test` inteiro verde; `npx tsc -b`, `npm run lint`, `npm run check:circular` limpos. Commit "Ticket 02 de processos-etapas: etapas do setor no Histórico".
+- [x] **Step 3: ver passar e comitar.** `npm test` inteiro verde; `npx tsc -b`, `npm run lint`, `npm run check:circular` limpos. Commit "Ticket 02 de processos-etapas: etapas do setor no Histórico".
 
 ---
 

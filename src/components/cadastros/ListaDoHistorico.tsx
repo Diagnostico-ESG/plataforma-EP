@@ -34,6 +34,7 @@ function EventoDoHistorico({ evento }: { evento: EventoDoCadastro }) {
       <span className="historico-mudanca">
         <span>Antes: {descreverEstadoDoCadastro(evento.antes)}</span>
         <span>Depois: {descreverEstadoDoCadastro(evento.depois)}</span>
+        {evento.motivo && <span>Nota: {evento.motivo}</span>}
       </span>
     </li>
   )
