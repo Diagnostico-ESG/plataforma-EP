@@ -1,7 +1,10 @@
 import { CadastroInexistente } from '../../cadastros/cadastroInexistente'
 import type { DadosDoSetor, ModuloDeCadastros, Setor } from '../../cadastros/tipos'
-import { AcoesDoSetor } from './AcoesDoSetor'
+import { AcoesDoCadastro } from './AcoesDoCadastro'
 import { FormularioDeSetor } from './FormularioDeSetor'
+
+// Neste ticket o setor ainda não tem macroprocessos; o ticket 04 passa a contá-los no texto.
+const TEXTO_DA_EXCLUSAO = 'O histórico guarda o que ele tinha, mas não é possível desfazer.'
 
 type SetorEditavelProps = {
   cadastros: ModuloDeCadastros
@@ -27,7 +30,10 @@ export function SetorEditavel({ cadastros, setor, aoVoltar, aoSumir, aoMudar }: 
     <div className="cadastros-secao">
       <FormularioDeSetor titulo={`Setor ${setor.sigla}`} inicial={setor} rotuloDoCancelar="Voltar à lista"
         aoSalvar={salvar} aoCancelar={aoVoltar} />
-      <AcoesDoSetor cadastros={cadastros} setor={setor} aoMudar={aoMudar} aoSumir={aoSumir} aoVoltar={aoVoltar} />
+      <AcoesDoCadastro ativo={setor.ativo} tituloDaJanela={`Excluir o setor ${setor.sigla}?`}
+        textoDaJanela={TEXTO_DA_EXCLUSAO} rotuloDaExclusao="Excluir setor"
+        desativar={() => cadastros.desativarSetor(setor.id)} reativar={() => cadastros.reativarSetor(setor.id)}
+        excluir={() => cadastros.excluirSetor(setor.id)} aoMudar={aoMudar} aoSumir={aoSumir} aoVoltar={aoVoltar} />
     </div>
   )
 }

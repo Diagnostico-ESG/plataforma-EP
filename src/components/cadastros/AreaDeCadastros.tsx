@@ -1,6 +1,7 @@
 import type { UsuarioAtual } from '../../acesso/tipos'
 import type { ModuloDeCadastros } from '../../cadastros/tipos'
 import { useEndereco } from '../../hooks/useEndereco'
+import { AreaDeMacroprocessos } from './AreaDeMacroprocessos'
 import { AreaDeSetores } from './AreaDeSetores'
 import './Cadastros.css'
 
@@ -32,9 +33,15 @@ export function AreaDeCadastros({ usuario, cadastros }: AreaDeCadastrosProps) {
           </a>
         ))}
       </nav>
-      {abaAtual === 'setores'
-        ? <AreaDeSetores cadastros={cadastros} podeAlterar={usuario.perfil !== 'consulta'} />
-        : <p className="cadastros-em-breve">Esta seção chega numa próxima entrega.</p>}
+      <SecaoAtual aba={abaAtual} cadastros={cadastros} podeAlterar={usuario.perfil !== 'consulta'} />
     </section>
   )
+}
+
+type SecaoAtualProps = { aba: AbaDosCadastros; cadastros: ModuloDeCadastros; podeAlterar: boolean }
+
+function SecaoAtual({ aba, cadastros, podeAlterar }: SecaoAtualProps) {
+  if (aba === 'setores') return <AreaDeSetores cadastros={cadastros} podeAlterar={podeAlterar} />
+  if (aba === 'macroprocessos') return <AreaDeMacroprocessos cadastros={cadastros} podeAlterar={podeAlterar} />
+  return <p className="cadastros-em-breve">Esta seção chega numa próxima entrega.</p>
 }

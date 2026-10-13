@@ -1,6 +1,6 @@
 import { TEXTO_DE_CADASTRO_INEXISTENTE } from '../../cadastros/cadastroInexistente'
 
-export function SetorInexistente({ aoVoltar }: { aoVoltar: () => void }) {
+export function ItemInexistente({ aoVoltar }: { aoVoltar: () => void }) {
   return (
     <div className="cadastros-erro" role="alert">
       <p>{TEXTO_DE_CADASTRO_INEXISTENTE}</p>
