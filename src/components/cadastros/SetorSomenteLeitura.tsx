@@ -1,6 +1,7 @@
-import type { Setor } from '../../cadastros/tipos'
+import type { SetorComMacroprocessos } from '../../cadastros/tipos'
+import { MacroprocessosDoSetor } from './MacroprocessosDoSetor'
 
-type SetorSomenteLeituraProps = { setor: Setor; aoVoltar: () => void }
+type SetorSomenteLeituraProps = { setor: SetorComMacroprocessos; aoVoltar: () => void }
 
 export function SetorSomenteLeitura({ setor, aoVoltar }: SetorSomenteLeituraProps) {
   return (
@@ -11,6 +12,7 @@ export function SetorSomenteLeitura({ setor, aoVoltar }: SetorSomenteLeituraProp
         <dt>Sigla</dt><dd>{setor.sigla}</dd>
         <dt>Observações</dt><dd>{setor.observacoes ?? '—'}</dd>
       </dl>
+      <MacroprocessosDoSetor macroprocessos={setor.macroprocessos} />
       <button type="button" className="botao botao-secundario" onClick={aoVoltar}>Voltar à lista</button>
     </section>
   )

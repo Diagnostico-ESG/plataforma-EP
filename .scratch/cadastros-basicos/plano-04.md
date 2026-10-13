@@ -464,10 +464,10 @@ export function LinhaDeSetorEnvolvido(props: { cadastros: ModuloDeCadastros; mac
 
 **Interfaces:** Consome `SetorComMacroprocessos` (já devolvido por `lerSetor`). Produz `MacroprocessosDoSetor({ macroprocessos }: { macroprocessos: MacroprocessoDoSetor[] })`.
 
-- [ ] **Passo 1: testes de tela que falham** (hash `#/setores`, abrir o setor): "Macroprocessos em que participa" lista código ("—" se não tem), nome e observação, na ordem código/sem código/nome, só leitura (sem botão nem campo editável dentro da seção); sem vínculos: "Este setor ainda não participa de nenhum macroprocesso."; a Consulta vê a mesma seção; um macroprocesso inativo em que o setor participa continua listado.
-- [ ] **Passo 2: ver falharem.** `npx vitest run src/App.macroprocessosDoSetor.test.tsx`.
-- [ ] **Passo 3: implementar** `MacroprocessosDoSetor` (`<section aria-label="Macroprocessos em que participa">` com `<h3>` e tabela, ou o texto vazio) e usá-lo em `SetorEditavel` (abaixo do formulário e acima das ações) e em `SetorSomenteLeitura`.
-- [ ] **Passo 4: verificar** (`npm test`, `npx tsc -b`, `npm run lint`). Commit.
+- [x] **Passo 1: testes de tela que falham** (hash `#/setores`, abrir o setor): "Macroprocessos em que participa" lista código ("—" se não tem), nome e observação, na ordem código/sem código/nome, só leitura (sem botão nem campo editável dentro da seção); sem vínculos: "Este setor ainda não participa de nenhum macroprocesso."; a Consulta vê a mesma seção; um macroprocesso inativo em que o setor participa continua listado.
+- [x] **Passo 2: ver falharem.** `npx vitest run src/App.macroprocessosDoSetor.test.tsx`.
+- [x] **Passo 3: implementar** `MacroprocessosDoSetor` (`<section aria-label="Macroprocessos em que participa">` com `<h3>` e tabela, ou o texto vazio) e usá-lo em `SetorEditavel` (abaixo do formulário e acima das ações) e em `SetorSomenteLeitura`.
+- [x] **Passo 4: verificar** (`npm test`, `npx tsc -b`, `npm run lint`). Commit.
 
 ---
 
