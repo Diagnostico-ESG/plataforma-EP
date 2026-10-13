@@ -622,7 +622,7 @@ Atenção: `private.acao_do_andamento` é chamada dentro de uma função `securi
   - `export const RECUSAS_DOS_PROCESSOS: RecusasDoModulo`
   - `export class ProcessosFalso implements ModuloDeProcessos` com `etapasDoSetor: Record<string, EtapaDoSetor[]>`, `falharLeitura`, `segurarLeitura`, `falhaDeGravacao: string | Error | null`, `chamadas: { acao: string; id: string; nota?: string }[]`
 
-- [ ] **Step 1: tipos.** `src/processos/tipos.ts`:
+- [x] **Step 1: tipos.** `src/processos/tipos.ts`:
 
 ```ts
 export type StatusDaEtapa = 'pendente' | 'em_andamento' | 'concluida' | 'realizada_anteriormente' | 'dispensada'
@@ -655,7 +655,7 @@ export type ModuloDeProcessos = {
 }
 ```
 
-- [ ] **Step 2: testes do módulo real (vermelho).** `src/processos/processosSupabase.test.ts`:
+- [x] **Step 2: testes do módulo real (vermelho).** `src/processos/processosSupabase.test.ts`:
 
 ```ts
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -755,7 +755,7 @@ test('nada mudou e a etapa sumiu (o setor foi excluído): aviso de cadastro inex
 
 Rodar `npx vitest run src/processos/processosSupabase.test.ts`. Esperado: falha (módulo inexistente).
 
-- [ ] **Step 3: módulo real.** `src/processos/processosSupabase.ts`:
+- [x] **Step 3: módulo real.** `src/processos/processosSupabase.ts`:
 
 ```ts
 import {
@@ -834,9 +834,9 @@ function falhaDoAndamento(erro: ErroDoBanco): Error {
 
 Se o `tsc` reclamar do `data as AndamentoLido[]` (tipo inferido pelo supabase-js diferente), trocar por `data as unknown as AndamentoLido[]`, como em `historicoSupabase.ts`.
 
-- [ ] **Step 4: ver passar.** `npx vitest run src/processos/processosSupabase.test.ts` verde; `npx tsc -b` limpo.
+- [x] **Step 4: ver passar.** `npx vitest run src/processos/processosSupabase.test.ts` verde; `npx tsc -b` limpo.
 
-- [ ] **Step 5: módulo falso.** `src/processos/ProcessosFalso.ts`:
+- [x] **Step 5: módulo falso.** `src/processos/ProcessosFalso.ts`:
 
 ```ts
 import type { EtapaDoSetor, ModuloDeProcessos } from './tipos'
@@ -891,7 +891,7 @@ export class ProcessosFalso implements ModuloDeProcessos {
 }
 ```
 
-- [ ] **Step 6: conferir e comitar.** `npx tsc -b`, `npx eslint src/processos`; commit "Ticket 02 de processos-etapas: módulo de processos (real e falso)".
+- [x] **Step 6: conferir e comitar.** `npx tsc -b`, `npx eslint src/processos`; commit "Ticket 02 de processos-etapas: módulo de processos (real e falso)".
 
 ---
 
@@ -909,7 +909,7 @@ export class ProcessosFalso implements ModuloDeProcessos {
   - `export function acoesDaEtapa(etapas: EtapaDoSetor[], indice: number): AcaoDaEtapa[]`
   - `export function formatarData(data: string | null): string`
 
-- [ ] **Step 1: testes (vermelho).** `src/processos/caminhoDeEtapas.test.ts`:
+- [x] **Step 1: testes (vermelho).** `src/processos/caminhoDeEtapas.test.ts`:
 
 ```ts
 import { describe, expect, test } from 'vitest'
@@ -965,7 +965,7 @@ test('a data do banco (AAAA-MM-DD) aparece como DD/MM/AAAA; sem data, um traço'
 
 Rodar `npx vitest run src/processos/caminhoDeEtapas.test.ts`. Esperado: falha (módulo inexistente).
 
-- [ ] **Step 2: implementar.** `src/processos/caminhoDeEtapas.ts`:
+- [x] **Step 2: implementar.** `src/processos/caminhoDeEtapas.ts`:
 
 ```ts
 import type { EtapaDoSetor, StatusDaEtapa } from './tipos'
@@ -1003,7 +1003,7 @@ export function formatarData(data: string | null): string {
 }
 ```
 
-- [ ] **Step 3: ver passar e comitar.** `npx vitest run src/processos` verde; commit "Ticket 02 de processos-etapas: etapa atual, ações e rótulos".
+- [x] **Step 3: ver passar e comitar.** `npx vitest run src/processos` verde; commit "Ticket 02 de processos-etapas: etapa atual, ações e rótulos".
 
 ---
 
@@ -1016,7 +1016,7 @@ export function formatarData(data: string | null): string {
 **Interfaces:**
 - Produces: `export function JanelaComCampo(props: { aberta: boolean; titulo: string; rotuloDoCampo: string; rotuloDaAcao: string; aoConfirmar: (texto: string) => void; aoFechar: () => void })`. `aoConfirmar` recebe o texto sem espaços nas pontas.
 
-- [ ] **Step 1: testes (vermelho).** `src/components/JanelaComCampo.test.tsx`:
+- [x] **Step 1: testes (vermelho).** `src/components/JanelaComCampo.test.tsx`:
 
 ```tsx
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
@@ -1071,7 +1071,7 @@ test('Cancelar e Esc fecham sem confirmar', () => {
 
 Rodar `npx vitest run src/components/JanelaComCampo.test.tsx`. Esperado: falha (componente inexistente).
 
-- [ ] **Step 2: implementar.** `src/components/JanelaComCampo.tsx`:
+- [x] **Step 2: implementar.** `src/components/JanelaComCampo.tsx`:
 
 ```tsx
 import './JanelaDeConfirmacao.css'
@@ -1151,7 +1151,7 @@ Acrescentar ao fim de `src/components/JanelaDeConfirmacao.css`:
 
 (Se `--esp-2` não existir em `src/styles/tokens.css`, usar o menor `--esp-*` que existir.)
 
-- [ ] **Step 3: ver passar e comitar.** `npx vitest run src/components/JanelaComCampo.test.tsx` verde; commit "Ticket 02 de processos-etapas: janela com campo obrigatório".
+- [x] **Step 3: ver passar e comitar.** `npx vitest run src/components/JanelaComCampo.test.tsx` verde; commit "Ticket 02 de processos-etapas: janela com campo obrigatório".
 
 ---
 
