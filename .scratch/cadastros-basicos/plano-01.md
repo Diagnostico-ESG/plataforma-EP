@@ -67,8 +67,8 @@
 **Interfaces:**
 - Produz: tabela `public.setores (id uuid, nome text, sigla text, observacoes text, ativo boolean, criado_em timestamptz)`; restrições `setores_sigla_key`, `setores_nome_unico`, `setores_sigla_formato`; funções `private.pode_alterar_cadastros()` e `private.acao_do_cadastro(text, jsonb, jsonb)`, reaproveitadas pelos tickets 03 e 04; eventos `entidade = 'setor'`, `entidade_ref = id`, `detalhes = {antes, depois}` com `sigla, nome, observacoes, ativo`.
 
-- [ ] **Passo 1: criar a branch.** `git switch -c cadastros-basicos`.
-- [ ] **Passo 2: escrever o teste pgTAP** em `supabase/tests/11_setores.test.sql`:
+- [x] **Passo 1: criar a branch.** `git switch -c cadastros-basicos`.
+- [x] **Passo 2: escrever o teste pgTAP** em `supabase/tests/11_setores.test.sql`:
 
 ```sql
 -- Setores: quem pode o quê, regras da sigla e do nome, e eventos (cadastros-basicos, ticket 01).
