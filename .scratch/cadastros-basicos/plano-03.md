@@ -74,10 +74,10 @@
   - Eventos (administrador cria, edita, desativa, reativa, exclui um macroprocesso `HIST`; gravação sem mudança não gera evento): `criar` grava o `depois` legível e o autor; `editar` grava o `antes`; `desativar` e `reativar` viram ação própria; `excluir` grava no `antes` todos os campos.
 - [x] **Passo 3: ver o teste falhar.** `git push -u origin cadastros-basicos` e disparar "Testes de banco" na branch pelo navegador. Esperado: vermelho (tabela não existe).
 - [x] **Passo 4: escrever a migração** no desenho da de setores: `create type`, `create table` com `constraint ..._tamanho` nas colunas de texto, `macroprocessos_codigo_key unique (codigo)` e `create unique index macroprocessos_nome_unico on public.macroprocessos (lower(nome))`; `enable row level security`; `revoke all ... from anon, authenticated`, `grant select, delete`, `grant insert (codigo, nome, descricao, categoria)`, `grant update (codigo, nome, descricao, categoria, ativo)`; quatro políticas (`"macroprocessos: ativo lê"` com `private.usuario_ativo()`; criar, alterar e apagar com `private.pode_alterar_cadastros()`); função `private.preparar_macroprocesso()` (`nome := btrim(nome)`, `codigo := nullif(btrim(codigo), '')`) em gatilho `before insert or update`; função `private.registrar_evento_do_macroprocesso()` (`security definer`, `search_path` vazio, mesmo molde de `registrar_evento_do_setor`, `entidade = 'macroprocesso'`, ignorando gravação sem mudança) em gatilho `after insert or update or delete`; `revoke execute` das duas funções de `public, anon, authenticated`. Comentário de topo como o da migração de setores.
-- [ ] **Passo 5: pedir ao usuário que aplique a migração** no SQL Editor do dev (colar o conteúdo do arquivo) e confirmar. Registrar em `supabase/AMBIENTES.md` a migração aplicada à mão (mesma forma das anteriores).
-- [ ] **Passo 6: ver o teste passar.** Push e disparo do "Testes de banco" na branch. Esperado: verde, com `00_rls_ligada` e `10_privilegios_padrao` intactos (critério 2).
-- [ ] **Passo 7: tipos.** Conferir o vínculo (`AMBIENTES.md` e `supabase/.temp/project-ref`), `npm run db:types`, `npx tsc -b` limpo.
-- [ ] **Passo 8: commit** da migração, do teste, dos tipos e do `AMBIENTES.md`.
+- [x] **Passo 5: pedir ao usuário que aplique a migração** no SQL Editor do dev (colar o conteúdo do arquivo) e confirmar. Registrar em `supabase/AMBIENTES.md` a migração aplicada à mão (mesma forma das anteriores).
+- [x] **Passo 6: ver o teste passar.** Push e disparo do "Testes de banco" na branch. Esperado: verde, com `00_rls_ligada` e `10_privilegios_padrao` intactos (critério 2).
+- [x] **Passo 7: tipos.** Conferir o vínculo (`AMBIENTES.md` e `supabase/.temp/project-ref`), `npm run db:types`, `npx tsc -b` limpo.
+- [x] **Passo 8: commit** da migração, do teste, dos tipos e do `AMBIENTES.md`.
 
 ---
 
