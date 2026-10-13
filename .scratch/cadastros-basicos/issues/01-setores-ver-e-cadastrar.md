@@ -20,3 +20,5 @@
 - [x] Lista compacta no padrão da lista de usuários (sigla, nome); estados "Carregando setores…" com linhas-fantasma, "Nenhum setor cadastrado ainda." e erro de carregamento com [Tentar de novo].
 - [x] Erro de gravação mostra "A alteração não foi salva: {motivo}. Seus dados continuam no formulário." em vermelho, com o formulário preenchido.
 - [x] Testes de interface com o aplicativo inteiro e os dois módulos falsos: lista, ordem, criar com sucesso e com falha, cada recusa, validação da sigla, estados, e a Consulta sem [Novo setor].
+
+Concluído em 2026-10-13 (commit 22ff6a7)
