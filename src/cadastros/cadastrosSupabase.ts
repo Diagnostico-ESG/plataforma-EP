@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import type { Database } from '../types/database'
 import { CadastroInexistente } from './cadastroInexistente'
+import { criarHistoricoSupabase } from './historicoSupabase'
 import { criarMacroprocessosSupabase } from './macroprocessosSupabase'
 import { compararMacroprocessos } from './ordemDosMacroprocessos'
 import { criarSetoresEnvolvidosSupabase } from './setoresEnvolvidosSupabase'
@@ -17,6 +18,7 @@ type AlteracaoDoSetor = Partial<DadosDoSetor> & { ativo?: boolean }
 export function criarCadastrosSupabase(cliente: ClienteSupabase): ModuloDeCadastros {
   return {
     ...criarSetoresSupabase(cliente), ...criarMacroprocessosSupabase(cliente), ...criarSetoresEnvolvidosSupabase(cliente),
+    ...criarHistoricoSupabase(cliente),
   }
 }
 

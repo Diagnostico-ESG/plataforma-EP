@@ -4,6 +4,8 @@ export type Pedido = {
   tabela: string; operacao: string; colunas?: string; valores?: unknown; filtro?: [string, string]
   /** Todos os `eq` em ordem; `filtro` guarda só o último. */
   filtros?: [string, string][]
+  /** O filtro `in` (coluna e valores aceitos). */
+  dentro?: [string, string[]]
   ordem?: Ordenacao[]
 }
 
@@ -17,16 +19,14 @@ export class ClienteSupabaseFalso {
     this.pedidos.push(pedido)
     const resposta = () => this.respostas[`${tabela}.${pedido.operacao}`] ?? { data: [], error: null }
     const consulta = {
-      select: (colunas?: string) => {
-        pedido.colunas ??= colunas
-        return consulta
-      },
+      select: (colunas?: string) => Object.assign(pedido, { colunas: pedido.colunas ?? colunas }) && consulta,
       order: (coluna: string, opcoes?: { ascending?: boolean; nullsFirst?: boolean }) =>
         (pedido.ordem ??= []).push(ordenacao(coluna, opcoes)) && consulta,
       insert: (valores: unknown) => Object.assign(pedido, { operacao: 'insert', valores }) && consulta,
       update: (valores: unknown) => Object.assign(pedido, { operacao: 'update', valores }) && consulta,
       delete: () => Object.assign(pedido, { operacao: 'delete' }) && consulta,
       eq: (coluna: string, valor: string) => guardarFiltro(pedido, coluna, valor) && consulta,
+      in: (coluna: string, valores: string[]) => Object.assign(pedido, { dentro: [coluna, valores] }) && consulta,
       then: (seCumprir: (r: RespostaDoBanco) => unknown, seFalhar?: (e: unknown) => unknown) =>
         Promise.resolve(resposta()).then(seCumprir, seFalhar),
     }

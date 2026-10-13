@@ -38,8 +38,8 @@ export type EventoDoCadastro = {
 export type ItemDoFiltro = { id: string; nome: string }
 
 /**
- * Único ponto por onde a interface fala com o banco nos cadastros (setores, macroprocessos e setores envolvidos;
- * o histórico chega no ticket seguinte). Recusa do banco chega como TravaDoBanco, com a frase pronta;
+ * Único ponto por onde a interface fala com o banco nos cadastros (setores, macroprocessos, setores envolvidos
+ * e o histórico deles). Recusa do banco chega como TravaDoBanco, com a frase pronta;
  * outra falha de gravação, como Error cuja mensagem é o motivo em português;
  * gravação em item que não existe mais, como CadastroInexistente.
  */
@@ -67,4 +67,6 @@ export type ModuloDeCadastros = {
   /** Tirar um vínculo que já não existe não é erro. */
   tirarSetorDoMacroprocesso(macroprocessoId: string, setorId: string): Promise<void>
   mudarObservacaoDoSetorEnvolvido(macroprocessoId: string, setorId: string, observacao: string | null): Promise<void>
+  /** Do mais recente para o mais antigo; a RLS deixa todo perfil ativo ler só os eventos dos cadastros. */
+  listarHistoricoDosCadastros(): Promise<EventoDoCadastro[]>
 }
