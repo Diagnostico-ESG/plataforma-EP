@@ -62,9 +62,9 @@
 - Produces: `public.etapas (id, codigo, nome, ordem, nivel, obrigatoria, ativa, criado_em)`; `public.andamentos (id, etapa_id, setor_id, status, nota, responsavel_id, iniciada_em, resolvida_em)`; enums `nivel_da_etapa`, `status_da_etapa`; eventos `entidade = 'andamento'` como em "Decisões de execução"; recusas `anterior_nao_resolvida:<nome>` e `etapa_obrigatoria:<nome>` (P0001).
 - Consumes: `private.usuario_ativo()`, `private.perfil_atual()`, `private.pode_alterar_cadastros()`.
 
-- [ ] **Step 1: pasta limpa, branch e marco.** `git status` sem mudanças; `git switch -c processos-etapas-02`; `git tag marco/2026-10-13-inicio-ticket-02-processos-etapas`.
+- [x] **Step 1: pasta limpa, branch e marco.** `git status` sem mudanças; `git switch -c processos-etapas-02`; `git tag marco/2026-10-13-inicio-ticket-02-processos-etapas`.
 
-- [ ] **Step 2: teste de banco (vermelho).** Criar `supabase/tests/15_etapas_do_setor.test.sql`:
+- [x] **Step 2: teste de banco (vermelho).** Criar `supabase/tests/15_etapas_do_setor.test.sql`:
 
 ```sql
 -- Etapas do setor: catálogo e andamentos, quem pode o quê, sequência, dispensa, datas e eventos
@@ -360,9 +360,9 @@ insert into _tap (linha) select is(
   0, 'Integrante não lê eventos de usuários nem de autorizações');
 ```
 
-- [ ] **Step 3: ver falhar.** `git add supabase/tests/15_etapas_do_setor.test.sql supabase/tests/03_login_leitura.test.sql`; commit "Ticket 02 de processos-etapas: teste de banco das etapas do setor"; `git push -u origin processos-etapas-02`; disparar "Testes de banco" na branch pelo navegador do app e ler o resultado. Esperado: `15_etapas_do_setor` vermelho (tabela `etapas` inexistente); os outros 15 arquivos verdes (o 03 passa com ou sem a migração).
+- [x] **Step 3: ver falhar.** `git add supabase/tests/15_etapas_do_setor.test.sql supabase/tests/03_login_leitura.test.sql`; commit "Ticket 02 de processos-etapas: teste de banco das etapas do setor"; `git push -u origin processos-etapas-02`; disparar "Testes de banco" na branch pelo navegador do app e ler o resultado. Esperado: `15_etapas_do_setor` vermelho (tabela `etapas` inexistente); os outros 15 arquivos verdes (o 03 passa com ou sem a migração).
 
-- [ ] **Step 4: migração.** `npx supabase migration new etapas_do_setor` e escrever no arquivo criado:
+- [x] **Step 4: migração.** `npx supabase migration new etapas_do_setor` e escrever no arquivo criado:
 
 ```sql
 -- Processos e etapas, ticket 02: catálogo de etapas (carga da fase 1) e etapas do setor, com sequência, dispensa,
