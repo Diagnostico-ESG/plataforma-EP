@@ -19,3 +19,5 @@
 - [x] Excluir com a janela "Excluir o macroprocesso {nome}?" (neste ticket com zero setores envolvidos), [Excluir macroprocesso] e [Cancelar]; Desativar e Reativar sem confirmação; item que não existe mais com [Voltar à lista].
 - [x] A Consulta vê a aba sem botões nem campos editáveis.
 - [x] Testes de interface com o aplicativo inteiro cobrindo lista, ordem, criar, editar, desativar, reativar e excluir com sucesso e com falha, cada recusa, a janela, os estados e a Consulta.
+
+Concluído em 2026-10-13 (commit 3e2d049)
