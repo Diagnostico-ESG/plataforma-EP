@@ -136,6 +136,10 @@ Decidido em 2026-10-13. Na rede do escritório a porta 5432 fica fechada, então
 
 A autorização vale só para esse ciclo de teste. Aplicar migração no banco e qualquer passo de produção continuam pedindo minha aprovação. A migração vai à mão pelo SQL Editor, rodada por mim.
 
+### Migração do desenvolvimento pelo GitHub Actions
+
+Decidido em 2026-10-13, valendo a partir da migração depois da de `macroprocessos` (essa o usuário aplica à mão no SQL Editor). Um workflow manual ("Run workflow", nunca em push automático) aplica no banco de **desenvolvimento** a migração indicada, pelo segredo `SUPABASE_DB_URL`, com a mesma trava do `scripts/testar-banco.mjs` (recusa outro projeto) e parando com aviso se a migração já foi aplicada. Eu crio o workflow na primeira migração que precisar dele. Fica autorizado, sem pedir antes, disparar esse workflow na branch de trabalho e ler o resultado. Produção e o `migration repair` continuam só pelos roteiros do `/ship`, com minha aprovação.
+
 ### Envio da `main` ao GitHub
 
 Decidido em 2026-10-13. `git push` da `main` para o GitHub (`origin`) não precisa da minha aprovação: envie sempre que houver commits locais à frente, por exemplo ao fim de cada ticket ou etapa. Nunca com `--force`; se o envio for recusado, pare e me explique. O envio que mexe em `supabase/` dispara o "Testes de banco" na `main`: confira o resultado e me avise se falhar.
