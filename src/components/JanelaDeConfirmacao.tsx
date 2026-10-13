@@ -1,3 +1,4 @@
+import './JanelaDeConfirmacao.css'
 import { useEffect, useId, useRef } from 'react'
 
 type JanelaDeConfirmacaoProps = {

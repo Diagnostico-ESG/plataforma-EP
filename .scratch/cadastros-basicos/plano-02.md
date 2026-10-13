@@ -56,12 +56,12 @@
 
 **Interfaces:** Produz `JanelaDeConfirmacao` em `src/components/JanelaDeConfirmacao.tsx`, mesma assinatura de hoje (`aberta, titulo, texto, rotuloDaAcao, aoConfirmar, aoFechar`).
 
-- [ ] **Passo 1: linha de base.** `npm test` passa (531).
-- [ ] **Passo 2: mover os arquivos** com `git mv src/components/administracao/JanelaDeConfirmacao.tsx src/components/JanelaDeConfirmacao.tsx` e o mesmo para o `.test.tsx`.
-- [ ] **Passo 3: mover o CSS.** Recortar as quatro regras `.janela-confirmacao*` (hoje em `Administracao.css`, linhas ~200-222) para `src/components/JanelaDeConfirmacao.css`, sem mudar uma propriedade. No topo de `JanelaDeConfirmacao.tsx`, acrescentar `import './JanelaDeConfirmacao.css'`.
-- [ ] **Passo 4: ajustar os usos.** Em `LinhaDaTabelaDeUsuarios.tsx`: `import { JanelaDeConfirmacao } from '../JanelaDeConfirmacao'`. Em `vite.config.ts`: `css: { include: /(Administracao|Moldura|Cadastros|JanelaDeConfirmacao)\.css/ }`. Conferir com `grep -rn "janela-confirmacao" src` se algum teste lia essas regras em `Administracao.css?raw` (os dois testes que importam esse CSS são `App.coresDasMensagens` e `App.perfilComSalvar`; se algum conferir `.janela-confirmacao`, passar a importar o novo `.css`).
-- [ ] **Passo 5: `npm test`** passa com os mesmos 531 testes; `npm run lint` e `npx tsc -b` sem erro.
-- [ ] **Passo 6: commit** `Janela de confirmação sai da Administração para os componentes compartilhados`.
+- [x] **Passo 1: linha de base.** `npm test` passa (531).
+- [x] **Passo 2: mover os arquivos** com `git mv src/components/administracao/JanelaDeConfirmacao.tsx src/components/JanelaDeConfirmacao.tsx` e o mesmo para o `.test.tsx`.
+- [x] **Passo 3: mover o CSS.** Recortar as quatro regras `.janela-confirmacao*` (hoje em `Administracao.css`, linhas ~200-222) para `src/components/JanelaDeConfirmacao.css`, sem mudar uma propriedade. No topo de `JanelaDeConfirmacao.tsx`, acrescentar `import './JanelaDeConfirmacao.css'`.
+- [x] **Passo 4: ajustar os usos.** Em `LinhaDaTabelaDeUsuarios.tsx`: `import { JanelaDeConfirmacao } from '../JanelaDeConfirmacao'`. Em `vite.config.ts`: `css: { include: /(Administracao|Moldura|Cadastros|JanelaDeConfirmacao)\.css/ }`. Conferir com `grep -rn "janela-confirmacao" src` se algum teste lia essas regras em `Administracao.css?raw` (os dois testes que importam esse CSS são `App.coresDasMensagens` e `App.perfilComSalvar`; se algum conferir `.janela-confirmacao`, passar a importar o novo `.css`).
+- [x] **Passo 5: `npm test`** passa com os mesmos 531 testes; `npm run lint` e `npx tsc -b` sem erro.
+- [x] **Passo 6: commit** `Janela de confirmação sai da Administração para os componentes compartilhados`.
 
 ---
 
