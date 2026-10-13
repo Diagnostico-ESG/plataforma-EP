@@ -30,3 +30,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-09 | testes-banco-actions | /executar-simples (ajuste do segredo e diagnóstico no Actions) | US$ 3,64 acumulado da sessão (já inclui US$ 1,57 da linha anterior; diferença: US$ 2,07)
 2026-10-09 | login-perfis | /ship (retomada: passos 7, 11 e 12) | 4% da sessão (/usage; plano sem valor em dólar)
 2026-10-09 | login-perfis | /situação e /ship (entrada por bug: permissões padrão) | 22% da sessão (/usage; plano sem valor em dólar; a janela pode incluir a sessão do caminho de bug, que não teve linha)
+2026-10-13 | testes-banco-actions | /situação e /ship | US$ 3,40
