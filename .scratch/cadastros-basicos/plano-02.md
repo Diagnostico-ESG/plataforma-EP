@@ -676,7 +676,7 @@ export function SetorAberto({ cadastros, podeAlterar, id, aoVoltar }: SetorAbert
 
 **Interfaces:** `AcoesDoSetor({ cadastros, setor, aoMudar, aoSumir, aoVoltar })`. Consome `JanelaDeConfirmacao` (`../JanelaDeConfirmacao`), `textoDaFalha` (`../../acesso/falhasDeGravacao`), `CadastroInexistente`.
 
-- [ ] **Passo 1: testes que falham** em `src/App.excluirSetor.test.tsx` (mesmo cabeçalho; helper `abrir`):
+- [x] **Passo 1: testes que falham** em `src/App.excluirSetor.test.tsx` (mesmo cabeçalho; helper `abrir`):
 
 ```tsx
 test('Desativar grava na hora, sem confirmação, e o botão passa a ser Reativar', async () => {
@@ -776,8 +776,8 @@ test('desativar um setor que já foi excluído por outra pessoa mostra o aviso p
 
 (`montar(perfil = 'integrante_ep')` e `abrir` iguais aos do arquivo da Tarefa 4; importar `act` e `within`.)
 
-- [ ] **Passo 2: rodar o arquivo** e conferir que falha.
-- [ ] **Passo 3: `AcoesDoSetor.tsx`.**
+- [x] **Passo 2: rodar o arquivo** e conferir que falha.
+- [x] **Passo 3: `AcoesDoSetor.tsx`.**
 
 ```tsx
 import { useState } from 'react'
@@ -832,10 +832,10 @@ export function AcoesDoSetor({ cadastros, setor, aoMudar, aoSumir, aoVoltar }: A
 
 (`textoDaFalha` devolve a frase da `TravaDoBanco` sozinha, ou "A alteração não foi salva: {motivo}." para falha comum.)
 
-- [ ] **Passo 4: `SetorEditavel.tsx`**: voltar a desestruturar `aoMudar` e renderizar, depois do formulário, `<AcoesDoSetor cadastros={cadastros} setor={setor} aoMudar={aoMudar} aoSumir={aoSumir} aoVoltar={aoVoltar} />`.
-- [ ] **Passo 5: CSS** `.acoes-do-setor { display: flex; flex-wrap: wrap; gap: var(--esp-2); align-items: center; }` em `Cadastros.css`.
-- [ ] **Passo 6: `npx vitest run src/App.excluirSetor.test.tsx` passa**; depois `npm test`, `npx tsc -b`, `npm run lint`.
-- [ ] **Passo 7: commit** `Setor aberto: desativar, reativar e excluir com janela de confirmação`.
+- [x] **Passo 4: `SetorEditavel.tsx`**: voltar a desestruturar `aoMudar` e renderizar, depois do formulário, `<AcoesDoSetor cadastros={cadastros} setor={setor} aoMudar={aoMudar} aoSumir={aoSumir} aoVoltar={aoVoltar} />`.
+- [x] **Passo 5: CSS** `.acoes-do-setor { display: flex; flex-wrap: wrap; gap: var(--esp-2); align-items: center; }` em `Cadastros.css`.
+- [x] **Passo 6: `npx vitest run src/App.excluirSetor.test.tsx` passa**; depois `npm test`, `npx tsc -b`, `npm run lint`.
+- [x] **Passo 7: commit** `Setor aberto: desativar, reativar e excluir com janela de confirmação`.
 
 ---
 

@@ -123,3 +123,10 @@
 .setor-leitura-dados dd {
   margin: 0;
 }
+
+.acoes-do-setor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+  align-items: center;
+}

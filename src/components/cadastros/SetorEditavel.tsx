@@ -1,5 +1,6 @@
 import { CadastroInexistente } from '../../cadastros/cadastroInexistente'
 import type { DadosDoSetor, ModuloDeCadastros, Setor } from '../../cadastros/tipos'
+import { AcoesDoSetor } from './AcoesDoSetor'
 import { FormularioDeSetor } from './FormularioDeSetor'
 
 type SetorEditavelProps = {
@@ -7,9 +8,10 @@ type SetorEditavelProps = {
   setor: Setor
   aoVoltar: () => void
   aoSumir: () => void
+  aoMudar: () => void
 }
 
-export function SetorEditavel({ cadastros, setor, aoVoltar, aoSumir }: SetorEditavelProps) {
+export function SetorEditavel({ cadastros, setor, aoVoltar, aoSumir, aoMudar }: SetorEditavelProps) {
   // A falha comum segue para o formulário, que a mostra e mantém os dados; setor excluído por outra pessoa vira o aviso próprio.
   async function salvar(dados: DadosDoSetor) {
     try {
@@ -25,6 +27,7 @@ export function SetorEditavel({ cadastros, setor, aoVoltar, aoSumir }: SetorEdit
     <div className="cadastros-secao">
       <FormularioDeSetor titulo={`Setor ${setor.sigla}`} inicial={setor} rotuloDoCancelar="Voltar à lista"
         aoSalvar={salvar} aoCancelar={aoVoltar} />
+      <AcoesDoSetor cadastros={cadastros} setor={setor} aoMudar={aoMudar} aoSumir={aoSumir} aoVoltar={aoVoltar} />
     </div>
   )
 }
