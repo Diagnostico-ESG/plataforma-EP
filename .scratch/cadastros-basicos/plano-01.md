@@ -561,7 +561,7 @@ export class CadastrosFalso implements ModuloDeCadastros {
 }
 ```
 
-- [ ] **Passo 7: comitar.** `npm run typecheck && npm test`, depois commit "Módulo de cadastros: listar e criar setor, real e falso".
+- [x] **Passo 7: comitar.** `npm run typecheck && npm test`, depois commit "Módulo de cadastros: listar e criar setor, real e falso".
 
 ---
 
