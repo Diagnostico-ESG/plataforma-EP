@@ -51,7 +51,10 @@ insert into _tap (linha) select results_eq(
 insert into _tap (linha) select is(
   (select count(*)::int from public.autorizacoes), 0, 'Integrante não lê autorizações');
 insert into _tap (linha) select is(
-  (select count(*)::int from public.eventos), 0, 'Integrante não lê eventos');
+  -- Os eventos dos cadastros são lidos por todo perfil ativo desde cadastros-basicos (teste 14); aqui
+  -- conta só o resto, que continua só do administrador.
+  (select count(*)::int from public.eventos where entidade not in ('setor', 'macroprocesso', 'setor_envolvido')),
+  0, 'Integrante não lê eventos de usuários nem de autorizações');
 reset role;
 
 -- Consulta
