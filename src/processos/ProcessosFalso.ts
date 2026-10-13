@@ -1,4 +1,4 @@
-import type { EtapaDoSetor, ModuloDeProcessos } from './tipos'
+import type { DadosDoResponsavel, EtapaDoSetor, ModuloDeProcessos, ResponsavelDoSetor } from './tipos'
 
 type ChamadaDeEtapa = { acao: string; id: string; nota?: string }
 
@@ -15,6 +15,9 @@ export class ProcessosFalso implements ModuloDeProcessos {
   falhaDeGravacao: string | Error | null = null
   /** As ações gravadas, na ordem. */
   chamadas: ChamadaDeEtapa[] = []
+  /** Os responsáveis de cada setor (pelo id do setor). Leitura e gravação seguem as falhas acima. */
+  responsaveisDoSetor: Record<string, ResponsavelDoSetor[]> = {}
+  private proximoId = 1
 
   async lerEtapasDoSetor(setorId: string): Promise<EtapaDoSetor[]> {
     if (this.segurarLeitura) return new Promise<never>(() => {})
@@ -38,10 +41,39 @@ export class ProcessosFalso implements ModuloDeProcessos {
     this.mudar({ acao: 'realizada', id, nota }, { status: 'realizada_anteriormente', nota, resolvidaEm: HOJE })
   }
 
+  async lerResponsaveisDoSetor(setorId: string): Promise<ResponsavelDoSetor[]> {
+    if (this.segurarLeitura) return new Promise<never>(() => {})
+    if (this.falharLeitura) throw new Error('falha de conexão simulada')
+    return [...(this.responsaveisDoSetor[setorId] ?? [])].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
+  }
+
+  async criarResponsavel(setorId: string, dados: DadosDoResponsavel): Promise<void> {
+    this.conferirGravacao()
+    const novo = { id: `r${this.proximoId++}`, ...dados }
+    this.responsaveisDoSetor[setorId] = [...(this.responsaveisDoSetor[setorId] ?? []), novo]
+  }
+
+  async editarResponsavel(id: string, dados: DadosDoResponsavel): Promise<void> {
+    this.conferirGravacao()
+    this.mudarResponsaveis((lista) => lista.map((responsavel) => (responsavel.id === id ? { id, ...dados } : responsavel)))
+  }
+
+  async excluirResponsavel(id: string): Promise<void> {
+    this.conferirGravacao()
+    this.mudarResponsaveis((lista) => lista.filter((responsavel) => responsavel.id !== id))
+  }
+
+  private conferirGravacao(): void {
+    if (this.falhaDeGravacao === null) return
+    throw typeof this.falhaDeGravacao === 'string' ? new Error(this.falhaDeGravacao) : this.falhaDeGravacao
+  }
+
+  private mudarResponsaveis(mudar: (lista: ResponsavelDoSetor[]) => ResponsavelDoSetor[]): void {
+    for (const [setorId, lista] of Object.entries(this.responsaveisDoSetor)) this.responsaveisDoSetor[setorId] = mudar(lista)
+  }
+
   private mudar(chamada: ChamadaDeEtapa, mudancas: Partial<EtapaDoSetor>): void {
-    if (this.falhaDeGravacao !== null) {
-      throw typeof this.falhaDeGravacao === 'string' ? new Error(this.falhaDeGravacao) : this.falhaDeGravacao
-    }
+    this.conferirGravacao()
     this.chamadas.push(chamada)
     for (const [setorId, etapas] of Object.entries(this.etapasDoSetor)) {
       this.etapasDoSetor[setorId] = etapas.map((etapa) => (etapa.id === chamada.id ? { ...etapa, ...mudancas } : etapa))

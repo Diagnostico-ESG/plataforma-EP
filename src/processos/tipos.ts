@@ -21,7 +21,7 @@ export type DadosDoResponsavel = Omit<ResponsavelDoSetor, 'id'>
 /**
  * Único ponto por onde a interface fala com o banco em processos e etapas. Recusa do banco chega como TravaDoBanco,
  * com a frase pronta; outra falha, como Error cuja mensagem é o motivo em português;
- * etapa de um setor que já não existe, como CadastroInexistente.
+ * etapa ou responsável que já não existe, como CadastroInexistente.
  */
 export type ModuloDeProcessos = {
   /** Na ordem do catálogo. */
@@ -30,4 +30,9 @@ export type ModuloDeProcessos = {
   concluirEtapa(andamentoId: string): Promise<void>
   dispensarEtapa(andamentoId: string, nota: string): Promise<void>
   registrarRealizadaAnteriormente(andamentoId: string, nota: string): Promise<void>
+  /** Em ordem alfabética de nome. */
+  lerResponsaveisDoSetor(setorId: string): Promise<ResponsavelDoSetor[]>
+  criarResponsavel(setorId: string, dados: DadosDoResponsavel): Promise<void>
+  editarResponsavel(id: string, dados: DadosDoResponsavel): Promise<void>
+  excluirResponsavel(id: string): Promise<void>
 }

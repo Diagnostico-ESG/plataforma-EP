@@ -3,6 +3,7 @@ import {
 } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import type { ClienteSupabase } from '../lib/supabase'
+import { criarResponsaveisSupabase } from './responsaveisSupabase'
 import type { EtapaDoSetor, ModuloDeProcessos, StatusDaEtapa } from './tipos'
 
 // A etapa do setor só some junto com o setor: o aviso é o do cadastro excluído.
@@ -20,6 +21,7 @@ export function criarProcessosSupabase(cliente: ClienteSupabase): ModuloDeProces
     concluirEtapa: (id) => mudarAndamento(cliente, id, { status: 'concluida' }),
     dispensarEtapa: (id, nota) => mudarAndamento(cliente, id, { status: 'dispensada', nota }),
     registrarRealizadaAnteriormente: (id, nota) => mudarAndamento(cliente, id, { status: 'realizada_anteriormente', nota }),
+    ...criarResponsaveisSupabase(cliente, RECUSAS_DOS_PROCESSOS),
   }
 }
 
