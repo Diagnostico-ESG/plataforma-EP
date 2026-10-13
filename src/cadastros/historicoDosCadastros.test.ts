@@ -1,0 +1,153 @@
+import { describe, expect, test } from 'vitest'
+import {
+  descreverEstadoDoCadastro, eventosDoItem, itensDoFiltro, nomeDoItem, textoDaAcaoDoCadastro,
+} from './historicoDosCadastros'
+import type { EventoDoCadastro } from './tipos'
+
+function evento(parcial: Partial<EventoDoCadastro> & { entidade: string; entidadeRef: string }): EventoDoCadastro {
+  return {
+    id: 1, ocorridoEm: '2026-10-13T15:00:00Z', autor: 'Pessoa Fictícia', acao: 'criar', antes: null, depois: null, ...parcial,
+  }
+}
+
+const SETOR = { sigla: 'CEE', nome: 'Escola Fictícia', observacoes: null, ativo: true }
+const MACRO = { codigo: '01', nome: 'Planejamento Fictício', descricao: null, categoria: 'apoio', ativo: true }
+const VINCULO = {
+  setor_id: 's1', setor_sigla: 'CEE', macroprocesso_id: 'm1', macroprocesso_nome: 'Planejamento Fictício', observacao: 'Apoia',
+}
+
+describe('textoDaAcaoDoCadastro', () => {
+  test.each([
+    ['criar', 'Criou'], ['editar', 'Editou'], ['desativar', 'Desativou'], ['reativar', 'Reativou'], ['excluir', 'Excluiu'],
+  ])('%s de setor e de macroprocesso', (acao, texto) => {
+    expect(textoDaAcaoDoCadastro(acao, 'setor')).toBe(texto)
+    expect(textoDaAcaoDoCadastro(acao, 'macroprocesso')).toBe(texto)
+  })
+
+  test('as três ações do setor envolvido têm texto próprio', () => {
+    expect(textoDaAcaoDoCadastro('criar', 'setor_envolvido')).toBe('Pôs o setor no macroprocesso')
+    expect(textoDaAcaoDoCadastro('excluir', 'setor_envolvido')).toBe('Tirou o setor do macroprocesso')
+    expect(textoDaAcaoDoCadastro('editar', 'setor_envolvido')).toBe('Mudou a observação do setor no macroprocesso')
+  })
+
+  test('ação desconhecida aparece pelo código, em vez de sumir', () => {
+    expect(textoDaAcaoDoCadastro('arquivar', 'setor')).toBe('arquivar')
+  })
+})
+
+describe('nomeDoItem', () => {
+  test('setor: sigla e nome; o excluído usa o antes', () => {
+    expect(nomeDoItem(evento({ entidade: 'setor', entidadeRef: 's1', depois: SETOR }))).toBe('CEE — Escola Fictícia')
+    expect(nomeDoItem(evento({ entidade: 'setor', entidadeRef: 's1', acao: 'excluir', antes: SETOR }))).toBe('CEE — Escola Fictícia')
+  })
+
+  test('macroprocesso: código e nome, ou só o nome quando não há código', () => {
+    expect(nomeDoItem(evento({ entidade: 'macroprocesso', entidadeRef: 'm1', depois: MACRO }))).toBe('01 — Planejamento Fictício')
+    expect(nomeDoItem(evento({ entidade: 'macroprocesso', entidadeRef: 'm1', depois: { ...MACRO, codigo: null } })))
+      .toBe('Planejamento Fictício')
+  })
+
+  test('setor envolvido: sigla do setor e nome do macroprocesso', () => {
+    expect(nomeDoItem(evento({ entidade: 'setor_envolvido', entidadeRef: 'm1:s1', depois: VINCULO })))
+      .toBe('CEE em Planejamento Fictício')
+  })
+
+  test('evento sem estado legível cai na referência', () => {
+    expect(nomeDoItem(evento({ entidade: 'setor', entidadeRef: 's9' }))).toBe('s9')
+  })
+})
+
+describe('descreverEstadoDoCadastro', () => {
+  test('sem estado, travessão', () => {
+    expect(descreverEstadoDoCadastro(null)).toBe('—')
+  })
+
+  test('setor: rótulos em português, situação por extenso e vazio como travessão', () => {
+    expect(descreverEstadoDoCadastro(SETOR)).toBe('Sigla: CEE; Nome: Escola Fictícia; Observações: —; Situação: Ativo')
+    expect(descreverEstadoDoCadastro({ ...SETOR, ativo: false })).toContain('Situação: Inativo')
+  })
+
+  test('macroprocesso: categoria pelo rótulo', () => {
+    expect(descreverEstadoDoCadastro(MACRO))
+      .toBe('Código: 01; Nome: Planejamento Fictício; Descrição: —; Categoria: Apoio; Situação: Ativo')
+  })
+
+  test('exclusão de setor traz os macroprocessos que ele tinha, com a observação', () => {
+    const lista = [
+      { macroprocesso_id: 'm1', codigo: '01', nome: 'Planejamento Fictício', observacao: 'Apoia' },
+      { macroprocesso_id: 'm2', codigo: null, nome: 'Compras Fictícias', observacao: null },
+    ]
+    expect(descreverEstadoDoCadastro({ ...SETOR, macroprocessos: lista })).toContain(
+      'Macroprocessos: 01 — Planejamento Fictício (Apoia), Compras Fictícias')
+    expect(descreverEstadoDoCadastro({ ...SETOR, macroprocessos: [] })).toContain('Macroprocessos: nenhum')
+  })
+
+  test('exclusão de macroprocesso traz os setores envolvidos', () => {
+    const setores = [{ setor_id: 's1', sigla: 'CEE', nome: 'Escola Fictícia', observacao: 'Apoia' }]
+    expect(descreverEstadoDoCadastro({ ...MACRO, setores })).toContain('Setores: CEE — Escola Fictícia (Apoia)')
+    expect(descreverEstadoDoCadastro({ ...MACRO, setores: [] })).toContain('Setores: nenhum')
+  })
+
+  test('vínculo: setor, macroprocesso e observação, sem os ids', () => {
+    expect(descreverEstadoDoCadastro(VINCULO)).toBe('Setor: CEE; Macroprocesso: Planejamento Fictício; Observação: Apoia')
+  })
+})
+
+describe('itensDoFiltro', () => {
+  const maisRecentePrimeiro: EventoDoCadastro[] = [
+    evento({ id: 4, entidade: 'setor', entidadeRef: 's1', acao: 'editar', depois: { ...SETOR, nome: 'Escola Nova Fictícia' } }),
+    evento({ id: 3, entidade: 'setor_envolvido', entidadeRef: 'm1:s2', depois: { ...VINCULO, setor_id: 's2', setor_sigla: 'ZZZ' } }),
+    evento({ id: 2, entidade: 'macroprocesso', entidadeRef: 'm1', acao: 'excluir', antes: MACRO }),
+    evento({ id: 1, entidade: 'setor', entidadeRef: 's1', depois: SETOR }),
+  ]
+
+  test('cada setor e macroprocesso aparece uma vez, com o nome do evento mais recente', () => {
+    expect(itensDoFiltro(maisRecentePrimeiro).map(({ id }) => id)).toEqual(['m1', 's1', 's2'])
+    expect(itensDoFiltro(maisRecentePrimeiro)).toContainEqual({ id: 's1', nome: 'CEE — Escola Nova Fictícia' })
+  })
+
+  test('o macroprocesso excluído continua na lista', () => {
+    expect(itensDoFiltro(maisRecentePrimeiro)).toContainEqual({ id: 'm1', nome: '01 — Planejamento Fictício' })
+  })
+
+  test('setor só citado em evento de vínculo entra pela sigla', () => {
+    expect(itensDoFiltro(maisRecentePrimeiro)).toContainEqual({ id: 's2', nome: 'ZZZ' })
+  })
+
+  test('ordem pelo nome, sem diferenciar acento', () => {
+    const itens = itensDoFiltro([
+      evento({ entidade: 'setor', entidadeRef: 'b', depois: { ...SETOR, sigla: 'ÉTA', nome: 'Beta' } }),
+      evento({ entidade: 'setor', entidadeRef: 'a', depois: { ...SETOR, sigla: 'ZED', nome: 'Alfa' } }),
+    ])
+    expect(itens.map(({ id }) => id)).toEqual(['b', 'a'])
+  })
+
+  test('sem eventos, sem itens', () => {
+    expect(itensDoFiltro([])).toEqual([])
+  })
+})
+
+describe('eventosDoItem', () => {
+  const setor = evento({ id: 1, entidade: 'setor', entidadeRef: 's1' })
+  const macro = evento({ id: 2, entidade: 'macroprocesso', entidadeRef: 'm1' })
+  const vinculo = evento({ id: 3, entidade: 'setor_envolvido', entidadeRef: 'm1:s1' })
+  const outro = evento({ id: 4, entidade: 'setor', entidadeRef: 's2' })
+  const todos = [setor, macro, vinculo, outro]
+
+  test('sem item, todos', () => {
+    expect(eventosDoItem(todos, null)).toEqual(todos)
+  })
+
+  test('setor: os eventos dele e os vínculos em que ele está', () => {
+    expect(eventosDoItem(todos, 's1')).toEqual([setor, vinculo])
+  })
+
+  test('macroprocesso: os eventos dele e os vínculos em que ele está', () => {
+    expect(eventosDoItem(todos, 'm1')).toEqual([macro, vinculo])
+  })
+
+  test('item sem eventos, lista vazia', () => {
+    expect(eventosDoItem(todos, 'x')).toEqual([])
+  })
+})
+

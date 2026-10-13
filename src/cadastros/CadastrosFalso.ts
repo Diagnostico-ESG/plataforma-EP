@@ -2,8 +2,8 @@ import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from './cadastroInexistente'
 import { compararMacroprocessos } from './ordemDosMacroprocessos'
 import type {
-  DadosDoMacroprocesso, DadosDoSetor, Macroprocesso, MacroprocessoComSetores, MacroprocessoDaLista, ModuloDeCadastros,
-  Setor, SetorComMacroprocessos, SetorDaLista,
+  DadosDoMacroprocesso, DadosDoSetor, EventoDoCadastro, Macroprocesso, MacroprocessoComSetores, MacroprocessoDaLista,
+  ModuloDeCadastros, Setor, SetorComMacroprocessos, SetorDaLista,
 } from './tipos'
 
 type Vinculo = { macroprocessoId: string; setorId: string; observacao: string | null }
@@ -16,6 +16,10 @@ export class CadastrosFalso implements ModuloDeCadastros {
   vinculos: Vinculo[] = []
   falharLista = false
   segurarLista = false
+  /** Do mais recente para o mais antigo, como o banco. */
+  historico: EventoDoCadastro[] = []
+  falharHistorico = false
+  segurarHistorico = false
   falharListaDeMacroprocessos = false
   segurarListaDeMacroprocessos = false
   /** Texto: motivo em português (falha genérica). Error: a recusa pronta (TravaDoBanco), como o módulo real. */
@@ -135,6 +139,12 @@ export class CadastrosFalso implements ModuloDeCadastros {
     this.falharSeConfigurado()
     const achado = this.acharVinculo(macroprocessoId, setorId)
     this.vinculos = this.vinculos.map((vinculo) => (vinculo === achado ? { ...vinculo, observacao } : vinculo))
+  }
+
+  async listarHistoricoDosCadastros(): Promise<EventoDoCadastro[]> {
+    if (this.segurarHistorico) return new Promise<never>(() => {})
+    if (this.falharHistorico) throw new Error('falha de conexão simulada')
+    return [...this.historico]
   }
 
   private acharVinculo(macroprocessoId: string, setorId: string): Vinculo | undefined {

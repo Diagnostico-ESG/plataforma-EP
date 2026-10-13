@@ -242,3 +242,13 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Branch comum e plano numerado (item não testado).** `plano-04.md` ao lado dos anteriores, caixas marcadas por tarefa; a linha `Concluído em` vai no fim.
 - **Ferramentas.** Arquivos do projeto têm fim de linha CRLF: `String.replace` com texto de várias linhas falha em silêncio; usei um ajudante que normaliza e falha se a troca não casar. Sem Python na máquina. O "Run workflow" do navegador do app: o clique por referência ficou obsoleto depois da animação do painel; o clique pelo próprio navegador funcionou.
 - **Conferência na tela.** O login é pelo Google institucional; a conferência visual (lista de setores envolvidos, observações e seletor alinhados) ficou para o usuário, como nos tickets 02 e 03.
+
+## 2026-10-13 — /executar-complexo do ticket 05 de cadastros-basicos
+
+- **TDD de RLS e teste `00_rls_ligada`.** Esperado: o teste novo (`14_historico_dos_cadastros`) falha antes e passa depois. Aconteceu: run #20 vermelho (23 de 25: só Integrante e Consulta sem leitura), run #21 verde na mesma branch depois da migração, 25 de 25 e 15 de 15 arquivos.
+- **Migração aplicada pelo workflow manual (segundo uso).** Esperado: aplicar na transação e registrar a versão. Aconteceu: job #2 verde em 19 s, sem o aviso de "já aplicada"; o teste 14 passou depois. Não li a linha de saída da etapa do script nem conferi a linha em `supabase_migrations.schema_migrations` (a premissa sobre as colunas segue por conferir antes do `migration repair`).
+- **Migração só de política: sem `db:types`.** Não houve tabela nem coluna nova, então `src/types/database.ts` não mudou; o plano registrou isso de antemão.
+- **Marco de início esquecido.** O `CLAUDE.md` pede marco antes de iniciar a funcionalidade; só o criei no fim, apontando para o commit de partida (`7ab0dcc`). O `/executar-complexo` não lembra do marco por ticket. Sugestão: dizer em qual comando nasce o marco de cada ticket.
+- **Disparo do workflow no navegador do app.** O clique por coordenada fechou o painel "Run workflow" várias vezes (a captura de tela muda o tamanho da página); dirigir o painel pelo DOM (abrir, escolher a branch, preencher, clicar) funcionou. Vale registrar no procedimento.
+- **Conferência na tela.** Não há `.claude/launch.json` e o login do Google barra a sessão; a conferência visual da aba Histórico ficou para o usuário, como nos tickets 02 a 04.
+- **Branch comum e plano numerado (item não testado).** `plano-05.md` ao lado dos anteriores, branch `cadastros-basicos-05` (a `cadastros-basicos` do ticket anterior ainda existe no GitHub), caixas marcadas por passo; a linha `Concluído em` vai no fim.

@@ -22,9 +22,24 @@ export type SetorEnvolvido = { setorId: string; sigla: string; nome: string; ati
 export type MacroprocessoDaLista = Macroprocesso & { quantidadeDeSetores: number }
 export type MacroprocessoComSetores = Macroprocesso & { setoresEnvolvidos: SetorEnvolvido[] }
 
+/** Antes ou depois de uma mudança, como o gatilho gravou em eventos.detalhes (as exclusões trazem também listas). */
+export type EstadoDoCadastro = Record<string, unknown> | null
+/** Um evento de setor, macroprocesso ou setor envolvido; a referência do vínculo é 'macroprocessoId:setorId'. */
+export type EventoDoCadastro = {
+  id: number
+  ocorridoEm: string
+  autor: string | null
+  acao: string
+  entidade: string
+  entidadeRef: string
+  antes: EstadoDoCadastro
+  depois: EstadoDoCadastro
+}
+export type ItemDoFiltro = { id: string; nome: string }
+
 /**
- * Único ponto por onde a interface fala com o banco nos cadastros (setores, macroprocessos e setores envolvidos;
- * o histórico chega no ticket seguinte). Recusa do banco chega como TravaDoBanco, com a frase pronta;
+ * Único ponto por onde a interface fala com o banco nos cadastros (setores, macroprocessos, setores envolvidos
+ * e o histórico deles). Recusa do banco chega como TravaDoBanco, com a frase pronta;
  * outra falha de gravação, como Error cuja mensagem é o motivo em português;
  * gravação em item que não existe mais, como CadastroInexistente.
  */
@@ -52,4 +67,6 @@ export type ModuloDeCadastros = {
   /** Tirar um vínculo que já não existe não é erro. */
   tirarSetorDoMacroprocesso(macroprocessoId: string, setorId: string): Promise<void>
   mudarObservacaoDoSetorEnvolvido(macroprocessoId: string, setorId: string, observacao: string | null): Promise<void>
+  /** Do mais recente para o mais antigo; a RLS deixa todo perfil ativo ler só os eventos dos cadastros. */
+  listarHistoricoDosCadastros(): Promise<EventoDoCadastro[]>
 }
