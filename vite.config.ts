@@ -7,7 +7,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     // Por padrão o Vitest devolve CSS vazio; estes arquivos precisam vir inteiros para os testes das cores das mensagens.
-    css: { include: /(Administracao|Moldura|Cadastros)\.css/ },
+    css: { include: /(Administracao|Moldura|Cadastros|JanelaDeConfirmacao)\.css/ },
     setupFiles: ['./src/configurarTestes.ts'],
     exclude: [...configDefaults.exclude, '.claude/worktrees/**'],
     coverage: {

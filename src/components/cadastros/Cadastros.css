@@ -76,3 +76,57 @@
   background: var(--atraso-fundo);
   color: var(--atraso-texto);
 }
+
+.cadastros-inativos {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  font-size: var(--tam-secundario);
+}
+
+.linha-clicavel {
+  cursor: pointer;
+}
+
+.linha-clicavel:hover {
+  background: var(--fundo);
+}
+
+/* Botão com cara de texto: a linha toda é clicável, o botão serve ao teclado. */
+.cadastros-abrir {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--azul);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.setor-leitura {
+  display: grid;
+  gap: var(--esp-3);
+  max-width: 480px;
+}
+
+.setor-leitura-dados {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--esp-2) var(--esp-4);
+  margin: 0;
+}
+
+.setor-leitura-dados dt {
+  color: var(--texto-2);
+}
+
+.setor-leitura-dados dd {
+  margin: 0;
+}
+
+.acoes-do-setor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+  align-items: center;
+}

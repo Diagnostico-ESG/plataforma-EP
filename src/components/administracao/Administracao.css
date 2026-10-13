@@ -196,27 +196,3 @@
     grid-column: auto;
   }
 }
-
-.janela-confirmacao {
-  max-width: 44ch;
-  padding: var(--esp-5);
-  border: 1px solid var(--linha);
-  border-radius: var(--canto);
-  background: var(--folha);
-  color: var(--texto);
-}
-
-.janela-confirmacao::backdrop {
-  background: var(--veu-janela);
-}
-
-.janela-confirmacao-titulo {
-  margin: 0 0 var(--esp-2);
-  font-size: var(--tam-base);
-}
-
-.janela-confirmacao-botoes {
-  display: flex;
-  gap: var(--esp-2);
-  margin-top: var(--esp-4);
-}

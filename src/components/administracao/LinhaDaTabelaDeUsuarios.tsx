@@ -4,7 +4,7 @@ import type { LinhaDeUsuario, Perfil, SituacaoDoUsuario } from '../../acesso/tip
 import { Avatar } from '../Avatar'
 import { Pilula, type SituacaoPilula } from '../Pilula'
 import { CorrecaoDeNome } from './CorrecaoDeNome'
-import { JanelaDeConfirmacao } from './JanelaDeConfirmacao'
+import { JanelaDeConfirmacao } from '../JanelaDeConfirmacao'
 import { PerfilDaLinha } from './PerfilDaLinha'
 
 const ROTULO_DA_SITUACAO: Record<SituacaoDoUsuario, string> = {
