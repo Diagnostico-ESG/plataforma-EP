@@ -841,9 +841,9 @@ export function AcoesDoSetor({ cadastros, setor, aoMudar, aoSumir, aoVoltar }: A
 
 ### Tarefa 6: Fechamento do ticket (critério 9 e protocolo)
 
-- [ ] **Passo 1:** `npm test -- --coverage` (cobertura mínima de 70%); conferir cada critério do ticket contra o código e os testes e marcar as caixas do arquivo do ticket (`- [x]`).
+- [x] **Passo 1:** `npm test -- --coverage` (cobertura mínima de 70%); conferir cada critério do ticket contra o código e os testes e marcar as caixas do arquivo do ticket (`- [x]`).
 - [ ] **Passo 2: ver a tela rodando** (`preview_start` do `npm run dev`) com um perfil de integrante e outro de consulta: abrir, editar, desativar, reativar, excluir, "Mostrar inativos", janela de exclusão (foco, Esc), usando só dados inventados; o painel de dados reais e segredos não é lido.
-- [ ] **Passo 3: commit** das caixas marcadas do ticket e deste plano.
+- [x] **Passo 3: commit** das caixas marcadas do ticket e deste plano.
 - [ ] **Passo 4: junção e fechamento** (feitos pelo `/executar-complexo`): `git switch main`, merge da branch `cadastros-basicos`, `git branch -d`, linha `Concluído em` no ticket, `git push` da `main`, notas em `.scratch/melhorias-protocolo.md` e pedido do `/cost`.
 
 ## Autorrevisão
