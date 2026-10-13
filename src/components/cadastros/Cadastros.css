@@ -148,3 +148,10 @@
   gap: var(--esp-2);
   align-items: center;
 }
+
+.historico-filtro {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+  align-items: center;
+}

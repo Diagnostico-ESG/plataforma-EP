@@ -1,6 +1,7 @@
 import type { UsuarioAtual } from '../../acesso/tipos'
 import type { ModuloDeCadastros } from '../../cadastros/tipos'
 import { useEndereco } from '../../hooks/useEndereco'
+import { AreaDeHistorico } from './AreaDeHistorico'
 import { AreaDeMacroprocessos } from './AreaDeMacroprocessos'
 import { AreaDeSetores } from './AreaDeSetores'
 import './Cadastros.css'
@@ -43,5 +44,5 @@ type SecaoAtualProps = { aba: AbaDosCadastros; cadastros: ModuloDeCadastros; pod
 function SecaoAtual({ aba, cadastros, podeAlterar }: SecaoAtualProps) {
   if (aba === 'setores') return <AreaDeSetores cadastros={cadastros} podeAlterar={podeAlterar} />
   if (aba === 'macroprocessos') return <AreaDeMacroprocessos cadastros={cadastros} podeAlterar={podeAlterar} />
-  return <p className="cadastros-em-breve">Esta seção chega numa próxima entrega.</p>
+  return <AreaDeHistorico cadastros={cadastros} />
 }
