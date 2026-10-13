@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import type { Database } from '../types/database'
 import { CadastroInexistente } from './cadastroInexistente'
+import { criarMacroprocessosSupabase } from './macroprocessosSupabase'
 import type { DadosDoSetor, ModuloDeCadastros, Setor } from './tipos'
 
 type ClienteSupabase = SupabaseClient<Database>
@@ -11,6 +12,13 @@ type AlteracaoDoSetor = Partial<DadosDoSetor> & { ativo?: boolean }
 const COLUNAS_DO_SETOR = 'id, sigla, nome, observacoes, ativo'
 
 export function criarCadastrosSupabase(cliente: ClienteSupabase): ModuloDeCadastros {
+  return { ...criarSetoresSupabase(cliente), ...criarMacroprocessosSupabase(cliente) }
+}
+
+type OperacoesDeSetor = Pick<ModuloDeCadastros, 'listarSetores' | 'criarSetor' | 'lerSetor' | 'editarSetor'
+  | 'desativarSetor' | 'reativarSetor' | 'excluirSetor'>
+
+function criarSetoresSupabase(cliente: ClienteSupabase): OperacoesDeSetor {
   return {
     listarSetores: () => listarSetores(cliente),
     criarSetor: (dados) => criarSetor(cliente, dados),

@@ -100,13 +100,13 @@
 
 **Interfaces:** Produz, em `ModuloDeCadastros`: `listarMacroprocessos(): Promise<Macroprocesso[]>`, `criarMacroprocesso(dados: DadosDoMacroprocesso): Promise<void>`, `lerMacroprocesso(id): Promise<Macroprocesso | null>`, `editarMacroprocesso(id, dados): Promise<void>`, `desativarMacroprocesso(id)`, `reativarMacroprocesso(id)`, `excluirMacroprocesso(id)`; tipos `Macroprocesso = { id; codigo: string | null; nome; descricao: string | null; categoria: CategoriaDoMacroprocesso | null; ativo }` e `DadosDoMacroprocesso = { codigo; nome; descricao; categoria }`. `CadastrosFalso` ganha `macroprocessos: Macroprocesso[]`, `falharListaDeMacroprocessos`, `segurarListaDeMacroprocessos`; `falhaDeGravacao` vale para as duas famílias.
 
-- [ ] **Passo 1: testes que falham.**
+- [x] **Passo 1: testes que falham.**
   - `validacaoDoMacroprocesso.test.ts`: nome só com espaços → "O nome do macroprocesso é obrigatório."; nome preenchido → `null`; `normalizarCodigo("  ")` → `null` e `normalizarCodigo(" MP01 ")` → "MP01".
   - `macroprocessosSupabase.test.ts` (molde de `cadastrosSupabase.test.ts`, com `ClienteSupabaseFalso`): lista pede as colunas `id, codigo, nome, descricao, categoria, ativo` com a ordem por código (sem código depois) e por nome; falha ao listar vira erro com o motivo; criar envia os dados à tabela `macroprocessos`; cada recusa (`23505` nome, `23505` código, `42501`) vira `TravaDoBanco` com a frase pronta; outra falha vira "erro inesperado do banco (…)"; ler pelo id e `null` quando não existe; editar/desativar/reativar gravam só o que muda filtrando pelo id; excluir apaga pelo id; zero linhas afetadas com o item sumido → `CadastroInexistente`, com o item ainda lá → `TravaDoBanco('Seu perfil não permite alterar os cadastros.')`.
   - Estender `ClienteSupabaseFalso` só se a ordem por duas colunas ou `nullsFirst` exigir (guardar `nullsFirst` no pedido).
-- [ ] **Passo 2: ver falharem.** `npx vitest run src/cadastros`.
-- [ ] **Passo 3: implementar.** Tipos e `categorias.ts` (`ROTULOS_DAS_CATEGORIAS`, lista das opções com "Sem categoria"); validação; `macroprocessosSupabase.ts` com `criarMacroprocessosSupabase(cliente)` (mesmo molde de `cadastrosSupabase.ts`: `listar`, `ler`, `criar`, `alterar`, `excluir`, `porQueNadaMudou`, `falhaDoMacroprocesso`); `cadastrosSupabase.ts` passa a devolver `{ ...setores, ...macroprocessos }` (a parte dos setores sai para uma função própria se o arquivo passar de 100 linhas); `CadastrosFalso` com as sete operações (ordem código/nome como o banco).
-- [ ] **Passo 4: verificar.** Testes do módulo passam; `npm test`, `npx tsc -b`, `npm run lint`. Commit.
+- [x] **Passo 2: ver falharem.** `npx vitest run src/cadastros`.
+- [x] **Passo 3: implementar.** Tipos e `categorias.ts` (`ROTULOS_DAS_CATEGORIAS`, lista das opções com "Sem categoria"); validação; `macroprocessosSupabase.ts` com `criarMacroprocessosSupabase(cliente)` (mesmo molde de `cadastrosSupabase.ts`: `listar`, `ler`, `criar`, `alterar`, `excluir`, `porQueNadaMudou`, `falhaDoMacroprocesso`); `cadastrosSupabase.ts` passa a devolver `{ ...setores, ...macroprocessos }` (a parte dos setores sai para uma função própria se o arquivo passar de 100 linhas); `CadastrosFalso` com as sete operações (ordem código/nome como o banco).
+- [x] **Passo 4: verificar.** Testes do módulo passam; `npm test`, `npx tsc -b`, `npm run lint`. Commit.
 
 ---
 

@@ -1,7 +1,8 @@
 export type RespostaDoBanco = { data: unknown; error: { message: string; code?: string } | null }
+type Ordenacao = [string, boolean] | [string, boolean, boolean]
 export type Pedido = {
   tabela: string; operacao: string; colunas?: string; valores?: unknown; filtro?: [string, string]
-  ordem?: [string, boolean][]
+  ordem?: Ordenacao[]
 }
 
 /** Cliente Supabase falso para os testes de módulo: guarda cada pedido e responde por "tabela.operação". */
@@ -18,8 +19,8 @@ export class ClienteSupabaseFalso {
         pedido.colunas ??= colunas
         return consulta
       },
-      order: (coluna: string, opcoes?: { ascending?: boolean }) =>
-        (pedido.ordem ??= []).push([coluna, opcoes?.ascending ?? true]) && consulta,
+      order: (coluna: string, opcoes?: { ascending?: boolean; nullsFirst?: boolean }) =>
+        (pedido.ordem ??= []).push(ordenacao(coluna, opcoes)) && consulta,
       insert: (valores: unknown) => Object.assign(pedido, { operacao: 'insert', valores }) && consulta,
       update: (valores: unknown) => Object.assign(pedido, { operacao: 'update', valores }) && consulta,
       delete: () => Object.assign(pedido, { operacao: 'delete' }) && consulta,
@@ -29,4 +30,10 @@ export class ClienteSupabaseFalso {
     }
     return consulta
   }
+}
+
+// Só guarda "nulos primeiro ou depois" quando o módulo pediu, para as ordens simples continuarem com dois itens.
+function ordenacao(coluna: string, opcoes?: { ascending?: boolean; nullsFirst?: boolean }): Ordenacao {
+  const ascendente = opcoes?.ascending ?? true
+  return opcoes?.nullsFirst === undefined ? [coluna, ascendente] : [coluna, ascendente, opcoes.nullsFirst]
 }
