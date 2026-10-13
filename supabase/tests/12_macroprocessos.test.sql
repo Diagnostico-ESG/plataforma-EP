@@ -176,7 +176,7 @@ insert into _tap (linha) select is((pg_temp.evento_do_hist('desativar')).detalhe
 insert into _tap (linha) select is((pg_temp.evento_do_hist('reativar')).detalhes -> 'depois' ->> 'ativo', 'true',
   'reativar vira ação própria');
 insert into _tap (linha) select is((pg_temp.evento_do_hist('excluir')).detalhes,
-  '{"antes": {"codigo": "HIST", "nome": "Macro do Histórico Renomeado", "descricao": "Nota inventada", "categoria": "apoio", "ativo": true}, "depois": null}'::jsonb,
+  '{"antes": {"codigo": "HIST", "nome": "Macro do Histórico Renomeado", "descricao": "Nota inventada", "categoria": "apoio", "ativo": true, "setores": []}, "depois": null}'::jsonb,
   'excluir grava no antes todos os campos');
 insert into _tap (linha) select is((select count(*)::int from public.eventos e join public.macroprocessos m
     on e.entidade_ref = m.id::text where m.nome = 'Macroprocesso Fixo de Teste' and e.entidade = 'macroprocesso'
