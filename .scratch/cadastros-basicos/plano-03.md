@@ -142,13 +142,13 @@
 
 **Interfaces:** Consome `AcoesDoCadastro`, `ItemInexistente`, `FormularioDeMacroprocesso` e as operações de ler, editar, desativar, reativar e excluir. Produz `MacroprocessoAberto({ cadastros, podeAlterar, id, aoVoltar })`.
 
-- [ ] **Passo 1: testes que falham.**
+- [x] **Passo 1: testes que falham.**
   - Editar (`App.editarMacroprocesso.test.tsx`): clicar na linha abre o macroprocesso com código, nome, descrição e categoria preenchidos; editar qualquer campo, inclusive o nome, e Salvar grava e volta à lista; as duas recusas de unicidade e a falha genérica mostram a mensagem em vermelho e mantêm os dados; macroprocesso excluído por outra pessoa durante a edição mostra "Este cadastro não existe mais. Ele pode ter sido excluído; veja o Histórico." com [Voltar à lista]; item que já não existe ao abrir mostra o mesmo aviso; erro ao ler mostra "Não foi possível carregar o macroprocesso…" com [Tentar de novo]; "Carregando macroprocesso…".
   - Ciclo e exclusão (`App.excluirMacroprocesso.test.tsx`): Desativar grava na hora, sem janela, e o botão vira Reativar (e o inverso); a lista deixa de mostrar o desativado; falha ao desativar mostra o motivo em vermelho e o estado não muda; Excluir abre a janela "Excluir o macroprocesso {nome}?" com o texto "O histórico guarda o que ele tinha, mas não é possível desfazer.", botões [Excluir macroprocesso] e [Cancelar], foco no Cancelar; Cancelar e Esc fecham sem gravar; confirmar apaga e volta à lista; falha ao excluir mostra o motivo e o item continua; excluir um item já excluído por outra pessoa mostra o aviso de inexistente.
   - Consulta: abre o macroprocesso com os dados em leitura, sem campos editáveis e sem botões de alteração, só [Voltar à lista].
-- [ ] **Passo 2: ver falharem.**
-- [ ] **Passo 3: implementar** os três componentes (molde de `SetorAberto`, `SetorEditavel`, `SetorSomenteLeitura`; `SetorSomenteLeitura` mostra "—" para campo vazio e o rótulo da categoria) e ligar o clique da linha em `AreaDeMacroprocessos`.
-- [ ] **Passo 4: verificar. Commit.**
+- [x] **Passo 2: ver falharem.**
+- [x] **Passo 3: implementar** os três componentes (molde de `SetorAberto`, `SetorEditavel`, `SetorSomenteLeitura`; `SetorSomenteLeitura` mostra "—" para campo vazio e o rótulo da categoria) e ligar o clique da linha em `AreaDeMacroprocessos`.
+- [x] **Passo 4: verificar. Commit.**
 
 ---
 
