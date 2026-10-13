@@ -348,9 +348,9 @@ create trigger registrar_evento_do_setor after insert or update or delete on pub
   for each row execute function private.registrar_evento_do_setor();
 ```
 
-- [ ] **Passo 5: aplicar no desenvolvimento.** Conferir o vínculo (`supabase/AMBIENTES.md`: `yclkzyoebpsxmgpbcbus`; `supabase/.temp/project-ref`, se existir, com o mesmo ref). Pedir ao usuário que cole a migração no SQL Editor do projeto **plataforma-ep-dev** e a rode. Registrar em `supabase/AMBIENTES.md`, na lista de migrações aplicadas à mão, a linha `- <versão>_setores (<data>; testes 11, 00 e 10 passaram pelo GitHub Actions)`.
+- [x] **Passo 5: aplicar no desenvolvimento.** Conferir o vínculo (`supabase/AMBIENTES.md`: `yclkzyoebpsxmgpbcbus`; `supabase/.temp/project-ref`, se existir, com o mesmo ref). Pedir ao usuário que cole a migração no SQL Editor do projeto **plataforma-ep-dev** e a rode. Registrar em `supabase/AMBIENTES.md`, na lista de migrações aplicadas à mão, a linha `- <versão>_setores (<data>; testes 11, 00 e 10 passaram pelo GitHub Actions)`.
 - [ ] **Passo 6: ver o teste passar.** Comitar a migração, o `AMBIENTES.md` e, depois do passo 7, os tipos (um commit só: "Migração de setores: tabela, RLS, regras e eventos"), enviar a branch e pedir ao usuário que rode "Testes de banco" na branch. Esperado: todos os arquivos passando, inclusive `00_rls_ligada`, `10_privilegios_padrao` e `11_setores` (47 ok).
-- [ ] **Passo 7: gerar os tipos.** `npm run db:types` (vínculo conferido no passo 5). Esperado: `src/types/database.ts` com `setores` em `Tables`. `npm run typecheck` passando.
+- [x] **Passo 7: gerar os tipos.** `npm run db:types` (vínculo conferido no passo 5). Esperado: `src/types/database.ts` com `setores` em `Tables`. `npm run typecheck` passando.
 
 ---
 

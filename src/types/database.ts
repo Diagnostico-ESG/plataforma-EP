@@ -106,6 +106,33 @@ export type Database = {
           },
         ]
       }
+      setores: {
+        Row: {
+          ativo: boolean
+          criado_em: string
+          id: string
+          nome: string
+          observacoes: string | null
+          sigla: string
+        }
+        Insert: {
+          ativo?: boolean
+          criado_em?: string
+          id?: string
+          nome: string
+          observacoes?: string | null
+          sigla: string
+        }
+        Update: {
+          ativo?: boolean
+          criado_em?: string
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          sigla?: string
+        }
+        Relationships: []
+      }
       usuarios: {
         Row: {
           ativo: boolean
