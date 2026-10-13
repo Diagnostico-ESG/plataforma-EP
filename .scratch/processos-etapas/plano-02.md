@@ -1165,7 +1165,7 @@ Acrescentar ao fim de `src/components/JanelaDeConfirmacao.css`:
 - Consumes: `ModuloDeProcessos`, `EtapaDoSetor`, `ProcessosFalso` (Task 2); `acoesDaEtapa`, `indiceDaEtapaAtual`, `ROTULO_DO_STATUS`, `formatarData`, `AcaoDaEtapa` (Task 3); `JanelaComCampo` (Task 4); `useCarregamento`, `useGravacaoComFalha`, `ErroAoCarregar`, `Pilula`.
 - Produces: `App` com a prop `processos: ModuloDeProcessos`; `EtapasDoSetor({ processos, setorId, podeAlterar, aoSumir })`.
 
-- [ ] **Step 1: injeção (sem mudar comportamento).** Em `src/App.tsx`: importar `import type { ModuloDeProcessos } from './processos/tipos'`; `type AppProps = { acesso: ModuloDeAcesso; cadastros: ModuloDeCadastros; processos: ModuloDeProcessos }`; desestruturar `processos` e passar `<AreaDeCadastros usuario={estado.usuario} cadastros={cadastros} processos={processos} />`. Em `src/main.tsx`: `import { criarProcessosSupabase } from './processos/processosSupabase'`, `const processos = criarProcessosSupabase(supabase)` e `<App acesso={acesso} cadastros={cadastros} processos={processos} />`. Em `AreaDeCadastros.tsx`: a prop `processos: ModuloDeProcessos` entra em `AreaDeCadastrosProps` e em `SecaoAtualProps`, e vai para `<AreaDeSetores cadastros={cadastros} processos={processos} podeAlterar={podeAlterar} />`. Em `AreaDeSetores.tsx`: prop `processos` em `AreaDeSetoresProps`, repassada a `<SetorAberto cadastros={cadastros} processos={processos} ... />`. Em `SetorAberto.tsx`: acrescentar `processos: ModuloDeProcessos` só ao tipo `SetorAbertoProps` (sem desestruturar ainda, para o ESLint não reclamar de variável sem uso); o passo 4 passa a usá-la.
+- [x] **Step 1: injeção (sem mudar comportamento).** Em `src/App.tsx`: importar `import type { ModuloDeProcessos } from './processos/tipos'`; `type AppProps = { acesso: ModuloDeAcesso; cadastros: ModuloDeCadastros; processos: ModuloDeProcessos }`; desestruturar `processos` e passar `<AreaDeCadastros usuario={estado.usuario} cadastros={cadastros} processos={processos} />`. Em `src/main.tsx`: `import { criarProcessosSupabase } from './processos/processosSupabase'`, `const processos = criarProcessosSupabase(supabase)` e `<App acesso={acesso} cadastros={cadastros} processos={processos} />`. Em `AreaDeCadastros.tsx`: a prop `processos: ModuloDeProcessos` entra em `AreaDeCadastrosProps` e em `SecaoAtualProps`, e vai para `<AreaDeSetores cadastros={cadastros} processos={processos} podeAlterar={podeAlterar} />`. Em `AreaDeSetores.tsx`: prop `processos` em `AreaDeSetoresProps`, repassada a `<SetorAberto cadastros={cadastros} processos={processos} ... />`. Em `SetorAberto.tsx`: acrescentar `processos: ModuloDeProcessos` só ao tipo `SetorAbertoProps` (sem desestruturar ainda, para o ESLint não reclamar de variável sem uso); o passo 4 passa a usá-la.
 
   Nos testes de tela existentes, substituição mecânica (todas as montagens passam `cadastros={...}` sem `}` dentro):
 
@@ -1176,7 +1176,7 @@ sed -i "/^import { CadastrosFalso } from '.\/cadastros\/CadastrosFalso'/a import
 
   Conferir com `grep -c "processos={new ProcessosFalso()}" src/App*.test.tsx` (43 montagens no total) e `npx tsc -b` limpo; `npm test` verde, com os mesmos testes de antes mais os das Tasks 2 a 4.
 
-- [ ] **Step 2: testes de tela (vermelho).** `src/App.etapasDoSetor.test.tsx`:
+- [x] **Step 2: testes de tela (vermelho).** `src/App.etapasDoSetor.test.tsx`:
 
 ```tsx
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
@@ -1367,7 +1367,7 @@ test('falha ao carregar mostra o erro e Tentar de novo carrega as etapas', async
 
 Rodar `npx vitest run src/App.etapasDoSetor.test.tsx`. Esperado: falha (a seção "Etapas do setor" não existe).
 
-- [ ] **Step 3: componentes.** `src/components/processos/LinhaDaEtapa.tsx`:
+- [x] **Step 3: componentes.** `src/components/processos/LinhaDaEtapa.tsx`:
 
 ```tsx
 import { type AcaoDaEtapa, ROTULO_DO_STATUS, formatarData } from '../../processos/caminhoDeEtapas'
@@ -1567,7 +1567,7 @@ function ConteudoDasEtapas({ estado, aoTentarDeNovo, ...caminho }: ConteudoProps
 
 (Mesma ressalva dos tokens `--esp-*` da Task 4.)
 
-- [ ] **Step 4: montar a seção no setor aberto.** `src/components/cadastros/SetorAberto.tsx` passa a ser:
+- [x] **Step 4: montar a seção no setor aberto.** `src/components/cadastros/SetorAberto.tsx` passa a ser:
 
 ```tsx
 import { useCallback, useState } from 'react'
@@ -1611,9 +1611,9 @@ export function SetorAberto({ cadastros, processos, podeAlterar, id, aoVoltar }:
 
   Atenção a testes de tela antigos que procuram `getByRole('status')` ou `getByRole('alert')` sem escopo depois de abrir um setor: com a seção nova pode haver mais de um. Se algum falhar, restringir a busca à região do setor (`within(...)`) no próprio teste; não mudar o comportamento.
 
-- [ ] **Step 5: ver passar.** `npx vitest run src/App.etapasDoSetor.test.tsx` verde; `npm test` inteiro verde; `npx tsc -b`, `npm run lint`, `npm run check:circular` limpos.
+- [x] **Step 5: ver passar.** `npx vitest run src/App.etapasDoSetor.test.tsx` verde; `npm test` inteiro verde; `npx tsc -b`, `npm run lint`, `npm run check:circular` limpos.
 
-- [ ] **Step 6: comitar.** Commit "Ticket 02 de processos-etapas: etapas do setor na tela do setor".
+- [x] **Step 6: comitar.** Commit "Ticket 02 de processos-etapas: etapas do setor na tela do setor".
 
 ---
 

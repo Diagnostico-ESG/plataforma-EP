@@ -4,6 +4,7 @@ import App from './App'
 import { AcessoFalso } from './acesso/AcessoFalso'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
+import { ProcessosFalso } from './processos/ProcessosFalso'
 import css from './components/cadastros/Cadastros.css?raw'
 import { regrasDaClasse } from './testes/regrasDaClasse'
 
@@ -16,7 +17,7 @@ afterEach(() => {
 })
 
 async function abrirFormulario(cadastros = new CadastrosFalso()) {
-  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} />)
+  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} processos={new ProcessosFalso()} />)
   fireEvent.click(await screen.findByRole('button', { name: 'Novo setor' }))
   return cadastros
 }

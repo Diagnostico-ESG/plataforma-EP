@@ -5,6 +5,7 @@ import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { Perfil } from './acesso/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
+import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { Setor } from './cadastros/tipos'
 
 beforeEach(() => {
@@ -23,7 +24,7 @@ const SETORES: Setor[] = [
 function montar(perfil: Perfil = 'integrante_ep') {
   const cadastros = new CadastrosFalso()
   cadastros.setores = [...SETORES]
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={new ProcessosFalso()} />)
   return cadastros
 }
 

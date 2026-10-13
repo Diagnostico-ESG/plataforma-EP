@@ -1,0 +1,44 @@
+.etapas-do-setor {
+  margin-top: var(--esp-5);
+}
+
+.caminho-de-etapas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--linha);
+}
+
+.etapa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-2) var(--esp-3);
+  padding: var(--esp-3) 0;
+  border-bottom: 1px solid var(--linha);
+  color: var(--texto-2);
+}
+
+/* A etapa atual em azul, como no caminho da identidade visual. */
+.etapa[aria-current='step'] {
+  color: var(--texto);
+  box-shadow: inset 3px 0 0 var(--azul);
+  padding-left: var(--esp-3);
+}
+
+.etapa-nome {
+  font-weight: 600;
+}
+
+.etapa-datas,
+.etapa-nota {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.etapa-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+  flex-basis: 100%;
+}

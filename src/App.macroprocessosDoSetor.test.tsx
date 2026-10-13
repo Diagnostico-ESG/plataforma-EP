@@ -4,6 +4,7 @@ import App from './App'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import type { Perfil } from './acesso/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
+import { ProcessosFalso } from './processos/ProcessosFalso'
 
 beforeEach(() => {
   window.location.hash = '#/setores'
@@ -30,7 +31,7 @@ function montar(perfil: Perfil = 'integrante_ep') {
     { macroprocessoId: 'm3', setorId: 's1', observacao: 'Papel no extinto' },
     { macroprocessoId: 'm1', setorId: 's1', observacao: 'Papel no um' },
   ]
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={new ProcessosFalso()} />)
   return cadastros
 }
 

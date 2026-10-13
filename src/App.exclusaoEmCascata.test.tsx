@@ -3,6 +3,7 @@ import { afterEach, beforeEach, expect, test } from 'vitest'
 import App from './App'
 import { AcessoFalso } from './acesso/AcessoFalso'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
+import { ProcessosFalso } from './processos/ProcessosFalso'
 
 afterEach(() => {
   cleanup()
@@ -32,7 +33,7 @@ function montar(hash: string) {
     { macroprocessoId: 'm3', setorId: 's1', observacao: null },
     { macroprocessoId: 'm1', setorId: 's2', observacao: null },
   ]
-  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} />)
+  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} processos={new ProcessosFalso()} />)
   return cadastros
 }
 
