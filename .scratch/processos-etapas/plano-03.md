@@ -419,7 +419,7 @@ Atenção: `private.preparar_responsavel_do_setor` não é `security definer` e 
 
 - [ ] **Step 5: aplicar e ver passar.** Commit "Ticket 03 de processos-etapas: migração dos responsáveis do setor"; `git push`; disparar "Migrar banco de desenvolvimento" com o nome do arquivo criado no passo 4; depois "Testes de banco" na branch. Esperado: os 17 arquivos verdes, `16_responsaveis_do_setor` com 49 de 49. Se algum item falhar, corrigir com **migração nova** (a já aplicada não se edita) ou o teste, se o erro for dele.
 
-- [ ] **Step 6: registro e tipos.** Acrescentar em `supabase/AMBIENTES.md`, na lista das migrações aplicadas, a linha `- <arquivo sem .sql> (2026-10-13; processos-etapas, ticket 03; teste 16 falhou antes, tabela inexistente, e 13 falhou no "antes" da exclusão do setor; passaram depois, com os 17 arquivos verdes; aplicada pelo workflow "Migrar banco de desenvolvimento", e testada pelo "Testes de banco" na branch)`. Conferir o vínculo (`AMBIENTES.md` e `supabase/.temp/project-ref` = `yclkzyoebpsxmgpbcbus`), `npm run db:types`, `npx tsc -b` limpo (`responsaveis_do_setor` aparece em `src/types/database.ts`). Commit "Ticket 03 de processos-etapas: tipos e registro da migração"; `git push`.
+- [x] **Step 6: registro e tipos.** Acrescentar em `supabase/AMBIENTES.md`, na lista das migrações aplicadas, a linha `- <arquivo sem .sql> (2026-10-13; processos-etapas, ticket 03; teste 16 falhou antes, tabela inexistente, e 13 falhou no "antes" da exclusão do setor; passaram depois, com os 17 arquivos verdes; aplicada pelo workflow "Migrar banco de desenvolvimento", e testada pelo "Testes de banco" na branch)`. Conferir o vínculo (`AMBIENTES.md` e `supabase/.temp/project-ref` = `yclkzyoebpsxmgpbcbus`), `npm run db:types`, `npx tsc -b` limpo (`responsaveis_do_setor` aparece em `src/types/database.ts`). Commit "Ticket 03 de processos-etapas: tipos e registro da migração"; `git push`.
 
 ---
 
@@ -517,7 +517,7 @@ Run: o mesmo comando → PASS.
 - Consumes: `fraseDoEmailMalFormado` (Task 2); tabela e recusa da Task 1.
 - Produces: em `ModuloDeProcessos`: `lerResponsaveisDoSetor(setorId: string): Promise<ResponsavelDoSetor[]>` (ordem de nome), `criarResponsavel(setorId: string, dados: DadosDoResponsavel): Promise<void>`, `editarResponsavel(id: string, dados: DadosDoResponsavel): Promise<void>`, `excluirResponsavel(id: string): Promise<void>`. `ProcessosFalso.responsaveisDoSetor: Record<string, ResponsavelDoSetor[]>`.
 
-- [ ] **Step 1: contrato.** Em `ModuloDeProcessos` (`src/processos/tipos.ts`), depois de `registrarRealizadaAnteriormente`:
+- [x] **Step 1: contrato.** Em `ModuloDeProcessos` (`src/processos/tipos.ts`), depois de `registrarRealizadaAnteriormente`:
 
 ```ts
   /** Em ordem alfabética de nome. */
@@ -529,7 +529,7 @@ Run: o mesmo comando → PASS.
 
 E no comentário do tipo, trocar "etapa de um setor que já não existe, como CadastroInexistente" por "etapa ou responsável que já não existe, como CadastroInexistente".
 
-- [ ] **Step 2: teste que falha.** `src/processos/responsaveisSupabase.test.ts`:
+- [x] **Step 2: teste que falha.** `src/processos/responsaveisSupabase.test.ts`:
 
 ```ts
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -610,7 +610,7 @@ test('nada alterado: ainda legível é perfil; ilegível, o responsável sumiu',
 
 Run: `npx vitest run src/processos/responsaveisSupabase.test.ts` → FAIL (funções inexistentes).
 
-- [ ] **Step 3: implementação real.** `src/processos/responsaveisSupabase.ts`:
+- [x] **Step 3: implementação real.** `src/processos/responsaveisSupabase.ts`:
 
 ```ts
 import {
@@ -722,7 +722,7 @@ E os métodos, com `conferirGravacao` extraído do começo de `mudar` (que passa
 
 Run: `npx tsc -b` limpo; `npm test` → PASS.
 
-- [ ] **Step 5: commit** "Ticket 03 de processos-etapas: módulo de processos com os responsáveis (real e falso)".
+- [x] **Step 5: commit** "Ticket 03 de processos-etapas: módulo de processos com os responsáveis (real e falso)".
 
 ---
 
@@ -736,7 +736,7 @@ Run: `npx tsc -b` limpo; `npm test` → PASS.
 - Consumes: as quatro operações e `ProcessosFalso.responsaveisDoSetor` (Task 3); `problemaNoResponsavel`, `dadosDoResponsavel`, `CamposDoResponsavel` (Task 2).
 - Produces: `<ResponsaveisDoSetor processos setorId podeAlterar />`.
 
-- [ ] **Step 1: testes que falham.** `src/App.responsaveisDoSetor.test.tsx`:
+- [x] **Step 1: testes que falham.** `src/App.responsaveisDoSetor.test.tsx`:
 
 ```tsx
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
@@ -927,9 +927,9 @@ test('a Consulta vê nome, e-mail e cargo, sem botões', async () => {
 
 Run: `npx vitest run src/App.responsaveisDoSetor.test.tsx` → FAIL (região inexistente).
 
-- [ ] **Step 2: janela com texto opcional.** Em `src/components/JanelaDeConfirmacao.tsx`: `texto?: string` no tipo das props e `{texto && <p>{texto}</p>}` no lugar de `<p>{texto}</p>`.
+- [x] **Step 2: janela com texto opcional.** Em `src/components/JanelaDeConfirmacao.tsx`: `texto?: string` no tipo das props e `{texto && <p>{texto}</p>}` no lugar de `<p>{texto}</p>`.
 
-- [ ] **Step 3: formulário.** `src/components/processos/FormularioDeResponsavel.tsx`:
+- [x] **Step 3: formulário.** `src/components/processos/FormularioDeResponsavel.tsx`:
 
 ```tsx
 import { type ChangeEvent, type FormEvent, useId, useState } from 'react'
@@ -1166,7 +1166,7 @@ Em `src/components/processos/Etapas.css`, trocar o seletor `.etapas-do-setor {` 
 **Interfaces:**
 - Consumes: eventos `responsavel_do_setor` (Task 1).
 
-- [ ] **Step 1: testes que falham.** Em `src/cadastros/historicoDosCadastros.test.ts`, no fim:
+- [x] **Step 1: testes que falham.** Em `src/cadastros/historicoDosCadastros.test.ts`, no fim:
 
 ```ts
 describe('responsáveis do setor', () => {
@@ -1213,7 +1213,7 @@ test('os responsáveis do setor aparecem no Histórico e entram no filtro pelo s
 
 Run: `npx vitest run src/cadastros src/App.historicoDosCadastros.test.tsx` → FAIL.
 
-- [ ] **Step 2: implementação.**
+- [x] **Step 2: implementação.**
   - `src/cadastros/historicoSupabase.ts`: `ENTIDADES_DOS_CADASTROS` ganha `'responsavel_do_setor'`; o comentário cita também etapas e responsáveis do setor.
   - `src/cadastros/historicoDosCadastros.ts`:
     - `ENTIDADES_QUE_LIGAM = new Set(['setor_envolvido', 'andamento', 'responsavel_do_setor'])`, com o comentário "Vínculos, etapas e responsáveis do setor têm a referência 'idA:idB'…".
@@ -1230,7 +1230,7 @@ Se `nomeDoItem` passar de 20 linhas ou 10 caminhos (ESLint), extrair as linhas d
 
 Run: o mesmo comando → PASS; `npm test`, `npx tsc -b`, `npx eslint .` limpos.
 
-- [ ] **Step 3: commit** "Ticket 03 de processos-etapas: responsáveis do setor no Histórico".
+- [x] **Step 3: commit** "Ticket 03 de processos-etapas: responsáveis do setor no Histórico".
 
 ---
 
@@ -1239,4 +1239,4 @@ Run: o mesmo comando → PASS; `npm test`, `npx tsc -b`, `npx eslint .` limpos.
 - [ ] **Step 1: conferência final.** `npm test` (todos verdes), `npx tsc -b`, `npx eslint .`, `npx madge --circular --extensions ts,tsx src` limpos; "Testes de banco" verde na branch depois do último `git push`.
 - [ ] **Step 2: conferência visual (critério 5).** Subir `npm run dev` em segundo plano e abrir pelo navegador do app; com login, olhar a tela de um setor: seção acima das etapas, tabela, formulário aberto, janela de exclusão e erro do e-mail. Se não houver login no navegador da sessão, pedir ao usuário que confira (como no ticket 02).
 - [ ] **Step 3: integrar.** `git switch main`; `git merge --no-ff processos-etapas -m "Integra o ticket 03 de processos-etapas"`; `npm test`; `git branch -d processos-etapas`; `git push`. Conferir o "Testes de banco" disparado na `main` (o envio mexe em `supabase/`).
-- [x] **Step 4: marcas.** Seguir o fim do `/executar-complexo`: linha `Concluído em` no ticket, commit, apontar o próximo ticket (04, Cadastro de processos e quadro), notas do protocolo, avisar o usuário dos textos novos fora da spec ("O nome do responsável é obrigatório." e a janela sem texto de apoio) e o `/cost`.
+- [ ] **Step 4: marcas.** Seguir o fim do `/executar-complexo`: linha `Concluído em` no ticket, commit, apontar o próximo ticket (04, Cadastro de processos e quadro), notas do protocolo, avisar o usuário dos textos novos fora da spec ("O nome do responsável é obrigatório." e a janela sem texto de apoio) e o `/cost`.
