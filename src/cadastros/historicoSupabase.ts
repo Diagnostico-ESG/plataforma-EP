@@ -1,8 +1,6 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '../types/database'
+import type { ClienteSupabase } from '../lib/supabase'
 import type { EstadoDoCadastro, EventoDoCadastro, ModuloDeCadastros } from './tipos'
 
-type ClienteSupabase = SupabaseClient<Database>
 type EventoDoBanco = {
   id: number; ocorrido_em: string; acao: string; entidade: string; entidade_ref: string
   detalhes: { antes: EstadoDoCadastro; depois: EstadoDoCadastro }; autor: { nome: string } | null

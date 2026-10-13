@@ -1,7 +1,6 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
-import { TravaDoBanco } from '../acesso/falhasDeGravacao'
-import type { Database } from '../types/database'
-import { CadastroInexistente } from './cadastroInexistente'
+import { type ErroDoBanco, TravaDoBanco, porQueNadaMudou, recusaPorPerfil } from '../acesso/falhasDeGravacao'
+import type { ClienteSupabase } from '../lib/supabase'
+import { RECUSAS_DOS_CADASTROS } from './cadastroInexistente'
 import { criarHistoricoSupabase } from './historicoSupabase'
 import { criarMacroprocessosSupabase } from './macroprocessosSupabase'
 import { compararMacroprocessos } from './ordemDosMacroprocessos'
@@ -10,8 +9,6 @@ import type {
   DadosDoSetor, MacroprocessoDoSetor, ModuloDeCadastros, SetorComMacroprocessos, SetorDaLista,
 } from './tipos'
 
-type ClienteSupabase = SupabaseClient<Database>
-type ErroDoBanco = { message: string; code?: string }
 type AlteracaoDoSetor = Partial<DadosDoSetor> & { ativo?: boolean }
 
 
@@ -76,19 +73,13 @@ async function criarSetor(cliente: ClienteSupabase, dados: DadosDoSetor): Promis
 async function alterarSetor(cliente: ClienteSupabase, id: string, alteracao: AlteracaoDoSetor): Promise<void> {
   const { data, error } = await cliente.from('setores').update(alteracao).eq('id', id).select('id')
   if (error) throw falhaDoSetor(error, alteracao)
-  if (!data.length) throw await porQueNadaMudou(cliente, id)
+  if (!data.length) throw porQueNadaMudou(Boolean(await lerSetor(cliente, id)), RECUSAS_DOS_CADASTROS)
 }
 
 async function excluirSetor(cliente: ClienteSupabase, id: string): Promise<void> {
   const { data, error } = await cliente.from('setores').delete().eq('id', id).select('id')
   if (error) throw falhaDoSetor(error, {})
-  if (!data.length) throw await porQueNadaMudou(cliente, id)
-}
-
-// A RLS não acusa erro ao filtrar: zero linhas quer dizer que o setor sumiu ou que o perfil mudou com a página aberta.
-async function porQueNadaMudou(cliente: ClienteSupabase, id: string): Promise<Error> {
-  if (await lerSetor(cliente, id)) return new TravaDoBanco('Seu perfil não permite alterar os cadastros.')
-  return new CadastroInexistente()
+  if (!data.length) throw porQueNadaMudou(Boolean(await lerSetor(cliente, id)), RECUSAS_DOS_CADASTROS)
 }
 
 // O banco recusa pelo código do Postgres e pelo nome da restrição (migração de setores); a frase usa o que foi enviado.
@@ -100,6 +91,5 @@ function falhaDoSetor(erro: ErroDoBanco, dados: Partial<DadosDoSetor>): Error {
   if (repetido && erro.message.includes('setores_nome_unico')) {
     return new TravaDoBanco(`Já existe um setor com o nome ${dados.nome}.`)
   }
-  if (erro.code === '42501') return new TravaDoBanco('Seu perfil não permite alterar os cadastros.')
-  return new Error(`erro inesperado do banco (${erro.message})`)
+  return recusaPorPerfil(erro, RECUSAS_DOS_CADASTROS.semPermissao)
 }

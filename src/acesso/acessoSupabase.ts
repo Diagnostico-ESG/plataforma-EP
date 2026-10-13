@@ -1,10 +1,8 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '../types/database'
+import type { ClienteSupabase } from '../lib/supabase'
 import { criarAdministracaoSupabase } from './administracaoSupabase'
 import { lerRecusaDaUrl } from './motivos'
 import type { ModuloDeAcesso, SessaoAtual, UsuarioAtual } from './tipos'
 
-type ClienteSupabase = SupabaseClient<Database>
 const DOMINIO_INSTITUCIONAL = 'ccivil.pr.gov.br'
 
 // urlDeChegada é lida no main.tsx antes de o supabase-js tratar o endereço de retorno do Google.

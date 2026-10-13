@@ -1,13 +1,10 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
-import { TravaDoBanco } from '../acesso/falhasDeGravacao'
-import type { Database } from '../types/database'
-import { CadastroInexistente } from './cadastroInexistente'
+import { type ErroDoBanco, TravaDoBanco, porQueNadaMudou, recusaPorPerfil } from '../acesso/falhasDeGravacao'
+import type { ClienteSupabase } from '../lib/supabase'
+import { RECUSAS_DOS_CADASTROS } from './cadastroInexistente'
 import type {
   DadosDoMacroprocesso, MacroprocessoComSetores, MacroprocessoDaLista, ModuloDeCadastros, SetorEnvolvido,
 } from './tipos'
 
-type ClienteSupabase = SupabaseClient<Database>
-type ErroDoBanco = { message: string; code?: string }
 type AlteracaoDoMacroprocesso = Partial<DadosDoMacroprocesso> & { ativo?: boolean }
 type OperacoesDeMacroprocesso = Pick<ModuloDeCadastros, 'listarMacroprocessos' | 'criarMacroprocesso'
   | 'lerMacroprocesso' | 'editarMacroprocesso' | 'desativarMacroprocesso' | 'reativarMacroprocesso'
@@ -68,19 +65,13 @@ async function criar(cliente: ClienteSupabase, dados: DadosDoMacroprocesso): Pro
 async function alterar(cliente: ClienteSupabase, id: string, alteracao: AlteracaoDoMacroprocesso): Promise<void> {
   const { data, error } = await cliente.from('macroprocessos').update(alteracao).eq('id', id).select('id')
   if (error) throw falhaDoMacroprocesso(error, alteracao)
-  if (!data.length) throw await porQueNadaMudou(cliente, id)
+  if (!data.length) throw porQueNadaMudou(Boolean(await ler(cliente, id)), RECUSAS_DOS_CADASTROS)
 }
 
 async function excluir(cliente: ClienteSupabase, id: string): Promise<void> {
   const { data, error } = await cliente.from('macroprocessos').delete().eq('id', id).select('id')
   if (error) throw falhaDoMacroprocesso(error, {})
-  if (!data.length) throw await porQueNadaMudou(cliente, id)
-}
-
-// A RLS não acusa erro ao filtrar: zero linhas quer dizer que o item sumiu ou que o perfil mudou com a página aberta.
-async function porQueNadaMudou(cliente: ClienteSupabase, id: string): Promise<Error> {
-  if (await ler(cliente, id)) return new TravaDoBanco('Seu perfil não permite alterar os cadastros.')
-  return new CadastroInexistente()
+  if (!data.length) throw porQueNadaMudou(Boolean(await ler(cliente, id)), RECUSAS_DOS_CADASTROS)
 }
 
 // O banco recusa pelo código do Postgres e pelo nome da restrição (migração de macroprocessos); a frase usa o que foi enviado.
@@ -92,6 +83,5 @@ function falhaDoMacroprocesso(erro: ErroDoBanco, dados: AlteracaoDoMacroprocesso
   if (repetido && erro.message.includes('macroprocessos_codigo_key')) {
     return new TravaDoBanco(`Já existe um macroprocesso com o código ${dados.codigo}.`)
   }
-  if (erro.code === '42501') return new TravaDoBanco('Seu perfil não permite alterar os cadastros.')
-  return new Error(`erro inesperado do banco (${erro.message})`)
+  return recusaPorPerfil(erro, RECUSAS_DOS_CADASTROS.semPermissao)
 }

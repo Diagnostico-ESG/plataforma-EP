@@ -1,9 +1,8 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
+import type { ClienteSupabase } from '../lib/supabase'
 import type { Database } from '../types/database'
-import { falhaDeGravacao } from './falhasDeGravacao'
+import { type ErroDoBanco, falhaDeGravacao } from './falhasDeGravacao'
 import type { EstadoRegistrado, EventoDoHistorico, LinhaDeUsuario, ModuloDeAcesso, Perfil } from './tipos'
 
-type ClienteSupabase = SupabaseClient<Database>
 type FuncoesDeAdministracao = Pick<ModuloDeAcesso,
   'listarUsuarios' | 'autorizarEmail' | 'mudarPerfilDaAutorizacao' | 'excluirAutorizacao'
   | 'mudarPerfilDoUsuario' | 'desativarUsuario' | 'reativarUsuario' | 'corrigirNome' | 'listarHistorico'>
@@ -16,7 +15,7 @@ type UsuarioDoBanco = {
   usuarios_emails: { email: string } | null
 }
 type AlteracaoDoUsuario = Pick<Database['public']['Tables']['usuarios']['Update'], 'nome' | 'perfil' | 'ativo'>
-type RespostaDeAlteracao = { data: unknown[] | null; error: { message: string; code?: string } | null }
+type RespostaDeAlteracao = { data: unknown[] | null; error: ErroDoBanco | null }
 
 export function criarAdministracaoSupabase(cliente: ClienteSupabase): FuncoesDeAdministracao {
   return {

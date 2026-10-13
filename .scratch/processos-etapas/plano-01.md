@@ -114,10 +114,10 @@ export const RECUSAS_DOS_CADASTROS: RecusasDoModulo = {
 
 **Interfaces:** consome tudo da Task 1. Nos três `alterar`/`excluir`: `if (!data.length) throw porQueNadaMudou(Boolean(await lerSetor(cliente, id)), RECUSAS_DOS_CADASTROS)` (com `ler` no de macroprocessos).
 
-- [ ] **Step 1: trocar** os seis arquivos como acima; `SupabaseClient`/`Database` saem dos imports onde ficarem sem uso.
-- [ ] **Step 2: conferir** — `grep -rn "type ClienteSupabase\|type ErroDoBanco\|Seu perfil não permite alterar os cadastros" src --include=*.ts | grep -v test` mostra uma declaração de cada e a frase só em `cadastroInexistente.ts`.
-- [ ] **Step 3: bateria** — `npm test` (esperado: 732 + 4 novos = 736, todos passando), `npm run typecheck`, `npm run lint`, `npm run check:circular`.
-- [ ] **Step 4: commit** — "Ticket 01 de processos-etapas: módulos usam as peças comuns".
+- [x] **Step 1: trocar** os seis arquivos como acima; `SupabaseClient`/`Database` saem dos imports onde ficarem sem uso.
+- [x] **Step 2: conferir** — `grep -rn "type ClienteSupabase\|type ErroDoBanco\|Seu perfil não permite alterar os cadastros" src --include=*.ts | grep -v test` mostra uma declaração de cada e a frase só em `cadastroInexistente.ts`.
+- [x] **Step 3: bateria** — `npm test` (esperado: 732 + 4 novos = 736, todos passando), `npm run typecheck`, `npm run lint`, `npm run check:circular`.
+- [x] **Step 4: commit** — "Ticket 01 de processos-etapas: módulos usam as peças comuns".
 
 ### Task 3: Backlog
 
