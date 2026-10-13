@@ -24,14 +24,14 @@ const TEXTOS_DA_ENTIDADE: Record<string, Record<string, string>> = {
   setor_envolvido: TEXTO_DA_ACAO_DO_VINCULO, andamento: TEXTO_DA_ACAO_DO_ANDAMENTO,
 }
 
-// Vínculos e etapas do setor têm a referência 'idA:idB': o item do filtro sai dos ids gravados no evento.
-const ENTIDADES_QUE_LIGAM = new Set(['setor_envolvido', 'andamento'])
+// Vínculos, etapas e responsáveis do setor têm a referência 'idA:idB': o item do filtro sai dos ids gravados no evento.
+const ENTIDADES_QUE_LIGAM = new Set(['setor_envolvido', 'andamento', 'responsavel_do_setor'])
 
 const ROTULO_DO_CAMPO: Record<string, string> = {
   sigla: 'Sigla', nome: 'Nome', observacoes: 'Observações', ativo: 'Situação', codigo: 'Código', descricao: 'Descrição',
   categoria: 'Categoria', observacao: 'Observação', setor_sigla: 'Setor', macroprocesso_nome: 'Macroprocesso',
   macroprocessos: 'Macroprocessos', setores: 'Setores', status: 'Situação da etapa', iniciada_em: 'Início',
-  resolvida_em: 'Conclusão',
+  resolvida_em: 'Conclusão', email: 'E-mail', cargo: 'Cargo', responsaveis: 'Responsáveis',
 }
 
 // Os ids existem para o filtro; quem lê o histórico vê a sigla e o nome. Código e nome da etapa já estão no título.
@@ -60,13 +60,19 @@ function codigoENome(codigo: unknown, nome: unknown): string {
   return typeof codigo === 'string' && codigo !== '' ? `${codigo} — ${texto(nome)}` : texto(nome)
 }
 
+// Etapa e responsável pertencem a um setor: o nome deles vem com a sigla; null se o evento não for deles.
+function nomeDoItemDoSetor(entidade: string, estado: Record<string, unknown>): string | null {
+  const nomes: Record<string, unknown> = { andamento: estado.etapa_nome, responsavel_do_setor: estado.nome }
+  const nome = nomes[entidade]
+  return typeof nome === 'string' ? `${nome} — ${texto(estado.setor_sigla)}` : null
+}
+
 export function nomeDoItem(evento: EventoDoCadastro): string {
   const estado = estadoLegivel(evento)
   if (evento.entidade === 'setor' && typeof estado.sigla === 'string') return `${estado.sigla} — ${texto(estado.nome)}`
   if (evento.entidade === 'macroprocesso' && typeof estado.nome === 'string') return codigoENome(estado.codigo, estado.nome)
-  if (evento.entidade === 'andamento' && typeof estado.etapa_nome === 'string') {
-    return `${estado.etapa_nome} — ${texto(estado.setor_sigla)}`
-  }
+  const doSetor = nomeDoItemDoSetor(evento.entidade, estado)
+  if (doSetor !== null) return doSetor
   if (typeof estado.setor_sigla === 'string' && typeof estado.macroprocesso_nome === 'string') {
     return `${estado.setor_sigla} em ${estado.macroprocesso_nome}`
   }

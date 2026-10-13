@@ -6,9 +6,9 @@ type EventoDoBanco = {
   detalhes: { antes: EstadoDoCadastro; depois: EstadoDoCadastro; motivo?: string | null }; autor: { nome: string } | null
 }
 
-// A RLS de eventos já deixa passar só estas entidades para quem não é administrador; o filtro mantém o mesmo
+// Cadastros, etapas e responsáveis do setor. A RLS de eventos já deixa passar só estas entidades para quem não é administrador; o filtro mantém o mesmo
 // resultado para o administrador, que também lê os eventos de usuários (com e-mails).
-const ENTIDADES_DOS_CADASTROS = ['setor', 'macroprocesso', 'setor_envolvido', 'andamento']
+const ENTIDADES_DOS_CADASTROS = ['setor', 'macroprocesso', 'setor_envolvido', 'andamento', 'responsavel_do_setor']
 
 export function criarHistoricoSupabase(cliente: ClienteSupabase): Pick<ModuloDeCadastros, 'listarHistoricoDosCadastros'> {
   return { listarHistoricoDosCadastros: () => listarHistoricoDosCadastros(cliente) }

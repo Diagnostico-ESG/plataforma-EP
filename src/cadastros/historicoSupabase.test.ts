@@ -19,7 +19,7 @@ describe('histórico dos cadastros no módulo real', () => {
     await criar(cliente).listarHistoricoDosCadastros()
     expect(cliente.pedidos[0]).toMatchObject({
       tabela: 'eventos', colunas: 'id, ocorrido_em, acao, entidade, entidade_ref, detalhes, autor:usuarios(nome)',
-      dentro: ['entidade', ['setor', 'macroprocesso', 'setor_envolvido', 'andamento']],
+      dentro: ['entidade', ['setor', 'macroprocesso', 'setor_envolvido', 'andamento', 'responsavel_do_setor']],
       ordem: [['ocorrido_em', false], ['id', false]],
     })
   })
