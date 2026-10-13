@@ -14,3 +14,5 @@
 - [ ] A tradução da recusa por perfil e a explicação de gravação sem efeito existem uma vez só, com o texto de cada módulo passado como parâmetro (o de cadastros continua "Seu perfil não permite alterar os cadastros.").
 - [ ] Os testes existentes passam sem mudança de comportamento, mesma quantidade antes e depois; testes das peças compartilhadas onde ainda não houver.
 - [ ] O item do backlog é atualizado dizendo que a parte (2) foi feita neste ticket.
+
+Concluído em 2026-10-13 (commit 8cce4e8)

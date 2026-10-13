@@ -273,3 +273,11 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Spec com Modelo de dados, "quem pode o quê", regras no banco, regras de estado, "não guarde o que se calcula" e `[visual]` (item não testado).** Esperado: tudo presente. Aconteceu: presente; situação "concluído" e etapa atual numa view com `security_invoker`; 8 critérios `[visual]`.
 - **Prefatoração como ticket 01.** O `to-tickets` pede prefatorar antes; puxei para o ticket 01 uma parte de um item de refatoração que o usuário tinha deixado no backlog (decisão do `/ship` de cadastros-basicos), com aprovação dele. Sugestão: o `/planejar` dizer se itens do backlog podem virar ticket de preparação.
 - **Lembrete do teste antigo que conta a tabela inteira** (sugestão do `/ship` de cadastros-basicos): aplicado; entrou nas decisões de teste da spec e no critério do ticket 02.
+
+## 2026-10-13 — /executar-complexo do ticket 01 de processos-etapas
+
+- **Ticket só de refatoração, sem banco.** Os itens de banco do bloco não aconteceram; branch comum, `plano-01.md` e `Concluído em` já têm entradas anteriores. Sem `banco.md`, por não mexer em banco.
+- **Marco por ticket criado no início** (`marco/2026-10-13-inicio-ticket-01-processos-etapas`), seguindo a sugestão do ticket 05 de cadastros-basicos; o comando ainda não pede isso.
+- **Critério "mesma quantidade de testes".** Esperado: os 732 testes de antes continuarem passando. Aconteceu: 732 + 4 novos (peças compartilhadas) = 736, todos verdes.
+- **claude-mem sem cota** desde o início da sessão (provedor esgotou a cota); a sessão seguiu sem ele, como manda o `CLAUDE.md`.
+- **Observação:** rodou em Opus (a tabela recomenda Sonnet), na mesma sessão do `/situação`, por escolha do usuário.
