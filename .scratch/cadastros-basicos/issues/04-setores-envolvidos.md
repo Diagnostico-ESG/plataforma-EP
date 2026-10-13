@@ -21,3 +21,5 @@
 - [ ] Janelas de exclusão passam a dizer "{SIGLA} sai de {n} macroprocessos." e "{n} setores deixam de estar envolvidos nele.".
 - [ ] A Consulta vê os vínculos sem [Tirar], sem seletor e sem observação editável.
 - [ ] Testes de interface com o aplicativo inteiro: pôr, tirar e mudar observação com sucesso e com falha, o seletor (sem inativos e sem os já envolvidos), as contagens, as janelas com n e a Consulta.
+
+Concluído em 2026-10-13 (commit 1dcd4c8)
