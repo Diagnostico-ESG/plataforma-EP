@@ -62,15 +62,15 @@
 
 **Produz:** política `"eventos: perfil ativo lê os cadastros"` em `public.eventos`, `for select to authenticated using ((select private.usuario_ativo()) and entidade in ('setor', 'macroprocesso', 'setor_envolvido'))`. A política do Administrador (leitura de tudo) continua; as duas somam.
 
-- [ ] **Passo 1: conferir o alvo.** Linha "vínculo atual" de `supabase/AMBIENTES.md` = dev `yclkzyoebpsxmgpbcbus`.
-- [ ] **Passo 2: teste que falha.** `14_historico_dos_cadastros.test.sql` no molde de `06_historico.test.sql` (usuários inventados a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo; função temporária que conta, por papel, os eventos visíveis de uma lista de `entidade_ref` inventada). Eventos inseridos pelo dono do teste (um de cada: `setor`, `macroprocesso`, `setor_envolvido`, `usuario`, `autorizacao`, com `entidade_ref` e `acao` próprios do teste). Conferências:
+- [x] **Passo 1: conferir o alvo.** Linha "vínculo atual" de `supabase/AMBIENTES.md` = dev `yclkzyoebpsxmgpbcbus`.
+- [x] **Passo 2: teste que falha.** `14_historico_dos_cadastros.test.sql` no molde de `06_historico.test.sql` (usuários inventados a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo; função temporária que conta, por papel, os eventos visíveis de uma lista de `entidade_ref` inventada). Eventos inseridos pelo dono do teste (um de cada: `setor`, `macroprocesso`, `setor_envolvido`, `usuario`, `autorizacao`, com `entidade_ref` e `acao` próprios do teste). Conferências:
   - Administrador, Integrante e Consulta leem os 3 eventos de cadastros; Administrador lê também o de `usuario` e o de `autorizacao`;
   - Integrante e Consulta **não** leem `usuario` nem `autorizacao`;
   - inativo (administrador desativado) lê 0; visitante recebe `42501` ao ler;
   - Integrante, Consulta e Administrador recusam (`42501`) incluir, alterar, apagar e `truncate` em `eventos` com `entidade = 'setor'` (mesma função `conferir_que_nao_grava` do 06, copiada).
-- [ ] **Passo 3: ver falhar.** Commit só do teste, `git push -u origin cadastros-basicos-05`, disparar "Testes de banco" na branch pelo navegador do app e ler o resultado: o teste 14 vermelho (Integrante e Consulta leem 0 dos cadastros).
-- [ ] **Passo 4: migração.** `npx supabase migration new historico_dos_cadastros`, com a política acima e um comentário do porquê (eventos de usuário trazem e-mails, ficam só com o Administrador). Registrar a migração em `supabase/AMBIENTES.md` (lista das aplicadas pelo workflow).
-- [ ] **Passo 5: aplicar e conferir.** Commit, push; disparar "Migrar banco de desenvolvimento" na branch com o nome do arquivo e ler o resultado; disparar "Testes de banco" de novo: todos os arquivos verdes, o 14 inteiro. Commit de ajuste se algo falhar (regra de parada: três tentativas).
+- [x] **Passo 3: ver falhar.** Commit só do teste, `git push -u origin cadastros-basicos-05`, disparar "Testes de banco" na branch pelo navegador do app e ler o resultado: o teste 14 vermelho (Integrante e Consulta leem 0 dos cadastros).
+- [x] **Passo 4: migração.** `npx supabase migration new historico_dos_cadastros`, com a política acima e um comentário do porquê (eventos de usuário trazem e-mails, ficam só com o Administrador). Registrar a migração em `supabase/AMBIENTES.md` (lista das aplicadas pelo workflow).
+- [x] **Passo 5: aplicar e conferir.** Commit, push; disparar "Migrar banco de desenvolvimento" na branch com o nome do arquivo e ler o resultado; disparar "Testes de banco" de novo: todos os arquivos verdes, o 14 inteiro. Commit de ajuste se algo falhar (regra de parada: três tentativas).
 
 ---
 
@@ -91,15 +91,15 @@ export type ItemDoFiltro = { id: string; nome: string }
 
 e, em `historicoDosCadastros.ts`: `textoDaAcaoDoCadastro(acao: string, entidade: string): string`, `nomeDoItem(evento: EventoDoCadastro): string`, `descreverEstadoDoCadastro(estado: EstadoDoCadastro): string`, `itensDoFiltro(eventos: EventoDoCadastro[]): ItemDoFiltro[]`, `eventosDoItem(eventos: EventoDoCadastro[], itemId: string | null): EventoDoCadastro[]` (`null` = todos).
 
-- [ ] **Passo 1: testes que falham** (`historicoDosCadastros.test.ts`):
+- [x] **Passo 1: testes que falham** (`historicoDosCadastros.test.ts`):
   - `textoDaAcaoDoCadastro`: as 5 ações de setor/macroprocesso ("Criou", "Editou", "Desativou", "Reativou", "Excluiu"); as 3 do vínculo com os textos do ticket; ação desconhecida devolve o código.
   - `nomeDoItem`: setor `CEE — Escola Fictícia`; excluído usa o `antes`; macroprocesso com e sem código; vínculo `CEE em Planejamento Fictício`.
   - `descreverEstadoDoCadastro`: `null` → `—`; setor `Sigla: CEE; Nome: …; Observações: —; Situação: Ativo`; categoria `apoio` → `Categoria: Apoio`; exclusão de setor com `macroprocessos` de 2 itens e de 0 (`Macroprocessos: nenhum`); exclusão de macroprocesso com `setores`; vínculo `Setor: CEE; Macroprocesso: …; Observação: …`.
   - `itensDoFiltro`: nome pelo evento mais recente (setor renomeado aparece uma vez, com o nome novo); setor excluído continua na lista; setor só citado em evento de vínculo entra pela sigla; ordem por nome.
   - `eventosDoItem`: `null` devolve todos; id de setor devolve os eventos do setor e os vínculos dele; id de macroprocesso idem; id sem eventos devolve `[]`.
-- [ ] **Passo 2: ver falharem.** `npx vitest run src/cadastros/historicoDosCadastros.test.ts`.
-- [ ] **Passo 3: implementar** (funções de até 20 linhas; tabelas de rótulos como constantes, no estilo de `src/acesso/historico.ts`; reaproveitar `rotuloDaCategoria`).
-- [ ] **Passo 4: verificar** (`npx vitest run src/cadastros`, `npx tsc -b`, `npm run lint`). Commit.
+- [x] **Passo 2: ver falharem.** `npx vitest run src/cadastros/historicoDosCadastros.test.ts`.
+- [x] **Passo 3: implementar** (funções de até 20 linhas; tabelas de rótulos como constantes, no estilo de `src/acesso/historico.ts`; reaproveitar `rotuloDaCategoria`).
+- [x] **Passo 4: verificar** (`npx vitest run src/cadastros`, `npx tsc -b`, `npm run lint`). Commit.
 
 ---
 
@@ -109,10 +109,10 @@ e, em `historicoDosCadastros.ts`: `textoDaAcaoDoCadastro(acao: string, entidade:
 
 **Consome:** `EventoDoCadastro` (Tarefa 2). **Produz:** `ModuloDeCadastros.listarHistoricoDosCadastros(): Promise<EventoDoCadastro[]>` (mais recente primeiro; atualizar o comentário do módulo: o histórico chegou); `criarHistoricoSupabase(cliente)` devolvendo `{ listarHistoricoDosCadastros }`; no falso: `historico: EventoDoCadastro[] = []`, `falharHistorico = false`, `segurarHistorico = false`.
 
-- [ ] **Passo 1: testes que falham** (`historicoSupabase.test.ts`, molde de `macroprocessosSupabase.test.ts`): pede a `eventos` as colunas `'id, ocorrido_em, acao, entidade, entidade_ref, detalhes, autor:usuarios(nome)'`, filtro `entidade in ('setor','macroprocesso','setor_envolvido')`, ordem `ocorrido_em` e `id` decrescentes; converte cada linha em `EventoDoCadastro` (autor nulo vira `null`; `detalhes.antes/depois` viram `antes/depois`); falha vira `Error('Falha ao ler o histórico dos cadastros: <motivo>')`. Se o `ClienteSupabaseFalso` não registrar `in`, ajustar primeiro (guardar em `pedidos[n].dentro`) e conferir os testes existentes.
-- [ ] **Passo 2: ver falhar.** `npx vitest run src/cadastros/historicoSupabase.test.ts`.
-- [ ] **Passo 3: implementar** `historicoSupabase.ts` (uma função de leitura e uma de conversão, ≤ 20 linhas cada); juntar em `criarCadastrosSupabase`; no `CadastrosFalso`, `listarHistoricoDosCadastros` devolve cópia de `historico`, lança `Error('falha de conexão simulada')` com `falharHistorico` e nunca resolve com `segurarHistorico` (mesmo padrão de `listarSetores`).
-- [ ] **Passo 4: verificar** (`npm test`, `npx tsc -b`, `npm run lint`). Commit.
+- [x] **Passo 1: testes que falham** (`historicoSupabase.test.ts`, molde de `macroprocessosSupabase.test.ts`): pede a `eventos` as colunas `'id, ocorrido_em, acao, entidade, entidade_ref, detalhes, autor:usuarios(nome)'`, filtro `entidade in ('setor','macroprocesso','setor_envolvido')`, ordem `ocorrido_em` e `id` decrescentes; converte cada linha em `EventoDoCadastro` (autor nulo vira `null`; `detalhes.antes/depois` viram `antes/depois`); falha vira `Error('Falha ao ler o histórico dos cadastros: <motivo>')`. Se o `ClienteSupabaseFalso` não registrar `in`, ajustar primeiro (guardar em `pedidos[n].dentro`) e conferir os testes existentes.
+- [x] **Passo 2: ver falhar.** `npx vitest run src/cadastros/historicoSupabase.test.ts`.
+- [x] **Passo 3: implementar** `historicoSupabase.ts` (uma função de leitura e uma de conversão, ≤ 20 linhas cada); juntar em `criarCadastrosSupabase`; no `CadastrosFalso`, `listarHistoricoDosCadastros` devolve cópia de `historico`, lança `Error('falha de conexão simulada')` com `falharHistorico` e nunca resolve com `segurarHistorico` (mesmo padrão de `listarSetores`).
+- [x] **Passo 4: verificar** (`npm test`, `npx tsc -b`, `npm run lint`). Commit.
 
 ---
 
@@ -122,7 +122,7 @@ e, em `historicoDosCadastros.ts`: `textoDaAcaoDoCadastro(acao: string, entidade:
 
 **Consome:** `ModuloDeCadastros.listarHistoricoDosCadastros`, as 5 funções da Tarefa 2, `useCarregamento`, `formatarMomento` e `AUTOR_DIRETO_NO_BANCO` (`src/acesso/historico`), `ErroAoCarregar` (ver como `AreaDeSetores` o usa; se o texto de erro dele não servir para "histórico", reaproveitar a mensagem de `HistoricoDeUsuarios`: "Não foi possível carregar o histórico. Verifique a conexão e tente de novo."). **Produz:** `AreaDeHistorico({ cadastros })`.
 
-- [ ] **Passo 1: testes que falham** (`App.historicoDosCadastros.test.tsx`, aplicativo inteiro, `CadastrosFalso.historico` com eventos inventados, hash `#/setores/historico`, login falso como nos outros `App.*.test.tsx`):
+- [x] **Passo 1: testes que falham** (`App.historicoDosCadastros.test.tsx`, aplicativo inteiro, `CadastrosFalso.historico` com eventos inventados, hash `#/setores/historico`, login falso como nos outros `App.*.test.tsx`):
   - lista: um item por evento, na ordem recebida, com data e hora, autor, texto da ação, nome do item e "Antes: …" / "Depois: …";
   - autor nulo mostra `AUTOR_DIRETO_NO_BANCO`;
   - exclusão de setor mostra no "Antes" todos os campos e `Macroprocessos: …` com a observação; exclusão de macroprocesso mostra `Setores: …`;
@@ -130,16 +130,16 @@ e, em `historicoDosCadastros.ts`: `textoDaAcaoDoCadastro(acao: string, entidade:
   - filtro "Item": opções "Todos os itens" e os itens do histórico (inclusive um setor excluído); escolher um setor mostra só os eventos dele e os vínculos dele; escolher o excluído mostra o que aconteceu com ele; voltar a "Todos os itens" mostra tudo;
   - estados: "Carregando histórico…" (com `segurarHistorico`); "Nenhuma alteração registrada ainda." (lista vazia); erro com [Tentar de novo] que, após consertar o falso, mostra a lista;
   - Consulta e Integrante abrem a aba e leem; a aba não tem nenhum botão de alteração; a aba "Histórico" é a corrente (`aria-current="page"`).
-- [ ] **Passo 2: ver falharem.** `npx vitest run src/App.historicoDosCadastros.test.tsx`.
-- [ ] **Passo 3: implementar.** `AreaDeHistorico` carrega com `useCarregamento` (callback estável por `useCallback`), guarda o item escolhido em `useState<string | null>` e entrega à `ListaDoHistorico` os eventos filtrados e os itens; `<label>Item <select>` com "Todos os itens"; lista `<ol className="historico-lista">` com as classes `historico-item` e `historico-mudanca` do histórico de usuários; `SecaoAtual` em `AreaDeCadastros.tsx` passa a devolver a área na aba `historico` (some a frase "Esta seção chega numa próxima entrega."; procurar testes que dependam dela e ajustá-los); CSS do filtro em `Cadastros.css`, usando as variáveis de cor/espaço já existentes. Se um componente passar de 300 linhas ou 10 caminhos, extrair.
-- [ ] **Passo 4: verificar** (`npm test`, `npx tsc -b`, `npm run lint`). Commit.
+- [x] **Passo 2: ver falharem.** `npx vitest run src/App.historicoDosCadastros.test.tsx`.
+- [x] **Passo 3: implementar.** `AreaDeHistorico` carrega com `useCarregamento` (callback estável por `useCallback`), guarda o item escolhido em `useState<string | null>` e entrega à `ListaDoHistorico` os eventos filtrados e os itens; `<label>Item <select>` com "Todos os itens"; lista `<ol className="historico-lista">` com as classes `historico-item` e `historico-mudanca` do histórico de usuários; `SecaoAtual` em `AreaDeCadastros.tsx` passa a devolver a área na aba `historico` (some a frase "Esta seção chega numa próxima entrega."; procurar testes que dependam dela e ajustá-los); CSS do filtro em `Cadastros.css`, usando as variáveis de cor/espaço já existentes. Se um componente passar de 300 linhas ou 10 caminhos, extrair.
+- [x] **Passo 4: verificar** (`npm test`, `npx tsc -b`, `npm run lint`). Commit.
 
 ---
 
 ### Tarefa 5: Fechamento (critérios 1 a 7 conferidos)
 
-- [ ] **Passo 1: gate completo.** `npm test`, `npx tsc -b`, `npm run lint`, `npm run check:circular`, `npm run test:coverage` com cobertura ≥ 70%.
-- [ ] **Passo 2: conferir os 7 critérios do ticket** um a um, com a evidência (teste ou arquivo) de cada, e marcar as caixas do ticket.
-- [ ] **Passo 3: revisão visual.** Subir o Vite (`preview_start`) e abrir `#/setores/historico`; se o login institucional do Google barrar a sessão, registrar que a conferência visual ficou com o usuário, como nos tickets anteriores.
-- [ ] **Passo 4: registros.** Spec: nota curta na seção de histórico dizendo que o filtro reconhece eventos de vínculo pelos dois ids. `.scratch/melhorias-protocolo.md`: itens de `.claude/regras/nao-testados.md` que aconteceram nesta execução e o resultado dos dois workflows.
+- [x] **Passo 1: gate completo.** `npm test`, `npx tsc -b`, `npm run lint`, `npm run check:circular`, `npm run test:coverage` com cobertura ≥ 70%.
+- [x] **Passo 2: conferir os 7 critérios do ticket** um a um, com a evidência (teste ou arquivo) de cada, e marcar as caixas do ticket.
+- [x] **Passo 3: revisão visual.** Subir o Vite (`preview_start`) e abrir `#/setores/historico`; se o login institucional do Google barrar a sessão, registrar que a conferência visual ficou com o usuário, como nos tickets anteriores. **Feito assim:** não há `.claude/launch.json` (e o `.claude/` não se edita neste projeto) e o login do Google barra a sessão no navegador do app; a conferência da aba Histórico ficou com o usuário.
+- [x] **Passo 4: registros.** Spec: nota curta na seção de histórico dizendo que o filtro reconhece eventos de vínculo pelos dois ids. `.scratch/melhorias-protocolo.md`: itens de `.claude/regras/nao-testados.md` que aconteceram nesta execução e o resultado dos dois workflows.
 - [ ] **Passo 5: encerrar.** `git switch main`, merge da branch, `git branch -d cadastros-basicos-05`, linha `Concluído em` no ticket, commit, `git push` da `main` (autorizado) e conferência de "Testes de banco" e "Verificação" na `main`.
