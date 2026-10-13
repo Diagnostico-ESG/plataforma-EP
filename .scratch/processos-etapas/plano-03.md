@@ -677,7 +677,7 @@ Se `tsc` reclamar do tipo de retorno de `update(...).select('id')` em `conferir`
 
 Run: o mesmo comando → PASS; `npx vitest run src/processos` → PASS.
 
-- [ ] **Step 4: falso.** Em `src/processos/ProcessosFalso.ts`: importar `DadosDoResponsavel` e `ResponsavelDoSetor`; acrescentar, depois de `chamadas`:
+- [x] **Step 4: falso.** Em `src/processos/ProcessosFalso.ts`: importar `DadosDoResponsavel` e `ResponsavelDoSetor`; acrescentar, depois de `chamadas`:
 
 ```ts
   /** Os responsáveis de cada setor (pelo id do setor). Leitura e gravação seguem as falhas acima. */
@@ -991,7 +991,7 @@ export function FormularioDeResponsavel({ titulo, inicial, aoSalvar, aoCancelar 
 }
 ```
 
-- [ ] **Step 4: tabela.** `src/components/processos/TabelaDeResponsaveis.tsx`:
+- [x] **Step 4: tabela.** `src/components/processos/TabelaDeResponsaveis.tsx`:
 
 ```tsx
 import type { ResponsavelDoSetor } from '../../processos/tipos'
@@ -1038,7 +1038,7 @@ function BotoesDoResponsavel({ responsavel, acoes }: { responsavel: ResponsavelD
 }
 ```
 
-- [ ] **Step 5: edição.** `src/components/processos/ResponsaveisEditaveis.tsx`:
+- [x] **Step 5: edição.** `src/components/processos/ResponsaveisEditaveis.tsx`:
 
 ```tsx
 import { useState } from 'react'
@@ -1100,7 +1100,7 @@ export function ResponsaveisEditaveis({ processos, setorId, responsaveis, aoMuda
 }
 ```
 
-- [ ] **Step 6: seção e montagem.** `src/components/processos/ResponsaveisDoSetor.tsx`:
+- [x] **Step 6: seção e montagem.** `src/components/processos/ResponsaveisDoSetor.tsx`:
 
 ```tsx
 import { useCallback } from 'react'
@@ -1152,9 +1152,9 @@ Em `src/components/processos/Etapas.css`, trocar o seletor `.etapas-do-setor {` 
 }
 ```
 
-- [ ] **Step 7: ver passar.** `npx vitest run src/App.responsaveisDoSetor.test.tsx` → PASS; `npm test`, `npx tsc -b`, `npx eslint .` e `npx madge --circular --extensions ts,tsx src` limpos. Se um teste de tela antigo passar a achar dois `alert`/`status` (as duas seções), restringi-lo à região dele com `within`.
+- [x] **Step 7: ver passar.** `npx vitest run src/App.responsaveisDoSetor.test.tsx` → PASS; `npm test`, `npx tsc -b`, `npx eslint .` e `npx madge --circular --extensions ts,tsx src` limpos. Se um teste de tela antigo passar a achar dois `alert`/`status` (as duas seções), restringi-lo à região dele com `within`.
 
-- [ ] **Step 8: commit** "Ticket 03 de processos-etapas: responsáveis do setor na tela do setor".
+- [x] **Step 8: commit** "Ticket 03 de processos-etapas: responsáveis do setor na tela do setor".
 
 ---
 
@@ -1239,4 +1239,4 @@ Run: o mesmo comando → PASS; `npm test`, `npx tsc -b`, `npx eslint .` limpos.
 - [ ] **Step 1: conferência final.** `npm test` (todos verdes), `npx tsc -b`, `npx eslint .`, `npx madge --circular --extensions ts,tsx src` limpos; "Testes de banco" verde na branch depois do último `git push`.
 - [ ] **Step 2: conferência visual (critério 5).** Subir `npm run dev` em segundo plano e abrir pelo navegador do app; com login, olhar a tela de um setor: seção acima das etapas, tabela, formulário aberto, janela de exclusão e erro do e-mail. Se não houver login no navegador da sessão, pedir ao usuário que confira (como no ticket 02).
 - [ ] **Step 3: integrar.** `git switch main`; `git merge --no-ff processos-etapas -m "Integra o ticket 03 de processos-etapas"`; `npm test`; `git branch -d processos-etapas`; `git push`. Conferir o "Testes de banco" disparado na `main` (o envio mexe em `supabase/`).
-- [ ] **Step 4: marcas.** Seguir o fim do `/executar-complexo`: linha `Concluído em` no ticket, commit, apontar o próximo ticket (04, Cadastro de processos e quadro), notas do protocolo, avisar o usuário dos textos novos fora da spec ("O nome do responsável é obrigatório." e a janela sem texto de apoio) e o `/cost`.
+- [x] **Step 4: marcas.** Seguir o fim do `/executar-complexo`: linha `Concluído em` no ticket, commit, apontar o próximo ticket (04, Cadastro de processos e quadro), notas do protocolo, avisar o usuário dos textos novos fora da spec ("O nome do responsável é obrigatório." e a janela sem texto de apoio) e o `/cost`.

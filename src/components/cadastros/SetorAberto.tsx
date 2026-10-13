@@ -3,6 +3,7 @@ import type { ModuloDeCadastros } from '../../cadastros/tipos'
 import { useCarregamento } from '../../hooks/useCarregamento'
 import type { ModuloDeProcessos } from '../../processos/tipos'
 import { EtapasDoSetor } from '../processos/EtapasDoSetor'
+import { ResponsaveisDoSetor } from '../processos/ResponsaveisDoSetor'
 import { ErroAoCarregar } from './ErroAoCarregar'
 import { SetorEditavel } from './SetorEditavel'
 import { ItemInexistente } from './ItemInexistente'
@@ -24,14 +25,19 @@ export function SetorAberto({ cadastros, processos, podeAlterar, id, aoVoltar }:
   if (estado.tipo === 'erro') return <ErroAoCarregar alvo="o setor" aoTentarDeNovo={tentarDeNovo} />
   if (estado.tipo === 'carregando') return <p className="cadastros-vazio" role="status">Carregando setor…</p>
   if (sumiu || estado.valor === null) return <ItemInexistente aoVoltar={aoVoltar} />
-  // As etapas do setor ficam abaixo do que o setor já mostrava, para os dois modos.
-  const etapas = <EtapasDoSetor processos={processos} setorId={id} podeAlterar={podeAlterar} aoSumir={() => setSumiu(true)} />
-  if (!podeAlterar) return <><SetorSomenteLeitura setor={estado.valor} aoVoltar={aoVoltar} />{etapas}</>
+  // Responsáveis e etapas do setor ficam abaixo do que o setor já mostrava, para os dois modos.
+  const secoes = (
+    <>
+      <ResponsaveisDoSetor processos={processos} setorId={id} podeAlterar={podeAlterar} />
+      <EtapasDoSetor processos={processos} setorId={id} podeAlterar={podeAlterar} aoSumir={() => setSumiu(true)} />
+    </>
+  )
+  if (!podeAlterar) return <><SetorSomenteLeitura setor={estado.valor} aoVoltar={aoVoltar} />{secoes}</>
   return (
     <>
       <SetorEditavel cadastros={cadastros} setor={estado.valor} aoVoltar={aoVoltar}
         aoSumir={() => setSumiu(true)} aoMudar={recarregar} />
-      {etapas}
+      {secoes}
     </>
   )
 }
