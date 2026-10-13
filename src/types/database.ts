@@ -169,6 +169,42 @@ export type Database = {
         }
         Relationships: []
       }
+      setores_envolvidos: {
+        Row: {
+          criado_em: string
+          macroprocesso_id: string
+          observacao: string | null
+          setor_id: string
+        }
+        Insert: {
+          criado_em?: string
+          macroprocesso_id: string
+          observacao?: string | null
+          setor_id: string
+        }
+        Update: {
+          criado_em?: string
+          macroprocesso_id?: string
+          observacao?: string | null
+          setor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "setores_envolvidos_macroprocesso_id_fkey"
+            columns: ["macroprocesso_id"]
+            isOneToOne: false
+            referencedRelation: "macroprocessos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "setores_envolvidos_setor_id_fkey"
+            columns: ["setor_id"]
+            isOneToOne: false
+            referencedRelation: "setores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       usuarios: {
         Row: {
           ativo: boolean

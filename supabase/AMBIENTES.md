@@ -24,3 +24,4 @@ Migrações aplicadas à mão no dev pelo SQL Editor (fora do histórico da CLI;
 - 20261010012539_sem_privilegios_padrao (2026-10-09; bug das permissões padrão; teste 10 falhou antes, 15 permissões sobrando, e passou depois, pelo GitHub Actions)
 - 20261013123327_setores (2026-10-13; cadastros-basicos, ticket 01; testes 11, 00 e 10 pelo GitHub Actions)
 - 20261013133248_macroprocessos (2026-10-13; cadastros-basicos, ticket 03; teste 12 falhou antes, tabela inexistente, e passou depois, 48 de 48, com os 13 arquivos verdes, pelo GitHub Actions)
+- 20261013150735_setores_envolvidos (2026-10-13; cadastros-basicos, ticket 04; aplicada pelo workflow "Migrar banco de desenvolvimento", o primeiro uso dele; teste 13 falhou antes, tabela inexistente, e passou depois, 56 de 56, com os 14 arquivos verdes, pelo GitHub Actions)
