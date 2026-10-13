@@ -69,8 +69,8 @@
 
 **Interfaces:** Produz `public.setores_envolvidos (macroprocesso_id, setor_id, observacao, criado_em)` com `setores_envolvidos_pkey (macroprocesso_id, setor_id)`; eventos `entidade = 'setor_envolvido'` (`criar`/`editar`/`excluir`); `antes` do `excluir` de setor com `macroprocessos` e de macroprocesso com `setores`. Consome `private.pode_alterar_cadastros()`, `private.usuario_ativo()` e `private.acao_do_cadastro(text, jsonb, jsonb)`.
 
-- [ ] **Passo 1: conferir a pasta limpa** (`git status` sem mudanças) e criar a branch `git switch -c cadastros-basicos` e o marco `git tag marco/2026-10-13-inicio-ticket-04-setores-envolvidos`.
-- [ ] **Passo 2: teste do nome da migração (vermelho).** `scripts/caminhoDaMigracao.test.mjs`, no molde de `scripts/relatorio-tap.test.mjs` (Vitest já pega `*.test.mjs`):
+- [x] **Passo 1: conferir a pasta limpa** (`git status` sem mudanças) e criar a branch `git switch -c cadastros-basicos` e o marco `git tag marco/2026-10-13-inicio-ticket-04-setores-envolvidos`.
+- [x] **Passo 2: teste do nome da migração (vermelho).** `scripts/caminhoDaMigracao.test.mjs`, no molde de `scripts/relatorio-tap.test.mjs` (Vitest já pega `*.test.mjs`):
 
 ```js
 import { expect, test } from 'vitest'
@@ -89,7 +89,7 @@ test.each(['../.env', 'supabase/migrations/20261013140000_a.sql', '2026101314000
 ```
 
   Rodar `npx vitest run scripts/caminhoDaMigracao.test.mjs`; esperado: falha (módulo não existe).
-- [ ] **Passo 3: implementar o nome e o script.**
+- [x] **Passo 3: implementar o nome e o script.**
 
 `scripts/caminhoDaMigracao.mjs`:
 
@@ -161,7 +161,7 @@ aplicar(lerConfiguracao()).catch((erro) => {
 ```
 
   Rodar de novo `npx vitest run scripts/caminhoDaMigracao.test.mjs` (verde).
-- [ ] **Passo 4: workflow.** `.github/workflows/migrar-dev.yml`:
+- [x] **Passo 4: workflow.** `.github/workflows/migrar-dev.yml`:
 
 ```yaml
 # Aplica no banco de DESENVOLVIMENTO a migração indicada. Só roda por "Run workflow" (nunca em push).
@@ -200,8 +200,8 @@ jobs:
           MIGRACAO: ${{ inputs.migracao }}
 ```
 
-- [ ] **Passo 5: levar workflow e script à `main`.** `npm test`, `npx tsc -b` e `npm run lint` verdes; commit "Workflow para migrar o banco de desenvolvimento"; `git switch main`, `git merge --ff-only cadastros-basicos`, `git push origin main` (autorizado), `git switch cadastros-basicos`. Conferir no navegador (painel do app) que "Migrar banco de desenvolvimento" aparece em Actions. O push não toca `supabase/`, então não dispara "Testes de banco"; conferir só que "Verificação" fica verde.
-- [ ] **Passo 6: escrever o teste pgTAP `13_setores_envolvidos.test.sql`**, copiando a estrutura de `12_macroprocessos.test.sql` (mesmos quatro usuários `a1` a `a4`, `_tap`, funções `pg_temp.conferir_quem_altera` e `conferir_quem_nao_altera`, visitante, `plan(N)` com N contado, saída `RESULTADO DOS TESTES`). Fixtures inventadas: setores `TSA`/`TSB`/`TSC` e macroprocessos `Macro de Teste Um`/`Dois`, mais um vínculo fixo (`TSA` em `Macro de Teste Um`, observação "Papel fictício"). Casos, um por célula da tabela "quem pode o quê":
+- [x] **Passo 5: levar workflow e script à `main`.** `npm test`, `npx tsc -b` e `npm run lint` verdes; commit "Workflow para migrar o banco de desenvolvimento"; `git switch main`, `git merge --ff-only cadastros-basicos`, `git push origin main` (autorizado), `git switch cadastros-basicos`. Conferir no navegador (painel do app) que "Migrar banco de desenvolvimento" aparece em Actions. O push não toca `supabase/`, então não dispara "Testes de banco"; conferir só que "Verificação" fica verde.
+- [x] **Passo 6: escrever o teste pgTAP `13_setores_envolvidos.test.sql`**, copiando a estrutura de `12_macroprocessos.test.sql` (mesmos quatro usuários `a1` a `a4`, `_tap`, funções `pg_temp.conferir_quem_altera` e `conferir_quem_nao_altera`, visitante, `plan(N)` com N contado, saída `RESULTADO DOS TESTES`). Fixtures inventadas: setores `TSA`/`TSB`/`TSC` e macroprocessos `Macro de Teste Um`/`Dois`, mais um vínculo fixo (`TSA` em `Macro de Teste Um`, observação "Papel fictício"). Casos, um por célula da tabela "quem pode o quê":
   - Administrador e Integrante: leem; criam (`TSB` no macro Um); alteram a `observacao` (1 linha); recusam alterar `macroprocesso_id`, `setor_id` e `criado_em` (`42501`); apagam.
   - Consulta e Inativo (administrador desativado): Consulta lê, Inativo não; nenhum cria (`42501`), altera a observação (0 linhas), altera as colunas fixas (`42501`) ou apaga (0 linhas).
   - Visitante: `42501` em ler, criar, alterar a observação, alterar as colunas fixas e apagar.
@@ -211,9 +211,9 @@ jobs:
   - Exclusão de setor com dois vínculos (`TSC`): gera dois eventos `excluir` de `setor_envolvido` com a sigla `TSC` e o nome do macroprocesso legíveis, e o evento `excluir` do setor com `antes = {sigla, nome, observacoes, ativo, macroprocessos: [{macroprocesso_id, codigo, nome, observacao}, …]}` (lista na ordem código, sem código depois, nome).
   - Exclusão de macroprocesso com dois vínculos: o mesmo, com a chave `setores: [{setor_id, sigla, nome, observacao}, …]` (ordem da sigla) e dois eventos de tirar com a sigla e o nome legíveis.
   - Exclusão de setor sem vínculo: `antes.macroprocessos = []`; de macroprocesso sem vínculo: `antes.setores = []`.
-- [ ] **Passo 7: atualizar os testes 11 e 12.** Em `11_setores.test.sql`, o jsonb esperado do `excluir` ganha `"macroprocessos": []` dentro de `antes`; em `12_macroprocessos.test.sql`, ganha `"setores": []`. Os `plan(N)` não mudam.
-- [ ] **Passo 8: ver os testes falharem.** `git push -u origin cadastros-basicos`; disparar "Testes de banco" na branch, pelo navegador. Esperado: `13` vermelho (tabela não existe) e `11` e `12` vermelhos (jsonb sem a lista); os demais verdes. Registrar o resultado.
-- [ ] **Passo 9: escrever a migração.** `npx supabase migration new setores_envolvidos` e preencher com:
+- [x] **Passo 7: atualizar os testes 11 e 12.** Em `11_setores.test.sql`, o jsonb esperado do `excluir` ganha `"macroprocessos": []` dentro de `antes`; em `12_macroprocessos.test.sql`, ganha `"setores": []`. Os `plan(N)` não mudam.
+- [x] **Passo 8: ver os testes falharem.** `git push -u origin cadastros-basicos`; disparar "Testes de banco" na branch, pelo navegador. Esperado: `13` vermelho (tabela não existe) e `11` e `12` vermelhos (jsonb sem a lista); os demais verdes. Registrar o resultado.
+- [x] **Passo 9: escrever a migração.** `npx supabase migration new setores_envolvidos` e preencher com:
 
 ```sql
 -- Cadastros básicos, ticket 04: setores envolvidos em cada macroprocesso, com RLS por perfil e eventos no histórico.
@@ -354,10 +354,10 @@ create trigger registrar_exclusao_do_macroprocesso before delete on public.macro
 ```
 
   Conferir contra o teste: se o teste 13 achar um detalhe diferente (ex.: ordem do jsonb), ajustar a **migração** ou o **teste**, nunca os dois ao mesmo tempo sem entender a causa.
-- [ ] **Passo 10: aplicar pelo workflow.** `git push`; disparar "Migrar banco de desenvolvimento" na branch com `migracao` = nome do arquivo criado no passo 9 (autorizado); ler o log (esperado: "Migração … aplicada."; se aparecer o aviso de já aplicada, ou se a inserção na tabela de registro falhar, anotar em `.scratch/melhorias-protocolo.md` e seguir pelo SQL Editor, pedindo ao usuário que cole o arquivo).
-- [ ] **Passo 11: ver os testes passarem.** Disparar "Testes de banco" na branch. Esperado: verde nos 14 arquivos (`00` e `10` cobrem a tabela nova sem mudança; `11` e `12` com a lista nova).
-- [ ] **Passo 12: tipos.** Conferir o vínculo (`AMBIENTES.md` e `supabase/.temp/project-ref`), `npm run db:types`, `npx tsc -b` limpo (a tabela e as relações para `setores_envolvidos(...)` aparecem em `src/types/database.ts`).
-- [ ] **Passo 13: registro e commit.** Acrescentar a `supabase/AMBIENTES.md`, na lista de migrações do dev, a linha `<versão>_setores_envolvidos (2026-10-13; cadastros-basicos, ticket 04; aplicada pelo workflow "Migrar banco de desenvolvimento"; teste 13 falhou antes, tabela inexistente, e passou depois, com os 14 arquivos verdes, pelo GitHub Actions)`. Commit de migração, testes 11/12/13, tipos e `AMBIENTES.md`.
+- [x] **Passo 10: aplicar pelo workflow.** `git push`; disparar "Migrar banco de desenvolvimento" na branch com `migracao` = nome do arquivo criado no passo 9 (autorizado); ler o log (esperado: "Migração … aplicada."; se aparecer o aviso de já aplicada, ou se a inserção na tabela de registro falhar, anotar em `.scratch/melhorias-protocolo.md` e seguir pelo SQL Editor, pedindo ao usuário que cole o arquivo).
+- [x] **Passo 11: ver os testes passarem.** Disparar "Testes de banco" na branch. Esperado: verde nos 14 arquivos (`00` e `10` cobrem a tabela nova sem mudança; `11` e `12` com a lista nova).
+- [x] **Passo 12: tipos.** Conferir o vínculo (`AMBIENTES.md` e `supabase/.temp/project-ref`), `npm run db:types`, `npx tsc -b` limpo (a tabela e as relações para `setores_envolvidos(...)` aparecem em `src/types/database.ts`).
+- [x] **Passo 13: registro e commit.** Acrescentar a `supabase/AMBIENTES.md`, na lista de migrações do dev, a linha `<versão>_setores_envolvidos (2026-10-13; cadastros-basicos, ticket 04; aplicada pelo workflow "Migrar banco de desenvolvimento"; teste 13 falhou antes, tabela inexistente, e passou depois, com os 14 arquivos verdes, pelo GitHub Actions)`. Commit de migração, testes 11/12/13, tipos e `AMBIENTES.md`.
 
 ---
 
@@ -378,21 +378,21 @@ export type MacroprocessoComSetores = Macroprocesso & { setoresEnvolvidos: Setor
 
 e em `ModuloDeCadastros`: `listarSetores(): Promise<SetorDaLista[]>`, `lerSetor(id): Promise<SetorComMacroprocessos | null>`, `listarMacroprocessos(): Promise<MacroprocessoDaLista[]>`, `lerMacroprocesso(id): Promise<MacroprocessoComSetores | null>`, `porSetorNoMacroprocesso(macroprocessoId: string, setorId: string): Promise<void>`, `tirarSetorDoMacroprocesso(macroprocessoId: string, setorId: string): Promise<void>`, `mudarObservacaoDoSetorEnvolvido(macroprocessoId: string, setorId: string, observacao: string | null): Promise<void>`. `ordemDosMacroprocessos.ts` produz `compararMacroprocessos(a: { codigo: string | null; nome: string }, b: { codigo: string | null; nome: string }): number` (código, sem código depois, nome em `pt-BR`; é a `naOrdemDoBanco` que hoje vive em `CadastrosFalso.ts`). `textosDeExclusao.ts` produz `textoDaExclusaoDoSetor(sigla: string, macroprocessos: number): string` e `textoDaExclusaoDoMacroprocesso(setores: number): string`.
 
-- [ ] **Passo 1: testes que falham.**
+- [x] **Passo 1: testes que falham.**
   - `textosDeExclusao.test.ts`: setor com 3 → "CEE sai de 3 macroprocessos. O histórico guarda o que ele tinha, mas não é possível desfazer."; com 1 → "…sai de 1 macroprocesso. …"; com 0 → "O histórico guarda o que ele tinha, mas não é possível desfazer."; macroprocesso com 2 → "2 setores deixam de estar envolvidos nele. O histórico guarda…"; com 1 → "1 setor deixa de estar envolvido nele. …"; com 0 → só "O histórico guarda…".
   - `cadastrosSupabase.test.ts` (ajustar os existentes): `listarSetores` pede `'id, sigla, nome, observacoes, ativo, setores_envolvidos(count)'` e devolve cada setor com `quantidadeDeMacroprocessos` (resposta `setores_envolvidos: [{ count: 2 }]`; lista vazia vira 0); `lerSetor` pede `'id, sigla, nome, observacoes, ativo, setores_envolvidos(observacao, macroprocessos(id, codigo, nome))'` e devolve `macroprocessos` achatados e ordenados por `compararMacroprocessos`.
   - `macroprocessosSupabase.test.ts` (ajustar): `listarMacroprocessos` pede `'id, codigo, nome, descricao, categoria, ativo, setores_envolvidos(count)'` com a mesma ordem de antes e devolve `quantidadeDeSetores`; `lerMacroprocesso` pede `'id, codigo, nome, descricao, categoria, ativo, setores_envolvidos(observacao, setores(id, sigla, nome, ativo))'` e devolve `setoresEnvolvidos` ordenados por sigla.
   - `setoresEnvolvidosSupabase.test.ts` (novo, molde de `macroprocessosSupabase.test.ts`): pôr faz `insert` em `setores_envolvidos` com `{ macroprocesso_id, setor_id }`; `23505` com `setores_envolvidos_pkey` busca a sigla em `setores` (`eq id`) e vira `TravaDoBanco("O setor SIGLA já está neste macroprocesso.")`; `23503` vira `CadastroInexistente`; `42501` vira `TravaDoBanco("Seu perfil não permite alterar os cadastros.")`; outro erro vira `Error("erro inesperado do banco (…)")`; tirar faz `delete` com dois filtros (`macroprocesso_id` e `setor_id`); tirar com zero linhas e vínculo sem leitura resolve em silêncio; tirar com zero linhas e vínculo ainda legível vira `TravaDoBanco` de perfil; anotar faz `update` de `{ observacao }` com os dois filtros e segue as mesmas regras de zero linhas.
   - `ClienteSupabaseFalso`: guardar todos os filtros `eq` em `filtros: [string, string][]` (mantendo `filtro` como o último, para os testes atuais).
-- [ ] **Passo 2: ver falharem.** `npx vitest run src/cadastros`.
-- [ ] **Passo 3: implementar.**
+- [x] **Passo 2: ver falharem.** `npx vitest run src/cadastros`.
+- [x] **Passo 3: implementar.**
   - `tipos.ts` com os tipos e as 7 assinaturas acima (atualizar o comentário do módulo: setores envolvidos já chegam; só o histórico falta).
   - `ordemDosMacroprocessos.ts` (mover a regra, sem mudar comportamento) e `CadastrosFalso` passa a importá-la.
   - `textosDeExclusao.ts`: duas funções curtas com `const FRASE_FINAL = 'O histórico guarda o que ele tinha, mas não é possível desfazer.'`.
   - `cadastrosSupabase.ts`/`macroprocessosSupabase.ts`: novas colunas e funções de tradução (`comContagem`, `achatarMacroprocessos`, `achatarSetores`) de até 20 linhas cada; o `count` embutido chega como `[{ count: n }]` (ausente = 0).
   - `setoresEnvolvidosSupabase.ts` com `criarSetoresEnvolvidosSupabase(cliente)` devolvendo `porSetorNoMacroprocesso`, `tirarSetorDoMacroprocesso` e `mudarObservacaoDoSetorEnvolvido`, no molde das outras (`inserir`, `apagar`, `anotar`, `falhaDoVinculo(erro, cliente)`, `porQueNadaMudouNoVinculo`); `criarCadastrosSupabase` junta os três grupos.
   - `CadastrosFalso`: campo `vinculos: { macroprocessoId: string; setorId: string; observacao: string | null }[] = []`; `listarSetores`/`listarMacroprocessos` contam a partir dele; `lerSetor`/`lerMacroprocesso` montam as listas (ordem do banco); `porSetorNoMacroprocesso` recusa o repetido com `TravaDoBanco("O setor {SIGLA} já está neste macroprocesso.")` e, se o setor ou o macroprocesso não existe, lança `CadastroInexistente`; `tirar…` e `mudarObservacao…` ignoram vínculo inexistente; `excluirSetor` e `excluirMacroprocesso` removem os vínculos do item; todas as gravações passam por `falharSeConfigurado()`.
-- [ ] **Passo 4: verificar.** `npx vitest run src/cadastros` verde; `npm test` (as telas atuais podem falhar só nos cabeçalhos e nos textos que a Tarefa 3 muda — qualquer outra falha é regressão: corrigir agora), `npx tsc -b`, `npm run lint`. Commit.
+- [x] **Passo 4: verificar.** `npx vitest run src/cadastros` verde; `npm test` (as telas atuais podem falhar só nos cabeçalhos e nos textos que a Tarefa 3 muda — qualquer outra falha é regressão: corrigir agora), `npx tsc -b`, `npm run lint`. Commit.
 
 ---
 

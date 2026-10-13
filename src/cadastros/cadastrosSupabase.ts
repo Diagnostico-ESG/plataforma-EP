@@ -3,16 +3,21 @@ import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import type { Database } from '../types/database'
 import { CadastroInexistente } from './cadastroInexistente'
 import { criarMacroprocessosSupabase } from './macroprocessosSupabase'
-import type { DadosDoSetor, ModuloDeCadastros, Setor } from './tipos'
+import { compararMacroprocessos } from './ordemDosMacroprocessos'
+import { criarSetoresEnvolvidosSupabase } from './setoresEnvolvidosSupabase'
+import type {
+  DadosDoSetor, MacroprocessoDoSetor, ModuloDeCadastros, SetorComMacroprocessos, SetorDaLista,
+} from './tipos'
 
 type ClienteSupabase = SupabaseClient<Database>
 type ErroDoBanco = { message: string; code?: string }
 type AlteracaoDoSetor = Partial<DadosDoSetor> & { ativo?: boolean }
 
-const COLUNAS_DO_SETOR = 'id, sigla, nome, observacoes, ativo'
 
 export function criarCadastrosSupabase(cliente: ClienteSupabase): ModuloDeCadastros {
-  return { ...criarSetoresSupabase(cliente), ...criarMacroprocessosSupabase(cliente) }
+  return {
+    ...criarSetoresSupabase(cliente), ...criarMacroprocessosSupabase(cliente), ...criarSetoresEnvolvidosSupabase(cliente),
+  }
 }
 
 type OperacoesDeSetor = Pick<ModuloDeCadastros, 'listarSetores' | 'criarSetor' | 'lerSetor' | 'editarSetor'
@@ -30,16 +35,35 @@ function criarSetoresSupabase(cliente: ClienteSupabase): OperacoesDeSetor {
   }
 }
 
-async function listarSetores(cliente: ClienteSupabase): Promise<Setor[]> {
-  const { data, error } = await cliente.from('setores').select(COLUNAS_DO_SETOR).order('sigla')
+async function listarSetores(cliente: ClienteSupabase): Promise<SetorDaLista[]> {
+  const { data, error } = await cliente.from('setores')
+    .select('id, sigla, nome, observacoes, ativo, setores_envolvidos(count)').order('sigla')
   if (error) throw new Error(`Falha ao listar os setores: ${error.message}`)
-  return data
+  return data.map(({ setores_envolvidos: contagem, ...setor }) => ({
+    ...setor, quantidadeDeMacroprocessos: contagem[0]?.count ?? 0,
+  }))
 }
 
-async function lerSetor(cliente: ClienteSupabase, id: string): Promise<Setor | null> {
-  const { data, error } = await cliente.from('setores').select(COLUNAS_DO_SETOR).eq('id', id)
+type VinculoLido = {
+  observacao: string | null
+  macroprocessos: { id: string; codigo: string | null; nome: string } | null
+}
+
+async function lerSetor(cliente: ClienteSupabase, id: string): Promise<SetorComMacroprocessos | null> {
+  const { data, error } = await cliente.from('setores')
+    .select('id, sigla, nome, observacoes, ativo, setores_envolvidos(observacao, macroprocessos(id, codigo, nome))')
+    .eq('id', id)
   if (error) throw new Error(`Falha ao ler o setor: ${error.message}`)
-  return data[0] ?? null
+  if (!data[0]) return null
+  const { setores_envolvidos: vinculos, ...setor } = data[0]
+  return { ...setor, macroprocessos: macroprocessosDoSetor(vinculos) }
+}
+
+// Os macroprocessos saem na ordem da lista (código, sem código depois, nome); o banco não ordena o que vem embutido.
+function macroprocessosDoSetor(vinculos: VinculoLido[]): MacroprocessoDoSetor[] {
+  return vinculos
+    .flatMap(({ observacao, macroprocessos }) => (macroprocessos ? [{ ...macroprocessos, observacao }] : []))
+    .sort(compararMacroprocessos)
 }
 
 async function criarSetor(cliente: ClienteSupabase, dados: DadosDoSetor): Promise<void> {

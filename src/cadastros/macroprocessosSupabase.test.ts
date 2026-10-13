@@ -12,6 +12,9 @@ const NOVO: DadosDoMacroprocesso = {
 }
 const LINHA = { id: 'm1', ...NOVO, ativo: true }
 const COLUNAS = 'id, codigo, nome, descricao, categoria, ativo'
+const COLUNAS_COM_CONTAGEM = `${COLUNAS}, setores_envolvidos(count)`
+const COLUNAS_COM_SETORES = `${COLUNAS}, setores_envolvidos(observacao, setores(id, sigla, nome, ativo))`
+const LINHA_LIDA = { ...LINHA, setores_envolvidos: [] }
 
 function criar(cliente: ClienteSupabaseFalso) {
   return criarCadastrosSupabase(cliente as unknown as SupabaseClient<Database>)
@@ -19,11 +22,13 @@ function criar(cliente: ClienteSupabaseFalso) {
 type Modulo = ReturnType<typeof criar>
 
 describe('macroprocessos no módulo real', () => {
-  test('lista pedindo ao banco a ordem pelo código, sem código depois, e depois pelo nome', async () => {
+  test('lista com a quantidade de setores, pedindo ao banco a ordem pelo código, sem código depois, e depois pelo nome', async () => {
     const cliente = new ClienteSupabaseFalso()
-    cliente.respostas['macroprocessos.select'] = { data: [LINHA], error: null }
-    expect(await criar(cliente).listarMacroprocessos()).toEqual([LINHA])
-    expect(cliente.pedidos[0]).toMatchObject({ tabela: 'macroprocessos', colunas: COLUNAS,
+    cliente.respostas['macroprocessos.select'] = { data: [
+      { ...LINHA, setores_envolvidos: [{ count: 3 }] }, { ...LINHA, id: 'm2', setores_envolvidos: [] }], error: null }
+    expect(await criar(cliente).listarMacroprocessos()).toEqual([
+      { ...LINHA, quantidadeDeSetores: 3 }, { ...LINHA, id: 'm2', quantidadeDeSetores: 0 }])
+    expect(cliente.pedidos[0]).toMatchObject({ tabela: 'macroprocessos', colunas: COLUNAS_COM_CONTAGEM,
       ordem: [['codigo', true, false], ['nome', true]] })
   })
 
@@ -62,11 +67,18 @@ describe('macroprocessos no módulo real', () => {
     expect((falha as Error).message).toBe('erro inesperado do banco (conexão perdida)')
   })
 
-  test('ler pede o macroprocesso pelo id e devolve a linha', async () => {
+  test('ler pede o macroprocesso pelo id e devolve a linha com os setores envolvidos pela sigla', async () => {
     const cliente = new ClienteSupabaseFalso()
-    cliente.respostas['macroprocessos.select'] = { data: [LINHA], error: null }
-    expect(await criar(cliente).lerMacroprocesso('m1')).toEqual(LINHA)
-    expect(cliente.pedidos[0]).toMatchObject({ tabela: 'macroprocessos', filtro: ['id', 'm1'] })
+    cliente.respostas['macroprocessos.select'] = { data: [{ ...LINHA, setores_envolvidos: [
+      { observacao: null, setores: { id: 's2', sigla: 'TSB', nome: 'Setor B', ativo: false } },
+      { observacao: 'Papel A', setores: { id: 's1', sigla: 'TSA', nome: 'Setor A', ativo: true } },
+    ] }], error: null }
+    expect(await criar(cliente).lerMacroprocesso('m1')).toEqual({ ...LINHA, setoresEnvolvidos: [
+      { setorId: 's1', sigla: 'TSA', nome: 'Setor A', ativo: true, observacao: 'Papel A' },
+      { setorId: 's2', sigla: 'TSB', nome: 'Setor B', ativo: false, observacao: null },
+    ] })
+    expect(cliente.pedidos[0]).toMatchObject({ tabela: 'macroprocessos', colunas: COLUNAS_COM_SETORES,
+      filtro: ['id', 'm1'] })
   })
 
   test('ler um macroprocesso que não existe devolve null', async () => {
@@ -120,7 +132,7 @@ describe('macroprocessos no módulo real', () => {
   test('nenhuma linha afetada com o item ainda lá: o perfil não permite', async () => {
     const cliente = new ClienteSupabaseFalso()
     cliente.respostas['macroprocessos.update'] = { data: [], error: null }
-    cliente.respostas['macroprocessos.select'] = { data: [LINHA], error: null }
+    cliente.respostas['macroprocessos.select'] = { data: [LINHA_LIDA], error: null }
     const falha = await criar(cliente).desativarMacroprocesso('m1').catch((erro: unknown) => erro)
     expect(falha).toBeInstanceOf(TravaDoBanco)
     expect((falha as Error).message).toBe('Seu perfil não permite alterar os cadastros.')

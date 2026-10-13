@@ -13,13 +13,16 @@ function criar(cliente: ClienteSupabaseFalso) {
 }
 
 describe('criarCadastrosSupabase', () => {
-  test('lista os setores pedindo ao banco a ordem pela sigla', async () => {
+  test('lista os setores com a quantidade de macroprocessos, pedindo ao banco a ordem pela sigla', async () => {
     const cliente = new ClienteSupabaseFalso()
     const linha = { id: 's1', sigla: 'NFT', nome: NOVO.nome, observacoes: null, ativo: true }
-    cliente.respostas['setores.select'] = { data: [linha], error: null }
-    expect(await criar(cliente).listarSetores()).toEqual([linha])
-    expect(cliente.pedidos[0]).toMatchObject({ tabela: 'setores', colunas: 'id, sigla, nome, observacoes, ativo',
-      ordem: [['sigla', true]] })
+    const outra = { ...linha, id: 's2', sigla: 'OUT' }
+    cliente.respostas['setores.select'] = { data: [
+      { ...linha, setores_envolvidos: [{ count: 2 }] }, { ...outra, setores_envolvidos: [] }], error: null }
+    expect(await criar(cliente).listarSetores()).toEqual([
+      { ...linha, quantidadeDeMacroprocessos: 2 }, { ...outra, quantidadeDeMacroprocessos: 0 }])
+    expect(cliente.pedidos[0]).toMatchObject({ tabela: 'setores',
+      colunas: 'id, sigla, nome, observacoes, ativo, setores_envolvidos(count)', ordem: [['sigla', true]] })
   })
 
   test('falha ao listar vira erro com o motivo do banco', async () => {
@@ -56,13 +59,21 @@ describe('criarCadastrosSupabase', () => {
   })
 
   const LINHA = { id: 's1', sigla: 'NFT', nome: NOVO.nome, observacoes: null, ativo: true }
+  const LINHA_LIDA = { ...LINHA, setores_envolvidos: [] }
   type Modulo = ReturnType<typeof criar>
 
-  test('ler pede o setor pelo id e devolve a linha', async () => {
+  test('ler pede o setor pelo id e devolve a linha com os macroprocessos na ordem da lista', async () => {
     const cliente = new ClienteSupabaseFalso()
-    cliente.respostas['setores.select'] = { data: [LINHA], error: null }
-    expect(await criar(cliente).lerSetor('s1')).toEqual(LINHA)
-    expect(cliente.pedidos[0]).toMatchObject({ tabela: 'setores', filtro: ['id', 's1'] })
+    cliente.respostas['setores.select'] = { data: [{ ...LINHA, setores_envolvidos: [
+      { observacao: 'Papel B', macroprocessos: { id: 'm2', codigo: null, nome: 'Beta Fictício' } },
+      { observacao: null, macroprocessos: { id: 'm1', codigo: 'MPT01', nome: 'Alfa Fictício' } },
+    ] }], error: null }
+    expect(await criar(cliente).lerSetor('s1')).toEqual({ ...LINHA, macroprocessos: [
+      { id: 'm1', codigo: 'MPT01', nome: 'Alfa Fictício', observacao: null },
+      { id: 'm2', codigo: null, nome: 'Beta Fictício', observacao: 'Papel B' },
+    ] })
+    expect(cliente.pedidos[0]).toMatchObject({ tabela: 'setores', filtro: ['id', 's1'],
+      colunas: 'id, sigla, nome, observacoes, ativo, setores_envolvidos(observacao, macroprocessos(id, codigo, nome))' })
   })
 
   test('ler um setor que não existe devolve null', async () => {
@@ -115,7 +126,7 @@ describe('criarCadastrosSupabase', () => {
   test('nenhuma linha afetada com o setor ainda lá: o perfil não permite', async () => {
     const cliente = new ClienteSupabaseFalso()
     cliente.respostas['setores.update'] = { data: [], error: null }
-    cliente.respostas['setores.select'] = { data: [LINHA], error: null }
+    cliente.respostas['setores.select'] = { data: [LINHA_LIDA], error: null }
     const falha = await criar(cliente).desativarSetor('s1').catch((erro: unknown) => erro)
     expect(falha).toBeInstanceOf(TravaDoBanco)
     expect((falha as Error).message).toBe('Seu perfil não permite alterar os cadastros.')

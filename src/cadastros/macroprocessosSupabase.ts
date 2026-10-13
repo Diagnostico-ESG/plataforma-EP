@@ -2,7 +2,9 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import type { Database } from '../types/database'
 import { CadastroInexistente } from './cadastroInexistente'
-import type { DadosDoMacroprocesso, Macroprocesso, ModuloDeCadastros } from './tipos'
+import type {
+  DadosDoMacroprocesso, MacroprocessoComSetores, MacroprocessoDaLista, ModuloDeCadastros, SetorEnvolvido,
+} from './tipos'
 
 type ClienteSupabase = SupabaseClient<Database>
 type ErroDoBanco = { message: string; code?: string }
@@ -11,7 +13,6 @@ type OperacoesDeMacroprocesso = Pick<ModuloDeCadastros, 'listarMacroprocessos' |
   | 'lerMacroprocesso' | 'editarMacroprocesso' | 'desativarMacroprocesso' | 'reativarMacroprocesso'
   | 'excluirMacroprocesso'>
 
-const COLUNAS_DO_MACROPROCESSO = 'id, codigo, nome, descricao, categoria, ativo'
 
 export function criarMacroprocessosSupabase(cliente: ClienteSupabase): OperacoesDeMacroprocesso {
   return {
@@ -25,17 +26,38 @@ export function criarMacroprocessosSupabase(cliente: ClienteSupabase): Operacoes
   }
 }
 
-async function listar(cliente: ClienteSupabase): Promise<Macroprocesso[]> {
-  const { data, error } = await cliente.from('macroprocessos').select(COLUNAS_DO_MACROPROCESSO)
+async function listar(cliente: ClienteSupabase): Promise<MacroprocessoDaLista[]> {
+  const { data, error } = await cliente.from('macroprocessos')
+    .select('id, codigo, nome, descricao, categoria, ativo, setores_envolvidos(count)')
     .order('codigo', { nullsFirst: false }).order('nome')
   if (error) throw new Error(`Falha ao listar os macroprocessos: ${error.message}`)
-  return data
+  return data.map(({ setores_envolvidos: contagem, ...macroprocesso }) => ({
+    ...macroprocesso, quantidadeDeSetores: contagem[0]?.count ?? 0,
+  }))
 }
 
-async function ler(cliente: ClienteSupabase, id: string): Promise<Macroprocesso | null> {
-  const { data, error } = await cliente.from('macroprocessos').select(COLUNAS_DO_MACROPROCESSO).eq('id', id)
+type VinculoLido = {
+  observacao: string | null
+  setores: { id: string; sigla: string; nome: string; ativo: boolean } | null
+}
+
+async function ler(cliente: ClienteSupabase, id: string): Promise<MacroprocessoComSetores | null> {
+  const { data, error } = await cliente.from('macroprocessos')
+    .select('id, codigo, nome, descricao, categoria, ativo, setores_envolvidos(observacao, setores(id, sigla, nome, ativo))')
+    .eq('id', id)
   if (error) throw new Error(`Falha ao ler o macroprocesso: ${error.message}`)
-  return data[0] ?? null
+  if (!data[0]) return null
+  const { setores_envolvidos: vinculos, ...macroprocesso } = data[0]
+  return { ...macroprocesso, setoresEnvolvidos: setoresEnvolvidos(vinculos) }
+}
+
+// Os setores saem na ordem da sigla; o banco não ordena o que vem embutido.
+function setoresEnvolvidos(vinculos: VinculoLido[]): SetorEnvolvido[] {
+  return vinculos
+    .flatMap(({ observacao, setores }) => (setores
+      ? [{ setorId: setores.id, sigla: setores.sigla, nome: setores.nome, ativo: setores.ativo, observacao }]
+      : []))
+    .sort((a, b) => a.sigla.localeCompare(b.sigla, 'pt-BR'))
 }
 
 async function criar(cliente: ClienteSupabase, dados: DadosDoMacroprocesso): Promise<void> {

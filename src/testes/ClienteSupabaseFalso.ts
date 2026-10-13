@@ -2,6 +2,8 @@ export type RespostaDoBanco = { data: unknown; error: { message: string; code?: 
 type Ordenacao = [string, boolean] | [string, boolean, boolean]
 export type Pedido = {
   tabela: string; operacao: string; colunas?: string; valores?: unknown; filtro?: [string, string]
+  /** Todos os `eq` em ordem; `filtro` guarda só o último. */
+  filtros?: [string, string][]
   ordem?: Ordenacao[]
 }
 
@@ -24,12 +26,18 @@ export class ClienteSupabaseFalso {
       insert: (valores: unknown) => Object.assign(pedido, { operacao: 'insert', valores }) && consulta,
       update: (valores: unknown) => Object.assign(pedido, { operacao: 'update', valores }) && consulta,
       delete: () => Object.assign(pedido, { operacao: 'delete' }) && consulta,
-      eq: (coluna: string, valor: string) => Object.assign(pedido, { filtro: [coluna, valor] }) && consulta,
+      eq: (coluna: string, valor: string) => guardarFiltro(pedido, coluna, valor) && consulta,
       then: (seCumprir: (r: RespostaDoBanco) => unknown, seFalhar?: (e: unknown) => unknown) =>
         Promise.resolve(resposta()).then(seCumprir, seFalhar),
     }
     return consulta
   }
+}
+
+function guardarFiltro(pedido: Pedido, coluna: string, valor: string): true {
+  pedido.filtro = [coluna, valor]
+  ;(pedido.filtros ??= []).push([coluna, valor])
+  return true
 }
 
 // Só guarda "nulos primeiro ou depois" quando o módulo pediu, para as ordens simples continuarem com dois itens.
