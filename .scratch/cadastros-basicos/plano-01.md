@@ -1232,6 +1232,6 @@ Nota da execução (2026-10-13): o teste de cor lia o CSS vazio, porque o `vite.
 
 ### Tarefa 6: Fechamento
 
-- [ ] **Passo 1:** marcar no ticket os critérios atendidos (`- [x]`), conferindo cada um contra os testes acima.
-- [ ] **Passo 2:** `npm run test:coverage`, para ver a cobertura (o mínimo de 70% é conferido no `/ship`).
+- [x] **Passo 1:** marcar no ticket os critérios atendidos (`- [x]`), conferindo cada um contra os testes acima.
+- [x] **Passo 2:** `npm run test:coverage`, para ver a cobertura (o mínimo de 70% é conferido no `/ship`).
 - [ ] **Passo 3:** juntar a branch à `main` (`git switch main`, `git merge cadastros-basicos`), apagar a branch com `git branch -d cadastros-basicos`, acrescentar ao fim do ticket `Concluído em AAAA-MM-DD (commit <hash>)` e comitar.
