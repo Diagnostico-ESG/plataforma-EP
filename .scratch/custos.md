@@ -36,3 +36,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-13 | cadastros-basicos | /situação e executar-complexo (ticket 02) | US$ 3,11
 2026-10-13 | cadastros-basicos | /situação e executar-complexo (ticket 03) | US$ 6,85
 2026-10-13 | cadastros-basicos | /situação e executar-complexo (ticket 05) | US$ 6,99
+2026-10-13 | cadastros-basicos | /situação e /polir | US$ 1,38
