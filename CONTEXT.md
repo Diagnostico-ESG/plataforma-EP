@@ -71,5 +71,55 @@ Apagar o cadastro de vez, o que só é possível enquanto nenhum processo depend
 _Avoid_: remover, deletar
 
 **Responsável do setor**:
-Pessoa de um setor atendido que responde pelo processo mapeado. Não é usuário e não entra na plataforma.
+Pessoa de um setor atendido que responde pelo setor junto ao EP. Um setor pode ter nenhum ou vários. Não é usuário e não entra na plataforma.
 _Avoid_: dono do processo, usuário do setor
+
+## Processos
+
+**Processo**:
+Trabalho de um setor que o EP mapeia, ligado a um único setor (o dono) e a um macroprocesso em que esse setor é setor envolvido. Por isso, um setor não sai de um macroprocesso enquanto tiver processos nele. O nome é único dentro do setor, porque entra no nome dos arquivos.
+_Avoid_: fluxo, atividade, procedimento
+
+**Subprocesso**:
+Processo que pertence a um processo pai e segue o macroprocesso dele; pode ter setor diferente do pai. Tem o próprio ciclo de etapas. Não tem subprocessos.
+_Avoid_: processo filho, subfluxo
+
+**A classificar**:
+Tipo provisório do item identificado (ou importado) que ainda não se sabe se é processo ou subprocesso. Tem ciclo de etapas normal.
+_Avoid_: indefinido, rascunho
+
+**Catálogo de etapas**:
+A lista ordenada de etapas, mantida pelo administrador, que todo processo percorre. Cada etapa é do setor (feita uma vez pelo setor e valendo para todos os processos dele) ou do processo.
+_Avoid_: workflow, fluxo de etapas
+
+**Etapa do setor / Etapa do processo**:
+Etapa do catálogo feita uma vez pelo setor (identificação dos responsáveis, sensibilização, identificação dos processos) ou feita em cada processo (da reunião de modelagem em diante). A primeira etapa do processo só começa com as etapas do setor resolvidas.
+_Avoid_: etapa geral, etapa inicial
+
+**Etapa obrigatória / Etapa opcional**:
+Marcação do catálogo. Só a etapa opcional pode ser dispensada; o processo só se conclui com todas as obrigatórias resolvidas.
+_Avoid_: etapa facultativa, etapa pulável
+
+**Status da etapa**:
+Pendente, em andamento, concluída, realizada anteriormente (feita fora da plataforma, com nota) ou dispensada (opcional que não será feita, com nota). As três últimas contam como **resolvida**.
+_Avoid_: estado, fase (para status)
+
+**Etapa atual**:
+A etapa em andamento do processo ou, se nenhuma estiver, a primeira pendente. Cada processo tem no máximo uma etapa em andamento.
+_Avoid_: etapa corrente, passo atual
+
+**Voltar a uma etapa**:
+Reabrir uma etapa anterior, com motivo; as etapas seguintes já concluídas voltam a pendente. Nada se apaga do histórico.
+_Avoid_: retroceder, desfazer, reabrir processo
+
+**Responsável da etapa**:
+Usuário (Administrador ou Integrante do EP) que cuida de uma etapa de um processo. Não confundir com o responsável do setor, que não é usuário.
+_Avoid_: dono da etapa, executor
+
+**Situação do processo**:
+Em andamento, suspenso, cancelado ou concluído. Suspender, cancelar e **retomar** exigem motivo e congelam ou liberam o andamento; concluído não se marca, acontece quando todas as etapas obrigatórias estão resolvidas.
+_Avoid_: status do processo, estado
+
+**Reclassificação**:
+Mudança do tipo de um item (processo, subprocesso ou a classificar), com motivo, que preserva o mesmo item com tudo o que ele já tem.
+_Avoid_: conversão, migração, recriação
