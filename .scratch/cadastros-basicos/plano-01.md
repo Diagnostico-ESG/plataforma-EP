@@ -573,7 +573,7 @@ export class CadastrosFalso implements ModuloDeCadastros {
 **Interfaces:**
 - Produz: `normalizarSigla(valor: string): string`; `problemaNoSetor(nome: string, sigla: string): string | null`.
 
-- [ ] **Passo 1: escrever o teste:**
+- [x] **Passo 1: escrever o teste:**
 
 ```ts
 import { describe, expect, test } from 'vitest'
@@ -599,8 +599,8 @@ describe('validação do setor na tela', () => {
 })
 ```
 
-- [ ] **Passo 2: ver falhar.** `npx vitest run src/cadastros/validacaoDoSetor.test.ts`: FAIL (módulo inexistente).
-- [ ] **Passo 3: implementar:**
+- [x] **Passo 2: ver falhar.** `npx vitest run src/cadastros/validacaoDoSetor.test.ts`: FAIL (módulo inexistente).
+- [x] **Passo 3: implementar:**
 
 ```ts
 // O banco confere de novo (restrição setores_sigla_formato); aqui a pessoa vê o problema antes de enviar.
@@ -617,7 +617,7 @@ export function problemaNoSetor(nome: string, sigla: string): string | null {
 }
 ```
 
-- [ ] **Passo 4: ver passar** e comitar: "Validação da sigla e do nome do setor na tela".
+- [x] **Passo 4: ver passar** e comitar: "Validação da sigla e do nome do setor na tela".
 
 ---
 
