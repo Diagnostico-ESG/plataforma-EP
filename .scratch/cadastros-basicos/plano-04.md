@@ -477,10 +477,10 @@ export function LinhaDeSetorEnvolvido(props: { cadastros: ModuloDeCadastros; mac
 
 **Interfaces:** Consome `textoDaExclusaoDoSetor(sigla, n)` e `textoDaExclusaoDoMacroprocesso(n)` (Tarefa 2), `macroprocessos.length` do setor aberto e `setoresEnvolvidos.length` do macroprocesso aberto. Remove as constantes `TEXTO_DA_EXCLUSAO` provisórias dos dois componentes.
 
-- [ ] **Passo 1: testes que falham** (`App.exclusaoEmCascata.test.tsx`): Excluir setor com 3 macroprocessos abre a janela "Excluir o setor TSA?" com "TSA sai de 3 macroprocessos. O histórico guarda o que ele tinha, mas não é possível desfazer."; com 1 usa o singular; sem vínculos o texto começa por "O histórico guarda…"; Excluir macroprocesso com 2 setores diz "2 setores deixam de estar envolvidos nele. …", com 1 o singular, com 0 só "O histórico guarda…"; confirmar exclui e o falso remove também os vínculos (o setor excluído some do macroprocesso aberto em seguida: reabrir o macroprocesso não o lista); Cancelar e Esc não gravam.
-- [ ] **Passo 2: ver falharem.** `npx vitest run src/App.exclusaoEmCascata.test.tsx`.
-- [ ] **Passo 3: implementar** trocando as constantes pelo texto calculado.
-- [ ] **Passo 4: verificar** (`npm test`, `npx tsc -b`, `npm run lint`). Commit.
+- [x] **Passo 1: testes que falham** (`App.exclusaoEmCascata.test.tsx`): Excluir setor com 3 macroprocessos abre a janela "Excluir o setor TSA?" com "TSA sai de 3 macroprocessos. O histórico guarda o que ele tinha, mas não é possível desfazer."; com 1 usa o singular; sem vínculos o texto começa por "O histórico guarda…"; Excluir macroprocesso com 2 setores diz "2 setores deixam de estar envolvidos nele. …", com 1 o singular, com 0 só "O histórico guarda…"; confirmar exclui e o falso remove também os vínculos (o setor excluído some do macroprocesso aberto em seguida: reabrir o macroprocesso não o lista); Cancelar e Esc não gravam.
+- [x] **Passo 2: ver falharem.** `npx vitest run src/App.exclusaoEmCascata.test.tsx`.
+- [x] **Passo 3: implementar** trocando as constantes pelo texto calculado.
+- [x] **Passo 4: verificar** (`npm test`, `npx tsc -b`, `npm run lint`). Commit.
 
 ---
 

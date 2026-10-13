@@ -1,11 +1,9 @@
 import { CadastroInexistente } from '../../cadastros/cadastroInexistente'
+import { textoDaExclusaoDoMacroprocesso } from '../../cadastros/textosDeExclusao'
 import type { DadosDoMacroprocesso, MacroprocessoComSetores, ModuloDeCadastros } from '../../cadastros/tipos'
 import { AcoesDoCadastro } from './AcoesDoCadastro'
 import { FormularioDeMacroprocesso } from './FormularioDeMacroprocesso'
 import { SetoresEnvolvidos } from './SetoresEnvolvidos'
-
-// Neste ticket o macroprocesso ainda não tem setores envolvidos; o ticket 04 passa a contá-los no texto.
-const TEXTO_DA_EXCLUSAO = 'O histórico guarda o que ele tinha, mas não é possível desfazer.'
 
 type MacroprocessoEditavelProps = {
   cadastros: ModuloDeCadastros
@@ -34,7 +32,7 @@ export function MacroprocessoEditavel({ cadastros, macroprocesso, aoVoltar, aoSu
       <SetoresEnvolvidos envolvidos={macroprocesso.setoresEnvolvidos}
         edicao={{ cadastros, macroprocessoId: macroprocesso.id, aoMudar, aoSumir }} />
       <AcoesDoCadastro ativo={macroprocesso.ativo} tituloDaJanela={`Excluir o macroprocesso ${macroprocesso.nome}?`}
-        textoDaJanela={TEXTO_DA_EXCLUSAO} rotuloDaExclusao="Excluir macroprocesso"
+        textoDaJanela={textoDaExclusaoDoMacroprocesso(macroprocesso.setoresEnvolvidos.length)} rotuloDaExclusao="Excluir macroprocesso"
         desativar={() => cadastros.desativarMacroprocesso(macroprocesso.id)}
         reativar={() => cadastros.reativarMacroprocesso(macroprocesso.id)}
         excluir={() => cadastros.excluirMacroprocesso(macroprocesso.id)}
