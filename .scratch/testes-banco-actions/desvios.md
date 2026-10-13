@@ -1,0 +1,11 @@
+# Desvios — testes-banco-actions
+
+## 2026-10-13 — /ship de testes-banco-actions
+
+Ponto de partida da revisão: `marco/2026-10-09-inicio-testes-banco-actions`. Escopo: `.github/workflows/testes-banco.yml` e `.github/workflows/verificacao.yml` (o resto do diff desde o marco é de login-perfis, já entregue).
+
+- **Registro da spec incompleto (code-review, eixo spec):** a spec dizia que o passo temporário de diagnóstico (`838327a`) imprimiu só usuário, porta e formato. Ele também imprimiu o tamanho da senha do banco de desenvolvimento e se ela tem só letras e números ou colchetes, nunca o valor. Ficou nos logs das execuções #4, #5 e #6 de "Testes de banco" (não só na #4: as duas manuais seguintes rodaram com o passo). Spec corrigida. Decisão do usuário: ele apaga esses logs depois (backlog); senha não trocada (repositório privado).
+- **Trava contra produção mais fraca do que a spec afirmava (code-review, eixo spec):** `scripts/testar-banco.mjs` só confere se o ref de desenvolvimento aparece em algum ponto da cadeia. Risco baixo; o script é anterior a esta funcionalidade. Spec reescrita para dizer o que a trava faz; a conferência pelo usuário da cadeia foi para o backlog, por decisão do usuário.
+- **Pontos de julgamento (code-review, eixo standards), todos no backlog por decisão do usuário:** `package-lock.json` fora do filtro de "Testes de banco"; ações presas por etiqueta e não por SHA; versão do Node repetida nos dois arquivos; comentário de `verificacao.yml` ("mesmas verificações do computador") impreciso; comentário e mensagem de erro do script ainda falando só do `.env.banco.local`.
+- **Execução automática do `test:db`:** a cada envio que mexe no banco, o GitHub roda os testes sem a conferência manual do alvo que o protocolo pede; a trava do script faz esse papel. Registrado em `.scratch/melhorias-protocolo.md`.
+- **`/security-review`:** o usuário informou que já tinha rodado; o resultado não chegou a esta conversa e, na `main` já integrada, o comando não acha mudanças. Feita a revisão de reserva dos dois workflows e de `scripts/testar-banco.mjs`: segredo só no passo do `test:db`, sem gatilho de pull request, permissões só de leitura, script sem imprimir a cadeia. Nenhum achado além dos de cima.

@@ -24,7 +24,7 @@ Fora do escopo: cobertura no Actions, build, publicação, banco de produção (
 
 - A conexão direta do Supabase (`db.<ref>.supabase.co`) é só IPv6 e o GitHub Actions não usa IPv6. A cadeia guardada em `SUPABASE_DB_URL` deve ser a do **Session pooler** (painel do projeto dev → Connect → Session pooler; usuário `postgres.<ref>`, porta 5432 do endereço do pooler, que é alcançável do GitHub).
 - A trava do script (a cadeia precisa conter o ref de desenvolvimento) continua valendo; no pooler o ref aparece no usuário.
-- `npm run test:db` no workflow usa o ref de desenvolvimento do próprio `package.json`: o workflow não consegue apontar para produção.
+- `npm run test:db` no workflow usa o ref de desenvolvimento do próprio `package.json`. A trava é uma busca de texto: a cadeia precisa conter esse ref em algum ponto (no pooler, ele vem no usuário). Na prática, uma cadeia de produção não passa, porque tem outro ref; a conferência mais rígida, pelo usuário da cadeia, está no backlog.
 
 ## Segredo e dado pessoal (decisão do usuário, 2026-10-09)
 
@@ -37,8 +37,8 @@ Fora do escopo: cobertura no Actions, build, publicação, banco de produção (
 - [x] Os dois arquivos existem (2026-10-09), com o disparo e as permissões acima, e o YAML é válido (conferido localmente).
 - [x] Depois de eu cadastrar o segredo (2026-10-09: 10 de 10 arquivos passaram, 148 verificações, 0 reprovadas; o segredo precisou ser refeito com a senha certa) e enviar o código: o botão "Run workflow" de "Testes de banco" roda, e a execução termina verde com os 10 arquivos de teste (`00` a `09`) passando. Verificado pelo usuário na aba Actions (ou pela saída que ele colar).
 - [x] "Verificação" termina verde (2026-10-09, execuções #1 e #2) no mesmo envio.
-- [ ] Um envio que só altera `src/` não dispara "Testes de banco" (confere o filtro).
-- [x] Nenhuma cadeia de conexão (2026-10-09; o passo de diagnóstico imprimiu só usuário, porta e formato, e foi removido) em arquivo, log ou conversa.
+- [x] Um envio que só altera `src/` não dispara "Testes de banco" (confere o filtro). Conferido em 2026-10-13 na aba Actions: os envios de `6b71a70`, `2d49a6b` e `dacd22f`, sem arquivo do filtro, rodaram só "Verificação".
+- [x] Nenhuma cadeia de conexão (2026-10-09) em arquivo, log ou conversa. O passo temporário de diagnóstico (commit `838327a`, removido em `1b8b960`) não imprimiu a cadeia nem a senha, mas imprimiu, além de usuário, porta e formato, o tamanho da senha e se ela tem só letras e números ou colchetes. Isso ficou nos logs das execuções #4, #5 e #6 de "Testes de banco"; o usuário vai apagá-los (backlog).
 - [ ] `[visual]` — nenhum.
 
 Sem testes automatizados próprios: o "teste" é a execução real no GitHub (as duas primeiras caixas acima). Arquivo YAML não tem função de lógica a cobrir.
