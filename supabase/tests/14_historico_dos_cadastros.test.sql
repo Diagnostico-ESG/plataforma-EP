@@ -6,7 +6,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(25);
+insert into _tap (linha) select plan(29);
 
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 -- O inativo é administrador de propósito: a recusa dele só pode vir de estar inativo.
@@ -68,7 +68,7 @@ set local role anon;
 insert into _tap (linha) select throws_ok('select 1 from public.eventos', '42501', null, 'Visitante não lê o histórico');
 reset role;
 
--- Ninguém grava: as mesmas quatro conferências para cada perfil ativo e para o visitante, com evento de cadastro.
+-- Ninguém grava: as mesmas quatro conferências para cada perfil, para o inativo e para o visitante, com evento de cadastro.
 create function pg_temp.conferir_que_nao_grava(papel text, id_usuario text, quem text) returns void
 language plpgsql as $$
 begin
@@ -93,6 +93,7 @@ grant execute on function pg_temp.conferir_que_nao_grava(text, text, text) to an
 select pg_temp.conferir_que_nao_grava('authenticated', '00000000-0000-0000-0000-0000000000a1', 'Administrador');
 select pg_temp.conferir_que_nao_grava('authenticated', '00000000-0000-0000-0000-0000000000a2', 'Integrante');
 select pg_temp.conferir_que_nao_grava('authenticated', '00000000-0000-0000-0000-0000000000a3', 'Consulta');
+select pg_temp.conferir_que_nao_grava('authenticated', '00000000-0000-0000-0000-0000000000a4', 'Inativo');
 select pg_temp.conferir_que_nao_grava('anon', null, 'Visitante');
 
 insert into _tap (linha) select * from finish();

@@ -124,3 +124,12 @@ test('desativar um setor que já foi excluído por outra pessoa mostra o aviso p
   expect((await screen.findByRole('alert')).textContent).toContain('Este cadastro não existe mais.')
   expect(screen.getByRole('button', { name: 'Voltar à lista' })).toBeTruthy()
 })
+
+test('excluir um setor que já foi excluído por outra pessoa mostra o aviso próprio', async () => {
+  const cadastros = montar()
+  await abrir('AFT')
+  fireEvent.click(await screen.findByRole('button', { name: 'Excluir' }))
+  cadastros.setores = cadastros.setores.filter((setor) => setor.id !== 's1')
+  fireEvent.click(screen.getByRole('button', { name: 'Excluir setor' }))
+  expect((await screen.findByRole('alert')).textContent).toContain('Este cadastro não existe mais.')
+})
