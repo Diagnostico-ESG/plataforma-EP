@@ -123,5 +123,5 @@ export const RECUSAS_DOS_CADASTROS: RecusasDoModulo = {
 
 **Files:** Modify: `.scratch/backlog.md` (item "Refatoração em cadastros-basicos")
 
-- [ ] **Step 1:** acrescentar ao item: "(2) feita no ticket 01 de processos-etapas (2026-10-13); as demais partes seguem." (critério 4).
-- [ ] **Step 2: commit** — "Backlog: parte (2) da refatoração feita no ticket 01".
+- [x] **Step 1:** acrescentar ao item: "(2) feita no ticket 01 de processos-etapas (2026-10-13); as demais partes seguem." (critério 4).
+- [x] **Step 2: commit** — "Backlog: parte (2) da refatoração feita no ticket 01".
