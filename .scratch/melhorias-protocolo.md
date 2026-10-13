@@ -252,3 +252,14 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Disparo do workflow no navegador do app.** O clique por coordenada fechou o painel "Run workflow" várias vezes (a captura de tela muda o tamanho da página); dirigir o painel pelo DOM (abrir, escolher a branch, preencher, clicar) funcionou. Vale registrar no procedimento.
 - **Conferência na tela.** Não há `.claude/launch.json` e o login do Google barra a sessão; a conferência visual da aba Histórico ficou para o usuário, como nos tickets 02 a 04.
 - **Branch comum e plano numerado (item não testado).** `plano-05.md` ao lado dos anteriores, branch `cadastros-basicos-05` (a `cadastros-basicos` do ticket anterior ainda existe no GitHub), caixas marcadas por passo; a linha `Concluído em` vai no fim.
+
+## 2026-10-13 — /ship de cadastros-basicos
+
+- **Conferência de entregas anteriores (passo 0).** Esperado: as funcionalidades anteriores com `Entregue em`. Aconteceu: login-perfis com a marca, sem `Em revisão desde`; segui direto.
+- **Ponto de partida da revisão.** Esperado: o marco de início da funcionalidade. Aconteceu: `marco/2026-10-09-inicio-cadastros-basicos` fica antes da entrega de testes-banco-actions, feita no meio; usei `4c4b110` (marca de entrega daquela) para não revisar de novo o que já foi entregue. O comando não prevê funcionalidade intercalada.
+- **`/security-review` e revisão de reserva.** Esperado: o usuário roda o comando. Aconteceu: o comando não achou diferença com a principal (já integrada) e fiz a revisão de reserva desde `4c4b110`, por subagente; nenhum achado com confiança 8 ou mais.
+- **"Verificado manualmente".** O usuário conferiu os seis itens `[visual]` na tela e respondeu "ok", sem detalhar; entram como verificados manualmente por ele.
+- **Passo 7, cadastro aberto.** Esperado: confirmar com o usuário que a opção segue desligada no painel. Aconteceu: está ligada, de propósito (ADR 0001: com o login do Google, desligá-la impede o primeiro acesso; quem barra é o gancho `before_user_created`). Eu pedi "desligada" por seguir o texto do comando. Sugestão: o passo 7 dizer "desligada, ou conforme ADR do projeto" e, com login por provedor externo, conferir o gancho que barra a criação.
+- **Passo 7, `db push`.** Sem porta 5432; as quatro migrações já tinham sido aplicadas pelo SQL Editor e pelo workflow "Migrar banco de desenvolvimento". A bateria rodou pelo GitHub Actions (#23 falhou, #24 verde).
+- **Teste antigo que dependia do banco vazio.** `03_login_leitura` contava todos os eventos e só passava porque o desenvolvimento não tinha eventos de cadastro gravados; quebrou com a conferência na tela do usuário. Sugestão para o `/planejar`: quando uma política nova abre leitura de uma tabela, procurar nos testes antigos as contagens da tabela inteira.
+- **Observação:** o `/ship` rodou em Opus (a tabela recomenda Sonnet), na mesma sessão do `/situação`, por escolha do usuário.
