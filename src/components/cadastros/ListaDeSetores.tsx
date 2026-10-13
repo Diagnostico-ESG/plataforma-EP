@@ -3,6 +3,7 @@ import type { Setor } from '../../cadastros/tipos'
 import type { EstadoDoCarregamento } from '../../hooks/useCarregamento'
 import { Pilula } from '../Pilula'
 import { ErroAoCarregar } from './ErroAoCarregar'
+import { CaixaMostrarInativos, LinhaFantasma } from './PecasDaLista'
 
 const LINHAS_FANTASMA = 3
 
@@ -21,12 +22,7 @@ export function ListaDeSetores({ estado, aoTentarDeNovo, aoAbrir }: ListaDeSetor
   const visiveis = estado.tipo === 'pronto' ? estado.valor.filter((setor) => mostrarInativos || setor.ativo) : []
   return (
     <>
-      {estado.tipo === 'pronto' && (
-        <label className="cadastros-inativos">
-          <input type="checkbox" checked={mostrarInativos} onChange={(evento) => setMostrarInativos(evento.target.checked)} />
-          Mostrar inativos
-        </label>
-      )}
+      {estado.tipo === 'pronto' && <CaixaMostrarInativos marcada={mostrarInativos} aoMudar={setMostrarInativos} />}
       {estado.tipo === 'pronto' && visiveis.length === 0
         ? <p className="cadastros-vazio">Nenhum setor ativo para mostrar.</p>
         : <TabelaDeSetores carregando={estado.tipo === 'carregando'} setores={visiveis} aoAbrir={aoAbrir} />}
@@ -45,7 +41,7 @@ function TabelaDeSetores({ carregando, setores, aoAbrir }: TabelaDeSetoresProps)
       </thead>
       <tbody>
         {carregando
-          ? Array.from({ length: LINHAS_FANTASMA }, (_, i) => <LinhaFantasma key={i} />)
+          ? Array.from({ length: LINHAS_FANTASMA }, (_, i) => <LinhaFantasma key={i} colunas={3} />)
           : setores.map((setor) => <LinhaDeSetor key={setor.id} setor={setor} aoAbrir={aoAbrir} />)}
       </tbody>
     </table>
@@ -59,15 +55,6 @@ function LinhaDeSetor({ setor, aoAbrir }: { setor: Setor; aoAbrir: (id: string) 
       <td><button type="button" className="cadastros-abrir">{setor.sigla}</button></td>
       <td>{setor.nome}</td>
       <td>{!setor.ativo && <Pilula situacao="neutra">Inativo</Pilula>}</td>
-    </tr>
-  )
-}
-
-function LinhaFantasma() {
-  return (
-    <tr className="linha-fantasma" aria-hidden="true">
-      <td><span className="fantasma-barra" /></td><td><span className="fantasma-barra" /></td>
-      <td><span className="fantasma-barra" /></td>
     </tr>
   )
 }
