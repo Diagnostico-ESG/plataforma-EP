@@ -450,7 +450,7 @@ function LinhaFantasma() {
 - `FormularioDeSetor` ganha props opcionais: `titulo?: string` (padrão "Novo setor", também o nome acessível do formulário), `inicial?: DadosDoSetor`, `rotuloDoCancelar?: string` (padrão "Cancelar").
 - `SetorAberto({ cadastros, podeAlterar, id, aoVoltar })`; `SetorEditavel({ cadastros, setor, aoVoltar, aoSumir, aoMudar })`; `SetorSomenteLeitura({ setor, aoVoltar })`; `SetorInexistente({ aoVoltar })`.
 
-- [ ] **Passo 1: testes que falham** em `src/App.editarSetor.test.tsx` (mesmo cabeçalho/`beforeEach`/`afterEach` do `App.setoresInativos.test.tsx`; `montar(perfil)` com `AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })`; helper `abrir(sigla)` = `fireEvent.click(await screen.findByRole('cell', { name: sigla }))`):
+- [x] **Passo 1: testes que falham** em `src/App.editarSetor.test.tsx` (mesmo cabeçalho/`beforeEach`/`afterEach` do `App.setoresInativos.test.tsx`; `montar(perfil)` com `AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })`; helper `abrir(sigla)` = `fireEvent.click(await screen.findByRole('cell', { name: sigla }))`):
 
 ```tsx
 test('clicar na linha abre o setor com o formulário preenchido', async () => {
@@ -559,9 +559,9 @@ test('a Consulta vê os dados sem campo editável e sem botões de alteração',
 
 (importar `TravaDoBanco` de `./acesso/falhasDeGravacao`; `Perfil`, `USUARIO_DE_TESTE`, `AcessoFalso`, `CadastrosFalso`, `Setor`, como nos outros arquivos.)
 
-- [ ] **Passo 2: rodar o arquivo** e conferir que falha.
-- [ ] **Passo 3: `FormularioDeSetor.tsx`**: props opcionais como acima. Estado inicial `useState(inicial?.nome ?? '')`, `useState(inicial?.sigla ?? '')`, `useState(inicial?.observacoes ?? '')`; `<form … aria-label={titulo}>`, `<h3>{titulo}</h3>`, botão de cancelar com `{rotuloDoCancelar}`; `titulo = 'Novo setor'` e `rotuloDoCancelar = 'Cancelar'` como padrões (os testes do ticket 01 não mudam).
-- [ ] **Passo 4: `SetorInexistente.tsx` e `SetorSomenteLeitura.tsx`.**
+- [x] **Passo 2: rodar o arquivo** e conferir que falha.
+- [x] **Passo 3: `FormularioDeSetor.tsx`**: props opcionais como acima. Estado inicial `useState(inicial?.nome ?? '')`, `useState(inicial?.sigla ?? '')`, `useState(inicial?.observacoes ?? '')`; `<form … aria-label={titulo}>`, `<h3>{titulo}</h3>`, botão de cancelar com `{rotuloDoCancelar}`; `titulo = 'Novo setor'` e `rotuloDoCancelar = 'Cancelar'` como padrões (os testes do ticket 01 não mudam).
+- [x] **Passo 4: `SetorInexistente.tsx` e `SetorSomenteLeitura.tsx`.**
 
 ```tsx
 import { TEXTO_DE_CADASTRO_INEXISTENTE } from '../../cadastros/cadastroInexistente'
@@ -596,7 +596,7 @@ export function SetorSomenteLeitura({ setor, aoVoltar }: SetorSomenteLeituraProp
 }
 ```
 
-- [ ] **Passo 5: `SetorEditavel.tsx`** (por enquanto sem as ações, que entram na Tarefa 5):
+- [x] **Passo 5: `SetorEditavel.tsx`** (por enquanto sem as ações, que entram na Tarefa 5):
 
 ```tsx
 import { CadastroInexistente } from '../../cadastros/cadastroInexistente'
@@ -634,7 +634,7 @@ export function SetorEditavel({ cadastros, setor, aoVoltar, aoSumir }: SetorEdit
 
 (`aoMudar` já na assinatura; usado só na Tarefa 5. O ESLint de variáveis não usadas obriga a só desestruturar `aoMudar` na Tarefa 5.)
 
-- [ ] **Passo 6: `SetorAberto.tsx`.**
+- [x] **Passo 6: `SetorAberto.tsx`.**
 
 ```tsx
 import { useCallback, useState } from 'react'
@@ -663,10 +663,10 @@ export function SetorAberto({ cadastros, podeAlterar, id, aoVoltar }: SetorAbert
 }
 ```
 
-- [ ] **Passo 7: `AreaDeSetores.tsx`**: quando `aberto !== null`, devolver `<SetorAberto cadastros={cadastros} podeAlterar={podeAlterar} id={aberto} aoVoltar={voltar} />` com `function voltar() { setAberto(null); recarregar() }`. O `useCarregamento` da lista continua no topo (hooks antes do retorno antecipado).
-- [ ] **Passo 8: CSS** de `.setor-leitura-dados` (grade de duas colunas, `dt` em `var(--texto-2)`, `dd` sem margem) em `Cadastros.css`.
-- [ ] **Passo 9: `npx vitest run src/App.editarSetor.test.tsx` passa**; depois `npm test`, `npx tsc -b`, `npm run lint`.
-- [ ] **Passo 10: commit** `Setor aberto: edição, leitura da Consulta e aviso de cadastro inexistente`.
+- [x] **Passo 7: `AreaDeSetores.tsx`**: quando `aberto !== null`, devolver `<SetorAberto cadastros={cadastros} podeAlterar={podeAlterar} id={aberto} aoVoltar={voltar} />` com `function voltar() { setAberto(null); recarregar() }`. O `useCarregamento` da lista continua no topo (hooks antes do retorno antecipado).
+- [x] **Passo 8: CSS** de `.setor-leitura-dados` (grade de duas colunas, `dt` em `var(--texto-2)`, `dd` sem margem) em `Cadastros.css`.
+- [x] **Passo 9: `npx vitest run src/App.editarSetor.test.tsx` passa**; depois `npm test`, `npx tsc -b`, `npm run lint`.
+- [x] **Passo 10: commit** `Setor aberto: edição, leitura da Consulta e aviso de cadastro inexistente`.
 
 ---
 

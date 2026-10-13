@@ -3,13 +3,22 @@ import { textoDaFalhaNoFormulario } from '../../acesso/falhasDeGravacao'
 import type { DadosDoSetor } from '../../cadastros/tipos'
 import { normalizarSigla, problemaNoSetor } from '../../cadastros/validacaoDoSetor'
 
-type FormularioDeSetorProps = { aoSalvar: (dados: DadosDoSetor) => Promise<void>; aoCancelar: () => void }
+type FormularioDeSetorProps = {
+  aoSalvar: (dados: DadosDoSetor) => Promise<void>
+  aoCancelar: () => void
+  titulo?: string
+  inicial?: DadosDoSetor
+  rotuloDoCancelar?: string
+}
 
 // noValidate: as mensagens são as nossas (com o valor digitado), não as do navegador.
-export function FormularioDeSetor({ aoSalvar, aoCancelar }: FormularioDeSetorProps) {
-  const [nome, setNome] = useState('')
-  const [sigla, setSigla] = useState('')
-  const [observacoes, setObservacoes] = useState('')
+export function FormularioDeSetor({
+  aoSalvar, aoCancelar, titulo = 'Novo setor', inicial, rotuloDoCancelar = 'Cancelar',
+}: FormularioDeSetorProps) {
+  const comeco = camposIniciais(inicial)
+  const [nome, setNome] = useState(comeco.nome)
+  const [sigla, setSigla] = useState(comeco.sigla)
+  const [observacoes, setObservacoes] = useState(comeco.observacoes)
   const [aviso, setAviso] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
   const id = useId()
@@ -24,13 +33,13 @@ export function FormularioDeSetor({ aoSalvar, aoCancelar }: FormularioDeSetorPro
       await aoSalvar({ nome: nome.trim(), sigla: normalizarSigla(sigla), observacoes: observacoes.trim() || null })
     } catch (erro) {
       setAviso(textoDaFalhaNoFormulario(erro))
-      setEnviando(false)
     }
+    setEnviando(false)
   }
 
   return (
-    <form className="form-setor" aria-label="Novo setor" noValidate onSubmit={enviar}>
-      <h3 className="form-setor-titulo">Novo setor</h3>
+    <form className="form-setor" aria-label={titulo} noValidate onSubmit={enviar}>
+      <h3 className="form-setor-titulo">{titulo}</h3>
       <label htmlFor={`${id}-nome`}>Nome</label>
       <input id={`${id}-nome`} value={nome} maxLength={200} autoComplete="off"
         onChange={(evento) => setNome(evento.target.value)} />
@@ -42,9 +51,13 @@ export function FormularioDeSetor({ aoSalvar, aoCancelar }: FormularioDeSetorPro
         onChange={(evento) => setObservacoes(evento.target.value)} />
       <div className="form-setor-botoes">
         <button type="submit" className="botao botao-principal" disabled={enviando}>Salvar</button>
-        <button type="button" className="botao botao-secundario" onClick={aoCancelar}>Cancelar</button>
+        <button type="button" className="botao botao-secundario" onClick={aoCancelar}>{rotuloDoCancelar}</button>
       </div>
       {aviso && <p id={`${id}-aviso`} className="cadastros-falha" role="alert">{aviso}</p>}
     </form>
   )
+}
+
+function camposIniciais(inicial?: DadosDoSetor) {
+  return { nome: inicial?.nome ?? '', sigla: inicial?.sigla ?? '', observacoes: inicial?.observacoes ?? '' }
 }
