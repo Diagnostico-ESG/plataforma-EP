@@ -10,16 +10,16 @@
 
 ## Critérios de aceite
 
-- [ ] Testes pgTAP antes da migração: cada célula de `setores_envolvidos` da tabela "quem pode o quê"; mesmo setor duas vezes no mesmo macroprocesso recusado; excluir setor ou macroprocesso apaga as linhas dele.
-- [ ] Migração não destrutiva cria `setores_envolvidos` (chave composta, referências que apagam junto, observação até 500 caracteres) com RLS ligada e os mesmos privilégios do 01.
-- [ ] Gatilhos gravam em `eventos` (entidade `setor_envolvido`, os dois ids) pôr (`criar`), tirar (`excluir`) e mudar observação (`editar`), com a sigla do setor e o nome do macroprocesso legíveis; a exclusão em cascata também gera os eventos de tirar.
-- [ ] O "antes" do evento de exclusão de setor e de macroprocesso passa a trazer a lista dos setores envolvidos; teste pgTAP.
-- [ ] Módulo de cadastros ganha pôr, tirar, mudar observação e as leituras com vínculos e contagens (real e falso); a recusa vira "O setor {SIGLA} já está neste macroprocesso.". Contagem derivada na leitura; se virar view, `security_invoker = true`.
-- [ ] Macroprocesso aberto: lista com sigla, nome, observação editável e [Tirar]; seletor só com setores ativos ainda não envolvidos, mais [Pôr setor]; setores inativos envolvidos marcados "Inativo"; falha mostrada na linha; "Nenhum setor envolvido ainda.".
-- [ ] Setor aberto: "Macroprocessos em que participa" (código, nome, observação, só leitura) ou "Este setor ainda não participa de nenhum macroprocesso.".
-- [ ] Listas ganham a coluna de quantidade (macroprocessos do setor, setores do macroprocesso).
-- [ ] Janelas de exclusão passam a dizer "{SIGLA} sai de {n} macroprocessos." e "{n} setores deixam de estar envolvidos nele.".
-- [ ] A Consulta vê os vínculos sem [Tirar], sem seletor e sem observação editável.
-- [ ] Testes de interface com o aplicativo inteiro: pôr, tirar e mudar observação com sucesso e com falha, o seletor (sem inativos e sem os já envolvidos), as contagens, as janelas com n e a Consulta.
+- [x] Testes pgTAP antes da migração: cada célula de `setores_envolvidos` da tabela "quem pode o quê"; mesmo setor duas vezes no mesmo macroprocesso recusado; excluir setor ou macroprocesso apaga as linhas dele.
+- [x] Migração não destrutiva cria `setores_envolvidos` (chave composta, referências que apagam junto, observação até 500 caracteres) com RLS ligada e os mesmos privilégios do 01.
+- [x] Gatilhos gravam em `eventos` (entidade `setor_envolvido`, os dois ids) pôr (`criar`), tirar (`excluir`) e mudar observação (`editar`), com a sigla do setor e o nome do macroprocesso legíveis; a exclusão em cascata também gera os eventos de tirar.
+- [x] O "antes" do evento de exclusão de setor e de macroprocesso passa a trazer a lista dos setores envolvidos; teste pgTAP.
+- [x] Módulo de cadastros ganha pôr, tirar, mudar observação e as leituras com vínculos e contagens (real e falso); a recusa vira "O setor {SIGLA} já está neste macroprocesso.". Contagem derivada na leitura; se virar view, `security_invoker = true`.
+- [x] Macroprocesso aberto: lista com sigla, nome, observação editável e [Tirar]; seletor só com setores ativos ainda não envolvidos, mais [Pôr setor]; setores inativos envolvidos marcados "Inativo"; falha mostrada na linha; "Nenhum setor envolvido ainda.".
+- [x] Setor aberto: "Macroprocessos em que participa" (código, nome, observação, só leitura) ou "Este setor ainda não participa de nenhum macroprocesso.".
+- [x] Listas ganham a coluna de quantidade (macroprocessos do setor, setores do macroprocesso).
+- [x] Janelas de exclusão passam a dizer "{SIGLA} sai de {n} macroprocessos." e "{n} setores deixam de estar envolvidos nele.".
+- [x] A Consulta vê os vínculos sem [Tirar], sem seletor e sem observação editável.
+- [x] Testes de interface com o aplicativo inteiro: pôr, tirar e mudar observação com sucesso e com falha, o seletor (sem inativos e sem os já envolvidos), as contagens, as janelas com n e a Consulta.
 
 Concluído em 2026-10-13 (commit 1dcd4c8)
