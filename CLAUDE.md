@@ -134,7 +134,11 @@ Decidido em 2026-10-13. Na rede do escritório a porta 5432 fica fechada, então
 * `git push` da branch de trabalho (sem `--force`), para levar os testes ao GitHub;
 * disparar o workflow "Testes de banco" na branch (Run workflow) e ler o resultado.
 
-A autorização vale só para esse ciclo de teste. Enviar à `main`, aplicar migração no banco e qualquer passo de produção continuam pedindo minha aprovação. A migração vai à mão pelo SQL Editor, rodada por mim.
+A autorização vale só para esse ciclo de teste. Aplicar migração no banco e qualquer passo de produção continuam pedindo minha aprovação. A migração vai à mão pelo SQL Editor, rodada por mim.
+
+### Envio da `main` ao GitHub
+
+Decidido em 2026-10-13. `git push` da `main` para o GitHub (`origin`) não precisa da minha aprovação: envie sempre que houver commits locais à frente, por exemplo ao fim de cada ticket ou etapa. Nunca com `--force`; se o envio for recusado, pare e me explique. O envio que mexe em `supabase/` dispara o "Testes de banco" na `main`: confira o resultado e me avise se falhar.
 
 ### Agent skills
 
