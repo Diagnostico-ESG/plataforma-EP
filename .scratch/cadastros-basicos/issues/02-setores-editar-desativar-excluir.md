@@ -19,3 +19,5 @@
 - [x] Setor aberto que já foi excluído: "Este cadastro não existe mais. Ele pode ter sido excluído; veja o Histórico." com [Voltar à lista].
 - [x] Erro de gravação e recusas mantêm o formulário, em vermelho.
 - [x] Testes de interface com o aplicativo inteiro: editar, desativar, reativar e excluir com sucesso e com falha, a janela (textos, Cancelar, Esc), "Mostrar inativos", item que não existe mais e a Consulta sem botões.
+
+Concluído em 2026-10-13 (commit 7e838df)

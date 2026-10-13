@@ -214,3 +214,10 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **`git branch -d` recusado depois do merge (item não testado: branch comum).** Esperado: `-d` aceito depois do merge local, como nos tickets do login-perfis. Aconteceu: a branch tinha sido enviada ao GitHub para o teste de banco, e o Git recusou o `-d` porque a cópia remota (`origin/cadastros-basicos`) não tinha os últimos commits, embora a `main` local já os tivesse. Parei e perguntei, como o comando manda. Sugestão: o comando dizer o que fazer com a branch já enviada ao remoto (enviar os últimos commits antes do `-d` e apagar também a remota).
 - **CSS vazio nos testes.** O `vite.config.ts` só entrega aos testes o conteúdo dos CSS listados em `test.css.include`; um CSS novo testado por cor precisa entrar na lista. Sugestão: anotar isso no `/setup` ou num comentário do teste de cores.
 - **Observação:** o `/executar-complexo` rodou em Opus (a tabela recomenda Sonnet), na mesma sessão do `/situação`, por escolha do usuário.
+
+## 2026-10-13 — /executar-complexo do ticket 02 de cadastros-basicos
+
+- **Branch comum (item não testado).** Esperado: `git switch -c`, execução, merge e `git branch -d`. Aconteceu: a branch `cadastros-basicos` foi criada de novo a partir da `main`, ficou só local, e o `-d` foi aceito depois do merge (sem envio ao GitHub, porque o ticket não mexeu em `supabase/`).
+- **Plano e linha de conclusão (item não testado).** Esperado: `plano-02.md` ao lado do `plano-01.md`, e a linha `Concluído em` no ticket. Aconteceu: ambos gravados; as caixas do plano foram marcadas por tarefa, e os critérios do ticket só no fim.
+- **Tarefa sem banco.** O ticket só mexeu na interface, então o passo de banco do comando (teste pgTAP, migração, `db:types`) foi dispensado no plano, com o motivo escrito no cabeçalho dele. Sugestão: o comando dizer explicitamente que um ticket sem mudança de banco pula esse passo.
+- **Conferência na tela.** A tarefa final do plano previa ver a tela rodando; o login é pelo Google institucional e a sessão não entra, então a conferência visual ficou para o usuário (os testes de tela com o aplicativo inteiro passaram).
