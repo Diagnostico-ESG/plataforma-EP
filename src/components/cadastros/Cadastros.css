@@ -76,3 +76,29 @@
   background: var(--atraso-fundo);
   color: var(--atraso-texto);
 }
+
+.cadastros-inativos {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  font-size: var(--tam-secundario);
+}
+
+.linha-clicavel {
+  cursor: pointer;
+}
+
+.linha-clicavel:hover {
+  background: var(--fundo);
+}
+
+/* Botão com cara de texto: a linha toda é clicável, o botão serve ao teclado. */
+.cadastros-abrir {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--azul);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}

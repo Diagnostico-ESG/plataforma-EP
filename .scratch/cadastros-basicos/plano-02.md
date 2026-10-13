@@ -266,7 +266,7 @@ async function porQueNadaMudou(cliente: ClienteSupabase, id: string): Promise<Er
 - Consome `Setor` e `EstadoDoCarregamento` (já existem).
 - Produz `ErroAoCarregar({ alvo, aoTentarDeNovo })` (`alvo`: "os setores", "o setor"…) e `ListaDeSetores({ estado, aoTentarDeNovo, aoAbrir: (id: string) => void })`.
 
-- [ ] **Passo 1: testes que falham** em `src/App.setoresInativos.test.tsx` (mesma montagem dos outros arquivos `App.*.test.tsx`: `beforeEach` com `window.location.hash = '#/setores'`, `afterEach` com `cleanup` e hash vazio; `SETORES` = AFT e CIT ativos, EXT inativo, como em `App.setores.test.tsx`):
+- [x] **Passo 1: testes que falham** em `src/App.setoresInativos.test.tsx` (mesma montagem dos outros arquivos `App.*.test.tsx`: `beforeEach` com `window.location.hash = '#/setores'`, `afterEach` com `cleanup` e hash vazio; `SETORES` = AFT e CIT ativos, EXT inativo, como em `App.setores.test.tsx`):
 
 ```tsx
 function montar(setores = SETORES) {
@@ -310,8 +310,8 @@ test('só inativos e caixa desmarcada: "Nenhum setor ativo para mostrar."', asyn
 
 (`screen.findByRole('cell', { name: 'AFT' })` continua valendo mesmo com o botão dentro da célula, da Tarefa 3 passo 3.)
 
-- [ ] **Passo 2: rodar `npx vitest run src/App.setoresInativos.test.tsx`** e conferir que falham.
-- [ ] **Passo 3: `ErroAoCarregar.tsx`** (o bloco que hoje está dentro de `ListaDeSetores`, extraído porque o setor aberto precisa do mesmo):
+- [x] **Passo 2: rodar `npx vitest run src/App.setoresInativos.test.tsx`** e conferir que falham.
+- [x] **Passo 3: `ErroAoCarregar.tsx`** (o bloco que hoje está dentro de `ListaDeSetores`, extraído porque o setor aberto precisa do mesmo):
 
 ```tsx
 type ErroAoCarregarProps = { alvo: string; aoTentarDeNovo: () => void }
@@ -326,7 +326,7 @@ export function ErroAoCarregar({ alvo, aoTentarDeNovo }: ErroAoCarregarProps) {
 }
 ```
 
-- [ ] **Passo 4: reescrever `ListaDeSetores.tsx`.**
+- [x] **Passo 4: reescrever `ListaDeSetores.tsx`.**
 
 ```tsx
 import { useState } from 'react'
@@ -404,8 +404,8 @@ function LinhaFantasma() {
 }
 ```
 
-- [ ] **Passo 5: `AreaDeSetores.tsx`**: guardar `const [aberto, setAberto] = useState<string | null>(null)` e passar `aoAbrir={setAberto}` à lista (a tela do setor aberto vem na Tarefa 4; por ora só a lista muda). Se algum teste de `App.setores.test.tsx` conferir os cabeçalhos da tabela ("Sigla", "Nome"), acrescentar "Situação" na expectativa; nenhuma outra expectativa existente deve mudar.
-- [ ] **Passo 6: CSS** em `Cadastros.css`:
+- [x] **Passo 5: `AreaDeSetores.tsx`**: guardar `const [aberto, setAberto] = useState<string | null>(null)` e passar `aoAbrir={setAberto}` à lista (a tela do setor aberto vem na Tarefa 4; por ora só a lista muda). Se algum teste de `App.setores.test.tsx` conferir os cabeçalhos da tabela ("Sigla", "Nome"), acrescentar "Situação" na expectativa; nenhuma outra expectativa existente deve mudar.
+- [x] **Passo 6: CSS** em `Cadastros.css`:
 
 ```css
 .cadastros-inativos {
@@ -437,8 +437,8 @@ function LinhaFantasma() {
 
 (Conferir em `src/styles/` o nome real do token de fundo suave; se não houver, usar o de superfície que as outras tabelas usam.)
 
-- [ ] **Passo 7: `npm test`, `npx tsc -b`, `npm run lint`** passam.
-- [ ] **Passo 8: commit** `Lista de setores: Mostrar inativos, pílula Inativo e linha clicável`.
+- [x] **Passo 7: `npm test`, `npx tsc -b`, `npm run lint`** passam.
+- [x] **Passo 8: commit** `Lista de setores: Mostrar inativos, pílula Inativo e linha clicável`.
 
 ---
 

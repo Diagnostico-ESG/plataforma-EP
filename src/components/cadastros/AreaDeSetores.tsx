@@ -10,6 +10,7 @@ export function AreaDeSetores({ cadastros, podeAlterar }: AreaDeSetoresProps) {
   const listar = useCallback(() => cadastros.listarSetores(), [cadastros])
   const { estado, tentarDeNovo, recarregar } = useCarregamento(listar)
   const [criando, setCriando] = useState(false)
+  const [, setAberto] = useState<string | null>(null)
 
   // A falha segue para o formulário, que a mostra e mantém os dados.
   async function criar(dados: DadosDoSetor) {
@@ -26,7 +27,7 @@ export function AreaDeSetores({ cadastros, podeAlterar }: AreaDeSetoresProps) {
         </button>
       )}
       {criando && <FormularioDeSetor aoSalvar={criar} aoCancelar={() => setCriando(false)} />}
-      <ListaDeSetores estado={estado} aoTentarDeNovo={tentarDeNovo} />
+      <ListaDeSetores estado={estado} aoTentarDeNovo={tentarDeNovo} aoAbrir={setAberto} />
     </div>
   )
 }
