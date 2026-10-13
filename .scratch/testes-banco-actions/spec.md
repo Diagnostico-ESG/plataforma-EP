@@ -51,3 +51,5 @@ Sem testes automatizados próprios: o "teste" é a execução real no GitHub (as
 4. Enviar o código (`git push`) e apertar "Run workflow" em "Testes de banco".
 
 Implementado em 2026-10-09 (commit 2d7f021)
+
+Entregue em 2026-10-13 (commit 6e95781)
