@@ -44,21 +44,21 @@ test('o endereço da aba abre a lista, com a aba Macroprocessos destacada', asyn
   expect(abas.getByRole('link', { name: 'Macroprocessos' }).getAttribute('aria-current')).toBe('page')
 })
 
-test('a tabela tem as colunas Código, Nome, Categoria e Situação', async () => {
+test('a tabela tem as colunas Código, Nome, Categoria, Setores e Situação', async () => {
   montar()
   await screen.findByRole('cell', { name: 'Planejamento Inventado de Teste' })
   expect(screen.getAllByRole('columnheader').map((coluna) => coluna.textContent))
-    .toEqual(['Código', 'Nome', 'Categoria', 'Situação'])
+    .toEqual(['Código', 'Nome', 'Categoria', 'Setores', 'Situação'])
 })
 
 test('a lista dos ativos vai pelo código e deixa os sem código depois, em ordem alfabética', async () => {
   montar()
   await screen.findByRole('cell', { name: 'Planejamento Inventado de Teste' })
   expect(linhasDaTabela()).toEqual([
-    'MPT01Planejamento Inventado de TesteFinalístico',
-    'MPT02Gestão Fictícia de TesteApoio',
-    '—Arquivo Fictício de TesteGerencial',
-    '—Zeladoria Inventada de Teste—',
+    'MPT01Planejamento Inventado de TesteFinalístico0',
+    'MPT02Gestão Fictícia de TesteApoio0',
+    '—Arquivo Fictício de TesteGerencial0',
+    '—Zeladoria Inventada de Teste—0',
   ])
 })
 

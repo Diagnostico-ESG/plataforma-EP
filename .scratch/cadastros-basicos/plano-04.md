@@ -402,12 +402,12 @@ e em `ModuloDeCadastros`: `listarSetores(): Promise<SetorDaLista[]>`, `lerSetor(
 
 **Interfaces:** Consome `SetorDaLista`, `MacroprocessoDaLista`, `CadastrosFalso.vinculos`. As props `estado` das duas listas passam a `EstadoDoCarregamento<SetorDaLista[]>` e `EstadoDoCarregamento<MacroprocessoDaLista[]>`.
 
-- [ ] **Passo 1: testes que falham.**
+- [x] **Passo 1: testes que falham.**
   - Ajustar os testes de cabeçalho: `['Sigla', 'Nome', 'Macroprocessos', 'Situação']` e `['Código', 'Nome', 'Categoria', 'Setores', 'Situação']`.
   - `App.contagens.test.tsx` (aplicativo inteiro, `CadastrosFalso` com setores, macroprocessos e `vinculos` inventados, hash `#/setores` e `#/setores/macroprocessos`): a coluna mostra a quantidade certa por linha (inclusive 0); desativar um setor não muda a contagem dele; a Consulta vê as mesmas contagens.
-- [ ] **Passo 2: ver falharem.** `npx vitest run src/App.contagens.test.tsx src/App.setores.test.tsx src/App.macroprocessos.test.tsx`.
-- [ ] **Passo 3: implementar** a coluna nas duas tabelas (`LinhaFantasma` com 4 e 5 colunas) mostrando o número puro.
-- [ ] **Passo 4: verificar** (`npm test`, `npx tsc -b`, `npm run lint`). Commit.
+- [x] **Passo 2: ver falharem.** `npx vitest run src/App.contagens.test.tsx src/App.setores.test.tsx src/App.macroprocessos.test.tsx`.
+- [x] **Passo 3: implementar** a coluna nas duas tabelas (`LinhaFantasma` com 4 e 5 colunas) mostrando o número puro.
+- [x] **Passo 4: verificar** (`npm test`, `npx tsc -b`, `npm run lint`). Commit.
 
 ---
 

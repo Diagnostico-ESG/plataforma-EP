@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Setor } from '../../cadastros/tipos'
+import type { SetorDaLista } from '../../cadastros/tipos'
 import type { EstadoDoCarregamento } from '../../hooks/useCarregamento'
 import { Pilula } from '../Pilula'
 import { ErroAoCarregar } from './ErroAoCarregar'
@@ -8,7 +8,7 @@ import { CaixaMostrarInativos, LinhaFantasma } from './PecasDaLista'
 const LINHAS_FANTASMA = 3
 
 type ListaDeSetoresProps = {
-  estado: EstadoDoCarregamento<Setor[]>
+  estado: EstadoDoCarregamento<SetorDaLista[]>
   aoTentarDeNovo: () => void
   aoAbrir: (id: string) => void
 }
@@ -30,18 +30,21 @@ export function ListaDeSetores({ estado, aoTentarDeNovo, aoAbrir }: ListaDeSetor
   )
 }
 
-type TabelaDeSetoresProps = { carregando: boolean; setores: Setor[]; aoAbrir: (id: string) => void }
+type TabelaDeSetoresProps = { carregando: boolean; setores: SetorDaLista[]; aoAbrir: (id: string) => void }
 
 function TabelaDeSetores({ carregando, setores, aoAbrir }: TabelaDeSetoresProps) {
   return (
     <table className="tabela-cadastros" aria-busy={carregando}>
       {carregando && <caption>Carregando setores…</caption>}
       <thead>
-        <tr><th scope="col">Sigla</th><th scope="col">Nome</th><th scope="col">Situação</th></tr>
+        <tr>
+          <th scope="col">Sigla</th><th scope="col">Nome</th><th scope="col">Macroprocessos</th>
+          <th scope="col">Situação</th>
+        </tr>
       </thead>
       <tbody>
         {carregando
-          ? Array.from({ length: LINHAS_FANTASMA }, (_, i) => <LinhaFantasma key={i} colunas={3} />)
+          ? Array.from({ length: LINHAS_FANTASMA }, (_, i) => <LinhaFantasma key={i} colunas={4} />)
           : setores.map((setor) => <LinhaDeSetor key={setor.id} setor={setor} aoAbrir={aoAbrir} />)}
       </tbody>
     </table>
@@ -49,11 +52,12 @@ function TabelaDeSetores({ carregando, setores, aoAbrir }: TabelaDeSetoresProps)
 }
 
 // A linha inteira abre o setor; o botão na sigla dá o mesmo caminho a quem usa o teclado.
-function LinhaDeSetor({ setor, aoAbrir }: { setor: Setor; aoAbrir: (id: string) => void }) {
+function LinhaDeSetor({ setor, aoAbrir }: { setor: SetorDaLista; aoAbrir: (id: string) => void }) {
   return (
     <tr className="linha-clicavel" onClick={() => aoAbrir(setor.id)}>
       <td><button type="button" className="cadastros-abrir">{setor.sigla}</button></td>
       <td>{setor.nome}</td>
+      <td>{setor.quantidadeDeMacroprocessos}</td>
       <td>{!setor.ativo && <Pilula situacao="neutra">Inativo</Pilula>}</td>
     </tr>
   )

@@ -72,7 +72,7 @@ function linhasDaTabela() {
 test('a lista mostra sigla e nome dos setores ativos, na ordem recebida', async () => {
   montar()
   await screen.findByText('AFT')
-  expect(linhasDaTabela()).toEqual(['AFTAssessoria Fictícia de Teste', 'CITCoordenação Inventada de Teste'])
+  expect(linhasDaTabela()).toEqual(['AFTAssessoria Fictícia de Teste0', 'CITCoordenação Inventada de Teste0'])
 })
 
 test('enquanto carrega, mostra "Carregando setores…"', async () => {

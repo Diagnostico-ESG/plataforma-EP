@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { rotuloDaCategoria } from '../../cadastros/categorias'
-import type { Macroprocesso } from '../../cadastros/tipos'
+import type { MacroprocessoDaLista } from '../../cadastros/tipos'
 import type { EstadoDoCarregamento } from '../../hooks/useCarregamento'
 import { Pilula } from '../Pilula'
 import { ErroAoCarregar } from './ErroAoCarregar'
@@ -10,7 +10,7 @@ const LINHAS_FANTASMA = 3
 const SEM_VALOR = '—'
 
 type ListaDeMacroprocessosProps = {
-  estado: EstadoDoCarregamento<Macroprocesso[]>
+  estado: EstadoDoCarregamento<MacroprocessoDaLista[]>
   aoTentarDeNovo: () => void
   aoAbrir: (id: string) => void
 }
@@ -34,7 +34,7 @@ export function ListaDeMacroprocessos({ estado, aoTentarDeNovo, aoAbrir }: Lista
   )
 }
 
-type TabelaProps = { carregando: boolean; macroprocessos: Macroprocesso[]; aoAbrir: (id: string) => void }
+type TabelaProps = { carregando: boolean; macroprocessos: MacroprocessoDaLista[]; aoAbrir: (id: string) => void }
 
 function TabelaDeMacroprocessos({ carregando, macroprocessos, aoAbrir }: TabelaProps) {
   return (
@@ -43,12 +43,12 @@ function TabelaDeMacroprocessos({ carregando, macroprocessos, aoAbrir }: TabelaP
       <thead>
         <tr>
           <th scope="col">Código</th><th scope="col">Nome</th><th scope="col">Categoria</th>
-          <th scope="col">Situação</th>
+          <th scope="col">Setores</th><th scope="col">Situação</th>
         </tr>
       </thead>
       <tbody>
         {carregando
-          ? Array.from({ length: LINHAS_FANTASMA }, (_, i) => <LinhaFantasma key={i} colunas={4} />)
+          ? Array.from({ length: LINHAS_FANTASMA }, (_, i) => <LinhaFantasma key={i} colunas={5} />)
           : macroprocessos.map((macroprocesso) => (
             <LinhaDeMacroprocesso key={macroprocesso.id} macroprocesso={macroprocesso} aoAbrir={aoAbrir} />
           ))}
@@ -58,12 +58,13 @@ function TabelaDeMacroprocessos({ carregando, macroprocessos, aoAbrir }: TabelaP
 }
 
 // A linha inteira abre o macroprocesso; o botão no nome dá o mesmo caminho a quem usa o teclado (nem todos têm código).
-function LinhaDeMacroprocesso({ macroprocesso, aoAbrir }: { macroprocesso: Macroprocesso; aoAbrir: (id: string) => void }) {
+function LinhaDeMacroprocesso({ macroprocesso, aoAbrir }: { macroprocesso: MacroprocessoDaLista; aoAbrir: (id: string) => void }) {
   return (
     <tr className="linha-clicavel" onClick={() => aoAbrir(macroprocesso.id)}>
       <td>{macroprocesso.codigo ?? SEM_VALOR}</td>
       <td><button type="button" className="cadastros-abrir">{macroprocesso.nome}</button></td>
       <td>{macroprocesso.categoria === null ? SEM_VALOR : rotuloDaCategoria(macroprocesso.categoria)}</td>
+      <td>{macroprocesso.quantidadeDeSetores}</td>
       <td>{!macroprocesso.ativo && <Pilula situacao="neutra">Inativo</Pilula>}</td>
     </tr>
   )
