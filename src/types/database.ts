@@ -39,6 +39,61 @@ export type Database = {
   }
   public: {
     Tables: {
+      andamentos: {
+        Row: {
+          etapa_id: string
+          id: string
+          iniciada_em: string | null
+          nota: string | null
+          resolvida_em: string | null
+          responsavel_id: string | null
+          setor_id: string
+          status: Database["public"]["Enums"]["status_da_etapa"]
+        }
+        Insert: {
+          etapa_id: string
+          id?: string
+          iniciada_em?: string | null
+          nota?: string | null
+          resolvida_em?: string | null
+          responsavel_id?: string | null
+          setor_id: string
+          status?: Database["public"]["Enums"]["status_da_etapa"]
+        }
+        Update: {
+          etapa_id?: string
+          id?: string
+          iniciada_em?: string | null
+          nota?: string | null
+          resolvida_em?: string | null
+          responsavel_id?: string | null
+          setor_id?: string
+          status?: Database["public"]["Enums"]["status_da_etapa"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "andamentos_etapa_id_fkey"
+            columns: ["etapa_id"]
+            isOneToOne: false
+            referencedRelation: "etapas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "andamentos_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "andamentos_setor_id_fkey"
+            columns: ["setor_id"]
+            isOneToOne: false
+            referencedRelation: "setores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       autorizacoes: {
         Row: {
           criada_em: string
@@ -67,6 +122,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      etapas: {
+        Row: {
+          ativa: boolean
+          codigo: string
+          criado_em: string
+          id: string
+          nivel: Database["public"]["Enums"]["nivel_da_etapa"]
+          nome: string
+          obrigatoria: boolean
+          ordem: number
+        }
+        Insert: {
+          ativa?: boolean
+          codigo: string
+          criado_em?: string
+          id?: string
+          nivel: Database["public"]["Enums"]["nivel_da_etapa"]
+          nome: string
+          obrigatoria: boolean
+          ordem: number
+        }
+        Update: {
+          ativa?: boolean
+          codigo?: string
+          criado_em?: string
+          id?: string
+          nivel?: Database["public"]["Enums"]["nivel_da_etapa"]
+          nome?: string
+          obrigatoria?: boolean
+          ordem?: number
+        }
+        Relationships: []
       }
       eventos: {
         Row: {
@@ -264,7 +352,14 @@ export type Database = {
     }
     Enums: {
       categoria_macroprocesso: "finalistico" | "apoio" | "gerencial"
+      nivel_da_etapa: "setor" | "processo"
       perfil: "administrador" | "integrante_ep" | "consulta"
+      status_da_etapa:
+        | "pendente"
+        | "em_andamento"
+        | "concluida"
+        | "realizada_anteriormente"
+        | "dispensada"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -396,7 +491,15 @@ export const Constants = {
   public: {
     Enums: {
       categoria_macroprocesso: ["finalistico", "apoio", "gerencial"],
+      nivel_da_etapa: ["setor", "processo"],
       perfil: ["administrador", "integrante_ep", "consulta"],
+      status_da_etapa: [
+        "pendente",
+        "em_andamento",
+        "concluida",
+        "realizada_anteriormente",
+        "dispensada",
+      ],
     },
   },
 } as const

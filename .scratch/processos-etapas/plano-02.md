@@ -62,9 +62,9 @@
 - Produces: `public.etapas (id, codigo, nome, ordem, nivel, obrigatoria, ativa, criado_em)`; `public.andamentos (id, etapa_id, setor_id, status, nota, responsavel_id, iniciada_em, resolvida_em)`; enums `nivel_da_etapa`, `status_da_etapa`; eventos `entidade = 'andamento'` como em "Decisões de execução"; recusas `anterior_nao_resolvida:<nome>` e `etapa_obrigatoria:<nome>` (P0001).
 - Consumes: `private.usuario_ativo()`, `private.perfil_atual()`, `private.pode_alterar_cadastros()`.
 
-- [ ] **Step 1: pasta limpa, branch e marco.** `git status` sem mudanças; `git switch -c processos-etapas-02`; `git tag marco/2026-10-13-inicio-ticket-02-processos-etapas`.
+- [x] **Step 1: pasta limpa, branch e marco.** `git status` sem mudanças; `git switch -c processos-etapas-02`; `git tag marco/2026-10-13-inicio-ticket-02-processos-etapas`.
 
-- [ ] **Step 2: teste de banco (vermelho).** Criar `supabase/tests/15_etapas_do_setor.test.sql`:
+- [x] **Step 2: teste de banco (vermelho).** Criar `supabase/tests/15_etapas_do_setor.test.sql`:
 
 ```sql
 -- Etapas do setor: catálogo e andamentos, quem pode o quê, sequência, dispensa, datas e eventos
@@ -360,9 +360,9 @@ insert into _tap (linha) select is(
   0, 'Integrante não lê eventos de usuários nem de autorizações');
 ```
 
-- [ ] **Step 3: ver falhar.** `git add supabase/tests/15_etapas_do_setor.test.sql supabase/tests/03_login_leitura.test.sql`; commit "Ticket 02 de processos-etapas: teste de banco das etapas do setor"; `git push -u origin processos-etapas-02`; disparar "Testes de banco" na branch pelo navegador do app e ler o resultado. Esperado: `15_etapas_do_setor` vermelho (tabela `etapas` inexistente); os outros 15 arquivos verdes (o 03 passa com ou sem a migração).
+- [x] **Step 3: ver falhar.** `git add supabase/tests/15_etapas_do_setor.test.sql supabase/tests/03_login_leitura.test.sql`; commit "Ticket 02 de processos-etapas: teste de banco das etapas do setor"; `git push -u origin processos-etapas-02`; disparar "Testes de banco" na branch pelo navegador do app e ler o resultado. Esperado: `15_etapas_do_setor` vermelho (tabela `etapas` inexistente); os outros 15 arquivos verdes (o 03 passa com ou sem a migração).
 
-- [ ] **Step 4: migração.** `npx supabase migration new etapas_do_setor` e escrever no arquivo criado:
+- [x] **Step 4: migração.** `npx supabase migration new etapas_do_setor` e escrever no arquivo criado:
 
 ```sql
 -- Processos e etapas, ticket 02: catálogo de etapas (carga da fase 1) e etapas do setor, com sequência, dispensa,
@@ -601,9 +601,9 @@ create policy "eventos: perfil ativo lê as etapas" on public.eventos
 
 Atenção: `private.acao_do_andamento` é chamada dentro de uma função `security definer` (roda como dono), por isso a execução pode ficar tirada de `authenticated`. As três `conferir_*` são chamadas por `preparar_andamento`, que roda como quem altera: precisam de execução para `authenticated`.
 
-- [ ] **Step 5: aplicar e ver passar.** Commit "Ticket 02 de processos-etapas: migração das etapas do setor"; `git push`; disparar "Migrar banco de desenvolvimento" com o nome do arquivo criado no passo 4; depois "Testes de banco" na branch. Esperado: os 16 arquivos verdes, `15_etapas_do_setor` com todos os itens passando. Se algum item falhar, corrigir com **migração nova** (a já aplicada não se edita) ou o teste, se o erro for dele.
+- [x] **Step 5: aplicar e ver passar.** Commit "Ticket 02 de processos-etapas: migração das etapas do setor"; `git push`; disparar "Migrar banco de desenvolvimento" com o nome do arquivo criado no passo 4; depois "Testes de banco" na branch. Esperado: os 16 arquivos verdes, `15_etapas_do_setor` com todos os itens passando. Se algum item falhar, corrigir com **migração nova** (a já aplicada não se edita) ou o teste, se o erro for dele.
 
-- [ ] **Step 6: registro e tipos.** Acrescentar em `supabase/AMBIENTES.md`, na lista das migrações aplicadas à mão, a linha `- <arquivo sem .sql> (2026-10-13; processos-etapas, ticket 02; teste 15 falhou antes, tabela inexistente, e passou depois, com os 16 arquivos verdes; aplicada pelo workflow "Migrar banco de desenvolvimento")`. Conferir o vínculo (`AMBIENTES.md` e `supabase/.temp/project-ref` = `yclkzyoebpsxmgpbcbus`), `npm run db:types`, `npx tsc -b` limpo (`etapas`, `andamentos` e os dois enums aparecem em `src/types/database.ts`). Commit "Ticket 02 de processos-etapas: tipos e registro da migração"; `git push`.
+- [x] **Step 6: registro e tipos.** Acrescentar em `supabase/AMBIENTES.md`, na lista das migrações aplicadas à mão, a linha `- <arquivo sem .sql> (2026-10-13; processos-etapas, ticket 02; teste 15 falhou antes, tabela inexistente, e passou depois, com os 16 arquivos verdes; aplicada pelo workflow "Migrar banco de desenvolvimento")`. Conferir o vínculo (`AMBIENTES.md` e `supabase/.temp/project-ref` = `yclkzyoebpsxmgpbcbus`), `npm run db:types`, `npx tsc -b` limpo (`etapas`, `andamentos` e os dois enums aparecem em `src/types/database.ts`). Commit "Ticket 02 de processos-etapas: tipos e registro da migração"; `git push`.
 
 ---
 
@@ -622,7 +622,7 @@ Atenção: `private.acao_do_andamento` é chamada dentro de uma função `securi
   - `export const RECUSAS_DOS_PROCESSOS: RecusasDoModulo`
   - `export class ProcessosFalso implements ModuloDeProcessos` com `etapasDoSetor: Record<string, EtapaDoSetor[]>`, `falharLeitura`, `segurarLeitura`, `falhaDeGravacao: string | Error | null`, `chamadas: { acao: string; id: string; nota?: string }[]`
 
-- [ ] **Step 1: tipos.** `src/processos/tipos.ts`:
+- [x] **Step 1: tipos.** `src/processos/tipos.ts`:
 
 ```ts
 export type StatusDaEtapa = 'pendente' | 'em_andamento' | 'concluida' | 'realizada_anteriormente' | 'dispensada'
@@ -655,7 +655,7 @@ export type ModuloDeProcessos = {
 }
 ```
 
-- [ ] **Step 2: testes do módulo real (vermelho).** `src/processos/processosSupabase.test.ts`:
+- [x] **Step 2: testes do módulo real (vermelho).** `src/processos/processosSupabase.test.ts`:
 
 ```ts
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -755,7 +755,7 @@ test('nada mudou e a etapa sumiu (o setor foi excluído): aviso de cadastro inex
 
 Rodar `npx vitest run src/processos/processosSupabase.test.ts`. Esperado: falha (módulo inexistente).
 
-- [ ] **Step 3: módulo real.** `src/processos/processosSupabase.ts`:
+- [x] **Step 3: módulo real.** `src/processos/processosSupabase.ts`:
 
 ```ts
 import {
@@ -834,9 +834,9 @@ function falhaDoAndamento(erro: ErroDoBanco): Error {
 
 Se o `tsc` reclamar do `data as AndamentoLido[]` (tipo inferido pelo supabase-js diferente), trocar por `data as unknown as AndamentoLido[]`, como em `historicoSupabase.ts`.
 
-- [ ] **Step 4: ver passar.** `npx vitest run src/processos/processosSupabase.test.ts` verde; `npx tsc -b` limpo.
+- [x] **Step 4: ver passar.** `npx vitest run src/processos/processosSupabase.test.ts` verde; `npx tsc -b` limpo.
 
-- [ ] **Step 5: módulo falso.** `src/processos/ProcessosFalso.ts`:
+- [x] **Step 5: módulo falso.** `src/processos/ProcessosFalso.ts`:
 
 ```ts
 import type { EtapaDoSetor, ModuloDeProcessos } from './tipos'
@@ -891,7 +891,7 @@ export class ProcessosFalso implements ModuloDeProcessos {
 }
 ```
 
-- [ ] **Step 6: conferir e comitar.** `npx tsc -b`, `npx eslint src/processos`; commit "Ticket 02 de processos-etapas: módulo de processos (real e falso)".
+- [x] **Step 6: conferir e comitar.** `npx tsc -b`, `npx eslint src/processos`; commit "Ticket 02 de processos-etapas: módulo de processos (real e falso)".
 
 ---
 
@@ -909,7 +909,7 @@ export class ProcessosFalso implements ModuloDeProcessos {
   - `export function acoesDaEtapa(etapas: EtapaDoSetor[], indice: number): AcaoDaEtapa[]`
   - `export function formatarData(data: string | null): string`
 
-- [ ] **Step 1: testes (vermelho).** `src/processos/caminhoDeEtapas.test.ts`:
+- [x] **Step 1: testes (vermelho).** `src/processos/caminhoDeEtapas.test.ts`:
 
 ```ts
 import { describe, expect, test } from 'vitest'
@@ -965,7 +965,7 @@ test('a data do banco (AAAA-MM-DD) aparece como DD/MM/AAAA; sem data, um traço'
 
 Rodar `npx vitest run src/processos/caminhoDeEtapas.test.ts`. Esperado: falha (módulo inexistente).
 
-- [ ] **Step 2: implementar.** `src/processos/caminhoDeEtapas.ts`:
+- [x] **Step 2: implementar.** `src/processos/caminhoDeEtapas.ts`:
 
 ```ts
 import type { EtapaDoSetor, StatusDaEtapa } from './tipos'
@@ -1003,7 +1003,7 @@ export function formatarData(data: string | null): string {
 }
 ```
 
-- [ ] **Step 3: ver passar e comitar.** `npx vitest run src/processos` verde; commit "Ticket 02 de processos-etapas: etapa atual, ações e rótulos".
+- [x] **Step 3: ver passar e comitar.** `npx vitest run src/processos` verde; commit "Ticket 02 de processos-etapas: etapa atual, ações e rótulos".
 
 ---
 
@@ -1016,7 +1016,7 @@ export function formatarData(data: string | null): string {
 **Interfaces:**
 - Produces: `export function JanelaComCampo(props: { aberta: boolean; titulo: string; rotuloDoCampo: string; rotuloDaAcao: string; aoConfirmar: (texto: string) => void; aoFechar: () => void })`. `aoConfirmar` recebe o texto sem espaços nas pontas.
 
-- [ ] **Step 1: testes (vermelho).** `src/components/JanelaComCampo.test.tsx`:
+- [x] **Step 1: testes (vermelho).** `src/components/JanelaComCampo.test.tsx`:
 
 ```tsx
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
@@ -1071,7 +1071,7 @@ test('Cancelar e Esc fecham sem confirmar', () => {
 
 Rodar `npx vitest run src/components/JanelaComCampo.test.tsx`. Esperado: falha (componente inexistente).
 
-- [ ] **Step 2: implementar.** `src/components/JanelaComCampo.tsx`:
+- [x] **Step 2: implementar.** `src/components/JanelaComCampo.tsx`:
 
 ```tsx
 import './JanelaDeConfirmacao.css'
@@ -1151,7 +1151,7 @@ Acrescentar ao fim de `src/components/JanelaDeConfirmacao.css`:
 
 (Se `--esp-2` não existir em `src/styles/tokens.css`, usar o menor `--esp-*` que existir.)
 
-- [ ] **Step 3: ver passar e comitar.** `npx vitest run src/components/JanelaComCampo.test.tsx` verde; commit "Ticket 02 de processos-etapas: janela com campo obrigatório".
+- [x] **Step 3: ver passar e comitar.** `npx vitest run src/components/JanelaComCampo.test.tsx` verde; commit "Ticket 02 de processos-etapas: janela com campo obrigatório".
 
 ---
 
@@ -1165,7 +1165,7 @@ Acrescentar ao fim de `src/components/JanelaDeConfirmacao.css`:
 - Consumes: `ModuloDeProcessos`, `EtapaDoSetor`, `ProcessosFalso` (Task 2); `acoesDaEtapa`, `indiceDaEtapaAtual`, `ROTULO_DO_STATUS`, `formatarData`, `AcaoDaEtapa` (Task 3); `JanelaComCampo` (Task 4); `useCarregamento`, `useGravacaoComFalha`, `ErroAoCarregar`, `Pilula`.
 - Produces: `App` com a prop `processos: ModuloDeProcessos`; `EtapasDoSetor({ processos, setorId, podeAlterar, aoSumir })`.
 
-- [ ] **Step 1: injeção (sem mudar comportamento).** Em `src/App.tsx`: importar `import type { ModuloDeProcessos } from './processos/tipos'`; `type AppProps = { acesso: ModuloDeAcesso; cadastros: ModuloDeCadastros; processos: ModuloDeProcessos }`; desestruturar `processos` e passar `<AreaDeCadastros usuario={estado.usuario} cadastros={cadastros} processos={processos} />`. Em `src/main.tsx`: `import { criarProcessosSupabase } from './processos/processosSupabase'`, `const processos = criarProcessosSupabase(supabase)` e `<App acesso={acesso} cadastros={cadastros} processos={processos} />`. Em `AreaDeCadastros.tsx`: a prop `processos: ModuloDeProcessos` entra em `AreaDeCadastrosProps` e em `SecaoAtualProps`, e vai para `<AreaDeSetores cadastros={cadastros} processos={processos} podeAlterar={podeAlterar} />`. Em `AreaDeSetores.tsx`: prop `processos` em `AreaDeSetoresProps`, repassada a `<SetorAberto cadastros={cadastros} processos={processos} ... />`. Em `SetorAberto.tsx`: acrescentar `processos: ModuloDeProcessos` só ao tipo `SetorAbertoProps` (sem desestruturar ainda, para o ESLint não reclamar de variável sem uso); o passo 4 passa a usá-la.
+- [x] **Step 1: injeção (sem mudar comportamento).** Em `src/App.tsx`: importar `import type { ModuloDeProcessos } from './processos/tipos'`; `type AppProps = { acesso: ModuloDeAcesso; cadastros: ModuloDeCadastros; processos: ModuloDeProcessos }`; desestruturar `processos` e passar `<AreaDeCadastros usuario={estado.usuario} cadastros={cadastros} processos={processos} />`. Em `src/main.tsx`: `import { criarProcessosSupabase } from './processos/processosSupabase'`, `const processos = criarProcessosSupabase(supabase)` e `<App acesso={acesso} cadastros={cadastros} processos={processos} />`. Em `AreaDeCadastros.tsx`: a prop `processos: ModuloDeProcessos` entra em `AreaDeCadastrosProps` e em `SecaoAtualProps`, e vai para `<AreaDeSetores cadastros={cadastros} processos={processos} podeAlterar={podeAlterar} />`. Em `AreaDeSetores.tsx`: prop `processos` em `AreaDeSetoresProps`, repassada a `<SetorAberto cadastros={cadastros} processos={processos} ... />`. Em `SetorAberto.tsx`: acrescentar `processos: ModuloDeProcessos` só ao tipo `SetorAbertoProps` (sem desestruturar ainda, para o ESLint não reclamar de variável sem uso); o passo 4 passa a usá-la.
 
   Nos testes de tela existentes, substituição mecânica (todas as montagens passam `cadastros={...}` sem `}` dentro):
 
@@ -1176,7 +1176,7 @@ sed -i "/^import { CadastrosFalso } from '.\/cadastros\/CadastrosFalso'/a import
 
   Conferir com `grep -c "processos={new ProcessosFalso()}" src/App*.test.tsx` (43 montagens no total) e `npx tsc -b` limpo; `npm test` verde, com os mesmos testes de antes mais os das Tasks 2 a 4.
 
-- [ ] **Step 2: testes de tela (vermelho).** `src/App.etapasDoSetor.test.tsx`:
+- [x] **Step 2: testes de tela (vermelho).** `src/App.etapasDoSetor.test.tsx`:
 
 ```tsx
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
@@ -1367,7 +1367,7 @@ test('falha ao carregar mostra o erro e Tentar de novo carrega as etapas', async
 
 Rodar `npx vitest run src/App.etapasDoSetor.test.tsx`. Esperado: falha (a seção "Etapas do setor" não existe).
 
-- [ ] **Step 3: componentes.** `src/components/processos/LinhaDaEtapa.tsx`:
+- [x] **Step 3: componentes.** `src/components/processos/LinhaDaEtapa.tsx`:
 
 ```tsx
 import { type AcaoDaEtapa, ROTULO_DO_STATUS, formatarData } from '../../processos/caminhoDeEtapas'
@@ -1567,7 +1567,7 @@ function ConteudoDasEtapas({ estado, aoTentarDeNovo, ...caminho }: ConteudoProps
 
 (Mesma ressalva dos tokens `--esp-*` da Task 4.)
 
-- [ ] **Step 4: montar a seção no setor aberto.** `src/components/cadastros/SetorAberto.tsx` passa a ser:
+- [x] **Step 4: montar a seção no setor aberto.** `src/components/cadastros/SetorAberto.tsx` passa a ser:
 
 ```tsx
 import { useCallback, useState } from 'react'
@@ -1611,9 +1611,9 @@ export function SetorAberto({ cadastros, processos, podeAlterar, id, aoVoltar }:
 
   Atenção a testes de tela antigos que procuram `getByRole('status')` ou `getByRole('alert')` sem escopo depois de abrir um setor: com a seção nova pode haver mais de um. Se algum falhar, restringir a busca à região do setor (`within(...)`) no próprio teste; não mudar o comportamento.
 
-- [ ] **Step 5: ver passar.** `npx vitest run src/App.etapasDoSetor.test.tsx` verde; `npm test` inteiro verde; `npx tsc -b`, `npm run lint`, `npm run check:circular` limpos.
+- [x] **Step 5: ver passar.** `npx vitest run src/App.etapasDoSetor.test.tsx` verde; `npm test` inteiro verde; `npx tsc -b`, `npm run lint`, `npm run check:circular` limpos.
 
-- [ ] **Step 6: comitar.** Commit "Ticket 02 de processos-etapas: etapas do setor na tela do setor".
+- [x] **Step 6: comitar.** Commit "Ticket 02 de processos-etapas: etapas do setor na tela do setor".
 
 ---
 
@@ -1626,7 +1626,7 @@ export function SetorAberto({ cadastros, processos, podeAlterar, id, aoVoltar }:
 - Consumes: `ROTULO_DO_STATUS`, `formatarData` (Task 3); `StatusDaEtapa` (Task 2); eventos `andamento` da Task 1.
 - Produces: `EventoDoCadastro` com `motivo?: string`; `textoDaAcaoDoCadastro(acao, 'andamento')`, `nomeDoItem` e `descreverEstadoDoCadastro` para etapas do setor.
 
-- [ ] **Step 1: testes (vermelho).** Acrescentar ao fim de `src/cadastros/historicoDosCadastros.test.ts` (ajustar o import do topo para trazer `descreverEstadoDoCadastro, eventosDoItem, itensDoFiltro, nomeDoItem, textoDaAcaoDoCadastro` e o tipo `EventoDoCadastro`, se ainda não vierem):
+- [x] **Step 1: testes (vermelho).** Acrescentar ao fim de `src/cadastros/historicoDosCadastros.test.ts` (ajustar o import do topo para trazer `descreverEstadoDoCadastro, eventosDoItem, itensDoFiltro, nomeDoItem, textoDaAcaoDoCadastro` e o tipo `EventoDoCadastro`, se ainda não vierem):
 
 ```ts
 const ETAPA_PENDENTE = {
@@ -1683,7 +1683,7 @@ Em `src/cadastros/historicoSupabase.test.ts`, ajustar a expectativa do filtro de
 
 Rodar `npx vitest run src/cadastros src/App.historicoDosCadastros.test.tsx`. Esperado: falhas nos testes novos e no filtro de entidades.
 
-- [ ] **Step 2: implementar.**
+- [x] **Step 2: implementar.**
 
 `src/cadastros/tipos.ts`, em `EventoDoCadastro`, acrescentar depois de `depois`:
 
@@ -1744,7 +1744,7 @@ const ENTIDADES_QUE_LIGAM = new Set(['setor_envolvido', 'andamento'])
 
 Se `valorLegivel` ou `nomeDoItem` passar de complexidade 10 no ESLint, extrair o trecho novo numa função com nome próprio (`valorDaEtapa(campo, valor): string | null`, por exemplo), sem juntar instruções.
 
-- [ ] **Step 3: ver passar e comitar.** `npm test` inteiro verde; `npx tsc -b`, `npm run lint`, `npm run check:circular` limpos. Commit "Ticket 02 de processos-etapas: etapas do setor no Histórico".
+- [x] **Step 3: ver passar e comitar.** `npm test` inteiro verde; `npx tsc -b`, `npm run lint`, `npm run check:circular` limpos. Commit "Ticket 02 de processos-etapas: etapas do setor no Histórico".
 
 ---
 

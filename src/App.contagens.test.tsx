@@ -4,6 +4,7 @@ import App from './App'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import type { Perfil } from './acesso/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
+import { ProcessosFalso } from './processos/ProcessosFalso'
 
 beforeEach(() => {
   window.location.hash = '#/setores'
@@ -37,7 +38,7 @@ function cadastrosComVinculos() {
 }
 
 function montar(perfil: Perfil = 'integrante_ep') {
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastrosComVinculos()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastrosComVinculos()} processos={new ProcessosFalso()} />)
 }
 
 function contagemDaLinha(nome: string): string {

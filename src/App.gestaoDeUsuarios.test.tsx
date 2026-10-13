@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import App from './App'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
+import { ProcessosFalso } from './processos/ProcessosFalso'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { LinhaDeUsuario, Perfil } from './acesso/tipos'
@@ -26,7 +27,7 @@ const LINHAS: LinhaDeUsuario[] = [
 async function abrirComoAdministrador() {
   const acesso = AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'administrador' as Perfil })
   acesso.linhas = [...LINHAS]
-  render(<App acesso={acesso} cadastros={new CadastrosFalso()} />)
+  render(<App acesso={acesso} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} />)
   await screen.findByRole('table', { busy: false })
   return acesso
 }

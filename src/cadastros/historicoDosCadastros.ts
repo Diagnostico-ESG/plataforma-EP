@@ -1,3 +1,5 @@
+import { ROTULO_DO_STATUS, formatarData } from '../processos/caminhoDeEtapas'
+import type { StatusDaEtapa } from '../processos/tipos'
 import { rotuloDaCategoria } from './categorias'
 import type { CategoriaDoMacroprocesso, EstadoDoCadastro, EventoDoCadastro, ItemDoFiltro } from './tipos'
 
@@ -11,18 +13,33 @@ const TEXTO_DA_ACAO_DO_VINCULO: Record<string, string> = {
   editar: 'Mudou a observação do setor no macroprocesso',
 }
 
+const TEXTO_DA_ACAO_DO_ANDAMENTO: Record<string, string> = {
+  iniciar: 'Iniciou a etapa',
+  concluir: 'Concluiu a etapa',
+  dispensar: 'Dispensou a etapa',
+  registrar_realizada: 'Registrou a etapa como realizada anteriormente',
+}
+
+const TEXTOS_DA_ENTIDADE: Record<string, Record<string, string>> = {
+  setor_envolvido: TEXTO_DA_ACAO_DO_VINCULO, andamento: TEXTO_DA_ACAO_DO_ANDAMENTO,
+}
+
+// Vínculos e etapas do setor têm a referência 'idA:idB': o item do filtro sai dos ids gravados no evento.
+const ENTIDADES_QUE_LIGAM = new Set(['setor_envolvido', 'andamento'])
+
 const ROTULO_DO_CAMPO: Record<string, string> = {
   sigla: 'Sigla', nome: 'Nome', observacoes: 'Observações', ativo: 'Situação', codigo: 'Código', descricao: 'Descrição',
   categoria: 'Categoria', observacao: 'Observação', setor_sigla: 'Setor', macroprocesso_nome: 'Macroprocesso',
-  macroprocessos: 'Macroprocessos', setores: 'Setores',
+  macroprocessos: 'Macroprocessos', setores: 'Setores', status: 'Situação da etapa', iniciada_em: 'Início',
+  resolvida_em: 'Conclusão',
 }
 
-// Os ids existem para o filtro; quem lê o histórico vê a sigla e o nome.
-const CAMPOS_ESCONDIDOS = new Set(['setor_id', 'macroprocesso_id'])
+// Os ids existem para o filtro; quem lê o histórico vê a sigla e o nome. Código e nome da etapa já estão no título.
+const CAMPOS_ESCONDIDOS = new Set(['setor_id', 'macroprocesso_id', 'etapa_codigo', 'etapa_nome'])
 
 // Ação desconhecida (de uma funcionalidade futura) aparece pelo código: sumir do histórico é pior que texto cru.
 export function textoDaAcaoDoCadastro(acao: string, entidade: string): string {
-  const textos = entidade === 'setor_envolvido' ? TEXTO_DA_ACAO_DO_VINCULO : TEXTO_DA_ACAO
+  const textos = TEXTOS_DA_ENTIDADE[entidade] ?? TEXTO_DA_ACAO
   return textos[acao] ?? acao
 }
 
@@ -47,6 +64,9 @@ export function nomeDoItem(evento: EventoDoCadastro): string {
   const estado = estadoLegivel(evento)
   if (evento.entidade === 'setor' && typeof estado.sigla === 'string') return `${estado.sigla} — ${texto(estado.nome)}`
   if (evento.entidade === 'macroprocesso' && typeof estado.nome === 'string') return codigoENome(estado.codigo, estado.nome)
+  if (evento.entidade === 'andamento' && typeof estado.etapa_nome === 'string') {
+    return `${estado.etapa_nome} — ${texto(estado.setor_sigla)}`
+  }
   if (typeof estado.setor_sigla === 'string' && typeof estado.macroprocesso_nome === 'string') {
     return `${estado.setor_sigla} em ${estado.macroprocesso_nome}`
   }
@@ -60,9 +80,18 @@ function itemDaLista(item: unknown): string {
   return typeof observacao === 'string' && observacao !== '' ? `${nomeCompleto} (${observacao})` : nomeCompleto
 }
 
+// Campos do andamento (etapas do setor): status pelo rótulo da tela e datas em DD/MM/AAAA; null se não for deles.
+function valorDaEtapa(campo: string, valor: unknown): string | null {
+  if (campo === 'status') return ROTULO_DO_STATUS[valor as StatusDaEtapa] ?? texto(valor)
+  if (campo === 'iniciada_em' || campo === 'resolvida_em') return formatarData(typeof valor === 'string' ? valor : null)
+  return null
+}
+
 function valorLegivel(campo: string, valor: unknown): string {
   if (campo === 'ativo') return valor ? 'Ativo' : 'Inativo'
   if (campo === 'categoria') return rotuloDaCategoria(valor as CategoriaDoMacroprocesso | null)
+  const daEtapa = valorDaEtapa(campo, valor)
+  if (daEtapa !== null) return daEtapa
   if (!Array.isArray(valor)) return texto(valor)
   return valor.length === 0 ? 'nenhum' : valor.map(itemDaLista).join(', ')
 }
@@ -77,7 +106,7 @@ export function descreverEstadoDoCadastro(estado: EstadoDoCadastro): string {
 
 // Evento de vínculo cita o setor e o macroprocesso: serve de nome quando nenhum evento próprio nomeou o item.
 function itensDoVinculo(evento: EventoDoCadastro): [string, string][] {
-  if (evento.entidade !== 'setor_envolvido') return []
+  if (!ENTIDADES_QUE_LIGAM.has(evento.entidade)) return []
   const estado = estadoLegivel(evento)
   const pares: [unknown, unknown][] = [
     [estado.setor_id, estado.setor_sigla], [estado.macroprocesso_id, estado.macroprocesso_nome],
@@ -89,7 +118,7 @@ function itensDoVinculo(evento: EventoDoCadastro): [string, string][] {
 export function itensDoFiltro(eventos: EventoDoCadastro[]): ItemDoFiltro[] {
   const nomes = new Map<string, string>()
   for (const evento of eventos) {
-    if (evento.entidade !== 'setor_envolvido' && !nomes.has(evento.entidadeRef)) nomes.set(evento.entidadeRef, nomeDoItem(evento))
+    if (!ENTIDADES_QUE_LIGAM.has(evento.entidade) && !nomes.has(evento.entidadeRef)) nomes.set(evento.entidadeRef, nomeDoItem(evento))
   }
   for (const par of eventos.flatMap(itensDoVinculo)) if (!nomes.has(par[0])) nomes.set(par[0], par[1])
   return [...nomes].map(([id, nome]) => ({ id, nome })).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
