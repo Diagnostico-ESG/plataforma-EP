@@ -1,45 +1,17 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { describe, expect, test } from 'vitest'
+import { ClienteSupabaseFalso } from '../testes/ClienteSupabaseFalso'
 import type { Database } from '../types/database'
 import { criarAdministracaoSupabase } from './administracaoSupabase'
 import { TravaDoBanco } from './falhasDeGravacao'
 
-type RespostaDoBanco = { data: unknown; error: { message: string; code?: string } | null }
-type Pedido = {
-  tabela: string; operacao: string; valores?: unknown; filtro?: [string, string]; ordem?: [string, boolean][]
-}
-
-/** Cliente Supabase falso: guarda cada pedido e responde por "tabela.operação". */
-class ClienteDeAdministracaoFalso {
-  respostas: Record<string, RespostaDoBanco> = {}
-  pedidos: Pedido[] = []
-
-  from(tabela: string) {
-    const pedido: Pedido = { tabela, operacao: 'select' }
-    this.pedidos.push(pedido)
-    const resposta = () => this.respostas[`${tabela}.${pedido.operacao}`] ?? { data: [], error: null }
-    const consulta = {
-      select: () => consulta,
-      order: (coluna: string, opcoes?: { ascending?: boolean }) =>
-        (pedido.ordem ??= []).push([coluna, opcoes?.ascending ?? true]) && consulta,
-      insert: (valores: unknown) => Object.assign(pedido, { operacao: 'insert', valores }) && consulta,
-      update: (valores: unknown) => Object.assign(pedido, { operacao: 'update', valores }) && consulta,
-      delete: () => Object.assign(pedido, { operacao: 'delete' }) && consulta,
-      eq: (coluna: string, valor: string) => Object.assign(pedido, { filtro: [coluna, valor] }) && consulta,
-      then: (seCumprir: (r: RespostaDoBanco) => unknown, seFalhar?: (e: unknown) => unknown) =>
-        Promise.resolve(resposta()).then(seCumprir, seFalhar),
-    }
-    return consulta
-  }
-}
-
-function criar(cliente: ClienteDeAdministracaoFalso) {
+function criar(cliente: ClienteSupabaseFalso) {
   return criarAdministracaoSupabase(cliente as unknown as SupabaseClient<Database>)
 }
 
 describe('criarAdministracaoSupabase', () => {
   test('a lista traz as autorizações aguardando e depois os usuários, com e-mail e situação', async () => {
-    const cliente = new ClienteDeAdministracaoFalso()
+    const cliente = new ClienteSupabaseFalso()
     cliente.respostas['autorizacoes.select'] = { data: [{ email: 'nova.teste@ccivil.pr.gov.br', perfil: 'consulta' }], error: null }
     cliente.respostas['usuarios.select'] = {
       data: [{ id: 'u1', nome: 'Ana Teste', foto_url: null, perfil: 'administrador', ativo: false,
@@ -55,19 +27,19 @@ describe('criarAdministracaoSupabase', () => {
   })
 
   test('falha ao listar vira exceção com o texto do banco', async () => {
-    const cliente = new ClienteDeAdministracaoFalso()
+    const cliente = new ClienteSupabaseFalso()
     cliente.respostas['usuarios.select'] = { data: null, error: { message: 'sem rede' } }
     await expect(criar(cliente).listarUsuarios()).rejects.toThrow(/usuários.*sem rede/)
   })
 
   test('falha ao listar as autorizações vira exceção com o texto do banco', async () => {
-    const cliente = new ClienteDeAdministracaoFalso()
+    const cliente = new ClienteSupabaseFalso()
     cliente.respostas['autorizacoes.select'] = { data: null, error: { message: 'sem rede' } }
     await expect(criar(cliente).listarUsuarios()).rejects.toThrow('Falha ao listar as autorizações: sem rede')
   })
 
   test('usuário ativo aparece com a situação ativo', async () => {
-    const cliente = new ClienteDeAdministracaoFalso()
+    const cliente = new ClienteSupabaseFalso()
     cliente.respostas['usuarios.select'] = {
       data: [{ id: 'u1', nome: 'Ana Teste', foto_url: null, perfil: 'consulta', ativo: true,
         usuarios_emails: { email: 'ana.teste@ccivil.pr.gov.br' } }],
@@ -77,7 +49,7 @@ describe('criarAdministracaoSupabase', () => {
   })
 
   test('autorizar inclui e-mail e perfil; a recusa do banco vira o motivo', async () => {
-    const cliente = new ClienteDeAdministracaoFalso()
+    const cliente = new ClienteSupabaseFalso()
     await criar(cliente).autorizarEmail('nova.teste@ccivil.pr.gov.br', 'integrante_ep')
     expect(cliente.pedidos[0]).toMatchObject({ tabela: 'autorizacoes', operacao: 'insert',
       valores: { email: 'nova.teste@ccivil.pr.gov.br', perfil: 'integrante_ep' } })
@@ -88,7 +60,7 @@ describe('criarAdministracaoSupabase', () => {
   })
 
   test('mudar perfil filtra pelo e-mail e falha quando nenhuma linha muda', async () => {
-    const cliente = new ClienteDeAdministracaoFalso()
+    const cliente = new ClienteSupabaseFalso()
     cliente.respostas['autorizacoes.update'] = { data: [{ email: 'x.teste@ccivil.pr.gov.br' }], error: null }
     await criar(cliente).mudarPerfilDaAutorizacao('x.teste@ccivil.pr.gov.br', 'administrador')
     expect(cliente.pedidos[0]).toMatchObject({ operacao: 'update', valores: { perfil: 'administrador' },
@@ -99,14 +71,14 @@ describe('criarAdministracaoSupabase', () => {
   })
 
   test('excluir apaga a autorização do e-mail', async () => {
-    const cliente = new ClienteDeAdministracaoFalso()
+    const cliente = new ClienteSupabaseFalso()
     cliente.respostas['autorizacoes.delete'] = { data: [{ email: 'x.teste@ccivil.pr.gov.br' }], error: null }
     await criar(cliente).excluirAutorizacao('x.teste@ccivil.pr.gov.br')
     expect(cliente.pedidos[0]).toMatchObject({ operacao: 'delete', filtro: ['email', 'x.teste@ccivil.pr.gov.br'] })
   })
 
   test('mudar perfil, desativar, reativar e corrigir nome alteram só a coluna, filtrando pelo id', async () => {
-    const cliente = new ClienteDeAdministracaoFalso()
+    const cliente = new ClienteSupabaseFalso()
     cliente.respostas['usuarios.update'] = { data: [{ id: 'u1' }], error: null }
     const administracao = criar(cliente)
     await administracao.mudarPerfilDoUsuario('u1', 'consulta')
@@ -123,13 +95,13 @@ describe('criarAdministracaoSupabase', () => {
   })
 
   test('alteração de usuário que não muda nenhuma linha vira falha com o id', async () => {
-    const cliente = new ClienteDeAdministracaoFalso()
+    const cliente = new ClienteSupabaseFalso()
     cliente.respostas['usuarios.update'] = { data: [], error: null }
     await expect(criar(cliente).desativarUsuario('u1')).rejects.toThrow(/usuário u1 não foi encontrado/)
   })
 
   test('a trava do banco chega como TravaDoBanco com a frase da tela', async () => {
-    const cliente = new ClienteDeAdministracaoFalso()
+    const cliente = new ClienteSupabaseFalso()
     cliente.respostas['usuarios.update'] = { data: null,
       error: { message: 'ultimo_administrador:Ana Teste', code: 'P0001' } }
     const falha = await criar(cliente).desativarUsuario('u1').catch((erro: unknown) => erro)
@@ -138,7 +110,7 @@ describe('criarAdministracaoSupabase', () => {
   })
 
   test('o histórico vem do mais recente ao mais antigo, com autor, ação e o alvo pelo nome', async () => {
-    const cliente = new ClienteDeAdministracaoFalso()
+    const cliente = new ClienteSupabaseFalso()
     cliente.respostas['eventos.select'] = { data: [
       { id: 2, ocorrido_em: '2026-10-08T14:05:00Z', acao: 'desativar', entidade: 'usuario', entidade_ref: 'u1',
         detalhes: { antes: { ativo: true }, depois: { ativo: false } }, autor: { nome: 'Ana Teste' } },
@@ -157,7 +129,7 @@ describe('criarAdministracaoSupabase', () => {
   })
 
   test('usuário que não está mais na lista aparece pelo id; falha ao ler o histórico vira exceção', async () => {
-    const cliente = new ClienteDeAdministracaoFalso()
+    const cliente = new ClienteSupabaseFalso()
     cliente.respostas['eventos.select'] = { data: [{ id: 1, ocorrido_em: '2026-10-08T14:05:00Z', acao: 'reativar',
       entidade: 'usuario', entidade_ref: 'u9', detalhes: { antes: null, depois: null }, autor: null }], error: null }
     expect((await criar(cliente).listarHistorico())[0].alvo).toBe('u9')

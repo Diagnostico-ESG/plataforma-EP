@@ -251,8 +251,8 @@ end $$;
 
 Conta: 6 × 2 (quem altera) + 6 × 2 (quem não altera) + 6 (visitante) + 10 (regras) + 7 (eventos) = 47.
 
-- [ ] **Passo 3: ver o teste falhar.** Comitar só o teste (`git add supabase/tests/11_setores.test.sql`; mensagem "Teste de banco de setores (vermelho)"), pedir autorização para `git push -u origin cadastros-basicos` e pedir ao usuário que rode "Testes de banco" com "Run workflow" na branch `cadastros-basicos`. Esperado: `FALHOU supabase/tests/11_setores.test.sql` com erro de SQL (`relation "public.setores" does not exist`) e os outros arquivos passando.
-- [ ] **Passo 4: criar a migração** com `npx supabase migration new setores` e preencher:
+- [x] **Passo 3: ver o teste falhar.** Comitar só o teste (`git add supabase/tests/11_setores.test.sql`; mensagem "Teste de banco de setores (vermelho)"), pedir autorização para `git push -u origin cadastros-basicos` e pedir ao usuário que rode "Testes de banco" com "Run workflow" na branch `cadastros-basicos`. Esperado: `FALHOU supabase/tests/11_setores.test.sql` com erro de SQL (`relation "public.setores" does not exist`) e os outros arquivos passando.
+- [x] **Passo 4: criar a migração** com `npx supabase migration new setores` e preencher:
 
 ```sql
 -- Cadastros básicos, ticket 01: setores, com sigla conferida, RLS por perfil e eventos no histórico.
@@ -371,7 +371,7 @@ create trigger registrar_evento_do_setor after insert or update or delete on pub
   - `class CadastrosFalso implements ModuloDeCadastros` com `setores: Setor[]`, `falharLista`, `segurarLista`, `falhaDeGravacao: string | Error | null`
   - `class ClienteSupabaseFalso` com `respostas: Record<string, RespostaDoBanco>`, `pedidos: Pedido[]` (agora com `colunas?: string`)
 
-- [ ] **Passo 1: extrair o cliente falso.** Mover a classe `ClienteDeAdministracaoFalso` e os tipos `RespostaDoBanco` e `Pedido` de `src/acesso/administracaoSupabase.test.ts` para `src/testes/ClienteSupabaseFalso.ts`, exportada como `ClienteSupabaseFalso`, com o `select` passando a guardar as colunas do primeiro `select`:
+- [x] **Passo 1: extrair o cliente falso.** Mover a classe `ClienteDeAdministracaoFalso` e os tipos `RespostaDoBanco` e `Pedido` de `src/acesso/administracaoSupabase.test.ts` para `src/testes/ClienteSupabaseFalso.ts`, exportada como `ClienteSupabaseFalso`, com o `select` passando a guardar as colunas do primeiro `select`:
 
 ```ts
 export type RespostaDoBanco = { data: unknown; error: { message: string; code?: string } | null }
