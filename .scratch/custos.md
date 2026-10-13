@@ -34,3 +34,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-13 | cadastros-basicos | /planejar (tickets) | US$ 1,19
 2026-10-13 | cadastros-basicos | executar-complexo (ticket 01) | US$ 9,43
 2026-10-13 | cadastros-basicos | /situação e executar-complexo (ticket 02) | US$ 3,11
+2026-10-13 | cadastros-basicos | /situação e executar-complexo (ticket 03) | US$ 6,85
