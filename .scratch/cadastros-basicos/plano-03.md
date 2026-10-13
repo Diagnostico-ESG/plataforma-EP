@@ -129,10 +129,10 @@
 
 **Interfaces:** Produz `FormularioDeMacroprocesso({ aoSalvar: (dados: DadosDoMacroprocesso) => Promise<void>, aoCancelar, titulo?, inicial?, rotuloDoCancelar? })`, no molde de `FormularioDeSetor` (`noValidate`, falha da gravação mostrada com `textoDaFalhaNoFormulario` e dados mantidos).
 
-- [ ] **Passo 1: testes que falham:** [Novo macroprocesso] abre o formulário com Código, Nome, Descrição e Categoria (opções "Sem categoria", Finalístico, Apoio, Gerencial, começando em "Sem categoria"); só o nome é obrigatório (nome vazio → "O nome do macroprocesso é obrigatório." e nada é gravado); salvar só com nome grava, fecha o formulário e o item aparece na lista; salvar com todos os campos grava código, descrição e categoria; recusa de nome repetido mostra "Já existe um macroprocesso com o nome {nome}." em vermelho e mantém os dados; recusa de código repetido mostra "Já existe um macroprocesso com o código {código}."; falha genérica mostra "A alteração não foi salva: {motivo}. Seus dados continuam no formulário."; Cancelar fecha sem gravar.
-- [ ] **Passo 2: ver falharem.**
-- [ ] **Passo 3: implementar** o formulário e ligar o [Novo macroprocesso] em `AreaDeMacroprocessos` (grava, fecha, recarrega a lista).
-- [ ] **Passo 4: verificar. Commit.**
+- [x] **Passo 1: testes que falham:** [Novo macroprocesso] abre o formulário com Código, Nome, Descrição e Categoria (opções "Sem categoria", Finalístico, Apoio, Gerencial, começando em "Sem categoria"); só o nome é obrigatório (nome vazio → "O nome do macroprocesso é obrigatório." e nada é gravado); salvar só com nome grava, fecha o formulário e o item aparece na lista; salvar com todos os campos grava código, descrição e categoria; recusa de nome repetido mostra "Já existe um macroprocesso com o nome {nome}." em vermelho e mantém os dados; recusa de código repetido mostra "Já existe um macroprocesso com o código {código}."; falha genérica mostra "A alteração não foi salva: {motivo}. Seus dados continuam no formulário."; Cancelar fecha sem gravar.
+- [x] **Passo 2: ver falharem.**
+- [x] **Passo 3: implementar** o formulário e ligar o [Novo macroprocesso] em `AreaDeMacroprocessos` (grava, fecha, recarrega a lista).
+- [x] **Passo 4: verificar. Commit.**
 
 ---
 
