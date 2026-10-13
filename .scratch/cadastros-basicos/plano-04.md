@@ -486,8 +486,19 @@ export function LinhaDeSetorEnvolvido(props: { cadastros: ModuloDeCadastros; mac
 
 ### Tarefa 7: Fechamento (critérios 1 a 10 conferidos)
 
-- [ ] **Passo 1: gate completo.** `npm test` (todos passando), `npx tsc -b`, `npm run lint`, `npm run check:circular`, `npm run test:coverage` com cobertura ≥ 70%.
-- [ ] **Passo 2: conferir os 10 critérios do ticket** um a um, anotando a evidência (teste ou arquivo) de cada.
-- [ ] **Passo 3: revisão visual.** Subir o Vite (`preview_start`) e conferir o macroprocesso aberto (lista, observação, seletor alinhados) e o setor aberto; se o login institucional do Google barrar a sessão, registrar que a conferência visual ficou com o usuário, como nos tickets anteriores.
-- [ ] **Passo 4: spec e registros.** Acrescentar à spec (`Modelo de dados`, abaixo da tabela de `eventos`) a nota dos nomes do evento de vínculo e das chaves `macroprocessos`/`setores` no "antes" da exclusão (decisão de execução acima), para o ticket 05 ler. Atualizar `.scratch/melhorias-protocolo.md` com os itens de `.claude/regras/nao-testados.md` que aconteceram nesta execução e com o resultado do workflow de migração (primeira execução real).
+- [x] **Passo 1: gate completo.** `npm test` (todos passando), `npx tsc -b`, `npm run lint`, `npm run check:circular`, `npm run test:coverage` com cobertura ≥ 70%.
+- [x] **Passo 2: conferir os 11 critérios do ticket** um a um, anotando a evidência (teste ou arquivo) de cada.
+  - 1 (pgTAP antes da migração): `13_setores_envolvidos.test.sql`, vermelho no run #17 e verde no #18 (56 de 56).
+  - 2 (migração, RLS, privilégios): `20261013150735_setores_envolvidos.sql`; `00_rls_ligada` e `10_privilegios_padrao` verdes nos 14 arquivos.
+  - 3 (eventos pôr, tirar e anotar, com sigla e nome; cascata gera os de tirar): testes 13 (seis eventos do vínculo e os da exclusão).
+  - 4 (`antes` da exclusão com a lista): testes 13, mais `11` e `12` atualizados.
+  - 5 (módulo real e falso, frase da recusa, contagem derivada na leitura): `setoresEnvolvidosSupabase.test.ts`, `cadastrosSupabase.test.ts`, `macroprocessosSupabase.test.ts`; contagem por `setores_envolvidos(count)`, sem view nova.
+  - 6 (macroprocesso aberto): `App.setoresEnvolvidos.test.tsx` (15 testes).
+  - 7 (setor aberto): `App.macroprocessosDoSetor.test.tsx`.
+  - 8 (colunas de quantidade): `App.contagens.test.tsx`, `App.macroprocessos.test.tsx`, `App.setores.test.tsx`.
+  - 9 (janelas com n): `App.exclusaoEmCascata.test.tsx`, `textosDeExclusao.test.ts`.
+  - 10 (Consulta): `App.setoresEnvolvidos.test.tsx` e `App.macroprocessosDoSetor.test.tsx`.
+  - 11 (testes com o aplicativo inteiro): os mesmos arquivos de tela, cobrindo sucesso e falha, seletor, contagens, janelas e Consulta.
+- [x] **Passo 3: revisão visual.** Não feita pelo assistente: o login institucional do Google barra a sessão no navegador do app; a conferência visual ficou com o usuário, como nos tickets 02 e 03. Subir o Vite (`preview_start`) e conferir o macroprocesso aberto (lista, observação, seletor alinhados) e o setor aberto; se o login institucional do Google barrar a sessão, registrar que a conferência visual ficou com o usuário, como nos tickets anteriores.
+- [x] **Passo 4: spec e registros.** Acrescentar à spec (`Modelo de dados`, abaixo da tabela de `eventos`) a nota dos nomes do evento de vínculo e das chaves `macroprocessos`/`setores` no "antes" da exclusão (decisão de execução acima), para o ticket 05 ler. Atualizar `.scratch/melhorias-protocolo.md` com os itens de `.claude/regras/nao-testados.md` que aconteceram nesta execução e com o resultado do workflow de migração (primeira execução real).
 - [ ] **Passo 5: encerrar.** Juntar a branch à `main` (`git switch main`, merge, `git branch -d cadastros-basicos`), linha `Concluído em` no ticket, commit, `git push` da `main` (autorizado) e conferência do "Testes de banco" e da "Verificação" na `main` (o push mexe em `supabase/`).
