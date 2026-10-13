@@ -410,7 +410,7 @@ export class ClienteSupabaseFalso {
 
 No teste da administração, trocar `ClienteDeAdministracaoFalso` por `ClienteSupabaseFalso` (import de `../testes/ClienteSupabaseFalso`). Rodar `npx vitest run src/acesso/administracaoSupabase.test.ts`: tudo passa sem mudar asserções.
 
-- [ ] **Passo 2: escrever o teste do módulo real** em `src/cadastros/cadastrosSupabase.test.ts`:
+- [x] **Passo 2: escrever o teste do módulo real** em `src/cadastros/cadastrosSupabase.test.ts`:
 
 ```ts
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -471,8 +471,8 @@ describe('criarCadastrosSupabase', () => {
 })
 ```
 
-- [ ] **Passo 3: ver falhar.** `npx vitest run src/cadastros/cadastrosSupabase.test.ts`. Esperado: FAIL, módulo `./cadastrosSupabase` inexistente.
-- [ ] **Passo 4: implementar** `src/cadastros/tipos.ts`:
+- [x] **Passo 3: ver falhar.** `npx vitest run src/cadastros/cadastrosSupabase.test.ts`. Esperado: FAIL, módulo `./cadastrosSupabase` inexistente.
+- [x] **Passo 4: implementar** `src/cadastros/tipos.ts`:
 
 ```ts
 export type Setor = { id: string; sigla: string; nome: string; observacoes: string | null; ativo: boolean }
@@ -532,8 +532,8 @@ function falhaDoSetor(erro: ErroDoBanco, dados: DadosDoSetor): Error {
 }
 ```
 
-- [ ] **Passo 5: ver passar.** `npx vitest run src/cadastros/cadastrosSupabase.test.ts src/acesso/administracaoSupabase.test.ts`: PASS.
-- [ ] **Passo 6: implementar o falso** `src/cadastros/CadastrosFalso.ts` (sem teste próprio: é exercitado pelos testes de tela):
+- [x] **Passo 5: ver passar.** `npx vitest run src/cadastros/cadastrosSupabase.test.ts src/acesso/administracaoSupabase.test.ts`: PASS.
+- [x] **Passo 6: implementar o falso** `src/cadastros/CadastrosFalso.ts` (sem teste próprio: é exercitado pelos testes de tela):
 
 ```ts
 import type { DadosDoSetor, ModuloDeCadastros, Setor } from './tipos'
