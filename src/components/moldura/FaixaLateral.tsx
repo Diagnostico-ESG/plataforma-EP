@@ -18,7 +18,7 @@ type FaixaLateralProps = {
   aoIrPara: (area: AreaComTela) => void
 }
 
-// Só Quadro e Administração têm tela por enquanto; as outras áreas ganham tela na sua funcionalidade.
+// Quadro, Setores e Administração têm tela; as outras áreas ganham tela na sua funcionalidade.
 export function FaixaLateral({ areaAtual, mostrarAdministracao, aoIrPara }: FaixaLateralProps) {
   const itens = mostrarAdministracao ? ITENS : ITENS.filter((item) => item.area !== 'administracao')
   return (

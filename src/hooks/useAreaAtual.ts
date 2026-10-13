@@ -1,24 +1,15 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import type { AreaComTela } from '../components/moldura/areas'
+import { useEndereco } from './useEndereco'
 
-// A área fica no endereço (#/administracao) para sobreviver ao recarregar a página.
-function areaDoEndereco(): AreaComTela {
-  return window.location.hash === '#/administracao' ? 'administracao' : 'quadro'
+// A área é o primeiro trecho do endereço (#/setores/macroprocessos → setores).
+function areaDoEndereco(endereco: string): AreaComTela {
+  const area = endereco.split('/')[1]
+  return area === 'administracao' || area === 'setores' ? area : 'quadro'
 }
 
 export function useAreaAtual(): [AreaComTela, (area: AreaComTela) => void] {
-  const [area, setArea] = useState(areaDoEndereco)
-
-  useEffect(() => {
-    const aoMudarEndereco = () => setArea(areaDoEndereco())
-    window.addEventListener('hashchange', aoMudarEndereco)
-    return () => window.removeEventListener('hashchange', aoMudarEndereco)
-  }, [])
-
-  const irPara = useCallback((nova: AreaComTela) => {
-    setArea(nova)
-    window.location.hash = `#/${nova}`
-  }, [])
-
-  return [area, irPara]
+  const [endereco, irParaEndereco] = useEndereco()
+  const irPara = useCallback((nova: AreaComTela) => irParaEndereco(`#/${nova}`), [irParaEndereco])
+  return [areaDoEndereco(endereco), irPara]
 }

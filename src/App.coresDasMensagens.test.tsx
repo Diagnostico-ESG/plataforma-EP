@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import App from './App'
+import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import css from './components/administracao/Administracao.css?raw'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
@@ -36,21 +37,21 @@ function ehVermelha(mensagem: HTMLElement) {
 test('erro ao carregar a lista é vermelho', async () => {
   const acesso = acessoDoAdministrador()
   acesso.falharLista = true
-  render(<App acesso={acesso} />)
+  render(<App acesso={acesso} cadastros={new CadastrosFalso()} />)
   ehVermelha(await screen.findByText(/Não foi possível carregar os usuários/))
 })
 
 test('erro ao carregar o histórico é vermelho', async () => {
   const acesso = acessoDoAdministrador()
   acesso.falharHistorico = true
-  render(<App acesso={acesso} />)
+  render(<App acesso={acesso} cadastros={new CadastrosFalso()} />)
   ehVermelha(await screen.findByText(/Não foi possível carregar o histórico/))
 })
 
 test('erro de gravação é vermelho', async () => {
   const acesso = acessoDoAdministrador()
   acesso.falhaDeGravacao = 'sem conexão'
-  render(<App acesso={acesso} />)
+  render(<App acesso={acesso} cadastros={new CadastrosFalso()} />)
   await screen.findByRole('table', { busy: false })
   fireEvent.change(screen.getByLabelText(`Perfil de ${ANA}`), { target: { value: 'integrante_ep' } })
   fireEvent.click(screen.getByRole('button', { name: `Salvar perfil de ${ANA}` }))
@@ -60,7 +61,7 @@ test('erro de gravação é vermelho', async () => {
 test('recusa de trava é vermelha', async () => {
   const acesso = acessoDoAdministrador()
   acesso.falhaDeGravacao = new TravaDoBanco('Você não pode desativar a si mesmo.')
-  render(<App acesso={acesso} />)
+  render(<App acesso={acesso} cadastros={new CadastrosFalso()} />)
   await screen.findByRole('table', { busy: false })
   fireEvent.click(screen.getByRole('button', { name: `Desativar ${ANA}` }))
   fireEvent.click(screen.getByRole('button', { name: 'Desativar' }))
@@ -68,7 +69,7 @@ test('recusa de trava é vermelha', async () => {
 })
 
 test('perfil sem permissão é aviso amarelo, não falha', async () => {
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'consulta' })} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'consulta' })} cadastros={new CadastrosFalso()} />)
   const aviso = await screen.findByText(/não permite administrar usuários/)
   expect(aviso.classList.contains('administracao-sem-permissao')).toBe(true)
   expect(aviso.closest('.administracao-erro, .administracao-falha')).toBeNull()

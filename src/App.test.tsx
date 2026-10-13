@@ -1,12 +1,13 @@
 import { cleanup, render, screen, within } from '@testing-library/react'
 import { afterEach, expect, test } from 'vitest'
 import App from './App'
+import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { AcessoFalso } from './acesso/AcessoFalso'
 
 afterEach(cleanup)
 
 async function abrirLogado() {
-  render(<App acesso={AcessoFalso.logadoComo()} />)
+  render(<App acesso={AcessoFalso.logadoComo()} cadastros={new CadastrosFalso()} />)
   await screen.findByRole('heading', { name: 'Processos' })
 }
 

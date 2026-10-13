@@ -349,7 +349,7 @@ create trigger registrar_evento_do_setor after insert or update or delete on pub
 ```
 
 - [x] **Passo 5: aplicar no desenvolvimento.** Conferir o vínculo (`supabase/AMBIENTES.md`: `yclkzyoebpsxmgpbcbus`; `supabase/.temp/project-ref`, se existir, com o mesmo ref). Pedir ao usuário que cole a migração no SQL Editor do projeto **plataforma-ep-dev** e a rode. Registrar em `supabase/AMBIENTES.md`, na lista de migrações aplicadas à mão, a linha `- <versão>_setores (<data>; testes 11, 00 e 10 passaram pelo GitHub Actions)`.
-- [ ] **Passo 6: ver o teste passar.** Comitar a migração, o `AMBIENTES.md` e, depois do passo 7, os tipos (um commit só: "Migração de setores: tabela, RLS, regras e eventos"), enviar a branch e pedir ao usuário que rode "Testes de banco" na branch. Esperado: todos os arquivos passando, inclusive `00_rls_ligada`, `10_privilegios_padrao` e `11_setores` (47 ok).
+- [x] **Passo 6: ver o teste passar.** Comitar a migração, o `AMBIENTES.md` e, depois do passo 7, os tipos (um commit só: "Migração de setores: tabela, RLS, regras e eventos"), enviar a branch e pedir ao usuário que rode "Testes de banco" na branch. Esperado: todos os arquivos passando, inclusive `00_rls_ligada`, `10_privilegios_padrao` e `11_setores` (47 ok).
 - [x] **Passo 7: gerar os tipos.** `npm run db:types` (vínculo conferido no passo 5). Esperado: `src/types/database.ts` com `setores` em `Tables`. `npm run typecheck` passando.
 
 ---
@@ -631,8 +631,8 @@ export function problemaNoSetor(nome: string, sigla: string): string | null {
 - Consome: `ModuloDeCadastros`, `CadastrosFalso` (tarefa 2).
 - Produz: `useEndereco(): [string, (novo: string) => void]`; `App` com props `{ acesso: ModuloDeAcesso; cadastros: ModuloDeCadastros }`; `AreaDeCadastros({ usuario, cadastros })`; `AreaComTela` inclui `'setores'`.
 
-- [ ] **Passo 1: injetar o módulo nos testes existentes.** Em cada `src/App*.test.tsx`, trocar `<App acesso={X} />` por `<App acesso={X} cadastros={new CadastrosFalso()} />` e acrescentar `import { CadastrosFalso } from './cadastros/CadastrosFalso'` logo depois de `import App from './App'`. Comando: `perl -0pi -e "s/<App acesso=\{(.*?)\} \/>/<App acesso={\$1} cadastros={new CadastrosFalso()} \/>/g; s/(import App from '.\/App'\n)/\$1import { CadastrosFalso } from '.\/cadastros\/CadastrosFalso'\n/" src/App*.test.tsx`. Conferir com `git diff --stat` (11 arquivos) e `grep -c "cadastros={" src/App*.test.tsx`.
-- [ ] **Passo 2: escrever o teste de navegação** em `src/App.setores.test.tsx` (as listas entram na tarefa 5):
+- [x] **Passo 1: injetar o módulo nos testes existentes.** Em cada `src/App*.test.tsx`, trocar `<App acesso={X} />` por `<App acesso={X} cadastros={new CadastrosFalso()} />` e acrescentar `import { CadastrosFalso } from './cadastros/CadastrosFalso'` logo depois de `import App from './App'`. Comando: `perl -0pi -e "s/<App acesso=\{(.*?)\} \/>/<App acesso={\$1} cadastros={new CadastrosFalso()} \/>/g; s/(import App from '.\/App'\n)/\$1import { CadastrosFalso } from '.\/cadastros\/CadastrosFalso'\n/" src/App*.test.tsx`. Conferir com `git diff --stat` (11 arquivos) e `grep -c "cadastros={" src/App*.test.tsx`.
+- [x] **Passo 2: escrever o teste de navegação** em `src/App.setores.test.tsx` (as listas entram na tarefa 5):
 
 ```tsx
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
@@ -703,8 +703,8 @@ test('o endereço da aba Histórico sobrevive ao recarregar', async () => {
 })
 ```
 
-- [ ] **Passo 3: ver falhar.** `npx vitest run src/App.setores.test.tsx`: FAIL (prop `cadastros` e área inexistentes).
-- [ ] **Passo 4: implementar.** `src/hooks/useEndereco.ts`:
+- [x] **Passo 3: ver falhar.** `npx vitest run src/App.setores.test.tsx`: FAIL (prop `cadastros` e área inexistentes).
+- [x] **Passo 4: implementar.** `src/hooks/useEndereco.ts`:
 
 ```ts
 import { useCallback, useEffect, useState } from 'react'
@@ -856,8 +856,8 @@ function App({ acesso, cadastros }: AppProps) {
 
 Antes de gravar o CSS, conferir os nomes dos tokens em `src/styles/tokens.css` (`--borda`, `--texto-secundario`, `--acento`, `--esp-*`) e trocar por equivalentes existentes, se algum não existir.
 
-- [ ] **Passo 5: ver passar.** `npx vitest run src/App.setores.test.tsx`; depois `npm run typecheck && npm test` (os testes antigos seguem passando). Se o jsdom não navegar pelo link de âncora no teste "trocar de aba", trocar os links por botões que chamam `irPara(destino)` de `useEndereco` (mesmo texto e `aria-current`), e o teste passa a buscar `button` em vez de `link`.
-- [ ] **Passo 6: comitar.** "Área Setores no endereço, com as três abas".
+- [x] **Passo 5: ver passar.** `npx vitest run src/App.setores.test.tsx`; depois `npm run typecheck && npm test` (os testes antigos seguem passando). Se o jsdom não navegar pelo link de âncora no teste "trocar de aba", trocar os links por botões que chamam `irPara(destino)` de `useEndereco` (mesmo texto e `aria-current`), e o teste passa a buscar `button` em vez de `link`.
+- [x] **Passo 6: comitar.** "Área Setores no endereço, com as três abas".
 
 ---
 

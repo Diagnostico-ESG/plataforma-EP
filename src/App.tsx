@@ -1,5 +1,7 @@
 import type { ModuloDeAcesso } from './acesso/tipos'
+import type { ModuloDeCadastros } from './cadastros/tipos'
 import { AreaDeAdministracao } from './components/administracao/AreaDeAdministracao'
+import { AreaDeCadastros } from './components/cadastros/AreaDeCadastros'
 import { TelaDeEntrada } from './components/entrada/TelaDeEntrada'
 import type { AreaComTela } from './components/moldura/areas'
 import { Moldura } from './components/moldura/Moldura'
@@ -7,11 +9,13 @@ import { QuadroVazio } from './components/quadro/QuadroVazio'
 import { useAreaAtual } from './hooks/useAreaAtual'
 import { useEntrada } from './hooks/useEntrada'
 
-type AppProps = { acesso: ModuloDeAcesso }
+type AppProps = { acesso: ModuloDeAcesso; cadastros: ModuloDeCadastros }
 
-const TITULO_DA_AREA: Record<AreaComTela, string> = { quadro: 'Processos', administracao: 'Administração' }
+const TITULO_DA_AREA: Record<AreaComTela, string> = {
+  quadro: 'Processos', setores: 'Setores', administracao: 'Administração',
+}
 
-function App({ acesso }: AppProps) {
+function App({ acesso, cadastros }: AppProps) {
   const { estado, entrar, sair, tentarDeNovo } = useEntrada(acesso)
   const [area, irPara] = useAreaAtual()
   if (estado.tipo !== 'dentro') {
@@ -19,7 +23,9 @@ function App({ acesso }: AppProps) {
   }
   return (
     <Moldura areaAtual={area} aoIrPara={irPara} titulo={TITULO_DA_AREA[area]} usuario={estado.usuario} aoSair={sair}>
-      {area === 'quadro' ? <QuadroVazio /> : <AreaDeAdministracao usuario={estado.usuario} acesso={acesso} />}
+      {area === 'quadro' && <QuadroVazio />}
+      {area === 'setores' && <AreaDeCadastros usuario={estado.usuario} cadastros={cadastros} />}
+      {area === 'administracao' && <AreaDeAdministracao usuario={estado.usuario} acesso={acesso} />}
     </Moldura>
   )
 }

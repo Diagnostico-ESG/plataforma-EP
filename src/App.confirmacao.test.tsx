@@ -1,6 +1,7 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import App from './App'
+import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import type { LinhaDeUsuario, Perfil } from './acesso/tipos'
 
@@ -24,7 +25,7 @@ const LINHAS: LinhaDeUsuario[] = [
 async function abrirComoAdministrador() {
   const acesso = AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'administrador' as Perfil })
   acesso.linhas = [...LINHAS]
-  render(<App acesso={acesso} />)
+  render(<App acesso={acesso} cadastros={new CadastrosFalso()} />)
   await screen.findByRole('table', { busy: false })
   return acesso
 }
