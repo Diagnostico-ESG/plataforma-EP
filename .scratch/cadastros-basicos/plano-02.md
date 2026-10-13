@@ -72,7 +72,7 @@
 **Interfaces:**
 - Produz `CadastroInexistente` (extends `Error`, mensagem `TEXTO_DE_CADASTRO_INEXISTENTE`) e, em `ModuloDeCadastros`: `lerSetor(id: string): Promise<Setor | null>`, `editarSetor(id: string, dados: DadosDoSetor): Promise<void>`, `desativarSetor(id: string)`, `reativarSetor(id: string)`, `excluirSetor(id: string)` (todas `Promise<void>`; as quatro de gravação lançam `CadastroInexistente` se o setor não existe).
 
-- [ ] **Passo 1: criar `src/cadastros/cadastroInexistente.ts`.**
+- [x] **Passo 1: criar `src/cadastros/cadastroInexistente.ts`.**
 
 ```ts
 export const TEXTO_DE_CADASTRO_INEXISTENTE = 'Este cadastro não existe mais. Ele pode ter sido excluído; veja o Histórico.'
@@ -87,7 +87,7 @@ export class CadastroInexistente extends Error {
 }
 ```
 
-- [ ] **Passo 2: ampliar o tipo** em `tipos.ts`: dentro de `ModuloDeCadastros`, depois de `criarSetor`, acrescentar
+- [x] **Passo 2: ampliar o tipo** em `tipos.ts`: dentro de `ModuloDeCadastros`, depois de `criarSetor`, acrescentar
 
 ```ts
   /** null: o setor não existe (mais). */
@@ -100,7 +100,7 @@ export class CadastroInexistente extends Error {
 
 e ajustar o comentário do tipo para dizer que gravação em setor que não existe mais chega como `CadastroInexistente`.
 
-- [ ] **Passo 3: escrever os testes que falham** em `cadastrosSupabase.test.ts` (dentro do `describe`; importar `CadastroInexistente` de `./cadastroInexistente`):
+- [x] **Passo 3: escrever os testes que falham** em `cadastrosSupabase.test.ts` (dentro do `describe`; importar `CadastroInexistente` de `./cadastroInexistente`):
 
 ```ts
   const LINHA = { id: 's1', sigla: 'NFT', nome: NOVO.nome, observacoes: null, ativo: true }
@@ -169,8 +169,8 @@ e ajustar o comentário do tipo para dizer que gravação em setor que não exis
   })
 ```
 
-- [ ] **Passo 4: `npx vitest run src/cadastros/cadastrosSupabase.test.ts`** e conferir que os testes novos falham (operações não existem).
-- [ ] **Passo 5: implementar** em `cadastrosSupabase.ts`. O objeto de `criarCadastrosSupabase` ganha
+- [x] **Passo 4: `npx vitest run src/cadastros/cadastrosSupabase.test.ts`** e conferir que os testes novos falham (operações não existem).
+- [x] **Passo 5: implementar** em `cadastrosSupabase.ts`. O objeto de `criarCadastrosSupabase` ganha
 
 ```ts
     lerSetor: (id) => lerSetor(cliente, id),
@@ -210,7 +210,7 @@ async function porQueNadaMudou(cliente: ClienteSupabase, id: string): Promise<Er
 }
 ```
 
-- [ ] **Passo 6: `CadastrosFalso.ts`.** Importar `CadastroInexistente`. Trocar o corpo de `criarSetor` para usar `this.falharSeConfigurado()` e acrescentar:
+- [x] **Passo 6: `CadastrosFalso.ts`.** Importar `CadastroInexistente`. Trocar o corpo de `criarSetor` para usar `this.falharSeConfigurado()` e acrescentar:
 
 ```ts
   async lerSetor(id: string): Promise<Setor | null> {
@@ -253,8 +253,8 @@ async function porQueNadaMudou(cliente: ClienteSupabase, id: string): Promise<Er
   }
 ```
 
-- [ ] **Passo 7: `npx vitest run src/cadastros` passa**, `npx tsc -b` e `npm run lint` sem erro; `npm test` inteiro passa.
-- [ ] **Passo 8: commit** `Módulo de cadastros: ler, editar, desativar, reativar e excluir setor`.
+- [x] **Passo 7: `npx vitest run src/cadastros` passa**, `npx tsc -b` e `npm run lint` sem erro; `npm test` inteiro passa.
+- [x] **Passo 8: commit** `Módulo de cadastros: ler, editar, desativar, reativar e excluir setor`.
 
 ---
 
