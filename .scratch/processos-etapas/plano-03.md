@@ -66,9 +66,9 @@
 **Interfaces:**
 - Produces: tabela `public.responsaveis_do_setor (id, setor_id, nome, email, cargo, criado_em)`; recusa `email_mal_formado:<valor>` (P0001); eventos `entidade = 'responsavel_do_setor'`, ref `'<setor_id>:<id>'`; "antes" da exclusão do setor com `responsaveis: [{nome, email, cargo}]`.
 
-- [ ] **Step 1: branch.** `git switch -c processos-etapas` a partir da `main` (isolamento já feito: branch comum, sem worktree).
+- [x] **Step 1: branch.** `git switch -c processos-etapas` a partir da `main` (isolamento já feito: branch comum, sem worktree).
 
-- [ ] **Step 2: teste que falha.** Criar `supabase/tests/16_responsaveis_do_setor.test.sql`:
+- [x] **Step 2: teste que falha.** Criar `supabase/tests/16_responsaveis_do_setor.test.sql`:
 
 ```sql
 -- Responsáveis do setor: quem pode o quê, e-mail, eventos e exclusão junto com o setor (processos-etapas, ticket 03).
@@ -287,9 +287,9 @@ Em `supabase/tests/13_setores_envolvidos.test.sql`, no "antes" esperado da exclu
     'responsaveis', jsonb_build_array())),
 ```
 
-- [ ] **Step 3: ver falhar.** Commit "Ticket 03 de processos-etapas: teste de banco dos responsáveis do setor"; `git push -u origin processos-etapas`; disparar "Testes de banco" na branch. Esperado: `16_responsaveis_do_setor` falha (tabela inexistente) e `13_setores_envolvidos` falha só no item "excluir o setor grava no antes a lista dos macroprocessos"; os outros 15 arquivos verdes.
+- [x] **Step 3: ver falhar.** Commit "Ticket 03 de processos-etapas: teste de banco dos responsáveis do setor"; `git push -u origin processos-etapas`; disparar "Testes de banco" na branch. Esperado: `16_responsaveis_do_setor` falha (tabela inexistente) e `13_setores_envolvidos` falha só no item "excluir o setor grava no antes a lista dos macroprocessos"; os outros 15 arquivos verdes.
 
-- [ ] **Step 4: migração.** `npx supabase migration new responsaveis_do_setor` e escrever no arquivo criado:
+- [x] **Step 4: migração.** `npx supabase migration new responsaveis_do_setor` e escrever no arquivo criado:
 
 ```sql
 -- Processos e etapas, ticket 03: responsáveis do setor (nome, e-mail e cargo), lidos por todo perfil ativo e mantidos
@@ -432,7 +432,7 @@ Atenção: `private.preparar_responsavel_do_setor` não é `security definer` e 
 **Interfaces:**
 - Produces: `ResponsavelDoSetor = { id: string; nome: string; email: string | null; cargo: string | null }`; `DadosDoResponsavel = Omit<ResponsavelDoSetor, 'id'>`; `CamposDoResponsavel = { nome: string; email: string; cargo: string }`; `fraseDoEmailMalFormado(recebido: string): string`; `problemaNoResponsavel(campos: CamposDoResponsavel): string | null`; `dadosDoResponsavel(campos: CamposDoResponsavel): DadosDoResponsavel`.
 
-- [ ] **Step 1: tipos.** Em `src/processos/tipos.ts`, depois de `EtapaDoSetor`:
+- [x] **Step 1: tipos.** Em `src/processos/tipos.ts`, depois de `EtapaDoSetor`:
 
 ```ts
 /** Pessoa do setor atendido que responde por ele junto ao EP. */
@@ -441,7 +441,7 @@ export type ResponsavelDoSetor = { id: string; nome: string; email: string | nul
 export type DadosDoResponsavel = Omit<ResponsavelDoSetor, 'id'>
 ```
 
-- [ ] **Step 2: teste que falha.** `src/processos/validacaoDoResponsavel.test.ts`:
+- [x] **Step 2: teste que falha.** `src/processos/validacaoDoResponsavel.test.ts`:
 
 ```ts
 import { expect, test } from 'vitest'
@@ -473,7 +473,7 @@ test('dados saem sem espaços nas pontas, e-mail em minúsculas e vazios como nu
 
 Run: `npx vitest run src/processos/validacaoDoResponsavel.test.ts` → FAIL (módulo inexistente).
 
-- [ ] **Step 3: implementação.** `src/processos/validacaoDoResponsavel.ts`:
+- [x] **Step 3: implementação.** `src/processos/validacaoDoResponsavel.ts`:
 
 ```ts
 import type { DadosDoResponsavel } from './tipos'
@@ -503,7 +503,7 @@ export function dadosDoResponsavel({ nome, email, cargo }: CamposDoResponsavel):
 
 Run: o mesmo comando → PASS.
 
-- [ ] **Step 4: commit** "Ticket 03 de processos-etapas: conferência do responsável na tela".
+- [x] **Step 4: commit** "Ticket 03 de processos-etapas: conferência do responsável na tela".
 
 ---
 
