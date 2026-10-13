@@ -23,3 +23,56 @@
   font-weight: 600;
   border-bottom-color: var(--azul);
 }
+
+/* Lista compacta, no padrão da lista de usuários. */
+.tabela-cadastros {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--folha);
+  font-size: var(--tam-secundario);
+}
+
+.tabela-cadastros caption {
+  text-align: left;
+  padding: var(--esp-2) 0;
+}
+
+.tabela-cadastros th,
+.tabela-cadastros td {
+  padding: var(--esp-2) var(--esp-3);
+  text-align: left;
+  border-bottom: 1px solid var(--linha);
+}
+
+.form-setor {
+  display: grid;
+  gap: var(--esp-2);
+  max-width: 480px;
+}
+
+.form-setor-titulo {
+  margin: 0;
+}
+
+.form-setor-botoes {
+  display: flex;
+  gap: var(--esp-2);
+}
+
+.cadastros-novo {
+  justify-self: start;
+}
+
+.cadastros-secao {
+  display: grid;
+  gap: var(--esp-4);
+}
+
+/* "A ação não aconteceu" (vermelho), como na Administração (ADR 0003). */
+.cadastros-erro,
+.cadastros-falha {
+  padding: var(--esp-3) var(--esp-4);
+  border-radius: var(--canto);
+  background: var(--atraso-fundo);
+  color: var(--atraso-texto);
+}

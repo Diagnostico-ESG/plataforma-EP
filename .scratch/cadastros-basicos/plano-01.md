@@ -871,7 +871,7 @@ Antes de gravar o CSS, conferir os nomes dos tokens em `src/styles/tokens.css` (
 - Consome: `useCarregamento` e `EstadoDoCarregamento<T>` de `src/hooks/useCarregamento.ts`; `textoDaFalhaNoFormulario` de `src/acesso/falhasDeGravacao.ts`; `normalizarSigla`, `problemaNoSetor` (tarefa 3).
 - Produz: `AreaDeSetores({ cadastros, podeAlterar })`; `ListaDeSetores({ estado, aoTentarDeNovo })`; `FormularioDeSetor({ aoSalvar, aoCancelar })`.
 
-- [ ] **Passo 1: testes da lista e dos estados**, acrescentados a `src/App.setores.test.tsx`:
+- [x] **Passo 1: testes da lista e dos estados**, acrescentados a `src/App.setores.test.tsx`:
 
 ```tsx
 function linhasDaTabela() {
@@ -919,7 +919,7 @@ test.each<Perfil>(['administrador', 'integrante_ep'])('%s vê [Novo setor]', asy
 })
 ```
 
-- [ ] **Passo 2: testes do cadastro** em `src/App.novoSetor.test.tsx`:
+- [x] **Passo 2: testes do cadastro** em `src/App.novoSetor.test.tsx`:
 
 ```tsx
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
@@ -1023,8 +1023,8 @@ test('as mensagens de falha e de erro de carregamento são vermelhas no CSS', ()
 })
 ```
 
-- [ ] **Passo 3: ver falhar.** `npx vitest run src/App.setores.test.tsx src/App.novoSetor.test.tsx`: FAIL (lista e formulário inexistentes).
-- [ ] **Passo 4: implementar.** `src/components/cadastros/AreaDeSetores.tsx`:
+- [x] **Passo 3: ver falhar.** `npx vitest run src/App.setores.test.tsx src/App.novoSetor.test.tsx`: FAIL (lista e formulário inexistentes).
+- [x] **Passo 4: implementar.** `src/components/cadastros/AreaDeSetores.tsx`:
 
 ```tsx
 import { useCallback, useState } from 'react'
@@ -1223,8 +1223,10 @@ Acrescentar a `src/components/cadastros/Cadastros.css` (conferindo os tokens em 
 
 As linhas-fantasma usam as classes `.linha-fantasma` e `.fantasma-barra`, que já existem em `Administracao.css` (carregado pelo `App`).
 
-- [ ] **Passo 5: ver passar.** `npx vitest run src/App.setores.test.tsx src/App.novoSetor.test.tsx`: PASS; depois `npm run lint && npm run typecheck && npm test && npm run check:circular`.
-- [ ] **Passo 6: comitar.** "Lista de setores e cadastro de setor na área Setores".
+- [x] **Passo 5: ver passar.** `npx vitest run src/App.setores.test.tsx src/App.novoSetor.test.tsx`: PASS; depois `npm run lint && npm run typecheck && npm test && npm run check:circular`.
+- [x] **Passo 6: comitar.** "Lista de setores e cadastro de setor na área Setores".
+
+Nota da execução (2026-10-13): o teste de cor lia o CSS vazio, porque o `vite.config.ts` só entrega aos testes o conteúdo de `Administracao.css` e `Moldura.css`. `Cadastros.css` entrou nessa lista (`test.css.include`).
 
 ---
 

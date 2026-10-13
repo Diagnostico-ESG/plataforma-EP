@@ -64,3 +64,47 @@ test('o endereço da aba Histórico sobrevive ao recarregar', async () => {
   await screen.findByRole('navigation', { name: 'Seções de Setores' })
   expect(abas().getByRole('link', { name: 'Histórico' }).getAttribute('aria-current')).toBe('page')
 })
+
+function linhasDaTabela() {
+  return screen.getAllByRole('row').slice(1).map((linha) => linha.textContent)
+}
+
+test('a lista mostra sigla e nome dos setores ativos, na ordem recebida', async () => {
+  montar()
+  await screen.findByText('AFT')
+  expect(linhasDaTabela()).toEqual(['AFTAssessoria Fictícia de Teste', 'CITCoordenação Inventada de Teste'])
+})
+
+test('enquanto carrega, mostra "Carregando setores…"', async () => {
+  const cadastros = cadastrosComSetores()
+  cadastros.segurarLista = true
+  montar('integrante_ep', cadastros)
+  expect(await screen.findByText('Carregando setores…')).toBeTruthy()
+})
+
+test('sem setores, mostra "Nenhum setor cadastrado ainda."', async () => {
+  montar('integrante_ep', new CadastrosFalso())
+  expect(await screen.findByText('Nenhum setor cadastrado ainda.')).toBeTruthy()
+})
+
+test('se a lista falha, mostra o erro em vermelho e recupera com Tentar de novo', async () => {
+  const cadastros = cadastrosComSetores()
+  cadastros.falharLista = true
+  montar('integrante_ep', cadastros)
+  const erro = await screen.findByText('Não foi possível carregar os setores. Verifique a conexão e tente de novo.')
+  expect(erro.closest('.cadastros-erro')).not.toBeNull()
+  cadastros.falharLista = false
+  fireEvent.click(screen.getByRole('button', { name: 'Tentar de novo' }))
+  expect(await screen.findByText('AFT')).toBeTruthy()
+})
+
+test('a Consulta vê a lista sem [Novo setor]', async () => {
+  montar('consulta')
+  await screen.findByText('AFT')
+  expect(screen.queryByRole('button', { name: 'Novo setor' })).toBeNull()
+})
+
+test.each<Perfil>(['administrador', 'integrante_ep'])('%s vê [Novo setor]', async (perfil) => {
+  montar(perfil)
+  expect(await screen.findByRole('button', { name: 'Novo setor' })).toBeTruthy()
+})
