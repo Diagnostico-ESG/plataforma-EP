@@ -13,6 +13,11 @@ export type EtapaDoSetor = {
   resolvidaEm: string | null
 }
 
+/** Pessoa do setor atendido que responde por ele junto ao EP. */
+export type ResponsavelDoSetor = { id: string; nome: string; email: string | null; cargo: string | null }
+
+export type DadosDoResponsavel = Omit<ResponsavelDoSetor, 'id'>
+
 /**
  * Único ponto por onde a interface fala com o banco em processos e etapas. Recusa do banco chega como TravaDoBanco,
  * com a frase pronta; outra falha, como Error cuja mensagem é o motivo em português;
