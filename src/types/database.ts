@@ -106,6 +106,42 @@ export type Database = {
           },
         ]
       }
+      macroprocessos: {
+        Row: {
+          ativo: boolean
+          categoria:
+            | Database["public"]["Enums"]["categoria_macroprocesso"]
+            | null
+          codigo: string | null
+          criado_em: string
+          descricao: string | null
+          id: string
+          nome: string
+        }
+        Insert: {
+          ativo?: boolean
+          categoria?:
+            | Database["public"]["Enums"]["categoria_macroprocesso"]
+            | null
+          codigo?: string | null
+          criado_em?: string
+          descricao?: string | null
+          id?: string
+          nome: string
+        }
+        Update: {
+          ativo?: boolean
+          categoria?:
+            | Database["public"]["Enums"]["categoria_macroprocesso"]
+            | null
+          codigo?: string | null
+          criado_em?: string
+          descricao?: string | null
+          id?: string
+          nome?: string
+        }
+        Relationships: []
+      }
       setores: {
         Row: {
           ativo: boolean
@@ -191,6 +227,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      categoria_macroprocesso: "finalistico" | "apoio" | "gerencial"
       perfil: "administrador" | "integrante_ep" | "consulta"
     }
     CompositeTypes: {
@@ -322,6 +359,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      categoria_macroprocesso: ["finalistico", "apoio", "gerencial"],
       perfil: ["administrador", "integrante_ep", "consulta"],
     },
   },

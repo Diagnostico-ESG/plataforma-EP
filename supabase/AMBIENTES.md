@@ -23,3 +23,4 @@ Migrações aplicadas à mão no dev pelo SQL Editor (fora do histórico da CLI;
 - 20261008205500_foto_pela_identidade (2026-10-08; achado da revisão de segurança do /ship; teste 07 falhou antes, 7 de 8, e passou depois, 8 de 8, pelo SQL Editor)
 - 20261010012539_sem_privilegios_padrao (2026-10-09; bug das permissões padrão; teste 10 falhou antes, 15 permissões sobrando, e passou depois, pelo GitHub Actions)
 - 20261013123327_setores (2026-10-13; cadastros-basicos, ticket 01; testes 11, 00 e 10 pelo GitHub Actions)
+- 20261013133248_macroprocessos (2026-10-13; cadastros-basicos, ticket 03; teste 12 falhou antes, tabela inexistente, e passou depois, 48 de 48, com os 13 arquivos verdes, pelo GitHub Actions)
