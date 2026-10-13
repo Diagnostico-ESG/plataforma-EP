@@ -242,3 +242,5 @@ Setor e macroprocesso: Ativo ⇄ (desativar / reativar) ⇄ Inativo; nos dois es
   - macroprocessos e os setores de cada um ficam na área Setores, e não na Administração (tela 7);
   - a especificação previa "ativo" só no macroprocesso; o setor também ganhou, e os dois podem ser excluídos.
 - Na rede do escritório, a migração vai à mão pelo SQL Editor e precisa ser registrada em `supabase/AMBIENTES.md` para o `migration repair` antes da primeira publicação em produção.
+
+Entregue em 2026-10-13 (commit 3a552d3)
