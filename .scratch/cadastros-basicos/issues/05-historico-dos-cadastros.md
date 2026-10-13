@@ -18,3 +18,5 @@
 - [x] Filtro "Item" com todos os setores e macroprocessos que aparecem no histórico, inclusive excluídos, nomeados pelo evento mais recente.
 - [x] Estados "Carregando histórico…", "Nenhuma alteração registrada ainda." e erro de carregamento com [Tentar de novo].
 - [x] Testes de interface com o aplicativo inteiro: lista, ordem, filtro (inclusive por item excluído), estados e a Consulta lendo o histórico dos cadastros.
+
+Concluído em 2026-10-13 (commit af2b14b)
