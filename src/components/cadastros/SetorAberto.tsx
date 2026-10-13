@@ -14,7 +14,7 @@ export function SetorAberto({ cadastros, podeAlterar, id, aoVoltar }: SetorAbert
   const [sumiu, setSumiu] = useState(false)
 
   if (estado.tipo === 'erro') return <ErroAoCarregar alvo="o setor" aoTentarDeNovo={tentarDeNovo} />
-  if (estado.tipo === 'carregando') return <p className="cadastros-vazio">Carregando setor…</p>
+  if (estado.tipo === 'carregando') return <p className="cadastros-vazio" role="status">Carregando setor…</p>
   if (sumiu || estado.valor === null) return <ItemInexistente aoVoltar={aoVoltar} />
   if (!podeAlterar) return <SetorSomenteLeitura setor={estado.valor} aoVoltar={aoVoltar} />
   return (

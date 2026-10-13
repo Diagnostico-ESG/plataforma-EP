@@ -18,7 +18,7 @@ export function AreaDeHistorico({ cadastros }: { cadastros: ModuloDeCadastros })
 type ConteudoProps = { estado: EstadoDoCarregamento<EventoDoCadastro[]>; aoTentarDeNovo: () => void }
 
 function ConteudoDoHistorico({ estado, aoTentarDeNovo }: ConteudoProps) {
-  if (estado.tipo === 'carregando') return <p className="historico-aviso">Carregando histórico…</p>
+  if (estado.tipo === 'carregando') return <p className="historico-aviso" role="status">Carregando histórico…</p>
   if (estado.tipo === 'erro') return <ErroAoCarregar alvo="o histórico" aoTentarDeNovo={aoTentarDeNovo} />
   if (estado.valor.length === 0) return <p className="historico-aviso">Nenhuma alteração registrada ainda.</p>
   return <ListaDoHistorico eventos={estado.valor} />

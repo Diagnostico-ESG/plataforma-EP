@@ -155,3 +155,25 @@
   gap: var(--esp-2);
   align-items: center;
 }
+
+/* Campos no mesmo desenho dos da Administração (32px, borda de token), para alinhar com os botões ao lado. */
+.cadastros input:not([type='checkbox']),
+.cadastros select,
+.cadastros textarea {
+  min-height: 32px;
+  font: inherit;
+  padding: var(--esp-1) var(--esp-2);
+  border: 1px solid var(--linha);
+  border-radius: var(--canto-botao);
+  background: var(--folha);
+  color: var(--texto);
+}
+
+.cadastros textarea {
+  resize: vertical;
+}
+
+/* Estados sem dados ("Nenhum…", "Carregando…") em tom secundário, como o aviso do histórico. */
+.cadastros-vazio {
+  color: var(--texto-2);
+}

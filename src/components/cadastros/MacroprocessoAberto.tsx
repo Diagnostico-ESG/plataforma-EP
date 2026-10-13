@@ -14,7 +14,7 @@ export function MacroprocessoAberto({ cadastros, podeAlterar, id, aoVoltar }: Ma
   const [sumiu, setSumiu] = useState(false)
 
   if (estado.tipo === 'erro') return <ErroAoCarregar alvo="o macroprocesso" aoTentarDeNovo={tentarDeNovo} />
-  if (estado.tipo === 'carregando') return <p className="cadastros-vazio">Carregando macroprocesso…</p>
+  if (estado.tipo === 'carregando') return <p className="cadastros-vazio" role="status">Carregando macroprocesso…</p>
   if (sumiu || estado.valor === null) return <ItemInexistente aoVoltar={aoVoltar} />
   if (!podeAlterar) return <MacroprocessoSomenteLeitura macroprocesso={estado.valor} aoVoltar={aoVoltar} />
   return (
