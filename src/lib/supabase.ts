@@ -1,6 +1,7 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '../types/database'
 
+export type ClienteSupabase = SupabaseClient<Database>
 type VariaveisSupabase = Record<string, string | undefined>
 
 // Único ponto de conexão com o banco: a interface usa só a chave publicável.

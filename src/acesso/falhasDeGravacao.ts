@@ -1,4 +1,4 @@
-type ErroDoBanco = { message: string; code?: string }
+export type ErroDoBanco = { message: string; code?: string }
 type RecusaDoEmail = 'email_fora_do_dominio' | 'email_ja_autorizado' | 'email_ja_e_usuario'
 
 // O banco recusa com "motivo:email" (private.preparar_autorizacao); o PostgREST pode acrescentar texto em volta.
@@ -52,4 +52,19 @@ export function textoDaFalhaNoFormulario(erro: unknown): string {
 
 function mensagemDoErro(erro: unknown): string {
   return erro instanceof Error ? erro.message : String(erro)
+}
+
+/** Frases de recusa de um módulo: o que o perfil não pode alterar e o aviso de registro que já não existe. */
+export type RecusasDoModulo = { semPermissao: string; registroInexistente: () => Error }
+
+// 42501 é o código do Postgres para falta de privilégio: a permissão do perfil recusou a gravação.
+export function recusaPorPerfil(erro: ErroDoBanco, semPermissao: string): Error {
+  if (erro.code === '42501') return new TravaDoBanco(semPermissao)
+  return new Error(`erro inesperado do banco (${erro.message})`)
+}
+
+// A RLS não acusa erro ao filtrar: zero linhas com o registro ainda legível é perfil; ilegível, ele sumiu.
+export function porQueNadaMudou(aindaExiste: boolean, recusas: RecusasDoModulo): Error {
+  if (aindaExiste) return new TravaDoBanco(recusas.semPermissao)
+  return recusas.registroInexistente()
 }

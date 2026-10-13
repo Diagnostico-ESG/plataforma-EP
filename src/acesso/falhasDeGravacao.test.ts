@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import {
-  TravaDoBanco, falhaDeGravacao, motivoDaFalhaDeGravacao, textoDaFalha, textoDaFalhaNoFormulario,
+  TravaDoBanco, falhaDeGravacao, motivoDaFalhaDeGravacao, porQueNadaMudou, recusaPorPerfil, textoDaFalha,
+  textoDaFalhaNoFormulario,
 } from './falhasDeGravacao'
 
 describe('motivoDaFalhaDeGravacao', () => {
@@ -52,5 +53,34 @@ describe('texto da falha na tela', () => {
     expect(textoDaFalha(falha)).toBe('A alteração não foi salva: seu perfil não permite esta alteração.')
     expect(textoDaFalhaNoFormulario(falha))
       .toBe('A alteração não foi salva: seu perfil não permite esta alteração. Seus dados continuam no formulário.')
+  })
+})
+
+describe('recusaPorPerfil', () => {
+  test('42501 vira TravaDoBanco com a frase do módulo', () => {
+    const falha = recusaPorPerfil({ message: 'permission denied', code: '42501' }, 'Seu perfil não permite isto.')
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect(falha.message).toBe('Seu perfil não permite isto.')
+  })
+
+  test('outro código vira erro inesperado com o texto recebido', () => {
+    const falha = recusaPorPerfil({ message: 'Failed to fetch' }, 'Seu perfil não permite isto.')
+    expect(falha).not.toBeInstanceOf(TravaDoBanco)
+    expect(falha.message).toBe('erro inesperado do banco (Failed to fetch)')
+  })
+})
+
+describe('porQueNadaMudou', () => {
+  class RegistroSumiu extends Error {}
+  const recusas = { semPermissao: 'Seu perfil não permite isto.', registroInexistente: () => new RegistroSumiu('sumiu') }
+
+  test('registro ainda legível: a recusa foi do perfil', () => {
+    const falha = porQueNadaMudou(true, recusas)
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect(falha.message).toBe('Seu perfil não permite isto.')
+  })
+
+  test('registro ilegível: ele não existe mais', () => {
+    expect(porQueNadaMudou(false, recusas)).toBeInstanceOf(RegistroSumiu)
   })
 })

@@ -36,7 +36,7 @@
   - `export type ClienteSupabase = SupabaseClient<Database>` (em `src/lib/supabase.ts`)
   - `export const RECUSAS_DOS_CADASTROS: RecusasDoModulo`
 
-- [ ] **Step 1: testes que falham** — em `falhasDeGravacao.test.ts`, acrescentar ao import `porQueNadaMudou, recusaPorPerfil` e:
+- [x] **Step 1: testes que falham** — em `falhasDeGravacao.test.ts`, acrescentar ao import `porQueNadaMudou, recusaPorPerfil` e:
 
 ```ts
 describe('recusaPorPerfil', () => {
@@ -69,9 +69,9 @@ describe('porQueNadaMudou', () => {
 })
 ```
 
-- [ ] **Step 2: rodar e ver falhar** — `npx vitest run src/acesso/falhasDeGravacao.test.ts`. Esperado: falha por `recusaPorPerfil`/`porQueNadaMudou` não exportados.
+- [x] **Step 2: rodar e ver falhar** — `npx vitest run src/acesso/falhasDeGravacao.test.ts`. Esperado: falha por `recusaPorPerfil`/`porQueNadaMudou` não exportados.
 
-- [ ] **Step 3: implementar** — em `falhasDeGravacao.ts`, trocar a linha 1 por `export type ErroDoBanco = ...` e acrescentar no fim:
+- [x] **Step 3: implementar** — em `falhasDeGravacao.ts`, trocar a linha 1 por `export type ErroDoBanco = ...` e acrescentar no fim:
 
 ```ts
 /** Frases de recusa de um módulo: o que o perfil não pode alterar e o aviso de registro que já não existe. */
@@ -100,9 +100,9 @@ export const RECUSAS_DOS_CADASTROS: RecusasDoModulo = {
 }
 ```
 
-- [ ] **Step 4: rodar e ver passar** — `npx vitest run src/acesso/falhasDeGravacao.test.ts`.
+- [x] **Step 4: rodar e ver passar** — `npx vitest run src/acesso/falhasDeGravacao.test.ts`.
 
-- [ ] **Step 5: commit** — `git add` os quatro arquivos; mensagem "Ticket 01 de processos-etapas: peças comuns de recusa do banco".
+- [x] **Step 5: commit** — `git add` os quatro arquivos; mensagem "Ticket 01 de processos-etapas: peças comuns de recusa do banco".
 
 ### Task 2: Módulos passam a usar as peças comuns
 
