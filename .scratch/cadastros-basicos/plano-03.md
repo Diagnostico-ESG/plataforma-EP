@@ -154,8 +154,8 @@
 
 ### Tarefa 7: Fechamento (critérios 1 a 9 conferidos)
 
-- [ ] **Passo 1: gate completo.** `npm test` (todos passando), `npx tsc -b`, `npm run lint`, `npm run test -- --coverage` com cobertura ≥ 70%.
-- [ ] **Passo 2: conferir os 9 critérios do ticket** um a um, anotando a evidência (teste ou arquivo) de cada.
-- [ ] **Passo 3: revisão visual.** Subir o Vite (`preview_start`) e conferir a aba Macroprocessos na tela (se o login institucional do Google barrar a sessão, registrar que a conferência visual ficou com o usuário, como no ticket 02).
-- [ ] **Passo 4: registros.** Atualizar `.scratch/melhorias-protocolo.md` com os itens de `.claude/regras/nao-testados.md` que aconteceram nesta execução.
-- [ ] **Passo 5: encerrar.** Junto da branch à `main` (`git switch main`, merge, `git branch -d cadastros-basicos`), linha `Concluído em` no ticket, commit, `git push` da `main` e conferência do "Testes de banco" na `main` (o push mexe em `supabase/`).
+- [x] **Passo 1: gate completo.** `npm test` (todos passando), `npx tsc -b`, `npm run lint`, `npm run test -- --coverage` com cobertura ≥ 70%.
+- [x] **Passo 2: conferir os 9 critérios do ticket** um a um, anotando a evidência (teste ou arquivo) de cada.
+- [x] **Passo 3: revisão visual.** Subir o Vite (`preview_start`) e conferir a aba Macroprocessos na tela (se o login institucional do Google barrar a sessão, registrar que a conferência visual ficou com o usuário, como no ticket 02).
+- [x] **Passo 4: registros.** Atualizar `.scratch/melhorias-protocolo.md` com os itens de `.claude/regras/nao-testados.md` que aconteceram nesta execução.
+- [x] **Passo 5: encerrar.** Junto da branch à `main` (`git switch main`, merge, `git branch -d cadastros-basicos`), linha `Concluído em` no ticket, commit, `git push` da `main` e conferência do "Testes de banco" na `main` (o push mexe em `supabase/`).
