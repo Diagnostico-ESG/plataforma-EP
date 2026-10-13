@@ -55,7 +55,7 @@ test('trocar de aba põe a aba no endereço e a destaca', async () => {
   fireEvent.click(await screen.findByRole('link', { name: 'Macroprocessos' }))
   await waitFor(() => expect(abas().getByRole('link', { name: 'Macroprocessos' }).getAttribute('aria-current')).toBe('page'))
   expect(window.location.hash).toBe('#/setores/macroprocessos')
-  expect(screen.getByText('Esta seção chega numa próxima entrega.')).toBeTruthy()
+  expect(await screen.findByText('Nenhum macroprocesso cadastrado ainda.')).toBeTruthy()
 })
 
 test('o endereço da aba Histórico sobrevive ao recarregar', async () => {

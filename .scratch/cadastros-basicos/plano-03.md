@@ -116,10 +116,10 @@
 
 **Interfaces:** Consome `useCarregamento`, `ErroAoCarregar`, `PecasDaLista`, `Pilula`, `ModuloDeCadastros.listarMacroprocessos`. Produz `AreaDeMacroprocessos({ cadastros, podeAlterar })` e `ListaDeMacroprocessos({ estado, aoTentarDeNovo, aoAbrir })`.
 
-- [ ] **Passo 1: testes de tela que falham** (molde `App.setores.test.tsx` e `App.setoresInativos.test.tsx`, hash `#/setores/macroprocessos`, macroprocessos inventados): colunas Código, Nome, Categoria, Situação; ordem pelo código com os sem código depois em ordem alfabética; só ativos ao abrir; "Mostrar inativos" mostra os inativos com a pílula "Inativo"; "Carregando macroprocessos…"; "Nenhum macroprocesso cadastrado ainda."; "Nenhum macroprocesso ativo para mostrar." quando só há inativos; erro de carregamento em vermelho com [Tentar de novo] que recupera; a aba atual fica destacada; [Novo macroprocesso] aparece para Administrador e Integrante e não para a Consulta.
-- [ ] **Passo 2: ver falharem.** `npx vitest run src/App.macroprocessos.test.tsx`.
-- [ ] **Passo 3: implementar** os dois componentes e ligar a aba em `AreaDeCadastros` (a aba Histórico segue com o aviso "chega numa próxima entrega").
-- [ ] **Passo 4: verificar** (`npm test`, `tsc`, `lint`). Commit.
+- [x] **Passo 1: testes de tela que falham** (molde `App.setores.test.tsx` e `App.setoresInativos.test.tsx`, hash `#/setores/macroprocessos`, macroprocessos inventados): colunas Código, Nome, Categoria, Situação; ordem pelo código com os sem código depois em ordem alfabética; só ativos ao abrir; "Mostrar inativos" mostra os inativos com a pílula "Inativo"; "Carregando macroprocessos…"; "Nenhum macroprocesso cadastrado ainda."; "Nenhum macroprocesso ativo para mostrar." quando só há inativos; erro de carregamento em vermelho com [Tentar de novo] que recupera; a aba atual fica destacada; [Novo macroprocesso] aparece para Administrador e Integrante e não para a Consulta.
+- [x] **Passo 2: ver falharem.** `npx vitest run src/App.macroprocessos.test.tsx`.
+- [x] **Passo 3: implementar** os dois componentes e ligar a aba em `AreaDeCadastros` (a aba Histórico segue com o aviso "chega numa próxima entrega").
+- [x] **Passo 4: verificar** (`npm test`, `tsc`, `lint`). Commit.
 
 ---
 
