@@ -1,9 +1,10 @@
 import { rotuloDaCategoria } from '../../cadastros/categorias'
-import type { Macroprocesso } from '../../cadastros/tipos'
+import type { MacroprocessoComSetores } from '../../cadastros/tipos'
+import { SetoresEnvolvidos } from './SetoresEnvolvidos'
 
 const SEM_VALOR = '—'
 
-type MacroprocessoSomenteLeituraProps = { macroprocesso: Macroprocesso; aoVoltar: () => void }
+type MacroprocessoSomenteLeituraProps = { macroprocesso: MacroprocessoComSetores; aoVoltar: () => void }
 
 export function MacroprocessoSomenteLeitura({ macroprocesso, aoVoltar }: MacroprocessoSomenteLeituraProps) {
   return (
@@ -15,6 +16,7 @@ export function MacroprocessoSomenteLeitura({ macroprocesso, aoVoltar }: Macropr
         <dt>Descrição</dt><dd>{macroprocesso.descricao ?? SEM_VALOR}</dd>
         <dt>Categoria</dt><dd>{rotuloDaCategoria(macroprocesso.categoria)}</dd>
       </dl>
+      <SetoresEnvolvidos envolvidos={macroprocesso.setoresEnvolvidos} />
       <button type="button" className="botao botao-secundario" onClick={aoVoltar}>Voltar à lista</button>
     </section>
   )

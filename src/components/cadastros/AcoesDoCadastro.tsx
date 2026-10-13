@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { textoDaFalha } from '../../acesso/falhasDeGravacao'
-import { CadastroInexistente } from '../../cadastros/cadastroInexistente'
+import { useGravacaoComFalha } from '../../hooks/useGravacaoComFalha'
 import { JanelaDeConfirmacao } from '../JanelaDeConfirmacao'
 
 type AcoesDoCadastroProps = {
@@ -21,18 +20,7 @@ export function AcoesDoCadastro({
   ativo, tituloDaJanela, textoDaJanela, rotuloDaExclusao, desativar, reativar, excluir, aoMudar, aoSumir, aoVoltar,
 }: AcoesDoCadastroProps) {
   const [confirmando, setConfirmando] = useState(false)
-  const [falha, setFalha] = useState<string | null>(null)
-
-  async function executar(gravar: () => Promise<void>, depois: () => void) {
-    setFalha(null)
-    try {
-      await gravar()
-    } catch (erro) {
-      if (erro instanceof CadastroInexistente) return aoSumir()
-      return setFalha(textoDaFalha(erro))
-    }
-    depois()
-  }
+  const { falha, executar } = useGravacaoComFalha(aoSumir)
 
   return (
     <div className="acoes-do-setor">

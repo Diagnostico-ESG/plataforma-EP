@@ -130,3 +130,21 @@
   gap: var(--esp-2);
   align-items: center;
 }
+
+/* Setores envolvidos no macroprocesso aberto: observação e [Pôr setor] alinhados, sem quebrar a linha. */
+.setores-envolvidos {
+  display: grid;
+  gap: var(--esp-3);
+}
+
+.observacao-do-setor {
+  width: 100%;
+  min-width: 14rem;
+}
+
+.por-setor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+  align-items: center;
+}

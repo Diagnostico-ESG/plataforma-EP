@@ -434,8 +434,8 @@ export function PorSetor(props: { cadastros: ModuloDeCadastros; macroprocessoId:
 export function LinhaDeSetorEnvolvido(props: { cadastros: ModuloDeCadastros; macroprocessoId: string; setor: SetorEnvolvido; aoMudar: () => void; aoSumir: () => void }): JSX.Element
 ```
 
-- [ ] **Passo 1: prefactor (sem mudar comportamento).** Extrair de `AcoesDoCadastro` o estado `falha` e a função `executar` (zera a falha; `CadastroInexistente` → `aoSumir()`; outra falha → `setFalha(textoDaFalha(erro))`; sucesso → `depois()`) para `useGravacaoComFalha`; `AcoesDoCadastro` passa a usá-lo. `npm test` com a mesma contagem de testes passando, `npx tsc -b`, `npm run lint`.
-- [ ] **Passo 2: testes de tela que falham** (`App.setoresEnvolvidos.test.tsx`, aplicativo inteiro, hash `#/setores/macroprocessos`, abrir o macroprocesso clicando na linha; setores `TSA`, `TSB`, `TSC` ativos e `TSX` inativo, inventados):
+- [x] **Passo 1: prefactor (sem mudar comportamento).** Extrair de `AcoesDoCadastro` o estado `falha` e a função `executar` (zera a falha; `CadastroInexistente` → `aoSumir()`; outra falha → `setFalha(textoDaFalha(erro))`; sucesso → `depois()`) para `useGravacaoComFalha`; `AcoesDoCadastro` passa a usá-lo. `npm test` com a mesma contagem de testes passando, `npx tsc -b`, `npm run lint`.
+- [x] **Passo 2: testes de tela que falham** (`App.setoresEnvolvidos.test.tsx`, aplicativo inteiro, hash `#/setores/macroprocessos`, abrir o macroprocesso clicando na linha; setores `TSA`, `TSB`, `TSC` ativos e `TSX` inativo, inventados):
   - com vínculos: a seção "Setores envolvidos" lista sigla, nome, observação editável e [Tirar] por linha, ordenados por sigla; sem vínculos: "Nenhum setor envolvido ainda."
   - setor inativo envolvido aparece com a pílula "Inativo" (e continua com [Tirar]).
   - seletor "Setor a pôr": só tem "Escolha um setor" e os setores **ativos ainda não envolvidos** (sem `TSX`, sem os já envolvidos); [Pôr setor] desabilitado até escolher.
@@ -447,14 +447,14 @@ export function LinhaDeSetorEnvolvido(props: { cadastros: ModuloDeCadastros; mac
   - macroprocesso excluído por outra pessoa durante a operação (`CadastroInexistente`): vira o aviso "Este cadastro não existe mais…" com [Voltar à lista].
   - falha ao carregar os setores do seletor (`falharLista`): "Não foi possível carregar os setores. Verifique a conexão e tente de novo." com [Tentar de novo], sem esconder a lista de envolvidos.
   - Consulta: vê a lista com sigla, nome, observação em texto e a pílula "Inativo", **sem** [Tirar], **sem** seletor, **sem** campo editável; "Nenhum setor envolvido ainda." também aparece para ela.
-- [ ] **Passo 3: ver falharem.** `npx vitest run src/App.setoresEnvolvidos.test.tsx`.
-- [ ] **Passo 4: implementar.**
+- [x] **Passo 3: ver falharem.** `npx vitest run src/App.setoresEnvolvidos.test.tsx`.
+- [x] **Passo 4: implementar.**
   - `SetoresEnvolvidos`: `<section aria-label="Setores envolvidos">` com `<h3>`, tabela (`tabela-cadastros`) de `LinhaDeSetorEnvolvido` ou o texto vazio, e `PorSetor` abaixo.
   - `LinhaDeSetorEnvolvido`: sigla, nome, pílula neutra "Inativo" se `!ativo`, `<input aria-label="Observação de {SIGLA}" maxLength={500}>` com estado local e `onBlur` que só grava se mudou (`texto.trim() || null`), botão [Tirar] (`aria-label="Tirar {SIGLA}"`), e abaixo a falha da linha (`role="alert"`, classe `cadastros-falha`), tudo via `useGravacaoComFalha(aoSumir)`; `depois` = `aoMudar`.
   - `PorSetor`: `useCarregamento(() => cadastros.listarSetores())`; opções = ativos que não estão em `envolvidos`; erro → `ErroAoCarregar alvo="os setores"`; botão desabilitado sem escolha; ao pôr, limpa a escolha e chama `aoMudar`.
   - `MacroprocessoEditavel` recebe `MacroprocessoComSetores`, renderiza `SetoresEnvolvidos` entre o formulário e as ações; `MacroprocessoSomenteLeitura` mostra a mesma lista em leitura (sem [Tirar], seletor ou campo: observação em texto, "—" se vazia).
   - CSS: o campo de observação ocupa a largura disponível da célula, sem quebrar a linha (`[visual]` da spec).
-- [ ] **Passo 5: verificar** (`npm test`, `npx tsc -b`, `npm run lint`). Commit.
+- [x] **Passo 5: verificar** (`npm test`, `npx tsc -b`, `npm run lint`). Commit.
 
 ---
 
