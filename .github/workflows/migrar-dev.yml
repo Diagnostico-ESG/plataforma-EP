@@ -1,0 +1,34 @@
+# Aplica no banco de DESENVOLVIMENTO a migração indicada. Só roda por "Run workflow" (nunca em push).
+# Produção não passa por aqui: só pelos roteiros do /ship.
+name: Migrar banco de desenvolvimento
+
+on:
+  workflow_dispatch:
+    inputs:
+      migracao:
+        description: 'Arquivo em supabase/migrations (ex.: 20261013140000_setores_envolvidos.sql)'
+        required: true
+
+permissions:
+  contents: read
+
+# Mesmo grupo dos testes de banco: nunca dois ao mesmo tempo no mesmo banco.
+concurrency:
+  group: testes-banco
+  cancel-in-progress: false
+
+jobs:
+  migrar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: node scripts/aplicar-migracao.mjs yclkzyoebpsxmgpbcbus "$MIGRACAO"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          MIGRACAO: ${{ inputs.migracao }}
