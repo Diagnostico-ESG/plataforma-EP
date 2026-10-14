@@ -135,16 +135,16 @@ export function linhasDaLista(processos: ProcessoDaLista[]): LinhaDaLista[]
 export function textoDaEtapaAtual(processo: ProcessoDaLista): string
 ```
 
-- [ ] Testes de `filtrosDosProcessos` (critério 2), com processos inventados montados por uma função `processo(nome, mudancas)` no arquivo:
+- [x] Testes de `filtrosDosProcessos` (critério 2), com processos inventados montados por uma função `processo(nome, mudancas)` no arquivo:
   - `temFiltro(SEM_FILTROS)` falso; com um campo preenchido, verdadeiro;
   - cada filtro sozinho: setor (`setorId`), macroprocesso (`macroprocessoId`), tipo, responsável (`responsavel?.id`), situação; etapa `modelagem` pega só quem tem `etapaAtual.codigo === 'modelagem'` e **não** aguarda o setor; etapa `aguardando-o-setor` pega só quem aguarda;
   - combinação (setor + tipo) é "e";
   - `opcoesDosFiltros`: setores sem repetição, em ordem de sigla, com `rotulo` = sigla; macroprocessos sem repetição por nome; etapas = "Aguardando o setor" primeiro e as do catálogo na ordem dele (só ativas ou com processo nelas, como no Quadro); responsáveis sem repetição por nome, sem os processos sem responsável; tipos e situações com os rótulos de `rotulos.ts`.
-- [ ] Testes de `linhasDaLista` (critério 1): ordem pela sigla do setor e depois pelo nome (`localeCompare` `pt-BR`, sem diferenciar maiúsculas); `nomeDoPai` preenchido no subprocesso cujo pai está na lista e null nos outros; `textoDaEtapaAtual`: "Aguardando o setor" quando aguarda, o nome da etapa quando há, "—" sem etapa.
-- [ ] Rodar os dois testes: falham.
-- [ ] Implementar. `filtrarProcessos` com uma função `passaNoFiltro(processo, filtros)` por campo (cada uma com early return), para caber no limite de complexidade; `opcoesDosFiltros` com uma função `semRepetir(pares, ordem)`. Reaproveitar `ROTULO_DO_TIPO` e `ROTULO_DA_SITUACAO`.
-- [ ] Rodar: passam. `npm run lint`.
-- [ ] Comitar: `Ticket 09 de processos-etapas: filtros, opções e linhas da Lista`.
+- [x] Testes de `linhasDaLista` (critério 1): ordem pela sigla do setor e depois pelo nome (`localeCompare` `pt-BR`, sem diferenciar maiúsculas); `nomeDoPai` preenchido no subprocesso cujo pai está na lista e null nos outros; `textoDaEtapaAtual`: "Aguardando o setor" quando aguarda, o nome da etapa quando há, "—" sem etapa.
+- [x] Rodar os dois testes: falham.
+- [x] Implementar. `filtrarProcessos` com uma função `passaNoFiltro(processo, filtros)` por campo (cada uma com early return), para caber no limite de complexidade; `opcoesDosFiltros` com uma função `semRepetir(pares, ordem)`. Reaproveitar `ROTULO_DO_TIPO` e `ROTULO_DA_SITUACAO`.
+- [x] Rodar: passam. `npm run lint`.
+- [x] Comitar: `Ticket 09 de processos-etapas: filtros, opções e linhas da Lista`.
 
 ### Tarefa 3 — A Lista, a navegação e o painel por cima da visão
 
