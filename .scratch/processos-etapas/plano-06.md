@@ -1,6 +1,6 @@
 # Ticket 06 de processos-etapas (Voltar, datas e responsável da etapa) — Plano de execução
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** a equipe volta a uma etapa anterior com motivo (no processo e no setor), corrige as datas de início e conclusão e escolhe o responsável de cada etapa do processo, com o histórico guardando como estava antes.
 
@@ -72,8 +72,8 @@ Casos (cada um uma linha do plano pgTAP):
 15. Consulta não altera data nem responsável (nenhuma linha muda).
 16. A função `voltar_a_etapa` não é `security definer` (`prosecdef` falso em `pg_proc`) — critério 2.
 
-- [ ] **Step 1:** escrever o arquivo (com `plan(<n>)` igual ao número de linhas) e comitar só ele na branch.
-- [ ] **Step 2:** `git push -u origin processos-etapas-06`, disparar o workflow "Testes de banco" na branch (Run workflow, pelo navegador do app) e ler o resultado. Esperado: o teste 19 falha (função inexistente / privilégio negado); os demais seguem verdes.
+- [x] **Step 1:** escrever o arquivo (com `plan(<n>)` igual ao número de linhas) e comitar só ele na branch.
+- [x] **Step 2:** `git push -u origin processos-etapas-06`, disparar o workflow "Testes de banco" na branch (Run workflow, pelo navegador do app) e ler o resultado. Esperado: o teste 19 falha (função inexistente / privilégio negado); os demais seguem verdes.
 
 ### Task 2: Migração (critérios 1 e 2) e tipos
 
@@ -89,10 +89,10 @@ Conteúdo da migração (uma responsabilidade por função; comentário do porqu
 - `public.voltar_a_etapa(p_andamento uuid, p_motivo text) returns void` (`language plpgsql`, sem `security definer`, `set search_path = ''`): exige motivo (`motivo_obrigatorio`), lê o andamento (inexistente → `registro_inexistente`), exige status resolvido (`etapa_nao_resolvida:<nome>`), liga `ep.voltando` e `ep.motivo_da_volta`, volta primeiro as seguintes não pendentes do mesmo dono (`processo_id`/`setor_id` com `is not distinct from`, ordem maior) a pendente com datas e nota nulas, depois a escolhida a `em_andamento` com `resolvida_em = null`, `nota = null`, `iniciada_em = coalesce(iniciada_em, current_date)`; se a atualização da escolhida não alterar linha (RLS), `raise exception using errcode = '42501'`. `revoke execute ... from public, anon; grant execute ... to authenticated`.
 - `revoke execute` das funções novas de `private` como nas migrações anteriores.
 
-- [ ] **Step 1:** criar a migração e escrever o conteúdo acima.
-- [ ] **Step 2:** comitar, `git push`, disparar o workflow "Migrar banco de desenvolvimento" na branch com o arquivo novo; ler o resultado (se acusar "já aplicada", seguir).
-- [ ] **Step 3:** disparar "Testes de banco" na branch. Esperado: os 19 arquivos verdes. Se o 19 falhar por erro do próprio teste, corrigir o teste e rodar de novo; se a migração precisar mudar, **migração nova** (a antiga já foi aplicada).
-- [ ] **Step 4:** `npm run db:types`; conferir o alvo antes (linha "vínculo atual" e `supabase/.temp/project-ref`); a função `voltar_a_etapa` entra em `Functions` de `src/types/database.ts`. Registrar a migração em `supabase/AMBIENTES.md`. Comitar tudo (migração, teste, tipos) no mesmo commit.
+- [x] **Step 1:** criar a migração e escrever o conteúdo acima.
+- [x] **Step 2:** comitar, `git push`, disparar o workflow "Migrar banco de desenvolvimento" na branch com o arquivo novo; ler o resultado (se acusar "já aplicada", seguir).
+- [x] **Step 3:** disparar "Testes de banco" na branch. Esperado: os 19 arquivos verdes. Se o 19 falhar por erro do próprio teste, corrigir o teste e rodar de novo; se a migração precisar mudar, **migração nova** (a antiga já foi aplicada).
+- [x] **Step 4:** `npm run db:types`; conferir o alvo antes (linha "vínculo atual" e `supabase/.temp/project-ref`); a função `voltar_a_etapa` entra em `Functions` de `src/types/database.ts`. Registrar a migração em `supabase/AMBIENTES.md`. Comitar tudo (migração, teste, tipos) no mesmo commit.
 
 ### Task 3: Módulo — tipos, cliente falso, real e traduções (critério 3)
 
@@ -111,17 +111,17 @@ mudarResponsavelDaEtapa(andamentoId: string, usuarioId: string | null): Promise<
 listarResponsaveisPossiveis(): Promise<UsuarioResponsavel[]>
 ```
 
-- [ ] **Step 1 (teste primeiro, vê falhar):** em `andamentosSupabase.test.ts`, com o `ClienteSupabaseFalso` (que ganha `rpc`): (a) `voltarParaEtapa` chama `rpc('voltar_a_etapa', { p_andamento, p_motivo })`; (b) `corrigirDatasDaEtapa` faz `update` em `andamentos` com `{ iniciada_em, resolvida_em }` filtrado por id; (c) `mudarResponsavelDaEtapa` faz `update { responsavel_id }`; (d) traduções: `data_no_futuro:2026-10-20` → "A data 20/10/2026 está no futuro."; `resolvida_antes_do_inicio:2026-10-01:2026-10-05` → "A conclusão (01/10/2026) não pode ser antes do início (05/10/2026)."; `responsavel_invalido:Maria Teste` → "Maria Teste não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP."; `motivo_obrigatorio` → "O motivo é obrigatório."; `etapa_nao_resolvida:<n>` → "A etapa <n> ainda não foi resolvida."; erro `42501` → "Seu perfil não permite alterar os processos."; zero linhas com o andamento legível → perfil; ilegível → `CadastroInexistente`; (e) `listarResponsaveisPossiveis` pede `usuarios` com `ativo = true` e perfil em `administrador`, `integrante_ep`, e devolve por nome. Em `lerProcessoSupabase.test.ts`: o responsável da etapa traz `responsavelId` e `responsavelInativo` (do `ativo` de `usuarios`).
-- [ ] **Step 2:** rodar `npx vitest run src/processos`; esperado: falha.
-- [ ] **Step 3:** implementar. `ClienteSupabaseFalso.rpc(nome, args)` guarda `{ tabela: 'rpc', operacao: nome, valores: args }` e responde por `rpc.<nome>`. Mover `mudarAndamento`, `andamentoExiste` e as traduções de `processosSupabase.ts` para `andamentosSupabase.ts`, acrescentar as operações novas e as frases; `processosSupabase.ts` só monta o módulo. `lerAndamentosDoProcesso` seleciona `responsavel:usuarios(id, nome, ativo)`.
-- [ ] **Step 4:** `npx vitest run src/processos` verde; `npm run typecheck`; `npm run lint`. Comitar.
+- [x] **Step 1 (teste primeiro, vê falhar):** em `andamentosSupabase.test.ts`, com o `ClienteSupabaseFalso` (que ganha `rpc`): (a) `voltarParaEtapa` chama `rpc('voltar_a_etapa', { p_andamento, p_motivo })`; (b) `corrigirDatasDaEtapa` faz `update` em `andamentos` com `{ iniciada_em, resolvida_em }` filtrado por id; (c) `mudarResponsavelDaEtapa` faz `update { responsavel_id }`; (d) traduções: `data_no_futuro:2026-10-20` → "A data 20/10/2026 está no futuro."; `resolvida_antes_do_inicio:2026-10-01:2026-10-05` → "A conclusão (01/10/2026) não pode ser antes do início (05/10/2026)."; `responsavel_invalido:Maria Teste` → "Maria Teste não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP."; `motivo_obrigatorio` → "O motivo é obrigatório."; `etapa_nao_resolvida:<n>` → "A etapa <n> ainda não foi resolvida."; erro `42501` → "Seu perfil não permite alterar os processos."; zero linhas com o andamento legível → perfil; ilegível → `CadastroInexistente`; (e) `listarResponsaveisPossiveis` pede `usuarios` com `ativo = true` e perfil em `administrador`, `integrante_ep`, e devolve por nome. Em `lerProcessoSupabase.test.ts`: o responsável da etapa traz `responsavelId` e `responsavelInativo` (do `ativo` de `usuarios`).
+- [x] **Step 2:** rodar `npx vitest run src/processos`; esperado: falha.
+- [x] **Step 3:** implementar. `ClienteSupabaseFalso.rpc(nome, args)` guarda `{ tabela: 'rpc', operacao: nome, valores: args }` e responde por `rpc.<nome>`. Mover `mudarAndamento`, `andamentoExiste` e as traduções de `processosSupabase.ts` para `andamentosSupabase.ts`, acrescentar as operações novas e as frases; `processosSupabase.ts` só monta o módulo. `lerAndamentosDoProcesso` seleciona `responsavel:usuarios(id, nome, ativo)`.
+- [x] **Step 4:** `npx vitest run src/processos` verde; `npm run typecheck`; `npm run lint`. Comitar.
 
 ### Task 4: Falso e regras puras (critérios 3 e 4)
 
 **Files:** Modify `src/processos/andamentoFalso.ts`, `ProcessosFalso.ts`, `caminhoDeEtapas.ts`; Tests `andamentoFalso.test.ts`, `caminhoDeEtapas.test.ts`, novo `ProcessosFalso.voltar.test.ts`.
 
-- [ ] **Step 1 (teste primeiro):** `acoesDaEtapa`: etapa resolvida anterior à atual → `['voltar']`; com todas resolvidas (índice atual −1) toda resolvida → `['voltar']`; a pendente futura → `[]`; a atual continua com as ações de hoje. `ProcessosFalso`: `voltarParaEtapa` põe a escolhida em andamento e as seguintes não pendentes em pendente, recalcula etapa atual e situação (concluído deixa de ser), nota vazia recusada com `TravaDoBanco('O motivo é obrigatório.')`, sem mexer nos processos quando a etapa é do setor; `corrigirDatasDaEtapa` recusa futuro (hoje do falso é `2026-10-13`) e conclusão antes do início com as frases do critério 3; `mudarResponsavelDaEtapa` recusa quem não está em `usuariosPossiveis` com a frase do critério 3 e atualiza o `responsavelNome`, `responsavelId` e o `responsavel` do cartão quando é a etapa atual; `listarResponsaveisPossiveis` devolve `usuariosPossiveis`. As chamadas entram em `chamadas` (`{ acao: 'voltar', id, nota: motivo }`, `{ acao: 'datas', id, ... }`, `{ acao: 'responsavel', id, usuarioId }`).
-- [ ] **Step 2:** rodar; esperado falha. **Step 3:** implementar (`andamentoFalso.ts` com funções puras `voltarEtapas(etapas, id)` e `conferirDatas(datas)`; o falso aplica em etapas do processo e do setor). **Step 4:** verde, typecheck, lint; comitar.
+- [x] **Step 1 (teste primeiro):** `acoesDaEtapa`: etapa resolvida anterior à atual → `['voltar']`; com todas resolvidas (índice atual −1) toda resolvida → `['voltar']`; a pendente futura → `[]`; a atual continua com as ações de hoje. `ProcessosFalso`: `voltarParaEtapa` põe a escolhida em andamento e as seguintes não pendentes em pendente, recalcula etapa atual e situação (concluído deixa de ser), nota vazia recusada com `TravaDoBanco('O motivo é obrigatório.')`, sem mexer nos processos quando a etapa é do setor; `corrigirDatasDaEtapa` recusa futuro (hoje do falso é `2026-10-13`) e conclusão antes do início com as frases do critério 3; `mudarResponsavelDaEtapa` recusa quem não está em `usuariosPossiveis` com a frase do critério 3 e atualiza o `responsavelNome`, `responsavelId` e o `responsavel` do cartão quando é a etapa atual; `listarResponsaveisPossiveis` devolve `usuariosPossiveis`. As chamadas entram em `chamadas` (`{ acao: 'voltar', id, nota: motivo }`, `{ acao: 'datas', id, ... }`, `{ acao: 'responsavel', id, usuarioId }`).
+- [x] **Step 2:** rodar; esperado falha. **Step 3:** implementar (`andamentoFalso.ts` com funções puras `voltarEtapas(etapas, id)` e `conferirDatas(datas)`; o falso aplica em etapas do processo e do setor). **Step 4:** verde, typecheck, lint; comitar.
 
 ### Task 5: Tela — voltar, datas e responsável (critérios 4, 5 e 7)
 
@@ -133,23 +133,23 @@ Comportamento:
 - Só nas etapas do processo e para quem pode alterar: `SeletorDeResponsavel` (`<select>` rotulado "Responsável de {etapa}", opção "Sem responsável" e os `listarResponsaveisPossiveis`; responsável inativo aparece como opção desabilitada "{nome} (Inativo)", selecionada); trocar grava na hora. Consulta vê só o texto "Responsável: {nome}" (e "(Inativo)" quando for o caso) e nenhum botão ou campo.
 - O cartão do Quadro já mostra o avatar do responsável da etapa atual (`CartaoDoProcesso`); fica só o teste.
 
-- [ ] **Step 1 (teste de tela primeiro, vê falhar):** (1) painel: etapas 4 e 5 concluídas e a 6 atual → [Voltar a esta etapa] na 4 e na 5, nenhuma na 6 nem nas futuras; voltar à 4 com motivo grava, a 5 volta a pendente e a 4 a "Em andamento"; confirmar desabilitado com motivo vazio, Esc não grava; falha de gravação (texto e `TravaDoBanco`) aparece em vermelho; (2) processo concluído: voltar tira a pílula "Concluído"; (3) tela do setor: [Voltar a esta etapa] nas etapas do setor resolvidas e a lista de processos do setor não muda; (4) datas: corrigir início e conclusão grava e mostra DD/MM/AAAA; data no futuro e conclusão antes do início mostram a frase com o valor recebido e o formulário continua preenchido; Cancelar não grava; (5) responsável: o seletor lista só os usuários possíveis, escolher grava; inativo aparece "(Inativo)" e não é opção a escolher; recusa do falso aparece em vermelho; (6) Consulta não vê [Voltar], [Corrigir datas] nem seletor; (7) cartão do Quadro mostra o avatar do responsável da etapa atual depois de trocar o responsável; (8) históricos: textos "Voltou à etapa", "Corrigiu as datas da etapa", "Mudou o responsável da etapa" com o motivo (esse na Task 6).
-- [ ] **Step 2:** `npx vitest run src/App.voltarDatasResponsavel.test.tsx`; esperado falha.
-- [ ] **Step 3:** implementar os componentes; manter `CaminhoDeEtapas` pequeno extraindo um hook `useAcoesDaEtapa` se passar de 20 linhas por função.
-- [ ] **Step 4:** teste novo verde; conferir os testes antigos que contam botões (`App.andamentoDoProcesso`, `App.etapasDoSetor`) e ajustá-los só onde o botão novo for esperado; `npm test`, typecheck, lint. Comitar.
+- [x] **Step 1 (teste de tela primeiro, vê falhar):** (1) painel: etapas 4 e 5 concluídas e a 6 atual → [Voltar a esta etapa] na 4 e na 5, nenhuma na 6 nem nas futuras; voltar à 4 com motivo grava, a 5 volta a pendente e a 4 a "Em andamento"; confirmar desabilitado com motivo vazio, Esc não grava; falha de gravação (texto e `TravaDoBanco`) aparece em vermelho; (2) processo concluído: voltar tira a pílula "Concluído"; (3) tela do setor: [Voltar a esta etapa] nas etapas do setor resolvidas e a lista de processos do setor não muda; (4) datas: corrigir início e conclusão grava e mostra DD/MM/AAAA; data no futuro e conclusão antes do início mostram a frase com o valor recebido e o formulário continua preenchido; Cancelar não grava; (5) responsável: o seletor lista só os usuários possíveis, escolher grava; inativo aparece "(Inativo)" e não é opção a escolher; recusa do falso aparece em vermelho; (6) Consulta não vê [Voltar], [Corrigir datas] nem seletor; (7) cartão do Quadro mostra o avatar do responsável da etapa atual depois de trocar o responsável; (8) históricos: textos "Voltou à etapa", "Corrigiu as datas da etapa", "Mudou o responsável da etapa" com o motivo (esse na Task 6).
+- [x] **Step 2:** `npx vitest run src/App.voltarDatasResponsavel.test.tsx`; esperado falha.
+- [x] **Step 3:** implementar os componentes; manter `CaminhoDeEtapas` pequeno extraindo um hook `useAcoesDaEtapa` se passar de 20 linhas por função.
+- [x] **Step 4:** teste novo verde; conferir os testes antigos que contam botões (`App.andamentoDoProcesso`, `App.etapasDoSetor`) e ajustá-los só onde o botão novo for esperado; `npm test`, typecheck, lint. Comitar.
 
 ### Task 6: Histórico (critério 6)
 
 **Files:** Modify `src/cadastros/historicoDosCadastros.ts`; Test `src/cadastros/historicoDosCadastros.test.ts`.
 
-- [ ] **Step 1 (teste primeiro):** `textoDaAcaoDoCadastro('voltar', 'andamento')` → "Voltou à etapa"; `'corrigir_datas'` → "Corrigiu as datas da etapa"; `'mudar_responsavel'` → "Mudou o responsável da etapa"; `descreverEstadoDoCadastro` mostra "Responsável: {nome}" (rótulo `responsavel_nome`) e o motivo continua mostrado pelo formato que a lista já usa.
-- [ ] **Step 2:** falha; **Step 3:** acrescentar as três ações em `TEXTO_DA_ACAO_DO_ANDAMENTO` e `responsavel_nome: 'Responsável'` em `ROTULO_DO_CAMPO`; **Step 4:** verde; comitar.
+- [x] **Step 1 (teste primeiro):** `textoDaAcaoDoCadastro('voltar', 'andamento')` → "Voltou à etapa"; `'corrigir_datas'` → "Corrigiu as datas da etapa"; `'mudar_responsavel'` → "Mudou o responsável da etapa"; `descreverEstadoDoCadastro` mostra "Responsável: {nome}" (rótulo `responsavel_nome`) e o motivo continua mostrado pelo formato que a lista já usa.
+- [x] **Step 2:** falha; **Step 3:** acrescentar as três ações em `TEXTO_DA_ACAO_DO_ANDAMENTO` e `responsavel_nome: 'Responsável'` em `ROTULO_DO_CAMPO`; **Step 4:** verde; comitar.
 
 ### Task 7: Fechamento do ticket
 
-- [ ] **Step 1:** `npm test`, `npm run typecheck`, `npm run lint`, `npm run check:circular`, tudo verde.
-- [ ] **Step 2:** escrever a entrada do ticket 06 em `.scratch/processos-etapas/desvios.md` (as decisões de projeto acima, o que ficou de fora, a conferência visual não feita) e as notas do protocolo em `.scratch/melhorias-protocolo.md` (o CLAUDE.md manda ler `.claude/regras/nao-testados.md` ao fim do comando).
-- [ ] **Step 3:** comitar; seguir o passo 4 do `/executar-complexo` (merge na `main`, `git branch -d`, linha `Concluído em` no ticket 06).
+- [x] **Step 1:** `npm test`, `npm run typecheck`, `npm run lint`, `npm run check:circular`, tudo verde.
+- [x] **Step 2:** escrever a entrada do ticket 06 em `.scratch/processos-etapas/desvios.md` (as decisões de projeto acima, o que ficou de fora, a conferência visual não feita) e as notas do protocolo em `.scratch/melhorias-protocolo.md` (o CLAUDE.md manda ler `.claude/regras/nao-testados.md` ao fim do comando).
+- [x] **Step 3:** comitar; seguir o passo 4 do `/executar-complexo` (merge na `main`, `git branch -d`, linha `Concluído em` no ticket 06).
 
 ## Auto-revisão (spec × plano)
 
