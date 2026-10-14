@@ -40,10 +40,10 @@
 
 **Arquivos:** criar com `npx supabase migration new situacao_do_processo`, só depois da rodada que provou a falha.
 
-- [ ] Escrever a migração: `grant update (situacao, motivo_da_situacao)`; `private.mudando_situacao()`; `private.conferir_transicao_da_situacao(de, para)`; gatilho `conferir_situacao_do_processo` (antes de alterar `processos`); `private.mudar_situacao(processo, nova, motivo)`; as três funções públicas; `private.conferir_processo_em_andamento(uuid)` e `preparar_andamento` com a chamada nova (resto igual ao do ticket 06); `private.acao_do_processo(operacao, antes, depois)` e `registrar_evento_do_processo` com ação e `motivo`; `revoke`/`grant`.
-- [ ] Comitar, `git push`, disparar "Migrar banco de desenvolvimento" na branch com o arquivo novo e depois "Testes de banco": os 21 arquivos verdes, o 20 com 31 de 31.
-- [ ] `npm run db:types` (vínculo conferido); conferir que `suspender_processo`, `cancelar_processo` e `retomar_processo` entraram em `Functions`.
-- [ ] Registrar a migração em `supabase/AMBIENTES.md`. Comitar migração, teste e tipos juntos.
+- [x] Escrever a migração: `grant update (situacao, motivo_da_situacao)`; `private.mudando_situacao()`; `private.conferir_transicao_da_situacao(de, para)`; gatilho `conferir_situacao_do_processo` (antes de alterar `processos`); `private.mudar_situacao(processo, nova, motivo)`; as três funções públicas; `private.conferir_processo_em_andamento(uuid)` e `preparar_andamento` com a chamada nova (resto igual ao do ticket 06); `private.acao_do_processo(operacao, antes, depois)` e `registrar_evento_do_processo` com ação e `motivo`; `revoke`/`grant`.
+- [x] Comitar, `git push`, disparar "Migrar banco de desenvolvimento" na branch com o arquivo novo e depois "Testes de banco": os 21 arquivos verdes, o 20 com 31 de 31.
+- [x] `npm run db:types` (vínculo conferido); conferir que `suspender_processo`, `cancelar_processo` e `retomar_processo` entraram em `Functions`.
+- [x] Registrar a migração em `supabase/AMBIENTES.md`. Comitar migração, teste e tipos juntos.
 
 ### Tarefa 3 — Módulo de processos (real e falso)
 
