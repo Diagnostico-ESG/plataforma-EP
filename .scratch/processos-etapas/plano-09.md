@@ -180,7 +180,7 @@ export function textoDaEtapaAtual(processo: ProcessoDaLista): string
 
 **Consome:** `filtrarProcessos`, `temFiltro`, `opcoesDosFiltros` (tarefa 2); o endereço (tarefa 1).
 
-- [ ] Escrever `App.filtrosDosProcessos.test.tsx` (critérios 2, 4 e 7):
+- [x] Escrever `App.filtrosDosProcessos.test.tsx` (critérios 2, 4 e 7):
   1. Lista: cada filtro sozinho (setor, macroprocesso, etapa atual, tipo, responsável, situação) troca as linhas e grava o endereço (ex.: escolher o setor TSA leva a `#/processos/lista?setor=s1`);
   2. combinação: setor + tipo deixam só a linha que atende aos dois, e o endereço tem os dois;
   3. recarregar com filtros: montar com `#/processos/lista?setor=s1&situacao=concluido` mostra só a linha certa e os seletores com esses valores;
@@ -188,13 +188,13 @@ export function textoDaEtapaAtual(processo: ProcessoDaLista): string
   5. sem resultado: "Nenhum processo com estes filtros." com [Limpar filtros], que volta ao endereço sem filtros e mostra tudo;
   6. [Limpar filtros] na barra aparece só com filtro ativo;
   7. Consulta: os filtros funcionam, sem [Cadastrar processo].
-- [ ] Rodar: falha.
-- [ ] `FiltrosDosProcessos` (`{ visao; opcoes: OpcoesDosFiltros; filtros; aoMudar(filtros): void }`): um `<label>` com `<select>` por filtro ("Setor", "Macroprocesso", "Etapa atual", "Tipo", "Responsável" e, na Lista, "Situação"), primeira opção vazia "Todos" (ou "Todas" em Etapa atual e Situação); [Limpar filtros] (`botao botao-secundario`) quando `temFiltro`. Exportar também `NenhumProcessoComFiltros({ aoLimpar })`: `<p className="cadastros-vazio">Nenhum processo com estes filtros.</p>` com o botão. Uma função `SeletorDoFiltro` para não repetir o `<label><select>` seis vezes.
-- [ ] `VisaoDosProcessos` recebe `filtros` e `aoMudarFiltros`; depois de carregar, mostra a barra (cadastrar + filtros), filtra (`filtrarProcessos`) e, se o resultado estiver vazio com filtro ativo, mostra `NenhumProcessoComFiltros`; senão o Quadro (com `{ etapas, processos: filtrados }`) ou a Tabela.
-- [ ] `AreaDeProcessos` passa `filtros` e `aoMudarFiltros = (filtros) => irParaVisao({ filtros, aberto: null })`.
-- [ ] Estilo em `Quadro.css`: `.filtros-dos-processos` (linha com `flex-wrap`, `gap: var(--esp-2)`, rótulo acima do seletor no tamanho de rótulo; seletor com a mesma altura e borda dos campos dos formulários; ocupa a largura da área, alinhado à esquerda; o botão Cadastrar continua à direita).
-- [ ] Rodar o teste novo, `npm test`, `npm run lint`, `npm run typecheck`.
-- [ ] Comitar: `Ticket 09 de processos-etapas: filtros no Quadro e na Lista, guardados no endereço`.
+- [x] Rodar: falha.
+- [x] `FiltrosDosProcessos` (`{ visao; opcoes: OpcoesDosFiltros; filtros; aoMudar(filtros): void }`): um `<label>` com `<select>` por filtro ("Setor", "Macroprocesso", "Etapa atual", "Tipo", "Responsável" e, na Lista, "Situação"), primeira opção vazia "Todos" (ou "Todas" em Etapa atual e Situação); [Limpar filtros] (`botao botao-secundario`) quando `temFiltro`. Exportar também `NenhumProcessoComFiltros({ aoLimpar })`: `<p className="cadastros-vazio">Nenhum processo com estes filtros.</p>` com o botão. Uma função `SeletorDoFiltro` para não repetir o `<label><select>` seis vezes.
+- [x] `VisaoDosProcessos` recebe `filtros` e `aoMudarFiltros`; depois de carregar, mostra a barra (cadastrar + filtros), filtra (`filtrarProcessos`) e, se o resultado estiver vazio com filtro ativo, mostra `NenhumProcessoComFiltros`; senão o Quadro (com `{ etapas, processos: filtrados }`) ou a Tabela.
+- [x] `AreaDeProcessos` passa `filtros` e `aoMudarFiltros = (filtros) => irParaVisao({ filtros, aberto: null })`.
+- [x] Estilo em `Quadro.css`: `.filtros-dos-processos` (linha com `flex-wrap`, `gap: var(--esp-2)`, rótulo acima do seletor no tamanho de rótulo; seletor com a mesma altura e borda dos campos dos formulários; ocupa a largura da área, alinhado à esquerda; o botão Cadastrar continua à direita).
+- [x] Rodar o teste novo, `npm test`, `npm run lint`, `npm run typecheck`.
+- [x] Comitar: `Ticket 09 de processos-etapas: filtros no Quadro e na Lista, guardados no endereço`.
 
 ### Tarefa 5 — Processos do setor
 

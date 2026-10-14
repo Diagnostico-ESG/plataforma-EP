@@ -26,6 +26,12 @@ test('o subprocesso traz o nome do pai que está na lista', () => {
   expect(linhas.map((l) => [l.nome, l.nomeDoPai])).toEqual([['Filho', 'Pai'], ['Órfão', null], ['Pai', null]])
 })
 
+test('o pai filtrado fora da Lista continua com o nome ao lado do subprocesso', () => {
+  const pai = processo('Pai')
+  const filho = processo('Filho', { tipo: 'subprocesso', processoPaiId: 'p-Pai' })
+  expect(linhasDaLista([filho], [pai, filho]).map((l) => l.nomeDoPai)).toEqual(['Pai'])
+})
+
 test('texto da etapa atual: aguardando o setor, o nome da etapa ou "—"', () => {
   expect(textoDaEtapaAtual(processo('A', { aguardandoOSetor: true }))).toBe('Aguardando o setor')
   expect(textoDaEtapaAtual(processo('B'))).toBe('Reunião de modelagem')

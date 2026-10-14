@@ -69,7 +69,7 @@ test('as colunas, a ordem por sigla e nome, todas as situações e o pai do subp
     ['Conferir Recibo↳ Pagar Diária', 'Subprocesso', 'TSB', 'Macro de Teste', 'Reunião de modelagem', 'Ana Teste', 'Em andamento'],
     ['Pagar Diária', 'Processo', 'TSB', 'Macro de Teste', 'Reunião de modelagem', '—', 'Em andamento'],
   ])
-  expect(screen.getByText('Concluído').className).toContain('pilula')
+  expect(within(screen.getByRole('table')).getByText('Concluído').className).toContain('pilula')
 })
 
 test('clicar na linha abre o painel com a Lista esmaecida atrás; fechar volta à Lista e ao botão da linha', async () => {
