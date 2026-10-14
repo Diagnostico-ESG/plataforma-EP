@@ -210,7 +210,7 @@ insert into _tap (linha) select throws_ok(
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a4","role":"authenticated"}', true);
 insert into _tap (linha) select throws_ok(
   $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Datas', 'modelagem'), 'Tentativa')$sql$,
-  'Inativo não volta a etapa');
+  'P0001', 'registro_inexistente', 'Inativo não volta a etapa (não lê nada, a etapa "não existe" para ele)');
 set local role anon;
 insert into _tap (linha) select throws_ok(
   $sql$select public.voltar_a_etapa('00000000-0000-0000-0000-000000000000', 'Tentativa')$sql$, '42501', null,

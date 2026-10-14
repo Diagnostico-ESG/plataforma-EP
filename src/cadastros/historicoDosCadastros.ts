@@ -19,6 +19,16 @@ const TEXTO_DA_ACAO_DO_ANDAMENTO: Record<string, string> = {
   concluir: 'Concluiu a etapa',
   dispensar: 'Dispensou a etapa',
   registrar_realizada: 'Registrou a etapa como realizada anteriormente',
+  voltar: 'Voltou à etapa',
+  corrigir_datas: 'Corrigiu as datas da etapa',
+  mudar_responsavel: 'Mudou o responsável da etapa',
+}
+
+// O texto livre do evento é nota (dispensar, realizada anteriormente) ou motivo (voltar).
+const ACOES_COM_MOTIVO = new Set(['voltar'])
+
+export function rotuloDoMotivo(acao: string): string {
+  return ACOES_COM_MOTIVO.has(acao) ? 'Motivo' : 'Nota'
 }
 
 const TEXTOS_DA_ENTIDADE: Record<string, Record<string, string>> = {
@@ -34,7 +44,7 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   macroprocessos: 'Macroprocessos', setores: 'Setores', status: 'Situação da etapa', iniciada_em: 'Início',
   resolvida_em: 'Conclusão', email: 'E-mail', cargo: 'Cargo', responsaveis: 'Responsáveis',
   tipo: 'Tipo', origem: 'Origem', situacao: 'Situação', contexto: 'Contexto', andamentos: 'Etapas',
-  processo_nome: 'Processo',
+  processo_nome: 'Processo', responsavel_nome: 'Responsável',
 }
 
 // Os ids existem para o filtro; quem lê o histórico vê a sigla e o nome. Código e nome da etapa já estão no título.

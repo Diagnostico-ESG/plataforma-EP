@@ -19,7 +19,7 @@ afterEach(() => {
 function doProcesso(ordem: number, codigo: string, nome: string, mudancas: Partial<EtapaDoProcesso> = {}): EtapaDoProcesso {
   return {
     id: `a${ordem}`, codigo, nome, ordem, obrigatoria: true, status: 'pendente', nota: null, iniciadaEm: null,
-    resolvidaEm: null, responsavelNome: null, ...mudancas,
+    resolvidaEm: null, responsavelId: null, responsavelNome: null, responsavelInativo: false, ...mudancas,
   }
 }
 

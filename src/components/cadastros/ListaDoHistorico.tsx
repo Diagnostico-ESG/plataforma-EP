@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { AUTOR_DIRETO_NO_BANCO, formatarMomento } from '../../acesso/historico'
 import {
-  descreverEstadoDoCadastro, eventosDoItem, itensDoFiltro, nomeDoItem, textoDaAcaoDoCadastro,
+  descreverEstadoDoCadastro, eventosDoItem, itensDoFiltro, nomeDoItem, rotuloDoMotivo, textoDaAcaoDoCadastro,
 } from '../../cadastros/historicoDosCadastros'
 import type { EventoDoCadastro } from '../../cadastros/tipos'
 
@@ -34,7 +34,7 @@ export function EventoDoHistorico({ evento }: { evento: EventoDoCadastro }) {
       <span className="historico-mudanca">
         <span>Antes: {descreverEstadoDoCadastro(evento.antes)}</span>
         <span>Depois: {descreverEstadoDoCadastro(evento.depois)}</span>
-        {evento.motivo && <span>Nota: {evento.motivo}</span>}
+        {evento.motivo && <span>{rotuloDoMotivo(evento.acao)}: {evento.motivo}</span>}
       </span>
     </li>
   )

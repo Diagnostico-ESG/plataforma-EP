@@ -560,7 +560,10 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      voltar_a_etapa: {
+        Args: { p_andamento: string; p_motivo: string }
+        Returns: undefined
+      }
     }
     Enums: {
       categoria_macroprocesso: "finalistico" | "apoio" | "gerencial"

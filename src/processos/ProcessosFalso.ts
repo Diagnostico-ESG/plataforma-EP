@@ -1,13 +1,17 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import type { EventoDoCadastro } from '../cadastros/tipos'
-import { atualizarSetorDoProcesso, mudarEtapaDoProcesso } from './andamentoFalso'
+import {
+  atualizarSetorDoProcesso, conferirDatasDaEtapa, responsavelDoCartao, trocarEtapaDoProcesso, voltarEtapas,
+} from './andamentoFalso'
 import type {
-  DadosDoProcesso, DadosDoResponsavel, EtapaDoCatalogo, EtapaDoSetor, ListaDeProcessos, ModuloDeProcessos,
-  ProcessoLido, ResponsavelDoSetor,
+  DadosDoProcesso, DadosDoResponsavel, DatasDaEtapa, EtapaDoCatalogo, EtapaDoProcesso, EtapaDoSetor, ListaDeProcessos,
+  ModuloDeProcessos, ProcessoLido, ResponsavelDoSetor, UsuarioResponsavel,
 } from './tipos'
 
-type ChamadaDeEtapa = { acao: string; id: string; nota?: string }
+type ChamadaDeEtapa = { acao: string; id: string; nota?: string; datas?: DatasDaEtapa; usuarioId?: string | null }
+type TrocaDeEtapas = <T extends EtapaDoSetor>(etapas: T[]) => T[]
+const RESOLVIDAS = ['concluida', 'realizada_anteriormente', 'dispensada']
 
 // Dia fixo: os testes de tela não dependem da data em que rodam.
 const HOJE = '2026-10-13'
@@ -24,6 +28,8 @@ export class ProcessosFalso implements ModuloDeProcessos {
   chamadas: ChamadaDeEtapa[] = []
   /** Os responsáveis de cada setor (pelo id do setor). Leitura e gravação seguem as falhas acima. */
   responsaveisDoSetor: Record<string, ResponsavelDoSetor[]> = {}
+  /** Quem pode ser escolhido como responsável de uma etapa (ativos, Administrador ou Integrante). */
+  usuariosPossiveis: UsuarioResponsavel[] = []
   /** Os processos cadastrados; a lista e a leitura partem daqui. */
   processos: ProcessoLido[] = []
   /** As etapas de nível processo do catálogo, na ordem dele (as colunas do Quadro). */
@@ -61,6 +67,37 @@ export class ProcessosFalso implements ModuloDeProcessos {
 
   async registrarRealizadaAnteriormente(id: string, nota: string): Promise<void> {
     this.mudar({ acao: 'realizada', id, nota }, { status: 'realizada_anteriormente', nota, resolvidaEm: HOJE })
+  }
+
+  async voltarParaEtapa(id: string, motivo: string): Promise<void> {
+    this.conferirGravacao()
+    const etapa = this.acharEtapa(id)
+    if (motivo.trim() === '') throw new TravaDoBanco('O motivo é obrigatório.')
+    if (!RESOLVIDAS.includes(etapa.status)) throw new TravaDoBanco(`A etapa ${etapa.nome} ainda não foi resolvida.`)
+    this.chamadas.push({ acao: 'voltar', id, nota: motivo })
+    this.aplicar(id, (etapas) => voltarEtapas(etapas, id, HOJE))
+  }
+
+  async corrigirDatasDaEtapa(id: string, datas: DatasDaEtapa): Promise<void> {
+    this.conferirGravacao()
+    this.acharEtapa(id)
+    conferirDatasDaEtapa(datas, HOJE)
+    this.mudar({ acao: 'datas', id, datas }, { iniciadaEm: datas.iniciadaEm, resolvidaEm: datas.resolvidaEm })
+  }
+
+  async mudarResponsavelDaEtapa(id: string, usuarioId: string | null): Promise<void> {
+    this.conferirGravacao()
+    this.acharEtapa(id)
+    const usuario = this.usuariosPossiveis.find((possivel) => possivel.id === usuarioId) ?? null
+    this.mudar({ acao: 'responsavel', id, usuarioId }, {
+      responsavelId: usuarioId, responsavelNome: usuario?.nome ?? null, responsavelInativo: false,
+    })
+    const cartao = usuario ? { id: usuario.id, nome: usuario.nome, fotoUrl: null } : null
+    this.processos = this.processos.map((processo) => responsavelDoCartao(processo, id, cartao))
+  }
+
+  async listarResponsaveisPossiveis(): Promise<UsuarioResponsavel[]> {
+    return [...this.usuariosPossiveis]
   }
 
   async lerResponsaveisDoSetor(setorId: string): Promise<ResponsavelDoSetor[]> {
@@ -153,7 +190,8 @@ export class ProcessosFalso implements ModuloDeProcessos {
       responsavel: null, motivoDaSituacao: null, etapasDoSetor: this.etapasDoSetor[dados.setorId] ?? [],
       etapasDoProcesso: etapas.map((etapa) => ({
         id: `a${this.proximoId++}`, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, obrigatoria: true,
-        status: 'pendente', nota: null, iniciadaEm: null, resolvidaEm: null, responsavelNome: null,
+        status: 'pendente', nota: null, iniciadaEm: null, resolvidaEm: null, responsavelId: null, responsavelNome: null,
+        responsavelInativo: false,
       })),
     }
   }
@@ -167,15 +205,27 @@ export class ProcessosFalso implements ModuloDeProcessos {
     for (const [setorId, lista] of Object.entries(this.responsaveisDoSetor)) this.responsaveisDoSetor[setorId] = mudar(lista)
   }
 
-  private mudar(chamada: ChamadaDeEtapa, mudancas: Partial<EtapaDoSetor>): void {
+  // A etapa do setor ou do processo; que ela não existe (mais) é o aviso de cadastro inexistente.
+  private acharEtapa(id: string): EtapaDoSetor {
+    const todas: EtapaDoSetor[] = [
+      ...Object.values(this.etapasDoSetor).flat(), ...this.processos.flatMap((processo) => processo.etapasDoProcesso),
+    ]
+    const etapa = todas.find((candidata) => candidata.id === id)
+    if (!etapa) throw new CadastroInexistente()
+    return etapa
+  }
+
+  private mudar(chamada: ChamadaDeEtapa, mudancas: Partial<EtapaDoProcesso>): void {
     this.conferirGravacao()
     this.chamadas.push(chamada)
-    for (const [setorId, etapas] of Object.entries(this.etapasDoSetor)) {
-      this.etapasDoSetor[setorId] = etapas.map((etapa) => (etapa.id === chamada.id ? { ...etapa, ...mudancas } : etapa))
-    }
+    this.aplicar(chamada.id, (etapas) => etapas.map((etapa) => (etapa.id === chamada.id ? { ...etapa, ...mudancas } : etapa)))
+  }
+
+  private aplicar(id: string, trocar: TrocaDeEtapas): void {
+    for (const [setorId, etapas] of Object.entries(this.etapasDoSetor)) this.etapasDoSetor[setorId] = trocar(etapas)
     // Só o setor que tem etapas cadastradas no falso recalcula "aguardando o setor"; o que o teste montou à mão fica como está.
     this.processos = this.processos.map((processo) => {
-      const comEtapa = mudarEtapaDoProcesso(processo, chamada.id, mudancas)
+      const comEtapa = trocarEtapaDoProcesso(processo, id, trocar)
       const doSetor = this.etapasDoSetor[processo.setorId]
       return doSetor ? atualizarSetorDoProcesso(comEtapa, doSetor) : comEtapa
     })
