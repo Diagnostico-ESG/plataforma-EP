@@ -59,7 +59,11 @@ set local role authenticated;
 
 -- Preparação: as etapas do setor resolvidas; "Processo Volta" com a 4, a 5 e a 6 concluídas.
 update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
-  where setor_id = '5f000000-0000-0000-0000-000000000006';
+  where id = pg_temp.andamento_do_setor('identificacao_responsaveis');
+update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
+  where id = pg_temp.andamento_do_setor('sensibilizacao');
+update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
+  where id = pg_temp.andamento_do_setor('identificacao_processos');
 select pg_temp.agir('Processo Volta', 'modelagem', 'em_andamento');
 select pg_temp.agir('Processo Volta', 'modelagem', 'concluida');
 select pg_temp.agir('Processo Volta', 'relatorio_modelagem_tecnica', 'em_andamento');
