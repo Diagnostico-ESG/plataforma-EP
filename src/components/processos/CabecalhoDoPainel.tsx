@@ -1,11 +1,8 @@
-import { ROTULO_DA_SITUACAO, ROTULO_DO_TIPO } from '../../processos/rotulos'
-import type { ProcessoLido, SituacaoDoProcesso } from '../../processos/tipos'
+import { ROTULO_DO_TIPO } from '../../processos/rotulos'
+import type { ProcessoLido } from '../../processos/tipos'
 import { Icone } from '../Icone'
-import { Pilula, type SituacaoPilula } from '../Pilula'
-
-const PILULA_DA_SITUACAO: Record<SituacaoDoProcesso, SituacaoPilula> = {
-  em_andamento: 'informativa', suspenso: 'vencendo', cancelado: 'atraso', concluido: 'aprovado',
-}
+import { Pilula } from '../Pilula'
+import { PilulaDaSituacao } from './PilulaDaSituacao'
 
 type CabecalhoDoPainelProps = { processo: ProcessoLido; aoFechar: () => void }
 
@@ -18,7 +15,7 @@ export function CabecalhoDoPainel({ processo, aoFechar }: CabecalhoDoPainelProps
         <p className="painel-macroprocesso">{processo.macroprocessoNome}</p>
         <div className="cartao-pilulas">
           <Pilula situacao="neutra">{ROTULO_DO_TIPO[processo.tipo]}</Pilula>
-          <Pilula situacao={PILULA_DA_SITUACAO[processo.situacao]}>{ROTULO_DA_SITUACAO[processo.situacao]}</Pilula>
+          <PilulaDaSituacao situacao={processo.situacao} />
         </div>
       </div>
       <BotaoFechar aoFechar={aoFechar} />
