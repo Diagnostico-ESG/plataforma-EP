@@ -1,6 +1,7 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import type { EventoDoCadastro } from '../cadastros/tipos'
+import { atualizarSetorDoProcesso, mudarEtapaDoProcesso } from './andamentoFalso'
 import type {
   DadosDoProcesso, DadosDoResponsavel, EtapaDoCatalogo, EtapaDoSetor, ListaDeProcessos, ModuloDeProcessos,
   ProcessoLido, ResponsavelDoSetor,
@@ -172,5 +173,11 @@ export class ProcessosFalso implements ModuloDeProcessos {
     for (const [setorId, etapas] of Object.entries(this.etapasDoSetor)) {
       this.etapasDoSetor[setorId] = etapas.map((etapa) => (etapa.id === chamada.id ? { ...etapa, ...mudancas } : etapa))
     }
+    // Só o setor que tem etapas cadastradas no falso recalcula "aguardando o setor"; o que o teste montou à mão fica como está.
+    this.processos = this.processos.map((processo) => {
+      const comEtapa = mudarEtapaDoProcesso(processo, chamada.id, mudancas)
+      const doSetor = this.etapasDoSetor[processo.setorId]
+      return doSetor ? atualizarSetorDoProcesso(comEtapa, doSetor) : comEtapa
+    })
   }
 }

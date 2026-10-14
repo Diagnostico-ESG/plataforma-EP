@@ -14,3 +14,16 @@ Diferenças entre o que a spec e o ticket dizem e o que foi construído. Nada di
 - **Teste de tela por recusa de exclusão:** as três frases são provadas no módulo (`recusasDeProcessos.test.ts` e os `*Supabase.test.ts`); na tela, os testes de exclusão de setor e de macroprocesso já provam que a frase pronta da recusa aparece em vermelho (o de setor passou a usar a frase da spec).
 - **Quadro:** a área interna continua `quadro`; o endereço passou a `#/processos`. `#/processos/lista` cai no Quadro até o ticket 09. A alternância Quadro | Lista da barra superior segue como estava.
 - **Conferência visual não feita nesta sessão.** O app exige login no Supabase e não há servidor de visualização com dados; Quadro, painel e formulário só foram conferidos por teste de tela. Os critérios `[visual]` da spec ficam para o `/polir` e o `/ship`.
+
+## 2026-10-14 — /executar-complexo do ticket 05 (andamento das etapas do processo)
+
+Diferenças entre o que a spec e o ticket dizem e o que foi construído. Nada disso muda a spec; fica para o `/ship` e para os tickets seguintes.
+
+- **Desvio do ticket 04 resolvido.** A política de alteração de `andamentos` voltou a valer para o andamento do processo, os gatilhos `preparar_andamento` e `registrar_evento_do_andamento` passaram a conhecer o processo, e o teste 17 não desliga mais o gatilho de evento (ele também resolve as etapas em ordem, uma por comando).
+- **Ordem das conferências ao iniciar.** O banco confere "já há uma etapa em andamento" antes de "a etapa anterior não foi resolvida". Com a anterior em andamento, o aviso mais útil é o de quem está em andamento. A spec lista as duas frases sem ordem.
+- **A recusa "O setor {SIGLA} ainda não resolveu as etapas do setor." vale para qualquer saída de pendente da primeira etapa do processo**, não só para Iniciar (dispensar ou registrar como realizada anteriormente também esperam o setor), como a regra da sequência já fazia com a anterior.
+- **Histórico do processo.** A leitura traz os eventos de `processo` e os de `andamento` cuja referência começa pelo id do processo (`processo_id:andamento_id`). O evento de etapa de processo guarda `processo_id`, `processo_nome` e `setor_sigla` (sem `setor_id`, para o filtro do Histórico dos cadastros não listar o setor por causa dele). O nome do item no Histórico dos cadastros traz o processo.
+- **Testes pequenos sem a rodada "falha antes".** As duas frases novas do módulo real, o `like` do cliente falso e o nome do item do histórico foram escritos junto com o código, sem rodar o teste antes para vê-lo falhar. Os testes de banco e os de tela seguiram o TDD no que o plano pedia (o teste 18 falhou antes da migração).
+- **O falso não mexe no responsável.** `ProcessosFalso` recalcula etapa atual, situação e "aguardando o setor"; o responsável do cartão fica como o teste o montou (o ticket 06 trata do responsável).
+- **Processo suspenso ou cancelado:** nenhuma ação é bloqueada ainda, nem no banco nem no falso; o congelamento vem no ticket 07.
+- **Conferência visual não feita nesta sessão** (o app exige login e não há servidor com dados). A etapa atual destacada, o ✓ nas resolvidas, as futuras apagadas e a pílula Concluído só foram conferidos por teste de tela; os critérios `[visual]` ficam para o `/polir` e o `/ship`.

@@ -75,7 +75,8 @@ test('o histórico do processo vem do mais recente ao mais antigo, só dos event
     entidadeRef: 'p1', antes: null, depois: { nome: 'Emitir Ofício Fictício' }, motivo: undefined,
   }])
   expect(cliente.pedidos[0]).toMatchObject({
-    tabela: 'eventos', filtros: [['entidade', 'processo'], ['entidade_ref', 'p1']], ordem: [['ocorrido_em', false], ['id', false]],
+    tabela: 'eventos', dentro: ['entidade', ['processo', 'andamento']], parecido: ['entidade_ref', 'p1%'],
+    ordem: [['ocorrido_em', false], ['id', false]],
   })
 })
 

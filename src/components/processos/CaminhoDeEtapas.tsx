@@ -13,16 +13,19 @@ const JANELA_DA_NOTA: Record<AcaoComNota, { titulo: (nome: string) => string; ro
   realizada: { titulo: (nome) => `Registrar a etapa ${nome} como realizada anteriormente?`, rotuloDaAcao: 'Registrar' },
 }
 
-type CaminhoDoSetorProps = {
+/** Etapa do setor ou do processo: só a do processo traz o nome do responsável. */
+type EtapaDoCaminho = EtapaDoSetor & { responsavelNome?: string | null }
+
+type CaminhoDeEtapasProps = {
   processos: ModuloDeProcessos
-  etapas: EtapaDoSetor[]
+  etapas: EtapaDoCaminho[]
   podeAlterar: boolean
   aoMudar: () => void
   aoSumir: () => void
 }
 
-/** O caminho das etapas do setor: só a etapa atual tem ações; Dispensar e Realizada anteriormente pedem nota. */
-export function CaminhoDoSetor({ processos, etapas, podeAlterar, aoMudar, aoSumir }: CaminhoDoSetorProps) {
+/** O caminho de etapas (do setor ou do processo): só a etapa atual tem ações; Dispensar e Realizada anteriormente pedem nota. */
+export function CaminhoDeEtapas({ processos, etapas, podeAlterar, aoMudar, aoSumir }: CaminhoDeEtapasProps) {
   const { falha, executar } = useGravacaoComFalha(aoSumir)
   const [pedido, setPedido] = useState<PedidoDeNota | null>(null)
   const atual = indiceDaEtapaAtual(etapas)
@@ -49,7 +52,8 @@ export function CaminhoDoSetor({ processos, etapas, podeAlterar, aoMudar, aoSumi
       <ol className="caminho-de-etapas">
         {etapas.map((etapa, indice) => (
           <LinhaDaEtapa key={etapa.id} etapa={etapa} atual={indice === atual}
-            acoes={podeAlterar ? acoesDaEtapa(etapas, indice) : []} aoAgir={(acao) => agir(acao, etapa)} />
+            acoes={podeAlterar ? acoesDaEtapa(etapas, indice) : []} aoAgir={(acao) => agir(acao, etapa)}
+            responsavelNome={etapa.responsavelNome} />
         ))}
       </ol>
       {falha && <p className="cadastros-falha" role="alert">{falha}</p>}

@@ -43,12 +43,14 @@ async function andamentoExiste(cliente: ClienteSupabase, id: string): Promise<bo
   return Boolean(data?.length)
 }
 
-// O banco recusa a sequência e a dispensa com "motivo:nome da etapa" (migração etapas_do_setor).
-const PADRAO_DA_RECUSA = /\b(anterior_nao_resolvida|etapa_obrigatoria):(.*)$/m
+// O banco recusa a sequência e a dispensa com "motivo:valor" (migrações etapas_do_setor e andamento_do_processo).
+const PADRAO_DA_RECUSA = /\b(anterior_nao_resolvida|etapa_obrigatoria|setor_nao_resolveu|ja_ha_etapa_em_andamento):(.*)$/m
 
-const FRASE_DA_RECUSA: Record<string, (etapa: string) => string> = {
+const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   anterior_nao_resolvida: (etapa) => `A etapa ${etapa} ainda não foi resolvida.`,
   etapa_obrigatoria: (etapa) => `A etapa ${etapa} é obrigatória e não pode ser dispensada.`,
+  setor_nao_resolveu: (sigla) => `O setor ${sigla} ainda não resolveu as etapas do setor.`,
+  ja_ha_etapa_em_andamento: (etapa) => `Já há uma etapa em andamento neste processo: ${etapa}.`,
 }
 
 function falhaDoAndamento(erro: ErroDoBanco): Error {
