@@ -1,22 +1,27 @@
 import { useId } from 'react'
 import type { Macroprocesso, Setor } from '../../cadastros/tipos'
-import { ROTULO_DA_ORIGEM } from '../../processos/rotulos'
-import type { OrigemDoProcesso } from '../../processos/tipos'
+import { ROTULO_DA_ORIGEM, ROTULO_DO_TIPO } from '../../processos/rotulos'
+import type { OrigemDoProcesso, ProcessoDaLista, TipoDeProcesso } from '../../processos/tipos'
 import type { CamposDoProcesso } from '../../processos/validacaoDoProcesso'
 
-export type OpcoesDoProcesso = { setores: Setor[]; macroprocessos: Macroprocesso[] }
+/** Os pais possíveis são os processos do tipo Processo (só no cadastro; na edição a lista fica vazia). */
+export type OpcoesDoProcesso = { setores: Setor[]; macroprocessos: Macroprocesso[]; pais: ProcessoDaLista[] }
 
 type CamposDoFormularioProps = {
   campos: CamposDoProcesso
   opcoes: OpcoesDoProcesso
-  /** O tipo só se escolhe no cadastro: depois dele, só a reclassificação o muda. */
+  /** Tipo e pai só se escolhem no cadastro: depois dele, só a reclassificação os muda. */
   mostrarTipo: boolean
   aoMudar: (mudanca: Partial<CamposDoProcesso>) => void
 }
 
 const ORIGENS: OrigemDoProcesso[] = ['novo', 'retomado']
+const TIPOS: TipoDeProcesso[] = ['processo', 'subprocesso', 'a_classificar']
 
-/** Os campos do formulário do processo. Setor e macroprocesso: só os ativos (e o atual, se já foi desativado). */
+/**
+ * Os campos do formulário do processo. Setor e macroprocesso: só os ativos (e o atual, se já foi desativado).
+ * No subprocesso, o macroprocesso fica fixo no do pai.
+ */
 export function CamposDoFormulario({ campos, opcoes, mostrarTipo, aoMudar }: CamposDoFormularioProps) {
   const id = useId()
   return (
@@ -31,15 +36,11 @@ export function CamposDoFormulario({ campos, opcoes, mostrarTipo, aoMudar }: Cam
           <option key={setor.id} value={setor.id}>{setor.sigla} — {setor.nome}</option>
         ))}
       </select>
-      <label htmlFor={`${id}-macroprocesso`}>Macroprocesso</label>
-      <select id={`${id}-macroprocesso`} value={campos.macroprocessoId}
-        onChange={(evento) => aoMudar({ macroprocessoId: evento.target.value })}>
-        <option value="">Escolha o macroprocesso</option>
-        {opcoes.macroprocessos.filter((macro) => macro.ativo || macro.id === campos.macroprocessoId).map((macro) => (
-          <option key={macro.id} value={macro.id}>{macro.nome}</option>
-        ))}
-      </select>
+      <CampoDoMacroprocesso id={id} campos={campos} macroprocessos={opcoes.macroprocessos} aoMudar={aoMudar} />
       {mostrarTipo && <CampoDoTipo id={id} valor={campos.tipo} aoMudar={aoMudar} />}
+      {mostrarTipo && campos.tipo === 'subprocesso' && (
+        <CampoDoPai id={id} valor={campos.processoPaiId} pais={opcoes.pais} aoMudar={aoMudar} />
+      )}
       <label htmlFor={`${id}-origem`}>Origem</label>
       <select id={`${id}-origem`} value={campos.origem}
         onChange={(evento) => aoMudar({ origem: evento.target.value as OrigemDoProcesso })}>
@@ -55,16 +56,43 @@ export function CamposDoFormulario({ campos, opcoes, mostrarTipo, aoMudar }: Cam
   )
 }
 
-type CampoDoTipoProps = { id: string; valor: CamposDoProcesso['tipo']; aoMudar: CamposDoFormularioProps['aoMudar'] }
+type CampoProps = { id: string; aoMudar: CamposDoFormularioProps['aoMudar'] }
 
-function CampoDoTipo({ id, valor, aoMudar }: CampoDoTipoProps) {
+function CampoDoTipo({ id, valor, aoMudar }: CampoProps & { valor: TipoDeProcesso }) {
   return (
     <>
       <label htmlFor={`${id}-tipo`}>Tipo</label>
-      <select id={`${id}-tipo`} value={valor}
-        onChange={(evento) => aoMudar({ tipo: evento.target.value as CamposDoProcesso['tipo'] })}>
-        <option value="processo">Processo</option>
-        <option value="a_classificar">A classificar</option>
+      <select id={`${id}-tipo`} value={valor} onChange={(evento) => aoMudar({ tipo: evento.target.value as TipoDeProcesso })}>
+        {TIPOS.map((tipo) => <option key={tipo} value={tipo}>{ROTULO_DO_TIPO[tipo]}</option>)}
+      </select>
+    </>
+  )
+}
+
+function CampoDoPai({ id, valor, pais, aoMudar }: CampoProps & { valor: string; pais: ProcessoDaLista[] }) {
+  return (
+    <>
+      <label htmlFor={`${id}-pai`}>Processo pai</label>
+      <select id={`${id}-pai`} value={valor} onChange={(evento) => aoMudar({ processoPaiId: evento.target.value })}>
+        <option value="">Escolha o processo pai</option>
+        {pais.map((pai) => <option key={pai.id} value={pai.id}>{pai.setorSigla} — {pai.nome}</option>)}
+      </select>
+    </>
+  )
+}
+
+type CampoDoMacroprocessoProps = CampoProps & { campos: CamposDoProcesso; macroprocessos: Macroprocesso[] }
+
+function CampoDoMacroprocesso({ id, campos, macroprocessos, aoMudar }: CampoDoMacroprocessoProps) {
+  return (
+    <>
+      <label htmlFor={`${id}-macroprocesso`}>Macroprocesso</label>
+      <select id={`${id}-macroprocesso`} value={campos.macroprocessoId} disabled={campos.tipo === 'subprocesso'}
+        onChange={(evento) => aoMudar({ macroprocessoId: evento.target.value })}>
+        <option value="">Escolha o macroprocesso</option>
+        {macroprocessos.filter((macro) => macro.ativo || macro.id === campos.macroprocessoId).map((macro) => (
+          <option key={macro.id} value={macro.id}>{macro.nome}</option>
+        ))}
       </select>
     </>
   )

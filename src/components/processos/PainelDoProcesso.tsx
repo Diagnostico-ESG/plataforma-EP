@@ -133,7 +133,7 @@ function DetalhesDoProcesso({ processo, processos, cadastros, podeAlterar, aoFec
       <CaminhoDoProcesso processo={processo} processos={processos} podeAlterar={podeAlterar} aoSumir={aoSumir}
         aoMudar={aposMudar} />
       {editando
-        ? <FormularioDoProcesso cadastros={cadastros} titulo="Editar processo" inicial={processo} aoSalvar={salvar}
+        ? <FormularioDoProcesso cadastros={cadastros} processos={processos} titulo="Editar processo" inicial={processo} aoSalvar={salvar}
             aoCancelar={() => setEditando(false)} />
         : <DadosLidos processo={processo} />}
       {podeAlterar && !editando && (

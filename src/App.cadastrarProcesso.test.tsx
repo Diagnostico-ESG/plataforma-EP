@@ -80,7 +80,7 @@ test('o cadastro oferece só setores e macroprocessos ativos, com "A classificar
   expect(opcoes(form.getByLabelText('Setor'))).toEqual(['Escolha o setor', 'TSA — Setor Teste A', 'TSB — Setor Teste B'])
   expect(opcoes(form.getByLabelText('Macroprocesso'))).toEqual(['Escolha o macroprocesso', 'Macro A', 'Macro B'])
   expect((form.getByLabelText('Tipo') as HTMLSelectElement).value).toBe('a_classificar')
-  expect(opcoes(form.getByLabelText('Tipo'))).toEqual(['Processo', 'A classificar'])
+  expect(opcoes(form.getByLabelText('Tipo'))).toEqual(['Processo', 'Subprocesso', 'A classificar'])
   expect((form.getByLabelText('Origem') as HTMLSelectElement).value).toBe('novo')
   expect(opcoes(form.getByLabelText('Origem'))).toEqual(['Novo', 'Retomado'])
   expect(form.getByLabelText('Contexto')).toBeTruthy()

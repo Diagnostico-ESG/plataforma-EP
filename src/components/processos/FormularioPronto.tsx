@@ -16,16 +16,23 @@ type FormularioProntoProps = {
 }
 
 const CAMPOS_EM_BRANCO: CamposDoProcesso = {
-  nome: '', setorId: '', macroprocessoId: '', tipo: 'a_classificar', origem: 'novo', contexto: '', observacoes: '',
+  nome: '', setorId: '', macroprocessoId: '', tipo: 'a_classificar', processoPaiId: '', origem: 'novo', contexto: '',
+  observacoes: '',
 }
 
 function camposIniciais(inicial?: ProcessoLido): CamposDoProcesso {
   if (!inicial) return CAMPOS_EM_BRANCO
   return {
     nome: inicial.nome, setorId: inicial.setorId, macroprocessoId: inicial.macroprocessoId,
-    tipo: inicial.tipo === 'processo' ? 'processo' : 'a_classificar', origem: inicial.origem,
+    tipo: inicial.tipo, processoPaiId: inicial.processoPaiId ?? '', origem: inicial.origem,
     contexto: inicial.contexto ?? '', observacoes: inicial.observacoes ?? '',
   }
+}
+
+// O subprocesso segue o macroprocesso do pai: escolher o pai já mostra o macroprocesso que o banco vai gravar.
+function comMacroprocessoDoPai(campos: CamposDoProcesso, pais: OpcoesDoProcesso['pais']): CamposDoProcesso {
+  const pai = campos.tipo === 'subprocesso' ? pais.find((outro) => outro.id === campos.processoPaiId) : undefined
+  return pai ? { ...campos, macroprocessoId: pai.macroprocessoId } : campos
 }
 
 // noValidate: as mensagens são as nossas, não as do navegador.
@@ -54,7 +61,7 @@ export function FormularioPronto({ cadastros, opcoes, titulo, inicial, aoSalvar,
     <form className="formulario-do-processo" aria-label={titulo} noValidate onSubmit={enviar}>
       <h3 className="painel-subtitulo">{titulo}</h3>
       <CamposDoFormulario campos={campos} opcoes={opcoes} mostrarTipo={!inicial}
-        aoMudar={(mudanca) => setCampos((atuais) => ({ ...atuais, ...mudanca }))} />
+        aoMudar={(mudanca) => setCampos((atuais) => comMacroprocessoDoPai({ ...atuais, ...mudanca }, opcoes.pais))} />
       {setor && macroprocesso && (
         <AvisoDeSetorIncluido key={macroprocesso.id} cadastros={cadastros} setorId={setor.id} setorSigla={setor.sigla}
           macroprocessoId={macroprocesso.id} macroprocessoNome={macroprocesso.nome} />

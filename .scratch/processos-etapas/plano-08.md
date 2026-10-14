@@ -196,9 +196,9 @@ end $$;
 
 **Arquivos:** `src/processos/validacaoDoProcesso.ts` (+ teste); `src/components/processos/CamposDoProcesso.tsx`; `FormularioDoProcesso.tsx`; `FormularioPronto.tsx`; `PainelDeNovoProcesso.tsx`; `PainelDoProcesso.tsx` (passa `processos` ao formulário); criar `src/App.subprocessos.test.tsx`.
 
-- [ ] Teste de tela primeiro (aplicativo inteiro, `ProcessosFalso` e `CadastrosFalso`; critérios 4 e 8): o tipo oferece Processo, Subprocesso e A classificar; Subprocesso mostra o seletor "Processo pai" só com os processos do tipo Processo; escolher o pai fixa o macroprocesso no dele (campo desabilitado); salvar sem pai mostra "Escolha o processo pai."; cadastrar o subprocesso grava `tipo: 'subprocesso'` e o pai, e o cartão aparece com a pílula "Subprocesso"; falha de gravação mostra a frase e mantém os dados; a edição não mostra tipo nem pai.
-- [ ] Implementar: `CamposDoProcesso` ganha `processoPaiId`; `problemaNoProcesso` recusa subprocesso sem pai com "Escolha o processo pai."; `dadosDoProcesso` manda o pai só no subprocesso; `OpcoesDoProcesso.pais: ProcessoDaLista[]`; `FormularioDoProcesso` recebe `processos` e, só no cadastro, carrega os pais (`listarProcessos`, filtro `tipo === 'processo'`); `FormularioPronto` copia o macroprocesso do pai ao escolhê-lo; `CampoDoPai` no `CamposDoProcesso`.
-- [ ] `npm test`, `npx tsc --noEmit` e `npm run lint` verdes; comitar.
+- [x] Teste de tela primeiro (aplicativo inteiro, `ProcessosFalso` e `CadastrosFalso`; critérios 4 e 8): o tipo oferece Processo, Subprocesso e A classificar; Subprocesso mostra o seletor "Processo pai" só com os processos do tipo Processo; escolher o pai fixa o macroprocesso no dele (campo desabilitado); salvar sem pai mostra "Escolha o processo pai."; cadastrar o subprocesso grava `tipo: 'subprocesso'` e o pai, e o cartão aparece com a pílula "Subprocesso"; falha de gravação mostra a frase e mantém os dados; a edição não mostra tipo nem pai.
+- [x] Implementar: `CamposDoProcesso` ganha `processoPaiId`; `problemaNoProcesso` recusa subprocesso sem pai com "Escolha o processo pai."; `dadosDoProcesso` manda o pai só no subprocesso; `OpcoesDoProcesso.pais: ProcessoDaLista[]`; `FormularioDoProcesso` recebe `processos` e, só no cadastro, carrega os pais (`listarProcessos`, filtro `tipo === 'processo'`); `FormularioPronto` copia o macroprocesso do pai ao escolhê-lo; `CampoDoPai` no `CamposDoProcesso`.
+- [x] `npm test`, `npx tsc --noEmit` e `npm run lint` verdes; comitar.
 
 ### Tarefa 5 — Painel: estrutura, Reclassificar e histórico
 
