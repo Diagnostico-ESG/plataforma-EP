@@ -63,8 +63,8 @@
 
 ### Tarefa 5 — Fechamento
 
-- [ ] `npm test` completo, `npm run lint`, checagem de tipos; registrar `desvios.md`, melhorias do protocolo e itens não testados (bloco do `/executar-complexo` em `.claude/regras/nao-testados.md`).
-- [ ] Marcar o plano, integrar a branch (`git switch main`, merge, `git branch -d`), `git push` da `main`, ticket com `Concluído em`, comitar e conferir o "Testes de banco" da `main`.
+- [x] `npm test` completo, `npm run lint`, checagem de tipos; registrar `desvios.md`, melhorias do protocolo e itens não testados (bloco do `/executar-complexo` em `.claude/regras/nao-testados.md`).
+- [x] Marcar o plano, integrar a branch (`git switch main`, merge, `git branch -d`), `git push` da `main`, ticket com `Concluído em`, comitar e conferir o "Testes de banco" da `main`.
 
 ## Autoavaliação
 
