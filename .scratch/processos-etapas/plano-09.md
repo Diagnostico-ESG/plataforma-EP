@@ -62,14 +62,14 @@ export function lerEnderecoDosProcessos(endereco: string): EnderecoDosProcessos
 export function montarEnderecoDosProcessos(endereco: EnderecoDosProcessos): string
 ```
 
-- [ ] Escrever os testes (critério 6) primeiro:
+- [x] Escrever os testes (critério 6) primeiro:
   - `#/processos` → quadro, sem aberto, `SEM_FILTROS`; `#/processos/lista` → lista; `#/processos/p1` → aberto `p1`; `#/processos/lista/p1` → lista com `p1`; `#/processos/novo` → aberto `novo`;
   - `#/processos/lista?setor=s1&tipo=subprocesso&situacao=cancelado` → os três filtros; o mesmo no Quadro (`#/processos?setor=s1&situacao=cancelado`) → `situacao` null;
   - `tipo=xyz` e `situacao=xyz` → null; parâmetro vazio (`setor=`) → null;
   - montar: `{ lista, null, SEM_FILTROS }` → `#/processos/lista`; com aberto `p1` e `setor: 's1', etapa: 'modelagem'` → `#/processos/lista/p1?setor=s1&etapa=modelagem`; quadro com `situacao: 'concluido'` → sem `situacao`;
   - ida e volta: `montar(ler(x)) === x` para `#/processos/lista/p1?setor=s1&macroprocesso=m1&etapa=aguardando-o-setor&tipo=processo&responsavel=u1&situacao=suspenso`.
-- [ ] Rodar `npx vitest run src/processos/enderecoDosProcessos.test.ts`: falha (módulo inexistente).
-- [ ] Implementar com `URLSearchParams` (trecho depois do `?`), separando o caminho por `/`:
+- [x] Rodar `npx vitest run src/processos/enderecoDosProcessos.test.ts`: falha (módulo inexistente).
+- [x] Implementar com `URLSearchParams` (trecho depois do `?`), separando o caminho por `/`:
 
 ```ts
 const NOMES_DOS_FILTROS = ['setor', 'macroprocesso', 'etapa', 'tipo', 'responsavel', 'situacao'] as const
@@ -107,8 +107,8 @@ export function montarEnderecoDosProcessos({ visao, aberto, filtros }: EnderecoD
 }
 ```
 
-- [ ] Rodar o teste: passa. `npm run lint` sem erro.
-- [ ] Comitar: `Ticket 09 de processos-etapas: endereço dos processos com a visão e os filtros`.
+- [x] Rodar o teste: passa. `npm run lint` sem erro.
+- [x] Comitar: `Ticket 09 de processos-etapas: endereço dos processos com a visão e os filtros`.
 
 ### Tarefa 2 — Filtros, opções e linhas da Lista (funções puras)
 
