@@ -45,9 +45,10 @@ export type Database = {
           id: string
           iniciada_em: string | null
           nota: string | null
+          processo_id: string | null
           resolvida_em: string | null
           responsavel_id: string | null
-          setor_id: string
+          setor_id: string | null
           status: Database["public"]["Enums"]["status_da_etapa"]
         }
         Insert: {
@@ -55,9 +56,10 @@ export type Database = {
           id?: string
           iniciada_em?: string | null
           nota?: string | null
+          processo_id?: string | null
           resolvida_em?: string | null
           responsavel_id?: string | null
-          setor_id: string
+          setor_id?: string | null
           status?: Database["public"]["Enums"]["status_da_etapa"]
         }
         Update: {
@@ -65,9 +67,10 @@ export type Database = {
           id?: string
           iniciada_em?: string | null
           nota?: string | null
+          processo_id?: string | null
           resolvida_em?: string | null
           responsavel_id?: string | null
-          setor_id?: string
+          setor_id?: string | null
           status?: Database["public"]["Enums"]["status_da_etapa"]
         }
         Relationships: [
@@ -76,6 +79,27 @@ export type Database = {
             columns: ["etapa_id"]
             isOneToOne: false
             referencedRelation: "etapas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "andamentos_etapa_id_fkey"
+            columns: ["etapa_id"]
+            isOneToOne: false
+            referencedRelation: "processos_com_andamento"
+            referencedColumns: ["etapa_atual_id"]
+          },
+          {
+            foreignKeyName: "andamentos_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: false
+            referencedRelation: "processos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "andamentos_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: false
+            referencedRelation: "processos_com_andamento"
             referencedColumns: ["id"]
           },
           {
@@ -230,6 +254,87 @@ export type Database = {
         }
         Relationships: []
       }
+      processos: {
+        Row: {
+          contexto: string | null
+          criado_em: string
+          id: string
+          macroprocesso_id: string
+          motivo_da_situacao: string | null
+          nome: string
+          observacoes: string | null
+          origem: Database["public"]["Enums"]["origem_do_processo"]
+          processo_pai_id: string | null
+          setor_id: string
+          situacao: Database["public"]["Enums"]["situacao_guardada"]
+          tipo: Database["public"]["Enums"]["tipo_de_processo"]
+        }
+        Insert: {
+          contexto?: string | null
+          criado_em?: string
+          id?: string
+          macroprocesso_id: string
+          motivo_da_situacao?: string | null
+          nome: string
+          observacoes?: string | null
+          origem?: Database["public"]["Enums"]["origem_do_processo"]
+          processo_pai_id?: string | null
+          setor_id: string
+          situacao?: Database["public"]["Enums"]["situacao_guardada"]
+          tipo?: Database["public"]["Enums"]["tipo_de_processo"]
+        }
+        Update: {
+          contexto?: string | null
+          criado_em?: string
+          id?: string
+          macroprocesso_id?: string
+          motivo_da_situacao?: string | null
+          nome?: string
+          observacoes?: string | null
+          origem?: Database["public"]["Enums"]["origem_do_processo"]
+          processo_pai_id?: string | null
+          setor_id?: string
+          situacao?: Database["public"]["Enums"]["situacao_guardada"]
+          tipo?: Database["public"]["Enums"]["tipo_de_processo"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "processos_envolvido_fkey"
+            columns: ["macroprocesso_id", "setor_id"]
+            isOneToOne: false
+            referencedRelation: "setores_envolvidos"
+            referencedColumns: ["macroprocesso_id", "setor_id"]
+          },
+          {
+            foreignKeyName: "processos_macroprocesso_id_fkey"
+            columns: ["macroprocesso_id"]
+            isOneToOne: false
+            referencedRelation: "macroprocessos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "processos_processo_pai_id_fkey"
+            columns: ["processo_pai_id"]
+            isOneToOne: false
+            referencedRelation: "processos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "processos_processo_pai_id_fkey"
+            columns: ["processo_pai_id"]
+            isOneToOne: false
+            referencedRelation: "processos_com_andamento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "processos_setor_id_fkey"
+            columns: ["setor_id"]
+            isOneToOne: false
+            referencedRelation: "setores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       responsaveis_do_setor: {
         Row: {
           cargo: string | null
@@ -380,7 +485,79 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      processos_com_andamento: {
+        Row: {
+          aguardando_o_setor: boolean | null
+          contexto: string | null
+          criado_em: string | null
+          etapa_atual_codigo: string | null
+          etapa_atual_id: string | null
+          etapa_atual_nome: string | null
+          etapa_atual_ordem: number | null
+          id: string | null
+          macroprocesso_id: string | null
+          macroprocesso_nome: string | null
+          motivo_da_situacao: string | null
+          nome: string | null
+          observacoes: string | null
+          origem: Database["public"]["Enums"]["origem_do_processo"] | null
+          processo_pai_id: string | null
+          responsavel_foto_url: string | null
+          responsavel_id: string | null
+          responsavel_nome: string | null
+          setor_id: string | null
+          setor_sigla: string | null
+          situacao: string | null
+          situacao_guardada:
+            | Database["public"]["Enums"]["situacao_guardada"]
+            | null
+          tipo: Database["public"]["Enums"]["tipo_de_processo"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "andamentos_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "processos_envolvido_fkey"
+            columns: ["macroprocesso_id", "setor_id"]
+            isOneToOne: false
+            referencedRelation: "setores_envolvidos"
+            referencedColumns: ["macroprocesso_id", "setor_id"]
+          },
+          {
+            foreignKeyName: "processos_macroprocesso_id_fkey"
+            columns: ["macroprocesso_id"]
+            isOneToOne: false
+            referencedRelation: "macroprocessos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "processos_processo_pai_id_fkey"
+            columns: ["processo_pai_id"]
+            isOneToOne: false
+            referencedRelation: "processos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "processos_processo_pai_id_fkey"
+            columns: ["processo_pai_id"]
+            isOneToOne: false
+            referencedRelation: "processos_com_andamento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "processos_setor_id_fkey"
+            columns: ["setor_id"]
+            isOneToOne: false
+            referencedRelation: "setores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
@@ -388,13 +565,16 @@ export type Database = {
     Enums: {
       categoria_macroprocesso: "finalistico" | "apoio" | "gerencial"
       nivel_da_etapa: "setor" | "processo"
+      origem_do_processo: "novo" | "retomado"
       perfil: "administrador" | "integrante_ep" | "consulta"
+      situacao_guardada: "em_andamento" | "suspenso" | "cancelado"
       status_da_etapa:
         | "pendente"
         | "em_andamento"
         | "concluida"
         | "realizada_anteriormente"
         | "dispensada"
+      tipo_de_processo: "processo" | "subprocesso" | "a_classificar"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -527,7 +707,9 @@ export const Constants = {
     Enums: {
       categoria_macroprocesso: ["finalistico", "apoio", "gerencial"],
       nivel_da_etapa: ["setor", "processo"],
+      origem_do_processo: ["novo", "retomado"],
       perfil: ["administrador", "integrante_ep", "consulta"],
+      situacao_guardada: ["em_andamento", "suspenso", "cancelado"],
       status_da_etapa: [
         "pendente",
         "em_andamento",
@@ -535,6 +717,7 @@ export const Constants = {
         "realizada_anteriormente",
         "dispensada",
       ],
+      tipo_de_processo: ["processo", "subprocesso", "a_classificar"],
     },
   },
 } as const
