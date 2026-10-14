@@ -32,15 +32,18 @@ function dadosDoProcesso(linha: LinhaDoProcesso) {
   }
 }
 
-type AndamentoDoProcessoLido = AndamentoLido & { responsavel: { nome: string } | null }
+type AndamentoDoProcessoLido = AndamentoLido & { responsavel: { id: string; nome: string; ativo: boolean } | null }
 
 async function lerAndamentosDoProcesso(cliente: ClienteSupabase, id: string): Promise<EtapaDoProcesso[]> {
   const { data, error } = await cliente.from('andamentos')
-    .select(`${COLUNAS_DO_ANDAMENTO}, responsavel:usuarios(nome)`).eq('processo_id', id)
+    .select(`${COLUNAS_DO_ANDAMENTO}, responsavel:usuarios(id, nome, ativo)`).eq('processo_id', id)
   if (error) throw new Error(`Falha ao ler as etapas do processo: ${error.message}`)
   return (data as unknown as AndamentoDoProcessoLido[])
     .flatMap(({ responsavel, ...andamento }) =>
-      etapaDoAndamento(andamento).map((etapa) => ({ ...etapa, responsavelNome: responsavel?.nome ?? null })))
+      etapaDoAndamento(andamento).map((etapa) => ({
+        ...etapa, responsavelId: responsavel?.id ?? null, responsavelNome: responsavel?.nome ?? null,
+        responsavelInativo: responsavel ? !responsavel.ativo : false,
+      })))
     .sort((a, b) => a.ordem - b.ordem)
 }
 

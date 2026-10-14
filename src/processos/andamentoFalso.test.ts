@@ -1,11 +1,15 @@
-import { expect, test } from 'vitest'
-import { atualizarSetorDoProcesso, mudarEtapaDoProcesso } from './andamentoFalso'
+import { describe, expect, test } from 'vitest'
+import {
+  atualizarSetorDoProcesso, conferirDatasDaEtapa, mudarEtapaDoProcesso, trocarEtapaDoProcesso, voltarEtapas,
+} from './andamentoFalso'
 import type { EtapaDoProcesso, EtapaDoSetor, ProcessoLido } from './tipos'
+
+const HOJE = '2026-10-13'
 
 function etapa(ordem: number, mudancas: Partial<EtapaDoProcesso> = {}): EtapaDoProcesso {
   return {
     id: `a${ordem}`, codigo: `c${ordem}`, nome: `Etapa ${ordem}`, ordem, obrigatoria: true, status: 'pendente',
-    nota: null, iniciadaEm: null, resolvidaEm: null, responsavelNome: null, ...mudancas,
+    nota: null, iniciadaEm: null, resolvidaEm: null, responsavelId: null, responsavelNome: null, responsavelInativo: false, ...mudancas,
   }
 }
 
@@ -40,4 +44,59 @@ test('o processo aguarda o setor enquanto uma etapa do setor está pendente ou e
   }]
   expect(atualizarSetorDoProcesso(PROCESSO, doSetor('em_andamento')).aguardandoOSetor).toBe(true)
   expect(atualizarSetorDoProcesso(PROCESSO, doSetor('concluida')).aguardandoOSetor).toBe(false)
+})
+
+describe('voltar', () => {
+  const resolvidas = [
+    etapa(4, { status: 'concluida', iniciadaEm: '2026-10-10', resolvidaEm: '2026-10-11', nota: null }),
+    etapa(5, { status: 'concluida', iniciadaEm: '2026-10-11', resolvidaEm: '2026-10-12' }),
+    etapa(6, { status: 'dispensada', nota: 'Não se aplica', resolvidaEm: '2026-10-12' }),
+    etapa(7, { status: 'em_andamento', iniciadaEm: '2026-10-13' }),
+    etapa(9, { obrigatoria: false }),
+  ]
+
+  test('a escolhida volta a em andamento, com o início e sem a conclusão; as seguintes, a pendente sem datas nem nota', () => {
+    const depois = voltarEtapas(resolvidas, 'a4', HOJE)
+    expect(depois.map((e) => e.status)).toEqual(['em_andamento', 'pendente', 'pendente', 'pendente', 'pendente'])
+    expect(depois[0]).toMatchObject({ iniciadaEm: '2026-10-10', resolvidaEm: null })
+    expect(depois[2]).toMatchObject({ iniciadaEm: null, resolvidaEm: null, nota: null })
+  })
+
+  test('a escolhida sem início (realizada anteriormente) recebe a data de hoje', () => {
+    const etapas = [etapa(4, { status: 'realizada_anteriormente', nota: 'Feita antes', resolvidaEm: '2026-10-09' })]
+    expect(voltarEtapas(etapas, 'a4', HOJE)[0]).toMatchObject({ iniciadaEm: HOJE, resolvidaEm: null, nota: null })
+  })
+
+  test('etapa que não é da lista não muda nada', () => {
+    expect(voltarEtapas(resolvidas, 'x', HOJE)).toBe(resolvidas)
+  })
+
+  test('voltar uma etapa do processo concluído tira o processo de concluído', () => {
+    const concluido = mudarEtapaDoProcesso(
+      { ...PROCESSO, etapasDoProcesso: [etapa(4, { status: 'concluida' }), etapa(5, { status: 'concluida' })] },
+      'a5', { status: 'concluida' })
+    expect(concluido.situacao).toBe('concluido')
+    const depois = trocarEtapaDoProcesso(concluido, 'a4', (etapas) => voltarEtapas(etapas, 'a4', HOJE))
+    expect(depois.situacao).toBe('em_andamento')
+    expect(depois.etapaAtual?.codigo).toBe('c4')
+  })
+})
+
+describe('datas', () => {
+  test('aceita datas até hoje, com a conclusão no dia do início ou depois', () => {
+    expect(() => conferirDatasDaEtapa({ iniciadaEm: '2026-10-12', resolvidaEm: HOJE }, HOJE)).not.toThrow()
+    expect(() => conferirDatasDaEtapa({ iniciadaEm: null, resolvidaEm: null }, HOJE)).not.toThrow()
+  })
+
+  test('recusa data no futuro com o valor em DD/MM/AAAA', () => {
+    expect(() => conferirDatasDaEtapa({ iniciadaEm: '2026-10-20', resolvidaEm: null }, HOJE))
+      .toThrow('A data 20/10/2026 está no futuro.')
+    expect(() => conferirDatasDaEtapa({ iniciadaEm: null, resolvidaEm: '2026-11-01' }, HOJE))
+      .toThrow('A data 01/11/2026 está no futuro.')
+  })
+
+  test('recusa conclusão antes do início com as duas datas', () => {
+    expect(() => conferirDatasDaEtapa({ iniciadaEm: '2026-10-05', resolvidaEm: '2026-10-01' }, HOJE))
+      .toThrow('A conclusão (01/10/2026) não pode ser antes do início (05/10/2026).')
+  })
 })

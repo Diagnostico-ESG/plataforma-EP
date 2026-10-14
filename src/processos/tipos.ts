@@ -49,7 +49,18 @@ export type ProcessoDaLista = {
 export type ListaDeProcessos = { etapas: EtapaDoCatalogo[]; processos: ProcessoDaLista[] }
 
 /** Uma etapa do processo (o andamento): como a do setor, com o nome de quem responde por ela. */
-export type EtapaDoProcesso = EtapaDoSetor & { responsavelNome: string | null }
+export type EtapaDoProcesso = EtapaDoSetor & {
+  responsavelId: string | null
+  responsavelNome: string | null
+  /** O responsável foi desativado depois de escolhido: aparece marcado e não se escolhe de novo. */
+  responsavelInativo: boolean
+}
+
+/** As datas de uma etapa como o banco as guarda (AAAA-MM-DD); null onde a etapa não tem a data. */
+export type DatasDaEtapa = { iniciadaEm: string | null; resolvidaEm: string | null }
+
+/** Quem pode ser responsável por uma etapa: usuário ativo de perfil Administrador ou Integrante. */
+export type UsuarioResponsavel = { id: string; nome: string }
 
 export type ProcessoLido = ProcessoDaLista & {
   origem: OrigemDoProcesso
@@ -93,6 +104,13 @@ export type ModuloDeProcessos = {
   concluirEtapa(andamentoId: string): Promise<void>
   dispensarEtapa(andamentoId: string, nota: string): Promise<void>
   registrarRealizadaAnteriormente(andamentoId: string, nota: string): Promise<void>
+  /** A etapa resolvida volta a em andamento e as seguintes a pendente; o motivo é obrigatório. */
+  voltarParaEtapa(andamentoId: string, motivo: string): Promise<void>
+  corrigirDatasDaEtapa(andamentoId: string, datas: DatasDaEtapa): Promise<void>
+  /** null tira o responsável. */
+  mudarResponsavelDaEtapa(andamentoId: string, usuarioId: string | null): Promise<void>
+  /** Por nome. */
+  listarResponsaveisPossiveis(): Promise<UsuarioResponsavel[]>
   /** Em ordem alfabética de nome. */
   lerResponsaveisDoSetor(setorId: string): Promise<ResponsavelDoSetor[]>
   criarResponsavel(setorId: string, dados: DadosDoResponsavel): Promise<void>

@@ -16,6 +16,12 @@ export class ClienteSupabaseFalso {
   respostas: Record<string, RespostaDoBanco> = {}
   pedidos: Pedido[] = []
 
+  /** Chamada de função do banco: o nome vira a operação de um pedido "rpc"; a resposta sai de "rpc.<nome>". */
+  rpc(nome: string, args: unknown): Promise<RespostaDoBanco> {
+    this.pedidos.push({ tabela: 'rpc', operacao: nome, valores: args })
+    return Promise.resolve(this.respostas[`rpc.${nome}`] ?? { data: null, error: null })
+  }
+
   from(tabela: string) {
     const pedido: Pedido = { tabela, operacao: 'select' }
     this.pedidos.push(pedido)

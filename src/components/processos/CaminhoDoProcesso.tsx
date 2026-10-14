@@ -1,3 +1,5 @@
+import { useCallback } from 'react'
+import { useCarregamento } from '../../hooks/useCarregamento'
 import type { ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 import { CaminhoDeEtapas } from './CaminhoDeEtapas'
 import { LinhaDaEtapa } from './LinhaDaEtapa'
@@ -18,6 +20,11 @@ type CaminhoDoProcessoProps = {
  * depois as do processo, com as ações na etapa atual para quem pode alterar (a RLS é quem protege).
  */
 export function CaminhoDoProcesso({ processo, processos, podeAlterar, aoMudar, aoSumir }: CaminhoDoProcessoProps) {
+  // Quem não altera não escolhe responsável: não precisa da lista. Falha ao lê-la deixa o seletor só com o atual.
+  const ler = useCallback(
+    () => (podeAlterar ? processos.listarResponsaveisPossiveis() : Promise.resolve([])), [processos, podeAlterar])
+  const { estado } = useCarregamento(ler)
+  const usuarios = estado.tipo === 'pronto' ? estado.valor : []
   return (
     <section className="painel-caminho" aria-label="Caminho de etapas">
       <div className="painel-caminho-titulo">
@@ -31,7 +38,7 @@ export function CaminhoDoProcesso({ processo, processos, podeAlterar, aoMudar, a
       </ol>
       <h3 className="painel-subtitulo">Etapas do processo</h3>
       <CaminhoDeEtapas processos={processos} etapas={processo.etapasDoProcesso} podeAlterar={podeAlterar}
-        aoMudar={aoMudar} aoSumir={aoSumir} />
+        usuarios={usuarios} aoMudar={aoMudar} aoSumir={aoSumir} />
     </section>
   )
 }

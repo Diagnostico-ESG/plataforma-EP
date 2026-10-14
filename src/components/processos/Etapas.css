@@ -48,3 +48,29 @@
   gap: var(--esp-2);
   flex-basis: 100%;
 }
+
+.etapa-edicao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-2) var(--esp-3);
+  flex-basis: 100%;
+}
+
+.etapa-edicao:empty {
+  display: none;
+}
+
+.etapa-datas-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-2) var(--esp-3);
+  flex-basis: 100%;
+}
+
+.etapa-campo-de-data {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+}

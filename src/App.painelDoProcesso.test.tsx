@@ -26,7 +26,7 @@ function etapaDoSetor(ordem: number, codigo: string, nome: string, mudancas: Par
 function etapaDoProcesso(ordem: number, codigo: string, nome: string, mudancas: Partial<EtapaDoProcesso> = {}): EtapaDoProcesso {
   return {
     id: `a${ordem}`, codigo, nome, ordem, obrigatoria: true, status: 'pendente', nota: null, iniciadaEm: null,
-    resolvidaEm: null, responsavelNome: null, ...mudancas,
+    resolvidaEm: null, responsavelId: null, responsavelNome: null, responsavelInativo: false, ...mudancas,
   }
 }
 
@@ -133,12 +133,14 @@ test('o caminho mostra as etapas do setor primeiro, só leitura, e depois as do 
     'Relatório e modelagem técnica', 'Revisão interna'])
   const atuais = caminho.getAllByRole('listitem').filter((item) => item.getAttribute('aria-current') === 'step')
   expect(atuais.map((item) => item.querySelector('.etapa-nome')?.textContent)).toEqual(['Relatório e modelagem técnica'])
-  // As do setor seguem só leitura; as ações são só as da etapa atual do processo (ticket 05).
-  expect(caminho.getAllByRole('button').map((botao) => botao.textContent)).toEqual(['Concluir', 'Realizada anteriormente'])
+  // As do setor seguem só leitura; as ações são as da etapa atual e o Voltar da resolvida anterior a ela (tickets 05 e 06),
+  // mais o Corrigir datas das etapas que já têm data.
+  expect(caminho.getAllByRole('button').map((botao) => botao.textContent)).toEqual([
+    'Corrigir datas', 'Voltar a esta etapa', 'Corrigir datas', 'Concluir', 'Realizada anteriormente'])
 })
 
 test('o caminho mostra status, responsável, datas e nota das etapas do processo', async () => {
-  montar()
+  montar({ perfil: 'consulta' })
   const caminho = within(await (await painel()).findByRole('region', { name: 'Caminho de etapas' }))
   const modelagem = within((await caminho.findByText('Reunião de modelagem')).closest('li') as HTMLElement)
   expect(modelagem.getByText('Concluída')).toBeTruthy()

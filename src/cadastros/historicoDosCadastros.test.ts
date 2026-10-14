@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import {
-  descreverEstadoDoCadastro, eventosDoItem, itensDoFiltro, nomeDoItem, textoDaAcaoDoCadastro,
+  descreverEstadoDoCadastro, eventosDoItem, itensDoFiltro, nomeDoItem, rotuloDoMotivo, textoDaAcaoDoCadastro,
 } from './historicoDosCadastros'
 import type { EventoDoCadastro } from './tipos'
 
@@ -177,6 +177,26 @@ describe('etapas do setor no histórico', () => {
   test('o evento entra no filtro pelo setor', () => {
     expect(itensDoFiltro([ETAPA_DISPENSADA])).toEqual([{ id: 's1', nome: 'TSA' }])
     expect(eventosDoItem([ETAPA_DISPENSADA], 's1')).toEqual([ETAPA_DISPENSADA])
+  })
+})
+
+describe('voltar, datas e responsável da etapa no histórico', () => {
+  test('texto de cada ação', () => {
+    expect(['voltar', 'corrigir_datas', 'mudar_responsavel'].map((acao) => textoDaAcaoDoCadastro(acao, 'andamento')))
+      .toEqual(['Voltou à etapa', 'Corrigiu as datas da etapa', 'Mudou o responsável da etapa'])
+  })
+
+  test('antes e depois mostram o responsável pelo nome; sem responsável nos dois, o campo nem aparece', () => {
+    expect(descreverEstadoDoCadastro({ ...ETAPA_PENDENTE, responsavel_nome: 'Ana Teste' }))
+      .toBe('Setor: TSA; Situação da etapa: Pendente; Início: —; Conclusão: —; Responsável: Ana Teste')
+    expect(descreverEstadoDoCadastro({ ...ETAPA_PENDENTE, responsavel_nome: null }))
+      .toContain('Responsável: —')
+    expect(descreverEstadoDoCadastro(ETAPA_PENDENTE)).not.toContain('Responsável')
+  })
+
+  test('o motivo da volta se chama Motivo; a nota das outras ações, Nota', () => {
+    expect(rotuloDoMotivo('voltar')).toBe('Motivo')
+    expect(rotuloDoMotivo('dispensar')).toBe('Nota')
   })
 })
 

@@ -13,7 +13,7 @@ const LINHA = {
   responsavel_id: null, responsavel_nome: null, responsavel_foto_url: null,
 }
 const MODELAGEM = {
-  id: 'a4', status: 'pendente', nota: null, iniciada_em: null, resolvida_em: null, responsavel: { nome: 'Ana Teste' },
+  id: 'a4', status: 'pendente', nota: null, iniciada_em: null, resolvida_em: null, responsavel: { id: 'u1', nome: 'Ana Teste', ativo: true },
   etapas: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, obrigatoria: true },
 }
 const RELATORIO = {
@@ -42,6 +42,16 @@ test('lê o processo com as etapas do processo (ordem do catálogo, com o respon
     ['modelagem', 'Ana Teste'], ['relatorio_modelagem_tecnica', null]])
   expect(cliente.pedidos.filter((pedido) => pedido.tabela === 'andamentos').map((pedido) => pedido.filtro)).toEqual(
     expect.arrayContaining([['processo_id', 'p1'], ['setor_id', 's1']]))
+})
+
+test('a etapa traz o id do responsável e se ele foi desativado depois de escolhido', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
+  const inativo = { ...MODELAGEM, responsavel: { id: 'u2', nome: 'Caio Teste', ativo: false } }
+  cliente.respostas['andamentos.select'] = { data: [inativo, RELATORIO, MODELAGEM], error: null }
+  const lido = await criar(cliente).lerProcesso('p1')
+  expect(lido?.etapasDoProcesso.map((etapa) => [etapa.responsavelId, etapa.responsavelInativo])).toEqual([
+    ['u2', true], ['u1', false], [null, false]])
 })
 
 test('as etapas do setor também chegam, no mesmo formato da tela do setor', async () => {

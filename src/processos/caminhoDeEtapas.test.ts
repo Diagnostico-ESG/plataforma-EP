@@ -29,10 +29,21 @@ describe('ações da etapa', () => {
     expect(acoesDaEtapa([etapa(1, 'concluida'), etapa(2, 'em_andamento', true)], 1)).toEqual(['concluir', 'realizada'])
   })
 
-  test('as outras etapas não têm ação', () => {
+  test('a pendente depois da atual não tem ação', () => {
     const etapas = [etapa(1, 'concluida'), etapa(2, 'pendente'), etapa(3, 'pendente')]
-    expect(acoesDaEtapa(etapas, 0)).toEqual([])
     expect(acoesDaEtapa(etapas, 2)).toEqual([])
+  })
+
+  test('a resolvida anterior à atual pode ser voltada', () => {
+    const etapas = [etapa(1, 'concluida'), etapa(2, 'dispensada'), etapa(3, 'em_andamento'), etapa(4, 'pendente')]
+    expect(acoesDaEtapa(etapas, 0)).toEqual(['voltar'])
+    expect(acoesDaEtapa(etapas, 1)).toEqual(['voltar'])
+  })
+
+  test('com todas resolvidas (processo concluído), qualquer uma pode ser voltada', () => {
+    const etapas = [etapa(1, 'concluida'), etapa(2, 'realizada_anteriormente')]
+    expect(acoesDaEtapa(etapas, 0)).toEqual(['voltar'])
+    expect(acoesDaEtapa(etapas, 1)).toEqual(['voltar'])
   })
 })
 
