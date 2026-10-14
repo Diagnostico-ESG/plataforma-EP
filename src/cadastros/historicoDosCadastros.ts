@@ -1,4 +1,5 @@
 import { ROTULO_DO_STATUS, formatarData } from '../processos/caminhoDeEtapas'
+import { ROTULO_DA_ORIGEM, ROTULO_DA_SITUACAO, ROTULO_DO_TIPO } from '../processos/rotulos'
 import type { StatusDaEtapa } from '../processos/tipos'
 import { rotuloDaCategoria } from './categorias'
 import type { CategoriaDoMacroprocesso, EstadoDoCadastro, EventoDoCadastro, ItemDoFiltro } from './tipos'
@@ -32,6 +33,7 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   categoria: 'Categoria', observacao: 'Observação', setor_sigla: 'Setor', macroprocesso_nome: 'Macroprocesso',
   macroprocessos: 'Macroprocessos', setores: 'Setores', status: 'Situação da etapa', iniciada_em: 'Início',
   resolvida_em: 'Conclusão', email: 'E-mail', cargo: 'Cargo', responsaveis: 'Responsáveis',
+  tipo: 'Tipo', origem: 'Origem', situacao: 'Situação', contexto: 'Contexto', andamentos: 'Etapas',
 }
 
 // Os ids existem para o filtro; quem lê o histórico vê a sigla e o nome. Código e nome da etapa já estão no título.
@@ -71,6 +73,7 @@ export function nomeDoItem(evento: EventoDoCadastro): string {
   const estado = estadoLegivel(evento)
   if (evento.entidade === 'setor' && typeof estado.sigla === 'string') return `${estado.sigla} — ${texto(estado.nome)}`
   if (evento.entidade === 'macroprocesso' && typeof estado.nome === 'string') return codigoENome(estado.codigo, estado.nome)
+  if (evento.entidade === 'processo' && typeof estado.nome === 'string') return `${texto(estado.setor_sigla)} — ${estado.nome}`
   const doSetor = nomeDoItemDoSetor(evento.entidade, estado)
   if (doSetor !== null) return doSetor
   if (typeof estado.setor_sigla === 'string' && typeof estado.macroprocesso_nome === 'string') {
@@ -81,7 +84,8 @@ export function nomeDoItem(evento: EventoDoCadastro): string {
 
 // Um item das listas da exclusão: macroprocesso (código) ou setor (sigla), com a observação do papel.
 function itemDaLista(item: unknown): string {
-  const { codigo, sigla, nome, observacao } = registro(item)
+  const { codigo, sigla, nome, observacao, etapa_nome: etapa, status } = registro(item)
+  if (typeof etapa === 'string') return `${etapa} (${ROTULO_DO_STATUS[status as StatusDaEtapa] ?? texto(status)})`
   const nomeCompleto = codigoENome(codigo ?? sigla, nome)
   return typeof observacao === 'string' && observacao !== '' ? `${nomeCompleto} (${observacao})` : nomeCompleto
 }
@@ -93,10 +97,19 @@ function valorDaEtapa(campo: string, valor: unknown): string | null {
   return null
 }
 
+// Campos do processo: tipo, origem e situação pelo rótulo da tela; null se não for deles.
+function valorDoProcesso(campo: string, valor: unknown): string | null {
+  const rotulos: Record<string, Record<string, string>> = {
+    tipo: ROTULO_DO_TIPO, origem: ROTULO_DA_ORIGEM, situacao: ROTULO_DA_SITUACAO,
+  }
+  const rotulosDoCampo = rotulos[campo]
+  return rotulosDoCampo ? (rotulosDoCampo[String(valor)] ?? texto(valor)) : null
+}
+
 function valorLegivel(campo: string, valor: unknown): string {
   if (campo === 'ativo') return valor ? 'Ativo' : 'Inativo'
   if (campo === 'categoria') return rotuloDaCategoria(valor as CategoriaDoMacroprocesso | null)
-  const daEtapa = valorDaEtapa(campo, valor)
+  const daEtapa = valorDaEtapa(campo, valor) ?? valorDoProcesso(campo, valor)
   if (daEtapa !== null) return daEtapa
   if (!Array.isArray(valor)) return texto(valor)
   return valor.length === 0 ? 'nenhum' : valor.map(itemDaLista).join(', ')

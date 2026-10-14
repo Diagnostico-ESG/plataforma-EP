@@ -201,3 +201,38 @@ describe('responsáveis do setor', () => {
     expect(descreverEstadoDoCadastro({ sigla: 'CEE', responsaveis: [] })).toBe('Sigla: CEE; Responsáveis: nenhum')
   })
 })
+
+describe('processos', () => {
+  const PROCESSO = {
+    nome: 'Emitir Ofício', setor_id: 's1', setor_sigla: 'TSA', macroprocesso_id: 'm1', macroprocesso_nome: 'Macro A',
+    tipo: 'a_classificar', origem: 'novo', situacao: 'em_andamento', contexto: null, observacoes: null,
+  }
+  const criado = evento({ entidade: 'processo', entidadeRef: 'p1', depois: PROCESSO })
+
+  test('o item é a sigla do setor e o nome (e não o par setor e macroprocesso dos vínculos)', () => {
+    expect(nomeDoItem(criado)).toBe('TSA — Emitir Ofício')
+    expect(nomeDoItem(evento({ entidade: 'processo', entidadeRef: 'p1', acao: 'excluir', antes: PROCESSO }))).toBe('TSA — Emitir Ofício')
+  })
+
+  test('os campos aparecem legíveis, com tipo, origem e situação pelo rótulo da tela', () => {
+    expect(descreverEstadoDoCadastro(PROCESSO)).toBe(
+      'Nome: Emitir Ofício; Setor: TSA; Macroprocesso: Macro A; Tipo: A classificar; Origem: Novo; Situação: Em andamento; Contexto: —; Observações: —')
+    expect(textoDaAcaoDoCadastro('criar', 'processo')).toBe('Criou')
+    expect(textoDaAcaoDoCadastro('excluir', 'processo')).toBe('Excluiu')
+  })
+
+  test('a exclusão lista as etapas do processo com o nome e o status', () => {
+    const andamentos = [
+      { etapa_codigo: 'modelagem', etapa_nome: 'Reunião de modelagem', status: 'concluida' },
+      { etapa_codigo: 'revisao_interna', etapa_nome: 'Revisão interna', status: 'pendente' },
+    ]
+    expect(descreverEstadoDoCadastro({ nome: 'Emitir Ofício', andamentos }))
+      .toBe('Nome: Emitir Ofício; Etapas: Reunião de modelagem (Concluída), Revisão interna (Pendente)')
+  })
+
+  test('o processo excluído continua no filtro pelo nome', () => {
+    const excluido = evento({ entidade: 'processo', entidadeRef: 'p1', acao: 'excluir', antes: PROCESSO })
+    expect(itensDoFiltro([excluido])).toEqual([{ id: 'p1', nome: 'TSA — Emitir Ofício' }])
+    expect(eventosDoItem([excluido, criado], 'p1')).toHaveLength(2)
+  })
+})

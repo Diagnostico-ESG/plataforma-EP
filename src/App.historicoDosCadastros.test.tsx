@@ -189,3 +189,15 @@ test('os responsáveis do setor aparecem no Histórico e entram no filtro pelo s
   fireEvent.change(screen.getByRole('combobox', { name: 'Item' }), { target: { value: 's1' } })
   expect(screen.getAllByRole('listitem')[0].textContent).toContain('Criou Ana Teste')
 })
+
+test('um processo excluído continua no Histórico, com o que tinha, inclusive as etapas', async () => {
+  const antes = {
+    nome: 'Emitir Ofício', setor_sigla: 'TSA', macroprocesso_nome: 'Macro Teste Um', tipo: 'a_classificar', origem: 'novo',
+    situacao: 'em_andamento', andamentos: [{ etapa_nome: 'Reunião de modelagem', status: 'concluida' }],
+  }
+  montar('integrante_ep', [evento(9, { acao: 'excluir', entidade: 'processo', entidadeRef: 'p1', antes })])
+  const itens = await itensDaLista()
+  expect(itens[0].textContent).toContain('Excluiu')
+  expect(itens[0].textContent).toContain('TSA — Emitir Ofício')
+  expect(itens[0].textContent).toContain('Etapas: Reunião de modelagem (Concluída)')
+})

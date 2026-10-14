@@ -302,3 +302,15 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Marco por ticket criado no início** (`marco/2026-10-13-inicio-ticket-03-processos-etapas`), como nos tickets 01 e 02; o comando ainda não pede.
 - **claude-mem sem cota** desde o início da primeira sessão; seguiu sem ele.
 - **Observação:** rodou em Opus (a tabela recomenda Sonnet), por escolha do usuário.
+
+## 2026-10-14 — /executar-complexo do ticket 04 de processos-etapas
+
+- **Branch comum e `plano-04.md` (itens não testados).** Esperado: `git switch -c processos-etapas` a partir da `main`, plano em `plano-<número>.md`, linha `Concluído em` no fim. Aconteceu: tudo conforme; o plano foi comitado na branch antes de executar. Marco `marco/2026-10-14-inicio-ticket-04-processos-etapas` criado no início, como nos tickets anteriores; o comando ainda não pede.
+- **TDD de RLS, `00_rls_ligada`, view com `security_invoker` (itens não testados).** Esperado: teste de banco antes da migração, view com `security_invoker = true`. Aconteceu: o teste 17 falhou antes (tabela inexistente), passou depois com os 18 arquivos verdes; a view nasceu com `security_invoker` e `revoke all`.
+- **Primeira execução do teste 17 com erro do próprio teste.** Duas subconsultas de eventos `excluir` não filtravam pelo setor e apanhavam as exclusões dos testes por perfil ("more than one row"). Sugestão para o `/planejar`: nos testes pgTAP, filtrar sempre o evento pelo item do cenário.
+- **Trava de git, falsos positivos (item não testado).** Bloqueou duas vezes um comando só de leitura: `sed -n` de um intervalo de linhas (a mesma família do `sed -i` do ticket 03) e uma linha com `git tag -l` encadeada por `&&` a `git switch -c`. Aceitei o bloqueio e refiz com a ferramenta de leitura e com um comando por vez. Sugestão: revisar o padrão que confunde `sed` e encadeamento com a pasta `.git`.
+- **Workflows pelo navegador do app.** Desta vez o navegador do app estava logado no GitHub: disparei "Testes de banco" (3 vezes) e "Migrar banco de desenvolvimento" sem o celular. O painel "Run workflow" abre com animação, o campo muda de lugar depois de escolher a branch: conferir a captura antes de digitar.
+- **Edição por script em arquivo com CRLF falhou em silêncio** (`String.replace` com `\n` não achou o trecho) em dois arquivos; pegou o teste de tela, não o protocolo. Sugestão para quem executa: conferir o resultado de cada edição por script, ou usar a ferramenta de edição.
+- **Mais de um arquivo novo por tarefa:** o `tsc` do pre-commit obrigou a juntar no mesmo commit o módulo real, o falso e os testes (o falso incompleto quebra a compilação dos testes de tela). O plano separou em duas tarefas; a ordem teste → migração → workflow → `db:types` valeu de novo.
+- **claude-mem sem cota:** não notei aviso desta vez; a sessão registrou normalmente até aqui.
+- **Observação:** rodou em Sonnet, como a tabela recomenda.

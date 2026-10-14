@@ -104,6 +104,14 @@ describe('criarCadastrosSupabase', () => {
     expect(cliente.pedidos[0]).toMatchObject({ tabela: 'setores', operacao: 'delete', filtro: ['id', 's1'] })
   })
 
+  test('excluir setor com processos vira a frase com a quantidade', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['setores.delete'] = { data: null, error: { code: 'P0001', message: 'setor_com_processos:2' } }
+    const falha = await criar(cliente).excluirSetor('s1').catch((erro: unknown) => erro)
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect((falha as Error).message).toBe('Não é possível excluir: setor tem 2 processos ligados.')
+  })
+
   test('editar com sigla repetida vira a frase pronta da tela', async () => {
     const cliente = new ClienteSupabaseFalso()
     cliente.respostas['setores.update'] = { data: null, error: { code: '23505',

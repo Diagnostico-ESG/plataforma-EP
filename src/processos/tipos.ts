@@ -1,4 +1,6 @@
-export type StatusDaEtapa = 'pendente' | 'em_andamento' | 'concluida' | 'realizada_anteriormente' | 'dispensada'
+import type { EventoDoCadastro } from '../cadastros/tipos'
+
+export type StatusDaEtapa ='pendente' | 'em_andamento' | 'concluida' | 'realizada_anteriormente' | 'dispensada'
 
 /** Uma etapa do catálogo num setor (o andamento): o id é o do andamento, que as ações recebem. */
 export type EtapaDoSetor = {
@@ -18,12 +20,73 @@ export type ResponsavelDoSetor = { id: string; nome: string; email: string | nul
 
 export type DadosDoResponsavel = Omit<ResponsavelDoSetor, 'id'>
 
+export type TipoDeProcesso = 'processo' | 'subprocesso' | 'a_classificar'
+export type OrigemDoProcesso = 'novo' | 'retomado'
+/** A situação calculada: "concluido" não é guardado, vem de as etapas obrigatórias estarem resolvidas. */
+export type SituacaoDoProcesso = 'em_andamento' | 'suspenso' | 'cancelado' | 'concluido'
+
+/** Uma etapa do catálogo de nível processo, como as colunas do Quadro a usam. */
+export type EtapaDoCatalogo = { id: string; codigo: string; nome: string; ordem: number; ativa: boolean }
+
+export type ResponsavelDaEtapa = { id: string; nome: string; fotoUrl: string | null }
+
+/** Um processo como o Quadro e a Lista o mostram: com a etapa atual, o responsável dela e a situação calculada. */
+export type ProcessoDaLista = {
+  id: string
+  nome: string
+  tipo: TipoDeProcesso
+  setorId: string
+  setorSigla: string
+  macroprocessoId: string
+  macroprocessoNome: string
+  situacao: SituacaoDoProcesso
+  etapaAtual: { codigo: string; nome: string; ordem: number } | null
+  /** As etapas do setor ainda não foram resolvidas: o processo espera na coluna "Aguardando o setor". */
+  aguardandoOSetor: boolean
+  responsavel: ResponsavelDaEtapa | null
+}
+
+export type ListaDeProcessos = { etapas: EtapaDoCatalogo[]; processos: ProcessoDaLista[] }
+
+/** Uma etapa do processo (o andamento): como a do setor, com o nome de quem responde por ela. */
+export type EtapaDoProcesso = EtapaDoSetor & { responsavelNome: string | null }
+
+export type ProcessoLido = ProcessoDaLista & {
+  origem: OrigemDoProcesso
+  contexto: string | null
+  observacoes: string | null
+  motivoDaSituacao: string | null
+  /** Só para leitura no painel do processo; na ordem do catálogo. */
+  etapasDoSetor: EtapaDoSetor[]
+  etapasDoProcesso: EtapaDoProcesso[]
+}
+
+/** O que o formulário grava. O tipo só vale no cadastro: a edição não o muda (a mudança é a reclassificação). */
+export type DadosDoProcesso = {
+  nome: string
+  setorId: string
+  macroprocessoId: string
+  tipo: Exclude<TipoDeProcesso, 'subprocesso'>
+  origem: OrigemDoProcesso
+  contexto: string | null
+  observacoes: string | null
+}
+
 /**
  * Único ponto por onde a interface fala com o banco em processos e etapas. Recusa do banco chega como TravaDoBanco,
  * com a frase pronta; outra falha, como Error cuja mensagem é o motivo em português;
- * etapa ou responsável que já não existe, como CadastroInexistente.
+ * etapa, responsável ou processo que já não existe, como CadastroInexistente.
  */
 export type ModuloDeProcessos = {
+  /** Todos os processos por nome, mais as etapas de nível processo do catálogo, na ordem dele. */
+  listarProcessos(): Promise<ListaDeProcessos>
+  /** null: o processo não existe (mais). */
+  lerProcesso(id: string): Promise<ProcessoLido | null>
+  criarProcesso(dados: DadosDoProcesso): Promise<void>
+  editarProcesso(id: string, dados: DadosDoProcesso): Promise<void>
+  excluirProcesso(id: string): Promise<void>
+  /** Do mais recente para o mais antigo. */
+  lerHistoricoDoProcesso(id: string): Promise<EventoDoCadastro[]>
   /** Na ordem do catálogo. */
   lerEtapasDoSetor(setorId: string): Promise<EtapaDoSetor[]>
   iniciarEtapa(andamentoId: string): Promise<void>

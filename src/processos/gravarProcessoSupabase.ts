@@ -1,0 +1,67 @@
+import {
+  type ErroDoBanco, type RecusasDoModulo, TravaDoBanco, porQueNadaMudou, recusaPorPerfil,
+} from '../acesso/falhasDeGravacao'
+import type { ClienteSupabase } from '../lib/supabase'
+import type { DadosDoProcesso, ModuloDeProcessos } from './tipos'
+
+type OperacoesDeGravacao = Pick<ModuloDeProcessos, 'criarProcesso' | 'editarProcesso' | 'excluirProcesso'>
+type DadosDaFalha = Pick<DadosDoProcesso, 'nome' | 'setorId'>
+type RespostaDaGravacao = { data: { id: string }[] | null; error: ErroDoBanco | null }
+
+// As recusas chegam de fora (as de processos) para este módulo não importar quem o monta.
+export function criarGravacaoDeProcessoSupabase(
+  cliente: ClienteSupabase, recusas: RecusasDoModulo,
+): OperacoesDeGravacao {
+  const tabela = () => cliente.from('processos')
+  const conferir = (id: string, resposta: RespostaDaGravacao, dados?: DadosDaFalha) =>
+    conferirGravacao(cliente, id, recusas, resposta, dados)
+  return {
+    criarProcesso: async (dados) => {
+      const { error } = await tabela().insert(valoresDoCadastro(dados))
+      if (error) throw await falhaDoProcesso(cliente, error, recusas, dados)
+    },
+    editarProcesso: async (id, dados) =>
+      conferir(id, await tabela().update(valoresDaEdicao(dados)).eq('id', id).select('id'), dados),
+    excluirProcesso: async (id) => conferir(id, await tabela().delete().eq('id', id).select('id')),
+  }
+}
+
+function valoresDaEdicao(dados: DadosDoProcesso) {
+  return {
+    setor_id: dados.setorId, macroprocesso_id: dados.macroprocessoId, nome: dados.nome, origem: dados.origem,
+    contexto: dados.contexto, observacoes: dados.observacoes,
+  }
+}
+
+// O tipo só entra no cadastro: depois dele muda pela reclassificação (ticket 08).
+function valoresDoCadastro(dados: DadosDoProcesso) {
+  return { ...valoresDaEdicao(dados), tipo: dados.tipo }
+}
+
+// A RLS não acusa erro ao filtrar: sem linha afetada, a leitura decide entre perfil e processo que sumiu.
+async function conferirGravacao(
+  cliente: ClienteSupabase, id: string, recusas: RecusasDoModulo, { data, error }: RespostaDaGravacao,
+  dados?: DadosDaFalha,
+): Promise<void> {
+  if (error) throw await falhaDoProcesso(cliente, error, recusas, dados)
+  if (data?.length) return
+  const { data: lidos } = await cliente.from('processos').select('id').eq('id', id)
+  throw porQueNadaMudou(Boolean(lidos?.length), recusas)
+}
+
+// O banco recusa pelo código do Postgres e pelo nome da restrição (migração processos); a frase usa o que foi enviado.
+async function falhaDoProcesso(
+  cliente: ClienteSupabase, erro: ErroDoBanco, recusas: RecusasDoModulo, dados?: DadosDaFalha,
+): Promise<Error> {
+  if (dados && erro.code === '23505' && erro.message.includes('processos_nome_unico')) {
+    return new TravaDoBanco(`Já existe um processo com o nome ${dados.nome} no setor ${await siglaDoSetor(cliente, dados.setorId)}.`)
+  }
+  // O setor ou o macroprocesso escolhido foi excluído por outra pessoa enquanto o formulário estava aberto.
+  if (erro.code === '23503') return recusas.registroInexistente()
+  return recusaPorPerfil(erro, recusas.semPermissao)
+}
+
+async function siglaDoSetor(cliente: ClienteSupabase, setorId: string): Promise<string> {
+  const { data } = await cliente.from('setores').select('sigla').eq('id', setorId)
+  return data?.[0]?.sigla ?? setorId
+}

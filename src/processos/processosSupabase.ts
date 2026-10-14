@@ -3,10 +3,14 @@ import {
 } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import type { ClienteSupabase } from '../lib/supabase'
+import { lerEtapasDoSetor } from './etapasDoSetorSupabase'
+import { criarGravacaoDeProcessoSupabase } from './gravarProcessoSupabase'
+import { criarLeituraDeProcessoSupabase } from './lerProcessoSupabase'
+import { criarListaDeProcessosSupabase } from './listaDeProcessosSupabase'
 import { criarResponsaveisSupabase } from './responsaveisSupabase'
-import type { EtapaDoSetor, ModuloDeProcessos, StatusDaEtapa } from './tipos'
+import type { ModuloDeProcessos, StatusDaEtapa } from './tipos'
 
-// A etapa do setor só some junto com o setor: o aviso é o do cadastro excluído.
+// A etapa do setor só some junto com o setor, e o processo, quando outra pessoa o exclui: o aviso é o do item excluído.
 export const RECUSAS_DOS_PROCESSOS: RecusasDoModulo = {
   semPermissao: 'Seu perfil não permite alterar os processos.',
   registroInexistente: () => new CadastroInexistente(),
@@ -22,30 +26,10 @@ export function criarProcessosSupabase(cliente: ClienteSupabase): ModuloDeProces
     dispensarEtapa: (id, nota) => mudarAndamento(cliente, id, { status: 'dispensada', nota }),
     registrarRealizadaAnteriormente: (id, nota) => mudarAndamento(cliente, id, { status: 'realizada_anteriormente', nota }),
     ...criarResponsaveisSupabase(cliente, RECUSAS_DOS_PROCESSOS),
+    ...criarListaDeProcessosSupabase(cliente),
+    ...criarLeituraDeProcessoSupabase(cliente),
+    ...criarGravacaoDeProcessoSupabase(cliente, RECUSAS_DOS_PROCESSOS),
   }
-}
-
-type AndamentoLido = {
-  id: string
-  status: StatusDaEtapa
-  nota: string | null
-  iniciada_em: string | null
-  resolvida_em: string | null
-  etapas: { codigo: string; nome: string; ordem: number; obrigatoria: boolean } | null
-}
-
-// O banco não ordena o que vem embutido: a ordem do catálogo é aplicada aqui.
-async function lerEtapasDoSetor(cliente: ClienteSupabase, setorId: string): Promise<EtapaDoSetor[]> {
-  const { data, error } = await cliente.from('andamentos')
-    .select('id, status, nota, iniciada_em, resolvida_em, etapas(codigo, nome, ordem, obrigatoria)')
-    .eq('setor_id', setorId)
-  if (error) throw new Error(`Falha ao ler as etapas do setor: ${error.message}`)
-  return (data as AndamentoLido[]).flatMap(etapaDoSetor).sort((a, b) => a.ordem - b.ordem)
-}
-
-function etapaDoSetor({ etapas, iniciada_em, resolvida_em, ...andamento }: AndamentoLido): EtapaDoSetor[] {
-  if (!etapas) return []
-  return [{ ...andamento, ...etapas, iniciadaEm: iniciada_em, resolvidaEm: resolvida_em }]
 }
 
 async function mudarAndamento(cliente: ClienteSupabase, id: string, mudanca: MudancaDoAndamento): Promise<void> {

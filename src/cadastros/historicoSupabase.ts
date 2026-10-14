@@ -1,14 +1,14 @@
 import type { ClienteSupabase } from '../lib/supabase'
 import type { EstadoDoCadastro, EventoDoCadastro, ModuloDeCadastros } from './tipos'
 
-type EventoDoBanco = {
+export type EventoDoBanco = {
   id: number; ocorrido_em: string; acao: string; entidade: string; entidade_ref: string
   detalhes: { antes: EstadoDoCadastro; depois: EstadoDoCadastro; motivo?: string | null }; autor: { nome: string } | null
 }
 
 // Cadastros, etapas e responsáveis do setor. A RLS de eventos já deixa passar só estas entidades para quem não é administrador; o filtro mantém o mesmo
 // resultado para o administrador, que também lê os eventos de usuários (com e-mails).
-const ENTIDADES_DOS_CADASTROS = ['setor', 'macroprocesso', 'setor_envolvido', 'andamento', 'responsavel_do_setor']
+const ENTIDADES_DOS_CADASTROS = ['setor', 'macroprocesso', 'setor_envolvido', 'andamento', 'responsavel_do_setor', 'processo']
 
 export function criarHistoricoSupabase(cliente: ClienteSupabase): Pick<ModuloDeCadastros, 'listarHistoricoDosCadastros'> {
   return { listarHistoricoDosCadastros: () => listarHistoricoDosCadastros(cliente) }
@@ -23,7 +23,7 @@ async function listarHistoricoDosCadastros(cliente: ClienteSupabase): Promise<Ev
   return (data as unknown as EventoDoBanco[]).map(eventoDoCadastro)
 }
 
-function eventoDoCadastro(linha: EventoDoBanco): EventoDoCadastro {
+export function eventoDoCadastro(linha: EventoDoBanco): EventoDoCadastro {
   return {
     id: linha.id, ocorridoEm: linha.ocorrido_em, autor: linha.autor?.nome ?? null, acao: linha.acao,
     entidade: linha.entidade, entidadeRef: linha.entidade_ref, antes: linha.detalhes.antes, depois: linha.detalhes.depois,

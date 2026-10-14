@@ -64,6 +64,15 @@ describe('setores envolvidos no módulo real', () => {
     expect(cliente.pedidos[0]).toMatchObject({ tabela: 'setores_envolvidos', operacao: 'delete', filtros: FILTROS })
   })
 
+  test('tirar um setor que tem processos no macroprocesso vira a frase com a sigla e a quantidade', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['setores_envolvidos.delete'] = {
+      data: null, error: { code: 'P0001', message: 'setor_com_processos_no_macroprocesso:TSA:2' } }
+    const falha = await criar(cliente).tirarSetorDoMacroprocesso('m1', 's1').catch((erro: unknown) => erro)
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect((falha as Error).message).toBe('O setor TSA tem 2 processos neste macroprocesso; mova-os ou exclua-os antes.')
+  })
+
   test('anotar grava só a observação, pelos dois ids', async () => {
     const cliente = new ClienteSupabaseFalso()
     cliente.respostas['setores_envolvidos.update'] = { data: [{ setor_id: 's1' }], error: null }
