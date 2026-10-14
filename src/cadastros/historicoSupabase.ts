@@ -1,7 +1,7 @@
 import type { ClienteSupabase } from '../lib/supabase'
 import type { EstadoDoCadastro, EventoDoCadastro, ModuloDeCadastros } from './tipos'
 
-type EventoDoBanco = {
+export type EventoDoBanco = {
   id: number; ocorrido_em: string; acao: string; entidade: string; entidade_ref: string
   detalhes: { antes: EstadoDoCadastro; depois: EstadoDoCadastro; motivo?: string | null }; autor: { nome: string } | null
 }
@@ -23,7 +23,7 @@ async function listarHistoricoDosCadastros(cliente: ClienteSupabase): Promise<Ev
   return (data as unknown as EventoDoBanco[]).map(eventoDoCadastro)
 }
 
-function eventoDoCadastro(linha: EventoDoBanco): EventoDoCadastro {
+export function eventoDoCadastro(linha: EventoDoBanco): EventoDoCadastro {
   return {
     id: linha.id, ocorridoEm: linha.ocorrido_em, autor: linha.autor?.nome ?? null, acao: linha.acao,
     entidade: linha.entidade, entidadeRef: linha.entidade_ref, antes: linha.detalhes.antes, depois: linha.detalhes.depois,

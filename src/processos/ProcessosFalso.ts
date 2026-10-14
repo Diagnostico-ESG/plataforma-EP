@@ -1,4 +1,10 @@
-import type { DadosDoResponsavel, EtapaDoSetor, ModuloDeProcessos, ResponsavelDoSetor } from './tipos'
+import { TravaDoBanco } from '../acesso/falhasDeGravacao'
+import { CadastroInexistente } from '../cadastros/cadastroInexistente'
+import type { EventoDoCadastro } from '../cadastros/tipos'
+import type {
+  DadosDoProcesso, DadosDoResponsavel, EtapaDoCatalogo, EtapaDoSetor, ListaDeProcessos, ModuloDeProcessos,
+  ProcessoLido, ResponsavelDoSetor,
+} from './tipos'
 
 type ChamadaDeEtapa = { acao: string; id: string; nota?: string }
 
@@ -17,6 +23,21 @@ export class ProcessosFalso implements ModuloDeProcessos {
   chamadas: ChamadaDeEtapa[] = []
   /** Os responsáveis de cada setor (pelo id do setor). Leitura e gravação seguem as falhas acima. */
   responsaveisDoSetor: Record<string, ResponsavelDoSetor[]> = {}
+  /** Os processos cadastrados; a lista e a leitura partem daqui. */
+  processos: ProcessoLido[] = []
+  /** As etapas de nível processo do catálogo, na ordem dele (as colunas do Quadro). */
+  etapasDoCatalogo: EtapaDoCatalogo[] = []
+  /** O histórico de cada processo (pelo id do processo), do mais recente para o mais antigo. */
+  historicoDosProcessos: Record<string, EventoDoCadastro[]> = {}
+  /** Sigla e nome que o banco juntaria ao cartão (pelo id do setor e do macroprocesso). */
+  siglasDosSetores: Record<string, string> = {}
+  nomesDosMacroprocessos: Record<string, string> = {}
+  falharListaDeProcessos = false
+  segurarListaDeProcessos = false
+  falharLeituraDoProcesso = false
+  segurarLeituraDoProcesso = false
+  falharHistoricoDoProcesso = false
+  segurarHistoricoDoProcesso = false
   private proximoId = 1
 
   async lerEtapasDoSetor(setorId: string): Promise<EtapaDoSetor[]> {
@@ -61,6 +82,79 @@ export class ProcessosFalso implements ModuloDeProcessos {
   async excluirResponsavel(id: string): Promise<void> {
     this.conferirGravacao()
     this.mudarResponsaveis((lista) => lista.filter((responsavel) => responsavel.id !== id))
+  }
+
+  async listarProcessos(): Promise<ListaDeProcessos> {
+    if (this.segurarListaDeProcessos) return new Promise<never>(() => {})
+    if (this.falharListaDeProcessos) throw new Error('falha de conexão simulada')
+    return { etapas: [...this.etapasDoCatalogo], processos: [...this.processos] }
+  }
+
+  async lerProcesso(id: string): Promise<ProcessoLido | null> {
+    if (this.segurarLeituraDoProcesso) return new Promise<never>(() => {})
+    if (this.falharLeituraDoProcesso) throw new Error('falha de conexão simulada')
+    return this.processos.find((processo) => processo.id === id) ?? null
+  }
+
+  async lerHistoricoDoProcesso(id: string): Promise<EventoDoCadastro[]> {
+    if (this.segurarHistoricoDoProcesso) return new Promise<never>(() => {})
+    if (this.falharHistoricoDoProcesso) throw new Error('falha de conexão simulada')
+    return [...(this.historicoDosProcessos[id] ?? [])]
+  }
+
+  async criarProcesso(dados: DadosDoProcesso): Promise<void> {
+    this.conferirGravacao()
+    this.conferirNomeNovo(dados)
+    this.processos = [...this.processos, this.processoNovo(dados)]
+  }
+
+  async editarProcesso(id: string, dados: DadosDoProcesso): Promise<void> {
+    this.conferirGravacao()
+    const atual = this.processos.find((processo) => processo.id === id)
+    if (!atual) throw new CadastroInexistente()
+    this.conferirNomeNovo(dados, id)
+    // A edição não muda o tipo (a mudança é a reclassificação).
+    const campos: Partial<DadosDoProcesso> = { ...dados }
+    delete campos.tipo
+    this.processos = this.processos.map((processo) => (processo.id === id ? { ...processo, ...this.nomesDoCartao(dados), ...campos } : processo))
+  }
+
+  async excluirProcesso(id: string): Promise<void> {
+    this.conferirGravacao()
+    if (!this.processos.some((processo) => processo.id === id)) throw new CadastroInexistente()
+    this.processos = this.processos.filter((processo) => processo.id !== id)
+  }
+
+  // Imita o índice único do banco: o nome não se repete no setor, sem diferenciar maiúsculas.
+  private conferirNomeNovo(dados: DadosDoProcesso, idDoProprio?: string): void {
+    const repetido = this.processos.some((processo) => processo.id !== idDoProprio && processo.setorId === dados.setorId
+      && processo.nome.toLowerCase() === dados.nome.toLowerCase())
+    if (!repetido) return
+    const sigla = this.siglasDosSetores[dados.setorId] ?? dados.setorId
+    throw new TravaDoBanco(`Já existe um processo com o nome ${dados.nome} no setor ${sigla}.`)
+  }
+
+  private nomesDoCartao(dados: DadosDoProcesso) {
+    return {
+      setorSigla: this.siglasDosSetores[dados.setorId] ?? dados.setorId,
+      macroprocessoNome: this.nomesDosMacroprocessos[dados.macroprocessoId] ?? dados.macroprocessoId,
+    }
+  }
+
+  // O processo novo nasce com todas as etapas ativas do catálogo pendentes; aguarda o setor se as dele não estão resolvidas.
+  private processoNovo(dados: DadosDoProcesso): ProcessoLido {
+    const etapas = this.etapasDoCatalogo.filter((etapa) => etapa.ativa)
+    const primeira = etapas[0]
+    return {
+      ...dados, ...this.nomesDoCartao(dados), id: `p${this.proximoId++}`, situacao: 'em_andamento',
+      etapaAtual: primeira ? { codigo: primeira.codigo, nome: primeira.nome, ordem: primeira.ordem } : null,
+      aguardandoOSetor: (this.etapasDoSetor[dados.setorId] ?? []).some((etapa) => etapa.status === 'pendente' || etapa.status === 'em_andamento'),
+      responsavel: null, motivoDaSituacao: null, etapasDoSetor: this.etapasDoSetor[dados.setorId] ?? [],
+      etapasDoProcesso: etapas.map((etapa) => ({
+        id: `a${this.proximoId++}`, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, obrigatoria: true,
+        status: 'pendente', nota: null, iniciadaEm: null, resolvidaEm: null, responsavelNome: null,
+      })),
+    }
   }
 
   private conferirGravacao(): void {

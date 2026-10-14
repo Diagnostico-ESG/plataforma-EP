@@ -119,14 +119,14 @@
   - `DadosDoProcesso = { nome; setorId; macroprocessoId; tipo: 'processo' | 'a_classificar'; origem; contexto: string | null; observacoes: string | null }`.
   - Em `ModuloDeProcessos`: `listarProcessos(): Promise<ListaDeProcessos>`, `lerProcesso(id: string): Promise<ProcessoLido | null>`, `criarProcesso(dados: DadosDoProcesso): Promise<void>`, `editarProcesso(id: string, dados: DadosDoProcesso): Promise<void>` (o tipo não muda na edição: o módulo ignora `dados.tipo`), `excluirProcesso(id: string): Promise<void>`, `lerHistoricoDoProcesso(id: string): Promise<EventoDoCadastro[]>`.
 
-- [ ] **Step 1: contrato.** Acrescentar os tipos e as seis operações a `tipos.ts` (importando `EventoDoCadastro` de `../cadastros/tipos`; sem ciclo). Ajustar o comentário do tipo: "etapa, responsável ou processo que já não existe, como CadastroInexistente".
-- [ ] **Step 2: testes que falham**, com `ClienteSupabaseFalso` (um arquivo por módulo novo):
+- [x] **Step 1: contrato.** Acrescentar os tipos e as seis operações a `tipos.ts` (importando `EventoDoCadastro` de `../cadastros/tipos`; sem ciclo). Ajustar o comentário do tipo: "etapa, responsável ou processo que já não existe, como CadastroInexistente".
+- [x] **Step 2: testes que falham**, com `ClienteSupabaseFalso` (um arquivo por módulo novo):
   - `listaDeProcessosSupabase.test.ts`: lê `processos_com_andamento` ordenada por `nome` e `etapas` do nível processo ordenadas por `ordem`; mapeia colunas para os tipos da tela (inclusive `aguardando_o_setor`, `etapa_atual_*` nulos → `etapaAtual: null`, responsável sem id → `null`); falha de leitura vira `Error('Falha ao ler os processos: ...')`.
   - `lerProcessoSupabase.test.ts`: `lerProcesso` junta a linha da view, os andamentos do processo (com `etapas(...)` e `usuarios(nome)` embutidos, ordenados pela `ordem`) e as etapas do setor (reaproveita a leitura de `lerEtapasDoSetor`); id inexistente → `null`; `lerHistoricoDoProcesso` filtra `eventos` por `entidade = 'processo'` e `entidade_ref = id`, ordem do mais recente ao mais antigo, e mapeia como `historicoSupabase`.
   - `gravarProcessoSupabase.test.ts`: `criarProcesso` insere `{ setor_id, macroprocesso_id, nome, tipo, origem, contexto, observacoes }`; `editarProcesso` atualiza só `setor_id, macroprocesso_id, nome, origem, contexto, observacoes` com `.eq('id', id).select('id')`; `excluirProcesso` apaga e confirma; `23505` + `processos_nome_unico` vira `TravaDoBanco("Já existe um processo com o nome {nome} no setor {SIGLA}.")` (sigla lida de `setores`); `42501` vira "Seu perfil não permite alterar os processos."; nenhuma linha afetada: legível = perfil, ilegível = `CadastroInexistente`; `23503` do vínculo (setor ou macroprocesso sumiu) = `CadastroInexistente`.
   `npx vitest run src/processos` → FAIL.
-- [ ] **Step 3: implementação** nos três arquivos (funções ≤ 20 linhas; leituras e gravações separadas, mapeamentos em funções nomeadas) e `processosSupabase.ts` espalhando os três módulos no objeto devolvido, como já faz com `criarResponsaveisSupabase`. `npx vitest run src/processos` → PASS; `npx tsc -b` limpo.
-- [ ] **Step 4: commit** "Ticket 04 de processos-etapas: módulo de processos real".
+- [x] **Step 3: implementação** nos três arquivos (funções ≤ 20 linhas; leituras e gravações separadas, mapeamentos em funções nomeadas) e `processosSupabase.ts` espalhando os três módulos no objeto devolvido, como já faz com `criarResponsaveisSupabase`. `npx vitest run src/processos` → PASS; `npx tsc -b` limpo.
+- [x] **Step 4: commit** "Ticket 04 de processos-etapas: módulo de processos real".
 
 ---
 
@@ -139,12 +139,12 @@
 **Interfaces:**
 - Produces: `colunasDoQuadro(lista: ListaDeProcessos): ColunaDoQuadro[]` com `ColunaDoQuadro = { chave: string; titulo: string; processos: ProcessoDaLista[] }`; `problemaNoProcesso(campos: CamposDoProcesso): string | null`; `dadosDoProcesso(campos: CamposDoProcesso): DadosDoProcesso`; `CamposDoProcesso = { nome; setorId; macroprocessoId; tipo; origem; contexto; observacoes }` (textos do formulário). `ProcessosFalso`: `processos: ProcessoLido[]`, `etapasDoCatalogo: EtapaDoCatalogo[]`, `historicoDosProcessos: Record<string, EventoDoCadastro[]>`, `siglasDosSetores`, `nomesDosMacroprocessos`.
 
-- [ ] **Step 1: testes que falham.**
+- [x] **Step 1: testes que falham.**
   - `colunasDoQuadro.test.ts`: primeira coluna "Aguardando o setor" com os que aguardam; uma coluna por etapa ativa na ordem do catálogo; processo na coluna da etapa atual; concluídos e cancelados fora; suspenso dentro (com a situação); ordem pelo nome (pt-BR, sem diferenciar maiúsculas); coluna de etapa inativa só aparece se houver processo nela; coluna vazia aparece.
   - `validacaoDoProcesso.test.ts`: nome em branco → "O nome do processo é obrigatório."; setor vazio → "Escolha o setor do processo."; macroprocesso vazio → "Escolha o macroprocesso do processo."; dados saem sem espaços nas pontas e com vazios como `null`.
   `npx vitest run src/processos` → FAIL.
-- [ ] **Step 2: implementação** das duas funções puras e do falso. O falso: `listarProcessos`/`lerProcesso` respeitam `falharLeitura` e `segurarLeitura`; `criarProcesso` recusa nome repetido no setor (sem diferenciar maiúsculas, com a frase do banco e a sigla de `siglasDosSetores`) e inclui um `ProcessoLido` novo (`id` `p1`, `p2`…; seis etapas pendentes de `etapasDoCatalogo`); `editarProcesso` e `excluirProcesso` seguem `falhaDeGravacao`; excluir/editar id inexistente lança `CadastroInexistente`; `lerHistoricoDoProcesso` devolve `historicoDosProcessos[id] ?? []`. Reaproveitar `conferirGravacao` já existente.
-- [ ] **Step 3:** `npx vitest run src/processos` → PASS; `npx tsc -b` limpo; commit "Ticket 04 de processos-etapas: falso do módulo, colunas do Quadro e validação do processo".
+- [x] **Step 2: implementação** das duas funções puras e do falso. O falso: `listarProcessos`/`lerProcesso` respeitam `falharLeitura` e `segurarLeitura`; `criarProcesso` recusa nome repetido no setor (sem diferenciar maiúsculas, com a frase do banco e a sigla de `siglasDosSetores`) e inclui um `ProcessoLido` novo (`id` `p1`, `p2`…; seis etapas pendentes de `etapasDoCatalogo`); `editarProcesso` e `excluirProcesso` seguem `falhaDeGravacao`; excluir/editar id inexistente lança `CadastroInexistente`; `lerHistoricoDoProcesso` devolve `historicoDosProcessos[id] ?? []`. Reaproveitar `conferirGravacao` já existente.
+- [x] **Step 3:** `npx vitest run src/processos` → PASS; `npx tsc -b` limpo; commit "Ticket 04 de processos-etapas: falso do módulo, colunas do Quadro e validação do processo".
 
 ---
 
