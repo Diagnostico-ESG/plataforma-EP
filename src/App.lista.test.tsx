@@ -77,6 +77,8 @@ test('clicar na linha abre o painel com a Lista esmaecida atrás; fechar volta �
   fireEvent.click((await screen.findAllByRole('cell', { name: 'TSA' }))[0])
   await waitFor(() => expect(window.location.hash).toBe('#/processos/lista/p4'))
   expect(await screen.findByRole('complementary', { name: 'Painel do processo' })).toBeTruthy()
+  // O botão de fechar do "Carregando processo…" é trocado pelo do cabeçalho; clicar antes pegaria o que já saiu da tela.
+  await screen.findByRole('heading', { name: 'Arquivar Pasta' })
   const fundo = screen.getByRole('table').closest('.quadro-esmaecido')
   expect(fundo?.hasAttribute('inert')).toBe(true)
   fireEvent.click(screen.getByRole('button', { name: 'Fechar o painel' }))
