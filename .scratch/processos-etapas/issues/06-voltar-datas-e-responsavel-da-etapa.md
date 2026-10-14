@@ -18,3 +18,5 @@
 - [ ] Histórico: "Voltou à etapa", "Corrigiu as datas da etapa", "Mudou o responsável da etapa", com o motivo.
 - [ ] A Consulta não vê as ações nem os campos editáveis.
 - [ ] Testes de interface com o aplicativo inteiro: voltar (processo e setor) com sucesso e com falha, a janela de motivo, as datas recusadas com o valor recebido, o seletor de responsável e o avatar no cartão.
+
+Concluído em 2026-10-14 (commit 1920fe7)
