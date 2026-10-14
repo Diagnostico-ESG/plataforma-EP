@@ -560,8 +560,22 @@ export type Database = {
       }
     }
     Functions: {
+      acrescentar_etapa: {
+        Args: {
+          p_antes_de: string
+          p_codigo: string
+          p_nivel: Database["public"]["Enums"]["nivel_da_etapa"]
+          p_nome: string
+          p_obrigatoria: boolean
+        }
+        Returns: string
+      }
       cancelar_processo: {
         Args: { p_motivo: string; p_processo: string }
+        Returns: undefined
+      }
+      mover_etapa: {
+        Args: { p_etapa: string; p_sentido: string }
         Returns: undefined
       }
       reclassificar_processo: {

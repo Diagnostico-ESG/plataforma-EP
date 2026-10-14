@@ -81,6 +81,11 @@ select pg_temp.conferir_catalogo('00000000-0000-0000-0000-0000000000a2', 'Integr
 select pg_temp.conferir_catalogo('00000000-0000-0000-0000-0000000000a3', 'Consulta', false, 9);
 select pg_temp.conferir_catalogo('00000000-0000-0000-0000-0000000000a4', 'Inativo', false, 0);
 
+-- O id da etapa lido pelo dono do banco: o inativo não lê o catálogo, e a recusa dele tem de vir da RLS de
+-- andamentos (desde o ticket 10 o logado tem o privilégio de incluir, que o catálogo usa).
+create temp table _etapa_modelagem as select id from public.etapas where codigo = 'modelagem';
+grant select on _etapa_modelagem to authenticated;
+
 -- Andamentos: Administrador e Integrante mudam o status; ninguém cria, apaga ou troca etapa e setor direto.
 create function pg_temp.conferir_andamentos(id_usuario text, quem text, sigla_do_setor text, altera boolean, le int)
 returns void language plpgsql as $$
@@ -93,7 +98,7 @@ begin
     quem || case when le > 0 then ' lê as etapas do setor' else ' não lê as etapas do setor' end);
   insert into _tap (linha) select throws_ok(
     $sql$insert into public.andamentos (etapa_id, setor_id)
-      select id, '5b000000-0000-0000-0000-000000000003' from public.etapas where codigo = 'modelagem'$sql$,
+      select id, '5b000000-0000-0000-0000-000000000003' from _etapa_modelagem$sql$,
     '42501', null, quem || ' não cria andamento direto');
   -- Desde o ticket 10 o logado tem o privilégio de apagar (o catálogo usa), e a RLS filtra sem erro: nada é apagado.
   with apagados as (delete from public.andamentos returning 1)
