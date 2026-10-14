@@ -32,7 +32,7 @@
 
 **Arquivos:** criar `supabase/tests/20_situacao_do_processo.test.sql`; alterar `supabase/tests/17_processos.test.sql` (linhas ~87-89 e ~269).
 
-- [ ] Escrever o teste 20 (33 asserções, molde do 19): suspender com motivo, situação, `motivo_da_situacao`, evento `suspender` com motivo; suspender suspenso e sem motivo recusados; iniciar etapa, mudar responsável e voltar com o processo suspenso recusados (`processo_parado:suspenso`); retomar sem motivo recusado; retomar limpa o motivo e gera evento `retomar`; etapa volta a andar; cancelar (de em andamento e de suspenso), evento `cancelar`, cancelado→suspender recusado, etapa de cancelado recusada, retomar cancelado; mudança direta recusada; processo inexistente; funções sem `security definer`; Consulta recusada nas três (`42501`), inativo (`registro_inexistente`) e visitante (`42501`).
+- [ ] Escrever o teste 20 (31 asserções, molde do 19): suspender com motivo, situação, `motivo_da_situacao`, evento `suspender` com motivo; suspender suspenso e sem motivo recusados; iniciar etapa, mudar responsável e voltar com o processo suspenso recusados (`processo_parado:suspenso`); retomar sem motivo recusado; retomar limpa o motivo e gera evento `retomar`; etapa volta a andar; cancelar (de em andamento e de suspenso), evento `cancelar`, cancelado→suspender recusado, etapa de cancelado recusada, retomar cancelado; mudança direta recusada; processo inexistente; funções sem `security definer`; Consulta recusada nas três (`42501`), inativo (`registro_inexistente`) e visitante (`42501`).
 - [ ] Ajustar o teste 17 como descrito em "Decisões".
 - [ ] Comitar, `git push` da branch, disparar "Testes de banco" e ler o resultado: o teste 20 deve falhar por função inexistente (e o 17 por já ter o privilégio velho).
 
@@ -41,7 +41,7 @@
 **Arquivos:** criar com `npx supabase migration new situacao_do_processo`, só depois da rodada que provou a falha.
 
 - [ ] Escrever a migração: `grant update (situacao, motivo_da_situacao)`; `private.mudando_situacao()`; `private.conferir_transicao_da_situacao(de, para)`; gatilho `conferir_situacao_do_processo` (antes de alterar `processos`); `private.mudar_situacao(processo, nova, motivo)`; as três funções públicas; `private.conferir_processo_em_andamento(uuid)` e `preparar_andamento` com a chamada nova (resto igual ao do ticket 06); `private.acao_do_processo(operacao, antes, depois)` e `registrar_evento_do_processo` com ação e `motivo`; `revoke`/`grant`.
-- [ ] Comitar, `git push`, disparar "Migrar banco de desenvolvimento" na branch com o arquivo novo e depois "Testes de banco": os 21 arquivos verdes, o 20 com 33 de 33.
+- [ ] Comitar, `git push`, disparar "Migrar banco de desenvolvimento" na branch com o arquivo novo e depois "Testes de banco": os 21 arquivos verdes, o 20 com 31 de 31.
 - [ ] `npm run db:types` (vínculo conferido); conferir que `suspender_processo`, `cancelar_processo` e `retomar_processo` entraram em `Functions`.
 - [ ] Registrar a migração em `supabase/AMBIENTES.md`. Comitar migração, teste e tipos juntos.
 
