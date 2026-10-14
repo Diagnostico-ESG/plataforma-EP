@@ -47,3 +47,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-14 | escala-interface | executar-simples + polir | US$ 0,93
 2026-10-14 | processos-etapas | /situação e /executar-complexo (ticket 04) | US$ 14,11
 2026-10-14 | processos-etapas | /situação e /executar-complexo (ticket 05) | US$ 8,17
+2026-10-14 | processos-etapas | /situação e /executar-complexo (ticket 06) | US$ 10,94
