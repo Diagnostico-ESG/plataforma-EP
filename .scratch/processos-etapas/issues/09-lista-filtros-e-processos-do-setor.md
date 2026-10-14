@@ -17,3 +17,5 @@
 - [ ] Tela do setor: "Processos do setor" com nome, tipo, etapa atual e situação; "Este setor ainda não tem processos."; "Carregando processos do setor…"; clicar abre o painel.
 - [ ] Funções puras de leitura e escrita dos filtros no endereço com testes unitários.
 - [ ] Testes de interface com o aplicativo inteiro: cada filtro, a combinação de filtros, recarregar com filtros no endereço, limpar filtros, a lista do setor e a Consulta.
+
+Concluído em 2026-10-14 (commit b455a2e)
