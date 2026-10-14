@@ -18,3 +18,5 @@
 - [ ] A Consulta vê nome, e-mail e cargo, sem botões.
 - [ ] Histórico da área Setores mostra os eventos dos responsáveis e entra no filtro pelo setor.
 - [ ] Testes de interface com o aplicativo inteiro: criar, editar e excluir com sucesso e com falha, a validação do e-mail com o valor recebido, a janela (Cancelar e Esc sem gravar), a Consulta e os estados.
+
+Concluído em 2026-10-14 (commit a71c7c1)
