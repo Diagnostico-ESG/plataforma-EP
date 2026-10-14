@@ -87,12 +87,12 @@
   /* Tipografia */
   --fonte: 'Source Sans 3', system-ui, sans-serif;
   --fonte-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
-  --tam-rotulo: 11px;
-  --tam-secundario: 12px;
-  --tam-base: 13px;
-  --tam-coluna: 14px;
-  --tam-painel: 16px;
-  --tam-pagina: 20px;
+  --tam-rotulo: 12px;
+  --tam-secundario: 13px;
+  --tam-base: 15px;
+  --tam-coluna: 16px;
+  --tam-painel: 18px;
+  --tam-pagina: 22px;
 
   /* Espaçamento */
   --esp-1: 4px;
@@ -104,6 +104,9 @@
 
   /* Forma */
   --largura-faixa: 56px;
+  --largura-conteudo: 1280px;
+  --largura-formulario: 550px;
+  --largura-coluna-quadro: 310px;
   --canto: 6px;
   --canto-botao: 4px;
   --canto-macro: 2px;

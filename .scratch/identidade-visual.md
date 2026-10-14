@@ -63,12 +63,12 @@ Só tema claro. Tema escuro fica fora (não pedido).
 
 | Tamanho | Peso | Uso |
 |---|---|---|
-| 11px | 600, maiúsculas, espaçamento 0,5px | Rótulo de seção ("ETAPAS DO SETOR"), texto de pílula |
-| 12px | 400 | Texto secundário, metadados, mono de códigos (11–12px) |
-| 13px | 400 / 600 | Base da interface; nome do processo no cartão (600) |
-| 14px | 600 | Título de coluna, título da barra superior |
+| 12px | 600, maiúsculas, espaçamento 0,5px | Rótulo de seção ("ETAPAS DO SETOR"), texto de pílula |
+| 13px | 400 | Texto secundário, metadados, mono de códigos (12–13px) |
+| 15px | 400 / 600 | Base da interface; nome do processo no cartão (600) |
+| 16px | 600 | Título de coluna, título da barra superior |
 | 16px | 700 | Nome na barra superior ("EP"), título do painel |
-| 20px | 700 | Título de página (setor, administração) |
+| 22px | 700 | Título de página (setor, administração) |
 
 ## Espaçamento e forma
 
@@ -87,7 +87,7 @@ Só tema claro. Tema escuro fica fora (não pedido).
   - Cabeçalho da coluna: nome, contagem em mono, barrinha de proporção; o círculo azul "+" só na primeira coluna.
   - Coluna vazia: bloco tracejado com texto.
   - Com mais colunas que a tela, o quadro rola para o lado; uma indicação discreta mostra que há colunas fora da vista.
-- **Cartão do processo:** quadradinho(s) de macroprocesso no topo; nome (13px, 600); sigla do setor e versão em mono; pílula de situação quando houver (atraso, vencendo, aguarda revisor, aprovado com número do E-protocolo); rodapé com ícones e contagens (dias na etapa, versões, rodadas) e avatar do responsável à direita. Cartão escolhido: linha acesa.
+- **Cartão do processo:** quadradinho(s) de macroprocesso no topo; nome (15px, 600); sigla do setor e versão em mono; pílula de situação quando houver (atraso, vencendo, aguarda revisor, aprovado com número do E-protocolo); rodapé com ícones e contagens (dias na etapa, versões, rodadas) e avatar do responsável à direita. Cartão escolhido: linha acesa.
 - **Painel de detalhe (abre à direita ao clicar num cartão ou numa linha):** o quadro fica esmaecido atrás e o cartão continua aceso. Cabeçalho com quadradinho da sigla (fundo `azul`), nome, macroprocesso e responsável, pílula de situação e botão fechar. Abaixo, o **caminho de etapas** ("✓ Ident. → ✓ Sensib. → … → **Rev. setor** → Aprov.": feitas com ✓ em `texto`, atual em `azul` com sublinhado aceso, futuras em `texto-2`). Abas: Documentos, Revisões, Reuniões, Histórico (ativa com sublinhado aceso). Abaixo de 900px de largura, o painel ocupa a tela inteira.
 - **Aba Documentos:** filtros em pílula (Todos, Fluxogramas, Relatórios), botão "Enviar nova versão"; caixa de pendência quando um fluxograma não tem o relatório da mesma versão; prévia do fluxograma atual com "Abrir visualizador"; versões da mais nova para a mais antiga (V3 com pílula "atual", anteriores "substituída", V1F com cadeado e pílula "histórica · somente leitura"); cada arquivo numa linha com barrinha do tipo, nome em mono, data, avatar de quem enviou e botão baixar; rodapé "Versões nunca se apagam".
 - **Lista:** a mesma informação do quadro em tabela compacta, para filtrar, ordenar e exportar; clicar na linha abre o mesmo painel.
@@ -152,3 +152,7 @@ Sem "por favor", sem exclamação, sem pedir desculpa; dizer o que houve e o que
 - Fontes e ícones: guardar os arquivos no projeto. Se a implementação quiser um pacote de ícones ou de fontes, isso é dependência nova e pede ADR curto; ícones em SVG próprio também servem.
 - Arrastar cartões não entra na identidade: a primeira versão usa botões; arrastar é decisão do `/planejar` de "Processos e etapas" (exigiria biblioteca e ADR).
 - Os detalhes de cada tela (campos, permissões por perfil) vêm das specs do `/planejar`.
+
+## Registro de mudanças
+
+- 2026-10-14 — Escala da interface: fontes +2px (rótulo 12, secundário 13, base 15, coluna 16, painel 18, página 22) e larguras +15% em tokens (`--largura-conteudo` 1280px, `--largura-formulario` 550px, `--largura-coluna-quadro` 310px). Decisão do usuário; fonte, paleta e estrutura não mudaram.

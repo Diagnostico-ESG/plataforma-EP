@@ -2,7 +2,7 @@
   display: grid;
   gap: var(--esp-4);
   padding: var(--esp-5);
-  max-width: 1100px;
+  max-width: var(--largura-conteudo);
 }
 
 .cadastros-abas {
@@ -47,7 +47,7 @@
 .form-setor {
   display: grid;
   gap: var(--esp-2);
-  max-width: 480px;
+  max-width: var(--largura-formulario);
 }
 
 .form-setor-titulo {
@@ -106,7 +106,7 @@
 .setor-leitura {
   display: grid;
   gap: var(--esp-3);
-  max-width: 480px;
+  max-width: var(--largura-formulario);
 }
 
 .setor-leitura-dados {

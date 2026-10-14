@@ -2,7 +2,7 @@
   display: grid;
   gap: var(--esp-4);
   padding: var(--esp-5);
-  max-width: 1100px;
+  max-width: var(--largura-conteudo);
 }
 
 .administracao-titulo {
