@@ -417,7 +417,7 @@ create policy "eventos: perfil ativo lê os responsáveis do setor" on public.ev
 
 Atenção: `private.preparar_responsavel_do_setor` não é `security definer` e não chama outra função: a execução pode ficar tirada de `authenticated` (como `preparar_andamento`).
 
-- [ ] **Step 5: aplicar e ver passar.** Commit "Ticket 03 de processos-etapas: migração dos responsáveis do setor"; `git push`; disparar "Migrar banco de desenvolvimento" com o nome do arquivo criado no passo 4; depois "Testes de banco" na branch. Esperado: os 17 arquivos verdes, `16_responsaveis_do_setor` com 49 de 49. Se algum item falhar, corrigir com **migração nova** (a já aplicada não se edita) ou o teste, se o erro for dele.
+- [x] **Step 5: aplicar e ver passar.** Commit "Ticket 03 de processos-etapas: migração dos responsáveis do setor"; `git push`; disparar "Migrar banco de desenvolvimento" com o nome do arquivo criado no passo 4; depois "Testes de banco" na branch. Esperado: os 17 arquivos verdes, `16_responsaveis_do_setor` com 49 de 49. Se algum item falhar, corrigir com **migração nova** (a já aplicada não se edita) ou o teste, se o erro for dele.
 
 - [x] **Step 6: registro e tipos.** Acrescentar em `supabase/AMBIENTES.md`, na lista das migrações aplicadas, a linha `- <arquivo sem .sql> (2026-10-13; processos-etapas, ticket 03; teste 16 falhou antes, tabela inexistente, e 13 falhou no "antes" da exclusão do setor; passaram depois, com os 17 arquivos verdes; aplicada pelo workflow "Migrar banco de desenvolvimento", e testada pelo "Testes de banco" na branch)`. Conferir o vínculo (`AMBIENTES.md` e `supabase/.temp/project-ref` = `yclkzyoebpsxmgpbcbus`), `npm run db:types`, `npx tsc -b` limpo (`responsaveis_do_setor` aparece em `src/types/database.ts`). Commit "Ticket 03 de processos-etapas: tipos e registro da migração"; `git push`.
 
@@ -1236,7 +1236,7 @@ Run: o mesmo comando → PASS; `npm test`, `npx tsc -b`, `npx eslint .` limpos.
 
 ### Task 6: Fechamento do ticket
 
-- [ ] **Step 1: conferência final.** `npm test` (todos verdes), `npx tsc -b`, `npx eslint .`, `npx madge --circular --extensions ts,tsx src` limpos; "Testes de banco" verde na branch depois do último `git push`.
+- [x] **Step 1: conferência final.** `npm test` (todos verdes), `npx tsc -b`, `npx eslint .`, `npx madge --circular --extensions ts,tsx src` limpos; "Testes de banco" verde na branch depois do último `git push`.
 - [ ] **Step 2: conferência visual (critério 5).** Subir `npm run dev` em segundo plano e abrir pelo navegador do app; com login, olhar a tela de um setor: seção acima das etapas, tabela, formulário aberto, janela de exclusão e erro do e-mail. Se não houver login no navegador da sessão, pedir ao usuário que confira (como no ticket 02).
 - [ ] **Step 3: integrar.** `git switch main`; `git merge --no-ff processos-etapas -m "Integra o ticket 03 de processos-etapas"`; `npm test`; `git branch -d processos-etapas`; `git push`. Conferir o "Testes de banco" disparado na `main` (o envio mexe em `supabase/`).
 - [ ] **Step 4: marcas.** Seguir o fim do `/executar-complexo`: linha `Concluído em` no ticket, commit, apontar o próximo ticket (04, Cadastro de processos e quadro), notas do protocolo, avisar o usuário dos textos novos fora da spec ("O nome do responsável é obrigatório." e a janela sem texto de apoio) e o `/cost`.
