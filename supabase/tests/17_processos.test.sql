@@ -9,7 +9,7 @@ grant all on sequence _tap_n_seq to anon, authenticated;
 -- O processo que a exclusão vai apagar, guardado antes para conferir os andamentos depois.
 create temp table _alvo (id uuid);
 grant all on _alvo to authenticated;
-insert into _tap (linha) select plan(80);
+insert into _tap (linha) select plan(79);
 
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 -- O inativo é administrador de propósito: a recusa dele só pode vir de estar inativo.
@@ -150,7 +150,7 @@ insert into _tap (linha) select throws_ok(
       (select id from public.processos limit 1))$sql$,
   '42501', null, 'o pai não se informa na inclusão (ticket 08)');
 
--- Andamentos do processo: nascem pendentes; ninguém cria, apaga nem muda direto neste ticket.
+-- Andamentos do processo: nascem pendentes; ninguém cria nem apaga direto.
 insert into _tap (linha) select is(
   (select count(*)::int from public.andamentos a join public.etapas e on e.id = a.etapa_id
     where a.processo_id = (select id from public.processos
@@ -165,11 +165,6 @@ insert into _tap (linha) select throws_ok(
 insert into _tap (linha) select throws_ok(
   $sql$delete from public.andamentos where processo_id is not null$sql$, '42501', null,
   'andamento de processo não se apaga direto');
-with alterados as (update public.andamentos set status = 'em_andamento'
-  where processo_id = (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004')
-    and etapa_id = (select id from public.etapas where codigo = 'modelagem') returning 1)
-insert into _tap (linha) select is((select count(*)::int from alterados), 0,
-  'andamento de processo ainda não muda (ticket 05)');
 
 -- Eventos do cadastro: o criar traz os campos legíveis, o vínculo do setor incluído também.
 insert into _tap (linha) select is(
@@ -220,9 +215,7 @@ insert into _tap (linha) select throws_ok(
   'P0001', 'macroprocesso_com_processos:1', 'excluir macroprocesso com processo é recusado');
 reset role;
 
--- A view, com o estado montado pelo dono do banco. Os andamentos de processo só mudam assim neste ticket, e o
--- gatilho de eventos do andamento ainda é só do setor (ticket 05): desligado aqui, dentro da transação do teste.
-alter table public.andamentos disable trigger registrar_evento_do_andamento;
+-- A view, com o estado montado pelo dono do banco.
 insert into _tap (linha) select is(
   (select etapa_atual_codigo from public.processos_com_andamento
     where setor_id = '5e000000-0000-0000-0000-000000000004'),
@@ -254,7 +247,19 @@ insert into _tap (linha) select is(
   'em_andamento', 'com etapas obrigatórias pendentes o processo está em andamento');
 update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
   where processo_id = (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004')
-    and etapa_id in (select id from public.etapas where obrigatoria and nivel = 'processo');
+    and etapa_id = (select id from public.etapas where codigo = 'modelagem');
+update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
+  where processo_id = (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004')
+    and etapa_id = (select id from public.etapas where codigo = 'relatorio_modelagem_tecnica');
+update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
+  where processo_id = (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004')
+    and etapa_id = (select id from public.etapas where codigo = 'revisao_interna');
+update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
+  where processo_id = (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004')
+    and etapa_id = (select id from public.etapas where codigo = 'revisao_setor');
+update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
+  where processo_id = (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004')
+    and etapa_id = (select id from public.etapas where codigo = 'aprovacao_setor');
 insert into _tap (linha) select is(
   (select situacao from public.processos_com_andamento where setor_id = '5e000000-0000-0000-0000-000000000004'),
   'concluido', 'com as obrigatórias resolvidas o processo aparece como concluído');
