@@ -44,3 +44,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-14 | processos-etapas | /situação e /executar-complexo (ticket 03, retomada) | US$ 20,93
 2026-10-14 | projeto | /situação e decisões visuais (largura do Quadro, escala da interface) | US$ 1,65
 2026-10-14 | projeto | /situação e /demanda (escala da interface) | US$ 0,77
+2026-10-14 | escala-interface | executar-simples + polir | US$ 0,93
