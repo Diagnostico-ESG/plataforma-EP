@@ -351,3 +351,15 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Skills `writing-plans` e `executing-plans`:** acionadas pelo `Skill` sem recusa. Escrevi as caixas do plano já marcadas por engano e as desmarquei antes de começar.
 - **claude-mem sem cota:** o aviso apareceu no início da sessão; a sessão segue sem registro nele até a cota voltar.
 - **Observação:** rodou em Sonnet, como a tabela recomenda.
+
+## 2026-10-14 — /executar-complexo do ticket 08 (subprocessos e reclassificação)
+
+- **Item não testado: branch comum no `/executar-complexo`, marco antes do ticket, `plano-<número>.md`.** Esperado: branch `processos-etapas-08` a partir da `main`, marco `marco/2026-10-14-inicio-ticket-08-processos-etapas`, `plano-08.md`. Aconteceu: tudo isso; a retomada não foi usada.
+- **Item não testado: TDD de gatilhos e função de banco com o teste antes da migração.** Esperado: o teste falha, a migração é criada depois. Aconteceu: o teste 21 falhou por função inexistente (e o 17 nos três pontos que mudavam); a migração só foi criada depois, com `npx supabase migration new`. A sugestão do ticket 07 (buscar nos testes antigos o que mexe nas colunas que ganham privilégio) foi seguida no plano, e o 17 já foi ajustado antes da primeira rodada.
+- **Item não testado: migração com função em `public` e `db:types`.** Esperado: a função entra em `Functions` do `database.ts`. Aconteceu: entrou, mas com `p_pai: string`, sem aceitar nulo (o gerador não marca parâmetro anulável). Precisei de uma conversão de tipo comentada no módulo real. Sugestão: o plano de uma função com parâmetro opcional pode prever isso, ou a função pode declarar `default null` no parâmetro.
+- **Workflow "Migrar banco de desenvolvimento":** a primeira tentativa falhou porque passei o caminho (`supabase/migrations/...`) no campo, que só aceita o nome do arquivo. Nada foi aplicado; a segunda deu certo. Sugestão: o protocolo ou o plano pode dizer "só o nome do arquivo" no passo do workflow.
+- **Pre-commit e testes escritos antes do código:** o hook roda `tsc` e `vitest` sobre a pasta inteira, inclusive arquivos ainda não comitados, então o commit da migração falhou por causa de um teste vermelho da tarefa seguinte. Tirei o arquivo da pasta (para o rascunho da sessão), comitei e o devolvi. Sugestão: o plano pode dizer para escrever o teste da tarefa seguinte só depois de comitar a anterior.
+- **Navegador do app:** o painel mudou de escala no meio da sessão e os cliques por coordenada pararam de acertar; `javascript_tool` (clicar no botão pelo texto, focar o campo pelo `name`) e `find` + `form_input` foram os caminhos estáveis. O log do job só aparece depois de abrir o passo (`summary`) pelo script.
+- **Scripts de edição:** o arquivo do projeto usa CRLF; trocas por `node` com `\n` não pegaram sem normalizar antes. O `Edit` resolveu.
+- **Skills `writing-plans` e `executing-plans`:** acionadas pelo `Skill` sem recusa.
+- **Observação:** rodou em Opus 5.5, não em Sonnet como a tabela recomenda para o `/executar-*` (a sessão foi trocada de modelo antes do comando).
