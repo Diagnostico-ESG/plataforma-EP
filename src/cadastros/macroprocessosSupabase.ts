@@ -1,6 +1,7 @@
 import { type ErroDoBanco, TravaDoBanco, porQueNadaMudou, recusaPorPerfil } from '../acesso/falhasDeGravacao'
 import type { ClienteSupabase } from '../lib/supabase'
 import { RECUSAS_DOS_CADASTROS } from './cadastroInexistente'
+import { recusaDeProcessos } from './recusasDeProcessos'
 import type {
   DadosDoMacroprocesso, MacroprocessoComSetores, MacroprocessoDaLista, ModuloDeCadastros, SetorEnvolvido,
 } from './tipos'
@@ -76,6 +77,8 @@ async function excluir(cliente: ClienteSupabase, id: string): Promise<void> {
 
 // O banco recusa pelo código do Postgres e pelo nome da restrição (migração de macroprocessos); a frase usa o que foi enviado.
 function falhaDoMacroprocesso(erro: ErroDoBanco, dados: AlteracaoDoMacroprocesso): Error {
+  const recusaPorProcessos = recusaDeProcessos(erro)
+  if (recusaPorProcessos) return recusaPorProcessos
   const repetido = erro.code === '23505'
   if (repetido && erro.message.includes('macroprocessos_nome_unico')) {
     return new TravaDoBanco(`Já existe um macroprocesso com o nome ${dados.nome}.`)

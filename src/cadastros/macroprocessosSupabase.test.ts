@@ -103,6 +103,15 @@ describe('macroprocessos no módulo real', () => {
       tabela: 'macroprocessos', operacao: 'update', valores, filtro: ['id', 'm1'] })
   })
 
+  test('excluir macroprocesso com processos vira a frase com a quantidade', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['macroprocessos.delete'] = {
+      data: null, error: { code: 'P0001', message: 'macroprocesso_com_processos:1' } }
+    const falha = await criar(cliente).excluirMacroprocesso('m1').catch((erro: unknown) => erro)
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect((falha as Error).message).toBe('Não é possível excluir: macroprocesso tem 1 processo ligado.')
+  })
+
   test('excluir apaga pelo id', async () => {
     const cliente = new ClienteSupabaseFalso()
     cliente.respostas['macroprocessos.delete'] = { data: [{ id: 'm1' }], error: null }

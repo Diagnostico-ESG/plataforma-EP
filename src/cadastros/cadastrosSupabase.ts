@@ -4,6 +4,7 @@ import { RECUSAS_DOS_CADASTROS } from './cadastroInexistente'
 import { criarHistoricoSupabase } from './historicoSupabase'
 import { criarMacroprocessosSupabase } from './macroprocessosSupabase'
 import { compararMacroprocessos } from './ordemDosMacroprocessos'
+import { recusaDeProcessos } from './recusasDeProcessos'
 import { criarSetoresEnvolvidosSupabase } from './setoresEnvolvidosSupabase'
 import type {
   DadosDoSetor, MacroprocessoDoSetor, ModuloDeCadastros, SetorComMacroprocessos, SetorDaLista,
@@ -84,6 +85,8 @@ async function excluirSetor(cliente: ClienteSupabase, id: string): Promise<void>
 
 // O banco recusa pelo código do Postgres e pelo nome da restrição (migração de setores); a frase usa o que foi enviado.
 function falhaDoSetor(erro: ErroDoBanco, dados: Partial<DadosDoSetor>): Error {
+  const recusaPorProcessos = recusaDeProcessos(erro)
+  if (recusaPorProcessos) return recusaPorProcessos
   const repetido = erro.code === '23505'
   if (repetido && erro.message.includes('setores_sigla_key')) {
     return new TravaDoBanco(`Já existe um setor com a sigla ${dados.sigla}.`)

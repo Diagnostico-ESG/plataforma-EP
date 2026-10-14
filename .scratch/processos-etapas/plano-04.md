@@ -96,9 +96,9 @@
 - Consumes: mensagens P0001 da Task 1.
 - Produces: `excluirSetor` e `excluirMacroprocesso` rejeitam com `TravaDoBanco("Não é possível excluir: setor tem {n} processos ligados.")` (ou "macroprocesso"); `tirarSetorDoMacroprocesso` rejeita com `TravaDoBanco("O setor {SIGLA} tem {n} processos neste macroprocesso; mova-os ou exclua-os antes.")`; singular com n = 1.
 
-- [ ] **Step 1: testes que falham.** Em cada `*.test.ts`, um teste por recusa com `ClienteSupabaseFalso` respondendo `error: { message: 'setor_com_processos:2', code: 'P0001' }` (e `macroprocesso_com_processos:1`, `setor_com_processos_no_macroprocesso:TSA:3`), esperando a frase e o singular quando n = 1. `npx vitest run src/cadastros` → FAIL.
-- [ ] **Step 2: implementação.** Criar `src/cadastros/recusasDeProcessos.ts` (puro) com `frasesDeProcessos(erro: ErroDoBanco): Error | null` que reconhece os três padrões (`/\b(setor_com_processos_no_macroprocesso|setor_com_processos|macroprocesso_com_processos):(.*)$/m`) e devolve a `TravaDoBanco`; chamá-lo no começo de `falhaDoSetor` (só na exclusão), `falhaDoMacroprocesso` (exclusão) e no `tirar` de `setoresEnvolvidosSupabase` (hoje `recusaPorPerfil` direto). Testes do novo arquivo inclusos. `npx vitest run src/cadastros` → PASS.
-- [ ] **Step 3: commit** "Ticket 04 de processos-etapas: recusas de exclusão por processo nos cadastros".
+- [x] **Step 1: testes que falham.** Em cada `*.test.ts`, um teste por recusa com `ClienteSupabaseFalso` respondendo `error: { message: 'setor_com_processos:2', code: 'P0001' }` (e `macroprocesso_com_processos:1`, `setor_com_processos_no_macroprocesso:TSA:3`), esperando a frase e o singular quando n = 1. `npx vitest run src/cadastros` → FAIL.
+- [x] **Step 2: implementação.** Criar `src/cadastros/recusasDeProcessos.ts` (puro) com `frasesDeProcessos(erro: ErroDoBanco): Error | null` que reconhece os três padrões (`/\b(setor_com_processos_no_macroprocesso|setor_com_processos|macroprocesso_com_processos):(.*)$/m`) e devolve a `TravaDoBanco`; chamá-lo no começo de `falhaDoSetor` (só na exclusão), `falhaDoMacroprocesso` (exclusão) e no `tirar` de `setoresEnvolvidosSupabase` (hoje `recusaPorPerfil` direto). Testes do novo arquivo inclusos. `npx vitest run src/cadastros` → PASS.
+- [x] **Step 3: commit** "Ticket 04 de processos-etapas: recusas de exclusão por processo nos cadastros".
 
 ---
 

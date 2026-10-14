@@ -1,6 +1,7 @@
 import { type ErroDoBanco, TravaDoBanco, recusaPorPerfil } from '../acesso/falhasDeGravacao'
 import type { ClienteSupabase } from '../lib/supabase'
 import { CadastroInexistente, RECUSAS_DOS_CADASTROS } from './cadastroInexistente'
+import { recusaDeProcessos } from './recusasDeProcessos'
 import type { ModuloDeCadastros } from './tipos'
 
 type OperacoesDeVinculo = Pick<ModuloDeCadastros, 'porSetorNoMacroprocesso' | 'tirarSetorDoMacroprocesso'
@@ -24,7 +25,8 @@ async function por(cliente: ClienteSupabase, macroprocessoId: string, setorId: s
 async function tirar(cliente: ClienteSupabase, macroprocessoId: string, setorId: string): Promise<void> {
   const { data, error } = await cliente.from('setores_envolvidos').delete()
     .eq('macroprocesso_id', macroprocessoId).eq('setor_id', setorId).select('setor_id')
-  if (error) throw recusaPorPerfil(error, RECUSAS_DOS_CADASTROS.semPermissao)
+  // O banco recusa tirar o setor de um macroprocesso em que ele tem processos (migração processos).
+  if (error) throw recusaDeProcessos(error) ?? recusaPorPerfil(error, RECUSAS_DOS_CADASTROS.semPermissao)
   if (!data.length) await conferirPerfil(cliente, macroprocessoId, setorId)
 }
 
