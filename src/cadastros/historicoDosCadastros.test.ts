@@ -179,3 +179,25 @@ describe('etapas do setor no histórico', () => {
     expect(eventosDoItem([ETAPA_DISPENSADA], 's1')).toEqual([ETAPA_DISPENSADA])
   })
 })
+
+describe('responsáveis do setor', () => {
+  const RESPONSAVEL = { setor_id: 's1', setor_sigla: 'CEE', nome: 'Pessoa Fictícia', email: 'pessoa@exemplo.com', cargo: null }
+  const criado = evento({ entidade: 'responsavel_do_setor', entidadeRef: 's1:r1', depois: RESPONSAVEL })
+
+  test('o item é o nome com a sigla, e os campos aparecem legíveis', () => {
+    expect(nomeDoItem(criado)).toBe('Pessoa Fictícia — CEE')
+    expect(descreverEstadoDoCadastro(RESPONSAVEL)).toBe('Setor: CEE; Nome: Pessoa Fictícia; E-mail: pessoa@exemplo.com; Cargo: —')
+    expect(textoDaAcaoDoCadastro('criar', 'responsavel_do_setor')).toBe('Criou')
+  })
+
+  test('o evento entra no filtro pelo setor', () => {
+    expect(itensDoFiltro([criado])).toEqual([{ id: 's1', nome: 'CEE' }])
+    expect(eventosDoItem([criado], 's1')).toEqual([criado])
+  })
+
+  test('a exclusão do setor lista os responsáveis pelo nome', () => {
+    expect(descreverEstadoDoCadastro({ sigla: 'CEE', responsaveis: [RESPONSAVEL, { nome: 'Outra Fictícia' }] }))
+      .toBe('Sigla: CEE; Responsáveis: Pessoa Fictícia, Outra Fictícia')
+    expect(descreverEstadoDoCadastro({ sigla: 'CEE', responsaveis: [] })).toBe('Sigla: CEE; Responsáveis: nenhum')
+  })
+})

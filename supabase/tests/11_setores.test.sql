@@ -164,7 +164,7 @@ insert into _tap (linha) select is((pg_temp.evento_do_hist('desativar')).detalhe
 insert into _tap (linha) select is((pg_temp.evento_do_hist('reativar')).detalhes -> 'depois' ->> 'ativo', 'true',
   'reativar vira ação própria');
 insert into _tap (linha) select is((pg_temp.evento_do_hist('excluir')).detalhes,
-  '{"antes": {"sigla": "HIST", "nome": "Setor do Histórico Renomeado", "observacoes": "Nota inventada", "ativo": true, "macroprocessos": []}, "depois": null}'::jsonb,
+  '{"antes": {"sigla": "HIST", "nome": "Setor do Histórico Renomeado", "observacoes": "Nota inventada", "ativo": true, "macroprocessos": [], "responsaveis": []}, "depois": null}'::jsonb,
   'excluir grava no antes todos os campos');
 insert into _tap (linha) select is((select count(*)::int from public.eventos e join public.setores s
     on e.entidade_ref = s.id::text where s.sigla = 'SFT' and e.acao = 'editar'), 0,

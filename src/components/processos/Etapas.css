@@ -1,5 +1,11 @@
+.responsaveis-do-setor,
 .etapas-do-setor {
   margin-top: var(--esp-5);
+}
+
+.acoes-do-responsavel {
+  display: flex;
+  gap: var(--esp-2);
 }
 
 .caminho-de-etapas {
