@@ -201,7 +201,7 @@
 - Consumes: `criarProcesso`, `editarProcesso`, `excluirProcesso` (Task 3); `problemaNoProcesso`, `dadosDoProcesso` (Task 4); `cadastros.listarSetores`, `listarMacroprocessos`, `lerMacroprocesso`.
 - Produces: `<FormularioDoProcesso processos cadastros inicial? aoSalvar aoCancelar />`.
 
-- [ ] **Step 1: testes que falham** em `src/App.cadastrarProcesso.test.tsx`:
+- [x] **Step 1: testes que falham** em `src/App.cadastrarProcesso.test.tsx`:
   - `#/processos/novo` abre o painel "Cadastrar processo" com nome, setor e macroprocesso (só ativos), tipo ("A classificar" marcado; opções Processo e A classificar), origem ("Novo" marcado; Novo e Retomado), contexto e observações; salvar cadastra, fecha o painel e o cartão aparece na coluna da etapa atual (ou em "Aguardando o setor");
   - conferência na tela com as três frases; nome repetido no setor mostra a recusa em vermelho e mantém os dados ("A alteração não foi salva…" para falha genérica, a frase pronta para `TravaDoBanco`);
   - aviso amarelo "O setor TSA ainda não está no macroprocesso …; ele será incluído ao salvar." quando o setor não é envolvido (e some quando é);
@@ -209,8 +209,8 @@
   - [Excluir] abre "Excluir o processo {nome}?" com o texto e [Excluir processo] [Cancelar] (foco no Cancelar); confirmar exclui, fecha o painel e o cartão some; falha na exclusão aparece no painel; Consulta não vê [Cadastrar processo], [Editar] nem [Excluir];
   - cada recusa de exclusão dos cadastros aparece na tela de setor/macroprocesso (com `falhaDeGravacao = new TravaDoBanco(...)` no `CadastrosFalso`): as três frases do critério 4.
   `npx vitest run src/App.cadastrarProcesso.test.tsx` → FAIL.
-- [ ] **Step 2: implementação.** `FormularioDoProcesso` segue `FormularioDeSetor` (`noValidate`, `textoDaFalhaNoFormulario`, botão desabilitado enquanto envia); `CamposDoProcesso` carrega as opções com `useCarregamento`; `AvisoDeSetorIncluido` usa `cadastros.lerMacroprocesso(macroprocessoId)` quando setor e macroprocesso estão escolhidos (classe de aviso amarelo, `--pendencia-fundo`). `DadosDoProcesso` ganha [Editar] e [Excluir] (só `podeAlterar`); a exclusão usa `JanelaDeConfirmacao` e `useGravacaoComFalha`; `CadastroInexistente` vira o aviso de inexistente. Salvar, excluir e cadastrar chamam `aoMudar` (recarrega o Quadro) e voltam a `#/processos`.
-- [ ] **Step 3:** `npx vitest run` → PASS; `npx eslint src` e `npx tsc -b` limpos; commit "Ticket 04 de processos-etapas: cadastrar, editar e excluir processo".
+- [x] **Step 2: implementação.** `FormularioDoProcesso` segue `FormularioDeSetor` (`noValidate`, `textoDaFalhaNoFormulario`, botão desabilitado enquanto envia); `CamposDoProcesso` carrega as opções com `useCarregamento`; `AvisoDeSetorIncluido` usa `cadastros.lerMacroprocesso(macroprocessoId)` quando setor e macroprocesso estão escolhidos (classe de aviso amarelo, `--pendencia-fundo`). `DadosDoProcesso` ganha [Editar] e [Excluir] (só `podeAlterar`); a exclusão usa `JanelaDeConfirmacao` e `useGravacaoComFalha`; `CadastroInexistente` vira o aviso de inexistente. Salvar, excluir e cadastrar chamam `aoMudar` (recarrega o Quadro) e voltam a `#/processos`.
+- [x] **Step 3:** `npx vitest run` → PASS; `npx eslint src` e `npx tsc -b` limpos; commit "Ticket 04 de processos-etapas: cadastrar, editar e excluir processo".
 
 ---
 

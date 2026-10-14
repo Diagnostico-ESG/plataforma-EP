@@ -1,35 +1,58 @@
-import { type KeyboardEvent, type ReactNode, useCallback, useState } from 'react'
+import { type ReactNode, useCallback, useState } from 'react'
+import { CadastroInexistente } from '../../cadastros/cadastroInexistente'
+import type { ModuloDeCadastros } from '../../cadastros/tipos'
 import { type EstadoDoCarregamento, useCarregamento } from '../../hooks/useCarregamento'
-import type { ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
+import type { DadosDoProcesso, ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { ItemInexistente } from '../cadastros/ItemInexistente'
+import { AcoesDoProcesso } from './AcoesDoProcesso'
 import { BotaoFechar, CabecalhoDoPainel } from './CabecalhoDoPainel'
 import { CaminhoDoProcesso } from './CaminhoDoProcesso'
-import { DadosDoProcesso } from './DadosDoProcesso'
+import { DadosDoProcesso as DadosLidos } from './DadosDoProcesso'
+import { fecharComEsc } from './fecharComEsc'
+import { FormularioDoProcesso } from './FormularioDoProcesso'
 import { HistoricoDoProcesso } from './HistoricoDoProcesso'
 import './Painel.css'
 
-type PainelDoProcessoProps = { processos: ModuloDeProcessos; id: string; aoFechar: () => void }
+type PainelDoProcessoProps = {
+  processos: ModuloDeProcessos
+  cadastros: ModuloDeCadastros
+  id: string
+  podeAlterar: boolean
+  aoFechar: () => void
+  /** O processo mudou ou foi excluído: o Quadro atrás do painel precisa recarregar. */
+  aoMudar: () => void
+}
 
 const TEXTO_DE_PROCESSO_INEXISTENTE = 'Este processo não existe mais. Ele pode ter sido excluído; veja o Histórico.'
 
 /** O painel abre à direita, por cima do Quadro; Esc fecha. */
-export function PainelDoProcesso({ processos, id, aoFechar }: PainelDoProcessoProps) {
+export function PainelDoProcesso(props: PainelDoProcessoProps) {
+  const { processos, id, aoFechar, aoMudar } = props
   const ler = useCallback(() => processos.lerProcesso(id), [processos, id])
-  const { estado, tentarDeNovo } = useCarregamento(ler)
-  const fecharComEsc = (evento: KeyboardEvent) => {
-    if (evento.key === 'Escape') aoFechar()
+  const { estado, tentarDeNovo, recarregar } = useCarregamento(ler)
+  const [sumiu, setSumiu] = useState(false)
+  const aoSumir = () => {
+    setSumiu(true)
+    aoMudar()
   }
   return (
-    <aside className="painel" aria-label="Painel do processo" onKeyDown={fecharComEsc}>
-      <ConteudoDoPainel estado={estado} processos={processos} id={id} aoFechar={aoFechar} aoTentarDeNovo={tentarDeNovo} />
+    <aside className="painel" aria-label="Painel do processo" onKeyDown={fecharComEsc(aoFechar)}>
+      <ConteudoDoPainel {...props} estado={sumiu ? { tipo: 'pronto', valor: null } : estado}
+        aoTentarDeNovo={tentarDeNovo} aoAtualizar={recarregar} aoSumir={aoSumir} />
     </aside>
   )
 }
 
-type ConteudoProps = PainelDoProcessoProps & { estado: EstadoDoCarregamento<ProcessoLido | null>; aoTentarDeNovo: () => void }
+type ConteudoProps = PainelDoProcessoProps & {
+  estado: EstadoDoCarregamento<ProcessoLido | null>
+  aoTentarDeNovo: () => void
+  aoAtualizar: () => void
+  aoSumir: () => void
+}
 
-function ConteudoDoPainel({ estado, processos, id, aoFechar, aoTentarDeNovo }: ConteudoProps) {
+function ConteudoDoPainel({ estado, aoTentarDeNovo, aoAtualizar, aoSumir, ...painel }: ConteudoProps) {
+  const { aoFechar } = painel
   if (estado.tipo === 'carregando') return <SemProcesso aoFechar={aoFechar}><p role="status">Carregando processo…</p></SemProcesso>
   if (estado.tipo === 'erro') {
     return <SemProcesso aoFechar={aoFechar}><ErroAoCarregar alvo="o processo" aoTentarDeNovo={aoTentarDeNovo} /></SemProcesso>
@@ -41,7 +64,7 @@ function ConteudoDoPainel({ estado, processos, id, aoFechar, aoTentarDeNovo }: C
       </SemProcesso>
     )
   }
-  return <ProcessoAberto processo={estado.valor} processos={processos} id={id} aoFechar={aoFechar} />
+  return <ProcessoAberto processo={estado.valor} aoAtualizar={aoAtualizar} aoSumir={aoSumir} {...painel} />
 }
 
 function SemProcesso({ aoFechar, children }: { aoFechar: () => void; children: ReactNode }) {
@@ -54,9 +77,15 @@ function SemProcesso({ aoFechar, children }: { aoFechar: () => void; children: R
 }
 
 type Aba = 'detalhes' | 'historico'
-type ProcessoAbertoProps = { processo: ProcessoLido; processos: ModuloDeProcessos; id: string; aoFechar: () => void }
+type ProcessoAbertoProps = Omit<PainelDoProcessoProps, 'aoFechar'> & {
+  processo: ProcessoLido
+  aoFechar: () => void
+  aoAtualizar: () => void
+  aoSumir: () => void
+}
 
-function ProcessoAberto({ processo, processos, id, aoFechar }: ProcessoAbertoProps) {
+function ProcessoAberto(props: ProcessoAbertoProps) {
+  const { processo, processos, id, aoFechar } = props
   const [aba, setAba] = useState<Aba>('detalhes')
   return (
     <>
@@ -66,9 +95,45 @@ function ProcessoAberto({ processo, processos, id, aoFechar }: ProcessoAbertoPro
         <BotaoDeAba rotulo="Histórico" ativa={aba === 'historico'} aoEscolher={() => setAba('historico')} />
       </div>
       <div className="painel-corpo" role="tabpanel">
-        {aba === 'detalhes' && <><CaminhoDoProcesso processo={processo} /><DadosDoProcesso processo={processo} /></>}
+        {aba === 'detalhes' && <DetalhesDoProcesso {...props} />}
         {aba === 'historico' && <HistoricoDoProcesso processos={processos} id={id} />}
       </div>
+    </>
+  )
+}
+
+// Os dados viram o formulário na edição; salvar volta aos dados, já atualizados, e o Quadro recarrega.
+function DetalhesDoProcesso({ processo, processos, cadastros, podeAlterar, aoFechar, aoMudar, aoAtualizar, aoSumir }: ProcessoAbertoProps) {
+  const [editando, setEditando] = useState(false)
+
+  async function salvar(dados: DadosDoProcesso) {
+    try {
+      await processos.editarProcesso(processo.id, dados)
+    } catch (erro) {
+      if (erro instanceof CadastroInexistente) return aoSumir()
+      throw erro
+    }
+    setEditando(false)
+    aoAtualizar()
+    aoMudar()
+  }
+
+  function aposExcluir() {
+    aoMudar()
+    aoFechar()
+  }
+
+  return (
+    <>
+      <CaminhoDoProcesso processo={processo} />
+      {editando
+        ? <FormularioDoProcesso cadastros={cadastros} titulo="Editar processo" inicial={processo} aoSalvar={salvar}
+            aoCancelar={() => setEditando(false)} />
+        : <DadosLidos processo={processo} />}
+      {podeAlterar && !editando && (
+        <AcoesDoProcesso processo={processo} processos={processos} aoEditar={() => setEditando(true)}
+          aoExcluir={aposExcluir} aoSumir={aoSumir} />
+      )}
     </>
   )
 }

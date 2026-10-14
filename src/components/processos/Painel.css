@@ -167,3 +167,51 @@
 .etapa-responsavel {
   flex-basis: 100%;
 }
+
+.painel-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+}
+
+.painel-acoes .cadastros-falha {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+/* Campos no mesmo desenho dos de Cadastros (32px, borda de token), agora dentro do painel. */
+.formulario-do-processo {
+  display: grid;
+  gap: var(--esp-2);
+}
+
+.formulario-do-processo input,
+.formulario-do-processo select,
+.formulario-do-processo textarea {
+  min-height: 32px;
+  padding: var(--esp-1) var(--esp-2);
+  border: 1px solid var(--linha);
+  border-radius: var(--canto-botao);
+  background: var(--folha);
+  color: var(--texto);
+  font: inherit;
+}
+
+.formulario-do-processo textarea {
+  resize: vertical;
+}
+
+.formulario-do-processo-botoes {
+  display: flex;
+  gap: var(--esp-2);
+}
+
+/* Aviso (amarelo): informa o que vai acontecer ao salvar, sem dizer que algo falhou. */
+.processo-aviso {
+  margin: 0;
+  padding: var(--esp-3) var(--esp-4);
+  border: 1px solid var(--pendencia-borda);
+  border-radius: var(--canto);
+  background: var(--pendencia-fundo);
+  color: var(--texto);
+}
