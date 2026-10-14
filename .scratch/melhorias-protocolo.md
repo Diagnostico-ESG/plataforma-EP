@@ -326,3 +326,15 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Migração criada cedo demais.** Criei a migração com `npx supabase migration new` antes da rodada que prova a falha do teste, tirei o arquivo da pasta para comitar só os testes e tive de criar outro depois (a CLI usa a hora de agora no nome). Sugestão: o plano pode pedir para criar a migração só depois da rodada que prova a falha.
 - **claude-mem sem cota:** o aviso de cota apareceu no início da sessão; a sessão segue sem registro nele até a cota voltar.
 - **Observação:** rodou em Sonnet, como a tabela recomenda.
+
+## 2026-10-14 — /executar-complexo do ticket 06 (voltar, datas e responsável da etapa)
+
+- **Item não testado: branch comum no `/executar-complexo`, marco antes do ticket, `plano-<número>.md`, retomada com a branch aberta.** Esperado: branch `processos-etapas-06` a partir da `main`, marco `marco/2026-10-14-inicio-ticket-06-processos-etapas`, `plano-06.md`. Aconteceu: tudo isso; a retomada não foi usada.
+- **Item não testado: TDD de gatilhos e funções de banco com o teste antes da migração.** Esperado: o teste falha, a migração é criada depois. Aconteceu: o teste 19 falhou por função inexistente; a migração só foi criada depois (a melhoria da sessão anterior foi seguida).
+- **Item não testado: migração com função em `public` (`voltar_a_etapa`) e `db:types`.** Esperado: a função entra em `Functions` do `database.ts`. Aconteceu: entrou, com `Args` e `Returns: undefined`. O `ClienteSupabaseFalso` ganhou `rpc`.
+- **Ao escrever o teste pgTAP, duas armadilhas:** (1) um `update` que resolve várias etapas do setor num só comando falha na sequência, porque o gatilho "antes" lê o estado do começo do comando; (2) `throws_ok(sql, 'descrição')` com dois argumentos lê a descrição como mensagem esperada. O molde dos testes 17 e 18 já resolvia a etapa do setor uma a uma, mas o plano não dizia isso. Sugestão: o plano que mexe em sequência de etapas pode pedir "um comando por etapa" e mostrar o `throws_ok` de quatro argumentos.
+- **Workflows pelo navegador do app:** funcionou de novo, mas o painel "Run workflow" e a lista de branches demoram a aparecer (esperar 5 s e conferir com captura antes de cada clique) e a espera de `wait` é no máximo 10 s por chamada. O campo do arquivo da migração só aceita `form_input`.
+- **`python` não existe nesta máquina:** a primeira tentativa de editar o teste por script em Python falhou sem avisar a tempo e o commit saiu sem a correção; usei o `Edit` e `node` depois. Sugestão: o plano pode citar `node` para edições por script.
+- **Skills `writing-plans` e `executing-plans`:** acionadas pelo `Skill` sem recusa. O `executing-plans` sugere `subagent-driven-development`; ficou na sessão, como o comando manda (branch comum, sem worktree).
+- **claude-mem sem cota:** o aviso apareceu no início da sessão; a sessão segue sem registro nele até a cota voltar.
+- **Observação:** rodou em Sonnet, como a tabela recomenda.
