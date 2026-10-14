@@ -95,8 +95,9 @@ begin
     $sql$insert into public.andamentos (etapa_id, setor_id)
       select id, '5b000000-0000-0000-0000-000000000003' from public.etapas where codigo = 'modelagem'$sql$,
     '42501', null, quem || ' não cria andamento direto');
-  insert into _tap (linha) select throws_ok(
-    $sql$delete from public.andamentos$sql$, '42501', null, quem || ' não apaga andamento direto');
+  -- Desde o ticket 10 o logado tem o privilégio de apagar (o catálogo usa), e a RLS filtra sem erro: nada é apagado.
+  with apagados as (delete from public.andamentos returning 1)
+  insert into _tap (linha) select is((select count(*)::int from apagados), 0, quem || ' não apaga andamento direto');
   insert into _tap (linha) select throws_ok(
     $sql$update public.andamentos set etapa_id = etapa_id$sql$, '42501', null, quem || ' não troca a etapa');
   insert into _tap (linha) select throws_ok(
@@ -136,10 +137,10 @@ insert into _tap (linha) select throws_ok(
   $sql$delete from public.andamentos$sql$, '42501', null, 'Visitante não apaga andamento');
 reset role;
 
--- Etapa com andamento não se apaga, nem pelo dono do banco.
+-- Etapa usada não se apaga, nem pelo dono do banco (desde o ticket 10, o gatilho recusa antes da referência).
 insert into _tap (linha) select throws_ok(
-  $sql$delete from public.etapas where codigo = 'identificacao_responsaveis'$sql$, '23503', null,
-  'etapa usada em algum setor não se apaga');
+  $sql$delete from public.etapas where codigo = 'identificacao_responsaveis'$sql$, 'P0001',
+  'etapa_usada:Identificação dos responsáveis', 'etapa usada em algum setor não se apaga');
 
 -- Regras, agindo como o Integrante no setor TRS.
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);

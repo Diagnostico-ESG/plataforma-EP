@@ -179,8 +179,9 @@ insert into _tap (linha) select throws_ok(
     values ((select id from public.etapas where codigo = 'modelagem'),
       (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004'))$sql$,
   '42501', null, 'andamento de processo não se cria direto');
-insert into _tap (linha) select throws_ok(
-  $sql$delete from public.andamentos where processo_id is not null$sql$, '42501', null,
+-- Desde o ticket 10 o logado tem o privilégio de apagar (o catálogo usa), e a RLS filtra sem erro: nada é apagado.
+with apagados as (delete from public.andamentos where processo_id is not null returning 1)
+insert into _tap (linha) select is((select count(*)::int from apagados), 0,
   'andamento de processo não se apaga direto');
 
 -- Eventos do cadastro: o criar traz os campos legíveis, o vínculo do setor incluído também.
