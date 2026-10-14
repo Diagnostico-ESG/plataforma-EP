@@ -28,6 +28,35 @@ export type SituacaoDoProcesso = 'em_andamento' | 'suspenso' | 'cancelado' | 'co
 /** Uma etapa do catálogo de nível processo, como as colunas do Quadro a usam. */
 export type EtapaDoCatalogo = { id: string; codigo: string; nome: string; ordem: number; ativa: boolean }
 
+export type NivelDaEtapa = 'setor' | 'processo'
+
+/** Uma etapa do catálogo como a Administração a mostra: ativa ou não, de qualquer nível. */
+export type EtapaNoCatalogo = EtapaDoCatalogo & { nivel: NivelDaEtapa; obrigatoria: boolean }
+
+/** O que o formulário de etapa nova grava; `antesDe` null põe a etapa no fim. */
+export type EtapaNova = { codigo: string; nome: string; nivel: NivelDaEtapa; obrigatoria: boolean; antesDe: string | null }
+
+/** O que a edição muda: código e nível não mudam depois de criados. */
+export type DadosDaEtapa = { nome: string; obrigatoria: boolean }
+
+export type SentidoDaOrdem = 'subir' | 'descer'
+
+/** A manutenção do catálogo (só o administrador; a RLS decide). Recusas como no módulo de processos. */
+export type ModuloDoCatalogo = {
+  /** Todas as etapas, ativas e inativas, na ordem. */
+  listarCatalogo(): Promise<EtapaNoCatalogo[]>
+  acrescentarEtapa(etapa: EtapaNova): Promise<void>
+  editarEtapa(id: string, dados: DadosDaEtapa): Promise<void>
+  /** Troca com a vizinha; na ponta, nada muda. */
+  moverEtapa(id: string, sentido: SentidoDaOrdem): Promise<void>
+  /** Some de onde estava pendente e continua onde já foi usada (ADR 0004). */
+  desativarEtapa(id: string): Promise<void>
+  /** Volta como pendente onde falta. */
+  reativarEtapa(id: string): Promise<void>
+  /** Só a etapa nunca usada. */
+  excluirEtapa(id: string): Promise<void>
+}
+
 export type ResponsavelDaEtapa = { id: string; nome: string; fotoUrl: string | null }
 
 /** Um processo como o Quadro e a Lista o mostram: com a etapa atual, o responsável dela e a situação calculada. */
@@ -139,4 +168,5 @@ export type ModuloDeProcessos = {
   criarResponsavel(setorId: string, dados: DadosDoResponsavel): Promise<void>
   editarResponsavel(id: string, dados: DadosDoResponsavel): Promise<void>
   excluirResponsavel(id: string): Promise<void>
+  catalogo: ModuloDoCatalogo
 }

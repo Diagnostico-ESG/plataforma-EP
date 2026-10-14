@@ -1,6 +1,7 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import type { EventoDoCadastro } from '../cadastros/tipos'
+import { CatalogoFalso } from './CatalogoFalso'
 import {
   atualizarSetorDoProcesso, conferirDatasDaEtapa, responsavelDoCartao, trocarEtapaDoProcesso, voltarEtapas,
 } from './andamentoFalso'
@@ -49,6 +50,8 @@ export class ProcessosFalso implements ModuloDeProcessos {
   segurarLeituraDoProcesso = false
   falharHistoricoDoProcesso = false
   segurarHistoricoDoProcesso = false
+  /** O catálogo inteiro; as gravações nele mudam `etapasDoCatalogo`, os processos e as etapas dos setores. */
+  catalogo = new CatalogoFalso(this)
   private proximoId = 1
 
   async lerEtapasDoSetor(setorId: string): Promise<EtapaDoSetor[]> {

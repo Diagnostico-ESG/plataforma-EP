@@ -4,6 +4,7 @@ import {
 import type { ClienteSupabase } from '../lib/supabase'
 import type { Database } from '../types/database'
 import { formatarData } from './caminhoDeEtapas'
+import { FRASE_DA_ORDEM_DOS_NIVEIS, fraseDaEtapaUsada } from './frasesDoCatalogo'
 import { FRASE_DO_PAI, fraseDeTipoInvalido, fraseDosSubprocessos } from './frasesDeReclassificacao'
 import { fraseDeSituacaoInvalida, fraseDoProcessoParado } from './frasesDeSituacao'
 import type { ModuloDeProcessos, UsuarioResponsavel } from './tipos'
@@ -57,12 +58,13 @@ async function listarResponsaveisPossiveis(cliente: ClienteSupabase): Promise<Us
 }
 
 // O banco recusa com "motivo:valor" (migrações etapas_do_setor, andamento_do_processo, voltar_datas_responsavel,
-// situacao_do_processo e subprocessos_e_reclassificacao).
+// situacao_do_processo, subprocessos_e_reclassificacao e catalogo_de_etapas).
 // O motivo "motivo_obrigatorio" não tem valor; o valor vai até o fim da mensagem.
 const PADRAO_DA_RECUSA = new RegExp(
   '\\b(anterior_nao_resolvida|etapa_obrigatoria|setor_nao_resolveu|ja_ha_etapa_em_andamento|etapa_nao_resolvida'
   + '|motivo_obrigatorio|data_no_futuro|resolvida_antes_do_inicio|responsavel_invalido|processo_parado'
-  + '|situacao_invalida|processo_com_subprocessos|pai_nao_e_processo|tipo_invalido)(?::(.*))?$', 'm')
+  + '|situacao_invalida|processo_com_subprocessos|pai_nao_e_processo|tipo_invalido'
+  + '|etapa_usada|etapas_do_setor_primeiro)(?::(.*))?$', 'm')
 
 const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   anterior_nao_resolvida: (etapa) => `A etapa ${etapa} ainda não foi resolvida.`,
@@ -89,6 +91,8 @@ const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
     const [de, para] = tipos.split(':')
     return fraseDeTipoInvalido(de, para)
   },
+  etapa_usada: fraseDaEtapaUsada,
+  etapas_do_setor_primeiro: () => FRASE_DA_ORDEM_DOS_NIVEIS,
 }
 
 // Serve também à situação, à reclassificação e à gravação do processo: as recusas do banco têm o mesmo formato.
