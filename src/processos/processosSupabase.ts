@@ -6,6 +6,7 @@ import { lerEtapasDoSetor } from './etapasDoSetorSupabase'
 import { criarGravacaoDeProcessoSupabase } from './gravarProcessoSupabase'
 import { criarLeituraDeProcessoSupabase } from './lerProcessoSupabase'
 import { criarListaDeProcessosSupabase } from './listaDeProcessosSupabase'
+import { criarReclassificacaoSupabase } from './reclassificacaoSupabase'
 import { criarResponsaveisSupabase } from './responsaveisSupabase'
 import { criarSituacaoSupabase } from './situacaoSupabase'
 import type { ModuloDeProcessos } from './tipos'
@@ -21,6 +22,7 @@ export function criarProcessosSupabase(cliente: ClienteSupabase): ModuloDeProces
     lerEtapasDoSetor: (setorId) => lerEtapasDoSetor(cliente, setorId),
     ...criarAndamentosSupabase(cliente, RECUSAS_DOS_PROCESSOS),
     ...criarSituacaoSupabase(cliente, RECUSAS_DOS_PROCESSOS),
+    ...criarReclassificacaoSupabase(cliente, RECUSAS_DOS_PROCESSOS),
     ...criarResponsaveisSupabase(cliente, RECUSAS_DOS_PROCESSOS),
     ...criarListaDeProcessosSupabase(cliente),
     ...criarLeituraDeProcessoSupabase(cliente),

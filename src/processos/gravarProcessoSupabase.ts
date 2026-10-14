@@ -1,7 +1,8 @@
 import {
-  type ErroDoBanco, type RecusasDoModulo, TravaDoBanco, porQueNadaMudou, recusaPorPerfil,
+  type ErroDoBanco, type RecusasDoModulo, TravaDoBanco, porQueNadaMudou,
 } from '../acesso/falhasDeGravacao'
 import type { ClienteSupabase } from '../lib/supabase'
+import { falhaDoAndamento } from './andamentosSupabase'
 import type { DadosDoProcesso, ModuloDeProcessos } from './tipos'
 
 type OperacoesDeGravacao = Pick<ModuloDeProcessos, 'criarProcesso' | 'editarProcesso' | 'excluirProcesso'>
@@ -33,9 +34,9 @@ function valoresDaEdicao(dados: DadosDoProcesso) {
   }
 }
 
-// O tipo só entra no cadastro: depois dele muda pela reclassificação (ticket 08).
+// Tipo e pai só entram no cadastro: depois dele mudam pela reclassificação.
 function valoresDoCadastro(dados: DadosDoProcesso) {
-  return { ...valoresDaEdicao(dados), tipo: dados.tipo }
+  return { ...valoresDaEdicao(dados), tipo: dados.tipo, processo_pai_id: dados.processoPaiId }
 }
 
 // A RLS não acusa erro ao filtrar: sem linha afetada, a leitura decide entre perfil e processo que sumiu.
@@ -58,7 +59,8 @@ async function falhaDoProcesso(
   }
   // O setor ou o macroprocesso escolhido foi excluído por outra pessoa enquanto o formulário estava aberto.
   if (erro.code === '23503') return recusas.registroInexistente()
-  return recusaPorPerfil(erro, recusas.semPermissao)
+  // As recusas com motivo (processo com subprocessos, pai que não é Processo) e a do perfil.
+  return falhaDoAndamento(erro, recusas)
 }
 
 async function siglaDoSetor(cliente: ClienteSupabase, setorId: string): Promise<string> {

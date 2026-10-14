@@ -16,6 +16,7 @@ function etapa(ordem: number, mudancas: Partial<EtapaDoProcesso> = {}): EtapaDoP
 const PROCESSO: ProcessoLido = {
   id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
   macroprocessoNome: 'Macro', situacao: 'em_andamento', etapaAtual: { codigo: 'c4', nome: 'Etapa 4', ordem: 4 },
+  processoPaiId: null, processoPai: null, subprocessos: [],
   aguardandoOSetor: false, responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
   etapasDoSetor: [], etapasDoProcesso: [etapa(4), etapa(5), etapa(9, { obrigatoria: false })],
 }

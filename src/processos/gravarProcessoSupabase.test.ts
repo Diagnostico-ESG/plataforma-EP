@@ -8,8 +8,8 @@ import { criarProcessosSupabase } from './processosSupabase'
 import type { DadosDoProcesso } from './tipos'
 
 const DADOS: DadosDoProcesso = {
-  nome: 'Emitir Ofício Fictício', setorId: 's1', macroprocessoId: 'm1', tipo: 'a_classificar', origem: 'novo',
-  contexto: 'Contexto inventado', observacoes: null,
+  nome: 'Emitir Ofício Fictício', setorId: 's1', macroprocessoId: 'm1', tipo: 'a_classificar', processoPaiId: null,
+  origem: 'novo', contexto: 'Contexto inventado', observacoes: null,
 }
 const PERFIL = 'Seu perfil não permite alterar os processos.'
 
@@ -27,16 +27,39 @@ describe('gravação de processos no módulo real', () => {
     const cliente = new ClienteSupabaseFalso()
     await criar(cliente).criarProcesso(DADOS)
     expect(cliente.pedidos[0]).toMatchObject({ tabela: 'processos', operacao: 'insert', valores: {
-      setor_id: 's1', macroprocesso_id: 'm1', nome: DADOS.nome, tipo: 'a_classificar', origem: 'novo',
-      contexto: 'Contexto inventado', observacoes: null } })
+      setor_id: 's1', macroprocesso_id: 'm1', nome: DADOS.nome, tipo: 'a_classificar', processo_pai_id: null,
+      origem: 'novo', contexto: 'Contexto inventado', observacoes: null } })
   })
 
-  test('editar atualiza os campos editáveis pelo id e não manda o tipo', async () => {
+  test('criar um subprocesso manda o pai', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    await criar(cliente).criarProcesso({ ...DADOS, tipo: 'subprocesso', processoPaiId: 'p0' })
+    expect(cliente.pedidos[0].valores).toMatchObject({ tipo: 'subprocesso', processo_pai_id: 'p0' })
+  })
+
+  test('o pai que não é Processo vira a frase do critério', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['processos.insert'] = { data: null, error: { code: 'P0001', message: 'pai_nao_e_processo' } }
+    const falha = await falhaDe(criar(cliente).criarProcesso({ ...DADOS, tipo: 'subprocesso', processoPaiId: 'p0' }))
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect(falha.message).toBe('O processo pai precisa ser do tipo Processo.')
+  })
+
+  test('excluir processo com subprocessos vira a frase com a contagem', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['processos.delete'] = { data: null, error: { code: 'P0001', message: 'processo_com_subprocessos:3' } }
+    const falha = await falhaDe(criar(cliente).excluirProcesso('p1'))
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect(falha.message).toBe('Este processo tem 3 subprocessos; reclassifique-os ou exclua-os antes.')
+  })
+
+  test('editar atualiza os campos editáveis pelo id e não manda o tipo nem o pai', async () => {
     const cliente = new ClienteSupabaseFalso()
     cliente.respostas['processos.update'] = { data: [{ id: 'p1' }], error: null }
     await criar(cliente).editarProcesso('p1', { ...DADOS, tipo: 'processo' })
     expect(cliente.pedidos[0]).toMatchObject({ tabela: 'processos', operacao: 'update', filtro: ['id', 'p1'] })
     expect(cliente.pedidos[0].valores).not.toHaveProperty('tipo')
+    expect(cliente.pedidos[0].valores).not.toHaveProperty('processo_pai_id')
     expect(cliente.pedidos[0].valores).toMatchObject({ nome: DADOS.nome, setor_id: 's1', macroprocesso_id: 'm1' })
   })
 

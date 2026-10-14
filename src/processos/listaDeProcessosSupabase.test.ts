@@ -26,7 +26,7 @@ test('lista os processos por nome e as etapas de nível processo na ordem do cat
     etapas: [ETAPA],
     processos: [{
       id: 'p1', nome: 'Emitir Ofício Fictício', tipo: 'a_classificar', setorId: 's1', setorSigla: 'TSA',
-      macroprocessoId: 'm1', macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento',
+      macroprocessoId: 'm1', macroprocessoNome: 'Macro de Teste', processoPaiId: null, situacao: 'em_andamento',
       etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 }, aguardandoOSetor: false,
       responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null },
     }],

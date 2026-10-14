@@ -80,11 +80,21 @@ begin
   insert into _tap (linha) select throws_ok(
     $sql$update public.processos set criado_em = criado_em$sql$, '42501', null,
     quem || ' não troca a data de criação do processo');
-  insert into _tap (linha) select throws_ok(
-    $sql$update public.processos set tipo = tipo$sql$, '42501', null, quem || ' não troca o tipo do processo direto');
-  insert into _tap (linha) select throws_ok(
-    $sql$update public.processos set processo_pai_id = null$sql$, '42501', null,
-    quem || ' não troca o pai do processo direto');
+  -- Tipo e pai têm privilégio de coluna desde o ticket 08, mas só mudam pela reclassificação, como a situação.
+  begin
+    update public.processos set tipo = 'processo' where nome = 'Processo Semente ' || sigla_do_setor;
+  exception when others then
+    recusada := sqlerrm like 'tipo_so_pela_funcao%';
+  end;
+  insert into _tap (linha) select is(recusada, altera, quem || ' não troca o tipo do processo direto');
+  recusada := false;
+  begin
+    update public.processos set processo_pai_id = id where nome = 'Processo Semente ' || sigla_do_setor;
+  exception when others then
+    recusada := sqlerrm like 'tipo_so_pela_funcao%';
+  end;
+  insert into _tap (linha) select is(recusada, altera, quem || ' não troca o pai do processo direto');
+  recusada := false;
   -- A situação tem privilégio de coluna desde o ticket 07, mas só muda pelas funções: o gatilho recusa a mudança
   -- direta de quem altera (quem só lê não enxerga linha para alterar, e nada acontece).
   begin
@@ -155,7 +165,7 @@ insert into _tap (linha) select throws_ok(
   $sql$insert into public.processos (setor_id, macroprocesso_id, nome, processo_pai_id)
     values ('5e000000-0000-0000-0000-000000000004', 'ab000000-0000-0000-0000-000000000002', 'Filho Teste',
       (select id from public.processos limit 1))$sql$,
-  '42501', null, 'o pai não se informa na inclusão (ticket 08)');
+  '23514', null, '"a classificar" com pai é recusado (o pai só vale no subprocesso)');
 
 -- Andamentos do processo: nascem pendentes; ninguém cria nem apaga direto.
 insert into _tap (linha) select is(

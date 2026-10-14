@@ -24,7 +24,7 @@ export function PainelDeNovoProcesso({ processos, cadastros, aoFechar, aoCriado 
     <aside className="painel" aria-label="Painel do novo processo" onKeyDown={fecharComEsc(aoFechar)}>
       <div className="painel-barra"><BotaoFechar aoFechar={aoFechar} /></div>
       <div className="painel-corpo">
-        <FormularioDoProcesso cadastros={cadastros} titulo="Cadastrar processo" aoSalvar={criar} aoCancelar={aoFechar} />
+        <FormularioDoProcesso cadastros={cadastros} processos={processos} titulo="Cadastrar processo" aoSalvar={criar} aoCancelar={aoFechar} />
       </div>
     </aside>
   )

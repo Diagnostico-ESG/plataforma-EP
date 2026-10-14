@@ -19,10 +19,27 @@ async function lerProcesso(cliente: ClienteSupabase, id: string): Promise<Proces
   const { data, error } = await cliente.from('processos_com_andamento').select('*').eq('id', id)
   if (error) throw new Error(`Falha ao ler o processo: ${error.message}`)
   if (!data[0]) return null
-  const [etapasDoProcesso, etapasDoSetor] = await Promise.all([
+  const [etapasDoProcesso, etapasDoSetor, estrutura] = await Promise.all([
     lerAndamentosDoProcesso(cliente, id), lerEtapasDoSetor(cliente, data[0].setor_id ?? ''),
+    lerEstrutura(cliente, id, data[0].processo_pai_id),
   ])
-  return { ...dadosDoProcesso(data[0]), etapasDoSetor, etapasDoProcesso }
+  return { ...dadosDoProcesso(data[0]), ...estrutura, etapasDoSetor, etapasDoProcesso }
+}
+
+type LinhaDaEstrutura = { id: string; nome: string; processo_pai_id: string | null }
+type Estrutura = Pick<ProcessoLido, 'processoPai' | 'subprocessos'>
+
+// O pai e os subprocessos numa leitura só: as linhas que têm este processo como pai, mais a do pai, se houver.
+async function lerEstrutura(cliente: ClienteSupabase, id: string, paiId: string | null): Promise<Estrutura> {
+  const filtro = paiId ? `processo_pai_id.eq.${id},id.eq.${paiId}` : `processo_pai_id.eq.${id}`
+  const { data, error } = await cliente.from('processos').select('id, nome, processo_pai_id').or(filtro).order('nome')
+  if (error) throw new Error(`Falha ao ler o pai e os subprocessos do processo: ${error.message}`)
+  const linhas = data as LinhaDaEstrutura[]
+  const pai = linhas.find((linha) => linha.id === paiId)
+  return {
+    processoPai: pai ? { id: pai.id, nome: pai.nome } : null,
+    subprocessos: linhas.filter((linha) => linha.processo_pai_id === id).map(({ id: idDoFilho, nome }) => ({ id: idDoFilho, nome })),
+  }
 }
 
 function dadosDoProcesso(linha: LinhaDoProcesso) {

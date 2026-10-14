@@ -21,6 +21,7 @@ function falso(): ProcessosFalso {
   const processo: ProcessoLido = {
     id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 'set1', setorSigla: 'TSA', macroprocessoId: 'm1',
     macroprocessoNome: 'Macro', situacao: 'em_andamento', etapaAtual: { codigo: 'c6', nome: 'Etapa 6', ordem: 6 },
+    processoPaiId: null, processoPai: null, subprocessos: [],
     aguardandoOSetor: false, responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
     etapasDoSetor: [DO_SETOR],
     etapasDoProcesso: [

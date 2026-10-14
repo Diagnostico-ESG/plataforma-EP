@@ -9,6 +9,7 @@ const RELATORIO: EtapaDoCatalogo = {
 
 function processo(nome: string, mudancas: Partial<ProcessoDaLista> = {}): ProcessoDaLista {
   return {
+    processoPaiId: null,
     id: nome, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1', macroprocessoNome: 'Macro',
     situacao: 'em_andamento', etapaAtual: { codigo: 'modelagem', nome: MODELAGEM.nome, ordem: 4 }, aguardandoOSetor: false,
     responsavel: null, ...mudancas,

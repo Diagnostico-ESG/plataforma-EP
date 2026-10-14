@@ -35,6 +35,7 @@ const PROCESSO: ProcessoLido = {
   macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento',
   etapaAtual: { codigo: 'relatorio', nome: 'Relatório e modelagem técnica', ordem: 5 }, aguardandoOSetor: false,
   responsavel: null, origem: 'retomado', contexto: 'Contexto inventado', observacoes: 'Observação inventada',
+  processoPaiId: null, processoPai: null, subprocessos: [],
   motivoDaSituacao: null,
   etapasDoSetor: [
     etapaDoSetor(1, 'identificacao_responsaveis', 'Identificação dos responsáveis'),
