@@ -227,7 +227,7 @@
 
 ### Task 9: Fechamento do ticket
 
-- [ ] **Step 1: gates.** `npm test` (todos), `npx eslint .`, `npx tsc -b`, `npx madge --circular src`, `npm run build`. O pgTAP (18 arquivos) já passou na Task 1; reconferir com um novo "Testes de banco" depois do último push de `supabase/`.
-- [ ] **Step 2: conferência na tela.** Subir o app (`preview_start`), entrar como usuário de teste do dev se existir, ou conferir só por testes de tela quando o login não permitir; registrar o resultado. Critérios `[visual]` da spec (Quadro, painel, pílulas, janela) ficam para o `/polir` e o `/ship`.
-- [ ] **Step 3: registros.** Marcar as caixas do plano; anotar em `.scratch/processos-etapas/desvios.md` (criar se faltar) os desvios; em `.scratch/melhorias-protocolo.md` o que foi observado (itens não testados do `/executar-complexo`); em `.scratch/backlog.md` (uma linha) o que surgir fora do escopo. Commit.
+- [x] **Step 1: gates.** `npm test` (todos), `npx eslint .`, `npx tsc -b`, `npx madge --circular src`, `npm run build`. O pgTAP (18 arquivos) já passou na Task 1; reconferir com um novo "Testes de banco" depois do último push de `supabase/`.
+- [x] **Step 2: conferência na tela.** Subir o app (`preview_start`), entrar como usuário de teste do dev se existir, ou conferir só por testes de tela quando o login não permitir; registrar o resultado. Critérios `[visual]` da spec (Quadro, painel, pílulas, janela) ficam para o `/polir` e o `/ship`.
+- [x] **Step 3: registros.** Marcar as caixas do plano; anotar em `.scratch/processos-etapas/desvios.md` (criar se faltar) os desvios; em `.scratch/melhorias-protocolo.md` o que foi observado (itens não testados do `/executar-complexo`); em `.scratch/backlog.md` (uma linha) o que surgir fora do escopo. Commit.
 - [ ] **Step 4: integração.** `git switch main`, merge da branch (opção de merge do `finishing-a-development-branch`), `git branch -d processos-etapas`, `git push` da `main`, conferir o "Testes de banco" disparado na `main`. Acrescentar ao fim do ticket 04 a linha `Concluído em AAAA-MM-DD (commit <hash>)`, comitar e pedir o `/cost`.
