@@ -36,9 +36,18 @@ export function rotuloDoMotivo(acao: string): string {
   return ACOES_COM_MOTIVO.has(acao) ? 'Motivo' : 'Nota'
 }
 
+const TEXTO_DA_ACAO_DA_ETAPA: Record<string, string> = {
+  ...TEXTO_DA_ACAO, acrescentar: 'Acrescentou a etapa ao catálogo', mudar_ordem: 'Mudou a ordem do catálogo',
+  desativar: 'Desativou a etapa', reativar: 'Reativou a etapa',
+}
+
 const TEXTOS_DA_ENTIDADE: Record<string, Record<string, string>> = {
   setor_envolvido: TEXTO_DA_ACAO_DO_VINCULO, andamento: TEXTO_DA_ACAO_DO_ANDAMENTO, processo: TEXTO_DA_ACAO_DO_PROCESSO,
+  etapa: TEXTO_DA_ACAO_DA_ETAPA,
 }
+
+// Macroprocesso e etapa do catálogo aparecem como "código — nome".
+const ENTIDADES_COM_CODIGO = new Set(['macroprocesso', 'etapa'])
 
 // Vínculos, etapas e responsáveis do setor têm a referência 'idA:idB': o item do filtro sai dos ids gravados no evento.
 const ENTIDADES_QUE_LIGAM = new Set(['setor_envolvido', 'andamento', 'responsavel_do_setor'])
@@ -50,6 +59,7 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   resolvida_em: 'Conclusão', email: 'E-mail', cargo: 'Cargo', responsaveis: 'Responsáveis',
   tipo: 'Tipo', origem: 'Origem', situacao: 'Situação', contexto: 'Contexto', andamentos: 'Etapas',
   processo_nome: 'Processo', responsavel_nome: 'Responsável', processo_pai_nome: 'Processo pai',
+  nivel: 'Nível', obrigatoria: 'Obrigatória', ativa: 'Situação', ordem: 'Posição',
 }
 
 // Os ids existem para o filtro; quem lê o histórico vê a sigla e o nome. Código e nome da etapa já estão no título.
@@ -89,7 +99,7 @@ function nomeDoItemComDono(entidade: string, estado: Record<string, unknown>): s
 export function nomeDoItem(evento: EventoDoCadastro): string {
   const estado = estadoLegivel(evento)
   if (evento.entidade === 'setor' && typeof estado.sigla === 'string') return `${estado.sigla} — ${texto(estado.nome)}`
-  if (evento.entidade === 'macroprocesso' && typeof estado.nome === 'string') return codigoENome(estado.codigo, estado.nome)
+  if (ENTIDADES_COM_CODIGO.has(evento.entidade) && typeof estado.nome === 'string') return codigoENome(estado.codigo, estado.nome)
   if (evento.entidade === 'processo' && typeof estado.nome === 'string') return `${texto(estado.setor_sigla)} — ${estado.nome}`
   const comDono = nomeDoItemComDono(evento.entidade, estado)
   if (comDono !== null) return comDono
@@ -114,10 +124,13 @@ function valorDaEtapa(campo: string, valor: unknown): string | null {
   return null
 }
 
-// Campos do processo: tipo, origem e situação pelo rótulo da tela; null se não for deles.
-function valorDoProcesso(campo: string, valor: unknown): string | null {
+// Campos do processo (tipo, origem, situação) e da etapa do catálogo (nível, obrigatória, ativa) pelo rótulo da tela;
+// null se não for deles.
+function valorPorRotulo(campo: string, valor: unknown): string | null {
   const rotulos: Record<string, Record<string, string>> = {
     tipo: ROTULO_DO_TIPO, origem: ROTULO_DA_ORIGEM, situacao: ROTULO_DA_SITUACAO,
+    nivel: { setor: 'Setor', processo: 'Processo' }, obrigatoria: { true: 'Sim', false: 'Não' },
+    ativa: { true: 'Ativa', false: 'Inativa' },
   }
   const rotulosDoCampo = rotulos[campo]
   return rotulosDoCampo ? (rotulosDoCampo[String(valor)] ?? texto(valor)) : null
@@ -126,8 +139,9 @@ function valorDoProcesso(campo: string, valor: unknown): string | null {
 function valorLegivel(campo: string, valor: unknown): string {
   if (campo === 'ativo') return valor ? 'Ativo' : 'Inativo'
   if (campo === 'categoria') return rotuloDaCategoria(valor as CategoriaDoMacroprocesso | null)
-  const daEtapa = valorDaEtapa(campo, valor) ?? valorDoProcesso(campo, valor)
+  const daEtapa = valorDaEtapa(campo, valor) ?? valorPorRotulo(campo, valor)
   if (daEtapa !== null) return daEtapa
+  if (typeof valor === 'number') return String(valor) // a posição da etapa no catálogo
   if (!Array.isArray(valor)) return texto(valor)
   return valor.length === 0 ? 'nenhum' : valor.map(itemDaLista).join(', ')
 }
