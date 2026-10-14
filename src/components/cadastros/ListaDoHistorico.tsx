@@ -25,7 +25,7 @@ export function ListaDoHistorico({ eventos }: { eventos: EventoDoCadastro[] }) {
   )
 }
 
-function EventoDoHistorico({ evento }: { evento: EventoDoCadastro }) {
+export function EventoDoHistorico({ evento }: { evento: EventoDoCadastro }) {
   return (
     <li className="historico-item">
       <time dateTime={evento.ocorridoEm}>{formatarMomento(evento.ocorridoEm)}</time>

@@ -14,14 +14,22 @@ const ROTULO_DA_ACAO: Record<AcaoDaEtapa, string> = {
   iniciar: 'Iniciar', concluir: 'Concluir', dispensar: 'Dispensar', realizada: 'Realizada anteriormente',
 }
 
-type LinhaDaEtapaProps = { etapa: EtapaDoSetor; atual: boolean; acoes: AcaoDaEtapa[]; aoAgir: (acao: AcaoDaEtapa) => void }
+type LinhaDaEtapaProps = {
+  etapa: EtapaDoSetor
+  atual: boolean
+  acoes: AcaoDaEtapa[]
+  aoAgir: (acao: AcaoDaEtapa) => void
+  /** Só as etapas do processo mostram o responsável ("—" sem ele); nas do setor fica de fora. */
+  responsavelNome?: string | null
+}
 
-/** Uma etapa do caminho: nome, status (pílula com texto), datas, nota e as ações que cabem a ela. */
-export function LinhaDaEtapa({ etapa, atual, acoes, aoAgir }: LinhaDaEtapaProps) {
+/** Uma etapa do caminho: nome, status (pílula com texto), responsável, datas, nota e as ações que cabem a ela. */
+export function LinhaDaEtapa({ etapa, atual, acoes, aoAgir, responsavelNome }: LinhaDaEtapaProps) {
   return (
-    <li className="etapa" aria-current={atual ? 'step' : undefined}>
+    <li className={`etapa etapa-${etapa.status}`} aria-current={atual ? 'step' : undefined}>
       <span className="etapa-nome">{etapa.nome}</span>
       <Pilula situacao={SITUACAO_DO_STATUS[etapa.status]}>{ROTULO_DO_STATUS[etapa.status]}</Pilula>
+      {responsavelNome !== undefined && <span className="etapa-responsavel">Responsável: {responsavelNome ?? '—'}</span>}
       <span className="etapa-datas">
         Início: {formatarData(etapa.iniciadaEm)} · Conclusão: {formatarData(etapa.resolvidaEm)}
       </span>

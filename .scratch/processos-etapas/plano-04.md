@@ -178,7 +178,7 @@
 - Consumes: `lerProcesso`, `lerHistoricoDoProcesso` (Task 3).
 - Produces: `<PainelDoProcesso processos cadastros id podeAlterar aoFechar aoMudar />` (a edição e a exclusão entram na Task 7).
 
-- [ ] **Step 1: testes que falham** em `src/App.painelDoProcesso.test.tsx` (`#/processos/<id>` com o Quadro atrás):
+- [x] **Step 1: testes que falham** em `src/App.painelDoProcesso.test.tsx` (`#/processos/<id>` com o Quadro atrás):
   - "Carregando processo…"; erro com [Tentar de novo]; processo inexistente ("Este processo não existe mais. Ele pode ter sido excluído; veja o Histórico.") com [Voltar] que leva a `#/processos`;
   - cabeçalho (sigla, nome, macroprocesso, pílulas de tipo e de situação, botão fechar que volta a `#/processos`; Esc também fecha e devolve o foco ao cartão);
   - dados (setor, macroprocesso, tipo, origem, contexto, observações); caminho: etapas do setor primeiro, só leitura, com o link "Ver no setor" (`#/setores/<setorId>`), depois as do processo com status, responsável, datas e nota, a atual destacada (`aria-current="step"`), sem nenhum botão de ação;
@@ -186,8 +186,8 @@
   - Consulta: nenhum botão de alteração (nem [Editar]/[Excluir], que entram na Task 7).
   - `#/setores/<id>` abre o setor direto (teste em `App.setores`/novo arquivo): voltar à lista limpa o endereço.
   `npx vitest run src/App.painelDoProcesso.test.tsx` → FAIL.
-- [ ] **Step 2: implementação.** `AreaDeProcessos` lê o segundo trecho do endereço: `novo` (Task 7) ou um id → monta o painel por cima do Quadro (que continua montado, com `aria-hidden` e esmaecido por CSS). `PainelDoProcesso` carrega com `useCarregamento` e divide em `DadosDoProcesso`, `CaminhoDoProcesso` (reaproveita `LinhaDaEtapa` sem ações, com `responsavelNome`) e `HistoricoDoProcesso` (reaproveita `ListaDoHistorico`; vazio/erro/carregando próprios). `Painel.css`: painel à direita (~480px, abaixo de 900px a tela inteira), `--sombra-flutuante`, véu sobre o Quadro, ✓ nas resolvidas, atual em azul com sublinhado aceso e futuras apagadas. `AreaDeSetores` abre o setor do segundo trecho depois de `#/setores/` e, ao voltar, troca o endereço para `#/setores`.
-- [ ] **Step 3:** `npx vitest run` → PASS; `npx eslint src` e `npx tsc -b` limpos; commit "Ticket 04 de processos-etapas: painel do processo".
+- [x] **Step 2: implementação.** `AreaDeProcessos` lê o segundo trecho do endereço: `novo` (Task 7) ou um id → monta o painel por cima do Quadro (que continua montado, com `aria-hidden` e esmaecido por CSS). `PainelDoProcesso` carrega com `useCarregamento` e divide em `DadosDoProcesso`, `CaminhoDoProcesso` (reaproveita `LinhaDaEtapa` sem ações, com `responsavelNome`) e `HistoricoDoProcesso` (reaproveita `ListaDoHistorico`; vazio/erro/carregando próprios). `Painel.css`: painel à direita (~480px, abaixo de 900px a tela inteira), `--sombra-flutuante`, véu sobre o Quadro, ✓ nas resolvidas, atual em azul com sublinhado aceso e futuras apagadas. `AreaDeSetores` abre o setor do segundo trecho depois de `#/setores/` e, ao voltar, troca o endereço para `#/setores`.
+- [x] **Step 3:** `npx vitest run` → PASS; `npx eslint src` e `npx tsc -b` limpos; commit "Ticket 04 de processos-etapas: painel do processo".
 
 ---
 

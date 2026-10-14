@@ -3,6 +3,7 @@ import type { UsuarioAtual } from '../../acesso/tipos'
 import { useCarregamento } from '../../hooks/useCarregamento'
 import { useEndereco } from '../../hooks/useEndereco'
 import type { ModuloDeProcessos } from '../../processos/tipos'
+import { PainelDoProcesso } from './PainelDoProcesso'
 import { QuadroDeProcessos } from './QuadroDeProcessos'
 
 type AreaDeProcessosProps = { usuario: UsuarioAtual; processos: ModuloDeProcessos }
@@ -18,10 +19,21 @@ export function AreaDeProcessos({ usuario, processos }: AreaDeProcessosProps) {
   const listar = useCallback(() => processos.listarProcessos(), [processos])
   const { estado, tentarDeNovo } = useCarregamento(listar)
   const [endereco, irPara] = useEndereco()
+  const idAberto = idDoEndereco(endereco)
+
+  // O foco volta ao cartão do processo que estava aberto, depois que o Quadro deixa de estar inerte.
+  function fechar() {
+    irPara('#/processos')
+    setTimeout(() => document.getElementById(`cartao-${idAberto}`)?.focus(), 0)
+  }
+
   return (
     <section className="area-de-processos" aria-label="Processos">
-      <QuadroDeProcessos estado={estado} aoTentarDeNovo={tentarDeNovo} podeAlterar={usuario.perfil !== 'consulta'}
-        aoCadastrar={() => irPara('#/processos/novo')} idEscolhido={idDoEndereco(endereco)} />
+      <div className={idAberto ? 'quadro-esmaecido' : undefined} inert={idAberto !== null}>
+        <QuadroDeProcessos estado={estado} aoTentarDeNovo={tentarDeNovo} podeAlterar={usuario.perfil !== 'consulta'}
+          aoCadastrar={() => irPara('#/processos/novo')} idEscolhido={idAberto} />
+      </div>
+      {idAberto && <PainelDoProcesso key={idAberto} processos={processos} id={idAberto} aoFechar={fechar} />}
     </section>
   )
 }

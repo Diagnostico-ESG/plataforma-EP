@@ -1,0 +1,169 @@
+/* O painel do processo abre à direita, por cima do Quadro, que fica esmaecido atrás (identidade visual).
+   Abaixo de 900px ocupa a tela inteira. */
+.area-de-processos {
+  position: relative;
+}
+
+.quadro-esmaecido {
+  opacity: 0.45;
+  transition: opacity 200ms var(--curva-saida);
+}
+
+.painel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  width: min(520px, 100%);
+  overflow-y: auto;
+  background: var(--folha);
+  box-shadow: var(--sombra-flutuante);
+  animation: painel-entra 200ms var(--curva-saida);
+}
+
+@keyframes painel-entra {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .painel {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .painel {
+    animation: none;
+  }
+}
+
+.painel-barra {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--esp-3) var(--esp-4) 0;
+}
+
+.painel-cabecalho {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--esp-3);
+  padding: var(--esp-4);
+  border-bottom: 1px solid var(--linha);
+}
+
+.painel-sigla {
+  flex: none;
+}
+
+.painel-identificacao {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--esp-1);
+  min-width: 0;
+}
+
+.painel-titulo {
+  margin: 0;
+  font-size: var(--tam-painel);
+  font-weight: 700;
+}
+
+.painel-macroprocesso {
+  margin: 0;
+  color: var(--texto-2);
+}
+
+.painel-fechar {
+  flex: none;
+}
+
+.painel-abas {
+  display: flex;
+  gap: var(--esp-4);
+  padding: 0 var(--esp-4);
+  border-bottom: 1px solid var(--linha);
+}
+
+.painel-aba {
+  padding: var(--esp-3) 0;
+  border: 0;
+  border-bottom: var(--linha-acesa);
+  border-bottom-color: transparent;
+  background: transparent;
+  color: var(--texto-2);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.painel-aba[aria-selected='true'] {
+  border-bottom-color: var(--azul);
+  color: var(--texto);
+}
+
+.painel-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-5);
+  padding: var(--esp-4);
+}
+
+.painel-subtitulo {
+  margin: 0 0 var(--esp-2);
+  font-size: var(--tam-coluna);
+  font-weight: 700;
+}
+
+.painel-caminho-titulo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.painel-link {
+  color: var(--azul);
+  font-size: var(--tam-secundario);
+}
+
+.painel-lista-de-dados {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--esp-2) var(--esp-4);
+  margin: 0;
+}
+
+.painel-lista-de-dados dt {
+  color: var(--texto-2);
+}
+
+.painel-lista-de-dados dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Etapas resolvidas com ✓ e futuras apagadas, como no caminho da identidade visual. */
+.etapa-concluida .etapa-nome::before,
+.etapa-realizada_anteriormente .etapa-nome::before,
+.etapa-dispensada .etapa-nome::before {
+  content: '✓ ';
+  color: var(--aprovado-texto);
+}
+
+.etapa-pendente {
+  opacity: 0.75;
+}
+
+.etapa-pendente[aria-current='step'] {
+  opacity: 1;
+}
+
+.etapa-responsavel {
+  flex-basis: 100%;
+}
