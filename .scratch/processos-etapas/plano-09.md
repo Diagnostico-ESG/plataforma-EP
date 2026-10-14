@@ -202,18 +202,18 @@ export function textoDaEtapaAtual(processo: ProcessoDaLista): string
 
 **Consome:** `PilulaDaSituacao`, `textoDaEtapaAtual`, `montarEnderecoDosProcessos`, `SEM_FILTROS`.
 
-- [ ] Escrever `App.processosDoSetor.test.tsx` (critério 5; montagem como em `App.responsaveisDoSetor.test.tsx`, abrindo o setor TSA pela célula da lista):
+- [x] Escrever `App.processosDoSetor.test.tsx` (critério 5; montagem como em `App.responsaveisDoSetor.test.tsx`, abrindo o setor TSA pela célula da lista):
   1. a seção "Processos do setor" lista só os processos de `s1`, por nome, com nome, tipo, etapa atual e situação (inclusive concluído e cancelado);
   2. vazio: "Este setor ainda não tem processos.";
   3. carregando: "Carregando processos do setor…" (`segurarListaDeProcessos`);
   4. erro: a frase de erro com [Tentar de novo], que carrega de novo (`falharListaDeProcessos`);
   5. clicar num processo leva a `#/processos/lista/<id>?setor=s1` e abre o painel dele;
   6. Consulta: a seção aparece igual.
-- [ ] Rodar: falha.
-- [ ] `ProcessosDoSetor` (`{ processos: ModuloDeProcessos; setorId: string }`), no molde de `ResponsaveisDoSetor`: `useCarregamento(listarProcessos)`, filtra por `setorId` e ordena por nome; `<section aria-label="Processos do setor">` com `<h3 className="form-setor-titulo">`; a tabela `tabela-cadastros` com o nome em `<button className="cadastros-abrir">` e a linha `linha-clicavel`, que faz `window.location.hash = montarEnderecoDosProcessos({ visao: 'lista', aberto: id, filtros: { ...SEM_FILTROS, setor: setorId } })`.
-- [ ] `SetorAberto`: acrescentar `<ProcessosDoSetor processos={processos} setorId={id} />` depois de `EtapasDoSetor`, nos dois modos.
-- [ ] Rodar o teste novo, `npm test`, `npm run lint`, `npm run typecheck`.
-- [ ] Comitar: `Ticket 09 de processos-etapas: processos do setor na tela do setor`.
+- [x] Rodar: falha.
+- [x] `ProcessosDoSetor` (`{ processos: ModuloDeProcessos; setorId: string }`), no molde de `ResponsaveisDoSetor`: `useCarregamento(listarProcessos)`, filtra por `setorId` e ordena por nome; `<section aria-label="Processos do setor">` com `<h3 className="form-setor-titulo">`; a tabela `tabela-cadastros` com o nome em `<button className="cadastros-abrir">` e a linha `linha-clicavel`, que faz `window.location.hash = montarEnderecoDosProcessos({ visao: 'lista', aberto: id, filtros: { ...SEM_FILTROS, setor: setorId } })`.
+- [x] `SetorAberto`: acrescentar `<ProcessosDoSetor processos={processos} setorId={id} />` depois de `EtapasDoSetor`, nos dois modos.
+- [x] Rodar o teste novo, `npm test`, `npm run lint`, `npm run typecheck`.
+- [x] Comitar: `Ticket 09 de processos-etapas: processos do setor na tela do setor`.
 
 ### Tarefa 6 — Fechamento
 
