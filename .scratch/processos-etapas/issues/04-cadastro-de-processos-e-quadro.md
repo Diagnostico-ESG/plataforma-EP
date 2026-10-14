@@ -20,3 +20,5 @@
 - [ ] Janela "Excluir o processo {nome}?" com [Excluir processo] [Cancelar].
 - [ ] A Consulta vê Quadro e painel sem botões.
 - [ ] Testes de interface com o aplicativo inteiro: cadastrar, editar, mover de macroprocesso e excluir com sucesso e com falha, cada recusa, o aviso de setor incluído, as colunas, a Consulta e os estados.
+
+Concluído em 2026-10-14 (commit 947b1df)
