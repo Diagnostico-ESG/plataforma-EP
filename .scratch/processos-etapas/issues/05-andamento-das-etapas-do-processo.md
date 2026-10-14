@@ -16,3 +16,5 @@
 - [ ] Quadro: o cartão muda de coluna depois de cada ação; o processo concluído sai do Quadro.
 - [ ] A Consulta não vê as ações.
 - [ ] Testes de interface com o aplicativo inteiro: cada ação com sucesso e com falha, cada recusa, a janela de nota, o processo saindo de "Aguardando o setor" quando o setor resolve as etapas, o cartão mudando de coluna e o concluído saindo do Quadro.
+
+Concluído em 2026-10-14 (commit 48b38b3)

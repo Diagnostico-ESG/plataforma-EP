@@ -1,6 +1,6 @@
 # Ticket 05 de processos-etapas (Andamento das etapas do processo) — Plano de execução
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** a equipe anda com o processo pelo painel (Iniciar, Concluir, Dispensar, Realizada anteriormente), com o banco impondo a sequência, e o cartão do Quadro muda de coluna e some quando o processo conclui.
 
@@ -51,7 +51,7 @@
 - Consumes: `andamentos`, `etapas`, `processos`, `setores`, `eventos`, `processos_com_andamento`, `private.preparar_andamento()`, `private.conferir_anterior_resolvida(public.andamentos)`, `private.conferir_dispensa`, `private.pode_alterar_cadastros()`.
 - Produces: exceções com estes textos (o módulo da Task 2 as traduz): `setor_nao_resolveu:<SIGLA>`, `ja_ha_etapa_em_andamento:<nome da etapa>`, `anterior_nao_resolvida:<nome>` (já existia), `etapa_obrigatoria:<nome>` (já existia), `transicao_nao_permitida:<de>:<para>`. Evento de andamento de processo: `entidade = 'andamento'`, `entidade_ref = '<processo_id>:<andamento_id>'`, `detalhes.antes/depois` com `processo_id`, `processo_nome`, `setor_sigla`, `etapa_codigo`, `etapa_nome`, `status`, `iniciada_em`, `resolvida_em`, e `detalhes.motivo` = nota.
 
-- [ ] **Step 1: Conferir o alvo e criar branch e marco**
+- [x] **Step 1: Conferir o alvo e criar branch e marco**
 
 ```bash
 git switch -c processos-etapas-05
@@ -59,7 +59,7 @@ git tag marco/2026-10-14-inicio-ticket-05-processos-etapas
 ```
 Conferir a linha "vínculo atual" de `supabase/AMBIENTES.md` (= `yclkzyoebpsxmgpbcbus`, o desenvolvimento).
 
-- [ ] **Step 2: Escrever o teste novo (falha, porque a migração não existe)**
+- [x] **Step 2: Escrever o teste novo (falha, porque a migração não existe)**
 
 Criar `supabase/tests/18_andamento_do_processo.test.sql`:
 
@@ -218,7 +218,7 @@ end $$;
 
 Contagem: 25 asserções (1 setor recusado, 2 aguardando, 3 iniciar, 4 data, 5 segunda em andamento, 6 concluir, 7 data, 8 anterior, 9 dispensa, 10 nota, 11 transição, 12–15 quatro registros, 16 concluído, 17 etapa atual, 18 dispensa opcional, 19 eventos, 20 motivo, 21 nome do processo, 22 consulta, 23 inativo, 24 admin, 25 visitante). Se o `plan(25)` não bater, ajustar o número e nada mais.
 
-- [ ] **Step 3: Ajustar o teste 17**
+- [x] **Step 3: Ajustar o teste 17**
 
 Em `supabase/tests/17_processos.test.sql`:
 1. Trocar o comentário "ninguém cria, apaga nem muda direto neste ticket" por "ninguém cria nem apaga direto" e **apagar** o bloco `with alterados as (update public.andamentos set status = 'em_andamento' ... 'andamento de processo ainda não muda (ticket 05)')`.
@@ -227,7 +227,7 @@ Em `supabase/tests/17_processos.test.sql`:
 4. Baixar `plan(80)` para `plan(79)`.
 5. Se algum teste que conta eventos de **todo** o banco falhar por causa dos eventos de andamento que agora são gravados, restringir a contagem à entidade que ele quer (`entidade = 'processo'`).
 
-- [ ] **Step 4: Escrever a migração**
+- [x] **Step 4: Escrever a migração**
 
 `npx supabase migration new andamento_do_processo` e preencher o arquivo criado em `supabase/migrations/`:
 
@@ -376,15 +376,15 @@ revoke execute on function private.base_do_evento_do_andamento(public.andamentos
 
 Observação para quem executa: `preparar_andamento` e `registrar_evento_do_andamento` continuam com os `revoke` do ticket 02 (`create or replace` preserva os privilégios). O `conferir_anterior_resolvida` do ticket 02 não muda.
 
-- [ ] **Step 5: Rodar o teste e ver o resultado antes/depois da migração**
+- [x] **Step 5: Rodar o teste e ver o resultado antes/depois da migração**
 
 Primeiro, só os testes novos, para ver a falha esperada: `git add supabase/tests && git commit -m "Ticket 05 de processos-etapas: testes de banco do andamento do processo"`, `git push -u origin processos-etapas-05` e disparar "Testes de banco" na branch (Run workflow). Esperado: o teste 18 **falha** (o gatilho ainda não conhece o processo; a política ainda recusa). Depois de conferir a falha, passar para o Step 6.
 
-- [ ] **Step 6: Aplicar a migração no desenvolvimento e rodar os testes**
+- [x] **Step 6: Aplicar a migração no desenvolvimento e rodar os testes**
 
 Commitar a migração; push; disparar "Migrar banco de desenvolvimento" com o nome do arquivo novo; conferir que terminou; disparar "Testes de banco". Esperado: todos os testes passam (17 com 79, 18 com 25, `00_rls_ligada` e `10_privilegios_padrao` sem mudança). Falhou? Ler o resultado, corrigir o teste ou a **nova migração** (migração já aplicada não se edita: a correção vira migração nova).
 
-- [ ] **Step 7: Tipos e registro**
+- [x] **Step 7: Tipos e registro**
 
 `npm run db:types` (alvo conferido: desenvolvimento). Esperado: sem diferença em `src/types/database.ts` (nenhuma tabela, coluna ou view mudou). Registrar a migração em `supabase/AMBIENTES.md` na lista de "aplicadas fora do histórico da CLI", como as anteriores. Commit: teste, migração, registro (e tipos, se mudaram) — `Ticket 05 de processos-etapas: andamento do processo no banco`.
 
@@ -402,7 +402,7 @@ Commitar a migração; push; disparar "Migrar banco de desenvolvimento" com o no
 - Consumes: as exceções da Task 1.
 - Produces: `iniciarEtapa/concluirEtapa/dispensarEtapa/registrarRealizadaAnteriormente` lançam `TravaDoBanco` com as frases do ticket; `lerHistoricoDoProcesso(id)` devolve também os eventos `entidade = 'andamento'` cuja `entidade_ref` começa por `<id>:`.
 
-- [ ] **Step 1: Testes das duas frases** — em `processosSupabase.test.ts`, depois do teste "dispensar etapa obrigatória vira a frase da spec":
+- [x] **Step 1: Testes das duas frases** — em `processosSupabase.test.ts`, depois do teste "dispensar etapa obrigatória vira a frase da spec":
 
 ```ts
 test('iniciar a primeira etapa com o setor pendente vira a frase com a sigla', async () => {
@@ -420,7 +420,7 @@ test('segunda etapa em andamento vira a frase com o nome da que está em andamen
 ```
 Rodar `npx vitest run src/processos/processosSupabase.test.ts`: os dois falham.
 
-- [ ] **Step 2: Implementar** — em `processosSupabase.ts` trocar o padrão e o mapa:
+- [x] **Step 2: Implementar** — em `processosSupabase.ts` trocar o padrão e o mapa:
 
 ```ts
 // O banco recusa a sequência e a dispensa com "motivo:valor" (migrações etapas_do_setor e andamento_do_processo).
@@ -435,9 +435,9 @@ const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
 ```
 (o resto de `falhaDoAndamento` não muda). Rodar o arquivo: passa.
 
-- [ ] **Step 3: Cliente falso com `like`** — em `ClienteSupabaseFalso.ts`, acrescentar ao tipo `Pedido` a linha `/** O filtro `like` (coluna e padrão). */ parecido?: [string, string]` e ao objeto `consulta`: `like: (coluna: string, padrao: string) => Object.assign(pedido, { parecido: [coluna, padrao] }) && consulta,`.
+- [x] **Step 3: Cliente falso com `like`** — em `ClienteSupabaseFalso.ts`, acrescentar ao tipo `Pedido` a linha `/** O filtro `like` (coluna e padrão). */ parecido?: [string, string]` e ao objeto `consulta`: `like: (coluna: string, padrao: string) => Object.assign(pedido, { parecido: [coluna, padrao] }) && consulta,`.
 
-- [ ] **Step 4: Teste e implementação do histórico** — em `lerProcessoSupabase.test.ts`, trocar a asserção do pedido do teste "o histórico do processo vem do mais recente ao mais antigo, só dos eventos dele" por:
+- [x] **Step 4: Teste e implementação do histórico** — em `lerProcessoSupabase.test.ts`, trocar a asserção do pedido do teste "o histórico do processo vem do mais recente ao mais antigo, só dos eventos dele" por:
 
 ```ts
   expect(cliente.pedidos[0]).toMatchObject({
@@ -453,7 +453,7 @@ Rodar: falha. Em `lerProcessoSupabase.ts`, em `lerHistoricoDoProcesso`, trocar `
 ```
 Rodar: passa.
 
-- [ ] **Step 5: Nome do item do evento de etapa de processo** — teste em `historicoDosCadastros.test.ts` (seguir o formato dos testes vizinhos de `nomeDoItem`):
+- [x] **Step 5: Nome do item do evento de etapa de processo** — teste em `historicoDosCadastros.test.ts` (seguir o formato dos testes vizinhos de `nomeDoItem`):
 
 ```ts
 test('o nome do item do evento de etapa de processo traz o processo, não o setor', () => {
@@ -478,7 +478,7 @@ function nomeDoItemComDono(entidade: string, estado: Record<string, unknown>): s
 ```
 e atualizar a chamada em `nomeDoItem`. Rodar `npx vitest run src/cadastros src/processos`: passa.
 
-- [ ] **Step 6: Commit** — `git add src && git commit -m "Ticket 05 de processos-etapas: recusas e histórico do andamento no módulo"` (o pre-commit roda lint, tipos e testes).
+- [x] **Step 6: Commit** — `git add src && git commit -m "Ticket 05 de processos-etapas: recusas e histórico do andamento no módulo"` (o pre-commit roda lint, tipos e testes).
 
 ---
 
@@ -491,7 +491,7 @@ e atualizar a chamada em `nomeDoItem`. Rodar `npx vitest run src/cadastros src/p
 **Interfaces:**
 - Produces: `mudarEtapaDoProcesso(processo: ProcessoLido, id: string, mudancas: Partial<EtapaDoProcesso>): ProcessoLido` (devolve o mesmo objeto se a etapa não é do processo; senão recalcula `etapaAtual` e `situacao`) e `atualizarSetorDoProcesso(processo: ProcessoLido, etapasDoSetor: EtapaDoSetor[]): ProcessoLido` (recalcula `etapasDoSetor` e `aguardandoOSetor`).
 
-- [ ] **Step 1: Teste (falha)** — `andamentoFalso.test.ts`:
+- [x] **Step 1: Teste (falha)** — `andamentoFalso.test.ts`:
 
 ```ts
 import { expect, test } from 'vitest'
@@ -539,7 +539,7 @@ test('o processo aguarda o setor enquanto uma etapa do setor está pendente ou e
 ```
 Rodar `npx vitest run src/processos/andamentoFalso.test.ts`: falha (módulo não existe).
 
-- [ ] **Step 2: Implementar** — `andamentoFalso.ts`:
+- [x] **Step 2: Implementar** — `andamentoFalso.ts`:
 
 ```ts
 import { indiceDaEtapaAtual } from './caminhoDeEtapas'
@@ -567,7 +567,7 @@ export function atualizarSetorDoProcesso(processo: ProcessoLido, etapasDoSetor: 
 ```
 Rodar: passa.
 
-- [ ] **Step 3: Ligar no `ProcessosFalso.mudar`** — importar as duas funções e trocar o corpo do método `mudar` por:
+- [x] **Step 3: Ligar no `ProcessosFalso.mudar`** — importar as duas funções e trocar o corpo do método `mudar` por:
 
 ```ts
   private mudar(chamada: ChamadaDeEtapa, mudancas: Partial<EtapaDoSetor>): void {
@@ -599,7 +599,7 @@ Rodar `npx vitest run src`: tudo passa (os testes antigos não mudam). Commit: `
 - Produces: `CaminhoDeEtapas({ processos, etapas, podeAlterar, aoMudar, aoSumir })` com `etapas: EtapaDoCaminho[]` (`EtapaDoSetor & { responsavelNome?: string | null }`); mostra "Responsável: …" quando `responsavelNome` está definido (etapas do processo).
   `CaminhoDoProcesso({ processo, processos, podeAlterar, aoMudar, aoSumir })`.
 
-- [ ] **Step 1: Testes de tela (falham)** — `src/App.andamentoDoProcesso.test.tsx` (cabeçalho e fixtures no estilo de `App.painelDoProcesso.test.tsx` e `App.quadro.test.tsx`):
+- [x] **Step 1: Testes de tela (falham)** — `src/App.andamentoDoProcesso.test.tsx` (cabeçalho e fixtures no estilo de `App.painelDoProcesso.test.tsx` e `App.quadro.test.tsx`):
 
 ```tsx
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
@@ -790,13 +790,13 @@ test('o processo sai de "Aguardando o setor" quando o setor resolve as etapas', 
 ```
 Rodar `npx vitest run src/App.andamentoDoProcesso.test.tsx`: falham (o painel ainda não tem ações). Ajuste fino dos seletores permitido (por exemplo, o nome acessível do botão da janela de nota), sem mudar o que cada teste prova.
 
-- [ ] **Step 2: Renomear e generalizar o caminho** — `git mv src/components/processos/CaminhoDoSetor.tsx src/components/processos/CaminhoDeEtapas.tsx`; dentro dele:
+- [x] **Step 2: Renomear e generalizar o caminho** — `git mv src/components/processos/CaminhoDoSetor.tsx src/components/processos/CaminhoDeEtapas.tsx`; dentro dele:
   - `export function CaminhoDoSetor` → `export function CaminhoDeEtapas`; `type CaminhoDoSetorProps` → `CaminhoDeEtapasProps`; comentário: "O caminho de etapas (do setor ou do processo): só a etapa atual tem ações; …";
   - acrescentar `type EtapaDoCaminho = EtapaDoSetor & { responsavelNome?: string | null }` e usar `etapas: EtapaDoCaminho[]` em `CaminhoDeEtapasProps`;
   - no `<LinhaDaEtapa ... />` do `map`, acrescentar `responsavelNome={etapa.responsavelNome}` (indefinido nas do setor: a linha não mostra "Responsável").
   Em `EtapasDoSetor.tsx`: importar `CaminhoDeEtapas` de `./CaminhoDeEtapas` e usá-lo no lugar de `CaminhoDoSetor`.
 
-- [ ] **Step 3: Painel com as ações** — `CaminhoDoProcesso.tsx` passa a:
+- [x] **Step 3: Painel com as ações** — `CaminhoDoProcesso.tsx` passa a:
 
 ```tsx
 import type { ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
@@ -845,7 +845,7 @@ Em `PainelDoProcesso.tsx`, `DetalhesDoProcesso`: trocar `<CaminhoDoProcesso proc
 ```
 (`aoAtualizar` recarrega o painel, `aoMudar` recarrega o Quadro atrás). Rodar `npx vitest run src/App.andamentoDoProcesso.test.tsx src/App.painelDoProcesso.test.tsx src/App.etapasDoSetor.test.tsx`: passam. O teste do painel "o caminho mostra… e `caminho.queryAllByRole('button')` vazio" continua verdadeiro? Ele monta o processo com `etapa atual` em andamento e perfil integrante: agora o painel mostra Concluir/Realizada anteriormente. **Atualizar esse teste**: trocar a última asserção por `expect(caminho.getAllByRole('button').map((b) => b.textContent)).toEqual(['Concluir', 'Realizada anteriormente'])` (e ele deixa de dizer "só leitura" para o processo; o setor segue só leitura, como o próprio título do teste ajustado diz).
 
-- [ ] **Step 4: Rodar tudo** — `npm test`, `npm run lint`, `npm run typecheck`, `npm run check:circular`. Esperado: tudo verde. Commit: `Ticket 05 de processos-etapas: ações das etapas no painel do processo`.
+- [x] **Step 4: Rodar tudo** — `npm test`, `npm run lint`, `npm run typecheck`, `npm run check:circular`. Esperado: tudo verde. Commit: `Ticket 05 de processos-etapas: ações das etapas no painel do processo`.
 
 ---
 
@@ -854,10 +854,10 @@ Em `PainelDoProcesso.tsx`, `DetalhesDoProcesso`: trocar `<CaminhoDoProcesso proc
 **Files:**
 - Modify: `.scratch/processos-etapas/desvios.md` (entrada nova, datada, sem editar as antigas), `.scratch/melhorias-protocolo.md` (itens de `.claude/regras/nao-testados.md` do `/executar-complexo` que aconteceram, sem concluir se funcionaram), `.scratch/processos-etapas/issues/05-...md` (linha `Concluído em`, depois do merge)
 
-- [ ] **Step 1: Desvios** — registrar em `desvios.md`: (a) o desvio herdado do ticket 04 foi resolvido (política relaxada, gatilhos reescritos, teste 17 sem o desvio); (b) a ordem das conferências ao iniciar (já há outra em andamento antes de "anterior não resolvida"); (c) o histórico do processo agora lê `entidade = 'andamento'` por `entidade_ref like '<id>%'`; (d) o que mais surgir na execução.
-- [ ] **Step 2: Conferência visual** — o app exige login no Supabase e o navegador de visualização não tem dados: registrar de novo que o critério `[visual]` (etapa atual destacada, ✓ nas resolvidas, futuras apagadas) fica para o `/polir`.
-- [ ] **Step 3: Integrar** — com `npm test` verde: `git switch main`, merge da branch (opção de merge do `finishing-a-development-branch`), `git branch -d processos-etapas-05`; `git push` da `main` (autorizado no `CLAUDE.md`); conferir o "Testes de banco" que o push em `supabase/` dispara na `main`.
-- [ ] **Step 4: Marca no ticket** — na `main`, acrescentar ao fim de `issues/05-andamento-das-etapas-do-processo.md` a linha `Concluído em 2026-10-14 (commit <hash do último commit do ticket>)`, marcar as caixas dos critérios que a execução provou, comitar e fazer push.
+- [x] **Step 1: Desvios** — registrar em `desvios.md`: (a) o desvio herdado do ticket 04 foi resolvido (política relaxada, gatilhos reescritos, teste 17 sem o desvio); (b) a ordem das conferências ao iniciar (já há outra em andamento antes de "anterior não resolvida"); (c) o histórico do processo agora lê `entidade = 'andamento'` por `entidade_ref like '<id>%'`; (d) o que mais surgir na execução.
+- [x] **Step 2: Conferência visual** — o app exige login no Supabase e o navegador de visualização não tem dados: registrar de novo que o critério `[visual]` (etapa atual destacada, ✓ nas resolvidas, futuras apagadas) fica para o `/polir`.
+- [x] **Step 3: Integrar** — com `npm test` verde: `git switch main`, merge da branch (opção de merge do `finishing-a-development-branch`), `git branch -d processos-etapas-05`; `git push` da `main` (autorizado no `CLAUDE.md`); conferir o "Testes de banco" que o push em `supabase/` dispara na `main`.
+- [x] **Step 4: Marca no ticket** — na `main`, acrescentar ao fim de `issues/05-andamento-das-etapas-do-processo.md` a linha `Concluído em 2026-10-14 (commit <hash do último commit do ticket>)`, marcar as caixas dos critérios que a execução provou, comitar e fazer push.
 
 ---
 
