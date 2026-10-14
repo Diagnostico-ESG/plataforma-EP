@@ -49,9 +49,9 @@
 
 **Arquivos:** `src/processos/tipos.ts`; criar `src/processos/situacaoSupabase.ts` (+ `situacaoSupabase.test.ts`); `src/processos/andamentosSupabase.ts` (frases `processo_parado`, `situacao_invalida`; exportar `falhaDoAndamento`); `src/processos/processosSupabase.ts`; criar `src/processos/situacaoFalso.ts` (+ teste); `src/processos/ProcessosFalso.ts`.
 
-- [ ] Testes primeiro: `situacaoSupabase.test.ts` (chama `rpc` com `p_processo` e `p_motivo`; `processo_parado:suspenso` vira a frase do critério 3; `motivo_obrigatorio`; `situacao_invalida`; `42501` vira "Seu perfil não permite alterar os processos."; `registro_inexistente` vira `CadastroInexistente`) e `situacaoFalso.test.ts` (transições, motivo obrigatório, retomar limpa o motivo, concluído conta como em andamento guardado, etapa de processo parado recusada).
-- [ ] Implementar: `ModuloDeProcessos` ganha `suspenderProcesso`, `cancelarProcesso`, `retomarProcesso(id, motivo): Promise<void>`; o real usa `cliente.rpc`; o falso aplica as transições e recusa `iniciar/concluir/dispensar/realizada/voltar/datas/responsavel` com o processo parado.
-- [ ] `npm test` verde para o módulo; comitar.
+- [x] Testes primeiro: `situacaoSupabase.test.ts` (chama `rpc` com `p_processo` e `p_motivo`; `processo_parado:suspenso` vira a frase do critério 3; `motivo_obrigatorio`; `situacao_invalida`; `42501` vira "Seu perfil não permite alterar os processos."; `registro_inexistente` vira `CadastroInexistente`) e `situacaoFalso.test.ts` (transições, motivo obrigatório, retomar limpa o motivo, concluído conta como em andamento guardado, etapa de processo parado recusada).
+- [x] Implementar: `ModuloDeProcessos` ganha `suspenderProcesso`, `cancelarProcesso`, `retomarProcesso(id, motivo): Promise<void>`; o real usa `cliente.rpc`; o falso aplica as transições e recusa `iniciar/concluir/dispensar/realizada/voltar/datas/responsavel` com o processo parado.
+- [x] `npm test` verde para o módulo; comitar.
 
 ### Tarefa 4 — Tela: ações, aviso e histórico
 
