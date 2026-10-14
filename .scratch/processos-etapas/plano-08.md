@@ -1,6 +1,6 @@
 # Ticket 08 de processos-etapas (Subprocessos e reclassificação) — Plano de execução
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** cadastrar subprocesso ligado a um pai do tipo Processo (seguindo o macroprocesso dele) e reclassificar qualquer item com motivo, mantendo o mesmo item; o banco impõe um nível só, pai do tipo Processo, macroprocesso do pai e nenhum subprocesso perdido numa exclusão.
 
@@ -210,8 +210,8 @@ end $$;
 
 ### Tarefa 6 — Fechamento
 
-- [ ] `npm test` completo, `npm run lint` e checagem de tipos; registrar `desvios.md`, melhorias do protocolo e itens não testados (blocos do `/executar-complexo` e "Qualquer momento" em `.claude/regras/nao-testados.md`).
-- [ ] Marcar o plano, integrar a branch (`git switch main`, merge, `git branch -d`), `git push` da `main`, ticket com `Concluído em`, comitar e conferir o "Testes de banco" da `main`.
+- [x] `npm test` completo, `npm run lint` e checagem de tipos; registrar `desvios.md`, melhorias do protocolo e itens não testados (blocos do `/executar-complexo` e "Qualquer momento" em `.claude/regras/nao-testados.md`).
+- [x] Marcar o plano, integrar a branch (`git switch main`, merge, `git branch -d`), `git push` da `main`, ticket com `Concluído em`, comitar e conferir o "Testes de banco" da `main`.
 
 ## Autoavaliação
 

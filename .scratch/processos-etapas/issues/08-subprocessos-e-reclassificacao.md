@@ -18,3 +18,5 @@
 - [ ] Histórico: "Reclassificou", com de, para e motivo.
 - [ ] A Consulta não vê [Reclassificar].
 - [ ] Testes de interface com o aplicativo inteiro: cadastrar subprocesso, reclassificar nos três sentidos com sucesso e com falha, o aviso de macroprocesso, cada recusa e a navegação entre pai e subprocessos.
+
+Concluído em 2026-10-14 (commit 0bc37e1)
