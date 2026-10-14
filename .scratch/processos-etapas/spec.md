@@ -174,6 +174,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
     - a pílula "Suspenso";
     - o avatar do responsável da etapa atual.
   - **Ordem na coluna:** pelo nome do processo.
+  - **Largura** (decidido pelo usuário em 2026-10-14): o Quadro ocupa toda a largura à direita da faixa lateral, sem largura máxima (diferente dos 1100px de Cadastros e Administração); cada coluna tem largura fixa de cerca de 272px, e o que não cabe na tela fica na rolagem lateral.
 - **Lista:**
   - **Colunas:** nome (com "↳ pai" no subprocesso), tipo, setor, macroprocesso, etapa atual, responsável e situação em pílula.
   - **Ordem:** pela sigla do setor e pelo nome.
