@@ -274,11 +274,13 @@ set local role authenticated;
 delete from public.processos where setor_id = '5e000000-0000-0000-0000-000000000005';
 insert into _tap (linha) select is(
   (select jsonb_array_length(detalhes -> 'antes' -> 'andamentos') from public.eventos
-    where entidade = 'processo' and acao = 'excluir'),
+    where entidade = 'processo' and acao = 'excluir'
+      and detalhes -> 'antes' ->> 'setor_sigla' = 'TRX'),
   6, 'excluir o processo grava no antes os 6 andamentos');
 insert into _tap (linha) select is(
   (select detalhes -> 'antes' -> 'andamentos' -> 0 ->> 'etapa_codigo' from public.eventos
-    where entidade = 'processo' and acao = 'excluir'),
+    where entidade = 'processo' and acao = 'excluir'
+      and detalhes -> 'antes' ->> 'setor_sigla' = 'TRX'),
   'modelagem', 'os andamentos do antes vêm na ordem do catálogo');
 insert into _tap (linha) select is(
   (select count(*)::int from public.andamentos where processo_id = (select id from _alvo)),
