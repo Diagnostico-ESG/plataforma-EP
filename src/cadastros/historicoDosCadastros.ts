@@ -24,15 +24,19 @@ const TEXTO_DA_ACAO_DO_ANDAMENTO: Record<string, string> = {
   mudar_responsavel: 'Mudou o responsável da etapa',
 }
 
-// O texto livre do evento é nota (dispensar, realizada anteriormente) ou motivo (voltar).
-const ACOES_COM_MOTIVO = new Set(['voltar'])
+const TEXTO_DA_ACAO_DO_PROCESSO: Record<string, string> = {
+  ...TEXTO_DA_ACAO, suspender: 'Suspendeu', cancelar: 'Cancelou', retomar: 'Retomou',
+}
+
+// O texto livre do evento é nota (dispensar, realizada anteriormente) ou motivo (voltar e a situação do processo).
+const ACOES_COM_MOTIVO = new Set(['voltar', 'suspender', 'cancelar', 'retomar'])
 
 export function rotuloDoMotivo(acao: string): string {
   return ACOES_COM_MOTIVO.has(acao) ? 'Motivo' : 'Nota'
 }
 
 const TEXTOS_DA_ENTIDADE: Record<string, Record<string, string>> = {
-  setor_envolvido: TEXTO_DA_ACAO_DO_VINCULO, andamento: TEXTO_DA_ACAO_DO_ANDAMENTO,
+  setor_envolvido: TEXTO_DA_ACAO_DO_VINCULO, andamento: TEXTO_DA_ACAO_DO_ANDAMENTO, processo: TEXTO_DA_ACAO_DO_PROCESSO,
 }
 
 // Vínculos, etapas e responsáveis do setor têm a referência 'idA:idB': o item do filtro sai dos ids gravados no evento.
