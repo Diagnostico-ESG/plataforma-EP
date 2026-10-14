@@ -207,7 +207,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
   - **Reclassificar:** a janela traz o novo tipo e, para Subprocesso, o pai. Quando o macroprocesso muda, ela mostra o aviso "O item passa do macroprocesso {de} para {para}, o do processo pai."
 - **Confirmação simples (ADR 0003)** em Excluir processo, Excluir responsável e Excluir etapa do catálogo:
   - "Excluir o processo {nome}? O histórico guarda o que ele tinha, inclusive as etapas, mas não é possível desfazer." [Excluir processo] [Cancelar];
-  - "Excluir o responsável {nome}?" [Excluir responsável] [Cancelar];
+  - "Excluir o responsável {nome}?" [Excluir responsável] [Cancelar], só com o título, sem texto de apoio (aprovado pelo usuário em 2026-10-14);
   - "Excluir a etapa {nome} do catálogo?" [Excluir etapa] [Cancelar].
 - **Tela do setor** ganha, abaixo do que já existe:
   - "Responsáveis do setor": lista com nome, e-mail, cargo, [Editar] e [Excluir], mais [Novo responsável];
@@ -227,7 +227,8 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
   - "Este processo tem {n} subprocessos; reclassifique-os ou exclua-os antes." (exclusão e reclassificação em subprocesso)
   - "O processo pai precisa ser do tipo Processo."
   - "{Usuário} não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP."
-  - "O e-mail deve ter o formato nome@dominio. Recebido: "{valor}"."
+  - "O e-mail deve ter o formato nome@dominio. Recebido: "{valor}"." (a tela confere antes de enviar, com o mesmo formato do banco: algo@algo.algo, sem espaços)
+- **Conferência na tela, antes de enviar:** "O nome do responsável é obrigatório." (aprovado pelo usuário em 2026-10-14).
   - "Não é possível excluir: {setor | macroprocesso} tem {n} processos ligados."
   - "O setor {SIGLA} tem {n} processos neste macroprocesso; mova-os ou exclua-os antes."
   - "A etapa {nome} já foi usada; desative-a em vez de excluir."
