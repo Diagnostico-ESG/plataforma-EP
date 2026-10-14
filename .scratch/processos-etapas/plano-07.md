@@ -32,9 +32,9 @@
 
 **Arquivos:** criar `supabase/tests/20_situacao_do_processo.test.sql`; alterar `supabase/tests/17_processos.test.sql` (linhas ~87-89 e ~269).
 
-- [ ] Escrever o teste 20 (31 asserções, molde do 19): suspender com motivo, situação, `motivo_da_situacao`, evento `suspender` com motivo; suspender suspenso e sem motivo recusados; iniciar etapa, mudar responsável e voltar com o processo suspenso recusados (`processo_parado:suspenso`); retomar sem motivo recusado; retomar limpa o motivo e gera evento `retomar`; etapa volta a andar; cancelar (de em andamento e de suspenso), evento `cancelar`, cancelado→suspender recusado, etapa de cancelado recusada, retomar cancelado; mudança direta recusada; processo inexistente; funções sem `security definer`; Consulta recusada nas três (`42501`), inativo (`registro_inexistente`) e visitante (`42501`).
-- [ ] Ajustar o teste 17 como descrito em "Decisões".
-- [ ] Comitar, `git push` da branch, disparar "Testes de banco" e ler o resultado: o teste 20 deve falhar por função inexistente (e o 17 por já ter o privilégio velho).
+- [x] Escrever o teste 20 (31 asserções, molde do 19): suspender com motivo, situação, `motivo_da_situacao`, evento `suspender` com motivo; suspender suspenso e sem motivo recusados; iniciar etapa, mudar responsável e voltar com o processo suspenso recusados (`processo_parado:suspenso`); retomar sem motivo recusado; retomar limpa o motivo e gera evento `retomar`; etapa volta a andar; cancelar (de em andamento e de suspenso), evento `cancelar`, cancelado→suspender recusado, etapa de cancelado recusada, retomar cancelado; mudança direta recusada; processo inexistente; funções sem `security definer`; Consulta recusada nas três (`42501`), inativo (`registro_inexistente`) e visitante (`42501`).
+- [x] Ajustar o teste 17 como descrito em "Decisões".
+- [x] Comitar, `git push` da branch, disparar "Testes de banco" e ler o resultado: o teste 20 deve falhar por função inexistente (e o 17 por já ter o privilégio velho).
 
 ### Tarefa 2 — Migração (banco)
 
