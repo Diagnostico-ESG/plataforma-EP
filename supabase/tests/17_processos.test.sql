@@ -281,6 +281,11 @@ select set_config('ep.mudando_situacao', 'off', true);
 insert into _tap (linha) select is(
   (select situacao from public.processos_com_andamento where setor_id = '5e000000-0000-0000-0000-000000000004'),
   'suspenso', 'a situação guardada suspensa aparece na view');
+-- O processo volta a andar para as restrições mais adiante (as etapas de processo suspenso ficam congeladas desde o ticket 07).
+select set_config('ep.mudando_situacao', 'on', true);
+update public.processos set situacao = 'em_andamento', motivo_da_situacao = null
+  where setor_id = '5e000000-0000-0000-0000-000000000004';
+select set_config('ep.mudando_situacao', 'off', true);
 
 -- Excluir o processo, como Integrante: o evento guarda os andamentos e eles vão junto.
 insert into _alvo select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000005';
