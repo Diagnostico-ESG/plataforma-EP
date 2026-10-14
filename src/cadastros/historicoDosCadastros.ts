@@ -34,10 +34,11 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   macroprocessos: 'Macroprocessos', setores: 'Setores', status: 'Situação da etapa', iniciada_em: 'Início',
   resolvida_em: 'Conclusão', email: 'E-mail', cargo: 'Cargo', responsaveis: 'Responsáveis',
   tipo: 'Tipo', origem: 'Origem', situacao: 'Situação', contexto: 'Contexto', andamentos: 'Etapas',
+  processo_nome: 'Processo',
 }
 
 // Os ids existem para o filtro; quem lê o histórico vê a sigla e o nome. Código e nome da etapa já estão no título.
-const CAMPOS_ESCONDIDOS = new Set(['setor_id', 'macroprocesso_id', 'etapa_codigo', 'etapa_nome'])
+const CAMPOS_ESCONDIDOS = new Set(['setor_id', 'processo_id', 'macroprocesso_id', 'etapa_codigo', 'etapa_nome'])
 
 // Ação desconhecida (de uma funcionalidade futura) aparece pelo código: sumir do histórico é pior que texto cru.
 export function textoDaAcaoDoCadastro(acao: string, entidade: string): string {
@@ -62,11 +63,12 @@ function codigoENome(codigo: unknown, nome: unknown): string {
   return typeof codigo === 'string' && codigo !== '' ? `${codigo} — ${texto(nome)}` : texto(nome)
 }
 
-// Etapa e responsável pertencem a um setor: o nome deles vem com a sigla; null se o evento não for deles.
-function nomeDoItemDoSetor(entidade: string, estado: Record<string, unknown>): string | null {
+// Etapa e responsável pertencem a um setor (a etapa, também a um processo): o nome vem com o dono; null se não for deles.
+function nomeDoItemComDono(entidade: string, estado: Record<string, unknown>): string | null {
   const nomes: Record<string, unknown> = { andamento: estado.etapa_nome, responsavel_do_setor: estado.nome }
   const nome = nomes[entidade]
-  return typeof nome === 'string' ? `${nome} — ${texto(estado.setor_sigla)}` : null
+  if (typeof nome !== 'string') return null
+  return `${nome} — ${texto(estado.processo_nome ?? estado.setor_sigla)}`
 }
 
 export function nomeDoItem(evento: EventoDoCadastro): string {
@@ -74,8 +76,8 @@ export function nomeDoItem(evento: EventoDoCadastro): string {
   if (evento.entidade === 'setor' && typeof estado.sigla === 'string') return `${estado.sigla} — ${texto(estado.nome)}`
   if (evento.entidade === 'macroprocesso' && typeof estado.nome === 'string') return codigoENome(estado.codigo, estado.nome)
   if (evento.entidade === 'processo' && typeof estado.nome === 'string') return `${texto(estado.setor_sigla)} — ${estado.nome}`
-  const doSetor = nomeDoItemDoSetor(evento.entidade, estado)
-  if (doSetor !== null) return doSetor
+  const comDono = nomeDoItemComDono(evento.entidade, estado)
+  if (comDono !== null) return comDono
   if (typeof estado.setor_sigla === 'string' && typeof estado.macroprocesso_nome === 'string') {
     return `${estado.setor_sigla} em ${estado.macroprocesso_nome}`
   }

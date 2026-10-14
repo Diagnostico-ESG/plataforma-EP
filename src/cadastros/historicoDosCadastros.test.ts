@@ -214,6 +214,17 @@ describe('processos', () => {
     expect(nomeDoItem(evento({ entidade: 'processo', entidadeRef: 'p1', acao: 'excluir', antes: PROCESSO }))).toBe('TSA — Emitir Ofício')
   })
 
+  test('o evento de etapa de processo traz o processo no nome do item e nos campos, sem o id', () => {
+    const depois = {
+      processo_id: 'p1', processo_nome: 'Emitir Ofício', setor_sigla: 'TSA', etapa_codigo: 'modelagem',
+      etapa_nome: 'Reunião de modelagem', status: 'em_andamento', iniciada_em: '2026-10-14', resolvida_em: null,
+    }
+    expect(nomeDoItem(evento({ entidade: 'andamento', entidadeRef: 'p1:a4', acao: 'iniciar', depois })))
+      .toBe('Reunião de modelagem — Emitir Ofício')
+    expect(descreverEstadoDoCadastro(depois)).toBe(
+      'Processo: Emitir Ofício; Setor: TSA; Situação da etapa: Em andamento; Início: 14/10/2026; Conclusão: —')
+  })
+
   test('os campos aparecem legíveis, com tipo, origem e situação pelo rótulo da tela', () => {
     expect(descreverEstadoDoCadastro(PROCESSO)).toBe(
       'Nome: Emitir Ofício; Setor: TSA; Macroprocesso: Macro A; Tipo: A classificar; Origem: Novo; Situação: Em andamento; Contexto: —; Observações: —')

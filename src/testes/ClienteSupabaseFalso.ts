@@ -6,6 +6,8 @@ export type Pedido = {
   filtros?: [string, string][]
   /** O filtro `in` (coluna e valores aceitos). */
   dentro?: [string, string[]]
+  /** O filtro `like` (coluna e padrão). */
+  parecido?: [string, string]
   ordem?: Ordenacao[]
 }
 
@@ -27,6 +29,7 @@ export class ClienteSupabaseFalso {
       delete: () => Object.assign(pedido, { operacao: 'delete' }) && consulta,
       eq: (coluna: string, valor: string) => guardarFiltro(pedido, coluna, valor) && consulta,
       in: (coluna: string, valores: string[]) => Object.assign(pedido, { dentro: [coluna, valores] }) && consulta,
+      like: (coluna: string, padrao: string) => Object.assign(pedido, { parecido: [coluna, padrao] }) && consulta,
       then: (seCumprir: (r: RespostaDoBanco) => unknown, seFalhar?: (e: unknown) => unknown) =>
         Promise.resolve(resposta()).then(seCumprir, seFalhar),
     }
