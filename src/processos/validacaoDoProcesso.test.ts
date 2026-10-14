@@ -20,7 +20,7 @@ test.each([
 
 test('dados saem sem espaços nas pontas e com textos vazios como nulos', () => {
   expect(dadosDoProcesso({ ...CAMPOS, nome: ' Emitir Ofício ', contexto: ' ', observacoes: ' Nota ' })).toEqual({
-    nome: 'Emitir Ofício', setorId: 's1', macroprocessoId: 'm1', tipo: 'a_classificar', origem: 'novo',
-    contexto: null, observacoes: 'Nota',
+    nome: 'Emitir Ofício', setorId: 's1', macroprocessoId: 'm1', tipo: 'a_classificar', processoPaiId: null,
+    origem: 'novo', contexto: null, observacoes: 'Nota',
   })
 })

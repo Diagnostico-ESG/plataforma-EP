@@ -39,6 +39,8 @@ export type ProcessoDaLista = {
   setorSigla: string
   macroprocessoId: string
   macroprocessoNome: string
+  /** Só no subprocesso. */
+  processoPaiId: string | null
   situacao: SituacaoDoProcesso
   etapaAtual: { codigo: string; nome: string; ordem: number } | null
   /** As etapas do setor ainda não foram resolvidas: o processo espera na coluna "Aguardando o setor". */
@@ -62,26 +64,41 @@ export type DatasDaEtapa = { iniciadaEm: string | null; resolvidaEm: string | nu
 /** Quem pode ser responsável por uma etapa: usuário ativo de perfil Administrador ou Integrante. */
 export type UsuarioResponsavel = { id: string; nome: string }
 
+/** Um processo citado no painel de outro (o pai ou um subprocesso): abre o painel dele. */
+export type ItemDaEstrutura = { id: string; nome: string }
+
 export type ProcessoLido = ProcessoDaLista & {
   origem: OrigemDoProcesso
   contexto: string | null
   observacoes: string | null
   motivoDaSituacao: string | null
+  /** O pai do subprocesso; null nos outros tipos. */
+  processoPai: ItemDaEstrutura | null
+  /** Os subprocessos do processo, por nome. */
+  subprocessos: ItemDaEstrutura[]
   /** Só para leitura no painel do processo; na ordem do catálogo. */
   etapasDoSetor: EtapaDoSetor[]
   etapasDoProcesso: EtapaDoProcesso[]
 }
 
-/** O que o formulário grava. O tipo só vale no cadastro: a edição não o muda (a mudança é a reclassificação). */
+/**
+ * O que o formulário grava. Tipo e pai só valem no cadastro: a edição não os muda (a mudança é a reclassificação).
+ * No subprocesso, o banco põe o macroprocesso do pai.
+ */
 export type DadosDoProcesso = {
   nome: string
   setorId: string
   macroprocessoId: string
-  tipo: Exclude<TipoDeProcesso, 'subprocesso'>
+  tipo: TipoDeProcesso
+  /** Só no subprocesso. */
+  processoPaiId: string | null
   origem: OrigemDoProcesso
   contexto: string | null
   observacoes: string | null
 }
+
+/** O tipo novo de uma reclassificação; o pai só no subprocesso. Nada volta a "a classificar". */
+export type Reclassificacao = { tipo: Exclude<TipoDeProcesso, 'a_classificar'>; processoPaiId: string | null }
 
 /**
  * Único ponto por onde a interface fala com o banco em processos e etapas. Recusa do banco chega como TravaDoBanco,
@@ -113,6 +130,8 @@ export type ModuloDeProcessos = {
   suspenderProcesso(id: string, motivo: string): Promise<void>
   cancelarProcesso(id: string, motivo: string): Promise<void>
   retomarProcesso(id: string, motivo: string): Promise<void>
+  /** Muda o tipo com motivo, mantendo o mesmo item; ao virar subprocesso, ele passa ao macroprocesso do pai. */
+  reclassificarProcesso(id: string, reclassificacao: Reclassificacao, motivo: string): Promise<void>
   /** Por nome. */
   listarResponsaveisPossiveis(): Promise<UsuarioResponsavel[]>
   /** Em ordem alfabética de nome. */

@@ -23,6 +23,6 @@ export function problemaNoProcesso({ nome, setorId, macroprocessoId }: CamposDoP
 export function dadosDoProcesso(campos: CamposDoProcesso): DadosDoProcesso {
   return {
     nome: campos.nome.trim(), setorId: campos.setorId, macroprocessoId: campos.macroprocessoId, tipo: campos.tipo,
-    origem: campos.origem, contexto: campos.contexto.trim() || null, observacoes: campos.observacoes.trim() || null,
+    processoPaiId: null, origem: campos.origem, contexto: campos.contexto.trim() || null, observacoes: campos.observacoes.trim() || null,
   }
 }

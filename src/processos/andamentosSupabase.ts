@@ -4,6 +4,7 @@ import {
 import type { ClienteSupabase } from '../lib/supabase'
 import type { Database } from '../types/database'
 import { formatarData } from './caminhoDeEtapas'
+import { FRASE_DO_PAI, fraseDeTipoInvalido, fraseDosSubprocessos } from './frasesDeReclassificacao'
 import { fraseDeSituacaoInvalida, fraseDoProcessoParado } from './frasesDeSituacao'
 import type { ModuloDeProcessos, UsuarioResponsavel } from './tipos'
 
@@ -55,12 +56,13 @@ async function listarResponsaveisPossiveis(cliente: ClienteSupabase): Promise<Us
   return data
 }
 
-// O banco recusa com "motivo:valor" (migrações etapas_do_setor, andamento_do_processo e voltar_datas_responsavel).
+// O banco recusa com "motivo:valor" (migrações etapas_do_setor, andamento_do_processo, voltar_datas_responsavel,
+// situacao_do_processo e subprocessos_e_reclassificacao).
 // O motivo "motivo_obrigatorio" não tem valor; o valor vai até o fim da mensagem.
 const PADRAO_DA_RECUSA = new RegExp(
   '\\b(anterior_nao_resolvida|etapa_obrigatoria|setor_nao_resolveu|ja_ha_etapa_em_andamento|etapa_nao_resolvida'
   + '|motivo_obrigatorio|data_no_futuro|resolvida_antes_do_inicio|responsavel_invalido|processo_parado'
-  + '|situacao_invalida)(?::(.*))?$', 'm')
+  + '|situacao_invalida|processo_com_subprocessos|pai_nao_e_processo|tipo_invalido)(?::(.*))?$', 'm')
 
 const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   anterior_nao_resolvida: (etapa) => `A etapa ${etapa} ainda não foi resolvida.`,
@@ -81,9 +83,15 @@ const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
     const [de, para] = situacoes.split(':')
     return fraseDeSituacaoInvalida(de, para)
   },
+  processo_com_subprocessos: fraseDosSubprocessos,
+  pai_nao_e_processo: () => FRASE_DO_PAI,
+  tipo_invalido: (tipos) => {
+    const [de, para] = tipos.split(':')
+    return fraseDeTipoInvalido(de, para)
+  },
 }
 
-// Serve também à situação do processo (situacaoSupabase): as recusas do banco têm o mesmo formato.
+// Serve também à situação, à reclassificação e à gravação do processo: as recusas do banco têm o mesmo formato.
 export function falhaDoAndamento(erro: ErroDoBanco, recusas: RecusasDoModulo): Error {
   const recusa = erro.message.match(PADRAO_DA_RECUSA)
   if (recusa) return new TravaDoBanco(FRASE_DA_RECUSA[recusa[1]]((recusa[2] ?? '').trim()))

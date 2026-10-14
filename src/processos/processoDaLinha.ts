@@ -13,6 +13,7 @@ export function processoDaLinha(linha: LinhaDoProcesso): ProcessoDaLista {
     setorSigla: linha.setor_sigla ?? '',
     macroprocessoId: linha.macroprocesso_id ?? '',
     macroprocessoNome: linha.macroprocesso_nome ?? '',
+    processoPaiId: linha.processo_pai_id,
     situacao: (linha.situacao ?? 'em_andamento') as SituacaoDoProcesso,
     etapaAtual: etapaAtualDaLinha(linha),
     aguardandoOSetor: Boolean(linha.aguardando_o_setor),

@@ -4,10 +4,13 @@ import type { EventoDoCadastro } from '../cadastros/tipos'
 import {
   atualizarSetorDoProcesso, conferirDatasDaEtapa, responsavelDoCartao, trocarEtapaDoProcesso, voltarEtapas,
 } from './andamentoFalso'
+import {
+  conferirPai, conferirSemSubprocessos, estruturaDoProcesso, levarMacroprocessoAosFilhos, macroprocessoDo, reclassificar,
+} from './reclassificacaoFalso'
 import { conferirProcessoEmAndamento, mudarSituacao } from './situacaoFalso'
 import type {
   DadosDoProcesso, DadosDoResponsavel, DatasDaEtapa, EtapaDoCatalogo, EtapaDoProcesso, EtapaDoSetor, ListaDeProcessos,
-  ModuloDeProcessos, ProcessoLido, ResponsavelDoSetor, UsuarioResponsavel,
+  ModuloDeProcessos, ProcessoLido, Reclassificacao, ResponsavelDoSetor, UsuarioResponsavel,
 } from './tipos'
 
 type ChamadaDeEtapa = { acao: string; id: string; nota?: string; datas?: DatasDaEtapa; usuarioId?: string | null }
@@ -92,6 +95,12 @@ export class ProcessosFalso implements ModuloDeProcessos {
     this.mudarSituacaoDoProcesso(id, 'em_andamento', motivo)
   }
 
+  async reclassificarProcesso(id: string, reclassificacao: Reclassificacao, motivo: string): Promise<void> {
+    this.conferirGravacao()
+    const mudado = reclassificar(this.processos, this.acharProcesso(id), reclassificacao, motivo)
+    this.processos = this.processos.map((processo) => (processo.id === id ? mudado : processo))
+  }
+
   async corrigirDatasDaEtapa(id: string, datas: DatasDaEtapa): Promise<void> {
     this.conferirGravacao()
     this.acharEtapa(id)
@@ -145,7 +154,8 @@ export class ProcessosFalso implements ModuloDeProcessos {
   async lerProcesso(id: string): Promise<ProcessoLido | null> {
     if (this.segurarLeituraDoProcesso) return new Promise<never>(() => {})
     if (this.falharLeituraDoProcesso) throw new Error('falha de conexão simulada')
-    return this.processos.find((processo) => processo.id === id) ?? null
+    const processo = this.processos.find((outro) => outro.id === id)
+    return processo ? { ...processo, ...estruturaDoProcesso(this.processos, processo) } : null
   }
 
   async lerHistoricoDoProcesso(id: string): Promise<EventoDoCadastro[]> {
@@ -157,23 +167,28 @@ export class ProcessosFalso implements ModuloDeProcessos {
   async criarProcesso(dados: DadosDoProcesso): Promise<void> {
     this.conferirGravacao()
     this.conferirNomeNovo(dados)
-    this.processos = [...this.processos, this.processoNovo(dados)]
+    // Como o gatilho do banco: o subprocesso tem pai do tipo Processo e adota o macroprocesso dele.
+    const macroprocesso = dados.tipo === 'subprocesso' ? macroprocessoDo(conferirPai(this.processos, dados.processoPaiId)) : {}
+    this.processos = [...this.processos, { ...this.processoNovo(dados), ...macroprocesso }]
   }
 
   async editarProcesso(id: string, dados: DadosDoProcesso): Promise<void> {
     this.conferirGravacao()
-    const atual = this.processos.find((processo) => processo.id === id)
-    if (!atual) throw new CadastroInexistente()
+    const atual = this.acharProcesso(id)
     this.conferirNomeNovo(dados, id)
-    // A edição não muda o tipo (a mudança é a reclassificação).
+    // A edição não muda tipo nem pai (a mudança é a reclassificação); o subprocesso fica no macroprocesso do pai.
     const campos: Partial<DadosDoProcesso> = { ...dados }
     delete campos.tipo
-    this.processos = this.processos.map((processo) => (processo.id === id ? { ...processo, ...this.nomesDoCartao(dados), ...campos } : processo))
+    delete campos.processoPaiId
+    const pai = this.processos.find((processo) => processo.id === atual.processoPaiId)
+    const editado = { ...atual, ...this.nomesDoCartao(dados), ...campos, ...(pai ? macroprocessoDo(pai) : {}) }
+    this.processos = levarMacroprocessoAosFilhos(this.processos.map((processo) => (processo.id === id ? editado : processo)), editado)
   }
 
   async excluirProcesso(id: string): Promise<void> {
     this.conferirGravacao()
-    if (!this.processos.some((processo) => processo.id === id)) throw new CadastroInexistente()
+    this.acharProcesso(id)
+    conferirSemSubprocessos(this.processos, id)
     this.processos = this.processos.filter((processo) => processo.id !== id)
   }
 
@@ -201,7 +216,7 @@ export class ProcessosFalso implements ModuloDeProcessos {
       ...dados, ...this.nomesDoCartao(dados), id: `p${this.proximoId++}`, situacao: 'em_andamento',
       etapaAtual: primeira ? { codigo: primeira.codigo, nome: primeira.nome, ordem: primeira.ordem } : null,
       aguardandoOSetor: (this.etapasDoSetor[dados.setorId] ?? []).some((etapa) => etapa.status === 'pendente' || etapa.status === 'em_andamento'),
-      responsavel: null, motivoDaSituacao: null, etapasDoSetor: this.etapasDoSetor[dados.setorId] ?? [],
+      responsavel: null, motivoDaSituacao: null, processoPai: null, subprocessos: [], etapasDoSetor: this.etapasDoSetor[dados.setorId] ?? [],
       etapasDoProcesso: etapas.map((etapa) => ({
         id: `a${this.proximoId++}`, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, obrigatoria: true,
         status: 'pendente', nota: null, iniciadaEm: null, resolvidaEm: null, responsavelId: null, responsavelNome: null,
@@ -242,11 +257,15 @@ export class ProcessosFalso implements ModuloDeProcessos {
     if (dono) conferirProcessoEmAndamento(dono)
   }
 
+  private acharProcesso(id: string): ProcessoLido {
+    const processo = this.processos.find((outro) => outro.id === id)
+    if (!processo) throw new CadastroInexistente()
+    return processo
+  }
+
   private mudarSituacaoDoProcesso(id: string, nova: 'em_andamento' | 'suspenso' | 'cancelado', motivo: string): void {
     this.conferirGravacao()
-    const atual = this.processos.find((processo) => processo.id === id)
-    if (!atual) throw new CadastroInexistente()
-    const mudado = mudarSituacao(atual, nova, motivo)
+    const mudado = mudarSituacao(this.acharProcesso(id), nova, motivo)
     this.processos = this.processos.map((processo) => (processo.id === id ? mudado : processo))
   }
 

@@ -18,6 +18,7 @@ function falso(situacao: SituacaoDoProcesso = 'em_andamento', etapas: EtapaDoPro
     id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 'set1', setorSigla: 'TSA', macroprocessoId: 'm1',
     macroprocessoNome: 'Macro', situacao, etapaAtual: { codigo: 'c5', nome: 'Etapa 5', ordem: 5 },
     aguardandoOSetor: false, responsavel: null, origem: 'novo', contexto: null, observacoes: null,
+    processoPaiId: null, processoPai: null, subprocessos: [],
     motivoDaSituacao: situacao === 'suspenso' || situacao === 'cancelado' ? 'Motivo antigo' : null,
     etapasDoSetor: [], etapasDoProcesso: etapas,
   }

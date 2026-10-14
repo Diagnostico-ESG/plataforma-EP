@@ -8,6 +8,8 @@ export type Pedido = {
   dentro?: [string, string[]]
   /** O filtro `like` (coluna e padrão). */
   parecido?: [string, string]
+  /** O filtro `or`, como o PostgREST o recebe (ex.: 'id.eq.p1,processo_pai_id.eq.p1'). */
+  ou?: string
   ordem?: Ordenacao[]
 }
 
@@ -36,6 +38,7 @@ export class ClienteSupabaseFalso {
       eq: (coluna: string, valor: string) => guardarFiltro(pedido, coluna, valor) && consulta,
       in: (coluna: string, valores: string[]) => Object.assign(pedido, { dentro: [coluna, valores] }) && consulta,
       like: (coluna: string, padrao: string) => Object.assign(pedido, { parecido: [coluna, padrao] }) && consulta,
+      or: (filtro: string) => Object.assign(pedido, { ou: filtro }) && consulta,
       then: (seCumprir: (r: RespostaDoBanco) => unknown, seFalhar?: (e: unknown) => unknown) =>
         Promise.resolve(resposta()).then(seCumprir, seFalhar),
     }

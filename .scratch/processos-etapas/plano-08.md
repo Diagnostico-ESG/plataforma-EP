@@ -35,7 +35,7 @@
 
 **Arquivos:** criar `supabase/tests/21_subprocessos_e_reclassificacao.test.sql` (molde do 20: usuários a1 a a4, `_tap`, `plan(N)` com o N exato); alterar `supabase/tests/17_processos.test.sql` (linhas ~83-87 e ~154-158).
 
-- [ ] Escrever o teste 21 (critérios 1 e 2). Preparação como integrante: setores TS8 e TS9, macroprocessos "Macro Um" e "Macro Dois", TS8 envolvido nos dois, TS9 em nenhum; etapas do setor resolvidas; processos "Pai" (tipo processo, Macro Um), "Outro Pai" (processo, Macro Dois), "Solto" (a_classificar, Macro Dois), "Avulso" (processo, Macro Dois). Asserções:
+- [x] Escrever o teste 21 (critérios 1 e 2). Preparação como integrante: setores TS8 e TS9, macroprocessos "Macro Um" e "Macro Dois", TS8 envolvido nos dois, TS9 em nenhum; etapas do setor resolvidas; processos "Pai" (tipo processo, Macro Um), "Outro Pai" (processo, Macro Dois), "Solto" (a_classificar, Macro Dois), "Avulso" (processo, Macro Dois). Asserções:
   1. subprocesso com pai subprocesso → `P0001` `pai_nao_e_processo`; com pai "a classificar" → o mesmo;
   2. processo com pai e "a classificar" com pai → `23514`;
   3. subprocesso "Filho" (setor TS9, macroprocesso informado Macro Dois, pai "Pai") → aceito; macroprocesso do Filho = Macro Um; TS9 passa a envolvido em Macro Um; o evento `criar` do Filho tem `processo_pai_nome` = 'Pai';
@@ -48,14 +48,14 @@
   10. `update` direto de `tipo` e de `processo_pai_id` → `tipo_so_pela_funcao`;
   11. processo inexistente → `registro_inexistente`; `reclassificar_processo` sem `security definer` (`prosecdef` falso);
   12. Consulta → `42501`; inativo → `registro_inexistente`; visitante → `42501`.
-- [ ] Ajustar o teste 17 como descrito em "Decisões" (mesmo número de asserções: o `plan(79)` não muda).
-- [ ] Comitar, `git push -u origin processos-etapas-08`, disparar "Testes de banco" e ler o resultado: o 21 deve falhar por função inexistente e o 17 nos dois pontos ajustados.
+- [x] Ajustar o teste 17 como descrito em "Decisões" (mesmo número de asserções: o `plan(79)` não muda).
+- [x] Comitar, `git push -u origin processos-etapas-08`, disparar "Testes de banco" e ler o resultado: o 21 deve falhar por função inexistente e o 17 nos dois pontos ajustados.
 
 ### Tarefa 2 — Migração (banco)
 
 **Arquivos:** criar com `npx supabase migration new subprocessos_e_reclassificacao`, só depois da rodada que provou a falha; `src/types/database.ts` (gerado); `supabase/AMBIENTES.md`.
 
-- [ ] Escrever a migração:
+- [x] Escrever a migração:
 
 ```sql
 -- Subprocessos e reclassificação (processos-etapas, ticket 08). Recusas em P0001 "motivo:valor"
@@ -172,9 +172,9 @@ end $$;
 ```
 
   Depois, no mesmo arquivo: `create or replace` de `private.estado_do_processo` (igual ao do ticket 04, mais `|| case when processo.processo_pai_id is not null then jsonb_build_object('processo_pai_nome', (select nome from public.processos where id = processo.processo_pai_id)) else '{}'::jsonb end`); de `private.acao_do_processo` (primeiro caso novo: `antes ->> 'tipo' is distinct from depois ->> 'tipo'` → `'reclassificar'`, depois o do ticket 07); e de `private.registrar_evento_do_processo` (igual ao do ticket 07, com `motivo := coalesce(<o da situação>, case when private.reclassificando() then nullif(current_setting('ep.motivo_da_reclassificacao', true), '') end)`). Fecho: `revoke execute` de `public, anon, authenticated` nas funções só de gatilho (`conferir_tipo_do_processo`, `adotar_macroprocesso_do_pai`, `levar_macroprocesso_aos_subprocessos`, `conferir_processo_sem_subprocessos`); `revoke ... from public, anon` e `grant execute ... to authenticated` em `private.reclassificando()`, `private.conferir_reclassificacao(...)` e `public.reclassificar_processo(...)`.
-- [ ] Comitar, `git push`, disparar "Migrar banco de desenvolvimento" na branch com o arquivo novo e depois "Testes de banco": os 22 arquivos verdes. Falha do próprio teste se corrige no teste; falha da migração já aplicada se corrige com migração nova.
-- [ ] `npm run db:types` (vínculo conferido); conferir que `reclassificar_processo` entrou em `Functions`.
-- [ ] Registrar a migração em `supabase/AMBIENTES.md`. Comitar migração, teste e tipos juntos.
+- [x] Comitar, `git push`, disparar "Migrar banco de desenvolvimento" na branch com o arquivo novo e depois "Testes de banco": os 22 arquivos verdes. Falha do próprio teste se corrige no teste; falha da migração já aplicada se corrige com migração nova.
+- [x] `npm run db:types` (vínculo conferido); conferir que `reclassificar_processo` entrou em `Functions`.
+- [x] Registrar a migração em `supabase/AMBIENTES.md`. Comitar migração, teste e tipos juntos.
 
 ### Tarefa 3 — Módulo de processos (real e falso)
 
@@ -188,9 +188,9 @@ end $$;
 - `ModuloDeProcessos.reclassificarProcesso(id: string, reclassificacao: Reclassificacao, motivo: string): Promise<void>`
 - `frasesDeReclassificacao.ts`: `fraseDosSubprocessos(total: string)`, `FRASE_DO_PAI` e `fraseDeTipoInvalido(de: string, para: string)` ("Um item {rótulo de} não pode passar a {rótulo para}.", com `ROTULO_DO_TIPO` em minúsculas)
 
-- [ ] Testes primeiro: `reclassificacaoSupabase.test.ts` (chama `rpc('reclassificar_processo', { p_processo, p_tipo, p_pai, p_motivo })`; `processo_com_subprocessos:2`, `pai_nao_e_processo`, `tipo_invalido:processo:a_classificar` e `motivo_obrigatorio` viram as frases; `42501` vira "Seu perfil não permite alterar os processos."; `registro_inexistente` vira `CadastroInexistente`); em `gravarProcessoSupabase.test.ts`, o cadastro envia `processo_pai_id` e a exclusão recusada com `processo_com_subprocessos:3` vira a frase do critério 3; em `lerProcessoSupabase.test.ts`, o lido traz `processoPai` e `subprocessos`; `reclassificacaoFalso.test.ts` (as transições, a recusa com a contagem, o pai que não é Processo, a adoção do macroprocesso e o nome dele no cartão, virar processo apaga o pai e mantém o macroprocesso, mesmo id e etapas; a estrutura lida; a exclusão recusada; o macroprocesso do pai levado aos filhos).
-- [ ] Implementar: tipos e fixtures (`processoPaiId: null`, `processoPai: null`, `subprocessos: []`); `processoDaLinha` lê `processo_pai_id`; `lerProcesso` lê pai e subprocessos em paralelo com as etapas (`cliente.from('processos').select('id, nome')`); `valoresDoCadastro` com `processo_pai_id`; `falhaDoProcesso` termina em `falhaDoAndamento(erro, recusas)` em vez de `recusaPorPerfil`; `PADRAO_DA_RECUSA` e `FRASE_DA_RECUSA` com `processo_com_subprocessos`, `pai_nao_e_processo` e `tipo_invalido`; `reclassificacaoSupabase.ts` no molde de `situacaoSupabase.ts`; `ProcessosFalso` chama as funções puras de `reclassificacaoFalso.ts` em `criarProcesso` (pai), `editarProcesso` (filhos acompanham), `excluirProcesso` (recusa), `lerProcesso` (estrutura calculada) e `reclassificarProcesso`. Se o `ProcessosFalso` passar de 300 linhas, extrair o que for de reclassificação para `reclassificacaoFalso.ts`.
-- [ ] `npm test`, `npx tsc --noEmit` e `npm run lint` verdes; comitar.
+- [x] Testes primeiro: `reclassificacaoSupabase.test.ts` (chama `rpc('reclassificar_processo', { p_processo, p_tipo, p_pai, p_motivo })`; `processo_com_subprocessos:2`, `pai_nao_e_processo`, `tipo_invalido:processo:a_classificar` e `motivo_obrigatorio` viram as frases; `42501` vira "Seu perfil não permite alterar os processos."; `registro_inexistente` vira `CadastroInexistente`); em `gravarProcessoSupabase.test.ts`, o cadastro envia `processo_pai_id` e a exclusão recusada com `processo_com_subprocessos:3` vira a frase do critério 3; em `lerProcessoSupabase.test.ts`, o lido traz `processoPai` e `subprocessos`; `reclassificacaoFalso.test.ts` (as transições, a recusa com a contagem, o pai que não é Processo, a adoção do macroprocesso e o nome dele no cartão, virar processo apaga o pai e mantém o macroprocesso, mesmo id e etapas; a estrutura lida; a exclusão recusada; o macroprocesso do pai levado aos filhos).
+- [x] Implementar: tipos e fixtures (`processoPaiId: null`, `processoPai: null`, `subprocessos: []`); `processoDaLinha` lê `processo_pai_id`; `lerProcesso` lê pai e subprocessos em paralelo com as etapas (`cliente.from('processos').select('id, nome')`); `valoresDoCadastro` com `processo_pai_id`; `falhaDoProcesso` termina em `falhaDoAndamento(erro, recusas)` em vez de `recusaPorPerfil`; `PADRAO_DA_RECUSA` e `FRASE_DA_RECUSA` com `processo_com_subprocessos`, `pai_nao_e_processo` e `tipo_invalido`; `reclassificacaoSupabase.ts` no molde de `situacaoSupabase.ts`; `ProcessosFalso` chama as funções puras de `reclassificacaoFalso.ts` em `criarProcesso` (pai), `editarProcesso` (filhos acompanham), `excluirProcesso` (recusa), `lerProcesso` (estrutura calculada) e `reclassificarProcesso`. Se o `ProcessosFalso` passar de 300 linhas, extrair o que for de reclassificação para `reclassificacaoFalso.ts`.
+- [x] `npm test`, `npx tsc --noEmit` e `npm run lint` verdes; comitar.
 
 ### Tarefa 4 — Formulário: subprocesso no cadastro
 

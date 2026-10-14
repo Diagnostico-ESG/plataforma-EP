@@ -62,6 +62,34 @@ test('as etapas do setor também chegam, no mesmo formato da tela do setor', asy
   expect(lido?.etapasDoSetor[0]).toMatchObject({ codigo: 'identificacao_responsaveis', status: 'dispensada', nota: 'Nota inventada' })
 })
 
+test('o processo traz os subprocessos, por nome, numa leitura só', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
+  cliente.respostas['processos.select'] = { data: [
+    { id: 'p2', nome: 'Filho A', processo_pai_id: 'p1' }, { id: 'p3', nome: 'Filho B', processo_pai_id: 'p1' },
+  ], error: null }
+  const lido = await criar(cliente).lerProcesso('p1')
+  expect(lido).toMatchObject({ processoPai: null, subprocessos: [{ id: 'p2', nome: 'Filho A' }, { id: 'p3', nome: 'Filho B' }] })
+  expect(cliente.pedidos.find((pedido) => pedido.tabela === 'processos')).toMatchObject({
+    ou: 'processo_pai_id.eq.p1', ordem: [['nome', true]] })
+})
+
+test('o subprocesso traz o pai', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['processos_com_andamento.select'] = { data: [{ ...LINHA, tipo: 'subprocesso', processo_pai_id: 'p0' }], error: null }
+  cliente.respostas['processos.select'] = { data: [{ id: 'p0', nome: 'Pai Fictício', processo_pai_id: null }], error: null }
+  const lido = await criar(cliente).lerProcesso('p1')
+  expect(lido).toMatchObject({ processoPaiId: 'p0', processoPai: { id: 'p0', nome: 'Pai Fictício' }, subprocessos: [] })
+  expect(cliente.pedidos.find((pedido) => pedido.tabela === 'processos')?.ou).toBe('processo_pai_id.eq.p1,id.eq.p0')
+})
+
+test('falha ao ler o pai e os subprocessos vira erro com o motivo do banco', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
+  cliente.respostas['processos.select'] = { data: null, error: { message: 'sem conexão' } }
+  await expect(criar(cliente).lerProcesso('p1')).rejects.toThrow('Falha ao ler o pai e os subprocessos do processo: sem conexão')
+})
+
 test('processo que não existe: null', async () => {
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas['processos_com_andamento.select'] = { data: [], error: null }

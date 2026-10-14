@@ -20,6 +20,7 @@ const EMITIR: ProcessoLido = {
   id: 'p1', nome: 'Emitir Ofício', tipo: 'a_classificar', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
   macroprocessoNome: 'Macro A', situacao: 'em_andamento', etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 },
   aguardandoOSetor: false, responsavel: null, origem: 'retomado', contexto: 'Contexto inventado', observacoes: null,
+  processoPaiId: null, processoPai: null, subprocessos: [],
   motivoDaSituacao: null, etapasDoSetor: [], etapasDoProcesso: [],
 }
 
