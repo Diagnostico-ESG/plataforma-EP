@@ -18,3 +18,5 @@
 - [ ] Histórico: "Suspendeu", "Cancelou", "Retomou", com o motivo.
 - [ ] A Consulta não vê as ações.
 - [ ] Testes de interface com o aplicativo inteiro: cada ação com sucesso e com falha, a janela de motivo (vazia, Esc), o congelamento, a pílula no cartão e o cancelado saindo do Quadro.
+
+Concluído em 2026-10-14 (commit a39b33a)
