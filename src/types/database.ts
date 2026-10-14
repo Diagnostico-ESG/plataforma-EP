@@ -564,6 +564,15 @@ export type Database = {
         Args: { p_motivo: string; p_processo: string }
         Returns: undefined
       }
+      reclassificar_processo: {
+        Args: {
+          p_motivo: string
+          p_pai: string
+          p_processo: string
+          p_tipo: Database["public"]["Enums"]["tipo_de_processo"]
+        }
+        Returns: undefined
+      }
       retomar_processo: {
         Args: { p_motivo: string; p_processo: string }
         Returns: undefined
