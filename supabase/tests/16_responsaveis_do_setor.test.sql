@@ -139,7 +139,8 @@ insert into _tap (linha) select is(
 update public.responsaveis_do_setor set cargo = 'Chefe Novo' where nome = 'Fulano Teste';
 insert into _tap (linha) select is(
   (select (detalhes -> 'antes' ->> 'cargo') || ' > ' || (detalhes -> 'depois' ->> 'cargo')
-    from public.eventos where entidade = 'responsavel_do_setor' and acao = 'editar'),
+    from public.eventos where entidade = 'responsavel_do_setor' and acao = 'editar'
+      and entidade_ref like '5c000000-0000-0000-0000-000000000004:%'),
   'Chefe de Teste > Chefe Novo', 'editar gera o evento com o antes e o depois');
 update public.responsaveis_do_setor set cargo = cargo where nome = 'Fulano Teste';
 insert into _tap (linha) select is(
@@ -149,7 +150,8 @@ insert into _tap (linha) select is(
 delete from public.responsaveis_do_setor where nome = 'Beltrana Teste';
 insert into _tap (linha) select is(
   (select detalhes -> 'antes' ->> 'nome' from public.eventos
-    where entidade = 'responsavel_do_setor' and acao = 'excluir'),
+    where entidade = 'responsavel_do_setor' and acao = 'excluir'
+      and entidade_ref like '5c000000-0000-0000-0000-000000000004:%'),
   'Beltrana Teste', 'excluir gera o evento com o que o responsável tinha');
 reset role;
 
