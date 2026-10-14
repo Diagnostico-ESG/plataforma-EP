@@ -225,3 +225,22 @@
   background: var(--pendencia-fundo);
   font-size: var(--tam-secundario);
 }
+
+/* Processo pai ou Subprocessos: links que abrem o painel de cada um. */
+.painel-estrutura-lista {
+  display: grid;
+  gap: var(--esp-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Janela de reclassificar: vários campos, cada rótulo na sua linha, com o aviso de macroprocesso entre eles. */
+.janela-reclassificacao label {
+  display: block;
+  margin-top: var(--esp-3);
+}
+
+.janela-reclassificacao .processo-aviso {
+  margin-top: var(--esp-3);
+}

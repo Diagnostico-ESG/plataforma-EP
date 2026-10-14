@@ -138,3 +138,40 @@ test('a edição do subprocesso não mostra o tipo nem o pai, e o macroprocesso 
   expect(form.queryByLabelText('Processo pai')).toBeNull()
   expect((form.getByLabelText('Macroprocesso') as HTMLSelectElement).disabled).toBe(true)
 })
+
+const painelDoProcesso = async () => within(await screen.findByRole('complementary', { name: 'Painel do processo' }))
+
+test('o painel do pai lista os subprocessos, e cada um abre o seu painel, com o link de volta ao pai', async () => {
+  window.location.hash = '#/processos/p1'
+  montar()
+  const subprocessos = within(await (await painelDoProcesso()).findByRole('region', { name: 'Subprocessos' }))
+  fireEvent.click(subprocessos.getByRole('link', { name: 'Conferir Ofício' }))
+  await waitFor(() => expect(window.location.hash).toBe('#/processos/p3'))
+  const pai = within(await (await painelDoProcesso()).findByRole('region', { name: 'Processo pai' }))
+  expect(pai.getByRole('link', { name: 'Emitir Ofício' }).getAttribute('href')).toBe('#/processos/p1')
+})
+
+test('processo sem pai e sem subprocessos não mostra a seção', async () => {
+  window.location.hash = '#/processos/p2'
+  montar()
+  const aberto = await painelDoProcesso()
+  await aberto.findByText('Dados do processo')
+  expect(aberto.queryByRole('region', { name: 'Subprocessos' })).toBeNull()
+  expect(aberto.queryByRole('region', { name: 'Processo pai' })).toBeNull()
+})
+
+test('a Consulta também vê os subprocessos', async () => {
+  window.location.hash = '#/processos/p1'
+  montar('consulta')
+  expect(await (await painelDoProcesso()).findByRole('region', { name: 'Subprocessos' })).toBeTruthy()
+})
+
+test('excluir o processo com subprocessos é recusado com a contagem', async () => {
+  window.location.hash = '#/processos/p1'
+  const falso = montar()
+  fireEvent.click(await (await painelDoProcesso()).findByRole('button', { name: 'Excluir' }))
+  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Excluir processo' }))
+  expect((await (await painelDoProcesso()).findByRole('alert')).textContent)
+    .toBe('Este processo tem 1 subprocessos; reclassifique-os ou exclua-os antes.')
+  expect(falso.processos).toHaveLength(3)
+})

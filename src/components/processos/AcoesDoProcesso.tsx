@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useGravacaoComFalha } from '../../hooks/useGravacaoComFalha'
 import type { ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 import { JanelaDeConfirmacao } from '../JanelaDeConfirmacao'
+import { AcoesDeReclassificacao } from './AcoesDeReclassificacao'
 import { AcoesDeSituacao } from './AcoesDeSituacao'
 
 type AcoesDoProcessoProps = {
@@ -15,13 +16,14 @@ type AcoesDoProcessoProps = {
 
 const TEXTO_DA_EXCLUSAO = 'O histórico guarda o que ele tinha, inclusive as etapas, mas não é possível desfazer.'
 
-/** Ações de situação, [Editar] e [Excluir] (com janela de confirmação): só para quem pode alterar; a RLS é quem protege. */
+/** Ações de situação, [Reclassificar], [Editar] e [Excluir] (com janela de confirmação): só para quem pode alterar; a RLS é quem protege. */
 export function AcoesDoProcesso({ processo, processos, aoEditar, aoExcluir, aoMudar, aoSumir }: AcoesDoProcessoProps) {
   const [confirmando, setConfirmando] = useState(false)
   const { falha, executar } = useGravacaoComFalha(aoSumir)
   return (
     <div className="painel-acoes">
       <AcoesDeSituacao processo={processo} processos={processos} aoMudar={aoMudar} aoSumir={aoSumir} />
+      <AcoesDeReclassificacao processo={processo} processos={processos} aoMudar={aoMudar} aoSumir={aoSumir} />
       <button type="button" className="botao botao-secundario" onClick={aoEditar}>Editar</button>
       <button type="button" className="botao botao-secundario" onClick={() => setConfirmando(true)}>Excluir</button>
       {falha && <p className="cadastros-falha" role="alert">{falha}</p>}

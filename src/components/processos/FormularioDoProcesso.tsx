@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import type { ModuloDeCadastros } from '../../cadastros/tipos'
 import { useCarregamento } from '../../hooks/useCarregamento'
+import { paisPossiveis } from '../../processos/paisPossiveis'
 import type { DadosDoProcesso, ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { FormularioPronto } from './FormularioPronto'
@@ -22,7 +23,7 @@ export function FormularioDoProcesso({ cadastros, processos, ...formulario }: Fo
   const cadastrando = !formulario.inicial
   const carregar = useCallback(async () => ({
     setores: await cadastros.listarSetores(), macroprocessos: await cadastros.listarMacroprocessos(),
-    pais: cadastrando ? (await processos.listarProcessos()).processos.filter((processo) => processo.tipo === 'processo') : [],
+    pais: cadastrando ? paisPossiveis((await processos.listarProcessos()).processos) : [],
   }), [cadastros, processos, cadastrando])
   const { estado, tentarDeNovo } = useCarregamento(carregar)
   if (estado.tipo === 'carregando') return <p className="cadastros-vazio" role="status">Carregando setores e macroprocessos…</p>

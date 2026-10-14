@@ -213,6 +213,18 @@ describe('situação do processo no histórico', () => {
   })
 })
 
+describe('reclassificação no histórico', () => {
+  test('"Reclassificou", com o texto livre chamado Motivo', () => {
+    expect(textoDaAcaoDoCadastro('reclassificar', 'processo')).toBe('Reclassificou')
+    expect(rotuloDoMotivo('reclassificar')).toBe('Motivo')
+  })
+
+  test('o tipo sai pelo rótulo da tela e o pai, pelo nome', () => {
+    expect(descreverEstadoDoCadastro({ tipo: 'subprocesso', processo_pai_nome: 'Emitir Ofício' }))
+      .toBe('Tipo: Subprocesso; Processo pai: Emitir Ofício')
+  })
+})
+
 describe('responsáveis do setor', () => {
   const RESPONSAVEL = { setor_id: 's1', setor_sigla: 'CEE', nome: 'Pessoa Fictícia', email: 'pessoa@exemplo.com', cargo: null }
   const criado = evento({ entidade: 'responsavel_do_setor', entidadeRef: 's1:r1', depois: RESPONSAVEL })

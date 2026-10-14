@@ -9,6 +9,7 @@ import { AcoesDoProcesso } from './AcoesDoProcesso'
 import { BotaoFechar, CabecalhoDoPainel } from './CabecalhoDoPainel'
 import { CaminhoDoProcesso } from './CaminhoDoProcesso'
 import { DadosDoProcesso as DadosLidos } from './DadosDoProcesso'
+import { EstruturaDoProcesso } from './EstruturaDoProcesso'
 import { fecharComEsc } from './fecharComEsc'
 import { FormularioDoProcesso } from './FormularioDoProcesso'
 import { HistoricoDoProcesso } from './HistoricoDoProcesso'
@@ -136,6 +137,7 @@ function DetalhesDoProcesso({ processo, processos, cadastros, podeAlterar, aoFec
         ? <FormularioDoProcesso cadastros={cadastros} processos={processos} titulo="Editar processo" inicial={processo} aoSalvar={salvar}
             aoCancelar={() => setEditando(false)} />
         : <DadosLidos processo={processo} />}
+      <EstruturaDoProcesso processo={processo} />
       {podeAlterar && !editando && (
         <AcoesDoProcesso processo={processo} processos={processos} aoEditar={() => setEditando(true)}
           aoExcluir={aposExcluir} aoMudar={aposMudar} aoSumir={aoSumir} />
