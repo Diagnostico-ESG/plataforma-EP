@@ -7,6 +7,7 @@ import { criarGravacaoDeProcessoSupabase } from './gravarProcessoSupabase'
 import { criarLeituraDeProcessoSupabase } from './lerProcessoSupabase'
 import { criarListaDeProcessosSupabase } from './listaDeProcessosSupabase'
 import { criarResponsaveisSupabase } from './responsaveisSupabase'
+import { criarSituacaoSupabase } from './situacaoSupabase'
 import type { ModuloDeProcessos } from './tipos'
 
 // A etapa do setor só some junto com o setor, e o processo, quando outra pessoa o exclui: o aviso é o do item excluído.
@@ -19,6 +20,7 @@ export function criarProcessosSupabase(cliente: ClienteSupabase): ModuloDeProces
   return {
     lerEtapasDoSetor: (setorId) => lerEtapasDoSetor(cliente, setorId),
     ...criarAndamentosSupabase(cliente, RECUSAS_DOS_PROCESSOS),
+    ...criarSituacaoSupabase(cliente, RECUSAS_DOS_PROCESSOS),
     ...criarResponsaveisSupabase(cliente, RECUSAS_DOS_PROCESSOS),
     ...criarListaDeProcessosSupabase(cliente),
     ...criarLeituraDeProcessoSupabase(cliente),

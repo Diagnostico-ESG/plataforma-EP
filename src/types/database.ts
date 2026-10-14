@@ -560,6 +560,18 @@ export type Database = {
       }
     }
     Functions: {
+      cancelar_processo: {
+        Args: { p_motivo: string; p_processo: string }
+        Returns: undefined
+      }
+      retomar_processo: {
+        Args: { p_motivo: string; p_processo: string }
+        Returns: undefined
+      }
+      suspender_processo: {
+        Args: { p_motivo: string; p_processo: string }
+        Returns: undefined
+      }
       voltar_a_etapa: {
         Args: { p_andamento: string; p_motivo: string }
         Returns: undefined

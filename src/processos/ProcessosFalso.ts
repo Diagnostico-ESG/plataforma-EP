@@ -4,6 +4,7 @@ import type { EventoDoCadastro } from '../cadastros/tipos'
 import {
   atualizarSetorDoProcesso, conferirDatasDaEtapa, responsavelDoCartao, trocarEtapaDoProcesso, voltarEtapas,
 } from './andamentoFalso'
+import { conferirProcessoEmAndamento, mudarSituacao } from './situacaoFalso'
 import type {
   DadosDoProcesso, DadosDoResponsavel, DatasDaEtapa, EtapaDoCatalogo, EtapaDoProcesso, EtapaDoSetor, ListaDeProcessos,
   ModuloDeProcessos, ProcessoLido, ResponsavelDoSetor, UsuarioResponsavel,
@@ -72,10 +73,23 @@ export class ProcessosFalso implements ModuloDeProcessos {
   async voltarParaEtapa(id: string, motivo: string): Promise<void> {
     this.conferirGravacao()
     const etapa = this.acharEtapa(id)
+    this.conferirProcessoDaEtapa(id)
     if (motivo.trim() === '') throw new TravaDoBanco('O motivo é obrigatório.')
     if (!RESOLVIDAS.includes(etapa.status)) throw new TravaDoBanco(`A etapa ${etapa.nome} ainda não foi resolvida.`)
     this.chamadas.push({ acao: 'voltar', id, nota: motivo })
     this.aplicar(id, (etapas) => voltarEtapas(etapas, id, HOJE))
+  }
+
+  async suspenderProcesso(id: string, motivo: string): Promise<void> {
+    this.mudarSituacaoDoProcesso(id, 'suspenso', motivo)
+  }
+
+  async cancelarProcesso(id: string, motivo: string): Promise<void> {
+    this.mudarSituacaoDoProcesso(id, 'cancelado', motivo)
+  }
+
+  async retomarProcesso(id: string, motivo: string): Promise<void> {
+    this.mudarSituacaoDoProcesso(id, 'em_andamento', motivo)
   }
 
   async corrigirDatasDaEtapa(id: string, datas: DatasDaEtapa): Promise<void> {
@@ -217,8 +231,23 @@ export class ProcessosFalso implements ModuloDeProcessos {
 
   private mudar(chamada: ChamadaDeEtapa, mudancas: Partial<EtapaDoProcesso>): void {
     this.conferirGravacao()
+    this.conferirProcessoDaEtapa(chamada.id)
     this.chamadas.push(chamada)
     this.aplicar(chamada.id, (etapas) => etapas.map((etapa) => (etapa.id === chamada.id ? { ...etapa, ...mudancas } : etapa)))
+  }
+
+  // O processo que tem a etapa (as do setor não têm): parado, ele recusa qualquer mudança nelas.
+  private conferirProcessoDaEtapa(idDaEtapa: string): void {
+    const dono = this.processos.find((processo) => processo.etapasDoProcesso.some((etapa) => etapa.id === idDaEtapa))
+    if (dono) conferirProcessoEmAndamento(dono)
+  }
+
+  private mudarSituacaoDoProcesso(id: string, nova: 'em_andamento' | 'suspenso' | 'cancelado', motivo: string): void {
+    this.conferirGravacao()
+    const atual = this.processos.find((processo) => processo.id === id)
+    if (!atual) throw new CadastroInexistente()
+    const mudado = mudarSituacao(atual, nova, motivo)
+    this.processos = this.processos.map((processo) => (processo.id === id ? mudado : processo))
   }
 
   private aplicar(id: string, trocar: TrocaDeEtapas): void {

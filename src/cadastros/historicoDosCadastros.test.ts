@@ -200,6 +200,19 @@ describe('voltar, datas e responsável da etapa no histórico', () => {
   })
 })
 
+describe('situação do processo no histórico', () => {
+  test('texto de suspender, cancelar e retomar; as ações de cadastro seguem iguais', () => {
+    expect(['suspender', 'cancelar', 'retomar'].map((acao) => textoDaAcaoDoCadastro(acao, 'processo')))
+      .toEqual(['Suspendeu', 'Cancelou', 'Retomou'])
+    expect(['criar', 'editar', 'excluir'].map((acao) => textoDaAcaoDoCadastro(acao, 'processo')))
+      .toEqual(['Criou', 'Editou', 'Excluiu'])
+  })
+
+  test('o texto livre da situação se chama Motivo', () => {
+    expect(['suspender', 'cancelar', 'retomar'].map(rotuloDoMotivo)).toEqual(['Motivo', 'Motivo', 'Motivo'])
+  })
+})
+
 describe('responsáveis do setor', () => {
   const RESPONSAVEL = { setor_id: 's1', setor_sigla: 'CEE', nome: 'Pessoa Fictícia', email: 'pessoa@exemplo.com', cargo: null }
   const criado = evento({ entidade: 'responsavel_do_setor', entidadeRef: 's1:r1', depois: RESPONSAVEL })

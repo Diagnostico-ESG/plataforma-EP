@@ -109,6 +109,10 @@ export type ModuloDeProcessos = {
   corrigirDatasDaEtapa(andamentoId: string, datas: DatasDaEtapa): Promise<void>
   /** null tira o responsável. */
   mudarResponsavelDaEtapa(andamentoId: string, usuarioId: string | null): Promise<void>
+  /** Suspender, cancelar e retomar pedem motivo; com o processo parado, nenhuma etapa dele muda. */
+  suspenderProcesso(id: string, motivo: string): Promise<void>
+  cancelarProcesso(id: string, motivo: string): Promise<void>
+  retomarProcesso(id: string, motivo: string): Promise<void>
   /** Por nome. */
   listarResponsaveisPossiveis(): Promise<UsuarioResponsavel[]>
   /** Em ordem alfabética de nome. */

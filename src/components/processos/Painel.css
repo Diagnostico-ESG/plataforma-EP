@@ -215,3 +215,13 @@
   background: var(--pendencia-fundo);
   color: var(--texto);
 }
+
+/* Processo suspenso ou cancelado: o motivo e o que fazer, no lugar das ações das etapas. */
+.painel-aviso {
+  margin: 0 0 var(--esp-3);
+  padding: var(--esp-2) var(--esp-3);
+  border: 1px solid var(--pendencia-borda);
+  border-radius: var(--canto);
+  background: var(--pendencia-fundo);
+  font-size: var(--tam-secundario);
+}

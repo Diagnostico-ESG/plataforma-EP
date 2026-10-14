@@ -123,17 +123,22 @@ function DetalhesDoProcesso({ processo, processos, cadastros, podeAlterar, aoFec
     aoFechar()
   }
 
+  const aposMudar = () => {
+    aoAtualizar()
+    aoMudar()
+  }
+
   return (
     <>
       <CaminhoDoProcesso processo={processo} processos={processos} podeAlterar={podeAlterar} aoSumir={aoSumir}
-        aoMudar={() => { aoAtualizar(); aoMudar() }} />
+        aoMudar={aposMudar} />
       {editando
         ? <FormularioDoProcesso cadastros={cadastros} titulo="Editar processo" inicial={processo} aoSalvar={salvar}
             aoCancelar={() => setEditando(false)} />
         : <DadosLidos processo={processo} />}
       {podeAlterar && !editando && (
         <AcoesDoProcesso processo={processo} processos={processos} aoEditar={() => setEditando(true)}
-          aoExcluir={aposExcluir} aoSumir={aoSumir} />
+          aoExcluir={aposExcluir} aoMudar={aposMudar} aoSumir={aoSumir} />
       )}
     </>
   )

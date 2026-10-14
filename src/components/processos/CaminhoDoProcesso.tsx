@@ -15,6 +15,12 @@ type CaminhoDoProcessoProps = {
   aoSumir: () => void
 }
 
+// A frase da spec ("Interface"); sem motivo gravado (não deveria acontecer), fica só a explicação.
+function avisoDoProcessoParado({ situacao, motivoDaSituacao }: ProcessoLido): string {
+  const motivo = motivoDaSituacao ? `: ${motivoDaSituacao}.` : '.'
+  return `Este processo está ${situacao}${motivo} Retome-o para registrar o andamento.`
+}
+
 /**
  * O caminho do processo no painel: as etapas do setor primeiro, só para leitura, com o caminho para a tela do setor;
  * depois as do processo, com as ações na etapa atual para quem pode alterar (a RLS é quem protege).
@@ -25,6 +31,7 @@ export function CaminhoDoProcesso({ processo, processos, podeAlterar, aoMudar, a
     () => (podeAlterar ? processos.listarResponsaveisPossiveis() : Promise.resolve([])), [processos, podeAlterar])
   const { estado } = useCarregamento(ler)
   const usuarios = estado.tipo === 'pronto' ? estado.valor : []
+  const parado = processo.situacao === 'suspenso' || processo.situacao === 'cancelado'
   return (
     <section className="painel-caminho" aria-label="Caminho de etapas">
       <div className="painel-caminho-titulo">
@@ -37,7 +44,8 @@ export function CaminhoDoProcesso({ processo, processos, podeAlterar, aoMudar, a
         ))}
       </ol>
       <h3 className="painel-subtitulo">Etapas do processo</h3>
-      <CaminhoDeEtapas processos={processos} etapas={processo.etapasDoProcesso} podeAlterar={podeAlterar}
+      {parado && <p className="painel-aviso" role="status">{avisoDoProcessoParado(processo)}</p>}
+      <CaminhoDeEtapas processos={processos} etapas={processo.etapasDoProcesso} podeAlterar={podeAlterar && !parado}
         usuarios={usuarios} aoMudar={aoMudar} aoSumir={aoSumir} />
     </section>
   )

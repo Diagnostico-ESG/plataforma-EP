@@ -338,3 +338,16 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Skills `writing-plans` e `executing-plans`:** acionadas pelo `Skill` sem recusa. O `executing-plans` sugere `subagent-driven-development`; ficou na sessão, como o comando manda (branch comum, sem worktree).
 - **claude-mem sem cota:** o aviso apareceu no início da sessão; a sessão segue sem registro nele até a cota voltar.
 - **Observação:** rodou em Sonnet, como a tabela recomenda.
+
+## 2026-10-14 — /executar-complexo do ticket 07 (situação do processo)
+
+- **Item não testado: branch comum no `/executar-complexo`, marco antes do ticket, `plano-<número>.md`.** Esperado: branch `processos-etapas-07` a partir da `main`, marco `marco/2026-10-14-inicio-ticket-07-processos-etapas`, `plano-07.md`. Aconteceu: tudo isso; a retomada não foi usada.
+- **Item não testado: TDD de gatilho e funções de banco com o teste antes da migração.** Esperado: o teste falha, a migração é criada depois. Aconteceu: o teste 20 falhou por função inexistente (e o 17 nos dois casos que mudavam); a migração só foi criada depois, com `npx supabase migration new`.
+- **Item não testado: migração com função em `public` (suspender, cancelar, retomar) e `db:types`.** Esperado: as funções entram em `Functions` do `database.ts`. Aconteceu: entraram, com `Args` e `Returns: undefined`.
+- **Mudar uma restrição que um teste antigo usava.** Dar privilégio de coluna e travar a situação por gatilho quebrou dois pontos do teste 17, que só apareceram na rodada do GitHub (um deles, só depois da migração aplicada). Sugestão: o plano que muda privilégio ou congela dados pode pedir uma busca prévia nos testes antigos por tudo que mexe na coluna ou nas linhas congeladas (`grep` de `situacao` nos testes de banco).
+- **Contagem do `plan(N)` do pgTAP errada no plano (33 em vez de 31):** contei de cabeça e só conferi com `grep` depois do primeiro envio. Sugestão: o plano pode mandar contar as asserções com `grep -c "^insert into _tap"` antes do envio.
+- **Workflows pelo navegador do app:** funcionou, mas o painel do navegador mudou de tamanho no meio da sessão (a posição dos botões mudou), então os cliques por coordenada exigiram um `screenshot` antes de cada um; `find` com o texto do botão e `form_input` no campo da migração foram os mais estáveis. A leitura do log da rodada deu certo por `javascript_tool` no texto da página do job.
+- **`gh` não existe nesta máquina** (como o `python`): disparar e ler o workflow é só pelo navegador do app.
+- **Skills `writing-plans` e `executing-plans`:** acionadas pelo `Skill` sem recusa. Escrevi as caixas do plano já marcadas por engano e as desmarquei antes de começar.
+- **claude-mem sem cota:** o aviso apareceu no início da sessão; a sessão segue sem registro nele até a cota voltar.
+- **Observação:** rodou em Sonnet, como a tabela recomenda.

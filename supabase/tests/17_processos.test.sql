@@ -53,6 +53,7 @@ create function pg_temp.conferir_processos(id_usuario text, quem text, sigla_do_
 returns void language plpgsql as $$
 declare
   id_do_setor uuid := (select id from public.setores where sigla = sigla_do_setor);
+  recusada boolean := false;
   inclusao text := format(
     $sql$insert into public.processos (setor_id, macroprocesso_id, nome)
       values (%L, 'ab000000-0000-0000-0000-000000000001', 'Processo Novo')$sql$, id_do_setor);
@@ -84,9 +85,15 @@ begin
   insert into _tap (linha) select throws_ok(
     $sql$update public.processos set processo_pai_id = null$sql$, '42501', null,
     quem || ' não troca o pai do processo direto');
-  insert into _tap (linha) select throws_ok(
-    $sql$update public.processos set situacao = situacao$sql$, '42501', null,
-    quem || ' não troca a situação do processo direto');
+  -- A situação tem privilégio de coluna desde o ticket 07, mas só muda pelas funções: o gatilho recusa a mudança
+  -- direta de quem altera (quem só lê não enxerga linha para alterar, e nada acontece).
+  begin
+    update public.processos set situacao = 'suspenso', motivo_da_situacao = 'Direto'
+      where nome = 'Processo Semente ' || sigla_do_setor;
+  exception when others then
+    recusada := sqlerrm like 'situacao_so_pela_funcao%';
+  end;
+  insert into _tap (linha) select is(recusada, altera, quem || ' não troca a situação do processo direto');
   with apagadas as (delete from public.processos where nome = 'Processo Semente ' || sigla_do_setor returning 1)
   insert into _tap (linha) select is((select count(*)::int from apagadas), case when altera then 1 else 0 end,
     quem || case when altera then ' apaga o processo' else ' não apaga o processo' end);
@@ -266,11 +273,19 @@ insert into _tap (linha) select is(
 insert into _tap (linha) select is(
   (select etapa_atual_codigo from public.processos_com_andamento where setor_id = '5e000000-0000-0000-0000-000000000004'),
   'publicacao', 'a etapa atual passa a ser a opcional que sobrou');
+-- A suspensão direta só passa com a chave que as funções do ticket 07 ligam; aqui o dono do banco a liga à mão.
+select set_config('ep.mudando_situacao', 'on', true);
 update public.processos set situacao = 'suspenso', motivo_da_situacao = 'Parado para teste'
   where setor_id = '5e000000-0000-0000-0000-000000000004';
+select set_config('ep.mudando_situacao', 'off', true);
 insert into _tap (linha) select is(
   (select situacao from public.processos_com_andamento where setor_id = '5e000000-0000-0000-0000-000000000004'),
   'suspenso', 'a situação guardada suspensa aparece na view');
+-- O processo volta a andar para as restrições mais adiante (as etapas de processo suspenso ficam congeladas desde o ticket 07).
+select set_config('ep.mudando_situacao', 'on', true);
+update public.processos set situacao = 'em_andamento', motivo_da_situacao = null
+  where setor_id = '5e000000-0000-0000-0000-000000000004';
+select set_config('ep.mudando_situacao', 'off', true);
 
 -- Excluir o processo, como Integrante: o evento guarda os andamentos e eles vão junto.
 insert into _alvo select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000005';
