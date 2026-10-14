@@ -217,8 +217,8 @@ export function textoDaEtapaAtual(processo: ProcessoDaLista): string
 
 ### Tarefa 6 — Fechamento
 
-- [ ] `npm test` inteiro, `npm run lint`, `npm run typecheck` e `npm run check:circular` verdes.
-- [ ] Conferência na tela (opcional, se o app logado estiver disponível): Lista, filtros e a seção do setor; senão, fica para o `/polir`.
-- [ ] `desvios.md` de processos-etapas: entrada datada com "processos do setor pela lista inteira filtrada, sem operação nova no módulo" e "ícone Filtrar sem ação; filtros em barra visível". `backlog.md`: o ícone "Filtrar" da barra superior sem ação (para o `/polir`).
-- [ ] `melhorias-protocolo.md`: os itens de `.claude/regras/nao-testados.md` (blocos `/executar-complexo` e "Qualquer momento") que aconteceram nesta execução.
-- [ ] Comitar os registros; integração (passo 4 do `/executar-complexo`): `git switch main`, merge, `git branch -d processos-etapas-09`, `git push` da `main` (nada em `supabase/`, então o "Testes de banco" não dispara); linha `Concluído em` no fim do ticket 09; comitar e enviar.
+- [x] `npm test` inteiro, `npm run lint`, `npm run typecheck` e `npm run check:circular` verdes.
+- [x] Conferência na tela (opcional, se o app logado estiver disponível): Lista, filtros e a seção do setor; senão, fica para o `/polir`.
+- [x] `desvios.md` de processos-etapas: entrada datada com "processos do setor pela lista inteira filtrada, sem operação nova no módulo" e "ícone Filtrar sem ação; filtros em barra visível". `backlog.md`: o ícone "Filtrar" da barra superior sem ação (para o `/polir`).
+- [x] `melhorias-protocolo.md`: os itens de `.claude/regras/nao-testados.md` (blocos `/executar-complexo` e "Qualquer momento") que aconteceram nesta execução.
+- [x] Comitar os registros; integração (passo 4 do `/executar-complexo`): `git switch main`, merge, `git branch -d processos-etapas-09`, `git push` da `main` (nada em `supabase/`, então o "Testes de banco" não dispara); linha `Concluído em` no fim do ticket 09; comitar e enviar.
