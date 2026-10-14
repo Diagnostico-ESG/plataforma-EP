@@ -219,9 +219,9 @@
 **Files:**
 - Modify: `src/cadastros/historicoDosCadastros.ts`, `src/cadastros/historicoSupabase.ts` e os `*.test.ts`; `src/App.historicoDosCadastros.test.tsx`
 
-- [ ] **Step 1: testes que falham.** `historicoSupabase.test.ts`: `processo` entre as entidades lidas. `historicoDosCadastros.test.ts`: `nomeDoItem` de um evento `processo` é `SIGLA — nome` (sem cair no ramo do vínculo); campos legíveis (`Tipo`, `Origem`, `Situação`, `Contexto`, valores "Processo/Subprocesso/A classificar" e "Novo/Retomado"); a exclusão mostra a lista `Andamentos` com o nome da etapa e o status; o item entra no filtro por nome. `App.historicoDosCadastros.test.tsx`: processo excluído continua no Histórico da área Setores com o que tinha. FAIL.
-- [ ] **Step 2: implementação** nas duas funções (ramo explícito em `nomeDoItem`, rótulos, `valorLegivel`, item de andamento em `itemDaLista`) e a entidade na lista de leitura. PASS.
-- [ ] **Step 3: commit** "Ticket 04 de processos-etapas: histórico dos cadastros com processo".
+- [x] **Step 1: testes que falham.** `historicoSupabase.test.ts`: `processo` entre as entidades lidas. `historicoDosCadastros.test.ts`: `nomeDoItem` de um evento `processo` é `SIGLA — nome` (sem cair no ramo do vínculo); campos legíveis (`Tipo`, `Origem`, `Situação`, `Contexto`, valores "Processo/Subprocesso/A classificar" e "Novo/Retomado"); a exclusão mostra a lista `Andamentos` com o nome da etapa e o status; o item entra no filtro por nome. `App.historicoDosCadastros.test.tsx`: processo excluído continua no Histórico da área Setores com o que tinha. FAIL.
+- [x] **Step 2: implementação** nas duas funções (ramo explícito em `nomeDoItem`, rótulos, `valorLegivel`, item de andamento em `itemDaLista`) e a entidade na lista de leitura. PASS.
+- [x] **Step 3: commit** "Ticket 04 de processos-etapas: histórico dos cadastros com processo".
 
 ---
 
