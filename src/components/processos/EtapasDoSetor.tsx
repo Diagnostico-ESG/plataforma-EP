@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { type EstadoDoCarregamento, useCarregamento } from '../../hooks/useCarregamento'
 import type { EtapaDoSetor, ModuloDeProcessos } from '../../processos/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
-import { CaminhoDoSetor } from './CaminhoDoSetor'
+import { CaminhoDeEtapas } from './CaminhoDeEtapas'
 import './Etapas.css'
 
 type EtapasDoSetorProps = { processos: ModuloDeProcessos; setorId: string; podeAlterar: boolean; aoSumir: () => void }
@@ -29,5 +29,5 @@ type ConteudoProps = Omit<EtapasDoSetorProps, 'setorId'> & {
 function ConteudoDasEtapas({ estado, aoTentarDeNovo, ...caminho }: ConteudoProps) {
   if (estado.tipo === 'carregando') return <p className="cadastros-vazio" role="status">Carregando etapas do setor…</p>
   if (estado.tipo === 'erro') return <ErroAoCarregar alvo="as etapas do setor" aoTentarDeNovo={aoTentarDeNovo} />
-  return <CaminhoDoSetor etapas={estado.valor} {...caminho} />
+  return <CaminhoDeEtapas etapas={estado.valor} {...caminho} />
 }

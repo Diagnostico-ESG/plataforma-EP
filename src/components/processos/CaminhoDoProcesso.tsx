@@ -1,16 +1,23 @@
-import { indiceDaEtapaAtual } from '../../processos/caminhoDeEtapas'
-import type { ProcessoLido } from '../../processos/tipos'
+import type { ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
+import { CaminhoDeEtapas } from './CaminhoDeEtapas'
 import { LinhaDaEtapa } from './LinhaDaEtapa'
 
 const SEM_ACOES: never[] = []
 const NADA_A_FAZER = () => undefined
 
+type CaminhoDoProcessoProps = {
+  processo: ProcessoLido
+  processos: ModuloDeProcessos
+  podeAlterar: boolean
+  aoMudar: () => void
+  aoSumir: () => void
+}
+
 /**
  * O caminho do processo no painel: as etapas do setor primeiro, só para leitura, com o caminho para a tela do setor;
- * depois as do processo (por ora também só leitura: o andamento chega no ticket 05).
+ * depois as do processo, com as ações na etapa atual para quem pode alterar (a RLS é quem protege).
  */
-export function CaminhoDoProcesso({ processo }: { processo: ProcessoLido }) {
-  const atual = indiceDaEtapaAtual(processo.etapasDoProcesso)
+export function CaminhoDoProcesso({ processo, processos, podeAlterar, aoMudar, aoSumir }: CaminhoDoProcessoProps) {
   return (
     <section className="painel-caminho" aria-label="Caminho de etapas">
       <div className="painel-caminho-titulo">
@@ -23,12 +30,8 @@ export function CaminhoDoProcesso({ processo }: { processo: ProcessoLido }) {
         ))}
       </ol>
       <h3 className="painel-subtitulo">Etapas do processo</h3>
-      <ol className="caminho-de-etapas">
-        {processo.etapasDoProcesso.map((etapa, indice) => (
-          <LinhaDaEtapa key={etapa.id} etapa={etapa} atual={indice === atual} acoes={SEM_ACOES}
-            aoAgir={NADA_A_FAZER} responsavelNome={etapa.responsavelNome} />
-        ))}
-      </ol>
+      <CaminhoDeEtapas processos={processos} etapas={processo.etapasDoProcesso} podeAlterar={podeAlterar}
+        aoMudar={aoMudar} aoSumir={aoSumir} />
     </section>
   )
 }

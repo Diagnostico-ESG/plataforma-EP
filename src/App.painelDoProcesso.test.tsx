@@ -125,7 +125,7 @@ test('os dados do processo aparecem no painel', async () => {
   for (const texto of ['Retomado', 'Contexto inventado', 'Observação inventada']) expect(secao.getByText(texto)).toBeTruthy()
 })
 
-test('o caminho mostra as etapas do setor primeiro, só leitura, e depois as do processo, com a atual destacada', async () => {
+test('o caminho mostra as etapas do setor primeiro, só leitura, e depois as do processo, com a atual destacada e com as ações', async () => {
   montar()
   const caminho = within(await (await painel()).findByRole('region', { name: 'Caminho de etapas' }))
   const nomes = caminho.getAllByRole('listitem').map((item) => item.querySelector('.etapa-nome')?.textContent)
@@ -133,7 +133,8 @@ test('o caminho mostra as etapas do setor primeiro, só leitura, e depois as do 
     'Relatório e modelagem técnica', 'Revisão interna'])
   const atuais = caminho.getAllByRole('listitem').filter((item) => item.getAttribute('aria-current') === 'step')
   expect(atuais.map((item) => item.querySelector('.etapa-nome')?.textContent)).toEqual(['Relatório e modelagem técnica'])
-  expect(caminho.queryAllByRole('button')).toEqual([])
+  // As do setor seguem só leitura; as ações são só as da etapa atual do processo (ticket 05).
+  expect(caminho.getAllByRole('button').map((botao) => botao.textContent)).toEqual(['Concluir', 'Realizada anteriormente'])
 })
 
 test('o caminho mostra status, responsável, datas e nota das etapas do processo', async () => {
