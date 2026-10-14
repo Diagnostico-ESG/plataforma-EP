@@ -158,13 +158,13 @@
 - Consumes: `listarProcessos`, `colunasDoQuadro` (Tasks 3 e 4).
 - Produces: `<AreaDeProcessos usuario processos cadastros />` (aqui só o Quadro e a abertura do painel por endereço; o painel chega na Task 6); `QuadroVazio({ podeCadastrar, aoCadastrar })`; endereço `#/processos` para a área `quadro`.
 
-- [ ] **Step 1: testes que falham** em `src/App.quadro.test.tsx` (app inteiro com `ProcessosFalso`, endereço `#/processos`): 
+- [x] **Step 1: testes que falham** em `src/App.quadro.test.tsx` (app inteiro com `ProcessosFalso`, endereço `#/processos`): 
   - "Carregando processos…" com colunas-fantasma enquanto a leitura não responde; erro com [Tentar de novo] que recarrega; estado vazio ("Nenhum processo cadastrado ainda.") com [Cadastrar processo] para Integrante e sem o botão para a Consulta;
   - colunas "Aguardando o setor" e uma por etapa ativa, na ordem do catálogo, com os cartões no lugar certo e em ordem de nome; cartão com sigla, nome, macroprocesso, pílula "A classificar" só no tipo `a_classificar` e responsável (Avatar com o nome); suspenso com pílula "Suspenso"; concluído e cancelado fora do Quadro;
   - clicar [Cadastrar processo] ou no cartão muda o endereço para `#/processos/novo` / `#/processos/<id>`; o item "Quadro" da faixa lateral leva a `#/processos`.
   Atualizar `App.test.tsx` onde o Quadro vazio era estático. `npx vitest run src/App.quadro.test.tsx` → FAIL.
-- [ ] **Step 2: implementação.** `useAreaAtual`: o primeiro trecho `processos` (ou ausente) é a área `quadro`, e `irPara('quadro')` grava `#/processos`. `App.tsx` renderiza `<AreaDeProcessos ... />` no lugar do `QuadroVazio`. `AreaDeProcessos` carrega com `useCarregamento(listarProcessos)`, guarda `recarregar` e entrega `QuadroDeProcessos` (carregando com colunas-fantasma, erro com `ErroAoCarregar alvo="os processos"`, vazio com `QuadroVazio`, colunas com `ColunaDoQuadro` e `CartaoDoProcesso`). `Quadro.css`: ocupa toda a largura à direita da faixa lateral (sem `--largura-conteudo`), colunas de `var(--largura-coluna-quadro)`, rolagem lateral com sombra de rolagem em CSS puro, cartão branco com borda `--linha` que escurece ao passar o mouse e linha acesa (`--linha-acesa`) no cartão do endereço.
-- [ ] **Step 3:** `npx vitest run` → PASS; `npx eslint src` e `npx tsc -b` limpos; commit "Ticket 04 de processos-etapas: área Processos e Quadro".
+- [x] **Step 2: implementação.** `useAreaAtual`: o primeiro trecho `processos` (ou ausente) é a área `quadro`, e `irPara('quadro')` grava `#/processos`. `App.tsx` renderiza `<AreaDeProcessos ... />` no lugar do `QuadroVazio`. `AreaDeProcessos` carrega com `useCarregamento(listarProcessos)`, guarda `recarregar` e entrega `QuadroDeProcessos` (carregando com colunas-fantasma, erro com `ErroAoCarregar alvo="os processos"`, vazio com `QuadroVazio`, colunas com `ColunaDoQuadro` e `CartaoDoProcesso`). `Quadro.css`: ocupa toda a largura à direita da faixa lateral (sem `--largura-conteudo`), colunas de `var(--largura-coluna-quadro)`, rolagem lateral com sombra de rolagem em CSS puro, cartão branco com borda `--linha` que escurece ao passar o mouse e linha acesa (`--linha-acesa`) no cartão do endereço.
+- [x] **Step 3:** `npx vitest run` → PASS; `npx eslint src` e `npx tsc -b` limpos; commit "Ticket 04 de processos-etapas: área Processos e Quadro".
 
 ---
 

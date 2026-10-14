@@ -6,7 +6,7 @@ import { AreaDeCadastros } from './components/cadastros/AreaDeCadastros'
 import { TelaDeEntrada } from './components/entrada/TelaDeEntrada'
 import type { AreaComTela } from './components/moldura/areas'
 import { Moldura } from './components/moldura/Moldura'
-import { QuadroVazio } from './components/quadro/QuadroVazio'
+import { AreaDeProcessos } from './components/processos/AreaDeProcessos'
 import { useAreaAtual } from './hooks/useAreaAtual'
 import { useEntrada } from './hooks/useEntrada'
 
@@ -24,7 +24,7 @@ function App({ acesso, cadastros, processos }: AppProps) {
   }
   return (
     <Moldura areaAtual={area} aoIrPara={irPara} titulo={TITULO_DA_AREA[area]} usuario={estado.usuario} aoSair={sair}>
-      {area === 'quadro' && <QuadroVazio />}
+      {area === 'quadro' && <AreaDeProcessos usuario={estado.usuario} processos={processos} />}
       {area === 'setores' && <AreaDeCadastros usuario={estado.usuario} cadastros={cadastros} processos={processos} />}
       {area === 'administracao' && <AreaDeAdministracao usuario={estado.usuario} acesso={acesso} />}
     </Moldura>

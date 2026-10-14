@@ -28,6 +28,6 @@ test('para quem não é administrador, a navegação tem cinco áreas, sem Admin
 
 test('sem processos, mostra o aviso de vazio com a ação de cadastrar', async () => {
   await abrirLogado()
-  expect(screen.getByText(/Nenhum processo cadastrado ainda/)).toBeTruthy()
+  expect(await screen.findByText(/Nenhum processo cadastrado ainda/)).toBeTruthy()
   expect(screen.getByRole('button', { name: 'Cadastrar processo' })).toBeTruthy()
 })
