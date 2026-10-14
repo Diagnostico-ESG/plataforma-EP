@@ -3,17 +3,19 @@ import type { UsuarioAtual } from '../../acesso/tipos'
 import type { ModuloDeCadastros } from '../../cadastros/tipos'
 import { useCarregamento } from '../../hooks/useCarregamento'
 import { useEndereco } from '../../hooks/useEndereco'
+import {
+  lerEnderecoDosProcessos, montarEnderecoDosProcessos, type EnderecoDosProcessos,
+} from '../../processos/enderecoDosProcessos'
 import type { ModuloDeProcessos } from '../../processos/tipos'
 import { PainelDeNovoProcesso } from './PainelDeNovoProcesso'
 import { PainelDoProcesso } from './PainelDoProcesso'
-import { QuadroDeProcessos } from './QuadroDeProcessos'
+import { VisaoDosProcessos } from './VisaoDosProcessos'
 
 type AreaDeProcessosProps = { usuario: UsuarioAtual; processos: ModuloDeProcessos; cadastros: ModuloDeCadastros }
 
-// O segundo trecho do endereço (#/processos/<id>) é o processo escolhido; "novo" e "lista" não são ids.
-function idDoEndereco(endereco: string): string | null {
-  const trecho = endereco.split('/')[2]
-  return trecho && trecho !== 'novo' && trecho !== 'lista' ? trecho : null
+// O foco volta ao cartão (Quadro) ou ao botão da linha (Lista) do processo que estava aberto, depois que a visão deixa de estar inerte.
+function focarNoProcesso(id: string) {
+  setTimeout(() => (document.getElementById(`cartao-${id}`) ?? document.getElementById(`linha-${id}`))?.focus(), 0)
 }
 
 // Esconder botões e o formulário da Consulta é conveniência; quem protege os dados é a RLS de processos.
@@ -21,33 +23,37 @@ export function AreaDeProcessos({ usuario, processos, cadastros }: AreaDeProcess
   const listar = useCallback(() => processos.listarProcessos(), [processos])
   const { estado, tentarDeNovo, recarregar } = useCarregamento(listar)
   const [endereco, irPara] = useEndereco()
+  const atual = lerEnderecoDosProcessos(endereco)
   const podeAlterar = usuario.perfil !== 'consulta'
-  const idAberto = idDoEndereco(endereco)
-  const cadastrando = podeAlterar && endereco.split('/')[2] === 'novo'
+  const cadastrando = podeAlterar && atual.aberto === 'novo'
+  const idAberto = atual.aberto === 'novo' ? null : atual.aberto
+  const irParaVisao = (mudancas: Partial<EnderecoDosProcessos>) => irPara(montarEnderecoDosProcessos({ ...atual, ...mudancas }))
+  const enderecoDoProcesso = (id: string) => montarEnderecoDosProcessos({ ...atual, aberto: id })
 
-  // O foco volta ao cartão do processo que estava aberto, depois que o Quadro deixa de estar inerte.
   function fechar() {
-    irPara('#/processos')
-    setTimeout(() => document.getElementById(`cartao-${idAberto}`)?.focus(), 0)
+    irParaVisao({ aberto: null })
+    if (idAberto) focarNoProcesso(idAberto)
   }
 
   function aoCriar() {
-    irPara('#/processos')
+    irParaVisao({ aberto: null })
     recarregar()
   }
 
   return (
     <section className="area-de-processos" aria-label="Processos">
       <div className={idAberto || cadastrando ? 'quadro-esmaecido' : undefined} inert={idAberto !== null || cadastrando}>
-        <QuadroDeProcessos estado={estado} aoTentarDeNovo={tentarDeNovo} podeAlterar={podeAlterar}
-          aoCadastrar={() => irPara('#/processos/novo')} idEscolhido={idAberto} />
+        <VisaoDosProcessos visao={atual.visao} estado={estado} aoTentarDeNovo={tentarDeNovo} podeAlterar={podeAlterar}
+          aoCadastrar={() => irParaVisao({ aberto: 'novo' })} idEscolhido={idAberto}
+          enderecoDoProcesso={enderecoDoProcesso} aoAbrir={(id) => irParaVisao({ aberto: id })}
+          filtros={atual.filtros} aoMudarFiltros={(filtros) => irParaVisao({ filtros, aberto: null })} />
       </div>
       {idAberto && (
         <PainelDoProcesso key={idAberto} processos={processos} cadastros={cadastros} id={idAberto}
-          podeAlterar={podeAlterar} aoFechar={fechar} aoMudar={recarregar} />
+          podeAlterar={podeAlterar} aoFechar={fechar} aoMudar={recarregar} enderecoDoProcesso={enderecoDoProcesso} />
       )}
       {cadastrando && (
-        <PainelDeNovoProcesso processos={processos} cadastros={cadastros} aoFechar={() => irPara('#/processos')}
+        <PainelDeNovoProcesso processos={processos} cadastros={cadastros} aoFechar={() => irParaVisao({ aberto: null })}
           aoCriado={aoCriar} />
       )}
     </section>

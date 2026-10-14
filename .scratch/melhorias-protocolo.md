@@ -363,3 +363,12 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Scripts de edição:** o arquivo do projeto usa CRLF; trocas por `node` com `\n` não pegaram sem normalizar antes. O `Edit` resolveu.
 - **Skills `writing-plans` e `executing-plans`:** acionadas pelo `Skill` sem recusa.
 - **Observação:** rodou em Opus 5.5, não em Sonnet como a tabela recomenda para o `/executar-*` (a sessão foi trocada de modelo antes do comando).
+
+## 2026-10-14 — /executar-complexo do ticket 09 (lista, filtros e processos do setor)
+
+- **Item não testado: branch comum no `/executar-complexo`, `plano-<número>.md`, marco antes do ticket.** Esperado: branch `processos-etapas-09` a partir da `main`, marco `marco/2026-10-14-inicio-ticket-09-processos-etapas`, `plano-09.md`. Aconteceu: tudo isso; a retomada não foi usada.
+- **Ticket sem banco:** o plano registrou que `.claude/regras/banco.md` não se aplicava (nenhuma tabela, política, função ou arquivo) e nenhum workflow de banco foi disparado.
+- **Testes de tela que leem a tabela cedo demais:** três testes novos falharam na primeira rodada porque liam a tabela ou a faixa lateral enquanto o aplicativo ainda carregava (a tabela de "carregando" tem cabeçalho e linhas-fantasma ocultas). Esperar uma célula visível resolveu. Sugestão: deixar isso como padrão nos testes de lista.
+- **Scripts de edição e CRLF:** de novo, troca por `node` com `\n` não pegou num arquivo CRLF; normalizar antes ou usar o `Edit` resolveu.
+- **Skills `writing-plans` e `executing-plans`:** acionadas pelo `Skill` sem recusa.
+- **Observação:** rodou em Opus 5.5, não em Sonnet como a tabela recomenda (o comando foi rodado nesta sessão depois do `/situação`, que recomendou abrir uma sessão nova).

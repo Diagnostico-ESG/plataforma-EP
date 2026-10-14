@@ -78,3 +78,19 @@ Diferenças entre o que a spec e o ticket dizem e o que foi construído. Nada di
 - **A pílula "Subprocesso" do cartão** já existia (ticket 04); o teste de tela do cadastro prova que ela aparece no cartão do subprocesso novo.
 - **TDD fora de ordem em um ponto:** o teste do módulo real de reclassificação foi escrito antes do código, mas rodou só depois dele (o pre-commit barrou o commit da migração com o teste ainda sem implementação; o arquivo saiu da pasta durante o commit). Os demais seguiram o vermelho antes do verde.
 - **Conferência visual não feita nesta sessão** (o app exige login e não há servidor com dados). A seção da estrutura, o seletor de pai e a janela de reclassificar só foram conferidos por teste de tela; os critérios `[visual]` ficam para o `/polir` e o `/ship`.
+
+## 2026-10-14 — /executar-complexo do ticket 09 (lista, filtros e processos do setor)
+
+Diferenças entre o que a spec e o ticket dizem e o que foi construído. Nada disso muda a spec; fica para o `/ship` e para o `/polir`.
+
+- **Nenhum banco.** A view `processos_com_andamento` já devolvia todos os processos, de qualquer situação, com o pai; Lista, filtros e processos do setor são só interface.
+- **"Ler os processos de um setor"** (spec, "Terceiro módulo injetado") não virou operação nova: a seção "Processos do setor" usa `listarProcessos()` filtrada pelo setor. Para o volume do EP (dezenas de processos) basta; se a lista crescer muito, vira uma consulta com filtro no banco.
+- **Endereço:** os filtros vão no fim do endereço como consulta (`#/processos/lista?setor=…&tipo=…`), sempre na mesma ordem e só os preenchidos; o painel aberto da Lista fica em `#/processos/lista/<id>` e o do Quadro em `#/processos/<id>`, os dois com os filtros. Os links de pai e subprocessos do painel e o fechar mantêm a visão e os filtros.
+- **Etapa atual "Aguardando o setor"** é uma opção do filtro de etapa; o filtro de uma etapa do catálogo não pega quem aguarda o setor (como as colunas do Quadro). Na Lista, a coluna mostra "Aguardando o setor" nesse caso e "—" no processo sem etapa atual (concluído).
+- **Opções dos filtros** saem da lista carregada: só aparecem o setor, o macroprocesso e o responsável que têm processo. O filtro de etapa mostra as etapas do catálogo que viram coluna no Quadro.
+- **Onde ficam os filtros:** numa barra sempre visível acima do Quadro e da Lista (seletores nativos, com "Todos"/"Todas"), com [Limpar filtros] quando há filtro. O ícone "Filtrar" da barra superior continua sem ação (backlog, para o `/polir`).
+- **Alternância Quadro | Lista e faixa lateral** levam ao endereço sem filtros: os filtros não passam de uma visão para a outra.
+- **"↳ pai" com filtro:** o nome do pai vem de todos os processos, então aparece mesmo quando o filtro tirou o pai da Lista.
+- **Processos do setor:** clicar abre o painel por cima da Lista já filtrada pelo setor (`#/processos/lista/<id>?setor=<id>`); fechar volta a essa Lista, não à tela do setor.
+- **Pílula da situação** virou o componente `PilulaDaSituacao`, usado no cabeçalho do painel, na Lista e na tela do setor.
+- **Conferência visual não feita nesta sessão** (o app exige login e não há servidor com dados). Lista, barra de filtros e a seção do setor só foram conferidas por teste de tela; os critérios `[visual]` ficam para o `/polir` e o `/ship`.

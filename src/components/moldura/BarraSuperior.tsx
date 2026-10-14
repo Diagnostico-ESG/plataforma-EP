@@ -1,26 +1,28 @@
 import type { UsuarioAtual } from '../../acesso/tipos'
 import { Icone } from '../Icone'
+import type { AreaComTela } from './areas'
 import { MenuDaConta } from './MenuDaConta'
 
 type BarraSuperiorProps = {
   titulo: string
   usuario: UsuarioAtual
   aoSair: () => Promise<void>
-  /** O Quadro/Lista só faz sentido na área de processos. */
-  mostrarAlternancia: boolean
+  /** A visão da área de processos; null fora dela, onde o Quadro/Lista não faz sentido. */
+  visao: 'quadro' | 'lista' | null
+  aoIrPara: (area: AreaComTela) => void
 }
 
-export function BarraSuperior({ titulo, usuario, aoSair, mostrarAlternancia }: BarraSuperiorProps) {
+export function BarraSuperior({ titulo, usuario, aoSair, visao, aoIrPara }: BarraSuperiorProps) {
   return (
     <header className="barra-superior">
       <span className="barra-marca">EP</span>
       <h1 className="barra-titulo">{titulo}</h1>
-      {mostrarAlternancia && (
+      {visao && (
         <div className="alternancia" role="group" aria-label="Forma de ver os processos">
-          <button type="button" className="alternancia-opcao" aria-pressed="true">
+          <button type="button" className="alternancia-opcao" aria-pressed={visao === 'quadro'} onClick={() => aoIrPara('quadro')}>
             Quadro
           </button>
-          <button type="button" className="alternancia-opcao" aria-pressed="false">
+          <button type="button" className="alternancia-opcao" aria-pressed={visao === 'lista'} onClick={() => aoIrPara('lista')}>
             Lista
           </button>
         </div>

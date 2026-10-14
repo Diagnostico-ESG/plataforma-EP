@@ -23,6 +23,8 @@ type PainelDoProcessoProps = {
   aoFechar: () => void
   /** O processo mudou ou foi excluído: o Quadro atrás do painel precisa recarregar. */
   aoMudar: () => void
+  /** O endereço do painel de outro processo (pai ou subprocesso), por cima da mesma visão. */
+  enderecoDoProcesso: (id: string) => string
 }
 
 const TEXTO_DE_PROCESSO_INEXISTENTE = 'Este processo não existe mais. Ele pode ter sido excluído; veja o Histórico.'
@@ -104,7 +106,8 @@ function ProcessoAberto(props: ProcessoAbertoProps) {
 }
 
 // Os dados viram o formulário na edição; salvar volta aos dados, já atualizados, e o Quadro recarrega.
-function DetalhesDoProcesso({ processo, processos, cadastros, podeAlterar, aoFechar, aoMudar, aoAtualizar, aoSumir }: ProcessoAbertoProps) {
+function DetalhesDoProcesso(props: ProcessoAbertoProps) {
+  const { processo, processos, cadastros, podeAlterar, aoFechar, aoMudar, aoAtualizar, aoSumir, enderecoDoProcesso } = props
   const [editando, setEditando] = useState(false)
 
   async function salvar(dados: DadosDoProcesso) {
@@ -137,7 +140,7 @@ function DetalhesDoProcesso({ processo, processos, cadastros, podeAlterar, aoFec
         ? <FormularioDoProcesso cadastros={cadastros} processos={processos} titulo="Editar processo" inicial={processo} aoSalvar={salvar}
             aoCancelar={() => setEditando(false)} />
         : <DadosLidos processo={processo} />}
-      <EstruturaDoProcesso processo={processo} />
+      <EstruturaDoProcesso processo={processo} enderecoDoProcesso={enderecoDoProcesso} />
       {podeAlterar && !editando && (
         <AcoesDoProcesso processo={processo} processos={processos} aoEditar={() => setEditando(true)}
           aoExcluir={aposExcluir} aoMudar={aposMudar} aoSumir={aoSumir} />

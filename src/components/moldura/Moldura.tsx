@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { UsuarioAtual } from '../../acesso/tipos'
-import type { AreaComTela, AreaDoSistema } from './areas'
+import { ehAreaDeProcessos, type AreaComTela, type AreaDoSistema } from './areas'
 import { BarraSuperior } from './BarraSuperior'
 import { FaixaLateral } from './FaixaLateral'
 import './Moldura.css'
@@ -17,7 +17,8 @@ type MolduraProps = {
 export function Moldura({ areaAtual, aoIrPara, titulo, usuario, aoSair, children }: MolduraProps) {
   return (
     <div className="moldura">
-      <BarraSuperior titulo={titulo} usuario={usuario} aoSair={aoSair} mostrarAlternancia={areaAtual === 'quadro'} />
+      <BarraSuperior titulo={titulo} usuario={usuario} aoSair={aoSair}
+        visao={ehAreaDeProcessos(areaAtual) ? areaAtual : null} aoIrPara={aoIrPara} />
       <FaixaLateral
         areaAtual={areaAtual}
         mostrarAdministracao={usuario.perfil === 'administrador'}
