@@ -72,3 +72,15 @@ Diferenças entre o que a spec e o ticket dizem e o que foi construído. Nada di
 - **TDD das funções puras e do endereço (tarefa 3):** os testes e o código dessa tarefa foram escritos juntos, sem rodar o teste antes para vê-lo falhar. As demais tarefas (frases, módulo e telas) seguiram vermelho antes do verde.
 - **`montarReunioes` ganhou irmã `falsoDeReunioes`** (monta só o falso), usada pelo novo `montarNosCadastros`, que monta o aplicativo com setores, processos e reuniões que combinam entre si.
 - **Conferência visual não feita nesta sessão** (o app exige login e não há servidor com dados). As seções do setor e do processo, o formulário preenchido e o histórico só foram conferidos por teste de tela; os critérios `[visual]` seguem para o `/polir` e o `/ship`.
+
+## 2026-10-15 — /polir da funcionalidade reuniões
+
+Auditoria e polimento em nível de código (o app exige login e não há servidor com dados; **nenhuma tela foi vista renderizada**, então os critérios `[visual]` continuam presumidos para o `/ship`). O detector do Impeccable não achou nada nas pastas `src/components` e `src/styles`.
+
+**Corrigido**
+- **Espaçamento das seções "Reuniões":** a seção não tinha espaço entre título, lista e [Registrar reunião], e no setor ficava colada na seção de cima (as irmãs usam `margin-top: var(--esp-5)`; `processos-do-setor` não tem regra). Nova classe `secao-de-reunioes` em `Reunioes.css`, com `grid` e `gap`, e a folga superior só no setor (no painel do processo o `gap` do próprio painel já separa as seções).
+- **Leitor de tela:** o separador "·" entre data, tipo e processos da lista agora é `aria-hidden`, para não ser lido como "ponto médio".
+
+**Deixado de fora**
+- `aria-label` "Reuniões do setor/processo" repetindo o título "Reuniões": segue o padrão das seções vizinhas ("Processos do setor"); mudar sozinho deixaria a seção diferente das outras.
+- Alvos de toque de 32 px nos botões de texto (`cadastros-abrir`): o uso é em computador (PRODUCT.md) e é o padrão do projeto inteiro.

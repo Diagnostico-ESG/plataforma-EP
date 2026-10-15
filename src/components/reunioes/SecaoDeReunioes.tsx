@@ -6,6 +6,7 @@ import { ROTULO_DO_TIPO_DE_REUNIAO, dataEHoraDaReuniao } from '../../reunioes/ro
 import type { ModuloDeReunioes, Reuniao } from '../../reunioes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import '../processos/Painel.css'
+import './Reunioes.css'
 
 export type SecaoDeReunioesProps = {
   reunioes: ModuloDeReunioes
@@ -32,7 +33,7 @@ export function SecaoDeReunioes({ reunioes, de, selecionar, comProcessos, modelo
   const ler = useCallback(() => reunioes.listarReunioes(), [reunioes])
   const { estado, tentarDeNovo } = useCarregamento(ler)
   return (
-    <section className={classeDaSecao} aria-label={`Reuniões do ${de}`}>
+    <section className={`${classeDaSecao} secao-de-reunioes`} aria-label={`Reuniões do ${de}`}>
       <h3 className={classeDoTitulo}>Reuniões</h3>
       {estado.tipo === 'carregando' && <p className="cadastros-vazio" role="status">Carregando reuniões…</p>}
       {estado.tipo === 'erro' && <ErroAoCarregar alvo="as reuniões" aoTentarDeNovo={tentarDeNovo} />}
@@ -60,8 +61,10 @@ function ListaDeReunioes({ reunioes, comProcessos }: ListaDeReunioesProps) {
           <button type="button" className="cadastros-abrir" onClick={() => abrirReuniao(reuniao.id)}>
             {dataEHoraDaReuniao(reuniao)}
           </button>
-          <span> · {ROTULO_DO_TIPO_DE_REUNIAO[reuniao.tipo]}</span>
-          {comProcessos && reuniao.processos.length > 0 && <span> · {reuniao.processos.map((processo) => processo.nome).join(', ')}</span>}
+          <span><span aria-hidden="true"> · </span>{ROTULO_DO_TIPO_DE_REUNIAO[reuniao.tipo]}</span>
+          {comProcessos && reuniao.processos.length > 0 && (
+            <span><span aria-hidden="true"> · </span>{reuniao.processos.map((processo) => processo.nome).join(', ')}</span>
+          )}
         </li>
       ))}
     </ul>

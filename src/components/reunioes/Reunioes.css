@@ -8,6 +8,23 @@
   background: var(--folha);
 }
 
+/* Seção "Reuniões" do setor e do painel do processo: título, lista e [Registrar reunião] com o espaço das seções
+   vizinhas. No setor, a seção vem logo abaixo de outra e precisa da mesma folga superior (no painel, quem separa as
+   seções é o gap do próprio painel). */
+.secao-de-reunioes {
+  display: grid;
+  justify-items: start;
+  gap: var(--esp-2);
+}
+
+.secao-de-reunioes > h3 {
+  margin: 0;
+}
+
+.secao-de-reunioes.processos-do-setor {
+  margin-top: var(--esp-5);
+}
+
 /* A marca "sem anotações" é só texto, discreta, abaixo da data (nunca só cor). */
 .reuniao-sem-anotacoes {
   display: block;
