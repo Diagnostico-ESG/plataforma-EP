@@ -64,6 +64,17 @@ describe('gravação de processos no módulo real', () => {
     expect(falha.message).toBe(frase)
   })
 
+  test.each([
+    ['processo_com_reunioes_muda_de_setor:1', 'Não é possível trocar o setor: processo foi tratado em 1 reunião. Registre um processo novo no outro setor.'],
+    ['processo_com_reunioes_muda_de_setor:2', 'Não é possível trocar o setor: processo foi tratado em 2 reuniões. Registre um processo novo no outro setor.'],
+  ])('trocar o setor de processo tratado em reunião: "%s" vira a frase com a contagem', async (mensagem, frase) => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['processos.update'] = { data: null, error: { code: 'P0001', message: mensagem } }
+    const falha = await falhaDe(criar(cliente).editarProcesso('p1', DADOS))
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect(falha.message).toBe(frase)
+  })
+
   test('editar atualiza os campos editáveis pelo id e não manda o tipo nem o pai', async () => {
     const cliente = new ClienteSupabaseFalso()
     cliente.respostas['processos.update'] = { data: [{ id: 'p1' }], error: null }
