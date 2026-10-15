@@ -3,7 +3,7 @@
 import type { PapelDoArquivo } from './nomePadrao.ts'
 
 export type Perfil = 'administrador' | 'integrante_ep' | 'consulta'
-export type Acao = 'iniciar_envio' | 'baixar'
+export type Acao = 'iniciar_envio' | 'baixar' | 'registrar'
 export interface Chamador {
   perfil: Perfil
   ativo: boolean
@@ -16,6 +16,8 @@ export type CodigoDeRecusa =
   | 'processo_fora_de_andamento'
   | 'extensao_nao_aceita'
   | 'arquivo_grande'
+  | 'arquivo_nao_chegou'
+  | 'arquivo_fora_da_pasta'
 export interface Recusa {
   codigo: CodigoDeRecusa
   mensagem: string
@@ -31,18 +33,19 @@ export interface EntradaIniciarEnvio {
 export interface EntradaBaixar {
   driveId: string
 }
-type Falha = { ok: false; recusa: Recusa }
+export type Falha = { ok: false; recusa: Recusa }
 export type Validacao<T> = { ok: true; valor: T } | Falha
-type Corpo = Record<string, unknown>
+export type Corpo = Record<string, unknown>
 
 export const LIMITE_DE_TAMANHO = 20 * 1024 * 1024
 
 const PERFIS_POR_ACAO: Record<Acao, readonly Perfil[]> = {
   iniciar_envio: ['administrador', 'integrante_ep'],
   baixar: ['administrador', 'integrante_ep', 'consulta'],
+  registrar: ['administrador', 'integrante_ep'],
 }
 
-const EXTENSOES_POR_PAPEL: Record<PapelDoArquivo, readonly string[]> = {
+export const EXTENSOES_POR_PAPEL: Record<PapelDoArquivo, readonly string[]> = {
   bpmn: ['bpmn'],
   png: ['png'],
   bpm: ['bpm'],
@@ -57,10 +60,12 @@ const MENSAGENS: Record<CodigoDeRecusa, string> = {
   processo_fora_de_andamento: 'O processo não está em andamento.',
   extensao_nao_aceita: 'Tipo de arquivo não aceito para este papel.',
   arquivo_grande: 'O arquivo passa de 20 MB.',
+  arquivo_nao_chegou: 'Um dos arquivos não chegou ao Drive. Envie de novo.',
+  arquivo_fora_da_pasta: 'O arquivo não está na pasta do processo no Drive.',
 }
 
-const FORMATO_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-const FORMATO_ID_DO_DRIVE = /^[A-Za-z0-9_-]{1,200}$/
+export const FORMATO_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+export const FORMATO_ID_DO_DRIVE = /^[A-Za-z0-9_-]{1,200}$/
 
 const STATUS_POR_CODIGO: Partial<Record<CodigoDeRecusa, number>> = {
   sem_login: 401,
@@ -78,10 +83,10 @@ export function statusDaRecusa(recusa: Recusa): number {
 
 export function lerAcao(corpo: unknown): Acao | null {
   const acao = eCorpo(corpo) ? corpo.acao : null
-  return acao === 'iniciar_envio' || acao === 'baixar' ? acao : null
+  return acao === 'iniciar_envio' || acao === 'baixar' || acao === 'registrar' ? acao : null
 }
 
-function falhar(codigo: CodigoDeRecusa, detalhe?: string): Falha {
+export function falhar(codigo: CodigoDeRecusa, detalhe?: string): Falha {
   return { ok: false, recusa: recusar(codigo, detalhe) }
 }
 
@@ -103,27 +108,27 @@ export function extensaoDoNome(nome: string): string {
 }
 
 // Só o tipo recebido entra na mensagem: o valor pode trazer dado de fora (e pessoal).
-function tipoDe(valor: unknown): string {
+export function tipoDe(valor: unknown): string {
   if (valor === null) return 'null'
   if (Array.isArray(valor)) return 'array'
   return typeof valor
 }
 
-function eCorpo(valor: unknown): valor is Corpo {
+export function eCorpo(valor: unknown): valor is Corpo {
   return tipoDe(valor) === 'object'
 }
 
-function campoInvalido(corpo: Corpo, campo: string, esperado: string): Falha {
+export function campoInvalido(corpo: Corpo, campo: string, esperado: string): Falha {
   return falhar('entrada_invalida', `campo ${campo}: esperado ${esperado}, recebido ${tipoDe(corpo[campo])}`)
 }
 
-function lerTexto(corpo: Corpo, campo: string, formato: RegExp, esperado: string): Validacao<string> {
+export function lerTexto(corpo: Corpo, campo: string, formato: RegExp, esperado: string): Validacao<string> {
   const valor = corpo[campo]
   if (typeof valor !== 'string' || !formato.test(valor)) return campoInvalido(corpo, campo, esperado)
   return { ok: true, valor }
 }
 
-function lerInteiroPositivo(corpo: Corpo, campo: string): Validacao<number> {
+export function lerInteiroPositivo(corpo: Corpo, campo: string): Validacao<number> {
   const valor = corpo[campo]
   if (typeof valor !== 'number' || !Number.isInteger(valor) || valor <= 0) {
     return campoInvalido(corpo, campo, 'número inteiro maior que zero')
@@ -137,7 +142,7 @@ function lerBooleano(corpo: Corpo, campo: string): Validacao<boolean> {
   return { ok: true, valor }
 }
 
-function lerPapel(corpo: Corpo): Validacao<PapelDoArquivo> {
+export function lerPapel(corpo: Corpo): Validacao<PapelDoArquivo> {
   const valor = corpo.papel
   if (typeof valor !== 'string' || !(valor in EXTENSOES_POR_PAPEL)) {
     return campoInvalido(corpo, 'papel', 'bpmn, png, bpm ou relatorio')

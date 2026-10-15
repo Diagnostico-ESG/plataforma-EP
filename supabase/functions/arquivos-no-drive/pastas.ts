@@ -16,7 +16,7 @@ export interface ContextoDoDrive {
   config: Configuracao
 }
 
-interface Dono {
+export interface Dono {
   coluna: 'setor_id' | 'processo_id'
   id: string
 }
@@ -32,7 +32,7 @@ function falhaDoBanco(operacao: string, codigo: string): Error {
   return new Error(`${operacao} em pastas_no_drive falhou (código ${codigo}); esperado: perfil que altera cadastros`)
 }
 
-async function lerPastaRegistrada(cliente: SupabaseClient, dono: Dono): Promise<string | null> {
+export async function lerPastaRegistrada(cliente: SupabaseClient, dono: Dono): Promise<string | null> {
   const { data, error } = await cliente.from('pastas_no_drive').select('drive_id').eq(dono.coluna, dono.id).maybeSingle()
   if (error) throw falhaDoBanco('leitura', error.code)
   return data?.drive_id ?? null

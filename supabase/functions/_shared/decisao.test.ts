@@ -50,6 +50,11 @@ describe('conferirChamador', () => {
     ['consulta baixa', consulta, 'baixar', null],
     ['inativo não baixa', inativo, 'baixar', 'usuario_inativo'],
     ['sem login não baixa', null, 'baixar', 'sem_login'],
+    ['administrador registra', administrador, 'registrar', null],
+    ['integrante registra', integrante, 'registrar', null],
+    ['consulta não registra', consulta, 'registrar', 'sem_permissao'],
+    ['inativo não registra', inativo, 'registrar', 'usuario_inativo'],
+    ['sem login não registra', null, 'registrar', 'sem_login'],
   ]
 
   it.each(casos)('%s', (_nome, chamador, acao, esperado) => {
@@ -176,7 +181,7 @@ describe('extensaoDoNome', () => {
 })
 
 describe('lerAcao', () => {
-  it.each(['iniciar_envio', 'baixar'])('lê a ação %s', (acao) => {
+  it.each(['iniciar_envio', 'baixar', 'registrar'])('lê a ação %s', (acao) => {
     expect(lerAcao({ acao })).toBe(acao)
   })
 

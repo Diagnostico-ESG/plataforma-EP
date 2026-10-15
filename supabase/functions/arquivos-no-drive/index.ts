@@ -1,4 +1,4 @@
-// Função arquivos-no-drive (documentos-versoes, ticket 01). Ordem fixa: configuração → quem chamou →
+// Função arquivos-no-drive (documentos-versoes, tickets 01 e 02). Ordem fixa: configuração → quem chamou →
 // perfil e situação (decisao.ts) → entrada → Drive. Nenhuma ação toca o Drive antes de conferir quem chamou.
 import '@supabase/functions-js/edge-runtime.d.ts'
 import {
@@ -10,10 +10,12 @@ import {
   type Acao,
 } from '../_shared/decisao.ts'
 import { cabecalhosDeOrigem } from '../_shared/drive.ts'
+import { validarRegistrar } from '../_shared/registro.ts'
 import { baixar, iniciarEnvio } from './acoes.ts'
 import { identificarChamador, type ContextoDoChamador } from './chamador.ts'
 import { lerConfiguracao, type Configuracao } from './configuracao.ts'
 import { ErroDoDrive, obterToken } from './google.ts'
+import { registrar } from './registrar.ts'
 import { comCabecalhos, responderErroInterno, responderJson, responderRecusa } from './respostas.ts'
 
 async function lerCorpo(req: Request): Promise<unknown> {
@@ -21,6 +23,11 @@ async function lerCorpo(req: Request): Promise<unknown> {
 }
 
 async function executar(acao: Acao, corpo: unknown, chamador: ContextoDoChamador, config: Configuracao, origem: string | null): Promise<Response> {
+  if (acao === 'registrar') {
+    const entrada = validarRegistrar(corpo)
+    if (!entrada.ok) return responderRecusa(entrada.recusa)
+    return await registrar({ cliente: chamador.cliente, token: await obterToken(config), config }, entrada.valor)
+  }
   if (acao === 'baixar') {
     const entrada = validarBaixar(corpo)
     if (!entrada.ok) return responderRecusa(entrada.recusa)
@@ -38,7 +45,7 @@ async function atender(req: Request, config: Configuracao): Promise<Response> {
   if (!chamador) return responderRecusa(recusar('sem_login'))
   const corpo = await lerCorpo(req)
   const acao = lerAcao(corpo)
-  if (!acao) return responderRecusa(recusar('entrada_invalida', 'campo acao: esperado iniciar_envio ou baixar'))
+  if (!acao) return responderRecusa(recusar('entrada_invalida', 'campo acao: esperado iniciar_envio, baixar ou registrar'))
   const recusa = conferirChamador(chamador.chamador, acao)
   if (recusa) return responderRecusa(recusa)
   return await executar(acao, corpo, chamador, config, req.headers.get('Origin'))

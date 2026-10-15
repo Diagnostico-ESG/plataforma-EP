@@ -1,4 +1,4 @@
-// Prova de ponta a ponta da função arquivos-no-drive (documentos-versoes, ticket 01), rodada pelo usuário
+// Prova de ponta a ponta da função arquivos-no-drive (documentos-versoes, tickets 01 e 02), rodada pelo usuário
 // no terminal dele, contra o projeto de DESENVOLVIMENTO. Pede e-mail e senha dos usuários inventados na hora,
 // não grava nem imprime nenhum dos dois, nem token, nem endereço da sessão de envio. Imprime só OK/FALHOU e códigos.
 import { createClient } from '@supabase/supabase-js'
@@ -55,21 +55,55 @@ async function escolherProcesso(cliente) {
   return data[0].id
 }
 
-function pedidoDeEnvio(processoId) {
-  return { acao: 'iniciar_envio', processo_id: processoId, papel: 'bpmn', nome_original: 'prova.bpmn', tamanho: CONTEUDO.length, numero: 99, historica: false }
+// PNG inventado de 1x1 pixel, só para a prova (o par .bpmn e .png é obrigatório na versão).
+const PNG = Uint8Array.from(
+  atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='),
+  (letra) => letra.charCodeAt(0),
+)
+
+function pedidoDeEnvio(processoId, numero = 1, papel = 'bpmn', bytes = CONTEUDO) {
+  return { acao: 'iniciar_envio', processo_id: processoId, papel, nome_original: `prova.${papel}`, tamanho: bytes.length, numero, historica: false }
+}
+
+// O número que a versão vai receber: o maior do processo + 1, como a tela calcula na prévia.
+async function proximoNumero(cliente, processoId) {
+  const { data, error } = await cliente.from('versoes').select('numero').eq('processo_id', processoId)
+  if (error) throw new Error('leitura das versões falhou')
+  return Math.max(0, ...data.map((versao) => versao.numero)) + 1
+}
+
+async function enviarUmArquivo(config, token, pedido, bytes, tipo) {
+  const sessao = await chamarFuncao(config, token, pedido)
+  if (sessao.status !== 200) return relatar(`sessão de envio do .${pedido.papel}`, false, await codigoDe(sessao))
+  const { upload_url: endereco, nome } = await sessao.json()
+  relatar(`sessão de envio do .${pedido.papel}`, true, nome)
+  const envio = await fetch(endereco, { method: 'PUT', headers: { 'Content-Type': tipo, Origin: ORIGEM }, body: bytes })
+  if (!envio.ok) return relatar(`bytes do .${pedido.papel} enviados direto ao Drive`, false, String(envio.status))
+  const arquivo = await envio.json()
+  relatar(`bytes do .${pedido.papel} enviados direto ao Drive`, true, `tamanho ${arquivo.size}, md5 ${arquivo.md5Checksum ? 'informado' : 'ausente'}`)
+  return arquivo.id
+}
+
+async function registrarVersao(config, integrante, processoId, numero, ids) {
+  const corpo = {
+    acao: 'registrar', processo_id: processoId, numero, observacao: 'Prova de ponta a ponta',
+    arquivos: [{ papel: 'bpmn', drive_id: ids[0] }, { papel: 'png', drive_id: ids[1] }],
+  }
+  const resposta = await chamarFuncao(config, integrante.token, corpo)
+  if (resposta.status !== 200) return relatar('integrante registra a versão', false, await codigoDe(resposta))
+  const { data } = await integrante.cliente.from('versoes').select('numero').eq('processo_id', processoId).eq('numero', numero)
+  relatar('integrante registra a versão', data?.length === 1, `V${numero}`)
 }
 
 async function enviarComoIntegrante(config, integrante) {
   const processoId = await escolherProcesso(integrante.cliente)
-  const sessao = await chamarFuncao(config, integrante.token, pedidoDeEnvio(processoId))
-  if (sessao.status !== 200) return relatar('integrante abre a sessão de envio', false, await codigoDe(sessao))
-  const { upload_url: endereco, nome } = await sessao.json()
-  relatar('integrante abre a sessão de envio', true, nome)
-  const envio = await fetch(endereco, { method: 'PUT', headers: { 'Content-Type': 'application/xml', Origin: ORIGEM }, body: CONTEUDO })
-  if (!envio.ok) return relatar('bytes enviados direto ao Drive', false, String(envio.status))
-  const arquivo = await envio.json()
-  relatar('bytes enviados direto ao Drive', true, `tamanho ${arquivo.size}, md5 ${arquivo.md5Checksum ? 'informado' : 'ausente'}`)
-  return { processoId, driveId: arquivo.id }
+  const numero = await proximoNumero(integrante.cliente, processoId)
+  const bpmn = await enviarUmArquivo(config, integrante.token, pedidoDeEnvio(processoId, numero), CONTEUDO, 'application/xml')
+  if (!bpmn) return null
+  const png = await enviarUmArquivo(config, integrante.token, pedidoDeEnvio(processoId, numero, 'png', PNG), PNG, 'image/png')
+  if (!png) return null
+  await registrarVersao(config, integrante, processoId, numero, [bpmn, png])
+  return { processoId, driveId: bpmn }
 }
 
 async function conferirDownload(config, token, driveId, passo) {
