@@ -48,4 +48,13 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-14 | processos-etapas | /situação e /executar-complexo (ticket 04) | US$ 14,11
 2026-10-14 | processos-etapas | /situação e /executar-complexo (ticket 05) | US$ 8,17
 2026-10-14 | processos-etapas | /situação e /executar-complexo (ticket 06) | US$ 10,94
-2026-10-14 | processos-etapas | /ship | valor não informado
+2026-10-14 | processos-etapas | /ship | US$ 4,04
+2026-10-14 | processos-etapas | /situação e /executar-complexo (ticket 10, até a Tarefa 5) | US$ 13,22
+2026-10-14 | processos-etapas | /situação e /executar-complexo (ticket 10, retomada) | US$ 1,91
+2026-10-14 | processos-etapas | /situação e /polir (tickets 07 a 10) | US$ 1,60
+2026-10-14 | processos-etapas | /situação e /executar-complexo (ticket 09) | US$ 8,31
+2026-10-14 | processos-etapas | /executar-simples (remover ícone Filtrar da barra superior) | US$ 0,71
+2026-10-14 | processos-etapas | /situação e /executar-complexo (ticket 08) | US$ 16,47
+2026-10-14 | reunioes | /planejar | US$ 3,10
+2026-10-14 | processos-etapas | /situação e /executar-complexo (ticket 07) | US$ 7,33
+2026-10-15 | reunioes | /executar-complexo (ticket 03) | US$ 11,22
