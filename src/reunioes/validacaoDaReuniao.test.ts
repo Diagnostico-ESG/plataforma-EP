@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 import type { Reuniao } from './tipos'
 import {
-  CAMPOS_DA_REUNIAO_EM_BRANCO, type CamposDaReuniao, camposDaReuniao, comMudanca, dadosDaReuniao, faltaPreencher,
+  CAMPOS_DA_REUNIAO_EM_BRANCO, type CamposDaReuniao, camposDaReuniao, camposDoModelo, comMudanca, dadosDaReuniao, faltaPreencher,
 } from './validacaoDaReuniao'
 
 const PREENCHIDOS: CamposDaReuniao = {
@@ -75,4 +75,23 @@ test('salvar a edição sem mexer devolve os mesmos dados da reunião, inclusive
 test('na edição, trocar o setor ou o tipo desmarca os processos da reunião', () => {
   expect(comMudanca(camposDaReuniao(REUNIAO), { setorId: 's2' }).processosIds).toEqual([])
   expect(comMudanca(camposDaReuniao(REUNIAO), { tipo: 'sensibilizacao' }).processosIds).toEqual([])
+})
+
+test('o registro preenchido parte do setor, do tipo e do processo do modelo, e do resto em branco', () => {
+  const modelo = { setorId: 's1', tipo: 'modelagem' as const, processoId: 'p1' }
+  expect(camposDoModelo(modelo, ['s1', 's2'])).toEqual({
+    ...CAMPOS_DA_REUNIAO_EM_BRANCO, tipo: 'modelagem', setorId: 's1', processosIds: ['p1'],
+  })
+  expect(camposDoModelo({ setorId: 's1', tipo: null, processoId: null }, ['s1']))
+    .toEqual({ ...CAMPOS_DA_REUNIAO_EM_BRANCO, setorId: 's1' })
+})
+
+test('sem modelo, ou com setor que não está entre os ativos, o formulário parte em branco', () => {
+  expect(camposDoModelo(null, ['s1'])).toEqual(CAMPOS_DA_REUNIAO_EM_BRANCO)
+  expect(camposDoModelo({ setorId: 's3', tipo: 'modelagem', processoId: 'p1' }, ['s1'])).toEqual(CAMPOS_DA_REUNIAO_EM_BRANCO)
+})
+
+test('o processo do modelo só entra na modelagem', () => {
+  const campos = camposDoModelo({ setorId: 's1', tipo: 'sensibilizacao', processoId: 'p1' }, ['s1'])
+  expect(campos.processosIds).toEqual([])
 })

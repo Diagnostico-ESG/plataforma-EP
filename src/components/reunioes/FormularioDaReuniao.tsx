@@ -1,10 +1,11 @@
 import { type FormEvent, useCallback, useState } from 'react'
 import { textoDaFalhaNoFormulario } from '../../acesso/falhasDeGravacao'
 import { useCarregamento } from '../../hooks/useCarregamento'
+import type { ModeloDaReuniao } from '../../reunioes/enderecoDasReunioes'
 import { setoresDaEscolha } from '../../reunioes/setoresDaEscolha'
 import type { DadosDaReuniao, ModuloDeReunioes, Reuniao, SetorParaReuniao } from '../../reunioes/tipos'
 import {
-  CAMPOS_DA_REUNIAO_EM_BRANCO, type CamposDaReuniao, camposDaReuniao, comMudanca, dadosDaReuniao, faltaPreencher,
+  type CamposDaReuniao, camposDaReuniao, camposDoModelo, comMudanca, dadosDaReuniao, faltaPreencher,
 } from '../../reunioes/validacaoDaReuniao'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { CamposDoFormulario } from './CamposDaReuniao'
@@ -14,6 +15,8 @@ type FormularioDaReuniaoProps = {
   titulo: string
   /** Na edição, a reunião que já existe: o formulário parte dos dados dela. */
   reuniao?: Reuniao
+  /** No registro vindo do setor ou do processo, o que já vem preenchido. */
+  modelo?: ModeloDaReuniao | null
   /** A falha segue para o formulário, que a mostra e mantém os dados. */
   aoSalvar: (dados: DadosDaReuniao) => Promise<void>
   aoCancelar: () => void
@@ -31,8 +34,10 @@ export function FormularioDaReuniao({ reunioes, ...formulario }: FormularioDaReu
 type FormularioProntoProps = FormularioDaReuniaoProps & { setores: SetorParaReuniao[] }
 
 // noValidate: as mensagens são as nossas, não as do navegador. Salvar só se habilita com o obrigatório preenchido.
-function FormularioPronto({ reunioes, setores, titulo, reuniao, aoSalvar, aoCancelar }: FormularioProntoProps) {
-  const [campos, setCampos] = useState<CamposDaReuniao>(reuniao ? camposDaReuniao(reuniao) : CAMPOS_DA_REUNIAO_EM_BRANCO)
+function FormularioPronto({ reunioes, setores, titulo, reuniao, modelo, aoSalvar, aoCancelar }: FormularioProntoProps) {
+  const [campos, setCampos] = useState<CamposDaReuniao>(
+    () => (reuniao ? camposDaReuniao(reuniao) : camposDoModelo(modelo ?? null, setores.map((setor) => setor.id))),
+  )
   const [aviso, setAviso] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
 

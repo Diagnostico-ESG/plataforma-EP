@@ -66,8 +66,8 @@ export const REUNIOES_DE_TESTE: Reuniao[] = [
 
 type Montagem = { perfil?: Perfil; reunioes?: Reuniao[]; ajustar?: (falso: ReunioesFalso) => void }
 
-/** Renderiza o aplicativo inteiro com a falsa de reuniões, já com setores e processos inventados. */
-export function montarReunioes({ perfil = 'integrante_ep', reunioes = REUNIOES_DE_TESTE, ajustar }: Montagem = {}) {
+/** A falsa de reuniões com setores, processos, usuários e responsáveis inventados. */
+export function falsoDeReunioes({ reunioes = REUNIOES_DE_TESTE, ajustar }: Omit<Montagem, 'perfil'> = {}): ReunioesFalso {
   const falso = new ReunioesFalso()
   falso.reunioes = reunioes
   falso.setores = SETORES_DE_TESTE
@@ -75,6 +75,12 @@ export function montarReunioes({ perfil = 'integrante_ep', reunioes = REUNIOES_D
   falso.usuarios = USUARIOS_DE_TESTE
   falso.responsaveisDosSetores = RESPONSAVEIS_DE_TESTE
   ajustar?.(falso)
+  return falso
+}
+
+/** Renderiza o aplicativo inteiro com a falsa de reuniões, já com setores e processos inventados. */
+export function montarReunioes({ perfil = 'integrante_ep', ...montagem }: Montagem = {}) {
+  const falso = falsoDeReunioes(montagem)
   const acesso = AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })
   render(<App acesso={acesso} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} reunioes={falso} />)
   return falso

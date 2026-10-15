@@ -1,3 +1,4 @@
+import type { ModeloDaReuniao } from './enderecoDasReunioes'
 import type { DadosDaReuniao, Reuniao, TipoDeReuniao } from './tipos'
 
 /** Os campos do formulário como a pessoa os preenche (tudo texto, para os campos nativos). */
@@ -66,4 +67,14 @@ export function dadosDaReuniao(campos: CamposDaReuniao): DadosDaReuniao {
     usuariosIds: campos.usuariosIds, responsaveisIds: campos.responsaveisIds,
     outrosParticipantes: linhasDoTexto(campos.outrosParticipantes),
   }
+}
+
+/**
+ * Os campos do registro "preenchido" (vindo do setor ou do processo). O setor do modelo só vale se estiver entre os
+ * ativos: o banco recusa reunião nova em setor inativo, e o formulário não deve partir de um setor que não oferece.
+ */
+export function camposDoModelo(modelo: ModeloDaReuniao | null, setoresAtivosIds: string[]): CamposDaReuniao {
+  if (!modelo || !setoresAtivosIds.includes(modelo.setorId)) return CAMPOS_DA_REUNIAO_EM_BRANCO
+  const processosIds = modelo.tipo === 'modelagem' && modelo.processoId ? [modelo.processoId] : []
+  return { ...CAMPOS_DA_REUNIAO_EM_BRANCO, tipo: modelo.tipo ?? '', setorId: modelo.setorId, processosIds }
 }

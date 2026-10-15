@@ -7,11 +7,14 @@ import {
   lerEnderecoDosProcessos, montarEnderecoDosProcessos, type EnderecoDosProcessos,
 } from '../../processos/enderecoDosProcessos'
 import type { ModuloDeProcessos } from '../../processos/tipos'
+import type { ModuloDeReunioes } from '../../reunioes/tipos'
 import { PainelDeNovoProcesso } from './PainelDeNovoProcesso'
 import { PainelDoProcesso } from './PainelDoProcesso'
 import { VisaoDosProcessos } from './VisaoDosProcessos'
 
-type AreaDeProcessosProps = { usuario: UsuarioAtual; processos: ModuloDeProcessos; cadastros: ModuloDeCadastros }
+type AreaDeProcessosProps = {
+  usuario: UsuarioAtual; processos: ModuloDeProcessos; cadastros: ModuloDeCadastros; reunioes: ModuloDeReunioes
+}
 
 // O foco volta ao cartão (Quadro) ou ao botão da linha (Lista) do processo que estava aberto, depois que a visão deixa de estar inerte.
 function focarNoProcesso(id: string) {
@@ -19,7 +22,7 @@ function focarNoProcesso(id: string) {
 }
 
 // Esconder botões e o formulário da Consulta é conveniência; quem protege os dados é a RLS de processos.
-export function AreaDeProcessos({ usuario, processos, cadastros }: AreaDeProcessosProps) {
+export function AreaDeProcessos({ usuario, processos, cadastros, reunioes }: AreaDeProcessosProps) {
   const listar = useCallback(() => processos.listarProcessos(), [processos])
   const { estado, tentarDeNovo, recarregar } = useCarregamento(listar)
   const [endereco, irPara] = useEndereco()
@@ -49,7 +52,7 @@ export function AreaDeProcessos({ usuario, processos, cadastros }: AreaDeProcess
           filtros={atual.filtros} aoMudarFiltros={(filtros) => irParaVisao({ filtros, aberto: null })} />
       </div>
       {idAberto && (
-        <PainelDoProcesso key={idAberto} processos={processos} cadastros={cadastros} id={idAberto}
+        <PainelDoProcesso key={idAberto} processos={processos} cadastros={cadastros} reunioes={reunioes} id={idAberto}
           podeAlterar={podeAlterar} aoFechar={fechar} aoMudar={recarregar} enderecoDoProcesso={enderecoDoProcesso} />
       )}
       {cadastrando && (

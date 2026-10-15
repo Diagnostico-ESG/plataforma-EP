@@ -3,7 +3,7 @@ import type { UsuarioAtual } from '../../acesso/tipos'
 import { useCarregamento } from '../../hooks/useCarregamento'
 import { useEndereco } from '../../hooks/useEndereco'
 import {
-  type EnderecoDasReunioes, lerEnderecoDasReunioes, montarEnderecoDasReunioes,
+  type EnderecoDasReunioes, lerEnderecoDasReunioes, lerModeloDaReuniao, montarEnderecoDasReunioes,
 } from '../../reunioes/enderecoDasReunioes'
 import { hojeLocal } from '../../reunioes/quandoAcontece'
 import type { ModuloDeReunioes } from '../../reunioes/tipos'
@@ -53,7 +53,10 @@ export function AreaDeReunioes({ usuario, reunioes }: AreaDeReunioesProps) {
         <PainelDaReuniao key={idAberto} reunioes={reunioes} id={idAberto} podeAlterar={podeAlterar} aoFechar={fechar}
           aoMudar={recarregar} />
       )}
-      {registrando && <PainelDeNovaReuniao reunioes={reunioes} aoFechar={() => irParaLista({ aberto: null })} aoRegistrada={aoRegistrar} />}
+      {registrando && (
+        <PainelDeNovaReuniao reunioes={reunioes} modelo={lerModeloDaReuniao(endereco)} aoFechar={() => irParaLista({ aberto: null })}
+          aoRegistrada={aoRegistrar} />
+      )}
     </section>
   )
 }

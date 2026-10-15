@@ -3,8 +3,10 @@ import { CadastroInexistente } from '../../cadastros/cadastroInexistente'
 import type { ModuloDeCadastros } from '../../cadastros/tipos'
 import { type EstadoDoCarregamento, useCarregamento } from '../../hooks/useCarregamento'
 import type { DadosDoProcesso, ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
+import type { ModuloDeReunioes } from '../../reunioes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { ItemInexistente } from '../cadastros/ItemInexistente'
+import { ReunioesDoProcesso } from '../reunioes/ReunioesDoProcesso'
 import { AcoesDoProcesso } from './AcoesDoProcesso'
 import { BotaoFechar, CabecalhoDoPainel } from './CabecalhoDoPainel'
 import { CaminhoDoProcesso } from './CaminhoDoProcesso'
@@ -18,6 +20,7 @@ import './Painel.css'
 type PainelDoProcessoProps = {
   processos: ModuloDeProcessos
   cadastros: ModuloDeCadastros
+  reunioes: ModuloDeReunioes
   id: string
   podeAlterar: boolean
   aoFechar: () => void
@@ -88,7 +91,7 @@ type ProcessoAbertoProps = Omit<PainelDoProcessoProps, 'aoFechar'> & {
 }
 
 function ProcessoAberto(props: ProcessoAbertoProps) {
-  const { processo, processos, id, aoFechar } = props
+  const { processo, processos, reunioes, id, aoFechar } = props
   const [aba, setAba] = useState<Aba>('detalhes')
   return (
     <>
@@ -99,7 +102,7 @@ function ProcessoAberto(props: ProcessoAbertoProps) {
       </div>
       <div className="painel-corpo" role="tabpanel">
         {aba === 'detalhes' && <DetalhesDoProcesso {...props} />}
-        {aba === 'historico' && <HistoricoDoProcesso processos={processos} id={id} />}
+        {aba === 'historico' && <HistoricoDoProcesso processos={processos} reunioes={reunioes} id={id} />}
       </div>
     </>
   )
@@ -107,7 +110,7 @@ function ProcessoAberto(props: ProcessoAbertoProps) {
 
 // Os dados viram o formulário na edição; salvar volta aos dados, já atualizados, e o Quadro recarrega.
 function DetalhesDoProcesso(props: ProcessoAbertoProps) {
-  const { processo, processos, cadastros, podeAlterar, aoFechar, aoMudar, aoAtualizar, aoSumir, enderecoDoProcesso } = props
+  const { processo, processos, cadastros, reunioes, podeAlterar, aoFechar, aoMudar, aoAtualizar, aoSumir, enderecoDoProcesso } = props
   const [editando, setEditando] = useState(false)
 
   async function salvar(dados: DadosDoProcesso) {
@@ -141,6 +144,7 @@ function DetalhesDoProcesso(props: ProcessoAbertoProps) {
             aoCancelar={() => setEditando(false)} />
         : <DadosLidos processo={processo} />}
       <EstruturaDoProcesso processo={processo} enderecoDoProcesso={enderecoDoProcesso} />
+      <ReunioesDoProcesso reunioes={reunioes} processoId={processo.id} setorId={processo.setorId} podeAlterar={podeAlterar} />
       {podeAlterar && !editando && (
         <AcoesDoProcesso processo={processo} processos={processos} aoEditar={() => setEditando(true)}
           aoExcluir={aposExcluir} aoMudar={aposMudar} aoSumir={aoSumir} />
