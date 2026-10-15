@@ -19,3 +19,5 @@
 - [ ] Reunião excluída por outra pessoa: o painel avisa que ela não existe mais.
 - [ ] Consulta não vê [Editar] nem [Excluir].
 - [ ] Testes de interface com o aplicativo inteiro cobrindo os itens acima.
+
+Concluído em 2026-10-15 (commit e3927d2)
