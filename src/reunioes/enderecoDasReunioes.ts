@@ -47,3 +47,27 @@ export function montarEnderecoDasReunioes({ aberto, filtros }: EnderecoDasReunio
   const texto = consulta.toString()
   return ['#/reunioes', aberto].filter((trecho) => trecho !== null).join('/') + (texto ? `?${texto}` : '')
 }
+
+/** O que o registro "preenchido" leva do setor ou do processo de onde a pessoa veio. */
+export type ModeloDaReuniao = { setorId: string; tipo: TipoDeReuniao | null; processoId: string | null }
+
+/** #/reunioes/nova[?para-setor=&para-tipo=&para-processo=]; os campos "para-" não colidem com os filtros da lista. */
+export function montarEnderecoDeNovaReuniao(modelo: ModeloDaReuniao | null): string {
+  if (!modelo) return '#/reunioes/nova'
+  const consulta = new URLSearchParams({ 'para-setor': modelo.setorId })
+  if (modelo.tipo) consulta.set('para-tipo', modelo.tipo)
+  if (modelo.processoId) consulta.set('para-processo', modelo.processoId)
+  return `#/reunioes/nova?${consulta.toString()}`
+}
+
+/** O modelo do endereço do registro; nulo sem setor (o setor é o que dá sentido a "preenchido"). */
+export function lerModeloDaReuniao(endereco: string): ModeloDaReuniao | null {
+  const consulta = new URLSearchParams(endereco.split('?')[1] ?? '')
+  const setorId = valor(consulta, 'para-setor')
+  if (!setorId) return null
+  const tipo = valor(consulta, 'para-tipo')
+  return {
+    setorId, tipo: tipo === 'sensibilizacao' || tipo === 'modelagem' ? tipo : null,
+    processoId: valor(consulta, 'para-processo'),
+  }
+}
