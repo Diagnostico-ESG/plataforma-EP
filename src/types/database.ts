@@ -118,6 +118,70 @@ export type Database = {
           },
         ]
       }
+      arquivos_da_versao: {
+        Row: {
+          copiado_de: string | null
+          drive_id: string
+          enviado_em: string
+          enviado_por: string
+          formato: string
+          hash_md5: string
+          id: string
+          nome: string
+          papel: Database["public"]["Enums"]["papel_do_arquivo"]
+          tamanho: number
+          versao_id: string
+        }
+        Insert: {
+          copiado_de?: string | null
+          drive_id: string
+          enviado_em?: string
+          enviado_por: string
+          formato: string
+          hash_md5: string
+          id?: string
+          nome: string
+          papel: Database["public"]["Enums"]["papel_do_arquivo"]
+          tamanho: number
+          versao_id: string
+        }
+        Update: {
+          copiado_de?: string | null
+          drive_id?: string
+          enviado_em?: string
+          enviado_por?: string
+          formato?: string
+          hash_md5?: string
+          id?: string
+          nome?: string
+          papel?: Database["public"]["Enums"]["papel_do_arquivo"]
+          tamanho?: number
+          versao_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "arquivos_da_versao_copiado_de_fkey"
+            columns: ["copiado_de"]
+            isOneToOne: false
+            referencedRelation: "arquivos_da_versao"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "arquivos_da_versao_enviado_por_fkey"
+            columns: ["enviado_por"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "arquivos_da_versao_versao_id_fkey"
+            columns: ["versao_id"]
+            isOneToOne: false
+            referencedRelation: "versoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       autorizacoes: {
         Row: {
           criada_em: string
@@ -667,6 +731,75 @@ export type Database = {
           },
         ]
       }
+      versoes: {
+        Row: {
+          enviada_em: string
+          enviada_por: string
+          etapa_id: string | null
+          historica: boolean
+          id: string
+          numero: number
+          observacao: string | null
+          processo_id: string
+        }
+        Insert: {
+          enviada_em?: string
+          enviada_por: string
+          etapa_id?: string | null
+          historica?: boolean
+          id?: string
+          numero: number
+          observacao?: string | null
+          processo_id: string
+        }
+        Update: {
+          enviada_em?: string
+          enviada_por?: string
+          etapa_id?: string | null
+          historica?: boolean
+          id?: string
+          numero?: number
+          observacao?: string | null
+          processo_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "versoes_enviada_por_fkey"
+            columns: ["enviada_por"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "versoes_etapa_id_fkey"
+            columns: ["etapa_id"]
+            isOneToOne: false
+            referencedRelation: "etapas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "versoes_etapa_id_fkey"
+            columns: ["etapa_id"]
+            isOneToOne: false
+            referencedRelation: "processos_com_andamento"
+            referencedColumns: ["etapa_atual_id"]
+          },
+          {
+            foreignKeyName: "versoes_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: false
+            referencedRelation: "processos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "versoes_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: false
+            referencedRelation: "processos_com_andamento"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       processos_com_andamento: {
@@ -771,6 +904,15 @@ export type Database = {
         }
         Returns: undefined
       }
+      registrar_versao: {
+        Args: {
+          p_arquivos: Json
+          p_numero: number
+          p_observacao: string
+          p_processo: string
+        }
+        Returns: string
+      }
       retomar_processo: {
         Args: { p_motivo: string; p_processo: string }
         Returns: undefined
@@ -804,6 +946,7 @@ export type Database = {
       categoria_macroprocesso: "finalistico" | "apoio" | "gerencial"
       nivel_da_etapa: "setor" | "processo"
       origem_do_processo: "novo" | "retomado"
+      papel_do_arquivo: "bpmn" | "png" | "bpm" | "relatorio"
       perfil: "administrador" | "integrante_ep" | "consulta"
       situacao_guardada: "em_andamento" | "suspenso" | "cancelado"
       status_da_etapa:
@@ -947,6 +1090,7 @@ export const Constants = {
       categoria_macroprocesso: ["finalistico", "apoio", "gerencial"],
       nivel_da_etapa: ["setor", "processo"],
       origem_do_processo: ["novo", "retomado"],
+      papel_do_arquivo: ["bpmn", "png", "bpm", "relatorio"],
       perfil: ["administrador", "integrante_ep", "consulta"],
       situacao_guardada: ["em_andamento", "suspenso", "cancelado"],
       status_da_etapa: [
