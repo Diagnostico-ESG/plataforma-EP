@@ -349,7 +349,7 @@ export type ModuloDoCatalogo = {
 
 ### Tarefa 7 — Fechamento
 
-- [ ] Rodar `npm test` inteiro duas vezes (os testes de foco já foram instáveis) e o lint.
-- [ ] Acrescentar a `.scratch/processos-etapas/desvios.md` a entrada datada do ticket 10: as frases que a spec não trazia (ver "Decisões"); a exclusão direta de andamento que passou de `42501` a "nada apagado" nos testes 15 e 17; a recusa de etapa usada que passou de `23503` a `etapa_usada`; o evento de ordem só da etapa movida; os eventos do catálogo no Histórico dos cadastros; o evento da etapa por gatilho `security definer` (como todos os eventos do projeto); conferência visual não feita (critérios `[visual]` para o `/polir` e o `/ship`).
-- [ ] Itens de `.claude/regras/nao-testados.md` (blocos `/executar-complexo` e "Qualquer momento") que aconteceram e ainda não estão em `.scratch/melhorias-protocolo.md`.
-- [ ] Commitar, `git switch main`, `git merge processos-etapas-10`, `npm test` na `main`, `git branch -d processos-etapas-10`, linha `Concluído em` no ticket, commit e `git push` da `main` (autorizado); conferir o "Testes de banco" disparado pelo envio.
+- [x] Rodar `npm test` inteiro duas vezes (os testes de foco já foram instáveis) e o lint.
+- [x] Acrescentar a `.scratch/processos-etapas/desvios.md` a entrada datada do ticket 10: as frases que a spec não trazia (ver "Decisões"); a exclusão direta de andamento que passou de `42501` a "nada apagado" nos testes 15 e 17; a recusa de etapa usada que passou de `23503` a `etapa_usada`; o evento de ordem só da etapa movida; os eventos do catálogo no Histórico dos cadastros; o evento da etapa por gatilho `security definer` (como todos os eventos do projeto); conferência visual não feita (critérios `[visual]` para o `/polir` e o `/ship`).
+- [x] Itens de `.claude/regras/nao-testados.md` (blocos `/executar-complexo` e "Qualquer momento") que aconteceram e ainda não estão em `.scratch/melhorias-protocolo.md`.
+- [x] Commitar, `git switch main`, `git merge processos-etapas-10`, `npm test` na `main`, `git branch -d processos-etapas-10`, linha `Concluído em` no ticket, commit e `git push` da `main` (autorizado); conferir o "Testes de banco" disparado pelo envio.

@@ -95,3 +95,18 @@ Diferenças entre o que a spec e o ticket dizem e o que foi construído. Nada di
 - **Pílula da situação** virou o componente `PilulaDaSituacao`, usado no cabeçalho do painel, na Lista e na tela do setor.
 - **Conferência visual não feita nesta sessão** (o app exige login e não há servidor com dados). Lista, barra de filtros e a seção do setor só foram conferidas por teste de tela; os critérios `[visual]` ficam para o `/polir` e o `/ship`.
 - **Teste instável corrigido depois da integração:** "Quadro: … o fechar mantêm os filtros" falhou em cerca de 2 de 5 rodadas da bateria inteira na `main`. Causa: o painel troca o botão de fechar do "Carregando processo…" pelo do cabeçalho, e o teste às vezes clicava no que já tinha saído da tela. Os dois testes novos que fecham o painel passaram a esperar o título do processo antes de clicar; 4 rodadas seguidas verdes depois.
+
+## 2026-10-14 — /executar-complexo do ticket 10 (catálogo de etapas na Administração)
+
+Diferenças entre o que a spec e o ticket dizem e o que foi construído. Nada disso muda a spec; fica para o `/ship` e para o `/polir`.
+
+- **Frases que a spec não trazia:** "O nome da etapa é obrigatório."; "O código deve ter de 2 a 40 caracteres: letras minúsculas sem acento, números e sublinhado. Recebido: "{valor}"."; "Já existe uma etapa com o nome {nome}."; "Já existe uma etapa com o código {código}.". As duas últimas vêm do módulo, não do formulário.
+- **Exclusão direta de andamento:** nos testes 15 e 17, apagar um andamento fora do catálogo deixou de dar `42501` e passou a "nada apagado" (a RLS filtra sem acusar erro). Os testes agora conferem que a linha continua lá.
+- **Etapa usada não se exclui:** a recusa passou de `23503` (referência) a `etapa_usada:{nome}`, levantada pelo gatilho "antes de apagar". A tela mostra "A etapa {nome} já foi usada; desative-a em vez de excluir."
+- **Evento de ordem:** subir ou descer gera evento só para a etapa movida (não para a vizinha); o espaço aberto por uma etapa nova não gera nenhum.
+- **Histórico:** os eventos do catálogo aparecem no Histórico dos cadastros (área Setores), com o item do filtro "{código} — {nome}", visíveis a todo perfil ativo.
+- **Evento por gatilho `security definer`**, como todos os eventos do projeto. Criar e reordenar passam pelas funções `acrescentar_etapa` e `mover_etapa`.
+- **Abas da Administração:** estado local, sem endereço (recarregar a página volta a "Usuários"). Esconder a aba é conveniência; quem protege é a RLS.
+- **Posição da etapa nova:** seletor com "Antes de {nome}" para cada etapa, inclusive as inativas, e "No fim" como padrão.
+- **Conferência visual não feita nesta sessão** (o app exige login e não há servidor com dados). As abas, a tabela do catálogo e os formulários só foram conferidos por teste de tela; os critérios `[visual]` ficam para o `/polir` e o `/ship`.
+- **Resultado do "Testes de banco" na branch não lido por mim:** o `gh` não existe nesta máquina; a rodada depois do ajuste do teste 15 (commit 5cd437a) precisa ser conferida no GitHub.

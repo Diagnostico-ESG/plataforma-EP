@@ -372,3 +372,13 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Scripts de edição e CRLF:** de novo, troca por `node` com `\n` não pegou num arquivo CRLF; normalizar antes ou usar o `Edit` resolveu.
 - **Skills `writing-plans` e `executing-plans`:** acionadas pelo `Skill` sem recusa.
 - **Observação:** rodou em Opus 5.5, não em Sonnet como a tabela recomenda (o comando foi rodado nesta sessão depois do `/situação`, que recomendou abrir uma sessão nova).
+
+## 2026-10-14 — /executar-complexo do ticket 10 (catálogo de etapas na Administração)
+
+- **Item não testado: retomada com a branch aberta.** Esperado: pular os passos 1 e 2 e continuar da primeira caixa aberta, apesar de haver mudanças não comitadas. Aconteceu: a branch `processos-etapas-10` já estava ativa, as mudanças não comitadas eram só os testes de tela escritos antes do código, e o trabalho continuou da Tarefa 6 sem precisar perguntar. O comando manda parar "se houver mudanças não comitadas" só em ticket novo; o texto serve.
+- **Item não testado: linha `Concluído em` no ticket, depois do merge.** Gravada no fim do arquivo do ticket 10 na `main`.
+- **Pre-commit com testes que falham:** o pre-commit roda `npm test`, então os testes de tela escritos antes do código (TDD) não podem ser comitados sozinhos. Foi preciso deixá-los fora do commit até os componentes existirem, e o ciclo vermelho não aparece no histórico. Sugestão: o protocolo poderia dizer onde o teste que falha de propósito espera entre uma sessão e outra (o handoff cobriu).
+- **Bash e bloco longo com vários `cat <<EOF`:** um comando com seis arquivos em heredoc falhou ("unexpected EOF") sem criar nada. Os arquivos foram criados com a ferramenta Write.
+- **`gh` ausente:** não há como ler o resultado do workflow "Testes de banco" por esta máquina; o `CLAUDE.md` manda conferir e avisar.
+- **Skill `executing-plans`:** acionada pelo `Skill` sem recusa.
+- **Observação:** rodou em Sonnet 5.5, como a tabela recomenda.
