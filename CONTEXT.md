@@ -67,7 +67,7 @@ Cadastro que não aparece mais nas listas de escolha, mas continua aparecendo, m
 _Avoid_: arquivado, extinto
 
 **Excluir (setor ou macroprocesso)**:
-Apagar o cadastro de vez, o que só é possível enquanto nenhum processo depende dele. O histórico guarda o que foi apagado. Diferente do usuário, que depois do primeiro acesso só se desativa.
+Apagar o cadastro de vez, o que só é possível enquanto nenhum processo (e, no setor, nenhuma reunião) depende dele. O histórico guarda o que foi apagado. Diferente do usuário, que depois do primeiro acesso só se desativa.
 _Avoid_: remover, deletar
 
 **Responsável do setor**:
@@ -123,3 +123,21 @@ _Avoid_: status do processo, estado
 **Reclassificação**:
 Mudança do tipo de um item (processo, subprocesso ou a classificar), com motivo, que preserva o mesmo item com tudo o que ele já tem.
 _Avoid_: conversão, migração, recriação
+
+## Reuniões
+
+**Reunião**:
+Encontro do EP com um único setor, de sensibilização ou de modelagem, com data (e hora, se houver), local, participantes e anotações. Pode ser registrada antes de acontecer: a data diz se é próxima ou realizada. É um registro e não muda o status de nenhuma etapa.
+_Avoid_: encontro, evento, agenda
+
+**Reunião de sensibilização**:
+Reunião com o setor, sem processos ligados, que apresenta o trabalho do EP.
+_Avoid_: reunião inicial, apresentação
+
+**Reunião de modelagem**:
+Reunião que trata um ou mais processos do próprio setor da reunião, em qualquer situação. Um processo tratado numa reunião não pode ser excluído.
+_Avoid_: oficina, workshop
+
+**Participante**:
+Pessoa presente numa reunião: um usuário, um responsável do setor ou outra pessoa, anotada só pelo nome. O responsável do setor excluído continua na reunião como outra pessoa, com o nome que tinha.
+_Avoid_: convidado, presente
