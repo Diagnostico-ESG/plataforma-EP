@@ -246,3 +246,4 @@ Nenhuma migração destrutiva: só tabelas, tipo, gatilhos, políticas e uma fun
   - **Outros participantes** ficam guardados como lista de nomes (um por linha no formulário), para o responsável excluído entrar nela sem mexer no texto escrito.
 - **Rede do escritório:** a migração vai pelo workflow "Migrar banco de desenvolvimento" e precisa ser registrada em `supabase/AMBIENTES.md` para o `migration repair` antes da primeira publicação em produção.
 - **Privilégios padrão:** toda tabela nova em `public` reprova o teste `10_privilegios_padrao` até receber o seu `revoke`.
+Entregue em 2026-10-15 (commit ccd2f8b), com ressalva: critérios [visual] presumidos (a tela não foi conferida)
