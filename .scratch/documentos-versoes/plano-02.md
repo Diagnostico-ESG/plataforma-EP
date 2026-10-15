@@ -85,8 +85,8 @@ Modificar: `supabase/functions/_shared/decisao.ts` (+ teste), `arquivos-no-drive
 
 **Consome:** tipos da Tarefa 3; `TravaDoBanco` e `recusaPorPerfil`.
 **Produz:** `criarVersoesSupabase(cliente, enviarBytes: (url: string, arquivo: File) => Promise<Response> = enviarComFetch)`; `fraseDaRecusaDeVersao(codigo, mensagem): string` e `falhaDoEnvio(…)`, que devolve `TravaDoBanco` com a frase; `class VersoesFalso implements ModuloDeVersoes` com `versoes: Record<processoId, Versao[]>`, `falharLeitura`, `segurarLeitura`, `falharNoArquivo: number | null`, `falhaNoRegistro: Error | null`, `segurarEnvio`, `envios: PedidoDeVersao[]` e o evento no histórico do falso de processos (método `aoEnviar` para ligar os dois).
-- [ ] Testes do módulo real (vermelho): lista do banco (`versoes` com `arquivos_da_versao`, autor e etapa, por número); envio chama `iniciar_envio` por arquivo com `numero`, faz o `PUT` no `upload_url` devolvido, avisa o progresso e só então chama `registrar` com os `drive_id`; falha num `PUT` não chama `registrar`; cada código de recusa vira a frase (perfil, fora de andamento, sem .bpmn ou .png, número mudou, extensão, tamanho, Drive sem espaço, arquivo não chegou, erro genérico). Testes do falso (envio registra, falhas programáveis).
-- [ ] Implementar; verde; commit.
+- [x] Testes do módulo real (vermelho): lista do banco (`versoes` com `arquivos_da_versao`, autor e etapa, por número); envio chama `iniciar_envio` por arquivo com `numero`, faz o `PUT` no `upload_url` devolvido, avisa o progresso e só então chama `registrar` com os `drive_id`; falha num `PUT` não chama `registrar`; cada código de recusa vira a frase (perfil, fora de andamento, sem .bpmn ou .png, número mudou, extensão, tamanho, Drive sem espaço, arquivo não chegou, erro genérico). Testes do falso (envio registra, falhas programáveis).
+- [x] Implementar; verde; commit.
 
 ### Tarefa 5 — Seção Versões e formulário de envio no painel (critérios 5, 6, 8, 10, 11 e 13)
 

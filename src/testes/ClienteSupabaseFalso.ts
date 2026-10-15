@@ -18,6 +18,17 @@ export class ClienteSupabaseFalso {
   respostas: Record<string, RespostaDoBanco> = {}
   pedidos: Pedido[] = []
 
+  /** Respostas da função do servidor por "funcao.<acao>"; a falha leva em `context` a Response, como o supabase-js. */
+  respostasDaFuncao: Record<string, { data: unknown; error: { message: string; context?: Response } | null }> = {}
+  /** Os corpos enviados à função do servidor, na ordem. */
+  chamadasDaFuncao: Record<string, unknown>[] = []
+  functions = {
+    invoke: (_nome: string, opcoes: { body: Record<string, unknown> }) => {
+      this.chamadasDaFuncao.push(opcoes.body)
+      return Promise.resolve(this.respostasDaFuncao[`funcao.${String(opcoes.body.acao)}`] ?? { data: null, error: null })
+    },
+  }
+
   /** Chamada de função do banco: o nome vira a operação de um pedido "rpc"; a resposta sai de "rpc.<nome>". */
   rpc(nome: string, args: unknown): Promise<RespostaDoBanco> {
     this.pedidos.push({ tabela: 'rpc', operacao: nome, valores: args })
