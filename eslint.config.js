@@ -25,7 +25,7 @@ export default defineConfig([
   },
   {
     // Componentes .tsx ficam fora: são divididos por responsabilidade, não por tamanho de função.
-    files: ['src/**/*.ts'],
+    files: ['src/**/*.ts', 'supabase/functions/**/*.ts'],
     ignores: ['**/*.test.ts', 'src/hooks/**'],
     rules: {
       'max-lines-per-function': ['error', { max: 20, skipBlankLines: true, skipComments: true }],
