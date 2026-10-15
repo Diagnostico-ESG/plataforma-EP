@@ -93,11 +93,11 @@ set local role authenticated;
 -- Registrar: sensibilização sem processo e modelagem com dois processos.
 insert into _tap (linha) select lives_ok(
   $sql$insert into _r select 'sens1', public.salvar_reuniao(null, 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-10', '09:30', 'Sala 1', 'Primeira conversa', '{}', '{}')$sql$,
+    '2026-11-10', '09:30', 'Sala 1', 'Primeira conversa', '{}', '{}', '{}', '{}')$sql$,
   'integrante registra reunião de sensibilização sem processos');
 insert into _tap (linha) select lives_ok(
   $sql$insert into _r select 'mod1', public.salvar_reuniao(null, 'modelagem', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-11', null, null, null, '{}', array[pg_temp.processo('Proc A'), pg_temp.processo('Proc B')])$sql$,
+    '2026-11-11', null, null, null, '{}', array[pg_temp.processo('Proc A'), pg_temp.processo('Proc B')], '{}', '{}')$sql$,
   'integrante registra reunião de modelagem com dois processos');
 insert into _tap (linha) select is(
   (select count(*) from public.reunioes_processos where reuniao_id = pg_temp.reuniao('mod1')), 2::bigint,
@@ -106,59 +106,59 @@ insert into _tap (linha) select is(
 -- Regras do tipo, do setor e do processo.
 insert into _tap (linha) select throws_ok(
   $sql$select public.salvar_reuniao(null, 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a3',
-    '2026-11-10', null, null, null, '{}', '{}')$sql$,
+    '2026-11-10', null, null, null, '{}', '{}', '{}', '{}')$sql$,
   'P0001', 'setor_inativo:TR3', 'reunião nova em setor inativo é recusada');
 insert into _tap (linha) select throws_ok(
   $sql$select public.salvar_reuniao(null, 'modelagem', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-10', null, null, null, '{}', '{}')$sql$,
+    '2026-11-10', null, null, null, '{}', '{}', '{}', '{}')$sql$,
   'P0001', 'modelagem_sem_processo', 'modelagem sem processo é recusada');
 insert into _tap (linha) select throws_ok(
   $sql$select public.salvar_reuniao(null, 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-10', null, null, null, '{}', array[pg_temp.processo('Proc A')])$sql$,
+    '2026-11-10', null, null, null, '{}', array[pg_temp.processo('Proc A')], '{}', '{}')$sql$,
   'P0001', 'sensibilizacao_com_processo', 'sensibilização com processo é recusada');
 insert into _tap (linha) select throws_ok(
   $sql$select public.salvar_reuniao(null, 'modelagem', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-10', null, null, null, '{}', array[pg_temp.processo('Proc C')])$sql$,
+    '2026-11-10', null, null, null, '{}', array[pg_temp.processo('Proc C')], '{}', '{}')$sql$,
   'P0001', 'processo_de_outro_setor:Proc C', 'processo de outro setor é recusado');
 insert into _tap (linha) select lives_ok(
   $sql$select public.cancelar_processo(pg_temp.processo('Proc B'), 'Cancelado para o teste')$sql$,
   'integrante cancela o Proc B');
 insert into _tap (linha) select lives_ok(
   $sql$insert into _r select 'mod2', public.salvar_reuniao(null, 'modelagem', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-12', null, null, null, '{}', array[pg_temp.processo('Proc B')])$sql$,
+    '2026-11-12', null, null, null, '{}', array[pg_temp.processo('Proc B')], '{}', '{}')$sql$,
   'processo cancelado pode ser tratado numa reunião');
 insert into _tap (linha) select lives_ok(
   $sql$select public.salvar_reuniao(pg_temp.reuniao('mod2'), 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-12', null, null, null, '{}', '{}')$sql$,
+    '2026-11-12', null, null, null, '{}', '{}', '{}', '{}')$sql$,
   'trocar o tipo para sensibilização tirando os processos na mesma gravação é aceito');
 insert into _tap (linha) select is(
   (select count(*) from public.reunioes_processos where reuniao_id = pg_temp.reuniao('mod2')), 0::bigint,
   'a reunião que virou sensibilização ficou sem processos');
 insert into _tap (linha) select throws_ok(
   $sql$select public.salvar_reuniao(pg_temp.reuniao('mod1'), 'modelagem', '5f000000-0000-0000-0000-0000000000a2',
-    '2026-11-11', null, null, null, '{}', array[pg_temp.processo('Proc A'), pg_temp.processo('Proc B')])$sql$,
+    '2026-11-11', null, null, null, '{}', array[pg_temp.processo('Proc A'), pg_temp.processo('Proc B')], '{}', '{}')$sql$,
   'P0001', 'processo_de_outro_setor:Proc A', 'trocar o setor mantendo processos do setor antigo é recusado');
 insert into _tap (linha) select lives_ok(
   $sql$select public.salvar_reuniao(pg_temp.reuniao('sens1'), 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a2',
-    '2026-11-10', '09:30', 'Sala 1', 'Primeira conversa', '{}', '{}')$sql$,
+    '2026-11-10', '09:30', 'Sala 1', 'Primeira conversa', '{}', '{}', '{}', '{}')$sql$,
   'trocar o setor de uma sensibilização é aceito');
 
 -- Textos.
 insert into _tap (linha) select throws_ok(
   $sql$select public.salvar_reuniao(null, 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-10', null, null, repeat('x', 10001), '{}', '{}')$sql$,
+    '2026-11-10', null, null, repeat('x', 10001), '{}', '{}', '{}', '{}')$sql$,
   '23514', null, 'anotações com 10.001 caracteres são recusadas');
 insert into _tap (linha) select throws_ok(
   $sql$select public.salvar_reuniao(null, 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-10', null, repeat('x', 301), null, '{}', '{}')$sql$,
+    '2026-11-10', null, repeat('x', 301), null, '{}', '{}', '{}', '{}')$sql$,
   '23514', null, 'local com 301 caracteres é recusado');
 insert into _tap (linha) select throws_ok(
   $sql$select public.salvar_reuniao(null, 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-10', null, null, null, array[repeat('x', 201)], '{}')$sql$,
+    '2026-11-10', null, null, null, array[repeat('x', 201)], '{}', '{}', '{}')$sql$,
   'P0001', 'outro_participante_longo:201', 'outro participante com 201 caracteres é recusado');
 insert into _tap (linha) select lives_ok(
   $sql$insert into _r select 'txt', public.salvar_reuniao(null, 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-13', null, '  ', '  nota  ', array[' Ana ', '', '  '], '{}')$sql$,
+    '2026-11-13', null, '  ', '  nota  ', array[' Ana ', '', '  '], '{}', '{}', '{}')$sql$,
   'reunião com textos sujos é gravada');
 insert into _tap (linha) select is((select local from public.reunioes where id = pg_temp.reuniao('txt')), null,
   'local só com espaços vira nulo');
@@ -196,7 +196,7 @@ insert into _tap (linha) select ok(
   'o evento de alteração traz antes e depois');
 insert into _tap (linha) select lives_ok(
   $sql$select public.salvar_reuniao(pg_temp.reuniao('txt'), 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-13', null, null, 'nota', array['Ana'], '{}')$sql$,
+    '2026-11-13', null, null, 'nota', array['Ana'], '{}', '{}', '{}')$sql$,
   'salvar sem mudar nada é aceito');
 insert into _tap (linha) select is(
   (select count(*) from public.eventos where entidade = 'reuniao' and entidade_ref = pg_temp.reuniao('txt')::text),
@@ -212,16 +212,16 @@ insert into _tap (linha) select is(jsonb_array_length(pg_temp.evento('mod1', 'ex
 -- Alterar (ticket 02): um campo, só os processos e reunião que não existe.
 insert into _tap (linha) select lives_ok(
   $sql$select public.salvar_reuniao(pg_temp.reuniao('txt'), 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-14', null, null, 'nota', array['Ana'], '{}')$sql$,
+    '2026-11-14', null, null, 'nota', array['Ana'], '{}', '{}', '{}')$sql$,
   'integrante altera só a data da reunião');
 insert into _tap (linha) select is(pg_temp.eventos('txt', 'editar'), 1::bigint, 'alterar um campo gera um evento');
 insert into _tap (linha) select lives_ok(
   $sql$insert into _r select 'mod3', public.salvar_reuniao(null, 'modelagem', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-15', null, null, null, '{}', array[pg_temp.processo('Proc A')])$sql$,
+    '2026-11-15', null, null, null, '{}', array[pg_temp.processo('Proc A')], '{}', '{}')$sql$,
   'integrante registra uma modelagem com o Proc A');
 insert into _tap (linha) select lives_ok(
   $sql$select public.salvar_reuniao(pg_temp.reuniao('mod3'), 'modelagem', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-15', null, null, null, '{}', array[pg_temp.processo('Proc D')])$sql$,
+    '2026-11-15', null, null, null, '{}', array[pg_temp.processo('Proc D')], '{}', '{}')$sql$,
   'integrante troca só o processo tratado');
 insert into _tap (linha) select is(pg_temp.eventos('mod3', 'editar'), 1::bigint,
   'trocar só os processos gera um evento de alteração');
@@ -231,7 +231,7 @@ insert into _tap (linha) select ok(
   'o evento traz o processo de antes e o de depois');
 insert into _tap (linha) select throws_ok(
   $sql$select public.salvar_reuniao('ef000000-0000-0000-0000-0000000000ff', 'sensibilizacao',
-    '5f000000-0000-0000-0000-0000000000a1', '2026-11-10', null, null, null, '{}', '{}')$sql$,
+    '5f000000-0000-0000-0000-0000000000a1', '2026-11-10', null, null, null, '{}', '{}', '{}', '{}')$sql$,
   'P0001', 'registro_inexistente', 'alterar reunião que não existe é recusado');
 
 -- Quem pode o quê.
@@ -247,11 +247,11 @@ insert into _tap (linha) select throws_ok(
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
 insert into _tap (linha) select lives_ok(
   $sql$insert into _r select 'adm1', public.salvar_reuniao(null, 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a2',
-    '2026-12-01', null, null, null, '{}', '{}')$sql$,
+    '2026-12-01', null, null, null, '{}', '{}', '{}', '{}')$sql$,
   'administrador registra reunião');
 insert into _tap (linha) select lives_ok(
   $sql$select public.salvar_reuniao(pg_temp.reuniao('adm1'), 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a2',
-    '2026-12-02', null, null, null, '{}', '{}')$sql$, 'administrador altera reunião');
+    '2026-12-02', null, null, null, '{}', '{}', '{}', '{}')$sql$, 'administrador altera reunião');
 insert into _tap (linha) select lives_ok(
   $sql$delete from public.reunioes where id = pg_temp.reuniao('adm1')$sql$, 'administrador exclui reunião');
 insert into _tap (linha) select is((select count(*) from public.reunioes where id = pg_temp.reuniao('adm1')), 0::bigint,
@@ -264,11 +264,11 @@ insert into _tap (linha) select ok(
   (select count(*) from public.eventos where entidade = 'reuniao') > 0, 'consulta lê os eventos de reunião');
 insert into _tap (linha) select throws_ok(
   $sql$select public.salvar_reuniao(null, 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-10', null, null, null, '{}', '{}')$sql$, '42501', null, 'consulta não registra reunião');
+    '2026-11-10', null, null, null, '{}', '{}', '{}', '{}')$sql$, '42501', null, 'consulta não registra reunião');
 insert into _tap (linha) select is(pg_temp.apagar_reunioes(), 0::bigint, 'consulta não apaga reunião');
 insert into _tap (linha) select throws_ok(
   $sql$select public.salvar_reuniao(pg_temp.reuniao('txt'), 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-14', null, null, 'nota', array['Ana'], '{}')$sql$, '42501', null, 'consulta não altera reunião');
+    '2026-11-14', null, null, 'nota', array['Ana'], '{}', '{}', '{}')$sql$, '42501', null, 'consulta não altera reunião');
 insert into _tap (linha) select is(pg_temp.alterar_reunioes(), 0::bigint, 'consulta não altera reunião direto na tabela');
 insert into _tap (linha) select throws_ok(
   $sql$insert into public.reunioes_processos (reuniao_id, processo_id)
@@ -281,11 +281,11 @@ insert into _tap (linha) select is(
   (select count(*) from public.eventos where entidade = 'reuniao'), 0::bigint, 'inativo não lê eventos de reunião');
 insert into _tap (linha) select throws_ok(
   $sql$select public.salvar_reuniao(null, 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-10', null, null, null, '{}', '{}')$sql$, '42501', null, 'inativo não registra reunião');
+    '2026-11-10', null, null, null, '{}', '{}', '{}', '{}')$sql$, '42501', null, 'inativo não registra reunião');
 -- O inativo não lê a reunião, então para ele ela "não existe" (a mesma regra do porQueNadaMudou da interface).
 insert into _tap (linha) select throws_ok(
   $sql$select public.salvar_reuniao(pg_temp.reuniao('txt'), 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-14', null, null, 'nota', array['Ana'], '{}')$sql$, 'P0001', 'registro_inexistente',
+    '2026-11-14', null, null, 'nota', array['Ana'], '{}', '{}', '{}')$sql$, 'P0001', 'registro_inexistente',
   'inativo não altera reunião');
 insert into _tap (linha) select is(pg_temp.apagar_reunioes(), 0::bigint, 'inativo não apaga reunião');
 
@@ -294,7 +294,7 @@ insert into _tap (linha) select throws_ok($sql$select count(*) from public.reuni
   'visitante não lê reuniões');
 insert into _tap (linha) select throws_ok(
   $sql$select public.salvar_reuniao(null, 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
-    '2026-11-10', null, null, null, '{}', '{}')$sql$, '42501', null, 'visitante não registra reunião');
+    '2026-11-10', null, null, null, '{}', '{}', '{}', '{}')$sql$, '42501', null, 'visitante não registra reunião');
 insert into _tap (linha) select throws_ok($sql$delete from public.reunioes$sql$, '42501', null,
   'visitante não apaga reunião');
 
