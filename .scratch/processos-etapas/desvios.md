@@ -110,3 +110,13 @@ Diferenças entre o que a spec e o ticket dizem e o que foi construído. Nada di
 - **Posição da etapa nova:** seletor com "Antes de {nome}" para cada etapa, inclusive as inativas, e "No fim" como padrão.
 - **Conferência visual não feita nesta sessão** (o app exige login e não há servidor com dados). As abas, a tabela do catálogo e os formulários só foram conferidos por teste de tela; os critérios `[visual]` ficam para o `/polir` e o `/ship`.
 - **Resultado do "Testes de banco" na branch não lido por mim:** o `gh` não existe nesta máquina; a rodada depois do ajuste do teste 15 (commit 5cd437a) precisa ser conferida no GitHub.
+
+## 2026-10-14 — /polir dos tickets 07 a 10 (situação, subprocessos e reclassificação, lista e filtros, catálogo)
+
+Auditoria feita só no código (detector do Impeccable em `src/`, CSS e componentes novos); o app exige login Google e não há servidor com dados, então **nenhuma conferência visual foi feita**. Detector: nenhum achado.
+
+- **Corrigido (P1, acessibilidade): contraste das etapas futuras no painel.** `.etapa-pendente` tinha `opacity: 0.75` sobre o texto secundário: 3,4:1, abaixo dos 4,5:1 da WCAG AA. Tirei a opacidade; o texto fica a 5,8:1 e a etapa futura se distingue da resolvida pela falta do ✓. Sem teste de regressão: o jsdom não calcula contraste e um teste que lesse o CSS seria frágil.
+- **Deixado de fora (P2): abas incompletas no padrão ARIA.** Painel do processo e Administração usam `role="tab"` sem `aria-controls`, sem `aria-labelledby` no painel da aba, sem setas do teclado e sem foco por aba; na Administração nem há `tabpanel`. Todas as abas continuam acessíveis por Tab e Enter. Motivo: o conserto certo é um componente de abas único, que é refatoração com testes, não polimento. Foi para o backlog.
+- **Deixado de fora (P3): foco ao abrir o painel.** O Quadro fica `inert` e o foco volta ao cartão ao fechar, mas ao abrir o foco não vai para dentro do painel. Sem conferir no leitor de tela, não sei se atrapalha; registrado no backlog.
+- **Já registrado, não tratado aqui:** ícone "Filtrar" da barra superior sem ação (backlog, ticket 09). Decisão minha pendente.
+- **Pontos bons:** tokens de cor e espaço usados em todo o CSS novo, sem cor solta; `prefers-reduced-motion` respeitado; contorno de foco global; `inert` no Quadro atrás do painel; janelas nativas `<dialog>` com foco no primeiro campo; tabelas com `th scope`.

@@ -382,3 +382,9 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **`gh` ausente:** não há como ler o resultado do workflow "Testes de banco" por esta máquina; o `CLAUDE.md` manda conferir e avisar.
 - **Skill `executing-plans`:** acionada pelo `Skill` sem recusa.
 - **Observação:** rodou em Sonnet 5.5, como a tabela recomenda.
+
+## 2026-10-14 — /polir de processos-etapas (tickets 07 a 10)
+
+- **Item não testado: `/polir` sem conferência visual.** Esperado: o Impeccable audit olhar a interface rodando. Aconteceu: o app exige login Google e não há servidor com dados, então a auditoria foi só de código (detector, CSS, componentes) e o resultado está dito assim no `desvios.md`. Sugestão: o protocolo poderia prever um modo de demonstração com dados falsos para o `/polir`.
+- **Item não testado: `impeccable.cmd context` e `detect` no Windows.** `context` funcionou; `detect src` rodou sem achados.
+- **Correção sem teste de regressão:** o bug de contraste é de CSS e o jsdom não o enxerga. Registrado no `desvios.md`; o `CLAUDE.md` pede teste para todo bug, então a regra poderia dizer o que fazer com defeito só de estilo.
