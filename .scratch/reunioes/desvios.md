@@ -15,3 +15,20 @@ Diferenças entre o que a spec e o ticket dizem e o que foi construído. Nada di
 - **Período e setor dos filtros.** O filtro de setor traz só os setores que têm reunião (como os filtros dos processos); "de" e "até" são inclusivos nas duas pontas.
 - **`useAreaAtual` lia mal o endereço com filtros sem item aberto** (`#/reunioes?tipo=...`): o primeiro trecho vinha com a consulta junto. Corrigido para todas as áreas.
 - **Conferência visual não feita nesta sessão** (o app exige login e não há servidor com dados). A tabela, o painel e o formulário só foram conferidos por teste de tela; os critérios `[visual]` ficam para o `/polir` e o `/ship`.
+
+## 2026-10-15 — /executar-complexo do ticket 02 (editar, excluir e histórico da reunião)
+
+Diferenças entre o que a spec e o ticket dizem e o que foi construído. Nada disso muda a spec; fica para o `/ship` e para os tickets seguintes.
+
+- **Sem migração: o critério de banco virou conferência.** O teste 23 do ticket 01 já provava alterar e excluir por Administrador e Integrante, a exclusão com o estado completo no "antes" e salvar sem mudança sem evento. Acrescentei 13 casos (alterar um campo, trocar só os processos, alterar reunião inexistente, administrador alterando, Consulta, inativo e visitante alterando e apagando); todos passaram de primeira (66 de 66, 24 arquivos verdes, "Testes de banco" #64). O vermelho do ticket está nos testes de tela.
+- **Inativo editando: `registro_inexistente`, não falta de permissão.** O inativo não lê a reunião; a função de salvar, sem linha afetada e sem poder lê-la, responde que ela não existe (a mesma regra do `porQueNadaMudou`). A Consulta, que lê, recebe `42501`.
+- **`outrosParticipantes` entrou nos tipos agora**, como o aviso deste arquivo pedia: `Reuniao` e `DadosDaReuniao` o trazem, a leitura seleciona `outros_participantes`, o formulário o guarda sem mostrar e a edição o devolve. O ticket 03 só acrescenta a área de texto.
+- **"O que mudou" na alteração.** O histórico da reunião (e o geral) mostra, nas alterações, só os campos que diferem no Antes e no Depois; criação e exclusão mostram o estado completo. Os outros eventos continuam como estavam.
+- **A exclusão aparece no histórico geral, não na aba da reunião**: a reunião excluída já não abre. A aba trata criação e alteração.
+- **Setor inativo na edição.** A escolha do setor traz os ativos e, na edição, o setor da reunião se estiver inativo, escrito "TSC (inativo)".
+- **Falso imita o evento do banco.** `ReunioesFalso` grava um evento por gravação aceita (criar, editar, excluir), sem evento quando nada mudou, e devolve os processos da reunião por nome, como o módulo real.
+- **Histórico geral sem código novo.** Bastou incluir `reuniao` na lista de entidades e os textos próprios; o teste de tela passou de primeira.
+- **Refatoração pequena:** `EventosDoHistorico` (carregando, erro, vazio e lista) saiu do `HistoricoDoProcesso` e serve também à reunião; `COLUNAS_DO_EVENTO` saiu do módulo de histórico dos cadastros e é usada nos dois lugares.
+- **Teste novo em arquivo novo:** os testes dos textos de reunião no histórico ficaram em `src/cadastros/historicoDasReunioes.test.ts`, porque `historicoDosCadastros.test.ts` já tinha 294 linhas.
+- **Frases que a spec não traz:** título da janela "Excluir a reunião de {tipo} de {data}?", texto "O histórico guarda o que ela tinha, mas não é possível desfazer." e botão "Excluir reunião"; no histórico, "Reunião de {tipo} de {data} — {sigla}" como nome do item.
+- **Conferência visual não feita nesta sessão** (o app exige login e não há servidor com dados). As abas, o formulário de edição e a janela de exclusão só foram conferidos por teste de tela; os critérios `[visual]` seguem para o `/polir` e o `/ship`.
