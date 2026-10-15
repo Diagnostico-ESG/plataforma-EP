@@ -116,8 +116,8 @@ export function cabecalhosDeOrigem(origem: string | null, aceitas: string): Reco
 
 **Arquivos:** `supabase/tests/26_pastas_no_drive.test.sql`, `supabase/migrations/<AAAAMMDDHHMMSS>_pastas_no_drive.sql`, `src/types/database.ts`, `supabase/AMBIENTES.md`. Regras de `banco.md` que valem: toda tabela com RLS e políticas testadas na mesma migração, teste antes; revoke dos privilégios padrão (teste `10_privilegios_padrao`); alvo conferido; migração só pelo workflow "Migrar banco de desenvolvimento" e testes pelo "Testes de banco".
 
-- [ ] Teste 26 no molde do 25 (`_tap`, usuários a1 administrador, a2 integrante, a3 consulta, a4 inativo; visitante com `set local role anon`). Uma pasta de setor e uma de processo preparadas como dono; casos: **ler** (a1, a2, a3 veem as duas linhas; a4 e visitante 0 ou recusa); **criar** pasta de setor e de processo (a1 e a2 conseguem; a3, a4 e visitante recusados); **alterar `drive_id`** (a1 e a2 conseguem; a3, a4 e visitante 0 linhas); **alterar `setor_id` ou `processo_id`** recusado até para a1 (sem privilégio de coluna); **apagar** recusado para os cinco; regras da tabela: uma linha com os dois donos preenchidos recusada, uma sem nenhum recusada, segunda pasta para o mesmo setor e para o mesmo processo recusadas, `drive_id` vazio recusado; **apagar o processo** (como dono) remove a pasta dele em cascata. Plano com a contagem real.
-- [ ] Migração (`npx supabase migration new pastas_no_drive`):
+- [x] Teste 26 no molde do 25 (`_tap`, usuários a1 administrador, a2 integrante, a3 consulta, a4 inativo; visitante com `set local role anon`). Uma pasta de setor e uma de processo preparadas como dono; casos: **ler** (a1, a2, a3 veem as duas linhas; a4 e visitante 0 ou recusa); **criar** pasta de setor e de processo (a1 e a2 conseguem; a3, a4 e visitante recusados); **alterar `drive_id`** (a1 e a2 conseguem; a3, a4 e visitante 0 linhas); **alterar `setor_id` ou `processo_id`** recusado até para a1 (sem privilégio de coluna); **apagar** recusado para os cinco; regras da tabela: uma linha com os dois donos preenchidos recusada, uma sem nenhum recusada, segunda pasta para o mesmo setor e para o mesmo processo recusadas, `drive_id` vazio recusado; **apagar o processo** (como dono) remove a pasta dele em cascata. Plano com a contagem real.
+- [x] Migração (`npx supabase migration new pastas_no_drive`):
   ```sql
   create table public.pastas_no_drive (
     id uuid primary key default gen_random_uuid(),
@@ -140,8 +140,8 @@ export function cabecalhosDeOrigem(origem: string | null, aceitas: string): Reco
     using ((select private.pode_alterar_cadastros())) with check ((select private.pode_alterar_cadastros()));
   ```
   Comentário na migração: o `on delete cascade` apaga só a linha; a pasta no Drive fica (a função não apaga nada).
-- [ ] Comitar o teste 26 **sem** a migração (o "vermelho"), `git push -u origin documentos-versoes-01`, disparar "Testes de banco" na branch e ler: o 26 falha (tabela inexistente) e os demais passam. Depois comitar a migração, push, disparar "Migrar banco de desenvolvimento" (`migracao` = nome do arquivo) e "Testes de banco" de novo: todos verdes.
-- [ ] `npm run db:types` (alvo conferido); `tsc` verde. Registrar a migração em `supabase/AMBIENTES.md` (com o que falhou antes e o que passou depois). Comitar.
+- [x] Comitar o teste 26 **sem** a migração (o "vermelho"), `git push -u origin documentos-versoes-01`, disparar "Testes de banco" na branch e ler: o 26 falha (tabela inexistente) e os demais passam. Depois comitar a migração, push, disparar "Migrar banco de desenvolvimento" (`migracao` = nome do arquivo) e "Testes de banco" de novo: todos verdes.
+- [x] `npm run db:types` (alvo conferido); `tsc` verde. Registrar a migração em `supabase/AMBIENTES.md` (com o que falhou antes e o que passou depois). Comitar.
 
 ### Tarefa 6 — Função `arquivos-no-drive` (critérios 3, 5, 6, 9)
 

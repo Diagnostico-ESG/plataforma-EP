@@ -254,6 +254,49 @@ export type Database = {
         }
         Relationships: []
       }
+      pastas_no_drive: {
+        Row: {
+          drive_id: string
+          id: string
+          processo_id: string | null
+          setor_id: string | null
+        }
+        Insert: {
+          drive_id: string
+          id?: string
+          processo_id?: string | null
+          setor_id?: string | null
+        }
+        Update: {
+          drive_id?: string
+          id?: string
+          processo_id?: string | null
+          setor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pastas_no_drive_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: true
+            referencedRelation: "processos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pastas_no_drive_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: true
+            referencedRelation: "processos_com_andamento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pastas_no_drive_setor_id_fkey"
+            columns: ["setor_id"]
+            isOneToOne: true
+            referencedRelation: "setores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       processos: {
         Row: {
           contexto: string | null
