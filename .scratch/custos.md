@@ -61,3 +61,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-15 | projeto | /demanda (bug: testes instáveis) | US$ 0,91
 2026-10-15 | reunioes | /ship | US$ 4,89
 2026-10-15 | reunioes | /executar-complexo (ticket 04) | US$ 6,09
+2026-10-15 | reunioes | /polir | US$ 0,94
