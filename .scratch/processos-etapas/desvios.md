@@ -120,3 +120,13 @@ Auditoria feita só no código (detector do Impeccable em `src/`, CSS e componen
 - **Deixado de fora (P3): foco ao abrir o painel.** O Quadro fica `inert` e o foco volta ao cartão ao fechar, mas ao abrir o foco não vai para dentro do painel. Sem conferir no leitor de tela, não sei se atrapalha; registrado no backlog.
 - **Já registrado, não tratado aqui:** ícone "Filtrar" da barra superior sem ação (backlog, ticket 09). Decisão minha pendente.
 - **Pontos bons:** tokens de cor e espaço usados em todo o CSS novo, sem cor solta; `prefers-reduced-motion` respeitado; contorno de foco global; `inert` no Quadro atrás do painel; janelas nativas `<dialog>` com foco no primeiro campo; tabelas com `th scope`.
+
+## 2026-10-14 — /ship de processos-etapas
+
+Revisão do diff inteiro desde `marco/2026-10-13-inicio-processos-etapas` (por amostragem; revisões de padrões e de spec) e revisão de segurança de reserva (o `/security-review` embutido não achou mudanças, por a branch ser a `main`). Os achados foram aceitos como ressalva e vão ao backlog para uma `/demanda`; nada foi corrigido neste `/ship`.
+
+- **Padrões, sem violação grave.** Juízo: `RespostaDaGravacao` e `conferirGravacao` copiadas em `catalogoSupabase.ts`, `gravarProcessoSupabase.ts` e `responsaveisSupabase.ts` (regra de extrair na repetição); o `useEffect` de `showModal` repetido em `JanelaComCampo` e `JanelaDeConfirmacao`; `formatarData` e `ROTULO_DO_STATUS` em `processos/` usados por `cadastros/`; motivos de recusa em dois lugares de `andamentosSupabase.ts` (regex e mapa); `ProcessosFalso.ts` com 284 linhas.
+- **Spec, nenhum requisito grande ausente.** (1) O banco não amarra data e nota ao status: dá para gravar data em etapa pendente e nota fora de dispensada ou realizada anteriormente. (2) Desativar etapa obrigatória pendente apaga o andamento dela e pode fazer processos virarem "Concluído" sozinhos, sem evento no processo; a spec não trata. (3) As datas automáticas usam `current_date` do servidor (UTC), que pode diferir do dia local perto da meia-noite. (4) Reclassificar um processo suspenso ou cancelado é permitido; a spec não proíbe.
+- **Segurança (revisão de reserva, estática):** nenhum achado com confiança acima de 8. Ressalva: conferir no painel do Supabase de desenvolvimento que a API publica só `public` e `graphql_public` (só o `config.toml` local foi lido).
+- **Banco:** sem migração destrutiva, sem chave secreta, view com `security_invoker`, `security definer` só em `private` com `search_path` vazio, tipos em dia. "Testes de banco" #54 na `main` (commit `dd32b58`) verde, com o teste 22.
+- **Critérios `[visual]` da spec em presumido:** o usuário não pôde olhar a tela no `/ship`, e o app exige login sem servidor com dados.

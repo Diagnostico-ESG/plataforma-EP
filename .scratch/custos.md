@@ -48,3 +48,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-14 | processos-etapas | /situação e /executar-complexo (ticket 04) | US$ 14,11
 2026-10-14 | processos-etapas | /situação e /executar-complexo (ticket 05) | US$ 8,17
 2026-10-14 | processos-etapas | /situação e /executar-complexo (ticket 06) | US$ 10,94
+2026-10-14 | processos-etapas | /ship | valor não informado

@@ -388,3 +388,11 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Item não testado: `/polir` sem conferência visual.** Esperado: o Impeccable audit olhar a interface rodando. Aconteceu: o app exige login Google e não há servidor com dados, então a auditoria foi só de código (detector, CSS, componentes) e o resultado está dito assim no `desvios.md`. Sugestão: o protocolo poderia prever um modo de demonstração com dados falsos para o `/polir`.
 - **Item não testado: `impeccable.cmd context` e `detect` no Windows.** `context` funcionou; `detect src` rodou sem achados.
 - **Correção sem teste de regressão:** o bug de contraste é de CSS e o jsdom não o enxerga. Registrado no `desvios.md`; o `CLAUDE.md` pede teste para todo bug, então a regra poderia dizer o que fazer com defeito só de estilo.
+
+## 2026-10-14 — /ship de processos-etapas
+
+- **Item não testado: marca de entrega com ressalva.** Esperado: gravar `Entregue em ... com ressalva: critérios [visual] presumidos`. Aconteceu: gravada assim, porque o usuário não pôde olhar a tela (o app exige login e não há servidor com dados).
+- **Item não testado: revisão de segurança de reserva.** Esperado: o `/security-review` embutido não achar mudanças na `main` e eu fazer a revisão por conta própria. Aconteceu: foi o caso; a revisão de reserva foi estática, por sub-agente, e não achou nada acima de 8.
+- **Item não testado: passo 7 com leitura do resultado do Actions pelo navegador da sessão.** Esperado: confirmar o "Testes de banco" na `main`. Aconteceu: sem `gh` e com repositório privado, o resultado foi lido no navegador embutido (#54 verde).
+- **Item não testado: custo sem valor.** O usuário não informou o `/cost`; a linha de custo foi gravada como "valor não informado".
+- **Sugestão:** o `/ship` poderia dizer o que fazer quando o `/security-review` embutido não acha mudanças porque a branch já é a principal, o caso comum no fluxo desta equipe (a reserva já é prevista, mas só "se o comando não encontrar mudanças").
