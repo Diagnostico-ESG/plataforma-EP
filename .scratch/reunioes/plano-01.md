@@ -44,8 +44,8 @@
 
 **Arquivos:** criar `supabase/tests/23_reunioes.test.sql` (molde do 21: usuários a1 a a4, `_tap`, `plan(N)` exato, exceção do fim).
 
-- [ ] `git switch -c reunioes-01`; marco `marco/2026-10-14-inicio-ticket-01-reunioes` (`git tag`); conferir que `.github/workflows/` tem "Testes de banco" e o de migração (criar o de migração na tarefa 2 se faltar).
-- [ ] Escrever o teste 23 (critérios 1 e 2). Preparação (dono do banco): setores TR1 (ativo), TR2 (ativo), TR3 (inativo); macroprocesso "Macro Reunião" com TR1, TR2 e TR3 envolvidos; processos "Proc A" (TR1), "Proc B" (TR1, depois cancelado por `cancelar_processo`) e "Proc C" (TR2). Asserções:
+- [x] `git switch -c reunioes-01`; marco `marco/2026-10-14-inicio-ticket-01-reunioes` (`git tag`); conferir que `.github/workflows/` tem "Testes de banco" e o de migração (criar o de migração na tarefa 2 se faltar).
+- [x] Escrever o teste 23 (critérios 1 e 2). Preparação (dono do banco): setores TR1 (ativo), TR2 (ativo), TR3 (inativo); macroprocesso "Macro Reunião" com TR1, TR2 e TR3 envolvidos; processos "Proc A" (TR1), "Proc B" (TR1, depois cancelado por `cancelar_processo`) e "Proc C" (TR2). Asserções:
   1. Administrador e Integrante: `salvar_reuniao` de sensibilização no TR1 (sem processos) vive; de modelagem no TR1 com "Proc A" e "Proc B" vive; ligação aparece em `reunioes_processos`.
   2. Regras: setor inativo (TR3) → `P0001` `setor_inativo:TR3`; modelagem sem processo → `modelagem_sem_processo`; sensibilização com processo → `sensibilizacao_com_processo`; processo de outro setor ("Proc C" em reunião de TR1) → `processo_de_outro_setor:Proc C`; processo cancelado ("Proc B") aceito.
   3. Trocar o tipo para sensibilização tirando os processos na mesma gravação é aceito; trocar o setor com processo do setor antigo é recusado.
@@ -56,56 +56,56 @@
   8. Eventos `reuniao` lidos: Consulta lê (>0); Inativo e Visitante 0; ninguém insere/altera/apaga evento (`42501`).
   9. `prosecdef` falso em `salvar_reuniao` e nas funções públicas; verdadeiro só nas que gravam evento.
   10. `00_rls_ligada` e `10_privilegios_padrao` conferem as tabelas novas (não alterar esses arquivos; só confirmar que passam depois da migração).
-- [ ] Ajustar o teste de exclusão de setor/processo existentes só se a ordem de gatilhos mudar o resultado (conferir na rodada).
-- [ ] Comitar ("Ticket 01 de reunioes: teste de banco (falha antes da migração)"), `git push -u origin reunioes-01`, disparar "Testes de banco" na branch, ler o resultado: o 23 deve falhar por tabela/função inexistente.
+- [x] Ajustar o teste de exclusão de setor/processo existentes só se a ordem de gatilhos mudar o resultado (conferir na rodada).
+- [x] Comitar ("Ticket 01 de reunioes: teste de banco (falha antes da migração)"), `git push -u origin reunioes-01`, disparar "Testes de banco" na branch, ler o resultado: o 23 deve falhar por tabela/função inexistente.
 
 ### Tarefa 2 — Migração (banco), tipos e registro
 
 **Arquivos:** criar com `npx supabase migration new reunioes`; `src/types/database.ts`; `supabase/AMBIENTES.md`; `.github/workflows/` se faltar o de migração.
 
-- [ ] Escrever a migração (modelo: `20261014232135_catalogo_de_etapas.sql` e `20261014130147_processos.sql`): tipo, tabelas com RLS e privilégios (`reunioes`: `select, delete` e `insert/update` só das colunas editáveis; `reunioes_processos`: `select, insert, delete`), políticas por `private.pode_alterar_cadastros()` e `private.usuario_ativo()`, gatilhos `preparar_reuniao`, `conferir_setor_da_reuniao`, `conferir_processo_da_reuniao`, `conferir_tipo_da_reuniao` (restrição adiada), `conferir_setor_sem_reunioes`, `conferir_processo_sem_reunioes`, evento (`estado_da_reuniao`, `registrar_exclusao_da_reuniao`), função `salvar_reuniao`, política de leitura em `eventos` para `entidade = 'reuniao'`, `revoke`/`grant` das funções.
-- [ ] Atualizar `src/types/database.ts` à mão (ou por `npm run db:types` se a rede permitir; senão, editar o arquivo com as tabelas, o enum e a função) para as tabelas novas.
-- [ ] Comitar migração + tipos; push; disparar "Testes de banco": o 23 e os demais passam. Disparar o workflow de migração; registrar a migração em `supabase/AMBIENTES.md`.
+- [x] Escrever a migração (modelo: `20261014232135_catalogo_de_etapas.sql` e `20261014130147_processos.sql`): tipo, tabelas com RLS e privilégios (`reunioes`: `select, delete` e `insert/update` só das colunas editáveis; `reunioes_processos`: `select, insert, delete`), políticas por `private.pode_alterar_cadastros()` e `private.usuario_ativo()`, gatilhos `preparar_reuniao`, `conferir_setor_da_reuniao`, `conferir_processo_da_reuniao`, `conferir_tipo_da_reuniao` (restrição adiada), `conferir_setor_sem_reunioes`, `conferir_processo_sem_reunioes`, evento (`estado_da_reuniao`, `registrar_exclusao_da_reuniao`), função `salvar_reuniao`, política de leitura em `eventos` para `entidade = 'reuniao'`, `revoke`/`grant` das funções.
+- [x] Atualizar `src/types/database.ts` à mão (ou por `npm run db:types` se a rede permitir; senão, editar o arquivo com as tabelas, o enum e a função) para as tabelas novas.
+- [x] Comitar migração + tipos; push; disparar "Testes de banco": o 23 e os demais passam. Disparar o workflow de migração; registrar a migração em `supabase/AMBIENTES.md`.
 
 ### Tarefa 3 — Funções puras: período, ordem, endereço e filtros
 
 **Arquivos:** criar `src/reunioes/tipos.ts` (tipos), `src/reunioes/quandoAcontece.ts` (+ teste), `src/reunioes/enderecoDasReunioes.ts` (+ teste), `src/reunioes/filtrosDasReunioes.ts` (+ teste).
 
-- [ ] Testes que falham: `ehProxima('2026-10-15', '2026-10-14')` verdadeiro, `ehProxima('2026-10-14', '2026-10-14')` falso; `ordenarReunioes` põe as próximas primeiro (da mais próxima à mais distante, depois por hora) e as realizadas depois (da mais recente à mais antiga); `semAnotacoes(reuniao, hoje)` só para realizada sem anotações; endereço ida e volta (`#/reunioes/abc?setor=s1&tipo=modelagem&de=2026-10-01&ate=2026-10-31`), tipo inválido ignorado, `nova` como `aberto`; `filtrarReunioes` por setor, tipo, de e até (inclusivos), cada um opcional.
-- [ ] Implementar o mínimo até passar.
+- [x] Testes que falham: `ehProxima('2026-10-15', '2026-10-14')` verdadeiro, `ehProxima('2026-10-14', '2026-10-14')` falso; `ordenarReunioes` põe as próximas primeiro (da mais próxima à mais distante, depois por hora) e as realizadas depois (da mais recente à mais antiga); `semAnotacoes(reuniao, hoje)` só para realizada sem anotações; endereço ida e volta (`#/reunioes/abc?setor=s1&tipo=modelagem&de=2026-10-01&ate=2026-10-31`), tipo inválido ignorado, `nova` como `aberto`; `filtrarReunioes` por setor, tipo, de e até (inclusivos), cada um opcional.
+- [x] Implementar o mínimo até passar.
 
 ### Tarefa 4 — Módulo de reuniões (falso e Supabase)
 
 **Arquivos:** `src/reunioes/tipos.ts` (acrescentar `ModuloDeReunioes`), criar `src/reunioes/ReunioesFalso.ts` (+ teste), `src/reunioes/recusasDeReunioes.ts` (+ teste), `src/reunioes/reunioesSupabase.ts` (+ teste), `src/cadastros/recusasDeProcessos.ts` (acrescentar `setor_com_reunioes` e `processo_com_reunioes`, com teste), `src/main.tsx`, `src/App.tsx`.
 
-- [ ] Testes que falham do módulo Supabase (cliente falso): `listarReunioes` junta setor e processos e devolve `Reuniao[]`; `lerReuniao` devolve null quando não existe; `lerOpcoesDoFormulario(setorId)` devolve setores ativos e processos do setor (todos os estados); `salvarReuniao` chama `rpc('salvar_reuniao', ...)` com os parâmetros em snake_case e traduz cada recusa em `TravaDoBanco` com a frase; `42501` vira "Seu perfil não permite alterar as reuniões."; erro desconhecido vira `Error` com o motivo.
-- [ ] Implementar o módulo real e o falso (o falso guarda reuniões e imita as recusas: setor inativo, modelagem sem processo, sensibilização com processo, processo de outro setor, `falhaDeGravacao`, `falharLeitura`, `segurarLeitura`).
-- [ ] `App` recebe `reunioes: ModuloDeReunioes`; `main.tsx` cria `criarReunioesSupabase(supabase)`; atualizar os `render(<App .../>)` dos testes existentes (todos passam a receber o falso) — fazer por um assistente `src/testes/` ou ajustar o `App` com o prop opcional? **Decisão:** prop obrigatória no `App`, e os ~40 testes de `App.*.test.tsx` passam a incluir `reunioes={new ReunioesFalso()}` (substituição mecânica com `sed`).
+- [x] Testes que falham do módulo Supabase (cliente falso): `listarReunioes` junta setor e processos e devolve `Reuniao[]`; `lerReuniao` devolve null quando não existe; `lerOpcoesDoFormulario(setorId)` devolve setores ativos e processos do setor (todos os estados); `salvarReuniao` chama `rpc('salvar_reuniao', ...)` com os parâmetros em snake_case e traduz cada recusa em `TravaDoBanco` com a frase; `42501` vira "Seu perfil não permite alterar as reuniões."; erro desconhecido vira `Error` com o motivo.
+- [x] Implementar o módulo real e o falso (o falso guarda reuniões e imita as recusas: setor inativo, modelagem sem processo, sensibilização com processo, processo de outro setor, `falhaDeGravacao`, `falharLeitura`, `segurarLeitura`).
+- [x] `App` recebe `reunioes: ModuloDeReunioes`; `main.tsx` cria `criarReunioesSupabase(supabase)`; atualizar os `render(<App .../>)` dos testes existentes (todos passam a receber o falso) — fazer por um assistente `src/testes/` ou ajustar o `App` com o prop opcional? **Decisão:** prop obrigatória no `App`, e os ~40 testes de `App.*.test.tsx` passam a incluir `reunioes={new ReunioesFalso()}` (substituição mecânica com `sed`).
 
 ### Tarefa 5 — Área Reuniões: lista, filtros e roteamento
 
 **Arquivos:** `src/components/moldura/areas.ts`, `src/components/moldura/FaixaLateral.tsx` (comentário), `src/hooks/useAreaAtual.ts`, `src/App.tsx`; criar `src/components/reunioes/AreaDeReunioes.tsx`, `TabelaDeReunioes.tsx`, `FiltrosDasReunioes.tsx`, `Reunioes.css`; criar `src/App.reunioes.test.tsx`.
 
-- [ ] Testes de tela que falham (critérios 4, 5, 9, 10, 12): botão Reuniões da faixa abre a área; tabela com colunas Data e hora, Tipo, Setor, Processos, Local; próximas no topo, realizadas abaixo; marca "sem anotações" só na realizada sem anotações; filtros por setor, tipo, de, até; filtros no endereço e restaurados ao recarregar; [Limpar filtros]; "Nenhuma reunião com esses filtros."; "Nenhuma reunião registrada." com [Registrar reunião] para Integrante e sem para Consulta; carregando; erro com [Tentar de novo].
-- [ ] Implementar `AreaDeReunioes` reaproveitando `useCarregamento`, `useEndereco`, `ErroAoCarregar`; `hoje` por prop com padrão local.
+- [x] Testes de tela que falham (critérios 4, 5, 9, 10, 12): botão Reuniões da faixa abre a área; tabela com colunas Data e hora, Tipo, Setor, Processos, Local; próximas no topo, realizadas abaixo; marca "sem anotações" só na realizada sem anotações; filtros por setor, tipo, de, até; filtros no endereço e restaurados ao recarregar; [Limpar filtros]; "Nenhuma reunião com esses filtros."; "Nenhuma reunião registrada." com [Registrar reunião] para Integrante e sem para Consulta; carregando; erro com [Tentar de novo].
+- [x] Implementar `AreaDeReunioes` reaproveitando `useCarregamento`, `useEndereco`, `ErroAoCarregar`; `hoje` por prop com padrão local.
 
 ### Tarefa 6 — Formulário de registro
 
 **Arquivos:** criar `src/components/reunioes/PainelDeNovaReuniao.tsx`, `FormularioDaReuniao.tsx`, `CamposDaReuniao.tsx`, `validacaoDaReuniao.ts` (+ teste), `useFormularioDaReuniao.ts`; testes em `src/App.registrarReuniao.test.tsx`.
 
-- [ ] Testes que falham (critérios 6 e 7): [Registrar reunião] abre o formulário; salvar desabilitado sem tipo, setor, data ou (modelagem) processo; só setores ativos; processos do setor (todos os estados) só na modelagem; trocar setor ou passar para sensibilização desmarca processos; salvar manda os dados ao falso e volta à lista com a reunião nova; falha genérica e cada recusa (setor inativo, processo de outro setor, modelagem sem processo, sensibilização com processo, texto longo) em vermelho sem perder o preenchido.
-- [ ] Implementar no padrão de `PainelDeNovoProcesso`/`FormularioDoProcesso`.
+- [x] Testes que falham (critérios 6 e 7): [Registrar reunião] abre o formulário; salvar desabilitado sem tipo, setor, data ou (modelagem) processo; só setores ativos; processos do setor (todos os estados) só na modelagem; trocar setor ou passar para sensibilização desmarca processos; salvar manda os dados ao falso e volta à lista com a reunião nova; falha genérica e cada recusa (setor inativo, processo de outro setor, modelagem sem processo, sensibilização com processo, texto longo) em vermelho sem perder o preenchido.
+- [x] Implementar no padrão de `PainelDeNovoProcesso`/`FormularioDoProcesso`.
 
 ### Tarefa 7 — Painel da reunião
 
 **Arquivos:** criar `src/components/reunioes/PainelDaReuniao.tsx`, `DadosDaReuniao.tsx`; teste `src/App.painelDaReuniao.test.tsx`.
 
-- [ ] Testes que falham (critério 8 e 10): clicar na linha abre o painel com id no endereço e todos os dados; setor e processo inativos com pílula; clicar num processo abre o painel dele (`#/processos/<id>`); reunião inexistente avisa "excluída" (padrão `ItemInexistente`); estados de carregando e erro; Consulta sem botões.
-- [ ] Implementar.
+- [x] Testes que falham (critério 8 e 10): clicar na linha abre o painel com id no endereço e todos os dados; setor e processo inativos com pílula; clicar num processo abre o painel dele (`#/processos/<id>`); reunião inexistente avisa "excluída" (padrão `ItemInexistente`); estados de carregando e erro; Consulta sem botões.
+- [x] Implementar.
 
 ### Tarefa 8 — Portões de qualidade, registros e fecho
 
-- [ ] `npm test` (cobertura ≥ 70%), `npx tsc -b` (ou `npm run build`), `npm run lint`, arquivos ≤ 300 linhas.
-- [ ] Marcar as caixas deste plano; acrescentar a `.scratch/reunioes/desvios.md` as frases novas e decisões; anotar em `.scratch/melhorias-protocolo.md` os itens não testados do `/executar-complexo`.
-- [ ] Merge na `main` (`git switch main`, `git merge`, `git branch -d reunioes-01`), `git push origin main`, conferir o "Testes de banco" da `main`.
-- [ ] Linha `Concluído em AAAA-MM-DD (commit <hash>)` no ticket 01; comitar; apontar o próximo ticket.
+- [x] `npm test` (cobertura ≥ 70%), `npx tsc -b` (ou `npm run build`), `npm run lint`, arquivos ≤ 300 linhas.
+- [x] Marcar as caixas deste plano; acrescentar a `.scratch/reunioes/desvios.md` as frases novas e decisões; anotar em `.scratch/melhorias-protocolo.md` os itens não testados do `/executar-complexo`.
+- [x] Merge na `main` (`git switch main`, `git merge`, `git branch -d reunioes-01`), `git push origin main`, conferir o "Testes de banco" da `main`.
+- [x] Linha `Concluído em AAAA-MM-DD (commit <hash>)` no ticket 01; comitar; apontar o próximo ticket.
