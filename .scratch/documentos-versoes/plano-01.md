@@ -61,9 +61,9 @@ export function limparParaNomeDeArquivo(texto: string): string
 export function nomePadrao(dados: DadosDoNome): string
 ```
 
-- [ ] Teste que falha (`nomePadrao.test.ts`), cobrindo: `CEE_V6_Nome do processo.bpmn`; histórica `CEE_V5F_Nome do processo.png`; relatório `CEE_V6_Nome do processo_Relatório.pdf`; acentos mantidos (`Concessão de Licença`); `\ / : * ? " < > |` e caractere de controle (`\u0007`) viram `-`; espaços repetidos e pontas viram um espaço só; extensão em maiúsculas sai em minúsculas; `numero` 0, negativo ou fracionário lança erro com o valor recebido e o formato esperado ("número inteiro maior que zero").
-- [ ] Rodar `npx vitest run supabase/functions/_shared/nomePadrao.test.ts`: falha por função inexistente.
-- [ ] Implementar: `limparParaNomeDeArquivo` troca `/[\\/:*?"<>|\u0000-\u001f]/g` por `-`, reduz `\s+` a um espaço e apara; `nomePadrao` monta `${sigla}_V${numero}${historica ? 'F' : ''}_${nome}${papel === 'relatorio' ? '_Relatório' : ''}.${extensao.toLowerCase()}`, limpando sigla e nome. Rodar o teste e comitar.
+- [x] Teste que falha (`nomePadrao.test.ts`), cobrindo: `CEE_V6_Nome do processo.bpmn`; histórica `CEE_V5F_Nome do processo.png`; relatório `CEE_V6_Nome do processo_Relatório.pdf`; acentos mantidos (`Concessão de Licença`); `\ / : * ? " < > |` e caractere de controle (`\u0007`) viram `-`; espaços repetidos e pontas viram um espaço só; extensão em maiúsculas sai em minúsculas; `numero` 0, negativo ou fracionário lança erro com o valor recebido e o formato esperado ("número inteiro maior que zero").
+- [x] Rodar `npx vitest run supabase/functions/_shared/nomePadrao.test.ts`: falha por função inexistente.
+- [x] Implementar: `limparParaNomeDeArquivo` troca `/[\\/:*?"<>|\u0000-\u001f]/g` por `-`, reduz `\s+` a um espaço e apara; `nomePadrao` monta `${sigla}_V${numero}${historica ? 'F' : ''}_${nome}${papel === 'relatorio' ? '_Relatório' : ''}.${extensao.toLowerCase()}`, limpando sigla e nome. Rodar o teste e comitar.
 
 ### Tarefa 3 — Decisão pura (critérios 4, 5, 9)
 
