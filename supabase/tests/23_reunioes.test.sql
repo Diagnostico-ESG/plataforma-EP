@@ -6,7 +6,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(53);
+insert into _tap (linha) select plan(66);
 
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 insert into public.autorizacoes (email, perfil) values
@@ -66,6 +66,15 @@ begin
   return apagadas;
 end $$;
 grant execute on function pg_temp.apagar_reunioes() to authenticated;
+
+create function pg_temp.alterar_reunioes() returns bigint
+language plpgsql as $$
+declare alteradas bigint;
+begin
+  with alterada as (update public.reunioes set local = 'x' returning id) select count(*) into alteradas from alterada;
+  return alteradas;
+end $$;
+grant execute on function pg_temp.alterar_reunioes() to authenticated;
 
 -- Preparação como dono do banco: duas reuniões em TR4 e uma de modelagem com o "Proc D". Os eventos pendentes
 -- (restrições adiadas) saem aqui, antes dos testes.
@@ -200,6 +209,31 @@ insert into _tap (linha) select is(pg_temp.eventos('mod1', 'excluir'), 1::bigint
 insert into _tap (linha) select is(jsonb_array_length(pg_temp.evento('mod1', 'excluir') -> 'antes' -> 'processos'), 2,
   'o evento de exclusão traz tudo o que a reunião tinha');
 
+-- Alterar (ticket 02): um campo, só os processos e reunião que não existe.
+insert into _tap (linha) select lives_ok(
+  $sql$select public.salvar_reuniao(pg_temp.reuniao('txt'), 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
+    '2026-11-14', null, null, 'nota', array['Ana'], '{}')$sql$,
+  'integrante altera só a data da reunião');
+insert into _tap (linha) select is(pg_temp.eventos('txt', 'editar'), 1::bigint, 'alterar um campo gera um evento');
+insert into _tap (linha) select lives_ok(
+  $sql$insert into _r select 'mod3', public.salvar_reuniao(null, 'modelagem', '5f000000-0000-0000-0000-0000000000a1',
+    '2026-11-15', null, null, null, '{}', array[pg_temp.processo('Proc A')])$sql$,
+  'integrante registra uma modelagem com o Proc A');
+insert into _tap (linha) select lives_ok(
+  $sql$select public.salvar_reuniao(pg_temp.reuniao('mod3'), 'modelagem', '5f000000-0000-0000-0000-0000000000a1',
+    '2026-11-15', null, null, null, '{}', array[pg_temp.processo('Proc D')])$sql$,
+  'integrante troca só o processo tratado');
+insert into _tap (linha) select is(pg_temp.eventos('mod3', 'editar'), 1::bigint,
+  'trocar só os processos gera um evento de alteração');
+insert into _tap (linha) select ok(
+  pg_temp.evento('mod3', 'editar') -> 'antes' -> 'processos' -> 0 ->> 'nome' = 'Proc A'
+  and pg_temp.evento('mod3', 'editar') -> 'depois' -> 'processos' -> 0 ->> 'nome' = 'Proc D',
+  'o evento traz o processo de antes e o de depois');
+insert into _tap (linha) select throws_ok(
+  $sql$select public.salvar_reuniao('ef000000-0000-0000-0000-0000000000ff', 'sensibilizacao',
+    '5f000000-0000-0000-0000-0000000000a1', '2026-11-10', null, null, null, '{}', '{}')$sql$,
+  'P0001', 'registro_inexistente', 'alterar reunião que não existe é recusado');
+
 -- Quem pode o quê.
 insert into _tap (linha) select throws_ok(
   $sql$update public.reunioes set criado_em = now()$sql$, '42501', null, 'ninguém altera criado_em');
@@ -216,6 +250,9 @@ insert into _tap (linha) select lives_ok(
     '2026-12-01', null, null, null, '{}', '{}')$sql$,
   'administrador registra reunião');
 insert into _tap (linha) select lives_ok(
+  $sql$select public.salvar_reuniao(pg_temp.reuniao('adm1'), 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a2',
+    '2026-12-02', null, null, null, '{}', '{}')$sql$, 'administrador altera reunião');
+insert into _tap (linha) select lives_ok(
   $sql$delete from public.reunioes where id = pg_temp.reuniao('adm1')$sql$, 'administrador exclui reunião');
 insert into _tap (linha) select is((select count(*) from public.reunioes where id = pg_temp.reuniao('adm1')), 0::bigint,
   'a reunião excluída pelo administrador sumiu');
@@ -230,6 +267,10 @@ insert into _tap (linha) select throws_ok(
     '2026-11-10', null, null, null, '{}', '{}')$sql$, '42501', null, 'consulta não registra reunião');
 insert into _tap (linha) select is(pg_temp.apagar_reunioes(), 0::bigint, 'consulta não apaga reunião');
 insert into _tap (linha) select throws_ok(
+  $sql$select public.salvar_reuniao(pg_temp.reuniao('txt'), 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
+    '2026-11-14', null, null, 'nota', array['Ana'], '{}')$sql$, '42501', null, 'consulta não altera reunião');
+insert into _tap (linha) select is(pg_temp.alterar_reunioes(), 0::bigint, 'consulta não altera reunião direto na tabela');
+insert into _tap (linha) select throws_ok(
   $sql$insert into public.reunioes_processos (reuniao_id, processo_id)
     values (pg_temp.reuniao('txt'), pg_temp.processo('Proc A'))$sql$, '42501', null,
   'consulta não liga processo a reunião');
@@ -241,6 +282,12 @@ insert into _tap (linha) select is(
 insert into _tap (linha) select throws_ok(
   $sql$select public.salvar_reuniao(null, 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
     '2026-11-10', null, null, null, '{}', '{}')$sql$, '42501', null, 'inativo não registra reunião');
+-- O inativo não lê a reunião, então para ele ela "não existe" (a mesma regra do porQueNadaMudou da interface).
+insert into _tap (linha) select throws_ok(
+  $sql$select public.salvar_reuniao(pg_temp.reuniao('txt'), 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
+    '2026-11-14', null, null, 'nota', array['Ana'], '{}')$sql$, 'P0001', 'registro_inexistente',
+  'inativo não altera reunião');
+insert into _tap (linha) select is(pg_temp.apagar_reunioes(), 0::bigint, 'inativo não apaga reunião');
 
 set local role anon;
 insert into _tap (linha) select throws_ok($sql$select count(*) from public.reunioes$sql$, '42501', null,
@@ -248,6 +295,8 @@ insert into _tap (linha) select throws_ok($sql$select count(*) from public.reuni
 insert into _tap (linha) select throws_ok(
   $sql$select public.salvar_reuniao(null, 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
     '2026-11-10', null, null, null, '{}', '{}')$sql$, '42501', null, 'visitante não registra reunião');
+insert into _tap (linha) select throws_ok($sql$delete from public.reunioes$sql$, '42501', null,
+  'visitante não apaga reunião');
 
 reset role;
 insert into _tap (linha) select ok(
