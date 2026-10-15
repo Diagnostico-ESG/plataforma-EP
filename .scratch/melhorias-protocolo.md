@@ -435,3 +435,11 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 
 - **Item não testado: caminho de bug do `/demanda` (marco, investigação, vermelho, verde, `code-review`, relatório).** Esperado: seguir o caminho. Aconteceu: marco `marco/2026-10-15-antes-correcao-testes-instaveis`; a instabilidade não reproduziu rodando os arquivos sozinhos nem com a bateria em paralelo, então o "vermelho" foi provado com `--testTimeout=300` (o teste grande falhou); a correção foi o teste dividido por filtro e `testTimeout` de 15 s; bateria verde (112 arquivos, 1334 testes); `code-review` feito direto, sem sub-agentes, por ser diff de 2 arquivos.
 - **Sugestão:** o caminho de bug poderia prever o caso de bug intermitente que não se reproduz, aceitando como "vermelho" a falha provocada por limite de tempo apertado.
+
+## 2026-10-15 — /executar-complexo do ticket 04 de reunioes (reuniões no setor e no processo)
+
+- **Item não testado: ticket que não precisa de migração, só de um teste de banco que confere o que já existe.** Esperado: o comando prever teste de banco sem "vermelho". Aconteceu: o teste 25 nasceu verde (comportamento já existente) e foi registrado no `desvios.md`; o "Testes de banco" da branch passou (#69).
+- **Item não testado: branch comum, `plano-<número>.md`, marco e linha `Concluído em` no ticket.** Esperado: seguir o comando. Aconteceu: branch `reunioes-04`, plano em `plano-04.md`, marco `marco/2026-10-15-inicio-ticket-04-reunioes`.
+- **Item não testado: conferência do alvo antes de comando de banco.** Esperado: vínculo atual igual ao `supabase/.temp/project-ref`. Aconteceu: os dois eram `yclkzyoebpsxmgpbcbus`; o banco só foi tocado pelo "Testes de banco" do Actions.
+- **Ocorrência: a trava de git bloqueou, por engano, comandos `sed -i` em arquivos de `src/`** (mensagem "apagar ou mover a pasta `.git`"); o mesmo comando sem `-i`, ou a edição pela ferramenta de edição, passou. **Sugestão:** a trava poderia olhar o alvo do comando, e não só a presença de `-i`.
+- **Sugestão:** em Windows, o Git avisa "LF will be replaced by CRLF" a cada commit e os arquivos do projeto estão em CRLF; um `.gitattributes` com `* text=auto eol=lf` tiraria o aviso e o risco de edições por script que procuram `\n` não acharem o texto.

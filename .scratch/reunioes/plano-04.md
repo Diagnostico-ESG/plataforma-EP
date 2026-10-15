@@ -1,6 +1,6 @@
 # Ticket 04 de reunioes (Reuniões no setor e no processo) — Plano de execução
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** o setor aberto e o painel do processo mostram as reuniões ligadas a eles, com [Registrar reunião] que abre o formulário já preenchido; o histórico do processo mostra os eventos de reunião em que ele aparece; excluir setor ou processo com reunião mostra a recusa com a contagem e o caminho.
 
@@ -39,16 +39,16 @@ Modificar: `src/cadastros/recusasDeProcessos.ts` (+ teste), `src/processos/andam
 **Arquivos:** `supabase/tests/25_reunioes_nos_cadastros.test.sql` (novo).
 
 - [x] `git switch -c reunioes-04` e `git tag marco/2026-10-15-inicio-ticket-04-reunioes` (feitos). Alvo conferido: os dois são `yclkzyoebpsxmgpbcbus`.
-- [ ] Criar o 25 no molde do 23 (`begin`, `_tap`, `plan(N)`, usuários a1 a4, `finish()` e a exceção `RESULTADO DOS TESTES`): setor TN1 com um processo `a_classificar` ("Solto N") tratado numa reunião de modelagem registrada pelo integrante; asserções: (1) o integrante reclassifica o "Solto N" para `processo`; (2) a reunião continua existindo; (3) a ligação com o processo continua (1 linha em `reunioes_processos`, com o mesmo id do processo); (4) o histórico do processo ganha o evento `reclassificar` e a reunião **não** ganha evento de alteração por causa disso.
-- [ ] Comitar ("Ticket 04 de reunioes: plano de execução e teste de banco da reclassificação"), `git push -u origin reunioes-04`, disparar "Testes de banco" na branch e ler: o 25 e todos os demais verdes.
+- [x] Criar o 25 no molde do 23 (`begin`, `_tap`, `plan(N)`, usuários a1 a4, `finish()` e a exceção `RESULTADO DOS TESTES`): setor TN1 com um processo `a_classificar` ("Solto N") tratado numa reunião de modelagem registrada pelo integrante; asserções: (1) o integrante reclassifica o "Solto N" para `processo`; (2) a reunião continua existindo; (3) a ligação com o processo continua (1 linha em `reunioes_processos`, com o mesmo id do processo); (4) o histórico do processo ganha o evento `reclassificar` e a reunião **não** ganha evento de alteração por causa disso.
+- [x] Comitar ("Ticket 04 de reunioes: plano de execução e teste de banco da reclassificação"), `git push -u origin reunioes-04`, disparar "Testes de banco" na branch e ler: o 25 e todos os demais verdes.
 
 ### Tarefa 2 — Frases de recusa (critério 5)
 
 **Arquivos:** `src/cadastros/recusasDeProcessos.ts` (+ teste), `src/processos/frasesDeReuniao.ts`, `src/processos/andamentosSupabase.ts` (+ teste).
 
-- [ ] Testes que falham: `setor_com_reunioes:2` vira `TravaDoBanco` "Não é possível excluir: setor tem 2 reuniões registradas. Desative o setor em vez de excluí-lo."; com `:1`, "1 reunião registrada"; `processo_com_reunioes:1` vira "Não é possível excluir: processo foi tratado em 1 reunião. Cancele o processo em vez de excluí-lo." e `:3`, "3 reuniões".
-- [ ] Implementar: `setor_com_reunioes` no padrão e no mapa de `recusasDeProcessos.ts` (o mais longo continua primeiro; `setor_com_reunioes` não é prefixo de outro); `processo_com_reunioes` no padrão e no mapa de `andamentosSupabase.ts`, com `fraseDoProcessoComReunioes(n: string)` em `frasesDeReuniao.ts`.
-- [ ] Rodar os testes dos dois arquivos e comitar.
+- [x] Testes que falham: `setor_com_reunioes:2` vira `TravaDoBanco` "Não é possível excluir: setor tem 2 reuniões registradas. Desative o setor em vez de excluí-lo."; com `:1`, "1 reunião registrada"; `processo_com_reunioes:1` vira "Não é possível excluir: processo foi tratado em 1 reunião. Cancele o processo em vez de excluí-lo." e `:3`, "3 reuniões".
+- [x] Implementar: `setor_com_reunioes` no padrão e no mapa de `recusasDeProcessos.ts` (o mais longo continua primeiro; `setor_com_reunioes` não é prefixo de outro); `processo_com_reunioes` no padrão e no mapa de `andamentosSupabase.ts`, com `fraseDoProcessoComReunioes(n: string)` em `frasesDeReuniao.ts`.
+- [x] Rodar os testes dos dois arquivos e comitar.
 
 ### Tarefa 3 — Funções puras e endereço (critérios 2, 3)
 
@@ -56,8 +56,8 @@ Modificar: `src/cadastros/recusasDeProcessos.ts` (+ teste), `src/processos/andam
 
 **Interfaces — Produz:** `reunioesDoSetor(reunioes: Reuniao[], setorId: string): Reuniao[]` (mais recente primeiro, empate pelo id); `reunioesDoProcesso(reunioes: Reuniao[], processoId: string): Reuniao[]` (só as que trazem o processo, mais recente primeiro); `juntarEventos(a: EventoDoCadastro[], b: EventoDoCadastro[]): EventoDoCadastro[]` (mais recente primeiro; empate, id maior primeiro); `ModeloDaReuniao = { setorId: string; tipo: TipoDeReuniao | null; processoId: string | null }`; `montarEnderecoDeNovaReuniao(modelo: ModeloDaReuniao | null): string` (`#/reunioes/nova` com `para-*`); `lerModeloDaReuniao(endereco: string): ModeloDaReuniao | null`.
 
-- [ ] Testes que falham para cada função (incluindo: setor sem reunião devolve lista vazia; reunião de sensibilização nunca aparece no processo; modelo sem setor vira `null`; tipo inválido ignorado).
-- [ ] Implementar o mínimo e rodar os testes; comitar.
+- [x] Testes que falham para cada função (incluindo: setor sem reunião devolve lista vazia; reunião de sensibilização nunca aparece no processo; modelo sem setor vira `null`; tipo inválido ignorado).
+- [x] Implementar o mínimo e rodar os testes; comitar.
 
 ### Tarefa 4 — Módulo: eventos de reunião do processo (critério 4)
 
@@ -65,18 +65,18 @@ Modificar: `src/cadastros/recusasDeProcessos.ts` (+ teste), `src/processos/andam
 
 **Interfaces — Produz:** `ModuloDeReunioes.lerEventosDeReuniaoDoProcesso(processoId: string): Promise<EventoDoCadastro[]>` (mais recente primeiro).
 
-- [ ] Testes que falham: no módulo real (cliente falso), o pedido lê `eventos` de entidade `reuniao`, devolve só os eventos cujo `antes` ou `depois` traz o processo em `processos`, e a falha de leitura vira `Error` "Falha ao ler o histórico do processo p1: …"; no falso, `lerEventosDeReuniaoDoProcesso` devolve do `historico` os eventos que citam o processo (antes ou depois), do mais recente ao mais antigo, e respeita `falharHistoricoDoProcesso`/`segurarHistoricoDoProcesso` (campos novos).
-- [ ] Implementar o mínimo; rodar; comitar.
+- [x] Testes que falham: no módulo real (cliente falso), o pedido lê `eventos` de entidade `reuniao`, devolve só os eventos cujo `antes` ou `depois` traz o processo em `processos`, e a falha de leitura vira `Error` "Falha ao ler o histórico do processo p1: …"; no falso, `lerEventosDeReuniaoDoProcesso` devolve do `historico` os eventos que citam o processo (antes ou depois), do mais recente ao mais antigo, e respeita `falharHistoricoDoProcesso`/`segurarHistoricoDoProcesso` (campos novos).
+- [x] Implementar o mínimo; rodar; comitar.
 
 ### Tarefa 5 — Interface: seções, formulário preenchido, histórico (critérios 2 a 6)
 
 **Arquivos:** `src/components/reunioes/SecaoDeReunioes.tsx`, `ReunioesDoSetor.tsx`, `ReunioesDoProcesso.tsx`, `AreaDeReunioes.tsx`, `PainelDeNovaReuniao.tsx`, `FormularioDaReuniao.tsx`; `AreaDeCadastros.tsx`, `AreaDeSetores.tsx`, `SetorAberto.tsx`; `AreaDeProcessos.tsx`, `PainelDoProcesso.tsx`, `HistoricoDoProcesso.tsx`; `App.tsx`; testes de tela (arquivos novos, listados acima) e `src/testes/reunioesDeTeste.tsx`.
 
-- [ ] Testes de tela que falham (renderizando o aplicativo inteiro, falsos nomeados): **setor aberto** — seção Reuniões com data, tipo e processos, ordem da mais recente; "Nenhuma reunião."; carregando; erro com [Tentar de novo]; clicar abre `#/reunioes/<id>` com o painel; [Registrar reunião] abre o formulário com o setor preenchido; Consulta sem o botão; setor inativo sem o botão. **Painel do processo** — só as reuniões de modelagem que o trataram; "Nenhuma reunião."; [Registrar reunião] abre o formulário com tipo modelagem, setor e processo marcados; Consulta sem o botão; aba Histórico mostra o evento de reunião (criação com o processo, e a exclusão da reunião) junto dos do processo. **Recusa** — excluir setor e excluir processo com a recusa programada (`falhaDeGravacao`) mostram a frase em vermelho com a contagem e o caminho.
-- [ ] Implementar: `SecaoDeReunioes` (título "Reuniões", carregando, erro, vazio, tabela curta, botão), os dois usos, o modelo no endereço/painel/formulário (partindo do modelo só se o setor está ativo), a junção dos históricos, e o módulo de reuniões chegando às áreas.
-- [ ] `npx vitest run` dos arquivos tocados; `npx tsc -b`; `npx eslint` nos arquivos; comitar por etapas.
+- [x] Testes de tela que falham (renderizando o aplicativo inteiro, falsos nomeados): **setor aberto** — seção Reuniões com data, tipo e processos, ordem da mais recente; "Nenhuma reunião."; carregando; erro com [Tentar de novo]; clicar abre `#/reunioes/<id>` com o painel; [Registrar reunião] abre o formulário com o setor preenchido; Consulta sem o botão; setor inativo sem o botão. **Painel do processo** — só as reuniões de modelagem que o trataram; "Nenhuma reunião."; [Registrar reunião] abre o formulário com tipo modelagem, setor e processo marcados; Consulta sem o botão; aba Histórico mostra o evento de reunião (criação com o processo, e a exclusão da reunião) junto dos do processo. **Recusa** — excluir setor e excluir processo com a recusa programada (`falhaDeGravacao`) mostram a frase em vermelho com a contagem e o caminho.
+- [x] Implementar: `SecaoDeReunioes` (título "Reuniões", carregando, erro, vazio, tabela curta, botão), os dois usos, o modelo no endereço/painel/formulário (partindo do modelo só se o setor está ativo), a junção dos históricos, e o módulo de reuniões chegando às áreas.
+- [x] `npx vitest run` dos arquivos tocados; `npx tsc -b`; `npx eslint` nos arquivos; comitar por etapas.
 
 ### Tarefa 6 — Fecho
 
-- [ ] Bateria completa (`npm test`), `tsc -b`, `eslint`; `desvios.md` (sem migração, teste 25 nasce verde, leituras por filtro na tela, filtro do histórico na tela, frases, destino após registrar); `melhorias-protocolo.md`; marcar as caixas deste plano.
-- [ ] Merge na `main` (`git switch main`, `git merge reunioes-04`), `git branch -d reunioes-04`, linha `Concluído em` no ticket, push da `main`, conferir o "Testes de banco" da `main` se mexeu em `supabase/` (mexeu: teste novo).
+- [x] Bateria completa (`npm test`), `tsc -b`, `eslint`; `desvios.md` (sem migração, teste 25 nasce verde, leituras por filtro na tela, filtro do histórico na tela, frases, destino após registrar); `melhorias-protocolo.md`; marcar as caixas deste plano.
+- [x] Merge na `main` (`git switch main`, `git merge reunioes-04`), `git branch -d reunioes-04`, linha `Concluído em` no ticket, push da `main`, conferir o "Testes de banco" da `main` se mexeu em `supabase/` (mexeu: teste novo).
