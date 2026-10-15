@@ -9,5 +9,7 @@ export function estadoDoEventoDaReuniao(reuniao: Reuniao): Record<string, unknow
     tipo: reuniao.tipo, setor_id: reuniao.setorId, setor_sigla: reuniao.setorSigla, data: reuniao.data, hora: reuniao.hora,
     local: reuniao.local, anotacoes: reuniao.anotacoes, outros_participantes: reuniao.outrosParticipantes,
     processos: reuniao.processos.map(({ id, nome }) => ({ id, nome })),
+    usuarios: reuniao.usuarios.map(({ id, nome }) => ({ id, nome })),
+    responsaveis: reuniao.responsaveis.map(({ id, nome }) => ({ id, nome })),
   }
 }

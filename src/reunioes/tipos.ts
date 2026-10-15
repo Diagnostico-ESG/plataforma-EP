@@ -5,6 +5,12 @@ export type TipoDeReuniao = 'sensibilizacao' | 'modelagem'
 /** Um processo tratado na reunião; "cancelado" é o que, num processo, equivale a inativo. */
 export type ProcessoDaReuniao = { id: string; nome: string; cancelado: boolean }
 
+/** Um usuário do EP presente na reunião; "ativo" falso é o que, num usuário, deixou de estar ativo depois dela. */
+export type UsuarioDaReuniao = { id: string; nome: string; ativo: boolean }
+
+/** Um responsável do setor presente na reunião; o excluído sai daqui e passa a ser um dos outros participantes. */
+export type ResponsavelDaReuniao = { id: string; nome: string }
+
 /** Data é AAAA-MM-DD e hora é HH:MM, como o banco as devolve; a hora é opcional. */
 export type Reuniao = {
   id: string
@@ -16,13 +22,17 @@ export type Reuniao = {
   hora: string | null
   local: string | null
   anotacoes: string | null
-  /** Nomes escritos à mão, um por item; a tela os mostra no ticket de participantes. */
+  /** Nomes escritos à mão, um por item (inclui o do responsável do setor que foi excluído). */
   outrosParticipantes: string[]
   /** Só na modelagem; por nome. */
   processos: ProcessoDaReuniao[]
+  /** Por nome. */
+  usuarios: UsuarioDaReuniao[]
+  /** Por nome; todos do setor da reunião. */
+  responsaveis: ResponsavelDaReuniao[]
 }
 
-/** O que o formulário grava. Os outros participantes seguem como estavam: quem edita os devolve sem mexer. */
+/** O que o formulário grava: as três listas de participantes vão inteiras, e o banco troca as ligações. */
 export type DadosDaReuniao = {
   tipo: TipoDeReuniao
   setorId: string
@@ -31,6 +41,8 @@ export type DadosDaReuniao = {
   local: string | null
   anotacoes: string | null
   processosIds: string[]
+  usuariosIds: string[]
+  responsaveisIds: string[]
   outrosParticipantes: string[]
 }
 
@@ -50,6 +62,10 @@ export type ModuloDeReunioes = {
   listarSetoresAtivos(): Promise<SetorParaReuniao[]>
   /** Processos e subprocessos do setor, em qualquer situação, por nome. */
   listarProcessosDoSetor(setorId: string): Promise<ProcessoDaReuniao[]>
+  /** Todos os usuários ativos, de qualquer perfil, por nome. */
+  listarUsuariosAtivos(): Promise<UsuarioDaReuniao[]>
+  /** Os responsáveis do setor, por nome. */
+  listarResponsaveisDoSetor(setorId: string): Promise<ResponsavelDaReuniao[]>
   /** id nulo cria a reunião; senão altera a existente. */
   salvarReuniao(id: string | null, dados: DadosDaReuniao): Promise<void>
   /** Reunião que já não existe: CadastroInexistente; perfil sem permissão: TravaDoBanco. */

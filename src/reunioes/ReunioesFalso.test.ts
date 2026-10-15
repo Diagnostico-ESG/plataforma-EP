@@ -6,13 +6,19 @@ import type { DadosDaReuniao } from './tipos'
 
 const DADOS: DadosDaReuniao = {
   tipo: 'modelagem', setorId: 's1', data: '2026-10-20', hora: null, local: 'Sala 1', anotacoes: null, processosIds: ['p1'],
-  outrosParticipantes: ['Ana'],
+  usuariosIds: [], responsaveisIds: [], outrosParticipantes: ['Ana'],
 }
 
 function falso(): ReunioesFalso {
   const reunioes = new ReunioesFalso()
   reunioes.setores = [{ id: 's1', sigla: 'TSA', nome: 'Setor A', ativo: true }]
   reunioes.processosDosSetores = { s1: [{ id: 'p1', nome: 'Emitir Ofício', cancelado: false }] }
+  reunioes.usuarios = [
+    { id: 'u2', nome: 'Caio Teste', ativo: false }, { id: 'u1', nome: 'Bia Teste', ativo: true },
+  ]
+  reunioes.responsaveisDosSetores = {
+    s1: [{ id: 'x2', nome: 'Edu Teste' }, { id: 'x1', nome: 'Dani Teste' }], s2: [{ id: 'x3', nome: 'Olga Teste' }],
+  }
   return reunioes
 }
 
@@ -63,6 +69,58 @@ describe('eventos que o falso imita do banco', () => {
     reunioes.segurarHistoricoDaReuniao = true
     const resposta = await Promise.race([reunioes.lerHistoricoDaReuniao('r1'), Promise.resolve('esperando')])
     expect(resposta).toBe('esperando')
+  })
+})
+
+describe('participantes', () => {
+  test('a escolha de usuários traz só os ativos, e a de responsáveis, os do setor', async () => {
+    const reunioes = falso()
+    expect(await reunioes.listarUsuariosAtivos()).toEqual([{ id: 'u1', nome: 'Bia Teste', ativo: true }])
+    expect((await reunioes.listarResponsaveisDoSetor('s1')).map((r) => r.nome)).toEqual(['Dani Teste', 'Edu Teste'])
+    expect(await reunioes.listarResponsaveisDoSetor('s9')).toEqual([])
+  })
+
+  test('salvar guarda usuários (mesmo o inativo) e responsáveis por nome, e o evento os traz', async () => {
+    const reunioes = falso()
+    await reunioes.salvarReuniao(null, { ...DADOS, usuariosIds: ['u2', 'u1'], responsaveisIds: ['x2', 'x1'] })
+    const salva = await reunioes.lerReuniao('r1')
+    expect(salva?.usuarios).toEqual([{ id: 'u1', nome: 'Bia Teste', ativo: true }, { id: 'u2', nome: 'Caio Teste', ativo: false }])
+    expect(salva?.responsaveis.map((r) => r.nome)).toEqual(['Dani Teste', 'Edu Teste'])
+    expect(reunioes.historico[0].depois).toMatchObject({
+      usuarios: [{ id: 'u1', nome: 'Bia Teste' }, { id: 'u2', nome: 'Caio Teste' }],
+      responsaveis: [{ id: 'x1', nome: 'Dani Teste' }, { id: 'x2', nome: 'Edu Teste' }],
+    })
+  })
+
+  test('responsável de outro setor e outro participante longo demais são recusados como o banco os recusa', async () => {
+    const reunioes = falso()
+    const fora = reunioes.salvarReuniao(null, { ...DADOS, responsaveisIds: ['x3'] })
+    await expect(fora).rejects.toThrow('O responsável Olga Teste não é do setor da reunião.')
+    const longo = reunioes.salvarReuniao(null, { ...DADOS, outrosParticipantes: ['x'.repeat(201)] })
+    await expect(longo).rejects.toThrow('Cada outro participante pode ter no máximo 200 caracteres. Recebido: 201.')
+    expect(reunioes.historico).toEqual([])
+  })
+
+  test('excluir o responsável o tira das reuniões e acrescenta o nome aos outros participantes, com um evento por reunião', async () => {
+    const reunioes = falso()
+    await reunioes.salvarReuniao(null, { ...DADOS, responsaveisIds: ['x1', 'x2'] })
+    await reunioes.salvarReuniao(null, { ...DADOS, responsaveisIds: ['x1'], outrosParticipantes: ['Dani Teste'] })
+    reunioes.excluirResponsavelDoSetor('x1')
+    const [primeira, segunda] = await reunioes.listarReunioes()
+    expect(primeira.responsaveis.map((r) => r.nome)).toEqual(['Edu Teste'])
+    expect(primeira.outrosParticipantes).toEqual(['Ana', 'Dani Teste'])
+    expect(segunda.responsaveis).toEqual([])
+    expect(segunda.outrosParticipantes).toEqual(['Dani Teste'])
+    expect((await reunioes.listarResponsaveisDoSetor('s1')).map((r) => r.nome)).toEqual(['Edu Teste'])
+    expect(reunioes.historico.map((evento) => evento.acao)).toEqual(['criar', 'criar', 'editar', 'editar'])
+    expect(reunioes.historico.slice(2).map((evento) => evento.entidadeRef)).toEqual(['r1', 'r2'])
+  })
+
+  test('excluir o responsável que não está em nenhuma reunião não acrescenta evento', async () => {
+    const reunioes = falso()
+    await reunioes.salvarReuniao(null, DADOS)
+    reunioes.excluirResponsavelDoSetor('x1')
+    expect(reunioes.historico.map((evento) => evento.acao)).toEqual(['criar'])
   })
 })
 

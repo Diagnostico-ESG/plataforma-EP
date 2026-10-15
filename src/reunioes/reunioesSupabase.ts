@@ -4,7 +4,9 @@ import type { EventoDoCadastro } from '../cadastros/tipos'
 import type { ClienteSupabase } from '../lib/supabase'
 import { RECUSAS_DAS_REUNIOES, SEM_PERMISSAO_DAS_REUNIOES, falhaDaReuniao } from './recusasDeReunioes'
 import { COLUNAS_DA_REUNIAO, type LinhaDaReuniao, reuniaoDaLinha } from './reuniaoDaLinha'
-import type { DadosDaReuniao, ModuloDeReunioes, ProcessoDaReuniao, Reuniao, SetorParaReuniao } from './tipos'
+import type {
+  DadosDaReuniao, ModuloDeReunioes, ProcessoDaReuniao, ResponsavelDaReuniao, Reuniao, SetorParaReuniao, UsuarioDaReuniao,
+} from './tipos'
 
 export function criarReunioesSupabase(cliente: ClienteSupabase): ModuloDeReunioes {
   return {
@@ -12,6 +14,8 @@ export function criarReunioesSupabase(cliente: ClienteSupabase): ModuloDeReunioe
     lerReuniao: (id) => lerReuniao(cliente, id),
     listarSetoresAtivos: () => listarSetoresAtivos(cliente),
     listarProcessosDoSetor: (setorId) => listarProcessosDoSetor(cliente, setorId),
+    listarUsuariosAtivos: () => listarUsuariosAtivos(cliente),
+    listarResponsaveisDoSetor: (setorId) => listarResponsaveisDoSetor(cliente, setorId),
     salvarReuniao: (id, dados) => salvarReuniao(cliente, id, dados),
     excluirReuniao: (id) => excluirReuniao(cliente, id),
     lerHistoricoDaReuniao: (id) => lerHistoricoDaReuniao(cliente, id),
@@ -44,11 +48,24 @@ async function listarProcessosDoSetor(cliente: ClienteSupabase, setorId: string)
   return data.map(({ id, nome, situacao }) => ({ id, nome, cancelado: situacao === 'cancelado' }))
 }
 
+async function listarUsuariosAtivos(cliente: ClienteSupabase): Promise<UsuarioDaReuniao[]> {
+  const { data, error } = await cliente.from('usuarios').select('id, nome, ativo').eq('ativo', true).order('nome')
+  if (error) throw new Error(`Falha ao ler os usuários: ${error.message}`)
+  return data
+}
+
+async function listarResponsaveisDoSetor(cliente: ClienteSupabase, setorId: string): Promise<ResponsavelDaReuniao[]> {
+  const { data, error } = await cliente.from('responsaveis_do_setor').select('id, nome').eq('setor_id', setorId).order('nome')
+  if (error) throw new Error(`Falha ao ler os responsáveis do setor ${setorId}: ${error.message}`)
+  return data
+}
+
 async function salvarReuniao(cliente: ClienteSupabase, id: string | null, dados: DadosDaReuniao): Promise<void> {
   // O gerador de tipos do Supabase não marca parâmetro de função como anulável; o banco aceita nulo nestes (id nulo cria).
   const { error } = await cliente.rpc('salvar_reuniao', {
     p_id: id as string, p_tipo: dados.tipo, p_setor_id: dados.setorId, p_data: dados.data, p_hora: dados.hora as string,
-    p_local: dados.local as string, p_anotacoes: dados.anotacoes as string, p_outros: dados.outrosParticipantes, p_processos: dados.processosIds,
+    p_local: dados.local as string, p_anotacoes: dados.anotacoes as string, p_outros: dados.outrosParticipantes,
+    p_processos: dados.processosIds, p_usuarios: dados.usuariosIds, p_responsaveis: dados.responsaveisIds,
   })
   if (error) throw falhaDaReuniao(error, dados)
 }

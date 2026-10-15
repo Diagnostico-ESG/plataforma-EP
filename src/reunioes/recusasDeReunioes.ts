@@ -12,15 +12,20 @@ export const FRASE_DA_MODELAGEM_SEM_PROCESSO = 'A reunião de modelagem precisa 
 export const FRASE_DA_SENSIBILIZACAO_COM_PROCESSO = 'A reunião de sensibilização não tem processos.'
 export const fraseDoSetorInativo = (sigla: string) => `O setor ${sigla} está inativo; escolha um setor ativo.`
 export const fraseDoProcessoDeOutroSetor = (nome: string) => `O processo ${nome} não é do setor da reunião.`
+export const fraseDoResponsavelDeOutroSetor = (nome: string) => `O responsável ${nome} não é do setor da reunião.`
+export const fraseDoOutroParticipanteLongo = (tamanho: string) =>
+  `Cada outro participante pode ter no máximo 200 caracteres. Recebido: ${tamanho}.`
 const fraseDoTextoLongo = (campo: string, verbo: string, limite: string, recebido: number) =>
   `${campo} ${verbo} ter no máximo ${limite} caracteres. Recebido: ${recebido}.`
 
 // O banco recusa com "motivo:valor" (migração reunioes); o PostgREST pode acrescentar texto em volta.
-const PADRAO_COM_VALOR = /\b(setor_inativo|processo_de_outro_setor):(.*)$/m
+const PADRAO_COM_VALOR =
+  /\b(setor_inativo|processo_de_outro_setor|responsavel_de_outro_setor|outro_participante_longo):(.*)$/m
 const PADRAO_SEM_VALOR = /\b(modelagem_sem_processo|sensibilizacao_com_processo)\b/
 
 const FRASE_COM_VALOR: Record<string, (valor: string) => string> = {
   setor_inativo: fraseDoSetorInativo, processo_de_outro_setor: fraseDoProcessoDeOutroSetor,
+  responsavel_de_outro_setor: fraseDoResponsavelDeOutroSetor, outro_participante_longo: fraseDoOutroParticipanteLongo,
 }
 const FRASE_SEM_VALOR: Record<string, string> = {
   modelagem_sem_processo: FRASE_DA_MODELAGEM_SEM_PROCESSO, sensibilizacao_com_processo: FRASE_DA_SENSIBILIZACAO_COM_PROCESSO,

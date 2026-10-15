@@ -14,10 +14,15 @@ const LINHA = {
     { processos: { id: 'p2', nome: 'Pagar Diária', situacao: 'em_andamento' } },
     { processos: { id: 'p1', nome: 'Arquivar Pasta', situacao: 'cancelado' } },
   ],
+  reunioes_usuarios: [
+    { usuarios: { id: 'u2', nome: 'Caio Teste', ativo: false } },
+    { usuarios: { id: 'u1', nome: 'Ana Teste', ativo: true } },
+  ],
+  reunioes_responsaveis: [{ responsaveis_do_setor: { id: 'x1', nome: 'Dani Teste' } }],
 }
 const DADOS: DadosDaReuniao = {
   tipo: 'modelagem', setorId: 's1', data: '2026-10-20', hora: '09:30', local: 'Sala 1', anotacoes: null, processosIds: ['p1'],
-  outrosParticipantes: ['Ana'],
+  usuariosIds: ['u1'], responsaveisIds: ['x1'], outrosParticipantes: ['Ana'],
 }
 
 function criar(cliente: ClienteSupabaseFalso) {
@@ -31,6 +36,8 @@ test('lista as reuniões com o setor e os processos por nome, a hora sem os segu
     id: 'r1', tipo: 'modelagem', setorId: 's1', setorSigla: 'TSA', setorAtivo: true, data: '2026-10-20', hora: '09:30',
     local: 'Sala 1', anotacoes: null, outrosParticipantes: ['Ana'],
     processos: [{ id: 'p1', nome: 'Arquivar Pasta', cancelado: true }, { id: 'p2', nome: 'Pagar Diária', cancelado: false }],
+    usuarios: [{ id: 'u1', nome: 'Ana Teste', ativo: true }, { id: 'u2', nome: 'Caio Teste', ativo: false }],
+    responsaveis: [{ id: 'x1', nome: 'Dani Teste' }],
   }])
   expect(cliente.pedidos[0]).toMatchObject({ tabela: 'reunioes', operacao: 'select' })
 })
@@ -64,14 +71,45 @@ test('os processos da escolha são os do setor, em qualquer situação, por nome
   expect(cliente.pedidos[0]).toMatchObject({ tabela: 'processos', filtro: ['setor_id', 's1'], ordem: [['nome', true]] })
 })
 
-test('salvar chama a função do banco com os parâmetros, inclusive os outros participantes que já estavam lá; id nulo cria', async () => {
+test('os usuários da escolha são só os ativos, por nome', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['usuarios.select'] = { data: [{ id: 'u1', nome: 'Ana Teste', ativo: true }], error: null }
+  expect(await criar(cliente).listarUsuariosAtivos()).toEqual([{ id: 'u1', nome: 'Ana Teste', ativo: true }])
+  expect(cliente.pedidos[0]).toMatchObject({ tabela: 'usuarios', filtro: ['ativo', true], ordem: [['nome', true]] })
+})
+
+test('os responsáveis da escolha são os do setor, por nome', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['responsaveis_do_setor.select'] = { data: [{ id: 'x1', nome: 'Dani Teste' }], error: null }
+  expect(await criar(cliente).listarResponsaveisDoSetor('s1')).toEqual([{ id: 'x1', nome: 'Dani Teste' }])
+  expect(cliente.pedidos[0]).toMatchObject({ tabela: 'responsaveis_do_setor', filtro: ['setor_id', 's1'], ordem: [['nome', true]] })
+})
+
+test('a leitura dos usuários e a dos responsáveis que falham viram erro com o motivo', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['usuarios.select'] = { data: null, error: { message: 'sem rede' } }
+  cliente.respostas['responsaveis_do_setor.select'] = { data: null, error: { message: 'sem rede' } }
+  await expect(criar(cliente).listarUsuariosAtivos()).rejects.toThrow('Falha ao ler os usuários: sem rede')
+  await expect(criar(cliente).listarResponsaveisDoSetor('s1'))
+    .rejects.toThrow('Falha ao ler os responsáveis do setor s1: sem rede')
+})
+
+test('a recusa de responsável de outro setor chega como TravaDoBanco com a frase pronta', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['rpc.salvar_reuniao'] = { data: null, error: { message: 'responsavel_de_outro_setor:Olga Teste', code: 'P0001' } }
+  const falha = await criar(cliente).salvarReuniao(null, DADOS).catch((erro: unknown) => erro)
+  expect(falha).toBeInstanceOf(TravaDoBanco)
+  expect((falha as Error).message).toBe('O responsável Olga Teste não é do setor da reunião.')
+})
+
+test('salvar chama a função do banco com os parâmetros, inclusive os participantes; id nulo cria', async () => {
   const cliente = new ClienteSupabaseFalso()
   await criar(cliente).salvarReuniao(null, DADOS)
   expect(cliente.pedidos[0]).toMatchObject({
     tabela: 'rpc', operacao: 'salvar_reuniao',
     valores: {
       p_id: null, p_tipo: 'modelagem', p_setor_id: 's1', p_data: '2026-10-20', p_hora: '09:30', p_local: 'Sala 1',
-      p_anotacoes: null, p_outros: ['Ana'], p_processos: ['p1'],
+      p_anotacoes: null, p_outros: ['Ana'], p_processos: ['p1'], p_usuarios: ['u1'], p_responsaveis: ['x1'],
     },
   })
 })

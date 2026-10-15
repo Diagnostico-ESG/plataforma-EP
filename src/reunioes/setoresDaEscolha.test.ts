@@ -10,7 +10,7 @@ const ATIVOS: SetorParaReuniao[] = [
 function reuniaoDoSetor(setorId: string, setorSigla: string, setorAtivo: boolean): Reuniao {
   return {
     id: 'r1', tipo: 'sensibilizacao', setorId, setorSigla, setorAtivo, data: '2026-10-20', hora: null, local: null,
-    anotacoes: null, outrosParticipantes: [], processos: [],
+    anotacoes: null, outrosParticipantes: [], processos: [], usuarios: [], responsaveis: [],
   }
 }
 

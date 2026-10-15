@@ -16,6 +16,9 @@ test('cada recusa por regra vira a frase da tela, com o valor que o banco devolv
   expect(frase('processo_de_outro_setor:Emitir Ofício', 'P0001')).toBe('O processo Emitir Ofício não é do setor da reunião.')
   expect(frase('modelagem_sem_processo', 'P0001')).toBe('A reunião de modelagem precisa de ao menos um processo.')
   expect(frase('sensibilizacao_com_processo', 'P0001')).toBe('A reunião de sensibilização não tem processos.')
+  expect(frase('responsavel_de_outro_setor:Olga Teste', 'P0001')).toBe('O responsável Olga Teste não é do setor da reunião.')
+  expect(frase('outro_participante_longo:201', 'P0001'))
+    .toBe('Cada outro participante pode ter no máximo 200 caracteres. Recebido: 201.')
 })
 
 test('texto longo demais cita o tamanho do que foi enviado', () => {

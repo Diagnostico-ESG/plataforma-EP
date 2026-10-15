@@ -66,7 +66,7 @@ test('salvar grava pelo id, volta aos dados já atualizados e a lista de trás r
   await waitFor(() => expect(screen.queryByRole('form', { name: 'Editar reunião' })).toBeNull())
   expect(falso.gravacoes).toEqual([{ id: 'r4', dados: {
     tipo: 'modelagem', setorId: 's1', data: '2026-11-30', hora: null, local: 'Sala 3',
-    anotacoes: 'Ficou combinado revisar o fluxo.\nPrazo na sexta.', processosIds: ['p2', 'p1'], outrosParticipantes: [],
+    anotacoes: 'Ficou combinado revisar o fluxo.\nPrazo na sexta.', processosIds: ['p2', 'p1'], usuariosIds: [], responsaveisIds: [], outrosParticipantes: [],
   } }])
   const dados = within(await painel().findByRole('region', { name: 'Dados da reunião' }))
   expect(await dados.findByText('30/11/2026')).toBeTruthy()

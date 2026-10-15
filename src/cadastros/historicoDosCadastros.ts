@@ -63,7 +63,7 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   processo_nome: 'Processo', responsavel_nome: 'Responsável', processo_pai_nome: 'Processo pai',
   nivel: 'Nível', obrigatoria: 'Obrigatória', ativa: 'Situação', ordem: 'Posição',
   data: 'Data', hora: 'Hora', local: 'Local', anotacoes: 'Anotações', outros_participantes: 'Outros participantes',
-  processos: 'Processos',
+  processos: 'Processos', usuarios: 'Usuários do EP',
 }
 
 // Os ids existem para o filtro; quem lê o histórico vê a sigla e o nome. Código e nome da etapa já estão no título.

@@ -451,6 +451,66 @@ export type Database = {
           },
         ]
       }
+      reunioes_responsaveis: {
+        Row: {
+          responsavel_id: string
+          reuniao_id: string
+        }
+        Insert: {
+          responsavel_id: string
+          reuniao_id: string
+        }
+        Update: {
+          responsavel_id?: string
+          reuniao_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reunioes_responsaveis_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "responsaveis_do_setor"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reunioes_responsaveis_reuniao_id_fkey"
+            columns: ["reuniao_id"]
+            isOneToOne: false
+            referencedRelation: "reunioes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reunioes_usuarios: {
+        Row: {
+          reuniao_id: string
+          usuario_id: string
+        }
+        Insert: {
+          reuniao_id: string
+          usuario_id: string
+        }
+        Update: {
+          reuniao_id?: string
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reunioes_usuarios_reuniao_id_fkey"
+            columns: ["reuniao_id"]
+            isOneToOne: false
+            referencedRelation: "reunioes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reunioes_usuarios_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       setores: {
         Row: {
           ativo: boolean
@@ -681,8 +741,10 @@ export type Database = {
           p_local: string
           p_outros: string[]
           p_processos: string[]
+          p_responsaveis: string[]
           p_setor_id: string
           p_tipo: Database["public"]["Enums"]["tipo_de_reuniao"]
+          p_usuarios: string[]
         }
         Returns: string
       }

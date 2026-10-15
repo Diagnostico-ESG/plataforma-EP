@@ -61,7 +61,7 @@ test('registra uma sensibilização sem processos; hora, local e anotações vaz
   expect(falso.gravacoes).toEqual([{
     id: null,
     dados: { tipo: 'sensibilizacao', setorId: 's1', data: '2026-11-20', hora: null, local: null, anotacoes: null, processosIds: [],
-      outrosParticipantes: [] },
+      usuariosIds: [], responsaveisIds: [], outrosParticipantes: [] },
   }])
   expect(await screen.findByText('20/11/2026')).toBeTruthy()
   expect(window.location.hash).toBe('#/reunioes')
@@ -83,7 +83,7 @@ test('registra uma modelagem com vários processos do setor, inclusive o cancela
   await waitFor(() => expect(falso.gravacoes).toHaveLength(1))
   expect(falso.gravacoes[0].dados).toEqual({
     tipo: 'modelagem', setorId: 's1', data: '2026-11-20', hora: '14:30', local: 'Sala 2', anotacoes: 'Mapeamos o fluxo.',
-    processosIds: ['p1', 'p2'], outrosParticipantes: [],
+    processosIds: ['p1', 'p2'], usuariosIds: [], responsaveisIds: [], outrosParticipantes: [],
   })
   expect(await screen.findByText('20/11/2026 14:30')).toBeTruthy()
 })

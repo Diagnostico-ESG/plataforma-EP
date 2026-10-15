@@ -6,7 +6,7 @@ import type { Perfil } from '../acesso/tipos'
 import { CadastrosFalso } from '../cadastros/CadastrosFalso'
 import { ProcessosFalso } from '../processos/ProcessosFalso'
 import { ReunioesFalso, type SetorDoFalso } from '../reunioes/ReunioesFalso'
-import type { ProcessoDaReuniao, Reuniao } from '../reunioes/tipos'
+import type { ProcessoDaReuniao, ResponsavelDaReuniao, Reuniao, UsuarioDaReuniao } from '../reunioes/tipos'
 
 /** Hoje nos testes de reuniões: a tela calcula "próxima" e "realizada" pelo relógio. */
 export const HOJE_DE_TESTE = new Date(2026, 9, 14, 12, 0)
@@ -29,10 +29,24 @@ export const PROCESSOS_DE_TESTE: Record<string, ProcessoDaReuniao[]> = {
   s3: [],
 }
 
+/** O cadastro de usuários do EP: Ana e Bia ativas, Caio inativo. */
+export const USUARIOS_DE_TESTE: UsuarioDaReuniao[] = [
+  { id: 'u1', nome: 'Ana Teste', ativo: true },
+  { id: 'u2', nome: 'Bia Teste', ativo: true },
+  { id: 'u3', nome: 'Caio Teste', ativo: false },
+]
+
+/** Os responsáveis de cada setor (pelo id do setor). */
+export const RESPONSAVEIS_DE_TESTE: Record<string, ResponsavelDaReuniao[]> = {
+  s1: [{ id: 'x1', nome: 'Dani Teste' }, { id: 'x2', nome: 'Edu Teste' }],
+  s2: [{ id: 'x3', nome: 'Fabi Teste' }],
+  s3: [],
+}
+
 export function reuniao(id: string, data: string, mudancas: Partial<Reuniao> = {}): Reuniao {
   return {
     id, tipo: 'sensibilizacao', setorId: 's1', setorSigla: 'TSA', setorAtivo: true, data, hora: null, local: null,
-    anotacoes: null, outrosParticipantes: [], processos: [], ...mudancas,
+    anotacoes: null, outrosParticipantes: [], processos: [], usuarios: [], responsaveis: [], ...mudancas,
   }
 }
 
@@ -58,6 +72,8 @@ export function montarReunioes({ perfil = 'integrante_ep', reunioes = REUNIOES_D
   falso.reunioes = reunioes
   falso.setores = SETORES_DE_TESTE
   falso.processosDosSetores = PROCESSOS_DE_TESTE
+  falso.usuarios = USUARIOS_DE_TESTE
+  falso.responsaveisDosSetores = RESPONSAVEIS_DE_TESTE
   ajustar?.(falso)
   const acesso = AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })
   render(<App acesso={acesso} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} reunioes={falso} />)

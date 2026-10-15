@@ -2,10 +2,14 @@ import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import type { EventoDoCadastro } from '../cadastros/tipos'
 import { estadoDoEventoDaReuniao } from './estadoDoEvento'
+import { compararPorNome } from './ordemPorNome'
 import {
-  FRASE_DA_MODELAGEM_SEM_PROCESSO, FRASE_DA_SENSIBILIZACAO_COM_PROCESSO, fraseDoProcessoDeOutroSetor, fraseDoSetorInativo,
+  FRASE_DA_MODELAGEM_SEM_PROCESSO, FRASE_DA_SENSIBILIZACAO_COM_PROCESSO, fraseDoOutroParticipanteLongo,
+  fraseDoProcessoDeOutroSetor, fraseDoResponsavelDeOutroSetor, fraseDoSetorInativo,
 } from './recusasDeReunioes'
-import type { DadosDaReuniao, ModuloDeReunioes, ProcessoDaReuniao, Reuniao, SetorParaReuniao } from './tipos'
+import type {
+  DadosDaReuniao, ModuloDeReunioes, ProcessoDaReuniao, ResponsavelDaReuniao, Reuniao, SetorParaReuniao, UsuarioDaReuniao,
+} from './tipos'
 
 export type SetorDoFalso = SetorParaReuniao & { ativo: boolean }
 export type GravacaoDeReuniao = { id: string | null; dados: DadosDaReuniao }
@@ -18,6 +22,10 @@ export class ReunioesFalso implements ModuloDeReunioes {
   setores: SetorDoFalso[] = []
   /** Os processos de cada setor (pelo id do setor), por nome. */
   processosDosSetores: Record<string, ProcessoDaReuniao[]> = {}
+  /** O cadastro de usuários, ativos ou não (a escolha do formulário só mostra os ativos). */
+  usuarios: UsuarioDaReuniao[] = []
+  /** Os responsáveis de cada setor (pelo id do setor). */
+  responsaveisDosSetores: Record<string, ResponsavelDaReuniao[]> = {}
   falharLeitura = false
   segurarLeitura = false
   falharLeituraDaReuniao = false
@@ -56,6 +64,16 @@ export class ReunioesFalso implements ModuloDeReunioes {
     return [...(this.processosDosSetores[setorId] ?? [])]
   }
 
+  async listarUsuariosAtivos(): Promise<UsuarioDaReuniao[]> {
+    this.conferirOpcoes()
+    return this.usuarios.filter((usuario) => usuario.ativo).sort(compararPorNome)
+  }
+
+  async listarResponsaveisDoSetor(setorId: string): Promise<ResponsavelDaReuniao[]> {
+    this.conferirOpcoes()
+    return [...(this.responsaveisDosSetores[setorId] ?? [])].sort(compararPorNome)
+  }
+
   async salvarReuniao(id: string | null, dados: DadosDaReuniao): Promise<void> {
     this.falharSeConfigurado()
     const anterior = this.reunioes.find((reuniao) => reuniao.id === id)
@@ -74,6 +92,30 @@ export class ReunioesFalso implements ModuloDeReunioes {
     if (!anterior) throw new CadastroInexistente()
     this.reunioes = this.reunioes.filter((reuniao) => reuniao.id !== id)
     this.registrarEvento(anterior, undefined)
+  }
+
+  /**
+   * Imita o gatilho do banco: o responsável excluído sai das reuniões em que esteve e o nome dele passa a ser um dos
+   * outros participantes (uma vez só), com um evento de alteração por reunião.
+   */
+  excluirResponsavelDoSetor(id: string): void {
+    const responsavel = Object.values(this.responsaveisDosSetores).flat().find((candidato) => candidato.id === id)
+    if (!responsavel) return
+    for (const [setorId, lista] of Object.entries(this.responsaveisDosSetores)) {
+      this.responsaveisDosSetores[setorId] = lista.filter((candidato) => candidato.id !== id)
+    }
+    this.reunioes = this.reunioes.map((reuniao) => this.semOResponsavel(reuniao, responsavel))
+  }
+
+  private semOResponsavel(reuniao: Reuniao, responsavel: ResponsavelDaReuniao): Reuniao {
+    if (!reuniao.responsaveis.some((presente) => presente.id === responsavel.id)) return reuniao
+    const outros = reuniao.outrosParticipantes
+    const depois: Reuniao = {
+      ...reuniao, responsaveis: reuniao.responsaveis.filter((presente) => presente.id !== responsavel.id),
+      outrosParticipantes: outros.includes(responsavel.nome) ? outros : [...outros, responsavel.nome],
+    }
+    this.registrarEvento(reuniao, depois)
+    return depois
   }
 
   async lerHistoricoDaReuniao(id: string): Promise<EventoDoCadastro[]> {
@@ -111,6 +153,21 @@ export class ReunioesFalso implements ModuloDeReunioes {
     const doSetor = this.processosDosSetores[dados.setorId] ?? []
     const fora = dados.processosIds.find((processoId) => !doSetor.some((processo) => processo.id === processoId))
     if (fora) throw new TravaDoBanco(fraseDoProcessoDeOutroSetor(this.nomeDoProcesso(fora)))
+    this.conferirParticipantes(dados)
+  }
+
+  // Responsável de outro setor e outro participante longo demais, como o banco os recusa.
+  private conferirParticipantes(dados: DadosDaReuniao): void {
+    const doSetor = this.responsaveisDosSetores[dados.setorId] ?? []
+    const fora = dados.responsaveisIds.find((responsavelId) => !doSetor.some((responsavel) => responsavel.id === responsavelId))
+    if (fora) throw new TravaDoBanco(fraseDoResponsavelDeOutroSetor(this.nomeDoResponsavel(fora)))
+    const longo = dados.outrosParticipantes.find((nome) => nome.length > 200)
+    if (longo) throw new TravaDoBanco(fraseDoOutroParticipanteLongo(String(longo.length)))
+  }
+
+  private nomeDoResponsavel(id: string): string {
+    const todos = Object.values(this.responsaveisDosSetores).flat()
+    return todos.find((responsavel) => responsavel.id === id)?.nome ?? id
   }
 
   private nomeDoProcesso(id: string): string {
@@ -125,8 +182,10 @@ export class ReunioesFalso implements ModuloDeReunioes {
       data: dados.data, hora: dados.hora, local: dados.local, anotacoes: dados.anotacoes,
       outrosParticipantes: dados.outrosParticipantes,
       // Por nome, como o módulo real devolve (reuniaoDaLinha).
-      processos: doSetor.filter((processo) => dados.processosIds.includes(processo.id))
-        .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' })),
+      processos: doSetor.filter((processo) => dados.processosIds.includes(processo.id)).sort(compararPorNome),
+      usuarios: this.usuarios.filter((usuario) => dados.usuariosIds.includes(usuario.id)).sort(compararPorNome),
+      responsaveis: (this.responsaveisDosSetores[dados.setorId] ?? [])
+        .filter((responsavel) => dados.responsaveisIds.includes(responsavel.id)).sort(compararPorNome),
     }
   }
 }
