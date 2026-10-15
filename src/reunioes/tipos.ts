@@ -72,4 +72,6 @@ export type ModuloDeReunioes = {
   excluirReuniao(id: string): Promise<void>
   /** Os eventos da reunião, do mais recente para o mais antigo. */
   lerHistoricoDaReuniao(id: string): Promise<EventoDoCadastro[]>
+  /** Os eventos de reunião em que o processo aparece, antes ou depois da mudança (inclui a reunião já excluída), do mais recente ao mais antigo. */
+  lerEventosDeReuniaoDoProcesso(processoId: string): Promise<EventoDoCadastro[]>
 }

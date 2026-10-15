@@ -39,6 +39,8 @@ export class ReunioesFalso implements ModuloDeReunioes {
   segurarResponsaveis = false
   falharHistoricoDaReuniao = false
   segurarHistoricoDaReuniao = false
+  falharEventosDoProcesso = false
+  segurarEventosDoProcesso = false
   /** Os eventos que o banco gravaria, na ordem em que aconteceram (a leitura devolve do mais recente). */
   historico: EventoDoCadastro[] = []
   /** Texto: motivo em português (falha genérica). Error: a recusa pronta (TravaDoBanco), como o módulo real. */
@@ -131,6 +133,14 @@ export class ReunioesFalso implements ModuloDeReunioes {
     if (this.segurarHistoricoDaReuniao) return new Promise<never>(() => {})
     if (this.falharHistoricoDaReuniao) throw new Error('falha de conexão simulada')
     return this.historico.filter((evento) => evento.entidadeRef === id).reverse()
+  }
+
+  async lerEventosDeReuniaoDoProcesso(processoId: string): Promise<EventoDoCadastro[]> {
+    if (this.segurarEventosDoProcesso) return new Promise<never>(() => {})
+    if (this.falharEventosDoProcesso) throw new Error('falha de conexão simulada')
+    const cita = (estado: EventoDoCadastro['antes']) =>
+      Array.isArray(estado?.processos) && (estado.processos as { id: string }[]).some((processo) => processo.id === processoId)
+    return this.historico.filter((evento) => cita(evento.antes) || cita(evento.depois)).reverse()
   }
 
   // Um evento por gravação, com o estado completo; gravação sem mudança não gera evento (como o banco).

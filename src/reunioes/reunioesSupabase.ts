@@ -19,6 +19,7 @@ export function criarReunioesSupabase(cliente: ClienteSupabase): ModuloDeReunioe
     salvarReuniao: (id, dados) => salvarReuniao(cliente, id, dados),
     excluirReuniao: (id) => excluirReuniao(cliente, id),
     lerHistoricoDaReuniao: (id) => lerHistoricoDaReuniao(cliente, id),
+    lerEventosDeReuniaoDoProcesso: (processoId) => lerEventosDeReuniaoDoProcesso(cliente, processoId),
   }
 }
 
@@ -85,4 +86,22 @@ async function lerHistoricoDaReuniao(cliente: ClienteSupabase, id: string): Prom
     .order('ocorrido_em', { ascending: false }).order('id', { ascending: false })
   if (error) throw new Error(`Falha ao ler o histórico da reunião ${id}: ${error.message}`)
   return (data as unknown as EventoDoBanco[]).map(eventoDoCadastro)
+}
+
+// O estado do evento guarda os processos da reunião como [{ id, nome }]; o filtro é feito aqui, e não no banco, porque
+// a consulta por dentro do JSON não é conferida pelos testes (otimização no backlog).
+async function lerEventosDeReuniaoDoProcesso(cliente: ClienteSupabase, processoId: string): Promise<EventoDoCadastro[]> {
+  const { data, error } = await cliente.from('eventos').select(COLUNAS_DO_EVENTO).eq('entidade', 'reuniao')
+    .order('ocorrido_em', { ascending: false }).order('id', { ascending: false })
+  if (error) throw new Error(`Falha ao ler as reuniões do histórico do processo ${processoId}: ${error.message}`)
+  return (data as unknown as EventoDoBanco[]).map(eventoDoCadastro).filter((evento) => citaOProcesso(evento, processoId))
+}
+
+function citaOProcesso({ antes, depois }: EventoDoCadastro, processoId: string): boolean {
+  return [antes, depois].some((estado) => processosDoEstado(estado).some((processo) => processo.id === processoId))
+}
+
+function processosDoEstado(estado: EventoDoCadastro['antes']): { id: string }[] {
+  const processos = estado?.processos
+  return Array.isArray(processos) ? (processos as { id: string }[]) : []
 }

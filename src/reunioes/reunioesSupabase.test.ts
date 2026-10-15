@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { expect, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { ClienteSupabaseFalso } from '../testes/ClienteSupabaseFalso'
@@ -177,4 +177,32 @@ test('o histórico que falha vira erro com o motivo', async () => {
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas['eventos.select'] = { data: null, error: { message: 'sem rede' } }
   await expect(criar(cliente).lerHistoricoDaReuniao('r1')).rejects.toThrow('Falha ao ler o histórico da reunião r1: sem rede')
+})
+
+describe('eventos de reunião de um processo', () => {
+  const evento = (id: number, antes: unknown, depois: unknown) => ({
+    id, ocorrido_em: `2026-10-1${id}T15:00:00Z`, acao: 'editar', entidade: 'reuniao', entidade_ref: `r${id}`,
+    detalhes: { antes, depois }, autor: { nome: 'Pessoa Fictícia' },
+  })
+  const COM_P1 = { processos: [{ id: 'p1', nome: 'Emitir Ofício' }] }
+  const COM_P2 = { processos: [{ id: 'p2', nome: 'Pagar Diária' }] }
+
+  test('traz só os eventos que citam o processo no estado de antes ou de depois, inclusive a reunião excluída', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['eventos.select'] = { data: [
+      evento(1, null, COM_P1), evento(2, COM_P2, COM_P2), evento(3, COM_P1, null), evento(4, { local: 'x' }, { local: 'y' }),
+    ], error: null }
+    const lidos = await criar(cliente).lerEventosDeReuniaoDoProcesso('p1')
+    expect(lidos.map((lido) => lido.id)).toEqual([1, 3])
+    expect(cliente.pedidos[0]).toMatchObject({
+      tabela: 'eventos', filtros: [['entidade', 'reuniao']], ordem: [['ocorrido_em', false], ['id', false]],
+    })
+  })
+
+  test('a leitura que falha vira erro com o motivo', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['eventos.select'] = { data: null, error: { message: 'sem rede' } }
+    await expect(criar(cliente).lerEventosDeReuniaoDoProcesso('p1'))
+      .rejects.toThrow('Falha ao ler as reuniões do histórico do processo p1: sem rede')
+  })
 })

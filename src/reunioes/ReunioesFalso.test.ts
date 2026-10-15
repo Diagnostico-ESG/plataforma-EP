@@ -61,6 +61,26 @@ describe('eventos que o falso imita do banco', () => {
     expect((await reunioes.lerHistoricoDaReuniao('r2')).map((evento) => evento.acao)).toEqual(['criar'])
   })
 
+  test('os eventos de reunião do processo citam o processo antes ou depois, do mais recente ao mais antigo', async () => {
+    const reunioes = falso()
+    await reunioes.salvarReuniao(null, DADOS)
+    await reunioes.salvarReuniao(null, { ...DADOS, tipo: 'sensibilizacao', processosIds: [] })
+    await reunioes.excluirReuniao('r1')
+    const eventos = await reunioes.lerEventosDeReuniaoDoProcesso('p1')
+    expect(eventos.map((evento) => evento.acao)).toEqual(['excluir', 'criar'])
+    expect(await reunioes.lerEventosDeReuniaoDoProcesso('p9')).toEqual([])
+  })
+
+  test('a leitura dos eventos do processo pode falhar ou ficar esperando', async () => {
+    const reunioes = falso()
+    reunioes.falharEventosDoProcesso = true
+    await expect(reunioes.lerEventosDeReuniaoDoProcesso('p1')).rejects.toThrow('falha de conexão simulada')
+    reunioes.falharEventosDoProcesso = false
+    reunioes.segurarEventosDoProcesso = true
+    const resposta = await Promise.race([reunioes.lerEventosDeReuniaoDoProcesso('p1'), Promise.resolve('esperando')])
+    expect(resposta).toBe('esperando')
+  })
+
   test('a leitura do histórico pode falhar ou ficar esperando', async () => {
     const reunioes = falso()
     reunioes.falharHistoricoDaReuniao = true
