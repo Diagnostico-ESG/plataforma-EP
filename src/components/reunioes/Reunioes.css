@@ -19,9 +19,16 @@
   white-space: pre-wrap;
 }
 
-/* Tipo e processos são grupos de escolha: caixas e botões de opção, uma por linha, sem a moldura padrão do fieldset. */
+/* A dica abaixo de um campo (por exemplo, "Um nome por linha."): só texto, discreta. */
+.reuniao-dica {
+  color: var(--texto-2);
+  font-size: var(--tam-rotulo);
+}
+
+/* Tipo, processos e participantes são grupos de escolha: caixas e botões de opção, uma por linha, sem a moldura
+   padrão do fieldset. */
 .reuniao-tipo,
-.reuniao-processos {
+.reuniao-escolha {
   display: grid;
   gap: var(--esp-1);
   margin: 0;
@@ -30,7 +37,7 @@
 }
 
 .reuniao-tipo legend,
-.reuniao-processos legend {
+.reuniao-escolha legend {
   padding: 0;
   margin-bottom: var(--esp-1);
 }

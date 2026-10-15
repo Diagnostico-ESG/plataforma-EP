@@ -32,6 +32,11 @@ export class ReunioesFalso implements ModuloDeReunioes {
   segurarLeituraDaReuniao = false
   /** A leitura dos setores e dos processos do formulário. */
   falharOpcoes = false
+  /** A leitura dos usuários e a dos responsáveis do setor, cada uma por si. */
+  falharUsuarios = false
+  segurarUsuarios = false
+  falharResponsaveis = false
+  segurarResponsaveis = false
   falharHistoricoDaReuniao = false
   segurarHistoricoDaReuniao = false
   /** Os eventos que o banco gravaria, na ordem em que aconteceram (a leitura devolve do mais recente). */
@@ -65,11 +70,15 @@ export class ReunioesFalso implements ModuloDeReunioes {
   }
 
   async listarUsuariosAtivos(): Promise<UsuarioDaReuniao[]> {
+    if (this.segurarUsuarios) return new Promise<never>(() => {})
+    if (this.falharUsuarios) throw new Error('falha de conexão simulada')
     this.conferirOpcoes()
     return this.usuarios.filter((usuario) => usuario.ativo).sort(compararPorNome)
   }
 
   async listarResponsaveisDoSetor(setorId: string): Promise<ResponsavelDaReuniao[]> {
+    if (this.segurarResponsaveis) return new Promise<never>(() => {})
+    if (this.falharResponsaveis) throw new Error('falha de conexão simulada')
     this.conferirOpcoes()
     return [...(this.responsaveisDosSetores[setorId] ?? [])].sort(compararPorNome)
   }

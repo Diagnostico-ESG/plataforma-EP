@@ -80,6 +80,21 @@ describe('participantes', () => {
     expect(await reunioes.listarResponsaveisDoSetor('s9')).toEqual([])
   })
 
+  test('a leitura dos usuários e a dos responsáveis podem falhar ou ficar esperando, cada uma por si', async () => {
+    const reunioes = falso()
+    reunioes.falharUsuarios = true
+    await expect(reunioes.listarUsuariosAtivos()).rejects.toThrow('falha de conexão simulada')
+    expect(await reunioes.listarResponsaveisDoSetor('s1')).toHaveLength(2)
+    reunioes.falharUsuarios = false
+    reunioes.falharResponsaveis = true
+    await expect(reunioes.listarResponsaveisDoSetor('s1')).rejects.toThrow('falha de conexão simulada')
+    reunioes.falharResponsaveis = false
+    reunioes.segurarResponsaveis = true
+    expect(await Promise.race([reunioes.listarResponsaveisDoSetor('s1'), Promise.resolve('esperando')])).toBe('esperando')
+    reunioes.segurarUsuarios = true
+    expect(await Promise.race([reunioes.listarUsuariosAtivos(), Promise.resolve('esperando')])).toBe('esperando')
+  })
+
   test('salvar guarda usuários (mesmo o inativo) e responsáveis por nome, e o evento os traz', async () => {
     const reunioes = falso()
     await reunioes.salvarReuniao(null, { ...DADOS, usuariosIds: ['u2', 'u1'], responsaveisIds: ['x2', 'x1'] })

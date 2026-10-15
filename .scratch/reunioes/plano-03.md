@@ -103,7 +103,7 @@ Modificar: `supabase/tests/23_reunioes.test.sql`, `src/types/database.ts` (gerad
 
 **Interfaces — Produz:** `CaixasDeMarcar({ legenda, opcoes, marcados, aoMudar })` com `opcoes: { id: string; rotulo: string }[]`; `EscolhaDeUsuarios({ reunioes, daReuniao, marcados, aoMudar })`; `EscolhaDeResponsaveis({ reunioes, setorId, daReuniao, marcados, aoMudar })`; `OutrosParticipantes({ valor, aoMudar })`; `CamposDoFormulario` ganha a prop `reuniao?: Reuniao` (para os já marcados que saíram da lista).
 
-- [ ] Testes de tela que falham (aplicativo inteiro e `ReunioesFalso`; arte anterior: `App.registrarReuniao` e `App.editarReuniao`), em `App.participantesNoFormulario.test.tsx`:
+- [x] Testes de tela que falham (aplicativo inteiro e `ReunioesFalso`; arte anterior: `App.registrarReuniao` e `App.editarReuniao`), em `App.participantesNoFormulario.test.tsx`:
   - o formulário de nova reunião mostra "Usuários do EP" com os usuários ativos (sem o inativo), a área "Outros participantes" e, só depois de escolhido o setor, "Responsáveis do setor" com os do setor escolhido; setor sem responsáveis mostra "Este setor ainda não tem responsáveis.";
   - marcar dois usuários e um responsável e escrever "  Gil Externo  \n\nHilda Externa" grava `usuariosIds`, `responsaveisIds` e `outrosParticipantes: ['Gil Externo', 'Hilda Externa']`; a reunião aparece no painel com os nomes (conferência leve; o painel é provado no outro arquivo);
   - trocar o setor desmarca os responsáveis e mantém os usuários marcados;
@@ -111,8 +111,8 @@ Modificar: `supabase/tests/23_reunioes.test.sql`, `src/types/database.ts` (gerad
   - recusa "responsável de outro setor" e "outro participante com mais de 200 caracteres" aparecem em vermelho com o preenchido mantido (falha programada no falso);
   - carregando e erro com [Tentar de novo] nas duas listas (`falharOpcoes`);
   - a Consulta não vê [Editar] nem o formulário.
-- [ ] Implementar na ordem: (a) `CaixasDeMarcar` e `EscolhaDeProcessos` usando-o (os testes de processos do formulário continuam passando); (b) `EscolhaDeUsuarios` e `EscolhaDeResponsaveis` (carregando, erro com [Tentar de novo], vazio, lista, no molde de `EscolhaDeProcessos`, usando `usuariosDaEscolha`/`responsaveisDaEscolha`, `alternarMarcado` e " (inativo)" no nome do inativo); (c) `OutrosParticipantes` (rótulo "Outros participantes", dica "Um nome por linha." ligada por `aria-describedby`); (d) `CamposDoFormulario` põe as três partes entre o local e as anotações e passa `reuniao`; `EscolhaDeResponsaveis` leva `key={campos.setorId}` e só aparece com setor escolhido; (e) `FormularioDaReuniao` repassa `reuniao`.
-- [ ] `npx vitest run src/App.participantesNoFormulario.test.tsx src/App.registrarReuniao.test.tsx src/App.editarReuniao.test.tsx` passa; arquivos ≤ 300 linhas. Comitar.
+- [x] Implementar na ordem: (a) `CaixasDeMarcar` e `EscolhaDeProcessos` usando-o (os testes de processos do formulário continuam passando); (b) `EscolhaDeUsuarios` e `EscolhaDeResponsaveis` (carregando, erro com [Tentar de novo], vazio, lista, no molde de `EscolhaDeProcessos`, usando `usuariosDaEscolha`/`responsaveisDaEscolha`, `alternarMarcado` e " (inativo)" no nome do inativo); (c) `OutrosParticipantes` (rótulo "Outros participantes", dica "Um nome por linha." ligada por `aria-describedby`); (d) `CamposDoFormulario` põe as três partes entre o local e as anotações e passa `reuniao`; `EscolhaDeResponsaveis` leva `key={campos.setorId}` e só aparece com setor escolhido; (e) `FormularioDaReuniao` repassa `reuniao`.
+- [x] `npx vitest run src/App.participantesNoFormulario.test.tsx src/App.registrarReuniao.test.tsx src/App.editarReuniao.test.tsx` passa; arquivos ≤ 300 linhas. Comitar.
 
 ### Tarefa 7 — Painel com participantes e responsável excluído (critérios 5, 6, 7)
 

@@ -51,7 +51,7 @@ function FormularioPronto({ reunioes, setores, titulo, reuniao, aoSalvar, aoCanc
   return (
     <form className="formulario-do-processo" aria-label={titulo} noValidate onSubmit={enviar}>
       <h3 className="painel-subtitulo">{titulo}</h3>
-      <CamposDoFormulario campos={campos} setores={setoresDaEscolha(setores, reuniao)} reunioes={reunioes}
+      <CamposDoFormulario campos={campos} setores={setoresDaEscolha(setores, reuniao)} reunioes={reunioes} reuniao={reuniao}
         aoMudar={(mudanca) => setCampos((atuais) => comMudanca(atuais, mudanca))} />
       <div className="formulario-do-processo-botoes">
         <button type="submit" className="botao botao-principal" disabled={enviando || faltaPreencher(campos)}>Salvar</button>
