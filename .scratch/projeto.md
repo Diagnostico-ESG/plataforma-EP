@@ -18,7 +18,7 @@ Plataforma web interna do Centro Estadual de Desburocratização (CED) para cont
 1. **Login e perfis** (login-perfis)**:** usuários, os três perfis, criação de contas pela plataforma e segurança por perfil no banco.
 2. **Cadastros básicos** (cadastros-basicos)**:** setores (sigla e responsável), macroprocessos e os setores de cada macroprocesso.
 3. **Processos e etapas** (processos-etapas)**:** processos e subprocessos, catálogo de etapas configurável, andamento com dispensa e "realizada anteriormente", reclassificação e o histórico de alterações (que as funcionalidades seguintes também alimentam).
-4. **Reuniões:** de sensibilização e de modelagem, com data, local, participantes e anotações.
+4. **Reuniões** (reunioes)**:** de sensibilização e de modelagem, com data, local, participantes e anotações.
 5. **Documentos e versões:** envio de fluxogramas e relatórios, numeração de versões, versões históricas (sufixo F) e o padrão de nome dos arquivos.
 6. **Revisões e aprovação:** revisão interna (o revisor precisa ser diferente de quem enviou), rodadas de revisão pelo setor com os e-mails e aprovação com o número do E-protocolo.
 7. **Visualizador de fluxograma:** abre o .bpmn no navegador, no detalhe do processo.
