@@ -62,8 +62,23 @@ const MENSAGENS: Record<CodigoDeRecusa, string> = {
 const FORMATO_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const FORMATO_ID_DO_DRIVE = /^[A-Za-z0-9_-]{1,200}$/
 
-function recusar(codigo: CodigoDeRecusa, detalhe?: string): Recusa {
+const STATUS_POR_CODIGO: Partial<Record<CodigoDeRecusa, number>> = {
+  sem_login: 401,
+  usuario_inativo: 403,
+  sem_permissao: 403,
+}
+
+export function recusar(codigo: CodigoDeRecusa, detalhe?: string): Recusa {
   return { codigo, mensagem: detalhe ? `${MENSAGENS[codigo]} (${detalhe})` : MENSAGENS[codigo] }
+}
+
+export function statusDaRecusa(recusa: Recusa): number {
+  return STATUS_POR_CODIGO[recusa.codigo] ?? 400
+}
+
+export function lerAcao(corpo: unknown): Acao | null {
+  const acao = eCorpo(corpo) ? corpo.acao : null
+  return acao === 'iniciar_envio' || acao === 'baixar' ? acao : null
 }
 
 function falhar(codigo: CodigoDeRecusa, detalhe?: string): Falha {

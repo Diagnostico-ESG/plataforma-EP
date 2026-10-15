@@ -3,6 +3,9 @@ import {
   conferirChamador,
   conferirProcessoEmAndamento,
   extensaoDoNome,
+  lerAcao,
+  recusar,
+  statusDaRecusa,
   LIMITE_DE_TAMANHO,
   validarBaixar,
   validarIniciarEnvio,
@@ -169,5 +172,29 @@ describe('extensaoDoNome', () => {
     ['termina em ponto.', ''],
   ])('%s → %s', (nome, esperado) => {
     expect(extensaoDoNome(nome)).toBe(esperado)
+  })
+})
+
+describe('lerAcao', () => {
+  it.each(['iniciar_envio', 'baixar'])('lê a ação %s', (acao) => {
+    expect(lerAcao({ acao })).toBe(acao)
+  })
+
+  it.each([null, 'baixar', {}, { acao: 'apagar' }, { acao: 3 }])('devolve null para %j', (corpo) => {
+    expect(lerAcao(corpo)).toBeNull()
+  })
+})
+
+describe('statusDaRecusa', () => {
+  it.each([
+    ['sem_login', 401],
+    ['usuario_inativo', 403],
+    ['sem_permissao', 403],
+    ['entrada_invalida', 400],
+    ['processo_fora_de_andamento', 400],
+    ['extensao_nao_aceita', 400],
+    ['arquivo_grande', 400],
+  ] as const)('%s → %i', (codigo, status) => {
+    expect(statusDaRecusa(recusar(codigo))).toBe(status)
   })
 })

@@ -26,6 +26,45 @@ export function eErroDeCota(corpo: unknown): boolean {
   })
 }
 
+const TIPOS_MIME: Record<string, string> = {
+  png: 'image/png',
+  pdf: 'application/pdf',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  bpmn: 'application/xml',
+}
+
+// O .bpm do Bizagi não tem tipo registrado; vai como binário genérico.
+export function tipoMimeDaExtensao(extensao: string): string {
+  return TIPOS_MIME[extensao] ?? 'application/octet-stream'
+}
+
+export interface ContaDeServico {
+  email: string
+  chave: string
+}
+
+const ERRO_DA_CONTA =
+  'segredo EP_DRIVE_CONTA_JSON_BASE64 inválido (recebido: conteúdo omitido); esperado: o JSON da chave da conta de serviço do Google, em base64'
+
+function decodificarBase64(texto: string): string {
+  const binario = atob(texto)
+  return new TextDecoder().decode(Uint8Array.from(binario, (letra) => letra.charCodeAt(0)))
+}
+
+// O conteúdo nunca entra na mensagem de erro: é a chave privada.
+export function lerContaDeServico(base64: string): ContaDeServico {
+  let conta: { client_email?: unknown; private_key?: unknown }
+  try {
+    conta = JSON.parse(decodificarBase64(base64.trim()))
+  } catch {
+    throw new Error(ERRO_DA_CONTA)
+  }
+  if (typeof conta?.client_email !== 'string' || typeof conta?.private_key !== 'string') {
+    throw new Error(ERRO_DA_CONTA)
+  }
+  return { email: conta.client_email, chave: conta.private_key }
+}
+
 export function origemAceita(origem: string | null, aceitas: string): boolean {
   if (!origem) return false
   return aceitas.split(',').map((item) => item.trim()).filter(Boolean).includes(origem)

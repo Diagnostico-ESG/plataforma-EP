@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { cabecalhosDeOrigem, consultaDePastaPorNome, eErroDeCota, origemAceita } from './drive.ts'
+import {
+  cabecalhosDeOrigem,
+  consultaDePastaPorNome,
+  eErroDeCota,
+  lerContaDeServico,
+  origemAceita,
+  tipoMimeDaExtensao,
+} from './drive.ts'
 
 describe('consultaDePastaPorNome', () => {
   it('procura a pasta pelo nome e pelo pai, fora da lixeira', () => {
@@ -61,5 +68,45 @@ describe('cabecalhosDeOrigem', () => {
 
   it('não libera origem fora da lista', () => {
     expect(cabecalhosDeOrigem('https://c.z', 'https://a.x')).toEqual(comuns)
+  })
+})
+
+describe('tipoMimeDaExtensao', () => {
+  it.each([
+    ['png', 'image/png'],
+    ['pdf', 'application/pdf'],
+    ['docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+    ['bpmn', 'application/xml'],
+    ['bpm', 'application/octet-stream'],
+  ])('%s → %s', (extensao, tipo) => {
+    expect(tipoMimeDaExtensao(extensao)).toBe(tipo)
+  })
+})
+
+// O JSON da conta vem do Google em UTF-8; o base64 é o que o usuário grava como segredo.
+function paraBase64(texto: string): string {
+  return btoa(String.fromCharCode(...new TextEncoder().encode(texto)))
+}
+
+describe('lerContaDeServico', () => {
+  const chave = '-----BEGIN PRIVATE KEY-----\nabc\n-----END PRIVATE KEY-----\n'
+  const json = JSON.stringify({ type: 'service_account', client_email: 'ep-drive@exemplo.iam.gserviceaccount.com', private_key: chave })
+  const base64 = paraBase64(json)
+
+  it('lê o e-mail e a chave do JSON da conta de serviço em base64', () => {
+    expect(lerContaDeServico(base64)).toEqual({ email: 'ep-drive@exemplo.iam.gserviceaccount.com', chave })
+  })
+
+  it.each([
+    ['texto que não é base64', '%%%'],
+    ['base64 que não é JSON', paraBase64('não é json')],
+    ['JSON sem a chave', paraBase64(JSON.stringify({ client_email: 'x@y' }))],
+  ])('recusa %s, sem repetir o conteúdo', (_nome, valor) => {
+    expect(() => lerContaDeServico(valor)).toThrow(/EP_DRIVE_CONTA_JSON_BASE64/)
+    try {
+      lerContaDeServico(valor)
+    } catch (erro) {
+      expect(String(erro)).not.toContain(valor)
+    }
   })
 })
