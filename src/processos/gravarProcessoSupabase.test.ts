@@ -53,6 +53,17 @@ describe('gravação de processos no módulo real', () => {
     expect(falha.message).toBe('Este processo tem 3 subprocessos; reclassifique-os ou exclua-os antes.')
   })
 
+  test.each([
+    ['processo_com_reunioes:1', 'Não é possível excluir: processo foi tratado em 1 reunião. Cancele o processo em vez de excluí-lo.'],
+    ['processo_com_reunioes:3', 'Não é possível excluir: processo foi tratado em 3 reuniões. Cancele o processo em vez de excluí-lo.'],
+  ])('excluir processo tratado em reunião: "%s" vira a frase com a contagem', async (mensagem, frase) => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['processos.delete'] = { data: null, error: { code: 'P0001', message: mensagem } }
+    const falha = await falhaDe(criar(cliente).excluirProcesso('p1'))
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect(falha.message).toBe(frase)
+  })
+
   test('editar atualiza os campos editáveis pelo id e não manda o tipo nem o pai', async () => {
     const cliente = new ClienteSupabaseFalso()
     cliente.respostas['processos.update'] = { data: [{ id: 'p1' }], error: null }
