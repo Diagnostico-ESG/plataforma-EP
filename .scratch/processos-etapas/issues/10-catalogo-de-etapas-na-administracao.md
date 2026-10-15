@@ -18,3 +18,5 @@
 - [ ] Quadro: coluna de etapa desativada aparece enquanto houver processo nela; etapa nova vira coluna.
 - [ ] Histórico: "Acrescentou a etapa ao catálogo", "Mudou a ordem do catálogo", "Desativou a etapa", "Reativou a etapa", "Editou", "Excluiu".
 - [ ] Testes de interface com o aplicativo inteiro: cada ação com sucesso e com falha, cada recusa, a etapa nova aparecendo no caminho de um processo em andamento e não num concluído, e a aba escondida para os outros perfis.
+
+Concluído em 2026-10-14 (commit bdff546)
