@@ -7,11 +7,11 @@ Uma linha por item: o que é e onde surgiu.
 - Decisão aberta: plano do Supabase (backup diário) e onde o front-end será hospedado. (especificação, item 11.1)
 - Decisão aberta: validação do uso de nuvem externa pelo jurídico e pela TI (contrato e LGPD). (especificação, item 11.2)
 - ~~Decisão aberta: login por e-mail e senha no Supabase Auth ou integração com acesso do governo, se existir.~~ Resolvida em 2026-10-07: conta Google institucional, liberada por autorização (ADR 0001). (especificação, item 11.3)
-- Decisão aberta: a cópia dos arquivos para o Drive institucional entra na v1.5? (especificação, item 11.4)
+- ~~Decisão aberta: a cópia dos arquivos para o Drive institucional entra na v1.5?~~ Resolvida em 2026-10-15: os arquivos ficam só no Drive compartilhado do CED já na v1, sem Storage (sabatina de documentos-versoes). (especificação, item 11.4)
 - Decisão aberta: publicação só interna ou também no site da Casa Civil. (especificação, item 11.5)
 - Decisão aberta: formato e origem dos dados atuais para importação (planilha, base do Power BI). (especificação, item 11.6)
 - Decisão aberta: lista de macroprocessos parte da Cadeia de Valor da Casa Civil ou é criada pelo EP; a categoria (finalístico, apoio, gerencial) será usada? (especificação, item 11.7)
-- Decisão aberta: arquivo-fonte do Bizagi (.bpm) obrigatório, opcional ou não guardado. (especificação, item 11.8)
+- ~~Decisão aberta: arquivo-fonte do Bizagi (.bpm) obrigatório, opcional ou não guardado.~~ Resolvida em 2026-10-15: opcional (sabatina de documentos-versoes). (especificação, item 11.8)
 - ~~Decisão aberta: o fluxograma piloto entra na numeração de versões (V1) ou fica fora.~~ Resolvida em 2026-10-07: entra (piloto V6, técnica V7). (especificação, item 11.9)
 - ~~Decisão aberta: responsável pelas etapas 7 e 8 e se elas são capturadas como a revisão interna.~~ Resolvida em 2026-10-07: as duas são capturadas. (especificação, item 11.11)
 - Configuração do administrador: para cada etapa, escolher entre "capturada por qualquer integrante" e "sempre atribuída a um usuário fixo" (todos os processos que chegam nela vão para essa pessoa). (conversa de 2026-10-07 sobre o fluxo das etapas 4 a 8)
@@ -77,3 +77,4 @@ Uma linha por item: o que é e onde surgiu.
 - Histórico do processo: a leitura dos eventos de reunião traz todos os eventos de entidade `reuniao` e filtra na tela pelo processo; trocar por filtro no banco (consulta no JSON `antes`/`depois`, `processos`) quando a lista crescer, depois de conferir a sintaxe do PostgREST contra o banco. (ticket 04 de reunioes, 2026-10-15)
 - Reuniões, limpeza opcional (cheiros do /ship de 2026-10-15): extrair o esqueleto repetido das três `EscolhaDeProcessos/Usuarios/Responsaveis`; reduzir a repetição de `delete ... <> all`/`insert ... unnest` e os 11 parâmetros de `salvar_reuniao`; juntar as três consultas de eventos de `reunioesSupabase.ts`; tirar o `grant execute` de `private.reuniao_da_linha` a `authenticated` se nenhum chamador precisar.
 - Conferir a tela (critérios `[visual]` de reunioes) quando houver login e dados: área Reuniões, formulário, painel, seções no setor e no processo. (`/ship` de reunioes, 2026-10-15)
+- Tentar converter o .bpm do Bizagi em .bpmn pela própria plataforma (o formato do Bizagi é fechado; investigar com um .bpm fictício). Por ora, o .bpmn é exportado no Bizagi e enviado junto. (sabatina de documentos-versoes, 2026-10-15)

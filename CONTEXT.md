@@ -141,3 +141,29 @@ _Avoid_: oficina, workshop
 **Participante**:
 Pessoa presente numa reunião: um usuário, um responsável do setor ou outra pessoa, anotada só pelo nome. O responsável do setor excluído continua na reunião como outra pessoa, com o nome que tinha.
 _Avoid_: convidado, presente
+
+## Documentos
+
+**Versão**:
+Conjunto de arquivos do fluxograma de um processo, com número sequencial por processo (V1, V2…). Nasce com o .bpmn e o .png (o .bpm do Bizagi é opcional) e pode receber o relatório depois. Nunca se apaga, mas um arquivo dela pode ser substituído. Registra a etapa atual do processo no momento do envio, mas não muda nenhuma etapa.
+_Avoid_: documento, revisão (para versão), arquivo
+
+**Relatório**:
+Arquivo (.docx ou .pdf) que acompanha uma versão e usa o número dela; não tem numeração própria.
+_Avoid_: laudo, documento técnico
+
+**Substituir arquivo**:
+Trocar um arquivo de uma versão por outro do mesmo tipo. O arquivo anterior não fica guardado; o histórico registra a troca.
+_Avoid_: corrigir versão, reenviar, atualizar arquivo
+
+**Relatório pendente**:
+Situação da versão que ainda não tem relatório.
+_Avoid_: relatório faltando, versão incompleta
+
+**Sem alteração de conteúdo**:
+Registro, numa versão nova, do mesmo relatório da versão anterior, com o nome da versão nova.
+_Avoid_: cópia do relatório, relatório repetido
+
+**Versão histórica**:
+Versão da primeira etapa do trabalho, feita antes da plataforma, somente leitura, com o sufixo F no rótulo (V5F). Só se registra enquanto o processo não tem versão nova, e a primeira versão nova continua a numeração (V5F → V6). Pode ter só o .bpm.
+_Avoid_: versão antiga, versão importada, versão final
