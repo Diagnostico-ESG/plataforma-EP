@@ -60,9 +60,17 @@ select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000
 set local role authenticated;
 update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
   where setor_id = '5f000000-0000-0000-0000-0000000000e1' and status = 'pendente';
-update public.andamentos a set status = 'realizada_anteriormente', nota = 'Feita antes'
-  from public.etapas e
-  where e.id = a.etapa_id and a.processo_id = pg_temp.processo('e4') and e.obrigatoria and a.status = 'pendente';
+-- Na ordem do caminho, uma por vez (a sequência das etapas é conferida a cada mudança).
+update public.andamentos a set status = 'realizada_anteriormente', nota = 'Feita antes' from public.etapas e
+  where e.id = a.etapa_id and a.processo_id = pg_temp.processo('e4') and e.codigo = 'modelagem';
+update public.andamentos a set status = 'realizada_anteriormente', nota = 'Feita antes' from public.etapas e
+  where e.id = a.etapa_id and a.processo_id = pg_temp.processo('e4') and e.codigo = 'relatorio_modelagem_tecnica';
+update public.andamentos a set status = 'realizada_anteriormente', nota = 'Feita antes' from public.etapas e
+  where e.id = a.etapa_id and a.processo_id = pg_temp.processo('e4') and e.codigo = 'revisao_interna';
+update public.andamentos a set status = 'realizada_anteriormente', nota = 'Feita antes' from public.etapas e
+  where e.id = a.etapa_id and a.processo_id = pg_temp.processo('e4') and e.codigo = 'revisao_setor';
+update public.andamentos a set status = 'realizada_anteriormente', nota = 'Feita antes' from public.etapas e
+  where e.id = a.etapa_id and a.processo_id = pg_temp.processo('e4') and e.codigo = 'aprovacao_setor';
 select public.registrar_versao(pg_temp.processo('e2'), 1, null, pg_temp.par());
 select public.suspender_processo(pg_temp.processo('e2'), 'Aguardando o setor');
 select public.cancelar_processo(pg_temp.processo('e3'), 'Não segue');
