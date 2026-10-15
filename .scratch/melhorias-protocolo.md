@@ -396,3 +396,9 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Item não testado: passo 7 com leitura do resultado do Actions pelo navegador da sessão.** Esperado: confirmar o "Testes de banco" na `main`. Aconteceu: sem `gh` e com repositório privado, o resultado foi lido no navegador embutido (#54 verde).
 - **Item não testado: custo sem valor.** O usuário não informou o `/cost`; a linha de custo foi gravada como "valor não informado".
 - **Sugestão:** o `/ship` poderia dizer o que fazer quando o `/security-review` embutido não acha mudanças porque a branch já é a principal, o caso comum no fluxo desta equipe (a reserva já é prevista, mas só "se o comando não encontrar mudanças").
+
+## 2026-10-14 — /planejar (modo completo) de reunioes
+
+- **Item não testado: nome curto da funcionalidade anotado em `projeto.md`.** Esperado: escolher o nome e anotá-lo entre parênteses ao lado do item. Aconteceu: `reunioes` anotado e comitado antes do marco.
+- **Item não testado: sabatina com a skill `grill-with-docs` carregando `grilling` e `domain-modeling`.** Esperado: a skill gravar `CONTEXT.md` e ADRs. Aconteceu: duas rodadas; o glossário ganhou a seção "Reuniões" e ajustes em "Excluir" e "Participante"; nenhum ADR (nenhuma decisão difícil de desfazer).
+- **Item não testado: tickets fundidos a pedido.** Esperado: o usuário ajustar a divisão no quiz do `to-tickets`. Aconteceu: cinco tickets propostos; o de filtros entrou no primeiro, ficando quatro.
