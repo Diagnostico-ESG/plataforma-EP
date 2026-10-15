@@ -109,8 +109,8 @@ export function origemAceita(origem: string | null, aceitas: string): boolean
 export function cabecalhosDeOrigem(origem: string | null, aceitas: string): Record<string, string>
 ```
 
-- [ ] Testes que falham: `consultaDePastaPorNome("A'B\\C", 'pai1')` devolve `name = 'A\'B\\\\C' and 'pai1' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false` (aspas e barras escapadas); `eErroDeCota` verdadeiro para `{error:{errors:[{reason:'storageQuotaExceeded'}]}}` e `teamDriveFileLimitExceeded`, falso para outro motivo, `null`, texto e objeto sem `error`; `origemAceita` com lista `"https://a.x, https://b.y"`: aceita `https://b.y`, recusa `https://c.z`, recusa `null` e lista vazia; `cabecalhosDeOrigem` devolve `Access-Control-Allow-Origin` só para origem aceita, sempre `Vary: Origin`, `Access-Control-Allow-Headers: authorization, content-type, apikey, x-client-info` e `Access-Control-Allow-Methods: POST, OPTIONS`.
-- [ ] Rodar (falha), implementar, rodar e comitar.
+- [x] Testes que falham: `consultaDePastaPorNome("A'B\\C", 'pai1')` devolve `name = 'A\'B\\\\C' and 'pai1' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false` (aspas e barras escapadas); `eErroDeCota` verdadeiro para `{error:{errors:[{reason:'storageQuotaExceeded'}]}}` e `teamDriveFileLimitExceeded`, falso para outro motivo, `null`, texto e objeto sem `error`; `origemAceita` com lista `"https://a.x, https://b.y"`: aceita `https://b.y`, recusa `https://c.z`, recusa `null` e lista vazia; `cabecalhosDeOrigem` devolve `Access-Control-Allow-Origin` só para origem aceita, sempre `Vary: Origin`, `Access-Control-Allow-Headers: authorization, content-type, apikey, x-client-info` e `Access-Control-Allow-Methods: POST, OPTIONS`.
+- [x] Rodar (falha), implementar, rodar e comitar.
 
 ### Tarefa 5 — Banco: `pastas_no_drive` (critério 8)
 
