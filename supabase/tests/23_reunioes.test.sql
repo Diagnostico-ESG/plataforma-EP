@@ -231,7 +231,7 @@ insert into _tap (linha) select throws_ok(
 insert into _tap (linha) select is(pg_temp.apagar_reunioes(), 0::bigint, 'consulta não apaga reunião');
 insert into _tap (linha) select throws_ok(
   $sql$insert into public.reunioes_processos (reuniao_id, processo_id)
-    values (pg_temp.reuniao('sens1'), pg_temp.processo('Proc A'))$sql$, '42501', null,
+    values (pg_temp.reuniao('txt'), pg_temp.processo('Proc A'))$sql$, '42501', null,
   'consulta não liga processo a reunião');
 
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a4","role":"authenticated"}', true);
