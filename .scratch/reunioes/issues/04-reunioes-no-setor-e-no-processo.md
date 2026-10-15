@@ -17,3 +17,5 @@
 - [ ] Excluir setor ou processo com reunião mostra em vermelho a recusa com a contagem de reuniões e o caminho (desativar o setor, cancelar o processo).
 - [ ] Consulta vê as seções sem [Registrar reunião].
 - [ ] Testes de interface com o aplicativo inteiro cobrindo os itens acima.
+
+Concluído em 2026-10-15 (commit 1a3bd5c)
