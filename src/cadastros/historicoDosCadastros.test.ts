@@ -286,20 +286,6 @@ describe('processos', () => {
       .toBe('Nome: Emitir Ofício; Etapas: Reunião de modelagem (Concluída), Revisão interna (Pendente)')
   })
 
-  test('o estado da reunião lista usuários e responsáveis por nome, sem ids, e "nenhum" quando vazios', () => {
-    const estado = {
-      tipo: 'sensibilizacao', setor_id: 's1', setor_sigla: 'TSA', data: '2026-10-14', hora: null, local: null, anotacoes: null,
-      outros_participantes: [], processos: [],
-      usuarios: [{ id: 'u1', nome: 'Ana Teste' }, { id: 'u2', nome: 'Bia Teste' }], responsaveis: [{ id: 'x1', nome: 'Caio Teste' }],
-    }
-    const texto = descreverEstadoDoCadastro(estado)
-    expect(texto).toContain('Usuários do EP: Ana Teste, Bia Teste')
-    expect(texto).toContain('Responsáveis: Caio Teste')
-    expect(texto).not.toContain('u1')
-    expect(descreverEstadoDoCadastro({ ...estado, usuarios: [], responsaveis: [] }))
-      .toContain('Usuários do EP: nenhum; Responsáveis: nenhum')
-  })
-
   test('o processo excluído continua no filtro pelo nome', () => {
     const excluido = evento({ entidade: 'processo', entidadeRef: 'p1', acao: 'excluir', antes: PROCESSO })
     expect(itensDoFiltro([excluido])).toEqual([{ id: 'p1', nome: 'TSA — Emitir Ofício' }])

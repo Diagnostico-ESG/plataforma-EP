@@ -118,18 +118,18 @@ Modificar: `supabase/tests/23_reunioes.test.sql`, `src/types/database.ts` (gerad
 
 **Arquivos:** `src/components/reunioes/DadosDaReuniao.tsx`, `src/App.participantesNoPainel.test.tsx` (novo).
 
-- [ ] Testes de tela que falham, em `App.participantesNoPainel.test.tsx`:
+- [x] Testes de tela que falham, em `App.participantesNoPainel.test.tsx`:
   - o painel mostra as três listas ("Usuários do EP", "Responsáveis do setor", "Outros participantes") com os nomes; lista vazia mostra "—";
   - usuário inativo marcado na reunião aparece com a pílula "Inativo";
   - a Consulta vê as três listas, sem [Editar], [Excluir] nem campos editáveis;
   - responsável excluído: com um responsável presente numa reunião, `falso.excluirResponsavelDoSetor(...)` antes de abrir o painel faz o nome aparecer em "Outros participantes" e sumir de "Responsáveis do setor";
   - a aba Histórico, depois de editar a reunião marcando um usuário, mostra só o campo que mudou ("Usuários do EP") com o antes (nenhum) e o depois (o nome).
-- [ ] Implementar: três linhas novas em `DadosDaReuniao` (lista `ul.painel-estrutura-lista` de nomes, "—" se vazia; o usuário inativo com `Pilula situacao="neutra"` "Inativo"), num componente pequeno `ListaDeNomes` no mesmo arquivo; o `Dado` já existe lá.
-- [ ] `npx vitest run src/App.participantesNoPainel.test.tsx src/App.painelDaReuniao.test.tsx` passa. Comitar.
+- [x] Implementar: três linhas novas em `DadosDaReuniao` (lista `ul.painel-estrutura-lista` de nomes, "—" se vazia; o usuário inativo com `Pilula situacao="neutra"` "Inativo"), num componente pequeno `ListaDeNomes` no mesmo arquivo; o `Dado` já existe lá.
+- [x] `npx vitest run src/App.participantesNoPainel.test.tsx src/App.painelDaReuniao.test.tsx` passa. Comitar.
 
 ### Tarefa 8 — Portões de qualidade, registros e fecho
 
-- [ ] `npm test` (cobertura ≥ 70%), `npx tsc -b`, `npm run lint`, arquivos ≤ 300 linhas; conferir de novo o "Testes de banco" na branch se `supabase/` mudou depois da tarefa 2.
-- [ ] Marcar as caixas deste plano; acrescentar a `.scratch/reunioes/desvios.md` as decisões e frases novas (seção "Ticket 03", incluindo o 16 conferido sem mudança e os testes já provados no 23) e, em `.scratch/melhorias-protocolo.md`, os itens não testados do `/executar-complexo` que aconteceram (migração que troca a assinatura de uma função, trigger de exclusão em outra tabela, `db:types` depois da migração, workflows na branch).
-- [ ] Merge na `main` (`git switch main`, `git merge reunioes-03`, `git branch -d reunioes-03`), `git push origin main` (autorizado, sem `--force`) e conferir o "Testes de banco" da `main` (o envio mexe em `supabase/`).
-- [ ] Linha `Concluído em AAAA-MM-DD (commit <hash>)` no fim do ticket 03; comitar; apontar o próximo ticket (04) e pedir o `/cost`.
+- [x] `npm test` (cobertura ≥ 70%), `npx tsc -b`, `npm run lint`, arquivos ≤ 300 linhas; conferir de novo o "Testes de banco" na branch se `supabase/` mudou depois da tarefa 2.
+- [x] Marcar as caixas deste plano; acrescentar a `.scratch/reunioes/desvios.md` as decisões e frases novas (seção "Ticket 03", incluindo o 16 conferido sem mudança e os testes já provados no 23) e, em `.scratch/melhorias-protocolo.md`, os itens não testados do `/executar-complexo` que aconteceram (migração que troca a assinatura de uma função, trigger de exclusão em outra tabela, `db:types` depois da migração, workflows na branch).
+- [x] Merge na `main` (`git switch main`, `git merge reunioes-03`, `git branch -d reunioes-03`), `git push origin main` (autorizado, sem `--force`) e conferir o "Testes de banco" da `main` (o envio mexe em `supabase/`).
+- [x] Linha `Concluído em AAAA-MM-DD (commit <hash>)` no fim do ticket 03; comitar; apontar o próximo ticket (04) e pedir o `/cost`.

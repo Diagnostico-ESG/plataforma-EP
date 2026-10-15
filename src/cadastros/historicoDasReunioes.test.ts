@@ -39,4 +39,18 @@ describe('eventos de reunião no histórico', () => {
     expect(itensDoFiltro([evento({ acao: 'excluir', antes: REUNIAO, depois: null })]))
       .toEqual([{ id: 'r1', nome: 'Reunião de modelagem de 14/10/2026 — TSA' }])
   })
+
+  test('o estado da reunião lista usuários e responsáveis por nome, sem ids, e "nenhum" quando vazios', () => {
+    const estado = {
+      tipo: 'sensibilizacao', setor_id: 's1', setor_sigla: 'TSA', data: '2026-10-14', hora: null, local: null, anotacoes: null,
+      outros_participantes: [], processos: [],
+      usuarios: [{ id: 'u1', nome: 'Ana Teste' }, { id: 'u2', nome: 'Bia Teste' }], responsaveis: [{ id: 'x1', nome: 'Caio Teste' }],
+    }
+    const texto = descreverEstadoDoCadastro(estado)
+    expect(texto).toContain('Usuários do EP: Ana Teste, Bia Teste')
+    expect(texto).toContain('Responsáveis: Caio Teste')
+    expect(texto).not.toContain('u1')
+    expect(descreverEstadoDoCadastro({ ...estado, usuarios: [], responsaveis: [] }))
+      .toContain('Usuários do EP: nenhum; Responsáveis: nenhum')
+  })
 })
