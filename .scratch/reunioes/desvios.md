@@ -95,3 +95,4 @@ Revisão do diff inteiro (marco `2026-10-14-inicio-reunioes`, 38 commits) em dua
 - **`testTimeout` de 15 s no `vite.config.ts`** veio do bug dos testes instáveis (`/demanda` de 2026-10-15), não desta funcionalidade.
 - **Cheiros de padrão (julgamento, nada violou regra do projeto):** três `EscolhaDe*` com o mesmo esqueleto; `delete ... <> all` e `insert ... unnest` repetidos em `salvar_reuniao`; onze parâmetros posicionais em `salvar_reuniao`; três consultas de eventos quase iguais em `reunioesSupabase.ts`. Foram para o backlog.
 - **Conferência visual presumida** (o app exige login e dados): ver o relatório do `/ship`.
+- **Revisão de segurança do código** (`/security-review`, 2026-10-15): sem achados; o gatilho novo só acrescenta uma restrição. Custo do `/ship` não registrado por decisão do usuário.
