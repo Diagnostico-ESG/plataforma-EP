@@ -5,6 +5,7 @@ import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import type { Perfil } from './acesso/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
+import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import type { ProcessoLido, TipoDeProcesso } from './processos/tipos'
 
 beforeEach(() => {
@@ -47,7 +48,7 @@ function montar(perfil: Perfil = 'integrante_ep') {
   falso.siglasDosSetores = { s1: 'TSA', s2: 'TSB' }
   falso.nomesDosMacroprocessos = { m1: 'Macro A', m2: 'Macro B' }
   falso.processos = PROCESSOS.map((item) => ({ ...item }))
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} reunioes={new ReunioesFalso()} />)
   return falso
 }
 

@@ -3,12 +3,13 @@ import { afterEach, expect, test } from 'vitest'
 import App from './App'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
+import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import { AcessoFalso } from './acesso/AcessoFalso'
 
 afterEach(cleanup)
 
 async function abrirLogado() {
-  render(<App acesso={AcessoFalso.logadoComo()} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo()} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} reunioes={new ReunioesFalso()} />)
   await screen.findByRole('heading', { name: 'Processos' })
 }
 

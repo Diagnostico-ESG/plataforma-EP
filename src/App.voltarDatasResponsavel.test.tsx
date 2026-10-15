@@ -7,6 +7,7 @@ import type { Perfil } from './acesso/tipos'
 import type { EventoDoCadastro } from './cadastros/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
+import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import type { EtapaDoProcesso, EtapaDoSetor, ProcessoLido } from './processos/tipos'
 
 beforeEach(() => {
@@ -68,7 +69,7 @@ function montar({ perfil = 'integrante_ep', processos = [processo()], ajustar }:
     { id: 'e9', codigo: 'c9', nome: 'Publicação', ordem: 9, ativa: true },
   ]
   ajustar?.(falso)
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} reunioes={new ReunioesFalso()} />)
   return falso
 }
 

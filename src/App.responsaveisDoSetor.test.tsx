@@ -6,6 +6,7 @@ import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { Perfil } from './acesso/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
+import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import type { ResponsavelDoSetor } from './processos/tipos'
 
 beforeEach(() => {
@@ -27,7 +28,7 @@ function montar({ perfil = 'integrante_ep', responsaveis = [BRUNO, ANA], ajustar
   const processos = new ProcessosFalso()
   processos.responsaveisDoSetor = { s1: responsaveis }
   ajustar?.(processos)
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={processos} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={processos} reunioes={new ReunioesFalso()} />)
   return processos
 }
 

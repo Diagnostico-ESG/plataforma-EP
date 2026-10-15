@@ -3,6 +3,7 @@ import { afterEach, expect, test } from 'vitest'
 import App from './App'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
+import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import type { LinhaDeUsuario, Perfil } from './acesso/tipos'
 
@@ -28,7 +29,7 @@ function acessoDoAdministrador() {
 }
 
 async function irParaAdministracao(acesso: AcessoFalso) {
-  render(<App acesso={acesso} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} />)
+  render(<App acesso={acesso} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} reunioes={new ReunioesFalso()} />)
   const navegacao = await screen.findByRole('navigation', { name: 'Áreas do sistema' })
   fireEvent.click(within(navegacao).getByRole('button', { name: 'Administração' }))
 }
@@ -42,7 +43,7 @@ test('o administrador vê Administração na navegação e chega à lista de usu
 test.each<[Perfil, string]>([['integrante_ep', 'Integrante do EP'], ['consulta', 'Consulta']])(
   'perfil %s que chega pelo endereço vê a mensagem, sem a lista', async (perfil, rotulo) => {
     window.location.hash = '#/administracao'
-    render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} />)
+    render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} reunioes={new ReunioesFalso()} />)
     expect(await screen.findByText(
       `Seu perfil (${rotulo}) não permite administrar usuários. Peça a um administrador para mudar seu perfil.`)).toBeTruthy()
     expect(screen.queryByRole('table')).toBeNull()

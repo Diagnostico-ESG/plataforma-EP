@@ -3,6 +3,7 @@ import { afterEach, expect, test } from 'vitest'
 import App from './App'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
+import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import { AcessoFalso } from './acesso/AcessoFalso'
 import css from './components/moldura/Moldura.css?raw'
 import { regrasDaClasse } from './testes/regrasDaClasse'
@@ -10,7 +11,7 @@ import { regrasDaClasse } from './testes/regrasDaClasse'
 afterEach(cleanup)
 
 async function abrirLogado(acesso = AcessoFalso.logadoComo()) {
-  render(<App acesso={acesso} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} />)
+  render(<App acesso={acesso} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} reunioes={new ReunioesFalso()} />)
   return screen.findByRole('button', { name: 'Sua conta: Pessoa de Teste' })
 }
 

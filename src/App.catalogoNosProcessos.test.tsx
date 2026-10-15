@@ -3,6 +3,7 @@ import { afterEach, expect, test } from 'vitest'
 import App from './App'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
+import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import type { ProcessosFalso } from './processos/ProcessosFalso'
 import type { EtapaDoProcesso, EtapaNoCatalogo, ProcessoLido, SituacaoDoProcesso } from './processos/tipos'
 import { ETAPAS_DE_TESTE, abrirCatalogo, montarComCatalogo } from './testes/catalogoDeTeste'
@@ -47,7 +48,7 @@ function montar(): ProcessosFalso {
 function abrirEm(processos: ProcessosFalso, endereco: string) {
   cleanup()
   window.location.hash = endereco
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'administrador' })} cadastros={new CadastrosFalso()} processos={processos} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'administrador' })} cadastros={new CadastrosFalso()} processos={processos} reunioes={new ReunioesFalso()} />)
 }
 
 async function acrescentarEncerramento() {

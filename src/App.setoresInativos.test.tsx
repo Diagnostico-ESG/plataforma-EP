@@ -4,6 +4,7 @@ import App from './App'
 import { AcessoFalso } from './acesso/AcessoFalso'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
+import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import type { Setor } from './cadastros/tipos'
 
 beforeEach(() => {
@@ -23,7 +24,7 @@ const SETORES: Setor[] = [
 function montar(setores = SETORES) {
   const cadastros = new CadastrosFalso()
   cadastros.setores = [...setores]
-  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} processos={new ProcessosFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} processos={new ProcessosFalso()} reunioes={new ReunioesFalso()} />)
   return cadastros
 }
 

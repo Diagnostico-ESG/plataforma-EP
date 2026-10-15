@@ -6,6 +6,7 @@ import { AUTOR_DIRETO_NO_BANCO } from './acesso/historico'
 import type { Perfil } from './acesso/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
+import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import type { EventoDoCadastro } from './cadastros/tipos'
 
 beforeEach(() => {
@@ -44,7 +45,7 @@ function montar(perfil: Perfil = 'integrante_ep', eventos: EventoDoCadastro[] = 
   const cadastros = new CadastrosFalso()
   cadastros.historico = eventos
   ajustar?.(cadastros)
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={new ProcessosFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={new ProcessosFalso()} reunioes={new ReunioesFalso()} />)
   return cadastros
 }
 

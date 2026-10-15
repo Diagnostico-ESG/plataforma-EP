@@ -59,12 +59,12 @@ language sql stable as $$
 grant execute on function pg_temp.evento(text, text) to authenticated;
 
 create function pg_temp.apagar_reunioes() returns bigint
-language plpgsql as $
+language plpgsql as $$
 declare apagadas bigint;
 begin
   with apagada as (delete from public.reunioes returning id) select count(*) into apagadas from apagada;
   return apagadas;
-end $;
+end $$;
 grant execute on function pg_temp.apagar_reunioes() to authenticated;
 
 -- Preparação como dono do banco: duas reuniões em TR4 e uma de modelagem com o "Proc D". Os eventos pendentes

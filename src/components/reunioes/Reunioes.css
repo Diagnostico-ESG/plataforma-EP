@@ -1,0 +1,46 @@
+/* A área Reuniões reaproveita a Lista de processos (tabela, filtros e painel); aqui só o que é próprio dela. */
+.reunioes-grupo th {
+  padding: var(--esp-2) var(--esp-3);
+  color: var(--texto-2);
+  font-size: var(--tam-rotulo);
+  font-weight: 700;
+  text-align: left;
+  background: var(--folha);
+}
+
+/* A marca "sem anotações" é só texto, discreta, abaixo da data (nunca só cor). */
+.reuniao-sem-anotacoes {
+  display: block;
+  color: var(--texto-2);
+  font-size: var(--tam-rotulo);
+}
+
+.reuniao-anotacoes {
+  white-space: pre-wrap;
+}
+
+/* Tipo e processos são grupos de escolha: caixas e botões de opção, uma por linha, sem a moldura padrão do fieldset. */
+.reuniao-tipo,
+.reuniao-processos {
+  display: grid;
+  gap: var(--esp-1);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.reuniao-tipo legend,
+.reuniao-processos legend {
+  padding: 0;
+  margin-bottom: var(--esp-1);
+}
+
+.reuniao-tipo-opcao {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+}
+
+.reuniao-tipo-opcao input {
+  min-height: 0;
+}
