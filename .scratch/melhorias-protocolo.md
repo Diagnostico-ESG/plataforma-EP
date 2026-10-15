@@ -443,3 +443,12 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Item não testado: conferência do alvo antes de comando de banco.** Esperado: vínculo atual igual ao `supabase/.temp/project-ref`. Aconteceu: os dois eram `yclkzyoebpsxmgpbcbus`; o banco só foi tocado pelo "Testes de banco" do Actions.
 - **Ocorrência: a trava de git bloqueou, por engano, comandos `sed -i` em arquivos de `src/`** (mensagem "apagar ou mover a pasta `.git`"); o mesmo comando sem `-i`, ou a edição pela ferramenta de edição, passou. **Sugestão:** a trava poderia olhar o alvo do comando, e não só a presença de `-i`.
 - **Sugestão:** em Windows, o Git avisa "LF will be replaced by CRLF" a cada commit e os arquivos do projeto estão em CRLF; um `.gitattributes` com `* text=auto eol=lf` tiraria o aviso e o risco de edições por script que procuram `\n` não acharem o texto.
+
+## 2026-10-15 — /ship de reunioes
+
+- **Item não testado: marca de entrega com ressalva.** Esperado: gravar `Entregue em ... , com ressalva: <qual>` quando o critério [visual] fica presumido. Aconteceu: gravada com ressalva de critérios [visual] presumidos; o marco `marco/2026-10-15-entrega-reunioes` foi criado.
+- **Item não testado: conferência de entregas anteriores.** Esperado: funcionalidades 1 a 3 com `Entregue em`. Aconteceu: as três tinham a marca e nenhuma `Em revisão desde`; o passo seguiu sem perguntar.
+- **Item não testado: `/security-review` e checagens de banco (passo 7).** Esperado: o usuário roda o comando e eu corrijo achados. Aconteceu: sem achados; checagens de banco (views, `security definer`, chave secreta, tipos, destrutivas) passaram; "Testes de banco" verde na branch (#71) e na `main` (#72).
+- **Ocorrência: o `code-review` achou uma brecha de regra de negócio no banco** (setor do processo com reunião); foi corrigida no próprio `/ship`, com migração nova, e isso refez os passos 2, 4 e 5. **Sugestão:** o comando poderia dizer que, quando a correção do passo 1 cria migração, o ciclo de aplicar pelo Actions e testar também se refaz, e que o `/security-review` do passo 4 é decidido só depois da correção.
+- **Sugestão:** o `/ship` poderia permitir seguir sem o `/cost` por decisão do usuário (aqui registrado como "não informado").
+- **Ocorrência:** `git branch -d reunioes-ship` recusou apagar a branch já integrada por fast-forward; ficou como está (apagar à força é com o usuário).
