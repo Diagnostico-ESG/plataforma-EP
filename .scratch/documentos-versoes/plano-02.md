@@ -77,7 +77,7 @@ Modificar: `supabase/functions/_shared/decisao.ts` (+ teste), `arquivos-no-drive
 - `tipos.ts`: `PapelDoArquivo` (reexportado de `supabase/functions/_shared/nomePadrao.ts`); `ArquivoDaVersao = { id, papel, nome, formato, tamanho }`; `Versao = { id, numero, historica, enviadaEm, autor: string | null, etapa: string | null, observacao: string | null, arquivos: ArquivoDaVersao[] }`; `ArquivoEscolhido = { papel: PapelDoArquivo; arquivo: File }`; `PedidoDeVersao = { processoId, numero, observacao: string | null, arquivos: ArquivoEscolhido[] }`; `ModuloDeVersoes = { listarVersoes(processoId): Promise<Versao[]>; enviarVersao(pedido, aoProgredir: (enviados: number, total: number) => void): Promise<void> }`.
 - `rotulos.ts`: `rotuloDaVersao(v)` ("V7" / "V5F"), `ROTULO_DO_PAPEL`, `proximoNumero(versoes)` (maior + 1, contando as históricas; 1 sem versão), `ordenarVersoes` (mais recente primeiro, pelo número), `ACCEPT_DO_PAPEL`.
 - `conferenciaDosArquivos.ts`: `conferirArquivo(papel, arquivo: File): Promise<string | null>` (null = ok; senão a frase da tela): extensão, tamanho até 20 MB, assinatura PNG (8 primeiros bytes), BPMN 2.0 (`DOMParser`, elemento `definitions` no namespace `http://www.omg.org/spec/BPMN/20100524/MODEL`).
-- [ ] Testes primeiro (vermelho), com `File` inventados no jsdom; implementar; verde; commit.
+- [x] Testes primeiro (vermelho), com `File` inventados no jsdom; implementar; verde; commit.
 
 ### Tarefa 4 — Módulo de versões real e falso (critérios 8 e 9)
 
