@@ -62,3 +62,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-15 | reunioes | /ship | US$ 4,89
 2026-10-15 | reunioes | /executar-complexo (ticket 04) | US$ 6,09
 2026-10-15 | reunioes | /polir | US$ 0,94
+2026-10-15 | documentos-versoes | planejar | US$ 5,20
