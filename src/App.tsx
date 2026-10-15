@@ -26,7 +26,7 @@ function App({ acesso, cadastros, processos }: AppProps) {
     <Moldura areaAtual={area} aoIrPara={irPara} titulo={TITULO_DA_AREA[area]} usuario={estado.usuario} aoSair={sair}>
       {ehAreaDeProcessos(area) && <AreaDeProcessos usuario={estado.usuario} processos={processos} cadastros={cadastros} />}
       {area === 'setores' && <AreaDeCadastros usuario={estado.usuario} cadastros={cadastros} processos={processos} />}
-      {area === 'administracao' && <AreaDeAdministracao usuario={estado.usuario} acesso={acesso} />}
+      {area === 'administracao' && <AreaDeAdministracao usuario={estado.usuario} acesso={acesso} processos={processos} />}
     </Moldura>
   )
 }

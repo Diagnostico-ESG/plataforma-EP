@@ -196,3 +196,27 @@
     grid-column: auto;
   }
 }
+
+.administracao-abas {
+  display: flex;
+  gap: var(--esp-4);
+  padding: 0 var(--esp-5);
+  border-bottom: 1px solid var(--linha);
+}
+
+.administracao-aba {
+  padding: var(--esp-3) 0;
+  border: 0;
+  border-bottom: var(--linha-acesa);
+  border-bottom-color: transparent;
+  background: transparent;
+  color: var(--texto-2);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.administracao-aba[aria-selected='true'] {
+  border-bottom-color: var(--azul);
+  color: var(--texto);
+}

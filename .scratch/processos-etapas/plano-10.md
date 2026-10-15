@@ -39,8 +39,8 @@
 
 **Arquivos:** criar `supabase/tests/22_catalogo_de_etapas.test.sql` (molde do 21: usuários a1 a a4, `_tap`, `plan(N)` com o N exato e a exceção do fim); alterar `supabase/tests/15_etapas_do_setor.test.sql` e `supabase/tests/17_processos.test.sql` como em "Decisões" (o número de asserções não muda).
 
-- [ ] Branch: `git switch -c processos-etapas-10` (a partir da `main`) e o marco `marco/2026-10-14-inicio-ticket-10-processos-etapas`.
-- [ ] Escrever o teste 22 (critérios 1 e 2). Preparação, como dono do banco: setores TC1 (ativo) e TC2 (inativo, `ativo = false`), macroprocesso "Macro Catálogo" com TC1 envolvido; etapas do setor de TC1 resolvidas como `realizada_anteriormente` com nota, na ordem; processos de TC1 "Andando" (em andamento), "Parado" (suspenso por `suspender_processo`, como integrante), "Cancelado" (por `cancelar_processo`) e "Pronto" (as 5 etapas obrigatórias do processo como `realizada_anteriormente`, na ordem: situação calculada `concluido`). Asserções, como administrador salvo indicação:
+- [x] Branch: `git switch -c processos-etapas-10` (a partir da `main`) e o marco `marco/2026-10-14-inicio-ticket-10-processos-etapas`.
+- [x] Escrever o teste 22 (critérios 1 e 2). Preparação, como dono do banco: setores TC1 (ativo) e TC2 (inativo, `ativo = false`), macroprocesso "Macro Catálogo" com TC1 envolvido; etapas do setor de TC1 resolvidas como `realizada_anteriormente` com nota, na ordem; processos de TC1 "Andando" (em andamento), "Parado" (suspenso por `suspender_processo`, como integrante), "Cancelado" (por `cancelar_processo`) e "Pronto" (as 5 etapas obrigatórias do processo como `realizada_anteriormente`, na ordem: situação calculada `concluido`). Asserções, como administrador salvo indicação:
   1. `acrescentar_etapa('teste_nova', 'Etapa Nova', 'processo', true, null)` vive; a etapa fica no fim da ordem;
   2. um andamento pendente dela em "Andando" e em "Parado"; nenhum em "Pronto" e em "Cancelado";
   3. `acrescentar_etapa('teste_setor', 'Etapa Nova do Setor', 'setor', false, <id de modelagem>)`: a etapa nova fica com a ordem antiga de `modelagem`, e `modelagem` sobe 1; um pendente em TC1 e um em TC2 (inativo);
@@ -54,15 +54,15 @@
   11. Integrante e Consulta: `acrescentar_etapa` → `42501`; `mover_etapa` → `42501`; desativar e excluir apagam/alteram 0 linhas. Inativo: os mesmos. Visitante: `acrescentar_etapa` e `mover_etapa` → `42501`;
   12. Consulta lê os eventos `etapa` (contagem > 0); Inativo não lê (0);
   13. `prosecdef` falso em `acrescentar_etapa`, `mover_etapa`, `private.sincronizar_andamentos_da_etapa` e `private.conferir_etapa_nunca_usada` (critério 2).
-- [ ] Ajustar os testes 15 e 17 como em "Decisões".
-- [ ] Comitar ("Ticket 10 de processos-etapas: teste de banco do catálogo (falha antes da migração)"), `git push -u origin processos-etapas-10`, disparar "Testes de banco" na branch e ler o resultado: o 22 deve falhar por função inexistente, e o 15 e o 17 nos pontos ajustados.
+- [x] Ajustar os testes 15 e 17 como em "Decisões".
+- [x] Comitar ("Ticket 10 de processos-etapas: teste de banco do catálogo (falha antes da migração)"), `git push -u origin processos-etapas-10`, disparar "Testes de banco" na branch e ler o resultado: o 22 deve falhar por função inexistente, e o 15 e o 17 nos pontos ajustados.
 
 ### Tarefa 2 — Migração (banco)
 
 **Arquivos:** criar com `npx supabase migration new catalogo_de_etapas`, só depois da rodada que provou a falha; `src/types/database.ts` (gerado); `supabase/AMBIENTES.md`.
 
-- [ ] Conferir em `supabase/migrations/20261008143706_historico_usuarios.sql` (e seguintes) se `eventos.acao` ou `eventos.entidade` têm restrição de valores; se tiverem, incluir `etapa` e as ações novas na migração.
-- [ ] Escrever a migração:
+- [x] Conferir em `supabase/migrations/20261008143706_historico_usuarios.sql` (e seguintes) se `eventos.acao` ou `eventos.entidade` têm restrição de valores; se tiverem, incluir `etapa` e as ações novas na migração.
+- [x] Escrever a migração:
 
 ```sql
 -- Catálogo de etapas (processos-etapas, ticket 10; ADR 0004). Recusas em P0001 "motivo:valor"
@@ -279,17 +279,17 @@ revoke execute on function private.sincronizar_andamentos_da_etapa(), private.co
 ```
 
   Se o `registrar_evento_da_etapa` precisar ler `new.id` num `DELETE` (onde `new` é nulo) e o Postgres recusar, separar a referência numa variável com `case tg_op`.
-- [ ] Commitar a migração na branch, `git push`, disparar "Migrar banco de desenvolvimento" com `<versão>_catalogo_de_etapas.sql` (só o nome do arquivo, sem a pasta, lição do ticket 08) e ler o resultado.
-- [ ] Disparar "Testes de banco" na branch: os 23 arquivos verdes. Se falhar, corrigir a causa (teste ou nova migração; a já aplicada não se edita) e repetir; três tentativas sem resolver, parar e perguntar.
-- [ ] `npm run db:types` (vínculo conferido): entram `acrescentar_etapa` e `mover_etapa` em `Functions`.
-- [ ] Registrar a migração em `supabase/AMBIENTES.md` (lista do `migration repair`), no formato das anteriores.
-- [ ] Commitar os tipos e o AMBIENTES ("Ticket 10 de processos-etapas: migração do catálogo de etapas").
+- [x] Commitar a migração na branch, `git push`, disparar "Migrar banco de desenvolvimento" com `<versão>_catalogo_de_etapas.sql` (só o nome do arquivo, sem a pasta, lição do ticket 08) e ler o resultado.
+- [x] Disparar "Testes de banco" na branch: os 23 arquivos verdes. Se falhar, corrigir a causa (teste ou nova migração; a já aplicada não se edita) e repetir; três tentativas sem resolver, parar e perguntar.
+- [x] `npm run db:types` (vínculo conferido): entram `acrescentar_etapa` e `mover_etapa` em `Functions`.
+- [x] Registrar a migração em `supabase/AMBIENTES.md` (lista do `migration repair`), no formato das anteriores.
+- [x] Commitar os tipos e o AMBIENTES ("Ticket 10 de processos-etapas: migração do catálogo de etapas").
 
 ### Tarefa 3 — Tipos e catálogo falso
 
 **Arquivos:** `src/processos/tipos.ts`; criar `src/processos/CatalogoFalso.ts` e `src/processos/CatalogoFalso.test.ts`; `src/processos/ProcessosFalso.ts` (uma linha de campo e o import).
 
-- [ ] Tipos (critério 3):
+- [x] Tipos (critério 3):
 
 ```ts
 export type NivelDaEtapa = 'setor' | 'processo'
@@ -316,36 +316,36 @@ export type ModuloDoCatalogo = {
 ```
 
   e `catalogo: ModuloDoCatalogo` em `ModuloDeProcessos`.
-- [ ] Testes do falso (`CatalogoFalso.test.ts`), escritos antes, cada um um comportamento: acrescentar antes de uma etapa abre espaço na ordem; etapa nova de nível processo entra pendente no caminho de um processo em andamento e de um suspenso, e não no concluído nem no cancelado, e vira coluna (`etapasDoCatalogo`); etapa nova do setor entra nas etapas de todos os setores; etapa do setor depois de uma do processo → `TravaDoBanco` "As etapas do setor precisam vir antes das etapas do processo."; nome repetido (sem diferenciar maiúsculas) → "Já existe uma etapa com o nome {nome}."; subir e descer trocam com a vizinha; desativar tira os pendentes e mantém os resolvidos; reativar devolve os pendentes onde faltam; excluir etapa usada → "A etapa {nome} já foi usada; desative-a em vez de excluir."; excluir nunca usada some com os pendentes; `falharLeitura`, `segurarLeitura` e `falhaDeGravacao` como no `ProcessosFalso`.
-- [ ] Implementar `CatalogoFalso` (classe `implements ModuloDoCatalogo`, construída com o `ProcessosFalso`, tipado por um `Pick` com `processos`, `etapasDoCatalogo` e `etapasDoSetor`), com `etapas: EtapaNoCatalogo[]` público para os testes de tela. Depois de cada gravação, `sincronizar()` refaz `dono.etapasDoCatalogo` (as de nível processo) e inclui ou tira os pendentes. Em `ProcessosFalso`: `catalogo = new CatalogoFalso(this)`.
-- [ ] `npx vitest run src/processos/CatalogoFalso.test.ts` verde; `npx tsc --noEmit` acusa só o módulo real ainda sem `catalogo` (Tarefa 4).
+- [x] Testes do falso (`CatalogoFalso.test.ts`), escritos antes, cada um um comportamento: acrescentar antes de uma etapa abre espaço na ordem; etapa nova de nível processo entra pendente no caminho de um processo em andamento e de um suspenso, e não no concluído nem no cancelado, e vira coluna (`etapasDoCatalogo`); etapa nova do setor entra nas etapas de todos os setores; etapa do setor depois de uma do processo → `TravaDoBanco` "As etapas do setor precisam vir antes das etapas do processo."; nome repetido (sem diferenciar maiúsculas) → "Já existe uma etapa com o nome {nome}."; subir e descer trocam com a vizinha; desativar tira os pendentes e mantém os resolvidos; reativar devolve os pendentes onde faltam; excluir etapa usada → "A etapa {nome} já foi usada; desative-a em vez de excluir."; excluir nunca usada some com os pendentes; `falharLeitura`, `segurarLeitura` e `falhaDeGravacao` como no `ProcessosFalso`.
+- [x] Implementar `CatalogoFalso` (classe `implements ModuloDoCatalogo`, construída com o `ProcessosFalso`, tipado por um `Pick` com `processos`, `etapasDoCatalogo` e `etapasDoSetor`), com `etapas: EtapaNoCatalogo[]` público para os testes de tela. Depois de cada gravação, `sincronizar()` refaz `dono.etapasDoCatalogo` (as de nível processo) e inclui ou tira os pendentes. Em `ProcessosFalso`: `catalogo = new CatalogoFalso(this)`.
+- [x] `npx vitest run src/processos/CatalogoFalso.test.ts` verde; `npx tsc --noEmit` acusa só o módulo real ainda sem `catalogo` (Tarefa 4).
 
 ### Tarefa 4 — Catálogo real
 
 **Arquivos:** criar `src/processos/catalogoSupabase.ts` e `src/processos/catalogoSupabase.test.ts` (molde de `reclassificacaoSupabase.test.ts`, com `src/testes/ClienteSupabaseFalso.ts`); `src/processos/processosSupabase.ts`; `src/processos/andamentosSupabase.ts` (as duas recusas novas no padrão e nas frases).
 
-- [ ] Testes (antes): `listarCatalogo` lê `etapas` com `id, codigo, nome, ordem, nivel, obrigatoria, ativa`, em ordem, e devolve os tipos da tela; falha de leitura vira `Error` com a mensagem do banco; `acrescentarEtapa` chama `acrescentar_etapa` com `p_antes_de` nulo para "No fim"; `moverEtapa` chama `mover_etapa`; `etapa_usada:Reunião de modelagem` e `etapas_do_setor_primeiro` viram as frases do critério 3; `23505` com `etapas_nome_unico` e com `etapas_codigo_key` viram as frases de nome e código repetidos; editar, desativar, reativar e excluir que não mudam nenhuma linha viram recusa por perfil (etapa ainda legível) ou `CadastroInexistente` (etapa sumiu), pelo `porQueNadaMudou`; `42501` vira "Seu perfil não permite alterar os processos.".
-- [ ] Implementar `criarCatalogoSupabase(cliente, recusas): ModuloDoCatalogo`, com `catalogo: criarCatalogoSupabase(cliente, RECUSAS_DOS_PROCESSOS)` em `criarProcessosSupabase`. Acrescentar `etapa_usada` e `etapas_do_setor_primeiro` a `PADRAO_DA_RECUSA` e `FRASE_DA_RECUSA` de `andamentosSupabase.ts` (e o nome da migração no comentário de lá).
-- [ ] `npx vitest run src/processos` e `npx tsc --noEmit` verdes; commitar as Tarefas 3 e 4 ("Ticket 10 de processos-etapas: catálogo no módulo de processos, real e falso").
+- [x] Testes (antes): `listarCatalogo` lê `etapas` com `id, codigo, nome, ordem, nivel, obrigatoria, ativa`, em ordem, e devolve os tipos da tela; falha de leitura vira `Error` com a mensagem do banco; `acrescentarEtapa` chama `acrescentar_etapa` com `p_antes_de` nulo para "No fim"; `moverEtapa` chama `mover_etapa`; `etapa_usada:Reunião de modelagem` e `etapas_do_setor_primeiro` viram as frases do critério 3; `23505` com `etapas_nome_unico` e com `etapas_codigo_key` viram as frases de nome e código repetidos; editar, desativar, reativar e excluir que não mudam nenhuma linha viram recusa por perfil (etapa ainda legível) ou `CadastroInexistente` (etapa sumiu), pelo `porQueNadaMudou`; `42501` vira "Seu perfil não permite alterar os processos.".
+- [x] Implementar `criarCatalogoSupabase(cliente, recusas): ModuloDoCatalogo`, com `catalogo: criarCatalogoSupabase(cliente, RECUSAS_DOS_PROCESSOS)` em `criarProcessosSupabase`. Acrescentar `etapa_usada` e `etapas_do_setor_primeiro` a `PADRAO_DA_RECUSA` e `FRASE_DA_RECUSA` de `andamentosSupabase.ts` (e o nome da migração no comentário de lá).
+- [x] `npx vitest run src/processos` e `npx tsc --noEmit` verdes; commitar as Tarefas 3 e 4 ("Ticket 10 de processos-etapas: catálogo no módulo de processos, real e falso").
 
 ### Tarefa 5 — Validação da etapa e textos do histórico
 
 **Arquivos:** criar `src/processos/validacaoDaEtapa.ts` e o teste; `src/cadastros/historicoDosCadastros.ts` e o teste; `src/cadastros/historicoSupabase.ts` (`'etapa'` em `ENTIDADES_DOS_CADASTROS`) e o teste.
 
-- [ ] Testes (antes) da validação (critério 4): nome vazio ou só espaços → "O nome da etapa é obrigatório."; código fora de `^[a-z0-9_]{2,40}$` ("Revisão", "a", 41 caracteres) → a frase do código com o valor recebido; código válido e nome com espaços nas pontas → dados limpos.
-- [ ] Testes (antes) do histórico (critério 7): `textoDaAcaoDoCadastro` para `etapa` com `acrescentar`, `mudar_ordem`, `desativar`, `reativar`, `editar` e `excluir` → "Acrescentou a etapa ao catálogo", "Mudou a ordem do catálogo", "Desativou a etapa", "Reativou a etapa", "Editou", "Excluiu"; `nomeDoItem` de um evento `etapa` → "{código} — {nome}"; `descreverEstadoDoCadastro` mostra Nível ("Setor"/"Processo"), Obrigatória ("Sim"/"Não"), Situação ("Ativa"/"Inativa") e Posição; o módulo real pede a entidade `etapa`.
-- [ ] Implementar: `TEXTO_DA_ACAO_DA_ETAPA` em `TEXTOS_DA_ENTIDADE`; `etapa` junto de `macroprocesso` no `codigoENome` de `nomeDoItem` (um conjunto `ENTIDADES_COM_CODIGO`, sem aumentar a complexidade); rótulos `nivel`, `obrigatoria`, `ativa` e `ordem` em `ROTULO_DO_CAMPO` e os valores no mapa de `valorDoProcesso` (que passa a se chamar `valorPorRotulo`, por servir também à etapa).
-- [ ] `npx vitest run src/processos src/cadastros` verde; commitar ("Ticket 10 de processos-etapas: validação da etapa e textos do catálogo no histórico").
+- [x] Testes (antes) da validação (critério 4): nome vazio ou só espaços → "O nome da etapa é obrigatório."; código fora de `^[a-z0-9_]{2,40}$` ("Revisão", "a", 41 caracteres) → a frase do código com o valor recebido; código válido e nome com espaços nas pontas → dados limpos.
+- [x] Testes (antes) do histórico (critério 7): `textoDaAcaoDoCadastro` para `etapa` com `acrescentar`, `mudar_ordem`, `desativar`, `reativar`, `editar` e `excluir` → "Acrescentou a etapa ao catálogo", "Mudou a ordem do catálogo", "Desativou a etapa", "Reativou a etapa", "Editou", "Excluiu"; `nomeDoItem` de um evento `etapa` → "{código} — {nome}"; `descreverEstadoDoCadastro` mostra Nível ("Setor"/"Processo"), Obrigatória ("Sim"/"Não"), Situação ("Ativa"/"Inativa") e Posição; o módulo real pede a entidade `etapa`.
+- [x] Implementar: `TEXTO_DA_ACAO_DA_ETAPA` em `TEXTOS_DA_ENTIDADE`; `etapa` junto de `macroprocesso` no `codigoENome` de `nomeDoItem` (um conjunto `ENTIDADES_COM_CODIGO`, sem aumentar a complexidade); rótulos `nivel`, `obrigatoria`, `ativa` e `ordem` em `ROTULO_DO_CAMPO` e os valores no mapa de `valorDoProcesso` (que passa a se chamar `valorPorRotulo`, por servir também à etapa).
+- [x] `npx vitest run src/processos src/cadastros` verde; commitar ("Ticket 10 de processos-etapas: validação da etapa e textos do catálogo no histórico").
 
 ### Tarefa 6 — Aba "Catálogo de etapas" na Administração
 
 **Arquivos:** `src/App.tsx` (passa `processos` à Administração); `src/components/administracao/AreaDeAdministracao.tsx` (abas); criar em `src/components/administracao/`: `CatalogoDeEtapas.tsx` (carregamento, erro e lista), `CatalogoEditavel.tsx` (formulário, exclusão e falhas, no molde de `ResponsaveisEditaveis`), `TabelaDoCatalogo.tsx` (linhas e botões, no molde de `TabelaDeResponsaveis`), `FormularioDaEtapa.tsx` (nova e editar, no molde de `FormularioDeResponsavel`); `Administracao.css` (só o que faltar); criar `src/App.catalogoDeEtapas.test.tsx` e `src/App.catalogoNosProcessos.test.tsx`.
 
-- [ ] Testes de tela (antes), aplicativo inteiro com `AcessoFalso`, `CadastrosFalso` e `ProcessosFalso` (critérios 4, 5 e 8):
+- [x] Testes de tela (antes), aplicativo inteiro com `AcessoFalso`, `CadastrosFalso` e `ProcessosFalso` (critérios 4, 5 e 8):
   - `App.catalogoDeEtapas.test.tsx`: o administrador vê as abas "Usuários" e "Catálogo de etapas"; a lista em ordem com nome, nível, "Obrigatória" ou "Opcional" e a pílula "Inativa"; Integrante e Consulta não veem a aba; "Carregando catálogo…"; erro com [Tentar de novo] que recarrega; [Nova etapa] com sucesso na posição escolhida ("Entrar antes de" e "No fim"); código inválido mostra a frase com o valor e não grava; nome vazio idem; falha de gravação mostra "A alteração não foi salva: {motivo}. Seus dados continuam no formulário."; recusa "As etapas do setor precisam vir antes das etapas do processo."; [Editar] (nome e obrigatória) com sucesso e com falha; [Subir] e [Descer] com sucesso, desabilitados nas pontas, e falha; [Desativar] e [Reativar] com sucesso e com falha; [Excluir] abre "Excluir a etapa {nome} do catálogo?" com [Excluir etapa] e [Cancelar]; excluir com sucesso; recusa "A etapa {nome} já foi usada; desative-a em vez de excluir."; Cancelar não grava.
   - `App.catalogoNosProcessos.test.tsx`: etapa nova de nível processo vira coluna no Quadro; aparece pendente no caminho do painel de um processo em andamento e não no de um concluído; desativar a etapa em que um processo está mantém a coluna enquanto ele estiver nela.
-- [ ] Implementar as abas e os componentes. Nível na tela: "Setor" e "Processo"; obrigatória: caixa de marcar "Obrigatória". Posição: seletor "Posição" com "Antes de {nome}" para cada etapa e "No fim" (o padrão). Cada botão da linha com `aria-label` "{ação} {nome}". Depois de cada gravação, a lista recarrega.
-- [ ] `npm test`, `npm run lint` e `npx tsc --noEmit` verdes; commitar ("Ticket 10 de processos-etapas: aba do catálogo de etapas na Administração").
+- [x] Implementar as abas e os componentes. Nível na tela: "Setor" e "Processo"; obrigatória: caixa de marcar "Obrigatória". Posição: seletor "Posição" com "Antes de {nome}" para cada etapa e "No fim" (o padrão). Cada botão da linha com `aria-label` "{ação} {nome}". Depois de cada gravação, a lista recarrega.
+- [x] `npm test`, `npm run lint` e `npx tsc --noEmit` verdes; commitar ("Ticket 10 de processos-etapas: aba do catálogo de etapas na Administração").
 
 ### Tarefa 7 — Fechamento
 
