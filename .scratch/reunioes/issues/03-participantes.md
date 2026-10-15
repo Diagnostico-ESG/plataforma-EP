@@ -17,3 +17,5 @@
 - [ ] Painel: as três listas de participantes; usuário inativo marcado com pílula.
 - [ ] Consulta vê os participantes sem campos editáveis.
 - [ ] Testes de interface com o aplicativo inteiro cobrindo os itens acima, incluindo o responsável excluído aparecendo como outro participante.
+
+Concluído em 2026-10-15 (commit bf4fbe3)
