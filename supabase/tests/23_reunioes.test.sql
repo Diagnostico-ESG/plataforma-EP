@@ -180,10 +180,10 @@ insert into _tap (linha) select is(pg_temp.evento('sens1', 'criar') -> 'depois' 
   'o evento de criação traz a sigla do setor');
 insert into _tap (linha) select is(jsonb_array_length(pg_temp.evento('mod1', 'criar') -> 'depois' -> 'processos'), 2,
   'o evento de criação da modelagem traz os dois processos');
-insert into _tap (linha) select is(pg_temp.eventos('sens1', 'alterar'), 1::bigint, 'alterar gera um evento');
+insert into _tap (linha) select is(pg_temp.eventos('sens1', 'editar'), 1::bigint, 'alterar gera um evento');
 insert into _tap (linha) select ok(
-  pg_temp.evento('sens1', 'alterar') -> 'antes' ->> 'setor_sigla' = 'TR1'
-  and pg_temp.evento('sens1', 'alterar') -> 'depois' ->> 'setor_sigla' = 'TR2',
+  pg_temp.evento('sens1', 'editar') -> 'antes' ->> 'setor_sigla' = 'TR1'
+  and pg_temp.evento('sens1', 'editar') -> 'depois' ->> 'setor_sigla' = 'TR2',
   'o evento de alteração traz antes e depois');
 insert into _tap (linha) select lives_ok(
   $sql$select public.salvar_reuniao(pg_temp.reuniao('txt'), 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
