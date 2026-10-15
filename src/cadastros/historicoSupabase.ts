@@ -9,8 +9,11 @@ export type EventoDoBanco = {
 // Cadastros, etapas (do setor e do catálogo) e responsáveis do setor. A RLS de eventos já deixa passar só estas entidades para quem não é administrador; o filtro mantém o mesmo
 // resultado para o administrador, que também lê os eventos de usuários (com e-mails).
 const ENTIDADES_DOS_CADASTROS = [
-  'setor', 'macroprocesso', 'setor_envolvido', 'andamento', 'responsavel_do_setor', 'processo', 'etapa',
+  'setor', 'macroprocesso', 'setor_envolvido', 'andamento', 'responsavel_do_setor', 'processo', 'etapa', 'reuniao',
 ]
+
+/** As colunas de um evento com o nome de quem o causou. */
+export const COLUNAS_DO_EVENTO = 'id, ocorrido_em, acao, entidade, entidade_ref, detalhes, autor:usuarios(nome)'
 
 export function criarHistoricoSupabase(cliente: ClienteSupabase): Pick<ModuloDeCadastros, 'listarHistoricoDosCadastros'> {
   return { listarHistoricoDosCadastros: () => listarHistoricoDosCadastros(cliente) }
@@ -18,7 +21,7 @@ export function criarHistoricoSupabase(cliente: ClienteSupabase): Pick<ModuloDeC
 
 async function listarHistoricoDosCadastros(cliente: ClienteSupabase): Promise<EventoDoCadastro[]> {
   const { data, error } = await cliente.from('eventos')
-    .select('id, ocorrido_em, acao, entidade, entidade_ref, detalhes, autor:usuarios(nome)')
+    .select(COLUNAS_DO_EVENTO)
     .in('entidade', ENTIDADES_DOS_CADASTROS)
     .order('ocorrido_em', { ascending: false }).order('id', { ascending: false })
   if (error) throw new Error(`Falha ao ler o histórico dos cadastros: ${error.message}`)

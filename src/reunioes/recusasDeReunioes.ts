@@ -1,7 +1,12 @@
-import { type ErroDoBanco, TravaDoBanco, recusaPorPerfil } from '../acesso/falhasDeGravacao'
+import { type ErroDoBanco, type RecusasDoModulo, TravaDoBanco, recusaPorPerfil } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 
 export const SEM_PERMISSAO_DAS_REUNIOES = 'Seu perfil não permite alterar as reuniões.'
+
+/** O que não pode alterar e o aviso de reunião que sumiu, para a conferência de linha afetada (porQueNadaMudou). */
+export const RECUSAS_DAS_REUNIOES: RecusasDoModulo = {
+  semPermissao: SEM_PERMISSAO_DAS_REUNIOES, registroInexistente: () => new CadastroInexistente(),
+}
 
 export const FRASE_DA_MODELAGEM_SEM_PROCESSO = 'A reunião de modelagem precisa de ao menos um processo.'
 export const FRASE_DA_SENSIBILIZACAO_COM_PROCESSO = 'A reunião de sensibilização não tem processos.'

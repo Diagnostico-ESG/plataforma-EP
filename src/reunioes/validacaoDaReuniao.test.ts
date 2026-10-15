@@ -1,8 +1,12 @@
 import { expect, test } from 'vitest'
-import { CAMPOS_DA_REUNIAO_EM_BRANCO, type CamposDaReuniao, comMudanca, dadosDaReuniao, faltaPreencher } from './validacaoDaReuniao'
+import type { Reuniao } from './tipos'
+import {
+  CAMPOS_DA_REUNIAO_EM_BRANCO, type CamposDaReuniao, camposDaReuniao, comMudanca, dadosDaReuniao, faltaPreencher,
+} from './validacaoDaReuniao'
 
 const PREENCHIDOS: CamposDaReuniao = {
   tipo: 'modelagem', setorId: 's1', processosIds: ['p1'], data: '2026-10-20', hora: '', local: '', anotacoes: '',
+  outrosParticipantes: [],
 }
 
 test('falta preencher quando falta tipo, setor ou data', () => {
@@ -28,5 +32,32 @@ test('trocar o setor ou passar para sensibilização desmarca os processos; outr
 test('os dados gravados trazem hora, local e anotações aparados, com nulo no lugar do vazio', () => {
   expect(dadosDaReuniao({ ...PREENCHIDOS, hora: '09:30', local: ' Sala 1 ', anotacoes: '   ' })).toEqual({
     tipo: 'modelagem', setorId: 's1', data: '2026-10-20', hora: '09:30', local: 'Sala 1', anotacoes: null, processosIds: ['p1'],
+    outrosParticipantes: [],
   })
+})
+
+const REUNIAO: Reuniao = {
+  id: 'r1', tipo: 'modelagem', setorId: 's1', setorSigla: 'TSA', setorAtivo: true, data: '2026-10-20', hora: '09:30', local: 'Sala 1',
+  anotacoes: 'Pauta', outrosParticipantes: ['Ana'],
+  processos: [{ id: 'p1', nome: 'Emitir Ofício', cancelado: false }, { id: 'p2', nome: 'Arquivar Pasta', cancelado: true }],
+}
+
+test('os campos da edição partem da reunião, com texto vazio no lugar de nulo', () => {
+  expect(camposDaReuniao(REUNIAO)).toEqual({
+    tipo: 'modelagem', setorId: 's1', processosIds: ['p1', 'p2'], data: '2026-10-20', hora: '09:30', local: 'Sala 1',
+    anotacoes: 'Pauta', outrosParticipantes: ['Ana'],
+  })
+  expect(camposDaReuniao({ ...REUNIAO, hora: null, local: null, anotacoes: null })).toMatchObject({ hora: '', local: '', anotacoes: '' })
+})
+
+test('salvar a edição sem mexer devolve os mesmos dados da reunião, inclusive os outros participantes', () => {
+  expect(dadosDaReuniao(camposDaReuniao(REUNIAO))).toEqual({
+    tipo: 'modelagem', setorId: 's1', data: '2026-10-20', hora: '09:30', local: 'Sala 1', anotacoes: 'Pauta',
+    processosIds: ['p1', 'p2'], outrosParticipantes: ['Ana'],
+  })
+})
+
+test('na edição, trocar o setor ou o tipo desmarca os processos da reunião', () => {
+  expect(comMudanca(camposDaReuniao(REUNIAO), { setorId: 's2' }).processosIds).toEqual([])
+  expect(comMudanca(camposDaReuniao(REUNIAO), { tipo: 'sensibilizacao' }).processosIds).toEqual([])
 })

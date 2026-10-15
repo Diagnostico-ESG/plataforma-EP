@@ -6,7 +6,7 @@ import type { Reuniao } from './tipos'
 function reuniao(id: string, mudancas: Partial<Reuniao>): Reuniao {
   return {
     id, tipo: 'sensibilizacao', setorId: 's1', setorSigla: 'TSA', setorAtivo: true, data: '2026-10-10', hora: null,
-    local: null, anotacoes: null, processos: [], ...mudancas,
+    local: null, anotacoes: null, outrosParticipantes: [], processos: [], ...mudancas,
   }
 }
 

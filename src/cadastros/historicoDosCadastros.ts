@@ -1,6 +1,8 @@
 import { ROTULO_DO_STATUS, formatarData } from '../processos/caminhoDeEtapas'
 import { ROTULO_DA_ORIGEM, ROTULO_DA_SITUACAO, ROTULO_DO_TIPO } from '../processos/rotulos'
 import type { StatusDaEtapa } from '../processos/tipos'
+import { ROTULO_DO_TIPO_DE_REUNIAO } from '../reunioes/rotulos'
+import { nomeDaReuniaoNoHistorico, valorDoCampoDaReuniao } from '../reunioes/textosDoHistorico'
 import { rotuloDaCategoria } from './categorias'
 import type { CategoriaDoMacroprocesso, EstadoDoCadastro, EventoDoCadastro, ItemDoFiltro } from './tipos'
 
@@ -60,6 +62,8 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   tipo: 'Tipo', origem: 'Origem', situacao: 'Situação', contexto: 'Contexto', andamentos: 'Etapas',
   processo_nome: 'Processo', responsavel_nome: 'Responsável', processo_pai_nome: 'Processo pai',
   nivel: 'Nível', obrigatoria: 'Obrigatória', ativa: 'Situação', ordem: 'Posição',
+  data: 'Data', hora: 'Hora', local: 'Local', anotacoes: 'Anotações', outros_participantes: 'Outros participantes',
+  processos: 'Processos',
 }
 
 // Os ids existem para o filtro; quem lê o histórico vê a sigla e o nome. Código e nome da etapa já estão no título.
@@ -88,8 +92,10 @@ function codigoENome(codigo: unknown, nome: unknown): string {
   return typeof codigo === 'string' && codigo !== '' ? `${codigo} — ${texto(nome)}` : texto(nome)
 }
 
-// Etapa e responsável pertencem a um setor (a etapa, também a um processo): o nome vem com o dono; null se não for deles.
+// Etapa e responsável pertencem a um setor (a etapa, também a um processo): o nome vem com o dono; a reunião tem o
+// nome próprio (tipo, data e setor); null se o item não for de nenhum deles.
 function nomeDoItemComDono(entidade: string, estado: Record<string, unknown>): string | null {
+  if (entidade === 'reuniao') return nomeDaReuniaoNoHistorico(estado)
   const nomes: Record<string, unknown> = { andamento: estado.etapa_nome, responsavel_do_setor: estado.nome }
   const nome = nomes[entidade]
   if (typeof nome !== 'string') return null
@@ -128,7 +134,7 @@ function valorDaEtapa(campo: string, valor: unknown): string | null {
 // null se não for deles.
 function valorPorRotulo(campo: string, valor: unknown): string | null {
   const rotulos: Record<string, Record<string, string>> = {
-    tipo: ROTULO_DO_TIPO, origem: ROTULO_DA_ORIGEM, situacao: ROTULO_DA_SITUACAO,
+    tipo: { ...ROTULO_DO_TIPO, ...ROTULO_DO_TIPO_DE_REUNIAO }, origem: ROTULO_DA_ORIGEM, situacao: ROTULO_DA_SITUACAO,
     nivel: { setor: 'Setor', processo: 'Processo' }, obrigatoria: { true: 'Sim', false: 'Não' },
     ativa: { true: 'Ativa', false: 'Inativa' },
   }
@@ -139,7 +145,7 @@ function valorPorRotulo(campo: string, valor: unknown): string | null {
 function valorLegivel(campo: string, valor: unknown): string {
   if (campo === 'ativo') return valor ? 'Ativo' : 'Inativo'
   if (campo === 'categoria') return rotuloDaCategoria(valor as CategoriaDoMacroprocesso | null)
-  const daEtapa = valorDaEtapa(campo, valor) ?? valorPorRotulo(campo, valor)
+  const daEtapa = valorDaEtapa(campo, valor) ?? valorPorRotulo(campo, valor) ?? valorDoCampoDaReuniao(campo, valor)
   if (daEtapa !== null) return daEtapa
   if (typeof valor === 'number') return String(valor) // a posição da etapa no catálogo
   if (!Array.isArray(valor)) return texto(valor)

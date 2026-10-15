@@ -7,7 +7,7 @@ const HOJE = '2026-10-14'
 function reuniao(id: string, data: string, mudancas: Partial<Reuniao> = {}): Reuniao {
   return {
     id, tipo: 'sensibilizacao', setorId: 's1', setorSigla: 'TSA', setorAtivo: true, data, hora: null, local: null,
-    anotacoes: null, processos: [], ...mudancas,
+    anotacoes: null, outrosParticipantes: [], processos: [], ...mudancas,
   }
 }
 

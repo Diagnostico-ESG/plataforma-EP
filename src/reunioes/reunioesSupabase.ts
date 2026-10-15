@@ -1,5 +1,8 @@
+import { porQueNadaMudou, recusaPorPerfil } from '../acesso/falhasDeGravacao'
+import { COLUNAS_DO_EVENTO, type EventoDoBanco, eventoDoCadastro } from '../cadastros/historicoSupabase'
+import type { EventoDoCadastro } from '../cadastros/tipos'
 import type { ClienteSupabase } from '../lib/supabase'
-import { falhaDaReuniao } from './recusasDeReunioes'
+import { RECUSAS_DAS_REUNIOES, SEM_PERMISSAO_DAS_REUNIOES, falhaDaReuniao } from './recusasDeReunioes'
 import { COLUNAS_DA_REUNIAO, type LinhaDaReuniao, reuniaoDaLinha } from './reuniaoDaLinha'
 import type { DadosDaReuniao, ModuloDeReunioes, ProcessoDaReuniao, Reuniao, SetorParaReuniao } from './tipos'
 
@@ -10,6 +13,8 @@ export function criarReunioesSupabase(cliente: ClienteSupabase): ModuloDeReunioe
     listarSetoresAtivos: () => listarSetoresAtivos(cliente),
     listarProcessosDoSetor: (setorId) => listarProcessosDoSetor(cliente, setorId),
     salvarReuniao: (id, dados) => salvarReuniao(cliente, id, dados),
+    excluirReuniao: (id) => excluirReuniao(cliente, id),
+    lerHistoricoDaReuniao: (id) => lerHistoricoDaReuniao(cliente, id),
   }
 }
 
@@ -43,7 +48,24 @@ async function salvarReuniao(cliente: ClienteSupabase, id: string | null, dados:
   // O gerador de tipos do Supabase não marca parâmetro de função como anulável; o banco aceita nulo nestes (id nulo cria).
   const { error } = await cliente.rpc('salvar_reuniao', {
     p_id: id as string, p_tipo: dados.tipo, p_setor_id: dados.setorId, p_data: dados.data, p_hora: dados.hora as string,
-    p_local: dados.local as string, p_anotacoes: dados.anotacoes as string, p_outros: [], p_processos: dados.processosIds,
+    p_local: dados.local as string, p_anotacoes: dados.anotacoes as string, p_outros: dados.outrosParticipantes, p_processos: dados.processosIds,
   })
   if (error) throw falhaDaReuniao(error, dados)
+}
+
+// A RLS não acusa erro ao filtrar: sem linha afetada, a leitura decide entre perfil e reunião que sumiu.
+async function excluirReuniao(cliente: ClienteSupabase, id: string): Promise<void> {
+  const { data, error } = await cliente.from('reunioes').delete().eq('id', id).select('id')
+  if (error) throw recusaPorPerfil(error, SEM_PERMISSAO_DAS_REUNIOES)
+  if (data.length) return
+  const { data: lidas } = await cliente.from('reunioes').select('id').eq('id', id)
+  throw porQueNadaMudou(Boolean(lidas?.length), RECUSAS_DAS_REUNIOES)
+}
+
+async function lerHistoricoDaReuniao(cliente: ClienteSupabase, id: string): Promise<EventoDoCadastro[]> {
+  const { data, error } = await cliente.from('eventos').select(COLUNAS_DO_EVENTO)
+    .eq('entidade', 'reuniao').eq('entidade_ref', id)
+    .order('ocorrido_em', { ascending: false }).order('id', { ascending: false })
+  if (error) throw new Error(`Falha ao ler o histórico da reunião ${id}: ${error.message}`)
+  return (data as unknown as EventoDoBanco[]).map(eventoDoCadastro)
 }

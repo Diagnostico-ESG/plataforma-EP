@@ -1,4 +1,7 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
+import { CadastroInexistente } from '../cadastros/cadastroInexistente'
+import type { EventoDoCadastro } from '../cadastros/tipos'
+import { estadoDoEventoDaReuniao } from './estadoDoEvento'
 import {
   FRASE_DA_MODELAGEM_SEM_PROCESSO, FRASE_DA_SENSIBILIZACAO_COM_PROCESSO, fraseDoProcessoDeOutroSetor, fraseDoSetorInativo,
 } from './recusasDeReunioes'
@@ -21,6 +24,10 @@ export class ReunioesFalso implements ModuloDeReunioes {
   segurarLeituraDaReuniao = false
   /** A leitura dos setores e dos processos do formulário. */
   falharOpcoes = false
+  falharHistoricoDaReuniao = false
+  segurarHistoricoDaReuniao = false
+  /** Os eventos que o banco gravaria, na ordem em que aconteceram (a leitura devolve do mais recente). */
+  historico: EventoDoCadastro[] = []
   /** Texto: motivo em português (falha genérica). Error: a recusa pronta (TravaDoBanco), como o módulo real. */
   falhaDeGravacao: string | Error | null = null
   /** As gravações que o banco aceitou, na ordem. */
@@ -50,14 +57,46 @@ export class ReunioesFalso implements ModuloDeReunioes {
   }
 
   async salvarReuniao(id: string | null, dados: DadosDaReuniao): Promise<void> {
-    if (typeof this.falhaDeGravacao === 'string') throw new Error(this.falhaDeGravacao)
-    if (this.falhaDeGravacao) throw this.falhaDeGravacao
+    this.falharSeConfigurado()
     const anterior = this.reunioes.find((reuniao) => reuniao.id === id)
+    if (id !== null && !anterior) throw new CadastroInexistente()
     const setor = this.setores.find((candidato) => candidato.id === dados.setorId)
     this.conferirRegras(dados, setor, anterior)
     const reuniao = this.montar(id ?? `r${this.proximoId++}`, dados, setor)
     this.reunioes = anterior ? this.reunioes.map((r) => (r.id === reuniao.id ? reuniao : r)) : [...this.reunioes, reuniao]
     this.gravacoes.push({ id, dados })
+    this.registrarEvento(anterior, reuniao)
+  }
+
+  async excluirReuniao(id: string): Promise<void> {
+    this.falharSeConfigurado()
+    const anterior = this.reunioes.find((reuniao) => reuniao.id === id)
+    if (!anterior) throw new CadastroInexistente()
+    this.reunioes = this.reunioes.filter((reuniao) => reuniao.id !== id)
+    this.registrarEvento(anterior, undefined)
+  }
+
+  async lerHistoricoDaReuniao(id: string): Promise<EventoDoCadastro[]> {
+    if (this.segurarHistoricoDaReuniao) return new Promise<never>(() => {})
+    if (this.falharHistoricoDaReuniao) throw new Error('falha de conexão simulada')
+    return this.historico.filter((evento) => evento.entidadeRef === id).reverse()
+  }
+
+  // Um evento por gravação, com o estado completo; gravação sem mudança não gera evento (como o banco).
+  private registrarEvento(antes: Reuniao | undefined, depois: Reuniao | undefined): void {
+    const estadoAntes = antes ? estadoDoEventoDaReuniao(antes) : null
+    const estadoDepois = depois ? estadoDoEventoDaReuniao(depois) : null
+    if (JSON.stringify(estadoAntes) === JSON.stringify(estadoDepois)) return
+    const acao = !antes ? 'criar' : !depois ? 'excluir' : 'editar'
+    this.historico.push({
+      id: this.historico.length + 1, ocorridoEm: new Date().toISOString(), autor: 'Pessoa de Teste', acao,
+      entidade: 'reuniao', entidadeRef: (depois ?? antes)?.id ?? '', antes: estadoAntes, depois: estadoDepois,
+    })
+  }
+
+  private falharSeConfigurado(): void {
+    if (typeof this.falhaDeGravacao === 'string') throw new Error(this.falhaDeGravacao)
+    if (this.falhaDeGravacao) throw this.falhaDeGravacao
   }
 
   private conferirOpcoes(): void {
@@ -84,6 +123,7 @@ export class ReunioesFalso implements ModuloDeReunioes {
     return {
       id, tipo: dados.tipo, setorId: dados.setorId, setorSigla: setor?.sigla ?? dados.setorId, setorAtivo: setor?.ativo ?? true,
       data: dados.data, hora: dados.hora, local: dados.local, anotacoes: dados.anotacoes,
+      outrosParticipantes: dados.outrosParticipantes,
       processos: doSetor.filter((processo) => dados.processosIds.includes(processo.id)),
     }
   }
