@@ -370,6 +370,87 @@ export type Database = {
           },
         ]
       }
+      reunioes: {
+        Row: {
+          anotacoes: string | null
+          criado_em: string
+          data: string
+          hora: string | null
+          id: string
+          local: string | null
+          outros_participantes: string[]
+          setor_id: string
+          tipo: Database["public"]["Enums"]["tipo_de_reuniao"]
+        }
+        Insert: {
+          anotacoes?: string | null
+          criado_em?: string
+          data: string
+          hora?: string | null
+          id?: string
+          local?: string | null
+          outros_participantes?: string[]
+          setor_id: string
+          tipo: Database["public"]["Enums"]["tipo_de_reuniao"]
+        }
+        Update: {
+          anotacoes?: string | null
+          criado_em?: string
+          data?: string
+          hora?: string | null
+          id?: string
+          local?: string | null
+          outros_participantes?: string[]
+          setor_id?: string
+          tipo?: Database["public"]["Enums"]["tipo_de_reuniao"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reunioes_setor_id_fkey"
+            columns: ["setor_id"]
+            isOneToOne: false
+            referencedRelation: "setores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reunioes_processos: {
+        Row: {
+          processo_id: string
+          reuniao_id: string
+        }
+        Insert: {
+          processo_id: string
+          reuniao_id: string
+        }
+        Update: {
+          processo_id?: string
+          reuniao_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reunioes_processos_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: false
+            referencedRelation: "processos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reunioes_processos_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: false
+            referencedRelation: "processos_com_andamento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reunioes_processos_reuniao_id_fkey"
+            columns: ["reuniao_id"]
+            isOneToOne: false
+            referencedRelation: "reunioes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       setores: {
         Row: {
           ativo: boolean
@@ -591,6 +672,20 @@ export type Database = {
         Args: { p_motivo: string; p_processo: string }
         Returns: undefined
       }
+      salvar_reuniao: {
+        Args: {
+          p_anotacoes: string
+          p_data: string
+          p_hora: string
+          p_id: string
+          p_local: string
+          p_outros: string[]
+          p_processos: string[]
+          p_setor_id: string
+          p_tipo: Database["public"]["Enums"]["tipo_de_reuniao"]
+        }
+        Returns: string
+      }
       suspender_processo: {
         Args: { p_motivo: string; p_processo: string }
         Returns: undefined
@@ -613,6 +708,7 @@ export type Database = {
         | "realizada_anteriormente"
         | "dispensada"
       tipo_de_processo: "processo" | "subprocesso" | "a_classificar"
+      tipo_de_reuniao: "sensibilizacao" | "modelagem"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -756,6 +852,7 @@ export const Constants = {
         "dispensada",
       ],
       tipo_de_processo: ["processo", "subprocesso", "a_classificar"],
+      tipo_de_reuniao: ["sensibilizacao", "modelagem"],
     },
   },
 } as const
