@@ -145,3 +145,8 @@ test('clicar dentro do menu da conta não fecha o menu', async () => {
   fireEvent.pointerDown(screen.getByText('Integrante do EP'))
   expect(screen.getByRole('button', { name: 'Sair' })).toBeTruthy()
 })
+
+test('a barra superior não tem botão "Filtrar": os filtros ficam na barra própria dos processos', async () => {
+  await abrirLogado()
+  expect(screen.queryByRole('button', { name: 'Filtrar' })).toBeNull()
+})

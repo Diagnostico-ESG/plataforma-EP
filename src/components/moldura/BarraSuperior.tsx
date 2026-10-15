@@ -1,5 +1,4 @@
 import type { UsuarioAtual } from '../../acesso/tipos'
-import { Icone } from '../Icone'
 import type { AreaComTela } from './areas'
 import { MenuDaConta } from './MenuDaConta'
 
@@ -28,9 +27,6 @@ export function BarraSuperior({ titulo, usuario, aoSair, visao, aoIrPara }: Barr
         </div>
       )}
       <div className="barra-acoes">
-        <button type="button" className="botao-icone barra-icone" aria-label="Filtrar" title="Filtrar">
-          <Icone nome="filtro" />
-        </button>
         <MenuDaConta usuario={usuario} aoSair={aoSair} />
       </div>
     </header>

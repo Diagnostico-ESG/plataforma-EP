@@ -130,14 +130,6 @@
   margin-left: auto;
 }
 
-.barra-icone {
-  color: var(--folha);
-}
-
-.barra-icone:hover {
-  background: var(--branco-sobre-azul-hover);
-}
-
 /* Na barra azul o contorno azul sumiria: o foco vira branco. */
 .barra-superior :focus-visible {
   outline-color: var(--folha);

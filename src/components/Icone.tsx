@@ -31,7 +31,6 @@ const DESENHOS = {
       <circle cx="10" cy="17" r="2" />
     </>
   ),
-  filtro: <path d="M4 5h16l-6 7.5V18l-4 2v-7.5z" />,
   conta: (
     <>
       <circle cx="12" cy="8" r="4" />
