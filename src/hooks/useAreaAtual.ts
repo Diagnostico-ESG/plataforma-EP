@@ -5,7 +5,7 @@ import { useEndereco } from './useEndereco'
 
 // A área é o primeiro trecho do endereço (#/setores/macroprocessos → setores); Quadro e Lista moram em #/processos.
 function areaDoEndereco(endereco: string): AreaComTela {
-  const area = endereco.split('/')[1]
+  const area = endereco.split('?')[0].split('/')[1]
   if (area === 'administracao' || area === 'setores' || area === 'reunioes') return area
   return lerEnderecoDosProcessos(endereco).visao
 }

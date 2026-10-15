@@ -76,6 +76,7 @@ insert into public.reunioes (id, setor_id, tipo, data) values
 insert into public.reunioes_processos (reuniao_id, processo_id) values
   ('ef000000-0000-0000-0000-0000000000b3', pg_temp.processo('Proc D'));
 set constraints all immediate;
+set constraints all deferred;
 
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 set local role authenticated;
@@ -194,6 +195,7 @@ insert into _tap (linha) select is(
 insert into _tap (linha) select lives_ok(
   $sql$delete from public.reunioes where id = pg_temp.reuniao('mod1')$sql$, 'integrante exclui a reunião de modelagem');
 set constraints all immediate;
+set constraints all deferred;
 insert into _tap (linha) select is(pg_temp.eventos('mod1', 'excluir'), 1::bigint, 'excluir gera um evento');
 insert into _tap (linha) select is(jsonb_array_length(pg_temp.evento('mod1', 'excluir') -> 'antes' -> 'processos'), 2,
   'o evento de exclusão traz tudo o que a reunião tinha');
