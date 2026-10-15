@@ -61,25 +61,28 @@ async function escolher(rotulo: string, opcao: string) {
   fireEvent.change(seletor, { target: { value: valor } })
 }
 
-test('cada filtro da Lista troca as linhas e vai para o endereço', async () => {
+test('o filtro de Setor troca as linhas da Lista e vai para o endereço', async () => {
   montar()
   await escolher('Setor', 'TSB')
   await waitFor(() => expect(window.location.hash).toBe('#/processos/lista?setor=s2'))
   expect(await nomesNaLista()).toEqual(['Arquivar Pasta', 'Emitir Ofício'])
-  const casos: [string, string, string[]][] = [
-    ['Macroprocesso', 'Macro Dois', ['Arquivar Pasta']],
-    ['Etapa atual', 'Aguardando o setor', ['Cadastrar Bem']],
-    ['Etapa atual', 'Relatório técnico', ['Arquivar Pasta']],
-    ['Tipo', 'Subprocesso', ['Conferir Recibo']],
-    ['Responsável', 'Ana Teste', ['Cadastrar Bem', 'Conferir Recibo']],
-    ['Situação', 'Concluído', ['Emitir Ofício']],
-  ]
-  for (const [rotulo, opcao, esperado] of casos) {
-    window.location.hash = '#/processos/lista'
-    await waitFor(() => expect((screen.getByLabelText('Setor') as HTMLSelectElement).value).toBe(''))
-    await escolher(rotulo, opcao)
-    await waitFor(async () => expect(await nomesNaLista()).toEqual(esperado))
-  }
+})
+
+// Um teste por filtro: um teste só com todos os casos estourava o tempo sob carga e, ao estourar, deixava o
+// endereço do caso seguinte (como responsavel=u1) vazar para o teste que vinha depois.
+const CASOS: [string, string, string[]][] = [
+  ['Macroprocesso', 'Macro Dois', ['Arquivar Pasta']],
+  ['Etapa atual', 'Aguardando o setor', ['Cadastrar Bem']],
+  ['Etapa atual', 'Relatório técnico', ['Arquivar Pasta']],
+  ['Tipo', 'Subprocesso', ['Conferir Recibo']],
+  ['Responsável', 'Ana Teste', ['Cadastrar Bem', 'Conferir Recibo']],
+  ['Situação', 'Concluído', ['Emitir Ofício']],
+]
+
+test.each(CASOS)('o filtro %s = %s troca as linhas da Lista', async (rotulo, opcao, esperado) => {
+  montar()
+  await escolher(rotulo, opcao)
+  await waitFor(async () => expect(await nomesNaLista()).toEqual(esperado))
 })
 
 test('a combinação de filtros é "e", e o endereço guarda os dois', async () => {
