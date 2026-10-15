@@ -58,3 +58,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-14 | reunioes | /planejar | US$ 3,10
 2026-10-14 | processos-etapas | /situação e /executar-complexo (ticket 07) | US$ 7,33
 2026-10-15 | reunioes | /executar-complexo (ticket 03) | US$ 11,22
+2026-10-15 | projeto | /demanda (bug: testes instáveis) | US$ 0,91
