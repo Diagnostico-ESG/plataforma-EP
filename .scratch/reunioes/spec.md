@@ -161,7 +161,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
 |---|---|---|
 | Reunião nova só em setor ativo; a que já existe continua válida se o setor ficar inativo | gatilho antes de incluir e de trocar o setor | registrar em setor inativo recusado; desativar setor com reunião mantém a reunião |
 | Modelagem tem ao menos um processo; sensibilização não tem nenhum | gatilho de restrição adiado para o fim da gravação (`deferrable initially deferred`) em `reunioes` e `reunioes_processos` | modelagem sem processo recusada; sensibilização com processo recusada; trocar o tipo para sensibilização tirando os processos na mesma gravação aceito |
-| Processo da reunião é do setor da reunião | gatilho antes de incluir em `reunioes_processos` e ao trocar o setor da reunião | processo de outro setor recusado; trocar o setor com processo do setor antigo recusado |
+| Processo da reunião é do setor da reunião | gatilho antes de incluir em `reunioes_processos`, ao trocar o setor da reunião e ao trocar o setor do processo (recusado se ele tem reunião; migração `processo_com_reunioes_nao_troca_de_setor`) | processo de outro setor recusado; trocar o setor com processo do setor antigo recusado; trocar o setor de processo com reunião recusado com a contagem |
 | Processo em qualquer situação pode ser tratado | nenhuma restrição de situação | processo cancelado aceito |
 | Responsável presente é do setor da reunião | gatilho antes de incluir em `reunioes_responsaveis` e ao trocar o setor | responsável de outro setor recusado |
 | Não excluir setor com reunião | referência recusa apagar; a recusa traz a contagem | excluir setor com 2 reuniões recusado com "2" |

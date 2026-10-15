@@ -84,3 +84,14 @@ Auditoria e polimento em nível de código (o app exige login e não há servido
 **Deixado de fora**
 - `aria-label` "Reuniões do setor/processo" repetindo o título "Reuniões": segue o padrão das seções vizinhas ("Processos do setor"); mudar sozinho deixaria a seção diferente das outras.
 - Alvos de toque de 32 px nos botões de texto (`cadastros-abrir`): o uso é em computador (PRODUCT.md) e é o padrão do projeto inteiro.
+
+## 2026-10-15 — /ship de reunioes
+
+Revisão do diff inteiro (marco `2026-10-14-inicio-reunioes`, 38 commits) em duas frentes, padrões e spec.
+
+- **Achado real, corrigido: o setor de um processo com reunião podia ser trocado.** A regra "o processo da reunião é do setor da reunião" valia ao incluir o processo na reunião e ao trocar o setor da reunião, mas não ao trocar o setor do processo (a Edição do processo oferece o campo Setor e `processos.setor_id` é editável). Corrigido pela migração `20261015101637_processo_com_reunioes_nao_troca_de_setor`: gatilho que recusa com `processo_com_reunioes_muda_de_setor:<total>`; a frase "Não é possível trocar o setor: processo foi tratado em N reunião(ões). Registre um processo novo no outro setor." entrou em `frasesDeReuniao.ts`. Reclassificar o tipo continua livre. Escolha do usuário no `/ship`: corrigir agora. O teste 25 ganhou 3 casos (recusa com a contagem, o processo fica no setor, processo sem reunião ainda troca de setor); migração aplicada pelo workflow "Migrar banco de desenvolvimento" (#15) e "Testes de banco" na branch verde (#71). **O "vermelho" do teste de banco não foi provado antes da migração**: escrevi teste, migração e frase juntos para poupar um ciclo do Actions; o caso de recusa só passa com o gatilho.
+- **Não é falha:** a exclusão de responsável roda com a mesma permissão da alteração (`pode_alterar_cadastros`), e o nome do responsável tem o mesmo limite de 200 caracteres do outro participante; os dois pontos levantados pela revisão não se confirmam.
+- **Testes antigos de exclusão (11, 16 e 17):** não ganharam caso novo com reunião; a recusa está nos testes 23 e 24. Fica registrado.
+- **`testTimeout` de 15 s no `vite.config.ts`** veio do bug dos testes instáveis (`/demanda` de 2026-10-15), não desta funcionalidade.
+- **Cheiros de padrão (julgamento, nada violou regra do projeto):** três `EscolhaDe*` com o mesmo esqueleto; `delete ... <> all` e `insert ... unnest` repetidos em `salvar_reuniao`; onze parâmetros posicionais em `salvar_reuniao`; três consultas de eventos quase iguais em `reunioesSupabase.ts`. Foram para o backlog.
+- **Conferência visual presumida** (o app exige login e dados): ver o relatório do `/ship`.
