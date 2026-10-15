@@ -58,6 +58,15 @@ language sql stable as $$
     and entidade_ref = pg_temp.reuniao(nome_da_reuniao)::text order by id desc limit 1 $$;
 grant execute on function pg_temp.evento(text, text) to authenticated;
 
+create function pg_temp.apagar_reunioes() returns bigint
+language plpgsql as $
+declare apagadas bigint;
+begin
+  with apagada as (delete from public.reunioes returning id) select count(*) into apagadas from apagada;
+  return apagadas;
+end $;
+grant execute on function pg_temp.apagar_reunioes() to authenticated;
+
 -- Preparação como dono do banco: duas reuniões em TR4 e uma de modelagem com o "Proc D". Os eventos pendentes
 -- (restrições adiadas) saem aqui, antes dos testes.
 insert into public.reunioes (id, setor_id, tipo, data) values
@@ -217,9 +226,7 @@ insert into _tap (linha) select ok(
 insert into _tap (linha) select throws_ok(
   $sql$select public.salvar_reuniao(null, 'sensibilizacao', '5f000000-0000-0000-0000-0000000000a1',
     '2026-11-10', null, null, null, '{}', '{}')$sql$, '42501', null, 'consulta não registra reunião');
-insert into _tap (linha) select is(
-  (with apagadas as (delete from public.reunioes returning id) select count(*) from apagadas), 0::bigint,
-  'consulta não apaga reunião');
+insert into _tap (linha) select is(pg_temp.apagar_reunioes(), 0::bigint, 'consulta não apaga reunião');
 insert into _tap (linha) select throws_ok(
   $sql$insert into public.reunioes_processos (reuniao_id, processo_id)
     values (pg_temp.reuniao('sens1'), pg_temp.processo('Proc A'))$sql$, '42501', null,
