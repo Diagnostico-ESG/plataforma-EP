@@ -4,6 +4,7 @@ import {
   descreverEstadoDoCadastro, eventosDoItem, itensDoFiltro, nomeDoItem, rotuloDoMotivo, textoDaAcaoDoCadastro,
 } from '../../cadastros/historicoDosCadastros'
 import type { EventoDoCadastro } from '../../cadastros/tipos'
+import { apenasOQueMudou } from '../../reunioes/textosDoHistorico'
 
 // As classes historico-* vêm da Administração: a lista é a mesma do histórico de usuários.
 export function ListaDoHistorico({ eventos }: { eventos: EventoDoCadastro[] }) {
@@ -25,15 +26,21 @@ export function ListaDoHistorico({ eventos }: { eventos: EventoDoCadastro[] }) {
   )
 }
 
+// Na alteração de uma reunião, só o que mudou: o estado inteiro dela é longo e quase todo igual.
+function antesEDepois({ entidade, acao, antes, depois }: EventoDoCadastro) {
+  return entidade === 'reuniao' && acao === 'editar' ? apenasOQueMudou(antes, depois) : [antes, depois]
+}
+
 export function EventoDoHistorico({ evento }: { evento: EventoDoCadastro }) {
+  const [antes, depois] = antesEDepois(evento)
   return (
     <li className="historico-item">
       <time dateTime={evento.ocorridoEm}>{formatarMomento(evento.ocorridoEm)}</time>
       <span>{evento.autor ?? AUTOR_DIRETO_NO_BANCO}</span>
       <span><strong>{textoDaAcaoDoCadastro(evento.acao, evento.entidade)}</strong> {nomeDoItem(evento)}</span>
       <span className="historico-mudanca">
-        <span>Antes: {descreverEstadoDoCadastro(evento.antes)}</span>
-        <span>Depois: {descreverEstadoDoCadastro(evento.depois)}</span>
+        <span>Antes: {descreverEstadoDoCadastro(antes)}</span>
+        <span>Depois: {descreverEstadoDoCadastro(depois)}</span>
         {evento.motivo && <span>{rotuloDoMotivo(evento.acao)}: {evento.motivo}</span>}
       </span>
     </li>

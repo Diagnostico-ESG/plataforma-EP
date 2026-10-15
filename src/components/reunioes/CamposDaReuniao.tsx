@@ -31,7 +31,9 @@ export function CamposDoFormulario({ campos, setores, reunioes, aoMudar }: Campo
       <label htmlFor={`${id}-setor`}>Setor</label>
       <select id={`${id}-setor`} value={campos.setorId} onChange={(evento) => aoMudar({ setorId: evento.target.value })}>
         <option value="">Escolha o setor</option>
-        {setores.map((setor) => <option key={setor.id} value={setor.id}>{setor.sigla} — {setor.nome}</option>)}
+        {setores.map((setor) => (
+          <option key={setor.id} value={setor.id}>{setor.inativo ? `${setor.sigla} (inativo)` : `${setor.sigla} — ${setor.nome}`}</option>
+        ))}
       </select>
       {campos.tipo === 'modelagem' && campos.setorId && (
         <EscolhaDeProcessos key={campos.setorId} reunioes={reunioes} setorId={campos.setorId}

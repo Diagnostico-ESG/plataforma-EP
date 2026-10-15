@@ -49,7 +49,10 @@ export function AreaDeReunioes({ usuario, reunioes }: AreaDeReunioesProps) {
           aoAbrir={(id) => irParaLista({ aberto: id })} filtros={atual.filtros}
           aoMudarFiltros={(filtros) => irParaLista({ filtros, aberto: null })} />
       </div>
-      {idAberto && <PainelDaReuniao key={idAberto} reunioes={reunioes} id={idAberto} aoFechar={fechar} />}
+      {idAberto && (
+        <PainelDaReuniao key={idAberto} reunioes={reunioes} id={idAberto} podeAlterar={podeAlterar} aoFechar={fechar}
+          aoMudar={recarregar} />
+      )}
       {registrando && <PainelDeNovaReuniao reunioes={reunioes} aoFechar={() => irParaLista({ aberto: null })} aoRegistrada={aoRegistrar} />}
     </section>
   )

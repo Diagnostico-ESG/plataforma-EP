@@ -124,7 +124,9 @@ export class ReunioesFalso implements ModuloDeReunioes {
       id, tipo: dados.tipo, setorId: dados.setorId, setorSigla: setor?.sigla ?? dados.setorId, setorAtivo: setor?.ativo ?? true,
       data: dados.data, hora: dados.hora, local: dados.local, anotacoes: dados.anotacoes,
       outrosParticipantes: dados.outrosParticipantes,
-      processos: doSetor.filter((processo) => dados.processosIds.includes(processo.id)),
+      // Por nome, como o módulo real devolve (reuniaoDaLinha).
+      processos: doSetor.filter((processo) => dados.processosIds.includes(processo.id))
+        .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' })),
     }
   }
 }

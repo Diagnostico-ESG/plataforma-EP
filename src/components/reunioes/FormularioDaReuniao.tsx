@@ -1,9 +1,10 @@
 import { type FormEvent, useCallback, useState } from 'react'
 import { textoDaFalhaNoFormulario } from '../../acesso/falhasDeGravacao'
 import { useCarregamento } from '../../hooks/useCarregamento'
-import type { DadosDaReuniao, ModuloDeReunioes, SetorParaReuniao } from '../../reunioes/tipos'
+import { setoresDaEscolha } from '../../reunioes/setoresDaEscolha'
+import type { DadosDaReuniao, ModuloDeReunioes, Reuniao, SetorParaReuniao } from '../../reunioes/tipos'
 import {
-  CAMPOS_DA_REUNIAO_EM_BRANCO, type CamposDaReuniao, comMudanca, dadosDaReuniao, faltaPreencher,
+  CAMPOS_DA_REUNIAO_EM_BRANCO, type CamposDaReuniao, camposDaReuniao, comMudanca, dadosDaReuniao, faltaPreencher,
 } from '../../reunioes/validacaoDaReuniao'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { CamposDoFormulario } from './CamposDaReuniao'
@@ -11,6 +12,8 @@ import { CamposDoFormulario } from './CamposDaReuniao'
 type FormularioDaReuniaoProps = {
   reunioes: ModuloDeReunioes
   titulo: string
+  /** Na edição, a reunião que já existe: o formulário parte dos dados dela. */
+  reuniao?: Reuniao
   /** A falha segue para o formulário, que a mostra e mantém os dados. */
   aoSalvar: (dados: DadosDaReuniao) => Promise<void>
   aoCancelar: () => void
@@ -28,8 +31,8 @@ export function FormularioDaReuniao({ reunioes, ...formulario }: FormularioDaReu
 type FormularioProntoProps = FormularioDaReuniaoProps & { setores: SetorParaReuniao[] }
 
 // noValidate: as mensagens são as nossas, não as do navegador. Salvar só se habilita com o obrigatório preenchido.
-function FormularioPronto({ reunioes, setores, titulo, aoSalvar, aoCancelar }: FormularioProntoProps) {
-  const [campos, setCampos] = useState<CamposDaReuniao>(CAMPOS_DA_REUNIAO_EM_BRANCO)
+function FormularioPronto({ reunioes, setores, titulo, reuniao, aoSalvar, aoCancelar }: FormularioProntoProps) {
+  const [campos, setCampos] = useState<CamposDaReuniao>(reuniao ? camposDaReuniao(reuniao) : CAMPOS_DA_REUNIAO_EM_BRANCO)
   const [aviso, setAviso] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
 
@@ -48,7 +51,7 @@ function FormularioPronto({ reunioes, setores, titulo, aoSalvar, aoCancelar }: F
   return (
     <form className="formulario-do-processo" aria-label={titulo} noValidate onSubmit={enviar}>
       <h3 className="painel-subtitulo">{titulo}</h3>
-      <CamposDoFormulario campos={campos} setores={setores} reunioes={reunioes}
+      <CamposDoFormulario campos={campos} setores={setoresDaEscolha(setores, reuniao)} reunioes={reunioes}
         aoMudar={(mudanca) => setCampos((atuais) => comMudanca(atuais, mudanca))} />
       <div className="formulario-do-processo-botoes">
         <button type="submit" className="botao botao-principal" disabled={enviando || faltaPreencher(campos)}>Salvar</button>
