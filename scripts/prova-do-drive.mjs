@@ -1,4 +1,4 @@
-// Prova de ponta a ponta da função arquivos-no-drive (documentos-versoes, tickets 01 e 02), rodada pelo usuário
+// Prova de ponta a ponta da função arquivos-no-drive (documentos-versoes, tickets 01 a 06), rodada pelo usuário
 // no terminal dele, contra o projeto de DESENVOLVIMENTO. Pede e-mail e senha dos usuários inventados na hora,
 // não grava nem imprime nenhum dos dois, nem token, nem endereço da sessão de envio. Imprime só OK/FALHOU e códigos.
 import { createClient } from '@supabase/supabase-js'
@@ -170,6 +170,27 @@ async function provarRelatorioDepois(config, integrante, { processoId, numero })
   await provarSemAlteracao(config, integrante, processoId)
 }
 
+// Substituir (ticket 06): o arquivo novo entra no MESMO arquivo do Drive (o id que o Drive devolve no envio é o que o
+// banco já guardava), o nome fica, o hash muda; trocar por outro tipo é recusado antes de tocar o Drive.
+async function provarSubstituicao(config, integrante, { processoId, arquivoId, numero }) {
+  const colunas = 'drive_id, nome, hash_md5'
+  const { data: antes } = await integrante.cliente.from('arquivos_da_versao').select(colunas).eq('id', arquivoId).single()
+  const pedido = { ...pedidoDeEnvio(processoId, numero), arquivo_id: arquivoId }
+  const outroTipo = { ...pedidoDeEnvio(processoId, numero, 'png', PNG), arquivo_id: arquivoId }
+  await esperarRecusa(await chamarFuncao(config, integrante.token, outroTipo), 'substituir por outro tipo é recusado', '409 tipo_de_arquivo_diferente')
+  const novos = new TextEncoder().encode(`${new TextDecoder().decode(CONTEUDO)}<!-- trocado -->
+`)
+  const idNoDrive = await enviarUmArquivo(config, integrante.token, { ...pedido, tamanho: novos.length }, novos, 'application/xml')
+  if (!idNoDrive) return
+  relatar('a substituição usa o mesmo arquivo do Drive', idNoDrive === antes.drive_id, idNoDrive === antes.drive_id ? 'mesmo identificador' : 'identificador diferente')
+  const corpo = { acao: 'registrar', processo_id: processoId, numero, observacao: null, historica: false, arquivo_id: arquivoId, arquivos: [{ papel: 'bpmn', drive_id: idNoDrive }] }
+  const resposta = await chamarFuncao(config, integrante.token, corpo)
+  if (resposta.status !== 200) return relatar('integrante substitui o arquivo', false, await codigoDe(resposta))
+  const { data: depois } = await integrante.cliente.from('arquivos_da_versao').select(colunas).eq('id', arquivoId).single()
+  const trocou = depois.hash_md5 !== antes.hash_md5 && depois.nome === antes.nome && depois.drive_id === antes.drive_id
+  relatar('integrante substitui o arquivo', trocou, trocou ? 'hash novo, mesmo nome e mesmo identificador' : 'o registro não ficou como esperado')
+}
+
 async function conferirDownload(config, token, arquivoId, passo) {
   const resposta = await chamarFuncao(config, token, { acao: 'baixar', arquivo_id: arquivoId })
   if (resposta.status !== 200) return relatar(passo, false, await codigoDe(resposta))
@@ -198,6 +219,8 @@ async function provar() {
   await conferirDownload(config, consulta.token, enviado.arquivoId, 'consulta baixa o arquivo enviado pelo integrante')
   await esperarRecusa(await chamarFuncao(config, consulta.token, { acao: 'baixar', arquivo_id: ARQUIVO_INEXISTENTE }), 'arquivo que não existe é recusado', '403 sem_permissao')
   await esperarRecusa(await chamarFuncao(config, null, { acao: 'baixar', arquivo_id: enviado.arquivoId }), 'sem login é recusado', '401 sem_login')
+  // Por último: a troca muda os bytes do arquivo que a consulta baixou e comparou acima.
+  await provarSubstituicao(config, integrante, enviado)
 }
 
 provar().catch((erro) => {

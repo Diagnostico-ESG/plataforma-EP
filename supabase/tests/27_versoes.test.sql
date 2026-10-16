@@ -211,12 +211,14 @@ insert into _tap (linha) select is(
   3::bigint, 'cada envio gera um evento ligado ao processo, que a consulta lê');
 insert into _tap (linha) select is(
   (select detalhes -> 'depois' ->> 'rotulo' from public.eventos
-    where entidade = 'versao' and entidade_ref = pg_temp.processo('e1')::text and autor_id = '00000000-0000-0000-0000-0000000000a1'
+    where entidade = 'versao' and acao = 'enviar' and entidade_ref = pg_temp.processo('e1')::text
+      and autor_id = '00000000-0000-0000-0000-0000000000a1'
     order by id limit 1),
   'V1', 'o evento traz o rótulo da versão e o autor');
 insert into _tap (linha) select is(
   (select jsonb_array_length(detalhes -> 'depois' -> 'arquivos') from public.eventos
-    where entidade = 'versao' and entidade_ref = pg_temp.processo('e1')::text and detalhes -> 'depois' ->> 'rotulo' = 'V3'),
+    where entidade = 'versao' and acao = 'enviar' and entidade_ref = pg_temp.processo('e1')::text
+      and detalhes -> 'depois' ->> 'rotulo' = 'V3'),
   4, 'o evento traz os arquivos da versão');
 
 -- Inativo.

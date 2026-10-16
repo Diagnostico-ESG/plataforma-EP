@@ -92,8 +92,22 @@ describe('validarIniciarEnvio', () => {
         tamanho: 1024,
         numero: 6,
         historica: false,
+        arquivoId: null,
       },
     })
+  })
+
+  it('arquivo_id é opcional: ausente ou nulo vale null, e um uuid é lido (a substituição do arquivo)', () => {
+    const ARQUIVO = '8f000000-0000-0000-0000-0000000000d1'
+    const lido = (mudancas: Record<string, unknown>) => {
+      const resultado = validarIniciarEnvio(entradaDeEnvio(mudancas))
+      return resultado.ok ? resultado.valor.arquivoId : 'recusada'
+    }
+    expect(lido({})).toBeNull()
+    expect(lido({ arquivo_id: null })).toBeNull()
+    expect(lido({ arquivo_id: ARQUIVO })).toBe(ARQUIVO)
+    expect(lido({ arquivo_id: 'a1' })).toBe('recusada')
+    expect(lido({ arquivo_id: 7 })).toBe('recusada')
   })
 
   it.each([

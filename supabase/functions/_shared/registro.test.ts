@@ -40,6 +40,7 @@ describe('validarRegistrar', () => {
         observacao: 'Corrigido o fluxo',
         historica: false,
         versaoId: null,
+        arquivoId: null,
         arquivos: [{ papel: 'bpmn', driveId: 'id-bpmn' }, { papel: 'png', driveId: 'id-png' }],
       },
     })
@@ -191,19 +192,53 @@ describe('funcaoDoBancoPara e parametrosDoBanco', () => {
   const gravar = [{ papel: 'relatorio' as const, nome: 'a.pdf', formato: 'pdf', tamanho: 1, hash_md5: MD5, drive_id: 'x' }]
 
   it('a nova grava por registrar_versao, a histórica por registrar_versao_historica e o relatório por acrescentar_relatorio', () => {
-    expect(funcaoDoBancoPara({ historica: false, versaoId: null })).toBe('registrar_versao')
-    expect(funcaoDoBancoPara({ historica: true, versaoId: null })).toBe('registrar_versao_historica')
-    expect(funcaoDoBancoPara({ historica: false, versaoId: VERSAO })).toBe('acrescentar_relatorio')
+    expect(funcaoDoBancoPara({ historica: false, versaoId: null, arquivoId: null })).toBe('registrar_versao')
+    expect(funcaoDoBancoPara({ historica: true, versaoId: null, arquivoId: null })).toBe('registrar_versao_historica')
+    expect(funcaoDoBancoPara({ historica: false, versaoId: VERSAO, arquivoId: null })).toBe('acrescentar_relatorio')
   })
 
   it('os parâmetros seguem a função: versão nova ou histórica levam o processo; o relatório, a versão e o arquivo', () => {
-    const base = { processoId: PROCESSO, numero: 3, observacao: null, historica: false, arquivos: [] }
+    const base = { processoId: PROCESSO, numero: 3, observacao: null, historica: false, arquivoId: null, arquivos: [] }
     expect(parametrosDoBanco({ ...base, versaoId: null }, gravar)).toEqual({
       p_processo: PROCESSO, p_numero: 3, p_observacao: null, p_arquivos: gravar,
     })
     expect(parametrosDoBanco({ ...base, versaoId: VERSAO }, gravar)).toEqual({
       p_versao: VERSAO, p_numero: 3, p_arquivo: gravar[0],
     })
+  })
+})
+
+describe('substituição do arquivo (arquivo_id)', () => {
+  const ARQUIVO = '8f000000-0000-0000-0000-0000000000d1'
+  const VERSAO = '8f000000-0000-0000-0000-0000000000c1'
+  const png = [{ papel: 'png', drive_id: 'id-png' }]
+  const gravar = [{ papel: 'png' as const, nome: 'a.png', formato: 'png', tamanho: 9, hash_md5: MD5, drive_id: 'id-png' }]
+
+  it('lê o arquivo_id e o único arquivo, de qualquer papel', () => {
+    const resultado = validarRegistrar(entrada({ arquivo_id: ARQUIVO, arquivos: png }))
+    expect(resultado.ok && resultado.valor.arquivoId).toBe(ARQUIVO)
+  })
+
+  it.each([
+    ['arquivo_id que não é uuid', { arquivo_id: 'a1', arquivos: png }],
+    ['mais de um arquivo', { arquivo_id: ARQUIVO }],
+    ['histórica', { arquivo_id: ARQUIVO, arquivos: png, historica: true }],
+    ['versao_id junto', { arquivo_id: ARQUIVO, arquivos: png, versao_id: VERSAO }],
+  ])('recusa %s', (_nome, mudancas) => {
+    expect(codigoDe(entrada(mudancas))).toBe('entrada_invalida')
+  })
+
+  it('grava por substituir_arquivo, com o arquivo e o que o Drive informou dele', () => {
+    const base = { processoId: PROCESSO, numero: 3, observacao: null, historica: false, versaoId: null, arquivos: [] }
+    const substituicao = { ...base, arquivoId: ARQUIVO }
+    expect(funcaoDoBancoPara(substituicao)).toBe('substituir_arquivo')
+    expect(parametrosDoBanco(substituicao, gravar)).toEqual({ p_arquivo: ARQUIVO, p_novo: gravar[0] })
+  })
+
+  it('a recusa do formato diferente chega como código e 409', () => {
+    const recusa = recusaDoBanco({ code: 'P0001', message: 'tipo_de_arquivo_diferente:pdf' })
+    expect(recusa).toEqual({ codigo: 'tipo_de_arquivo_diferente', mensagem: 'pdf' })
+    expect(recusa && statusDaRecusaDoBanco(recusa)).toBe(409)
   })
 })
 

@@ -10,6 +10,8 @@ import {
   type ArquivoParaGravar,
   type EntradaRegistrar,
 } from '../_shared/registro.ts'
+import { conferirAlvoDoRegistro } from '../_shared/substituicao.ts'
+import { lerAlvoDaSubstituicao } from './acoes.ts'
 import { responderResultadoDoBanco } from './gravacao.ts'
 import { ErroDoDrive, lerJsonDoDrive } from './google.ts'
 import { API_DE_ARQUIVOS, lerPastaRegistrada, type ContextoDoDrive } from './pastas.ts'
@@ -38,7 +40,14 @@ async function lerArquivoNoDrive(token: string, driveId: string): Promise<Arquiv
 async function gravar(contexto: ContextoDoDrive, entrada: EntradaRegistrar, arquivos: ArquivoParaGravar[]): Promise<Response> {
   const funcao = funcaoDoBancoPara(entrada)
   const resultado = await contexto.cliente.rpc(funcao, parametrosDoBanco(entrada, arquivos))
-  return responderResultadoDoBanco(funcao, resultado, entrada.versaoId === null ? 'versao_id' : 'arquivo_id')
+  return responderResultadoDoBanco(funcao, resultado, entrada.versaoId === null && entrada.arquivoId === null ? 'versao_id' : 'arquivo_id')
+}
+
+// O arquivo que chegou ao Drive precisa ser o do alvo: senão o hash de outro arquivo da pasta entraria nele.
+async function conferirSubstituicao(contexto: ContextoDoDrive, entrada: EntradaRegistrar, arquivoId: string): Promise<Response | null> {
+  const alvo = await lerAlvoDaSubstituicao(contexto, arquivoId)
+  const conferido = conferirAlvoDoRegistro(alvo, { processoId: entrada.processoId, driveId: entrada.arquivos[0].driveId })
+  return conferido.ok ? null : responderRecusa(conferido.recusa)
 }
 
 export async function registrar(contexto: ContextoDoDrive, entrada: EntradaRegistrar): Promise<Response> {
@@ -46,6 +55,10 @@ export async function registrar(contexto: ContextoDoDrive, entrada: EntradaRegis
   if (situacao === null) return responderRecusa(recusar('entrada_invalida', 'processo não encontrado'))
   const foraDeAndamento = conferirProcessoEmAndamento(situacao)
   if (foraDeAndamento) return responderRecusa(foraDeAndamento)
+  if (entrada.arquivoId !== null) {
+    const recusaDoAlvo = await conferirSubstituicao(contexto, entrada, entrada.arquivoId)
+    if (recusaDoAlvo) return recusaDoAlvo
+  }
   const pastaId = await lerPastaRegistrada(contexto.cliente, { coluna: 'processo_id', id: entrada.processoId })
   if (!pastaId) return responderRecusa(recusar('arquivo_fora_da_pasta'))
   const lidos = await Promise.all(entrada.arquivos.map((arquivo) => lerArquivoNoDrive(contexto.token, arquivo.driveId)))

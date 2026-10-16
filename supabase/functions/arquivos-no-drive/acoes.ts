@@ -9,6 +9,7 @@ import {
 } from '../_shared/decisao.ts'
 import { tipoMimeDaExtensao } from '../_shared/drive.ts'
 import { nomePadrao } from '../_shared/nomePadrao.ts'
+import { conferirAlvoDoEnvio, type AlvoDaSubstituicao } from '../_shared/substituicao.ts'
 import { chamarDrive } from './google.ts'
 import { API_DE_ARQUIVOS, garantirPastaDoProcesso, type ContextoDoDrive, type ProcessoDaPasta } from './pastas.ts'
 import { responderJson, responderRecusa } from './respostas.ts'
@@ -30,10 +31,18 @@ export async function lerProcesso(contexto: ContextoDoDrive, id: string): Promis
 }
 
 interface PedidoDaSessao {
-  nome: string
-  pastaId: string
+  /** Criar um arquivo novo (POST, com nome e pasta) ou atualizar o conteúdo de um que existe (PATCH, sem mexer em nome nem pasta). */
+  destino: { criar: { nome: string; pastaId: string } } | { atualizar: string }
   entrada: EntradaIniciarEnvio
   origem: string | null
+}
+
+const CAMPOS_DO_ENVIO = 'uploadType=resumable&fields=id,name,size,md5Checksum'
+
+function requisicaoDaSessao({ destino }: PedidoDaSessao): { endereco: string; metodo: string; corpo: string } {
+  if ('atualizar' in destino) return { endereco: `${API_DE_ENVIO}/${destino.atualizar}?${CAMPOS_DO_ENVIO}`, metodo: 'PATCH', corpo: '{}' }
+  const { nome, pastaId } = destino.criar
+  return { endereco: `${API_DE_ENVIO}?${CAMPOS_DO_ENVIO}`, metodo: 'POST', corpo: JSON.stringify({ name: nome, parents: [pastaId] }) }
 }
 
 // O Origin do navegador vai junto: sem ele, o Google recusa o PUT direto do navegador (CORS).
@@ -44,11 +53,8 @@ async function abrirSessaoDeEnvio(token: string, pedido: PedidoDaSessao): Promis
     'X-Upload-Content-Type': tipoMimeDaExtensao(extensaoDoNome(pedido.entrada.nomeOriginal)),
   }
   if (pedido.origem) headers.Origin = pedido.origem
-  const resposta = await chamarDrive(token, `${API_DE_ENVIO}?uploadType=resumable&fields=id,name,size,md5Checksum`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({ name: pedido.nome, parents: [pedido.pastaId] }),
-  })
+  const { endereco: destino, metodo, corpo } = requisicaoDaSessao(pedido)
+  const resposta = await chamarDrive(token, destino, { method: metodo, headers, body: corpo })
   const endereco = resposta.headers.get('Location')
   if (!endereco) throw new Error('sessão de envio sem endereço (recebido: sem Location); esperado: cabeçalho Location do Drive')
   return endereco
@@ -74,10 +80,45 @@ export async function iniciarEnvio(
   if (!processo) return responderRecusa(recusar('entrada_invalida', 'processo não encontrado'))
   const foraDeAndamento = conferirProcessoEmAndamento(processo.situacao)
   if (foraDeAndamento) return responderRecusa(foraDeAndamento)
+  if (entrada.arquivoId !== null) return await iniciarSubstituicao(contexto, entrada, entrada.arquivoId, origem)
   const pastaId = await garantirPastaDoProcesso(contexto, processo)
   const nome = nomeDoArquivo(processo, entrada)
-  const uploadUrl = await abrirSessaoDeEnvio(contexto.token, { nome, pastaId, entrada, origem })
+  const destino = { criar: { nome, pastaId } }
+  const uploadUrl = await abrirSessaoDeEnvio(contexto.token, { destino, entrada, origem })
   return responderJson(200, { upload_url: uploadUrl, nome })
+}
+
+interface LinhaDoAlvo {
+  papel: AlvoDaSubstituicao['papel']
+  formato: string
+  nome: string
+  drive_id: string
+  versoes: { processo_id: string; historica: boolean } | null
+}
+
+// O arquivo a substituir, lido pela RLS com o login de quem chamou: o que ela não mostra não existe para a função.
+export async function lerAlvoDaSubstituicao(contexto: ContextoDoDrive, arquivoId: string): Promise<AlvoDaSubstituicao | null> {
+  const { data, error } = await contexto.cliente
+    .from('arquivos_da_versao')
+    .select('papel, formato, nome, drive_id, versoes(processo_id, historica)')
+    .eq('id', arquivoId)
+    .maybeSingle()
+  if (error) throw new Error(`leitura de arquivos_da_versao falhou (código ${error.code}); esperado: arquivo visível`)
+  const linha = data as unknown as LinhaDoAlvo | null
+  if (!linha?.versoes) return null
+  const { papel, formato, nome, drive_id: driveId, versoes } = linha
+  return { papel, formato, nome, driveId, processoId: versoes.processo_id, historica: versoes.historica }
+}
+
+// Substituir (ADR 0007): a sessão atualiza o MESMO arquivo do Drive (nada novo na pasta, nada apagado); o nome fica
+// o que já está guardado. Os bytes vão do navegador direto ao Google, como no envio.
+async function iniciarSubstituicao(
+  contexto: ContextoDoDrive, entrada: EntradaIniciarEnvio, arquivoId: string, origem: string | null,
+): Promise<Response> {
+  const conferido = conferirAlvoDoEnvio(await lerAlvoDaSubstituicao(contexto, arquivoId), entrada)
+  if (!conferido.ok) return responderRecusa(conferido.recusa)
+  const uploadUrl = await abrirSessaoDeEnvio(contexto.token, { destino: { atualizar: conferido.valor.driveId }, entrada, origem })
+  return responderJson(200, { upload_url: uploadUrl, nome: conferido.valor.nome })
 }
 
 interface ArquivoDaLinha {

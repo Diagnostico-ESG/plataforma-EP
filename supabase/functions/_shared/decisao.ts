@@ -18,6 +18,8 @@ export type CodigoDeRecusa =
   | 'arquivo_grande'
   | 'arquivo_nao_chegou'
   | 'arquivo_fora_da_pasta'
+  | 'tipo_de_arquivo_diferente'
+  | 'versao_historica_somente_leitura'
 export interface Recusa {
   codigo: CodigoDeRecusa
   mensagem: string
@@ -29,6 +31,8 @@ export interface EntradaIniciarEnvio {
   tamanho: number
   numero: number
   historica: boolean
+  /** Com o arquivo: troca o conteúdo dele (mesmo arquivo do Drive); sem: cria um arquivo novo. */
+  arquivoId: string | null
 }
 export interface EntradaBaixar {
   arquivoId: string
@@ -63,6 +67,8 @@ const MENSAGENS: Record<CodigoDeRecusa, string> = {
   arquivo_grande: 'O arquivo passa de 20 MB.',
   arquivo_nao_chegou: 'Um dos arquivos não chegou ao Drive. Envie de novo.',
   arquivo_fora_da_pasta: 'O arquivo não está na pasta do processo no Drive.',
+  tipo_de_arquivo_diferente: 'O arquivo novo precisa ser do mesmo tipo do que sai.',
+  versao_historica_somente_leitura: 'A versão histórica é somente leitura.',
 }
 
 export const FORMATO_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -72,6 +78,8 @@ const STATUS_POR_CODIGO: Partial<Record<CodigoDeRecusa, number>> = {
   sem_login: 401,
   usuario_inativo: 403,
   sem_permissao: 403,
+  tipo_de_arquivo_diferente: 409,
+  versao_historica_somente_leitura: 409,
 }
 
 export function recusar(codigo: CodigoDeRecusa, detalhe?: string): Recusa {
@@ -129,6 +137,13 @@ export function lerTexto(corpo: Corpo, campo: string, formato: RegExp, esperado:
   return { ok: true, valor }
 }
 
+/** Um uuid que pode faltar: ausente ou nulo vale null; presente e fora do formato, recusa. */
+export function lerUuidOpcional(corpo: Corpo, campo: string): Validacao<string | null> {
+  const valor = corpo[campo]
+  if (valor === undefined || valor === null) return { ok: true, valor: null }
+  return lerTexto(corpo, campo, FORMATO_UUID, 'uuid')
+}
+
 export function lerInteiroPositivo(corpo: Corpo, campo: string): Validacao<number> {
   const valor = corpo[campo]
   if (typeof valor !== 'number' || !Number.isInteger(valor) || valor <= 0) {
@@ -164,8 +179,11 @@ function lerCamposDoEnvio(corpo: Corpo): Validacao<EntradaIniciarEnvio> {
   if (!numero.ok) return numero
   const historica = lerBooleano(corpo, 'historica')
   if (!historica.ok) return historica
+  const arquivoId = lerUuidOpcional(corpo, 'arquivo_id')
+  if (!arquivoId.ok) return arquivoId
   const valor = { processoId: processoId.valor, papel: papel.valor, nomeOriginal: nomeOriginal.valor }
-  return { ok: true, valor: { ...valor, tamanho: tamanho.valor, numero: numero.valor, historica: historica.valor } }
+  const numeros = { tamanho: tamanho.valor, numero: numero.valor, historica: historica.valor, arquivoId: arquivoId.valor }
+  return { ok: true, valor: { ...valor, ...numeros } }
 }
 
 function conferirArquivo(entrada: EntradaIniciarEnvio): Validacao<EntradaIniciarEnvio> {
