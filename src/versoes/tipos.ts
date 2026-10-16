@@ -1,6 +1,7 @@
+import type { SituacaoNoDrive } from '../../supabase/functions/_shared/conferencia.ts'
 import type { PapelDoArquivo } from '../../supabase/functions/_shared/nomePadrao.ts'
 
-export type { PapelDoArquivo }
+export type { PapelDoArquivo, SituacaoNoDrive }
 
 /** Um arquivo da versão como o banco o guarda; o nome é o padrão, gravado no envio. */
 export type ArquivoDaVersao = {
@@ -45,6 +46,9 @@ export type PedidoDeRelatorio = { processoId: string; versaoId: string; numero: 
 /** A troca do conteúdo de um arquivo de versão nova; `numero` é o da versão, que a função do servidor repete no pedido. */
 export type PedidoDeSubstituicao = { processoId: string; numero: number; arquivo: ArquivoDaVersao; novo: File }
 
+/** Como cada arquivo do processo está no Drive agora (MD5 e existência comparados com o banco), pelo id do arquivo. */
+export type ConferenciaDosArquivos = Record<string, SituacaoNoDrive>
+
 /**
  * Único ponto por onde a interface fala com o banco e com a função do Drive nas versões. Recusa chega como
  * TravaDoBanco, com a frase pronta; outra falha, como Error cuja mensagem é o motivo em português.
@@ -78,6 +82,11 @@ export type ModuloDeVersoes = {
    * quando o arquivo chegou. Se algo falhar, nada é registrado.
    */
   substituirArquivo(pedido: PedidoDeSubstituicao, aoProgredir: (enviados: number, total: number) => void): Promise<void>
+  /**
+   * Como cada arquivo do processo está no Drive agora: o MD5 e a existência são comparados com o que o banco guarda; nada é
+   * gravado. Falha de conexão ou do Drive rejeita (a tela mostra o aviso, sem marcas).
+   */
+  conferirArquivos(processoId: string): Promise<ConferenciaDosArquivos>
   /** Os bytes do arquivo, com o tipo do formato (o navegador o mostra se souber). Qualquer perfil ativo pode. */
   baixarArquivo(arquivo: ArquivoDaVersao): Promise<Blob>
 }

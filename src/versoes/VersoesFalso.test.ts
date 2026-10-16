@@ -270,3 +270,24 @@ test('as falhas programadas valem também para a substituição, e nada muda qua
   await expect(versoes.substituirArquivo(pedido, () => {})).rejects.toThrow('sem espaço')
   expect((await versoes.listarVersoes('p1'))[0].arquivos.find((arquivo) => arquivo.papel === 'png')).toEqual(png)
 })
+
+test('a conferência devolve ok para todo arquivo do processo e a situação programada, e registra o processo conferido', async () => {
+  const { versoes, png } = await comUmEnvio()
+  const [bpmn] = (await versoes.listarVersoes('p1'))[0].arquivos
+  versoes.conferencia[png.id] = 'nao_encontrado'
+  expect(await versoes.conferirArquivos('p1')).toEqual({ [bpmn.id]: 'ok', [png.id]: 'nao_encontrado' })
+  expect(versoes.conferidos).toEqual(['p1'])
+})
+
+test('a conferência pode falhar por conexão', async () => {
+  const { versoes } = await comUmEnvio()
+  versoes.falharConferencia = true
+  await expect(versoes.conferirArquivos('p1')).rejects.toThrow('falha de conexão simulada')
+})
+
+test('depois da substituição o arquivo volta a ficar ok (o banco passa a guardar o MD5 novo)', async () => {
+  const { versoes, png } = await comUmEnvio()
+  versoes.conferencia[png.id] = 'alterado'
+  await versoes.substituirArquivo({ processoId: 'p1', numero: 1, arquivo: png, novo: NOVO_PNG }, () => {})
+  expect((await versoes.conferirArquivos('p1'))[png.id]).toBe('ok')
+})

@@ -3,7 +3,7 @@ import { extensaoDoNome } from '../../supabase/functions/_shared/decisao.ts'
 import type { ClienteSupabase } from '../lib/supabase'
 import { falhaDaFuncao, falhaDoDownload } from './recusasDeVersoes'
 import type {
-  ArquivoDaVersao, ArquivoEscolhido, ModuloDeVersoes, PedidoDeRelatorio, PedidoDeSubstituicao, PedidoDeVersao, Versao,
+  ArquivoDaVersao, ArquivoEscolhido, ConferenciaDosArquivos, ModuloDeVersoes, PedidoDeRelatorio, PedidoDeSubstituicao, PedidoDeVersao, Versao,
 } from './tipos'
 import { COLUNAS_DA_VERSAO, type LinhaDaVersao, versaoDaLinha } from './versaoDaLinha'
 
@@ -22,6 +22,7 @@ export function criarVersoesSupabase(cliente: ClienteSupabase, enviarBytes: Envi
     acrescentarRelatorio: (pedido, aoProgredir) => acrescentarRelatorio(cliente, enviarBytes, pedido, aoProgredir),
     semAlteracaoDeConteudo: (processoId, versaoId) => semAlteracao(cliente, processoId, versaoId),
     substituirArquivo: (pedido, aoProgredir) => substituirArquivo(cliente, enviarBytes, pedido, aoProgredir),
+    conferirArquivos: (processoId) => conferirArquivos(cliente, processoId),
     baixarArquivo: (arquivo) => baixarArquivo(cliente, arquivo),
   }
 }
@@ -110,6 +111,12 @@ async function substituirArquivo(cliente: ClienteSupabase, enviarBytes: EnviarBy
 // A cópia é feita pela função, no Drive: aqui só se pede, e a recusa volta como frase da tela.
 async function semAlteracao(cliente: ClienteSupabase, processoId: string, versaoId: string): Promise<void> {
   await chamarFuncao(cliente, { acao: 'sem_alteracao', processo_id: processoId, versao_id: versaoId })
+}
+
+// Só pergunta: a função compara com o Drive e devolve a situação de cada arquivo; nada é gravado.
+async function conferirArquivos(cliente: ClienteSupabase, processoId: string): Promise<ConferenciaDosArquivos> {
+  const { arquivos } = await chamarFuncao<{ arquivos: ConferenciaDosArquivos }>(cliente, { acao: 'conferir', processo_id: processoId })
+  return arquivos
 }
 
 // A função devolve application/octet-stream (o supabase-js só entrega Blob para esse tipo); o tipo do formato é

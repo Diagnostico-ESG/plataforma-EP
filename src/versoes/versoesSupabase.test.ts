@@ -305,3 +305,16 @@ test.each([
   expect(falha).toBeInstanceOf(TravaDoBanco)
   expect((falha as Error).message).toBe(frase)
 })
+
+test('a conferência pergunta à função pelo processo e devolve a situação de cada arquivo', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostasDaFuncao['funcao.conferir'] = { data: { arquivos: { a1: 'ok', a2: 'alterado' } }, error: null }
+  expect(await criar(cliente).conferirArquivos('p1')).toEqual({ a1: 'ok', a2: 'alterado' })
+  expect(cliente.chamadasDaFuncao).toEqual([{ acao: 'conferir', processo_id: 'p1' }])
+})
+
+test('a falha da função na conferência vira rejeição', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostasDaFuncao['funcao.conferir'] = recusa('drive_indisponivel', '', 502)
+  await expect(criar(cliente).conferirArquivos('p1')).rejects.toBeInstanceOf(Error)
+})

@@ -5,7 +5,7 @@ import type { EventoDoCadastro } from '../cadastros/tipos'
 import { falhaDaFuncao } from './recusasDeVersoes'
 import { haVersaoNova, ordenarVersoes, proximoNumero, relatorioPendente, rotuloDaVersao } from './rotulos'
 import type {
-  ArquivoDaVersao, ModuloDeVersoes, PedidoDeRelatorio, PedidoDeSubstituicao, PedidoDeVersao, Versao,
+  ArquivoDaVersao, ConferenciaDosArquivos, ModuloDeVersoes, PedidoDeRelatorio, PedidoDeSubstituicao, PedidoDeVersao, Versao,
 } from './tipos'
 
 /** O que o falso precisa saber do processo para nomear os arquivos e guardar a etapa, como o banco. */
@@ -29,6 +29,12 @@ export class VersoesFalso implements ModuloDeVersoes {
   falharNoDownload: boolean | Error = false
   /** Os ids dos arquivos baixados, na ordem. */
   baixados: string[] = []
+  /** A situação de cada arquivo no Drive, pelo id do arquivo; o que não está aqui está `ok`. */
+  conferencia: ConferenciaDosArquivos = {}
+  /** Verdadeiro: a conferência com o Drive falha por conexão. */
+  falharConferencia = false
+  /** Os ids de processo conferidos com o Drive, na ordem. */
+  conferidos: string[] = []
   /** Os envios que chegaram ao registro, na ordem. */
   envios: PedidoDeVersao[] = []
   /** Chamado com o evento de cada versão registrada (o histórico do processo fica no falso de processos). */
@@ -101,6 +107,14 @@ export class VersoesFalso implements ModuloDeVersoes {
     this.guardarTroca(processoId, versao, atual, novo.size)
   }
 
+  // Como a ação conferir da função: uma situação por arquivo do processo, `ok` quando nada foi programado.
+  async conferirArquivos(processoId: string): Promise<ConferenciaDosArquivos> {
+    this.conferidos.push(processoId)
+    if (this.falharConferencia) throw new Error('falha de conexão simulada')
+    const arquivos = (this.versoes[processoId] ?? []).flatMap((versao) => versao.arquivos)
+    return Object.fromEntries(arquivos.map((arquivo) => [arquivo.id, this.conferencia[arquivo.id] ?? 'ok']))
+  }
+
   async baixarArquivo(arquivo: ArquivoDaVersao): Promise<Blob> {
     if (this.falharNoDownload instanceof Error) throw this.falharNoDownload
     if (this.falharNoDownload) throw new Error('falha de conexão simulada')
@@ -131,6 +145,7 @@ export class VersoesFalso implements ModuloDeVersoes {
     const processo = this.processos[processoId] ?? { sigla: 'TSA', nome: processoId, etapa: null }
     const hashQueSaiu = this.hashDe(atual.id)
     this.trocas[atual.id] = (this.trocas[atual.id] ?? 0) + 1
+    delete this.conferencia[atual.id] // o banco passa a guardar o MD5 novo
     const atualizada: Versao = { ...versao, arquivos: versao.arquivos.map((outro) => (outro.id === atual.id ? { ...atual, tamanho } : outro)) }
     this.versoes[processoId] = (this.versoes[processoId] ?? []).map((outra) => (outra.id === versao.id ? atualizada : outra))
     const evento = eventoDaSubstituicao(processoId, atualizada, processo, atual.nome, { saiu: hashQueSaiu, entrou: this.hashDe(atual.id) })
