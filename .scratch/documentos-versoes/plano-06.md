@@ -84,5 +84,7 @@ Modificar: `supabase/functions/_shared/decisao.ts`, `registro.ts` (+ testes), `a
 
 - [x] `npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`; "Testes de banco" verde na branch (#88).
 - [x] `desvios.md` (entrada "ticket 06"), ticket 06 (caixas dos critérios provados, ressalva do `[visual]`, prova do Drive pendente), `.scratch/melhorias-protocolo.md` (itens de `.claude/regras/nao-testados.md` que aconteceram).
-- [ ] Juntar à `documentos-versoes-01` (fast-forward) e apagar a branch com `git branch -d`; enviar a `documentos-versoes-01` (sem `--force`). Se o `-d` recusar, parar e perguntar.
-- [ ] **Perguntar ao usuário** se grava a linha `Concluído em` do ticket 06 agora ou só depois da prova do Drive. Depois, apontar o ticket 07 e lembrar o `/cost`.
+- [x] Juntar à `documentos-versoes-01` (fast-forward) e apagar a branch com `git branch -d`; enviar a `documentos-versoes-01` (sem `--force`). Se o `-d` recusar, parar e perguntar.
+- [x] **Perguntar ao usuário** se grava a linha `Concluído em` do ticket 06 agora ou só depois da prova do Drive. Depois, apontar o ticket 07 e lembrar o `/cost`.
+
+> **Situação em 2026-10-16:** tarefas 1 a 5 feitas. O ticket 06 foi juntado à `documentos-versoes-01` por fast-forward (último commit de código `837b799`; da documentação, `e85e7bf`), e não à `main`; a branch local `documentos-versoes-06` foi apagada com `git branch -d` depois de eu enviar a 01 e a 06 (o `-d` recusou na primeira vez porque a cópia da 06 no GitHub estava um commit atrás; a cópia remota da 06 continua lá). A linha `Concluído em` não foi gravada (regra dos tickets 01 a 05, prova do Drive pendente); a pergunta ao usuário ficou para o relatório final da sessão. A função do servidor alterada não foi publicada no desenvolvimento.
