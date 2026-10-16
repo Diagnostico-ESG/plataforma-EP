@@ -42,3 +42,10 @@ export function falhaDoDownload(codigo: string): Error {
   if (frase) return new TravaDoBanco(frase)
   return new Error(`erro inesperado do servidor (${codigo})`)
 }
+
+/** O aviso em vermelho quando o download falha: a frase pronta da recusa, ou o arquivo e o motivo. */
+export function textoDaFalhaDoDownload(erro: unknown, nomeDoArquivo: string): string {
+  if (erro instanceof TravaDoBanco) return erro.message
+  const motivo = erro instanceof Error ? erro.message : String(erro)
+  return `Não foi possível baixar ${nomeDoArquivo}: ${motivo}.`
+}

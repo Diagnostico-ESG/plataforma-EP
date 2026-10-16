@@ -47,15 +47,15 @@
 
 ### Task 3: Abrir ou baixar no navegador (critério 3)
 
-- [ ] Teste `abrirOuBaixar.test.ts`: `abrirAba(formato)` abre aba só para png e pdf (`window.open` chamado/não); `entregarArquivo({ aba, blob, nome })` navega a aba para a URL do blob quando há aba; sem aba (bloqueada ou formato que não abre) cria `<a download=nome>` e clica; a URL é revogada depois.
-- [ ] `abrirOuBaixar.ts` com `abrirAba`, `entregarArquivo`, `fecharAba`.
-- [ ] Comitar.
+- [x] Teste `abrirOuBaixar.test.ts`: `abrirAba(formato)` abre aba só para png e pdf (`window.open` chamado/não); `entregarArquivo({ aba, blob, nome })` navega a aba para a URL do blob quando há aba; sem aba (bloqueada ou formato que não abre) cria `<a download=nome>` e clica; a URL é revogada depois.
+- [x] `abrirOuBaixar.ts` com `abrirAba`, `entregarArquivo`, `fecharAba`.
+- [x] Comitar.
 
 ### Task 4: Links na seção Versões (critérios 2, 3 e 4)
 
-- [ ] Teste `App.baixarArquivo.test.tsx` (aplicativo inteiro com `VersoesFalso`): cada perfil (administrador, integrante, consulta) vê o nome de cada arquivo como link; clicar num .png abre a aba (`window.open` simulado) e a leva à URL do blob; num .bpmn não abre aba e baixa com o nome padrão; aba bloqueada (`null`) baixa; falha no download fecha a aba aberta e mostra mensagem em vermelho (`role="alert"`); processo suspenso ainda mostra os links.
-- [ ] `LinkDoArquivo.tsx` (link + aviso) e `ListaDeVersoes`/`SecaoDeVersoes` passam o módulo; CSS do aviso.
-- [ ] Comitar.
+- [x] Teste `App.baixarArquivo.test.tsx` (aplicativo inteiro com `VersoesFalso`): cada perfil (administrador, integrante, consulta) vê o nome de cada arquivo como link; clicar num .png abre a aba (`window.open` simulado) e a leva à URL do blob; num .bpmn não abre aba e baixa com o nome padrão; aba bloqueada (`null`) baixa; falha no download fecha a aba aberta e mostra mensagem em vermelho (`role="alert"`); processo suspenso ainda mostra os links.
+- [x] `LinkDoArquivo.tsx` (link + aviso) e `ListaDeVersoes`/`SecaoDeVersoes` passam o módulo; CSS do aviso.
+- [x] Comitar.
 
 ### Task 5: Prova, registros e fecho (critério 6)
 

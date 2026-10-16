@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
-import { falhaDaFuncao, falhaDoDownload } from './recusasDeVersoes'
+import { falhaDaFuncao, falhaDoDownload, textoDaFalhaDoDownload } from './recusasDeVersoes'
 
 test.each([
   ['sem_permissao', '', 'Seu perfil não permite enviar versões.'],
@@ -44,4 +44,11 @@ test('no download, código desconhecido vira falha genérica com o código receb
   const falha = falhaDoDownload('erro_interno')
   expect(falha).not.toBeInstanceOf(TravaDoBanco)
   expect(falha.message).toBe('erro inesperado do servidor (erro_interno)')
+})
+
+test('a falha do download com frase pronta aparece como veio; outra falha cita o arquivo e o motivo', () => {
+  expect(textoDaFalhaDoDownload(new TravaDoBanco('Você não pode baixar este arquivo.'), 'a.png'))
+    .toBe('Você não pode baixar este arquivo.')
+  expect(textoDaFalhaDoDownload(new Error('não foi possível falar com o servidor (sem conexão?)'), 'a.png'))
+    .toBe('Não foi possível baixar a.png: não foi possível falar com o servidor (sem conexão?).')
 })

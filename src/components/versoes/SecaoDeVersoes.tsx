@@ -47,7 +47,7 @@ function VersoesProntas({ versoes, processo, lidas, podeEnviar, aoEnviada }: Ver
         <FormularioDeVersao modulo={versoes} processo={processo} numero={proximoNumero(lidas)} aoEnviada={aposEnviar}
           aoCancelar={() => setEnviando(false)} />
       )}
-      <ListaDeVersoes versoes={lidas} />
+      <ListaDeVersoes modulo={versoes} versoes={lidas} />
       {podeEnviar && !enviando && (
         <button type="button" className="botao botao-secundario" onClick={() => setEnviando(true)}>Enviar versão</button>
       )}
