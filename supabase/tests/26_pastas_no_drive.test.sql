@@ -8,6 +8,16 @@ grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
 insert into _tap (linha) select plan(26);
 
+-- Isola o teste dos dados que já existem no banco (a prova do Drive deixa versões, arquivos, eventos e pastas de teste
+-- no desenvolvimento): a limpeza vale só nesta transação, que é desfeita no fim. replica desliga os gatilhos que
+-- impedem apagar; a volta a origin liga todos de novo antes das preparações do teste.
+set local session_replication_role = replica;
+delete from public.arquivos_da_versao;
+delete from public.versoes;
+delete from public.pastas_no_drive;
+delete from public.eventos where entidade = 'versao';
+set local session_replication_role = origin;
+
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 insert into public.autorizacoes (email, perfil) values
   ('admin.teste@ccivil.pr.gov.br', 'administrador'),
