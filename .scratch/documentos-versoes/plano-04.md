@@ -124,9 +124,9 @@ Modificar: `supabase/functions/_shared/registro.ts` (+ teste), `supabase/functio
 
 ### Tarefa 6 — Fecho do ticket
 
-- [ ] `npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`; "Testes de banco" verde na branch.
-- [ ] `desvios.md` (entrada "ticket 04"): o que divergir deste plano; que o relatório "só na criação" usa `enviada_em = now()` e como o teste simula outra chamada; que `registrar_versao` foi refeita para dividir a gravação com a histórica; que "sem [Substituir] e sem relatório pendente" na histórica só tem o que provar nos tickets 05 e 06; a prova do Drive da histórica pendente.
-- [ ] Ticket 04: marcar as caixas dos critérios provados (com a ressalva do `[visual]`: tela não conferida) e deixar a prova real do Drive anotada.
-- [ ] `.scratch/melhorias-protocolo.md`: os itens de `.claude/regras/nao-testados.md` (blocos "/executar-simples e /executar-complexo" e "Qualquer momento") que aconteceram nesta execução.
+- [x] `npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`; "Testes de banco" verde na branch.
+- [x] `desvios.md` (entrada "ticket 04"): o que divergir deste plano; que o relatório "só na criação" usa `enviada_em = now()` e como o teste simula outra chamada; que `registrar_versao` foi refeita para dividir a gravação com a histórica; que "sem [Substituir] e sem relatório pendente" na histórica só tem o que provar nos tickets 05 e 06; a prova do Drive da histórica pendente.
+- [x] Ticket 04: marcar as caixas dos critérios provados (com a ressalva do `[visual]`: tela não conferida) e deixar a prova real do Drive anotada.
+- [x] `.scratch/melhorias-protocolo.md`: os itens de `.claude/regras/nao-testados.md` (blocos "/executar-simples e /executar-complexo" e "Qualquer momento") que aconteceram nesta execução.
 - [ ] Juntar à `documentos-versoes-01` (fast-forward, como o ticket 03) e apagar a branch com `git branch -d`; enviar a `documentos-versoes-01` ao GitHub (sem `--force`). Se o `-d` recusar, parar e perguntar.
 - [ ] **Perguntar ao usuário** se grava a linha `Concluído em` do ticket 04 agora (o comando manda) ou só depois da prova do Drive (regra dos tickets 01 a 03). Depois, apontar o ticket 05 e lembrar o `/cost`.
