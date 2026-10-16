@@ -95,3 +95,10 @@
 - **Mudança de comportamento mínima:** a chamada ao Drive só leva o `name` quando há renomeação (antes levava sempre, mesmo igual); mover continua usando `addParents` e `removeParents`.
 - **O critério 5 (prova) virou o passo manual 6.2 do roteiro**, e não passo do `prova-do-drive.mjs`: o script não renomeia dados do usuário. Os critérios 2 a 4 dependem dessa prova (e da função publicada).
 - **Sem a linha `Concluído em`** no ticket 08, até a prova do Drive (mesma regra dos tickets 01 a 07). Branch `documentos-versoes-08`, juntada à `documentos-versoes-01`, e não à `main`.
+
+## 2026-10-16 — fecho dos tickets 01 a 08
+
+- **Todos os tickets ganharam `Concluído em` depois da prova do Drive** (regra do usuário de 2026-10-15). A saída do Integrante não foi colada (só relatada como OK); vale o relato, registrado nos tickets 01, 02, 04 e 05. Os passos de histórica, relatório depois e "sem alteração" não aparecem na saída do Consulta e ficam como presumidos a partir do relato.
+- **Ticket 08 com ressalva:** a troca de sigla e a mudança de setor (critérios 3 e 4) não foram provadas no Drive, só pela decisão pura testada no Vitest.
+- **O fecho é feito em ordem diferente da do plano:** o `plano-01.md` pedia o "Testes de banco" na branch e na `main`; nenhuma migração nova entrou depois do #88, então o último resultado verde vale, e a `main` é conferida depois do envio.
+- **A arrumação da prova (seção 7 do roteiro) segue adiada** para antes do `/ship` (ver `.scratch/backlog.md`).

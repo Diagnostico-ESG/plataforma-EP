@@ -24,3 +24,9 @@
 - **Prova real no Drive: pendente** (roteiro do usuário). O `prova-do-drive.mjs` já tem o passo da troca. A função do servidor alterada não foi publicada.
 - **`[visual]`:** o [Substituir] ao lado do nome do arquivo, o formulário da troca no item e a janela de confirmação não foram conferidos olhando a tela.
 - **Sem a linha `Concluído em`**, até a prova do Drive (ver `desvios.md`).
+
+## Fecho (2026-10-16)
+
+- **Prova real (critério 2):** na saída do Consulta, a substituição do `.bpmn` mostra o mesmo identificador do Drive, hash novo e nome igual; troca por outro tipo recusada (409 `tipo_de_arquivo_diferente`); depois da troca o arquivo segue `ok`.
+
+Concluído em 2026-10-16 (commit b54ee01)

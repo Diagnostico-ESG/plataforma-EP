@@ -29,3 +29,10 @@
 - **Banco (critérios 1 a 3):** `supabase/tests/27_versoes.test.sql` (52 casos) falhou antes da migração, com tabela inexistente (#75), e passou depois, com os 28 arquivos verdes, inclusive `00_rls_ligada`, `01_buckets_privados` e `10_privilegios_padrao` (#77). Migração `20261015224928_versoes` aplicada pelo workflow "Migrar banco de desenvolvimento" (#17) e registrada em `supabase/AMBIENTES.md`. O caso "processo com 2 versões não se exclui" ficou no 27, e não num teste antigo (ver `desvios.md`).
 - **Função (critério 4):** a decisão de `registrar` fica no arquivo puro `supabase/functions/_shared/registro.ts`, testado no Vitest: quem pode, entrada, arquivo que não chegou, tamanho real, formato, pasta do processo, MD5 e recusa do banco. A chamada `registrar.ts` lê cada arquivo no Drive e só então grava; não apaga nada. **Ressalva:** a função ainda não foi publicada. A prova real (`scripts/prova-do-drive.mjs`, que agora envia .bpmn e .png e registra a versão) depende dos passos do usuário em `docs/drive-conta-de-servico.md`, junto com a do ticket 01.
 - **Tela (critérios 5 a 13):** `src/App.versoesNoProcesso.test.tsx`, `src/App.enviarVersao.test.tsx` e `src/App.versoesNoHistorico.test.tsx`, com o aplicativo inteiro e a `VersoesFalso`. Módulo real coberto por `src/versoes/versoesSupabase.test.ts`, com o cliente e o envio ao Drive simulados por classes nomeadas. **Ressalva `[visual]`:** a tela não foi conferida no navegador; os critérios visuais da spec ficam presumidos até o `/polir` ou o `/ship`.
+
+## Fecho (2026-10-16)
+
+- **Prova real:** o envio do `.bpmn` (sessão resumível, bytes direto ao Drive) e o registro da versão passaram no script do Integrante (relatado OK, saída não colada) e no passo do Consulta (`prova-do-drive.md`).
+- **Ressalva `[visual]`:** a tela não foi conferida no navegador; os critérios visuais seguem presumidos até o `/polir` ou o `/ship`.
+
+Concluído em 2026-10-16 (commit d820b0e)

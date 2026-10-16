@@ -542,3 +542,11 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **2026-10-16 · Ocorrência: o primeiro commit (só do plano) falhou em silêncio** porque o teste vermelho já estava no disco e o pré-commit rodou a bateria inteira; `git commit -q` com `tail` escondeu a falha. O plano foi comitado junto com o código verde. Lição: criar o teste vermelho só depois de comitar o plano, ou não usar `-q`.
 - **2026-10-16 · Ocorrência: o diretório de trabalho do Bash mudou de novo** depois de um `cd` para subpasta.
 - **2026-10-16 · Ocorrência: o aviso do claude-mem (cota esgotada) apareceu no início da sessão**; a sessão seguiu sem ele.
+- **2026-10-16 · Ocorrência (prova do Drive): a política da organização do Google Cloud do usuário bloqueava a criação de chave de conta de serviço** (`iam.disableServiceAccountKeyCreation`); ele precisou do papel de Administrador de políticas da organização para desligá-la só no projeto. O roteiro deveria avisar isso antes do passo 1.
+- **2026-10-16 · Ocorrência: a janela "Gerenciar participantes" do Drive compartilhado não abriu na janela normal do navegador**; abriu em janela anônima, outro navegador ou no painel de detalhes.
+- **2026-10-16 · Ocorrência: o `ReadAllBytes` do PowerShell procurou o arquivo em `C:\Windows\system32`**, e o primeiro `secrets set` falhou sem gravar nada; o roteiro passou a usar `Resolve-Path`.
+- **2026-10-16 · Ocorrência: o provedor Email do Supabase de desenvolvimento precisou ser ligado para a prova** (a seção 7 do roteiro manda desligá-lo; adiada).
+- **2026-10-16 · Ocorrência: a skill `handoff` recusa ser acionada pelo agente**, como o `CLAUDE.md` já prevê; o handoff foi escrito à mão.
+- **2026-10-16 · Item não testado: `/executar-complexo` no fecho (Tarefa 9) com `Concluído em` em 8 tickets de uma vez e merge da branch na `main`.** Aconteceu: ver o resultado do merge abaixo. A trava de git não foi testada com comando destrutivo.
+- **2026-10-16 · Ocorrência: a primeira leitura do `/situação` contou como concluídos os tickets 04 a 08**, porque `grep -c 'Concluído em'` também casou a frase "Sem a linha `Concluído em`" do registro. O `/situação` deveria contar só a linha que começa por `Concluído em`.
+- **2026-10-16 · Ocorrência: o aviso do claude-mem (cota esgotada) apareceu no início da sessão**; a sessão seguiu sem ele.

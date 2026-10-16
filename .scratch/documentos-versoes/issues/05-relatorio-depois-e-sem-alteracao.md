@@ -25,3 +25,9 @@
 - **Prova real no Drive: pendente** (roteiro do usuário). O `prova-do-drive.mjs` já tem o passo do relatório depois e do "sem alteração".
 - **`[visual]`:** a marca "Relatório pendente", o formulário do relatório e o texto "Sem alteração de conteúdo · relatório da V3" não foram conferidos olhando a tela.
 - **Sem a linha `Concluído em`**, até a prova do Drive (ver `desvios.md`).
+
+## Fecho (2026-10-16)
+
+- **Prova real:** os passos do relatório depois e do "sem alteração" (cópia no Drive) estão no script do Integrante, relatado OK pelo usuário (saída não colada). Presumido a partir do relato.
+
+Concluído em 2026-10-16 (commit 617fdbb)

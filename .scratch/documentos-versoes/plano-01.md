@@ -170,11 +170,11 @@ export function cabecalhosDeOrigem(origem: string | null, aceitas: string): Reco
 **Arquivos:** `scripts/prova-do-drive.mjs`.
 
 - [x] Script do usuário, sem dependência nova (`@supabase/supabase-js` já existe): lê `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` de `.env.local` (sem imprimir), pede por `readline` o e-mail e a senha do Integrante inventado (a senha sem eco não é necessária: o terminal é do usuário; nada é gravado nem impresso), entra, escolhe o primeiro processo em andamento do desenvolvimento, chama `iniciar_envio` com um `.bpmn` de teste inventado de poucos bytes, faz o `PUT` ao `upload_url` (com `Origin` do site local), chama `baixar` com o `id` devolvido e compara os bytes (igual → "OK: enviado e baixado de volta, iguais"); repete com o Consulta e espera `403 sem_permissao` no envio e sucesso no download. Imprime só códigos e "OK"/"FALHOU", nunca e-mail, senha, token ou endereço da sessão.
-- [ ] Comitar. O usuário roda o script; o resultado (as linhas impressas) volta para a conversa e é registrado no ticket.
+- [x] Comitar. O usuário roda o script; o resultado (as linhas impressas) volta para a conversa e é registrado no ticket.
 
 ### Tarefa 9 — Fecho do ticket
 
-- [ ] Registrar no ticket: o que foi confirmado na documentação (critério 1), a fonte do papel do Drive, o resultado da prova e a ressalva do `[visual]` (nenhuma, ticket sem tela). Marcar as caixas dos critérios.
+- [x] Registrar no ticket: o que foi confirmado na documentação (critério 1), a fonte do papel do Drive, o resultado da prova e a ressalva do `[visual]` (nenhuma, ticket sem tela). Marcar as caixas dos critérios.
 - [x] `.scratch/documentos-versoes/desvios.md` (novo, com data): `iniciar_envio` recebe `numero` e `historica` neste ticket; `baixar` confere a pasta e não a RLS de `arquivos_da_versao`; `_shared` como lugar do código compartilhado e do arquivo puro; qualquer outra divergência que apareça.
-- [ ] Rodar a bateria completa (`npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`) e o "Testes de banco" na branch; juntar à `main` (`git switch main`, merge, `git branch -d documentos-versoes-01`; se o `-d` recusar, parar e perguntar); `git push` da `main`, conferir o "Testes de banco" na `main`.
-- [ ] Linha `Concluído em AAAA-MM-DD (commit <hash>)` no fim do ticket, comitar, e registrar em `.scratch/melhorias-protocolo.md` os itens não testados que aconteceram (conforme `.claude/regras/nao-testados.md`).
+- [x] Rodar a bateria completa (`npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`) e o "Testes de banco" na branch; juntar à `main` (`git switch main`, merge, `git branch -d documentos-versoes-01`; se o `-d` recusar, parar e perguntar); `git push` da `main`, conferir o "Testes de banco" na `main`.
+- [x] Linha `Concluído em AAAA-MM-DD (commit <hash>)` no fim do ticket, comitar, e registrar em `.scratch/melhorias-protocolo.md` os itens não testados que aconteceram (conforme `.claude/regras/nao-testados.md`).

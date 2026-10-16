@@ -14,7 +14,7 @@
 - [x] Ao abrir a seção Versões, a conferência roda uma vez; as marcas aparecem como pílulas com texto no arquivo afetado.
 - [x] Conferência que falha: lista normal, sem marcas, com o aviso "Não foi possível conferir os arquivos no Drive.".
 - [x] Testes de interface com a falsa: cada resultado e a falha; teste do módulo real com `fetch` simulado.
-- [ ] Prova no projeto de desenvolvimento: arquivo alterado à mão no Drive de desenvolvimento aparece como "alterado fora da plataforma".
+- [x] Prova no projeto de desenvolvimento: arquivo alterado à mão no Drive de desenvolvimento aparece como "alterado fora da plataforma".
 
 ## Registro da execução (2026-10-16)
 
@@ -25,3 +25,10 @@
 - **Critério 5 (prova no desenvolvimento): pendente, do usuário.** Falta publicar a função (`npx supabase functions deploy arquivos-no-drive --use-api`, vínculo conferido) e seguir os passos 6 e 6.1 de `docs/drive-conta-de-servico.md`.
 - **`[visual]`:** as pílulas "Alterado fora da plataforma" e "Não encontrado no Drive" e o aviso discreto não foram conferidos olhando a tela (critério da spec, para o `/ship`).
 - **Sem a linha `Concluído em`**, até a prova do Drive (ver `desvios.md`).
+
+## Fecho (2026-10-16)
+
+- **Critério 5 (prova, passo 6.1 à mão):** arquivo na lixeira apareceu como "Não encontrado no Drive" e, restaurado, a marca sumiu; nova versão pelo próprio Drive apareceu como "Alterado fora da plataforma". Um arquivo novo com o mesmo nome conta como outro arquivo (outro identificador). Na saída do script, a conferência dá `ok`, recusa sem login e continua `ok` depois da troca.
+- **Ressalva `[visual]`:** as pílulas foram vistas pelo usuário na prova, mas a conferência visual da spec fica para o `/ship`.
+
+Concluído em 2026-10-16 (commit 1693d88)

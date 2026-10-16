@@ -23,3 +23,9 @@
 - **Prova real no Drive: pendente** (roteiro do usuário). O `prova-do-drive.mjs` já tem o passo da histórica.
 - **`[visual]`:** a marca "Histórica · somente leitura" e o formulário não foram conferidos olhando a tela.
 - **Sem a linha `Concluído em`**, até a prova do Drive (ver `desvios.md`).
+
+## Fecho (2026-10-16)
+
+- **Prova real:** o passo da histórica está no script do Integrante, relatado OK pelo usuário (saída não colada). A saída do Consulta não o exercita. Registrado como presumido a partir do relato.
+
+Concluído em 2026-10-16 (commit 0bf5327)
