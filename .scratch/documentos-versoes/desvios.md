@@ -102,3 +102,13 @@
 - **Ticket 08 com ressalva:** a troca de sigla e a mudança de setor (critérios 3 e 4) não foram provadas no Drive, só pela decisão pura testada no Vitest.
 - **O fecho é feito em ordem diferente da do plano:** o `plano-01.md` pedia o "Testes de banco" na branch e na `main`; nenhuma migração nova entrou depois do #88, então o último resultado verde vale, e a `main` é conferida depois do envio.
 - **A arrumação da prova (seção 7 do roteiro) segue adiada** para antes do `/ship` (ver `.scratch/backlog.md`).
+
+## 2026-10-16 — `/polir` (auditoria e polimento da seção Versões)
+
+Método: detector do Impeccable em `src/components/versoes` (sem achados) e leitura dos componentes e do CSS. **A tela não foi aberta no navegador** (exigiria login no ambiente de desenvolvimento); os critérios `[visual]` seguem presumidos para o `/ship`.
+
+- **Corrigido (P2, componente próprio no lugar do compartilhado):** as marcas "Histórica · somente leitura", "Relatório pendente", "Alterado fora da plataforma" e "Não encontrado no Drive" usavam uma moldura própria (`.bloco-da-versao-marca`), enquanto o resto do app usa `Pilula` (com texto e cor semântica). Passaram a usar `Pilula`: histórica = neutra, relatório pendente = vencendo, alterado/não encontrado = atraso. A regra de CSS própria foi removida. Textos, comportamento e testes não mudaram.
+- **Deixado de fora (P3):** o nome do arquivo é um `<a href="#baixar">` que age como botão (o clique é interceptado). Trocar por `<button>` quebra os testes e a spec, que pedem "link"; abrir em nova aba pelo meio do mouse leva a `#baixar`. Fica como está até alguém pedir.
+- **Deixado de fora (P3):** `aria-label` no `<li>` de cada versão (papel sem nome pela ARIA 1.2); os testes de interface dependem dele para achar a versão.
+- **Deixado de fora (P2):** o foco do teclado não vai ao formulário quando ele abre e se perde (vai ao corpo da página) quando ele fecha. Mexe nos três formulários e no padrão das outras seções (Reuniões); melhor resolver nos dois lugares de uma vez, numa demanda própria.
+- **Conferido sem problema:** nenhuma cor fixa (só tokens), contraste do texto secundário (`--texto-2` sobre branco, cerca de 5,9:1), rótulos e `aria-describedby` nos campos de arquivo, `role="alert"` nas falhas e `role="status"` no progresso e no carregamento, quebra de linha em tela estreita.
