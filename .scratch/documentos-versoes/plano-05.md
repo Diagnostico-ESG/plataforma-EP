@@ -84,5 +84,7 @@ Modificar: `supabase/functions/_shared/decisao.ts`, `registro.ts` (+ testes), `a
 
 - [x] `npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`; "Testes de banco" verde na branch.
 - [x] `desvios.md` (entrada "ticket 05"), ticket 05 (caixas dos critérios provados, ressalva do `[visual]`, prova do Drive pendente), `.scratch/melhorias-protocolo.md` (itens de `.claude/regras/nao-testados.md` que aconteceram).
-- [ ] Juntar à `documentos-versoes-01` (fast-forward) e apagar a branch com `git branch -d`; enviar a `documentos-versoes-01` (sem `--force`). Se o `-d` recusar, parar e perguntar.
-- [ ] **Perguntar ao usuário** se grava a linha `Concluído em` do ticket 05 agora ou só depois da prova do Drive. Depois, apontar o ticket 06 e lembrar o `/cost`.
+- [x] Juntar à `documentos-versoes-01` (fast-forward) e apagar a branch com `git branch -d`; enviar a `documentos-versoes-01` (sem `--force`). Se o `-d` recusar, parar e perguntar.
+- [x] **Perguntar ao usuário** se grava a linha `Concluído em` do ticket 05 agora ou só depois da prova do Drive. Depois, apontar o ticket 06 e lembrar o `/cost`.
+
+> **Situação em 2026-10-16:** tarefas 1 a 5 feitas. O ticket 05 foi juntado à `documentos-versoes-01` por fast-forward (último commit `a7e6d71`), e não à `main`. A linha `Concluído em` não foi gravada (regra dos tickets 01 a 04, prova do Drive pendente); a pergunta ao usuário ficou para o relatório final da sessão.
