@@ -4,6 +4,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { consultaDePastaPorNome } from '../_shared/drive.ts'
 import { limparParaNomeDeArquivo } from '../_shared/nomePadrao.ts'
+import { decidirAjusteDaPasta } from '../_shared/pasta.ts'
 import type { Configuracao } from './configuracao.ts'
 import { chamarDrive, lerJsonDoDrive } from './google.ts'
 
@@ -73,16 +74,17 @@ async function acertarPasta(token: string, driveId: string, nome: string, paiId:
     token,
     `${API_DE_ARQUIVOS}/${driveId}?fields=name,parents`,
   )
-  const pais = atual.parents ?? []
-  if (atual.name === nome && pais.includes(paiId)) return
+  const ajuste = decidirAjusteDaPasta({ nome: atual.name, pais: atual.parents ?? [] }, { nome, paiId })
+  if (!ajuste.renomearPara && !ajuste.mover) return
   const url = new URL(`${API_DE_ARQUIVOS}/${driveId}`)
-  const paisAntigos = pais.filter((pai) => pai !== paiId)
-  if (!pais.includes(paiId)) url.searchParams.set('addParents', paiId)
-  if (paisAntigos.length > 0) url.searchParams.set('removeParents', paisAntigos.join(','))
+  if (ajuste.mover) {
+    url.searchParams.set('addParents', ajuste.mover.paraPai)
+    if (ajuste.mover.tirarDe.length > 0) url.searchParams.set('removeParents', ajuste.mover.tirarDe.join(','))
+  }
   await chamarDrive(token, url.toString(), {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json; charset=UTF-8' },
-    body: JSON.stringify({ name: nome }),
+    body: JSON.stringify(ajuste.renomearPara ? { name: ajuste.renomearPara } : {}),
   })
 }
 
