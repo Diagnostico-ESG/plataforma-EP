@@ -100,8 +100,8 @@ Modificar: `supabase/functions/_shared/decisao.ts` (+ teste), `arquivos-no-drive
 ### Tarefa 6 — Histórico e recusa de excluir (critérios 9 e 12)
 
 **Arquivos:** `src/processos/lerProcessoSupabase.ts` (+ teste), `src/cadastros/historicoDosCadastros.ts` (+ teste), `src/processos/andamentosSupabase.ts` (+ teste), `src/processos/ProcessosFalso.ts` (a recusa e o evento no falso), `src/App.historico.test.tsx` ou novo teste de interface.
-- [ ] Testes (vermelho): o histórico do processo lê `versao`; o evento aparece como "Enviou a versão V3 — Nome do processo", com etapa, observação e arquivos; excluir processo com versões mostra "Não é possível excluir: processo tem 2 versões enviadas."
-- [ ] Implementar; verde; commit.
+- [x] Testes (vermelho): o histórico do processo lê `versao`; o evento aparece como "Enviou a versão V3 — Nome do processo", com etapa, observação e arquivos; excluir processo com versões mostra "Não é possível excluir: processo tem 2 versões enviadas."
+- [x] Implementar; verde; commit.
 
 ### Tarefa 7 — Fecho do ticket
 

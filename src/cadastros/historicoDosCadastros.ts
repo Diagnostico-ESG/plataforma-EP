@@ -43,9 +43,11 @@ const TEXTO_DA_ACAO_DA_ETAPA: Record<string, string> = {
   desativar: 'Desativou a etapa', reativar: 'Reativou a etapa',
 }
 
+const TEXTO_DA_ACAO_DA_VERSAO: Record<string, string> = { enviar: 'Enviou a versão' }
+
 const TEXTOS_DA_ENTIDADE: Record<string, Record<string, string>> = {
   setor_envolvido: TEXTO_DA_ACAO_DO_VINCULO, andamento: TEXTO_DA_ACAO_DO_ANDAMENTO, processo: TEXTO_DA_ACAO_DO_PROCESSO,
-  etapa: TEXTO_DA_ACAO_DA_ETAPA,
+  etapa: TEXTO_DA_ACAO_DA_ETAPA, versao: TEXTO_DA_ACAO_DA_VERSAO,
 }
 
 // Macroprocesso e etapa do catálogo aparecem como "código — nome".
@@ -64,6 +66,7 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   nivel: 'Nível', obrigatoria: 'Obrigatória', ativa: 'Situação', ordem: 'Posição',
   data: 'Data', hora: 'Hora', local: 'Local', anotacoes: 'Anotações', outros_participantes: 'Outros participantes',
   processos: 'Processos', usuarios: 'Usuários do EP',
+  rotulo: 'Versão', etapa: 'Etapa', arquivos: 'Arquivos',
 }
 
 // Os ids existem para o filtro; quem lê o histórico vê a sigla e o nome. Código e nome da etapa já estão no título.
@@ -93,9 +96,10 @@ function codigoENome(codigo: unknown, nome: unknown): string {
 }
 
 // Etapa e responsável pertencem a um setor (a etapa, também a um processo): o nome vem com o dono; a reunião tem o
-// nome próprio (tipo, data e setor); null se o item não for de nenhum deles.
+// nome próprio (tipo, data e setor); a versão vem com o processo dela; null se o item não for de nenhum deles.
 function nomeDoItemComDono(entidade: string, estado: Record<string, unknown>): string | null {
   if (entidade === 'reuniao') return nomeDaReuniaoNoHistorico(estado)
+  if (entidade === 'versao') return `${texto(estado.rotulo)} — ${texto(estado.processo_nome)}`
   const nomes: Record<string, unknown> = { andamento: estado.etapa_nome, responsavel_do_setor: estado.nome }
   const nome = nomes[entidade]
   if (typeof nome !== 'string') return null
