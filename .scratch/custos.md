@@ -64,3 +64,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-15 | reunioes | /polir | US$ 0,94
 2026-10-15 | documentos-versoes | planejar | US$ 5,20
 2026-10-16 | documentos-versoes | /executar-complexo (ticket 01) e prova do Drive | US$ 7,45
+2026-10-16 | documentos-versoes | /ship | não informado (usuário pulou o /cost)
