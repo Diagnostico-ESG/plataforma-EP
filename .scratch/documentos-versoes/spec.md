@@ -363,3 +363,5 @@ O que a implementação faz de diferente do texto acima, ou além dele. O porqu�
 - **Banco:** `drive_id` só com letras, números, `_` e `-` (até 200), nas duas tabelas (migração `20261016200000_drive_id_com_formato`). Versão histórica é somente leitura depois da chamada que a cria. Cada arquivo que entra depois da versão gera um evento (`acrescentar_relatorio`, `sem_alteracao`, `substituir`).
 - **Recusas da tela:** arquivo vazio e `entrada_invalida` têm frase própria (antes viravam "erro inesperado").
 - **Provas pendentes:** a conferência visual das telas e a prova no Drive dos critérios 3 e 4 do ticket 08 (sigla trocada e mudança de setor) e da saída do Integrante dos tickets 01, 02, 04 e 05. A função corrigida nesta etapa ainda precisa ser publicada no desenvolvimento.
+
+Entregue em 2026-10-16 (commit 869901d), com ressalva: critérios [visual] presumidos (a tela não foi conferida) e função arquivos-no-drive corrigida ainda não publicada no desenvolvimento
