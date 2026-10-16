@@ -18,7 +18,7 @@ grant insert (historica) on public.versoes to authenticated;
 -- (a restrição versoes_numero_unico continua como rede de segurança). Roda com a permissão de quem grava.
 create function private.conferir_versao_historica(processo uuid, numero_digitado integer) returns void
 language plpgsql stable set search_path = ''
-as $
+as $$
 begin
   if exists (select 1 from public.versoes where processo_id = processo and not historica) then
     raise exception 'historica_depois_de_versao_nova';
@@ -26,13 +26,13 @@ begin
   if exists (select 1 from public.versoes where processo_id = processo and numero = numero_digitado) then
     raise exception 'numero_historico_repetido:%', numero_digitado;
   end if;
-end $;
+end $$;
 
 -- Antes de incluir a versão: a nova recebe o número (maior do processo + 1, o que vier é ignorado) e a etapa atual; a
 -- histórica mantém o número digitado e não tem etapa. Autor, data e observação aparada valem para as duas.
 create or replace function private.preparar_versao() returns trigger
 language plpgsql set search_path = ''
-as $
+as $$
 begin
   perform private.conferir_processo_que_recebe_versao(new.processo_id);
   if new.historica then
@@ -46,13 +46,13 @@ begin
   new.enviada_por := (select auth.uid());
   new.enviada_em := now();
   return new;
-end $;
+end $$;
 
 -- A nova tem .bpmn e .png; a histórica, o .bpm ou o par .bpmn e .png (o relatório é opcional nas duas). Conferido no
 -- fim da gravação (restrição adiada), porque a versão entra antes dos arquivos.
 create or replace function private.conferir_arquivos_da_versao() returns trigger
 language plpgsql set search_path = ''
-as $
+as $$
 declare
   papeis public.papel_do_arquivo[] := array(select papel from public.arquivos_da_versao where versao_id = new.id);
 begin
@@ -64,14 +64,14 @@ begin
     raise exception 'versao_sem_bpmn_e_png';
   end if;
   return null; -- gatilho "depois": o retorno é ignorado
-end $;
+end $$;
 
 -- Antes de incluir ou trocar o conteúdo de um arquivo: processo em andamento, autor e data de quem grava. A histórica é
 -- somente leitura: nenhum arquivo muda, e só entra arquivo na chamada que criou a versão (enviada_em = now() é o
 -- início da transação; outra chamada tem outro instante).
 create or replace function private.preparar_arquivo_da_versao() returns trigger
 language plpgsql set search_path = ''
-as $
+as $$
 declare
   da_versao record;
 begin
@@ -83,44 +83,44 @@ begin
   new.enviado_por := (select auth.uid());
   new.enviado_em := now();
   return new;
-end $;
+end $$;
 
 -- Um evento por registro: "registrar_historica" na histórica, "enviar" na nova.
 create or replace function private.registrar_evento_da_versao() returns trigger
 language plpgsql security definer set search_path = ''
-as $
+as $$
 begin
   insert into public.eventos (autor_id, acao, entidade, entidade_ref, detalhes)
   values ((select auth.uid()), case when new.historica then 'registrar_historica' else 'enviar' end, 'versao',
     new.processo_id::text, jsonb_build_object('antes', null, 'depois', private.estado_da_versao(new.id)));
   return null; -- gatilho "depois": o retorno é ignorado
-end $;
+end $$;
 
 -- Os arquivos que a função de registro recebeu (papel, nome, formato, tamanho, hash_md5, drive_id), gravados com a
 -- permissão de quem chamou: a RLS e os gatilhos decidem. Compartilhada pelas duas funções de registro.
 create function private.gravar_arquivos_da_versao(versao uuid, arquivos jsonb) returns void
 language sql set search_path = ''
-as $
+as $$
   insert into public.arquivos_da_versao (versao_id, papel, nome, formato, tamanho, hash_md5, drive_id)
   select versao, (a ->> 'papel')::public.papel_do_arquivo, a ->> 'nome', a ->> 'formato', (a ->> 'tamanho')::bigint,
     a ->> 'hash_md5', a ->> 'drive_id'
-  from jsonb_array_elements(arquivos) as a $;
+  from jsonb_array_elements(arquivos) as a $$;
 
 -- No fim da gravação, cobra as conferências adiadas e o evento; nomes qualificados (lição da migração
 -- reunioes_salvar_com_nomes_qualificados).
 create function private.cobrar_conferencias_da_versao() returns void
 language plpgsql set search_path = ''
-as $
+as $$
 begin
   set constraints public.conferir_arquivos_da_versao, public.registrar_evento_da_versao immediate;
   set constraints public.conferir_arquivos_da_versao, public.registrar_evento_da_versao deferred;
-end $;
+end $$;
 
 -- Mesma assinatura e mesmo comportamento da migração versoes; só passa a usar as funções compartilhadas.
 create or replace function public.registrar_versao(p_processo uuid, p_numero integer, p_observacao text, p_arquivos jsonb)
 returns uuid
 language plpgsql set search_path = ''
-as $
+as $$
 declare
   versao uuid;
   numero_dado integer;
@@ -133,14 +133,14 @@ begin
   perform private.gravar_arquivos_da_versao(versao, p_arquivos);
   perform private.cobrar_conferencias_da_versao();
   return versao;
-end $;
+end $$;
 
 -- Grava a versão histórica e os arquivos de uma vez, chamada pela função arquivos-no-drive com o login de quem chamou.
 -- Sem security definer: a RLS decide. p_numero é o número digitado.
 create function public.registrar_versao_historica(p_processo uuid, p_numero integer, p_observacao text, p_arquivos jsonb)
 returns uuid
 language plpgsql set search_path = ''
-as $
+as $$
 declare
   versao uuid;
 begin
@@ -149,7 +149,7 @@ begin
   perform private.gravar_arquivos_da_versao(versao, p_arquivos);
   perform private.cobrar_conferencias_da_versao();
   return versao;
-end $;
+end $$;
 
 revoke execute on function public.registrar_versao_historica(uuid, integer, text, jsonb) from public, anon;
 grant execute on function public.registrar_versao_historica(uuid, integer, text, jsonb) to authenticated;
