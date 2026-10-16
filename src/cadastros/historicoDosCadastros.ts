@@ -45,6 +45,7 @@ const TEXTO_DA_ACAO_DA_ETAPA: Record<string, string> = {
 
 const TEXTO_DA_ACAO_DA_VERSAO: Record<string, string> = {
   enviar: 'Enviou a versão', registrar_historica: 'Registrou a versão histórica',
+  acrescentar_relatorio: 'Acrescentou o relatório à versão', sem_alteracao: 'Marcou sem alteração de conteúdo na versão',
 }
 
 const TEXTOS_DA_ENTIDADE: Record<string, Record<string, string>> = {
@@ -68,7 +69,7 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   nivel: 'Nível', obrigatoria: 'Obrigatória', ativa: 'Situação', ordem: 'Posição',
   data: 'Data', hora: 'Hora', local: 'Local', anotacoes: 'Anotações', outros_participantes: 'Outros participantes',
   processos: 'Processos', usuarios: 'Usuários do EP',
-  rotulo: 'Versão', etapa: 'Etapa', arquivos: 'Arquivos',
+  rotulo: 'Versão', etapa: 'Etapa', arquivos: 'Arquivos', relatorio_de: 'Relatório copiado da versão',
 }
 
 // Os ids existem para o filtro; quem lê o histórico vê a sigla e o nome. Código e nome da etapa já estão no título.

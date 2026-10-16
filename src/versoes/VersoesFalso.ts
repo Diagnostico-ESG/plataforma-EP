@@ -3,8 +3,8 @@ import { tipoMimeDaExtensao } from '../../supabase/functions/_shared/drive.ts'
 import { nomePadrao } from '../../supabase/functions/_shared/nomePadrao.ts'
 import type { EventoDoCadastro } from '../cadastros/tipos'
 import { falhaDaFuncao } from './recusasDeVersoes'
-import { haVersaoNova, ordenarVersoes, proximoNumero, rotuloDaVersao } from './rotulos'
-import type { ArquivoDaVersao, ModuloDeVersoes, PedidoDeVersao, Versao } from './tipos'
+import { haVersaoNova, ordenarVersoes, proximoNumero, relatorioPendente, rotuloDaVersao } from './rotulos'
+import type { ArquivoDaVersao, ModuloDeVersoes, PedidoDeRelatorio, PedidoDeVersao, Versao } from './tipos'
 
 /** O que o falso precisa saber do processo para nomear os arquivos e guardar a etapa, como o banco. */
 export type ProcessoDoFalso = { sigla: string; nome: string; etapa: string | null }
@@ -58,11 +58,52 @@ export class VersoesFalso implements ModuloDeVersoes {
     this.registrar(pedido, historica)
   }
 
+  // Como o relatório depois do banco (função acrescentar_relatorio): só na versão nova que ainda não tem relatório.
+  async acrescentarRelatorio(pedido: PedidoDeRelatorio, aoProgredir: (enviados: number, total: number) => void): Promise<void> {
+    if (this.falharNoArquivo === 1) throw new Error(`o arquivo ${pedido.arquivo.name} não chegou ao Drive`)
+    aoProgredir(1, 1)
+    if (this.segurarDepoisDe === 1) await new Promise<never>(() => {})
+    this.falharNoRegistroSeConfigurado()
+    const versao = this.versaoDoPedido(pedido.processoId, pedido.versaoId)
+    conferirRelatorioNovo(versao)
+    this.guardarRelatorio(pedido.processoId, versao, { formato: extensaoDoNome(pedido.arquivo.name), tamanho: pedido.arquivo.size })
+  }
+
+  // Como o banco (funções origem_do_relatorio e registrar_sem_alteracao): copia o relatório da versão imediatamente
+  // anterior, com o nome da versão nova, ligado ao original.
+  async semAlteracaoDeConteudo(processoId: string, versaoId: string): Promise<void> {
+    this.falharNoRegistroSeConfigurado()
+    const versao = this.versaoDoPedido(processoId, versaoId)
+    if (versao.historica) throw falhaDaFuncao('versao_historica_somente_leitura', '')
+    const origem = relatorioDaAnterior(versao, this.versoes[processoId] ?? [])
+    if (!origem) throw falhaDaFuncao('versao_anterior_sem_relatorio', '')
+    conferirRelatorioNovo(versao)
+    this.guardarRelatorio(processoId, versao, origem.arquivo, origem)
+  }
+
   async baixarArquivo(arquivo: ArquivoDaVersao): Promise<Blob> {
     if (this.falharNoDownload instanceof Error) throw this.falharNoDownload
     if (this.falharNoDownload) throw new Error('falha de conexão simulada')
     this.baixados.push(arquivo.id)
     return new Blob([`conteúdo de ${arquivo.nome}`], { type: tipoMimeDaExtensao(arquivo.formato) })
+  }
+
+  private versaoDoPedido(processoId: string, versaoId: string): Versao {
+    const versao = (this.versoes[processoId] ?? []).find((outra) => outra.id === versaoId)
+    if (!versao) throw new Error(`versão ${versaoId} não encontrada no processo ${processoId}`)
+    return versao
+  }
+
+  // O relatório entra na versão (último na ordem dos papéis); o evento traz, na cópia, a versão de onde veio.
+  private guardarRelatorio(processoId: string, versao: Versao, { formato, tamanho }: Pick<ArquivoDaVersao, 'formato' | 'tamanho'>,
+    origem?: OrigemDaCopia): void {
+    const processo = this.processos[processoId] ?? { sigla: 'TSA', nome: processoId, etapa: null }
+    const nome = nomePadrao({ sigla: processo.sigla, numero: versao.numero, historica: false, nomeDoProcesso: processo.nome, papel: 'relatorio', extensao: formato })
+    const copia = origem ? { copiadoDe: origem.arquivo.id } : {}
+    const novo: ArquivoDaVersao = { id: `a${this.proximoId++}`, papel: 'relatorio', nome, formato, tamanho, ...copia }
+    const atualizada: Versao = { ...versao, arquivos: [...versao.arquivos, novo] }
+    this.versoes[processoId] = (this.versoes[processoId] ?? []).map((outra) => (outra.id === versao.id ? atualizada : outra))
+    this.aoRegistrar?.(processoId, eventoDaVersao(processoId, atualizada, processo, origem ? 'sem_alteracao' : 'acrescentar_relatorio', origem?.rotulo))
   }
 
   private falharNoRegistroSeConfigurado(): void {
@@ -84,7 +125,7 @@ export class VersoesFalso implements ModuloDeVersoes {
     }
     this.versoes[pedido.processoId] = [...doProcesso, versao]
     this.envios.push(pedido)
-    this.aoRegistrar?.(pedido.processoId, eventoDoEnvio(pedido.processoId, versao, processo))
+    this.aoRegistrar?.(pedido.processoId, eventoDaVersao(pedido.processoId, versao, processo, historica ? 'registrar_historica' : 'enviar'))
   }
 
   private arquivos(pedido: PedidoDeVersao, processo: ProcessoDoFalso, numero: number, historica: boolean): ArquivoDaVersao[] {
@@ -108,14 +149,30 @@ function conferirHistorica(doProcesso: Versao[], pedido: PedidoDeVersao): void {
   }
 }
 
+// O relatório só entra na versão nova que ainda não tem relatório (migração relatorio_depois_e_sem_alteracao).
+function conferirRelatorioNovo(versao: Versao): void {
+  if (versao.historica) throw falhaDaFuncao('versao_historica_somente_leitura', '')
+  if (!relatorioPendente(versao)) throw falhaDaFuncao('relatorio_ja_existe', '')
+}
+
+type OrigemDaCopia = { arquivo: ArquivoDaVersao; rotulo: string }
+
+// O relatório da versão imediatamente anterior (a de maior número menor), com o rótulo dela.
+function relatorioDaAnterior(versao: Versao, doProcesso: Versao[]): OrigemDaCopia | undefined {
+  const anterior = ordenarVersoes(doProcesso).find((outra) => outra.numero < versao.numero)
+  const arquivo = anterior?.arquivos.find((outro) => outro.papel === 'relatorio')
+  return anterior && arquivo ? { arquivo, rotulo: rotuloDaVersao(anterior) } : undefined
+}
+
 // O evento que o gatilho do banco grava (migração versoes): entidade "versao", referência no processo.
-function eventoDoEnvio(processoId: string, versao: Versao, processo: ProcessoDoFalso): EventoDoCadastro {
+function eventoDaVersao(processoId: string, versao: Versao, processo: ProcessoDoFalso, acao: string, relatorioDe?: string): EventoDoCadastro {
   const depois = {
     rotulo: rotuloDaVersao(versao), processo_nome: processo.nome, setor_sigla: processo.sigla, etapa: versao.etapa,
     observacao: versao.observacao, arquivos: versao.arquivos.map(({ papel, nome }) => ({ papel, nome })),
+    ...(relatorioDe ? { relatorio_de: relatorioDe } : {}),
   }
   return {
-    id: Date.now(), ocorridoEm: versao.enviadaEm, autor: 'Pessoa de Teste', acao: versao.historica ? 'registrar_historica' : 'enviar', entidade: 'versao',
+    id: Date.now(), ocorridoEm: versao.enviadaEm, autor: 'Pessoa de Teste', acao, entidade: 'versao',
     entidadeRef: processoId, antes: null, depois,
   }
 }

@@ -19,6 +19,12 @@ test.each([
   ['historica_depois_de_versao_nova', '', 'O processo já tem versão nova; versões históricas só podem ser registradas antes dela.'],
   ['numero_historico_repetido', '5', 'O processo já tem a versão histórica V5F. Use outro número.'],
   ['historica_sem_arquivo_de_fluxograma', '', 'A versão histórica precisa do arquivo .bpm, ou do .bpmn com o .png.'],
+  ['relatorio_ja_existe', '', 'Esta versão já tem relatório.'],
+  ['versao_anterior_sem_relatorio', '', 'A versão anterior não tem relatório para copiar. Envie o relatório.'],
+  ['versao_historica_somente_leitura', '', 'A versão histórica é somente leitura: não recebe arquivos.'],
+  ['copia_so_de_relatorio', '', 'Não foi possível copiar o relatório da versão anterior. Envie o relatório.'],
+  ['copia_de_versao_que_nao_e_a_anterior', '', 'Não foi possível copiar o relatório da versão anterior. Envie o relatório.'],
+  ['copia_diferente_do_original', '', 'Não foi possível copiar o relatório da versão anterior. Envie o relatório.'],
 ])('o código %s vira a frase da tela', (codigo, mensagem, frase) => {
   const falha = falhaDaFuncao(codigo, mensagem)
   expect(falha).toBeInstanceOf(TravaDoBanco)

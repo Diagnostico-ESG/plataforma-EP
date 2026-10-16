@@ -3,7 +3,7 @@ import { expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { ClienteSupabaseFalso } from '../testes/ClienteSupabaseFalso'
 import type { Database } from '../types/database'
-import type { PedidoDeVersao } from './tipos'
+import type { PedidoDeRelatorio, PedidoDeVersao } from './tipos'
 import { criarVersoesSupabase, type EnviarBytes } from './versoesSupabase'
 
 const LINHA = {
@@ -184,4 +184,78 @@ test('resposta que não são bytes (texto) vira erro com o recebido e o esperado
   cliente.respostasDaFuncao['funcao.baixar'] = { data: 'texto', error: null }
   await expect(criar(cliente).baixarArquivo(ARQUIVO_PNG))
     .rejects.toThrow('a função devolveu string; esperado: os bytes do arquivo (Blob)')
+})
+
+test('o relatório copiado vem da lista com o id do arquivo de origem', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  const copia = { id: 'a9', papel: 'relatorio', nome: 'TSA_V3_Emitir Ofício_Relatório.pdf', formato: 'pdf', tamanho: 5, copiado_de: 'a4' }
+  cliente.respostas['versoes.select'] = { data: [{ ...LINHA, arquivos_da_versao: [copia] }], error: null }
+  const [versao] = await criar(cliente).listarVersoes('p1')
+  expect(versao.arquivos).toEqual([
+    { id: 'a9', papel: 'relatorio', nome: 'TSA_V3_Emitir Ofício_Relatório.pdf', formato: 'pdf', tamanho: 5, copiadoDe: 'a4' },
+  ])
+})
+
+const PEDIDO_DE_RELATORIO: PedidoDeRelatorio = { processoId: 'p1', versaoId: 'v3', numero: 3, arquivo: new File(['pdf'], 'relatorio.pdf') }
+
+test('o relatório depois abre a sessão com o número da versão, envia, avisa o progresso e registra na versão', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  comSessoes(cliente)
+  const envio = new EnvioAoDriveFalso()
+  const progresso: string[] = []
+  await criar(cliente, envio).acrescentarRelatorio(PEDIDO_DE_RELATORIO, (enviados, total) => progresso.push(`${enviados}/${total}`))
+  expect(cliente.chamadasDaFuncao).toEqual([
+    { acao: 'iniciar_envio', processo_id: 'p1', papel: 'relatorio', nome_original: 'relatorio.pdf', tamanho: 3, numero: 3, historica: false },
+    {
+      acao: 'registrar', processo_id: 'p1', numero: 3, observacao: null, historica: false, versao_id: 'v3',
+      arquivos: [{ papel: 'relatorio', drive_id: 'id-sessao' }],
+    },
+  ])
+  expect(progresso).toEqual(['1/1'])
+})
+
+test('se o relatório não chega ao Drive, nada é registrado', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  comSessoes(cliente)
+  const envio = new EnvioAoDriveFalso()
+  envio.falharEm = 'sessao'
+  await expect(criar(cliente, envio).acrescentarRelatorio(PEDIDO_DE_RELATORIO, () => {}))
+    .rejects.toThrow('o arquivo relatorio.pdf não chegou ao Drive')
+  expect(cliente.chamadasDaFuncao.map((corpo) => corpo.acao)).toEqual(['iniciar_envio'])
+})
+
+test.each([
+  ['relatorio_ja_existe', '', 'Esta versão já tem relatório.'],
+  ['versao_historica_somente_leitura', '', 'A versão histórica é somente leitura: não recebe arquivos.'],
+])('a recusa %s do banco no relatório depois vira a frase da tela', async (codigo, valor, frase) => {
+  const cliente = new ClienteSupabaseFalso()
+  comSessoes(cliente)
+  cliente.respostasDaFuncao['funcao.registrar'] = recusa(codigo, valor)
+  const falha = await criar(cliente).acrescentarRelatorio(PEDIDO_DE_RELATORIO, () => {}).catch((erro: unknown) => erro)
+  expect(falha).toBeInstanceOf(TravaDoBanco)
+  expect((falha as Error).message).toBe(frase)
+})
+
+test('"sem alteração" chama a ação da função com o processo e a versão', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostasDaFuncao['funcao.sem_alteracao'] = { data: { arquivo_id: 'a9' }, error: null }
+  await criar(cliente).semAlteracaoDeConteudo('p1', 'v3')
+  expect(cliente.chamadasDaFuncao).toEqual([{ acao: 'sem_alteracao', processo_id: 'p1', versao_id: 'v3' }])
+})
+
+test.each([
+  ['versao_anterior_sem_relatorio', 'A versão anterior não tem relatório para copiar. Envie o relatório.'],
+  ['processo_fora_de_andamento', 'O processo não está em andamento; não é possível enviar versão.'],
+])('a recusa %s no "sem alteração" vira a frase da tela', async (codigo, frase) => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostasDaFuncao['funcao.sem_alteracao'] = recusa(codigo)
+  const falha = await criar(cliente).semAlteracaoDeConteudo('p1', 'v3').catch((erro: unknown) => erro)
+  expect(falha).toBeInstanceOf(TravaDoBanco)
+  expect((falha as Error).message).toBe(frase)
+})
+
+test('"sem alteração" sem resposta da função (sem conexão) vira erro com o motivo', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostasDaFuncao['funcao.sem_alteracao'] = { data: null, error: { message: 'Failed to send a request' } }
+  await expect(criar(cliente).semAlteracaoDeConteudo('p1', 'v3')).rejects.toThrow('sem conexão')
 })

@@ -1,4 +1,4 @@
-import type { PapelDoArquivo, Versao } from './tipos'
+import type { ArquivoDaVersao, PapelDoArquivo, Versao } from './tipos'
 
 /** Os papéis na ordem em que aparecem no formulário e na lista de arquivos. */
 export const PAPEIS: readonly PapelDoArquivo[] = ['bpmn', 'png', 'bpm', 'relatorio']
@@ -33,4 +33,37 @@ export function haVersaoNova(versoes: Pick<Versao, 'historica'>[]): boolean {
 /** Da mais recente (maior número) para a mais antiga. */
 export function ordenarVersoes(versoes: Versao[]): Versao[] {
   return [...versoes].sort((a, b) => b.numero - a.numero)
+}
+
+/** "Relatório pendente": versão nova sem o arquivo do relatório (calculado na tela, não guardado). */
+export function relatorioPendente(versao: Pick<Versao, 'historica' | 'arquivos'>): boolean {
+  return !versao.historica && !versao.arquivos.some((arquivo) => arquivo.papel === 'relatorio')
+}
+
+/** As versões com relatório pendente, da mais recente para a mais antiga (a primeira é a escolhida no formulário). */
+export function versoesComRelatorioPendente(versoes: Versao[]): Versao[] {
+  return ordenarVersoes(versoes).filter(relatorioPendente)
+}
+
+function relatorioDaVersao(versao: Versao): ArquivoDaVersao | undefined {
+  return versao.arquivos.find((arquivo) => arquivo.papel === 'relatorio')
+}
+
+/** A versão imediatamente anterior: a de maior número menor que o da versão (o banco usa a mesma regra). */
+function versaoAnterior(versao: Versao, versoes: Versao[]): Versao | undefined {
+  return ordenarVersoes(versoes).find((outra) => outra.numero < versao.numero)
+}
+
+/** [Sem alteração de conteúdo]: versão pendente cuja versão anterior tem relatório para copiar. */
+export function podeCopiarRelatorio(versao: Versao, versoes: Versao[]): boolean {
+  if (!relatorioPendente(versao)) return false
+  const anterior = versaoAnterior(versao, versoes)
+  return anterior !== undefined && relatorioDaVersao(anterior) !== undefined
+}
+
+/** O rótulo da versão de onde veio o relatório copiado ("V4"); null se o arquivo não é cópia (ou a origem não está na lista). */
+export function origemDoRelatorio(arquivo: ArquivoDaVersao, versoes: Versao[]): string | null {
+  if (!arquivo.copiadoDe) return null
+  const origem = versoes.find((versao) => versao.arquivos.some((outro) => outro.id === arquivo.copiadoDe))
+  return origem ? rotuloDaVersao(origem) : null
 }

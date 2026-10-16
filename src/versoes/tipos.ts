@@ -3,7 +3,15 @@ import type { PapelDoArquivo } from '../../supabase/functions/_shared/nomePadrao
 export type { PapelDoArquivo }
 
 /** Um arquivo da versão como o banco o guarda; o nome é o padrão, gravado no envio. */
-export type ArquivoDaVersao = { id: string; papel: PapelDoArquivo; nome: string; formato: string; tamanho: number }
+export type ArquivoDaVersao = {
+  id: string
+  papel: PapelDoArquivo
+  nome: string
+  formato: string
+  tamanho: number
+  /** Só no relatório de "sem alteração de conteúdo": o id do relatório da versão anterior, de onde veio. */
+  copiadoDe?: string
+}
 
 /** Versão do processo (V7, ou V5F na histórica); `enviadaEm` é o instante ISO do envio. */
 export type Versao = {
@@ -31,6 +39,9 @@ export type PedidoDeVersao = {
   arquivos: ArquivoEscolhido[]
 }
 
+/** O relatório que entra numa versão nova que ainda não tem; `numero` é o da versão, com que o arquivo é nomeado no Drive. */
+export type PedidoDeRelatorio = { processoId: string; versaoId: string; numero: number; arquivo: File }
+
 /**
  * Único ponto por onde a interface fala com o banco e com a função do Drive nas versões. Recusa chega como
  * TravaDoBanco, com a frase pronta; outra falha, como Error cuja mensagem é o motivo em português.
@@ -48,6 +59,16 @@ export type ModuloDeVersoes = {
    * regras da histórica (só antes da versão nova, número que ainda não existe, .bpm ou .bpmn e .png).
    */
   registrarVersaoHistorica(pedido: PedidoDeVersao, aoProgredir: (enviados: number, total: number) => void): Promise<void>
+  /**
+   * Envia o relatório direto ao Drive e só então o registra na versão (que ainda não tem relatório). `aoProgredir`
+   * avisa quando o arquivo chegou. Se algo falhar, nada é registrado.
+   */
+  acrescentarRelatorio(pedido: PedidoDeRelatorio, aoProgredir: (enviados: number, total: number) => void): Promise<void>
+  /**
+   * "Sem alteração de conteúdo": a função copia no Drive o relatório da versão anterior, com o nome desta versão, e o
+   * registra ligado ao original. Só vale na versão nova sem relatório, cuja anterior tem relatório.
+   */
+  semAlteracaoDeConteudo(processoId: string, versaoId: string): Promise<void>
   /** Os bytes do arquivo, com o tipo do formato (o navegador o mostra se souber). Qualquer perfil ativo pode. */
   baixarArquivo(arquivo: ArquivoDaVersao): Promise<Blob>
 }

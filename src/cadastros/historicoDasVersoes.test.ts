@@ -21,6 +21,16 @@ describe('eventos de versão no histórico', () => {
     expect(textoDaAcaoDoCadastro('registrar_historica', 'versao')).toBe('Registrou a versão histórica')
   })
 
+  test('o relatório depois e o "sem alteração" têm texto próprio', () => {
+    expect(textoDaAcaoDoCadastro('acrescentar_relatorio', 'versao')).toBe('Acrescentou o relatório à versão')
+    expect(textoDaAcaoDoCadastro('sem_alteracao', 'versao')).toBe('Marcou sem alteração de conteúdo na versão')
+  })
+
+  test('o estado do "sem alteração" diz de qual versão veio o relatório', () => {
+    const semAlteracao = { ...ENVIO.depois, rotulo: 'V3', relatorio_de: 'V2' }
+    expect(descreverEstadoDoCadastro(semAlteracao)).toMatch(/; Relatório copiado da versão: V2$/)
+  })
+
   test('o item é a versão com o processo', () => {
     expect(nomeDoItem(ENVIO)).toBe('V3 — Emitir Ofício')
   })
