@@ -1,0 +1,100 @@
+/* Seção "Versões" do painel do processo: no estilo da seção Reuniões (título, lista e botão com o mesmo espaço). */
+.secao-de-versoes {
+  display: grid;
+  justify-items: start;
+  gap: var(--esp-2);
+}
+
+.secao-de-versoes > h3 {
+  margin: 0;
+}
+
+/* Cada versão é um bloco: cabeçalho numa linha (rótulo, data, autor, etapa), observação e a lista de arquivos. */
+.lista-de-versoes {
+  display: grid;
+  gap: var(--esp-2);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bloco-da-versao {
+  display: grid;
+  gap: var(--esp-1);
+  padding: var(--esp-2) var(--esp-3);
+  border: 1px solid var(--linha);
+  border-radius: var(--canto);
+  background: var(--folha);
+}
+
+.bloco-da-versao-cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-1) var(--esp-3);
+  margin: 0;
+  color: var(--texto-2);
+  font-size: var(--tam-rotulo);
+}
+
+.bloco-da-versao-cabecalho strong {
+  color: var(--texto);
+  font-size: var(--tam-base);
+}
+
+.bloco-da-versao-observacao {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.bloco-da-versao-arquivos {
+  display: grid;
+  gap: var(--esp-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-wrap: anywhere;
+}
+
+/* Formulário de envio: o grupo de arquivos sem a moldura padrão do fieldset; cada campo com a prévia ou a recusa. */
+.formulario-de-versao {
+  width: 100%;
+}
+
+.formulario-de-versao-campos {
+  display: grid;
+  gap: var(--esp-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.formulario-de-versao-campos legend {
+  padding: 0;
+  margin-bottom: var(--esp-1);
+}
+
+.campo-de-arquivo {
+  display: grid;
+  gap: var(--esp-1);
+}
+
+.campo-de-arquivo .cadastros-falha,
+.campo-de-arquivo-nome {
+  margin: 0;
+  font-size: var(--tam-rotulo);
+  overflow-wrap: anywhere;
+}
+
+.campo-de-arquivo-nome {
+  color: var(--texto-2);
+}
+
+.formulario-de-versao-previa,
+.formulario-de-versao-progresso {
+  margin: 0;
+}
+
+.formulario-de-versao-progresso {
+  font-weight: 700;
+}

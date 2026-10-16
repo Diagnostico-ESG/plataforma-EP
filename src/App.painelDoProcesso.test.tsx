@@ -8,6 +8,7 @@ import type { EventoDoCadastro } from './cadastros/tipos'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import type { EtapaDoProcesso, EtapaDoSetor, ProcessoLido } from './processos/tipos'
+import { VersoesFalso } from './versoes/VersoesFalso'
 
 beforeEach(() => {
   window.location.hash = '#/processos/p1'
@@ -65,7 +66,7 @@ function montar({ perfil = 'integrante_ep', processos = [PROCESSO], ajustar }: M
   falso.etapasDoCatalogo = [{ id: 'e5', codigo: 'relatorio', nome: 'Relatório e modelagem técnica', ordem: 5, ativa: true }]
   falso.historicoDosProcessos = { p1: [EVENTO] }
   ajustar?.(falso)
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} reunioes={new ReunioesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} reunioes={new ReunioesFalso()} versoes={new VersoesFalso()} />)
   return falso
 }
 

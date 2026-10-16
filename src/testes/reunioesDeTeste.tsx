@@ -7,6 +7,7 @@ import { CadastrosFalso } from '../cadastros/CadastrosFalso'
 import { ProcessosFalso } from '../processos/ProcessosFalso'
 import { ReunioesFalso, type SetorDoFalso } from '../reunioes/ReunioesFalso'
 import type { ProcessoDaReuniao, ResponsavelDaReuniao, Reuniao, UsuarioDaReuniao } from '../reunioes/tipos'
+import { VersoesFalso } from '../versoes/VersoesFalso'
 
 /** Hoje nos testes de reuniões: a tela calcula "próxima" e "realizada" pelo relógio. */
 export const HOJE_DE_TESTE = new Date(2026, 9, 14, 12, 0)
@@ -82,7 +83,7 @@ export function falsoDeReunioes({ reunioes = REUNIOES_DE_TESTE, ajustar }: Omit<
 export function montarReunioes({ perfil = 'integrante_ep', ...montagem }: Montagem = {}) {
   const falso = falsoDeReunioes(montagem)
   const acesso = AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })
-  render(<App acesso={acesso} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} reunioes={falso} />)
+  render(<App acesso={acesso} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} reunioes={falso} versoes={new VersoesFalso()} />)
   return falso
 }
 

@@ -9,6 +9,7 @@ import type { EventoDoCadastro } from './cadastros/tipos'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import type { ProcessoLido, TipoDeProcesso } from './processos/tipos'
+import { VersoesFalso } from './versoes/VersoesFalso'
 
 afterEach(() => {
   cleanup()
@@ -41,7 +42,7 @@ function montar({ id, perfil = 'integrante_ep', ajustar }: Montagem) {
   const falso = new ProcessosFalso()
   falso.processos = PROCESSOS.map((item) => ({ ...item }))
   ajustar?.(falso)
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={falso} reunioes={new ReunioesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={falso} reunioes={new ReunioesFalso()} versoes={new VersoesFalso()} />)
   return falso
 }
 

@@ -6,6 +6,7 @@ import { CadastrosFalso } from '../cadastros/CadastrosFalso'
 import { ProcessosFalso } from '../processos/ProcessosFalso'
 import { ReunioesFalso } from '../reunioes/ReunioesFalso'
 import type { EtapaNoCatalogo } from '../processos/tipos'
+import { VersoesFalso } from '../versoes/VersoesFalso'
 
 /** Um catálogo inventado: uma etapa do setor, duas do processo e uma do processo desativada. */
 export const ETAPAS_DE_TESTE: EtapaNoCatalogo[] = [
@@ -22,7 +23,7 @@ export function montarComCatalogo({ perfil = 'administrador', ajustar }: Montage
   const processos = new ProcessosFalso()
   processos.catalogo.etapas = [...ETAPAS_DE_TESTE]
   ajustar?.(processos)
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={processos} reunioes={new ReunioesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={processos} reunioes={new ReunioesFalso()} versoes={new VersoesFalso()} />)
   return processos
 }
 

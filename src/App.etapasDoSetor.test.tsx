@@ -8,6 +8,7 @@ import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import type { EtapaDoSetor } from './processos/tipos'
+import { VersoesFalso } from './versoes/VersoesFalso'
 
 beforeEach(() => {
   window.location.hash = '#/setores'
@@ -36,7 +37,7 @@ function montar({ perfil = 'integrante_ep', etapas = [RESPONSAVEIS, SENSIBILIZAC
   const processos = new ProcessosFalso()
   processos.etapasDoSetor = { s1: etapas }
   ajustar?.(processos)
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={processos} reunioes={new ReunioesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={processos} reunioes={new ReunioesFalso()} versoes={new VersoesFalso()} />)
   return processos
 }
 

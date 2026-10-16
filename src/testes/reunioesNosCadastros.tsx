@@ -7,6 +7,7 @@ import { ProcessosFalso } from '../processos/ProcessosFalso'
 import type { ProcessoLido } from '../processos/tipos'
 import type { ReunioesFalso } from '../reunioes/ReunioesFalso'
 import { falsoDeReunioes, SETORES_DE_TESTE } from './reunioesDeTeste'
+import { VersoesFalso } from '../versoes/VersoesFalso'
 
 function processo(id: string, nome: string, mudancas: Partial<ProcessoLido> = {}): ProcessoLido {
   return {
@@ -30,10 +31,26 @@ type Montagem = {
   ajustarReunioes?: (falso: ReunioesFalso) => void
   ajustarProcessos?: (falso: ProcessosFalso) => void
   ajustarCadastros?: (falso: CadastrosFalso) => void
+  ajustarVersoes?: (falso: VersoesFalso) => void
+}
+
+// O falso de versões conhece a sigla, o nome e a etapa atual de cada processo (para os nomes padrão e a etapa da
+// versão), e o evento de cada envio vai para o histórico do processo, como o gatilho do banco faz.
+function falsoDeVersoes(processos: ProcessosFalso): VersoesFalso {
+  const versoes = new VersoesFalso()
+  for (const processo of processos.processos) {
+    versoes.processos[processo.id] = { sigla: processo.setorSigla, nome: processo.nome, etapa: processo.etapaAtual?.nome ?? null }
+  }
+  versoes.aoRegistrar = (processoId, evento) => {
+    processos.historicoDosProcessos[processoId] = [evento, ...(processos.historicoDosProcessos[processoId] ?? [])]
+  }
+  return versoes
 }
 
 /** O aplicativo inteiro com setores, processos e reuniões que combinam entre si (as reuniões de teste de sempre). */
-export function montarNosCadastros({ perfil = 'integrante_ep', ajustarReunioes, ajustarProcessos, ajustarCadastros }: Montagem = {}) {
+export function montarNosCadastros(
+  { perfil = 'integrante_ep', ajustarReunioes, ajustarProcessos, ajustarCadastros, ajustarVersoes }: Montagem = {},
+) {
   const cadastros = new CadastrosFalso()
   cadastros.setores = SETORES_DE_TESTE.map(({ id, sigla, nome, ativo }) => ({ id, sigla, nome, observacoes: null, ativo }))
   ajustarCadastros?.(cadastros)
@@ -41,7 +58,9 @@ export function montarNosCadastros({ perfil = 'integrante_ep', ajustarReunioes, 
   processos.processos = PROCESSOS_DOS_CADASTROS
   ajustarProcessos?.(processos)
   const reunioes = falsoDeReunioes({ ajustar: ajustarReunioes })
+  const versoes = falsoDeVersoes(processos)
+  ajustarVersoes?.(versoes)
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={processos}
-    reunioes={reunioes} />)
-  return { cadastros, processos, reunioes }
+    reunioes={reunioes} versoes={versoes} />)
+  return { cadastros, processos, reunioes, versoes }
 }

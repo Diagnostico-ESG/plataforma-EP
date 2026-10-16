@@ -4,9 +4,11 @@ import type { ModuloDeCadastros } from '../../cadastros/tipos'
 import { type EstadoDoCarregamento, useCarregamento } from '../../hooks/useCarregamento'
 import type { DadosDoProcesso, ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 import type { ModuloDeReunioes } from '../../reunioes/tipos'
+import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { ItemInexistente } from '../cadastros/ItemInexistente'
 import { ReunioesDoProcesso } from '../reunioes/ReunioesDoProcesso'
+import { SecaoDeVersoes } from '../versoes/SecaoDeVersoes'
 import { AcoesDoProcesso } from './AcoesDoProcesso'
 import { BotaoFechar, CabecalhoDoPainel } from './CabecalhoDoPainel'
 import { CaminhoDoProcesso } from './CaminhoDoProcesso'
@@ -21,6 +23,7 @@ type PainelDoProcessoProps = {
   processos: ModuloDeProcessos
   cadastros: ModuloDeCadastros
   reunioes: ModuloDeReunioes
+  versoes: ModuloDeVersoes
   id: string
   podeAlterar: boolean
   aoFechar: () => void
@@ -110,7 +113,9 @@ function ProcessoAberto(props: ProcessoAbertoProps) {
 
 // Os dados viram o formulário na edição; salvar volta aos dados, já atualizados, e o Quadro recarrega.
 function DetalhesDoProcesso(props: ProcessoAbertoProps) {
-  const { processo, processos, cadastros, reunioes, podeAlterar, aoFechar, aoMudar, aoAtualizar, aoSumir, enderecoDoProcesso } = props
+  const {
+    processo, processos, cadastros, reunioes, versoes, podeAlterar, aoFechar, aoMudar, aoAtualizar, aoSumir, enderecoDoProcesso,
+  } = props
   const [editando, setEditando] = useState(false)
 
   async function salvar(dados: DadosDoProcesso) {
@@ -145,6 +150,7 @@ function DetalhesDoProcesso(props: ProcessoAbertoProps) {
         : <DadosLidos processo={processo} />}
       <EstruturaDoProcesso processo={processo} enderecoDoProcesso={enderecoDoProcesso} />
       <ReunioesDoProcesso reunioes={reunioes} processoId={processo.id} setorId={processo.setorId} podeAlterar={podeAlterar} />
+      <SecaoDeVersoes versoes={versoes} processo={processo} podeAlterar={podeAlterar} />
       {podeAlterar && !editando && (
         <AcoesDoProcesso processo={processo} processos={processos} aoEditar={() => setEditando(true)}
           aoExcluir={aposExcluir} aoMudar={aposMudar} aoSumir={aoSumir} />

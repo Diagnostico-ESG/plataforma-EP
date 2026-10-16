@@ -1,0 +1,56 @@
+import { useCallback, useState } from 'react'
+import { useCarregamento } from '../../hooks/useCarregamento'
+import type { ProcessoLido } from '../../processos/tipos'
+import { proximoNumero } from '../../versoes/rotulos'
+import type { ModuloDeVersoes, Versao } from '../../versoes/tipos'
+import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
+import '../processos/Painel.css'
+import { FormularioDeVersao } from './FormularioDeVersao'
+import { ListaDeVersoes } from './ListaDeVersoes'
+import './Versoes.css'
+
+type SecaoDeVersoesProps = { versoes: ModuloDeVersoes; processo: ProcessoLido; podeAlterar: boolean }
+
+/**
+ * Seção "Versões" do painel do processo (e do subprocesso). Enviar só para Administrador e Integrante com o processo
+ * em andamento; esconder o botão é conveniência, quem recusa é a função do servidor e o banco.
+ */
+export function SecaoDeVersoes({ versoes, processo, podeAlterar }: SecaoDeVersoesProps) {
+  const ler = useCallback(() => versoes.listarVersoes(processo.id), [versoes, processo.id])
+  const { estado, tentarDeNovo, recarregar } = useCarregamento(ler)
+  const podeEnviar = podeAlterar && processo.situacao === 'em_andamento'
+  return (
+    <section className="painel-estrutura secao-de-versoes" aria-label="Versões do processo">
+      <h3 className="painel-subtitulo">Versões</h3>
+      {estado.tipo === 'carregando' && <p className="cadastros-vazio" role="status">Carregando…</p>}
+      {estado.tipo === 'erro' && <ErroAoCarregar alvo="as versões" aoTentarDeNovo={tentarDeNovo} />}
+      {estado.tipo === 'pronto' && (
+        <VersoesProntas versoes={versoes} processo={processo} lidas={estado.valor} podeEnviar={podeEnviar} aoEnviada={recarregar} />
+      )}
+    </section>
+  )
+}
+
+type VersoesProntasProps = {
+  versoes: ModuloDeVersoes; processo: ProcessoLido; lidas: Versao[]; podeEnviar: boolean; aoEnviada: () => void
+}
+
+function VersoesProntas({ versoes, processo, lidas, podeEnviar, aoEnviada }: VersoesProntasProps) {
+  const [enviando, setEnviando] = useState(false)
+  const aposEnviar = () => {
+    setEnviando(false)
+    aoEnviada()
+  }
+  return (
+    <>
+      {enviando && (
+        <FormularioDeVersao modulo={versoes} processo={processo} numero={proximoNumero(lidas)} aoEnviada={aposEnviar}
+          aoCancelar={() => setEnviando(false)} />
+      )}
+      <ListaDeVersoes versoes={lidas} />
+      {podeEnviar && !enviando && (
+        <button type="button" className="botao botao-secundario" onClick={() => setEnviando(true)}>Enviar versão</button>
+      )}
+    </>
+  )
+}

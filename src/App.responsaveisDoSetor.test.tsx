@@ -8,6 +8,7 @@ import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import type { ResponsavelDoSetor } from './processos/tipos'
+import { VersoesFalso } from './versoes/VersoesFalso'
 
 beforeEach(() => {
   window.location.hash = '#/setores'
@@ -28,7 +29,7 @@ function montar({ perfil = 'integrante_ep', responsaveis = [BRUNO, ANA], ajustar
   const processos = new ProcessosFalso()
   processos.responsaveisDoSetor = { s1: responsaveis }
   ajustar?.(processos)
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={processos} reunioes={new ReunioesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={processos} reunioes={new ReunioesFalso()} versoes={new VersoesFalso()} />)
   return processos
 }
 

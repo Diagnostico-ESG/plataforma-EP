@@ -6,6 +6,7 @@ import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import type { EventoDoCadastro } from './cadastros/tipos'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import { ReunioesFalso } from './reunioes/ReunioesFalso'
+import { VersoesFalso } from './versoes/VersoesFalso'
 
 beforeEach(() => {
   window.location.hash = '#/setores/historico'
@@ -36,7 +37,7 @@ function montar() {
   const cadastros = new CadastrosFalso()
   cadastros.historico = EVENTOS
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'consulta' })} cadastros={cadastros}
-    processos={new ProcessosFalso()} reunioes={new ReunioesFalso()} />)
+    processos={new ProcessosFalso()} reunioes={new ReunioesFalso()} versoes={new VersoesFalso()} />)
 }
 
 test('os eventos de reunião aparecem no histórico geral, junto com os dos cadastros', async () => {

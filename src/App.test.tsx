@@ -5,11 +5,12 @@ import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import { AcessoFalso } from './acesso/AcessoFalso'
+import { VersoesFalso } from './versoes/VersoesFalso'
 
 afterEach(cleanup)
 
 async function abrirLogado() {
-  render(<App acesso={AcessoFalso.logadoComo()} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} reunioes={new ReunioesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo()} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} reunioes={new ReunioesFalso()} versoes={new VersoesFalso()} />)
   await screen.findByRole('heading', { name: 'Processos' })
 }
 
