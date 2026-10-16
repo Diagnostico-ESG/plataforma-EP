@@ -36,5 +36,5 @@ OK      depois da troca, o arquivo segue ok (o banco guarda o MD5 novo) (situaç
 
 ## Pendente
 
-- Seção 7 do roteiro (arrumação): apagar os arquivos de teste no Drive, desativar os dois usuários inventados e desligar o Email.
+- Seção 7 do roteiro (arrumação): adiada pelo usuário em 2026-10-16, registrada no `.scratch/backlog.md` para antes do `/ship`.
 - Fecho: Tarefa 9 do `plano-01.md` e o `Concluído em` dos tickets 01 a 08, conferindo esta saída contra os critérios de prova de cada um.
