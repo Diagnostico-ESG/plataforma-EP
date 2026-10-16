@@ -46,7 +46,7 @@ O resultado deve ser `yclkzyoebpsxmgpbcbus`. Se for outro, pare.
 2. Grave a chave da conta de serviço. O comando transforma o arquivo em texto base64 e o grava sem mostrá-lo na tela:
 
 ```powershell
-$conta = [Convert]::ToBase64String([IO.File]::ReadAllBytes("dados-reais\ep-drive.json")); npx supabase secrets set "EP_DRIVE_CONTA_JSON_BASE64=$conta" --project-ref yclkzyoebpsxmgpbcbus; Remove-Variable conta
+$conta = [Convert]::ToBase64String([IO.File]::ReadAllBytes((Resolve-Path "dados-reais\ep-drive.json"))); npx supabase secrets set "EP_DRIVE_CONTA_JSON_BASE64=$conta" --project-ref yclkzyoebpsxmgpbcbus; Remove-Variable conta
 ```
 
 3. Grave o identificador do Drive de desenvolvimento (troque `<identificador>`) e o endereço do site local:
@@ -118,4 +118,5 @@ Esta parte também é só sua e depende da função publicada com o ticket 08 (`
 
 1. No **EP – desenvolvimento**, apague o arquivo de teste (o nome tem `_V99_`). As pastas do setor e do processo podem ficar.
 2. Desative os dois usuários inventados na Administração da plataforma. Quem já entrou não se exclui (ADR 0002).
-3. Guarde o `dados-reais/ep-drive.json` fora do computador do escritório, se a política do CED pedir. Ele vai ser usado de novo na publicação em produção, pelo roteiro do `/ship`.
+3. No painel do Supabase de desenvolvimento, em **Authentication → Sign In / Providers**, desligue de novo o **Email**. Ele só foi ligado para a prova, porque o login da plataforma é pelo Google (ADR 0001).
+4. Guarde o `dados-reais/ep-drive.json` fora do computador do escritório, se a política do CED pedir. Ele vai ser usado de novo na publicação em produção, pelo roteiro do `/ship`.
