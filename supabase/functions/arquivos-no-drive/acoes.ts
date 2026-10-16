@@ -110,6 +110,13 @@ export async function lerAlvoDaSubstituicao(contexto: ContextoDoDrive, arquivoId
   return { papel, formato, nome, driveId, processoId: versoes.processo_id, historica: versoes.historica }
 }
 
+// O processo de uma versão, lido pela RLS com o login de quem chamou (null: a versão não existe ou não aparece).
+export async function lerProcessoDaVersao(contexto: ContextoDoDrive, versaoId: string): Promise<string | null> {
+  const { data, error } = await contexto.cliente.from('versoes').select('processo_id').eq('id', versaoId).maybeSingle()
+  if (error) throw new Error(`leitura de versoes falhou (código ${error.code}); esperado: versão visível`)
+  return (data as { processo_id: string } | null)?.processo_id ?? null
+}
+
 // Substituir (ADR 0007): a sessão atualiza o MESMO arquivo do Drive (nada novo na pasta, nada apagado); o nome fica
 // o que já está guardado. Os bytes vão do navegador direto ao Google, como no envio.
 async function iniciarSubstituicao(

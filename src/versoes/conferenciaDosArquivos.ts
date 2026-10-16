@@ -22,6 +22,7 @@ function recusaDaExtensao(papel: PapelDoArquivo, nome: string): string | null {
 }
 
 function recusaDoTamanho(tamanho: number): string | null {
+  if (tamanho === 0) return 'O arquivo está vazio. Recebido: 0 bytes.'
   if (tamanho <= LIMITE_DE_TAMANHO) return null
   return `O arquivo passa de 20 MB. Recebido: ${megabytes(tamanho)} MB (${tamanho} bytes).`
 }

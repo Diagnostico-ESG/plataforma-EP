@@ -112,3 +112,19 @@ Método: detector do Impeccable em `src/components/versoes` (sem achados) e leit
 - **Deixado de fora (P3):** `aria-label` no `<li>` de cada versão (papel sem nome pela ARIA 1.2); os testes de interface dependem dele para achar a versão.
 - **Deixado de fora (P2):** o foco do teclado não vai ao formulário quando ele abre e se perde (vai ao corpo da página) quando ele fecha. Mexe nos três formulários e no padrão das outras seções (Reuniões); melhor resolver nos dois lugares de uma vez, numa demanda própria.
 - **Conferido sem problema:** nenhuma cor fixa (só tokens), contraste do texto secundário (`--texto-2` sobre branco, cerca de 5,9:1), rótulos e `aria-describedby` nos campos de arquivo, `role="alert"` nas falhas e `role="status"` no progresso e no carregamento, quebra de linha em tela estreita.
+
+## 2026-10-16 — /ship (code-review dos 79 commits desde `marco/2026-10-15-inicio-documentos-versoes`, e testes de banco)
+
+- **Testes de banco 26 a 30 reprovaram na `main` (#89) por dados da prova do Drive.** A prova deixou versões, arquivos, eventos e pastas de teste no desenvolvimento, e os cinco testes contam a tabela inteira esperando-a vazia (ex.: "have 6, want 2"). Decisão do usuário: os testes limpam essas tabelas dentro da própria transação (`session_replication_role = replica`, desfeita no fim), em vez de o banco ser limpo à mão. Commit `eea12c6`; "Testes de banco" #90 na `main`, verde. A arrumação da prova (usuários inventados, provedor Email, arquivos no Drive) segue pendente e é do usuário.
+- **Revisão de padrões: nenhuma violação dura.** Cheiros de juízo (Duplicated Code em `versoesSupabase.ts` e nos formulários de relatório e substituição, cadeia de `if` em `index.ts`, `{cliente, token, config}` remontado, `mensagem: ''` em `semAlteracao.ts`) foram para o backlog como limpeza opcional.
+- **Revisão de spec, corrigidos agora (decisão do usuário), cada um com teste:**
+  - `acrescentar_relatorio` não conferia que a versão é do processo do pedido: um pedido montado fora da tela ligaria um arquivo da pasta do processo A à versão do B. A função do servidor agora lê o processo da versão (RLS) e recusa com `entrada_invalida` (`conferirVersaoDoProcesso`).
+  - O nome do arquivo no Drive não era conferido contra o rótulo da versão (um "V5" gravado numa histórica V5F). O registro confere que o nome tem `_V<n>_` ou `_V<n>F_` (não confere na substituição, em que o nome fica). Conferir o nome padrão inteiro foi descartado: o processo pode ser renomeado entre `iniciar_envio` e `registrar`.
+  - Arquivo vazio (0 byte) e `entrada_invalida` viravam "erro inesperado". A tela recusa 0 byte com frase própria, o servidor recusa 0 byte (`arquivo_nao_chegou`) e `entrada_invalida` ganhou frase na tela.
+  - **A função alterada (`arquivos-no-drive`) precisa ser publicada de novo pelo usuário** (`functions deploy`).
+- **Revisão de spec, registrados e deixados de fora (backlog):**
+  - A pasta do processo não acompanha a renomeação numa substituição (`iniciarSubstituicao` desvia antes de `garantirPastaDoProcesso`); a próxima versão nova renomeia a pasta.
+  - Sem teste de banco para as histórias 47 e 48 (reclassificação e troca de setor/nome com versões) nem para os limites de 2.000 caracteres da observação e 300 do nome.
+  - Substituir uma cópia de "sem alteração de conteúdo" mantém `copiado_de` e a marca "Sem alteração de conteúdo · relatório da V3", com conteúdo já trocado.
+  - O gatilho `registrar_evento_do_relatorio` não olha o papel: um `.bpmn`/`.png` inserido direto numa versão nova sairia no evento `acrescentar_relatorio`. A tela e a função do servidor não permitem isso.
+  - Critérios marcados `[x]` sem prova própria: ticket 08, critérios 3 e 4 (só o teste da decisão); tickets 01, 02, 04 e 05 (a saída do Integrante da prova não foi colada, e a cópia `files.copy` nunca apareceu numa saída). Já estavam declarados como presumidos nos tickets.

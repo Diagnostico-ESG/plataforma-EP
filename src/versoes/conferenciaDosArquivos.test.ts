@@ -44,3 +44,7 @@ test('recusa o .bpmn que não é XML ou que não tem o definitions do BPMN 2.0',
   expect(await conferirArquivo('bpmn', arquivo('fluxo.bpmn', ['<outro xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"/>'])))
     .toBe(recusa)
 })
+
+test('recusa arquivo vazio, dizendo o tamanho recebido', async () => {
+  expect(await conferirArquivo('bpm', arquivo('vazio.bpm', [new Uint8Array(0)]))).toBe('O arquivo está vazio. Recebido: 0 bytes.')
+})

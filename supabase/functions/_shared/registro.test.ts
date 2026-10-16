@@ -285,3 +285,35 @@ describe('recusaDoBanco', () => {
     expect(recusaDoBanco({ code: '08006', message: 'conexão caiu' })).toBeNull()
   })
 })
+
+describe('conferirArquivosNoDrive: rótulo da versão no nome e arquivo vazio', () => {
+  const pedidos: ArquivoPedido[] = [{ papel: 'bpm', driveId: 'id-bpm' }]
+
+  function conferirComRotulo(nome: string, rotulo: string | null, mudancas: Partial<ArquivoNoDrive> = {}) {
+    return conferirArquivosNoDrive(pedidos, [lido('id-bpm', nome, mudancas)], PASTA, rotulo)
+  }
+
+  function recusaDe(resultado: ReturnType<typeof conferirComRotulo>): { codigo: string; mensagem: string } | null {
+    return resultado.ok ? null : resultado.recusa
+  }
+
+  it('aceita o nome que tem o rótulo da versão pedida', () => {
+    expect(recusaDe(conferirComRotulo('TSA_V5_Emitir Ofício.bpm', 'V5'))).toBeNull()
+    expect(recusaDe(conferirComRotulo('TSA_V5F_Emitir Ofício.bpm', 'V5F'))).toBeNull()
+  })
+
+  it('recusa o nome de outra versão ou sem o F da histórica, citando o recebido e o esperado', () => {
+    const recusa = recusaDe(conferirComRotulo('TSA_V5_Emitir Ofício.bpm', 'V5F'))
+    expect(recusa?.codigo).toBe('arquivo_nao_chegou')
+    expect(recusa?.mensagem).toContain('nome TSA_V5_Emitir Ofício.bpm; esperado o rótulo V5F')
+    expect(recusaDe(conferirComRotulo('TSA_V6_Emitir Ofício.bpm', 'V5'))?.codigo).toBe('arquivo_nao_chegou')
+  })
+
+  it('sem rótulo (substituição, em que o nome fica) não confere o nome', () => {
+    expect(recusaDe(conferirComRotulo('TSA_V9_Emitir Ofício.bpm', null))).toBeNull()
+  })
+
+  it('recusa arquivo vazio no Drive', () => {
+    expect(recusaDe(conferirComRotulo('TSA_V5_Emitir Ofício.bpm', 'V5', { size: '0' }))?.codigo).toBe('arquivo_nao_chegou')
+  })
+})

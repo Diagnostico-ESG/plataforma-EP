@@ -172,27 +172,39 @@ export function parametrosDoBanco(entrada: EntradaRegistrar, arquivos: ArquivoPa
   return { p_processo: entrada.processoId, p_numero: entrada.numero, p_observacao: entrada.observacao, p_arquivos: arquivos }
 }
 
+// O nome foi dado por iniciar_envio com o número e o F da tela: um pedido montado fora dela não grava um nome que mente.
+function conferirRotuloNoNome(nome: string, rotulo: string | null): Validacao<null> {
+  if (rotulo === null || nome.includes(`_${rotulo}_`)) return { ok: true, valor: null }
+  return falhar('arquivo_nao_chegou', `nome ${nome}; esperado o rótulo ${rotulo}`)
+}
+
 // O formato vem do nome que a função deu ao arquivo no Drive; o tamanho e o MD5, do próprio Drive.
-function conferirUmArquivo(pedido: ArquivoPedido, lido: ArquivoNoDrive | null, pastaId: string): Validacao<ArquivoParaGravar> {
+function conferirUmArquivo(
+  pedido: ArquivoPedido, lido: ArquivoNoDrive | null, pastaId: string, rotulo: string | null,
+): Validacao<ArquivoParaGravar> {
   if (!lido || lido.id !== pedido.driveId || !lido.md5Checksum) return falhar('arquivo_nao_chegou')
   if (!(lido.parents ?? []).includes(pastaId)) return falhar('arquivo_fora_da_pasta')
+  const rotuloConferido = conferirRotuloNoNome(lido.name, rotulo)
+  if (!rotuloConferido.ok) return rotuloConferido
   const formato = extensaoDoNome(lido.name)
   if (!EXTENSOES_POR_PAPEL[pedido.papel].includes(formato)) return falhar('extensao_nao_aceita', `recebido .${formato}`)
   const tamanho = Number(lido.size)
+  if (tamanho < 1) return falhar('arquivo_nao_chegou', `recebido ${lido.size} bytes; esperado ao menos 1`)
   if (!(tamanho <= LIMITE_DE_TAMANHO)) return falhar('arquivo_grande', `recebido ${lido.size} bytes; esperado até ${LIMITE_DE_TAMANHO}`)
   const valor = { papel: pedido.papel, nome: lido.name, formato, tamanho }
   return { ok: true, valor: { ...valor, hash_md5: lido.md5Checksum, drive_id: lido.id } }
 }
 
-/** `lidos[i]` é o que o Drive informou de `pedidos[i]` (null: o Drive não achou o arquivo). */
+/** `lidos[i]` é o que o Drive informou de `pedidos[i]` (null: o Drive não achou o arquivo). `rotulo` (V5, V5F): o que o nome precisa ter; null na substituição, em que o nome fica. */
 export function conferirArquivosNoDrive(
   pedidos: ArquivoPedido[],
   lidos: (ArquivoNoDrive | null)[],
   pastaId: string,
+  rotulo: string | null = null,
 ): Validacao<ArquivoParaGravar[]> {
   const arquivos: ArquivoParaGravar[] = []
   for (const [indice, pedido] of pedidos.entries()) {
-    const arquivo = conferirUmArquivo(pedido, lidos[indice] ?? null, pastaId)
+    const arquivo = conferirUmArquivo(pedido, lidos[indice] ?? null, pastaId, rotulo)
     if (!arquivo.ok) return arquivo
     arquivos.push(arquivo.valor)
   }

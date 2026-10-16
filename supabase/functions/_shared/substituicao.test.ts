@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Validacao } from './decisao.ts'
-import { conferirAlvoDoEnvio, conferirAlvoDoRegistro, type AlvoDaSubstituicao } from './substituicao.ts'
+import { conferirAlvoDoEnvio, conferirAlvoDoRegistro, conferirVersaoDoProcesso, type AlvoDaSubstituicao } from './substituicao.ts'
 
 const PROCESSO = '9f000000-0000-0000-0000-0000000000b1'
 
@@ -66,5 +66,18 @@ describe('conferirAlvoDoRegistro', () => {
     const outro = { ...pedidoDeRegistro, processoId: '9f000000-0000-0000-0000-0000000000b2' }
     expect(codigo(conferirAlvoDoRegistro(alvo, outro))).toBe('entrada_invalida')
     expect(codigo(conferirAlvoDoRegistro({ ...alvo, historica: true }, pedidoDeRegistro))).toBe('versao_historica_somente_leitura')
+  })
+})
+
+describe('conferirVersaoDoProcesso', () => {
+  it('aceita a versão que é do processo do pedido', () => {
+    expect(conferirVersaoDoProcesso(PROCESSO, PROCESSO)).toEqual({ ok: true, valor: PROCESSO })
+  })
+
+  it('recusa versão de outro processo ou que não existe, com a mesma recusa, sem revelar qual dos dois', () => {
+    const outro = conferirVersaoDoProcesso('9f000000-0000-0000-0000-0000000000b2', PROCESSO)
+    expect(codigo(outro)).toBe('entrada_invalida')
+    expect(mensagem(outro)).toContain('versão não encontrada neste processo')
+    expect(codigo(conferirVersaoDoProcesso(null, PROCESSO))).toBe('entrada_invalida')
   })
 })

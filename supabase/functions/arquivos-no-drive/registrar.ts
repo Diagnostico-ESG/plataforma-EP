@@ -10,8 +10,8 @@ import {
   type ArquivoParaGravar,
   type EntradaRegistrar,
 } from '../_shared/registro.ts'
-import { conferirAlvoDoRegistro } from '../_shared/substituicao.ts'
-import { lerAlvoDaSubstituicao } from './acoes.ts'
+import { conferirAlvoDoRegistro, conferirVersaoDoProcesso } from '../_shared/substituicao.ts'
+import { lerAlvoDaSubstituicao, lerProcessoDaVersao } from './acoes.ts'
 import { responderResultadoDoBanco } from './gravacao.ts'
 import { lerNoDriveOuNulo } from './google.ts'
 import { API_DE_ARQUIVOS, lerPastaRegistrada, type ContextoDoDrive } from './pastas.ts'
@@ -45,19 +45,35 @@ async function conferirSubstituicao(contexto: ContextoDoDrive, entrada: EntradaR
   return conferido.ok ? null : responderRecusa(conferido.recusa)
 }
 
+// Relatório depois: a versão tem de ser do processo do pedido, senão o arquivo da pasta de um processo entraria na de outro.
+async function conferirRelatorioDepois(contexto: ContextoDoDrive, entrada: EntradaRegistrar, versaoId: string): Promise<Response | null> {
+  const conferido = conferirVersaoDoProcesso(await lerProcessoDaVersao(contexto, versaoId), entrada.processoId)
+  return conferido.ok ? null : responderRecusa(conferido.recusa)
+}
+
+// Na troca o nome fica; nos demais, o nome do Drive precisa ter o número (e o F) com que a versão será gravada.
+function rotuloEsperado(entrada: EntradaRegistrar): string | null {
+  return entrada.arquivoId === null ? `V${entrada.numero}${entrada.historica ? 'F' : ''}` : null
+}
+
+// As conferências do alvo que o pedido nomeia (arquivo a trocar ou versão a completar); null quando passa ou não há alvo.
+async function conferirAlvoDoPedido(contexto: ContextoDoDrive, entrada: EntradaRegistrar): Promise<Response | null> {
+  if (entrada.arquivoId !== null) return await conferirSubstituicao(contexto, entrada, entrada.arquivoId)
+  if (entrada.versaoId !== null) return await conferirRelatorioDepois(contexto, entrada, entrada.versaoId)
+  return null
+}
+
 export async function registrar(contexto: ContextoDoDrive, entrada: EntradaRegistrar): Promise<Response> {
   const situacao = await lerSituacao(contexto, entrada.processoId)
   if (situacao === null) return responderRecusa(recusar('entrada_invalida', 'processo não encontrado'))
   const foraDeAndamento = conferirProcessoEmAndamento(situacao)
   if (foraDeAndamento) return responderRecusa(foraDeAndamento)
-  if (entrada.arquivoId !== null) {
-    const recusaDoAlvo = await conferirSubstituicao(contexto, entrada, entrada.arquivoId)
-    if (recusaDoAlvo) return recusaDoAlvo
-  }
+  const recusaDoAlvo = await conferirAlvoDoPedido(contexto, entrada)
+  if (recusaDoAlvo) return recusaDoAlvo
   const pastaId = await lerPastaRegistrada(contexto.cliente, { coluna: 'processo_id', id: entrada.processoId })
   if (!pastaId) return responderRecusa(recusar('arquivo_fora_da_pasta'))
   const lidos = await Promise.all(entrada.arquivos.map((arquivo) => lerArquivoNoDrive(contexto.token, arquivo.driveId)))
-  const conferidos = conferirArquivosNoDrive(entrada.arquivos, lidos, pastaId)
+  const conferidos = conferirArquivosNoDrive(entrada.arquivos, lidos, pastaId, rotuloEsperado(entrada))
   if (!conferidos.ok) return responderRecusa(conferidos.recusa)
   return await gravar(contexto, entrada, conferidos.valor)
 }
