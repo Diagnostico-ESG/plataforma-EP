@@ -63,8 +63,8 @@ const PNG = Uint8Array.from(
 
 const ARQUIVO_INEXISTENTE = '00000000-0000-0000-0000-00000000dead'
 
-function pedidoDeEnvio(processoId, numero = 1, papel = 'bpmn', bytes = CONTEUDO, historica = false) {
-  return { acao: 'iniciar_envio', processo_id: processoId, papel, nome_original: `prova.${papel}`, tamanho: bytes.length, numero, historica }
+function pedidoDeEnvio(processoId, numero = 1, papel = 'bpmn', bytes = CONTEUDO, historica = false, extensao = papel) {
+  return { acao: 'iniciar_envio', processo_id: processoId, papel, nome_original: `prova.${extensao}`, tamanho: bytes.length, numero, historica }
 }
 
 // O número que a versão vai receber: o maior do processo + 1, como a tela calcula na prévia.
@@ -113,7 +113,7 @@ async function enviarComoIntegrante(config, integrante) {
   await registrarVersao(config, integrante, processoId, numero, [bpmn, png])
   const arquivoId = await arquivoDoDrive(integrante.cliente, bpmn)
   if (!arquivoId) return relatar('arquivo registrado visível ao integrante', false, 'sem linha em arquivos_da_versao')
-  return { processoId, arquivoId }
+  return { processoId, arquivoId, numero }
 }
 
 // Só o processo em andamento sem versão nova aceita versão histórica (regra do banco).
@@ -138,6 +138,38 @@ async function registrarHistorica(config, integrante) {
   relatar('integrante registra a versão histórica', data?.length === 1, `V${numero}F`)
 }
 
+async function versaoDoProcesso(cliente, processoId, numero) {
+  const { data } = await cliente.from('versoes').select('id').eq('processo_id', processoId).eq('numero', numero).maybeSingle()
+  return data?.id ?? null
+}
+
+// A versão seguinte, sem relatório, copia o da anterior pela ação sem_alteracao: o arquivo novo fica ligado ao original.
+async function provarSemAlteracao(config, integrante, processoId) {
+  const numero = await proximoNumero(integrante.cliente, processoId)
+  const bpmn = await enviarUmArquivo(config, integrante.token, pedidoDeEnvio(processoId, numero), CONTEUDO, 'application/xml')
+  const png = await enviarUmArquivo(config, integrante.token, pedidoDeEnvio(processoId, numero, 'png', PNG), PNG, 'image/png')
+  if (!bpmn || !png) return
+  await registrarVersao(config, integrante, processoId, numero, [bpmn, png])
+  const versaoId = await versaoDoProcesso(integrante.cliente, processoId, numero)
+  const resposta = await chamarFuncao(config, integrante.token, { acao: 'sem_alteracao', processo_id: processoId, versao_id: versaoId })
+  if (resposta.status !== 200) return relatar('integrante marca sem alteração de conteúdo', false, await codigoDe(resposta))
+  const { data } = await integrante.cliente.from('arquivos_da_versao').select('copiado_de').eq('versao_id', versaoId).eq('papel', 'relatorio').maybeSingle()
+  relatar('integrante marca sem alteração de conteúdo', Boolean(data?.copiado_de), `V${numero} copiou o relatório da V${numero - 1}`)
+}
+
+// O relatório que ficou pendente entra depois (registrar com versao_id); só então a próxima versão pode copiá-lo.
+async function provarRelatorioDepois(config, integrante, { processoId, numero }) {
+  const versaoId = await versaoDoProcesso(integrante.cliente, processoId, numero)
+  const pedido = pedidoDeEnvio(processoId, numero, 'relatorio', CONTEUDO, false, 'pdf')
+  const relatorio = await enviarUmArquivo(config, integrante.token, pedido, CONTEUDO, 'application/pdf')
+  if (!relatorio) return
+  const corpo = { acao: 'registrar', processo_id: processoId, numero, versao_id: versaoId, historica: false, observacao: null, arquivos: [{ papel: 'relatorio', drive_id: relatorio }] }
+  const resposta = await chamarFuncao(config, integrante.token, corpo)
+  if (resposta.status !== 200) return relatar('integrante acrescenta o relatório depois', false, await codigoDe(resposta))
+  relatar('integrante acrescenta o relatório depois', true, `V${numero}`)
+  await provarSemAlteracao(config, integrante, processoId)
+}
+
 async function conferirDownload(config, token, arquivoId, passo) {
   const resposta = await chamarFuncao(config, token, { acao: 'baixar', arquivo_id: arquivoId })
   if (resposta.status !== 200) return relatar(passo, false, await codigoDe(resposta))
@@ -159,6 +191,7 @@ async function provar() {
   if (!enviado) return leitor.close()
   await conferirDownload(config, integrante.token, enviado.arquivoId, 'integrante baixa o arquivo de volta')
   await registrarHistorica(config, integrante)
+  await provarRelatorioDepois(config, integrante, enviado)
   const consulta = await entrar(config, leitor, 'Consulta')
   leitor.close()
   await esperarRecusa(await chamarFuncao(config, consulta.token, pedidoDeEnvio(enviado.processoId)), 'consulta é recusada no envio', '403 sem_permissao')

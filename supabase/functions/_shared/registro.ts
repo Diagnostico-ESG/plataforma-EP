@@ -17,6 +17,7 @@ import {
   recusar,
   tipoDe,
   type Corpo,
+  type Falha,
   type Validacao,
 } from './decisao.ts'
 import type { PapelDoArquivo } from './nomePadrao.ts'
@@ -31,6 +32,8 @@ export interface EntradaRegistrar {
   observacao: string | null
   /** Versão da primeira etapa do trabalho (V5F): o número é o digitado, não o que o banco daria. */
   historica: boolean
+  /** Com a versão: acrescenta o relatório a ela (o `arquivos` é só o relatório); sem: registra uma versão. */
+  versaoId: string | null
   arquivos: ArquivoPedido[]
 }
 /** O que o Drive devolve de um arquivo (`fields=id,name,size,md5Checksum,parents`). */
@@ -73,6 +76,21 @@ function lerHistorica(corpo: Corpo): Validacao<boolean> {
   return corpo.historica === undefined ? { ok: true, valor: false } : lerBooleano(corpo, 'historica')
 }
 
+function lerVersaoId(corpo: Corpo): Validacao<string | null> {
+  const valor = corpo.versao_id
+  if (valor === undefined || valor === null) return { ok: true, valor: null }
+  return lerTexto(corpo, 'versao_id', FORMATO_UUID, 'uuid')
+}
+
+// O relatório depois entra numa versão nova que já existe: um arquivo só, o relatório (o banco confere o resto).
+function conferirRelatorioDepois(versaoId: string | null, historica: boolean, arquivos: ArquivoPedido[]): Falha | null {
+  if (versaoId === null) return null
+  if (historica || arquivos.length !== 1 || arquivos[0].papel !== 'relatorio') {
+    return falhar('entrada_invalida', 'campo versao_id: esperado um único arquivo, o relatorio, sem historica')
+  }
+  return null
+}
+
 function lerArquivoPedido(item: unknown): Validacao<ArquivoPedido> {
   if (!eCorpo(item)) return falhar('entrada_invalida', `item de arquivos: esperado objeto, recebido ${tipoDe(item)}`)
   const papel = lerPapel(item)
@@ -108,15 +126,28 @@ export function validarRegistrar(corpo: unknown): Validacao<EntradaRegistrar> {
   if (!observacao.ok) return observacao
   const historica = lerHistorica(corpo)
   if (!historica.ok) return historica
+  const versaoId = lerVersaoId(corpo)
+  if (!versaoId.ok) return versaoId
   const arquivos = lerArquivosPedidos(corpo)
   if (!arquivos.ok) return arquivos
+  const recusa = conferirRelatorioDepois(versaoId.valor, historica.valor, arquivos.valor)
+  if (recusa) return recusa
   const valor = { processoId: processoId.valor, numero: numero.valor, observacao: observacao.valor }
-  return { ok: true, valor: { ...valor, historica: historica.valor, arquivos: arquivos.valor } }
+  return { ok: true, valor: { ...valor, historica: historica.valor, versaoId: versaoId.valor, arquivos: arquivos.valor } }
 }
 
-/** A função do banco que grava a versão: a histórica tem as regras próprias dela (migração versoes_historicas). */
-export function funcaoDoBancoPara({ historica }: Pick<EntradaRegistrar, 'historica'>): 'registrar_versao' | 'registrar_versao_historica' {
+export type FuncaoDeRegistro = 'registrar_versao' | 'registrar_versao_historica' | 'acrescentar_relatorio'
+
+/** A função do banco que grava: o relatório depois, a histórica (regras próprias) ou a versão nova. */
+export function funcaoDoBancoPara({ historica, versaoId }: Pick<EntradaRegistrar, 'historica' | 'versaoId'>): FuncaoDeRegistro {
+  if (versaoId !== null) return 'acrescentar_relatorio'
   return historica ? 'registrar_versao_historica' : 'registrar_versao'
+}
+
+/** Os parâmetros da função do banco escolhida (o relatório depois leva a versão e o único arquivo). */
+export function parametrosDoBanco(entrada: EntradaRegistrar, arquivos: ArquivoParaGravar[]): Record<string, unknown> {
+  if (entrada.versaoId !== null) return { p_versao: entrada.versaoId, p_numero: entrada.numero, p_arquivo: arquivos[0] }
+  return { p_processo: entrada.processoId, p_numero: entrada.numero, p_observacao: entrada.observacao, p_arquivos: arquivos }
 }
 
 // O formato vem do nome que a função deu ao arquivo no Drive; o tamanho e o MD5, do próprio Drive.

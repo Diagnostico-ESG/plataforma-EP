@@ -3,6 +3,7 @@ import { LIMITE_DE_TAMANHO } from './decisao.ts'
 import {
   conferirArquivosNoDrive,
   funcaoDoBancoPara,
+  parametrosDoBanco,
   recusaDoBanco,
   statusDaRecusaDoBanco,
   validarRegistrar,
@@ -38,6 +39,7 @@ describe('validarRegistrar', () => {
         numero: 3,
         observacao: 'Corrigido o fluxo',
         historica: false,
+        versaoId: null,
         arquivos: [{ papel: 'bpmn', driveId: 'id-bpmn' }, { papel: 'png', driveId: 'id-png' }],
       },
     })
@@ -151,10 +153,57 @@ describe('conferirArquivosNoDrive', () => {
   })
 })
 
-describe('funcaoDoBancoPara', () => {
-  it('a versão nova grava por registrar_versao e a histórica, por registrar_versao_historica', () => {
-    expect(funcaoDoBancoPara({ historica: false })).toBe('registrar_versao')
-    expect(funcaoDoBancoPara({ historica: true })).toBe('registrar_versao_historica')
+describe('relatório depois (versao_id)', () => {
+  const VERSAO = '8f000000-0000-0000-0000-0000000000c1'
+  const relatorio = [{ papel: 'relatorio', drive_id: 'id-relatorio' }]
+
+  it('lê o versao_id e o único arquivo, o relatório', () => {
+    const resultado = validarRegistrar(entrada({ versao_id: VERSAO, arquivos: relatorio }))
+    expect(resultado.ok && resultado.valor.versaoId).toBe(VERSAO)
+  })
+
+  it('versao_id ausente ou nulo vale null', () => {
+    const ausente = validarRegistrar(entrada())
+    expect(ausente.ok && ausente.valor.versaoId).toBeNull()
+    const nulo = validarRegistrar(entrada({ versao_id: null }))
+    expect(nulo.ok && nulo.valor.versaoId).toBeNull()
+  })
+
+  it.each([
+    ['versao_id que não é uuid', { versao_id: 'v1', arquivos: relatorio }],
+    ['versao_id de tipo errado', { versao_id: 7, arquivos: relatorio }],
+    ['mais de um arquivo', { versao_id: VERSAO }],
+    ['arquivo que não é relatório', { versao_id: VERSAO, arquivos: [{ papel: 'png', drive_id: 'id-png' }] }],
+    ['histórica', { versao_id: VERSAO, arquivos: relatorio, historica: true }],
+  ])('recusa %s', (_nome, mudancas) => {
+    expect(codigoDe(entrada(mudancas))).toBe('entrada_invalida')
+  })
+
+  it('o tipo errado do versao_id aparece na mensagem, sem o valor', () => {
+    const resultado = validarRegistrar(entrada({ versao_id: 7, arquivos: relatorio }))
+    expect(!resultado.ok && resultado.recusa.mensagem).toContain('versao_id')
+    expect(!resultado.ok && resultado.recusa.mensagem).toContain('number')
+  })
+})
+
+describe('funcaoDoBancoPara e parametrosDoBanco', () => {
+  const VERSAO = '8f000000-0000-0000-0000-0000000000c1'
+  const gravar = [{ papel: 'relatorio' as const, nome: 'a.pdf', formato: 'pdf', tamanho: 1, hash_md5: MD5, drive_id: 'x' }]
+
+  it('a nova grava por registrar_versao, a histórica por registrar_versao_historica e o relatório por acrescentar_relatorio', () => {
+    expect(funcaoDoBancoPara({ historica: false, versaoId: null })).toBe('registrar_versao')
+    expect(funcaoDoBancoPara({ historica: true, versaoId: null })).toBe('registrar_versao_historica')
+    expect(funcaoDoBancoPara({ historica: false, versaoId: VERSAO })).toBe('acrescentar_relatorio')
+  })
+
+  it('os parâmetros seguem a função: versão nova ou histórica levam o processo; o relatório, a versão e o arquivo', () => {
+    const base = { processoId: PROCESSO, numero: 3, observacao: null, historica: false, arquivos: [] }
+    expect(parametrosDoBanco({ ...base, versaoId: null }, gravar)).toEqual({
+      p_processo: PROCESSO, p_numero: 3, p_observacao: null, p_arquivos: gravar,
+    })
+    expect(parametrosDoBanco({ ...base, versaoId: VERSAO }, gravar)).toEqual({
+      p_versao: VERSAO, p_numero: 3, p_arquivo: gravar[0],
+    })
   })
 })
 
@@ -163,6 +212,11 @@ describe('recusaDoBanco', () => {
     ['historica_depois_de_versao_nova', 'historica_depois_de_versao_nova', ''],
     ['numero_historico_repetido:5', 'numero_historico_repetido', '5'],
     ['historica_sem_arquivo_de_fluxograma', 'historica_sem_arquivo_de_fluxograma', ''],
+    ['relatorio_ja_existe', 'relatorio_ja_existe', ''],
+    ['versao_anterior_sem_relatorio', 'versao_anterior_sem_relatorio', ''],
+    ['copia_de_versao_que_nao_e_a_anterior', 'copia_de_versao_que_nao_e_a_anterior', ''],
+    ['copia_diferente_do_original', 'copia_diferente_do_original', ''],
+    ['versao_historica_somente_leitura', 'versao_historica_somente_leitura', ''],
   ])('a recusa %s do banco chega com o motivo como código e o valor como mensagem (409)', (texto, codigo, valor) => {
     const recusa = recusaDoBanco({ code: 'P0001', message: texto })
     expect(recusa).toEqual({ codigo, mensagem: valor })

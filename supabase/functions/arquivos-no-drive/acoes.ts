@@ -15,11 +15,11 @@ import { responderJson, responderRecusa } from './respostas.ts'
 
 const API_DE_ENVIO = 'https://www.googleapis.com/upload/drive/v3/files'
 
-interface ProcessoDoEnvio extends ProcessoDaPasta {
+export interface ProcessoDoEnvio extends ProcessoDaPasta {
   situacao: string
 }
 
-async function lerProcesso(contexto: ContextoDoDrive, id: string): Promise<ProcessoDoEnvio | null> {
+export async function lerProcesso(contexto: ContextoDoDrive, id: string): Promise<ProcessoDoEnvio | null> {
   const { data, error } = await contexto.cliente
     .from('processos_com_andamento')
     .select('id, nome, setor_id, setor_sigla, situacao')

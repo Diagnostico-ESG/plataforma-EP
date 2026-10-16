@@ -55,6 +55,11 @@ describe('conferirChamador', () => {
     ['consulta não registra', consulta, 'registrar', 'sem_permissao'],
     ['inativo não registra', inativo, 'registrar', 'usuario_inativo'],
     ['sem login não registra', null, 'registrar', 'sem_login'],
+    ['administrador marca sem alteração', administrador, 'sem_alteracao', null],
+    ['integrante marca sem alteração', integrante, 'sem_alteracao', null],
+    ['consulta não marca sem alteração', consulta, 'sem_alteracao', 'sem_permissao'],
+    ['inativo não marca sem alteração', inativo, 'sem_alteracao', 'usuario_inativo'],
+    ['sem login não marca sem alteração', null, 'sem_alteracao', 'sem_login'],
   ]
 
   it.each(casos)('%s', (_nome, chamador, acao, esperado) => {
@@ -183,11 +188,11 @@ describe('extensaoDoNome', () => {
 })
 
 describe('lerAcao', () => {
-  it.each(['iniciar_envio', 'baixar', 'registrar'])('lê a ação %s', (acao) => {
+  it.each(['iniciar_envio', 'baixar', 'registrar', 'sem_alteracao'])('lê a ação %s', (acao) => {
     expect(lerAcao({ acao })).toBe(acao)
   })
 
-  it.each([null, 'baixar', {}, { acao: 'apagar' }, { acao: 3 }])('devolve null para %j', (corpo) => {
+  it.each([null, 'baixar', {}, { acao: 'apagar' }, { acao: 3 }, { acao: 'constructor' }])('devolve null para %j', (corpo) => {
     expect(lerAcao(corpo)).toBeNull()
   })
 })

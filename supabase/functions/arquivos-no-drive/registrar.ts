@@ -5,14 +5,15 @@ import { conferirProcessoEmAndamento, recusar } from '../_shared/decisao.ts'
 import {
   conferirArquivosNoDrive,
   funcaoDoBancoPara,
-  recusaDoBanco,
-  statusDaRecusaDoBanco,
+  parametrosDoBanco,
   type ArquivoNoDrive,
+  type ArquivoParaGravar,
   type EntradaRegistrar,
 } from '../_shared/registro.ts'
+import { responderResultadoDoBanco } from './gravacao.ts'
 import { ErroDoDrive, lerJsonDoDrive } from './google.ts'
 import { API_DE_ARQUIVOS, lerPastaRegistrada, type ContextoDoDrive } from './pastas.ts'
-import { responderJson, responderRecusa } from './respostas.ts'
+import { responderRecusa } from './respostas.ts'
 
 async function lerSituacao(contexto: ContextoDoDrive, processoId: string): Promise<string | null> {
   const { data, error } = await contexto.cliente
@@ -34,17 +35,10 @@ async function lerArquivoNoDrive(token: string, driveId: string): Promise<Arquiv
   }
 }
 
-async function gravar(contexto: ContextoDoDrive, entrada: EntradaRegistrar, arquivos: unknown[]): Promise<Response> {
-  const { data, error } = await contexto.cliente.rpc(funcaoDoBancoPara(entrada), {
-    p_processo: entrada.processoId,
-    p_numero: entrada.numero,
-    p_observacao: entrada.observacao,
-    p_arquivos: arquivos,
-  })
-  if (!error) return responderJson(200, { versao_id: data })
-  const recusa = recusaDoBanco(error)
-  if (!recusa) throw new Error(`${funcaoDoBancoPara(entrada)} falhou (código ${error.code}); esperado: gravação ou recusa do banco`)
-  return responderJson(statusDaRecusaDoBanco(recusa), recusa)
+async function gravar(contexto: ContextoDoDrive, entrada: EntradaRegistrar, arquivos: ArquivoParaGravar[]): Promise<Response> {
+  const funcao = funcaoDoBancoPara(entrada)
+  const resultado = await contexto.cliente.rpc(funcao, parametrosDoBanco(entrada, arquivos))
+  return responderResultadoDoBanco(funcao, resultado, entrada.versaoId === null ? 'versao_id' : 'arquivo_id')
 }
 
 export async function registrar(contexto: ContextoDoDrive, entrada: EntradaRegistrar): Promise<Response> {

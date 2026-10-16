@@ -3,7 +3,7 @@
 import type { PapelDoArquivo } from './nomePadrao.ts'
 
 export type Perfil = 'administrador' | 'integrante_ep' | 'consulta'
-export type Acao = 'iniciar_envio' | 'baixar' | 'registrar'
+export type Acao = 'iniciar_envio' | 'baixar' | 'registrar' | 'sem_alteracao'
 export interface Chamador {
   perfil: Perfil
   ativo: boolean
@@ -43,6 +43,7 @@ const PERFIS_POR_ACAO: Record<Acao, readonly Perfil[]> = {
   iniciar_envio: ['administrador', 'integrante_ep'],
   baixar: ['administrador', 'integrante_ep', 'consulta'],
   registrar: ['administrador', 'integrante_ep'],
+  sem_alteracao: ['administrador', 'integrante_ep'],
 }
 
 export const EXTENSOES_POR_PAPEL: Record<PapelDoArquivo, readonly string[]> = {
@@ -83,7 +84,7 @@ export function statusDaRecusa(recusa: Recusa): number {
 
 export function lerAcao(corpo: unknown): Acao | null {
   const acao = eCorpo(corpo) ? corpo.acao : null
-  return acao === 'iniciar_envio' || acao === 'baixar' || acao === 'registrar' ? acao : null
+  return typeof acao === 'string' && Object.hasOwn(PERFIS_POR_ACAO, acao) ? (acao as Acao) : null
 }
 
 export function falhar(codigo: CodigoDeRecusa, detalhe?: string): Falha {
