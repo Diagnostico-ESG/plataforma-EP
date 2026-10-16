@@ -152,15 +152,17 @@ describe('validarIniciarEnvio', () => {
 })
 
 describe('validarBaixar', () => {
-  it('aceita o identificador do Drive', () => {
-    expect(validarBaixar({ drive_id: '1AbC_d-E2' })).toEqual({ ok: true, valor: { driveId: '1AbC_d-E2' } })
+  const ARQUIVO = '9f000000-0000-0000-0000-0000000000c1'
+
+  it('aceita o identificador do arquivo da versão', () => {
+    expect(validarBaixar({ arquivo_id: ARQUIVO })).toEqual({ ok: true, valor: { arquivoId: ARQUIVO } })
   })
 
   it.each([
-    ['vazio', { drive_id: '' }],
-    ['com caractere estranho', { drive_id: "abc' or 1=1" }],
-    ['longo demais', { drive_id: 'a'.repeat(201) }],
-    ['que não é texto', { drive_id: 12 }],
+    ['vazio', { arquivo_id: '' }],
+    ['que não é uuid', { arquivo_id: "abc' or 1=1" }],
+    ['que é um identificador do Drive', { arquivo_id: '1AbC_d-E2' }],
+    ['que não é texto', { arquivo_id: 12 }],
     ['ausente', {}],
     ['corpo nulo', null],
   ])('recusa o identificador %s', (_nome, entrada) => {

@@ -9,7 +9,7 @@ import {
 } from '../_shared/decisao.ts'
 import { tipoMimeDaExtensao } from '../_shared/drive.ts'
 import { nomePadrao } from '../_shared/nomePadrao.ts'
-import { chamarDrive, lerJsonDoDrive } from './google.ts'
+import { chamarDrive } from './google.ts'
 import { API_DE_ARQUIVOS, garantirPastaDoProcesso, type ContextoDoDrive, type ProcessoDaPasta } from './pastas.ts'
 import { responderJson, responderRecusa } from './respostas.ts'
 
@@ -80,32 +80,33 @@ export async function iniciarEnvio(
   return responderJson(200, { upload_url: uploadUrl, nome })
 }
 
-// Neste ticket a conferência é pela pasta: só sai arquivo que está numa pasta de processo registrada e
-// legível por quem chamou (a RLS de pastas_no_drive). No ticket 02 passa a ser pela RLS de arquivos_da_versao.
-async function estaEmPastaDeProcesso(contexto: ContextoDoDrive, pais: string[]): Promise<boolean> {
-  if (pais.length === 0) return false
-  const { data, error } = await contexto.cliente
-    .from('pastas_no_drive')
-    .select('id')
-    .in('drive_id', pais)
-    .not('processo_id', 'is', null)
-    .limit(1)
-  if (error) throw new Error(`leitura de pastas_no_drive falhou (código ${error.code}); esperado: pastas visíveis`)
-  return data.length > 0
+interface ArquivoDaLinha {
+  nome: string
+  drive_id: string
 }
 
+// A conferência é a RLS de arquivos_da_versao, com o login de quem chamou: o que ela não mostra não sai.
+// Sem linha visível, a recusa é a mesma de "sem permissão", para não revelar se o arquivo existe.
+async function lerArquivoDaVersao(contexto: ContextoDoDrive, arquivoId: string): Promise<ArquivoDaLinha | null> {
+  const { data, error } = await contexto.cliente
+    .from('arquivos_da_versao')
+    .select('nome, drive_id')
+    .eq('id', arquivoId)
+    .maybeSingle()
+  if (error) throw new Error(`leitura de arquivos_da_versao falhou (código ${error.code}); esperado: arquivo visível`)
+  return data as ArquivoDaLinha | null
+}
+
+// Sempre application/octet-stream: o supabase-js do navegador só devolve Blob para esse tipo (e PDF); qualquer
+// outro vira texto e estraga os bytes. O navegador reconstrói o tipo pelo formato do arquivo.
 export async function baixar(contexto: ContextoDoDrive, entrada: EntradaBaixar): Promise<Response> {
-  const arquivo = await lerJsonDoDrive<{ name: string; mimeType: string; parents?: string[] }>(
-    contexto.token,
-    `${API_DE_ARQUIVOS}/${entrada.driveId}?fields=name,mimeType,parents`,
-  )
-  if (!(await estaEmPastaDeProcesso(contexto, arquivo.parents ?? []))) return responderRecusa(recusar('sem_permissao'))
-  const conteudo = await chamarDrive(contexto.token, `${API_DE_ARQUIVOS}/${entrada.driveId}?alt=media`)
+  const arquivo = await lerArquivoDaVersao(contexto, entrada.arquivoId)
+  if (!arquivo) return responderRecusa(recusar('sem_permissao'))
+  const conteudo = await chamarDrive(contexto.token, `${API_DE_ARQUIVOS}/${arquivo.drive_id}?alt=media`)
   return new Response(conteudo.body, {
     headers: {
-      'Content-Type': arquivo.mimeType,
-      'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(arquivo.name)}`,
-      'Access-Control-Expose-Headers': 'Content-Disposition',
+      'Content-Type': 'application/octet-stream',
+      'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(arquivo.nome)}`,
     },
   })
 }

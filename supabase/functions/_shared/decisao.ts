@@ -31,7 +31,7 @@ export interface EntradaIniciarEnvio {
   historica: boolean
 }
 export interface EntradaBaixar {
-  driveId: string
+  arquivoId: string
 }
 export type Falha = { ok: false; recusa: Recusa }
 export type Validacao<T> = { ok: true; valor: T } | Falha
@@ -188,7 +188,7 @@ export function validarIniciarEnvio(entrada: unknown): Validacao<EntradaIniciarE
 
 export function validarBaixar(entrada: unknown): Validacao<EntradaBaixar> {
   if (!eCorpo(entrada)) return falhar('entrada_invalida', `corpo: esperado objeto, recebido ${tipoDe(entrada)}`)
-  const driveId = lerTexto(entrada, 'drive_id', FORMATO_ID_DO_DRIVE, 'identificador do Drive')
-  if (!driveId.ok) return driveId
-  return { ok: true, valor: { driveId: driveId.valor } }
+  const arquivoId = lerTexto(entrada, 'arquivo_id', FORMATO_UUID, 'uuid')
+  if (!arquivoId.ok) return arquivoId
+  return { ok: true, valor: { arquivoId: arquivoId.valor } }
 }
