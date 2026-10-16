@@ -82,7 +82,7 @@ Modificar: `supabase/functions/_shared/decisao.ts`, `registro.ts` (+ testes), `a
 
 ### Tarefa 5 — Fecho do ticket
 
-- [ ] `npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`; "Testes de banco" verde na branch.
-- [ ] `desvios.md` (entrada "ticket 06"), ticket 06 (caixas dos critérios provados, ressalva do `[visual]`, prova do Drive pendente), `.scratch/melhorias-protocolo.md` (itens de `.claude/regras/nao-testados.md` que aconteceram).
+- [x] `npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`; "Testes de banco" verde na branch (#88).
+- [x] `desvios.md` (entrada "ticket 06"), ticket 06 (caixas dos critérios provados, ressalva do `[visual]`, prova do Drive pendente), `.scratch/melhorias-protocolo.md` (itens de `.claude/regras/nao-testados.md` que aconteceram).
 - [ ] Juntar à `documentos-versoes-01` (fast-forward) e apagar a branch com `git branch -d`; enviar a `documentos-versoes-01` (sem `--force`). Se o `-d` recusar, parar e perguntar.
 - [ ] **Perguntar ao usuário** se grava a linha `Concluído em` do ticket 06 agora ou só depois da prova do Drive. Depois, apontar o ticket 07 e lembrar o `/cost`.
