@@ -54,3 +54,32 @@ describe('eventos de versão no histórico', () => {
     )
   })
 })
+
+describe('evento de substituição no histórico', () => {
+  const SUBSTITUICAO: EventoDoCadastro = {
+    ...ENVIO, acao: 'substituir',
+    antes: { nome: 'TSA_V3_Emitir Ofício.png', hash_md5: '0123456789abcdef0123456789abcdef' },
+    depois: {
+      rotulo: 'V3', processo_nome: 'Emitir Ofício', setor_sigla: 'TSA', nome: 'TSA_V3_Emitir Ofício.png',
+      hash_md5: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+    },
+  }
+
+  test('a ação de substituir tem texto próprio', () => {
+    expect(textoDaAcaoDoCadastro('substituir', 'versao')).toBe('Substituiu o arquivo da versão')
+  })
+
+  test('o antes mostra o nome e o hash do que saiu, e o depois, a versão e o hash novo', () => {
+    expect(descreverEstadoDoCadastro(SUBSTITUICAO.antes)).toBe(
+      'Nome: TSA_V3_Emitir Ofício.png; Impressão digital (MD5): 0123456789abcdef0123456789abcdef',
+    )
+    expect(descreverEstadoDoCadastro(SUBSTITUICAO.depois)).toBe(
+      'Versão: V3; Processo: Emitir Ofício; Setor: TSA; Nome: TSA_V3_Emitir Ofício.png; '
+      + 'Impressão digital (MD5): bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+    )
+  })
+
+  test('o item é a versão com o processo', () => {
+    expect(nomeDoItem(SUBSTITUICAO)).toBe('V3 — Emitir Ofício')
+  })
+})

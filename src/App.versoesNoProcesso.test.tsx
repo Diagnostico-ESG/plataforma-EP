@@ -42,7 +42,7 @@ test('a seção mostra as versões da mais recente para a mais antiga, com rótu
   expect(v2.getByText('Bia Teste')).toBeTruthy()
   expect(v2.getByText('Relatório e modelagem técnica')).toBeTruthy()
   expect(v2.getByText('Ajustada a raia do setor')).toBeTruthy()
-  expect(v2.getAllByRole('listitem').map((item) => item.textContent)).toEqual([
+  expect(v2.getAllByRole('link').map((link) => link.textContent)).toEqual([
     'TSA_V2_Emitir Ofício.bpmn', 'TSA_V2_Emitir Ofício.png', 'TSA_V2_Emitir Ofício_Relatório.pdf',
   ])
 })

@@ -22,6 +22,7 @@ test.each([
   ['relatorio_ja_existe', '', 'Esta versão já tem relatório.'],
   ['versao_anterior_sem_relatorio', '', 'A versão anterior não tem relatório para copiar. Envie o relatório.'],
   ['versao_historica_somente_leitura', '', 'A versão histórica é somente leitura: não recebe arquivos.'],
+  ['tipo_de_arquivo_diferente', 'pdf', 'O arquivo novo precisa ser do mesmo tipo do que sai.'],
   ['copia_so_de_relatorio', '', 'Não foi possível copiar o relatório da versão anterior. Envie o relatório.'],
   ['copia_de_versao_que_nao_e_a_anterior', '', 'Não foi possível copiar o relatório da versão anterior. Envie o relatório.'],
   ['copia_diferente_do_original', '', 'Não foi possível copiar o relatório da versão anterior. Envie o relatório.'],

@@ -4,7 +4,9 @@ import { nomePadrao } from '../../supabase/functions/_shared/nomePadrao.ts'
 import type { EventoDoCadastro } from '../cadastros/tipos'
 import { falhaDaFuncao } from './recusasDeVersoes'
 import { haVersaoNova, ordenarVersoes, proximoNumero, relatorioPendente, rotuloDaVersao } from './rotulos'
-import type { ArquivoDaVersao, ModuloDeVersoes, PedidoDeRelatorio, PedidoDeVersao, Versao } from './tipos'
+import type {
+  ArquivoDaVersao, ModuloDeVersoes, PedidoDeRelatorio, PedidoDeSubstituicao, PedidoDeVersao, Versao,
+} from './tipos'
 
 /** O que o falso precisa saber do processo para nomear os arquivos e guardar a etapa, como o banco. */
 export type ProcessoDoFalso = { sigla: string; nome: string; etapa: string | null }
@@ -32,6 +34,8 @@ export class VersoesFalso implements ModuloDeVersoes {
   /** Chamado com o evento de cada versão registrada (o histórico do processo fica no falso de processos). */
   aoRegistrar: ((processoId: string, evento: EventoDoCadastro) => void) | null = null
   private proximoId = 1
+  /** Quantas vezes cada arquivo foi trocado: o hash (que o banco guarda) muda a cada troca. */
+  private trocas: Record<string, number> = {}
 
   async listarVersoes(processoId: string): Promise<Versao[]> {
     if (this.segurarLeitura) return new Promise<never>(() => {})
@@ -81,6 +85,22 @@ export class VersoesFalso implements ModuloDeVersoes {
     this.guardarRelatorio(processoId, versao, origem.arquivo, origem)
   }
 
+  // Como o banco (função substituir_arquivo): o arquivo novo troca o conteúdo no mesmo registro, sem versão nova; a versão
+  // histórica e o tipo diferente são recusados antes de o arquivo subir, como na sessão de envio da função.
+  async substituirArquivo(pedido: PedidoDeSubstituicao, aoProgredir: (enviados: number, total: number) => void): Promise<void> {
+    const { processoId, arquivo, novo } = pedido
+    const versao = (this.versoes[processoId] ?? []).find((outra) => outra.arquivos.some((outro) => outro.id === arquivo.id))
+    const atual = versao?.arquivos.find((outro) => outro.id === arquivo.id)
+    if (!versao || !atual) throw new Error(`arquivo ${arquivo.id} não encontrado no processo ${processoId}`)
+    if (versao.historica) throw falhaDaFuncao('versao_historica_somente_leitura', '')
+    if (extensaoDoNome(novo.name) !== atual.formato) throw falhaDaFuncao('tipo_de_arquivo_diferente', atual.formato)
+    if (this.falharNoArquivo === 1) throw new Error(`o arquivo ${novo.name} não chegou ao Drive`)
+    aoProgredir(1, 1)
+    if (this.segurarDepoisDe === 1) await new Promise<never>(() => {})
+    this.falharNoRegistroSeConfigurado()
+    this.guardarTroca(processoId, versao, atual, novo.size)
+  }
+
   async baixarArquivo(arquivo: ArquivoDaVersao): Promise<Blob> {
     if (this.falharNoDownload instanceof Error) throw this.falharNoDownload
     if (this.falharNoDownload) throw new Error('falha de conexão simulada')
@@ -104,6 +124,21 @@ export class VersoesFalso implements ModuloDeVersoes {
     const atualizada: Versao = { ...versao, arquivos: [...versao.arquivos, novo] }
     this.versoes[processoId] = (this.versoes[processoId] ?? []).map((outra) => (outra.id === versao.id ? atualizada : outra))
     this.aoRegistrar?.(processoId, eventoDaVersao(processoId, atualizada, processo, origem ? 'sem_alteracao' : 'acrescentar_relatorio', origem?.rotulo))
+  }
+
+  // O arquivo fica com o mesmo id e o mesmo nome; muda o tamanho, e o evento traz o nome e o hash do que saiu.
+  private guardarTroca(processoId: string, versao: Versao, atual: ArquivoDaVersao, tamanho: number): void {
+    const processo = this.processos[processoId] ?? { sigla: 'TSA', nome: processoId, etapa: null }
+    const hashQueSaiu = this.hashDe(atual.id)
+    this.trocas[atual.id] = (this.trocas[atual.id] ?? 0) + 1
+    const atualizada: Versao = { ...versao, arquivos: versao.arquivos.map((outro) => (outro.id === atual.id ? { ...atual, tamanho } : outro)) }
+    this.versoes[processoId] = (this.versoes[processoId] ?? []).map((outra) => (outra.id === versao.id ? atualizada : outra))
+    const evento = eventoDaSubstituicao(processoId, atualizada, processo, atual.nome, { saiu: hashQueSaiu, entrou: this.hashDe(atual.id) })
+    this.aoRegistrar?.(processoId, evento)
+  }
+
+  private hashDe(arquivoId: string): string {
+    return `hash-${arquivoId}-${this.trocas[arquivoId] ?? 0}`
   }
 
   private falharNoRegistroSeConfigurado(): void {
@@ -162,6 +197,18 @@ function relatorioDaAnterior(versao: Versao, doProcesso: Versao[]): OrigemDaCopi
   const anterior = ordenarVersoes(doProcesso).find((outra) => outra.numero < versao.numero)
   const arquivo = anterior?.arquivos.find((outro) => outro.papel === 'relatorio')
   return anterior && arquivo ? { arquivo, rotulo: rotuloDaVersao(anterior) } : undefined
+}
+
+// O evento do gatilho da substituição (migração substituir_arquivo): o antes guarda o nome e o hash do que saiu.
+function eventoDaSubstituicao(processoId: string, versao: Versao, processo: ProcessoDoFalso, nome: string,
+  hashes: { saiu: string; entrou: string }): EventoDoCadastro {
+  return {
+    id: Date.now(), ocorridoEm: new Date().toISOString(), autor: 'Pessoa de Teste', acao: 'substituir', entidade: 'versao',
+    entidadeRef: processoId, antes: { nome, hash_md5: hashes.saiu },
+    depois: {
+      rotulo: rotuloDaVersao(versao), processo_nome: processo.nome, setor_sigla: processo.sigla, nome, hash_md5: hashes.entrou,
+    },
+  }
 }
 
 // O evento que o gatilho do banco grava (migração versoes): entidade "versao", referência no processo.

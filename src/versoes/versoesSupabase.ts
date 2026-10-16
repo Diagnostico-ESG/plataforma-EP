@@ -2,7 +2,9 @@ import { tipoMimeDaExtensao } from '../../supabase/functions/_shared/drive.ts'
 import { extensaoDoNome } from '../../supabase/functions/_shared/decisao.ts'
 import type { ClienteSupabase } from '../lib/supabase'
 import { falhaDaFuncao, falhaDoDownload } from './recusasDeVersoes'
-import type { ArquivoDaVersao, ArquivoEscolhido, ModuloDeVersoes, PedidoDeRelatorio, PedidoDeVersao, Versao } from './tipos'
+import type {
+  ArquivoDaVersao, ArquivoEscolhido, ModuloDeVersoes, PedidoDeRelatorio, PedidoDeSubstituicao, PedidoDeVersao, Versao,
+} from './tipos'
 import { COLUNAS_DA_VERSAO, type LinhaDaVersao, versaoDaLinha } from './versaoDaLinha'
 
 /** O PUT dos bytes ao endereço da sessão de envio do Drive; injetável para o teste simular o Google. */
@@ -19,6 +21,7 @@ export function criarVersoesSupabase(cliente: ClienteSupabase, enviarBytes: Envi
     registrarVersaoHistorica: (pedido, aoProgredir) => enviarVersao(cliente, enviarBytes, pedido, aoProgredir, true),
     acrescentarRelatorio: (pedido, aoProgredir) => acrescentarRelatorio(cliente, enviarBytes, pedido, aoProgredir),
     semAlteracaoDeConteudo: (processoId, versaoId) => semAlteracao(cliente, processoId, versaoId),
+    substituirArquivo: (pedido, aoProgredir) => substituirArquivo(cliente, enviarBytes, pedido, aoProgredir),
     baixarArquivo: (arquivo) => baixarArquivo(cliente, arquivo),
   }
 }
@@ -49,11 +52,12 @@ async function chamarFuncao<T>(cliente: ClienteSupabase, corpo: Record<string, u
   return data as T
 }
 
+// `extras` leva o que muda o pedido da sessão (a substituição manda o `arquivo_id` do arquivo a trocar).
 async function enviarUmArquivo(cliente: ClienteSupabase, enviarBytes: EnviarBytes, pedido: PedidoDeVersao,
-  { papel, arquivo }: ArquivoEscolhido, historica: boolean): Promise<string> {
+  { papel, arquivo }: ArquivoEscolhido, historica: boolean, extras: Record<string, unknown> = {}): Promise<string> {
   const { upload_url: endereco } = await chamarFuncao<{ upload_url: string }>(cliente, {
     acao: 'iniciar_envio', processo_id: pedido.processoId, papel, nome_original: arquivo.name, tamanho: arquivo.size,
-    numero: pedido.numero, historica,
+    numero: pedido.numero, historica, ...extras,
   })
   const resposta = await enviarBytes(endereco, arquivo).catch(() => null)
   if (!resposta?.ok) throw new Error(`o arquivo ${arquivo.name} não chegou ao Drive`)
@@ -86,6 +90,20 @@ async function acrescentarRelatorio(cliente: ClienteSupabase, enviarBytes: Envia
   await chamarFuncao(cliente, {
     acao: 'registrar', processo_id: pedido.processoId, numero: pedido.numero, observacao: null, historica: false,
     versao_id: pedido.versaoId, arquivos: [{ papel: 'relatorio', drive_id: id }],
+  })
+}
+
+// A troca: o arquivo novo vai ao mesmo arquivo do Drive (a sessão é de atualização) e só então o banco registra o hash novo.
+async function substituirArquivo(cliente: ClienteSupabase, enviarBytes: EnviarBytes, pedido: PedidoDeSubstituicao,
+  aoProgredir: (enviados: number, total: number) => void): Promise<void> {
+  const { processoId, numero, arquivo, novo } = pedido
+  const escolhido: ArquivoEscolhido = { papel: arquivo.papel, arquivo: novo }
+  const envio = { processoId, numero, observacao: null, arquivos: [escolhido] }
+  const id = await enviarUmArquivo(cliente, enviarBytes, envio, escolhido, false, { arquivo_id: arquivo.id })
+  aoProgredir(1, 1)
+  await chamarFuncao(cliente, {
+    acao: 'registrar', processo_id: processoId, numero, observacao: null, historica: false, arquivo_id: arquivo.id,
+    arquivos: [{ papel: arquivo.papel, drive_id: id }],
   })
 }
 

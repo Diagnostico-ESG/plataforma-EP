@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import type { EventoDoCadastro } from '../cadastros/tipos'
-import type { PedidoDeVersao } from './tipos'
+import type { ArquivoDaVersao, PedidoDeVersao } from './tipos'
 import { VersoesFalso } from './VersoesFalso'
 
 const PEDIDO: PedidoDeVersao = {
@@ -218,4 +218,55 @@ test('a falha programada no registro vale também para o "sem alteração"', asy
   versoes.falhaNoRegistro = new TravaDoBanco('Seu perfil não permite enviar versões.')
   await expect(versoes.semAlteracaoDeConteudo('p1', (await versoes.listarVersoes('p1'))[0].id))
     .rejects.toThrow('Seu perfil não permite enviar versões.')
+})
+
+const NOVO_PNG = new File(['png novo'], 'trocado.png')
+
+async function comUmEnvio(): Promise<{ versoes: VersoesFalso; png: ArquivoDaVersao }> {
+  const versoes = falso()
+  await versoes.enviarVersao(PEDIDO, () => {})
+  const png = (await versoes.listarVersoes('p1'))[0].arquivos.find((arquivo) => arquivo.papel === 'png')
+  if (!png) throw new Error('esperado: .png na versão enviada')
+  return { versoes, png }
+}
+
+test('a substituição troca o conteúdo no mesmo arquivo, sem versão nova, e gera o evento com o nome e o hash do que saiu', async () => {
+  const { versoes, png } = await comUmEnvio()
+  const eventos: EventoDoCadastro[] = []
+  versoes.aoRegistrar = (_processoId, evento) => eventos.push(evento)
+  const progresso: string[] = []
+  await versoes.substituirArquivo({ processoId: 'p1', numero: 1, arquivo: png, novo: NOVO_PNG }, (enviados, total) => progresso.push(`${enviados}/${total}`))
+  const lidas = await versoes.listarVersoes('p1')
+  expect(lidas).toHaveLength(1)
+  expect(lidas[0].arquivos.find((arquivo) => arquivo.papel === 'png')).toEqual({ ...png, tamanho: NOVO_PNG.size })
+  expect(progresso).toEqual(['1/1'])
+  expect(eventos).toHaveLength(1)
+  expect(eventos[0]).toMatchObject({
+    acao: 'substituir', entidade: 'versao', entidadeRef: 'p1',
+    antes: { nome: 'TSA_V1_Emitir Ofício.png' },
+    depois: { rotulo: 'V1', processo_nome: 'Emitir Ofício', setor_sigla: 'TSA', nome: 'TSA_V1_Emitir Ofício.png' },
+  })
+  expect((eventos[0].antes as { hash_md5: string }).hash_md5).not.toBe((eventos[0].depois as { hash_md5: string }).hash_md5)
+})
+
+test('a substituição recusa outro tipo de arquivo e a versão histórica, com as frases do módulo real', async () => {
+  const { versoes, png } = await comUmEnvio()
+  await expect(versoes.substituirArquivo({ processoId: 'p1', numero: 1, arquivo: png, novo: new File(['x'], 'foto.jpg') }, () => {}))
+    .rejects.toThrow('O arquivo novo precisa ser do mesmo tipo do que sai.')
+  const historica = falso()
+  await historica.registrarVersaoHistorica(HISTORICA, () => {})
+  const bpm = (await historica.listarVersoes('p1'))[0].arquivos[0]
+  await expect(historica.substituirArquivo({ processoId: 'p1', numero: 5, arquivo: bpm, novo: new File(['z'], 'outro.bpm') }, () => {}))
+    .rejects.toThrow('A versão histórica é somente leitura: não recebe arquivos.')
+})
+
+test('as falhas programadas valem também para a substituição, e nada muda quando falha', async () => {
+  const { versoes, png } = await comUmEnvio()
+  const pedido = { processoId: 'p1', numero: 1, arquivo: png, novo: NOVO_PNG }
+  versoes.falharNoArquivo = 1
+  await expect(versoes.substituirArquivo(pedido, () => {})).rejects.toThrow('o arquivo trocado.png não chegou ao Drive')
+  versoes.falharNoArquivo = null
+  versoes.falhaNoRegistro = 'sem espaço'
+  await expect(versoes.substituirArquivo(pedido, () => {})).rejects.toThrow('sem espaço')
+  expect((await versoes.listarVersoes('p1'))[0].arquivos.find((arquivo) => arquivo.papel === 'png')).toEqual(png)
 })

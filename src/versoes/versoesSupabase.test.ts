@@ -259,3 +259,49 @@ test('"sem alteração" sem resposta da função (sem conexão) vira erro com o 
   cliente.respostasDaFuncao['funcao.sem_alteracao'] = { data: null, error: { message: 'Failed to send a request' } }
   await expect(criar(cliente).semAlteracaoDeConteudo('p1', 'v3')).rejects.toThrow('sem conexão')
 })
+
+const ARQUIVO_A_TROCAR = { id: 'a3', papel: 'relatorio' as const, nome: 'TSA_V3_Emitir Ofício_Relatório.pdf', formato: 'pdf', tamanho: 5 }
+const PEDIDO_DE_SUBSTITUICAO = { processoId: 'p1', numero: 3, arquivo: ARQUIVO_A_TROCAR, novo: new File(['novo'], 'outro.pdf') }
+
+test('a substituição abre a sessão do arquivo, envia, avisa o progresso e registra no mesmo arquivo', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  comSessoes(cliente)
+  const envio = new EnvioAoDriveFalso()
+  const progresso: string[] = []
+  await criar(cliente, envio).substituirArquivo(PEDIDO_DE_SUBSTITUICAO, (enviados, total) => progresso.push(`${enviados}/${total}`))
+  expect(cliente.chamadasDaFuncao).toEqual([
+    {
+      acao: 'iniciar_envio', processo_id: 'p1', papel: 'relatorio', nome_original: 'outro.pdf', tamanho: 4, numero: 3, historica: false,
+      arquivo_id: 'a3',
+    },
+    {
+      acao: 'registrar', processo_id: 'p1', numero: 3, observacao: null, historica: false, arquivo_id: 'a3',
+      arquivos: [{ papel: 'relatorio', drive_id: 'id-sessao' }],
+    },
+  ])
+  expect(envio.enderecos).toEqual(['sessao'])
+  expect(progresso).toEqual(['1/1'])
+})
+
+test('se o arquivo novo não chega ao Drive, a troca não é registrada', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  comSessoes(cliente)
+  const envio = new EnvioAoDriveFalso()
+  envio.falharEm = 'sessao'
+  await expect(criar(cliente, envio).substituirArquivo(PEDIDO_DE_SUBSTITUICAO, () => {}))
+    .rejects.toThrow('o arquivo outro.pdf não chegou ao Drive')
+  expect(cliente.chamadasDaFuncao.map((corpo) => corpo.acao)).toEqual(['iniciar_envio'])
+})
+
+test.each([
+  ['tipo_de_arquivo_diferente', 'pdf', 'O arquivo novo precisa ser do mesmo tipo do que sai.'],
+  ['versao_historica_somente_leitura', '', 'A versão histórica é somente leitura: não recebe arquivos.'],
+  ['processo_fora_de_andamento', 'suspenso', 'O processo não está em andamento; não é possível enviar versão.'],
+])('a recusa %s na substituição vira a frase da tela', async (codigo, valor, frase) => {
+  const cliente = new ClienteSupabaseFalso()
+  comSessoes(cliente)
+  cliente.respostasDaFuncao['funcao.iniciar_envio'] = recusa(codigo, valor)
+  const falha = await criar(cliente).substituirArquivo(PEDIDO_DE_SUBSTITUICAO, () => {}).catch((erro: unknown) => erro)
+  expect(falha).toBeInstanceOf(TravaDoBanco)
+  expect((falha as Error).message).toBe(frase)
+})

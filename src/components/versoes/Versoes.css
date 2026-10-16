@@ -120,6 +120,18 @@
   color: var(--texto);
 }
 
+/* Cada arquivo: o nome (link), a origem da cópia e o [Substituir] numa linha que quebra; o formulário da troca ocupa a linha toda. */
+.bloco-da-versao-arquivos > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-1) var(--esp-2);
+}
+
+.bloco-da-versao-arquivos > li > .formulario-de-versao {
+  flex-basis: 100%;
+}
+
 /* De onde veio o relatório copiado ("Sem alteração de conteúdo · relatório da V3"): texto discreto ao lado do nome. */
 .bloco-da-versao-origem {
   margin-left: var(--esp-2);

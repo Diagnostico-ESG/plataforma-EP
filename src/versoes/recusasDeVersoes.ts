@@ -30,6 +30,7 @@ const FRASE_DO_CODIGO: Record<string, (valor: string) => string> = {
   copia_so_de_relatorio: () => FALHA_DA_COPIA,
   copia_de_versao_que_nao_e_a_anterior: () => FALHA_DA_COPIA,
   copia_diferente_do_original: () => FALHA_DA_COPIA,
+  tipo_de_arquivo_diferente: () => 'O arquivo novo precisa ser do mesmo tipo do que sai.',
 }
 
 /** A recusa da função (ou do banco, por ela) com a frase pronta da tela; código desconhecido vira falha genérica. */

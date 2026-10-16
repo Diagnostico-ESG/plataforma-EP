@@ -42,6 +42,9 @@ export type PedidoDeVersao = {
 /** O relatório que entra numa versão nova que ainda não tem; `numero` é o da versão, com que o arquivo é nomeado no Drive. */
 export type PedidoDeRelatorio = { processoId: string; versaoId: string; numero: number; arquivo: File }
 
+/** A troca do conteúdo de um arquivo de versão nova; `numero` é o da versão, que a função do servidor repete no pedido. */
+export type PedidoDeSubstituicao = { processoId: string; numero: number; arquivo: ArquivoDaVersao; novo: File }
+
 /**
  * Único ponto por onde a interface fala com o banco e com a função do Drive nas versões. Recusa chega como
  * TravaDoBanco, com a frase pronta; outra falha, como Error cuja mensagem é o motivo em português.
@@ -69,6 +72,12 @@ export type ModuloDeVersoes = {
    * registra ligado ao original. Só vale na versão nova sem relatório, cuja anterior tem relatório.
    */
   semAlteracaoDeConteudo(processoId: string, versaoId: string): Promise<void>
+  /**
+   * Troca o conteúdo de um arquivo de versão nova pelo de `pedido.novo` (do mesmo papel e formato): envia direto ao Drive,
+   * no mesmo arquivo, e só então registra a troca. O arquivo anterior não fica guardado (ADR 0007). `aoProgredir` avisa
+   * quando o arquivo chegou. Se algo falhar, nada é registrado.
+   */
+  substituirArquivo(pedido: PedidoDeSubstituicao, aoProgredir: (enviados: number, total: number) => void): Promise<void>
   /** Os bytes do arquivo, com o tipo do formato (o navegador o mostra se souber). Qualquer perfil ativo pode. */
   baixarArquivo(arquivo: ArquivoDaVersao): Promise<Blob>
 }

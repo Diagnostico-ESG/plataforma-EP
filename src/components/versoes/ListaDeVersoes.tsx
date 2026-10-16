@@ -2,6 +2,7 @@ import { formatarMomento } from '../../acesso/historico'
 import { origemDoRelatorio, podeCopiarRelatorio, relatorioPendente, rotuloDaAnterior, rotuloDaVersao } from '../../versoes/rotulos'
 import type { ModuloDeVersoes, Versao } from '../../versoes/tipos'
 import { AcaoSemAlteracao } from './AcaoSemAlteracao'
+import { AcaoSubstituir } from './AcaoSubstituir'
 import { LinkDoArquivo } from './LinkDoArquivo'
 
 type ListaDeVersoesProps = {
@@ -46,6 +47,9 @@ function BlocoDaVersao({ modulo, processoId, versao, versoes, podeAlterar, aoAlt
             <li key={arquivo.id}>
               <LinkDoArquivo versoes={modulo} arquivo={arquivo} />
               {origem && <span className="bloco-da-versao-origem">{`Sem alteração de conteúdo · relatório da ${origem}`}</span>}
+              {podeAlterar && !versao.historica && (
+                <AcaoSubstituir modulo={modulo} processoId={processoId} versao={versao} arquivo={arquivo} aoConcluir={aoAlterada} />
+              )}
             </li>
           )
         })}

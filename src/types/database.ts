@@ -958,6 +958,10 @@ export type Database = {
         }
         Returns: string
       }
+      substituir_arquivo: {
+        Args: { p_arquivo: string; p_novo: Json }
+        Returns: string
+      }
       suspender_processo: {
         Args: { p_motivo: string; p_processo: string }
         Returns: undefined

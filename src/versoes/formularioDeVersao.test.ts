@@ -2,7 +2,7 @@ import { expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import {
   arquivosDoPedido, lerNumeroHistorico, nomeNaPrevia, podeAcrescentarRelatorio, podeEnviar, podeRegistrarHistorica, podeSubmeter,
-  textoDaFalhaDoEnvio, textoDaFalhaDoRelatorio,
+  podeTrocarArquivo, recusaDoTipoNaTroca, textoDaFalhaDaTroca, textoDaFalhaDoEnvio, textoDaFalhaDoRelatorio,
   textoDoProgresso,
 } from './formularioDeVersao'
 
@@ -90,4 +90,26 @@ test('a falha do relatório depois: a frase pronta da recusa, ou o motivo com o 
   expect(textoDaFalhaDoRelatorio(new TravaDoBanco('Esta versão já tem relatório.'))).toBe('Esta versão já tem relatório.')
   expect(textoDaFalhaDoRelatorio(new Error('sem rede')))
     .toBe('O relatório não foi registrado: sem rede. O arquivo escolhido continua no formulário.')
+})
+
+test('na troca, o arquivo novo precisa ter a extensão do que sai (sem importar maiúsculas); senão, a frase com as duas', () => {
+  expect(recusaDoTipoNaTroca('pdf', new File(['x'], 'novo.PDF'))).toBeNull()
+  expect(recusaDoTipoNaTroca('pdf', new File(['x'], 'novo.docx')))
+    .toBe('Escolha um arquivo .pdf, o mesmo tipo do arquivo que sai. Recebido: .docx.')
+  expect(recusaDoTipoNaTroca('png', new File(['x'], 'sem-extensao')))
+    .toBe('Escolha um arquivo .png, o mesmo tipo do arquivo que sai. Recebido: sem extensão.')
+})
+
+test('trocar o arquivo só se habilita com o arquivo escolhido, sem recusa e sem conferência em andamento', () => {
+  expect(podeTrocarArquivo(undefined, null, false)).toBe(false)
+  expect(podeTrocarArquivo(png, null, false)).toBe(true)
+  expect(podeTrocarArquivo(png, 'O arquivo não é uma imagem PNG.', false)).toBe(false)
+  expect(podeTrocarArquivo(png, null, true)).toBe(false)
+})
+
+test('a falha da troca: a frase pronta da recusa, ou o motivo com o aviso do formulário', () => {
+  expect(textoDaFalhaDaTroca(new TravaDoBanco('A versão histórica é somente leitura: não recebe arquivos.')))
+    .toBe('A versão histórica é somente leitura: não recebe arquivos.')
+  expect(textoDaFalhaDaTroca(new Error('sem rede')))
+    .toBe('A troca não foi registrada: sem rede. O arquivo escolhido continua no formulário.')
 })

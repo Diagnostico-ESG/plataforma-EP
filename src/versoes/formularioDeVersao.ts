@@ -80,3 +80,22 @@ export function textoDaFalhaDoRelatorio(erro: unknown): string {
   const motivo = erro instanceof Error ? erro.message : String(erro)
   return `O relatório não foi registrado: ${motivo}. O arquivo escolhido continua no formulário.`
 }
+
+/** Na troca, o arquivo novo é do mesmo tipo do que sai: a extensão é a do arquivo guardado. Null se serve. */
+export function recusaDoTipoNaTroca(formatoDoQueSai: string, novo: File): string | null {
+  const extensao = extensaoDoNome(novo.name)
+  if (extensao === formatoDoQueSai) return null
+  const recebida = extensao ? `.${extensao}` : 'sem extensão'
+  return `Escolha um arquivo .${formatoDoQueSai}, o mesmo tipo do arquivo que sai. Recebido: ${recebida}.`
+}
+
+/** A troca pede o arquivo novo escolhido, sem recusa (do papel ou do tipo) e sem conferência em andamento. */
+export function podeTrocarArquivo(escolhido: File | undefined, recusa: string | null, conferindo: boolean): boolean {
+  return escolhido !== undefined && recusa === null && !conferindo
+}
+
+export function textoDaFalhaDaTroca(erro: unknown): string {
+  if (erro instanceof TravaDoBanco) return erro.message
+  const motivo = erro instanceof Error ? erro.message : String(erro)
+  return `A troca não foi registrada: ${motivo}. O arquivo escolhido continua no formulário.`
+}
