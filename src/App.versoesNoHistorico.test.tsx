@@ -33,6 +33,24 @@ test('a versão enviada aparece no histórico do processo, com texto próprio', 
   expect(painel.getByText(/Arquivos: TSA_V1_Emitir Ofício.bpmn, TSA_V1_Emitir Ofício.png/)).toBeTruthy()
 })
 
+test('a versão histórica registrada aparece no histórico do processo, com texto próprio', async () => {
+  montarNosCadastros()
+  const painel = await painelAberto()
+  const secao = within(await painel.findByRole('region', { name: 'Versões do processo' }))
+  fireEvent.click(await secao.findByRole('button', { name: 'Registrar versão histórica' }))
+  const form = within(await secao.findByRole('form', { name: 'Registrar versão histórica' }))
+  fireEvent.change(form.getByLabelText('Número da versão'), { target: { value: '5' } })
+  fireEvent.change(form.getByLabelText('Arquivo do Bizagi (.bpm) (opcional)'), { target: { files: [new File(['b'], 'fonte.bpm')] } })
+  const registrar = form.getByRole('button', { name: 'Registrar' }) as HTMLButtonElement
+  await waitFor(() => expect(registrar.disabled).toBe(false))
+  fireEvent.click(registrar)
+  await secao.findByRole('listitem', { name: 'V5F' })
+  fireEvent.click(painel.getByRole('tab', { name: 'Histórico' }))
+  const evento = await painel.findByText('Registrou a versão histórica')
+  expect(evento.parentElement?.textContent).toBe('Registrou a versão histórica V5F — Emitir Ofício')
+  expect(painel.getByText(/Arquivos: TSA_V5F_Emitir Ofício.bpm/)).toBeTruthy()
+})
+
 // A recusa que o banco devolveria (migração versoes), traduzida pelo módulo real: a tela mostra o que ele produziria.
 test('excluir processo com versões mostra em vermelho a contagem e o caminho (cancelar), e o processo continua', async () => {
   const { processos } = montarNosCadastros()

@@ -43,7 +43,9 @@ const TEXTO_DA_ACAO_DA_ETAPA: Record<string, string> = {
   desativar: 'Desativou a etapa', reativar: 'Reativou a etapa',
 }
 
-const TEXTO_DA_ACAO_DA_VERSAO: Record<string, string> = { enviar: 'Enviou a versão' }
+const TEXTO_DA_ACAO_DA_VERSAO: Record<string, string> = {
+  enviar: 'Enviou a versão', registrar_historica: 'Registrou a versão histórica',
+}
 
 const TEXTOS_DA_ENTIDADE: Record<string, Record<string, string>> = {
   setor_envolvido: TEXTO_DA_ACAO_DO_VINCULO, andamento: TEXTO_DA_ACAO_DO_ANDAMENTO, processo: TEXTO_DA_ACAO_DO_PROCESSO,

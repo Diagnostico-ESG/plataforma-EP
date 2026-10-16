@@ -16,6 +16,9 @@ test.each([
   ['nao_encontrado_no_drive', '', 'Um dos arquivos não chegou ao Drive. Envie de novo.'],
   ['arquivo_fora_da_pasta', '', 'Um dos arquivos não está na pasta do processo no Drive. Envie de novo.'],
   ['drive_indisponivel', '', 'Não foi possível falar com o Drive. Tente de novo em instantes.'],
+  ['historica_depois_de_versao_nova', '', 'O processo já tem versão nova; versões históricas só podem ser registradas antes dela.'],
+  ['numero_historico_repetido', '5', 'O processo já tem a versão histórica V5F. Use outro número.'],
+  ['historica_sem_arquivo_de_fluxograma', '', 'A versão histórica precisa do arquivo .bpm, ou do .bpmn com o .png.'],
 ])('o código %s vira a frase da tela', (codigo, mensagem, frase) => {
   const falha = falhaDaFuncao(codigo, mensagem)
   expect(falha).toBeInstanceOf(TravaDoBanco)

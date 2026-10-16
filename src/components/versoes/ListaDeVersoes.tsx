@@ -22,6 +22,7 @@ function BlocoDaVersao({ modulo, versao }: { modulo: ModuloDeVersoes; versao: Ve
         <time dateTime={versao.enviadaEm}>{formatarMomento(versao.enviadaEm)}</time>
         <span>{versao.autor ?? '—'}</span>
         {versao.etapa && <span>{versao.etapa}</span>}
+        {versao.historica && <span className="bloco-da-versao-marca">Histórica · somente leitura</span>}
       </p>
       {versao.observacao && <p className="bloco-da-versao-observacao">{versao.observacao}</p>}
       <ul className="bloco-da-versao-arquivos">

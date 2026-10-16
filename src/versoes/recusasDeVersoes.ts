@@ -19,6 +19,9 @@ const FRASE_DO_CODIGO: Record<string, (valor: string) => string> = {
   nao_encontrado_no_drive: () => ARQUIVO_NAO_CHEGOU,
   arquivo_fora_da_pasta: () => 'Um dos arquivos não está na pasta do processo no Drive. Envie de novo.',
   drive_indisponivel: () => 'Não foi possível falar com o Drive. Tente de novo em instantes.',
+  historica_depois_de_versao_nova: () => 'O processo já tem versão nova; versões históricas só podem ser registradas antes dela.',
+  numero_historico_repetido: (numero) => `O processo já tem a versão histórica V${numero}F. Use outro número.`,
+  historica_sem_arquivo_de_fluxograma: () => 'A versão histórica precisa do arquivo .bpm, ou do .bpmn com o .png.',
 }
 
 /** A recusa da função (ou do banco, por ela) com a frase pronta da tela; código desconhecido vira falha genérica. */

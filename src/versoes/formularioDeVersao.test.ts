@@ -1,12 +1,14 @@
 import { expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import {
-  arquivosDoPedido, nomeNaPrevia, podeEnviar, textoDaFalhaDoEnvio, textoDoProgresso,
+  arquivosDoPedido, lerNumeroHistorico, nomeNaPrevia, podeEnviar, podeRegistrarHistorica, podeSubmeter, textoDaFalhaDoEnvio,
+  textoDoProgresso,
 } from './formularioDeVersao'
 
 const bpmn = new File(['x'], 'fluxo.bpmn')
 const png = new File(['y'], 'fluxo.PNG')
 const relatorio = new File(['z'], 'relatorio.pdf')
+const bpm = new File(['w'], 'fonte.bpm')
 
 test('os arquivos do pedido vão na ordem dos papéis, só os escolhidos', () => {
   expect(arquivosDoPedido({ relatorio, png, bpmn })).toEqual([
@@ -22,6 +24,36 @@ test('enviar só se habilita com .bpmn e .png, sem recusa e sem conferência em 
   expect(podeEnviar({ bpmn, png }, {}, true)).toBe(false)
 })
 
+test('o número da versão histórica é um inteiro maior que zero, só com dígitos', () => {
+  expect(lerNumeroHistorico('5')).toBe(5)
+  expect(lerNumeroHistorico('12')).toBe(12)
+  for (const texto of ['', ' 5 ', '0', '-1', '5.5', '5,5', 'abc', '05x']) expect(lerNumeroHistorico(texto)).toBeNull()
+})
+
+test('registrar a histórica pede o número e o .bpm, ou o .bpmn com o .png', () => {
+  expect(podeRegistrarHistorica({ bpm }, {}, false, 5)).toBe(true)
+  expect(podeRegistrarHistorica({ bpmn, png }, {}, false, 5)).toBe(true)
+  expect(podeRegistrarHistorica({ bpmn, png, bpm, relatorio }, {}, false, 5)).toBe(true)
+  expect(podeRegistrarHistorica({ bpmn }, {}, false, 5)).toBe(false)
+  expect(podeRegistrarHistorica({ png }, {}, false, 5)).toBe(false)
+  expect(podeRegistrarHistorica({ relatorio }, {}, false, 5)).toBe(false)
+  expect(podeRegistrarHistorica({}, {}, false, 5)).toBe(false)
+})
+
+test('registrar a histórica não habilita sem número, com recusa ou com conferência em andamento', () => {
+  expect(podeRegistrarHistorica({ bpm }, {}, false, null)).toBe(false)
+  expect(podeRegistrarHistorica({ bpm }, { bpm: 'Escolha um arquivo .bpm.' }, false, 5)).toBe(false)
+  expect(podeRegistrarHistorica({ bpm }, {}, true, 5)).toBe(false)
+})
+
+test('o botão do formulário segue a regra do modo: nova pede o par; histórica pede o número e o .bpm', () => {
+  const sem = { recusas: {}, conferindo: false }
+  expect(podeSubmeter({ tipo: 'nova', numero: 3 }, { ...sem, escolhidos: { bpm } }, 3)).toBe(false)
+  expect(podeSubmeter({ tipo: 'nova', numero: 3 }, { ...sem, escolhidos: { bpmn, png } }, 3)).toBe(true)
+  expect(podeSubmeter({ tipo: 'historica' }, { ...sem, escolhidos: { bpm } }, 5)).toBe(true)
+  expect(podeSubmeter({ tipo: 'historica' }, { ...sem, escolhidos: { bpm } }, null)).toBe(false)
+})
+
 test('o progresso diz qual arquivo está indo, sem passar do total', () => {
   expect(textoDoProgresso({ enviados: 0, total: 3 })).toBe('Enviando 1 de 3…')
   expect(textoDoProgresso({ enviados: 1, total: 3 })).toBe('Enviando 2 de 3…')
@@ -32,6 +64,12 @@ test('a prévia do nome usa a sigla, o número, o nome do processo e a extensão
   const processo = { setorSigla: 'TSA', nome: 'Emitir Ofício' }
   expect(nomeNaPrevia(processo, 3, 'png', png)).toBe('TSA_V3_Emitir Ofício.png')
   expect(nomeNaPrevia(processo, 3, 'relatorio', relatorio)).toBe('TSA_V3_Emitir Ofício_Relatório.pdf')
+})
+
+test('a prévia do nome da histórica leva o F depois do número', () => {
+  const processo = { setorSigla: 'TSA', nome: 'Emitir Ofício' }
+  expect(nomeNaPrevia(processo, 5, 'bpm', bpm, true)).toBe('TSA_V5F_Emitir Ofício.bpm')
+  expect(nomeNaPrevia(processo, 5, 'relatorio', relatorio, true)).toBe('TSA_V5F_Emitir Ofício_Relatório.pdf')
 })
 
 test('a recusa aparece como veio; outra falha diz que a versão não foi registrada e que os arquivos continuam', () => {

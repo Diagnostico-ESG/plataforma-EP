@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { ordenarVersoes, proximoNumero, rotuloDaVersao } from './rotulos'
+import { haVersaoNova, ordenarVersoes, proximoNumero, rotuloDaVersao } from './rotulos'
 import type { Versao } from './tipos'
 
 function versao(numero: number, historica = false): Versao {
@@ -18,6 +18,12 @@ test('a próxima versão é a maior + 1, contando as históricas; sem versão, �
   expect(proximoNumero([])).toBe(1)
   expect(proximoNumero([versao(3, true), versao(5, true)])).toBe(6)
   expect(proximoNumero([versao(6), versao(7), versao(5, true)])).toBe(8)
+})
+
+test('há versão nova quando alguma versão do processo não é histórica', () => {
+  expect(haVersaoNova([])).toBe(false)
+  expect(haVersaoNova([versao(3, true), versao(5, true)])).toBe(false)
+  expect(haVersaoNova([versao(5, true), versao(6)])).toBe(true)
 })
 
 test('as versões vão da mais recente (maior número) para a mais antiga', () => {

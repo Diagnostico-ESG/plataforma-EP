@@ -913,6 +913,15 @@ export type Database = {
         }
         Returns: string
       }
+      registrar_versao_historica: {
+        Args: {
+          p_arquivos: Json
+          p_numero: number
+          p_observacao: string
+          p_processo: string
+        }
+        Returns: string
+      }
       retomar_processo: {
         Args: { p_motivo: string; p_processo: string }
         Returns: undefined

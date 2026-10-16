@@ -30,6 +30,58 @@ test('o envio registra a versão com o número do banco, os nomes padrão, a eta
   expect(eventos[0][1]).toMatchObject({ acao: 'enviar', entidade: 'versao', entidadeRef: 'p1', depois: { rotulo: 'V1' } })
 })
 
+const HISTORICA: PedidoDeVersao = {
+  processoId: 'p1', numero: 5, observacao: null, arquivos: [{ papel: 'bpm', arquivo: new File(['z'], 'fonte.bpm') }],
+}
+
+test('a histórica guarda o número digitado, sem etapa, com o F nos nomes, e gera o evento próprio', async () => {
+  const versoes = falso()
+  const eventos: EventoDoCadastro[] = []
+  versoes.aoRegistrar = (_processoId, evento) => eventos.push(evento)
+  await versoes.registrarVersaoHistorica(HISTORICA, () => {})
+  const [versao] = await versoes.listarVersoes('p1')
+  expect(versao).toMatchObject({ numero: 5, historica: true, etapa: null })
+  expect(versao.arquivos.map((arquivo) => arquivo.nome)).toEqual(['TSA_V5F_Emitir Ofício.bpm'])
+  expect(eventos[0]).toMatchObject({ acao: 'registrar_historica', entidade: 'versao', depois: { rotulo: 'V5F', etapa: null } })
+})
+
+test('registra várias históricas, e a primeira versão nova continua a numeração (V5F → V6)', async () => {
+  const versoes = falso()
+  await versoes.registrarVersaoHistorica({ ...HISTORICA, numero: 3 }, () => {})
+  await versoes.registrarVersaoHistorica(HISTORICA, () => {})
+  await versoes.enviarVersao(PEDIDO, () => {})
+  expect((await versoes.listarVersoes('p1')).map((versao) => versao.numero)).toEqual([6, 5, 3])
+})
+
+test('recusa o número de histórica repetido e a histórica depois da versão nova, com as frases do módulo real', async () => {
+  const versoes = falso()
+  await versoes.registrarVersaoHistorica(HISTORICA, () => {})
+  await expect(versoes.registrarVersaoHistorica(HISTORICA, () => {}))
+    .rejects.toThrow('O processo já tem a versão histórica V5F. Use outro número.')
+  await versoes.enviarVersao(PEDIDO, () => {})
+  const falha = await versoes.registrarVersaoHistorica({ ...HISTORICA, numero: 2 }, () => {}).catch((erro: unknown) => erro)
+  expect(falha).toBeInstanceOf(TravaDoBanco)
+  expect((falha as Error).message).toBe('O processo já tem versão nova; versões históricas só podem ser registradas antes dela.')
+})
+
+test('recusa a histórica sem .bpm nem o par .bpmn e .png', async () => {
+  const versoes = falso()
+  const soPng: PedidoDeVersao = { ...HISTORICA, arquivos: [{ papel: 'png', arquivo: new File(['y'], 'a.png') }] }
+  await expect(versoes.registrarVersaoHistorica(soPng, () => {}))
+    .rejects.toThrow('A versão histórica precisa do arquivo .bpm, ou do .bpmn com o .png.')
+  expect(await versoes.listarVersoes('p1')).toEqual([])
+})
+
+test('as falhas programadas valem também para a histórica', async () => {
+  const versoes = falso()
+  versoes.falharNoArquivo = 1
+  await expect(versoes.registrarVersaoHistorica(HISTORICA, () => {})).rejects.toThrow('o arquivo fonte.bpm não chegou ao Drive')
+  versoes.falharNoArquivo = null
+  versoes.falhaNoRegistro = 'sem conexão'
+  await expect(versoes.registrarVersaoHistorica(HISTORICA, () => {})).rejects.toThrow('sem conexão')
+  expect(await versoes.listarVersoes('p1')).toEqual([])
+})
+
 test('a lista vem da mais recente para a mais antiga', async () => {
   const versoes = falso()
   await versoes.enviarVersao(PEDIDO, () => {})

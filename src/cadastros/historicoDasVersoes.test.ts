@@ -17,8 +17,24 @@ describe('eventos de versão no histórico', () => {
     expect(textoDaAcaoDoCadastro('enviar', 'versao')).toBe('Enviou a versão')
   })
 
+  test('o registro da histórica tem texto próprio', () => {
+    expect(textoDaAcaoDoCadastro('registrar_historica', 'versao')).toBe('Registrou a versão histórica')
+  })
+
   test('o item é a versão com o processo', () => {
     expect(nomeDoItem(ENVIO)).toBe('V3 — Emitir Ofício')
+  })
+
+  test('o item da histórica é a V5F com o processo, e o estado mostra "—" na etapa, que ela não tem', () => {
+    const historica: EventoDoCadastro = {
+      ...ENVIO, acao: 'registrar_historica',
+      depois: { rotulo: 'V5F', processo_nome: 'Emitir Ofício', setor_sigla: 'TSA', etapa: null, observacao: null,
+        arquivos: [{ papel: 'bpm', nome: 'TSA_V5F_Emitir Ofício.bpm' }] },
+    }
+    expect(nomeDoItem(historica)).toBe('V5F — Emitir Ofício')
+    expect(descreverEstadoDoCadastro(historica.depois)).toBe(
+      'Versão: V5F; Processo: Emitir Ofício; Setor: TSA; Etapa: —; Observação: —; Arquivos: TSA_V5F_Emitir Ofício.bpm',
+    )
   })
 
   test('o estado traz a versão, o processo, a etapa, a observação e os nomes dos arquivos', () => {

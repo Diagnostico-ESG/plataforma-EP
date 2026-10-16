@@ -15,7 +15,8 @@ export const enviarComFetch: EnviarBytes = (endereco, arquivo) =>
 export function criarVersoesSupabase(cliente: ClienteSupabase, enviarBytes: EnviarBytes = enviarComFetch): ModuloDeVersoes {
   return {
     listarVersoes: (processoId) => listarVersoes(cliente, processoId),
-    enviarVersao: (pedido, aoProgredir) => enviarVersao(cliente, enviarBytes, pedido, aoProgredir),
+    enviarVersao: (pedido, aoProgredir) => enviarVersao(cliente, enviarBytes, pedido, aoProgredir, false),
+    registrarVersaoHistorica: (pedido, aoProgredir) => enviarVersao(cliente, enviarBytes, pedido, aoProgredir, true),
     baixarArquivo: (arquivo) => baixarArquivo(cliente, arquivo),
   }
 }
@@ -47,10 +48,10 @@ async function chamarFuncao<T>(cliente: ClienteSupabase, corpo: Record<string, u
 }
 
 async function enviarUmArquivo(cliente: ClienteSupabase, enviarBytes: EnviarBytes, pedido: PedidoDeVersao,
-  { papel, arquivo }: ArquivoEscolhido): Promise<string> {
+  { papel, arquivo }: ArquivoEscolhido, historica: boolean): Promise<string> {
   const { upload_url: endereco } = await chamarFuncao<{ upload_url: string }>(cliente, {
     acao: 'iniciar_envio', processo_id: pedido.processoId, papel, nome_original: arquivo.name, tamanho: arquivo.size,
-    numero: pedido.numero, historica: false,
+    numero: pedido.numero, historica,
   })
   const resposta = await enviarBytes(endereco, arquivo).catch(() => null)
   if (!resposta?.ok) throw new Error(`o arquivo ${arquivo.name} não chegou ao Drive`)
@@ -58,16 +59,17 @@ async function enviarUmArquivo(cliente: ClienteSupabase, enviarBytes: EnviarByte
   return id
 }
 
-// Um arquivo por vez, para o progresso ser real; o registro só acontece depois que todos chegaram ao Drive.
+// Um arquivo por vez, para o progresso ser real; o registro só acontece depois que todos chegaram ao Drive. A
+// histórica segue o mesmo caminho: o banco (função registrar_versao_historica) é que aplica as regras dela.
 async function enviarVersao(cliente: ClienteSupabase, enviarBytes: EnviarBytes, pedido: PedidoDeVersao,
-  aoProgredir: (enviados: number, total: number) => void): Promise<void> {
+  aoProgredir: (enviados: number, total: number) => void, historica: boolean): Promise<void> {
   const ids: string[] = []
   for (const escolhido of pedido.arquivos) {
-    ids.push(await enviarUmArquivo(cliente, enviarBytes, pedido, escolhido))
+    ids.push(await enviarUmArquivo(cliente, enviarBytes, pedido, escolhido, historica))
     aoProgredir(ids.length, pedido.arquivos.length)
   }
   await chamarFuncao(cliente, {
-    acao: 'registrar', processo_id: pedido.processoId, numero: pedido.numero, observacao: pedido.observacao,
+    acao: 'registrar', processo_id: pedido.processoId, numero: pedido.numero, observacao: pedido.observacao, historica,
     arquivos: pedido.arquivos.map(({ papel }, posicao) => ({ papel, drive_id: ids[posicao] })),
   })
 }

@@ -75,12 +75,51 @@ test('envia cada arquivo pela sessão devolvida, avisa o progresso e só então 
     { acao: 'iniciar_envio', processo_id: 'p1', papel: 'bpmn', nome_original: 'fluxo.bpmn', tamanho: 4, numero: 3, historica: false },
     { acao: 'iniciar_envio', processo_id: 'p1', papel: 'png', nome_original: 'fluxo.png', tamanho: 3, numero: 3, historica: false },
     {
-      acao: 'registrar', processo_id: 'p1', numero: 3, observacao: 'Corrigido',
+      acao: 'registrar', processo_id: 'p1', numero: 3, observacao: 'Corrigido', historica: false,
       arquivos: [{ papel: 'bpmn', drive_id: 'id-sessao' }, { papel: 'png', drive_id: 'id-sessao' }],
     },
   ])
   expect(envio.enderecos).toEqual(['sessao', 'sessao'])
   expect(progresso).toEqual(['1/2', '2/2'])
+})
+
+const PEDIDO_HISTORICO: PedidoDeVersao = {
+  processoId: 'p1', numero: 5, observacao: null, arquivos: [{ papel: 'bpm', arquivo: new File(['bizagi'], 'fonte.bpm') }],
+}
+
+test('a versão histórica abre a sessão e registra com historica verdadeiro e o número digitado', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  comSessoes(cliente)
+  const envio = new EnvioAoDriveFalso()
+  const progresso: string[] = []
+  await criar(cliente, envio).registrarVersaoHistorica(PEDIDO_HISTORICO, (enviados, total) => progresso.push(enviados + '/' + total))
+  expect(cliente.chamadasDaFuncao).toEqual([
+    { acao: 'iniciar_envio', processo_id: 'p1', papel: 'bpm', nome_original: 'fonte.bpm', tamanho: 6, numero: 5, historica: true },
+    { acao: 'registrar', processo_id: 'p1', numero: 5, observacao: null, historica: true, arquivos: [{ papel: 'bpm', drive_id: 'id-sessao' }] },
+  ])
+  expect(progresso).toEqual(['1/1'])
+})
+
+test('se o arquivo da histórica não chega ao Drive, ela não é registrada', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  comSessoes(cliente)
+  const envio = new EnvioAoDriveFalso()
+  envio.falharEm = 'sessao'
+  await expect(criar(cliente, envio).registrarVersaoHistorica(PEDIDO_HISTORICO, () => {}))
+    .rejects.toThrow('o arquivo fonte.bpm não chegou ao Drive')
+  expect(cliente.chamadasDaFuncao.map((corpo) => corpo.acao)).toEqual(['iniciar_envio'])
+})
+
+test.each([
+  ['numero_historico_repetido', '5', 'O processo já tem a versão histórica V5F. Use outro número.'],
+  ['historica_depois_de_versao_nova', '', 'O processo já tem versão nova; versões históricas só podem ser registradas antes dela.'],
+])('a recusa %s do banco no registro da histórica vira a frase da tela', async (codigo, valor, frase) => {
+  const cliente = new ClienteSupabaseFalso()
+  comSessoes(cliente)
+  cliente.respostasDaFuncao['funcao.registrar'] = recusa(codigo, valor)
+  const falha = await criar(cliente).registrarVersaoHistorica(PEDIDO_HISTORICO, () => {}).catch((erro: unknown) => erro)
+  expect(falha).toBeInstanceOf(TravaDoBanco)
+  expect((falha as Error).message).toBe(frase)
 })
 
 test('se um arquivo não chega ao Drive, a versão não é registrada', async () => {

@@ -1,7 +1,8 @@
 import { useCallback, useState } from 'react'
 import { useCarregamento } from '../../hooks/useCarregamento'
 import type { ProcessoLido } from '../../processos/tipos'
-import { proximoNumero } from '../../versoes/rotulos'
+import type { ModoDoFormulario } from '../../versoes/formularioDeVersao'
+import { haVersaoNova, proximoNumero } from '../../versoes/rotulos'
 import type { ModuloDeVersoes, Versao } from '../../versoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import '../processos/Painel.css'
@@ -12,8 +13,8 @@ import './Versoes.css'
 type SecaoDeVersoesProps = { versoes: ModuloDeVersoes; processo: ProcessoLido; podeAlterar: boolean }
 
 /**
- * Seção "Versões" do painel do processo (e do subprocesso). Enviar só para Administrador e Integrante com o processo
- * em andamento; esconder o botão é conveniência, quem recusa é a função do servidor e o banco.
+ * Seção "Versões" do painel do processo (e do subprocesso). Enviar e registrar histórica só para Administrador e
+ * Integrante com o processo em andamento; esconder o botão é conveniência, quem recusa é a função do servidor e o banco.
  */
 export function SecaoDeVersoes({ versoes, processo, podeAlterar }: SecaoDeVersoesProps) {
   const ler = useCallback(() => versoes.listarVersoes(processo.id), [versoes, processo.id])
@@ -36,20 +37,28 @@ type VersoesProntasProps = {
 }
 
 function VersoesProntas({ versoes, processo, lidas, podeEnviar, aoEnviada }: VersoesProntasProps) {
-  const [enviando, setEnviando] = useState(false)
+  const [aberto, setAberto] = useState<ModoDoFormulario | null>(null)
   const aposEnviar = () => {
-    setEnviando(false)
+    setAberto(null)
     aoEnviada()
   }
   return (
     <>
-      {enviando && (
-        <FormularioDeVersao modulo={versoes} processo={processo} numero={proximoNumero(lidas)} aoEnviada={aposEnviar}
-          aoCancelar={() => setEnviando(false)} />
+      {aberto && (
+        <FormularioDeVersao modulo={versoes} processo={processo} modo={aberto} aoEnviada={aposEnviar} aoCancelar={() => setAberto(null)} />
       )}
       <ListaDeVersoes modulo={versoes} versoes={lidas} />
-      {podeEnviar && !enviando && (
-        <button type="button" className="botao botao-secundario" onClick={() => setEnviando(true)}>Enviar versão</button>
+      {podeEnviar && !aberto && (
+        <div className="secao-de-versoes-acoes">
+          <button type="button" className="botao botao-secundario" onClick={() => setAberto({ tipo: 'nova', numero: proximoNumero(lidas) })}>
+            Enviar versão
+          </button>
+          {!haVersaoNova(lidas) && (
+            <button type="button" className="botao botao-secundario" onClick={() => setAberto({ tipo: 'historica' })}>
+              Registrar versão histórica
+            </button>
+          )}
+        </div>
       )}
     </>
   )

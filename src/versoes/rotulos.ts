@@ -25,6 +25,11 @@ export function proximoNumero(versoes: Pick<Versao, 'numero'>[]): number {
   return Math.max(0, ...versoes.map((versao) => versao.numero)) + 1
 }
 
+/** A versão histórica só pode ser registrada enquanto o processo não tem versão nova (o banco impõe a regra). */
+export function haVersaoNova(versoes: Pick<Versao, 'historica'>[]): boolean {
+  return versoes.some((versao) => !versao.historica)
+}
+
 /** Da mais recente (maior número) para a mais antiga. */
 export function ordenarVersoes(versoes: Versao[]): Versao[] {
   return [...versoes].sort((a, b) => b.numero - a.numero)

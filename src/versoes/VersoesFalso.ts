@@ -2,7 +2,8 @@ import { extensaoDoNome } from '../../supabase/functions/_shared/decisao.ts'
 import { tipoMimeDaExtensao } from '../../supabase/functions/_shared/drive.ts'
 import { nomePadrao } from '../../supabase/functions/_shared/nomePadrao.ts'
 import type { EventoDoCadastro } from '../cadastros/tipos'
-import { ordenarVersoes, proximoNumero, rotuloDaVersao } from './rotulos'
+import { falhaDaFuncao } from './recusasDeVersoes'
+import { haVersaoNova, ordenarVersoes, proximoNumero, rotuloDaVersao } from './rotulos'
 import type { ArquivoDaVersao, ModuloDeVersoes, PedidoDeVersao, Versao } from './tipos'
 
 /** O que o falso precisa saber do processo para nomear os arquivos e guardar a etapa, como o banco. */
@@ -39,13 +40,22 @@ export class VersoesFalso implements ModuloDeVersoes {
   }
 
   async enviarVersao(pedido: PedidoDeVersao, aoProgredir: (enviados: number, total: number) => void): Promise<void> {
+    await this.enviar(pedido, aoProgredir, false)
+  }
+
+  async registrarVersaoHistorica(pedido: PedidoDeVersao, aoProgredir: (enviados: number, total: number) => void): Promise<void> {
+    await this.enviar(pedido, aoProgredir, true)
+  }
+
+  private async enviar(pedido: PedidoDeVersao, aoProgredir: (enviados: number, total: number) => void,
+    historica: boolean): Promise<void> {
     for (const [posicao, { arquivo }] of pedido.arquivos.entries()) {
       if (this.falharNoArquivo === posicao + 1) throw new Error(`o arquivo ${arquivo.name} não chegou ao Drive`)
       aoProgredir(posicao + 1, pedido.arquivos.length)
       if (this.segurarDepoisDe === posicao + 1) await new Promise<never>(() => {})
     }
     this.falharNoRegistroSeConfigurado()
-    this.registrar(pedido)
+    this.registrar(pedido, historica)
   }
 
   async baixarArquivo(arquivo: ArquivoDaVersao): Promise<Blob> {
@@ -60,26 +70,41 @@ export class VersoesFalso implements ModuloDeVersoes {
     if (this.falhaNoRegistro) throw this.falhaNoRegistro
   }
 
-  // Como o banco: o número é o maior + 1 (o do pedido é ignorado), e a etapa e o autor vêm de quem grava.
-  private registrar(pedido: PedidoDeVersao): void {
+  // Como o banco: na nova o número é o maior + 1 (o do pedido é ignorado) e a etapa vem do processo; a histórica
+  // guarda o número digitado, sem etapa, e as regras dela valem antes de gravar. O autor vem de quem grava.
+  private registrar(pedido: PedidoDeVersao, historica: boolean): void {
     const doProcesso = this.versoes[pedido.processoId] ?? []
     const processo = this.processos[pedido.processoId] ?? { sigla: 'TSA', nome: pedido.processoId, etapa: null }
-    const numero = proximoNumero(doProcesso)
+    if (historica) conferirHistorica(doProcesso, pedido)
+    const numero = historica ? pedido.numero : proximoNumero(doProcesso)
     const versao: Versao = {
-      id: `v${this.proximoId++}`, numero, historica: false, enviadaEm: new Date().toISOString(), autor: 'Pessoa de Teste',
-      etapa: processo.etapa, observacao: pedido.observacao, arquivos: this.arquivos(pedido, processo, numero),
+      id: `v${this.proximoId++}`, numero, historica, enviadaEm: new Date().toISOString(), autor: 'Pessoa de Teste',
+      etapa: historica ? null : processo.etapa, observacao: pedido.observacao,
+      arquivos: this.arquivos(pedido, processo, numero, historica),
     }
     this.versoes[pedido.processoId] = [...doProcesso, versao]
     this.envios.push(pedido)
     this.aoRegistrar?.(pedido.processoId, eventoDoEnvio(pedido.processoId, versao, processo))
   }
 
-  private arquivos(pedido: PedidoDeVersao, processo: ProcessoDoFalso, numero: number): ArquivoDaVersao[] {
+  private arquivos(pedido: PedidoDeVersao, processo: ProcessoDoFalso, numero: number, historica: boolean): ArquivoDaVersao[] {
     return pedido.arquivos.map(({ papel, arquivo }) => {
       const formato = extensaoDoNome(arquivo.name)
-      const nome = nomePadrao({ sigla: processo.sigla, numero, historica: false, nomeDoProcesso: processo.nome, papel, extensao: formato })
+      const nome = nomePadrao({ sigla: processo.sigla, numero, historica, nomeDoProcesso: processo.nome, papel, extensao: formato })
       return { id: `a${this.proximoId++}`, papel, nome, formato, tamanho: arquivo.size }
     })
+  }
+}
+
+// As regras que o banco impõe à histórica (migração versoes_historicas), com as mesmas frases do módulo real.
+function conferirHistorica(doProcesso: Versao[], pedido: PedidoDeVersao): void {
+  if (haVersaoNova(doProcesso)) throw falhaDaFuncao('historica_depois_de_versao_nova', '')
+  if (doProcesso.some((versao) => versao.numero === pedido.numero)) {
+    throw falhaDaFuncao('numero_historico_repetido', String(pedido.numero))
+  }
+  const papeis = pedido.arquivos.map(({ papel }) => papel)
+  if (!papeis.includes('bpm') && !(papeis.includes('bpmn') && papeis.includes('png'))) {
+    throw falhaDaFuncao('historica_sem_arquivo_de_fluxograma', '')
   }
 }
 
@@ -90,7 +115,7 @@ function eventoDoEnvio(processoId: string, versao: Versao, processo: ProcessoDoF
     observacao: versao.observacao, arquivos: versao.arquivos.map(({ papel, nome }) => ({ papel, nome })),
   }
   return {
-    id: Date.now(), ocorridoEm: versao.enviadaEm, autor: 'Pessoa de Teste', acao: 'enviar', entidade: 'versao',
+    id: Date.now(), ocorridoEm: versao.enviadaEm, autor: 'Pessoa de Teste', acao: versao.historica ? 'registrar_historica' : 'enviar', entidade: 'versao',
     entidadeRef: processoId, antes: null, depois,
   }
 }
