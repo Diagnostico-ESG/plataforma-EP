@@ -1,6 +1,6 @@
 # Ticket 07 de documentos-versoes (Conferência com o Drive) — Plano de execução
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** ao abrir a seção Versões, a tela pergunta à função do servidor como está cada arquivo do processo no Drive e marca "Alterado fora da plataforma" ou "Não encontrado no Drive" no arquivo afetado; se a pergunta falhar, a lista aparece normal, sem marcas, com o aviso "Não foi possível conferir os arquivos no Drive.".
 
@@ -48,7 +48,7 @@ Modificar: `supabase/functions/_shared/decisao.ts` (ação e perfis), `arquivos-
 
 ### Tarefa 0 — Branch e marco
 
-- [ ] Conferir que a árvore está limpa e que a branch atual é `documentos-versoes-01`. Criar o marco `marco/2026-10-16-inicio-ticket-07-documentos-versoes` e a branch `documentos-versoes-07` (`git switch -c documentos-versoes-07`). Comitar este plano.
+- [x] Conferir que a árvore está limpa e que a branch atual é `documentos-versoes-01`. Criar o marco `marco/2026-10-16-inicio-ticket-07-documentos-versoes` e a branch `documentos-versoes-07` (`git switch -c documentos-versoes-07`). Comitar este plano.
 
 ### Tarefa 1 — Decisão pura da conferência (critério 1)
 
@@ -56,7 +56,7 @@ Modificar: `supabase/functions/_shared/decisao.ts` (ação e perfis), `arquivos-
 
 **Interfaces — produz:** `SituacaoNoDrive`; `LidoNoDrive = { md5Checksum?: string; trashed?: boolean }`; `EntradaConferir = { processoId: string }`; `validarConferir(corpo: unknown): Validacao<EntradaConferir>`; `situacaoDoArquivo(hashMd5: string, lido: LidoNoDrive | null): SituacaoNoDrive`. Em `decisao.ts`: `Acao` ganha `'conferir'`, liberada aos três perfis.
 
-- [ ] Teste `conferencia.test.ts` (vermelho, antes do código):
+- [x] Teste `conferencia.test.ts` (vermelho, antes do código):
 
 ```ts
 import { describe, expect, it } from 'vitest'
@@ -121,9 +121,9 @@ describe('quem pode conferir', () => {
 })
 ```
 
-- [ ] Rodar `npx vitest run supabase/functions/_shared/conferencia.test.ts`: falha (módulo e ação inexistentes). Esse é o vermelho.
-- [ ] `decisao.ts`: `Acao` ganha `'conferir'`; `PERFIS_POR_ACAO` ganha `conferir: ['administrador', 'integrante_ep', 'consulta']`.
-- [ ] `conferencia.ts` (cabeçalho no padrão dos arquivos puros: o que decide e que é testado no Vitest):
+- [x] Rodar `npx vitest run supabase/functions/_shared/conferencia.test.ts`: falha (módulo e ação inexistentes). Esse é o vermelho.
+- [x] `decisao.ts`: `Acao` ganha `'conferir'`; `PERFIS_POR_ACAO` ganha `conferir: ['administrador', 'integrante_ep', 'consulta']`.
+- [x] `conferencia.ts` (cabeçalho no padrão dos arquivos puros: o que decide e que é testado no Vitest):
 
 ```ts
 // Decisão da ação conferir da função arquivos-no-drive (documentos-versoes, ticket 07). Arquivo puro, testado no Vitest.
@@ -157,7 +157,7 @@ export function situacaoDoArquivo(hashMd5: string, lido: LidoNoDrive | null): Si
 }
 ```
 
-- [ ] Rodar o arquivo de teste: passa. `npm run lint` e `npm run typecheck`. Commit (segundo plano): "Ticket 07 de documentos-versoes: decisão pura da conferência com o Drive (entrada, situação do arquivo e perfis)".
+- [x] Rodar o arquivo de teste: passa. `npm run lint` e `npm run typecheck`. Commit (segundo plano): "Ticket 07 de documentos-versoes: decisão pura da conferência com o Drive (entrada, situação do arquivo e perfis)".
 
 ### Tarefa 2 — Ação `conferir` na função do servidor (critério 1)
 
@@ -167,7 +167,7 @@ export function situacaoDoArquivo(hashMd5: string, lido: LidoNoDrive | null): Si
 
 Os arquivos Deno não rodam no Vitest; o teste desta tarefa é a leitura cuidadosa contra a documentação do Drive e a prova do critério 5. O que decide está testado na Tarefa 1.
 
-- [ ] `google.ts`: acrescentar, depois de `lerJsonDoDrive`, o auxiliar tirado de `registrar.ts`:
+- [x] `google.ts`: acrescentar, depois de `lerJsonDoDrive`, o auxiliar tirado de `registrar.ts`:
 
 ```ts
 // O arquivo que o Drive não acha (404) vira null; qualquer outra falha do Drive segue como erro do Drive.
@@ -182,8 +182,8 @@ export async function lerNoDriveOuNulo<T>(token: string, endereco: string): Prom
 ```
 
   O auxiliar recebe o endereço já montado por quem chama (`API_DE_ARQUIVOS` vive em `pastas.ts`, que importa de `google.ts`; importar de volta criaria dependência circular e o `check:circular` reprova). `registrar.ts` e `conferir.ts` passam `` `${API_DE_ARQUIVOS}/${driveId}?fields=…` ``. Interface: `lerNoDriveOuNulo<T>(token: string, endereco: string): Promise<T | null>`.
-- [ ] `registrar.ts`: apagar a função local `lerArquivoNoDrive` e usar `lerNoDriveOuNulo<ArquivoNoDrive>(contexto.token, \`${API_DE_ARQUIVOS}/${arquivo.driveId}?fields=id,name,size,md5Checksum,parents\`)` na linha do `Promise.all`. Ajustar os imports (`ErroDoDrive` deixa de ser usado ali; `lerJsonDoDrive` também).
-- [ ] `conferir.ts`:
+- [x] `registrar.ts`: apagar a função local `lerArquivoNoDrive` e usar `lerNoDriveOuNulo<ArquivoNoDrive>(contexto.token, \`${API_DE_ARQUIVOS}/${arquivo.driveId}?fields=id,name,size,md5Checksum,parents\`)` na linha do `Promise.all`. Ajustar os imports (`ErroDoDrive` deixa de ser usado ali; `lerJsonDoDrive` também).
+- [x] `conferir.ts`:
 
 ```ts
 // Ação conferir (ticket 07): para um processo, compara a existência e o MD5 de cada arquivo no Drive com o que o banco
@@ -223,8 +223,8 @@ export async function conferir(contexto: ContextoDoDrive, entrada: EntradaConfer
 }
 ```
 
-- [ ] `index.ts`: importar `validarConferir` e `conferir`; em `executar`, antes do bloco de `baixar`, acrescentar o bloco `if (acao === 'conferir')` no mesmo molde dos vizinhos (validar → `responderRecusa` → `conferir({ cliente: chamador.cliente, token: await obterToken(config), config }, entrada.valor)`); a mensagem da ação desconhecida passa a ser `'campo acao: esperado iniciar_envio, baixar, registrar, sem_alteracao ou conferir'`; o comentário do cabeçalho cita o ticket 07. Se `executar` passar de 20 linhas ou da complexidade, extrair as ações de leitura (`baixar`, `conferir`) para uma função `executarLeitura`.
-- [ ] Conferir à mão: `fields=id,md5Checksum,trashed` é um valor válido de `files.get`; `supportsAllDrives=true` já é posto por `chamarDrive`; a resposta não leva nome nem corpo do Google. `npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`. Commit: "Ticket 07 de documentos-versoes: ação conferir da função do servidor e leitura do Drive compartilhada com o registrar".
+- [x] `index.ts`: importar `validarConferir` e `conferir`; em `executar`, antes do bloco de `baixar`, acrescentar o bloco `if (acao === 'conferir')` no mesmo molde dos vizinhos (validar → `responderRecusa` → `conferir({ cliente: chamador.cliente, token: await obterToken(config), config }, entrada.valor)`); a mensagem da ação desconhecida passa a ser `'campo acao: esperado iniciar_envio, baixar, registrar, sem_alteracao ou conferir'`; o comentário do cabeçalho cita o ticket 07. Se `executar` passar de 20 linhas ou da complexidade, extrair as ações de leitura (`baixar`, `conferir`) para uma função `executarLeitura`.
+- [x] Conferir à mão: `fields=id,md5Checksum,trashed` é um valor válido de `files.get`; `supportsAllDrives=true` já é posto por `chamarDrive`; a resposta não leva nome nem corpo do Google. `npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`. Commit: "Ticket 07 de documentos-versoes: ação conferir da função do servidor e leitura do Drive compartilhada com o registrar".
 
 ### Tarefa 3 — Módulo de versões: tipo, real e falso (critério 4, módulo)
 
@@ -232,11 +232,11 @@ export async function conferir(contexto: ContextoDoDrive, entrada: EntradaConfer
 
 **Interfaces — produz:** em `tipos.ts`: `SituacaoNoDrive = 'ok' | 'alterado' | 'nao_encontrado'`, `ConferenciaDosArquivos = Record<string, SituacaoNoDrive>` (por id do arquivo) e o método `conferirArquivos(processoId: string): Promise<ConferenciaDosArquivos>` em `ModuloDeVersoes`. Em `situacaoNoDrive.ts`: `marcaDaSituacao(situacao: SituacaoNoDrive | undefined): string | null` (`ok` e ausente → `null`; `alterado` → "Alterado fora da plataforma"; `nao_encontrado` → "Não encontrado no Drive").
 
-- [ ] Testes (vermelho, antes do código):
+- [x] Testes (vermelho, antes do código):
   - `situacaoNoDrive.test.ts`: `marcaDaSituacao('alterado')` é "Alterado fora da plataforma"; `'nao_encontrado'` é "Não encontrado no Drive"; `'ok'` e `undefined` são `null`.
   - `versoesSupabase.test.ts`: `conferirArquivos('p1')` chama a função uma vez com `{ acao: 'conferir', processo_id: 'p1' }` (`cliente.chamadasDaFuncao`) e devolve o `arquivos` da resposta (`cliente.respostasDaFuncao['funcao.conferir'] = { data: { arquivos: { a1: 'ok', a2: 'alterado' } }, error: null }`); falha da função (`recusa('drive_indisponivel', '', 502)`, o auxiliar que o arquivo já tem) vira rejeição.
   - `VersoesFalso.test.ts`: `conferirArquivos` devolve `ok` para todo arquivo do processo e a situação programada em `conferencia`; registra o processo em `conferidos`; com `falharConferencia = true` rejeita com `falha de conexão simulada`; depois de `substituirArquivo` no arquivo programado como `alterado`, a situação volta a `ok`.
-- [ ] Rodar os três arquivos: falham. Implementar:
+- [x] Rodar os três arquivos: falham. Implementar:
   - `tipos.ts`: os dois tipos e o método em `ModuloDeVersoes`, com o comentário "Como cada arquivo do processo está no Drive agora: o MD5 e a existência são comparados com o que o banco guarda; nada é gravado. Falha de conexão ou do Drive rejeita (a tela mostra o aviso, sem marcas)".
   - `versoesSupabase.ts`: `conferirArquivos: (processoId) => conferirArquivos(cliente, processoId)` na fábrica e
     ```ts
@@ -258,7 +258,7 @@ export async function conferir(contexto: ContextoDoDrive, entrada: EntradaConfer
     }
     ```
     e, em `guardarTroca`, `delete this.conferencia[atual.id]` (o banco passa a guardar o MD5 novo).
-- [ ] Rodar os três arquivos: passam. `npm run lint`, `npm run typecheck`, `npm test`. Commit: "Ticket 07 de documentos-versoes: conferirArquivos no módulo de versões (real e falso) e as frases das marcas".
+- [x] Rodar os três arquivos: passam. `npm run lint`, `npm run typecheck`, `npm test`. Commit: "Ticket 07 de documentos-versoes: conferirArquivos no módulo de versões (real e falso) e as frases das marcas".
 
 ### Tarefa 4 — Tela: conferência ao abrir, marcas e aviso (critérios 2, 3 e 4)
 
@@ -266,14 +266,14 @@ export async function conferir(contexto: ContextoDoDrive, entrada: EntradaConfer
 
 **Interfaces — consome:** `ModuloDeVersoes.conferirArquivos`, `ConferenciaDosArquivos`, `marcaDaSituacao` (Tarefa 3). **Produz:** `useConferenciaNoDrive(modulo, processoId, versoes): { tipo: 'conferindo' } | { tipo: 'falhou' } | { tipo: 'pronta'; situacoes: ConferenciaDosArquivos }`; `MarcaNoDrive({ situacao })`; `ListaDeVersoes` ganha a prop opcional `situacoes?: ConferenciaDosArquivos`.
 
-- [ ] Testes de interface (vermelho), com o aplicativo inteiro e a `VersoesFalso`, em `App.conferenciaNoDrive.test.tsx`, no molde de `App.substituirArquivo.test.tsx` (mesmos `beforeEach`/`afterEach` do hash `#/processos/p1`, `secaoDeVersoes()`, `montarNosCadastros`, `versaoDeTeste`, `arquivoDeTeste`). Dados: V4 só com o par (`a4-bpmn`, `a4-png`) e V3 com relatório (`a3-relatorio`). Casos:
+- [x] Testes de interface (vermelho), com o aplicativo inteiro e a `VersoesFalso`, em `App.conferenciaNoDrive.test.tsx`, no molde de `App.substituirArquivo.test.tsx` (mesmos `beforeEach`/`afterEach` do hash `#/processos/p1`, `secaoDeVersoes()`, `montarNosCadastros`, `versaoDeTeste`, `arquivoDeTeste`). Dados: V4 só com o par (`a4-bpmn`, `a4-png`) e V3 com relatório (`a3-relatorio`). Casos:
   1. **Marcas:** com `falso.conferencia = { 'a4-png': 'alterado', 'a3-relatorio': 'nao_encontrado' }`, o item do `.png` da V4 mostra "Alterado fora da plataforma", o do relatório da V3 mostra "Não encontrado no Drive", e o `.bpmn` da V4 não mostra marca (cada marca dentro do `li` do arquivo: `secao.getByRole('link', { name: <nome> }).closest('li')`, `await within(li).findByText(...)`).
   2. **Uma vez ao abrir:** depois de a lista e as marcas aparecerem, `falso.conferidos` é `['p1']`.
   3. **Consulta também vê as marcas** (`montarNosCadastros({ perfil: 'consulta', ajustarVersoes })`).
   4. **Falha:** com `falso.falharConferencia = true`, a lista aparece normal (os nomes dos arquivos), o aviso "Não foi possível conferir os arquivos no Drive." aparece e nenhuma marca ("Alterado fora da plataforma", "Não encontrado no Drive") existe.
   5. **Tudo certo:** sem programar nada, nenhuma marca e nenhum aviso.
   6. **Lista vazia:** processo sem versões não chama a função (`falso.conferidos` vazio).
-- [ ] Rodar o arquivo: falha. Implementar:
+- [x] Rodar o arquivo: falha. Implementar:
   - `useConferenciaNoDrive.ts`:
     ```ts
     import { useEffect, useState } from 'react'
@@ -306,17 +306,17 @@ export async function conferir(contexto: ContextoDoDrive, entrada: EntradaConfer
   - `SecaoDeVersoes.tsx` (`VersoesProntas`): `const conferencia = useConferenciaNoDrive(versoes, processo.id, lidas)`; acima da lista, `{conferencia.tipo === 'falhou' && <p className="secao-de-versoes-aviso" role="status">Não foi possível conferir os arquivos no Drive.</p>}`; `ListaDeVersoes` recebe `situacoes={conferencia.tipo === 'pronta' ? conferencia.situacoes : undefined}`.
   - `ListaDeVersoes.tsx`: a prop `situacoes` entra em `ListaDeVersoesProps` (já repassada pelo `...resto`), `BlocoDaVersao` a recebe e põe `<MarcaNoDrive situacao={situacoes?.[arquivo.id]} />` logo depois do `LinkDoArquivo`.
   - `Versoes.css`: `.secao-de-versoes-aviso { margin: 0; color: var(--texto-2); font-size: var(--tam-rotulo); }` (aviso discreto, no padrão de `.bloco-da-versao-origem`); a pílula reaproveita `.bloco-da-versao-marca`, com texto (nunca só cor). Se a marca de "Não encontrado" pedir mais destaque, usar só borda e texto já definidos; nenhuma cor nova.
-- [ ] Rodar o arquivo: passa. Rodar também `App.substituirArquivo`, `App.enviarVersao`, `App.versoesNoProcesso` (a lista mudou de lugar da marca e o hook roda em todos). `npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`. Commit: "Ticket 07 de documentos-versoes: seção Versões confere os arquivos com o Drive, marca alterado e não encontrado e avisa quando a conferência falha".
+- [x] Rodar o arquivo: passa. Rodar também `App.substituirArquivo`, `App.enviarVersao`, `App.versoesNoProcesso` (a lista mudou de lugar da marca e o hook roda em todos). `npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`. Commit: "Ticket 07 de documentos-versoes: seção Versões confere os arquivos com o Drive, marca alterado e não encontrado e avisa quando a conferência falha".
 
 ### Tarefa 5 — Prova do Drive, registros e fecho do ticket
 
 **Arquivos:** modificar `scripts/prova-do-drive.mjs`, `docs/drive-conta-de-servico.md`, `.scratch/documentos-versoes/desvios.md`, `issues/07-conferencia-com-o-drive.md`, `.scratch/melhorias-protocolo.md`.
 
-- [ ] `scripts/prova-do-drive.mjs`: passo novo logo depois de `conferirDownload` do integrante e antes de `registrarHistorica`: `conferirNoDrive(config, token, processoId, arquivoId, passo)` chama `{ acao: 'conferir', processo_id }` e relata `ok` quando a resposta é 200 e `arquivos[arquivoId] === 'ok'` (arquivo recém-enviado, intacto), com o texto "situação 'ok' para o arquivo enviado". Passos para os outros perfis: a consulta também confere (200); sem login é `401 sem_login` (mesmo molde de `esperarRecusa`). Se o script passar de 300 linhas, o passo vai num auxiliar já existente ou em arquivo irmão.
-- [ ] `docs/drive-conta-de-servico.md`: acrescentar ao roteiro do usuário o passo manual do critério 5: depois da prova, abrir o arquivo de teste no Drive de desenvolvimento, **editar ou substituir o conteúdo** (por exemplo, subir um arquivo novo por cima, pelo próprio Drive) e abrir o processo na plataforma: o arquivo deve aparecer com "Alterado fora da plataforma"; mover o arquivo para a lixeira do Drive e reabrir: "Não encontrado no Drive". Antes: publicar a função (`npx supabase functions deploy arquivos-no-drive --use-api`, com o vínculo de desenvolvimento conferido).
-- [ ] `npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`. Sem migração, não há "Testes de banco" novo a rodar; o último (#88) segue valendo, pois nada de `supabase/migrations/` ou `supabase/tests/` mudou.
-- [ ] `desvios.md` (entrada "ticket 07", datada): o `try/catch` do 404 foi extraído de `registrar.ts` para `lerNoDriveOuNulo`; a lixeira conta como "não encontrado"; MD5 ausente conta como "alterado"; a conferência roda também a cada recarga da lista; sem migração; o que ficou pendente (publicação da função e prova do critério 5, do usuário). Qualquer outro desvio que apareça na execução.
-- [ ] Ticket 07: marcar as caixas dos critérios provados (1 a 4); o critério 5 fica aberto, com a nota "prova do Drive pendente (do usuário)"; ressalva do critério `[visual]` das marcas (tela não conferida a olho), como nos tickets anteriores.
-- [ ] `.scratch/melhorias-protocolo.md`: acrescentar os itens de `.claude/regras/nao-testados.md` do `/executar-complexo` e do bloco "Qualquer momento" que aconteceram nesta execução (data, item, esperado, aconteceu), sem concluir se funcionou.
-- [ ] Commit dos registros. Juntar à `documentos-versoes-01` (`git switch documentos-versoes-01`; `git merge --ff-only documentos-versoes-07`), apagar a branch com `git branch -d documentos-versoes-07` (se o `-d` recusar, parar e perguntar) e enviar a `documentos-versoes-01` (`git push`, sem `--force`).
-- [ ] **Perguntar ao usuário**: (1) se grava a linha `Concluído em` do ticket 07 agora ou só depois da prova do Drive (regra dos tickets 01 a 06); (2) se aprova publicar a função no desenvolvimento para a prova do critério 5. Depois, apontar o ticket 08 (ou a prova dos tickets 01 a 03, pendente) e lembrar o `/cost`.
+- [x] `scripts/prova-do-drive.mjs`: passo novo logo depois de `conferirDownload` do integrante e antes de `registrarHistorica`: `conferirNoDrive(config, token, processoId, arquivoId, passo)` chama `{ acao: 'conferir', processo_id }` e relata `ok` quando a resposta é 200 e `arquivos[arquivoId] === 'ok'` (arquivo recém-enviado, intacto), com o texto "situação 'ok' para o arquivo enviado". Passos para os outros perfis: a consulta também confere (200); sem login é `401 sem_login` (mesmo molde de `esperarRecusa`). Se o script passar de 300 linhas, o passo vai num auxiliar já existente ou em arquivo irmão.
+- [x] `docs/drive-conta-de-servico.md`: acrescentar ao roteiro do usuário o passo manual do critério 5: depois da prova, abrir o arquivo de teste no Drive de desenvolvimento, **editar ou substituir o conteúdo** (por exemplo, subir um arquivo novo por cima, pelo próprio Drive) e abrir o processo na plataforma: o arquivo deve aparecer com "Alterado fora da plataforma"; mover o arquivo para a lixeira do Drive e reabrir: "Não encontrado no Drive". Antes: publicar a função (`npx supabase functions deploy arquivos-no-drive --use-api`, com o vínculo de desenvolvimento conferido).
+- [x] `npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`. Sem migração, não há "Testes de banco" novo a rodar; o último (#88) segue valendo, pois nada de `supabase/migrations/` ou `supabase/tests/` mudou.
+- [x] `desvios.md` (entrada "ticket 07", datada): o `try/catch` do 404 foi extraído de `registrar.ts` para `lerNoDriveOuNulo`; a lixeira conta como "não encontrado"; MD5 ausente conta como "alterado"; a conferência roda também a cada recarga da lista; sem migração; o que ficou pendente (publicação da função e prova do critério 5, do usuário). Qualquer outro desvio que apareça na execução.
+- [x] Ticket 07: marcar as caixas dos critérios provados (1 a 4); o critério 5 fica aberto, com a nota "prova do Drive pendente (do usuário)"; ressalva do critério `[visual]` das marcas (tela não conferida a olho), como nos tickets anteriores.
+- [x] `.scratch/melhorias-protocolo.md`: acrescentar os itens de `.claude/regras/nao-testados.md` do `/executar-complexo` e do bloco "Qualquer momento" que aconteceram nesta execução (data, item, esperado, aconteceu), sem concluir se funcionou.
+- [x] Commit dos registros. Juntar à `documentos-versoes-01` (`git switch documentos-versoes-01`; `git merge --ff-only documentos-versoes-07`), apagar a branch com `git branch -d documentos-versoes-07` (se o `-d` recusar, parar e perguntar) e enviar a `documentos-versoes-01` (`git push`, sem `--force`).
+- [x] **Perguntar ao usuário**: (1) se grava a linha `Concluído em` do ticket 07 agora ou só depois da prova do Drive (regra dos tickets 01 a 06); (2) se aprova publicar a função no desenvolvimento para a prova do critério 5. Depois, apontar o ticket 08 (ou a prova dos tickets 01 a 03, pendente) e lembrar o `/cost`.

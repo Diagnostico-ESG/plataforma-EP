@@ -199,6 +199,14 @@ async function conferirDownload(config, token, arquivoId, passo) {
   relatar(passo, iguais, iguais ? 'bytes iguais aos enviados' : 'bytes diferentes')
 }
 
+// A conferência (ticket 07) compara o MD5 do Drive com o do banco: o arquivo que acabou de ser enviado (ou trocado) está "ok".
+async function conferirNoDrive(config, token, { processoId, arquivoId }, passo) {
+  const resposta = await chamarFuncao(config, token, { acao: 'conferir', processo_id: processoId })
+  if (resposta.status !== 200) return relatar(passo, false, await codigoDe(resposta))
+  const { arquivos } = await resposta.json()
+  relatar(passo, arquivos?.[arquivoId] === 'ok', `situação '${arquivos?.[arquivoId]}' para o arquivo enviado`)
+}
+
 async function esperarRecusa(resposta, passo, esperado) {
   const codigo = await codigoDe(resposta)
   relatar(passo, codigo === esperado, codigo)
@@ -211,16 +219,20 @@ async function provar() {
   const enviado = await enviarComoIntegrante(config, integrante)
   if (!enviado) return leitor.close()
   await conferirDownload(config, integrante.token, enviado.arquivoId, 'integrante baixa o arquivo de volta')
+  await conferirNoDrive(config, integrante.token, enviado, 'integrante confere o arquivo enviado com o Drive')
   await registrarHistorica(config, integrante)
   await provarRelatorioDepois(config, integrante, enviado)
   const consulta = await entrar(config, leitor, 'Consulta')
   leitor.close()
   await esperarRecusa(await chamarFuncao(config, consulta.token, pedidoDeEnvio(enviado.processoId)), 'consulta é recusada no envio', '403 sem_permissao')
   await conferirDownload(config, consulta.token, enviado.arquivoId, 'consulta baixa o arquivo enviado pelo integrante')
+  await conferirNoDrive(config, consulta.token, enviado, 'consulta confere o arquivo enviado com o Drive')
+  await esperarRecusa(await chamarFuncao(config, null, { acao: 'conferir', processo_id: enviado.processoId }), 'conferir sem login é recusado', '401 sem_login')
   await esperarRecusa(await chamarFuncao(config, consulta.token, { acao: 'baixar', arquivo_id: ARQUIVO_INEXISTENTE }), 'arquivo que não existe é recusado', '403 sem_permissao')
   await esperarRecusa(await chamarFuncao(config, null, { acao: 'baixar', arquivo_id: enviado.arquivoId }), 'sem login é recusado', '401 sem_login')
   // Por último: a troca muda os bytes do arquivo que a consulta baixou e comparou acima.
   await provarSubstituicao(config, integrante, enviado)
+  await conferirNoDrive(config, integrante.token, enviado, 'depois da troca, o arquivo segue ok (o banco guarda o MD5 novo)')
 }
 
 provar().catch((erro) => {

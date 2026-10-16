@@ -95,6 +95,15 @@ node scripts/prova-do-drive.mjs
 
 O script pede o e-mail e a senha de cada usuário inventado na hora, e não grava nem mostra nenhum dos dois. Ele imprime só "OK" ou "FALHOU" de cada passo, o código devolvido pela função e o nome do arquivo de teste. Copie as linhas impressas para a conversa.
 
+### 6.1 Conferir a mão no Drive (marcas "Alterado fora da plataforma" e "Não encontrado no Drive")
+
+Esta parte é só sua, no navegador, e fica para depois de a prova do passo 6 passar (ela já confere, pelo script, que o arquivo intacto aparece como "ok"). Antes, a função precisa estar publicada com a ação `conferir` (o comando do passo 5, com o vínculo de desenvolvimento conferido).
+
+1. Entre na plataforma, abra o processo da prova e confira que a seção **Versões** abre sem marca nem aviso.
+2. No **EP – desenvolvimento**, abra o arquivo de teste e troque o conteúdo por outro (por exemplo, enviando um arquivo diferente por cima, pelo próprio Drive). Volte à plataforma e abra o processo de novo: o arquivo deve aparecer com a marca **Alterado fora da plataforma**.
+3. No Drive, mande o arquivo para a lixeira e abra o processo de novo: a marca deve ser **Não encontrado no Drive**. Restaure o arquivo da lixeira se quiser ver a marca sumir (se o conteúdo ainda for o trocado no passo 2, volta a ser "alterado").
+4. Copie para a conversa o que apareceu em cada passo.
+
 ## 7. Depois da prova
 
 1. No **EP – desenvolvimento**, apague o arquivo de teste (o nome tem `_V99_`). As pastas do setor e do processo podem ficar.

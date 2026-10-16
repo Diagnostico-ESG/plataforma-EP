@@ -76,3 +76,16 @@
 - **Prova real no Drive pendente** (roteiro do usuário), junto com os tickets 01 a 05.
 - **O ticket foi executado fora da ordem.** O `/executar-complexo` retomaria o ticket 01; o usuário pediu o ticket 06 e que a branch parta de `documentos-versoes-01` (o argumento chegou cortado, "documentos-versoes-0", e foi lido como `documentos-versoes-01`, a única que existe). A `documentos-versoes-06` é juntada a ela, e não à `main`.
 - **O ticket 06 não ganhou a linha `Concluído em`**, pela mesma regra dos tickets 01 a 05 (decisão do usuário em 2026-10-15).
+
+## 2026-10-16 — ticket 07 (conferência com o Drive)
+
+- **Sem migração, sem teste de banco novo e sem `db:types`.** A conferência só lê: `arquivos_da_versao` pela RLS (política "ativo lê" e o teste 27 já existem desde o ticket 02) e o Drive. O último "Testes de banco" (#88) segue valendo.
+- **O trecho que transforma o 404 do Drive em "não achei" foi extraído de `registrar.ts` para `lerNoDriveOuNulo` em `google.ts`**, porque a conferência precisa do mesmo. O `registrar` continua com o mesmo comportamento (os testes não mudaram). O auxiliar recebe o endereço já montado, porque `API_DE_ARQUIVOS` vive em `pastas.ts`, que importa de `google.ts` (importar de volta criaria dependência circular).
+- **Arquivo na lixeira do Drive conta como "não encontrado"**, mesmo com o MD5 igual: quem abre a pasta não o vê mais. **MD5 ausente conta como "alterado"** (o arquivo deixou de ser o binário enviado, como um documento do Google). A spec só fala de "hash e existência".
+- **Falha do Drive que não é 404 derruba a conferência inteira** (erro da função, aviso na tela), em vez de marcar o arquivo: nunca se afirma que um arquivo foi alterado sem ter conseguido perguntar.
+- **A conferência roda ao abrir a seção e de novo a cada recarga da lista** (depois de enviar, substituir etc.), e não só "uma vez": a spec diz "ao abrir", mas sem refazer, a marca de um arquivo recém-substituído ficaria na tela até reabrir o painel. Lista sem versão não chama a função.
+- **Cada arquivo é lido no Drive com uma chamada, todas ao mesmo tempo** (`ponytail:` no código): serve para os tamanhos de processo previstos; processo com centenas de arquivos pede lotes.
+- **`index.ts` ganhou `executarBaixar` e `executarConferir`**: o `executar` passaria do limite de 20 linhas com a ação nova. O comportamento do `baixar` não mudou (o token do Google continua sendo pedido só depois de a entrada valer).
+- **A marca reaproveita a pílula `bloco-da-versao-marca`** (a de "Relatório pendente"), com texto; só o aviso da conferência que falhou ganhou estilo novo (`secao-de-versoes-aviso`, texto discreto, sem cor nova).
+- **A função alterada não foi publicada** (`functions deploy` é do usuário, com o vínculo conferido). O `prova-do-drive.mjs` ganhou quatro passos de conferência (integrante, consulta, sem login e "depois da troca, segue ok") e o roteiro do usuário ganhou o passo 6.1 (alterar o arquivo à mão no Drive e ver as marcas). O critério 5 do ticket fica aberto, e o ticket não ganha a linha `Concluído em` agora (regra dos tickets 01 a 06).
+- **O ticket foi executado fora da ordem**: o `/executar-complexo` retomaria o ticket 01; o usuário pediu o 07 e que a branch parta de `documentos-versoes-01`. A `documentos-versoes-07` é juntada a ela, e não à `main`.
