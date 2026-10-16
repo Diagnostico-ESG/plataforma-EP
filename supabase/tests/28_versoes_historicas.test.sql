@@ -155,14 +155,14 @@ insert into _tap (linha) select is((select count(*) from public.versoes where pr
 reset role;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a3","role":"authenticated"}', true);
 set local role authenticated;
-insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 8, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$, '42501', null, 'consulta não registra histórica');
+insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e5'), 8, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$, '42501', null, 'consulta não registra histórica');
 insert into _tap (linha) select is((select count(*) from public.eventos where entidade = 'versao' and acao = 'registrar_historica'), 6::bigint, 'consulta lê os eventos de histórica');
 
 -- Inativo.
 reset role;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a4","role":"authenticated"}', true);
 set local role authenticated;
-insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 8, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$, '42501', null, 'inativo não registra histórica');
+insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e5'), 8, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$, '42501', null, 'inativo não registra histórica');
 insert into _tap (linha) select is((select count(*) from public.eventos where entidade = 'versao' and acao = 'registrar_historica'), 0::bigint, 'inativo não lê os eventos de histórica');
 
 -- Visitante.
