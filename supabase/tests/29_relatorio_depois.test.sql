@@ -56,7 +56,7 @@ language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('bpmn', 'b
 create function pg_temp.relatorio(nome text, hash text default 'abcdef0123456789abcdef0123456789') returns jsonb
 language sql immutable as $$
   select jsonb_build_object('papel', 'relatorio', 'nome', nome, 'formato', 'pdf', 'tamanho', 100, 'hash_md5', hash,
-    'drive_id', 'drive-' || nome) $$;
+    'drive_id', 'drive-' || md5(nome)) $$;
 create function pg_temp.processo(sufixo text) returns uuid
 language sql immutable as $$ select ('9f000000-0000-0000-0000-0000000000' || sufixo)::uuid $$;
 create function pg_temp.versao(processo uuid, numero_da_versao integer) returns uuid
