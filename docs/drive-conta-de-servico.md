@@ -104,6 +104,16 @@ Esta parte é só sua, no navegador, e fica para depois de a prova do passo 6 pa
 3. No Drive, mande o arquivo para a lixeira e abra o processo de novo: a marca deve ser **Não encontrado no Drive**. Restaure o arquivo da lixeira se quiser ver a marca sumir (se o conteúdo ainda for o trocado no passo 2, volta a ser "alterado").
 4. Copie para a conversa o que apareceu em cada passo.
 
+### 6.2 Conferir a mão a pasta que acompanha a renomeação (ticket 08)
+
+Esta parte também é só sua e depende da função publicada com o ticket 08 (`npx supabase functions deploy arquivos-no-drive --use-api`, com o vínculo de desenvolvimento conferido).
+
+1. Na plataforma, abra o processo inventado da prova (o que já tem pasta no Drive) e renomeie-o (por exemplo, acrescentando " renomeado" ao nome).
+2. Envie uma versão nova nesse processo.
+3. No **EP – desenvolvimento**, confira: a pasta do processo agora tem o nome novo (é a mesma pasta, não uma segunda); os arquivos enviados antes mantêm o nome antigo; os arquivos novos usam o nome novo.
+4. Opcional: troque a sigla do setor e envie outra versão (a pasta do setor deve ser renomeada); mude o processo para outro setor e envie outra versão (a pasta do processo deve ir para a pasta do novo setor, criada se faltar).
+5. Copie para a conversa o que apareceu em cada passo.
+
 ## 7. Depois da prova
 
 1. No **EP – desenvolvimento**, apague o arquivo de teste (o nome tem `_V99_`). As pastas do setor e do processo podem ficar.

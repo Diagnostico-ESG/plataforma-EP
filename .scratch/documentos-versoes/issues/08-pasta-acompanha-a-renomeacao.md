@@ -15,3 +15,9 @@
 - [ ] Sigla trocada: a pasta do setor é renomeada.
 - [ ] Processo trocado de setor: a pasta do processo é movida para a pasta do novo setor (criada se faltar).
 - [ ] Prova no projeto de desenvolvimento com um processo inventado renomeado.
+## Registro da execução (2026-10-16)
+
+- **Critério 1:** `decidirAjusteDaPasta` (`supabase/functions/_shared/pasta.ts`) decide entre nada, renomear e mover (ou os dois), testada em `pasta.test.ts`: nada, processo renomeado, sigla trocada, setor trocado, os dois ao mesmo tempo, subprocesso reclassificado e pasta sem pai informado.
+- **Critérios 2 a 4 (comportamento):** `acertarPasta` (`arquivos-no-drive/pastas.ts`) segue a decisão a cada `iniciar_envio`; a pasta do setor novo é garantida (criada se faltar) antes da pasta do processo. Os arquivos antigos não são tocados (a função não renomeia arquivo). O código que fala com o Drive não tem teste automático (Deno); a prova é a do critério 5.
+- **Critério 5 (prova no desenvolvimento): pendente, do usuário.** Publicar a função (`npx supabase functions deploy arquivos-no-drive --use-api`, vínculo conferido) e seguir o passo 6.2 de `docs/drive-conta-de-servico.md`.
+- **Sem a linha `Concluído em`**, até a prova do Drive (ver `desvios.md`). Sem `[visual]`: o ticket não mexe na tela.

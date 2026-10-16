@@ -89,3 +89,9 @@
 - **A marca reaproveita a pílula `bloco-da-versao-marca`** (a de "Relatório pendente"), com texto; só o aviso da conferência que falhou ganhou estilo novo (`secao-de-versoes-aviso`, texto discreto, sem cor nova).
 - **A função alterada não foi publicada** (`functions deploy` é do usuário, com o vínculo conferido). O `prova-do-drive.mjs` ganhou quatro passos de conferência (integrante, consulta, sem login e "depois da troca, segue ok") e o roteiro do usuário ganhou o passo 6.1 (alterar o arquivo à mão no Drive e ver as marcas). O critério 5 do ticket fica aberto, e o ticket não ganha a linha `Concluído em` agora (regra dos tickets 01 a 06).
 - **O ticket foi executado fora da ordem**: o `/executar-complexo` retomaria o ticket 01; o usuário pediu o 07 e que a branch parta de `documentos-versoes-01`. A `documentos-versoes-07` é juntada a ela, e não à `main`.
+## Ticket 08 (2026-10-16)
+
+- **O ajuste da pasta já existia desde o ticket 01** (`acertarPasta`, chamada por `garantirPasta` a cada `iniciar_envio` e `sem_alteracao`, achando a pasta pelo identificador de `pastas_no_drive`). O ticket 08 não escreveu o recurso: extraiu a decisão "nada, renomear, mover" para o arquivo puro `_shared/pasta.ts` (`decidirAjusteDaPasta`), testado em `pasta.test.ts` (7 casos, inclusive subprocesso), e fez `acertarPasta` obedecê-la.
+- **Mudança de comportamento mínima:** a chamada ao Drive só leva o `name` quando há renomeação (antes levava sempre, mesmo igual); mover continua usando `addParents` e `removeParents`.
+- **O critério 5 (prova) virou o passo manual 6.2 do roteiro**, e não passo do `prova-do-drive.mjs`: o script não renomeia dados do usuário. Os critérios 2 a 4 dependem dessa prova (e da função publicada).
+- **Sem a linha `Concluído em`** no ticket 08, até a prova do Drive (mesma regra dos tickets 01 a 07). Branch `documentos-versoes-08`, juntada à `documentos-versoes-01`, e não à `main`.

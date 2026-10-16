@@ -153,10 +153,10 @@ async function acertarPasta(token: string, driveId: string, nome: string, paiId:
 
 **Arquivos:** `docs/drive-conta-de-servico.md`, `desvios.md`, `issues/08-...md`.
 
-- [ ] Roteiro: acrescentar o passo **6.2** (depois do 6.1): na plataforma, renomear um processo inventado que já tenha pasta no Drive (o da prova); enviar uma nova versão; no **EP – desenvolvimento** conferir que a pasta do processo tem o nome novo, que os arquivos antigos mantêm o nome antigo e que o arquivo novo usa o nome novo; opcional: trocar a sigla do setor (a pasta do setor é renomeada) e mudar o processo de setor (a pasta vai para a pasta do novo setor, criada se faltar). Copiar o que apareceu para a conversa. Pré-requisito: função publicada com este ticket.
-- [ ] `desvios.md`: entrada datada (2026-10-16) dizendo que o ajuste da pasta já existia desde o ticket 01 e que este ticket só extraiu a decisão pura e a testou; e que o ticket 08 também fica sem `Concluído em` até a prova do Drive (mesma regra dos 01 a 07), se o usuário confirmar.
-- [ ] Registro de execução no fim do ticket 08 (critérios 1 a 4 feitos e testados na decisão; 5 pendente do usuário). Marcar as caixas dos critérios 1 a 4 só se a decisão pura cobrir (1) e a prova ainda não confirmou 2 a 4: deixá-las abertas com a nota.
-- [ ] Marcar o plano. `npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`. Commit: "Ticket 08 de documentos-versoes: roteiro da prova, desvios, registro do ticket e plano".
+- [x] Roteiro: acrescentar o passo **6.2** (depois do 6.1): na plataforma, renomear um processo inventado que já tenha pasta no Drive (o da prova); enviar uma nova versão; no **EP – desenvolvimento** conferir que a pasta do processo tem o nome novo, que os arquivos antigos mantêm o nome antigo e que o arquivo novo usa o nome novo; opcional: trocar a sigla do setor (a pasta do setor é renomeada) e mudar o processo de setor (a pasta vai para a pasta do novo setor, criada se faltar). Copiar o que apareceu para a conversa. Pré-requisito: função publicada com este ticket.
+- [x] `desvios.md`: entrada datada (2026-10-16) dizendo que o ajuste da pasta já existia desde o ticket 01 e que este ticket só extraiu a decisão pura e a testou; e que o ticket 08 também fica sem `Concluído em` até a prova do Drive (mesma regra dos 01 a 07), se o usuário confirmar.
+- [x] Registro de execução no fim do ticket 08 (critérios 1 a 4 feitos e testados na decisão; 5 pendente do usuário). Marcar as caixas dos critérios 1 a 4 só se a decisão pura cobrir (1) e a prova ainda não confirmou 2 a 4: deixá-las abertas com a nota.
+- [x] Marcar o plano. `npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`. Commit: "Ticket 08 de documentos-versoes: roteiro da prova, desvios, registro do ticket e plano".
 
 ## Self-review
 
