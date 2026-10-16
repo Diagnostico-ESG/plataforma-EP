@@ -346,3 +346,20 @@ Nenhuma migração destrutiva: tabelas, tipo, gatilhos, funções e políticas n
 - **Rede do escritório:** a migração vai pelo workflow "Migrar banco de desenvolvimento" e precisa ser registrada em `supabase/AMBIENTES.md` para o `migration repair` antes da primeira publicação em produção. A função também precisa entrar nos roteiros "Publicar no banco de produção" e "Backup e restauração" do `/ship` (o backup do banco não leva os arquivos; eles estão no Drive do CED).
 - **Privilégios padrão:** toda tabela nova em `public` reprova o teste `10_privilegios_padrao` até receber o seu `revoke`.
 - **Primeira Edge Function do projeto:** no primeiro uso, confirmar na documentação atual do Supabase como a função autentica o usuário e quais variáveis ele injeta (regra de `banco.md`); o pré-commit e o ESLint precisam alcançar o arquivo puro de decisão.
+
+## Como ficou construído (acertos do /ship, 2026-10-16)
+
+O que a implementação faz de diferente do texto acima, ou além dele. O porquê de cada ponto está em `desvios.md`.
+
+- **Número da versão:** o banco dá o número (gatilho `preparar_versao`); a tela manda o número da prévia e o registro recusa com `numero_da_versao_mudou` se o banco der outro, para o nome do arquivo no Drive nunca divergir.
+- **Seção Versões:** fica em Detalhes, depois de Reuniões e antes das ações do processo. Só o [Acrescentar relatório] fica na seção; o [Sem alteração de conteúdo] fica em cada versão com relatório pendente.
+- **Substituição:** "mesmo tipo" é mesmo papel e mesma extensão. A confirmação vem depois de escolher o arquivo. A substituição atualiza o mesmo arquivo do Drive (mesmo identificador); o nome fica. Substituir o relatório original de uma cópia "sem alteração" não muda a cópia (`copiado_de` e a marca seguem).
+- **Download:** só `.png` e `.pdf` abrem em aba nova; os demais formatos baixam direto, com o nome padrão. O servidor devolve sempre `application/octet-stream`.
+- **Função do servidor, conferências além das da spec:**
+  - o arquivo registrado precisa estar na pasta do processo (`arquivo_fora_da_pasta`), ter o rótulo da versão no nome (`_V<n>_` ou `_V<n>F_`; na substituição o nome fica) e ter ao menos 1 byte;
+  - o relatório depois só vale para versão do próprio processo;
+  - antes de baixar, substituir, conferir, copiar ou mover pelo `drive_id` guardado, a função confere que o item está debaixo da raiz do ambiente (`_shared/raiz.ts`), porque a conta de serviço enxerga mais que a pasta do ambiente e o `drive_id` é gravado pelo banco por quem escreve;
+  - a pasta do processo não é acertada (renomeada ou movida) numa substituição; a próxima versão nova a acerta.
+- **Banco:** `drive_id` só com letras, números, `_` e `-` (até 200), nas duas tabelas (migração `20261016200000_drive_id_com_formato`). Versão histórica é somente leitura depois da chamada que a cria. Cada arquivo que entra depois da versão gera um evento (`acrescentar_relatorio`, `sem_alteracao`, `substituir`).
+- **Recusas da tela:** arquivo vazio e `entrada_invalida` têm frase própria (antes viravam "erro inesperado").
+- **Provas pendentes:** a conferência visual das telas e a prova no Drive dos critérios 3 e 4 do ticket 08 (sigla trocada e mudança de setor) e da saída do Integrante dos tickets 01, 02, 04 e 05. A função corrigida nesta etapa ainda precisa ser publicada no desenvolvimento.
