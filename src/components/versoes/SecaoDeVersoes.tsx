@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { useCarregamento } from '../../hooks/useCarregamento'
+import { useConferenciaNoDrive } from '../../hooks/useConferenciaNoDrive'
 import type { ProcessoLido } from '../../processos/tipos'
 import type { ModoDoFormulario } from '../../versoes/formularioDeVersao'
 import { haVersaoNova, proximoNumero, versoesComRelatorioPendente } from '../../versoes/rotulos'
@@ -43,6 +44,7 @@ type Aberto = ModoDoFormulario | { tipo: 'relatorio' }
 
 function VersoesProntas({ versoes, processo, lidas, podeEnviar, aoAlterada }: VersoesProntasProps) {
   const [aberto, setAberto] = useState<Aberto | null>(null)
+  const conferencia = useConferenciaNoDrive(versoes, processo.id, lidas)
   const aposEnviar = () => {
     setAberto(null)
     aoAlterada()
@@ -53,7 +55,9 @@ function VersoesProntas({ versoes, processo, lidas, podeEnviar, aoAlterada }: Ve
         <FormularioAberto aberto={aberto} versoes={versoes} processo={processo} lidas={lidas} aoEnviada={aposEnviar}
           aoCancelar={() => setAberto(null)} />
       )}
-      <ListaDeVersoes modulo={versoes} processoId={processo.id} versoes={lidas} podeAlterar={podeEnviar} aoAlterada={aoAlterada} />
+      {conferencia.tipo === 'falhou' && <p className="secao-de-versoes-aviso" role="status">Não foi possível conferir os arquivos no Drive.</p>}
+      <ListaDeVersoes modulo={versoes} processoId={processo.id} versoes={lidas} podeAlterar={podeEnviar} aoAlterada={aoAlterada}
+        situacoes={conferencia.tipo === 'pronta' ? conferencia.situacoes : undefined} />
       {podeEnviar && !aberto && <BotoesDaSecao lidas={lidas} aoAbrir={setAberto} />}
     </>
   )

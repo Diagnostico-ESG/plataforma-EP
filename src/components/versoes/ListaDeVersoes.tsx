@@ -1,9 +1,10 @@
 import { formatarMomento } from '../../acesso/historico'
 import { origemDoRelatorio, podeCopiarRelatorio, relatorioPendente, rotuloDaAnterior, rotuloDaVersao } from '../../versoes/rotulos'
-import type { ModuloDeVersoes, Versao } from '../../versoes/tipos'
+import type { ConferenciaDosArquivos, ModuloDeVersoes, Versao } from '../../versoes/tipos'
 import { AcaoSemAlteracao } from './AcaoSemAlteracao'
 import { AcaoSubstituir } from './AcaoSubstituir'
 import { LinkDoArquivo } from './LinkDoArquivo'
+import { MarcaNoDrive } from './MarcaNoDrive'
 
 type ListaDeVersoesProps = {
   modulo: ModuloDeVersoes
@@ -12,6 +13,8 @@ type ListaDeVersoesProps = {
   /** Administrador ou Integrante, com o processo em andamento (quem recusa é a função do servidor e o banco). */
   podeAlterar: boolean
   aoAlterada: () => void
+  /** O que a conferência com o Drive achou de cada arquivo; sem ela (ainda não respondeu, ou falhou), sem marcas. */
+  situacoes?: ConferenciaDosArquivos
 }
 
 /** As versões, da mais recente para a mais antiga; cada uma é um bloco com o cabeçalho e os arquivos. */
@@ -26,7 +29,7 @@ export function ListaDeVersoes({ versoes, ...resto }: ListaDeVersoesProps) {
 
 type BlocoDaVersaoProps = Omit<ListaDeVersoesProps, 'versoes'> & { versao: Versao; versoes: Versao[] }
 
-function BlocoDaVersao({ modulo, processoId, versao, versoes, podeAlterar, aoAlterada }: BlocoDaVersaoProps) {
+function BlocoDaVersao({ modulo, processoId, versao, versoes, podeAlterar, aoAlterada, situacoes }: BlocoDaVersaoProps) {
   const rotulo = rotuloDaVersao(versao)
   const rotuloDaOrigem = rotuloDaAnterior(versao, versoes)
   return (
@@ -46,6 +49,7 @@ function BlocoDaVersao({ modulo, processoId, versao, versoes, podeAlterar, aoAlt
           return (
             <li key={arquivo.id}>
               <LinkDoArquivo versoes={modulo} arquivo={arquivo} />
+              <MarcaNoDrive situacao={situacoes?.[arquivo.id]} />
               {origem && <span className="bloco-da-versao-origem">{`Sem alteração de conteúdo · relatório da ${origem}`}</span>}
               {podeAlterar && !versao.historica && (
                 <AcaoSubstituir modulo={modulo} processoId={processoId} versao={versao} arquivo={arquivo} aoConcluir={aoAlterada} />
