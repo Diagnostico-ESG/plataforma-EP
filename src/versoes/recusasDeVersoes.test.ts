@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
-import { falhaDaFuncao } from './recusasDeVersoes'
+import { falhaDaFuncao, falhaDoDownload } from './recusasDeVersoes'
 
 test.each([
   ['sem_permissao', '', 'Seu perfil não permite enviar versões.'],
@@ -24,6 +24,24 @@ test.each([
 
 test('código desconhecido vira falha genérica com o código recebido', () => {
   const falha = falhaDaFuncao('erro_interno', 'Não foi possível concluir o pedido.')
+  expect(falha).not.toBeInstanceOf(TravaDoBanco)
+  expect(falha.message).toBe('erro inesperado do servidor (erro_interno)')
+})
+
+test.each([
+  ['sem_permissao', 'Você não pode baixar este arquivo.'],
+  ['usuario_inativo', 'Seu usuário está desativado; não é possível baixar arquivos.'],
+  ['sem_login', 'Sua sessão terminou. Entre de novo para baixar o arquivo.'],
+  ['nao_encontrado_no_drive', 'O arquivo não foi encontrado no Drive. Avise o administrador.'],
+  ['drive_indisponivel', 'Não foi possível falar com o Drive. Tente de novo em instantes.'],
+])('no download, o código %s vira a frase da tela', (codigo, frase) => {
+  const falha = falhaDoDownload(codigo)
+  expect(falha).toBeInstanceOf(TravaDoBanco)
+  expect(falha.message).toBe(frase)
+})
+
+test('no download, código desconhecido vira falha genérica com o código recebido', () => {
+  const falha = falhaDoDownload('erro_interno')
   expect(falha).not.toBeInstanceOf(TravaDoBanco)
   expect(falha.message).toBe('erro inesperado do servidor (erro_interno)')
 })

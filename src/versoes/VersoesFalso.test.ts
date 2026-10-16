@@ -56,3 +56,21 @@ test('a leitura com falha programada é recusada', async () => {
   versoes.falharLeitura = true
   await expect(versoes.listarVersoes('p1')).rejects.toThrow('falha de conexão simulada')
 })
+
+const ARQUIVO = { id: 'a1', papel: 'png', nome: 'TSA_V1_Emitir Ofício.png', formato: 'png', tamanho: 3 } as const
+
+test('o download devolve um arquivo com o tipo do formato e guarda o pedido', async () => {
+  const versoes = falso()
+  const arquivo = await versoes.baixarArquivo(ARQUIVO)
+  expect(arquivo.type).toBe('image/png')
+  expect(versoes.baixados).toEqual(['a1'])
+})
+
+test('a falha programada no download chega como foi programada', async () => {
+  const versoes = falso()
+  versoes.falharNoDownload = new TravaDoBanco('O arquivo não foi encontrado no Drive. Avise o administrador.')
+  await expect(versoes.baixarArquivo(ARQUIVO)).rejects.toBeInstanceOf(TravaDoBanco)
+  versoes.falharNoDownload = true
+  await expect(versoes.baixarArquivo(ARQUIVO)).rejects.toThrow('falha de conexão simulada')
+  expect(versoes.baixados).toEqual([])
+})

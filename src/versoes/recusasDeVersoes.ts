@@ -27,3 +27,18 @@ export function falhaDaFuncao(codigo: string, mensagem: string): Error {
   if (frase) return new TravaDoBanco(frase(mensagem))
   return new Error(`erro inesperado do servidor (${codigo})`)
 }
+
+const FRASE_DO_DOWNLOAD: Record<string, string> = {
+  sem_permissao: 'Você não pode baixar este arquivo.',
+  usuario_inativo: 'Seu usuário está desativado; não é possível baixar arquivos.',
+  sem_login: 'Sua sessão terminou. Entre de novo para baixar o arquivo.',
+  nao_encontrado_no_drive: 'O arquivo não foi encontrado no Drive. Avise o administrador.',
+  drive_indisponivel: 'Não foi possível falar com o Drive. Tente de novo em instantes.',
+}
+
+/** A recusa da função ao baixar, com a frase pronta da tela; código desconhecido vira falha genérica. */
+export function falhaDoDownload(codigo: string): Error {
+  const frase = FRASE_DO_DOWNLOAD[codigo]
+  if (frase) return new TravaDoBanco(frase)
+  return new Error(`erro inesperado do servidor (${codigo})`)
+}

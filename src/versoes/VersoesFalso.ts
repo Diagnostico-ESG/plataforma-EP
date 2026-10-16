@@ -1,4 +1,5 @@
 import { extensaoDoNome } from '../../supabase/functions/_shared/decisao.ts'
+import { tipoMimeDaExtensao } from '../../supabase/functions/_shared/drive.ts'
 import { nomePadrao } from '../../supabase/functions/_shared/nomePadrao.ts'
 import type { EventoDoCadastro } from '../cadastros/tipos'
 import { ordenarVersoes, proximoNumero, rotuloDaVersao } from './rotulos'
@@ -21,6 +22,10 @@ export class VersoesFalso implements ModuloDeVersoes {
   segurarDepoisDe: number | null = null
   /** Texto: motivo em português (falha genérica). Error: a recusa pronta (TravaDoBanco), como o módulo real. */
   falhaNoRegistro: string | Error | null = null
+  /** Verdadeiro: o download falha por conexão; Error: a falha pronta (TravaDoBanco), como o módulo real. */
+  falharNoDownload: boolean | Error = false
+  /** Os ids dos arquivos baixados, na ordem. */
+  baixados: string[] = []
   /** Os envios que chegaram ao registro, na ordem. */
   envios: PedidoDeVersao[] = []
   /** Chamado com o evento de cada versão registrada (o histórico do processo fica no falso de processos). */
@@ -41,6 +46,13 @@ export class VersoesFalso implements ModuloDeVersoes {
     }
     this.falharNoRegistroSeConfigurado()
     this.registrar(pedido)
+  }
+
+  async baixarArquivo(arquivo: ArquivoDaVersao): Promise<Blob> {
+    if (this.falharNoDownload instanceof Error) throw this.falharNoDownload
+    if (this.falharNoDownload) throw new Error('falha de conexão simulada')
+    this.baixados.push(arquivo.id)
+    return new Blob([`conteúdo de ${arquivo.nome}`], { type: tipoMimeDaExtensao(arquivo.formato) })
   }
 
   private falharNoRegistroSeConfigurado(): void {

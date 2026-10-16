@@ -43,4 +43,6 @@ export type ModuloDeVersoes = {
    * chegaram. Se algo falhar, nada é registrado.
    */
   enviarVersao(pedido: PedidoDeVersao, aoProgredir: (enviados: number, total: number) => void): Promise<void>
+  /** Os bytes do arquivo, com o tipo do formato (o navegador o mostra se souber). Qualquer perfil ativo pode. */
+  baixarArquivo(arquivo: ArquivoDaVersao): Promise<Blob>
 }

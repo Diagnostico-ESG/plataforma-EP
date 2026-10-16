@@ -40,10 +40,10 @@
 
 ### Task 2: Módulo de versões — `baixarArquivo` (critérios 4 e 5, parte do módulo)
 
-- [ ] Testes: `recusasDeVersoes.test.ts` (frases do download: inativo, sem login, sem permissão, não encontrado no Drive, Drive indisponível, desconhecido); `versoesSupabase.test.ts` (chama a função com `{ acao: 'baixar', arquivo_id }`; devolve `Blob` com o tipo do formato e os bytes intactos, lidos como arquivo; recusa vira `TravaDoBanco` com a frase do download; resposta que não é `Blob` vira erro com o recebido); `VersoesFalso.test.ts` (devolve Blob com o nome no conteúdo, registra o arquivo pedido, falha programada).
-- [ ] `tipos.ts`: `baixarArquivo(arquivo: ArquivoDaVersao): Promise<Blob>` em `ModuloDeVersoes`.
-- [ ] `recusasDeVersoes.ts`: `falhaDoDownload(codigo, mensagem)`. `versoesSupabase.ts`: `chamarFuncao` aceita o tradutor de falha; `baixarArquivo`. `VersoesFalso.ts`: `baixados: string[]`, `falharNoDownload: boolean | Error`.
-- [ ] Comitar.
+- [x] Testes: `recusasDeVersoes.test.ts` (frases do download: inativo, sem login, sem permissão, não encontrado no Drive, Drive indisponível, desconhecido); `versoesSupabase.test.ts` (chama a função com `{ acao: 'baixar', arquivo_id }`; devolve `Blob` com o tipo do formato e os bytes intactos, lidos como arquivo; recusa vira `TravaDoBanco` com a frase do download; resposta que não é `Blob` vira erro com o recebido); `VersoesFalso.test.ts` (devolve Blob com o nome no conteúdo, registra o arquivo pedido, falha programada).
+- [x] `tipos.ts`: `baixarArquivo(arquivo: ArquivoDaVersao): Promise<Blob>` em `ModuloDeVersoes`.
+- [x] `recusasDeVersoes.ts`: `falhaDoDownload(codigo, mensagem)`. `versoesSupabase.ts`: `chamarFuncao` aceita o tradutor de falha; `baixarArquivo`. `VersoesFalso.ts`: `baixados: string[]`, `falharNoDownload: boolean | Error`.
+- [x] Comitar.
 
 ### Task 3: Abrir ou baixar no navegador (critério 3)
 

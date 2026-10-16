@@ -113,3 +113,36 @@ test('falha sem resposta da função (sem conexão) vira erro com o motivo', asy
   cliente.respostasDaFuncao['funcao.iniciar_envio'] = { data: null, error: { message: 'Failed to send a request to the Edge Function' } }
   await expect(criar(cliente).enviarVersao(PEDIDO, () => {})).rejects.toThrow('não foi possível falar com o servidor (sem conexão?)')
 })
+
+const ARQUIVO_PNG = { id: 'a2', papel: 'png', nome: 'TSA_V3_Emitir Ofício.png', formato: 'png', tamanho: 4 } as const
+
+test('baixa o arquivo pela função e devolve os bytes intactos, com o tipo do formato', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  const bytes = new Uint8Array([0x89, 0x50, 0xff, 0x00])
+  cliente.respostasDaFuncao['funcao.baixar'] = { data: new Blob([bytes], { type: 'application/octet-stream' }), error: null }
+  const arquivo = await criar(cliente).baixarArquivo(ARQUIVO_PNG)
+  expect(cliente.chamadasDaFuncao).toEqual([{ acao: 'baixar', arquivo_id: 'a2' }])
+  expect(arquivo.type).toBe('image/png')
+  expect(new Uint8Array(await arquivo.arrayBuffer())).toEqual(bytes)
+})
+
+test('a recusa da função no download vira a frase do download', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostasDaFuncao['funcao.baixar'] = recusa('nao_encontrado_no_drive', 'Arquivo não encontrado no Drive.', 404)
+  const falha = await criar(cliente).baixarArquivo(ARQUIVO_PNG).catch((erro: unknown) => erro)
+  expect(falha).toBeInstanceOf(TravaDoBanco)
+  expect((falha as Error).message).toBe('O arquivo não foi encontrado no Drive. Avise o administrador.')
+})
+
+test('download sem resposta da função (sem conexão) vira erro com o motivo', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostasDaFuncao['funcao.baixar'] = { data: null, error: { message: 'Failed to send a request to the Edge Function' } }
+  await expect(criar(cliente).baixarArquivo(ARQUIVO_PNG)).rejects.toThrow('não foi possível falar com o servidor (sem conexão?)')
+})
+
+test('resposta que não são bytes (texto) vira erro com o recebido e o esperado', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostasDaFuncao['funcao.baixar'] = { data: 'texto', error: null }
+  await expect(criar(cliente).baixarArquivo(ARQUIVO_PNG))
+    .rejects.toThrow('a função devolveu string; esperado: os bytes do arquivo (Blob)')
+})

@@ -1,8 +1,8 @@
 import { tipoMimeDaExtensao } from '../../supabase/functions/_shared/drive.ts'
 import { extensaoDoNome } from '../../supabase/functions/_shared/decisao.ts'
 import type { ClienteSupabase } from '../lib/supabase'
-import { falhaDaFuncao } from './recusasDeVersoes'
-import type { ArquivoEscolhido, ModuloDeVersoes, PedidoDeVersao, Versao } from './tipos'
+import { falhaDaFuncao, falhaDoDownload } from './recusasDeVersoes'
+import type { ArquivoDaVersao, ArquivoEscolhido, ModuloDeVersoes, PedidoDeVersao, Versao } from './tipos'
 import { COLUNAS_DA_VERSAO, type LinhaDaVersao, versaoDaLinha } from './versaoDaLinha'
 
 /** O PUT dos bytes ao endereço da sessão de envio do Drive; injetável para o teste simular o Google. */
@@ -16,6 +16,7 @@ export function criarVersoesSupabase(cliente: ClienteSupabase, enviarBytes: Envi
   return {
     listarVersoes: (processoId) => listarVersoes(cliente, processoId),
     enviarVersao: (pedido, aoProgredir) => enviarVersao(cliente, enviarBytes, pedido, aoProgredir),
+    baixarArquivo: (arquivo) => baixarArquivo(cliente, arquivo),
   }
 }
 
@@ -27,19 +28,21 @@ async function listarVersoes(cliente: ClienteSupabase, processoId: string): Prom
 }
 
 type FalhaDaChamada = { message: string; context?: unknown }
+type TradutorDeFalha = (codigo: string, mensagem: string) => Error
 
 // Na resposta fora de 2xx, o supabase-js põe a Response em `context`; sem ela, o pedido nem chegou à função.
-async function falhaDaChamada(erro: FalhaDaChamada): Promise<Error> {
+async function falhaDaChamada(erro: FalhaDaChamada, traduzir: TradutorDeFalha): Promise<Error> {
   const resposta = erro.context instanceof Response ? erro.context : null
   const corpo: unknown = resposta ? await resposta.json().catch(() => null) : null
   const { codigo, mensagem } = (corpo ?? {}) as { codigo?: unknown; mensagem?: unknown }
-  if (typeof codigo === 'string') return falhaDaFuncao(codigo, typeof mensagem === 'string' ? mensagem : '')
+  if (typeof codigo === 'string') return traduzir(codigo, typeof mensagem === 'string' ? mensagem : '')
   return new Error('não foi possível falar com o servidor (sem conexão?)')
 }
 
-async function chamarFuncao<T>(cliente: ClienteSupabase, corpo: Record<string, unknown>): Promise<T> {
+async function chamarFuncao<T>(cliente: ClienteSupabase, corpo: Record<string, unknown>,
+  traduzir: TradutorDeFalha = falhaDaFuncao): Promise<T> {
   const { data, error } = await cliente.functions.invoke('arquivos-no-drive', { body: corpo })
-  if (error) throw await falhaDaChamada(error as FalhaDaChamada)
+  if (error) throw await falhaDaChamada(error as FalhaDaChamada, traduzir)
   return data as T
 }
 
@@ -67,4 +70,12 @@ async function enviarVersao(cliente: ClienteSupabase, enviarBytes: EnviarBytes, 
     acao: 'registrar', processo_id: pedido.processoId, numero: pedido.numero, observacao: pedido.observacao,
     arquivos: pedido.arquivos.map(({ papel }, posicao) => ({ papel, drive_id: ids[posicao] })),
   })
+}
+
+// A função devolve application/octet-stream (o supabase-js só entrega Blob para esse tipo); o tipo do formato é
+// recolocado aqui para o navegador saber mostrar o .png e o .pdf.
+async function baixarArquivo(cliente: ClienteSupabase, arquivo: ArquivoDaVersao): Promise<Blob> {
+  const dados = await chamarFuncao<unknown>(cliente, { acao: 'baixar', arquivo_id: arquivo.id }, falhaDoDownload)
+  if (!(dados instanceof Blob)) throw new Error(`a função devolveu ${typeof dados}; esperado: os bytes do arquivo (Blob)`)
+  return new Blob([dados], { type: tipoMimeDaExtensao(arquivo.formato) })
 }
