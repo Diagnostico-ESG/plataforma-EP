@@ -61,6 +61,8 @@ const PNG = Uint8Array.from(
   (letra) => letra.charCodeAt(0),
 )
 
+const ARQUIVO_INEXISTENTE = '00000000-0000-0000-0000-00000000dead'
+
 function pedidoDeEnvio(processoId, numero = 1, papel = 'bpmn', bytes = CONTEUDO) {
   return { acao: 'iniciar_envio', processo_id: processoId, papel, nome_original: `prova.${papel}`, tamanho: bytes.length, numero, historica: false }
 }
@@ -95,6 +97,12 @@ async function registrarVersao(config, integrante, processoId, numero, ids) {
   relatar('integrante registra a versão', data?.length === 1, `V${numero}`)
 }
 
+// O download pede o id do arquivo da versão (a linha que a RLS mostra), não o do Drive.
+async function arquivoDoDrive(cliente, driveId) {
+  const { data } = await cliente.from('arquivos_da_versao').select('id').eq('drive_id', driveId).maybeSingle()
+  return data?.id ?? null
+}
+
 async function enviarComoIntegrante(config, integrante) {
   const processoId = await escolherProcesso(integrante.cliente)
   const numero = await proximoNumero(integrante.cliente, processoId)
@@ -103,11 +111,13 @@ async function enviarComoIntegrante(config, integrante) {
   const png = await enviarUmArquivo(config, integrante.token, pedidoDeEnvio(processoId, numero, 'png', PNG), PNG, 'image/png')
   if (!png) return null
   await registrarVersao(config, integrante, processoId, numero, [bpmn, png])
-  return { processoId, driveId: bpmn }
+  const arquivoId = await arquivoDoDrive(integrante.cliente, bpmn)
+  if (!arquivoId) return relatar('arquivo registrado visível ao integrante', false, 'sem linha em arquivos_da_versao')
+  return { processoId, arquivoId }
 }
 
-async function conferirDownload(config, token, driveId, passo) {
-  const resposta = await chamarFuncao(config, token, { acao: 'baixar', drive_id: driveId })
+async function conferirDownload(config, token, arquivoId, passo) {
+  const resposta = await chamarFuncao(config, token, { acao: 'baixar', arquivo_id: arquivoId })
   if (resposta.status !== 200) return relatar(passo, false, await codigoDe(resposta))
   const bytes = new Uint8Array(await resposta.arrayBuffer())
   const iguais = bytes.length === CONTEUDO.length && bytes.every((byte, i) => byte === CONTEUDO[i])
@@ -125,12 +135,13 @@ async function provar() {
   const integrante = await entrar(config, leitor, 'Integrante')
   const enviado = await enviarComoIntegrante(config, integrante)
   if (!enviado) return leitor.close()
-  await conferirDownload(config, integrante.token, enviado.driveId, 'integrante baixa o arquivo de volta')
+  await conferirDownload(config, integrante.token, enviado.arquivoId, 'integrante baixa o arquivo de volta')
   const consulta = await entrar(config, leitor, 'Consulta')
   leitor.close()
   await esperarRecusa(await chamarFuncao(config, consulta.token, pedidoDeEnvio(enviado.processoId)), 'consulta é recusada no envio', '403 sem_permissao')
-  await conferirDownload(config, consulta.token, enviado.driveId, 'consulta baixa o arquivo')
-  await esperarRecusa(await chamarFuncao(config, null, { acao: 'baixar', drive_id: enviado.driveId }), 'sem login é recusado', '401 sem_login')
+  await conferirDownload(config, consulta.token, enviado.arquivoId, 'consulta baixa o arquivo enviado pelo integrante')
+  await esperarRecusa(await chamarFuncao(config, consulta.token, { acao: 'baixar', arquivo_id: ARQUIVO_INEXISTENTE }), 'arquivo que não existe é recusado', '403 sem_permissao')
+  await esperarRecusa(await chamarFuncao(config, null, { acao: 'baixar', arquivo_id: enviado.arquivoId }), 'sem login é recusado', '401 sem_login')
 }
 
 provar().catch((erro) => {

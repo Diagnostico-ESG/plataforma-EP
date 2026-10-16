@@ -59,6 +59,6 @@
 
 ### Task 5: Prova, registros e fecho (critério 6)
 
-- [ ] `scripts/prova-do-drive.mjs`: depois do `registrar`, a Consulta inventada chama `baixar` com o `arquivo_id` e confere os bytes. A prova real depende do roteiro do usuário e fica pendente, como a do ticket 01.
-- [ ] Rodar `npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`.
-- [ ] Registro no ticket 03, `desvios.md`, itens não testados em `.scratch/melhorias-protocolo.md` (os de `.claude/regras/nao-testados.md` que aconteceram), comitar. **Sem a linha `Concluído em`** enquanto a prova do Drive não for feita (mesma regra dos tickets 01 e 02, decisão do usuário em 2026-10-15).
+- [x] `scripts/prova-do-drive.mjs`: depois do `registrar`, a Consulta inventada chama `baixar` com o `arquivo_id` e confere os bytes. A prova real depende do roteiro do usuário e fica pendente, como a do ticket 01.
+- [x] Rodar `npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`.
+- [x] Registro no ticket 03, `desvios.md`, itens não testados em `.scratch/melhorias-protocolo.md` (os de `.claude/regras/nao-testados.md` que aconteceram), comitar. **Sem a linha `Concluído em`** enquanto a prova do Drive não for feita (mesma regra dos tickets 01 e 02, decisão do usuário em 2026-10-15).

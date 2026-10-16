@@ -16,3 +16,10 @@
 - [ ] Falha no download (sem conexão, arquivo apagado no Drive) fecha a aba aberta e mostra mensagem em vermelho.
 - [ ] Testes do módulo real com `fetch` simulado (bytes lidos como arquivo, não como texto) e testes de interface com a falsa: link para cada perfil, sucesso e falha.
 - [ ] Prova no projeto de desenvolvimento: a Consulta inventada baixa um arquivo enviado pelo Integrante inventado.
+
+## Registro da execução (2026-10-15)
+
+- **Critério 1 (função):** `validarBaixar` passou a exigir `arquivo_id` (uuid) e a ação lê `arquivos_da_versao` com o login de quem chamou; inativo e sem login já eram recusados pelo `conferirChamador`. Coberto no Vitest (`decisao.test.ts`: perfis, inativo, sem login e entradas inválidas). A ação em si (Deno) só se prova de ponta a ponta.
+- **Critérios 2 a 4 (tela):** `src/App.baixarArquivo.test.tsx`, com o aplicativo inteiro e a `VersoesFalso`: link para Administrador, Integrante e Consulta, também com o processo suspenso, cancelado ou concluído; .png e .pdf abrem a aba, .bpmn baixa com o nome padrão, aba bloqueada cai no download, falha fecha a aba e mostra o aviso em vermelho. A entrega fica em `src/versoes/abrirOuBaixar.ts` (testada à parte).
+- **Critério 5 (módulo real):** `src/versoes/versoesSupabase.test.ts`: os bytes voltam intactos como `Blob` com o tipo do formato, recusa vira frase, sem resposta vira "sem conexão" e resposta em texto vira erro.
+- **Critério 6 (prova no desenvolvimento): pendente.** Depende de publicar a função e do roteiro do usuário (`docs/drive-conta-de-servico.md`). O `scripts/prova-do-drive.mjs` já faz o passo: a Consulta inventada baixa o arquivo enviado pelo Integrante inventado e confere os bytes.
