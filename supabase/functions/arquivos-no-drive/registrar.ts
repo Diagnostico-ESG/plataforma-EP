@@ -4,6 +4,7 @@
 import { conferirProcessoEmAndamento, recusar } from '../_shared/decisao.ts'
 import {
   conferirArquivosNoDrive,
+  funcaoDoBancoPara,
   recusaDoBanco,
   statusDaRecusaDoBanco,
   type ArquivoNoDrive,
@@ -34,7 +35,7 @@ async function lerArquivoNoDrive(token: string, driveId: string): Promise<Arquiv
 }
 
 async function gravar(contexto: ContextoDoDrive, entrada: EntradaRegistrar, arquivos: unknown[]): Promise<Response> {
-  const { data, error } = await contexto.cliente.rpc('registrar_versao', {
+  const { data, error } = await contexto.cliente.rpc(funcaoDoBancoPara(entrada), {
     p_processo: entrada.processoId,
     p_numero: entrada.numero,
     p_observacao: entrada.observacao,
@@ -42,7 +43,7 @@ async function gravar(contexto: ContextoDoDrive, entrada: EntradaRegistrar, arqu
   })
   if (!error) return responderJson(200, { versao_id: data })
   const recusa = recusaDoBanco(error)
-  if (!recusa) throw new Error(`registrar_versao falhou (código ${error.code}); esperado: gravação ou recusa do banco`)
+  if (!recusa) throw new Error(`${funcaoDoBancoPara(entrada)} falhou (código ${error.code}); esperado: gravação ou recusa do banco`)
   return responderJson(statusDaRecusaDoBanco(recusa), recusa)
 }
 

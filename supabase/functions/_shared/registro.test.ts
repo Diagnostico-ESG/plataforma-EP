@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { LIMITE_DE_TAMANHO } from './decisao.ts'
 import {
   conferirArquivosNoDrive,
+  funcaoDoBancoPara,
   recusaDoBanco,
   statusDaRecusaDoBanco,
   validarRegistrar,
@@ -36,6 +37,7 @@ describe('validarRegistrar', () => {
         processoId: PROCESSO,
         numero: 3,
         observacao: 'Corrigido o fluxo',
+        historica: false,
         arquivos: [{ papel: 'bpmn', driveId: 'id-bpmn' }, { papel: 'png', driveId: 'id-png' }],
       },
     })
@@ -46,6 +48,27 @@ describe('validarRegistrar', () => {
     expect(semObservacao.ok && semObservacao.valor.observacao).toBeNull()
     const nula = validarRegistrar(entrada({ observacao: null }))
     expect(nula.ok && nula.valor.observacao).toBeNull()
+  })
+
+  it('historica ausente vale falso; true e false são lidos como vieram', () => {
+    const ausente = validarRegistrar(entrada())
+    expect(ausente.ok && ausente.valor.historica).toBe(false)
+    const verdadeira = validarRegistrar(entrada({ historica: true }))
+    expect(verdadeira.ok && verdadeira.valor.historica).toBe(true)
+    const falsa = validarRegistrar(entrada({ historica: false }))
+    expect(falsa.ok && falsa.valor.historica).toBe(false)
+  })
+
+  it.each([
+    ['texto', 'sim'],
+    ['número', 1],
+    ['nulo', null],
+  ])('historica %s é recusada como entrada inválida, citando o tipo recebido', (_nome, valor) => {
+    const resultado = validarRegistrar(entrada({ historica: valor }))
+    expect(resultado.ok).toBe(false)
+    if (resultado.ok) return
+    expect(resultado.recusa.codigo).toBe('entrada_invalida')
+    expect(resultado.recusa.mensagem).toContain('campo historica: esperado booleano')
   })
 
   it.each([
@@ -128,7 +151,24 @@ describe('conferirArquivosNoDrive', () => {
   })
 })
 
+describe('funcaoDoBancoPara', () => {
+  it('a versão nova grava por registrar_versao e a histórica, por registrar_versao_historica', () => {
+    expect(funcaoDoBancoPara({ historica: false })).toBe('registrar_versao')
+    expect(funcaoDoBancoPara({ historica: true })).toBe('registrar_versao_historica')
+  })
+})
+
 describe('recusaDoBanco', () => {
+  it.each([
+    ['historica_depois_de_versao_nova', 'historica_depois_de_versao_nova', ''],
+    ['numero_historico_repetido:5', 'numero_historico_repetido', '5'],
+    ['historica_sem_arquivo_de_fluxograma', 'historica_sem_arquivo_de_fluxograma', ''],
+  ])('a recusa %s do banco chega com o motivo como código e o valor como mensagem (409)', (texto, codigo, valor) => {
+    const recusa = recusaDoBanco({ code: 'P0001', message: texto })
+    expect(recusa).toEqual({ codigo, mensagem: valor })
+    expect(statusDaRecusaDoBanco(recusa as { codigo: string; mensagem: string })).toBe(409)
+  })
+
   it('a recusa "motivo:valor" do banco vira código e valor', () => {
     expect(recusaDoBanco({ code: 'P0001', message: 'numero_da_versao_mudou:4' })).toEqual({
       codigo: 'numero_da_versao_mudou',

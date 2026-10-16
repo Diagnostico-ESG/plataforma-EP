@@ -10,6 +10,7 @@ import {
   eCorpo,
   extensaoDoNome,
   falhar,
+  lerBooleano,
   lerInteiroPositivo,
   lerPapel,
   lerTexto,
@@ -28,6 +29,8 @@ export interface EntradaRegistrar {
   processoId: string
   numero: number
   observacao: string | null
+  /** Versão da primeira etapa do trabalho (V5F): o número é o digitado, não o que o banco daria. */
+  historica: boolean
   arquivos: ArquivoPedido[]
 }
 /** O que o Drive devolve de um arquivo (`fields=id,name,size,md5Checksum,parents`). */
@@ -65,6 +68,11 @@ function lerObservacao(corpo: Corpo): Validacao<string | null> {
   return { ok: true, valor }
 }
 
+// Quem não manda `historica` registra uma versão nova (o pedido do ticket 02).
+function lerHistorica(corpo: Corpo): Validacao<boolean> {
+  return corpo.historica === undefined ? { ok: true, valor: false } : lerBooleano(corpo, 'historica')
+}
+
 function lerArquivoPedido(item: unknown): Validacao<ArquivoPedido> {
   if (!eCorpo(item)) return falhar('entrada_invalida', `item de arquivos: esperado objeto, recebido ${tipoDe(item)}`)
   const papel = lerPapel(item)
@@ -98,10 +106,17 @@ export function validarRegistrar(corpo: unknown): Validacao<EntradaRegistrar> {
   if (!numero.ok) return numero
   const observacao = lerObservacao(corpo)
   if (!observacao.ok) return observacao
+  const historica = lerHistorica(corpo)
+  if (!historica.ok) return historica
   const arquivos = lerArquivosPedidos(corpo)
   if (!arquivos.ok) return arquivos
   const valor = { processoId: processoId.valor, numero: numero.valor, observacao: observacao.valor }
-  return { ok: true, valor: { ...valor, arquivos: arquivos.valor } }
+  return { ok: true, valor: { ...valor, historica: historica.valor, arquivos: arquivos.valor } }
+}
+
+/** A função do banco que grava a versão: a histórica tem as regras próprias dela (migração versoes_historicas). */
+export function funcaoDoBancoPara({ historica }: Pick<EntradaRegistrar, 'historica'>): 'registrar_versao' | 'registrar_versao_historica' {
+  return historica ? 'registrar_versao_historica' : 'registrar_versao'
 }
 
 // O formato vem do nome que a função deu ao arquivo no Drive; o tamanho e o MD5, do próprio Drive.

@@ -63,8 +63,8 @@ const PNG = Uint8Array.from(
 
 const ARQUIVO_INEXISTENTE = '00000000-0000-0000-0000-00000000dead'
 
-function pedidoDeEnvio(processoId, numero = 1, papel = 'bpmn', bytes = CONTEUDO) {
-  return { acao: 'iniciar_envio', processo_id: processoId, papel, nome_original: `prova.${papel}`, tamanho: bytes.length, numero, historica: false }
+function pedidoDeEnvio(processoId, numero = 1, papel = 'bpmn', bytes = CONTEUDO, historica = false) {
+  return { acao: 'iniciar_envio', processo_id: processoId, papel, nome_original: `prova.${papel}`, tamanho: bytes.length, numero, historica }
 }
 
 // O número que a versão vai receber: o maior do processo + 1, como a tela calcula na prévia.
@@ -116,6 +116,28 @@ async function enviarComoIntegrante(config, integrante) {
   return { processoId, arquivoId }
 }
 
+// Só o processo em andamento sem versão nova aceita versão histórica (regra do banco).
+async function escolherProcessoSemVersaoNova(cliente) {
+  const { data: novas } = await cliente.from('versoes').select('processo_id').eq('historica', false)
+  const { data } = await cliente.from('processos_com_andamento').select('id').eq('situacao', 'em_andamento')
+  const comNova = new Set((novas ?? []).map((versao) => versao.processo_id))
+  return (data ?? []).find((processo) => !comNova.has(processo.id))?.id ?? null
+}
+
+// A V{n}F só com o .bpm (basta o .bpm, história 16): o nome volta com o F e a versão aparece com historica verdadeiro.
+async function registrarHistorica(config, integrante) {
+  const processoId = await escolherProcessoSemVersaoNova(integrante.cliente)
+  if (!processoId) return relatar('integrante registra a versão histórica', true, 'passo pulado: todo processo em andamento já tem versão nova')
+  const numero = await proximoNumero(integrante.cliente, processoId)
+  const bpm = await enviarUmArquivo(config, integrante.token, pedidoDeEnvio(processoId, numero, 'bpm', CONTEUDO, true), CONTEUDO, 'application/octet-stream')
+  if (!bpm) return null
+  const corpo = { acao: 'registrar', processo_id: processoId, numero, historica: true, observacao: null, arquivos: [{ papel: 'bpm', drive_id: bpm }] }
+  const resposta = await chamarFuncao(config, integrante.token, corpo)
+  if (resposta.status !== 200) return relatar('integrante registra a versão histórica', false, await codigoDe(resposta))
+  const { data } = await integrante.cliente.from('versoes').select('numero').eq('processo_id', processoId).eq('numero', numero).eq('historica', true)
+  relatar('integrante registra a versão histórica', data?.length === 1, `V${numero}F`)
+}
+
 async function conferirDownload(config, token, arquivoId, passo) {
   const resposta = await chamarFuncao(config, token, { acao: 'baixar', arquivo_id: arquivoId })
   if (resposta.status !== 200) return relatar(passo, false, await codigoDe(resposta))
@@ -136,6 +158,7 @@ async function provar() {
   const enviado = await enviarComoIntegrante(config, integrante)
   if (!enviado) return leitor.close()
   await conferirDownload(config, integrante.token, enviado.arquivoId, 'integrante baixa o arquivo de volta')
+  await registrarHistorica(config, integrante)
   const consulta = await entrar(config, leitor, 'Consulta')
   leitor.close()
   await esperarRecusa(await chamarFuncao(config, consulta.token, pedidoDeEnvio(enviado.processoId)), 'consulta é recusada no envio', '403 sem_permissao')

@@ -136,7 +136,7 @@ export function lerInteiroPositivo(corpo: Corpo, campo: string): Validacao<numbe
   return { ok: true, valor }
 }
 
-function lerBooleano(corpo: Corpo, campo: string): Validacao<boolean> {
+export function lerBooleano(corpo: Corpo, campo: string): Validacao<boolean> {
   const valor = corpo[campo]
   if (typeof valor !== 'boolean') return campoInvalido(corpo, campo, 'booleano')
   return { ok: true, valor }
