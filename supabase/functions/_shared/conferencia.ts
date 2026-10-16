@@ -4,8 +4,9 @@ import { FORMATO_UUID, eCorpo, falhar, lerTexto, tipoDe, type Validacao } from '
 
 export type SituacaoNoDrive = 'ok' | 'alterado' | 'nao_encontrado'
 
-/** O que o Drive informa do arquivo (`fields=id,md5Checksum,trashed`). */
+/** O que o Drive informa do arquivo (`fields=id,md5Checksum,trashed,parents`). */
 export interface LidoNoDrive {
+  parents?: string[]
   md5Checksum?: string
   trashed?: boolean
 }

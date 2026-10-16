@@ -11,7 +11,9 @@ import { tipoMimeDaExtensao } from '../_shared/drive.ts'
 import { nomePadrao } from '../_shared/nomePadrao.ts'
 import { conferirAlvoDoEnvio, type AlvoDaSubstituicao } from '../_shared/substituicao.ts'
 import { chamarDrive } from './google.ts'
-import { API_DE_ARQUIVOS, garantirPastaDoProcesso, type ContextoDoDrive, type ProcessoDaPasta } from './pastas.ts'
+import {
+  API_DE_ARQUIVOS, conferidorDaRaiz, garantirPastaDoProcesso, type ContextoDoDrive, type ProcessoDaPasta,
+} from './pastas.ts'
 import { responderJson, responderRecusa } from './respostas.ts'
 
 const API_DE_ENVIO = 'https://www.googleapis.com/upload/drive/v3/files'
@@ -40,7 +42,7 @@ interface PedidoDaSessao {
 const CAMPOS_DO_ENVIO = 'uploadType=resumable&fields=id,name,size,md5Checksum'
 
 function requisicaoDaSessao({ destino }: PedidoDaSessao): { endereco: string; metodo: string; corpo: string } {
-  if ('atualizar' in destino) return { endereco: `${API_DE_ENVIO}/${destino.atualizar}?${CAMPOS_DO_ENVIO}`, metodo: 'PATCH', corpo: '{}' }
+  if ('atualizar' in destino) return { endereco: `${API_DE_ENVIO}/${encodeURIComponent(destino.atualizar)}?${CAMPOS_DO_ENVIO}`, metodo: 'PATCH', corpo: '{}' }
   const { nome, pastaId } = destino.criar
   return { endereco: `${API_DE_ENVIO}?${CAMPOS_DO_ENVIO}`, metodo: 'POST', corpo: JSON.stringify({ name: nome, parents: [pastaId] }) }
 }
@@ -124,6 +126,7 @@ async function iniciarSubstituicao(
 ): Promise<Response> {
   const conferido = conferirAlvoDoEnvio(await lerAlvoDaSubstituicao(contexto, arquivoId), entrada)
   if (!conferido.ok) return responderRecusa(conferido.recusa)
+  if (!(await conferidorDaRaiz(contexto).itemSobARaiz(conferido.valor.driveId))) return responderRecusa(recusar('sem_permissao'))
   const uploadUrl = await abrirSessaoDeEnvio(contexto.token, { destino: { atualizar: conferido.valor.driveId }, entrada, origem })
   return responderJson(200, { upload_url: uploadUrl, nome: conferido.valor.nome })
 }
@@ -149,8 +152,8 @@ async function lerArquivoDaVersao(contexto: ContextoDoDrive, arquivoId: string):
 // outro vira texto e estraga os bytes. O navegador reconstrói o tipo pelo formato do arquivo.
 export async function baixar(contexto: ContextoDoDrive, entrada: EntradaBaixar): Promise<Response> {
   const arquivo = await lerArquivoDaVersao(contexto, entrada.arquivoId)
-  if (!arquivo) return responderRecusa(recusar('sem_permissao'))
-  const conteudo = await chamarDrive(contexto.token, `${API_DE_ARQUIVOS}/${arquivo.drive_id}?alt=media`)
+  if (!arquivo || !(await conferidorDaRaiz(contexto).itemSobARaiz(arquivo.drive_id))) return responderRecusa(recusar('sem_permissao'))
+  const conteudo = await chamarDrive(contexto.token, `${API_DE_ARQUIVOS}/${encodeURIComponent(arquivo.drive_id)}?alt=media`)
   return new Response(conteudo.body, {
     headers: {
       'Content-Type': 'application/octet-stream',

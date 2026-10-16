@@ -9,7 +9,7 @@ import type { EntradaSemAlteracao } from '../_shared/semAlteracao.ts'
 import { lerProcesso, type ProcessoDoEnvio } from './acoes.ts'
 import { responderResultadoDoBanco } from './gravacao.ts'
 import { lerJsonDoDrive } from './google.ts'
-import { API_DE_ARQUIVOS, garantirPastaDoProcesso, type ContextoDoDrive } from './pastas.ts'
+import { API_DE_ARQUIVOS, conferidorDaRaiz, garantirPastaDoProcesso, type ContextoDoDrive } from './pastas.ts'
 import { responderJson, responderRecusa } from './respostas.ts'
 
 interface VersaoDaCopia {
@@ -43,7 +43,7 @@ async function lerOrigem(contexto: ContextoDoDrive, versaoId: string): Promise<O
 async function copiarNoDrive(token: string, origem: OrigemDoRelatorio, nome: string, pastaId: string): Promise<ArquivoNoDrive> {
   return await lerJsonDoDrive<ArquivoNoDrive>(
     token,
-    `${API_DE_ARQUIVOS}/${origem.drive_id}/copy?fields=id,name,size,md5Checksum,parents`,
+    `${API_DE_ARQUIVOS}/${encodeURIComponent(origem.drive_id)}/copy?fields=id,name,size,md5Checksum,parents`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json; charset=UTF-8' },
@@ -60,6 +60,7 @@ interface PedidoDaCopia {
 }
 
 async function copiarEGravar(contexto: ContextoDoDrive, { entrada, processo, versao, origem }: PedidoDaCopia): Promise<Response> {
+  if (!(await conferidorDaRaiz(contexto).itemSobARaiz(origem.drive_id))) return responderRecusa(recusar('sem_permissao'))
   const pastaId = await garantirPastaDoProcesso(contexto, processo)
   const nome = nomePadrao({
     sigla: processo.setor_sigla,

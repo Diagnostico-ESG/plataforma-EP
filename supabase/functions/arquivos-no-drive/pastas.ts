@@ -5,8 +5,9 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { consultaDePastaPorNome } from '../_shared/drive.ts'
 import { limparParaNomeDeArquivo } from '../_shared/nomePadrao.ts'
 import { decidirAjusteDaPasta } from '../_shared/pasta.ts'
+import { estaSobARaiz, type LerPais } from '../_shared/raiz.ts'
 import type { Configuracao } from './configuracao.ts'
-import { chamarDrive, lerJsonDoDrive } from './google.ts'
+import { chamarDrive, lerJsonDoDrive, lerNoDriveOuNulo } from './google.ts'
 
 export const API_DE_ARQUIVOS = 'https://www.googleapis.com/drive/v3/files'
 const TIPO_PASTA = 'application/vnd.google-apps.folder'
@@ -27,6 +28,38 @@ export interface ProcessoDaPasta {
   nome: string
   setor_id: string
   setor_sigla: string
+}
+
+// Os pais de cada item, lidos uma vez por chamada (os arquivos de um processo dividem as mesmas pastas).
+function lerPaisNoDrive(token: string): LerPais {
+  const lidos = new Map<string, Promise<string[] | null>>()
+  return (id) => {
+    const endereco = `${API_DE_ARQUIVOS}/${encodeURIComponent(id)}?fields=parents`
+    const lido = lidos.get(id) ?? lerNoDriveOuNulo<{ parents?: string[] }>(token, endereco).then((item) => item && (item.parents ?? []))
+    lidos.set(id, lido)
+    return lido
+  }
+}
+
+// O drive_id guardado no banco é escrito por quem tem perfil de escrita; a raiz do ambiente é segredo da função. Antes de
+// agir com a conta de serviço num item guardado, a função confere que ele está debaixo da raiz (_shared/raiz.ts).
+export interface ConferidorDaRaiz {
+  /** O item com esses pais está debaixo da raiz? (quando os pais já foram lidos) */
+  paisSobARaiz: (pais: string[]) => Promise<boolean>
+  /** O item com esse identificador está debaixo da raiz? (false se o Drive não o acha) */
+  itemSobARaiz: (driveId: string) => Promise<boolean>
+}
+
+export function conferidorDaRaiz(contexto: ContextoDoDrive): ConferidorDaRaiz {
+  const lerPais = lerPaisNoDrive(contexto.token)
+  const raizId = contexto.config.raizId
+  return {
+    paisSobARaiz: (pais) => estaSobARaiz(pais, raizId, lerPais),
+    itemSobARaiz: async (driveId) => {
+      const pais = await lerPais(driveId)
+      return pais !== null && (await estaSobARaiz(pais, raizId, lerPais))
+    },
+  }
 }
 
 function falhaDoBanco(operacao: string, codigo: string): Error {
@@ -69,14 +102,22 @@ async function criarPasta(token: string, nome: string, paiId: string): Promise<s
   return pasta.id
 }
 
-async function acertarPasta(token: string, driveId: string, nome: string, paiId: string): Promise<void> {
+// A pasta registrada é escrita por quem tem perfil de escrita: só se mexe (renomear, mover) em pasta debaixo da raiz.
+async function lerPastaDoAmbiente(contexto: ContextoDoDrive, driveId: string): Promise<{ name: string; parents?: string[] }> {
   const atual = await lerJsonDoDrive<{ name: string; parents?: string[] }>(
-    token,
-    `${API_DE_ARQUIVOS}/${driveId}?fields=name,parents`,
+    contexto.token,
+    `${API_DE_ARQUIVOS}/${encodeURIComponent(driveId)}?fields=name,parents`,
   )
+  if (await conferidorDaRaiz(contexto).paisSobARaiz(atual.parents ?? [])) return atual
+  throw new Error(`pasta registrada (${driveId}) fora da raiz do ambiente; esperado: pasta debaixo da raiz`)
+}
+
+async function acertarPasta(contexto: ContextoDoDrive, driveId: string, nome: string, paiId: string): Promise<void> {
+  const { token } = contexto
+  const atual = await lerPastaDoAmbiente(contexto, driveId)
   const ajuste = decidirAjusteDaPasta({ nome: atual.name, pais: atual.parents ?? [] }, { nome, paiId })
   if (!ajuste.renomearPara && !ajuste.mover) return
-  const url = new URL(`${API_DE_ARQUIVOS}/${driveId}`)
+  const url = new URL(`${API_DE_ARQUIVOS}/${encodeURIComponent(driveId)}`)
   if (ajuste.mover) {
     url.searchParams.set('addParents', ajuste.mover.paraPai)
     if (ajuste.mover.tirarDe.length > 0) url.searchParams.set('removeParents', ajuste.mover.tirarDe.join(','))
@@ -91,7 +132,7 @@ async function acertarPasta(token: string, driveId: string, nome: string, paiId:
 async function garantirPasta(contexto: ContextoDoDrive, dono: Dono, nome: string, paiId: string): Promise<string> {
   const registrada = await lerPastaRegistrada(contexto.cliente, dono)
   if (registrada) {
-    await acertarPasta(contexto.token, registrada, nome, paiId)
+    await acertarPasta(contexto, registrada, nome, paiId)
     return registrada
   }
   const driveId = (await procurarPasta(contexto.token, nome, paiId)) ?? (await criarPasta(contexto.token, nome, paiId))
