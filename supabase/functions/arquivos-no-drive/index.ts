@@ -1,4 +1,4 @@
-// Função arquivos-no-drive (documentos-versoes, tickets 01 e 02). Ordem fixa: configuração → quem chamou →
+// Função arquivos-no-drive (documentos-versoes, tickets 01 a 07). Ordem fixa: configuração → quem chamou →
 // perfil e situação (decisao.ts) → entrada → Drive. Nenhuma ação toca o Drive antes de conferir quem chamou.
 import '@supabase/functions-js/edge-runtime.d.ts'
 import {
@@ -10,10 +10,12 @@ import {
   type Acao,
 } from '../_shared/decisao.ts'
 import { cabecalhosDeOrigem } from '../_shared/drive.ts'
+import { validarConferir } from '../_shared/conferencia.ts'
 import { validarRegistrar } from '../_shared/registro.ts'
 import { validarSemAlteracao } from '../_shared/semAlteracao.ts'
 import { baixar, iniciarEnvio } from './acoes.ts'
 import { identificarChamador, type ContextoDoChamador } from './chamador.ts'
+import { conferir } from './conferir.ts'
 import { lerConfiguracao, type Configuracao } from './configuracao.ts'
 import { ErroDoDrive, obterToken } from './google.ts'
 import { registrar } from './registrar.ts'
@@ -22,6 +24,19 @@ import { comCabecalhos, responderErroInterno, responderJson, responderRecusa } f
 
 async function lerCorpo(req: Request): Promise<unknown> {
   return await req.json().catch(() => null)
+}
+
+async function executarBaixar(corpo: unknown, chamador: ContextoDoChamador, config: Configuracao): Promise<Response> {
+  const entrada = validarBaixar(corpo)
+  if (!entrada.ok) return responderRecusa(entrada.recusa)
+  return await baixar({ cliente: chamador.cliente, token: await obterToken(config), config }, entrada.valor)
+}
+
+// Só lê (nada é gravado no banco nem no Drive); o token do Google só é pedido depois de a entrada valer.
+async function executarConferir(corpo: unknown, chamador: ContextoDoChamador, config: Configuracao): Promise<Response> {
+  const entrada = validarConferir(corpo)
+  if (!entrada.ok) return responderRecusa(entrada.recusa)
+  return await conferir({ cliente: chamador.cliente, token: await obterToken(config), config }, entrada.valor)
 }
 
 async function executar(acao: Acao, corpo: unknown, chamador: ContextoDoChamador, config: Configuracao, origem: string | null): Promise<Response> {
@@ -35,11 +50,8 @@ async function executar(acao: Acao, corpo: unknown, chamador: ContextoDoChamador
     if (!entrada.ok) return responderRecusa(entrada.recusa)
     return await semAlteracao({ cliente: chamador.cliente, token: await obterToken(config), config }, entrada.valor)
   }
-  if (acao === 'baixar') {
-    const entrada = validarBaixar(corpo)
-    if (!entrada.ok) return responderRecusa(entrada.recusa)
-    return await baixar({ cliente: chamador.cliente, token: await obterToken(config), config }, entrada.valor)
-  }
+  if (acao === 'conferir') return await executarConferir(corpo, chamador, config)
+  if (acao === 'baixar') return await executarBaixar(corpo, chamador, config)
   const entrada = validarIniciarEnvio(corpo)
   if (!entrada.ok) return responderRecusa(entrada.recusa)
   return await iniciarEnvio({ cliente: chamador.cliente, token: await obterToken(config), config }, entrada.valor, origem)
@@ -52,7 +64,7 @@ async function atender(req: Request, config: Configuracao): Promise<Response> {
   if (!chamador) return responderRecusa(recusar('sem_login'))
   const corpo = await lerCorpo(req)
   const acao = lerAcao(corpo)
-  if (!acao) return responderRecusa(recusar('entrada_invalida', 'campo acao: esperado iniciar_envio, baixar, registrar ou sem_alteracao'))
+  if (!acao) return responderRecusa(recusar('entrada_invalida', 'campo acao: esperado iniciar_envio, baixar, registrar, sem_alteracao ou conferir'))
   const recusa = conferirChamador(chamador.chamador, acao)
   if (recusa) return responderRecusa(recusa)
   return await executar(acao, corpo, chamador, config, req.headers.get('Origin'))

@@ -13,7 +13,7 @@ import {
 import { conferirAlvoDoRegistro } from '../_shared/substituicao.ts'
 import { lerAlvoDaSubstituicao } from './acoes.ts'
 import { responderResultadoDoBanco } from './gravacao.ts'
-import { ErroDoDrive, lerJsonDoDrive } from './google.ts'
+import { lerNoDriveOuNulo } from './google.ts'
 import { API_DE_ARQUIVOS, lerPastaRegistrada, type ContextoDoDrive } from './pastas.ts'
 import { responderRecusa } from './respostas.ts'
 
@@ -28,13 +28,8 @@ async function lerSituacao(contexto: ContextoDoDrive, processoId: string): Promi
 }
 
 // O arquivo que o Drive não acha é "não chegou"; qualquer outra falha do Drive segue como erro do Drive.
-async function lerArquivoNoDrive(token: string, driveId: string): Promise<ArquivoNoDrive | null> {
-  try {
-    return await lerJsonDoDrive<ArquivoNoDrive>(token, `${API_DE_ARQUIVOS}/${driveId}?fields=id,name,size,md5Checksum,parents`)
-  } catch (erro) {
-    if (erro instanceof ErroDoDrive && erro.codigo === 'nao_encontrado_no_drive') return null
-    throw erro
-  }
+function lerArquivoNoDrive(token: string, driveId: string): Promise<ArquivoNoDrive | null> {
+  return lerNoDriveOuNulo<ArquivoNoDrive>(token, `${API_DE_ARQUIVOS}/${driveId}?fields=id,name,size,md5Checksum,parents`)
 }
 
 async function gravar(contexto: ContextoDoDrive, entrada: EntradaRegistrar, arquivos: ArquivoParaGravar[]): Promise<Response> {

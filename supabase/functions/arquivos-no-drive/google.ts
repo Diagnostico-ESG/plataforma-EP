@@ -89,3 +89,13 @@ export async function lerJsonDoDrive<T>(token: string, endereco: string, opcoes:
   const resposta = await chamarDrive(token, endereco, opcoes)
   return (await resposta.json()) as T
 }
+
+// O arquivo que o Drive não acha (404) vira null; qualquer outra falha do Drive segue como erro do Drive.
+export async function lerNoDriveOuNulo<T>(token: string, endereco: string): Promise<T | null> {
+  try {
+    return await lerJsonDoDrive<T>(token, endereco)
+  } catch (erro) {
+    if (erro instanceof ErroDoDrive && erro.codigo === 'nao_encontrado_no_drive') return null
+    throw erro
+  }
+}
