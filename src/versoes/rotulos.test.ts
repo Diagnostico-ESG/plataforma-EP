@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import {
-  haVersaoNova, ordenarVersoes, origemDoRelatorio, podeCopiarRelatorio, proximoNumero, relatorioPendente, rotuloDaVersao,
+  haVersaoNova, ordenarVersoes, origemDoRelatorio, podeCopiarRelatorio, proximoNumero, relatorioPendente, rotuloDaAnterior, rotuloDaVersao,
   versoesComRelatorioPendente,
 } from './rotulos'
 import type { Versao } from './tipos'
@@ -71,4 +71,10 @@ test('a origem do relatório copiado é o rótulo da versão de onde veio', () =
   expect(origemDoRelatorio(versoes[1].arquivos[0], versoes)).toBe('V2')
   expect(origemDoRelatorio(versoes[0].arquivos[0], versoes)).toBeNull()
   expect(origemDoRelatorio({ ...relatorioDe(4, 'r9') }, versoes)).toBeNull()
+})
+
+test('o rótulo da versão anterior é o da de maior número menor; sem anterior, null', () => {
+  const versoes = [versao(2), versao(5, true), versao(7)]
+  expect(rotuloDaAnterior(versoes[2], versoes)).toBe('V5F')
+  expect(rotuloDaAnterior(versoes[0], versoes)).toBeNull()
 })

@@ -68,3 +68,15 @@ export function textoDaFalhaDoEnvio(erro: unknown): string {
   const motivo = erro instanceof Error ? erro.message : String(erro)
   return `A versão não foi registrada: ${motivo}. Os arquivos escolhidos continuam no formulário.`
 }
+
+/** O relatório depois pede só o arquivo do relatório, sem recusa e sem conferência em andamento. */
+export function podeAcrescentarRelatorio(escolhidos: Escolhidos, recusas: RecusasDosCampos, conferindo: boolean): boolean {
+  if (conferindo || Object.values(recusas).some(Boolean)) return false
+  return Boolean(escolhidos.relatorio)
+}
+
+export function textoDaFalhaDoRelatorio(erro: unknown): string {
+  if (erro instanceof TravaDoBanco) return erro.message
+  const motivo = erro instanceof Error ? erro.message : String(erro)
+  return `O relatório não foi registrado: ${motivo}. O arquivo escolhido continua no formulário.`
+}

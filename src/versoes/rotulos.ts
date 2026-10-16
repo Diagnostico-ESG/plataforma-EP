@@ -67,3 +67,9 @@ export function origemDoRelatorio(arquivo: ArquivoDaVersao, versoes: Versao[]): 
   const origem = versoes.find((versao) => versao.arquivos.some((outro) => outro.id === arquivo.copiadoDe))
   return origem ? rotuloDaVersao(origem) : null
 }
+
+/** O rótulo da versão imediatamente anterior ("V3"); null se a versão é a primeira. */
+export function rotuloDaAnterior(versao: Versao, versoes: Versao[]): string | null {
+  const anterior = versaoAnterior(versao, versoes)
+  return anterior ? rotuloDaVersao(anterior) : null
+}

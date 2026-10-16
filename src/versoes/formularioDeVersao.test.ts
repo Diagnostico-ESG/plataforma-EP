@@ -1,7 +1,8 @@
 import { expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import {
-  arquivosDoPedido, lerNumeroHistorico, nomeNaPrevia, podeEnviar, podeRegistrarHistorica, podeSubmeter, textoDaFalhaDoEnvio,
+  arquivosDoPedido, lerNumeroHistorico, nomeNaPrevia, podeAcrescentarRelatorio, podeEnviar, podeRegistrarHistorica, podeSubmeter,
+  textoDaFalhaDoEnvio, textoDaFalhaDoRelatorio,
   textoDoProgresso,
 } from './formularioDeVersao'
 
@@ -76,4 +77,17 @@ test('a recusa aparece como veio; outra falha diz que a versão não foi registr
   expect(textoDaFalhaDoEnvio(new TravaDoBanco('A versão precisa do .bpmn e do .png.'))).toBe('A versão precisa do .bpmn e do .png.')
   expect(textoDaFalhaDoEnvio(new Error('o arquivo fluxo.png não chegou ao Drive')))
     .toBe('A versão não foi registrada: o arquivo fluxo.png não chegou ao Drive. Os arquivos escolhidos continuam no formulário.')
+})
+
+test('acrescentar relatório só se habilita com o relatório escolhido, sem recusa e sem conferência em andamento', () => {
+  expect(podeAcrescentarRelatorio({}, {}, false)).toBe(false)
+  expect(podeAcrescentarRelatorio({ relatorio }, {}, false)).toBe(true)
+  expect(podeAcrescentarRelatorio({ relatorio }, { relatorio: 'Escolha um arquivo .docx ou .pdf.' }, false)).toBe(false)
+  expect(podeAcrescentarRelatorio({ relatorio }, {}, true)).toBe(false)
+})
+
+test('a falha do relatório depois: a frase pronta da recusa, ou o motivo com o aviso do formulário', () => {
+  expect(textoDaFalhaDoRelatorio(new TravaDoBanco('Esta versão já tem relatório.'))).toBe('Esta versão já tem relatório.')
+  expect(textoDaFalhaDoRelatorio(new Error('sem rede')))
+    .toBe('O relatório não foi registrado: sem rede. O arquivo escolhido continua no formulário.')
 })
