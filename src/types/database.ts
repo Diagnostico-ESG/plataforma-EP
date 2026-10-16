@@ -887,6 +887,10 @@ export type Database = {
         }
         Returns: string
       }
+      acrescentar_relatorio: {
+        Args: { p_arquivo: Json; p_numero: number; p_versao: string }
+        Returns: string
+      }
       cancelar_processo: {
         Args: { p_motivo: string; p_processo: string }
         Returns: undefined
@@ -894,6 +898,14 @@ export type Database = {
       mover_etapa: {
         Args: { p_etapa: string; p_sentido: string }
         Returns: undefined
+      }
+      origem_do_relatorio: {
+        Args: { p_versao: string }
+        Returns: {
+          arquivo_id: string
+          drive_id: string
+          formato: string
+        }[]
       }
       reclassificar_processo: {
         Args: {
@@ -903,6 +915,10 @@ export type Database = {
           p_tipo: Database["public"]["Enums"]["tipo_de_processo"]
         }
         Returns: undefined
+      }
+      registrar_sem_alteracao: {
+        Args: { p_arquivo: Json; p_versao: string }
+        Returns: string
       }
       registrar_versao: {
         Args: {
