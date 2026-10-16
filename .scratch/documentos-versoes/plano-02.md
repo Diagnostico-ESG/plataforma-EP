@@ -105,6 +105,8 @@ Modificar: `supabase/functions/_shared/decisao.ts` (+ teste), `arquivos-no-drive
 
 ### Tarefa 7 — Fecho do ticket
 
-- [ ] `npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`; "Testes de banco" na branch.
-- [ ] `desvios.md`: número conferido no registro; histórica sem privilégio até o 04; caso de exclusão com versão no 27; o que mais divergir. Marcar as caixas dos critérios no ticket, com a ressalva do `[visual]` (tela não conferida) e da prova real (depende do roteiro do usuário, junto com a do 01).
-- [ ] Juntar: o ticket 01 ainda não está na `main`. **Parar e perguntar ao usuário** se junta o 02 à `documentos-versoes-01` (esperando a prova) ou os dois à `main` agora. Depois, linha `Concluído em` no ticket e itens não testados em `.scratch/melhorias-protocolo.md`.
+- [x] `npm run lint`, `npm run typecheck`, `npm test`, `npm run check:circular`; "Testes de banco" na branch.
+- [x] `desvios.md`: número conferido no registro; histórica sem privilégio até o 04; caso de exclusão com versão no 27; o que mais divergir. Marcar as caixas dos critérios no ticket, com a ressalva do `[visual]` (tela não conferida) e da prova real (depende do roteiro do usuário, junto com a do 01).
+- [x] Juntar: o ticket 01 ainda não está na `main`. **Parar e perguntar ao usuário** se junta o 02 à `documentos-versoes-01` (esperando a prova) ou os dois à `main` agora. Depois, linha `Concluído em` no ticket e itens não testados em `.scratch/melhorias-protocolo.md`.
+
+> **Situação em 2026-10-15:** tarefas 1 a 7 feitas. Por decisão do usuário, o 02 foi juntado à branch documentos-versoes-01 (fast-forward até 7861104), e não à main. A linha Concluído em espera a prova do Drive, que confere os tickets 01 e 02 juntos.
