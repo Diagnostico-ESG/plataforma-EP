@@ -38,3 +38,8 @@ Decisões da sabatina (`grill-with-docs`), para o `to-spec`. Os termos estão no
 - `RodadaRevisaoSetor` previa e-mails de envio e de resposta anexados: saíram (ADR 0010).
 - `RevisaoInterna` previa resultado "aprovado | ajustes": virou "sem alteração | corrigida", com o escopo só na correção.
 - A seção 3, item 7, já previa a situação calculada; mantida.
+
+## Revisão de 2026-10-17 (no `/to-tickets`; substitui o que as rodadas 1 e 2 diziam nos pontos abaixo)
+
+- **Rodadas (substitui Q6, Q8b, Q12b na etapa 7, Q13 na numeração, Q16 e Q17 nas datas de envio e resposta):** saem. A revisão pelo setor é só a etapa; o ciclo "vai, volta, revisa, vai de novo" fica nos eventos de etapa e no "voltar a etapa" (ADR 0012). O "Concluir" da etapa 7 exige a versão mais recente completa. A aprovação fica no dia da última revisão interna ou depois.
+- **Subprocesso:** sem tratamento à parte; é um item como outro, com as mesmas regras. A aprovação do pai não depende da dos subprocessos.

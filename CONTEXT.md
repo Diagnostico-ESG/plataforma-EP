@@ -182,16 +182,12 @@ _Avoid_: validação, conferência, aprovação interna
 Integrante que registra a revisão interna; nunca é o autor da versão revisada.
 _Avoid_: aprovador, conferente
 
-**Rodada**:
-Cada envio de uma versão completa (.bpmn, .png e relatório) ao setor e a resposta dele: aprovada, ajustes solicitados ou sem resposta. Numerada por processo; só uma fica aberta por vez. Os e-mails da rodada não ficam na plataforma: a resposta pode vir pessoalmente, e a formalização é o E-protocolo.
-_Avoid_: ciclo, envio ao setor, revisão do setor (para a rodada)
-
-**Pronto para envio / Com o setor**:
-A situação do processo na etapa de revisão pelo setor: com o setor enquanto há uma rodada aberta, pronto para envio no resto do tempo. Calculada a partir das rodadas.
-_Avoid_: aguardando setor, enviado
+**Revisão pelo setor**:
+A etapa em que a versão completa (.bpmn, .png e relatório) está com o setor. Em andamento quer dizer "com o setor"; se o setor pede ajustes, o EP volta à revisão interna, e a ida seguinte é a etapa recomeçando. A plataforma não registra cada envio nem a resposta (ADR 0012): o histórico das etapas diz quando foi e voltou, e os e-mails ficam fora (a resposta pode vir pessoalmente).
+_Avoid_: rodada, ciclo, envio ao setor
 
 **Aprovação**:
-O registro, com o número do E-protocolo, de que o setor aprovou a versão mais recente do processo. Pode vir depois de uma rodada com ajustes pequenos, que o setor só vê de novo no E-protocolo. Uma por processo; a versão aprovada não tem arquivo substituído.
+O registro, com o número do E-protocolo, de que o setor aprovou a versão mais recente do processo. Pode vir depois de ajustes pequenos feitos sem nova ida ao setor, que o setor só vê de novo no E-protocolo. Uma por processo; a versão aprovada não tem arquivo substituído.
 _Avoid_: homologação, validação final
 
 **E-protocolo**:
