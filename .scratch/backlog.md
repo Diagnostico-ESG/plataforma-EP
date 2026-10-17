@@ -24,6 +24,8 @@ Uma linha por item: o que é e onde surgiu.
 
 ## Versões posteriores da especificação
 
+- EP v1.5: Prazos: prazo por etapa e indicador de atraso. Saiu da v1 por decisão do usuário em 2026-10-17 (era a funcionalidade 8 do resumo do projeto).
+- EP v1.5: Dashboard: os indicadores da seção 6 da especificação, que substituem o Power BI; inclui a fila de revisão e as revisões pendentes por integrante. Saiu da v1 por decisão do usuário em 2026-10-17 (era a funcionalidade 9).
 - EP v1.5: alertas por e-mail (prazo vencendo, revisão pendente, setor sem resposta). (especificação, seção 1)
 - EP v1.5: checagem automática do .bpmn no upload (RegraBpmn, ChecagemBpmn). (especificação, seção 1)
 - EP v1.5: publicação interna e/ou externa, conforme a decisão sobre o destino. (especificação, seção 1)
@@ -87,5 +89,5 @@ Uma linha por item: o que é e onde surgiu.
 - 2026-10-16 | ship documentos-versoes | `registrar_evento_do_relatorio` não olha o papel do arquivo; só importa se um dia houver inclusão de arquivo fora das funções | achado do code-review
 - 2026-10-16 | ship documentos-versoes | limpeza opcional: `versoesSupabase.ts` (acrescentarRelatorio e substituirArquivo repetem envio+registro), formulários de relatório e substituição (progresso/aviso), cadeia de `if` e `{cliente,token,config}` em `arquivos-no-drive/index.ts`, `lerSituacao` repete `lerProcesso`, `mensagem: ''` em `semAlteracao.ts` | cheiros do code-review
 - 2026-10-16 | ship documentos-versoes | PENDENTE DO USUÁRIO: publicar de novo a função `arquivos-no-drive` no desenvolvimento (`npx supabase functions deploy arquivos-no-drive --project-ref yclkzyoebpsxmgpbcbus --use-api`), porque o commit a8dbd01 a alterou (relatório só na versão do próprio processo, rótulo no nome, arquivo vazio); também a arrumação da prova do Drive (provedor Email, usuários prova.integrante e prova.consulta, arquivos no Drive) | usuário remoto, adiado
-- 2026-10-16 | planejar revisoes-aprovacao | fila de revisão (processos aguardando revisor, revisões pendentes por integrante) fica para o Dashboard (funcionalidade 9) | sabatina Q10
+- 2026-10-16 | planejar revisoes-aprovacao | fila de revisão (processos aguardando revisor, revisões pendentes por integrante) fica para o Dashboard (v1.5) | sabatina Q10
 - 2026-10-16 | planejar revisoes-aprovacao | aviso "estrutura alterada após aprovação" no processo pai quando um subprocesso é vinculado a pai aprovado (regra 14 da especificação) | spec, fora do escopo

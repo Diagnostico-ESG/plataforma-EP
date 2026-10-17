@@ -1,6 +1,6 @@
 # Plataforma do Escritório de Processos (EP)
 
-Plataforma web interna do Centro Estadual de Desburocratização (CED) para controlar o trabalho do Escritório de Processos. Ela acompanha cada processo etapa por etapa (da identificação dos responsáveis até a aprovação com E-protocolo), guarda fluxogramas (.bpmn + .png) e relatórios com versões que nunca se apagam, registra reuniões, revisões e o histórico de tudo, e substitui o dashboard atual em Power BI por um painel próprio. O detalhe (modelo de dados, regras de negócio, telas) está em `.scratch/especificacao.md` e vai virar o `CONTEXT.md` na sabatina do `/planejar` da primeira funcionalidade.
+Plataforma web interna do Centro Estadual de Desburocratização (CED) para controlar o trabalho do Escritório de Processos. Ela acompanha cada processo etapa por etapa (da identificação dos responsáveis até a aprovação com E-protocolo), guarda fluxogramas (.bpmn + .png) e relatórios com versões que nunca se apagam, registra reuniões, revisões e o histórico de tudo, e, na v1.5, substitui o dashboard atual em Power BI por um painel próprio (na v1, o Power BI continua em uso). O detalhe (modelo de dados, regras de negócio, telas) está em `.scratch/especificacao.md` e vai virar o `CONTEXT.md` na sabatina do `/planejar` da primeira funcionalidade.
 
 - **Problema que resolve:** hoje o andamento fica espalhado entre planilhas, arquivos e o Power BI, sem versão, sem histórico e sem prazo visível.
 - **Quem usa:** equipe interna do EP, 6 pessoas hoje (até 10). Uso em computador; layout para celular é opcional. Acesso dos responsáveis dos setores fica no backlog.
@@ -20,11 +20,11 @@ Plataforma web interna do Centro Estadual de Desburocratização (CED) para cont
 3. **Processos e etapas** (processos-etapas)**:** processos e subprocessos, catálogo de etapas configurável, andamento com dispensa e "realizada anteriormente", reclassificação e o histórico de alterações (que as funcionalidades seguintes também alimentam).
 4. **Reuniões** (reunioes)**:** de sensibilização e de modelagem, com data, local, participantes e anotações.
 5. **Documentos e versões** (documentos-versoes)**:** envio de fluxogramas e relatórios, numeração de versões, versões históricas (sufixo F) e o padrão de nome dos arquivos.
-6. **Revisões e aprovação** (revisoes-aprovacao)**:** revisão interna (o revisor precisa ser diferente de quem enviou), rodadas de revisão pelo setor com os e-mails e aprovação com o número do E-protocolo.
+6. **Revisões e aprovação** (revisoes-aprovacao)**:** revisão interna (o revisor precisa ser diferente de quem enviou), rodadas de revisão pelo setor (sem guardar os e-mails, ADR 0010) e aprovação com o número do E-protocolo.
 7. **Visualizador de fluxograma:** abre o .bpmn no navegador, no detalhe do processo.
-8. **Prazos:** prazo por etapa e indicador de atraso.
-9. **Dashboard:** os indicadores da seção 6 da especificação.
-10. **Importação:** carga inicial com validação antes de gravar e uma lista de pendências.
-11. **Exportação em CSV e documentação de manutenção.**
+8. **Importação:** carga inicial com validação antes de gravar e uma lista de pendências.
+9. **Exportação em CSV e documentação de manutenção.**
+
+Prazos e Dashboard, previstos na especificação para a v1, passaram para a v1.5 por decisão do usuário em 2026-10-17 (backlog).
 
 As versões v1.5, v2 e "depois" da especificação estão no `.scratch/backlog.md`.

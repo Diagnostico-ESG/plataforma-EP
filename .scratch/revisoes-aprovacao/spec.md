@@ -8,7 +8,7 @@ Decisões de origem: sabatina de 2026-10-16 (`.scratch/revisoes-aprovacao/sabati
 
 ## Problema
 
-Depois da modelagem técnica (etapa 5), cada processo passa por três etapas que hoje não deixam rastro confiável: a revisão interna, em que um colega confere o trabalho do autor e muitas vezes o corrige; a revisão pelo setor, em que a versão completa vai ao setor uma ou mais vezes até ele aprovar ou pedir ajustes; e a aprovação formal, aberta no E-protocolo. A equipe precisa saber, para cada processo, quem revisou e se mudou algo, qual versão foi ao setor e quando, se o setor respondeu e o que disse, e qual versão foi aprovada e com que número. O painel (funcionalidade 9) vai precisar desses dados para separar o tempo de espera no EP do tempo com o setor. Também é preciso impedir que o processo seja dado como aprovado sem E-protocolo, ou revisado pelo próprio autor.
+Depois da modelagem técnica (etapa 5), cada processo passa por três etapas que hoje não deixam rastro confiável: a revisão interna, em que um colega confere o trabalho do autor e muitas vezes o corrige; a revisão pelo setor, em que a versão completa vai ao setor uma ou mais vezes até ele aprovar ou pedir ajustes; e a aprovação formal, aberta no E-protocolo. A equipe precisa saber, para cada processo, quem revisou e se mudou algo, qual versão foi ao setor e quando, se o setor respondeu e o que disse, e qual versão foi aprovada e com que número. O Dashboard (v1.5) vai precisar desses dados para separar o tempo de espera no EP do tempo com o setor. Também é preciso impedir que o processo seja dado como aprovado sem E-protocolo, ou revisado pelo próprio autor.
 
 ## Solução
 
@@ -219,7 +219,7 @@ Criar, alterar e apagar, além do perfil, passam pelas regras abaixo.
 
 #### Regras de estado
 
-- **Situação na revisão pelo setor:** "com o setor" quando há rodada sem resposta; "pronto para envio" no resto do tempo. Calculada, nunca gravada; na tela, por função pura. O painel (funcionalidade 9) fará a sua view a partir das rodadas.
+- **Situação na revisão pelo setor:** "com o setor" quando há rodada sem resposta; "pronto para envio" no resto do tempo. Calculada, nunca gravada; na tela, por função pura. O Dashboard (v1.5) fará a sua view a partir das rodadas.
 - **Rodada:** aberta (enviada, sem resposta) → respondida (aprovada, ajustes solicitados ou sem resposta). A resposta pode ser editada ou apagada (volta a aberta, pela edição das duas colunas juntas).
 - **Voltar a uma etapa:** nada se apaga; revisões, rodadas e aprovação continuam listadas com as suas versões. A volta para antes da aprovação exige excluir a aprovação antes. Depois de uma volta, as travas olham a versão mais recente, então os registros antigos não bastam se houver versão nova.
 - **"Realizada anteriormente"** continua permitida nas três etapas, com nota, sem as travas (processos aprovados antes da plataforma). As etapas são obrigatórias, então não se dispensam.
@@ -266,16 +266,16 @@ Nenhuma migração destrutiva: tipos, tabelas, gatilhos, funções e políticas 
 ## Fora do escopo
 
 - E-mails do setor (.eml): não ficam na plataforma (ADR 0010).
-- Fila de revisão e "revisões pendentes por integrante": Dashboard (funcionalidade 9; backlog).
+- Fila de revisão e "revisões pendentes por integrante": Dashboard (v1.5; backlog).
 - Devolver ao autor para corrigir: depois (especificação, seção 3, item 4).
 - Alertas por e-mail (revisão pendente, setor sem resposta): v2 (backlog).
 - Publicação (etapa 9) e o registro `Publicacao`: v1.5.
 - Aviso "estrutura alterada após aprovação" no processo pai (regra 14 da especificação): fica para quando o vínculo de subprocesso com pai aprovado for tratado; registrar no backlog.
-- Prazo e atraso por etapa: funcionalidade 8.
+- Prazo e atraso por etapa: Prazos (v1.5).
 
 ## Observações
 
 - **Divergências da especificação:** a `RodadaRevisaoSetor` previa os e-mails de envio e de resposta (saíram, ADR 0010); a `RevisaoInterna` previa resultado "aprovado | ajustes" (virou "sem alteração | corrigida", com escopo só na correção); a `Aprovacao` aponta a versão mais recente, que pode ter passado por um ajuste pequeno sem nova rodada.
-- **"Realizada anteriormente" nas três etapas, sem trava:** decidido na escrita da spec, para os processos aprovados antes da plataforma (importação, funcionalidade 10). Se o usuário quiser exigir os registros também aí, é uma linha a mais no gatilho.
+- **"Realizada anteriormente" nas três etapas, sem trava:** decidido na escrita da spec, para os processos aprovados antes da plataforma (Importação, funcionalidade 8). Se o usuário quiser exigir os registros também aí, é uma linha a mais no gatilho.
 - **Concluídos antigos:** a trava age só quando o status muda, então processos de teste já concluídos no desenvolvimento não são recusados.
 - O Drive guarda por 30 dias o conteúdo de um arquivo substituído, em "Gerenciar versões" (ADR 0011); a plataforma não precisa fazer nada para isso.
