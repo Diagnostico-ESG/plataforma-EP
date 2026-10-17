@@ -50,3 +50,21 @@ Princípios: **revelação progressiva** (mostrar primeiro o essencial e abrir o
 5. Reavaliar a posição da Importação na ordem.
 
 Cada item entra no funil pelo `/demanda`.
+
+## Cartão do Quadro (conversa de 2026-10-17, estilo Trello/Planner)
+
+Hoje o cartão traz sigla, macroprocesso, nome e o avatar do responsável: diz "o que é", mas nada sobre "como vai". Proposta (maquete mostrada na conversa):
+
+- **Sigla do setor + nome.** O macroprocesso sai do cartão (fica no filtro e no painel); "Subprocesso" continua como pílula só quando for o caso.
+- **Barra de progresso** das etapas do processo: feitas em verde, atual em azul, com "2 de 6 etapas".
+- **Selos que só aparecem quando há algo a dizer** (no máximo três por cartão): dias na etapa atual (âmbar acima de um limite, com borda âmbar no cartão), versão atual (V2), pendência que impede de concluir (vermelho, ex.: "falta relatório"), próxima reunião, número de subprocessos.
+- **Responsável da etapa atual** no rodapé; sem responsável, um botão tracejado [Assumir].
+- **Suspenso** fica apagado, com o motivo curto no rodapé.
+
+Interações no estilo Trello:
+- Arrastar o cartão uma coluna à frente = concluir a etapa atual (e iniciar a próxima). As travas continuam: se faltar algo, a janela pede (revisão, E-protocolo) ou o cartão volta com a frase do motivo. Voltar etapa continua só pelo painel, porque pede motivo.
+- "Agrupar por: Etapa | Responsável" e o filtro "Só os meus" (o "Comigo" sai daqui, sem tela nova).
+
+Custo técnico: a leitura do Quadro precisa trazer dias na etapa, versão atual, pendência, próxima reunião e número de subprocessos (uma view nova ou ampliada).
+
+Decisões em aberto com o usuário: arrastar para concluir (sim ou só botão), limite de dias para "parado" e agrupar por responsável.
