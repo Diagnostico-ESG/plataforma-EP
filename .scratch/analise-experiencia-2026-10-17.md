@@ -1,0 +1,52 @@
+# Análise de experiência do usuário — 2026-10-17
+
+Pedido do usuário: olhar a plataforma do ponto de vista de quem é avesso a burocracia e precisa ser convencido de que ela é mais fácil que planilha e e-mail. Ponto de partida citado por ele: o painel do processo (abre à direita no Quadro) tem informação demais, é longo, sem separação clara, com muito texto.
+
+Método: vitrine local com dados inventados (`vitrine.local/`, fora do git), tela 1280×800, perfil Administrador, um processo na Revisão interna com 2 versões, 2 reuniões e 1 subprocesso. Leitura do código do painel e da spec de `revisoes-aprovacao`.
+
+## O que se mede no painel hoje
+
+- **Altura:** cerca de 2.280 px, ou seja, quase 3 telas de rolagem num monitor comum.
+- **Controles:** 30 botões e 6 caixas de seleção visíveis de uma vez.
+- **Ordem:** Etapas do setor (3) → Etapas do processo (6) → Dados → Subprocessos → Reuniões → Versões → Ações do processo. O que a pessoa mais procura ("em que pé está, o que falta, cadê o arquivo") está no meio ou no fim.
+
+## Problemas do painel, do mais grave ao menos
+
+1. **Não responde à pergunta principal.** Quem abre um processo quer saber: em que etapa está, com quem, desde quando e o que falta. Hoje a resposta está diluída em 9 linhas de etapa iguais; a etapa atual só se distingue por uma barra azul fina.
+2. **Tudo aberto ao mesmo tempo.** Cada etapa, inclusive as futuras, mostra "Início: — · Conclusão: —" e "Responsável: [Sem responsável]". As etapas do setor (que não pertencem ao processo e não se mexem aqui) ocupam o topo.
+3. **Ações raras com o mesmo peso das frequentes.** "Corrigir datas" e "Voltar a esta etapa" se repetem em cada etapa concluída, com o mesmo botão do "Concluir". Suspender, Cancelar, Reclassificar, Editar e Excluir ficam lado a lado no rodapé, com o mesmo estilo; o Excluir (destrutivo) parece igual ao Editar.
+4. **Sem hierarquia visual entre seções.** Os títulos de seção têm o mesmo tamanho do texto, as divisórias são linhas finas e só as versões viram cartões. O olho não encontra onde uma seção acaba.
+5. **Repetição.** Sigla, macroprocesso e tipo aparecem no cabeçalho e de novo em "Dados do processo".
+6. **Versões ruidosas.** Nomes de arquivo longos e sublinhados ("TSA_V2_Emitir Ofício.bpmn"), um "Substituir" ao lado de cada arquivo, as versões antigas tão abertas quanto a atual.
+7. **Caixas de seleção nativas** sem estilo da identidade visual, que destoam do resto.
+
+## Proposta para o painel (boas práticas aplicadas)
+
+Princípios: **revelação progressiva** (mostrar primeiro o essencial e abrir o detalhe sob demanda), **uma ação principal por tela**, **agrupar por tarefa** e **ações raras dentro de um menu**.
+
+1. **Cabeçalho fixo:** nome, "Setor · Macroprocesso", pílula da situação, avatar do responsável e um menu "⋯" com Editar, Reclassificar, Suspender, Cancelar e Excluir (este em vermelho, no fim). Some a seção "Dados do processo" do topo.
+2. **Cartão "Agora"** logo abaixo: a etapa atual em destaque, quem cuida dela (ou [Assumir]), há quantos dias está nela e **um único botão principal** (ex.: [Concluir revisão interna]). Se algo impede a conclusão, o cartão diz o que falta ("Falta o relatório da V2").
+3. **Linha do tempo compacta das etapas:** uma linha por etapa (marca de feito, nome, data, iniciais do responsável). Clicar numa etapa abre o detalhe dela (datas, nota, Corrigir datas, Voltar a esta etapa). As etapas do setor viram uma linha só: "Etapas do setor: 3 de 3 resolvidas · ver no setor".
+4. **Abas em vez de rolagem:** Andamento (cartão Agora + linha do tempo + contexto e observações) · Arquivos · Reuniões · Histórico. Cada aba cabe numa tela.
+5. **Aba Arquivos:** só a versão mais recente aberta, com rótulos curtos ("Fluxograma .bpmn", "Imagem .png", "Relatório") e um botão de baixar; Substituir vai para um "⋯" do arquivo; versões antigas recolhidas em "Versões anteriores (n)".
+6. **Painel mais largo** (de 520 para cerca de 640 px) e espaçamento maior entre seções; títulos de seção mais fortes.
+
+## O que pesa no uso diário, além do painel
+
+1. **Dois cliques por etapa.** Hoje cada etapa precisa de [Iniciar] e depois de [Concluir], e concluir uma não inicia a seguinte. Nas 6 etapas do processo são 12 cliques, mais a escolha do responsável. Sugestão: concluir uma etapa já inicia a próxima e põe como responsável quem clicou (ou mantém o atual); o [Iniciar] some.
+2. **Revisões e aprovação (ainda não executada) vai aumentar o painel e o trabalho.** A spec prevê [Capturar], uma seção nova com formulário de revisão e de aprovação, e travas que recusam o [Concluir] até a pessoa ir a outra seção registrar. Para quem é direto, isso é burocracia em dobro. Sugestão: **o próprio [Concluir] pede o que falta**. Concluir a revisão interna abre a janela "Sem alteração / Corrigida + comentário"; concluir a aprovação abre a janela "Número do E-protocolo + link". Um clique, um registro. As travas do banco continuam iguais. **É o momento mais barato para mudar: nenhum ticket foi executado.**
+3. **"Capturar"** vale para qualquer etapa sem responsável, com o nome [Assumir] (mais claro).
+4. **Falta uma tela "Comigo"**: o que está sob minha responsabilidade agora, do mais parado para o mais recente. É o argumento mais forte contra a planilha (ninguém precisa procurar o que fazer). Não depende de Prazos.
+5. **Cartão do Quadro sem sinal de parado:** mostrar "há 12 dias" no cartão quando passa de um limite simples dá visibilidade sem depender da funcionalidade de Prazos (v1.5).
+6. **Importação é condição de adoção:** sem a carga inicial, a equipe teria de redigitar tudo que está na planilha e não vai querer começar. Vale considerar planejá-la logo depois de Revisões e aprovação, antes do visualizador de fluxograma.
+7. **Notas obrigatórias** (dispensar, realizada anteriormente, voltar, suspender) fazem sentido para o histórico, mas podem oferecer frases prontas para um clique.
+
+## Ordem sugerida
+
+1. Ajustar a spec de `revisoes-aprovacao` (item 2 acima) antes de executar os tickets.
+2. Redesenho do painel do processo (propostas 1 a 6), que muda telas já entregues.
+3. Concluir e seguir (item 1) e [Assumir] em qualquer etapa.
+4. Tela "Comigo" e "há N dias" no cartão.
+5. Reavaliar a posição da Importação na ordem.
+
+Cada item entra no funil pelo `/demanda`.
