@@ -76,3 +76,12 @@ Ideia do usuário: em vez do painel lateral, o processo abrir no próprio cartã
 - **"Verso do cartão" em janela central larga** (como o Trello e o Planner fazem): recomendado. Cerca de 800 px, duas colunas (à esquerda: Agora, etapas compactas e arquivos; à direita: reuniões, sobre, subprocessos, histórico), ações raras no "⋯". Cabe em uma tela, é o padrão que quem conhece Trello espera, mantém o endereço próprio de cada processo e o Esc para fechar.
 - **Painel lateral redesenhado:** alternativa, se o usuário quiser continuar vendo o quadro enquanto lê o processo.
 Decisão em aberto com o usuário.
+
+## Decisões do usuário (2026-10-17)
+
+- **Detalhe do processo:** opção A, "verso do cartão" em janela central larga, em duas colunas, no lugar do painel lateral.
+- **Histórico** vai para o menu "⋯" (pouco usado no dia a dia).
+- **Versão vigente** precisa estar clara no verso (e no cartão). Proposta: uma linha "Vigente: V2 · 02/10" com o que falta (ex.: "falta relatório"); depois da aprovação, "Vigente: V8 · aprovada · E-protocolo nº …". Versões anteriores recolhidas. Termo novo a confirmar para o `CONTEXT.md`.
+- **Reuniões simples no verso:** lista de datas e uma marcação rápida que pede só a data (tipo modelagem, setor e processo já vêm do processo). Local, participantes e anotações ficam opcionais, recolhidos em "mais detalhes", sem apagar o que já existe. A confirmar se a área de Reuniões também deve ser simplificada.
+- **Cartão:** acatadas as recomendações: arrastar uma coluna à frente conclui a etapa (com as travas); limite único de 15 dias para "parado"; "Agrupar por: Etapa | Responsável" e filtro "Só os meus".
+- **Revisões e aprovação:** acatado o [Concluir] que pede o que falta (revisão ou E-protocolo) e [Assumir] em qualquer etapa sem responsável; concluir uma etapa inicia a próxima.
