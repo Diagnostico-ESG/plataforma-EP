@@ -81,7 +81,7 @@ Decisão em aberto com o usuário.
 
 - **Detalhe do processo:** opção A, "verso do cartão" em janela central larga, em duas colunas, no lugar do painel lateral.
 - **Histórico** vai para o menu "⋯" (pouco usado no dia a dia).
-- **Versão vigente** precisa estar clara no verso (e no cartão). Proposta: uma linha "Vigente: V2 · 02/10" com o que falta (ex.: "falta relatório"); depois da aprovação, "Vigente: V8 · aprovada · E-protocolo nº …". Versões anteriores recolhidas. Termo novo a confirmar para o `CONTEXT.md`.
+- **Versão em vigor clara** no verso e no cartão: é sempre a mais recente (sem termo novo no CONTEXT.md, decisão do usuário). Uma linha "V2 · 02/10" com o que falta (ex.: "falta relatório"); depois da aprovação, "V8 · aprovada · E-protocolo nº …". Versões anteriores recolhidas.
 - **Reuniões simples no verso:** lista de datas e uma marcação rápida que pede só a data (tipo modelagem, setor e processo já vêm do processo). Local, participantes e anotações ficam opcionais, recolhidos em "mais detalhes", sem apagar o que já existe. A confirmar se a área de Reuniões também deve ser simplificada.
 - **Cartão:** acatadas as recomendações: arrastar uma coluna à frente conclui a etapa (com as travas); limite único de 15 dias para "parado"; "Agrupar por: Etapa | Responsável" e filtro "Só os meus".
 - **Revisões e aprovação:** acatado o [Concluir] que pede o que falta (revisão ou E-protocolo) e [Assumir] em qualquer etapa sem responsável; concluir uma etapa inicia a próxima.
