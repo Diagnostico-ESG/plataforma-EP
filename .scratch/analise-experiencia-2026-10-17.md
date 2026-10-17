@@ -68,3 +68,11 @@ Interações no estilo Trello:
 Custo técnico: a leitura do Quadro precisa trazer dias na etapa, versão atual, pendência, próxima reunião e número de subprocessos (uma view nova ou ampliada).
 
 Decisões em aberto com o usuário: arrastar para concluir (sim ou só botão), limite de dias para "parado" e agrupar por responsável.
+
+## Onde abre o detalhe (conversa de 2026-10-17)
+
+Ideia do usuário: em vez do painel lateral, o processo abrir no próprio cartão. Avaliação:
+- **Expandir dentro da coluna** (o cartão cresce no lugar): não recomendado. A coluna tem cerca de 250 px, empurra os outros cartões para baixo, quebra a leitura do quadro e não cabe etapas nem arquivos.
+- **"Verso do cartão" em janela central larga** (como o Trello e o Planner fazem): recomendado. Cerca de 800 px, duas colunas (à esquerda: Agora, etapas compactas e arquivos; à direita: reuniões, sobre, subprocessos, histórico), ações raras no "⋯". Cabe em uma tela, é o padrão que quem conhece Trello espera, mantém o endereço próprio de cada processo e o Esc para fechar.
+- **Painel lateral redesenhado:** alternativa, se o usuário quiser continuar vendo o quadro enquanto lê o processo.
+Decisão em aberto com o usuário.
