@@ -144,6 +144,8 @@ Decidido em 2026-10-13, valendo a partir da migração depois da de `macroproces
 
 Decidido em 2026-10-13. `git push` da `main` para o GitHub (`origin`) não precisa da minha aprovação: envie sempre que houver commits locais à frente, por exemplo ao fim de cada ticket ou etapa. Nunca com `--force`; se o envio for recusado, pare e me explique. O envio que mexe em `supabase/` dispara o "Testes de banco" na `main`: confira o resultado e me avise se falhar.
 
+Decidido em 2026-10-17. Os marcos (`marco/*`) também vão ao GitHub sem pedir aprovação: envie cada marco novo logo depois de criá-lo, ou junto com a `main` (`git push origin "refs/tags/marco/*:refs/tags/marco/*"`). Só os marcos; nunca apagar nem sobrescrever uma etiqueta que já está no GitHub.
+
 ### Agent skills
 
 Configuração das skills do Matt Pocock, gravada pelo `setup-matt-pocock-skills` em 2026-10-06 (o bloco fica aqui porque o protocolo só permite alterar esta seção).
