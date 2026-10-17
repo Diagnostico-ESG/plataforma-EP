@@ -167,3 +167,33 @@ _Avoid_: cópia do relatório, relatório repetido
 **Versão histórica**:
 Versão da primeira etapa do trabalho, feita antes da plataforma, somente leitura, com o sufixo F no rótulo (V5F). Só se registra enquanto o processo não tem versão nova, e a primeira versão nova continua a numeração (V5F → V6). Pode ter só o .bpm.
 _Avoid_: versão antiga, versão importada, versão final
+
+## Revisões e aprovação
+
+**Capturar**:
+O integrante pôr a si mesmo como responsável de uma etapa que está sem responsável, como nas etapas de revisão interna, revisão pelo setor e aprovação.
+_Avoid_: pegar, assumir, puxar
+
+**Revisão interna**:
+Conferência, por um integrante diferente do autor, da última versão do processo antes de ela ir ao setor. O revisor corrige ele mesmo: o resultado é "sem alteração" (segue a versão revisada) ou "corrigida" (o revisor enviou uma versão nova).
+_Avoid_: validação, conferência, aprovação interna
+
+**Revisor**:
+Integrante que registra a revisão interna; nunca é o autor da versão revisada.
+_Avoid_: aprovador, conferente
+
+**Rodada**:
+Cada envio de uma versão completa (.bpmn, .png e relatório) ao setor e a resposta dele: aprovada, ajustes solicitados ou sem resposta. Numerada por processo; só uma fica aberta por vez. Os e-mails da rodada não ficam na plataforma: a resposta pode vir pessoalmente, e a formalização é o E-protocolo.
+_Avoid_: ciclo, envio ao setor, revisão do setor (para a rodada)
+
+**Pronto para envio / Com o setor**:
+A situação do processo na etapa de revisão pelo setor: com o setor enquanto há uma rodada aberta, pronto para envio no resto do tempo. Calculada a partir das rodadas.
+_Avoid_: aguardando setor, enviado
+
+**Aprovação**:
+O registro, com o número do E-protocolo, de que o setor aprovou a versão mais recente do processo. Pode vir depois de uma rodada com ajustes pequenos, que o setor só vê de novo no E-protocolo. Uma por processo; a versão aprovada não tem arquivo substituído.
+_Avoid_: homologação, validação final
+
+**E-protocolo**:
+O sistema de protocolo do governo onde o setor formaliza a aprovação; a plataforma guarda só o número e, se houver, o link.
+_Avoid_: protocolo, processo eletrônico
