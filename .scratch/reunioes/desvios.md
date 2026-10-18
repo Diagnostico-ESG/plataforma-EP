@@ -96,3 +96,17 @@ Revisão do diff inteiro (marco `2026-10-14-inicio-reunioes`, 38 commits) em dua
 - **Cheiros de padrão (julgamento, nada violou regra do projeto):** três `EscolhaDe*` com o mesmo esqueleto; `delete ... <> all` e `insert ... unnest` repetidos em `salvar_reuniao`; onze parâmetros posicionais em `salvar_reuniao`; três consultas de eventos quase iguais em `reunioesSupabase.ts`. Foram para o backlog.
 - **Conferência visual presumida** (o app exige login e dados): ver o relatório do `/ship`.
 - **Revisão de segurança do código** (`/security-review`, 2026-10-15): sem achados; o gatilho novo só acrescenta uma restrição. Custo do `/ship` não registrado por decisão do usuário.
+
+## 2026-10-18 — /executar-complexo do ticket 05 (data da reunião no processo, sem a área Reuniões)
+
+- **Tipos regenerados junto com a retirada do código de reunião**, não no commit da migração: o pre-commit roda o typecheck, e com os tipos novos o módulo de reuniões não compilaria. A migração foi comitada sozinha (`1a2a2d4`), e os tipos vieram em `c12cd18`. O CLAUDE.md pede migração, teste e tipos no mesmo commit; o teste veio antes, como manda o TDD (`d08548c`).
+- **Commit intermediário sem compilar:** no `1a2a2d4` (migração), o `git mv` do ajudante de testes `reunioesNosCadastros.tsx` → `processosNosCadastros.tsx` entrou sem a edição, e os testes de versões ainda importavam o nome antigo. O pre-commit passou porque confere a pasta de trabalho, não o que vai no commit. O commit seguinte (`c12cd18`) acerta.
+- **Tarefas 3, 4 e 5 num commit só** (`c12cd18`): os construtores de processo dos testes ganharam a data na mesma passada em que perderam a prop de reuniões, e separar exigiria comitar estados que não compilam.
+- **TDD da retirada:** o teste de tela `App.reunioesRetiradas` foi escrito depois de apagar o código, e nasceu verde (os dois erros vistos eram do próprio teste). O "vermelho" da retirada não foi provado. A linha nova (`App.reuniaoDoProcesso`, 15 de 17 falhando antes) e o 32 do banco (#96) tiveram o vermelho provado.
+- **"Só o que mudou" agora vale para toda edição de processo** no histórico, e não só para a troca da data, como a spec descrevia: o estado do processo é longo, e a regra única é mais simples que separar a data. Antes, só a reunião usava esse recorte.
+- **Registros antigos de reunião fora do filtro "Item" do histórico geral**, porque todos teriam o mesmo nome ("Registro de reunião (recurso retirado da plataforma)"). A spec não falava do filtro.
+- **Gravação segurada no teste** substituindo `marcarReuniao` na falsa, em vez de um campo novo `segurar...`: a `ProcessosFalso.ts` está com 293 linhas, e o ticket 11 vai encolhê-la.
+- **Ensaio da migração** dentro de uma cópia do teste 32, desfeita no fim (#97, 35 de 35) e apagada. Na primeira montagem do ensaio, a migração tinha ficado antes do `begin` e seria aplicada de verdade; notei antes de enviar e corrigi.
+- **Teste 17 ajustado** depois da migração: ele compara o estado inteiro do evento de criação do processo, que passou a trazer `data_da_reuniao` (#98 reprovou, #99 verde).
+- **Excluir e trocar o setor de processo com data:** provados no banco (32). Na tela, só a exclusão tem teste, porque a falsa já não tem trava de reunião, e um teste de troca de setor pela tela não provaria nada a mais.
+- **A trava do DevFlow barrou por engano** um `sed` que só editava `supabase/tests/17_processos.test.sql` (a mensagem fala da pasta `.git`). Fiz a mesma edição pelo Edit, sem comando de git.

@@ -75,8 +75,8 @@
 
 **Arquivos:** criar `supabase/tests/32_data_da_reuniao.test.sql`; apagar `supabase/tests/23_*`, `24_*` e `25_*`.
 
-- [ ] `git switch -c reunioes-05` a partir da `main` limpa, e `git tag marco/2026-10-18-inicio-ticket-05-reunioes`. Enviar o marco (`git push origin refs/tags/marco/2026-10-18-inicio-ticket-05-reunioes`). Conferir o alvo (os dois `yclkzyoebpsxmgpbcbus`).
-- [ ] Escrever o 32 no molde do 23: `begin`, `_tap`, `plan(N)`, usuários inventados a1 (administrador), a2 (integrante), a3 (consulta) e a4 (inativo), `finish()` e a exceção `RESULTADO DOS TESTES`. Preparação: setores TD1 e TD2, um macroprocesso e três processos ("Proc Data", "Proc Cancelado", "Proc Excluir"). O cancelado vai por `private.mudar_situacao`, como dono, ou com `set_config('ep.mudando_situacao','on',true)`; o executor confere no 20. Asserções, uma por linha das tabelas da spec e do critério 2:
+- [x] `git switch -c reunioes-05` a partir da `main` limpa, e `git tag marco/2026-10-18-inicio-ticket-05-reunioes`. Enviar o marco (`git push origin refs/tags/marco/2026-10-18-inicio-ticket-05-reunioes`). Conferir o alvo (os dois `yclkzyoebpsxmgpbcbus`).
+- [x] Escrever o 32 no molde do 23: `begin`, `_tap`, `plan(N)`, usuários inventados a1 (administrador), a2 (integrante), a3 (consulta) e a4 (inativo), `finish()` e a exceção `RESULTADO DOS TESTES`. Preparação: setores TD1 e TD2, um macroprocesso e três processos ("Proc Data", "Proc Cancelado", "Proc Excluir"). O cancelado vai por `private.mudar_situacao`, como dono, ou com `set_config('ep.mudando_situacao','on',true)`; o executor confere no 20. Asserções, uma por linha das tabelas da spec e do critério 2:
   1. `has_column('public','processos','data_da_reuniao')`;
   2. administrador marca, integrante troca e integrante remove (volta a `null`), cada um com `lives_ok` e o valor conferido;
   3. a Consulta, o inativo e o visitante (`anon`) não mudam a coluna: 0 linhas afetadas, e o valor fica igual (a consulta e o inativo pela RLS, o visitante por `throws_ok` 42501);
@@ -87,14 +87,14 @@
   8. o processo com data se exclui (`lives_ok` no `delete`) e troca de setor (`lives_ok` no `update setor_id`, com a data mantida);
   9. `hasnt_table` para `reunioes`, `reunioes_processos`, `reunioes_usuarios` e `reunioes_responsaveis`, e `hasnt_type('public','tipo_de_reuniao')`;
   10. um evento antigo de `reuniao`, inserido como dono, é lido por a1, a2 e a3 (1 linha cada), e por a4 e `anon` não (0 linhas ou recusa).
-- [ ] Apagar o 23, o 24 e o 25: o assunto deles sai da plataforma, e o 32 cobre o que fica (critério 2).
-- [ ] Comitar ("Ticket 05 de reunioes: plano de execução e teste de banco da data da reunião"), `git push -u origin reunioes-05`, disparar o "Testes de banco" na branch pelo navegador do app e ler o resultado. Esperado: o 32 vermelho (coluna inexistente) e todos os outros verdes. Anotar o número da execução.
+- [x] Apagar o 23, o 24 e o 25: o assunto deles sai da plataforma, e o 32 cobre o que fica (critério 2).
+- [x] Comitar ("Ticket 05 de reunioes: plano de execução e teste de banco da data da reunião"), `git push -u origin reunioes-05`, disparar o "Testes de banco" na branch pelo navegador do app e ler o resultado. Esperado: o 32 vermelho (coluna inexistente) e todos os outros verdes. Anotar o número da execução.
 
 ### Tarefa 2 — Migração (critérios 1 e 9)
 
 **Arquivos:** criar `supabase/migrations/<timestamp>_data_da_reuniao.sql` (com `npx supabase migration new data_da_reuniao`); modificar `supabase/AMBIENTES.md`.
 
-- [ ] Escrever a migração, nesta ordem, com comentários do porquê no estilo das anteriores:
+- [x] Escrever a migração, nesta ordem, com comentários do porquê no estilo das anteriores:
   1. `alter table public.processos add column data_da_reuniao date;` e `grant update (data_da_reuniao) on public.processos to authenticated;`
   2. `create or replace function private.estado_do_processo(...)` igual à de `20261014204810_subprocessos_e_reclassificacao.sql`, com `'data_da_reuniao', processo.data_da_reuniao` no `jsonb_build_object`. Mantém o `security definer` e o `search_path = ''` da original.
   3. `create or replace view public.processos_com_andamento with (security_invoker = true) as` igual à de `20261014130147_processos.sql`, com `p.data_da_reuniao` acrescentada como **última** coluna. Repetir o `revoke all ... from anon, authenticated` e o `grant select ... to authenticated`.
@@ -112,20 +112,20 @@
 
      Depois, `drop type public.tipo_de_reuniao;`.
   7. Não tocar na política "eventos: perfil ativo lê as reuniões": os registros antigos continuam legíveis.
-- [ ] Ensaiar antes de aplicar:
+- [x] Ensaiar antes de aplicar:
   1. criar `supabase/tests/32b_ensaio_data_da_reuniao.test.sql`, uma cópia do 32 com o corpo da migração colado logo depois do `begin` e antes do `plan`;
   2. comitar, enviar e disparar o "Testes de banco". Esperado: o 32b verde e o 32 ainda vermelho;
   3. apagar o 32b e comitar a remoção.
 
   Se o ensaio falhar, corrigir a migração e repetir; na terceira falha, parar (regra de parada).
-- [ ] Comitar a migração (sem os tipos, ver as Decisões) e enviar. Disparar o "Migrar banco de desenvolvimento" na branch, com `migracao` igual ao nome do arquivo **sem a pasta**, e ler o resultado. Depois, o "Testes de banco" na branch. Esperado: todos verdes, o 32 com N de N.
-- [ ] Registrar em `supabase/AMBIENTES.md` a linha da migração, no formato das anteriores: data, ticket, o 32 vermelho antes e verde depois com os números das execuções, o ensaio e o workflow usado. Comitar.
+- [x] Comitar a migração (sem os tipos, ver as Decisões) e enviar. Disparar o "Migrar banco de desenvolvimento" na branch, com `migracao` igual ao nome do arquivo **sem a pasta**, e ler o resultado. Depois, o "Testes de banco" na branch. Esperado: todos verdes, o 32 com N de N.
+- [x] Registrar em `supabase/AMBIENTES.md` a linha da migração, no formato das anteriores: data, ticket, o 32 vermelho antes e verde depois com os números das execuções, o ensaio e o workflow usado. Comitar.
 
 ### Tarefa 3 — Retirar o módulo e as telas de reunião, e regenerar os tipos (critério 6)
 
 **Arquivos:** os de "Apagar", mais `App.tsx`, `main.tsx`, `areas.ts`, `FaixaLateral.tsx`, `Icone.tsx`, `useAreaAtual.ts`, `AreaDeCadastros.tsx`, `AreaDeSetores.tsx`, `SetorAberto.tsx`, `AreaDeProcessos.tsx`, `PainelDoProcesso.tsx`, `HistoricoDoProcesso.tsx`, `ListaDoHistorico.tsx`, `historicoDosCadastros.ts`, `recusasDeProcessos.ts`, `andamentosSupabase.ts` (+ testes), `src/testes/processosNosCadastros.tsx`, `src/types/database.ts`; criar `src/App.reunioesRetiradas.test.tsx`.
 
-- [ ] Testes que falham, em `App.reunioesRetiradas.test.tsx` (o aplicativo inteiro, com as falsas nomeadas):
+- [x] Testes que falham, em `App.reunioesRetiradas.test.tsx` (o aplicativo inteiro, com as falsas nomeadas):
   1. a faixa lateral mostra Quadro, Lista, Setores e Painel, sem "Reuniões". Ajustar a expectativa em `App.test.tsx`;
   2. `#/reunioes` e `#/reunioes/qualquer` abrem o Quadro;
   3. o setor aberto não tem a seção "Reuniões";
@@ -133,8 +133,8 @@
   5. no histórico geral, um evento antigo de `reuniao` aparece como "Criou Registro de reunião (recurso retirado da plataforma)", com a data e o autor, sem "Antes:" e "Depois:", e fora da lista do filtro "Item".
 
   Em `historicoDosCadastros.test.ts`: `nomeDoItem` de um evento `reuniao` dá a linha simples, e `itensDoFiltro` não inclui reuniões. Em `recusasDeProcessos.test.ts` e `andamentosSupabase.test.ts`: tirar os casos de `setor_com_reunioes` e `processo_com_reunioes*`.
-- [ ] Rodar e ver falhar pelos motivos esperados.
-- [ ] Implementar:
+- [x] Rodar e ver falhar pelos motivos esperados.
+- [x] Implementar:
   - apagar `src/reunioes/`, `src/components/reunioes/`, `frasesDeReuniao.ts`, `reunioesDeTeste.tsx` e os testes de tela da lista "Apagar";
   - renomear `reunioesNosCadastros.tsx` para `processosNosCadastros.tsx`, sem o falso de reuniões, e ajustar os imports dos testes de versões;
   - tirar a prop `reunioes` de `App`, `main.tsx`, `AreaDeProcessos`, `PainelDoProcesso` (sem a `ReunioesDoProcesso`), `HistoricoDoProcesso` (só `processos.lerHistoricoDoProcesso`), `AreaDeCadastros`, `AreaDeSetores` e `SetorAberto` (sem a `ReunioesDoSetor`);
@@ -147,8 +147,8 @@
   - `apenasOQueMudou` vai para `src/cadastros/apenasOQueMudou.ts`, com o teste dele, se houver, movido junto;
   - `ListaDoHistorico.tsx`: entidade `reuniao` sem os spans de antes e depois, e `apenasOQueMudou` no `editar` de `processo`. Deixar no código o comentário do porquê;
   - `historicoSupabase.ts` mantém `'reuniao'` na lista de entidades, com o comentário atualizado: só registros antigos.
-- [ ] `npm run db:types` (o alvo já foi conferido) e conferir no `src/types/database.ts` que saíram as tabelas de reunião e `salvar_reuniao`, e que entrou `data_da_reuniao` em `processos` e na view.
-- [ ] `npx tsc -b`, `npx eslint .`, `npm run check:circular` e `npm test`, tudo verde. Um `grep -rni "reuni" src` só pode mostrar a linha simples, a data nova, a etapa "Reunião de modelagem" dos dados de teste e o histórico. Comitar ("Ticket 05 de reunioes: sai a área Reuniões; tipos regenerados").
+- [x] `npm run db:types` (o alvo já foi conferido) e conferir no `src/types/database.ts` que saíram as tabelas de reunião e `salvar_reuniao`, e que entrou `data_da_reuniao` em `processos` e na view.
+- [x] `npx tsc -b`, `npx eslint .`, `npm run check:circular` e `npm test`, tudo verde. Um `grep -rni "reuni" src` só pode mostrar a linha simples, a data nova, a etapa "Reunião de modelagem" dos dados de teste e o histórico. Comitar ("Ticket 05 de reunioes: sai a área Reuniões; tipos regenerados").
 
 ### Tarefa 4 — Função pura do texto (critério 8, primeira parte)
 
@@ -158,13 +158,13 @@
 - `hojeLocal(agora?: Date): string`, no formato AAAA-MM-DD, como era em `quandoAcontece.ts`;
 - `textoDaReuniao(data: string | null, hoje: string): string`, que devolve "não marcada", "marcada para DD/MM/AAAA" ou "realizada em DD/MM/AAAA" e usa o `formatarData` de `caminhoDeEtapas.ts`.
 
-- [ ] Testes que falham:
+- [x] Testes que falham:
   - `null` dá "não marcada";
   - `2026-10-20` com hoje `2026-10-14` dá "marcada para 20/10/2026";
   - a data igual a hoje dá "marcada para";
   - `2026-10-13` dá "realizada em 13/10/2026";
   - `hojeLocal(new Date(2026, 0, 5, 23, 59))` dá `2026-01-05`.
-- [ ] Implementar o mínimo, rodar e comitar.
+- [x] Implementar o mínimo, rodar e comitar.
 
 ### Tarefa 5 — Módulo de processos: ler e marcar a data (critério 8, segunda parte)
 
@@ -175,12 +175,12 @@
 - `ModuloDeProcessos.marcarReuniao(id: string, data: string | null): Promise<void>`, em que `null` remove a data. As recusas seguem as do módulo: perfil, com a frase de `RECUSAS_DOS_PROCESSOS`, e processo que sumiu, com `CadastroInexistente`;
 - `ProcessosFalso.marcarReuniao`, que respeita `falhaDeGravacao` e acrescenta `{ acao: 'reuniao', id, nota: data ?? undefined }` às `chamadas`.
 
-- [ ] Testes que falham:
+- [x] Testes que falham:
   - `lerProcessoSupabase.test.ts`: a linha da view com `data_da_reuniao: '2026-10-20'` vira `dataDaReuniao: '2026-10-20'`, e com `null` vira `null`;
   - o teste da gravação: `marcarReuniao('p1', '2026-10-20')` faz `update({ data_da_reuniao: '2026-10-20' }).eq('id','p1').select('id')`, e `null` grava `null`. Sem linha afetada, a leitura decide entre a recusa de perfil ("Seu perfil não permite alterar os processos.") e `CadastroInexistente`. Um erro do banco vira `Error` com o motivo;
   - `ProcessosFalso`: marca e remove; a leitura devolve a data; `falhaDeGravacao` lança; processo inexistente lança `CadastroInexistente`; o processo novo nasce com `null`.
-- [ ] Implementar e acrescentar `dataDaReuniao: null` em cada construtor da lista. `ProcessosFalso.ts` tem de continuar abaixo de 300 linhas; se passar, extrair a montagem do processo novo para `andamentoFalso.ts` ou um arquivo vizinho.
-- [ ] `npx tsc -b`, rodar os testes tocados e comitar.
+- [x] Implementar e acrescentar `dataDaReuniao: null` em cada construtor da lista. `ProcessosFalso.ts` tem de continuar abaixo de 300 linhas; se passar, extrair a montagem do processo novo para `andamentoFalso.ts` ou um arquivo vizinho.
+- [x] `npx tsc -b`, rodar os testes tocados e comitar.
 
 ### Tarefa 6 — Linha "Reunião de modelagem piloto" no painel (critérios 3, 4, 5, 7 e 8)
 
@@ -188,7 +188,7 @@
 
 **Interfaces — consome:** `textoDaReuniao`, `hojeLocal`, `ModuloDeProcessos.marcarReuniao`, `useGravacaoComFalha` e `processo.dataDaReuniao`.
 
-- [ ] Testes de tela que falham (o aplicativo inteiro, o painel aberto por `#/processos/<id>` e o relógio fixado só no `Date`, como em `reunioesDeTeste.fixarOHoje`, que agora sai):
+- [x] Testes de tela que falham (o aplicativo inteiro, o painel aberto por `#/processos/<id>` e o relógio fixado só no `Date`, como em `reunioesDeTeste.fixarOHoje`, que agora sai):
   1. os textos "marcada para 20/10/2026" (futura), "marcada para 14/10/2026" (hoje), "realizada em 10/10/2026" e "não marcada";
   2. marcar: o campo `date` com o rótulo "Data da reunião de modelagem piloto" mais [Salvar] gravam (`chamadas` do falso), e o texto atualiza;
   3. trocar a data;
@@ -200,15 +200,15 @@
   9. Consulta: vê o texto, sem campo e sem botões;
   10. histórico do processo: um evento `editar` com `data_da_reuniao` de `2026-10-14` para `2026-10-20` mostra só "Reunião de modelagem piloto: 14/10/2026" no antes e "20/10/2026" no depois, com o autor;
   11. excluir e trocar o setor de um processo com data, sem recusa.
-- [ ] Implementar:
+- [x] Implementar:
   - em `historicoDosCadastros.ts`, o rótulo `data_da_reuniao: 'Reunião de modelagem piloto'` e o valor em DD/MM/AAAA por `formatarData`;
   - `ReuniaoDoProcesso`: uma seção com rótulo, no estilo de `painel-dados`, com uma `dl` de uma linha (`dt` "Reunião de modelagem piloto", `dd` com o texto) e, para quem altera, o campo e os botões;
   - no `PainelDoProcesso`, a `ReuniaoDoProcesso` no lugar da antiga `ReunioesDoProcesso`, depois da `EstruturaDoProcesso` e antes da `SecaoDeVersoes`. Ao gravar, chama `aoAtualizar` e `aoMudar`, como as outras ações.
-- [ ] Rodar os testes tocados, `npx tsc -b` e `npx eslint`, e comitar.
+- [x] Rodar os testes tocados, `npx tsc -b` e `npx eslint`, e comitar.
 
 ### Tarefa 7 — Fecho
 
-- [ ] `npm test`, `npx tsc -b`, `npx eslint .` e `npm run check:circular`, tudo verde. Conferir os critérios do ticket um a um.
-- [ ] Gravar o `.scratch/reunioes/desvios.md`: tipos regenerados na Tarefa 3; "só o que mudou" vale agora para qualquer edição do processo; reuniões antigas fora do filtro do histórico; ensaio da migração; o que mais surgir. Gravar também o `.scratch/melhorias-protocolo.md` (os itens não testados do `/executar-complexo`). Marcar as caixas deste plano e comitar.
-- [ ] Juntar à `main`: `git switch main`, `git merge reunioes-05` e `git branch -d reunioes-05` (se o `-d` recusar, parar e perguntar). Gravar a linha `Concluído em AAAA-MM-DD (commit <hash>)` no ticket e comitar. `git push origin main`, e conferir o "Testes de banco" da `main`, porque o envio mexe em `supabase/`.
-- [ ] Apontar o próximo ticket, `processos-etapas/11`, e pedir o `/cost`.
+- [x] `npm test`, `npx tsc -b`, `npx eslint .` e `npm run check:circular`, tudo verde. Conferir os critérios do ticket um a um.
+- [x] Gravar o `.scratch/reunioes/desvios.md`: tipos regenerados na Tarefa 3; "só o que mudou" vale agora para qualquer edição do processo; reuniões antigas fora do filtro do histórico; ensaio da migração; o que mais surgir. Gravar também o `.scratch/melhorias-protocolo.md` (os itens não testados do `/executar-complexo`). Marcar as caixas deste plano e comitar.
+- [x] Juntar à `main`: `git switch main`, `git merge reunioes-05` e `git branch -d reunioes-05` (se o `-d` recusar, parar e perguntar). Gravar a linha `Concluído em AAAA-MM-DD (commit <hash>)` no ticket e comitar. `git push origin main`, e conferir o "Testes de banco" da `main`, porque o envio mexe em `supabase/`.
+- [x] Apontar o próximo ticket, `processos-etapas/11`, e pedir o `/cost`.
