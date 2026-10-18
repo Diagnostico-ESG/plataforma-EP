@@ -606,3 +606,8 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **2026-10-18 · Ocorrência: o limite de uso da sessão foi atingido no meio da Tarefa 4** e a sessão retomou depois, sem perda (os arquivos e o git guardavam tudo).
 - **2026-10-18 · Ocorrência: o aviso do claude-mem (cota esgotada) apareceu no início da sessão**, e a sessão seguiu sem ele.
 - **2026-10-18 · Ocorrência: a sessão rodou com o Opus**, porque o usuário pediu o `/executar-complexo` nesta mesma sessão, logo depois do `/situação`. A tabela do funil indica Sonnet.
+
+## 2026-10-18 — /ship da parte 1 (processos-etapas e reunioes)
+
+- **2026-10-18 · Item não testado: `/cost` por sessão em `custos.md`, com coluna de funcionalidade.** Esperado: uma linha com valor por sessão. Aconteceu: o usuário pulou o `/cost` no `/ship` (linha gravada como "não informado"), e as sessões de 17 e 18/10 (`/demanda`, `/planejar` da parte 1, tickets 05, 11 e 12, `/polir`) não têm linha nenhuma; a soma por funcionalidade sai incompleta.
+- **Conferência de tela sem login:** o "verificado manualmente" foi feito numa vitrine local (`vitrine.local/`, fora do git) que monta o app com os módulos falsos dos testes. Ela tinha ficado desatualizada com a remoção dos módulos de reunião e precisou ser refeita. Sugestão: o protocolo prever esse caminho (app com falsas, servido pelo Vite) quando o app exige login e o banco não tem dados de teste.
