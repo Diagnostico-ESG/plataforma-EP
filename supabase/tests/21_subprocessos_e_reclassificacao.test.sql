@@ -69,9 +69,7 @@ grant execute on function pg_temp.status(text, text) to authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 set local role authenticated;
 
--- Preparação: as etapas do setor resolvidas e a modelagem do "Solto" concluída.
-update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
-  where setor_id = '5f000000-0000-0000-0000-000000000008' and status = 'pendente';
+-- Preparação: a modelagem do "Solto" concluída.
 update public.andamentos set status = 'em_andamento' where processo_id = pg_temp.processo('Solto')
   and etapa_id = (select id from public.etapas where codigo = 'modelagem');
 update public.andamentos set status = 'concluida' where processo_id = pg_temp.processo('Solto')

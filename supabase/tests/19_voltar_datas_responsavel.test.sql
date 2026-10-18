@@ -6,7 +6,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(38);
+insert into _tap (linha) select plan(35);
 
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 insert into public.autorizacoes (email, perfil) values
@@ -21,7 +21,7 @@ insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-0000000000a4', 'inativo.teste@ccivil.pr.gov.br', 'authenticated', 'authenticated');
 update public.usuarios set ativo = false where id = '00000000-0000-0000-0000-0000000000a4';
 
--- Um setor (o gatilho dá a ele as 3 etapas do setor), um macroprocesso e três processos (6 etapas cada).
+-- Um setor, um macroprocesso e três processos (6 etapas cada).
 insert into public.setores (id, sigla, nome) values ('5f000000-0000-0000-0000-000000000006', 'TS6', 'Setor Volta');
 insert into public.macroprocessos (id, codigo, nome) values ('af000000-0000-0000-0000-000000000006', null, 'Macro Volta');
 insert into public.processos (setor_id, macroprocesso_id, nome) values
@@ -37,12 +37,6 @@ language sql stable as $$
   where p.nome = nome_do_processo and e.codigo = codigo_da_etapa $$;
 grant execute on function pg_temp.andamento(text, text) to authenticated;
 
-create function pg_temp.andamento_do_setor(codigo_da_etapa text) returns uuid
-language sql stable as $$
-  select a.id from public.andamentos a join public.etapas e on e.id = a.etapa_id
-  where a.setor_id = '5f000000-0000-0000-0000-000000000006' and e.codigo = codigo_da_etapa $$;
-grant execute on function pg_temp.andamento_do_setor(text) to authenticated;
-
 create function pg_temp.agir(nome_do_processo text, codigo_da_etapa text, novo public.status_da_etapa,
   nova_nota text default null) returns void
 language sql as $$
@@ -57,13 +51,7 @@ grant execute on function pg_temp.status(text, text) to authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 set local role authenticated;
 
--- Preparação: as etapas do setor resolvidas; "Processo Volta" com a 4, a 5 e a 6 concluídas.
-update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
-  where id = pg_temp.andamento_do_setor('identificacao_responsaveis');
-update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
-  where id = pg_temp.andamento_do_setor('sensibilizacao');
-update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
-  where id = pg_temp.andamento_do_setor('identificacao_processos');
+-- Preparação: "Processo Volta" com a 1 e a 2 concluídas.
 select pg_temp.agir('Processo Volta', 'modelagem', 'em_andamento');
 select pg_temp.agir('Processo Volta', 'modelagem', 'concluida');
 select pg_temp.agir('Processo Volta', 'relatorio_modelagem_tecnica', 'em_andamento');
@@ -215,19 +203,6 @@ set local role anon;
 insert into _tap (linha) select throws_ok(
   $sql$select public.voltar_a_etapa('00000000-0000-0000-0000-000000000000', 'Tentativa')$sql$, '42501', null,
   'visitante não volta a etapa');
-
--- Voltar no setor não mexe nos andamentos dos processos do setor.
-reset role;
-select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
-set local role authenticated;
-insert into _tap (linha) select lives_ok(
-  $sql$select public.voltar_a_etapa(pg_temp.andamento_do_setor('identificacao_responsaveis'), 'Faltou um responsável')$sql$,
-  'voltar a uma etapa do setor');
-insert into _tap (linha) select is(
-  (select count(*)::int from public.andamentos where setor_id = '5f000000-0000-0000-0000-000000000006' and status = 'pendente'),
-  2, 'as etapas seguintes do setor voltam a pendente');
-insert into _tap (linha) select is(pg_temp.status('Processo Volta', 'modelagem'), 'em_andamento'::public.status_da_etapa,
-  'os andamentos dos processos do setor ficam como estavam');
 
 reset role;
 -- A função não é security definer: a RLS de quem chama decide.

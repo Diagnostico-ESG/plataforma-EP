@@ -65,11 +65,9 @@ end $$;
 grant execute on function pg_temp.arquivo(text, text, bigint), pg_temp.par(), pg_temp.processo(text),
   pg_temp.versao(uuid, integer), pg_temp.alterar_tamanhos(bigint) to authenticated;
 
--- Preparação, como integrante: as etapas do setor resolvidas e o "Processo Concluido V" com as obrigatórias resolvidas.
+-- Preparação, como integrante: o "Processo Concluido V" com as obrigatórias resolvidas.
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 set local role authenticated;
-update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
-  where setor_id = '5f000000-0000-0000-0000-0000000000e1' and status = 'pendente';
 -- Na ordem do caminho, uma por vez (a sequência das etapas é conferida a cada mudança).
 update public.andamentos a set status = 'realizada_anteriormente', nota = 'Feita antes' from public.etapas e
   where e.id = a.etapa_id and a.processo_id = pg_temp.processo('e4') and e.codigo = 'modelagem';

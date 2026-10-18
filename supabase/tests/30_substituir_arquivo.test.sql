@@ -100,8 +100,6 @@ insert into _tap (linha) select throws_ok(
 reset role;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 set local role authenticated;
-update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
-  where setor_id = '5f000000-0000-0000-0000-0000000000f1' and status = 'pendente';
 -- Na ordem do caminho, uma por vez (a sequência das etapas é conferida a cada mudança).
 update public.andamentos a set status = 'realizada_anteriormente', nota = 'Feita antes' from public.etapas e
   where e.id = a.etapa_id and a.processo_id = pg_temp.processo('f4') and e.codigo = 'modelagem';

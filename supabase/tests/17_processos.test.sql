@@ -9,7 +9,7 @@ grant all on sequence _tap_n_seq to anon, authenticated;
 -- O processo que a exclusão vai apagar, guardado antes para conferir os andamentos depois.
 create temp table _alvo (id uuid);
 grant all on _alvo to authenticated;
-insert into _tap (linha) select plan(79);
+insert into _tap (linha) select plan(77);
 
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 -- O inativo é administrador de propósito: a recusa dele só pode vir de estar inativo.
@@ -25,7 +25,7 @@ insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-0000000000a4', 'inativo.teste@ccivil.pr.gov.br', 'authenticated', 'authenticated');
 update public.usuarios set ativo = false where id = '00000000-0000-0000-0000-0000000000a4';
 
--- Setores inventados: TPA a TPC para os perfis, TRS e TRX para as regras. O gatilho dá a cada um as 3 etapas do setor.
+-- Setores inventados: TPA a TPC para os perfis, TRS e TRX para as regras.
 insert into public.setores (id, sigla, nome) values
   ('5e000000-0000-0000-0000-000000000001', 'TPA', 'Setor Perfil A'),
   ('5e000000-0000-0000-0000-000000000002', 'TPB', 'Setor Perfil B'),
@@ -172,7 +172,7 @@ insert into _tap (linha) select is(
   (select count(*)::int from public.andamentos a join public.etapas e on e.id = a.etapa_id
     where a.processo_id = (select id from public.processos
       where setor_id = '5e000000-0000-0000-0000-000000000004' and nome = 'Emitir Oficio')
-      and a.status = 'pendente' and e.nivel = 'processo'),
+      and a.status = 'pendente'),
   6, 'processo novo nasce com 6 andamentos pendentes');
 insert into _tap (linha) select throws_ok(
   $sql$insert into public.andamentos (etapa_id, processo_id)
@@ -240,22 +240,6 @@ insert into _tap (linha) select is(
   (select etapa_atual_codigo from public.processos_com_andamento
     where setor_id = '5e000000-0000-0000-0000-000000000004'),
   'modelagem', 'a etapa atual é a primeira pendente');
-insert into _tap (linha) select ok(
-  (select aguardando_o_setor from public.processos_com_andamento where setor_id = '5e000000-0000-0000-0000-000000000004'),
-  'aguarda o setor enquanto as etapas do setor estão pendentes');
-update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
-  where setor_id = '5e000000-0000-0000-0000-000000000004'
-    and etapa_id = (select id from public.etapas where codigo = 'identificacao_responsaveis');
-update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
-  where setor_id = '5e000000-0000-0000-0000-000000000004'
-    and etapa_id = (select id from public.etapas where codigo = 'sensibilizacao');
-update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
-  where setor_id = '5e000000-0000-0000-0000-000000000004'
-    and etapa_id = (select id from public.etapas where codigo = 'identificacao_processos');
-insert into _tap (linha) select ok(
-  not (select aguardando_o_setor from public.processos_com_andamento
-    where setor_id = '5e000000-0000-0000-0000-000000000004'),
-  'deixa de aguardar o setor com as etapas do setor resolvidas');
 update public.andamentos set responsavel_id = '00000000-0000-0000-0000-0000000000a2'
   where processo_id = (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004')
     and etapa_id = (select id from public.etapas where codigo = 'modelagem');
@@ -339,13 +323,12 @@ insert into _tap (linha) select is(pg_temp.eventos_dos_processos('00000000-0000-
 insert into _tap (linha) select is(pg_temp.eventos_dos_processos('00000000-0000-0000-0000-0000000000a4'), 0,
   'Inativo não lê os eventos dos processos');
 
--- Restrições do dono: um andamento é de um setor ou de um processo, e a etapa não se repete no processo.
+-- Restrições do dono: todo andamento é de um processo, e a etapa não se repete no processo.
 insert into _tap (linha) select throws_ok(
-  $sql$update public.andamentos
-    set processo_id = (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004')
-    where setor_id = '5e000000-0000-0000-0000-000000000004'
-      and etapa_id = (select id from public.etapas where codigo = 'sensibilizacao')$sql$,
-  '23514', null, 'andamento de setor e de processo ao mesmo tempo é recusado');
+  $sql$update public.andamentos set processo_id = null
+    where processo_id = (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004')
+      and etapa_id = (select id from public.etapas where codigo = 'modelagem')$sql$,
+  '23502', null, 'andamento sem processo é recusado');
 insert into _tap (linha) select throws_ok(
   $sql$insert into public.andamentos (etapa_id, processo_id)
     values ((select id from public.etapas where codigo = 'modelagem'),

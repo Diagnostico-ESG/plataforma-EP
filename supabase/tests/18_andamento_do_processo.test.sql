@@ -1,4 +1,4 @@
--- Andamento das etapas do processo: sequência, setor resolvido antes da primeira etapa, uma em andamento,
+-- Andamento das etapas do processo: sequência (a Modelagem piloto sem depender do setor), uma em andamento,
 -- dispensa, nota, concluído calculado, perfis e eventos (processos-etapas, ticket 05).
 begin;
 create extension if not exists pgtap with schema extensions;
@@ -6,7 +6,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(25);
+insert into _tap (linha) select plan(23);
 
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 insert into public.autorizacoes (email, perfil) values
@@ -21,7 +21,7 @@ insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-0000000000a4', 'inativo.teste@ccivil.pr.gov.br', 'authenticated', 'authenticated');
 update public.usuarios set ativo = false where id = '00000000-0000-0000-0000-0000000000a4';
 
--- Um setor (o gatilho dá a ele as 3 etapas do setor, pendentes), um macroprocesso e dois processos.
+-- Um setor, um macroprocesso e dois processos.
 insert into public.setores (id, sigla, nome) values ('5f000000-0000-0000-0000-000000000001', 'TS5', 'Setor Andamento');
 insert into public.macroprocessos (id, codigo, nome) values ('af000000-0000-0000-0000-000000000001', null, 'Macro Andamento');
 insert into public.processos (setor_id, macroprocesso_id, nome) values
@@ -46,32 +46,15 @@ grant execute on function pg_temp.agir(text, public.status_da_etapa, text) to au
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 set local role authenticated;
 
--- A primeira etapa do processo só começa com as etapas do setor resolvidas.
-insert into _tap (linha) select throws_ok(
-  $sql$select pg_temp.agir('modelagem', 'em_andamento')$sql$, 'P0001', 'setor_nao_resolveu:TS5',
-  'iniciar a primeira etapa com o setor pendente é recusado');
-update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
-  where setor_id = '5f000000-0000-0000-0000-000000000001'
-    and etapa_id = (select id from public.etapas where codigo = 'identificacao_responsaveis');
-update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
-  where setor_id = '5f000000-0000-0000-0000-000000000001'
-    and etapa_id = (select id from public.etapas where codigo = 'sensibilizacao');
-update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
-  where setor_id = '5f000000-0000-0000-0000-000000000001'
-    and etapa_id = (select id from public.etapas where codigo = 'identificacao_processos');
-insert into _tap (linha) select ok(
-  not (select aguardando_o_setor from public.processos_com_andamento where nome = 'Processo Andamento'),
-  'com o setor resolvido o processo deixa de aguardá-lo');
-
--- Iniciar e concluir: a data do dia é gravada.
+-- Iniciar e concluir: a data do dia é gravada. A primeira etapa (Modelagem piloto) não depende do setor.
 insert into _tap (linha) select lives_ok($sql$select pg_temp.agir('modelagem', 'em_andamento')$sql$,
-  'iniciar a primeira etapa com o setor resolvido');
+  'iniciar a Modelagem piloto sem depender do setor');
 insert into _tap (linha) select is(
   (select iniciada_em from public.andamentos where id = pg_temp.andamento('Processo Andamento', 'modelagem')),
   current_date, 'iniciar grava a data de início de hoje');
 insert into _tap (linha) select throws_ok(
   $sql$select pg_temp.agir('relatorio_modelagem_tecnica', 'em_andamento')$sql$, 'P0001',
-  'ja_ha_etapa_em_andamento:Reunião de modelagem', 'segunda etapa em andamento no processo é recusada');
+  'ja_ha_etapa_em_andamento:Modelagem piloto', 'segunda etapa em andamento no processo é recusada');
 insert into _tap (linha) select lives_ok($sql$select pg_temp.agir('modelagem', 'concluida')$sql$,
   'concluir a etapa em andamento');
 insert into _tap (linha) select is(

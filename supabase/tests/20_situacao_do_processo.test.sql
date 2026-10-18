@@ -21,7 +21,7 @@ insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-0000000000a4', 'inativo.teste@ccivil.pr.gov.br', 'authenticated', 'authenticated');
 update public.usuarios set ativo = false where id = '00000000-0000-0000-0000-0000000000a4';
 
--- Um setor (o gatilho dá a ele as 3 etapas do setor), um macroprocesso e três processos (6 etapas cada).
+-- Um setor, um macroprocesso e três processos (6 etapas cada).
 insert into public.setores (id, sigla, nome) values ('5f000000-0000-0000-0000-000000000007', 'TS7', 'Setor Situação');
 insert into public.macroprocessos (id, codigo, nome) values ('af000000-0000-0000-0000-000000000007', null, 'Macro Situação');
 insert into public.processos (setor_id, macroprocesso_id, nome) values
@@ -55,9 +55,7 @@ grant execute on function pg_temp.situacao(text) to authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 set local role authenticated;
 
--- Preparação: as etapas do setor resolvidas e, no "Processo Parado", a modelagem concluída.
-update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
-  where setor_id = '5f000000-0000-0000-0000-000000000007' and status = 'pendente';
+-- Preparação: no "Processo Parado", a modelagem concluída.
 select pg_temp.agir('Processo Parado', 'modelagem', 'em_andamento');
 select pg_temp.agir('Processo Parado', 'modelagem', 'concluida');
 
