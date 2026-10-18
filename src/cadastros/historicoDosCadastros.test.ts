@@ -292,3 +292,31 @@ describe('processos', () => {
     expect(eventosDoItem([excluido, criado], 'p1')).toHaveLength(2)
   })
 })
+
+describe('registros antigos de reunião (recurso retirado da plataforma)', () => {
+  const REUNIAO_ANTIGA = { tipo: 'modelagem', data: '2026-10-14', setor_sigla: 'TSA', hora: null, local: 'Sala 1' }
+
+  test('o item é a linha simples, com ou sem o estado de antes', () => {
+    const criada = evento({ entidade: 'reuniao', entidadeRef: 'r1', depois: REUNIAO_ANTIGA })
+    const excluida = evento({ entidade: 'reuniao', entidadeRef: 'r1', acao: 'excluir', antes: REUNIAO_ANTIGA })
+    expect(nomeDoItem(criada)).toBe('Registro de reunião (recurso retirado da plataforma)')
+    expect(nomeDoItem(excluida)).toBe('Registro de reunião (recurso retirado da plataforma)')
+  })
+
+  test('a ação usa o texto comum', () => {
+    expect(textoDaAcaoDoCadastro('criar', 'reuniao')).toBe('Criou')
+  })
+
+  test('fica fora do filtro de itens, porque todas teriam o mesmo nome', () => {
+    const reuniao = evento({ entidade: 'reuniao', entidadeRef: 'r1', depois: REUNIAO_ANTIGA })
+    const setor = evento({ entidade: 'setor', entidadeRef: 's1', depois: SETOR })
+    expect(itensDoFiltro([reuniao, setor])).toEqual([{ id: 's1', nome: 'CEE — Escola Fictícia' }])
+  })
+})
+
+describe('data da reunião no estado do processo', () => {
+  test('aparece com o rótulo da tela e a data em DD/MM/AAAA', () => {
+    expect(descreverEstadoDoCadastro({ data_da_reuniao: '2026-10-20' })).toBe('Reunião de modelagem piloto: 20/10/2026')
+    expect(descreverEstadoDoCadastro({ data_da_reuniao: null })).toBe('Reunião de modelagem piloto: —')
+  })
+})

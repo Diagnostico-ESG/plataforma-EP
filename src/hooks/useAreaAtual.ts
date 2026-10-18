@@ -6,12 +6,12 @@ import { useEndereco } from './useEndereco'
 // A área é o primeiro trecho do endereço (#/setores/macroprocessos → setores); Quadro e Lista moram em #/processos.
 function areaDoEndereco(endereco: string): AreaComTela {
   const area = endereco.split('?')[0].split('/')[1]
-  if (area === 'administracao' || area === 'setores' || area === 'reunioes') return area
+  if (area === 'administracao' || area === 'setores') return area
   return lerEnderecoDosProcessos(endereco).visao
 }
 
 const ENDERECO_DA_AREA: Record<AreaComTela, string> = {
-  quadro: '#/processos', lista: '#/processos/lista', setores: '#/setores', reunioes: '#/reunioes', administracao: '#/administracao',
+  quadro: '#/processos', lista: '#/processos/lista', setores: '#/setores', administracao: '#/administracao',
 }
 
 export function useAreaAtual(): [AreaComTela, (area: AreaComTela) => void] {

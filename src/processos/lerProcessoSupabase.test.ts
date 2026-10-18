@@ -123,3 +123,10 @@ test('falha ao ler o histórico vira erro com o motivo do banco', async () => {
   cliente.respostas['eventos.select'] = { data: null, error: { message: 'sem conexão' } }
   await expect(criar(cliente).lerHistoricoDoProcesso('p1')).rejects.toThrow('Falha ao ler o histórico do processo: sem conexão')
 })
+
+test.each([['2026-10-20'], [null]])('a data da reunião (%s) chega com o processo', async (data) => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['processos_com_andamento.select'] = { data: [{ ...LINHA, data_da_reuniao: data }], error: null }
+  cliente.respostas['andamentos.select'] = { data: [], error: null }
+  expect((await criar(cliente).lerProcesso('p1'))?.dataDaReuniao).toBe(data)
+})

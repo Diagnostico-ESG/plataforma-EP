@@ -6,7 +6,6 @@ import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { Perfil } from './acesso/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
-import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import type { ProcessoLido } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
@@ -23,7 +22,7 @@ const EMITIR: ProcessoLido = {
   macroprocessoNome: 'Macro A', situacao: 'em_andamento', etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 },
   aguardandoOSetor: false, responsavel: null, origem: 'retomado', contexto: 'Contexto inventado', observacoes: null,
   processoPaiId: null, processoPai: null, subprocessos: [],
-  motivoDaSituacao: null, etapasDoSetor: [], etapasDoProcesso: [],
+  motivoDaSituacao: null, dataDaReuniao: null, etapasDoSetor: [], etapasDoProcesso: [],
 }
 
 type Montagem = { perfil?: Perfil; processos?: ProcessoLido[] }
@@ -47,7 +46,7 @@ function montar({ perfil = 'integrante_ep', processos = [] }: Montagem = {}) {
   falso.siglasDosSetores = { s1: 'TSA', s2: 'TSB' }
   falso.nomesDosMacroprocessos = { m1: 'Macro A', m2: 'Macro B' }
   falso.processos = processos
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} reunioes={new ReunioesFalso()} versoes={new VersoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} />)
   return falso
 }
 

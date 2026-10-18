@@ -5,7 +5,6 @@ import { AcessoFalso } from './acesso/AcessoFalso'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
-import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import css from './components/cadastros/Cadastros.css?raw'
 import { regrasDaClasse } from './testes/regrasDaClasse'
 import { VersoesFalso } from './versoes/VersoesFalso'
@@ -19,7 +18,7 @@ afterEach(() => {
 })
 
 async function abrirFormulario(cadastros = new CadastrosFalso()) {
-  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} processos={new ProcessosFalso()} reunioes={new ReunioesFalso()} versoes={new VersoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} processos={new ProcessosFalso()} versoes={new VersoesFalso()} />)
   fireEvent.click(await screen.findByRole('button', { name: 'Novo setor' }))
   return cadastros
 }

@@ -5,7 +5,7 @@ import type { ClienteSupabase } from '../lib/supabase'
 import { falhaDoAndamento } from './andamentosSupabase'
 import type { DadosDoProcesso, ModuloDeProcessos } from './tipos'
 
-type OperacoesDeGravacao = Pick<ModuloDeProcessos, 'criarProcesso' | 'editarProcesso' | 'excluirProcesso'>
+type OperacoesDeGravacao = Pick<ModuloDeProcessos, 'criarProcesso' | 'editarProcesso' | 'excluirProcesso' | 'marcarReuniao'>
 type DadosDaFalha = Pick<DadosDoProcesso, 'nome' | 'setorId'>
 type RespostaDaGravacao = { data: { id: string }[] | null; error: ErroDoBanco | null }
 
@@ -24,6 +24,8 @@ export function criarGravacaoDeProcessoSupabase(
     editarProcesso: async (id, dados) =>
       conferir(id, await tabela().update(valoresDaEdicao(dados)).eq('id', id).select('id'), dados),
     excluirProcesso: async (id) => conferir(id, await tabela().delete().eq('id', id).select('id')),
+    marcarReuniao: async (id, data) =>
+      conferir(id, await tabela().update({ data_da_reuniao: data }).eq('id', id).select('id')),
   }
 }
 

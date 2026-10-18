@@ -3,14 +3,13 @@ import { afterEach, expect, test } from 'vitest'
 import App from './App'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
-import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import { AcessoFalso } from './acesso/AcessoFalso'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
 afterEach(cleanup)
 
 async function abrirLogado() {
-  render(<App acesso={AcessoFalso.logadoComo()} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} reunioes={new ReunioesFalso()} versoes={new VersoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo()} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} versoes={new VersoesFalso()} />)
   await screen.findByRole('heading', { name: 'Processos' })
 }
 
@@ -25,7 +24,7 @@ test('para quem não é administrador, a navegação tem cinco áreas, sem Admin
   await abrirLogado()
   const navegacao = screen.getByRole('navigation', { name: 'Áreas do sistema' })
   const rotulos = Array.from(navegacao.querySelectorAll('button')).map((b) => b.getAttribute('aria-label'))
-  expect(rotulos).toEqual(['Quadro', 'Lista', 'Setores', 'Reuniões', 'Painel'])
+  expect(rotulos).toEqual(['Quadro', 'Lista', 'Setores', 'Painel'])
 })
 
 test('sem processos, mostra o aviso de vazio com a ação de cadastrar', async () => {

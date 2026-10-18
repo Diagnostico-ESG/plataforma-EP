@@ -7,7 +7,6 @@ import type { Perfil } from './acesso/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import type { EventoDoCadastro } from './cadastros/tipos'
 import { ProcessosFalso } from './processos/ProcessosFalso'
-import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import type { EtapaDoProcesso, ProcessoLido, SituacaoDoProcesso } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
@@ -37,7 +36,7 @@ function processo(situacao: SituacaoDoProcesso = 'em_andamento'): ProcessoLido {
     macroprocessoNome: 'Macro de Teste', situacao, etapaAtual: { codigo: 'c5', nome: RELATORIO, ordem: 5 },
     aguardandoOSetor: false, responsavel: null, origem: 'novo', contexto: null, observacoes: null,
     processoPaiId: null, processoPai: null, subprocessos: [],
-    motivoDaSituacao: parado ? 'Aguardando decisão' : null, etapasDoSetor: [],
+    motivoDaSituacao: parado ? 'Aguardando decisão' : null, dataDaReuniao: null, etapasDoSetor: [],
     etapasDoProcesso: [
       doProcesso(4, MODELAGEM, { status: 'concluida', iniciadaEm: '2026-10-10', resolvidaEm: '2026-10-11' }),
       doProcesso(5, RELATORIO, { status: 'em_andamento', iniciadaEm: '2026-10-12' }),
@@ -55,7 +54,7 @@ function montar({ perfil = 'integrante_ep', situacao = 'em_andamento', ajustar }
     { id: 'e5', codigo: 'c5', nome: RELATORIO, ordem: 5, ativa: true },
   ]
   ajustar?.(falso)
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={falso} reunioes={new ReunioesFalso()} versoes={new VersoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={falso} versoes={new VersoesFalso()} />)
   return falso
 }
 

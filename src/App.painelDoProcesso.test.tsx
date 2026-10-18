@@ -6,7 +6,6 @@ import type { Perfil } from './acesso/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import type { EventoDoCadastro } from './cadastros/tipos'
 import { ProcessosFalso } from './processos/ProcessosFalso'
-import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import type { EtapaDoProcesso, EtapaDoSetor, ProcessoLido } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
@@ -39,7 +38,7 @@ const PROCESSO: ProcessoLido = {
   responsavel: null, origem: 'retomado', contexto: 'Contexto inventado', observacoes: 'Observação inventada',
   processoPaiId: null, processoPai: null, subprocessos: [],
   motivoDaSituacao: null,
-  etapasDoSetor: [
+  dataDaReuniao: null, etapasDoSetor: [
     etapaDoSetor(1, 'identificacao_responsaveis', 'Identificação dos responsáveis'),
     etapaDoSetor(3, 'identificacao_processos', 'Identificação dos processos', { status: 'concluida', nota: null, obrigatoria: true }),
   ],
@@ -66,7 +65,7 @@ function montar({ perfil = 'integrante_ep', processos = [PROCESSO], ajustar }: M
   falso.etapasDoCatalogo = [{ id: 'e5', codigo: 'relatorio', nome: 'Relatório e modelagem técnica', ordem: 5, ativa: true }]
   falso.historicoDosProcessos = { p1: [EVENTO] }
   ajustar?.(falso)
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} reunioes={new ReunioesFalso()} versoes={new VersoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} />)
   return falso
 }
 

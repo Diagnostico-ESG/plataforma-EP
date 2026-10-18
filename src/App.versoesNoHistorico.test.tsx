@@ -2,7 +2,7 @@ import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/re
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import { falhaDoAndamento } from './processos/andamentosSupabase'
 import { RECUSAS_DOS_PROCESSOS } from './processos/processosSupabase'
-import { montarNosCadastros } from './testes/reunioesNosCadastros'
+import { montarNosCadastros } from './testes/processosNosCadastros'
 import { BPMN_VALIDO, PNG_VALIDO } from './testes/versoesDeTeste'
 
 beforeEach(() => {

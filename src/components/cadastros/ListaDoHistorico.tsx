@@ -4,7 +4,7 @@ import {
   descreverEstadoDoCadastro, eventosDoItem, itensDoFiltro, nomeDoItem, rotuloDoMotivo, textoDaAcaoDoCadastro,
 } from '../../cadastros/historicoDosCadastros'
 import type { EventoDoCadastro } from '../../cadastros/tipos'
-import { apenasOQueMudou } from '../../reunioes/textosDoHistorico'
+import { apenasOQueMudou } from '../../cadastros/apenasOQueMudou'
 
 // As classes historico-* vêm da Administração: a lista é a mesma do histórico de usuários.
 export function ListaDoHistorico({ eventos }: { eventos: EventoDoCadastro[] }) {
@@ -26,23 +26,30 @@ export function ListaDoHistorico({ eventos }: { eventos: EventoDoCadastro[] }) {
   )
 }
 
-// Na alteração de uma reunião, só o que mudou: o estado inteiro dela é longo e quase todo igual.
+// Na alteração de um processo, só o que mudou: o estado inteiro é longo, e trocar a data da reunião mudaria um campo só.
 function antesEDepois({ entidade, acao, antes, depois }: EventoDoCadastro) {
-  return entidade === 'reuniao' && acao === 'editar' ? apenasOQueMudou(antes, depois) : [antes, depois]
+  return entidade === 'processo' && acao === 'editar' ? apenasOQueMudou(antes, depois) : [antes, depois]
 }
 
 export function EventoDoHistorico({ evento }: { evento: EventoDoCadastro }) {
-  const [antes, depois] = antesEDepois(evento)
   return (
     <li className="historico-item">
       <time dateTime={evento.ocorridoEm}>{formatarMomento(evento.ocorridoEm)}</time>
       <span>{evento.autor ?? AUTOR_DIRETO_NO_BANCO}</span>
       <span><strong>{textoDaAcaoDoCadastro(evento.acao, evento.entidade)}</strong> {nomeDoItem(evento)}</span>
-      <span className="historico-mudanca">
-        <span>Antes: {descreverEstadoDoCadastro(antes)}</span>
-        <span>Depois: {descreverEstadoDoCadastro(depois)}</span>
-        {evento.motivo && <span>{rotuloDoMotivo(evento.acao)}: {evento.motivo}</span>}
-      </span>
+      {/* O registro antigo de reunião mostra só data, autor e ação: o recurso saiu da plataforma (ADR 0013). */}
+      {evento.entidade !== 'reuniao' && <MudancaDoEvento evento={evento} />}
     </li>
+  )
+}
+
+function MudancaDoEvento({ evento }: { evento: EventoDoCadastro }) {
+  const [antes, depois] = antesEDepois(evento)
+  return (
+    <span className="historico-mudanca">
+      <span>Antes: {descreverEstadoDoCadastro(antes)}</span>
+      <span>Depois: {descreverEstadoDoCadastro(depois)}</span>
+      {evento.motivo && <span>{rotuloDoMotivo(evento.acao)}: {evento.motivo}</span>}
+    </span>
   )
 }

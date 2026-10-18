@@ -188,6 +188,14 @@ export class ProcessosFalso implements ModuloDeProcessos {
     this.processos = levarMacroprocessoAosFilhos(this.processos.map((processo) => (processo.id === id ? editado : processo)), editado)
   }
 
+  // Como no banco, a data não depende da situação do processo nem mexe em etapa.
+  async marcarReuniao(id: string, data: string | null): Promise<void> {
+    this.conferirGravacao()
+    this.acharProcesso(id)
+    this.chamadas.push(data === null ? { acao: 'reuniao', id } : { acao: 'reuniao', id, nota: data })
+    this.processos = this.processos.map((processo) => (processo.id === id ? { ...processo, dataDaReuniao: data } : processo))
+  }
+
   async excluirProcesso(id: string): Promise<void> {
     this.conferirGravacao()
     this.acharProcesso(id)
@@ -219,7 +227,8 @@ export class ProcessosFalso implements ModuloDeProcessos {
       ...dados, ...this.nomesDoCartao(dados), id: `p${this.proximoId++}`, situacao: 'em_andamento',
       etapaAtual: primeira ? { codigo: primeira.codigo, nome: primeira.nome, ordem: primeira.ordem } : null,
       aguardandoOSetor: (this.etapasDoSetor[dados.setorId] ?? []).some((etapa) => etapa.status === 'pendente' || etapa.status === 'em_andamento'),
-      responsavel: null, motivoDaSituacao: null, processoPai: null, subprocessos: [], etapasDoSetor: this.etapasDoSetor[dados.setorId] ?? [],
+      responsavel: null, motivoDaSituacao: null, processoPai: null, subprocessos: [], dataDaReuniao: null,
+      etapasDoSetor: this.etapasDoSetor[dados.setorId] ?? [],
       etapasDoProcesso: etapas.map((etapa) => ({
         id: `a${this.proximoId++}`, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, obrigatoria: true,
         status: 'pendente', nota: null, iniciadaEm: null, resolvidaEm: null, responsavelId: null, responsavelNome: null,

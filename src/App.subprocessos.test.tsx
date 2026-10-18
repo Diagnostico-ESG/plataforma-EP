@@ -5,7 +5,6 @@ import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import type { Perfil } from './acesso/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
-import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import type { ProcessoLido, TipoDeProcesso } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
@@ -25,7 +24,7 @@ function processo({ id, nome, tipo, macro = 'm1', pai = null }: Item): ProcessoL
     macroprocessoNome: macro === 'm1' ? 'Macro A' : 'Macro B', processoPaiId: pai, situacao: 'em_andamento',
     etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 }, aguardandoOSetor: false,
     responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null, processoPai: null,
-    subprocessos: [], etapasDoSetor: [], etapasDoProcesso: [],
+    subprocessos: [], dataDaReuniao: null, etapasDoSetor: [], etapasDoProcesso: [],
   }
 }
 
@@ -49,7 +48,7 @@ function montar(perfil: Perfil = 'integrante_ep') {
   falso.siglasDosSetores = { s1: 'TSA', s2: 'TSB' }
   falso.nomesDosMacroprocessos = { m1: 'Macro A', m2: 'Macro B' }
   falso.processos = PROCESSOS.map((item) => ({ ...item }))
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} reunioes={new ReunioesFalso()} versoes={new VersoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} />)
   return falso
 }
 

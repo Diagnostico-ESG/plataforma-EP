@@ -6,8 +6,6 @@ test.each([
   ['setor_com_processos:2', 'Não é possível excluir: setor tem 2 processos ligados.'],
   ['setor_com_processos:1', 'Não é possível excluir: setor tem 1 processo ligado.'],
   ['macroprocesso_com_processos:3', 'Não é possível excluir: macroprocesso tem 3 processos ligados.'],
-  ['setor_com_reunioes:2', 'Não é possível excluir: setor tem 2 reuniões registradas. Desative o setor em vez de excluí-lo.'],
-  ['setor_com_reunioes:1', 'Não é possível excluir: setor tem 1 reunião registrada. Desative o setor em vez de excluí-lo.'],
   ['setor_com_processos_no_macroprocesso:TSA:2',
     'O setor TSA tem 2 processos neste macroprocesso; mova-os ou exclua-os antes.'],
   ['setor_com_processos_no_macroprocesso:TSA:1',

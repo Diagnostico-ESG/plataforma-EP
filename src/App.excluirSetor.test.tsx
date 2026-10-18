@@ -5,7 +5,6 @@ import { AcessoFalso } from './acesso/AcessoFalso'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
-import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import type { Setor } from './cadastros/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
@@ -26,7 +25,7 @@ const SETORES: Setor[] = [
 function montar() {
   const cadastros = new CadastrosFalso()
   cadastros.setores = [...SETORES]
-  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} processos={new ProcessosFalso()} reunioes={new ReunioesFalso()} versoes={new VersoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} processos={new ProcessosFalso()} versoes={new VersoesFalso()} />)
   return cadastros
 }
 

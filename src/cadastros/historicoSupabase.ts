@@ -6,8 +6,9 @@ export type EventoDoBanco = {
   detalhes: { antes: EstadoDoCadastro; depois: EstadoDoCadastro; motivo?: string | null }; autor: { nome: string } | null
 }
 
-// Cadastros, etapas (do setor e do catálogo) e responsáveis do setor. A RLS de eventos já deixa passar só estas entidades para quem não é administrador; o filtro mantém o mesmo
-// resultado para o administrador, que também lê os eventos de usuários (com e-mails).
+// Cadastros, etapas (do setor e do catálogo), responsáveis do setor e os registros antigos de reunião (o recurso saiu:
+// ADR 0013). A RLS de eventos já deixa passar só estas entidades para quem não é administrador; o filtro mantém o
+// mesmo resultado para o administrador, que também lê os eventos de usuários (com e-mails).
 const ENTIDADES_DOS_CADASTROS = [
   'setor', 'macroprocesso', 'setor_envolvido', 'andamento', 'responsavel_do_setor', 'processo', 'etapa', 'reuniao',
 ]

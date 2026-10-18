@@ -20,7 +20,7 @@ function falso(situacao: SituacaoDoProcesso = 'em_andamento', etapas: EtapaDoPro
     aguardandoOSetor: false, responsavel: null, origem: 'novo', contexto: null, observacoes: null,
     processoPaiId: null, processoPai: null, subprocessos: [],
     motivoDaSituacao: situacao === 'suspenso' || situacao === 'cancelado' ? 'Motivo antigo' : null,
-    etapasDoSetor: [], etapasDoProcesso: etapas,
+    dataDaReuniao: null, etapasDoSetor: [], etapasDoProcesso: etapas,
   }
   const modulo = new ProcessosFalso()
   modulo.processos = [processo]
@@ -110,5 +110,32 @@ describe('congelamento das etapas', () => {
     await modulo.retomarProcesso('p1', 'Segue')
     await modulo.iniciarEtapa('a5')
     expect(modulo.chamadas).toEqual([{ acao: 'iniciar', id: 'a5' }])
+  })
+})
+
+describe('data da reunião de modelagem piloto', () => {
+  test('marca, troca e remove, em qualquer situação', async () => {
+    const modulo = falso('cancelado')
+    await modulo.marcarReuniao('p1', '2026-10-20')
+    expect((await lido(modulo)).dataDaReuniao).toBe('2026-10-20')
+    await modulo.marcarReuniao('p1', null)
+    expect((await lido(modulo)).dataDaReuniao).toBeNull()
+    expect(modulo.chamadas).toEqual([{ acao: 'reuniao', id: 'p1', nota: '2026-10-20' }, { acao: 'reuniao', id: 'p1' }])
+  })
+
+  test('a falha programada e o processo que sumiu chegam como no módulo real', async () => {
+    const modulo = falso()
+    await expect(modulo.marcarReuniao('px', '2026-10-20')).rejects.toBeInstanceOf(CadastroInexistente)
+    modulo.falhaDeGravacao = new TravaDoBanco('Seu perfil não permite alterar os processos.')
+    expect((await falhaDe(modulo.marcarReuniao('p1', '2026-10-20'))).message).toBe('Seu perfil não permite alterar os processos.')
+  })
+
+  test('o processo novo nasce sem data', async () => {
+    const modulo = new ProcessosFalso()
+    await modulo.criarProcesso({
+      nome: 'Novo', setorId: 's1', macroprocessoId: 'm1', tipo: 'processo', processoPaiId: null, origem: 'novo',
+      contexto: null, observacoes: null,
+    })
+    expect(modulo.processos[0].dataDaReuniao).toBeNull()
   })
 })

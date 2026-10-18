@@ -3,13 +3,12 @@ import type { DadosDoSetor, ModuloDeCadastros } from '../../cadastros/tipos'
 import { useCarregamento } from '../../hooks/useCarregamento'
 import { useEndereco } from '../../hooks/useEndereco'
 import type { ModuloDeProcessos } from '../../processos/tipos'
-import type { ModuloDeReunioes } from '../../reunioes/tipos'
 import { FormularioDeSetor } from './FormularioDeSetor'
 import { ListaDeSetores } from './ListaDeSetores'
 import { SetorAberto } from './SetorAberto'
 
 type AreaDeSetoresProps = {
-  cadastros: ModuloDeCadastros; processos: ModuloDeProcessos; reunioes: ModuloDeReunioes; podeAlterar: boolean
+  cadastros: ModuloDeCadastros; processos: ModuloDeProcessos; podeAlterar: boolean
 }
 
 // Um terceiro trecho que não é aba (#/setores/<id>, de "Ver no setor") abre o setor direto.
@@ -18,7 +17,7 @@ function idDoSetorNoEndereco(endereco: string): string | null {
   return trecho && trecho !== 'macroprocessos' && trecho !== 'historico' ? trecho : null
 }
 
-export function AreaDeSetores({ cadastros, processos, reunioes, podeAlterar }: AreaDeSetoresProps) {
+export function AreaDeSetores({ cadastros, processos, podeAlterar }: AreaDeSetoresProps) {
   const listar = useCallback(() => cadastros.listarSetores(), [cadastros])
   const { estado, tentarDeNovo, recarregar } = useCarregamento(listar)
   const [endereco, irParaEndereco] = useEndereco()
@@ -40,7 +39,7 @@ export function AreaDeSetores({ cadastros, processos, reunioes, podeAlterar }: A
 
   if (aberto !== null) {
     return (
-      <SetorAberto cadastros={cadastros} processos={processos} reunioes={reunioes} podeAlterar={podeAlterar} id={aberto}
+      <SetorAberto cadastros={cadastros} processos={processos} podeAlterar={podeAlterar} id={aberto}
         aoVoltar={voltar} />
     )
   }

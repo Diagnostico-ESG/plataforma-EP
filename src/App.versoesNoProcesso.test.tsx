@@ -2,7 +2,7 @@ import { cleanup, fireEvent, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import { formatarMomento } from './acesso/historico'
 import type { SituacaoDoProcesso } from './processos/tipos'
-import { PROCESSOS_DOS_CADASTROS, montarNosCadastros } from './testes/reunioesNosCadastros'
+import { PROCESSOS_DOS_CADASTROS, montarNosCadastros } from './testes/processosNosCadastros'
 import { arquivoDeTeste, versaoDeTeste } from './testes/versoesDeTeste'
 
 beforeEach(() => {

@@ -23,7 +23,7 @@ function falso(): ProcessosFalso {
     macroprocessoNome: 'Macro', situacao: 'em_andamento', etapaAtual: { codigo: 'c6', nome: 'Etapa 6', ordem: 6 },
     processoPaiId: null, processoPai: null, subprocessos: [],
     aguardandoOSetor: false, responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
-    etapasDoSetor: [DO_SETOR],
+    dataDaReuniao: null, etapasDoSetor: [DO_SETOR],
     etapasDoProcesso: [
       doProcesso(4, { status: 'concluida', iniciadaEm: '2026-10-10', resolvidaEm: '2026-10-11' }),
       doProcesso(5, { status: 'concluida', iniciadaEm: '2026-10-11', resolvidaEm: '2026-10-12' }),

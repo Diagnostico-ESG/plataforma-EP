@@ -108,6 +108,8 @@ export type ProcessoLido = ProcessoDaLista & {
   /** Só para leitura no painel do processo; na ordem do catálogo. */
   etapasDoSetor: EtapaDoSetor[]
   etapasDoProcesso: EtapaDoProcesso[]
+  /** A data da reunião de modelagem piloto (AAAA-MM-DD), passada ou futura; null quando não marcada. */
+  dataDaReuniao: string | null
 }
 
 /**
@@ -142,6 +144,8 @@ export type ModuloDeProcessos = {
   criarProcesso(dados: DadosDoProcesso): Promise<void>
   editarProcesso(id: string, dados: DadosDoProcesso): Promise<void>
   excluirProcesso(id: string): Promise<void>
+  /** Marca, troca ou (com null) remove a data da reunião de modelagem piloto; vale em qualquer situação do processo. */
+  marcarReuniao(id: string, data: string | null): Promise<void>
   /** Do mais recente para o mais antigo. */
   lerHistoricoDoProcesso(id: string): Promise<EventoDoCadastro[]>
   /** Na ordem do catálogo. */

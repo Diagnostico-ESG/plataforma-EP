@@ -5,7 +5,6 @@ import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import type { Perfil } from './acesso/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
-import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
 beforeEach(() => {
@@ -40,7 +39,7 @@ function cadastrosComVinculos() {
 }
 
 function montar(perfil: Perfil = 'integrante_ep') {
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastrosComVinculos()} processos={new ProcessosFalso()} reunioes={new ReunioesFalso()} versoes={new VersoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastrosComVinculos()} processos={new ProcessosFalso()} versoes={new VersoesFalso()} />)
 }
 
 function contagemDaLinha(nome: string): string {

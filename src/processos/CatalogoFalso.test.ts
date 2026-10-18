@@ -27,7 +27,7 @@ function processo(id: string, situacao: SituacaoDoProcesso, status: EtapaDoProce
     id, nome: `Processo ${id}`, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
     macroprocessoNome: 'Macro', processoPaiId: null, situacao, etapaAtual: null, aguardandoOSetor: false,
     responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null, processoPai: null,
-    subprocessos: [], etapasDoSetor: [], etapasDoProcesso: [etapaDoProcesso(MODELAGEM, status)],
+    subprocessos: [], dataDaReuniao: null, etapasDoSetor: [], etapasDoProcesso: [etapaDoProcesso(MODELAGEM, status)],
   }
 }
 

@@ -53,28 +53,6 @@ describe('gravação de processos no módulo real', () => {
     expect(falha.message).toBe('Este processo tem 3 subprocessos; reclassifique-os ou exclua-os antes.')
   })
 
-  test.each([
-    ['processo_com_reunioes:1', 'Não é possível excluir: processo foi tratado em 1 reunião. Cancele o processo em vez de excluí-lo.'],
-    ['processo_com_reunioes:3', 'Não é possível excluir: processo foi tratado em 3 reuniões. Cancele o processo em vez de excluí-lo.'],
-  ])('excluir processo tratado em reunião: "%s" vira a frase com a contagem', async (mensagem, frase) => {
-    const cliente = new ClienteSupabaseFalso()
-    cliente.respostas['processos.delete'] = { data: null, error: { code: 'P0001', message: mensagem } }
-    const falha = await falhaDe(criar(cliente).excluirProcesso('p1'))
-    expect(falha).toBeInstanceOf(TravaDoBanco)
-    expect(falha.message).toBe(frase)
-  })
-
-  test.each([
-    ['processo_com_reunioes_muda_de_setor:1', 'Não é possível trocar o setor: processo foi tratado em 1 reunião. Registre um processo novo no outro setor.'],
-    ['processo_com_reunioes_muda_de_setor:2', 'Não é possível trocar o setor: processo foi tratado em 2 reuniões. Registre um processo novo no outro setor.'],
-  ])('trocar o setor de processo tratado em reunião: "%s" vira a frase com a contagem', async (mensagem, frase) => {
-    const cliente = new ClienteSupabaseFalso()
-    cliente.respostas['processos.update'] = { data: null, error: { code: 'P0001', message: mensagem } }
-    const falha = await falhaDe(criar(cliente).editarProcesso('p1', DADOS))
-    expect(falha).toBeInstanceOf(TravaDoBanco)
-    expect(falha.message).toBe(frase)
-  })
-
   test('editar atualiza os campos editáveis pelo id e não manda o tipo nem o pai', async () => {
     const cliente = new ClienteSupabaseFalso()
     cliente.respostas['processos.update'] = { data: [{ id: 'p1' }], error: null }
@@ -136,5 +114,29 @@ describe('gravação de processos no módulo real', () => {
     const falha = await falhaDe(criar(cliente).editarProcesso('p1', DADOS))
     expect(falha).toBeInstanceOf(TravaDoBanco)
     expect(falha.message).toBe(PERFIL)
+  })
+
+  test.each([['2026-10-20'], [null]])('marcar a reunião grava a data (%s) pelo id', async (data) => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['processos.update'] = { data: [{ id: 'p1' }], error: null }
+    await criar(cliente).marcarReuniao('p1', data)
+    expect(cliente.pedidos[0]).toMatchObject({
+      tabela: 'processos', operacao: 'update', filtro: ['id', 'p1'], valores: { data_da_reuniao: data },
+    })
+  })
+
+  test('marcar a reunião sem linha afetada: perfil ou processo que sumiu', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['processos.update'] = { data: [], error: null }
+    cliente.respostas['processos.select'] = { data: [{ id: 'p1' }], error: null }
+    expect((await falhaDe(criar(cliente).marcarReuniao('p1', '2026-10-20'))).message).toBe(PERFIL)
+    cliente.respostas['processos.select'] = { data: [], error: null }
+    await expect(criar(cliente).marcarReuniao('p1', null)).rejects.toBeInstanceOf(CadastroInexistente)
+  })
+
+  test('falha do banco ao marcar a reunião vira Error com o motivo', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['processos.update'] = { data: null, error: { code: '08006', message: 'conexão caiu' } }
+    expect((await falhaDe(criar(cliente).marcarReuniao('p1', '2026-10-20'))).message).toContain('conexão caiu')
   })
 })

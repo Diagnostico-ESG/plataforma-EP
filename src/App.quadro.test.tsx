@@ -5,7 +5,6 @@ import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import type { Perfil } from './acesso/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
-import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import type { EtapaDoCatalogo, ProcessoLido } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
@@ -29,7 +28,7 @@ function processo(nome: string, mudancas: Partial<ProcessoLido> = {}): ProcessoL
     etapaAtual: { codigo: MODELAGEM.codigo, nome: MODELAGEM.nome, ordem: MODELAGEM.ordem }, aguardandoOSetor: false,
     processoPaiId: null, processoPai: null, subprocessos: [],
     responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
-    etapasDoSetor: [], etapasDoProcesso: [], ...mudancas,
+    dataDaReuniao: null, etapasDoSetor: [], etapasDoProcesso: [], ...mudancas,
   }
 }
 
@@ -40,7 +39,7 @@ function montar({ perfil = 'integrante_ep', processos = [], ajustar }: Montagem 
   falso.etapasDoCatalogo = [RELATORIO, MODELAGEM]
   falso.processos = processos
   ajustar?.(falso)
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={falso} reunioes={new ReunioesFalso()} versoes={new VersoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={falso} versoes={new VersoesFalso()} />)
   return falso
 }
 

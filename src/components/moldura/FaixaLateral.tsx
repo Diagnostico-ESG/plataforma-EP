@@ -7,7 +7,6 @@ const ITENS: ItemDaFaixa[] = [
   { area: 'quadro', icone: 'quadro', rotulo: 'Quadro' },
   { area: 'lista', icone: 'lista', rotulo: 'Lista' },
   { area: 'setores', icone: 'setores', rotulo: 'Setores' },
-  { area: 'reunioes', icone: 'reunioes', rotulo: 'Reuniões' },
   { area: 'painel', icone: 'painel', rotulo: 'Painel' },
   { area: 'administracao', icone: 'administracao', rotulo: 'Administração' },
 ]
@@ -18,7 +17,7 @@ type FaixaLateralProps = {
   aoIrPara: (area: AreaComTela) => void
 }
 
-// Quadro, Lista, Setores, Reuniões e Administração têm tela; as outras áreas ganham tela na sua funcionalidade.
+// Quadro, Lista, Setores e Administração têm tela; as outras áreas ganham tela na sua funcionalidade.
 export function FaixaLateral({ areaAtual, mostrarAdministracao, aoIrPara }: FaixaLateralProps) {
   const itens = mostrarAdministracao ? ITENS : ITENS.filter((item) => item.area !== 'administracao')
   return (

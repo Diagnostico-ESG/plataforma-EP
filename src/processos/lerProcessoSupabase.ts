@@ -45,7 +45,7 @@ async function lerEstrutura(cliente: ClienteSupabase, id: string, paiId: string 
 function dadosDoProcesso(linha: LinhaDoProcesso) {
   return {
     ...processoDaLinha(linha), origem: linha.origem ?? 'novo', contexto: linha.contexto,
-    observacoes: linha.observacoes, motivoDaSituacao: linha.motivo_da_situacao,
+    observacoes: linha.observacoes, motivoDaSituacao: linha.motivo_da_situacao, dataDaReuniao: linha.data_da_reuniao,
   }
 }
 

@@ -5,20 +5,24 @@ import type { Perfil } from '../acesso/tipos'
 import { CadastrosFalso } from '../cadastros/CadastrosFalso'
 import { ProcessosFalso } from '../processos/ProcessosFalso'
 import type { ProcessoLido } from '../processos/tipos'
-import type { ReunioesFalso } from '../reunioes/ReunioesFalso'
-import { falsoDeReunioes, SETORES_DE_TESTE } from './reunioesDeTeste'
 import { VersoesFalso } from '../versoes/VersoesFalso'
+
+const SETORES_DE_TESTE = [
+  { id: 's1', sigla: 'TSA', nome: 'Setor A', ativo: true },
+  { id: 's2', sigla: 'TSB', nome: 'Setor B', ativo: true },
+  { id: 's3', sigla: 'TSC', nome: 'Setor C', ativo: false },
+]
 
 function processo(id: string, nome: string, mudancas: Partial<ProcessoLido> = {}): ProcessoLido {
   return {
     id, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1', macroprocessoNome: 'Macro Um',
     situacao: 'em_andamento', etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 },
     aguardandoOSetor: false, processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null, origem: 'novo',
-    contexto: null, observacoes: null, motivoDaSituacao: null, etapasDoSetor: [], etapasDoProcesso: [], ...mudancas,
+    contexto: null, observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, etapasDoSetor: [], etapasDoProcesso: [], ...mudancas,
   }
 }
 
-/** Os mesmos processos das reuniões de teste (p1, p2 e p3), mais o p4, que nenhuma reunião tratou. */
+/** Processos em dois setores (s1 e s2), um deles cancelado. */
 export const PROCESSOS_DOS_CADASTROS: ProcessoLido[] = [
   processo('p1', 'Emitir Ofício'),
   processo('p2', 'Arquivar Pasta', { situacao: 'cancelado', etapaAtual: null }),
@@ -28,7 +32,6 @@ export const PROCESSOS_DOS_CADASTROS: ProcessoLido[] = [
 
 type Montagem = {
   perfil?: Perfil
-  ajustarReunioes?: (falso: ReunioesFalso) => void
   ajustarProcessos?: (falso: ProcessosFalso) => void
   ajustarCadastros?: (falso: CadastrosFalso) => void
   ajustarVersoes?: (falso: VersoesFalso) => void
@@ -47,9 +50,9 @@ function falsoDeVersoes(processos: ProcessosFalso): VersoesFalso {
   return versoes
 }
 
-/** O aplicativo inteiro com setores, processos e reuniões que combinam entre si (as reuniões de teste de sempre). */
+/** O aplicativo inteiro com setores e processos que combinam entre si. */
 export function montarNosCadastros(
-  { perfil = 'integrante_ep', ajustarReunioes, ajustarProcessos, ajustarCadastros, ajustarVersoes }: Montagem = {},
+  { perfil = 'integrante_ep', ajustarProcessos, ajustarCadastros, ajustarVersoes }: Montagem = {},
 ) {
   const cadastros = new CadastrosFalso()
   cadastros.setores = SETORES_DE_TESTE.map(({ id, sigla, nome, ativo }) => ({ id, sigla, nome, observacoes: null, ativo }))
@@ -57,10 +60,9 @@ export function montarNosCadastros(
   const processos = new ProcessosFalso()
   processos.processos = PROCESSOS_DOS_CADASTROS
   ajustarProcessos?.(processos)
-  const reunioes = falsoDeReunioes({ ajustar: ajustarReunioes })
   const versoes = falsoDeVersoes(processos)
   ajustarVersoes?.(versoes)
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={processos}
-    reunioes={reunioes} versoes={versoes} />)
-  return { cadastros, processos, reunioes, versoes }
+    versoes={versoes} />)
+  return { cadastros, processos, versoes }
 }

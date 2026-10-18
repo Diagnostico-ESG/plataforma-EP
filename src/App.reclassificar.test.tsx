@@ -7,7 +7,6 @@ import type { Perfil } from './acesso/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import type { EventoDoCadastro } from './cadastros/tipos'
 import { ProcessosFalso } from './processos/ProcessosFalso'
-import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import type { ProcessoLido, TipoDeProcesso } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
@@ -23,7 +22,7 @@ function processo({ id, nome, tipo, macro, pai = null }: Item): ProcessoLido {
     id, nome, tipo, setorId: 's1', setorSigla: 'TSA', macroprocessoId: macro,
     macroprocessoNome: macro === 'm1' ? 'Macro A' : 'Macro B', processoPaiId: pai, situacao: 'em_andamento',
     etapaAtual: null, aguardandoOSetor: false, responsavel: null, origem: 'novo', contexto: null, observacoes: null,
-    motivoDaSituacao: null, processoPai: null, subprocessos: [], etapasDoSetor: [], etapasDoProcesso: [],
+    motivoDaSituacao: null, processoPai: null, subprocessos: [], dataDaReuniao: null, etapasDoSetor: [], etapasDoProcesso: [],
   }
 }
 
@@ -42,7 +41,7 @@ function montar({ id, perfil = 'integrante_ep', ajustar }: Montagem) {
   const falso = new ProcessosFalso()
   falso.processos = PROCESSOS.map((item) => ({ ...item }))
   ajustar?.(falso)
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={falso} reunioes={new ReunioesFalso()} versoes={new VersoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={falso} versoes={new VersoesFalso()} />)
   return falso
 }
 

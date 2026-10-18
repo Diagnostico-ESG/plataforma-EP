@@ -17,12 +17,6 @@ const DESENHOS = {
       <path d="M9 7.5h1M14 7.5h1M9 11.5h1M14 11.5h1M10 21v-4h4v4" />
     </>
   ),
-  reunioes: (
-    <>
-      <rect x="3" y="5" width="18" height="16" rx="2" />
-      <path d="M3 10h18M8 3v4M16 3v4" />
-    </>
-  ),
   painel: <path d="M4 20h16M7 16v-5M12 16V6M17 16v-8" />,
   administracao: (
     <>

@@ -2,7 +2,7 @@ import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/re
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { SituacaoDoProcesso } from './processos/tipos'
-import { PROCESSOS_DOS_CADASTROS, montarNosCadastros } from './testes/reunioesNosCadastros'
+import { PROCESSOS_DOS_CADASTROS, montarNosCadastros } from './testes/processosNosCadastros'
 import { arquivoDeTeste, versaoDeTeste } from './testes/versoesDeTeste'
 import type { VersoesFalso } from './versoes/VersoesFalso'
 

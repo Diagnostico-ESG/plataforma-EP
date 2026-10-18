@@ -3,7 +3,6 @@ import { afterEach, expect, test } from 'vitest'
 import App from './App'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
-import { ReunioesFalso } from './reunioes/ReunioesFalso'
 import type { ProcessosFalso } from './processos/ProcessosFalso'
 import type { EtapaDoProcesso, EtapaNoCatalogo, ProcessoLido, SituacaoDoProcesso } from './processos/tipos'
 import { ETAPAS_DE_TESTE, abrirCatalogo, montarComCatalogo } from './testes/catalogoDeTeste'
@@ -29,7 +28,7 @@ function processo(id: string, nome: string, situacao: SituacaoDoProcesso, status
     id, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1', macroprocessoNome: 'Macro de Teste',
     processoPaiId: null, situacao, etapaAtual: { codigo: MODELAGEM.codigo, nome: MODELAGEM.nome, ordem: MODELAGEM.ordem },
     aguardandoOSetor: false, responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
-    processoPai: null, subprocessos: [], etapasDoSetor: [],
+    processoPai: null, subprocessos: [], dataDaReuniao: null, etapasDoSetor: [],
     etapasDoProcesso: [etapa(MODELAGEM, statusDaModelagem), etapa(PUBLICACAO, 'pendente')],
   }
 }
@@ -49,7 +48,7 @@ function montar(): ProcessosFalso {
 function abrirEm(processos: ProcessosFalso, endereco: string) {
   cleanup()
   window.location.hash = endereco
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'administrador' })} cadastros={new CadastrosFalso()} processos={processos} reunioes={new ReunioesFalso()} versoes={new VersoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'administrador' })} cadastros={new CadastrosFalso()} processos={processos} versoes={new VersoesFalso()} />)
 }
 
 async function acrescentarEncerramento() {

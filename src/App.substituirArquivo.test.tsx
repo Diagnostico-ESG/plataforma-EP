@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import type { SituacaoDoProcesso } from './processos/tipos'
-import { montarNosCadastros } from './testes/reunioesNosCadastros'
+import { montarNosCadastros } from './testes/processosNosCadastros'
 import { arquivoDeTeste, PNG_VALIDO, versaoDeTeste } from './testes/versoesDeTeste'
 import { falhaDaFuncao } from './versoes/recusasDeVersoes'
 import type { VersoesFalso } from './versoes/VersoesFalso'

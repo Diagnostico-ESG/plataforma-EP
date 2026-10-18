@@ -184,14 +184,16 @@ with apagados as (delete from public.andamentos where processo_id is not null re
 insert into _tap (linha) select is((select count(*)::int from apagados), 0,
   'andamento de processo não se apaga direto');
 
--- Eventos do cadastro: o criar traz os campos legíveis, o vínculo do setor incluído também.
+-- Eventos do cadastro: o criar traz os campos legíveis (com a data da reunião, vazia: reunioes, ticket 05), o vínculo
+-- do setor incluído também.
 insert into _tap (linha) select is(
   (select detalhes from public.eventos where entidade = 'processo' and acao = 'criar'
     and detalhes -> 'depois' ->> 'setor_sigla' = 'TRS'),
   jsonb_build_object('antes', null, 'depois', jsonb_build_object(
     'nome', 'Emitir Oficio', 'setor_id', '5e000000-0000-0000-0000-000000000004', 'setor_sigla', 'TRS',
     'macroprocesso_id', 'ab000000-0000-0000-0000-000000000002', 'macroprocesso_nome', 'Macro Teste B',
-    'tipo', 'a_classificar', 'origem', 'novo', 'situacao', 'em_andamento', 'contexto', null, 'observacoes', null)),
+    'tipo', 'a_classificar', 'origem', 'novo', 'situacao', 'em_andamento', 'contexto', null, 'observacoes', null,
+    'data_da_reuniao', null)),
   'criar gera o evento com os campos legíveis');
 insert into _tap (linha) select is(
   (select count(*)::int from public.eventos where entidade = 'setor_envolvido' and acao = 'criar'

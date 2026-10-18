@@ -1,8 +1,6 @@
 import { ROTULO_DO_STATUS, formatarData } from '../processos/caminhoDeEtapas'
 import { ROTULO_DA_ORIGEM, ROTULO_DA_SITUACAO, ROTULO_DO_TIPO } from '../processos/rotulos'
 import type { StatusDaEtapa } from '../processos/tipos'
-import { ROTULO_DO_TIPO_DE_REUNIAO } from '../reunioes/rotulos'
-import { nomeDaReuniaoNoHistorico, valorDoCampoDaReuniao } from '../reunioes/textosDoHistorico'
 import { rotuloDaCategoria } from './categorias'
 import type { CategoriaDoMacroprocesso, EstadoDoCadastro, EventoDoCadastro, ItemDoFiltro } from './tipos'
 
@@ -68,8 +66,7 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   tipo: 'Tipo', origem: 'Origem', situacao: 'Situação', contexto: 'Contexto', andamentos: 'Etapas',
   processo_nome: 'Processo', responsavel_nome: 'Responsável', processo_pai_nome: 'Processo pai',
   nivel: 'Nível', obrigatoria: 'Obrigatória', ativa: 'Situação', ordem: 'Posição',
-  data: 'Data', hora: 'Hora', local: 'Local', anotacoes: 'Anotações', outros_participantes: 'Outros participantes',
-  processos: 'Processos', usuarios: 'Usuários do EP',
+  data_da_reuniao: 'Reunião de modelagem piloto',
   rotulo: 'Versão', etapa: 'Etapa', arquivos: 'Arquivos', relatorio_de: 'Relatório copiado da versão',
   hash_md5: 'Impressão digital (MD5)',
 }
@@ -100,10 +97,13 @@ function codigoENome(codigo: unknown, nome: unknown): string {
   return typeof codigo === 'string' && codigo !== '' ? `${codigo} — ${texto(nome)}` : texto(nome)
 }
 
-// Etapa e responsável pertencem a um setor (a etapa, também a um processo): o nome vem com o dono; a reunião tem o
-// nome próprio (tipo, data e setor); a versão vem com o processo dela; null se o item não for de nenhum deles.
+/** A área Reuniões saiu da plataforma (ADR 0013); os eventos dela ficam no histórico, numa linha sem o detalhe. */
+export const TEXTO_DA_REUNIAO_RETIRADA = 'Registro de reunião (recurso retirado da plataforma)'
+
+// Etapa e responsável pertencem a um setor (a etapa, também a um processo): o nome vem com o dono; a versão vem com o
+// processo dela; a reunião antiga é a linha simples; null se o item não for de nenhum deles.
 function nomeDoItemComDono(entidade: string, estado: Record<string, unknown>): string | null {
-  if (entidade === 'reuniao') return nomeDaReuniaoNoHistorico(estado)
+  if (entidade === 'reuniao') return TEXTO_DA_REUNIAO_RETIRADA
   if (entidade === 'versao') return `${texto(estado.rotulo)} — ${texto(estado.processo_nome)}`
   const nomes: Record<string, unknown> = { andamento: estado.etapa_nome, responsavel_do_setor: estado.nome }
   const nome = nomes[entidade]
@@ -132,10 +132,13 @@ function itemDaLista(item: unknown): string {
   return typeof observacao === 'string' && observacao !== '' ? `${nomeCompleto} (${observacao})` : nomeCompleto
 }
 
-// Campos do andamento (etapas do setor): status pelo rótulo da tela e datas em DD/MM/AAAA; null se não for deles.
+// As datas do andamento e a da reunião do processo aparecem em DD/MM/AAAA.
+const CAMPOS_DE_DATA = new Set(['iniciada_em', 'resolvida_em', 'data_da_reuniao'])
+
+// Campos do andamento (status pelo rótulo da tela) e as datas; null se não for deles.
 function valorDaEtapa(campo: string, valor: unknown): string | null {
   if (campo === 'status') return ROTULO_DO_STATUS[valor as StatusDaEtapa] ?? texto(valor)
-  if (campo === 'iniciada_em' || campo === 'resolvida_em') return formatarData(typeof valor === 'string' ? valor : null)
+  if (CAMPOS_DE_DATA.has(campo)) return formatarData(typeof valor === 'string' ? valor : null)
   return null
 }
 
@@ -143,7 +146,7 @@ function valorDaEtapa(campo: string, valor: unknown): string | null {
 // null se não for deles.
 function valorPorRotulo(campo: string, valor: unknown): string | null {
   const rotulos: Record<string, Record<string, string>> = {
-    tipo: { ...ROTULO_DO_TIPO, ...ROTULO_DO_TIPO_DE_REUNIAO }, origem: ROTULO_DA_ORIGEM, situacao: ROTULO_DA_SITUACAO,
+    tipo: ROTULO_DO_TIPO, origem: ROTULO_DA_ORIGEM, situacao: ROTULO_DA_SITUACAO,
     nivel: { setor: 'Setor', processo: 'Processo' }, obrigatoria: { true: 'Sim', false: 'Não' },
     ativa: { true: 'Ativa', false: 'Inativa' },
   }
@@ -154,7 +157,7 @@ function valorPorRotulo(campo: string, valor: unknown): string | null {
 function valorLegivel(campo: string, valor: unknown): string {
   if (campo === 'ativo') return valor ? 'Ativo' : 'Inativo'
   if (campo === 'categoria') return rotuloDaCategoria(valor as CategoriaDoMacroprocesso | null)
-  const daEtapa = valorDaEtapa(campo, valor) ?? valorPorRotulo(campo, valor) ?? valorDoCampoDaReuniao(campo, valor)
+  const daEtapa = valorDaEtapa(campo, valor) ?? valorPorRotulo(campo, valor)
   if (daEtapa !== null) return daEtapa
   if (typeof valor === 'number') return String(valor) // a posição da etapa no catálogo
   if (!Array.isArray(valor)) return texto(valor)
@@ -179,11 +182,16 @@ function itensDoVinculo(evento: EventoDoCadastro): [string, string][] {
   return pares.filter((par): par is [string, string] => typeof par[0] === 'string' && typeof par[1] === 'string')
 }
 
+// Vínculos entram pelos ids que citam; reuniões antigas ficam fora, porque todas teriam o mesmo nome no filtro.
+function temItemProprio(evento: EventoDoCadastro): boolean {
+  return !ENTIDADES_QUE_LIGAM.has(evento.entidade) && evento.entidade !== 'reuniao'
+}
+
 /** Eventos da mais recente para a mais antiga: a primeira ocorrência de cada item dá o nome dele. */
 export function itensDoFiltro(eventos: EventoDoCadastro[]): ItemDoFiltro[] {
   const nomes = new Map<string, string>()
-  for (const evento of eventos) {
-    if (!ENTIDADES_QUE_LIGAM.has(evento.entidade) && !nomes.has(evento.entidadeRef)) nomes.set(evento.entidadeRef, nomeDoItem(evento))
+  for (const evento of eventos.filter(temItemProprio)) {
+    if (!nomes.has(evento.entidadeRef)) nomes.set(evento.entidadeRef, nomeDoItem(evento))
   }
   for (const par of eventos.flatMap(itensDoVinculo)) if (!nomes.has(par[0])) nomes.set(par[0], par[1])
   return [...nomes].map(([id, nome]) => ({ id, nome })).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))

@@ -1,15 +1,11 @@
 import { type ErroDoBanco, TravaDoBanco } from '../acesso/falhasDeGravacao'
 
-// O banco recusa com "motivo:valor" (migrações processos e reunioes); o PostgREST pode acrescentar texto em volta.
+// O banco recusa com "motivo:valor" (migração processos); o PostgREST pode acrescentar texto em volta.
 // O mais longo vem primeiro: "setor_com_processos" também abre "setor_com_processos_no_macroprocesso".
-const PADRAO_DA_RECUSA = /\b(setor_com_processos_no_macroprocesso|setor_com_processos|setor_com_reunioes|macroprocesso_com_processos):(.*)$/m
+const PADRAO_DA_RECUSA = /\b(setor_com_processos_no_macroprocesso|setor_com_processos|macroprocesso_com_processos):(.*)$/m
 
 function processosLigados(quantidade: number): string {
   return quantidade === 1 ? '1 processo ligado' : `${quantidade} processos ligados`
-}
-
-function reunioesRegistradas(quantidade: number): string {
-  return quantidade === 1 ? '1 reunião registrada' : `${quantidade} reuniões registradas`
 }
 
 function aoTirarDoMacroprocesso(valor: string): string {
@@ -20,7 +16,6 @@ function aoTirarDoMacroprocesso(valor: string): string {
 
 const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   setor_com_processos: (n) => `Não é possível excluir: setor tem ${processosLigados(Number(n))}.`,
-  setor_com_reunioes: (n) => `Não é possível excluir: setor tem ${reunioesRegistradas(Number(n))}. Desative o setor em vez de excluí-lo.`,
   macroprocesso_com_processos: (n) => `Não é possível excluir: macroprocesso tem ${processosLigados(Number(n))}.`,
   setor_com_processos_no_macroprocesso: aoTirarDoMacroprocesso,
 }

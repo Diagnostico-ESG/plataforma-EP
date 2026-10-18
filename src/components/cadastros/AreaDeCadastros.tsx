@@ -2,7 +2,6 @@ import type { UsuarioAtual } from '../../acesso/tipos'
 import type { ModuloDeCadastros } from '../../cadastros/tipos'
 import { useEndereco } from '../../hooks/useEndereco'
 import type { ModuloDeProcessos } from '../../processos/tipos'
-import type { ModuloDeReunioes } from '../../reunioes/tipos'
 import { AreaDeHistorico } from './AreaDeHistorico'
 import { AreaDeMacroprocessos } from './AreaDeMacroprocessos'
 import { AreaDeSetores } from './AreaDeSetores'
@@ -10,7 +9,7 @@ import './Cadastros.css'
 
 type AbaDosCadastros = 'setores' | 'macroprocessos' | 'historico'
 type AreaDeCadastrosProps = {
-  usuario: UsuarioAtual; cadastros: ModuloDeCadastros; processos: ModuloDeProcessos; reunioes: ModuloDeReunioes
+  usuario: UsuarioAtual; cadastros: ModuloDeCadastros; processos: ModuloDeProcessos
 }
 
 const ABAS: { aba: AbaDosCadastros; rotulo: string; endereco: string }[] = [
@@ -26,7 +25,7 @@ function abaDoEndereco(endereco: string): AbaDosCadastros {
 }
 
 // Esconder botões da Consulta é conveniência; quem protege os dados é a RLS de setores.
-export function AreaDeCadastros({ usuario, cadastros, processos, reunioes }: AreaDeCadastrosProps) {
+export function AreaDeCadastros({ usuario, cadastros, processos }: AreaDeCadastrosProps) {
   const [endereco] = useEndereco()
   const abaAtual = abaDoEndereco(endereco)
   return (
@@ -38,19 +37,19 @@ export function AreaDeCadastros({ usuario, cadastros, processos, reunioes }: Are
           </a>
         ))}
       </nav>
-      <SecaoAtual aba={abaAtual} cadastros={cadastros} processos={processos} reunioes={reunioes}
+      <SecaoAtual aba={abaAtual} cadastros={cadastros} processos={processos}
         podeAlterar={usuario.perfil !== 'consulta'} />
     </section>
   )
 }
 
 type SecaoAtualProps = {
-  aba: AbaDosCadastros; cadastros: ModuloDeCadastros; processos: ModuloDeProcessos; reunioes: ModuloDeReunioes
+  aba: AbaDosCadastros; cadastros: ModuloDeCadastros; processos: ModuloDeProcessos
   podeAlterar: boolean
 }
 
-function SecaoAtual({ aba, cadastros, processos, reunioes, podeAlterar }: SecaoAtualProps) {
-  if (aba === 'setores') return <AreaDeSetores cadastros={cadastros} processos={processos} reunioes={reunioes} podeAlterar={podeAlterar} />
+function SecaoAtual({ aba, cadastros, processos, podeAlterar }: SecaoAtualProps) {
+  if (aba === 'setores') return <AreaDeSetores cadastros={cadastros} processos={processos} podeAlterar={podeAlterar} />
   if (aba === 'macroprocessos') return <AreaDeMacroprocessos cadastros={cadastros} podeAlterar={podeAlterar} />
   return <AreaDeHistorico cadastros={cadastros} />
 }
