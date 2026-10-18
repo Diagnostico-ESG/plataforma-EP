@@ -4,7 +4,7 @@ Status: ready-for-agent
 
 **Como resolve o problema.** Hoje o andamento de cada processo fica espalhado entre planilhas e o Power BI, sem saber com certeza em que etapa cada um está, quem cuida dele nem o que mudou. Com esta funcionalidade, a equipe do EP cadastra na plataforma cada processo e subprocesso, ligado ao setor dono e a um macroprocesso, e registra o andamento etapa por etapa, da Modelagem piloto em diante, num caminho que o administrador configura no catálogo de etapas. A área Processos mostra o trabalho vivo num Quadro, com uma coluna por etapa, e o arquivo completo numa Lista com filtros; ao abrir um processo, o painel mostra o caminho de etapas, as ações possíveis e o histórico. O banco impõe a sequência das etapas, a situação do processo, as regras de reclassificação e o registro de cada mudança no histórico. As funcionalidades seguintes (reuniões, documentos, revisões, prazos e painel) se apoiam nesse andamento.
 
-Decisões de origem: `.scratch/processos-etapas/sabatina.md` (sabatina de 2026-10-13, três rodadas), `CONTEXT.md` (seções "Setores" e "Processos") e ADR 0004 (mudar o catálogo muda o caminho dos processos em andamento). Mudança de 2026-10-18 (parte 1 da iniciativa experiencia-do-quadro, `.scratch/experiencia-do-quadro/sabatina-parte-1.md`, ADR 0013): saem as etapas do setor, a coluna "Aguardando o setor", os responsáveis do setor e o nível do catálogo; a primeira etapa passa a se chamar Modelagem piloto; o processo ganha a data da reunião (spec de `reunioes`).
+Decisões de origem: `.scratch/processos-etapas/sabatina.md` (sabatina de 2026-10-13, três rodadas), `CONTEXT.md` (seções "Setores" e "Processos") e ADR 0004 (mudar o catálogo muda o caminho dos processos em andamento). Mudança de 2026-10-18 (parte 1 da iniciativa experiencia-do-quadro, `.scratch/experiencia-do-quadro/sabatina-parte-1.md`, ADR 0013): saem as etapas do setor, a coluna "Aguardando o setor", os responsáveis do setor e o nível do catálogo; a primeira etapa passa a se chamar Modelagem piloto; o processo ganha a data da reunião (spec de `reunioes`). Mudança de 2026-10-18 (parte 2, `.scratch/experiencia-do-quadro/sabatina-parte-2.md`, ADR 0014): resolver a etapa atual (concluir, dispensar ou registrar como realizada anteriormente) já **avança**, ou seja, inicia a próxima etapa pendente com o responsável escolhido na mesma janela; voltar também escolhe o responsável; [Assumir] em etapa sem responsável; quem enviou a versão mais recente não pode ser escolhido como responsável da Revisão interna.
 
 ## Problema
 
@@ -17,6 +17,7 @@ O EP acompanha dezenas de processos de vários setores, cada um numa etapa difer
   - a **Lista** mostra todos os processos, de qualquer situação, numa tabela com filtros;
   - nos dois, [Cadastrar processo] para Administrador e Integrante, e clicar num cartão ou numa linha abre o **painel do processo** à direita.
 - **Painel do processo:** dados do processo, a data da reunião de modelagem piloto (spec de `reunioes`), o caminho de etapas com as ações, os subprocessos (ou o processo pai), as ações de situação (suspender, cancelar, retomar), reclassificar, editar, excluir e a aba Histórico.
+- **Avanço das etapas (desde 2026-10-18):** concluir, dispensar ou registrar como realizada anteriormente a etapa atual abre uma janela que pergunta "Quem fica com a próxima etapa?" e, ao confirmar, a próxima etapa pendente já entra em andamento com essa pessoa (ou sem ninguém, à espera de alguém assumir). Na etapa sem responsável, [Assumir] põe a própria pessoa como responsável com um clique.
 - **Tela do setor** (área Setores, que já existe): ganha a lista dos processos do setor.
 - **Catálogo de etapas** (área Administração, só para o administrador): a lista ordenada das etapas, com obrigatória ou opcional, e ativa.
 
@@ -61,21 +62,43 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
 ### Andamento das etapas do processo
 
 29. Como integrante do EP, quero ver no painel o caminho de etapas do processo, da Modelagem piloto em diante, cada uma com status, responsável, datas e nota.
-30. Como integrante do EP, quero iniciar a etapa atual, para registrar que o trabalho nela começou.
+30. Como integrante do EP, quero iniciar a etapa atual quando ela está pendente (a Modelagem piloto de um processo novo, ou depois de uma mudança no catálogo), com um clique e sem janela, para registrar que o trabalho nela começou. As demais etapas se iniciam sozinhas pelo avanço (histórias 89 em diante).
 31. Como integrante do EP, quero que a plataforma recuse iniciar uma etapa enquanto a anterior não estiver resolvida (concluída, realizada anteriormente ou dispensada), explicando qual falta.
 32. Como integrante do EP, quero iniciar a Modelagem piloto de um processo recém-cadastrado sem depender de nada do setor, porque identificação e sensibilização já foram feitas fora da plataforma.
 33. Como integrante do EP, quero que cada processo tenha no máximo uma etapa em andamento.
-34. Como integrante do EP, quero concluir a etapa em andamento.
-35. Como integrante do EP, quero dispensar uma etapa opcional, com nota obrigatória, para registrar por que ela não será feita.
+34. Como integrante do EP, quero concluir a etapa em andamento e, na mesma janela, escolher quem fica com a próxima, que já se inicia (histórias 89 em diante).
+35. Como integrante do EP, quero dispensar uma etapa opcional, com nota obrigatória, para registrar por que ela não será feita, e que a próxima já se inicie como no concluir.
 36. Como integrante do EP, quero que a plataforma recuse dispensar uma etapa obrigatória.
-37. Como integrante do EP, quero registrar qualquer etapa como "realizada anteriormente", com nota obrigatória, para os processos retomados que já fizeram parte do caminho fora da plataforma.
+37. Como integrante do EP, quero registrar qualquer etapa como "realizada anteriormente", com nota obrigatória, para os processos retomados que já fizeram parte do caminho fora da plataforma, e que a próxima já se inicie como no concluir.
 38. Como integrante do EP, quero que a data de início e a de conclusão venham preenchidas com hoje e que eu possa corrigi-las na hora ou depois, para registrar quando o trabalho de fato aconteceu.
 39. Como integrante do EP, quero que a plataforma recuse uma data no futuro e uma conclusão antes do início, mostrando a data recebida.
-40. Como integrante do EP, quero voltar a uma etapa anterior, com motivo obrigatório: ela volta a "em andamento" e as seguintes já resolvidas voltam a "pendente", para refazer o trabalho quando algo mudou.
+40. Como integrante do EP, quero voltar a uma etapa anterior, com motivo obrigatório: ela volta a "em andamento" e as seguintes já resolvidas voltam a "pendente", para refazer o trabalho quando algo mudou. Na mesma janela do motivo, quero escolher quem fica com a etapa reaberta, com o responsável atual dela já marcado.
 41. Como integrante do EP, quero que o histórico guarde como cada etapa estava antes de voltar.
 42. Como integrante do EP, quero escolher o responsável de qualquer etapa do processo entre os usuários ativos de perfil Administrador ou Integrante, e trocá-lo a qualquer momento.
 43. Como integrante do EP, quero ver o responsável que foi desativado depois marcado como "Inativo" na etapa, sem poder escolhê-lo de novo.
 44. Como integrante do EP, quero ver a etapa atual destacada no caminho, as resolvidas com ✓ e as futuras apagadas, como na identidade visual.
+
+### Avanço e responsável (parte 2, 2026-10-18)
+
+89. Como integrante do EP, quero que [Concluir] abra a janela "Quem fica com a próxima etapa?", com o título dizendo qual etapa se conclui e qual vem a seguir, para passar o trabalho adiante num gesto só.
+90. Como integrante do EP, quero ver na janela os usuários ativos de perfil Administrador ou Integrante, cada um com o nome, e a opção "Ninguém por enquanto", para escolher quem segue ou deixar a etapa à espera.
+91. Como integrante do EP, quero que a janela venha com o responsável que a próxima etapa já tem marcado e, se ela não tiver nenhum (ou ele não puder ser escolhido), comigo marcado, para confirmar com Enter no caso comum.
+92. Como integrante do EP, quero que, ao confirmar, a etapa atual fique concluída e a próxima entre em andamento com a pessoa escolhida, com início hoje, tudo de uma vez, para o processo nunca ficar sem etapa em andamento por uma falha no meio.
+93. Como integrante do EP, quero que, com "Ninguém por enquanto", a próxima etapa também entre em andamento, sem responsável, para alguém assumi-la depois.
+94. Como integrante do EP, quero que "a próxima etapa" seja a primeira pendente depois da que resolvi, pulando as já resolvidas, para o avanço não reabrir o que já foi feito.
+95. Como integrante do EP, quero que a próxima etapa opcional (Publicação) se inicie como qualquer outra, e que eu a dispense depois se ela não for feita.
+96. Como integrante do EP, quero que, sem nenhuma etapa pendente depois da que resolvo, não haja janela de responsável, e que o processo fique concluído se todas as obrigatórias estiverem resolvidas.
+97. Como integrante do EP, quero que as janelas de Dispensar e de Realizada anteriormente tragam, abaixo da nota, a mesma escolha de quem fica com a próxima etapa, para resolver e avançar num passo só.
+98. Como integrante do EP, quero que Esc ou [Cancelar] feche a janela sem gravar nada: a etapa continua como estava.
+99. Como integrante do EP, quero usar a janela só pelo teclado e com leitor de tela: o foco abre na opção marcada, as setas trocam de opção, Enter confirma e cada opção é lida com o nome da pessoa.
+100. Como integrante do EP, quero ver no histórico dois registros do avanço, com o mesmo autor e a mesma hora: "Concluiu a etapa" (ou "Dispensou a etapa", ou "Registrou a etapa como realizada anteriormente") e "Iniciou a etapa", com o responsável, para saber quem passou o trabalho e para quem.
+101. Como integrante do EP, quero [Assumir] numa etapa pendente ou em andamento que está sem responsável, para me pôr como responsável com um clique.
+102. Como integrante do EP, quero continuar escolhendo e trocando o responsável de qualquer etapa pelo seletor, para qualquer integrante, como na história 42.
+103. Como integrante do EP, quero que a plataforma não me deixe escolher como responsável da Revisão interna quem enviou a versão mais recente do processo (fora as versões históricas): a janela não mostra essa pessoa, o [Assumir] não aparece para ela, e o banco recusa a escolha pelo seletor ou fora da tela, porque ninguém revisa o próprio trabalho.
+104. Como integrante do EP, quero que essa trava confira só o momento da escolha, para o revisor que corrige e envia uma versão nova continuar responsável pela Revisão interna.
+105. Como integrante do EP, quero que, sem versão não histórica no processo, ninguém seja barrado da Revisão interna.
+106. Como integrante do EP, quero que, quando quem conclui é o autor da versão mais recente e a próxima é a Revisão interna, a janela já venha com "Ninguém por enquanto" marcado (ou o responsável que a etapa já tem, se ele puder).
+107. Como Consulta, quero ver quem é o responsável de cada etapa, sem [Assumir] nem a janela de avanço.
 
 ### Etapas do setor e responsáveis do setor (retirados em 2026-10-18)
 
@@ -145,8 +168,9 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
   - listar processos com etapa atual, responsável dela e situação calculada;
   - ler um processo com a data da reunião, o caminho de etapas, os subprocessos ou o pai, e o histórico;
   - criar, editar e excluir processo, e marcar a data da reunião (spec de `reunioes`);
-  - iniciar, concluir, dispensar e registrar como realizada anteriormente uma etapa;
-  - corrigir as datas de uma etapa, mudar o responsável de uma etapa e voltar a uma etapa;
+  - iniciar uma etapa;
+  - concluir, dispensar e registrar como realizada anteriormente a etapa atual, levando o responsável da próxima (ou nenhum), numa chamada só (desde 2026-10-18);
+  - corrigir as datas de uma etapa, mudar o responsável de uma etapa ([Assumir] é mudar para si mesmo) e voltar a uma etapa, levando o responsável da etapa reaberta (desde 2026-10-18);
   - suspender, cancelar, retomar e reclassificar um processo;
   - ler os processos de um setor;
   - listar e manter o catálogo de etapas.
@@ -183,10 +207,11 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
   - **Reunião de modelagem piloto:** a linha da data, no lugar da antiga seção Reuniões, depois dos dados e da estrutura e antes das Versões (spec de `reunioes`).
   - **Caminho de etapas:** em cada etapa: status, responsável (seletor para quem pode), datas de início e de conclusão (editáveis para quem pode) e nota. As etapas do setor e o link "Ver no setor" saíram em 2026-10-18.
   - **Ações na etapa atual:**
-    - [Iniciar] quando pendente;
-    - [Concluir] quando em andamento;
+    - [Iniciar] quando pendente (um clique, sem janela);
+    - [Concluir] quando em andamento (abre a janela de avanço; sem etapa pendente depois, conclui direto);
     - [Dispensar] só se opcional;
     - [Realizada anteriormente].
+  - **[Assumir]** (desde 2026-10-18): na linha de cada etapa pendente ou em andamento sem responsável, para Administrador e Integrante, ao lado do seletor. Não aparece na Revisão interna para quem enviou a versão mais recente não histórica.
   - **Ações nas etapas resolvidas anteriores à atual:** [Voltar a esta etapa].
   - **Abaixo do caminho:**
     - dados do processo com [Editar];
@@ -198,6 +223,14 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
   - **Nota:** em Dispensar e Realizada anteriormente.
   - **Motivo:** em Suspender, Cancelar, Retomar, Voltar e Reclassificar.
   - **Botões:** o de confirmar tem o verbo da ação e fica desabilitado com o campo vazio; o foco abre no campo e Esc fecha sem gravar.
+- **Janela de avanço** (desde 2026-10-18; a mesma janela nativa do ADR 0003):
+  - **Quando abre:** em [Concluir], e dentro das janelas de Dispensar e Realizada anteriormente, abaixo da nota, sempre que há etapa pendente depois da que se resolve. Sem pendente depois, Concluir grava direto, e Dispensar e Realizada anteriormente mostram só a nota.
+  - **Título:** "Concluir {etapa} e iniciar {próxima}" (com "Dispensar" ou "Registrar … como realizada anteriormente" nas outras ações).
+  - **Pergunta e opções:** "Quem fica com a próxima etapa?", em botões de rádio: cada usuário ativo Administrador ou Integrante pelo nome, e "Ninguém por enquanto" por último. Quando a próxima é a Revisão interna, o autor da versão mais recente não histórica não aparece.
+  - **Marcado ao abrir:** o responsável que a próxima já tem, se ele pode ser escolhido; senão, quem está na tela, se pode; senão, "Ninguém por enquanto".
+  - **Teclado e leitor de tela:** o grupo de rádios tem a pergunta como nome; o foco abre na opção marcada (na nota, quando há nota); as setas trocam de opção; Enter confirma; Esc e [Cancelar] fecham sem gravar.
+  - **Botão de confirmar:** "Concluir e iniciar {próxima}" (ou "Dispensar e iniciar {próxima}", "Registrar e iniciar {próxima}"); com nota, desabilitado enquanto ela estiver vazia.
+  - **Voltar:** a janela do motivo ganha "Quem fica com esta etapa?", com as mesmas opções e a mesma trava, e com o responsável atual da etapa reaberta marcado (se ele não pode, quem está na tela; senão, "Ninguém por enquanto").
   - **Reclassificar:** a janela traz o novo tipo e, para Subprocesso, o pai. Quando o macroprocesso muda, ela mostra o aviso "O item passa do macroprocesso {de} para {para}, o do processo pai."
 - **Confirmação simples (ADR 0003)** em Excluir processo e Excluir etapa do catálogo:
   - "Excluir o processo {nome}? O histórico guarda o que ele tinha, inclusive as etapas, mas não é possível desfazer." [Excluir processo] [Cancelar];
@@ -216,6 +249,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
   - "Este processo tem {n} subprocessos; reclassifique-os ou exclua-os antes." (exclusão e reclassificação em subprocesso)
   - "O processo pai precisa ser do tipo Processo."
   - "{Usuário} não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP."
+  - "{Usuário} enviou a versão V{n} e não pode ser responsável pela Revisão interna." (desde 2026-10-18)
   - "Não é possível excluir: {setor | macroprocesso} tem {n} processos ligados."
   - "O setor {SIGLA} tem {n} processos neste macroprocesso; mova-os ou exclua-os antes."
   - "A etapa {nome} já foi usada; desative-a em vez de excluir."
@@ -239,6 +273,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
   - **Textos das ações:**
     - "Criou", "Editou", "Excluiu";
     - "Iniciou a etapa", "Concluiu a etapa", "Dispensou a etapa", "Registrou a etapa como realizada anteriormente", "Voltou à etapa", "Corrigiu as datas da etapa", "Mudou o responsável da etapa";
+    - o avanço (desde 2026-10-18) aparece como dois desses registros, com o mesmo autor e a mesma hora: o da etapa resolvida e "Iniciou a etapa" da próxima, com o responsável dela no "depois". Sem texto novo;
     - "Suspendeu", "Cancelou", "Retomou", "Reclassificou";
     - "Acrescentou a etapa ao catálogo", "Mudou a ordem do catálogo", "Desativou a etapa", "Reativou a etapa".
   - **Registros de recursos retirados (2026-10-18):** eventos de responsável do setor, de andamento de etapa do setor (o andamento sem processo) e de reunião aparecem no histórico geral e no da área Setores numa linha simples, com data, autor e ação: "Registro de responsável do setor (recurso retirado da plataforma)", "Registro de etapa do setor (recurso retirado da plataforma)" e "Registro de reunião (recurso retirado da plataforma)". Os eventos antigos do catálogo com o campo "nível" mostram o campo como veio, sem tradução nova.
@@ -336,7 +371,9 @@ A indicação "aguardando o setor" saiu da view em 2026-10-18.
 
 **Privilégios padrão:** cada tabela nova nasce com `revoke all` de visitante e de logado e concede de volta só o necessário a logado, com a RLS decidindo o resto. A view nasce com `revoke all` de visitante. Assim o teste `10_privilegios_padrao` continua passando.
 
-**Gravações com várias linhas** (voltar, reclassificar, suspender, cancelar e retomar com motivo, e mexer no catálogo, que acrescenta ou tira andamentos) passam por funções do banco chamadas pela interface, sem `security definer`, que rodam com a permissão de quem chama. A RLS decide o resto. Iniciar, concluir, dispensar, realizada anteriormente, corrigir datas e mudar responsável também podem ir por funções, se a execução preferir.
+**Gravações com várias linhas** (voltar, reclassificar, suspender, cancelar e retomar com motivo, e mexer no catálogo, que acrescenta ou tira andamentos) passam por funções do banco chamadas pela interface, sem `security definer`, que rodam com a permissão de quem chama. A RLS decide o resto. Iniciar, corrigir datas e mudar responsável também podem ir por funções, se a execução preferir.
+
+**Avanço (desde 2026-10-18, ADR 0014).** Concluir, dispensar e registrar como realizada anteriormente passam por uma função do banco, nas mesmas condições das outras (sem `security definer`, com a permissão de quem chama), que recebe o andamento, a ação, a nota (quando há) e o responsável da próxima (ou nenhum). Numa transação só, ela resolve a etapa e, se houver etapa pendente depois dela na ordem do catálogo, põe a primeira em andamento com início hoje e o responsável recebido. Qualquer recusa (sequência, nota, trava do autor, processo congelado) desfaz tudo. A função de voltar ganha o parâmetro do responsável da etapa reaberta (é apagada e recriada com a assinatura nova, com os mesmos privilégios). Nenhuma tabela ou coluna muda; a tabela "quem pode o quê" continua a mesma.
 
 #### Quem pode o quê (cada célula vira um teste pgTAP)
 
@@ -384,6 +421,8 @@ A indicação "aguardando o setor" saiu da view em 2026-10-18.
 | Motivo obrigatório em suspender, cancelar e retomar | restrição sobre `motivo_da_situacao` + funções | suspender sem motivo recusado |
 | Voltar: a etapa escolhida volta a em andamento e as seguintes resolvidas voltam a pendente | função de voltar | voltar à 1 com a 2 e a 3 concluídas deixa 1 em andamento e 2 e 3 pendentes, com os eventos |
 | Responsável é usuário ativo Administrador ou Integrante | gatilho antes de incluir e alterar | escolher um usuário Consulta ou inativo recusado |
+| Resolver a etapa atual avança: a primeira pendente depois dela entra em andamento, com início hoje e o responsável recebido (ou nenhum); tudo ou nada (desde 2026-10-18) | função de avanço | concluir a 2 com a 3 pendente deixa a 2 concluída e a 3 em andamento com o responsável; "nenhum" deixa a 3 em andamento sem responsável; com a 3 já resolvida, inicia a 4; concluir a última não inicia nada; dispensar e realizada anteriormente avançam igual; dispensar sem nota recusado sem mudar nenhuma etapa |
+| Responsável da Revisão interna não é quem enviou a versão mais recente não histórica, conferido só quando o responsável muda para alguém (desde 2026-10-18) | gatilho antes de alterar o responsável do andamento de código `revisao_interna` | escolher o autor da V3 recusado pelo seletor, pelo avanço e pela função de voltar; autor de versão histórica aceito; processo sem versão aceito; o responsável que envia a V4 depois de escolhido continua responsável |
 | Etapa nova entra como pendente nos processos em andamento e suspensos não concluídos (ADR 0004) | função do catálogo, sem parâmetro de nível | etapa nova não entra em processo concluído nem cancelado |
 | Desativar etapa apaga os andamentos pendentes dela; reativar os recria onde faltam | função do catálogo | desativar mantém os resolvidos e apaga os pendentes |
 | Etapa usada não se exclui; código não muda | referência de `andamentos` recusa apagar quando há andamento não pendente; gatilho | excluir etapa com andamento concluído recusado |
@@ -404,6 +443,8 @@ resolvida ──voltar (motivo)──▶ em_andamento   (as seguintes resolvidas
 ```
 
 Sair de pendente exige a anterior resolvida (a Modelagem piloto, primeira, não tem anterior). Concluída, dispensada e realizada anteriormente contam como resolvida.
+
+**Avanço (desde 2026-10-18):** concluir, dispensar ou registrar como realizada anteriormente a etapa atual leva, na mesma transação, a primeira etapa pendente depois dela de `pendente` a `em_andamento` (com o responsável escolhido ou nenhum). Sem pendente depois, nada mais muda. Voltar põe a etapa escolhida em andamento com o responsável escolhido.
 
 **Processo (situação guardada):**
 
@@ -428,6 +469,10 @@ Destrutiva. A produção não existe; só se perdem dados inventados do desenvol
 6. **Processos:** acrescenta `data_da_reuniao`, concede a alteração dela a logado e inclui a data no estado guardado nos eventos do processo.
 
 As exclusões e a renumeração da migração não geram eventos: é mudança de estrutura, registrada no ADR 0013, e não ação de alguém. A migração precisa desligar os gatilhos de evento enquanto apaga e renumera (`session_replication_role = replica`, desfeito no fim, como nos testes de 2026-10-16). Os eventos antigos ficam como estão.
+
+#### Migração da parte 2 (Etapas mais rápidas)
+
+Não destrutiva: nenhuma tabela ou coluna muda. Uma migração nova cria a função de avanço, o gatilho da trava do autor na Revisão interna e recria a função de voltar com o parâmetro do responsável. Os eventos saem dos gatilhos que já existem (um por andamento alterado). Vai pelo workflow "Migrar banco de desenvolvimento" e entra no registro de `supabase/AMBIENTES.md`.
 
 
 ## Decisões de teste
@@ -457,7 +502,12 @@ As exclusões e a renumeração da migração não geram eventos: é mudança de
     - cada mensagem de recusa;
     - estados de carregando, vazio e erro de cada tela;
     - item que não existe mais;
-    - histórico do processo.
+    - histórico do processo;
+    - avanço (desde 2026-10-18): a janela de Concluir com o título, as opções e a opção marcada em cada caso (responsável que a próxima já tem, quem está na tela, "Ninguém por enquanto"); a próxima em andamento depois de confirmar, com e sem responsável; a primeira pendente pulando as resolvidas; a última etapa sem janela e o processo concluído; Dispensar e Realizada anteriormente com nota e escolha na mesma janela; Esc e [Cancelar] sem gravar; teclado (foco na opção marcada, setas, Enter) e nomes acessíveis; falha na gravação com a etapa como estava;
+    - [Assumir] nas etapas pendentes e em andamento sem responsável, ausente nas resolvidas, para a Consulta e, na Revisão interna, para o autor da versão mais recente;
+    - a trava do autor: ausente da janela de avanço e da de voltar, autor de versão histórica presente, e a recusa do banco pelo seletor com a mensagem;
+    - voltar com a escolha do responsável da etapa reaberta;
+    - os dois registros do avanço no histórico.
   - **Arte anterior:** os testes de tela de cadastros-basicos (`App.setores`, `App.macroprocessos`, `App.historicoDosCadastros`) e a janela de confirmação.
 - **Tradução entre o banco e a tela.** Testes pequenos do módulo de processos real com o cliente Supabase simulado. Eles provam que os códigos de recusa do banco viram as mensagens acima e que as linhas do banco e da view viram os tipos da tela. Arte anterior: os testes de `cadastrosSupabase` e `macroprocessosSupabase`.
 - **Funções puras** (filtros a partir do endereço, ordem das colunas, textos do histórico): testes unitários pequenos.
@@ -466,6 +516,7 @@ As exclusões e a renumeração da migração não geram eventos: é mudança de
   - **Testes gerais:** `00_rls_ligada` e `10_privilegios_padrao` cobrem as tabelas novas sem mudança.
   - **Testes antigos:** conferir os que contam linhas de uma tabela inteira, porque o andamento nascia junto com cada setor (achado do `/ship` de cadastros-basicos).
   - **Simplificação (2026-10-18):** os testes `15_etapas_do_setor` e `16_responsaveis_do_setor` são apagados; `17`, `18`, `19`, `20`, `21` e `22` são ajustados ao catálogo de 6 etapas sem nível (posições mudam: a Revisão interna passa de 6 a 3); um teste novo prova a migração (tabelas e colunas apagadas, catálogo renumerado e renomeado, setor novo sem andamento, Modelagem piloto inicia sem depender do setor, eventos antigos legíveis). Os testes da funcionalidade de documentos (`26` a `31`) que criam processos ou citam etapas pela posição também são conferidos.
+  - **Parte 2 (2026-10-18):** um teste por linha nova da tabela de regras (avanço e trava do autor), e os testes de "voltar" ajustados à assinatura nova. A função de avanço também ganha os casos de perfil (Consulta, inativo e visitante recusados) e de processo suspenso.
   - **Onde rodam:** os testes vêm antes da migração e rodam pelo GitHub Actions ("Testes de banco"). A migração vai pelo workflow "Migrar banco de desenvolvimento".
 - Todos os processos, setores e usuários dos testes são inventados.
 
@@ -474,8 +525,9 @@ As exclusões e a renumeração da migração não geram eventos: é mudança de
 - Reuniões: a data da reunião de modelagem piloto está na spec de `reunioes`; ela não muda nenhuma etapa.
 - Etapas do setor e responsáveis do setor: retirados em 2026-10-18 (ADR 0013).
 - Envio de fluxogramas e relatórios, versões e o nome dos arquivos: funcionalidade 5. A recusa de excluir processo com documento chega com ela.
-- Revisão interna, rodadas com o setor, E-protocolo e a captura de etapa: funcionalidade 6. Vão junto a configuração "etapa capturada ou atribuída a um usuário fixo", a regra 14 (aviso "estrutura alterada após aprovação") e os campos vigência e próxima revisão.
-- Conclusão automática de etapas por documento ou revisão: funcionalidades 5 e 6. Hoje todo andamento é manual.
+- Registro da revisão interna, E-protocolo e a trava que exige o registro para concluir as etapas de revisão: `revisoes-aprovacao` (parte 5 da iniciativa). Vão junto a regra 14 (aviso "estrutura alterada após aprovação") e os campos vigência e próxima revisão. O [Assumir] (antes "capturar") e a trava do autor na escolha do responsável entraram aqui em 2026-10-18 (ADR 0014); a regra que impede o autor de *registrar* a revisão fica na parte 5 e fecha a brecha de quem assume a Revisão interna pendente e depois envia a versão.
+- Conclusão automática de etapas por documento ou revisão. Resolver uma etapa continua manual; desde 2026-10-18, só o início da próxima é automático.
+- Arrastar o cartão para concluir e "Só os meus": parte 4 da iniciativa (o arrastar abre a janela de avanço desta parte).
 - Prazo padrão das etapas, prazo do andamento e indicador de atraso: funcionalidade 8.
 - Campo "fase" (AS-IS ou TO-BE) no catálogo: quando existir a fase 2.
 - Mais de um nível de subprocesso.
@@ -494,6 +546,7 @@ As exclusões e a renumeração da migração não geram eventos: é mudança de
   - `[visual]` Para a Consulta, Quadro, Lista, painel, tela do setor e histórico não mostram campos editáveis nem botões de alteração.
   - `[visual]` As janelas de nota e de motivo seguem o padrão da janela de confirmação, com o campo de texto e o botão de confirmar desabilitado enquanto vazio.
   - `[visual]` Mensagens de falha e de recusa em vermelho; avisos (setor que será incluído, macroprocesso que muda) em amarelo.
+  - `[visual]` A janela de avanço segue o padrão da janela de confirmação: título, pergunta, lista de nomes em rádios com "Ninguém por enquanto" por último, e a nota acima dela em Dispensar e Realizada anteriormente; o [Assumir] é um botão discreto na linha da etapa, no padrão dos botões secundários (desde 2026-10-18).
 - **Divergências com `.scratch/especificacao.md`**, decididas na sabatina de 2026-10-13:
   - o responsável do setor virou cadastro próprio, com vários por setor (a especificação tinha um responsável no setor);
   - os campos "fase" e "prazo padrão" do catálogo, e vigência e próxima revisão do processo, foram adiados;
@@ -505,9 +558,11 @@ As exclusões e a renumeração da migração não geram eventos: é mudança de
   - **Voltar:** devolve a "pendente" todas as etapas seguintes resolvidas (concluídas, dispensadas ou realizadas anteriormente). A sabatina falou em "concluídas"; deixar uma dispensada para trás tornaria o caminho incoerente.
   - **Etapa nova no catálogo:** entra também nos processos suspensos (eles não estão concluídos nem cancelados) (o "em todos os setores" valia para as etapas do setor, retiradas em 2026-10-18).
   - **Desativar uma etapa em andamento:** o processo continua nela até concluí-la. A coluna da etapa desativada aparece no Quadro enquanto houver processo nela.
+  - **Parte 2 (2026-10-18):** o início da próxima é a data de hoje (corrigível depois, como as outras datas); a janela de voltar segue a mesma regra de opção marcada da janela de avanço; a trava do autor é conferida sempre que o responsável da Revisão interna passa a ser alguém (não quando fica vazio nem quando não muda); a falha na gravação do avanço mostra a mensagem de erro de gravação e deixa as etapas como estavam.
 - **Tamanho:** a funcionalidade tem várias entregas. A sabatina permitiu deixar a Lista para um ticket posterior.
 - **Rede do escritório:** a migração vai pelo workflow "Migrar banco de desenvolvimento" e precisa ser registrada em `supabase/AMBIENTES.md` para o `migration repair` antes da primeira publicação em produção.
 - **Privilégios padrão:** toda tabela ou view nova em `public` reprova o teste `10_privilegios_padrao` até receber o seu `revoke`.
 
 Entregue em 2026-10-14 (commit f1cc3cf), com ressalva: critérios [visual] presumidos (a tela não foi conferida)
 Entregue em 2026-10-18 (commit e54f51b)
+Em revisão desde 2026-10-18
