@@ -100,12 +100,16 @@ _Avoid_: estado, fase (para status)
 A etapa em andamento do processo ou, se nenhuma estiver, a primeira pendente. Cada processo tem no máximo uma etapa em andamento.
 _Avoid_: etapa corrente, passo atual
 
+**Avançar**:
+O que acontece quando a etapa atual é concluída, dispensada ou registrada como realizada anteriormente: a primeira etapa pendente depois dela entra em andamento, com o responsável escolhido por quem resolveu (ou sem responsável). Sem etapa pendente depois, não há avanço. A etapa atual pendente (como a primeira de um processo novo) continua se iniciando à mão.
+_Avoid_: pular, passar de fase
+
 **Voltar a uma etapa**:
-Reabrir uma etapa anterior, com motivo; as etapas seguintes já concluídas voltam a pendente. Nada se apaga do histórico.
+Reabrir uma etapa anterior, com motivo; as etapas seguintes já concluídas voltam a pendente. Quem volta escolhe o responsável da etapa reaberta. Nada se apaga do histórico.
 _Avoid_: retroceder, desfazer, reabrir processo
 
 **Responsável da etapa**:
-Usuário (Administrador ou Integrante do EP) que cuida de uma etapa de um processo. Quem conclui uma etapa escolhe o responsável da seguinte; depois, qualquer integrante pode trocá-lo por qualquer outro. A plataforma não guarda os contatos dos setores.
+Usuário (Administrador ou Integrante do EP) que cuida de uma etapa de um processo. Quem conclui, dispensa ou registra como realizada anteriormente uma etapa escolhe o responsável da seguinte (pode não escolher ninguém); depois, qualquer integrante pode trocá-lo por qualquer outro. A plataforma não guarda os contatos dos setores.
 _Avoid_: dono da etapa, executor
 
 **Situação do processo**:
@@ -155,7 +159,7 @@ _Avoid_: versão antiga, versão importada, versão final
 ## Revisões e aprovação
 
 **Assumir**:
-O integrante pôr a si mesmo como responsável de uma etapa, de qualquer tipo, que está sem responsável.
+O integrante pôr a si mesmo como responsável de uma etapa, de qualquer tipo, pendente ou em andamento, que está sem responsável.
 _Avoid_: capturar, pegar, puxar
 
 **Revisão interna**:
@@ -163,7 +167,7 @@ Conferência, por um integrante diferente do autor, da última versão do proces
 _Avoid_: validação, conferência, aprovação interna
 
 **Revisor**:
-Integrante que registra a revisão interna; nunca é o autor da versão revisada.
+Integrante que registra a revisão interna; nunca é o autor da versão revisada. Por isso, quem enviou a versão mais recente (fora as versões históricas) não pode ser escolhido como responsável da revisão interna. A conferência vale no momento da escolha: o revisor que corrige e envia uma versão nova continua responsável.
 _Avoid_: aprovador, conferente
 
 **Revisão pelo setor**:
