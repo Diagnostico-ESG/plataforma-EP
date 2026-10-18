@@ -250,8 +250,7 @@ insert into _tap (linha) select is(
       jsonb_build_object('macroprocesso_id', 'aa000000-0000-0000-0000-000000000002', 'codigo', 'MT02',
         'nome', 'Macro de Teste Dois', 'observacao', null),
       jsonb_build_object('macroprocesso_id', 'aa000000-0000-0000-0000-000000000001', 'codigo', null,
-        'nome', 'Macro de Teste Um', 'observacao', 'Nota um')),
-    'responsaveis', jsonb_build_array())),
+        'nome', 'Macro de Teste Um', 'observacao', 'Nota um')))),
   'excluir o setor grava no antes a lista dos macroprocessos');
 
 -- Exclusão do macroprocesso M4.
