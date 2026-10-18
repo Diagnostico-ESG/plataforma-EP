@@ -77,3 +77,13 @@ test('no histórico geral, o registro antigo de responsável do setor aparece nu
   expect(item.textContent).not.toContain('Antes:')
   expect(within(filtro).getAllByRole('option').map((opcao) => opcao.textContent)).toEqual(['Todos os itens'])
 })
+
+test.each(['integrante_ep', 'consulta'] as const)('o setor aberto não tem a seção de responsáveis do setor (%s)', async (perfil) => {
+  window.location.hash = '#/setores'
+  montarNosCadastros({ perfil })
+  fireEvent.click(await screen.findByRole('cell', { name: 'TSA' }))
+  await screen.findByRole('region', { name: 'Processos do setor' })
+  expect(screen.queryByText('Responsáveis do setor')).toBeNull()
+  expect(screen.queryByText('Carregando responsáveis…')).toBeNull()
+  expect(screen.queryByRole('button', { name: /responsável/i })).toBeNull()
+})

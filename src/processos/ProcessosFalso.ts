@@ -10,8 +10,8 @@ import {
 } from './reclassificacaoFalso'
 import { conferirProcessoEmAndamento, mudarSituacao } from './situacaoFalso'
 import type {
-  DadosDoProcesso, DadosDoResponsavel, DatasDaEtapa, EtapaDoCatalogo, EtapaDoProcesso, EtapaDoSetor, ListaDeProcessos,
-  ModuloDeProcessos, ProcessoLido, Reclassificacao, ResponsavelDoSetor, UsuarioResponsavel,
+  DadosDoProcesso, DatasDaEtapa, EtapaDoCatalogo, EtapaDoProcesso, EtapaDoSetor, ListaDeProcessos,
+  ModuloDeProcessos, ProcessoLido, Reclassificacao, UsuarioResponsavel,
 } from './tipos'
 
 type ChamadaDeEtapa = { acao: string; id: string; nota?: string; datas?: DatasDaEtapa; usuarioId?: string | null }
@@ -31,8 +31,6 @@ export class ProcessosFalso implements ModuloDeProcessos {
   falhaDeGravacao: string | Error | null = null
   /** As ações gravadas, na ordem. */
   chamadas: ChamadaDeEtapa[] = []
-  /** Os responsáveis de cada setor (pelo id do setor). Leitura e gravação seguem as falhas acima. */
-  responsaveisDoSetor: Record<string, ResponsavelDoSetor[]> = {}
   /** Quem pode ser escolhido como responsável de uma etapa (ativos, Administrador ou Integrante). */
   usuariosPossiveis: UsuarioResponsavel[] = []
   /** Os processos cadastrados; a lista e a leitura partem daqui. */
@@ -124,28 +122,6 @@ export class ProcessosFalso implements ModuloDeProcessos {
 
   async listarResponsaveisPossiveis(): Promise<UsuarioResponsavel[]> {
     return [...this.usuariosPossiveis]
-  }
-
-  async lerResponsaveisDoSetor(setorId: string): Promise<ResponsavelDoSetor[]> {
-    if (this.segurarLeitura) return new Promise<never>(() => {})
-    if (this.falharLeitura) throw new Error('falha de conexão simulada')
-    return [...(this.responsaveisDoSetor[setorId] ?? [])].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
-  }
-
-  async criarResponsavel(setorId: string, dados: DadosDoResponsavel): Promise<void> {
-    this.conferirGravacao()
-    const novo = { id: `r${this.proximoId++}`, ...dados }
-    this.responsaveisDoSetor[setorId] = [...(this.responsaveisDoSetor[setorId] ?? []), novo]
-  }
-
-  async editarResponsavel(id: string, dados: DadosDoResponsavel): Promise<void> {
-    this.conferirGravacao()
-    this.mudarResponsaveis((lista) => lista.map((responsavel) => (responsavel.id === id ? { id, ...dados } : responsavel)))
-  }
-
-  async excluirResponsavel(id: string): Promise<void> {
-    this.conferirGravacao()
-    this.mudarResponsaveis((lista) => lista.filter((responsavel) => responsavel.id !== id))
   }
 
   async listarProcessos(): Promise<ListaDeProcessos> {
@@ -240,10 +216,6 @@ export class ProcessosFalso implements ModuloDeProcessos {
   private conferirGravacao(): void {
     if (this.falhaDeGravacao === null) return
     throw typeof this.falhaDeGravacao === 'string' ? new Error(this.falhaDeGravacao) : this.falhaDeGravacao
-  }
-
-  private mudarResponsaveis(mudar: (lista: ResponsavelDoSetor[]) => ResponsavelDoSetor[]): void {
-    for (const [setorId, lista] of Object.entries(this.responsaveisDoSetor)) this.responsaveisDoSetor[setorId] = mudar(lista)
   }
 
   // A etapa do setor ou do processo; que ela não existe (mais) é o aviso de cadastro inexistente.

@@ -445,41 +445,6 @@ export type Database = {
           },
         ]
       }
-      responsaveis_do_setor: {
-        Row: {
-          cargo: string | null
-          criado_em: string
-          email: string | null
-          id: string
-          nome: string
-          setor_id: string
-        }
-        Insert: {
-          cargo?: string | null
-          criado_em?: string
-          email?: string | null
-          id?: string
-          nome: string
-          setor_id: string
-        }
-        Update: {
-          cargo?: string | null
-          criado_em?: string
-          email?: string | null
-          id?: string
-          nome?: string
-          setor_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "responsaveis_do_setor_setor_id_fkey"
-            columns: ["setor_id"]
-            isOneToOne: false
-            referencedRelation: "setores"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       setores: {
         Row: {
           ativo: boolean

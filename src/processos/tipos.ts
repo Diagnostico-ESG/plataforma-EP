@@ -15,11 +15,6 @@ export type EtapaDoSetor = {
   resolvidaEm: string | null
 }
 
-/** Pessoa do setor atendido que responde por ele junto ao EP. */
-export type ResponsavelDoSetor = { id: string; nome: string; email: string | null; cargo: string | null }
-
-export type DadosDoResponsavel = Omit<ResponsavelDoSetor, 'id'>
-
 export type TipoDeProcesso = 'processo' | 'subprocesso' | 'a_classificar'
 export type OrigemDoProcesso = 'novo' | 'retomado'
 /** A situação calculada: "concluido" não é guardado, vem de as etapas obrigatórias estarem resolvidas. */
@@ -167,10 +162,5 @@ export type ModuloDeProcessos = {
   reclassificarProcesso(id: string, reclassificacao: Reclassificacao, motivo: string): Promise<void>
   /** Por nome. */
   listarResponsaveisPossiveis(): Promise<UsuarioResponsavel[]>
-  /** Em ordem alfabética de nome. */
-  lerResponsaveisDoSetor(setorId: string): Promise<ResponsavelDoSetor[]>
-  criarResponsavel(setorId: string, dados: DadosDoResponsavel): Promise<void>
-  editarResponsavel(id: string, dados: DadosDoResponsavel): Promise<void>
-  excluirResponsavel(id: string): Promise<void>
   catalogo: ModuloDoCatalogo
 }
