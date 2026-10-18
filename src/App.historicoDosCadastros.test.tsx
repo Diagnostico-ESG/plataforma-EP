@@ -161,23 +161,6 @@ test.each<Perfil>(['consulta', 'integrante_ep', 'administrador'])('o perfil %s l
   expect(screen.queryByRole('button', { name: /novo|excluir|desativar|editar/i })).toBeNull()
 })
 
-test('as etapas do setor aparecem no Histórico com o texto da ação e a nota, e entram no filtro pelo setor', async () => {
-  const ETAPA = {
-    setor_id: 's1', setor_sigla: 'TSA', etapa_codigo: 'sensibilizacao', etapa_nome: 'Reunião de sensibilização',
-    status: 'pendente', iniciada_em: null, resolvida_em: null,
-  }
-  montar('consulta', [
-    evento(9, { acao: 'dispensar', entidade: 'andamento', entidadeRef: 's1:a2', antes: ETAPA,
-      depois: { ...ETAPA, status: 'dispensada', resolvida_em: '2026-10-13' }, motivo: 'Setor já conhecido' }),
-    ...EVENTOS,
-  ])
-  const itens = await itensDaLista()
-  expect(itens[0].textContent).toContain('Dispensou a etapa Reunião de sensibilização — TSA')
-  expect(itens[0].textContent).toContain('Nota: Setor já conhecido')
-  fireEvent.change(screen.getByRole('combobox', { name: 'Item' }), { target: { value: 's1' } })
-  expect(screen.getAllByRole('listitem')[0].textContent).toContain('Dispensou a etapa')
-})
-
 test('um processo excluído continua no Histórico, com o que tinha, inclusive as etapas', async () => {
   const antes = {
     nome: 'Emitir Ofício', setor_sigla: 'TSA', macroprocesso_nome: 'Macro Teste Um', tipo: 'a_classificar', origem: 'novo',

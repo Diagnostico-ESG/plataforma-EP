@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import {
-  descreverEstadoDoCadastro, ehRecursoRetirado, eventosDoItem, itensDoFiltro, nomeDoItem, rotuloDoMotivo, textoDaAcaoDoCadastro,
+  descreverEstadoDoCadastro, ehRegistroRetirado, eventosDoItem, itensDoFiltro, nomeDoItem, rotuloDoMotivo, textoDaAcaoDoCadastro,
 } from './historicoDosCadastros'
 import type { EventoDoCadastro } from './tipos'
 
@@ -162,19 +162,20 @@ const ETAPA_DISPENSADA: EventoDoCadastro = {
   depois: { ...ETAPA_PENDENTE, status: 'dispensada', resolvida_em: '2026-10-13' }, motivo: 'Setor já conhecido',
 }
 
-describe('etapas do setor no histórico', () => {
+describe('registros antigos de etapa do setor (recurso retirado da plataforma)', () => {
   test('texto de cada ação', () => {
     expect(['iniciar', 'concluir', 'dispensar', 'registrar_realizada'].map((acao) => textoDaAcaoDoCadastro(acao, 'andamento')))
       .toEqual(['Iniciou a etapa', 'Concluiu a etapa', 'Dispensou a etapa', 'Registrou a etapa como realizada anteriormente'])
   })
 
-  test('o item é a etapa e o setor; antes e depois sem código e nome da etapa, com status e datas legíveis', () => {
-    expect(nomeDoItem(ETAPA_DISPENSADA)).toBe('Reunião de sensibilização — TSA')
-    expect(descreverEstadoDoCadastro(ETAPA_DISPENSADA.depois))
-      .toBe('Setor: TSA; Situação da etapa: Dispensada; Início: —; Conclusão: 13/10/2026')
+  test('o andamento sem processo é a linha simples; o do processo continua com o nome da etapa', () => {
+    expect(nomeDoItem(ETAPA_DISPENSADA)).toBe('Registro de etapa do setor (recurso retirado da plataforma)')
+    expect(ehRegistroRetirado(ETAPA_DISPENSADA)).toBe(true)
+    const doProcesso = evento({ entidade: 'andamento', entidadeRef: 'p1:a4', depois: { processo_id: 'p1', etapa_nome: 'Modelagem piloto' } })
+    expect(ehRegistroRetirado(doProcesso)).toBe(false)
   })
 
-  test('o evento entra no filtro pelo setor', () => {
+  test('o evento continua no filtro pelo setor', () => {
     expect(itensDoFiltro([ETAPA_DISPENSADA])).toEqual([{ id: 's1', nome: 'TSA' }])
     expect(eventosDoItem([ETAPA_DISPENSADA], 's1')).toEqual([ETAPA_DISPENSADA])
   })
@@ -232,8 +233,8 @@ describe('registros antigos de responsável do setor (recurso retirado da plataf
   test('o item é a linha simples, e a ação usa o texto comum', () => {
     expect(nomeDoItem(criado)).toBe('Registro de responsável do setor (recurso retirado da plataforma)')
     expect(textoDaAcaoDoCadastro('criar', 'responsavel_do_setor')).toBe('Criou')
-    expect(ehRecursoRetirado('responsavel_do_setor')).toBe(true)
-    expect(ehRecursoRetirado('setor')).toBe(false)
+    expect(ehRegistroRetirado(criado)).toBe(true)
+    expect(ehRegistroRetirado(evento({ entidade: 'setor', entidadeRef: 's1' }))).toBe(false)
   })
 
   test('fica fora da lista do filtro, mas aparece quando o setor é escolhido', () => {

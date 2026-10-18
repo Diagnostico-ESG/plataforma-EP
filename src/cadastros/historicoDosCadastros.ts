@@ -101,20 +101,23 @@ function codigoENome(codigo: unknown, nome: unknown): string {
 const TEXTO_DO_RECURSO_RETIRADO: Record<string, string> = {
   reuniao: 'Registro de reunião (recurso retirado da plataforma)',
   responsavel_do_setor: 'Registro de responsável do setor (recurso retirado da plataforma)',
+  andamento: 'Registro de etapa do setor (recurso retirado da plataforma)',
 }
 
-export function ehRecursoRetirado(entidade: string): boolean {
-  return entidade in TEXTO_DO_RECURSO_RETIRADO
+// O andamento só é recurso retirado quando era do setor: o do processo traz o processo_id no estado.
+export function ehRegistroRetirado(evento: EventoDoCadastro): boolean {
+  if (evento.entidade === 'andamento') return !('processo_id' in estadoLegivel(evento))
+  return evento.entidade in TEXTO_DO_RECURSO_RETIRADO
 }
 
-// A etapa pertence a um setor ou a um processo: o nome vem com o dono; a versão vem com o processo dela; os recursos
-// retirados são a linha simples; null se o item não for de nenhum deles.
-function nomeDoItemComDono(entidade: string, estado: Record<string, unknown>): string | null {
-  if (ehRecursoRetirado(entidade)) return TEXTO_DO_RECURSO_RETIRADO[entidade]
-  if (entidade === 'versao') return `${texto(estado.rotulo)} — ${texto(estado.processo_nome)}`
-  const nome = entidade === 'andamento' ? estado.etapa_nome : null
+// A etapa pertence a um processo: o nome vem com ele; a versão vem com o processo dela; os registros retirados são a
+// linha simples; null se o item não for de nenhum deles.
+function nomeDoItemComDono(evento: EventoDoCadastro, estado: Record<string, unknown>): string | null {
+  if (ehRegistroRetirado(evento)) return TEXTO_DO_RECURSO_RETIRADO[evento.entidade]
+  if (evento.entidade === 'versao') return `${texto(estado.rotulo)} — ${texto(estado.processo_nome)}`
+  const nome = evento.entidade === 'andamento' ? estado.etapa_nome : null
   if (typeof nome !== 'string') return null
-  return `${nome} — ${texto(estado.processo_nome ?? estado.setor_sigla)}`
+  return `${nome} — ${texto(estado.processo_nome)}`
 }
 
 export function nomeDoItem(evento: EventoDoCadastro): string {
@@ -122,7 +125,7 @@ export function nomeDoItem(evento: EventoDoCadastro): string {
   if (evento.entidade === 'setor' && typeof estado.sigla === 'string') return `${estado.sigla} — ${texto(estado.nome)}`
   if (ENTIDADES_COM_CODIGO.has(evento.entidade) && typeof estado.nome === 'string') return codigoENome(estado.codigo, estado.nome)
   if (evento.entidade === 'processo' && typeof estado.nome === 'string') return `${texto(estado.setor_sigla)} — ${estado.nome}`
-  const comDono = nomeDoItemComDono(evento.entidade, estado)
+  const comDono = nomeDoItemComDono(evento, estado)
   if (comDono !== null) return comDono
   if (typeof estado.setor_sigla === 'string' && typeof estado.macroprocesso_nome === 'string') {
     return `${estado.setor_sigla} em ${estado.macroprocesso_nome}`
@@ -148,8 +151,8 @@ function valorDaEtapa(campo: string, valor: unknown): string | null {
   return null
 }
 
-// Campos do processo (tipo, origem, situação) e da etapa do catálogo (nível, obrigatória, ativa) pelo rótulo da tela;
-// null se não for deles.
+// Campos do processo (tipo, origem, situação) e da etapa do catálogo (obrigatória, ativa; o nível só nos eventos
+// antigos) pelo rótulo da tela; null se não for deles.
 function valorPorRotulo(campo: string, valor: unknown): string | null {
   const rotulos: Record<string, Record<string, string>> = {
     tipo: ROTULO_DO_TIPO, origem: ROTULO_DA_ORIGEM, situacao: ROTULO_DA_SITUACAO,
@@ -190,7 +193,7 @@ function itensDoVinculo(evento: EventoDoCadastro): [string, string][] {
 
 // Vínculos entram pelos ids que citam; recursos retirados ficam fora, porque todos teriam o mesmo nome no filtro.
 function temItemProprio(evento: EventoDoCadastro): boolean {
-  return !ENTIDADES_QUE_LIGAM.has(evento.entidade) && !ehRecursoRetirado(evento.entidade)
+  return !ENTIDADES_QUE_LIGAM.has(evento.entidade) && !ehRegistroRetirado(evento)
 }
 
 /** Eventos da mais recente para a mais antiga: a primeira ocorrência de cada item dá o nome dele. */
