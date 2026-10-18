@@ -67,12 +67,8 @@ Cadastro que não aparece mais nas listas de escolha, mas continua aparecendo, m
 _Avoid_: arquivado, extinto
 
 **Excluir (setor ou macroprocesso)**:
-Apagar o cadastro de vez, o que só é possível enquanto nenhum processo (e, no setor, nenhuma reunião) depende dele. O histórico guarda o que foi apagado. Diferente do usuário, que depois do primeiro acesso só se desativa.
+Apagar o cadastro de vez, o que só é possível enquanto nenhum processo depende dele. O histórico guarda o que foi apagado. Diferente do usuário, que depois do primeiro acesso só se desativa.
 _Avoid_: remover, deletar
-
-**Responsável do setor**:
-Pessoa de um setor atendido que responde pelo setor junto ao EP. Um setor pode ter nenhum ou vários. Não é usuário e não entra na plataforma.
-_Avoid_: dono do processo, usuário do setor
 
 ## Processos
 
@@ -89,12 +85,8 @@ Tipo provisório do item identificado (ou importado) que ainda não se sabe se �
 _Avoid_: indefinido, rascunho
 
 **Catálogo de etapas**:
-A lista ordenada de etapas, mantida pelo administrador, que todo processo percorre. Cada etapa é do setor (feita uma vez pelo setor e valendo para todos os processos dele) ou do processo.
-_Avoid_: workflow, fluxo de etapas
-
-**Etapa do setor / Etapa do processo**:
-Etapa do catálogo feita uma vez pelo setor (identificação dos responsáveis, sensibilização, identificação dos processos) ou feita em cada processo (da reunião de modelagem em diante). A primeira etapa do processo só começa com as etapas do setor resolvidas.
-_Avoid_: etapa geral, etapa inicial
+A lista ordenada de etapas, mantida pelo administrador, que todo processo percorre, da modelagem piloto em diante. Não há etapas do setor: identificação dos responsáveis, sensibilização e identificação dos processos já foram feitas para todos os setores e ficam fora da plataforma.
+_Avoid_: workflow, fluxo de etapas, etapa do setor
 
 **Etapa obrigatória / Etapa opcional**:
 Marcação do catálogo. Só a etapa opcional pode ser dispensada; o processo só se conclui com todas as obrigatórias resolvidas.
@@ -113,7 +105,7 @@ Reabrir uma etapa anterior, com motivo; as etapas seguintes já concluídas volt
 _Avoid_: retroceder, desfazer, reabrir processo
 
 **Responsável da etapa**:
-Usuário (Administrador ou Integrante do EP) que cuida de uma etapa de um processo. Não confundir com o responsável do setor, que não é usuário.
+Usuário (Administrador ou Integrante do EP) que cuida de uma etapa de um processo. Quem conclui uma etapa escolhe o responsável da seguinte; depois, qualquer integrante pode trocá-lo por qualquer outro. A plataforma não guarda os contatos dos setores.
 _Avoid_: dono da etapa, executor
 
 **Situação do processo**:
@@ -126,21 +118,13 @@ _Avoid_: conversão, migração, recriação
 
 ## Reuniões
 
+**Modelagem piloto**:
+A primeira etapa de todo processo: o EP se reúne com o setor e faz o primeiro desenho do fluxo.
+_Avoid_: reunião de modelagem, oficina, workshop
+
 **Reunião**:
-Encontro do EP com um único setor, de sensibilização ou de modelagem, com data (e hora, se houver), local, participantes e anotações. Pode ser registrada antes de acontecer: a data diz se é próxima ou realizada. É um registro e não muda o status de nenhuma etapa.
-_Avoid_: encontro, evento, agenda
-
-**Reunião de sensibilização**:
-Reunião com o setor, sem processos ligados, que apresenta o trabalho do EP.
-_Avoid_: reunião inicial, apresentação
-
-**Reunião de modelagem**:
-Reunião que trata um ou mais processos do próprio setor da reunião, em qualquer situação. Um processo tratado numa reunião não pode ser excluído.
-_Avoid_: oficina, workshop
-
-**Participante**:
-Pessoa presente numa reunião: um usuário, um responsável do setor ou outra pessoa, anotada só pelo nome. O responsável do setor excluído continua na reunião como outra pessoa, com o nome que tinha.
-_Avoid_: convidado, presente
+Encontro do EP com o setor para a modelagem piloto de um processo, marcado no próprio processo só pela data. Pode ser marcado antes de acontecer: a data diz se é próxima ou realizada. Uma reunião que trata vários processos é marcada em cada um. Não muda o status de nenhuma etapa. Participantes, local e anotações ficam fora: a existência do relatório já pressupõe a reunião.
+_Avoid_: encontro, evento, agenda, oficina, reunião de sensibilização
 
 ## Documentos
 
@@ -170,9 +154,9 @@ _Avoid_: versão antiga, versão importada, versão final
 
 ## Revisões e aprovação
 
-**Capturar**:
-O integrante pôr a si mesmo como responsável de uma etapa que está sem responsável, como nas etapas de revisão interna, revisão pelo setor e aprovação.
-_Avoid_: pegar, assumir, puxar
+**Assumir**:
+O integrante pôr a si mesmo como responsável de uma etapa, de qualquer tipo, que está sem responsável.
+_Avoid_: capturar, pegar, puxar
 
 **Revisão interna**:
 Conferência, por um integrante diferente do autor, da última versão do processo antes de ela ir ao setor. O revisor corrige ele mesmo: o resultado é "sem alteração" (segue a versão revisada) ou "corrigida" (o revisor enviou uma versão nova).

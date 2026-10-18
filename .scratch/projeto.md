@@ -16,11 +16,16 @@ Plataforma web interna do Centro Estadual de Desburocratização (CED) para cont
 ## Funcionalidades da v1, na ordem de planejamento
 
 1. **Login e perfis** (login-perfis)**:** usuários, os três perfis, criação de contas pela plataforma e segurança por perfil no banco.
-2. **Cadastros básicos** (cadastros-basicos)**:** setores (sigla e responsável), macroprocessos e os setores de cada macroprocesso.
+2. **Cadastros básicos** (cadastros-basicos)**:** setores (sigla e nome), macroprocessos e os setores de cada macroprocesso.
 3. **Processos e etapas** (processos-etapas)**:** processos e subprocessos, catálogo de etapas configurável, andamento com dispensa e "realizada anteriormente", reclassificação e o histórico de alterações (que as funcionalidades seguintes também alimentam).
-4. **Reuniões** (reunioes)**:** de sensibilização e de modelagem, com data, local, participantes e anotações.
+4. **Reuniões** (reunioes)**:** a reunião da modelagem piloto, marcada no processo só pela data (simplificada na iniciativa experiencia-do-quadro).
 5. **Documentos e versões** (documentos-versoes)**:** envio de fluxogramas e relatórios, numeração de versões, versões históricas (sufixo F) e o padrão de nome dos arquivos.
-6. **Revisões e aprovação** (revisoes-aprovacao)**:** revisão interna (o revisor precisa ser diferente de quem enviou), revisão pelo setor como etapa, sem rodadas (ADR 0012) e aprovação com o número do E-protocolo.
+6. **Experiência do quadro** (experiencia-do-quadro)**:** iniciativa grande que simplifica o uso diário (mapa em `.scratch/experiencia-do-quadro/mapa.md`). Partes, nesta ordem; cada uma atualiza a spec da funcionalidade que muda:
+   1. **Simplificação** (processos-etapas, reunioes): saem as etapas do setor, a sensibilização, os responsáveis do setor e a área de Reuniões; a primeira etapa vira Modelagem piloto.
+   2. **Etapas mais rápidas** (processos-etapas): concluir escolhe o responsável da próxima e já a inicia; Assumir em qualquer etapa.
+   3. **Verso do cartão** (processos-etapas): janela central no lugar do painel lateral; Novo processo na mesma janela; Lista com busca.
+   4. **Cartão do Quadro** (processos-etapas): progresso, selos, arrastar para concluir, agrupar por responsável e Só os meus.
+   5. **Revisões e aprovação** (revisoes-aprovacao)**:** revisão interna (o revisor precisa ser diferente de quem enviou), revisão pelo setor como etapa, sem rodadas (ADR 0012) e aprovação com o número do E-protocolo.
 7. **Visualizador de fluxograma:** abre o .bpmn no navegador, no detalhe do processo.
 8. **Importação:** carga inicial com validação antes de gravar e uma lista de pendências.
 9. **Exportação em CSV e documentação de manutenção.**
