@@ -242,7 +242,7 @@ insert into _tap (linha) select is(pg_temp.eventos_lidos('00000000-0000-0000-000
 select set_config('request.jwt.claims', '{"role":"anon"}', true);
 set local role anon;
 insert into _tap (linha) select throws_ok(
-  $sql$select public.acrescentar_etapa('teste_visitante', 'Etapa do Visitante', 'processo', false, null)$sql$,
+  $sql$select public.acrescentar_etapa('teste_visitante', 'Etapa do Visitante', false, null)$sql$,
   '42501', null, 'Visitante não acrescenta etapa');
 insert into _tap (linha) select throws_ok(
   $sql$select public.mover_etapa('00000000-0000-0000-0000-000000000000', 'subir')$sql$,
