@@ -17,7 +17,7 @@ function processo(id: string, nome: string, mudancas: Partial<ProcessoLido> = {}
   return {
     id, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1', macroprocessoNome: 'Macro Um',
     situacao: 'em_andamento', etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 },
-    aguardandoOSetor: false, processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null, origem: 'novo',
+    processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null, origem: 'novo',
     contexto: null, observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, etapasDoSetor: [], etapasDoProcesso: [], ...mudancas,
   }
 }

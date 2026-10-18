@@ -22,7 +22,7 @@ function processo(id: string, nome: string, mudancas: Partial<ProcessoLido> = {}
   return {
     id, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1', macroprocessoNome: 'Macro de Teste',
     situacao: 'em_andamento', etapaAtual: { codigo: MODELAGEM.codigo, nome: MODELAGEM.nome, ordem: MODELAGEM.ordem },
-    aguardandoOSetor: false, processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null, origem: 'novo',
+    processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null, origem: 'novo',
     contexto: null, observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, etapasDoSetor: [], etapasDoProcesso: [], ...mudancas,
   }
 }
@@ -35,7 +35,7 @@ const PROCESSOS: ProcessoLido[] = [
   }),
   processo('p3', 'Emitir Ofício', { situacao: 'concluido', etapaAtual: null }),
   processo('p4', 'Arquivar Pasta', { situacao: 'cancelado' }),
-  processo('p5', 'Cadastrar Bem', { aguardandoOSetor: true }),
+  processo('p5', 'Cadastrar Bem', { etapaAtual: null }),
 ]
 
 type Montagem = { perfil?: Perfil; processos?: ProcessoLido[]; ajustar?: (processos: ProcessosFalso) => void }
@@ -65,7 +65,7 @@ test('as colunas, a ordem por sigla e nome, todas as situações e o pai do subp
   expect(cabecalho).toEqual(['Nome', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Responsável', 'Situação'])
   expect(corpo).toEqual([
     ['Arquivar Pasta', 'Processo', 'TSA', 'Macro de Teste', 'Reunião de modelagem', '—', 'Cancelado'],
-    ['Cadastrar Bem', 'Processo', 'TSA', 'Macro de Teste', 'Aguardando o setor', '—', 'Em andamento'],
+    ['Cadastrar Bem', 'Processo', 'TSA', 'Macro de Teste', '—', '—', 'Em andamento'],
     ['Emitir Ofício', 'Processo', 'TSA', 'Macro de Teste', '—', '—', 'Concluído'],
     ['Conferir Recibo↳ Pagar Diária', 'Subprocesso', 'TSB', 'Macro de Teste', 'Reunião de modelagem', 'Ana Teste', 'Em andamento'],
     ['Pagar Diária', 'Processo', 'TSB', 'Macro de Teste', 'Reunião de modelagem', '—', 'Em andamento'],
@@ -117,7 +117,7 @@ test('vazio: o estado vazio de sempre', async () => {
 test('a alternância Quadro | Lista troca a visão e marca a escolhida', async () => {
   window.location.hash = '#/processos'
   montar()
-  await screen.findByRole('region', { name: 'Aguardando o setor' })
+  await screen.findAllByRole('region')
   expect(alternancia().getByRole('button', { name: 'Quadro' }).getAttribute('aria-pressed')).toBe('true')
   fireEvent.click(alternancia().getByRole('button', { name: 'Lista' }))
   await waitFor(() => expect(window.location.hash).toBe('#/processos/lista'))

@@ -195,14 +195,13 @@ export class ProcessosFalso implements ModuloDeProcessos {
     }
   }
 
-  // O processo novo nasce com todas as etapas ativas do catálogo pendentes; aguarda o setor se as dele não estão resolvidas.
+  // O processo novo nasce com todas as etapas ativas do catálogo pendentes.
   private processoNovo(dados: DadosDoProcesso): ProcessoLido {
     const etapas = this.etapasDoCatalogo.filter((etapa) => etapa.ativa)
     const primeira = etapas[0]
     return {
       ...dados, ...this.nomesDoCartao(dados), id: `p${this.proximoId++}`, situacao: 'em_andamento',
       etapaAtual: primeira ? { codigo: primeira.codigo, nome: primeira.nome, ordem: primeira.ordem } : null,
-      aguardandoOSetor: (this.etapasDoSetor[dados.setorId] ?? []).some((etapa) => etapa.status === 'pendente' || etapa.status === 'em_andamento'),
       responsavel: null, motivoDaSituacao: null, processoPai: null, subprocessos: [], dataDaReuniao: null,
       etapasDoSetor: this.etapasDoSetor[dados.setorId] ?? [],
       etapasDoProcesso: etapas.map((etapa) => ({
@@ -255,7 +254,6 @@ export class ProcessosFalso implements ModuloDeProcessos {
 
   private aplicar(id: string, trocar: TrocaDeEtapas): void {
     for (const [setorId, etapas] of Object.entries(this.etapasDoSetor)) this.etapasDoSetor[setorId] = trocar(etapas)
-    // Só o setor que tem etapas cadastradas no falso recalcula "aguardando o setor"; o que o teste montou à mão fica como está.
     this.processos = this.processos.map((processo) => {
       const comEtapa = trocarEtapaDoProcesso(processo, id, trocar)
       const doSetor = this.etapasDoSetor[processo.setorId]

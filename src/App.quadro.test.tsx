@@ -25,7 +25,7 @@ function processo(nome: string, mudancas: Partial<ProcessoLido> = {}): ProcessoL
   return {
     id: `p-${nome.toLowerCase().replace(/[^a-z]/g, '')}`, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
     macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento',
-    etapaAtual: { codigo: MODELAGEM.codigo, nome: MODELAGEM.nome, ordem: MODELAGEM.ordem }, aguardandoOSetor: false,
+    etapaAtual: { codigo: MODELAGEM.codigo, nome: MODELAGEM.nome, ordem: MODELAGEM.ordem },
     processoPaiId: null, processoPai: null, subprocessos: [],
     responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
     dataDaReuniao: null, etapasDoSetor: [], etapasDoProcesso: [], ...mudancas,
@@ -58,7 +58,7 @@ test('erro ao carregar: a mensagem e [Tentar de novo], que carrega de novo', asy
   expect(alerta.textContent).toContain('Não foi possível carregar os processos. Verifique a conexão e tente de novo.')
   falso.falharListaDeProcessos = false
   fireEvent.click(within(alerta).getByRole('button', { name: 'Tentar de novo' }))
-  expect(await screen.findByRole('region', { name: 'Aguardando o setor' })).toBeTruthy()
+  expect(await screen.findByRole('region', { name: MODELAGEM.nome })).toBeTruthy()
 })
 
 test('sem processos: o aviso de vazio, com [Cadastrar processo] só para quem pode', async () => {
@@ -71,23 +71,21 @@ test('sem processos: o aviso de vazio, com [Cadastrar processo] só para quem po
   expect(screen.queryByRole('button', { name: 'Cadastrar processo' })).toBeNull()
 })
 
-test('as colunas: "Aguardando o setor" e uma por etapa ativa, na ordem do catálogo', async () => {
+test('as colunas: uma por etapa ativa, na ordem do catálogo, sem "Aguardando o setor"', async () => {
   montar({ processos: [processo('Emitir Ofício')] })
-  await screen.findByRole('region', { name: 'Aguardando o setor' })
+  await screen.findByRole('region', { name: MODELAGEM.nome })
   const titulos = screen.getAllByRole('region').map((regiao) => regiao.getAttribute('aria-label'))
-  expect(titulos.filter((titulo) => titulo === 'Aguardando o setor' || titulo === MODELAGEM.nome || titulo === RELATORIO.nome))
-    .toEqual(['Aguardando o setor', MODELAGEM.nome, RELATORIO.nome])
+  expect(titulos.filter((titulo) => titulo === MODELAGEM.nome || titulo === RELATORIO.nome)).toEqual([MODELAGEM.nome, RELATORIO.nome])
+  expect(screen.queryByRole('region', { name: 'Aguardando o setor' })).toBeNull()
 })
 
-test('cada processo fica na coluna da etapa atual, ou em "Aguardando o setor", em ordem de nome', async () => {
+test('cada processo fica na coluna da etapa atual, em ordem de nome', async () => {
   montar({ processos: [
     processo('Zeta'), processo('Alfa'),
-    processo('Beta', { aguardandoOSetor: true }),
     processo('Gama', { etapaAtual: { codigo: RELATORIO.codigo, nome: RELATORIO.nome, ordem: 5 } }),
   ] })
-  await screen.findByRole('region', { name: 'Aguardando o setor' })
+  await screen.findByRole('region', { name: MODELAGEM.nome })
   expect(cartoesDa(MODELAGEM.nome).map((texto) => texto?.includes('Alfa'))).toEqual([true, false])
-  expect(cartoesDa('Aguardando o setor')).toHaveLength(1)
   expect(cartoesDa(RELATORIO.nome)).toHaveLength(1)
 })
 
@@ -96,7 +94,7 @@ test('o cartão traz sigla, nome, macroprocesso, a pílula "A classificar" e o r
     processo('Emitir Ofício', { tipo: 'a_classificar', responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null } }),
     processo('Pagar Diária', { tipo: 'processo' }),
   ] })
-  await screen.findByRole('region', { name: 'Aguardando o setor' })
+  await screen.findByRole('region', { name: MODELAGEM.nome })
   const cartao = within(screen.getByRole('link', { name: /Emitir Ofício/ }))
   expect(cartao.getByText('TSA')).toBeTruthy()
   expect(cartao.getByText('Macro de Teste')).toBeTruthy()
@@ -111,7 +109,7 @@ test('suspenso aparece com a pílula "Suspenso"; concluído e cancelado saem do 
     processo('Pronto', { situacao: 'concluido', etapaAtual: null }),
     processo('Desistido', { situacao: 'cancelado' }),
   ] })
-  await screen.findByRole('region', { name: 'Aguardando o setor' })
+  await screen.findByRole('region', { name: MODELAGEM.nome })
   expect(within(screen.getByRole('link', { name: /Parado/ })).getByText('Suspenso')).toBeTruthy()
   expect(screen.queryByRole('link', { name: /Pronto/ })).toBeNull()
   expect(screen.queryByRole('link', { name: /Desistido/ })).toBeNull()

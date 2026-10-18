@@ -24,7 +24,7 @@ function processo(id: string, nome: string, mudancas: Partial<ProcessoLido> = {}
   return {
     id, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1', macroprocessoNome: 'Macro Um',
     situacao: 'em_andamento', etapaAtual: { codigo: MODELAGEM.codigo, nome: MODELAGEM.nome, ordem: MODELAGEM.ordem },
-    aguardandoOSetor: false, processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null, origem: 'novo',
+    processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null, origem: 'novo',
     contexto: null, observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, etapasDoSetor: [], etapasDoProcesso: [], ...mudancas,
   }
 }
@@ -37,7 +37,7 @@ const PROCESSOS: ProcessoLido[] = [
     setorId: 's2', setorSigla: 'TSB', macroprocessoId: 'm2', macroprocessoNome: 'Macro Dois',
     etapaAtual: { codigo: RELATORIO.codigo, nome: RELATORIO.nome, ordem: RELATORIO.ordem }, tipo: 'a_classificar',
   }),
-  processo('p5', 'Cadastrar Bem', { aguardandoOSetor: true, responsavel: ANA }),
+  processo('p5', 'Cadastrar Bem', { responsavel: ANA }),
 ]
 
 type Montagem = { perfil?: Perfil }
@@ -72,7 +72,6 @@ test('o filtro de Setor troca as linhas da Lista e vai para o endereço', async 
 // endereço do caso seguinte (como responsavel=u1) vazar para o teste que vinha depois.
 const CASOS: [string, string, string[]][] = [
   ['Macroprocesso', 'Macro Dois', ['Arquivar Pasta']],
-  ['Etapa atual', 'Aguardando o setor', ['Cadastrar Bem']],
   ['Etapa atual', 'Relatório técnico', ['Arquivar Pasta']],
   ['Tipo', 'Subprocesso', ['Conferir Recibo']],
   ['Responsável', 'Ana Teste', ['Cadastrar Bem', 'Conferir Recibo']],
@@ -83,6 +82,14 @@ test.each(CASOS)('o filtro %s = %s troca as linhas da Lista', async (rotulo, opc
   montar()
   await escolher(rotulo, opcao)
   await waitFor(async () => expect(await nomesNaLista()).toEqual(esperado))
+})
+
+test('as opções de etapa não têm "Aguardando o setor", e o endereço antigo com ele mostra tudo', async () => {
+  window.location.hash = '#/processos/lista?etapa=aguardando-o-setor'
+  montar()
+  expect(await nomesNaLista()).toHaveLength(PROCESSOS.length)
+  expect(within(screen.getByLabelText('Etapa atual')).queryByRole('option', { name: 'Aguardando o setor' })).toBeNull()
+  expect(screen.queryByText('Nenhum processo com estes filtros.')).toBeNull()
 })
 
 test('a combinação de filtros é "e", e o endereço guarda os dois', async () => {

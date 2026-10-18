@@ -27,7 +27,7 @@ test('lista os processos por nome e as etapas de nível processo na ordem do cat
     processos: [{
       id: 'p1', nome: 'Emitir Ofício Fictício', tipo: 'a_classificar', setorId: 's1', setorSigla: 'TSA',
       macroprocessoId: 'm1', macroprocessoNome: 'Macro de Teste', processoPaiId: null, situacao: 'em_andamento',
-      etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 }, aguardandoOSetor: false,
+      etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 },
       responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null },
     }],
   })
@@ -37,13 +37,13 @@ test('lista os processos por nome e as etapas de nível processo na ordem do cat
   ])
 })
 
-test('processo sem etapa atual e sem responsável chega com nulos; aguardando o setor vem da view', async () => {
+test('processo sem etapa atual e sem responsável chega com nulos', async () => {
   const cliente = new ClienteSupabaseFalso()
-  const aguardando = { ...LINHA, etapa_atual_codigo: null, etapa_atual_nome: null, etapa_atual_ordem: null,
-    etapa_atual_id: null, aguardando_o_setor: true, responsavel_id: null, responsavel_nome: null }
-  cliente.respostas['processos_com_andamento.select'] = { data: [aguardando], error: null }
+  const semEtapa = { ...LINHA, etapa_atual_codigo: null, etapa_atual_nome: null, etapa_atual_ordem: null,
+    etapa_atual_id: null, responsavel_id: null, responsavel_nome: null }
+  cliente.respostas['processos_com_andamento.select'] = { data: [semEtapa], error: null }
   const { processos } = await criar(cliente).listarProcessos()
-  expect(processos[0]).toMatchObject({ etapaAtual: null, aguardandoOSetor: true, responsavel: null })
+  expect(processos[0]).toMatchObject({ etapaAtual: null, responsavel: null })
 })
 
 test('a situação calculada "concluido" chega como está', async () => {

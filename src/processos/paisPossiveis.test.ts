@@ -5,7 +5,7 @@ import type { ProcessoDaLista, TipoDeProcesso } from './tipos'
 function item(id: string, tipo: TipoDeProcesso): ProcessoDaLista {
   return {
     id, nome: id, tipo, setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1', macroprocessoNome: 'Macro',
-    processoPaiId: null, situacao: 'em_andamento', etapaAtual: null, aguardandoOSetor: false, responsavel: null,
+    processoPaiId: null, situacao: 'em_andamento', etapaAtual: null, responsavel: null,
   }
 }
 

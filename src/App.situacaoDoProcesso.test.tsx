@@ -34,7 +34,7 @@ function processo(situacao: SituacaoDoProcesso = 'em_andamento'): ProcessoLido {
   return {
     id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
     macroprocessoNome: 'Macro de Teste', situacao, etapaAtual: { codigo: 'c5', nome: RELATORIO, ordem: 5 },
-    aguardandoOSetor: false, responsavel: null, origem: 'novo', contexto: null, observacoes: null,
+    responsavel: null, origem: 'novo', contexto: null, observacoes: null,
     processoPaiId: null, processoPai: null, subprocessos: [],
     motivoDaSituacao: parado ? 'Aguardando decisão' : null, dataDaReuniao: null, etapasDoSetor: [],
     etapasDoProcesso: [

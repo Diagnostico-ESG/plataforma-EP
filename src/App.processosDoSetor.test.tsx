@@ -20,7 +20,7 @@ function processo(id: string, nome: string, mudancas: Partial<ProcessoLido> = {}
   return {
     id, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1', macroprocessoNome: 'Macro Um',
     situacao: 'em_andamento', etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 },
-    aguardandoOSetor: false, processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null, origem: 'novo',
+    processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null, origem: 'novo',
     contexto: null, observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, etapasDoSetor: [], etapasDoProcesso: [], ...mudancas,
   }
 }
@@ -28,7 +28,7 @@ function processo(id: string, nome: string, mudancas: Partial<ProcessoLido> = {}
 const PROCESSOS: ProcessoLido[] = [
   processo('p1', 'Pagar Diária'),
   processo('p2', 'Conferir Recibo', { tipo: 'subprocesso', processoPaiId: 'p1', situacao: 'concluido', etapaAtual: null }),
-  processo('p3', 'Arquivar Pasta', { situacao: 'cancelado', aguardandoOSetor: true }),
+  processo('p3', 'Arquivar Pasta', { situacao: 'cancelado', etapaAtual: { codigo: 'relatorio', nome: 'Relatório técnico', ordem: 5 } }),
   processo('p4', 'Emitir Ofício', { setorId: 's2', setorSigla: 'TSB' }),
 ]
 
@@ -59,7 +59,7 @@ test('só os processos do setor, por nome, com tipo, etapa atual e situação', 
   montar()
   const secao = await abrirProcessosDoSetor()
   expect(await linhasDa(secao)).toEqual([
-    ['Arquivar Pasta', 'Processo', 'Aguardando o setor', 'Cancelado'],
+    ['Arquivar Pasta', 'Processo', 'Relatório técnico', 'Cancelado'],
     ['Conferir Recibo', 'Subprocesso', '—', 'Concluído'],
     ['Pagar Diária', 'Processo', 'Reunião de modelagem', 'Em andamento'],
   ])

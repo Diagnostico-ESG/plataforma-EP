@@ -16,7 +16,6 @@ export function processoDaLinha(linha: LinhaDoProcesso): ProcessoDaLista {
     processoPaiId: linha.processo_pai_id,
     situacao: (linha.situacao ?? 'em_andamento') as SituacaoDoProcesso,
     etapaAtual: etapaAtualDaLinha(linha),
-    aguardandoOSetor: Boolean(linha.aguardando_o_setor),
     responsavel: responsavelDaLinha(linha),
   }
 }

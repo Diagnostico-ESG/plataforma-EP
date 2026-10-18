@@ -5,7 +5,7 @@ export type VisaoDosProcessos = 'quadro' | 'lista'
 export type FiltrosDosProcessos = {
   setor: string | null
   macroprocesso: string | null
-  /** O código da etapa atual, ou "aguardando-o-setor". */
+  /** O código da etapa atual. */
   etapa: string | null
   tipo: TipoDeProcesso | null
   responsavel: string | null
@@ -41,10 +41,15 @@ function filtrosDaConsulta(consulta: URLSearchParams, visao: VisaoDosProcessos):
     return lido !== null && validos.has(lido) ? lido : null
   }
   return {
-    setor: valor('setor'), macroprocesso: valor('macroprocesso'), etapa: valor('etapa'),
+    setor: valor('setor'), macroprocesso: valor('macroprocesso'), etapa: etapaDaConsulta(valor('etapa')),
     tipo: conhecido('tipo', TIPOS) as TipoDeProcesso | null, responsavel: valor('responsavel'),
     situacao: visao === 'lista' ? conhecido('situacao', SITUACOES) as SituacaoDoProcesso | null : null,
   }
+}
+
+// "aguardando-o-setor" saiu com as etapas do setor (ADR 0013): o endereço antigo vale como sem filtro de etapa.
+function etapaDaConsulta(lida: string | null): string | null {
+  return lida === 'aguardando-o-setor' ? null : lida
 }
 
 export function montarEnderecoDosProcessos({ visao, aberto, filtros }: EnderecoDosProcessos): string {

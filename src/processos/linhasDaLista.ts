@@ -21,6 +21,5 @@ function nomeDoPai(processo: ProcessoDaLista, nomePorId: Map<string, string>): s
 }
 
 export function textoDaEtapaAtual(processo: ProcessoDaLista): string {
-  if (processo.aguardandoOSetor) return 'Aguardando o setor'
   return processo.etapaAtual?.nome ?? '—'
 }

@@ -22,7 +22,7 @@ function falso(): ProcessosFalso {
     id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 'set1', setorSigla: 'TSA', macroprocessoId: 'm1',
     macroprocessoNome: 'Macro', situacao: 'em_andamento', etapaAtual: { codigo: 'c6', nome: 'Etapa 6', ordem: 6 },
     processoPaiId: null, processoPai: null, subprocessos: [],
-    aguardandoOSetor: false, responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
+    responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
     dataDaReuniao: null, etapasDoSetor: [DO_SETOR],
     etapasDoProcesso: [
       doProcesso(4, { status: 'concluida', iniciadaEm: '2026-10-10', resolvidaEm: '2026-10-11' }),
@@ -69,7 +69,6 @@ describe('voltar', () => {
     expect((await modulo.lerEtapasDoSetor('set1'))[0].status).toBe('em_andamento')
     const lido = await doBanco(modulo)
     expect(lido.etapasDoProcesso.map((etapa) => etapa.status)).toEqual(['concluida', 'concluida', 'em_andamento'])
-    expect(lido.aguardandoOSetor).toBe(true)
   })
 
   test('falha de gravação programada aparece e nada muda', async () => {

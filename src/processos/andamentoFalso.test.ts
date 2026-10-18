@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest'
 import {
-  atualizarSetorDoProcesso, conferirDatasDaEtapa, mudarEtapaDoProcesso, trocarEtapaDoProcesso, voltarEtapas,
+  conferirDatasDaEtapa, mudarEtapaDoProcesso, trocarEtapaDoProcesso, voltarEtapas,
 } from './andamentoFalso'
-import type { EtapaDoProcesso, EtapaDoSetor, ProcessoLido } from './tipos'
+import type { EtapaDoProcesso, ProcessoLido } from './tipos'
 
 const HOJE = '2026-10-13'
 
@@ -17,7 +17,7 @@ const PROCESSO: ProcessoLido = {
   id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
   macroprocessoNome: 'Macro', situacao: 'em_andamento', etapaAtual: { codigo: 'c4', nome: 'Etapa 4', ordem: 4 },
   processoPaiId: null, processoPai: null, subprocessos: [],
-  aguardandoOSetor: false, responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
+  responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
   dataDaReuniao: null, etapasDoSetor: [], etapasDoProcesso: [etapa(4), etapa(5), etapa(9, { obrigatoria: false })],
 }
 
@@ -36,15 +36,6 @@ test('com as obrigatórias resolvidas o processo é concluído, mesmo com a opci
 
 test('etapa de outro processo não muda nada', () => {
   expect(mudarEtapaDoProcesso(PROCESSO, 'x', { status: 'concluida' })).toBe(PROCESSO)
-})
-
-test('o processo aguarda o setor enquanto uma etapa do setor está pendente ou em andamento', () => {
-  const doSetor = (status: EtapaDoSetor['status']): EtapaDoSetor[] => [{
-    id: 's1', codigo: 'c1', nome: 'Etapa do setor', ordem: 1, obrigatoria: true, status, nota: null,
-    iniciadaEm: null, resolvidaEm: null,
-  }]
-  expect(atualizarSetorDoProcesso(PROCESSO, doSetor('em_andamento')).aguardandoOSetor).toBe(true)
-  expect(atualizarSetorDoProcesso(PROCESSO, doSetor('concluida')).aguardandoOSetor).toBe(false)
 })
 
 describe('voltar', () => {

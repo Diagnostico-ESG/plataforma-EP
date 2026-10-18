@@ -25,7 +25,7 @@ function etapaDoProcesso(etapa: EtapaNoCatalogo, status: EtapaDoProcesso['status
 function processo(id: string, situacao: SituacaoDoProcesso, status: EtapaDoProcesso['status']): ProcessoLido {
   return {
     id, nome: `Processo ${id}`, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
-    macroprocessoNome: 'Macro', processoPaiId: null, situacao, etapaAtual: null, aguardandoOSetor: false,
+    macroprocessoNome: 'Macro', processoPaiId: null, situacao, etapaAtual: null,
     responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null, processoPai: null,
     subprocessos: [], dataDaReuniao: null, etapasDoSetor: [], etapasDoProcesso: [etapaDoProcesso(MODELAGEM, status)],
   }

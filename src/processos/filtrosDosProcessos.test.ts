@@ -9,7 +9,7 @@ const RELATORIO = { codigo: 'relatorio', nome: 'Relatório', ordem: 5 }
 function processo(nome: string, mudancas: Partial<ProcessoDaLista> = {}): ProcessoDaLista {
   return {
     id: nome, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1', macroprocessoNome: 'Macro Um',
-    processoPaiId: null, situacao: 'em_andamento', etapaAtual: MODELAGEM, aguardandoOSetor: false, responsavel: null,
+    processoPaiId: null, situacao: 'em_andamento', etapaAtual: MODELAGEM, responsavel: null,
     ...mudancas,
   }
 }
@@ -21,7 +21,7 @@ const PROCESSOS = [
   processo('Alfa'),
   processo('Beta', { setorId: 's2', setorSigla: 'TSB', tipo: 'subprocesso', processoPaiId: 'Alfa', responsavel: BRUNO }),
   processo('Gama', { macroprocessoId: 'm2', macroprocessoNome: 'Macro Dois', situacao: 'concluido', etapaAtual: null }),
-  processo('Delta', { aguardandoOSetor: true, responsavel: ANA }),
+  processo('Delta', { etapaAtual: null, responsavel: ANA }),
   processo('Épsilon', { etapaAtual: RELATORIO, tipo: 'a_classificar', situacao: 'suspenso', responsavel: ANA }),
 ]
 
@@ -42,9 +42,8 @@ test('cada filtro sozinho', () => {
   expect(nomes({ situacao: 'suspenso' })).toEqual(['Épsilon'])
 })
 
-test('etapa: a do catálogo não pega quem aguarda o setor; "aguardando-o-setor" pega só esses', () => {
+test('etapa: pega quem está na etapa atual escolhida', () => {
   expect(nomes({ etapa: 'modelagem' })).toEqual(['Alfa', 'Beta'])
-  expect(nomes({ etapa: 'aguardando-o-setor' })).toEqual(['Delta'])
 })
 
 test('a combinação de filtros é "e"', () => {
@@ -62,7 +61,6 @@ test('opções: sem repetição, na ordem certa', () => {
   expect(opcoes.setores).toEqual([{ valor: 's1', rotulo: 'TSA' }, { valor: 's2', rotulo: 'TSB' }])
   expect(opcoes.macroprocessos).toEqual([{ valor: 'm2', rotulo: 'Macro Dois' }, { valor: 'm1', rotulo: 'Macro Um' }])
   expect(opcoes.etapas).toEqual([
-    { valor: 'aguardando-o-setor', rotulo: 'Aguardando o setor' },
     { valor: 'modelagem', rotulo: 'Reunião de modelagem' },
     { valor: 'relatorio', rotulo: 'Relatório' },
   ])

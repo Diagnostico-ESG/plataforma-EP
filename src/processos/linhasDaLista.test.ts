@@ -6,7 +6,7 @@ function processo(nome: string, mudancas: Partial<ProcessoDaLista> = {}): Proces
   return {
     id: `p-${nome}`, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
     macroprocessoNome: 'Macro Um', processoPaiId: null, situacao: 'em_andamento',
-    etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 }, aguardandoOSetor: false, responsavel: null,
+    etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 }, responsavel: null,
     ...mudancas,
   }
 }
@@ -32,8 +32,7 @@ test('o pai filtrado fora da Lista continua com o nome ao lado do subprocesso', 
   expect(linhasDaLista([filho], [pai, filho]).map((l) => l.nomeDoPai)).toEqual(['Pai'])
 })
 
-test('texto da etapa atual: aguardando o setor, o nome da etapa ou "—"', () => {
-  expect(textoDaEtapaAtual(processo('A', { aguardandoOSetor: true }))).toBe('Aguardando o setor')
+test('texto da etapa atual: o nome da etapa ou "—"', () => {
   expect(textoDaEtapaAtual(processo('B'))).toBe('Reunião de modelagem')
   expect(textoDaEtapaAtual(processo('C', { etapaAtual: null }))).toBe('—')
 })

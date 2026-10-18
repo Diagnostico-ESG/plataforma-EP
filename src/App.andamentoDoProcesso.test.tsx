@@ -6,7 +6,7 @@ import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { Perfil } from './acesso/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
-import type { EtapaDoProcesso, EtapaDoSetor, ProcessoLido } from './processos/tipos'
+import type { EtapaDoProcesso, ProcessoLido } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
 beforeEach(() => {
@@ -24,16 +24,11 @@ function doProcesso(ordem: number, codigo: string, nome: string, mudancas: Parti
   }
 }
 
-const SETOR_PENDENTE: EtapaDoSetor = {
-  id: 's3', codigo: 'identificacao_processos', nome: 'Identificação dos processos', ordem: 3, obrigatoria: true,
-  status: 'pendente', nota: null, iniciadaEm: null, resolvidaEm: null,
-}
-
 function processo(mudancas: Partial<ProcessoLido> = {}): ProcessoLido {
   return {
     id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
     macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento',
-    etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 }, aguardandoOSetor: false,
+    etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 },
     processoPaiId: null, processoPai: null, subprocessos: [],
     responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, etapasDoSetor: [],
     etapasDoProcesso: [
@@ -163,24 +158,4 @@ test('falha comum de gravação mostra o motivo', async () => {
 test('a Consulta vê o caminho sem nenhuma ação', async () => {
   montar({ perfil: 'consulta' })
   expect((await etapa('Reunião de modelagem')).queryAllByRole('button')).toEqual([])
-})
-
-test('o processo sai de "Aguardando o setor" quando o setor resolve as etapas', async () => {
-  window.location.hash = '#/setores'
-  const falso = montar({
-    processos: [processo({ aguardandoOSetor: true, etapasDoSetor: [SETOR_PENDENTE] })],
-    ajustar: (f) => { f.etapasDoSetor = { s1: [SETOR_PENDENTE] } },
-  })
-  fireEvent.click(await screen.findByRole('cell', { name: 'TSA' }))
-  const secao = within(await screen.findByRole('region', { name: 'Etapas do setor' }))
-  const linha = within((await secao.findByText('Identificação dos processos')).closest('li') as HTMLElement)
-  fireEvent.click(linha.getByRole('button', { name: 'Realizada anteriormente' }))
-  const janela = within(screen.getByRole('dialog'))
-  fireEvent.change(janela.getByLabelText('Nota'), { target: { value: 'Feita antes' } })
-  fireEvent.click(janela.getByRole('button', { name: 'Registrar' }))
-  await linha.findByText('Realizada anteriormente')
-  expect(falso.processos[0].aguardandoOSetor).toBe(false)
-  window.location.hash = '#/processos'
-  const coluna = within(await screen.findByRole('region', { name: 'Reunião de modelagem' }))
-  expect(await coluna.findByRole('link', { name: /Emitir Ofício/ })).toBeTruthy()
 })

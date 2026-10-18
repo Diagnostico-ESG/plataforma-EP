@@ -34,7 +34,7 @@ function etapaDoProcesso(ordem: number, codigo: string, nome: string, mudancas: 
 const PROCESSO: ProcessoLido = {
   id: 'p1', nome: 'Emitir Ofício', tipo: 'a_classificar', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
   macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento',
-  etapaAtual: { codigo: 'relatorio', nome: 'Relatório e modelagem técnica', ordem: 5 }, aguardandoOSetor: false,
+  etapaAtual: { codigo: 'relatorio', nome: 'Relatório e modelagem técnica', ordem: 5 },
   responsavel: null, origem: 'retomado', contexto: 'Contexto inventado', observacoes: 'Observação inventada',
   processoPaiId: null, processoPai: null, subprocessos: [],
   motivoDaSituacao: null,

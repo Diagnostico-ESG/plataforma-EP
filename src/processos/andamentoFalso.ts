@@ -30,9 +30,9 @@ export function mudarEtapaDoProcesso(processo: ProcessoLido, id: string, mudanca
   return trocarEtapaDoProcesso(processo, id, (etapas) => etapas.map((etapa) => (etapa.id === id ? { ...etapa, ...mudancas } : etapa)))
 }
 
-/** As etapas do setor mudaram: o processo aguarda o setor enquanto alguma delas não estiver resolvida. */
+/** As etapas do setor mudaram: o processo passa a mostrá-las. */
 export function atualizarSetorDoProcesso(processo: ProcessoLido, etapasDoSetor: EtapaDoSetor[]): ProcessoLido {
-  return { ...processo, etapasDoSetor, aguardandoOSetor: etapasDoSetor.some((etapa) => !RESOLVIDOS.includes(etapa.status)) }
+  return { ...processo, etapasDoSetor }
 }
 
 /** O responsável do cartão é o da etapa atual: só muda quando a etapa trocada é ela. */

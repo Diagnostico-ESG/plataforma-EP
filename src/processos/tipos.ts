@@ -67,8 +67,6 @@ export type ProcessoDaLista = {
   processoPaiId: string | null
   situacao: SituacaoDoProcesso
   etapaAtual: { codigo: string; nome: string; ordem: number } | null
-  /** As etapas do setor ainda não foram resolvidas: o processo espera na coluna "Aguardando o setor". */
-  aguardandoOSetor: boolean
   responsavel: ResponsavelDaEtapa | null
 }
 

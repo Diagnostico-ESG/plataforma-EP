@@ -27,7 +27,7 @@ function processo(id: string, nome: string, situacao: SituacaoDoProcesso, status
   return {
     id, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1', macroprocessoNome: 'Macro de Teste',
     processoPaiId: null, situacao, etapaAtual: { codigo: MODELAGEM.codigo, nome: MODELAGEM.nome, ordem: MODELAGEM.ordem },
-    aguardandoOSetor: false, responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
+    responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
     processoPai: null, subprocessos: [], dataDaReuniao: null, etapasDoSetor: [],
     etapasDoProcesso: [etapa(MODELAGEM, statusDaModelagem), etapa(PUBLICACAO, 'pendente')],
   }

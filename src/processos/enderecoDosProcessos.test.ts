@@ -30,7 +30,11 @@ test('montar: só os filtros preenchidos, e sem situação no Quadro', () => {
     .toBe('#/processos')
 })
 
+test('o endereço antigo com "aguardando-o-setor" vale como sem filtro de etapa', () => {
+  expect(lerEnderecoDosProcessos('#/processos/lista?etapa=aguardando-o-setor').filtros.etapa).toBeNull()
+})
+
 test('ida e volta com todos os filtros', () => {
-  const endereco = '#/processos/lista/p1?setor=s1&macroprocesso=m1&etapa=aguardando-o-setor&tipo=processo&responsavel=u1&situacao=suspenso'
+  const endereco = '#/processos/lista/p1?setor=s1&macroprocesso=m1&etapa=modelagem&tipo=processo&responsavel=u1&situacao=suspenso'
   expect(montarEnderecoDosProcessos(lerEnderecoDosProcessos(endereco))).toBe(endereco)
 })
