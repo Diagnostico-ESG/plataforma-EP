@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest'
 import { ROTULO_DO_STATUS, acoesDaEtapa, formatarData, indiceDaEtapaAtual } from './caminhoDeEtapas'
-import type { EtapaDoSetor, StatusDaEtapa } from './tipos'
+import type { EtapaDoCaminho, StatusDaEtapa } from './tipos'
 
-function etapa(ordem: number, status: StatusDaEtapa, obrigatoria = false): EtapaDoSetor {
+function etapa(ordem: number, status: StatusDaEtapa, obrigatoria = false): EtapaDoCaminho {
   return {
     id: `a${ordem}`, codigo: `etapa_${ordem}`, nome: `Etapa ${ordem}`, ordem, obrigatoria, status,
     nota: null, iniciadaEm: null, resolvidaEm: null,

@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { useGravacaoComFalha } from '../../hooks/useGravacaoComFalha'
 import type { AcaoDaEtapa } from '../../processos/caminhoDeEtapas'
-import type { EtapaDoSetor, ModuloDeProcessos } from '../../processos/tipos'
+import type { EtapaDoCaminho, ModuloDeProcessos } from '../../processos/tipos'
 
 type AcaoComTexto = Extract<AcaoDaEtapa, 'dispensar' | 'realizada' | 'voltar'>
-export type PedidoDeTexto = { acao: AcaoComTexto; etapa: EtapaDoSetor }
+export type PedidoDeTexto = { acao: AcaoComTexto; etapa: EtapaDoCaminho }
 
 const ACOES_COM_TEXTO: AcaoDaEtapa[] = ['dispensar', 'realizada', 'voltar']
 
@@ -26,7 +26,7 @@ export function useAcoesDaEtapa(processos: ModuloDeProcessos, aoMudar: () => voi
   const { falha, executar } = useGravacaoComFalha(aoSumir)
   const [pedido, setPedido] = useState<PedidoDeTexto | null>(null)
 
-  function agir(acao: AcaoDaEtapa, etapa: EtapaDoSetor) {
+  function agir(acao: AcaoDaEtapa, etapa: EtapaDoCaminho) {
     if (pedeTexto(acao)) return setPedido({ acao, etapa })
     const gravar = acao === 'iniciar' ? () => processos.iniciarEtapa(etapa.id) : () => processos.concluirEtapa(etapa.id)
     executar(gravar, aoMudar)
@@ -37,7 +37,7 @@ export function useAcoesDaEtapa(processos: ModuloDeProcessos, aoMudar: () => voi
     if (pedido) executar(() => gravarPedido(processos, pedido, texto), aoMudar)
   }
 
-  function mudarResponsavel(etapa: EtapaDoSetor, usuarioId: string | null) {
+  function mudarResponsavel(etapa: EtapaDoCaminho, usuarioId: string | null) {
     executar(() => processos.mudarResponsavelDaEtapa(etapa.id, usuarioId), aoMudar)
   }
 

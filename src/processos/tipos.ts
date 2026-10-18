@@ -2,8 +2,8 @@ import type { EventoDoCadastro } from '../cadastros/tipos'
 
 export type StatusDaEtapa ='pendente' | 'em_andamento' | 'concluida' | 'realizada_anteriormente' | 'dispensada'
 
-/** Uma etapa do catálogo num setor (o andamento): o id é o do andamento, que as ações recebem. */
-export type EtapaDoSetor = {
+/** Uma etapa do catálogo num processo (o andamento): o id é o do andamento, que as ações recebem. */
+export type EtapaDoCaminho = {
   id: string
   codigo: string
   nome: string
@@ -72,8 +72,8 @@ export type ProcessoDaLista = {
 
 export type ListaDeProcessos = { etapas: EtapaDoCatalogo[]; processos: ProcessoDaLista[] }
 
-/** Uma etapa do processo (o andamento): como a do setor, com o nome de quem responde por ela. */
-export type EtapaDoProcesso = EtapaDoSetor & {
+/** A etapa do caminho com o nome de quem responde por ela. */
+export type EtapaDoProcesso = EtapaDoCaminho & {
   responsavelId: string | null
   responsavelNome: string | null
   /** O responsável foi desativado depois de escolhido: aparece marcado e não se escolhe de novo. */
@@ -98,8 +98,6 @@ export type ProcessoLido = ProcessoDaLista & {
   processoPai: ItemDaEstrutura | null
   /** Os subprocessos do processo, por nome. */
   subprocessos: ItemDaEstrutura[]
-  /** Só para leitura no painel do processo; na ordem do catálogo. */
-  etapasDoSetor: EtapaDoSetor[]
   etapasDoProcesso: EtapaDoProcesso[]
   /** A data da reunião de modelagem piloto (AAAA-MM-DD), passada ou futura; null quando não marcada. */
   dataDaReuniao: string | null
@@ -141,8 +139,6 @@ export type ModuloDeProcessos = {
   marcarReuniao(id: string, data: string | null): Promise<void>
   /** Do mais recente para o mais antigo. */
   lerHistoricoDoProcesso(id: string): Promise<EventoDoCadastro[]>
-  /** Na ordem do catálogo. */
-  lerEtapasDoSetor(setorId: string): Promise<EtapaDoSetor[]>
   iniciarEtapa(andamentoId: string): Promise<void>
   concluirEtapa(andamentoId: string): Promise<void>
   dispensarEtapa(andamentoId: string, nota: string): Promise<void>

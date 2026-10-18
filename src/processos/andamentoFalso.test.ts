@@ -18,7 +18,7 @@ const PROCESSO: ProcessoLido = {
   macroprocessoNome: 'Macro', situacao: 'em_andamento', etapaAtual: { codigo: 'c4', nome: 'Etapa 4', ordem: 4 },
   processoPaiId: null, processoPai: null, subprocessos: [],
   responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
-  dataDaReuniao: null, etapasDoSetor: [], etapasDoProcesso: [etapa(4), etapa(5), etapa(9, { obrigatoria: false })],
+  dataDaReuniao: null, etapasDoProcesso: [etapa(4), etapa(5), etapa(9, { obrigatoria: false })],
 }
 
 test('concluir a etapa atual passa a atual para a seguinte', () => {

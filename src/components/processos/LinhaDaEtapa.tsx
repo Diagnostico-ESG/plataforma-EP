@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { type AcaoDaEtapa, ROTULO_DO_STATUS, formatarData } from '../../processos/caminhoDeEtapas'
-import type { EtapaDoSetor, StatusDaEtapa } from '../../processos/tipos'
+import type { EtapaDoCaminho, StatusDaEtapa } from '../../processos/tipos'
 import { Pilula, type SituacaoPilula } from '../Pilula'
 
 const SITUACAO_DO_STATUS: Record<StatusDaEtapa, SituacaoPilula> = {
@@ -17,7 +17,7 @@ const ROTULO_DA_ACAO: Record<AcaoDaEtapa, string> = {
 }
 
 type LinhaDaEtapaProps = {
-  etapa: EtapaDoSetor
+  etapa: EtapaDoCaminho
   atual: boolean
   acoes: AcaoDaEtapa[]
   aoAgir: (acao: AcaoDaEtapa) => void

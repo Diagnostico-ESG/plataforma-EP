@@ -1,8 +1,6 @@
 import { type EventoDoBanco, eventoDoCadastro } from '../cadastros/historicoSupabase'
 import type { ClienteSupabase } from '../lib/supabase'
-import {
-  type AndamentoLido, COLUNAS_DO_ANDAMENTO, etapaDoAndamento, lerEtapasDoSetor,
-} from './etapasDoSetorSupabase'
+import { type AndamentoLido, COLUNAS_DO_ANDAMENTO, etapaDoAndamento } from './andamentoDoBanco'
 import { type LinhaDoProcesso, processoDaLinha } from './processoDaLinha'
 import type { EtapaDoProcesso, ModuloDeProcessos, ProcessoLido } from './tipos'
 
@@ -19,11 +17,10 @@ async function lerProcesso(cliente: ClienteSupabase, id: string): Promise<Proces
   const { data, error } = await cliente.from('processos_com_andamento').select('*').eq('id', id)
   if (error) throw new Error(`Falha ao ler o processo: ${error.message}`)
   if (!data[0]) return null
-  const [etapasDoProcesso, etapasDoSetor, estrutura] = await Promise.all([
-    lerAndamentosDoProcesso(cliente, id), lerEtapasDoSetor(cliente, data[0].setor_id ?? ''),
-    lerEstrutura(cliente, id, data[0].processo_pai_id),
+  const [etapasDoProcesso, estrutura] = await Promise.all([
+    lerAndamentosDoProcesso(cliente, id), lerEstrutura(cliente, id, data[0].processo_pai_id),
   ])
-  return { ...dadosDoProcesso(data[0]), ...estrutura, etapasDoSetor, etapasDoProcesso }
+  return { ...dadosDoProcesso(data[0]), ...estrutura, etapasDoProcesso }
 }
 
 type LinhaDaEstrutura = { id: string; nome: string; processo_pai_id: string | null }

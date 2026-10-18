@@ -7,7 +7,7 @@ import type { Perfil } from './acesso/tipos'
 import type { EventoDoCadastro } from './cadastros/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
-import type { EtapaDoProcesso, EtapaDoSetor, ProcessoLido } from './processos/tipos'
+import type { EtapaDoProcesso, ProcessoLido } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
 beforeEach(() => {
@@ -36,7 +36,7 @@ function processo(mudancas: Partial<ProcessoLido> = {}): ProcessoLido {
     macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento', etapaAtual: { codigo: 'c6', nome: REVISAO, ordem: 6 },
     processoPaiId: null, processoPai: null, subprocessos: [],
     responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
-    dataDaReuniao: null, etapasDoSetor: [],
+    dataDaReuniao: null,
     etapasDoProcesso: [
       doProcesso(4, MODELAGEM, { status: 'concluida', iniciadaEm: '2026-10-10', resolvidaEm: '2026-10-11' }),
       doProcesso(5, RELATORIO, { status: 'concluida', iniciadaEm: '2026-10-11', resolvidaEm: '2026-10-12' }),
@@ -44,13 +44,6 @@ function processo(mudancas: Partial<ProcessoLido> = {}): ProcessoLido {
       doProcesso(9, 'Publicação', { obrigatoria: false }),
     ],
     ...mudancas,
-  }
-}
-
-function doSetor(ordem: number, nome: string, status: EtapaDoSetor['status']): EtapaDoSetor {
-  return {
-    id: `s${ordem}`, codigo: `cs${ordem}`, nome, ordem, obrigatoria: false, status, nota: null,
-    iniciadaEm: status === 'pendente' ? null : '2026-10-01', resolvidaEm: status === 'concluida' ? '2026-10-02' : null,
   }
 }
 
@@ -141,25 +134,6 @@ test('voltar uma etapa do processo concluído tira a pílula Concluído', async 
   await voltarA(RELATORIO, 'Faltou revisar')
   expect(await (await etapa(RELATORIO)).findByText('Em andamento')).toBeTruthy()
   expect((await painel()).queryByText('Concluído')).toBeNull()
-})
-
-test('na tela do setor, voltar uma etapa do setor não mexe nos andamentos dos processos', async () => {
-  window.location.hash = '#/setores'
-  const etapasDoSetor = [
-    doSetor(1, 'Identificação dos responsáveis', 'concluida'), doSetor(2, 'Reunião de sensibilização', 'concluida'),
-    doSetor(3, 'Identificação dos processos', 'em_andamento'),
-  ]
-  const falso = montar({ ajustar: (f) => { f.etapasDoSetor = { s1: etapasDoSetor } } })
-  fireEvent.click(await screen.findByRole('cell', { name: 'TSA' }))
-  const secao = within(await screen.findByRole('region', { name: 'Etapas do setor' }))
-  const linha = async (nome: string) => within((await secao.findByText(nome)).closest('li') as HTMLElement)
-  fireEvent.click((await linha('Identificação dos responsáveis')).getByRole('button', { name: 'Voltar a esta etapa' }))
-  const janela = within(screen.getByRole('dialog', { name: 'Voltar à etapa Identificação dos responsáveis?' }))
-  fireEvent.change(janela.getByLabelText('Motivo'), { target: { value: 'Faltou um responsável' } })
-  fireEvent.click(janela.getByRole('button', { name: 'Voltar' }))
-  expect(await (await linha('Identificação dos responsáveis')).findByText('Em andamento')).toBeTruthy()
-  expect((await linha('Reunião de sensibilização')).getByText('Pendente')).toBeTruthy()
-  expect(falso.processos[0].etapasDoProcesso.map((e) => e.status)).toEqual(['concluida', 'concluida', 'em_andamento', 'pendente'])
 })
 
 async function corrigirDatas(nome: string) {

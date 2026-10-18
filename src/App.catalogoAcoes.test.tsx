@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, expect, test } from 'vitest'
 import type { ProcessosFalso } from './processos/ProcessosFalso'
+import type { ProcessoLido } from './processos/tipos'
 import { abrirCatalogo, linhasDoCatalogo, montarComCatalogo } from './testes/catalogoDeTeste'
 
 afterEach(() => {
@@ -101,16 +102,25 @@ test('Cancelar na confirmação não exclui', async () => {
   expect(processos.catalogo.etapas).toHaveLength(4)
 })
 
+// Um processo que já concluiu a Modelagem: a etapa está usada.
+const PROCESSO_QUE_USOU_A_MODELAGEM: ProcessoLido = {
+  id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
+  macroprocessoNome: 'Macro', processoPaiId: null, situacao: 'em_andamento', etapaAtual: null, responsavel: null,
+  origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null, processoPai: null, subprocessos: [],
+  dataDaReuniao: null, etapasDoProcesso: [{
+    id: 'a1', codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, obrigatoria: true, status: 'concluida',
+    nota: null, iniciadaEm: '2026-10-01', resolvidaEm: '2026-10-02', responsavelId: null, responsavelNome: null,
+    responsavelInativo: false,
+  }],
+}
+
 test('excluir etapa já usada é recusado, sugerindo desativar', async () => {
   montarComCatalogo({ ajustar: (processos) => {
-    processos.etapasDoSetor = { s1: [{
-      id: 'a1', codigo: 'identificacao_processos', nome: 'Identificação dos processos', ordem: 3, obrigatoria: true,
-      status: 'concluida', nota: null, iniciadaEm: '2026-10-01', resolvidaEm: '2026-10-02',
-    }] }
+    processos.processos = [PROCESSO_QUE_USOU_A_MODELAGEM]
   } })
   const secao = await abrirCatalogo()
-  fireEvent.click(await secao.findByRole('button', { name: 'Excluir Identificação dos processos' }))
+  fireEvent.click(await secao.findByRole('button', { name: 'Excluir Reunião de modelagem' }))
   fireEvent.click(janelaAberta().getByRole('button', { name: 'Excluir etapa' }))
   expect((await secao.findByRole('alert')).textContent)
-    .toBe('A etapa Identificação dos processos já foi usada; desative-a em vez de excluir.')
+    .toBe('A etapa Reunião de modelagem já foi usada; desative-a em vez de excluir.')
 })

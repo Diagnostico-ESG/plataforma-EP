@@ -6,15 +6,6 @@ import { ClienteSupabaseFalso } from '../testes/ClienteSupabaseFalso'
 import type { Database } from '../types/database'
 import { criarProcessosSupabase } from './processosSupabase'
 
-const RESPONSAVEIS = {
-  id: 'a1', status: 'dispensada', nota: 'Nota inventada', iniciada_em: null, resolvida_em: '2026-10-13',
-  etapas: { codigo: 'identificacao_responsaveis', nome: 'Identificação dos responsáveis', ordem: 1, obrigatoria: false },
-}
-const IDENTIFICACAO = {
-  id: 'a3', status: 'pendente', nota: null, iniciada_em: null, resolvida_em: null,
-  etapas: { codigo: 'identificacao_processos', nome: 'Identificação dos processos', ordem: 3, obrigatoria: true },
-}
-
 function criar(cliente: ClienteSupabaseFalso) {
   return criarProcessosSupabase(cliente as unknown as SupabaseClient<Database>)
 }
@@ -24,24 +15,6 @@ function clienteQueRecusa(erro: { message: string; code?: string }) {
   cliente.respostas['andamentos.update'] = { data: null, error: erro }
   return cliente
 }
-
-test('lê as etapas do setor na ordem do catálogo, com status, nota e datas', async () => {
-  const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['andamentos.select'] = { data: [IDENTIFICACAO, RESPONSAVEIS], error: null }
-  expect(await criar(cliente).lerEtapasDoSetor('s1')).toEqual([
-    { id: 'a1', codigo: 'identificacao_responsaveis', nome: 'Identificação dos responsáveis', ordem: 1,
-      obrigatoria: false, status: 'dispensada', nota: 'Nota inventada', iniciadaEm: null, resolvidaEm: '2026-10-13' },
-    { id: 'a3', codigo: 'identificacao_processos', nome: 'Identificação dos processos', ordem: 3,
-      obrigatoria: true, status: 'pendente', nota: null, iniciadaEm: null, resolvidaEm: null },
-  ])
-  expect(cliente.pedidos[0]).toMatchObject({ tabela: 'andamentos', filtro: ['setor_id', 's1'] })
-})
-
-test('falha ao ler vira erro com o motivo do banco', async () => {
-  const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['andamentos.select'] = { data: null, error: { message: 'sem conexão' } }
-  await expect(criar(cliente).lerEtapasDoSetor('s1')).rejects.toThrow('Falha ao ler as etapas do setor: sem conexão')
-})
 
 test('cada ação grava o status, e a nota quando há, no andamento escolhido', async () => {
   const cliente = new ClienteSupabaseFalso()

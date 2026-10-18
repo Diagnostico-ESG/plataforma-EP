@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { ehEtapaDoProcesso } from '../../processos/caminhoDeEtapas'
-import type { DatasDaEtapa, EtapaDoSetor, UsuarioResponsavel } from '../../processos/tipos'
+import type { DatasDaEtapa, EtapaDoCaminho, UsuarioResponsavel } from '../../processos/tipos'
 import { FormularioDeDatas } from './FormularioDeDatas'
 import { SeletorDeResponsavel } from './SeletorDeResponsavel'
 
 type EdicaoDaEtapaProps = {
-  etapa: EtapaDoSetor
+  etapa: EtapaDoCaminho
   /** Sem a lista, a etapa não tem responsável (as do setor): só as datas se corrigem. */
   usuarios?: UsuarioResponsavel[]
   aoCorrigirDatas: (datas: DatasDaEtapa) => Promise<void>

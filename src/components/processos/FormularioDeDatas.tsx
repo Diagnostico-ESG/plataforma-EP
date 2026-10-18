@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { textoDaFalhaNoFormulario } from '../../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../../cadastros/cadastroInexistente'
-import type { DatasDaEtapa, EtapaDoSetor } from '../../processos/tipos'
+import type { DatasDaEtapa, EtapaDoCaminho } from '../../processos/tipos'
 
 type FormularioDeDatasProps = {
-  etapa: EtapaDoSetor
+  etapa: EtapaDoCaminho
   /** Grava e recusa com a frase pronta; quem chama fecha o formulário quando a gravação dá certo. */
   aoSalvar: (datas: DatasDaEtapa) => Promise<void>
   aoCancelar: () => void

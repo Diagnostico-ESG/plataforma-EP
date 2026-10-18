@@ -1,9 +1,9 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
-import { atualizarSetorDoProcesso, recalcularProcesso } from './andamentoFalso'
+import { recalcularProcesso } from './andamentoFalso'
 import { FRASE_DA_ORDEM_DOS_NIVEIS, fraseDaEtapaUsada, fraseDeCodigoRepetido, fraseDeNomeRepetido } from './frasesDoCatalogo'
 import type {
-  DadosDaEtapa, EtapaDoCatalogo, EtapaDoProcesso, EtapaDoSetor, EtapaNoCatalogo, EtapaNova, ModuloDoCatalogo,
+  DadosDaEtapa, EtapaDoCatalogo, EtapaDoProcesso, EtapaDoCaminho, EtapaNoCatalogo, EtapaNova, ModuloDoCatalogo,
   ProcessoLido, SentidoDaOrdem, SituacaoDoProcesso,
 } from './tipos'
 
@@ -11,7 +11,6 @@ import type {
 export type DonoDoCatalogo = {
   processos: ProcessoLido[]
   etapasDoCatalogo: EtapaDoCatalogo[]
-  etapasDoSetor: Record<string, EtapaDoSetor[]>
 }
 
 // Como a função do banco: a etapa entra nos processos não concluídos e não cancelados (ADR 0004).
@@ -19,7 +18,7 @@ const SITUACOES_QUE_RECEBEM = new Set<SituacaoDoProcesso>(['em_andamento', 'susp
 
 const porOrdem = <T extends { ordem: number }>(a: T, b: T) => a.ordem - b.ordem
 
-function pendente(etapa: EtapaNoCatalogo, id: string): EtapaDoSetor {
+function pendente(etapa: EtapaNoCatalogo, id: string): EtapaDoCaminho {
   return {
     id, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, obrigatoria: etapa.obrigatoria, status: 'pendente',
     nota: null, iniciadaEm: null, resolvidaEm: null,
@@ -143,18 +142,13 @@ export class CatalogoFalso implements ModuloDoCatalogo {
       .map(({ id, codigo, nome, ordem, ativa }) => ({ id, codigo, nome, ordem, ativa }))
   }
 
-  private andamentosDe(codigo: string): EtapaDoSetor[] {
-    const todos = [...Object.values(this.dono.etapasDoSetor).flat(), ...this.dono.processos.flatMap((processo) => processo.etapasDoProcesso)]
+  private andamentosDe(codigo: string): EtapaDoCaminho[] {
+    const todos = this.dono.processos.flatMap((processo) => processo.etapasDoProcesso)
     return todos.filter((andamento) => andamento.codigo === codigo)
   }
 
   private incluirPendentes(etapa: EtapaNoCatalogo): void {
-    if (etapa.nivel === 'setor') {
-      for (const [setorId, etapas] of Object.entries(this.dono.etapasDoSetor)) {
-        if (!etapas.some((outra) => outra.codigo === etapa.codigo)) this.trocarEtapasDoSetor(setorId, [...etapas, pendente(etapa, `a${this.proximoId++}`)])
-      }
-      return
-    }
+    if (etapa.nivel === 'setor') return
     this.dono.processos = this.dono.processos.map((processo) => {
       if (!SITUACOES_QUE_RECEBEM.has(processo.situacao) || processo.etapasDoProcesso.some((outra) => outra.codigo === etapa.codigo)) return processo
       return recalcularProcesso(processo, [...processo.etapasDoProcesso, pendenteDoProcesso(etapa, `a${this.proximoId++}`)].sort(porOrdem))
@@ -162,18 +156,11 @@ export class CatalogoFalso implements ModuloDoCatalogo {
   }
 
   private tirarPendentes(codigo: string): void {
-    const ficam = (andamento: EtapaDoSetor) => andamento.codigo !== codigo || andamento.status !== 'pendente'
-    for (const [setorId, etapas] of Object.entries(this.dono.etapasDoSetor)) this.trocarEtapasDoSetor(setorId, etapas.filter(ficam))
+    const ficam = (andamento: EtapaDoCaminho) => andamento.codigo !== codigo || andamento.status !== 'pendente'
     this.dono.processos = this.dono.processos.map((processo) => {
       const restantes = processo.etapasDoProcesso.filter(ficam)
       return restantes.length === processo.etapasDoProcesso.length ? processo : recalcularProcesso(processo, restantes)
     })
   }
 
-  // As etapas do setor mudaram: os processos dele recalculam "aguardando o setor".
-  private trocarEtapasDoSetor(setorId: string, etapas: EtapaDoSetor[]): void {
-    const ordenadas = [...etapas].sort(porOrdem)
-    this.dono.etapasDoSetor[setorId] = ordenadas
-    this.dono.processos = this.dono.processos.map((processo) => (processo.setorId === setorId ? atualizarSetorDoProcesso(processo, ordenadas) : processo))
-  }
 }

@@ -24,7 +24,7 @@ function processo({ id, nome, tipo, macro = 'm1', pai = null }: Item): ProcessoL
     macroprocessoNome: macro === 'm1' ? 'Macro A' : 'Macro B', processoPaiId: pai, situacao: 'em_andamento',
     etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 },
     responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null, processoPai: null,
-    subprocessos: [], dataDaReuniao: null, etapasDoSetor: [], etapasDoProcesso: [],
+    subprocessos: [], dataDaReuniao: null, etapasDoProcesso: [],
   }
 }
 

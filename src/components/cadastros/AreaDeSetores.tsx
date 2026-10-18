@@ -11,7 +11,7 @@ type AreaDeSetoresProps = {
   cadastros: ModuloDeCadastros; processos: ModuloDeProcessos; podeAlterar: boolean
 }
 
-// Um terceiro trecho que não é aba (#/setores/<id>, de "Ver no setor") abre o setor direto.
+// Um terceiro trecho que não é aba (#/setores/<id>, um endereço guardado ou compartilhado) abre o setor direto.
 function idDoSetorNoEndereco(endereco: string): string | null {
   const trecho = endereco.split('/')[2]
   return trecho && trecho !== 'macroprocessos' && trecho !== 'historico' ? trecho : null

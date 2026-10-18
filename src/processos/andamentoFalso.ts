@@ -1,10 +1,10 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { formatarData, indiceDaEtapaAtual } from './caminhoDeEtapas'
-import type { DatasDaEtapa, EtapaDoProcesso, EtapaDoSetor, ProcessoLido, ResponsavelDaEtapa, StatusDaEtapa } from './tipos'
+import type { DatasDaEtapa, EtapaDoProcesso, EtapaDoCaminho, ProcessoLido, ResponsavelDaEtapa, StatusDaEtapa } from './tipos'
 
 const RESOLVIDOS: StatusDaEtapa[] = ['concluida', 'realizada_anteriormente', 'dispensada']
 
-type TrocaDeEtapas = <T extends EtapaDoSetor>(etapas: T[]) => T[]
+type TrocaDeEtapas = <T extends EtapaDoCaminho>(etapas: T[]) => T[]
 
 /** Recalcula, como a view, a etapa atual e o "concluído" a partir das etapas do processo. */
 export function recalcularProcesso(processo: ProcessoLido, etapasDoProcesso: EtapaDoProcesso[]): ProcessoLido {
@@ -30,11 +30,6 @@ export function mudarEtapaDoProcesso(processo: ProcessoLido, id: string, mudanca
   return trocarEtapaDoProcesso(processo, id, (etapas) => etapas.map((etapa) => (etapa.id === id ? { ...etapa, ...mudancas } : etapa)))
 }
 
-/** As etapas do setor mudaram: o processo passa a mostrá-las. */
-export function atualizarSetorDoProcesso(processo: ProcessoLido, etapasDoSetor: EtapaDoSetor[]): ProcessoLido {
-  return { ...processo, etapasDoSetor }
-}
-
 /** O responsável do cartão é o da etapa atual: só muda quando a etapa trocada é ela. */
 export function responsavelDoCartao(processo: ProcessoLido, id: string, responsavel: ResponsavelDaEtapa | null): ProcessoLido {
   const etapa = processo.etapasDoProcesso.find((candidata) => candidata.id === id)
@@ -46,7 +41,7 @@ export function responsavelDoCartao(processo: ProcessoLido, id: string, responsa
  * Como a função do banco: a escolhida volta a em andamento (mantém o início, ou recebe hoje se não tinha) e as
  * seguintes que não estão pendentes voltam a pendente, sem datas nem nota. Etapa fora da lista não muda nada.
  */
-export function voltarEtapas<T extends EtapaDoSetor>(etapas: T[], id: string, hoje: string): T[] {
+export function voltarEtapas<T extends EtapaDoCaminho>(etapas: T[], id: string, hoje: string): T[] {
   const escolhida = etapas.find((etapa) => etapa.id === id)
   if (!escolhida) return etapas
   return etapas.map((etapa) => {

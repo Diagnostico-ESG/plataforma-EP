@@ -3,7 +3,6 @@ import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import type { ClienteSupabase } from '../lib/supabase'
 import { criarAndamentosSupabase } from './andamentosSupabase'
 import { criarCatalogoSupabase } from './catalogoSupabase'
-import { lerEtapasDoSetor } from './etapasDoSetorSupabase'
 import { criarGravacaoDeProcessoSupabase } from './gravarProcessoSupabase'
 import { criarLeituraDeProcessoSupabase } from './lerProcessoSupabase'
 import { criarListaDeProcessosSupabase } from './listaDeProcessosSupabase'
@@ -19,7 +18,6 @@ export const RECUSAS_DOS_PROCESSOS: RecusasDoModulo = {
 
 export function criarProcessosSupabase(cliente: ClienteSupabase): ModuloDeProcessos {
   return {
-    lerEtapasDoSetor: (setorId) => lerEtapasDoSetor(cliente, setorId),
     ...criarAndamentosSupabase(cliente, RECUSAS_DOS_PROCESSOS),
     ...criarSituacaoSupabase(cliente, RECUSAS_DOS_PROCESSOS),
     ...criarReclassificacaoSupabase(cliente, RECUSAS_DOS_PROCESSOS),

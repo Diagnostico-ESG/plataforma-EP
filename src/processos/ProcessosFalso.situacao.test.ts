@@ -20,7 +20,7 @@ function falso(situacao: SituacaoDoProcesso = 'em_andamento', etapas: EtapaDoPro
     responsavel: null, origem: 'novo', contexto: null, observacoes: null,
     processoPaiId: null, processoPai: null, subprocessos: [],
     motivoDaSituacao: situacao === 'suspenso' || situacao === 'cancelado' ? 'Motivo antigo' : null,
-    dataDaReuniao: null, etapasDoSetor: [], etapasDoProcesso: etapas,
+    dataDaReuniao: null, etapasDoProcesso: etapas,
   }
   const modulo = new ProcessosFalso()
   modulo.processos = [processo]

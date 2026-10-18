@@ -15,7 +15,7 @@ function processo({ id, tipo, macro = 'm1', pai = null }: Montagem): ProcessoLid
     id, nome: `Processo ${id}`, tipo, setorId: 's1', setorSigla: 'TSA', macroprocessoId: macro,
     macroprocessoNome: `Macro ${macro}`, processoPaiId: pai, situacao: 'em_andamento', etapaAtual: null,
     responsavel: null, origem: 'novo', contexto: null, observacoes: null,
-    motivoDaSituacao: null, processoPai: null, subprocessos: [], dataDaReuniao: null, etapasDoSetor: [], etapasDoProcesso: [CONCLUIDA],
+    motivoDaSituacao: null, processoPai: null, subprocessos: [], dataDaReuniao: null, etapasDoProcesso: [CONCLUIDA],
   }
 }
 

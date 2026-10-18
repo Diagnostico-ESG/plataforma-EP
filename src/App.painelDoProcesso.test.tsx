@@ -6,7 +6,7 @@ import type { Perfil } from './acesso/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import type { EventoDoCadastro } from './cadastros/tipos'
 import { ProcessosFalso } from './processos/ProcessosFalso'
-import type { EtapaDoProcesso, EtapaDoSetor, ProcessoLido } from './processos/tipos'
+import type { EtapaDoProcesso, ProcessoLido } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
 beforeEach(() => {
@@ -16,13 +16,6 @@ afterEach(() => {
   cleanup()
   window.location.hash = ''
 })
-
-function etapaDoSetor(ordem: number, codigo: string, nome: string, mudancas: Partial<EtapaDoSetor> = {}): EtapaDoSetor {
-  return {
-    id: `s${ordem}`, codigo, nome, ordem, obrigatoria: false, status: 'dispensada', nota: 'Setor já conhecido',
-    iniciadaEm: null, resolvidaEm: '2026-10-10', ...mudancas,
-  }
-}
 
 function etapaDoProcesso(ordem: number, codigo: string, nome: string, mudancas: Partial<EtapaDoProcesso> = {}): EtapaDoProcesso {
   return {
@@ -38,12 +31,9 @@ const PROCESSO: ProcessoLido = {
   responsavel: null, origem: 'retomado', contexto: 'Contexto inventado', observacoes: 'Observação inventada',
   processoPaiId: null, processoPai: null, subprocessos: [],
   motivoDaSituacao: null,
-  dataDaReuniao: null, etapasDoSetor: [
-    etapaDoSetor(1, 'identificacao_responsaveis', 'Identificação dos responsáveis'),
-    etapaDoSetor(3, 'identificacao_processos', 'Identificação dos processos', { status: 'concluida', nota: null, obrigatoria: true }),
-  ],
+  dataDaReuniao: null,
   etapasDoProcesso: [
-    etapaDoProcesso(4, 'modelagem', 'Reunião de modelagem', {
+    etapaDoProcesso(4, 'modelagem', 'Modelagem piloto', {
       status: 'concluida', iniciadaEm: '2026-10-11', resolvidaEm: '2026-10-12', responsavelNome: 'Ana Teste' }),
     etapaDoProcesso(5, 'relatorio', 'Relatório e modelagem técnica', { status: 'em_andamento', iniciadaEm: '2026-10-13' }),
     etapaDoProcesso(6, 'revisao_interna', 'Revisão interna'),
@@ -127,16 +117,17 @@ test('os dados do processo aparecem no painel', async () => {
   for (const texto of ['Retomado', 'Contexto inventado', 'Observação inventada']) expect(secao.getByText(texto)).toBeTruthy()
 })
 
-test('o caminho mostra as etapas do setor primeiro, só leitura, e depois as do processo, com a atual destacada e com as ações', async () => {
+test('o caminho começa na Modelagem piloto, com a atual destacada e com as ações, sem etapas do setor nem "Ver no setor"', async () => {
   montar()
   const caminho = within(await (await painel()).findByRole('region', { name: 'Caminho de etapas' }))
   const nomes = caminho.getAllByRole('listitem').map((item) => item.querySelector('.etapa-nome')?.textContent)
-  expect(nomes).toEqual(['Identificação dos responsáveis', 'Identificação dos processos', 'Reunião de modelagem',
-    'Relatório e modelagem técnica', 'Revisão interna'])
+  expect(nomes).toEqual(['Modelagem piloto', 'Relatório e modelagem técnica', 'Revisão interna'])
+  expect(caminho.queryByText('Etapas do setor')).toBeNull()
+  expect(caminho.queryByRole('link', { name: 'Ver no setor' })).toBeNull()
   const atuais = caminho.getAllByRole('listitem').filter((item) => item.getAttribute('aria-current') === 'step')
   expect(atuais.map((item) => item.querySelector('.etapa-nome')?.textContent)).toEqual(['Relatório e modelagem técnica'])
-  // As do setor seguem só leitura; as ações são as da etapa atual e o Voltar da resolvida anterior a ela (tickets 05 e 06),
-  // mais o Corrigir datas das etapas que já têm data.
+  // As ações são as da etapa atual e o Voltar da resolvida anterior a ela (tickets 05 e 06), mais o Corrigir datas
+  // das etapas que já têm data.
   expect(caminho.getAllByRole('button').map((botao) => botao.textContent)).toEqual([
     'Corrigir datas', 'Voltar a esta etapa', 'Corrigir datas', 'Concluir', 'Realizada anteriormente'])
 })
@@ -144,24 +135,12 @@ test('o caminho mostra as etapas do setor primeiro, só leitura, e depois as do 
 test('o caminho mostra status, responsável, datas e nota das etapas do processo', async () => {
   montar({ perfil: 'consulta' })
   const caminho = within(await (await painel()).findByRole('region', { name: 'Caminho de etapas' }))
-  const modelagem = within((await caminho.findByText('Reunião de modelagem')).closest('li') as HTMLElement)
+  const modelagem = within((await caminho.findByText('Modelagem piloto')).closest('li') as HTMLElement)
   expect(modelagem.getByText('Concluída')).toBeTruthy()
   expect(modelagem.getByText('Responsável: Ana Teste')).toBeTruthy()
   expect(modelagem.getByText('Início: 11/10/2026 · Conclusão: 12/10/2026')).toBeTruthy()
   const revisao = within((await caminho.findByText('Revisão interna')).closest('li') as HTMLElement)
   expect(revisao.getByText('Responsável: —')).toBeTruthy()
-  expect(caminho.getByText('Nota: Setor já conhecido')).toBeTruthy()
-})
-
-test('"Ver no setor" abre a tela do setor, e voltar à lista limpa o endereço', async () => {
-  montar()
-  const caminho = within(await (await painel()).findByRole('region', { name: 'Caminho de etapas' }))
-  expect(caminho.getByRole('link', { name: 'Ver no setor' }).getAttribute('href')).toBe('#/setores/s1')
-  fireEvent.click(caminho.getByRole('link', { name: 'Ver no setor' }))
-  expect(await screen.findByRole('form', { name: 'Setor TSA' })).toBeTruthy()
-  fireEvent.click(screen.getByRole('button', { name: 'Voltar à lista' }))
-  await waitFor(() => expect(window.location.hash).toBe('#/setores'))
-  expect(await screen.findByRole('cell', { name: 'TSA' })).toBeTruthy()
 })
 
 test('a aba Histórico lista os eventos do processo', async () => {

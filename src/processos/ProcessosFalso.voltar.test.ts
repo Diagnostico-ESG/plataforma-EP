@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { ProcessosFalso } from './ProcessosFalso'
-import type { EtapaDoProcesso, EtapaDoSetor, ProcessoLido } from './tipos'
+import type { EtapaDoProcesso, ProcessoLido } from './tipos'
 
 function doProcesso(ordem: number, mudancas: Partial<EtapaDoProcesso> = {}): EtapaDoProcesso {
   return {
@@ -12,18 +12,13 @@ function doProcesso(ordem: number, mudancas: Partial<EtapaDoProcesso> = {}): Eta
   }
 }
 
-const DO_SETOR: EtapaDoSetor = {
-  id: 's1', codigo: 'c1', nome: 'Etapa do setor', ordem: 1, obrigatoria: true, status: 'concluida', nota: null,
-  iniciadaEm: '2026-10-01', resolvidaEm: '2026-10-02',
-}
-
 function falso(): ProcessosFalso {
   const processo: ProcessoLido = {
     id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 'set1', setorSigla: 'TSA', macroprocessoId: 'm1',
     macroprocessoNome: 'Macro', situacao: 'em_andamento', etapaAtual: { codigo: 'c6', nome: 'Etapa 6', ordem: 6 },
     processoPaiId: null, processoPai: null, subprocessos: [],
     responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
-    dataDaReuniao: null, etapasDoSetor: [DO_SETOR],
+    dataDaReuniao: null,
     etapasDoProcesso: [
       doProcesso(4, { status: 'concluida', iniciadaEm: '2026-10-10', resolvidaEm: '2026-10-11' }),
       doProcesso(5, { status: 'concluida', iniciadaEm: '2026-10-11', resolvidaEm: '2026-10-12' }),
@@ -32,7 +27,6 @@ function falso(): ProcessosFalso {
   }
   const modulo = new ProcessosFalso()
   modulo.processos = [processo]
-  modulo.etapasDoSetor = { set1: [DO_SETOR] }
   modulo.usuariosPossiveis = [{ id: 'u1', nome: 'Ana Teste' }, { id: 'u2', nome: 'Bia Teste' }]
   return modulo
 }
@@ -61,14 +55,6 @@ describe('voltar', () => {
 
   test('etapa que não existe avisa como cadastro inexistente', async () => {
     await expect(falso().voltarParaEtapa('x', 'Motivo')).rejects.toBeInstanceOf(CadastroInexistente)
-  })
-
-  test('voltar no setor não mexe nos andamentos do processo', async () => {
-    const modulo = falso()
-    await modulo.voltarParaEtapa('s1', 'Faltou um responsável')
-    expect((await modulo.lerEtapasDoSetor('set1'))[0].status).toBe('em_andamento')
-    const lido = await doBanco(modulo)
-    expect(lido.etapasDoProcesso.map((etapa) => etapa.status)).toEqual(['concluida', 'concluida', 'em_andamento'])
   })
 
   test('falha de gravação programada aparece e nada muda', async () => {

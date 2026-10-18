@@ -1,5 +1,5 @@
 import { acoesDaEtapa, ehEtapaDoProcesso, indiceDaEtapaAtual } from '../../processos/caminhoDeEtapas'
-import type { DatasDaEtapa, EtapaDoSetor, ModuloDeProcessos, UsuarioResponsavel } from '../../processos/tipos'
+import type { DatasDaEtapa, EtapaDoCaminho, ModuloDeProcessos, UsuarioResponsavel } from '../../processos/tipos'
 import { JanelaComCampo } from '../JanelaComCampo'
 import { EdicaoDaEtapa } from './EdicaoDaEtapa'
 import { LinhaDaEtapa } from './LinhaDaEtapa'
@@ -18,16 +18,16 @@ const JANELA_DO_TEXTO: Record<PedidoDeTexto['acao'], {
 type CaminhoDeEtapasProps = {
   processos: ModuloDeProcessos
   /** Do setor ou do processo (só esta traz o responsável). */
-  etapas: EtapaDoSetor[]
+  etapas: EtapaDoCaminho[]
   podeAlterar: boolean
-  /** Quem pode ser responsável; sem a lista (etapas do setor), não há seletor de responsável. */
+  /** Quem pode ser responsável; sem a lista, não há seletor de responsável. */
   usuarios?: UsuarioResponsavel[]
   aoMudar: () => void
   aoSumir: () => void
 }
 
-// O nome fica de fora quando o seletor o mostra e nas etapas do setor (sem responsável): undefined esconde a linha.
-function nomeDoResponsavel(etapa: EtapaDoSetor, comSeletor: boolean): string | null | undefined {
+// O nome fica de fora quando o seletor o mostra e na etapa sem responsável lido: undefined esconde a linha.
+function nomeDoResponsavel(etapa: EtapaDoCaminho, comSeletor: boolean): string | null | undefined {
   return ehEtapaDoProcesso(etapa) && !comSeletor ? etapa.responsavelNome : undefined
 }
 
@@ -40,7 +40,7 @@ export function CaminhoDeEtapas({ processos, etapas, podeAlterar, usuarios, aoMu
   const atual = indiceDaEtapaAtual(etapas)
   const janela = pedido ? JANELA_DO_TEXTO[pedido.acao] : null
 
-  async function corrigirDatas(etapa: EtapaDoSetor, datas: DatasDaEtapa) {
+  async function corrigirDatas(etapa: EtapaDoCaminho, datas: DatasDaEtapa) {
     await processos.corrigirDatasDaEtapa(etapa.id, datas)
     aoMudar()
   }

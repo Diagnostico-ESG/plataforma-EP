@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { ProcessosFalso } from './ProcessosFalso'
-import type { EtapaDoProcesso, EtapaDoSetor, EtapaNoCatalogo, ProcessoLido, SituacaoDoProcesso } from './tipos'
+import type { EtapaDoProcesso, EtapaNoCatalogo, ProcessoLido, SituacaoDoProcesso } from './tipos'
 
 const IDENTIFICACAO: EtapaNoCatalogo = {
   id: 'e3', codigo: 'identificacao_processos', nome: 'Identificação dos processos', ordem: 3, nivel: 'setor',
@@ -27,21 +27,13 @@ function processo(id: string, situacao: SituacaoDoProcesso, status: EtapaDoProce
     id, nome: `Processo ${id}`, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
     macroprocessoNome: 'Macro', processoPaiId: null, situacao, etapaAtual: null,
     responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null, processoPai: null,
-    subprocessos: [], dataDaReuniao: null, etapasDoSetor: [], etapasDoProcesso: [etapaDoProcesso(MODELAGEM, status)],
-  }
-}
-
-function etapaDoSetor(etapa: EtapaNoCatalogo, status: EtapaDoSetor['status']): EtapaDoSetor {
-  return {
-    id: `${etapa.id}-setor`, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, obrigatoria: etapa.obrigatoria,
-    status, nota: null, iniciadaEm: null, resolvidaEm: null,
+    subprocessos: [], dataDaReuniao: null, etapasDoProcesso: [etapaDoProcesso(MODELAGEM, status)],
   }
 }
 
 function montar(): ProcessosFalso {
   const falso = new ProcessosFalso()
   falso.catalogo.etapas = [IDENTIFICACAO, MODELAGEM, PUBLICACAO]
-  falso.etapasDoSetor = { s1: [etapaDoSetor(IDENTIFICACAO, 'concluida')], s2: [] }
   falso.processos = [
     processo('andando', 'em_andamento', 'em_andamento'), processo('parado', 'suspenso', 'pendente'),
     processo('pronto', 'concluido', 'concluida'), processo('cancelado', 'cancelado', 'pendente'),
@@ -80,13 +72,6 @@ describe('acrescentar etapa', () => {
     const falso = montar()
     await falso.catalogo.acrescentarEtapa({ codigo: 'nova', nome: 'Nova', nivel: 'processo', obrigatoria: true, antesDe: null })
     expect(codigos(falso.etapasDoCatalogo)).toEqual(['modelagem', 'publicacao', 'nova'])
-  })
-
-  test('do setor: entra nas etapas de todos os setores', async () => {
-    const falso = montar()
-    await falso.catalogo.acrescentarEtapa({ codigo: 'nova_setor', nome: 'Nova do setor', nivel: 'setor', obrigatoria: false, antesDe: 'e4' })
-    expect(codigos(falso.etapasDoSetor.s1)).toEqual(['identificacao_processos', 'nova_setor'])
-    expect(codigos(falso.etapasDoSetor.s2)).toEqual(['nova_setor'])
   })
 
   test('do setor depois de uma do processo é recusada', async () => {

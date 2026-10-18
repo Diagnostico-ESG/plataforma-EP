@@ -95,6 +95,18 @@ test.each(['integrante_ep', 'consulta'] as const)('o setor aberto não tem a se�
   expect(screen.queryByRole('button', { name: /responsável/i })).toBeNull()
 })
 
+test('o setor aberto não tem a seção de etapas do setor, para quem altera e para a Consulta', async () => {
+  for (const perfil of ['integrante_ep', 'consulta'] as const) {
+    window.location.hash = '#/setores'
+    montarNosCadastros({ perfil })
+    fireEvent.click(await screen.findByRole('cell', { name: 'TSA' }))
+    await screen.findByRole('region', { name: 'Processos do setor' })
+    expect(screen.queryByRole('region', { name: 'Etapas do setor' })).toBeNull()
+    expect(screen.queryByText('Carregando etapas do setor…')).toBeNull()
+    cleanup()
+  }
+})
+
 test('no histórico geral, o registro antigo de etapa do setor aparece numa linha simples e segue no filtro do setor', async () => {
   window.location.hash = '#/setores/historico'
   montarNosCadastros({ ajustarCadastros: (cadastros) => { cadastros.historico = [ETAPA_DO_SETOR_ANTIGA] } })

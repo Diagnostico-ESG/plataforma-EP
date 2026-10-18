@@ -3,19 +3,19 @@ import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import type { EventoDoCadastro } from '../cadastros/tipos'
 import { CatalogoFalso } from './CatalogoFalso'
 import {
-  atualizarSetorDoProcesso, conferirDatasDaEtapa, responsavelDoCartao, trocarEtapaDoProcesso, voltarEtapas,
+  conferirDatasDaEtapa, responsavelDoCartao, trocarEtapaDoProcesso, voltarEtapas,
 } from './andamentoFalso'
 import {
   conferirPai, conferirSemSubprocessos, estruturaDoProcesso, levarMacroprocessoAosFilhos, macroprocessoDo, reclassificar,
 } from './reclassificacaoFalso'
 import { conferirProcessoEmAndamento, mudarSituacao } from './situacaoFalso'
 import type {
-  DadosDoProcesso, DatasDaEtapa, EtapaDoCatalogo, EtapaDoProcesso, EtapaDoSetor, ListaDeProcessos,
+  DadosDoProcesso, DatasDaEtapa, EtapaDoCatalogo, EtapaDoProcesso, EtapaDoCaminho, ListaDeProcessos,
   ModuloDeProcessos, ProcessoLido, Reclassificacao, UsuarioResponsavel,
 } from './tipos'
 
 type ChamadaDeEtapa = { acao: string; id: string; nota?: string; datas?: DatasDaEtapa; usuarioId?: string | null }
-type TrocaDeEtapas = <T extends EtapaDoSetor>(etapas: T[]) => T[]
+type TrocaDeEtapas = <T extends EtapaDoCaminho>(etapas: T[]) => T[]
 const RESOLVIDAS = ['concluida', 'realizada_anteriormente', 'dispensada']
 
 // Dia fixo: os testes de tela não dependem da data em que rodam.
@@ -23,10 +23,6 @@ const HOJE = '2026-10-13'
 
 /** Implementação falsa de processos para os testes de tela: sem rede, com falhas e esperas simuladas. */
 export class ProcessosFalso implements ModuloDeProcessos {
-  /** As etapas de cada setor (pelo id do setor), na ordem do catálogo. */
-  etapasDoSetor: Record<string, EtapaDoSetor[]> = {}
-  falharLeitura = false
-  segurarLeitura = false
   /** Texto: motivo em português (falha genérica). Error: a recusa pronta (TravaDoBanco), como o módulo real. */
   falhaDeGravacao: string | Error | null = null
   /** As ações gravadas, na ordem. */
@@ -48,15 +44,9 @@ export class ProcessosFalso implements ModuloDeProcessos {
   segurarLeituraDoProcesso = false
   falharHistoricoDoProcesso = false
   segurarHistoricoDoProcesso = false
-  /** O catálogo inteiro; as gravações nele mudam `etapasDoCatalogo`, os processos e as etapas dos setores. */
+  /** O catálogo inteiro; as gravações nele mudam `etapasDoCatalogo` e os processos. */
   catalogo = new CatalogoFalso(this)
   private proximoId = 1
-
-  async lerEtapasDoSetor(setorId: string): Promise<EtapaDoSetor[]> {
-    if (this.segurarLeitura) return new Promise<never>(() => {})
-    if (this.falharLeitura) throw new Error('falha de conexão simulada')
-    return [...(this.etapasDoSetor[setorId] ?? [])]
-  }
 
   async iniciarEtapa(id: string): Promise<void> {
     this.mudar({ acao: 'iniciar', id }, { status: 'em_andamento', iniciadaEm: HOJE })
@@ -203,7 +193,6 @@ export class ProcessosFalso implements ModuloDeProcessos {
       ...dados, ...this.nomesDoCartao(dados), id: `p${this.proximoId++}`, situacao: 'em_andamento',
       etapaAtual: primeira ? { codigo: primeira.codigo, nome: primeira.nome, ordem: primeira.ordem } : null,
       responsavel: null, motivoDaSituacao: null, processoPai: null, subprocessos: [], dataDaReuniao: null,
-      etapasDoSetor: this.etapasDoSetor[dados.setorId] ?? [],
       etapasDoProcesso: etapas.map((etapa) => ({
         id: `a${this.proximoId++}`, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, obrigatoria: true,
         status: 'pendente', nota: null, iniciadaEm: null, resolvidaEm: null, responsavelId: null, responsavelNome: null,
@@ -217,11 +206,9 @@ export class ProcessosFalso implements ModuloDeProcessos {
     throw typeof this.falhaDeGravacao === 'string' ? new Error(this.falhaDeGravacao) : this.falhaDeGravacao
   }
 
-  // A etapa do setor ou do processo; que ela não existe (mais) é o aviso de cadastro inexistente.
-  private acharEtapa(id: string): EtapaDoSetor {
-    const todas: EtapaDoSetor[] = [
-      ...Object.values(this.etapasDoSetor).flat(), ...this.processos.flatMap((processo) => processo.etapasDoProcesso),
-    ]
+  // A etapa de algum processo; que ela não existe (mais) é o aviso de cadastro inexistente.
+  private acharEtapa(id: string): EtapaDoCaminho {
+    const todas: EtapaDoCaminho[] = this.processos.flatMap((processo) => processo.etapasDoProcesso)
     const etapa = todas.find((candidata) => candidata.id === id)
     if (!etapa) throw new CadastroInexistente()
     return etapa
@@ -234,7 +221,7 @@ export class ProcessosFalso implements ModuloDeProcessos {
     this.aplicar(chamada.id, (etapas) => etapas.map((etapa) => (etapa.id === chamada.id ? { ...etapa, ...mudancas } : etapa)))
   }
 
-  // O processo que tem a etapa (as do setor não têm): parado, ele recusa qualquer mudança nelas.
+  // O processo que tem a etapa: parado, ele recusa qualquer mudança nelas.
   private conferirProcessoDaEtapa(idDaEtapa: string): void {
     const dono = this.processos.find((processo) => processo.etapasDoProcesso.some((etapa) => etapa.id === idDaEtapa))
     if (dono) conferirProcessoEmAndamento(dono)
@@ -253,11 +240,6 @@ export class ProcessosFalso implements ModuloDeProcessos {
   }
 
   private aplicar(id: string, trocar: TrocaDeEtapas): void {
-    for (const [setorId, etapas] of Object.entries(this.etapasDoSetor)) this.etapasDoSetor[setorId] = trocar(etapas)
-    this.processos = this.processos.map((processo) => {
-      const comEtapa = trocarEtapaDoProcesso(processo, id, trocar)
-      const doSetor = this.etapasDoSetor[processo.setorId]
-      return doSetor ? atualizarSetorDoProcesso(comEtapa, doSetor) : comEtapa
-    })
+    this.processos = this.processos.map((processo) => trocarEtapaDoProcesso(processo, id, trocar))
   }
 }

@@ -36,7 +36,7 @@ function processo(situacao: SituacaoDoProcesso = 'em_andamento'): ProcessoLido {
     macroprocessoNome: 'Macro de Teste', situacao, etapaAtual: { codigo: 'c5', nome: RELATORIO, ordem: 5 },
     responsavel: null, origem: 'novo', contexto: null, observacoes: null,
     processoPaiId: null, processoPai: null, subprocessos: [],
-    motivoDaSituacao: parado ? 'Aguardando decisão' : null, dataDaReuniao: null, etapasDoSetor: [],
+    motivoDaSituacao: parado ? 'Aguardando decisão' : null, dataDaReuniao: null,
     etapasDoProcesso: [
       doProcesso(4, MODELAGEM, { status: 'concluida', iniciadaEm: '2026-10-10', resolvidaEm: '2026-10-11' }),
       doProcesso(5, RELATORIO, { status: 'em_andamento', iniciadaEm: '2026-10-12' }),

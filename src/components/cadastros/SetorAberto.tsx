@@ -2,7 +2,6 @@ import { useCallback, useState } from 'react'
 import type { ModuloDeCadastros } from '../../cadastros/tipos'
 import { useCarregamento } from '../../hooks/useCarregamento'
 import type { ModuloDeProcessos } from '../../processos/tipos'
-import { EtapasDoSetor } from '../processos/EtapasDoSetor'
 import { ProcessosDoSetor } from '../processos/ProcessosDoSetor'
 import { ErroAoCarregar } from './ErroAoCarregar'
 import { SetorEditavel } from './SetorEditavel'
@@ -25,10 +24,9 @@ export function SetorAberto({ cadastros, processos, podeAlterar, id, aoVoltar }:
   if (estado.tipo === 'erro') return <ErroAoCarregar alvo="o setor" aoTentarDeNovo={tentarDeNovo} />
   if (estado.tipo === 'carregando') return <p className="cadastros-vazio" role="status">Carregando setor…</p>
   if (sumiu || estado.valor === null) return <ItemInexistente aoVoltar={aoVoltar} />
-  // Etapas e processos do setor ficam abaixo do que o setor já mostrava, para os dois modos.
+  // Os processos do setor ficam abaixo do que o setor já mostrava, para os dois modos.
   const secoes = (
     <>
-      <EtapasDoSetor processos={processos} setorId={id} podeAlterar={podeAlterar} aoSumir={() => setSumiu(true)} />
       <ProcessosDoSetor processos={processos} setorId={id} />
     </>
   )

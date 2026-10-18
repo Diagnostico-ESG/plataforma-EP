@@ -1,7 +1,3 @@
-.etapas-do-setor {
-  margin-top: var(--esp-5);
-}
-
 /* Nasceu nos responsáveis do setor (retirados em 2026-10-18); a tabela do catálogo da Administração ainda a usa. */
 .acoes-do-responsavel {
   display: flex;

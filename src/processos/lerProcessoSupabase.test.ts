@@ -20,16 +20,12 @@ const RELATORIO = {
   id: 'a5', status: 'pendente', nota: null, iniciada_em: null, resolvida_em: null, responsavel: null,
   etapas: { codigo: 'relatorio_modelagem_tecnica', nome: 'Relatório e modelagem técnica', ordem: 5, obrigatoria: true },
 }
-const DO_SETOR = {
-  id: 'a1', status: 'dispensada', nota: 'Nota inventada', iniciada_em: null, resolvida_em: '2026-10-13',
-  etapas: { codigo: 'identificacao_responsaveis', nome: 'Identificação dos responsáveis', ordem: 1, obrigatoria: false },
-}
 
 function criar(cliente: ClienteSupabaseFalso) {
   return criarProcessosSupabase(cliente as unknown as SupabaseClient<Database>)
 }
 
-test('lê o processo com as etapas do processo (ordem do catálogo, com o responsável) e as do setor', async () => {
+test('lê o processo com as etapas do processo (ordem do catálogo, com o responsável), sem ler etapas do setor', async () => {
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
   cliente.respostas['andamentos.select'] = { data: [RELATORIO, MODELAGEM], error: null }
@@ -41,7 +37,7 @@ test('lê o processo com as etapas do processo (ordem do catálogo, com o respon
   expect(lido?.etapasDoProcesso.map((etapa) => [etapa.codigo, etapa.responsavelNome])).toEqual([
     ['modelagem', 'Ana Teste'], ['relatorio_modelagem_tecnica', null]])
   expect(cliente.pedidos.filter((pedido) => pedido.tabela === 'andamentos').map((pedido) => pedido.filtro)).toEqual(
-    expect.arrayContaining([['processo_id', 'p1'], ['setor_id', 's1']]))
+    [['processo_id', 'p1']])
 })
 
 test('a etapa traz o id do responsável e se ele foi desativado depois de escolhido', async () => {
@@ -52,14 +48,6 @@ test('a etapa traz o id do responsável e se ele foi desativado depois de escolh
   const lido = await criar(cliente).lerProcesso('p1')
   expect(lido?.etapasDoProcesso.map((etapa) => [etapa.responsavelId, etapa.responsavelInativo])).toEqual([
     ['u2', true], ['u1', false], [null, false]])
-})
-
-test('as etapas do setor também chegam, no mesmo formato da tela do setor', async () => {
-  const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
-  cliente.respostas['andamentos.select'] = { data: [DO_SETOR], error: null }
-  const lido = await criar(cliente).lerProcesso('p1')
-  expect(lido?.etapasDoSetor[0]).toMatchObject({ codigo: 'identificacao_responsaveis', status: 'dispensada', nota: 'Nota inventada' })
 })
 
 test('o processo traz os subprocessos, por nome, numa leitura só', async () => {

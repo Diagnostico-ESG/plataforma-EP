@@ -34,7 +34,7 @@ export type EventoDoCadastro = {
   entidadeRef: string
   antes: EstadoDoCadastro
   depois: EstadoDoCadastro
-  /** A nota ou o motivo que acompanhou a ação (etapas do setor), quando houve. */
+  /** A nota ou o motivo que acompanhou a ação (etapas e situação do processo), quando houve. */
   motivo?: string
 }
 export type ItemDoFiltro = { id: string; nome: string }
