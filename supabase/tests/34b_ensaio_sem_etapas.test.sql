@@ -39,18 +39,18 @@ drop function private.conferir_ordem_dos_niveis();
 -- Processo novo nasce com todas as etapas ativas (versão anterior: 20261014130147_processos).
 create or replace function private.criar_andamentos_do_processo() returns trigger
 language plpgsql security definer set search_path = ''
-as $
+as $$
 begin
   insert into public.andamentos (etapa_id, processo_id)
   select id, new.id from public.etapas where ativa;
   return null; -- gatilho "depois": o retorno é ignorado
-end $;
+end $$;
 
 -- A primeira etapa (Modelagem piloto) sai de pendente sem conferir nada; as outras pedem a anterior resolvida
 -- (versões anteriores: 20261014135657_andamento_do_processo).
 create or replace function private.conferir_sequencia_do_processo(andamento public.andamentos) returns void
 language plpgsql stable set search_path = ''
-as $
+as $$
 declare
   anterior record;
 begin
@@ -62,32 +62,32 @@ begin
   if found and anterior.status in ('pendente', 'em_andamento') then
     raise exception 'anterior_nao_resolvida:%', anterior.nome;
   end if;
-end $;
+end $$;
 
 create or replace function private.conferir_sequencia(andamento public.andamentos) returns void
 language plpgsql stable set search_path = ''
-as $
+as $$
 begin
   if andamento.status = 'em_andamento' then
     perform private.conferir_uma_em_andamento(andamento);
   end if;
   perform private.conferir_sequencia_do_processo(andamento);
-end $;
+end $$;
 
 drop function private.conferir_setor_resolvido(uuid), private.conferir_anterior_resolvida(public.andamentos);
 
 -- O evento do andamento é sempre do processo (versões anteriores: andamento_do_processo e voltar_datas_responsavel).
 create or replace function private.base_do_evento_do_andamento(andamento public.andamentos) returns jsonb
 language sql stable security definer set search_path = ''
-as $
+as $$
   select jsonb_build_object('processo_id', p.id, 'processo_nome', p.nome, 'setor_sigla', s.sigla,
     'etapa_codigo', e.codigo, 'etapa_nome', e.nome)
   from public.processos p join public.setores s on s.id = p.setor_id, public.etapas e
-  where p.id = andamento.processo_id and e.id = andamento.etapa_id $;
+  where p.id = andamento.processo_id and e.id = andamento.etapa_id $$;
 
 create or replace function private.registrar_evento_do_andamento() returns trigger
 language plpgsql security definer set search_path = ''
-as $
+as $$
 declare
   base jsonb := private.base_do_evento_do_andamento(new);
   com_responsavel boolean := old.responsavel_id is not null or new.responsavel_id is not null;
@@ -103,23 +103,23 @@ begin
     new.processo_id::text || ':' || new.id::text,
     jsonb_build_object('antes', antes, 'depois', depois, 'motivo', motivo));
   return null; -- gatilho "depois": o retorno é ignorado
-end $;
+end $$;
 
 -- Voltar: as seguintes do mesmo processo (versão anterior: voltar_datas_responsavel).
 create or replace function private.devolver_etapas_seguintes(escolhido public.andamentos) returns void
 language sql set search_path = ''
-as $
+as $$
   update public.andamentos a set status = 'pendente', nota = null, iniciada_em = null, resolvida_em = null
   from public.etapas e, public.etapas da_escolhida
   where e.id = a.etapa_id and da_escolhida.id = escolhido.etapa_id
     and a.processo_id = escolhido.processo_id
-    and e.ordem > da_escolhida.ordem and a.status <> 'pendente' $;
+    and e.ordem > da_escolhida.ordem and a.status <> 'pendente' $$;
 
 -- A etapa nova (ou reativada) entra só nos processos em andamento e suspensos não concluídos (versão anterior:
 -- catalogo_de_etapas).
 create or replace function private.incluir_andamentos_pendentes(etapa public.etapas) returns void
 language plpgsql set search_path = ''
-as $
+as $$
 begin
   perform set_config('ep.sincronizando_catalogo', 'on', true);
   insert into public.andamentos (etapa_id, processo_id)
@@ -127,20 +127,20 @@ begin
   where p.situacao in ('em_andamento', 'suspenso')
     and not exists (select 1 from public.andamentos a where a.etapa_id = etapa.id and a.processo_id = p.id);
   perform set_config('ep.sincronizando_catalogo', 'off', true);
-end $;
+end $$;
 
 -- O evento da etapa sem o nível; os eventos antigos ficam com ele.
 create or replace function private.estado_da_etapa(etapa public.etapas) returns jsonb
 language sql immutable set search_path = ''
-as $ select jsonb_build_object('codigo', etapa.codigo, 'nome', etapa.nome,
-  'obrigatoria', etapa.obrigatoria, 'ativa', etapa.ativa, 'ordem', etapa.ordem) $;
+as $$ select jsonb_build_object('codigo', etapa.codigo, 'nome', etapa.nome,
+  'obrigatoria', etapa.obrigatoria, 'ativa', etapa.ativa, 'ordem', etapa.ordem) $$;
 
 -- Acrescentar etapa sem o nível: apagada e recriada com a assinatura nova e os mesmos privilégios.
 drop function public.acrescentar_etapa(text, text, public.nivel_da_etapa, boolean, uuid);
 create function public.acrescentar_etapa(p_codigo text, p_nome text, p_obrigatoria boolean, p_antes_de uuid)
   returns uuid
 language plpgsql set search_path = ''
-as $
+as $$
 declare
   posicao integer := (select ordem from public.etapas where id = p_antes_de);
   nova uuid;
@@ -155,7 +155,7 @@ begin
   values (p_codigo, btrim(p_nome), posicao, p_obrigatoria) returning id into nova;
   perform set_config('ep.etapa_movida', '', true);
   return nova;
-end $;
+end $$;
 
 revoke execute on function public.acrescentar_etapa(text, text, boolean, uuid) from public, anon;
 grant execute on function public.acrescentar_etapa(text, text, boolean, uuid) to authenticated;
