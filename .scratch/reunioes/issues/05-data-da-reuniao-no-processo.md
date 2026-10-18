@@ -19,3 +19,5 @@
 - [ ] Excluir e trocar o setor de processo com data, sem recusa de reunião.
 - [ ] Função pura do texto da data com teste unitário; teste do módulo de processos real (data na leitura e na gravação); testes de interface com o aplicativo inteiro cobrindo os itens acima.
 - [ ] `supabase/AMBIENTES.md` registra a migração.
+
+Concluído em 2026-10-18 (commit b045d78)
