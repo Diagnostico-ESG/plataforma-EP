@@ -595,3 +595,14 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **2026-10-18 · Ocorrência: o `executing-plans` pede subagentes ou worktree.** A regra do projeto (branch comum) prevaleceu, e a skill foi avisada de que o isolamento já estava feito.
 - **2026-10-18 · Ocorrência: o aviso do claude-mem (cota esgotada) apareceu no início da sessão**, e a sessão seguiu sem ele.
 - **2026-10-18 · Ocorrência: a sessão rodou com o Opus**, porque o usuário pediu o `/executar-complexo` nesta mesma sessão, logo depois do `/situação`. A tabela do funil indica Sonnet.
+
+## 2026-10-18 — /executar-complexo do ticket 12 de processos-etapas (sem etapas do setor)
+
+- **2026-10-18 · Item não testado: branch comum no `/executar-complexo`, `plano-<número>.md` e linha `Concluído em`.** Esperado: branch a partir da principal, plano em `plano-12.md` e a linha no fim do ticket. Aconteceu: a branch `processos-etapas-12` saiu da `main` limpa; o plano foi para `.scratch/processos-etapas/plano-12.md`; a linha `Concluído em` foi gravada depois do merge.
+- **2026-10-18 · Item não testado: leitura de `.claude/regras/banco.md` e conferência do alvo.** Aconteceu: o `banco.md` foi lido antes do plano. O alvo foi conferido (linha "vínculo atual" e `supabase/.temp/project-ref`, os dois `yclkzyoebpsxmgpbcbus`) antes do workflow de migração e do `db:types`.
+- **2026-10-18 · Ocorrência: o ensaio da migração perdeu os `$$` de novo**, porque o `String.replace` do Node com texto de troca transforma `$$` em `$` (tropeço já registrado antes, no teste 23). Custou uma rodada do "Testes de banco" (#106). Sugestão: o protocolo guardar um script de ensaio pronto (cópia do teste com a migração dentro, usando função de troca) em vez de cada sessão montar o seu.
+- **2026-10-18 · Ocorrência: o primeiro clique em "Run workflow" no GitHub não disparou a execução** (o menu ainda carregava a lista de branches); só se percebeu ao procurar a execução. Sugestão: depois de disparar, sempre conferir que a página foi para a execução nova (#número) antes de seguir.
+- **2026-10-18 · Ocorrência: a janela do navegador do app mudou de tamanho no meio da sessão** e os cliques por coordenada pararam de acertar; os passos seguintes usaram as referências dos elementos (`find`/`read_page`), que não dependem do tamanho.
+- **2026-10-18 · Ocorrência: o limite de uso da sessão foi atingido no meio da Tarefa 4** e a sessão retomou depois, sem perda (os arquivos e o git guardavam tudo).
+- **2026-10-18 · Ocorrência: o aviso do claude-mem (cota esgotada) apareceu no início da sessão**, e a sessão seguiu sem ele.
+- **2026-10-18 · Ocorrência: a sessão rodou com o Opus**, porque o usuário pediu o `/executar-complexo` nesta mesma sessão, logo depois do `/situação`. A tabela do funil indica Sonnet.

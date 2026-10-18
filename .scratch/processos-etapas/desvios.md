@@ -140,3 +140,21 @@ Revisão do diff inteiro desde `marco/2026-10-13-inicio-processos-etapas` (por a
 - **A classe `acoes-do-responsavel` ficou no CSS:** a tabela do catálogo da Administração também a usa. O plano mandava apagá-la; a busca final achou o uso.
 - **O `git mv` do teste de tela** (`App.reunioesRetiradas` → `App.recursosRetirados`) entrou no commit da migração (`3a30d45`), por ter sido preparado antes dele; o conteúdo novo do arquivo veio no commit seguinte.
 - **Critérios de tela conferidos só por teste:** a tela não foi aberta (o app exige login e não há servidor com dados).
+
+## 2026-10-18 — /executar-complexo do ticket 12 (sem etapas do setor; Modelagem piloto)
+
+- **Gatilhos desligados com `session_replication_role = replica`** só no trecho da migração que apaga os andamentos de setor e as etapas de nível setor, renumera e renomeia: nenhum evento de catálogo nasceu. O `set local` vale porque o script aplica a migração numa transação.
+- **Renumeração por `row_number()`** na ordem atual, e não por "ordem − 3", para valer mesmo com o catálogo do desenvolvimento mexido pela tela.
+- **`andamentos.processo_id` passou a obrigatório**, e a restrição `andamentos_um_dono` saiu antes de apagar `setor_id`. O teste 17 trocou a asserção "andamento de setor e de processo ao mesmo tempo" por "andamento sem processo é recusado" (23502).
+- **A view saiu e voltou** (`drop view` e `create view`), porque `create or replace view` não tira coluna.
+- **`conferir_processo_em_andamento` ficou com o `if processo is null then return`**, hoje inofensivo; mexer nela seria ruído.
+- **Registros antigos de etapa do setor no histórico:** o andamento sem `processo_id` no estado aparece como "Registro de etapa do setor (recurso retirado da plataforma)", sem antes, depois e nota, e continua no filtro do setor pela referência. `ehRecursoRetirado(entidade)` virou `ehRegistroRetirado(evento)`, e a conferência foi para `nomeDoItemComDono`, porque `nomeDoItem` passava do limite de complexidade.
+- **O rótulo "Nível" e os valores "Setor"/"Processo" ficaram no histórico** só para os eventos antigos do catálogo; o teste que já existia em `historicoDoCatalogo.test.ts` prova isso, então não ganhou teste novo.
+- **O caso "processo novo direto na coluna Modelagem piloto"** já estava coberto em `App.cadastrarProcesso.test.tsx` ("o cartão aparece na coluna da etapa atual"); o plano previa um teste novo no Quadro, e ele não foi escrito para não repetir.
+- **O tipo `EtapaDoSetor` virou `EtapaDoCaminho`** (é a base de `EtapaDoProcesso`), e `etapasDoSetorSupabase.ts` virou `andamentoDoBanco.ts`. Os sinalizadores `falharLeitura` e `segurarLeitura` do `ProcessosFalso` saíram, porque só a leitura das etapas do setor os usava.
+- **A rota `#/setores/<id>` ficou** sem o link "Ver no setor": ela serve a endereço guardado ou compartilhado e é barata.
+- **Catálogo de teste da Administração refeito** sem a etapa do setor: Modelagem piloto, Relatório e modelagem técnica, Publicação e Arquivamento (desativada). O teste "a recusa ao mover aparece em vermelho" passou a usar uma recusa pronta (`TravaDoBanco`), porque a ordem entre níveis não existe mais.
+- **No `CatalogoFalso`, entre as tarefas 5 e 6,** a etapa de nível setor ficou sem efeito nos processos, até o nível sair de vez na tarefa 6.
+- **Ensaio da migração** dentro de cópias dos testes 34, 19 e 22. A primeira montagem (#106) perdeu os delimitadores `$$`, porque o `String.replace` do Node trata `$$` como `$` no texto de troca (tropeço já registrado antes em `melhorias-protocolo.md`, no teste 23); refeita com função de troca (#107). O 22b falhou 1 de 46 por um erro do próprio teste 22 (a chamada do visitante ainda passava o nível), corrigido antes de aplicar.
+- **Tipos regenerados na tarefa 6**, não no commit da migração: com os tipos novos, `catalogoSupabase.ts` (o `p_nivel`) não compilava antes. Mesmo desvio dos tickets 05 e 11.
+- **Critérios de tela conferidos só por teste:** a tela não foi aberta (o app exige login e não há servidor com dados).

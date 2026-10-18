@@ -61,8 +61,8 @@
 
 **Arquivos:** criar `supabase/tests/34_sem_etapas_do_setor.test.sql`; modificar 17 a 22 e 27 a 30; apagar 15.
 
-- [ ] `git switch -c processos-etapas-12` a partir da `main` limpa; `git tag marco/2026-10-18-inicio-ticket-12-processos-etapas` e `git push origin refs/tags/marco/2026-10-18-inicio-ticket-12-processos-etapas`. Conferir o alvo (os dois `yclkzyoebpsxmgpbcbus`).
-- [ ] Escrever o 34 com o cabeçalho, os usuários a1 a a4, o `finish()` e a exceção `RESULTADO DOS TESTES` do 33. `plan(18)`. Corpo:
+- [x] `git switch -c processos-etapas-12` a partir da `main` limpa; `git tag marco/2026-10-18-inicio-ticket-12-processos-etapas` e `git push origin refs/tags/marco/2026-10-18-inicio-ticket-12-processos-etapas`. Conferir o alvo (os dois `yclkzyoebpsxmgpbcbus`).
+- [x] Escrever o 34 com o cabeçalho, os usuários a1 a a4, o `finish()` e a exceção `RESULTADO DOS TESTES` do 33. `plan(18)`. Corpo:
 
 ```sql
 -- Preparação como dono do banco: um setor e um processo novos, e um evento antigo de andamento de setor.
@@ -137,7 +137,7 @@ reset role;
 ```
 
   Junto com os itens 1 a 7 entra também `hasnt_function('private', 'criar_andamentos_do_setor', 'a função criar_andamentos_do_setor não existe')`. Conta: 8 do que saiu + catálogo + setor novo + processo novo + iniciar + recusa + 3 perfis ativos + inativo + visitante = 18.
-- [ ] Ajustar os testes antigos (todos ficam vermelhos antes da migração, por falta de `setor_nao_resolveu` resolvido ou por esperarem o estado novo):
+- [x] Ajustar os testes antigos (todos ficam vermelhos antes da migração, por falta de `setor_nao_resolveu` resolvido ou por esperarem o estado novo):
   - **17:** linha 175, tirar `and e.nivel = 'processo'`; apagar as duas asserções de `aguardando_o_setor` (linhas 243-245 e 255-258) e as três `update ... where setor_id = ...` entre elas (246-254); trocar a asserção "andamento de setor e de processo ao mesmo tempo" (342-348) por `throws_ok($sql$update public.andamentos set processo_id = null where processo_id = (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004') and etapa_id = (select id from public.etapas where codigo = 'modelagem')$sql$, '23502', null, 'andamento sem processo é recusado')`, e o comentário acima vira "Restrições do dono: todo andamento é de um processo, e a etapa não se repete no processo."; `plan(79)` → `plan(77)`.
   - **18:** cabeçalho sem "setor resolvido antes da primeira etapa"; comentário do setor sem "(o gatilho dá a ele as 3 etapas do setor, pendentes)"; apagar o `throws_ok` de `setor_nao_resolveu`, as três `update ... setor_id` e o `ok(not aguardando_o_setor ...)` (linhas 49-65); o `lives_ok` seguinte passa a "iniciar a Modelagem piloto sem depender do setor"; `'ja_ha_etapa_em_andamento:Reunião de modelagem'` → `'ja_ha_etapa_em_andamento:Modelagem piloto'`; `plan(25)` → `plan(23)`.
   - **19:** apagar `pg_temp.andamento_do_setor` (40-44), as três `update` da preparação (61-66, comentário vira "Preparação: \"Processo Volta\" com a 1 e a 2 concluídas.") e o bloco "Voltar no setor" (219-230: 3 asserções); `plan(38)` → `plan(35)`.
@@ -158,14 +158,14 @@ insert into _tap (linha) select is(pg_temp.no_processo('Andando', 'teste_antes',
 ```
 
     e no resto `teste_setor` → `teste_antes` (`_teste_setor` → `_teste_antes`) e `'etapa_usada:Reunião de modelagem'` → `'etapa_usada:Modelagem piloto'`; `plan(49)` → `plan(46)`. Comentário do setor TC2 sem "(inativo: recebe as etapas do setor mesmo assim)" (o TC2 fica, sem uso, ou sai com a linha dele — sai).
-- [ ] `git rm supabase/tests/15_etapas_do_setor.test.sql`.
-- [ ] Comitar ("Ticket 12 de processos-etapas: testes de banco sem as etapas do setor"), enviar a branch e disparar o "Testes de banco" na branch. Esperado: vermelhos o 34 e os ajustados (17 a 22, 27 a 30); os demais verdes. Anotar a execução.
+- [x] `git rm supabase/tests/15_etapas_do_setor.test.sql`.
+- [x] Comitar ("Ticket 12 de processos-etapas: testes de banco sem as etapas do setor"), enviar a branch e disparar o "Testes de banco" na branch. Esperado: vermelhos o 34 e os ajustados (17 a 22, 27 a 30); os demais verdes. Anotar a execução.
 
 ### Tarefa 2 — Migração, ensaio e aplicação (critérios 1 e 10)
 
 **Arquivos:** criar `supabase/migrations/<timestamp>_sem_etapas_do_setor.sql`; modificar `supabase/AMBIENTES.md`.
 
-- [ ] `npx supabase migration new sem_etapas_do_setor` e escrever:
+- [x] `npx supabase migration new sem_etapas_do_setor` e escrever:
 
 ```sql
 -- Processos e etapas, ticket 12 (Simplificação, ADR 0013): saem as etapas do setor, a coluna "aguardando o setor" e o
@@ -358,9 +358,9 @@ grant select on public.processos_com_andamento to authenticated;
 ```
 
   Antes de colar, conferir em `20261014143045_voltar_datas_responsavel.sql` e `20261018123613_data_da_reuniao.sql` que os corpos copiados são as versões mais novas (o de `registrar_evento_do_andamento` só troca a referência).
-- [ ] Ensaiar: criar `supabase/tests/34b_ensaio_sem_etapas.test.sql`, `19b_ensaio_voltar.test.sql` e `22b_ensaio_catalogo.test.sql`, cópias dos testes da Tarefa 1 com o corpo da migração logo depois do `begin` (por script Node, para não errar a cópia); comitar, enviar e disparar o "Testes de banco". Esperado: 34b, 19b e 22b verdes; os originais ainda vermelhos. Apagar as três cópias e comitar. Se o ensaio falhar, corrigir a migração e repetir; na terceira falha, parar (regra de parada).
-- [ ] Comitar a migração (sem os tipos) e enviar. Disparar o "Migrar banco de desenvolvimento" na branch com o nome do arquivo e ler o resultado. Depois, o "Testes de banco" na branch. Esperado: todos verdes, o 34 com 18 de 18.
-- [ ] Registrar em `supabase/AMBIENTES.md` a linha da migração, no formato das anteriores (data, ticket, destrutiva e o que apaga, testes vermelhos antes e verdes depois com as execuções, o ensaio, o workflow; os tipos ficam para a Tarefa 6). Comitar.
+- [x] Ensaiar: criar `supabase/tests/34b_ensaio_sem_etapas.test.sql`, `19b_ensaio_voltar.test.sql` e `22b_ensaio_catalogo.test.sql`, cópias dos testes da Tarefa 1 com o corpo da migração logo depois do `begin` (por script Node, para não errar a cópia); comitar, enviar e disparar o "Testes de banco". Esperado: 34b, 19b e 22b verdes; os originais ainda vermelhos. Apagar as três cópias e comitar. Se o ensaio falhar, corrigir a migração e repetir; na terceira falha, parar (regra de parada).
+- [x] Comitar a migração (sem os tipos) e enviar. Disparar o "Migrar banco de desenvolvimento" na branch com o nome do arquivo e ler o resultado. Depois, o "Testes de banco" na branch. Esperado: todos verdes, o 34 com 18 de 18.
+- [x] Registrar em `supabase/AMBIENTES.md` a linha da migração, no formato das anteriores (data, ticket, destrutiva e o que apaga, testes vermelhos antes e verdes depois com as execuções, o ensaio, o workflow; os tipos ficam para a Tarefa 6). Comitar.
 
 ### Tarefa 3 — Eventos antigos de etapa do setor na linha simples (critério 7)
 
@@ -369,7 +369,7 @@ grant select on public.processos_com_andamento to authenticated;
 **Interfaces:**
 - Produz: `export function ehRegistroRetirado(evento: EventoDoCadastro): boolean` (substitui `ehRecursoRetirado`).
 
-- [ ] Testes que falham:
+- [x] Testes que falham:
   - em `App.recursosRetirados.test.tsx`, no molde do caso do responsável:
 
 ```tsx
@@ -393,8 +393,8 @@ test('no histórico geral, o registro antigo de etapa do setor aparece numa linh
 
   - em `historicoDosCadastros.test.ts`, um `describe('registros antigos de etapa do setor (recurso retirado da plataforma)')` com: `nomeDoItem` do evento de andamento sem `processo_id` = a linha simples; `ehRegistroRetirado` verdadeiro para ele, para `reuniao` e `responsavel_do_setor`, e falso para um andamento com `processo_id`; `eventosDoItem([evento], 's1')` o devolve. E um caso "evento antigo do catálogo com nível": `descreverEstadoDoCadastro({ codigo: 'sensibilizacao', nome: 'Reunião de sensibilização', nivel: 'setor', obrigatoria: false, ativa: true, ordem: 2 })` contém `Nível: Setor`.
   - trocar nos testes existentes os usos de `ehRecursoRetirado('x')` por `ehRegistroRetirado(evento({ entidade: 'x' }))`, e apagar (ou converter para a linha simples) os casos que esperam "Etapa — SIGLA" num andamento de setor (`grep -n "setor_sigla" src/cadastros/historicoDosCadastros.test.ts src/App.historicoDosCadastros.test.tsx`).
-- [ ] Rodar `npx vitest run src/App.recursosRetirados.test.tsx src/cadastros/historicoDosCadastros.test.ts`: falha (texto "Reunião de sensibilização — TSA"; `ehRegistroRetirado` não existe).
-- [ ] Implementar em `historicoDosCadastros.ts`:
+- [x] Rodar `npx vitest run src/App.recursosRetirados.test.tsx src/cadastros/historicoDosCadastros.test.ts`: falha (texto "Reunião de sensibilização — TSA"; `ehRegistroRetirado` não existe).
+- [x] Implementar em `historicoDosCadastros.ts`:
 
 ```ts
 /** Recursos que saíram da plataforma (ADR 0013): os eventos ficam no histórico, numa linha sem o detalhe. */
@@ -416,13 +416,13 @@ export function ehRegistroRetirado(evento: EventoDoCadastro): boolean {
   - `temItemProprio`: `!ENTIDADES_QUE_LIGAM.has(evento.entidade) && !ehRegistroRetirado(evento)`;
   - `ListaDoHistorico.tsx` (linha 41): `{!ehRegistroRetirado(evento) && <MudancaDoEvento evento={evento} />}`;
   - comentário de `valorPorRotulo`: "…e da etapa do catálogo (obrigatória, ativa; nível só nos eventos antigos)…".
-- [ ] Rodar os dois arquivos e `npm test`: verde. Comitar ("Ticket 12 de processos-etapas: registros antigos de etapa do setor na linha simples do histórico").
+- [x] Rodar os dois arquivos e `npm test`: verde. Comitar ("Ticket 12 de processos-etapas: registros antigos de etapa do setor na linha simples do histórico").
 
 ### Tarefa 4 — Quadro, Lista e filtros sem "Aguardando o setor" (critérios 3 e 4)
 
 **Arquivos:** `src/processos/{tipos,colunasDoQuadro,filtrosDosProcessos,enderecoDosProcessos,linhasDaLista,processoDaLinha,ProcessosFalso,andamentoFalso}.ts` (+ testes unitários), `src/App.{quadro,filtrosDosProcessos,lista}.test.tsx`, e os testes e fixtures que o `tsc` apontar ao tirar `aguardandoOSetor`.
 
-- [ ] Testes que falham:
+- [x] Testes que falham:
   - `App.quadro.test.tsx`: o caso "as colunas…" passa a "as colunas: uma por etapa ativa, na ordem do catálogo, sem 'Aguardando o setor'" (espera `[MODELAGEM.nome, RELATORIO.nome]` e `screen.queryByRole('region', { name: 'Aguardando o setor' })` nulo); o caso "cada processo fica na coluna…" perde o `aguardandoOSetor: true`; os `findByRole('region', { name: 'Aguardando o setor' })` usados como espera viram `findByRole('region', { name: MODELAGEM.nome })`. Caso novo:
 
 ```tsx
@@ -454,8 +454,8 @@ test('as opções de etapa não têm "Aguardando o setor", e o endereço antigo 
   (Conferir o nome da função de montagem e do seletor no arquivo.)
   - `App.lista.test.tsx`: o `Cadastrar Bem` perde o `aguardandoOSetor` e ganha `etapaAtual` da Modelagem; a linha esperada mostra o nome da etapa.
   - unitários: `colunasDoQuadro.test.ts`, `filtrosDosProcessos.test.ts`, `linhasDaLista.test.ts`, `enderecoDosProcessos.test.ts` (novo caso: `lerEnderecoDosProcessos('#/processos/lista?etapa=aguardando-o-setor').filtros.etapa` é `null`; conferir o nome da função exportada).
-- [ ] Rodar esses arquivos: falham.
-- [ ] Implementar:
+- [x] Rodar esses arquivos: falham.
+- [x] Implementar:
   - `tipos.ts`: tirar `aguardandoOSetor` (e o comentário) de `ProcessoDaLista`; comentário de `listarProcessos`: "Todos os processos por nome, mais as etapas do catálogo, na ordem dele.";
   - `colunasDoQuadro.ts`: tirar `CHAVE_AGUARDANDO_O_SETOR`; `colunasDoQuadro` filtra `noQuadro` direto pela etapa e devolve só `colunasDeEtapa`; comentário "Uma coluna por etapa ativa, na ordem do catálogo…";
   - `filtrosDosProcessos.ts`: `etapa: (processo, valor) => processo.etapaAtual?.codigo === valor`; apagar `estaNaEtapa` e o import; `opcoesDeEtapa` devolve `doCatalogo`;
@@ -472,13 +472,13 @@ function etapaDaConsulta(lida: string | null): string | null {
   - `processoDaLinha.ts`: tirar `aguardandoOSetor`;
   - `ProcessosFalso.ts` (`processoNovo`) e `andamentoFalso.ts` (`atualizarSetorDoProcesso` deixa de calcular `aguardandoOSetor`; ela sai de vez na Tarefa 5): tirar o campo;
   - fixtures e testes que o `npm run typecheck` apontar: tirar `aguardandoOSetor: false`.
-- [ ] `npm run typecheck`, `npm test`, `npm run lint`: verdes. Comitar ("Ticket 12 de processos-etapas: Quadro, Lista e filtros sem Aguardando o setor").
+- [x] `npm run typecheck`, `npm test`, `npm run lint`: verdes. Comitar ("Ticket 12 de processos-etapas: Quadro, Lista e filtros sem Aguardando o setor").
 
 ### Tarefa 5 — Painel, tela do setor e módulo sem etapas do setor (critérios 5 e 8)
 
 **Arquivos:** `src/processos/{tipos,ProcessosFalso,CatalogoFalso,andamentoFalso,lerProcessoSupabase,processosSupabase,caminhoDeEtapas}.ts`, `etapasDoSetorSupabase.ts` → `andamentoDoBanco.ts`, `src/components/processos/{CaminhoDoProcesso,CaminhoDeEtapas,EdicaoDaEtapa,FormularioDeDatas,LinhaDaEtapa}.tsx`, `useAcoesDaEtapa.ts`, `Etapas.css`, `src/components/cadastros/{SetorAberto,AreaDeSetores}.tsx`, apagar `EtapasDoSetor.tsx` e `App.etapasDoSetor.test.tsx`, `src/App.recursosRetirados.test.tsx`, `src/App.painelDoProcesso.test.tsx`, os testes que o `tsc` apontar.
 
-- [ ] Testes que falham, em `App.recursosRetirados.test.tsx`:
+- [x] Testes que falham, em `App.recursosRetirados.test.tsx`:
 
 ```tsx
 test('o setor aberto não tem a seção de etapas do setor, para quem altera e para a Consulta', async () => {
@@ -495,8 +495,8 @@ test('o setor aberto não tem a seção de etapas do setor, para quem altera e p
 ```
 
   e, em `App.painelDoProcesso.test.tsx`, um caso "o caminho do painel começa na primeira etapa do processo, sem etapas do setor nem 'Ver no setor'" (abre um processo com `etapasDoProcesso` da Modelagem piloto e confere `queryByText('Etapas do setor')` e `queryByRole('link', { name: 'Ver no setor' })` nulos e o primeiro item do caminho com "Modelagem piloto"), usando a montagem do próprio arquivo; os casos antigos que montam `etapasDoSetor` no painel saem.
-- [ ] Rodar e ver falhar (a seção e o link ainda aparecem).
-- [ ] Implementar:
+- [x] Rodar e ver falhar (a seção e o link ainda aparecem).
+- [x] Implementar:
   - troca mecânica do tipo: `grep -rl "EtapaDoSetor\b" src | xargs sed -i 's/\bEtapaDoSetor\b/EtapaDoCaminho/g'`; em `tipos.ts`, o comentário do tipo vira "Uma etapa do catálogo num processo (o andamento): o id é o do andamento, que as ações recebem."; o de `EtapaDoProcesso`, "A etapa do caminho com o nome de quem responde por ela.";
   - `tipos.ts`: tirar `etapasDoSetor` de `ProcessoLido` e `lerEtapasDoSetor` de `ModuloDeProcessos`; `EtapaDoCatalogo` com o comentário "Uma etapa do catálogo, como as colunas do Quadro a usam.";
   - `git mv src/processos/etapasDoSetorSupabase.ts src/processos/andamentoDoBanco.ts`; nele, apagar `lerEtapasDoSetor`; comentário de `AndamentoLido`: "Um andamento com a etapa do catálogo embutida, como o banco devolve."; atualizar os imports (`lerProcessoSupabase.ts`, testes);
@@ -513,13 +513,13 @@ test('o setor aberto não tem a seção de etapas do setor, para quem altera e p
   - `CatalogoFalso.ts`: `DonoDoCatalogo` sem `etapasDoSetor`; apagar `trocarEtapasDoSetor`, o ramo do setor em `incluirPendentes`, o laço do setor em `tirarPendentes` e a parte do setor em `andamentosDe`;
   - testes e fixtures que o `tsc` apontar: tirar `etapasDoSetor: []` e os casos que só existiam para as etapas do setor (`andamentoFalso.test.ts`, `ProcessosFalso.voltar.test.ts`, `CatalogoFalso.test.ts`, `App.andamentoDoProcesso.test.tsx`, `App.voltarDatasResponsavel.test.tsx`, `lerProcessoSupabase.test.ts`, `processosSupabase.test.ts`).
   - grep final: `grep -rniE "etapasDoSetor|EtapasDoSetor|lerEtapasDoSetor|Etapas do setor|Ver no setor|etapas-do-setor|atualizarSetorDoProcesso" src` acha só testes que provam a ausência.
-- [ ] `npm run typecheck`, `npm test`, `npm run lint`: verdes. Comitar ("Ticket 12 de processos-etapas: painel, tela do setor e módulo sem etapas do setor").
+- [x] `npm run typecheck`, `npm test`, `npm run lint`: verdes. Comitar ("Ticket 12 de processos-etapas: painel, tela do setor e módulo sem etapas do setor").
 
 ### Tarefa 6 — Catálogo sem nível; recusas antigas fora; tipos regenerados (critérios 6 e 8)
 
 **Arquivos:** `src/processos/{tipos,catalogoSupabase,CatalogoFalso,listaDeProcessosSupabase,andamentosSupabase,frasesDoCatalogo}.ts`, `src/components/administracao/{CamposDaEtapaNova,FormularioDaEtapa,CatalogoEditavel,TabelaDoCatalogo}.tsx`, `src/testes/catalogoDeTeste.tsx`, `src/App.catalogoDeEtapas.test.tsx`, `src/App.catalogoAcoes.test.tsx`, os testes unitários do catálogo e das recusas, `src/types/database.ts`.
 
-- [ ] Testes que falham, em `App.catalogoDeEtapas.test.tsx`:
+- [x] Testes que falham, em `App.catalogoDeEtapas.test.tsx`:
 
 ```tsx
 test('o catálogo não tem a coluna nem o campo "Nível"', async () => {
@@ -532,8 +532,8 @@ test('o catálogo não tem a coluna nem o campo "Nível"', async () => {
 ```
 
   e ajustar os casos existentes: `ETAPAS_DE_TESTE` sem a etapa do setor e sem `nivel`, com a Modelagem piloto em primeiro (`{ id: 'e1', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 1, … }`, `publicacao` ordem 6, `arquivamento` ordem 7); as linhas esperadas sem "Setor"/"Processo"; o caso da recusa "As etapas do setor precisam vir antes…" sai (`grep -rn "precisam vir antes\|etapas_do_setor_primeiro\|setor_nao_resolveu\|ainda não resolveu" src`); `catalogoSupabase.test.ts` espera o `rpc` sem `p_nivel` e o `select` sem `nivel`; `listaDeProcessosSupabase.test.ts` sem o `.eq('nivel', …)`.
-- [ ] Rodar e ver falhar.
-- [ ] Implementar:
+- [x] Rodar e ver falhar.
+- [x] Implementar:
   - `tipos.ts`: apagar `NivelDaEtapa`; `EtapaNoCatalogo = EtapaDoCatalogo & { obrigatoria: boolean }` (comentário "…ativa ou não."); `EtapaNova` sem `nivel`; comentário de `DadosDaEtapa` "o código não muda depois de criado";
   - `CamposDaEtapaNova.tsx`: sem as props e o campo de nível; comentário "Código e posição: só se escolhem ao criar; depois de criada a etapa mantém o código.";
   - `FormularioDaEtapa.tsx`: sem o estado `nivel` e o `nivel` em `DadosDoFormularioDaEtapa` e no `aoSalvar`;
@@ -546,12 +546,12 @@ test('o catálogo não tem a coluna nem o campo "Nível"', async () => {
   - `listaDeProcessosSupabase.ts`: sem `.eq('nivel', 'processo')`;
   - conferir o alvo e rodar `npm run db:types`; conferir no diff de `src/types/database.ts` que saíram só `andamentos.setor_id`, `etapas.nivel`, `nivel_da_etapa`, `aguardando_o_setor`, o `p_nivel` de `acrescentar_etapa`, e que `processo_id` de `andamentos` passou a obrigatório;
   - grep final: `grep -rniE "nivel|NivelDaEtapa|aguardando_o_setor|aguardandoOSetor|setor_nao_resolveu|etapas_do_setor_primeiro" src --include=*.ts --include=*.tsx | grep -v "src/types/database.ts"` acha só `historicoDosCadastros.ts` (o rótulo dos eventos antigos) e testes que provam a ausência.
-- [ ] `npm test`, `npm run typecheck`, `npm run lint`: verdes. Comitar ("Ticket 12 de processos-etapas: catálogo sem nível; tipos regenerados").
+- [x] `npm test`, `npm run typecheck`, `npm run lint`: verdes. Comitar ("Ticket 12 de processos-etapas: catálogo sem nível; tipos regenerados").
 
 ### Tarefa 7 — Fecho
 
-- [ ] Gravar `.scratch/processos-etapas/desvios.md` (entrada datada): gatilhos desligados com `session_replication_role`; renumeração por `row_number()`; `processo_id` obrigatório; tipo `EtapaDoSetor` renomeado; eventos antigos de etapa do setor na linha simples; rótulo "Nível" mantido para eventos antigos; tipos regenerados na Tarefa 6; ensaios; o que mais surgir.
-- [ ] Gravar `.scratch/melhorias-protocolo.md` com os itens não testados do `/executar-complexo` e do "Qualquer momento" (`.claude/regras/nao-testados.md`) que aconteceram, mais a sessão no Opus.
-- [ ] Marcar as caixas deste plano e comitar.
-- [ ] `git switch main`, merge da branch, `git branch -d processos-etapas-12`; enviar a `main` e conferir o "Testes de banco" na `main`.
-- [ ] Na `main`: `Concluído em 2026-10-18 (commit <hash>)` no fim do ticket 12; comitar e enviar.
+- [x] Gravar `.scratch/processos-etapas/desvios.md` (entrada datada): gatilhos desligados com `session_replication_role`; renumeração por `row_number()`; `processo_id` obrigatório; tipo `EtapaDoSetor` renomeado; eventos antigos de etapa do setor na linha simples; rótulo "Nível" mantido para eventos antigos; tipos regenerados na Tarefa 6; ensaios; o que mais surgir.
+- [x] Gravar `.scratch/melhorias-protocolo.md` com os itens não testados do `/executar-complexo` e do "Qualquer momento" (`.claude/regras/nao-testados.md`) que aconteceram, mais a sessão no Opus.
+- [x] Marcar as caixas deste plano e comitar.
+- [x] `git switch main`, merge da branch, `git branch -d processos-etapas-12`; enviar a `main` e conferir o "Testes de banco" na `main`.
+- [x] Na `main`: `Concluído em 2026-10-18 (commit <hash>)` no fim do ticket 12; comitar e enviar.
