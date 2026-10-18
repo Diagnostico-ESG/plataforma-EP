@@ -92,3 +92,4 @@ Uma linha por item: o que é e onde surgiu.
 - 2026-10-16 | planejar revisoes-aprovacao | fila de revisão (processos aguardando revisor, revisões pendentes por integrante) fica para o Dashboard (v1.5) | sabatina Q10
 - 2026-10-16 | planejar revisoes-aprovacao | aviso "estrutura alterada após aprovação" no processo pai quando um subprocesso é vinculado a pai aprovado (regra 14 da especificação) | spec, fora do escopo
 - 2026-10-17 | ship documentos-versoes | a função `arquivos-no-drive` da linha de 2026-10-16 já foi publicada no desenvolvimento; segue pendente só a arrumação da prova do Drive (provedor Email, usuários prova.integrante e prova.consulta, arquivos no Drive) | usuário, 2026-10-17
+- Datas, versões, siglas e contagens em fonte mono (regra do DESIGN.md), hoje sem uso em nenhum componente. Surgiu no /polir da parte 1, em 2026-10-18.

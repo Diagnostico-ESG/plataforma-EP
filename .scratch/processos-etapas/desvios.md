@@ -158,3 +158,13 @@ Revisão do diff inteiro desde `marco/2026-10-13-inicio-processos-etapas` (por a
 - **Ensaio da migração** dentro de cópias dos testes 34, 19 e 22. A primeira montagem (#106) perdeu os delimitadores `$$`, porque o `String.replace` do Node trata `$$` como `$` no texto de troca (tropeço já registrado antes em `melhorias-protocolo.md`, no teste 23); refeita com função de troca (#107). O 22b falhou 1 de 46 por um erro do próprio teste 22 (a chamada do visitante ainda passava o nível), corrigido antes de aplicar.
 - **Tipos regenerados na tarefa 6**, não no commit da migração: com os tipos novos, `catalogoSupabase.ts` (o `p_nivel`) não compilava antes. Mesmo desvio dos tickets 05 e 11.
 - **Critérios de tela conferidos só por teste:** a tela não foi aberta (o app exige login e não há servidor com dados).
+
+## 2026-10-18 — /polir da parte 1 (Simplificação; tickets 11 e 12, com o 05 de reunioes)
+
+Auditoria do impeccable: 16/20 (Bom), detector sem achados em `src`. Conferido só pelo código e pelos testes: a tela não foi aberta (o app exige login).
+
+- **Corrigido (P2):** os campos de data do painel (o da reunião e o das datas da etapa) ficavam com a borda e a altura padrão do navegador, desalinhados dos botões de 32px. Ganharam, no `Painel.css`, o mesmo desenho dos outros campos.
+- **Corrigido (P3):** a regra `.painel-caminho-titulo`, que sobrou do título "Etapas do setor", foi apagada.
+- **Deixado de fora (P3):** o nome antigo "Reunião de modelagem" nos dados inventados de uns 27 arquivos de teste. Não aparece na tela, e trocar seria só mexida sem efeito no comportamento.
+- **Deixado de fora (P3):** "Salvando…" no botão enquanto a data grava. Nenhuma tela do projeto usa esse padrão; o botão desligado é o padrão dos vizinhos.
+- **Deixado de fora:** datas em fonte mono, como pede a regra do DESIGN.md. Nenhum componente usa a classe `.mono` hoje; é ajuste do projeto todo, não desta parte (vai para o backlog).

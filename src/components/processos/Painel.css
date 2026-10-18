@@ -121,12 +121,6 @@
   font-weight: 700;
 }
 
-.painel-caminho-titulo {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-}
-
 .painel-link {
   color: var(--azul);
   font-size: var(--tam-secundario);
@@ -245,6 +239,19 @@
   align-items: center;
   gap: var(--esp-2) var(--esp-3);
   margin-top: var(--esp-2);
+}
+
+/* Os campos de data do painel no desenho dos outros campos (32px, borda de token), alinhados aos botões ao lado;
+   sem isto ficavam com a borda e a altura padrão do navegador. */
+.reuniao-edicao input,
+.etapa-campo-de-data input {
+  min-height: 32px;
+  padding: var(--esp-1) var(--esp-2);
+  border: 1px solid var(--linha);
+  border-radius: var(--canto-botao);
+  background: var(--folha);
+  color: var(--texto);
+  font: inherit;
 }
 
 .reuniao-edicao .cadastros-falha {

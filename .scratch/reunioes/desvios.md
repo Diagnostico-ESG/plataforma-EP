@@ -110,3 +110,7 @@ Revisão do diff inteiro (marco `2026-10-14-inicio-reunioes`, 38 commits) em dua
 - **Teste 17 ajustado** depois da migração: ele compara o estado inteiro do evento de criação do processo, que passou a trazer `data_da_reuniao` (#98 reprovou, #99 verde).
 - **Excluir e trocar o setor de processo com data:** provados no banco (32). Na tela, só a exclusão tem teste, porque a falsa já não tem trava de reunião, e um teste de troca de setor pela tela não provaria nada a mais.
 - **A trava do DevFlow barrou por engano** um `sed` que só editava `supabase/tests/17_processos.test.sql` (a mensagem fala da pasta `.git`). Fiz a mesma edição pelo Edit, sem comando de git.
+
+## 2026-10-18 — /polir da parte 1 (Simplificação)
+
+Feito junto com o de processos-etapas; achados e decisões em `.scratch/processos-etapas/desvios.md`, na entrada de mesma data. Do que é desta funcionalidade: o campo de data da reunião ganhou o desenho dos outros campos do painel.
