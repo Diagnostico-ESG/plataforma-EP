@@ -155,4 +155,4 @@ Nenhuma. "Marcada para" e "realizada em" são calculados pela data, na tela.
 - **Rede do escritório:** a migração vai pelo workflow "Migrar banco de desenvolvimento" e precisa ser registrada em `supabase/AMBIENTES.md` para o `migration repair` antes da primeira publicação em produção.
 
 Entregue em 2026-10-15 (commit ccd2f8b), com ressalva: critérios [visual] presumidos (a tela não foi conferida)
-Em revisão desde 2026-10-18
+Entregue em 2026-10-18 (commit e54f51b)

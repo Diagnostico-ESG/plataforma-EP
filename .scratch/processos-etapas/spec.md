@@ -510,4 +510,4 @@ As exclusões e a renumeração da migração não geram eventos: é mudança de
 - **Privilégios padrão:** toda tabela ou view nova em `public` reprova o teste `10_privilegios_padrao` até receber o seu `revoke`.
 
 Entregue em 2026-10-14 (commit f1cc3cf), com ressalva: critérios [visual] presumidos (a tela não foi conferida)
-Em revisão desde 2026-10-18
+Entregue em 2026-10-18 (commit e54f51b)
