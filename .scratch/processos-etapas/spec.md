@@ -180,7 +180,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
   - **Tipo na edição:** a edição não muda o tipo; a mudança de tipo é só por Reclassificar.
 - **Painel do processo:**
   - **Cabeçalho:** quadradinho da sigla, nome, macroprocesso, pílulas de tipo e de situação, e botão fechar.
-  - **Reunião de modelagem piloto:** a linha da data, logo acima do caminho (spec de `reunioes`).
+  - **Reunião de modelagem piloto:** a linha da data, no lugar da antiga seção Reuniões, depois dos dados e da estrutura e antes das Versões (spec de `reunioes`).
   - **Caminho de etapas:** em cada etapa: status, responsável (seletor para quem pode), datas de início e de conclusão (editáveis para quem pode) e nota. As etapas do setor e o link "Ver no setor" saíram em 2026-10-18.
   - **Ações na etapa atual:**
     - [Iniciar] quando pendente;
@@ -418,7 +418,7 @@ em_andamento | suspenso ──cancelar (motivo)──▶ cancelado ──retomar
 
 #### Migração de 2026-10-18 (Simplificação)
 
-Destrutiva. A produção não existe; só se perdem dados inventados do desenvolvimento (ADR 0013). Uma migração nova, numa transação só, na ordem:
+Destrutiva. A produção não existe; só se perdem dados inventados do desenvolvimento (ADR 0013). Três migrações novas, uma por ticket, cada uma numa transação: `20261018123613_data_da_reuniao` (itens 1 e 6), `20261018132857_responsaveis_do_setor_saem` (item 2) e `20261018141346_sem_etapas_do_setor` (itens 3 a 5). O que cada uma faz:
 
 1. **Reuniões:** tudo o que a spec de `reunioes` lista como apagado (tabelas, tipo, funções, gatilhos e travas).
 2. **Responsáveis do setor:** apaga a tabela `responsaveis_do_setor`, os gatilhos e funções dela.
