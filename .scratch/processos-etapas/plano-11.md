@@ -60,8 +60,8 @@
 
 **Arquivos:** criar `supabase/tests/33_responsaveis_do_setor_saem.test.sql`; modificar 11 e 13; apagar 16.
 
-- [ ] `git switch -c processos-etapas-11` a partir da `main` limpa; `git tag marco/2026-10-18-inicio-ticket-11-processos-etapas` e enviar o marco (`git push origin refs/tags/marco/2026-10-18-inicio-ticket-11-processos-etapas`). Conferir o alvo (os dois `yclkzyoebpsxmgpbcbus`).
-- [ ] Escrever o 33 no molde do 32 (mesmo cabeçalho, `_tap`, usuários a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo, `finish()` e a exceção `RESULTADO DOS TESTES`). Preparação como dono do banco:
+- [x] `git switch -c processos-etapas-11` a partir da `main` limpa; `git tag marco/2026-10-18-inicio-ticket-11-processos-etapas` e enviar o marco (`git push origin refs/tags/marco/2026-10-18-inicio-ticket-11-processos-etapas`). Conferir o alvo (os dois `yclkzyoebpsxmgpbcbus`).
+- [x] Escrever o 33 no molde do 32 (mesmo cabeçalho, `_tap`, usuários a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo, `finish()` e a exceção `RESULTADO DOS TESTES`). Preparação como dono do banco:
 
 ```sql
 insert into public.eventos (autor_id, acao, entidade, entidade_ref, detalhes) values
@@ -82,15 +82,15 @@ grant execute on function pg_temp.eventos_antigos() to authenticated;
   4. a 6. administrador, integrante e Consulta leem o evento antigo (`is(pg_temp.eventos_antigos(), 1::bigint, ...)`), cada um com `set_config('request.jwt.claims', '{"sub":"…a1","role":"authenticated"}', true)` e `set local role authenticated`, como no 32;
   7. o inativo não lê (`0::bigint`);
   8. o visitante (`set local role anon`): `throws_ok($sql$select 1 from public.eventos where entidade = 'responsavel_do_setor'$sql$, '42501', null, ...)`.
-- [ ] No 11 (linha 167) e no 13 (linha 254): tirar `"responsaveis": []` e `'responsaveis', jsonb_build_array()` da expectativa do evento de exclusão do setor (no 13, tirar também a vírgula que fica sobrando).
-- [ ] `git rm supabase/tests/16_responsaveis_do_setor.test.sql`.
-- [ ] Comitar ("Ticket 11 de processos-etapas: testes de banco da saída dos responsáveis do setor"), enviar a branch e disparar o "Testes de banco" na branch. Esperado: vermelho no 33 (a tabela e as funções existem, nas asserções 1 a 3), no 11 e no 13 (a chave `responsaveis` ainda é gravada); os demais verdes. Anotar o número da execução.
+- [x] No 11 (linha 167) e no 13 (linha 254): tirar `"responsaveis": []` e `'responsaveis', jsonb_build_array()` da expectativa do evento de exclusão do setor (no 13, tirar também a vírgula que fica sobrando).
+- [x] `git rm supabase/tests/16_responsaveis_do_setor.test.sql`.
+- [x] Comitar ("Ticket 11 de processos-etapas: testes de banco da saída dos responsáveis do setor"), enviar a branch e disparar o "Testes de banco" na branch. Esperado: vermelho no 33 (a tabela e as funções existem, nas asserções 1 a 3), no 11 e no 13 (a chave `responsaveis` ainda é gravada); os demais verdes. Anotar o número da execução.
 
 ### Tarefa 2 — Migração, ensaio e aplicação (critérios 1 e 7)
 
 **Arquivos:** criar `supabase/migrations/<timestamp>_responsaveis_do_setor_saem.sql`; modificar `supabase/AMBIENTES.md`.
 
-- [ ] `npx supabase migration new responsaveis_do_setor_saem` e escrever:
+- [x] `npx supabase migration new responsaveis_do_setor_saem` e escrever:
 
 ```sql
 -- Processos e etapas, ticket 11 (Simplificação, ADR 0013): os responsáveis do setor saem da plataforma.
@@ -125,9 +125,9 @@ drop function private.preparar_responsavel_do_setor(), private.registrar_evento_
 ```
 
   Antes de colar, conferir em `20261013150735_setores_envolvidos.sql` se a versão anterior tinha mais alguma coisa (o corpo acima é o da migração dos responsáveis, sem as duas linhas deles).
-- [ ] Ensaiar: criar `supabase/tests/33b_ensaio_responsaveis.test.sql`, cópia do 33 com o corpo da migração logo depois do `begin` e antes do `plan`; comitar, enviar e disparar o "Testes de banco". Esperado: 33b verde, 33, 11 e 13 ainda vermelhos. Apagar o 33b e comitar a remoção. Se o ensaio falhar, corrigir e repetir; na terceira falha, parar (regra de parada).
-- [ ] Comitar a migração (sem os tipos) e enviar. Disparar o "Migrar banco de desenvolvimento" na branch, com `migracao` igual ao nome do arquivo **sem a pasta**, e ler o resultado. Depois, o "Testes de banco" na branch. Esperado: todos verdes, o 33 com 8 de 8.
-- [ ] Registrar em `supabase/AMBIENTES.md` a linha da migração, no formato das anteriores (data, ticket, testes vermelhos antes e verdes depois com os números das execuções, o ensaio e o workflow). Comitar.
+- [x] Ensaiar: criar `supabase/tests/33b_ensaio_responsaveis.test.sql`, cópia do 33 com o corpo da migração logo depois do `begin` e antes do `plan`; comitar, enviar e disparar o "Testes de banco". Esperado: 33b verde, 33, 11 e 13 ainda vermelhos. Apagar o 33b e comitar a remoção. Se o ensaio falhar, corrigir e repetir; na terceira falha, parar (regra de parada).
+- [x] Comitar a migração (sem os tipos) e enviar. Disparar o "Migrar banco de desenvolvimento" na branch, com `migracao` igual ao nome do arquivo **sem a pasta**, e ler o resultado. Depois, o "Testes de banco" na branch. Esperado: todos verdes, o 33 com 8 de 8.
+- [x] Registrar em `supabase/AMBIENTES.md` a linha da migração, no formato das anteriores (data, ticket, testes vermelhos antes e verdes depois com os números das execuções, o ensaio e o workflow). Comitar.
 
 ### Tarefa 3 — Linha simples dos responsáveis no histórico (critério 4)
 
@@ -136,8 +136,8 @@ drop function private.preparar_responsavel_do_setor(), private.registrar_evento_
 **Interfaces:**
 - Produz: `export function ehRecursoRetirado(entidade: string): boolean` em `historicoDosCadastros.ts` (o ticket 12 acrescenta `andamento` sem processo de outro jeito, mas usa o mesmo mapa).
 
-- [ ] `git mv src/App.reunioesRetiradas.test.tsx src/App.recursosRetirados.test.tsx`; trocar o comentário do topo por "Recursos que saíram da plataforma (ADR 0013): a área Reuniões (reunioes, ticket 05) e os responsáveis do setor (processos-etapas, ticket 11)."
-- [ ] Testes que falham:
+- [x] `git mv src/App.reunioesRetiradas.test.tsx src/App.recursosRetirados.test.tsx`; trocar o comentário do topo por "Recursos que saíram da plataforma (ADR 0013): a área Reuniões (reunioes, ticket 05) e os responsáveis do setor (processos-etapas, ticket 11)."
+- [x] Testes que falham:
   - em `App.recursosRetirados.test.tsx`, um caso no molde do da reunião:
 
 ```tsx
@@ -183,8 +183,8 @@ describe('registros antigos de responsável do setor (recurso retirado da plataf
 
   Manter o caso da linha 244 (evento antigo de exclusão de setor com a lista `responsaveis`).
   - em `App.historicoDosCadastros.test.tsx`, apagar o caso "os responsáveis do setor aparecem no Histórico e entram no filtro pelo setor" (linhas 181-193): o novo caso o substitui.
-- [ ] Rodar `npx vitest run src/App.recursosRetirados.test.tsx src/cadastros/historicoDosCadastros.test.ts` e ver falhar (texto antigo "Criou Ana Teste — TSA"; `ehRecursoRetirado` não existe).
-- [ ] Implementar em `historicoDosCadastros.ts`:
+- [x] Rodar `npx vitest run src/App.recursosRetirados.test.tsx src/cadastros/historicoDosCadastros.test.ts` e ver falhar (texto antigo "Criou Ana Teste — TSA"; `ehRecursoRetirado` não existe).
+- [x] Implementar em `historicoDosCadastros.ts`:
 
 ```ts
 /** Recursos que saíram da plataforma (ADR 0013): os eventos ficam no histórico, numa linha sem o detalhe. */
@@ -203,13 +203,13 @@ export function ehRecursoRetirado(entidade: string): boolean {
   - `temItemProprio`: `!ENTIDADES_QUE_LIGAM.has(evento.entidade) && !ehRecursoRetirado(evento.entidade)`, comentário "recursos retirados ficam fora, porque todos teriam o mesmo nome no filtro";
   - apagar a constante exportada `TEXTO_DA_REUNIAO_RETIRADA` (conferir com grep que nada mais a usa);
   - em `ListaDoHistorico.tsx` (linha 41): `{!ehRecursoRetirado(evento.entidade) && <MudancaDoEvento evento={evento} />}`.
-- [ ] Rodar os dois arquivos e a bateria (`npm test`): verde. Comitar ("Ticket 11 de processos-etapas: registros antigos de responsável do setor na linha simples do histórico").
+- [x] Rodar os dois arquivos e a bateria (`npm test`): verde. Comitar ("Ticket 11 de processos-etapas: registros antigos de responsável do setor na linha simples do histórico").
 
 ### Tarefa 4 — Tela do setor e módulo sem responsáveis; tipos regenerados (critérios 3, 5 e 6)
 
 **Arquivos:** os de "Apagar" (menos o 16), `SetorAberto.tsx`, `tipos.ts`, `ProcessosFalso.ts`, `processosSupabase.ts`, `Etapas.css`, `App.recursosRetirados.test.tsx`, `src/types/database.ts`.
 
-- [ ] Teste que falha, em `App.recursosRetirados.test.tsx`:
+- [x] Teste que falha, em `App.recursosRetirados.test.tsx`:
 
 ```tsx
 test('o setor aberto não tem a seção de responsáveis do setor, para quem altera e para a Consulta', async () => {
@@ -227,8 +227,8 @@ test('o setor aberto não tem a seção de responsáveis do setor, para quem alt
 ```
 
   Antes, conferir em `src/testes/processosNosCadastros.tsx` como o perfil é passado (`perfil` ou outro nome) e ajustar a chamada.
-- [ ] Rodar e ver falhar (a seção ainda aparece).
-- [ ] Implementar:
+- [x] Rodar e ver falhar (a seção ainda aparece).
+- [x] Implementar:
   - `SetorAberto.tsx`: tirar o import e a linha `<ResponsaveisDoSetor …/>`; comentário "Etapas e processos do setor ficam abaixo…";
   - apagar `ResponsaveisDoSetor.tsx`, `ResponsaveisEditaveis.tsx`, `FormularioDeResponsavel.tsx`, `TabelaDeResponsaveis.tsx`, `responsaveisSupabase.ts` (+ teste), `validacaoDoResponsavel.ts` (+ teste) e `App.responsaveisDoSetor.test.tsx`;
   - `tipos.ts`: tirar `ResponsavelDoSetor`, `DadosDoResponsavel` e, de `ModuloDeProcessos`, `lerResponsaveisDoSetor`, `criarResponsavel`, `editarResponsavel`, `excluirResponsavel`;
@@ -237,12 +237,12 @@ test('o setor aberto não tem a seção de responsáveis do setor, para quem alt
   - `Etapas.css`: o seletor `.responsaveis-do-setor,` sai (fica só `.etapas-do-setor`) e a regra `.acoes-do-responsavel` sai;
   - conferir o alvo e rodar `npm run db:types`; conferir no diff de `src/types/database.ts` que só `responsaveis_do_setor` saiu;
   - grep final: `grep -rniE "responsaveis_?do_?setor|ResponsavelDoSetor|DadosDoResponsavel|criarResponsavel|excluirResponsavel|editarResponsavel|validacaoDoResponsavel|acoes-do-responsavel" src` deve achar só `historicoDosCadastros.ts` (o mapa e o rótulo `responsaveis` dos eventos antigos), `historicoSupabase.ts` (a entidade na leitura) e testes do histórico.
-- [ ] `npm test`, `npm run typecheck` e `npm run lint`: verdes. Comitar ("Ticket 11 de processos-etapas: tela do setor e módulo sem responsáveis; tipos regenerados").
+- [x] `npm test`, `npm run typecheck` e `npm run lint`: verdes. Comitar ("Ticket 11 de processos-etapas: tela do setor e módulo sem responsáveis; tipos regenerados").
 
 ### Tarefa 5 — Fecho
 
-- [ ] Gravar `.scratch/processos-etapas/desvios.md` (entrada datada): tipos regenerados na Tarefa 4; eventos de responsável na linha simples e fora do filtro; evento de exclusão de setor sem a chave `responsaveis`; ensaio da migração; o que mais surgir.
-- [ ] Gravar `.scratch/melhorias-protocolo.md` com os itens não testados do `/executar-complexo` e do "Qualquer momento" (`.claude/regras/nao-testados.md`) que aconteceram, mais a sessão no Opus.
-- [ ] Marcar as caixas deste plano e comitar.
-- [ ] `git switch main`, merge da branch, `git branch -d processos-etapas-11`; enviar a `main` e conferir o "Testes de banco" na `main`.
-- [ ] Na `main`: `Concluído em 2026-10-18 (commit <hash>)` no fim do ticket 11; comitar e enviar.
+- [x] Gravar `.scratch/processos-etapas/desvios.md` (entrada datada): tipos regenerados na Tarefa 4; eventos de responsável na linha simples e fora do filtro; evento de exclusão de setor sem a chave `responsaveis`; ensaio da migração; o que mais surgir.
+- [x] Gravar `.scratch/melhorias-protocolo.md` com os itens não testados do `/executar-complexo` e do "Qualquer momento" (`.claude/regras/nao-testados.md`) que aconteceram, mais a sessão no Opus.
+- [x] Marcar as caixas deste plano e comitar.
+- [x] `git switch main`, merge da branch, `git branch -d processos-etapas-11`; enviar a `main` e conferir o "Testes de banco" na `main`.
+- [x] Na `main`: `Concluído em 2026-10-18 (commit <hash>)` no fim do ticket 11; comitar e enviar.

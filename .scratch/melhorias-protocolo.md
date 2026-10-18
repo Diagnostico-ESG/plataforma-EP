@@ -587,3 +587,11 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **2026-10-18 · Ocorrência: o pre-commit confere a pasta de trabalho, não o que vai no commit.** Um commit parcial (só a migração) passou com o resto da pasta já pronto, mas o próprio commit não compilava sozinho. Sugestão: o `/executar-*` lembrar disso quando um ticket separa commits, ou o pre-commit rodar sobre o que vai no commit (`git stash --keep-index`).
 - **2026-10-18 · Ocorrência: o aviso do claude-mem (cota esgotada) apareceu no início da sessão**, e a sessão seguiu sem ele.
 - **2026-10-18 · Ocorrência: a sessão rodou com o Opus**, porque o usuário pediu o `/executar-complexo` nesta mesma sessão. A tabela do funil indica Sonnet.
+
+## 2026-10-18 — /executar-complexo do ticket 11 de processos-etapas (responsáveis do setor saem)
+
+- **2026-10-18 · Item não testado: branch comum no `/executar-complexo`, `plano-<número>.md` e linha `Concluído em`.** Esperado: branch a partir da principal, plano em `plano-11.md` e a linha no fim do ticket. Aconteceu: a branch `processos-etapas-11` saiu da `main` limpa; o plano foi para `.scratch/processos-etapas/plano-11.md`; a linha `Concluído em` foi gravada depois do merge.
+- **2026-10-18 · Item não testado: leitura de `.claude/regras/banco.md` e conferência do alvo.** Aconteceu: o `banco.md` foi lido antes do plano. O alvo foi conferido (linha "vínculo atual" e `supabase/.temp/project-ref`, os dois `yclkzyoebpsxmgpbcbus`) antes do `db:types`.
+- **2026-10-18 · Ocorrência: o `executing-plans` pede subagentes ou worktree.** A regra do projeto (branch comum) prevaleceu, e a skill foi avisada de que o isolamento já estava feito.
+- **2026-10-18 · Ocorrência: o aviso do claude-mem (cota esgotada) apareceu no início da sessão**, e a sessão seguiu sem ele.
+- **2026-10-18 · Ocorrência: a sessão rodou com o Opus**, porque o usuário pediu o `/executar-complexo` nesta mesma sessão, logo depois do `/situação`. A tabela do funil indica Sonnet.

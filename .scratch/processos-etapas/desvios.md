@@ -130,3 +130,13 @@ Revisão do diff inteiro desde `marco/2026-10-13-inicio-processos-etapas` (por a
 - **Segurança (revisão de reserva, estática):** nenhum achado com confiança acima de 8. Ressalva: conferir no painel do Supabase de desenvolvimento que a API publica só `public` e `graphql_public` (só o `config.toml` local foi lido).
 - **Banco:** sem migração destrutiva, sem chave secreta, view com `security_invoker`, `security definer` só em `private` com `search_path` vazio, tipos em dia. "Testes de banco" #54 na `main` (commit `dd32b58`) verde, com o teste 22.
 - **Critérios `[visual]` da spec em presumido:** o usuário não pôde olhar a tela no `/ship`, e o app exige login sem servidor com dados.
+
+## 2026-10-18 — /executar-complexo do ticket 11 (responsáveis do setor saem)
+
+- **Registros antigos de responsável fora do filtro do histórico.** Aparecem com ação, data e autor, e o item é "Registro de responsável do setor (recurso retirado da plataforma)", sem as linhas de antes e depois (que traziam nome, e-mail e cargo). Saíram da lista do filtro "Item", porque todos teriam o mesmo nome; escolhido um setor no filtro, o evento continua aparecendo, porque a referência dele cita o setor. Mesmo tratamento dos registros antigos de reunião (reunioes, ticket 05). O texto dos recursos retirados virou um mapa por entidade, para o ticket 12 acrescentar a etapa do setor.
+- **Evento de exclusão do setor sem a chave `responsaveis`.** A função volta a ser a de `setores_envolvidos`. Os eventos antigos que têm a chave continuam mostrando "Responsáveis: …"; o rótulo fica no código para eles. Os testes 11 e 13 perderam a chave na expectativa.
+- **Ensaio da migração** dentro de uma cópia temporária do teste 33 (#102), apagada antes de aplicar, como no ticket 05 de reunioes.
+- **Tipos regenerados na tarefa da tela**, não no commit da migração: com os tipos novos, o acesso Supabase dos responsáveis não compilava e o pre-commit barraria. Mesmo desvio do ticket 05 de reunioes.
+- **A classe `acoes-do-responsavel` ficou no CSS:** a tabela do catálogo da Administração também a usa. O plano mandava apagá-la; a busca final achou o uso.
+- **O `git mv` do teste de tela** (`App.reunioesRetiradas` → `App.recursosRetirados`) entrou no commit da migração (`3a30d45`), por ter sido preparado antes dele; o conteúdo novo do arquivo veio no commit seguinte.
+- **Critérios de tela conferidos só por teste:** a tela não foi aberta (o app exige login e não há servidor com dados).
