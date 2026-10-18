@@ -1,0 +1,104 @@
+-- Responsáveis do setor saem (processos-etapas, ticket 11; ADR 0013): a tabela e as funções dos gatilhos dela não
+-- existem mais, e os eventos antigos de responsável continuam legíveis por todo perfil ativo.
+begin;
+create extension if not exists pgtap with schema extensions;
+-- ENSAIO TEMPORÁRIO: corpo da migração 20261018132857_responsaveis_do_setor_saem, desfeito pelo rollback do teste.
+-- Processos e etapas, ticket 11 (Simplificação, ADR 0013): os responsáveis do setor saem da plataforma.
+-- A tabela leva junto as políticas, o índice e os gatilhos; drop table não dispara os gatilhos de linha, então nenhum
+-- evento nasce. A política "eventos: perfil ativo lê os responsáveis do setor" fica: os eventos antigos continuam
+-- legíveis por todo perfil ativo.
+
+-- Excluir um setor deixa de listar os responsáveis (versão anterior: 20261013211710_responsaveis_do_setor; volta a
+-- ser a de 20261013150735_setores_envolvidos).
+create or replace function private.registrar_exclusao_do_setor() returns trigger
+language plpgsql security definer set search_path = ''
+as $$
+declare
+  macroprocessos jsonb;
+begin
+  select coalesce(jsonb_agg(jsonb_build_object('macroprocesso_id', m.id, 'codigo', m.codigo, 'nome', m.nome,
+    'observacao', v.observacao) order by m.codigo nulls last, m.nome), '[]'::jsonb) into macroprocessos
+  from public.setores_envolvidos v join public.macroprocessos m on m.id = v.macroprocesso_id
+  where v.setor_id = old.id;
+  delete from public.setores_envolvidos where setor_id = old.id;
+  insert into public.eventos (autor_id, acao, entidade, entidade_ref, detalhes)
+  values ((select auth.uid()), 'excluir', 'setor', old.id::text, jsonb_build_object(
+    'antes', jsonb_build_object('sigla', old.sigla, 'nome', old.nome, 'observacoes', old.observacoes,
+      'ativo', old.ativo, 'macroprocessos', macroprocessos),
+    'depois', null));
+  return old;
+end $$;
+
+revoke execute on function private.registrar_exclusao_do_setor() from public, anon, authenticated;
+
+drop table public.responsaveis_do_setor;
+drop function private.preparar_responsavel_do_setor(), private.registrar_evento_do_responsavel_do_setor();
+-- As linhas do pgTAP vão para _tap e saem na exceção do fim (ver scripts/relatorio-tap.mjs).
+create temp table _tap (n serial, linha text);
+grant all on _tap to anon, authenticated;
+grant all on sequence _tap_n_seq to anon, authenticated;
+insert into _tap (linha) select plan(8);
+
+-- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
+insert into public.autorizacoes (email, perfil) values
+  ('admin.teste@ccivil.pr.gov.br', 'administrador'),
+  ('integrante.teste@ccivil.pr.gov.br', 'integrante_ep'),
+  ('consulta.teste@ccivil.pr.gov.br', 'consulta'),
+  ('inativo.teste@ccivil.pr.gov.br', 'administrador');
+insert into auth.users (id, email, aud, role) values
+  ('00000000-0000-0000-0000-0000000000a1', 'admin.teste@ccivil.pr.gov.br', 'authenticated', 'authenticated'),
+  ('00000000-0000-0000-0000-0000000000a2', 'integrante.teste@ccivil.pr.gov.br', 'authenticated', 'authenticated'),
+  ('00000000-0000-0000-0000-0000000000a3', 'consulta.teste@ccivil.pr.gov.br', 'authenticated', 'authenticated'),
+  ('00000000-0000-0000-0000-0000000000a4', 'inativo.teste@ccivil.pr.gov.br', 'authenticated', 'authenticated');
+update public.usuarios set ativo = false where id = '00000000-0000-0000-0000-0000000000a4';
+
+-- Preparação como dono do banco: um evento antigo de responsável do setor (o recurso saiu).
+insert into public.eventos (autor_id, acao, entidade, entidade_ref, detalhes) values
+  (null, 'criar', 'responsavel_do_setor', 'setor-antigo-r1:responsavel-antigo-r1',
+   '{"antes": null, "depois": {"setor_sigla": "TRA", "nome": "Pessoa Fictícia"}}');
+
+create function pg_temp.eventos_antigos() returns bigint
+language sql stable as $$
+  select count(*) from public.eventos where entidade_ref = 'setor-antigo-r1:responsavel-antigo-r1'
+$$;
+grant execute on function pg_temp.eventos_antigos() to authenticated;
+
+-- O que era dos responsáveis do setor não existe mais.
+insert into _tap (linha) select hasnt_table('public', 'responsaveis_do_setor', 'a tabela responsaveis_do_setor não existe');
+insert into _tap (linha) select hasnt_function('private', 'preparar_responsavel_do_setor',
+  'a função preparar_responsavel_do_setor não existe');
+insert into _tap (linha) select hasnt_function('private', 'registrar_evento_do_responsavel_do_setor',
+  'a função registrar_evento_do_responsavel_do_setor não existe');
+
+-- Todo perfil ativo lê o evento antigo.
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
+set local role authenticated;
+insert into _tap (linha) select is(pg_temp.eventos_antigos(), 1::bigint, 'administrador lê o evento antigo de responsável');
+reset role;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
+set local role authenticated;
+insert into _tap (linha) select is(pg_temp.eventos_antigos(), 1::bigint, 'integrante lê o evento antigo de responsável');
+reset role;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a3","role":"authenticated"}', true);
+set local role authenticated;
+insert into _tap (linha) select is(pg_temp.eventos_antigos(), 1::bigint, 'Consulta lê o evento antigo de responsável');
+reset role;
+
+-- Inativo não lê.
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a4","role":"authenticated"}', true);
+set local role authenticated;
+insert into _tap (linha) select is(pg_temp.eventos_antigos(), 0::bigint, 'inativo não lê o evento antigo de responsável');
+reset role;
+
+-- Visitante não chega aos eventos.
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+set local role anon;
+insert into _tap (linha) select throws_ok(
+  $sql$select 1 from public.eventos where entidade = 'responsavel_do_setor'$sql$, '42501', null,
+  'visitante não lê os eventos de responsável');
+reset role;
+
+insert into _tap (linha) select * from finish();
+do $$ begin
+  raise exception E'RESULTADO DOS TESTES\n%', (select string_agg(linha, E'\n' order by n) from _tap);
+end $$;
