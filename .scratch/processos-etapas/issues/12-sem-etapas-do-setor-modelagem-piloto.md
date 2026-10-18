@@ -20,3 +20,5 @@
 - [ ] Módulo de processos (falsa e Supabase) sem leitura e alteração de etapas do setor; nenhum código morto ligado a elas.
 - [ ] Testes de interface com o aplicativo inteiro cobrindo os itens acima.
 - [ ] `supabase/AMBIENTES.md` registra a migração.
+
+Concluído em 2026-10-18 (commit 849a76e)
