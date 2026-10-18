@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import {
-  descreverEstadoDoCadastro, eventosDoItem, itensDoFiltro, nomeDoItem, rotuloDoMotivo, textoDaAcaoDoCadastro,
+  descreverEstadoDoCadastro, ehRecursoRetirado, eventosDoItem, itensDoFiltro, nomeDoItem, rotuloDoMotivo, textoDaAcaoDoCadastro,
 } from './historicoDosCadastros'
 import type { EventoDoCadastro } from './tipos'
 
@@ -225,22 +225,23 @@ describe('reclassificação no histórico', () => {
   })
 })
 
-describe('responsáveis do setor', () => {
+describe('registros antigos de responsável do setor (recurso retirado da plataforma)', () => {
   const RESPONSAVEL = { setor_id: 's1', setor_sigla: 'CEE', nome: 'Pessoa Fictícia', email: 'pessoa@exemplo.com', cargo: null }
   const criado = evento({ entidade: 'responsavel_do_setor', entidadeRef: 's1:r1', depois: RESPONSAVEL })
 
-  test('o item é o nome com a sigla, e os campos aparecem legíveis', () => {
-    expect(nomeDoItem(criado)).toBe('Pessoa Fictícia — CEE')
-    expect(descreverEstadoDoCadastro(RESPONSAVEL)).toBe('Setor: CEE; Nome: Pessoa Fictícia; E-mail: pessoa@exemplo.com; Cargo: —')
+  test('o item é a linha simples, e a ação usa o texto comum', () => {
+    expect(nomeDoItem(criado)).toBe('Registro de responsável do setor (recurso retirado da plataforma)')
     expect(textoDaAcaoDoCadastro('criar', 'responsavel_do_setor')).toBe('Criou')
+    expect(ehRecursoRetirado('responsavel_do_setor')).toBe(true)
+    expect(ehRecursoRetirado('setor')).toBe(false)
   })
 
-  test('o evento entra no filtro pelo setor', () => {
-    expect(itensDoFiltro([criado])).toEqual([{ id: 's1', nome: 'CEE' }])
+  test('fica fora da lista do filtro, mas aparece quando o setor é escolhido', () => {
+    expect(itensDoFiltro([criado])).toEqual([])
     expect(eventosDoItem([criado], 's1')).toEqual([criado])
   })
 
-  test('a exclusão do setor lista os responsáveis pelo nome', () => {
+  test('a exclusão antiga do setor ainda lista os responsáveis pelo nome', () => {
     expect(descreverEstadoDoCadastro({ sigla: 'CEE', responsaveis: [RESPONSAVEL, { nome: 'Outra Fictícia' }] }))
       .toBe('Sigla: CEE; Responsáveis: Pessoa Fictícia, Outra Fictícia')
     expect(descreverEstadoDoCadastro({ sigla: 'CEE', responsaveis: [] })).toBe('Sigla: CEE; Responsáveis: nenhum')

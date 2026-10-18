@@ -178,19 +178,6 @@ test('as etapas do setor aparecem no Histórico com o texto da ação e a nota, 
   expect(screen.getAllByRole('listitem')[0].textContent).toContain('Dispensou a etapa')
 })
 
-test('os responsáveis do setor aparecem no Histórico e entram no filtro pelo setor', async () => {
-  const RESPONSAVEL = { setor_id: 's1', setor_sigla: 'TSA', nome: 'Ana Teste', email: null, cargo: 'Chefe de Teste' }
-  montar('consulta', [
-    evento(9, { acao: 'criar', entidade: 'responsavel_do_setor', entidadeRef: 's1:r1', depois: RESPONSAVEL }),
-    ...EVENTOS,
-  ])
-  const itens = await itensDaLista()
-  expect(itens[0].textContent).toContain('Criou Ana Teste — TSA')
-  expect(itens[0].textContent).toContain('Cargo: Chefe de Teste')
-  fireEvent.change(screen.getByRole('combobox', { name: 'Item' }), { target: { value: 's1' } })
-  expect(screen.getAllByRole('listitem')[0].textContent).toContain('Criou Ana Teste')
-})
-
 test('um processo excluído continua no Histórico, com o que tinha, inclusive as etapas', async () => {
   const antes = {
     nome: 'Emitir Ofício', setor_sigla: 'TSA', macroprocesso_nome: 'Macro Teste Um', tipo: 'a_classificar', origem: 'novo',

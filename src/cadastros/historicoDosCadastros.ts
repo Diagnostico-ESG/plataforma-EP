@@ -55,8 +55,8 @@ const TEXTOS_DA_ENTIDADE: Record<string, Record<string, string>> = {
 // Macroprocesso e etapa do catálogo aparecem como "código — nome".
 const ENTIDADES_COM_CODIGO = new Set(['macroprocesso', 'etapa'])
 
-// Vínculos, etapas e responsáveis do setor têm a referência 'idA:idB': o item do filtro sai dos ids gravados no evento.
-const ENTIDADES_QUE_LIGAM = new Set(['setor_envolvido', 'andamento', 'responsavel_do_setor'])
+// Vínculos e etapas têm a referência 'idA:idB': o item do filtro sai dos ids gravados no evento.
+const ENTIDADES_QUE_LIGAM = new Set(['setor_envolvido', 'andamento'])
 
 const ROTULO_DO_CAMPO: Record<string, string> = {
   sigla: 'Sigla', nome: 'Nome', observacoes: 'Observações', ativo: 'Situação', codigo: 'Código', descricao: 'Descrição',
@@ -97,16 +97,22 @@ function codigoENome(codigo: unknown, nome: unknown): string {
   return typeof codigo === 'string' && codigo !== '' ? `${codigo} — ${texto(nome)}` : texto(nome)
 }
 
-/** A área Reuniões saiu da plataforma (ADR 0013); os eventos dela ficam no histórico, numa linha sem o detalhe. */
-export const TEXTO_DA_REUNIAO_RETIRADA = 'Registro de reunião (recurso retirado da plataforma)'
+/** Recursos que saíram da plataforma (ADR 0013): os eventos ficam no histórico, numa linha sem o detalhe. */
+const TEXTO_DO_RECURSO_RETIRADO: Record<string, string> = {
+  reuniao: 'Registro de reunião (recurso retirado da plataforma)',
+  responsavel_do_setor: 'Registro de responsável do setor (recurso retirado da plataforma)',
+}
 
-// Etapa e responsável pertencem a um setor (a etapa, também a um processo): o nome vem com o dono; a versão vem com o
-// processo dela; a reunião antiga é a linha simples; null se o item não for de nenhum deles.
+export function ehRecursoRetirado(entidade: string): boolean {
+  return entidade in TEXTO_DO_RECURSO_RETIRADO
+}
+
+// A etapa pertence a um setor ou a um processo: o nome vem com o dono; a versão vem com o processo dela; os recursos
+// retirados são a linha simples; null se o item não for de nenhum deles.
 function nomeDoItemComDono(entidade: string, estado: Record<string, unknown>): string | null {
-  if (entidade === 'reuniao') return TEXTO_DA_REUNIAO_RETIRADA
+  if (ehRecursoRetirado(entidade)) return TEXTO_DO_RECURSO_RETIRADO[entidade]
   if (entidade === 'versao') return `${texto(estado.rotulo)} — ${texto(estado.processo_nome)}`
-  const nomes: Record<string, unknown> = { andamento: estado.etapa_nome, responsavel_do_setor: estado.nome }
-  const nome = nomes[entidade]
+  const nome = entidade === 'andamento' ? estado.etapa_nome : null
   if (typeof nome !== 'string') return null
   return `${nome} — ${texto(estado.processo_nome ?? estado.setor_sigla)}`
 }
@@ -182,9 +188,9 @@ function itensDoVinculo(evento: EventoDoCadastro): [string, string][] {
   return pares.filter((par): par is [string, string] => typeof par[0] === 'string' && typeof par[1] === 'string')
 }
 
-// Vínculos entram pelos ids que citam; reuniões antigas ficam fora, porque todas teriam o mesmo nome no filtro.
+// Vínculos entram pelos ids que citam; recursos retirados ficam fora, porque todos teriam o mesmo nome no filtro.
 function temItemProprio(evento: EventoDoCadastro): boolean {
-  return !ENTIDADES_QUE_LIGAM.has(evento.entidade) && evento.entidade !== 'reuniao'
+  return !ENTIDADES_QUE_LIGAM.has(evento.entidade) && !ehRecursoRetirado(evento.entidade)
 }
 
 /** Eventos da mais recente para a mais antiga: a primeira ocorrência de cada item dá o nome dele. */

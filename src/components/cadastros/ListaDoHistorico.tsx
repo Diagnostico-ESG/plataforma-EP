@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { AUTOR_DIRETO_NO_BANCO, formatarMomento } from '../../acesso/historico'
 import {
-  descreverEstadoDoCadastro, eventosDoItem, itensDoFiltro, nomeDoItem, rotuloDoMotivo, textoDaAcaoDoCadastro,
+  descreverEstadoDoCadastro, ehRecursoRetirado, eventosDoItem, itensDoFiltro, nomeDoItem, rotuloDoMotivo, textoDaAcaoDoCadastro,
 } from '../../cadastros/historicoDosCadastros'
 import type { EventoDoCadastro } from '../../cadastros/tipos'
 import { apenasOQueMudou } from '../../cadastros/apenasOQueMudou'
@@ -37,8 +37,8 @@ export function EventoDoHistorico({ evento }: { evento: EventoDoCadastro }) {
       <time dateTime={evento.ocorridoEm}>{formatarMomento(evento.ocorridoEm)}</time>
       <span>{evento.autor ?? AUTOR_DIRETO_NO_BANCO}</span>
       <span><strong>{textoDaAcaoDoCadastro(evento.acao, evento.entidade)}</strong> {nomeDoItem(evento)}</span>
-      {/* O registro antigo de reunião mostra só data, autor e ação: o recurso saiu da plataforma (ADR 0013). */}
-      {evento.entidade !== 'reuniao' && <MudancaDoEvento evento={evento} />}
+      {/* O registro de um recurso retirado mostra só data, autor e ação (ADR 0013). */}
+      {!ehRecursoRetirado(evento.entidade) && <MudancaDoEvento evento={evento} />}
     </li>
   )
 }

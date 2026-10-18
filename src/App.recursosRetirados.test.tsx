@@ -3,7 +3,8 @@ import { afterEach, expect, test } from 'vitest'
 import type { EventoDoCadastro } from './cadastros/tipos'
 import { montarNosCadastros } from './testes/processosNosCadastros'
 
-// A área Reuniões saiu da plataforma (reunioes, ticket 05; ADR 0013): sobra só a data no processo.
+// Recursos que saíram da plataforma (ADR 0013): a área Reuniões (reunioes, ticket 05; sobra só a data no processo) e
+// os responsáveis do setor (processos-etapas, ticket 11).
 afterEach(() => {
   cleanup()
   window.location.hash = ''
@@ -12,6 +13,11 @@ afterEach(() => {
 const REUNIAO_ANTIGA: EventoDoCadastro = {
   id: 9, ocorridoEm: '2026-10-13T15:00:00Z', autor: 'Pessoa Fictícia', acao: 'criar', entidade: 'reuniao', entidadeRef: 'r1',
   antes: null, depois: { tipo: 'modelagem', data: '2026-10-14', setor_sigla: 'TSA', local: 'Sala 1' },
+}
+
+const RESPONSAVEL_ANTIGO: EventoDoCadastro = {
+  id: 10, ocorridoEm: '2026-10-13T16:00:00Z', autor: 'Pessoa Fictícia', acao: 'criar', entidade: 'responsavel_do_setor',
+  entidadeRef: 's1:r1', antes: null, depois: { setor_id: 's1', setor_sigla: 'TSA', nome: 'Ana Teste', email: null, cargo: 'Chefe' },
 }
 
 test('a faixa lateral não tem mais o item Reuniões', async () => {
@@ -56,5 +62,18 @@ test('no histórico geral, o registro antigo de reunião aparece numa linha simp
   expect(item.textContent).toMatch(/13\/10\/2026/)
   expect(item.textContent).not.toContain('Antes:')
   expect(item.textContent).not.toContain('Depois:')
+  expect(within(filtro).getAllByRole('option').map((opcao) => opcao.textContent)).toEqual(['Todos os itens'])
+})
+
+test('no histórico geral, o registro antigo de responsável do setor aparece numa linha simples, fora do filtro', async () => {
+  window.location.hash = '#/setores/historico'
+  montarNosCadastros({ ajustarCadastros: (cadastros) => { cadastros.historico = [RESPONSAVEL_ANTIGO] } })
+  const filtro = await screen.findByRole('combobox', { name: 'Item' })
+  const [item] = screen.getAllByRole('listitem')
+  expect(item.textContent).toContain('Criou Registro de responsável do setor (recurso retirado da plataforma)')
+  expect(within(item).getByText('Pessoa Fictícia')).toBeTruthy()
+  expect(item.textContent).toMatch(/13\/10\/2026/)
+  expect(item.textContent).not.toContain('Ana Teste')
+  expect(item.textContent).not.toContain('Antes:')
   expect(within(filtro).getAllByRole('option').map((opcao) => opcao.textContent)).toEqual(['Todos os itens'])
 })
