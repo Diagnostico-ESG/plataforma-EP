@@ -15,6 +15,7 @@ import { EstruturaDoProcesso } from './EstruturaDoProcesso'
 import { fecharComEsc } from './fecharComEsc'
 import { FormularioDoProcesso } from './FormularioDoProcesso'
 import { HistoricoDoProcesso } from './HistoricoDoProcesso'
+import { ReuniaoDoProcesso } from './ReuniaoDoProcesso'
 import './Painel.css'
 
 type PainelDoProcessoProps = {
@@ -146,6 +147,8 @@ function DetalhesDoProcesso(props: ProcessoAbertoProps) {
             aoCancelar={() => setEditando(false)} />
         : <DadosLidos processo={processo} />}
       <EstruturaDoProcesso processo={processo} enderecoDoProcesso={enderecoDoProcesso} />
+      <ReuniaoDoProcesso processo={processo} processos={processos} podeAlterar={podeAlterar} aoMudar={aposMudar}
+        aoSumir={aoSumir} />
       <SecaoDeVersoes versoes={versoes} processo={processo} podeAlterar={podeAlterar} />
       {podeAlterar && !editando && (
         <AcoesDoProcesso processo={processo} processos={processos} aoEditar={() => setEditando(true)}

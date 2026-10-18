@@ -237,3 +237,17 @@
 .janela-reclassificacao .processo-aviso {
   margin-top: var(--esp-3);
 }
+
+/* O campo e os botões da reunião ficam logo abaixo da linha, como o formulário de datas da etapa. */
+.reuniao-edicao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-2) var(--esp-3);
+  margin-top: var(--esp-2);
+}
+
+.reuniao-edicao .cadastros-falha {
+  flex-basis: 100%;
+  margin: 0;
+}
