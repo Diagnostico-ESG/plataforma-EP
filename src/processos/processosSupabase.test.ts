@@ -45,13 +45,6 @@ test('dispensar etapa obrigatória vira a frase da spec', async () => {
     .toThrow('A etapa Identificação dos processos é obrigatória e não pode ser dispensada.')
 })
 
-test('iniciar a primeira etapa com o setor pendente vira a frase com a sigla', async () => {
-  const cliente = clienteQueRecusa({ message: 'setor_nao_resolveu:TSA', code: 'P0001' })
-  const falha = await criar(cliente).iniciarEtapa('a4').catch((erro: unknown) => erro)
-  expect(falha).toBeInstanceOf(TravaDoBanco)
-  expect((falha as Error).message).toBe('O setor TSA ainda não resolveu as etapas do setor.')
-})
-
 test('segunda etapa em andamento vira a frase com o nome da que está em andamento', async () => {
   const cliente = clienteQueRecusa({ message: 'ja_ha_etapa_em_andamento:Reunião de modelagem', code: 'P0001' })
   await expect(criar(cliente).iniciarEtapa('a5')).rejects

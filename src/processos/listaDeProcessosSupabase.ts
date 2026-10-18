@@ -18,8 +18,7 @@ async function lerProcessos(cliente: ClienteSupabase): Promise<ProcessoDaLista[]
 }
 
 async function lerEtapasDoCatalogo(cliente: ClienteSupabase): Promise<EtapaDoCatalogo[]> {
-  const { data, error } = await cliente.from('etapas').select('id, codigo, nome, ordem, ativa')
-    .eq('nivel', 'processo').order('ordem')
+  const { data, error } = await cliente.from('etapas').select('id, codigo, nome, ordem, ativa').order('ordem')
   if (error) throw new Error(`Falha ao ler o catálogo de etapas: ${error.message}`)
   return data
 }

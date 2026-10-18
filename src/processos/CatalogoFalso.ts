@@ -1,7 +1,7 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { recalcularProcesso } from './andamentoFalso'
-import { FRASE_DA_ORDEM_DOS_NIVEIS, fraseDaEtapaUsada, fraseDeCodigoRepetido, fraseDeNomeRepetido } from './frasesDoCatalogo'
+import { fraseDaEtapaUsada, fraseDeCodigoRepetido, fraseDeNomeRepetido } from './frasesDoCatalogo'
 import type {
   DadosDaEtapa, EtapaDoCatalogo, EtapaDoProcesso, EtapaDoCaminho, EtapaNoCatalogo, EtapaNova, ModuloDoCatalogo,
   ProcessoLido, SentidoDaOrdem, SituacaoDoProcesso,
@@ -27,14 +27,6 @@ function pendente(etapa: EtapaNoCatalogo, id: string): EtapaDoCaminho {
 
 function pendenteDoProcesso(etapa: EtapaNoCatalogo, id: string): EtapaDoProcesso {
   return { ...pendente(etapa, id), responsavelId: null, responsavelNome: null, responsavelInativo: false }
-}
-
-// Como o gatilho de comando do banco: nenhuma etapa do setor depois de uma do processo.
-function conferirOrdemDosNiveis(etapas: EtapaNoCatalogo[]): void {
-  const ultimaDoSetor = Math.max(0, ...etapas.filter((etapa) => etapa.nivel === 'setor').map((etapa) => etapa.ordem))
-  if (etapas.some((etapa) => etapa.nivel === 'processo' && etapa.ordem < ultimaDoSetor)) {
-    throw new TravaDoBanco(FRASE_DA_ORDEM_DOS_NIVEIS)
-  }
 }
 
 /** Implementação falsa do catálogo para os testes: muda as colunas do Quadro e o caminho dos processos do dono. */
@@ -64,7 +56,7 @@ export class CatalogoFalso implements ModuloDoCatalogo {
     const antes = this.etapas.find((etapa) => etapa.id === dados.antesDe)
     const posicao = antes?.ordem ?? Math.max(0, ...this.etapas.map((etapa) => etapa.ordem)) + 1
     const nova: EtapaNoCatalogo = {
-      id: `c${this.proximoId++}`, codigo: dados.codigo, nome: dados.nome.trim(), ordem: posicao, nivel: dados.nivel,
+      id: `c${this.proximoId++}`, codigo: dados.codigo, nome: dados.nome.trim(), ordem: posicao,
       obrigatoria: dados.obrigatoria, ativa: true,
     }
     const abertas = this.etapas.map((etapa) => (etapa.ordem >= posicao ? { ...etapa, ordem: etapa.ordem + 1 } : etapa))
@@ -134,11 +126,10 @@ export class CatalogoFalso implements ModuloDoCatalogo {
     if (outras.some((etapa) => etapa.codigo === codigo)) throw new TravaDoBanco(fraseDeCodigoRepetido(codigo ?? ''))
   }
 
-  // Confere a ordem dos níveis antes de gravar, e o Quadro passa a mostrar as etapas do processo na ordem nova.
+  // O Quadro passa a mostrar as etapas na ordem nova.
   private gravar(etapas: EtapaNoCatalogo[]): void {
-    conferirOrdemDosNiveis(etapas)
     this.etapas = etapas
-    this.dono.etapasDoCatalogo = etapas.filter((etapa) => etapa.nivel === 'processo').sort(porOrdem)
+    this.dono.etapasDoCatalogo = [...etapas].sort(porOrdem)
       .map(({ id, codigo, nome, ordem, ativa }) => ({ id, codigo, nome, ordem, ativa }))
   }
 
@@ -148,7 +139,6 @@ export class CatalogoFalso implements ModuloDoCatalogo {
   }
 
   private incluirPendentes(etapa: EtapaNoCatalogo): void {
-    if (etapa.nivel === 'setor') return
     this.dono.processos = this.dono.processos.map((processo) => {
       if (!SITUACOES_QUE_RECEBEM.has(processo.situacao) || processo.etapasDoProcesso.some((outra) => outra.codigo === etapa.codigo)) return processo
       return recalcularProcesso(processo, [...processo.etapasDoProcesso, pendenteDoProcesso(etapa, `a${this.proximoId++}`)].sort(porOrdem))
@@ -162,5 +152,4 @@ export class CatalogoFalso implements ModuloDoCatalogo {
       return restantes.length === processo.etapasDoProcesso.length ? processo : recalcularProcesso(processo, restantes)
     })
   }
-
 }

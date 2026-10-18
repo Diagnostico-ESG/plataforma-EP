@@ -20,18 +20,16 @@ export type OrigemDoProcesso = 'novo' | 'retomado'
 /** A situação calculada: "concluido" não é guardado, vem de as etapas obrigatórias estarem resolvidas. */
 export type SituacaoDoProcesso = 'em_andamento' | 'suspenso' | 'cancelado' | 'concluido'
 
-/** Uma etapa do catálogo de nível processo, como as colunas do Quadro a usam. */
+/** Uma etapa do catálogo, como as colunas do Quadro a usam. */
 export type EtapaDoCatalogo = { id: string; codigo: string; nome: string; ordem: number; ativa: boolean }
 
-export type NivelDaEtapa = 'setor' | 'processo'
-
-/** Uma etapa do catálogo como a Administração a mostra: ativa ou não, de qualquer nível. */
-export type EtapaNoCatalogo = EtapaDoCatalogo & { nivel: NivelDaEtapa; obrigatoria: boolean }
+/** Uma etapa do catálogo como a Administração a mostra: ativa ou não. */
+export type EtapaNoCatalogo = EtapaDoCatalogo & { obrigatoria: boolean }
 
 /** O que o formulário de etapa nova grava; `antesDe` null põe a etapa no fim. */
-export type EtapaNova = { codigo: string; nome: string; nivel: NivelDaEtapa; obrigatoria: boolean; antesDe: string | null }
+export type EtapaNova = { codigo: string; nome: string; obrigatoria: boolean; antesDe: string | null }
 
-/** O que a edição muda: código e nível não mudam depois de criados. */
+/** O que a edição muda: o código não muda depois de criado. */
 export type DadosDaEtapa = { nome: string; obrigatoria: boolean }
 
 export type SentidoDaOrdem = 'subir' | 'descer'
@@ -128,7 +126,7 @@ export type Reclassificacao = { tipo: Exclude<TipoDeProcesso, 'a_classificar'>; 
  * etapa, responsável ou processo que já não existe, como CadastroInexistente.
  */
 export type ModuloDeProcessos = {
-  /** Todos os processos por nome, mais as etapas de nível processo do catálogo, na ordem dele. */
+  /** Todos os processos por nome, mais as etapas do catálogo, na ordem dele. */
   listarProcessos(): Promise<ListaDeProcessos>
   /** null: o processo não existe (mais). */
   lerProcesso(id: string): Promise<ProcessoLido | null>

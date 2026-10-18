@@ -11,12 +11,11 @@ afterEach(() => {
 
 type Secao = ReturnType<typeof within>
 
-function preencherNova(secao: Secao, campos: { nome?: string; codigo?: string; nivel?: string; posicao?: string; obrigatoria?: boolean }) {
+function preencherNova(secao: Secao, campos: { nome?: string; codigo?: string; posicao?: string; obrigatoria?: boolean }) {
   fireEvent.click(secao.getByRole('button', { name: 'Nova etapa' }))
   const formulario = within(secao.getByRole('form', { name: 'Nova etapa' }))
   if (campos.nome !== undefined) fireEvent.change(formulario.getByLabelText('Nome'), { target: { value: campos.nome } })
   if (campos.codigo !== undefined) fireEvent.change(formulario.getByLabelText('Código'), { target: { value: campos.codigo } })
-  if (campos.nivel !== undefined) fireEvent.change(formulario.getByLabelText('Nível'), { target: { value: campos.nivel } })
   if (campos.posicao !== undefined) fireEvent.change(formulario.getByLabelText('Posição'), { target: { value: campos.posicao } })
   if (campos.obrigatoria) fireEvent.click(formulario.getByLabelText('Obrigatória'))
   return formulario
@@ -30,15 +29,16 @@ test('o administrador vê as abas Usuários e Catálogo de etapas, com Usuários
   expect(screen.getByRole('heading', { name: 'Usuários' })).toBeTruthy()
 })
 
-test('a lista mostra as etapas em ordem, com nível, obrigatória ou opcional e a pílula Inativa', async () => {
+test('a lista mostra as etapas em ordem, com obrigatória ou opcional e a pílula Inativa, sem a coluna "Nível"', async () => {
   montarComCatalogo()
   const secao = await abrirCatalogo()
   expect(await linhasDoCatalogo(secao)).toEqual([
-    expect.stringMatching(/^Identificação dos processosSetorObrigatória/),
-    expect.stringMatching(/^Reunião de modelagemProcessoObrigatória/),
-    expect.stringMatching(/^PublicaçãoProcessoOpcional/),
-    expect.stringMatching(/^ArquivamentoInativaProcessoOpcional/),
+    expect.stringMatching(/^Modelagem pilotoObrigatória/),
+    expect.stringMatching(/^Relatório e modelagem técnicaObrigatória/),
+    expect.stringMatching(/^PublicaçãoOpcional/),
+    expect.stringMatching(/^ArquivamentoInativaOpcional/),
   ])
+  expect(secao.queryByRole('columnheader', { name: 'Nível' })).toBeNull()
   expect(secao.getByRole('button', { name: 'Reativar Arquivamento' })).toBeTruthy()
   expect(secao.getByRole('button', { name: 'Desativar Publicação' })).toBeTruthy()
 })
@@ -72,18 +72,21 @@ test('Nova etapa antes de outra entra na posição escolhida', async () => {
   const formulario = preencherNova(secao, { nome: 'Revisão técnica', codigo: 'revisao_tecnica', posicao: 'e9', obrigatoria: true })
   fireEvent.click(formulario.getByRole('button', { name: 'Salvar' }))
   await waitFor(() => expect(secao.queryByRole('form', { name: 'Nova etapa' })).toBeNull())
-  expect((await linhasDoCatalogo(secao))[2]).toMatch(/^Revisão técnicaProcessoObrigatória/)
+  expect((await linhasDoCatalogo(secao))[2]).toMatch(/^Revisão técnicaObrigatória/)
 })
 
-test('Nova etapa vai para o fim por padrão, com o nível escolhido', async () => {
+test('Nova etapa vai para o fim por padrão, sem o campo "Nível"', async () => {
   const processos = montarComCatalogo()
   const secao = await abrirCatalogo()
   await secao.findAllByRole('row')
   const formulario = preencherNova(secao, { nome: 'Encerramento', codigo: 'encerramento' })
+  expect(formulario.queryByLabelText('Nível')).toBeNull()
   expect((formulario.getByLabelText('Posição') as HTMLSelectElement).value).toBe('')
   fireEvent.click(formulario.getByRole('button', { name: 'Salvar' }))
   await waitFor(() => expect(processos.catalogo.etapas).toHaveLength(5))
-  expect(processos.catalogo.etapas.at(-1)).toMatchObject({ codigo: 'encerramento', nivel: 'processo', obrigatoria: false, ordem: 11 })
+  expect(processos.catalogo.etapas.at(-1)).toEqual({
+    id: expect.any(String), codigo: 'encerramento', nome: 'Encerramento', obrigatoria: false, ordem: 8, ativa: true,
+  })
 })
 
 test('código fora do formato é recusado na tela, com o valor recebido, sem gravar', async () => {
@@ -115,15 +118,6 @@ test('falha ao gravar mostra o motivo e mantém os dados no formulário', async 
   expect((await formulario.findByRole('alert')).textContent)
     .toBe('A alteração não foi salva: sem conexão. Seus dados continuam no formulário.')
   expect((formulario.getByLabelText('Nome') as HTMLInputElement).value).toBe('Encerramento')
-})
-
-test('etapa do setor depois das do processo é recusada com a frase da spec', async () => {
-  montarComCatalogo()
-  const secao = await abrirCatalogo()
-  await secao.findAllByRole('row')
-  const formulario = preencherNova(secao, { nome: 'Contato final', codigo: 'contato_final', nivel: 'setor' })
-  fireEvent.click(formulario.getByRole('button', { name: 'Salvar' }))
-  expect((await formulario.findByRole('alert')).textContent).toBe('As etapas do setor precisam vir antes das etapas do processo.')
 })
 
 test('a recusa pronta do banco aparece como veio', async () => {

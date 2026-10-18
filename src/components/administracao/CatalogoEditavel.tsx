@@ -60,6 +60,6 @@ function dadosDaEdicao({ nome, obrigatoria }: DadosDoFormularioDaEtapa): DadosDa
   return { nome, obrigatoria }
 }
 
-function etapaNova({ nome, codigo, nivel, obrigatoria, antesDe }: DadosDoFormularioDaEtapa): EtapaNova {
-  return { nome, codigo, nivel, obrigatoria, antesDe }
+function etapaNova({ nome, codigo, obrigatoria, antesDe }: DadosDoFormularioDaEtapa): EtapaNova {
+  return { nome, codigo, obrigatoria, antesDe }
 }

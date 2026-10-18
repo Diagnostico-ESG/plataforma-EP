@@ -135,7 +135,6 @@ test('resolvidas as obrigatórias, a pílula Concluído aparece no painel e o ca
 })
 
 const RECUSAS = [
-  'O setor TSA ainda não resolveu as etapas do setor.',
   'Já há uma etapa em andamento neste processo: Reunião de modelagem.',
   'A etapa Reunião de modelagem ainda não foi resolvida.',
   'A etapa Publicação é obrigatória e não pode ser dispensada.',

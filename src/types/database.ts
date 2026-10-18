@@ -45,10 +45,9 @@ export type Database = {
           id: string
           iniciada_em: string | null
           nota: string | null
-          processo_id: string | null
+          processo_id: string
           resolvida_em: string | null
           responsavel_id: string | null
-          setor_id: string | null
           status: Database["public"]["Enums"]["status_da_etapa"]
         }
         Insert: {
@@ -56,10 +55,9 @@ export type Database = {
           id?: string
           iniciada_em?: string | null
           nota?: string | null
-          processo_id?: string | null
+          processo_id: string
           resolvida_em?: string | null
           responsavel_id?: string | null
-          setor_id?: string | null
           status?: Database["public"]["Enums"]["status_da_etapa"]
         }
         Update: {
@@ -67,10 +65,9 @@ export type Database = {
           id?: string
           iniciada_em?: string | null
           nota?: string | null
-          processo_id?: string | null
+          processo_id?: string
           resolvida_em?: string | null
           responsavel_id?: string | null
-          setor_id?: string | null
           status?: Database["public"]["Enums"]["status_da_etapa"]
         }
         Relationships: [
@@ -107,13 +104,6 @@ export type Database = {
             columns: ["responsavel_id"]
             isOneToOne: false
             referencedRelation: "usuarios"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "andamentos_setor_id_fkey"
-            columns: ["setor_id"]
-            isOneToOne: false
-            referencedRelation: "setores"
             referencedColumns: ["id"]
           },
         ]
@@ -217,7 +207,6 @@ export type Database = {
           codigo: string
           criado_em: string
           id: string
-          nivel: Database["public"]["Enums"]["nivel_da_etapa"]
           nome: string
           obrigatoria: boolean
           ordem: number
@@ -227,7 +216,6 @@ export type Database = {
           codigo: string
           criado_em?: string
           id?: string
-          nivel: Database["public"]["Enums"]["nivel_da_etapa"]
           nome: string
           obrigatoria: boolean
           ordem: number
@@ -237,7 +225,6 @@ export type Database = {
           codigo?: string
           criado_em?: string
           id?: string
-          nivel?: Database["public"]["Enums"]["nivel_da_etapa"]
           nome?: string
           obrigatoria?: boolean
           ordem?: number
@@ -631,7 +618,6 @@ export type Database = {
     Views: {
       processos_com_andamento: {
         Row: {
-          aguardando_o_setor: boolean | null
           contexto: string | null
           criado_em: string | null
           data_da_reuniao: string | null
@@ -709,7 +695,6 @@ export type Database = {
         Args: {
           p_antes_de: string
           p_codigo: string
-          p_nivel: Database["public"]["Enums"]["nivel_da_etapa"]
           p_nome: string
           p_obrigatoria: boolean
         }
@@ -785,7 +770,6 @@ export type Database = {
     }
     Enums: {
       categoria_macroprocesso: "finalistico" | "apoio" | "gerencial"
-      nivel_da_etapa: "setor" | "processo"
       origem_do_processo: "novo" | "retomado"
       papel_do_arquivo: "bpmn" | "png" | "bpm" | "relatorio"
       perfil: "administrador" | "integrante_ep" | "consulta"
@@ -928,7 +912,6 @@ export const Constants = {
   public: {
     Enums: {
       categoria_macroprocesso: ["finalistico", "apoio", "gerencial"],
-      nivel_da_etapa: ["setor", "processo"],
       origem_do_processo: ["novo", "retomado"],
       papel_do_arquivo: ["bpmn", "png", "bpm", "relatorio"],
       perfil: ["administrador", "integrante_ep", "consulta"],

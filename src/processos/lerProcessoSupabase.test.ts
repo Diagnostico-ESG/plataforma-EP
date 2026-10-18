@@ -9,7 +9,7 @@ const LINHA = {
   situacao_guardada: 'em_andamento', motivo_da_situacao: null, contexto: 'Contexto inventado', observacoes: null,
   criado_em: '2026-10-14T10:00:00Z', setor_id: 's1', setor_sigla: 'TSA', macroprocesso_id: 'm1',
   macroprocesso_nome: 'Macro de Teste', situacao: 'em_andamento', etapa_atual_id: 'e4', etapa_atual_codigo: 'modelagem',
-  etapa_atual_nome: 'Reunião de modelagem', etapa_atual_ordem: 4, aguardando_o_setor: false,
+  etapa_atual_nome: 'Reunião de modelagem', etapa_atual_ordem: 4,
   responsavel_id: null, responsavel_nome: null, responsavel_foto_url: null,
 }
 const MODELAGEM = {

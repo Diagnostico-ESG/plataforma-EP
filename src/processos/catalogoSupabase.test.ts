@@ -7,9 +7,9 @@ import type { Database } from '../types/database'
 import { criarProcessosSupabase } from './processosSupabase'
 
 const MODELAGEM = {
-  id: 'e4', codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, nivel: 'processo', obrigatoria: true, ativa: true,
+  id: 'e4', codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, obrigatoria: true, ativa: true,
 }
-const NOVA = { codigo: 'nova', nome: 'Nova', nivel: 'processo' as const, obrigatoria: false, antesDe: null }
+const NOVA = { codigo: 'nova', nome: 'Nova', obrigatoria: false, antesDe: null }
 
 function criar(cliente: ClienteSupabaseFalso) {
   return criarProcessosSupabase(cliente as unknown as SupabaseClient<Database>).catalogo
@@ -20,7 +20,7 @@ test('lista o catálogo inteiro em ordem', async () => {
   cliente.respostas['etapas.select'] = { data: [MODELAGEM], error: null }
   expect(await criar(cliente).listarCatalogo()).toEqual([MODELAGEM])
   expect(cliente.pedidos[0]).toMatchObject({
-    tabela: 'etapas', colunas: 'id, codigo, nome, ordem, nivel, obrigatoria, ativa', ordem: [['ordem', true]],
+    tabela: 'etapas', colunas: 'id, codigo, nome, ordem, obrigatoria, ativa', ordem: [['ordem', true]],
   })
 })
 
@@ -36,7 +36,7 @@ test('acrescentar chama a função do banco; "No fim" vai como posição nula', 
   await criar(cliente).acrescentarEtapa({ ...NOVA, antesDe: 'e9' })
   expect(cliente.pedidos).toMatchObject([
     { tabela: 'rpc', operacao: 'acrescentar_etapa', valores: {
-      p_codigo: 'nova', p_nome: 'Nova', p_nivel: 'processo', p_obrigatoria: false, p_antes_de: null } },
+      p_codigo: 'nova', p_nome: 'Nova', p_obrigatoria: false, p_antes_de: null } },
     { tabela: 'rpc', operacao: 'acrescentar_etapa', valores: { p_antes_de: 'e9' } },
   ])
 })
@@ -66,7 +66,6 @@ test('editar, desativar, reativar e excluir mexem só na etapa escolhida', async
 
 test.each([
   ['etapa_usada:Reunião de modelagem', 'A etapa Reunião de modelagem já foi usada; desative-a em vez de excluir.'],
-  ['etapas_do_setor_primeiro', 'As etapas do setor precisam vir antes das etapas do processo.'],
 ])('a recusa "%s" do banco vira a frase da spec', async (mensagem, frase) => {
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas['etapas.delete'] = { data: null, error: { message: mensagem, code: 'P0001' } }

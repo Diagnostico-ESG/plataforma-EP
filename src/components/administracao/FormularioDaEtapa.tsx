@@ -1,6 +1,6 @@
 import { type FormEvent, useId, useState } from 'react'
 import { textoDaFalhaNoFormulario } from '../../acesso/falhasDeGravacao'
-import type { EtapaNoCatalogo, NivelDaEtapa } from '../../processos/tipos'
+import type { EtapaNoCatalogo } from '../../processos/tipos'
 import { problemaNaEtapa } from '../../processos/validacaoDaEtapa'
 import { CamposDaEtapaNova } from './CamposDaEtapaNova'
 
@@ -8,7 +8,6 @@ import { CamposDaEtapaNova } from './CamposDaEtapaNova'
 export type DadosDoFormularioDaEtapa = {
   nome: string
   codigo: string
-  nivel: NivelDaEtapa
   obrigatoria: boolean
   antesDe: string | null
 }
@@ -25,7 +24,6 @@ type FormularioDaEtapaProps = {
 export function FormularioDaEtapa({ titulo, inicial, etapas, aoSalvar, aoCancelar }: FormularioDaEtapaProps) {
   const [nome, setNome] = useState(inicial?.nome ?? '')
   const [codigo, setCodigo] = useState('')
-  const [nivel, setNivel] = useState<NivelDaEtapa>('processo')
   const [posicao, setPosicao] = useState('')
   const [obrigatoria, setObrigatoria] = useState(inicial?.obrigatoria ?? false)
   const [aviso, setAviso] = useState<string | null>(null)
@@ -39,7 +37,7 @@ export function FormularioDaEtapa({ titulo, inicial, etapas, aoSalvar, aoCancela
     if (problema) return
     setEnviando(true)
     try {
-      await aoSalvar({ nome: nome.trim(), codigo, nivel, obrigatoria, antesDe: posicao === '' ? null : posicao })
+      await aoSalvar({ nome: nome.trim(), codigo, obrigatoria, antesDe: posicao === '' ? null : posicao })
     } catch (erro) {
       setAviso(textoDaFalhaNoFormulario(erro))
     }
@@ -51,8 +49,8 @@ export function FormularioDaEtapa({ titulo, inicial, etapas, aoSalvar, aoCancela
       <h4 className="form-setor-titulo">{titulo}</h4>
       <label htmlFor={`${id}-nome`}>Nome</label>
       <input id={`${id}-nome`} value={nome} maxLength={200} autoComplete="off" onChange={(e) => setNome(e.target.value)} />
-      {!inicial && <CamposDaEtapaNova id={id} etapas={etapas} codigo={codigo} nivel={nivel} posicao={posicao}
-        aoMudarCodigo={setCodigo} aoMudarNivel={setNivel} aoMudarPosicao={setPosicao} />}
+      {!inicial && <CamposDaEtapaNova id={id} etapas={etapas} codigo={codigo} posicao={posicao}
+        aoMudarCodigo={setCodigo} aoMudarPosicao={setPosicao} />}
       <label className="campo-marcar">
         <input type="checkbox" checked={obrigatoria} onChange={(e) => setObrigatoria(e.target.checked)} /> Obrigatória
       </label>

@@ -13,7 +13,7 @@ afterEach(() => {
   window.location.hash = ''
 })
 
-const [, MODELAGEM, PUBLICACAO] = ETAPAS_DE_TESTE
+const [MODELAGEM, , PUBLICACAO] = ETAPAS_DE_TESTE
 
 function etapa(doCatalogo: EtapaNoCatalogo, status: EtapaDoProcesso['status']): EtapaDoProcesso {
   return {
@@ -36,8 +36,7 @@ function processo(id: string, nome: string, situacao: SituacaoDoProcesso, status
 // O Quadro e o painel leem o catálogo de processos que o falso mantém a cada gravação no catálogo.
 function montar(): ProcessosFalso {
   return montarComCatalogo({ ajustar: (processos) => {
-    processos.etapasDoCatalogo = ETAPAS_DE_TESTE.filter((outra) => outra.nivel === 'processo')
-      .map(({ id, codigo, nome, ordem, ativa }) => ({ id, codigo, nome, ordem, ativa }))
+    processos.etapasDoCatalogo = ETAPAS_DE_TESTE.map(({ id, codigo, nome, ordem, ativa }) => ({ id, codigo, nome, ordem, ativa }))
     processos.processos = [
       processo('p-andando', 'Andando', 'em_andamento', 'em_andamento'), processo('p-pronto', 'Pronto', 'concluido', 'concluida'),
     ]
@@ -85,8 +84,8 @@ test('etapa nova aparece no caminho do processo em andamento e não no do conclu
 test('a coluna da etapa desativada continua enquanto houver processo nela', async () => {
   const processos = montar()
   const secao = await abrirCatalogo()
-  fireEvent.click(await secao.findByRole('button', { name: 'Desativar Reunião de modelagem' }))
+  fireEvent.click(await secao.findByRole('button', { name: 'Desativar Modelagem piloto' }))
   await waitFor(() => expect(processos.etapasDoCatalogo.find((outra) => outra.codigo === 'modelagem')?.ativa).toBe(false))
   abrirEm(processos, '#/processos')
-  expect(await screen.findByRole('region', { name: 'Reunião de modelagem' })).toBeTruthy()
+  expect(await screen.findByRole('region', { name: 'Modelagem piloto' })).toBeTruthy()
 })

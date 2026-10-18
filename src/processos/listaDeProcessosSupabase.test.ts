@@ -9,7 +9,7 @@ const LINHA = {
   situacao_guardada: 'em_andamento', motivo_da_situacao: null, contexto: null, observacoes: null,
   criado_em: '2026-10-14T10:00:00Z', setor_id: 's1', setor_sigla: 'TSA', macroprocesso_id: 'm1',
   macroprocesso_nome: 'Macro de Teste', situacao: 'em_andamento', etapa_atual_id: 'e4', etapa_atual_codigo: 'modelagem',
-  etapa_atual_nome: 'Reunião de modelagem', etapa_atual_ordem: 4, aguardando_o_setor: false,
+  etapa_atual_nome: 'Reunião de modelagem', etapa_atual_ordem: 4,
   responsavel_id: 'u1', responsavel_nome: 'Ana Teste', responsavel_foto_url: null,
 }
 const ETAPA = { id: 'e4', codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, ativa: true }
@@ -33,7 +33,7 @@ test('lista os processos por nome e as etapas de nível processo na ordem do cat
   })
   expect(cliente.pedidos).toMatchObject([
     { tabela: 'processos_com_andamento', ordem: [['nome', true]] },
-    { tabela: 'etapas', filtro: ['nivel', 'processo'], ordem: [['ordem', true]] },
+    { tabela: 'etapas', ordem: [['ordem', true]] },
   ])
 })
 

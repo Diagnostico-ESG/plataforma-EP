@@ -7,12 +7,12 @@ import { ProcessosFalso } from '../processos/ProcessosFalso'
 import type { EtapaNoCatalogo } from '../processos/tipos'
 import { VersoesFalso } from '../versoes/VersoesFalso'
 
-/** Um catálogo inventado: uma etapa do setor, duas do processo e uma do processo desativada. */
+/** Um catálogo inventado: três etapas ativas, a Modelagem piloto em primeiro, e uma desativada. */
 export const ETAPAS_DE_TESTE: EtapaNoCatalogo[] = [
-  { id: 'e3', codigo: 'identificacao_processos', nome: 'Identificação dos processos', ordem: 3, nivel: 'setor', obrigatoria: true, ativa: true },
-  { id: 'e4', codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, nivel: 'processo', obrigatoria: true, ativa: true },
-  { id: 'e9', codigo: 'publicacao', nome: 'Publicação', ordem: 9, nivel: 'processo', obrigatoria: false, ativa: true },
-  { id: 'e10', codigo: 'arquivamento', nome: 'Arquivamento', ordem: 10, nivel: 'processo', obrigatoria: false, ativa: false },
+  { id: 'e1', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 1, obrigatoria: true, ativa: true },
+  { id: 'e2', codigo: 'relatorio_modelagem_tecnica', nome: 'Relatório e modelagem técnica', ordem: 2, obrigatoria: true, ativa: true },
+  { id: 'e9', codigo: 'publicacao', nome: 'Publicação', ordem: 6, obrigatoria: false, ativa: true },
+  { id: 'e10', codigo: 'arquivamento', nome: 'Arquivamento', ordem: 7, obrigatoria: false, ativa: false },
 ]
 
 type MontagemDoCatalogo = { perfil?: Perfil; ajustar?: (processos: ProcessosFalso) => void }

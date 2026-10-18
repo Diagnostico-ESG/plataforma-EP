@@ -1,5 +1,6 @@
 import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, expect, test } from 'vitest'
+import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { ProcessosFalso } from './processos/ProcessosFalso'
 import type { ProcessoLido } from './processos/tipos'
 import { abrirCatalogo, linhasDoCatalogo, montarComCatalogo } from './testes/catalogoDeTeste'
@@ -26,7 +27,7 @@ test('Editar muda nome e obrigatória', async () => {
   fireEvent.click(formulario.getByLabelText('Obrigatória'))
   fireEvent.click(formulario.getByRole('button', { name: 'Salvar' }))
   await waitFor(() => expect(processos.catalogo.etapas[2]).toMatchObject({ nome: 'Publicação final', obrigatoria: true }))
-  expect((await linhasDoCatalogo(secao))[2]).toMatch(/^Publicação finalProcessoObrigatória/)
+  expect((await linhasDoCatalogo(secao))[2]).toMatch(/^Publicação finalObrigatória/)
 })
 
 test('falha ao editar mostra o motivo no formulário', async () => {
@@ -45,24 +46,26 @@ test('Subir e Descer trocam a etapa com a vizinha', async () => {
   const secao = await abrirCatalogo()
   fireEvent.click(await secao.findByRole('button', { name: 'Subir Publicação' }))
   await waitFor(() => expect(nomesEmOrdem(processos)[1]).toBe('Publicação'))
-  fireEvent.click(await secao.findByRole('button', { name: 'Descer Reunião de modelagem' }))
+  fireEvent.click(await secao.findByRole('button', { name: 'Descer Relatório e modelagem técnica' }))
   await waitFor(() => expect(nomesEmOrdem(processos)).toEqual([
-    'Identificação dos processos', 'Publicação', 'Arquivamento', 'Reunião de modelagem',
+    'Modelagem piloto', 'Publicação', 'Arquivamento', 'Relatório e modelagem técnica',
   ]))
-  await waitFor(async () => expect((await linhasDoCatalogo(secao))[3]).toMatch(/^Reunião de modelagem/))
+  await waitFor(async () => expect((await linhasDoCatalogo(secao))[3]).toMatch(/^Relatório e modelagem técnica/))
 })
 
 test('a recusa ao mover aparece em vermelho, ao lado da lista', async () => {
-  montarComCatalogo()
+  montarComCatalogo({ ajustar: (processos) => {
+    processos.catalogo.falhaDeGravacao = new TravaDoBanco('Seu perfil não permite alterar os processos.')
+  } })
   const secao = await abrirCatalogo()
-  fireEvent.click(await secao.findByRole('button', { name: 'Subir Reunião de modelagem' }))
-  expect((await secao.findByRole('alert')).textContent).toBe('As etapas do setor precisam vir antes das etapas do processo.')
+  fireEvent.click(await secao.findByRole('button', { name: 'Subir Relatório e modelagem técnica' }))
+  expect((await secao.findByRole('alert')).textContent).toBe('Seu perfil não permite alterar os processos.')
 })
 
 test('Subir fica desabilitado na primeira etapa e Descer na última', async () => {
   montarComCatalogo()
   const secao = await abrirCatalogo()
-  expect((await secao.findByRole('button', { name: 'Subir Identificação dos processos' })).hasAttribute('disabled')).toBe(true)
+  expect((await secao.findByRole('button', { name: 'Subir Modelagem piloto' })).hasAttribute('disabled')).toBe(true)
   expect(secao.getByRole('button', { name: 'Descer Arquivamento' }).hasAttribute('disabled')).toBe(true)
 })
 
@@ -72,7 +75,7 @@ test('Desativar e Reativar trocam a pílula Inativa', async () => {
   fireEvent.click(await secao.findByRole('button', { name: 'Desativar Publicação' }))
   await waitFor(async () => expect((await linhasDoCatalogo(secao))[2]).toMatch(/^PublicaçãoInativa/))
   fireEvent.click(secao.getByRole('button', { name: 'Reativar Arquivamento' }))
-  await waitFor(async () => expect((await linhasDoCatalogo(secao))[3]).toMatch(/^ArquivamentoProcesso/))
+  await waitFor(async () => expect((await linhasDoCatalogo(secao))[3]).toMatch(/^ArquivamentoOpcional/))
 })
 
 test('falha ao desativar mostra o motivo e não muda a lista', async () => {
@@ -102,13 +105,13 @@ test('Cancelar na confirmação não exclui', async () => {
   expect(processos.catalogo.etapas).toHaveLength(4)
 })
 
-// Um processo que já concluiu a Modelagem: a etapa está usada.
+// Um processo que já concluiu a Modelagem piloto: a etapa está usada.
 const PROCESSO_QUE_USOU_A_MODELAGEM: ProcessoLido = {
   id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
   macroprocessoNome: 'Macro', processoPaiId: null, situacao: 'em_andamento', etapaAtual: null, responsavel: null,
   origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null, processoPai: null, subprocessos: [],
   dataDaReuniao: null, etapasDoProcesso: [{
-    id: 'a1', codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, obrigatoria: true, status: 'concluida',
+    id: 'a1', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 1, obrigatoria: true, status: 'concluida',
     nota: null, iniciadaEm: '2026-10-01', resolvidaEm: '2026-10-02', responsavelId: null, responsavelNome: null,
     responsavelInativo: false,
   }],
@@ -119,8 +122,8 @@ test('excluir etapa já usada é recusado, sugerindo desativar', async () => {
     processos.processos = [PROCESSO_QUE_USOU_A_MODELAGEM]
   } })
   const secao = await abrirCatalogo()
-  fireEvent.click(await secao.findByRole('button', { name: 'Excluir Reunião de modelagem' }))
+  fireEvent.click(await secao.findByRole('button', { name: 'Excluir Modelagem piloto' }))
   fireEvent.click(janelaAberta().getByRole('button', { name: 'Excluir etapa' }))
   expect((await secao.findByRole('alert')).textContent)
-    .toBe('A etapa Reunião de modelagem já foi usada; desative-a em vez de excluir.')
+    .toBe('A etapa Modelagem piloto já foi usada; desative-a em vez de excluir.')
 })

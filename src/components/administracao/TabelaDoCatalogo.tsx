@@ -10,22 +10,19 @@ export type AcoesDoCatalogo = {
 
 type TabelaDoCatalogoProps = { etapas: EtapaNoCatalogo[]; acoes: AcoesDoCatalogo }
 
-const ROTULO_DO_NIVEL = { setor: 'Setor', processo: 'Processo' } as const
-
 export function TabelaDoCatalogo({ etapas, acoes }: TabelaDoCatalogoProps) {
   if (etapas.length === 0) return <p className="cadastros-vazio">Nenhuma etapa no catálogo ainda.</p>
   return (
     <table className="tabela-cadastros">
       <thead>
         <tr>
-          <th scope="col">Etapa</th><th scope="col">Nível</th><th scope="col">Obrigatória</th><th scope="col">Ações</th>
+          <th scope="col">Etapa</th><th scope="col">Obrigatória</th><th scope="col">Ações</th>
         </tr>
       </thead>
       <tbody>
         {etapas.map((etapa, posicao) => (
           <tr key={etapa.id}>
             <td>{etapa.nome}{!etapa.ativa && <Pilula situacao="neutra">Inativa</Pilula>}</td>
-            <td>{ROTULO_DO_NIVEL[etapa.nivel]}</td>
             <td>{etapa.obrigatoria ? 'Obrigatória' : 'Opcional'}</td>
             <td>
               <BotoesDaEtapa etapa={etapa} acoes={acoes}

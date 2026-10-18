@@ -4,7 +4,7 @@ import {
 import type { ClienteSupabase } from '../lib/supabase'
 import type { Database } from '../types/database'
 import { formatarData } from './caminhoDeEtapas'
-import { FRASE_DA_ORDEM_DOS_NIVEIS, fraseDaEtapaUsada } from './frasesDoCatalogo'
+import { fraseDaEtapaUsada } from './frasesDoCatalogo'
 import { FRASE_DO_PAI, fraseDeTipoInvalido, fraseDosSubprocessos } from './frasesDeReclassificacao'
 import { fraseDoProcessoComVersoes } from './frasesDeVersao'
 import { fraseDeSituacaoInvalida, fraseDoProcessoParado } from './frasesDeSituacao'
@@ -62,17 +62,16 @@ async function listarResponsaveisPossiveis(cliente: ClienteSupabase): Promise<Us
 // situacao_do_processo, subprocessos_e_reclassificacao, catalogo_de_etapas e versoes).
 // O motivo "motivo_obrigatorio" não tem valor; o valor vai até o fim da mensagem.
 const PADRAO_DA_RECUSA = new RegExp(
-  '\\b(anterior_nao_resolvida|etapa_obrigatoria|setor_nao_resolveu|ja_ha_etapa_em_andamento|etapa_nao_resolvida'
+  '\\b(anterior_nao_resolvida|etapa_obrigatoria|ja_ha_etapa_em_andamento|etapa_nao_resolvida'
   + '|motivo_obrigatorio|data_no_futuro|resolvida_antes_do_inicio|responsavel_invalido|processo_parado'
   + '|situacao_invalida|processo_com_subprocessos|pai_nao_e_processo|tipo_invalido'
-  + '|etapa_usada|etapas_do_setor_primeiro'
+  + '|etapa_usada'
   + '|processo_com_versoes)(?::(.*))?$', 'm')
 
 const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   anterior_nao_resolvida: (etapa) => `A etapa ${etapa} ainda não foi resolvida.`,
   etapa_nao_resolvida: (etapa) => `A etapa ${etapa} ainda não foi resolvida.`,
   etapa_obrigatoria: (etapa) => `A etapa ${etapa} é obrigatória e não pode ser dispensada.`,
-  setor_nao_resolveu: (sigla) => `O setor ${sigla} ainda não resolveu as etapas do setor.`,
   ja_ha_etapa_em_andamento: (etapa) => `Já há uma etapa em andamento neste processo: ${etapa}.`,
   motivo_obrigatorio: () => 'O motivo é obrigatório.',
   data_no_futuro: (data) => `A data ${formatarData(data)} está no futuro.`,
@@ -94,7 +93,6 @@ const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
     return fraseDeTipoInvalido(de, para)
   },
   etapa_usada: fraseDaEtapaUsada,
-  etapas_do_setor_primeiro: () => FRASE_DA_ORDEM_DOS_NIVEIS,
   processo_com_versoes: fraseDoProcessoComVersoes,
 }
 

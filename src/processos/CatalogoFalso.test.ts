@@ -3,16 +3,11 @@ import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { ProcessosFalso } from './ProcessosFalso'
 import type { EtapaDoProcesso, EtapaNoCatalogo, ProcessoLido, SituacaoDoProcesso } from './tipos'
 
-const IDENTIFICACAO: EtapaNoCatalogo = {
-  id: 'e3', codigo: 'identificacao_processos', nome: 'Identificação dos processos', ordem: 3, nivel: 'setor',
-  obrigatoria: true, ativa: true,
+const RELATORIO: EtapaNoCatalogo = {
+  id: 'e3', codigo: 'relatorio_modelagem_tecnica', nome: 'Relatório e modelagem técnica', ordem: 3, obrigatoria: true, ativa: true,
 }
-const MODELAGEM: EtapaNoCatalogo = {
-  id: 'e4', codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, nivel: 'processo', obrigatoria: true, ativa: true,
-}
-const PUBLICACAO: EtapaNoCatalogo = {
-  id: 'e9', codigo: 'publicacao', nome: 'Publicação', ordem: 9, nivel: 'processo', obrigatoria: false, ativa: true,
-}
+const MODELAGEM: EtapaNoCatalogo = { id: 'e4', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 4, obrigatoria: true, ativa: true }
+const PUBLICACAO: EtapaNoCatalogo = { id: 'e9', codigo: 'publicacao', nome: 'Publicação', ordem: 9, obrigatoria: false, ativa: true }
 
 function etapaDoProcesso(etapa: EtapaNoCatalogo, status: EtapaDoProcesso['status']): EtapaDoProcesso {
   return {
@@ -33,7 +28,7 @@ function processo(id: string, situacao: SituacaoDoProcesso, status: EtapaDoProce
 
 function montar(): ProcessosFalso {
   const falso = new ProcessosFalso()
-  falso.catalogo.etapas = [IDENTIFICACAO, MODELAGEM, PUBLICACAO]
+  falso.catalogo.etapas = [RELATORIO, MODELAGEM, PUBLICACAO]
   falso.processos = [
     processo('andando', 'em_andamento', 'em_andamento'), processo('parado', 'suspenso', 'pendente'),
     processo('pronto', 'concluido', 'concluida'), processo('cancelado', 'cancelado', 'pendente'),
@@ -47,21 +42,21 @@ const etapasDe = (falso: ProcessosFalso, id: string) => falso.processos.find((ou
 describe('acrescentar etapa', () => {
   test('antes de outra, abre espaço na ordem', async () => {
     const falso = montar()
-    await falso.catalogo.acrescentarEtapa({ codigo: 'nova', nome: 'Nova', nivel: 'processo', obrigatoria: true, antesDe: 'e9' })
+    await falso.catalogo.acrescentarEtapa({ codigo: 'nova', nome: 'Nova', obrigatoria: true, antesDe: 'e9' })
     expect((await falso.catalogo.listarCatalogo()).map(({ codigo, ordem }) => [codigo, ordem])).toEqual([
-      ['identificacao_processos', 3], ['modelagem', 4], ['nova', 9], ['publicacao', 10],
+      ['relatorio_modelagem_tecnica', 3], ['modelagem', 4], ['nova', 9], ['publicacao', 10],
     ])
   })
 
   test('no fim, fica depois da última', async () => {
     const falso = montar()
-    await falso.catalogo.acrescentarEtapa({ codigo: 'nova', nome: 'Nova', nivel: 'processo', obrigatoria: false, antesDe: null })
-    expect(codigos(await falso.catalogo.listarCatalogo())).toEqual(['identificacao_processos', 'modelagem', 'publicacao', 'nova'])
+    await falso.catalogo.acrescentarEtapa({ codigo: 'nova', nome: 'Nova', obrigatoria: false, antesDe: null })
+    expect(codigos(await falso.catalogo.listarCatalogo())).toEqual(['relatorio_modelagem_tecnica', 'modelagem', 'publicacao', 'nova'])
   })
 
   test('do processo: entra pendente nos processos em andamento e suspensos, não nos concluídos e cancelados', async () => {
     const falso = montar()
-    await falso.catalogo.acrescentarEtapa({ codigo: 'nova', nome: 'Nova', nivel: 'processo', obrigatoria: true, antesDe: null })
+    await falso.catalogo.acrescentarEtapa({ codigo: 'nova', nome: 'Nova', obrigatoria: true, antesDe: null })
     expect(etapasDe(falso, 'andando').find((etapa) => etapa.codigo === 'nova')?.status).toBe('pendente')
     expect(codigos(etapasDe(falso, 'parado'))).toContain('nova')
     expect(codigos(etapasDe(falso, 'pronto'))).not.toContain('nova')
@@ -70,25 +65,19 @@ describe('acrescentar etapa', () => {
 
   test('do processo: vira coluna do Quadro', async () => {
     const falso = montar()
-    await falso.catalogo.acrescentarEtapa({ codigo: 'nova', nome: 'Nova', nivel: 'processo', obrigatoria: true, antesDe: null })
-    expect(codigos(falso.etapasDoCatalogo)).toEqual(['modelagem', 'publicacao', 'nova'])
-  })
-
-  test('do setor depois de uma do processo é recusada', async () => {
-    const falso = montar()
-    await expect(falso.catalogo.acrescentarEtapa({ codigo: 'nova', nome: 'Nova', nivel: 'setor', obrigatoria: false, antesDe: null }))
-      .rejects.toThrow(new TravaDoBanco('As etapas do setor precisam vir antes das etapas do processo.'))
+    await falso.catalogo.acrescentarEtapa({ codigo: 'nova', nome: 'Nova', obrigatoria: true, antesDe: null })
+    expect(codigos(falso.etapasDoCatalogo)).toEqual(['relatorio_modelagem_tecnica', 'modelagem', 'publicacao', 'nova'])
   })
 
   test('com nome repetido, sem diferenciar maiúsculas, é recusada', async () => {
     const falso = montar()
-    await expect(falso.catalogo.acrescentarEtapa({ codigo: 'outra', nome: 'PUBLICAÇÃO', nivel: 'processo', obrigatoria: false, antesDe: null }))
+    await expect(falso.catalogo.acrescentarEtapa({ codigo: 'outra', nome: 'PUBLICAÇÃO', obrigatoria: false, antesDe: null }))
       .rejects.toThrow(new TravaDoBanco('Já existe uma etapa com o nome PUBLICAÇÃO.'))
   })
 
   test('com código repetido é recusada', async () => {
     const falso = montar()
-    await expect(falso.catalogo.acrescentarEtapa({ codigo: 'publicacao', nome: 'Outra', nivel: 'processo', obrigatoria: false, antesDe: null }))
+    await expect(falso.catalogo.acrescentarEtapa({ codigo: 'publicacao', nome: 'Outra', obrigatoria: false, antesDe: null }))
       .rejects.toThrow(new TravaDoBanco('Já existe uma etapa com o código publicacao.'))
   })
 })
@@ -97,19 +86,13 @@ describe('mover e editar', () => {
   test('subir troca com a vizinha de cima', async () => {
     const falso = montar()
     await falso.catalogo.moverEtapa('e9', 'subir')
-    expect(codigos(await falso.catalogo.listarCatalogo())).toEqual(['identificacao_processos', 'publicacao', 'modelagem'])
+    expect(codigos(await falso.catalogo.listarCatalogo())).toEqual(['relatorio_modelagem_tecnica', 'publicacao', 'modelagem'])
   })
 
   test('descer troca com a vizinha de baixo e muda a ordem das colunas', async () => {
     const falso = montar()
     await falso.catalogo.moverEtapa('e4', 'descer')
-    expect(codigos(falso.etapasDoCatalogo)).toEqual(['publicacao', 'modelagem'])
-  })
-
-  test('subir uma etapa do processo acima de uma do setor é recusado', async () => {
-    const falso = montar()
-    await expect(falso.catalogo.moverEtapa('e4', 'subir'))
-      .rejects.toThrow(new TravaDoBanco('As etapas do setor precisam vir antes das etapas do processo.'))
+    expect(codigos(falso.etapasDoCatalogo)).toEqual(['relatorio_modelagem_tecnica', 'publicacao', 'modelagem'])
   })
 
   test('editar muda nome e obrigatória', async () => {
@@ -140,12 +123,12 @@ describe('desativar, reativar e excluir', () => {
   test('excluir etapa usada é recusado', async () => {
     const falso = montar()
     await expect(falso.catalogo.excluirEtapa('e4'))
-      .rejects.toThrow(new TravaDoBanco('A etapa Reunião de modelagem já foi usada; desative-a em vez de excluir.'))
+      .rejects.toThrow(new TravaDoBanco('A etapa Modelagem piloto já foi usada; desative-a em vez de excluir.'))
   })
 
   test('excluir etapa nunca usada a tira do catálogo e dos caminhos', async () => {
     const falso = montar()
-    await falso.catalogo.acrescentarEtapa({ codigo: 'nova', nome: 'Nova', nivel: 'processo', obrigatoria: true, antesDe: null })
+    await falso.catalogo.acrescentarEtapa({ codigo: 'nova', nome: 'Nova', obrigatoria: true, antesDe: null })
     const nova = (await falso.catalogo.listarCatalogo()).find((etapa) => etapa.codigo === 'nova')
     await falso.catalogo.excluirEtapa(nova?.id ?? '')
     expect(codigos(await falso.catalogo.listarCatalogo())).not.toContain('nova')
