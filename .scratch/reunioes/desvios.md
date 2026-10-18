@@ -114,3 +114,7 @@ Revisão do diff inteiro (marco `2026-10-14-inicio-reunioes`, 38 commits) em dua
 ## 2026-10-18 — /polir da parte 1 (Simplificação)
 
 Feito junto com o de processos-etapas; achados e decisões em `.scratch/processos-etapas/desvios.md`, na entrada de mesma data. Do que é desta funcionalidade: o campo de data da reunião ganhou o desenho dos outros campos do painel.
+
+## 2026-10-18 — /ship da parte 1 (Simplificação)
+
+Feito junto com o de processos-etapas; achados em `.scratch/processos-etapas/desvios.md`, na entrada de mesma data. Do que é desta funcionalidade: a migração destrutiva `20261018123613_data_da_reuniao` (apaga as quatro tabelas de reunião, o tipo, a função e os gatilhos) foi confirmada pelo usuário; a produção não existe (ADR 0013).

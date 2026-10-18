@@ -168,3 +168,12 @@ Auditoria do impeccable: 16/20 (Bom), detector sem achados em `src`. Conferido s
 - **Deixado de fora (P3):** o nome antigo "Reunião de modelagem" nos dados inventados de uns 27 arquivos de teste. Não aparece na tela, e trocar seria só mexida sem efeito no comportamento.
 - **Deixado de fora (P3):** "Salvando…" no botão enquanto a data grava. Nenhuma tela do projeto usa esse padrão; o botão desligado é o padrão dos vizinhos.
 - **Deixado de fora:** datas em fonte mono, como pede a regra do DESIGN.md. Nenhum componente usa a classe `.mono` hoje; é ajuste do projeto todo, não desta parte (vai para o backlog).
+
+## 2026-10-18 — /ship da parte 1 (Simplificação; tickets 11 e 12, com o 05 de reunioes)
+
+- **A revisão de código invalidou o critério "nenhum código morto ligado a eles" do ticket 11:** os rótulos `email` e `cargo` do histórico (`historicoDosCadastros.ts`) só serviam aos eventos de responsável do setor, que agora aparecem na linha simples. Retirados no commit `f10e015`, sem teste novo (não havia comportamento a provar); a suíte inteira passou.
+- **Spec divergente do construído, corrigida na spec:** a linha da reunião fica no lugar da antiga seção Reuniões, antes das Versões (a spec dizia "logo acima do caminho"; a de reunioes já dizia o lugar certo), por decisão do usuário, porque a parte 3 redesenha o painel; e saíram três migrações, uma por ticket, em vez de "uma migração nova, numa transação só".
+- **Pontos de julgamento da revisão de padrões** (tipos de etapa duplicados, `andamentoDoBanco.ts` com um só usuário, nome de classe CSS, campo `nota` na falsa, texto repetido, dado de teste antigo) foram para o backlog, por decisão do usuário.
+- **Migrações destrutivas confirmadas pelo usuário:** `20261018132857_responsaveis_do_setor_saem` (apaga `responsaveis_do_setor`) e `20261018141346_sem_etapas_do_setor` (apaga os andamentos de etapa do setor, `andamentos.setor_id` e `etapas.nivel`). A produção não existe; só dados inventados do desenvolvimento (ADR 0013).
+- **Revisão de segurança:** o `/security-review` viu só o último commit (trabalho direto na `main`); feita a revisão de reserva sobre o diff inteiro da parte 1, sem achados.
+- **Tela conferida pela vitrine local** (app com módulos falsos, fora do git), não com login no desenvolvimento.
