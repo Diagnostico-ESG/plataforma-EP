@@ -1,7 +1,10 @@
 import { ROTULO_DO_TIPO } from '../../processos/rotulos'
+import { hojeLocal } from '../../processos/textoDaReuniao'
 import type { ProcessoDaLista } from '../../processos/tipos'
 import { Avatar } from '../Avatar'
 import { Pilula } from '../Pilula'
+import { BarraDeProgresso } from './BarraDeProgresso'
+import { SelosDoCartao } from './SelosDoCartao'
 
 type CartaoDoProcessoProps = { processo: ProcessoDaLista; escolhido: boolean; href: string }
 
@@ -15,6 +18,8 @@ export function CartaoDoProcesso({ processo, escolhido, href }: CartaoDoProcesso
         <span className="cartao-macroprocesso">{macroprocessoNome}</span>
       </span>
       <span className="cartao-nome">{nome}</span>
+      <BarraDeProgresso processo={processo} />
+      <SelosDoCartao processo={processo} hoje={hojeLocal()} />
       <span className="cartao-rodape">
         <span className="cartao-pilulas">
           {tipo !== 'processo' && <Pilula situacao="neutra">{ROTULO_DO_TIPO[tipo]}</Pilula>}

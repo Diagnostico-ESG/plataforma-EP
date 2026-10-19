@@ -115,6 +115,54 @@
   font-weight: 600;
 }
 
+/* Barra de progresso: fina e discreta (cinza e azul); só o azul da etapa atual chama a atenção. */
+.cartao-barra {
+  display: flex;
+  gap: 2px;
+}
+
+.pedaco {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.pedaco-resolvida {
+  background: var(--texto-2);
+}
+
+.pedaco-atual {
+  background: var(--azul);
+}
+
+.pedaco-seguinte {
+  background: var(--linha-tracejada);
+}
+
+/* Selos: quebram de linha sem estourar a coluna; versão e subprocessos são texto neutro, sem fundo. */
+.cartao-selos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-1) var(--esp-2);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.selo-texto {
+  color: var(--texto-2);
+  font-size: var(--tam-rotulo);
+}
+
+.selo-versao {
+  font-family: var(--fonte-mono);
+}
+
+.selo-reuniao {
+  padding-left: var(--esp-1);
+  border-left: 3px solid var(--tipo-reuniao);
+}
+
 .cartao-rodape {
   display: flex;
   align-items: center;
