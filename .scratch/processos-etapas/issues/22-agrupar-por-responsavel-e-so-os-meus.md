@@ -18,3 +18,5 @@
 - [ ] [Limpar filtros] desliga o "Só os meus" e mantém o agrupamento.
 - [ ] Testes de interface com o aplicativo inteiro cobrindo os itens acima.
 - [ ] `[visual]` Agrupado por responsável, as colunas têm o nome da pessoa (com "Inativo" quando cabe) e os cartões mostram o nome da etapa no lugar da foto; "Agrupar por" e "Só os meus" ficam na barra do Quadro, junto dos filtros.
+
+Concluído em 2026-10-19 (commit dd95614)

@@ -714,3 +714,10 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **2026-10-19 · Ocorrência: a skill `superpowers:writing-plans` sugere salvar em `docs/superpowers/plans/`** e o cabeçalho dela difere do formato dos planos do projeto; o `/executar-complexo` já manda usar `.scratch/<funcionalidade>/plano-<número>.md` e foi seguido.
 - **2026-10-19 · Ocorrência: o ticket não traz o dado de que a função de avanço precisa** (o id do andamento): o ticket 20 deixou o `etapa_id` do caminho fora da tradução, e ele nem seria o id certo. A solução foi ler o processo ao soltar. Sugestão para o `/planejar`: ao dividir tickets de uma mesma tela, conferir se o ticket anterior entrega todos os campos que o seguinte consome.
 - **2026-10-19 · Ocorrência: a revisão final da branch foi feita pelo próprio executor** (sem subagente, como nos tickets 18 e 20).
+
+## 2026-10-19 — /executar-complexo do ticket 22 de processos-etapas (agrupar por responsável e "Só os meus")
+
+- **2026-10-19 · Item não testado: branch comum, `plano-<número>.md`, linha `Concluído em`, marco de início e `git branch -d`.** Esperado: plano em `plano-22.md`, branch sem worktree, `Concluído em` depois do merge. Aconteceu: tudo como descrito; o `git branch -d` passou de primeira, sem enviar a branch ao GitHub antes (a branch não chegou a ser enviada).
+- **2026-10-19 · Item não testado: trava de git com `git switch` e merge sem conflito.** Esperado: `git switch main` e `git merge` passam pela trava. Aconteceu: os dois passaram.
+- **2026-10-19 · Ocorrência: este ambiente não tem Python**, e o heredoc com aspas simples dentro do Bash falhou uma vez por erro de interpretação do comando. Contorno: scripts de edição em Node, gravados pela ferramenta de arquivo e apagados depois.
+- **2026-10-19 · Ocorrência: o `/executar-complexo` não diz como lidar com a skill `executing-plans` pedindo subagentes** ("Superpowers funciona melhor com subagentes"); a execução foi feita pelo próprio executor, como nos tickets 18, 20 e 21, e a revisão final também.
