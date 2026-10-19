@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "src/components/processos/Contexto.css"
+        ],
+        "createdAt": "2026-10-19T14:17:41.884Z",
+        "reason": "spec processos-etapas, Verso do cartão, Reunião: 'a data (mono, com a barrinha amarela de reunião)'; token --tipo-reuniao do design system"
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "src/components/versoes/VersaoEmDestaque.css"
+        ],
+        "createdAt": "2026-10-19T14:17:42.327Z",
+        "reason": "spec processos-etapas, Verso do cartão, Arquivos: 'com a barrinha de cor do tipo'; tokens --tipo-fluxograma/--tipo-relatorio do design system"
+      }
+    ]
+  }
+}
