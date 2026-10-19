@@ -30,7 +30,7 @@ function processo(mudancas: Partial<ProcessoLido> = {}): ProcessoLido {
     macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento',
     etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 },
     processoPaiId: null, processoPai: null, subprocessos: [],
-    responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null, dataDaReuniao: null,
+    responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, ultimaVersao: null,
     etapasDoProcesso: [
       doProcesso(4, 'modelagem', 'Reunião de modelagem'),
       doProcesso(5, 'relatorio', 'Relatório e modelagem técnica'),
@@ -63,11 +63,11 @@ async function etapa(nome: string) {
   return within((await caminho.findByText(nome)).closest('li') as HTMLElement)
 }
 
-test('a etapa atual pendente tem Iniciar e Realizada anteriormente; a obrigatória não tem Dispensar; as outras não têm ação', async () => {
+test('a etapa atual pendente tem Iniciar e Realizada anteriormente; a obrigatória não tem Dispensar; as outras só têm Assumir', async () => {
   montar()
   const atual = await etapa('Reunião de modelagem')
-  expect(atual.getAllByRole('button').map((botao) => botao.textContent)).toEqual(['Iniciar', 'Realizada anteriormente'])
-  expect((await etapa('Relatório e modelagem técnica')).queryAllByRole('button')).toEqual([])
+  expect(atual.getAllByRole('button').map((botao) => botao.textContent)).toEqual(['Assumir', 'Iniciar', 'Realizada anteriormente'])
+  expect((await etapa('Relatório e modelagem técnica')).queryAllByRole('button').map((botao) => botao.textContent)).toEqual(['Assumir'])
 })
 
 test('a etapa atual opcional tem Dispensar', async () => {

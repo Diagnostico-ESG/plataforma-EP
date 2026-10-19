@@ -1,7 +1,7 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
-import { formatarData, indiceDaEtapaAtual } from './caminhoDeEtapas'
+import { ehAutorBarrado, formatarData, indiceDaEtapaAtual, proximaPendente } from './caminhoDeEtapas'
 import type {
-  DatasDaEtapa, EtapaDoProcesso, EtapaDoCaminho, ProcessoLido, ResponsavelDaEtapa, StatusDaEtapa, UsuarioResponsavel,
+  DatasDaEtapa, EtapaDoProcesso, EtapaDoCaminho, ProcessoLido, ResponsavelDaEtapa, StatusDaEtapa, UltimaVersao, UsuarioResponsavel,
 } from './tipos'
 
 const RESOLVIDOS: StatusDaEtapa[] = ['concluida', 'realizada_anteriormente', 'dispensada']
@@ -103,7 +103,25 @@ export function conferirAvanco(etapa: EtapaDoCaminho, { acao, nota, responsavelI
   if (acao === 'dispensar' && etapa.obrigatoria) {
     throw new TravaDoBanco(`A etapa ${etapa.nome} é obrigatória e não pode ser dispensada.`)
   }
-  if (responsavelId !== null && !possiveis.some((usuario) => usuario.id === responsavelId)) {
-    throw new TravaDoBanco(`${responsavelId} não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP.`)
-  }
+  conferirResponsavelEscolhido(responsavelId, possiveis)
+}
+
+/** O responsável escolhido precisa estar entre os que podem ser responsáveis; ninguém (null) sempre vale. */
+export function conferirResponsavelEscolhido(responsavelId: string | null, possiveis: UsuarioResponsavel[]): void {
+  if (responsavelId === null || possiveis.some((usuario) => usuario.id === responsavelId)) return
+  throw new TravaDoBanco(`${responsavelId} não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP.`)
+}
+
+/** Como o gatilho do banco: só confere quando o responsável da Revisão interna passa a ser alguém e muda. */
+export function conferirAutorDaRevisao(ultimaVersao: UltimaVersao | null, etapa: EtapaDoProcesso, responsavelId: string | null): void {
+  if (responsavelId === null || responsavelId === etapa.responsavelId) return
+  if (ultimaVersao === null || !ehAutorBarrado(etapa, responsavelId, ultimaVersao)) return
+  throw new TravaDoBanco(`${ultimaVersao.autorNome} enviou a versão V${ultimaVersao.numero} e não pode ser responsável pela Revisão interna.`)
+}
+
+/** A trava do autor para a etapa que o avanço inicia: a primeira pendente depois da resolvida. */
+export function conferirAutorDaProxima(processo: ProcessoLido, idDaResolvida: string, responsavelId: string | null): void {
+  const etapas = processo.etapasDoProcesso
+  const proxima = proximaPendente(etapas, etapas.findIndex((etapa) => etapa.id === idDaResolvida))
+  if (proxima) conferirAutorDaRevisao(processo.ultimaVersao, proxima as EtapaDoProcesso, responsavelId)
 }

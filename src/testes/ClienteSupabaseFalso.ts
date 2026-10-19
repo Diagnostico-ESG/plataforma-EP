@@ -11,6 +11,8 @@ export type Pedido = {
   /** O filtro `or`, como o PostgREST o recebe (ex.: 'id.eq.p1,processo_pai_id.eq.p1'). */
   ou?: string
   ordem?: Ordenacao[]
+  /** O limite de linhas do pedido. */
+  limite?: number
 }
 
 /** Cliente Supabase falso para os testes de módulo: guarda cada pedido e responde por "tabela.operação". */
@@ -41,8 +43,8 @@ export class ClienteSupabaseFalso {
     const resposta = () => this.respostas[`${tabela}.${pedido.operacao}`] ?? { data: [], error: null }
     const consulta = {
       select: (colunas?: string) => Object.assign(pedido, { colunas: pedido.colunas ?? colunas }) && consulta,
-      order: (coluna: string, opcoes?: { ascending?: boolean; nullsFirst?: boolean }) =>
-        (pedido.ordem ??= []).push(ordenacao(coluna, opcoes)) && consulta,
+      order: (coluna: string, opcoes?: OpcoesDeOrdem) => ordenar(pedido, coluna, opcoes) && consulta,
+      limit: (limite: number) => Object.assign(pedido, { limite }) && consulta,
       insert: (valores: unknown) => Object.assign(pedido, { operacao: 'insert', valores }) && consulta,
       update: (valores: unknown) => Object.assign(pedido, { operacao: 'update', valores }) && consulta,
       delete: () => Object.assign(pedido, { operacao: 'delete' }) && consulta,
@@ -63,8 +65,15 @@ function guardarFiltro(pedido: Pedido, coluna: string, valor: string): true {
   return true
 }
 
+type OpcoesDeOrdem = { ascending?: boolean; nullsFirst?: boolean }
+
+function ordenar(pedido: Pedido, coluna: string, opcoes?: OpcoesDeOrdem): true {
+  ;(pedido.ordem ??= []).push(ordenacao(coluna, opcoes))
+  return true
+}
+
 // Só guarda "nulos primeiro ou depois" quando o módulo pediu, para as ordens simples continuarem com dois itens.
-function ordenacao(coluna: string, opcoes?: { ascending?: boolean; nullsFirst?: boolean }): Ordenacao {
+function ordenacao(coluna: string, opcoes?: OpcoesDeOrdem): Ordenacao {
   const ascendente = opcoes?.ascending ?? true
   return opcoes?.nullsFirst === undefined ? [coluna, ascendente] : [coluna, ascendente, opcoes.nullsFirst]
 }

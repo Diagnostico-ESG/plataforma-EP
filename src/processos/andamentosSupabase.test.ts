@@ -20,11 +20,14 @@ async function falhaDe(promessa: Promise<void>): Promise<Error> {
   return (await promessa.catch((erro: unknown) => erro)) as Error
 }
 
-test('voltar chama a função do banco com o andamento e o motivo', async () => {
+test('voltar chama a função do banco com o andamento, o motivo e o responsável (null: ninguém)', async () => {
   const cliente = new ClienteSupabaseFalso()
-  await criar(cliente).voltarParaEtapa('a4', 'Mudou o escopo')
+  const modulo = criar(cliente)
+  await modulo.voltarParaEtapa('a4', 'Mudou o escopo', 'u1')
+  await modulo.voltarParaEtapa('a4', 'Mudou o escopo', null)
   expect(cliente.pedidos).toEqual([
-    { tabela: 'rpc', operacao: 'voltar_a_etapa', valores: { p_andamento: 'a4', p_motivo: 'Mudou o escopo' } },
+    { tabela: 'rpc', operacao: 'voltar_a_etapa', valores: { p_andamento: 'a4', p_motivo: 'Mudou o escopo', p_responsavel: 'u1' } },
+    { tabela: 'rpc', operacao: 'voltar_a_etapa', valores: { p_andamento: 'a4', p_motivo: 'Mudou o escopo', p_responsavel: null } },
   ])
 })
 
@@ -69,23 +72,23 @@ test('responsável inválido vira a frase com o nome do usuário', async () => {
 
 test('voltar sem motivo e voltar a etapa não resolvida viram frases', async () => {
   const semMotivo = clienteQueRecusa('rpc.voltar_a_etapa', { message: 'motivo_obrigatorio', code: 'P0001' })
-  expect((await falhaDe(criar(semMotivo).voltarParaEtapa('a4', ' '))).message).toBe('O motivo é obrigatório.')
+  expect((await falhaDe(criar(semMotivo).voltarParaEtapa('a4', ' ', null))).message).toBe('O motivo é obrigatório.')
   const pendente = clienteQueRecusa('rpc.voltar_a_etapa',
     { message: 'etapa_nao_resolvida:Reunião de modelagem', code: 'P0001' })
-  expect((await falhaDe(criar(pendente).voltarParaEtapa('a4', 'Motivo'))).message)
+  expect((await falhaDe(criar(pendente).voltarParaEtapa('a4', 'Motivo', null))).message)
     .toBe('A etapa Reunião de modelagem ainda não foi resolvida.')
 })
 
 test('voltar recusado pela permissão (42501) vira "Seu perfil não permite alterar os processos."', async () => {
   const cliente = clienteQueRecusa('rpc.voltar_a_etapa', { message: 'sem permissão para voltar a etapa', code: '42501' })
-  const falha = await falhaDe(criar(cliente).voltarParaEtapa('a4', 'Motivo'))
+  const falha = await falhaDe(criar(cliente).voltarParaEtapa('a4', 'Motivo', null))
   expect(falha).toBeInstanceOf(TravaDoBanco)
   expect(falha.message).toBe('Seu perfil não permite alterar os processos.')
 })
 
 test('voltar a uma etapa que já não existe avisa como cadastro inexistente', async () => {
   const cliente = clienteQueRecusa('rpc.voltar_a_etapa', { message: 'registro_inexistente', code: 'P0001' })
-  expect(await falhaDe(criar(cliente).voltarParaEtapa('a4', 'Motivo'))).toBeInstanceOf(CadastroInexistente)
+  expect(await falhaDe(criar(cliente).voltarParaEtapa('a4', 'Motivo', null))).toBeInstanceOf(CadastroInexistente)
 })
 
 test('corrigir datas sem linha afetada: perfil se a etapa ainda é legível, aviso se sumiu', async () => {
@@ -112,4 +115,23 @@ test('falha ao listar os responsáveis possíveis vira erro com o motivo do banc
   const cliente = clienteQueRecusa('usuarios.select', { message: 'sem conexão' })
   await expect(criar(cliente).listarResponsaveisPossiveis()).rejects
     .toThrow('Falha ao ler os usuários que podem ser responsáveis: sem conexão')
+})
+
+const FRASE_DO_AUTOR = 'Ana Teste enviou a versão V3 e não pode ser responsável pela Revisão interna.'
+
+test.each([
+  ['o seletor', 'andamentos.update', (modulo: ReturnType<typeof criar>) => modulo.mudarResponsavelDaEtapa('a4', 'u1')],
+  ['o avanço', 'rpc.avancar_etapa', (modulo: ReturnType<typeof criar>) => modulo.concluirEtapa('a4', 'u1')],
+  ['o voltar', 'rpc.voltar_a_etapa', (modulo: ReturnType<typeof criar>) => modulo.voltarParaEtapa('a4', 'Motivo', 'u1')],
+])('o autor da versão mais recente recusado pelo banco vira a frase da trava (%s)', async (_via, resposta, agir) => {
+  const cliente = clienteQueRecusa(resposta, { message: 'autor_da_versao:3:Ana Teste', code: 'P0001' })
+  const falha = await falhaDe(agir(criar(cliente)))
+  expect(falha).toBeInstanceOf(TravaDoBanco)
+  expect(falha.message).toBe(FRASE_DO_AUTOR)
+})
+
+test('o nome do autor pode ter dois-pontos: o número vem primeiro e o resto é o nome', async () => {
+  const cliente = clienteQueRecusa('andamentos.update', { message: 'autor_da_versao:12:Ana: Teste', code: 'P0001' })
+  const falha = await falhaDe(criar(cliente).mudarResponsavelDaEtapa('a4', 'u1'))
+  expect(falha.message).toBe('Ana: Teste enviou a versão V12 e não pode ser responsável pela Revisão interna.')
 })

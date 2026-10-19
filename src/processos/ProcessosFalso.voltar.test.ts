@@ -18,7 +18,7 @@ function falso(): ProcessosFalso {
     macroprocessoNome: 'Macro', situacao: 'em_andamento', etapaAtual: { codigo: 'c6', nome: 'Etapa 6', ordem: 6 },
     processoPaiId: null, processoPai: null, subprocessos: [],
     responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
-    dataDaReuniao: null,
+    dataDaReuniao: null, ultimaVersao: null,
     etapasDoProcesso: [
       doProcesso(4, { status: 'concluida', iniciadaEm: '2026-10-10', resolvidaEm: '2026-10-11' }),
       doProcesso(5, { status: 'concluida', iniciadaEm: '2026-10-11', resolvidaEm: '2026-10-12' }),
@@ -36,31 +36,31 @@ const doBanco = async (modulo: ProcessosFalso) => (await modulo.lerProcesso('p1'
 describe('voltar', () => {
   test('a escolhida volta a em andamento e as seguintes, inclusive a em andamento, a pendente', async () => {
     const modulo = falso()
-    await modulo.voltarParaEtapa('a4', 'Mudou o escopo')
+    await modulo.voltarParaEtapa('a4', 'Mudou o escopo', null)
     const lido = await doBanco(modulo)
     expect(lido.etapasDoProcesso.map((etapa) => etapa.status)).toEqual(['em_andamento', 'pendente', 'pendente'])
     expect(lido.etapaAtual?.codigo).toBe('c4')
-    expect(modulo.chamadas).toEqual([{ acao: 'voltar', id: 'a4', nota: 'Mudou o escopo' }])
+    expect(modulo.chamadas).toEqual([{ acao: 'voltar', id: 'a4', nota: 'Mudou o escopo', usuarioId: null }])
   })
 
   test('sem motivo é recusado com a frase da tela', async () => {
-    const falha = await falso().voltarParaEtapa('a4', '  ').catch((erro: unknown) => erro)
+    const falha = await falso().voltarParaEtapa('a4', '  ', null).catch((erro: unknown) => erro)
     expect(falha).toBeInstanceOf(TravaDoBanco)
     expect((falha as Error).message).toBe('O motivo é obrigatório.')
   })
 
   test('etapa que ainda não foi resolvida é recusada', async () => {
-    await expect(falso().voltarParaEtapa('a6', 'Motivo')).rejects.toThrow('A etapa Etapa 6 ainda não foi resolvida.')
+    await expect(falso().voltarParaEtapa('a6', 'Motivo', null)).rejects.toThrow('A etapa Etapa 6 ainda não foi resolvida.')
   })
 
   test('etapa que não existe avisa como cadastro inexistente', async () => {
-    await expect(falso().voltarParaEtapa('x', 'Motivo')).rejects.toBeInstanceOf(CadastroInexistente)
+    await expect(falso().voltarParaEtapa('x', 'Motivo', null)).rejects.toBeInstanceOf(CadastroInexistente)
   })
 
   test('falha de gravação programada aparece e nada muda', async () => {
     const modulo = falso()
     modulo.falhaDeGravacao = 'falha de conexão simulada'
-    await expect(modulo.voltarParaEtapa('a4', 'Motivo')).rejects.toThrow('falha de conexão simulada')
+    await expect(modulo.voltarParaEtapa('a4', 'Motivo', null)).rejects.toThrow('falha de conexão simulada')
     expect((await doBanco(modulo)).etapasDoProcesso[0].status).toBe('concluida')
   })
 })
@@ -103,5 +103,54 @@ describe('responsável', () => {
 
   test('lista os usuários que podem ser responsáveis', async () => {
     expect((await falso().listarResponsaveisPossiveis()).map((usuario) => usuario.nome)).toEqual(['Ana Teste', 'Bia Teste'])
+  })
+})
+
+describe('voltar leva o responsável da etapa reaberta', () => {
+  const FRASE_DO_AUTOR = 'Ana Teste enviou a versão V3 e não pode ser responsável pela Revisão interna.'
+
+  test('a reaberta recebe o responsável (e o cartão, se ela vira a atual); null limpa o anterior', async () => {
+    const modulo = falso()
+    await modulo.mudarResponsavelDaEtapa('a4', 'u2')
+    await modulo.voltarParaEtapa('a4', 'Mudou o escopo', 'u1')
+    let lido = await doBanco(modulo)
+    expect(lido.etapasDoProcesso[0]).toMatchObject({ status: 'em_andamento', responsavelId: 'u1', responsavelNome: 'Ana Teste' })
+    expect(lido.responsavel).toEqual({ id: 'u1', nome: 'Ana Teste', fotoUrl: null })
+    expect(modulo.chamadas.at(-1)).toEqual({ acao: 'voltar', id: 'a4', nota: 'Mudou o escopo', usuarioId: 'u1' })
+    await modulo.concluirEtapa('a4', null)
+    await modulo.voltarParaEtapa('a4', 'De novo', null)
+    lido = await doBanco(modulo)
+    expect(lido.etapasDoProcesso[0]).toMatchObject({ responsavelId: null, responsavelNome: null })
+    expect(lido.responsavel).toBeNull()
+  })
+
+  test('responsável fora dos possíveis é recusado e nada muda', async () => {
+    const modulo = falso()
+    await expect(modulo.voltarParaEtapa('a4', 'Motivo', 'u9')).rejects.toThrow('u9 não pode ser responsável')
+    expect((await doBanco(modulo)).etapasDoProcesso.map((etapa) => etapa.status)).toEqual(['concluida', 'concluida', 'em_andamento'])
+  })
+
+  test('o autor da versão mais recente é recusado na Revisão interna, e aceito em outra etapa', async () => {
+    const modulo = falso()
+    modulo.processos[0] = {
+      ...modulo.processos[0], ultimaVersao: { numero: 3, autorId: 'u1', autorNome: 'Ana Teste' },
+      etapasDoProcesso: modulo.processos[0].etapasDoProcesso.map((etapa) => (etapa.id === 'a4' ? { ...etapa, codigo: 'revisao_interna' } : etapa)),
+    }
+    const falha = await modulo.voltarParaEtapa('a4', 'Motivo', 'u1').catch((erro: unknown) => erro)
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect((falha as Error).message).toBe(FRASE_DO_AUTOR)
+    expect((await doBanco(modulo)).etapasDoProcesso[0].status).toBe('concluida')
+    await expect(modulo.voltarParaEtapa('a5', 'Motivo', 'u1')).resolves.toBeUndefined()
+  })
+
+  test('o seletor também recusa o autor na Revisão interna e mantém o responsável', async () => {
+    const modulo = falso()
+    modulo.processos[0] = {
+      ...modulo.processos[0], ultimaVersao: { numero: 3, autorId: 'u1', autorNome: 'Ana Teste' },
+      etapasDoProcesso: modulo.processos[0].etapasDoProcesso.map((etapa) => (etapa.id === 'a6' ? { ...etapa, codigo: 'revisao_interna' } : etapa)),
+    }
+    await expect(modulo.mudarResponsavelDaEtapa('a6', 'u1')).rejects.toThrow(FRASE_DO_AUTOR)
+    expect((await doBanco(modulo)).etapasDoProcesso[2].responsavelId).toBeNull()
+    await expect(modulo.mudarResponsavelDaEtapa('a6', 'u2')).resolves.toBeUndefined()
   })
 })

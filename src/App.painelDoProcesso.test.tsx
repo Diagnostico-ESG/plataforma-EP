@@ -31,7 +31,7 @@ const PROCESSO: ProcessoLido = {
   responsavel: null, origem: 'retomado', contexto: 'Contexto inventado', observacoes: 'Observação inventada',
   processoPaiId: null, processoPai: null, subprocessos: [],
   motivoDaSituacao: null,
-  dataDaReuniao: null,
+  dataDaReuniao: null, ultimaVersao: null,
   etapasDoProcesso: [
     etapaDoProcesso(4, 'modelagem', 'Modelagem piloto', {
       status: 'concluida', iniciadaEm: '2026-10-11', resolvidaEm: '2026-10-12', responsavelNome: 'Ana Teste' }),
@@ -127,9 +127,9 @@ test('o caminho começa na Modelagem piloto, com a atual destacada e com as aç�
   const atuais = caminho.getAllByRole('listitem').filter((item) => item.getAttribute('aria-current') === 'step')
   expect(atuais.map((item) => item.querySelector('.etapa-nome')?.textContent)).toEqual(['Relatório e modelagem técnica'])
   // As ações são as da etapa atual e o Voltar da resolvida anterior a ela (tickets 05 e 06), mais o Corrigir datas
-  // das etapas que já têm data.
+  // das etapas que já têm data, e o Assumir das etapas pendentes ou em andamento sem responsável (ticket 14).
   expect(caminho.getAllByRole('button').map((botao) => botao.textContent)).toEqual([
-    'Corrigir datas', 'Voltar a esta etapa', 'Corrigir datas', 'Concluir', 'Realizada anteriormente'])
+    'Corrigir datas', 'Voltar a esta etapa', 'Assumir', 'Corrigir datas', 'Concluir', 'Realizada anteriormente', 'Assumir'])
 })
 
 test('o caminho mostra status, responsável, datas e nota das etapas do processo', async () => {

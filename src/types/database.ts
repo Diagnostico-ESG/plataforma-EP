@@ -773,7 +773,7 @@ export type Database = {
         Returns: undefined
       }
       voltar_a_etapa: {
-        Args: { p_andamento: string; p_motivo: string }
+        Args: { p_andamento: string; p_motivo: string; p_responsavel: string }
         Returns: undefined
       }
     }

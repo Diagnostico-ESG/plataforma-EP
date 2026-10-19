@@ -28,7 +28,7 @@ function processo(nome: string, mudancas: Partial<ProcessoLido> = {}): ProcessoL
     etapaAtual: { codigo: MODELAGEM.codigo, nome: MODELAGEM.nome, ordem: MODELAGEM.ordem },
     processoPaiId: null, processoPai: null, subprocessos: [],
     responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
-    dataDaReuniao: null, etapasDoProcesso: [], ...mudancas,
+    dataDaReuniao: null, ultimaVersao: null, etapasDoProcesso: [], ...mudancas,
   }
 }
 

@@ -87,6 +87,9 @@ export type UsuarioResponsavel = { id: string; nome: string }
 /** Um processo citado no painel de outro (o pai ou um subprocesso): abre o painel dele. */
 export type ItemDaEstrutura = { id: string; nome: string }
 
+/** A versão mais recente não histórica do processo e quem a enviou: esse autor não pode revisar o próprio trabalho. */
+export type UltimaVersao = { numero: number; autorId: string; autorNome: string }
+
 export type ProcessoLido = ProcessoDaLista & {
   origem: OrigemDoProcesso
   contexto: string | null
@@ -99,6 +102,8 @@ export type ProcessoLido = ProcessoDaLista & {
   etapasDoProcesso: EtapaDoProcesso[]
   /** A data da reunião de modelagem piloto (AAAA-MM-DD), passada ou futura; null quando não marcada. */
   dataDaReuniao: string | null
+  /** Null sem versão não histórica: a Revisão interna não barra ninguém. */
+  ultimaVersao: UltimaVersao | null
 }
 
 /**
@@ -145,8 +150,8 @@ export type ModuloDeProcessos = {
   concluirEtapa(andamentoId: string, proximoResponsavelId: string | null): Promise<void>
   dispensarEtapa(andamentoId: string, nota: string, proximoResponsavelId: string | null): Promise<void>
   registrarRealizadaAnteriormente(andamentoId: string, nota: string, proximoResponsavelId: string | null): Promise<void>
-  /** A etapa resolvida volta a em andamento e as seguintes a pendente; o motivo é obrigatório. */
-  voltarParaEtapa(andamentoId: string, motivo: string): Promise<void>
+  /** A etapa resolvida volta a em andamento, com o responsável (null: ninguém), e as seguintes a pendente; o motivo é obrigatório. */
+  voltarParaEtapa(andamentoId: string, motivo: string, responsavelId: string | null): Promise<void>
   corrigirDatasDaEtapa(andamentoId: string, datas: DatasDaEtapa): Promise<void>
   /** null tira o responsável. */
   mudarResponsavelDaEtapa(andamentoId: string, usuarioId: string | null): Promise<void>

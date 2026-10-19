@@ -6,8 +6,12 @@ import { EscolhaDoResponsavel, NINGUEM } from './EscolhaDoResponsavel'
 type JanelaDeAvancoProps = {
   titulo: string
   rotuloDaAcao: string
-  /** Dispensar e Realizada anteriormente: a nota obrigatória vem antes da escolha. */
+  /** Dispensar, Realizada anteriormente e Voltar: o campo obrigatório (nota ou motivo) vem antes da escolha. */
   comNota: boolean
+  /** O rótulo do campo obrigatório: "Nota" ou "Motivo". */
+  rotuloDoCampo: string
+  /** A pergunta da escolha: "Quem fica com a próxima etapa?" ou, ao voltar, "Quem fica com esta etapa?". */
+  pergunta: string
   usuarios: UsuarioResponsavel[]
   /** O id marcado ao abrir; null marca "Ninguém por enquanto". */
   marcadoAoAbrir: string | null
@@ -20,7 +24,7 @@ type JanelaDeAvancoProps = {
 // campo da nota (quando há) ou à opção marcada, o botão só se habilita com a nota preenchida e Esc fecha sem gravar.
 // Quem a monta a desmonta ao fechar, e a escolha recomeça marcada na próxima vez.
 export function JanelaDeAvanco({
-  titulo, rotuloDaAcao, comNota, usuarios, marcadoAoAbrir, aoConfirmar, aoFechar,
+  titulo, rotuloDaAcao, comNota, rotuloDoCampo, pergunta, usuarios, marcadoAoAbrir, aoConfirmar, aoFechar,
 }: JanelaDeAvancoProps) {
   const janela = useRef<HTMLDialogElement>(null)
   const campo = useRef<HTMLTextAreaElement>(null)
@@ -49,12 +53,12 @@ export function JanelaDeAvanco({
       <h3 id={idDoTitulo} className="janela-confirmacao-titulo">{titulo}</h3>
       {comNota && (
         <>
-          <label htmlFor={idDoCampo}>Nota</label>
+          <label htmlFor={idDoCampo}>{rotuloDoCampo}</label>
           <textarea ref={campo} id={idDoCampo} className="janela-campo" rows={3} maxLength={2000} value={nota}
             onChange={(mudanca) => setNota(mudanca.target.value)} />
         </>
       )}
-      <EscolhaDoResponsavel usuarios={usuarios} marcado={responsavel} aoEscolher={setResponsavel} aoConfirmar={confirmar} />
+      <EscolhaDoResponsavel pergunta={pergunta} usuarios={usuarios} marcado={responsavel} aoEscolher={setResponsavel} aoConfirmar={confirmar} />
       <div className="janela-confirmacao-botoes">
         <button type="button" className="botao botao-principal" disabled={!pronta} onClick={confirmar}>{rotuloDaAcao}</button>
         <button type="button" className="botao botao-secundario" onClick={aoFechar}>Cancelar</button>

@@ -4,9 +4,10 @@ import type { UsuarioResponsavel } from '../../processos/tipos'
 
 /** O valor da opção "Ninguém por enquanto": um id de usuário nunca é vazio. */
 export const NINGUEM = ''
-const PERGUNTA = 'Quem fica com a próxima etapa?'
 
 type EscolhaDoResponsavelProps = {
+  /** A pergunta que dá nome ao grupo: quem fica com a próxima etapa, ou com a etapa reaberta. */
+  pergunta: string
   usuarios: UsuarioResponsavel[]
   /** O id marcado; `NINGUEM` marca "Ninguém por enquanto". */
   marcado: string
@@ -19,7 +20,7 @@ type EscolhaDoResponsavelProps = {
  * "Quem fica com a próxima etapa?": um botão de rádio por usuário que pode ser responsável e, por último, "Ninguém
  * por enquanto". Rádios nativos com o mesmo nome: as setas trocam de opção e o leitor de tela lê o grupo pela pergunta.
  */
-export function EscolhaDoResponsavel({ usuarios, marcado, aoEscolher, aoConfirmar }: EscolhaDoResponsavelProps) {
+export function EscolhaDoResponsavel({ pergunta, usuarios, marcado, aoEscolher, aoConfirmar }: EscolhaDoResponsavelProps) {
   const idDaPergunta = useId()
   const nomeDoGrupo = useId()
   const opcoes = [...usuarios.map((usuario) => ({ valor: usuario.id, rotulo: usuario.nome })), { valor: NINGUEM, rotulo: 'Ninguém por enquanto' }]
@@ -32,7 +33,7 @@ export function EscolhaDoResponsavel({ usuarios, marcado, aoEscolher, aoConfirma
 
   return (
     <div role="radiogroup" aria-labelledby={idDaPergunta} className="janela-escolha" onKeyDown={aoTeclar}>
-      <span id={idDaPergunta} className="janela-escolha-pergunta">{PERGUNTA}</span>
+      <span id={idDaPergunta} className="janela-escolha-pergunta">{pergunta}</span>
       {opcoes.map((opcao) => (
         <label key={opcao.valor} className="janela-escolha-opcao">
           <input type="radio" name={nomeDoGrupo} value={opcao.valor} checked={marcado === opcao.valor}

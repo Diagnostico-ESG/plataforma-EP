@@ -32,7 +32,8 @@ export function CaminhoDoProcesso({ processo, processos, podeAlterar, usuarioId,
       <h3 className="painel-subtitulo">Etapas do processo</h3>
       {parado && <p className="painel-aviso" role="status">{avisoDoProcessoParado(processo)}</p>}
       <CaminhoDeEtapas processos={processos} etapas={processo.etapasDoProcesso} podeAlterar={podeAlterar && !parado}
-        usuarios={usuarios} usuarioId={usuarioId} aoMudar={aoMudar} aoSumir={aoSumir} />
+        usuarios={usuarios} usuarioId={usuarioId} ultimaVersao={processo.ultimaVersao} aoMudar={aoMudar}
+        aoSumir={aoSumir} />
     </section>
   )
 }

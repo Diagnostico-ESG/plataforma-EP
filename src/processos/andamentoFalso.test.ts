@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import {
-  avancarEtapas, conferirDatasDaEtapa, mudarEtapaDoProcesso, trocarEtapaDoProcesso, voltarEtapas,
+  avancarEtapas, conferirAutorDaRevisao, conferirDatasDaEtapa, conferirResponsavelEscolhido, mudarEtapaDoProcesso,
+  trocarEtapaDoProcesso, voltarEtapas,
 } from './andamentoFalso'
 import type { EtapaDoProcesso, ProcessoLido } from './tipos'
 
@@ -18,7 +19,7 @@ const PROCESSO: ProcessoLido = {
   macroprocessoNome: 'Macro', situacao: 'em_andamento', etapaAtual: { codigo: 'c4', nome: 'Etapa 4', ordem: 4 },
   processoPaiId: null, processoPai: null, subprocessos: [],
   responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
-  dataDaReuniao: null, etapasDoProcesso: [etapa(4), etapa(5), etapa(9, { obrigatoria: false })],
+  dataDaReuniao: null, ultimaVersao: null, etapasDoProcesso: [etapa(4), etapa(5), etapa(9, { obrigatoria: false })],
 }
 
 test('concluir a etapa atual passa a atual para a seguinte', () => {
@@ -109,5 +110,30 @@ describe('avançar', () => {
     expect(limpa[1]).toMatchObject({ status: 'em_andamento', responsavelId: null, responsavelNome: null })
     const ultima = avancarEtapas([etapa(4, { status: 'em_andamento' })], 'a4', { status: 'concluida' }, ANA, HOJE)
     expect(ultima.map((outra) => outra.status)).toEqual(['concluida'])
+  })
+})
+
+describe('trava do autor e responsável escolhido', () => {
+  const ULTIMA = { numero: 3, autorId: 'u1', autorNome: 'Ana Teste' }
+  const revisao = (responsavelId: string | null = null) => etapa(6, { codigo: 'revisao_interna', responsavelId })
+  const FRASE = 'Ana Teste enviou a versão V3 e não pode ser responsável pela Revisão interna.'
+
+  test('recusa o autor da versão mais recente como responsável da Revisão interna, com a frase do banco', () => {
+    expect(() => conferirAutorDaRevisao(ULTIMA, revisao(), 'u1')).toThrow(FRASE)
+  })
+
+  test('aceita outro usuário, outra etapa, ninguém, quem já era o responsável e o processo sem versão', () => {
+    expect(() => conferirAutorDaRevisao(ULTIMA, revisao(), 'u2')).not.toThrow()
+    expect(() => conferirAutorDaRevisao(ULTIMA, etapa(6), 'u1')).not.toThrow()
+    expect(() => conferirAutorDaRevisao(ULTIMA, revisao(), null)).not.toThrow()
+    expect(() => conferirAutorDaRevisao(ULTIMA, revisao('u1'), 'u1')).not.toThrow()
+    expect(() => conferirAutorDaRevisao(null, revisao(), 'u1')).not.toThrow()
+  })
+
+  test('o responsável escolhido fora dos possíveis é recusado com a frase do banco', () => {
+    expect(() => conferirResponsavelEscolhido('u9', [{ id: 'u1', nome: 'Ana Teste' }])).toThrow(
+      'u9 não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP.')
+    expect(() => conferirResponsavelEscolhido('u1', [{ id: 'u1', nome: 'Ana Teste' }])).not.toThrow()
+    expect(() => conferirResponsavelEscolhido(null, [])).not.toThrow()
   })
 })

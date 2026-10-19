@@ -3,7 +3,8 @@ import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import type { EventoDoCadastro } from '../cadastros/tipos'
 import { CatalogoFalso } from './CatalogoFalso'
 import {
-  avancarProcesso, conferirAvanco, conferirDatasDaEtapa, responsavelDoCartao, trocarEtapaDoProcesso, voltarEtapas,
+  avancarProcesso, conferirAutorDaProxima, conferirAutorDaRevisao, conferirAvanco, conferirDatasDaEtapa,
+  conferirResponsavelEscolhido, mudarEtapaDoProcesso, responsavelDoCartao, trocarEtapaDoProcesso, voltarEtapas,
   type PedidoDeAvanco,
 } from './andamentoFalso'
 import {
@@ -65,14 +66,18 @@ export class ProcessosFalso implements ModuloDeProcessos {
     this.avancar({ acao: 'realizada', id, nota, usuarioId }, { status: 'realizada_anteriormente', nota, resolvidaEm: HOJE })
   }
 
-  async voltarParaEtapa(id: string, motivo: string): Promise<void> {
+  // Como a função de voltar do banco: a reaberta recebe o responsável (null limpa o que tinha) e a trava do autor vale aqui também.
+  async voltarParaEtapa(id: string, motivo: string, usuarioId: string | null): Promise<void> {
     this.conferirGravacao()
     const etapa = this.acharEtapa(id)
     this.conferirProcessoDaEtapa(id)
     if (motivo.trim() === '') throw new TravaDoBanco('O motivo é obrigatório.')
     if (!RESOLVIDAS.includes(etapa.status)) throw new TravaDoBanco(`A etapa ${etapa.nome} ainda não foi resolvida.`)
-    this.chamadas.push({ acao: 'voltar', id, nota: motivo })
+    conferirResponsavelEscolhido(usuarioId, this.usuariosPossiveis)
+    this.conferirAutorDaEtapa(etapa as EtapaDoProcesso, usuarioId)
+    this.chamadas.push({ acao: 'voltar', id, nota: motivo, usuarioId })
     this.aplicar(id, (etapas) => voltarEtapas(etapas, id, HOJE))
+    this.porResponsavel(id, usuarioId)
   }
 
   async suspenderProcesso(id: string, motivo: string): Promise<void> {
@@ -102,13 +107,9 @@ export class ProcessosFalso implements ModuloDeProcessos {
 
   async mudarResponsavelDaEtapa(id: string, usuarioId: string | null): Promise<void> {
     this.conferirGravacao()
-    this.acharEtapa(id)
-    const usuario = this.usuariosPossiveis.find((possivel) => possivel.id === usuarioId) ?? null
-    this.mudar({ acao: 'responsavel', id, usuarioId }, {
-      responsavelId: usuarioId, responsavelNome: usuario?.nome ?? null, responsavelInativo: false,
-    })
-    const cartao = usuario ? { id: usuario.id, nome: usuario.nome, fotoUrl: null } : null
-    this.processos = this.processos.map((processo) => responsavelDoCartao(processo, id, cartao))
+    this.conferirAutorDaEtapa(this.acharEtapa(id) as EtapaDoProcesso, usuarioId)
+    this.mudar({ acao: 'responsavel', id, usuarioId }, {})
+    this.porResponsavel(id, usuarioId)
   }
 
   async listarResponsaveisPossiveis(): Promise<UsuarioResponsavel[]> {
@@ -193,7 +194,7 @@ export class ProcessosFalso implements ModuloDeProcessos {
     return {
       ...dados, ...this.nomesDoCartao(dados), id: `p${this.proximoId++}`, situacao: 'em_andamento',
       etapaAtual: primeira ? { codigo: primeira.codigo, nome: primeira.nome, ordem: primeira.ordem } : null,
-      responsavel: null, motivoDaSituacao: null, processoPai: null, subprocessos: [], dataDaReuniao: null,
+      responsavel: null, motivoDaSituacao: null, processoPai: null, subprocessos: [], dataDaReuniao: null, ultimaVersao: null,
       etapasDoProcesso: etapas.map((etapa) => ({
         id: `a${this.proximoId++}`, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, obrigatoria: true,
         status: 'pendente', nota: null, iniciadaEm: null, resolvidaEm: null, responsavelId: null, responsavelNome: null,
@@ -222,6 +223,7 @@ export class ProcessosFalso implements ModuloDeProcessos {
     this.conferirProcessoDaEtapa(chamada.id)
     const responsavelId = chamada.usuarioId ?? null
     conferirAvanco(etapa, { acao: chamada.acao, nota: chamada.nota ?? null, responsavelId }, this.usuariosPossiveis)
+    conferirAutorDaProxima(this.processoDaEtapa(chamada.id), chamada.id, responsavelId)
     this.chamadas.push(chamada)
     const usuario = this.usuariosPossiveis.find((possivel) => possivel.id === responsavelId) ?? null
     this.processos = this.processos.map((processo) => (
@@ -234,6 +236,23 @@ export class ProcessosFalso implements ModuloDeProcessos {
     this.conferirProcessoDaEtapa(chamada.id)
     this.chamadas.push(chamada)
     this.aplicar(chamada.id, (etapas) => etapas.map((etapa) => (etapa.id === chamada.id ? { ...etapa, ...mudancas } : etapa)))
+  }
+
+  // O responsável da etapa e, sendo ela a atual, o do cartão (quem não está entre os possíveis fica sem nome).
+  private porResponsavel(id: string, usuarioId: string | null): void {
+    const usuario = this.usuariosPossiveis.find((possivel) => possivel.id === usuarioId) ?? null
+    const mudancas = { responsavelId: usuarioId, responsavelNome: usuario?.nome ?? null, responsavelInativo: false }
+    const cartao = usuario ? { id: usuario.id, nome: usuario.nome, fotoUrl: null } : null
+    this.processos = this.processos.map((processo) => responsavelDoCartao(mudarEtapaDoProcesso(processo, id, mudancas), id, cartao))
+  }
+
+  // A trava do autor da versão mais recente na Revisão interna, como o gatilho do banco.
+  private conferirAutorDaEtapa(etapa: EtapaDoProcesso, usuarioId: string | null): void {
+    conferirAutorDaRevisao(this.processoDaEtapa(etapa.id).ultimaVersao, etapa, usuarioId)
+  }
+
+  private processoDaEtapa(idDaEtapa: string): ProcessoLido {
+    return this.processos.find((processo) => processo.etapasDoProcesso.some((etapa) => etapa.id === idDaEtapa)) as ProcessoLido
   }
 
   // O processo que tem a etapa: parado, ele recusa qualquer mudança nelas.

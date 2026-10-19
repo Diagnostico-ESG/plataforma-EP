@@ -10,11 +10,13 @@ type EdicaoDaEtapaProps = {
   usuarios?: UsuarioResponsavel[]
   aoCorrigirDatas: (datas: DatasDaEtapa) => Promise<void>
   aoEscolherResponsavel: (usuarioId: string | null) => void
+  /** Presente só quando quem está na tela pode assumir a etapa (sem responsável e sem a trava do autor). */
+  aoAssumir?: () => void
   aoSumir: () => void
 }
 
 /** O que quem pode alterar faz numa etapa além das ações: corrigir as datas e escolher o responsável. */
-export function EdicaoDaEtapa({ etapa, usuarios, aoCorrigirDatas, aoEscolherResponsavel, aoSumir }: EdicaoDaEtapaProps) {
+export function EdicaoDaEtapa({ etapa, usuarios, aoCorrigirDatas, aoEscolherResponsavel, aoAssumir, aoSumir }: EdicaoDaEtapaProps) {
   const [corrigindo, setCorrigindo] = useState(false)
 
   async function salvar(datas: DatasDaEtapa) {
@@ -25,6 +27,11 @@ export function EdicaoDaEtapa({ etapa, usuarios, aoCorrigirDatas, aoEscolherResp
   return (
     <div className="etapa-edicao">
       {usuarios && ehEtapaDoProcesso(etapa) && <SeletorDeResponsavel etapa={etapa} usuarios={usuarios} aoEscolher={aoEscolherResponsavel} />}
+      {aoAssumir && (
+        <button type="button" className="botao botao-secundario" aria-label={`Assumir ${etapa.nome}`} onClick={aoAssumir}>
+          Assumir
+        </button>
+      )}
       {etapa.status !== 'pendente' && !corrigindo && (
         <button type="button" className="botao botao-secundario" onClick={() => setCorrigindo(true)}>
           Corrigir datas

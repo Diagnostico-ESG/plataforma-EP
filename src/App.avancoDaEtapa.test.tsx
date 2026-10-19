@@ -40,7 +40,7 @@ function processo(etapas: EtapaDoProcesso[]): ProcessoLido {
     macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento',
     etapaAtual: { codigo: etapas[0].codigo, nome: etapas[0].nome, ordem: etapas[0].ordem },
     processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null, origem: 'novo', contexto: null,
-    observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, etapasDoProcesso: etapas,
+    observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, ultimaVersao: null, etapasDoProcesso: etapas,
   }
 }
 
