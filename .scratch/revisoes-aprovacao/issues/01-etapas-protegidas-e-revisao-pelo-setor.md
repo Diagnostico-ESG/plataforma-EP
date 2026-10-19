@@ -14,3 +14,5 @@
 - [x] A janela de concluir a Revisão pelo setor, pelo Agora e pelo arrastar no Quadro, mostra "A V8 está sem relatório." (ou o que faltar, ou que não há versão) e não deixa concluir; com versão completa, conclui como hoje.
 - [x] A recusa do catálogo aparece como frase na administração do catálogo de etapas.
 - [x] Testes de interface com as falsas cobrindo os itens acima, inclusive a recusa que vem do banco por outro caminho.
+
+Concluído em 2026-10-19 (commit 6596f47)
