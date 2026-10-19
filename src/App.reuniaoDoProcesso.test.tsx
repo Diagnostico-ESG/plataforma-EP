@@ -107,6 +107,18 @@ test('[Cancelar] volta à linha sem gravar', async () => {
   expect(falso.chamadas).toEqual([])
 })
 
+test('o foco vai ao campo ao abrir e volta ao botão ao cancelar ou salvar', async () => {
+  montar({ dataDaReuniao: '2026-10-14' })
+  const secao = await editar('Alterar data')
+  expect(document.activeElement).toBe(campo(secao))
+  fireEvent.click(secao.getByRole('button', { name: 'Cancelar' }))
+  expect(document.activeElement).toBe(secao.getByRole('button', { name: 'Alterar data' }))
+  fireEvent.click(secao.getByRole('button', { name: 'Alterar data' }))
+  fireEvent.change(campo(secao), { target: { value: '2026-10-21' } })
+  fireEvent.click(secao.getByRole('button', { name: 'Salvar' }))
+  await waitFor(() => expect(document.activeElement).toBe(secao.getByRole('button', { name: 'Alterar data' })))
+})
+
 test('[Remover] só aparece com data gravada e apaga sem pedir confirmação', async () => {
   const falso = montar({ dataDaReuniao: '2026-10-10' })
   const secao = await editar('Alterar data')

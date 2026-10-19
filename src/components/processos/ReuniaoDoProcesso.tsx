@@ -1,5 +1,5 @@
 import './Contexto.css'
-import { useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { TravaDoBanco } from '../../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../../cadastros/cadastroInexistente'
 import { formatarData } from '../../processos/caminhoDeEtapas'
@@ -29,20 +29,33 @@ export function ReuniaoDoProcesso(props: ReuniaoDoProcessoProps) {
   const { processo, podeAlterar } = props
   const idDoTitulo = useId()
   const [editando, setEditando] = useState(false)
+  // O botão some ao abrir o campo e volta ao fechar: o foco acompanha, para quem usa o teclado não perder o lugar.
+  const [voltouDaEdicao, setVoltouDaEdicao] = useState(false)
+  const terminar = () => {
+    setEditando(false)
+    setVoltouDaEdicao(true)
+  }
   return (
     <section className="contexto-secao" aria-labelledby={idDoTitulo}>
       <h3 id={idDoTitulo} className="contexto-titulo">Reunião</h3>
       {editando
-        ? <EdicaoDaReuniao {...props} aoTerminar={() => setEditando(false)} />
-        : <LeituraDaReuniao data={processo.dataDaReuniao} podeAlterar={podeAlterar} aoEditar={() => setEditando(true)} />}
+        ? <EdicaoDaReuniao {...props} aoTerminar={terminar} />
+        : (
+            <LeituraDaReuniao data={processo.dataDaReuniao} podeAlterar={podeAlterar} focar={voltouDaEdicao}
+              aoEditar={() => setEditando(true)} />
+          )}
     </section>
   )
 }
 
-type LeituraProps = { data: string | null; podeAlterar: boolean; aoEditar: () => void }
+type LeituraProps = { data: string | null; podeAlterar: boolean; focar: boolean; aoEditar: () => void }
 
-function LeituraDaReuniao({ data, podeAlterar, aoEditar }: LeituraProps) {
+function LeituraDaReuniao({ data, podeAlterar, focar, aoEditar }: LeituraProps) {
   const momento = momentoDaReuniao(data, hojeLocal())
+  const botao = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    if (focar) botao.current?.focus()
+  }, [focar])
   return (
     <div className="reuniao-linha">
       {data && momento
@@ -54,7 +67,7 @@ function LeituraDaReuniao({ data, podeAlterar, aoEditar }: LeituraProps) {
           )
         : <p className="reuniao-sem-data">Ainda não marcada</p>}
       {podeAlterar && (
-        <button type="button" className="contexto-link" onClick={aoEditar}>{data ? 'Alterar data' : 'Marcar data'}</button>
+        <button ref={botao} type="button" className="contexto-link" onClick={aoEditar}>{data ? 'Alterar data' : 'Marcar data'}</button>
       )}
     </div>
   )
@@ -68,6 +81,8 @@ function EdicaoDaReuniao({ processo, processos, aoMudar, aoSumir, aoTerminar }: 
   const [data, setData] = useState(gravada ?? '')
   const [gravando, setGravando] = useState(false)
   const [falha, setFalha] = useState<string | null>(null)
+  const campo = useRef<HTMLInputElement>(null)
+  useEffect(() => campo.current?.focus(), [])
 
   async function gravar(nova: string | null) {
     setFalha(null)
@@ -85,7 +100,7 @@ function EdicaoDaReuniao({ processo, processos, aoMudar, aoSumir, aoTerminar }: 
 
   return (
     <div className="reuniao-edicao">
-      <input type="date" aria-label="Data da reunião de modelagem piloto" value={data}
+      <input ref={campo} type="date" aria-label="Data da reunião de modelagem piloto" value={data}
         onChange={(mudanca) => setData(mudanca.target.value)} />
       <div className="reuniao-botoes">
         <button type="button" className="botao botao-principal" disabled={gravando || data === '' || data === gravada}

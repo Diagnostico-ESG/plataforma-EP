@@ -119,6 +119,18 @@
   border-color: var(--azul);
 }
 
+/* "Sem alteração de conteúdo" é a outra saída para o relatório que falta: um link discreto, não um segundo botão. */
+.versao-destaque > .painel-acoes .botao-secundario {
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--azul);
+  font-size: var(--tam-secundario);
+  font-weight: 400;
+  text-decoration: underline;
+}
+
 .arquivo-origem {
   color: var(--texto-2);
   font-size: var(--tam-rotulo);

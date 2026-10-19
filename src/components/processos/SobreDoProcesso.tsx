@@ -35,7 +35,7 @@ function Dado({ rotulo, valor }: { rotulo: string; valor: string | null }) {
 function DadoLongo({ rotulo, valor }: { rotulo: string; valor: string | null }) {
   if (!valor) return null
   return (
-    <div className="sobre-dado">
+    <div className="sobre-dado sobre-dado-longo">
       <dt>{rotulo}</dt>
       <dd><TextoQueSeAbre texto={valor} /></dd>
     </div>
