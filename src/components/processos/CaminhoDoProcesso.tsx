@@ -2,6 +2,7 @@ import { useCallback } from 'react'
 import { useAcoesDaEtapa } from '../../hooks/useAcoesDaEtapa'
 import { useCarregamento } from '../../hooks/useCarregamento'
 import type { ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
+import { AgoraDoProcesso } from './AgoraDoProcesso'
 import { CaminhoDeEtapas } from './CaminhoDeEtapas'
 import { JanelasDaEtapa } from './JanelasDaEtapa'
 
@@ -31,6 +32,8 @@ export function CaminhoDoProcesso({ processo, processos, podeAlterar, usuarioId,
   const acoes = useAcoesDaEtapa(processos, aoMudar, aoSumir)
   const parado = processo.situacao === 'suspenso' || processo.situacao === 'cancelado'
   return (
+    <>
+    <AgoraDoProcesso processo={processo} usuarios={usuarios} usuarioId={usuarioId} podeAlterar={podeAlterar} acoes={acoes} />
     <section className="painel-caminho" aria-label="Caminho de etapas">
       <h3 className="painel-subtitulo">Etapas do processo</h3>
       {parado && <p className="painel-aviso" role="status">{avisoDoProcessoParado(processo)}</p>}
@@ -40,5 +43,6 @@ export function CaminhoDoProcesso({ processo, processos, podeAlterar, usuarioId,
       {acoes.falha && <p className="cadastros-falha" role="alert">{acoes.falha}</p>}
       <JanelasDaEtapa acoes={acoes} usuarios={usuarios} usuarioId={usuarioId} ultimaVersao={processo.ultimaVersao} />
     </section>
+    </>
   )
 }

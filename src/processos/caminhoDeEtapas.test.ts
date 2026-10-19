@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import {
-  ROTULO_DO_STATUS, acoesDaEtapa, concluidoEm, formatarData, indiceDaEtapaAtual, opcoesDeResponsavel, podeAssumir, proximaPendente, responsavelMarcado, sinalDaEtapa, usuariosParaAEtapa,
+  ROTULO_DO_STATUS, acoesDaEtapa, concluidoEm, formatarData, indiceDaEtapaAtual, opcoesDeResponsavel, podeAssumir, proximaPendente, responsavelMarcado, rotuloDoAgora, sinalDaEtapa, usuariosParaAEtapa,
 } from './caminhoDeEtapas'
 import type { EtapaDoCaminho, EtapaDoProcesso, StatusDaEtapa, UltimaVersao } from './tipos'
 
@@ -162,4 +162,9 @@ test('o sinal de cada etapa: atual, concluída, anterior, dispensada, pendente e
   ]
   expect(etapas.map((_, indice) => sinalDaEtapa(etapas, indice))).toEqual(
     ['concluida', 'anterior', 'atual', 'pendente', 'opcional', 'dispensada'])
+})
+
+test('o rótulo do Agora diz a posição da etapa atual, e só "Agora" sem etapa atual', () => {
+  expect(rotuloDoAgora(1, 6)).toBe('Agora · etapa 2 de 6')
+  expect(rotuloDoAgora(-1, 6)).toBe('Agora')
 })

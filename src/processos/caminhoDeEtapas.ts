@@ -120,3 +120,8 @@ export function sinalDaEtapa(etapas: EtapaDoCaminho[], indice: number): SinalDaE
   if (etapa.status === 'dispensada') return 'dispensada'
   return etapa.obrigatoria ? 'pendente' : 'opcional'
 }
+
+/** O rótulo do cartão Agora: a posição da etapa atual no caminho ("etapa 2 de 6"). */
+export function rotuloDoAgora(indice: number, total: number): string {
+  return indice < 0 ? 'Agora' : `Agora · etapa ${indice + 1} de ${total}`
+}

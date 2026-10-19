@@ -1,0 +1,73 @@
+/* O cartão "Agora" (spec, "Coluna esquerda — Agora"): a única coisa acesa da janela, com a borda de 2 px em azul e o
+   único botão principal. Na Consulta a borda é cinza; suspenso, cancelado e concluído têm fundo próprio. */
+.agora {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  padding: var(--esp-4);
+  border: var(--linha-acesa);
+  border-radius: var(--canto);
+  background: var(--folha);
+}
+
+.agora-leitura {
+  border: 2px solid var(--linha);
+}
+
+.agora-rotulo {
+  margin: 0;
+  color: var(--texto-2);
+  font-size: var(--tam-rotulo);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.agora-etapa {
+  margin: 0;
+  font-size: var(--tam-painel);
+  font-weight: 600;
+}
+
+.agora-responsavel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-1) var(--esp-3);
+  margin: 0;
+}
+
+.agora-dias {
+  color: var(--texto-2);
+  font-size: var(--tam-secundario);
+}
+
+.agora-trocar {
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--azul);
+  font: inherit;
+  font-size: var(--tam-secundario);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.agora-lista {
+  min-height: 32px;
+  padding: var(--esp-1) var(--esp-2);
+  border: 1px solid var(--linha);
+  border-radius: var(--canto-botao);
+  background: var(--folha);
+  color: var(--texto);
+  font: inherit;
+}
+
+.agora-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-2);
+  margin-top: var(--esp-1);
+}

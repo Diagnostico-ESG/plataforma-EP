@@ -15,3 +15,6 @@ export async function escolherNoMenuDoProcesso(acao: string): Promise<void> {
 
 /** As janelas abertas por cima do verso; vazia quando só o verso está aberto. */
 export const janelasPorCima = (): HTMLElement[] => screen.queryAllByRole('dialog').filter((janela) => !janela.classList.contains('verso'))
+
+/** O cartão "Agora" do verso aberto. */
+export const agoraDoVerso = async () => within(await (await versoAberto()).findByRole('region', { name: /^Agora/ }))
