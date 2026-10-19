@@ -95,21 +95,24 @@ interface LinhaDoAlvo {
   formato: string
   nome: string
   drive_id: string
-  versoes: { processo_id: string; historica: boolean } | null
+  versoes: { processo_id: string; historica: boolean; numero: number; aprovacoes: { id: string }[] } | null
 }
 
 // O arquivo a substituir, lido pela RLS com o login de quem chamou: o que ela não mostra não existe para a função.
 export async function lerAlvoDaSubstituicao(contexto: ContextoDoDrive, arquivoId: string): Promise<AlvoDaSubstituicao | null> {
   const { data, error } = await contexto.cliente
     .from('arquivos_da_versao')
-    .select('papel, formato, nome, drive_id, versoes(processo_id, historica)')
+    .select('papel, formato, nome, drive_id, versoes(processo_id, historica, numero, aprovacoes(id))')
     .eq('id', arquivoId)
     .maybeSingle()
   if (error) throw new Error(`leitura de arquivos_da_versao falhou (código ${error.code}); esperado: arquivo visível`)
   const linha = data as unknown as LinhaDoAlvo | null
   if (!linha?.versoes) return null
   const { papel, formato, nome, drive_id: driveId, versoes } = linha
-  return { papel, formato, nome, driveId, processoId: versoes.processo_id, historica: versoes.historica }
+  return {
+    papel, formato, nome, driveId, processoId: versoes.processo_id, historica: versoes.historica, numero: versoes.numero,
+    aprovada: versoes.aprovacoes.length > 0,
+  }
 }
 
 // O processo de uma versão, lido pela RLS com o login de quem chamou (null: a versão não existe ou não aparece).

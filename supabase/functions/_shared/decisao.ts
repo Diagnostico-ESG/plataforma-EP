@@ -20,6 +20,7 @@ export type CodigoDeRecusa =
   | 'arquivo_fora_da_pasta'
   | 'tipo_de_arquivo_diferente'
   | 'versao_historica_somente_leitura'
+  | 'versao_aprovada'
 export interface Recusa {
   codigo: CodigoDeRecusa
   mensagem: string
@@ -70,6 +71,7 @@ const MENSAGENS: Record<CodigoDeRecusa, string> = {
   arquivo_fora_da_pasta: 'O arquivo não está na pasta do processo no Drive.',
   tipo_de_arquivo_diferente: 'O arquivo novo precisa ser do mesmo tipo do que sai.',
   versao_historica_somente_leitura: 'A versão histórica é somente leitura.',
+  versao_aprovada: 'A versão está aprovada: seus arquivos não podem ser substituídos.',
 }
 
 export const FORMATO_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -81,6 +83,7 @@ const STATUS_POR_CODIGO: Partial<Record<CodigoDeRecusa, number>> = {
   sem_permissao: 403,
   tipo_de_arquivo_diferente: 409,
   versao_historica_somente_leitura: 409,
+  versao_aprovada: 409,
 }
 
 export function recusar(codigo: CodigoDeRecusa, detalhe?: string): Recusa {

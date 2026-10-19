@@ -6,7 +6,7 @@ const PROCESSO = '9f000000-0000-0000-0000-0000000000b1'
 
 const alvo: AlvoDaSubstituicao = {
   papel: 'relatorio', formato: 'pdf', nome: 'TSA_V3_Emitir Ofício_Relatório.pdf', driveId: 'drive-do-relatorio',
-  processoId: PROCESSO, historica: false,
+  processoId: PROCESSO, historica: false, aprovada: false, numero: 3,
 }
 
 const pedidoDeEnvio = { processoId: PROCESSO, papel: 'relatorio' as const, nomeOriginal: 'novo relatório.PDF' }
@@ -33,6 +33,12 @@ describe('conferirAlvoDoEnvio', () => {
 
   it('recusa arquivo de versão histórica', () => {
     expect(codigo(conferirAlvoDoEnvio({ ...alvo, historica: true }, pedidoDeEnvio))).toBe('versao_historica_somente_leitura')
+  })
+
+  it('recusa arquivo de versão aprovada, citando o número da versão, antes de o arquivo subir ao Drive', () => {
+    const recusa = conferirAlvoDoEnvio({ ...alvo, aprovada: true }, pedidoDeEnvio)
+    expect(codigo(recusa)).toBe('versao_aprovada')
+    expect(mensagem(recusa)).toContain('(3)')
   })
 
   it('recusa papel diferente, citando o recebido e o esperado', () => {
@@ -66,6 +72,10 @@ describe('conferirAlvoDoRegistro', () => {
     const outro = { ...pedidoDeRegistro, processoId: '9f000000-0000-0000-0000-0000000000b2' }
     expect(codigo(conferirAlvoDoRegistro(alvo, outro))).toBe('entrada_invalida')
     expect(codigo(conferirAlvoDoRegistro({ ...alvo, historica: true }, pedidoDeRegistro))).toBe('versao_historica_somente_leitura')
+  })
+
+  it('recusa arquivo de versão aprovada', () => {
+    expect(codigo(conferirAlvoDoRegistro({ ...alvo, aprovada: true }, pedidoDeRegistro))).toBe('versao_aprovada')
   })
 })
 

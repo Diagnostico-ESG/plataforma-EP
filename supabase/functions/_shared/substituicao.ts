@@ -13,6 +13,9 @@ export interface AlvoDaSubstituicao {
   driveId: string
   processoId: string
   historica: boolean
+  /** O número da versão do arquivo e se ela já foi aprovada (ADR 0011: versão aprovada não tem arquivo substituído). */
+  numero: number
+  aprovada: boolean
 }
 
 export interface PedidoDeEnvioDaSubstituicao {
@@ -30,6 +33,7 @@ export interface PedidoDeRegistroDaSubstituicao {
 function conferirAlvo(alvo: AlvoDaSubstituicao | null, processoId: string): Validacao<AlvoDaSubstituicao> {
   if (!alvo || alvo.processoId !== processoId) return falhar('entrada_invalida', 'arquivo não encontrado neste processo')
   if (alvo.historica) return falhar('versao_historica_somente_leitura')
+  if (alvo.aprovada) return falhar('versao_aprovada', String(alvo.numero))
   return { ok: true, valor: alvo }
 }
 
