@@ -1,15 +1,21 @@
 import { type MouseEvent, useState } from 'react'
 import { abrirAba, entregarArquivo, fecharAba } from '../../versoes/abrirOuBaixar'
 import { textoDaFalhaDoDownload } from '../../versoes/recusasDeVersoes'
+import { Icone } from '../Icone'
 import type { ArquivoDaVersao, ModuloDeVersoes } from '../../versoes/tipos'
 
-type LinkDoArquivoProps = { versoes: ModuloDeVersoes; arquivo: ArquivoDaVersao }
+type LinkDoArquivoProps = {
+  versoes: ModuloDeVersoes
+  arquivo: ArquivoDaVersao
+  /** O rótulo curto do destaque ("Fluxograma .bpmn"); sem ele, o link mostra o nome do arquivo. */
+  rotulo?: string
+}
 
 /**
  * O nome do arquivo como link de download, para todo perfil ativo. A aba é aberta dentro do clique, antes de esperar
  * a rede (senão o navegador a bloqueia); na falha, a aba é fechada e o aviso aparece abaixo do nome.
  */
-export function LinkDoArquivo({ versoes, arquivo }: LinkDoArquivoProps) {
+export function LinkDoArquivo({ versoes, arquivo, rotulo }: LinkDoArquivoProps) {
   const [aviso, setAviso] = useState<string | null>(null)
 
   async function baixar(evento: MouseEvent) {
@@ -26,7 +32,16 @@ export function LinkDoArquivo({ versoes, arquivo }: LinkDoArquivoProps) {
 
   return (
     <>
-      <a href="#baixar" onClick={(evento) => void baixar(evento)}>{arquivo.nome}</a>
+      {rotulo
+        ? (
+            // O nome acessível contém o texto visível e traz o nome do arquivo, que o title também mostra.
+            <a href="#baixar" className="arquivo-botao" aria-label={`Baixar ${rotulo} (${arquivo.nome})`} title={arquivo.nome}
+              onClick={(evento) => void baixar(evento)}>
+              <span>{rotulo}</span>
+              <Icone nome="baixar" tamanho={16} />
+            </a>
+          )
+        : <a href="#baixar" onClick={(evento) => void baixar(evento)}>{arquivo.nome}</a>}
       {aviso && <p className="cadastros-falha" role="alert">{aviso}</p>}
     </>
   )

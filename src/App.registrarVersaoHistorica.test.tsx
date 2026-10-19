@@ -3,7 +3,8 @@ import { afterEach, beforeEach, expect, test } from 'vitest'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { SituacaoDoProcesso } from './processos/tipos'
 import { montarNosCadastros } from './testes/processosNosCadastros'
-import { BPMN_VALIDO, PNG_VALIDO, versaoDeTeste } from './testes/versoesDeTeste'
+import { BPMN_VALIDO, PNG_VALIDO, comNome, versaoDeTeste } from './testes/versoesDeTeste'
+import { MENU_DOS_ARQUIVOS, escolherNoMenu, itensDoMenu } from './testes/versoDoCartao'
 import type { VersoesFalso } from './versoes/VersoesFalso'
 
 beforeEach(() => {
@@ -28,14 +29,14 @@ const comHistoricas = (...numeros: number[]) => ({
 
 async function secaoDeVersoes() {
   const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-  return within(await painel.findByRole('region', { name: 'Versões do processo' }))
+  return within(await painel.findByRole('region', { name: 'Arquivos' }))
 }
 
 const BOTAO = 'Registrar versão histórica'
 
 async function abrirFormulario() {
   const secao = await secaoDeVersoes()
-  fireEvent.click(await secao.findByRole('button', { name: BOTAO }))
+  await escolherNoMenu(MENU_DOS_ARQUIVOS, BOTAO)
   return { secao, form: within(await secao.findByRole('form', { name: BOTAO })) }
 }
 
@@ -54,26 +55,28 @@ async function preencherNumeroEBpm(form: Form, numero: string) {
 
 test.each(['administrador', 'integrante_ep'] as const)('o %s vê [Registrar versão histórica] no processo sem versão', async (perfil) => {
   montarNosCadastros({ perfil })
-  expect(await (await secaoDeVersoes()).findByRole('button', { name: BOTAO })).toBeTruthy()
+  await secaoDeVersoes()
+  expect(await itensDoMenu(MENU_DOS_ARQUIVOS)).toContain(BOTAO)
 })
 
 test('com só versões históricas, o botão continua aparecendo', async () => {
   montarNosCadastros(comHistoricas(3, 4))
-  expect(await (await secaoDeVersoes()).findByRole('button', { name: BOTAO })).toBeTruthy()
+  await secaoDeVersoes()
+  expect(await itensDoMenu(MENU_DOS_ARQUIVOS)).toContain(BOTAO)
 })
 
 test('com versão nova, o botão não aparece', async () => {
   montarNosCadastros({ ajustarVersoes: (falso) => { falso.versoes.p1 = [historicaDeTeste(5), versaoDeTeste(6)] } })
   const secao = await secaoDeVersoes()
-  await secao.findByRole('listitem', { name: 'V6' })
-  expect(secao.queryByRole('button', { name: BOTAO })).toBeNull()
+  await secao.findByRole('article', { name: 'V6' })
+  expect(secao.queryByRole('button', { name: MENU_DOS_ARQUIVOS })).toBeNull()
 })
 
 test('a Consulta não vê o botão', async () => {
   montarNosCadastros({ perfil: 'consulta' })
   const secao = await secaoDeVersoes()
   await secao.findByText('Nenhuma versão enviada.')
-  expect(secao.queryByRole('button', { name: BOTAO })).toBeNull()
+  expect(secao.queryByRole('button', { name: MENU_DOS_ARQUIVOS })).toBeNull()
 })
 
 test.each(['suspenso', 'cancelado', 'concluido'] as const)('processo %s não mostra o botão', async (situacao: SituacaoDoProcesso) => {
@@ -84,7 +87,7 @@ test.each(['suspenso', 'cancelado', 'concluido'] as const)('processo %s não mos
   })
   const secao = await secaoDeVersoes()
   await secao.findByText('Nenhuma versão enviada.')
-  expect(secao.queryByRole('button', { name: BOTAO })).toBeNull()
+  expect(secao.queryByRole('button', { name: MENU_DOS_ARQUIVOS })).toBeNull()
 })
 
 test('o formulário tem o número, os quatro campos de arquivo e a observação, e começa sem poder registrar', async () => {
@@ -137,10 +140,10 @@ test('registrar a V5F fecha o formulário e a lista mostra a V5F, sem etapa, com
   const { secao, form } = await abrirFormulario()
   await preencherNumeroEBpm(form, '5')
   fireEvent.click(botaoRegistrar(form))
-  const v5f = within(await secao.findByRole('listitem', { name: 'V5F' }))
+  const v5f = within(await secao.findByRole('article', { name: 'V5F' }))
   expect(v5f.getByText('Histórica · somente leitura')).toBeTruthy()
   expect(v5f.queryByText('Reunião de modelagem')).toBeNull()
-  expect(v5f.getByText('TSA_V5F_Emitir Ofício.bpm')).toBeTruthy()
+  expect(v5f.getByRole('link', { name: comNome('TSA_V5F_Emitir Ofício.bpm') })).toBeTruthy()
   expect(v5f.queryByRole('button')).toBeNull()
   expect(secao.queryByRole('form', { name: BOTAO })).toBeNull()
   expect(versoes.envios[0]).toMatchObject({ processoId: 'p1', numero: 5 })
@@ -151,14 +154,14 @@ test('registra várias históricas, da mais recente para a mais antiga, e o bot�
   const { secao, form: primeiro } = await abrirFormulario()
   await preencherNumeroEBpm(primeiro, '3')
   fireEvent.click(botaoRegistrar(primeiro))
-  await secao.findByRole('listitem', { name: 'V3F' })
-  fireEvent.click(secao.getByRole('button', { name: BOTAO }))
+  await secao.findByRole('article', { name: 'V3F' })
+  await escolherNoMenu(MENU_DOS_ARQUIVOS, BOTAO)
   const segundo = within(await secao.findByRole('form', { name: BOTAO }))
   await preencherNumeroEBpm(segundo, '4')
   fireEvent.click(botaoRegistrar(segundo))
-  await secao.findByRole('listitem', { name: 'V4F' })
-  expect(secao.getAllByRole('listitem', { name: /^V\d/ }).map((item) => item.getAttribute('aria-label'))).toEqual(['V4F', 'V3F'])
-  expect(secao.getByRole('button', { name: BOTAO })).toBeTruthy()
+  await secao.findByRole('article', { name: 'V4F' })
+  expect(secao.getAllByRole('article', { name: /^V\d/ }).map((item) => item.getAttribute('aria-label'))).toEqual(['V4F', 'V3F'])
+  expect(await itensDoMenu(MENU_DOS_ARQUIVOS)).toContain(BOTAO)
 })
 
 test('a primeira versão nova continua a numeração (V5F → V6) e o botão da histórica some', async () => {
@@ -172,9 +175,9 @@ test('a primeira versão nova continua a numeração (V5F → V6) e o botão da 
   const enviar = form.getByRole('button', { name: 'Enviar' }) as HTMLButtonElement
   await waitFor(() => expect(enviar.disabled).toBe(false))
   fireEvent.click(enviar)
-  await secao.findByRole('listitem', { name: 'V6' })
-  expect(secao.queryByRole('button', { name: BOTAO })).toBeNull()
-  expect(secao.getByRole('listitem', { name: 'V5F' })).toBeTruthy()
+  await secao.findByRole('article', { name: 'V6' })
+  expect(secao.queryByRole('button', { name: MENU_DOS_ARQUIVOS })).toBeNull()
+  expect(secao.getByRole('article', { name: 'V5F' })).toBeTruthy()
 })
 
 test('número de histórica repetido: a recusa aparece em vermelho e o formulário continua preenchido', async () => {

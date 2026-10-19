@@ -3,7 +3,7 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { SituacaoDoProcesso } from './processos/tipos'
 import { PROCESSOS_DOS_CADASTROS, montarNosCadastros } from './testes/processosNosCadastros'
-import { arquivoDeTeste, versaoDeTeste } from './testes/versoesDeTeste'
+import { arquivoDeTeste, comNome, versaoDeTeste } from './testes/versoesDeTeste'
 import type { VersoesFalso } from './versoes/VersoesFalso'
 
 type Aba = { location: { href: string }; close: ReturnType<typeof vi.fn> }
@@ -41,20 +41,21 @@ const comUmaVersao = { ajustarVersoes: (falso: VersoesFalso) => { falso.versoes.
 
 const secao = async () => {
   const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-  return within(await painel.findByRole('region', { name: 'Versões do processo' }))
+  return within(await painel.findByRole('region', { name: 'Arquivos' }))
 }
 
-test.each(['administrador', 'integrante_ep', 'consulta'] as const)('o perfil %s vê o nome de cada arquivo como link', async (perfil) => {
+test.each(['administrador', 'integrante_ep', 'consulta'] as const)('o perfil %s vê cada arquivo como link, com o nome no title', async (perfil) => {
   montarNosCadastros({ perfil, ...comUmaVersao })
   const links = await (await secao()).findAllByRole('link')
-  expect(links.map((link) => link.textContent)).toEqual([
+  expect(links.map((link) => link.textContent)).toEqual(['Fluxograma .bpmn', 'Imagem .png', 'Relatório .pdf'])
+  expect(links.map((link) => link.getAttribute('title'))).toEqual([
     'TSA_V1_Emitir Ofício.bpmn', 'TSA_V1_Emitir Ofício.png', 'TSA_V1_Emitir Ofício_Relatório.pdf',
   ])
 })
 
 test('clicar num .png abre uma aba nova e a leva ao arquivo, sem baixar', async () => {
   const { versoes } = montarNosCadastros({ perfil: 'consulta', ...comUmaVersao })
-  fireEvent.click(await (await secao()).findByRole('link', { name: 'TSA_V1_Emitir Ofício.png' }))
+  fireEvent.click(await (await secao()).findByRole('link', { name: comNome('TSA_V1_Emitir Ofício.png') }))
   await waitFor(() => expect(abas[0]?.location.href).toBe('blob:arquivo'))
   expect(versoes.baixados).toEqual(['a1-png'])
   expect(baixados).toEqual([])
@@ -62,13 +63,13 @@ test('clicar num .png abre uma aba nova e a leva ao arquivo, sem baixar', async 
 
 test('clicar num .pdf também abre a aba', async () => {
   montarNosCadastros({ ...comUmaVersao })
-  fireEvent.click(await (await secao()).findByRole('link', { name: 'TSA_V1_Emitir Ofício_Relatório.pdf' }))
+  fireEvent.click(await (await secao()).findByRole('link', { name: comNome('TSA_V1_Emitir Ofício_Relatório.pdf') }))
   await waitFor(() => expect(abas[0]?.location.href).toBe('blob:arquivo'))
 })
 
 test('clicar num .bpmn não abre aba: baixa com o nome padrão', async () => {
   montarNosCadastros({ ...comUmaVersao })
-  fireEvent.click(await (await secao()).findByRole('link', { name: 'TSA_V1_Emitir Ofício.bpmn' }))
+  fireEvent.click(await (await secao()).findByRole('link', { name: comNome('TSA_V1_Emitir Ofício.bpmn') }))
   await waitFor(() => expect(baixados).toEqual([{ href: 'blob:arquivo', download: 'TSA_V1_Emitir Ofício.bpmn' }]))
   expect(abas).toEqual([])
 })
@@ -76,7 +77,7 @@ test('clicar num .bpmn não abre aba: baixa com o nome padrão', async () => {
 test('se o navegador bloqueia a aba, o .png é baixado com o nome padrão', async () => {
   bloquearAbas = true
   montarNosCadastros({ ...comUmaVersao })
-  fireEvent.click(await (await secao()).findByRole('link', { name: 'TSA_V1_Emitir Ofício.png' }))
+  fireEvent.click(await (await secao()).findByRole('link', { name: comNome('TSA_V1_Emitir Ofício.png') }))
   await waitFor(() => expect(baixados).toEqual([{ href: 'blob:arquivo', download: 'TSA_V1_Emitir Ofício.png' }]))
 })
 
@@ -84,7 +85,7 @@ test('falha no download fecha a aba aberta e mostra a mensagem em vermelho', asy
   const { versoes } = montarNosCadastros({ ...comUmaVersao })
   versoes.falharNoDownload = new TravaDoBanco('O arquivo não foi encontrado no Drive. Avise o administrador.')
   const tela = await secao()
-  fireEvent.click(await tela.findByRole('link', { name: 'TSA_V1_Emitir Ofício.png' }))
+  fireEvent.click(await tela.findByRole('link', { name: comNome('TSA_V1_Emitir Ofício.png') }))
   expect((await tela.findByRole('alert')).textContent).toBe('O arquivo não foi encontrado no Drive. Avise o administrador.')
   expect(abas[0].close).toHaveBeenCalledOnce()
   expect(baixados).toEqual([])
@@ -94,11 +95,11 @@ test('falha de conexão cita o arquivo e o motivo, e um novo clique limpa o avis
   const { versoes } = montarNosCadastros({ ...comUmaVersao })
   versoes.falharNoDownload = true
   const tela = await secao()
-  fireEvent.click(await tela.findByRole('link', { name: 'TSA_V1_Emitir Ofício.bpmn' }))
+  fireEvent.click(await tela.findByRole('link', { name: comNome('TSA_V1_Emitir Ofício.bpmn') }))
   expect((await tela.findByRole('alert')).textContent)
     .toBe('Não foi possível baixar TSA_V1_Emitir Ofício.bpmn: falha de conexão simulada.')
   versoes.falharNoDownload = false
-  fireEvent.click(tela.getByRole('link', { name: 'TSA_V1_Emitir Ofício.bpmn' }))
+  fireEvent.click(tela.getByRole('link', { name: comNome('TSA_V1_Emitir Ofício.bpmn') }))
   await waitFor(() => expect(tela.queryByRole('alert')).toBeNull())
 })
 

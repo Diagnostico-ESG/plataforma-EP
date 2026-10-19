@@ -85,7 +85,8 @@ export type DatasDaEtapa = { iniciadaEm: string | null; resolvidaEm: string | nu
 export type UsuarioResponsavel = { id: string; nome: string }
 
 /** Um processo citado no painel de outro (o pai ou um subprocesso): abre o painel dele. */
-export type ItemDaEstrutura = { id: string; nome: string }
+/** O pai ou um subprocesso no verso: nome em link, a etapa atual e, fora de em andamento, a situação. */
+export type ItemDaEstrutura = { id: string; nome: string; etapaAtual: string | null; situacao: SituacaoDoProcesso }
 
 /** A versão mais recente não histórica do processo e quem a enviou: esse autor não pode revisar o próprio trabalho. */
 export type UltimaVersao = { numero: number; autorId: string; autorNome: string }

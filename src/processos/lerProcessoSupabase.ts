@@ -2,7 +2,7 @@ import { type EventoDoBanco, eventoDoCadastro } from '../cadastros/historicoSupa
 import type { ClienteSupabase } from '../lib/supabase'
 import { type AndamentoLido, COLUNAS_DO_ANDAMENTO, etapaDoAndamento } from './andamentoDoBanco'
 import { type LinhaDoProcesso, processoDaLinha } from './processoDaLinha'
-import type { EtapaDoProcesso, ModuloDeProcessos, ProcessoLido, UltimaVersao } from './tipos'
+import type { EtapaDoProcesso, ItemDaEstrutura, ModuloDeProcessos, ProcessoLido, SituacaoDoProcesso, UltimaVersao } from './tipos'
 
 type OperacoesDeLeitura = Pick<ModuloDeProcessos, 'lerProcesso' | 'lerHistoricoDoProcesso'>
 
@@ -16,11 +16,13 @@ export function criarLeituraDeProcessoSupabase(cliente: ClienteSupabase): Operac
 async function lerProcesso(cliente: ClienteSupabase, id: string): Promise<ProcessoLido | null> {
   const { data, error } = await cliente.from('processos_com_andamento').select('*').eq('id', id)
   if (error) throw new Error(`Falha ao ler o processo: ${error.message}`)
-  if (!data[0]) return null
+  // A linha pelo id: o cliente falso dos testes responde à leitura da estrutura (a mesma view) com a mesma lista.
+  const linha = data.find((uma) => uma.id === id)
+  if (!linha) return null
   const [etapasDoProcesso, estrutura, ultimaVersao] = await Promise.all([
-    lerAndamentosDoProcesso(cliente, id), lerEstrutura(cliente, id, data[0].processo_pai_id), lerUltimaVersao(cliente, id),
+    lerAndamentosDoProcesso(cliente, id), lerEstrutura(cliente, id, linha.processo_pai_id), lerUltimaVersao(cliente, id),
   ])
-  return { ...dadosDoProcesso(data[0]), ...estrutura, etapasDoProcesso, ultimaVersao }
+  return { ...dadosDoProcesso(linha), ...estrutura, etapasDoProcesso, ultimaVersao }
 }
 
 type LinhaDaUltimaVersao = { numero: number; enviada_por: string; autor: { nome: string } | null }
@@ -35,19 +37,27 @@ async function lerUltimaVersao(cliente: ClienteSupabase, id: string): Promise<Ul
   return { numero: ultima.numero, autorId: ultima.enviada_por, autorNome: ultima.autor?.nome ?? '' }
 }
 
-type LinhaDaEstrutura = { id: string; nome: string; processo_pai_id: string | null }
+type LinhaDaEstrutura = Pick<LinhaDoProcesso, 'id' | 'nome' | 'processo_pai_id' | 'situacao' | 'etapa_atual_nome'>
 type Estrutura = Pick<ProcessoLido, 'processoPai' | 'subprocessos'>
 
-// O pai e os subprocessos numa leitura só: as linhas que têm este processo como pai, mais a do pai, se houver.
+// O pai e os subprocessos numa leitura só, pela view que já calcula a etapa atual e a situação: as linhas que têm
+// este processo como pai, mais a do pai, se houver.
 async function lerEstrutura(cliente: ClienteSupabase, id: string, paiId: string | null): Promise<Estrutura> {
   const filtro = paiId ? `processo_pai_id.eq.${id},id.eq.${paiId}` : `processo_pai_id.eq.${id}`
-  const { data, error } = await cliente.from('processos').select('id, nome, processo_pai_id').or(filtro).order('nome')
+  const { data, error } = await cliente.from('processos_com_andamento').select('id, nome, processo_pai_id, situacao, etapa_atual_nome').or(filtro).order('nome')
   if (error) throw new Error(`Falha ao ler o pai e os subprocessos do processo: ${error.message}`)
   const linhas = data as LinhaDaEstrutura[]
   const pai = linhas.find((linha) => linha.id === paiId)
   return {
-    processoPai: pai ? { id: pai.id, nome: pai.nome } : null,
-    subprocessos: linhas.filter((linha) => linha.processo_pai_id === id).map(({ id: idDoFilho, nome }) => ({ id: idDoFilho, nome })),
+    processoPai: pai ? itemDaEstrutura(pai) : null,
+    subprocessos: linhas.filter((linha) => linha.processo_pai_id === id).map(itemDaEstrutura),
+  }
+}
+
+function itemDaEstrutura(linha: LinhaDaEstrutura): ItemDaEstrutura {
+  return {
+    id: linha.id ?? '', nome: linha.nome ?? '', etapaAtual: linha.etapa_atual_nome,
+    situacao: (linha.situacao ?? 'em_andamento') as SituacaoDoProcesso,
   }
 }
 

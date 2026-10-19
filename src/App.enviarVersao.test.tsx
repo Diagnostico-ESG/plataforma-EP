@@ -22,7 +22,7 @@ const comDuasVersoes = (ajuste?: (falso: VersoesFalso) => void) => ({
 
 async function abrirFormulario() {
   const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-  const secao = within(await painel.findByRole('region', { name: 'Versões do processo' }))
+  const secao = within(await painel.findByRole('region', { name: 'Arquivos' }))
   fireEvent.click(await secao.findByRole('button', { name: 'Enviar versão' }))
   return { secao, form: within(await secao.findByRole('form', { name: 'Enviar versão' })) }
 }
@@ -70,8 +70,8 @@ test('enviar registra a versão, fecha o formulário e a lista mostra a V3 no al
   await escolherOPar(form)
   fireEvent.change(form.getByLabelText('Observação (opcional)'), { target: { value: 'Primeira técnica' } })
   fireEvent.click(botaoEnviar(form))
-  const v3 = within(await secao.findByRole('listitem', { name: 'V3' }))
-  expect(secao.getAllByRole('listitem', { name: /^V\d/ })[0].getAttribute('aria-label')).toBe('V3')
+  const v3 = within(await secao.findByRole('article', { name: 'V3' }))
+  expect(secao.getAllByRole('article', { name: /^V\d/ })[0].getAttribute('aria-label')).toBe('V3')
   expect(v3.getByText('Reunião de modelagem')).toBeTruthy()
   expect(v3.getByText('Primeira técnica')).toBeTruthy()
   expect(secao.queryByRole('form', { name: 'Enviar versão' })).toBeNull()
@@ -132,7 +132,7 @@ test('se um arquivo falha, nada é registrado, a mensagem aparece em vermelho e 
   expect(form.getByText('Será gravado como: TSA_V3_Emitir Ofício.png')).toBeTruthy()
   expect(botaoEnviar(form).disabled).toBe(false)
   expect(versoes.envios).toEqual([])
-  expect(secao.getAllByRole('listitem', { name: /^V\d/ })).toHaveLength(2)
+  expect(secao.getAllByRole('article', { name: /^V\d/ })).toHaveLength(2)
 })
 
 test('a recusa no registro aparece com a frase pronta', async () => {

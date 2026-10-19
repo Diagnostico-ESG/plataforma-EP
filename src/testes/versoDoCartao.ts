@@ -28,3 +28,20 @@ export async function gavetaDaEtapa(nome: string) {
   if (linha.getAttribute('aria-expanded') !== 'true') fireEvent.click(linha)
   return within(linha.closest('li') as HTMLElement)
 }
+
+/** O "⋯" da seção Arquivos (versão histórica, relatório de uma anterior). */
+export const MENU_DOS_ARQUIVOS = 'Mais ações dos arquivos'
+
+/** Abre um "⋯" do verso pelo nome ("Mais ações dos arquivos", "Ações de {arquivo}") e escolhe o item. */
+export async function escolherNoMenu(menu: string, item: string): Promise<void> {
+  const verso = await versoAberto()
+  fireEvent.click(await verso.findByRole('button', { name: menu }))
+  fireEvent.click(verso.getByRole('menuitem', { name: item }))
+}
+
+/** Os itens de um "⋯" do verso, que fica aberto. */
+export async function itensDoMenu(menu: string): Promise<string[]> {
+  const verso = await versoAberto()
+  fireEvent.click(await verso.findByRole('button', { name: menu }))
+  return verso.getAllByRole('menuitem').map((item) => item.textContent ?? '')
+}

@@ -36,13 +36,13 @@ export function processoLido(etapas: EtapaDoProcesso[], mudancas: Partial<Proces
   }
 }
 
-/** O aplicativo inteiro com o processo aberto no verso (endereço #/processos/{id}). */
-export function montarVerso(processo: ProcessoLido, perfil: Perfil = 'integrante_ep'): ProcessosFalso {
+/** O aplicativo inteiro com o processo aberto no verso (endereço #/processos/{id}); `outros` são o pai e os subprocessos. */
+export function montarVerso(processo: ProcessoLido, perfil: Perfil = 'integrante_ep', outros: ProcessoLido[] = []): ProcessosFalso {
   window.location.hash = `#/processos/${processo.id}`
   const cadastros = new CadastrosFalso()
   cadastros.setores = [{ id: 's1', sigla: 'TSA', nome: 'Setor Teste A', observacoes: null, ativo: true }]
   const falso = new ProcessosFalso()
-  falso.processos = [processo]
+  falso.processos = [processo, ...outros]
   falso.usuariosPossiveis = [EU, BIA]
   falso.etapasDoCatalogo = processo.etapasDoProcesso.map((etapa) => ({
     id: `e${etapa.ordem}`, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, ativa: true,

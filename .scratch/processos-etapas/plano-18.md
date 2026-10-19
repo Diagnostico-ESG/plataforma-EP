@@ -65,15 +65,15 @@
 
 **Arquivos:** os três módulos puros do mapa e os testes deles.
 
-- [ ] **Passo 1: testes que falham.**
+- [x] **Passo 1: testes que falham.**
   - `rotuloCurtoDoArquivo(arquivo)`: bpmn → "Fluxograma .bpmn"; png → "Imagem .png"; bpm → "Bizagi .bpm"; relatório `…_Relatório.docx` → "Relatório .docx", `.pdf` → "Relatório .pdf" (extensão tirada do nome, em minúsculas).
   - `formatarDiaEMes('2026-10-02T13:00:00Z')` → "02/10" (no fuso de quem usa, como `formatarMomento`).
   - `momentoDaReuniao(null, hoje)` → null; data depois de hoje e igual a hoje → 'proxima'; antes de hoje → 'realizada'.
   - `ehTextoLongo`: 240 caracteres → false, 241 → true; 4 linhas curtas → true, 3 → false.
-- [ ] **Passo 2:** `npx vitest run src/versoes/rotulos.test.ts src/processos/textoDaReuniao.test.ts src/processos/textoLongo.test.ts` falha (funções inexistentes).
-- [ ] **Passo 3:** implementar. `textoDaReuniao` sai (só o `ReuniaoDoProcesso` o usa; a Tarefa 3 troca o uso), com os testes dele; até a Tarefa 3, manter as duas funções para o commit não quebrar.
-- [ ] **Passo 4:** os testes passam; `npm run lint`, `npm run typecheck`.
-- [ ] **Passo 5: commit** `Ticket 18 de processos-etapas: funções puras do verso (arquivo, dia, reunião, texto longo)`.
+- [x] **Passo 2:** `npx vitest run src/versoes/rotulos.test.ts src/processos/textoDaReuniao.test.ts src/processos/textoLongo.test.ts` falha (funções inexistentes).
+- [x] **Passo 3:** implementar. `textoDaReuniao` sai (só o `ReuniaoDoProcesso` o usa; a Tarefa 3 troca o uso), com os testes dele; até a Tarefa 3, manter as duas funções para o commit não quebrar.
+- [x] **Passo 4:** os testes passam; `npm run lint`, `npm run typecheck`.
+- [x] **Passo 5: commit** `Ticket 18 de processos-etapas: funções puras do verso (arquivo, dia, reunião, texto longo)`.
 
 ### Tarefa 2: Estrutura com a etapa atual e a situação
 
@@ -81,17 +81,17 @@
 
 **Produz:** `ItemDaEstrutura = { id: string; nome: string; etapaAtual: string | null; situacao: SituacaoDoProcesso }`.
 
-- [ ] **Passo 1: testes que falham** em `lerProcessoSupabase.test.ts`: os dois de estrutura passam a responder em `processos_com_andamento.select` com as linhas do processo, dos filhos e do pai (com `situacao` e `etapa_atual_nome`), e esperam `subprocessos: [{ id: 'p2', nome: 'Filho A', etapaAtual: 'Revisão interna', situacao: 'em_andamento' }, …]` e `processoPai: { id: 'p0', nome: 'Pai Fictício', etapaAtual: …, situacao: … }`; o filtro `ou` do pedido da estrutura continua `processo_pai_id.eq.p1` e `processo_pai_id.eq.p1,id.eq.p0`; a falha continua com "Falha ao ler o pai e os subprocessos do processo".
-- [ ] **Passo 2:** rodar e ver falhar.
-- [ ] **Passo 3:** `lerEstrutura` lê `processos_com_andamento` com `select('id, nome, processo_pai_id, situacao, etapa_atual_nome')`; `lerProcesso` acha a linha do processo por `id` (não pela primeira linha), porque o cliente falso devolve a mesma resposta às duas leituras da view. `estruturaDoProcesso` do falso leva `etapaAtual: outro.etapaAtual?.nome ?? null` e `situacao`.
-- [ ] **Passo 4:** `npm test`, `npm run lint`, `npm run typecheck` (o TypeScript aponta os outros lugares que montam a estrutura).
-- [ ] **Passo 5: commit** `Ticket 18 de processos-etapas: a estrutura traz a etapa atual e a situação`.
+- [x] **Passo 1: testes que falham** em `lerProcessoSupabase.test.ts`: os dois de estrutura passam a responder em `processos_com_andamento.select` com as linhas do processo, dos filhos e do pai (com `situacao` e `etapa_atual_nome`), e esperam `subprocessos: [{ id: 'p2', nome: 'Filho A', etapaAtual: 'Revisão interna', situacao: 'em_andamento' }, …]` e `processoPai: { id: 'p0', nome: 'Pai Fictício', etapaAtual: …, situacao: … }`; o filtro `ou` do pedido da estrutura continua `processo_pai_id.eq.p1` e `processo_pai_id.eq.p1,id.eq.p0`; a falha continua com "Falha ao ler o pai e os subprocessos do processo".
+- [x] **Passo 2:** rodar e ver falhar.
+- [x] **Passo 3:** `lerEstrutura` lê `processos_com_andamento` com `select('id, nome, processo_pai_id, situacao, etapa_atual_nome')`; `lerProcesso` acha a linha do processo por `id` (não pela primeira linha), porque o cliente falso devolve a mesma resposta às duas leituras da view. `estruturaDoProcesso` do falso leva `etapaAtual: outro.etapaAtual?.nome ?? null` e `situacao`.
+- [x] **Passo 4:** `npm test`, `npm run lint`, `npm run typecheck` (o TypeScript aponta os outros lugares que montam a estrutura).
+- [x] **Passo 5: commit** `Ticket 18 de processos-etapas: a estrutura traz a etapa atual e a situação`.
 
 ### Tarefa 3: Coluna direita — Reunião, Sobre e Estrutura
 
 **Arquivos:** `ReuniaoDoProcesso.tsx`, `SobreDoProcesso.tsx`, `TextoQueSeAbre.tsx`, `EstruturaDoProcesso.tsx`, `Contexto.css`, `VersoDoCartao.tsx`; apagar `DadosDoProcesso.tsx`; `App.contextoDoVerso.test.tsx`; ajustes nos testes de tela atuais.
 
-- [ ] **Passo 1: testes que falham** em `App.contextoDoVerso.test.tsx` (com `montarVerso` e `processoLido`):
+- [x] **Passo 1: testes que falham** em `App.contextoDoVerso.test.tsx` (com `montarVerso` e `processoLido`):
   1. sem data: região "Reunião" com "Ainda não marcada" e [Marcar data];
   2. data futura: "DD/MM/AAAA" e "· próxima", [Alterar data]; data passada: "· realizada";
   3. [Marcar data] mostra o campo "Data da reunião de modelagem piloto" com [Salvar] e [Cancelar] (sem [Remover]); salvar grava (`falso` com a data nova) e volta à leitura com a data;
@@ -101,15 +101,15 @@
   7. contexto de 300 caracteres mostra [Ler mais], que vira [Ler menos] (`aria-expanded`); contexto curto, sem botão;
   8. processo com subprocessos: região "Subprocessos (2)", cada um com link e "Revisão interna" embaixo, e "Revisão interna · Suspenso" no suspenso; clicar no link abre o subprocesso na mesma janela (endereço `#/processos/<id>`);
   9. subprocesso: região "Faz parte de" com o pai; processo sem estrutura: nenhuma das duas regiões.
-- [ ] **Passo 2:** rodar e ver falhar.
-- [ ] **Passo 3: implementar.**
+- [x] **Passo 2:** rodar e ver falhar.
+- [x] **Passo 3: implementar.**
   - `ReuniaoDoProcesso`: `section` com `h3` "Reunião" (nome da região); leitura com a barrinha (`--tipo-reuniao`), a data em mono e o momento; estado `editando` (só para `podeAlterar`); a edição atual (falha, `CadastroInexistente`, chave que recomeça) ganha [Cancelar] e volta à leitura depois de gravar.
   - `SobreDoProcesso`: `section` "Sobre", `dl` com o rótulo em cima; só os campos com valor; contexto e observações por `TextoQueSeAbre` (`ehTextoLongo` decide o botão; o CSS corta em 4 linhas enquanto fechado).
   - `EstruturaDoProcesso`: títulos "Subprocessos ({n})" e "Faz parte de"; a linha cinza com `etapaAtual` e, fora de em andamento, `ROTULO_DA_SITUACAO`.
   - `Contexto.css`: rótulos pequenos em cinza (`--tam-rotulo`), valores em `--tam-secundario`/base, barrinha de 3 px, sem caixas pesadas (a coluna já tem fundo cinza).
-- [ ] **Passo 4: ajustar os testes atuais** (critério 7): `App.reuniaoDoProcesso` (região "Reunião", clicar [Marcar data]/[Alterar data] antes do campo, textos novos), `App.subprocessos` e `App.versoDoCartao` (regiões "Subprocessos (n)", "Faz parte de", "Sobre"), `App.reclassificar` e `App.recursosRetirados` ("Sobre" no lugar de "Dados do processo"). Mantêm o que conferem.
-- [ ] **Passo 5:** `npm test`, `npm run lint`, `npm run typecheck`.
-- [ ] **Passo 6: commit** `Ticket 18 de processos-etapas: Reunião, Sobre e Estrutura na coluna direita`.
+- [x] **Passo 4: ajustar os testes atuais** (critério 7): `App.reuniaoDoProcesso` (região "Reunião", clicar [Marcar data]/[Alterar data] antes do campo, textos novos), `App.subprocessos` e `App.versoDoCartao` (regiões "Subprocessos (n)", "Faz parte de", "Sobre"), `App.reclassificar` e `App.recursosRetirados` ("Sobre" no lugar de "Dados do processo"). Mantêm o que conferem.
+- [x] **Passo 5:** `npm test`, `npm run lint`, `npm run typecheck`.
+- [x] **Passo 6: commit** `Ticket 18 de processos-etapas: Reunião, Sobre e Estrutura na coluna direita`.
 
 ### Tarefa 4: Arquivos
 
@@ -117,7 +117,7 @@
 
 **Consome:** `rotuloCurtoDoArquivo`, `formatarDiaEMes` (Tarefa 1); `MenuDeAcoes` (`src/components/MenuDeAcoes.tsx`).
 
-- [ ] **Passo 1: testes que falham** em `App.arquivosDoVerso.test.tsx` (com `montarNosCadastros`, `versaoDeTeste`, `arquivoDeTeste`):
+- [x] **Passo 1: testes que falham** em `App.arquivosDoVerso.test.tsx` (com `montarNosCadastros`, `versaoDeTeste`, `arquivoDeTeste`):
   1. região "Arquivos" com o `article` "V2" em destaque: "V2", "02/10" e, sem relatório, a pílula "falta relatório"; os botões "Baixar Fluxograma .bpmn (…)" e "Baixar Imagem .png (…)"; o espaço [+ Acrescentar relatório] abre o formulário do relatório da V2;
   2. com relatório, sem a pílula nem o espaço, e com o botão "Baixar Relatório .pdf (…)";
   3. "Versões anteriores (2)" fechado (`details` sem `open`), com os `article` V1 e V2F dentro depois de abrir;
@@ -125,34 +125,34 @@
   5. o "⋯" de cada arquivo ("Ações de TSA_V2_Emitir Ofício.bpmn") tem Substituir, que abre o formulário da troca;
   6. Consulta: baixa (os botões existem), sem [Enviar versão], "⋯" da seção, "⋯" dos arquivos e espaço tracejado; o mesmo para processo suspenso;
   7. as marcas "alterado fora da plataforma" e "não encontrado no Drive" aparecem ao lado do botão do arquivo do destaque (critério 3).
-- [ ] **Passo 2:** rodar e ver falhar.
-- [ ] **Passo 3: implementar.**
+- [x] **Passo 2:** rodar e ver falhar.
+- [x] **Passo 3: implementar.**
   - `SecaoDeVersoes`: `section` com `h3` "Arquivos" e [Enviar versão] na mesma linha do título; o "⋯" da seção ao lado; formulário aberto, conferência e carregando como hoje; corpo = `VersaoEmDestaque` da primeira de `ordenarVersoes` + `<details>` com `ListaDeVersoes` das demais.
   - `VersaoEmDestaque`: `article` com `aria-label` do rótulo; linha `rotulo · dia · pílulas` (mono no rótulo e no dia; "Histórica · somente leitura" e "falta relatório" como `Pilula`); segunda linha cinza com autor, etapa e observação; lista de botões (`LinkDoArquivo` com `rotulo`, barrinha por papel: `--tipo-fluxograma` em bpmn, png e bpm, `--tipo-relatorio` no relatório; ícone `documento` à esquerda, seta de baixar à direita); `MarcaNoDrive` e `AcaoSubstituir` por arquivo; espaço tracejado (botão) quando `relatorioPendente` e pode enviar; `AcaoSemAlteracao` quando `podeCopiarRelatorio`.
   - `LinkDoArquivo`: `rotulo?: string`; com ele, mostra o rótulo e usa `aria-label` "Baixar {rotulo} ({nome})" e `title` com o nome.
   - `AcaoSubstituir`: o gatilho vira `MenuDeAcoes` com rótulo "Ações de {nome}" e o item "Substituir"; o formulário abre no lugar, como hoje.
   - `ListaDeVersoes`: `li > article aria-label` no lugar do `aria-label` do `li`.
   - Ícone de baixar: acrescentar `baixar` ao `Icone` (seta para baixo) se não existir.
-- [ ] **Passo 4: ajustar os testes atuais** (critério 7): região "Arquivos"; `findByRole('article', { name })` no lugar de `listitem`; "falta relatório" no lugar de "Relatório pendente" quando a versão é a mais recente; links da mais recente por `button`/`link` com nome em expressão regular do nome do arquivo; Substituir pelo "⋯" do arquivo; "Registrar versão histórica" e "Acrescentar relatório" pelo "⋯" da seção ou pelo espaço tracejado. Mantêm o que conferem.
-- [ ] **Passo 5:** `npm test`, `npm run lint`, `npm run typecheck`.
-- [ ] **Passo 6: commit** `Ticket 18 de processos-etapas: Arquivos com a versão mais recente em destaque`.
+- [x] **Passo 4: ajustar os testes atuais** (critério 7): região "Arquivos"; `findByRole('article', { name })` no lugar de `listitem`; "falta relatório" no lugar de "Relatório pendente" quando a versão é a mais recente; links da mais recente por `button`/`link` com nome em expressão regular do nome do arquivo; Substituir pelo "⋯" do arquivo; "Registrar versão histórica" e "Acrescentar relatório" pelo "⋯" da seção ou pelo espaço tracejado. Mantêm o que conferem.
+- [x] **Passo 5:** `npm test`, `npm run lint`, `npm run typecheck`.
+- [x] **Passo 6: commit** `Ticket 18 de processos-etapas: Arquivos com a versão mais recente em destaque`.
 
 ### Tarefa 5: Conferir a tela no navegador (critérios `[visual]`)
 
-- [ ] **Passo 1:** subir a vitrine local (`vitrine.local/`, fora do git, módulos falsos) com `npx vite --port 5179` em segundo plano (ou reaproveitar o servidor se a porta já responder) e montar nela: processo com V2 sem relatório e duas anteriores, reunião futura, contexto longo e dois subprocessos (um suspenso); um subprocesso; a Consulta. Se a vitrine quebrar pelas mudanças, ajustá-la (ela não entra no commit).
-- [ ] **Passo 2:** no navegador do app, conferir: a linha "V2 · 02/10 · falta relatório"; botões com a barrinha de cor; o tracejado no lugar do relatório; pílulas com texto; a coluna direita (reunião com a barrinha amarela, Sobre, Estrutura); o "⋯" e o `<details>`; a janela com menos de 900 px. Conferir também pelo DOM (as fotos saem atrasadas).
-- [ ] **Passo 3:** ajustar o CSS até ficar bom; encerrar o Vite da vitrine.
-- [ ] **Passo 4:** `npm test`, `npm run lint`, `npm run typecheck`.
-- [ ] **Passo 5: commit** `Ticket 18 de processos-etapas: acabamento visual de Arquivos e da coluna direita`.
+- [x] **Passo 1:** subir a vitrine local (`vitrine.local/`, fora do git, módulos falsos) com `npx vite --port 5179` em segundo plano (ou reaproveitar o servidor se a porta já responder) e montar nela: processo com V2 sem relatório e duas anteriores, reunião futura, contexto longo e dois subprocessos (um suspenso); um subprocesso; a Consulta. Se a vitrine quebrar pelas mudanças, ajustá-la (ela não entra no commit).
+- [x] **Passo 2:** no navegador do app, conferir: a linha "V2 · 02/10 · falta relatório"; botões com a barrinha de cor; o tracejado no lugar do relatório; pílulas com texto; a coluna direita (reunião com a barrinha amarela, Sobre, Estrutura); o "⋯" e o `<details>`; a janela com menos de 900 px. Conferir também pelo DOM (as fotos saem atrasadas).
+- [x] **Passo 3:** ajustar o CSS até ficar bom; encerrar o Vite da vitrine.
+- [x] **Passo 4:** `npm test`, `npm run lint`, `npm run typecheck`.
+- [x] **Passo 5: commit** `Ticket 18 de processos-etapas: acabamento visual de Arquivos e da coluna direita`.
 
 ### Tarefa 6: Fecho
 
-- [ ] **Passo 1:** `desvios.md` (entrada nova, datada): as dez decisões deste plano e o que a conferência mostrou, separando **visto** de **presumido**.
-- [ ] **Passo 2:** `.scratch/melhorias-protocolo.md`: ocorrências desta execução e os itens de `.claude/regras/nao-testados.md` que aconteceram (bloco do `/executar-complexo` e "Qualquer momento"), sem concluir se funcionaram.
-- [ ] **Passo 3:** `npm run test:coverage` (acima de 70%), `npm run check:circular`, `npm run build`.
-- [ ] **Passo 4:** marcar as caixas do plano e os critérios do ticket provados (os `[visual]` só com o que foi visto).
-- [ ] **Passo 5: commit** `Ticket 18 de processos-etapas: desvios, melhorias do protocolo e plano marcado`.
-- [ ] **Passo 6:** juntar à `main` (`git switch main`, merge), `git branch -d processos-etapas-18`, `Concluído em AAAA-MM-DD (commit <hash>)` no fim do ticket, commit, envio da `main` e do marco ao GitHub.
+- [x] **Passo 1:** `desvios.md` (entrada nova, datada): as dez decisões deste plano e o que a conferência mostrou, separando **visto** de **presumido**.
+- [x] **Passo 2:** `.scratch/melhorias-protocolo.md`: ocorrências desta execução e os itens de `.claude/regras/nao-testados.md` que aconteceram (bloco do `/executar-complexo` e "Qualquer momento"), sem concluir se funcionaram.
+- [x] **Passo 3:** `npm run test:coverage` (acima de 70%), `npm run check:circular`, `npm run build`.
+- [x] **Passo 4:** marcar as caixas do plano e os critérios do ticket provados (os `[visual]` só com o que foi visto).
+- [x] **Passo 5: commit** `Ticket 18 de processos-etapas: desvios, melhorias do protocolo e plano marcado`.
+- [x] **Passo 6:** juntar à `main` (`git switch main`, merge), `git branch -d processos-etapas-18`, `Concluído em AAAA-MM-DD (commit <hash>)` no fim do ticket, commit, envio da `main` e do marco ao GitHub.
 
 ## Cobertura dos critérios do ticket
 

@@ -28,10 +28,10 @@ function processo(id: string, nome: string, mudancas: Partial<ProcessoLido> = {}
 }
 
 const PROCESSOS: ProcessoLido[] = [
-  processo('p1', 'Pagar Diária', { setorId: 's2', setorSigla: 'TSB', subprocessos: [{ id: 'p2', nome: 'Conferir Recibo' }] }),
+  processo('p1', 'Pagar Diária', { setorId: 's2', setorSigla: 'TSB', subprocessos: [{ id: 'p2', nome: 'Conferir Recibo', etapaAtual: null, situacao: 'em_andamento' }] }),
   processo('p2', 'Conferir Recibo', {
     setorId: 's2', setorSigla: 'TSB', tipo: 'subprocesso', processoPaiId: 'p1',
-    processoPai: { id: 'p1', nome: 'Pagar Diária' }, responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null },
+    processoPai: { id: 'p1', nome: 'Pagar Diária', etapaAtual: null, situacao: 'em_andamento' }, responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null },
   }),
   processo('p3', 'Emitir Ofício', { situacao: 'concluido', etapaAtual: null }),
   processo('p4', 'Arquivar Pasta', { situacao: 'cancelado' }),

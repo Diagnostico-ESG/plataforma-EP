@@ -1,0 +1,145 @@
+/* A coluna direita do verso (o contexto): Reunião, Sobre e Estrutura. Quieta: a coluna já tem fundo próprio. */
+.contexto-secao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+}
+
+.contexto-titulo {
+  margin: 0;
+  color: var(--texto-2);
+  font-size: var(--tam-rotulo);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.contexto-link {
+  align-self: flex-start;
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--azul);
+  font: inherit;
+  font-size: var(--tam-secundario);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Reunião */
+.reuniao-linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--esp-1) var(--esp-3);
+}
+
+.reuniao-data,
+.reuniao-sem-data {
+  margin: 0;
+  padding-left: var(--esp-2);
+  border-left: 3px solid var(--tipo-reuniao);
+}
+
+.reuniao-data time {
+  font-family: var(--fonte-mono);
+  font-size: var(--tam-secundario);
+  font-weight: 600;
+}
+
+.reuniao-momento {
+  margin-left: var(--esp-1);
+  color: var(--texto-2);
+  font-size: var(--tam-secundario);
+}
+
+.reuniao-sem-data {
+  border-left-style: dashed;
+  color: var(--texto-2);
+  font-size: var(--tam-secundario);
+}
+
+.reuniao-edicao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+}
+
+.reuniao-edicao input {
+  align-self: flex-start;
+  font-family: var(--fonte-mono);
+}
+
+.reuniao-edicao .cadastros-falha {
+  margin: 0;
+}
+
+.reuniao-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+}
+
+/* Sobre */
+/* Os campos curtos lado a lado; contexto e observações ocupam a linha toda. */
+.sobre-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--esp-3) var(--esp-4);
+  margin: 0;
+}
+
+.sobre-dado-longo {
+  grid-column: 1 / -1;
+}
+
+.sobre-dado dt {
+  color: var(--texto-2);
+  font-size: var(--tam-rotulo);
+}
+
+.sobre-dado dd {
+  margin: 2px 0 0;
+  font-size: var(--tam-secundario);
+  overflow-wrap: anywhere;
+}
+
+.texto-que-se-abre {
+  margin: 0;
+  white-space: pre-line;
+}
+
+.texto-cortado {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+}
+
+/* Estrutura */
+.estrutura-lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.estrutura-lista li {
+  display: flex;
+  flex-direction: column;
+}
+
+.estrutura-link {
+  color: var(--azul);
+  font-size: var(--tam-secundario);
+}
+
+.estrutura-andamento {
+  color: var(--texto-2);
+  font-size: var(--tam-rotulo);
+}

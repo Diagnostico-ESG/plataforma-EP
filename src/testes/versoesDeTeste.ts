@@ -23,3 +23,6 @@ export const BPMN_VALIDO = new File(
   ['<?xml version="1.0"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" id="d"/>'], 'fluxo.bpmn',
 )
 export const PNG_VALIDO = new File([new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0])], 'fluxo.png')
+
+/** Para achar um arquivo pelo nome dentro do nome acessível do botão ("Baixar Imagem .png (TSA_V1_...png)"). */
+export const comNome = (trecho: string) => (nome: string) => nome.includes(trecho)

@@ -73,3 +73,19 @@ export function rotuloDaAnterior(versao: Versao, versoes: Versao[]): string | nu
   const anterior = versaoAnterior(versao, versoes)
   return anterior ? rotuloDaVersao(anterior) : null
 }
+
+const NOME_CURTO_DO_PAPEL: Record<PapelDoArquivo, string> = {
+  bpmn: 'Fluxograma', png: 'Imagem', bpm: 'Bizagi', relatorio: 'Relatório',
+}
+
+/** "Fluxograma .bpmn", "Relatório .pdf": o botão do arquivo no destaque da versão. */
+export function rotuloCurtoDoArquivo({ papel, formato }: Pick<ArquivoDaVersao, 'papel' | 'formato'>): string {
+  return `${NOME_CURTO_DO_PAPEL[papel]} .${formato.toLowerCase()}`
+}
+
+const FORMATO_DO_DIA_E_MES = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' })
+
+/** "02/10": o dia do envio na linha de destaque, no mesmo fuso do momento completo. */
+export function formatarDiaEMes(iso: string): string {
+  return FORMATO_DO_DIA_E_MES.format(new Date(iso))
+}

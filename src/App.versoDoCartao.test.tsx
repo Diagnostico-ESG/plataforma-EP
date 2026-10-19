@@ -106,7 +106,7 @@ test('pai e subprocesso abrem na mesma janela, com o endereço e o nome da janel
   const modal = vi.spyOn(HTMLDialogElement.prototype, 'showModal')
   montar()
   const pai = await versoAberto()
-  const subprocessos = within(await pai.findByRole('region', { name: 'Subprocessos' }))
+  const subprocessos = within(await pai.findByRole('region', { name: /^Subprocessos/ }))
   fireEvent.click(subprocessos.getByRole('link', { name: 'Conferir Ofício' }))
   await waitFor(() => expect(window.location.hash).toBe('#/processos/p3'))
   expect(await screen.findByRole('dialog', { name: 'Processo Conferir Ofício' })).toBeTruthy()
@@ -232,14 +232,14 @@ test('processo que não existe mais: o aviso e [Voltar], que volta ao Quadro', a
 
 // O que continua do painel
 
-test('as duas colunas: etapas e versões no trabalho; reunião, dados e estrutura no contexto', async () => {
+test('as duas colunas: etapas e versões no trabalho; reunião, Sobre e estrutura no contexto', async () => {
   window.location.hash = '#/processos/p2'
   montar()
   const aberto = await versoAberto()
   const caminho = await aberto.findByRole('region', { name: 'Etapas' })
   expect(caminho.closest('.verso-trabalho')).toBeTruthy()
-  expect(aberto.getByRole('region', { name: 'Dados do processo' }).closest('.verso-contexto')).toBeTruthy()
-  expect(aberto.getByRole('region', { name: 'Subprocessos' }).closest('.verso-contexto')).toBeTruthy()
+  expect(aberto.getByRole('region', { name: 'Sobre' }).closest('.verso-contexto')).toBeTruthy()
+  expect(aberto.getByRole('region', { name: /^Subprocessos/ }).closest('.verso-contexto')).toBeTruthy()
 })
 
 test('os dados do processo aparecem no verso', async () => {
