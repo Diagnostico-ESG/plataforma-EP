@@ -56,15 +56,15 @@
 
 ### Tarefa 1 — Plano, marco e branch
 
-- [ ] Comitar este plano na `main` ("Plano do ticket 13 de processos-etapas").
-- [ ] Criar o marco `marco/2026-10-18-inicio-ticket-13-processos-etapas` (se o nome existir, `-2`) e enviá-lo ao GitHub com `git push origin "refs/tags/marco/*:refs/tags/marco/*"`.
-- [ ] `git switch -c processos-etapas-13` (branch comum, sem worktree).
+- [x] Comitar este plano na `main` ("Plano do ticket 13 de processos-etapas").
+- [x] Criar o marco `marco/2026-10-18-inicio-ticket-13-processos-etapas` (se o nome existir, `-2`) e enviá-lo ao GitHub com `git push origin "refs/tags/marco/*:refs/tags/marco/*"`.
+- [x] `git switch -c processos-etapas-13` (branch comum, sem worktree).
 
 ### Tarefa 2 — Teste de banco que falha (critério 2)
 
 **Files:** Create `supabase/tests/35_avancar_etapa.test.sql`.
 
-- [ ] Criar o teste. Preparação como a do `19_voltar_datas_responsavel.test.sql` (mesma moldura `_tap`, mesmos quatro usuários inventados a1 Administrador, a2 Integrante, a3 Consulta, a4 Administrador inativo, as funções `pg_temp.andamento`, `pg_temp.agir`, `pg_temp.status`), mais:
+- [x] Criar o teste. Preparação como a do `19_voltar_datas_responsavel.test.sql` (mesma moldura `_tap`, mesmos quatro usuários inventados a1 Administrador, a2 Integrante, a3 Consulta, a4 Administrador inativo, as funções `pg_temp.andamento`, `pg_temp.agir`, `pg_temp.status`), mais:
 
 ```sql
 -- Avanço da etapa (processos-etapas, ticket 13, ADR 0014): resolver a etapa atual já inicia a próxima, com o
@@ -125,9 +125,9 @@ set local role authenticated;
      - (38) `avancar('Processo Pulo','opcional_teste','dispensar','Não se aplica',a2)` `lives_ok`; (39) a opcional `dispensada`; (40) `revisao_interna` continua `realizada_anteriormente` (a resolvida não é reaberta); (41) `revisao_setor` `em_andamento`; (42) responsável de `revisao_setor` = a2.
   7. **Perfis** (sobre "Processo Recusas", a 1 em andamento): a3 (Consulta): (43) `throws_ok` com `'42501', null` ao `avancar('Processo Recusas','modelagem','concluir',null,null)`. a4 (inativo): (44) `'P0001', 'registro_inexistente'`. `set local role anon`: (45) `select public.avancar_etapa('00000000-0000-0000-0000-000000000000', 'concluir', null, null)` → `'42501', null`.
   8. `reset role;` (46) `prosecdef` de `public.avancar_etapa` = `false`; `finish()` e o `do $$ … raise exception … $$` de relatório, como no fim do teste 19.
-- [ ] Comitar na branch ("Ticket 13 de processos-etapas: teste de banco do avanço"). O pre-commit só roda a bateria da tela.
-- [ ] `git push -u origin processos-etapas-13` (sem `--force`).
-- [ ] Disparar o workflow "Testes de banco" na branch `processos-etapas-13`, pelo navegador do app (`anthropic-skills:built-in-browser`; não há `gh`; o usuário já entrou no GitHub). Esperado: **só o teste 35 falha**, por `function public.avancar_etapa(uuid, text, text, uuid) does not exist`; os 34 arquivos anteriores passam. Se falhar por outro motivo (digitação, usuário, plano), corrigir e repetir.
+- [x] Comitar na branch ("Ticket 13 de processos-etapas: teste de banco do avanço"). O pre-commit só roda a bateria da tela.
+- [x] `git push -u origin processos-etapas-13` (sem `--force`).
+- [x] Disparar o workflow "Testes de banco" na branch `processos-etapas-13`, pelo navegador do app (`anthropic-skills:built-in-browser`; não há `gh`; o usuário já entrou no GitHub). Esperado: **só o teste 35 falha**, por `function public.avancar_etapa(uuid, text, text, uuid) does not exist`; os 34 arquivos anteriores passam. Se falhar por outro motivo (digitação, usuário, plano), corrigir e repetir.
 
 ### Tarefa 3 — Migração, aplicação e tipos (critérios 1 e 11)
 
