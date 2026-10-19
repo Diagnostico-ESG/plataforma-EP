@@ -86,7 +86,7 @@ test('Voltar a esta etapa só aparece nas resolvidas anteriores à atual', async
   expect(botoes(await etapa(MODELAGEM))).toContain('Voltar a esta etapa')
   expect(botoes(await etapa(RELATORIO))).toContain('Voltar a esta etapa')
   expect(botoes(await etapa(REVISAO))).not.toContain('Voltar a esta etapa')
-  expect(botoes(await etapa('Publicação'))).toEqual([])
+  expect(botoes(await etapa('Publicação'))).toEqual(['Assumir'])
 })
 
 test('voltar à modelagem pede o motivo, grava e devolve as seguintes a pendente', async () => {

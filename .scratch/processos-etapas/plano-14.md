@@ -213,7 +213,7 @@ grant execute on function private.conferir_autor_da_revisao_interna(), private.r
 
 **Files:** Create `src/App.assumirEAutor.test.tsx`; Modify `src/hooks/useAcoesDaEtapa.ts`, `src/components/processos/{CaminhoDeEtapas,CaminhoDoProcesso,EdicaoDaEtapa,JanelaDeAvanco,EscolhaDoResponsavel}.tsx`, `src/App.{voltarDatasResponsavel,avancoDaEtapa}.test.tsx`.
 
-- [ ] **Testes de tela primeiro** em `src/App.assumirEAutor.test.tsx` (mesma montagem de `App.avancoDaEtapa.test.tsx`: `montar`, processo `#/processos/p1`, `falso.usuariosPossiveis = [{ id: 'usuario-de-teste', nome: <o do USUARIO_DE_TESTE> }, { id: 'u2', nome: 'Bia Teste' }]`; a etapa `revisao_interna` presente no caminho; `ultimaVersao` posta no processo do `falso`). Casos:
+- [x] **Testes de tela primeiro** em `src/App.assumirEAutor.test.tsx` (mesma montagem de `App.avancoDaEtapa.test.tsx`: `montar`, processo `#/processos/p1`, `falso.usuariosPossiveis = [{ id: 'usuario-de-teste', nome: <o do USUARIO_DE_TESTE> }, { id: 'u2', nome: 'Bia Teste' }]`; a etapa `revisao_interna` presente no caminho; `ultimaVersao` posta no processo do `falso`). Casos:
   1. **[Assumir] aparece** (critério 4): em etapa pendente e em andamento sem responsável há o botão "Assumir" (com nome acessível "Assumir <etapa>"); não há em etapa resolvida, em etapa com responsável, nem para a Consulta (`perfil: 'consulta'`).
   2. **Um clique assume:** clicar [Assumir] na etapa em andamento grava `falso.chamadas` = `[{ acao: 'responsavel', id, usuarioId: 'usuario-de-teste' }]`; a linha passa a "Responsável: <nome>" e o botão some; na aba Histórico (com o evento `mudar_responsavel` no `historicoDosProcessos`) aparece "Mudou o responsável da etapa".
   3. **Autor na Revisão interna:** com `ultimaVersao = { numero: 3, autorId: 'usuario-de-teste', autorNome: <nome> }`, a Revisão interna **não** tem [Assumir] para o usuário da tela, mas as outras etapas têm; com o autor sendo `u2`, a Revisão interna tem [Assumir] para o usuário da tela.
@@ -222,9 +222,9 @@ grant execute on function private.conferir_autor_da_revisao_interna(), private.r
   6. **Seletor recusa o autor** (critério 6): escolher o autor no seletor "Responsável de Revisão interna" mostra o alerta "<Nome> enviou a versão V3 e não pode ser responsável pela Revisão interna." (o `falso` imita o banco) e o seletor continua no responsável anterior; escolher outra pessoa grava.
   7. **Janela de voltar** (critério 7): [Voltar a esta etapa] abre o `dialog` "Voltar à etapa <etapa>?" com o campo "Motivo" e o `radiogroup` "Quem fica com esta etapa?"; o botão "Voltar" fica desabilitado com o motivo vazio e habilita com texto; marcado o responsável atual da etapa reaberta (se pode), senão quem está na tela, senão "Ninguém por enquanto"; na Revisão interna o autor da versão mais recente não está na lista; confirmar grava `falso.chamadas` = `[{ acao: 'voltar', id, nota: <motivo>, usuarioId: <escolhido ou null> }]` e a etapa volta a "Em andamento" com "Responsável: <escolhido>" (ou "—"); Esc e [Cancelar] fecham sem gravar.
   8. **Falha ao voltar:** `falhaDeGravacao = 'Sem conexão'` mostra o alerta e as etapas ficam como estavam; a recusa da trava do banco (`TravaDoBanco` com a frase do autor) aparece como alerta.
-- [ ] Ajustar `App.voltarDatasResponsavel.test.tsx` (o voltar agora abre a `JanelaDeAvanco`: confirmar com o botão "Voltar" depois de escolher o responsável, `chamadas` com `usuarioId`) e o que mais o `npm test` apontar.
-- [ ] `npm test`: os casos novos falham pelo motivo certo (sem [Assumir], sem filtro, voltar ainda pela janela antiga).
-- [ ] **Implementar:**
+- [x] Ajustar `App.voltarDatasResponsavel.test.tsx` (o voltar agora abre a `JanelaDeAvanco`: confirmar com o botão "Voltar" depois de escolher o responsável, `chamadas` com `usuarioId`) e o que mais o `npm test` apontar.
+- [x] `npm test`: os casos novos falham pelo motivo certo (sem [Assumir], sem filtro, voltar ainda pela janela antiga).
+- [x] **Implementar:**
   - `EscolhaDoResponsavel.tsx`: prop `pergunta: string` no lugar da constante.
   - `JanelaDeAvanco.tsx`: props `rotuloDoCampo` (padrão "Nota") e `pergunta` (padrão "Quem fica com a próxima etapa?"); o `<label>` do campo usa `rotuloDoCampo`.
   - `useAcoesDaEtapa.ts`: `agir('voltar', etapa, …)` faz `setAvanco({ acao: 'voltar', etapa, proxima: etapa })`; o resto não muda (o hook segue ≤ 40 linhas).
@@ -232,7 +232,7 @@ grant execute on function private.conferir_autor_da_revisao_interna(), private.r
   - `EdicaoDaEtapa.tsx`: prop opcional `aoAssumir?: () => void` e o botão `<button type="button" className="botao botao-secundario" aria-label={`Assumir ${etapa.nome}`} onClick={aoAssumir}>Assumir</button>` ao lado do seletor.
   - `CaminhoDoProcesso.tsx`: passa `processo.ultimaVersao` ao `CaminhoDeEtapas`.
   - Ajustar `App.avancoDaEtapa.test.tsx` só no que o `npm test` apontar (a lista de usuários ganhou o filtro).
-- [ ] `npm test`, `npm run typecheck`, `npm run lint`, `npm run check:circular`: verdes. Comitar ("Ticket 14 de processos-etapas: Assumir, trava do autor nas janelas e voltar com responsável").
+- [x] `npm test`, `npm run typecheck`, `npm run lint`, `npm run check:circular`: verdes. Comitar ("Ticket 14 de processos-etapas: Assumir, trava do autor nas janelas e voltar com responsável").
 
 ### Tarefa 6 — Conferência na tela e fecho
 

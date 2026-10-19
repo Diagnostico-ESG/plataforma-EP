@@ -6,9 +6,9 @@ import { useGravacaoComFalha } from './useGravacaoComFalha'
 
 /**
  * As ações do caminho de etapas. Iniciar grava na hora; Concluir, Dispensar e Realizada anteriormente com etapa
- * pendente depois abrem a janela de avanço (`avanco`), que escolhe o responsável dela; sem pendente depois, Concluir
- * grava na hora e as outras duas abrem a janela da nota (`pedido`, como Voltar, que pede o motivo). A falha de
- * qualquer gravação fica em `falha`, para a tela mostrar.
+ * pendente depois abrem a janela de avanço (`avanco`), que escolhe o responsável dela; Voltar abre a mesma janela,
+ * com o motivo e o responsável da etapa reaberta. Sem pendente depois, Concluir grava na hora e as outras duas abrem a
+ * janela da nota (`pedido`). A falha de qualquer gravação fica em `falha`, para a tela mostrar.
  */
 export function useAcoesDaEtapa(processos: ModuloDeProcessos, aoMudar: () => void, aoSumir: () => void) {
   const { falha, executar } = useGravacaoComFalha(aoSumir)
@@ -17,7 +17,7 @@ export function useAcoesDaEtapa(processos: ModuloDeProcessos, aoMudar: () => voi
 
   function agir(acao: AcaoDaEtapa, etapa: EtapaDoCaminho, proxima: EtapaDoCaminho | null) {
     if (acao === 'iniciar') return executar(() => processos.iniciarEtapa(etapa.id), aoMudar)
-    if (acao === 'voltar') return setPedido({ acao, etapa })
+    if (acao === 'voltar') return setAvanco({ acao, etapa, proxima: etapa })
     if (proxima) return setAvanco({ acao, etapa, proxima })
     if (acao === 'concluir') return executar(() => processos.concluirEtapa(etapa.id, null), aoMudar)
     setPedido({ acao, etapa })
