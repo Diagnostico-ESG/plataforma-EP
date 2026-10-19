@@ -73,9 +73,13 @@ language sql immutable as $$
     'tamanho', tamanho, 'hash_md5', '0123456789abcdef0123456789abcdef', 'drive_id', 'drive-' || papel) $$;
 create function pg_temp.par() returns jsonb
 language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('bpmn', 'bpmn'), pg_temp.arquivo('png', 'png')) $$;
--- Quem envia é quem está nas claims (o gatilho põe auth.uid() como autor); o número que vier é ignorado.
+-- Quem envia é quem está nas claims (o gatilho põe auth.uid() como autor); a função recusa um número diferente do
+-- próximo (maior + 1), então o auxiliar o calcula.
 create function pg_temp.enviar(nome_do_processo text) returns uuid
-language sql as $$ select public.registrar_versao(pg_temp.processo(nome_do_processo), 1, null, pg_temp.par()) $$;
+language sql as $$
+  select public.registrar_versao(pg_temp.processo(nome_do_processo),
+    (select coalesce(max(numero), 0) + 1 from public.versoes where processo_id = pg_temp.processo(nome_do_processo)),
+    null, pg_temp.par()) $$;
 grant execute on function pg_temp.enviar(text) to authenticated;
 
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
