@@ -93,3 +93,10 @@
   border-color: var(--aprovado-fundo);
   background: var(--aprovado-fundo);
 }
+
+/* Concluído com etapa opcional aberta: a frase de cima e o corpo da etapa ficam separados por uma linha fina. */
+.agora-situacao + .agora-rotulo {
+  margin-top: var(--esp-2);
+  padding-top: var(--esp-3);
+  border-top: 1px solid rgb(30 36 51 / 10%);
+}
