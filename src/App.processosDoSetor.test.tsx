@@ -7,6 +7,7 @@ import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { ProcessoLido } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
+import { RevisoesFalso } from './revisoes/RevisoesFalso'
 
 beforeEach(() => {
   window.location.hash = '#/setores'
@@ -40,7 +41,7 @@ function montar({ perfil = 'integrante_ep', processos = PROCESSOS, ajustar }: Mo
   const falso = new ProcessosFalso()
   falso.processos = processos
   ajustar?.(falso)
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
   return falso
 }
 

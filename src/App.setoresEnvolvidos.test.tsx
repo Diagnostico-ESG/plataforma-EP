@@ -8,6 +8,7 @@ import { CadastroInexistente } from './cadastros/cadastroInexistente'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import { VersoesFalso } from './versoes/VersoesFalso'
+import { RevisoesFalso } from './revisoes/RevisoesFalso'
 
 beforeEach(() => {
   window.location.hash = '#/setores/macroprocessos'
@@ -39,7 +40,7 @@ function cadastrosComSetores() {
 
 function montar(perfil: Perfil = 'integrante_ep') {
   const cadastros = cadastrosComSetores()
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={new ProcessosFalso()} versoes={new VersoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
   return cadastros
 }
 
@@ -182,7 +183,7 @@ test('macroprocesso excluído por outra pessoa durante a operação vira o aviso
 test('falha ao carregar os setores do seletor mostra o erro com [Tentar de novo] sem esconder a lista', async () => {
   const cadastros = cadastrosComSetores()
   cadastros.falharLista = true
-  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} processos={new ProcessosFalso()} versoes={new VersoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
   const secao = await abrirSecao()
   expect(await secao.findByText('Não foi possível carregar os setores. Verifique a conexão e tente de novo.')).toBeTruthy()
   expect(secao.getByRole('button', { name: 'Tentar de novo' })).toBeTruthy()

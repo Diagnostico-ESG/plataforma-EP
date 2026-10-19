@@ -9,6 +9,7 @@ import type { EventoDoCadastro } from './cadastros/tipos'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { ProcessoLido, SituacaoDoProcesso } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
+import { RevisoesFalso } from './revisoes/RevisoesFalso'
 import { escolherNoMenuDoProcesso, janelasPorCima } from './testes/versoDoCartao'
 
 // "Hoje" nos testes: só o Date é simulado, e os temporizadores seguem reais (o waitFor continua funcionando).
@@ -36,7 +37,7 @@ function montar(mudancas: Partial<ProcessoLido> = {}, perfil: Perfil = 'integran
   const falso = new ProcessosFalso()
   falso.processos = [processo(mudancas)]
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={falso}
-    versoes={new VersoesFalso()} />)
+    versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
   return falso
 }
 

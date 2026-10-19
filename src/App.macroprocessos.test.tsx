@@ -7,6 +7,7 @@ import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { Macroprocesso } from './cadastros/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
+import { RevisoesFalso } from './revisoes/RevisoesFalso'
 
 beforeEach(() => {
   window.location.hash = '#/setores/macroprocessos'
@@ -31,7 +32,7 @@ function cadastrosComMacroprocessos(macroprocessos = MACROPROCESSOS) {
 }
 
 function montar(perfil: Perfil = 'integrante_ep', cadastros = cadastrosComMacroprocessos()) {
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={new ProcessosFalso()} versoes={new VersoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
   return cadastros
 }
 
