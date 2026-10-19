@@ -31,6 +31,8 @@
 
   /* Superfícies e linhas */
   --fundo: #edf1f9;
+  /* A coluna de contexto do verso do cartão: um cinza mais leve que o fundo da página. */
+  --fundo-contexto: #f7f8fb;
   --folha: #ffffff;
   --linha: #e1e6ef;
   --linha-tracejada: #c3cad8;
@@ -92,6 +94,7 @@
   --tam-base: 15px;
   --tam-coluna: 16px;
   --tam-painel: 18px;
+  --tam-verso-titulo: 19px;
   --tam-pagina: 22px;
 
   /* Espaçamento */

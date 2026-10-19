@@ -1,0 +1,215 @@
+/* O verso do cartão (spec, "Verso do cartão"): janela central de até cerca de 880 px, trabalho à esquerda (60%) e
+   contexto à direita (40%), uma só rolagem com o cabeçalho fixo. Abaixo de 900 px, a tela inteira em uma coluna. */
+.verso {
+  width: min(880px, calc(100vw - 2 * var(--esp-5)));
+  max-width: none;
+  max-height: 90vh;
+  padding: 0;
+  overflow-y: auto;
+  border: 0;
+  border-radius: var(--canto);
+  background: var(--folha);
+  color: var(--texto);
+  box-shadow: var(--sombra-flutuante);
+  animation: verso-entra 150ms var(--curva-saida);
+}
+
+.verso::backdrop {
+  background: var(--veu-janela);
+}
+
+.verso-estreita {
+  width: min(560px, calc(100vw - 2 * var(--esp-5)));
+}
+
+@keyframes verso-entra {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .verso {
+    animation: none;
+  }
+}
+
+/* Cabeçalho fixo: identificação à esquerda; pílula, "⋯" e fechar à direita. */
+.verso-cabecalho {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--esp-3);
+  padding: var(--esp-4) var(--esp-4) var(--esp-4) var(--esp-5);
+  border-bottom: 1px solid var(--linha);
+  background: var(--folha);
+}
+
+.verso-cabecalho .cartao-sigla {
+  flex: none;
+  margin-top: 2px;
+}
+
+.verso-identificacao {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.verso-titulo {
+  margin: 0;
+  font-size: var(--tam-verso-titulo);
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+/* O foco vai ao nome ao abrir, para o leitor de tela começar por ele; o contorno não serve para quem usa o mouse. */
+.verso-titulo:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.verso-subtitulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-1) var(--esp-2);
+  margin: 0;
+  color: var(--texto-2);
+  font-size: var(--tam-secundario);
+}
+
+.verso-cor-do-macroprocesso {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--canto-macro);
+}
+
+.verso-ferramentas {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--esp-1);
+}
+
+.verso-ferramentas .pilula {
+  margin-right: var(--esp-2);
+}
+
+.verso-fechar {
+  color: var(--texto-2);
+}
+
+.verso-fechar:hover {
+  background: var(--neutra-fundo);
+  color: var(--texto);
+}
+
+/* A falha de uma ação do "⋯" aparece logo abaixo do cabeçalho, onde a pessoa estava olhando. */
+.verso-falha {
+  margin: 0;
+  padding: var(--esp-3) var(--esp-5);
+  border-bottom: 1px solid var(--linha);
+}
+
+.verso-colunas {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+}
+
+.verso-trabalho,
+.verso-contexto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-5);
+  min-width: 0;
+  padding: var(--esp-5);
+}
+
+.verso-contexto {
+  border-left: 1px solid var(--linha);
+  background: var(--fundo-contexto);
+}
+
+/* Histórico e Editar ocupam a janela inteira, numa coluna só. */
+.verso-pagina {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-4);
+  padding: var(--esp-5);
+}
+
+.verso-pagina-estreita {
+  max-width: 560px;
+}
+
+.verso-voltar {
+  align-self: flex-start;
+}
+
+.verso-pagina-titulo {
+  margin: 0;
+  font-size: var(--tam-coluna);
+  font-weight: 700;
+}
+
+/* Erro, processo excluído e carregando: o fechar no topo e a mensagem no corpo. */
+.verso-barra {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--esp-3) var(--esp-4) 0;
+}
+
+.verso-mensagem {
+  padding: var(--esp-4) var(--esp-5) var(--esp-6);
+}
+
+/* Carregando: blocos cinza no formato do cabeçalho e das duas colunas, para nada pular quando os dados chegam. */
+.verso-fantasma {
+  border-radius: var(--canto);
+  background: var(--neutra-fundo);
+}
+
+.verso-fantasma-titulo {
+  width: 55%;
+  height: 22px;
+}
+
+.verso-fantasma-linha {
+  width: 35%;
+  height: 14px;
+}
+
+.verso-fantasma-bloco {
+  height: 120px;
+}
+
+.verso-fantasma-bloco-baixo {
+  height: 64px;
+}
+
+@media (max-width: 900px) {
+  .verso,
+  .verso-estreita {
+    width: 100vw;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .verso-colunas {
+    grid-template-columns: 1fr;
+  }
+
+  .verso-contexto {
+    border-top: 1px solid var(--linha);
+    border-left: 0;
+  }
+}
