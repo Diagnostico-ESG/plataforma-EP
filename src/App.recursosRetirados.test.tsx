@@ -53,7 +53,7 @@ test('o setor aberto não tem a seção de reuniões', async () => {
 test('o painel do processo não tem a seção de reuniões', async () => {
   window.location.hash = '#/processos/p1'
   montarNosCadastros()
-  await screen.findByRole('complementary', { name: 'Painel do processo' })
+  await screen.findByRole('dialog', { name: /^Processo( |$)/ })
   await screen.findByRole('region', { name: 'Dados do processo' })
   expect(screen.queryByText('Reuniões')).toBeNull()
   expect(screen.queryByRole('button', { name: 'Registrar reunião' })).toBeNull()

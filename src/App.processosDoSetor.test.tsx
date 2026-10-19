@@ -93,7 +93,7 @@ test('clicar num processo abre o painel dele sobre a Lista do setor', async () =
   const secao = await abrirProcessosDoSetor()
   fireEvent.click(await secao.findByRole('cell', { name: 'Reunião de modelagem' }))
   await waitFor(() => expect(window.location.hash).toBe('#/processos/lista/p1?setor=s1'))
-  expect(await screen.findByRole('complementary', { name: 'Painel do processo' })).toBeTruthy()
+  expect(await screen.findByRole('dialog', { name: /^Processo( |$)/ })).toBeTruthy()
 })
 
 test('a Consulta vê a mesma seção', async () => {

@@ -9,6 +9,7 @@ import type { EventoDoCadastro } from './cadastros/tipos'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { ProcessoLido, SituacaoDoProcesso } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
+import { escolherNoMenuDoProcesso, janelasPorCima } from './testes/versoDoCartao'
 
 // "Hoje" nos testes: só o Date é simulado, e os temporizadores seguem reais (o waitFor continua funcionando).
 beforeEach(() => {
@@ -80,7 +81,7 @@ test('[Remover] só aparece com data gravada e apaga sem pedir confirmação', a
   const secao = await linha()
   fireEvent.click(secao.getByRole('button', { name: 'Remover' }))
   expect(await secao.findByText('não marcada')).toBeTruthy()
-  expect(screen.queryByRole('dialog')).toBeNull()
+  expect(janelasPorCima()).toEqual([])
   expect(falso.processos[0].dataDaReuniao).toBeNull()
   expect(secao.queryByRole('button', { name: 'Remover' })).toBeNull()
 })
@@ -152,7 +153,7 @@ test('o histórico do processo mostra só a troca da data, com o autor', async (
   }
   const falso = montar()
   falso.historicoDosProcessos = { p1: [troca] }
-  fireEvent.click(await screen.findByRole('tab', { name: 'Histórico' }))
+  await escolherNoMenuDoProcesso('Histórico')
   const [item] = await screen.findAllByRole('listitem')
   expect(within(item).getByText('Ana Teste')).toBeTruthy()
   expect(within(item).getByText('Antes: Reunião de modelagem piloto: 14/10/2026')).toBeTruthy()
@@ -161,8 +162,7 @@ test('o histórico do processo mostra só a troca da data, com o autor', async (
 
 test('processo com data se exclui, sem recusa', async () => {
   const falso = montar({ dataDaReuniao: '2026-10-20' })
-  fireEvent.click(await within(await screen.findByRole('complementary', { name: 'Painel do processo' }))
-    .findByRole('button', { name: 'Excluir' }))
+  await escolherNoMenuDoProcesso('Excluir')
   fireEvent.click(screen.getByRole('button', { name: 'Excluir processo' }))
   await waitFor(() => expect(window.location.hash).toBe('#/processos'))
   expect(falso.processos).toEqual([])

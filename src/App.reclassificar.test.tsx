@@ -9,6 +9,7 @@ import type { EventoDoCadastro } from './cadastros/tipos'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { ProcessoLido, TipoDeProcesso } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
+import { escolherNoMenuDoProcesso, janelaPorCima, janelasPorCima } from './testes/versoDoCartao'
 
 afterEach(() => {
   cleanup()
@@ -45,14 +46,14 @@ function montar({ id, perfil = 'integrante_ep', ajustar }: Montagem) {
   return falso
 }
 
-const painel = async () => within(await screen.findByRole('complementary', { name: 'Painel do processo' }))
+const painel = async () => within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
 const opcoes = (seletor: HTMLElement) => Array.from((seletor as HTMLSelectElement).options).map((opcao) => opcao.textContent)
-// O cabeçalho do painel: título, macroprocesso e as pílulas de tipo e situação.
+// O cabeçalho do verso: título, macroprocesso, tipo e a pílula de situação.
 const cabecalho = (aberto: ReturnType<typeof within>) => within(aberto.getByRole('heading', { level: 2 }).closest('header') as HTMLElement)
 const escrever = (campo: HTMLElement, valor: string) => fireEvent.change(campo, { target: { value: valor } })
 
 async function abrirJanela(nome: string) {
-  fireEvent.click(await (await painel()).findByRole('button', { name: 'Reclassificar' }))
+  await escolherNoMenuDoProcesso('Reclassificar')
   return within(screen.getByRole('dialog', { name: `Reclassificar o processo ${nome}?` }))
 }
 
@@ -98,8 +99,8 @@ test('o botão fica desabilitado sem pai ou sem motivo, e Esc fecha sem gravar',
   expect(botao.disabled).toBe(false)
   escrever(janela.getByLabelText('Motivo'), '   ')
   expect(botao.disabled).toBe(true)
-  act(() => (screen.getByRole('dialog') as HTMLDialogElement).close())
-  expect(screen.queryByRole('dialog')).toBeNull()
+  act(() => (janelaPorCima() as HTMLDialogElement).close())
+  expect(janelasPorCima()).toEqual([])
   expect(falso.processos[3].tipo).toBe('processo')
 })
 
@@ -168,7 +169,7 @@ test('o histórico mostra "Reclassificou" com o tipo de e para, o pai e o motivo
     motivo: 'Faz parte do Emitir Ofício',
   }
   montar({ id: 'p3', ajustar: (f) => { f.historicoDosProcessos = { p3: [evento] } } })
-  fireEvent.click(await (await painel()).findByRole('tab', { name: 'Histórico' }))
+  await escolherNoMenuDoProcesso('Histórico')
   const aberto = await painel()
   for (const texto of ['Reclassificou', 'Tipo: A classificar', 'Tipo: Subprocesso; Processo pai: Emitir Ofício', 'Motivo: Faz parte do Emitir Ofício']) {
     expect(await aberto.findByText(texto, { exact: false })).toBeTruthy()

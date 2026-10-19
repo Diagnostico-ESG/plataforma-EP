@@ -6,6 +6,7 @@ import { montarNosCadastros } from './testes/processosNosCadastros'
 import { arquivoDeTeste, versaoDeTeste } from './testes/versoesDeTeste'
 import { falhaDaFuncao } from './versoes/recusasDeVersoes'
 import type { VersoesFalso } from './versoes/VersoesFalso'
+import { escolherNoMenuDoProcesso, janelaPorCima, janelasPorCima } from './testes/versoDoCartao'
 
 beforeEach(() => {
   window.location.hash = '#/processos/p1'
@@ -33,7 +34,7 @@ const COM_PENDENTES = {
 const semPendentes = { ajustarVersoes: (falso: VersoesFalso) => { falso.versoes.p1 = [comRelatorio(1), comRelatorio(2)] } }
 
 async function secaoDeVersoes() {
-  const painel = within(await screen.findByRole('complementary', { name: 'Painel do processo' }))
+  const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
   return within(await painel.findByRole('region', { name: 'Versões do processo' }))
 }
 
@@ -219,8 +220,8 @@ test('Cancelar na confirmação não copia nada', async () => {
   const { versoes } = montarNosCadastros(COM_PENDENTES)
   const secao = await secaoDeVersoes()
   fireEvent.click(within(await secao.findByRole('listitem', { name: 'V4' })).getByRole('button', { name: SEM_ALTERACAO }))
-  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Cancelar' }))
-  expect(screen.queryByRole('dialog')).toBeNull()
+  fireEvent.click(within(janelaPorCima()).getByRole('button', { name: 'Cancelar' }))
+  expect(janelasPorCima()).toEqual([])
   expect(versoes.versoes.p1.find((versao) => versao.id === 'v4')?.arquivos).toHaveLength(2)
 })
 
@@ -230,7 +231,7 @@ test('a recusa do servidor no "sem alteração" aparece em vermelho e a versão 
   const secao = await secaoDeVersoes()
   const v4 = within(await secao.findByRole('listitem', { name: 'V4' }))
   fireEvent.click(v4.getByRole('button', { name: SEM_ALTERACAO }))
-  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Copiar relatório' }))
+  fireEvent.click(within(janelaPorCima()).getByRole('button', { name: 'Copiar relatório' }))
   expect((await v4.findByRole('alert')).textContent).toBe('A versão anterior não tem relatório para copiar. Envie o relatório.')
   expect(v4.getByText('Relatório pendente')).toBeTruthy()
 })
@@ -243,10 +244,10 @@ test('o relatório depois e o "sem alteração" entram no histórico do processo
   fireEvent.click(botaoAcrescentar(form))
   await within(await secao.findByRole('listitem', { name: 'V4' })).findByText('TSA_V4_Emitir Ofício_Relatório.pdf')
   fireEvent.click(within(secao.getByRole('listitem', { name: 'V5' })).getByRole('button', { name: SEM_ALTERACAO }))
-  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Copiar relatório' }))
+  fireEvent.click(within(janelaPorCima()).getByRole('button', { name: 'Copiar relatório' }))
   await within(await secao.findByRole('listitem', { name: 'V5' })).findByText('TSA_V5_Emitir Ofício_Relatório.pdf')
-  const painel = within(screen.getByRole('complementary', { name: 'Painel do processo' }))
-  fireEvent.click(painel.getByRole('tab', { name: 'Histórico' }))
+  const painel = within(screen.getByRole('dialog', { name: /^Processo( |$)/ }))
+  await escolherNoMenuDoProcesso('Histórico')
   const acrescentou = await painel.findByText('Acrescentou o relatório à versão')
   expect(acrescentou.parentElement?.textContent).toBe('Acrescentou o relatório à versão V4 — Emitir Ofício')
   const semAlteracao = await painel.findByText('Marcou sem alteração de conteúdo na versão')

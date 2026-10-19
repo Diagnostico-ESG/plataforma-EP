@@ -120,7 +120,7 @@ test('Quadro: os filtros sem Situação; o painel e o fechar mantêm os filtros'
   await waitFor(() => expect(window.location.hash).toBe('#/processos/p4?setor=s2'))
   // O botão de fechar do "Carregando processo…" é trocado pelo do cabeçalho; clicar antes pegaria o que já saiu da tela.
   await screen.findByRole('heading', { name: 'Arquivar Pasta' })
-  fireEvent.click(screen.getByRole('button', { name: 'Fechar o painel' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Fechar a janela' }))
   await waitFor(() => expect(window.location.hash).toBe('#/processos?setor=s2'))
 })
 

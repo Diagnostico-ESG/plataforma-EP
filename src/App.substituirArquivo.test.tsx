@@ -5,6 +5,7 @@ import { montarNosCadastros } from './testes/processosNosCadastros'
 import { arquivoDeTeste, PNG_VALIDO, versaoDeTeste } from './testes/versoesDeTeste'
 import { falhaDaFuncao } from './versoes/recusasDeVersoes'
 import type { VersoesFalso } from './versoes/VersoesFalso'
+import { escolherNoMenuDoProcesso, janelasPorCima } from './testes/versoDoCartao'
 
 beforeEach(() => {
   window.location.hash = '#/processos/p1'
@@ -32,7 +33,7 @@ const RELATORIO_V3 = 'TSA_V3_Emitir Ofício_Relatório.pdf'
 const ROTULO_DO_PNG = 'Imagem do fluxograma (.png)'
 
 async function secaoDeVersoes() {
-  const painel = within(await screen.findByRole('complementary', { name: 'Painel do processo' }))
+  const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
   return within(await painel.findByRole('region', { name: 'Versões do processo' }))
 }
 
@@ -123,7 +124,7 @@ test('Substituir pede confirmação e avisa que o arquivo anterior não fica gua
   const janela = await escolherEConfirmar(form)
   expect(janela.getByText(/arquivo anterior não fica guardado/)).toBeTruthy()
   fireEvent.click(janela.getByRole('button', { name: 'Cancelar' }))
-  expect(screen.queryByRole('dialog')).toBeNull()
+  expect(janelasPorCima()).toEqual([])
   expect(tamanhoDoPngDaV3(versoes)).toBe(100)
   expect(botaoSubstituir(form).disabled).toBe(false)
 })
@@ -179,8 +180,8 @@ test('a troca entra no histórico do processo com o nome e o hash do que saiu', 
   const { secao, form } = await abrirTroca()
   fireEvent.click((await escolherEConfirmar(form)).getByRole('button', { name: 'Substituir' }))
   await waitFor(() => expect(secao.queryByRole('form', { name: `Substituir ${PNG_V3}` })).toBeNull())
-  const painel = within(screen.getByRole('complementary', { name: 'Painel do processo' }))
-  fireEvent.click(painel.getByRole('tab', { name: 'Histórico' }))
+  const painel = within(screen.getByRole('dialog', { name: /^Processo( |$)/ }))
+  await escolherNoMenuDoProcesso('Histórico')
   const troca = await painel.findByText('Substituiu o arquivo da versão')
   expect(troca.parentElement?.textContent).toBe('Substituiu o arquivo da versão V3 — Emitir Ofício')
   expect(painel.getByText(/Nome: TSA_V3_Emitir Ofício.png; Impressão digital \(MD5\): hash-a3-png-0/)).toBeTruthy()

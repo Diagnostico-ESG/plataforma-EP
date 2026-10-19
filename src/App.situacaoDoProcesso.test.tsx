@@ -9,6 +9,7 @@ import type { EventoDoCadastro } from './cadastros/tipos'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { EtapaDoProcesso, ProcessoLido, SituacaoDoProcesso } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
+import { escolherNoMenuDoProcesso, janelaPorCima } from './testes/versoDoCartao'
 
 beforeEach(() => {
   window.location.hash = '#/processos/p1'
@@ -58,30 +59,34 @@ function montar({ perfil = 'integrante_ep', situacao = 'em_andamento', ajustar }
   return falso
 }
 
-const painel = async () => within(await screen.findByRole('complementary', { name: 'Painel do processo' }))
-const DE_SITUACAO = ['Suspender', 'Cancelar', 'Retomar']
+const painel = async () => within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
+const DE_SITUACAO = ['Suspender', 'Cancelar processo', 'Retomar']
 
+// As ações de situação ficam no "⋯" do processo (verso do cartão, ticket 16); o menu fecha com Esc depois de lidas.
 async function botoesDeSituacao(): Promise<string[]> {
   const aberto = await painel()
   await aberto.findByText('Etapas do processo')
-  return aberto.queryAllByRole('button').map((botao) => botao.textContent ?? '').filter((texto) => DE_SITUACAO.includes(texto))
+  fireEvent.click(aberto.getByRole('button', { name: 'Ações do processo' }))
+  const itens = aberto.getAllByRole('menuitem').map((item) => item.textContent ?? '').filter((texto) => DE_SITUACAO.includes(texto))
+  fireEvent.keyDown(aberto.getAllByRole('menuitem')[0], { key: 'Escape' })
+  return itens
 }
 
 async function pedir(acao: string, titulo: string, motivo: string, rotuloDoBotao: string) {
-  fireEvent.click((await painel()).getByRole('button', { name: acao }))
+  await escolherNoMenuDoProcesso(acao)
   const janela = within(screen.getByRole('dialog', { name: titulo }))
   fireEvent.change(janela.getByLabelText('Motivo'), { target: { value: motivo } })
   fireEvent.click(janela.getByRole('button', { name: rotuloDoBotao }))
 }
 
 test.each([
-  ['em_andamento', ['Suspender', 'Cancelar']],
-  ['concluido', ['Suspender', 'Cancelar']],
-  ['suspenso', ['Cancelar', 'Retomar']],
+  ['em_andamento', ['Suspender', 'Cancelar processo']],
+  ['concluido', ['Suspender', 'Cancelar processo']],
+  ['suspenso', ['Retomar', 'Cancelar processo']],
   ['cancelado', ['Retomar']],
 ] as const)('processo %s: os botões de situação são %j', async (situacao, esperados) => {
   montar({ situacao })
-  expect([...(await botoesDeSituacao())].sort()).toEqual([...esperados].sort())
+  expect(await botoesDeSituacao()).toEqual(esperados)
 })
 
 test('Consulta não vê os botões de situação', async () => {
@@ -91,14 +96,14 @@ test('Consulta não vê os botões de situação', async () => {
 
 test('a janela do motivo: botão desabilitado com o campo vazio, Cancelar e Esc fecham sem gravar', async () => {
   const falso = montar()
-  fireEvent.click((await painel()).getByRole('button', { name: 'Suspender' }))
+  await escolherNoMenuDoProcesso('Suspender')
   const janela = within(screen.getByRole('dialog', { name: 'Suspender o processo Emitir Ofício?' }))
   expect((janela.getByRole('button', { name: 'Suspender processo' }) as HTMLButtonElement).disabled).toBe(true)
   fireEvent.change(janela.getByLabelText('Motivo'), { target: { value: '   ' } })
   expect((janela.getByRole('button', { name: 'Suspender processo' }) as HTMLButtonElement).disabled).toBe(true)
   fireEvent.click(janela.getByRole('button', { name: 'Cancelar' }))
-  fireEvent.click((await painel()).getByRole('button', { name: 'Suspender' }))
-  act(() => (screen.getByRole('dialog') as HTMLDialogElement).close())
+  await escolherNoMenuDoProcesso('Suspender')
+  act(() => (janelaPorCima() as HTMLDialogElement).close())
   expect(falso.processos[0].situacao).toBe('em_andamento')
 })
 
@@ -115,7 +120,7 @@ test('suspender grava o motivo, mostra a pílula, o aviso e o Quadro marca o car
 test('cancelar tira o cartão do Quadro e mostra o aviso de cancelado', async () => {
   montar()
   expect(await screen.findByRole('link', { name: /Emitir Ofício/ })).toBeTruthy()
-  await pedir('Cancelar', 'Cancelar o processo Emitir Ofício?', 'Não será mapeado', 'Cancelar processo')
+  await pedir('Cancelar processo', 'Cancelar o processo Emitir Ofício?', 'Não será mapeado', 'Cancelar processo')
   const aberto = await painel()
   expect(await aberto.findByText('Este processo está cancelado: Não será mapeado. Retome-o para registrar o andamento.')).toBeTruthy()
   await waitFor(() => expect(screen.queryByRole('link', { name: /Emitir Ofício/ })).toBeNull())
@@ -126,7 +131,7 @@ test('retomar limpa o aviso, devolve as ações das etapas e o botão de suspend
   await pedir('Retomar', 'Retomar o processo Emitir Ofício?', 'Decisão tomada', 'Retomar processo')
   const aberto = await painel()
   await waitFor(() => expect(aberto.queryByText(/Retome-o para registrar o andamento/)).toBeNull())
-  expect(aberto.getByRole('button', { name: 'Suspender' })).toBeTruthy()
+  expect(await botoesDeSituacao()).toEqual(['Suspender', 'Cancelar processo'])
   expect(aberto.getAllByRole('button', { name: 'Concluir' }).length).toBeGreaterThan(0)
   expect(falso.processos[0]).toMatchObject({ situacao: 'em_andamento', motivoDaSituacao: null })
 })
@@ -166,7 +171,7 @@ test('o histórico mostra Suspendeu, Cancelou e Retomou com o motivo', async () 
   montar({ ajustar: (f) => {
     f.historicoDosProcessos = { p1: [evento(3, 'retomar', 'Decisão tomada'), evento(2, 'cancelar', 'Desistiram'), evento(1, 'suspender', 'Parou')] }
   } })
-  fireEvent.click(await (await painel()).findByRole('tab', { name: 'Histórico' }))
+  await escolherNoMenuDoProcesso('Histórico')
   const aberto = await painel()
   for (const texto of ['Suspendeu', 'Cancelou', 'Retomou', 'Motivo: Decisão tomada', 'Motivo: Desistiram', 'Motivo: Parou']) {
     expect(await aberto.findByText(texto, { exact: false })).toBeTruthy()

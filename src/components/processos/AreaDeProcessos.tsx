@@ -8,8 +8,8 @@ import {
 } from '../../processos/enderecoDosProcessos'
 import type { ModuloDeProcessos } from '../../processos/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
-import { PainelDeNovoProcesso } from './PainelDeNovoProcesso'
-import { PainelDoProcesso } from './PainelDoProcesso'
+import { JanelaDoNovoProcesso } from './JanelaDoNovoProcesso'
+import { VersoDoCartao } from './VersoDoCartao'
 import { VisaoDosProcessos } from './VisaoDosProcessos'
 
 type AreaDeProcessosProps = {
@@ -46,18 +46,19 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes }: Area
 
   return (
     <section className="area-de-processos" aria-label="Processos">
-      <div className={idAberto || cadastrando ? 'quadro-esmaecido' : undefined} inert={idAberto !== null || cadastrando}>
+      {/* O fundo da janela (::backdrop) já escurece a visão; o inert a tira do Tab e do leitor de tela. */}
+      <div inert={idAberto !== null || cadastrando}>
         <VisaoDosProcessos visao={atual.visao} estado={estado} aoTentarDeNovo={tentarDeNovo} podeAlterar={podeAlterar}
           aoCadastrar={() => irParaVisao({ aberto: 'novo' })} idEscolhido={idAberto}
           enderecoDoProcesso={enderecoDoProcesso} aoAbrir={(id) => irParaVisao({ aberto: id })}
           filtros={atual.filtros} aoMudarFiltros={(filtros) => irParaVisao({ filtros, aberto: null })} />
       </div>
       {idAberto && (
-        <PainelDoProcesso key={idAberto} processos={processos} cadastros={cadastros} versoes={versoes} id={idAberto}
+        <VersoDoCartao processos={processos} cadastros={cadastros} versoes={versoes} id={idAberto}
           podeAlterar={podeAlterar} usuarioId={usuario.id} aoFechar={fechar} aoMudar={recarregar} enderecoDoProcesso={enderecoDoProcesso} />
       )}
       {cadastrando && (
-        <PainelDeNovoProcesso processos={processos} cadastros={cadastros} aoFechar={() => irParaVisao({ aberto: null })}
+        <JanelaDoNovoProcesso processos={processos} cadastros={cadastros} aoFechar={() => irParaVisao({ aberto: null })}
           aoCriado={aoCriar} />
       )}
     </section>

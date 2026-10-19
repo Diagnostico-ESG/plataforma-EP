@@ -2,6 +2,9 @@ import { useState } from 'react'
 import { textoDaFalha } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 
+/** Grava e, se der certo, segue para `depois`; a falha fica guardada para a tela mostrar. */
+export type Executar = (gravar: () => Promise<void>, depois: () => void) => Promise<void>
+
 /**
  * Roda uma gravação e guarda a mensagem de falha para a tela mostrar ao lado do botão.
  * Item que sumiu (excluído por outra pessoa) não é falha: avisa por `aoSumir`.
