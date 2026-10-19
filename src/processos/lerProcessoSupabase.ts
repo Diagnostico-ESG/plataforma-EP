@@ -1,5 +1,6 @@
 import { type EventoDoBanco, eventoDoCadastro } from '../cadastros/historicoSupabase'
 import type { ClienteSupabase } from '../lib/supabase'
+import type { PapelDoArquivo } from '../versoes/tipos'
 import { type AndamentoLido, COLUNAS_DO_ANDAMENTO, etapaDoAndamento } from './andamentoDoBanco'
 import { type LinhaDoProcesso, processoDaLinha } from './processoDaLinha'
 import type { EtapaDoProcesso, ItemDaEstrutura, ModuloDeProcessos, ProcessoLido, SituacaoDoProcesso, UltimaVersao } from './tipos'
@@ -25,16 +26,21 @@ async function lerProcesso(cliente: ClienteSupabase, id: string): Promise<Proces
   return { ...dadosDoProcesso(linha), ...estrutura, etapasDoProcesso, ultimaVersao }
 }
 
-type LinhaDaUltimaVersao = { numero: number; enviada_por: string; autor: { nome: string } | null }
+type LinhaDaUltimaVersao = {
+  numero: number; enviada_por: string; autor: { nome: string } | null; arquivos: { papel: PapelDoArquivo }[]
+}
 
 // A versão não histórica de maior número: quem a enviou não pode ser o responsável da Revisão interna (o banco confere).
 async function lerUltimaVersao(cliente: ClienteSupabase, id: string): Promise<UltimaVersao | null> {
-  const { data, error } = await cliente.from('versoes').select('numero, enviada_por, autor:usuarios(nome)')
+  const { data, error } = await cliente.from('versoes').select('numero, enviada_por, autor:usuarios(nome), arquivos:arquivos_da_versao(papel)')
     .eq('processo_id', id).eq('historica', false).order('numero', { ascending: false }).limit(1)
   if (error) throw new Error(`Falha ao ler a versão mais recente do processo: ${error.message}`)
   const ultima = (data as unknown as LinhaDaUltimaVersao[])[0]
   if (!ultima) return null
-  return { numero: ultima.numero, autorId: ultima.enviada_por, autorNome: ultima.autor?.nome ?? '' }
+  return {
+    numero: ultima.numero, autorId: ultima.enviada_por, autorNome: ultima.autor?.nome ?? '',
+    papeis: ultima.arquivos.map((arquivo) => arquivo.papel),
+  }
 }
 
 type LinhaDaEstrutura = Pick<LinhaDoProcesso, 'id' | 'nome' | 'processo_pai_id' | 'situacao' | 'etapa_atual_nome'>

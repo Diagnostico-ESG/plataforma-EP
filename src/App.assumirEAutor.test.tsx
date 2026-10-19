@@ -23,8 +23,8 @@ afterEach(() => {
 
 const EU: UsuarioResponsavel = { id: USUARIO_DE_TESTE.id, nome: USUARIO_DE_TESTE.nome }
 const BIA: UsuarioResponsavel = { id: 'u2', nome: 'Bia Teste' }
-const VERSAO_DA_BIA: UltimaVersao = { numero: 3, autorId: 'u2', autorNome: 'Bia Teste' }
-const VERSAO_DE_EU: UltimaVersao = { numero: 3, autorId: EU.id, autorNome: EU.nome }
+const VERSAO_DA_BIA: UltimaVersao = { numero: 3, autorId: 'u2', autorNome: 'Bia Teste', papeis: ['bpmn', 'png'] }
+const VERSAO_DE_EU: UltimaVersao = { numero: 3, autorId: EU.id, autorNome: EU.nome, papeis: ['bpmn', 'png'] }
 const FRASE_DA_BIA = 'Bia Teste enviou a versão V3 e não pode ser responsável pela Revisão interna.'
 
 const MODELAGEM = 'Reunião de modelagem'

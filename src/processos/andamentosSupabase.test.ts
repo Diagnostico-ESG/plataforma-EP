@@ -130,6 +130,23 @@ test.each([
   expect(falha.message).toBe(FRASE_DO_AUTOR)
 })
 
+test.each([
+  ['sem versão', 'sem_versao', 'O processo ainda não tem versão enviada.'],
+  ['sem relatório', 'versao_incompleta:8:relatorio', 'A V8 está sem relatório.'],
+  ['sem .png e relatório', 'versao_incompleta:8:png,relatorio', 'A V8 está sem .png e relatório.'],
+])('concluir a Revisão pelo setor com a versão incompleta vira a frase do que falta (%s)', async (_caso, mensagem, frase) => {
+  const cliente = clienteQueRecusa('rpc.avancar_etapa', { message: mensagem, code: 'P0001' })
+  const falha = await falhaDe(criar(cliente).concluirEtapa('a4', 'u1'))
+  expect(falha).toBeInstanceOf(TravaDoBanco)
+  expect(falha.message).toBe(frase)
+})
+
+test('a etapa protegida do catálogo recusada pelo banco vira a frase da etapa obrigatória', async () => {
+  const cliente = clienteQueRecusa('andamentos.update', { message: 'etapa_protegida:Revisão interna', code: 'P0001' })
+  const falha = await falhaDe(criar(cliente).mudarResponsavelDaEtapa('a4', 'u1'))
+  expect(falha.message).toBe('A etapa Revisão interna é obrigatória no fluxo: não pode ser desativada nem excluída.')
+})
+
 test('o nome do autor pode ter dois-pontos: o número vem primeiro e o resto é o nome', async () => {
   const cliente = clienteQueRecusa('andamentos.update', { message: 'autor_da_versao:12:Ana: Teste', code: 'P0001' })
   const falha = await falhaDe(criar(cliente).mudarResponsavelDaEtapa('a4', 'u1'))

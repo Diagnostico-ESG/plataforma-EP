@@ -131,12 +131,14 @@ test.each([['2026-10-20'], [null]])('a data da reunião (%s) chega com o process
   expect((await criar(cliente).lerProcesso('p1'))?.dataDaReuniao).toBe(data)
 })
 
-test('o processo traz a versão mais recente não histórica, com o autor', async () => {
+test('o processo traz a versão mais recente não histórica, com o autor e os papéis dos arquivos', async () => {
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
-  cliente.respostas['versoes.select'] = { data: [{ numero: 3, enviada_por: 'u1', autor: { nome: 'Ana Teste' } }], error: null }
+  cliente.respostas['versoes.select'] = {
+    data: [{ numero: 3, enviada_por: 'u1', autor: { nome: 'Ana Teste' }, arquivos: [{ papel: 'bpmn' }, { papel: 'png' }] }], error: null,
+  }
   const lido = await criar(cliente).lerProcesso('p1')
-  expect(lido?.ultimaVersao).toEqual({ numero: 3, autorId: 'u1', autorNome: 'Ana Teste' })
+  expect(lido?.ultimaVersao).toEqual({ numero: 3, autorId: 'u1', autorNome: 'Ana Teste', papeis: ['bpmn', 'png'] })
   expect(cliente.pedidos.find((pedido) => pedido.tabela === 'versoes')).toMatchObject({
     filtros: [['processo_id', 'p1'], ['historica', false]], ordem: [['numero', false]], limite: 1,
   })

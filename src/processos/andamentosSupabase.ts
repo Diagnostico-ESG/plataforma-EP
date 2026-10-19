@@ -4,7 +4,8 @@ import {
 import type { ClienteSupabase } from '../lib/supabase'
 import type { Database } from '../types/database'
 import { formatarData } from './caminhoDeEtapas'
-import { fraseDaEtapaUsada } from './frasesDoCatalogo'
+import { fraseDaEtapaProtegida, fraseDaEtapaUsada } from './frasesDoCatalogo'
+import { FRASE_SEM_VERSAO, fraseDaVersaoIncompleta } from './frasesDaVersaoCompleta'
 import { FRASE_DO_PAI, fraseDeTipoInvalido, fraseDosSubprocessos } from './frasesDeReclassificacao'
 import { fraseDoAutorDaVersao, fraseDoProcessoComVersoes } from './frasesDeVersao'
 import { fraseDeSituacaoInvalida, fraseDoProcessoParado } from './frasesDeSituacao'
@@ -79,8 +80,8 @@ const PADRAO_DA_RECUSA = new RegExp(
   '\\b(anterior_nao_resolvida|etapa_obrigatoria|ja_ha_etapa_em_andamento|etapa_nao_resolvida'
   + '|motivo_obrigatorio|nota_obrigatoria|data_no_futuro|resolvida_antes_do_inicio|responsavel_invalido|processo_parado'
   + '|situacao_invalida|processo_com_subprocessos|pai_nao_e_processo|tipo_invalido'
-  + '|etapa_usada'
-  + '|processo_com_versoes|autor_da_versao)(?::(.*))?$', 'm')
+  + '|etapa_usada|etapa_protegida'
+  + '|processo_com_versoes|autor_da_versao|sem_versao|versao_incompleta)(?::(.*))?$', 'm')
 
 const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   anterior_nao_resolvida: (etapa) => `A etapa ${etapa} ainda não foi resolvida.`,
@@ -110,6 +111,12 @@ const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   etapa_usada: fraseDaEtapaUsada,
   processo_com_versoes: fraseDoProcessoComVersoes,
   autor_da_versao: fraseDoAutorDaVersao,
+  etapa_protegida: fraseDaEtapaProtegida,
+  sem_versao: () => FRASE_SEM_VERSAO,
+  versao_incompleta: (valor) => {
+    const [numero, faltas] = valor.split(':')
+    return fraseDaVersaoIncompleta(numero, faltas.split(','))
+  },
 }
 
 // Serve também à situação, à reclassificação e à gravação do processo: as recusas do banco têm o mesmo formato.

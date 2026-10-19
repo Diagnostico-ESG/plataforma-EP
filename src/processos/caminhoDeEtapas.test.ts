@@ -94,7 +94,7 @@ describe('responsável marcado ao abrir a janela de avanço', () => {
 })
 
 describe('trava do autor da versão mais recente na Revisão interna', () => {
-  const ULTIMA: UltimaVersao = { numero: 3, autorId: 'u1', autorNome: 'Ana' }
+  const ULTIMA: UltimaVersao = { numero: 3, autorId: 'u1', autorNome: 'Ana', papeis: ['bpmn', 'png'] }
   const usuarios = [{ id: 'u1', nome: 'Ana' }, { id: 'u2', nome: 'Bia' }]
   const doProcesso = (codigo: string, status: StatusDaEtapa, responsavelId: string | null = null): EtapaDoProcesso => ({
     ...etapa(5, status), codigo, responsavelId, responsavelNome: null, responsavelInativo: false,

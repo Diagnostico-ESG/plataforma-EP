@@ -1,4 +1,5 @@
 import type { EventoDoCadastro } from '../cadastros/tipos'
+import type { PapelDoArquivo } from '../versoes/tipos'
 
 export type StatusDaEtapa ='pendente' | 'em_andamento' | 'concluida' | 'realizada_anteriormente' | 'dispensada'
 
@@ -110,8 +111,11 @@ export type UsuarioResponsavel = { id: string; nome: string }
 /** O pai ou um subprocesso no verso: nome em link, a etapa atual e, fora de em andamento, a situação. */
 export type ItemDaEstrutura = { id: string; nome: string; etapaAtual: string | null; situacao: SituacaoDoProcesso }
 
-/** A versão mais recente não histórica do processo e quem a enviou: esse autor não pode revisar o próprio trabalho. */
-export type UltimaVersao = { numero: number; autorId: string; autorNome: string }
+/**
+ * A versão mais recente não histórica do processo, quem a enviou (esse autor não pode revisar o próprio trabalho) e os
+ * papéis dos arquivos dela (a Revisão pelo setor só conclui com .bpmn, .png e relatório).
+ */
+export type UltimaVersao = { numero: number; autorId: string; autorNome: string; papeis: PapelDoArquivo[] }
 
 export type ProcessoLido = ProcessoDaLista & {
   origem: OrigemDoProcesso

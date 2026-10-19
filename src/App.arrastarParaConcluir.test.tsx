@@ -163,7 +163,7 @@ test('clicar no cartão continua abrindo o verso; o cartão segue sendo um link'
 })
 
 test('na Revisão interna como próxima, a janela não oferece o autor da versão mais recente', async () => {
-  const lido = processo('Emitir Ofício', { posicao: 2, processo: { ultimaVersao: { numero: 3, autorId: EU.id, autorNome: EU.nome } } })
+  const lido = processo('Emitir Ofício', { posicao: 2, processo: { ultimaVersao: { numero: 3, autorId: EU.id, autorNome: EU.nome, papeis: ['bpmn', 'png'] } } })
   montar([lido], 'integrante_ep', [EU, BIA])
   levantar(await cartaoDe('Emitir Ofício'))
   soltarEm('Revisão interna')

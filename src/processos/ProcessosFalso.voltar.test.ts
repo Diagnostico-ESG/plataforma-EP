@@ -133,7 +133,7 @@ describe('voltar leva o responsável da etapa reaberta', () => {
   test('o autor da versão mais recente é recusado na Revisão interna, e aceito em outra etapa', async () => {
     const modulo = falso()
     modulo.processos[0] = {
-      ...modulo.processos[0], ultimaVersao: { numero: 3, autorId: 'u1', autorNome: 'Ana Teste' },
+      ...modulo.processos[0], ultimaVersao: { numero: 3, autorId: 'u1', autorNome: 'Ana Teste', papeis: ['bpmn', 'png'] },
       etapasDoProcesso: modulo.processos[0].etapasDoProcesso.map((etapa) => (etapa.id === 'a4' ? { ...etapa, codigo: 'revisao_interna' } : etapa)),
     }
     const falha = await modulo.voltarParaEtapa('a4', 'Motivo', 'u1').catch((erro: unknown) => erro)
@@ -146,7 +146,7 @@ describe('voltar leva o responsável da etapa reaberta', () => {
   test('o seletor também recusa o autor na Revisão interna e mantém o responsável', async () => {
     const modulo = falso()
     modulo.processos[0] = {
-      ...modulo.processos[0], ultimaVersao: { numero: 3, autorId: 'u1', autorNome: 'Ana Teste' },
+      ...modulo.processos[0], ultimaVersao: { numero: 3, autorId: 'u1', autorNome: 'Ana Teste', papeis: ['bpmn', 'png'] },
       etapasDoProcesso: modulo.processos[0].etapasDoProcesso.map((etapa) => (etapa.id === 'a6' ? { ...etapa, codigo: 'revisao_interna' } : etapa)),
     }
     await expect(modulo.mudarResponsavelDaEtapa('a6', 'u1')).rejects.toThrow(FRASE_DO_AUTOR)

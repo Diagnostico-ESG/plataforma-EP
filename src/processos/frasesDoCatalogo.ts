@@ -4,6 +4,10 @@ export function fraseDaEtapaUsada(nome: string): string {
   return `A etapa ${nome} já foi usada; desative-a em vez de excluir.`
 }
 
+export function fraseDaEtapaProtegida(nome: string): string {
+  return `A etapa ${nome} é obrigatória no fluxo: não pode ser desativada nem excluída.`
+}
+
 export function fraseDeNomeRepetido(nome: string): string {
   return `Já existe uma etapa com o nome ${nome}.`
 }

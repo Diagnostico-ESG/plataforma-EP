@@ -3,7 +3,7 @@ import {
   avancarEtapas, conferirAutorDaRevisao, conferirDatasDaEtapa, conferirResponsavelEscolhido, mudarEtapaDoProcesso,
   trocarEtapaDoProcesso, voltarEtapas,
 } from './andamentoFalso'
-import type { EtapaDoProcesso, ProcessoLido } from './tipos'
+import type { EtapaDoProcesso, ProcessoLido, UltimaVersao } from './tipos'
 
 const HOJE = '2026-10-13'
 
@@ -114,7 +114,7 @@ describe('avançar', () => {
 })
 
 describe('trava do autor e responsável escolhido', () => {
-  const ULTIMA = { numero: 3, autorId: 'u1', autorNome: 'Ana Teste' }
+  const ULTIMA: UltimaVersao = { numero: 3, autorId: 'u1', autorNome: 'Ana Teste', papeis: ['bpmn', 'png'] }
   const revisao = (responsavelId: string | null = null) => etapa(6, { codigo: 'revisao_interna', responsavelId })
   const FRASE = 'Ana Teste enviou a versão V3 e não pode ser responsável pela Revisão interna.'
 

@@ -85,7 +85,7 @@ test('sem responsável, o Agora diz isso e oferece [Assumir], que põe quem est�
 })
 
 test('na Revisão interna, o autor da versão mais recente não vê [Assumir]', async () => {
-  const versao: UltimaVersao = { numero: 3, autorId: EU.id, autorNome: EU.nome }
+  const versao: UltimaVersao = { numero: 3, autorId: EU.id, autorNome: EU.nome, papeis: ['bpmn', 'png'] }
   montarVerso(processoLido([
     etapaDoProcesso(4, 'modelagem', MODELAGEM, CONCLUIDA),
     etapaDoProcesso(6, 'revisao_interna', REVISAO, { status: 'em_andamento', iniciadaEm: diasAtras(1) }),
