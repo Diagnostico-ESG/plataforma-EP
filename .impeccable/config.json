@@ -20,6 +20,15 @@
         ],
         "createdAt": "2026-10-19T14:17:42.327Z",
         "reason": "spec processos-etapas, Verso do cartão, Arquivos: 'com a barrinha de cor do tipo'; tokens --tipo-fluxograma/--tipo-relatorio do design system"
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "src/components/processos/Quadro.css"
+        ],
+        "createdAt": "2026-10-19T18:51:03.807Z",
+        "reason": "assistant: a barrinha amarela do selo Reunião é pedida pela spec de processos-etapas (Selos, item 4) e repete a marca de .reuniao-data; não é borda de cartão"
       }
     ]
   }
