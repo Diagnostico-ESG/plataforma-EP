@@ -1,6 +1,7 @@
 import { ROTULO_DO_STATUS, formatarData } from '../processos/caminhoDeEtapas'
 import { ROTULO_DA_ORIGEM, ROTULO_DA_SITUACAO, ROTULO_DO_TIPO } from '../processos/rotulos'
 import type { StatusDaEtapa } from '../processos/tipos'
+import { ROTULO_DO_ESCOPO } from '../revisoes/frasesDeRevisao'
 import { rotuloDaCategoria } from './categorias'
 import type { CategoriaDoMacroprocesso, EstadoDoCadastro, EventoDoCadastro, ItemDoFiltro } from './tipos'
 
@@ -47,9 +48,11 @@ const TEXTO_DA_ACAO_DA_VERSAO: Record<string, string> = {
   substituir: 'Substituiu o arquivo da versão',
 }
 
+const TEXTO_DA_ACAO_DA_REVISAO: Record<string, string> = { registrar: 'Registrou a revisão interna' }
+
 const TEXTOS_DA_ENTIDADE: Record<string, Record<string, string>> = {
   setor_envolvido: TEXTO_DA_ACAO_DO_VINCULO, andamento: TEXTO_DA_ACAO_DO_ANDAMENTO, processo: TEXTO_DA_ACAO_DO_PROCESSO,
-  etapa: TEXTO_DA_ACAO_DA_ETAPA, versao: TEXTO_DA_ACAO_DA_VERSAO,
+  etapa: TEXTO_DA_ACAO_DA_ETAPA, versao: TEXTO_DA_ACAO_DA_VERSAO, revisao_interna: TEXTO_DA_ACAO_DA_REVISAO,
 }
 
 // Macroprocesso e etapa do catálogo aparecem como "código — nome".
@@ -69,6 +72,8 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   data_da_reuniao: 'Reunião de modelagem piloto',
   rotulo: 'Versão', etapa: 'Etapa', arquivos: 'Arquivos', relatorio_de: 'Relatório copiado da versão',
   hash_md5: 'Impressão digital (MD5)',
+  versao_revisada: 'Versão revisada', versao_corrigida: 'Versão corrigida', resultado: 'Resultado', escopo: 'Escopo',
+  comentario: 'Comentário', revisor_nome: 'Revisor', revisada_em: 'Data da revisão',
 }
 
 // Os ids existem para o filtro; quem lê o histórico vê a sigla e o nome. Código e nome da etapa já estão no título.
@@ -115,6 +120,7 @@ export function ehRegistroRetirado(evento: EventoDoCadastro): boolean {
 function nomeDoItemComDono(evento: EventoDoCadastro, estado: Record<string, unknown>): string | null {
   if (ehRegistroRetirado(evento)) return TEXTO_DO_RECURSO_RETIRADO[evento.entidade]
   if (evento.entidade === 'versao') return `${texto(estado.rotulo)} — ${texto(estado.processo_nome)}`
+  if (evento.entidade === 'revisao_interna') return `${texto(estado.versao_revisada)} — ${texto(estado.processo_nome)}`
   const nome = evento.entidade === 'andamento' ? estado.etapa_nome : null
   if (typeof nome !== 'string') return null
   return `${nome} — ${texto(estado.processo_nome)}`
@@ -141,8 +147,8 @@ function itemDaLista(item: unknown): string {
   return typeof observacao === 'string' && observacao !== '' ? `${nomeCompleto} (${observacao})` : nomeCompleto
 }
 
-// As datas do andamento e a da reunião do processo aparecem em DD/MM/AAAA.
-const CAMPOS_DE_DATA = new Set(['iniciada_em', 'resolvida_em', 'data_da_reuniao'])
+// As datas do andamento, a da reunião do processo e a da revisão aparecem em DD/MM/AAAA.
+const CAMPOS_DE_DATA = new Set(['iniciada_em', 'resolvida_em', 'data_da_reuniao', 'revisada_em'])
 
 // Campos do andamento (status pelo rótulo da tela) e as datas; null se não for deles.
 function valorDaEtapa(campo: string, valor: unknown): string | null {
@@ -158,6 +164,7 @@ function valorPorRotulo(campo: string, valor: unknown): string | null {
     tipo: ROTULO_DO_TIPO, origem: ROTULO_DA_ORIGEM, situacao: ROTULO_DA_SITUACAO,
     nivel: { setor: 'Setor', processo: 'Processo' }, obrigatoria: { true: 'Sim', false: 'Não' },
     ativa: { true: 'Ativa', false: 'Inativa' },
+    resultado: { sem_alteracao: 'Sem alteração', corrigida: 'Corrigida' }, escopo: ROTULO_DO_ESCOPO,
   }
   const rotulosDoCampo = rotulos[campo]
   return rotulosDoCampo ? (rotulosDoCampo[String(valor)] ?? texto(valor)) : null

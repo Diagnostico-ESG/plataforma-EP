@@ -44,7 +44,7 @@ export function CaminhoDoProcesso({ processo, processos, revisoes, podeAlterar, 
       <AgoraDoProcesso processo={processo} processos={processos} usuarios={usuarios} usuarioId={usuarioId}
         podeAlterar={podeAlterar} acoes={acoes} executar={executar} aoMudar={aoMudar} />
       {acoes.falha && <p className="cadastros-falha" role="alert">{acoes.falha}</p>}
-      <EtapasDoProcesso etapas={processo.etapasDoProcesso} podeEditar={podeAlterar && !parado} usuarios={usuarios}
+      <EtapasDoProcesso etapas={processo.etapasDoProcesso} processoId={processo.id} revisoes={revisoes} podeEditar={podeAlterar && !parado} usuarios={usuarios}
         usuarioId={usuarioId} ultimaVersao={processo.ultimaVersao} acoes={acoes} aoCorrigirDatas={corrigirDatas}
         aoSumir={aoSumir} />
       <JanelasDaEtapa acoes={acoes} usuarios={usuarios} usuarioId={usuarioId} ultimaVersao={processo.ultimaVersao} />

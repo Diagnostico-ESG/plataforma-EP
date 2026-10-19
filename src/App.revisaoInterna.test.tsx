@@ -5,10 +5,12 @@ import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
+import type { Perfil } from './acesso/tipos'
 import type { EtapaDoProcesso, ProcessoLido, UltimaVersao } from './processos/tipos'
+import type { RevisaoInterna } from './revisoes/tipos'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
 import { cartaoDe, ETAPAS, montar as montarQuadro, processo as processoDoQuadro } from './testes/quadroDeTeste'
-import { agoraDoVerso, etapasDoVerso } from './testes/versoDoCartao'
+import { agoraDoVerso, escolherNoMenuDoProcesso, etapasDoVerso, gavetaDaEtapa, versoAberto } from './testes/versoDoCartao'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
 // Concluir a Revisão interna pela janela de concluir: o Resultado da revisão (sem alteração ou corrigida, com escopo e
@@ -57,16 +59,16 @@ function processo(ultimaVersao: UltimaVersao | null): ProcessoLido {
 }
 
 // O verso do processo no aplicativo inteiro, com a Revisão interna em andamento sob quem está na tela.
-function montar(ultimaVersao: UltimaVersao | null) {
+function montar(ultimaVersao: UltimaVersao | null, { perfil = 'integrante_ep', mudancas = {} }: { perfil?: Perfil; mudancas?: Partial<ProcessoLido> } = {}) {
   window.location.hash = '#/processos/p1'
   const cadastros = new CadastrosFalso()
   cadastros.setores = [{ id: 's1', sigla: 'TSA', nome: 'Setor Teste A', observacoes: null, ativo: true }]
   const falso = new ProcessosFalso()
-  falso.processos = [processo(ultimaVersao)]
+  falso.processos = [{ ...processo(ultimaVersao), ...mudancas }]
   falso.usuariosPossiveis = [EU, BIA]
   falso.etapasDoCatalogo = CAMINHO.map((etapa) => ({ id: `e${etapa.ordem}`, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, ativa: true }))
   const revisoes = new RevisoesFalso(falso, EU)
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'integrante_ep' })} cadastros={cadastros} processos={falso}
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso}
     versoes={new VersoesFalso()} revisoes={revisoes} />)
   return { falso, revisoes }
 }
@@ -228,4 +230,96 @@ test('arrastar com a versão minha mostra o escopo e, sem opção que caiba, a f
   const janela = within(await screen.findByRole('dialog', { name: TITULO_DO_ARRASTAR }))
   expect(janela.getByRole('alert').textContent).toBe('Quem enviou a versão V1 não pode revisá-la.')
   expect((janela.getByRole('button', { name: `Concluir e iniciar ${ETAPAS[3].nome}` }) as HTMLButtonElement).disabled).toBe(true)
+})
+
+// ---- As revisões na gaveta da Revisão interna e no histórico do processo
+
+const REVISAO_CORRIGIDA: RevisaoInterna = {
+  id: 'r2', versaoRevisada: 7, versaoCorrigida: 8, resultado: 'corrigida', escopo: 'ambos', comentario: 'Ajustei o fluxo',
+  revisor: BIA.nome, revisadaEm: '2026-10-13',
+}
+const REVISAO_SEM_ALTERACAO: RevisaoInterna = {
+  id: 'r1', versaoRevisada: 6, versaoCorrigida: null, resultado: 'sem_alteracao', escopo: null, comentario: null,
+  revisor: EU.nome, revisadaEm: '2026-10-12',
+}
+
+test('a gaveta lista as revisões da mais recente para a mais antiga, com versão, revisor, data, resultado, escopo e comentário', async () => {
+  const { revisoes } = montar(DE_BIA)
+  revisoes.revisoes.p1 = [REVISAO_CORRIGIDA, REVISAO_SEM_ALTERACAO]
+  const gaveta = await gavetaDaEtapa(REVISAO_INTERNA)
+  const itens = await gaveta.findAllByRole('listitem')
+  expect(itens.map((item) => item.textContent)).toEqual([
+    'V7 · Bia Teste · 13/10/2026Corrigida, gerou a V8 · Fluxograma e relatórioAjustei o fluxo',
+    `V6 · ${EU.nome} · 12/10/2026Sem alteração`,
+  ])
+})
+
+test('sem revisões a gaveta diz que nenhuma foi registrada', async () => {
+  montar(DE_BIA)
+  expect(await (await gavetaDaEtapa(REVISAO_INTERNA)).findByText('Nenhuma revisão registrada.')).toBeTruthy()
+})
+
+test('enquanto as revisões carregam a gaveta mostra "Carregando…"', async () => {
+  const { revisoes } = montar(DE_BIA)
+  revisoes.segurarLeitura = true
+  expect(await (await gavetaDaEtapa(REVISAO_INTERNA)).findByText('Carregando…')).toBeTruthy()
+})
+
+test('a falha ao ler as revisões mostra o aviso com [Tentar de novo], que lê outra vez', async () => {
+  const { revisoes } = montar(DE_BIA)
+  revisoes.revisoes.p1 = [REVISAO_SEM_ALTERACAO]
+  revisoes.falharLeitura = true
+  const gaveta = await gavetaDaEtapa(REVISAO_INTERNA)
+  expect((await gaveta.findByRole('alert')).textContent).toContain('Não foi possível carregar as revisões. Verifique a conexão e tente de novo.')
+  revisoes.falharLeitura = false
+  fireEvent.click(gaveta.getByRole('button', { name: 'Tentar de novo' }))
+  expect(await gaveta.findByText(/^V6 · /)).toBeTruthy()
+  expect(gaveta.queryByRole('alert')).toBeNull()
+})
+
+test('só a gaveta da Revisão interna traz as revisões', async () => {
+  montar(DE_BIA)
+  const gaveta = await gavetaDaEtapa(REVISAO_DO_SETOR)
+  expect(gaveta.queryByText('Nenhuma revisão registrada.')).toBeNull()
+})
+
+test('a Consulta vê as revisões, sem nenhum botão de revisão', async () => {
+  const { revisoes } = montar(DE_BIA, { perfil: 'consulta' })
+  revisoes.revisoes.p1 = [REVISAO_SEM_ALTERACAO]
+  const gaveta = await gavetaDaEtapa(REVISAO_INTERNA)
+  expect(await gaveta.findByText(/^V6 · /)).toBeTruthy()
+  // O único botão é a linha da etapa, que abre e fecha a gaveta.
+  expect(gaveta.getAllByRole('button').map((botao) => botao.getAttribute('aria-expanded'))).toEqual(['true'])
+})
+
+test('o subprocesso mostra as próprias revisões', async () => {
+  const { revisoes } = montar(DE_BIA, { mudancas: { tipo: 'subprocesso' } })
+  revisoes.revisoes.p1 = [REVISAO_SEM_ALTERACAO]
+  expect(await (await gavetaDaEtapa(REVISAO_INTERNA)).findByText(/^V6 · /)).toBeTruthy()
+})
+
+test('a revisão registrada pela janela aparece na gaveta depois da conclusão', async () => {
+  montar(DE_BIA)
+  const janela = await abrirAJanela()
+  fireEvent.click(opcao(janela, 'Sem alteração: segue a V7'))
+  fireEvent.click(botao(janela))
+  const gaveta = await gavetaDaEtapa(REVISAO_INTERNA)
+  expect(await gaveta.findByText(/^V7 · Pessoa de Teste · 13\/10\/2026/)).toBeTruthy()
+})
+
+test('o evento de revisão registrada aparece no histórico do processo, com texto próprio', async () => {
+  const { falso } = montar(DE_BIA)
+  falso.historicoDosProcessos.p1 = [{
+    id: 1, ocorridoEm: '2026-10-13T15:00:00Z', autor: BIA.nome, acao: 'registrar', entidade: 'revisao_interna', entidadeRef: 'p1',
+    antes: null,
+    depois: {
+      processo_nome: 'Emitir Ofício', setor_sigla: 'TSA', versao_revisada: 'V7', versao_corrigida: 'V8', resultado: 'corrigida',
+      escopo: 'ambos', comentario: 'Ajustei o fluxo', revisor_nome: BIA.nome, revisada_em: '2026-10-13',
+    },
+  }]
+  await escolherNoMenuDoProcesso('Histórico')
+  const verso = await versoAberto()
+  const evento = await verso.findByText('Registrou a revisão interna')
+  expect(evento.parentElement?.textContent).toBe('Registrou a revisão interna V7 — Emitir Ofício')
+  expect(verso.getByText(/Resultado: Corrigida; Escopo: Fluxograma e relatório; Comentário: Ajustei o fluxo/)).toBeTruthy()
 })

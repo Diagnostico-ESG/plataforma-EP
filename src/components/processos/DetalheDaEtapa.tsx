@@ -4,11 +4,16 @@ import {
 } from '../../processos/caminhoDeEtapas'
 import type { AcoesDaEtapaEmUso } from '../../hooks/useAcoesDaEtapa'
 import type { DatasDaEtapa, EtapaDoCaminho, EtapaDoProcesso, UltimaVersao, UsuarioResponsavel } from '../../processos/tipos'
+import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import { FormularioDeDatas } from './FormularioDeDatas'
+import { RevisoesDaEtapa } from './RevisoesDaEtapa'
 import { TrocaDoResponsavel } from './TrocaDoResponsavel'
 
 export type DadosDasEtapas = {
   etapas: EtapaDoProcesso[]
+  /** O processo das etapas e o módulo de revisões: a gaveta da Revisão interna lista as revisões dele. */
+  processoId: string
+  revisoes: ModuloDeRevisoes
   /** Quem pode alterar, com o processo em andamento ou concluído; suspenso, cancelado e Consulta só leem. */
   podeEditar: boolean
   usuarios: UsuarioResponsavel[]
@@ -41,6 +46,7 @@ export function DetalheDaEtapa(props: DetalheDaEtapaProps) {
     <div id={id} className="etapa-gaveta">
       <p className="etapa-datas">Início: {formatarData(etapa.iniciadaEm)} · Conclusão: {formatarData(etapa.resolvidaEm)}</p>
       {etapa.nota && <p className="etapa-nota">Nota: {etapa.nota}</p>}
+      {etapa.codigo === 'revisao_interna' && <RevisoesDaEtapa revisoes={props.revisoes} processoId={props.processoId} />}
       {sinal !== 'atual' && <ResponsavelNaGaveta {...props} />}
       <div className="etapa-gaveta-acoes">
         {podeEditar && etapa.status !== 'pendente' && !corrigindo && (
