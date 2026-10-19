@@ -10,16 +10,16 @@
 
 ## Critérios de aceite
 
-- [ ] Funções puras da contagem de dias na etapa, do limite de 15 dias e do "Concluído em" com testes unitários.
-- [ ] Agora pendente com [Iniciar {etapa}]; em andamento com [Concluir {etapa}] abrindo a janela de avanço; última etapa concluindo direto.
-- [ ] "⋯" do Agora com Dispensar só na opcional e Realizada anteriormente, pelas janelas da parte 2.
-- [ ] Sem responsável: "Sem responsável" e [Assumir]; ausente na Revisão interna para o autor da versão mais recente não histórica.
-- [ ] "Trocar" com a pessoa da tela primeiro, "(você)", e "Ninguém por enquanto" no fim; grava ao escolher; a falha mostra a mensagem de erro e mantém o responsável.
-- [ ] Dias na etapa: número até 15 e a pílula "{n} dias nesta etapa" a partir de 16.
-- [ ] Suspenso e cancelado com o motivo e [Retomar]; o aviso antigo de processo suspenso ou cancelado sai.
-- [ ] Concluído com "Concluído em {data}".
-- [ ] Consulta: o Agora sem botões nem "Trocar", com "Com {nome} há {n} dias".
-- [ ] Etapas com o nome acessível de cada status; gaveta uma por vez, abrindo e fechando pelo teclado com o estado anunciado; Corrigir datas e Voltar a esta etapa onde cabem; Trocar e [Assumir] nas pendentes depois da atual; só leitura em suspenso e cancelado.
-- [ ] Testes de interface com o aplicativo inteiro cobrindo os itens acima.
-- [ ] `[visual]` O Agora é a única coisa acesa da janela: borda de 2 px em `azul` e o único botão principal; na Consulta, borda cinza e sem botões; suspenso em âmbar claro, cancelado em cinza claro e concluído em verde claro.
-- [ ] `[visual]` As etapas são linhas compactas e quietas: só o verde de concluída e o azul da atual têm cor; o resto é cinza, com selos neutros para opcional, dispensada e anterior; a gaveta do detalhe abre sem empurrar a janela para fora da tela.
+- [x] Funções puras da contagem de dias na etapa, do limite de 15 dias e do "Concluído em" com testes unitários.
+- [x] Agora pendente com [Iniciar {etapa}]; em andamento com [Concluir {etapa}] abrindo a janela de avanço; última etapa concluindo direto.
+- [x] "⋯" do Agora com Dispensar só na opcional e Realizada anteriormente, pelas janelas da parte 2.
+- [x] Sem responsável: "Sem responsável" e [Assumir]; ausente na Revisão interna para o autor da versão mais recente não histórica.
+- [x] "Trocar" com a pessoa da tela primeiro, "(você)", e "Ninguém por enquanto" no fim; grava ao escolher; a falha mostra a mensagem de erro e mantém o responsável.
+- [x] Dias na etapa: número até 15 e a pílula "{n} dias nesta etapa" a partir de 16.
+- [x] Suspenso e cancelado com o motivo e [Retomar]; o aviso antigo de processo suspenso ou cancelado sai.
+- [x] Concluído com "Concluído em {data}".
+- [x] Consulta: o Agora sem botões nem "Trocar", com "Com {nome} há {n} dias".
+- [x] Etapas com o nome acessível de cada status; gaveta uma por vez, abrindo e fechando pelo teclado com o estado anunciado; Corrigir datas e Voltar a esta etapa onde cabem; Trocar e [Assumir] nas pendentes depois da atual; só leitura em suspenso e cancelado.
+- [x] Testes de interface com o aplicativo inteiro cobrindo os itens acima.
+- [x] `[visual]` O Agora é a única coisa acesa da janela: borda de 2 px em `azul` e o único botão principal; na Consulta, borda cinza e sem botões; suspenso em âmbar claro, cancelado em cinza claro e concluído em verde claro.
+- [x] `[visual]` As etapas são linhas compactas e quietas: só o verde de concluída e o azul da atual têm cor; o resto é cinza, com selos neutros para opcional, dispensada e anterior; a gaveta do detalhe abre sem empurrar a janela para fora da tela.
