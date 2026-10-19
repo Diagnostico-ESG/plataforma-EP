@@ -38,3 +38,18 @@ test('ida e volta com todos os filtros', () => {
   const endereco = '#/processos/lista/p1?setor=s1&macroprocesso=m1&etapa=modelagem&tipo=processo&responsavel=u1&situacao=suspenso'
   expect(montarEnderecoDosProcessos(lerEnderecoDosProcessos(endereco))).toBe(endereco)
 })
+
+test('a busca vem da consulta, só na Lista, e endereço sem busca continua valendo', () => {
+  expect(lerEnderecoDosProcessos('#/processos/lista?busca=pagar%20di').filtros).toEqual({ ...SEM_FILTROS, busca: 'pagar di' })
+  expect(lerEnderecoDosProcessos('#/processos?busca=pagar').filtros).toEqual(SEM_FILTROS)
+  expect(lerEnderecoDosProcessos('#/processos/lista?busca=').filtros.busca).toBeNull()
+  expect(lerEnderecoDosProcessos('#/processos/lista?setor=s1').filtros.busca).toBeNull()
+})
+
+test('montar a busca: depois dos filtros, e fora do Quadro', () => {
+  const filtros = { ...SEM_FILTROS, setor: 's1', busca: 'pagar di' }
+  expect(montarEnderecoDosProcessos({ visao: 'lista', aberto: null, filtros })).toBe('#/processos/lista?setor=s1&busca=pagar+di')
+  expect(montarEnderecoDosProcessos({ visao: 'quadro', aberto: null, filtros })).toBe('#/processos?setor=s1')
+  expect(lerEnderecoDosProcessos(montarEnderecoDosProcessos({ visao: 'lista', aberto: 'p1', filtros })))
+    .toEqual({ visao: 'lista', aberto: 'p1', filtros })
+})

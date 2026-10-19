@@ -11,17 +11,19 @@ export type FiltrosDosProcessos = {
   responsavel: string | null
   /** Só na Lista: o Quadro mostra apenas os vivos. */
   situacao: SituacaoDoProcesso | null
+  /** Só na Lista: trecho do nome do processo. */
+  busca: string | null
 }
 
 /** aberto: o id do processo no painel, 'novo' no cadastro, null sem painel. */
 export type EnderecoDosProcessos = { visao: VisaoDosProcessos; aberto: string | null; filtros: FiltrosDosProcessos }
 
 export const SEM_FILTROS: FiltrosDosProcessos = {
-  setor: null, macroprocesso: null, etapa: null, tipo: null, responsavel: null, situacao: null,
+  setor: null, macroprocesso: null, etapa: null, tipo: null, responsavel: null, situacao: null, busca: null,
 }
 
 // A ordem fixa deixa o mesmo filtro sempre com o mesmo endereço, para recarregar ou compartilhar.
-const NOMES_DOS_FILTROS = ['setor', 'macroprocesso', 'etapa', 'tipo', 'responsavel', 'situacao'] as const
+const NOMES_DOS_FILTROS = ['setor', 'macroprocesso', 'etapa', 'tipo', 'responsavel', 'situacao', 'busca'] as const
 const TIPOS = new Set<string>(['processo', 'subprocesso', 'a_classificar'])
 const SITUACOES = new Set<string>(['em_andamento', 'suspenso', 'cancelado', 'concluido'])
 
@@ -44,6 +46,7 @@ function filtrosDaConsulta(consulta: URLSearchParams, visao: VisaoDosProcessos):
     setor: valor('setor'), macroprocesso: valor('macroprocesso'), etapa: etapaDaConsulta(valor('etapa')),
     tipo: conhecido('tipo', TIPOS) as TipoDeProcesso | null, responsavel: valor('responsavel'),
     situacao: visao === 'lista' ? conhecido('situacao', SITUACOES) as SituacaoDoProcesso | null : null,
+    busca: visao === 'lista' ? valor('busca') : null,
   }
 }
 
@@ -56,7 +59,8 @@ export function montarEnderecoDosProcessos({ visao, aberto, filtros }: EnderecoD
   const trechos = ['#/processos', visao === 'lista' ? 'lista' : null, aberto].filter((trecho) => trecho !== null)
   const consulta = new URLSearchParams()
   for (const nome of NOMES_DOS_FILTROS) {
-    const valor = nome === 'situacao' && visao === 'quadro' ? null : filtros[nome]
+    const soDaLista = nome === 'situacao' || nome === 'busca'
+    const valor = soDaLista && visao === 'quadro' ? null : filtros[nome]
     if (valor) consulta.set(nome, valor)
   }
   const texto = consulta.toString()

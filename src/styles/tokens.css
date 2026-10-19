@@ -66,6 +66,9 @@
   --pendencia-fundo: #fff6e5;
   --pendencia-borda: #f3d28f;
 
+  /* Trecho achado pela busca da Lista */
+  --busca-marca: #fff2a8;
+
   /* Barrinha por tipo de registro */
   --tipo-fluxograma: #8cc4ea;
   --tipo-relatorio: #b7a5ec;

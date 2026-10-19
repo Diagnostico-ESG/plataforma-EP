@@ -2,21 +2,22 @@ import type { LinhaDaLista } from '../../processos/linhasDaLista'
 import { textoDaEtapaAtual } from '../../processos/linhasDaLista'
 import { ROTULO_DO_TIPO } from '../../processos/rotulos'
 import { LinhaFantasma } from '../cadastros/PecasDaLista'
+import { NomeComTrecho } from './NomeComTrecho'
 import { PilulaDaSituacao } from './PilulaDaSituacao'
 
 const COLUNAS = ['Nome', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Responsável', 'Situação']
 const LINHAS_FANTASMA = 3
 
-type TabelaDeProcessosProps = { linhas: LinhaDaLista[]; idEscolhido: string | null; aoAbrir: (id: string) => void }
+type TabelaDeProcessosProps = { linhas: LinhaDaLista[]; idEscolhido: string | null; aoAbrir: (id: string) => void; busca: string | null }
 
 /** A Lista: tabela compacta, no padrão das listas de cadastros. */
-export function TabelaDeProcessos({ linhas, idEscolhido, aoAbrir }: TabelaDeProcessosProps) {
+export function TabelaDeProcessos({ linhas, idEscolhido, aoAbrir, busca }: TabelaDeProcessosProps) {
   return (
     <table className="tabela-cadastros tabela-de-processos">
       <CabecalhoDaTabela />
       <tbody>
         {linhas.map((linha) => (
-          <LinhaDoProcesso key={linha.id} linha={linha} escolhida={linha.id === idEscolhido} aoAbrir={aoAbrir} />
+          <LinhaDoProcesso key={linha.id} linha={linha} escolhida={linha.id === idEscolhido} aoAbrir={aoAbrir} busca={busca} />
         ))}
       </tbody>
     </table>
@@ -43,14 +44,16 @@ function CabecalhoDaTabela() {
   )
 }
 
-type LinhaDoProcessoProps = { linha: LinhaDaLista; escolhida: boolean; aoAbrir: (id: string) => void }
+type LinhaDoProcessoProps = { linha: LinhaDaLista; escolhida: boolean; aoAbrir: (id: string) => void; busca: string | null }
 
 // A linha inteira abre o painel; o botão no nome dá o mesmo caminho a quem usa o teclado e recebe o foco ao fechar.
-function LinhaDoProcesso({ linha, escolhida, aoAbrir }: LinhaDoProcessoProps) {
+function LinhaDoProcesso({ linha, escolhida, aoAbrir, busca }: LinhaDoProcessoProps) {
   return (
     <tr className="linha-clicavel" aria-current={escolhida ? 'true' : undefined} onClick={() => aoAbrir(linha.id)}>
       <td>
-        <button type="button" id={`linha-${linha.id}`} className="cadastros-abrir">{linha.nome}</button>
+        <button type="button" id={`linha-${linha.id}`} className="cadastros-abrir">
+          <NomeComTrecho nome={linha.nome} busca={busca} />
+        </button>
         {linha.nomeDoPai && <span className="lista-pai">↳ {linha.nomeDoPai}</span>}
       </td>
       <td>{ROTULO_DO_TIPO[linha.tipo]}</td>

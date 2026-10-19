@@ -31,6 +31,12 @@ const DESENHOS = {
       <path d="M4 21c0-4 3.6-6 8-6s8 2 8 6" />
     </>
   ),
+  lupa: (
+    <>
+      <circle cx="11" cy="11" r="6.5" />
+      <path d="M16 16l4.5 4.5" />
+    </>
+  ),
   mais: <path d="M12 5v14M5 12h14" />,
   fechar: <path d="M6 6l12 12M18 6L6 18" />,
   relogio: (

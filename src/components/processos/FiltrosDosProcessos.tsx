@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { BuscaDaLista } from './BuscaDaLista'
 import type { FiltrosDosProcessos as Filtros, VisaoDosProcessos } from '../../processos/enderecoDosProcessos'
 import { SEM_FILTROS } from '../../processos/enderecoDosProcessos'
 import { temFiltro, type OpcaoDoFiltro, type OpcoesDosFiltros } from '../../processos/filtrosDosProcessos'
@@ -16,6 +17,7 @@ export function FiltrosDosProcessos({ visao, opcoes, filtros, aoMudar }: Filtros
   const mudar = (nome: keyof Filtros) => (valor: string) => aoMudar({ ...filtros, [nome]: valor || null } as Filtros)
   return (
     <div className="filtros-dos-processos" role="group" aria-label="Filtros dos processos">
+      {visao === 'lista' && <BuscaDaLista valor={filtros.busca} aoMudar={mudar('busca')} />}
       <SeletorDoFiltro rotulo="Setor" todos="Todos" opcoes={opcoes.setores} valor={filtros.setor} aoMudar={mudar('setor')} />
       <SeletorDoFiltro rotulo="Macroprocesso" todos="Todos" opcoes={opcoes.macroprocessos} valor={filtros.macroprocesso}
         aoMudar={mudar('macroprocesso')} />

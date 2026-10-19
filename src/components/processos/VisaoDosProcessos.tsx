@@ -45,11 +45,13 @@ export function VisaoDosProcessos(props: VisaoDosProcessosProps) {
 
 type ConteudoDaVisaoProps = VisaoDosProcessosProps & { lista: ListaDeProcessos; todos: ListaDeProcessos['processos'] }
 
-function ConteudoDaVisao({ visao, lista, todos, idEscolhido, enderecoDoProcesso, aoAbrir }: ConteudoDaVisaoProps) {
+function ConteudoDaVisao({ visao, lista, todos, idEscolhido, enderecoDoProcesso, aoAbrir, filtros }: ConteudoDaVisaoProps) {
   if (visao === 'quadro') {
     return <QuadroDeProcessos lista={lista} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso} />
   }
-  return <TabelaDeProcessos linhas={linhasDaLista(lista.processos, todos)} idEscolhido={idEscolhido} aoAbrir={aoAbrir} />
+  return (
+    <TabelaDeProcessos linhas={linhasDaLista(lista.processos, todos)} idEscolhido={idEscolhido} aoAbrir={aoAbrir} busca={filtros.busca} />
+  )
 }
 
 function BotaoCadastrar({ aoCadastrar }: { aoCadastrar: () => void }) {
