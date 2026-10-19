@@ -226,7 +226,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
 - **Janela de avanço** (desde 2026-10-18; a mesma janela nativa do ADR 0003):
   - **Quando abre:** em [Concluir], e dentro das janelas de Dispensar e Realizada anteriormente, abaixo da nota, sempre que há etapa pendente depois da que se resolve. Sem pendente depois, Concluir grava direto, e Dispensar e Realizada anteriormente mostram só a nota.
   - **Título:** "Concluir {etapa} e iniciar {próxima}" (com "Dispensar" ou "Registrar … como realizada anteriormente" nas outras ações).
-  - **Pergunta e opções:** "Quem fica com a próxima etapa?", em botões de rádio: cada usuário ativo Administrador ou Integrante pelo nome, e "Ninguém por enquanto" por último. Quando a próxima é a Revisão interna, o autor da versão mais recente não histórica não aparece.
+  - **Pergunta e opções:** "Quem fica com a próxima etapa?", em botões de rádio: cada usuário ativo Administrador ou Integrante pelo nome, e "Ninguém por enquanto" por último. Quando a próxima é a Revisão interna, o autor da versão mais recente não histórica não aparece. Se a lista de usuários ainda não chegou (ou a leitura falhou), a janela oferece só "Ninguém por enquanto". Para a tela esconder esse autor, o processo lido traz a versão mais recente não histórica (número e autor); a proteção é a do banco, a tela só poupa a recusa.
   - **Marcado ao abrir:** o responsável que a próxima já tem, se ele pode ser escolhido; senão, quem está na tela, se pode; senão, "Ninguém por enquanto".
   - **Teclado e leitor de tela:** o grupo de rádios tem a pergunta como nome; o foco abre na opção marcada (na nota, quando há nota); as setas trocam de opção; Enter confirma; Esc e [Cancelar] fecham sem gravar.
   - **Botão de confirmar:** "Concluir e iniciar {próxima}" (ou "Dispensar e iniciar {próxima}", "Registrar e iniciar {próxima}"); com nota, desabilitado enquanto ela estiver vazia.
@@ -250,6 +250,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
   - "O processo pai precisa ser do tipo Processo."
   - "{Usuário} não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP."
   - "{Usuário} enviou a versão V{n} e não pode ser responsável pela Revisão interna." (desde 2026-10-18)
+  - "A nota é obrigatória." (dispensar e registrar como realizada anteriormente, pelo avanço; o motivo de suspender, cancelar, retomar e voltar tem a frase "O motivo é obrigatório."; desde 2026-10-18)
   - "Não é possível excluir: {setor | macroprocesso} tem {n} processos ligados."
   - "O setor {SIGLA} tem {n} processos neste macroprocesso; mova-os ou exclua-os antes."
   - "A etapa {nome} já foi usada; desative-a em vez de excluir."
