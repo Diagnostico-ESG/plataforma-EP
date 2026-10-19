@@ -9,4 +9,12 @@ if (typeof HTMLDialogElement !== 'undefined') {
     this.removeAttribute('open')
     this.dispatchEvent(new Event('close'))
   }
+  // Esc no navegador: a janela de cima recebe "cancel", que pode ser impedido; se não for, ela fecha.
+  // Quem trata o Esc antes (um menu aberto) impede a ação padrão, e a janela fica.
+  document.addEventListener('keydown', (evento) => {
+    if (evento.key !== 'Escape' || evento.defaultPrevented) return
+    const abertas = document.querySelectorAll<HTMLDialogElement>('dialog[open]')
+    const deCima = abertas[abertas.length - 1]
+    if (deCima && deCima.dispatchEvent(new Event('cancel', { cancelable: true }))) deCima.close()
+  })
 }

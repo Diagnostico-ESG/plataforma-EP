@@ -46,3 +46,10 @@ test('Cancelar e Esc fecham sem confirmar', () => {
   expect(aoFechar).toHaveBeenCalled()
   expect(aoConfirmar).not.toHaveBeenCalled()
 })
+
+test('Esc fecha a janela sem gravar, como no navegador', () => {
+  const { aoConfirmar, aoFechar, janela } = montar()
+  fireEvent.keyDown(janela.getByLabelText('Nota'), { key: 'Escape' })
+  expect(aoFechar).toHaveBeenCalled()
+  expect(aoConfirmar).not.toHaveBeenCalled()
+})
