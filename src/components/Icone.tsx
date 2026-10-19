@@ -41,6 +41,14 @@ const DESENHOS = {
   ),
   documento: <path d="M6 3h8l5 5v13H6zM14 3v5h5" />,
   rodadas: <path d="M4 12a8 8 0 0 1 14-5.3M18 3v4h-4M20 12a8 8 0 0 1-14 5.3M6 21v-4h4" />,
+  // O "⋯" dos menus de ações: três pontos cheios, mais legíveis que o traço fino.
+  reticencias: (
+    <g fill="currentColor" stroke="none">
+      <circle cx="5" cy="12" r="1.6" />
+      <circle cx="12" cy="12" r="1.6" />
+      <circle cx="19" cy="12" r="1.6" />
+    </g>
+  ),
 } satisfies Record<string, ReactNode>
 
 export type NomeIcone = keyof typeof DESENHOS

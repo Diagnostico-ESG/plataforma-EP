@@ -1,0 +1,68 @@
+/* O "⋯" das ações raras: uma lista flutuante alinhada à direita do botão, no desenho do menu da conta. */
+.menu-de-acoes {
+  position: relative;
+}
+
+.menu-de-acoes-botao {
+  color: var(--texto-2);
+}
+
+.menu-de-acoes-botao:hover,
+.menu-de-acoes-botao[aria-expanded='true'] {
+  background: var(--neutra-fundo);
+  color: var(--texto);
+}
+
+.menu-de-acoes-lista {
+  position: absolute;
+  top: calc(100% + var(--esp-1));
+  right: 0;
+  z-index: 5;
+  min-width: 200px;
+  padding: var(--esp-1) 0;
+  border: 1px solid var(--linha);
+  border-radius: var(--canto);
+  background: var(--folha);
+  box-shadow: var(--sombra-flutuante);
+}
+
+/* A linha inteira é o alvo: 32px de altura, acima dos 24px da WCAG 2.2. */
+.menu-de-acoes-item {
+  display: block;
+  width: 100%;
+  min-height: 32px;
+  padding: 0 var(--esp-4);
+  border: 0;
+  background: transparent;
+  color: var(--texto);
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.menu-de-acoes-item:hover,
+.menu-de-acoes-item:focus {
+  background: var(--azul-claro);
+}
+
+/* O contorno do foco fica por dentro, para não ser cortado pela borda da lista. */
+.menu-de-acoes-item:focus-visible {
+  outline-offset: -2px;
+}
+
+/* Excluir: vermelho de "a ação não volta" (ADR 0003), sempre com o texto, nunca só a cor. */
+.menu-de-acoes-perigoso {
+  color: var(--atraso-texto);
+}
+
+.menu-de-acoes-perigoso:hover,
+.menu-de-acoes-perigoso:focus {
+  background: var(--atraso-fundo);
+}
+
+.menu-de-acoes-separador {
+  height: 1px;
+  margin: var(--esp-1) 0;
+  background: var(--linha);
+}
