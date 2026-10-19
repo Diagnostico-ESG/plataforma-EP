@@ -41,46 +41,77 @@ function montar(mudancas: Partial<ProcessoLido> = {}, perfil: Perfil = 'integran
 }
 
 async function linha() {
-  return within(await screen.findByRole('region', { name: 'Reunião de modelagem piloto' }))
+  return within(await screen.findByRole('region', { name: 'Reunião' }))
 }
 
-const campo = (secao: Awaited<ReturnType<typeof linha>>) =>
-  secao.getByLabelText('Data da reunião de modelagem piloto') as HTMLInputElement
+type Secao = Awaited<ReturnType<typeof linha>>
+
+const campo = (secao: Secao) => secao.getByLabelText('Data da reunião de modelagem piloto') as HTMLInputElement
+
+/** "Marcar data" ou "Alterar data": a linha vira o campo ali mesmo. */
+async function editar(rotulo: 'Marcar data' | 'Alterar data' = 'Marcar data'): Promise<Secao> {
+  const secao = await linha()
+  fireEvent.click(secao.getByRole('button', { name: rotulo }))
+  return secao
+}
 
 test.each([
-  ['2026-10-20', 'marcada para 20/10/2026'],
-  ['2026-10-14', 'marcada para 14/10/2026'],
-  ['2026-10-10', 'realizada em 10/10/2026'],
-  [null, 'não marcada'],
-])('com a data %s, a linha diz "%s"', async (data, texto) => {
+  ['2026-10-20', '20/10/2026', '· próxima'],
+  ['2026-10-14', '14/10/2026', '· próxima'],
+  ['2026-10-10', '10/10/2026', '· realizada'],
+])('com a data %s, a linha diz "%s %s" e oferece [Alterar data]', async (data, dia, momento) => {
   montar({ dataDaReuniao: data })
-  expect((await linha()).getByText(texto)).toBeTruthy()
+  const secao = await linha()
+  expect(secao.getByText(dia).tagName).toBe('TIME')
+  expect(secao.getByText(momento)).toBeTruthy()
+  expect(secao.getByRole('button', { name: 'Alterar data' })).toBeTruthy()
+  expect(secao.queryByLabelText('Data da reunião de modelagem piloto')).toBeNull()
 })
 
-test('marcar: escolher a data e [Salvar] grava e atualiza o texto', async () => {
-  const falso = montar()
+test('sem data, a linha diz "Ainda não marcada" e oferece [Marcar data]', async () => {
+  montar()
   const secao = await linha()
+  expect(secao.getByText('Ainda não marcada')).toBeTruthy()
+  expect(secao.getByRole('button', { name: 'Marcar data' })).toBeTruthy()
+})
+
+test('marcar: [Marcar data] abre o campo sem [Remover]; [Salvar] grava e volta à linha com a data', async () => {
+  const falso = montar()
+  const secao = await editar()
+  expect(secao.queryByRole('button', { name: 'Remover' })).toBeNull()
   fireEvent.change(campo(secao), { target: { value: '2026-10-20' } })
   fireEvent.click(secao.getByRole('button', { name: 'Salvar' }))
-  expect(await secao.findByText('marcada para 20/10/2026')).toBeTruthy()
+  expect(await secao.findByText('20/10/2026')).toBeTruthy()
+  expect(secao.getByText('· próxima')).toBeTruthy()
+  expect(secao.queryByLabelText('Data da reunião de modelagem piloto')).toBeNull()
   expect(falso.chamadas).toEqual([{ acao: 'reuniao', id: 'p1', nota: '2026-10-20' }])
 })
 
-test('trocar a data marcada', async () => {
+test('trocar a data marcada: o campo abre com ela', async () => {
   const falso = montar({ dataDaReuniao: '2026-10-14' })
-  const secao = await linha()
+  const secao = await editar('Alterar data')
   expect(campo(secao).value).toBe('2026-10-14')
   fireEvent.change(campo(secao), { target: { value: '2026-10-21' } })
   fireEvent.click(secao.getByRole('button', { name: 'Salvar' }))
-  expect(await secao.findByText('marcada para 21/10/2026')).toBeTruthy()
+  expect(await secao.findByText('21/10/2026')).toBeTruthy()
   expect(falso.processos[0].dataDaReuniao).toBe('2026-10-21')
+})
+
+test('[Cancelar] volta à linha sem gravar', async () => {
+  const falso = montar({ dataDaReuniao: '2026-10-14' })
+  const secao = await editar('Alterar data')
+  fireEvent.change(campo(secao), { target: { value: '2026-10-21' } })
+  fireEvent.click(secao.getByRole('button', { name: 'Cancelar' }))
+  expect(secao.getByText('14/10/2026')).toBeTruthy()
+  expect(secao.queryByLabelText('Data da reunião de modelagem piloto')).toBeNull()
+  expect(falso.chamadas).toEqual([])
 })
 
 test('[Remover] só aparece com data gravada e apaga sem pedir confirmação', async () => {
   const falso = montar({ dataDaReuniao: '2026-10-10' })
-  const secao = await linha()
+  const secao = await editar('Alterar data')
   fireEvent.click(secao.getByRole('button', { name: 'Remover' }))
-  expect(await secao.findByText('não marcada')).toBeTruthy()
+  expect(await secao.findByText('Ainda não marcada')).toBeTruthy()
   expect(janelasPorCima()).toEqual([])
   expect(falso.processos[0].dataDaReuniao).toBeNull()
   expect(secao.queryByRole('button', { name: 'Remover' })).toBeNull()
@@ -88,7 +119,7 @@ test('[Remover] só aparece com data gravada e apaga sem pedir confirmação', a
 
 test('[Salvar] desabilitado com o campo vazio e com a data igual à gravada', async () => {
   montar({ dataDaReuniao: '2026-10-14' })
-  const secao = await linha()
+  const secao = await editar('Alterar data')
   const salvar = secao.getByRole('button', { name: 'Salvar' }) as HTMLButtonElement
   expect(salvar.disabled).toBe(true)
   fireEvent.change(campo(secao), { target: { value: '' } })
@@ -100,17 +131,17 @@ test('[Salvar] desabilitado com o campo vazio e com a data igual à gravada', as
 test('os botões ficam desabilitados durante a gravação', async () => {
   const falso = montar({ dataDaReuniao: '2026-10-14' })
   falso.marcarReuniao = () => new Promise<never>(() => {})
-  const secao = await linha()
+  const secao = await editar('Alterar data')
   fireEvent.change(campo(secao), { target: { value: '2026-10-15' } })
   fireEvent.click(secao.getByRole('button', { name: 'Salvar' }))
   await waitFor(() => expect((secao.getByRole('button', { name: 'Salvar' }) as HTMLButtonElement).disabled).toBe(true))
   expect((secao.getByRole('button', { name: 'Remover' }) as HTMLButtonElement).disabled).toBe(true)
 })
 
-test('falha: a mensagem em vermelho, com a data escolhida mantida no campo', async () => {
+test('falha: a mensagem em vermelho, com o campo aberto e a data escolhida mantida', async () => {
   const falso = montar()
   falso.falhaDeGravacao = 'falha de conexão simulada'
-  const secao = await linha()
+  const secao = await editar()
   fireEvent.change(campo(secao), { target: { value: '2026-10-20' } })
   fireEvent.click(secao.getByRole('button', { name: 'Salvar' }))
   const alerta = await secao.findByRole('alert')
@@ -122,7 +153,7 @@ test('falha: a mensagem em vermelho, com a data escolhida mantida no campo', asy
 test('recusa por perfil: a frase dos processos', async () => {
   const falso = montar()
   falso.falhaDeGravacao = new TravaDoBanco('Seu perfil não permite alterar os processos.')
-  const secao = await linha()
+  const secao = await editar()
   fireEvent.change(campo(secao), { target: { value: '2026-10-20' } })
   fireEvent.click(secao.getByRole('button', { name: 'Salvar' }))
   expect((await secao.findByRole('alert')).textContent).toBe('Seu perfil não permite alterar os processos.')
@@ -130,17 +161,17 @@ test('recusa por perfil: a frase dos processos', async () => {
 
 test.each<SituacaoDoProcesso>(['suspenso', 'cancelado', 'concluido'])('marca a data com o processo %s', async (situacao) => {
   const falso = montar({ situacao, motivoDaSituacao: situacao === 'concluido' ? null : 'Motivo inventado' })
-  const secao = await linha()
+  const secao = await editar()
   fireEvent.change(campo(secao), { target: { value: '2026-11-03' } })
   fireEvent.click(secao.getByRole('button', { name: 'Salvar' }))
-  expect(await secao.findByText('marcada para 03/11/2026')).toBeTruthy()
+  expect(await secao.findByText('03/11/2026')).toBeTruthy()
   expect(falso.processos[0].dataDaReuniao).toBe('2026-11-03')
 })
 
 test('Consulta vê a data, sem campo nem botões', async () => {
   montar({ dataDaReuniao: '2026-10-20' }, 'consulta')
   const secao = await linha()
-  expect(secao.getByText('marcada para 20/10/2026')).toBeTruthy()
+  expect(secao.getByText('20/10/2026')).toBeTruthy()
   expect(secao.queryByLabelText('Data da reunião de modelagem piloto')).toBeNull()
   expect(secao.queryByRole('button')).toBeNull()
 })

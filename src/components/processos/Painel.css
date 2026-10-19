@@ -10,22 +10,6 @@
   font-size: var(--tam-secundario);
 }
 
-.painel-lista-de-dados {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: var(--esp-2) var(--esp-4);
-  margin: 0;
-}
-
-.painel-lista-de-dados dt {
-  color: var(--texto-2);
-}
-
-.painel-lista-de-dados dd {
-  margin: 0;
-  overflow-wrap: anywhere;
-}
-
 .painel-acoes {
   display: flex;
   flex-wrap: wrap;
@@ -74,15 +58,6 @@
   color: var(--texto);
 }
 
-/* Processo pai ou Subprocessos: links que abrem o painel de cada um. */
-.painel-estrutura-lista {
-  display: grid;
-  gap: var(--esp-1);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
 /* Janela de reclassificar: vários campos, cada rótulo na sua linha, com o aviso de macroprocesso entre eles. */
 .janela-reclassificacao label {
   display: block;
@@ -91,15 +66,6 @@
 
 .janela-reclassificacao .processo-aviso {
   margin-top: var(--esp-3);
-}
-
-/* O campo e os botões da reunião ficam logo abaixo da linha, como o formulário de datas da etapa. */
-.reuniao-edicao {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--esp-2) var(--esp-3);
-  margin-top: var(--esp-2);
 }
 
 /* Os campos de data do painel no desenho dos outros campos (32px, borda de token), alinhados aos botões ao lado;
@@ -113,9 +79,4 @@
   background: var(--folha);
   color: var(--texto);
   font: inherit;
-}
-
-.reuniao-edicao .cadastros-falha {
-  flex-basis: 100%;
-  margin: 0;
 }

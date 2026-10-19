@@ -54,7 +54,7 @@ test('o painel do processo não tem a seção de reuniões', async () => {
   window.location.hash = '#/processos/p1'
   montarNosCadastros()
   await screen.findByRole('dialog', { name: /^Processo( |$)/ })
-  await screen.findByRole('region', { name: 'Dados do processo' })
+  await screen.findByRole('region', { name: 'Sobre' })
   expect(screen.queryByText('Reuniões')).toBeNull()
   expect(screen.queryByRole('button', { name: 'Registrar reunião' })).toBeNull()
 })

@@ -12,12 +12,12 @@ import { SecaoDeVersoes } from '../versoes/SecaoDeVersoes'
 import { AcoesDoProcesso } from './AcoesDoProcesso'
 import { BotaoFecharJanela, CabecalhoDoVerso } from './CabecalhoDoVerso'
 import { CaminhoDoProcesso } from './CaminhoDoProcesso'
-import { DadosDoProcesso as DadosLidos } from './DadosDoProcesso'
 import { EstruturaDoProcesso } from './EstruturaDoProcesso'
 import { FormularioDoProcesso } from './FormularioDoProcesso'
 import { HistoricoDoProcesso } from './HistoricoDoProcesso'
 import { JanelaDoVerso } from './JanelaDoVerso'
 import { ReuniaoDoProcesso } from './ReuniaoDoProcesso'
+import { SobreDoProcesso } from './SobreDoProcesso'
 import { VersoCarregando } from './VersoCarregando'
 
 type VersoDoCartaoProps = {
@@ -186,7 +186,7 @@ function ColunasDoVerso(props: CorpoProps) {
       <div className="verso-contexto">
         <ReuniaoDoProcesso processo={processo} processos={processos} podeAlterar={podeAlterar} aoMudar={aposMudar}
           aoSumir={aoSumir} />
-        <DadosLidos processo={processo} />
+        <SobreDoProcesso processo={processo} />
         <EstruturaDoProcesso processo={processo} enderecoDoProcesso={enderecoDoProcesso} />
       </div>
     </div>

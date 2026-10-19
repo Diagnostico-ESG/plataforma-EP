@@ -70,7 +70,7 @@ function confirmar(janela: ReturnType<typeof within>, motivo: string) {
 test('Consulta não vê [Reclassificar]', async () => {
   montar({ id: 'p2', perfil: 'consulta' })
   const aberto = await painel()
-  await aberto.findByText('Dados do processo')
+  await aberto.findByRole('region', { name: 'Sobre' })
   expect(aberto.queryByRole('button', { name: 'Reclassificar' })).toBeNull()
 })
 
