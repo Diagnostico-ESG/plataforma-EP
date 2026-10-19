@@ -706,3 +706,11 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **2026-10-19 · Ocorrência: o `git branch -d` recusa a branch que tem upstream desatualizado no GitHub**, mesmo já integrada na `main`. Sugestão: o passo 4 do `/executar-complexo` dizer para enviar a branch (`git push`) antes de apagar, ou para o `-d` ser rodado depois do envio da `main`.
 - **2026-10-19 · Ocorrência: disparar os workflows do GitHub Actions pelo navegador do app foi o trecho mais lento da execução** (a máquina não tem `gh`; o painel "Run workflow" fecha ao escolher a branch em janela estreita; capturas de tela chegam atrasadas). Sugestão: instalar o `gh` na máquina do usuário ou ter um passo no protocolo para o disparo.
 - **2026-10-19 · Ocorrência: a revisão final da branch foi feita pelo próprio executor** (sem subagente, pelo mesmo motivo do ticket 18).
+
+## 2026-10-19 — /executar-complexo do ticket 21 de processos-etapas (arrastar o cartão para concluir)
+
+- **2026-10-19 · Item não testado: branch comum, `plano-<número>.md`, linha `Concluído em`, marco de início e `git branch -d`.** Esperado: plano em `plano-21.md`, branch sem worktree, `Concluído em` depois do merge. Aconteceu: tudo como descrito; desta vez a branch foi enviada ao GitHub antes do merge e o `git branch -d` não recusou (a sugestão do ticket 20 funcionou).
+- **2026-10-19 · Item não testado: trava de git com `git switch` e merge sem conflito.** Esperado: `git switch main` e `git merge` passam pela trava. Aconteceu: os dois passaram (avanço direto, sem conflito).
+- **2026-10-19 · Ocorrência: a skill `superpowers:writing-plans` sugere salvar em `docs/superpowers/plans/`** e o cabeçalho dela difere do formato dos planos do projeto; o `/executar-complexo` já manda usar `.scratch/<funcionalidade>/plano-<número>.md` e foi seguido.
+- **2026-10-19 · Ocorrência: o ticket não traz o dado de que a função de avanço precisa** (o id do andamento): o ticket 20 deixou o `etapa_id` do caminho fora da tradução, e ele nem seria o id certo. A solução foi ler o processo ao soltar. Sugestão para o `/planejar`: ao dividir tickets de uma mesma tela, conferir se o ticket anterior entrega todos os campos que o seguinte consome.
+- **2026-10-19 · Ocorrência: a revisão final da branch foi feita pelo próprio executor** (sem subagente, como nos tickets 18 e 20).
