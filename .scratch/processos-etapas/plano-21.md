@@ -46,7 +46,7 @@
 
 **Produz:** `colunaDeDestino(processo: ProcessoDaLista): string | null` (o código da coluna de destino, ou `null` quando o cartão não é arrastável por conta do processo) e `avancoDoCartao(etapas: EtapaDoCaminho[]): { etapa: EtapaDoCaminho; proxima: EtapaDoCaminho } | null` (a etapa atual em andamento e a próxima pendente, de um processo lido).
 
-- [ ] **Passo 1: o teste que falha.** `destinoDoArrastar.test.ts`, com processos montados à mão (uma função `com(posicao, mudancas)` local, caminho de 6 etapas `modelagem`, `relatorio`, `revisao_interna`, `revisao_do_setor`, `aprovacao`, `eprotocolo`). Casos de `colunaDeDestino`:
+- [x] **Passo 1: o teste que falha.** `destinoDoArrastar.test.ts`, com processos montados à mão (uma função `com(posicao, mudancas)` local, caminho de 6 etapas `modelagem`, `relatorio`, `revisao_interna`, `revisao_do_setor`, `aprovacao`, `eprotocolo`). Casos de `colunaDeDestino`:
   - etapa atual em andamento com a vizinha pendente → código da vizinha;
   - vizinha já resolvida (`dispensada` ou `realizada_anteriormente`) → o código da primeira `pendente` depois dela;
   - etapa atual pendente (`etapaAtualStatus: 'pendente'`) → `null`;
@@ -55,8 +55,8 @@
   - sem `cartao` → `null`;
   - `etapaAtual` fora do caminho → `null`.
   Casos de `avancoDoCartao` (etapas montadas como `EtapaDoCaminho` com `id`): atual `em_andamento` e próxima `pendente` → o par certo; atual `pendente` → `null`; sem pendente depois → `null`; todas resolvidas → `null`.
-- [ ] **Passo 2:** `npx vitest run src/processos/destinoDoArrastar.test.ts` — esperado: falha (módulo inexistente).
-- [ ] **Passo 3: implementar.**
+- [x] **Passo 2:** `npx vitest run src/processos/destinoDoArrastar.test.ts` — esperado: falha (módulo inexistente).
+- [x] **Passo 3: implementar.**
 
 ```ts
 import { indiceDaEtapaAtual, proximaPendente } from './caminhoDeEtapas'
@@ -84,8 +84,8 @@ export function avancoDoCartao(etapas: EtapaDoCaminho[]): { etapa: EtapaDoCaminh
 }
 ```
 
-- [ ] **Passo 4:** o teste do passo 1 passa; `npm run lint` e `npm run typecheck` verdes.
-- [ ] **Passo 5: commit** `Ticket 21 de processos-etapas: funções da coluna de destino do arrastar`.
+- [x] **Passo 4:** o teste do passo 1 passa; `npm run lint` e `npm run typecheck` verdes.
+- [x] **Passo 5: commit** `Ticket 21 de processos-etapas: funções da coluna de destino do arrastar`.
 
 ### Tarefa 2: Arrastar, realce e aviso no Quadro (critérios 2, 3 e 6)
 
