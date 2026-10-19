@@ -8,8 +8,8 @@ import type { ListaDeProcessos, ModuloDeProcessos } from '../../processos/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { Icone } from '../Icone'
 import { QuadroVazio } from '../quadro/QuadroVazio'
-import { AgruparPor } from './ControlesDoQuadro'
-import { FiltrosDosProcessos, NenhumProcessoComFiltros } from './FiltrosDosProcessos'
+import { AgruparPor, SoOsMeus } from './ControlesDoQuadro'
+import { FiltrosDosProcessos, NenhumProcessoComFiltros, NenhumProcessoDoUsuario } from './FiltrosDosProcessos'
 import { QuadroCarregando, QuadroDeProcessos } from './QuadroDeProcessos'
 import { TabelaCarregando, TabelaDeProcessos } from './TabelaDeProcessos'
 
@@ -36,7 +36,7 @@ type VisaoDosProcessosProps = {
 
 /** Quadro ou Lista, com os estados comuns (carregando, erro, vazio), a barra de cima e os filtros. */
 export function VisaoDosProcessos(props: VisaoDosProcessosProps) {
-  const { visao, estado, aoTentarDeNovo, podeAlterar, aoCadastrar, filtros, aoMudarFiltros, agrupar, aoMudarAgrupar } = props
+  const { visao, estado, aoTentarDeNovo, podeAlterar, aoCadastrar, filtros, aoMudarFiltros, agrupar, aoMudarAgrupar, usuarioId } = props
   if (estado.tipo === 'carregando') return visao === 'quadro' ? <QuadroCarregando /> : <ListaCarregando />
   if (estado.tipo === 'erro') return <ErroAoCarregar alvo="os processos" aoTentarDeNovo={aoTentarDeNovo} />
   if (estado.valor.processos.length === 0) return <QuadroVazio podeCadastrar={podeAlterar} aoCadastrar={aoCadastrar} />
@@ -45,14 +45,42 @@ export function VisaoDosProcessos(props: VisaoDosProcessosProps) {
     <div className="quadro">
       <div className="quadro-barra">
         <FiltrosDosProcessos visao={visao} opcoes={opcoesDosFiltros(estado.valor)} filtros={filtros} aoMudar={aoMudarFiltros} />
-        {visao === 'quadro' && <AgruparPor agrupar={agrupar} aoMudar={aoMudarAgrupar} />}
+        {visao === 'quadro' && (
+          <ControlesDoQuadroNaBarra agrupar={agrupar} aoMudarAgrupar={aoMudarAgrupar} filtros={filtros} aoMudarFiltros={aoMudarFiltros}
+            usuarioId={usuarioId} podeAlterar={podeAlterar} />
+        )}
         {podeAlterar && <BotaoCadastrar aoCadastrar={aoCadastrar} />}
       </div>
       {lista.processos.length === 0 && temFiltro(filtros)
-        ? <NenhumProcessoComFiltros aoLimpar={() => aoMudarFiltros(SEM_FILTROS)} />
+        ? <SemResultado filtros={filtros} usuarioId={usuarioId} aoMudarFiltros={aoMudarFiltros} />
         : <ConteudoDaVisao {...props} lista={lista} todos={estado.valor.processos} />}
     </div>
   )
+}
+
+type ControlesNaBarraProps = {
+  agrupar: AgruparQuadroPor; aoMudarAgrupar: (agrupar: AgruparQuadroPor) => void
+  filtros: Filtros; aoMudarFiltros: (filtros: Filtros) => void; usuarioId: string; podeAlterar: boolean
+}
+
+// "Só os meus" é o filtro Responsável com o próprio id; a Consulta não tem o botão (ela não é responsável de etapa).
+function ControlesDoQuadroNaBarra({ agrupar, aoMudarAgrupar, filtros, aoMudarFiltros, usuarioId, podeAlterar }: ControlesNaBarraProps) {
+  const ligado = filtros.responsavel === usuarioId
+  return (
+    <>
+      <AgruparPor agrupar={agrupar} aoMudar={aoMudarAgrupar} />
+      {podeAlterar && <SoOsMeus ligado={ligado} aoAlternar={() => aoMudarFiltros({ ...filtros, responsavel: ligado ? null : usuarioId })} />}
+    </>
+  )
+}
+
+type SemResultadoProps = { filtros: Filtros; usuarioId: string; aoMudarFiltros: (filtros: Filtros) => void }
+
+// Só o "Só os meus" ligado (sem outro filtro) tem a mensagem própria; com outros filtros vale a dos filtros.
+function SemResultado({ filtros, usuarioId, aoMudarFiltros }: SemResultadoProps) {
+  const soOsMeus = filtros.responsavel === usuarioId && !temFiltro({ ...filtros, responsavel: null })
+  if (soOsMeus) return <NenhumProcessoDoUsuario aoVerTodos={() => aoMudarFiltros(SEM_FILTROS)} />
+  return <NenhumProcessoComFiltros aoLimpar={() => aoMudarFiltros(SEM_FILTROS)} />
 }
 
 type ConteudoDaVisaoProps = VisaoDosProcessosProps & { lista: ListaDeProcessos; todos: ListaDeProcessos['processos'] }

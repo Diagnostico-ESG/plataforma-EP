@@ -22,3 +22,15 @@ export function AgruparPor({ agrupar, aoMudar }: AgruparPorProps) {
     </div>
   )
 }
+
+type SoOsMeusProps = { ligado: boolean; aoAlternar: () => void }
+
+/** "Só os meus" é o filtro Responsável com o id de quem está na tela; o botão só lê e escreve esse filtro. */
+export function SoOsMeus({ ligado, aoAlternar }: SoOsMeusProps) {
+  return (
+    <button type="button" className={ligado ? 'botao botao-principal' : 'botao botao-secundario'} aria-pressed={ligado}
+      onClick={aoAlternar}>
+      Só os meus
+    </button>
+  )
+}
