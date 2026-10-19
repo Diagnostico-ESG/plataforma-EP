@@ -690,3 +690,10 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **2026-10-19 · Ocorrência: a revisão de segurança do `/ship` só vê os commits ainda não enviados ao GitHub.** Sugestão: o protocolo dizer para rodar o `/security-review` antes de enviar a `main`, ou para tratar o resultado como parcial quando a `main` já estava enviada.
 - **2026-10-19 · Ocorrência: o relatório do `/security-review` veio em inglês** (o modelo do comando está em inglês). O usuário pediu português sempre; registrado na memória do Claude.
 - **2026-10-19 · Ocorrência: um teste instável (`App.macroprocessosDoSetor`) reprovou as duas rodadas de `npm run test:coverage`**, e com teste reprovado o Vitest não imprime a cobertura. A cobertura foi medida excluindo esse arquivo (`--exclude`), que passa sozinho. Sugestão: o protocolo dizer o que fazer quando a cobertura não sai por teste instável.
+
+## 2026-10-19 — /planejar (experiencia-do-quadro, parte 4: Cartão do Quadro), to-spec e to-tickets
+
+- **2026-10-19 · Ocorrência repetida (terceira vez): `banco.md` lido só depois da spec e dos tickets escritos.** A spec já seguia as regras (migração nova não destrutiva, view com `security_invoker`, nada calculado guardado, sem `security definer`). Reforça a sugestão das partes 1 e 2: o passo 0 do `/planejar` mandar ler o `banco.md` quando o projeto tem `supabase/`.
+- **2026-10-19 · Ocorrência repetida: o usuário pediu menos tickets** (de 5 para 3, juntando fatias que mexem na mesma área da tela). Reforça a sugestão da parte 3: a primeira proposta do `to-tickets` já vir mais enxuta.
+- **2026-10-19 · Ocorrência: a última rodada da sabatina (três padrões pequenos) não teve resposta explícita**; o usuário seguiu direto para o `to-spec`. Os padrões foram registrados na sabatina como aceitos por isso. Sugestão: o `/planejar` dizer que seguir para o próximo comando conta como aceite dos padrões propostos, ou pedir a confirmação antes de devolver o comando.
+- **2026-10-19 · Ocorrência: o `/planejar` foi chamado na mesma sessão do `/situação`, depois da troca para o Opus** (a sessão começou em Sonnet). Sem efeito; o modelo estava certo para a etapa.
