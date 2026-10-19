@@ -229,7 +229,7 @@ grant execute on function private.status_do_avanco(text),
 
 **Files:** Modify `src/processos/{tipos,andamentosSupabase,andamentoFalso,ProcessosFalso,caminhoDeEtapas}.ts` e os testes; Create `src/processos/ProcessosFalso.avanco.test.ts`.
 
-- [ ] **Testes primeiro (vermelhos):**
+- [x] **Testes primeiro (vermelhos):**
   - `andamentosSupabase.test.ts`: `concluirEtapa('a4', 'u1')` chama o `rpc` `avancar_etapa` com `{ p_andamento: 'a4', p_acao: 'concluir', p_nota: null, p_responsavel: 'u1' }`; `dispensarEtapa('a4', 'Sem publicação', null)` com `{ p_acao: 'dispensar', p_nota: 'Sem publicação', p_responsavel: null }`; `registrarRealizadaAnteriormente('a4', 'Feita em 2025', 'u2')` com `p_acao: 'realizada_anteriormente'`. Tradução das recusas do `rpc.avancar_etapa` (um `test.each`): `etapa_obrigatoria:Publicação` → "A etapa Publicação é obrigatória e não pode ser dispensada."; `responsavel_invalido:Maria Teste` → a frase do responsável; `anterior_nao_resolvida:Reunião de modelagem` → "A etapa Reunião de modelagem ainda não foi resolvida."; `processo_parado:suspenso` → "Este processo está suspenso; retome-o para registrar o andamento."; `nota_obrigatoria` → "A nota é obrigatória."; `42501` → "Seu perfil não permite alterar os processos."; `registro_inexistente` → `CadastroInexistente`.
   - `ProcessosFalso.avanco.test.ts` (processo de 3 etapas como em `ProcessosFalso.situacao.test.ts`, `usuariosPossiveis = [{ id: 'u1', nome: 'Ana Teste' }, { id: 'u2', nome: 'Bia Teste' }]`):
     - concluir a atual com a seguinte pendente → a atual `concluida` com `resolvidaEm` de hoje e a seguinte `em_andamento` com `iniciadaEm` de hoje, `responsavelId: 'u1'`, `responsavelNome: 'Ana Teste'`; `etapaAtual` e `responsavel` do processo passam à seguinte; a chamada gravada é `{ acao: 'concluir', id, usuarioId: 'u1' }`;
@@ -240,8 +240,8 @@ grant execute on function private.status_do_avanco(text),
     - recusas, sem mudar nenhuma etapa: dispensar obrigatória ("A etapa X é obrigatória e não pode ser dispensada."), nota vazia ("A nota é obrigatória."), responsável fora de `usuariosPossiveis` ("u9 não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP."), processo suspenso (a frase de `situacaoFalso`), `falhaDeGravacao`.
   - `andamentoFalso.test.ts`: `avancarEtapas` direto (pura): resolve a escolhida, inicia a primeira `pendente` com `ordem` maior, não mexe em outra.
   - `caminhoDeEtapas.test.ts`: `proximaPendente(etapas, indice)` (a seguinte pendente; pula a resolvida; `null` sem pendente depois); `responsavelMarcado(proxima, usuarioId, usuarios)` (o da próxima se está na lista; senão o usuário da tela se está na lista; senão `null`).
-- [ ] `npm test`: vermelho por falta das funções/assinaturas.
-- [ ] **Implementar:**
+- [x] `npm test`: vermelho por falta das funções/assinaturas.
+- [x] **Implementar:**
   - `tipos.ts` (`ModuloDeProcessos`): `concluirEtapa(andamentoId: string, proximoResponsavelId: string | null)`, `dispensarEtapa(andamentoId: string, nota: string, proximoResponsavelId: string | null)`, `registrarRealizadaAnteriormente(…mesmo…)`, com o comentário "Resolve a etapa atual e, se houver etapa pendente depois, a inicia com o responsável (null: nenhum), tudo ou nada; sem pendente depois o responsável é ignorado."
   - `andamentosSupabase.ts`: as três operações chamam `avancar(cliente, id, acao, nota, responsavelId, recusas)`:
 
@@ -263,7 +263,7 @@ async function avancar(
   - `ProcessosFalso.ts`: as três operações chamam `private avancar(chamada, mudancas, usuarioId)`: `conferirGravacao`, `conferirProcessoDaEtapa`, as recusas acima (extraídas para `conferirAvanco` em `andamentoFalso.ts` para não passar de 20 linhas), `chamadas.push`, `aplicar` com `avancarEtapas` e o `responsavel` do cartão. As chamadas gravadas: `{ acao: 'concluir', id, usuarioId }`, `{ acao: 'dispensar', id, nota, usuarioId }`, `{ acao: 'realizada', id, nota, usuarioId }`.
   - Chamadores atuais em `useAcoesDaEtapa.ts`: passam `null` como responsável por enquanto (a janela vem na Tarefa 5), para o commit compilar.
   - Ajustar os testes antigos que usam as assinaturas ou esperam `chamadas` sem `usuarioId`: `processosSupabase.test.ts`, `ProcessosFalso.situacao.test.ts`, `App.andamentoDoProcesso`, `App.painelDoProcesso`, `App.situacaoDoProcesso` (só o que o `npm test` apontar; o comportamento de tela fica para a Tarefa 5).
-- [ ] `npm test`, `npm run typecheck`, `npm run lint`, `npm run check:circular`: verdes. Comitar ("Ticket 13 de processos-etapas: módulo e falsa levam o responsável da próxima").
+- [x] `npm test`, `npm run typecheck`, `npm run lint`, `npm run check:circular`: verdes. Comitar ("Ticket 13 de processos-etapas: módulo e falsa levam o responsável da próxima").
 
 ### Tarefa 5 — Janela de avanço e as três ações (critérios 4 a 10)
 

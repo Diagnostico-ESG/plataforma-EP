@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import {
-  conferirDatasDaEtapa, mudarEtapaDoProcesso, trocarEtapaDoProcesso, voltarEtapas,
+  avancarEtapas, conferirDatasDaEtapa, mudarEtapaDoProcesso, trocarEtapaDoProcesso, voltarEtapas,
 } from './andamentoFalso'
 import type { EtapaDoProcesso, ProcessoLido } from './tipos'
 
@@ -90,5 +90,24 @@ describe('datas', () => {
   test('recusa conclusão antes do início com as duas datas', () => {
     expect(() => conferirDatasDaEtapa({ iniciadaEm: '2026-10-05', resolvidaEm: '2026-10-01' }, HOJE))
       .toThrow('A conclusão (01/10/2026) não pode ser antes do início (05/10/2026).')
+  })
+})
+
+describe('avançar', () => {
+  const ANA = { id: 'u1', nome: 'Ana Teste' }
+
+  test('resolve a escolhida e inicia a primeira pendente depois dela, com o responsável e hoje', () => {
+    const etapas = [etapa(4, { status: 'em_andamento' }), etapa(5, { status: 'concluida' }), etapa(6), etapa(7)]
+    const depois = avancarEtapas(etapas, 'a4', { status: 'concluida', resolvidaEm: HOJE }, ANA, HOJE)
+    expect(depois.map((outra) => outra.status)).toEqual(['concluida', 'concluida', 'em_andamento', 'pendente'])
+    expect(depois[2]).toMatchObject({ iniciadaEm: HOJE, responsavelId: 'u1', responsavelNome: 'Ana Teste' })
+  })
+
+  test('sem responsável, limpa o que a próxima tinha; sem pendente depois, não inicia nada', () => {
+    const limpa = avancarEtapas([etapa(4, { status: 'em_andamento' }), etapa(5, { responsavelId: 'u9', responsavelNome: 'Zé' })],
+      'a4', { status: 'concluida' }, null, HOJE)
+    expect(limpa[1]).toMatchObject({ status: 'em_andamento', responsavelId: null, responsavelNome: null })
+    const ultima = avancarEtapas([etapa(4, { status: 'em_andamento' })], 'a4', { status: 'concluida' }, ANA, HOJE)
+    expect(ultima.map((outra) => outra.status)).toEqual(['concluida'])
   })
 })

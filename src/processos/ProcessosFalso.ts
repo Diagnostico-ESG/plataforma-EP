@@ -3,7 +3,8 @@ import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import type { EventoDoCadastro } from '../cadastros/tipos'
 import { CatalogoFalso } from './CatalogoFalso'
 import {
-  conferirDatasDaEtapa, responsavelDoCartao, trocarEtapaDoProcesso, voltarEtapas,
+  avancarProcesso, conferirAvanco, conferirDatasDaEtapa, responsavelDoCartao, trocarEtapaDoProcesso, voltarEtapas,
+  type PedidoDeAvanco,
 } from './andamentoFalso'
 import {
   conferirPai, conferirSemSubprocessos, estruturaDoProcesso, levarMacroprocessoAosFilhos, macroprocessoDo, reclassificar,
@@ -52,16 +53,16 @@ export class ProcessosFalso implements ModuloDeProcessos {
     this.mudar({ acao: 'iniciar', id }, { status: 'em_andamento', iniciadaEm: HOJE })
   }
 
-  async concluirEtapa(id: string): Promise<void> {
-    this.mudar({ acao: 'concluir', id }, { status: 'concluida', resolvidaEm: HOJE })
+  async concluirEtapa(id: string, usuarioId: string | null): Promise<void> {
+    this.avancar({ acao: 'concluir', id, usuarioId }, { status: 'concluida', resolvidaEm: HOJE })
   }
 
-  async dispensarEtapa(id: string, nota: string): Promise<void> {
-    this.mudar({ acao: 'dispensar', id, nota }, { status: 'dispensada', nota, resolvidaEm: HOJE })
+  async dispensarEtapa(id: string, nota: string, usuarioId: string | null): Promise<void> {
+    this.avancar({ acao: 'dispensar', id, nota, usuarioId }, { status: 'dispensada', nota, resolvidaEm: HOJE })
   }
 
-  async registrarRealizadaAnteriormente(id: string, nota: string): Promise<void> {
-    this.mudar({ acao: 'realizada', id, nota }, { status: 'realizada_anteriormente', nota, resolvidaEm: HOJE })
+  async registrarRealizadaAnteriormente(id: string, nota: string, usuarioId: string | null): Promise<void> {
+    this.avancar({ acao: 'realizada', id, nota, usuarioId }, { status: 'realizada_anteriormente', nota, resolvidaEm: HOJE })
   }
 
   async voltarParaEtapa(id: string, motivo: string): Promise<void> {
@@ -212,6 +213,20 @@ export class ProcessosFalso implements ModuloDeProcessos {
     const etapa = todas.find((candidata) => candidata.id === id)
     if (!etapa) throw new CadastroInexistente()
     return etapa
+  }
+
+  // Como a função de avanço do banco: confere, resolve a etapa e inicia a próxima, ou não muda nada.
+  private avancar(chamada: ChamadaDeEtapa & { acao: PedidoDeAvanco['acao'] }, mudancas: Partial<EtapaDoProcesso>): void {
+    this.conferirGravacao()
+    const etapa = this.acharEtapa(chamada.id)
+    this.conferirProcessoDaEtapa(chamada.id)
+    const responsavelId = chamada.usuarioId ?? null
+    conferirAvanco(etapa, { acao: chamada.acao, nota: chamada.nota ?? null, responsavelId }, this.usuariosPossiveis)
+    this.chamadas.push(chamada)
+    const usuario = this.usuariosPossiveis.find((possivel) => possivel.id === responsavelId) ?? null
+    this.processos = this.processos.map((processo) => (
+      processo.etapasDoProcesso.some((outra) => outra.id === chamada.id)
+        ? avancarProcesso(processo, chamada.id, mudancas, usuario, HOJE) : processo))
   }
 
   private mudar(chamada: ChamadaDeEtapa, mudancas: Partial<EtapaDoProcesso>): void {

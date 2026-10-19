@@ -96,8 +96,8 @@ describe('congelamento das etapas', () => {
     const modulo = falso(situacao)
     const frase = `Este processo está ${situacao}; retome-o para registrar o andamento.`
     const tentativas = [
-      () => modulo.iniciarEtapa('a5'), () => modulo.concluirEtapa('a5'), () => modulo.dispensarEtapa('a5', 'n'),
-      () => modulo.registrarRealizadaAnteriormente('a5', 'n'), () => modulo.voltarParaEtapa('a4', 'M'),
+      () => modulo.iniciarEtapa('a5'), () => modulo.concluirEtapa('a5', null), () => modulo.dispensarEtapa('a5', 'n', null),
+      () => modulo.registrarRealizadaAnteriormente('a5', 'n', null), () => modulo.voltarParaEtapa('a4', 'M'),
       () => modulo.corrigirDatasDaEtapa('a4', { iniciadaEm: '2026-10-09', resolvidaEm: null }),
       () => modulo.mudarResponsavelDaEtapa('a4', null),
     ]

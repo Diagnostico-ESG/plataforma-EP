@@ -13,9 +13,9 @@ function pedeTexto(acao: AcaoDaEtapa): acao is AcaoComTexto {
 }
 
 function gravarPedido(processos: ModuloDeProcessos, { acao, etapa }: PedidoDeTexto, texto: string): Promise<void> {
-  if (acao === 'dispensar') return processos.dispensarEtapa(etapa.id, texto)
+  if (acao === 'dispensar') return processos.dispensarEtapa(etapa.id, texto, null)
   if (acao === 'voltar') return processos.voltarParaEtapa(etapa.id, texto)
-  return processos.registrarRealizadaAnteriormente(etapa.id, texto)
+  return processos.registrarRealizadaAnteriormente(etapa.id, texto, null)
 }
 
 /**
@@ -28,7 +28,7 @@ export function useAcoesDaEtapa(processos: ModuloDeProcessos, aoMudar: () => voi
 
   function agir(acao: AcaoDaEtapa, etapa: EtapaDoCaminho) {
     if (pedeTexto(acao)) return setPedido({ acao, etapa })
-    const gravar = acao === 'iniciar' ? () => processos.iniciarEtapa(etapa.id) : () => processos.concluirEtapa(etapa.id)
+    const gravar = acao === 'iniciar' ? () => processos.iniciarEtapa(etapa.id) : () => processos.concluirEtapa(etapa.id, null)
     executar(gravar, aoMudar)
   }
 

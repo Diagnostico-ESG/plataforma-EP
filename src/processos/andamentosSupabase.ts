@@ -21,9 +21,10 @@ export function criarAndamentosSupabase(
   const mudar = (id: string, mudanca: MudancaDoAndamento) => mudarAndamento(cliente, id, mudanca, recusas)
   return {
     iniciarEtapa: (id) => mudar(id, { status: 'em_andamento' }),
-    concluirEtapa: (id) => mudar(id, { status: 'concluida' }),
-    dispensarEtapa: (id, nota) => mudar(id, { status: 'dispensada', nota }),
-    registrarRealizadaAnteriormente: (id, nota) => mudar(id, { status: 'realizada_anteriormente', nota }),
+    concluirEtapa: (id, responsavelId) => avancar(cliente, id, 'concluir', null, responsavelId, recusas),
+    dispensarEtapa: (id, nota, responsavelId) => avancar(cliente, id, 'dispensar', nota, responsavelId, recusas),
+    registrarRealizadaAnteriormente: (id, nota, responsavelId) =>
+      avancar(cliente, id, 'realizada_anteriormente', nota, responsavelId, recusas),
     corrigirDatasDaEtapa: (id, datas) => mudar(id, { iniciada_em: datas.iniciadaEm, resolvida_em: datas.resolvidaEm }),
     mudarResponsavelDaEtapa: (id, usuarioId) => mudar(id, { responsavel_id: usuarioId }),
     voltarParaEtapa: (id, motivo) => voltarParaEtapa(cliente, id, motivo, recusas),
@@ -37,6 +38,18 @@ async function mudarAndamento(
   const { data, error } = await cliente.from('andamentos').update(mudanca).eq('id', id).select('id')
   if (error) throw falhaDoAndamento(error, recusas)
   if (!data.length) throw porQueNadaMudou(await andamentoExiste(cliente, id), recusas)
+}
+
+// A função do banco resolve a etapa e inicia a próxima numa transação só. O supabase-js manda null como null;
+// o tipo gerado não o admite nos parâmetros, como em reclassificar_processo.
+async function avancar(
+  cliente: ClienteSupabase, id: string, acao: 'concluir' | 'dispensar' | 'realizada_anteriormente',
+  nota: string | null, responsavelId: string | null, recusas: RecusasDoModulo,
+): Promise<void> {
+  const { error } = await cliente.rpc('avancar_etapa', {
+    p_andamento: id, p_acao: acao, p_nota: nota as string, p_responsavel: responsavelId as string,
+  })
+  if (error) throw falhaDoAndamento(error, recusas)
 }
 
 async function andamentoExiste(cliente: ClienteSupabase, id: string): Promise<boolean> {
@@ -63,7 +76,7 @@ async function listarResponsaveisPossiveis(cliente: ClienteSupabase): Promise<Us
 // O motivo "motivo_obrigatorio" não tem valor; o valor vai até o fim da mensagem.
 const PADRAO_DA_RECUSA = new RegExp(
   '\\b(anterior_nao_resolvida|etapa_obrigatoria|ja_ha_etapa_em_andamento|etapa_nao_resolvida'
-  + '|motivo_obrigatorio|data_no_futuro|resolvida_antes_do_inicio|responsavel_invalido|processo_parado'
+  + '|motivo_obrigatorio|nota_obrigatoria|data_no_futuro|resolvida_antes_do_inicio|responsavel_invalido|processo_parado'
   + '|situacao_invalida|processo_com_subprocessos|pai_nao_e_processo|tipo_invalido'
   + '|etapa_usada'
   + '|processo_com_versoes)(?::(.*))?$', 'm')
@@ -74,6 +87,7 @@ const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   etapa_obrigatoria: (etapa) => `A etapa ${etapa} é obrigatória e não pode ser dispensada.`,
   ja_ha_etapa_em_andamento: (etapa) => `Já há uma etapa em andamento neste processo: ${etapa}.`,
   motivo_obrigatorio: () => 'O motivo é obrigatório.',
+  nota_obrigatoria: () => 'A nota é obrigatória.',
   data_no_futuro: (data) => `A data ${formatarData(data)} está no futuro.`,
   resolvida_antes_do_inicio: (datas) => {
     const [conclusao, inicio] = datas.split(':')

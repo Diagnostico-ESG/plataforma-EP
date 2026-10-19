@@ -93,7 +93,8 @@ test('Concluir passa a etapa atual para a seguinte e o cartão muda de coluna no
     doProcesso(5, 'relatorio', 'Relatório e modelagem técnica'),
   ] })] })
   fireEvent.click((await etapa('Reunião de modelagem')).getByRole('button', { name: 'Concluir' }))
-  expect(await (await etapa('Relatório e modelagem técnica')).findByRole('button', { name: 'Iniciar' })).toBeTruthy()
+  // O avanço já inicia a seguinte: ela chega em andamento, com Concluir.
+  expect(await (await etapa('Relatório e modelagem técnica')).findByRole('button', { name: 'Concluir' })).toBeTruthy()
   const coluna = within(await screen.findByRole('region', { name: 'Relatório e modelagem técnica' }))
   expect(await coluna.findByRole('link', { name: /Emitir Ofício/ })).toBeTruthy()
 })
@@ -109,7 +110,7 @@ test('Dispensar e Realizada anteriormente pedem nota: vazia não grava, com nota
   fireEvent.change(janela.getByLabelText('Nota'), { target: { value: 'Sem publicação' } })
   fireEvent.click(janela.getByRole('button', { name: 'Dispensar' }))
   expect(await (await etapa('Publicação')).findByText('Nota: Sem publicação')).toBeTruthy()
-  expect(falso.chamadas).toEqual([{ acao: 'dispensar', id: 'a9', nota: 'Sem publicação' }])
+  expect(falso.chamadas).toEqual([{ acao: 'dispensar', id: 'a9', nota: 'Sem publicação', usuarioId: null }])
 })
 
 test('Realizada anteriormente grava com a nota', async () => {
@@ -120,7 +121,7 @@ test('Realizada anteriormente grava com a nota', async () => {
   fireEvent.change(janela.getByLabelText('Nota'), { target: { value: 'Feita em 2025' } })
   fireEvent.click(janela.getByRole('button', { name: 'Registrar' }))
   expect(await (await etapa('Reunião de modelagem')).findByText('Realizada anteriormente')).toBeTruthy()
-  expect(falso.chamadas).toEqual([{ acao: 'realizada', id: 'a4', nota: 'Feita em 2025' }])
+  expect(falso.chamadas).toEqual([{ acao: 'realizada', id: 'a4', nota: 'Feita em 2025', usuarioId: null }])
 })
 
 test('resolvidas as obrigatórias, a pílula Concluído aparece no painel e o cartão sai do Quadro', async () => {
