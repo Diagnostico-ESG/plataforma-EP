@@ -304,3 +304,21 @@ Impeccable `audit` (detector sem achados; leitura do CSS e dos componentes de `p
 - **Blocos cinza no carregando do formulário** (critério `[visual]` da spec): o formulário mostra só "Carregando setores e macroprocessos…" e a janela estreita muda de altura quando os dados chegam. Motivo: é acabamento que pede desenho próprio dos blocos; fica no backlog.
 - **Aviso "Processo cadastrado" como `role="status"`** que nasce junto com a janela: leitores de tela podem não o anunciar além do anúncio do próprio diálogo. Motivo: o diálogo já abre anunciando o processo; sem prova com leitor de tela real.
 - **Fonte mono em datas, versões e contagens** (regra do DESIGN.md): só a hora do histórico usa; as demais seguem no backlog de 2026-10-18.
+
+## 2026-10-19 — /ship da parte 3 (Verso do cartão; tickets 15 a 19 de processos-etapas)
+
+Ponto de partida da revisão: `8d01ca8` (último commit entregue; a parte 3 não teve marco de início próprio).
+
+**Achados corrigidos nesta entrega:**
+- **Busca da Lista não aparava espaços** (revisão de spec): "Emitir " não achava nada e uma busca só de espaços filtrava a lista. Teste novo falhou antes e passou depois; `contemTrecho` e `partesDoNome` passaram a aparar as pontas (commit `2f2c580`). Spec: história 138.
+- **Formulário (Novo processo e Editar) sem blocos cinza no carregando** (critério `[visual]` da spec, deixado de fora pelo `/polir`): agora `FormularioCarregando` mostra blocos do tamanho dos campos e do rodapé. Medido na vitrine local, no Novo processo, a janela fica com a mesma altura antes e depois dos dados chegarem (691 px); a primeira tentativa dava 52 px de diferença e foi ajustada às medidas do formulário pronto (commit `145883c`). Editar não foi medido na tela (a tentativa de abri-lo na vitrine falhou); só o teste confere o número de campos.
+
+**Achados de padrões (revisão do `/ship`, só julgamento, nada duro), levados ao backlog:** formatação de datas repetida em cinco pontos (`formatarData`, `diasNaEtapa`, `formatarDiaEMes`, `formatarMomento`, o horário da `LinhaDoTempo`), só uma com fuso fixo; tratamento do Esc em quatro lugares (`MenuDeAcoes`, `MenuDaConta`, `TrocaDoResponsavel`, `configurarTestes`); `papel === 'relatorio'` repetido em `VersaoEmDestaque`, `FormularioDeRelatorio` e `SecaoDeVersoes`; nomes pouco buscáveis (`Agora.css`, `Contexto.css`, `emOrdem`, `aoAlterada` e `aoConcluir`).
+
+**Deixado como está (julgamento):** o foco que volta ao cartão ou à linha usa `setTimeout(0)` e se perde quando o filtro da Lista esconde a linha de origem; o foco cai no corpo da página, que é o comportamento padrão do navegador. Anotado no backlog.
+
+**Segurança:** `/security-review` só viu os dois últimos commits (a `main` local está dois à frente do GitHub) e não achou nada neles. A parte 3 inteira foi revisada pela revisão de reserva (leitura de `src/`, sem `dangerouslySetInnerHTML`, `innerHTML` nem `eval`; a busca e o id vindos do endereço só entram como texto do React ou na consulta com RLS). Sem achado. `security-auditor`: pulado, `package.json` não mudou e `.scratch/security.md` existe. Banco: pulado, nada mudou em `supabase/`.
+
+**Testes instáveis:** `App.macroprocessosDoSetor` falhou nas duas rodadas com cobertura e uma vez na primeira rodada comum, e passou sozinho 3 de 3 e no pré-commit; mesma família do backlog de 2026-10-19. A cobertura foi medida sem esse arquivo: 98,43% das instruções, 94,11% dos ramos, 99,28% das funções, 99,31% das linhas (131 arquivos, 1845 testes).
+
+**Verificado na tela (vitrine local, módulos falsos):** busca da Lista com lupa, "×", trecho marcado em amarelo e `busca` no endereço; o verso como Consulta (borda cinza no Agora, sem botões, "⋯" só com Histórico); o formulário carregando em blocos cinza. **Presumido:** aparecimento suave e "menos movimento" (só CSS), Tab preso na janela, leitor de tela de verdade, e o Editar carregando na tela.

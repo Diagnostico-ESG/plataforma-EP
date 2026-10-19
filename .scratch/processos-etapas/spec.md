@@ -132,7 +132,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
 135. Como integrante do EP que usa o teclado, quero que o foco vá ao nome do processo ao abrir, que o Tab circule só dentro da janela, que Esc feche (no Histórico, o primeiro Esc volta ao processo) e que, ao fechar, o foco volte ao cartão ou à linha de onde vim.
 136. Como integrante do EP que usa leitor de tela, quero que a janela seja anunciada como "Processo {nome}".
 137. Como Consulta, quero ver o verso inteiro só para ler: o Agora sem botões e com a borda cinza ("Com Ana M. há 6 dias"), baixar arquivos, e no "⋯" só o Histórico.
-138. Como integrante do EP, quero buscar na Lista pelo nome do processo, sem me preocupar com maiúsculas e acentos, com o resultado filtrando enquanto digito, o trecho encontrado marcado no nome e um "×" para limpar.
+138. Como integrante do EP, quero buscar na Lista pelo nome do processo, sem me preocupar com maiúsculas, acentos e espaços nas pontas, com o resultado filtrando enquanto digito, o trecho encontrado marcado no nome e um "×" para limpar.
 139. Como integrante do EP, quero que a busca fique no endereço da página junto com os filtros, para recarregar ou compartilhar a mesma busca.
 140. Como integrante do EP, quero que a busca sem resultado mostre "Nenhum processo com estes filtros." com [Limpar filtros], que limpa também a busca.
 
