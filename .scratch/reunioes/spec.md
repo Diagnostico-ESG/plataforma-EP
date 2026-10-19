@@ -142,6 +142,7 @@ Nenhuma. "Marcada para" e "realizada em" são calculados pela data, na tela.
 
 ## Observações
 
+- **Verso do cartão (2026-10-19, parte 3 da experiencia-do-quadro):** a linha da data passa para a coluna direita do verso do cartão (rótulo "Reunião", data em mono com a barrinha amarela, "· próxima" ou "· realizada"; sem data, "Ainda não marcada"), e "Marcar data" (ou "Alterar data") vira ali mesmo o campo de data com [Salvar], [Remover] e [Cancelar]. O que a data faz não muda. O desenho está na spec de `processos-etapas` ("Verso do cartão"); o critério visual abaixo, sobre "os dados vizinhos do painel", passa a valer para a coluna direita do verso.
 - Critérios conferidos olhando a tela, para o `/ship`:
   - `[visual]` A linha "Reunião de modelagem piloto" segue o estilo dos dados vizinhos do painel, com o campo e os botões alinhados a ela.
   - `[visual]` Para a Consulta, a linha não mostra campo nem botões.
@@ -156,3 +157,4 @@ Nenhuma. "Marcada para" e "realizada em" são calculados pela data, na tela.
 
 Entregue em 2026-10-15 (commit ccd2f8b), com ressalva: critérios [visual] presumidos (a tela não foi conferida)
 Entregue em 2026-10-18 (commit e54f51b)
+Em revisão desde 2026-10-19

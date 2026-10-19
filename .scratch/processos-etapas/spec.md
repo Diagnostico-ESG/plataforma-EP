@@ -2,9 +2,9 @@
 
 Status: ready-for-agent
 
-**Como resolve o problema.** Hoje o andamento de cada processo fica espalhado entre planilhas e o Power BI, sem saber com certeza em que etapa cada um está, quem cuida dele nem o que mudou. Com esta funcionalidade, a equipe do EP cadastra na plataforma cada processo e subprocesso, ligado ao setor dono e a um macroprocesso, e registra o andamento etapa por etapa, da Modelagem piloto em diante, num caminho que o administrador configura no catálogo de etapas. A área Processos mostra o trabalho vivo num Quadro, com uma coluna por etapa, e o arquivo completo numa Lista com filtros; ao abrir um processo, o painel mostra o caminho de etapas, as ações possíveis e o histórico. O banco impõe a sequência das etapas, a situação do processo, as regras de reclassificação e o registro de cada mudança no histórico. As funcionalidades seguintes (reuniões, documentos, revisões, prazos e painel) se apoiam nesse andamento.
+**Como resolve o problema.** Hoje o andamento de cada processo fica espalhado entre planilhas e o Power BI, sem saber com certeza em que etapa cada um está, quem cuida dele nem o que mudou. Com esta funcionalidade, a equipe do EP cadastra na plataforma cada processo e subprocesso, ligado ao setor dono e a um macroprocesso, e registra o andamento etapa por etapa, da Modelagem piloto em diante, num caminho que o administrador configura no catálogo de etapas. A área Processos mostra o trabalho vivo num Quadro, com uma coluna por etapa, e o arquivo completo numa Lista com busca pelo nome e filtros; ao abrir um processo, o **verso do cartão**, uma janela central em duas colunas, mostra primeiro o que há para fazer agora (a etapa atual, quem cuida dela e um único botão principal), depois o caminho de etapas e os arquivos, e ao lado o contexto do processo; o que é raro (histórico, editar, reclassificar, suspender, cancelar, excluir) fica num menu. O banco impõe a sequência das etapas, a situação do processo, as regras de reclassificação e o registro de cada mudança no histórico. As funcionalidades seguintes (reuniões, documentos, revisões, prazos e painel) se apoiam nesse andamento.
 
-Decisões de origem: `.scratch/processos-etapas/sabatina.md` (sabatina de 2026-10-13, três rodadas), `CONTEXT.md` (seções "Setores" e "Processos") e ADR 0004 (mudar o catálogo muda o caminho dos processos em andamento). Mudança de 2026-10-18 (parte 1 da iniciativa experiencia-do-quadro, `.scratch/experiencia-do-quadro/sabatina-parte-1.md`, ADR 0013): saem as etapas do setor, a coluna "Aguardando o setor", os responsáveis do setor e o nível do catálogo; a primeira etapa passa a se chamar Modelagem piloto; o processo ganha a data da reunião (spec de `reunioes`). Mudança de 2026-10-18 (parte 2, `.scratch/experiencia-do-quadro/sabatina-parte-2.md`, ADR 0014): resolver a etapa atual (concluir, dispensar ou registrar como realizada anteriormente) já **avança**, ou seja, inicia a próxima etapa pendente com o responsável escolhido na mesma janela; voltar também escolhe o responsável; [Assumir] em etapa sem responsável; quem enviou a versão mais recente não pode ser escolhido como responsável da Revisão interna.
+Decisões de origem: `.scratch/processos-etapas/sabatina.md` (sabatina de 2026-10-13, três rodadas), `CONTEXT.md` (seções "Setores" e "Processos") e ADR 0004 (mudar o catálogo muda o caminho dos processos em andamento). Mudança de 2026-10-18 (parte 1 da iniciativa experiencia-do-quadro, `.scratch/experiencia-do-quadro/sabatina-parte-1.md`, ADR 0013): saem as etapas do setor, a coluna "Aguardando o setor", os responsáveis do setor e o nível do catálogo; a primeira etapa passa a se chamar Modelagem piloto; o processo ganha a data da reunião (spec de `reunioes`). Mudança de 2026-10-18 (parte 2, `.scratch/experiencia-do-quadro/sabatina-parte-2.md`, ADR 0014): resolver a etapa atual (concluir, dispensar ou registrar como realizada anteriormente) já **avança**, ou seja, inicia a próxima etapa pendente com o responsável escolhido na mesma janela; voltar também escolhe o responsável; [Assumir] em etapa sem responsável; quem enviou a versão mais recente não pode ser escolhido como responsável da Revisão interna. Mudança de 2026-10-19 (parte 3, "Verso do cartão", `.scratch/experiencia-do-quadro/sabatina-parte-3.md`, sem ADR nem mudança no banco): o painel lateral vira o verso do cartão, uma janela central em duas colunas com o cartão "Agora"; o Novo processo, o Editar e o Histórico abrem dentro dela; a Lista ganha busca pelo nome.
 
 ## Problema
 
@@ -14,11 +14,11 @@ O EP acompanha dezenas de processos de vários setores, cada um numa etapa difer
 
 - **Área Processos** (item "Quadro" e "Lista" da faixa lateral, alternância Quadro | Lista na barra superior):
   - o **Quadro** mostra os processos em andamento e os suspensos, cada um na coluna da etapa atual; o processo novo entra na coluna Modelagem piloto;
-  - a **Lista** mostra todos os processos, de qualquer situação, numa tabela com filtros;
-  - nos dois, [Cadastrar processo] para Administrador e Integrante, e clicar num cartão ou numa linha abre o **painel do processo** à direita.
-- **Painel do processo:** dados do processo, a data da reunião de modelagem piloto (spec de `reunioes`), o caminho de etapas com as ações, os subprocessos (ou o processo pai), as ações de situação (suspender, cancelar, retomar), reclassificar, editar, excluir e a aba Histórico.
+  - a **Lista** mostra todos os processos, de qualquer situação, numa tabela com busca pelo nome e filtros; é o lugar dos concluídos;
+  - nos dois, [Cadastrar processo] para Administrador e Integrante, e clicar num cartão ou numa linha abre o **verso do cartão** (desde 2026-10-19).
+- **Verso do cartão** (desde 2026-10-19, no lugar do painel lateral): janela central larga, com o Quadro ou a Lista escurecidos atrás. À esquerda, o trabalho: o cartão **Agora** (etapa atual, responsável ou [Assumir], dias na etapa e um único botão principal), as **Etapas** em linhas compactas (clicar abre o detalhe da etapa ali mesmo) e os **Arquivos** (a versão mais recente em destaque, com o que falta). À direita, o contexto: a data da **Reunião** de modelagem piloto (spec de `reunioes`), **Sobre** (setor, macroprocesso, tipo, origem, contexto, observações) e a **Estrutura** (subprocessos ou o processo pai). O menu "⋯" do cabeçalho traz Histórico, Editar, Reclassificar, Suspender ou Retomar, Cancelar e Excluir. Novo processo, Editar e Histórico abrem dentro da mesma janela.
 - **Avanço das etapas (desde 2026-10-18):** concluir, dispensar ou registrar como realizada anteriormente a etapa atual abre uma janela que pergunta "Quem fica com a próxima etapa?" e, ao confirmar, a próxima etapa pendente já entra em andamento com essa pessoa (ou sem ninguém, à espera de alguém assumir). Na etapa sem responsável, [Assumir] põe a própria pessoa como responsável com um clique.
-- **Tela do setor** (área Setores, que já existe): ganha a lista dos processos do setor.
+- **Tela do setor** (área Setores, que já existe): ganha a lista dos processos do setor; clicar num deles leva à Lista filtrada pelo setor, com o verso aberto.
 - **Catálogo de etapas** (área Administração, só para o administrador): a lista ordenada das etapas, com obrigatória ou opcional, e ativa.
 
 A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: quem não pode alterar é recusado mesmo que tente fora da tela, e toda mudança vira evento no histórico.
@@ -57,7 +57,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
 25. Como integrante do EP, quero filtrar o Quadro e a Lista por setor, macroprocesso, etapa, tipo e responsável, e a Lista também por situação, para achar o que procuro.
 26. Como integrante do EP, quero que os filtros fiquem no endereço da página, para recarregar ou compartilhar a mesma visão.
 27. Como integrante do EP, quero ver na Lista, ao lado do subprocesso, o nome do processo pai.
-28. Como integrante do EP, quero abrir o painel de um processo clicando no cartão ou na linha, com o quadro ou a lista esmaecidos atrás.
+28. Como integrante do EP, quero abrir o verso de um processo clicando no cartão ou na linha, com o quadro ou a lista escurecidos atrás (painel lateral até 2026-10-19).
 
 ### Andamento das etapas do processo
 
@@ -99,6 +99,42 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
 105. Como integrante do EP, quero que, sem versão não histórica no processo, ninguém seja barrado da Revisão interna.
 106. Como integrante do EP, quero que, quando quem conclui é o autor da versão mais recente e a próxima é a Revisão interna, a janela já venha com "Ninguém por enquanto" marcado (ou o responsável que a etapa já tem, se ele puder).
 107. Como Consulta, quero ver quem é o responsável de cada etapa, sem [Assumir] nem a janela de avanço.
+
+### Verso do cartão (parte 3, 2026-10-19)
+
+108. Como integrante do EP, quero que o processo abra numa janela central larga, em duas colunas, para ver o processo inteiro de uma vez, sem rolar um painel estreito.
+109. Como integrante do EP, quero que o endereço da página continue apontando para o processo aberto, para recarregar ou mandar o link a um colega e cair no mesmo processo.
+110. Como integrante do EP, quero ver no cabeçalho a sigla do setor, o nome do processo, o macroprocesso (com o quadradinho da cor dele) e o tipo, para saber de relance de que processo se trata.
+111. Como integrante do EP, quero que a situação apareça no cabeçalho só quando foge do normal (Suspenso, Cancelado, Concluído), para que a pílula chame a atenção quando importa.
+112. Como integrante do EP, quero que o cartão "Agora", no alto da coluna esquerda, mostre a etapa atual, a posição dela no caminho ("etapa 2 de 6"), quem cuida dela e há quantos dias ela está em andamento, para saber o que há a fazer sem procurar.
+113. Como integrante do EP, quero um único botão principal no Agora, com o nome da ação ([Iniciar Modelagem piloto], [Concluir Revisão interna]), para não ter dúvida sobre o próximo passo.
+114. Como integrante do EP, quero Dispensar (só na etapa opcional) e Realizada anteriormente num "⋯" do Agora, para que as ações raras não disputem atenção com o botão principal.
+115. Como integrante do EP, quero que o Concluir, o Dispensar e o Realizada anteriormente do Agora abram a mesma janela "Quem fica com a próxima etapa?" da parte 2.
+116. Como integrante do EP, quero que, passados 15 dias na mesma etapa, o número de dias vire a pílula âmbar "{n} dias nesta etapa", com o mesmo texto do selo do cartão da parte 4, para notar o processo que está demorando.
+117. Como integrante do EP, quero, na etapa atual sem responsável, o botão [Assumir] ao lado do principal, para me pôr como responsável com um clique.
+118. Como integrante do EP, quero trocar o responsável da etapa atual pelo "Trocar" do Agora, numa lista suspensa em que eu apareço primeiro, com "(você)", e "Ninguém por enquanto" fica no fim, gravando ao escolher, sem confirmação.
+119. Como integrante do EP, quero que o Agora de um processo suspenso ou cancelado mostre o motivo e [Retomar] como botão principal, para destravá-lo dali mesmo.
+120. Como integrante do EP, quero que o Agora de um processo concluído diga "Concluído em {data}", para saber quando ele terminou.
+121. Como integrante do EP, quero ver as etapas em linhas compactas, com um sinal para cada status (concluída, atual, pendente, opcional, dispensada, realizada anteriormente), a data e as iniciais de quem a resolveu, para ler o caminho de relance.
+122. Como integrante do EP, quero clicar numa etapa e ver o detalhe dela abrir ali mesmo, embaixo da linha, com datas, nota, [Corrigir datas] e [Voltar a esta etapa], uma etapa aberta por vez, para não perder de vista em que ponto do caminho estou.
+123. Como integrante do EP, quero ver a versão mais recente em destaque ("V2 · 02/10"), com os arquivos para baixar, e o que falta (a pílula "falta relatório" e o espaço tracejado [+ Acrescentar relatório] no lugar do relatório), para saber o que tapar e tapar no mesmo lugar.
+124. Como integrante do EP, quero as versões anteriores recolhidas em "Versões anteriores (n)", [Enviar versão] visível e "Registrar versão histórica" num "⋯" da seção, para que o comum fique à mão e o raro não atrapalhe.
+125. Como integrante do EP, quero ver e marcar a data da reunião de modelagem piloto na coluna direita, no próprio lugar, com "Alterar data" virando o campo de data.
+126. Como integrante do EP, quero ver em "Sobre" o setor, o macroprocesso, o tipo, a origem, o contexto e as observações, com textos longos cortados em 4 linhas e "Ler mais", e sem os campos vazios.
+127. Como integrante do EP, quero ver os subprocessos (com a etapa atual de cada um e a situação, quando não é em andamento) ou, num subprocesso, "Faz parte de" com o pai, e abrir qualquer um deles na mesma janela.
+128. Como integrante do EP, quero o menu "⋯" do cabeçalho com Histórico, Editar e Reclassificar; Suspender (ou Retomar) e Cancelar; e Excluir em vermelho, separado no fim, para que o destrutivo fique longe do resto.
+129. Como integrante do EP, quero que o Histórico abra dentro da janela, com "← Voltar ao processo", agrupado por dia ("Hoje", "Ontem", "12/10"), do mais novo para o mais antigo.
+130. Como integrante do EP, quero que o Editar e o Novo processo abram dentro da mesma janela, numa coluna estreita, com os botões num rodapé fixo, e que Salvar ou Cancelar volte ao verso.
+131. Como integrante do EP, quero que, depois de cadastrar um processo, a janela mostre o verso dele com o aviso "Processo cadastrado", porque o passo seguinte é quase sempre iniciar a Modelagem piloto ou marcar a reunião.
+132. Como integrante do EP, quero que a janela abra já no tamanho final, com blocos cinza no formato das colunas enquanto carrega, para nada pular de lugar quando os dados chegam.
+133. Como integrante do EP, quero ver, quando o processo não carrega, a mensagem de erro com [Tentar de novo], e, quando ele foi excluído, a mensagem que já existe com [Voltar].
+134. Como integrante do EP, quero que, numa tela com menos de 900 px de largura, a janela ocupe a tela toda e vire uma coluna só, com o trabalho em cima e o contexto embaixo.
+135. Como integrante do EP que usa o teclado, quero que o foco vá ao nome do processo ao abrir, que o Tab circule só dentro da janela, que Esc feche (no Histórico, o primeiro Esc volta ao processo) e que, ao fechar, o foco volte ao cartão ou à linha de onde vim.
+136. Como integrante do EP que usa leitor de tela, quero que a janela seja anunciada como "Processo {nome}".
+137. Como Consulta, quero ver o verso inteiro só para ler: o Agora sem botões e com a borda cinza ("Com Ana M. há 6 dias"), baixar arquivos, e no "⋯" só o Histórico.
+138. Como integrante do EP, quero buscar na Lista pelo nome do processo, sem me preocupar com maiúsculas e acentos, com o resultado filtrando enquanto digito, o trecho encontrado marcado no nome e um "×" para limpar.
+139. Como integrante do EP, quero que a busca fique no endereço da página junto com os filtros, para recarregar ou compartilhar a mesma busca.
+140. Como integrante do EP, quero que a busca sem resultado mostre "Nenhum processo com estes filtros." com [Limpar filtros], que limpa também a busca.
 
 ### Etapas do setor e responsáveis do setor (retirados em 2026-10-18)
 
@@ -142,7 +178,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
 
 ### Histórico
 
-78. Como integrante do EP, quero ver na aba Histórico do painel todas as alterações do processo e das etapas dele, das mais recentes para as mais antigas, com data e hora, quem fez, o que fez, o antes e depois e o motivo quando houver.
+78. Como integrante do EP, quero ver no Histórico do processo (aba do painel até 2026-10-19; desde então, pelo menu "⋯" do verso) todas as alterações do processo e das etapas dele, das mais recentes para as mais antigas, com data e hora, quem fez, o que fez, o antes e depois e o motivo quando houver.
 79. (Retirada em 2026-10-18: os eventos antigos de etapas e responsáveis do setor aparecem na linha simples da história 46.)
 80. Como integrante do EP, quero que um processo excluído continue aparecendo no histórico com o que tinha.
 81. Como administrador, quero que as mudanças no catálogo de etapas fiquem no histórico.
@@ -158,7 +194,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
 
 86. Como integrante do EP, quero que o banco recuse excluir um setor ou macroprocesso com processo ligado e diga quantos processos são.
 87. Como integrante do EP, quero que o banco recuse tirar de um macroprocesso um setor que tem processos nele e diga quantos são.
-88. Como integrante do EP, quero ver na tela do setor a lista dos processos dele, e abrir o painel de cada um.
+88. Como integrante do EP, quero ver na tela do setor a lista dos processos dele, e abrir o verso de cada um (na Lista filtrada pelo setor, desde 2026-10-19).
 
 ## Decisões de implementação
 
@@ -180,7 +216,9 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
   O aplicativo recebe o módulo por injeção; nos testes, uma implementação falsa nomeada. A falha chega como erro cuja mensagem é o motivo em português, como nos outros módulos.
 - **Navegação no endereço:**
   - `#/processos` para o Quadro e `#/processos/lista` para a Lista, com os filtros no endereço;
-  - `#/processos/<id>` abre o painel por cima da visão de onde veio;
+  - `#/processos/<id>` abre o verso do cartão por cima da visão de onde veio, e `#/processos/novo` o Novo processo na mesma janela (desde 2026-10-19; antes, o painel lateral);
+  - a busca da Lista fica no endereço como os filtros (parâmetro `busca`, desde 2026-10-19);
+  - Histórico e Editar são estados da janela aberta, sem endereço próprio: recarregar a página volta ao verso;
   - o catálogo fica numa aba da Administração.
 - **Quadro:**
   - **Colunas:** uma por etapa ativa, na ordem do catálogo. A coluna de uma etapa desativada aparece enquanto houver processo nela. A coluna "Aguardando o setor" saiu em 2026-10-18.
@@ -197,28 +235,61 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
   - **Colunas:** nome (com "↳ pai" no subprocesso), tipo, setor, macroprocesso, etapa atual, responsável e situação em pílula.
   - **Ordem:** pela sigla do setor e pelo nome.
   - **Filtros:** setor, macroprocesso, etapa atual (só as etapas do catálogo, sem "Aguardando o setor"), tipo, responsável e situação (todas as situações). O Quadro usa os mesmos filtros, menos situação. Um endereço antigo com o filtro "Aguardando o setor" é tratado como sem filtro de etapa.
-- **Formulário do processo** (cadastrar e editar, no painel):
+  - **Busca** (desde 2026-10-19, só na Lista; o Quadro fica sem busca):
+    - campo no começo da barra, antes dos filtros, com lupa, o texto de exemplo "Buscar pelo nome" e um "×" para limpar;
+    - procura só no nome do processo, como trecho, sem diferenciar maiúsculas, minúsculas e acentos;
+    - filtra enquanto se digita e soma-se aos filtros;
+    - o trecho encontrado aparece marcado em amarelo claro no nome;
+    - sem resultado, vale o estado "Nenhum processo com estes filtros." com [Limpar filtros], que limpa também a busca.
+- **Formulário do processo** (cadastrar e editar, dentro da janela do verso desde 2026-10-19; ver "Novo processo e Editar"):
   - **Campos:** nome, setor (ativos), macroprocesso (ativos), tipo (só no cadastro: Processo, Subprocesso ou A classificar), processo pai (só para Subprocesso, entre os processos do tipo Processo), origem (Novo ou Retomado), contexto e observações.
   - **Subprocesso:** o macroprocesso aparece fixo, o do pai.
   - **Setor fora do macroprocesso:** quando o setor não é envolvido no macroprocesso, o aviso amarelo "O setor {SIGLA} ainda não está no macroprocesso {nome}; ele será incluído ao salvar." aparece abaixo dos campos.
   - **Tipo na edição:** a edição não muda o tipo; a mudança de tipo é só por Reclassificar.
-- **Painel do processo:**
-  - **Cabeçalho:** quadradinho da sigla, nome, macroprocesso, pílulas de tipo e de situação, e botão fechar.
-  - **Reunião de modelagem piloto:** a linha da data, no lugar da antiga seção Reuniões, depois dos dados e da estrutura e antes das Versões (spec de `reunioes`).
-  - **Caminho de etapas:** em cada etapa: status, responsável (seletor para quem pode), datas de início e de conclusão (editáveis para quem pode) e nota. As etapas do setor e o link "Ver no setor" saíram em 2026-10-18.
-  - **Ações na etapa atual:**
-    - [Iniciar] quando pendente (um clique, sem janela);
-    - [Concluir] quando em andamento (abre a janela de avanço; sem etapa pendente depois, conclui direto);
-    - [Dispensar] só se opcional;
-    - [Realizada anteriormente].
-  - **[Assumir]** (desde 2026-10-18): na linha de cada etapa pendente ou em andamento sem responsável, para Administrador e Integrante, ao lado do seletor. Não aparece na Revisão interna para quem enviou a versão mais recente não histórica.
-  - **Ações nas etapas resolvidas anteriores à atual:** [Voltar a esta etapa].
-  - **Abaixo do caminho:**
-    - dados do processo com [Editar];
-    - "Subprocessos" (lista, cada um abre o seu painel) ou "Processo pai";
-    - ações [Suspender], [Cancelar] ou [Retomar], [Reclassificar] e [Excluir];
-    - a aba Histórico.
-  - **Processo suspenso ou cancelado:** as ações das etapas somem, e o aviso "Este processo está {suspenso | cancelado}: {motivo}. Retome-o para registrar o andamento." aparece.
+- **Verso do cartão** (desde 2026-10-19, no lugar do painel lateral de 520 px com as abas Detalhes e Histórico). Princípios de desenho: uma só coisa acesa (o Agora, com a linha azul de 2 px e o único botão principal da janela); o normal fica quieto, e só o que foge do normal ganha cor; trabalho à esquerda, contexto à direita.
+  - **Janela:**
+    - central, até cerca de 880 px de largura, com 60% para a coluna esquerda (fundo `folha`) e 40% para a direita (fundo levemente cinza, separada por uma linha fina);
+    - até 90% da altura da tela; uma só rolagem, da janela inteira, com o cabeçalho fixo no topo;
+    - o Quadro ou a Lista atrás ficam escurecidos e inertes;
+    - entra com um aparecimento suave de cerca de 150 ms, desligado quando o computador pede menos movimento;
+    - abaixo de 900 px de largura, ocupa a tela toda e vira uma coluna só (esquerda em cima, direita embaixo);
+    - pai e subprocessos abrem na mesma janela, trocando o conteúdo e o endereço; Esc fecha tudo.
+  - **Cabeçalho:** quadradinho da sigla (mono); o nome do processo (19 px, 700); embaixo, em texto secundário, o quadradinho da cor do macroprocesso, o nome dele e o tipo ("Processo", "Subprocesso" ou "A classificar"); a pílula de situação só para Suspenso (âmbar), Cancelado (cinza) e Concluído (verde), sem pílula em andamento; o botão "⋯" do processo e o botão fechar.
+  - **Menu "⋯" do processo,** em três grupos separados por linha fina:
+    - Histórico · Editar · Reclassificar;
+    - Suspender (ou Retomar, no suspenso e no cancelado) · Cancelar;
+    - Excluir, em vermelho.
+
+    A Consulta vê só Histórico. As janelas de motivo, de reclassificação e a confirmação de excluir são as que já existem.
+  - **Coluna esquerda — Agora** (cartão branco com a borda de 2 px em `azul`):
+    - rótulo "Agora · etapa {n} de {total}", o nome da etapa atual e a linha do responsável: avatar e nome, "há {n} dias" (o início da etapa até hoje) e o link "Trocar";
+    - **dias na etapa:** número em cinza até 15 dias; acima de 15, a pílula âmbar "{n} dias nesta etapa", o mesmo texto e o mesmo limite do selo do cartão da parte 4;
+    - **botão principal**, com o nome da ação e da etapa: [Iniciar {etapa}] quando a etapa atual está pendente (um clique, sem janela); [Concluir {etapa}] quando em andamento (abre a janela de avanço; sem etapa pendente depois, conclui direto);
+    - **"⋯" do Agora:** Dispensar (só na etapa opcional) e Realizada anteriormente, com as janelas da parte 2;
+    - **sem responsável:** no lugar do avatar, "Sem responsável", e o botão secundário [Assumir] ao lado do principal (mesma regra da parte 2: não aparece na Revisão interna para quem enviou a versão mais recente não histórica);
+    - **"Trocar":** lista suspensa no próprio Agora, com quem está na tela primeiro ("{nome} (você)"), os demais integrantes ativos e "Ninguém por enquanto" no fim; a mesma trava do autor; grava ao escolher, sem confirmação; a falha mostra a mensagem de erro de gravação e deixa o responsável como estava;
+    - **suspenso:** fundo âmbar claro, "Suspenso: {motivo}" e [Retomar] como botão principal;
+    - **cancelado:** fundo cinza claro, "Cancelado: {motivo}" e [Retomar];
+    - **concluído:** fundo verde claro e "Concluído em {data}" (a data da última etapa obrigatória resolvida); a parte 5 acrescenta a versão aprovada e o E-protocolo;
+    - **Consulta:** o mesmo cartão sem botões nem "Trocar", com a borda cinza em vez de azul e a frase "Com {nome} há {n} dias" (ou "Sem responsável").
+  - **Coluna esquerda — Etapas** (lista só de leitura, uma linha compacta por etapa):
+    - concluída: ✓ verde; atual: ponto azul, com a linha em `azul-claro` e o nome em 600; pendente: círculo cinza; opcional ainda pendente: círculo tracejado e o selo "opcional"; dispensada: traço cinza, nome riscado de leve e o selo "dispensada"; realizada anteriormente: ✓ cinza e o selo "anterior";
+    - à direita da linha, a data (mono; na atual, "desde {data}") e as iniciais de quem resolveu (na atual, do responsável);
+    - **detalhe da etapa:** clicar na linha abre uma gaveta logo abaixo dela, uma por vez, com datas de início e de conclusão, nota, responsável, [Corrigir datas] (formulário que já existe) e, nas resolvidas anteriores à atual, [Voltar a esta etapa] (janela da parte 2). Nas pendentes depois da atual, o responsável tem o mesmo "Trocar" do Agora e, sem ninguém, [Assumir], para manter as histórias 42, 101 e 102. A etapa atual, aberta, mostra só datas e nota: as ações e o responsável dela ficam no Agora;
+    - processo suspenso ou cancelado: a gaveta mostra só a leitura, sem botões.
+  - **Coluna esquerda — Arquivos:** a mesma seção da funcionalidade `documentos-versoes`, com outra apresentação:
+    - **linha de destaque** da versão mais recente: número (mono, 600), data (mono) e, quando falta algo, a pílula âmbar "falta relatório";
+    - embaixo, um botão para cada arquivo dela ("Fluxograma .bpmn", "Imagem .png", "Relatório .docx", com a barrinha de cor do tipo e o ícone de baixar);
+    - o relatório que falta aparece como espaço tracejado [+ Acrescentar relatório] no lugar onde ele estaria (só para quem pode enviar);
+    - [Enviar versão] no título da seção; "Registrar versão histórica" num "⋯" da seção; Substituir no "⋯" de cada arquivo, como já é;
+    - as versões anteriores recolhidas em "Versões anteriores ({n})", que abre a lista que já existe;
+    - os formulários de envio abrem no lugar da seção, como hoje.
+  - **Coluna direita — Reunião:** rótulo "Reunião", a data (mono, com a barrinha amarela de reunião) e "· próxima" ou "· realizada"; sem data, "Ainda não marcada". Para quem pode alterar, "Marcar data" (ou "Alterar data") vira ali mesmo o campo de data com [Salvar], [Remover] e [Cancelar] (o comportamento da spec de `reunioes`).
+  - **Coluna direita — Sobre:** setor, macroprocesso, tipo, origem, contexto e observações, cada um com o rótulo pequeno em cinza acima do valor; contexto e observações longos mostram até 4 linhas e "Ler mais" (que vira "Ler menos"); campo vazio não aparece.
+  - **Coluna direita — Estrutura:** "Subprocessos ({n})", cada um com o nome em link e, embaixo em cinza, a etapa atual e a situação quando não é em andamento; no subprocesso, "Faz parte de" com o pai do mesmo jeito; sem subprocessos nem pai, a seção não aparece.
+  - **Histórico** (pelo "⋯"): substitui o conteúdo da janela, que mantém a largura, com "← Voltar ao processo" e o título "Histórico" no topo; formato na seção "Histórico" abaixo. Esc volta ao verso; o segundo Esc fecha a janela.
+  - **Novo processo e Editar:** o formulário do processo ocupa a janela, que encolhe para uma coluna de cerca de 560 px; cabeçalho "Novo processo" ou "Editar {nome}"; rodapé fixo com [Cadastrar] ou [Salvar] (principal) e [Cancelar]. Editar: Salvar ou Cancelar volta ao verso. Novo processo: Cancelar e Esc fecham a janela; ao cadastrar, a janela se alarga e mostra o verso do processo criado (o endereço passa a ser o dele), com o aviso "Processo cadastrado", e o Quadro ou a Lista atrás recarregam.
+  - **Teclado e leitor de tela:** a janela é um diálogo anunciado como "Processo {nome}" (ou "Novo processo"); ao abrir, o foco vai ao nome do processo; o Tab circula só dentro da janela; Esc fecha (veja Histórico); ao fechar, o foco volta ao cartão (Quadro) ou à linha (Lista) de origem; menus e gavetas abrem e fecham pelo teclado, com o estado anunciado.
 - **Janelas com campo obrigatório** (a mesma janela nativa do ADR 0003, com um campo de texto):
   - **Nota:** em Dispensar e Realizada anteriormente.
   - **Motivo:** em Suspender, Cancelar, Retomar, Voltar e Reclassificar.
@@ -235,7 +306,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
 - **Confirmação simples (ADR 0003)** em Excluir processo e Excluir etapa do catálogo:
   - "Excluir o processo {nome}? O histórico guarda o que ele tinha, inclusive as etapas, mas não é possível desfazer." [Excluir processo] [Cancelar];
   - "Excluir a etapa {nome} do catálogo?" [Excluir etapa] [Cancelar].
-- **Tela do setor** ganha, abaixo do que já existe, "Processos do setor": lista com nome, tipo, etapa atual e situação, em que clicar abre o painel. As seções "Responsáveis do setor" e "Etapas do setor" saíram em 2026-10-18.
+- **Tela do setor** ganha, abaixo do que já existe, "Processos do setor": lista com nome, tipo, etapa atual e situação, em que clicar leva à Lista filtrada pelo setor com o verso aberto; fechar deixa a pessoa nessa Lista. As seções "Responsáveis do setor" e "Etapas do setor" saíram em 2026-10-18.
 - **Catálogo de etapas** (aba da Administração, só administrador):
   - **Lista:** em ordem, com nome, obrigatória ou opcional e pílula "Inativa".
   - **Ações:** [Nova etapa] (nome, código, obrigatória e posição), [Editar] (nome, obrigatória), [Subir], [Descer], [Desativar] ou [Reativar] e [Excluir]. O campo "Nível" saiu em 2026-10-18.
@@ -259,7 +330,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
   - **Carregando:**
     - Quadro: "Carregando processos…", com colunas-fantasma;
     - Lista: "Carregando processos…", com linhas-fantasma;
-    - painel: "Carregando processo…";
+    - verso: a janela já no tamanho final, com blocos cinza no formato do cabeçalho e das duas colunas, e "Carregando processo…" para o leitor de tela (desde 2026-10-19; antes, só o texto);
     - "Carregando catálogo…" e "Carregando processos do setor…".
   - **Vazio:**
     - nenhum processo: o estado vazio que já existe ("Nenhum processo cadastrado ainda." com [Cadastrar processo] para quem pode);
@@ -270,7 +341,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
   - **Erro de gravação:** "A alteração não foi salva: {motivo}. Seus dados continuam no formulário."
 - **Cores das mensagens (ADR 0003):** vermelho para "a ação não aconteceu" e amarelo para aviso.
 - **Histórico:**
-  - **Formato:** o mesmo da lista do Histórico dos cadastros, acrescido do motivo ou da nota.
+  - **Formato:** o mesmo da lista do Histórico dos cadastros, acrescido do motivo ou da nota. No verso (desde 2026-10-19), o histórico do processo é uma linha do tempo do mais novo para o mais antigo, agrupada por dia ("Hoje", "Ontem", "12/10"); cada evento traz a hora em mono, as iniciais de quem fez, a frase da ação com o antes e depois e, em cinza abaixo, o motivo ou a nota.
   - **Textos das ações:**
     - "Criou", "Editou", "Excluiu";
     - "Iniciou a etapa", "Concluiu a etapa", "Dispensou a etapa", "Registrou a etapa como realizada anteriormente", "Voltou à etapa", "Corrigiu as datas da etapa", "Mudou o responsável da etapa";
@@ -476,6 +547,10 @@ As exclusões e a renumeração da migração não geram eventos: é mudança de
 Não destrutiva: nenhuma tabela ou coluna muda. Uma migração nova cria a função de avanço, o gatilho da trava do autor na Revisão interna e recria a função de voltar com o parâmetro do responsável. Os eventos saem dos gatilhos que já existem (um por andamento alterado). Vai pelo workflow "Migrar banco de desenvolvimento" e entra no registro de `supabase/AMBIENTES.md`.
 
 
+#### Parte 3 (Verso do cartão, 2026-10-19)
+
+Sem migração: nenhuma tabela, coluna, política, view ou função muda. O verso usa o que o processo lido já traz (etapas com datas, responsáveis e notas, versão mais recente, data da reunião, estrutura e situação com motivo); os dias na etapa e o "Concluído em" se calculam na tela a partir das datas das etapas, e a busca filtra a lista já carregada.
+
 ## Decisões de teste
 
 - **Bom teste** confere o que a pessoa vê e consegue fazer, ou o que o banco aceita e recusa, nunca detalhes internos.
@@ -508,7 +583,24 @@ Não destrutiva: nenhuma tabela ou coluna muda. Uma migração nova cria a funç
     - [Assumir] nas etapas pendentes e em andamento sem responsável, ausente nas resolvidas, para a Consulta e, na Revisão interna, para o autor da versão mais recente;
     - a trava do autor: ausente da janela de avanço e da de voltar, autor de versão histórica presente, e a recusa do banco pelo seletor com a mensagem;
     - voltar com a escolha do responsável da etapa reaberta;
-    - os dois registros do avanço no histórico.
+    - os dois registros do avanço no histórico;
+    - verso do cartão (desde 2026-10-19), pelo aplicativo inteiro, como a pessoa usa:
+      - abrir pelo cartão, pela linha da Lista, pelo endereço e pela tela do setor; fechar pelo botão e por Esc, com o foco de volta ao cartão ou à linha; pai e subprocesso na mesma janela, com o endereço mudando;
+      - a janela como diálogo com o nome acessível "Processo {nome}", o foco no nome ao abrir e o Tab preso dentro dela;
+      - cabeçalho: tipo em texto, pílula de situação só em suspenso, cancelado e concluído;
+      - Agora em cada caso: pendente com [Iniciar {etapa}]; em andamento com [Concluir {etapa}] abrindo a janela de avanço; "⋯" com Dispensar só na opcional e Realizada anteriormente; sem responsável com [Assumir]; "Trocar" com a pessoa da tela primeiro e "Ninguém por enquanto" no fim, gravando ao escolher, e a falha com a mensagem de erro; dias na etapa até 15 e a pílula "{n} dias nesta etapa" a partir de 16; suspenso e cancelado com motivo e [Retomar]; concluído com a data; Consulta sem botões;
+      - etapas: o nome acessível de cada status; a gaveta abrindo uma por vez, com Corrigir datas e Voltar a esta etapa onde cabem, e o Trocar e o [Assumir] nas pendentes;
+      - arquivos: destaque da versão mais recente, "falta relatório" com o espaço [+ Acrescentar relatório], versões anteriores recolhidas, "Registrar versão histórica" no "⋯" da seção, e a Consulta só baixando;
+      - reunião marcada, alterada e removida no próprio lugar;
+      - Sobre sem os campos vazios e com "Ler mais" no texto longo;
+      - estrutura com a etapa atual de cada subprocesso, "Faz parte de" e a seção ausente sem estrutura;
+      - menu "⋯" com os três grupos, e só Histórico para a Consulta;
+      - Histórico dentro da janela, agrupado por dia, com "← Voltar ao processo" e o Esc que volta e depois fecha;
+      - Editar na janela, voltando ao verso; Novo processo na janela, abrindo o verso do criado com "Processo cadastrado"; falhas de gravação com os dados no formulário;
+      - estados do verso: carregando (com o texto para o leitor de tela), erro com [Tentar de novo] e processo excluído com [Voltar];
+      - busca da Lista: por trecho do nome, sem diferenciar maiúsculas e acentos, somada aos filtros, no endereço, com o "×", com o trecho marcado e sem resultado com [Limpar filtros] limpando também a busca;
+    - os testes de tela atuais que falam do painel (por exemplo `App.painelDoProcesso` e `App.andamentoDoProcesso`) são ajustados ao verso, mantendo os comportamentos que continuam valendo.
+  - **Funções puras novas:** a busca sem acento e sem maiúsculas, a contagem de dias na etapa e o limite de 15 dias, o agrupamento do histórico por dia e a leitura e montagem do endereço com `busca` ganham testes unitários pequenos.
   - **Arte anterior:** os testes de tela de cadastros-basicos (`App.setores`, `App.macroprocessos`, `App.historicoDosCadastros`) e a janela de confirmação.
 - **Tradução entre o banco e a tela.** Testes pequenos do módulo de processos real com o cliente Supabase simulado. Eles provam que os códigos de recusa do banco viram as mensagens acima e que as linhas do banco e da view viram os tipos da tela. Arte anterior: os testes de `cadastrosSupabase` e `macroprocessosSupabase`.
 - **Funções puras** (filtros a partir do endereço, ordem das colunas, textos do histórico): testes unitários pequenos.
@@ -529,6 +621,7 @@ Não destrutiva: nenhuma tabela ou coluna muda. Uma migração nova cria a funç
 - Registro da revisão interna, E-protocolo e a trava que exige o registro para concluir as etapas de revisão: `revisoes-aprovacao` (parte 5 da iniciativa). Vão junto a regra 14 (aviso "estrutura alterada após aprovação") e os campos vigência e próxima revisão. O [Assumir] (antes "capturar") e a trava do autor na escolha do responsável entraram aqui em 2026-10-18 (ADR 0014); a regra que impede o autor de *registrar* a revisão fica na parte 5 e fecha a brecha de quem assume a Revisão interna pendente e depois envia a versão.
 - Conclusão automática de etapas por documento ou revisão. Resolver uma etapa continua manual; desde 2026-10-18, só o início da próxima é automático.
 - Arrastar o cartão para concluir e "Só os meus": parte 4 da iniciativa (o arrastar abre a janela de avanço desta parte).
+- Parte 3 (2026-10-19): o novo desenho do cartão do Quadro (barra de progresso e selos) é da parte 4; busca no Quadro; reunião com mais de uma data (continua uma por processo, ADR 0013); endereço próprio para o Histórico e para o Editar; abrir o verso por cima da tela do setor; qualquer mudança no banco.
 - Prazo padrão das etapas, prazo do andamento e indicador de atraso: funcionalidade 8.
 - Campo "fase" (AS-IS ou TO-BE) no catálogo: quando existir a fase 2.
 - Mais de um nível de subprocesso.
@@ -540,8 +633,14 @@ Não destrutiva: nenhuma tabela ou coluna muda. Uma migração nova cria a funç
 
 - Critérios conferidos olhando a tela, para o `/ship`:
   - `[visual]` O Quadro segue a identidade visual: fundo azul-acinzentado, cartões brancos, colunas por etapa, a linha azul "acesa" no cartão escolhido, e indicação de colunas fora da vista quando o quadro rola para o lado.
-  - `[visual]` O painel do processo abre à direita com o quadro esmaecido atrás e o cartão aceso; abaixo de 900px de largura, ocupa a tela inteira.
-  - `[visual]` O caminho de etapas mostra as resolvidas com ✓, a atual em azul com o sublinhado aceso e as futuras apagadas; sem etapas do setor (desde 2026-10-18).
+  - `[visual]` (Desde 2026-10-19, substitui o critério do painel lateral.) O verso abre como janela central de até cerca de 880 px, em duas colunas de 60% e 40%, a direita em fundo levemente cinza, com o Quadro ou a Lista escurecidos atrás; o cabeçalho fica fixo e a janela tem uma só rolagem; abaixo de 900 px de largura, ocupa a tela inteira em uma coluna.
+  - `[visual]` O Agora é a única coisa acesa da janela: borda de 2 px em `azul` e o único botão principal; na Consulta, borda cinza e sem botões; suspenso em âmbar claro, cancelado em cinza claro e concluído em verde claro.
+  - `[visual]` As etapas são linhas compactas e quietas: só o verde de concluída e o azul da atual têm cor; o resto é cinza, com selos neutros para opcional, dispensada e anterior; a gaveta do detalhe abre sem empurrar a janela para fora da tela.
+  - `[visual]` Nos arquivos, a versão mais recente se lê numa linha ("V2 · 02/10 · falta relatório"), com os botões dos arquivos com a barrinha de cor do tipo e o espaço tracejado do arquivo que falta no lugar dele.
+  - `[visual]` O cabeçalho do verso mostra pílula só em suspenso, cancelado e concluído; o menu "⋯" tem os três grupos com Excluir em vermelho no fim.
+  - `[visual]` O Novo processo e o Editar encolhem a janela para uma coluna de cerca de 560 px, com os botões no rodapé fixo; o carregando mostra blocos cinza no formato final, sem a janela mudar de tamanho quando os dados chegam.
+  - `[visual]` A busca da Lista fica antes dos filtros, com lupa e "×", e o trecho encontrado aparece marcado em amarelo claro no nome.
+  - `[visual]` O caminho de etapas mostra as resolvidas com ✓, a atual em azul com o sublinhado aceso e as futuras apagadas; sem etapas do setor (desde 2026-10-18). Desde 2026-10-19, vale a lista compacta do verso, descrita acima.
   - `[visual]` As pílulas (Suspenso, Cancelado, Concluído, Subprocesso, A classificar, Inativo, Inativa) têm cor e texto, nunca só cor.
   - `[visual]` A Lista é uma tabela compacta, no padrão das listas de cadastros.
   - `[visual]` Para a Consulta, Quadro, Lista, painel, tela do setor e histórico não mostram campos editáveis nem botões de alteração.
@@ -560,6 +659,14 @@ Não destrutiva: nenhuma tabela ou coluna muda. Uma migração nova cria a funç
   - **Etapa nova no catálogo:** entra também nos processos suspensos (eles não estão concluídos nem cancelados) (o "em todos os setores" valia para as etapas do setor, retiradas em 2026-10-18).
   - **Desativar uma etapa em andamento:** o processo continua nela até concluí-la. A coluna da etapa desativada aparece no Quadro enquanto houver processo nela.
   - **Parte 2 (2026-10-18):** o início da próxima é a data de hoje (corrigível depois, como as outras datas); a janela de voltar segue a mesma regra de opção marcada da janela de avanço; a trava do autor é conferida sempre que o responsável da Revisão interna passa a ser alguém (não quando fica vazio nem quando não muda); a falha na gravação do avanço mostra a mensagem de erro de gravação e deixa as etapas como estavam.
+  - **Parte 3 (2026-10-19):**
+    - "Concluído em" é a data da última etapa obrigatória resolvida;
+    - Histórico e Editar não têm endereço próprio (recarregar volta ao verso);
+    - a etapa atual pendente (como a primeira de um processo novo) tem o botão principal [Iniciar {etapa}] no Agora;
+    - nas etapas pendentes depois da atual, o "Trocar" e o [Assumir] ficam na gaveta, para não perder a escolha antecipada do responsável (histórias 42 e 102);
+    - o aviso "Este processo está {suspenso | cancelado}: {motivo}. Retome-o para registrar o andamento." dá lugar ao Agora suspenso ou cancelado, com o motivo e [Retomar];
+    - a apresentação das versões e da reunião no verso muda o desenho das seções de `documentos-versoes` e `reunioes`, sem mudar o que elas fazem; as specs delas recebem uma nota apontando para cá;
+    - [Limpar filtros] limpa também a busca.
 - **Tamanho:** a funcionalidade tem várias entregas. A sabatina permitiu deixar a Lista para um ticket posterior.
 - **Rede do escritório:** a migração vai pelo workflow "Migrar banco de desenvolvimento" e precisa ser registrada em `supabase/AMBIENTES.md` para o `migration repair` antes da primeira publicação em produção.
 - **Privilégios padrão:** toda tabela ou view nova em `public` reprova o teste `10_privilegios_padrao` até receber o seu `revoke`.
@@ -567,3 +674,4 @@ Não destrutiva: nenhuma tabela ou coluna muda. Uma migração nova cria a funç
 Entregue em 2026-10-14 (commit f1cc3cf), com ressalva: critérios [visual] presumidos (a tela não foi conferida)
 Entregue em 2026-10-18 (commit e54f51b)
 Entregue em 2026-10-19 (commit 8d01ca8)
+Em revisão desde 2026-10-19

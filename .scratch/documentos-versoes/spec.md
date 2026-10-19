@@ -314,6 +314,7 @@ Nenhuma migração destrutiva: tabelas, tipo, gatilhos, funções e políticas n
 
 ## Observações
 
+- **Verso do cartão (2026-10-19, parte 3 da experiencia-do-quadro):** a seção de versões passa para a coluna esquerda do verso do cartão, com a versão mais recente numa linha de destaque (número e data em mono), o que falta na pílula âmbar ("falta relatório") e no espaço tracejado [+ Acrescentar relatório] no lugar do relatório, um botão por arquivo com a barrinha de cor do tipo, as anteriores recolhidas em "Versões anteriores (n)" e "Registrar versão histórica" num "⋯" da seção. O que cada ação faz não muda. O desenho está na spec de `processos-etapas` ("Verso do cartão").
 - Critérios conferidos olhando a tela, para o `/ship`:
   - `[visual]` A seção Versões segue o estilo das seções vizinhas do painel (Reuniões, Subprocessos), com cada versão como um bloco e os arquivos em lista.
   - `[visual]` As marcas "relatório pendente", "alterado fora da plataforma" e "não encontrado no Drive" seguem o padrão das pílulas existentes, com cor e texto (nunca só cor).
@@ -365,3 +366,4 @@ O que a implementação faz de diferente do texto acima, ou além dele. O porqu�
 - **Provas pendentes:** a conferência visual das telas e a prova no Drive dos critérios 3 e 4 do ticket 08 (sigla trocada e mudança de setor) e da saída do Integrante dos tickets 01, 02, 04 e 05. A função corrigida nesta etapa ainda precisa ser publicada no desenvolvimento.
 
 Entregue em 2026-10-16 (commit 869901d), com ressalva: critérios [visual] presumidos (a tela não foi conferida) e função arquivos-no-drive corrigida ainda não publicada no desenvolvimento
+Em revisão desde 2026-10-19
