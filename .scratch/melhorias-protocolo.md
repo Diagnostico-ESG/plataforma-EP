@@ -642,3 +642,10 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **2026-10-18 · Ocorrência: o seletor de branch do painel "Run workflow" do GitHub ainda não fixa a escolha com clique por coordenada no painel estreito** (o envio do formulário pela página deu 422, sem o token do GitHub). Contorno que funcionou: abrir o painel, abrir o seletor (às vezes só o segundo clique abre), clicar no item `li[role=menuitemradio]` pelo DOM com `.click()` e conferir o campo `branch` do formulário antes de apertar o botão verde. Sugestão: o protocolo ter um passo-a-passo do disparo manual pelo navegador do app, ou uma forma de disparar workflow sem o painel.
 - **2026-10-18 · Ocorrência: o shell travou com um script em linha que misturava crases e aspas** (`unexpected EOF`), e a edição em lote foi refeita gravando o script com a ferramenta de arquivo. Os arquivos do projeto têm finais de linha mistos (alguns CRLF), o que fez uma troca por texto falhar até o script normalizar. Sem efeito no protocolo.
 - **2026-10-18 · Ocorrência: o aviso do claude-mem (cota esgotada) apareceu no início da sessão**; a sessão seguiu sem ele.
+
+## 2026-10-19 — /planejar (experiencia-do-quadro, parte 3: Verso do cartão), to-tickets
+
+- **2026-10-19 · Item não testado: critério `[visual]` nos tickets.** Esperado: os critérios `[visual]` da spec chegando aos tickets que os entregam. Aconteceu: cada um dos tickets 15 a 19 leva os `[visual]` da sua parte, copiados da spec.
+- **2026-10-19 · Ocorrência: o usuário pediu menos tickets.** A primeira proposta tinha 8; ficou com 5 (opção B), depois de mostrar o risco de cada junção (caber numa sessão, achar o erro). Sugestão: o `/planejar` lembrar ao `to-tickets` que o custo de cada ciclo (executar, polir, ship) pesa para o usuário, para a primeira proposta já vir mais enxuta.
+- **2026-10-19 · Ocorrência: o shell travou de novo com um texto em linha cheio de aspas** (`unexpected EOF`); os tickets foram gravados com a ferramenta de arquivo. Sem efeito no protocolo.
+- **2026-10-19 · Ocorrência: o aviso do claude-mem (cota esgotada) apareceu no início da sessão**; a sessão seguiu sem ele.
