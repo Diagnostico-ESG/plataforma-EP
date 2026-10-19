@@ -15,3 +15,16 @@ export async function escolherNoMenuDoProcesso(acao: string): Promise<void> {
 
 /** As janelas abertas por cima do verso; vazia quando só o verso está aberto. */
 export const janelasPorCima = (): HTMLElement[] => screen.queryAllByRole('dialog').filter((janela) => !janela.classList.contains('verso'))
+
+/** O cartão "Agora" do verso aberto. */
+export const agoraDoVerso = async () => within(await (await versoAberto()).findByRole('region', { name: /^Agora/ }))
+
+/** A região "Etapas" do verso aberto. */
+export const etapasDoVerso = async () => within(await (await versoAberto()).findByRole('region', { name: 'Etapas' }))
+
+/** A etapa da lista, com a gaveta aberta (a linha tem o nome acessível "{nome}: {status}"). */
+export async function gavetaDaEtapa(nome: string) {
+  const linha = await (await etapasDoVerso()).findByRole('button', { name: new RegExp(`^${nome}:`) })
+  if (linha.getAttribute('aria-expanded') !== 'true') fireEvent.click(linha)
+  return within(linha.closest('li') as HTMLElement)
+}

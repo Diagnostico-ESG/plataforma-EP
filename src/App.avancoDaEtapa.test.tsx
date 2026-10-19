@@ -9,7 +9,7 @@ import type { EventoDoCadastro } from './cadastros/tipos'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { EtapaDoProcesso, ProcessoLido, UsuarioResponsavel } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
-import { escolherNoMenuDoProcesso, janelasPorCima } from './testes/versoDoCartao'
+import { agoraDoVerso, escolherNoMenuDoProcesso, etapasDoVerso, janelasPorCima } from './testes/versoDoCartao'
 
 beforeEach(() => {
   window.location.hash = '#/processos/p1'
@@ -61,18 +61,18 @@ function montar(etapas: EtapaDoProcesso[] = [MODELAGEM_EM_ANDAMENTO, RELATORIO, 
 }
 
 const painel = async () => within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-async function etapa(nome: string) {
-  const caminho = within(await (await painel()).findByRole('region', { name: 'Caminho de etapas' }))
-  return within((await caminho.findByText(nome)).closest('li') as HTMLElement)
-}
 async function clicar(nomeDaEtapa: string, botao: string) {
-  fireEvent.click((await etapa(nomeDaEtapa)).getByRole('button', { name: botao }))
+  const agora = await agoraDoVerso()
+  if (botao === 'Concluir' || botao === 'Iniciar') return fireEvent.click(agora.getByRole('button', { name: `${botao} ${nomeDaEtapa}` }))
+  // Dispensar e Realizada anteriormente ficam no "⋯" do Agora.
+  fireEvent.click(agora.getByRole('button', { name: 'Mais ações da etapa' }))
+  fireEvent.click(agora.getByRole('menuitem', { name: botao }))
 }
+// A linha da etapa na lista, pelo nome acessível "{nome}: {status}".
+const linha = async (nome: string, status: string) => (await etapasDoVerso()).findByRole('button', { name: `${nome}: ${status}` })
 const janela = (titulo: string) => within(screen.getByRole('dialog', { name: titulo }))
 const marcado = (aberta: ReturnType<typeof janela>) =>
   (aberta.getAllByRole('radio') as HTMLInputElement[]).find((radio) => radio.checked)?.closest('label')?.textContent
-const responsavelDe = async (nomeDaEtapa: string) =>
-  ((await etapa(nomeDaEtapa)).getByLabelText(`Responsável de ${nomeDaEtapa}`) as HTMLSelectElement).value
 
 test('Concluir abre a janela da próxima etapa, com os usuários e "Ninguém por enquanto" por último, sem gravar', async () => {
   const falso = montar()
@@ -101,9 +101,9 @@ test('confirmar com outra pessoa conclui a etapa e inicia a próxima com ela', a
   const aberta = janela('Concluir Reunião de modelagem e iniciar Relatório e modelagem técnica')
   fireEvent.click(aberta.getByRole('radio', { name: 'Bia Teste' }))
   fireEvent.click(aberta.getByRole('button', { name: 'Concluir e iniciar Relatório e modelagem técnica' }))
-  expect(await (await etapa('Reunião de modelagem')).findByText('Concluída')).toBeTruthy()
-  expect((await etapa('Relatório e modelagem técnica')).getByText('Em andamento')).toBeTruthy()
-  expect(await responsavelDe('Relatório e modelagem técnica')).toBe('u2')
+  expect(await linha('Reunião de modelagem', 'concluída')).toBeTruthy()
+  expect(await linha('Relatório e modelagem técnica', 'atual')).toBeTruthy()
+  expect((await agoraDoVerso()).getByText('Bia Teste')).toBeTruthy()
   expect(falso.chamadas).toEqual([{ acao: 'concluir', id: 'a4', usuarioId: 'u2' }])
   expect(janelasPorCima()).toEqual([])
 })
@@ -114,8 +114,8 @@ test('"Ninguém por enquanto" inicia a próxima sem responsável', async () => {
   const aberta = janela('Concluir Reunião de modelagem e iniciar Relatório e modelagem técnica')
   fireEvent.click(aberta.getByRole('radio', { name: 'Ninguém por enquanto' }))
   fireEvent.click(aberta.getByRole('button', { name: 'Concluir e iniciar Relatório e modelagem técnica' }))
-  expect((await (await etapa('Relatório e modelagem técnica')).findByText('Em andamento'))).toBeTruthy()
-  expect(await responsavelDe('Relatório e modelagem técnica')).toBe('')
+  expect((await linha('Relatório e modelagem técnica', 'atual'))).toBeTruthy()
+  expect((await agoraDoVerso()).getByText('Sem responsável')).toBeTruthy()
   expect(falso.chamadas).toEqual([{ acao: 'concluir', id: 'a4', usuarioId: null }])
 })
 
@@ -129,8 +129,8 @@ test('Dispensar com etapa pendente depois pede a nota e a escolha na mesma janel
   fireEvent.change(aberta.getByLabelText('Nota'), { target: { value: 'Não se aplica' } })
   expect(botao.disabled).toBe(false)
   fireEvent.click(botao)
-  expect(await (await etapa('Relatório e modelagem técnica')).findByText('Dispensada')).toBeTruthy()
-  expect((await etapa('Publicação')).getByText('Em andamento')).toBeTruthy()
+  expect(await linha('Relatório e modelagem técnica', 'dispensada')).toBeTruthy()
+  expect(await linha('Publicação', 'atual')).toBeTruthy()
   expect(falso.chamadas).toEqual([{ acao: 'dispensar', id: 'a5', nota: 'Não se aplica', usuarioId: 'usuario-de-teste' }])
 })
 
@@ -140,8 +140,8 @@ test('Realizada anteriormente com etapa pendente depois pede a nota e a escolha,
   const aberta = janela('Registrar Reunião de modelagem como realizada anteriormente e iniciar Relatório e modelagem técnica')
   fireEvent.change(aberta.getByLabelText('Nota'), { target: { value: 'Feita em 2025' } })
   fireEvent.click(aberta.getByRole('button', { name: 'Registrar e iniciar Relatório e modelagem técnica' }))
-  expect(await (await etapa('Reunião de modelagem')).findByText('Realizada anteriormente')).toBeTruthy()
-  expect((await etapa('Relatório e modelagem técnica')).getByText('Em andamento')).toBeTruthy()
+  expect(await linha('Reunião de modelagem', 'realizada anteriormente')).toBeTruthy()
+  expect(await linha('Relatório e modelagem técnica', 'atual')).toBeTruthy()
   expect(falso.chamadas).toEqual([{ acao: 'realizada', id: 'a4', nota: 'Feita em 2025', usuarioId: 'usuario-de-teste' }])
 })
 
@@ -160,7 +160,7 @@ test('sem etapa pendente depois, Dispensar mostra só a nota', async () => {
   expect(aberta.queryByRole('radiogroup')).toBeNull()
   fireEvent.change(aberta.getByLabelText('Nota'), { target: { value: 'Sem publicação' } })
   fireEvent.click(aberta.getByRole('button', { name: 'Dispensar' }))
-  expect(await (await etapa('Publicação')).findByText('Dispensada')).toBeTruthy()
+  expect(await linha('Publicação', 'dispensada')).toBeTruthy()
   expect(falso.chamadas).toEqual([{ acao: 'dispensar', id: 'a9', nota: 'Sem publicação', usuarioId: null }])
 })
 
@@ -186,7 +186,7 @@ test('Enter confirma; com a nota vazia, não grava', async () => {
   await clicar('Reunião de modelagem', 'Concluir')
   fireEvent.keyDown(janela('Concluir Reunião de modelagem e iniciar Relatório e modelagem técnica')
     .getByRole('radio', { name: 'Pessoa de Teste' }), { key: 'Enter' })
-  expect(await (await etapa('Reunião de modelagem')).findByText('Concluída')).toBeTruthy()
+  expect(await linha('Reunião de modelagem', 'concluída')).toBeTruthy()
   expect(falso.chamadas).toEqual([{ acao: 'concluir', id: 'a4', usuarioId: 'usuario-de-teste' }])
 })
 
@@ -197,7 +197,7 @@ test('Cancelar fecha sem gravar, a etapa fica como estava e a janela recomeça m
   fireEvent.click(aberta.getByRole('radio', { name: 'Bia Teste' }))
   fireEvent.click(aberta.getByRole('button', { name: 'Cancelar' }))
   expect(janelasPorCima()).toEqual([])
-  expect((await etapa('Reunião de modelagem')).getByText('Em andamento')).toBeTruthy()
+  expect(await linha('Reunião de modelagem', 'atual')).toBeTruthy()
   expect(falso.chamadas).toEqual([])
   await clicar('Reunião de modelagem', 'Concluir')
   expect(marcado(janela('Concluir Reunião de modelagem e iniciar Relatório e modelagem técnica'))).toBe('Pessoa de Teste')
@@ -213,22 +213,21 @@ test.each([
   fireEvent.click(janela('Concluir Reunião de modelagem e iniciar Relatório e modelagem técnica')
     .getByRole('button', { name: 'Concluir e iniciar Relatório e modelagem técnica' }))
   expect((await (await painel()).findByRole('alert')).textContent).toBe(texto)
-  expect((await etapa('Reunião de modelagem')).getByText('Em andamento')).toBeTruthy()
+  expect(await linha('Reunião de modelagem', 'atual')).toBeTruthy()
   expect(falso.chamadas).toEqual([])
 })
 
 test('Iniciar continua um clique, sem janela', async () => {
   const falso = montar([{ ...MODELAGEM_EM_ANDAMENTO, status: 'pendente', iniciadaEm: null }, RELATORIO])
   await clicar('Reunião de modelagem', 'Iniciar')
-  expect(await (await etapa('Reunião de modelagem')).findByText('Em andamento')).toBeTruthy()
+  expect(await linha('Reunião de modelagem', 'atual')).toBeTruthy()
   expect(janelasPorCima()).toEqual([])
   expect(falso.chamadas).toEqual([{ acao: 'iniciar', id: 'a4' }])
 })
 
 test('a Consulta não tem Concluir, Dispensar nem Realizada anteriormente', async () => {
   montar([MODELAGEM_EM_ANDAMENTO, RELATORIO], { perfil: 'consulta' })
-  const atual = await etapa('Reunião de modelagem')
-  expect(atual.queryAllByRole('button')).toEqual([])
+  expect((await agoraDoVerso()).queryAllByRole('button')).toEqual([])
   expect(janelasPorCima()).toEqual([])
 })
 

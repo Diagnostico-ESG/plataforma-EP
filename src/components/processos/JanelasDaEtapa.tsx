@@ -1,13 +1,9 @@
-import { useAcoesDaEtapa } from '../../hooks/useAcoesDaEtapa'
-import {
-  acoesDaEtapa, ehEtapaDoProcesso, indiceDaEtapaAtual, podeAssumir, proximaPendente, responsavelMarcado, usuariosParaAEtapa,
-} from '../../processos/caminhoDeEtapas'
+import type { AcoesDaEtapaEmUso } from '../../hooks/useAcoesDaEtapa'
+import { responsavelMarcado, usuariosParaAEtapa } from '../../processos/caminhoDeEtapas'
 import type { PedidoDeAvanco, PedidoDeTexto } from '../../processos/gravarAcoes'
-import type { DatasDaEtapa, EtapaDoCaminho, ModuloDeProcessos, UltimaVersao, UsuarioResponsavel } from '../../processos/tipos'
+import type { UltimaVersao, UsuarioResponsavel } from '../../processos/tipos'
 import { JanelaComCampo } from '../JanelaComCampo'
-import { EdicaoDaEtapa } from './EdicaoDaEtapa'
 import { JanelaDeAvanco } from './JanelaDeAvanco'
-import { LinhaDaEtapa } from './LinhaDaEtapa'
 
 const JANELA_DO_TEXTO: Record<PedidoDeTexto['acao'], {
   titulo: (nome: string) => string; rotuloDoCampo: string; rotuloDaAcao: string
@@ -44,62 +40,21 @@ const JANELA_DO_AVANCO: Record<PedidoDeAvanco['acao'], {
   },
 }
 
-type CaminhoDeEtapasProps = {
-  processos: ModuloDeProcessos
-  /** Do setor ou do processo (só esta traz o responsável). */
-  etapas: EtapaDoCaminho[]
-  podeAlterar: boolean
-  /** Quem pode ser responsável; sem a lista, não há seletor de responsável. */
+type JanelasDaEtapaProps = {
+  acoes: AcoesDaEtapaEmUso
   usuarios?: UsuarioResponsavel[]
-  /** Quem está na tela: a janela de avanço o marca quando a próxima etapa não tem responsável, e o [Assumir] o põe. */
+  /** Quem está na tela: a janela de avanço o marca quando a próxima etapa não tem responsável. */
   usuarioId: string
   /** A versão mais recente não histórica do processo: o autor dela não é escolhido para a Revisão interna. */
   ultimaVersao: UltimaVersao | null
-  aoMudar: () => void
-  aoSumir: () => void
 }
 
-// O nome fica de fora quando o seletor o mostra e na etapa sem responsável lido: undefined esconde a linha.
-function nomeDoResponsavel(etapa: EtapaDoCaminho, comSeletor: boolean): string | null | undefined {
-  return ehEtapaDoProcesso(etapa) && !comSeletor ? etapa.responsavelNome : undefined
-}
-
-/**
- * O caminho de etapas (do setor ou do processo): só a etapa atual anda e as resolvidas anteriores voltam;
- * Dispensar, Realizada anteriormente e Voltar pedem nota ou motivo. Quem pode alterar também corrige as datas.
- */
-export function CaminhoDeEtapas({
-  processos, etapas, podeAlterar, usuarios, usuarioId, ultimaVersao, aoMudar, aoSumir,
-}: CaminhoDeEtapasProps) {
-  const {
-    falha, pedido, avanco, agir, gravarComTexto, gravarComAvanco, mudarResponsavel, fecharPedido, fecharAvanco,
-  } = useAcoesDaEtapa(processos, aoMudar, aoSumir)
-  const atual = indiceDaEtapaAtual(etapas)
+/** As janelas das ações da etapa: a da nota (Dispensar e Realizada anteriormente sem pendente depois) e a de avanço. */
+export function JanelasDaEtapa({ acoes, usuarios, usuarioId, ultimaVersao }: JanelasDaEtapaProps) {
+  const { pedido, avanco, gravarComTexto, gravarComAvanco, fecharPedido, fecharAvanco } = acoes
   const janela = pedido ? JANELA_DO_TEXTO[pedido.acao] : null
-
-  async function corrigirDatas(etapa: EtapaDoCaminho, datas: DatasDaEtapa) {
-    await processos.corrigirDatasDaEtapa(etapa.id, datas)
-    aoMudar()
-  }
-
   return (
     <>
-      <ol className="caminho-de-etapas">
-        {etapas.map((etapa, indice) => (
-          <LinhaDaEtapa key={etapa.id} etapa={etapa} atual={indice === atual}
-            acoes={podeAlterar ? acoesDaEtapa(etapas, indice) : []} aoAgir={(acao) => agir(acao, etapa, proximaPendente(etapas, indice))}
-            responsavelNome={nomeDoResponsavel(etapa, podeAlterar && usuarios !== undefined)}
-            responsavelInativo={ehEtapaDoProcesso(etapa) && etapa.responsavelInativo}>
-            {podeAlterar && (
-              <EdicaoDaEtapa etapa={etapa} usuarios={usuarios} aoSumir={aoSumir}
-                aoCorrigirDatas={(datas) => corrigirDatas(etapa, datas)}
-                aoEscolherResponsavel={(escolhido) => mudarResponsavel(etapa, escolhido)}
-                aoAssumir={podeAssumir(etapa, usuarioId, ultimaVersao) ? () => mudarResponsavel(etapa, usuarioId) : undefined} />
-            )}
-          </LinhaDaEtapa>
-        ))}
-      </ol>
-      {falha && <p className="cadastros-falha" role="alert">{falha}</p>}
       <JanelaComCampo aberta={pedido !== null} titulo={janela && pedido ? janela.titulo(pedido.etapa.nome) : ''}
         rotuloDoCampo={janela?.rotuloDoCampo ?? ''} rotuloDaAcao={janela?.rotuloDaAcao ?? ''}
         aoConfirmar={gravarComTexto} aoFechar={fecharPedido} />

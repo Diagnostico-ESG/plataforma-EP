@@ -3,7 +3,7 @@ import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { CadastroInexistente } from '../../cadastros/cadastroInexistente'
 import type { ModuloDeCadastros } from '../../cadastros/tipos'
 import { type EstadoDoCarregamento, useCarregamento } from '../../hooks/useCarregamento'
-import { useGravacaoComFalha } from '../../hooks/useGravacaoComFalha'
+import { type Executar, useGravacaoComFalha } from '../../hooks/useGravacaoComFalha'
 import type { DadosDoProcesso, ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
@@ -127,12 +127,12 @@ function ProcessoAberto(props: ProcessoAbertoProps) {
     <>
       <CabecalhoDoVerso processo={processo} titulo={titulo} acoes={acoes} aoFechar={aoFechar} />
       {falha && <p className="cadastros-falha verso-falha" role="alert">{falha}</p>}
-      <CorpoDoVerso {...props} modo={modo} aoVoltar={() => setModo('verso')} aposMudar={aposMudar} />
+      <CorpoDoVerso {...props} modo={modo} executar={executar} aoVoltar={() => setModo('verso')} aposMudar={aposMudar} />
     </>
   )
 }
 
-type CorpoProps = ProcessoAbertoProps & { modo: ModoDoVerso; aoVoltar: () => void; aposMudar: () => void }
+type CorpoProps = ProcessoAbertoProps & { modo: ModoDoVerso; executar: Executar; aoVoltar: () => void; aposMudar: () => void }
 
 function CorpoDoVerso(props: CorpoProps) {
   const { modo, processos, processo, aoVoltar } = props
@@ -175,12 +175,12 @@ function EdicaoDoProcesso({ processo, processos, cadastros, aoVoltar, aposMudar,
 
 /** Trabalho à esquerda (etapas e arquivos), contexto à direita (reunião, dados e estrutura). */
 function ColunasDoVerso(props: CorpoProps) {
-  const { processo, processos, versoes, podeAlterar, usuarioId, aposMudar, aoSumir, enderecoDoProcesso } = props
+  const { processo, processos, versoes, podeAlterar, usuarioId, executar, aposMudar, aoSumir, enderecoDoProcesso } = props
   return (
     <div className="verso-colunas">
       <div className="verso-trabalho">
         <CaminhoDoProcesso processo={processo} processos={processos} podeAlterar={podeAlterar} usuarioId={usuarioId}
-          aoSumir={aoSumir} aoMudar={aposMudar} />
+          executar={executar} aoSumir={aoSumir} aoMudar={aposMudar} />
         <SecaoDeVersoes versoes={versoes} processo={processo} podeAlterar={podeAlterar} />
       </div>
       <div className="verso-contexto">

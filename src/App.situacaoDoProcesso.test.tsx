@@ -65,7 +65,7 @@ const DE_SITUACAO = ['Suspender', 'Cancelar processo', 'Retomar']
 // As ações de situação ficam no "⋯" do processo (verso do cartão, ticket 16); o menu fecha com Esc depois de lidas.
 async function botoesDeSituacao(): Promise<string[]> {
   const aberto = await painel()
-  await aberto.findByText('Etapas do processo')
+  await aberto.findByRole('heading', { name: 'Etapas' })
   fireEvent.click(aberto.getByRole('button', { name: 'Ações do processo' }))
   const itens = aberto.getAllByRole('menuitem').map((item) => item.textContent ?? '').filter((texto) => DE_SITUACAO.includes(texto))
   fireEvent.keyDown(aberto.getAllByRole('menuitem')[0], { key: 'Escape' })
@@ -111,7 +111,7 @@ test('suspender grava o motivo, mostra a pílula, o aviso e o Quadro marca o car
   const falso = montar()
   await pedir('Suspender', 'Suspender o processo Emitir Ofício?', 'Aguardando decisão', 'Suspender processo')
   const aberto = await painel()
-  expect(await aberto.findByText('Este processo está suspenso: Aguardando decisão. Retome-o para registrar o andamento.')).toBeTruthy()
+  expect(await aberto.findByText('Suspenso: Aguardando decisão')).toBeTruthy()
   expect(aberto.getAllByText('Suspenso').length).toBeGreaterThan(0)
   expect(falso.processos[0]).toMatchObject({ situacao: 'suspenso', motivoDaSituacao: 'Aguardando decisão' })
   await waitFor(() => expect(within(screen.getByRole('link', { name: /Emitir Ofício/ })).getByText('Suspenso')).toBeTruthy())
@@ -122,7 +122,7 @@ test('cancelar tira o cartão do Quadro e mostra o aviso de cancelado', async ()
   expect(await screen.findByRole('link', { name: /Emitir Ofício/ })).toBeTruthy()
   await pedir('Cancelar processo', 'Cancelar o processo Emitir Ofício?', 'Não será mapeado', 'Cancelar processo')
   const aberto = await painel()
-  expect(await aberto.findByText('Este processo está cancelado: Não será mapeado. Retome-o para registrar o andamento.')).toBeTruthy()
+  expect(await aberto.findByText('Cancelado: Não será mapeado')).toBeTruthy()
   await waitFor(() => expect(screen.queryByRole('link', { name: /Emitir Ofício/ })).toBeNull())
 })
 
@@ -130,27 +130,27 @@ test('retomar limpa o aviso, devolve as ações das etapas e o botão de suspend
   const falso = montar({ situacao: 'suspenso' })
   await pedir('Retomar', 'Retomar o processo Emitir Ofício?', 'Decisão tomada', 'Retomar processo')
   const aberto = await painel()
-  await waitFor(() => expect(aberto.queryByText(/Retome-o para registrar o andamento/)).toBeNull())
+  await waitFor(() => expect(aberto.queryByText(/^Suspenso:/)).toBeNull())
   expect(await botoesDeSituacao()).toEqual(['Suspender', 'Cancelar processo'])
-  expect(aberto.getAllByRole('button', { name: 'Concluir' }).length).toBeGreaterThan(0)
+  expect(aberto.getAllByRole('button', { name: /^Concluir / }).length).toBeGreaterThan(0)
   expect(falso.processos[0]).toMatchObject({ situacao: 'em_andamento', motivoDaSituacao: null })
 })
 
 test.each([
-  ['suspenso', 'Este processo está suspenso: Aguardando decisão. Retome-o para registrar o andamento.'],
-  ['cancelado', 'Este processo está cancelado: Aguardando decisão. Retome-o para registrar o andamento.'],
+  ['suspenso', 'Suspenso: Aguardando decisão'],
+  ['cancelado', 'Cancelado: Aguardando decisão'],
 ] as const)('com o processo %s, as ações das etapas somem e o aviso aparece', async (situacao, aviso) => {
   montar({ situacao })
   const aberto = await painel()
   expect(await aberto.findByText(aviso)).toBeTruthy()
   for (const nome of ['Concluir', 'Iniciar', 'Dispensar', 'Voltar a esta etapa', 'Corrigir datas']) {
-    expect(aberto.queryByRole('button', { name: nome })).toBeNull()
+    expect(aberto.queryByRole('button', { name: new RegExp(`^${nome}`) })).toBeNull()
   }
 })
 
 test('a Consulta também vê o aviso do processo parado', async () => {
   montar({ perfil: 'consulta', situacao: 'suspenso' })
-  expect(await (await painel()).findByText(/Este processo está suspenso: Aguardando decisão/)).toBeTruthy()
+  expect(await (await painel()).findByText('Suspenso: Aguardando decisão')).toBeTruthy()
 })
 
 test.each([

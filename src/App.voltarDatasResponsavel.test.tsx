@@ -9,7 +9,7 @@ import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { EtapaDoProcesso, ProcessoLido } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
-import { escolherNoMenuDoProcesso, janelaPorCima } from './testes/versoDoCartao'
+import { agoraDoVerso, escolherNoMenuDoProcesso, etapasDoVerso, gavetaDaEtapa, janelaPorCima } from './testes/versoDoCartao'
 
 beforeEach(() => {
   window.location.hash = '#/processos/p1'
@@ -68,12 +68,10 @@ function montar({ perfil = 'integrante_ep', processos = [processo()], ajustar }:
 }
 
 const painel = async () => within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-async function etapa(nome: string) {
-  const caminho = within(await (await painel()).findByRole('region', { name: 'Caminho de etapas' }))
-  return within((await caminho.findByText(nome)).closest('li') as HTMLElement)
-}
-const botoes = (linha: { queryAllByRole: (papel: 'button') => HTMLElement[] }) =>
-  linha.queryAllByRole('button').map((botao) => botao.textContent)
+// A gaveta da etapa, aberta pela linha dela.
+const etapa = gavetaDaEtapa
+// A linha da etapa na lista, pelo nome acessível "{nome}: {status}".
+const rotulada = async (nome: string, status: string) => (await etapasDoVerso()).findByRole('button', { name: `${nome}: ${status}` })
 
 async function voltarA(nome: string, motivo: string) {
   fireEvent.click((await etapa(nome)).getByRole('button', { name: 'Voltar a esta etapa' }))
@@ -82,12 +80,21 @@ async function voltarA(nome: string, motivo: string) {
   fireEvent.click(janela.getByRole('button', { name: 'Voltar' }))
 }
 
+// O Trocar do Agora, aberto: a etapa atual troca de responsável ali.
+async function abrirTrocaDoAgora(nome: string) {
+  const agora = await agoraDoVerso()
+  fireEvent.click(agora.getByRole('button', { name: `Trocar o responsável de ${nome}` }))
+  return { agora, seletor: agora.getByRole('combobox', { name: `Responsável de ${nome}` }) as HTMLSelectElement }
+}
+
 test('Voltar a esta etapa só aparece nas resolvidas anteriores à atual', async () => {
   montar()
-  expect(botoes(await etapa(MODELAGEM))).toContain('Voltar a esta etapa')
-  expect(botoes(await etapa(RELATORIO))).toContain('Voltar a esta etapa')
-  expect(botoes(await etapa(REVISAO))).not.toContain('Voltar a esta etapa')
-  expect(botoes(await etapa('Publicação'))).toEqual(['Assumir'])
+  expect((await etapa(MODELAGEM)).getByRole('button', { name: 'Voltar a esta etapa' })).toBeTruthy()
+  expect((await etapa(RELATORIO)).getByRole('button', { name: 'Voltar a esta etapa' })).toBeTruthy()
+  expect((await etapa(REVISAO)).queryByRole('button', { name: 'Voltar a esta etapa' })).toBeNull()
+  const publicacao = await etapa('Publicação')
+  expect(publicacao.queryByRole('button', { name: 'Voltar a esta etapa' })).toBeNull()
+  expect(publicacao.getByRole('button', { name: 'Assumir Publicação' })).toBeTruthy()
 })
 
 test('voltar à modelagem pede o motivo, grava e devolve as seguintes a pendente', async () => {
@@ -97,9 +104,9 @@ test('voltar à modelagem pede o motivo, grava e devolve as seguintes a pendente
   expect((janela.getByRole('button', { name: 'Voltar' }) as HTMLButtonElement).disabled).toBe(true)
   fireEvent.change(janela.getByLabelText('Motivo'), { target: { value: 'Mudou o escopo' } })
   fireEvent.click(janela.getByRole('button', { name: 'Voltar' }))
-  expect(await (await etapa(MODELAGEM)).findByText('Em andamento')).toBeTruthy()
-  expect((await etapa(RELATORIO)).getByText('Pendente')).toBeTruthy()
-  expect((await etapa(REVISAO)).getByText('Pendente')).toBeTruthy()
+  expect(await rotulada(MODELAGEM, 'atual')).toBeTruthy()
+  expect(await rotulada(RELATORIO, 'pendente')).toBeTruthy()
+  expect(await rotulada(REVISAO, 'pendente')).toBeTruthy()
   expect(falso.chamadas).toEqual([{ acao: 'voltar', id: 'a4', nota: 'Mudou o escopo', usuarioId: null }])
 })
 
@@ -108,7 +115,7 @@ test('cancelar a janela do motivo não grava', async () => {
   fireEvent.click((await etapa(MODELAGEM)).getByRole('button', { name: 'Voltar a esta etapa' }))
   fireEvent.click(within(janelaPorCima()).getByRole('button', { name: 'Cancelar' }))
   expect(falso.chamadas).toEqual([])
-  expect((await etapa(MODELAGEM)).getByText('Concluída')).toBeTruthy()
+  expect(await rotulada(MODELAGEM, 'concluída')).toBeTruthy()
 })
 
 test.each([
@@ -118,7 +125,7 @@ test.each([
   const falso = montar({ ajustar: (f) => { f.falhaDeGravacao = falha } })
   await voltarA(MODELAGEM, 'Mudou o escopo')
   expect((await (await painel()).findByRole('alert')).textContent).toBe(texto)
-  expect((await etapa(MODELAGEM)).getByText('Concluída')).toBeTruthy()
+  expect(await rotulada(MODELAGEM, 'concluída')).toBeTruthy()
   expect(falso.chamadas).toEqual([])
 })
 
@@ -133,13 +140,13 @@ test('voltar uma etapa do processo concluído tira a pílula Concluído', async 
   })] })
   expect(await (await painel()).findByText('Concluído')).toBeTruthy()
   await voltarA(RELATORIO, 'Faltou revisar')
-  expect(await (await etapa(RELATORIO)).findByText('Em andamento')).toBeTruthy()
+  expect(await rotulada(RELATORIO, 'atual')).toBeTruthy()
   expect((await painel()).queryByText('Concluído')).toBeNull()
 })
 
 async function corrigirDatas(nome: string) {
-  fireEvent.click((await etapa(nome)).getByRole('button', { name: 'Corrigir datas' }))
   const linha = await etapa(nome)
+  fireEvent.click(linha.getByRole('button', { name: 'Corrigir datas' }))
   return {
     linha,
     inicio: linha.getByLabelText(`Início da etapa ${nome}`) as HTMLInputElement,
@@ -188,55 +195,56 @@ test('conclusão antes do início é recusada com as duas datas', async () => {
     .toBe('A conclusão (01/10/2026) não pode ser antes do início (12/10/2026).')
 })
 
-test('o seletor de responsável lista só os usuários possíveis, e escolher grava e põe o avatar no cartão', async () => {
+test('o Trocar do Agora lista só os usuários possíveis, e escolher grava e põe o avatar no cartão', async () => {
   const falso = montar()
-  const linha = await etapa(REVISAO)
-  const seletor = linha.getByLabelText(`Responsável de ${REVISAO}`) as HTMLSelectElement
-  expect([...seletor.options].map((opcao) => opcao.textContent)).toEqual(['Sem responsável', 'Ana Teste', 'Bia Teste'])
+  const { agora, seletor } = await abrirTrocaDoAgora(REVISAO)
+  expect([...seletor.options].map((opcao) => opcao.textContent)).toEqual(['Ana Teste', 'Bia Teste', 'Ninguém por enquanto'])
   fireEvent.change(seletor, { target: { value: 'u1' } })
   const cartao = await screen.findByRole('link', { name: /Emitir Ofício/ })
   expect(await within(cartao).findByRole('img', { name: 'Ana Teste' })).toBeTruthy()
   expect(falso.chamadas).toEqual([{ acao: 'responsavel', id: 'a6', usuarioId: 'u1' }])
-  expect((await etapa(REVISAO)).getByLabelText(`Responsável de ${REVISAO}`)).toHaveProperty('value', 'u1')
+  expect(await agora.findByText('Ana Teste')).toBeTruthy()
 })
 
-test('escolher "Sem responsável" tira o responsável da etapa', async () => {
+test('escolher "Ninguém por enquanto" tira o responsável da etapa', async () => {
   const falso = montar({ processos: [processo({ etapasDoProcesso: [
     doProcesso(6, REVISAO, { status: 'em_andamento', iniciadaEm: '2026-10-13', responsavelId: 'u2', responsavelNome: 'Bia Teste' }),
   ] })] })
-  fireEvent.change((await etapa(REVISAO)).getByLabelText(`Responsável de ${REVISAO}`), { target: { value: '' } })
+  const { agora, seletor } = await abrirTrocaDoAgora(REVISAO)
+  fireEvent.change(seletor, { target: { value: '' } })
   await waitFor(() => expect(falso.chamadas).toEqual([{ acao: 'responsavel', id: 'a6', usuarioId: null }]))
-  expect(((await etapa(REVISAO)).getByLabelText(`Responsável de ${REVISAO}`) as HTMLSelectElement).value).toBe('')
+  expect(await agora.findByText('Sem responsável')).toBeTruthy()
 })
 
 test('o responsável desativado aparece marcado "Inativo" e não se escolhe de novo', async () => {
   montar({ processos: [processo({ etapasDoProcesso: [
-    doProcesso(4, MODELAGEM, { status: 'concluida', iniciadaEm: '2026-10-10', resolvidaEm: '2026-10-11',
+    doProcesso(6, REVISAO, { status: 'em_andamento', iniciadaEm: '2026-10-13',
       responsavelId: 'u9', responsavelNome: 'Caio Teste', responsavelInativo: true }),
   ] })] })
-  const seletor = (await etapa(MODELAGEM)).getByLabelText(`Responsável de ${MODELAGEM}`) as HTMLSelectElement
+  const { seletor } = await abrirTrocaDoAgora(REVISAO)
   expect(seletor.selectedOptions[0].textContent).toBe('Caio Teste (Inativo)')
   expect(seletor.selectedOptions[0].disabled).toBe(true)
   expect([...seletor.options].filter((opcao) => !opcao.disabled).map((opcao) => opcao.textContent))
-    .toEqual(['Sem responsável', 'Ana Teste', 'Bia Teste'])
+    .toEqual(['Ana Teste', 'Bia Teste', 'Ninguém por enquanto'])
 })
 
 test('a recusa ao mudar o responsável aparece como alerta', async () => {
   const frase = 'Maria Teste não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP.'
   montar({ ajustar: (f) => { f.falhaDeGravacao = new TravaDoBanco(frase) } })
-  fireEvent.change((await etapa(REVISAO)).getByLabelText(`Responsável de ${REVISAO}`), { target: { value: 'u1' } })
+  const { seletor } = await abrirTrocaDoAgora(REVISAO)
+  fireEvent.change(seletor, { target: { value: 'u1' } })
   expect((await (await painel()).findByRole('alert')).textContent).toBe(frase)
 })
 
-test('a Consulta não vê Voltar, Corrigir datas nem o seletor, só o nome do responsável', async () => {
+test('a Consulta não vê Voltar, Corrigir datas nem o Trocar, só o nome do responsável', async () => {
   montar({ perfil: 'consulta', processos: [processo({ etapasDoProcesso: [
     doProcesso(4, MODELAGEM, { status: 'concluida', iniciadaEm: '2026-10-10', resolvidaEm: '2026-10-11',
       responsavelId: 'u9', responsavelNome: 'Caio Teste', responsavelInativo: true }),
     doProcesso(6, REVISAO, { status: 'em_andamento', iniciadaEm: '2026-10-13' }),
   ] })] })
   const modelagem = await etapa(MODELAGEM)
-  expect(botoes(modelagem)).toEqual([])
-  expect(botoes(await etapa(REVISAO))).toEqual([])
+  expect(modelagem.getAllByRole('button')).toHaveLength(1)
+  expect((await agoraDoVerso()).queryAllByRole('button')).toEqual([])
   expect((await painel()).queryAllByRole('combobox')).toEqual([])
   expect(modelagem.getByText('Responsável: Caio Teste (Inativo)')).toBeTruthy()
 })

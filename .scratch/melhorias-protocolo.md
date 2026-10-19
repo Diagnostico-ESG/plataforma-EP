@@ -656,3 +656,11 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **2026-10-19 · Ocorrência: não há Python nesta máquina.** Uma troca de texto em lote por `python` falhou em silêncio (o `&&` seguinte não rodou, mas o `tsc` passou com o arquivo antigo); as trocas foram refeitas com `node -e` e com a ferramenta de edição. Os arquivos com final de linha CRLF fizeram outras trocas por texto não acharem o trecho. Sugestão: o protocolo dizer que os scripts de apoio usam `node`, que o projeto já tem.
 - **2026-10-19 · Ocorrência: as fotos de tela do navegador do app saem atrasadas** (o menu "⋯" e a janela carregando apareceram só na segunda foto, embora o DOM já os tivesse). Conferir pelo DOM antes de concluir que algo não aparece.
 - **2026-10-19 · Ocorrência: o aviso do claude-mem (cota esgotada) apareceu no início da sessão**; a sessão seguiu sem ele.
+
+## 2026-10-19 — /executar-complexo do ticket 17 de processos-etapas (o cartão Agora e o caminho de etapas)
+
+- **2026-10-19 · Item não testado: branch comum no `/executar-complexo`, `plano-<número>.md` e linha `Concluído em`.** Esperado: plano em `plano-17.md`, branch `processos-etapas-17` sem worktree, marco de início e linha `Concluído em` no ticket. Aconteceu: o plano e a branch foram criados como descrito; a linha `Concluído em` é gravada depois do merge.
+- **2026-10-19 · Ocorrência: o shell travou de novo com texto longo em linha** (`unexpected EOF while looking for matching`) em quatro chamadas com `cat <<'EOF'` ou `node -e` com aspas; os arquivos foram gravados pela ferramenta de arquivo, e as trocas em lote por um `.mjs` temporário, apagado depois. Sugestão: o protocolo dizer para gravar arquivos com a ferramenta de arquivo, nunca com heredoc.
+- **2026-10-19 · Ocorrência: o `Etapas.css` não era importado por nenhum arquivo** havia tempo; só apareceu ao mexer nele. Sem efeito no protocolo; registrado no `desvios.md`.
+- **2026-10-19 · Ocorrência: a porta 5179 já tinha um servidor do ticket 16 ainda rodando**; a vitrine foi aberta nele. Sugestão: o `/executar-complexo` lembrar de encerrar o servidor da vitrine ao fim da conferência da tela.
+- **2026-10-19 · Ocorrência: o aviso do claude-mem (cota esgotada) apareceu no início da sessão**; a sessão seguiu sem ele.
