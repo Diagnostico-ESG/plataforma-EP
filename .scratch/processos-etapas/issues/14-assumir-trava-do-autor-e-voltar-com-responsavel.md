@@ -19,3 +19,5 @@
 - [ ] Janela de voltar: "Quem fica com esta etapa?" com as mesmas opções e a mesma trava, marcado o responsável atual da etapa reaberta (se ele não pode, quem está na tela; senão, "Ninguém por enquanto"); confirmar desabilitado com o motivo vazio; Esc sem gravar.
 - [ ] Testes de interface com o aplicativo inteiro cobrindo os itens acima.
 - [ ] `supabase/AMBIENTES.md` registra a migração.
+
+Concluído em 2026-10-18 (commit fcca425)
