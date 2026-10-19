@@ -214,7 +214,7 @@ export function useConclusaoPeloQuadro(processos: ModuloDeProcessos, podeAlterar
 
 **Arquivos:** `.scratch/processos-etapas/desvios.md`, `.scratch/processos-etapas/spec.md` (só se algo divergir), `.scratch/backlog.md`, `.scratch/melhorias-protocolo.md`, `.scratch/custos.md` (o `/cost` é do usuário).
 
-- [ ] **Passo 1: revisão da branch** contra a spec e os critérios (ordem: critérios 1 a 10 do ticket, histórias 155 a 163): conferir que cada critério tem teste; o critério 10 `[visual]` fica **presumido** (a tela não foi conferida; o usuário confere o realce e o cartão apagado na vitrine ou no app).
-- [ ] **Passo 2:** `desvios.md` com as cinco decisões do plano (entrada nova, datada, ao fim) e, se a revisão achar divergência da spec, o achado (sem corrigir a spec).
-- [ ] **Passo 3:** `npm test`, `npm run lint`, `npm run typecheck`, cobertura conferida no `/ship` (não aqui). Commit `Ticket 21 de processos-etapas: desvios`.
+- [x] **Passo 1: revisão da branch** contra a spec e os critérios (ordem: critérios 1 a 10 do ticket, histórias 155 a 163): conferir que cada critério tem teste; o critério 10 `[visual]` fica **presumido** (a tela não foi conferida; o usuário confere o realce e o cartão apagado na vitrine ou no app).
+- [x] **Passo 2:** `desvios.md` com as cinco decisões do plano (entrada nova, datada, ao fim) e, se a revisão achar divergência da spec, o achado (sem corrigir a spec).
+- [x] **Passo 3:** `npm test`, `npm run lint`, `npm run typecheck`, cobertura conferida no `/ship` (não aqui). Commit `Ticket 21 de processos-etapas: desvios`.
 - [ ] **Passo 4:** (fora do plano de código, na branch principal, depois do merge, como manda o `/executar-complexo`) linha `Concluído em` no ticket 21, marca das melhorias do protocolo (`nao-testados.md`) e commit.

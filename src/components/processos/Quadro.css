@@ -65,10 +65,12 @@
 }
 
 /* Arrastar para concluir: só a coluna de destino acende; o cartão arrastado fica apagado no lugar de origem. */
+/* O contorno vai para dentro: a rolagem lateral cortaria o que sai da coluna. A altura mínima dá alvo à coluna vazia. */
 .coluna-destino {
   outline: 2px dashed var(--azul);
-  outline-offset: 4px;
+  outline-offset: -2px;
   border-radius: var(--canto);
+  min-height: 160px;
 }
 
 .cartao-apagado {
