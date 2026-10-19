@@ -43,3 +43,12 @@ Decisões da sabatina (`grill-with-docs`), para o `to-spec`. Os termos estão no
 
 - **Rodadas (substitui Q6, Q8b, Q12b na etapa 7, Q13 na numeração, Q16 e Q17 nas datas de envio e resposta):** saem. A revisão pelo setor é só a etapa; o ciclo "vai, volta, revisa, vai de novo" fica nos eventos de etapa e no "voltar a etapa" (ADR 0012). O "Concluir" da etapa 7 exige a versão mais recente completa. A aprovação fica no dia da última revisão interna ou depois.
 - **Subprocesso:** sem tratamento à parte; é um item como outro, com as mesmas regras. A aprovação do pai não depende da dos subprocessos.
+
+## Revisão de 2026-10-19 (no `/planejar`, parte 5 da iniciativa experiencia-do-quadro; ADR 0015)
+
+- **Gravação:** a revisão interna e a aprovação se gravam na janela de concluir a etapa, com a conclusão, numa gravação só; sai o [Registrar] separado (recomendação aceita sem objeção).
+- **Lugar:** os registros ficam na gaveta da etapa, no verso do cartão; a versão aprovada ganha o selo "Aprovada"; sai a seção própria (recomendação aceita sem objeção).
+- **E-protocolo:** número, link e data opcionais (decisão explícita do usuário); o número pode entrar depois pelo [Editar].
+- **Voltar:** a volta para a Aprovação ou antes dela desfaz a aprovação, com aviso; o histórico guarda o antes (recomendação aceita sem objeção).
+- **Corrigir:** só editar; não se exclui registro (recomendação aceita sem objeção).
+- **Brecha da parte 2:** quem enviou a versão revisada não conclui a revisão, mesmo tendo assumido a etapa antes do envio.

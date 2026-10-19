@@ -40,7 +40,7 @@ As partes da iniciativa definidas e em ordem, com as decisões que valem para ma
 - **Parte 2:** resolvido na sabatina de 2026-10-18 (`sabatina-parte-2.md`, ADR 0014).
 - **Parte 3:** o desenho fino das duas colunas; o que a Consulta vê; a busca da Lista (só nome ou também setor).
 - **Parte 4:** resolvido na sabatina de 2026-10-19 (`sabatina-parte-4.md`, sem ADR).
-- **Parte 5:** encaixe das janelas de revisão e aprovação na janela da parte 2; o que sai da spec atual (seção própria; [Capturar] e a trava do autor já entram na parte 2 como [Assumir], ADR 0014). Fechar a brecha aceita na parte 2: quem assumiu a Revisão interna pendente e depois enviou a versão revisada não pode registrar a revisão.
+- **Parte 5:** resolvido no `/planejar` de 2026-10-19 (`revisoes-aprovacao/sabatina.md`, revisão de 2026-10-19; ADR 0015).
 
 ## Out of scope
 
