@@ -1,7 +1,7 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { recalcularProcesso } from './andamentoFalso'
-import { fraseDaEtapaUsada, fraseDeCodigoRepetido, fraseDeNomeRepetido } from './frasesDoCatalogo'
+import { fraseDaEtapaProtegida, fraseDaEtapaUsada, fraseDeCodigoRepetido, fraseDeNomeRepetido } from './frasesDoCatalogo'
 import type {
   DadosDaEtapa, EtapaDoCatalogo, EtapaDoProcesso, EtapaDoCaminho, EtapaNoCatalogo, EtapaNova, ModuloDoCatalogo,
   ProcessoLido, SentidoDaOrdem, SituacaoDoProcesso,
@@ -15,6 +15,13 @@ export type DonoDoCatalogo = {
 
 // Como a função do banco: a etapa entra nos processos não concluídos e não cancelados (ADR 0004).
 const SITUACOES_QUE_RECEBEM = new Set<SituacaoDoProcesso>(['em_andamento', 'suspenso'])
+
+// Como o gatilho do banco: as três etapas de revisão e aprovação não se desativam nem se excluem.
+const PROTEGIDAS = ['revisao_interna', 'revisao_setor', 'aprovacao_setor']
+
+function conferirNaoProtegida(etapa: EtapaNoCatalogo): void {
+  if (PROTEGIDAS.includes(etapa.codigo ?? '')) throw new TravaDoBanco(fraseDaEtapaProtegida(etapa.nome))
+}
 
 const porOrdem = <T extends { ordem: number }>(a: T, b: T) => a.ordem - b.ordem
 
@@ -87,6 +94,7 @@ export class CatalogoFalso implements ModuloDoCatalogo {
   async desativarEtapa(id: string): Promise<void> {
     this.conferirGravacao()
     const etapa = this.acharEtapa(id)
+    conferirNaoProtegida(etapa)
     this.gravar(this.etapas.map((outra) => (outra.id === id ? { ...outra, ativa: false } : outra)))
     this.tirarPendentes(etapa.codigo)
   }
@@ -101,6 +109,7 @@ export class CatalogoFalso implements ModuloDoCatalogo {
   async excluirEtapa(id: string): Promise<void> {
     this.conferirGravacao()
     const etapa = this.acharEtapa(id)
+    conferirNaoProtegida(etapa)
     if (this.andamentosDe(etapa.codigo).some((andamento) => andamento.status !== 'pendente')) {
       throw new TravaDoBanco(fraseDaEtapaUsada(etapa.nome))
     }

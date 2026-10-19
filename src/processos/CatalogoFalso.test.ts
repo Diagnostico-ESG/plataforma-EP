@@ -150,3 +150,32 @@ describe('falhas simuladas', () => {
     expect((await falso.catalogo.listarCatalogo())[2].ativa).toBe(true)
   })
 })
+
+describe('as etapas de revisão e aprovação não saem do catálogo', () => {
+  const REVISAO = { id: 'e5', codigo: 'revisao_interna', nome: 'Revisão interna', ordem: 5, obrigatoria: true, ativa: true }
+  const APROVACAO = { id: 'e7', codigo: 'aprovacao_setor', nome: 'Aprovação pelo setor', ordem: 7, obrigatoria: true, ativa: true }
+
+  function comProtegidas(): ProcessosFalso {
+    const falso = montar()
+    falso.catalogo.etapas = [RELATORIO, REVISAO, APROVACAO, PUBLICACAO]
+    return falso
+  }
+
+  test.each([
+    ['desativar a Revisão interna', (f: ProcessosFalso) => f.catalogo.desativarEtapa('e5'), 'A etapa Revisão interna é obrigatória no fluxo: não pode ser desativada nem excluída.'],
+    ['excluir a Aprovação pelo setor', (f: ProcessosFalso) => f.catalogo.excluirEtapa('e7'), 'A etapa Aprovação pelo setor é obrigatória no fluxo: não pode ser desativada nem excluída.'],
+  ])('%s é recusado e o catálogo não muda', async (_caso, tentar, frase) => {
+    const falso = comProtegidas()
+    const falha = (await tentar(falso).catch((erro: unknown) => erro)) as Error
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect(falha.message).toBe(frase)
+    expect((await falso.catalogo.listarCatalogo()).filter((etapa) => etapa.ativa)).toHaveLength(4)
+  })
+
+  test('renomear e mover continuam aceitos', async () => {
+    const falso = comProtegidas()
+    await falso.catalogo.editarEtapa('e5', { nome: 'Revisão interna (EP)', obrigatoria: true })
+    await falso.catalogo.moverEtapa('e5', 'subir')
+    expect(codigos(await falso.catalogo.listarCatalogo())).toEqual(['revisao_interna', 'relatorio_modelagem_tecnica', 'aprovacao_setor', 'publicacao'])
+  })
+})

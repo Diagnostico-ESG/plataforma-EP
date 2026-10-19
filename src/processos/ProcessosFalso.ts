@@ -4,7 +4,7 @@ import type { EventoDoCadastro } from '../cadastros/tipos'
 import { CatalogoFalso } from './CatalogoFalso'
 import {
   avancarProcesso, conferirAutorDaProxima, conferirAutorDaRevisao, conferirAvanco, conferirDatasDaEtapa,
-  conferirResponsavelEscolhido, mudarEtapaDoProcesso, responsavelDoCartao, trocarEtapaDoProcesso, voltarEtapas,
+  conferirResponsavelEscolhido, conferirVersaoDaRevisaoDoSetor, mudarEtapaDoProcesso, responsavelDoCartao, trocarEtapaDoProcesso, voltarEtapas,
   type PedidoDeAvanco,
 } from './andamentoFalso'
 import {
@@ -232,6 +232,7 @@ export class ProcessosFalso implements ModuloDeProcessos {
     this.conferirProcessoDaEtapa(chamada.id)
     const responsavelId = chamada.usuarioId ?? null
     conferirAvanco(etapa, { acao: chamada.acao, nota: chamada.nota ?? null, responsavelId }, this.usuariosPossiveis)
+    if (chamada.acao === 'concluir') conferirVersaoDaRevisaoDoSetor(etapa, this.processoDaEtapa(chamada.id).ultimaVersao)
     conferirAutorDaProxima(this.processoDaEtapa(chamada.id), chamada.id, responsavelId)
     this.chamadas.push(chamada)
     const usuario = this.usuariosPossiveis.find((possivel) => possivel.id === responsavelId) ?? null

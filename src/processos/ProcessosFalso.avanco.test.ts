@@ -1,7 +1,8 @@
 import { describe, expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { ProcessosFalso } from './ProcessosFalso'
-import type { EtapaDoProcesso, ProcessoLido } from './tipos'
+import type { PapelDoArquivo } from '../versoes/tipos'
+import type { EtapaDoProcesso, ProcessoLido, UltimaVersao } from './tipos'
 
 function doProcesso(ordem: number, mudancas: Partial<EtapaDoProcesso> = {}): EtapaDoProcesso {
   return {
@@ -126,7 +127,7 @@ describe('trava do autor da versão mais recente', () => {
 
   function comAutor(): ProcessosFalso {
     const modulo = falso([doProcesso(4, EM_ANDAMENTO), doProcesso(5, REVISAO)])
-    modulo.processos[0] = { ...modulo.processos[0], ultimaVersao: { numero: 3, autorId: 'u1', autorNome: 'Ana Teste' } }
+    modulo.processos[0] = { ...modulo.processos[0], ultimaVersao: { numero: 3, autorId: 'u1', autorNome: 'Ana Teste', papeis: ['bpmn', 'png'] } }
     return modulo
   }
 
@@ -146,5 +147,47 @@ describe('trava do autor da versão mais recente', () => {
     const ninguem = comAutor()
     await ninguem.concluirEtapa('a4', null)
     expect(etapaDe(await lido(ninguem), 'a5').responsavelId).toBeNull()
+  })
+})
+
+describe('concluir a Revisão pelo setor exige a versão mais recente completa', () => {
+  const SETOR = { codigo: 'revisao_setor', ...EM_ANDAMENTO }
+  const versao = (papeis: PapelDoArquivo[]): UltimaVersao => ({ numero: 3, autorId: 'u1', autorNome: 'Ana Teste', papeis })
+
+  function comVersao(ultimaVersao: UltimaVersao | null): ProcessosFalso {
+    const modulo = falso([doProcesso(4, SETOR), doProcesso(5)])
+    modulo.processos[0] = { ...modulo.processos[0], ultimaVersao }
+    return modulo
+  }
+
+  test.each([
+    ['sem versão', null, 'O processo ainda não tem versão enviada.'],
+    ['sem relatório', versao(['bpmn', 'png']), 'A V3 está sem relatório.'],
+    ['sem .png e relatório', versao(['bpmn']), 'A V3 está sem .png e relatório.'],
+  ])('%s: recusa com o que falta e nada muda', async (_caso, ultimaVersao, frase) => {
+    const modulo = comVersao(ultimaVersao)
+    const falha = await falhaDe(modulo.concluirEtapa('a4', 'u2'))
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect(falha.message).toBe(frase)
+    expect(await statusDe(modulo)).toEqual(['em_andamento', 'pendente'])
+    expect(modulo.chamadas).toEqual([])
+  })
+
+  test('com a versão completa, conclui e inicia a próxima', async () => {
+    const modulo = comVersao(versao(['bpmn', 'png', 'relatorio']))
+    await modulo.concluirEtapa('a4', 'u2')
+    expect(await statusDe(modulo)).toEqual(['concluida', 'em_andamento'])
+  })
+
+  test('realizada anteriormente não depende de versão', async () => {
+    const modulo = comVersao(null)
+    await modulo.registrarRealizadaAnteriormente('a4', 'Feita em 2025', 'u2')
+    expect(await statusDe(modulo)).toEqual(['realizada_anteriormente', 'em_andamento'])
+  })
+
+  test('as outras etapas concluem sem versão', async () => {
+    const modulo = falso([doProcesso(4, EM_ANDAMENTO), doProcesso(5)])
+    await modulo.concluirEtapa('a4', 'u2')
+    expect(await statusDe(modulo)).toEqual(['concluida', 'em_andamento'])
   })
 })

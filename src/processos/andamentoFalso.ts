@@ -1,5 +1,6 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { ehAutorBarrado, formatarData, indiceDaEtapaAtual, proximaPendente } from './caminhoDeEtapas'
+import { fraseDoBloqueioDaConclusao } from './frasesDaVersaoCompleta'
 import type {
   DatasDaEtapa, EtapaDoProcesso, EtapaDoCaminho, ProcessoLido, ResponsavelDaEtapa, StatusDaEtapa, UltimaVersao, UsuarioResponsavel,
 } from './tipos'
@@ -117,6 +118,13 @@ export function conferirAutorDaRevisao(ultimaVersao: UltimaVersao | null, etapa:
   if (responsavelId === null || responsavelId === etapa.responsavelId) return
   if (ultimaVersao === null || !ehAutorBarrado(etapa, responsavelId, ultimaVersao)) return
   throw new TravaDoBanco(`${ultimaVersao.autorNome} enviou a versão V${ultimaVersao.numero} e não pode ser responsável pela Revisão interna.`)
+}
+
+/** Como o gatilho do banco: concluir a Revisão pelo setor exige a versão mais recente completa. */
+export function conferirVersaoDaRevisaoDoSetor(etapa: EtapaDoCaminho, ultimaVersao: UltimaVersao | null): void {
+  if (etapa.codigo !== 'revisao_setor') return
+  const frase = fraseDoBloqueioDaConclusao(ultimaVersao)
+  if (frase !== null) throw new TravaDoBanco(frase)
 }
 
 /** A trava do autor para a etapa que o avanço inicia: a primeira pendente depois da resolvida. */
