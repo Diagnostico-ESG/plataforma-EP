@@ -43,12 +43,21 @@ export function EventoDoHistorico({ evento }: { evento: EventoDoCadastro }) {
   )
 }
 
-function MudancaDoEvento({ evento }: { evento: EventoDoCadastro }) {
+/** As duas linhas "Antes: …" e "Depois: …" de um evento (a linha do tempo do processo as usa sem o motivo). */
+export function AntesEDepoisDoEvento({ evento }: { evento: EventoDoCadastro }) {
   const [antes, depois] = antesEDepois(evento)
   return (
-    <span className="historico-mudanca">
+    <>
       <span>Antes: {descreverEstadoDoCadastro(antes)}</span>
       <span>Depois: {descreverEstadoDoCadastro(depois)}</span>
+    </>
+  )
+}
+
+function MudancaDoEvento({ evento }: { evento: EventoDoCadastro }) {
+  return (
+    <span className="historico-mudanca">
+      <AntesEDepoisDoEvento evento={evento} />
       {evento.motivo && <span>{rotuloDoMotivo(evento.acao)}: {evento.motivo}</span>}
     </span>
   )

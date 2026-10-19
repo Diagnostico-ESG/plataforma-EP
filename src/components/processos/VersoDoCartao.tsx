@@ -43,6 +43,10 @@ export function VersoDoCartao(props: VersoDoCartaoProps) {
   const ler = useCallback(() => processos.lerProcesso(id), [processos, id])
   const { estado, tentarDeNovo, recarregar } = useCarregamento(ler)
   const [sumiu, setSumiu] = useState<string | null>(null)
+  const [aberto, setAberto] = useState<{ id: string; modo: ModoDoVerso }>({ id, modo: 'verso' })
+  // Trocar de processo (pai, subprocesso) volta ao verso: o modo guarda de quem ele é.
+  const modo = aberto.id === id ? aberto.modo : 'verso'
+  const aoMudarModo = (novo: ModoDoVerso) => setAberto({ id, modo: novo })
   const aoSumir = () => {
     setSumiu(id)
     aoMudar()
@@ -50,8 +54,9 @@ export function VersoDoCartao(props: VersoDoCartaoProps) {
   const atual = estadoDoVerso(estado, id, sumiu)
   const rotulo = atual.tipo === 'pronto' && atual.valor ? `Processo ${atual.valor.nome}` : 'Processo'
   return (
-    <JanelaDoVerso rotulo={rotulo} aoFechar={aoFechar}>
-      <ConteudoDoVerso {...props} estado={atual} aoTentarDeNovo={tentarDeNovo} aoAtualizar={recarregar} aoSumir={aoSumir} />
+    <JanelaDoVerso rotulo={rotulo} aoFechar={aoFechar} aoCancelar={modo === 'verso' ? aoFechar : () => aoMudarModo('verso')}
+      estreita={atual.tipo === 'pronto' && modo === 'editar'}>
+      <ConteudoDoVerso {...props} modo={modo} aoMudarModo={aoMudarModo} estado={atual} aoTentarDeNovo={tentarDeNovo} aoAtualizar={recarregar} aoSumir={aoSumir} />
     </JanelaDoVerso>
   )
 }
@@ -66,6 +71,8 @@ function estadoDoVerso(
 }
 
 type ConteudoProps = VersoDoCartaoProps & {
+  modo: ModoDoVerso
+  aoMudarModo: (modo: ModoDoVerso) => void
   estado: EstadoDoCarregamento<ProcessoLido | null>
   aoTentarDeNovo: () => void
   aoAtualizar: () => void
@@ -100,11 +107,12 @@ function SemProcesso({ aoFechar, children }: { aoFechar: () => void; children: R
 /** Verso, Histórico ou Editar: os dois últimos trocam o conteúdo da janela, sem endereço próprio (spec, "Navegação"). */
 type ModoDoVerso = 'verso' | 'historico' | 'editar'
 
-type ProcessoAbertoProps = VersoDoCartaoProps & { processo: ProcessoLido; aoAtualizar: () => void; aoSumir: () => void }
+type ProcessoAbertoProps = VersoDoCartaoProps & {
+  processo: ProcessoLido; modo: ModoDoVerso; aoMudarModo: (modo: ModoDoVerso) => void; aoAtualizar: () => void; aoSumir: () => void
+}
 
 function ProcessoAberto(props: ProcessoAbertoProps) {
-  const { processo, processos, podeAlterar, aoFechar, aoMudar, aoAtualizar, aoSumir } = props
-  const [modo, setModo] = useState<ModoDoVerso>('verso')
+  const { processo, processos, podeAlterar, aoFechar, aoMudar, aoAtualizar, aoSumir, modo, aoMudarModo } = props
   const titulo = useRef<HTMLHeadingElement>(null)
   const { falha, executar } = useGravacaoComFalha(aoSumir)
   // O foco vai ao nome ao abrir, ao trocar de processo (pai, subprocesso) e ao trocar de modo, que some com o botão usado.
@@ -120,19 +128,19 @@ function ProcessoAberto(props: ProcessoAbertoProps) {
   }
   const acoes = (
     <AcoesDoProcesso processo={processo} processos={processos} podeAlterar={podeAlterar} executar={executar}
-      aoAbrirHistorico={() => setModo('historico')} aoEditar={() => setModo('editar')} aoExcluir={aposExcluir}
+      aoAbrirHistorico={() => aoMudarModo('historico')} aoEditar={() => aoMudarModo('editar')} aoExcluir={aposExcluir}
       aoMudar={aposMudar} />
   )
   return (
     <>
       <CabecalhoDoVerso processo={processo} titulo={titulo} acoes={acoes} aoFechar={aoFechar} />
       {falha && <p className="cadastros-falha verso-falha" role="alert">{falha}</p>}
-      <CorpoDoVerso {...props} modo={modo} executar={executar} aoVoltar={() => setModo('verso')} aposMudar={aposMudar} />
+      <CorpoDoVerso {...props} executar={executar} aoVoltar={() => aoMudarModo('verso')} aposMudar={aposMudar} />
     </>
   )
 }
 
-type CorpoProps = ProcessoAbertoProps & { modo: ModoDoVerso; executar: Executar; aoVoltar: () => void; aposMudar: () => void }
+type CorpoProps = ProcessoAbertoProps & { executar: Executar; aoVoltar: () => void; aposMudar: () => void }
 
 function CorpoDoVerso(props: CorpoProps) {
   const { modo, processos, processo, aoVoltar } = props

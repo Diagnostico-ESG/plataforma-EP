@@ -198,7 +198,7 @@ test('o histórico do processo mostra só a troca da data, com o autor', async (
   falso.historicoDosProcessos = { p1: [troca] }
   await escolherNoMenuDoProcesso('Histórico')
   const [item] = await screen.findAllByRole('listitem')
-  expect(within(item).getByText('Ana Teste')).toBeTruthy()
+  expect(within(item).getByRole('img', { name: 'Ana Teste' })).toBeTruthy()
   expect(within(item).getByText('Antes: Reunião de modelagem piloto: 14/10/2026')).toBeTruthy()
   expect(within(item).getByText('Depois: Reunião de modelagem piloto: 20/10/2026')).toBeTruthy()
 })

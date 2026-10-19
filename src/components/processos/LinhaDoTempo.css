@@ -1,0 +1,53 @@
+/* O histórico do processo no verso: uma linha do tempo por dia, sem caixas; a hora em mono e as iniciais à esquerda. */
+.linha-do-tempo {
+  display: grid;
+  gap: var(--esp-5);
+}
+
+.linha-do-tempo-titulo {
+  margin: 0 0 var(--esp-2);
+  color: var(--texto-2);
+  font-size: var(--tam-rotulo);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.linha-do-tempo-eventos {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.linha-do-tempo-evento {
+  display: grid;
+  grid-template-columns: 3.5rem 24px 1fr;
+  align-items: start;
+  gap: var(--esp-3);
+  padding: var(--esp-2) 0;
+  border-bottom: 1px solid var(--linha);
+  font-size: var(--tam-secundario);
+}
+
+.linha-do-tempo-hora {
+  padding-top: 2px;
+  color: var(--texto-2);
+  font-family: var(--fonte-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.linha-do-tempo-texto {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.linha-do-tempo-mudanca {
+  display: grid;
+  color: var(--texto-2);
+}
+
+.linha-do-tempo-motivo {
+  color: var(--texto-2);
+  font-style: italic;
+}
