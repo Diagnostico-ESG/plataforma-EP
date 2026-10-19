@@ -93,6 +93,7 @@ test('Concluir passa a etapa atual para a seguinte e o cartão muda de coluna no
     doProcesso(5, 'relatorio', 'Relatório e modelagem técnica'),
   ] })] })
   fireEvent.click((await etapa('Reunião de modelagem')).getByRole('button', { name: 'Concluir' }))
+  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Concluir e iniciar Relatório e modelagem técnica' }))
   // O avanço já inicia a seguinte: ela chega em andamento, com Concluir.
   expect(await (await etapa('Relatório e modelagem técnica')).findByRole('button', { name: 'Concluir' })).toBeTruthy()
   const coluna = within(await screen.findByRole('region', { name: 'Relatório e modelagem técnica' }))
@@ -117,9 +118,9 @@ test('Realizada anteriormente grava com a nota', async () => {
   const falso = montar()
   fireEvent.click((await etapa('Reunião de modelagem')).getByRole('button', { name: 'Realizada anteriormente' }))
   const janela = within(screen.getByRole('dialog', {
-    name: 'Registrar a etapa Reunião de modelagem como realizada anteriormente?' }))
+    name: 'Registrar Reunião de modelagem como realizada anteriormente e iniciar Relatório e modelagem técnica' }))
   fireEvent.change(janela.getByLabelText('Nota'), { target: { value: 'Feita em 2025' } })
-  fireEvent.click(janela.getByRole('button', { name: 'Registrar' }))
+  fireEvent.click(janela.getByRole('button', { name: 'Registrar e iniciar Relatório e modelagem técnica' }))
   expect(await (await etapa('Reunião de modelagem')).findByText('Realizada anteriormente')).toBeTruthy()
   expect(falso.chamadas).toEqual([{ acao: 'realizada', id: 'a4', nota: 'Feita em 2025', usuarioId: null }])
 })
@@ -131,6 +132,7 @@ test('resolvidas as obrigatórias, a pílula Concluído aparece no painel e o ca
     doProcesso(9, 'publicacao', 'Publicação', { obrigatoria: false }),
   ], etapaAtual: { codigo: 'relatorio', nome: 'Relatório e modelagem técnica', ordem: 5 } })] })
   fireEvent.click((await etapa('Relatório e modelagem técnica')).getByRole('button', { name: 'Concluir' }))
+  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Concluir e iniciar Publicação' }))
   expect(await (await painel()).findByText('Concluído')).toBeTruthy()
   expect(screen.queryByRole('link', { name: /Emitir Ofício/ })).toBeNull()
 })

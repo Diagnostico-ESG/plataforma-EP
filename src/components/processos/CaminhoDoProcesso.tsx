@@ -7,6 +7,8 @@ type CaminhoDoProcessoProps = {
   processo: ProcessoLido
   processos: ModuloDeProcessos
   podeAlterar: boolean
+  /** Quem está na tela, para a janela de avanço o marcar como responsável. */
+  usuarioId: string
   aoMudar: () => void
   aoSumir: () => void
 }
@@ -18,7 +20,7 @@ function avisoDoProcessoParado({ situacao, motivoDaSituacao }: ProcessoLido): st
 }
 
 /** O caminho do processo no painel, com as ações na etapa atual para quem pode alterar (a RLS é quem protege). */
-export function CaminhoDoProcesso({ processo, processos, podeAlterar, aoMudar, aoSumir }: CaminhoDoProcessoProps) {
+export function CaminhoDoProcesso({ processo, processos, podeAlterar, usuarioId, aoMudar, aoSumir }: CaminhoDoProcessoProps) {
   // Quem não altera não escolhe responsável: não precisa da lista. Falha ao lê-la deixa o seletor só com o atual.
   const ler = useCallback(
     () => (podeAlterar ? processos.listarResponsaveisPossiveis() : Promise.resolve([])), [processos, podeAlterar])
@@ -30,7 +32,7 @@ export function CaminhoDoProcesso({ processo, processos, podeAlterar, aoMudar, a
       <h3 className="painel-subtitulo">Etapas do processo</h3>
       {parado && <p className="painel-aviso" role="status">{avisoDoProcessoParado(processo)}</p>}
       <CaminhoDeEtapas processos={processos} etapas={processo.etapasDoProcesso} podeAlterar={podeAlterar && !parado}
-        usuarios={usuarios} aoMudar={aoMudar} aoSumir={aoSumir} />
+        usuarios={usuarios} usuarioId={usuarioId} aoMudar={aoMudar} aoSumir={aoSumir} />
     </section>
   )
 }

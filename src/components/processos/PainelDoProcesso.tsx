@@ -24,6 +24,8 @@ type PainelDoProcessoProps = {
   versoes: ModuloDeVersoes
   id: string
   podeAlterar: boolean
+  /** Quem está na tela. */
+  usuarioId: string
   aoFechar: () => void
   /** O processo mudou ou foi excluído: o Quadro atrás do painel precisa recarregar. */
   aoMudar: () => void
@@ -112,7 +114,7 @@ function ProcessoAberto(props: ProcessoAbertoProps) {
 // Os dados viram o formulário na edição; salvar volta aos dados, já atualizados, e o Quadro recarrega.
 function DetalhesDoProcesso(props: ProcessoAbertoProps) {
   const {
-    processo, processos, cadastros, versoes, podeAlterar, aoFechar, aoMudar, aoAtualizar, aoSumir, enderecoDoProcesso,
+    processo, processos, cadastros, versoes, podeAlterar, usuarioId, aoFechar, aoMudar, aoAtualizar, aoSumir, enderecoDoProcesso,
   } = props
   const [editando, setEditando] = useState(false)
 
@@ -140,7 +142,7 @@ function DetalhesDoProcesso(props: ProcessoAbertoProps) {
 
   return (
     <>
-      <CaminhoDoProcesso processo={processo} processos={processos} podeAlterar={podeAlterar} aoSumir={aoSumir}
+      <CaminhoDoProcesso processo={processo} processos={processos} podeAlterar={podeAlterar} usuarioId={usuarioId} aoSumir={aoSumir}
         aoMudar={aposMudar} />
       {editando
         ? <FormularioDoProcesso cadastros={cadastros} processos={processos} titulo="Editar processo" inicial={processo} aoSalvar={salvar}
