@@ -58,11 +58,11 @@
 **Interfaces:**
 - Produces: `private.id_da_versao_mais_recente(p_processo uuid) returns uuid`; `private.papeis_que_faltam(p_versao uuid) returns text[]`; `private.conferir_versao_completa(p_processo uuid) returns void`; gatilhos `bloquear_etapa_protegida` (em `etapas`) e `conferir_conclusao_da_etapa` (em `andamentos`). Recusas `etapa_protegida:<nome>`, `sem_versao`, `versao_incompleta:<n>:<faltas>`.
 
-- [ ] **Step 0: Conferir o alvo e ler `.claude/regras/banco.md`** (já lido nesta sessão). `supabase/AMBIENTES.md` "vínculo atual" = `yclkzyoebpsxmgpbcbus` (dev). Árvore sem mudança real (o `database.ts` só difere por fim de linha).
+- [x] **Step 0: Conferir o alvo e ler `.claude/regras/banco.md`** (já lido nesta sessão). `supabase/AMBIENTES.md` "vínculo atual" = `yclkzyoebpsxmgpbcbus` (dev). Árvore sem mudança real (o `database.ts` só difere por fim de linha).
 
-- [ ] **Step 1: Criar a branch e o marco.** `git switch -c revisoes-aprovacao-01`; marco `marco/2026-10-19-inicio-ticket-01-revisoes-aprovacao` (`git tag`), e `git push origin "refs/tags/marco/*:refs/tags/marco/*"` depois.
+- [x] **Step 1: Criar a branch e o marco.** `git switch -c revisoes-aprovacao-01`; marco `marco/2026-10-19-inicio-ticket-01-revisoes-aprovacao` (`git tag`), e `git push origin "refs/tags/marco/*:refs/tags/marco/*"` depois.
 
-- [ ] **Step 2: Escrever o teste que falha** em `supabase/tests/38_etapas_protegidas_e_revisao_do_setor.test.sql`. Cabeçalho, usuários, setor, macroprocesso e os auxiliares `andamento`, `agir`, `status`, `processo`, `arquivo`, `par`, `enviar` são os de `36_trava_do_autor.test.sql` (linhas 1 a 83), com estas mudanças: `plan(30)`; sufixos `T38`/`...38` no lugar de `T14`/`...14` (setor `5f000000-0000-0000-0000-000000000038`, macro `af000000-...-000000000038`); processos `array['Sem Versao', 'Sem Relatorio', 'Sem Png', 'Completa', 'Nova Na Etapa', 'Realizada']`. Depois do cabeçalho, acrescentar o auxiliar que leva o processo até a Revisão pelo setor em andamento e o corpo do teste:
+- [x] **Step 2: Escrever o teste que falha** em `supabase/tests/38_etapas_protegidas_e_revisao_do_setor.test.sql`. Cabeçalho, usuários, setor, macroprocesso e os auxiliares `andamento`, `agir`, `status`, `processo`, `arquivo`, `par`, `enviar` são os de `36_trava_do_autor.test.sql` (linhas 1 a 83), com estas mudanças: `plan(30)`; sufixos `T38`/`...38` no lugar de `T14`/`...14` (setor `5f000000-0000-0000-0000-000000000038`, macro `af000000-...-000000000038`); processos `array['Sem Versao', 'Sem Relatorio', 'Sem Png', 'Completa', 'Nova Na Etapa', 'Realizada']`. Depois do cabeçalho, acrescentar o auxiliar que leva o processo até a Revisão pelo setor em andamento e o corpo do teste:
 
 ```sql
 -- Leva o processo até a Revisão pelo setor em andamento (as etapas 1 a 3 resolvidas, como a2).
@@ -206,9 +206,9 @@ end $$;
 
 Contar as asserções e ajustar o `plan(N)` ao número real (o `finish()` acusa a diferença). Se o `reset role` seguido de `set local role authenticated` perder o `request.jwt.claims`, o teste já o redefine logo depois (como acima).
 
-- [ ] **Step 3: Rodar para ver falhar.** `git add supabase/tests/38_*.sql`, commit "Ticket 01 de revisoes-aprovacao: teste de banco das etapas protegidas e da Revisão pelo setor", `git push -u origin revisoes-aprovacao-01`, disparar "Testes de banco" na branch (navegador do app) e ler o resultado. Esperado: o 38 falha (gatilhos inexistentes: as recusas não vêm e `concluir` passa); os outros arquivos ficam verdes. Se algum teste antigo já concluía a Revisão pelo setor (`concluida`) e vai falhar depois da migração, anotar para o Step 5.
+- [x] **Step 3: Rodar para ver falhar.** `git add supabase/tests/38_*.sql`, commit "Ticket 01 de revisoes-aprovacao: teste de banco das etapas protegidas e da Revisão pelo setor", `git push -u origin revisoes-aprovacao-01`, disparar "Testes de banco" na branch (navegador do app) e ler o resultado. Esperado: o 38 falha (gatilhos inexistentes: as recusas não vêm e `concluir` passa); os outros arquivos ficam verdes. Se algum teste antigo já concluía a Revisão pelo setor (`concluida`) e vai falhar depois da migração, anotar para o Step 5.
 
-- [ ] **Step 4: Escrever a migração.** `npx supabase migration new etapas_protegidas_e_revisao_do_setor`, com:
+- [x] **Step 4: Escrever a migração.** `npx supabase migration new etapas_protegidas_e_revisao_do_setor`, com:
 
 ```sql
 -- Etapas protegidas e Revisão pelo setor com versão completa (revisoes-aprovacao, ticket 01; ADR 0015). Não destrutiva:
@@ -291,9 +291,9 @@ grant execute on function private.id_da_versao_mais_recente(uuid), private.papei
   to authenticated;
 ```
 
-- [ ] **Step 5: Aplicar e testar.** Commit da migração; `git push`; disparar "Migrar banco de desenvolvimento" na branch (informar a migração; o vínculo é o dev) e depois "Testes de banco". Esperado: os 38 arquivos verdes. Se um teste antigo (17 a 37) concluir a Revisão pelo setor por `concluida`/`avancar_etapa` e falhar com `sem_versao`, ajustá-lo para montar uma versão completa antes (`registrar_versao` + `acrescentar_relatorio`, como o 38) e repetir. Se o 38 falhar por montagem do próprio teste, corrigir o teste.
+- [x] **Step 5: Aplicar e testar.** Commit da migração; `git push`; disparar "Migrar banco de desenvolvimento" na branch (informar a migração; o vínculo é o dev) e depois "Testes de banco". Esperado: os 38 arquivos verdes. Se um teste antigo (17 a 37) concluir a Revisão pelo setor por `concluida`/`avancar_etapa` e falhar com `sem_versao`, ajustá-lo para montar uma versão completa antes (`registrar_versao` + `acrescentar_relatorio`, como o 38) e repetir. Se o 38 falhar por montagem do próprio teste, corrigir o teste.
 
-- [ ] **Step 6: Tipos e registro.** `npm run db:types` (vínculo conferido; porta 443), confirmar que só mudou o fim de linha (nenhuma função pública nova: o `Functions` não muda); se o `database.ts` ficar modificado só por CRLF, `git restore` fica bloqueado — guardar cópia antes e restaurar a cópia. Acrescentar o registro em `supabase/AMBIENTES.md` (migração, teste 38 falhou antes e passou depois, números dos workflows) e comitar: "Ticket 01 de revisoes-aprovacao: migração das etapas protegidas e da Revisão pelo setor".
+- [x] **Step 6: Tipos e registro.** `npm run db:types` (vínculo conferido; porta 443), confirmar que só mudou o fim de linha (nenhuma função pública nova: o `Functions` não muda); se o `database.ts` ficar modificado só por CRLF, `git restore` fica bloqueado — guardar cópia antes e restaurar a cópia. Acrescentar o registro em `supabase/AMBIENTES.md` (migração, teste 38 falhou antes e passou depois, números dos workflows) e comitar: "Ticket 01 de revisoes-aprovacao: migração das etapas protegidas e da Revisão pelo setor".
 
 ---
 
@@ -306,7 +306,7 @@ grant execute on function private.id_da_versao_mais_recente(uuid), private.papei
 **Interfaces:**
 - Produces: `PapelDoArquivo` (de `../versoes/tipos`); `UltimaVersao = { numero: number; autorId: string; autorNome: string; papeis: PapelDoArquivo[] }`; `faltasDaVersao(papeis: PapelDoArquivo[]): PapelDoArquivo[]`; `fraseDaVersaoIncompleta(numero: number | string, faltas: string[]): string`; `FRASE_SEM_VERSAO: string`; `fraseDoBloqueioDaConclusao(ultima: UltimaVersao | null): string | null`; `fraseDaEtapaProtegida(nome: string): string` (em `frasesDoCatalogo.ts`).
 
-- [ ] **Step 1: Teste que falha** `src/processos/frasesDaVersaoCompleta.test.ts`:
+- [x] **Step 1: Teste que falha** `src/processos/frasesDaVersaoCompleta.test.ts`:
 
 ```ts
 import { describe, expect, it } from 'vitest'
@@ -334,7 +334,7 @@ describe('frasesDaVersaoCompleta', () => {
 
 Rodar `npx vitest run src/processos/frasesDaVersaoCompleta.test.ts` → FALHA (módulo inexistente).
 
-- [ ] **Step 2: Implementar** `src/processos/frasesDaVersaoCompleta.ts`:
+- [x] **Step 2: Implementar** `src/processos/frasesDaVersaoCompleta.ts`:
 
 ```ts
 import type { PapelDoArquivo } from '../versoes/tipos'
@@ -365,9 +365,9 @@ export function fraseDoBloqueioDaConclusao(ultima: UltimaVersao | null): string 
 }
 ```
 
-- [ ] **Step 3: `UltimaVersao.papeis`.** Em `src/processos/tipos.ts` trocar a linha 114 por `export type UltimaVersao = { numero: number; autorId: string; autorNome: string; papeis: PapelDoArquivo[] }` e importar `PapelDoArquivo` de `../versoes/tipos`; atualizar o comentário ("e os papéis dos arquivos dela"). Nas fixtures listadas acrescentar `papeis: ['bpmn', 'png']` (o `tsc -b` aponta cada uma). Rodar `npx tsc -b` até limpar.
+- [x] **Step 3: `UltimaVersao.papeis`.** Em `src/processos/tipos.ts` trocar a linha 114 por `export type UltimaVersao = { numero: number; autorId: string; autorNome: string; papeis: PapelDoArquivo[] }` e importar `PapelDoArquivo` de `../versoes/tipos`; atualizar o comentário ("e os papéis dos arquivos dela"). Nas fixtures listadas acrescentar `papeis: ['bpmn', 'png']` (o `tsc -b` aponta cada uma). Rodar `npx tsc -b` até limpar.
 
-- [ ] **Step 4: Frase do catálogo.** Em `frasesDoCatalogo.ts` acrescentar:
+- [x] **Step 4: Frase do catálogo.** Em `frasesDoCatalogo.ts` acrescentar:
 
 ```ts
 export function fraseDaEtapaProtegida(nome: string): string {
@@ -375,9 +375,9 @@ export function fraseDaEtapaProtegida(nome: string): string {
 }
 ```
 
-- [ ] **Step 5: Leitura real.** Teste primeiro em `lerProcessoSupabase.test.ts` (seguir o cliente simulado que o arquivo já usa para `versoes`): a linha da versão passa a trazer `arquivos: [{ papel: 'bpmn' }, { papel: 'png' }]` e o esperado é `ultimaVersao.papeis` igual a `['bpmn', 'png']`; um caso sem arquivos dá `[]`. Rodar → FALHA. Implementar em `lerUltimaVersao`: `select('numero, enviada_por, autor:usuarios(nome), arquivos:arquivos_da_versao(papel)')`, tipo da linha com `arquivos: { papel: PapelDoArquivo }[]` e retorno `{ ..., papeis: ultima.arquivos.map((arquivo) => arquivo.papel) }`. Rodar → PASSA.
+- [x] **Step 5: Leitura real.** Teste primeiro em `lerProcessoSupabase.test.ts` (seguir o cliente simulado que o arquivo já usa para `versoes`): a linha da versão passa a trazer `arquivos: [{ papel: 'bpmn' }, { papel: 'png' }]` e o esperado é `ultimaVersao.papeis` igual a `['bpmn', 'png']`; um caso sem arquivos dá `[]`. Rodar → FALHA. Implementar em `lerUltimaVersao`: `select('numero, enviada_por, autor:usuarios(nome), arquivos:arquivos_da_versao(papel)')`, tipo da linha com `arquivos: { papel: PapelDoArquivo }[]` e retorno `{ ..., papeis: ultima.arquivos.map((arquivo) => arquivo.papel) }`. Rodar → PASSA.
 
-- [ ] **Step 6: Códigos de recusa.** Teste primeiro em `andamentosSupabase.test.ts` (seguir os casos de `autor_da_versao`): `concluirEtapa` com erro P0001 `versao_incompleta:8:relatorio` rejeita com `TravaDoBanco` "A V8 está sem relatório."; `sem_versao` → `FRASE_SEM_VERSAO`; `etapa_protegida:Revisão interna` (via `catalogoSupabase.test.ts`, `desativarEtapa`) → `fraseDaEtapaProtegida('Revisão interna')`. Rodar → FALHA. Implementar em `andamentosSupabase.ts`: incluir `sem_versao|versao_incompleta|etapa_protegida` no `PADRAO_DA_RECUSA` e no `FRASE_DA_RECUSA`:
+- [x] **Step 6: Códigos de recusa.** Teste primeiro em `andamentosSupabase.test.ts` (seguir os casos de `autor_da_versao`): `concluirEtapa` com erro P0001 `versao_incompleta:8:relatorio` rejeita com `TravaDoBanco` "A V8 está sem relatório."; `sem_versao` → `FRASE_SEM_VERSAO`; `etapa_protegida:Revisão interna` (via `catalogoSupabase.test.ts`, `desativarEtapa`) → `fraseDaEtapaProtegida('Revisão interna')`. Rodar → FALHA. Implementar em `andamentosSupabase.ts`: incluir `sem_versao|versao_incompleta|etapa_protegida` no `PADRAO_DA_RECUSA` e no `FRASE_DA_RECUSA`:
 
 ```ts
   sem_versao: () => FRASE_SEM_VERSAO,
@@ -390,7 +390,7 @@ export function fraseDaEtapaProtegida(nome: string): string {
 
 (importar de `./frasesDaVersaoCompleta` e `./frasesDoCatalogo`). Se a função ficar com complexidade acima do limite, o objeto não conta; a regex é uma constante. Rodar → PASSA.
 
-- [ ] **Step 7: Rodar `npm test` (os novos e as fixtures) e comitar:** "Ticket 01 de revisoes-aprovacao: frases e leitura dos arquivos da versão mais recente".
+- [x] **Step 7: Rodar `npm test` (os novos e as fixtures) e comitar:** "Ticket 01 de revisoes-aprovacao: frases e leitura dos arquivos da versão mais recente".
 
 ---
 
@@ -403,9 +403,9 @@ export function fraseDaEtapaProtegida(nome: string): string {
 - Consumes: `fraseDoBloqueioDaConclusao`, `fraseDaEtapaProtegida`, `UltimaVersao.papeis`.
 - Produces: `conferirVersaoDaRevisaoDoSetor(etapa: EtapaDoCaminho, ultimaVersao: UltimaVersao | null): void` em `andamentoFalso.ts` (lança `TravaDoBanco` com a frase quando a etapa é a `revisao_setor` e a versão está incompleta ou ausente); `CatalogoFalso` recusa `desativarEtapa` e `excluirEtapa` das três etapas protegidas (códigos `revisao_interna`, `revisao_setor`, `aprovacao_setor`).
 
-- [ ] **Step 1: Testes que falham.** Em `ProcessosFalso.avanco.test.ts` (seguir o `describe` existente, com um processo cuja Revisão pelo setor está em andamento e a seguinte pendente): (a) `concluirEtapa` com `ultimaVersao: null` rejeita com `TravaDoBanco` de mensagem `FRASE_SEM_VERSAO`; (b) com `papeis: ['bpmn', 'png']` rejeita "A V3 está sem relatório." e a etapa continua em andamento; (c) com `papeis: ['bpmn', 'png', 'relatorio']` conclui e inicia a próxima; (d) `registrarRealizadaAnteriormente` passa sem versão. Em `CatalogoFalso.test.ts`: `desativarEtapa` e `excluirEtapa` de cada uma das três etapas rejeitam com a frase de `fraseDaEtapaProtegida` e a lista não muda; renomear e mover seguem. Rodar → FALHAM.
+- [x] **Step 1: Testes que falham.** Em `ProcessosFalso.avanco.test.ts` (seguir o `describe` existente, com um processo cuja Revisão pelo setor está em andamento e a seguinte pendente): (a) `concluirEtapa` com `ultimaVersao: null` rejeita com `TravaDoBanco` de mensagem `FRASE_SEM_VERSAO`; (b) com `papeis: ['bpmn', 'png']` rejeita "A V3 está sem relatório." e a etapa continua em andamento; (c) com `papeis: ['bpmn', 'png', 'relatorio']` conclui e inicia a próxima; (d) `registrarRealizadaAnteriormente` passa sem versão. Em `CatalogoFalso.test.ts`: `desativarEtapa` e `excluirEtapa` de cada uma das três etapas rejeitam com a frase de `fraseDaEtapaProtegida` e a lista não muda; renomear e mover seguem. Rodar → FALHAM.
 
-- [ ] **Step 2: Implementar.** `andamentoFalso.ts`:
+- [x] **Step 2: Implementar.** `andamentoFalso.ts`:
 
 ```ts
 const CODIGO_DA_REVISAO_DO_SETOR = 'revisao_setor'
@@ -420,7 +420,7 @@ export function conferirVersaoDaRevisaoDoSetor(etapa: EtapaDoCaminho, ultimaVers
 
 (importar `fraseDoBloqueioDaConclusao`). Em `ProcessosFalso.avancar` chamar, depois de `conferirAvanco(...)` e antes de `conferirAutorDaProxima`: `if (chamada.acao === 'concluir') conferirVersaoDaRevisaoDoSetor(etapa, this.processoDaEtapa(chamada.id).ultimaVersao)`. Manter `ProcessosFalso.ts` ≤ 300 linhas (hoje 288). `CatalogoFalso`: uma constante `PROTEGIDAS = ['revisao_interna', 'revisao_setor', 'aprovacao_setor']` e um método privado `conferirNaoProtegida(etapa)` chamado no começo de `desativarEtapa` e `excluirEtapa` (antes da recusa de "usada"), lançando `new TravaDoBanco(fraseDaEtapaProtegida(etapa.nome))`. Rodar os testes → PASSAM.
 
-- [ ] **Step 3: `npm test` completo.** Quem concluir a Revisão pelo setor pela falsa sem `papeis` completos agora falha: ajustar essas fixtures (o `npm test` mostra quais; só concluem a etapa `revisao_setor` por `concluida`) com `ultimaVersao: { ..., papeis: ['bpmn', 'png', 'relatorio'] }`. Comitar: "Ticket 01 de revisoes-aprovacao: as falsas imitam a trava".
+- [x] **Step 3: `npm test` completo.** Quem concluir a Revisão pelo setor pela falsa sem `papeis` completos agora falha: ajustar essas fixtures (o `npm test` mostra quais; só concluem a etapa `revisao_setor` por `concluida`) com `ultimaVersao: { ..., papeis: ['bpmn', 'png', 'relatorio'] }`. Comitar: "Ticket 01 de revisoes-aprovacao: as falsas imitam a trava".
 
 ---
 
@@ -435,7 +435,7 @@ export function conferirVersaoDaRevisaoDoSetor(etapa: EtapaDoCaminho, ultimaVers
 - Consumes: `fraseDoBloqueioDaConclusao`.
 - Produces: `JanelaDeAvanco` ganha a prop opcional `bloqueio?: string | null` (a frase; com ela o botão principal fica desabilitado e a frase aparece em `role="alert"` acima das opções).
 
-- [ ] **Step 1: Ler os testes de tela vizinhos** (`App.avancoDaEtapa.test.tsx`, `App.arrastarParaConcluir.test.tsx`, `App.assumirEAutor.test.tsx`) e copiar o `renderizar`/montagem do aplicativo inteiro com `AcessoFalso`, `CadastrosFalso`, `ProcessosFalso` e `VersoesFalso`. Escrever `src/App.revisaoDoSetor.test.tsx` com um processo cuja Revisão pelo setor (etapa 4) está em andamento e a Aprovação pelo setor (5) pendente, e os casos:
+- [x] **Step 1: Ler os testes de tela vizinhos** (`App.avancoDaEtapa.test.tsx`, `App.arrastarParaConcluir.test.tsx`, `App.assumirEAutor.test.tsx`) e copiar o `renderizar`/montagem do aplicativo inteiro com `AcessoFalso`, `CadastrosFalso`, `ProcessosFalso` e `VersoesFalso`. Escrever `src/App.revisaoDoSetor.test.tsx` com um processo cuja Revisão pelo setor (etapa 4) está em andamento e a Aprovação pelo setor (5) pendente, e os casos:
   1. Pelo [Concluir] do Agora, com `ultimaVersao` V8 com `papeis: ['bpmn', 'png']`: a janela mostra "A V8 está sem relatório." e o botão "Concluir e iniciar Aprovação pelo setor" está desabilitado; clicar não grava (`processos.chamadas` vazio).
   2. Pelo arrastar do cartão no Quadro para a coluna seguinte (seguir `App.arrastarParaConcluir`): a mesma janela, a mesma frase, botão desabilitado.
   3. `ultimaVersao: null`: "O processo ainda não tem versão enviada."
@@ -446,7 +446,7 @@ export function conferirVersaoDaRevisaoDoSetor(etapa: EtapaDoCaminho, ultimaVers
   8. Concluir a Revisão interna com versão sem relatório continua como hoje (o bloqueio é só da `revisao_setor`).
   Rodar `npx vitest run src/App.revisaoDoSetor.test.tsx` → os casos 1 a 4 FALHAM (sem bloqueio na janela).
 
-- [ ] **Step 2: Implementar a janela.** `JanelaDeAvanco.tsx`: prop `bloqueio?: string | null`; `const pronta = !comNota || nota.trim() !== ''` vira `const pronta = (!comNota || nota.trim() !== '') && !bloqueio`; acima do `EscolhaDoResponsavel`, `{bloqueio && <p role="alert" className="janela-aviso-vermelho">{bloqueio}</p>}` — usar a classe de aviso que `JanelaComCampo`/`JanelaDeReclassificacao` já usam para a falha em vermelho (conferir o nome em `JanelaDeConfirmacao.css`; se não houver, reaproveitar a classe de erro das janelas). O `confirmar()` já ignora quando `!pronta`. `JanelasDaEtapa.tsx`, em `JanelaDoAvancoDaEtapa`:
+- [x] **Step 2: Implementar a janela.** `JanelaDeAvanco.tsx`: prop `bloqueio?: string | null`; `const pronta = !comNota || nota.trim() !== ''` vira `const pronta = (!comNota || nota.trim() !== '') && !bloqueio`; acima do `EscolhaDoResponsavel`, `{bloqueio && <p role="alert" className="janela-aviso-vermelho">{bloqueio}</p>}` — usar a classe de aviso que `JanelaComCampo`/`JanelaDeReclassificacao` já usam para a falha em vermelho (conferir o nome em `JanelaDeConfirmacao.css`; se não houver, reaproveitar a classe de erro das janelas). O `confirmar()` já ignora quando `!pronta`. `JanelasDaEtapa.tsx`, em `JanelaDoAvancoDaEtapa`:
 
 ```tsx
   const bloqueio = acao === 'concluir' && etapa.codigo === 'revisao_setor' ? fraseDoBloqueioDaConclusao(ultimaVersao) : null
@@ -456,9 +456,9 @@ export function conferirVersaoDaRevisaoDoSetor(etapa: EtapaDoCaminho, ultimaVers
 
 (importar de `../../processos/frasesDaVersaoCompleta`). Rodar o arquivo → PASSA. O arrastar usa `useConclusaoPeloQuadro`, que já lê `lerProcesso(...).ultimaVersao`: nada a mudar lá (confirmar pelo caso 2).
 
-- [ ] **Step 3: Catálogo na Administração.** Em `App.catalogoDeEtapas.test.tsx` (seguir os casos de "Desativar"/"Excluir" já existentes): com o catálogo da falsa tendo a Revisão interna, ao desativar e ao excluir ela, a frase "A etapa Revisão interna é obrigatória no fluxo: não pode ser desativada nem excluída." aparece em vermelho na administração, e a etapa continua na lista; renomear segue aceito. Se a tela já mostra a `TravaDoBanco` da falsa (como mostra a de "etapa usada"), o teste passa só com o Task 3; senão, ajustar o componente da administração para exibir a mensagem (ver `src/components/` do catálogo; o caminho do erro de "etapa usada" é o modelo).
+- [x] **Step 3: Catálogo na Administração.** Em `App.catalogoDeEtapas.test.tsx` (seguir os casos de "Desativar"/"Excluir" já existentes): com o catálogo da falsa tendo a Revisão interna, ao desativar e ao excluir ela, a frase "A etapa Revisão interna é obrigatória no fluxo: não pode ser desativada nem excluída." aparece em vermelho na administração, e a etapa continua na lista; renomear segue aceito. Se a tela já mostra a `TravaDoBanco` da falsa (como mostra a de "etapa usada"), o teste passa só com o Task 3; senão, ajustar o componente da administração para exibir a mensagem (ver `src/components/` do catálogo; o caminho do erro de "etapa usada" é o modelo).
 
-- [ ] **Step 4: `npm test` completo, `npx tsc -b`, `npx madge --circular src`, `npx eslint src`.** Comitar: "Ticket 01 de revisoes-aprovacao: a janela de concluir diz o que falta na versão".
+- [x] **Step 4: `npm test` completo, `npx tsc -b`, `npx madge --circular src`, `npx eslint src`.** Comitar: "Ticket 01 de revisoes-aprovacao: a janela de concluir diz o que falta na versão".
 
 ---
 
@@ -467,10 +467,10 @@ export function conferirVersaoDaRevisaoDoSetor(etapa: EtapaDoCaminho, ultimaVers
 **Files:**
 - Modify: `.scratch/revisoes-aprovacao/desvios.md` (novo), `.scratch/revisoes-aprovacao/spec.md` (só se algo divergir), `.scratch/revisoes-aprovacao/issues/01-*.md` (marcas `[x]`), `CONTEXT.md` (só se houver termo novo), `.scratch/melhorias-protocolo.md`
 
-- [ ] **Step 1: Conferência na tela** (critérios [visual] são dos tickets 02/03; aqui só o texto): subir o Vite (`.claude/launch.json` já tem a configuração) e, na vitrine local, abrir a janela de concluir a Revisão pelo setor com versão incompleta; registrar se a conferência foi feita ou presumida.
-- [ ] **Step 2: `desvios.md`** (entrada datada): (1) "versão mais recente" = não histórica de maior número; (2) a falsa de processos usa `ultimaVersao.papeis` em vez de consultar a falsa de versões; (3) gatilho de conclusão genérico `conferir_conclusao_da_etapa`; (4) nome `bloquear_etapa_protegida` pela ordem alfabética dos gatilhos.
-- [ ] **Step 3: Marcar os critérios do ticket (`- [x]`) e as caixas deste plano; `.scratch/melhorias-protocolo.md`** com os itens não testados deste comando (conforme `.claude/regras/nao-testados.md`, bloco do `/executar-complexo`).
-- [ ] **Step 4: Comitar** "Ticket 01 de revisoes-aprovacao: desvios, critérios e melhorias do protocolo".
+- [ ] **Step 1: Conferência na tela (NÃO FEITA: registrada nos desvios; fica para o /polir)** (critérios [visual] são dos tickets 02/03; aqui só o texto): subir o Vite (`.claude/launch.json` já tem a configuração) e, na vitrine local, abrir a janela de concluir a Revisão pelo setor com versão incompleta; registrar se a conferência foi feita ou presumida.
+- [x] **Step 2: `desvios.md`** (entrada datada): (1) "versão mais recente" = não histórica de maior número; (2) a falsa de processos usa `ultimaVersao.papeis` em vez de consultar a falsa de versões; (3) gatilho de conclusão genérico `conferir_conclusao_da_etapa`; (4) nome `bloquear_etapa_protegida` pela ordem alfabética dos gatilhos.
+- [x] **Step 3: Marcar os critérios do ticket (`- [x]`) e as caixas deste plano; `.scratch/melhorias-protocolo.md`** com os itens não testados deste comando (conforme `.claude/regras/nao-testados.md`, bloco do `/executar-complexo`).
+- [x] **Step 4: Comitar** "Ticket 01 de revisoes-aprovacao: desvios, critérios e melhorias do protocolo".
 
 (O merge na `main`, a linha `Concluído em` e o envio ficam por conta do passo 4 do `/executar-complexo`.)
 

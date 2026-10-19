@@ -10,7 +10,7 @@
 
 ## Critérios de aceite
 
-- [ ] Banco: testes antes da migração: desativar e excluir as três etapas recusados, renomear e mover aceitos; concluir a Revisão pelo setor sem versão, com versão sem relatório, sem .bpmn ou sem .png recusado com o que falta; com versão completa aceito; com versão nova completa enviada na própria etapa aceito; "realizada anteriormente" aceita sem versão. Os testes antigos que concluem a etapa 4 passam a montar uma versão completa antes.
-- [ ] A janela de concluir a Revisão pelo setor, pelo Agora e pelo arrastar no Quadro, mostra "A V8 está sem relatório." (ou o que faltar, ou que não há versão) e não deixa concluir; com versão completa, conclui como hoje.
-- [ ] A recusa do catálogo aparece como frase na administração do catálogo de etapas.
-- [ ] Testes de interface com as falsas cobrindo os itens acima, inclusive a recusa que vem do banco por outro caminho.
+- [x] Banco: testes antes da migração: desativar e excluir as três etapas recusados, renomear e mover aceitos; concluir a Revisão pelo setor sem versão, com versão sem relatório, sem .bpmn ou sem .png recusado com o que falta; com versão completa aceito; com versão nova completa enviada na própria etapa aceito; "realizada anteriormente" aceita sem versão. Os testes antigos que concluem a etapa 4 passam a montar uma versão completa antes.
+- [x] A janela de concluir a Revisão pelo setor, pelo Agora e pelo arrastar no Quadro, mostra "A V8 está sem relatório." (ou o que faltar, ou que não há versão) e não deixa concluir; com versão completa, conclui como hoje.
+- [x] A recusa do catálogo aparece como frase na administração do catálogo de etapas.
+- [x] Testes de interface com as falsas cobrindo os itens acima, inclusive a recusa que vem do banco por outro caminho.
