@@ -483,7 +483,7 @@ export async function gavetaDaEtapa(nome: string) {
 - [x] **Passo 3:** `npm run test:coverage` (cobertura acima de 70%), `npm run check:circular`, `npm run build` (tipos e empacotamento).
 - [x] **Passo 4:** marcar as caixas do plano e dos critérios do ticket que a execução provou (os critérios `[visual]` só com o que foi visto na tela).
 - [x] **Passo 5: commit** `Ticket 17 de processos-etapas: desvios e conferência da tela`.
-- [ ] **Passo 6:** juntar a branch à `main` (`superpowers:finishing-a-development-branch`, opção de merge; `git switch main`), apagar a branch com `git branch -d processos-etapas-17`, gravar `Concluído em AAAA-MM-DD (commit <hash>)` no fim do ticket 17, comitar e enviar a `main` (e o marco) ao GitHub, conferindo o "Testes de banco" só se algo de `supabase/` mudou (não deve ter mudado).
+- [x] **Passo 6:** juntar a branch à `main` (`superpowers:finishing-a-development-branch`, opção de merge; `git switch main`), apagar a branch com `git branch -d processos-etapas-17`, gravar `Concluído em AAAA-MM-DD (commit <hash>)` no fim do ticket 17, comitar e enviar a `main` (e o marco) ao GitHub, conferindo o "Testes de banco" só se algo de `supabase/` mudou (não deve ter mudado).
 
 ## Cobertura dos critérios do ticket
 

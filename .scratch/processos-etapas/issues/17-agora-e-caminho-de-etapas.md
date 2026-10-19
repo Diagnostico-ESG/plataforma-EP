@@ -23,3 +23,5 @@
 - [x] Testes de interface com o aplicativo inteiro cobrindo os itens acima.
 - [x] `[visual]` O Agora é a única coisa acesa da janela: borda de 2 px em `azul` e o único botão principal; na Consulta, borda cinza e sem botões; suspenso em âmbar claro, cancelado em cinza claro e concluído em verde claro.
 - [x] `[visual]` As etapas são linhas compactas e quietas: só o verde de concluída e o azul da atual têm cor; o resto é cinza, com selos neutros para opcional, dispensada e anterior; a gaveta do detalhe abre sem empurrar a janela para fora da tela.
+
+Concluído em 2026-10-19 (commit 4ab2122)
