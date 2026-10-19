@@ -57,7 +57,8 @@ select pg_temp.agir('Processo Volta', 'modelagem', 'concluida');
 select pg_temp.agir('Processo Volta', 'relatorio_modelagem_tecnica', 'em_andamento');
 select pg_temp.agir('Processo Volta', 'relatorio_modelagem_tecnica', 'concluida');
 select pg_temp.agir('Processo Volta', 'revisao_interna', 'em_andamento');
-select pg_temp.agir('Processo Volta', 'revisao_interna', 'concluida');
+-- A Revisão interna só conclui com a revisão da versão mais recente (ticket 02 de revisoes-aprovacao): aqui só importa estar resolvida.
+select pg_temp.agir('Processo Volta', 'revisao_interna', 'realizada_anteriormente', 'Feita antes');
 
 -- Voltar à 4 com a 5 e a 6 concluídas.
 insert into _tap (linha) select lives_ok(

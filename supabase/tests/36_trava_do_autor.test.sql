@@ -147,8 +147,8 @@ select pg_temp.agir('Volta Autor', 'modelagem', 'concluida');
 select pg_temp.agir('Volta Autor', 'relatorio_modelagem_tecnica', 'em_andamento');
 select pg_temp.agir('Volta Autor', 'relatorio_modelagem_tecnica', 'concluida');
 select pg_temp.agir('Volta Autor', 'revisao_interna', 'em_andamento');
-select pg_temp.agir('Volta Autor', 'revisao_interna', 'concluida');
-select pg_temp.agir('Volta Autor', 'revisao_setor', 'em_andamento');
+-- A revisão da V1 (de a1) por a2 conclui a Revisão interna e já inicia a Revisão pelo setor (ticket 02 de revisoes-aprovacao).
+select public.concluir_revisao_interna(pg_temp.andamento('Volta Autor', 'revisao_interna'), 'sem_alteracao', null, null, null);
 insert into _tap (linha) select throws_ok(
   $sql$select public.voltar_a_etapa(pg_temp.andamento('Volta Autor', 'revisao_interna'), 'Refazer',
     '00000000-0000-0000-0000-0000000000a1')$sql$,

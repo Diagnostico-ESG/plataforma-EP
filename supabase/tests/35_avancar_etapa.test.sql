@@ -99,7 +99,8 @@ insert into _tap (linha) select is(
 
 -- "Ninguém por enquanto": a próxima entra em andamento sem responsável.
 insert into _tap (linha) select lives_ok(
-  $sql$select pg_temp.avancar('Processo Avanco', 'revisao_interna', 'concluir', null, null)$sql$, 'concluir a 3 sem responsável');
+  $sql$select pg_temp.avancar('Processo Avanco', 'revisao_interna', 'realizada_anteriormente', 'Feita antes', null)$sql$,
+  'resolver a 3 sem responsável (a conclusão da Revisão interna passa pela função da revisão: teste 39)');
 insert into _tap (linha) select is(pg_temp.status('Processo Avanco', 'revisao_setor'),
   'em_andamento'::public.status_da_etapa, 'a próxima entra em andamento mesmo sem responsável');
 insert into _tap (linha) select is(pg_temp.responsavel('Processo Avanco', 'revisao_setor'), null::uuid,

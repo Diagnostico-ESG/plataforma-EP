@@ -302,9 +302,8 @@ select public.reclassificar_processo(pg_temp.processo('Filho'), 'processo', null
 insert into _tap (linha) select is(pg_temp.revisoes('Filho'), 1::bigint, 'depois de reclassificar, a revisão continua no item');
 
 -- ===== Perfis: administrador, consulta, inativo e visitante =====
-select pg_temp.claims('a1');
+-- A V1 é de a2: o administrador a1 revisa (o autor não revisa a própria versão).
 select pg_temp.enviar('Perfis');
-select pg_temp.claims('a2');
 select pg_temp.ate_a_revisao_interna('Perfis');
 select pg_temp.claims('a3');
 insert into _tap (linha) select ok((select count(*) from public.revisoes_internas) > 0, 'consulta lê as revisões');
