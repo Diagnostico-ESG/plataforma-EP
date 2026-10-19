@@ -8,6 +8,7 @@ import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { ProcessoLido } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
+import { escolherNoMenuDoProcesso, janelasPorCima } from './testes/versoDoCartao'
 
 beforeEach(() => {
   window.location.hash = '#/processos/novo'
@@ -70,8 +71,8 @@ const salvar = (form: ReturnType<typeof within>) => fireEvent.click(form.getByRo
 async function abrirEdicao() {
   window.location.hash = '#/processos/p1'
   const falso = montar({ processos: [EMITIR] })
-  const painel = within(await screen.findByRole('complementary', { name: 'Painel do processo' }))
-  fireEvent.click(await painel.findByRole('button', { name: 'Editar' }))
+  const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
+  await escolherNoMenuDoProcesso('Editar')
   return { falso, painel, form: await formulario('Editar processo') }
 }
 
@@ -162,7 +163,7 @@ test('Esc fecha o painel de cadastro sem gravar', async () => {
   const falso = montar()
   const form = await formulario()
   preencher(form, { nome: 'Emitir Ofício' })
-  fireEvent.keyDown(screen.getByRole('complementary', { name: 'Painel do novo processo' }), { key: 'Escape' })
+  fireEvent.keyDown(screen.getByRole('dialog', { name: 'Novo processo' }), { key: 'Escape' })
   await waitFor(() => expect(window.location.hash).toBe('#/processos'))
   expect(falso.processos).toEqual([])
   expect(form).toBeTruthy()
@@ -182,7 +183,7 @@ test('[Editar] troca os dados pelo formulário preenchido, sem o campo de tipo, 
   expect((form.getByLabelText('Origem') as HTMLSelectElement).value).toBe('retomado')
   escrever(form.getByLabelText('Nome'), 'Emitir Ofício Novo')
   salvar(form)
-  const painel = within(screen.getByRole('complementary', { name: 'Painel do processo' }))
+  const painel = within(screen.getByRole('dialog', { name: /^Processo( |$)/ }))
   expect(await painel.findByRole('heading', { name: 'Emitir Ofício Novo' })).toBeTruthy()
   expect(screen.queryByRole('form', { name: 'Editar processo' })).toBeNull()
   expect(window.location.hash).toBe('#/processos/p1')
@@ -220,21 +221,19 @@ test('editar um processo que já foi excluído por outra pessoa mostra o aviso p
 test('[Excluir] abre a janela com o texto da spec e o foco no Cancelar; Cancelar não exclui', async () => {
   window.location.hash = '#/processos/p1'
   const falso = montar({ processos: [EMITIR] })
-  fireEvent.click(await within(await screen.findByRole('complementary', { name: 'Painel do processo' }))
-    .findByRole('button', { name: 'Excluir' }))
+  await escolherNoMenuDoProcesso('Excluir')
   const janela = within(screen.getByRole('dialog', { name: 'Excluir o processo Emitir Ofício?' }))
   expect(janela.getByText('O histórico guarda o que ele tinha, inclusive as etapas, mas não é possível desfazer.')).toBeTruthy()
   expect(document.activeElement).toBe(janela.getByRole('button', { name: 'Cancelar' }))
   fireEvent.click(janela.getByRole('button', { name: 'Cancelar' }))
-  expect(screen.queryByRole('dialog')).toBeNull()
+  expect(janelasPorCima()).toEqual([])
   expect(falso.processos).toHaveLength(1)
 })
 
 test('confirmar a exclusão apaga o processo, fecha o painel e o cartão some do Quadro', async () => {
   window.location.hash = '#/processos/p1'
   const falso = montar({ processos: [EMITIR] })
-  fireEvent.click(await within(await screen.findByRole('complementary', { name: 'Painel do processo' }))
-    .findByRole('button', { name: 'Excluir' }))
+  await escolherNoMenuDoProcesso('Excluir')
   fireEvent.click(screen.getByRole('button', { name: 'Excluir processo' }))
   await waitFor(() => expect(window.location.hash).toBe('#/processos'))
   expect(await screen.findByText('Nenhum processo cadastrado ainda.')).toBeTruthy()
@@ -244,8 +243,8 @@ test('confirmar a exclusão apaga o processo, fecha o painel e o cartão some do
 test('falha ao excluir mostra o motivo em vermelho no painel, que continua aberto', async () => {
   window.location.hash = '#/processos/p1'
   const falso = montar({ processos: [EMITIR] })
-  const painel = within(await screen.findByRole('complementary', { name: 'Painel do processo' }))
-  fireEvent.click(await painel.findByRole('button', { name: 'Excluir' }))
+  const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
+  await escolherNoMenuDoProcesso('Excluir')
   falso.falhaDeGravacao = new TravaDoBanco('Seu perfil não permite alterar os processos.')
   fireEvent.click(screen.getByRole('button', { name: 'Excluir processo' }))
   const alerta = await painel.findByRole('alert')
@@ -257,8 +256,8 @@ test('falha ao excluir mostra o motivo em vermelho no painel, que continua abert
 test('excluir um processo que já foi excluído por outra pessoa mostra o aviso próprio', async () => {
   window.location.hash = '#/processos/p1'
   const falso = montar({ processos: [EMITIR] })
-  const painel = within(await screen.findByRole('complementary', { name: 'Painel do processo' }))
-  fireEvent.click(await painel.findByRole('button', { name: 'Excluir' }))
+  const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
+  await escolherNoMenuDoProcesso('Excluir')
   act(() => { falso.processos = [] })
   fireEvent.click(screen.getByRole('button', { name: 'Excluir processo' }))
   expect((await painel.findByRole('alert')).textContent).toContain('Este processo não existe mais.')

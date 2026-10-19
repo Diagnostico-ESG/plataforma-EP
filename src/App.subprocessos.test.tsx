@@ -7,6 +7,7 @@ import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { ProcessoLido, TipoDeProcesso } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
+import { escolherNoMenuDoProcesso, janelaPorCima } from './testes/versoDoCartao'
 
 beforeEach(() => {
   window.location.hash = '#/processos/novo'
@@ -132,15 +133,15 @@ test('falha ao gravar o subprocesso: a frase em vermelho e os dados continuam no
 test('a edição do subprocesso não mostra o tipo nem o pai, e o macroprocesso fica fixo', async () => {
   window.location.hash = '#/processos/p3'
   montar()
-  const painel = within(await screen.findByRole('complementary', { name: 'Painel do processo' }))
-  fireEvent.click(await painel.findByRole('button', { name: 'Editar' }))
+  await screen.findByRole('dialog', { name: /^Processo( |$)/ })
+  await escolherNoMenuDoProcesso('Editar')
   const form = await formulario('Editar processo')
   expect(form.queryByLabelText('Tipo')).toBeNull()
   expect(form.queryByLabelText('Processo pai')).toBeNull()
   expect((form.getByLabelText('Macroprocesso') as HTMLSelectElement).disabled).toBe(true)
 })
 
-const painelDoProcesso = async () => within(await screen.findByRole('complementary', { name: 'Painel do processo' }))
+const painelDoProcesso = async () => within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
 
 test('o painel do pai lista os subprocessos, e cada um abre o seu painel, com o link de volta ao pai', async () => {
   window.location.hash = '#/processos/p1'
@@ -170,8 +171,8 @@ test('a Consulta também vê os subprocessos', async () => {
 test('excluir o processo com subprocessos é recusado com a contagem', async () => {
   window.location.hash = '#/processos/p1'
   const falso = montar()
-  fireEvent.click(await (await painelDoProcesso()).findByRole('button', { name: 'Excluir' }))
-  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Excluir processo' }))
+  await escolherNoMenuDoProcesso('Excluir')
+  fireEvent.click(within(janelaPorCima()).getByRole('button', { name: 'Excluir processo' }))
   expect((await (await painelDoProcesso()).findByRole('alert')).textContent)
     .toBe('Este processo tem 1 subprocessos; reclassifique-os ou exclua-os antes.')
   expect(falso.processos).toHaveLength(3)

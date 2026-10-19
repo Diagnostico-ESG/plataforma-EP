@@ -21,7 +21,7 @@ const comDuasVersoes = (ajuste?: (falso: VersoesFalso) => void) => ({
 })
 
 async function abrirFormulario() {
-  const painel = within(await screen.findByRole('complementary', { name: 'Painel do processo' }))
+  const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
   const secao = within(await painel.findByRole('region', { name: 'Versões do processo' }))
   fireEvent.click(await secao.findByRole('button', { name: 'Enviar versão' }))
   return { secao, form: within(await secao.findByRole('form', { name: 'Enviar versão' })) }

@@ -9,6 +9,7 @@ import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { EtapaDoProcesso, ProcessoLido } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
+import { escolherNoMenuDoProcesso, janelaPorCima } from './testes/versoDoCartao'
 
 beforeEach(() => {
   window.location.hash = '#/processos/p1'
@@ -66,7 +67,7 @@ function montar({ perfil = 'integrante_ep', processos = [processo()], ajustar }:
   return falso
 }
 
-const painel = async () => within(await screen.findByRole('complementary', { name: 'Painel do processo' }))
+const painel = async () => within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
 async function etapa(nome: string) {
   const caminho = within(await (await painel()).findByRole('region', { name: 'Caminho de etapas' }))
   return within((await caminho.findByText(nome)).closest('li') as HTMLElement)
@@ -105,7 +106,7 @@ test('voltar à modelagem pede o motivo, grava e devolve as seguintes a pendente
 test('cancelar a janela do motivo não grava', async () => {
   const falso = montar()
   fireEvent.click((await etapa(MODELAGEM)).getByRole('button', { name: 'Voltar a esta etapa' }))
-  fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Cancelar' }))
+  fireEvent.click(within(janelaPorCima()).getByRole('button', { name: 'Cancelar' }))
   expect(falso.chamadas).toEqual([])
   expect((await etapa(MODELAGEM)).getByText('Concluída')).toBeTruthy()
 })
@@ -257,7 +258,7 @@ test('a aba Histórico mostra voltar (com o motivo), corrigir as datas e mudar o
       evento(1, 'voltar', { status: 'concluida' }, { status: 'em_andamento' }, 'Mudou o escopo'),
     ] }
   } })
-  fireEvent.click(await (await painel()).findByRole('tab', { name: 'Histórico' }))
+  await escolherNoMenuDoProcesso('Histórico')
   const lista = within(await (await painel()).findByRole('list'))
   expect(lista.getByText('Voltou à etapa')).toBeTruthy()
   expect(lista.getByText('Corrigiu as datas da etapa')).toBeTruthy()

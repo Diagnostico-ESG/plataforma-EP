@@ -73,16 +73,16 @@ test('as colunas, a ordem por sigla e nome, todas as situações e o pai do subp
   expect(within(screen.getByRole('table')).getByText('Concluído').className).toContain('pilula')
 })
 
-test('clicar na linha abre o painel com a Lista esmaecida atrás; fechar volta à Lista e ao botão da linha', async () => {
+test('clicar na linha abre o verso com a Lista escurecida atrás; fechar volta à Lista e ao botão da linha', async () => {
   montar()
   fireEvent.click((await screen.findAllByRole('cell', { name: 'TSA' }))[0])
   await waitFor(() => expect(window.location.hash).toBe('#/processos/lista/p4'))
-  expect(await screen.findByRole('complementary', { name: 'Painel do processo' })).toBeTruthy()
+  expect(await screen.findByRole('dialog', { name: /^Processo( |$)/ })).toBeTruthy()
   // O botão de fechar do "Carregando processo…" é trocado pelo do cabeçalho; clicar antes pegaria o que já saiu da tela.
   await screen.findByRole('heading', { name: 'Arquivar Pasta' })
-  const fundo = screen.getByRole('table').closest('.quadro-esmaecido')
-  expect(fundo?.hasAttribute('inert')).toBe(true)
-  fireEvent.click(screen.getByRole('button', { name: 'Fechar o painel' }))
+  // O ::backdrop da janela escurece a Lista; o inert a tira do Tab e do leitor de tela.
+  expect(screen.getByRole('table', { hidden: true }).closest('[inert]')).toBeTruthy()
+  fireEvent.click(screen.getByRole('button', { name: 'Fechar a janela' }))
   await waitFor(() => expect(window.location.hash).toBe('#/processos/lista'))
   await waitFor(() => expect(document.activeElement?.id).toBe('linha-p4'))
 })

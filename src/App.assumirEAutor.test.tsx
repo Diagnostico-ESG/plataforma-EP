@@ -8,6 +8,7 @@ import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { EtapaDoProcesso, ProcessoLido, UltimaVersao, UsuarioResponsavel } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
+import { janelasPorCima } from './testes/versoDoCartao'
 
 // [Assumir], a trava do autor da versão mais recente na Revisão interna e voltar com a escolha do responsável
 // (ticket 14 de processos-etapas, ADR 0014).
@@ -82,7 +83,7 @@ function montar(etapas: EtapaDoProcesso[] = CAMINHO, { perfil = 'integrante_ep',
   return falso
 }
 
-const painel = async () => within(await screen.findByRole('complementary', { name: 'Painel do processo' }))
+const painel = async () => within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
 async function etapa(nome: string) {
   const caminho = within(await (await painel()).findByRole('region', { name: 'Caminho de etapas' }))
   return within((await caminho.findByText(nome)).closest('li') as HTMLElement)
@@ -245,7 +246,7 @@ test('"Ninguém por enquanto" volta a etapa sem responsável', async () => {
 test('Cancelar fecha a janela de voltar sem gravar', async () => {
   const falso = montar(CAMINHO_COM_REVISAO_CONCLUIDA)
   fireEvent.click((await abrirVoltar(REVISAO)).getByRole('button', { name: 'Cancelar' }))
-  expect(screen.queryByRole('dialog')).toBeNull()
+  expect(janelasPorCima()).toEqual([])
   expect(falso.chamadas).toEqual([])
   expect((await etapa(REVISAO)).getByText('Concluída')).toBeTruthy()
 })

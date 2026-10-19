@@ -9,6 +9,7 @@ import type { EventoDoCadastro } from './cadastros/tipos'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { EtapaDoProcesso, ProcessoLido, UsuarioResponsavel } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
+import { escolherNoMenuDoProcesso, janelasPorCima } from './testes/versoDoCartao'
 
 beforeEach(() => {
   window.location.hash = '#/processos/p1'
@@ -59,7 +60,7 @@ function montar(etapas: EtapaDoProcesso[] = [MODELAGEM_EM_ANDAMENTO, RELATORIO, 
   return falso
 }
 
-const painel = async () => within(await screen.findByRole('complementary', { name: 'Painel do processo' }))
+const painel = async () => within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
 async function etapa(nome: string) {
   const caminho = within(await (await painel()).findByRole('region', { name: 'Caminho de etapas' }))
   return within((await caminho.findByText(nome)).closest('li') as HTMLElement)
@@ -104,7 +105,7 @@ test('confirmar com outra pessoa conclui a etapa e inicia a próxima com ela', a
   expect((await etapa('Relatório e modelagem técnica')).getByText('Em andamento')).toBeTruthy()
   expect(await responsavelDe('Relatório e modelagem técnica')).toBe('u2')
   expect(falso.chamadas).toEqual([{ acao: 'concluir', id: 'a4', usuarioId: 'u2' }])
-  expect(screen.queryByRole('dialog')).toBeNull()
+  expect(janelasPorCima()).toEqual([])
 })
 
 test('"Ninguém por enquanto" inicia a próxima sem responsável', async () => {
@@ -148,7 +149,7 @@ test('sem etapa pendente depois, Concluir grava direto e o processo fica conclu�
   const falso = montar([MODELAGEM_CONCLUIDA, { ...RELATORIO, status: 'em_andamento', iniciadaEm: '2026-10-13' }])
   await clicar('Relatório e modelagem técnica', 'Concluir')
   expect(await (await painel()).findByText('Concluído')).toBeTruthy()
-  expect(screen.queryByRole('dialog')).toBeNull()
+  expect(janelasPorCima()).toEqual([])
   expect(falso.chamadas).toEqual([{ acao: 'concluir', id: 'a5', usuarioId: null }])
 })
 
@@ -195,7 +196,7 @@ test('Cancelar fecha sem gravar, a etapa fica como estava e a janela recomeça m
   const aberta = janela('Concluir Reunião de modelagem e iniciar Relatório e modelagem técnica')
   fireEvent.click(aberta.getByRole('radio', { name: 'Bia Teste' }))
   fireEvent.click(aberta.getByRole('button', { name: 'Cancelar' }))
-  expect(screen.queryByRole('dialog')).toBeNull()
+  expect(janelasPorCima()).toEqual([])
   expect((await etapa('Reunião de modelagem')).getByText('Em andamento')).toBeTruthy()
   expect(falso.chamadas).toEqual([])
   await clicar('Reunião de modelagem', 'Concluir')
@@ -220,7 +221,7 @@ test('Iniciar continua um clique, sem janela', async () => {
   const falso = montar([{ ...MODELAGEM_EM_ANDAMENTO, status: 'pendente', iniciadaEm: null }, RELATORIO])
   await clicar('Reunião de modelagem', 'Iniciar')
   expect(await (await etapa('Reunião de modelagem')).findByText('Em andamento')).toBeTruthy()
-  expect(screen.queryByRole('dialog')).toBeNull()
+  expect(janelasPorCima()).toEqual([])
   expect(falso.chamadas).toEqual([{ acao: 'iniciar', id: 'a4' }])
 })
 
@@ -228,7 +229,7 @@ test('a Consulta não tem Concluir, Dispensar nem Realizada anteriormente', asyn
   montar([MODELAGEM_EM_ANDAMENTO, RELATORIO], { perfil: 'consulta' })
   const atual = await etapa('Reunião de modelagem')
   expect(atual.queryAllByRole('button')).toEqual([])
-  expect(screen.queryByRole('dialog')).toBeNull()
+  expect(janelasPorCima()).toEqual([])
 })
 
 const DO_PROCESSO = { processo_id: 'p1', processo_nome: 'Emitir Ofício', setor_sigla: 'TSA' }
@@ -244,7 +245,7 @@ test('o histórico mostra os dois registros do avanço, o da etapa resolvida e o
       evento(4, 'concluir', { ...DO_PROCESSO, etapa_nome: 'Reunião de modelagem', status: 'concluida' }),
     ] }
   } })
-  fireEvent.click(await (await painel()).findByRole('tab', { name: 'Histórico' }))
+  await escolherNoMenuDoProcesso('Histórico')
   const aberto = await painel()
   expect(await aberto.findByText('Iniciou a etapa', { exact: false })).toBeTruthy()
   expect(aberto.getByText('Concluiu a etapa', { exact: false })).toBeTruthy()

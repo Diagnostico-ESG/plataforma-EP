@@ -14,7 +14,7 @@ afterEach(() => {
 })
 
 const secao = async () => {
-  const painel = within(await screen.findByRole('complementary', { name: 'Painel do processo' }))
+  const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
   return within(await painel.findByRole('region', { name: 'Versões do processo' }))
 }
 

@@ -1,7 +1,8 @@
-import { type KeyboardEvent, type RefObject, useEffect, useId, useRef, useState } from 'react'
+import { type KeyboardEvent, useEffect, useId, useRef, useState } from 'react'
 import { rotuloDoPerfil } from '../../acesso/perfis'
 import type { UsuarioAtual } from '../../acesso/tipos'
 import { Avatar } from '../Avatar'
+import { useFecharAoClicarFora } from '../../hooks/useFecharAoClicarFora'
 import { useSaida } from '../../hooks/useSaida'
 
 type MenuDaContaProps = { usuario: UsuarioAtual; aoSair: () => Promise<void> }
@@ -55,17 +56,4 @@ export function MenuDaConta({ usuario, aoSair }: MenuDaContaProps) {
       )}
     </div>
   )
-}
-
-// pointerdown (e não click): fecha antes de o clique fora acionar outra coisa por baixo do painel.
-// O ouvinte é refeito a cada renderização com o menu aberto (fechar muda); com o menu, isso é raro e barato.
-function useFecharAoClicarFora(menu: RefObject<HTMLDivElement | null>, aberto: boolean, fechar: () => void) {
-  useEffect(() => {
-    if (!aberto) return
-    const aoApertar = (evento: PointerEvent) => {
-      if (!menu.current?.contains(evento.target as Node)) fechar()
-    }
-    document.addEventListener('pointerdown', aoApertar)
-    return () => document.removeEventListener('pointerdown', aoApertar)
-  }, [menu, aberto, fechar])
 }
