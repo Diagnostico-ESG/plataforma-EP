@@ -46,8 +46,16 @@
   font-weight: 600;
 }
 
+/* A linha inteira é o alvo do clique: no mínimo 28px de altura (WCAG 2.2, alvo de 24px), e o botão de rádio nativo
+   usa o azul do sistema em vez do azul do navegador. */
 .janela-escolha-opcao {
   display: flex;
   align-items: center;
   gap: var(--esp-2);
+  min-height: 28px;
+  cursor: pointer;
+}
+
+.janela-escolha-opcao input {
+  accent-color: var(--azul);
 }
