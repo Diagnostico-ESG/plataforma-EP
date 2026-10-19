@@ -1,5 +1,6 @@
 import type { AcoesDaEtapaEmUso } from '../../hooks/useAcoesDaEtapa'
 import { responsavelMarcado, usuariosParaAEtapa } from '../../processos/caminhoDeEtapas'
+import { fraseDoBloqueioDaConclusao } from '../../processos/frasesDaVersaoCompleta'
 import type { PedidoDeAvanco, PedidoDeTexto } from '../../processos/gravarAcoes'
 import type { UltimaVersao, UsuarioResponsavel } from '../../processos/tipos'
 import { JanelaComCampo } from '../JanelaComCampo'
@@ -81,10 +82,12 @@ function JanelaDoAvancoDaEtapa({ avanco, usuarios = [], usuarioId, ultimaVersao,
   const { acao, etapa, proxima } = avanco
   const possiveis = usuariosParaAEtapa(proxima, usuarios, ultimaVersao)
   const textos = JANELA_DO_AVANCO[acao]
+  // O banco só deixa concluir a Revisão pelo setor com a versão mais recente completa; a janela já diz o que falta.
+  const bloqueio = acao === 'concluir' && etapa.codigo === 'revisao_setor' ? fraseDoBloqueioDaConclusao(ultimaVersao) : null
   return (
     <JanelaDeAvanco key={etapa.id} titulo={textos.titulo(etapa.nome, proxima.nome)}
       rotuloDaAcao={textos.rotuloDaAcao(proxima.nome)} comNota={acao !== 'concluir'} rotuloDoCampo={textos.rotuloDoCampo}
       pergunta={textos.pergunta} usuarios={possiveis} marcadoAoAbrir={responsavelMarcado(proxima, usuarioId, possiveis)}
-      aoConfirmar={aoConfirmar} aoFechar={aoFechar} />
+      bloqueio={bloqueio} aoConfirmar={aoConfirmar} aoFechar={aoFechar} />
   )
 }

@@ -127,3 +127,37 @@ test('excluir etapa já usada é recusado, sugerindo desativar', async () => {
   expect((await secao.findByRole('alert')).textContent)
     .toBe('A etapa Modelagem piloto já foi usada; desative-a em vez de excluir.')
 })
+
+// As três etapas de revisão e aprovação não saem do catálogo (revisoes-aprovacao, ticket 01, história 26).
+const REVISAO_INTERNA = { id: 'e5', codigo: 'revisao_interna', nome: 'Revisão interna', ordem: 3, obrigatoria: true, ativa: true }
+const FRASE_DA_PROTEGIDA = 'A etapa Revisão interna é obrigatória no fluxo: não pode ser desativada nem excluída.'
+const comRevisaoInterna = (processos: ProcessosFalso) => {
+  processos.catalogo.etapas = [...processos.catalogo.etapas, REVISAO_INTERNA]
+}
+
+test('desativar a Revisão interna é recusado com a frase, e a etapa continua ativa', async () => {
+  const processos = montarComCatalogo({ ajustar: comRevisaoInterna })
+  const secao = await abrirCatalogo()
+  fireEvent.click(await secao.findByRole('button', { name: 'Desativar Revisão interna' }))
+  expect((await secao.findByRole('alert')).textContent).toBe(FRASE_DA_PROTEGIDA)
+  expect(processos.catalogo.etapas.find((etapa) => etapa.codigo === 'revisao_interna')?.ativa).toBe(true)
+})
+
+test('excluir a Revisão interna é recusado com a frase, e a etapa continua no catálogo', async () => {
+  const processos = montarComCatalogo({ ajustar: comRevisaoInterna })
+  const secao = await abrirCatalogo()
+  fireEvent.click(await secao.findByRole('button', { name: 'Excluir Revisão interna' }))
+  fireEvent.click(janelaAberta().getByRole('button', { name: 'Excluir etapa' }))
+  expect((await secao.findByRole('alert')).textContent).toBe(FRASE_DA_PROTEGIDA)
+  expect(processos.catalogo.etapas.some((etapa) => etapa.codigo === 'revisao_interna')).toBe(true)
+})
+
+test('renomear a Revisão interna continua aceito', async () => {
+  const processos = montarComCatalogo({ ajustar: comRevisaoInterna })
+  const secao = await abrirCatalogo()
+  fireEvent.click(await secao.findByRole('button', { name: 'Editar Revisão interna' }))
+  const formulario = within(secao.getByRole('form', { name: 'Editar etapa' }))
+  fireEvent.change(formulario.getByLabelText('Nome'), { target: { value: 'Revisão interna do EP' } })
+  fireEvent.click(formulario.getByRole('button', { name: 'Salvar' }))
+  await waitFor(() => expect(processos.catalogo.etapas.find((etapa) => etapa.codigo === 'revisao_interna')?.nome).toBe('Revisão interna do EP'))
+})

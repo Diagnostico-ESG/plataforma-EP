@@ -15,6 +15,8 @@ type JanelaDeAvancoProps = {
   usuarios: UsuarioResponsavel[]
   /** O id marcado ao abrir; null marca "Ninguém por enquanto". */
   marcadoAoAbrir: string | null
+  /** O que impede de concluir (a versão mais recente incompleta): a frase aparece e o botão principal fica desabilitado. */
+  bloqueio?: string | null
   /** A nota chega sem espaços nas pontas ("" quando não há nota); o responsável, null para "Ninguém por enquanto". */
   aoConfirmar: (nota: string, responsavelId: string | null) => void
   aoFechar: () => void
@@ -24,7 +26,7 @@ type JanelaDeAvancoProps = {
 // campo da nota (quando há) ou à opção marcada, o botão só se habilita com a nota preenchida e Esc fecha sem gravar.
 // Quem a monta a desmonta ao fechar, e a escolha recomeça marcada na próxima vez.
 export function JanelaDeAvanco({
-  titulo, rotuloDaAcao, comNota, rotuloDoCampo, pergunta, usuarios, marcadoAoAbrir, aoConfirmar, aoFechar,
+  titulo, rotuloDaAcao, comNota, rotuloDoCampo, pergunta, usuarios, marcadoAoAbrir, bloqueio = null, aoConfirmar, aoFechar,
 }: JanelaDeAvancoProps) {
   const janela = useRef<HTMLDialogElement>(null)
   const campo = useRef<HTMLTextAreaElement>(null)
@@ -32,7 +34,7 @@ export function JanelaDeAvanco({
   const idDoCampo = useId()
   const [nota, setNota] = useState('')
   const [responsavel, setResponsavel] = useState(marcadoAoAbrir ?? NINGUEM)
-  const pronta = !comNota || nota.trim() !== ''
+  const pronta = (!comNota || nota.trim() !== '') && bloqueio === null
 
   useEffect(() => {
     const dialogo = janela.current
@@ -58,6 +60,7 @@ export function JanelaDeAvanco({
             onChange={(mudanca) => setNota(mudanca.target.value)} />
         </>
       )}
+      {bloqueio && <p className="cadastros-falha" role="alert">{bloqueio}</p>}
       <EscolhaDoResponsavel pergunta={pergunta} usuarios={usuarios} marcado={responsavel} aoEscolher={setResponsavel} aoConfirmar={confirmar} />
       <div className="janela-confirmacao-botoes">
         <button type="button" className="botao botao-principal" disabled={!pronta} onClick={confirmar}>{rotuloDaAcao}</button>
