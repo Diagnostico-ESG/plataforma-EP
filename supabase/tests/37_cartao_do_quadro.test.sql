@@ -26,10 +26,11 @@ insert into public.setores (id, sigla, nome) values ('5f000000-0000-0000-0000-00
 insert into public.macroprocessos (id, codigo, nome) values ('af000000-0000-0000-0000-000000000020', null, 'Macro Cartao');
 insert into public.processos (setor_id, macroprocesso_id, nome)
 select '5f000000-0000-0000-0000-000000000020', 'af000000-0000-0000-0000-000000000020', nome
-from unnest(array['Parado', 'Pendente', 'V1 Sem', 'V1 Com', 'Relatorio Depois', 'V2 Sem', 'Historica', 'Pai',
+from unnest(array['Parado', 'Pendente', 'V1 Sem', 'V1 Com', 'Relatorio Depois', 'V2 Sem', 'Historica',
   'Resp Ativo', 'Resp Inativo']) as nome;
--- O pai de um subprocesso precisa ser do tipo Processo.
-update public.processos set tipo = 'processo' where nome = 'Pai';
+-- O pai de um subprocesso precisa nascer do tipo Processo (o tipo só muda pela reclassificação).
+insert into public.processos (setor_id, macroprocesso_id, nome, tipo)
+values ('5f000000-0000-0000-0000-000000000020', 'af000000-0000-0000-0000-000000000020', 'Pai', 'processo');
 insert into public.processos (setor_id, macroprocesso_id, nome, tipo, processo_pai_id)
 select '5f000000-0000-0000-0000-000000000020', 'af000000-0000-0000-0000-000000000020', nome, 'subprocesso',
   (select id from public.processos where nome = 'Pai')
