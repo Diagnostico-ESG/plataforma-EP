@@ -140,7 +140,23 @@ test('o processo traz a versão mais recente não histórica, com o autor e os p
   const lido = await criar(cliente).lerProcesso('p1')
   expect(lido?.ultimaVersao).toEqual({ numero: 3, autorId: 'u1', autorNome: 'Ana Teste', papeis: ['bpmn', 'png'] })
   expect(cliente.pedidos.find((pedido) => pedido.tabela === 'versoes')).toMatchObject({
-    filtros: [['processo_id', 'p1'], ['historica', false]], ordem: [['numero', false]], limite: 1,
+    filtros: [['processo_id', 'p1'], ['historica', false]], ordem: [['numero', false]], limite: 2,
+  })
+})
+
+test('com duas versões, a anterior (número e autor) vem junto, para a revisão corrigida', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
+  cliente.respostas['versoes.select'] = {
+    data: [
+      { numero: 8, enviada_por: 'u1', autor: { nome: 'Ana Teste' }, arquivos: [{ papel: 'bpmn' }] },
+      { numero: 7, enviada_por: 'u2', autor: { nome: 'Bia Teste' }, arquivos: [{ papel: 'bpmn' }, { papel: 'png' }] },
+    ],
+    error: null,
+  }
+  const lido = await criar(cliente).lerProcesso('p1')
+  expect(lido?.ultimaVersao).toEqual({
+    numero: 8, autorId: 'u1', autorNome: 'Ana Teste', papeis: ['bpmn'], anterior: { numero: 7, autorId: 'u2' },
   })
 })
 

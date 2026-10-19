@@ -30,16 +30,18 @@ type LinhaDaUltimaVersao = {
   numero: number; enviada_por: string; autor: { nome: string } | null; arquivos: { papel: PapelDoArquivo }[]
 }
 
-// A versão não histórica de maior número: quem a enviou não pode ser o responsável da Revisão interna (o banco confere).
+// A versão não histórica de maior número e a anterior a ela: quem enviou a mais recente não pode ser o responsável da
+// Revisão interna (o banco confere), e a revisão "corrigida" corrige a anterior.
 async function lerUltimaVersao(cliente: ClienteSupabase, id: string): Promise<UltimaVersao | null> {
   const { data, error } = await cliente.from('versoes').select('numero, enviada_por, autor:usuarios(nome), arquivos:arquivos_da_versao(papel)')
-    .eq('processo_id', id).eq('historica', false).order('numero', { ascending: false }).limit(1)
+    .eq('processo_id', id).eq('historica', false).order('numero', { ascending: false }).limit(2)
   if (error) throw new Error(`Falha ao ler a versão mais recente do processo: ${error.message}`)
-  const ultima = (data as unknown as LinhaDaUltimaVersao[])[0]
+  const [ultima, anterior] = data as unknown as LinhaDaUltimaVersao[]
   if (!ultima) return null
   return {
     numero: ultima.numero, autorId: ultima.enviada_por, autorNome: ultima.autor?.nome ?? '',
     papeis: ultima.arquivos.map((arquivo) => arquivo.papel),
+    ...(anterior && { anterior: { numero: anterior.numero, autorId: anterior.enviada_por } }),
   }
 }
 

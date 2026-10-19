@@ -141,6 +141,27 @@ test.each([
   expect(falha.message).toBe(frase)
 })
 
+test.each([
+  ['revisor_e_autor:7', 'Quem enviou a versão V7 não pode revisá-la.'],
+  ['corrigida_sem_versao_do_revisor', 'Para marcar como corrigida, a versão mais recente precisa ser sua: envie a versão corrigida em Arquivos.'],
+  ['corrigida_sem_versao_anterior', 'Não há versão anterior para corrigir.'],
+  ['escopo_obrigatorio', 'Escolha o escopo da correção.'],
+  ['escopo_so_na_corrigida', 'O escopo só vale na revisão corrigida.'],
+  ['revisao_fora_da_etapa', 'A revisão só pode ser registrada com a Revisão interna em andamento.'],
+  ['sem_revisao_da_versao:8', 'A V8 ainda não tem revisão registrada. Conclua a Revisão interna pela janela de concluir.'],
+])('a recusa da Revisão interna (%s) vira a frase da tela', async (mensagem, frase) => {
+  const cliente = clienteQueRecusa('rpc.avancar_etapa', { message: mensagem, code: 'P0001' })
+  const falha = await falhaDe(criar(cliente).concluirEtapa('a4', 'u1'))
+  expect(falha).toBeInstanceOf(TravaDoBanco)
+  expect(falha.message).toBe(frase)
+})
+
+test('processo com revisão não se exclui: a frase traz a contagem', async () => {
+  const cliente = clienteQueRecusa('processos.delete', { message: 'processo_com_revisoes:2', code: 'P0001' })
+  const falha = await falhaDe(criar(cliente).excluirProcesso('p1'))
+  expect(falha.message).toBe('Não é possível excluir: processo tem 2 revisões registradas. Cancele o processo em vez de excluí-lo.')
+})
+
 test('a etapa protegida do catálogo recusada pelo banco vira a frase da etapa obrigatória', async () => {
   const cliente = clienteQueRecusa('andamentos.update', { message: 'etapa_protegida:Revisão interna', code: 'P0001' })
   const falha = await falhaDe(criar(cliente).mudarResponsavelDaEtapa('a4', 'u1'))

@@ -8,6 +8,11 @@ import { fraseDaEtapaProtegida, fraseDaEtapaUsada } from './frasesDoCatalogo'
 import { FRASE_SEM_VERSAO, fraseDaVersaoIncompleta } from './frasesDaVersaoCompleta'
 import { FRASE_DO_PAI, fraseDeTipoInvalido, fraseDosSubprocessos } from './frasesDeReclassificacao'
 import { fraseDoAutorDaVersao, fraseDoProcessoComVersoes } from './frasesDeVersao'
+import {
+  FRASE_DA_CORRIGIDA_SEM_ANTERIOR, FRASE_DA_CORRIGIDA_SEM_VERSAO_DO_REVISOR, FRASE_DA_REVISAO_FORA_DA_ETAPA,
+  FRASE_DO_ESCOPO_OBRIGATORIO, FRASE_DO_ESCOPO_SO_NA_CORRIGIDA, fraseDaVersaoSemRevisao, fraseDoProcessoComRevisoes,
+  fraseDoRevisorQueEAutor,
+} from '../revisoes/frasesDeRevisao'
 import { fraseDeSituacaoInvalida, fraseDoProcessoParado } from './frasesDeSituacao'
 import type { ModuloDeProcessos, UsuarioResponsavel } from './tipos'
 
@@ -74,14 +79,16 @@ async function listarResponsaveisPossiveis(cliente: ClienteSupabase): Promise<Us
 }
 
 // O banco recusa com "motivo:valor" (migrações etapas_do_setor, andamento_do_processo, voltar_datas_responsavel,
-// situacao_do_processo, subprocessos_e_reclassificacao, catalogo_de_etapas e versoes).
+// situacao_do_processo, subprocessos_e_reclassificacao, catalogo_de_etapas, versoes e revisao_interna).
 // O motivo "motivo_obrigatorio" não tem valor; o valor vai até o fim da mensagem.
 const PADRAO_DA_RECUSA = new RegExp(
   '\\b(anterior_nao_resolvida|etapa_obrigatoria|ja_ha_etapa_em_andamento|etapa_nao_resolvida'
   + '|motivo_obrigatorio|nota_obrigatoria|data_no_futuro|resolvida_antes_do_inicio|responsavel_invalido|processo_parado'
   + '|situacao_invalida|processo_com_subprocessos|pai_nao_e_processo|tipo_invalido'
   + '|etapa_usada|etapa_protegida'
-  + '|processo_com_versoes|autor_da_versao|sem_versao|versao_incompleta)(?::(.*))?$', 'm')
+  + '|processo_com_versoes|autor_da_versao|sem_versao|versao_incompleta'
+  + '|revisor_e_autor|corrigida_sem_versao_do_revisor|corrigida_sem_versao_anterior|escopo_obrigatorio'
+  + '|escopo_so_na_corrigida|revisao_fora_da_etapa|sem_revisao_da_versao|processo_com_revisoes)(?::(.*))?$', 'm')
 
 const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   anterior_nao_resolvida: (etapa) => `A etapa ${etapa} ainda não foi resolvida.`,
@@ -113,6 +120,14 @@ const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   autor_da_versao: fraseDoAutorDaVersao,
   etapa_protegida: fraseDaEtapaProtegida,
   sem_versao: () => FRASE_SEM_VERSAO,
+  revisor_e_autor: fraseDoRevisorQueEAutor,
+  corrigida_sem_versao_do_revisor: () => FRASE_DA_CORRIGIDA_SEM_VERSAO_DO_REVISOR,
+  corrigida_sem_versao_anterior: () => FRASE_DA_CORRIGIDA_SEM_ANTERIOR,
+  escopo_obrigatorio: () => FRASE_DO_ESCOPO_OBRIGATORIO,
+  escopo_so_na_corrigida: () => FRASE_DO_ESCOPO_SO_NA_CORRIGIDA,
+  revisao_fora_da_etapa: () => FRASE_DA_REVISAO_FORA_DA_ETAPA,
+  sem_revisao_da_versao: fraseDaVersaoSemRevisao,
+  processo_com_revisoes: fraseDoProcessoComRevisoes,
   versao_incompleta: (valor) => {
     const [numero, faltas] = valor.split(':')
     return fraseDaVersaoIncompleta(numero, faltas.split(','))

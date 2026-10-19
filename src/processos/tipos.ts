@@ -115,7 +115,11 @@ export type ItemDaEstrutura = { id: string; nome: string; etapaAtual: string | n
  * A versão mais recente não histórica do processo, quem a enviou (esse autor não pode revisar o próprio trabalho) e os
  * papéis dos arquivos dela (a Revisão pelo setor só conclui com .bpmn, .png e relatório).
  */
-export type UltimaVersao = { numero: number; autorId: string; autorNome: string; papeis: PapelDoArquivo[] }
+export type UltimaVersao = {
+  numero: number; autorId: string; autorNome: string; papeis: PapelDoArquivo[]
+  /** A não histórica de número imediatamente menor (a que a Revisão interna "corrigida" corrige); ausente sem anterior. */
+  anterior?: { numero: number; autorId: string }
+}
 
 export type ProcessoLido = ProcessoDaLista & {
   origem: OrigemDoProcesso
