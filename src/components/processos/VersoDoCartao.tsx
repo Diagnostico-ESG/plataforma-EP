@@ -108,7 +108,8 @@ function ProcessoAberto(props: ProcessoAbertoProps) {
   const titulo = useRef<HTMLHeadingElement>(null)
   const { falha, executar } = useGravacaoComFalha(aoSumir)
   // O foco vai ao nome ao abrir, ao trocar de processo (pai, subprocesso) e ao trocar de modo, que some com o botão usado.
-  useEffect(() => titulo.current?.focus(), [processo.id, modo])
+  // Sem rolar: o nome está no cabeçalho fixo, e o navegador rolava a janela para baixo ao focá-lo.
+  useEffect(() => titulo.current?.focus({ preventScroll: true }), [processo.id, modo])
   const aposMudar = () => {
     aoAtualizar()
     aoMudar()

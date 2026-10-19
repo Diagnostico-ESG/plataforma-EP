@@ -14,6 +14,17 @@
   animation: verso-entra 150ms var(--curva-saida);
 }
 
+/* Altura mínima: o carregando e o processo curto têm o mesmo tamanho, e a janela não salta quando os dados chegam.
+   Em coluna flexível, as duas colunas descem até o fim, com o fundo cinza da direita inteiro. */
+.verso[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.verso:not(.verso-estreita) {
+  min-height: min(600px, 90vh);
+}
+
 .verso::backdrop {
   background: var(--veu-janela);
 }
@@ -120,6 +131,7 @@
 
 .verso-colunas {
   display: grid;
+  flex: 1;
   grid-template-columns: 3fr 2fr;
 }
 
