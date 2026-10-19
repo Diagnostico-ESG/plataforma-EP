@@ -286,3 +286,25 @@
   justify-items: start;
   gap: var(--esp-2);
 }
+
+/* Agrupar por: o rótulo em cima e os dois botões embaixo, alinhados com os filtros. */
+.controle-do-quadro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+}
+
+.controle-opcoes {
+  display: flex;
+  gap: var(--esp-1);
+}
+
+/* Quadro por responsável: no rodapé do cartão, o nome da etapa ocupa o lugar do avatar. */
+.cartao-etapa {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--texto-2);
+  font-size: var(--tam-rotulo);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
