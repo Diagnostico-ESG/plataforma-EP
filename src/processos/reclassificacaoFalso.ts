@@ -1,6 +1,6 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { FRASE_DO_PAI, fraseDeTipoInvalido, fraseDosSubprocessos } from './frasesDeReclassificacao'
-import type { ProcessoLido, Reclassificacao, TipoDeProcesso } from './tipos'
+import type { ItemDaEstrutura, ProcessoLido, Reclassificacao, TipoDeProcesso } from './tipos'
 
 type Estrutura = Pick<ProcessoLido, 'processoPai' | 'subprocessos'>
 
@@ -15,9 +15,13 @@ export function estruturaDoProcesso(processos: ProcessoLido[], processo: Process
   const filhos = processos.filter((outro) => outro.processoPaiId === processo.id)
     .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
   return {
-    processoPai: pai ? { id: pai.id, nome: pai.nome } : null,
-    subprocessos: filhos.map(({ id, nome }) => ({ id, nome })),
+    processoPai: pai ? itemDaEstrutura(pai) : null,
+    subprocessos: filhos.map(itemDaEstrutura),
   }
+}
+
+function itemDaEstrutura({ id, nome, etapaAtual, situacao }: ProcessoLido): ItemDaEstrutura {
+  return { id, nome, etapaAtual: etapaAtual?.nome ?? null, situacao }
 }
 
 /** Como o gatilho do banco: o pai existe, é do tipo Processo e não é o próprio item. */

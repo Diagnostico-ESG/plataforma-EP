@@ -18,6 +18,8 @@ export type Pedido = {
 /** Cliente Supabase falso para os testes de módulo: guarda cada pedido e responde por "tabela.operação". */
 export class ClienteSupabaseFalso {
   respostas: Record<string, RespostaDoBanco> = {}
+  /** Respostas usadas uma a uma, antes de `respostas`: para duas leituras da mesma tabela com respostas diferentes. */
+  filaDeRespostas: Record<string, RespostaDoBanco[]> = {}
   pedidos: Pedido[] = []
 
   /** Respostas da função do servidor por "funcao.<acao>"; a falha leva em `context` a Response, como o supabase-js. */
@@ -37,10 +39,14 @@ export class ClienteSupabaseFalso {
     return Promise.resolve(this.respostas[`rpc.${nome}`] ?? { data: null, error: null })
   }
 
+  private respostaDe(chave: string): RespostaDoBanco {
+    return this.filaDeRespostas[chave]?.shift() ?? this.respostas[chave] ?? { data: [], error: null }
+  }
+
   from(tabela: string) {
     const pedido: Pedido = { tabela, operacao: 'select' }
     this.pedidos.push(pedido)
-    const resposta = () => this.respostas[`${tabela}.${pedido.operacao}`] ?? { data: [], error: null }
+    const resposta = () => this.respostaDe(`${tabela}.${pedido.operacao}`)
     const consulta = {
       select: (colunas?: string) => Object.assign(pedido, { colunas: pedido.colunas ?? colunas }) && consulta,
       order: (coluna: string, opcoes?: OpcoesDeOrdem) => ordenar(pedido, coluna, opcoes) && consulta,

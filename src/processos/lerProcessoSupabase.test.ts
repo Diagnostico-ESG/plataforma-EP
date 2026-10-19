@@ -50,31 +50,43 @@ test('a etapa traz o id do responsável e se ele foi desativado depois de escolh
     ['u2', true], ['u1', false], [null, false]])
 })
 
-test('o processo traz os subprocessos, por nome, numa leitura só', async () => {
-  const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
-  cliente.respostas['processos.select'] = { data: [
-    { id: 'p2', nome: 'Filho A', processo_pai_id: 'p1' }, { id: 'p3', nome: 'Filho B', processo_pai_id: 'p1' },
-  ], error: null }
-  const lido = await criar(cliente).lerProcesso('p1')
-  expect(lido).toMatchObject({ processoPai: null, subprocessos: [{ id: 'p2', nome: 'Filho A' }, { id: 'p3', nome: 'Filho B' }] })
-  expect(cliente.pedidos.find((pedido) => pedido.tabela === 'processos')).toMatchObject({
-    ou: 'processo_pai_id.eq.p1', ordem: [['nome', true]] })
+const VIEW = 'processos_com_andamento.select'
+const linhaDaEstrutura = (id: string, nome: string, pai: string | null, mudancas: object = {}) => ({
+  id, nome, processo_pai_id: pai, situacao: 'em_andamento', etapa_atual_nome: 'Revisão interna', ...mudancas,
 })
 
-test('o subprocesso traz o pai', async () => {
+test('o processo traz os subprocessos, por nome, com a etapa atual e a situação de cada um', async () => {
   const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['processos_com_andamento.select'] = { data: [{ ...LINHA, tipo: 'subprocesso', processo_pai_id: 'p0' }], error: null }
-  cliente.respostas['processos.select'] = { data: [{ id: 'p0', nome: 'Pai Fictício', processo_pai_id: null }], error: null }
+  cliente.filaDeRespostas[VIEW] = [{ data: [LINHA], error: null }, { data: [
+    linhaDaEstrutura('p2', 'Filho A', 'p1'),
+    linhaDaEstrutura('p3', 'Filho B', 'p1', { situacao: 'concluido', etapa_atual_nome: null }),
+  ], error: null }]
   const lido = await criar(cliente).lerProcesso('p1')
-  expect(lido).toMatchObject({ processoPaiId: 'p0', processoPai: { id: 'p0', nome: 'Pai Fictício' }, subprocessos: [] })
-  expect(cliente.pedidos.find((pedido) => pedido.tabela === 'processos')?.ou).toBe('processo_pai_id.eq.p1,id.eq.p0')
+  expect(lido).toMatchObject({ processoPai: null, subprocessos: [
+    { id: 'p2', nome: 'Filho A', etapaAtual: 'Revisão interna', situacao: 'em_andamento' },
+    { id: 'p3', nome: 'Filho B', etapaAtual: null, situacao: 'concluido' },
+  ] })
+  expect(cliente.pedidos.filter((pedido) => pedido.tabela === 'processos_com_andamento')[1]).toMatchObject({
+    colunas: 'id, nome, processo_pai_id, situacao, etapa_atual_nome', ou: 'processo_pai_id.eq.p1', ordem: [['nome', true]] })
+})
+
+test('o subprocesso traz o pai, com a etapa atual e a situação', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.filaDeRespostas[VIEW] = [
+    { data: [{ ...LINHA, tipo: 'subprocesso', processo_pai_id: 'p0' }], error: null },
+    { data: [linhaDaEstrutura('p0', 'Pai Fictício', null, { situacao: 'suspenso' })], error: null },
+  ]
+  const lido = await criar(cliente).lerProcesso('p1')
+  expect(lido).toMatchObject({
+    processoPaiId: 'p0', subprocessos: [],
+    processoPai: { id: 'p0', nome: 'Pai Fictício', etapaAtual: 'Revisão interna', situacao: 'suspenso' },
+  })
+  expect(cliente.pedidos.filter((pedido) => pedido.tabela === 'processos_com_andamento')[1]?.ou).toBe('processo_pai_id.eq.p1,id.eq.p0')
 })
 
 test('falha ao ler o pai e os subprocessos vira erro com o motivo do banco', async () => {
   const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
-  cliente.respostas['processos.select'] = { data: null, error: { message: 'sem conexão' } }
+  cliente.filaDeRespostas[VIEW] = [{ data: [LINHA], error: null }, { data: null, error: { message: 'sem conexão' } }]
   await expect(criar(cliente).lerProcesso('p1')).rejects.toThrow('Falha ao ler o pai e os subprocessos do processo: sem conexão')
 })
 
