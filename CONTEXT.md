@@ -100,6 +100,10 @@ _Avoid_: estado, fase (para status)
 A etapa em andamento do processo ou, se nenhuma estiver, a primeira pendente. Cada processo tem no máximo uma etapa em andamento.
 _Avoid_: etapa corrente, passo atual
 
+**Processo parado**:
+Processo em andamento cuja etapa atual começou há mais de 15 dias. O limite é um número único até os prazos por etapa.
+_Avoid_: atrasado, vencido, esquecido
+
 **Avançar**:
 O que acontece quando a etapa atual é concluída, dispensada ou registrada como realizada anteriormente: a primeira etapa pendente depois dela entra em andamento, com o responsável escolhido por quem resolveu (ou sem responsável). Sem etapa pendente depois, não há avanço. A etapa atual pendente (como a primeira de um processo novo) continua se iniciando à mão.
 _Avoid_: pular, passar de fase

@@ -2,9 +2,9 @@
 
 Status: ready-for-agent
 
-**Como resolve o problema.** Hoje o andamento de cada processo fica espalhado entre planilhas e o Power BI, sem saber com certeza em que etapa cada um está, quem cuida dele nem o que mudou. Com esta funcionalidade, a equipe do EP cadastra na plataforma cada processo e subprocesso, ligado ao setor dono e a um macroprocesso, e registra o andamento etapa por etapa, da Modelagem piloto em diante, num caminho que o administrador configura no catálogo de etapas. A área Processos mostra o trabalho vivo num Quadro, com uma coluna por etapa, e o arquivo completo numa Lista com busca pelo nome e filtros; ao abrir um processo, o **verso do cartão**, uma janela central em duas colunas, mostra primeiro o que há para fazer agora (a etapa atual, quem cuida dela e um único botão principal), depois o caminho de etapas e os arquivos, e ao lado o contexto do processo; o que é raro (histórico, editar, reclassificar, suspender, cancelar, excluir) fica num menu. O banco impõe a sequência das etapas, a situação do processo, as regras de reclassificação e o registro de cada mudança no histórico. As funcionalidades seguintes (reuniões, documentos, revisões, prazos e painel) se apoiam nesse andamento.
+**Como resolve o problema.** Hoje o andamento de cada processo fica espalhado entre planilhas e o Power BI, sem saber com certeza em que etapa cada um está, quem cuida dele nem o que mudou. Com esta funcionalidade, a equipe do EP cadastra na plataforma cada processo e subprocesso, ligado ao setor dono e a um macroprocesso, e registra o andamento etapa por etapa, da Modelagem piloto em diante, num caminho que o administrador configura no catálogo de etapas. A área Processos mostra o trabalho vivo num Quadro, com uma coluna por etapa, e o arquivo completo numa Lista com busca pelo nome e filtros; ao abrir um processo, o **verso do cartão**, uma janela central em duas colunas, mostra primeiro o que há para fazer agora (a etapa atual, quem cuida dela e um único botão principal), depois o caminho de etapas e os arquivos, e ao lado o contexto do processo; o que é raro (histórico, editar, reclassificar, suspender, cancelar, excluir) fica num menu. No Quadro, cada cartão mostra de relance onde o processo está (uma barra com um pedaço por etapa) e só ganha selo quando há algo a dizer (processo parado, relatório pendente, etapa sem responsável, reunião próxima, versão, subprocessos); arrastar o cartão para a coluna seguinte conclui a etapa, e a equipe pode agrupar o Quadro por responsável ou ver só os processos que estão com ela. O banco impõe a sequência das etapas, a situação do processo, as regras de reclassificação e o registro de cada mudança no histórico. As funcionalidades seguintes (reuniões, documentos, revisões, prazos e painel) se apoiam nesse andamento.
 
-Decisões de origem: `.scratch/processos-etapas/sabatina.md` (sabatina de 2026-10-13, três rodadas), `CONTEXT.md` (seções "Setores" e "Processos") e ADR 0004 (mudar o catálogo muda o caminho dos processos em andamento). Mudança de 2026-10-18 (parte 1 da iniciativa experiencia-do-quadro, `.scratch/experiencia-do-quadro/sabatina-parte-1.md`, ADR 0013): saem as etapas do setor, a coluna "Aguardando o setor", os responsáveis do setor e o nível do catálogo; a primeira etapa passa a se chamar Modelagem piloto; o processo ganha a data da reunião (spec de `reunioes`). Mudança de 2026-10-18 (parte 2, `.scratch/experiencia-do-quadro/sabatina-parte-2.md`, ADR 0014): resolver a etapa atual (concluir, dispensar ou registrar como realizada anteriormente) já **avança**, ou seja, inicia a próxima etapa pendente com o responsável escolhido na mesma janela; voltar também escolhe o responsável; [Assumir] em etapa sem responsável; quem enviou a versão mais recente não pode ser escolhido como responsável da Revisão interna. Mudança de 2026-10-19 (parte 3, "Verso do cartão", `.scratch/experiencia-do-quadro/sabatina-parte-3.md`, sem ADR nem mudança no banco): o painel lateral vira o verso do cartão, uma janela central em duas colunas com o cartão "Agora"; o Novo processo, o Editar e o Histórico abrem dentro dela; a Lista ganha busca pelo nome.
+Decisões de origem: `.scratch/processos-etapas/sabatina.md` (sabatina de 2026-10-13, três rodadas), `CONTEXT.md` (seções "Setores" e "Processos") e ADR 0004 (mudar o catálogo muda o caminho dos processos em andamento). Mudança de 2026-10-18 (parte 1 da iniciativa experiencia-do-quadro, `.scratch/experiencia-do-quadro/sabatina-parte-1.md`, ADR 0013): saem as etapas do setor, a coluna "Aguardando o setor", os responsáveis do setor e o nível do catálogo; a primeira etapa passa a se chamar Modelagem piloto; o processo ganha a data da reunião (spec de `reunioes`). Mudança de 2026-10-18 (parte 2, `.scratch/experiencia-do-quadro/sabatina-parte-2.md`, ADR 0014): resolver a etapa atual (concluir, dispensar ou registrar como realizada anteriormente) já **avança**, ou seja, inicia a próxima etapa pendente com o responsável escolhido na mesma janela; voltar também escolhe o responsável; [Assumir] em etapa sem responsável; quem enviou a versão mais recente não pode ser escolhido como responsável da Revisão interna. Mudança de 2026-10-19 (parte 3, "Verso do cartão", `.scratch/experiencia-do-quadro/sabatina-parte-3.md`, sem ADR nem mudança no banco): o painel lateral vira o verso do cartão, uma janela central em duas colunas com o cartão "Agora"; o Novo processo, o Editar e o Histórico abrem dentro dela; a Lista ganha busca pelo nome. Mudança de 2026-10-19 (parte 4, "Cartão do Quadro", `.scratch/experiencia-do-quadro/sabatina-parte-4.md`, sem ADR): o cartão do Quadro ganha a barra de progresso e os selos; arrastar o cartão para a coluna de destino abre a janela de avanço da parte 2; o Quadro ganha "Agrupar por: Etapa | Responsável" e "Só os meus"; a view `processos_com_andamento` ganha campos, por migração não destrutiva; `CONTEXT.md` ganha "Processo parado".
 
 ## Problema
 
@@ -13,7 +13,7 @@ O EP acompanha dezenas de processos de vários setores, cada um numa etapa difer
 ## Solução
 
 - **Área Processos** (item "Quadro" e "Lista" da faixa lateral, alternância Quadro | Lista na barra superior):
-  - o **Quadro** mostra os processos em andamento e os suspensos, cada um na coluna da etapa atual; o processo novo entra na coluna Modelagem piloto;
+  - o **Quadro** mostra os processos em andamento e os suspensos, cada um na coluna da etapa atual; o processo novo entra na coluna Modelagem piloto. Desde a parte 4 (2026-10-19), o cartão traz a barra de progresso e os selos, arrastar o cartão conclui a etapa, e o Quadro pode ser agrupado por responsável e filtrado por "Só os meus";
   - a **Lista** mostra todos os processos, de qualquer situação, numa tabela com busca pelo nome e filtros; é o lugar dos concluídos;
   - nos dois, [Cadastrar processo] para Administrador e Integrante, e clicar num cartão ou numa linha abre o **verso do cartão** (desde 2026-10-19).
 - **Verso do cartão** (desde 2026-10-19, no lugar do painel lateral): janela central larga, com o Quadro ou a Lista escurecidos atrás. À esquerda, o trabalho: o cartão **Agora** (etapa atual, responsável ou [Assumir], dias na etapa e um único botão principal), as **Etapas** em linhas compactas (clicar abre o detalhe da etapa ali mesmo) e os **Arquivos** (a versão mais recente em destaque, com o que falta). À direita, o contexto: a data da **Reunião** de modelagem piloto (spec de `reunioes`), **Sobre** (setor, macroprocesso, tipo, origem, contexto, observações) e a **Estrutura** (subprocessos ou o processo pai). O menu "⋯" do cabeçalho traz Histórico, Editar, Reclassificar, Suspender ou Retomar, Cancelar e Excluir. Novo processo, Editar e Histórico abrem dentro da mesma janela.
@@ -49,7 +49,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
 
 18. Como integrante do EP, quero ver no Quadro uma coluna por etapa, na ordem do catálogo, com os processos em andamento e suspensos na coluna da etapa atual, para enxergar o trabalho vivo.
 19. Como integrante do EP, quero que o processo recém-cadastrado apareça direto na coluna Modelagem piloto, sem coluna de espera antes dela.
-20. Como integrante do EP, quero que o cartão mostre o nome do processo, a sigla do setor, o macroprocesso, o tipo (quando for subprocesso ou "a classificar") e o responsável da etapa atual.
+20. Como integrante do EP, quero que o cartão mostre o nome do processo, a sigla do setor, o macroprocesso, o tipo (quando for subprocesso ou "a classificar") e o responsável da etapa atual (desde a parte 4, também a barra de progresso e os selos, histórias 141 em diante).
 21. Como integrante do EP, quero ver os processos suspensos no Quadro com a pílula "Suspenso", para não esquecer o trabalho parado.
 22. Como integrante do EP, quero que concluídos e cancelados saiam do Quadro e continuem na Lista.
 23. Como integrante do EP, quero que o Quadro role para o lado quando houver mais colunas que a tela, com uma indicação de que há colunas fora da vista.
@@ -136,6 +136,41 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
 139. Como integrante do EP, quero que a busca fique no endereço da página junto com os filtros, para recarregar ou compartilhar a mesma busca.
 140. Como integrante do EP, quero que a busca sem resultado mostre "Nenhum processo com estes filtros." com [Limpar filtros], que limpa também a busca.
 
+### Cartão do Quadro (parte 4, 2026-10-19)
+
+141. Como integrante do EP, quero ver em cada cartão uma barra com um pedaço por etapa do caminho do processo, com as resolvidas preenchidas, a atual destacada e as seguintes vazias, para saber de relance onde o processo está.
+142. Como integrante do EP, quero que etapa dispensada e etapa realizada anteriormente contem como resolvidas na barra, como no resto da plataforma.
+143. Como integrante do EP, quero que a barra seja discreta, em cinza e azul, sem cor de alerta, porque mostra o normal.
+144. Como integrante do EP, quero que um processo parado (a etapa atual em andamento há mais de 15 dias) ganhe o selo âmbar "{n} dias nesta etapa", o mesmo texto do Agora, para notar o que está demorando sem abrir cada processo.
+145. Como integrante do EP, quero que o processo com até 15 dias na etapa não tenha selo de dias, para o cartão normal ficar limpo.
+146. Como integrante do EP, quero que o processo suspenso e a etapa atual ainda não iniciada não ganhem o selo de dias, porque neles o tempo não está correndo.
+147. Como integrante do EP, quero ver no cartão o rótulo da última versão ("V3", ou "V5F" na versão histórica), em texto neutro, para saber em que versão o processo está.
+148. Como integrante do EP, quero que o processo sem versão não mostre nada no lugar da versão.
+149. Como integrante do EP, quero o selo "Relatório pendente" quando a última versão não tem relatório e a etapa atual é a Revisão interna ou uma posterior, para notar o que não pode seguir sem relatório.
+150. Como integrante do EP, quero que, antes da Revisão interna, faltar o relatório não vire selo, porque é o trabalho normal da etapa Relatório e modelagem técnica.
+151. Como integrante do EP, quero o selo neutro "Sem responsável" quando a etapa atual não tem responsável, para achar o trabalho que alguém precisa assumir.
+152. Como integrante do EP, quero o selo "Reunião {dd/mm}" (ou "Reunião hoje") quando a data da reunião é hoje ou futura, e nada depois que ela passou, para lembrar a reunião que vem aí.
+153. Como integrante do EP, quero ver no cartão do processo pai quantos subprocessos ele tem ("1 subprocesso", "3 subprocessos"), sem contar os cancelados.
+154. Como integrante do EP, quero os selos sempre na mesma ordem (dias, Relatório pendente, Sem responsável, Reunião, versão, subprocessos), com os alertas primeiro, quebrando de linha quando não couberem.
+155. Como integrante do EP, quero arrastar o cartão de um processo com a etapa atual em andamento e soltá-lo na coluna da etapa para onde ele vai avançar, para concluir a etapa sem abrir o processo.
+156. Como integrante do EP, quero que, enquanto arrasto, só a coluna de destino fique destacada, para saber onde soltar.
+157. Como integrante do EP, quero que a coluna de destino seja a da primeira etapa pendente depois da atual, mesmo que não seja a vizinha, porque é para lá que o processo vai.
+158. Como integrante do EP, quero que soltar o cartão na coluna de destino abra a mesma janela "Quem fica com a próxima etapa?" do [Concluir], e que confirmar conclua e avance como no verso.
+159. Como integrante do EP, quero que cancelar a janela (Esc ou [Cancelar]) deixe o cartão onde estava, sem gravar nada.
+160. Como integrante do EP, quero que soltar o cartão em outra coluna o devolva ao lugar, com o aviso curto "Solte o cartão na coluna {etapa}.", para entender por que nada aconteceu.
+161. Como integrante do EP, quero que não se arraste o cartão do processo suspenso, o da etapa atual ainda não iniciada (ela se inicia pelo verso, para não perder a data de início) nem o da última etapa (sem coluna depois, ela se conclui pelo verso).
+162. Como integrante do EP que usa o teclado, quero concluir pela tecla Enter no cartão e pelo [Concluir] do Agora, sem precisar arrastar.
+163. Como integrante do EP, quero que a falha na gravação ao soltar o cartão mostre a mensagem de erro de gravação e deixe o cartão e as etapas como estavam.
+164. Como integrante do EP, quero escolher "Agrupar por: Etapa | Responsável" no Quadro, para ver o trabalho por pessoa.
+165. Como integrante do EP, quero, agrupado por responsável, uma coluna por pessoa que tem algum cartão (depois dos filtros), em ordem alfabética, e a coluna "Sem responsável" no fim.
+166. Como integrante do EP, quero que a coluna de um responsável que foi desativado apareça marcada com a pílula "Inativo".
+167. Como integrante do EP, quero que, agrupado por responsável, o cartão mostre o nome da etapa atual no lugar da foto, e que não haja arrastar.
+168. Como integrante do EP, quero que o agrupamento fique no endereço da página, como os filtros, para voltar, recarregar ou compartilhar a mesma visão.
+169. Como integrante do EP, quero o botão "Só os meus", que mostra só os processos em que sou o responsável da etapa atual, com um clique, e desligá-lo com outro.
+170. Como integrante do EP, quero que "Só os meus" seja o mesmo que me escolher no filtro Responsável, para as duas formas nunca se contradizerem.
+171. Como integrante do EP, quero que "Só os meus" sem nenhum cartão mostre "Nenhum processo com você agora." com [Ver todos], que desliga o filtro.
+172. Como Consulta, quero ver a barra, os selos e o "Agrupar por", sem "Só os meus" e sem arrastar.
+
 ### Etapas do setor e responsáveis do setor (retirados em 2026-10-18)
 
 45. Como integrante do EP, quero que a tela do setor e o painel do processo não mostrem mais etapas do setor nem responsáveis do setor, porque esse trabalho já foi feito para todos os setores, fora da plataforma (ADR 0013).
@@ -201,7 +236,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
 ### Interface
 
 - **Terceiro módulo injetado:** um módulo de processos, separado dos de acesso e de cadastros. Operações:
-  - listar processos com etapa atual, responsável dela e situação calculada;
+  - listar processos com etapa atual, responsável dela e situação calculada (desde a parte 4, também o status e o início da etapa atual, o caminho de etapas com o status de cada uma, a última versão com a marca de relatório, a contagem de subprocessos não cancelados e se o responsável está ativo);
   - ler um processo com a data da reunião, o caminho de etapas, os subprocessos ou o pai, e o histórico;
   - criar, editar e excluir processo, e marcar a data da reunião (spec de `reunioes`);
   - iniciar uma etapa;
@@ -218,6 +253,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
   - `#/processos` para o Quadro e `#/processos/lista` para a Lista, com os filtros no endereço;
   - `#/processos/<id>` abre o verso do cartão por cima da visão de onde veio, e `#/processos/novo` o Novo processo na mesma janela (desde 2026-10-19; antes, o painel lateral);
   - a busca da Lista fica no endereço como os filtros (parâmetro `busca`, desde 2026-10-19);
+  - o agrupamento do Quadro fica no endereço (parâmetro `agrupar=responsavel`; sem ele, por etapa), desde a parte 4; "Só os meus" não tem parâmetro próprio: é o filtro `responsavel` com o id de quem está na tela;
   - Histórico e Editar são estados da janela aberta, sem endereço próprio: recarregar a página volta ao verso;
   - o catálogo fica numa aba da Administração.
 - **Quadro:**
@@ -228,8 +264,30 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
     - o macroprocesso;
     - a pílula de tipo (só "Subprocesso" e "A classificar");
     - a pílula "Suspenso";
-    - o avatar do responsável da etapa atual.
+    - o avatar do responsável da etapa atual;
+    - desde a parte 4 (2026-10-19), a barra de progresso e os selos, descritos abaixo.
   - **Ordem na coluna:** pelo nome do processo.
+  - **Barra de progresso** (parte 4): uma linha fina de pedaços iguais, um por etapa do caminho do processo, na ordem do catálogo; resolvida (concluída, realizada anteriormente, dispensada) preenchida em cinza-escuro, a atual em `azul`, as seguintes em cinza-claro. Sempre visível, inclusive no suspenso. Nome acessível: "Etapa {n} de {total}: {etapa atual}".
+  - **Selos** (parte 4), só quando há algo a dizer, nesta ordem, quebrando de linha:
+    1. **Processo parado:** pílula âmbar "{n} dias nesta etapa" quando a etapa atual está em andamento há mais de 15 dias (a mesma conta e o mesmo limite do Agora); nunca no suspenso nem na etapa atual pendente;
+    2. **Relatório pendente:** pílula âmbar quando a última versão não histórica não tem relatório e a etapa atual é a Revisão interna ou posterior na ordem do catálogo (posição comparada pelo código `revisao_interna`);
+    3. **Sem responsável:** pílula neutra quando a etapa atual não tem responsável (não aparece agrupado por responsável, porque a coluna já diz);
+    4. **Reunião:** pílula neutra com a barrinha amarela de reunião, "Reunião {dd/mm}" ou "Reunião hoje", quando a data da reunião é hoje ou futura;
+    5. **Versão:** texto mono neutro, sem fundo, com o rótulo da última versão ("V3", "V5F"), quando há versão;
+    6. **Subprocessos:** texto neutro "{n} subprocesso(s)", no processo pai com pelo menos um subprocesso não cancelado.
+  - **Arrastar para concluir** (parte 4), com o arrastar nativo do navegador, sem biblioteca:
+    - só Administrador e Integrante; só cartão com a etapa atual em andamento, de processo em andamento, com etapa pendente depois da atual; nos demais, o cartão não é arrastável;
+    - **coluna de destino:** a da primeira etapa pendente depois da atual; durante o arrastar, só ela recebe o realce (borda tracejada em `azul`);
+    - soltar no destino abre a janela de avanço da parte 2, como o [Concluir] do Agora, com as mesmas opções, a mesma opção marcada e a mesma trava do autor; confirmar grava pela mesma função de avanço; Esc ou [Cancelar] não grava;
+    - soltar em outra coluna devolve o cartão e mostra o aviso "Solte o cartão na coluna {etapa}.";
+    - em tela de toque o arrastar não acontece (o arrastar nativo não funciona por toque, e isso é o desejado: rolar o Quadro não conclui nada); o caminho é o verso;
+    - o cartão continua link: clicar ou Enter abre o verso. O caminho pelo teclado é esse, sem atalho novo;
+    - ao confirmar, o Quadro recarrega e o cartão aparece na coluna nova; a falha mostra a mensagem de erro de gravação e nada muda.
+  - **Agrupar por** (parte 4): controle "Agrupar por: Etapa | Responsável" na barra do Quadro, para todos os perfis.
+    - **Responsável:** uma coluna por pessoa que é responsável da etapa atual de algum cartão visível (depois dos filtros), em ordem alfabética, com a pílula "Inativo" quando a pessoa foi desativada, e a coluna "Sem responsável" no fim (só se houver cartão nela); a contagem no título como nas colunas de etapa;
+    - o cartão, nesse modo, mostra o nome da etapa atual no lugar do avatar; sem arrastar;
+    - o filtro de etapa continua valendo nos dois modos.
+  - **Só os meus** (parte 4): botão de liga e desliga na barra do Quadro, só para Administrador e Integrante, com o estado anunciado (aria-pressed). Ligado, põe o filtro Responsável em quem está na tela; desligado, limpa esse filtro. Escolher a si mesmo no filtro Responsável liga o botão; escolher outra pessoa o desliga.
   - **Largura** (decidido pelo usuário em 2026-10-14): o Quadro ocupa toda a largura à direita da faixa lateral, sem largura máxima (diferente dos 1280px de Cadastros e Administração); cada coluna tem largura fixa de 310px (token `--largura-coluna-quadro`, escala da interface de 2026-10-14; antes cerca de 272px), e o que não cabe na tela fica na rolagem lateral.
 - **Lista:**
   - **Colunas:** nome (com "↳ pai" no subprocesso), tipo, setor, macroprocesso, etapa atual, responsável e situação em pílula.
@@ -335,6 +393,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
   - **Vazio:**
     - nenhum processo: o estado vazio que já existe ("Nenhum processo cadastrado ainda." com [Cadastrar processo] para quem pode);
     - filtros sem resultado: "Nenhum processo com estes filtros." com [Limpar filtros];
+    - "Só os meus" sem resultado (sem outros filtros): "Nenhum processo com você agora." com [Ver todos], que desliga o "Só os meus" (parte 4); com outros filtros ligados, vale a mensagem dos filtros;
     - "Este setor ainda não tem processos." e "Nenhuma alteração registrada ainda." no histórico.
   - **Erro ao carregar, inclusive falha de conexão:** "Não foi possível carregar {os processos | o processo | o catálogo}. Verifique a conexão e tente de novo." com [Tentar de novo].
   - **Item que não existe mais:** "Este processo não existe mais. Ele pode ter sido excluído; veja o Histórico." com [Voltar].
@@ -425,9 +484,20 @@ O par (`etapa_id`, `processo_id`) é único. A coluna `setor_id` foi apagada em 
 - o **responsável** da etapa atual;
 - a **situação calculada**: `concluido` quando a guardada é `em_andamento` e todas as etapas obrigatórias do processo estão resolvidas; senão, a guardada.
 
-A indicação "aguardando o setor" saiu da view em 2026-10-18.
+A indicação "aguardando o setor" saiu da view em 2026-10-18. Desde a parte 4 (2026-10-19), a view devolve também, acrescentados no fim:
 
-**Derivado, não guardado:** etapa atual, situação "concluído", quantidade de subprocessos e de processos por setor.
+| Campo | Tipo | Vazio quando |
+|---|---|---|
+| etapa_atual_status | status_da_etapa (`pendente` ou `em_andamento`) | sem etapa atual |
+| etapa_atual_iniciada_em | data | etapa atual pendente ou sem etapa atual |
+| responsavel_ativo | booleano | sem responsável |
+| caminho | lista JSON, na ordem do catálogo, de `{etapa_id, codigo, status}` de cada andamento do processo | nunca (lista vazia sem andamentos) |
+| ultima_versao_numero | inteiro (a versão de maior número, histórica ou não) | sem versão |
+| ultima_versao_historica | booleano | sem versão |
+| ultima_versao_tem_relatorio | booleano (algum arquivo de papel relatório na última versão) | sem versão |
+| subprocessos_quantidade | inteiro (subprocessos de situação guardada diferente de cancelado) | nunca (0) |
+
+**Derivado, não guardado:** etapa atual, situação "concluído", quantidade de subprocessos e de processos por setor; desde a parte 4, os dias na etapa, o processo parado, a coluna de destino do arrastar e os selos (calculados na tela a partir dos campos da view).
 
 **`eventos`** (já existe): recebe as entidades `processo`, `andamento` e `etapa`. Os eventos antigos de `responsavel_do_setor` e os de `andamento` de etapa do setor continuam guardados e legíveis por todo perfil ativo.
 - O `detalhes` traz antes e depois com campos legíveis: nome do processo, sigla do setor, nome do macroprocesso, nome e código da etapa, nome do responsável, e a data da reunião. Assim o histórico continua legível depois de uma exclusão.
@@ -551,6 +621,10 @@ Não destrutiva: nenhuma tabela ou coluna muda. Uma migração nova cria a funç
 
 Sem migração: nenhuma tabela, coluna, política, view ou função muda. O verso usa o que o processo lido já traz (etapas com datas, responsáveis e notas, versão mais recente, data da reunião, estrutura e situação com motivo); os dias na etapa e o "Concluído em" se calculam na tela a partir das datas das etapas, e a busca filtra a lista já carregada.
 
+#### Migração da parte 4 (Cartão do Quadro, 2026-10-19)
+
+Não destrutiva: nenhuma tabela, coluna, política ou função muda; a tabela "quem pode o quê" continua a mesma. Uma migração nova recria a view `processos_com_andamento` com os campos acima acrescentados no fim (`create or replace view`, que mantém os campos atuais na mesma ordem), com `security_invoker = true` e o mesmo `revoke` de visitante. Como a view roda com a permissão de quem lê, ela só mostra versões, arquivos e subprocessos que o perfil já lê pelas próprias políticas (todo perfil ativo lê processos, andamentos, versões e arquivos da versão). O arrastar grava pela função de avanço da parte 2, sem nada novo no banco. Vai pelo workflow "Migrar banco de desenvolvimento" e entra no registro de `supabase/AMBIENTES.md`.
+
 ## Decisões de teste
 
 - **Bom teste** confere o que a pessoa vê e consegue fazer, ou o que o banco aceita e recusa, nunca detalhes internos.
@@ -599,10 +673,17 @@ Sem migração: nenhuma tabela, coluna, política, view ou função muda. O vers
       - Editar na janela, voltando ao verso; Novo processo na janela, abrindo o verso do criado com "Processo cadastrado"; falhas de gravação com os dados no formulário;
       - estados do verso: carregando (com o texto para o leitor de tela), erro com [Tentar de novo] e processo excluído com [Voltar];
       - busca da Lista: por trecho do nome, sem diferenciar maiúsculas e acentos, somada aos filtros, no endereço, com o "×", com o trecho marcado e sem resultado com [Limpar filtros] limpando também a busca;
+    - cartão do Quadro (parte 4), pelo aplicativo inteiro, como a pessoa usa:
+      - a barra com o nome acessível "Etapa {n} de {total}: {etapa}", contando dispensada e realizada anteriormente como resolvidas;
+      - cada selo aparecendo e não aparecendo: dias com 15 e com 16 dias, sem selo no suspenso e na etapa pendente; Relatório pendente na Relatório e modelagem técnica (ausente), na Revisão interna (presente) e com relatório (ausente); Sem responsável; Reunião hoje, futura e passada (ausente); versão normal, histórica ("V5F") e ausente; subprocessos com um cancelado fora da contagem; a ordem dos selos;
+      - arrastar: o cartão arrastável só nos casos permitidos (não no suspenso, na etapa pendente, na última etapa, para a Consulta nem agrupado por responsável); soltar na coluna de destino abre a janela de avanço com o título dela; a coluna de destino quando a vizinha já está resolvida; confirmar move o cartão; Esc e [Cancelar] deixam tudo como estava; soltar em outra coluna mostra "Solte o cartão na coluna {etapa}."; a falha de gravação com a mensagem e nada mudado; o realce só na coluna de destino;
+      - Agrupar por Responsável: colunas em ordem alfabética, "Sem responsável" no fim, pílula "Inativo", o nome da etapa no cartão, os filtros valendo, e o agrupamento no endereço (recarregar mantém);
+      - Só os meus: liga e desliga, equivale ao filtro Responsável nos dois sentidos, ausente para a Consulta, e o vazio "Nenhum processo com você agora." com [Ver todos];
     - os testes de tela atuais que falam do painel (por exemplo `App.painelDoProcesso` e `App.andamentoDoProcesso`) são ajustados ao verso, mantendo os comportamentos que continuam valendo.
-  - **Funções puras novas:** a busca sem acento e sem maiúsculas, a contagem de dias na etapa e o limite de 15 dias, o agrupamento do histórico por dia e a leitura e montagem do endereço com `busca` ganham testes unitários pequenos.
+  - **Funções puras novas:** a busca sem acento e sem maiúsculas, a contagem de dias na etapa e o limite de 15 dias, o agrupamento do histórico por dia e a leitura e montagem do endereço com `busca` ganham testes unitários pequenos. Na parte 4: os selos de um processo (quais e em que ordem), a barra a partir do caminho, a coluna de destino do arrastar (ou nenhuma), as colunas agrupadas por responsável e o endereço com `agrupar`.
+  - **Arrastar nos testes:** os eventos nativos de arrastar e soltar disparados sobre o cartão e a coluna (o jsdom não faz o gesto, mas entrega os eventos), como a pessoa faria.
   - **Arte anterior:** os testes de tela de cadastros-basicos (`App.setores`, `App.macroprocessos`, `App.historicoDosCadastros`) e a janela de confirmação.
-- **Tradução entre o banco e a tela.** Testes pequenos do módulo de processos real com o cliente Supabase simulado. Eles provam que os códigos de recusa do banco viram as mensagens acima e que as linhas do banco e da view viram os tipos da tela. Arte anterior: os testes de `cadastrosSupabase` e `macroprocessosSupabase`.
+- **Tradução entre o banco e a tela.** Testes pequenos do módulo de processos real com o cliente Supabase simulado. Eles provam que os códigos de recusa do banco viram as mensagens acima e que as linhas do banco e da view viram os tipos da tela (na parte 4, os campos novos da view, inclusive vazios). Arte anterior: os testes de `cadastrosSupabase` e `macroprocessosSupabase`.
 - **Funções puras** (filtros a partir do endereço, ordem das colunas, textos do histórico): testes unitários pequenos.
 - **Banco.**
   - **Testes:** pgTAP, um teste por célula da tabela "quem pode o quê" (com um usuário inventado de cada perfil, um inativo e um visitante) e um por regra da tabela de regras. As transições de estado ganham um teste cada.
@@ -610,6 +691,7 @@ Sem migração: nenhuma tabela, coluna, política, view ou função muda. O vers
   - **Testes antigos:** conferir os que contam linhas de uma tabela inteira, porque o andamento nascia junto com cada setor (achado do `/ship` de cadastros-basicos).
   - **Simplificação (2026-10-18):** os testes `15_etapas_do_setor` e `16_responsaveis_do_setor` são apagados; `17`, `18`, `19`, `20`, `21` e `22` são ajustados ao catálogo de 6 etapas sem nível (posições mudam: a Revisão interna passa de 6 a 3); um teste novo prova a migração (tabelas e colunas apagadas, catálogo renumerado e renomeado, setor novo sem andamento, Modelagem piloto inicia sem depender do setor, eventos antigos legíveis). Os testes da funcionalidade de documentos (`26` a `31`) que criam processos ou citam etapas pela posição também são conferidos.
   - **Parte 2 (2026-10-18):** um teste por linha nova da tabela de regras (avanço e trava do autor), e os testes de "voltar" ajustados à assinatura nova. A função de avanço também ganha os casos de perfil (Consulta, inativo e visitante recusados) e de processo suspenso.
+  - **Parte 4 (2026-10-19):** um teste novo da view prova cada campo novo (início e status da etapa atual, caminho na ordem do catálogo, última versão histórica e não histórica, relatório presente e ausente, subprocesso cancelado fora da contagem, responsável inativo) e que a Consulta lê os mesmos valores; visitante e inativo continuam sem ler (o teste da view que já existe). O `10_privilegios_padrao` continua passando.
   - **Onde rodam:** os testes vêm antes da migração e rodam pelo GitHub Actions ("Testes de banco"). A migração vai pelo workflow "Migrar banco de desenvolvimento".
 - Todos os processos, setores e usuários dos testes são inventados.
 
@@ -620,7 +702,7 @@ Sem migração: nenhuma tabela, coluna, política, view ou função muda. O vers
 - Envio de fluxogramas e relatórios, versões e o nome dos arquivos: funcionalidade 5. A recusa de excluir processo com documento chega com ela.
 - Registro da revisão interna, E-protocolo e a trava que exige o registro para concluir as etapas de revisão: `revisoes-aprovacao` (parte 5 da iniciativa). Vão junto a regra 14 (aviso "estrutura alterada após aprovação") e os campos vigência e próxima revisão. O [Assumir] (antes "capturar") e a trava do autor na escolha do responsável entraram aqui em 2026-10-18 (ADR 0014); a regra que impede o autor de *registrar* a revisão fica na parte 5 e fecha a brecha de quem assume a Revisão interna pendente e depois envia a versão.
 - Conclusão automática de etapas por documento ou revisão. Resolver uma etapa continua manual; desde 2026-10-18, só o início da próxima é automático.
-- Arrastar o cartão para concluir e "Só os meus": parte 4 da iniciativa (o arrastar abre a janela de avanço desta parte).
+- Parte 4 (2026-10-19): barra e selos na Lista; arrastar para dispensar, para voltar ou para iniciar a etapa pendente; arrastar em tela de toque; atalho de teclado para concluir no cartão; ordem dos cartões por dias parados; prazos por etapa (o limite de processo parado é o número único 15, até a v1.5); outras pendências como selo.
 - Parte 3 (2026-10-19): o novo desenho do cartão do Quadro (barra de progresso e selos) é da parte 4; busca no Quadro; reunião com mais de uma data (continua uma por processo, ADR 0013); endereço próprio para o Histórico e para o Editar; abrir o verso por cima da tela do setor; qualquer mudança no banco.
 - Prazo padrão das etapas, prazo do andamento e indicador de atraso: funcionalidade 8.
 - Campo "fase" (AS-IS ou TO-BE) no catálogo: quando existir a fase 2.
@@ -642,6 +724,9 @@ Sem migração: nenhuma tabela, coluna, política, view ou função muda. O vers
   - `[visual]` A busca da Lista fica antes dos filtros, com lupa e "×", e o trecho encontrado aparece marcado em amarelo claro no nome.
   - `[visual]` O caminho de etapas mostra as resolvidas com ✓, a atual em azul com o sublinhado aceso e as futuras apagadas; sem etapas do setor (desde 2026-10-18). Desde 2026-10-19, vale a lista compacta do verso, descrita acima.
   - `[visual]` As pílulas (Suspenso, Cancelado, Concluído, Subprocesso, A classificar, Inativo, Inativa) têm cor e texto, nunca só cor.
+  - `[visual]` (Parte 4.) O cartão normal fica limpo: a barra fina em cinza e azul e, no máximo, versão e subprocessos em texto neutro; só "{n} dias nesta etapa" e "Relatório pendente" têm cor (âmbar); os selos quebram de linha sem estourar a largura da coluna.
+  - `[visual]` (Parte 4.) Durante o arrastar, só a coluna de destino ganha a borda tracejada azul; o cartão arrastado fica levemente apagado no lugar de origem.
+  - `[visual]` (Parte 4.) Agrupado por responsável, as colunas têm o nome da pessoa (com "Inativo" quando cabe) e os cartões mostram o nome da etapa no lugar da foto; "Agrupar por" e "Só os meus" ficam na barra do Quadro, junto dos filtros.
   - `[visual]` A Lista é uma tabela compacta, no padrão das listas de cadastros.
   - `[visual]` Para a Consulta, Quadro, Lista, painel, tela do setor e histórico não mostram campos editáveis nem botões de alteração.
   - `[visual]` As janelas de nota e de motivo seguem o padrão da janela de confirmação, com o campo de texto e o botão de confirmar desabilitado enquanto vazio.
@@ -652,6 +737,7 @@ Sem migração: nenhuma tabela, coluna, política, view ou função muda. O vers
   - os campos "fase" e "prazo padrão" do catálogo, e vigência e próxima revisão do processo, foram adiados;
   - a regra 14 foi para a funcionalidade 6;
   - o catálogo fica numa aba da Administração, como a especificação prevê.
+- **Divergências da parte 4 (2026-10-19)** com o Dashboard v1 da especificação (que passou à v1.5): no cartão, "versão sem relatório" só vira pendência da Revisão interna em diante, e o limite de processo parado é um número único (15 dias), não um por etapa. O painel da v1.5 decide a sua própria conta.
 - **Divergências de 2026-10-18** (ADR 0013): etapas do setor, responsáveis do setor e reuniões saem da plataforma; a especificação previa os três.
 - **Decisões tomadas ao escrever a spec, a confirmar na leitura:**
   - **Código fixo da etapa:** cada etapa do catálogo tem um código fixo, para as funcionalidades 5 e 6 reconhecerem as etapas que vão andar sozinhas.
@@ -667,6 +753,13 @@ Sem migração: nenhuma tabela, coluna, política, view ou função muda. O vers
     - o aviso "Este processo está {suspenso | cancelado}: {motivo}. Retome-o para registrar o andamento." dá lugar ao Agora suspenso ou cancelado, com o motivo e [Retomar];
     - a apresentação das versões e da reunião no verso muda o desenho das seções de `documentos-versoes` e `reunioes`, sem mudar o que elas fazem; as specs delas recebem uma nota apontando para cá;
     - [Limpar filtros] limpa também a busca.
+  - **Parte 4 (2026-10-19):**
+    - "Relatório pendente" não vale para a última versão histórica (ela é só leitura e não recebe relatório);
+    - o selo "Sem responsável" some quando o Quadro está agrupado por responsável, porque a coluna já diz;
+    - o cartão suspenso mantém a barra e os selos que não são de tempo (versão, reunião, subprocessos, Sem responsável);
+    - "Só os meus" é o filtro Responsável com o próprio id, sem parâmetro novo no endereço;
+    - o arrastar usa o recurso nativo do navegador, sem biblioteca nova; por isso não funciona por toque, o que a sabatina queria;
+    - [Limpar filtros] também desliga o "Só os meus" (é um filtro), mas mantém o agrupamento.
 - **Tamanho:** a funcionalidade tem várias entregas. A sabatina permitiu deixar a Lista para um ticket posterior.
 - **Rede do escritório:** a migração vai pelo workflow "Migrar banco de desenvolvimento" e precisa ser registrada em `supabase/AMBIENTES.md` para o `migration repair` antes da primeira publicação em produção.
 - **Privilégios padrão:** toda tabela ou view nova em `public` reprova o teste `10_privilegios_padrao` até receber o seu `revoke`.
@@ -675,3 +768,4 @@ Entregue em 2026-10-14 (commit f1cc3cf), com ressalva: critérios [visual] presu
 Entregue em 2026-10-18 (commit e54f51b)
 Entregue em 2026-10-19 (commit 8d01ca8)
 Entregue em 2026-10-19 (commit 8ef4091)
+Em revisão desde 2026-10-19
