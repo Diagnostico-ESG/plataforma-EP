@@ -135,12 +135,14 @@ export class ProcessosFalso implements ModuloDeProcessos {
     return [...(this.historicoDosProcessos[id] ?? [])]
   }
 
-  async criarProcesso(dados: DadosDoProcesso): Promise<void> {
+  async criarProcesso(dados: DadosDoProcesso): Promise<string> {
     this.conferirGravacao()
     this.conferirNomeNovo(dados)
     // Como o gatilho do banco: o subprocesso tem pai do tipo Processo e adota o macroprocesso dele.
     const macroprocesso = dados.tipo === 'subprocesso' ? macroprocessoDo(conferirPai(this.processos, dados.processoPaiId)) : {}
-    this.processos = [...this.processos, { ...this.processoNovo(dados), ...macroprocesso }]
+    const novo = { ...this.processoNovo(dados), ...macroprocesso }
+    this.processos = [...this.processos, novo]
+    return novo.id
   }
 
   async editarProcesso(id: string, dados: DadosDoProcesso): Promise<void> {
@@ -188,11 +190,18 @@ export class ProcessosFalso implements ModuloDeProcessos {
   }
 
   // O processo novo nasce com todas as etapas ativas do catálogo pendentes.
+  // Os testes carregam processos com ids fixos (p1, p2…): o processo novo não pode repetir um deles.
+  private idLivreDeProcesso(): string {
+    let id = `p${this.proximoId++}`
+    while (this.processos.some((processo) => processo.id === id)) id = `p${this.proximoId++}`
+    return id
+  }
+
   private processoNovo(dados: DadosDoProcesso): ProcessoLido {
     const etapas = this.etapasDoCatalogo.filter((etapa) => etapa.ativa)
     const primeira = etapas[0]
     return {
-      ...dados, ...this.nomesDoCartao(dados), id: `p${this.proximoId++}`, situacao: 'em_andamento',
+      ...dados, ...this.nomesDoCartao(dados), id: this.idLivreDeProcesso(), situacao: 'em_andamento',
       etapaAtual: primeira ? { codigo: primeira.codigo, nome: primeira.nome, ordem: primeira.ordem } : null,
       responsavel: null, motivoDaSituacao: null, processoPai: null, subprocessos: [], dataDaReuniao: null, ultimaVersao: null,
       etapasDoProcesso: etapas.map((etapa) => ({

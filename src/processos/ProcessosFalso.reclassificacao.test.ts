@@ -31,7 +31,7 @@ function falso(): ProcessosFalso {
 }
 
 const lido = async (modulo: ProcessosFalso, id: string) => (await modulo.lerProcesso(id)) as ProcessoLido
-async function falhaDe(promessa: Promise<void>): Promise<Error> {
+async function falhaDe(promessa: Promise<unknown>): Promise<Error> {
   return (await promessa.catch((erro: unknown) => erro)) as Error
 }
 

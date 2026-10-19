@@ -136,7 +136,8 @@ export type ModuloDeProcessos = {
   listarProcessos(): Promise<ListaDeProcessos>
   /** null: o processo não existe (mais). */
   lerProcesso(id: string): Promise<ProcessoLido | null>
-  criarProcesso(dados: DadosDoProcesso): Promise<void>
+  /** Devolve o id do processo criado. */
+  criarProcesso(dados: DadosDoProcesso): Promise<string>
   editarProcesso(id: string, dados: DadosDoProcesso): Promise<void>
   excluirProcesso(id: string): Promise<void>
   /** Marca, troca ou (com null) remove a data da reunião de modelagem piloto; vale em qualquer situação do processo. */

@@ -18,8 +18,9 @@ export function criarGravacaoDeProcessoSupabase(
     conferirGravacao(cliente, id, recusas, resposta, dados)
   return {
     criarProcesso: async (dados) => {
-      const { error } = await tabela().insert(valoresDoCadastro(dados))
+      const { data, error } = await tabela().insert(valoresDoCadastro(dados)).select('id')
       if (error) throw await falhaDoProcesso(cliente, error, recusas, dados)
+      return idDoCriado(data)
     },
     editarProcesso: async (id, dados) =>
       conferir(id, await tabela().update(valoresDaEdicao(dados)).eq('id', id).select('id'), dados),
@@ -27,6 +28,12 @@ export function criarGravacaoDeProcessoSupabase(
     marcarReuniao: async (id, data) =>
       conferir(id, await tabela().update({ data_da_reuniao: data }).eq('id', id).select('id')),
   }
+}
+
+function idDoCriado(data: { id: string }[] | null): string {
+  const id = data?.[0]?.id
+  if (!id) throw new Error(`O banco não devolveu o id do processo criado: recebido ${JSON.stringify(data)}, esperado uma linha com id.`)
+  return id
 }
 
 function valoresDaEdicao(dados: DadosDoProcesso) {

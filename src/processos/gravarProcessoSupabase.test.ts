@@ -18,13 +18,28 @@ function criar(cliente: ClienteSupabaseFalso) {
 }
 type Modulo = ReturnType<typeof criar>
 
-async function falhaDe(gravar: Promise<void>): Promise<Error> {
+async function falhaDe(gravar: Promise<unknown>): Promise<Error> {
   return (await gravar.catch((erro: unknown) => erro)) as Error
 }
 
 describe('gravação de processos no módulo real', () => {
+  test('criar devolve o id do processo criado e o pede ao banco', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['processos.insert'] = { data: [{ id: 'p9' }], error: null }
+    expect(await criar(cliente).criarProcesso(DADOS)).toBe('p9')
+    expect(cliente.pedidos[0].colunas).toBe('id')
+  })
+
+  test('criar sem o id de volta é falha, com o valor recebido e o formato esperado', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['processos.insert'] = { data: [], error: null }
+    const falha = await falhaDe(criar(cliente).criarProcesso(DADOS))
+    expect(falha.message).toBe('O banco não devolveu o id do processo criado: recebido [], esperado uma linha com id.')
+  })
+
   test('criar insere os campos do cadastro, com o tipo', async () => {
     const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['processos.insert'] = { data: [{ id: 'p9' }], error: null }
     await criar(cliente).criarProcesso(DADOS)
     expect(cliente.pedidos[0]).toMatchObject({ tabela: 'processos', operacao: 'insert', valores: {
       setor_id: 's1', macroprocesso_id: 'm1', nome: DADOS.nome, tipo: 'a_classificar', processo_pai_id: null,
@@ -33,6 +48,7 @@ describe('gravação de processos no módulo real', () => {
 
   test('criar um subprocesso manda o pai', async () => {
     const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['processos.insert'] = { data: [{ id: 'p9' }], error: null }
     await criar(cliente).criarProcesso({ ...DADOS, tipo: 'subprocesso', processoPaiId: 'p0' })
     expect(cliente.pedidos[0].valores).toMatchObject({ tipo: 'subprocesso', processo_pai_id: 'p0' })
   })
