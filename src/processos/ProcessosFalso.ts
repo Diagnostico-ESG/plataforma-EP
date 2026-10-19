@@ -135,12 +135,14 @@ export class ProcessosFalso implements ModuloDeProcessos {
     return [...(this.historicoDosProcessos[id] ?? [])]
   }
 
-  async criarProcesso(dados: DadosDoProcesso): Promise<void> {
+  async criarProcesso(dados: DadosDoProcesso): Promise<string> {
     this.conferirGravacao()
     this.conferirNomeNovo(dados)
     // Como o gatilho do banco: o subprocesso tem pai do tipo Processo e adota o macroprocesso dele.
     const macroprocesso = dados.tipo === 'subprocesso' ? macroprocessoDo(conferirPai(this.processos, dados.processoPaiId)) : {}
-    this.processos = [...this.processos, { ...this.processoNovo(dados), ...macroprocesso }]
+    const novo = { ...this.processoNovo(dados), ...macroprocesso }
+    this.processos = [...this.processos, novo]
+    return novo.id
   }
 
   async editarProcesso(id: string, dados: DadosDoProcesso): Promise<void> {
