@@ -88,7 +88,7 @@ insert into _tap (linha) select throws_ok(
     where id = pg_temp.andamento('Processo Parado', 'modelagem')$sql$,
   'P0001', 'processo_parado:suspenso', 'mudar o responsável de etapa de processo suspenso é recusado');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Parado', 'modelagem'), 'Tentativa')$sql$,
+  $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Parado', 'modelagem'), 'Tentativa', null)$sql$,
   'P0001', 'processo_parado:suspenso', 'voltar a etapa de processo suspenso é recusado');
 
 -- Retomar.

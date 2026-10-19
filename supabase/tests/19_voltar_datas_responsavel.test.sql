@@ -61,7 +61,7 @@ select pg_temp.agir('Processo Volta', 'revisao_interna', 'concluida');
 
 -- Voltar à 4 com a 5 e a 6 concluídas.
 insert into _tap (linha) select lives_ok(
-  $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Volta', 'modelagem'), 'Mudou o escopo')$sql$,
+  $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Volta', 'modelagem'), 'Mudou o escopo', null)$sql$,
   'voltar à etapa 4 com a 5 e a 6 concluídas');
 insert into _tap (linha) select is(pg_temp.status('Processo Volta', 'modelagem'), 'em_andamento'::public.status_da_etapa,
   'a etapa escolhida volta a em andamento');
@@ -90,20 +90,20 @@ insert into _tap (linha) select is(
 select pg_temp.agir('Processo Volta', 'modelagem', 'concluida');
 select pg_temp.agir('Processo Volta', 'relatorio_modelagem_tecnica', 'em_andamento');
 insert into _tap (linha) select lives_ok(
-  $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Volta', 'modelagem'), 'Refazer')$sql$,
+  $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Volta', 'modelagem'), 'Refazer', null)$sql$,
   'voltar à 4 com a 5 em andamento');
 insert into _tap (linha) select is(pg_temp.status('Processo Volta', 'relatorio_modelagem_tecnica'), 'pendente'::public.status_da_etapa,
   'a seguinte em andamento volta a pendente');
 
 -- Recusas.
 insert into _tap (linha) select throws_ok(
-  $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Volta', 'modelagem'), '  ')$sql$, 'P0001', 'motivo_obrigatorio',
+  $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Volta', 'modelagem'), '  ', null)$sql$, 'P0001', 'motivo_obrigatorio',
   'voltar sem motivo é recusado');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Volta', 'modelagem'), null)$sql$, 'P0001', 'motivo_obrigatorio',
+  $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Volta', 'modelagem'), null, null)$sql$, 'P0001', 'motivo_obrigatorio',
   'voltar com motivo nulo é recusado');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Volta', 'relatorio_modelagem_tecnica'), 'Motivo')$sql$,
+  $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Volta', 'relatorio_modelagem_tecnica'), 'Motivo', null)$sql$,
   'P0001', 'etapa_nao_resolvida:Relatório e modelagem técnica', 'voltar a uma etapa que não está resolvida é recusado');
 
 -- O processo concluído deixa de ser concluído ao voltar.
@@ -116,7 +116,7 @@ insert into _tap (linha) select is(
   (select situacao from public.processos_com_andamento where nome = 'Processo Concluido'), 'concluido',
   'com as obrigatórias resolvidas o processo é concluído');
 insert into _tap (linha) select lives_ok(
-  $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Concluido', 'revisao_interna'), 'Faltou revisar')$sql$,
+  $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Concluido', 'revisao_interna'), 'Faltou revisar', null)$sql$,
   'voltar numa etapa do processo concluído');
 insert into _tap (linha) select is(
   (select situacao from public.processos_com_andamento where nome = 'Processo Concluido'), 'em_andamento',
@@ -193,15 +193,15 @@ with alterados as (update public.andamentos set responsavel_id = '00000000-0000-
   where id = pg_temp.andamento('Processo Datas', 'modelagem') returning 1)
 insert into _tap (linha) select is((select count(*)::int from alterados), 0, 'Consulta não muda o responsável');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Datas', 'modelagem'), 'Tentativa')$sql$, '42501', null,
+  $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Datas', 'modelagem'), 'Tentativa', null)$sql$, '42501', null,
   'Consulta não volta a etapa');
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a4","role":"authenticated"}', true);
 insert into _tap (linha) select throws_ok(
-  $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Datas', 'modelagem'), 'Tentativa')$sql$,
+  $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Datas', 'modelagem'), 'Tentativa', null)$sql$,
   'P0001', 'registro_inexistente', 'Inativo não volta a etapa (não lê nada, a etapa "não existe" para ele)');
 set local role anon;
 insert into _tap (linha) select throws_ok(
-  $sql$select public.voltar_a_etapa('00000000-0000-0000-0000-000000000000', 'Tentativa')$sql$, '42501', null,
+  $sql$select public.voltar_a_etapa('00000000-0000-0000-0000-000000000000', 'Tentativa', null)$sql$, '42501', null,
   'visitante não volta a etapa');
 
 reset role;
