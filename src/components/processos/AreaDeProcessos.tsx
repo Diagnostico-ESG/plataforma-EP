@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import type { UsuarioAtual } from '../../acesso/tipos'
 import type { ModuloDeCadastros } from '../../cadastros/tipos'
 import { useCarregamento } from '../../hooks/useCarregamento'
@@ -29,18 +29,22 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes }: Area
   const [endereco, irPara] = useEndereco()
   const atual = lerEnderecoDosProcessos(endereco)
   const podeAlterar = usuario.perfil !== 'consulta'
+  const [recemCriado, setRecemCriado] = useState<string | null>(null)
   const cadastrando = podeAlterar && atual.aberto === 'novo'
   const idAberto = atual.aberto === 'novo' ? null : atual.aberto
   const irParaVisao = (mudancas: Partial<EnderecoDosProcessos>) => irPara(montarEnderecoDosProcessos({ ...atual, ...mudancas }))
   const enderecoDoProcesso = (id: string) => montarEnderecoDosProcessos({ ...atual, aberto: id })
 
   function fechar() {
+    setRecemCriado(null)
     irParaVisao({ aberto: null })
     if (idAberto) focarNoProcesso(idAberto)
   }
 
-  function aoCriar() {
-    irParaVisao({ aberto: null })
+  // O verso do processo recém-criado abre com o aviso; abrir outro (ou reabrir este depois) não o repete.
+  function aoCriar(idCriado: string) {
+    setRecemCriado(idCriado)
+    irParaVisao({ aberto: idCriado })
     recarregar()
   }
 
@@ -55,7 +59,8 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes }: Area
       </div>
       {idAberto && (
         <VersoDoCartao processos={processos} cadastros={cadastros} versoes={versoes} id={idAberto}
-          podeAlterar={podeAlterar} usuarioId={usuario.id} aoFechar={fechar} aoMudar={recarregar} enderecoDoProcesso={enderecoDoProcesso} />
+          podeAlterar={podeAlterar} usuarioId={usuario.id} aoFechar={fechar}
+          aviso={recemCriado === idAberto ? 'Processo cadastrado' : undefined} aoMudar={recarregar} enderecoDoProcesso={enderecoDoProcesso} />
       )}
       {cadastrando && (
         <JanelaDoNovoProcesso processos={processos} cadastros={cadastros} aoFechar={() => irParaVisao({ aberto: null })}

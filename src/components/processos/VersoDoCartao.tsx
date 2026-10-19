@@ -11,6 +11,7 @@ import { ItemInexistente } from '../cadastros/ItemInexistente'
 import { SecaoDeVersoes } from '../versoes/SecaoDeVersoes'
 import { AcoesDoProcesso } from './AcoesDoProcesso'
 import { BotaoFecharJanela, CabecalhoDoVerso } from './CabecalhoDoVerso'
+import { CabecalhoDoFormulario } from './CabecalhoDoFormulario'
 import { CaminhoDoProcesso } from './CaminhoDoProcesso'
 import { EstruturaDoProcesso } from './EstruturaDoProcesso'
 import { FormularioDoProcesso } from './FormularioDoProcesso'
@@ -33,6 +34,8 @@ type VersoDoCartaoProps = {
   aoMudar: () => void
   /** O endereço de outro processo (pai ou subprocesso), aberto na mesma janela. */
   enderecoDoProcesso: (id: string) => string
+  /** Uma confirmação logo abaixo do cabeçalho ("Processo cadastrado"). */
+  aviso?: string
 }
 
 const TEXTO_DE_PROCESSO_INEXISTENTE = 'Este processo não existe mais. Ele pode ter sido excluído; veja o Histórico.'
@@ -133,7 +136,10 @@ function ProcessoAberto(props: ProcessoAbertoProps) {
   )
   return (
     <>
-      <CabecalhoDoVerso processo={processo} titulo={titulo} acoes={acoes} aoFechar={aoFechar} />
+      {modo === 'editar'
+        ? <CabecalhoDoFormulario titulo={`Editar ${processo.nome}`} referencia={titulo} aoFechar={aoFechar} />
+        : <CabecalhoDoVerso processo={processo} titulo={titulo} acoes={acoes} aoFechar={aoFechar} />}
+      {props.aviso && modo === 'verso' && <p className="verso-aviso" role="status">{props.aviso}</p>}
       {falha && <p className="cadastros-falha verso-falha" role="alert">{falha}</p>}
       <CorpoDoVerso {...props} executar={executar} aoVoltar={() => aoMudarModo('verso')} aposMudar={aposMudar} />
     </>

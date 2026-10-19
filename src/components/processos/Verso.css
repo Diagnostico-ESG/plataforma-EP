@@ -225,3 +225,19 @@
     border-left: 0;
   }
 }
+
+/* Novo processo e Editar: o cabeçalho é só o título e o fechar. */
+.verso-cabecalho-formulario {
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Confirmação logo abaixo do cabeçalho: texto verde de sucesso, sem caixa. */
+.verso-aviso {
+  margin: 0;
+  padding: var(--esp-2) var(--esp-5);
+  border-bottom: 1px solid var(--linha);
+  color: var(--aprovado-texto);
+  font-size: var(--tam-secundario);
+  font-weight: 600;
+}

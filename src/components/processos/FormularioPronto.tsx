@@ -59,15 +59,14 @@ export function FormularioPronto({ cadastros, opcoes, titulo, inicial, aoSalvar,
   const macroprocesso = opcoes.macroprocessos.find((outro) => outro.id === campos.macroprocessoId)
   return (
     <form className="formulario-do-processo" aria-label={titulo} noValidate onSubmit={enviar}>
-      <h3 className="painel-subtitulo">{titulo}</h3>
       <CamposDoFormulario campos={campos} opcoes={opcoes} mostrarTipo={!inicial}
         aoMudar={(mudanca) => setCampos((atuais) => comMacroprocessoDoPai({ ...atuais, ...mudanca }, opcoes.pais))} />
       {setor && macroprocesso && (
         <AvisoDeSetorIncluido key={macroprocesso.id} cadastros={cadastros} setorId={setor.id} setorSigla={setor.sigla}
           macroprocessoId={macroprocesso.id} macroprocessoNome={macroprocesso.nome} />
       )}
-      <div className="formulario-do-processo-botoes">
-        <button type="submit" className="botao botao-principal" disabled={enviando}>Salvar</button>
+      <div className="formulario-do-processo-rodape">
+        <button type="submit" className="botao botao-principal" disabled={enviando}>{inicial ? 'Salvar' : 'Cadastrar'}</button>
         <button type="button" className="botao botao-secundario" onClick={aoCancelar}>Cancelar</button>
       </div>
       {aviso && <p className="cadastros-falha" role="alert">{aviso}</p>}

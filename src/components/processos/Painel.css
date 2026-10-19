@@ -43,9 +43,23 @@
   resize: vertical;
 }
 
+/* Os botões dos formulários de arquivo, que ficam no fluxo da página. */
 .formulario-do-processo-botoes {
   display: flex;
   gap: var(--esp-2);
+}
+
+/* Rodapé fixo: os botões ficam à vista enquanto o formulário rola dentro da janela; as margens negativas
+   levam o fundo e a linha até as bordas da janela, por cima do padding da página. */
+.formulario-do-processo-rodape {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  gap: var(--esp-2);
+  margin: var(--esp-2) calc(-1 * var(--esp-5)) calc(-1 * var(--esp-5));
+  padding: var(--esp-3) var(--esp-5);
+  border-top: 1px solid var(--linha);
+  background: var(--folha);
 }
 
 /* Aviso (amarelo): informa o que vai acontecer ao salvar, sem dizer que algo falhou. */

@@ -67,6 +67,7 @@ function preencher(form: ReturnType<typeof within>, campos: { nome?: string; set
 }
 
 const salvar = (form: ReturnType<typeof within>) => fireEvent.click(form.getByRole('button', { name: 'Salvar' }))
+const cadastrar = (form: ReturnType<typeof within>) => fireEvent.click(form.getByRole('button', { name: 'Cadastrar' }))
 
 async function abrirEdicao() {
   window.location.hash = '#/processos/p1'
@@ -89,31 +90,57 @@ test('o cadastro oferece só setores e macroprocessos ativos, com "A classificar
   expect(form.getByLabelText('Observações')).toBeTruthy()
 })
 
-test('cadastrar grava os dados, fecha o painel e o cartão aparece na coluna da etapa atual', async () => {
+test('cadastrar grava os dados e abre o verso do criado; ao fechar, o cartão aparece na coluna da etapa atual', async () => {
   const falso = montar()
   const form = await formulario()
   preencher(form, { nome: ' Emitir Ofício ', setor: 's1', macro: 'm1' })
   escrever(form.getByLabelText('Tipo'), 'processo')
   escrever(form.getByLabelText('Contexto'), 'Contexto inventado')
-  salvar(form)
-  await waitFor(() => expect(window.location.hash).toBe('#/processos'))
+  cadastrar(form)
+  await waitFor(() => expect(window.location.hash).toBe(`#/processos/${falso.processos[0].id}`))
   expect(falso.processos[0]).toMatchObject({
     nome: 'Emitir Ofício', setorId: 's1', macroprocessoId: 'm1', tipo: 'processo', origem: 'novo',
     contexto: 'Contexto inventado', observacoes: null })
+  const verso = await screen.findByRole('dialog', { name: 'Processo Emitir Ofício' })
+  expect((await within(verso).findByText('Processo cadastrado')).getAttribute('role')).toBe('status')
+  fireEvent.keyDown(within(verso).getByRole('heading', { name: 'Emitir Ofício', level: 2 }), { key: 'Escape' })
   const coluna = within(await screen.findByRole('region', { name: 'Reunião de modelagem' }))
   expect(await coluna.findByRole('link', { name: /Emitir Ofício/ })).toBeTruthy()
+})
+
+test('o aviso "Processo cadastrado" só vale para o verso recém-aberto pelo cadastro', async () => {
+  montar()
+  const form = await formulario()
+  preencher(form, { nome: 'Emitir Ofício', setor: 's1', macro: 'm1' })
+  cadastrar(form)
+  const verso = await screen.findByRole('dialog', { name: 'Processo Emitir Ofício' })
+  expect((await within(verso).findByText('Processo cadastrado')).getAttribute('role')).toBe('status')
+  fireEvent.keyDown(within(verso).getByRole('heading', { name: 'Emitir Ofício', level: 2 }), { key: 'Escape' })
+  fireEvent.click(await screen.findByRole('link', { name: /Emitir Ofício/ }))
+  const reaberto = await screen.findByRole('dialog', { name: 'Processo Emitir Ofício' })
+  expect(within(reaberto).queryByText('Processo cadastrado')).toBeNull()
+})
+
+test('o Novo processo tem o cabeçalho "Novo processo" e os botões [Cadastrar] e [Cancelar]', async () => {
+  montar()
+  const janela = within(await screen.findByRole('dialog', { name: 'Novo processo' }))
+  expect(janela.getByRole('heading', { name: 'Novo processo', level: 2 })).toBeTruthy()
+  const form = await formulario()
+  expect(form.getByRole('button', { name: 'Cadastrar' })).toBeTruthy()
+  expect(form.getByRole('button', { name: 'Cancelar' })).toBeTruthy()
+  expect(form.queryByRole('button', { name: 'Salvar' })).toBeNull()
 })
 
 test('nome, setor e macroprocesso são obrigatórios, conferidos antes de enviar', async () => {
   const falso = montar()
   const form = await formulario()
-  salvar(form)
+  cadastrar(form)
   expect((await form.findByRole('alert')).textContent).toBe('O nome do processo é obrigatório.')
   preencher(form, { nome: 'Emitir Ofício' })
-  salvar(form)
+  cadastrar(form)
   expect((await form.findByRole('alert')).textContent).toBe('Escolha o setor do processo.')
   preencher(form, { setor: 's1' })
-  salvar(form)
+  cadastrar(form)
   expect((await form.findByRole('alert')).textContent).toBe('Escolha o macroprocesso do processo.')
   expect(falso.processos).toEqual([])
 })
@@ -122,7 +149,7 @@ test('nome repetido no mesmo setor: a recusa em vermelho e os dados continuam no
   montar({ processos: [EMITIR] })
   const form = await formulario()
   preencher(form, { nome: 'emitir ofício', setor: 's1', macro: 'm1' })
-  salvar(form)
+  cadastrar(form)
   const alerta = await form.findByRole('alert')
   expect(alerta.textContent).toBe('Já existe um processo com o nome emitir ofício no setor TSA.')
   expect(alerta.classList.contains('cadastros-falha')).toBe(true)
@@ -133,7 +160,7 @@ test('o mesmo nome em outro setor é aceito', async () => {
   const falso = montar({ processos: [EMITIR] })
   const form = await formulario()
   preencher(form, { nome: 'Emitir Ofício', setor: 's2', macro: 'm1' })
-  salvar(form)
+  cadastrar(form)
   await waitFor(() => expect(falso.processos).toHaveLength(2))
 })
 
@@ -142,7 +169,7 @@ test('falha de gravação: a mensagem com o motivo e os dados continuam no formu
   falso.falhaDeGravacao = 'sem conexão'
   const form = await formulario()
   preencher(form, { nome: 'Emitir Ofício', setor: 's1', macro: 'm1' })
-  salvar(form)
+  cadastrar(form)
   expect((await form.findByRole('alert')).textContent)
     .toBe('A alteração não foi salva: sem conexão. Seus dados continuam no formulário.')
   expect((form.getByLabelText('Nome') as HTMLInputElement).value).toBe('Emitir Ofício')
@@ -178,6 +205,9 @@ test('a Consulta não tem o formulário de cadastro', async () => {
 test('[Editar] troca os dados pelo formulário preenchido, sem o campo de tipo, e salvar atualiza o painel', async () => {
   const { form } = await abrirEdicao()
   expect(form.queryByLabelText('Tipo')).toBeNull()
+  expect(screen.getByRole('heading', { name: 'Editar Emitir Ofício', level: 2 })).toBeTruthy()
+  expect(form.queryByRole('button', { name: 'Cadastrar' })).toBeNull()
+  expect(screen.getByRole('dialog', { name: 'Processo Emitir Ofício' }).classList.contains('verso-estreita')).toBe(true)
   expect((form.getByLabelText('Nome') as HTMLInputElement).value).toBe('Emitir Ofício')
   expect((form.getByLabelText('Setor') as HTMLSelectElement).value).toBe('s1')
   expect((form.getByLabelText('Origem') as HTMLSelectElement).value).toBe('retomado')
