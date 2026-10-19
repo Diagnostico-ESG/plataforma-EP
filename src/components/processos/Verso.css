@@ -206,6 +206,31 @@
   height: 64px;
 }
 
+/* Carregando do formulário: rótulo e controle do tamanho dos reais (rótulo de 22 px, campo de 32 px e caixa de texto de 3 linhas, medidos no formulário pronto) e os dois botões do rodapé. */
+.formulario-fantasma-campo {
+  display: grid;
+  gap: var(--esp-2);
+}
+
+.formulario-fantasma-rotulo {
+  width: 20%;
+  height: 14px;
+  margin-block: var(--esp-1);
+}
+
+.formulario-fantasma-controle {
+  height: 32px;
+}
+
+.formulario-fantasma-texto {
+  height: 75px;
+}
+
+.formulario-fantasma-botao {
+  width: 96px;
+  height: 32px;
+}
+
 @media (max-width: 900px) {
   .verso,
   .verso-estreita {
