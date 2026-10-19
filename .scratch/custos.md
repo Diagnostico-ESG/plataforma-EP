@@ -74,3 +74,5 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-19 | processos-etapas | /situação + /executar-complexo (ticket 19) + /polir (parte 3) | US$ 5,05
 2026-10-19 | processos-etapas | /ship (parte 3, Verso do cartão) | não informado (plano sem valor no /cost)
 2026-10-19 | processos-etapas | /situação + /executar-complexo (ticket 20) | não informado (plano sem valor no /cost)
+2026-10-19 | processos-etapas | /polir + /ship (parte 4, Cartão do Quadro) | não informado (plano sem valor no /cost)
+2026-10-19 | processos-etapas | /polir + /ship (parte 4, Cartão do Quadro) | não informado (plano sem valor no /cost)

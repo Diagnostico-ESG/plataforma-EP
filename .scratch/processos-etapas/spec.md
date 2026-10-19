@@ -760,6 +760,7 @@ Não destrutiva: nenhuma tabela, coluna, política ou função muda; a tabela "q
     - "Só os meus" é o filtro Responsável com o próprio id, sem parâmetro novo no endereço;
     - o arrastar usa o recurso nativo do navegador, sem biblioteca nova; por isso não funciona por toque, o que a sabatina queria;
     - [Limpar filtros] também desliga o "Só os meus" (é um filtro), mas mantém o agrupamento.
+  - **Entrega da parte 4 (2026-10-19):** o selo "Relatório pendente" compara a posição da Revisão interna no caminho do próprio processo (já na ordem do catálogo); processo sem a Revisão interna no caminho não ganha o selo.
 - **Tamanho:** a funcionalidade tem várias entregas. A sabatina permitiu deixar a Lista para um ticket posterior.
 - **Rede do escritório:** a migração vai pelo workflow "Migrar banco de desenvolvimento" e precisa ser registrada em `supabase/AMBIENTES.md` para o `migration repair` antes da primeira publicação em produção.
 - **Privilégios padrão:** toda tabela ou view nova em `public` reprova o teste `10_privilegios_padrao` até receber o seu `revoke`.
