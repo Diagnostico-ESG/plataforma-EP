@@ -77,3 +77,46 @@ export function podeAssumir(etapa: EtapaDoCaminho, usuarioId: string, ultimaVers
   if (etapa.status !== 'pendente' && etapa.status !== 'em_andamento') return false
   return !ehAutorBarrado(etapa, usuarioId, ultimaVersao)
 }
+
+/** "Concluído em": a data da última etapa obrigatória resolvida; null se nenhuma tem data. */
+export function concluidoEm(etapas: EtapaDoCaminho[]): string | null {
+  const datas = etapas.flatMap((etapa) => (etapa.obrigatoria && etapa.resolvidaEm ? [etapa.resolvidaEm] : []))
+  return datas.sort().at(-1) ?? null
+}
+
+export type OpcaoDeResponsavel = { valor: string; rotulo: string; desabilitada?: boolean }
+
+/**
+ * O "Trocar": quem está na tela primeiro, com "(você)"; os demais; o responsável atual que já não está na lista
+ * (desativado) e, por último, "Ninguém por enquanto" (valor ""). A lista chega sem o autor barrado da Revisão interna.
+ */
+export function opcoesDeResponsavel(etapa: EtapaDoProcesso, usuarios: UsuarioResponsavel[], usuarioId: string): OpcaoDeResponsavel[] {
+  const eu = usuarios.filter((usuario) => usuario.id === usuarioId).map((usuario) => ({ valor: usuario.id, rotulo: `${usuario.nome} (você)` }))
+  const outros = usuarios.filter((usuario) => usuario.id !== usuarioId).map((usuario) => ({ valor: usuario.id, rotulo: usuario.nome }))
+  return [...eu, ...outros, ...responsavelForaDaLista(etapa, usuarios), { valor: '', rotulo: 'Ninguém por enquanto' }]
+}
+
+function responsavelForaDaLista(etapa: EtapaDoProcesso, usuarios: UsuarioResponsavel[]): OpcaoDeResponsavel[] {
+  const atual = etapa.responsavelId
+  if (atual === null || usuarios.some((usuario) => usuario.id === atual)) return []
+  const inativo = etapa.responsavelInativo
+  return [{ valor: atual, rotulo: `${etapa.responsavelNome}${inativo ? ' (Inativo)' : ''}`, desabilitada: inativo }]
+}
+
+export type SinalDaEtapa = 'concluida' | 'atual' | 'pendente' | 'opcional' | 'dispensada' | 'anterior'
+
+/** O nome acessível de cada sinal, ao lado do nome da etapa. */
+export const ROTULO_DO_SINAL: Record<SinalDaEtapa, string> = {
+  concluida: 'concluída', atual: 'atual', pendente: 'pendente', opcional: 'opcional, pendente', dispensada: 'dispensada',
+  anterior: 'realizada anteriormente',
+}
+
+/** O sinal da linha da etapa (spec, "Etapas"): a atual vale mais que o status dela. */
+export function sinalDaEtapa(etapas: EtapaDoCaminho[], indice: number): SinalDaEtapa {
+  const etapa = etapas[indice]
+  if (indice === indiceDaEtapaAtual(etapas)) return 'atual'
+  if (etapa.status === 'concluida') return 'concluida'
+  if (etapa.status === 'realizada_anteriormente') return 'anterior'
+  if (etapa.status === 'dispensada') return 'dispensada'
+  return etapa.obrigatoria ? 'pendente' : 'opcional'
+}

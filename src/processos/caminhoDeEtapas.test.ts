@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import {
-  ROTULO_DO_STATUS, acoesDaEtapa, formatarData, indiceDaEtapaAtual, podeAssumir, proximaPendente, responsavelMarcado, usuariosParaAEtapa,
+  ROTULO_DO_STATUS, acoesDaEtapa, concluidoEm, formatarData, indiceDaEtapaAtual, opcoesDeResponsavel, podeAssumir, proximaPendente, responsavelMarcado, sinalDaEtapa, usuariosParaAEtapa,
 } from './caminhoDeEtapas'
 import type { EtapaDoCaminho, EtapaDoProcesso, StatusDaEtapa, UltimaVersao } from './tipos'
 
@@ -122,4 +122,44 @@ describe('trava do autor da versão mais recente na Revisão interna', () => {
     expect(podeAssumir(doProcesso('revisao_interna', 'em_andamento'), 'u1', ULTIMA)).toBe(false)
     expect(podeAssumir(doProcesso('revisao_interna', 'em_andamento'), 'u2', ULTIMA)).toBe(true)
   })
+})
+
+const etapaDe = (nome: string, mudancas: Partial<EtapaDoProcesso> = {}): EtapaDoProcesso => ({
+  id: nome, codigo: nome, nome, ordem: 1, obrigatoria: true, status: 'pendente', nota: null, iniciadaEm: null,
+  resolvidaEm: null, responsavelId: null, responsavelNome: null, responsavelInativo: false, ...mudancas,
+})
+
+test('concluidoEm é a data da última etapa obrigatória resolvida, e a opcional não conta', () => {
+  const etapas = [
+    etapaDe('a', { status: 'concluida', resolvidaEm: '2026-10-10' }),
+    etapaDe('b', { status: 'realizada_anteriormente', resolvidaEm: '2026-10-12' }),
+    etapaDe('c', { status: 'dispensada', obrigatoria: false, resolvidaEm: '2026-10-15' }),
+  ]
+  expect(concluidoEm(etapas)).toBe('2026-10-12')
+  expect(concluidoEm([etapaDe('a')])).toBeNull()
+})
+
+test('o Trocar põe quem está na tela primeiro, com (você), e Ninguém por enquanto no fim', () => {
+  const eu = { id: 'u1', nome: 'Ana Teste' }
+  const bia = { id: 'u2', nome: 'Bia Teste' }
+  const opcoes = opcoesDeResponsavel(etapaDe('x'), [bia, eu], 'u1')
+  expect(opcoes.map((opcao) => opcao.rotulo)).toEqual(['Ana Teste (você)', 'Bia Teste', 'Ninguém por enquanto'])
+  expect(opcoes.at(-1)?.valor).toBe('')
+})
+
+test('o responsável atual que saiu da lista continua à vista; o inativo fica desabilitado', () => {
+  const inativo = etapaDe('x', { responsavelId: 'u9', responsavelNome: 'Caio Teste', responsavelInativo: true })
+  const opcoes = opcoesDeResponsavel(inativo, [{ id: 'u1', nome: 'Ana Teste' }], 'u1')
+  expect(opcoes.map((opcao) => opcao.rotulo)).toEqual(['Ana Teste (você)', 'Caio Teste (Inativo)', 'Ninguém por enquanto'])
+  expect(opcoes[1].desabilitada).toBe(true)
+})
+
+test('o sinal de cada etapa: atual, concluída, anterior, dispensada, pendente e opcional', () => {
+  const etapas = [
+    etapaDe('a', { status: 'concluida' }), etapaDe('b', { status: 'realizada_anteriormente' }),
+    etapaDe('c', { status: 'em_andamento' }), etapaDe('d'), etapaDe('e', { obrigatoria: false }),
+    etapaDe('f', { status: 'dispensada', obrigatoria: false }),
+  ]
+  expect(etapas.map((_, indice) => sinalDaEtapa(etapas, indice))).toEqual(
+    ['concluida', 'anterior', 'atual', 'pendente', 'opcional', 'dispensada'])
 })
