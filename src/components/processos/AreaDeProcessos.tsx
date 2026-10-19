@@ -7,6 +7,7 @@ import {
   lerEnderecoDosProcessos, montarEnderecoDosProcessos, type EnderecoDosProcessos,
 } from '../../processos/enderecoDosProcessos'
 import type { ModuloDeProcessos } from '../../processos/tipos'
+import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { JanelaDoNovoProcesso } from './JanelaDoNovoProcesso'
 import { VersoDoCartao } from './VersoDoCartao'
@@ -15,6 +16,7 @@ import { VisaoDosProcessos } from './VisaoDosProcessos'
 type AreaDeProcessosProps = {
   usuario: UsuarioAtual; processos: ModuloDeProcessos; cadastros: ModuloDeCadastros
   versoes: ModuloDeVersoes
+  revisoes: ModuloDeRevisoes
 }
 
 // O foco volta ao cartão (Quadro) ou ao botão da linha (Lista) do processo que estava aberto, depois que a visão deixa de estar inerte.
@@ -23,7 +25,7 @@ function focarNoProcesso(id: string) {
 }
 
 // Esconder botões e o formulário da Consulta é conveniência; quem protege os dados é a RLS de processos.
-export function AreaDeProcessos({ usuario, processos, cadastros, versoes }: AreaDeProcessosProps) {
+export function AreaDeProcessos({ usuario, processos, cadastros, versoes, revisoes }: AreaDeProcessosProps) {
   const listar = useCallback(() => processos.listarProcessos(), [processos])
   const { estado, tentarDeNovo, recarregar } = useCarregamento(listar)
   const [endereco, irPara] = useEndereco()
@@ -57,10 +59,10 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes }: Area
           enderecoDoProcesso={enderecoDoProcesso} aoAbrir={(id) => irParaVisao({ aberto: id })}
           filtros={atual.filtros} aoMudarFiltros={(filtros) => irParaVisao({ filtros, aberto: null })}
           agrupar={atual.agrupar} aoMudarAgrupar={(agrupar) => irParaVisao({ agrupar, aberto: null })}
-          processos={processos} usuarioId={usuario.id} aoMudar={recarregar} />
+          processos={processos} revisoes={revisoes} usuarioId={usuario.id} aoMudar={recarregar} />
       </div>
       {idAberto && (
-        <VersoDoCartao processos={processos} cadastros={cadastros} versoes={versoes} id={idAberto}
+        <VersoDoCartao processos={processos} cadastros={cadastros} versoes={versoes} revisoes={revisoes} id={idAberto}
           podeAlterar={podeAlterar} usuarioId={usuario.id} aoFechar={fechar}
           aviso={recemCriado === idAberto ? 'Processo cadastrado' : undefined} aoMudar={recarregar} enderecoDoProcesso={enderecoDoProcesso} />
       )}

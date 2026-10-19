@@ -432,6 +432,81 @@ export type Database = {
           },
         ]
       }
+      revisoes_internas: {
+        Row: {
+          comentario: string | null
+          escopo: Database["public"]["Enums"]["escopo_da_correcao"] | null
+          id: string
+          processo_id: string
+          registrada_em: string
+          resultado: Database["public"]["Enums"]["resultado_da_revisao"]
+          revisada_em: string
+          revisor_id: string
+          versao_corrigida_id: string | null
+          versao_revisada_id: string
+        }
+        Insert: {
+          comentario?: string | null
+          escopo?: Database["public"]["Enums"]["escopo_da_correcao"] | null
+          id?: string
+          processo_id: string
+          registrada_em?: string
+          resultado: Database["public"]["Enums"]["resultado_da_revisao"]
+          revisada_em: string
+          revisor_id: string
+          versao_corrigida_id?: string | null
+          versao_revisada_id: string
+        }
+        Update: {
+          comentario?: string | null
+          escopo?: Database["public"]["Enums"]["escopo_da_correcao"] | null
+          id?: string
+          processo_id?: string
+          registrada_em?: string
+          resultado?: Database["public"]["Enums"]["resultado_da_revisao"]
+          revisada_em?: string
+          revisor_id?: string
+          versao_corrigida_id?: string | null
+          versao_revisada_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "revisoes_internas_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: false
+            referencedRelation: "processos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "revisoes_internas_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: false
+            referencedRelation: "processos_com_andamento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "revisoes_internas_revisor_id_fkey"
+            columns: ["revisor_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "revisoes_internas_versao_corrigida_id_fkey"
+            columns: ["versao_corrigida_id"]
+            isOneToOne: false
+            referencedRelation: "versoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "revisoes_internas_versao_revisada_id_fkey"
+            columns: ["versao_revisada_id"]
+            isOneToOne: false
+            referencedRelation: "versoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       setores: {
         Row: {
           ativo: boolean
@@ -727,6 +802,16 @@ export type Database = {
         Args: { p_motivo: string; p_processo: string }
         Returns: undefined
       }
+      concluir_revisao_interna: {
+        Args: {
+          p_andamento: string
+          p_comentario: string
+          p_escopo: Database["public"]["Enums"]["escopo_da_correcao"]
+          p_responsavel: string
+          p_resultado: Database["public"]["Enums"]["resultado_da_revisao"]
+        }
+        Returns: undefined
+      }
       mover_etapa: {
         Args: { p_etapa: string; p_sentido: string }
         Returns: undefined
@@ -789,9 +874,11 @@ export type Database = {
     }
     Enums: {
       categoria_macroprocesso: "finalistico" | "apoio" | "gerencial"
+      escopo_da_correcao: "fluxograma" | "relatorio" | "ambos"
       origem_do_processo: "novo" | "retomado"
       papel_do_arquivo: "bpmn" | "png" | "bpm" | "relatorio"
       perfil: "administrador" | "integrante_ep" | "consulta"
+      resultado_da_revisao: "sem_alteracao" | "corrigida"
       situacao_guardada: "em_andamento" | "suspenso" | "cancelado"
       status_da_etapa:
         | "pendente"
@@ -931,9 +1018,11 @@ export const Constants = {
   public: {
     Enums: {
       categoria_macroprocesso: ["finalistico", "apoio", "gerencial"],
+      escopo_da_correcao: ["fluxograma", "relatorio", "ambos"],
       origem_do_processo: ["novo", "retomado"],
       papel_do_arquivo: ["bpmn", "png", "bpm", "relatorio"],
       perfil: ["administrador", "integrante_ep", "consulta"],
+      resultado_da_revisao: ["sem_alteracao", "corrigida"],
       situacao_guardada: ["em_andamento", "suspenso", "cancelado"],
       status_da_etapa: [
         "pendente",

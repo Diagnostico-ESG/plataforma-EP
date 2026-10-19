@@ -5,6 +5,7 @@ import type { ModuloDeCadastros } from '../../cadastros/tipos'
 import { type EstadoDoCarregamento, useCarregamento } from '../../hooks/useCarregamento'
 import { type Executar, useGravacaoComFalha } from '../../hooks/useGravacaoComFalha'
 import type { DadosDoProcesso, ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
+import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { ItemInexistente } from '../cadastros/ItemInexistente'
@@ -25,6 +26,7 @@ type VersoDoCartaoProps = {
   processos: ModuloDeProcessos
   cadastros: ModuloDeCadastros
   versoes: ModuloDeVersoes
+  revisoes: ModuloDeRevisoes
   id: string
   podeAlterar: boolean
   /** Quem está na tela. */
@@ -189,11 +191,11 @@ function EdicaoDoProcesso({ processo, processos, cadastros, aoVoltar, aposMudar,
 
 /** Trabalho à esquerda (etapas e arquivos), contexto à direita (reunião, dados e estrutura). */
 function ColunasDoVerso(props: CorpoProps) {
-  const { processo, processos, versoes, podeAlterar, usuarioId, executar, aposMudar, aoSumir, enderecoDoProcesso } = props
+  const { processo, processos, versoes, revisoes, podeAlterar, usuarioId, executar, aposMudar, aoSumir, enderecoDoProcesso } = props
   return (
     <div className="verso-colunas">
       <div className="verso-trabalho">
-        <CaminhoDoProcesso processo={processo} processos={processos} podeAlterar={podeAlterar} usuarioId={usuarioId}
+        <CaminhoDoProcesso processo={processo} processos={processos} revisoes={revisoes} podeAlterar={podeAlterar} usuarioId={usuarioId}
           executar={executar} aoSumir={aoSumir} aoMudar={aposMudar} />
         <SecaoDeVersoes versoes={versoes} processo={processo} podeAlterar={podeAlterar} />
       </div>

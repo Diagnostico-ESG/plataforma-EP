@@ -3,6 +3,8 @@ import { responsavelMarcado, usuariosParaAEtapa } from '../../processos/caminhoD
 import { fraseDoBloqueioDaConclusao } from '../../processos/frasesDaVersaoCompleta'
 import type { PedidoDeAvanco, PedidoDeTexto } from '../../processos/gravarAcoes'
 import type { UltimaVersao, UsuarioResponsavel } from '../../processos/tipos'
+import { opcoesDaRevisao } from '../../revisoes/opcoesDaRevisao'
+import type { DadosDaRevisao } from '../../revisoes/tipos'
 import { JanelaComCampo } from '../JanelaComCampo'
 import { JanelaDeAvanco } from './JanelaDeAvanco'
 
@@ -52,7 +54,7 @@ type JanelasDaEtapaProps = {
 
 /** As janelas das ações da etapa: a da nota (Dispensar e Realizada anteriormente sem pendente depois) e a de avanço. */
 export function JanelasDaEtapa({ acoes, usuarios, usuarioId, ultimaVersao }: JanelasDaEtapaProps) {
-  const { pedido, avanco, gravarComTexto, gravarComAvanco, fecharPedido, fecharAvanco } = acoes
+  const { pedido, avanco, gravarComTexto, gravarComAvanco, gravarRevisaoDaEtapa, fecharPedido, fecharAvanco } = acoes
   const janela = pedido ? JANELA_DO_TEXTO[pedido.acao] : null
   return (
     <>
@@ -61,7 +63,7 @@ export function JanelasDaEtapa({ acoes, usuarios, usuarioId, ultimaVersao }: Jan
         aoConfirmar={gravarComTexto} aoFechar={fecharPedido} />
       {avanco && (
         <JanelaDoAvancoDaEtapa avanco={avanco} usuarios={usuarios} usuarioId={usuarioId} ultimaVersao={ultimaVersao}
-          aoConfirmar={gravarComAvanco} aoFechar={fecharAvanco} />
+          aoConfirmar={gravarComAvanco} aoConfirmarRevisao={gravarRevisaoDaEtapa} aoFechar={fecharAvanco} />
       )}
     </>
   )
@@ -73,21 +75,25 @@ type JanelaDoAvancoDaEtapaProps = {
   usuarioId: string
   ultimaVersao: UltimaVersao | null
   aoConfirmar: (nota: string, responsavelId: string | null) => void
+  aoConfirmarRevisao: (dados: DadosDaRevisao, responsavelId: string | null) => Promise<string | null>
   aoFechar: () => void
 }
 
 // Sem a lista de usuários (ainda não lida, ou a leitura falhou), a janela só oferece "Ninguém por enquanto". A lista já
 // vem sem o autor da versão mais recente quando a etapa que ganha o responsável é a Revisão interna.
-function JanelaDoAvancoDaEtapa({ avanco, usuarios = [], usuarioId, ultimaVersao, aoConfirmar, aoFechar }: JanelaDoAvancoDaEtapaProps) {
+function JanelaDoAvancoDaEtapa({ avanco, usuarios = [], usuarioId, ultimaVersao, aoConfirmar, aoConfirmarRevisao, aoFechar }: JanelaDoAvancoDaEtapaProps) {
   const { acao, etapa, proxima } = avanco
   const possiveis = usuariosParaAEtapa(proxima, usuarios, ultimaVersao)
   const textos = JANELA_DO_AVANCO[acao]
   // O banco só deixa concluir a Revisão pelo setor com a versão mais recente completa; a janela já diz o que falta.
   const bloqueio = acao === 'concluir' && etapa.codigo === 'revisao_setor' ? fraseDoBloqueioDaConclusao(ultimaVersao) : null
+  // Concluir a Revisão interna pede o resultado da revisão e grava a revisão junto da conclusão (quem conclui é o revisor).
+  const revisao = acao === 'concluir' && etapa.codigo === 'revisao_interna'
+    ? { opcoes: opcoesDaRevisao(ultimaVersao, usuarioId), aoConfirmar: aoConfirmarRevisao } : undefined
   return (
     <JanelaDeAvanco key={etapa.id} titulo={textos.titulo(etapa.nome, proxima.nome)}
       rotuloDaAcao={textos.rotuloDaAcao(proxima.nome)} comNota={acao !== 'concluir'} rotuloDoCampo={textos.rotuloDoCampo}
       pergunta={textos.pergunta} usuarios={possiveis} marcadoAoAbrir={responsavelMarcado(proxima, usuarioId, possiveis)}
-      bloqueio={bloqueio} aoConfirmar={aoConfirmar} aoFechar={aoFechar} />
+      bloqueio={bloqueio} revisao={revisao} aoConfirmar={aoConfirmar} aoFechar={aoFechar} />
   )
 }

@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { avancoDoCartao } from '../processos/destinoDoArrastar'
 import type { ModuloDeProcessos, UltimaVersao } from '../processos/tipos'
+import type { ModuloDeRevisoes } from '../revisoes/tipos'
 import { useAcoesDaEtapa } from './useAcoesDaEtapa'
 import { useCarregamento } from './useCarregamento'
 
@@ -9,12 +10,12 @@ import { useCarregamento } from './useCarregamento'
  * acha a etapa atual e a próxima e abre a janela de avanço. Quadro desatualizado (a etapa já não está em andamento ou
  * não há pendente depois): nada abre, o Quadro só recarrega.
  */
-export function useConclusaoPeloQuadro(processos: ModuloDeProcessos, podeAlterar: boolean, aoMudar: () => void) {
+export function useConclusaoPeloQuadro(processos: ModuloDeProcessos, revisoes: ModuloDeRevisoes, podeAlterar: boolean, aoMudar: () => void) {
   // Quem não altera não escolhe responsável (nem arrasta): não precisa da lista.
   const ler = useCallback(
     () => (podeAlterar ? processos.listarResponsaveisPossiveis() : Promise.resolve([])), [processos, podeAlterar])
   const { estado } = useCarregamento(ler)
-  const acoes = useAcoesDaEtapa(processos, aoMudar, aoMudar)
+  const acoes = useAcoesDaEtapa(processos, revisoes, aoMudar, aoMudar)
   const [ultimaVersao, setUltimaVersao] = useState<UltimaVersao | null>(null)
   const [falhaDaLeitura, setFalhaDaLeitura] = useState<string | null>(null)
 

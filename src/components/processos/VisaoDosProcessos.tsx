@@ -5,6 +5,7 @@ import {
 import { filtrarProcessos, opcoesDosFiltros, temFiltro } from '../../processos/filtrosDosProcessos'
 import { linhasDaLista } from '../../processos/linhasDaLista'
 import type { ListaDeProcessos, ModuloDeProcessos } from '../../processos/tipos'
+import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { Icone } from '../Icone'
 import { QuadroVazio } from '../quadro/QuadroVazio'
@@ -28,6 +29,7 @@ type VisaoDosProcessosProps = {
   agrupar: AgruparQuadroPor
   aoMudarAgrupar: (agrupar: AgruparQuadroPor) => void
   processos: ModuloDeProcessos
+  revisoes: ModuloDeRevisoes
   /** Quem está na tela, para a janela de avanço do arrastar o marcar como responsável. */
   usuarioId: string
   /** O Quadro mudou (um cartão foi concluído): a lista de processos precisa recarregar. */
@@ -86,11 +88,11 @@ function SemResultado({ filtros, usuarioId, aoMudarFiltros }: SemResultadoProps)
 type ConteudoDaVisaoProps = VisaoDosProcessosProps & { lista: ListaDeProcessos; todos: ListaDeProcessos['processos'] }
 
 function ConteudoDaVisao(props: ConteudoDaVisaoProps) {
-  const { visao, lista, todos, idEscolhido, enderecoDoProcesso, aoAbrir, filtros, podeAlterar, processos, usuarioId, aoMudar, agrupar } = props
+  const { visao, lista, todos, idEscolhido, enderecoDoProcesso, aoAbrir, filtros, podeAlterar, processos, revisoes, usuarioId, aoMudar, agrupar } = props
   if (visao === 'quadro') {
     return (
       <QuadroDeProcessos lista={lista} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso} podeAlterar={podeAlterar}
-        processos={processos} usuarioId={usuarioId} aoMudar={aoMudar} agrupar={agrupar} />
+        processos={processos} revisoes={revisoes} usuarioId={usuarioId} aoMudar={aoMudar} agrupar={agrupar} />
     )
   }
   return (

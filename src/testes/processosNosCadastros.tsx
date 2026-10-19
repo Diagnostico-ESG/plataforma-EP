@@ -5,6 +5,7 @@ import type { Perfil } from '../acesso/tipos'
 import { CadastrosFalso } from '../cadastros/CadastrosFalso'
 import { ProcessosFalso } from '../processos/ProcessosFalso'
 import type { ProcessoLido } from '../processos/tipos'
+import { RevisoesFalso } from '../revisoes/RevisoesFalso'
 import { VersoesFalso } from '../versoes/VersoesFalso'
 
 const SETORES_DE_TESTE = [
@@ -63,6 +64,6 @@ export function montarNosCadastros(
   const versoes = falsoDeVersoes(processos)
   ajustarVersoes?.(versoes)
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={processos}
-    versoes={versoes} />)
+    versoes={versoes} revisoes={new RevisoesFalso(processos)} />)
   return { cadastros, processos, versoes }
 }

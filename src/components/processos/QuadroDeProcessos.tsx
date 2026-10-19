@@ -3,6 +3,7 @@ import { useConclusaoPeloQuadro } from '../../hooks/useConclusaoPeloQuadro'
 import { colunasDoQuadro, colunasPorResponsavel } from '../../processos/colunasDoQuadro'
 import type { AgruparQuadroPor } from '../../processos/enderecoDosProcessos'
 import type { ListaDeProcessos, ModuloDeProcessos } from '../../processos/tipos'
+import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import { ColunaDoQuadro } from './ColunaDoQuadro'
 import { JanelasDaEtapa } from './JanelasDaEtapa'
 import './Quadro.css'
@@ -14,6 +15,7 @@ type QuadroDeProcessosProps = {
   enderecoDoProcesso: (id: string) => string
   podeAlterar: boolean
   processos: ModuloDeProcessos
+  revisoes: ModuloDeRevisoes
   /** Quem está na tela: a janela de avanço do arrastar o marca como responsável. */
   usuarioId: string
   /** Um cartão foi concluído: a lista de processos precisa recarregar. */
@@ -23,9 +25,9 @@ type QuadroDeProcessosProps = {
 
 const COLUNAS_FANTASMA = [0, 1, 2, 3]
 
-export function QuadroDeProcessos({ lista, idEscolhido, enderecoDoProcesso, podeAlterar, processos, usuarioId, aoMudar, agrupar }: QuadroDeProcessosProps) {
+export function QuadroDeProcessos({ lista, idEscolhido, enderecoDoProcesso, podeAlterar, processos, revisoes, usuarioId, aoMudar, agrupar }: QuadroDeProcessosProps) {
   const colunas = agrupar === 'responsavel' ? colunasPorResponsavel(lista.processos) : colunasDoQuadro(lista)
-  const { acoes, usuarios, ultimaVersao, falhaDaLeitura, concluirDoCartao } = useConclusaoPeloQuadro(processos, podeAlterar, aoMudar)
+  const { acoes, usuarios, ultimaVersao, falhaDaLeitura, concluirDoCartao } = useConclusaoPeloQuadro(processos, revisoes, podeAlterar, aoMudar)
   const arrasto = useArrastoDoQuadro(colunas, concluirDoCartao)
   const falha = falhaDaLeitura ?? acoes.falha
   return (

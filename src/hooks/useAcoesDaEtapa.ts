@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import type { AcaoDaEtapa } from '../processos/caminhoDeEtapas'
-import { type PedidoDeAvanco, type PedidoDeTexto, gravarAvanco, gravarTexto } from '../processos/gravarAcoes'
+import { type PedidoDeAvanco, type PedidoDeTexto, gravarAvanco, gravarRevisao, gravarTexto } from '../processos/gravarAcoes'
 import type { EtapaDoCaminho, ModuloDeProcessos } from '../processos/tipos'
+import type { DadosDaRevisao, ModuloDeRevisoes } from '../revisoes/tipos'
 import { useGravacaoComFalha } from './useGravacaoComFalha'
 
 /**
@@ -10,7 +11,7 @@ import { useGravacaoComFalha } from './useGravacaoComFalha'
  * com o motivo e o responsável da etapa reaberta. Sem pendente depois, Concluir grava na hora e as outras duas abrem a
  * janela da nota (`pedido`). A falha de qualquer gravação fica em `falha`, para a tela mostrar.
  */
-export function useAcoesDaEtapa(processos: ModuloDeProcessos, aoMudar: () => void, aoSumir: () => void) {
+export function useAcoesDaEtapa(processos: ModuloDeProcessos, revisoes: ModuloDeRevisoes, aoMudar: () => void, aoSumir: () => void) {
   const { falha, executar } = useGravacaoComFalha(aoSumir)
   const [pedido, setPedido] = useState<PedidoDeTexto | null>(null)
   const [avanco, setAvanco] = useState<PedidoDeAvanco | null>(null)
@@ -32,12 +33,20 @@ export function useAcoesDaEtapa(processos: ModuloDeProcessos, aoMudar: () => voi
     if (avanco) executar(() => gravarAvanco(processos, avanco.acao, avanco.etapa, nota, responsavelId), aoMudar)
   }
 
+  // A janela da Revisão interna espera a gravação para mostrar a falha dentro dela: devolve a frase da falha ou null.
+  async function gravarRevisaoDaEtapa(dados: DadosDaRevisao, responsavelId: string | null): Promise<string | null> {
+    if (!avanco) return null
+    const falhou = await gravarRevisao(revisoes, avanco.etapa, dados, responsavelId, aoSumir)
+    if (!falhou) aoMudar()
+    return falhou
+  }
+
   function mudarResponsavel(etapa: EtapaDoCaminho, usuarioId: string | null) {
     executar(() => processos.mudarResponsavelDaEtapa(etapa.id, usuarioId), aoMudar)
   }
 
   return {
-    falha, pedido, avanco, agir, gravarComTexto, gravarComAvanco, mudarResponsavel,
+    falha, pedido, avanco, agir, gravarComTexto, gravarComAvanco, gravarRevisaoDaEtapa, mudarResponsavel,
     fecharPedido: () => setPedido(null), fecharAvanco: () => setAvanco(null),
   }
 }

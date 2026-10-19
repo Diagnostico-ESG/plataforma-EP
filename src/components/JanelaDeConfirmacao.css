@@ -59,3 +59,41 @@
 .janela-escolha-opcao input {
   accent-color: var(--azul);
 }
+
+/* Resultado e Escopo da revisão (JanelaDeAvanco, conclusão da Revisão interna): grupos de rádios sem a moldura nativa. */
+.janela-revisao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  margin: var(--esp-4) 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.janela-revisao legend {
+  padding: 0;
+  margin-bottom: var(--esp-2);
+}
+
+.janela-revisao-rotulo {
+  display: block;
+  margin-top: var(--esp-4);
+}
+
+.janela-revisao-opcao {
+  display: flex;
+  flex-direction: column;
+}
+
+/* O motivo de a opção não caber fica sob o rótulo, alinhado ao texto dele (depois do botão de rádio). */
+.janela-revisao-motivo {
+  padding-left: calc(13px + var(--esp-2));
+  color: var(--texto-2);
+  font-size: var(--tam-secundario);
+}
+
+.janela-ajuda {
+  margin: var(--esp-2) 0 0;
+  color: var(--texto-2);
+  font-size: var(--tam-secundario);
+}
