@@ -2,7 +2,7 @@ import type { EstadoDoCarregamento } from '../../hooks/useCarregamento'
 import { SEM_FILTROS, type FiltrosDosProcessos as Filtros, type VisaoDosProcessos as Visao } from '../../processos/enderecoDosProcessos'
 import { filtrarProcessos, opcoesDosFiltros, temFiltro } from '../../processos/filtrosDosProcessos'
 import { linhasDaLista } from '../../processos/linhasDaLista'
-import type { ListaDeProcessos } from '../../processos/tipos'
+import type { ListaDeProcessos, ModuloDeProcessos } from '../../processos/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { Icone } from '../Icone'
 import { QuadroVazio } from '../quadro/QuadroVazio'
@@ -21,6 +21,11 @@ type VisaoDosProcessosProps = {
   aoAbrir: (id: string) => void
   filtros: Filtros
   aoMudarFiltros: (filtros: Filtros) => void
+  processos: ModuloDeProcessos
+  /** Quem está na tela, para a janela de avanço do arrastar o marcar como responsável. */
+  usuarioId: string
+  /** O Quadro mudou (um cartão foi concluído): a lista de processos precisa recarregar. */
+  aoMudar: () => void
 }
 
 /** Quadro ou Lista, com os estados comuns (carregando, erro, vazio), a barra de cima e os filtros. */
@@ -45,9 +50,12 @@ export function VisaoDosProcessos(props: VisaoDosProcessosProps) {
 
 type ConteudoDaVisaoProps = VisaoDosProcessosProps & { lista: ListaDeProcessos; todos: ListaDeProcessos['processos'] }
 
-function ConteudoDaVisao({ visao, lista, todos, idEscolhido, enderecoDoProcesso, aoAbrir, filtros, podeAlterar }: ConteudoDaVisaoProps) {
+function ConteudoDaVisao({ visao, lista, todos, idEscolhido, enderecoDoProcesso, aoAbrir, filtros, podeAlterar, processos, usuarioId, aoMudar }: ConteudoDaVisaoProps) {
   if (visao === 'quadro') {
-    return <QuadroDeProcessos lista={lista} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso} podeAlterar={podeAlterar} />
+    return (
+      <QuadroDeProcessos lista={lista} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso} podeAlterar={podeAlterar}
+        processos={processos} usuarioId={usuarioId} aoMudar={aoMudar} />
+    )
   }
   return (
     <TabelaDeProcessos linhas={linhasDaLista(lista.processos, todos)} idEscolhido={idEscolhido} aoAbrir={aoAbrir} busca={filtros.busca} />

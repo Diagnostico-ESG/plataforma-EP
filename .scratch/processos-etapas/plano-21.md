@@ -159,15 +159,15 @@ export function useArrastoDoQuadro(colunas: ColunaDoQuadro[], aoSoltarNoDestino:
 - Consome: `avancoDoCartao` (Tarefa 1), `useAcoesDaEtapa(processos, aoMudar, aoSumir)` e `JanelasDaEtapa` (já existem), `listarResponsaveisPossiveis` e `lerProcesso`.
 - Produz: `useConclusaoPeloQuadro(processos, podeAlterar, aoMudar) → { acoes: AcoesDaEtapaEmUso; usuarios: UsuarioResponsavel[]; ultimaVersao: UltimaVersao | null; falhaDaLeitura: string | null; concluirDoCartao: (id: string) => Promise<void> }`.
 
-- [ ] **Passo 1: os testes que falham** (no mesmo arquivo de teste; o `montar()` leva `usuarios: [EU, BIA]`):
+- [x] **Passo 1: os testes que falham** (no mesmo arquivo de teste; o `montar()` leva `usuarios: [EU, BIA]`):
   1. **Soltar no destino abre a janela** (critério 4): `dragStart`, `dragOver`, `drop` na coluna "Revisão do setor" → `dialog` com o título `Concluir Revisão interna e iniciar Revisão do setor`, a pergunta "Quem fica com a próxima etapa?" e quem está na tela marcado; confirmar chama `concluirEtapa` com o id do andamento (`falso.chamadas`: `{ acao: 'concluir', id: 'a3', usuarioId }`) e o cartão passa para a coluna "Revisão do setor" (o `ProcessosFalso` recalcula `etapaAtual`).
   2. **Esc e [Cancelar]** (critério 5): abrir a janela, `Esc` (evento `cancel`/`close` do `dialog`, como no `App.avancoDaEtapa.test.tsx`) e depois [Cancelar] → `falso.chamadas` vazio e o cartão na coluna de origem.
   3. **Falha de gravação** (critério 7): `falso.falhaDeGravacao = 'sem conexão'` → ao confirmar, aparece o `role="alert"` com `A alteração não foi salva: sem conexão.` e o cartão continua na coluna de origem.
   4. **Clique e Enter** (critério 8): clicar no cartão (ou `userEvent.keyboard('{Enter}')` com o foco nele) abre o verso (`dialog` `Processo ...`), como antes; um `dragEnd` sem soltar não abre nada.
   5. **Trava do autor** (critério 4, "a mesma trava"): processo cuja `ultimaVersao.autorId` é o usuário da tela e cuja próxima etapa é a Revisão interna → a janela não oferece esse usuário (reaproveita `usuariosParaAEtapa`; um expect basta).
   6. **Quadro desatualizado:** o `lerProcesso` devolve a etapa atual já concluída (ajustar `falso.processos` entre o `listar` e o soltar) → nenhuma janela abre e o Quadro recarrega.
-- [ ] **Passo 2:** `npx vitest run src/App.arrastarParaConcluir.test.tsx` — esperado: os seis falham (a janela não abre).
-- [ ] **Passo 3: o hook.**
+- [x] **Passo 2:** `npx vitest run src/App.arrastarParaConcluir.test.tsx` — esperado: os seis falham (a janela não abre).
+- [x] **Passo 3: o hook.**
 
 ```ts
 import { useCallback, useState } from 'react'
@@ -206,9 +206,9 @@ export function useConclusaoPeloQuadro(processos: ModuloDeProcessos, podeAlterar
 }
 ```
 
-- [ ] **Passo 4: ligar no Quadro.** `QuadroDeProcessos` chama `useConclusaoPeloQuadro(processos, podeAlterar, aoMudar)`, passa `concluirDoCartao` ao `useArrastoDoQuadro`, e renderiza, depois das colunas, `{(falhaDaLeitura ?? acoes.falha) && <p className="cadastros-falha" role="alert">...</p>}` e `<JanelasDaEtapa acoes={acoes} usuarios={usuarios} usuarioId={usuarioId} ultimaVersao={ultimaVersao} />`. Se o arquivo passar de 20 linhas na função, extrair um componente `JanelasDoQuadro` no mesmo arquivo.
-- [ ] **Passo 5:** os testes da Tarefa 3 e os da Tarefa 2 passam; `npm test`, `npm run lint`, `npm run typecheck` verdes (repita o arquivo isolado se um teste de tela instável falhar sob carga).
-- [ ] **Passo 6: commit** `Ticket 21 de processos-etapas: soltar no destino abre a janela de avanço e conclui`.
+- [x] **Passo 4: ligar no Quadro.** `QuadroDeProcessos` chama `useConclusaoPeloQuadro(processos, podeAlterar, aoMudar)`, passa `concluirDoCartao` ao `useArrastoDoQuadro`, e renderiza, depois das colunas, `{(falhaDaLeitura ?? acoes.falha) && <p className="cadastros-falha" role="alert">...</p>}` e `<JanelasDaEtapa acoes={acoes} usuarios={usuarios} usuarioId={usuarioId} ultimaVersao={ultimaVersao} />`. Se o arquivo passar de 20 linhas na função, extrair um componente `JanelasDoQuadro` no mesmo arquivo.
+- [x] **Passo 5:** os testes da Tarefa 3 e os da Tarefa 2 passam; `npm test`, `npm run lint`, `npm run typecheck` verdes (repita o arquivo isolado se um teste de tela instável falhar sob carga).
+- [x] **Passo 6: commit** `Ticket 21 de processos-etapas: soltar no destino abre a janela de avanço e conclui`.
 
 ### Tarefa 4: Fechamento
 
