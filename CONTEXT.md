@@ -179,7 +179,7 @@ A etapa em que a versão completa (.bpmn, .png e relatório) está com o setor. 
 _Avoid_: rodada, ciclo, envio ao setor
 
 **Aprovação**:
-O registro, com o número do E-protocolo, de que o setor aprovou a versão mais recente do processo. Pode vir depois de ajustes pequenos feitos sem nova ida ao setor, que o setor só vê de novo no E-protocolo. Uma por processo; a versão aprovada não tem arquivo substituído.
+O registro de que o setor aprovou a versão mais recente do processo, feito ao concluir a etapa de aprovação, com o número, o link e a data do E-protocolo quando houver (o número pode entrar depois). Pode vir depois de ajustes pequenos feitos sem nova ida ao setor, que o setor só vê de novo no E-protocolo. Uma por processo; a versão aprovada não tem arquivo substituído, e voltar para a etapa de aprovação ou antes dela a desfaz.
 _Avoid_: homologação, validação final
 
 **E-protocolo**:
