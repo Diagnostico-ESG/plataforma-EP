@@ -23,7 +23,8 @@ const BIA_INATIVA = de('u2', 'Bia Teste', false)
 const CAIO = de('u3', 'Caio Teste')
 
 const sem = (nome: string) => processo(nome, { processo: { responsavel: null } })
-const titulos = () => Array.from(document.querySelectorAll('.coluna-titulo')).map((titulo) => titulo.textContent)
+// Nome da coluna e contagem, separados por espaço (a pílula Inativo, quando há, vai dentro do nome).
+const titulos = () => Array.from(document.querySelectorAll('.coluna-titulo')).map((titulo) => Array.from(titulo.children).map((parte) => parte.textContent).join(' '))
 const trocar = async (nome: 'Etapa' | 'Responsável') => fireEvent.click(await screen.findByRole('button', { name: nome }))
 const grupo = async () => within(await screen.findByRole('group', { name: 'Agrupar por' }))
 

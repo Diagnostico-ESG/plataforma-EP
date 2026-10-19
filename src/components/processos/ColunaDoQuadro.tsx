@@ -28,7 +28,8 @@ export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAl
         arrasto.soltarEm(coluna.chave)
       }}>
       <h3 className="coluna-titulo">
-        {coluna.titulo}{coluna.inativo && <> <Pilula situacao="neutra">Inativo</Pilula></>} <span className="coluna-contagem">{coluna.processos.length}</span>
+        <span>{coluna.titulo}{coluna.inativo && <> <Pilula situacao="neutra">Inativo</Pilula></>}</span>
+        <span className="coluna-contagem">{coluna.processos.length}</span>
       </h3>
       <div className="coluna-cartoes">
         {coluna.processos.map((processo) => (

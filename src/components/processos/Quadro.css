@@ -207,8 +207,14 @@
 
 /* Filtros à esquerda, numa linha que quebra quando falta espaço; [Cadastrar processo] continua à direita. */
 .quadro-barra {
+  flex-wrap: wrap;
   align-items: flex-end;
   gap: var(--esp-3);
+}
+
+.quadro-barra > .botao,
+.controle-opcoes .botao {
+  white-space: nowrap;
 }
 
 .filtros-dos-processos {
