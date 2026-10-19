@@ -118,3 +118,28 @@ test.each([['2026-10-20'], [null]])('a data da reunião (%s) chega com o process
   cliente.respostas['andamentos.select'] = { data: [], error: null }
   expect((await criar(cliente).lerProcesso('p1'))?.dataDaReuniao).toBe(data)
 })
+
+test('o processo traz a versão mais recente não histórica, com o autor', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
+  cliente.respostas['versoes.select'] = { data: [{ numero: 3, enviada_por: 'u1', autor: { nome: 'Ana Teste' } }], error: null }
+  const lido = await criar(cliente).lerProcesso('p1')
+  expect(lido?.ultimaVersao).toEqual({ numero: 3, autorId: 'u1', autorNome: 'Ana Teste' })
+  expect(cliente.pedidos.find((pedido) => pedido.tabela === 'versoes')).toMatchObject({
+    filtros: [['processo_id', 'p1'], ['historica', false]], ordem: [['numero', false]], limite: 1,
+  })
+})
+
+test('sem versão não histórica, o processo não tem última versão', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
+  cliente.respostas['versoes.select'] = { data: [], error: null }
+  expect((await criar(cliente).lerProcesso('p1'))?.ultimaVersao).toBeNull()
+})
+
+test('falha ao ler a versão mais recente vira erro com o motivo do banco', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
+  cliente.respostas['versoes.select'] = { data: null, error: { message: 'sem conexão' } }
+  await expect(criar(cliente).lerProcesso('p1')).rejects.toThrow('Falha ao ler a versão mais recente do processo: sem conexão')
+})

@@ -22,7 +22,7 @@ const EMITIR: ProcessoLido = {
   macroprocessoNome: 'Macro A', situacao: 'em_andamento', etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 },
   responsavel: null, origem: 'retomado', contexto: 'Contexto inventado', observacoes: null,
   processoPaiId: null, processoPai: null, subprocessos: [],
-  motivoDaSituacao: null, dataDaReuniao: null, etapasDoProcesso: [],
+  motivoDaSituacao: null, dataDaReuniao: null, ultimaVersao: null, etapasDoProcesso: [],
 }
 
 type Montagem = { perfil?: Perfil; processos?: ProcessoLido[] }

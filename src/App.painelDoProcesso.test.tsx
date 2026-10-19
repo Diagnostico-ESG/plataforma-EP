@@ -31,7 +31,7 @@ const PROCESSO: ProcessoLido = {
   responsavel: null, origem: 'retomado', contexto: 'Contexto inventado', observacoes: 'Observação inventada',
   processoPaiId: null, processoPai: null, subprocessos: [],
   motivoDaSituacao: null,
-  dataDaReuniao: null,
+  dataDaReuniao: null, ultimaVersao: null,
   etapasDoProcesso: [
     etapaDoProcesso(4, 'modelagem', 'Modelagem piloto', {
       status: 'concluida', iniciadaEm: '2026-10-11', resolvidaEm: '2026-10-12', responsavelNome: 'Ana Teste' }),

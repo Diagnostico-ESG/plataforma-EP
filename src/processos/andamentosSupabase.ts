@@ -6,7 +6,7 @@ import type { Database } from '../types/database'
 import { formatarData } from './caminhoDeEtapas'
 import { fraseDaEtapaUsada } from './frasesDoCatalogo'
 import { FRASE_DO_PAI, fraseDeTipoInvalido, fraseDosSubprocessos } from './frasesDeReclassificacao'
-import { fraseDoProcessoComVersoes } from './frasesDeVersao'
+import { fraseDoAutorDaVersao, fraseDoProcessoComVersoes } from './frasesDeVersao'
 import { fraseDeSituacaoInvalida, fraseDoProcessoParado } from './frasesDeSituacao'
 import type { ModuloDeProcessos, UsuarioResponsavel } from './tipos'
 
@@ -27,7 +27,7 @@ export function criarAndamentosSupabase(
       avancar(cliente, id, 'realizada_anteriormente', nota, responsavelId, recusas),
     corrigirDatasDaEtapa: (id, datas) => mudar(id, { iniciada_em: datas.iniciadaEm, resolvida_em: datas.resolvidaEm }),
     mudarResponsavelDaEtapa: (id, usuarioId) => mudar(id, { responsavel_id: usuarioId }),
-    voltarParaEtapa: (id, motivo) => voltarParaEtapa(cliente, id, motivo, recusas),
+    voltarParaEtapa: (id, motivo, responsavelId) => voltarParaEtapa(cliente, id, motivo, responsavelId, recusas),
     listarResponsaveisPossiveis: () => listarResponsaveisPossiveis(cliente),
   }
 }
@@ -57,10 +57,11 @@ async function andamentoExiste(cliente: ClienteSupabase, id: string): Promise<bo
   return Boolean(data?.length)
 }
 
+// Como em avancar: p_responsavel vai como null quando não há (o supabase-js manda null; o tipo gerado não o admite).
 async function voltarParaEtapa(
-  cliente: ClienteSupabase, id: string, motivo: string, recusas: RecusasDoModulo,
+  cliente: ClienteSupabase, id: string, motivo: string, responsavelId: string | null, recusas: RecusasDoModulo,
 ): Promise<void> {
-  const { error } = await cliente.rpc('voltar_a_etapa', { p_andamento: id, p_motivo: motivo, p_responsavel: null as unknown as string })
+  const { error } = await cliente.rpc('voltar_a_etapa', { p_andamento: id, p_motivo: motivo, p_responsavel: responsavelId as string })
   if (error) throw falhaDoAndamento(error, recusas)
 }
 
@@ -79,7 +80,7 @@ const PADRAO_DA_RECUSA = new RegExp(
   + '|motivo_obrigatorio|nota_obrigatoria|data_no_futuro|resolvida_antes_do_inicio|responsavel_invalido|processo_parado'
   + '|situacao_invalida|processo_com_subprocessos|pai_nao_e_processo|tipo_invalido'
   + '|etapa_usada'
-  + '|processo_com_versoes)(?::(.*))?$', 'm')
+  + '|processo_com_versoes|autor_da_versao)(?::(.*))?$', 'm')
 
 const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   anterior_nao_resolvida: (etapa) => `A etapa ${etapa} ainda não foi resolvida.`,
@@ -108,6 +109,7 @@ const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   },
   etapa_usada: fraseDaEtapaUsada,
   processo_com_versoes: fraseDoProcessoComVersoes,
+  autor_da_versao: fraseDoAutorDaVersao,
 }
 
 // Serve também à situação, à reclassificação e à gravação do processo: as recusas do banco têm o mesmo formato.

@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest'
 import {
-  ROTULO_DO_STATUS, acoesDaEtapa, formatarData, indiceDaEtapaAtual, proximaPendente, responsavelMarcado,
+  ROTULO_DO_STATUS, acoesDaEtapa, formatarData, indiceDaEtapaAtual, podeAssumir, proximaPendente, responsavelMarcado, usuariosParaAEtapa,
 } from './caminhoDeEtapas'
-import type { EtapaDoCaminho, StatusDaEtapa } from './tipos'
+import type { EtapaDoCaminho, EtapaDoProcesso, StatusDaEtapa, UltimaVersao } from './tipos'
 
 function etapa(ordem: number, status: StatusDaEtapa, obrigatoria = false): EtapaDoCaminho {
   return {
@@ -90,5 +90,36 @@ describe('responsável marcado ao abrir a janela de avanço', () => {
   test('sem nenhum dos dois na lista, ninguém', () => {
     expect(responsavelMarcado(proxima('u9'), 'u8', usuarios)).toBeNull()
     expect(responsavelMarcado(etapa(2, 'pendente'), 'u1', [])).toBeNull()
+  })
+})
+
+describe('trava do autor da versão mais recente na Revisão interna', () => {
+  const ULTIMA: UltimaVersao = { numero: 3, autorId: 'u1', autorNome: 'Ana' }
+  const usuarios = [{ id: 'u1', nome: 'Ana' }, { id: 'u2', nome: 'Bia' }]
+  const doProcesso = (codigo: string, status: StatusDaEtapa, responsavelId: string | null = null): EtapaDoProcesso => ({
+    ...etapa(5, status), codigo, responsavelId, responsavelNome: null, responsavelInativo: false,
+  })
+
+  test('na Revisão interna a lista não traz o autor; nas outras etapas e sem versão, traz todos', () => {
+    expect(usuariosParaAEtapa(doProcesso('revisao_interna', 'pendente'), usuarios, ULTIMA)).toEqual([{ id: 'u2', nome: 'Bia' }])
+    expect(usuariosParaAEtapa(doProcesso('modelagem', 'pendente'), usuarios, ULTIMA)).toEqual(usuarios)
+    expect(usuariosParaAEtapa(doProcesso('revisao_interna', 'pendente'), usuarios, null)).toEqual(usuarios)
+  })
+
+  test('assume a etapa pendente ou em andamento sem responsável', () => {
+    expect(podeAssumir(doProcesso('modelagem', 'pendente'), 'u1', ULTIMA)).toBe(true)
+    expect(podeAssumir(doProcesso('modelagem', 'em_andamento'), 'u1', null)).toBe(true)
+  })
+
+  test('não assume etapa resolvida, com responsável ou sem os dados do processo', () => {
+    expect(podeAssumir(doProcesso('modelagem', 'concluida'), 'u1', null)).toBe(false)
+    expect(podeAssumir(doProcesso('modelagem', 'dispensada'), 'u1', null)).toBe(false)
+    expect(podeAssumir(doProcesso('modelagem', 'em_andamento', 'u2'), 'u1', null)).toBe(false)
+    expect(podeAssumir(etapa(5, 'pendente'), 'u1', null)).toBe(false)
+  })
+
+  test('na Revisão interna, o autor da versão mais recente não assume, mas outro usuário assume', () => {
+    expect(podeAssumir(doProcesso('revisao_interna', 'em_andamento'), 'u1', ULTIMA)).toBe(false)
+    expect(podeAssumir(doProcesso('revisao_interna', 'em_andamento'), 'u2', ULTIMA)).toBe(true)
   })
 })

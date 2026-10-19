@@ -36,7 +36,7 @@ function processo(mudancas: Partial<ProcessoLido> = {}): ProcessoLido {
     macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento', etapaAtual: { codigo: 'c6', nome: REVISAO, ordem: 6 },
     processoPaiId: null, processoPai: null, subprocessos: [],
     responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
-    dataDaReuniao: null,
+    dataDaReuniao: null, ultimaVersao: null,
     etapasDoProcesso: [
       doProcesso(4, MODELAGEM, { status: 'concluida', iniciadaEm: '2026-10-10', resolvidaEm: '2026-10-11' }),
       doProcesso(5, RELATORIO, { status: 'concluida', iniciadaEm: '2026-10-11', resolvidaEm: '2026-10-12' }),
@@ -99,7 +99,7 @@ test('voltar à modelagem pede o motivo, grava e devolve as seguintes a pendente
   expect(await (await etapa(MODELAGEM)).findByText('Em andamento')).toBeTruthy()
   expect((await etapa(RELATORIO)).getByText('Pendente')).toBeTruthy()
   expect((await etapa(REVISAO)).getByText('Pendente')).toBeTruthy()
-  expect(falso.chamadas).toEqual([{ acao: 'voltar', id: 'a4', nota: 'Mudou o escopo' }])
+  expect(falso.chamadas).toEqual([{ acao: 'voltar', id: 'a4', nota: 'Mudou o escopo', usuarioId: null }])
 })
 
 test('cancelar a janela do motivo não grava', async () => {

@@ -20,6 +20,6 @@ export function gravarAvanco(
 
 /** Sem etapa pendente depois não há responsável a escolher: o avanço leva null. */
 export function gravarTexto(processos: ModuloDeProcessos, { acao, etapa }: PedidoDeTexto, texto: string): Promise<void> {
-  if (acao === 'voltar') return processos.voltarParaEtapa(etapa.id, texto)
+  if (acao === 'voltar') return processos.voltarParaEtapa(etapa.id, texto, null)
   return gravarAvanco(processos, acao, etapa, texto, null)
 }

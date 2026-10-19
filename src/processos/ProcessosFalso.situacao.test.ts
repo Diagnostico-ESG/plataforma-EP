@@ -20,7 +20,7 @@ function falso(situacao: SituacaoDoProcesso = 'em_andamento', etapas: EtapaDoPro
     responsavel: null, origem: 'novo', contexto: null, observacoes: null,
     processoPaiId: null, processoPai: null, subprocessos: [],
     motivoDaSituacao: situacao === 'suspenso' || situacao === 'cancelado' ? 'Motivo antigo' : null,
-    dataDaReuniao: null, etapasDoProcesso: etapas,
+    dataDaReuniao: null, ultimaVersao: null, etapasDoProcesso: etapas,
   }
   const modulo = new ProcessosFalso()
   modulo.processos = [processo]
@@ -97,7 +97,7 @@ describe('congelamento das etapas', () => {
     const frase = `Este processo está ${situacao}; retome-o para registrar o andamento.`
     const tentativas = [
       () => modulo.iniciarEtapa('a5'), () => modulo.concluirEtapa('a5', null), () => modulo.dispensarEtapa('a5', 'n', null),
-      () => modulo.registrarRealizadaAnteriormente('a5', 'n', null), () => modulo.voltarParaEtapa('a4', 'M'),
+      () => modulo.registrarRealizadaAnteriormente('a5', 'n', null), () => modulo.voltarParaEtapa('a4', 'M', null),
       () => modulo.corrigirDatasDaEtapa('a4', { iniciadaEm: '2026-10-09', resolvidaEm: null }),
       () => modulo.mudarResponsavelDaEtapa('a4', null),
     ]

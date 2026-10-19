@@ -189,15 +189,15 @@ grant execute on function private.conferir_autor_da_revisao_interna(), private.r
 
 **Files:** Modify `src/processos/{tipos,andamentosSupabase,lerProcessoSupabase,andamentoFalso,ProcessosFalso,caminhoDeEtapas,gravarAcoes,frasesDeVersao}.ts`, os testes listados em "Estrutura de arquivos" e os fixtures que o `tsc` apontar.
 
-- [ ] **Testes primeiro (vermelhos):**
+- [x] **Testes primeiro (vermelhos):**
   - `andamentosSupabase.test.ts`: `voltarParaEtapa('a4', 'Mudou o escopo', 'u1')` chama o `rpc` `voltar_a_etapa` com `{ p_andamento: 'a4', p_motivo: 'Mudou o escopo', p_responsavel: 'u1' }` (e `null` quando não há); a recusa `autor_da_versao:3:Ana Teste` (nas funções `rpc.avancar_etapa`, `rpc.voltar_a_etapa` e no `update` de `andamentos`) vira a `TravaDoBanco` "Ana Teste enviou a versão V3 e não pode ser responsável pela Revisão interna."; os testes existentes de voltar levam o terceiro argumento.
   - `lerProcessoSupabase.test.ts`: a leitura de `versoes` (`select numero, enviada_por, autor:usuarios(nome)`, `processo_id = id`, `historica = false`, `numero` decrescente, `limit 1`) vira `ultimaVersao: { numero: 3, autorId: 'u1', autorNome: 'Ana Teste' }`; sem linha, `null`; erro de leitura, `Falha ao ler a versão mais recente do processo: …`.
   - `caminhoDeEtapas.test.ts`: `usuariosParaAEtapa` tira o autor só na etapa de código `revisao_interna` (nas outras etapas e sem `ultimaVersao` devolve a lista inteira); `podeAssumir` é verdadeiro para etapa pendente ou em andamento sem responsável e falso para resolvida, para etapa com responsável, e, na Revisão interna, para o autor da `ultimaVersao`.
   - `andamentoFalso.test.ts`: `conferirAutorDaRevisao` recusa o autor na Revisão interna (mesma frase), aceita outro usuário, outra etapa, `null` e quem já era o responsável; `conferirResponsavelEscolhido` mantém a frase de `responsavel_invalido` do avanço.
   - `ProcessosFalso.avanco.test.ts`: concluir a etapa anterior à Revisão interna com o autor como próximo responsável é recusado (a frase da trava) sem mudar nenhuma etapa; com outro usuário passa.
   - `ProcessosFalso.voltar.test.ts`: `voltarParaEtapa(id, motivo, responsavelId)` põe a etapa em andamento com o responsável (ou nenhum, limpando o anterior) e grava `{ acao: 'voltar', id, nota: motivo, usuarioId }`; recusa o autor na Revisão interna e o responsável fora de `usuariosPossiveis`, sem mudar nada.
-- [ ] `npm test` e `npm run typecheck`: vermelhos pelo motivo certo (assinaturas e campo que faltam).
-- [ ] **Implementar:**
+- [x] `npm test` e `npm run typecheck`: vermelhos pelo motivo certo (assinaturas e campo que faltam).
+- [x] **Implementar:**
   - `tipos.ts`: `export type UltimaVersao = { numero: number; autorId: string; autorNome: string }`; em `ProcessoLido`, `/** A versão mais recente não histórica; null sem versão (a Revisão interna não barra ninguém). */ ultimaVersao: UltimaVersao | null`; `voltarParaEtapa(andamentoId: string, motivo: string, responsavelId: string | null)` com o comentário "A etapa reaberta recebe o responsável (null: ninguém)".
   - `lerProcessoSupabase.ts`: `lerUltimaVersao(cliente, id): Promise<UltimaVersao | null>` (≤ 20 linhas, early return) entra no `Promise.all` de `lerProcesso`.
   - `frasesDeVersao.ts`: `fraseDoAutorDaVersao(valor: string)` recebe `numero:nome`, separa no primeiro `:` e devolve a frase da spec.
@@ -207,7 +207,7 @@ grant execute on function private.conferir_autor_da_revisao_interna(), private.r
   - `gravarAcoes.ts`: `AcaoDeAvanco` ganha `'voltar'`, `AcaoDeTexto` fica `'dispensar' | 'realizada'`, `PedidoDeAvanco` fica como está (`proxima`); `gravarAvanco` chama `voltarParaEtapa(etapa.id, nota, responsavelId)` quando a ação é `'voltar'`; `gravarTexto` perde o ramo do voltar.
   - `caminhoDeEtapas.ts`: `usuariosParaAEtapa` e `podeAssumir`, como acima.
   - Fixtures: `ultimaVersao: null` onde o `tsc` apontar.
-- [ ] `npm test`, `npm run typecheck`, `npm run lint`, `npm run check:circular`: verdes. Comitar ("Ticket 14 de processos-etapas: módulo e falsa com a trava do autor e o voltar com responsável"). Se os testes de tela do voltar quebrarem aqui por causa de `PedidoDeAvanco`, deixar para a Tarefa 5 só o que depende da janela (o commit precisa compilar e passar).
+- [x] `npm test`, `npm run typecheck`, `npm run lint`, `npm run check:circular`: verdes. Comitar ("Ticket 14 de processos-etapas: módulo e falsa com a trava do autor e o voltar com responsável"). Se os testes de tela do voltar quebrarem aqui por causa de `PedidoDeAvanco`, deixar para a Tarefa 5 só o que depende da janela (o commit precisa compilar e passar).
 
 ### Tarefa 5 — Tela: [Assumir], trava nas janelas e voltar com responsável (critérios 4 a 8)
 

@@ -110,7 +110,7 @@ const PROCESSO_QUE_USOU_A_MODELAGEM: ProcessoLido = {
   id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
   macroprocessoNome: 'Macro', processoPaiId: null, situacao: 'em_andamento', etapaAtual: null, responsavel: null,
   origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null, processoPai: null, subprocessos: [],
-  dataDaReuniao: null, etapasDoProcesso: [{
+  dataDaReuniao: null, ultimaVersao: null, etapasDoProcesso: [{
     id: 'a1', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 1, obrigatoria: true, status: 'concluida',
     nota: null, iniciadaEm: '2026-10-01', resolvidaEm: '2026-10-02', responsavelId: null, responsavelNome: null,
     responsavelInativo: false,

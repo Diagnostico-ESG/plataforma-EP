@@ -30,7 +30,7 @@ function processo(mudancas: Partial<ProcessoLido> = {}): ProcessoLido {
     macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento',
     etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 },
     processoPaiId: null, processoPai: null, subprocessos: [],
-    responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null, dataDaReuniao: null,
+    responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, ultimaVersao: null,
     etapasDoProcesso: [
       doProcesso(4, 'modelagem', 'Reunião de modelagem'),
       doProcesso(5, 'relatorio', 'Relatório e modelagem técnica'),

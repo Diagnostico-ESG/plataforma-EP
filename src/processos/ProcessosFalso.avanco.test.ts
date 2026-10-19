@@ -19,7 +19,7 @@ function falso(etapas: EtapaDoProcesso[], situacao: ProcessoLido['situacao'] = '
     macroprocessoNome: 'Macro', situacao, etapaAtual: { codigo: 'c4', nome: 'Etapa 4', ordem: 4 },
     responsavel: null, origem: 'novo', contexto: null, observacoes: null,
     processoPaiId: null, processoPai: null, subprocessos: [], motivoDaSituacao: null,
-    dataDaReuniao: null, etapasDoProcesso: etapas,
+    dataDaReuniao: null, ultimaVersao: null, etapasDoProcesso: etapas,
   }
   const modulo = new ProcessosFalso()
   modulo.processos = [processo]
@@ -118,5 +118,33 @@ describe('recusas, sem mudar nenhuma etapa', () => {
     modulo.falhaDeGravacao = 'Sem conexão'
     expect((await falhaDe(modulo.concluirEtapa('a4', 'u1'))).message).toBe('Sem conexão')
     expect(await statusDe(modulo)).toEqual(['em_andamento', 'pendente'])
+  })
+})
+
+describe('trava do autor da versão mais recente', () => {
+  const REVISAO = { codigo: 'revisao_interna' }
+
+  function comAutor(): ProcessosFalso {
+    const modulo = falso([doProcesso(4, EM_ANDAMENTO), doProcesso(5, REVISAO)])
+    modulo.processos[0] = { ...modulo.processos[0], ultimaVersao: { numero: 3, autorId: 'u1', autorNome: 'Ana Teste' } }
+    return modulo
+  }
+
+  test('o avanço não põe o autor como responsável da Revisão interna e nada muda', async () => {
+    const modulo = comAutor()
+    const falha = await falhaDe(modulo.concluirEtapa('a4', 'u1'))
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect(falha.message).toBe('Ana Teste enviou a versão V3 e não pode ser responsável pela Revisão interna.')
+    expect(await statusDe(modulo)).toEqual(['em_andamento', 'pendente'])
+    expect(modulo.chamadas).toEqual([])
+  })
+
+  test('outro usuário, ninguém, ou outra etapa seguinte passam', async () => {
+    const outro = comAutor()
+    await outro.concluirEtapa('a4', 'u2')
+    expect(etapaDe(await lido(outro), 'a5')).toMatchObject({ status: 'em_andamento', responsavelId: 'u2' })
+    const ninguem = comAutor()
+    await ninguem.concluirEtapa('a4', null)
+    expect(etapaDe(await lido(ninguem), 'a5').responsavelId).toBeNull()
   })
 })

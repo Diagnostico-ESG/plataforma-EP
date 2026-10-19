@@ -1,4 +1,4 @@
-import type { EtapaDoProcesso, EtapaDoCaminho, StatusDaEtapa, UsuarioResponsavel } from './tipos'
+import type { EtapaDoProcesso, EtapaDoCaminho, StatusDaEtapa, UltimaVersao, UsuarioResponsavel } from './tipos'
 
 export type AcaoDaEtapa = 'iniciar' | 'concluir' | 'dispensar' | 'realizada' | 'voltar'
 
@@ -55,4 +55,25 @@ export function formatarData(data: string | null): string {
   if (!data) return '—'
   const [ano, mes, dia] = data.split('-')
   return `${dia}/${mes}/${ano}`
+}
+
+const CODIGO_DA_REVISAO_INTERNA = 'revisao_interna'
+
+/** Ninguém revisa o próprio trabalho: na Revisão interna, quem enviou a versão mais recente não histórica não é escolhido. O banco confere de novo. */
+export function ehAutorBarrado(etapa: EtapaDoCaminho, usuarioId: string, ultimaVersao: UltimaVersao | null): boolean {
+  return etapa.codigo === CODIGO_DA_REVISAO_INTERNA && ultimaVersao !== null && ultimaVersao.autorId === usuarioId
+}
+
+/** Quem a janela e a escolha oferecem como responsável da etapa: a lista sem o autor barrado. */
+export function usuariosParaAEtapa(
+  etapa: EtapaDoCaminho, usuarios: UsuarioResponsavel[], ultimaVersao: UltimaVersao | null,
+): UsuarioResponsavel[] {
+  return usuarios.filter((usuario) => !ehAutorBarrado(etapa, usuario.id, ultimaVersao))
+}
+
+/** [Assumir]: etapa do processo pendente ou em andamento, sem responsável, que quem está na tela pode assumir. */
+export function podeAssumir(etapa: EtapaDoCaminho, usuarioId: string, ultimaVersao: UltimaVersao | null): boolean {
+  if (!ehEtapaDoProcesso(etapa) || etapa.responsavelId !== null) return false
+  if (etapa.status !== 'pendente' && etapa.status !== 'em_andamento') return false
+  return !ehAutorBarrado(etapa, usuarioId, ultimaVersao)
 }

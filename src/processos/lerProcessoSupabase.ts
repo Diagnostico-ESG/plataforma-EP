@@ -2,7 +2,7 @@ import { type EventoDoBanco, eventoDoCadastro } from '../cadastros/historicoSupa
 import type { ClienteSupabase } from '../lib/supabase'
 import { type AndamentoLido, COLUNAS_DO_ANDAMENTO, etapaDoAndamento } from './andamentoDoBanco'
 import { type LinhaDoProcesso, processoDaLinha } from './processoDaLinha'
-import type { EtapaDoProcesso, ModuloDeProcessos, ProcessoLido } from './tipos'
+import type { EtapaDoProcesso, ModuloDeProcessos, ProcessoLido, UltimaVersao } from './tipos'
 
 type OperacoesDeLeitura = Pick<ModuloDeProcessos, 'lerProcesso' | 'lerHistoricoDoProcesso'>
 
@@ -17,10 +17,22 @@ async function lerProcesso(cliente: ClienteSupabase, id: string): Promise<Proces
   const { data, error } = await cliente.from('processos_com_andamento').select('*').eq('id', id)
   if (error) throw new Error(`Falha ao ler o processo: ${error.message}`)
   if (!data[0]) return null
-  const [etapasDoProcesso, estrutura] = await Promise.all([
-    lerAndamentosDoProcesso(cliente, id), lerEstrutura(cliente, id, data[0].processo_pai_id),
+  const [etapasDoProcesso, estrutura, ultimaVersao] = await Promise.all([
+    lerAndamentosDoProcesso(cliente, id), lerEstrutura(cliente, id, data[0].processo_pai_id), lerUltimaVersao(cliente, id),
   ])
-  return { ...dadosDoProcesso(data[0]), ...estrutura, etapasDoProcesso }
+  return { ...dadosDoProcesso(data[0]), ...estrutura, etapasDoProcesso, ultimaVersao }
+}
+
+type LinhaDaUltimaVersao = { numero: number; enviada_por: string; autor: { nome: string } | null }
+
+// A versão não histórica de maior número: quem a enviou não pode ser o responsável da Revisão interna (o banco confere).
+async function lerUltimaVersao(cliente: ClienteSupabase, id: string): Promise<UltimaVersao | null> {
+  const { data, error } = await cliente.from('versoes').select('numero, enviada_por, autor:usuarios(nome)')
+    .eq('processo_id', id).eq('historica', false).order('numero', { ascending: false }).limit(1)
+  if (error) throw new Error(`Falha ao ler a versão mais recente do processo: ${error.message}`)
+  const ultima = (data as unknown as LinhaDaUltimaVersao[])[0]
+  if (!ultima) return null
+  return { numero: ultima.numero, autorId: ultima.enviada_por, autorNome: ultima.autor?.nome ?? '' }
 }
 
 type LinhaDaEstrutura = { id: string; nome: string; processo_pai_id: string | null }
