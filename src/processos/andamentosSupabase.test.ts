@@ -24,7 +24,7 @@ test('voltar chama a função do banco com o andamento e o motivo', async () => 
   const cliente = new ClienteSupabaseFalso()
   await criar(cliente).voltarParaEtapa('a4', 'Mudou o escopo')
   expect(cliente.pedidos).toEqual([
-    { tabela: 'rpc', operacao: 'voltar_a_etapa', valores: { p_andamento: 'a4', p_motivo: 'Mudou o escopo' } },
+    { tabela: 'rpc', operacao: 'voltar_a_etapa', valores: { p_andamento: 'a4', p_motivo: 'Mudou o escopo', p_responsavel: null } },
   ])
 })
 

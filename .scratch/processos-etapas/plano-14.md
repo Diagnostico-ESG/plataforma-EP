@@ -56,19 +56,19 @@
 
 ### Tarefa 1 — Plano, marco e branch
 
-- [ ] Comitar este plano na `main` ("Plano do ticket 14 de processos-etapas").
-- [ ] Criar o marco `marco/2026-10-18-inicio-ticket-14-processos-etapas` (se o nome existir, `-2`) e enviá-lo ao GitHub com `git push origin "refs/tags/marco/*:refs/tags/marco/*"`.
-- [ ] `git switch -c processos-etapas-14` (branch comum, sem worktree).
+- [x] Comitar este plano na `main` ("Plano do ticket 14 de processos-etapas").
+- [x] Criar o marco `marco/2026-10-18-inicio-ticket-14-processos-etapas` (se o nome existir, `-2`) e enviá-lo ao GitHub com `git push origin "refs/tags/marco/*:refs/tags/marco/*"`.
+- [x] `git switch -c processos-etapas-14` (branch comum, sem worktree).
 
 ### Tarefa 2 — Teste de banco que falha (critério 2)
 
 **Files:** Create `supabase/tests/36_trava_do_autor.test.sql`.
 
-- [ ] Criar o teste, com a moldura do `35_avancar_etapa.test.sql` (`_tap`, `plan(33)`, os mesmos quatro usuários inventados a1 Administrador, a2 Integrante, a3 Consulta, a4 Administrador inativo, as funções `pg_temp.andamento`, `pg_temp.agir`, `pg_temp.status`) e do `27_versoes.test.sql` (`pg_temp.arquivo`, `pg_temp.par`), mais:
+- [x] Criar o teste, com a moldura do `35_avancar_etapa.test.sql` (`_tap`, `plan(33)`, os mesmos quatro usuários inventados a1 Administrador, a2 Integrante, a3 Consulta, a4 Administrador inativo, as funções `pg_temp.andamento`, `pg_temp.agir`, `pg_temp.status`) e do `27_versoes.test.sql` (`pg_temp.arquivo`, `pg_temp.par`), mais:
   - `pg_temp.processo(nome text) returns uuid` (id do processo pelo nome); `pg_temp.nome(id uuid) returns text` (`select nome from public.usuarios`); `pg_temp.enviar(nome_do_processo text)` = `select public.registrar_versao(pg_temp.processo(nome_do_processo), 1, null, pg_temp.par())` (o número é ignorado; sai o maior + 1); `pg_temp.escolher(nome_do_processo text, codigo text, usuario uuid)` = `update public.andamentos set responsavel_id = usuario where id = pg_temp.andamento(nome_do_processo, codigo)`; `pg_temp.responsavel(nome_do_processo, codigo) returns uuid`; todas com `grant execute … to authenticated`.
   - Quem envia a versão é quem está no `request.jwt.claims` (o `enviada_por` vem de `auth.uid()`): trocar com `select set_config('request.jwt.claims', '{"sub":"…a1","role":"authenticated"}', true)` entre os envios, como o teste 35 faz.
   - Seis processos inventados no setor `TS14`: `Autor Seletor`, `Avanco Autor`, `Volta Autor`, `Volta Vazio`, `Historica`, `Sem Versao`. Etapas: `modelagem`=1, `relatorio_modelagem_tecnica`=2, `revisao_interna`=3, `revisao_setor`=4, `aprovacao_setor`=5, `publicacao`=6.
-- [ ] Casos (33 asserções, cada uma `insert into _tap (linha) select …`; `n(x)` = `pg_temp.nome(x)`):
+- [x] Casos (33 asserções, cada uma `insert into _tap (linha) select …`; `n(x)` = `pg_temp.nome(x)`):
   1. **Autor Seletor** (a2 envia V1 e V2; a1 envia V3). Como a2:
      - (1) `throws_ok` de `escolher('Autor Seletor','revisao_interna',a1)`: `'P0001', 'autor_da_versao:3:' || n(a1)`; (2) responsável continua `null`;
      - (3) `lives_ok` de `escolher(…,a2)` (a2 enviou a V1 e a V2, não a mais recente); (4) responsável = a2;
@@ -90,15 +90,15 @@
   6. **Sem Versao:** (29) `lives_ok` de `escolher('Sem Versao','revisao_interna',a1)`.
   7. **A função nova** (`reset role` antes): (30) `is((select count(*)::int from pg_proc where proname = 'voltar_a_etapa' and pronamespace = 'public'::regnamespace), 1, 'só existe a assinatura nova de voltar_a_etapa')`; (31) `has_function_privilege('anon', 'public.voltar_a_etapa(uuid, text, uuid)', 'execute')` = `false`; (32) o mesmo para `authenticated` = `true`; (33) `prosecdef` de `public.voltar_a_etapa` = `false`.
   - Terminar com `finish()` e o `do $$ … raise exception … $$` do relatório, como no teste 35.
-- [ ] Comitar na branch ("Ticket 14 de processos-etapas: teste de banco da trava do autor"). O pre-commit só roda a bateria da tela.
-- [ ] `git push -u origin processos-etapas-14` (sem `--force`).
-- [ ] Disparar o workflow "Testes de banco" na branch `processos-etapas-14`, pelo navegador do app (`anthropic-skills:built-in-browser`; não há `gh`; o usuário já entrou no GitHub; o formulário do botão é `/actions/manual`, com o campo `branch`, como no ticket 13). Esperado: **só o teste 36 falha**, pelas asserções que dependem da função e do gatilho novos (e as chamadas de `voltar_a_etapa` com 3 argumentos não acham a função); os 35 arquivos anteriores passam (os testes 19 e 20 ainda estão com 2 argumentos). Se o 36 falhar por outro motivo (digitação, usuário, plano), corrigir e repetir.
+- [x] Comitar na branch ("Ticket 14 de processos-etapas: teste de banco da trava do autor"). O pre-commit só roda a bateria da tela.
+- [x] `git push -u origin processos-etapas-14` (sem `--force`).
+- [x] Disparar o workflow "Testes de banco" na branch `processos-etapas-14`, pelo navegador do app (`anthropic-skills:built-in-browser`; não há `gh`; o usuário já entrou no GitHub; o formulário do botão é `/actions/manual`, com o campo `branch`, como no ticket 13). Esperado: **só o teste 36 falha**, pelas asserções que dependem da função e do gatilho novos (e as chamadas de `voltar_a_etapa` com 3 argumentos não acham a função); os 35 arquivos anteriores passam (os testes 19 e 20 ainda estão com 2 argumentos). Se o 36 falhar por outro motivo (digitação, usuário, plano), corrigir e repetir.
 
 ### Tarefa 3 — Migração, aplicação e tipos (critérios 1 e 9)
 
 **Files:** Create `supabase/migrations/<timestamp>_trava_do_autor_e_voltar_com_responsavel.sql`; Modify `supabase/tests/{19_voltar_datas_responsavel,20_situacao_do_processo}.test.sql`, `supabase/AMBIENTES.md`, `src/types/database.ts`.
 
-- [ ] `npx supabase migration new trava_do_autor_e_voltar_com_responsavel` e preencher:
+- [x] `npx supabase migration new trava_do_autor_e_voltar_com_responsavel` e preencher:
 
 ```sql
 -- Trava do autor na Revisão interna e voltar com responsável (processos-etapas, ticket 14, ADR 0014). Não destrutiva:
@@ -179,11 +179,11 @@ grant execute on function private.conferir_autor_da_revisao_interna(), private.r
   public.voltar_a_etapa(uuid, text, uuid) to authenticated;
 ```
 
-- [ ] Nos testes 19 e 20, acrescentar `, null` como terceiro argumento de cada `voltar_a_etapa(...)` (11 chamadas no 19, 1 no 20; a chamada com o id zerado também). Antes de comitar, ler as asserções do 19 sobre o responsável da etapa reaberta e conferir se ainda valem com `null`; as que não valem são ajustadas ao novo comportamento (anotar em `desvios.md` na Tarefa 6).
-- [ ] Comitar e enviar ("Ticket 14 de processos-etapas: migração da trava do autor e do voltar"). Disparar o workflow "Migrar banco de desenvolvimento" na branch, com `migracao` = `<timestamp>_trava_do_autor_e_voltar_com_responsavel.sql`. Esperado: aplicada, sem o aviso de já aplicada.
-- [ ] Disparar o "Testes de banco" na branch. Esperado: os 36 arquivos verdes, o 36 com 33 de 33. Se o 36 falhar, ler a linha `not ok`; se for erro da migração, **nova migração** (a enviada não se edita); se for do teste, corrigir o teste. Na terceira falha sobre o mesmo ponto, parar (regra de parada do `CLAUDE.md`).
-- [ ] Conferir o alvo e rodar `npm run db:types`; no diff de `src/types/database.ts` deve mudar só `voltar_a_etapa` (`Args: { p_andamento: string; p_motivo: string; p_responsavel: string }`).
-- [ ] Registrar em `supabase/AMBIENTES.md` a linha da migração (data, ticket 14 de processos-etapas, não destrutiva, teste 36 falhou antes e passou depois com os 36 arquivos verdes, testes 19 e 20 ajustados à assinatura nova, aplicada pelo workflow, tipos regenerados). Comitar e enviar ("Ticket 14 de processos-etapas: registro da migração e tipos"). Nesse commit o `npm run typecheck` acusa a chamada antiga de `voltar_a_etapa` em `andamentosSupabase.ts`: corrigi-la aqui (`p_responsavel: null as unknown as string`, provisório até a Tarefa 4) para o commit compilar.
+- [x] Nos testes 19 e 20, acrescentar `, null` como terceiro argumento de cada `voltar_a_etapa(...)` (11 chamadas no 19, 1 no 20; a chamada com o id zerado também). Antes de comitar, ler as asserções do 19 sobre o responsável da etapa reaberta e conferir se ainda valem com `null`; as que não valem são ajustadas ao novo comportamento (anotar em `desvios.md` na Tarefa 6).
+- [x] Comitar e enviar ("Ticket 14 de processos-etapas: migração da trava do autor e do voltar"). Disparar o workflow "Migrar banco de desenvolvimento" na branch, com `migracao` = `<timestamp>_trava_do_autor_e_voltar_com_responsavel.sql`. Esperado: aplicada, sem o aviso de já aplicada.
+- [x] Disparar o "Testes de banco" na branch. Esperado: os 36 arquivos verdes, o 36 com 33 de 33. Se o 36 falhar, ler a linha `not ok`; se for erro da migração, **nova migração** (a enviada não se edita); se for do teste, corrigir o teste. Na terceira falha sobre o mesmo ponto, parar (regra de parada do `CLAUDE.md`).
+- [x] Conferir o alvo e rodar `npm run db:types`; no diff de `src/types/database.ts` deve mudar só `voltar_a_etapa` (`Args: { p_andamento: string; p_motivo: string; p_responsavel: string }`).
+- [x] Registrar em `supabase/AMBIENTES.md` a linha da migração (data, ticket 14 de processos-etapas, não destrutiva, teste 36 falhou antes e passou depois com os 36 arquivos verdes, testes 19 e 20 ajustados à assinatura nova, aplicada pelo workflow, tipos regenerados). Comitar e enviar ("Ticket 14 de processos-etapas: registro da migração e tipos"). Nesse commit o `npm run typecheck` acusa a chamada antiga de `voltar_a_etapa` em `andamentosSupabase.ts`: corrigi-la aqui (`p_responsavel: null as unknown as string`, provisório até a Tarefa 4) para o commit compilar.
 
 ### Tarefa 4 — Módulo de processos (critério 3)
 

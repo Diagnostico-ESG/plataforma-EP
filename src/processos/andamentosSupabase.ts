@@ -60,7 +60,7 @@ async function andamentoExiste(cliente: ClienteSupabase, id: string): Promise<bo
 async function voltarParaEtapa(
   cliente: ClienteSupabase, id: string, motivo: string, recusas: RecusasDoModulo,
 ): Promise<void> {
-  const { error } = await cliente.rpc('voltar_a_etapa', { p_andamento: id, p_motivo: motivo })
+  const { error } = await cliente.rpc('voltar_a_etapa', { p_andamento: id, p_motivo: motivo, p_responsavel: null as unknown as string })
   if (error) throw falhaDoAndamento(error, recusas)
 }
 
