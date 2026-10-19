@@ -11,7 +11,7 @@ type ProcessosDoSetorProps = { processos: ModuloDeProcessos; setorId: string }
 
 // O painel abre por cima da Lista já filtrada pelo setor, e fechar volta a ela.
 function abrirProcesso(id: string, setorId: string) {
-  window.location.hash = montarEnderecoDosProcessos({ visao: 'lista', aberto: id, filtros: { ...SEM_FILTROS, setor: setorId } })
+  window.location.hash = montarEnderecoDosProcessos({ visao: 'lista', aberto: id, filtros: { ...SEM_FILTROS, setor: setorId }, agrupar: 'etapa' })
 }
 
 /** Seção "Processos do setor" da tela do setor: a lista inteira, filtrada pelo setor, por nome. Todos os perfis. */
