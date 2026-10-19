@@ -157,4 +157,4 @@ Nenhuma. "Marcada para" e "realizada em" são calculados pela data, na tela.
 
 Entregue em 2026-10-15 (commit ccd2f8b), com ressalva: critérios [visual] presumidos (a tela não foi conferida)
 Entregue em 2026-10-18 (commit e54f51b)
-Em revisão desde 2026-10-19
+Entregue em 2026-10-19 (commit 8ef4091)

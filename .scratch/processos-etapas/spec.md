@@ -674,4 +674,4 @@ Sem migração: nenhuma tabela, coluna, política, view ou função muda. O vers
 Entregue em 2026-10-14 (commit f1cc3cf), com ressalva: critérios [visual] presumidos (a tela não foi conferida)
 Entregue em 2026-10-18 (commit e54f51b)
 Entregue em 2026-10-19 (commit 8d01ca8)
-Em revisão desde 2026-10-19
+Entregue em 2026-10-19 (commit 8ef4091)
