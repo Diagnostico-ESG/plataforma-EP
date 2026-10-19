@@ -11,12 +11,13 @@ function formaDeBusca(texto: string): string {
 }
 
 export function contemTrecho(nome: string, busca: string): boolean {
-  return formaDeBusca(nome).includes(formaDeBusca(busca))
+  return formaDeBusca(nome).includes(formaDeBusca(busca.trim()))
 }
 
 /** O nome cortado em partes, com `achado` nas que casam com a busca (sem diferenciar maiúsculas e acentos). */
 export function partesDoNome(nome: string, busca: string): ParteDoNome[] {
-  const procurado = [...busca].map(semAcento)
+  // Espaço nas pontas é de quem digita ("Emitir "), não do nome; contemTrecho faz o mesmo.
+  const procurado = [...busca.trim()].map(semAcento)
   const letras = [...nome]
   const formas = letras.map(semAcento)
   const partes: ParteDoNome[] = []

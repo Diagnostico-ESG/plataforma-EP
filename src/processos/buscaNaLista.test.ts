@@ -12,6 +12,16 @@ test('busca vazia deixa tudo passar', () => {
   expect(contemTrecho('Pagar Diária', '')).toBe(true)
 })
 
+test('espaços nas pontas da busca não contam (achado do /ship da parte 3)', () => {
+  expect(contemTrecho('Emitir Ofício', 'emitir ')).toBe(true)
+  expect(contemTrecho('Pagar Diária', 'diária ')).toBe(true)
+  expect(contemTrecho('Pagar Diária', '   ')).toBe(true)
+  expect(partesDoNome('Pagar Diária', ' diaria ')).toEqual([
+    { texto: 'Pagar ', achado: false }, { texto: 'Diária', achado: true },
+  ])
+  expect(partesDoNome('Pagar Diária', '  ')).toEqual([{ texto: 'Pagar Diária', achado: false }])
+})
+
 test('as partes do nome marcam o trecho achado e guardam o texto original', () => {
   expect(partesDoNome('Emitir Ofício', 'ofic')).toEqual([
     { texto: 'Emitir ', achado: false }, { texto: 'Ofíc', achado: true }, { texto: 'io', achado: false },
