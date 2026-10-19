@@ -290,3 +290,17 @@ Ponto de partida da revisão: `marco/2026-10-18-inicio-etapas-mais-rapidas` (23 
 - **O falso de processos repetia ids** (o processo novo podia ficar com `p1`, já usado por um processo carregado no teste): agora pula os ids em uso. Só afetava testes que cadastram com processos já carregados.
 - **Tela conferida no navegador do app pela vitrine local** (porta 5180, porque a 5179 ainda tinha o servidor do ticket 18; o da 5180 foi encerrado). **Visto:** Histórico agrupado em Hoje, Ontem e 10/10 com hora em mono e iniciais; Esc volta ao verso; Editar com o título "Editar Emitir Ofício" e o rodapé fixo na janela estreita; Novo processo com rolagem e rodapé fixo; ao cadastrar, o verso do criado com "Processo cadastrado" em verde. O carregando do formulário não ganhou blocos cinza no formato final (o formulário mostra só "Carregando setores e macroprocessos…"): o critério `[visual]` da spec sobre isso fica para o `/polir`.
 - **Contorno de ambiente:** o e-mail de autor do git continua fora da configuração da máquina; os commits passaram o e-mail dos commits anteriores só no comando.
+
+## 2026-10-19 — /polir da parte 3 (Verso do cartão; tickets 15 a 19 de processos-etapas)
+
+Impeccable `audit` (detector sem achados; leitura do CSS e dos componentes de `processos` e `versoes`; contraste dos tokens de texto conferido: texto-2 e aprovado-texto acima de 4,5:1) e `polish`. Notas do audit: acessibilidade 3, desempenho 4, tema 3, responsivo 4, integridade 4.
+
+**Corrigido:**
+- **[P1] A recusa do formulário ficava abaixo do rodapé fixo** de Novo processo e Editar: com o formulário rolado para cima, a mensagem ("O nome do processo é obrigatório", nome repetido, falha de gravação) ficava fora da vista. Agora aparece dentro do rodapé, acima dos botões (`formulario-do-processo-aviso`), com teste.
+- **[P2] Campos obrigatórios sem indicação para leitor de tela:** `aria-required` em Nome, Setor, Macroprocesso e Processo pai (a validação e os textos não mudaram).
+- **[P3] Cor solta no tema:** a linha fina do Agora usava `rgb(30 36 51 / 10%)`; passou para `var(--linha)`.
+
+**Deixado de fora:**
+- **Blocos cinza no carregando do formulário** (critério `[visual]` da spec): o formulário mostra só "Carregando setores e macroprocessos…" e a janela estreita muda de altura quando os dados chegam. Motivo: é acabamento que pede desenho próprio dos blocos; fica no backlog.
+- **Aviso "Processo cadastrado" como `role="status"`** que nasce junto com a janela: leitores de tela podem não o anunciar além do anúncio do próprio diálogo. Motivo: o diálogo já abre anunciando o processo; sem prova com leitor de tela real.
+- **Fonte mono em datas, versões e contagens** (regra do DESIGN.md): só a hora do histórico usa; as demais seguem no backlog de 2026-10-18.

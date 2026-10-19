@@ -68,8 +68,9 @@ export function FormularioPronto({ cadastros, opcoes, titulo, inicial, aoSalvar,
       <div className="formulario-do-processo-rodape">
         <button type="submit" className="botao botao-principal" disabled={enviando}>{inicial ? 'Salvar' : 'Cadastrar'}</button>
         <button type="button" className="botao botao-secundario" onClick={aoCancelar}>Cancelar</button>
+        {/* Dentro do rodapé fixo: a recusa aparece onde a pessoa clicou, mesmo com o formulário rolado para cima. */}
+        {aviso && <p className="cadastros-falha formulario-do-processo-aviso" role="alert">{aviso}</p>}
       </div>
-      {aviso && <p className="cadastros-falha" role="alert">{aviso}</p>}
     </form>
   )
 }

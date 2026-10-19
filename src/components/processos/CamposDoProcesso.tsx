@@ -27,10 +27,10 @@ export function CamposDoFormulario({ campos, opcoes, mostrarTipo, aoMudar }: Cam
   return (
     <>
       <label htmlFor={`${id}-nome`}>Nome</label>
-      <input id={`${id}-nome`} value={campos.nome} maxLength={200} autoComplete="off"
+      <input id={`${id}-nome`} aria-required="true" value={campos.nome} maxLength={200} autoComplete="off"
         onChange={(evento) => aoMudar({ nome: evento.target.value })} />
       <label htmlFor={`${id}-setor`}>Setor</label>
-      <select id={`${id}-setor`} value={campos.setorId} onChange={(evento) => aoMudar({ setorId: evento.target.value })}>
+      <select id={`${id}-setor`} aria-required="true" value={campos.setorId} onChange={(evento) => aoMudar({ setorId: evento.target.value })}>
         <option value="">Escolha o setor</option>
         {opcoes.setores.filter((setor) => setor.ativo || setor.id === campos.setorId).map((setor) => (
           <option key={setor.id} value={setor.id}>{setor.sigla} — {setor.nome}</option>
@@ -73,7 +73,7 @@ function CampoDoPai({ id, valor, pais, aoMudar }: CampoProps & { valor: string; 
   return (
     <>
       <label htmlFor={`${id}-pai`}>Processo pai</label>
-      <select id={`${id}-pai`} value={valor} onChange={(evento) => aoMudar({ processoPaiId: evento.target.value })}>
+      <select id={`${id}-pai`} aria-required="true" value={valor} onChange={(evento) => aoMudar({ processoPaiId: evento.target.value })}>
         <option value="">Escolha o processo pai</option>
         {pais.map((pai) => <option key={pai.id} value={pai.id}>{pai.setorSigla} — {pai.nome}</option>)}
       </select>
@@ -87,7 +87,7 @@ function CampoDoMacroprocesso({ id, campos, macroprocessos, aoMudar }: CampoDoMa
   return (
     <>
       <label htmlFor={`${id}-macroprocesso`}>Macroprocesso</label>
-      <select id={`${id}-macroprocesso`} value={campos.macroprocessoId} disabled={campos.tipo === 'subprocesso'}
+      <select id={`${id}-macroprocesso`} aria-required="true" value={campos.macroprocessoId} disabled={campos.tipo === 'subprocesso'}
         onChange={(evento) => aoMudar({ macroprocessoId: evento.target.value })}>
         <option value="">Escolha o macroprocesso</option>
         {macroprocessos.filter((macro) => macro.ativo || macro.id === campos.macroprocessoId).map((macro) => (

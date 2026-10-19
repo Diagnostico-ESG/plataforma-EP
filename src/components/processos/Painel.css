@@ -59,7 +59,14 @@
   margin: var(--esp-2) calc(-1 * var(--esp-5)) calc(-1 * var(--esp-5));
   padding: var(--esp-3) var(--esp-5);
   border-top: 1px solid var(--linha);
+  flex-wrap: wrap;
   background: var(--folha);
+}
+
+.formulario-do-processo-aviso {
+  order: -1;
+  flex-basis: 100%;
+  margin: 0;
 }
 
 /* Aviso (amarelo): informa o que vai acontecer ao salvar, sem dizer que algo falhou. */

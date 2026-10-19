@@ -145,6 +145,15 @@ test('nome, setor e macroprocesso são obrigatórios, conferidos antes de enviar
   expect(falso.processos).toEqual([])
 })
 
+test('a recusa aparece dentro do rodapé fixo, e os campos obrigatórios são marcados', async () => {
+  montar()
+  const form = await formulario()
+  for (const campo of ['Nome', 'Setor', 'Macroprocesso']) expect(form.getByLabelText(campo).getAttribute('aria-required')).toBe('true')
+  cadastrar(form)
+  const alerta = await form.findByRole('alert')
+  expect(alerta.closest('.formulario-do-processo-rodape')).not.toBeNull()
+})
+
 test('nome repetido no mesmo setor: a recusa em vermelho e os dados continuam no formulário', async () => {
   montar({ processos: [EMITIR] })
   const form = await formulario()
