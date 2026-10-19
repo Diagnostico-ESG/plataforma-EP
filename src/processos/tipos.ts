@@ -52,6 +52,24 @@ export type ModuloDoCatalogo = {
 
 export type ResponsavelDaEtapa = { id: string; nome: string; fotoUrl: string | null }
 
+/** Uma etapa do caminho do processo como o cartão do Quadro a conta: só o código e o status. */
+export type PedacoDoCaminho = { codigo: string; status: StatusDaEtapa }
+
+/** O que o cartão do Quadro mostra além do resto do processo (parte 4); a view traz tudo pronto. */
+export type DadosDoCartao = {
+  etapaAtualStatus: 'pendente' | 'em_andamento' | null
+  /** AAAA-MM-DD; null com a etapa atual pendente ou sem etapa atual. */
+  etapaAtualIniciadaEm: string | null
+  /** null sem responsável. */
+  responsavelAtivo: boolean | null
+  /** Na ordem do catálogo; vazio sem andamentos. */
+  caminho: PedacoDoCaminho[]
+  /** A versão de maior número, histórica ou não; null sem versão. */
+  ultimaVersao: { numero: number; historica: boolean; temRelatorio: boolean } | null
+  /** Os subprocessos que não foram cancelados. */
+  subprocessos: number
+}
+
 /** Um processo como o Quadro e a Lista o mostram: com a etapa atual, o responsável dela e a situação calculada. */
 export type ProcessoDaLista = {
   id: string
@@ -66,6 +84,10 @@ export type ProcessoDaLista = {
   situacao: SituacaoDoProcesso
   etapaAtual: { codigo: string; nome: string; ordem: number } | null
   responsavel: ResponsavelDaEtapa | null
+  /** A data da reunião de modelagem piloto (AAAA-MM-DD). Opcional para quem monta o processo à mão; o ProcessoLido a exige. */
+  dataDaReuniao?: string | null
+  /** Opcional pelo mesmo motivo: sem ele o cartão não tem barra nem selos. */
+  cartao?: DadosDoCartao
 }
 
 export type ListaDeProcessos = { etapas: EtapaDoCatalogo[]; processos: ProcessoDaLista[] }

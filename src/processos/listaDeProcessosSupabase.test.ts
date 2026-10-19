@@ -29,6 +29,8 @@ test('lista os processos por nome e as etapas de nível processo na ordem do cat
       macroprocessoId: 'm1', macroprocessoNome: 'Macro de Teste', processoPaiId: null, situacao: 'em_andamento',
       etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 },
       responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null },
+      // As linhas deste teste não trazem os campos novos da view: o cartão chega vazio.
+      cartao: { etapaAtualStatus: null, etapaAtualIniciadaEm: null, responsavelAtivo: null, caminho: [], ultimaVersao: null, subprocessos: 0 },
     }],
   })
   expect(cliente.pedidos).toMatchObject([
@@ -44,6 +46,19 @@ test('processo sem etapa atual e sem responsável chega com nulos', async () => 
   cliente.respostas['processos_com_andamento.select'] = { data: [semEtapa], error: null }
   const { processos } = await criar(cliente).listarProcessos()
   expect(processos[0]).toMatchObject({ etapaAtual: null, responsavel: null })
+})
+
+test('os campos novos da view chegam ao cartão do processo na lista', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  const completa = { ...LINHA, etapa_atual_status: 'em_andamento', etapa_atual_iniciada_em: '2026-10-01', responsavel_ativo: false,
+    caminho: [{ etapa_id: 'e4', codigo: 'modelagem', status: 'em_andamento' }], ultima_versao_numero: 2,
+    ultima_versao_historica: false, ultima_versao_tem_relatorio: true, subprocessos_quantidade: 3, data_da_reuniao: '2026-10-25' }
+  cliente.respostas['processos_com_andamento.select'] = { data: [completa], error: null }
+  const { processos } = await criar(cliente).listarProcessos()
+  expect(processos[0].dataDaReuniao).toBe('2026-10-25')
+  expect(processos[0].cartao).toEqual({ etapaAtualStatus: 'em_andamento', etapaAtualIniciadaEm: '2026-10-01', responsavelAtivo: false,
+    caminho: [{ codigo: 'modelagem', status: 'em_andamento' }], ultimaVersao: { numero: 2, historica: false, temRelatorio: true },
+    subprocessos: 3 })
 })
 
 test('a situação calculada "concluido" chega como está', async () => {

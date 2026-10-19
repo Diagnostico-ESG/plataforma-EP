@@ -1,5 +1,7 @@
 import type { Database } from '../types/database'
-import type { ProcessoDaLista, ResponsavelDaEtapa, SituacaoDoProcesso } from './tipos'
+import type {
+  DadosDoCartao, PedacoDoCaminho, ProcessoDaLista, ResponsavelDaEtapa, SituacaoDoProcesso, StatusDaEtapa,
+} from './tipos'
 
 export type LinhaDoProcesso = Database['public']['Views']['processos_com_andamento']['Row']
 
@@ -17,6 +19,39 @@ export function processoDaLinha(linha: LinhaDoProcesso): ProcessoDaLista {
     situacao: (linha.situacao ?? 'em_andamento') as SituacaoDoProcesso,
     etapaAtual: etapaAtualDaLinha(linha),
     responsavel: responsavelDaLinha(linha),
+    dataDaReuniao: linha.data_da_reuniao,
+    cartao: cartaoDaLinha(linha),
+  }
+}
+
+// O banco devolve o caminho como JSON solto (`Json`): é o único ponto onde ele vira a lista tipada, e o que não for lista
+// de {codigo, status} vira lista vazia, para o cartão só ficar sem barra em vez de quebrar a tela.
+function caminhoDaLinha(caminho: LinhaDoProcesso['caminho']): PedacoDoCaminho[] {
+  if (!Array.isArray(caminho)) return []
+  return caminho.flatMap((item) => {
+    if (item === null || typeof item !== 'object' || Array.isArray(item)) return []
+    const { codigo, status } = item
+    return typeof codigo === 'string' && typeof status === 'string' ? [{ codigo, status: status as StatusDaEtapa }] : []
+  })
+}
+
+function ultimaVersaoDaLinha(linha: LinhaDoProcesso): DadosDoCartao['ultimaVersao'] {
+  if (linha.ultima_versao_numero == null) return null
+  return {
+    numero: linha.ultima_versao_numero, historica: linha.ultima_versao_historica ?? false,
+    temRelatorio: linha.ultima_versao_tem_relatorio ?? false,
+  }
+}
+
+function cartaoDaLinha(linha: LinhaDoProcesso): DadosDoCartao {
+  return {
+    etapaAtualStatus: linha.etapa_atual_status === 'pendente' || linha.etapa_atual_status === 'em_andamento'
+      ? linha.etapa_atual_status : null,
+    etapaAtualIniciadaEm: linha.etapa_atual_iniciada_em ?? null,
+    responsavelAtivo: linha.responsavel_ativo ?? null,
+    caminho: caminhoDaLinha(linha.caminho),
+    ultimaVersao: ultimaVersaoDaLinha(linha),
+    subprocessos: linha.subprocessos_quantidade ?? 0,
   }
 }
 
