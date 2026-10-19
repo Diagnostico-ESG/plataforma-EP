@@ -20,3 +20,5 @@
 - [ ] Sem responsável, Reunião (hoje, futura; ausente na passada), versão ("V3", "V5F", ausente sem versão) e subprocessos (cancelado fora da contagem; só no pai).
 - [ ] Testes de interface com o aplicativo inteiro cobrindo os itens acima, para Integrante e Consulta.
 - [ ] `[visual]` O cartão normal fica limpo: barra fina em cinza e azul e, no máximo, versão e subprocessos em texto neutro; só "{n} dias nesta etapa" e "Relatório pendente" em âmbar; os selos quebram de linha sem estourar a coluna.
+
+Concluído em 2026-10-19 (commit cf06df0)
