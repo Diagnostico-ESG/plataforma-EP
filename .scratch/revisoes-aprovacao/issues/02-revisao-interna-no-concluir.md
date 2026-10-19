@@ -17,3 +17,5 @@
 - [x] Os eventos de revisão registrada aparecem no histórico do processo.
 - [x] Testes do módulo real com o cliente simulado (chamadas e tradução das recusas), das funções puras (opções que cabem, prévia das versões) e da tela inteira com as falsas, cobrindo os itens acima.
 - [ ] [visual] A janela mostra claramente qual versão é revisada e cabe na tela do notebook (1366×768); os registros seguem o estilo da gaveta.
+
+Concluído em 2026-10-19 (commit 8658376)
