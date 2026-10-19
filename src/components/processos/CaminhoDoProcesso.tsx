@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { useAcoesDaEtapa } from '../../hooks/useAcoesDaEtapa'
 import { useCarregamento } from '../../hooks/useCarregamento'
+import type { Executar } from '../../hooks/useGravacaoComFalha'
 import type { ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 import { AgoraDoProcesso } from './AgoraDoProcesso'
 import { CaminhoDeEtapas } from './CaminhoDeEtapas'
@@ -12,6 +13,8 @@ type CaminhoDoProcessoProps = {
   podeAlterar: boolean
   /** Quem está na tela, para a janela de avanço o marcar como responsável. */
   usuarioId: string
+  /** Grava a situação (Retomar do Agora) e guarda a falha para o verso mostrar. */
+  executar: Executar
   aoMudar: () => void
   aoSumir: () => void
 }
@@ -23,7 +26,7 @@ function avisoDoProcessoParado({ situacao, motivoDaSituacao }: ProcessoLido): st
 }
 
 /** O caminho do processo no painel, com as ações na etapa atual para quem pode alterar (a RLS é quem protege). */
-export function CaminhoDoProcesso({ processo, processos, podeAlterar, usuarioId, aoMudar, aoSumir }: CaminhoDoProcessoProps) {
+export function CaminhoDoProcesso({ processo, processos, podeAlterar, usuarioId, executar, aoMudar, aoSumir }: CaminhoDoProcessoProps) {
   // Quem não altera não escolhe responsável: não precisa da lista. Falha ao lê-la deixa o seletor só com o atual.
   const ler = useCallback(
     () => (podeAlterar ? processos.listarResponsaveisPossiveis() : Promise.resolve([])), [processos, podeAlterar])
@@ -33,7 +36,8 @@ export function CaminhoDoProcesso({ processo, processos, podeAlterar, usuarioId,
   const parado = processo.situacao === 'suspenso' || processo.situacao === 'cancelado'
   return (
     <>
-    <AgoraDoProcesso processo={processo} usuarios={usuarios} usuarioId={usuarioId} podeAlterar={podeAlterar} acoes={acoes} />
+    <AgoraDoProcesso processo={processo} processos={processos} usuarios={usuarios} usuarioId={usuarioId} podeAlterar={podeAlterar}
+      acoes={acoes} executar={executar} aoMudar={aoMudar} />
     <section className="painel-caminho" aria-label="Caminho de etapas">
       <h3 className="painel-subtitulo">Etapas do processo</h3>
       {parado && <p className="painel-aviso" role="status">{avisoDoProcessoParado(processo)}</p>}

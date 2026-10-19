@@ -71,3 +71,25 @@
   gap: var(--esp-2);
   margin-top: var(--esp-1);
 }
+
+.agora-situacao {
+  margin: 0;
+  font-size: var(--tam-painel);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.agora-suspenso {
+  border-color: var(--pendencia-borda);
+  background: var(--pendencia-fundo);
+}
+
+.agora-cancelado {
+  border-color: var(--linha);
+  background: var(--neutra-fundo);
+}
+
+.agora-concluido {
+  border-color: var(--aprovado-fundo);
+  background: var(--aprovado-fundo);
+}

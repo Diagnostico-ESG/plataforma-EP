@@ -2,7 +2,7 @@ import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/re
 import { afterEach, expect, test } from 'vitest'
 import type { UltimaVersao } from './processos/tipos'
 import { BIA, EU, diasAtras, etapaDoProcesso, montarVerso, processoLido } from './testes/processoNoVerso'
-import { agoraDoVerso, janelasPorCima } from './testes/versoDoCartao'
+import { agoraDoVerso, janelasPorCima, versoAberto } from './testes/versoDoCartao'
 
 // O cartão "Agora" do verso (ticket 17 de processos-etapas): a etapa atual, quem cuida dela, os dias e o botão principal.
 
@@ -148,4 +148,76 @@ test('a Consulta vê o Agora sem botões nem "Trocar", com a borda cinza e "Com 
 test('a Consulta vê "Sem responsável" quando a etapa não tem ninguém', async () => {
   montarVerso(processoLido(caminho()), 'consulta')
   expect((await agoraDoVerso()).getByText('Sem responsável')).toBeTruthy()
+})
+
+// ---- Suspenso, cancelado e concluído
+
+const classeDoAgora = async () => (await (await versoAberto()).findByRole('region', { name: /^Agora/ })).className
+
+test('suspenso: o Agora mostra o motivo e [Retomar] como botão principal, no lugar do aviso antigo', async () => {
+  montarVerso(processoLido(caminho(), { situacao: 'suspenso', motivoDaSituacao: 'Aguardando decisão' }))
+  const agora = await agoraDoVerso()
+  expect(agora.getByText('Suspenso: Aguardando decisão')).toBeTruthy()
+  expect(agora.getByRole('button', { name: 'Retomar' })).toBeTruthy()
+  expect(agora.queryByRole('button', { name: new RegExp(`^(Iniciar|Concluir) `) })).toBeNull()
+  expect(await classeDoAgora()).toContain('agora-suspenso')
+})
+
+test('cancelado: o Agora mostra o motivo e [Retomar]', async () => {
+  montarVerso(processoLido(caminho(), { situacao: 'cancelado', motivoDaSituacao: 'Não será mapeado' }))
+  const agora = await agoraDoVerso()
+  expect(agora.getByText('Cancelado: Não será mapeado')).toBeTruthy()
+  expect(agora.getByRole('button', { name: 'Retomar' })).toBeTruthy()
+  expect(await classeDoAgora()).toContain('agora-cancelado')
+})
+
+test('[Retomar] pede o motivo, grava e devolve o Agora do andamento', async () => {
+  const falso = montarVerso(processoLido(caminho(), { situacao: 'suspenso', motivoDaSituacao: 'Aguardando decisão' }))
+  fireEvent.click((await agoraDoVerso()).getByRole('button', { name: 'Retomar' }))
+  const janela = within(screen.getByRole('dialog', { name: 'Retomar o processo Emitir Ofício?' }))
+  expect((janela.getByRole('button', { name: 'Retomar processo' }) as HTMLButtonElement).disabled).toBe(true)
+  fireEvent.change(janela.getByLabelText('Motivo'), { target: { value: 'Decisão tomada' } })
+  fireEvent.click(janela.getByRole('button', { name: 'Retomar processo' }))
+  expect(await (await agoraDoVerso()).findByRole('button', { name: `Concluir ${MODELAGEM}` })).toBeTruthy()
+  expect(falso.processos[0]).toMatchObject({ situacao: 'em_andamento', motivoDaSituacao: null })
+})
+
+test('a falha ao retomar aparece como alerta e o Agora continua suspenso', async () => {
+  const falso = montarVerso(processoLido(caminho(), { situacao: 'suspenso', motivoDaSituacao: 'Aguardando decisão' }))
+  falso.falhaDeGravacao = 'sem conexão'
+  fireEvent.click((await agoraDoVerso()).getByRole('button', { name: 'Retomar' }))
+  const janela = within(screen.getByRole('dialog', { name: 'Retomar o processo Emitir Ofício?' }))
+  fireEvent.change(janela.getByLabelText('Motivo'), { target: { value: 'Decisão tomada' } })
+  fireEvent.click(janela.getByRole('button', { name: 'Retomar processo' }))
+  expect((await screen.findByRole('alert')).textContent).toBe('A alteração não foi salva: sem conexão.')
+  expect((await agoraDoVerso()).getByText('Suspenso: Aguardando decisão')).toBeTruthy()
+})
+
+test('concluído: o Agora diz "Concluído em" com a data da última etapa obrigatória, e a opcional aberta segue à mão', async () => {
+  montarVerso(processoLido([
+    etapaDoProcesso(4, 'modelagem', MODELAGEM, { ...CONCLUIDA, resolvidaEm: '2026-10-10' }),
+    etapaDoProcesso(5, 'relatorio', RELATORIO, { ...CONCLUIDA, resolvidaEm: '2026-10-12' }),
+    etapaDoProcesso(9, 'publicacao', PUBLICACAO, { obrigatoria: false }),
+  ], { situacao: 'concluido' }))
+  const agora = await agoraDoVerso()
+  expect(agora.getByText('Concluído em 12/10/2026')).toBeTruthy()
+  expect(agora.getByRole('button', { name: `Iniciar ${PUBLICACAO}` })).toBeTruthy()
+  expect(await classeDoAgora()).toContain('agora-concluido')
+})
+
+test('concluído sem etapa aberta: só "Concluído em", sem botões', async () => {
+  montarVerso(processoLido([
+    etapaDoProcesso(4, 'modelagem', MODELAGEM, { ...CONCLUIDA, resolvidaEm: '2026-10-10' }),
+    etapaDoProcesso(9, 'publicacao', PUBLICACAO, { obrigatoria: false, status: 'dispensada', nota: 'Não se aplica', resolvidaEm: '2026-10-11' }),
+  ], { situacao: 'concluido' }))
+  const agora = await agoraDoVerso()
+  expect(agora.getByText('Concluído em 10/10/2026')).toBeTruthy()
+  expect(agora.queryAllByRole('button')).toEqual([])
+})
+
+test('a Consulta vê o motivo do suspenso sem [Retomar], e o concluído com a data', async () => {
+  montarVerso(processoLido(caminho(), { situacao: 'suspenso', motivoDaSituacao: 'Aguardando decisão' }), 'consulta')
+  const agora = await agoraDoVerso()
+  expect(agora.getByText('Suspenso: Aguardando decisão')).toBeTruthy()
+  expect(agora.queryAllByRole('button')).toEqual([])
 })
