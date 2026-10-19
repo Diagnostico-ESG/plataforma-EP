@@ -10,11 +10,13 @@
 
 ## Critérios de aceite
 
-- [ ] Função pura do agrupamento do histórico por dia ("Hoje", "Ontem", "dd/mm") com testes unitários.
-- [ ] Histórico dentro da janela, agrupado por dia, com "← Voltar ao processo"; o primeiro Esc volta ao verso e o segundo fecha; "Nenhuma alteração registrada ainda." sem eventos; os textos das ações e as linhas dos recursos retirados continuam como estão.
-- [ ] Editar na janela, voltando ao verso ao salvar ou cancelar; falha de gravação com os dados no formulário.
-- [ ] Novo processo na janela, por [Cadastrar processo] e pelo endereço; Cancelar e Esc fecham; ao cadastrar, o verso do criado com "Processo cadastrado", o endereço dele e o Quadro ou a Lista recarregados; falha de gravação com os dados no formulário.
-- [ ] Recarregar com o Histórico ou o Editar abertos volta ao verso.
-- [ ] Os testes de tela atuais de cadastrar, editar e histórico do processo passam ajustados à janela, mantendo os comportamentos.
-- [ ] Testes de interface com o aplicativo inteiro cobrindo os itens acima.
-- [ ] `[visual]` O Novo processo e o Editar encolhem a janela para uma coluna de cerca de 560 px, com os botões no rodapé fixo.
+- [x] Função pura do agrupamento do histórico por dia ("Hoje", "Ontem", "dd/mm") com testes unitários.
+- [x] Histórico dentro da janela, agrupado por dia, com "← Voltar ao processo"; o primeiro Esc volta ao verso e o segundo fecha; "Nenhuma alteração registrada ainda." sem eventos; os textos das ações e as linhas dos recursos retirados continuam como estão.
+- [x] Editar na janela, voltando ao verso ao salvar ou cancelar; falha de gravação com os dados no formulário.
+- [x] Novo processo na janela, por [Cadastrar processo] e pelo endereço; Cancelar e Esc fecham; ao cadastrar, o verso do criado com "Processo cadastrado", o endereço dele e o Quadro ou a Lista recarregados; falha de gravação com os dados no formulário.
+- [x] Recarregar com o Histórico ou o Editar abertos volta ao verso.
+- [x] Os testes de tela atuais de cadastrar, editar e histórico do processo passam ajustados à janela, mantendo os comportamentos.
+- [x] Testes de interface com o aplicativo inteiro cobrindo os itens acima.
+- [x] `[visual]` O Novo processo e o Editar encolhem a janela para uma coluna de cerca de 560 px, com os botões no rodapé fixo.
+
+Concluído em 2026-10-19 (commit 59bc1a9)
