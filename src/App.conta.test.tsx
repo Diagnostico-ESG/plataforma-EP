@@ -7,11 +7,12 @@ import { AcessoFalso } from './acesso/AcessoFalso'
 import css from './components/moldura/Moldura.css?raw'
 import { regrasDaClasse } from './testes/regrasDaClasse'
 import { VersoesFalso } from './versoes/VersoesFalso'
+import { RevisoesFalso } from './revisoes/RevisoesFalso'
 
 afterEach(cleanup)
 
 async function abrirLogado(acesso = AcessoFalso.logadoComo()) {
-  render(<App acesso={acesso} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} versoes={new VersoesFalso()} />)
+  render(<App acesso={acesso} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
   return screen.findByRole('button', { name: 'Sua conta: Pessoa de Teste' })
 }
 

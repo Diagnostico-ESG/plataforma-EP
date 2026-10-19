@@ -6,6 +6,7 @@ import { ProcessosFalso } from './processos/ProcessosFalso'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import type { LinhaDeUsuario, Perfil } from './acesso/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
+import { RevisoesFalso } from './revisoes/RevisoesFalso'
 
 beforeEach(() => {
   window.location.hash = '#/administracao'
@@ -27,7 +28,7 @@ const LINHAS: LinhaDeUsuario[] = [
 async function abrirComoAdministrador() {
   const acesso = AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'administrador' as Perfil })
   acesso.linhas = [...LINHAS]
-  render(<App acesso={acesso} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} versoes={new VersoesFalso()} />)
+  render(<App acesso={acesso} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
   await screen.findByRole('table', { busy: false })
   return acesso
 }

@@ -8,6 +8,7 @@ import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { EtapaDoProcesso, ProcessoLido, UltimaVersao, UsuarioResponsavel } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
+import { RevisoesFalso } from './revisoes/RevisoesFalso'
 import { agoraDoVerso, etapasDoVerso, gavetaDaEtapa, janelasPorCima } from './testes/versoDoCartao'
 
 // [Assumir], a trava do autor da versão mais recente na Revisão interna e voltar com a escolha do responsável
@@ -79,7 +80,7 @@ function montar(etapas: EtapaDoProcesso[] = CAMINHO, { perfil = 'integrante_ep',
   falso.usuariosPossiveis = [EU, BIA]
   falso.etapasDoCatalogo = etapas.map((etapa) => ({ id: `e${etapa.ordem}`, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, ativa: true }))
   if (falha) falso.falhaDeGravacao = falha
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
   return falso
 }
 

@@ -80,6 +80,10 @@ test('soltar em outra coluna avisa onde soltar, não grava e não abre janela', 
 const EU: UsuarioResponsavel = { id: USUARIO_DE_TESTE.id, nome: USUARIO_DE_TESTE.nome }
 const BIA: UsuarioResponsavel = { id: 'u2', nome: 'Bia Teste' }
 const TITULO_DA_JANELA = 'Concluir Revisão interna e iniciar Revisão do setor'
+// Concluir a Revisão interna pede o resultado: a versão mais recente é de outra pessoa, e a opção é "sem alteração".
+const VERSAO_DE_BIA = { numero: 7, autorId: BIA.id, autorNome: BIA.nome, papeis: ['bpmn', 'png', 'relatorio'] } as const
+const SEM_ALTERACAO = 'Sem alteração: segue a V7'
+const comVersaoDeBia = (nome: string) => processo(nome, { processo: { ultimaVersao: { ...VERSAO_DE_BIA, papeis: [...VERSAO_DE_BIA.papeis] } } })
 // A janela abre depois de ler o processo, então ela é esperada.
 const janela = async (titulo = TITULO_DA_JANELA) => within(await screen.findByRole('dialog', { name: titulo }))
 const cartoesDa = (nome: string) => within(coluna(nome)).queryAllByRole('link').map((cartao) => cartao.querySelector('.cartao-nome')?.textContent)
@@ -103,9 +107,10 @@ test('soltar no destino abre a janela de avanço, sem gravar, com a pergunta e q
 })
 
 test('confirmar conclui pela função de avanço e o cartão passa para a coluna nova', async () => {
-  const lido = processo('Emitir Ofício')
+  const lido = comVersaoDeBia('Emitir Ofício')
   const falso = montar([lido], 'integrante_ep', [EU, BIA])
   await soltarNoDestino('Emitir Ofício')
+  fireEvent.click((await janela()).getByRole('radio', { name: SEM_ALTERACAO }))
   fireEvent.click((await janela()).getByRole('radio', { name: BIA.nome }))
   fireEvent.click((await janela()).getByRole('button', { name: 'Concluir e iniciar Revisão do setor' }))
   await waitFor(() => expect(cartoesDa('Revisão do setor')).toEqual(['Emitir Ofício']))
@@ -132,9 +137,10 @@ test.each([
     'Este processo está suspenso; retome-o para registrar o andamento.'],
   ['sem conexão', 'A alteração não foi salva: sem conexão.'],
 ])('a falha de gravação mostra a mensagem e nada muda (%s)', async (falha, texto) => {
-  const falso = montar([processo('Emitir Ofício')], 'integrante_ep', [EU, BIA])
+  const falso = montar([comVersaoDeBia('Emitir Ofício')], 'integrante_ep', [EU, BIA])
   falso.falhaDeGravacao = falha
   await soltarNoDestino('Emitir Ofício')
+  fireEvent.click((await janela()).getByRole('radio', { name: SEM_ALTERACAO }))
   fireEvent.click((await janela()).getByRole('button', { name: 'Concluir e iniciar Revisão do setor' }))
   expect((await screen.findByRole('alert')).textContent).toBe(texto)
   expect(cartoesDa('Revisão interna')).toEqual(['Emitir Ofício'])
