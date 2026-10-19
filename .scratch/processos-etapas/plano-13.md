@@ -133,7 +133,7 @@ set local role authenticated;
 
 **Files:** Create `supabase/migrations/<timestamp>_avancar_etapa.sql`; Modify `supabase/AMBIENTES.md`, `src/types/database.ts`.
 
-- [ ] `npx supabase migration new avancar_etapa` e preencher:
+- [x] `npx supabase migration new avancar_etapa` e preencher:
 
 ```sql
 -- Avanço da etapa (processos-etapas, ticket 13, ADR 0014): resolver a etapa atual já inicia a próxima, com o
@@ -220,10 +220,10 @@ grant execute on function private.status_do_avanco(text),
 ```
 
   Os parâmetros das auxiliares levam o prefixo `p_` (`p_nota`, `p_responsavel`) para não colidir com as colunas `nota` e `responsavel_id` dentro do `update` (o plpgsql recusa nome ambíguo).
-- [ ] Comitar e enviar ("Ticket 13 de processos-etapas: migração do avanço"). Disparar o workflow "Migrar banco de desenvolvimento" na branch, com `migracao` = `<timestamp>_avancar_etapa.sql`. Esperado: aplicada, sem o aviso de já aplicada.
-- [ ] Disparar o "Testes de banco" na branch. Esperado: os 35 arquivos verdes, o 35 com 46 de 46. Se o 35 falhar, ler a linha `not ok`; se for erro da função, **nova migração** (a enviada não se edita); se for do teste, corrigir o teste. Na terceira falha sobre o mesmo ponto, parar (regra de parada do `CLAUDE.md`).
-- [ ] Conferir o alvo e rodar `npm run db:types`; no diff de `src/types/database.ts` deve entrar só `avancar_etapa` em `Functions` (`Args: { p_acao: string; p_andamento: string; p_nota: string; p_responsavel: string }`).
-- [ ] Registrar em `supabase/AMBIENTES.md` a linha da migração (data, ticket 13 de processos-etapas, não destrutiva, teste 35 falhou antes por função inexistente e passou depois com os 35 arquivos verdes, aplicada pelo workflow, tipos regenerados). Comitar e enviar ("Ticket 13 de processos-etapas: registro da migração e tipos").
+- [x] Comitar e enviar ("Ticket 13 de processos-etapas: migração do avanço"). Disparar o workflow "Migrar banco de desenvolvimento" na branch, com `migracao` = `<timestamp>_avancar_etapa.sql`. Esperado: aplicada, sem o aviso de já aplicada.
+- [x] Disparar o "Testes de banco" na branch. Esperado: os 35 arquivos verdes, o 35 com 46 de 46. Se o 35 falhar, ler a linha `not ok`; se for erro da função, **nova migração** (a enviada não se edita); se for do teste, corrigir o teste. Na terceira falha sobre o mesmo ponto, parar (regra de parada do `CLAUDE.md`).
+- [x] Conferir o alvo e rodar `npm run db:types`; no diff de `src/types/database.ts` deve entrar só `avancar_etapa` em `Functions` (`Args: { p_acao: string; p_andamento: string; p_nota: string; p_responsavel: string }`).
+- [x] Registrar em `supabase/AMBIENTES.md` a linha da migração (data, ticket 13 de processos-etapas, não destrutiva, teste 35 falhou antes por função inexistente e passou depois com os 35 arquivos verdes, aplicada pelo workflow, tipos regenerados). Comitar e enviar ("Ticket 13 de processos-etapas: registro da migração e tipos").
 
 ### Tarefa 4 — Módulo de processos: levar o responsável da próxima (critério 3)
 

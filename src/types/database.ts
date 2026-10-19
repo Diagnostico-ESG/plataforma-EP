@@ -704,6 +704,15 @@ export type Database = {
         Args: { p_arquivo: Json; p_numero: number; p_versao: string }
         Returns: string
       }
+      avancar_etapa: {
+        Args: {
+          p_acao: string
+          p_andamento: string
+          p_nota: string
+          p_responsavel: string
+        }
+        Returns: undefined
+      }
       cancelar_processo: {
         Args: { p_motivo: string; p_processo: string }
         Returns: undefined
