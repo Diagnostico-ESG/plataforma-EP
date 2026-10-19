@@ -21,3 +21,5 @@
 - [ ] Histórico do processo mostra os dois registros do avanço; [Iniciar] continua sem janela; a Consulta não vê a janela.
 - [ ] Testes de interface com o aplicativo inteiro cobrindo os itens acima.
 - [ ] `supabase/AMBIENTES.md` registra a migração.
+
+Concluído em 2026-10-18 (commit 37d3b5c)

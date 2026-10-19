@@ -303,5 +303,5 @@ async function avancar(
 - [x] Gravar `.scratch/processos-etapas/desvios.md` (entrada datada): função com ação em texto; transição conferida na função para recusar resolver de novo; `nota_obrigatoria` nova; migração e tipos em commits seguintes ao da migração; o que mais surgir.
 - [x] Gravar `.scratch/melhorias-protocolo.md` com os itens não testados do `/executar-complexo` e do "Qualquer momento" (`.claude/regras/nao-testados.md`) que aconteceram.
 - [x] Marcar as caixas deste plano e comitar.
-- [ ] `git switch main`, merge da branch (`finishing-a-development-branch`), `git branch -d processos-etapas-13`; enviar a `main` e conferir o "Testes de banco" na `main`.
-- [ ] Na `main`: `Concluído em 2026-10-18 (commit <hash>)` no fim do ticket 13; comitar e enviar. Lembrar: peça o `/cost`; próximo, o ticket 14.
+- [x] `git switch main`, merge da branch (`finishing-a-development-branch`), `git branch -d processos-etapas-13`; enviar a `main` e conferir o "Testes de banco" na `main`.
+- [x] Na `main`: `Concluído em 2026-10-18 (commit <hash>)` no fim do ticket 13; comitar e enviar. Lembrar: peça o `/cost`; próximo, o ticket 14.
