@@ -56,6 +56,7 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes }: Area
           aoCadastrar={() => irParaVisao({ aberto: 'novo' })} idEscolhido={idAberto}
           enderecoDoProcesso={enderecoDoProcesso} aoAbrir={(id) => irParaVisao({ aberto: id })}
           filtros={atual.filtros} aoMudarFiltros={(filtros) => irParaVisao({ filtros, aberto: null })}
+          agrupar={atual.agrupar} aoMudarAgrupar={(agrupar) => irParaVisao({ agrupar, aberto: null })}
           processos={processos} usuarioId={usuario.id} aoMudar={recarregar} />
       </div>
       {idAberto && (

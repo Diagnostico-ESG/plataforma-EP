@@ -67,3 +67,12 @@ export function NenhumProcessoComFiltros({ aoLimpar }: { aoLimpar: () => void })
     </div>
   )
 }
+
+export function NenhumProcessoDoUsuario({ aoVerTodos }: { aoVerTodos: () => void }) {
+  return (
+    <div className="filtros-sem-resultado">
+      <p className="cadastros-vazio">Nenhum processo com você agora.</p>
+      <button type="button" className="botao botao-secundario" onClick={aoVerTodos}>Ver todos</button>
+    </div>
+  )
+}

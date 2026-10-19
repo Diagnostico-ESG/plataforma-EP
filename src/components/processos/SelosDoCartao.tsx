@@ -11,8 +11,8 @@ function SeloDoCartao({ selo }: { selo: Selo }) {
 }
 
 /** Só o que há a dizer, na ordem da spec; o cartão normal não ganha nada. */
-export function SelosDoCartao({ processo, hoje }: { processo: ProcessoDaLista; hoje: string }) {
-  const selos = selosDoCartao(processo, hoje)
+export function SelosDoCartao({ processo, hoje, semSeloDeResponsavel }: { processo: ProcessoDaLista; hoje: string; semSeloDeResponsavel: boolean }) {
+  const selos = selosDoCartao(processo, hoje).filter((selo) => !(semSeloDeResponsavel && selo.tipo === 'sem_responsavel'))
   if (selos.length === 0) return null
   return (
     <span className="cartao-selos">

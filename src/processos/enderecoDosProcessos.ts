@@ -15,8 +15,15 @@ export type FiltrosDosProcessos = {
   busca: string | null
 }
 
-/** aberto: o id do processo no painel, 'novo' no cadastro, null sem painel. */
-export type EnderecoDosProcessos = { visao: VisaoDosProcessos; aberto: string | null; filtros: FiltrosDosProcessos }
+export type AgruparQuadroPor = 'etapa' | 'responsavel'
+
+/**
+ * aberto: o id do processo no painel, 'novo' no cadastro, null sem painel.
+ * agrupar fica fora dos filtros para o [Limpar filtros] não o desligar; só vale no Quadro.
+ */
+export type EnderecoDosProcessos = {
+  visao: VisaoDosProcessos; aberto: string | null; filtros: FiltrosDosProcessos; agrupar: AgruparQuadroPor
+}
 
 export const SEM_FILTROS: FiltrosDosProcessos = {
   setor: null, macroprocesso: null, etapa: null, tipo: null, responsavel: null, situacao: null, busca: null,
@@ -33,7 +40,9 @@ export function lerEnderecoDosProcessos(endereco: string): EnderecoDosProcessos 
   const trechos = caminho.split('/').slice(2)
   const visao: VisaoDosProcessos = trechos[0] === 'lista' ? 'lista' : 'quadro'
   const aberto = (visao === 'lista' ? trechos[1] : trechos[0]) || null
-  return { visao, aberto, filtros: filtrosDaConsulta(new URLSearchParams(consulta), visao) }
+  const parametros = new URLSearchParams(consulta)
+  const agrupar = visao === 'quadro' && parametros.get('agrupar') === 'responsavel' ? 'responsavel' : 'etapa'
+  return { visao, aberto, filtros: filtrosDaConsulta(parametros, visao), agrupar }
 }
 
 function filtrosDaConsulta(consulta: URLSearchParams, visao: VisaoDosProcessos): FiltrosDosProcessos {
@@ -55,7 +64,7 @@ function etapaDaConsulta(lida: string | null): string | null {
   return lida === 'aguardando-o-setor' ? null : lida
 }
 
-export function montarEnderecoDosProcessos({ visao, aberto, filtros }: EnderecoDosProcessos): string {
+export function montarEnderecoDosProcessos({ visao, aberto, filtros, agrupar }: EnderecoDosProcessos): string {
   const trechos = ['#/processos', visao === 'lista' ? 'lista' : null, aberto].filter((trecho) => trecho !== null)
   const consulta = new URLSearchParams()
   for (const nome of NOMES_DOS_FILTROS) {
@@ -63,6 +72,7 @@ export function montarEnderecoDosProcessos({ visao, aberto, filtros }: EnderecoD
     const valor = soDaLista && visao === 'quadro' ? null : filtros[nome]
     if (valor) consulta.set(nome, valor)
   }
+  if (visao === 'quadro' && agrupar === 'responsavel') consulta.set('agrupar', 'responsavel')
   const texto = consulta.toString()
   return trechos.join('/') + (texto ? `?${texto}` : '')
 }
