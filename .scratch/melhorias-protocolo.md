@@ -675,3 +675,10 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **2026-10-19 · Ocorrência: a vitrine local do ticket 17 não existia mais** e foi recriada (`vitrine.local/`, fora do git). Sugestão: o protocolo dizer se a vitrine deve ser mantida entre tickets ou recriada a cada um.
 - **2026-10-19 · Ocorrência: o shell travou de novo com texto longo em linha** (`unexpected EOF`); as trocas em lote foram feitas por scripts `.mjs` gravados com a ferramenta de arquivo, numa pasta ignorada pelo git.
 - **2026-10-19 · Ocorrência: revisão final da branch feita pelo próprio executor**, não por um revisor novo: a skill `executing-plans` pede um subagente, e as instruções da sessão só permitem subagente a pedido do usuário. Sugestão: o protocolo dizer se a revisão final do `/executar-complexo` deve usar subagente.
+
+## 2026-10-19 — /executar-complexo do ticket 19 de processos-etapas (Histórico, Novo processo e Editar na janela)
+
+- **2026-10-19 · Item não testado: branch comum no `/executar-complexo`, `plano-<número>.md` e linha `Concluído em`.** Esperado: plano em `plano-19.md`, branch `processos-etapas-19` sem worktree, marco de início e linha `Concluído em` no ticket. Aconteceu: plano, marco (`marco/2026-10-19-inicio-ticket-19-processos-etapas`) e branch criados como descrito; a linha `Concluído em` é gravada depois do merge.
+- **2026-10-19 · Ocorrência: o plano do projeto não tem o formato que a skill `executing-plans` espera** (sem ledger, `task-start` e `task-done` do `sdd-workspace`); o acompanhamento foi pelas caixas do `plano-19.md` e pelos commits. Sugestão: o protocolo dizer qual dos dois vale quando a skill pede o ledger.
+- **2026-10-19 · Ocorrência: testes de interface instáveis travaram um commit de novo** (`App.editarSetor`, "clicar na linha abre o setor…"); passou na segunda tentativa. Mesma família do backlog de 2026-10-19.
+- **2026-10-19 · Ocorrência: o shell reclamou de aspas em scripts de troca longos**; as trocas foram por um `.mjs` gravado na pasta temporária da sessão, lido pelo `node`.
