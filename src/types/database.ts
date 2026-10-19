@@ -618,13 +618,18 @@ export type Database = {
     Views: {
       processos_com_andamento: {
         Row: {
+          caminho: Json | null
           contexto: string | null
           criado_em: string | null
           data_da_reuniao: string | null
           etapa_atual_codigo: string | null
           etapa_atual_id: string | null
+          etapa_atual_iniciada_em: string | null
           etapa_atual_nome: string | null
           etapa_atual_ordem: number | null
+          etapa_atual_status:
+            | Database["public"]["Enums"]["status_da_etapa"]
+            | null
           id: string | null
           macroprocesso_id: string | null
           macroprocesso_nome: string | null
@@ -633,6 +638,7 @@ export type Database = {
           observacoes: string | null
           origem: Database["public"]["Enums"]["origem_do_processo"] | null
           processo_pai_id: string | null
+          responsavel_ativo: boolean | null
           responsavel_foto_url: string | null
           responsavel_id: string | null
           responsavel_nome: string | null
@@ -642,7 +648,11 @@ export type Database = {
           situacao_guardada:
             | Database["public"]["Enums"]["situacao_guardada"]
             | null
+          subprocessos_quantidade: number | null
           tipo: Database["public"]["Enums"]["tipo_de_processo"] | null
+          ultima_versao_historica: boolean | null
+          ultima_versao_numero: number | null
+          ultima_versao_tem_relatorio: boolean | null
         }
         Relationships: [
           {
