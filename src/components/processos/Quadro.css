@@ -153,8 +153,10 @@
   background: var(--azul);
 }
 
+/* Oco, com borda no cinza dos ícones (3:1 sobre o cartão branco): o cinza claro de antes ficava em 1,6:1 e sumia. */
 .pedaco-seguinte {
-  background: var(--linha-tracejada);
+  box-sizing: border-box;
+  border: 1px solid var(--icone-inativo);
 }
 
 /* Selos: quebram de linha sem estourar a coluna; versão e subprocessos são texto neutro, sem fundo. */
