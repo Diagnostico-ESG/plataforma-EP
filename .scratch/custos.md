@@ -70,3 +70,4 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-18 | processos-etapas | /polir (parte 2) | não informado (usuário não passou o /cost)
 2026-10-19 | processos-etapas | /ship (parte 2) | não informado (usuário não passou o /cost)
 2026-10-19 | processos-etapas | /planejar (parte 3, Verso do cartão) | não informado (usuário não passou o /cost)
+2026-10-19 | processos-etapas | /executar-complexo (ticket 18) | US$ 2,93
