@@ -19,3 +19,5 @@
 - [ ] O Quadro não mostra o campo de busca.
 - [ ] Testes de interface com o aplicativo inteiro cobrindo os itens acima.
 - [ ] `[visual]` A busca fica antes dos filtros, com lupa e "×", e o trecho encontrado aparece marcado em amarelo claro no nome.
+
+Concluído em 2026-10-19 (commit a5c527f)
