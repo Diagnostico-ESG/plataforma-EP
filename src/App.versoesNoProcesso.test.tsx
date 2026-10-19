@@ -15,7 +15,7 @@ afterEach(() => {
 
 const secao = async () => {
   const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-  return within(await painel.findByRole('region', { name: 'Versões do processo' }))
+  return within(await painel.findByRole('region', { name: 'Arquivos' }))
 }
 
 const comSituacao = (situacao: SituacaoDoProcesso) => ({
@@ -24,7 +24,7 @@ const comSituacao = (situacao: SituacaoDoProcesso) => ({
   },
 })
 
-test('a seção mostra as versões da mais recente para a mais antiga, com rótulo, data, autor, etapa, observação e arquivos', async () => {
+test('a seção mostra a mais recente em destaque, com rótulo, dia, autor, etapa, observação e arquivos, e as anteriores depois', async () => {
   montarNosCadastros({ ajustarVersoes: (falso) => {
     falso.versoes.p1 = [
       versaoDeTeste(1),
@@ -35,14 +35,14 @@ test('a seção mostra as versões da mais recente para a mais antiga, com rótu
     ]
   } })
   const tela = await secao()
-  const versoes = await tela.findAllByRole('listitem', { name: /^V\d/ })
+  const versoes = await tela.findAllByRole('article', { name: /^V\d/ })
   expect(versoes.map((versao) => versao.getAttribute('aria-label'))).toEqual(['V2', 'V1'])
   const v2 = within(versoes[0])
-  expect(v2.getByText(formatarMomento('2026-10-02T13:00:00Z'))).toBeTruthy()
+  expect(v2.getByText('02/10').getAttribute('title')).toBe(formatarMomento('2026-10-02T13:00:00Z'))
   expect(v2.getByText('Bia Teste')).toBeTruthy()
   expect(v2.getByText('Relatório e modelagem técnica')).toBeTruthy()
   expect(v2.getByText('Ajustada a raia do setor')).toBeTruthy()
-  expect(v2.getAllByRole('link').map((link) => link.textContent)).toEqual([
+  expect(v2.getAllByRole('link').map((link) => link.getAttribute('title'))).toEqual([
     'TSA_V2_Emitir Ofício.bpmn', 'TSA_V2_Emitir Ofício.png', 'TSA_V2_Emitir Ofício_Relatório.pdf',
   ])
 })
@@ -56,7 +56,7 @@ test('o subprocesso tem a sua seção Versões', async () => {
     },
     ajustarVersoes: (falso) => { falso.versoes.p4 = [versaoDeTeste(1)] },
   })
-  expect(await (await secao()).findByRole('listitem', { name: 'V1' })).toBeTruthy()
+  expect(await (await secao()).findByRole('article', { name: 'V1' })).toBeTruthy()
 })
 
 test('sem versão, a seção diz "Nenhuma versão enviada." e mostra [Enviar versão] a quem pode', async () => {
@@ -80,19 +80,19 @@ test('se a leitura falha, mostra o erro e [Tentar de novo] recarrega', async () 
   expect(await tela.findByText('Não foi possível carregar as versões. Verifique a conexão e tente de novo.')).toBeTruthy()
   versoes.falharLeitura = false
   fireEvent.click(tela.getByRole('button', { name: 'Tentar de novo' }))
-  expect(await tela.findByRole('listitem', { name: 'V1' })).toBeTruthy()
+  expect(await tela.findByRole('article', { name: 'V1' })).toBeTruthy()
 })
 
 test('a Consulta vê as versões, sem [Enviar versão]', async () => {
   montarNosCadastros({ perfil: 'consulta', ajustarVersoes: (falso) => { falso.versoes.p1 = [versaoDeTeste(1)] } })
   const tela = await secao()
-  expect(await tela.findByRole('listitem', { name: 'V1' })).toBeTruthy()
+  expect(await tela.findByRole('article', { name: 'V1' })).toBeTruthy()
   expect(tela.queryByRole('button', { name: 'Enviar versão' })).toBeNull()
 })
 
 test.each(['suspenso', 'cancelado', 'concluido'] as const)('processo %s mostra as versões, sem [Enviar versão]', async (situacao) => {
   montarNosCadastros({ ...comSituacao(situacao), ajustarVersoes: (falso) => { falso.versoes.p1 = [versaoDeTeste(1)] } })
   const tela = await secao()
-  expect(await tela.findByRole('listitem', { name: 'V1' })).toBeTruthy()
+  expect(await tela.findByRole('article', { name: 'V1' })).toBeTruthy()
   expect(tela.queryByRole('button', { name: 'Enviar versão' })).toBeNull()
 })

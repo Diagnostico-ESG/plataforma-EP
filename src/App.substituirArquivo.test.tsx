@@ -2,10 +2,10 @@ import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/re
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import type { SituacaoDoProcesso } from './processos/tipos'
 import { montarNosCadastros } from './testes/processosNosCadastros'
-import { arquivoDeTeste, PNG_VALIDO, versaoDeTeste } from './testes/versoesDeTeste'
+import { arquivoDeTeste, comNome, PNG_VALIDO, versaoDeTeste } from './testes/versoesDeTeste'
 import { falhaDaFuncao } from './versoes/recusasDeVersoes'
 import type { VersoesFalso } from './versoes/VersoesFalso'
-import { escolherNoMenuDoProcesso, janelasPorCima } from './testes/versoDoCartao'
+import { escolherNoMenu, escolherNoMenuDoProcesso, janelasPorCima } from './testes/versoDoCartao'
 
 beforeEach(() => {
   window.location.hash = '#/processos/p1'
@@ -34,15 +34,16 @@ const ROTULO_DO_PNG = 'Imagem do fluxograma (.png)'
 
 async function secaoDeVersoes() {
   const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-  return within(await painel.findByRole('region', { name: 'Versões do processo' }))
+  return within(await painel.findByRole('region', { name: 'Arquivos' }))
 }
 
-const botaoDaTroca = (nome: string) => ({ name: `Substituir ${nome}` })
+/** O "⋯" do arquivo, onde fica o Substituir. */
+const botaoDaTroca = (nome: string) => ({ name: `Ações de ${nome}` })
 
 async function abrirTroca(nome = PNG_V3, montagem: Parameters<typeof montarNosCadastros>[0] = COM_VERSOES) {
   const falso = montarNosCadastros(montagem)
   const secao = await secaoDeVersoes()
-  fireEvent.click(await secao.findByRole('button', botaoDaTroca(nome)))
+  await escolherNoMenu(`Ações de ${nome}`, 'Substituir')
   return { ...falso, secao, form: within(await secao.findByRole('form', { name: `Substituir ${nome}` })) }
 }
 
@@ -63,7 +64,7 @@ async function escolherEConfirmar(form: Form) {
 
 test.each(['administrador', 'integrante_ep'] as const)('o %s vê [Substituir] em cada arquivo da versão nova', async (perfil) => {
   montarNosCadastros({ ...COM_VERSOES, perfil })
-  const v3 = within(await (await secaoDeVersoes()).findByRole('listitem', { name: 'V3' }))
+  const v3 = within(await (await secaoDeVersoes()).findByRole('article', { name: 'V3' }))
   for (const nome of [PNG_V3, 'TSA_V3_Emitir Ofício.bpmn', RELATORIO_V3]) {
     expect(v3.getByRole('button', botaoDaTroca(nome))).toBeTruthy()
   }
@@ -72,14 +73,14 @@ test.each(['administrador', 'integrante_ep'] as const)('o %s vê [Substituir] em
 test('a versão histórica não tem [Substituir]', async () => {
   montarNosCadastros(COM_VERSOES)
   const secao = await secaoDeVersoes()
-  const historica = within(await secao.findByRole('listitem', { name: 'V2F' }))
+  const historica = within(await secao.findByRole('article', { name: 'V2F' }))
   expect(historica.queryByRole('button')).toBeNull()
 })
 
 test('a Consulta vê os links dos arquivos, sem [Substituir]', async () => {
   montarNosCadastros({ ...COM_VERSOES, perfil: 'consulta' })
   const secao = await secaoDeVersoes()
-  expect(await secao.findByText(PNG_V3)).toBeTruthy()
+  expect(await secao.findByRole('link', { name: comNome(PNG_V3) })).toBeTruthy()
   expect(secao.queryByRole('button')).toBeNull()
 })
 
@@ -91,7 +92,7 @@ test.each(['suspenso', 'cancelado', 'concluido'] as const)('processo %s não mos
     },
   })
   const secao = await secaoDeVersoes()
-  expect(await secao.findByText(PNG_V3)).toBeTruthy()
+  expect(await secao.findByRole('link', { name: comNome(PNG_V3) })).toBeTruthy()
   expect(secao.queryByRole('button', botaoDaTroca(PNG_V3))).toBeNull()
 })
 
@@ -134,10 +135,10 @@ test('confirmar troca o arquivo no mesmo lugar: mesmo nome, sem versão nova, e 
   fireEvent.click((await escolherEConfirmar(form)).getByRole('button', { name: 'Substituir' }))
   await waitFor(() => expect(secao.queryByRole('form', { name: `Substituir ${PNG_V3}` })).toBeNull())
   await waitFor(() => expect(tamanhoDoPngDaV3(versoes)).toBe(PNG_VALIDO.size))
-  const v3 = within(secao.getByRole('listitem', { name: 'V3' }))
-  expect(v3.getByText(PNG_V3)).toBeTruthy()
+  const v3 = within(secao.getByRole('article', { name: 'V3' }))
+  expect(v3.getByRole('link', { name: comNome(PNG_V3) })).toBeTruthy()
   expect(v3.getByRole('button', botaoDaTroca(PNG_V3))).toBeTruthy()
-  expect(secao.getAllByRole('listitem', { name: /^V\d/ })).toHaveLength(3)
+  expect(secao.getAllByRole('article', { name: /^V\d/ })).toHaveLength(3)
   expect(versoes.versoes.p1).toHaveLength(3)
 })
 

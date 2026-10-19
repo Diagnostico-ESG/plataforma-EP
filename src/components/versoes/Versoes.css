@@ -1,11 +1,20 @@
-/* Seção "Versões" do painel do processo: no estilo da seção Reuniões (título, lista e botão com o mesmo espaço). */
+/* Seção "Arquivos" do verso: o título com [Enviar versão] e o "⋯", o destaque e as anteriores. */
 .secao-de-versoes {
   display: grid;
   justify-items: start;
   gap: var(--esp-2);
 }
 
-.secao-de-versoes > h3 {
+.secao-de-versoes-titulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-2);
+  width: 100%;
+}
+
+.secao-de-versoes-titulo > h3 {
   margin: 0;
 }
 
@@ -99,11 +108,11 @@
   font-weight: 700;
 }
 
-/* Os botões da seção lado a lado; a dica do formulário da histórica. */
+/* [Enviar versão] e o "⋯" da seção, no título; a dica do formulário da histórica. */
 .secao-de-versoes-acoes {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--esp-2);
+  align-items: center;
+  gap: var(--esp-1);
 }
 
 .formulario-de-versao-dica {
@@ -119,7 +128,7 @@
   font-size: var(--tam-rotulo);
 }
 
-/* Cada arquivo: o nome (link), a origem da cópia e o [Substituir] numa linha que quebra; o formulário da troca ocupa a linha toda. */
+/* Cada arquivo das anteriores: o nome (link), a origem da cópia e o "⋯" numa linha que quebra; o formulário da troca ocupa a linha toda. */
 .bloco-da-versao-arquivos > li {
   display: flex;
   flex-wrap: wrap;

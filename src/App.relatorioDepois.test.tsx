@@ -3,7 +3,7 @@ import { afterEach, beforeEach, expect, test } from 'vitest'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { SituacaoDoProcesso } from './processos/tipos'
 import { montarNosCadastros } from './testes/processosNosCadastros'
-import { arquivoDeTeste, versaoDeTeste } from './testes/versoesDeTeste'
+import { arquivoDeTeste, comNome, versaoDeTeste } from './testes/versoesDeTeste'
 import { falhaDaFuncao } from './versoes/recusasDeVersoes'
 import type { VersoesFalso } from './versoes/VersoesFalso'
 import { escolherNoMenuDoProcesso, janelaPorCima, janelasPorCima } from './testes/versoDoCartao'
@@ -35,7 +35,7 @@ const semPendentes = { ajustarVersoes: (falso: VersoesFalso) => { falso.versoes.
 
 async function secaoDeVersoes() {
   const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-  return within(await painel.findByRole('region', { name: 'Versões do processo' }))
+  return within(await painel.findByRole('region', { name: 'Arquivos' }))
 }
 
 const BOTAO = 'Acrescentar relatório'
@@ -59,21 +59,20 @@ test.each(['administrador', 'integrante_ep'] as const)('o %s vê [Acrescentar re
   expect(await (await secaoDeVersoes()).findByRole('button', { name: BOTAO })).toBeTruthy()
 })
 
-test('a marca "Relatório pendente" aparece só na versão nova sem relatório', async () => {
+test('a marca do relatório que falta aparece só na versão nova sem relatório: "falta relatório" na mais recente', async () => {
   montarNosCadastros(COM_PENDENTES)
   const secao = await secaoDeVersoes()
-  for (const rotulo of ['V4', 'V5']) {
-    expect(within(await secao.findByRole('listitem', { name: rotulo })).getByText('Relatório pendente')).toBeTruthy()
-  }
+  expect(within(await secao.findByRole('article', { name: 'V5' })).getByText('falta relatório')).toBeTruthy()
+  expect(within(secao.getByRole('article', { name: 'V4' })).getByText('Relatório pendente')).toBeTruthy()
   for (const rotulo of ['V3', 'V2F']) {
-    expect(within(secao.getByRole('listitem', { name: rotulo })).queryByText('Relatório pendente')).toBeNull()
+    expect(within(secao.getByRole('article', { name: rotulo })).queryByText('Relatório pendente')).toBeNull()
   }
 })
 
 test('a Consulta vê a marca e os links, sem nenhum botão de alteração', async () => {
   montarNosCadastros({ ...COM_PENDENTES, perfil: 'consulta' })
   const secao = await secaoDeVersoes()
-  expect(within(await secao.findByRole('listitem', { name: 'V4' })).getByText('Relatório pendente')).toBeTruthy()
+  expect(within(await secao.findByRole('article', { name: 'V4' })).getByText('Relatório pendente')).toBeTruthy()
   expect(secao.queryByRole('button')).toBeNull()
 })
 
@@ -85,7 +84,7 @@ test.each(['suspenso', 'cancelado', 'concluido'] as const)('processo %s não mos
     },
   })
   const secao = await secaoDeVersoes()
-  await secao.findByRole('listitem', { name: 'V4' })
+  await secao.findByRole('article', { name: 'V4' })
   expect(secao.queryByRole('button', { name: BOTAO })).toBeNull()
   expect(secao.queryByRole('button', { name: 'Sem alteração de conteúdo' })).toBeNull()
 })
@@ -93,7 +92,7 @@ test.each(['suspenso', 'cancelado', 'concluido'] as const)('processo %s não mos
 test('sem versão pendente, não há [Acrescentar relatório]', async () => {
   montarNosCadastros(semPendentes)
   const secao = await secaoDeVersoes()
-  await secao.findByRole('listitem', { name: 'V2' })
+  await secao.findByRole('article', { name: 'V2' })
   expect(secao.queryByRole('button', { name: BOTAO })).toBeNull()
 })
 
@@ -128,11 +127,11 @@ test('acrescentar tira a marca da versão, mostra o relatório e fecha o formul�
   escolherRelatorio(form, PDF)
   await waitFor(() => expect(botaoAcrescentar(form).disabled).toBe(false))
   fireEvent.click(botaoAcrescentar(form))
-  const v4 = within(await secao.findByRole('listitem', { name: 'V4' }))
+  const v4 = within(await secao.findByRole('article', { name: 'V4' }))
   expect(await v4.findByText('TSA_V4_Emitir Ofício_Relatório.pdf')).toBeTruthy()
   expect(v4.queryByText('Relatório pendente')).toBeNull()
   expect(secao.queryByRole('form', { name: BOTAO })).toBeNull()
-  expect(within(secao.getByRole('listitem', { name: 'V5' })).getByText('Relatório pendente')).toBeTruthy()
+  expect(within(secao.getByRole('article', { name: 'V5' })).getByText('falta relatório')).toBeTruthy()
   expect(versoes.versoes.p1.find((versao) => versao.id === 'v4')?.arquivos.map((arquivo) => arquivo.papel)).toContain('relatorio')
 })
 
@@ -143,7 +142,7 @@ test('depois do último relatório pendente, o botão some', async () => {
   escolherRelatorio(form, PDF)
   await waitFor(() => expect(botaoAcrescentar(form).disabled).toBe(false))
   fireEvent.click(botaoAcrescentar(form))
-  await within(await secao.findByRole('listitem', { name: 'V2' })).findByText('TSA_V2_Emitir Ofício_Relatório.pdf')
+  await within(await secao.findByRole('article', { name: 'V2' })).findByRole('link', { name: comNome('TSA_V2_Emitir Ofício_Relatório.pdf') })
   expect(secao.queryByRole('button', { name: BOTAO })).toBeNull()
 })
 
@@ -167,7 +166,7 @@ test('se o relatório não chega ao Drive, nada é registrado e o formulário co
   expect((await form.findByRole('alert')).textContent)
     .toBe('O relatório não foi registrado: o arquivo depois.pdf não chegou ao Drive. O arquivo escolhido continua no formulário.')
   expect(botaoAcrescentar(form).disabled).toBe(false)
-  expect(within(secao.getByRole('listitem', { name: 'V5' })).getByText('Relatório pendente')).toBeTruthy()
+  expect(within(secao.getByRole('article', { name: 'V5' })).getByText('falta relatório')).toBeTruthy()
 })
 
 test('a recusa do servidor vira a frase da tela, com o formulário preenchido', async () => {
@@ -193,33 +192,33 @@ const SEM_ALTERACAO = 'Sem alteração de conteúdo'
 test('[Sem alteração de conteúdo] só aparece na versão pendente cuja anterior tem relatório', async () => {
   montarNosCadastros(COM_PENDENTES)
   const secao = await secaoDeVersoes()
-  expect(within(await secao.findByRole('listitem', { name: 'V4' })).getByRole('button', { name: SEM_ALTERACAO })).toBeTruthy()
+  expect(within(await secao.findByRole('article', { name: 'V4' })).getByRole('button', { name: SEM_ALTERACAO })).toBeTruthy()
   for (const rotulo of ['V5', 'V3', 'V2F']) {
-    expect(within(secao.getByRole('listitem', { name: rotulo })).queryByRole('button', { name: SEM_ALTERACAO })).toBeNull()
+    expect(within(secao.getByRole('article', { name: rotulo })).queryByRole('button', { name: SEM_ALTERACAO })).toBeNull()
   }
 })
 
 test('pede confirmação, copia o relatório da anterior e a versão mostra de qual veio', async () => {
   const { versoes } = montarNosCadastros(COM_PENDENTES)
   const secao = await secaoDeVersoes()
-  fireEvent.click(within(await secao.findByRole('listitem', { name: 'V4' })).getByRole('button', { name: SEM_ALTERACAO }))
+  fireEvent.click(within(await secao.findByRole('article', { name: 'V4' })).getByRole('button', { name: SEM_ALTERACAO }))
   const janela = within(screen.getByRole('dialog', { name: 'Marcar a V4 como sem alteração de conteúdo?' }))
   expect(janela.getByText('O relatório da V3 será copiado para a V4, com o nome da V4.')).toBeTruthy()
   expect(versoes.versoes.p1.find((versao) => versao.id === 'v4')?.arquivos).toHaveLength(2)
   fireEvent.click(janela.getByRole('button', { name: 'Copiar relatório' }))
-  const v4 = within(await secao.findByRole('listitem', { name: 'V4' }))
+  const v4 = within(await secao.findByRole('article', { name: 'V4' }))
   expect(await v4.findByText('TSA_V4_Emitir Ofício_Relatório.pdf')).toBeTruthy()
   expect(v4.getByText('Sem alteração de conteúdo · relatório da V3')).toBeTruthy()
   expect(v4.queryByText('Relatório pendente')).toBeNull()
   expect(v4.queryByRole('button', { name: SEM_ALTERACAO })).toBeNull()
   // A V5 agora tem anterior com relatório: o botão passa a aparecer nela.
-  expect(within(secao.getByRole('listitem', { name: 'V5' })).getByRole('button', { name: SEM_ALTERACAO })).toBeTruthy()
+  expect(within(secao.getByRole('article', { name: 'V5' })).getByRole('button', { name: SEM_ALTERACAO })).toBeTruthy()
 })
 
 test('Cancelar na confirmação não copia nada', async () => {
   const { versoes } = montarNosCadastros(COM_PENDENTES)
   const secao = await secaoDeVersoes()
-  fireEvent.click(within(await secao.findByRole('listitem', { name: 'V4' })).getByRole('button', { name: SEM_ALTERACAO }))
+  fireEvent.click(within(await secao.findByRole('article', { name: 'V4' })).getByRole('button', { name: SEM_ALTERACAO }))
   fireEvent.click(within(janelaPorCima()).getByRole('button', { name: 'Cancelar' }))
   expect(janelasPorCima()).toEqual([])
   expect(versoes.versoes.p1.find((versao) => versao.id === 'v4')?.arquivos).toHaveLength(2)
@@ -229,7 +228,7 @@ test('a recusa do servidor no "sem alteração" aparece em vermelho e a versão 
   const { versoes } = montarNosCadastros(COM_PENDENTES)
   versoes.falhaNoRegistro = new TravaDoBanco('A versão anterior não tem relatório para copiar. Envie o relatório.')
   const secao = await secaoDeVersoes()
-  const v4 = within(await secao.findByRole('listitem', { name: 'V4' }))
+  const v4 = within(await secao.findByRole('article', { name: 'V4' }))
   fireEvent.click(v4.getByRole('button', { name: SEM_ALTERACAO }))
   fireEvent.click(within(janelaPorCima()).getByRole('button', { name: 'Copiar relatório' }))
   expect((await v4.findByRole('alert')).textContent).toBe('A versão anterior não tem relatório para copiar. Envie o relatório.')
@@ -242,10 +241,10 @@ test('o relatório depois e o "sem alteração" entram no histórico do processo
   escolherRelatorio(form, PDF)
   await waitFor(() => expect(botaoAcrescentar(form).disabled).toBe(false))
   fireEvent.click(botaoAcrescentar(form))
-  await within(await secao.findByRole('listitem', { name: 'V4' })).findByText('TSA_V4_Emitir Ofício_Relatório.pdf')
-  fireEvent.click(within(secao.getByRole('listitem', { name: 'V5' })).getByRole('button', { name: SEM_ALTERACAO }))
+  await within(await secao.findByRole('article', { name: 'V4' })).findByText('TSA_V4_Emitir Ofício_Relatório.pdf')
+  fireEvent.click(within(secao.getByRole('article', { name: 'V5' })).getByRole('button', { name: SEM_ALTERACAO }))
   fireEvent.click(within(janelaPorCima()).getByRole('button', { name: 'Copiar relatório' }))
-  await within(await secao.findByRole('listitem', { name: 'V5' })).findByText('TSA_V5_Emitir Ofício_Relatório.pdf')
+  await within(await secao.findByRole('article', { name: 'V5' })).findByRole('link', { name: comNome('TSA_V5_Emitir Ofício_Relatório.pdf') })
   const painel = within(screen.getByRole('dialog', { name: /^Processo( |$)/ }))
   await escolherNoMenuDoProcesso('Histórico')
   const acrescentou = await painel.findByText('Acrescentou o relatório à versão')

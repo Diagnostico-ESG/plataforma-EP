@@ -1,7 +1,7 @@
 import { cleanup, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import { montarNosCadastros } from './testes/processosNosCadastros'
-import { arquivoDeTeste, versaoDeTeste } from './testes/versoesDeTeste'
+import { arquivoDeTeste, comNome, versaoDeTeste } from './testes/versoesDeTeste'
 import type { VersoesFalso } from './versoes/VersoesFalso'
 
 beforeEach(() => {
@@ -34,11 +34,11 @@ function comVersoes(programar: (falso: VersoesFalso) => void = () => {}) {
 
 async function secaoDeVersoes() {
   const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-  return within(await painel.findByRole('region', { name: 'Versões do processo' }))
+  return within(await painel.findByRole('region', { name: 'Arquivos' }))
 }
 
 async function itemDoArquivo(secao: Awaited<ReturnType<typeof secaoDeVersoes>>, nome: string) {
-  const item = (await secao.findByRole('link', { name: nome })).closest('li')
+  const item = (await secao.findByRole('link', { name: comNome(nome) })).closest('li')
   if (!item) throw new Error(`esperado: item de lista com o arquivo ${nome}`)
   return within(item)
 }
@@ -75,7 +75,7 @@ test('se a conferência falha, a lista aparece normal, sem marcas, com o aviso',
   }))
   const secao = await secaoDeVersoes()
   expect(await secao.findByText(AVISO)).toBeTruthy()
-  expect(secao.getByRole('link', { name: PNG_V4 })).toBeTruthy()
+  expect(secao.getByRole('link', { name: comNome(PNG_V4) })).toBeTruthy()
   expect(secao.queryByText(ALTERADO)).toBeNull()
   expect(secao.queryByText(NAO_ENCONTRADO)).toBeNull()
 })
