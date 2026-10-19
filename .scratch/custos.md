@@ -66,3 +66,6 @@ AAAA-MM-DD | funcionalidade | etapa | valor
 2026-10-16 | documentos-versoes | /executar-complexo (ticket 01) e prova do Drive | US$ 7,45
 2026-10-16 | documentos-versoes | /ship | não informado (usuário pulou o /cost)
 2026-10-18 | processos-etapas, reunioes | /ship (parte 1 da experiencia-do-quadro) | não informado (usuário pulou o /cost)
+2026-10-18 | processos-etapas | /executar-complexo (ticket 14) | não informado (usuário não passou o /cost)
+2026-10-18 | processos-etapas | /polir (parte 2) | não informado (usuário não passou o /cost)
+2026-10-19 | processos-etapas | /ship (parte 2) | não informado (usuário não passou o /cost)
