@@ -721,3 +721,11 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **2026-10-19 · Item não testado: trava de git com `git switch` e merge sem conflito.** Esperado: `git switch main` e `git merge` passam pela trava. Aconteceu: os dois passaram.
 - **2026-10-19 · Ocorrência: este ambiente não tem Python**, e o heredoc com aspas simples dentro do Bash falhou uma vez por erro de interpretação do comando. Contorno: scripts de edição em Node, gravados pela ferramenta de arquivo e apagados depois.
 - **2026-10-19 · Ocorrência: o `/executar-complexo` não diz como lidar com a skill `executing-plans` pedindo subagentes** ("Superpowers funciona melhor com subagentes"); a execução foi feita pelo próprio executor, como nos tickets 18, 20 e 21, e a revisão final também.
+
+## 2026-10-19 — /polir e /ship da parte 4 de processos-etapas (tickets 20 a 22)
+
+- **2026-10-19 · Item não testado: marca de entrega com ressalva e troca de `Em revisão desde` pela marca nova.** Esperado: a linha `Em revisão desde` vira `Entregue em ... com ressalva`. Aconteceu: troca feita por `sed` na última linha da spec.
+- **2026-10-19 · Item não testado: `/security-review` sem mudanças a revisar e revisão de reserva.** Esperado: o comando não acha diff (a `main` já inclui tudo) e eu faço a revisão de reserva. Aconteceu: o diff veio vazio; revisão de reserva feita e registrada no `desvios.md`.
+- **2026-10-19 · Item não testado: passo 7 de banco, parte remota.** Esperado: `db push` e `test:db` no desenvolvimento. Aconteceu: não rodaram (porta 5432 fechada, `gh` ausente); usado o registro do `AMBIENTES.md` (teste 37 verde no Actions) e `db:types` pela porta 443.
+- **2026-10-19 · Ocorrência: o `/ship` não diz o que fazer com o `/cost` sem valor.** Registrado "não informado" em `custos.md`, como nas linhas anteriores.
+- **2026-10-19 · Ocorrência: o `db:types` deixa `src/types/database.ts` modificado só por fim de linha (CRLF)**; não foi comitado.
