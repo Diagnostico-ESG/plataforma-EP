@@ -1,7 +1,9 @@
 import { useCallback } from 'react'
+import { useAcoesDaEtapa } from '../../hooks/useAcoesDaEtapa'
 import { useCarregamento } from '../../hooks/useCarregamento'
 import type { ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 import { CaminhoDeEtapas } from './CaminhoDeEtapas'
+import { JanelasDaEtapa } from './JanelasDaEtapa'
 
 type CaminhoDoProcessoProps = {
   processo: ProcessoLido
@@ -26,14 +28,17 @@ export function CaminhoDoProcesso({ processo, processos, podeAlterar, usuarioId,
     () => (podeAlterar ? processos.listarResponsaveisPossiveis() : Promise.resolve([])), [processos, podeAlterar])
   const { estado } = useCarregamento(ler)
   const usuarios = estado.tipo === 'pronto' ? estado.valor : []
+  const acoes = useAcoesDaEtapa(processos, aoMudar, aoSumir)
   const parado = processo.situacao === 'suspenso' || processo.situacao === 'cancelado'
   return (
     <section className="painel-caminho" aria-label="Caminho de etapas">
       <h3 className="painel-subtitulo">Etapas do processo</h3>
       {parado && <p className="painel-aviso" role="status">{avisoDoProcessoParado(processo)}</p>}
       <CaminhoDeEtapas processos={processos} etapas={processo.etapasDoProcesso} podeAlterar={podeAlterar && !parado}
-        usuarios={usuarios} usuarioId={usuarioId} ultimaVersao={processo.ultimaVersao} aoMudar={aoMudar}
+        usuarios={usuarios} usuarioId={usuarioId} ultimaVersao={processo.ultimaVersao} acoes={acoes} aoMudar={aoMudar}
         aoSumir={aoSumir} />
+      {acoes.falha && <p className="cadastros-falha" role="alert">{acoes.falha}</p>}
+      <JanelasDaEtapa acoes={acoes} usuarios={usuarios} usuarioId={usuarioId} ultimaVersao={processo.ultimaVersao} />
     </section>
   )
 }

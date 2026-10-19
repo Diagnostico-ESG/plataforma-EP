@@ -41,3 +41,5 @@ export function useAcoesDaEtapa(processos: ModuloDeProcessos, aoMudar: () => voi
     fecharPedido: () => setPedido(null), fecharAvanco: () => setAvanco(null),
   }
 }
+
+export type AcoesDaEtapaEmUso = ReturnType<typeof useAcoesDaEtapa>
