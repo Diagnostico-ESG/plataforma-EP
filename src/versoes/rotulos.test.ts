@@ -1,9 +1,9 @@
 import { expect, test } from 'vitest'
 import {
-  haVersaoNova, ordenarVersoes, origemDoRelatorio, podeCopiarRelatorio, proximoNumero, relatorioPendente, rotuloDaAnterior, rotuloDaVersao,
+  formatarDiaEMes, haVersaoNova, ordenarVersoes, origemDoRelatorio, podeCopiarRelatorio, proximoNumero, relatorioPendente, rotuloCurtoDoArquivo, rotuloDaAnterior, rotuloDaVersao,
   versoesComRelatorioPendente,
 } from './rotulos'
-import type { Versao } from './tipos'
+import type { ArquivoDaVersao, Versao } from './tipos'
 
 function versao(numero: number, historica = false): Versao {
   return {
@@ -77,4 +77,21 @@ test('o rótulo da versão anterior é o da de maior número menor; sem anterior
   const versoes = [versao(2), versao(5, true), versao(7)]
   expect(rotuloDaAnterior(versoes[2], versoes)).toBe('V5F')
   expect(rotuloDaAnterior(versoes[0], versoes)).toBeNull()
+})
+
+function arquivoCom(papel: ArquivoDaVersao['papel'], formato: string): ArquivoDaVersao {
+  return { id: `a-${papel}`, papel, nome: `TSA_V2_Emitir Ofício.${formato}`, formato, tamanho: 10 }
+}
+
+test('o rótulo curto do arquivo diz o que ele é e a extensão', () => {
+  expect(rotuloCurtoDoArquivo(arquivoCom('bpmn', 'bpmn'))).toBe('Fluxograma .bpmn')
+  expect(rotuloCurtoDoArquivo(arquivoCom('png', 'png'))).toBe('Imagem .png')
+  expect(rotuloCurtoDoArquivo(arquivoCom('bpm', 'bpm'))).toBe('Bizagi .bpm')
+  expect(rotuloCurtoDoArquivo(arquivoCom('relatorio', 'docx'))).toBe('Relatório .docx')
+  expect(rotuloCurtoDoArquivo(arquivoCom('relatorio', 'PDF'))).toBe('Relatório .pdf')
+})
+
+test('o dia e o mês da versão saem no horário de Brasília', () => {
+  expect(formatarDiaEMes('2026-10-02T13:00:00Z')).toBe('02/10')
+  expect(formatarDiaEMes('2026-10-03T01:00:00Z')).toBe('02/10')
 })
