@@ -64,6 +64,22 @@
   gap: var(--esp-2);
 }
 
+/* Arrastar para concluir: só a coluna de destino acende; o cartão arrastado fica apagado no lugar de origem. */
+.coluna-destino {
+  outline: 2px dashed var(--azul);
+  outline-offset: 4px;
+  border-radius: var(--canto);
+}
+
+.cartao-apagado {
+  opacity: 0.5;
+}
+
+.quadro-aviso {
+  margin: 0;
+  color: var(--texto-2);
+}
+
 .coluna-fantasma {
   min-height: 180px;
   border: 1px dashed var(--linha-tracejada);

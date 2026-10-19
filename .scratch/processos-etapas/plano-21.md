@@ -96,13 +96,13 @@ export function avancoDoCartao(etapas: EtapaDoCaminho[]): { etapa: EtapaDoCaminh
 - `useArrastoDoQuadro(colunas: ColunaDoQuadro[], aoSoltarNoDestino: (id: string) => void): ArrastoDoQuadro`
 - `QuadroDeProcessos` ganha as props `processos: ModuloDeProcessos`, `podeAlterar: boolean`, `usuarioId: string`, `aoMudar: () => void`; `VisaoDosProcessos` as repassa (`processos`, `usuarioId`, `aoMudar`; `podeAlterar` ele já tem).
 
-- [ ] **Passo 1: subir a ajuda de teste.** Mover de `App.cartaoDoQuadro.test.tsx` para `src/testes/quadroDeTeste.ts` (exportando) `ETAPAS`, `dia`, `processo()`, `montar()` e `cartaoDe()`. O `processo()` passa a preencher `etapasDoProcesso` com uma `EtapaDoProcesso` por etapa do catálogo (`id: 'a<ordem>'`, `status` igual ao do `caminho`, `iniciadaEm` só na atual, `responsavelId` e `responsavelNome` da etapa atual iguais aos do `responsavel` do processo, `obrigatoria: true`). `montar()` ganha o segundo argumento `{ perfil, usuarios }` (`falso.usuariosPossiveis = usuarios`) e devolve o `ProcessosFalso`. Ajustar o `App.cartaoDoQuadro.test.tsx` para importar; `npx vitest run src/App.cartaoDoQuadro.test.tsx` continua verde.
-- [ ] **Passo 2: os testes que falham.** `App.arrastarParaConcluir.test.tsx`, com um `dataTransfer` falso (`{ setData() {}, effectAllowed: 'move', dropEffect: 'move' }`) passado em cada `fireEvent.dragStart/dragOver/drop`, e a coluna por `screen.getByRole('region', { name })`. Testes (Integrante, salvo onde dito):
+- [x] **Passo 1: subir a ajuda de teste.** Mover de `App.cartaoDoQuadro.test.tsx` para `src/testes/quadroDeTeste.ts` (exportando) `ETAPAS`, `dia`, `processo()`, `montar()` e `cartaoDe()`. O `processo()` passa a preencher `etapasDoProcesso` com uma `EtapaDoProcesso` por etapa do catálogo (`id: 'a<ordem>'`, `status` igual ao do `caminho`, `iniciadaEm` só na atual, `responsavelId` e `responsavelNome` da etapa atual iguais aos do `responsavel` do processo, `obrigatoria: true`). `montar()` ganha o segundo argumento `{ perfil, usuarios }` (`falso.usuariosPossiveis = usuarios`) e devolve o `ProcessosFalso`. Ajustar o `App.cartaoDoQuadro.test.tsx` para importar; `npx vitest run src/App.cartaoDoQuadro.test.tsx` continua verde.
+- [x] **Passo 2: os testes que falham.** `App.arrastarParaConcluir.test.tsx`, com um `dataTransfer` falso (`{ setData() {}, effectAllowed: 'move', dropEffect: 'move' }`) passado em cada `fireEvent.dragStart/dragOver/drop`, e a coluna por `screen.getByRole('region', { name })`. Testes (Integrante, salvo onde dito):
   1. **Arrastável só nos casos permitidos** (critério 2): cartão em andamento com pendente depois tem `draggable="true"`; o suspenso, o da etapa atual pendente, o da última etapa e (como `consulta`) qualquer cartão têm `draggable="false"`.
   2. **Só a coluna de destino acende** (critério 3): `dragStart` no cartão da Revisão interna → só a coluna "Revisão do setor" ganha a classe `coluna-destino` (e a das outras, não); com a vizinha dispensada, a que acende é a da pendente depois dela; `dragEnd` apaga o realce.
   3. **Soltar em outra coluna** (critério 6): `dragStart`, `drop` na coluna "Aprovação" → aparece `Solte o cartão na coluna Revisão do setor.` (`role="status"`), nada foi gravado (`falso.chamadas` vazio) e nenhuma janela abre.
-- [ ] **Passo 3:** `npx vitest run src/App.arrastarParaConcluir.test.tsx` — esperado: falha (cartão sem `draggable`, sem realce, sem aviso).
-- [ ] **Passo 4: o hook do estado do arrastar.**
+- [x] **Passo 3:** `npx vitest run src/App.arrastarParaConcluir.test.tsx` — esperado: falha (cartão sem `draggable`, sem realce, sem aviso).
+- [x] **Passo 4: o hook do estado do arrastar.**
 
 ```ts
 import { useState } from 'react'
@@ -142,14 +142,14 @@ export function useArrastoDoQuadro(colunas: ColunaDoQuadro[], aoSoltarNoDestino:
 }
 ```
 
-- [ ] **Passo 5: os componentes.**
+- [x] **Passo 5: os componentes.**
   - `CartaoDoProcesso` ganha `arrastavel: boolean`, `apagado: boolean`, `aoLevantar: () => void`, `aoBaixar: () => void`; o `<a>` recebe `draggable={arrastavel}`, `onDragStart` (`evento.dataTransfer.setData('text/plain', id)`, `evento.dataTransfer.effectAllowed = 'move'`, depois `aoLevantar()`), `onDragEnd={aoBaixar}` e a classe `cartao-apagado` quando `apagado`. Sem `arrastavel`, os eventos não fazem nada.
   - `ColunaDoQuadro` ganha `arrasto: ArrastoDoQuadro` e `podeAlterar: boolean`; a `<section>` leva a classe `coluna-destino` quando `arrasto.levantado` existe e `colunaDeDestino(arrasto.levantado) === coluna.chave`; `onDragOver` chama `preventDefault()` só com cartão levantado; `onDrop` chama `preventDefault()` e `arrasto.soltarEm(coluna.chave)`. Cada cartão: `arrastavel={podeAlterar && colunaDeDestino(processo) !== null}`, `apagado={arrasto.levantado?.id === processo.id}`, `aoLevantar={() => arrasto.levantar(processo)}`, `aoBaixar={arrasto.baixar}`.
   - `QuadroDeProcessos`: monta `const colunas = colunasDoQuadro(lista)`, `const arrasto = useArrastoDoQuadro(colunas, concluirDoCartao)`; neste passo `concluirDoCartao` é `() => {}` (a Tarefa 3 o liga); mostra `{arrasto.aviso && <p className="quadro-aviso" role="status">{arrasto.aviso}</p>}` antes das colunas.
   - `VisaoDosProcessos` e `AreaDeProcessos` passam `processos`, `usuarioId={usuario.id}` e `aoMudar={recarregar}` até o Quadro.
   - `Quadro.css`: `.coluna-destino { outline: 2px dashed var(--azul); outline-offset: -2px; border-radius: var(--raio-2); }` (use o token de raio que o arquivo já usa na `.coluna`), `.cartao-apagado { opacity: 0.5; }`, `.quadro-aviso` com a cor e o espaçamento dos avisos vizinhos (copie de `.quadro-carregando`).
-- [ ] **Passo 6:** `npx vitest run src/App.arrastarParaConcluir.test.tsx src/App.cartaoDoQuadro.test.tsx src/App.quadro.test.tsx` verdes; depois `npm test`, `npm run lint`, `npm run typecheck`.
-- [ ] **Passo 7: commit** `Ticket 21 de processos-etapas: arrastar, realce e aviso no Quadro`.
+- [x] **Passo 6:** `npx vitest run src/App.arrastarParaConcluir.test.tsx src/App.cartaoDoQuadro.test.tsx src/App.quadro.test.tsx` verdes; depois `npm test`, `npm run lint`, `npm run typecheck`.
+- [x] **Passo 7: commit** `Ticket 21 de processos-etapas: arrastar, realce e aviso no Quadro`.
 
 ### Tarefa 3: Soltar no destino abre a janela e conclui (critérios 4, 5, 7, 8 e 9)
 

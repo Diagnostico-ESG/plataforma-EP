@@ -1,13 +1,7 @@
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
-import App from './App'
-import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
-import type { Perfil } from './acesso/tipos'
-import { CadastrosFalso } from './cadastros/CadastrosFalso'
-import { ProcessosFalso } from './processos/ProcessosFalso'
-import { hojeLocal } from './processos/textoDaReuniao'
-import type { DadosDoCartao, EtapaDoCatalogo, ProcessoLido, StatusDaEtapa } from './processos/tipos'
-import { VersoesFalso } from './versoes/VersoesFalso'
+import type { StatusDaEtapa } from './processos/tipos'
+import { cartaoDe, dia, ETAPAS, montar, processo } from './testes/quadroDeTeste'
 
 beforeEach(() => {
   window.location.hash = '#/processos'
@@ -16,66 +10,6 @@ afterEach(() => {
   cleanup()
   window.location.hash = ''
 })
-
-const ETAPAS: EtapaDoCatalogo[] = [
-  { id: 'e1', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 1, ativa: true },
-  { id: 'e2', codigo: 'relatorio_modelagem_tecnica', nome: 'Relatório e modelagem técnica', ordem: 2, ativa: true },
-  { id: 'e3', codigo: 'revisao_interna', nome: 'Revisão interna', ordem: 3, ativa: true },
-  { id: 'e4', codigo: 'revisao_do_setor', nome: 'Revisão do setor', ordem: 4, ativa: true },
-  { id: 'e5', codigo: 'aprovacao', nome: 'Aprovação', ordem: 5, ativa: true },
-  { id: 'e6', codigo: 'eprotocolo', nome: 'E-protocolo', ordem: 6, ativa: true },
-]
-
-/** O dia de hoje deslocado em dias (AAAA-MM-DD), para os testes não dependerem da data em que rodam. */
-function dia(deslocamento: number): string {
-  const data = new Date()
-  data.setDate(data.getDate() + deslocamento)
-  return hojeLocal(data)
-}
-
-type Mudancas = {
-  /** A posição (1 a 6) da etapa atual; as anteriores ficam concluídas e as seguintes pendentes. */
-  posicao?: number
-  anteriores?: StatusDaEtapa
-  cartao?: Partial<DadosDoCartao>
-  processo?: Partial<ProcessoLido>
-}
-
-let contador = 0
-
-function processo(nome: string, { posicao = 3, anteriores = 'concluida', cartao = {}, processo: mudancas = {} }: Mudancas = {}): ProcessoLido {
-  const atual = ETAPAS[posicao - 1]
-  contador += 1
-  return {
-    id: `p${contador}`, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
-    macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento',
-    etapaAtual: { codigo: atual.codigo, nome: atual.nome, ordem: atual.ordem },
-    processoPaiId: null, processoPai: null, subprocessos: [], responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null },
-    origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, ultimaVersao: null,
-    etapasDoProcesso: [],
-    cartao: {
-      etapaAtualStatus: 'em_andamento', etapaAtualIniciadaEm: dia(0), responsavelAtivo: true,
-      caminho: ETAPAS.map((etapa, indice) => ({
-        codigo: etapa.codigo, status: indice < posicao - 1 ? anteriores : indice === posicao - 1 ? 'em_andamento' : 'pendente',
-      })),
-      ultimaVersao: null, subprocessos: 0, ...cartao,
-    },
-    ...mudancas,
-  }
-}
-
-function montar(processos: ProcessoLido[], perfil: Perfil = 'integrante_ep') {
-  const falso = new ProcessosFalso()
-  falso.etapasDoCatalogo = ETAPAS
-  falso.processos = processos
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={falso} versoes={new VersoesFalso()} />)
-}
-
-/** O cartão do processo pelo nome, depois que o Quadro carregou. */
-async function cartaoDe(nome: string): Promise<HTMLElement> {
-  const nomeNoCartao = await screen.findByText(nome, { selector: '.cartao-nome' })
-  return nomeNoCartao.closest('a') as HTMLElement
-}
 
 const selos = (cartao: HTMLElement) => Array.from(cartao.querySelectorAll('.cartao-selos > *')).map((selo) => selo.textContent)
 

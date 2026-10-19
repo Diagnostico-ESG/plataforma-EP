@@ -45,9 +45,9 @@ export function VisaoDosProcessos(props: VisaoDosProcessosProps) {
 
 type ConteudoDaVisaoProps = VisaoDosProcessosProps & { lista: ListaDeProcessos; todos: ListaDeProcessos['processos'] }
 
-function ConteudoDaVisao({ visao, lista, todos, idEscolhido, enderecoDoProcesso, aoAbrir, filtros }: ConteudoDaVisaoProps) {
+function ConteudoDaVisao({ visao, lista, todos, idEscolhido, enderecoDoProcesso, aoAbrir, filtros, podeAlterar }: ConteudoDaVisaoProps) {
   if (visao === 'quadro') {
-    return <QuadroDeProcessos lista={lista} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso} />
+    return <QuadroDeProcessos lista={lista} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso} podeAlterar={podeAlterar} />
   }
   return (
     <TabelaDeProcessos linhas={linhasDaLista(lista.processos, todos)} idEscolhido={idEscolhido} aoAbrir={aoAbrir} busca={filtros.busca} />

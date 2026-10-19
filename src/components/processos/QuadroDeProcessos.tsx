@@ -1,3 +1,4 @@
+import { useArrastoDoQuadro } from '../../hooks/useArrastoDoQuadro'
 import { colunasDoQuadro } from '../../processos/colunasDoQuadro'
 import type { ListaDeProcessos } from '../../processos/tipos'
 import { ColunaDoQuadro } from './ColunaDoQuadro'
@@ -8,17 +9,24 @@ type QuadroDeProcessosProps = {
   idEscolhido: string | null
   /** O endereço do painel de um processo, com a visão e os filtros de agora. */
   enderecoDoProcesso: (id: string) => string
+  podeAlterar: boolean
 }
 
 const COLUNAS_FANTASMA = [0, 1, 2, 3]
 
-export function QuadroDeProcessos({ lista, idEscolhido, enderecoDoProcesso }: QuadroDeProcessosProps) {
+export function QuadroDeProcessos({ lista, idEscolhido, enderecoDoProcesso, podeAlterar }: QuadroDeProcessosProps) {
+  const colunas = colunasDoQuadro(lista)
+  const arrasto = useArrastoDoQuadro(colunas, () => undefined)
   return (
-    <div className="quadro-colunas">
-      {colunasDoQuadro(lista).map((coluna) => (
-        <ColunaDoQuadro key={coluna.chave} coluna={coluna} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso} />
-      ))}
-    </div>
+    <>
+      {arrasto.aviso && <p className="quadro-aviso" role="status">{arrasto.aviso}</p>}
+      <div className="quadro-colunas">
+        {colunas.map((coluna) => (
+          <ColunaDoQuadro key={coluna.chave} coluna={coluna} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso}
+            podeAlterar={podeAlterar} arrasto={arrasto} />
+        ))}
+      </div>
+    </>
   )
 }
 
