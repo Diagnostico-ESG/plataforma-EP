@@ -221,3 +221,33 @@ test('a Consulta vê o motivo do suspenso sem [Retomar], e o concluído com a da
   expect(agora.getByText('Suspenso: Aguardando decisão')).toBeTruthy()
   expect(agora.queryAllByRole('button')).toEqual([])
 })
+
+// ---- Teclado e leitor de tela
+
+test('o Trocar leva o foco à lista; Esc fecha só a lista e devolve o foco ao link, com o verso aberto', async () => {
+  montarVerso(processoLido(caminho()))
+  const agora = await agoraDoVerso()
+  const link = agora.getByRole('button', { name: `Trocar o responsável de ${MODELAGEM}` })
+  fireEvent.click(link)
+  const lista = agora.getByRole('combobox', { name: `Responsável de ${MODELAGEM}` })
+  expect(document.activeElement).toBe(lista)
+  fireEvent.keyDown(lista, { key: 'Escape' })
+  expect(agora.queryByRole('combobox')).toBeNull()
+  expect(document.activeElement).toBe(agora.getByRole('button', { name: `Trocar o responsável de ${MODELAGEM}` }))
+  expect(await agoraDoVerso()).toBeTruthy()
+})
+
+test('escolher no Trocar devolve o foco ao link', async () => {
+  montarVerso(processoLido(caminho()))
+  const agora = await agoraDoVerso()
+  fireEvent.click(agora.getByRole('button', { name: `Trocar o responsável de ${MODELAGEM}` }))
+  fireEvent.change(agora.getByRole('combobox', { name: `Responsável de ${MODELAGEM}` }), { target: { value: BIA.id } })
+  await agora.findByText(BIA.nome)
+  expect(document.activeElement).toBe(agora.getByRole('button', { name: `Trocar o responsável de ${MODELAGEM}` }))
+})
+
+test('o Agora é uma região anunciada com a posição da etapa', async () => {
+  montarVerso(processoLido(caminho()))
+  const regiao = await versoAberto()
+  expect(regiao.getByRole('region', { name: 'Agora · etapa 1 de 3' })).toBeTruthy()
+})

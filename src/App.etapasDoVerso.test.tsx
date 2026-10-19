@@ -118,3 +118,14 @@ test('a Consulta lê as gavetas sem botões', async () => {
   expect(gaveta.getAllByRole('button')).toHaveLength(1)
   expect(within(await (await etapasDoVerso()).findByRole('list')).getAllByRole('listitem')).toHaveLength(6)
 })
+
+test('cada linha é um botão nativo, que abre e fecha pelo teclado (Enter e Espaço) com o estado anunciado', async () => {
+  montarVerso(processoLido(caminho()))
+  const linhas = (await etapasDoVerso()).getAllByRole('button')
+  expect(linhas).toHaveLength(6)
+  for (const linha of linhas) {
+    expect(linha.tagName).toBe('BUTTON')
+    expect(linha.getAttribute('type')).toBe('button')
+    expect(linha.hasAttribute('aria-expanded')).toBe(true)
+  }
+})
