@@ -4,56 +4,159 @@
   gap: var(--esp-2);
 }
 
-.caminho-de-etapas {
+/* As Etapas do verso (spec, "Coluna esquerda — Etapas"): linhas compactas e quietas. Só o verde da concluída e o azul
+   da atual têm cor; o resto é cinza. A gaveta do detalhe abre logo abaixo da linha. */
+.etapas-lista {
   list-style: none;
   margin: 0;
   padding: 0;
   border-top: 1px solid var(--linha);
 }
 
-.etapa {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--esp-2) var(--esp-3);
-  padding: var(--esp-3) 0;
+.etapa-linha {
   border-bottom: 1px solid var(--linha);
   color: var(--texto-2);
 }
 
-/* A etapa atual em azul, como no caminho da identidade visual. */
-.etapa[aria-current='step'] {
-  color: var(--texto);
-  box-shadow: inset 3px 0 0 var(--azul);
-  padding-left: var(--esp-3);
+.etapa-cabeca {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  width: 100%;
+  min-height: 36px;
+  padding: var(--esp-1) var(--esp-2);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.etapa-cabeca:hover {
+  background: var(--fundo-contexto);
 }
 
 .etapa-nome {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.etapa-quando {
+  flex: none;
+  font-family: var(--fonte-mono);
+  font-size: var(--tam-secundario);
+}
+
+.etapa-iniciais {
+  flex: none;
+  width: 2.2em;
+  font-size: var(--tam-rotulo);
+  font-weight: 600;
+  text-align: right;
+}
+
+.etapa-selo {
+  flex: none;
+  padding: 0 var(--esp-2);
+  border-radius: 999px;
+  background: var(--neutra-fundo);
+  color: var(--neutra-texto);
+  font-size: var(--tam-rotulo);
+  line-height: 1.6;
+}
+
+/* O sinal de cada status: ✓ verde (concluída), ✓ cinza (anterior), ponto azul (atual), círculo (pendente), círculo
+   tracejado (opcional) e traço (dispensada). */
+.etapa-sinal {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  border: 2px solid var(--icone-inativo);
+  border-radius: 50%;
+}
+
+.etapa-concluida .etapa-sinal,
+.etapa-anterior .etapa-sinal {
+  border: 0;
+  border-radius: 0;
+}
+
+.etapa-concluida .etapa-sinal::before,
+.etapa-anterior .etapa-sinal::before {
+  content: '✓';
+  font-weight: 700;
+  line-height: 1;
+}
+
+.etapa-concluida .etapa-sinal {
+  color: var(--aprovado-texto);
+}
+
+.etapa-anterior .etapa-sinal {
+  color: var(--icone-inativo);
+}
+
+.etapa-atual {
+  color: var(--texto);
+}
+
+.etapa-atual .etapa-cabeca {
+  background: var(--azul-claro);
   font-weight: 600;
 }
 
-.etapa-datas,
-.etapa-nota {
-  flex-basis: 100%;
+.etapa-atual .etapa-sinal {
+  border-color: var(--azul);
+  background: var(--azul);
+}
+
+.etapa-opcional .etapa-sinal {
+  border-style: dashed;
+}
+
+.etapa-dispensada .etapa-sinal {
+  height: 0;
+  border-width: 1px 0 0;
+  border-radius: 0;
+}
+
+.etapa-dispensada .etapa-nome {
+  text-decoration: line-through;
+}
+
+/* A gaveta: recuada sob o nome, com a mesma largura da linha. */
+.etapa-gaveta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--esp-2);
+  padding: var(--esp-2) var(--esp-2) var(--esp-3) calc(var(--esp-2) + 16px + var(--esp-3));
+  color: var(--texto);
+}
+
+.etapa-gaveta p {
   margin: 0;
 }
 
-.etapa-acoes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--esp-2);
-  flex-basis: 100%;
-}
-
-.etapa-edicao {
+.etapa-responsavel {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--esp-2) var(--esp-3);
-  flex-basis: 100%;
+  gap: var(--esp-1) var(--esp-3);
 }
 
-.etapa-edicao:empty {
+.etapa-gaveta-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+}
+
+.etapa-gaveta-acoes:empty {
   display: none;
 }
 
@@ -62,7 +165,6 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--esp-2) var(--esp-3);
-  flex-basis: 100%;
 }
 
 .etapa-campo-de-data {

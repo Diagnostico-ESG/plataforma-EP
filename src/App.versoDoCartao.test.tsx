@@ -7,7 +7,7 @@ import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import type { EventoDoCadastro } from './cadastros/tipos'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { EtapaDoProcesso, ProcessoLido, SituacaoDoProcesso } from './processos/tipos'
-import { escolherNoMenuDoProcesso, janelaPorCima, versoAberto } from './testes/versoDoCartao'
+import { agoraDoVerso, escolherNoMenuDoProcesso, etapasDoVerso, gavetaDaEtapa, janelaPorCima, versoAberto } from './testes/versoDoCartao'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
 beforeEach(() => {
@@ -163,9 +163,9 @@ test('Histórico pelo "⋯" troca o conteúdo da janela, e "← Voltar ao proces
   const aberto = await versoAberto()
   expect(await aberto.findByRole('heading', { name: 'Histórico' })).toBeTruthy()
   expect(await aberto.findByText('Criou')).toBeTruthy()
-  expect(aberto.queryByRole('region', { name: 'Caminho de etapas' })).toBeNull()
+  expect(aberto.queryByRole('region', { name: 'Etapas' })).toBeNull()
   fireEvent.click(aberto.getByRole('button', { name: '← Voltar ao processo' }))
-  expect(await aberto.findByRole('region', { name: 'Caminho de etapas' })).toBeTruthy()
+  expect(await aberto.findByRole('region', { name: 'Etapas' })).toBeTruthy()
 })
 
 test('Editar pelo "⋯" abre o formulário na janela, e Cancelar volta ao verso', async () => {
@@ -173,7 +173,7 @@ test('Editar pelo "⋯" abre o formulário na janela, e Cancelar volta ao verso'
   await escolherNoMenuDoProcesso('Editar')
   const form = within(await (await versoAberto()).findByRole('form', { name: 'Editar processo' }))
   fireEvent.click(form.getByRole('button', { name: 'Cancelar' }))
-  expect(await (await versoAberto()).findByRole('region', { name: 'Caminho de etapas' })).toBeTruthy()
+  expect(await (await versoAberto()).findByRole('region', { name: 'Etapas' })).toBeTruthy()
 })
 
 test('Suspender pelo "⋯" abre a janela do motivo por cima do verso e grava', async () => {
@@ -236,7 +236,7 @@ test('as duas colunas: etapas e versões no trabalho; reunião, dados e estrutur
   window.location.hash = '#/processos/p2'
   montar()
   const aberto = await versoAberto()
-  const caminho = await aberto.findByRole('region', { name: 'Caminho de etapas' })
+  const caminho = await aberto.findByRole('region', { name: 'Etapas' })
   expect(caminho.closest('.verso-trabalho')).toBeTruthy()
   expect(aberto.getByRole('region', { name: 'Dados do processo' }).closest('.verso-contexto')).toBeTruthy()
   expect(aberto.getByRole('region', { name: 'Subprocessos' }).closest('.verso-contexto')).toBeTruthy()
@@ -249,25 +249,26 @@ test('os dados do processo aparecem no verso', async () => {
   for (const texto of ['Retomado', 'Contexto inventado', 'Observação inventada']) expect(aberto.getByText(texto)).toBeTruthy()
 })
 
-test('o caminho começa na Modelagem piloto, com a atual destacada e com as ações', async () => {
+test('as etapas começam na Modelagem piloto, com a atual destacada, e as ações da atual ficam no Agora', async () => {
   montar()
-  const caminho = within(await (await versoAberto()).findByRole('region', { name: 'Caminho de etapas' }))
+  const caminho = within(await (await versoAberto()).findByRole('region', { name: 'Etapas' }))
   const nomes = caminho.getAllByRole('listitem').map((item) => item.querySelector('.etapa-nome')?.textContent)
   expect(nomes).toEqual(['Modelagem piloto', 'Relatório e modelagem técnica', 'Revisão interna'])
   const atuais = caminho.getAllByRole('listitem').filter((item) => item.getAttribute('aria-current') === 'step')
   expect(atuais.map((item) => item.querySelector('.etapa-nome')?.textContent)).toEqual(['Relatório e modelagem técnica'])
-  expect(caminho.getAllByRole('button').map((botao) => botao.textContent)).toEqual([
-    'Corrigir datas', 'Voltar a esta etapa', 'Assumir', 'Corrigir datas', 'Concluir', 'Realizada anteriormente', 'Assumir'])
+  const agora = await agoraDoVerso()
+  expect(agora.getByRole('button', { name: 'Concluir Relatório e modelagem técnica' })).toBeTruthy()
+  expect(agora.getByRole('button', { name: 'Assumir Relatório e modelagem técnica' })).toBeTruthy()
+  expect(agora.getByRole('button', { name: 'Mais ações da etapa' })).toBeTruthy()
 })
 
-test('o caminho mostra status, responsável, datas e nota das etapas do processo', async () => {
+test('a gaveta mostra status, responsável, datas e nota das etapas do processo', async () => {
   montar({ perfil: 'consulta' })
-  const caminho = within(await (await versoAberto()).findByRole('region', { name: 'Caminho de etapas' }))
-  const modelagem = within((await caminho.findByText('Modelagem piloto')).closest('li') as HTMLElement)
-  expect(modelagem.getByText('Concluída')).toBeTruthy()
+  const modelagem = await gavetaDaEtapa('Modelagem piloto')
+  expect(await (await etapasDoVerso()).findByRole('button', { name: 'Modelagem piloto: concluída' })).toBeTruthy()
   expect(modelagem.getByText('Responsável: Ana Teste')).toBeTruthy()
   expect(modelagem.getByText('Início: 11/10/2026 · Conclusão: 12/10/2026')).toBeTruthy()
-  const revisao = within((await caminho.findByText('Revisão interna')).closest('li') as HTMLElement)
+  const revisao = await gavetaDaEtapa('Revisão interna')
   expect(revisao.getByText('Responsável: —')).toBeTruthy()
 })
 

@@ -61,7 +61,7 @@ async function acrescentarEncerramento() {
 }
 
 async function etapasDoCaminho(): Promise<string[]> {
-  const caminho = within(await screen.findByRole('region', { name: 'Caminho de etapas' }))
+  const caminho = within(await screen.findByRole('region', { name: 'Etapas' }))
   return caminho.getAllByRole('listitem').map((item) => item.querySelector('.etapa-nome')?.textContent ?? '')
 }
 

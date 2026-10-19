@@ -2,9 +2,9 @@ import { useCallback } from 'react'
 import { useAcoesDaEtapa } from '../../hooks/useAcoesDaEtapa'
 import { useCarregamento } from '../../hooks/useCarregamento'
 import type { Executar } from '../../hooks/useGravacaoComFalha'
-import type { ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
+import type { DatasDaEtapa, EtapaDoCaminho, ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 import { AgoraDoProcesso } from './AgoraDoProcesso'
-import { CaminhoDeEtapas } from './CaminhoDeEtapas'
+import { EtapasDoProcesso } from './EtapasDoProcesso'
 import { JanelasDaEtapa } from './JanelasDaEtapa'
 
 type CaminhoDoProcessoProps = {
@@ -19,34 +19,33 @@ type CaminhoDoProcessoProps = {
   aoSumir: () => void
 }
 
-// A frase da spec ("Interface"); sem motivo gravado (não deveria acontecer), fica só a explicação.
-function avisoDoProcessoParado({ situacao, motivoDaSituacao }: ProcessoLido): string {
-  const motivo = motivoDaSituacao ? `: ${motivoDaSituacao}.` : '.'
-  return `Este processo está ${situacao}${motivo} Retome-o para registrar o andamento.`
-}
-
-/** O caminho do processo no painel, com as ações na etapa atual para quem pode alterar (a RLS é quem protege). */
+/**
+ * O trabalho do processo no verso: o cartão Agora, as Etapas e as janelas das ações. Quem pode alterar age pelo Agora
+ * e pela gaveta das etapas (a RLS é quem protege); suspenso e cancelado só leem, até o Retomar.
+ */
 export function CaminhoDoProcesso({ processo, processos, podeAlterar, usuarioId, executar, aoMudar, aoSumir }: CaminhoDoProcessoProps) {
-  // Quem não altera não escolhe responsável: não precisa da lista. Falha ao lê-la deixa o seletor só com o atual.
+  // Quem não altera não escolhe responsável: não precisa da lista. Falha ao lê-la deixa a escolha só com "Ninguém".
   const ler = useCallback(
     () => (podeAlterar ? processos.listarResponsaveisPossiveis() : Promise.resolve([])), [processos, podeAlterar])
   const { estado } = useCarregamento(ler)
   const usuarios = estado.tipo === 'pronto' ? estado.valor : []
   const acoes = useAcoesDaEtapa(processos, aoMudar, aoSumir)
   const parado = processo.situacao === 'suspenso' || processo.situacao === 'cancelado'
+
+  async function corrigirDatas(etapa: EtapaDoCaminho, datas: DatasDaEtapa) {
+    await processos.corrigirDatasDaEtapa(etapa.id, datas)
+    aoMudar()
+  }
+
   return (
     <>
-    <AgoraDoProcesso processo={processo} processos={processos} usuarios={usuarios} usuarioId={usuarioId} podeAlterar={podeAlterar}
-      acoes={acoes} executar={executar} aoMudar={aoMudar} />
-    <section className="painel-caminho" aria-label="Caminho de etapas">
-      <h3 className="painel-subtitulo">Etapas do processo</h3>
-      {parado && <p className="painel-aviso" role="status">{avisoDoProcessoParado(processo)}</p>}
-      <CaminhoDeEtapas processos={processos} etapas={processo.etapasDoProcesso} podeAlterar={podeAlterar && !parado}
-        usuarios={usuarios} usuarioId={usuarioId} ultimaVersao={processo.ultimaVersao} acoes={acoes} aoMudar={aoMudar}
-        aoSumir={aoSumir} />
+      <AgoraDoProcesso processo={processo} processos={processos} usuarios={usuarios} usuarioId={usuarioId}
+        podeAlterar={podeAlterar} acoes={acoes} executar={executar} aoMudar={aoMudar} />
       {acoes.falha && <p className="cadastros-falha" role="alert">{acoes.falha}</p>}
+      <EtapasDoProcesso etapas={processo.etapasDoProcesso} podeEditar={podeAlterar && !parado} usuarios={usuarios}
+        usuarioId={usuarioId} ultimaVersao={processo.ultimaVersao} acoes={acoes} aoCorrigirDatas={corrigirDatas}
+        aoSumir={aoSumir} />
       <JanelasDaEtapa acoes={acoes} usuarios={usuarios} usuarioId={usuarioId} ultimaVersao={processo.ultimaVersao} />
-    </section>
     </>
   )
 }
