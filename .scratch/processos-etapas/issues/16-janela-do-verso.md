@@ -22,3 +22,5 @@
 - [ ] `[visual]` O verso abre como janela central de até cerca de 880 px, em duas colunas de 60% e 40%, a direita em fundo levemente cinza, com o Quadro ou a Lista escurecidos atrás; o cabeçalho fica fixo e a janela tem uma só rolagem; abaixo de 900 px de largura, ocupa a tela inteira em uma coluna.
 - [ ] `[visual]` O cabeçalho do verso mostra pílula só em suspenso, cancelado e concluído; o menu "⋯" tem os três grupos com Excluir em vermelho no fim.
 - [ ] `[visual]` O carregando mostra blocos cinza no formato final, sem a janela mudar de tamanho quando os dados chegam.
+
+Concluído em 2026-10-19 (commit 9abb033)
