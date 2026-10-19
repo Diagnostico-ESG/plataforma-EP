@@ -1,6 +1,8 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { formatarData, indiceDaEtapaAtual } from './caminhoDeEtapas'
-import type { DatasDaEtapa, EtapaDoProcesso, EtapaDoCaminho, ProcessoLido, ResponsavelDaEtapa, StatusDaEtapa } from './tipos'
+import type {
+  DatasDaEtapa, EtapaDoProcesso, EtapaDoCaminho, ProcessoLido, ResponsavelDaEtapa, StatusDaEtapa, UsuarioResponsavel,
+} from './tipos'
 
 const RESOLVIDOS: StatusDaEtapa[] = ['concluida', 'realizada_anteriormente', 'dispensada']
 
@@ -61,5 +63,47 @@ export function conferirDatasDaEtapa({ iniciadaEm, resolvidaEm }: DatasDaEtapa, 
   if (iniciadaEm !== null && resolvidaEm !== null && resolvidaEm < iniciadaEm) {
     throw new TravaDoBanco(
       `A conclusão (${formatarData(resolvidaEm)}) não pode ser antes do início (${formatarData(iniciadaEm)}).`)
+  }
+}
+
+/**
+ * Como a função de avanço do banco: a escolhida recebe as mudanças e a primeira pendente depois dela entra em
+ * andamento com hoje e o responsável (null: ninguém, mesmo que a etapa já tivesse um). Sem pendente depois, só resolve.
+ */
+export function avancarEtapas(
+  etapas: EtapaDoProcesso[], id: string, resolvida: Partial<EtapaDoProcesso>, responsavel: UsuarioResponsavel | null, hoje: string,
+): EtapaDoProcesso[] {
+  const indice = etapas.findIndex((etapa) => etapa.id === id)
+  const proxima = etapas.findIndex((etapa, posicao) => posicao > indice && etapa.status === 'pendente')
+  return etapas.map((etapa, posicao) => {
+    if (posicao === indice) return { ...etapa, ...resolvida }
+    if (posicao !== proxima) return etapa
+    return {
+      ...etapa, status: 'em_andamento', iniciadaEm: hoje, responsavelId: responsavel?.id ?? null,
+      responsavelNome: responsavel?.nome ?? null, responsavelInativo: false,
+    }
+  })
+}
+
+/** O avanço no processo: as etapas avançam, a etapa atual e o "concluído" são recalculados e o cartão mostra o responsável da nova atual. */
+export function avancarProcesso(
+  processo: ProcessoLido, id: string, resolvida: Partial<EtapaDoProcesso>, responsavel: UsuarioResponsavel | null, hoje: string,
+): ProcessoLido {
+  const recalculado = recalcularProcesso(processo, avancarEtapas(processo.etapasDoProcesso, id, resolvida, responsavel, hoje))
+  const atual = recalculado.etapasDoProcesso[indiceDaEtapaAtual(recalculado.etapasDoProcesso)]
+  const cartao = atual?.responsavelId ? { id: atual.responsavelId, nome: atual.responsavelNome ?? '', fotoUrl: null } : null
+  return { ...recalculado, responsavel: cartao }
+}
+
+export type PedidoDeAvanco = { acao: 'concluir' | 'dispensar' | 'realizada'; nota: string | null; responsavelId: string | null }
+
+/** As recusas do banco no avanço, na ordem dele: nota obrigatória, etapa obrigatória não se dispensa e responsável que pode ser escolhido. */
+export function conferirAvanco(etapa: EtapaDoCaminho, { acao, nota, responsavelId }: PedidoDeAvanco, possiveis: UsuarioResponsavel[]): void {
+  if (acao !== 'concluir' && (nota ?? '').trim() === '') throw new TravaDoBanco('A nota é obrigatória.')
+  if (acao === 'dispensar' && etapa.obrigatoria) {
+    throw new TravaDoBanco(`A etapa ${etapa.nome} é obrigatória e não pode ser dispensada.`)
+  }
+  if (responsavelId !== null && !possiveis.some((usuario) => usuario.id === responsavelId)) {
+    throw new TravaDoBanco(`${responsavelId} não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP.`)
   }
 }

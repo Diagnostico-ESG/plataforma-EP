@@ -138,9 +138,13 @@ export type ModuloDeProcessos = {
   /** Do mais recente para o mais antigo. */
   lerHistoricoDoProcesso(id: string): Promise<EventoDoCadastro[]>
   iniciarEtapa(andamentoId: string): Promise<void>
-  concluirEtapa(andamentoId: string): Promise<void>
-  dispensarEtapa(andamentoId: string, nota: string): Promise<void>
-  registrarRealizadaAnteriormente(andamentoId: string, nota: string): Promise<void>
+  /**
+   * Concluir, dispensar e registrar como realizada anteriormente resolvem a etapa atual e, se houver etapa pendente
+   * depois dela, a iniciam com o responsável (null: ninguém), tudo ou nada; sem pendente depois, o responsável é ignorado.
+   */
+  concluirEtapa(andamentoId: string, proximoResponsavelId: string | null): Promise<void>
+  dispensarEtapa(andamentoId: string, nota: string, proximoResponsavelId: string | null): Promise<void>
+  registrarRealizadaAnteriormente(andamentoId: string, nota: string, proximoResponsavelId: string | null): Promise<void>
   /** A etapa resolvida volta a em andamento e as seguintes a pendente; o motivo é obrigatório. */
   voltarParaEtapa(andamentoId: string, motivo: string): Promise<void>
   corrigirDatasDaEtapa(andamentoId: string, datas: DatasDaEtapa): Promise<void>

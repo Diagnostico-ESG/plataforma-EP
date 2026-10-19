@@ -54,7 +54,7 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes }: Area
       </div>
       {idAberto && (
         <PainelDoProcesso key={idAberto} processos={processos} cadastros={cadastros} versoes={versoes} id={idAberto}
-          podeAlterar={podeAlterar} aoFechar={fechar} aoMudar={recarregar} enderecoDoProcesso={enderecoDoProcesso} />
+          podeAlterar={podeAlterar} usuarioId={usuario.id} aoFechar={fechar} aoMudar={recarregar} enderecoDoProcesso={enderecoDoProcesso} />
       )}
       {cadastrando && (
         <PainelDeNovoProcesso processos={processos} cadastros={cadastros} aoFechar={() => irParaVisao({ aberto: null })}

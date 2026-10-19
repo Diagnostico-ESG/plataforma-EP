@@ -56,15 +56,15 @@
 
 ### Tarefa 1 — Plano, marco e branch
 
-- [ ] Comitar este plano na `main` ("Plano do ticket 13 de processos-etapas").
-- [ ] Criar o marco `marco/2026-10-18-inicio-ticket-13-processos-etapas` (se o nome existir, `-2`) e enviá-lo ao GitHub com `git push origin "refs/tags/marco/*:refs/tags/marco/*"`.
-- [ ] `git switch -c processos-etapas-13` (branch comum, sem worktree).
+- [x] Comitar este plano na `main` ("Plano do ticket 13 de processos-etapas").
+- [x] Criar o marco `marco/2026-10-18-inicio-ticket-13-processos-etapas` (se o nome existir, `-2`) e enviá-lo ao GitHub com `git push origin "refs/tags/marco/*:refs/tags/marco/*"`.
+- [x] `git switch -c processos-etapas-13` (branch comum, sem worktree).
 
 ### Tarefa 2 — Teste de banco que falha (critério 2)
 
 **Files:** Create `supabase/tests/35_avancar_etapa.test.sql`.
 
-- [ ] Criar o teste. Preparação como a do `19_voltar_datas_responsavel.test.sql` (mesma moldura `_tap`, mesmos quatro usuários inventados a1 Administrador, a2 Integrante, a3 Consulta, a4 Administrador inativo, as funções `pg_temp.andamento`, `pg_temp.agir`, `pg_temp.status`), mais:
+- [x] Criar o teste. Preparação como a do `19_voltar_datas_responsavel.test.sql` (mesma moldura `_tap`, mesmos quatro usuários inventados a1 Administrador, a2 Integrante, a3 Consulta, a4 Administrador inativo, as funções `pg_temp.andamento`, `pg_temp.agir`, `pg_temp.status`), mais:
 
 ```sql
 -- Avanço da etapa (processos-etapas, ticket 13, ADR 0014): resolver a etapa atual já inicia a próxima, com o
@@ -125,15 +125,15 @@ set local role authenticated;
      - (38) `avancar('Processo Pulo','opcional_teste','dispensar','Não se aplica',a2)` `lives_ok`; (39) a opcional `dispensada`; (40) `revisao_interna` continua `realizada_anteriormente` (a resolvida não é reaberta); (41) `revisao_setor` `em_andamento`; (42) responsável de `revisao_setor` = a2.
   7. **Perfis** (sobre "Processo Recusas", a 1 em andamento): a3 (Consulta): (43) `throws_ok` com `'42501', null` ao `avancar('Processo Recusas','modelagem','concluir',null,null)`. a4 (inativo): (44) `'P0001', 'registro_inexistente'`. `set local role anon`: (45) `select public.avancar_etapa('00000000-0000-0000-0000-000000000000', 'concluir', null, null)` → `'42501', null`.
   8. `reset role;` (46) `prosecdef` de `public.avancar_etapa` = `false`; `finish()` e o `do $$ … raise exception … $$` de relatório, como no fim do teste 19.
-- [ ] Comitar na branch ("Ticket 13 de processos-etapas: teste de banco do avanço"). O pre-commit só roda a bateria da tela.
-- [ ] `git push -u origin processos-etapas-13` (sem `--force`).
-- [ ] Disparar o workflow "Testes de banco" na branch `processos-etapas-13`, pelo navegador do app (`anthropic-skills:built-in-browser`; não há `gh`; o usuário já entrou no GitHub). Esperado: **só o teste 35 falha**, por `function public.avancar_etapa(uuid, text, text, uuid) does not exist`; os 34 arquivos anteriores passam. Se falhar por outro motivo (digitação, usuário, plano), corrigir e repetir.
+- [x] Comitar na branch ("Ticket 13 de processos-etapas: teste de banco do avanço"). O pre-commit só roda a bateria da tela.
+- [x] `git push -u origin processos-etapas-13` (sem `--force`).
+- [x] Disparar o workflow "Testes de banco" na branch `processos-etapas-13`, pelo navegador do app (`anthropic-skills:built-in-browser`; não há `gh`; o usuário já entrou no GitHub). Esperado: **só o teste 35 falha**, por `function public.avancar_etapa(uuid, text, text, uuid) does not exist`; os 34 arquivos anteriores passam. Se falhar por outro motivo (digitação, usuário, plano), corrigir e repetir.
 
 ### Tarefa 3 — Migração, aplicação e tipos (critérios 1 e 11)
 
 **Files:** Create `supabase/migrations/<timestamp>_avancar_etapa.sql`; Modify `supabase/AMBIENTES.md`, `src/types/database.ts`.
 
-- [ ] `npx supabase migration new avancar_etapa` e preencher:
+- [x] `npx supabase migration new avancar_etapa` e preencher:
 
 ```sql
 -- Avanço da etapa (processos-etapas, ticket 13, ADR 0014): resolver a etapa atual já inicia a próxima, com o
@@ -220,16 +220,16 @@ grant execute on function private.status_do_avanco(text),
 ```
 
   Os parâmetros das auxiliares levam o prefixo `p_` (`p_nota`, `p_responsavel`) para não colidir com as colunas `nota` e `responsavel_id` dentro do `update` (o plpgsql recusa nome ambíguo).
-- [ ] Comitar e enviar ("Ticket 13 de processos-etapas: migração do avanço"). Disparar o workflow "Migrar banco de desenvolvimento" na branch, com `migracao` = `<timestamp>_avancar_etapa.sql`. Esperado: aplicada, sem o aviso de já aplicada.
-- [ ] Disparar o "Testes de banco" na branch. Esperado: os 35 arquivos verdes, o 35 com 46 de 46. Se o 35 falhar, ler a linha `not ok`; se for erro da função, **nova migração** (a enviada não se edita); se for do teste, corrigir o teste. Na terceira falha sobre o mesmo ponto, parar (regra de parada do `CLAUDE.md`).
-- [ ] Conferir o alvo e rodar `npm run db:types`; no diff de `src/types/database.ts` deve entrar só `avancar_etapa` em `Functions` (`Args: { p_acao: string; p_andamento: string; p_nota: string; p_responsavel: string }`).
-- [ ] Registrar em `supabase/AMBIENTES.md` a linha da migração (data, ticket 13 de processos-etapas, não destrutiva, teste 35 falhou antes por função inexistente e passou depois com os 35 arquivos verdes, aplicada pelo workflow, tipos regenerados). Comitar e enviar ("Ticket 13 de processos-etapas: registro da migração e tipos").
+- [x] Comitar e enviar ("Ticket 13 de processos-etapas: migração do avanço"). Disparar o workflow "Migrar banco de desenvolvimento" na branch, com `migracao` = `<timestamp>_avancar_etapa.sql`. Esperado: aplicada, sem o aviso de já aplicada.
+- [x] Disparar o "Testes de banco" na branch. Esperado: os 35 arquivos verdes, o 35 com 46 de 46. Se o 35 falhar, ler a linha `not ok`; se for erro da função, **nova migração** (a enviada não se edita); se for do teste, corrigir o teste. Na terceira falha sobre o mesmo ponto, parar (regra de parada do `CLAUDE.md`).
+- [x] Conferir o alvo e rodar `npm run db:types`; no diff de `src/types/database.ts` deve entrar só `avancar_etapa` em `Functions` (`Args: { p_acao: string; p_andamento: string; p_nota: string; p_responsavel: string }`).
+- [x] Registrar em `supabase/AMBIENTES.md` a linha da migração (data, ticket 13 de processos-etapas, não destrutiva, teste 35 falhou antes por função inexistente e passou depois com os 35 arquivos verdes, aplicada pelo workflow, tipos regenerados). Comitar e enviar ("Ticket 13 de processos-etapas: registro da migração e tipos").
 
 ### Tarefa 4 — Módulo de processos: levar o responsável da próxima (critério 3)
 
 **Files:** Modify `src/processos/{tipos,andamentosSupabase,andamentoFalso,ProcessosFalso,caminhoDeEtapas}.ts` e os testes; Create `src/processos/ProcessosFalso.avanco.test.ts`.
 
-- [ ] **Testes primeiro (vermelhos):**
+- [x] **Testes primeiro (vermelhos):**
   - `andamentosSupabase.test.ts`: `concluirEtapa('a4', 'u1')` chama o `rpc` `avancar_etapa` com `{ p_andamento: 'a4', p_acao: 'concluir', p_nota: null, p_responsavel: 'u1' }`; `dispensarEtapa('a4', 'Sem publicação', null)` com `{ p_acao: 'dispensar', p_nota: 'Sem publicação', p_responsavel: null }`; `registrarRealizadaAnteriormente('a4', 'Feita em 2025', 'u2')` com `p_acao: 'realizada_anteriormente'`. Tradução das recusas do `rpc.avancar_etapa` (um `test.each`): `etapa_obrigatoria:Publicação` → "A etapa Publicação é obrigatória e não pode ser dispensada."; `responsavel_invalido:Maria Teste` → a frase do responsável; `anterior_nao_resolvida:Reunião de modelagem` → "A etapa Reunião de modelagem ainda não foi resolvida."; `processo_parado:suspenso` → "Este processo está suspenso; retome-o para registrar o andamento."; `nota_obrigatoria` → "A nota é obrigatória."; `42501` → "Seu perfil não permite alterar os processos."; `registro_inexistente` → `CadastroInexistente`.
   - `ProcessosFalso.avanco.test.ts` (processo de 3 etapas como em `ProcessosFalso.situacao.test.ts`, `usuariosPossiveis = [{ id: 'u1', nome: 'Ana Teste' }, { id: 'u2', nome: 'Bia Teste' }]`):
     - concluir a atual com a seguinte pendente → a atual `concluida` com `resolvidaEm` de hoje e a seguinte `em_andamento` com `iniciadaEm` de hoje, `responsavelId: 'u1'`, `responsavelNome: 'Ana Teste'`; `etapaAtual` e `responsavel` do processo passam à seguinte; a chamada gravada é `{ acao: 'concluir', id, usuarioId: 'u1' }`;
@@ -240,8 +240,8 @@ grant execute on function private.status_do_avanco(text),
     - recusas, sem mudar nenhuma etapa: dispensar obrigatória ("A etapa X é obrigatória e não pode ser dispensada."), nota vazia ("A nota é obrigatória."), responsável fora de `usuariosPossiveis` ("u9 não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP."), processo suspenso (a frase de `situacaoFalso`), `falhaDeGravacao`.
   - `andamentoFalso.test.ts`: `avancarEtapas` direto (pura): resolve a escolhida, inicia a primeira `pendente` com `ordem` maior, não mexe em outra.
   - `caminhoDeEtapas.test.ts`: `proximaPendente(etapas, indice)` (a seguinte pendente; pula a resolvida; `null` sem pendente depois); `responsavelMarcado(proxima, usuarioId, usuarios)` (o da próxima se está na lista; senão o usuário da tela se está na lista; senão `null`).
-- [ ] `npm test`: vermelho por falta das funções/assinaturas.
-- [ ] **Implementar:**
+- [x] `npm test`: vermelho por falta das funções/assinaturas.
+- [x] **Implementar:**
   - `tipos.ts` (`ModuloDeProcessos`): `concluirEtapa(andamentoId: string, proximoResponsavelId: string | null)`, `dispensarEtapa(andamentoId: string, nota: string, proximoResponsavelId: string | null)`, `registrarRealizadaAnteriormente(…mesmo…)`, com o comentário "Resolve a etapa atual e, se houver etapa pendente depois, a inicia com o responsável (null: nenhum), tudo ou nada; sem pendente depois o responsável é ignorado."
   - `andamentosSupabase.ts`: as três operações chamam `avancar(cliente, id, acao, nota, responsavelId, recusas)`:
 
@@ -263,13 +263,13 @@ async function avancar(
   - `ProcessosFalso.ts`: as três operações chamam `private avancar(chamada, mudancas, usuarioId)`: `conferirGravacao`, `conferirProcessoDaEtapa`, as recusas acima (extraídas para `conferirAvanco` em `andamentoFalso.ts` para não passar de 20 linhas), `chamadas.push`, `aplicar` com `avancarEtapas` e o `responsavel` do cartão. As chamadas gravadas: `{ acao: 'concluir', id, usuarioId }`, `{ acao: 'dispensar', id, nota, usuarioId }`, `{ acao: 'realizada', id, nota, usuarioId }`.
   - Chamadores atuais em `useAcoesDaEtapa.ts`: passam `null` como responsável por enquanto (a janela vem na Tarefa 5), para o commit compilar.
   - Ajustar os testes antigos que usam as assinaturas ou esperam `chamadas` sem `usuarioId`: `processosSupabase.test.ts`, `ProcessosFalso.situacao.test.ts`, `App.andamentoDoProcesso`, `App.painelDoProcesso`, `App.situacaoDoProcesso` (só o que o `npm test` apontar; o comportamento de tela fica para a Tarefa 5).
-- [ ] `npm test`, `npm run typecheck`, `npm run lint`, `npm run check:circular`: verdes. Comitar ("Ticket 13 de processos-etapas: módulo e falsa levam o responsável da próxima").
+- [x] `npm test`, `npm run typecheck`, `npm run lint`, `npm run check:circular`: verdes. Comitar ("Ticket 13 de processos-etapas: módulo e falsa levam o responsável da próxima").
 
 ### Tarefa 5 — Janela de avanço e as três ações (critérios 4 a 10)
 
 **Files:** Create `src/components/processos/{JanelaDeAvanco,EscolhaDoResponsavel}.tsx`, `src/components/processos/gravarPedidos.ts`, `src/App.avancoDaEtapa.test.tsx`; Modify `src/components/processos/{useAcoesDaEtapa.ts,CaminhoDeEtapas.tsx,CaminhoDoProcesso.tsx,PainelDoProcesso.tsx,AreaDeProcessos.tsx}`, `src/components/JanelaDeConfirmacao.css`, `src/App.{andamentoDoProcesso,painelDoProcesso,situacaoDoProcesso}.test.tsx`.
 
-- [ ] **Testes de tela primeiro** em `src/App.avancoDaEtapa.test.tsx` (mesma montagem de `App.andamentoDoProcesso.test.tsx`: `montar`, `etapa(nome)`, processo `#/processos/p1`; `falso.usuariosPossiveis = [{ id: 'usuario-de-teste', nome: <nome do USUARIO_DE_TESTE> }, { id: 'u2', nome: 'Bia Teste' }]`). Cada caso, com as asserções:
+- [x] **Testes de tela primeiro** em `src/App.avancoDaEtapa.test.tsx` (mesma montagem de `App.andamentoDoProcesso.test.tsx`: `montar`, `etapa(nome)`, processo `#/processos/p1`; `falso.usuariosPossiveis = [{ id: 'usuario-de-teste', nome: <nome do USUARIO_DE_TESTE> }, { id: 'u2', nome: 'Bia Teste' }]`). Cada caso, com as asserções:
   1. **Concluir abre a janela** (critério 4): clicar [Concluir] na etapa em andamento abre o `dialog` "Concluir Reunião de modelagem e iniciar Relatório e modelagem técnica"; o grupo `radiogroup` de nome "Quem fica com a próxima etapa?" tem os rádios `[<usuário da tela>, 'Bia Teste', 'Ninguém por enquanto']` nessa ordem, com "Ninguém por enquanto" por último; o botão é "Concluir e iniciar Relatório e modelagem técnica". Nada foi gravado (`falso.chamadas` vazio).
   2. **Marcado ao abrir:** (a) a próxima sem responsável → marcado o usuário da tela; (b) a próxima com responsável `u2` → marcado "Bia Teste"; (c) a próxima com responsável que não está na lista (ex.: `u9`) e o usuário da tela fora da lista → marcado "Ninguém por enquanto".
   3. **Confirmar grava e avança:** escolher "Bia Teste" e confirmar → `falso.chamadas` = `[{ acao: 'concluir', id: 'a4', usuarioId: 'u2' }]`; a etapa 4 vira "Concluída", a 5 vira "Em andamento" com "Responsável: Bia Teste"; o cartão do Quadro (rota `#/processos`, se o teste usar o Quadro) mostra a nova coluna. Com "Ninguém por enquanto": `usuarioId: null`, a 5 "Em andamento" com "Responsável: —".
@@ -279,8 +279,8 @@ async function avancar(
   7. **Teclado e leitor de tela** (critério 7): ao abrir, `document.activeElement` é o rádio marcado; com nota (Dispensar), é o campo "Nota"; Enter (`fireEvent.keyDown(rádio, { key: 'Enter' })`) confirma e grava; Enter com a nota vazia **não** grava; [Cancelar] fecha sem gravar e a etapa continua "Em andamento" (`chamadas` vazio); reabrir a janela volta ao marcado inicial.
   8. **Falha** (critério 8): `falhaDeGravacao = 'Sem conexão'` → o alerta "Sem conexão" (formato de falha do painel) aparece, e as etapas ficam como estavam; `falhaDeGravacao = new TravaDoBanco('A etapa X é obrigatória e não pode ser dispensada.')` → o alerta traz a frase.
   9. **Histórico, Iniciar e Consulta** (critério 9): com `historicoDosProcessos['p1']` com dois eventos de andamento do mesmo autor e hora (`concluir` e `iniciar`, esta com o "depois" trazendo `responsavel_nome`), a aba Histórico mostra "Concluiu a etapa" e "Iniciou a etapa" e o responsável; [Iniciar] numa etapa pendente grava na hora, sem `dialog`; a Consulta não vê [Concluir], [Dispensar] nem [Realizada anteriormente] (já coberto em `App.andamentoDoProcesso`; aqui basta a asserção de que nenhum `dialog` abre).
-- [ ] `npm test`: os casos novos falham pelo motivo certo (o [Concluir] ainda grava na hora).
-- [ ] **Implementar:**
+- [x] `npm test`: os casos novos falham pelo motivo certo (o [Concluir] ainda grava na hora).
+- [x] **Implementar:**
   - `gravarPedidos.ts` (funções puras, ≤ 20 linhas cada): `gravarTexto(processos, { acao, etapa }, texto)` (as janelas só com nota ou motivo: dispensar e realizada com `null` como responsável, voltar) e `gravarAvanco(processos, { acao, etapa }, nota, responsavelId)` (concluir, dispensar, realizada com o responsável). `gravarPedido` de `useAcoesDaEtapa.ts` sai para cá.
   - `useAcoesDaEtapa.ts`: dois pedidos — `pedido` (texto: dispensar/realizada sem próxima, e voltar) e `avanco` (`{ acao: 'concluir'|'dispensar'|'realizada'; etapa; proxima }`). `agir(acao, etapa, proxima)`: iniciar grava na hora; voltar abre a janela do motivo; concluir sem `proxima` grava na hora com `null`; dispensar e realizada sem `proxima` abrem a janela do texto; com `proxima`, abrem o avanço. Devolve também `gravarAvanco(nota, responsavelId)` e `fecharAvanco`. O hook segue ≤ 40 linhas (a escolha entre pedidos sai em funções pequenas).
   - `EscolhaDoResponsavel.tsx`: o grupo de rádios — `role="radiogroup"` com `aria-labelledby` na pergunta "Quem fica com a próxima etapa?", um `<label><input type="radio" name={…} value={id} checked onChange /> Nome</label>` por usuário e "Ninguém por enquanto" por último (valor `''`); `onKeyDown` do grupo: Enter chama `aoConfirmarComEnter`.
@@ -295,13 +295,13 @@ async function avancar(
   - `CaminhoDoProcesso.tsx`, `PainelDoProcesso.tsx` e `AreaDeProcessos.tsx`: passam `usuarioId={usuario.id}` até o `CaminhoDeEtapas`.
   - `JanelaDeConfirmacao.css`: estilo mínimo do grupo de rádios (coluna com espaço entre as opções) usando os tokens já existentes.
   - Ajustar os testes antigos de [Concluir], [Dispensar] e [Realizada anteriormente] que agora abrem a janela (confirmar com o botão novo, `chamadas` com `usuarioId`).
-- [ ] `npm test`, `npm run typecheck`, `npm run lint`, `npm run check:circular`: verdes. Comitar ("Ticket 13 de processos-etapas: janela de avanço").
+- [x] `npm test`, `npm run typecheck`, `npm run lint`, `npm run check:circular`: verdes. Comitar ("Ticket 13 de processos-etapas: janela de avanço").
 
 ### Tarefa 6 — Conferência na tela e fecho
 
-- [ ] Conferir no navegador do app a janela no Quadro, com a vitrine local (`vitrine.local/`, fora do git, servida pelo `npx vite`): foco no rádio marcado, setas trocando de opção, Enter confirmando, Esc e [Cancelar] fechando sem gravar, nota com a escolha em Dispensar. Registrar como verificado manualmente apenas o que foi visto; o resto, como presumido (a vitrine usa as falsas, não o banco).
-- [ ] Gravar `.scratch/processos-etapas/desvios.md` (entrada datada): função com ação em texto; transição conferida na função para recusar resolver de novo; `nota_obrigatoria` nova; migração e tipos em commits seguintes ao da migração; o que mais surgir.
-- [ ] Gravar `.scratch/melhorias-protocolo.md` com os itens não testados do `/executar-complexo` e do "Qualquer momento" (`.claude/regras/nao-testados.md`) que aconteceram.
-- [ ] Marcar as caixas deste plano e comitar.
+- [x] Conferir no navegador do app a janela no Quadro, com a vitrine local (`vitrine.local/`, fora do git, servida pelo `npx vite`): foco no rádio marcado, setas trocando de opção, Enter confirmando, Esc e [Cancelar] fechando sem gravar, nota com a escolha em Dispensar. Registrar como verificado manualmente apenas o que foi visto; o resto, como presumido (a vitrine usa as falsas, não o banco).
+- [x] Gravar `.scratch/processos-etapas/desvios.md` (entrada datada): função com ação em texto; transição conferida na função para recusar resolver de novo; `nota_obrigatoria` nova; migração e tipos em commits seguintes ao da migração; o que mais surgir.
+- [x] Gravar `.scratch/melhorias-protocolo.md` com os itens não testados do `/executar-complexo` e do "Qualquer momento" (`.claude/regras/nao-testados.md`) que aconteceram.
+- [x] Marcar as caixas deste plano e comitar.
 - [ ] `git switch main`, merge da branch (`finishing-a-development-branch`), `git branch -d processos-etapas-13`; enviar a `main` e conferir o "Testes de banco" na `main`.
 - [ ] Na `main`: `Concluído em 2026-10-18 (commit <hash>)` no fim do ticket 13; comitar e enviar. Lembrar: peça o `/cost`; próximo, o ticket 14.

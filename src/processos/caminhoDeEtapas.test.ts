@@ -1,5 +1,7 @@
 import { describe, expect, test } from 'vitest'
-import { ROTULO_DO_STATUS, acoesDaEtapa, formatarData, indiceDaEtapaAtual } from './caminhoDeEtapas'
+import {
+  ROTULO_DO_STATUS, acoesDaEtapa, formatarData, indiceDaEtapaAtual, proximaPendente, responsavelMarcado,
+} from './caminhoDeEtapas'
 import type { EtapaDoCaminho, StatusDaEtapa } from './tipos'
 
 function etapa(ordem: number, status: StatusDaEtapa, obrigatoria = false): EtapaDoCaminho {
@@ -57,4 +59,36 @@ test('rótulos de status com o texto da tela', () => {
 test('a data do banco (AAAA-MM-DD) aparece como DD/MM/AAAA; sem data, um traço', () => {
   expect(formatarData('2026-10-13')).toBe('13/10/2026')
   expect(formatarData(null)).toBe('—')
+})
+
+describe('próxima pendente', () => {
+  test('é a primeira pendente depois da etapa, pulando as resolvidas', () => {
+    const etapas = [etapa(1, 'em_andamento'), etapa(2, 'concluida'), etapa(3, 'pendente'), etapa(4, 'pendente')]
+    expect(proximaPendente(etapas, 0)?.id).toBe('a3')
+    expect(proximaPendente(etapas, 2)?.id).toBe('a4')
+  })
+
+  test('sem pendente depois, não há próxima', () => {
+    expect(proximaPendente([etapa(1, 'pendente'), etapa(2, 'concluida')], 0)).toBeNull()
+    expect(proximaPendente([etapa(1, 'em_andamento')], 0)).toBeNull()
+  })
+})
+
+describe('responsável marcado ao abrir a janela de avanço', () => {
+  const usuarios = [{ id: 'u1', nome: 'Ana' }, { id: 'u2', nome: 'Bia' }]
+  const proxima = (responsavelId: string | null) => ({ ...etapa(2, 'pendente'), responsavelId, responsavelNome: null, responsavelInativo: false })
+
+  test('o que a próxima já tem, se ele está na lista', () => {
+    expect(responsavelMarcado(proxima('u2'), 'u1', usuarios)).toBe('u2')
+  })
+
+  test('sem ele (ou fora da lista), quem está na tela, se está na lista', () => {
+    expect(responsavelMarcado(proxima(null), 'u1', usuarios)).toBe('u1')
+    expect(responsavelMarcado(proxima('u9'), 'u1', usuarios)).toBe('u1')
+  })
+
+  test('sem nenhum dos dois na lista, ninguém', () => {
+    expect(responsavelMarcado(proxima('u9'), 'u8', usuarios)).toBeNull()
+    expect(responsavelMarcado(etapa(2, 'pendente'), 'u1', [])).toBeNull()
+  })
 })

@@ -1,4 +1,4 @@
-import type { EtapaDoProcesso, EtapaDoCaminho, StatusDaEtapa } from './tipos'
+import type { EtapaDoProcesso, EtapaDoCaminho, StatusDaEtapa, UsuarioResponsavel } from './tipos'
 
 export type AcaoDaEtapa = 'iniciar' | 'concluir' | 'dispensar' | 'realizada' | 'voltar'
 
@@ -32,6 +32,22 @@ export function acoesDaEtapa(etapas: EtapaDoCaminho[], indice: number): AcaoDaEt
   if (indice !== atual) return RESOLVIDOS.has(etapa.status) && (atual === -1 || indice < atual) ? ['voltar'] : []
   const avancar: AcaoDaEtapa = etapa.status === 'pendente' ? 'iniciar' : 'concluir'
   return etapa.obrigatoria ? [avancar, 'realizada'] : [avancar, 'dispensar', 'realizada']
+}
+
+/** A etapa que o avanço inicia: a primeira pendente depois da do índice, pulando as já resolvidas. O banco decide de novo. */
+export function proximaPendente(etapas: EtapaDoCaminho[], indice: number): EtapaDoCaminho | null {
+  return etapas.slice(indice + 1).find((etapa) => etapa.status === 'pendente') ?? null
+}
+
+/**
+ * Quem a janela de avanço marca ao abrir: o responsável que a próxima já tem, se pode ser escolhido; senão quem
+ * está na tela, se pode; senão ninguém (null).
+ */
+export function responsavelMarcado(proxima: EtapaDoCaminho, usuarioId: string, usuarios: UsuarioResponsavel[]): string | null {
+  const pode = (id: string | null) => id !== null && usuarios.some((usuario) => usuario.id === id)
+  const dela = ehEtapaDoProcesso(proxima) ? proxima.responsavelId : null
+  if (pode(dela)) return dela
+  return pode(usuarioId) ? usuarioId : null
 }
 
 // O banco guarda a data como AAAA-MM-DD; a tela mostra DD/MM/AAAA.
