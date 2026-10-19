@@ -30,7 +30,9 @@ insert into public.macroprocessos (id, codigo, nome) values ('af000000-0000-0000
 insert into public.processos (setor_id, macroprocesso_id, nome)
 select '5f000000-0000-0000-0000-000000000039', 'af000000-0000-0000-0000-000000000039', nome
 from unnest(array['Sem Alteracao', 'Corrigida', 'Autor Unico', 'Autor Duplo', 'Assumiu', 'Sem Versao', 'Escopo', 'Parado',
-  'Etapa Pendente', 'Direta', 'Nova Versao', 'Atomica', 'Perfis', 'Pai']) as nome;
+  'Etapa Pendente', 'Direta', 'Nova Versao', 'Atomica', 'Perfis']) as nome;
+insert into public.processos (setor_id, macroprocesso_id, nome, tipo)
+values ('5f000000-0000-0000-0000-000000000039', 'af000000-0000-0000-0000-000000000039', 'Pai', 'processo');
 insert into public.processos (setor_id, macroprocesso_id, nome, tipo, processo_pai_id)
 select '5f000000-0000-0000-0000-000000000039', 'af000000-0000-0000-0000-000000000039', 'Filho', 'subprocesso', id
 from public.processos where nome = 'Pai';
