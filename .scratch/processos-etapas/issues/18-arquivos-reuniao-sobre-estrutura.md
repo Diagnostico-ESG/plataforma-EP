@@ -10,13 +10,13 @@
 
 ## Critérios de aceite
 
-- [ ] Arquivos: destaque da versão mais recente; "falta relatório" com o espaço [+ Acrescentar relatório] para quem pode enviar; versões anteriores recolhidas em "Versões anteriores ({n})"; "Registrar versão histórica" no "⋯" da seção; Substituir no "⋯" de cada arquivo.
-- [ ] A Consulta só baixa os arquivos, sem envio, acréscimo, substituição nem versão histórica.
-- [ ] As marcas atuais de "alterado fora da plataforma" e "não encontrado no Drive" continuam aparecendo.
-- [ ] Reunião marcada, alterada e removida no próprio lugar, com "· próxima" ou "· realizada"; "Ainda não marcada" sem data; Consulta sem os botões.
-- [ ] Sobre sem os campos vazios e com "Ler mais" / "Ler menos" no texto longo.
-- [ ] Estrutura com a etapa atual de cada subprocesso, a situação quando não é em andamento, "Faz parte de" no subprocesso e a seção ausente sem estrutura; os links abrem na mesma janela.
-- [ ] Os testes de tela atuais de versões e reunião passam ajustados à nova apresentação, mantendo os comportamentos.
-- [ ] Testes de interface com o aplicativo inteiro cobrindo os itens acima.
-- [ ] `[visual]` Nos arquivos, a versão mais recente se lê numa linha ("V2 · 02/10 · falta relatório"), com os botões dos arquivos com a barrinha de cor do tipo e o espaço tracejado do arquivo que falta no lugar dele.
-- [ ] `[visual]` As pílulas têm cor e texto, nunca só cor.
+- [x] Arquivos: destaque da versão mais recente; "falta relatório" com o espaço [+ Acrescentar relatório] para quem pode enviar; versões anteriores recolhidas em "Versões anteriores ({n})"; "Registrar versão histórica" no "⋯" da seção; Substituir no "⋯" de cada arquivo.
+- [x] A Consulta só baixa os arquivos, sem envio, acréscimo, substituição nem versão histórica.
+- [x] As marcas atuais de "alterado fora da plataforma" e "não encontrado no Drive" continuam aparecendo.
+- [x] Reunião marcada, alterada e removida no próprio lugar, com "· próxima" ou "· realizada"; "Ainda não marcada" sem data; Consulta sem os botões.
+- [x] Sobre sem os campos vazios e com "Ler mais" / "Ler menos" no texto longo.
+- [x] Estrutura com a etapa atual de cada subprocesso, a situação quando não é em andamento, "Faz parte de" no subprocesso e a seção ausente sem estrutura; os links abrem na mesma janela.
+- [x] Os testes de tela atuais de versões e reunião passam ajustados à nova apresentação, mantendo os comportamentos.
+- [x] Testes de interface com o aplicativo inteiro cobrindo os itens acima.
+- [x] `[visual]` Nos arquivos, a versão mais recente se lê numa linha ("V2 · 02/10 · falta relatório"), com os botões dos arquivos com a barrinha de cor do tipo e o espaço tracejado do arquivo que falta no lugar dele.
+- [x] `[visual]` As pílulas têm cor e texto, nunca só cor.
