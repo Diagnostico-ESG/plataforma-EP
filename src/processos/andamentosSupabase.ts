@@ -13,6 +13,10 @@ import {
   FRASE_DO_ESCOPO_OBRIGATORIO, FRASE_DO_ESCOPO_SO_NA_CORRIGIDA, fraseDaVersaoSemRevisao, fraseDoProcessoComRevisoes,
   fraseDoRevisorQueEAutor,
 } from '../revisoes/frasesDeRevisao'
+import {
+  FRASE_DA_APROVACAO_FORA_DA_ETAPA, FRASE_DA_APROVACAO_NA_VOLTA, FRASE_DO_LINK_INVALIDO, FRASE_DO_PROCESSO_COM_APROVACAO,
+  FRASE_DO_PROCESSO_JA_APROVADO, fraseDaAprovacaoAntesDaRevisao, fraseDaDataNoFuturo, fraseDaVersaoAprovada, fraseDaVersaoSemAprovacao,
+} from '../revisoes/frasesDeAprovacao'
 import { fraseDeSituacaoInvalida, fraseDoProcessoParado } from './frasesDeSituacao'
 import type { ModuloDeProcessos, UsuarioResponsavel } from './tipos'
 
@@ -88,7 +92,9 @@ const PADRAO_DA_RECUSA = new RegExp(
   + '|etapa_usada|etapa_protegida'
   + '|processo_com_versoes|autor_da_versao|sem_versao|versao_incompleta'
   + '|revisor_e_autor|corrigida_sem_versao_do_revisor|corrigida_sem_versao_anterior|escopo_obrigatorio'
-  + '|escopo_so_na_corrigida|revisao_fora_da_etapa|sem_revisao_da_versao|processo_com_revisoes)(?::(.*))?$', 'm')
+  + '|escopo_so_na_corrigida|revisao_fora_da_etapa|sem_revisao_da_versao|processo_com_revisoes'
+  + '|aprovacao_fora_da_etapa|processo_ja_aprovado|link_invalido|aprovacao_antes_da_revisao|sem_aprovacao'
+  + '|aprovacao_so_se_desfaz_na_volta|versao_aprovada|processo_com_aprovacao)(?::(.*))?$', 'm')
 
 const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   anterior_nao_resolvida: (etapa) => `A etapa ${etapa} ainda não foi resolvida.`,
@@ -97,7 +103,7 @@ const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   ja_ha_etapa_em_andamento: (etapa) => `Já há uma etapa em andamento neste processo: ${etapa}.`,
   motivo_obrigatorio: () => 'O motivo é obrigatório.',
   nota_obrigatoria: () => 'A nota é obrigatória.',
-  data_no_futuro: (data) => `A data ${formatarData(data)} está no futuro.`,
+  data_no_futuro: fraseDaDataNoFuturo,
   resolvida_antes_do_inicio: (datas) => {
     const [conclusao, inicio] = datas.split(':')
     return `A conclusão (${formatarData(conclusao)}) não pode ser antes do início (${formatarData(inicio)}).`
@@ -128,6 +134,14 @@ const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   revisao_fora_da_etapa: () => FRASE_DA_REVISAO_FORA_DA_ETAPA,
   sem_revisao_da_versao: fraseDaVersaoSemRevisao,
   processo_com_revisoes: fraseDoProcessoComRevisoes,
+  aprovacao_fora_da_etapa: () => FRASE_DA_APROVACAO_FORA_DA_ETAPA,
+  processo_ja_aprovado: () => FRASE_DO_PROCESSO_JA_APROVADO,
+  link_invalido: () => FRASE_DO_LINK_INVALIDO,
+  aprovacao_antes_da_revisao: fraseDaAprovacaoAntesDaRevisao,
+  sem_aprovacao: fraseDaVersaoSemAprovacao,
+  aprovacao_so_se_desfaz_na_volta: () => FRASE_DA_APROVACAO_NA_VOLTA,
+  versao_aprovada: fraseDaVersaoAprovada,
+  processo_com_aprovacao: () => FRASE_DO_PROCESSO_COM_APROVACAO,
   versao_incompleta: (valor) => {
     const [numero, faltas] = valor.split(':')
     return fraseDaVersaoIncompleta(numero, faltas.split(','))

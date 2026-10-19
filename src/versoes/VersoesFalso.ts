@@ -35,6 +35,8 @@ export class VersoesFalso implements ModuloDeVersoes {
   falharConferencia = false
   /** Os ids de processo conferidos com o Drive, na ordem. */
   conferidos: string[] = []
+  /** O número da versão aprovada de cada processo (a falsa de revisões o preenche ao concluir a Aprovação e o apaga na volta). */
+  aprovadas: Record<string, number> = {}
   /** Os envios que chegaram ao registro, na ordem. */
   envios: PedidoDeVersao[] = []
   /** Chamado com o evento de cada versão registrada (o histórico do processo fica no falso de processos). */
@@ -46,7 +48,8 @@ export class VersoesFalso implements ModuloDeVersoes {
   async listarVersoes(processoId: string): Promise<Versao[]> {
     if (this.segurarLeitura) return new Promise<never>(() => {})
     if (this.falharLeitura) throw new Error('falha de conexão simulada')
-    return ordenarVersoes(this.versoes[processoId] ?? [])
+    const aprovada = this.aprovadas[processoId]
+    return ordenarVersoes(this.versoes[processoId] ?? []).map((versao) => (versao.numero === aprovada ? { ...versao, aprovada: true } : versao))
   }
 
   async enviarVersao(pedido: PedidoDeVersao, aoProgredir: (enviados: number, total: number) => void): Promise<void> {
@@ -99,6 +102,7 @@ export class VersoesFalso implements ModuloDeVersoes {
     const atual = versao?.arquivos.find((outro) => outro.id === arquivo.id)
     if (!versao || !atual) throw new Error(`arquivo ${arquivo.id} não encontrado no processo ${processoId}`)
     if (versao.historica) throw falhaDaFuncao('versao_historica_somente_leitura', '')
+    if (this.aprovadas[processoId] === versao.numero) throw falhaDaFuncao('versao_aprovada', String(versao.numero))
     if (extensaoDoNome(novo.name) !== atual.formato) throw falhaDaFuncao('tipo_de_arquivo_diferente', atual.formato)
     if (this.falharNoArquivo === 1) throw new Error(`o arquivo ${novo.name} não chegou ao Drive`)
     aoProgredir(1, 1)

@@ -59,6 +59,14 @@ test('lista as versões do processo com autor, etapa e os arquivos na ordem dos 
   expect(cliente.pedidos[0]).toMatchObject({ tabela: 'versoes', filtro: ['processo_id', 'p1'], ordem: [['numero', false]] })
 })
 
+test('a versão com aprovação sai marcada como aprovada', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['versoes.select'] = { data: [{ ...LINHA, aprovacao: [{ id: 'ap1' }] }, { ...LINHA, id: 'v2', aprovacao: [] }], error: null }
+  const [aprovada, outra] = await criar(cliente).listarVersoes('p1')
+  expect(aprovada.aprovada).toBe(true)
+  expect(outra.aprovada).toBeUndefined()
+})
+
 test('falha na leitura vira erro com o motivo', async () => {
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas['versoes.select'] = { data: null, error: { message: 'sem conexão' } }

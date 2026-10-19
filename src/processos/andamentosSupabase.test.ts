@@ -173,3 +173,25 @@ test('o nome do autor pode ter dois-pontos: o número vem primeiro e o resto é 
   const falha = await falhaDe(criar(cliente).mudarResponsavelDaEtapa('a4', 'u1'))
   expect(falha.message).toBe('Ana: Teste enviou a versão V12 e não pode ser responsável pela Revisão interna.')
 })
+
+test.each([
+  ['aprovacao_fora_da_etapa', 'A aprovação só pode ser registrada com a Aprovação pelo setor em andamento.'],
+  ['processo_ja_aprovado', 'Este processo já tem aprovação registrada.'],
+  ['link_invalido', 'O link do E-protocolo precisa começar com http:// ou https://.'],
+  ['aprovacao_antes_da_revisao:2026-10-12:2026-10-13',
+    'A data da aprovação (12/10/2026) não pode ser antes da última revisão interna (13/10/2026).'],
+  ['sem_aprovacao:8', 'A V8 ainda não tem aprovação registrada. Conclua a Aprovação pelo setor pela janela de concluir.'],
+  ['aprovacao_so_se_desfaz_na_volta', 'A aprovação só é desfeita ao voltar para a Aprovação pelo setor ou para antes dela.'],
+  ['versao_aprovada:8', 'A versão V8 foi aprovada e seus arquivos não podem ser substituídos.'],
+])('a recusa %s da aprovação, no avanço, vira a frase da tela', async (codigo, frase) => {
+  const cliente = clienteQueRecusa('rpc.avancar_etapa', { message: codigo, code: 'P0001' })
+  const falha = await falhaDe(criar(cliente).concluirEtapa('a5', 'u1'))
+  expect(falha).toBeInstanceOf(TravaDoBanco)
+  expect(falha.message).toBe(frase)
+})
+
+test('processo com aprovação não se exclui', async () => {
+  const cliente = clienteQueRecusa('processos.delete', { message: 'processo_com_aprovacao', code: 'P0001' })
+  const falha = await falhaDe(criar(cliente).excluirProcesso('p1'))
+  expect(falha.message).toBe('Não é possível excluir: processo tem aprovação registrada. Cancele o processo em vez de excluí-lo.')
+})

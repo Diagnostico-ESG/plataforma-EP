@@ -108,6 +108,68 @@ export type Database = {
           },
         ]
       }
+      aprovacoes: {
+        Row: {
+          aprovada_em: string | null
+          id: string
+          link: string | null
+          numero_eprotocolo: string | null
+          processo_id: string
+          registrada_em: string
+          registrada_por: string
+          versao_id: string
+        }
+        Insert: {
+          aprovada_em?: string | null
+          id?: string
+          link?: string | null
+          numero_eprotocolo?: string | null
+          processo_id: string
+          registrada_em?: string
+          registrada_por: string
+          versao_id: string
+        }
+        Update: {
+          aprovada_em?: string | null
+          id?: string
+          link?: string | null
+          numero_eprotocolo?: string | null
+          processo_id?: string
+          registrada_em?: string
+          registrada_por?: string
+          versao_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aprovacoes_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: true
+            referencedRelation: "processos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "aprovacoes_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: true
+            referencedRelation: "processos_com_andamento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "aprovacoes_registrada_por_fkey"
+            columns: ["registrada_por"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "aprovacoes_versao_id_fkey"
+            columns: ["versao_id"]
+            isOneToOne: false
+            referencedRelation: "versoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       arquivos_da_versao: {
         Row: {
           copiado_de: string | null
@@ -800,6 +862,16 @@ export type Database = {
       }
       cancelar_processo: {
         Args: { p_motivo: string; p_processo: string }
+        Returns: undefined
+      }
+      concluir_aprovacao: {
+        Args: {
+          p_andamento: string
+          p_data: string
+          p_link: string
+          p_numero: string
+          p_responsavel: string
+        }
         Returns: undefined
       }
       concluir_revisao_interna: {

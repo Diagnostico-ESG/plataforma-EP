@@ -1,4 +1,5 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
+import { fraseDaVersaoAprovada } from '../revisoes/frasesDeAprovacao'
 
 // Códigos que chegam da função arquivos-no-drive: os dela (decisao.ts, google.ts) e os do banco, que ela repassa
 // como "motivo" de "motivo:valor" (migração versoes), com o valor na mensagem.
@@ -30,6 +31,7 @@ const FRASE_DO_CODIGO: Record<string, (valor: string) => string> = {
   copia_so_de_relatorio: () => FALHA_DA_COPIA,
   copia_de_versao_que_nao_e_a_anterior: () => FALHA_DA_COPIA,
   copia_diferente_do_original: () => FALHA_DA_COPIA,
+  versao_aprovada: fraseDaVersaoAprovada,
   tipo_de_arquivo_diferente: () => 'O arquivo novo precisa ser do mesmo tipo do que sai.',
   entrada_invalida: () => 'Os dados do envio não foram aceitos. Confira os campos e os arquivos e envie de novo.',
 }

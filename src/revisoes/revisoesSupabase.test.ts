@@ -84,3 +84,66 @@ test('etapa que já não existe vira o aviso de cadastro inexistente', async () 
   const falha = await criar(cliente).concluirRevisaoInterna('a3', DADOS, null).catch((erro: unknown) => erro)
   expect(falha).toBeInstanceOf(CadastroInexistente)
 })
+
+const DADOS_DA_APROVACAO = { numeroEprotocolo: 'PROT-1', link: null, aprovadaEm: '2026-10-13' }
+
+function clienteQueRecusaAAprovacao(erro: { message: string; code?: string }) {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['rpc.concluir_aprovacao'] = { data: null, error: erro }
+  return cliente
+}
+
+test('lerAprovacao lê a aprovação do processo com a versão e quem registrou', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['aprovacoes.select'] = {
+    data: [{ id: 'ap1', numero_eprotocolo: 'PROT-1', link: 'https://eprotocolo.example/a', aprovada_em: '2026-10-13',
+      registrada_em: '2026-10-13T12:00:00Z', versao: { numero: 8 }, registrador: { nome: 'Bia Teste' } }],
+    error: null,
+  }
+  expect(await criar(cliente).lerAprovacao('p1')).toEqual({
+    id: 'ap1', versao: 8, numeroEprotocolo: 'PROT-1', link: 'https://eprotocolo.example/a', aprovadaEm: '2026-10-13',
+    registradaPor: 'Bia Teste', registradaEm: '2026-10-13T12:00:00Z',
+  })
+  expect(cliente.pedidos[0]).toMatchObject({ tabela: 'aprovacoes', filtros: [['processo_id', 'p1']] })
+})
+
+test('sem aprovação, lerAprovacao devolve null', async () => {
+  expect(await criar(new ClienteSupabaseFalso()).lerAprovacao('p1')).toBeNull()
+})
+
+test('falha ao ler a aprovação vira erro com o processo e o motivo do banco', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['aprovacoes.select'] = { data: null, error: { message: 'sem conexão' } }
+  await expect(criar(cliente).lerAprovacao('p1')).rejects.toThrow('Falha ao ler a aprovação do processo p1: sem conexão')
+})
+
+test('concluirAprovacao chama a função do banco com o andamento, os três campos e o responsável', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  await criar(cliente).concluirAprovacao('a5', DADOS_DA_APROVACAO, 'u2')
+  expect(cliente.pedidos).toEqual([{
+    tabela: 'rpc', operacao: 'concluir_aprovacao',
+    valores: { p_andamento: 'a5', p_numero: 'PROT-1', p_link: null, p_data: '2026-10-13', p_responsavel: 'u2' },
+  }])
+})
+
+test.each([
+  ['versao_incompleta:8:relatorio', 'A V8 está sem relatório.'],
+  ['link_invalido', 'O link do E-protocolo precisa começar com http:// ou https://.'],
+  ['aprovacao_antes_da_revisao:2026-10-12:2026-10-13',
+    'A data da aprovação (12/10/2026) não pode ser antes da última revisão interna (13/10/2026).'],
+  ['sem_aprovacao:8', 'A V8 ainda não tem aprovação registrada. Conclua a Aprovação pelo setor pela janela de concluir.'],
+])('a recusa %s do banco vira a frase da tela', async (codigo, frase) => {
+  const falha = await criar(clienteQueRecusaAAprovacao({ message: codigo, code: 'P0001' }))
+    .concluirAprovacao('a5', DADOS_DA_APROVACAO, null).catch((erro: unknown) => erro)
+  expect(falha).toBeInstanceOf(TravaDoBanco)
+  expect((falha as Error).message).toBe(frase)
+})
+
+test('falta de privilégio na aprovação vira a frase do perfil e etapa que sumiu, o aviso de cadastro inexistente', async () => {
+  const semPermissao = await criar(clienteQueRecusaAAprovacao({ message: 'x', code: '42501' }))
+    .concluirAprovacao('a5', DADOS_DA_APROVACAO, null).catch((erro: unknown) => erro)
+  expect((semPermissao as Error).message).toBe('Seu perfil não permite alterar os processos.')
+  const sumiu = await criar(clienteQueRecusaAAprovacao({ message: 'registro_inexistente', code: 'P0001' }))
+    .concluirAprovacao('a5', DADOS_DA_APROVACAO, null).catch((erro: unknown) => erro)
+  expect(sumiu).toBeInstanceOf(CadastroInexistente)
+})

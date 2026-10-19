@@ -291,3 +291,14 @@ test('depois da substituição o arquivo volta a ficar ok (o banco passa a guard
   await versoes.substituirArquivo({ processoId: 'p1', numero: 1, arquivo: png, novo: NOVO_PNG }, () => {})
   expect((await versoes.conferirArquivos('p1'))[png.id]).toBe('ok')
 })
+
+test('a versão aprovada sai marcada na leitura e recusa a substituição, com a frase do módulo real', async () => {
+  const { versoes, png } = await comUmEnvio()
+  expect((await versoes.listarVersoes('p1'))[0].aprovada).toBeUndefined()
+  versoes.aprovadas.p1 = 1
+  expect((await versoes.listarVersoes('p1'))[0].aprovada).toBe(true)
+  await expect(versoes.substituirArquivo({ processoId: 'p1', numero: 1, arquivo: png, novo: NOVO_PNG }, () => {}))
+    .rejects.toThrow('A versão V1 foi aprovada e seus arquivos não podem ser substituídos.')
+  delete versoes.aprovadas.p1
+  await versoes.substituirArquivo({ processoId: 'p1', numero: 1, arquivo: png, novo: NOVO_PNG }, () => {})
+})

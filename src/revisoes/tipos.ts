@@ -30,4 +30,26 @@ export type ModuloDeRevisoes = {
    * responsável; null: ninguém). Se a conclusão falha, a revisão não fica.
    */
   concluirRevisaoInterna(andamentoId: string, dados: DadosDaRevisao, proximoResponsavelId: string | null): Promise<void>
+  /** A aprovação do processo; null quando ainda não há (ou foi desfeita pela volta de etapa). */
+  lerAprovacao(processoId: string): Promise<Aprovacao | null>
+  /**
+   * Grava a aprovação e conclui a Aprovação pelo setor numa gravação só (a próxima etapa pendente, se houver, entra em
+   * andamento com o responsável; null: ninguém). Se a conclusão falha, a aprovação não fica.
+   */
+  concluirAprovacao(andamentoId: string, dados: DadosDaAprovacao, proximoResponsavelId: string | null): Promise<void>
+}
+
+/** O que a janela de concluir a Aprovação grava; os três campos são opcionais (null: sem), e a data vem em AAAA-MM-DD. */
+export type DadosDaAprovacao = { numeroEprotocolo: string | null; link: string | null; aprovadaEm: string | null }
+
+/** A aprovação registrada do processo; `versao` é o número aprovado (V8) e `registradaPor` o nome de quem a registrou. */
+export type Aprovacao = {
+  id: string
+  versao: number
+  numeroEprotocolo: string | null
+  link: string | null
+  aprovadaEm: string | null
+  /** Nome de quem registrou; null se o usuário não puder ser lido. */
+  registradaPor: string | null
+  registradaEm: string
 }

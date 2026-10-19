@@ -37,6 +37,8 @@ export class ProcessosFalso implements ModuloDeProcessos {
   etapasDoCatalogo: EtapaDoCatalogo[] = []
   /** O histórico de cada processo (pelo id do processo), do mais recente para o mais antigo. */
   historicoDosProcessos: Record<string, EventoDoCadastro[]> = {}
+  /** Chamado ao fim de cada volta de etapa, com o processo e o código da etapa reaberta (a falsa de revisões desfaz a aprovação). */
+  aoVoltar: ((processoId: string, etapaCodigo: string) => void) | null = null
   /** Sigla e nome que o banco juntaria ao cartão (pelo id do setor e do macroprocesso). */
   siglasDosSetores: Record<string, string> = {}
   nomesDosMacroprocessos: Record<string, string> = {}
@@ -78,6 +80,7 @@ export class ProcessosFalso implements ModuloDeProcessos {
     this.chamadas.push({ acao: 'voltar', id, nota: motivo, usuarioId })
     this.aplicar(id, (etapas) => voltarEtapas(etapas, id, HOJE))
     this.porResponsavel(id, usuarioId)
+    this.aoVoltar?.(this.processoDaEtapa(id).id, etapa.codigo)
   }
 
   async suspenderProcesso(id: string, motivo: string): Promise<void> {

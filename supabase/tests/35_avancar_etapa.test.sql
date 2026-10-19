@@ -128,6 +128,7 @@ insert into _tap (linha) select is(
     and entidade_ref like '%:' || pg_temp.andamento('Processo Realizada', 'modelagem')::text),
   1, 'um evento de realizada anteriormente');
 
+-- (Desde o ticket 03 de revisoes-aprovacao, concluir a Aprovação exige aprovação: aqui ela entra como "realizada anteriormente".)
 -- Processo Ultima: a opcional depois da última obrigatória também inicia; concluir a última não inicia nada.
 select pg_temp.agir('Processo Ultima', 'modelagem', 'realizada_anteriormente', 'Feita antes');
 select pg_temp.agir('Processo Ultima', 'relatorio_modelagem_tecnica', 'realizada_anteriormente', 'Feita antes');
@@ -135,8 +136,8 @@ select pg_temp.agir('Processo Ultima', 'revisao_interna', 'realizada_anteriormen
 select pg_temp.agir('Processo Ultima', 'revisao_setor', 'realizada_anteriormente', 'Feita antes');
 select pg_temp.agir('Processo Ultima', 'aprovacao_setor', 'em_andamento');
 insert into _tap (linha) select lives_ok(
-  $sql$select pg_temp.avancar('Processo Ultima', 'aprovacao_setor', 'concluir', null,
-    '00000000-0000-0000-0000-0000000000a1')$sql$, 'concluir a 5 com a opcional pendente');
+  $sql$select pg_temp.avancar('Processo Ultima', 'aprovacao_setor', 'realizada_anteriormente', 'Aprovada antes da plataforma',
+    '00000000-0000-0000-0000-0000000000a1')$sql$, 'resolver a 5 com a opcional pendente');
 insert into _tap (linha) select is(pg_temp.status('Processo Ultima', 'publicacao'),
   'em_andamento'::public.status_da_etapa, 'a opcional entra em andamento como qualquer outra');
 insert into _tap (linha) select is(pg_temp.responsavel('Processo Ultima', 'publicacao'),

@@ -27,6 +27,8 @@ export type Versao = {
   observacao: string | null
   /** Na ordem dos papéis (.bpmn, .png, .bpm, relatório). */
   arquivos: ArquivoDaVersao[]
+  /** Verdadeiro na versão que o setor aprovou (ADR 0011): ganha o selo "Aprovada" e não tem arquivo substituído. Ausente: não. */
+  aprovada?: boolean
 }
 
 /** Um arquivo escolhido no formulário, para um papel. */
