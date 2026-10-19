@@ -649,3 +649,10 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **2026-10-19 · Ocorrência: o usuário pediu menos tickets.** A primeira proposta tinha 8; ficou com 5 (opção B), depois de mostrar o risco de cada junção (caber numa sessão, achar o erro). Sugestão: o `/planejar` lembrar ao `to-tickets` que o custo de cada ciclo (executar, polir, ship) pesa para o usuário, para a primeira proposta já vir mais enxuta.
 - **2026-10-19 · Ocorrência: o shell travou de novo com um texto em linha cheio de aspas** (`unexpected EOF`); os tickets foram gravados com a ferramenta de arquivo. Sem efeito no protocolo.
 - **2026-10-19 · Ocorrência: o aviso do claude-mem (cota esgotada) apareceu no início da sessão**; a sessão seguiu sem ele.
+
+## 2026-10-19 — /executar-complexo do ticket 16 de processos-etapas (a janela do verso)
+
+- **2026-10-19 · Ocorrência: o comando rodou na mesma sessão do `/planejar`, no Opus**, porque o usuário o chamou aqui; a tabela do funil recomenda o Sonnet. O aviso foi dado e a execução seguiu, pela regra de precedência (instrução explícita do usuário).
+- **2026-10-19 · Ocorrência: não há Python nesta máquina.** Uma troca de texto em lote por `python` falhou em silêncio (o `&&` seguinte não rodou, mas o `tsc` passou com o arquivo antigo); as trocas foram refeitas com `node -e` e com a ferramenta de edição. Os arquivos com final de linha CRLF fizeram outras trocas por texto não acharem o trecho. Sugestão: o protocolo dizer que os scripts de apoio usam `node`, que o projeto já tem.
+- **2026-10-19 · Ocorrência: as fotos de tela do navegador do app saem atrasadas** (o menu "⋯" e a janela carregando apareceram só na segunda foto, embora o DOM já os tivesse). Conferir pelo DOM antes de concluir que algo não aparece.
+- **2026-10-19 · Ocorrência: o aviso do claude-mem (cota esgotada) apareceu no início da sessão**; a sessão seguiu sem ele.

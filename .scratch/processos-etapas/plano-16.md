@@ -49,7 +49,7 @@
 
 **Produz:** `useFecharAoClicarFora(raiz: RefObject<HTMLElement | null>, aberto: boolean, fechar: () => void): void`; nos testes, `fireEvent.keyDown(elemento, { key: 'Escape' })` passa a fechar a janela de cima, como o navegador.
 
-- [ ] **Passo 1: teste que falha** em `JanelaComCampo.test.tsx`:
+- [x] **Passo 1: teste que falha** em `JanelaComCampo.test.tsx`:
 
 ```tsx
 test('Esc fecha a janela sem gravar, como no navegador', () => {
@@ -63,8 +63,8 @@ test('Esc fecha a janela sem gravar, como no navegador', () => {
 })
 ```
 
-- [ ] **Passo 2:** `npx vitest run src/components/JanelaComCampo.test.tsx`: falha, porque `aoFechar` não é chamado.
-- [ ] **Passo 3:** acrescentar a `configurarTestes.ts`, dentro do `if` que já existe:
+- [x] **Passo 2:** `npx vitest run src/components/JanelaComCampo.test.tsx`: falha, porque `aoFechar` não é chamado.
+- [x] **Passo 3:** acrescentar a `configurarTestes.ts`, dentro do `if` que já existe:
 
 ```ts
   // Esc no navegador: a janela de cima recebe "cancel", que pode ser impedido; se não for, ela fecha.
@@ -77,9 +77,9 @@ test('Esc fecha a janela sem gravar, como no navegador', () => {
   })
 ```
 
-- [ ] **Passo 4:** mover `useFecharAoClicarFora` de `MenuDaConta.tsx` para `src/hooks/useFecharAoClicarFora.ts`, exportado, com o comentário que já tem e o tipo `RefObject<HTMLElement | null>`, e importá-lo em `MenuDaConta.tsx`.
-- [ ] **Passo 5:** `npm test` e `npm run lint`: tudo verde (os testes do menu da conta cobrem o hook movido).
-- [ ] **Passo 6:** commit "Ticket 16 de processos-etapas: Esc no dialog dos testes e hook de clique fora".
+- [x] **Passo 4:** mover `useFecharAoClicarFora` de `MenuDaConta.tsx` para `src/hooks/useFecharAoClicarFora.ts`, exportado, com o comentário que já tem e o tipo `RefObject<HTMLElement | null>`, e importá-lo em `MenuDaConta.tsx`.
+- [x] **Passo 5:** `npm test` e `npm run lint`: tudo verde (os testes do menu da conta cobrem o hook movido).
+- [x] **Passo 6:** commit "Ticket 16 de processos-etapas: Esc no dialog dos testes e hook de clique fora".
 
 ### Tarefa 2: o menu "⋯" comum
 
@@ -104,7 +104,7 @@ Comportamento (padrão de menu da WAI-ARIA, com os textos da spec "Menu '⋯' do
 - escolher um item fecha o menu, devolve o foco ao botão e chama `aoEscolher` (a janela nativa que ele abrir devolve o foco ao botão ao fechar);
 - item `perigoso` com a classe `menu-de-acoes-perigoso` (vermelho de `--atraso-texto`).
 
-- [ ] **Passo 1: testes que falham** em `MenuDeAcoes.test.tsx`, um por comportamento acima. Exemplos:
+- [x] **Passo 1: testes que falham** em `MenuDeAcoes.test.tsx`, um por comportamento acima. Exemplos:
 
 ```tsx
 const GRUPOS = (escolhido: (rotulo: string) => void): ItemDoMenu[][] => [
@@ -140,11 +140,11 @@ test('seta para cima no botão abre com o foco no último item', () => { /* Excl
 test('o item perigoso tem a marca de perigo', () => { /* classe menu-de-acoes-perigoso no Excluir */ })
 ```
 
-- [ ] **Passo 2:** `npx vitest run src/components/MenuDeAcoes.test.tsx`: falha (módulo inexistente).
-- [ ] **Passo 3:** em `Icone.tsx`, o desenho `reticencias`: `<><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></>`.
-- [ ] **Passo 4:** `MenuDeAcoes.tsx` com o botão, a lista (`ListaDoMenu`, que foca o primeiro ou o último item ao montar) e a navegação numa função pura de índice (`proximoIndice(tecla, atual, total): number | null`), para ficar abaixo da complexidade 10. `MenuDeAcoes.css`: `.menu-de-acoes { position: relative }`; lista absoluta, alinhada à direita do botão, `min-width: 200px`, fundo `--folha`, borda `--linha`, `--canto`, `--sombra-flutuante`, `padding: var(--esp-1) 0`; item com altura mínima de 32 px, `padding: 0 var(--esp-4)`, alinhado à esquerda, fundo `--azul-claro` no foco e no hover; separador de 1 px em `--linha` com `margin: var(--esp-1) 0`.
-- [ ] **Passo 5:** `npm test` e `npm run lint`: verdes.
-- [ ] **Passo 6:** commit "Ticket 16 de processos-etapas: menu ⋯ comum".
+- [x] **Passo 2:** `npx vitest run src/components/MenuDeAcoes.test.tsx`: falha (módulo inexistente).
+- [x] **Passo 3:** em `Icone.tsx`, o desenho `reticencias`: `<><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></>`.
+- [x] **Passo 4:** `MenuDeAcoes.tsx` com o botão, a lista (`ListaDoMenu`, que foca o primeiro ou o último item ao montar) e a navegação numa função pura de índice (`proximoIndice(tecla, atual, total): number | null`), para ficar abaixo da complexidade 10. `MenuDeAcoes.css`: `.menu-de-acoes { position: relative }`; lista absoluta, alinhada à direita do botão, `min-width: 200px`, fundo `--folha`, borda `--linha`, `--canto`, `--sombra-flutuante`, `padding: var(--esp-1) 0`; item com altura mínima de 32 px, `padding: 0 var(--esp-4)`, alinhado à esquerda, fundo `--azul-claro` no foco e no hover; separador de 1 px em `--linha` com `margin: var(--esp-1) 0`.
+- [x] **Passo 5:** `npm test` e `npm run lint`: verdes.
+- [x] **Passo 6:** commit "Ticket 16 de processos-etapas: menu ⋯ comum".
 
 ### Tarefa 3: a cor de cada macroprocesso
 
@@ -154,9 +154,9 @@ test('o item perigoso tem a marca de perigo', () => { /* classe menu-de-acoes-pe
 
 Decisão de implementação (registrar no `desvios.md` na Tarefa 7): o banco não guarda cor de macroprocesso e o ticket não muda o banco. A cor sai do id, sempre a mesma para o mesmo macroprocesso, entre as seis cores de macroprocesso dos tokens. Se o usuário quiser escolher a cor de cada um, isso é uma coluna nova num ticket próprio.
 
-- [ ] **Passo 1: testes que falham:** o mesmo id dá sempre a mesma cor; toda cor devolvida é uma das seis (`--macro-violeta`, `--macro-ciano`, `--macro-magenta`, `--macro-indigo`, `--macro-oliva` e `--macro-cobre`); ids diferentes de uma amostra de 12 usam ao menos 4 cores.
-- [ ] **Passo 2:** `npx vitest run src/processos/corDoMacroprocesso.test.ts`: falha.
-- [ ] **Passo 3:** implementar com a soma dos códigos dos caracteres do id, módulo 6:
+- [x] **Passo 1: testes que falham:** o mesmo id dá sempre a mesma cor; toda cor devolvida é uma das seis (`--macro-violeta`, `--macro-ciano`, `--macro-magenta`, `--macro-indigo`, `--macro-oliva` e `--macro-cobre`); ids diferentes de uma amostra de 12 usam ao menos 4 cores.
+- [x] **Passo 2:** `npx vitest run src/processos/corDoMacroprocesso.test.ts`: falha.
+- [x] **Passo 3:** implementar com a soma dos códigos dos caracteres do id, módulo 6:
 
 ```ts
 // O banco não guarda cor de macroprocesso: a cor sai do id, sempre a mesma, entre as seis da identidade (sem as de situação).
@@ -169,7 +169,7 @@ export function corDoMacroprocesso(id: string): string {
 }
 ```
 
-- [ ] **Passo 4:** testes e lint verdes; commit "Ticket 16 de processos-etapas: cor do macroprocesso".
+- [x] **Passo 4:** testes e lint verdes; commit "Ticket 16 de processos-etapas: cor do macroprocesso".
 
 ### Tarefa 4: a casca da janela
 
@@ -182,13 +182,13 @@ type JanelaDoVersoProps = { rotulo: string; estreita?: boolean; aoFechar: () => 
 export function JanelaDoVerso(props: JanelaDoVersoProps): JSX.Element
 ```
 
-- [ ] **Passo 1: testes que falham** em `JanelaDoVerso.test.tsx`:
+- [x] **Passo 1: testes que falham** em `JanelaDoVerso.test.tsx`:
   - abre com `showModal` (espiar `HTMLDialogElement.prototype.showModal` com `vi.spyOn`) e é um `dialog` com o nome do `rotulo`;
   - Esc chama `aoFechar` e a janela continua montada (quem fecha é o endereço);
   - o Esc de uma `JanelaComCampo` aberta dentro dela fecha só a de dentro (`aoFechar` do verso não é chamado);
   - `estreita` põe a classe `verso-estreita`.
-- [ ] **Passo 2:** `npx vitest run src/components/processos/JanelaDoVerso.test.tsx`: falha.
-- [ ] **Passo 3:** implementar:
+- [x] **Passo 2:** `npx vitest run src/components/processos/JanelaDoVerso.test.tsx`: falha.
+- [x] **Passo 3:** implementar:
 
 ```tsx
 // <dialog> modal (ADR 0003): o navegador escurece o fundo, deixa o resto da página inerte e prende o Tab dentro dela.
@@ -212,7 +212,7 @@ export function JanelaDoVerso({ rotulo, estreita = false, aoFechar, children }: 
 }
 ```
 
-- [ ] **Passo 4:** tokens novos em `tokens.css`: `--fundo-contexto: #f7f8fb` (o "levemente cinza" da coluna direita) e `--tam-verso-titulo: 19px`. `Verso.css`, com os valores da spec:
+- [x] **Passo 4:** tokens novos em `tokens.css`: `--fundo-contexto: #f7f8fb` (o "levemente cinza" da coluna direita) e `--tam-verso-titulo: 19px`. `Verso.css`, com os valores da spec:
 
 ```css
 /* O verso do cartão (spec, "Verso do cartão"): janela central de até cerca de 880 px, 60% e 40%, uma só rolagem. */
@@ -247,7 +247,7 @@ export function JanelaDoVerso({ rotulo, estreita = false, aoFechar, children }: 
 ```
 
   As classes do cabeçalho, das colunas e do carregando entram na Tarefa 5.
-- [ ] **Passo 5:** testes e lint verdes; commit "Ticket 16 de processos-etapas: casca da janela do verso".
+- [x] **Passo 5:** testes e lint verdes; commit "Ticket 16 de processos-etapas: casca da janela do verso".
 
 ### Tarefa 5: o verso no lugar do painel (critérios 1 a 8 do ticket 16)
 
@@ -284,7 +284,7 @@ Desenho (spec, "Verso do cartão"):
 - **`AreaDeProcessos`:** troca `PainelDoProcesso` por `VersoDoCartao` e tira a classe `quadro-esmaecido` (o `::backdrop` já escurece; deixar os dois escurece demais), mantendo o `inert` e a volta do foco ao cartão ou à linha.
 - **`Painel.css`:** sai o que era do painel lateral e das abas (`.painel`, `painel-entra`, `.painel-barra`, `.painel-cabecalho`, `.painel-sigla`, `.painel-identificacao`, `.painel-titulo`, `.painel-macroprocesso`, `.painel-fechar`, `.painel-abas`, `.painel-aba`, `.painel-corpo`, `.painel-acoes`, `.quadro-esmaecido`), depois de conferir com o grep que nenhum outro componente usa essas classes.
 
-- [ ] **Passo 1: testes novos que falham** em `App.versoDoCartao.test.tsx`, com o mesmo `montar` e os mesmos dados inventados do `App.painelDoProcesso.test.tsx` (copiar o `PROCESSO`, o `EVENTO` e o `montar`), um caso por critério 1 a 7 do ticket 16:
+- [x] **Passo 1: testes novos que falham** em `App.versoDoCartao.test.tsx`, com o mesmo `montar` e os mesmos dados inventados do `App.painelDoProcesso.test.tsx` (copiar o `PROCESSO`, o `EVENTO` e o `montar`), um caso por critério 1 a 7 do ticket 16:
   - abre pelo cartão (clique no link `cartao-p1` a partir de `#/processos`), pela linha da Lista e pelo endereço; o caminho pela tela do setor continua coberto por `App.processosDoSetor`;
   - fecha pelo "Fechar o processo" e por Esc, com o endereço `#/processos` e o foco de volta em `cartao-p1` (na Lista, em `linha-p1`);
   - pai e subprocesso abrem na mesma janela, com o endereço e o nome do diálogo mudando;
@@ -293,11 +293,11 @@ Desenho (spec, "Verso do cartão"):
   - menu: os três grupos com os itens de cada situação; só Histórico para a Consulta; Histórico abre o modo histórico com "← Voltar ao processo"; Editar abre o formulário e Cancelar volta; Suspender abre a janela do motivo e grava; Excluir abre a confirmação, e confirmar fecha o verso;
   - falha de uma ação do menu aparece abaixo do cabeçalho em `role="alert"`;
   - estados: carregando ("Carregando processo…" em `role="status"`, com o diálogo já aberto), erro com [Tentar de novo] e excluído com [Voltar].
-- [ ] **Passo 2:** `npx vitest run src/App.versoDoCartao.test.tsx`: falha.
-- [ ] **Passo 3:** criar `CabecalhoDoVerso.tsx`, refazer `AcoesDoProcesso.tsx`, `AcoesDeSituacao.tsx` e `AcoesDeReclassificacao.tsx` e criar `VersoDoCartao.tsx` (`VersoDoCartao`, `ConteudoDoVerso` para os estados, `ProcessoAberto` para os modos e `ColunasDoVerso` para as seções), cada função abaixo de 20 linhas.
-- [ ] **Passo 4:** `AreaDeProcessos.tsx` e as folhas de estilo, como descrito acima.
-- [ ] **Passo 5:** `npx vitest run src/App.versoDoCartao.test.tsx`: passa.
-- [ ] **Passo 6: ajustar os testes antigos** (critério 8 do ticket 16), sem mudar o que cada um prova:
+- [x] **Passo 2:** `npx vitest run src/App.versoDoCartao.test.tsx`: falha.
+- [x] **Passo 3:** criar `CabecalhoDoVerso.tsx`, refazer `AcoesDoProcesso.tsx`, `AcoesDeSituacao.tsx` e `AcoesDeReclassificacao.tsx` e criar `VersoDoCartao.tsx` (`VersoDoCartao`, `ConteudoDoVerso` para os estados, `ProcessoAberto` para os modos e `ColunasDoVerso` para as seções), cada função abaixo de 20 linhas.
+- [x] **Passo 4:** `AreaDeProcessos.tsx` e as folhas de estilo, como descrito acima.
+- [x] **Passo 5:** `npx vitest run src/App.versoDoCartao.test.tsx`: passa.
+- [x] **Passo 6: ajustar os testes antigos** (critério 8 do ticket 16), sem mudar o que cada um prova:
   - `screen.findByRole('complementary', { name: 'Painel do processo' })` e os `const painel = ...` locais viram `versoAberto()`;
   - `findByRole('tab', { name: 'Histórico' })` vira `escolherNoMenuDoProcesso('Histórico')`;
   - os cliques nos botões Editar, Excluir, Suspender, Cancelar, Retomar e Reclassificar do processo viram `escolherNoMenuDoProcesso(...)`. Cuidado: o "Cancelar" dos formulários e das janelas continua botão;
@@ -306,21 +306,21 @@ Desenho (spec, "Verso do cartão"):
   - os casos do `App.painelDoProcesso.test.tsx` que continuam valendo (dados, caminho, reunião, versões) vão para `App.versoDoCartao.test.tsx`; o de "pílula Em andamento" sai, substituído pelo do cabeçalho novo. Depois disso, apagar o arquivo antigo.
 
   Rodar `npm test` depois de cada grupo de arquivos ajustados. Se um teste antigo falhar por comportamento (e não pela forma de achar o elemento), parar e investigar antes de mexer no teste.
-- [ ] **Passo 7:** `npm test`, `npm run lint` e `npm run typecheck`: verdes. Conferir com o grep que não sobra "Painel do processo", "Fechar o painel" nem `'complementary'` nos testes de processos.
-- [ ] **Passo 8:** commit "Ticket 16 de processos-etapas: verso do cartão no lugar do painel".
+- [x] **Passo 7:** `npm test`, `npm run lint` e `npm run typecheck`: verdes. Conferir com o grep que não sobra "Painel do processo", "Fechar o painel" nem `'complementary'` nos testes de processos.
+- [x] **Passo 8:** commit "Ticket 16 de processos-etapas: verso do cartão no lugar do painel".
 
 ### Tarefa 6: o Novo processo dentro da janela
 
 **Arquivos:** criar `JanelaDoNovoProcesso.tsx`; alterar `AreaDeProcessos.tsx`, `App.cadastrarProcesso.test.tsx` e `App.versoDoCartao.test.tsx`; apagar `PainelDeNovoProcesso.tsx`.
 
-- [ ] **Passo 1: testes que falham:** [Cadastrar processo] e `#/processos/novo` abrem o diálogo "Novo processo", estreito (classe `verso-estreita`), com o formulário; Esc e Cancelar fecham; cadastrar fecha e recarrega o Quadro, como hoje (abrir o verso do criado é do ticket 19). No `App.cadastrarProcesso.test.tsx`, "Painel do novo processo" vira o diálogo "Novo processo", e o Esc vira `keyDown` com `Escape` no campo de nome.
-- [ ] **Passo 2:** `npx vitest run src/App.cadastrarProcesso.test.tsx src/App.versoDoCartao.test.tsx`: falha.
-- [ ] **Passo 3:** `JanelaDoNovoProcesso` com `JanelaDoVerso rotulo="Novo processo" estreita`, um cabeçalho simples ("Novo processo" em `h2` e o fechar) e o `FormularioDoProcesso` com o título "Cadastrar processo"; `AreaDeProcessos` passa a usá-la. Apagar `PainelDeNovoProcesso.tsx` e o `fecharComEsc.ts` se nada mais o usar (grep).
-- [ ] **Passo 4:** testes, lint e typecheck verdes; commit "Ticket 16 de processos-etapas: novo processo dentro da janela".
+- [x] **Passo 1: testes que falham:** [Cadastrar processo] e `#/processos/novo` abrem o diálogo "Novo processo", estreito (classe `verso-estreita`), com o formulário; Esc e Cancelar fecham; cadastrar fecha e recarrega o Quadro, como hoje (abrir o verso do criado é do ticket 19). No `App.cadastrarProcesso.test.tsx`, "Painel do novo processo" vira o diálogo "Novo processo", e o Esc vira `keyDown` com `Escape` no campo de nome.
+- [x] **Passo 2:** `npx vitest run src/App.cadastrarProcesso.test.tsx src/App.versoDoCartao.test.tsx`: falha.
+- [x] **Passo 3:** `JanelaDoNovoProcesso` com `JanelaDoVerso rotulo="Novo processo" estreita`, um cabeçalho simples ("Novo processo" em `h2` e o fechar) e o `FormularioDoProcesso` com o título "Cadastrar processo"; `AreaDeProcessos` passa a usá-la. Apagar `PainelDeNovoProcesso.tsx` e o `fecharComEsc.ts` se nada mais o usar (grep).
+- [x] **Passo 4:** testes, lint e typecheck verdes; commit "Ticket 16 de processos-etapas: novo processo dentro da janela".
 
 ### Tarefa 7: conferência na tela, desvios e fecho
 
-- [ ] **Passo 1: conferir a tela no navegador do app**, pela vitrine local (`vitrine.local/`, servida pelo `npx vite`; mapa da iniciativa, "Notes") ou pela aplicação de desenvolvimento, nos três `[visual]` do ticket 16:
+- [x] **Passo 1: conferir a tela no navegador do app**, pela vitrine local (`vitrine.local/`, servida pelo `npx vite`; mapa da iniciativa, "Notes") ou pela aplicação de desenvolvimento, nos três `[visual]` do ticket 16:
   - a janela de 880 px, as colunas 60% e 40% e o fundo da direita;
   - o cabeçalho fixo ao rolar, com uma só rolagem;
   - as pílulas só fora do normal;
@@ -330,7 +330,7 @@ Desenho (spec, "Verso do cartão"):
   - o foco visível ao navegar com o Tab.
 
   O que ficar feio ou difícil de usar se corrige aqui, com teste quando for comportamento. Desenho e facilidade de uso são a prioridade.
-- [ ] **Passo 2:** registrar em `.scratch/processos-etapas/desvios.md` (entrada nova, datada) a cor do macroprocesso saída do id (Tarefa 3), o fim do esmaecido duplicado e qualquer outra diferença em relação ao ticket.
-- [ ] **Passo 3:** itens de `.claude/regras/nao-testados.md` (blocos `/executar-complexo` e "Qualquer momento") que aconteceram nesta execução vão para `.scratch/melhorias-protocolo.md`.
-- [ ] **Passo 4:** `npm test`, `npm run lint` e `npm run typecheck` verdes; commit "Ticket 16 de processos-etapas: desvios e conferência da tela".
-- [ ] **Passo 5:** `git switch main`, merge de `processos-etapas-16`, `git branch -d processos-etapas-16`, linha `Concluído em` no ticket 16, commit e envio da `main` (Ajustes deste Projeto).
+- [x] **Passo 2:** registrar em `.scratch/processos-etapas/desvios.md` (entrada nova, datada) a cor do macroprocesso saída do id (Tarefa 3), o fim do esmaecido duplicado e qualquer outra diferença em relação ao ticket.
+- [x] **Passo 3:** itens de `.claude/regras/nao-testados.md` (blocos `/executar-complexo` e "Qualquer momento") que aconteceram nesta execução vão para `.scratch/melhorias-protocolo.md`.
+- [x] **Passo 4:** `npm test`, `npm run lint` e `npm run typecheck` verdes; commit "Ticket 16 de processos-etapas: desvios e conferência da tela".
+- [x] **Passo 5:** `git switch main`, merge de `processos-etapas-16`, `git branch -d processos-etapas-16`, linha `Concluído em` no ticket 16, commit e envio da `main` (Ajustes deste Projeto).
