@@ -20,3 +20,5 @@
 - [x] Testes de interface com o aplicativo inteiro cobrindo os itens acima.
 - [x] `[visual]` Nos arquivos, a versão mais recente se lê numa linha ("V2 · 02/10 · falta relatório"), com os botões dos arquivos com a barrinha de cor do tipo e o espaço tracejado do arquivo que falta no lugar dele.
 - [x] `[visual]` As pílulas têm cor e texto, nunca só cor.
+
+Concluído em 2026-10-19 (commit e818622)
