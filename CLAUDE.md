@@ -146,6 +146,10 @@ Decidido em 2026-10-13. `git push` da `main` para o GitHub (`origin`) não preci
 
 Decidido em 2026-10-17. Os marcos (`marco/*`) também vão ao GitHub sem pedir aprovação: envie cada marco novo logo depois de criá-lo, ou junto com a `main` (`git push origin "refs/tags/marco/*:refs/tags/marco/*"`). Só os marcos; nunca apagar nem sobrescrever uma etiqueta que já está no GitHub.
 
+### Sem linha de custo
+
+Decidido em 2026-10-20. Este projeto não registra mais custo: não peça o `/cost` nem o `/usage` ao fim das etapas (inclusive no passo 11 do `/ship`) e não acrescente linhas em `.scratch/custos.md`. Isso vale no lugar da regra "Custo" de "Registros do Projeto" e do pedido do `/cost` em "Funil de Trabalho". As linhas já gravadas ficam como estão. O `/ship` segue sem o passo 11 e grava a marca de entrega normalmente.
+
 ### Agent skills
 
 Configuração das skills do Matt Pocock, gravada pelo `setup-matt-pocock-skills` em 2026-10-06 (o bloco fica aqui porque o protocolo só permite alterar esta seção).
