@@ -10,7 +10,9 @@ export const FRASE_DA_CORRIGIDA_SEM_VERSAO_DO_REVISOR =
 export const FRASE_DA_CORRIGIDA_SEM_ANTERIOR = 'Não há versão anterior para corrigir.'
 export const FRASE_DO_ESCOPO_OBRIGATORIO = 'Escolha o escopo da correção.'
 export const FRASE_DO_ESCOPO_SO_NA_CORRIGIDA = 'O escopo só vale na revisão corrigida.'
-export const FRASE_DA_REVISAO_FORA_DA_ETAPA = 'A revisão só pode ser registrada com a Revisão interna em andamento.'
+/** O registro que a pessoa editava já não existe (a aprovação desfeita por uma volta de etapa, por exemplo). */
+export const FRASE_DO_REGISTRO_QUE_SUMIU = 'Este registro não existe mais. Feche a janela e confira a gaveta da etapa.'
+export const FRASE_DA_REVISAO_FORA_DA_ETAPA ='A revisão só pode ser registrada com a Revisão interna em andamento.'
 
 /** Concluir a Revisão interna por outro caminho que não a janela: o banco recusa a versão sem revisão. */
 export function fraseDaVersaoSemRevisao(numero: number | string): string {

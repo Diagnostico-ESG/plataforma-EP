@@ -147,3 +147,75 @@ test('falta de privilégio na aprovação vira a frase do perfil e etapa que sum
     .concluirAprovacao('a5', DADOS_DA_APROVACAO, null).catch((erro: unknown) => erro)
   expect(sumiu).toBeInstanceOf(CadastroInexistente)
 })
+
+// ---- Editar a revisão e a aprovação (ticket 04)
+
+function clienteQueGrava(tabela: 'revisoes_internas' | 'aprovacoes') {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas[`${tabela}.update`] = { data: [{ id: 'x1' }], error: null }
+  return cliente
+}
+
+function clienteQueRecusaAEdicao(tabela: 'revisoes_internas' | 'aprovacoes', erro: { message: string; code?: string }) {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas[`${tabela}.update`] = { data: null, error: erro }
+  return cliente
+}
+
+test('editarRevisao altera só o escopo e o comentário da revisão pelo id', async () => {
+  const cliente = clienteQueGrava('revisoes_internas')
+  await criar(cliente).editarRevisao('r1', { escopo: 'relatorio', comentario: null })
+  expect(cliente.pedidos).toEqual([{
+    tabela: 'revisoes_internas', operacao: 'update', valores: { escopo: 'relatorio', comentario: null },
+    colunas: 'id', filtro: ['id', 'r1'], filtros: [['id', 'r1']],
+  }])
+})
+
+test('editarAprovacao altera o número, o link e a data da aprovação pelo id', async () => {
+  const cliente = clienteQueGrava('aprovacoes')
+  await criar(cliente).editarAprovacao('ap1', { numeroEprotocolo: 'PROT-9', link: null, aprovadaEm: '2026-10-13' })
+  expect(cliente.pedidos).toEqual([{
+    tabela: 'aprovacoes', operacao: 'update',
+    valores: { numero_eprotocolo: 'PROT-9', link: null, aprovada_em: '2026-10-13' },
+    colunas: 'id', filtro: ['id', 'ap1'], filtros: [['id', 'ap1']],
+  }])
+})
+
+test.each([
+  ['revisoes_internas', 'escopo_obrigatorio', 'Escolha o escopo da correção.'],
+  ['revisoes_internas', 'escopo_so_na_corrigida', 'O escopo só vale na revisão corrigida.'],
+  ['revisoes_internas', 'processo_parado:suspenso', 'Este processo está suspenso; retome-o para registrar o andamento.'],
+  ['aprovacoes', 'link_invalido', 'O link do E-protocolo precisa começar com http:// ou https://.'],
+  ['aprovacoes', 'data_no_futuro:2026-10-20', 'A data 20/10/2026 está no futuro.'],
+  ['aprovacoes', 'aprovacao_antes_da_revisao:2026-10-12:2026-10-13',
+    'A data da aprovação (12/10/2026) não pode ser antes da última revisão interna (13/10/2026).'],
+] as const)('a recusa %s de %s na edição vira a frase da tela', async (tabela, codigo, frase) => {
+  const cliente = clienteQueRecusaAEdicao(tabela, { message: codigo, code: 'P0001' })
+  const modulo = criar(cliente)
+  const falha = await (tabela === 'aprovacoes'
+    ? modulo.editarAprovacao('ap1', { numeroEprotocolo: null, link: null, aprovadaEm: null })
+    : modulo.editarRevisao('r1', { escopo: null, comentario: null })).catch((erro: unknown) => erro)
+  expect(falha).toBeInstanceOf(TravaDoBanco)
+  expect((falha as Error).message).toBe(frase)
+})
+
+test('falta de privilégio na edição vira a frase do perfil', async () => {
+  const cliente = clienteQueRecusaAEdicao('aprovacoes', { message: 'permission denied', code: '42501' })
+  const falha = await criar(cliente).editarAprovacao('ap1', { numeroEprotocolo: null, link: null, aprovadaEm: null })
+    .catch((erro: unknown) => erro)
+  expect((falha as Error).message).toBe('Seu perfil não permite alterar os processos.')
+})
+
+test('nenhuma linha alterada com o registro ainda legível é falta de permissão (a política filtrou)', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['revisoes_internas.select'] = { data: [{ id: 'r1' }], error: null }
+  const falha = await criar(cliente).editarRevisao('r1', { escopo: null, comentario: 'x' }).catch((erro: unknown) => erro)
+  expect(falha).toBeInstanceOf(TravaDoBanco)
+  expect((falha as Error).message).toBe('Seu perfil não permite alterar os processos.')
+})
+
+test('nenhuma linha alterada e o registro ilegível é cadastro inexistente (sumiu)', async () => {
+  const falha = await criar(new ClienteSupabaseFalso())
+    .editarAprovacao('ap1', { numeroEprotocolo: 'PROT-9', link: null, aprovadaEm: null }).catch((erro: unknown) => erro)
+  expect(falha).toBeInstanceOf(CadastroInexistente)
+})

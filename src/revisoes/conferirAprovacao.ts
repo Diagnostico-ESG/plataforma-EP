@@ -14,6 +14,11 @@ export function conferirAprovacao(dados: DadosDaAprovacao, { jaAprovado, ultima,
   if (jaAprovado) throw new TravaDoBanco(FRASE_DO_PROCESSO_JA_APROVADO)
   const incompleta = fraseDoBloqueioDaConclusao(ultima)
   if (incompleta !== null) throw new TravaDoBanco(incompleta)
+  conferirLinkEData(dados, ultimaRevisao, hoje)
+}
+
+/** O link e a data da aprovação, conferidos na conclusão e de novo na edição (o banco usa as mesmas funções nos dois). */
+export function conferirLinkEData(dados: DadosDaAprovacao, ultimaRevisao: string | null, hoje: string): void {
   if (dados.link !== null && !/^https?:\/\/.+/i.test(dados.link)) throw new TravaDoBanco(FRASE_DO_LINK_INVALIDO)
   const data = dados.aprovadaEm
   if (data === null) return

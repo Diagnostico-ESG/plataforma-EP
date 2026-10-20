@@ -1,21 +1,31 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
+import type { EventoDoCadastro } from '../cadastros/tipos'
 import type { ProcessosFalso } from '../processos/ProcessosFalso'
+import { conferirProcessoEmAndamento } from '../processos/situacaoFalso'
 import type { ProcessoLido, UltimaVersao, UsuarioResponsavel } from '../processos/tipos'
 import { FRASE_DO_ESCOPO_OBRIGATORIO, FRASE_DO_ESCOPO_SO_NA_CORRIGIDA } from './frasesDeRevisao'
 import { opcoesDaRevisao } from './opcoesDaRevisao'
 import { eventoDaAprovacao } from './eventoDaAprovacao'
+import { eventoDaRevisaoEditada } from './eventoDaRevisao'
 import type { VersoesFalso } from '../versoes/VersoesFalso'
-import { conferirAprovacao, voltaDesfazAprovacao } from './conferirAprovacao'
-import type { Aprovacao, DadosDaAprovacao, DadosDaRevisao, ModuloDeRevisoes, RevisaoInterna } from './tipos'
+import { conferirAprovacao, conferirLinkEData, voltaDesfazAprovacao } from './conferirAprovacao'
+import type {
+  Aprovacao, DadosDaAprovacao, DadosDaEdicaoDaRevisao, DadosDaRevisao, ModuloDeRevisoes, RevisaoInterna,
+} from './tipos'
 
 // O mesmo dia fixo da falsa de processos: os testes de tela não dependem da data em que rodam.
 const HOJE = '2026-10-13'
 
+/** O escopo só vale na "corrigida" e lá é obrigatório: o banco o confere na conclusão e na edição. */
+function conferirEscopo(resultado: DadosDaRevisao['resultado'], escopo: DadosDaRevisao['escopo']): void {
+  if (resultado === 'sem_alteracao' && escopo !== null) throw new TravaDoBanco(FRASE_DO_ESCOPO_SO_NA_CORRIGIDA)
+  if (resultado === 'corrigida' && escopo === null) throw new TravaDoBanco(FRASE_DO_ESCOPO_OBRIGATORIO)
+}
+
 /** As recusas do banco para a revisão: escopo e quem pode revisar a versão mais recente (as regras de opcoesDaRevisao). */
 function conferirRevisao(ultima: UltimaVersao | null, usuarioId: string, dados: DadosDaRevisao): void {
-  if (dados.resultado === 'sem_alteracao' && dados.escopo !== null) throw new TravaDoBanco(FRASE_DO_ESCOPO_SO_NA_CORRIGIDA)
-  if (dados.resultado === 'corrigida' && dados.escopo === null) throw new TravaDoBanco(FRASE_DO_ESCOPO_OBRIGATORIO)
+  conferirEscopo(dados.resultado, dados.escopo)
   const opcoes = opcoesDaRevisao(ultima, usuarioId)
   const opcao = dados.resultado === 'corrigida' ? opcoes.corrigida : opcoes.semAlteracao
   if (!opcao.disponivel) throw new TravaDoBanco(opcao.motivo ?? opcoes.bloqueio ?? '')
@@ -71,10 +81,7 @@ export class RevisoesFalso implements ModuloDeRevisoes {
   }
 
   async concluirRevisaoInterna(andamentoId: string, dados: DadosDaRevisao, responsavelId: string | null): Promise<void> {
-    if (this.falhaNaGravacao !== null) {
-      throw typeof this.falhaNaGravacao === 'string' ? new Error(this.falhaNaGravacao) : this.falhaNaGravacao
-    }
-    if (this.segurarGravacao) await new Promise<never>(() => {})
+    await this.esperarAGravacao()
     const processo = this.processoDaEtapa(andamentoId)
     conferirRevisao(processo.ultimaVersao, this.usuario.id, dados)
     // Conclui primeiro: a recusa da conclusão (responsável, processo parado) não deixa a revisão, como no banco.
@@ -84,18 +91,61 @@ export class RevisoesFalso implements ModuloDeRevisoes {
   }
 
   async concluirAprovacao(andamentoId: string, dados: DadosDaAprovacao, responsavelId: string | null): Promise<void> {
-    if (this.falhaNaGravacao !== null) {
-      throw typeof this.falhaNaGravacao === 'string' ? new Error(this.falhaNaGravacao) : this.falhaNaGravacao
-    }
-    if (this.segurarGravacao) await new Promise<never>(() => {})
+    await this.esperarAGravacao()
     const processo = this.processoDaEtapa(andamentoId)
-    const ultimaRevisao = (this.revisoes[processo.id] ?? []).map((revisao) => revisao.revisadaEm).sort().pop() ?? null
     conferirAprovacao(dados, {
-      jaAprovado: processo.id in this.aprovacoes, ultima: processo.ultimaVersao, ultimaRevisao, hoje: HOJE,
+      jaAprovado: processo.id in this.aprovacoes, ultima: processo.ultimaVersao, ultimaRevisao: this.ultimaRevisaoDe(processo.id),
+      hoje: HOJE,
     })
     // Conclui primeiro: a recusa da conclusão (processo parado, responsável) não deixa a aprovação, como no banco.
     await (this.processos as ProcessosFalso).concluirEtapa(andamentoId, responsavelId)
     this.aprovacaoConcluida(andamentoId, processo, dados, responsavelId)
+  }
+
+  async editarRevisao(revisaoId: string, dados: DadosDaEdicaoDaRevisao): Promise<void> {
+    await this.esperarAGravacao()
+    const processo = this.processoDoRegistro((id) => (this.revisoes[id] ?? []).some((revisao) => revisao.id === revisaoId))
+    const antes = this.revisoes[processo.id].find((revisao) => revisao.id === revisaoId) as RevisaoInterna
+    conferirProcessoEmAndamento(processo)
+    conferirEscopo(antes.resultado, dados.escopo)
+    const depois: RevisaoInterna = { ...antes, escopo: dados.escopo, comentario: dados.comentario }
+    this.revisoes[processo.id] = this.revisoes[processo.id].map((revisao) => (revisao.id === revisaoId ? depois : revisao))
+    if (antes.escopo === depois.escopo && antes.comentario === depois.comentario) return
+    this.noHistorico(processo, eventoDaRevisaoEditada(processo, antes, depois, this.usuario.nome))
+  }
+
+  async editarAprovacao(aprovacaoId: string, dados: DadosDaAprovacao): Promise<void> {
+    await this.esperarAGravacao()
+    const processo = this.processoDoRegistro((id) => this.aprovacoes[id]?.id === aprovacaoId)
+    const antes = this.aprovacoes[processo.id]
+    conferirProcessoEmAndamento(processo)
+    conferirLinkEData(dados, this.ultimaRevisaoDe(processo.id), HOJE)
+    const depois: Aprovacao = {
+      ...antes, numeroEprotocolo: dados.numeroEprotocolo, link: dados.link, aprovadaEm: dados.aprovadaEm,
+    }
+    this.aprovacoes[processo.id] = depois
+    const mudou = antes.numeroEprotocolo !== depois.numeroEprotocolo || antes.link !== depois.link || antes.aprovadaEm !== depois.aprovadaEm
+    if (mudou) this.noHistorico(processo, eventoDaAprovacao(processo, 'editar', depois, antes))
+  }
+
+  // Falha e espera programadas pelo teste, antes de qualquer gravação.
+  private async esperarAGravacao(): Promise<void> {
+    if (this.falhaNaGravacao !== null) {
+      throw typeof this.falhaNaGravacao === 'string' ? new Error(this.falhaNaGravacao) : this.falhaNaGravacao
+    }
+    if (this.segurarGravacao) await new Promise<never>(() => {})
+  }
+
+  // A data da última revisão interna do processo (a que limita a data da aprovação); null sem revisão.
+  private ultimaRevisaoDe(processoId: string): string | null {
+    return (this.revisoes[processoId] ?? []).map((revisao) => revisao.revisadaEm).sort().pop() ?? null
+  }
+
+  // O processo dono do registro (a revisão ou a aprovação que a edição acha); sumiu: o cadastro não existe mais.
+  private processoDoRegistro(temORegistro: (processoId: string) => boolean): ProcessoLido {
+    const processo = this.processos?.processos.find((outro) => temORegistro(outro.id))
+    if (!processo) throw new CadastroInexistente()
+    return processo
   }
 
   private aprovacaoConcluida(andamentoId: string, processo: ProcessoLido, dados: DadosDaAprovacao, responsavelId: string | null): void {
@@ -106,7 +156,7 @@ export class RevisoesFalso implements ModuloDeRevisoes {
     }
     if (this.versoes) this.versoes.aprovadas[processo.id] = versao
     this.aprovacoesConcluidas.push({ andamentoId, dados, responsavelId })
-    this.registrarEvento(processo, 'registrar', this.aprovacoes[processo.id])
+    this.noHistorico(processo, eventoDaAprovacao(processo, 'registrar', this.aprovacoes[processo.id]))
   }
 
   // Como a função voltar_a_etapa do banco: voltar para a Aprovação ou antes dela apaga a aprovação, com o evento "desfazer".
@@ -116,12 +166,12 @@ export class RevisoesFalso implements ModuloDeRevisoes {
     if (!aprovacao || !processo || !voltaDesfazAprovacao(processo.etapasDoProcesso, etapaCodigo)) return
     delete this.aprovacoes[processoId]
     if (this.versoes) delete this.versoes.aprovadas[processoId]
-    this.registrarEvento(processo, 'desfazer', aprovacao)
+    this.noHistorico(processo, eventoDaAprovacao(processo, 'desfazer', aprovacao))
   }
 
-  private registrarEvento(processo: ProcessoLido, acao: 'registrar' | 'desfazer', aprovacao: Aprovacao): void {
+  private noHistorico(processo: ProcessoLido, evento: EventoDoCadastro): void {
     const historico = (this.processos as ProcessosFalso).historicoDosProcessos
-    historico[processo.id] = [eventoDaAprovacao(processo, acao, aprovacao), ...(historico[processo.id] ?? [])]
+    historico[processo.id] = [evento, ...(historico[processo.id] ?? [])]
   }
 
   private processoDaEtapa(andamentoId: string): ProcessoLido {

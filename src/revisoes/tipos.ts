@@ -4,6 +4,9 @@ export type EscopoDaCorrecao = 'fluxograma' | 'relatorio' | 'ambos'
 /** O que a janela de concluir a Revisão interna grava: o escopo só vale em "corrigida"; o comentário vem aparado (null: sem). */
 export type DadosDaRevisao = { resultado: ResultadoDaRevisao; escopo: EscopoDaCorrecao | null; comentario: string | null }
 
+/** O que a janela de editar a revisão grava: o escopo só vale em "corrigida"; o comentário vem aparado (null: sem). */
+export type DadosDaEdicaoDaRevisao = { escopo: EscopoDaCorrecao | null; comentario: string | null }
+
 /** Uma revisão registrada; as versões são os números (V7, V8) e `revisadaEm` é a data AAAA-MM-DD. */
 export type RevisaoInterna = {
   id: string
@@ -37,6 +40,10 @@ export type ModuloDeRevisoes = {
    * andamento com o responsável; null: ninguém). Se a conclusão falha, a aprovação não fica.
    */
   concluirAprovacao(andamentoId: string, dados: DadosDaAprovacao, proximoResponsavelId: string | null): Promise<void>
+  /** Corrige o escopo (só na "corrigida") e o comentário de uma revisão; o banco confere de novo e grava o antes e o depois. */
+  editarRevisao(revisaoId: string, dados: DadosDaEdicaoDaRevisao): Promise<void>
+  /** Corrige o número, o link e a data da aprovação (inclusive acrescentando o número que chegou depois da conclusão). */
+  editarAprovacao(aprovacaoId: string, dados: DadosDaAprovacao): Promise<void>
 }
 
 /** O que a janela de concluir a Aprovação grava; os três campos são opcionais (null: sem), e a data vem em AAAA-MM-DD. */

@@ -1,7 +1,9 @@
-import type { RecusasDoModulo } from '../acesso/falhasDeGravacao'
+import { type RecusasDoModulo, porQueNadaMudou } from '../acesso/falhasDeGravacao'
 import type { ClienteSupabase } from '../lib/supabase'
 import { falhaDoAndamento } from '../processos/andamentosSupabase'
-import type { Aprovacao, DadosDaAprovacao, DadosDaRevisao, ModuloDeRevisoes, RevisaoInterna } from './tipos'
+import type {
+  Aprovacao, DadosDaAprovacao, DadosDaEdicaoDaRevisao, DadosDaRevisao, ModuloDeRevisoes, RevisaoInterna,
+} from './tipos'
 
 // O revisor e as duas versões (a revisada e, na "corrigida", a corrigida) vêm junto, pelas chaves estrangeiras.
 const COLUNAS = 'id, resultado, escopo, comentario, revisada_em, revisor:usuarios(nome), '
@@ -35,6 +37,8 @@ export function criarRevisoesSupabase(cliente: ClienteSupabase, recusas: Recusas
     lerAprovacao: (processoId) => lerAprovacao(cliente, processoId),
     concluirAprovacao: (andamentoId, dados, responsavelId) =>
       concluirAprovacao(cliente, andamentoId, dados, responsavelId, recusas),
+    editarRevisao: (id, dados) => editarRevisao(cliente, id, dados, recusas),
+    editarAprovacao: (id, dados) => editarAprovacao(cliente, id, dados, recusas),
   }
 }
 
@@ -94,4 +98,30 @@ async function concluirAprovacao(
     p_data: dados.aprovadaEm as string, p_responsavel: responsavelId as string,
   })
   if (error) throw falhaDoAndamento(error, recusas)
+}
+
+// Só o escopo e o comentário se alteram (o resto não tem privilégio). A RLS não acusa erro ao filtrar: zero linhas com o
+// registro ainda legível é perfil; ilegível, o registro sumiu.
+async function editarRevisao(
+  cliente: ClienteSupabase, id: string, dados: DadosDaEdicaoDaRevisao, recusas: RecusasDoModulo,
+): Promise<void> {
+  const { data, error } = await cliente.from('revisoes_internas')
+    .update({ escopo: dados.escopo, comentario: dados.comentario }).eq('id', id).select('id')
+  if (error) throw falhaDoAndamento(error, recusas)
+  if (data.length) return
+  const existe = Boolean((await cliente.from('revisoes_internas').select('id').eq('id', id)).data?.length)
+  throw porQueNadaMudou(existe, recusas)
+}
+
+// Número, link e data: o banco confere de novo o formato do link e as datas, como na conclusão.
+async function editarAprovacao(
+  cliente: ClienteSupabase, id: string, dados: DadosDaAprovacao, recusas: RecusasDoModulo,
+): Promise<void> {
+  const { data, error } = await cliente.from('aprovacoes')
+    .update({ numero_eprotocolo: dados.numeroEprotocolo, link: dados.link, aprovada_em: dados.aprovadaEm })
+    .eq('id', id).select('id')
+  if (error) throw falhaDoAndamento(error, recusas)
+  if (data.length) return
+  const existe = Boolean((await cliente.from('aprovacoes').select('id').eq('id', id)).data?.length)
+  throw porQueNadaMudou(existe, recusas)
 }

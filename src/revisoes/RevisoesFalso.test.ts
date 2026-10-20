@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
+import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { ProcessosFalso } from '../processos/ProcessosFalso'
 import type { EtapaDoProcesso, ProcessoLido, UltimaVersao } from '../processos/tipos'
 import { RevisoesFalso } from './RevisoesFalso'
@@ -108,5 +109,64 @@ describe('concluir a revisão interna', () => {
 
   test('sem a falsa de processos, avisa como montar', async () => {
     await expect(new RevisoesFalso().concluirRevisaoInterna('a3', SEM_ALTERACAO, null)).rejects.toThrow('RevisoesFalso sem ProcessosFalso')
+  })
+})
+
+describe('editar a revisão', () => {
+  const CORRIGIDA_REGISTRADA = {
+    id: 'r1', versaoRevisada: 7, versaoCorrigida: 8, resultado: 'corrigida', escopo: 'ambos', comentario: 'Ajustei',
+    revisor: 'Bia Teste', revisadaEm: '2026-10-13',
+  } as const
+  const SEM_ALTERACAO_REGISTRADA = { ...CORRIGIDA_REGISTRADA, id: 'r2', versaoCorrigida: null, resultado: 'sem_alteracao', escopo: null } as const
+
+  test('troca o escopo e o comentário e põe o evento "editar" com o antes e o depois no histórico', async () => {
+    const { processos, revisoes } = montar(MINHA)
+    revisoes.revisoes.p1 = [CORRIGIDA_REGISTRADA]
+    await revisoes.editarRevisao('r1', { escopo: 'relatorio', comentario: 'Ajustei só o relatório' })
+    expect((await revisoes.listarRevisoes('p1'))[0]).toMatchObject({ escopo: 'relatorio', comentario: 'Ajustei só o relatório' })
+    const [evento] = await processos.lerHistoricoDoProcesso('p1')
+    expect(evento).toMatchObject({ acao: 'editar', entidade: 'revisao_interna', entidadeRef: 'p1' })
+    expect(evento.antes).toMatchObject({ escopo: 'ambos', comentario: 'Ajustei', versao_revisada: 'V7' })
+    expect(evento.depois).toMatchObject({ escopo: 'relatorio', comentario: 'Ajustei só o relatório' })
+  })
+
+  test('salvar sem mudar nada não põe evento no histórico', async () => {
+    const { processos, revisoes } = montar(MINHA)
+    revisoes.revisoes.p1 = [CORRIGIDA_REGISTRADA]
+    await revisoes.editarRevisao('r1', { escopo: 'ambos', comentario: 'Ajustei' })
+    expect(await processos.lerHistoricoDoProcesso('p1')).toEqual([])
+  })
+
+  test('recusa tirar o escopo da corrigida e pôr escopo na sem alteração, com as frases do banco', async () => {
+    const { revisoes } = montar(MINHA)
+    revisoes.revisoes.p1 = [CORRIGIDA_REGISTRADA, SEM_ALTERACAO_REGISTRADA]
+    const semEscopo = await falhaDe(revisoes.editarRevisao('r1', { escopo: null, comentario: null }))
+    expect(semEscopo).toBeInstanceOf(TravaDoBanco)
+    expect(semEscopo.message).toBe('Escolha o escopo da correção.')
+    const comEscopo = await falhaDe(revisoes.editarRevisao('r2', { escopo: 'ambos', comentario: null }))
+    expect(comEscopo.message).toBe('O escopo só vale na revisão corrigida.')
+  })
+
+  test('processo suspenso recusa a edição', async () => {
+    const { processos, revisoes } = montar(MINHA)
+    revisoes.revisoes.p1 = [CORRIGIDA_REGISTRADA]
+    processos.processos[0].situacao = 'suspenso'
+    const falha = await falhaDe(revisoes.editarRevisao('r1', { escopo: 'ambos', comentario: 'x' }))
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect(falha.message).toBe('Este processo está suspenso; retome-o para registrar o andamento.')
+  })
+
+  test('revisão que não existe é cadastro inexistente; falha e espera programadas valem para a edição', async () => {
+    const { revisoes } = montar(MINHA)
+    revisoes.revisoes.p1 = [CORRIGIDA_REGISTRADA]
+    expect(await falhaDe(revisoes.editarRevisao('nao-existe', { escopo: null, comentario: null }))).toBeInstanceOf(CadastroInexistente)
+    revisoes.falhaNaGravacao = 'sem conexão'
+    expect((await falhaDe(revisoes.editarRevisao('r1', { escopo: 'ambos', comentario: 'x' }))).message).toBe('sem conexão')
+    revisoes.falhaNaGravacao = null
+    revisoes.segurarGravacao = true
+    let terminou = false
+    void revisoes.editarRevisao('r1', { escopo: 'ambos', comentario: 'x' }).then(() => { terminou = true })
+    await Promise.resolve()
+    expect(terminou).toBe(false)
   })
 })

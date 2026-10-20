@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest'
+import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { ProcessosFalso } from '../processos/ProcessosFalso'
 import type { EtapaDoProcesso, ProcessoLido, UltimaVersao } from '../processos/tipos'
 import { VersoesFalso } from '../versoes/VersoesFalso'
@@ -129,5 +130,55 @@ describe('voltar desfaz a aprovação', () => {
     expect(await revisoes.lerAprovacao('p1')).not.toBeNull()
     await processos.voltarParaEtapa('a5', 'Rever', null)
     expect(await revisoes.lerAprovacao('p1')).toBeNull()
+  })
+})
+
+describe('editarAprovacao', () => {
+  async function aprovada(dados: DadosDaAprovacao = SEM_NADA) {
+    const montado = montar()
+    await montado.revisoes.concluirAprovacao('a5', dados, EU.id)
+    return montado
+  }
+  const ID = 'ap1'
+
+  test('acrescenta o número a uma aprovação sem ele, põe o evento "editar" com o antes vazio e o depois', async () => {
+    const { processos, revisoes } = await aprovada()
+    await revisoes.editarAprovacao(ID, { numeroEprotocolo: 'PROT-9', link: null, aprovadaEm: null })
+    expect(await revisoes.lerAprovacao('p1')).toMatchObject({ numeroEprotocolo: 'PROT-9' })
+    const [evento] = await processos.lerHistoricoDoProcesso('p1')
+    expect(evento).toMatchObject({ acao: 'editar', entidade: 'aprovacao', entidadeRef: 'p1' })
+    expect(evento.antes).toMatchObject({ numero_eprotocolo: null, versao: 'V8' })
+    expect(evento.depois).toMatchObject({ numero_eprotocolo: 'PROT-9' })
+  })
+
+  test('salvar sem mudar nada não põe evento no histórico', async () => {
+    const { processos, revisoes } = await aprovada({ numeroEprotocolo: 'PROT-1', link: null, aprovadaEm: null })
+    const antes = (await processos.lerHistoricoDoProcesso('p1')).length
+    await revisoes.editarAprovacao(ID, { numeroEprotocolo: 'PROT-1', link: null, aprovadaEm: null })
+    expect((await processos.lerHistoricoDoProcesso('p1')).length).toBe(antes)
+  })
+
+  test.each([
+    [{ numeroEprotocolo: null, link: 'ftp://x.example/a', aprovadaEm: null }, 'O link do E-protocolo precisa começar com http:// ou https://.'],
+    [{ numeroEprotocolo: null, link: null, aprovadaEm: '2026-10-14' }, 'A data 14/10/2026 está no futuro.'],
+  ])('recusa %o com a frase do banco', async (dados, frase) => {
+    const { revisoes } = await aprovada()
+    const falha = await falhaDe(revisoes.editarAprovacao(ID, dados))
+    expect(falha.message).toBe(frase)
+  })
+
+  test('recusa a data antes da última revisão interna', async () => {
+    const { revisoes } = await aprovada()
+    revisoes.revisoes.p1 = [{
+      id: 'r1', versaoRevisada: 8, versaoCorrigida: null, resultado: 'sem_alteracao', escopo: null, comentario: null,
+      revisor: 'Ana Teste', revisadaEm: '2026-10-13',
+    }]
+    const falha = await falhaDe(revisoes.editarAprovacao(ID, { numeroEprotocolo: null, link: null, aprovadaEm: '2026-10-12' }))
+    expect(falha.message).toBe('A data da aprovação (12/10/2026) não pode ser antes da última revisão interna (13/10/2026).')
+  })
+
+  test('aprovação que não existe (desfeita por uma volta) é cadastro inexistente', async () => {
+    const { revisoes } = montar()
+    expect(await falhaDe(revisoes.editarAprovacao(ID, SEM_NADA))).toBeInstanceOf(CadastroInexistente)
   })
 })
