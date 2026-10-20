@@ -3,8 +3,10 @@ import {
   type SinalDaEtapa, acoesDaEtapa, formatarData, opcoesDeResponsavel, podeAssumir, usuariosParaAEtapa,
 } from '../../processos/caminhoDeEtapas'
 import type { AcoesDaEtapaEmUso } from '../../hooks/useAcoesDaEtapa'
+import type { EstadoDoCarregamento } from '../../hooks/useCarregamento'
 import type { DatasDaEtapa, EtapaDoCaminho, EtapaDoProcesso, UltimaVersao, UsuarioResponsavel } from '../../processos/tipos'
-import type { ModuloDeRevisoes } from '../../revisoes/tipos'
+import type { Aprovacao, ModuloDeRevisoes } from '../../revisoes/tipos'
+import { AprovacaoDaEtapa } from './AprovacaoDaEtapa'
 import { FormularioDeDatas } from './FormularioDeDatas'
 import { RevisoesDaEtapa } from './RevisoesDaEtapa'
 import { TrocaDoResponsavel } from './TrocaDoResponsavel'
@@ -21,6 +23,9 @@ export type DadosDasEtapas = {
   usuarioId: string
   ultimaVersao: UltimaVersao | null
   acoes: AcoesDaEtapaEmUso
+  /** A aprovação do processo (lida pelo verso): a gaveta da Aprovação a mostra, com os estados de carregando e de erro. */
+  aprovacao: EstadoDoCarregamento<Aprovacao | null>
+  aoTentarDeNovoAAprovacao: () => void
   aoCorrigirDatas: (etapa: EtapaDoCaminho, datas: DatasDaEtapa) => Promise<void>
   aoSumir: () => void
 }
@@ -46,7 +51,7 @@ export function DetalheDaEtapa(props: DetalheDaEtapaProps) {
     <div id={id} className="etapa-gaveta">
       <p className="etapa-datas">Início: {formatarData(etapa.iniciadaEm)} · Conclusão: {formatarData(etapa.resolvidaEm)}</p>
       {etapa.nota && <p className="etapa-nota">Nota: {etapa.nota}</p>}
-      {etapa.codigo === 'revisao_interna' && <RevisoesDaEtapa revisoes={props.revisoes} processoId={props.processoId} />}
+      <RegistrosDaEtapa codigo={etapa.codigo} {...props} />
       {sinal !== 'atual' && <ResponsavelNaGaveta {...props} />}
       <div className="etapa-gaveta-acoes">
         {podeEditar && etapa.status !== 'pendente' && !corrigindo && (
@@ -61,6 +66,13 @@ export function DetalheDaEtapa(props: DetalheDaEtapaProps) {
       {corrigindo && <FormularioDeDatas etapa={etapa} aoSalvar={salvarDatas} aoCancelar={() => setCorrigindo(false)} aoSumir={aoSumir} />}
     </div>
   )
+}
+
+// Os registros que a gaveta mostra: as revisões na Revisão interna e a aprovação na Aprovação pelo setor.
+function RegistrosDaEtapa({ codigo, ...props }: DetalheDaEtapaProps & { codigo: string }) {
+  if (codigo === 'revisao_interna') return <RevisoesDaEtapa revisoes={props.revisoes} processoId={props.processoId} />
+  if (codigo === 'aprovacao_setor') return <AprovacaoDaEtapa estado={props.aprovacao} aoTentarDeNovo={props.aoTentarDeNovoAAprovacao} />
+  return null
 }
 
 function ResponsavelNaGaveta({ etapas, indice, sinal, podeEditar, usuarios, usuarioId, ultimaVersao, acoes }: DetalheDaEtapaProps) {

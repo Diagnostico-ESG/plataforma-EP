@@ -2,9 +2,11 @@ import type { AcoesDaEtapaEmUso } from '../../hooks/useAcoesDaEtapa'
 import { responsavelMarcado, usuariosParaAEtapa } from '../../processos/caminhoDeEtapas'
 import { fraseDoBloqueioDaConclusao } from '../../processos/frasesDaVersaoCompleta'
 import type { PedidoDeAvanco, PedidoDeTexto } from '../../processos/gravarAcoes'
-import type { UltimaVersao, UsuarioResponsavel } from '../../processos/tipos'
+import type { EtapaDoCaminho, UltimaVersao, UsuarioResponsavel } from '../../processos/tipos'
+import { voltaDesfazAprovacao } from '../../revisoes/conferirAprovacao'
+import { fraseDoAvisoDaVolta } from '../../revisoes/frasesDeAprovacao'
 import { opcoesDaRevisao } from '../../revisoes/opcoesDaRevisao'
-import type { DadosDaAprovacao, DadosDaRevisao } from '../../revisoes/tipos'
+import type { Aprovacao, DadosDaAprovacao, DadosDaRevisao } from '../../revisoes/tipos'
 import { JanelaComCampo } from '../JanelaComCampo'
 import { JanelaDeAvanco } from './JanelaDeAvanco'
 
@@ -50,10 +52,13 @@ type JanelasDaEtapaProps = {
   usuarioId: string
   /** A versão mais recente não histórica do processo: o autor dela não é escolhido para a Revisão interna. */
   ultimaVersao: UltimaVersao | null
+  /** A aprovação do processo e as etapas dele: a janela de voltar avisa quando a volta a desfaz. Sem elas (o Quadro), sem aviso. */
+  aprovacao?: Aprovacao | null
+  etapasDoProcesso?: EtapaDoCaminho[]
 }
 
 /** As janelas das ações da etapa: a da nota (Dispensar e Realizada anteriormente sem pendente depois) e a de avanço. */
-export function JanelasDaEtapa({ acoes, usuarios, usuarioId, ultimaVersao }: JanelasDaEtapaProps) {
+export function JanelasDaEtapa({ acoes, usuarios, usuarioId, ultimaVersao, aprovacao, etapasDoProcesso }: JanelasDaEtapaProps) {
   const { pedido, avanco, gravarComTexto, gravarComAvanco, gravarRevisaoDaEtapa, gravarAprovacaoDaEtapa, fecharPedido, fecharAvanco } = acoes
   const janela = pedido ? JANELA_DO_TEXTO[pedido.acao] : null
   return (
@@ -63,6 +68,7 @@ export function JanelasDaEtapa({ acoes, usuarios, usuarioId, ultimaVersao }: Jan
         aoConfirmar={gravarComTexto} aoFechar={fecharPedido} />
       {avanco && (
         <JanelaDoAvancoDaEtapa avanco={avanco} usuarios={usuarios} usuarioId={usuarioId} ultimaVersao={ultimaVersao}
+          aviso={avisoDaVolta(avanco, aprovacao, etapasDoProcesso)}
           aoConfirmar={gravarComAvanco} aoConfirmarRevisao={gravarRevisaoDaEtapa} aoConfirmarAprovacao={gravarAprovacaoDaEtapa}
           aoFechar={fecharAvanco} />
       )}
@@ -72,6 +78,7 @@ export function JanelasDaEtapa({ acoes, usuarios, usuarioId, ultimaVersao }: Jan
 
 type JanelaDoAvancoDaEtapaProps = {
   avanco: PedidoDeAvanco
+  aviso: string | null
   usuarios?: UsuarioResponsavel[]
   usuarioId: string
   ultimaVersao: UltimaVersao | null
@@ -88,6 +95,12 @@ function textosDoAvanco({ acao, etapa, proxima }: PedidoDeAvanco) {
   return { titulo: textos.titulo(etapa.nome, proxima.nome), rotuloDaAcao: textos.rotuloDaAcao(proxima.nome), pergunta: textos.pergunta }
 }
 
+// Voltar para a Aprovação ou antes dela desfaz a aprovação: a janela avisa antes de confirmar.
+function avisoDaVolta({ acao, etapa }: PedidoDeAvanco, aprovacao: Aprovacao | null | undefined, etapas: EtapaDoCaminho[] | undefined): string | null {
+  if (acao !== 'voltar' || !aprovacao || !voltaDesfazAprovacao(etapas ?? [], etapa.codigo)) return null
+  return fraseDoAvisoDaVolta(aprovacao.versao)
+}
+
 // O banco só deixa concluir a Revisão pelo setor e a Aprovação com a versão mais recente completa; a janela já diz o que falta.
 function bloqueioDaConclusao({ acao, etapa }: PedidoDeAvanco, ultimaVersao: UltimaVersao | null): string | null {
   const confere = acao === 'concluir' && (etapa.codigo === 'revisao_setor' || etapa.codigo === 'aprovacao_setor')
@@ -97,7 +110,7 @@ function bloqueioDaConclusao({ acao, etapa }: PedidoDeAvanco, ultimaVersao: Ulti
 // Sem a lista de usuários (ainda não lida, ou a leitura falhou), a janela só oferece "Ninguém por enquanto". A lista já
 // vem sem o autor da versão mais recente quando a etapa que ganha o responsável é a Revisão interna.
 function JanelaDoAvancoDaEtapa({
-  avanco, usuarios = [], usuarioId, ultimaVersao, aoConfirmar, aoConfirmarRevisao, aoConfirmarAprovacao, aoFechar,
+  avanco, aviso, usuarios = [], usuarioId, ultimaVersao, aoConfirmar, aoConfirmarRevisao, aoConfirmarAprovacao, aoFechar,
 }: JanelaDoAvancoDaEtapaProps) {
   const { acao, etapa, proxima } = avanco
   const possiveis = proxima ? usuariosParaAEtapa(proxima, usuarios, ultimaVersao) : []
@@ -112,7 +125,7 @@ function JanelaDoAvancoDaEtapa({
     <JanelaDeAvanco key={etapa.id} titulo={textos.titulo} rotuloDaAcao={textos.rotuloDaAcao} comNota={acao !== 'concluir'}
       rotuloDoCampo={JANELA_DO_AVANCO[acao].rotuloDoCampo} pergunta={textos.pergunta} usuarios={possiveis}
       marcadoAoAbrir={proxima ? responsavelMarcado(proxima, usuarioId, possiveis) : null}
-      bloqueio={bloqueioDaConclusao(avanco, ultimaVersao)} revisao={revisao} aprovacao={aprovacao}
+      bloqueio={bloqueioDaConclusao(avanco, ultimaVersao)} aviso={aviso} revisao={revisao} aprovacao={aprovacao}
       aoConfirmar={aoConfirmar} aoFechar={aoFechar} />
   )
 }

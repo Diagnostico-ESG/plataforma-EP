@@ -50,9 +50,12 @@ const TEXTO_DA_ACAO_DA_VERSAO: Record<string, string> = {
 
 const TEXTO_DA_ACAO_DA_REVISAO: Record<string, string> = { registrar: 'Registrou a revisão interna' }
 
+const TEXTO_DA_ACAO_DA_APROVACAO: Record<string, string> = { registrar: 'Registrou a aprovação', desfazer: 'Desfez a aprovação' }
+
 const TEXTOS_DA_ENTIDADE: Record<string, Record<string, string>> = {
   setor_envolvido: TEXTO_DA_ACAO_DO_VINCULO, andamento: TEXTO_DA_ACAO_DO_ANDAMENTO, processo: TEXTO_DA_ACAO_DO_PROCESSO,
   etapa: TEXTO_DA_ACAO_DA_ETAPA, versao: TEXTO_DA_ACAO_DA_VERSAO, revisao_interna: TEXTO_DA_ACAO_DA_REVISAO,
+  aprovacao: TEXTO_DA_ACAO_DA_APROVACAO,
 }
 
 // Macroprocesso e etapa do catálogo aparecem como "código — nome".
@@ -74,6 +77,8 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   hash_md5: 'Impressão digital (MD5)',
   versao_revisada: 'Versão revisada', versao_corrigida: 'Versão corrigida', resultado: 'Resultado', escopo: 'Escopo',
   comentario: 'Comentário', revisor_nome: 'Revisor', revisada_em: 'Data da revisão',
+  versao: 'Versão aprovada', numero_eprotocolo: 'Número do E-protocolo', link: 'Link', aprovada_em: 'Data da aprovação',
+  registrada_por_nome: 'Registrada por',
 }
 
 // Os ids existem para o filtro; quem lê o histórico vê a sigla e o nome. Código e nome da etapa já estão no título.
@@ -121,6 +126,7 @@ function nomeDoItemComDono(evento: EventoDoCadastro, estado: Record<string, unkn
   if (ehRegistroRetirado(evento)) return TEXTO_DO_RECURSO_RETIRADO[evento.entidade]
   if (evento.entidade === 'versao') return `${texto(estado.rotulo)} — ${texto(estado.processo_nome)}`
   if (evento.entidade === 'revisao_interna') return `${texto(estado.versao_revisada)} — ${texto(estado.processo_nome)}`
+  if (evento.entidade === 'aprovacao') return `${texto(estado.versao)} — ${texto(estado.processo_nome)}`
   const nome = evento.entidade === 'andamento' ? estado.etapa_nome : null
   if (typeof nome !== 'string') return null
   return `${nome} — ${texto(estado.processo_nome)}`
@@ -148,7 +154,7 @@ function itemDaLista(item: unknown): string {
 }
 
 // As datas do andamento, a da reunião do processo e a da revisão aparecem em DD/MM/AAAA.
-const CAMPOS_DE_DATA = new Set(['iniciada_em', 'resolvida_em', 'data_da_reuniao', 'revisada_em'])
+const CAMPOS_DE_DATA = new Set(['iniciada_em', 'resolvida_em', 'data_da_reuniao', 'revisada_em', 'aprovada_em'])
 
 // Campos do andamento (status pelo rótulo da tela) e as datas; null se não for deles.
 function valorDaEtapa(campo: string, valor: unknown): string | null {

@@ -125,3 +125,8 @@ export function sinalDaEtapa(etapas: EtapaDoCaminho[], indice: number): SinalDaE
 export function rotuloDoAgora(indice: number, total: number): string {
   return indice < 0 ? 'Agora' : `Agora · etapa ${indice + 1} de ${total}`
 }
+
+/** Muda quando uma conclusão ou uma volta mexe nas etapas: o que depende delas (a aprovação, os arquivos) lê de novo. */
+export function assinaturaDasEtapas(etapas: { status: string }[]): string {
+  return etapas.map((etapa) => etapa.status).join()
+}

@@ -1,16 +1,12 @@
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, expect, test } from 'vitest'
-import App from './App'
-import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
-import { CadastrosFalso } from './cadastros/CadastrosFalso'
-import { ProcessosFalso } from './processos/ProcessosFalso'
-import type { Perfil } from './acesso/tipos'
-import type { EtapaDoProcesso, ProcessoLido, UltimaVersao } from './processos/tipos'
-import { RevisoesFalso } from './revisoes/RevisoesFalso'
+import type { UltimaVersao } from './processos/tipos'
 import { cartaoDe, ETAPAS, montar as montarQuadro, processo as processoDoQuadro } from './testes/quadroDeTeste'
 import { agoraDoVerso, etapasDoVerso } from './testes/versoDoCartao'
-import { VersoesFalso } from './versoes/VersoesFalso'
+import {
+  APROVACAO, EU, PUBLICACAO, TITULO_DA_JANELA, abrirAJanela, botao, campo, montar, versao,
+} from './testes/aprovacaoNoVerso'
 
 // Concluir a Aprovação pelo setor pela janela de concluir (versão aprovada, número, link e data do E-protocolo opcionais),
 // a aprovação na gaveta, o selo "Aprovada" em Arquivos, o aviso de voltar e o histórico (ticket 03 de revisoes-aprovacao,
@@ -20,75 +16,6 @@ afterEach(() => {
   cleanup()
   window.location.hash = ''
 })
-
-const EU = { id: USUARIO_DE_TESTE.id, nome: USUARIO_DE_TESTE.nome }
-const BIA = { id: 'u2', nome: 'Bia Teste' }
-const REVISAO_DO_SETOR = 'Revisão pelo setor'
-const APROVACAO = 'Aprovação pelo setor'
-const PUBLICACAO = 'Publicação'
-const TITULO_DA_JANELA = `Concluir ${APROVACAO} e iniciar ${PUBLICACAO}`
-const BOTAO_DA_JANELA = `Concluir e iniciar ${PUBLICACAO}`
-const COMPLETA = ['bpmn', 'png', 'relatorio'] as const
-
-const versao = (papeis: UltimaVersao['papeis'] = [...COMPLETA]): UltimaVersao =>
-  ({ numero: 8, autorId: BIA.id, autorNome: BIA.nome, papeis })
-
-function doProcesso(ordem: number, codigo: string, nome: string, mudancas: Partial<EtapaDoProcesso> = {}): EtapaDoProcesso {
-  return {
-    id: `a${ordem}`, codigo, nome, ordem, obrigatoria: true, status: 'pendente', nota: null, iniciadaEm: null,
-    resolvidaEm: null, responsavelId: null, responsavelNome: null, responsavelInativo: false, ...mudancas,
-  }
-}
-
-const CONCLUIDA = { status: 'concluida', iniciadaEm: '2026-10-10', resolvidaEm: '2026-10-11' } as const
-
-function caminho(publicacao: Partial<EtapaDoProcesso> = {}): EtapaDoProcesso[] {
-  return [
-    doProcesso(3, 'revisao_interna', 'Revisão interna', CONCLUIDA),
-    doProcesso(4, 'revisao_setor', REVISAO_DO_SETOR, CONCLUIDA),
-    doProcesso(5, 'aprovacao_setor', APROVACAO, {
-      status: 'em_andamento', iniciadaEm: '2026-10-12', responsavelId: EU.id, responsavelNome: EU.nome,
-    }),
-    doProcesso(6, 'publicacao', PUBLICACAO, publicacao),
-  ]
-}
-
-function processo(ultimaVersao: UltimaVersao | null, etapas: EtapaDoProcesso[]): ProcessoLido {
-  return {
-    id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
-    macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento',
-    etapaAtual: { codigo: 'aprovacao_setor', nome: APROVACAO, ordem: 5 },
-    processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null, origem: 'novo', contexto: null,
-    observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, ultimaVersao, etapasDoProcesso: etapas,
-  }
-}
-
-type Opcoes = { perfil?: Perfil; mudancas?: Partial<ProcessoLido>; publicacao?: Partial<EtapaDoProcesso> }
-
-// O verso do processo no aplicativo inteiro, com a Aprovação em andamento sob quem está na tela.
-function montar(ultimaVersao: UltimaVersao | null, { perfil = 'integrante_ep', mudancas = {}, publicacao }: Opcoes = {}) {
-  window.location.hash = '#/processos/p1'
-  const cadastros = new CadastrosFalso()
-  cadastros.setores = [{ id: 's1', sigla: 'TSA', nome: 'Setor Teste A', observacoes: null, ativo: true }]
-  const etapas = caminho(publicacao)
-  const falso = new ProcessosFalso()
-  falso.processos = [{ ...processo(ultimaVersao, etapas), ...mudancas }]
-  falso.usuariosPossiveis = [EU, BIA]
-  falso.etapasDoCatalogo = etapas.map((etapa) => ({ id: `e${etapa.ordem}`, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, ativa: true }))
-  const versoes = new VersoesFalso()
-  const revisoes = new RevisoesFalso(falso, EU, versoes)
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso}
-    versoes={versoes} revisoes={revisoes} />)
-  return { falso, revisoes, versoes }
-}
-
-const abrirAJanela = async (titulo = TITULO_DA_JANELA, concluir = `Concluir ${APROVACAO}`) => {
-  fireEvent.click((await agoraDoVerso()).getByRole('button', { name: concluir }))
-  return within(await screen.findByRole('dialog', { name: titulo }))
-}
-type Janela = ReturnType<typeof within>
-const botao = (janela: Janela, nome = BOTAO_DA_JANELA) => janela.getByRole('button', { name: nome }) as HTMLButtonElement
-const campo = (janela: Janela, nome: RegExp) => janela.getByLabelText(nome) as HTMLInputElement
 
 test('a janela mostra a versão aprovada e os três campos opcionais, e conclui sem preencher nada', async () => {
   const { revisoes } = montar(versao())
@@ -218,3 +145,4 @@ test('arrastar com a versão incompleta mostra a frase e não deixa concluir', a
   expect((janela.getByRole('button', { name: `Concluir e iniciar ${ETAPAS[5].nome}` }) as HTMLButtonElement).disabled).toBe(true)
   expect(falso.chamadas).toEqual([])
 })
+

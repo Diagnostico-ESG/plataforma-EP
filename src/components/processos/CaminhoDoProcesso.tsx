@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { useAcoesDaEtapa } from '../../hooks/useAcoesDaEtapa'
 import { useCarregamento } from '../../hooks/useCarregamento'
+import { assinaturaDasEtapas } from '../../processos/caminhoDeEtapas'
 import type { Executar } from '../../hooks/useGravacaoComFalha'
 import type { DatasDaEtapa, EtapaDoCaminho, ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
@@ -31,6 +32,11 @@ export function CaminhoDoProcesso({ processo, processos, revisoes, podeAlterar, 
     () => (podeAlterar ? processos.listarResponsaveisPossiveis() : Promise.resolve([])), [processos, podeAlterar])
   const { estado } = useCarregamento(ler)
   const usuarios = estado.tipo === 'pronto' ? estado.valor : []
+  // A aprovação alimenta a gaveta da Aprovação e o aviso de voltar; lê de novo quando as etapas mudam (conclusão ou volta).
+  const assinatura = assinaturaDasEtapas(processo.etapasDoProcesso)
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- a assinatura não é usada dentro: só faz a leitura se refazer quando as etapas mudam
+  const lerAprovacao = useCallback(() => revisoes.lerAprovacao(processo.id), [revisoes, processo.id, assinatura])
+  const aprovacao = useCarregamento(lerAprovacao)
   const acoes = useAcoesDaEtapa(processos, revisoes, aoMudar, aoSumir)
   const parado = processo.situacao === 'suspenso' || processo.situacao === 'cancelado'
 
@@ -46,8 +52,9 @@ export function CaminhoDoProcesso({ processo, processos, revisoes, podeAlterar, 
       {acoes.falha && <p className="cadastros-falha" role="alert">{acoes.falha}</p>}
       <EtapasDoProcesso etapas={processo.etapasDoProcesso} processoId={processo.id} revisoes={revisoes} podeEditar={podeAlterar && !parado} usuarios={usuarios}
         usuarioId={usuarioId} ultimaVersao={processo.ultimaVersao} acoes={acoes} aoCorrigirDatas={corrigirDatas}
-        aoSumir={aoSumir} />
-      <JanelasDaEtapa acoes={acoes} usuarios={usuarios} usuarioId={usuarioId} ultimaVersao={processo.ultimaVersao} />
+        aprovacao={aprovacao.estado} aoTentarDeNovoAAprovacao={aprovacao.tentarDeNovo} aoSumir={aoSumir} />
+      <JanelasDaEtapa acoes={acoes} usuarios={usuarios} usuarioId={usuarioId} ultimaVersao={processo.ultimaVersao}
+        aprovacao={aprovacao.estado.tipo === 'pronto' ? aprovacao.estado.valor : null} etapasDoProcesso={processo.etapasDoProcesso} />
     </>
   )
 }

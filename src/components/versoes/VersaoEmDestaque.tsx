@@ -47,6 +47,7 @@ function LinhaDoDestaque({ versao }: { versao: Versao }) {
       <span className="versao-destaque-ponto" aria-hidden="true">·</span>
       <time dateTime={versao.enviadaEm} title={formatarMomento(versao.enviadaEm)}>{formatarDiaEMes(versao.enviadaEm)}</time>
       {versao.historica && <Pilula situacao="neutra">Histórica · somente leitura</Pilula>}
+      {versao.aprovada && <Pilula situacao="aprovado">Aprovada</Pilula>}
       {relatorioPendente(versao) && <Pilula situacao="vencendo">falta relatório</Pilula>}
     </p>
   )
@@ -78,7 +79,7 @@ function ArquivosDoDestaque({ modulo, processoId, versao, versoes, podeAlterar, 
             <LinkDoArquivo versoes={modulo} arquivo={arquivo} rotulo={rotuloCurtoDoArquivo(arquivo)} />
             <MarcaNoDrive situacao={situacoes?.[arquivo.id]} />
             {origem && <span className="arquivo-origem">{`Sem alteração de conteúdo · relatório da ${origem}`}</span>}
-            {podeAlterar && !versao.historica && (
+            {podeAlterar && !versao.historica && !versao.aprovada && (
               <AcaoSubstituir modulo={modulo} processoId={processoId} versao={versao} arquivo={arquivo} aoConcluir={aoAlterada} />
             )}
           </li>

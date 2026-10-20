@@ -42,6 +42,7 @@ function BlocoDaVersao({ modulo, processoId, versao, versoes, podeAlterar, aoAlt
         <span>{versao.autor ?? '—'}</span>
         {versao.etapa && <span>{versao.etapa}</span>}
         {versao.historica && <Pilula situacao="neutra">Histórica · somente leitura</Pilula>}
+        {versao.aprovada && <Pilula situacao="aprovado">Aprovada</Pilula>}
         {relatorioPendente(versao) && <Pilula situacao="vencendo">Relatório pendente</Pilula>}
       </p>
       {versao.observacao && <p className="bloco-da-versao-observacao">{versao.observacao}</p>}
@@ -53,7 +54,7 @@ function BlocoDaVersao({ modulo, processoId, versao, versoes, podeAlterar, aoAlt
               <LinkDoArquivo versoes={modulo} arquivo={arquivo} />
               <MarcaNoDrive situacao={situacoes?.[arquivo.id]} />
               {origem && <span className="bloco-da-versao-origem">{`Sem alteração de conteúdo · relatório da ${origem}`}</span>}
-              {podeAlterar && !versao.historica && (
+              {podeAlterar && !versao.historica && !versao.aprovada && (
                 <AcaoSubstituir modulo={modulo} processoId={processoId} versao={versao} arquivo={arquivo} aoConcluir={aoAlterada} />
               )}
             </li>

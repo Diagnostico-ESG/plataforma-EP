@@ -21,6 +21,8 @@ type JanelaDeAvancoProps = {
   marcadoAoAbrir: string | null
   /** O que impede de concluir (a versão mais recente incompleta): a frase aparece e o botão principal fica desabilitado. */
   bloqueio?: string | null
+  /** Um aviso que não impede (ex.: "A aprovação da V8 será desfeita." ao voltar): aparece acima do campo do motivo. */
+  aviso?: string | null
   /** Só na conclusão da Revisão interna: o Resultado, o Escopo e o Comentário entram na janela e a gravação é dela. */
   revisao?: RevisaoDaJanela
   /** Só na conclusão da Aprovação pelo setor: a versão aprovada e o número, o link e a data do E-protocolo entram na janela e a gravação é dela. */
@@ -34,7 +36,7 @@ type JanelaDeAvancoProps = {
 // campo da nota (quando há) ou à opção marcada, o botão só se habilita com a nota preenchida e Esc fecha sem gravar.
 // Quem a monta a desmonta ao fechar, e a escolha recomeça marcada na próxima vez.
 export function JanelaDeAvanco({
-  titulo, rotuloDaAcao, comNota, rotuloDoCampo, pergunta, usuarios, marcadoAoAbrir, bloqueio, revisao, aprovacao, aoConfirmar, aoFechar,
+  titulo, rotuloDaAcao, comNota, rotuloDoCampo, pergunta, usuarios, marcadoAoAbrir, bloqueio, aviso, revisao, aprovacao, aoConfirmar, aoFechar,
 }: JanelaDeAvancoProps) {
   const janela = useRef<HTMLDialogElement>(null)
   const campo = useRef<HTMLTextAreaElement>(null)
@@ -70,6 +72,7 @@ export function JanelaDeAvanco({
   return (
     <dialog ref={janela} className="janela-confirmacao" aria-labelledby={idDoTitulo} onClose={aoFechar}>
       <h3 id={idDoTitulo} className="janela-confirmacao-titulo">{titulo}</h3>
+      {aviso && <p className="janela-ajuda" role="note">{aviso}</p>}
       {comNota && (
         <>
           <label htmlFor={idDoCampo}>{rotuloDoCampo}</label>
@@ -78,8 +81,7 @@ export function JanelaDeAvanco({
         </>
       )}
       <AlertaDaJanela texto={gravacao.frase} />
-      {revisao && <BlocoDaRevisao opcoes={revisao.opcoes} valor={daRevisao.rascunho} aoMudar={daRevisao.setRascunho} />}
-      {aprovacao && <BlocoDaAprovacao versao={aprovacao.versao} valor={daAprovacao.rascunho} aoMudar={daAprovacao.setRascunho} />}
+      <BlocosDoRegistro revisao={revisao} aprovacao={aprovacao} daRevisao={daRevisao} daAprovacao={daAprovacao} />
       <AlertaDaJanela texto={gravacao.falha} />
       {pergunta !== null && (
         <EscolhaDoResponsavel pergunta={pergunta} usuarios={usuarios} marcado={responsavel} aoEscolher={setResponsavel} aoConfirmar={confirmar} />
@@ -91,6 +93,23 @@ export function JanelaDeAvanco({
         <button type="button" className="botao botao-secundario" onClick={aoFechar}>Cancelar</button>
       </div>
     </dialog>
+  )
+}
+
+type BlocosDoRegistroProps = {
+  revisao?: RevisaoDaJanela
+  aprovacao?: AprovacaoDaJanela
+  daRevisao: ReturnType<typeof useRevisaoDaJanela>
+  daAprovacao: ReturnType<typeof useAprovacaoDaJanela>
+}
+
+// O que a conclusão da Revisão interna ou da Aprovação pede acima da escolha do responsável.
+function BlocosDoRegistro({ revisao, aprovacao, daRevisao, daAprovacao }: BlocosDoRegistroProps) {
+  return (
+    <>
+      {revisao && <BlocoDaRevisao opcoes={revisao.opcoes} valor={daRevisao.rascunho} aoMudar={daRevisao.setRascunho} />}
+      {aprovacao && <BlocoDaAprovacao versao={aprovacao.versao} valor={daAprovacao.rascunho} aoMudar={daAprovacao.setRascunho} />}
+    </>
   )
 }
 
