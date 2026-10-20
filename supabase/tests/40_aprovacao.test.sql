@@ -61,13 +61,13 @@ create function pg_temp.processo(nome_do_processo text) returns uuid
 language sql stable as $$ select id from public.processos where nome = nome_do_processo $$;
 grant execute on function pg_temp.processo(text) to authenticated;
 
--- Um arquivo inventado no formato que registrar_versao recebe, e o par .bpmn + .png de uma versão nova.
+-- Um arquivo inventado no formato que registrar_versao recebe, e o par .bpm + .png de uma versão nova.
 create function pg_temp.arquivo(papel text, formato text, tamanho bigint default 100) returns jsonb
 language sql immutable as $$
   select jsonb_build_object('papel', papel, 'nome', 'T40_V1_Processo.' || formato, 'formato', formato,
     'tamanho', tamanho, 'hash_md5', '0123456789abcdef0123456789abcdef', 'drive_id', 'drive-' || papel) $$;
 create function pg_temp.par() returns jsonb
-language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('bpmn', 'bpmn'), pg_temp.arquivo('png', 'png')) $$;
+language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('bpm', 'bpm'), pg_temp.arquivo('png', 'png')) $$;
 -- Quem envia é quem está nas claims (o gatilho põe auth.uid() como autor); a função recusa um número diferente do
 -- próximo (maior + 1), então o auxiliar o calcula.
 create function pg_temp.enviar(nome_do_processo text) returns uuid
@@ -77,7 +77,7 @@ language sql as $$
     null, pg_temp.par()) $$;
 grant execute on function pg_temp.enviar(text) to authenticated;
 
--- A versão completa: o par .bpmn + .png e o relatório acrescentado depois (registrar_versao só exige o par).
+-- A versão completa: o par .bpm + .png e o relatório acrescentado depois (registrar_versao só exige o par).
 create function pg_temp.enviar_completa(nome_do_processo text) returns void
 language plpgsql as $$
 declare

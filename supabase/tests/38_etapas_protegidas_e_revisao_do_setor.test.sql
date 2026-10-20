@@ -1,13 +1,13 @@
 -- Etapas protegidas e Revisão pelo setor com versão completa (revisoes-aprovacao, ticket 01, ADR 0015): as três etapas
 -- de revisão e aprovação não se desativam nem se excluem, e concluir a Revisão pelo setor exige a versão mais recente
--- completa (.bpmn, .png e relatório).
+-- completa (.bpm, .png e relatório).
 begin;
 create extension if not exists pgtap with schema extensions;
 -- As linhas do pgTAP vão para _tap e saem na exceção do fim (ver scripts/relatorio-tap.mjs).
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(26);
+insert into _tap (linha) select plan(27);
 
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 insert into public.autorizacoes (email, perfil) values
@@ -27,7 +27,7 @@ insert into public.setores (id, sigla, nome) values ('5f000000-0000-0000-0000-00
 insert into public.macroprocessos (id, codigo, nome) values ('af000000-0000-0000-0000-000000000038', null, 'Macro Trava');
 insert into public.processos (setor_id, macroprocesso_id, nome)
 select '5f000000-0000-0000-0000-000000000038', 'af000000-0000-0000-0000-000000000038', nome
-from unnest(array['Sem Versao', 'Sem Relatorio', 'Sem Png', 'Completa', 'Nova Na Etapa', 'Realizada']) as nome;
+from unnest(array['Sem Versao', 'Sem Relatorio', 'Sem Png', 'Sem Bpm', 'Completa', 'Nova Na Etapa', 'Realizada']) as nome;
 
 create function pg_temp.andamento(nome_do_processo text, codigo_da_etapa text) returns uuid
 language sql stable as $$
@@ -66,13 +66,13 @@ create function pg_temp.nome(usuario uuid) returns text
 language sql stable as $$ select nome from public.usuarios where id = usuario $$;
 grant execute on function pg_temp.nome(uuid) to authenticated;
 
--- Um arquivo inventado no formato que registrar_versao recebe, e o par .bpmn + .png de uma versão nova.
+-- Um arquivo inventado no formato que registrar_versao recebe, e o par .bpm + .png de uma versão nova.
 create function pg_temp.arquivo(papel text, formato text, tamanho bigint default 100) returns jsonb
 language sql immutable as $$
   select jsonb_build_object('papel', papel, 'nome', 'T38_V1_Processo.' || formato, 'formato', formato,
     'tamanho', tamanho, 'hash_md5', '0123456789abcdef0123456789abcdef', 'drive_id', 'drive-' || papel) $$;
 create function pg_temp.par() returns jsonb
-language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('bpmn', 'bpmn'), pg_temp.arquivo('png', 'png')) $$;
+language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('bpm', 'bpm'), pg_temp.arquivo('png', 'png')) $$;
 -- Quem envia é quem está nas claims (o gatilho põe auth.uid() como autor); a função recusa um número diferente do
 -- próximo (maior + 1), então o auxiliar o calcula.
 create function pg_temp.enviar(nome_do_processo text) returns uuid
@@ -140,7 +140,7 @@ insert into _tap (linha) select throws_ok(
 insert into _tap (linha) select is(pg_temp.status('Sem Versao', 'revisao_setor'), 'em_andamento'::public.status_da_etapa,
   'a recusa deixa a etapa em andamento');
 
--- Sem Relatorio: a V1 tem .bpmn e .png, sem relatório.
+-- Sem Relatorio: a V1 tem .bpm e .png, sem relatório.
 select pg_temp.enviar('Sem Relatorio');
 select pg_temp.ate_a_revisao_do_setor('Sem Relatorio');
 insert into _tap (linha) select throws_ok(
@@ -161,6 +161,18 @@ set local role authenticated;
 insert into _tap (linha) select throws_ok(
   $sql$select pg_temp.agir('Sem Png', 'revisao_setor', 'concluida')$sql$,
   'P0001', 'versao_incompleta:1:png,relatorio', 'concluir com a versão sem .png e sem relatório é recusado, com os dois');
+
+-- Sem Bpm: a V1 perde o .bpm (apagado pelo dono do banco, como no caso anterior).
+select pg_temp.enviar('Sem Bpm');
+select pg_temp.ate_a_revisao_do_setor('Sem Bpm');
+reset role;
+delete from public.arquivos_da_versao
+where papel = 'bpm' and versao_id = (select id from public.versoes where processo_id = pg_temp.processo('Sem Bpm'));
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
+set local role authenticated;
+insert into _tap (linha) select throws_ok(
+  $sql$select pg_temp.agir('Sem Bpm', 'revisao_setor', 'concluida')$sql$,
+  'P0001', 'versao_incompleta:1:bpm,relatorio', 'concluir com a versão sem .bpm e sem relatório é recusado, com os dois');
 
 -- Completa: a V1 recebe o relatório.
 select pg_temp.enviar('Completa');

@@ -66,13 +66,13 @@ create function pg_temp.nome(usuario uuid) returns text
 language sql stable as $$ select nome from public.usuarios where id = usuario $$;
 grant execute on function pg_temp.nome(uuid) to authenticated;
 
--- Um arquivo inventado no formato que registrar_versao recebe, e o par .bpmn + .png de uma versão nova.
+-- Um arquivo inventado no formato que registrar_versao recebe, e o par .bpm + .png de uma versão nova.
 create function pg_temp.arquivo(papel text, formato text, tamanho bigint default 100) returns jsonb
 language sql immutable as $$
   select jsonb_build_object('papel', papel, 'nome', 'T14_V1_Processo.' || formato, 'formato', formato,
     'tamanho', tamanho, 'hash_md5', '0123456789abcdef0123456789abcdef', 'drive_id', 'drive-' || papel) $$;
 create function pg_temp.par() returns jsonb
-language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('bpmn', 'bpmn'), pg_temp.arquivo('png', 'png')) $$;
+language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('bpm', 'bpm'), pg_temp.arquivo('png', 'png')) $$;
 -- Quem envia é quem está nas claims (o gatilho põe auth.uid() como autor); a função recusa um número diferente do
 -- próximo (maior + 1), então o auxiliar o calcula.
 create function pg_temp.enviar(nome_do_processo text) returns uuid

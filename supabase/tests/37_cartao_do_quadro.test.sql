@@ -67,7 +67,7 @@ language sql immutable as $$
   select jsonb_build_object('papel', papel, 'nome', 'T20_V1_Processo.' || formato, 'formato', formato,
     'tamanho', 100, 'hash_md5', '0123456789abcdef0123456789abcdef', 'drive_id', 'drive-' || papel || '-' || formato) $$;
 create function pg_temp.par() returns jsonb
-language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('bpmn', 'bpmn'), pg_temp.arquivo('png', 'png')) $$;
+language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('bpm', 'bpm'), pg_temp.arquivo('png', 'png')) $$;
 create function pg_temp.relatorio(nome text) returns jsonb
 language sql immutable as $$
   select jsonb_build_object('papel', 'relatorio', 'nome', nome, 'formato', 'pdf', 'tamanho', 100,

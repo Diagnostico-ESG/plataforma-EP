@@ -48,7 +48,7 @@ language sql immutable as $$
   select jsonb_build_object('papel', papel, 'nome', 'SB1_V1_Processo.' || formato, 'formato', formato,
     'tamanho', 100, 'hash_md5', '0123456789abcdef0123456789abcdef', 'drive_id', 'drive-' || papel) $$;
 create function pg_temp.par() returns jsonb
-language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('bpmn', 'bpmn'), pg_temp.arquivo('png', 'png')) $$;
+language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('bpm', 'bpm'), pg_temp.arquivo('png', 'png')) $$;
 create function pg_temp.relatorio() returns jsonb
 language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('relatorio', 'pdf')) $$;
 -- O que a função do servidor entrega à substituição: o que o Drive informou do arquivo novo.
@@ -64,13 +64,13 @@ language sql stable as $$
 grant execute on function pg_temp.arquivo(text, text), pg_temp.par(), pg_temp.relatorio(), pg_temp.novo(text, text),
   pg_temp.processo(text), pg_temp.arquivo_da(uuid, integer, public.papel_do_arquivo) to authenticated;
 
--- Versões, como administrador (os processos ainda estão em andamento): V1 com .bpmn, .png e relatório em cada um;
+-- Versões, como administrador (os processos ainda estão em andamento): V1 com .bpm, .png, .bpmn e relatório em cada um;
 -- em f5, a histórica V1F com o mesmo conteúdo.
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
 set local role authenticated;
-select public.registrar_versao(pg_temp.processo(sufixo), 1, null, pg_temp.par() || pg_temp.relatorio())
+select public.registrar_versao(pg_temp.processo(sufixo), 1, null, pg_temp.par() || pg_temp.arquivo('bpmn', 'bpmn') || pg_temp.relatorio())
   from (values ('f1'), ('f2'), ('f3'), ('f4'), ('f6')) as processos (sufixo);
-select public.registrar_versao_historica(pg_temp.processo('f5'), 1, null, pg_temp.par() || pg_temp.relatorio());
+select public.registrar_versao_historica(pg_temp.processo('f5'), 1, null, pg_temp.par() || pg_temp.arquivo('bpmn', 'bpmn') || pg_temp.relatorio());
 
 -- Administrador, no processo f1.
 insert into _tap (linha) select lives_ok(
@@ -85,8 +85,8 @@ insert into _tap (linha) select lives_ok(
   $sql$select public.substituir_arquivo(pg_temp.arquivo_da(pg_temp.processo('f1'), 1, 'relatorio'), pg_temp.novo('pdf', 'cccccccccccccccccccccccccccccccc'))$sql$,
   'administrador substitui o relatório da V1');
 insert into _tap (linha) select is((select count(*) from public.arquivos_da_versao v
-    where v.versao_id in (select id from public.versoes where processo_id = pg_temp.processo('f1'))), 3::bigint,
-  'a substituição não cria arquivo: a V1 continua com os três');
+    where v.versao_id in (select id from public.versoes where processo_id = pg_temp.processo('f1'))), 4::bigint,
+  'a substituição não cria arquivo: a V1 continua com os quatro');
 insert into _tap (linha) select throws_ok(
   $sql$select public.substituir_arquivo(pg_temp.arquivo_da(pg_temp.processo('f1'), 1, 'relatorio'), pg_temp.novo('docx'))$sql$,
   'P0001', 'tipo_de_arquivo_diferente:pdf', 'o relatório .pdf não é trocado por um .docx');

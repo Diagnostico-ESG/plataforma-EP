@@ -51,7 +51,7 @@ language sql immutable as $$
   select jsonb_build_object('papel', papel, 'nome', 'RD1_V1_Processo.' || formato, 'formato', formato,
     'tamanho', tamanho, 'hash_md5', '0123456789abcdef0123456789abcdef', 'drive_id', 'drive-' || papel) $$;
 create function pg_temp.par() returns jsonb
-language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('bpmn', 'bpmn'), pg_temp.arquivo('png', 'png')) $$;
+language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('bpm', 'bpm'), pg_temp.arquivo('png', 'png')) $$;
 -- O relatório do V2 (o que o "sem alteração" copia) e o que a cópia traz de volta; o MD5 pode ser trocado.
 create function pg_temp.relatorio(nome text, hash text default 'abcdef0123456789abcdef0123456789') returns jsonb
 language sql immutable as $$
@@ -152,7 +152,7 @@ insert into _tap (linha) select throws_ok(
 insert into _tap (linha) select throws_ok(
   $sql$insert into public.arquivos_da_versao (versao_id, papel, nome, formato, tamanho, hash_md5, drive_id, copiado_de)
     values (pg_temp.versao(pg_temp.processo('e1'), 4), 'relatorio', 'RD1_V4_P_Relatório.pdf', 'pdf', 100, '0123456789abcdef0123456789abcdef', 'x',
-      pg_temp.arquivo_da(pg_temp.processo('e1'), 3, 'bpmn'))$sql$,
+      pg_temp.arquivo_da(pg_temp.processo('e1'), 3, 'png'))$sql$,
   'P0001', 'copia_so_de_relatorio', 'copiar de um arquivo que não é relatório é recusado');
 insert into _tap (linha) select lives_ok(
   $sql$select public.registrar_sem_alteracao(pg_temp.versao(pg_temp.processo('e1'), 4), pg_temp.relatorio('RD1_V4_Processo Relatorio_Relatório.pdf'))$sql$,
