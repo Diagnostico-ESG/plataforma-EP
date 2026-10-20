@@ -16,3 +16,5 @@
 - [x] Recusas e falhas ao gravar aparecem em vermelho sem perder o preenchido.
 - [x] Edições aparecem no histórico do processo com o antes e o depois.
 - [x] Testes do módulo real e da tela inteira com a falsa cobrindo os itens acima.
+
+Concluído em 2026-10-19 (commit d19c34a)
