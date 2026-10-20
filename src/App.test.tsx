@@ -6,11 +6,12 @@ import { ProcessosFalso } from './processos/ProcessosFalso'
 import { AcessoFalso } from './acesso/AcessoFalso'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
+import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 
 afterEach(cleanup)
 
 async function abrirLogado() {
-  render(<App acesso={AcessoFalso.logadoComo()} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo()} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
   await screen.findByRole('heading', { name: 'Processos' })
 }
 

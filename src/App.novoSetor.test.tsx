@@ -9,6 +9,7 @@ import css from './components/cadastros/Cadastros.css?raw'
 import { regrasDaClasse } from './testes/regrasDaClasse'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
+import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 
 beforeEach(() => {
   window.location.hash = '#/setores'
@@ -19,7 +20,7 @@ afterEach(() => {
 })
 
 async function abrirFormulario(cadastros = new CadastrosFalso()) {
-  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
   fireEvent.click(await screen.findByRole('button', { name: 'Novo setor' }))
   return cadastros
 }

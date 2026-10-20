@@ -10,10 +10,10 @@
 
 ## Critérios de aceite
 
-- [ ] Banco: testes antes da migração: só o Administrador ativo pede (Integrante, Consulta, desativado e visitante recusados); segundo pedido com um em andamento recusado com `atualizacao_em_andamento`; cofre incompleto recusado com `planilhas_nao_configuradas`; só as 10 mais recentes ficam; leitura das tentativas só do Administrador ativo e ninguém grava direto; resultado calculado nos quatro casos; ficha certa aceita uma vez, ficha errada, tentativa já terminada e repetição recusadas; `links_das_planilhas` só para o Administrador; o agendamento existe e não começa com uma em andamento. O teste confere o registro e a ficha, não a chegada à função.
-- [ ] A aba Planilhas aparece só para o Administrador, com as tentativas da mais recente para a mais antiga, "Automática" ou "Pelo botão · <nome>", data e hora de Brasília, resultado e motivo.
-- [ ] Apertar [Atualizar planilhas agora] mostra a tentativa "Em andamento" na hora e desliga o botão; a tentativa muda sozinha para o resultado; "Sem resposta" libera o botão; a recusa aparece como "Já há uma atualização em andamento.".
-- [ ] Os dois links abrem em aba nova; sem configuração, a aba diz isso e o botão explica por que não atualiza.
-- [ ] Testes do módulo real com o cliente simulado, da tabela dos motivos e da tela inteira com as falsas, cobrindo os itens acima, inclusive falha ao ler e ao pedir.
-- [ ] Roteiro do cofre escrito para o usuário: lista numerada, um passo por linha, com o endereço direto do SQL Editor do projeto de desenvolvimento.
-- [ ] [visual] A aba segue o estilo de Usuários e Catálogo de etapas; o resultado de cada tentativa se distingue pela cor das mensagens e pelo texto.
+- [x] Banco: testes antes da migração: só o Administrador ativo pede (Integrante, Consulta, desativado e visitante recusados); segundo pedido com um em andamento recusado com `atualizacao_em_andamento`; cofre incompleto recusado com `planilhas_nao_configuradas`; só as 10 mais recentes ficam; leitura das tentativas só do Administrador ativo e ninguém grava direto; resultado calculado nos quatro casos; ficha certa aceita uma vez, ficha errada, tentativa já terminada e repetição recusadas; `links_das_planilhas` só para o Administrador; o agendamento existe e não começa com uma em andamento. O teste confere o registro e a ficha, não a chegada à função.
+- [x] A aba Planilhas aparece só para o Administrador, com as tentativas da mais recente para a mais antiga, "Automática" ou "Pelo botão · <nome>", data e hora de Brasília, resultado e motivo.
+- [x] Apertar [Atualizar planilhas agora] mostra a tentativa "Em andamento" na hora e desliga o botão; a tentativa muda sozinha para o resultado; "Sem resposta" libera o botão; a recusa aparece como "Já há uma atualização em andamento.".
+- [x] Os dois links abrem em aba nova; sem configuração, a aba diz isso e o botão explica por que não atualiza.
+- [x] Testes do módulo real com o cliente simulado, da tabela dos motivos e da tela inteira com as falsas, cobrindo os itens acima, inclusive falha ao ler e ao pedir.
+- [x] Roteiro do cofre escrito para o usuário: lista numerada, um passo por linha, com o endereço direto do SQL Editor do projeto de desenvolvimento.
+- [x] [visual] A aba segue o estilo de Usuários e Catálogo de etapas; o resultado de cada tentativa se distingue pela cor das mensagens e pelo texto.

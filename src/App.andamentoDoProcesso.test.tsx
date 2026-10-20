@@ -9,6 +9,7 @@ import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { EtapaDoProcesso, ProcessoLido } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
+import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 import { agoraDoVerso, etapasDoVerso, gavetaDaEtapa, janelaPorCima } from './testes/versoDoCartao'
 
 beforeEach(() => {
@@ -55,7 +56,7 @@ function montar({ perfil = 'integrante_ep', processos = [processo()], ajustar }:
     { id: 'e9', codigo: 'publicacao', nome: 'Publicação', ordem: 9, ativa: true },
   ]
   ajustar?.(falso)
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
   return falso
 }
 

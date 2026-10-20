@@ -1,21 +1,29 @@
 import { useState } from 'react'
 import { rotuloDoPerfil } from '../../acesso/perfis'
 import type { ModuloDeAcesso, UsuarioAtual } from '../../acesso/tipos'
+import type { ModuloDePlanilhas } from '../../planilhas/tipos'
 import type { ModuloDeProcessos } from '../../processos/tipos'
+import { AreaDasPlanilhas } from './AreaDasPlanilhas'
 import { AreaDeUsuarios } from './AreaDeUsuarios'
 import { CatalogoDeEtapas } from './CatalogoDeEtapas'
 import './Administracao.css'
 
-type AreaDeAdministracaoProps = { usuario: UsuarioAtual; acesso: ModuloDeAcesso; processos: ModuloDeProcessos }
+type AreaDeAdministracaoProps = {
+  usuario: UsuarioAtual
+  acesso: ModuloDeAcesso
+  processos: ModuloDeProcessos
+  planilhas: ModuloDePlanilhas
+}
 
-type Aba = 'usuarios' | 'catalogo'
+type Aba = 'usuarios' | 'catalogo' | 'planilhas'
 const ABAS: { aba: Aba; rotulo: string }[] = [
   { aba: 'usuarios', rotulo: 'Usuários' },
   { aba: 'catalogo', rotulo: 'Catálogo de etapas' },
+  { aba: 'planilhas', rotulo: 'Planilhas' },
 ]
 
 // Esconder o item da faixa é conveniência; quem protege os dados é a RLS de autorizacoes e de etapas.
-export function AreaDeAdministracao({ usuario, acesso, processos }: AreaDeAdministracaoProps) {
+export function AreaDeAdministracao({ usuario, acesso, processos, planilhas }: AreaDeAdministracaoProps) {
   const [aba, setAba] = useState<Aba>('usuarios')
   if (usuario.perfil !== 'administrador') {
     return (
@@ -33,7 +41,9 @@ export function AreaDeAdministracao({ usuario, acesso, processos }: AreaDeAdmini
             onClick={() => setAba(esta)}>{rotulo}</button>
         ))}
       </div>
-      {aba === 'usuarios' ? <AreaDeUsuarios acesso={acesso} /> : <CatalogoDeEtapas catalogo={processos.catalogo} />}
+      {aba === 'usuarios' && <AreaDeUsuarios acesso={acesso} />}
+      {aba === 'catalogo' && <CatalogoDeEtapas catalogo={processos.catalogo} />}
+      {aba === 'planilhas' && <AreaDasPlanilhas planilhas={planilhas} />}
     </>
   )
 }

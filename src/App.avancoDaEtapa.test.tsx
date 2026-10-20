@@ -10,6 +10,7 @@ import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { EtapaDoProcesso, ProcessoLido, UsuarioResponsavel } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
+import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 import { agoraDoVerso, escolherNoMenuDoProcesso, etapasDoVerso, janelasPorCima } from './testes/versoDoCartao'
 
 beforeEach(() => {
@@ -57,7 +58,7 @@ function montar(etapas: EtapaDoProcesso[] = [MODELAGEM_EM_ANDAMENTO, RELATORIO, 
   falso.usuariosPossiveis = usuarios
   falso.etapasDoCatalogo = etapas.map((etapa) => ({ id: `e${etapa.ordem}`, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, ativa: true }))
   ajustar?.(falso)
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
   return falso
 }
 

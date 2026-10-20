@@ -7,6 +7,7 @@ import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
+import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 
 beforeEach(() => {
   window.location.hash = '#/setores/macroprocessos'
@@ -19,7 +20,7 @@ afterEach(() => {
 type Campos = { codigo?: string; nome: string; descricao?: string; categoria?: string }
 
 async function abrirFormulario(cadastros = new CadastrosFalso()) {
-  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
   fireEvent.click(await screen.findByRole('button', { name: 'Novo macroprocesso' }))
   return cadastros
 }

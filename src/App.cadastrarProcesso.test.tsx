@@ -9,6 +9,7 @@ import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { ProcessoLido } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
+import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 import { escolherNoMenuDoProcesso, janelasPorCima } from './testes/versoDoCartao'
 
 beforeEach(() => {
@@ -48,7 +49,7 @@ function montar({ perfil = 'integrante_ep', processos = [] }: Montagem = {}) {
   falso.siglasDosSetores = { s1: 'TSA', s2: 'TSB' }
   falso.nomesDosMacroprocessos = { m1: 'Macro A', m2: 'Macro B' }
   falso.processos = processos
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
   return falso
 }
 

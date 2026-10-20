@@ -9,6 +9,7 @@ import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { EventoDoCadastro } from './cadastros/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
+import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 
 beforeEach(() => {
   window.location.hash = '#/setores/historico'
@@ -46,7 +47,7 @@ function montar(perfil: Perfil = 'integrante_ep', eventos: EventoDoCadastro[] = 
   const cadastros = new CadastrosFalso()
   cadastros.historico = eventos
   ajustar?.(cadastros)
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
   return cadastros
 }
 

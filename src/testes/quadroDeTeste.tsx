@@ -10,6 +10,7 @@ import type {
 } from '../processos/tipos'
 import { VersoesFalso } from '../versoes/VersoesFalso'
 import { RevisoesFalso } from '../revisoes/RevisoesFalso'
+import { PlanilhasFalso } from '../planilhas/PlanilhasFalso'
 
 export const ETAPAS: EtapaDoCatalogo[] = [
   { id: 'e1', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 1, ativa: true },
@@ -83,7 +84,7 @@ export function montar(processos: ProcessoLido[], perfil: Perfil = 'integrante_e
   falso.etapasDoCatalogo = ETAPAS
   falso.processos = processos
   falso.usuariosPossiveis = usuarios
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso(falso)} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso(falso)} planilhas={new PlanilhasFalso()} />)
   return falso
 }
 

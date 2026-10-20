@@ -8,6 +8,7 @@ import type { EtapaDoProcesso, EtapaNoCatalogo, ProcessoLido, SituacaoDoProcesso
 import { ETAPAS_DE_TESTE, abrirCatalogo, montarComCatalogo } from './testes/catalogoDeTeste'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
+import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 
 afterEach(() => {
   cleanup()
@@ -48,7 +49,7 @@ function montar(): ProcessosFalso {
 function abrirEm(processos: ProcessosFalso, endereco: string) {
   cleanup()
   window.location.hash = endereco
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'administrador' })} cadastros={new CadastrosFalso()} processos={processos} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'administrador' })} cadastros={new CadastrosFalso()} processos={processos} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
 }
 
 async function acrescentarEncerramento() {
