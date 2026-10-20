@@ -25,7 +25,7 @@ O conjunto de permissões de um usuário; cada usuário tem exatamente um: Admin
 _Avoid_: papel, função, nível de acesso
 
 **Administrador**:
-Perfil que pode tudo, incluindo gerir usuários, o catálogo de etapas e a importação.
+Perfil que pode tudo, incluindo gerir usuários, o catálogo de etapas e as planilhas dos dashboards.
 _Avoid_: admin, gestor
 
 **Integrante do EP**:
@@ -87,6 +87,10 @@ _Avoid_: indefinido, rascunho
 **Catálogo de etapas**:
 A lista ordenada de etapas, mantida pelo administrador, que todo processo percorre, da modelagem piloto em diante. Não há etapas do setor: identificação dos responsáveis, sensibilização e identificação dos processos já foram feitas para todos os setores e ficam fora da plataforma.
 _Avoid_: workflow, fluxo de etapas, etapa do setor
+
+**Fase do Regimento**:
+Cada uma das nove fases do mapeamento definidas no art. 8º do Regimento Interno do EP (I a IX), pelas quais os dashboards contam o andamento. Cada etapa do catálogo pertence a uma fase; uma fase pode juntar várias etapas (a VI junta Revisão interna, Revisão pelo setor e Aprovação pelo setor). As fases I a III não têm etapa, porque foram feitas fora da plataforma para todos os setores, e contam sempre como concluídas.
+_Avoid_: etapa (para a fase), etapa do Regimento, macroetapa
 
 **Etapa obrigatória / Etapa opcional**:
 Marcação do catálogo. Só a etapa opcional pode ser dispensada; o processo só se conclui com todas as obrigatórias resolvidas.
@@ -185,3 +189,21 @@ _Avoid_: homologação, validação final
 **E-protocolo**:
 O sistema de protocolo do governo onde o setor formaliza a aprovação; a plataforma guarda só o número e, se houver, o link.
 _Avoid_: protocolo, processo eletrônico
+
+## Dashboards
+
+**Planilha interna**:
+Planilha do Google que a plataforma escreve com o andamento de cada processo e de cada fase do Regimento, sem nome de pessoa, para o dashboard interno. Só a equipe do EP tem acesso.
+_Avoid_: planilha do dashboard, planilha de controle, base
+
+**Planilha pública**:
+Planilha do Google que a plataforma escreve só com contagens (processos, setores e conclusões por fase do Regimento), sem nome de processo nem de pessoa, para o dashboard público.
+_Avoid_: planilha aberta, dados abertos
+
+**Dashboard interno / Dashboard público**:
+Os relatórios montados fora da plataforma, no Data Studio da conta do CED, a partir da planilha interna e da planilha pública. O público é divulgado por link na página do EP no site da Casa Civil. Diferente do **Painel**, que é a área da própria plataforma.
+_Avoid_: painel (para o dashboard), relatório (para o dashboard), BI
+
+**Atualizar as planilhas**:
+Reescrever as duas planilhas inteiras com os dados atuais da plataforma, todo dia de manhã ou quando o Administrador pede. Se falha, as planilhas ficam como estavam.
+_Avoid_: sincronizar, exportar, publicar
