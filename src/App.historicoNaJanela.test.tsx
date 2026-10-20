@@ -9,6 +9,7 @@ import type { ProcessoLido } from './processos/tipos'
 import { escolherNoMenuDoProcesso, versoAberto } from './testes/versoDoCartao'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
+import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 
 beforeEach(() => {
   // Só o relógio de Date: o resto dos temporizadores segue real, para o waitFor funcionar.
@@ -48,7 +49,7 @@ function montar(historico: EventoDoCadastro[] = EVENTOS) {
   const falso = new ProcessosFalso()
   falso.processos = [PROCESSO]
   falso.historicoDosProcessos = { p1: historico }
-  render(<App acesso={AcessoFalso.logadoComo(USUARIO_DE_TESTE)} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo(USUARIO_DE_TESTE)} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
   return falso
 }
 

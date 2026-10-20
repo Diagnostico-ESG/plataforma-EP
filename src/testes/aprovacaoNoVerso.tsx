@@ -6,6 +6,7 @@ import { CadastrosFalso } from '../cadastros/CadastrosFalso'
 import { ProcessosFalso } from '../processos/ProcessosFalso'
 import type { EtapaDoProcesso, ProcessoLido, UltimaVersao } from '../processos/tipos'
 import { RevisoesFalso } from '../revisoes/RevisoesFalso'
+import { PlanilhasFalso } from '../planilhas/PlanilhasFalso'
 import { VersoesFalso } from '../versoes/VersoesFalso'
 import { agoraDoVerso } from './versoDoCartao'
 
@@ -79,7 +80,7 @@ export function montar(ultimaVersao: UltimaVersao | null, { perfil = 'integrante
   const revisoes = new RevisoesFalso(falso, EU, versoes)
   ajustar?.({ falso, revisoes, versoes })
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso}
-    versoes={versoes} revisoes={revisoes} />)
+    versoes={versoes} revisoes={revisoes} planilhas={new PlanilhasFalso()} />)
   return { falso, revisoes, versoes }
 }
 

@@ -8,11 +8,12 @@ import css from './components/moldura/Moldura.css?raw'
 import { regrasDaClasse } from './testes/regrasDaClasse'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
+import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 
 afterEach(cleanup)
 
 async function abrirLogado(acesso = AcessoFalso.logadoComo()) {
-  render(<App acesso={acesso} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
+  render(<App acesso={acesso} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
   return screen.findByRole('button', { name: 'Sua conta: Pessoa de Teste' })
 }
 

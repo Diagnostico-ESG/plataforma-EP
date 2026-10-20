@@ -8,6 +8,7 @@ import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { EtapaDoProcesso, ProcessoLido, UltimaVersao } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
+import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 import { agoraDoVerso, etapasDoVerso } from './testes/versoDoCartao'
 import { cartaoDe, ETAPAS, montar as montarQuadro, processo as processoDoQuadro } from './testes/quadroDeTeste'
 
@@ -63,7 +64,7 @@ function montar(ultimaVersao: UltimaVersao | null, falha?: string | Error): Proc
   falso.usuariosPossiveis = [{ id: USUARIO_DE_TESTE.id, nome: USUARIO_DE_TESTE.nome }]
   falso.etapasDoCatalogo = CAMINHO.map((etapa) => ({ id: `e${etapa.ordem}`, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, ativa: true }))
   if (falha) falso.falhaDeGravacao = falha
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'integrante_ep' })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'integrante_ep' })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
   return falso
 }
 

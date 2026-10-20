@@ -9,6 +9,7 @@ import type { Perfil } from './acesso/tipos'
 import type { EtapaDoProcesso, ProcessoLido, UltimaVersao } from './processos/tipos'
 import type { RevisaoInterna } from './revisoes/tipos'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
+import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 import { cartaoDe, ETAPAS, montar as montarQuadro, processo as processoDoQuadro } from './testes/quadroDeTeste'
 import { agoraDoVerso, escolherNoMenuDoProcesso, etapasDoVerso, gavetaDaEtapa, versoAberto } from './testes/versoDoCartao'
 import { VersoesFalso } from './versoes/VersoesFalso'
@@ -69,7 +70,7 @@ function montar(ultimaVersao: UltimaVersao | null, { perfil = 'integrante_ep', m
   falso.etapasDoCatalogo = CAMINHO.map((etapa) => ({ id: `e${etapa.ordem}`, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, ativa: true }))
   const revisoes = new RevisoesFalso(falso, EU)
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso}
-    versoes={new VersoesFalso()} revisoes={revisoes} />)
+    versoes={new VersoesFalso()} revisoes={revisoes} planilhas={new PlanilhasFalso()} />)
   return { falso, revisoes }
 }
 

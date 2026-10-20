@@ -8,6 +8,7 @@ import { hojeLocal } from '../processos/textoDaReuniao'
 import type { EtapaDoProcesso, ProcessoLido, UsuarioResponsavel } from '../processos/tipos'
 import { VersoesFalso } from '../versoes/VersoesFalso'
 import { RevisoesFalso } from '../revisoes/RevisoesFalso'
+import { PlanilhasFalso } from '../planilhas/PlanilhasFalso'
 
 export const EU: UsuarioResponsavel = { id: USUARIO_DE_TESTE.id, nome: USUARIO_DE_TESTE.nome }
 export const BIA: UsuarioResponsavel = { id: 'u2', nome: 'Bia Teste' }
@@ -48,6 +49,6 @@ export function montarVerso(processo: ProcessoLido, perfil: Perfil = 'integrante
   falso.etapasDoCatalogo = processo.etapasDoProcesso.map((etapa) => ({
     id: `e${etapa.ordem}`, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, ativa: true,
   }))
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso(falso)} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso(falso)} planilhas={new PlanilhasFalso()} />)
   return falso
 }

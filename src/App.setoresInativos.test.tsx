@@ -7,6 +7,7 @@ import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { Setor } from './cadastros/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
+import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 
 beforeEach(() => {
   window.location.hash = '#/setores'
@@ -25,7 +26,7 @@ const SETORES: Setor[] = [
 function montar(setores = SETORES) {
   const cadastros = new CadastrosFalso()
   cadastros.setores = [...setores]
-  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
   return cadastros
 }
 

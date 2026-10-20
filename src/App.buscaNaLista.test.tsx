@@ -7,6 +7,7 @@ import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { EtapaDoCatalogo, ProcessoLido } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
+import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 
 beforeEach(() => {
   window.location.hash = '#/processos/lista'
@@ -38,7 +39,7 @@ function montar() {
   const falso = new ProcessosFalso()
   falso.etapasDoCatalogo = [MODELAGEM]
   falso.processos = PROCESSOS
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'integrante_ep' })} cadastros={new CadastrosFalso()} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'integrante_ep' })} cadastros={new CadastrosFalso()} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
 }
 
 async function nomesNaLista(): Promise<string[]> {

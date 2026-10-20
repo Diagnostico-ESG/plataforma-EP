@@ -6,6 +6,7 @@ import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
+import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 
 afterEach(() => {
   cleanup()
@@ -35,7 +36,7 @@ function montar(hash: string) {
     { macroprocessoId: 'm3', setorId: 's1', observacao: null },
     { macroprocessoId: 'm1', setorId: 's2', observacao: null },
   ]
-  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} />)
+  render(<App acesso={AcessoFalso.logadoComo()} cadastros={cadastros} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
   return cadastros
 }
 
