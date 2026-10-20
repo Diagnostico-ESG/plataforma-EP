@@ -96,7 +96,7 @@ select public.cancelar_processo(pg_temp.processo('Filho C'), 'Não segue');
 -- Etapa atual: início e status.
 insert into _tap (linha) select is((pg_temp.linha('Parado')).etapa_atual_status::text, 'em_andamento',
   'a etapa atual iniciada aparece como em andamento');
-insert into _tap (linha) select is((pg_temp.linha('Parado')).etapa_atual_iniciada_em, current_date,
+insert into _tap (linha) select is((pg_temp.linha('Parado')).etapa_atual_iniciada_em, private.hoje(),
   'o início da etapa atual é a data em que ela foi iniciada');
 insert into _tap (linha) select is((pg_temp.linha('Pendente')).etapa_atual_status::text, 'pendente',
   'a etapa atual não iniciada aparece como pendente');
@@ -156,7 +156,7 @@ select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000
 insert into _tap (linha) select is((pg_temp.linha('V2 Sem')).ultima_versao_numero, 2, 'o integrante lê a última versão');
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a3","role":"authenticated"}', true);
 insert into _tap (linha) select is((pg_temp.linha('V2 Sem')).ultima_versao_numero, 2, 'a consulta lê a mesma última versão');
-insert into _tap (linha) select is((pg_temp.linha('Parado')).etapa_atual_iniciada_em, current_date, 'a consulta lê o mesmo início da etapa');
+insert into _tap (linha) select is((pg_temp.linha('Parado')).etapa_atual_iniciada_em, private.hoje(), 'a consulta lê o mesmo início da etapa');
 insert into _tap (linha) select is((pg_temp.linha('Pai')).subprocessos_quantidade, 2, 'a consulta lê a mesma contagem de subprocessos');
 
 -- O usuário desativado e o visitante não leem.

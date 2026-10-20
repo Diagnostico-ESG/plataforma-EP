@@ -71,7 +71,7 @@ insert into _tap (linha) select is(
     pg_temp.andamento('Processo Volta', 'relatorio_modelagem_tecnica'), pg_temp.andamento('Processo Volta', 'revisao_interna'))
     and status = 'pendente'), 2, 'as seguintes resolvidas voltam a pendente');
 insert into _tap (linha) select ok(
-  (select iniciada_em = current_date and resolvida_em is null from public.andamentos
+  (select iniciada_em = private.hoje() and resolvida_em is null from public.andamentos
     where id = pg_temp.andamento('Processo Volta', 'modelagem')),
   'a escolhida mantém o início e perde a conclusão');
 insert into _tap (linha) select ok(
@@ -128,18 +128,18 @@ select pg_temp.agir('Processo Datas', 'modelagem', 'em_andamento');
 select pg_temp.agir('Processo Datas', 'modelagem', 'concluida');
 insert into _tap (linha) select throws_ok(
   format($sql$update public.andamentos set iniciada_em = %L where id = pg_temp.andamento('Processo Datas', 'modelagem')$sql$,
-    current_date + 1), 'P0001', 'data_no_futuro:' || (current_date + 1)::text, 'início no futuro é recusado');
+    private.hoje() + 1), 'P0001', 'data_no_futuro:' || (private.hoje() + 1)::text, 'início no futuro é recusado');
 insert into _tap (linha) select throws_ok(
   format($sql$update public.andamentos set resolvida_em = %L where id = pg_temp.andamento('Processo Datas', 'modelagem')$sql$,
-    current_date + 1), 'P0001', 'data_no_futuro:' || (current_date + 1)::text, 'conclusão no futuro é recusada');
+    private.hoje() + 1), 'P0001', 'data_no_futuro:' || (private.hoje() + 1)::text, 'conclusão no futuro é recusada');
 insert into _tap (linha) select throws_ok(
   format($sql$update public.andamentos set iniciada_em = %L, resolvida_em = %L
-    where id = pg_temp.andamento('Processo Datas', 'modelagem')$sql$, current_date, current_date - 1),
-  'P0001', 'resolvida_antes_do_inicio:' || (current_date - 1)::text || ':' || current_date::text,
+    where id = pg_temp.andamento('Processo Datas', 'modelagem')$sql$, private.hoje(), private.hoje() - 1),
+  'P0001', 'resolvida_antes_do_inicio:' || (private.hoje() - 1)::text || ':' || private.hoje()::text,
   'conclusão antes do início é recusada');
 insert into _tap (linha) select lives_ok(
   format($sql$update public.andamentos set iniciada_em = %L, resolvida_em = %L
-    where id = pg_temp.andamento('Processo Datas', 'modelagem')$sql$, current_date - 3, current_date - 1),
+    where id = pg_temp.andamento('Processo Datas', 'modelagem')$sql$, private.hoje() - 3, private.hoje() - 1),
   'corrigir início e conclusão');
 insert into _tap (linha) select is(
   (select count(*)::int from public.eventos where acao = 'corrigir_datas'
@@ -148,7 +148,7 @@ insert into _tap (linha) select is(
 insert into _tap (linha) select is(
   (select detalhes -> 'depois' ->> 'resolvida_em' from public.eventos where acao = 'corrigir_datas'
     and entidade_ref like '%:' || pg_temp.andamento('Processo Datas', 'modelagem')::text),
-  (current_date - 1)::text, 'o evento traz a data nova');
+  (private.hoje() - 1)::text, 'o evento traz a data nova');
 update public.andamentos set iniciada_em = iniciada_em where id = pg_temp.andamento('Processo Datas', 'modelagem');
 insert into _tap (linha) select is(
   (select count(*)::int from public.eventos where acao = 'corrigir_datas'
@@ -187,7 +187,7 @@ insert into _tap (linha) select lives_ok(
 
 -- Perfis: Consulta e inativo não alteram; visitante nem tenta.
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a3","role":"authenticated"}', true);
-with alterados as (update public.andamentos set iniciada_em = current_date - 5
+with alterados as (update public.andamentos set iniciada_em = private.hoje() - 5
   where id = pg_temp.andamento('Processo Datas', 'modelagem') returning 1)
 insert into _tap (linha) select is((select count(*)::int from alterados), 0, 'Consulta não corrige datas');
 with alterados as (update public.andamentos set responsavel_id = '00000000-0000-0000-0000-0000000000a2'
