@@ -27,16 +27,16 @@
 - Criar: `supabase/migrations/<data>_versao_exige_bpm_e_png.sql`
 - Registro: `supabase/AMBIENTES.md`
 
-- [ ] **1.1 Branch e marco.** `git switch -c documentos-versoes-bpm`; marco `marco/2026-10-20-inicio-mudanca-bpm` e envio do marco.
-- [ ] **1.2 Testes pgTAP (vermelhos com o banco atual).**
+- [x] **1.1 Branch e marco.** `git switch -c documentos-versoes-bpm`; marco `marco/2026-10-20-inicio-mudanca-bpm` e envio do marco.
+- [x] **1.2 Testes pgTAP (vermelhos com o banco atual).**
   - Em todos os arquivos da lista com `pg_temp.par()`: o par passa a `jsonb_build_array(pg_temp.arquivo('bpm', 'bpm'), pg_temp.arquivo('png', 'png'))`, e os comentários "par .bpmn + .png" passam a ".bpm + .png". **Exceção, 28:** o `par()` fica .bpmn + .png (prova a histórica com o par); só a linha 130 (versão nova depois da V5F) passa a `jsonb_build_array(pg_temp.arquivo('bpm', 'bpm'), pg_temp.arquivo('png', 'png'))`.
   - **27:** a primeira descrição vira "administrador registra uma versão com .bpm e .png, sem .bpmn"; os dois `throws_ok` de `versao_sem_bpmn_e_png` viram três com `versao_sem_bpm_e_png`: só `.bpm` ("versão sem .png é recusada"), só `.png` ("versão sem .bpm é recusada") e `.bpmn` + `.png` ("versão com .bpmn e .png, sem .bpm, é recusada"). O "segundo arquivo do mesmo papel" usa `pg_temp.par() || pg_temp.arquivo('bpm', 'bpm')`. `plan(52)` → `plan(53)`. Comentário do cabeçalho: "par .bpm e .png".
   - **29, linha 155:** `arquivo_da(..., 3, 'bpmn')` → `'png'` (continua um arquivo que não é relatório).
   - **30:** as V1 (f1 a f4, f6) e a histórica V1F de f5 passam a `pg_temp.par() || pg_temp.arquivo('bpmn', 'bpmn') || pg_temp.relatorio()`; os casos de `'bpmn'` ficam como estão e passam a provar a história 60 (substituir o .bpmn opcional). Comentário: "V1 com .bpm, .png, .bpmn e relatório".
   - **38:** caso novo "Sem Bpm", logo depois do "Sem Png", no mesmo molde (o dono do banco apaga o `bpm` da V1): `throws_ok(..., 'P0001', 'versao_incompleta:1:bpm,relatorio', 'concluir com a versão sem .bpm e sem relatório é recusado, com os dois')`. `plan(26)` → `plan(27)`. O caso "Completa" já sem .bpmn prova a história 59; comentários "(.bpmn, .png e relatório)" → "(.bpm, .png e relatório)".
   - **36, 37, 39, 40, 41:** só o `par()` e os comentários (o 40 e o 41 com a versão completa sem .bpmn provam a Aprovação da história 59).
-- [ ] **1.3 Comitar os testes, enviar a branch e disparar "Testes de banco".** Esperado: vermelho (o banco atual recusa a versão sem .bpmn com `versao_sem_bpmn_e_png` e não conhece `versao_sem_bpm_e_png`). Anotar o número da execução.
-- [ ] **1.4 Migração.** `npx supabase migration new versao_exige_bpm_e_png`, com:
+- [x] **1.3 Comitar os testes, enviar a branch e disparar "Testes de banco".** Esperado: vermelho (o banco atual recusa a versão sem .bpmn com `versao_sem_bpmn_e_png` e não conhece `versao_sem_bpm_e_png`). Anotar o número da execução.
+- [x] **1.4 Migração.** `npx supabase migration new versao_exige_bpm_e_png`, com:
 
 ```sql
 -- documentos-versoes, mudança de 2026-10-20 (ADR 0016): a versão nova exige o .bpm e o .png; o .bpmn fica opcional, e a
@@ -80,26 +80,26 @@ as $$
 
 **Produz:** `PAPEIS` (ordem do formulário) = `['bpm', 'png', 'bpmn', 'relatorio']`; `ORDEM_DOS_ARQUIVOS` = `['png', 'bpm', 'relatorio', 'bpmn']` e `emOrdemDeExibicao(arquivos: ArquivoDaVersao[]): ArquivoDaVersao[]` em `rotulos.ts`; `PAPEIS_OBRIGATORIOS = ['bpm', 'png']`.
 
-- [ ] **2.1 Testes vermelhos:**
+- [x] **2.1 Testes vermelhos:**
   - `rotulos.test.ts`: `PAPEIS` igual a `['bpm', 'png', 'bpmn', 'relatorio']`; `emOrdemDeExibicao` de [bpmn, relatorio, bpm, png] devolve [png, bpm, relatorio, bpmn]; `ROTULO_DO_PAPEL` traz "Fluxograma Bizagi (.bpm)", "Imagem do fluxo (.png)" e ".bpmn"; `rotuloCurtoDoArquivo` dá "Fluxograma .bpm", "Imagem .png", "BPMN .bpmn".
   - `formularioDeVersao.test.ts`: `podeEnviar` verdadeiro com .bpm e .png sem .bpmn; falso só com .bpmn e .png; falso sem .png; `arquivosDoPedido` na ordem .bpm, .png, .bpmn, relatório.
   - `frasesDaVersaoCompleta.test.ts`: `faltasDaVersao(['png', 'bpmn', 'relatorio'])` = `['bpm']`; `fraseDaVersaoIncompleta(8, ['bpm', 'relatorio'])` = "A V8 está sem .bpm e relatório."; `fraseDoBloqueioDaConclusao` nulo com bpm, png e relatório sem bpmn.
   - `recusasDeVersoes.test.ts`: `versao_sem_bpm_e_png` → "A versão precisa do .bpm e do .png." (sai a linha do código antigo).
-- [ ] **2.2 Implementar:** `rotulos.ts` (PAPEIS, ORDEM_DOS_ARQUIVOS, `emOrdemDeExibicao`, rótulos: bpm "Fluxograma Bizagi (.bpm)", png "Imagem do fluxo (.png)", bpmn ".bpmn"; nomes curtos bpm "Fluxograma", png "Imagem", bpmn "BPMN"); `formularioDeVersao.ts` (`PAPEIS_OBRIGATORIOS`); `frasesDaVersaoCompleta.ts` (`EXIGIDOS = ['bpm', 'png', 'relatorio']`, `ROTULO` com `bpm: '.bpm'`); `recusasDeVersoes.ts` (chave e texto novos); `versaoDaLinha.ts` ordena por `ORDEM_DOS_ARQUIVOS`. `registro.test.ts` usa `versao_sem_bpm_e_png` como exemplo.
-- [ ] **2.3** Os testes da 2.1 passam. Seguir para a Tarefa 3 antes de comitar (a bateria inteira ainda tem testes de tela antigos).
+- [x] **2.2 Implementar:** `rotulos.ts` (PAPEIS, ORDEM_DOS_ARQUIVOS, `emOrdemDeExibicao`, rótulos: bpm "Fluxograma Bizagi (.bpm)", png "Imagem do fluxo (.png)", bpmn ".bpmn"; nomes curtos bpm "Fluxograma", png "Imagem", bpmn "BPMN"); `formularioDeVersao.ts` (`PAPEIS_OBRIGATORIOS`); `frasesDaVersaoCompleta.ts` (`EXIGIDOS = ['bpm', 'png', 'relatorio']`, `ROTULO` com `bpm: '.bpm'`); `recusasDeVersoes.ts` (chave e texto novos); `versaoDaLinha.ts` ordena por `ORDEM_DOS_ARQUIVOS`. `registro.test.ts` usa `versao_sem_bpm_e_png` como exemplo.
+- [x] **2.3** Os testes da 2.1 passam. Seguir para a Tarefa 3 antes de comitar (a bateria inteira ainda tem testes de tela antigos).
 
 ### Tarefa 3: Falsa de versões, tela e testes antigos
 
 **Arquivos:** `src/versoes/VersoesFalso.ts` (+ `.test.ts`), `src/components/versoes/VersaoEmDestaque.tsx`, `src/components/versoes/ListaDeVersoes.tsx`, `src/testes/versoesDeTeste.ts`, os `App.*.test.tsx` e testes de módulo que montam versões ou procuram os rótulos antigos, `src/versoes/tipos.ts` e `src/processos/tipos.ts` (comentários).
 
-- [ ] **3.1 Teste vermelho da falsa** (`VersoesFalso.test.ts`): a versão nova sem .bpm (só .bpmn e .png) é recusada com o código `versao_sem_bpm_e_png`; com .bpm e .png sem .bpmn é aceita.
-- [ ] **3.2 Falsa:** `conferirNova(pedido)` no molde de `conferirHistorica`, chamada em `registrar` quando não é histórica: sem `bpm` ou sem `png` → `falhaDaFuncao('versao_sem_bpm_e_png', '')`.
-- [ ] **3.3 Tela:** `VersaoEmDestaque` troca a `emOrdem` local por `emOrdemDeExibicao` (o comentário diz a ordem nova); `ListaDeVersoes` usa `emOrdemDeExibicao(versao.arquivos)`.
-- [ ] **3.4 Testes de tela novos** (critérios de "Decisões de teste"): em `App.enviarVersao` — envia com .bpm e .png sem .bpmn; botão desabilitado sem .bpm; habilitado sem .bpmn; ordem dos campos (.bpm, .png, .bpmn, relatório, observação, pelos rótulos). Em `App.versoesNoProcesso` — ordem dos arquivos no destaque e nas anteriores (.png, .bpm, relatório, .bpmn). Em `App.revisaoDoSetor` — janela diz "sem .bpm" quando falta; conclui com .bpm, .png e relatório sem .bpmn. Em `App.aprovacao` — conclui sem .bpmn. `App.registrarVersaoHistorica` — a histórica só com .bpm continua aceita (conferir se já existe; senão, acrescentar).
-- [ ] **3.5 Testes antigos:** `versaoDeTeste` passa a montar .bpm e .png (comentário junto); onde um teste monta a versão completa ou envia uma versão nova com .bpmn + .png, trocar por .bpm + .png (arquivo `.bpm` inventado, como o que os testes da histórica já usam); onde procura "Fluxograma .bpmn", "Imagem do fluxograma (.png)" ou "Fluxograma (.bpmn)", usar os rótulos novos; `papeis` de `UltimaVersao` completos passam a `['bpm', 'png', 'relatorio']`. Rodar `npm test` até verde, sem afrouxar asserção.
-- [ ] **3.6 Verificar e comitar:** `npm test`, `npm run typecheck`, `npm run lint` verdes; commit único da Tarefa 2 e 3 (funções, falsa, tela e testes).
+- [x] **3.1 Teste vermelho da falsa** (`VersoesFalso.test.ts`): a versão nova sem .bpm (só .bpmn e .png) é recusada com o código `versao_sem_bpm_e_png`; com .bpm e .png sem .bpmn é aceita.
+- [x] **3.2 Falsa:** `conferirNova(pedido)` no molde de `conferirHistorica`, chamada em `registrar` quando não é histórica: sem `bpm` ou sem `png` → `falhaDaFuncao('versao_sem_bpm_e_png', '')`.
+- [x] **3.3 Tela:** `VersaoEmDestaque` troca a `emOrdem` local por `emOrdemDeExibicao` (o comentário diz a ordem nova); `ListaDeVersoes` usa `emOrdemDeExibicao(versao.arquivos)`.
+- [x] **3.4 Testes de tela novos** (critérios de "Decisões de teste"): em `App.enviarVersao` — envia com .bpm e .png sem .bpmn; botão desabilitado sem .bpm; habilitado sem .bpmn; ordem dos campos (.bpm, .png, .bpmn, relatório, observação, pelos rótulos). Em `App.versoesNoProcesso` — ordem dos arquivos no destaque e nas anteriores (.png, .bpm, relatório, .bpmn). Em `App.revisaoDoSetor` — janela diz "sem .bpm" quando falta; conclui com .bpm, .png e relatório sem .bpmn. Em `App.aprovacao` — conclui sem .bpmn. `App.registrarVersaoHistorica` — a histórica só com .bpm continua aceita (conferir se já existe; senão, acrescentar).
+- [x] **3.5 Testes antigos:** `versaoDeTeste` passa a montar .bpm e .png (comentário junto); onde um teste monta a versão completa ou envia uma versão nova com .bpmn + .png, trocar por .bpm + .png (arquivo `.bpm` inventado, como o que os testes da histórica já usam); onde procura "Fluxograma .bpmn", "Imagem do fluxograma (.png)" ou "Fluxograma (.bpmn)", usar os rótulos novos; `papeis` de `UltimaVersao` completos passam a `['bpm', 'png', 'relatorio']`. Rodar `npm test` até verde, sem afrouxar asserção.
+- [x] **3.6 Verificar e comitar:** `npm test`, `npm run typecheck`, `npm run lint` verdes; commit único da Tarefa 2 e 3 (funções, falsa, tela e testes).
 
 ### Tarefa 4: Fecho
 
-- [ ] **4.1** `desvios.md` de documentos-versoes: entrada datada com o que divergiu da spec (rótulos curtos escolhidos, testes antigos alterados, o que não foi visto na tela). Itens de `nao-testados.md` do `/executar-complexo` em `melhorias-protocolo.md`.
+- [x] **4.1** `desvios.md` de documentos-versoes: entrada datada com o que divergiu da spec (rótulos curtos escolhidos, testes antigos alterados, o que não foi visto na tela). Itens de `nao-testados.md` do `/executar-complexo` em `melhorias-protocolo.md`.
 - [ ] **4.2** Juntar à `main` (`git switch main`, `git merge documentos-versoes-bpm`, `git branch -d documentos-versoes-bpm`), enviar a `main` e conferir o "Testes de banco" da `main`. Linha `Implementado em` no fim da seção da mudança na spec; comitar e enviar.

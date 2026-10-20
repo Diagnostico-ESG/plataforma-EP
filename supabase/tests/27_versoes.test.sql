@@ -146,8 +146,8 @@ insert into _tap (linha) select throws_ok(
   'P0001', 'numero_da_versao_mudou:3', 'número esperado diferente do que o banco dá é recusado');
 insert into _tap (linha) select lives_ok(
   $sql$select public.registrar_versao(pg_temp.processo('e1'), 3, null,
-    pg_temp.par() || pg_temp.arquivo('bpm', 'bpm') || pg_temp.arquivo('relatorio', 'pdf'))$sql$,
-  'versão com .bpm e relatório é aceita');
+    pg_temp.par() || pg_temp.arquivo('bpmn', 'bpmn') || pg_temp.arquivo('relatorio', 'pdf'))$sql$,
+  'versão com o .bpmn opcional e relatório é aceita');
 insert into _tap (linha) select is(
   (select count(*) from public.arquivos_da_versao where versao_id = pg_temp.versao(pg_temp.processo('e1'), 3)), 4::bigint,
   'a V3 tem os quatro arquivos');

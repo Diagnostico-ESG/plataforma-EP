@@ -142,3 +142,14 @@ Método: detector do Impeccable em `src/components/versoes` (sem achados) e leit
 ## 2026-10-17 — publicação da função corrigida
 
 - **A função `arquivos-no-drive` foi publicada no desenvolvimento** (`yclkzyoebpsxmgpbcbus`) pelo usuário, no PowerShell, com o código dos commits `a8dbd01` e `984bb6a`. O classificador de permissões do Claude Code bloqueou de novo o `functions deploy` pelo agente. A conferência de ponta a ponta da função publicada não foi feita.
+
+## 2026-10-20 — /executar-complexo (mudança do .bpm, ADR 0016)
+
+- **Rótulos curtos dos botões** (a spec deixou ao `/polir`): "Fluxograma .bpm", "Imagem .png", "BPMN .bpmn" e "Relatório .pdf". O campo opcional do formulário se chama ".bpmn", e o "(opcional)" vem do campo, como nos outros.
+- **[+ Acrescentar relatório] no destaque** passou a ficar no lugar do relatório, antes do .bpmn (antes vinha por último). A lista virou duas partes: os arquivos sem o .bpmn, o espaço do relatório e o .bpmn.
+- **Nome da migração com horário escolhido à mão** (`20261020150000`): a CLI gerou `20261020105515`, antes da `20261020143000` (também escolhida à mão), e a migração ficaria fora de ordem.
+- **Testes de banco antigos alterados:** o par das versões novas passou a .bpm + .png em 27, 29, 30, 36 a 41. No 28, o par segue .bpmn + .png (prova a histórica), e só a versão nova depois da V5F usa o .bpm. No 29, a cópia recusada sai de um .png, não de um .bpmn. No 30, as V1 ganharam o .bpmn (a substituição do .bpmn opcional, história 60, segue provada), e a contagem foi de 3 para 4 arquivos. No 27, as duas recusas viraram três (sem .png, sem .bpm, só .bpmn e .png). No 38, entrou o caso "Sem Bpm".
+- **Testes de tela antigos alterados:** a versão de teste (`versaoDeTeste`) passou a ter .bpm e .png, as versões completas a .bpm, .png e relatório, e os rótulos procurados mudaram para os novos. Os testes de download, do verso e da conferência no Drive ganharam o .bpm ao lado do .bpmn que já usavam.
+- **TDD:** as funções puras, a falsa e os testes de banco foram vistos falhando antes do código ("Testes de banco" #141). Os testes de tela da ordem no destaque, nas anteriores e do espaço do relatório foram escritos depois do código e não foram vistos falhando.
+- **Tela não aberta no navegador:** os dois critérios `[visual]` da mudança seguem presumidos para o `/ship`.
+- **Commit da migração separado do dos testes de banco:** o teste foi comitado primeiro, para provar o vermelho. A cópia temporária dos testes de tela, que já estavam vermelhos (para comitar a migração antes da tela), foi barrada pela trava de segurança. Por isso a migração foi comitada depois de a bateria de tela ficar verde.
