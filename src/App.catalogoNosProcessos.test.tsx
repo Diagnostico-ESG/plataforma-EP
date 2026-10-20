@@ -57,6 +57,7 @@ async function acrescentarEncerramento() {
   const formulario = within(secao.getByRole('form', { name: 'Nova etapa' }))
   fireEvent.change(formulario.getByLabelText('Nome'), { target: { value: 'Encerramento' } })
   fireEvent.change(formulario.getByLabelText('Código'), { target: { value: 'encerramento' } })
+  fireEvent.change(formulario.getByLabelText('Fase do Regimento'), { target: { value: 'VI' } })
   fireEvent.click(formulario.getByRole('button', { name: 'Salvar' }))
   await waitFor(() => expect(secao.queryByRole('form', { name: 'Nova etapa' })).toBeNull())
 }

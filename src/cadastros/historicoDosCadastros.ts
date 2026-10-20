@@ -73,7 +73,7 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   resolvida_em: 'Conclusão', responsaveis: 'Responsáveis',
   tipo: 'Tipo', origem: 'Origem', situacao: 'Situação', contexto: 'Contexto', andamentos: 'Etapas',
   processo_nome: 'Processo', responsavel_nome: 'Responsável', processo_pai_nome: 'Processo pai',
-  nivel: 'Nível', obrigatoria: 'Obrigatória', ativa: 'Situação', ordem: 'Posição',
+  nivel: 'Nível', obrigatoria: 'Obrigatória', fase: 'Fase', ativa: 'Situação', ordem: 'Posição',
   data_da_reuniao: 'Reunião de modelagem piloto',
   rotulo: 'Versão', etapa: 'Etapa', arquivos: 'Arquivos', relatorio_de: 'Relatório copiado da versão',
   hash_md5: 'Impressão digital (MD5)',

@@ -7,9 +7,9 @@ import type { Database } from '../types/database'
 import { criarProcessosSupabase } from './processosSupabase'
 
 const MODELAGEM = {
-  id: 'e4', codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, obrigatoria: true, ativa: true,
+  id: 'e4', codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, obrigatoria: true, fase: 'IV' as const, ativa: true,
 }
-const NOVA = { codigo: 'nova', nome: 'Nova', obrigatoria: false, antesDe: null }
+const NOVA = { codigo: 'nova', nome: 'Nova', obrigatoria: false, fase: 'VI' as const, antesDe: null }
 
 function criar(cliente: ClienteSupabaseFalso) {
   return criarProcessosSupabase(cliente as unknown as SupabaseClient<Database>).catalogo
@@ -20,7 +20,7 @@ test('lista o catálogo inteiro em ordem', async () => {
   cliente.respostas['etapas.select'] = { data: [MODELAGEM], error: null }
   expect(await criar(cliente).listarCatalogo()).toEqual([MODELAGEM])
   expect(cliente.pedidos[0]).toMatchObject({
-    tabela: 'etapas', colunas: 'id, codigo, nome, ordem, obrigatoria, ativa', ordem: [['ordem', true]],
+    tabela: 'etapas', colunas: 'id, codigo, nome, ordem, obrigatoria, fase, ativa', ordem: [['ordem', true]],
   })
 })
 
@@ -36,7 +36,7 @@ test('acrescentar chama a função do banco; "No fim" vai como posição nula', 
   await criar(cliente).acrescentarEtapa({ ...NOVA, antesDe: 'e9' })
   expect(cliente.pedidos).toMatchObject([
     { tabela: 'rpc', operacao: 'acrescentar_etapa', valores: {
-      p_codigo: 'nova', p_nome: 'Nova', p_obrigatoria: false, p_antes_de: null } },
+      p_codigo: 'nova', p_nome: 'Nova', p_obrigatoria: false, p_fase: 'VI', p_antes_de: null } },
     { tabela: 'rpc', operacao: 'acrescentar_etapa', valores: { p_antes_de: 'e9' } },
   ])
 })
@@ -52,12 +52,12 @@ test('editar, desativar, reativar e excluir mexem só na etapa escolhida', async
   cliente.respostas['etapas.update'] = { data: [{ id: 'e4' }], error: null }
   cliente.respostas['etapas.delete'] = { data: [{ id: 'e4' }], error: null }
   const catalogo = criar(cliente)
-  await catalogo.editarEtapa('e4', { nome: 'Modelagem', obrigatoria: false })
+  await catalogo.editarEtapa('e4', { nome: 'Modelagem', obrigatoria: false, fase: 'V' })
   await catalogo.desativarEtapa('e4')
   await catalogo.reativarEtapa('e4')
   await catalogo.excluirEtapa('e4')
   expect(cliente.pedidos).toMatchObject([
-    { operacao: 'update', valores: { nome: 'Modelagem', obrigatoria: false }, filtro: ['id', 'e4'] },
+    { operacao: 'update', valores: { nome: 'Modelagem', obrigatoria: false, fase: 'V' }, filtro: ['id', 'e4'] },
     { operacao: 'update', valores: { ativa: false }, filtro: ['id', 'e4'] },
     { operacao: 'update', valores: { ativa: true }, filtro: ['id', 'e4'] },
     { operacao: 'delete', filtro: ['id', 'e4'] },
@@ -91,7 +91,7 @@ test('nome repetido na edição vira a frase com o valor', async () => {
   cliente.respostas['etapas.update'] = {
     data: null, error: { message: 'duplicate key value violates unique constraint "etapas_nome_unico"', code: '23505' },
   }
-  await expect(criar(cliente).editarEtapa('e4', { nome: 'Publicação', obrigatoria: true }))
+  await expect(criar(cliente).editarEtapa('e4', { nome: 'Publicação', obrigatoria: true, fase: 'VII' }))
     .rejects.toEqual(new TravaDoBanco('Já existe uma etapa com o nome Publicação.'))
 })
 

@@ -1,5 +1,6 @@
 import type { EventoDoCadastro } from '../cadastros/tipos'
 import type { PapelDoArquivo } from '../versoes/tipos'
+import type { FaseDoRegimento } from './fasesDoRegimento'
 
 export type StatusDaEtapa ='pendente' | 'em_andamento' | 'concluida' | 'realizada_anteriormente' | 'dispensada'
 
@@ -25,13 +26,13 @@ export type SituacaoDoProcesso = 'em_andamento' | 'suspenso' | 'cancelado' | 'co
 export type EtapaDoCatalogo = { id: string; codigo: string; nome: string; ordem: number; ativa: boolean }
 
 /** Uma etapa do catálogo como a Administração a mostra: ativa ou não. */
-export type EtapaNoCatalogo = EtapaDoCatalogo & { obrigatoria: boolean }
+export type EtapaNoCatalogo = EtapaDoCatalogo & { obrigatoria: boolean; fase: FaseDoRegimento }
 
 /** O que o formulário de etapa nova grava; `antesDe` null põe a etapa no fim. */
-export type EtapaNova = { codigo: string; nome: string; obrigatoria: boolean; antesDe: string | null }
+export type EtapaNova = { codigo: string; nome: string; obrigatoria: boolean; fase: FaseDoRegimento; antesDe: string | null }
 
 /** O que a edição muda: o código não muda depois de criado. */
-export type DadosDaEtapa = { nome: string; obrigatoria: boolean }
+export type DadosDaEtapa = { nome: string; obrigatoria: boolean; fase: FaseDoRegimento }
 
 export type SentidoDaOrdem = 'subir' | 'descer'
 

@@ -268,6 +268,7 @@ export type Database = {
           ativa: boolean
           codigo: string
           criado_em: string
+          fase: Database["public"]["Enums"]["fase_do_regimento"]
           id: string
           nome: string
           obrigatoria: boolean
@@ -277,6 +278,7 @@ export type Database = {
           ativa?: boolean
           codigo: string
           criado_em?: string
+          fase: Database["public"]["Enums"]["fase_do_regimento"]
           id?: string
           nome: string
           obrigatoria: boolean
@@ -286,6 +288,7 @@ export type Database = {
           ativa?: boolean
           codigo?: string
           criado_em?: string
+          fase?: Database["public"]["Enums"]["fase_do_regimento"]
           id?: string
           nome?: string
           obrigatoria?: boolean
@@ -842,6 +845,7 @@ export type Database = {
         Args: {
           p_antes_de: string
           p_codigo: string
+          p_fase: Database["public"]["Enums"]["fase_do_regimento"]
           p_nome: string
           p_obrigatoria: boolean
         }
@@ -947,6 +951,7 @@ export type Database = {
     Enums: {
       categoria_macroprocesso: "finalistico" | "apoio" | "gerencial"
       escopo_da_correcao: "fluxograma" | "relatorio" | "ambos"
+      fase_do_regimento: "IV" | "V" | "VI" | "VII" | "VIII" | "IX"
       origem_do_processo: "novo" | "retomado"
       papel_do_arquivo: "bpmn" | "png" | "bpm" | "relatorio"
       perfil: "administrador" | "integrante_ep" | "consulta"
@@ -1091,6 +1096,7 @@ export const Constants = {
     Enums: {
       categoria_macroprocesso: ["finalistico", "apoio", "gerencial"],
       escopo_da_correcao: ["fluxograma", "relatorio", "ambos"],
+      fase_do_regimento: ["IV", "V", "VI", "VII", "VIII", "IX"],
       origem_do_processo: ["novo", "retomado"],
       papel_do_arquivo: ["bpmn", "png", "bpm", "relatorio"],
       perfil: ["administrador", "integrante_ep", "consulta"],

@@ -10,10 +10,10 @@ import { RevisoesFalso } from '../revisoes/RevisoesFalso'
 
 /** Um catálogo inventado: três etapas ativas, a Modelagem piloto em primeiro, e uma desativada. */
 export const ETAPAS_DE_TESTE: EtapaNoCatalogo[] = [
-  { id: 'e1', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 1, obrigatoria: true, ativa: true },
-  { id: 'e2', codigo: 'relatorio_modelagem_tecnica', nome: 'Relatório e modelagem técnica', ordem: 2, obrigatoria: true, ativa: true },
-  { id: 'e9', codigo: 'publicacao', nome: 'Publicação', ordem: 6, obrigatoria: false, ativa: true },
-  { id: 'e10', codigo: 'arquivamento', nome: 'Arquivamento', ordem: 7, obrigatoria: false, ativa: false },
+  { id: 'e1', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 1, obrigatoria: true, fase: 'IV', ativa: true },
+  { id: 'e2', codigo: 'relatorio_modelagem_tecnica', nome: 'Relatório e modelagem técnica', ordem: 2, obrigatoria: true, fase: 'V', ativa: true },
+  { id: 'e9', codigo: 'publicacao', nome: 'Publicação', ordem: 6, obrigatoria: false, fase: 'VII', ativa: true },
+  { id: 'e10', codigo: 'arquivamento', nome: 'Arquivamento', ordem: 7, obrigatoria: false, fase: 'VII', ativa: false },
 ]
 
 type MontagemDoCatalogo = { perfil?: Perfil; ajustar?: (processos: ProcessosFalso) => void }

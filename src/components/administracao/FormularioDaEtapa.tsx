@@ -1,14 +1,17 @@
 import { type FormEvent, useId, useState } from 'react'
 import { textoDaFalhaNoFormulario } from '../../acesso/falhasDeGravacao'
+import { type FaseDoRegimento, ehFaseDoRegimento } from '../../processos/fasesDoRegimento'
 import type { EtapaNoCatalogo } from '../../processos/tipos'
 import { problemaNaEtapa } from '../../processos/validacaoDaEtapa'
+import { CampoDaFase } from './CampoDaFase'
 import { CamposDaEtapaNova } from './CamposDaEtapaNova'
 
-/** O que o formulário entrega; na edição só nome e obrigatória valem. */
+/** O que o formulário entrega; na edição só nome, obrigatória e fase valem. */
 export type DadosDoFormularioDaEtapa = {
   nome: string
   codigo: string
   obrigatoria: boolean
+  fase: FaseDoRegimento
   antesDe: string | null
 }
 
@@ -26,18 +29,19 @@ export function FormularioDaEtapa({ titulo, inicial, etapas, aoSalvar, aoCancela
   const [codigo, setCodigo] = useState('')
   const [posicao, setPosicao] = useState('')
   const [obrigatoria, setObrigatoria] = useState(inicial?.obrigatoria ?? false)
+  const [fase, setFase] = useState<string>(inicial?.fase ?? '')
   const [aviso, setAviso] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
   const id = useId()
 
   async function enviar(evento: FormEvent) {
     evento.preventDefault()
-    const problema = problemaNaEtapa({ nome, codigo: inicial ? null : codigo })
+    const problema = problemaNaEtapa({ nome, codigo: inicial ? null : codigo, fase })
     setAviso(problema)
-    if (problema) return
+    if (problema || !ehFaseDoRegimento(fase)) return
     setEnviando(true)
     try {
-      await aoSalvar({ nome: nome.trim(), codigo, obrigatoria, antesDe: posicao === '' ? null : posicao })
+      await aoSalvar({ nome: nome.trim(), codigo, obrigatoria, fase, antesDe: posicao === '' ? null : posicao })
     } catch (erro) {
       setAviso(textoDaFalhaNoFormulario(erro))
     }
@@ -51,6 +55,7 @@ export function FormularioDaEtapa({ titulo, inicial, etapas, aoSalvar, aoCancela
       <input id={`${id}-nome`} value={nome} maxLength={200} autoComplete="off" onChange={(e) => setNome(e.target.value)} />
       {!inicial && <CamposDaEtapaNova id={id} etapas={etapas} codigo={codigo} posicao={posicao}
         aoMudarCodigo={setCodigo} aoMudarPosicao={setPosicao} />}
+      <CampoDaFase id={id} fase={fase} aoMudar={setFase} />
       <label className="campo-marcar">
         <input type="checkbox" checked={obrigatoria} onChange={(e) => setObrigatoria(e.target.checked)} /> Obrigatória
       </label>

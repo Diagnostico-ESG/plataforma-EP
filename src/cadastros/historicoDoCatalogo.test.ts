@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest'
 import { descreverEstadoDoCadastro, nomeDoItem, textoDaAcaoDoCadastro } from './historicoDosCadastros'
 import type { EventoDoCadastro } from './tipos'
 
-const ETAPA = { codigo: 'publicacao', nome: 'Publicação', nivel: 'processo', obrigatoria: false, ativa: true, ordem: 9 }
+const ETAPA = { codigo: 'publicacao', nome: 'Publicação', nivel: 'processo', obrigatoria: false, fase: 'VII', ativa: true, ordem: 9 }
 
 function evento(parcial: Partial<EventoDoCadastro>): EventoDoCadastro {
   return {
@@ -26,8 +26,16 @@ describe('catálogo de etapas no histórico', () => {
 
   test('o estado mostra nível, obrigatória, situação e posição pelos rótulos da tela', () => {
     expect(descreverEstadoDoCadastro(ETAPA)).toBe(
-      'Código: publicacao; Nome: Publicação; Nível: Processo; Obrigatória: Não; Situação: Ativa; Posição: 9')
+      'Código: publicacao; Nome: Publicação; Nível: Processo; Obrigatória: Não; Fase: VII; Situação: Ativa; Posição: 9')
     expect(descreverEstadoDoCadastro({ ...ETAPA, nivel: 'setor', obrigatoria: true, ativa: false }))
-      .toContain('Nível: Setor; Obrigatória: Sim; Situação: Inativa')
+      .toContain('Nível: Setor; Obrigatória: Sim; Fase: VII; Situação: Inativa')
+  })
+
+  test('a mudança de fase aparece no antes e no depois; evento antigo, sem fase, segue legível', () => {
+    expect(descreverEstadoDoCadastro({ ...ETAPA, fase: 'V' })).toContain('Fase: V;')
+    expect(descreverEstadoDoCadastro({ ...ETAPA, fase: 'VI' })).toContain('Fase: VI;')
+    const antigo: Record<string, unknown> = { ...ETAPA }
+    delete antigo.fase
+    expect(descreverEstadoDoCadastro(antigo)).not.toContain('Fase')
   })
 })

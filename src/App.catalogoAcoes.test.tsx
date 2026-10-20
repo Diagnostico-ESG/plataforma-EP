@@ -16,18 +16,20 @@ function janelaAberta() {
   return within(screen.getByRole('dialog'))
 }
 
-test('Editar muda nome e obrigatória', async () => {
+test('Editar muda nome, obrigatória e fase', async () => {
   const processos = montarComCatalogo()
   const secao = await abrirCatalogo()
   fireEvent.click(await secao.findByRole('button', { name: 'Editar Publicação' }))
   const formulario = within(secao.getByRole('form', { name: 'Editar etapa' }))
   expect((formulario.getByLabelText('Nome') as HTMLInputElement).value).toBe('Publicação')
   expect(formulario.queryByLabelText('Código')).toBeNull()
+  expect((formulario.getByLabelText('Fase do Regimento') as HTMLSelectElement).value).toBe('VII')
+  fireEvent.change(formulario.getByLabelText('Fase do Regimento'), { target: { value: 'IX' } })
   fireEvent.change(formulario.getByLabelText('Nome'), { target: { value: 'Publicação final' } })
   fireEvent.click(formulario.getByLabelText('Obrigatória'))
   fireEvent.click(formulario.getByRole('button', { name: 'Salvar' }))
-  await waitFor(() => expect(processos.catalogo.etapas[2]).toMatchObject({ nome: 'Publicação final', obrigatoria: true }))
-  expect((await linhasDoCatalogo(secao))[2]).toMatch(/^Publicação finalObrigatória/)
+  await waitFor(() => expect(processos.catalogo.etapas[2]).toMatchObject({ nome: 'Publicação final', obrigatoria: true, fase: 'IX' }))
+  expect((await linhasDoCatalogo(secao))[2]).toMatch(/^Publicação finalObrigatóriaIX/)
 })
 
 test('falha ao editar mostra o motivo no formulário', async () => {
@@ -129,7 +131,7 @@ test('excluir etapa já usada é recusado, sugerindo desativar', async () => {
 })
 
 // As três etapas de revisão e aprovação não saem do catálogo (revisoes-aprovacao, ticket 01, história 26).
-const REVISAO_INTERNA = { id: 'e5', codigo: 'revisao_interna', nome: 'Revisão interna', ordem: 3, obrigatoria: true, ativa: true }
+const REVISAO_INTERNA = { id: 'e5', codigo: 'revisao_interna', nome: 'Revisão interna', ordem: 3, obrigatoria: true, fase: 'VI' as const, ativa: true }
 const FRASE_DA_PROTEGIDA = 'A etapa Revisão interna é obrigatória no fluxo: não pode ser desativada nem excluída.'
 const comRevisaoInterna = (processos: ProcessosFalso) => {
   processos.catalogo.etapas = [...processos.catalogo.etapas, REVISAO_INTERNA]

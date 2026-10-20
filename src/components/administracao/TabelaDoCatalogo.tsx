@@ -16,7 +16,7 @@ export function TabelaDoCatalogo({ etapas, acoes }: TabelaDoCatalogoProps) {
     <table className="tabela-cadastros">
       <thead>
         <tr>
-          <th scope="col">Etapa</th><th scope="col">Obrigatória</th><th scope="col">Ações</th>
+          <th scope="col">Etapa</th><th scope="col">Obrigatória</th><th scope="col">Fase</th><th scope="col">Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -24,6 +24,7 @@ export function TabelaDoCatalogo({ etapas, acoes }: TabelaDoCatalogoProps) {
           <tr key={etapa.id}>
             <td>{etapa.nome}{!etapa.ativa && <Pilula situacao="neutra">Inativa</Pilula>}</td>
             <td>{etapa.obrigatoria ? 'Obrigatória' : 'Opcional'}</td>
+            <td>{etapa.fase}</td>
             <td>
               <BotoesDaEtapa etapa={etapa} acoes={acoes}
                 naPrimeira={posicao === 0} naUltima={posicao === etapas.length - 1} />

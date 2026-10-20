@@ -64,7 +64,7 @@ export class CatalogoFalso implements ModuloDoCatalogo {
     const posicao = antes?.ordem ?? Math.max(0, ...this.etapas.map((etapa) => etapa.ordem)) + 1
     const nova: EtapaNoCatalogo = {
       id: `c${this.proximoId++}`, codigo: dados.codigo, nome: dados.nome.trim(), ordem: posicao,
-      obrigatoria: dados.obrigatoria, ativa: true,
+      obrigatoria: dados.obrigatoria, fase: dados.fase, ativa: true,
     }
     const abertas = this.etapas.map((etapa) => (etapa.ordem >= posicao ? { ...etapa, ordem: etapa.ordem + 1 } : etapa))
     this.gravar([...abertas, nova])
