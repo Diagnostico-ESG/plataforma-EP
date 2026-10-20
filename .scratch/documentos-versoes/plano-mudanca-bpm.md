@@ -72,7 +72,7 @@ as $$
     select 1 from public.arquivos_da_versao a where a.versao_id = p_versao and a.papel::text = exigido.papel) $$;
 ```
 
-- [ ] **1.5 Comitar a migração, enviar, disparar "Migrar banco de desenvolvimento"** (campo da migração = nome do arquivo) e depois "Testes de banco". Esperado: verde. Registrar a migração em `supabase/AMBIENTES.md` no molde das anteriores (data, motivo, testes vermelho/verde com os números, workflow, sem `db:types`) e comitar.
+- [x] **1.5 Comitar a migração, enviar, disparar "Migrar banco de desenvolvimento"** (campo da migração = nome do arquivo) e depois "Testes de banco". Esperado: verde. Registrar a migração em `supabase/AMBIENTES.md` no molde das anteriores (data, motivo, testes vermelho/verde com os números, workflow, sem `db:types`) e comitar.
 
 ### Tarefa 2: Funções puras e frases (TDD)
 
