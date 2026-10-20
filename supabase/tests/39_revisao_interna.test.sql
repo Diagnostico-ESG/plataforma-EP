@@ -127,7 +127,7 @@ insert into _tap (linha) select results_eq(
   $sql$select resultado::text, escopo::text, comentario, revisor_id::text, revisada_em, (versao_corrigida_id is null),
     (versao_revisada_id = (select id from public.versoes where processo_id = pg_temp.processo('Sem Alteracao') and numero = 1))
     from public.revisoes_internas where processo_id = pg_temp.processo('Sem Alteracao')$sql$,
-  $sql$values ('sem_alteracao', null::text, 'Segue', '00000000-0000-0000-0000-0000000000a2', current_date, true, true)$sql$,
+  $sql$values ('sem_alteracao', null::text, 'Segue', '00000000-0000-0000-0000-0000000000a2', (now() at time zone 'America/Sao_Paulo')::date, true, true)$sql$,
   'a revisão guarda o resultado, o comentário aparado, o revisor, o dia e a versão revisada (a mais recente)');
 insert into _tap (linha) select is(pg_temp.status('Sem Alteracao', 'revisao_interna'), 'concluida'::public.status_da_etapa,
   'a Revisão interna fica concluída');

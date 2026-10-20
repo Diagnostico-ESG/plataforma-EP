@@ -8,7 +8,7 @@ import { useGravacaoNaJanela } from './useGravacaoNaJanela'
  * espera. A frase devolvida é a falha (a janela fica aberta, com o preenchido); null é a aprovação gravada.
  */
 export type AprovacaoDaJanela = {
-  versao: number
+  versao: number | null
   aoConfirmar: (dados: DadosDaAprovacao, responsavelId: string | null) => Promise<string | null>
 }
 

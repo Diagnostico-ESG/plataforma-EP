@@ -9,7 +9,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(67);
+insert into _tap (linha) select plan(69);
 
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 insert into public.autorizacoes (email, perfil) values
@@ -30,7 +30,7 @@ insert into public.macroprocessos (id, codigo, nome) values ('af000000-0000-0000
 insert into public.processos (setor_id, macroprocesso_id, nome)
 select '5f000000-0000-0000-0000-000000000040', 'af000000-0000-0000-0000-000000000040', nome
 from unnest(array['Aprovada', 'Etapa Errada', 'Parado', 'Sem Versao', 'Incompleta', 'Segunda', 'Link', 'Datas', 'Datas Antes',
-  'Datas Futuro', 'Direta', 'Realizada', 'Volta Setor', 'Volta Propria', 'Volta Publicacao', 'Troca', 'Livre', 'Perfis',
+  'Datas Futuro', 'Fuso', 'Direta', 'Realizada', 'Volta Setor', 'Volta Propria', 'Volta Publicacao', 'Troca', 'Livre', 'Perfis',
   'Excluir']) as nome;
 insert into public.processos (setor_id, macroprocesso_id, nome, tipo)
 values ('5f000000-0000-0000-0000-000000000040', 'af000000-0000-0000-0000-000000000040', 'Pai', 'processo');
@@ -173,21 +173,38 @@ select pg_temp.ate_a_aprovacao_revisando('Datas');
 select pg_temp.ate_a_aprovacao_revisando('Datas Antes');
 select pg_temp.ate_a_aprovacao_revisando('Datas Futuro');
 insert into _tap (linha) select lives_ok(
-  $sql$select pg_temp.aprovar('Datas', '  PROT-2026-0001  ', '  https://eprotocolo.example/abc  ', current_date)$sql$,
+  $sql$select pg_temp.aprovar('Datas', '  PROT-2026-0001  ', '  https://eprotocolo.example/abc  ', (now() at time zone 'America/Sao_Paulo')::date)$sql$,
   'número, link e a data de hoje (a da revisão) são aceitos');
 insert into _tap (linha) select results_eq(
   $sql$select numero_eprotocolo, link, aprovada_em from public.aprovacoes where processo_id = pg_temp.processo('Datas')$sql$,
-  $sql$values ('PROT-2026-0001', 'https://eprotocolo.example/abc', current_date)$sql$,
+  $sql$values ('PROT-2026-0001', 'https://eprotocolo.example/abc', (now() at time zone 'America/Sao_Paulo')::date)$sql$,
   'número e link vêm aparados');
 insert into _tap (linha) select throws_ok(
-  $sql$select pg_temp.aprovar('Datas Antes', null, null, current_date - 1)$sql$,
-  'P0001', 'aprovacao_antes_da_revisao:' || (current_date - 1)::text || ':' || current_date::text,
+  $sql$select pg_temp.aprovar('Datas Antes', null, null, (now() at time zone 'America/Sao_Paulo')::date - 1)$sql$,
+  'P0001', 'aprovacao_antes_da_revisao:' || ((now() at time zone 'America/Sao_Paulo')::date - 1)::text || ':' || (now() at time zone 'America/Sao_Paulo')::date::text,
   'data antes da última revisão interna é recusada, com as duas datas');
 insert into _tap (linha) select lives_ok(
-  $sql$select pg_temp.aprovar('Datas Antes', null, null, current_date)$sql$, 'a data do dia da revisão é aceita');
+  $sql$select pg_temp.aprovar('Datas Antes', null, null, (now() at time zone 'America/Sao_Paulo')::date)$sql$, 'a data do dia da revisão é aceita');
 insert into _tap (linha) select throws_ok(
-  $sql$select pg_temp.aprovar('Datas Futuro', null, null, current_date + 1)$sql$,
-  'P0001', 'data_no_futuro:' || (current_date + 1)::text, 'data no futuro é recusada');
+  $sql$select pg_temp.aprovar('Datas Futuro', null, null, (now() at time zone 'America/Sao_Paulo')::date + 1)$sql$,
+  'P0001', 'data_no_futuro:' || ((now() at time zone 'America/Sao_Paulo')::date + 1)::text, 'data no futuro é recusada');
+
+-- ===== Fuso do escritório: o dia da revisão e o "hoje" da aprovação são os de Brasília, não os do relógio do banco =====
+select pg_temp.claims('a1');
+select pg_temp.enviar_completa('Fuso');
+select pg_temp.claims('a2');
+-- Escolhe, entre um fuso à frente e um atrás de Brasília, o que está em outro dia agora (sempre há um): com current_date
+-- do banco a revisão gravaria o dia errado ou a data de hoje seria recusada como futura.
+select set_config('timezone', case when (now() at time zone 'Pacific/Kiritimati')::date <> (now() at time zone 'America/Sao_Paulo')::date
+  then 'Pacific/Kiritimati' else 'Etc/GMT+12' end, true);
+select pg_temp.ate_a_aprovacao_revisando('Fuso');
+insert into _tap (linha) select is(
+  (select max(revisada_em) from public.revisoes_internas where processo_id = pg_temp.processo('Fuso')),
+  (now() at time zone 'America/Sao_Paulo')::date, 'a revisão grava o dia de Brasília, qualquer que seja o fuso da conexão');
+insert into _tap (linha) select lives_ok(
+  $sql$select pg_temp.aprovar('Fuso', null, null, (now() at time zone 'America/Sao_Paulo')::date)$sql$,
+  'a data de hoje em Brasília é aceita na aprovação, qualquer que seja o fuso da conexão');
+reset timezone;
 
 -- ===== Link =====
 select pg_temp.claims('a1');

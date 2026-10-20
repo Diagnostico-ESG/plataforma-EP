@@ -124,7 +124,7 @@ set local role authenticated;
 
 -- ===== Preparação: cinco processos com revisão e aprovação =====
 select pg_temp.ate_a_aprovacao_corrigindo('Corrigida');
-select pg_temp.aprovar('Corrigida', 'PROT-1', 'https://eprotocolo.example/a', current_date);
+select pg_temp.aprovar('Corrigida', 'PROT-1', 'https://eprotocolo.example/a', (now() at time zone 'America/Sao_Paulo')::date);
 select pg_temp.ate_a_aprovacao_corrigindo('Sem Numero');
 select pg_temp.aprovar('Sem Numero');
 select pg_temp.ate_a_aprovacao_corrigindo('Parado');
@@ -187,17 +187,17 @@ insert into _tap (linha) select throws_ok(
   $sql$update public.revisoes_internas set revisor_id = '00000000-0000-0000-0000-0000000000a1'$sql$,
   '42501', null, 'o revisor não muda');
 insert into _tap (linha) select throws_ok(
-  $sql$update public.revisoes_internas set revisada_em = current_date$sql$,
+  $sql$update public.revisoes_internas set revisada_em = (now() at time zone 'America/Sao_Paulo')::date$sql$,
   '42501', null, 'a data da revisão não muda');
 
 -- ===== Aprovação: edições aceitas =====
 insert into _tap (linha) select lives_ok(
   $sql$update public.aprovacoes set numero_eprotocolo = '  PROT-9  ', link = '  http://novo.example/b  ',
-    aprovada_em = current_date where processo_id = pg_temp.processo('Corrigida')$sql$,
+    aprovada_em = (now() at time zone 'America/Sao_Paulo')::date where processo_id = pg_temp.processo('Corrigida')$sql$,
   'integrante edita o número, o link e a data da aprovação');
 insert into _tap (linha) select results_eq(
   $sql$select numero_eprotocolo, link, aprovada_em from public.aprovacoes where processo_id = pg_temp.processo('Corrigida')$sql$,
-  $sql$values ('PROT-9', 'http://novo.example/b', current_date)$sql$, 'número e link ficam aparados');
+  $sql$values ('PROT-9', 'http://novo.example/b', (now() at time zone 'America/Sao_Paulo')::date)$sql$, 'número e link ficam aparados');
 insert into _tap (linha) select results_eq(
   $sql$select detalhes->'antes'->>'numero_eprotocolo', detalhes->'depois'->>'numero_eprotocolo',
     detalhes->'antes'->>'link', detalhes->'depois'->>'link'
@@ -239,11 +239,11 @@ insert into _tap (linha) select throws_ok(
   $sql$update public.aprovacoes set link = 'x.example/a' where processo_id = pg_temp.processo('Corrigida')$sql$,
   'P0001', 'link_invalido', 'link sem esquema é recusado na edição');
 insert into _tap (linha) select throws_ok(
-  $sql$update public.aprovacoes set aprovada_em = current_date + 1 where processo_id = pg_temp.processo('Corrigida')$sql$,
-  'P0001', 'data_no_futuro:' || (current_date + 1)::text, 'data no futuro é recusada na edição');
+  $sql$update public.aprovacoes set aprovada_em = (now() at time zone 'America/Sao_Paulo')::date + 1 where processo_id = pg_temp.processo('Corrigida')$sql$,
+  'P0001', 'data_no_futuro:' || ((now() at time zone 'America/Sao_Paulo')::date + 1)::text, 'data no futuro é recusada na edição');
 insert into _tap (linha) select throws_ok(
-  $sql$update public.aprovacoes set aprovada_em = current_date - 1 where processo_id = pg_temp.processo('Corrigida')$sql$,
-  'P0001', 'aprovacao_antes_da_revisao:' || (current_date - 1)::text || ':' || current_date::text,
+  $sql$update public.aprovacoes set aprovada_em = (now() at time zone 'America/Sao_Paulo')::date - 1 where processo_id = pg_temp.processo('Corrigida')$sql$,
+  'P0001', 'aprovacao_antes_da_revisao:' || ((now() at time zone 'America/Sao_Paulo')::date - 1)::text || ':' || (now() at time zone 'America/Sao_Paulo')::date::text,
   'data antes da última revisão interna é recusada na edição, com as duas datas');
 insert into _tap (linha) select throws_ok(
   $sql$update public.aprovacoes set versao_id = gen_random_uuid()$sql$, '42501', null, 'a versão aprovada não muda');

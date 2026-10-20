@@ -146,3 +146,11 @@ test('arrastar com a versão incompleta mostra a frase e não deixa concluir', a
   expect(falso.chamadas).toEqual([])
 })
 
+
+// Achado do /ship: sem versão a janela mostrava "Versão aprovada: V0"; só a frase do bloqueio deve aparecer.
+test('sem versão a janela não mostra "Versão aprovada"', async () => {
+  montar(null)
+  const janela = await abrirAJanela()
+  expect(janela.queryByText(/Versão aprovada/)).toBeNull()
+  expect(janela.getByRole('alert').textContent).toBe('O processo ainda não tem versão enviada.')
+})

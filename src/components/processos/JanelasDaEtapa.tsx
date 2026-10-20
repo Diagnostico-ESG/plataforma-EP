@@ -120,7 +120,7 @@ function JanelaDoAvancoDaEtapa({
     ? { opcoes: opcoesDaRevisao(ultimaVersao, usuarioId), aoConfirmar: aoConfirmarRevisao } : undefined
   // Concluir a Aprovação mostra a versão aprovada e pede o E-protocolo (opcional), gravando a aprovação junto da conclusão.
   const aprovacao = acao === 'concluir' && etapa.codigo === 'aprovacao_setor'
-    ? { versao: ultimaVersao?.numero ?? 0, aoConfirmar: aoConfirmarAprovacao } : undefined
+    ? { versao: ultimaVersao?.numero ?? null, aoConfirmar: aoConfirmarAprovacao } : undefined
   return (
     <JanelaDeAvanco key={etapa.id} titulo={textos.titulo} rotuloDaAcao={textos.rotuloDaAcao} comNota={acao !== 'concluir'}
       rotuloDoCampo={JANELA_DO_AVANCO[acao].rotuloDoCampo} pergunta={textos.pergunta} usuarios={possiveis}

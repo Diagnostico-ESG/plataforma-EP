@@ -7,6 +7,8 @@ import type { EtapaDoCaminho, ModuloDeProcessos } from '../processos/tipos'
 import type { DadosDaAprovacao, DadosDaRevisao, ModuloDeRevisoes } from '../revisoes/tipos'
 import { useGravacaoComFalha } from './useGravacaoComFalha'
 
+const ETAPAS_QUE_GRAVAM_NA_JANELA = ['revisao_interna', 'aprovacao_setor']
+
 /**
  * As ações do caminho de etapas. Iniciar grava na hora; Concluir, Dispensar e Realizada anteriormente com etapa
  * pendente depois abrem a janela de avanço (`avanco`), que escolhe o responsável dela; Voltar abre a mesma janela,
@@ -21,8 +23,8 @@ export function useAcoesDaEtapa(processos: ModuloDeProcessos, revisoes: ModuloDe
   function agir(acao: AcaoDaEtapa, etapa: EtapaDoCaminho, proxima: EtapaDoCaminho | null) {
     if (acao === 'iniciar') return executar(() => processos.iniciarEtapa(etapa.id), aoMudar)
     if (acao === 'voltar') return setAvanco({ acao, etapa, proxima: etapa })
-    // Concluir a Aprovação pede o E-protocolo na janela, mesmo sem etapa pendente depois.
-    if (proxima || (acao === 'concluir' && etapa.codigo === 'aprovacao_setor')) return setAvanco({ acao, etapa, proxima })
+    // Concluir a Revisão interna e a Aprovação grava um registro na janela (resultado, E-protocolo), mesmo sem etapa pendente depois.
+    if (proxima || (acao === 'concluir' && ETAPAS_QUE_GRAVAM_NA_JANELA.includes(etapa.codigo))) return setAvanco({ acao, etapa, proxima })
     if (acao === 'concluir') return executar(() => processos.concluirEtapa(etapa.id, null), aoMudar)
     setPedido({ acao, etapa })
   }

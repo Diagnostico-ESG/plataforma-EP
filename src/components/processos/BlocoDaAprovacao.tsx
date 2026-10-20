@@ -3,7 +3,7 @@ import { CamposDoEProtocolo } from './CamposDoEProtocolo'
 
 type BlocoDaAprovacaoProps = {
   /** O número da versão que está sendo aprovada (a mais recente). */
-  versao: number
+  versao: number | null
   valor: RascunhoDaAprovacao
   aoMudar: (valor: RascunhoDaAprovacao) => void
 }
@@ -12,7 +12,7 @@ type BlocoDaAprovacaoProps = {
 export function BlocoDaAprovacao({ versao, valor, aoMudar }: BlocoDaAprovacaoProps) {
   return (
     <>
-      <p className="janela-aprovada">{`Versão aprovada: V${versao}`}</p>
+      {versao !== null && <p className="janela-aprovada">{`Versão aprovada: V${versao}`}</p>}
       <CamposDoEProtocolo valor={valor} aoMudar={aoMudar} />
     </>
   )
