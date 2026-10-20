@@ -24,3 +24,5 @@ O que depende da produção, que ainda não existe, vai com o que se sabe hoje, 
 - [x] O que depende da produção está marcado como "conferir no `/ship` de produção".
 - [x] O índice dos ADRs cobre do 0001 ao último, uma linha cada.
 - [x] Nenhum dado pessoal, segredo ou identificador real nos documentos.
+
+Concluído em 2026-10-20 (commit 042e2fc)
