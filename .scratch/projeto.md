@@ -26,7 +26,7 @@ Plataforma web interna do Centro Estadual de Desburocratização (CED) para cont
    3. **Verso do cartão** (processos-etapas): janela central no lugar do painel lateral; Novo processo na mesma janela; Lista com busca.
    4. **Cartão do Quadro** (processos-etapas): progresso, selos, arrastar para concluir, agrupar por responsável e Só os meus.
    5. **Revisões e aprovação** (revisoes-aprovacao)**:** revisão interna (o revisor precisa ser diferente de quem enviou), revisão pelo setor como etapa, sem rodadas (ADR 0012) e aprovação com o número do E-protocolo.
-7. **Exportação em CSV e documentação de manutenção.**
+7. **Exportação em CSV e documentação de manutenção** (exportacao-e-manutencao)**.**
 
 A importação (era a funcionalidade 7) saiu da v1 por decisão do usuário em 2026-10-20: os dados atuais (planilhas, Power BI e nomes dos arquivos) não seguem a organização da plataforma, então um importador deixaria quase tudo como pendência ou exigiria arrumar os dados antes, o mesmo trabalho de cadastrar pela tela. A equipe cadastra os dados atuais à mão pelas telas que já existem (as versões antigas como versão histórica, e a plataforma dá o nome padrão aos arquivos no envio). A importação está no backlog.
 
