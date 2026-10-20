@@ -9,7 +9,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(68);
+insert into _tap (linha) select plan(67);
 
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 insert into public.autorizacoes (email, perfil) values
@@ -298,10 +298,7 @@ insert into _tap (linha) select throws_ok(
   $sql$delete from public.aprovacoes where processo_id = pg_temp.processo('Volta Publicacao')$sql$,
   'P0001', 'aprovacao_so_se_desfaz_na_volta', 'apagar a aprovação direto é recusado');
 
--- ===== Nada se altera =====
-insert into _tap (linha) select throws_ok(
-  $sql$update public.aprovacoes set link = 'https://x.example'$sql$, '42501', null,
-  'integrante não altera aprovação (a edição é do ticket 04)');
+-- ===== Quem registra e a versão não são escolhidos (a edição de número, link e data é provada no teste 41) =====
 insert into _tap (linha) select throws_ok(
   $sql$insert into public.aprovacoes (processo_id, versao_id) values (pg_temp.processo('Segunda'), gen_random_uuid())$sql$,
   '42501', null, 'a versão não é escolhida por quem inclui');

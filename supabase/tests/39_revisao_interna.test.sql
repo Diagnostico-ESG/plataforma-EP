@@ -2,14 +2,14 @@
 -- revisoes_internas e nos eventos dela, as regras do banco (processo e etapa em andamento, revisor nunca o autor da
 -- versão revisada, "corrigida" com a versão mais recente do revisor e a anterior de outra pessoa, escopo, conclusão que
 -- exige revisão da versão mais recente, revisão e conclusão juntas, nada se altera nem se apaga, processo com revisão
--- não se exclui, um evento por revisão). A edição da revisão é do ticket 04.
+-- não se exclui, um evento por revisão). A edição da revisão é do teste 41 (ticket 04).
 begin;
 create extension if not exists pgtap with schema extensions;
 -- As linhas do pgTAP vão para _tap e saem na exceção do fim (ver scripts/relatorio-tap.mjs).
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(56);
+insert into _tap (linha) select plan(55);
 
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 insert into public.autorizacoes (email, perfil) values
@@ -272,9 +272,7 @@ insert into _tap (linha) select is(pg_temp.revisoes('Atomica'), 0::bigint, 'a co
 insert into _tap (linha) select is(pg_temp.status('Atomica', 'revisao_interna'), 'em_andamento'::public.status_da_etapa,
   'a etapa segue em andamento');
 
--- ===== Nada se altera nem se apaga =====
-insert into _tap (linha) select throws_ok(
-  $sql$update public.revisoes_internas set comentario = 'x'$sql$, '42501', null, 'integrante não altera revisão (a edição é do ticket 04)');
+-- ===== Nada se apaga (a edição de escopo e comentário é provada no teste 41) =====
 insert into _tap (linha) select throws_ok(
   $sql$delete from public.revisoes_internas$sql$, '42501', null, 'integrante não apaga revisão');
 insert into _tap (linha) select throws_ok(
