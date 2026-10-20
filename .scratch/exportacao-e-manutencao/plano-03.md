@@ -127,12 +127,12 @@
 
 ### Tarefa 13 — Conferência no desenvolvimento, com o usuário (critério 3)
 
-- [ ] O usuário cumpre o roteiro da Tarefa 12 (deploy e segredos são dele). Se ele não puder agora, parar aqui, deixar o critério 3 aberto e perguntar se o ticket fecha com a ressalva "provas no desenvolvimento pendentes" ou espera.
-- [ ] Com a função publicada: no app de desenvolvimento (o usuário entra com a conta dele no navegador do app), apertar [Atualizar planilhas agora] e conferir que a tentativa vira "Concluída" e que as abas Processos e Fases da interna e Resumo e Fases da pública estão preenchidas (conferir cabeçalhos, contagem de linhas e a ausência de nome de pessoa; sem repetir dado na conversa). Provocar a falha (conta de serviço sem acesso à planilha pública): "Falhou" com "O Google recusou a escrita na planilha pública.", a interna já nova e a pública como estava; devolver o acesso e apertar de novo: "Concluída".
-- [ ] Anotar no `desvios.md` o que foi visto e o que ficou presumido; marcar o critério 3.
+- [x] O usuário cumpre o roteiro da Tarefa 12 (deploy e segredos são dele). Se ele não puder agora, parar aqui, deixar o critério 3 aberto e perguntar se o ticket fecha com a ressalva "provas no desenvolvimento pendentes" ou espera.
+- [x] Com a função publicada: no app de desenvolvimento (o usuário entra com a conta dele no navegador do app), apertar [Atualizar planilhas agora] e conferir que a tentativa vira "Concluída" e que as abas Processos e Fases da interna e Resumo e Fases da pública estão preenchidas (conferir cabeçalhos, contagem de linhas e a ausência de nome de pessoa; sem repetir dado na conversa). Provocar a falha (conta de serviço sem acesso à planilha pública): "Falhou" com "O Google recusou a escrita na planilha pública.", a interna já nova e a pública como estava; devolver o acesso e apertar de novo: "Concluída".
+- [x] Anotar no `desvios.md` o que foi visto e o que ficou presumido; marcar o critério 3.
 
 ### Tarefa 14 — Fechamento
 
-- [ ] `npm test` (e o pre-commit) verdes; "Testes de banco" verde na branch.
-- [ ] Mesclar à `main` (`git switch main`, merge, `git push origin main`; marco enviado), apagar a branch com `git branch -d` (se recusar, parar e perguntar), acrescentar ao fim do ticket `Concluído em AAAA-MM-DD (commit <hash>)` e comitar.
-- [ ] Ler o bloco "executar-complexo" e "Qualquer momento" de `.claude/regras/nao-testados.md` e registrar em `.scratch/melhorias-protocolo.md` os itens que aconteceram. Lembrar `/cost` e o próximo ticket (04: dashboards no Data Studio, Sonnet).
+- [x] `npm test` (e o pre-commit) verdes; "Testes de banco" verde na branch.
+- [x] Mesclar à `main` (`git switch main`, merge, `git push origin main`; marco enviado), apagar a branch com `git branch -d` (se recusar, parar e perguntar), acrescentar ao fim do ticket `Concluído em AAAA-MM-DD (commit <hash>)` e comitar.
+- [x] Ler o bloco "executar-complexo" e "Qualquer momento" de `.claude/regras/nao-testados.md` e registrar em `.scratch/melhorias-protocolo.md` os itens que aconteceram. Lembrar `/cost` e o próximo ticket (04: dashboards no Data Studio, Sonnet).

@@ -6,7 +6,7 @@ Termos usados aqui:
 
 - **Função das planilhas (`planilhas-dos-dashboards`):** o pequeno programa, no servidor do Supabase, que recebe os dados do banco e reescreve as duas planilhas.
 - **API do Google Planilhas (Sheets):** o serviço do Google que a função usa para escrever na planilha. Precisa estar ligado no projeto do Google Cloud.
-- **Conta de serviço:** o "usuário robô" do Google (`ep-drive`, ver `docs/drive-conta-de-servico.md`). Ela já é membro do Drive compartilhado **EP – desenvolvimento** e, por isso, já alcança as planilhas criadas lá.
+- **Conta de serviço:** o "usuário robô" do Google (`ep-drive` no roteiro; no seu projeto pode ter outro nome, como `ep-dev`: vale o e-mail, ver `docs/drive-conta-de-servico.md`). Ela já é membro do Drive compartilhado **EP – desenvolvimento** e, por isso, já alcança as planilhas criadas lá.
 - **Segredo da função:** um valor guardado no Supabase, que só a função lê.
 - **Senha interna:** a senha que o banco envia à função em cada pedido. A função só trabalha se ela vier certa. É a mesma que você já gravou no cofre do banco (passo 4 de `docs/planilhas-cofre-do-banco.md`).
 - **Chave publicável:** a chave do projeto que a própria plataforma já usa no navegador (`sb_publishable_…`). Não é secreta. A função a usa só para devolver ao banco o resultado da atualização.
@@ -78,24 +78,24 @@ A aba de fábrica "Planilha1" (ou "Sheet1") pode ficar como está; a função n�
 Serve para conferir que uma falha aparece com a frase do motivo e que a planilha que falhou fica como estava. A planilha interna é escrita primeiro, então ela já estará nova.
 
 1. Abra o SQL Editor do desenvolvimento: https://supabase.com/dashboard/project/yclkzyoebpsxmgpbcbus/sql/new
-2. Descubra o `id` do segredo da planilha pública no cofre:
+2. Troque o identificador da planilha pública por um que não existe (o comando acha o segredo sozinho, sem copiar `id`):
 
 ```sql
-select id from vault.secrets where name = 'planilhas_id_publica';
+select vault.update_secret((select id from vault.secrets where name = 'planilhas_id_publica'), 'identificador-que-nao-existe');
 ```
 
-3. Troque o identificador por um que não existe (troque `<id>` pelo valor do passo 2):
+3. Confira que a troca valeu. O resultado deve ser `true`:
 
 ```sql
-select vault.update_secret('<id>', 'identificador-que-nao-existe');
+select (decrypted_secret = 'identificador-que-nao-existe') as trocado from vault.decrypted_secrets where name = 'planilhas_id_publica';
 ```
 
 4. Na plataforma, em **Administração → Planilhas**, clique em **Atualizar planilhas agora**.
 5. A tentativa deve terminar como **Falhou**, com o motivo **O Google recusou a escrita na planilha pública.** A planilha interna continua escrita; a pública continua como estava.
-6. Devolva o identificador certo (troque `<id>` pelo do passo 2 e `<identificador-da-planilha-publica>` pelo da planilha pública, o do passo 3 do roteiro do cofre):
+6. Devolva o identificador certo (troque `<identificador-da-planilha-publica>` pelo da planilha pública, o do passo 3 do roteiro do cofre):
 
 ```sql
-select vault.update_secret('<id>', '<identificador-da-planilha-publica>');
+select vault.update_secret((select id from vault.secrets where name = 'planilhas_id_publica'), '<identificador-da-planilha-publica>');
 ```
 
 7. Clique em **Atualizar planilhas agora** de novo: deve terminar como **Concluída**.
@@ -105,7 +105,7 @@ select vault.update_secret('<id>', '<identificador-da-planilha-publica>');
 | O que aparece | O que quase sempre é |
 | --- | --- |
 | A tentativa fica **Em andamento** e vira **Sem resposta** depois de 10 minutos | A função não foi publicada, ou a senha interna dela (`EP_PLANILHAS_SENHA`) é diferente da do cofre. Veja o item A abaixo |
-| **Falhou** com "O Google recusou a escrita na planilha interna." (ou pública) | A API do Google Planilhas não está ligada (passo 1), a planilha não está no Drive compartilhado onde `ep-drive` é membro, ou o identificador no cofre está errado |
+| **Falhou** com "O Google recusou a escrita na planilha interna." (ou pública) | A API do Google Planilhas não está ligada (passo 1), a planilha não está no Drive compartilhado onde a conta de serviço é membro, ou o identificador no cofre está errado |
 | **Falhou** com "O Google não respondeu." | O Google ficou fora do ar ou limitou as chamadas; clique de novo em alguns minutos |
 | **Falhou** com "O pedido enviado à atualização estava incompleto." | O banco e a função estão em versões diferentes; publique a função de novo (passo 3) |
 | **Falhou** com "A atualização falhou por um motivo não identificado." | Erro inesperado da função; veja o item B abaixo |
