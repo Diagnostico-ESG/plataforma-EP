@@ -102,4 +102,4 @@ as $$
 ### Tarefa 4: Fecho
 
 - [x] **4.1** `desvios.md` de documentos-versoes: entrada datada com o que divergiu da spec (rótulos curtos escolhidos, testes antigos alterados, o que não foi visto na tela). Itens de `nao-testados.md` do `/executar-complexo` em `melhorias-protocolo.md`.
-- [ ] **4.2** Juntar à `main` (`git switch main`, `git merge documentos-versoes-bpm`, `git branch -d documentos-versoes-bpm`), enviar a `main` e conferir o "Testes de banco" da `main`. Linha `Implementado em` no fim da seção da mudança na spec; comitar e enviar.
+- [x] **4.2** Juntar à `main` (`git switch main`, `git merge documentos-versoes-bpm`, `git branch -d documentos-versoes-bpm`), enviar a `main` e conferir o "Testes de banco" da `main`. Linha `Implementado em` no fim da seção da mudança na spec; comitar e enviar.
