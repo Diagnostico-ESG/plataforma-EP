@@ -780,3 +780,7 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **2026-10-19 · Ocorrência: o disparo dos workflows pelo navegador do app por clique falhou** (cliques por coordenada no lugar errado com o painel pequeno, captura de tela estourando o tempo); o que funcionou foi abrir o menu "Run workflow" e enviar o formulário pelo DOM (campos `branch` e `inputs[migracao]`, `requestSubmit`).
 - **2026-10-19 · Ocorrência: o comando e a spec se contradizem sobre "concluído".** O critério 2 do ticket manda o [Editar] sumir com o processo concluído e o critério 3 pede editar a aprovação concluída; resolvido pelo critério 3 e registrado no `desvios.md`. Sugestão: o `/to-tickets` poderia cruzar critérios de estado ("some com…") com os de uso ("funciona depois de…").
 - **2026-10-19 · Ocorrência: TDD pulado em partes do front** (falsa de revisões, janelas de edição e componentes da gaveta escritos antes dos testes de módulo falso e de janela); só o módulo real e a tela inteira foram vistos falhando antes.
+
+## 2026-10-19 — /polir (revisoes-aprovacao)
+
+- **2026-10-19 · Item não testado: testes, commit e registro dos achados em `desvios.md` depois do polimento.** Esperado: `npm test` e typecheck verdes, commit, entrada datada em `desvios.md`. Aconteceu: dois testes de tela falharam porque o aviso "(abre em nova aba)" mudou o nome acessível do link; ajustei por prefixo e acrescentei um teste do aviso. O app não foi aberto no navegador (auditoria só pelo código).

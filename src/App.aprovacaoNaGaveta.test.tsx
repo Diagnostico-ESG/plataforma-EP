@@ -42,9 +42,10 @@ test('a gaveta da Aprovação mostra a versão aprovada, o número como link em 
   montar(versao(), { ajustar: aprovadaCom({}) })
   const gaveta = await gavetaDaEtapa(APROVACAO)
   expect(await gaveta.findByText('V8 aprovada')).toBeTruthy()
-  const link = gaveta.getByRole('link', { name: 'PROT-2026-0001' }) as HTMLAnchorElement
+  const link = gaveta.getByRole('link', { name: /^PROT-2026-0001/ }) as HTMLAnchorElement
   expect(link.href).toBe('https://eprotocolo.example/a')
   expect(link.target).toBe('_blank')
+  expect(link.textContent).toContain('abre em nova aba')
   expect(link.rel).toBe('noopener noreferrer')
   expect(gaveta.getByText(/09\/10\/2026/)).toBeTruthy()
   expect(gaveta.getByText(/Registrada por Bia Teste/)).toBeTruthy()

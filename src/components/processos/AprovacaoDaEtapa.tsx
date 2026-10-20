@@ -42,7 +42,7 @@ export function AprovacaoDaEtapa({ estado, aoTentarDeNovo, revisoes, podeEditar,
 }
 
 function AbrirEmAbaNova({ link, texto }: { link: string; texto: string }) {
-  return <a href={link} target="_blank" rel="noopener noreferrer">{texto}</a>
+  return <a href={link} target="_blank" rel="noopener noreferrer">{texto}<span className="etapa-so-leitor"> (abre em nova aba)</span></a>
 }
 
 function NumeroDoEProtocolo({ numero, link }: { numero: string | null; link: string | null }) {

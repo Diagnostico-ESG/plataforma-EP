@@ -103,7 +103,7 @@ test('editar o link troca o endereço do número, que segue abrindo em aba nova'
   expect(campo(janela, /Data da aprovação/).value).toBe('2026-10-09')
   fireEvent.change(campo(janela, /Link/), { target: { value: 'https://eprotocolo.example/b' } })
   salvar(janela)
-  await waitFor(() => expect((gaveta.getByRole('link', { name: 'PROT-2026-0001' }) as HTMLAnchorElement).href).toBe('https://eprotocolo.example/b'))
+  await waitFor(() => expect((gaveta.getByRole('link', { name: /^PROT-2026-0001/ }) as HTMLAnchorElement).href).toBe('https://eprotocolo.example/b'))
 })
 
 test.each([

@@ -60,3 +60,16 @@
 - **Sem conferência na tela (critérios `[visual]`):** não há `.claude/launch.json` para a vitrine local e a pasta `.claude/` não se edita neste projeto. Os testes de tela rodam com as falsas; a aparência do [Editar] e das janelas de edição (altura em 1366×768, alinhamento na gaveta) segue **presumida**, como a dos tickets 02 e 03.
 - **TDD parcial em pedaços do front:** a falsa de revisões (`editarRevisao`/`editarAprovacao`), as janelas de edição e os componentes da gaveta foram escritos antes dos testes do módulo falso e das janelas (só o teste do módulo real e o da tela inteira foram vistos falhando antes); o teste de banco e o de tela inteira seguiram o vermelho antes do verde.
 - **Pre-commit sem `--no-verify`;** o commit da migração só passou depois de a falsa implementar os métodos novos (o typecheck olha a árvore inteira), então a falsa foi comitada depois da migração, na ordem inversa da do plano (plano e teste → migração → módulo → registro → janelas → gaveta).
+
+## 2026-10-19 — /polir (revisões e aprovação, tickets 01 a 04)
+
+Auditoria (impeccable audit): 17/20; o detector automático não achou nada nos 22 arquivos de tela alterados. Conferência feita só pelo código; o app não foi aberto no navegador.
+
+Corrigido:
+- **[P2]** `etapa-nota` e `etapa-registro-resultado` não tinham regra de CSS, e o registro das revisões e da aprovação saía sem hierarquia. Ganharam regra em `Etapas.css` (resultado no texto principal, nota/comentário no tom secundário, quebra de texto longo). A regra de `etapa-nota` vale também para a "Nota:" do `DetalheDaEtapa`, que já a usava sem estilo.
+- **[P3]** o link do E-protocolo abre em aba nova sem avisar o leitor de tela: ganhou "(abre em nova aba)" visível só para leitor de tela (`etapa-so-leitor`); testes ajustados (nome do link por prefixo) e um teste novo confere o aviso.
+- **[P3]** `13px` fixo no motivo da opção desabilitada virou a variável `--largura-do-radio`.
+
+Deixado de fora:
+- **[P3]** contador de caracteres no comentário da revisão (limite de 2.000): o campo corta sem avisar; uso interno, raro. Vai ao backlog se virar incômodo.
+- Responsivo/celular: o uso é em computador (PRODUCT.md); nada quebra no código.

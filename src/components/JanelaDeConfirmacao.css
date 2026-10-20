@@ -62,6 +62,7 @@
 
 /* Resultado e Escopo da revisão (JanelaDeAvanco, conclusão da Revisão interna): grupos de rádios sem a moldura nativa. */
 .janela-revisao {
+  --largura-do-radio: 13px; /* o tamanho do botão de rádio do navegador, que alinha o motivo ao texto */
   display: flex;
   flex-direction: column;
   gap: var(--esp-2);
@@ -87,7 +88,7 @@
 
 /* O motivo de a opção não caber fica sob o rótulo, alinhado ao texto dele (depois do botão de rádio). */
 .janela-revisao-motivo {
-  padding-left: calc(13px + var(--esp-2));
+  padding-left: calc(var(--largura-do-radio) + var(--esp-2));
   color: var(--texto-2);
   font-size: var(--tam-secundario);
 }
