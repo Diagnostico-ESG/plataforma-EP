@@ -432,3 +432,12 @@ enabled = true
 verify_jwt = false
 import_map = "./functions/arquivos-no-drive/deno.json"
 entrypoint = "./functions/arquivos-no-drive/index.ts"
+
+# Função das planilhas dos dashboards (exportacao-e-manutencao, ticket 03). Quem a chama é o banco (pg_net), sem login:
+# a verificação de login da plataforma fica desligada e a própria função confere a senha interna (cabeçalho
+# x-senha-interna) antes de qualquer trabalho. Ao publicar com --use-api, passe também --no-verify-jwt.
+[functions.planilhas-dos-dashboards]
+enabled = true
+verify_jwt = false
+import_map = "./functions/planilhas-dos-dashboards/deno.json"
+entrypoint = "./functions/planilhas-dos-dashboards/index.ts"
