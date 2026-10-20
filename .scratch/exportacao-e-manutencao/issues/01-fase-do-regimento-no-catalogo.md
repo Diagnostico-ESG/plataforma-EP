@@ -10,9 +10,9 @@
 
 ## Critérios de aceite
 
-- [ ] Banco: testes antes da migração: etapa sem fase recusada; valor fora de IV a IX recusado; as seis etapas atuais com a fase da sabatina; `acrescentar_etapa` grava a fase; mudar a fase gera evento no histórico do catálogo com o antes e o depois; Integrante, Consulta, desativado e visitante sem poder mudar a fase; a fase de uma etapa protegida pode ser mudada pelo Administrador. Os testes antigos que criam etapas passam a informar a fase.
-- [ ] O Administrador escolhe a fase ao criar uma etapa; sem fase, o formulário recusa com "Escolha a fase do Regimento." sem perder o preenchido.
-- [ ] O Administrador troca a fase pelo [Editar]; a tabela do catálogo mostra a coluna Fase.
-- [ ] O histórico do catálogo mostra a mudança de fase.
-- [ ] Testes do módulo real com o cliente simulado e da tela inteira com as falsas, cobrindo os itens acima, inclusive falha ao gravar.
-- [ ] [visual] O campo e a coluna cabem no formulário e na tabela do catálogo sem quebrar o alinhamento, no notebook (1366×768).
+- [x] Banco: testes antes da migração: etapa sem fase recusada; valor fora de IV a IX recusado; as seis etapas atuais com a fase da sabatina; `acrescentar_etapa` grava a fase; mudar a fase gera evento no histórico do catálogo com o antes e o depois; Integrante, Consulta, desativado e visitante sem poder mudar a fase; a fase de uma etapa protegida pode ser mudada pelo Administrador. Os testes antigos que criam etapas passam a informar a fase.
+- [x] O Administrador escolhe a fase ao criar uma etapa; sem fase, o formulário recusa com "Escolha a fase do Regimento." sem perder o preenchido.
+- [x] O Administrador troca a fase pelo [Editar]; a tabela do catálogo mostra a coluna Fase.
+- [x] O histórico do catálogo mostra a mudança de fase.
+- [x] Testes do módulo real com o cliente simulado e da tela inteira com as falsas, cobrindo os itens acima, inclusive falha ao gravar.
+- [x] [visual] O campo e a coluna cabem no formulário e na tabela do catálogo sem quebrar o alinhamento, no notebook (1366×768).

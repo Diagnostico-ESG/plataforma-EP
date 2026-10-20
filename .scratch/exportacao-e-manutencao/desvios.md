@@ -1,0 +1,9 @@
+# Desvios — exportacao-e-manutencao
+
+## 2026-10-20 — ticket 01 (Fase do Regimento no catálogo)
+
+- **O histórico mostra a fase nas linhas "Antes:" e "Depois:", não como "Fase: V → VI".** O histórico do catálogo já exibe o estado inteiro da etapa antes e depois de cada edição (`ListaDoHistorico`), e só o processo mostra "apenas o que mudou". O ticket e a spec citam "Fase: V → VI"; segui o formato que já existe (rótulo "Fase" em `historicoDosCadastros.ts`), então a mudança aparece como "Fase: V" no Antes e "Fase: VI" no Depois. Se o texto com a seta for preferido, é uma mudança pequena em `ListaDoHistorico` (aplicar `apenasOQueMudou` também às edições de etapa), mas muda o que o histórico mostra hoje para o nome e a obrigatória.
+- **Etapa fora das seis, no banco de desenvolvimento, recebe a fase da etapa anterior na ordem (ou IV).** A spec só diz as seis. A coluna é obrigatória, então a migração precisava de uma regra para qualquer outra etapa que existisse; escolha padrão, corrigível pelo [Editar] do catálogo. Não conferi se o desenvolvimento tinha etapas extras.
+- **Posição do parâmetro:** `acrescentar_etapa(p_codigo, p_nome, p_obrigatoria, p_fase, p_antes_de)`, com a fase antes da posição. Os testes 22, 34 e 35 passaram a informar a fase (VI) nas chamadas.
+- **Validação da fase: teste e código no mesmo passo.** Em `validacaoDaEtapa`, o teste novo e a implementação entraram juntos, sem uma execução vermelha antes; os demais testes novos do ticket (banco, módulo real, falso, tela) falharam antes de o código existir.
+- **Verificado na tela (vitrine local, módulos falsos, 1366×768, critério 6 [visual]):** a coluna Fase da tabela (alinhada, sem quebrar as ações) e o campo "Fase do Regimento" do formulário de Nova etapa (alinhado aos outros campos, sem rolagem horizontal). **Presumido:** o formulário de Editar (mesmo componente, com a fase atual) e a tela com banco e dados reais.
