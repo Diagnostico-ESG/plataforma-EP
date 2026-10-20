@@ -18,3 +18,5 @@
 - [x] Os eventos de aprovação registrada e desfeita aparecem no histórico do processo.
 - [x] Testes do módulo real, das funções puras e da tela inteira com as falsas (a de processos e a de versões passam a consultar a aprovação), cobrindo os itens acima, inclusive falhas.
 - [ ] [visual] A janela mostra claramente qual versão é aprovada e cabe na tela do notebook (1366×768); o selo segue o estilo das pílulas de Arquivos.
+
+Concluído em 2026-10-19 (commit eddfdd9)
