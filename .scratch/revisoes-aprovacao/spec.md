@@ -261,4 +261,4 @@ Nenhuma migração destrutiva: tipos, tabelas, funções, gatilhos e políticas 
 - **Concluídos antigos:** a trava age só quando o status muda, então processos de teste já concluídos no desenvolvimento não são recusados.
 - O Drive guarda por 30 dias o conteúdo de um arquivo substituído, em "Gerenciar versões" (ADR 0011); a plataforma não precisa fazer nada para isso.
 
-Em revisão desde 2026-10-19
+Entregue em 2026-10-20 (commit 6ce74d6), com ressalva: critérios [visual] presumidos (selo "Aprovada" ao lado das pílulas de Arquivos, janela de edição e registro da Revisão interna na gaveta não foram vistos na tela; a janela de concluir e a gaveta da Aprovação foram vistas na vitrine local, com módulos falsos); função arquivos-no-drive com a trava de versão aprovada ainda sem publicar no desenvolvimento
