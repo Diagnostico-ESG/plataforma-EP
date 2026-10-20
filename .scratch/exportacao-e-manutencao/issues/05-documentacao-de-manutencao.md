@@ -19,8 +19,8 @@ O que depende da produção, que ainda não existe, vai com o que se sabe hoje, 
 
 ## Critérios de aceite
 
-- [ ] Os seis temas existem em `docs/manutencao/`, com um índice que aponta para cada um.
-- [ ] Cada roteiro é uma lista numerada, um passo por linha, com o caminho completo de arquivo ou pasta e o endereço da página quando há.
-- [ ] O que depende da produção está marcado como "conferir no `/ship` de produção".
-- [ ] O índice dos ADRs cobre do 0001 ao último, uma linha cada.
-- [ ] Nenhum dado pessoal, segredo ou identificador real nos documentos.
+- [x] Os seis temas existem em `docs/manutencao/`, com um índice que aponta para cada um.
+- [x] Cada roteiro é uma lista numerada, um passo por linha, com o caminho completo de arquivo ou pasta e o endereço da página quando há.
+- [x] O que depende da produção está marcado como "conferir no `/ship` de produção".
+- [x] O índice dos ADRs cobre do 0001 ao último, uma linha cada.
+- [x] Nenhum dado pessoal, segredo ou identificador real nos documentos.
