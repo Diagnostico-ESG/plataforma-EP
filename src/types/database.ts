@@ -234,6 +234,47 @@ export type Database = {
           },
         ]
       }
+      atualizacoes_das_planilhas: {
+        Row: {
+          concluida_em: string | null
+          deu_certo: boolean | null
+          ficha_hash: string
+          id: string
+          iniciada_em: string
+          motivo: string | null
+          origem: Database["public"]["Enums"]["origem_da_atualizacao"]
+          pedida_por: string | null
+        }
+        Insert: {
+          concluida_em?: string | null
+          deu_certo?: boolean | null
+          ficha_hash: string
+          id?: string
+          iniciada_em?: string
+          motivo?: string | null
+          origem: Database["public"]["Enums"]["origem_da_atualizacao"]
+          pedida_por?: string | null
+        }
+        Update: {
+          concluida_em?: string | null
+          deu_certo?: boolean | null
+          ficha_hash?: string
+          id?: string
+          iniciada_em?: string
+          motivo?: string | null
+          origem?: Database["public"]["Enums"]["origem_da_atualizacao"]
+          pedida_por?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "atualizacoes_das_planilhas_pedida_por_fkey"
+            columns: ["pedida_por"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       autorizacoes: {
         Row: {
           criada_em: string
@@ -839,6 +880,27 @@ export type Database = {
           },
         ]
       }
+      resultado_das_atualizacoes_das_planilhas: {
+        Row: {
+          concluida_em: string | null
+          id: string | null
+          iniciada_em: string | null
+          motivo: string | null
+          origem: Database["public"]["Enums"]["origem_da_atualizacao"] | null
+          pedida_por: string | null
+          pedida_por_nome: string | null
+          resultado: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "atualizacoes_das_planilhas_pedida_por_fkey"
+            columns: ["pedida_por"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       acrescentar_etapa: {
@@ -888,6 +950,13 @@ export type Database = {
         }
         Returns: undefined
       }
+      links_das_planilhas: {
+        Args: never
+        Returns: {
+          planilha_interna: string
+          planilha_publica: string
+        }[]
+      }
       mover_etapa: {
         Args: { p_etapa: string; p_sentido: string }
         Returns: undefined
@@ -900,12 +969,22 @@ export type Database = {
           formato: string
         }[]
       }
+      pedir_atualizacao_das_planilhas: { Args: never; Returns: string }
       reclassificar_processo: {
         Args: {
           p_motivo: string
           p_pai: string
           p_processo: string
           p_tipo: Database["public"]["Enums"]["tipo_de_processo"]
+        }
+        Returns: undefined
+      }
+      registrar_resultado_das_planilhas: {
+        Args: {
+          p_deu_certo: boolean
+          p_ficha: string
+          p_motivo: string
+          p_tentativa: string
         }
         Returns: undefined
       }
@@ -952,6 +1031,7 @@ export type Database = {
       categoria_macroprocesso: "finalistico" | "apoio" | "gerencial"
       escopo_da_correcao: "fluxograma" | "relatorio" | "ambos"
       fase_do_regimento: "IV" | "V" | "VI" | "VII" | "VIII" | "IX"
+      origem_da_atualizacao: "automatica" | "botao"
       origem_do_processo: "novo" | "retomado"
       papel_do_arquivo: "bpmn" | "png" | "bpm" | "relatorio"
       perfil: "administrador" | "integrante_ep" | "consulta"
@@ -1097,6 +1177,7 @@ export const Constants = {
       categoria_macroprocesso: ["finalistico", "apoio", "gerencial"],
       escopo_da_correcao: ["fluxograma", "relatorio", "ambos"],
       fase_do_regimento: ["IV", "V", "VI", "VII", "VIII", "IX"],
+      origem_da_atualizacao: ["automatica", "botao"],
       origem_do_processo: ["novo", "retomado"],
       papel_do_arquivo: ["bpmn", "png", "bpm", "relatorio"],
       perfil: ["administrador", "integrante_ep", "consulta"],
