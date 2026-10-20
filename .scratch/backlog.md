@@ -27,6 +27,8 @@ Uma linha por item: o que é e onde surgiu.
 - EP v1.5: Prazos: prazo por etapa e indicador de atraso. Saiu da v1 por decisão do usuário em 2026-10-17 (era a funcionalidade 8 do resumo do projeto).
 - EP v1.5: Dashboard: os indicadores da seção 6 da especificação, que substituem o Power BI; inclui a fila de revisão e as revisões pendentes por integrante. Saiu da v1 por decisão do usuário em 2026-10-17 (era a funcionalidade 9).
 - EP v1.5: alertas por e-mail (prazo vencendo, revisão pendente, setor sem resposta). (especificação, seção 1)
+- EP versão futura: visualizador de .bpmn no navegador, no detalhe do processo (bpmn-js carregada só ao abrir, sem editar). Saiu da v1 por decisão do usuário em 2026-10-20 (era a funcionalidade 7); antes, provar com .bpmn exportado do Bizagi. (ADR 0016)
+- EP versão futura: geração do .png a partir do .bpmn no envio de versão, com a biblioteca do visualizador; testar antes com arquivos reais do Bizagi, porque o desenho sai com a aparência da bpmn-js. Saiu da v1 junto com o visualizador, em 2026-10-20.
 - EP v1.5: checagem automática do .bpmn no upload (RegraBpmn, ChecagemBpmn). (especificação, seção 1)
 - EP v1.5: publicação interna e/ou externa, conforme a decisão sobre o destino. (especificação, seção 1)
 - EP v1.5: sincronização com o Google Drive institucional (Edge Function copia versões aprovadas). (especificação, seções 1 e 7)

@@ -26,9 +26,10 @@ Plataforma web interna do Centro Estadual de Desburocratização (CED) para cont
    3. **Verso do cartão** (processos-etapas): janela central no lugar do painel lateral; Novo processo na mesma janela; Lista com busca.
    4. **Cartão do Quadro** (processos-etapas): progresso, selos, arrastar para concluir, agrupar por responsável e Só os meus.
    5. **Revisões e aprovação** (revisoes-aprovacao)**:** revisão interna (o revisor precisa ser diferente de quem enviou), revisão pelo setor como etapa, sem rodadas (ADR 0012) e aprovação com o número do E-protocolo.
-7. **Visualizador de fluxograma:** abre o .bpmn no navegador, no detalhe do processo.
-8. **Importação:** carga inicial com validação antes de gravar e uma lista de pendências.
-9. **Exportação em CSV e documentação de manutenção.**
+7. **Importação:** carga inicial com validação antes de gravar e uma lista de pendências.
+8. **Exportação em CSV e documentação de manutenção.**
+
+O visualizador de .bpmn (era a funcionalidade 7) saiu da v1 por decisão do usuário em 2026-10-20: a versão passa a exigir o .bpm e o .png, e o fluxo se vê pelo .png (ADR 0016; mudança em documentos-versoes; o visualizador está no backlog).
 
 Prazos e Dashboard, previstos na especificação para a v1, passaram para a v1.5 por decisão do usuário em 2026-10-17 (backlog).
 

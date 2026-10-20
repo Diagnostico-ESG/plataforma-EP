@@ -137,7 +137,7 @@ _Avoid_: encontro, evento, agenda, oficina, reunião de sensibilização
 ## Documentos
 
 **Versão**:
-Conjunto de arquivos do fluxograma de um processo, com número sequencial por processo (V1, V2…). Nasce com o .bpmn e o .png (o .bpm do Bizagi é opcional) e pode receber o relatório depois. Nunca se apaga, mas um arquivo dela pode ser substituído. Registra a etapa atual do processo no momento do envio, mas não muda nenhuma etapa.
+Conjunto de arquivos do fluxograma de um processo, com número sequencial por processo (V1, V2…). Nasce com o .bpm (arquivo-fonte do Bizagi) e o .png (o .bpmn é opcional) e pode receber o relatório depois. Nunca se apaga, mas um arquivo dela pode ser substituído. Registra a etapa atual do processo no momento do envio, mas não muda nenhuma etapa.
 _Avoid_: documento, revisão (para versão), arquivo
 
 **Relatório**:
@@ -175,7 +175,7 @@ Integrante que registra a revisão interna; nunca é o autor da versão revisada
 _Avoid_: aprovador, conferente
 
 **Revisão pelo setor**:
-A etapa em que a versão completa (.bpmn, .png e relatório) está com o setor. Em andamento quer dizer "com o setor"; se o setor pede ajustes, o EP volta à revisão interna, e a ida seguinte é a etapa recomeçando. A plataforma não registra cada envio nem a resposta (ADR 0012): o histórico das etapas diz quando foi e voltou, e os e-mails ficam fora (a resposta pode vir pessoalmente).
+A etapa em que a versão completa (.bpm, .png e relatório) está com o setor. Em andamento quer dizer "com o setor"; se o setor pede ajustes, o EP volta à revisão interna, e a ida seguinte é a etapa recomeçando. A plataforma não registra cada envio nem a resposta (ADR 0012): o histórico das etapas diz quando foi e voltou, e os e-mails ficam fora (a resposta pode vir pessoalmente).
 _Avoid_: rodada, ciclo, envio ao setor
 
 **Aprovação**:
