@@ -42,7 +42,20 @@ Criado em Data Studio pelo endereço `datastudio.google.com/reporting/create` (o
   - `Publicados` = `COUNT_DISTINCT(CASE WHEN Fase = "VII" AND Situação = "Concluída" THEN Identificador END)`
   - `Fase nº` = `CASE Fase WHEN "I" THEN 1 ... WHEN "VIII" THEN 8 ELSE 9 END` (para ordenar as fases romanas, que em ordem alfabética saem fora de ordem)
 - **Página 1 (visão geral), feito até agora:** quatro cartões (Total de processos, Publicados, Avanço I a VII, Avanço IV a VII) e um gráfico de barras Fase × Concluídas e Total de processos. Conferência com a planilha de prova (3 processos, 21 linhas de fase): total 3, publicados 0, avanço I a VII 0,48 (10 de 21), avanço IV a VII 0,08 (1 de 12). Batem.
-- **Dificuldade:** o painel do navegador do app tem altura pequena (440 px) e o painel de propriedades do Data Studio fica cortado; o controle de ordenação do gráfico não foi alcançado. O gráfico por fase sai ordenado pelo valor, não pela ordem romana, até a ordenação por `Fase nº` ser configurada.
+- **Página 1 (visão geral)**, completa: quatro cartões (Total de processos, Publicados, Avanço I a VII e Avanço IV a VII, os dois últimos em formato Porcentagem: 47,62% e 8,33%, o que bate com 10 de 21 e 1 de 12 fases concluídas na planilha de prova), gráfico de colunas por fase (Fase × Concluídas e Total de processos, ordenado por `Fase nº` crescente: em Configuração, seção "Classificar"), tabela dinâmica com mapa de calor Área × Fase (linhas = Área, coluna = Fase, métrica = Concluídas) e gráfico de colunas das modelagens piloto por mês (fonte Processos; dimensão `Modelagem piloto em` com tipo "Ano e mês"; métrica Record Count; linha de referência "Meta mensal (12)" de valor constante 12 em Estilo > Linhas de referência. A meta 12 muda ali mesmo, no Data Studio).
+- **Página 2 (por fase):** lista suspensa de Fase no topo (controle), cartões Concluídas (10), Prontos para iniciar (2) e Aguardando (8), e gráfico de colunas "processos por setor" (Área × Total de processos). Fonte: Fases interna. O controle de Fase filtra os cartões e o gráfico da página.
+- **Página 3 (processo × fase):** tabela com a fonte "Processos e fases" (combinação), uma linha por processo e fase: Concluída em, Situação da fase, Fase, Situação do processo (rótulo "Em andamento · V", "Próxima · IV"), Área e Processo. O Identificador ficou fora da tabela. **Observações** não aparece: a coluna da planilha chega vazia (ver Achados).
+- **Nomes das páginas:** ficaram "Página sem título"; mudar o nome pelo painel "Páginas do relatório" não funcionou no navegador do app (ctrl+A selecionou os componentes em vez do texto). Renomear à mão, na ficha de revisão visual.
+- **Dificuldade (resolvida):** com o painel do navegador de 440 px de altura o painel de propriedades fica cortado e não se alcança o "Classificar"; com o painel maior ele aparece. No navegador do app, menus e botões do Data Studio só respondem ao clique depois de um `hover` (passar o mouse) sobre eles, e desenhar um gráfico exige um passo para escolher o tipo e outro, separado, para arrastar no canvas.
+
+## Dashboard público (relatório "Dashboard público do EP (dev)")
+
+Relatório separado, só com as fontes da **planilha pública** (nenhuma fonte interna foi adicionada; a janela "Revise o acesso aos dados" lista só Resumo e Fases públicas). Credenciais dos dados: do proprietário.
+
+- Campo calculado na fonte Fases pública: `% concluído` = `SUM(Concluídos) / SUM(Total)`. Ao digitar, o Enter só aceita a sugestão de campo se o popup de sugestões já apareceu: esperar ~1 s entre digitar o início do nome e teclar Enter.
+- Cartões: `% concluído` (47,62%, formato Porcentagem), Total de processos (3, fonte Resumo) e Total de setores (3, fonte Resumo).
+- Gráfico de colunas por fase (fonte Fases pública): dimensão Fase, métricas `% concluído` (e Total, no eixo da direita), classificado por Fase crescente. Valores de prova: fases I, II e III em 100%, IV em 33% (1 de 3), V a VII em 0%.
+- "Atualizado em" (Resumo) ainda não aparece na página; pode entrar como texto pequeno.
 - Arrastar um campo do painel Dados para o campo "Dimensão" ou "Métrica" do painel de propriedades troca o campo do gráfico (acrescenta, no caso de métrica já preenchida pelo gráfico novo).
 
 ## Achados
