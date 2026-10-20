@@ -249,8 +249,8 @@ test('a gaveta lista as revisões da mais recente para a mais antiga, com versã
   const gaveta = await gavetaDaEtapa(REVISAO_INTERNA)
   const itens = await gaveta.findAllByRole('listitem')
   expect(itens.map((item) => item.textContent)).toEqual([
-    'V7 · Bia Teste · 13/10/2026Corrigida, gerou a V8 · Fluxograma e relatórioAjustei o fluxo',
-    `V6 · ${EU.nome} · 12/10/2026Sem alteração`,
+    'V7 · Bia Teste · 13/10/2026Corrigida, gerou a V8 · Fluxograma e relatórioAjustei o fluxoEditar',
+    `V6 · ${EU.nome} · 12/10/2026Sem alteraçãoEditar`,
   ])
 })
 

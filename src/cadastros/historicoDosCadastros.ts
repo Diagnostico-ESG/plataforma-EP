@@ -48,9 +48,11 @@ const TEXTO_DA_ACAO_DA_VERSAO: Record<string, string> = {
   substituir: 'Substituiu o arquivo da versão',
 }
 
-const TEXTO_DA_ACAO_DA_REVISAO: Record<string, string> = { registrar: 'Registrou a revisão interna' }
+const TEXTO_DA_ACAO_DA_REVISAO: Record<string, string> = { registrar: 'Registrou a revisão interna', editar: 'Editou a revisão interna' }
 
-const TEXTO_DA_ACAO_DA_APROVACAO: Record<string, string> = { registrar: 'Registrou a aprovação', desfazer: 'Desfez a aprovação' }
+const TEXTO_DA_ACAO_DA_APROVACAO: Record<string, string> = {
+  registrar: 'Registrou a aprovação', desfazer: 'Desfez a aprovação', editar: 'Editou a aprovação',
+}
 
 const TEXTOS_DA_ENTIDADE: Record<string, Record<string, string>> = {
   setor_envolvido: TEXTO_DA_ACAO_DO_VINCULO, andamento: TEXTO_DA_ACAO_DO_ANDAMENTO, processo: TEXTO_DA_ACAO_DO_PROCESSO,

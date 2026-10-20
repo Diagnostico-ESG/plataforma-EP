@@ -26,6 +26,8 @@ export type DadosDasEtapas = {
   /** A aprovação do processo (lida pelo verso): a gaveta da Aprovação a mostra, com os estados de carregando e de erro. */
   aprovacao: EstadoDoCarregamento<Aprovacao | null>
   aoTentarDeNovoAAprovacao: () => void
+  /** Lê a aprovação de novo, sem piscar, depois de editar. */
+  aoAtualizarAAprovacao: () => void
   aoCorrigirDatas: (etapa: EtapaDoCaminho, datas: DatasDaEtapa) => Promise<void>
   aoSumir: () => void
 }
@@ -70,8 +72,13 @@ export function DetalheDaEtapa(props: DetalheDaEtapaProps) {
 
 // Os registros que a gaveta mostra: as revisões na Revisão interna e a aprovação na Aprovação pelo setor.
 function RegistrosDaEtapa({ codigo, ...props }: DetalheDaEtapaProps & { codigo: string }) {
-  if (codigo === 'revisao_interna') return <RevisoesDaEtapa revisoes={props.revisoes} processoId={props.processoId} />
-  if (codigo === 'aprovacao_setor') return <AprovacaoDaEtapa estado={props.aprovacao} aoTentarDeNovo={props.aoTentarDeNovoAAprovacao} />
+  if (codigo === 'revisao_interna') return <RevisoesDaEtapa revisoes={props.revisoes} processoId={props.processoId} podeEditar={props.podeEditar} />
+  if (codigo === 'aprovacao_setor') {
+    return (
+      <AprovacaoDaEtapa estado={props.aprovacao} aoTentarDeNovo={props.aoTentarDeNovoAAprovacao} revisoes={props.revisoes}
+        podeEditar={props.podeEditar} aoAtualizar={props.aoAtualizarAAprovacao} />
+    )
+  }
   return null
 }
 
