@@ -73,3 +73,20 @@ Corrigido:
 Deixado de fora:
 - **[P3]** contador de caracteres no comentário da revisão (limite de 2.000): o campo corta sem avisar; uso interno, raro. Vai ao backlog se virar incômodo.
 - Responsivo/celular: o uso é em computador (PRODUCT.md); nada quebra no código.
+
+## 2026-10-20 — /ship (revisões e aprovação, tickets 01 a 04)
+
+Revisão de código (`/mattpocock-skills:code-review`, desde o marco `marco/2026-10-19-inicio-revisoes-aprovacao`, 39 commits): nenhuma violação dura de padrão; achados de julgamento (duplicação entre `editarRevisao`/`editarAprovacao` e entre as janelas de edição, frases com tipos soltos, regex do link em três pontos) ficam como estão, sem risco hoje.
+
+Corrigido, cada um com teste antes:
+- **[Spec] Data da revisão e "hoje" da aprovação em UTC.** `revisada_em` e o limite de data futura usavam `current_date` do banco (UTC, 3 h à frente de Brasília): depois das 21h a revisão gravava o dia seguinte e a data de hoje escolhida na tela era recusada. Decisão do usuário (2026-10-20): corrigir. Migração `20261020143000_datas_no_fuso_do_escritorio` cria `private.hoje()` (dia de Brasília) e a usa em `preparar_revisao_interna` e `conferir_data_da_aprovacao`. Teste 40 ganhou 2 casos que rodam sob um fuso em outro dia que Brasília (falharam antes, 67 de 69; depois, ver `AMBIENTES.md`); os testes 39, 40 e 41 passaram a comparar com o dia de Brasília em vez de `current_date`. As datas de início e fim das etapas seguem em UTC (backlog).
+- **[Spec] Revisão interna sem etapa pendente depois concluía direto, sem a janela do Resultado** (o banco recusava com `sem_revisao_da_versao`). `useAcoesDaEtapa` abre a janela também para a Revisão interna sem pendente depois (`ETAPAS_QUE_GRAVAM_NA_JANELA`); teste novo em `App.revisaoInterna.test.tsx`.
+- **[Spec] "Versão aprovada: V0" na janela da Aprovação sem versão.** `BlocoDaAprovacao` aceita `versao: null` e não mostra o destaque; só a frase do bloqueio aparece; teste novo em `App.aprovacao.test.tsx`.
+
+Registrado, sem mudança de código:
+- **A janela de edição é a `JanelaDeEdicao` nova, não a `JanelaComCampo`** que a spec e o ticket 04 citam: a edição precisa de vários campos e de texto da falha dentro da janela; ela tem a mesma base (janela nativa, ADR 0003) e o mesmo estilo.
+- **Edição dentro de subprocesso sem teste de banco próprio** (teste 41): as políticas e os gatilhos de edição não olham o tipo do processo; a inclusão e a reclassificação em subprocesso têm teste (39 e 40).
+- **Falso alarme da revisão:** "o teste 40 não prova a aprovação de subprocesso": prova (aprova o `Filho` e confere que continua depois de reclassificar).
+- **Registro com link e sem número** mostra "Abrir o E-protocolo" na gaveta (acréscimo pequeno à história 29).
+
+Verificado na tela (vitrine local, módulos falsos, 1366×768): a janela de concluir a Revisão interna (637 px de altura, sem rolagem interna) e a da Aprovação (633 px; "Versão aprovada: V4", os três campos, a pergunta do responsável) cabem inteiras; a gaveta da Aprovação mostra "V4 aprovada · 12/10/2026", o número como link com "(abre em nova aba)", "Registrada por Bia Teste" e [Editar] com o processo concluído, no estilo da gaveta. **Presumido:** o selo "Aprovada" ao lado das pílulas de Arquivos (a vitrine não tinha versões com arquivos), o aspecto da janela de edição, o registro da Revisão interna na gaveta, o foco do teclado e a tela com banco e dados reais.

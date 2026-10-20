@@ -97,7 +97,7 @@ A Consulta vê os registros e o selo, sem nenhum botão. Quem não pode alterar 
   - `revisao_setor`: sem campos. Com versão incompleta (ou sem versão), a frase do que falta, e o botão desabilitado.
   - `aprovacao_setor`: "Versão aprovada: V8"; Número do E-protocolo (até 60 caracteres), Link (até 500), Data da aprovação com `input type="date"` (vazia ao abrir, sem data futura). Com versão incompleta, a frase e o botão desabilitado.
   - Dispensar e "Realizada anteriormente" não mudam: as três etapas são obrigatórias, e "realizada anteriormente" continua sem registro (processos aprovados antes da plataforma).
-- **Gaveta da etapa** (`DetalheDaEtapa`): nas linhas `revisao_interna` e `aprovacao_setor`, abaixo das datas e da nota, os registros e o [Editar]. A edição abre uma janela no padrão da `JanelaComCampo`, com os campos editáveis preenchidos.
+- **Gaveta da etapa** (`DetalheDaEtapa`): nas linhas `revisao_interna` e `aprovacao_setor`, abaixo das datas e da nota, os registros e o [Editar]. A edição abre a `JanelaDeEdicao` (a mesma janela nativa da `JanelaComCampo`, ADR 0003, com vários campos), com os campos editáveis preenchidos.
 - **Selo "Aprovada"** na versão aprovada, em destaque ou recolhida, com a `Pilula` que já existe; o [Substituir] não aparece nela.
 - **Janela de voltar:** quando a etapa escolhida é a `aprovacao_setor` ou anterior a ela e há aprovação, mostra "A aprovação da V8 será desfeita." acima do motivo.
 - **Estados dos registros na gaveta:**
@@ -125,7 +125,7 @@ A Consulta vê os registros e o selo, sem nenhum botão. Quem não pode alterar 
 | `resultado` | `resultado_da_revisao` | sim | não muda |
 | `escopo` | `escopo_da_correcao` | só em "corrigida" | nulo em "sem alteração" |
 | `comentario` | text | não | até 2.000 caracteres, sem espaços nas pontas, vazio vira nulo |
-| `revisada_em` | date | sim | preenchida pelo banco: o dia da conclusão; não muda |
+| `revisada_em` | date | sim | preenchida pelo banco: o dia da conclusão, no horário de Brasília (`private.hoje()`); não muda |
 | `revisor_id` | uuid → `usuarios` | sim | quem chamou, preenchido pelo banco; não muda |
 | `registrada_em` | timestamptz | sim | gerado |
 
