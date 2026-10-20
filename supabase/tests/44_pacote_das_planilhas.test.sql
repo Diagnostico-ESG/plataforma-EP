@@ -30,9 +30,12 @@ select vault.create_secret('id-publica-teste', 'planilhas_id_publica');
 -- Um setor, um macroprocesso e os processos do cenário (todos com o prefixo T44, para não se misturar com dados do banco).
 insert into public.setores (id, sigla, nome) values ('5f000000-0000-0000-0000-000000000044', 'T44', 'Setor Pacote');
 insert into public.macroprocessos (id, codigo, nome) values ('af000000-0000-0000-0000-000000000044', null, 'Macro T44');
+-- Sem tipo informado o processo nasce "a classificar"; o Normal nasce do tipo Processo para provar o tipo no pacote.
+insert into public.processos (setor_id, macroprocesso_id, nome, tipo)
+values ('5f000000-0000-0000-0000-000000000044', 'af000000-0000-0000-0000-000000000044', 'T44 Normal', 'processo');
 insert into public.processos (setor_id, macroprocesso_id, nome)
 select '5f000000-0000-0000-0000-000000000044', 'af000000-0000-0000-0000-000000000044', nome
-from unnest(array['T44 Normal', 'T44 Cancelado', 'T44 Concluido', 'T44 Versoes', 'T44 Historica', 'T44 Sem Versao']) as nome;
+from unnest(array['T44 Cancelado', 'T44 Concluido', 'T44 Versoes', 'T44 Historica', 'T44 Sem Versao']) as nome;
 
 create function pg_temp.processo(nome_do_processo text) returns uuid
 language sql stable as $$ select id from public.processos where nome = nome_do_processo $$;
