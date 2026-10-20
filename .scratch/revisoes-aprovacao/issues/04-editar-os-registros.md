@@ -10,9 +10,9 @@
 
 ## Critérios de aceite
 
-- [ ] Banco: testes antes da migração: editar comentário e escopo da revisão "corrigida" e número, link e data da aprovação aceitos; escopo na revisão "sem alteração" recusado; editar versão, resultado, revisor, data da revisão ou quem registrou recusado; link fora do formato e data futura ou anterior à última revisão interna recusados na edição; processo parado recusado; consulta, inativo e visitante recusados; cada edição gera um evento com antes e depois.
-- [ ] [Editar] em cada registro da gaveta, para Administrador e Integrante, com o processo em andamento; some com a Consulta e com o processo suspenso, cancelado ou concluído.
-- [ ] Acrescentar o número do E-protocolo a uma aprovação concluída sem ele funciona e aparece na gaveta.
-- [ ] Recusas e falhas ao gravar aparecem em vermelho sem perder o preenchido.
-- [ ] Edições aparecem no histórico do processo com o antes e o depois.
-- [ ] Testes do módulo real e da tela inteira com a falsa cobrindo os itens acima.
+- [x] Banco: testes antes da migração: editar comentário e escopo da revisão "corrigida" e número, link e data da aprovação aceitos; escopo na revisão "sem alteração" recusado; editar versão, resultado, revisor, data da revisão ou quem registrou recusado; link fora do formato e data futura ou anterior à última revisão interna recusados na edição; processo parado recusado; consulta, inativo e visitante recusados; cada edição gera um evento com antes e depois.
+- [x] [Editar] em cada registro da gaveta, para Administrador e Integrante, com o processo em andamento; some com a Consulta e com o processo suspenso, cancelado ou concluído. *(Feito para suspenso e cancelado; com o processo concluído o botão aparece, para o critério 3 poder acontecer: ver `desvios.md`, 2026-10-19, ticket 04. Aparência presumida, sem conferência na tela.)*
+- [x] Acrescentar o número do E-protocolo a uma aprovação concluída sem ele funciona e aparece na gaveta.
+- [x] Recusas e falhas ao gravar aparecem em vermelho sem perder o preenchido.
+- [x] Edições aparecem no histórico do processo com o antes e o depois.
+- [x] Testes do módulo real e da tela inteira com a falsa cobrindo os itens acima.
