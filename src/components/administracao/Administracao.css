@@ -220,3 +220,34 @@
   border-bottom-color: var(--azul);
   color: var(--texto);
 }
+
+/* Aba Planilhas: links e botão na mesma linha, quebrando em telas estreitas. */
+.planilhas-barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-3) var(--esp-4);
+}
+
+.planilhas-links {
+  display: flex;
+  gap: var(--esp-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Aviso (amarelo): informa sem dizer que algo falhou. */
+.planilhas-aviso {
+  margin: 0;
+  padding: var(--esp-3) var(--esp-4);
+  border-radius: var(--canto);
+  background: var(--pendencia-fundo);
+  border: 1px solid var(--pendencia-borda);
+}
+
+.planilhas-explicacao {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: var(--tam-secundario);
+}

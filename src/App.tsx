@@ -1,5 +1,6 @@
 import type { ModuloDeAcesso } from './acesso/tipos'
 import type { ModuloDeCadastros } from './cadastros/tipos'
+import type { ModuloDePlanilhas } from './planilhas/tipos'
 import type { ModuloDeProcessos } from './processos/tipos'
 import type { ModuloDeRevisoes } from './revisoes/tipos'
 import type { ModuloDeVersoes } from './versoes/tipos'
@@ -18,13 +19,14 @@ type AppProps = {
   processos: ModuloDeProcessos
   versoes: ModuloDeVersoes
   revisoes: ModuloDeRevisoes
+  planilhas: ModuloDePlanilhas
 }
 
 const TITULO_DA_AREA: Record<AreaComTela, string> = {
   quadro: 'Processos', lista: 'Processos', setores: 'Setores', administracao: 'Administração',
 }
 
-function App({ acesso, cadastros, processos, versoes, revisoes }: AppProps) {
+function App({ acesso, cadastros, processos, versoes, revisoes, planilhas }: AppProps) {
   const { estado, entrar, sair, tentarDeNovo } = useEntrada(acesso)
   const [area, irPara] = useAreaAtual()
   if (estado.tipo !== 'dentro') {
@@ -35,7 +37,8 @@ function App({ acesso, cadastros, processos, versoes, revisoes }: AppProps) {
       {ehAreaDeProcessos(area) && <AreaDeProcessos usuario={estado.usuario} processos={processos} cadastros={cadastros}
         versoes={versoes} revisoes={revisoes} />}
       {area === 'setores' && <AreaDeCadastros usuario={estado.usuario} cadastros={cadastros} processos={processos} />}
-      {area === 'administracao' && <AreaDeAdministracao usuario={estado.usuario} acesso={acesso} processos={processos} />}
+      {area === 'administracao' && <AreaDeAdministracao usuario={estado.usuario} acesso={acesso} processos={processos}
+        planilhas={planilhas} />}
     </Moldura>
   )
 }
