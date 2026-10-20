@@ -55,7 +55,7 @@ insert into _tap (linha) select hasnt_trigger('public', 'setores', 'criar_andame
   'setor novo não tem gatilho de andamentos');
 insert into _tap (linha) select hasnt_function('private', 'criar_andamentos_do_setor',
   'a função criar_andamentos_do_setor não existe');
-insert into _tap (linha) select has_function('public', 'acrescentar_etapa', array['text', 'text', 'boolean', 'uuid'],
+insert into _tap (linha) select has_function('public', 'acrescentar_etapa', array['text', 'text', 'boolean', 'fase_do_regimento', 'uuid'],
   'acrescentar_etapa sem o nível');
 
 -- O catálogo renumerado e renomeado.

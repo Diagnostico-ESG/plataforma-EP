@@ -34,8 +34,8 @@
 
 ### Tarefa 1 — Teste de banco que falha (critério 1)
 
-- [ ] Criar `supabase/tests/42_fase_do_regimento.test.sql` no formato do teste 22 (tabela `_tap`, usuários inventados a1 a4, exceção final com o relatório). Casos: etapa sem fase recusada (23502); fase fora de IV a IX recusada (22P02); as seis etapas atuais com a fase da sabatina (modelagem IV; relatorio_modelagem_tecnica V; revisao_interna, revisao_setor, aprovacao_setor VI; publicacao VII); `acrescentar_etapa` grava a fase; mudar a fase gera evento `editar` com `fase` no antes e no depois; Integrante, Consulta, administrador desativado e visitante não mudam a fase (a linha segue igual); o Administrador muda a fase de uma etapa protegida (`revisao_interna`).
-- [ ] Trocar as chamadas de `acrescentar_etapa` nos testes 22, 34 (`has_function`) e 35 pela assinatura nova, com a fase (ex.: `'VI'`).
+- [x] Criar `supabase/tests/42_fase_do_regimento.test.sql` no formato do teste 22 (tabela `_tap`, usuários inventados a1 a4, exceção final com o relatório). Casos: etapa sem fase recusada (23502); fase fora de IV a IX recusada (22P02); as seis etapas atuais com a fase da sabatina (modelagem IV; relatorio_modelagem_tecnica V; revisao_interna, revisao_setor, aprovacao_setor VI; publicacao VII); `acrescentar_etapa` grava a fase; mudar a fase gera evento `editar` com `fase` no antes e no depois; Integrante, Consulta, administrador desativado e visitante não mudam a fase (a linha segue igual); o Administrador muda a fase de uma etapa protegida (`revisao_interna`).
+- [x] Trocar as chamadas de `acrescentar_etapa` nos testes 22, 34 (`has_function`) e 35 pela assinatura nova, com a fase (ex.: `'VI'`).
 - [ ] Commit só dos testes e `git push -u origin exportacao-e-manutencao-01`. Disparar "Testes de banco" na branch: esperado falhar no 42 e nos três ajustados (função com assinatura antiga). Anotar o número da execução.
 
 ### Tarefa 2 — Migração e tipos (critério 1)

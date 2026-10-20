@@ -193,7 +193,7 @@ select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000
 select pg_temp.agir('Processo Pulo', 'modelagem', 'realizada_anteriormente', 'Feita antes');
 select pg_temp.agir('Processo Pulo', 'relatorio_modelagem_tecnica', 'realizada_anteriormente', 'Feita antes');
 select pg_temp.agir('Processo Pulo', 'revisao_interna', 'realizada_anteriormente', 'Feita antes');
-select public.acrescentar_etapa('opcional_teste', 'Opcional de teste', false,
+select public.acrescentar_etapa('opcional_teste', 'Opcional de teste', false, 'VI',
   (select id from public.etapas where codigo = 'revisao_interna'));
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 insert into _tap (linha) select throws_ok(

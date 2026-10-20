@@ -100,7 +100,7 @@ set local role authenticated;
 
 -- Etapa nova no fim: entra pendente nos processos em andamento e suspensos, não nos concluídos e cancelados.
 insert into _tap (linha) select lives_ok(
-  $sql$select public.acrescentar_etapa('teste_nova', 'Etapa Nova', true, null)$sql$,
+  $sql$select public.acrescentar_etapa('teste_nova', 'Etapa Nova', true, 'VI', null)$sql$,
   'o administrador acrescenta uma etapa no fim');
 insert into _tap (linha) select is(pg_temp.ordem('teste_nova'), (select max(ordem) from _ordens) + 1,
   'a etapa nova fica no fim da ordem');
@@ -115,7 +115,7 @@ insert into _tap (linha) select is(pg_temp.no_processo('Cancelado', 'teste_nova'
 
 -- Etapa nova antes da Modelagem piloto: abre espaço na ordem e entra pendente nos processos.
 insert into _tap (linha) select lives_ok(
-  $sql$select public.acrescentar_etapa('teste_antes', 'Etapa Nova Antes', false, pg_temp.etapa('modelagem'))$sql$,
+  $sql$select public.acrescentar_etapa('teste_antes', 'Etapa Nova Antes', false, 'VI', pg_temp.etapa('modelagem'))$sql$,
   'o administrador acrescenta uma etapa antes da Modelagem piloto');
 insert into _tap (linha) select is(pg_temp.ordem('teste_antes'), pg_temp.ordem_antes('modelagem'),
   'a etapa nova fica na posição da Modelagem piloto');
@@ -197,7 +197,7 @@ begin
   perform pg_temp.entrar(id_usuario);
   set local role authenticated;
   insert into _tap (linha) select throws_ok(
-    $sql$select public.acrescentar_etapa('teste_outro', 'Etapa de Outro', false, null)$sql$,
+    $sql$select public.acrescentar_etapa('teste_outro', 'Etapa de Outro', false, 'VI', null)$sql$,
     '42501', null, quem || ' não acrescenta etapa');
   insert into _tap (linha) select throws_ok(
     $sql$select public.mover_etapa(pg_temp.etapa('publicacao'), 'subir')$sql$, recusa_ao_mover, null,
@@ -242,7 +242,7 @@ insert into _tap (linha) select is(pg_temp.eventos_lidos('00000000-0000-0000-000
 select set_config('request.jwt.claims', '{"role":"anon"}', true);
 set local role anon;
 insert into _tap (linha) select throws_ok(
-  $sql$select public.acrescentar_etapa('teste_visitante', 'Etapa do Visitante', false, null)$sql$,
+  $sql$select public.acrescentar_etapa('teste_visitante', 'Etapa do Visitante', false, 'VI', null)$sql$,
   '42501', null, 'Visitante não acrescenta etapa');
 insert into _tap (linha) select throws_ok(
   $sql$select public.mover_etapa('00000000-0000-0000-0000-000000000000', 'subir')$sql$,
