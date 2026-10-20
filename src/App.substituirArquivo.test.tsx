@@ -30,7 +30,7 @@ const COM_VERSOES = {
 
 const PNG_V3 = 'TSA_V3_Emitir Ofício.png'
 const RELATORIO_V3 = 'TSA_V3_Emitir Ofício_Relatório.pdf'
-const ROTULO_DO_PNG = 'Imagem do fluxograma (.png)'
+const ROTULO_DO_PNG = 'Imagem do fluxo (.png)'
 
 async function secaoDeVersoes() {
   const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))

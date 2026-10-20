@@ -25,7 +25,7 @@ export type Versao = {
   /** Nome da etapa em que o processo estava no envio; a histórica não tem. */
   etapa: string | null
   observacao: string | null
-  /** Na ordem dos papéis (.bpmn, .png, .bpm, relatório). */
+  /** Na ordem de exibição (.png, .bpm, relatório, .bpmn). */
   arquivos: ArquivoDaVersao[]
   /** Verdadeiro na versão que o setor aprovou (ADR 0011): ganha o selo "Aprovada" e não tem arquivo substituído. Ausente: não. */
   aprovada?: boolean

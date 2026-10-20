@@ -13,7 +13,7 @@ export type Progresso = { enviados: number; total: number }
 /** Nova: o número é o da prévia (maior + 1). Histórica: o número é digitado, e os arquivos são os que existirem. */
 export type ModoDoFormulario = { tipo: 'nova'; numero: number } | { tipo: 'historica' }
 
-export const PAPEIS_OBRIGATORIOS: readonly PapelDoArquivo[] = ['bpmn', 'png']
+export const PAPEIS_OBRIGATORIOS: readonly PapelDoArquivo[] = ['bpm', 'png']
 
 export function arquivosDoPedido(escolhidos: Escolhidos): ArquivoEscolhido[] {
   return PAPEIS.flatMap((papel) => {
@@ -41,7 +41,7 @@ export function podeRegistrarHistorica(escolhidos: Escolhidos, recusas: RecusasD
   return Boolean(escolhidos.bpm || (escolhidos.bpmn && escolhidos.png))
 }
 
-/** Se o botão do formulário se habilita: a nova pede o par, a histórica pede o número e o .bpm (ou o par). */
+/** Se o botão do formulário se habilita: a nova pede o .bpm e o .png, a histórica pede o número e o .bpm (ou o par). */
 export function podeSubmeter(modo: ModoDoFormulario, arquivos: { escolhidos: Escolhidos; recusas: RecusasDosCampos; conferindo: boolean },
   numero: number | null): boolean {
   const { escolhidos, recusas, conferindo } = arquivos

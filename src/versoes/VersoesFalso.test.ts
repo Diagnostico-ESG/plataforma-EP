@@ -6,7 +6,7 @@ import { VersoesFalso } from './VersoesFalso'
 
 const PEDIDO: PedidoDeVersao = {
   processoId: 'p1', numero: 1, observacao: 'Primeira',
-  arquivos: [{ papel: 'bpmn', arquivo: new File(['x'], 'a.bpmn') }, { papel: 'png', arquivo: new File(['y'], 'a.png') }],
+  arquivos: [{ papel: 'bpm', arquivo: new File(['x'], 'a.bpm') }, { papel: 'png', arquivo: new File(['y'], 'a.png') }],
 }
 
 function falso(): VersoesFalso {
@@ -23,7 +23,7 @@ test('o envio registra a versão com o número do banco, os nomes padrão, a eta
   await versoes.enviarVersao(PEDIDO, (enviados, total) => progresso.push(`${enviados}/${total}`))
   const [versao] = await versoes.listarVersoes('p1')
   expect(versao).toMatchObject({ numero: 1, historica: false, etapa: 'Reunião de modelagem', observacao: 'Primeira', autor: 'Pessoa de Teste' })
-  expect(versao.arquivos.map((arquivo) => arquivo.nome)).toEqual(['TSA_V1_Emitir Ofício.bpmn', 'TSA_V1_Emitir Ofício.png'])
+  expect(versao.arquivos.map((arquivo) => arquivo.nome)).toEqual(['TSA_V1_Emitir Ofício.bpm', 'TSA_V1_Emitir Ofício.png'])
   expect(progresso).toEqual(['1/2', '2/2'])
   expect(versoes.envios).toEqual([PEDIDO])
   expect(eventos[0][0]).toBe('p1')
@@ -70,6 +70,20 @@ test('recusa a histórica sem .bpm nem o par .bpmn e .png', async () => {
   await expect(versoes.registrarVersaoHistorica(soPng, () => {}))
     .rejects.toThrow('A versão histórica precisa do arquivo .bpm, ou do .bpmn com o .png.')
   expect(await versoes.listarVersoes('p1')).toEqual([])
+})
+
+test('recusa a versão nova sem .bpm ou sem .png, como o banco, e aceita sem .bpmn', async () => {
+  const versoes = falso()
+  const semBpm: PedidoDeVersao = { ...PEDIDO, arquivos: [
+    { papel: 'bpmn', arquivo: new File(['x'], 'a.bpmn') }, { papel: 'png', arquivo: new File(['y'], 'a.png') },
+  ] }
+  const semPng: PedidoDeVersao = { ...PEDIDO, arquivos: [{ papel: 'bpm', arquivo: new File(['x'], 'a.bpm') }] }
+  for (const pedido of [semBpm, semPng]) {
+    await expect(versoes.enviarVersao(pedido, () => {})).rejects.toThrow('A versão precisa do .bpm e do .png.')
+  }
+  expect(await versoes.listarVersoes('p1')).toEqual([])
+  await versoes.enviarVersao(PEDIDO, () => {})
+  expect(await versoes.listarVersoes('p1')).toHaveLength(1)
 })
 
 test('as falhas programadas valem também para a histórica', async () => {
@@ -145,7 +159,7 @@ test('o relatório depois entra na versão sem relatório, com o nome padrão, e
   await versoes.acrescentarRelatorio(RELATORIO(await primeiraVersaoId(versoes)), (enviados, total) => progresso.push(`${enviados}/${total}`))
   const [versao] = await versoes.listarVersoes('p1')
   expect(versao.arquivos.map((arquivo) => arquivo.nome)).toEqual([
-    'TSA_V1_Emitir Ofício.bpmn', 'TSA_V1_Emitir Ofício.png', 'TSA_V1_Emitir Ofício_Relatório.pdf',
+    'TSA_V1_Emitir Ofício.bpm', 'TSA_V1_Emitir Ofício.png', 'TSA_V1_Emitir Ofício_Relatório.pdf',
   ])
   expect(progresso).toEqual(['1/1'])
   expect(eventos[0]).toMatchObject({ acao: 'acrescentar_relatorio', entidade: 'versao', entidadeRef: 'p1', depois: { rotulo: 'V1' } })

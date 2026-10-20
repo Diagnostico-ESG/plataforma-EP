@@ -16,15 +16,15 @@ const AVISO = 'Não foi possível conferir os arquivos no Drive.'
 const ALTERADO = 'Alterado fora da plataforma'
 const NAO_ENCONTRADO = 'Não encontrado no Drive'
 const PNG_V4 = 'TSA_V4_Emitir Ofício.png'
-const BPMN_V4 = 'TSA_V4_Emitir Ofício.bpmn'
+const BPM_V4 = 'TSA_V4_Emitir Ofício.bpm'
 const RELATORIO_V3 = 'TSA_V3_Emitir Ofício_Relatório.pdf'
 
-/** V3 com relatório e V4 só com o par. */
+/** V3 com relatório e V4 só com o .bpm e o .png. */
 function comVersoes(programar: (falso: VersoesFalso) => void = () => {}) {
   return {
     ajustarVersoes: (falso: VersoesFalso) => {
       const v3 = versaoDeTeste(3, {
-        arquivos: [arquivoDeTeste(3, 'bpmn', 'bpmn'), arquivoDeTeste(3, 'png', 'png'), arquivoDeTeste(3, 'relatorio', 'pdf')],
+        arquivos: [arquivoDeTeste(3, 'bpm', 'bpm'), arquivoDeTeste(3, 'png', 'png'), arquivoDeTeste(3, 'relatorio', 'pdf')],
       })
       falso.versoes.p1 = [v3, versaoDeTeste(4)]
       programar(falso)
@@ -51,7 +51,7 @@ test('marca o arquivo alterado e o não encontrado, cada um no seu item, e deixa
   const secao = await secaoDeVersoes()
   expect(await (await itemDoArquivo(secao, PNG_V4)).findByText(ALTERADO)).toBeTruthy()
   expect(await (await itemDoArquivo(secao, RELATORIO_V3)).findByText(NAO_ENCONTRADO)).toBeTruthy()
-  expect((await itemDoArquivo(secao, BPMN_V4)).queryByText(/Alterado|Não encontrado/)).toBeNull()
+  expect((await itemDoArquivo(secao, BPM_V4)).queryByText(/Alterado|Não encontrado/)).toBeNull()
   expect(secao.queryByText(AVISO)).toBeNull()
 })
 

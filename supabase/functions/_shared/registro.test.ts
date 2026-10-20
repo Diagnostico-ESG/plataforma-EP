@@ -266,8 +266,8 @@ describe('recusaDoBanco', () => {
   })
 
   it('a recusa sem valor vira só o código', () => {
-    expect(recusaDoBanco({ code: 'P0001', message: 'versao_sem_bpmn_e_png' })).toEqual({
-      codigo: 'versao_sem_bpmn_e_png',
+    expect(recusaDoBanco({ code: 'P0001', message: 'versao_sem_bpm_e_png' })).toEqual({
+      codigo: 'versao_sem_bpm_e_png',
       mensagem: '',
     })
   })
@@ -278,7 +278,7 @@ describe('recusaDoBanco', () => {
 
   it('sem permissão é 403; a regra do banco, 409', () => {
     expect(statusDaRecusaDoBanco({ codigo: 'sem_permissao', mensagem: '' })).toBe(403)
-    expect(statusDaRecusaDoBanco({ codigo: 'versao_sem_bpmn_e_png', mensagem: '' })).toBe(409)
+    expect(statusDaRecusaDoBanco({ codigo: 'versao_sem_bpm_e_png', mensagem: '' })).toBe(409)
   })
 
   it('outro erro do banco não é recusa (vira erro interno)', () => {

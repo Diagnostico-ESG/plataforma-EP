@@ -27,10 +27,11 @@ const comSituacao = (situacao: SituacaoDoProcesso) => ({
 test('a seção mostra a mais recente em destaque, com rótulo, dia, autor, etapa, observação e arquivos, e as anteriores depois', async () => {
   montarNosCadastros({ ajustarVersoes: (falso) => {
     falso.versoes.p1 = [
-      versaoDeTeste(1),
+      versaoDeTeste(1, { arquivos: [arquivoDeTeste(1, 'bpmn', 'bpmn'), ...versaoDeTeste(1).arquivos] }),
       versaoDeTeste(2, {
         autor: 'Bia Teste', etapa: 'Relatório e modelagem técnica', observacao: 'Ajustada a raia do setor',
-        arquivos: [arquivoDeTeste(2, 'bpmn', 'bpmn'), arquivoDeTeste(2, 'png', 'png'), arquivoDeTeste(2, 'relatorio', 'pdf')],
+        arquivos: [arquivoDeTeste(2, 'bpmn', 'bpmn'), arquivoDeTeste(2, 'relatorio', 'pdf'), arquivoDeTeste(2, 'bpm', 'bpm'),
+          arquivoDeTeste(2, 'png', 'png')],
       }),
     ]
   } })
@@ -42,9 +43,24 @@ test('a seção mostra a mais recente em destaque, com rótulo, dia, autor, etap
   expect(v2.getByText('Bia Teste')).toBeTruthy()
   expect(v2.getByText('Relatório e modelagem técnica')).toBeTruthy()
   expect(v2.getByText('Ajustada a raia do setor')).toBeTruthy()
+  // Na ordem .png, .bpm, relatório e .bpmn, no destaque e nas anteriores.
   expect(v2.getAllByRole('link').map((link) => link.getAttribute('title'))).toEqual([
-    'TSA_V2_Emitir Ofício.bpmn', 'TSA_V2_Emitir Ofício.png', 'TSA_V2_Emitir Ofício_Relatório.pdf',
+    'TSA_V2_Emitir Ofício.png', 'TSA_V2_Emitir Ofício.bpm', 'TSA_V2_Emitir Ofício_Relatório.pdf', 'TSA_V2_Emitir Ofício.bpmn',
   ])
+  expect(within(versoes[1]).getAllByRole('link').map((link) => link.textContent)).toEqual([
+    'TSA_V1_Emitir Ofício.png', 'TSA_V1_Emitir Ofício.bpm', 'TSA_V1_Emitir Ofício.bpmn',
+  ])
+})
+
+test('no destaque, o [Acrescentar relatório] fica no lugar do relatório, antes do .bpmn', async () => {
+  montarNosCadastros({ ajustarVersoes: (falso) => {
+    falso.versoes.p1 = [versaoDeTeste(1, { arquivos: [arquivoDeTeste(1, 'bpmn', 'bpmn'), ...versaoDeTeste(1).arquivos] })]
+  } })
+  const v1 = await (await secao()).findByRole('article', { name: 'V1' })
+  const texto = v1.textContent ?? ''
+  const posicoes = ['Imagem .png', 'Fluxograma .bpm', 'Acrescentar relatório', 'BPMN .bpmn'].map((trecho) => texto.indexOf(trecho))
+  expect(posicoes.every((posicao) => posicao >= 0)).toBe(true)
+  expect([...posicoes].sort((a, b) => a - b)).toEqual(posicoes)
 })
 
 test('o subprocesso tem a sua seção Versões', async () => {

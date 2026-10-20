@@ -1,7 +1,7 @@
 import './VersaoEmDestaque.css'
 import { formatarMomento } from '../../acesso/historico'
 import {
-  PAPEIS, formatarDiaEMes, origemDoRelatorio, podeCopiarRelatorio, relatorioPendente, rotuloCurtoDoArquivo, rotuloDaAnterior,
+  emOrdemDeExibicao, formatarDiaEMes, origemDoRelatorio, podeCopiarRelatorio, relatorioPendente, rotuloCurtoDoArquivo, rotuloDaAnterior,
   rotuloDaVersao,
 } from '../../versoes/rotulos'
 import type { ArquivoDaVersao, ConferenciaDosArquivos, ModuloDeVersoes, Versao } from '../../versoes/tipos'
@@ -64,27 +64,30 @@ function AutoriaDoDestaque({ versao }: { versao: Versao }) {
   )
 }
 
-/** Na ordem do formulário (fluxograma, imagem, Bizagi, relatório): o relatório que falta fica no lugar dele, por último. */
-function emOrdem(arquivos: ArquivoDaVersao[]): ArquivoDaVersao[] {
-  return [...arquivos].sort((a, b) => PAPEIS.indexOf(a.papel) - PAPEIS.indexOf(b.papel))
+type ArquivoDoDestaqueProps = VersaoEmDestaqueProps & { arquivo: ArquivoDaVersao }
+
+function ArquivoDoDestaque({ modulo, processoId, versao, versoes, podeAlterar, situacoes, aoAlterada, arquivo }: ArquivoDoDestaqueProps) {
+  const origem = origemDoRelatorio(arquivo, versoes)
+  return (
+    <li className={`arquivo-do-destaque arquivo-${arquivo.papel === 'relatorio' ? 'relatorio' : 'fluxograma'}`}>
+      <LinkDoArquivo versoes={modulo} arquivo={arquivo} rotulo={rotuloCurtoDoArquivo(arquivo)} />
+      <MarcaNoDrive situacao={situacoes?.[arquivo.id]} />
+      {origem && <span className="arquivo-origem">{`Sem alteração de conteúdo · relatório da ${origem}`}</span>}
+      {podeAlterar && !versao.historica && !versao.aprovada && (
+        <AcaoSubstituir modulo={modulo} processoId={processoId} versao={versao} arquivo={arquivo} aoConcluir={aoAlterada} />
+      )}
+    </li>
+  )
 }
 
-function ArquivosDoDestaque({ modulo, processoId, versao, versoes, podeAlterar, situacoes, aoAlterada, aoAcrescentarRelatorio }: VersaoEmDestaqueProps) {
+/** Na ordem .png, .bpm, relatório e .bpmn: o relatório que falta fica no lugar dele, antes do .bpmn opcional. */
+function ArquivosDoDestaque(props: VersaoEmDestaqueProps) {
+  const { versao, podeAlterar, aoAcrescentarRelatorio } = props
+  const arquivos = emOrdemDeExibicao(versao.arquivos)
+  const item = (arquivo: ArquivoDaVersao) => <ArquivoDoDestaque key={arquivo.id} {...props} arquivo={arquivo} />
   return (
     <ul className="arquivos-do-destaque">
-      {emOrdem(versao.arquivos).map((arquivo) => {
-        const origem = origemDoRelatorio(arquivo, versoes)
-        return (
-          <li key={arquivo.id} className={`arquivo-do-destaque arquivo-${arquivo.papel === 'relatorio' ? 'relatorio' : 'fluxograma'}`}>
-            <LinkDoArquivo versoes={modulo} arquivo={arquivo} rotulo={rotuloCurtoDoArquivo(arquivo)} />
-            <MarcaNoDrive situacao={situacoes?.[arquivo.id]} />
-            {origem && <span className="arquivo-origem">{`Sem alteração de conteúdo · relatório da ${origem}`}</span>}
-            {podeAlterar && !versao.historica && !versao.aprovada && (
-              <AcaoSubstituir modulo={modulo} processoId={processoId} versao={versao} arquivo={arquivo} aoConcluir={aoAlterada} />
-            )}
-          </li>
-        )
-      })}
+      {arquivos.filter(({ papel }) => papel !== 'bpmn').map(item)}
       {podeAlterar && relatorioPendente(versao) && (
         <li className="arquivo-do-destaque">
           <button type="button" className="arquivo-que-falta" onClick={aoAcrescentarRelatorio}>
@@ -92,6 +95,7 @@ function ArquivosDoDestaque({ modulo, processoId, versao, versoes, podeAlterar, 
           </button>
         </li>
       )}
+      {arquivos.filter(({ papel }) => papel === 'bpmn').map(item)}
     </ul>
   )
 }

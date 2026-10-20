@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import {
-  formatarDiaEMes, haVersaoNova, ordenarVersoes, origemDoRelatorio, podeCopiarRelatorio, proximoNumero, relatorioPendente, rotuloCurtoDoArquivo, rotuloDaAnterior, rotuloDaVersao,
+  PAPEIS, ROTULO_DO_PAPEL, emOrdemDeExibicao, formatarDiaEMes, haVersaoNova, ordenarVersoes, origemDoRelatorio, podeCopiarRelatorio, proximoNumero, relatorioPendente, rotuloCurtoDoArquivo, rotuloDaAnterior, rotuloDaVersao,
   versoesComRelatorioPendente,
 } from './rotulos'
 import type { ArquivoDaVersao, Versao } from './tipos'
@@ -83,10 +83,22 @@ function arquivoCom(papel: ArquivoDaVersao['papel'], formato: string): ArquivoDa
   return { id: `a-${papel}`, papel, nome: `TSA_V2_Emitir Ofício.${formato}`, formato, tamanho: 10 }
 }
 
+test('o formulário pede .bpm, .png, .bpmn e relatório, nessa ordem e com esses rótulos', () => {
+  expect(PAPEIS).toEqual(['bpm', 'png', 'bpmn', 'relatorio'])
+  expect(PAPEIS.map((papel) => ROTULO_DO_PAPEL[papel])).toEqual([
+    'Fluxograma Bizagi (.bpm)', 'Imagem do fluxo (.png)', '.bpmn', 'Relatório (.docx ou .pdf)',
+  ])
+})
+
+test('os arquivos da versão aparecem na ordem .png, .bpm, relatório e .bpmn', () => {
+  const arquivos = [arquivoCom('bpmn', 'bpmn'), arquivoCom('relatorio', 'pdf'), arquivoCom('bpm', 'bpm'), arquivoCom('png', 'png')]
+  expect(emOrdemDeExibicao(arquivos).map(({ papel }) => papel)).toEqual(['png', 'bpm', 'relatorio', 'bpmn'])
+})
+
 test('o rótulo curto do arquivo diz o que ele é e a extensão', () => {
-  expect(rotuloCurtoDoArquivo(arquivoCom('bpmn', 'bpmn'))).toBe('Fluxograma .bpmn')
+  expect(rotuloCurtoDoArquivo(arquivoCom('bpm', 'bpm'))).toBe('Fluxograma .bpm')
   expect(rotuloCurtoDoArquivo(arquivoCom('png', 'png'))).toBe('Imagem .png')
-  expect(rotuloCurtoDoArquivo(arquivoCom('bpm', 'bpm'))).toBe('Bizagi .bpm')
+  expect(rotuloCurtoDoArquivo(arquivoCom('bpmn', 'bpmn'))).toBe('BPMN .bpmn')
   expect(rotuloCurtoDoArquivo(arquivoCom('relatorio', 'docx'))).toBe('Relatório .docx')
   expect(rotuloCurtoDoArquivo(arquivoCom('relatorio', 'PDF'))).toBe('Relatório .pdf')
 })

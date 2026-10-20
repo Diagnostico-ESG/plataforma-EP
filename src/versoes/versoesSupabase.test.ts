@@ -10,8 +10,9 @@ const LINHA = {
   id: 'v3', numero: 3, historica: false, enviada_em: '2026-10-15T13:00:00+00:00', observacao: 'Corrigido',
   autor: { nome: 'Ana Teste' }, etapa: { nome: 'Reunião de modelagem' },
   arquivos_da_versao: [
-    { id: 'a2', papel: 'png', nome: 'TSA_V3_Emitir Ofício.png', formato: 'png', tamanho: 20 },
     { id: 'a1', papel: 'bpmn', nome: 'TSA_V3_Emitir Ofício.bpmn', formato: 'bpmn', tamanho: 10 },
+    { id: 'a2', papel: 'png', nome: 'TSA_V3_Emitir Ofício.png', formato: 'png', tamanho: 20 },
+    { id: 'a3', papel: 'bpm', nome: 'TSA_V3_Emitir Ofício.bpm', formato: 'bpm', tamanho: 30 },
   ],
 }
 
@@ -45,15 +46,16 @@ function recusa(codigo: string, mensagem = '', status = 409) {
   return { data: null, error: { message: 'Edge Function returned a non-2xx status code', context: new Response(JSON.stringify({ codigo, mensagem }), { status }) } }
 }
 
-test('lista as versões do processo com autor, etapa e os arquivos na ordem dos papéis', async () => {
+test('lista as versões do processo com autor, etapa e os arquivos na ordem de exibição (.png, .bpm, relatório, .bpmn)', async () => {
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas['versoes.select'] = { data: [LINHA], error: null }
   expect(await criar(cliente).listarVersoes('p1')).toEqual([{
     id: 'v3', numero: 3, historica: false, enviadaEm: '2026-10-15T13:00:00+00:00', autor: 'Ana Teste',
     etapa: 'Reunião de modelagem', observacao: 'Corrigido',
     arquivos: [
-      { id: 'a1', papel: 'bpmn', nome: 'TSA_V3_Emitir Ofício.bpmn', formato: 'bpmn', tamanho: 10 },
       { id: 'a2', papel: 'png', nome: 'TSA_V3_Emitir Ofício.png', formato: 'png', tamanho: 20 },
+      { id: 'a3', papel: 'bpm', nome: 'TSA_V3_Emitir Ofício.bpm', formato: 'bpm', tamanho: 30 },
+      { id: 'a1', papel: 'bpmn', nome: 'TSA_V3_Emitir Ofício.bpmn', formato: 'bpmn', tamanho: 10 },
     ],
   }])
   expect(cliente.pedidos[0]).toMatchObject({ tabela: 'versoes', filtro: ['processo_id', 'p1'], ordem: [['numero', false]] })

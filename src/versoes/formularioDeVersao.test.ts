@@ -11,18 +11,21 @@ const png = new File(['y'], 'fluxo.PNG')
 const relatorio = new File(['z'], 'relatorio.pdf')
 const bpm = new File(['w'], 'fonte.bpm')
 
-test('os arquivos do pedido vão na ordem dos papéis, só os escolhidos', () => {
-  expect(arquivosDoPedido({ relatorio, png, bpmn })).toEqual([
-    { papel: 'bpmn', arquivo: bpmn }, { papel: 'png', arquivo: png }, { papel: 'relatorio', arquivo: relatorio },
+test('os arquivos do pedido vão na ordem do formulário (.bpm, .png, .bpmn, relatório), só os escolhidos', () => {
+  expect(arquivosDoPedido({ relatorio, bpmn, png, bpm })).toEqual([
+    { papel: 'bpm', arquivo: bpm }, { papel: 'png', arquivo: png }, { papel: 'bpmn', arquivo: bpmn },
+    { papel: 'relatorio', arquivo: relatorio },
   ])
 })
 
-test('enviar só se habilita com .bpmn e .png, sem recusa e sem conferência em andamento', () => {
-  expect(podeEnviar({ bpmn }, {}, false)).toBe(false)
+test('enviar só se habilita com .bpm e .png (o .bpmn é opcional), sem recusa e sem conferência em andamento', () => {
+  expect(podeEnviar({ bpm }, {}, false)).toBe(false)
   expect(podeEnviar({ png }, {}, false)).toBe(false)
-  expect(podeEnviar({ bpmn, png }, {}, false)).toBe(true)
-  expect(podeEnviar({ bpmn, png, relatorio }, { relatorio: 'Escolha um arquivo .docx ou .pdf.' }, false)).toBe(false)
-  expect(podeEnviar({ bpmn, png }, {}, true)).toBe(false)
+  expect(podeEnviar({ bpmn, png }, {}, false)).toBe(false)
+  expect(podeEnviar({ bpm, png }, {}, false)).toBe(true)
+  expect(podeEnviar({ bpm, png, bpmn }, {}, false)).toBe(true)
+  expect(podeEnviar({ bpm, png, relatorio }, { relatorio: 'Escolha um arquivo .docx ou .pdf.' }, false)).toBe(false)
+  expect(podeEnviar({ bpm, png }, {}, true)).toBe(false)
 })
 
 test('o número da versão histórica é um inteiro maior que zero, só com dígitos', () => {
@@ -50,7 +53,8 @@ test('registrar a histórica não habilita sem número, com recusa ou com confer
 test('o botão do formulário segue a regra do modo: nova pede o par; histórica pede o número e o .bpm', () => {
   const sem = { recusas: {}, conferindo: false }
   expect(podeSubmeter({ tipo: 'nova', numero: 3 }, { ...sem, escolhidos: { bpm } }, 3)).toBe(false)
-  expect(podeSubmeter({ tipo: 'nova', numero: 3 }, { ...sem, escolhidos: { bpmn, png } }, 3)).toBe(true)
+  expect(podeSubmeter({ tipo: 'nova', numero: 3 }, { ...sem, escolhidos: { bpmn, png } }, 3)).toBe(false)
+  expect(podeSubmeter({ tipo: 'nova', numero: 3 }, { ...sem, escolhidos: { bpm, png } }, 3)).toBe(true)
   expect(podeSubmeter({ tipo: 'historica' }, { ...sem, escolhidos: { bpm } }, 5)).toBe(true)
   expect(podeSubmeter({ tipo: 'historica' }, { ...sem, escolhidos: { bpm } }, null)).toBe(false)
 })

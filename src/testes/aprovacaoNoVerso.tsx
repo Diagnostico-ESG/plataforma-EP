@@ -19,7 +19,7 @@ export const APROVACAO = 'Aprovação pelo setor'
 export const PUBLICACAO = 'Publicação'
 export const TITULO_DA_JANELA = `Concluir ${APROVACAO} e iniciar ${PUBLICACAO}`
 export const BOTAO_DA_JANELA = `Concluir e iniciar ${PUBLICACAO}`
-export const COMPLETA = ['bpmn', 'png', 'relatorio'] as const
+export const COMPLETA = ['bpm', 'png', 'relatorio'] as const
 
 export const versao = (papeis: UltimaVersao['papeis'] = [...COMPLETA]): UltimaVersao =>
   ({ numero: 8, autorId: BIA.id, autorNome: BIA.nome, papeis })

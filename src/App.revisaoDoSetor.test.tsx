@@ -11,7 +11,7 @@ import { RevisoesFalso } from './revisoes/RevisoesFalso'
 import { agoraDoVerso, etapasDoVerso } from './testes/versoDoCartao'
 import { cartaoDe, ETAPAS, montar as montarQuadro, processo as processoDoQuadro } from './testes/quadroDeTeste'
 
-// Concluir a Revisão pelo setor exige a versão mais recente completa (.bpmn, .png e relatório): a janela diz o que
+// Concluir a Revisão pelo setor exige a versão mais recente completa (.bpm, .png e relatório): a janela diz o que
 // falta e não deixa concluir (ticket 01 de revisoes-aprovacao, histórias 11 e 12).
 
 afterEach(() => {
@@ -23,7 +23,7 @@ const REVISAO_DO_SETOR = 'Revisão pelo setor'
 const APROVACAO = 'Aprovação pelo setor'
 const TITULO_DA_JANELA = `Concluir ${REVISAO_DO_SETOR} e iniciar ${APROVACAO}`
 const BOTAO_DA_JANELA = `Concluir e iniciar ${APROVACAO}`
-const COMPLETA = ['bpmn', 'png', 'relatorio'] as const
+const COMPLETA = ['bpm', 'png', 'relatorio'] as const
 
 const versao = (papeis: UltimaVersao['papeis']): UltimaVersao => ({ numero: 8, autorId: 'u2', autorNome: 'Bia Teste', papeis })
 
@@ -71,8 +71,9 @@ const concluirAtual = async () => fireEvent.click((await agoraDoVerso()).getByRo
 const janela = async () => within(await screen.findByRole('dialog', { name: TITULO_DA_JANELA }))
 
 test.each([
-  ['sem relatório', versao(['bpmn', 'png']), 'A V8 está sem relatório.'],
-  ['sem .png e relatório', versao(['bpmn']), 'A V8 está sem .png e relatório.'],
+  ['sem relatório', versao(['bpm', 'png']), 'A V8 está sem relatório.'],
+  ['sem .png e relatório', versao(['bpm']), 'A V8 está sem .png e relatório.'],
+  ['sem .bpm e relatório, mesmo com o .bpmn', versao(['png', 'bpmn']), 'A V8 está sem .bpm e relatório.'],
   ['sem versão', null, 'O processo ainda não tem versão enviada.'],
 ])('a janela de concluir diz o que falta e não deixa concluir (%s)', async (_caso, ultimaVersao, frase) => {
   const falso = montar(ultimaVersao)
@@ -137,7 +138,7 @@ async function soltarNaAprovacao() {
 
 test('arrastar para concluir a Revisão do setor com versão incompleta mostra a frase e não deixa concluir', async () => {
   window.location.hash = '#/processos'
-  const falso = montarQuadro([revisaoDoSetorNoQuadro(versao(['bpmn', 'png']))], 'integrante_ep', [{ id: USUARIO_DE_TESTE.id, nome: USUARIO_DE_TESTE.nome }])
+  const falso = montarQuadro([revisaoDoSetorNoQuadro(versao(['bpm', 'png']))], 'integrante_ep', [{ id: USUARIO_DE_TESTE.id, nome: USUARIO_DE_TESTE.nome }])
   await soltarNaAprovacao()
   const aberta = within(await screen.findByRole('dialog', { name: `Concluir ${ETAPAS[3].nome} e iniciar ${ETAPAS[4].nome}` }))
   expect(aberta.getByText('A V8 está sem relatório.')).toBeTruthy()

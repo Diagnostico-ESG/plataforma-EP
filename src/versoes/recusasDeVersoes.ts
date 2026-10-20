@@ -12,7 +12,7 @@ const FRASE_DO_CODIGO: Record<string, (valor: string) => string> = {
   usuario_inativo: () => 'Seu usuário está desativado; não é possível enviar versões.',
   sem_login: () => 'Sua sessão terminou. Entre de novo para enviar a versão.',
   processo_fora_de_andamento: () => 'O processo não está em andamento; não é possível enviar versão.',
-  versao_sem_bpmn_e_png: () => 'A versão precisa do .bpmn e do .png.',
+  versao_sem_bpm_e_png: () => 'A versão precisa do .bpm e do .png.',
   numero_da_versao_mudou: (numero) =>
     `Outra pessoa enviou uma versão enquanto você enviava; esta seria a V${numero}. Envie de novo.`,
   extensao_nao_aceita: () => 'Um dos arquivos tem um tipo que não é aceito no campo dele.',

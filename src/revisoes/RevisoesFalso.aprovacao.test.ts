@@ -7,7 +7,7 @@ import { RevisoesFalso } from './RevisoesFalso'
 import type { DadosDaAprovacao } from './tipos'
 
 const EU = { id: 'u2', nome: 'Bia Teste' }
-const COMPLETA: UltimaVersao = { numero: 8, autorId: 'u1', autorNome: 'Ana Teste', papeis: ['bpmn', 'png', 'relatorio'] }
+const COMPLETA: UltimaVersao = { numero: 8, autorId: 'u1', autorNome: 'Ana Teste', papeis: ['bpm', 'png', 'relatorio'] }
 const SEM_NADA: DadosDaAprovacao = { numeroEprotocolo: null, link: null, aprovadaEm: null }
 
 function etapa(ordem: number, codigo: string, mudancas: Partial<EtapaDoProcesso> = {}): EtapaDoProcesso {
@@ -74,7 +74,7 @@ describe('concluirAprovacao', () => {
   })
 
   test.each([
-    ['versão incompleta', { ...COMPLETA, papeis: ['bpmn', 'png'] as UltimaVersao['papeis'] }, SEM_NADA, 'A V8 está sem relatório.'],
+    ['versão incompleta', { ...COMPLETA, papeis: ['bpm', 'png'] as UltimaVersao['papeis'] }, SEM_NADA, 'A V8 está sem relatório.'],
     ['sem versão', null, SEM_NADA, 'O processo ainda não tem versão enviada.'],
     ['link fora do formato', COMPLETA, { ...SEM_NADA, link: 'ftp://x.example/a' }, 'O link do E-protocolo precisa começar com http:// ou https://.'],
     ['data no futuro', COMPLETA, { ...SEM_NADA, aprovadaEm: '2026-10-14' }, 'A data 14/10/2026 está no futuro.'],

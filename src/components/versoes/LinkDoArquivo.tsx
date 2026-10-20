@@ -7,7 +7,7 @@ import type { ArquivoDaVersao, ModuloDeVersoes } from '../../versoes/tipos'
 type LinkDoArquivoProps = {
   versoes: ModuloDeVersoes
   arquivo: ArquivoDaVersao
-  /** O rótulo curto do destaque ("Fluxograma .bpmn"); sem ele, o link mostra o nome do arquivo. */
+  /** O rótulo curto do destaque ("Fluxograma .bpm"); sem ele, o link mostra o nome do arquivo. */
   rotulo?: string
 }
 

@@ -171,6 +171,7 @@ export class VersoesFalso implements ModuloDeVersoes {
     const doProcesso = this.versoes[pedido.processoId] ?? []
     const processo = this.processos[pedido.processoId] ?? { sigla: 'TSA', nome: pedido.processoId, etapa: null }
     if (historica) conferirHistorica(doProcesso, pedido)
+    else conferirNova(pedido)
     const numero = historica ? pedido.numero : proximoNumero(doProcesso)
     const versao: Versao = {
       id: `v${this.proximoId++}`, numero, historica, enviadaEm: new Date().toISOString(), autor: 'Pessoa de Teste',
@@ -189,6 +190,12 @@ export class VersoesFalso implements ModuloDeVersoes {
       return { id: `a${this.proximoId++}`, papel, nome, formato, tamanho: arquivo.size }
     })
   }
+}
+
+// A versão nova precisa do .bpm e do .png; o .bpmn é opcional (migração versao_exige_bpm_e_png).
+function conferirNova(pedido: PedidoDeVersao): void {
+  const papeis = pedido.arquivos.map(({ papel }) => papel)
+  if (!papeis.includes('bpm') || !papeis.includes('png')) throw falhaDaFuncao('versao_sem_bpm_e_png', '')
 }
 
 // As regras que o banco impõe à histórica (migração versoes_historicas), com as mesmas frases do módulo real.

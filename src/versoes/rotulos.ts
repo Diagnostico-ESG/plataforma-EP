@@ -1,12 +1,19 @@
 import type { ArquivoDaVersao, PapelDoArquivo, Versao } from './tipos'
 
-/** Os papéis na ordem em que aparecem no formulário e na lista de arquivos. */
-export const PAPEIS: readonly PapelDoArquivo[] = ['bpmn', 'png', 'bpm', 'relatorio']
+/** Os papéis na ordem do formulário: os obrigatórios (.bpm e .png) primeiro, o .bpmn opcional antes do relatório (ADR 0016). */
+export const PAPEIS: readonly PapelDoArquivo[] = ['bpm', 'png', 'bpmn', 'relatorio']
+
+/** A ordem dos arquivos da versão na tela: o .png primeiro, porque é o que se abre para ver o fluxo. */
+const ORDEM_DOS_ARQUIVOS: readonly PapelDoArquivo[] = ['png', 'bpm', 'relatorio', 'bpmn']
+
+export function emOrdemDeExibicao<T extends Pick<ArquivoDaVersao, 'papel'>>(arquivos: T[]): T[] {
+  return [...arquivos].sort((a, b) => ORDEM_DOS_ARQUIVOS.indexOf(a.papel) - ORDEM_DOS_ARQUIVOS.indexOf(b.papel))
+}
 
 export const ROTULO_DO_PAPEL: Record<PapelDoArquivo, string> = {
-  bpmn: 'Fluxograma (.bpmn)',
-  png: 'Imagem do fluxograma (.png)',
-  bpm: 'Arquivo do Bizagi (.bpm)',
+  bpm: 'Fluxograma Bizagi (.bpm)',
+  png: 'Imagem do fluxo (.png)',
+  bpmn: '.bpmn',
   relatorio: 'Relatório (.docx ou .pdf)',
 }
 
@@ -75,10 +82,10 @@ export function rotuloDaAnterior(versao: Versao, versoes: Versao[]): string | nu
 }
 
 const NOME_CURTO_DO_PAPEL: Record<PapelDoArquivo, string> = {
-  bpmn: 'Fluxograma', png: 'Imagem', bpm: 'Bizagi', relatorio: 'Relatório',
+  bpm: 'Fluxograma', png: 'Imagem', bpmn: 'BPMN', relatorio: 'Relatório',
 }
 
-/** "Fluxograma .bpmn", "Relatório .pdf": o botão do arquivo no destaque da versão. */
+/** "Fluxograma .bpm", "Relatório .pdf": o botão do arquivo no destaque da versão. */
 export function rotuloCurtoDoArquivo({ papel, formato }: Pick<ArquivoDaVersao, 'papel' | 'formato'>): string {
   return `${NOME_CURTO_DO_PAPEL[papel]} .${formato.toLowerCase()}`
 }

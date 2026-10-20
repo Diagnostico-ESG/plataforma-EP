@@ -46,7 +46,8 @@ test('número, link e data preenchidos vão aparados e a data não passa de hoje
 })
 
 test.each([
-  ['a versão está sem relatório', versao(['bpmn', 'png']), 'A V8 está sem relatório.'],
+  ['a versão está sem relatório', versao(['bpm', 'png']), 'A V8 está sem relatório.'],
+  ['a versão está sem .bpm, mesmo com o .bpmn', versao(['png', 'relatorio', 'bpmn']), 'A V8 está sem .bpm.'],
   ['não há versão', null, 'O processo ainda não tem versão enviada.'],
 ])('com a versão incompleta (%s) a janela diz o que falta e não deixa concluir', async (_caso, ultima, frase) => {
   const { revisoes } = montar(ultima)
@@ -138,7 +139,7 @@ test('arrastar para concluir a Aprovação abre a mesma janela, com a versão ap
 
 test('arrastar com a versão incompleta mostra a frase e não deixa concluir', async () => {
   window.location.hash = '#/processos'
-  const falso = montarQuadro([aprovacaoNoQuadro(versao(['bpmn', 'png']))], 'integrante_ep', [EU])
+  const falso = montarQuadro([aprovacaoNoQuadro(versao(['bpm', 'png']))], 'integrante_ep', [EU])
   await soltarNoEProtocolo()
   const janela = within(await screen.findByRole('dialog', { name: `Concluir ${ETAPAS[4].nome} e iniciar ${ETAPAS[5].nome}` }))
   expect(janela.getByText('A V8 está sem relatório.')).toBeTruthy()

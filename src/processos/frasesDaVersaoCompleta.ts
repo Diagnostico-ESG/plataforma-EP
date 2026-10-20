@@ -2,8 +2,8 @@ import type { PapelDoArquivo } from '../versoes/tipos'
 import type { UltimaVersao } from './tipos'
 
 /** Os papéis que a versão completa exige, na ordem em que a frase os lista (a mesma do banco). */
-const EXIGIDOS: PapelDoArquivo[] = ['bpmn', 'png', 'relatorio']
-const ROTULO: Record<string, string> = { bpmn: '.bpmn', png: '.png', relatorio: 'relatório' }
+const EXIGIDOS: PapelDoArquivo[] = ['bpm', 'png', 'relatorio']
+const ROTULO: Record<string, string> = { bpm: '.bpm', png: '.png', relatorio: 'relatório' }
 
 export const FRASE_SEM_VERSAO = 'O processo ainda não tem versão enviada.'
 

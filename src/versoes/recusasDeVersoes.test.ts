@@ -7,7 +7,7 @@ test.each([
   ['usuario_inativo', '', 'Seu usuário está desativado; não é possível enviar versões.'],
   ['sem_login', '', 'Sua sessão terminou. Entre de novo para enviar a versão.'],
   ['processo_fora_de_andamento', 'suspenso', 'O processo não está em andamento; não é possível enviar versão.'],
-  ['versao_sem_bpmn_e_png', '', 'A versão precisa do .bpmn e do .png.'],
+  ['versao_sem_bpm_e_png', '', 'A versão precisa do .bpm e do .png.'],
   ['numero_da_versao_mudou', '4', 'Outra pessoa enviou uma versão enquanto você enviava; esta seria a V4. Envie de novo.'],
   ['extensao_nao_aceita', 'Tipo de arquivo não aceito.', 'Um dos arquivos tem um tipo que não é aceito no campo dele.'],
   ['arquivo_grande', 'O arquivo passa de 20 MB.', 'Um dos arquivos passa de 20 MB.'],

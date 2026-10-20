@@ -3,7 +3,7 @@ import { afterEach, beforeEach, expect, test } from 'vitest'
 import { falhaDoAndamento } from './processos/andamentosSupabase'
 import { RECUSAS_DOS_PROCESSOS } from './processos/processosSupabase'
 import { montarNosCadastros } from './testes/processosNosCadastros'
-import { BPMN_VALIDO, PNG_VALIDO } from './testes/versoesDeTeste'
+import { BPM_VALIDO, PNG_VALIDO } from './testes/versoesDeTeste'
 import { MENU_DOS_ARQUIVOS, escolherNoMenu, escolherNoMenuDoProcesso } from './testes/versoDoCartao'
 
 beforeEach(() => {
@@ -22,8 +22,8 @@ test('a versão enviada aparece no histórico do processo, com texto próprio', 
   const secao = within(await painel.findByRole('region', { name: 'Arquivos' }))
   fireEvent.click(await secao.findByRole('button', { name: 'Enviar versão' }))
   const form = within(await secao.findByRole('form', { name: 'Enviar versão' }))
-  fireEvent.change(form.getByLabelText('Fluxograma (.bpmn)'), { target: { files: [BPMN_VALIDO] } })
-  fireEvent.change(form.getByLabelText('Imagem do fluxograma (.png)'), { target: { files: [PNG_VALIDO] } })
+  fireEvent.change(form.getByLabelText('Fluxograma Bizagi (.bpm)'), { target: { files: [BPM_VALIDO] } })
+  fireEvent.change(form.getByLabelText('Imagem do fluxo (.png)'), { target: { files: [PNG_VALIDO] } })
   const enviar = form.getByRole('button', { name: 'Enviar' }) as HTMLButtonElement
   await waitFor(() => expect(enviar.disabled).toBe(false))
   fireEvent.click(enviar)
@@ -31,7 +31,7 @@ test('a versão enviada aparece no histórico do processo, com texto próprio', 
   await escolherNoMenuDoProcesso('Histórico')
   const evento = await painel.findByText('Enviou a versão')
   expect(evento.parentElement?.textContent).toBe('Enviou a versão V1 — Emitir Ofício')
-  expect(painel.getByText(/Arquivos: TSA_V1_Emitir Ofício.bpmn, TSA_V1_Emitir Ofício.png/)).toBeTruthy()
+  expect(painel.getByText(/Arquivos: TSA_V1_Emitir Ofício.bpm, TSA_V1_Emitir Ofício.png/)).toBeTruthy()
 })
 
 test('a versão histórica registrada aparece no histórico do processo, com texto próprio', async () => {
@@ -41,7 +41,7 @@ test('a versão histórica registrada aparece no histórico do processo, com tex
   await escolherNoMenu(MENU_DOS_ARQUIVOS, 'Registrar versão histórica')
   const form = within(await secao.findByRole('form', { name: 'Registrar versão histórica' }))
   fireEvent.change(form.getByLabelText('Número da versão'), { target: { value: '5' } })
-  fireEvent.change(form.getByLabelText('Arquivo do Bizagi (.bpm) (opcional)'), { target: { files: [new File(['b'], 'fonte.bpm')] } })
+  fireEvent.change(form.getByLabelText('Fluxograma Bizagi (.bpm) (opcional)'), { target: { files: [new File(['b'], 'fonte.bpm')] } })
   const registrar = form.getByRole('button', { name: 'Registrar' }) as HTMLButtonElement
   await waitFor(() => expect(registrar.disabled).toBe(false))
   fireEvent.click(registrar)

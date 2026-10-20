@@ -35,7 +35,7 @@ afterEach(() => {
 })
 
 const versaoComRelatorio = () => versaoDeTeste(1, {
-  arquivos: [arquivoDeTeste(1, 'bpmn', 'bpmn'), arquivoDeTeste(1, 'png', 'png'), arquivoDeTeste(1, 'relatorio', 'pdf')],
+  arquivos: [arquivoDeTeste(1, 'bpm', 'bpm'), arquivoDeTeste(1, 'png', 'png'), arquivoDeTeste(1, 'relatorio', 'pdf'), arquivoDeTeste(1, 'bpmn', 'bpmn')],
 })
 const comUmaVersao = { ajustarVersoes: (falso: VersoesFalso) => { falso.versoes.p1 = [versaoComRelatorio()] } }
 
@@ -47,9 +47,9 @@ const secao = async () => {
 test.each(['administrador', 'integrante_ep', 'consulta'] as const)('o perfil %s vê cada arquivo como link, com o nome no title', async (perfil) => {
   montarNosCadastros({ perfil, ...comUmaVersao })
   const links = await (await secao()).findAllByRole('link')
-  expect(links.map((link) => link.textContent)).toEqual(['Fluxograma .bpmn', 'Imagem .png', 'Relatório .pdf'])
+  expect(links.map((link) => link.textContent)).toEqual(['Imagem .png', 'Fluxograma .bpm', 'Relatório .pdf', 'BPMN .bpmn'])
   expect(links.map((link) => link.getAttribute('title'))).toEqual([
-    'TSA_V1_Emitir Ofício.bpmn', 'TSA_V1_Emitir Ofício.png', 'TSA_V1_Emitir Ofício_Relatório.pdf',
+    'TSA_V1_Emitir Ofício.png', 'TSA_V1_Emitir Ofício.bpm', 'TSA_V1_Emitir Ofício_Relatório.pdf', 'TSA_V1_Emitir Ofício.bpmn',
   ])
 })
 
@@ -110,5 +110,5 @@ test.each(['suspenso', 'cancelado', 'concluido'] as const)('processo %s continua
     },
     ...comUmaVersao,
   })
-  expect((await (await secao()).findAllByRole('link')).length).toBe(3)
+  expect((await (await secao()).findAllByRole('link')).length).toBe(4)
 })

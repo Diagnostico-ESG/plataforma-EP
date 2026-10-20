@@ -1,5 +1,5 @@
 import { formatarMomento } from '../../acesso/historico'
-import { origemDoRelatorio, podeCopiarRelatorio, relatorioPendente, rotuloDaAnterior, rotuloDaVersao } from '../../versoes/rotulos'
+import { emOrdemDeExibicao, origemDoRelatorio, podeCopiarRelatorio, relatorioPendente, rotuloDaAnterior, rotuloDaVersao } from '../../versoes/rotulos'
 import type { ConferenciaDosArquivos, ModuloDeVersoes, Versao } from '../../versoes/tipos'
 import { Pilula } from '../Pilula'
 import { AcaoSemAlteracao } from './AcaoSemAlteracao'
@@ -47,7 +47,7 @@ function BlocoDaVersao({ modulo, processoId, versao, versoes, podeAlterar, aoAlt
       </p>
       {versao.observacao && <p className="bloco-da-versao-observacao">{versao.observacao}</p>}
       <ul className="bloco-da-versao-arquivos">
-        {versao.arquivos.map((arquivo) => {
+        {emOrdemDeExibicao(versao.arquivos).map((arquivo) => {
           const origem = origemDoRelatorio(arquivo, versoes)
           return (
             <li key={arquivo.id}>

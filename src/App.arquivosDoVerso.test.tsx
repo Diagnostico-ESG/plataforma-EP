@@ -15,7 +15,8 @@ afterEach(() => {
 })
 
 const comRelatorio = (numero: number) => versaoDeTeste(numero, {
-  arquivos: [arquivoDeTeste(numero, 'bpmn', 'bpmn'), arquivoDeTeste(numero, 'png', 'png'), arquivoDeTeste(numero, 'relatorio', 'pdf')],
+  arquivos: [arquivoDeTeste(numero, 'bpm', 'bpm'), arquivoDeTeste(numero, 'png', 'png'), arquivoDeTeste(numero, 'relatorio', 'pdf'),
+    arquivoDeTeste(numero, 'bpmn', 'bpmn')],
 })
 const historica = (numero: number) => versaoDeTeste(numero, {
   historica: true, etapa: null,
@@ -50,9 +51,9 @@ test('a versão mais recente em destaque: "V2 · 02/10 · falta relatório", os 
   expect(v2.getByText('02/10').tagName).toBe('TIME')
   expect(v2.getByText('falta relatório')).toBeTruthy()
   expect(v2.getAllByRole('link').map((link) => link.getAttribute('aria-label'))).toEqual([
-    'Baixar Fluxograma .bpmn (TSA_V2_Emitir Ofício.bpmn)', 'Baixar Imagem .png (TSA_V2_Emitir Ofício.png)',
+    'Baixar Imagem .png (TSA_V2_Emitir Ofício.png)', 'Baixar Fluxograma .bpm (TSA_V2_Emitir Ofício.bpm)',
   ])
-  expect(v2.getByRole('link', { name: comNome('TSA_V2_Emitir Ofício.bpmn') }).textContent).toContain('Fluxograma .bpmn')
+  expect(v2.getByRole('link', { name: comNome('TSA_V2_Emitir Ofício.bpm') }).textContent).toContain('Fluxograma .bpm')
 })
 
 test('[+ Acrescentar relatório] abre o formulário do relatório com a versão em destaque escolhida', async () => {

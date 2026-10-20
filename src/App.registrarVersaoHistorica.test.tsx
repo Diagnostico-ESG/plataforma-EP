@@ -45,7 +45,7 @@ type Form = Awaited<ReturnType<typeof abrirFormulario>>['form']
 const botaoRegistrar = (form: Form) => form.getByRole('button', { name: 'Registrar' }) as HTMLButtonElement
 const digitarNumero = (form: Form, texto: string) => fireEvent.change(form.getByLabelText('Número da versão'), { target: { value: texto } })
 const escolher = (form: Form, rotulo: string, arquivo: File) => fireEvent.change(form.getByLabelText(rotulo), { target: { files: [arquivo] } })
-const escolherBpm = (form: Form) => escolher(form, 'Arquivo do Bizagi (.bpm) (opcional)', BPM)
+const escolherBpm = (form: Form) => escolher(form, 'Fluxograma Bizagi (.bpm) (opcional)', BPM)
 
 async function preencherNumeroEBpm(form: Form, numero: string) {
   digitarNumero(form, numero)
@@ -94,7 +94,7 @@ test('o formulário tem o número, os quatro campos de arquivo e a observação,
   montarNosCadastros()
   const { form } = await abrirFormulario()
   expect((form.getByLabelText('Número da versão') as HTMLInputElement).value).toBe('')
-  for (const rotulo of ['Fluxograma (.bpmn) (opcional)', 'Imagem do fluxograma (.png) (opcional)', 'Arquivo do Bizagi (.bpm) (opcional)',
+  for (const rotulo of ['.bpmn (opcional)', 'Imagem do fluxo (.png) (opcional)', 'Fluxograma Bizagi (.bpm) (opcional)',
     'Relatório (.docx ou .pdf) (opcional)']) {
     expect((form.getByLabelText(rotulo) as HTMLInputElement).type).toBe('file')
   }
@@ -108,7 +108,7 @@ test.each(['', '0', '5.5', 'abc', '-3'])('o número "%s" não habilita o botão'
   const { form } = await abrirFormulario()
   escolherBpm(form)
   digitarNumero(form, texto)
-  await waitFor(() => expect(form.getByLabelText('Arquivo do Bizagi (.bpm) (opcional)')).toBeTruthy())
+  await waitFor(() => expect(form.getByLabelText('Fluxograma Bizagi (.bpm) (opcional)')).toBeTruthy())
   expect(botaoRegistrar(form).disabled).toBe(true)
   if (texto) expect(form.getByText('Digite um número inteiro maior que zero.')).toBeTruthy()
 })
@@ -117,10 +117,10 @@ test('basta o .bpm; só o .bpmn ou só o .png não bastam; o par basta, com rela
   montarNosCadastros()
   const { form } = await abrirFormulario()
   digitarNumero(form, '5')
-  escolher(form, 'Fluxograma (.bpmn) (opcional)', BPMN_VALIDO)
+  escolher(form, '.bpmn (opcional)', BPMN_VALIDO)
   expect(await form.findByText('Será gravado como: TSA_V5F_Emitir Ofício.bpmn')).toBeTruthy()
   expect(botaoRegistrar(form).disabled).toBe(true)
-  escolher(form, 'Imagem do fluxograma (.png) (opcional)', PNG_VALIDO)
+  escolher(form, 'Imagem do fluxo (.png) (opcional)', PNG_VALIDO)
   await waitFor(() => expect(botaoRegistrar(form).disabled).toBe(false))
   escolher(form, 'Relatório (.docx ou .pdf) (opcional)', new File(['r'], 'relatorio.docx'))
   expect(await form.findByText('Será gravado como: TSA_V5F_Emitir Ofício_Relatório.docx')).toBeTruthy()
@@ -170,8 +170,8 @@ test('a primeira versão nova continua a numeração (V5F → V6) e o botão da 
   fireEvent.click(await secao.findByRole('button', { name: 'Enviar versão' }))
   const form = within(await secao.findByRole('form', { name: 'Enviar versão' }))
   expect(form.getByText(/Esta versão será a/).textContent).toBe('Esta versão será a V6.')
-  fireEvent.change(form.getByLabelText('Fluxograma (.bpmn)'), { target: { files: [BPMN_VALIDO] } })
-  fireEvent.change(form.getByLabelText('Imagem do fluxograma (.png)'), { target: { files: [PNG_VALIDO] } })
+  fireEvent.change(form.getByLabelText('Fluxograma Bizagi (.bpm)'), { target: { files: [BPM] } })
+  fireEvent.change(form.getByLabelText('Imagem do fluxo (.png)'), { target: { files: [PNG_VALIDO] } })
   const enviar = form.getByRole('button', { name: 'Enviar' }) as HTMLButtonElement
   await waitFor(() => expect(enviar.disabled).toBe(false))
   fireEvent.click(enviar)

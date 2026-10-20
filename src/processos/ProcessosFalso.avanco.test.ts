@@ -127,7 +127,7 @@ describe('trava do autor da versão mais recente', () => {
 
   function comAutor(): ProcessosFalso {
     const modulo = falso([doProcesso(4, EM_ANDAMENTO), doProcesso(5, REVISAO)])
-    modulo.processos[0] = { ...modulo.processos[0], ultimaVersao: { numero: 3, autorId: 'u1', autorNome: 'Ana Teste', papeis: ['bpmn', 'png'] } }
+    modulo.processos[0] = { ...modulo.processos[0], ultimaVersao: { numero: 3, autorId: 'u1', autorNome: 'Ana Teste', papeis: ['bpm', 'png'] } }
     return modulo
   }
 
@@ -162,8 +162,9 @@ describe('concluir a Revisão pelo setor exige a versão mais recente completa',
 
   test.each([
     ['sem versão', null, 'O processo ainda não tem versão enviada.'],
-    ['sem relatório', versao(['bpmn', 'png']), 'A V3 está sem relatório.'],
-    ['sem .png e relatório', versao(['bpmn']), 'A V3 está sem .png e relatório.'],
+    ['sem relatório', versao(['bpm', 'png']), 'A V3 está sem relatório.'],
+    ['sem .png e relatório', versao(['bpm']), 'A V3 está sem .png e relatório.'],
+    ['sem .bpm, mesmo com o .bpmn', versao(['png', 'relatorio', 'bpmn']), 'A V3 está sem .bpm.'],
   ])('%s: recusa com o que falta e nada muda', async (_caso, ultimaVersao, frase) => {
     const modulo = comVersao(ultimaVersao)
     const falha = await falhaDe(modulo.concluirEtapa('a4', 'u2'))
@@ -174,7 +175,7 @@ describe('concluir a Revisão pelo setor exige a versão mais recente completa',
   })
 
   test('com a versão completa, conclui e inicia a próxima', async () => {
-    const modulo = comVersao(versao(['bpmn', 'png', 'relatorio']))
+    const modulo = comVersao(versao(['bpm', 'png', 'relatorio']))
     await modulo.concluirEtapa('a4', 'u2')
     expect(await statusDe(modulo)).toEqual(['concluida', 'em_andamento'])
   })

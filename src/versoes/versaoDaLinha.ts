@@ -1,4 +1,4 @@
-import { PAPEIS } from './rotulos'
+import { emOrdemDeExibicao } from './rotulos'
 import type { ArquivoDaVersao, PapelDoArquivo, Versao } from './tipos'
 
 /** A leitura de `versoes` com o autor, a etapa e os arquivos (o tipo gerado do Supabase não acompanha as ligações). */
@@ -27,15 +27,11 @@ function arquivoDaLinha({ copiado_de: copiadoDe, ...arquivo }: LinhaDoArquivo): 
   return copiadoDe ? { ...arquivo, copiadoDe } : arquivo
 }
 
-function ordemDoPapel(arquivo: ArquivoDaVersao): number {
-  return PAPEIS.indexOf(arquivo.papel)
-}
-
 export function versaoDaLinha(linha: LinhaDaVersao): Versao {
   return {
     id: linha.id, numero: linha.numero, historica: linha.historica, enviadaEm: linha.enviada_em,
     autor: linha.autor?.nome ?? null, etapa: linha.etapa?.nome ?? null, observacao: linha.observacao,
-    arquivos: linha.arquivos_da_versao.map(arquivoDaLinha).sort((a, b) => ordemDoPapel(a) - ordemDoPapel(b)),
+    arquivos: emOrdemDeExibicao(linha.arquivos_da_versao.map(arquivoDaLinha)),
     ...(linha.aprovacao?.length ? { aprovada: true } : {}),
   }
 }
