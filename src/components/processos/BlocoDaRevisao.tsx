@@ -1,8 +1,8 @@
 import { useId } from 'react'
 import type { OpcaoDaRevisao, OpcoesDaRevisao } from '../../revisoes/opcoesDaRevisao'
 import type { RascunhoDaRevisao } from '../../revisoes/rascunhoDaRevisao'
-import { ROTULO_DO_ESCOPO } from '../../revisoes/frasesDeRevisao'
-import type { EscopoDaCorrecao, ResultadoDaRevisao } from '../../revisoes/tipos'
+import type { ResultadoDaRevisao } from '../../revisoes/tipos'
+import { CampoDoComentario, CampoDoEscopo } from './CamposDaRevisao'
 
 type BlocoDaRevisaoProps = {
   opcoes: OpcoesDaRevisao
@@ -10,16 +10,12 @@ type BlocoDaRevisaoProps = {
   aoMudar: (valor: RascunhoDaRevisao) => void
 }
 
-const ESCOPOS: EscopoDaCorrecao[] = ['fluxograma', 'relatorio', 'ambos']
-
 /**
  * O que a janela de concluir a Revisão interna pede acima da escolha do responsável: o Resultado (com a prévia das
  * versões em cada opção; a que não cabe fica desabilitada com o motivo), o Escopo (só em "Corrigida") e o Comentário.
  */
 export function BlocoDaRevisao({ opcoes, valor, aoMudar }: BlocoDaRevisaoProps) {
   const nomeDoResultado = useId()
-  const nomeDoEscopo = useId()
-  const idDoComentario = useId()
   const escolher = (resultado: ResultadoDaRevisao) => aoMudar({ ...valor, resultado })
   return (
     <>
@@ -30,21 +26,8 @@ export function BlocoDaRevisao({ opcoes, valor, aoMudar }: BlocoDaRevisaoProps) 
         <OpcaoDoResultado nome={nomeDoResultado} rotulo="Corrigida" opcao={opcoes.corrigida}
           marcada={valor.resultado === 'corrigida'} aoEscolher={() => escolher('corrigida')} />
       </fieldset>
-      {valor.resultado === 'corrigida' && (
-        <fieldset className="janela-revisao">
-          <legend className="janela-escolha-pergunta">Escopo da correção</legend>
-          {ESCOPOS.map((escopo) => (
-            <label key={escopo} className="janela-escolha-opcao">
-              <input type="radio" name={nomeDoEscopo} checked={valor.escopo === escopo} onChange={() => aoMudar({ ...valor, escopo })} />
-              {ROTULO_DO_ESCOPO[escopo]}
-            </label>
-          ))}
-        </fieldset>
-      )}
-      <label htmlFor={idDoComentario} className="janela-escolha-pergunta janela-revisao-rotulo">Comentário (opcional)</label>
-      <textarea id={idDoComentario} className="janela-campo" rows={2} maxLength={2000} value={valor.comentario}
-        onChange={(mudanca) => aoMudar({ ...valor, comentario: mudanca.target.value })} />
-      <p className="janela-ajuda">Não anote dado pessoal de pessoas do setor.</p>
+      {valor.resultado === 'corrigida' && <CampoDoEscopo valor={valor.escopo} aoMudar={(escopo) => aoMudar({ ...valor, escopo })} />}
+      <CampoDoComentario valor={valor.comentario} aoMudar={(comentario) => aoMudar({ ...valor, comentario })} />
     </>
   )
 }
