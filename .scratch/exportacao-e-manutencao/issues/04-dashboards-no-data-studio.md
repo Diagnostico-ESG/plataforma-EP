@@ -15,8 +15,8 @@ A porcentagem é calculada no Data Studio a partir das contagens. Compartilhar o
 
 ## Critérios de aceite
 
-- [ ] O dashboard interno tem as três páginas, lendo a planilha interna, com a meta mensal de 12 modelagens no gráfico por mês.
-- [ ] O dashboard público lê só a planilha pública e mostra os números da página pública de hoje.
+- [x] O dashboard interno tem as três páginas, lendo a planilha interna, com a meta mensal de 12 modelagens no gráfico por mês.
+- [x] O dashboard público lê só a planilha pública e mostra os números da página pública de hoje.
 - [ ] O interno está compartilhado só com as pessoas da equipe e o público está como "Não listado", ambos com a confirmação do usuário no momento.
-- [ ] As decisões de montagem (fontes, campos calculados, filtros e o que ficou diferente do Power BI por limite do Data Studio) estão anotadas em `.scratch/exportacao-e-manutencao/` para o ticket 05.
+- [x] As decisões de montagem (fontes, campos calculados, filtros e o que ficou diferente do Power BI por limite do Data Studio) estão anotadas em `.scratch/exportacao-e-manutencao/` para o ticket 05.
 - [ ] [visual] Os dois dashboards ficam parecidos com as páginas de hoje do Power BI, revisados pelo usuário.
