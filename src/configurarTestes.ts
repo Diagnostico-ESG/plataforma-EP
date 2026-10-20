@@ -1,3 +1,8 @@
+import { configure } from '@testing-library/react'
+
+// Padrão de 1 s do findBy/waitFor estourava com a máquina ocupada (bateria cheia, outra sessão): a tabela ainda carregando. O limite do teste inteiro (testTimeout) é 15 s.
+configure({ asyncUtilTimeout: 5000 })
+
 // O jsdom não implementa showModal/close de <dialog>; este é o mínimo para os testes de interface.
 // O teste do hook em .claude/hooks roda em Node puro, sem DOM: nele não há nada a preparar.
 if (typeof HTMLDialogElement !== 'undefined') {
