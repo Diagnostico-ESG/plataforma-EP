@@ -1,0 +1,19 @@
+# 02: Aba Planilhas e o pedido de atualização
+
+**Como resolve a sua parte.** O Administrador precisa saber se as planilhas estão em dia e poder atualizá-las na hora. Este ticket monta todo o caminho do pedido no banco (ADR 0018) e a aba Planilhas na Administração, ainda sem a função que escreve as planilhas: um pedido feito agora fica "Em andamento" e passa a "Sem resposta" depois de 10 minutos. O ticket 03 liga a função a esse caminho.
+
+**What to build:** extensões pg_cron, pg_net e Vault, se faltarem; tabela `atualizacoes_das_planilhas` com RLS (leitura só do Administrador ativo; ninguém grava direto), ficha de uso único guardada como hash e gatilho que mantém só as 10 mais recentes; view com `security_invoker` que calcula o resultado (em andamento, sem resposta, concluída, falhou); função privada `security definer` (com `search_path` vazio) que registra a tentativa, gera a ficha e envia o pacote pelo pg_net ao endereço do cofre, com a senha interna no cabeçalho (neste ticket o pacote leva só a tentativa e a ficha; o ticket 03 acrescenta os dados); `pedir_atualizacao_das_planilhas()` só para o Administrador ativo, com as recusas `atualizacao_em_andamento` e `planilhas_nao_configuradas`; agendamento pelo pg_cron às 9h UTC (6h de Brasília), que não começa com uma tentativa em andamento; `links_das_planilhas()` só para o Administrador; `registrar_resultado_das_planilhas(tentativa, ficha, deu_certo, motivo)`, chamável sem login, que aceita só a ficha certa, uma vez, para tentativa sem fim; módulo das planilhas (real e falso); aba "Planilhas" depois de "Catálogo de etapas", com a lista (origem, quem, quando, resultado e motivo), "Nenhuma atualização ainda.", os dois links em aba nova ou o aviso de ambiente sem configuração, o botão [Atualizar planilhas agora] desligado durante uma atualização, a releitura a cada poucos segundos só enquanto há tentativa em andamento, a tabela pura dos motivos (código desconhecido vira "A atualização falhou por um motivo não identificado."), estados de carregando e de erro com "Tentar de novo"; o roteiro do cofre para o usuário gravar pelo SQL Editor. Spec: histórias 28, 29 e 31 a 43.
+
+**Blocked by:** None (can start immediately).
+
+**Status:** ready-for-agent
+
+## Critérios de aceite
+
+- [ ] Banco: testes antes da migração: só o Administrador ativo pede (Integrante, Consulta, desativado e visitante recusados); segundo pedido com um em andamento recusado com `atualizacao_em_andamento`; cofre incompleto recusado com `planilhas_nao_configuradas`; só as 10 mais recentes ficam; leitura das tentativas só do Administrador ativo e ninguém grava direto; resultado calculado nos quatro casos; ficha certa aceita uma vez, ficha errada, tentativa já terminada e repetição recusadas; `links_das_planilhas` só para o Administrador; o agendamento existe e não começa com uma em andamento. O teste confere o registro e a ficha, não a chegada à função.
+- [ ] A aba Planilhas aparece só para o Administrador, com as tentativas da mais recente para a mais antiga, "Automática" ou "Pelo botão · <nome>", data e hora de Brasília, resultado e motivo.
+- [ ] Apertar [Atualizar planilhas agora] mostra a tentativa "Em andamento" na hora e desliga o botão; a tentativa muda sozinha para o resultado; "Sem resposta" libera o botão; a recusa aparece como "Já há uma atualização em andamento.".
+- [ ] Os dois links abrem em aba nova; sem configuração, a aba diz isso e o botão explica por que não atualiza.
+- [ ] Testes do módulo real com o cliente simulado, da tabela dos motivos e da tela inteira com as falsas, cobrindo os itens acima, inclusive falha ao ler e ao pedir.
+- [ ] Roteiro do cofre escrito para o usuário: lista numerada, um passo por linha, com o endereço direto do SQL Editor do projeto de desenvolvimento.
+- [ ] [visual] A aba segue o estilo de Usuários e Catálogo de etapas; o resultado de cada tentativa se distingue pela cor das mensagens e pelo texto.

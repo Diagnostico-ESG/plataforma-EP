@@ -126,6 +126,24 @@ A equipe atualiza à mão a planilha do dashboard, marcando processo por process
   - O **pacote de dados** montado pela função privada: a data e a hora da geração; as etapas ativas do catálogo (identificador, código, ordem, fase); os processos (identificador, nome, tipo, sigla do setor, nome do macroprocesso, situação guardada, se está concluído, observações, data da reunião, número da última versão não histórica); e os andamentos (processo, etapa, status, início e resolução). Nenhum nome de pessoa nem e-mail entra no pacote.
 - **Extensões:** pg_cron, pg_net e o Vault ligados por migração, se ainda não estiverem.
 
+#### Quem pode o quê
+
+| Ação | Administrador | Integrante do EP | Consulta | Desativado | Sem login |
+|-|-|-|-|-|-|
+| Ver a fase das etapas | sim | sim | sim | não | não |
+| Escolher ou mudar a fase | sim | não | não | não | não |
+| Ver as tentativas e os links | sim | não | não | não | não |
+| Pedir a atualização | sim | não | não | não | não |
+| Gravar tentativa direto na tabela | não | não | não | não | não |
+| Chamar a montagem do pacote | não | não | não | não | não |
+| Registrar o resultado | só com a ficha certa da tentativa, uma vez (a função chama sem login) |||||
+
+#### Regras de estado
+
+- Uma tentativa nasce "Em andamento", com a ficha; termina uma única vez, em "Concluída" ou "Falhou"; sem fim depois de 10 minutos, aparece "Sem resposta" (calculado, não guardado).
+- Com uma tentativa "Em andamento", nenhum pedido novo começa (nem o do botão, nem o das 6h).
+- Uma tentativa terminada não muda mais.
+
 ### Edge Function `planilhas-dos-dashboards`
 
 - Ordem fixa: configuração → senha interna (cabeçalho) → validação do pacote → montagem → escrita → resultado ao banco. Nada toca o Google antes de a senha e o pacote valerem.
