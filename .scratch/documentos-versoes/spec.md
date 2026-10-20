@@ -420,6 +420,10 @@ O que a implementação faz de diferente do texto acima, ou além dele. O porqu�
 - `[visual]` O formulário de envio mostra .bpm e .png como obrigatórios e o .bpmn por último, marcado como opcional.
 - `[visual]` No destaque da versão, o .png vem primeiro, depois o .bpm, o relatório (ou o espaço de acrescentar) e o .bpmn, se houver.
 
+### Entrega
+
+Uma só, sem tickets: esta seção é o ticket (confirmado pelo usuário em 2026-10-20). Execução por `/executar-complexo` (migração com teste antes, depois a tela, as falsas e os testes antigos), plano em `plano-mudanca-bpm.md`; a linha `Implementado em` entra no fim desta seção.
+
 ### Fora do escopo desta mudança
 
 - Botão "Acrescentar .bpmn" numa versão que não o tem.
