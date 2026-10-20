@@ -99,7 +99,7 @@ test('o formulário tem o número, os quatro campos de arquivo e a observação,
     expect((form.getByLabelText(rotulo) as HTMLInputElement).type).toBe('file')
   }
   expect((form.getByLabelText('Observação (opcional)') as HTMLTextAreaElement).maxLength).toBe(2000)
-  expect(form.getByText('Informe o .bpm, ou o .bpmn com o .png.')).toBeTruthy()
+  expect(form.getByRole('group', { name: 'Arquivos', description: 'Informe o .bpm, ou o .bpmn com o .png.' })).toBeTruthy()
   expect(botaoRegistrar(form).disabled).toBe(true)
 })
 

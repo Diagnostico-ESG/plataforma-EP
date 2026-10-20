@@ -66,10 +66,10 @@ export function FormularioDeVersao({ modulo, processo, modo, aoEnviada, aoCancel
       {numero !== null && (
         <p className="formulario-de-versao-previa">Esta versão será a <strong>{rotuloDaVersao({ numero, historica })}</strong>.</p>
       )}
-      <fieldset className="formulario-de-versao-campos" disabled={enviando}>
+      <fieldset className="formulario-de-versao-campos" disabled={enviando} aria-describedby={historica ? `${id}-dica` : undefined}>
         <legend>Arquivos</legend>
         {historica && <CampoDoNumeroHistorico texto={textoDoNumero} aoMudar={setTextoDoNumero} />}
-        {historica && <p className="formulario-de-versao-dica">Informe o .bpm, ou o .bpmn com o .png.</p>}
+        {historica && <p id={`${id}-dica`} className="formulario-de-versao-dica">Informe o .bpm, ou o .bpmn com o .png.</p>}
         {PAPEIS.map((papel) => {
           const arquivo = arquivos.escolhidos[papel]
           return (

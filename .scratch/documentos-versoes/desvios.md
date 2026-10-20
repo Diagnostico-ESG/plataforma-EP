@@ -153,3 +153,9 @@ Método: detector do Impeccable em `src/components/versoes` (sem achados) e leit
 - **TDD:** as funções puras, a falsa e os testes de banco foram vistos falhando antes do código ("Testes de banco" #141). Os testes de tela da ordem no destaque, nas anteriores e do espaço do relatório foram escritos depois do código e não foram vistos falhando.
 - **Tela não aberta no navegador:** os dois critérios `[visual]` da mudança seguem presumidos para o `/ship`.
 - **Commit da migração separado do dos testes de banco:** o teste foi comitado primeiro, para provar o vermelho. A cópia temporária dos testes de tela, que já estavam vermelhos (para comitar a migração antes da tela), foi barrada pela trava de segurança. Por isso a migração foi comitada depois de a bateria de tela ficar verde.
+
+## 2026-10-20 — /polir (mudança do .bpm na tela de versões)
+
+- **Auditoria (`/impeccable audit`), escopo: `src/components/versoes/` (destaque, lista, formulário, campo de arquivo).** O detector automático não achou nada. Cores e tamanhos vêm dos tokens, os alvos de clique têm 24 px ou mais e o formulário tem rótulos ligados aos campos, `fieldset`/`legend` e `role="alert"` nas recusas. Nenhum achado P0, P1 ou P2.
+- **Corrigido (P3, acessibilidade):** a dica do formulário de versão histórica ("Informe o .bpm, ou o .bpmn com o .png.") ficava solta; agora está ligada ao grupo "Arquivos" por `aria-describedby`, e o leitor de tela a anuncia ao entrar no grupo. O teste `App.registrarVersaoHistorica.test.tsx` passou a conferir essa ligação.
+- **Deixado de fora:** a conferência visual da ordem dos arquivos no destaque e do formulário no navegador. Os critérios `[visual]` seguem presumidos, como registrado acima; a tela só foi vista na vitrine local, com módulos falsos. O polimento visual (`polish`) não encontrou o que mexer além do item acima.
