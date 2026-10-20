@@ -17,3 +17,5 @@
 - [x] Testes do módulo real com o cliente simulado, da tabela dos motivos e da tela inteira com as falsas, cobrindo os itens acima, inclusive falha ao ler e ao pedir.
 - [x] Roteiro do cofre escrito para o usuário: lista numerada, um passo por linha, com o endereço direto do SQL Editor do projeto de desenvolvimento.
 - [x] [visual] A aba segue o estilo de Usuários e Catálogo de etapas; o resultado de cada tentativa se distingue pela cor das mensagens e pelo texto.
+
+Concluído em 2026-10-20 (commit 3f56e56)

@@ -331,7 +331,7 @@ export type ModuloDePlanilhas = {
 
 - [x] `npm test`, `npx tsc -b` e lint passando (o pre-commit confere).
 - [x] `supabase/AMBIENTES.md`: linha da migração aplicada (nome, data, "não destrutiva", teste 43 com os números das execuções antes e depois, padrão das linhas anteriores). `.scratch/exportacao-e-manutencao/desvios.md`: entrada datada com a exceção de `public.registrar_resultado_das_planilhas` (`security definer` em `public`, `anon` executa, por que e qual a trava), a decisão da automática silenciosa, qualquer ajuste de teste e o que ficou presumido na Tarefa 6.
-- [ ] Marcar os critérios do ticket e fechar pelo passo 4 do `/executar-complexo` (merge na `main`, `git branch -d`, linha `Concluído em`, push da `main` e dos marcos).
+- [x] Marcar os critérios do ticket e fechar pelo passo 4 do `/executar-complexo` (merge na `main`, `git branch -d`, linha `Concluído em`, push da `main` e dos marcos).
 - [x] Itens não testados do `/executar-complexo` que aconteceram → `.scratch/melhorias-protocolo.md`.
 
 ## Conferência do plano contra o ticket
