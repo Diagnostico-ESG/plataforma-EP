@@ -842,3 +842,8 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **2026-10-20 · Ocorrência: o navegador do app estava logado numa conta Google diferente da institucional, e a autorização do Data Studio foi dada nela antes de conferir a conta.** Sugestão: antes de pedir "pode autorizar", conferir a conta pelo ícone do perfil.
 - **2026-10-20 · Ocorrência: a trava de git bloqueou uma leitura inofensiva** (um `node -e` que lia `src/types/database.ts`, junto de um `grep` nas migrações) com a mensagem de apagar a pasta `.git`. Reescrito em partes menores, passou. Falso positivo da trava; não contornei.
 - **2026-10-20 · Ocorrência: roteiros antigos de `docs/` trazem o ref do projeto de desenvolvimento nos endereços.** Documentação nova usa `<ref>`; conferir se o critério "nenhum identificador real" deve valer para os roteiros antigos.
+
+## 2026-10-20 — /demanda, caminho de bug (testes de interface instáveis)
+
+- **2026-10-20 · Itens não testados que aconteceram:** classificação como bug com decisão de alcance (A/B/C) antes de agir; marco `marco/2026-10-20-antes-correcao-testes-instaveis`; correção na `main`; `/mattpocock-skills:code-review` sobre o diff da correção. Esperado: seguir o funil do bug; aconteceu: seguiu. Não houve `/polir` nem `/ship` (só `src/` de teste mudou). A avaliação é do usuário.
+- **2026-10-20 · Ocorrência: o teste vermelho de um bug que depende de carga não é determinístico.** Reproduzi a falha com 3 baterias em paralelo (1 de 3 falhou) e usei um teste de configuração (prazo ≥ 5 s) como vermelho/verde estável. Sugestão: o `/demanda` prever esse caso (bug de teste instável) no passo 2.
