@@ -770,3 +770,5 @@ Entregue em 2026-10-18 (commit e54f51b)
 Entregue em 2026-10-19 (commit 8d01ca8)
 Entregue em 2026-10-19 (commit 8ef4091)
 Entregue em 2026-10-19 (commit f3a12b3), com ressalva: critérios [visual] da parte 4 presumidos (a tela não foi conferida nesta entrega); Enter no cartão e voltar/recarregar do agrupamento sem teste de navegador
+
+Entregue em 2026-10-20 (commit 8a7efb7)
