@@ -2,9 +2,9 @@
 
 Status: ready-for-agent
 
-**Como resolve o problema.** Hoje os fluxogramas (.bpmn, .png e o .bpm do Bizagi) e os relatórios de cada processo ficam em pastas e e-mails, sem numeração confiável, sem saber quem enviou o quê e quando, e sem ligação com o andamento do processo. Com esta funcionalidade, o painel do processo ganha a seção **Versões**: a equipe envia cada versão (V1, V2…) com o .bpmn e o .png, o .bpm opcional e o relatório, junto ou depois; registra as versões históricas da primeira etapa do trabalho (V5F); acrescenta o relatório que ficou pendente ou marca "sem alteração de conteúdo"; substitui um arquivo enviado por engano; e baixa qualquer arquivo com o nome padrão (`CEE_V6_Nome do processo`). Os arquivos ficam no Drive compartilhado do CED, numa pasta aberta à equipe e organizada por setor e processo; a plataforma entra no Drive por uma conta de serviço do EP, cuja chave fica só numa função do servidor, e o banco guarda apenas os dados de cada arquivo. A plataforma avisa quando um arquivo foi alterado ou apagado direto no Drive. O banco impõe as regras (numeração, versão histórica só antes da primeira nova, processo em andamento, quem pode) e toda mudança entra no histórico do processo.
+**Como resolve o problema.** Hoje os fluxogramas (.bpmn, .png e o .bpm do Bizagi) e os relatórios de cada processo ficam em pastas e e-mails, sem numeração confiável, sem saber quem enviou o quê e quando, e sem ligação com o andamento do processo. Com esta funcionalidade, o painel do processo ganha a seção **Versões**: a equipe envia cada versão (V1, V2…) com o .bpm do Bizagi e o .png, o .bpmn opcional e o relatório, junto ou depois (ADR 0016: o fluxo se vê pelo .png); registra as versões históricas da primeira etapa do trabalho (V5F); acrescenta o relatório que ficou pendente ou marca "sem alteração de conteúdo"; substitui um arquivo enviado por engano; e baixa qualquer arquivo com o nome padrão (`CEE_V6_Nome do processo`). Os arquivos ficam no Drive compartilhado do CED, numa pasta aberta à equipe e organizada por setor e processo; a plataforma entra no Drive por uma conta de serviço do EP, cuja chave fica só numa função do servidor, e o banco guarda apenas os dados de cada arquivo. A plataforma avisa quando um arquivo foi alterado ou apagado direto no Drive. O banco impõe as regras (numeração, versão histórica só antes da primeira nova, processo em andamento, quem pode) e toda mudança entra no histórico do processo.
 
-Decisões de origem: sabatina de 2026-10-15 (`.scratch/documentos-versoes/sabatina.md`), `CONTEXT.md` (seção "Documentos") e ADRs 0005 (versão do processo com os arquivos dentro), 0006 (envio não muda a etapa), 0007 (arquivo se substitui sem guardar o anterior) e 0008 (arquivos no Drive compartilhado por conta de serviço).
+Decisões de origem: sabatina de 2026-10-15 (`.scratch/documentos-versoes/sabatina.md`), `CONTEXT.md` (seção "Documentos") e ADRs 0005 (versão do processo com os arquivos dentro), 0006 (envio não muda a etapa), 0007 (arquivo se substitui sem guardar o anterior) e 0008 (arquivos no Drive compartilhado por conta de serviço). Mudança de 2026-10-20 (sabatina do visualizador, que saiu da v1): ADR 0016 (versão exige .bpm e .png; .bpmn opcional); ver a seção "Mudança de 2026-10-20".
 
 ## Problema
 
@@ -17,7 +17,7 @@ O EP produz, para cada processo, uma sequência de fluxogramas e relatórios: o 
   - a marca **"relatório pendente"** na versão nova sem relatório;
   - as marcas **"alterado fora da plataforma"** e **"não encontrado no Drive"** no arquivo que mudou ou sumiu no Drive;
   - para Administrador e Integrante, com o processo em andamento: [Enviar versão]; [Registrar versão histórica], enquanto não houver versão nova; em cada versão com relatório pendente, [Acrescentar relatório] e [Sem alteração de conteúdo]; em cada arquivo de versão nova, [Substituir].
-- **Enviar versão:** um formulário no painel com os campos de arquivo .bpmn e .png (obrigatórios), .bpm (opcional), relatório .docx ou .pdf (opcional) e a observação (opcional). Mostra o número que a versão vai receber e o nome que cada arquivo vai ter. Confere os arquivos antes de enviar, mostra o progresso ("Enviando 2 de 3…") e só registra a versão depois que todos chegaram ao Drive.
+- **Enviar versão:** um formulário no painel com os campos de arquivo .bpm e .png (obrigatórios), .bpmn (opcional), relatório .docx ou .pdf (opcional) e a observação (opcional). Mostra o número que a versão vai receber e o nome que cada arquivo vai ter. Confere os arquivos antes de enviar, mostra o progresso ("Enviando 2 de 3…") e só registra a versão depois que todos chegaram ao Drive.
 - **Registrar versão histórica:** o mesmo formulário com o número digitado (5 vira V5F) e os arquivos que existirem (basta o .bpm, ou o .bpmn com o .png; relatório opcional).
 - **Acrescentar relatório:** escolhe a versão (a mais recente com relatório pendente vem escolhida) e envia o .docx ou o .pdf.
 - **Sem alteração de conteúdo:** na versão nova com relatório pendente, registra o relatório da versão anterior com o nome da versão nova, com um clique de confirmação.
@@ -31,15 +31,15 @@ A Consulta vê a seção e baixa os arquivos, sem nenhum botão de alteração, 
 
 ### Enviar uma versão
 
-1. Como integrante do EP, quero enviar o fluxograma de um processo (.bpmn e .png), para que a versão fique registrada com número, data e autor.
+1. Como integrante do EP, quero enviar o fluxograma de um processo (.bpm do Bizagi e .png), para que a versão fique registrada com número, data e autor.
 2. Como integrante do EP, quero que o número da versão seja dado pela plataforma, continuando a numeração do processo (inclusive a das versões históricas), para não errar a numeração à mão.
 3. Como integrante do EP, quero ver, antes de enviar, o número que a versão vai receber e o nome de cada arquivo, para conferir o que vai ser gravado.
-4. Como integrante do EP, quero enviar o .bpm do Bizagi junto, se tiver, para guardar o arquivo-fonte.
+4. Como integrante do EP, quero enviar o .bpmn junto, se tiver, sem que ele seja exigido (ADR 0016).
 5. Como integrante do EP, quero enviar o relatório junto com o fluxograma, quando ele já estiver pronto, para não precisar de um segundo envio.
 6. Como integrante do EP, quero escrever uma observação curta sobre o que mudou na versão, se quiser.
 7. Como integrante do EP, quero que a versão registre sozinha a etapa em que o processo está, para saber depois se ela foi o piloto, a técnica ou a correção da revisão.
 8. Como integrante do EP, quero que o envio não mexa nas etapas, para que o andamento continue sendo decidido por mim.
-9. Como integrante do EP, quero que o botão de enviar fique desabilitado enquanto faltam o .bpmn ou o .png, para saber o que falta.
+9. Como integrante do EP, quero que o botão de enviar fique desabilitado enquanto faltam o .bpm ou o .png, para saber o que falta.
 10. Como integrante do EP, quero ser avisado antes do envio se escolhi um arquivo com extensão errada, maior que 20 MB, um .png que não é imagem ou um .bpmn que não é BPMN, para não gravar o arquivo errado.
 11. Como integrante do EP, quero ver o progresso do envio, para saber que a plataforma está trabalhando.
 12. Como integrante do EP, quero que, se algum arquivo falhar, a versão não seja registrada e eu veja uma mensagem clara, sem perder o que preenchi, para tentar de novo.
@@ -121,7 +121,7 @@ A Consulta vê a seção e baixa os arquivos, sem nenhum botão de alteração, 
   - **conferência com o Drive falhou:** a lista aparece normalmente, com o aviso "Não foi possível conferir os arquivos no Drive." e sem as marcas de alteração;
   - **envio em andamento:** "Enviando 2 de 3…", com os campos travados;
   - **falha no envio, no download ou recusa:** mensagem em vermelho, sem perder o que foi preenchido.
-- **Recusas:** cada recusa chega como código (da função ou do banco) e vira mensagem na tela, no padrão de `recusasDeReunioes`: perfil sem permissão, processo fora de andamento, versão histórica depois de versão nova, número histórico repetido, versão sem .bpmn ou .png, histórica sem arquivo de fluxograma, relatório já existente, versão anterior sem relatório (no "sem alteração"), substituir em versão histórica, tipo de arquivo diferente na substituição, extensão não aceita, arquivo maior que 20 MB, Drive sem espaço, e na exclusão do processo a contagem de versões.
+- **Recusas:** cada recusa chega como código (da função ou do banco) e vira mensagem na tela, no padrão de `recusasDeReunioes`: perfil sem permissão, processo fora de andamento, versão histórica depois de versão nova, número histórico repetido, versão sem .bpm ou .png, histórica sem arquivo de fluxograma, relatório já existente, versão anterior sem relatório (no "sem alteração"), substituir em versão histórica, tipo de arquivo diferente na substituição, extensão não aceita, arquivo maior que 20 MB, Drive sem espaço, e na exclusão do processo a contagem de versões.
 - **Histórico do processo:** os eventos de versão entram na lista de eventos que já existe, com textos próprios (rótulo, papel do arquivo, nome, e, na substituição, o nome e o hash do que saiu).
 - **Módulo de versões:** um módulo próprio, ao lado de processos e reuniões, com a mesma forma (interface com uma implementação real e uma falsa nomeada): listar as versões de um processo (com os arquivos e as marcas da conferência), enviar versão, registrar histórica, acrescentar relatório, sem alteração de conteúdo, substituir e baixar. A implementação real fala com a função do servidor e envia os bytes direto ao Drive pela sessão de envio; a leitura da lista vem do banco.
 
@@ -245,7 +245,7 @@ Função pura, usada no formulário (prévia) e na função do servidor (nome gr
 | Versão histórica só enquanto o processo não tem versão nova | gatilho antes de incluir | histórica depois do V6 recusada |
 | Versão nova registra a etapa atual do processo; a histórica não tem etapa | gatilho antes de incluir | versão enviada com a etapa "Reunião de modelagem" atual guarda essa etapa; histórica com etapa nula |
 | Envio e alterações só com o processo em andamento | gatilho antes de incluir em `versoes` e de incluir e alterar em `arquivos_da_versao` | processo suspenso, cancelado ou concluído recusado |
-| Versão nova tem .bpmn e .png; histórica tem .bpm ou o par .bpmn e .png | gatilho de restrição adiado para o fim da gravação (`deferrable initially deferred`) | versão sem .png recusada; histórica só com .bpm aceita; histórica só com .png recusada |
+| Versão nova tem .bpm e .png (.bpmn opcional; ADR 0016); histórica tem .bpm ou o par .bpmn e .png | gatilho de restrição adiado para o fim da gravação (`deferrable initially deferred`) | versão sem .png recusada; versão sem .bpm recusada; versão com .bpm e .png, sem .bpmn, aceita; histórica só com .bpm aceita; histórica só com .png recusada |
 | Um arquivo por papel em cada versão | restrição única (`versao_id`, `papel`) | segundo relatório na mesma versão recusado |
 | Formato coerente com o papel; tamanho até 20 MB; nome até 300 caracteres | restrições | relatório `.png` recusado; 20 MB + 1 byte recusado |
 | Versão histórica é somente leitura | gatilho antes de incluir e alterar em `arquivos_da_versao` | relatório acrescentado ou arquivo substituído em histórica recusado (o relatório da histórica só entra na criação dela) |
@@ -271,7 +271,7 @@ Nenhuma migração destrutiva: tabelas, tipo, gatilhos, funções e políticas n
   - **Como:** Vitest com Testing Library, renderizando o aplicativo inteiro com a implementação falsa nomeada do módulo de versões. Ela guarda versões, arquivos, conferências e histórico, aceita falhas programáveis (no envio de um arquivo, no registro, no download, na conferência) e imita as recusas, ao lado das falsas do acesso, dos cadastros, dos processos e das reuniões.
   - **O que cobre:**
     - a seção Versões para cada perfil (Consulta só com os links de download);
-    - enviar versão com .bpmn e .png, com .bpm, com relatório; número e nomes na prévia; botão desabilitado sem arquivo obrigatório;
+    - enviar versão com .bpm e .png, com .bpmn, com relatório; número e nomes na prévia; botão desabilitado sem arquivo obrigatório;
     - cada conferência de arquivo que falha (extensão, tamanho, PNG, BPMN);
     - progresso e falha no meio do envio (nada registrado, formulário preservado);
     - registrar histórica (só .bpm; várias); botão sumindo depois da versão nova; número repetido recusado;
@@ -300,7 +300,8 @@ Nenhuma migração destrutiva: tabelas, tipo, gatilhos, funções e políticas n
 - Tipo "outro" de documento.
 - Trava da versão enviada ao setor ou aprovada: decidida no planejamento da funcionalidade 6.
 - Envio que muda a etapa (atribuir a etapa 5, concluir a etapa 5): ADR 0006; vira demanda se fizer falta.
-- PNG gerado a partir do .bpmn e o visualizador: funcionalidade 7.
+- PNG gerado a partir do .bpmn e o visualizador de .bpmn: saíram da v1 em 2026-10-20 (ADR 0016; backlog, versão futura).
+- Acrescentar o .bpmn depois a uma versão que não o tem (só no envio; ver "Mudança de 2026-10-20").
 - Checagem automática do conteúdo do .bpmn: v1.5.
 - Converter .bpm em .bpmn: backlog.
 - Baixar a versão inteira num .zip.
@@ -334,7 +335,7 @@ Nenhuma migração destrutiva: tabelas, tipo, gatilhos, funções e políticas n
   - "versões nunca são apagadas; substituir cria versão nova" virou "a versão nunca se apaga; um arquivo se substitui sem guardar o anterior" (ADR 0007);
   - Storage com cópia ao Drive na v1.5 virou Drive desde já, sem Storage (ADR 0008);
   - "referência ao Drive" deixou de ser opcional: todo arquivo tem o identificador do Drive;
-  - o .bpm é opcional (decisão aberta 11.8).
+  - o .bpm é opcional (decisão aberta 11.8). Mudou em 2026-10-20 (ADR 0016): na versão nova o .bpm é obrigatório e o .bpmn opcional, ao contrário da regra 3 da seção 5 da especificação, e o visualizador de .bpmn saiu da v1.
 - **Decisões tomadas ao escrever a spec, a confirmar na leitura:**
   - **"Sem alteração de conteúdo" faz uma cópia do relatório no Drive** (pela própria função, sem passar pelo navegador), com o nome da versão nova. Na sabatina, a ideia era não duplicar o arquivo, mas isso valia para o Storage; com a pasta aberta à equipe, sem a cópia o relatório do V7 não apareceria no Drive com o nome do V7, e substituir um dos dois mudaria os dois.
   - **O hash é o MD5 informado pelo Drive**, lido pela função depois do envio, e não um hash calculado no navegador: é o único que o Drive informa de volta, e é com ele que a conferência "alterado fora da plataforma" funciona.
@@ -365,5 +366,70 @@ O que a implementação faz de diferente do texto acima, ou além dele. O porqu�
 - **Recusas da tela:** arquivo vazio e `entrada_invalida` têm frase própria (antes viravam "erro inesperado").
 - **Provas pendentes:** a conferência visual das telas e a prova no Drive dos critérios 3 e 4 do ticket 08 (sigla trocada e mudança de setor) e da saída do Integrante dos tickets 01, 02, 04 e 05. A função corrigida nesta etapa ainda precisa ser publicada no desenvolvimento.
 
+## Mudança de 2026-10-20: a versão exige o .bpm e o .png (ADR 0016)
+
+**Como resolve.** O trabalho do EP acontece no Bizagi: o .bpm é o arquivo que permite continuar o fluxo a partir de uma versão, e o .png é o que se lê. Até aqui a versão exigia o .bpmn, que só serviria ao visualizador no navegador; o visualizador saiu da v1 e o fluxo se vê pelo .png, que já abre em aba nova. Com a mudança, a versão nova exige o .bpm e o .png, o .bpmn fica opcional, e a "versão completa" que destrava a Revisão pelo setor e a Aprovação passa a ser .bpm, .png e relatório. Nenhuma tela nova; muda o que é obrigatório, a ordem dos campos e dos arquivos, e as frases do que falta.
+
+### Histórias de usuário
+
+51. Como integrante do EP, quero que a versão nova exija o .bpm e o .png, para que toda versão tenha o arquivo editável do Bizagi e a imagem do fluxo.
+52. Como integrante do EP, quero poder enviar uma versão sem o .bpmn, porque a plataforma não o usa na v1.
+53. Como integrante do EP, quero enviar o .bpmn junto, se tiver, e vê-lo na versão como os demais arquivos.
+54. Como integrante do EP, quero que o botão de enviar fique desabilitado enquanto faltam o .bpm ou o .png, e não por faltar o .bpmn.
+55. Como integrante do EP, quero ver no formulário de envio, nesta ordem, "Fluxograma Bizagi (.bpm)", "Imagem do fluxo (.png)" e ".bpmn (opcional)", e depois o relatório e a observação.
+56. Como usuário, quero ver os arquivos da versão (no destaque e nas versões anteriores) na ordem .png, .bpm, relatório e .bpmn (se houver), com o .png primeiro porque é o que se abre para ver o fluxo.
+57. Como integrante do EP, quero que a plataforma recuse, mesmo fora da tela, uma versão nova sem .bpm, com a mensagem "A versão precisa do .bpm e do .png.".
+58. Como integrante do EP, quero ser impedido de concluir a Revisão pelo setor ou a Aprovação quando a versão mais recente não tem .bpm, .png ou relatório, com a janela dizendo o que falta ("A V8 está sem .bpm e relatório.").
+59. Como integrante do EP, quero concluir a Revisão pelo setor e a Aprovação quando a versão mais recente tem .bpm, .png e relatório, mesmo sem .bpmn.
+60. Como integrante do EP, quero substituir o .bpmn de uma versão que já o tem, como qualquer outro arquivo; a versão sem .bpmn não ganha botão para acrescentá-lo depois.
+61. Como integrante do EP, quero que a versão histórica continue aceitando só o .bpm, ou o par .bpmn e .png, como antes.
+62. Como usuário, quero que as versões já gravadas continuem aparecendo e baixando como antes, com ou sem .bpm.
+
+### Decisões de implementação
+
+- **Banco (migração nova, não destrutiva):** recria a função do gatilho que confere os arquivos da versão nova, trocando o par exigido `bpmn` + `png` por `bpm` + `png`; a regra da histórica não muda. Recria `private.papeis_que_faltam` com `bpm`, `png` e `relatorio`, nessa ordem (a ordem da frase), usada pela trava da Revisão pelo setor e da Aprovação (ADR 0009). O tipo `papel_do_arquivo` não muda (o `bpmn` continua aceito). O gatilho só age na inclusão: nenhuma versão já gravada é revista, e não há dado a corrigir (a produção ainda não existe; no desenvolvimento só há dados inventados).
+- **Recusa do banco:** o código da recusa da versão sem os arquivos obrigatórios passa de `versao_sem_bpmn_e_png` a `versao_sem_bpm_e_png` (o nome antigo enganaria quem buscar por ele), no gatilho recriado e na tradução da tela, com o texto "A versão precisa do .bpm e do .png.".
+- **Tela, formulário de envio:** os papéis obrigatórios da versão nova passam a ser `bpm` e `png`; os campos aparecem na ordem .bpm, .png, .bpmn, relatório, observação; os rótulos passam a "Fluxograma Bizagi (.bpm)", "Imagem do fluxo (.png)" e ".bpmn (opcional)". O formulário da histórica não muda de regra (basta o .bpm, ou o .bpmn com o .png), só acompanha a ordem nova.
+- **Tela, arquivos da versão:** a ordem de exibição passa a .png, .bpm, relatório, .bpmn, no destaque e nas versões anteriores, com os rótulos curtos dos botões ajustados ao novo papel do .bpm (o "Fluxograma" deixa de ser o .bpmn). Os rótulos exatos o `/polir` pode ajustar.
+- **Tela, frase do que falta:** a lista dos exigidos da janela de concluir a Revisão pelo setor e a Aprovação passa a .bpm, .png e relatório, na mesma ordem do banco, com o rótulo ".bpm".
+- **Função do servidor:** nada muda; ela já aceita os quatro papéis, e quem exige os obrigatórios é o banco. Não precisa de nova publicação por causa desta mudança.
+- **Conferência no navegador:** o .bpm continua conferido só pela extensão e pelo tamanho; o .bpmn, quando enviado, continua conferido como BPMN.
+
+### Modelo de dados
+
+- **Tabelas e colunas:** nenhuma criada ou alterada; o tipo `papel_do_arquivo` fica como está.
+- **Quem pode o quê:** nada muda (a tabela "quem pode o quê" acima continua valendo).
+- **Regras que o banco impõe, alteradas:**
+
+| Regra | Como | Caso de teste que a prova |
+|---|---|---|
+| Versão nova tem .bpm e .png; .bpmn opcional | gatilho de restrição adiado, recriado | sem .bpm recusada com `versao_sem_bpm_e_png`; .bpm e .png sem .bpmn aceita; .bpmn e .png sem .bpm recusada |
+| Versão completa (trava da Revisão pelo setor e da Aprovação) é .bpm, .png e relatório | `private.papeis_que_faltam` recriada | concluir com .bpm, .png e relatório sem .bpmn aceito; sem .bpm recusado, com `bpm` entre os que faltam |
+
+- **Migração:** não destrutiva (só recria duas funções); nenhum dado existente muda, e nenhuma versão já gravada é revista.
+
+### Decisões de teste
+
+- **Ponto de teste: a tela inteira**, com as implementações falsas nomeadas (a falsa de versões passa a recusar a versão nova sem .bpm ou .png, imitando o banco). Casos: enviar com .bpm e .png sem .bpmn; botão desabilitado sem .bpm; botão habilitado sem .bpmn; ordem dos campos no formulário; ordem dos arquivos no destaque e nas anteriores; concluir a Revisão pelo setor e a Aprovação com .bpm, .png e relatório sem .bpmn; janela dizendo "sem .bpm" quando falta; histórica só com .bpm continua aceita. Os testes da tela que hoje montam versões com .bpmn e .png passam a montá-las com .bpm e .png onde a versão precisa estar completa.
+- **Banco (pgTAP, antes da migração):** versão nova com .bpm e .png aceita; sem .bpm recusada; sem .png recusada; com .bpmn e .png sem .bpm recusada; `papeis_que_faltam` devolve `bpm` quando falta; concluir Revisão pelo setor e Aprovação com .bpm, .png e relatório, sem .bpmn, aceito. Os testes antigos que gravam versões com .bpmn e .png passam a gravá-las com .bpm e .png. Rodam pelo "Testes de banco"; a migração vai pelo "Migrar banco de desenvolvimento".
+- **Funções puras:** papéis obrigatórios, ordem dos arquivos e frase do que falta, com testes unitários pequenos.
+- **Arte anterior:** `App.enviarVersao`, `App.versoesNoProcesso`, `App.revisaoDoSetor`, `App.aprovacao`; pgTAP `27` (versões) e `38` (etapas protegidas e revisão do setor).
+
+### Critérios para o `/ship`
+
+- `[visual]` O formulário de envio mostra .bpm e .png como obrigatórios e o .bpmn por último, marcado como opcional.
+- `[visual]` No destaque da versão, o .png vem primeiro, depois o .bpm, o relatório (ou o espaço de acrescentar) e o .bpmn, se houver.
+
+### Fora do escopo desta mudança
+
+- Botão "Acrescentar .bpmn" numa versão que não o tem.
+- Visualizador de .bpmn e geração do .png a partir do .bpmn (backlog).
+- Rever as versões já gravadas sem .bpm.
+
+### Outras specs afetadas
+
+A trava da versão completa está descrita na spec de `revisoes-aprovacao` (".bpmn, .png e relatório") e os botões dos arquivos no destaque, na de `processos-etapas` ("Fluxograma .bpmn", "Imagem .png"…). Esta seção é a que vale; as duas specs recebem uma nota apontando para cá.
+
 Entregue em 2026-10-16 (commit 869901d), com ressalva: critérios [visual] presumidos (a tela não foi conferida) e função arquivos-no-drive corrigida ainda não publicada no desenvolvimento
 Entregue em 2026-10-19 (commit 8ef4091), com ressalva: as provas no Drive real (critérios 3 e 4 do ticket 08 e a saída do Integrante dos tickets 01, 02, 04 e 05) seguem pendentes; a tela dos arquivos foi vista só na vitrine local, com módulos falsos
+Em revisão desde 2026-10-20

@@ -22,7 +22,7 @@ Depois do Relatório e modelagem técnica (etapa 2 do catálogo), cada processo 
 
 - **Concluir a Revisão interna:** a janela de concluir ganha, acima de "Quem fica com a próxima etapa?", o **Resultado da revisão**: "Sem alteração: segue a V7" ou "Corrigida: a V8, enviada por você, corrige a V7". Em "Corrigida", o **Escopo** (fluxograma, relatório ou ambos). Há também um **Comentário** opcional. Quem conclui é o revisor. A revisão e a conclusão se gravam juntas.
 - **Brecha fechada** (mapa, parte 5): quem enviou a versão revisada não conclui a revisão. Se a pessoa enviou a versão mais recente, só cabe "Corrigida", e só se a versão anterior for de outra pessoa. Quando nenhuma opção cabe, a janela diz por quê ("Quem enviou a versão V7 não pode revisá-la.") e o botão fica desabilitado.
-- **Concluir a Revisão pelo setor:** a janela de sempre. Se a versão mais recente não estiver completa (.bpmn, .png e relatório), a janela diz o que falta ("A V8 está sem relatório.") e não deixa concluir.
+- **Concluir a Revisão pelo setor:** a janela de sempre. Se a versão mais recente não estiver completa (.bpmn, .png e relatório; desde 2026-10-20, .bpm, .png e relatório, ADR 0016), a janela diz o que falta ("A V8 está sem relatório.") e não deixa concluir.
 - **Concluir a Aprovação pelo setor:** a janela mostra "Versão aprovada: V8" e pede o **Número do E-protocolo**, o **Link** e a **Data da aprovação**, os três opcionais. Com a versão mais recente incompleta, diz o que falta e não deixa concluir. Sem etapa pendente depois, a janela aparece mesmo assim, sem a pergunta do responsável.
 - **Na gaveta da etapa** (lista Etapas do verso):
   - **Revisão interna:** as revisões, da mais recente para a mais antiga, cada uma com a versão revisada, o revisor, a data, o resultado ("Sem alteração" ou "Corrigida, gerou a V8", com o escopo) e o comentário.
@@ -147,7 +147,7 @@ A Consulta vê os registros e o selo, sem nenhum botão. Quem não pode alterar 
 - `concluir_revisao_interna(p_andamento, p_resultado, p_escopo, p_comentario, p_responsavel)`: inclui a revisão e chama `avancar_etapa(p_andamento, 'concluir', null, p_responsavel)`, numa gravação só.
 - `concluir_aprovacao(p_andamento, p_numero, p_link, p_data, p_responsavel)`: inclui a aprovação e chama `avancar_etapa` do mesmo jeito.
 
-**"Versão mais recente"** é a de maior número do processo; **"completa"** é a que tem arquivos de papel `bpmn`, `png` e `relatorio`. Uma função pequena em `private` responde cada uma, usada pelos gatilhos.
+**"Versão mais recente"** é a de maior número do processo; **"completa"** é a que tem arquivos de papel `bpmn`, `png` e `relatorio`. Uma função pequena em `private` responde cada uma, usada pelos gatilhos. (Mudou em 2026-10-20, ADR 0016: "completa" passa a ser `bpm`, `png` e `relatorio`; vale a seção "Mudança de 2026-10-20" da spec de `documentos-versoes`.)
 
 **Privilégios padrão:** cada tabela nova nasce com `revoke all` de visitante e de logado e concede de volta a logado: ler; incluir só as colunas que a pessoa escolhe (revisão: `processo_id`, `resultado`, `escopo`, `comentario`; aprovação: `processo_id`, `numero_eprotocolo`, `link`, `aprovada_em`); alterar só as editáveis (revisão: `escopo`, `comentario`; aprovação: `numero_eprotocolo`, `link`, `aprovada_em`); apagar só na aprovação, que um gatilho limita à volta de etapa. O teste `10_privilegios_padrao` continua passando.
 

@@ -337,7 +337,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
     - processo suspenso ou cancelado: a gaveta mostra só a leitura, sem botões.
   - **Coluna esquerda — Arquivos:** a mesma seção da funcionalidade `documentos-versoes`, com outra apresentação:
     - **linha de destaque** da versão mais recente: número (mono, 600), data (mono) e, quando falta algo, a pílula âmbar "falta relatório";
-    - embaixo, um botão para cada arquivo dela ("Fluxograma .bpmn", "Imagem .png", "Relatório .docx", com a barrinha de cor do tipo e o ícone de baixar);
+    - embaixo, um botão para cada arquivo dela ("Fluxograma .bpmn", "Imagem .png", "Relatório .docx", com a barrinha de cor do tipo e o ícone de baixar; desde 2026-10-20, na ordem .png, .bpm, relatório, .bpmn, ADR 0016 e seção "Mudança de 2026-10-20" da spec de `documentos-versoes`);
     - o relatório que falta aparece como espaço tracejado [+ Acrescentar relatório] no lugar onde ele estaria (só para quem pode enviar);
     - [Enviar versão] no título da seção; "Registrar versão histórica" num "⋯" da seção; Substituir no "⋯" de cada arquivo, como já é;
     - as versões anteriores recolhidas em "Versões anteriores ({n})", que abre a lista que já existe;
