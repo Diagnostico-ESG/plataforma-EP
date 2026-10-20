@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import type { AcaoDaEtapa } from '../processos/caminhoDeEtapas'
-import { type PedidoDeAvanco, type PedidoDeTexto, gravarAvanco, gravarRevisao, gravarTexto } from '../processos/gravarAcoes'
+import {
+  type PedidoDeAvanco, type PedidoDeTexto, gravarAprovacao, gravarAvanco, gravarRevisao, gravarTexto,
+} from '../processos/gravarAcoes'
 import type { EtapaDoCaminho, ModuloDeProcessos } from '../processos/tipos'
-import type { DadosDaRevisao, ModuloDeRevisoes } from '../revisoes/tipos'
+import type { DadosDaAprovacao, DadosDaRevisao, ModuloDeRevisoes } from '../revisoes/tipos'
 import { useGravacaoComFalha } from './useGravacaoComFalha'
 
 /**
@@ -19,7 +21,8 @@ export function useAcoesDaEtapa(processos: ModuloDeProcessos, revisoes: ModuloDe
   function agir(acao: AcaoDaEtapa, etapa: EtapaDoCaminho, proxima: EtapaDoCaminho | null) {
     if (acao === 'iniciar') return executar(() => processos.iniciarEtapa(etapa.id), aoMudar)
     if (acao === 'voltar') return setAvanco({ acao, etapa, proxima: etapa })
-    if (proxima) return setAvanco({ acao, etapa, proxima })
+    // Concluir a Aprovação pede o E-protocolo na janela, mesmo sem etapa pendente depois.
+    if (proxima || (acao === 'concluir' && etapa.codigo === 'aprovacao_setor')) return setAvanco({ acao, etapa, proxima })
     if (acao === 'concluir') return executar(() => processos.concluirEtapa(etapa.id, null), aoMudar)
     setPedido({ acao, etapa })
   }
@@ -41,12 +44,20 @@ export function useAcoesDaEtapa(processos: ModuloDeProcessos, revisoes: ModuloDe
     return falhou
   }
 
+  // A janela da Aprovação também espera a gravação: devolve a frase da falha ou null.
+  async function gravarAprovacaoDaEtapa(dados: DadosDaAprovacao, responsavelId: string | null): Promise<string | null> {
+    if (!avanco) return null
+    const falhou = await gravarAprovacao(revisoes, avanco.etapa, dados, responsavelId, aoSumir)
+    if (!falhou) aoMudar()
+    return falhou
+  }
+
   function mudarResponsavel(etapa: EtapaDoCaminho, usuarioId: string | null) {
     executar(() => processos.mudarResponsavelDaEtapa(etapa.id, usuarioId), aoMudar)
   }
 
   return {
-    falha, pedido, avanco, agir, gravarComTexto, gravarComAvanco, gravarRevisaoDaEtapa, mudarResponsavel,
+    falha, pedido, avanco, agir, gravarComTexto, gravarComAvanco, gravarRevisaoDaEtapa, gravarAprovacaoDaEtapa, mudarResponsavel,
     fecharPedido: () => setPedido(null), fecharAvanco: () => setAvanco(null),
   }
 }

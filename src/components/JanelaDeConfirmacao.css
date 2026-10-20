@@ -97,3 +97,9 @@
   color: var(--texto-2);
   font-size: var(--tam-secundario);
 }
+
+/* A versão que a Aprovação pelo setor aprova, em destaque no alto do bloco (JanelaDeAvanco). */
+.janela-aprovada {
+  margin: var(--esp-4) 0 0;
+  font-weight: 600;
+}
