@@ -74,7 +74,7 @@ insert into _tap (linha) select is(pg_temp.status('Processo Avanco', 'relatorio_
 insert into _tap (linha) select is(pg_temp.status('Processo Avanco', 'revisao_interna'),
   'em_andamento'::public.status_da_etapa, 'a próxima entra em andamento');
 insert into _tap (linha) select ok(
-  (select iniciada_em = current_date from public.andamentos where id = pg_temp.andamento('Processo Avanco', 'revisao_interna')),
+  (select iniciada_em = private.hoje() from public.andamentos where id = pg_temp.andamento('Processo Avanco', 'revisao_interna')),
   'a próxima começa hoje');
 insert into _tap (linha) select is(pg_temp.responsavel('Processo Avanco', 'revisao_interna'),
   '00000000-0000-0000-0000-0000000000a1'::uuid, 'a próxima fica com o responsável escolhido');

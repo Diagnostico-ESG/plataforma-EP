@@ -51,7 +51,7 @@ insert into _tap (linha) select lives_ok($sql$select pg_temp.agir('modelagem', '
   'iniciar a Modelagem piloto sem depender do setor');
 insert into _tap (linha) select is(
   (select iniciada_em from public.andamentos where id = pg_temp.andamento('Processo Andamento', 'modelagem')),
-  current_date, 'iniciar grava a data de início de hoje');
+  private.hoje(), 'iniciar grava a data de início de hoje');
 insert into _tap (linha) select throws_ok(
   $sql$select pg_temp.agir('relatorio_modelagem_tecnica', 'em_andamento')$sql$, 'P0001',
   'ja_ha_etapa_em_andamento:Modelagem piloto', 'segunda etapa em andamento no processo é recusada');
@@ -59,7 +59,7 @@ insert into _tap (linha) select lives_ok($sql$select pg_temp.agir('modelagem', '
   'concluir a etapa em andamento');
 insert into _tap (linha) select is(
   (select resolvida_em from public.andamentos where id = pg_temp.andamento('Processo Andamento', 'modelagem')),
-  current_date, 'concluir grava a data de conclusão de hoje');
+  private.hoje(), 'concluir grava a data de conclusão de hoje');
 
 -- Sequência, dispensa, nota e transições.
 insert into _tap (linha) select throws_ok(
