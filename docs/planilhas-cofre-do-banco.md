@@ -57,6 +57,7 @@ Este roteiro vale para o projeto de **desenvolvimento**. A produção ainda não
 1. No SQL Editor, rode `select id, name from vault.secrets where name = '<nome>';` e anote o `id` (o nome é um dos quatro do passo 10).
 2. Rode `select vault.update_secret('<id>', '<novo-valor>');`, com o `id` do passo anterior e o novo valor.
 
-## O que ainda não existe (ticket 03)
 
-Até o ticket 03, um pedido de atualização é registrado e enviado, mas **nada escreve nas planilhas**: a tentativa fica "Em andamento" e passa a "Sem resposta" depois de 10 minutos. O ticket 03 traz a função, o segredo novo dela (a mesma senha interna, cadastrada com `npx supabase secrets set`, por você) e o passo de ligar a API do Google Planilhas (Sheets) no projeto do Google Cloud.
+## O que vem depois
+
+Com o cofre gravado, falta publicar a função que escreve as planilhas, ligar a API do Google Planilhas (Sheets) e gravar os dois segredos novos dela. Isso está em `docs/planilhas-publicar-a-funcao.md`. Enquanto a função não estiver publicada, um pedido de atualização é registrado e enviado, mas **nada escreve nas planilhas**: a tentativa fica "Em andamento" e passa a "Sem resposta" depois de 10 minutos.
