@@ -16,3 +16,5 @@
 - [x] O histórico do catálogo mostra a mudança de fase.
 - [x] Testes do módulo real com o cliente simulado e da tela inteira com as falsas, cobrindo os itens acima, inclusive falha ao gravar.
 - [x] [visual] O campo e a coluna cabem no formulário e na tabela do catálogo sem quebrar o alinhamento, no notebook (1366×768).
+
+Concluído em 2026-10-20 (commit 1aa7e58)
