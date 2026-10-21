@@ -68,3 +68,15 @@ Relatório separado, só com as fontes da **planilha pública** (nenhuma fonte i
 
 - **Interno:** compartilhado como Visualizador, à mão pelo usuário, com as oito pessoas da equipe; o usuário confirmou acesso geral "Restrito". Uma das pessoas só foi aceita pelo Google depois de o endereço ter conta do Google (e-mail institucional sem conta Google dá "Esse endereço não existe"; a saída é a pessoa criar uma Conta do Google com o endereço atual).
 - **Público:** "Não listado", papel Leitor, feito por Arquivo > Compartilhar > Configurações de link, com o "sim" do usuário; conferido reabrindo a janela. No painel estreito do navegador do app, Compartilhar fica dentro do menu Arquivo.
+
+## Visual do Power BI na página 1 do interno (2026-10-21)
+
+Insumo para o ticket 05. Escolha padrão (usuário sem preferência firme): sem cópia de segurança do relatório (o navegador do app bloqueia a aba da cópia); proteção pelo Histórico de versões do Data Studio. Trabalho feito pelo Claude in Chrome na conta do CED; o editor pediu autorização do Google Planilhas na primeira abertura no Chrome (erro enganoso "a planilha não existe mais").
+
+- **Página:** 1200 × 680 px (proporção do Power BI), fundo `#E8EDF5`, componentes brancos com raio 10, cabeçalho `#003070`, grade de 10 px.
+- **Cartões:** fonte Fases; título pelo "Nome de exibição" do campo na métrica; avanços com tipo Porcentagem; texto em `#003070`. Sem barra de progresso nem linha colorida (limite do Data Studio).
+- **Painel A:** barras horizontais, dimensão Fase, métrica `% concluído` = `Concluídas / Total de processos` (Porcentagem, 0 casas), barras `#003070`, rótulos ligados, sem legenda.
+- **Painel B:** tabela dinâmica Área × Fase; métrica `Situação nº` = `MAX(CASE Situação WHEN "Concluída" THEN 4 WHEN "Em andamento" THEN 3 WHEN "Pronto para iniciar" THEN 2 ELSE 1 END)`; aparência Número; 4 regras de formatação condicional (4 `#3DBE7A`, 3 `#F5A623`, 2 `#3F8FE0`, 1 `#E3E7EF`), cor da fonte igual à do fundo para esconder o número. Largura mínima de coluna da dinâmica (~77 px): o painel precisa ser largo para as 7 etapas.
+- **Painel C:** barras `#003070`, rótulos ligados, sem legenda, linha de referência 12.
+- **Limites do Data Studio:** sem campo de posição/tamanho (só arrasto; a grade ajuda); sem barra de progresso nos cartões; sem pílulas de situação; texto de título é caixa de texto à parte.
+- **Faltam na página 1:** legenda das cores, seletor de Setor, faixa "Visão Geral", frases calculadas. Páginas 2, 3 e público: o usuário continua à mão.
