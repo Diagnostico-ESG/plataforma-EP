@@ -18,6 +18,8 @@ select is_empty(
   'toda view de public tem security_invoker = true'
 );
 
+-- Única exceção, por decisão registrada (ADR 0018 e desvios.md de exportacao-e-manutencao): a Edge Function devolve o resultado
+-- da atualização das planilhas sem login, e a trava é a ficha de uso único (teste 43).
 -- proacl nulo quer dizer o padrão do Postgres: execução liberada a todos (PUBLIC).
 select is_empty(
   $sql$
@@ -29,6 +31,7 @@ select is_empty(
     where n.nspname = 'public'
       and a.privilege_type = 'EXECUTE'
       and (a.grantee = 0 or r.rolname = 'anon')
+      and p.proname <> 'registrar_resultado_das_planilhas'
       and not exists (select 1 from pg_depend d where d.objid = p.oid and d.deptype = 'e')
   $sql$,
   'nenhuma função de public pode ser executada por visitante (anon ou public)'
@@ -41,6 +44,7 @@ select is_empty(
     join pg_namespace n on n.oid = p.pronamespace
     where n.nspname = 'public'
       and p.prosecdef
+      and p.proname <> 'registrar_resultado_das_planilhas'
       and not exists (select 1 from pg_depend d where d.objid = p.oid and d.deptype = 'e')
   $sql$,
   'nenhuma função security definer em public (elas ficam em private, fora da API)'
