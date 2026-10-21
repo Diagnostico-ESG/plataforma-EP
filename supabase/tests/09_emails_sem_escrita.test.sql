@@ -1,6 +1,6 @@
 -- Ninguém cria, altera ou apaga e-mail em usuarios_emails pela API; só o gatilho do primeiro acesso inclui
 -- (login-perfis, tabela "quem pode o quê" da spec; lacuna achada na revisão do /ship, 2026-10-08).
--- Sem política de escrita, a RLS recusa a inclusão (42501) e faz alterar e apagar não tocarem em linha nenhuma.
+-- Ninguém tem privilégio de escrita na tabela (migração sem_privilegios_a_mais_no_login): incluir, alterar e apagar recusam com 42501.
 begin;
 create extension if not exists pgtap with schema extensions;
 -- As linhas do pgTAP vão para _tap e saem na exceção do fim (ver scripts/relatorio-tap.mjs).
@@ -38,11 +38,11 @@ begin
   insert into _tap (linha) select throws_ok(
     format($sql$insert into public.usuarios_emails (usuario_id, email) values (%L, 'outro.teste@ccivil.pr.gov.br')$sql$, id_alvo),
     '42501', null, quem || ' não cria e-mail');
-  with alteradas as (
-    update public.usuarios_emails set email = 'trocado.teste@ccivil.pr.gov.br' where usuario_id = id_alvo returning 1)
-  insert into _tap (linha) select is((select count(*)::int from alteradas), 0, quem || ' não altera e-mail');
-  with apagadas as (delete from public.usuarios_emails where usuario_id = id_alvo returning 1)
-  insert into _tap (linha) select is((select count(*)::int from apagadas), 0, quem || ' não apaga e-mail');
+  insert into _tap (linha) select throws_ok(
+    format($sql$update public.usuarios_emails set email = 'trocado.teste@ccivil.pr.gov.br' where usuario_id = %L$sql$, id_alvo),
+    '42501', null, quem || ' não altera e-mail');
+  insert into _tap (linha) select throws_ok(
+    format($sql$delete from public.usuarios_emails where usuario_id = %L$sql$, id_alvo), '42501', null, quem || ' não apaga e-mail');
   reset role;
 end $$;
 grant execute on function pg_temp.conferir_que_nao_escreve(text, text, uuid, text) to anon, authenticated;

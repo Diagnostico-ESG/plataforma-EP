@@ -83,10 +83,8 @@ reset role;
 -- Visitante (sem login)
 select set_config('request.jwt.claims', '{"role":"anon"}', true);
 set local role anon;
-insert into _tap (linha) select is(
-  (select count(*)::int from public.usuarios), 0, 'Visitante não lê usuários');
-insert into _tap (linha) select is(
-  (select count(*)::int from public.usuarios_emails), 0, 'Visitante não lê e-mails');
+insert into _tap (linha) select throws_ok('select 1 from public.usuarios', '42501', null, 'Visitante não lê usuários');
+insert into _tap (linha) select throws_ok('select 1 from public.usuarios_emails', '42501', null, 'Visitante não lê e-mails');
 reset role;
 
 insert into _tap (linha) select * from finish();
