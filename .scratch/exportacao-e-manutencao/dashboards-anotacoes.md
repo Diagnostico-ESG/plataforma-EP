@@ -81,3 +81,13 @@ Insumo para o ticket 05. Escolha padrão (usuário sem preferência firme): sem 
 - **Limites do Data Studio:** sem campo de posição/tamanho (só arrasto; a grade ajuda); sem barra de progresso nos cartões; sem pílulas de situação; texto de título é caixa de texto à parte.
 - **Faltam na página 1:** legenda das cores, seletor de Setor, faixa "Visão Geral", frases calculadas. Páginas 2, 3 e público: o usuário continua à mão.
 - **Separação entre as células do mapa (painel B):** a tabela dinâmica só tem "Cor da borda da célula" (já em branco, linha de 1 px); não há espessura, espaçamento nem cantos arredondados. Decisão do usuário em 2026-10-21: deixar assim por enquanto. Alternativas, se voltar a importar: linhas brancas verticais por cima (só separa as etapas) ou tabela comum com 7 métricas e 28 regras de cor.
+
+## Visual do dashboard público (2026-10-21)
+
+- **Página:** 1200 × 680 px, grade de 10 px, fundo `#EEF3F9`, componentes brancos com raio 14.
+- **Cabeçalho:** retângulo com degradê linear a 90° de `#0069B4` a `#2B4A66`, sem borda; título (32 px, negrito, branco) e subtítulo (14 px, branco) em caixas de texto.
+- **Cartões:** fontes Resumo (Total de processos, Total de setores) e Fases (% concluído); texto das legendas pelo "Nome de exibição" do campo; números em `#1A6DB5`, e o % em verde.
+- **Painel "Andamento do trabalho":** barras horizontais, dimensão Fase, métrica `% concluído` (Porcentagem), barras `#1A6DB5`, rótulos ligados, sem legenda. Uma barra por etapa (I a VII): o Power BI agrupa I a III, o que o Data Studio faria só com um campo calculado a mais.
+- **Cartões de texto:** "Para que serve…" (fundo branco) e "O que vem depois" (fundo `#FFF8C4`), caixas de texto com fundo e raio.
+- **Cuidado:** clicar numa barra no editor aplica um filtro cruzado (aparece uma ficha "Fase X" no topo); remover em "Redefinir".
+- **Diferenças do Power BI:** sem ícones redondos, sem a faixa amarela sob o título, sem o selo de data no rodapé do texto e com a barra de cada etapa em vez do agrupamento I a III.
