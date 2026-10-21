@@ -8,7 +8,7 @@ select plan(3);
 
 select is_empty(
   $sql$
-    select c.relname || ' (relkind ' || c.relkind || ')'
+    select c.relname || ' (relkind ' || c.relkind::text || ')'
     from pg_class c
     join pg_namespace n on n.oid = c.relnamespace
     where n.nspname = 'public'
