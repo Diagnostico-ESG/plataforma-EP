@@ -80,3 +80,4 @@ Insumo para o ticket 05. Escolha padrão (usuário sem preferência firme): sem 
 - **Painel C:** barras `#003070`, rótulos ligados, sem legenda, linha de referência 12.
 - **Limites do Data Studio:** sem campo de posição/tamanho (só arrasto; a grade ajuda); sem barra de progresso nos cartões; sem pílulas de situação; texto de título é caixa de texto à parte.
 - **Faltam na página 1:** legenda das cores, seletor de Setor, faixa "Visão Geral", frases calculadas. Páginas 2, 3 e público: o usuário continua à mão.
+- **Separação entre as células do mapa (painel B):** a tabela dinâmica só tem "Cor da borda da célula" (já em branco, linha de 1 px); não há espessura, espaçamento nem cantos arredondados. Decisão do usuário em 2026-10-21: deixar assim por enquanto. Alternativas, se voltar a importar: linhas brancas verticais por cima (só separa as etapas) ou tabela comum com 7 métricas e 28 regras de cor.
