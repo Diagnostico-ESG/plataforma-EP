@@ -852,3 +852,9 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 
 - **2026-10-21 · Itens não testados que aconteceram:** marco antes da mudança; TDD do script novo (teste junto da função; o "vermelho" foi o raciocínio de que `includes` aceita os três casos, não uma execução da versão velha). Esperado: seguir o caminho; aconteceu: seguiu.
 - **2026-10-21 · Ocorrência: `replace` em Node falhou em silêncio nos arquivos com CRLF** (a trava dos dois scripts não mudou na primeira passada; só o `git diff` mostrou). Refiz com a ferramenta de edição. Sugestão: conferir o diff depois de edição em lote.
+
+## 2026-10-21 — /demanda (testes gerais de banco)
+
+- **2026-10-21 · Itens não testados que aconteceram:** leitura do `banco.md` inteiro antes de mexer em teste de banco; conferência do vínculo (`yclkzyoebpsxmgpbcbus` em `supabase/.temp/project-ref`); TDD de banco (teste vermelho com o achado real antes de ajustar a exceção); teste de banco rodado no GitHub Actions pela branch, disparado pelo navegador do app. Esperado: tudo dentro das regras; aconteceu: sem falha de regra. A avaliação é do usuário.
+- **2026-10-21 · Ocorrência: disparar o "Run workflow" pelo navegador do app custou três tentativas** (o painel anima e a referência do botão fica fora da tela por alguns segundos; o clique por referência falha com "outside the viewport" e o clique por JavaScript é mais estável). Repetiu o registro de 2026-10-20. Roteiro que funcionou: abrir o painel, esperar 8 s, abrir a lista de branches, esperar 5 s, escolher a branch, conferir o texto do painel por JavaScript e só então clicar no botão verde.
+- **2026-10-21 · Ocorrência: o teste novo falhou primeiro por erro do próprio SQL** (`text || "char"` no `relkind`), o que gastou uma rodada de 1,5 min. Sugestão: o `/executar-*` lembrar de ensaiar a consulta do teste antes de rodar a bateria.
