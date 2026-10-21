@@ -63,3 +63,8 @@ Relatório separado, só com as fontes da **planilha pública** (nenhuma fonte i
 - A coluna **Observações** da aba Processos não apareceu como campo na fonte (a planilha de prova tem 3 processos e a coluna está vazia). Conferir com dados preenchidos.
 - O painel do navegador do app é estreito; o trabalho no Data Studio fica bem mais fácil com o painel largo.
 - O endereço de criação de fonte com identificador de conector colado à mão é recusado ("código do conector inválido"): sempre escolher o conector pela lista.
+
+## Compartilhamento (2026-10-21)
+
+- **Interno:** compartilhado como Visualizador, à mão pelo usuário, com as oito pessoas da equipe; o usuário confirmou acesso geral "Restrito". Uma das pessoas só foi aceita pelo Google depois de o endereço ter conta do Google (e-mail institucional sem conta Google dá "Esse endereço não existe"; a saída é a pessoa criar uma Conta do Google com o endereço atual).
+- **Público:** "Não listado", papel Leitor, feito por Arquivo > Compartilhar > Configurações de link, com o "sim" do usuário; conferido reabrindo a janela. No painel estreito do navegador do app, Compartilhar fica dentro do menu Arquivo.
