@@ -113,3 +113,12 @@ test('o Quadro não tem o campo de busca', async () => {
   await screen.findByLabelText('Setor')
   expect(screen.queryByRole('textbox', { name: 'Buscar pelo nome' })).toBeNull()
 })
+
+test('digitar a busca não enche o histórico do navegador: o Voltar não anda letra por letra', async () => {
+  montar()
+  await screen.findByRole('textbox', { name: 'Buscar pelo nome' })
+  const antes = window.history.length
+  for (const texto of ['P', 'Pa', 'Pag', 'Paga']) await buscar(texto)
+  await waitFor(() => expect(window.location.hash).toBe('#/processos/lista?busca=Paga'))
+  expect(window.history.length).toBe(antes)
+})

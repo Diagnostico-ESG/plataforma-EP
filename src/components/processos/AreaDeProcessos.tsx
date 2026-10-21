@@ -34,7 +34,7 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes, reviso
   const [recemCriado, setRecemCriado] = useState<string | null>(null)
   const cadastrando = podeAlterar && atual.aberto === 'novo'
   const idAberto = atual.aberto === 'novo' ? null : atual.aberto
-  const irParaVisao = (mudancas: Partial<EnderecoDosProcessos>) => irPara(montarEnderecoDosProcessos({ ...atual, ...mudancas }))
+  const irParaVisao = (mudancas: Partial<EnderecoDosProcessos>, substituir = false) => irPara(montarEnderecoDosProcessos({ ...atual, ...mudancas }), substituir)
   const enderecoDoProcesso = (id: string) => montarEnderecoDosProcessos({ ...atual, aberto: id })
 
   function fechar() {
@@ -57,7 +57,7 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes, reviso
         <VisaoDosProcessos visao={atual.visao} estado={estado} aoTentarDeNovo={tentarDeNovo} podeAlterar={podeAlterar}
           aoCadastrar={() => irParaVisao({ aberto: 'novo' })} idEscolhido={idAberto}
           enderecoDoProcesso={enderecoDoProcesso} aoAbrir={(id) => irParaVisao({ aberto: id })}
-          filtros={atual.filtros} aoMudarFiltros={(filtros) => irParaVisao({ filtros, aberto: null })}
+          filtros={atual.filtros} aoMudarFiltros={(filtros) => irParaVisao({ filtros, aberto: null }, filtros.busca !== atual.filtros.busca)}
           agrupar={atual.agrupar} aoMudarAgrupar={(agrupar) => irParaVisao({ agrupar, aberto: null })}
           processos={processos} revisoes={revisoes} usuarioId={usuario.id} aoMudar={recarregar} />
       </div>
