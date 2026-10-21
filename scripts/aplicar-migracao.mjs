@@ -4,6 +4,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import pg from 'pg'
 import { caminhoDaMigracao } from './caminhoDaMigracao.mjs'
+import { conferirProjeto } from './travaDoProjeto.mjs'
 
 const ARQUIVO_ENV = '.env.banco.local'
 
@@ -12,9 +13,8 @@ function lerConfiguracao() {
   if (!ref || !nome) throw new Error('Uso: node scripts/aplicar-migracao.mjs <ref-dev> <arquivo.sql>')
   if (existsSync(ARQUIVO_ENV)) process.loadEnvFile(ARQUIVO_ENV)
   const url = process.env.SUPABASE_DB_URL
-  if (!url) throw new Error('Faltou a variável SUPABASE_DB_URL.')
-  // Trava contra o banco errado: a cadeia precisa citar o ref do projeto de desenvolvimento.
-  if (!url.includes(ref)) throw new Error(`A cadeia de conexão não é do projeto de desenvolvimento (${ref}). Nada foi executado.`)
+  if (!url) throw new Error(`Faltou a variável SUPABASE_DB_URL (esperada em ${ARQUIVO_ENV} ou no segredo do GitHub).`)
+  conferirProjeto(url, ref)
   return { url, nome, caminho: caminhoDaMigracao(nome) }
 }
 

@@ -847,3 +847,8 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 
 - **2026-10-20 · Itens não testados que aconteceram:** classificação como bug com decisão de alcance (A/B/C) antes de agir; marco `marco/2026-10-20-antes-correcao-testes-instaveis`; correção na `main`; `/mattpocock-skills:code-review` sobre o diff da correção. Esperado: seguir o funil do bug; aconteceu: seguiu. Não houve `/polir` nem `/ship` (só `src/` de teste mudou). A avaliação é do usuário.
 - **2026-10-20 · Ocorrência: o teste vermelho de um bug que depende de carga não é determinístico.** Reproduzi a falha com 3 baterias em paralelo (1 de 3 falhou) e usei um teste de configuração (prazo ≥ 5 s) como vermelho/verde estável. Sugestão: o `/demanda` prever esse caso (bug de teste instável) no passo 2.
+
+## 2026-10-21 — /demanda (ajustes de CI e trava do banco)
+
+- **2026-10-21 · Itens não testados que aconteceram:** marco antes da mudança; TDD do script novo (teste junto da função; o "vermelho" foi o raciocínio de que `includes` aceita os três casos, não uma execução da versão velha). Esperado: seguir o caminho; aconteceu: seguiu.
+- **2026-10-21 · Ocorrência: `replace` em Node falhou em silêncio nos arquivos com CRLF** (a trava dos dois scripts não mudou na primeira passada; só o `git diff` mostrou). Refiz com a ferramenta de edição. Sugestão: conferir o diff depois de edição em lote.

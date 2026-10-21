@@ -4,11 +4,12 @@
 //
 // Uso: node scripts/testar-banco.mjs <ref-do-projeto-dev> [arquivo.test.sql ...]
 // A cadeia de conexão vem da variável SUPABASE_DB_URL, lida do arquivo .env.banco.local
-// (ignorado pelo git). O script nunca mostra a cadeia, que contém a senha do banco.
+// (ignorado pelo git) ou, no GitHub Actions, do segredo de mesmo nome. O script nunca mostra a cadeia, que contém a senha do banco.
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import pg from 'pg'
 import { linhasDoRelatorio } from './relatorio-tap.mjs'
+import { conferirProjeto } from './travaDoProjeto.mjs'
 
 const PASTA = 'supabase/tests'
 const ARQUIVO_ENV = '.env.banco.local'
@@ -18,11 +19,8 @@ function lerConfiguracao() {
   if (!ref) throw new Error('Faltou o ref do projeto de desenvolvimento. Uso: node scripts/testar-banco.mjs <ref-dev>')
   if (existsSync(ARQUIVO_ENV)) process.loadEnvFile(ARQUIVO_ENV)
   const url = process.env.SUPABASE_DB_URL
-  if (!url) throw new Error(`Faltou a variável SUPABASE_DB_URL (esperada em ${ARQUIVO_ENV}).`)
-  // Trava contra o banco errado: a cadeia precisa citar o ref do projeto de desenvolvimento.
-  if (!url.includes(ref)) {
-    throw new Error(`A cadeia de conexão não é do projeto de desenvolvimento (${ref}). Nada foi executado.`)
-  }
+  if (!url) throw new Error(`Faltou a variável SUPABASE_DB_URL (esperada em ${ARQUIVO_ENV} ou no segredo do GitHub).`)
+  conferirProjeto(url, ref)
   return { url, arquivos }
 }
 
