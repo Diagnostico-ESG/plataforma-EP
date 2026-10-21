@@ -91,3 +91,15 @@ Insumo para o ticket 05. Escolha padrão (usuário sem preferência firme): sem 
 - **Cartões de texto:** "Para que serve…" (fundo branco) e "O que vem depois" (fundo `#FFF8C4`), caixas de texto com fundo e raio.
 - **Cuidado:** clicar numa barra no editor aplica um filtro cruzado (aparece uma ficha "Fase X" no topo); remover em "Redefinir".
 - **Diferenças do Power BI:** sem ícones redondos, sem a faixa amarela sob o título, sem o selo de data no rodapé do texto e com a barra de cada etapa em vez do agrupamento I a III.
+
+## Página 2 do interno — "por etapa" (2026-10-21, em construção)
+
+Desenho tirado do print da página 2 do Power BI (filtros Setor e Etapa, quatro cartões, "Processos por setor" empilhado por situação, "Onde agir" com duas listas).
+
+- **Base:** página copiada da 1 (cabeçalho, tema, linha de cartões). Cartões: Concluídas (`Concluídas`), Prontos para iniciar, Aguardando, Processos no mapeamento (todos da fonte Fases, nome de exibição em maiúsculas).
+- **Processos por setor:** barras horizontais empilhadas; dimensão Área, dimensão detalhada Situação, métrica Contagem de registros; cores por "Gerenciar cores de valor de dimensão": Concluída `#3DBE7A`, Aguardando etapa anterior `#C9CFDB`, Pronto para iniciar `#3F8FE0`, Em andamento `#F5A623`. Os nomes têm de ser exatamente os da planilha.
+- **Onde agir:** tabela (Área × métrica `Prontos para iniciar`) com filtro "Só prontos para iniciar" (Incluir, Situação igual a "Pronto para iniciar").
+- **Achado:** o cartão "Prontos para iniciar" mostra 0 (devia ser 2), enquanto a tabela com o mesmo campo mostra 1 + 1. Suspeita: a dimensão de período `Concluída em` que o Data Studio põe em todo componente novo e que descarta linhas sem data.
+- **Cuidado:** ao clicar no botão de remover a dimensão de período pelo painel, o Data Studio voltou à tela inicial (sessão recarregada); nada se perdeu.
+- **Cópia de segurança:** existe "Cópia de Dashboard interno do EP (dev)" na lista de relatórios (17h).
+- **Faltam:** filtro Setor (lista à esquerda), botões de Etapa (I a VII), segunda lista "Aguardando a etapa anterior", títulos dos painéis, cartões com o texto de apoio ("62% dos 110 processos"), brasão.
