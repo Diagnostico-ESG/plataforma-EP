@@ -345,7 +345,7 @@ set local session_replication_role = origin;
 
 -- ===== Conferência =====
 create function pg_temp.escolha(nome_do_processo text) returns boolean
-language sql stable as $ select vai_para_publicacao from public.processos where id = pg_temp.processo(nome_do_processo) $;
+language sql stable as $$ select vai_para_publicacao from public.processos where id = pg_temp.processo(nome_do_processo) $$;
 insert into _tap (linha) select is(pg_temp.escolha('Concluida'), true, 'Publicação concluída vira "sim"');
 insert into _tap (linha) select is(pg_temp.escolha('Realizada'), true, 'Publicação realizada anteriormente vira "sim"');
 insert into _tap (linha) select is(pg_temp.escolha('Em Andamento'), true, 'Publicação em andamento vira "sim"');
