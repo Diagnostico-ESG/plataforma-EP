@@ -215,3 +215,5 @@ Nenhuma migração destrutiva: tipo, coluna, tabela, view, funções, gatilho e 
 - **Transição:** a planilha manual e o Power BI continuam em uso até o cadastro dos processos atuais terminar; os dashboards novos podem ser montados antes, com os dados do desenvolvimento ou da produção, conforme o que existir.
 - **Produção:** ainda não existe. O cofre, o agendamento e a função entram em produção pelo roteiro de publicação do `/ship`, com a aprovação do usuário.
 - **Passos do usuário** (fora da sessão): criar as duas planilhas em branco no Drive compartilhado, ligar o Sheets no projeto do Google Cloud, gravar o segredo novo da função, gravar o cofre do banco pelo SQL Editor, publicar a função no desenvolvimento e entrar no Data Studio no navegador do app.
+
+Entregue em 2026-10-22 (commit 06c8052), com ressalva: critérios [visual] dos tickets 01 e 02 vistos só na vitrine local com módulos falsos e o dos dashboards (ticket 04) em aberto, a finalizar pelo usuário por fora; camada Deno da função planilhas-dos-dashboards sem teste automático; resultado atual do "Testes de banco" no GitHub não reconferido; revisão de segurança foi a de reserva (menos completa)
