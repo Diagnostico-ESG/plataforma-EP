@@ -35,8 +35,8 @@ export function criarRevisoesSupabase(cliente: ClienteSupabase, recusas: Recusas
     concluirRevisaoInterna: (andamentoId, dados, responsavelId) =>
       concluirRevisaoInterna(cliente, andamentoId, dados, responsavelId, recusas),
     lerAprovacao: (processoId) => lerAprovacao(cliente, processoId),
-    concluirAprovacao: (andamentoId, dados, responsavelId) =>
-      concluirAprovacao(cliente, andamentoId, dados, responsavelId, recusas),
+    concluirAprovacao: (andamentoId, dados, responsavelId, vai) =>
+      concluirAprovacao(cliente, { andamentoId, dados, responsavelId, vai: vai ?? null }, recusas),
     editarRevisao: (id, dados) => editarRevisao(cliente, id, dados, recusas),
     editarAprovacao: (id, dados) => editarAprovacao(cliente, id, dados, recusas),
   }
@@ -90,12 +90,13 @@ async function lerAprovacao(cliente: ClienteSupabase, processoId: string): Promi
 }
 
 // A aprovação e a conclusão se gravam juntas, numa função do banco. Os campos vazios vão como null (o tipo gerado não o admite).
-async function concluirAprovacao(
-  cliente: ClienteSupabase, andamentoId: string, dados: DadosDaAprovacao, responsavelId: string | null, recusas: RecusasDoModulo,
-): Promise<void> {
+type PedidoDaAprovacao = { andamentoId: string; dados: DadosDaAprovacao; responsavelId: string | null; vai: boolean | null }
+
+async function concluirAprovacao(cliente: ClienteSupabase, pedido: PedidoDaAprovacao, recusas: RecusasDoModulo): Promise<void> {
+  const { andamentoId, dados } = pedido
   const { error } = await cliente.rpc('concluir_aprovacao', {
     p_andamento: andamentoId, p_numero: dados.numeroEprotocolo as string, p_link: dados.link as string,
-    p_data: dados.aprovadaEm as string, p_responsavel: responsavelId as string,
+    p_data: dados.aprovadaEm as string, p_responsavel: pedido.responsavelId as string, p_vai_para_publicacao: pedido.vai as boolean,
   })
   if (error) throw falhaDoAndamento(error, recusas)
 }

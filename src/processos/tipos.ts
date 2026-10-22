@@ -19,7 +19,10 @@ export type EtapaDoCaminho = {
 
 export type TipoDeProcesso = 'processo' | 'subprocesso' | 'a_classificar'
 export type OrigemDoProcesso = 'novo' | 'retomado'
-/** A situação calculada: "concluido" não é guardado, vem de as etapas obrigatórias estarem resolvidas. */
+/**
+ * A situação calculada: "concluido" não é guardado, vem de as etapas obrigatórias estarem resolvidas e de a escolha de
+ * publicação ser "não" ou a Publicação estar resolvida.
+ */
 export type SituacaoDoProcesso = 'em_andamento' | 'suspenso' | 'cancelado' | 'concluido'
 
 /** Uma etapa do catálogo, como as colunas do Quadro a usam. */
@@ -90,6 +93,10 @@ export type ProcessoDaLista = {
   dataDaReuniao?: string | null
   /** Opcional pelo mesmo motivo: sem ele o cartão não tem barra nem selos. */
   cartao?: DadosDoCartao
+  /** "Vai para publicação?" (ADR 0020): null sem resposta. Opcional pelo mesmo motivo. */
+  vaiParaPublicacao?: boolean | null
+  /** O dia em que a Publicação foi concluída (AAAA-MM-DD); null sem publicação. Opcional pelo mesmo motivo. */
+  publicadoEm?: string | null
 }
 
 export type ListaDeProcessos = { etapas: EtapaDoCatalogo[]; processos: ProcessoDaLista[] }
@@ -114,7 +121,7 @@ export type ItemDaEstrutura = { id: string; nome: string; etapaAtual: string | n
 
 /**
  * A versão mais recente não histórica do processo, quem a enviou (esse autor não pode revisar o próprio trabalho) e os
- * papéis dos arquivos dela (a Revisão pelo setor só conclui com .bpm, .png e relatório).
+ * papéis dos arquivos dela (a Validação com o setor só conclui com .bpm, .png e relatório).
  */
 export type UltimaVersao = {
   numero: number; autorId: string; autorNome: string; papeis: PapelDoArquivo[]
@@ -179,10 +186,14 @@ export type ModuloDeProcessos = {
   /**
    * Concluir, dispensar e registrar como realizada anteriormente resolvem a etapa atual e, se houver etapa pendente
    * depois dela, a iniciam com o responsável (null: ninguém), tudo ou nada; sem pendente depois, o responsável é ignorado.
+   * Na Aprovação pelo setor com a Publicação pendente depois, a escolha de publicação é obrigatória ("não" pula a
+   * Publicação); nas outras etapas ela é ignorada.
    */
-  concluirEtapa(andamentoId: string, proximoResponsavelId: string | null): Promise<void>
+  concluirEtapa(andamentoId: string, proximoResponsavelId: string | null, vaiParaPublicacao?: boolean | null): Promise<void>
   dispensarEtapa(andamentoId: string, nota: string, proximoResponsavelId: string | null): Promise<void>
-  registrarRealizadaAnteriormente(andamentoId: string, nota: string, proximoResponsavelId: string | null): Promise<void>
+  registrarRealizadaAnteriormente(
+    andamentoId: string, nota: string, proximoResponsavelId: string | null, vaiParaPublicacao?: boolean | null,
+  ): Promise<void>
   /** A etapa resolvida volta a em andamento, com o responsável (null: ninguém), e as seguintes a pendente; o motivo é obrigatório. */
   voltarParaEtapa(andamentoId: string, motivo: string, responsavelId: string | null): Promise<void>
   corrigirDatasDaEtapa(andamentoId: string, datas: DatasDaEtapa): Promise<void>

@@ -17,6 +17,7 @@ import {
   FRASE_DA_APROVACAO_FORA_DA_ETAPA, FRASE_DA_APROVACAO_NA_VOLTA, FRASE_DO_LINK_INVALIDO, FRASE_DO_PROCESSO_COM_APROVACAO,
   FRASE_DO_PROCESSO_JA_APROVADO, fraseDaAprovacaoAntesDaRevisao, fraseDaDataNoFuturo, fraseDaVersaoAprovada, fraseDaVersaoSemAprovacao,
 } from '../revisoes/frasesDeAprovacao'
+import { FRASE_DA_ESCOLHA_OBRIGATORIA, FRASE_DA_ESCOLHA_SO_PELA_FUNCAO } from './frasesDePublicacao'
 import { fraseDeSituacaoInvalida, fraseDoProcessoParado } from './frasesDeSituacao'
 import type { ModuloDeProcessos, UsuarioResponsavel } from './tipos'
 
@@ -31,10 +32,10 @@ export function criarAndamentosSupabase(
   const mudar = (id: string, mudanca: MudancaDoAndamento) => mudarAndamento(cliente, id, mudanca, recusas)
   return {
     iniciarEtapa: (id) => mudar(id, { status: 'em_andamento' }),
-    concluirEtapa: (id, responsavelId) => avancar(cliente, id, 'concluir', null, responsavelId, recusas),
-    dispensarEtapa: (id, nota, responsavelId) => avancar(cliente, id, 'dispensar', nota, responsavelId, recusas),
-    registrarRealizadaAnteriormente: (id, nota, responsavelId) =>
-      avancar(cliente, id, 'realizada_anteriormente', nota, responsavelId, recusas),
+    concluirEtapa: (id, responsavelId, vai) => avancar(cliente, { id, acao: 'concluir', nota: null, responsavelId, vai }, recusas),
+    dispensarEtapa: (id, nota, responsavelId) => avancar(cliente, { id, acao: 'dispensar', nota, responsavelId }, recusas),
+    registrarRealizadaAnteriormente: (id, nota, responsavelId, vai) =>
+      avancar(cliente, { id, acao: 'realizada_anteriormente', nota, responsavelId, vai }, recusas),
     corrigirDatasDaEtapa: (id, datas) => mudar(id, { iniciada_em: datas.iniciadaEm, resolvida_em: datas.resolvidaEm }),
     mudarResponsavelDaEtapa: (id, usuarioId) => mudar(id, { responsavel_id: usuarioId }),
     voltarParaEtapa: (id, motivo, responsavelId) => voltarParaEtapa(cliente, id, motivo, responsavelId, recusas),
@@ -50,14 +51,17 @@ async function mudarAndamento(
   if (!data.length) throw porQueNadaMudou(await andamentoExiste(cliente, id), recusas)
 }
 
-// A função do banco resolve a etapa e inicia a próxima numa transação só. O supabase-js manda null como null;
-// o tipo gerado não o admite nos parâmetros, como em reclassificar_processo.
-async function avancar(
-  cliente: ClienteSupabase, id: string, acao: 'concluir' | 'dispensar' | 'realizada_anteriormente',
-  nota: string | null, responsavelId: string | null, recusas: RecusasDoModulo,
-): Promise<void> {
+type PedidoDoAvanco = {
+  id: string; acao: 'concluir' | 'dispensar' | 'realizada_anteriormente'; nota: string | null
+  responsavelId: string | null; vai?: boolean | null
+}
+
+// A função do banco resolve a etapa, grava a escolha de publicação (só a Aprovação a usa) e inicia a próxima numa
+// transação só. O supabase-js manda null como null; o tipo gerado não o admite nos parâmetros, como em reclassificar_processo.
+async function avancar(cliente: ClienteSupabase, pedido: PedidoDoAvanco, recusas: RecusasDoModulo): Promise<void> {
   const { error } = await cliente.rpc('avancar_etapa', {
-    p_andamento: id, p_acao: acao, p_nota: nota as string, p_responsavel: responsavelId as string,
+    p_andamento: pedido.id, p_acao: pedido.acao, p_nota: pedido.nota as string, p_responsavel: pedido.responsavelId as string,
+    p_vai_para_publicacao: (pedido.vai ?? null) as boolean,
   })
   if (error) throw falhaDoAndamento(error, recusas)
 }
@@ -94,7 +98,8 @@ const PADRAO_DA_RECUSA = new RegExp(
   + '|revisor_e_autor|corrigida_sem_versao_do_revisor|corrigida_sem_versao_anterior|escopo_obrigatorio'
   + '|escopo_so_na_corrigida|revisao_fora_da_etapa|sem_revisao_da_versao|processo_com_revisoes'
   + '|aprovacao_fora_da_etapa|processo_ja_aprovado|link_invalido|aprovacao_antes_da_revisao|sem_aprovacao'
-  + '|aprovacao_so_se_desfaz_na_volta|versao_aprovada|processo_com_aprovacao)(?::(.*))?$', 'm')
+  + '|aprovacao_so_se_desfaz_na_volta|versao_aprovada|processo_com_aprovacao'
+  + '|escolha_de_publicacao_obrigatoria|publicacao_so_pela_funcao)(?::(.*))?$', 'm')
 
 const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   anterior_nao_resolvida: (etapa) => `A etapa ${etapa} ainda não foi resolvida.`,
@@ -142,6 +147,8 @@ const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   aprovacao_so_se_desfaz_na_volta: () => FRASE_DA_APROVACAO_NA_VOLTA,
   versao_aprovada: fraseDaVersaoAprovada,
   processo_com_aprovacao: () => FRASE_DO_PROCESSO_COM_APROVACAO,
+  escolha_de_publicacao_obrigatoria: () => FRASE_DA_ESCOLHA_OBRIGATORIA,
+  publicacao_so_pela_funcao: () => FRASE_DA_ESCOLHA_SO_PELA_FUNCAO,
   versao_incompleta: (valor) => {
     const [numero, faltas] = valor.split(':')
     return fraseDaVersaoIncompleta(numero, faltas.split(','))

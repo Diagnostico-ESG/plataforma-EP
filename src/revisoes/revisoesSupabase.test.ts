@@ -117,12 +117,16 @@ test('falha ao ler a aprovação vira erro com o processo e o motivo do banco', 
   await expect(criar(cliente).lerAprovacao('p1')).rejects.toThrow('Falha ao ler a aprovação do processo p1: sem conexão')
 })
 
-test('concluirAprovacao chama a função do banco com o andamento, os três campos e o responsável', async () => {
+test('concluirAprovacao chama a função do banco com o andamento, os três campos, o responsável e a escolha', async () => {
   const cliente = new ClienteSupabaseFalso()
-  await criar(cliente).concluirAprovacao('a5', DADOS_DA_APROVACAO, 'u2')
+  await criar(cliente).concluirAprovacao('a5', DADOS_DA_APROVACAO, 'u2', true)
+  await criar(cliente).concluirAprovacao('a5', DADOS_DA_APROVACAO, null, null)
   expect(cliente.pedidos).toEqual([{
     tabela: 'rpc', operacao: 'concluir_aprovacao',
-    valores: { p_andamento: 'a5', p_numero: 'PROT-1', p_link: null, p_data: '2026-10-13', p_responsavel: 'u2' },
+    valores: { p_andamento: 'a5', p_numero: 'PROT-1', p_link: null, p_data: '2026-10-13', p_responsavel: 'u2', p_vai_para_publicacao: true },
+  }, {
+    tabela: 'rpc', operacao: 'concluir_aprovacao',
+    valores: { p_andamento: 'a5', p_numero: 'PROT-1', p_link: null, p_data: '2026-10-13', p_responsavel: null, p_vai_para_publicacao: null },
   }])
 })
 

@@ -21,6 +21,8 @@ export function processoDaLinha(linha: LinhaDoProcesso): ProcessoDaLista {
     responsavel: responsavelDaLinha(linha),
     dataDaReuniao: linha.data_da_reuniao,
     cartao: cartaoDaLinha(linha),
+    vaiParaPublicacao: linha.vai_para_publicacao,
+    publicadoEm: linha.publicado_em,
   }
 }
 

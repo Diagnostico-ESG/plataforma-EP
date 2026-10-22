@@ -9,7 +9,15 @@ const VAZIA: LinhaDoProcesso = {
   contexto: null, criado_em: null, motivo_da_situacao: null, observacoes: null, origem: 'novo',
   etapa_atual_status: null, etapa_atual_iniciada_em: null, responsavel_ativo: null, caminho: [],
   ultima_versao_numero: null, ultima_versao_historica: null, ultima_versao_tem_relatorio: null, subprocessos_quantidade: 0,
+  vai_para_publicacao: null, publicado_em: null,
 }
+
+test('traduz a escolha de publicação e a data da publicação', () => {
+  expect(processoDaLinha({ ...VAZIA, vai_para_publicacao: true, publicado_em: '2026-10-20' }))
+    .toMatchObject({ vaiParaPublicacao: true, publicadoEm: '2026-10-20' })
+  expect(processoDaLinha({ ...VAZIA, vai_para_publicacao: false })).toMatchObject({ vaiParaPublicacao: false, publicadoEm: null })
+  expect(processoDaLinha(VAZIA)).toMatchObject({ vaiParaPublicacao: null, publicadoEm: null })
+})
 
 test('traduz os campos do cartão: etapa atual, responsável, caminho, última versão, subprocessos e reunião', () => {
   const processo = processoDaLinha({

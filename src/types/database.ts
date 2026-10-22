@@ -469,6 +469,7 @@ export type Database = {
           setor_id: string
           situacao: Database["public"]["Enums"]["situacao_guardada"]
           tipo: Database["public"]["Enums"]["tipo_de_processo"]
+          vai_para_publicacao: boolean | null
         }
         Insert: {
           contexto?: string | null
@@ -484,6 +485,7 @@ export type Database = {
           setor_id: string
           situacao?: Database["public"]["Enums"]["situacao_guardada"]
           tipo?: Database["public"]["Enums"]["tipo_de_processo"]
+          vai_para_publicacao?: boolean | null
         }
         Update: {
           contexto?: string | null
@@ -499,6 +501,7 @@ export type Database = {
           setor_id?: string
           situacao?: Database["public"]["Enums"]["situacao_guardada"]
           tipo?: Database["public"]["Enums"]["tipo_de_processo"]
+          vai_para_publicacao?: boolean | null
         }
         Relationships: [
           {
@@ -819,6 +822,7 @@ export type Database = {
           observacoes: string | null
           origem: Database["public"]["Enums"]["origem_do_processo"] | null
           processo_pai_id: string | null
+          publicado_em: string | null
           responsavel_ativo: boolean | null
           responsavel_foto_url: string | null
           responsavel_id: string | null
@@ -834,6 +838,7 @@ export type Database = {
           ultima_versao_historica: boolean | null
           ultima_versao_numero: number | null
           ultima_versao_tem_relatorio: boolean | null
+          vai_para_publicacao: boolean | null
         }
         Relationships: [
           {
@@ -923,6 +928,7 @@ export type Database = {
           p_andamento: string
           p_nota: string
           p_responsavel: string
+          p_vai_para_publicacao?: boolean
         }
         Returns: undefined
       }
@@ -937,6 +943,7 @@ export type Database = {
           p_link: string
           p_numero: string
           p_responsavel: string
+          p_vai_para_publicacao?: boolean
         }
         Returns: undefined
       }

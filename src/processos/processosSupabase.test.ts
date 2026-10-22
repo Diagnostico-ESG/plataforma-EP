@@ -32,10 +32,22 @@ test('concluir, dispensar e registrar como realizada anteriormente chamam a fun�
   await modulo.dispensarEtapa('a1', 'Setor já conhecido', null)
   await modulo.registrarRealizadaAnteriormente('a1', 'Feita em 2025', 'u2')
   expect(cliente.pedidos.map(({ tabela, operacao, valores }) => [tabela, operacao, valores])).toEqual([
-    ['rpc', 'avancar_etapa', { p_andamento: 'a1', p_acao: 'concluir', p_nota: null, p_responsavel: 'u1' }],
-    ['rpc', 'avancar_etapa', { p_andamento: 'a1', p_acao: 'dispensar', p_nota: 'Setor já conhecido', p_responsavel: null }],
+    ['rpc', 'avancar_etapa', { p_andamento: 'a1', p_acao: 'concluir', p_nota: null, p_responsavel: 'u1', p_vai_para_publicacao: null }],
     ['rpc', 'avancar_etapa',
-      { p_andamento: 'a1', p_acao: 'realizada_anteriormente', p_nota: 'Feita em 2025', p_responsavel: 'u2' }],
+      { p_andamento: 'a1', p_acao: 'dispensar', p_nota: 'Setor já conhecido', p_responsavel: null, p_vai_para_publicacao: null }],
+    ['rpc', 'avancar_etapa',
+      { p_andamento: 'a1', p_acao: 'realizada_anteriormente', p_nota: 'Feita em 2025', p_responsavel: 'u2', p_vai_para_publicacao: null }],
+  ])
+})
+
+test('concluir e registrar como realizada anteriormente levam a escolha de publicação, quando há', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  const modulo = criar(cliente)
+  await modulo.concluirEtapa('a5', 'u1', true)
+  await modulo.registrarRealizadaAnteriormente('a5', 'Aprovada em 2025', null, false)
+  expect(cliente.pedidos.map(({ valores }) => valores)).toEqual([
+    { p_andamento: 'a5', p_acao: 'concluir', p_nota: null, p_responsavel: 'u1', p_vai_para_publicacao: true },
+    { p_andamento: 'a5', p_acao: 'realizada_anteriormente', p_nota: 'Aprovada em 2025', p_responsavel: null, p_vai_para_publicacao: false },
   ])
 })
 

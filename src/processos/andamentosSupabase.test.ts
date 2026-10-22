@@ -190,6 +190,16 @@ test.each([
   expect(falha.message).toBe(frase)
 })
 
+test.each([
+  ['escolha_de_publicacao_obrigatoria', 'Responda se o processo vai para publicação.'],
+  ['publicacao_so_pela_funcao', 'A escolha de publicação só muda ao concluir a Aprovação pelo setor ou ao voltar a uma etapa.'],
+])('a recusa %s da escolha de publicação vira a frase da tela', async (codigo, frase) => {
+  const cliente = clienteQueRecusa('rpc.avancar_etapa', { message: codigo, code: 'P0001' })
+  const falha = await falhaDe(criar(cliente).concluirEtapa('a5', null, null))
+  expect(falha).toBeInstanceOf(TravaDoBanco)
+  expect(falha.message).toBe(frase)
+})
+
 test('processo com aprovação não se exclui', async () => {
   const cliente = clienteQueRecusa('processos.delete', { message: 'processo_com_aprovacao', code: 'P0001' })
   const falha = await falhaDe(criar(cliente).excluirProcesso('p1'))

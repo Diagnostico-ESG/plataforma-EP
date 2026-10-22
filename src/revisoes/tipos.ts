@@ -37,9 +37,12 @@ export type ModuloDeRevisoes = {
   lerAprovacao(processoId: string): Promise<Aprovacao | null>
   /**
    * Grava a aprovação e conclui a Aprovação pelo setor numa gravação só (a próxima etapa pendente, se houver, entra em
-   * andamento com o responsável; null: ninguém). Se a conclusão falha, a aprovação não fica.
+   * andamento com o responsável; null: ninguém). Se a conclusão falha, a aprovação não fica. Com a Publicação pendente
+   * depois, a escolha de publicação é obrigatória: "não" pula a Publicação (null: sem resposta).
    */
-  concluirAprovacao(andamentoId: string, dados: DadosDaAprovacao, proximoResponsavelId: string | null): Promise<void>
+  concluirAprovacao(
+    andamentoId: string, dados: DadosDaAprovacao, proximoResponsavelId: string | null, vaiParaPublicacao?: boolean | null,
+  ): Promise<void>
   /** Corrige o escopo (só na "corrigida") e o comentário de uma revisão; o banco confere de novo e grava o antes e o depois. */
   editarRevisao(revisaoId: string, dados: DadosDaEdicaoDaRevisao): Promise<void>
   /** Corrige o número, o link e a data da aprovação (inclusive acrescentando o número que chegou depois da conclusão). */
