@@ -325,7 +325,7 @@ A atualização dos dados roda com os gatilhos de evento desligados, como na mig
 ## Observações
 
 - **Onde está esta spec:** o `/planejar` pede que a demanda que altera uma funcionalidade atualize a spec dela. Esta funcionalidade, porém, está no `projeto.md` com nome e pasta próprios e mexe em três specs entregues. Segui o que já foi feito em revisoes-aprovacao e na mudança do .bpm: spec própria, com uma nota e a linha `Em revisão desde 2026-10-22` em cada spec afetada.
-- **Escolhas desta spec que a sabatina não fixou** (adotadas como o caminho mais simples e fácil de desfazer; a confirmar com você):
+- **Escolhas desta spec que a sabatina não fixou** (adotadas como o caminho mais simples e fácil de desfazer; confirmadas pelo usuário em 2026-10-22):
   1. A pergunta também aparece ao registrar a Aprovação como "realizada anteriormente".
   2. Processo concluído fica sem etapa atual e sem responsável. Por isso, "Só os meus" e o filtro Responsável não trazem concluídos, e o filtro Etapa = Publicação não traz os não publicados.
   3. Arquivado recusa qualquer alteração (dados, etapas, versões, aprovação, situação, reclassificação, exclusão), menos Registrar publicação e Desarquivar.
