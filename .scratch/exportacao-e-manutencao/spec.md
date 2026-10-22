@@ -108,8 +108,8 @@ A equipe atualiza à mão a planilha do dashboard, marcando processo por process
 - **Módulo das planilhas** (interface do lado da tela): ler as tentativas e os links; pedir a atualização. Duas implementações nomeadas, a do Supabase e a falsa (com tentativas em memória, as recusas do banco e falhas programáveis), como as dos outros módulos.
 - **Enquanto há uma tentativa "Em andamento"**, a aba relê as tentativas a cada poucos segundos e para quando ela termina ou passa a "Sem resposta". Sem tentativa em andamento, não relê.
 - **Rótulos das tentativas:** "Automática" ou "Pelo botão · <nome do Administrador>"; resultado "Em andamento", "Concluída", "Falhou" (com o motivo) ou "Sem resposta". Data e hora no fuso de Brasília.
-- **Motivos de falha:** um código curto vindo da função (por exemplo, `planilha_interna_recusada`, `planilha_publica_recusada`, `google_indisponivel`, `pacote_invalido`), traduzido numa frase por uma tabela pura da tela. Código desconhecido vira "A atualização falhou por um motivo não identificado."
-- **Catálogo:** o formulário da etapa (criar e editar) ganha o campo "Fase do Regimento", uma lista com IV a IX, sem valor escolhido na criação. A tabela do catálogo ganha a coluna "Fase". A mensagem de recusa segue o padrão do formulário, com o valor recebido.
+- **Motivos de falha:** um código curto vindo da função (por exemplo, `planilha_interna_recusada`, `planilha_publica_recusada`, `google_indisponivel`, `pacote_invalido`), traduzido numa frase por uma tabela pura da tela. Código desconhecido (inclusive `erro_interno`) vira "A atualização falhou por um motivo não identificado."
+- **Catálogo:** o formulário da etapa (criar e editar) ganha o campo "Fase do Regimento", uma lista com IV a IX, sem valor escolhido na criação. A tabela do catálogo ganha a coluna "Fase". A mensagem de recusa segue o padrão do formulário, com o valor recebido. O histórico do catálogo mostra a fase nas linhas "Antes" e "Depois" (formato que já existia), não como "Fase: V → VI".
 - **Histórico do catálogo:** o texto do evento de edição passa a citar a fase quando ela muda ("Fase: V → VI").
 
 ### Modelo de dados
@@ -194,7 +194,7 @@ Nenhuma migração destrutiva: tipo, coluna, tabela, view, funções, gatilho e 
 
 - [visual] A aba Planilhas segue o estilo das abas Usuários e Catálogo de etapas: lista legível, o resultado de cada tentativa distinguível pela cor das mensagens da plataforma e pelo texto, e o botão no lugar dos botões principais da Administração.
 - [visual] O campo "Fase do Regimento" e a coluna Fase cabem no formulário e na tabela do catálogo sem quebrar o alinhamento, no notebook (1366×768).
-- [visual] Os dois dashboards no Data Studio ficam parecidos com as páginas de hoje do Power BI, revisados pelo usuário.
+- [visual] Os dois dashboards no Data Studio ficam parecidos com as páginas de hoje do Power BI, revisados pelo usuário. (Ficou para o usuário finalizar por fora do projeto, decisão de 2026-10-22; o compartilhamento dos dois dashboards foi feito.)
 
 ## Fora do escopo
 
@@ -206,7 +206,7 @@ Nenhuma migração destrutiva: tipo, coluna, tabela, view, funções, gatilho e 
 - **Atualizar a cada mudança:** a reescrita é diária e pelo botão (ADR 0017).
 - **Troca do link no site, fim do Power BI e exclusão da planilha antiga:** passos do usuário, descritos na documentação.
 - **Responsável ou qualquer nome de pessoa nas planilhas.**
-- **Data das etapas no fuso de Brasília:** as datas de início e conclusão ainda seguem o dia UTC do banco (backlog de 2026-10-20); afeta pouco as contagens por mês.
+- **Data das etapas no fuso de Brasília:** corrigido depois (migração `20261020180000_datas_das_etapas_no_fuso`): as datas de início e conclusão passaram a usar o dia de Brasília (`private.hoje()`).
 
 ## Observações
 
