@@ -20,3 +20,7 @@ A porcentagem é calculada no Data Studio a partir das contagens. Compartilhar o
 - [x] O interno está compartilhado só com as pessoas da equipe e o público está como "Não listado", ambos com a confirmação do usuário no momento.
 - [x] As decisões de montagem (fontes, campos calculados, filtros e o que ficou diferente do Power BI por limite do Data Studio) estão anotadas em `.scratch/exportacao-e-manutencao/` para o ticket 05.
 - [ ] [visual] Os dois dashboards ficam parecidos com as páginas de hoje do Power BI, revisados pelo usuário.
+
+Critério [visual] (o último) não conferido nesta execução: por decisão do usuário em 2026-10-22, ele finaliza os dois dashboards por fora e o ticket é dado como concluído assim mesmo.
+
+Concluído em 2026-10-22 (commit 3a2dbec)
