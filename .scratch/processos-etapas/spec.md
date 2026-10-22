@@ -713,6 +713,7 @@ Não destrutiva: nenhuma tabela, coluna, política ou função muda; a tabela "q
 
 ## Observações
 
+- **Mudança de 2026-10-22 (publicacao-e-arquivamento, ADR 0020):** o concluído passa a exigir também a escolha "não" ou a Publicação resolvida; a Publicação não se dispensa mais; o Quadro ganha a coluna Concluídos; o processo concluído pode ser arquivado e fica só na Lista, com selo e filtro; processo concluído fica sem etapa atual. O detalhe está em `.scratch/publicacao-e-arquivamento/spec.md`, que vale sobre esta spec no que divergir.
 - Critérios conferidos olhando a tela, para o `/ship`:
   - `[visual]` O Quadro segue a identidade visual: fundo azul-acinzentado, cartões brancos, colunas por etapa, a linha azul "acesa" no cartão escolhido, e indicação de colunas fora da vista quando o quadro rola para o lado.
   - `[visual]` (Desde 2026-10-19, substitui o critério do painel lateral.) O verso abre como janela central de até cerca de 880 px, em duas colunas de 60% e 40%, a direita em fundo levemente cinza, com o Quadro ou a Lista escurecidos atrás; o cabeçalho fica fixo e a janela tem uma só rolagem; abaixo de 900 px de largura, ocupa a tela inteira em uma coluna.
@@ -772,3 +773,5 @@ Entregue em 2026-10-19 (commit 8ef4091)
 Entregue em 2026-10-19 (commit f3a12b3), com ressalva: critérios [visual] da parte 4 presumidos (a tela não foi conferida nesta entrega); Enter no cartão e voltar/recarregar do agrupamento sem teste de navegador
 
 Entregue em 2026-10-20 (commit 8a7efb7)
+
+Em revisão desde 2026-10-22

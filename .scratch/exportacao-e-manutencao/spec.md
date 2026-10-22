@@ -210,6 +210,7 @@ Nenhuma migração destrutiva: tipo, coluna, tabela, view, funções, gatilho e 
 
 ## Observações
 
+- **Mudança de 2026-10-22 (publicacao-e-arquivamento, ADR 0020):** a fase VII de um processo não publicado sai "Não publicado" (não conta como concluída), no lugar da exceção "Dispensada"; o rótulo da situação fica "Publicado" com a Publicação concluída e "Concluído" com a escolha "não"; o pacote das planilhas ganha a escolha. O detalhe está em `.scratch/publicacao-e-arquivamento/spec.md`.
 - **Divergência da especificação:** a "exportação em CSV para usar Power BI" virou as planilhas alimentadas pela plataforma e os dashboards no Data Studio (ADR 0017).
 - **Robô das 6h sem chave secreta:** decisão do usuário nesta spec (ADR 0018). O botão e a atualização automática seguem o mesmo caminho pelo banco.
 - **Transição:** a planilha manual e o Power BI continuam em uso até o cadastro dos processos atuais terminar; os dashboards novos podem ser montados antes, com os dados do desenvolvimento ou da produção, conforme o que existir.
@@ -217,3 +218,5 @@ Nenhuma migração destrutiva: tipo, coluna, tabela, view, funções, gatilho e 
 - **Passos do usuário** (fora da sessão): criar as duas planilhas em branco no Drive compartilhado, ligar o Sheets no projeto do Google Cloud, gravar o segredo novo da função, gravar o cofre do banco pelo SQL Editor, publicar a função no desenvolvimento e entrar no Data Studio no navegador do app.
 
 Entregue em 2026-10-22 (commit 06c8052), com ressalva: critérios [visual] dos tickets 01 e 02 vistos só na vitrine local com módulos falsos e o dos dashboards (ticket 04) em aberto, a finalizar pelo usuário por fora; camada Deno da função planilhas-dos-dashboards sem teste automático; resultado atual do "Testes de banco" no GitHub não reconferido; revisão de segurança foi a de reserva (menos completa)
+
+Em revisão desde 2026-10-22

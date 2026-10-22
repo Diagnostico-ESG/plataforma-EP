@@ -254,6 +254,7 @@ Nenhuma migração destrutiva: tipos, tabelas, funções, gatilhos e políticas 
 
 ## Observações
 
+- **Mudança de 2026-10-22 (publicacao-e-arquivamento, ADR 0020):** a Revisão pelo setor passa a se chamar Validação com o setor (código e regra iguais); a janela de concluir a Aprovação ganha a pergunta "Vai para publicação?"; voltar até a Aprovação ou antes também apaga a escolha. O item "Publicação (etapa 6) … v1.5" de Fora do escopo deixa de valer. O detalhe está em `.scratch/publicacao-e-arquivamento/spec.md`.
 - **Divergências da especificação:** a `RodadaRevisaoSetor` saiu inteira (ADR 0012); a `RevisaoInterna` previa resultado "aprovado | ajustes" (virou "sem alteração | corrigida", com escopo só na correção); a `Aprovacao` aponta a versão mais recente, que pode ter passado por um ajuste pequeno sem nova ida ao setor, e o número do E-protocolo passou a opcional (ADR 0015).
 - **Mudança de 2026-10-17 (no `/to-tickets`):** saíram as rodadas; a trava da Revisão pelo setor passou a ser "versão mais recente completa"; a data da aprovação passou a ser conferida contra a última revisão interna; o subprocesso deixou de ter tratamento à parte.
 - **Mudança de 2026-10-19 (no `/planejar`, parte 5 da iniciativa experiencia-do-quadro; ADR 0015):** o [Registrar] separado e a seção "Revisão e aprovação" saíram; a revisão e a aprovação se gravam na janela de concluir e aparecem na gaveta da etapa; o número, o link e a data do E-protocolo passaram a opcionais; voltar desfaz a aprovação; não se exclui registro, só se edita; o "Capturar" virou o [Assumir] já feito na parte 2, com a trava do autor na escolha (ADR 0014); as etapas foram renumeradas (Revisão interna 3, Revisão pelo setor 4, Aprovação 5) depois do ADR 0013, que tirou as etapas do setor (a Revisão pelo setor continua). As quatro decisões de gravação, lugar, volta e correção seguiram a recomendação, sem objeção do usuário; o E-protocolo opcional foi decisão explícita dele.
@@ -262,3 +263,5 @@ Nenhuma migração destrutiva: tipos, tabelas, funções, gatilhos e políticas 
 - O Drive guarda por 30 dias o conteúdo de um arquivo substituído, em "Gerenciar versões" (ADR 0011); a plataforma não precisa fazer nada para isso.
 
 Entregue em 2026-10-20 (commit 6ce74d6), com ressalva: critérios [visual] presumidos (selo "Aprovada" ao lado das pílulas de Arquivos, janela de edição e registro da Revisão interna na gaveta não foram vistos na tela; a janela de concluir e a gaveta da Aprovação foram vistas na vitrine local, com módulos falsos); função arquivos-no-drive com a trava de versão aprovada ainda sem publicar no desenvolvimento
+
+Em revisão desde 2026-10-22
