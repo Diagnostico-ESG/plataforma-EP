@@ -51,7 +51,7 @@ Casos (cada um uma asserção):
 - por último, Publicação desativada (`update etapas set ativa = false` por a1): Aprovação conclui sem escolha e o processo fica concluído.
 
 - [x] Escrever o teste.
-- [ ] Commit, `git push -u origin publicacao-e-arquivamento-01` (feito), disparar "Testes de banco" na branch: o 48 falha (função/coluna inexistente), os demais passam.
+- [x] Commit, `git push -u origin publicacao-e-arquivamento-01` (feito), disparar "Testes de banco" na branch: o 48 falha (função/coluna inexistente), os demais passam.
 
 ### Tarefa 2: Migração e ensaio
 
@@ -59,11 +59,11 @@ Casos (cada um uma asserção):
 
 Conteúdo da migração, na ordem: coluna e privilégio; `escolhendo_publicacao`; gatilho de conferência; gatilho de evento; `gravar_escolha_de_publicacao`; `conferir_sequencia_do_processo` e `iniciar_proxima_do_avanco` com o pulo; `avancar_etapa` (drop/create, revoke/grant); `concluir_aprovacao` com `p_vai_para_publicacao` (drop/create); `apagar_escolha_da_volta` e `voltar_a_etapa`; view; com `session_replication_role = replica` só no trecho: nome da `revisao_setor` (se ainda for "Revisão pelo setor") e a conversão dos dados.
 
-- [ ] Escrever a migração e os dois ensaios (escritos e enviados); push; "Testes de banco" na branch: os ensaios passam.
-- [ ] Apagar os ensaios; commit.
-- [ ] Disparar "Migrar banco de desenvolvimento" na branch com o nome do arquivo.
-- [ ] "Testes de banco" na branch: o 48 passa; ajustar os testes antigos que falharem pela regra nova (os que concluem a Aprovação passam a responder a escolha; os que esperam o concluído antigo passam a responder "não" ou a esperar a regra nova) até todos ficarem verdes.
-- [ ] `npm run db:types` (ou ajuste à mão de `src/types/database.ts`, se a rede barrar); commit único da migração, testes e tipos; registrar a migração em `supabase/AMBIENTES.md`.
+- [x] Escrever a migração e os dois ensaios (escritos e enviados); push; "Testes de banco" na branch: os ensaios passam.
+- [x] Apagar os ensaios; commit.
+- [x] Disparar "Migrar banco de desenvolvimento" na branch com o nome do arquivo.
+- [x] "Testes de banco" na branch: o 48 passa; ajustar os testes antigos que falharem pela regra nova (os que concluem a Aprovação passam a responder a escolha; os que esperam o concluído antigo passam a responder "não" ou a esperar a regra nova) até todos ficarem verdes.
+- [x] `npm run db:types` (ou ajuste à mão de `src/types/database.ts`, se a rede barrar); commit único da migração, testes e tipos; registrar a migração em `supabase/AMBIENTES.md`.
 
 ### Tarefa 3: Módulos reais (tradução banco ↔ tela)
 
