@@ -57,3 +57,5 @@ Spec: histórias 1 a 12, 16 a 22, 35 a 37 e 41 a 45 (no que toca a esta parte).
 - [ ] A Consulta vê tudo sem botões nem arrastar.
 - [ ] Testes do módulo real, das funções puras e da tela inteira com as falsas, cobrindo os itens acima, inclusive recusas e falhas ao gravar sem perder o preenchido.
 - [ ] [visual] A coluna Concluídos segue o estilo das demais. A pergunta fica clara na janela, que cabe na tela do notebook (1366×768). O Agora do concluído não quebra o alinhamento do verso. O selo "Não publicado" segue o estilo das pílulas.
+
+Concluído em 2026-10-22 (commit 3a17a0f)

@@ -114,4 +114,4 @@ Conteúdo da migração, na ordem: coluna e privilégio; `escolhendo_publicacao`
 - [x] `npm test`, `npm run lint`, `npm run typecheck`, `npm run check:circular` verdes.
 - [x] [visual] na vitrine local (falsas), a 1366×768: coluna Concluídos, janela com a pergunta, Agora do concluído, selo "Não publicado".
 - [x] Backlog: o que surgir fora do escopo.
-- [ ] Merge na `main` (`git switch main`, `git merge publicacao-e-arquivamento-01`), `git branch -d`, push da `main` e conferência do "Testes de banco" na `main`.
+- [x] Merge na `main` (`git switch main`, `git merge publicacao-e-arquivamento-01`), `git branch -d`, push da `main` e conferência do "Testes de banco" na `main`.
