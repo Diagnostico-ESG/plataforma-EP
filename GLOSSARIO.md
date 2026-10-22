@@ -68,6 +68,10 @@ Termos técnicos explicados em linguagem simples, conforme foram surgindo nas co
 
 **Vite** — ferramenta que criou e roda o projeto: serve a página localmente com atualização instantânea a cada salvamento (durante o desenvolvimento) e monta a versão final otimizada (o build).
 
+**React** — biblioteca de código que monta as telas em peças reutilizáveis chamadas componentes (um botão, um cartão de processo, uma janela) e atualiza só a peça afetada quando um dado muda. É o que desenha toda a interface do projeto; o Vite a roda e a empacota.
+
+**SPA (Single Page Application, aplicação de página única)** — site que o navegador baixa uma vez e, depois, troca só o conteúdo da tela a cada clique, sem recarregar tudo (como o Gmail). A plataforma é uma SPA feita com React e Vite, ligada a um banco na nuvem (Supabase).
+
 **Husky** — ferramenta que faz o Git obrigar checagens (lint, typecheck, testes) a rodar a cada `git commit`, bloqueando o commit se algo falhar. Configurado uma vez pelo `/setup`, roda sozinho em todo commit futuro.
 
 **lint-staged** — complemento do Husky que roda o lint só nos arquivos que entraram no commit, e não no projeto inteiro.
