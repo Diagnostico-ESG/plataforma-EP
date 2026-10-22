@@ -101,6 +101,14 @@ test('a ordem: dias, Relatório pendente, Sem responsável, Reunião, versão, s
     .toEqual(['dias', 'relatorio', 'sem_responsavel', 'reuniao', 'versao', 'subprocessos'])
 })
 
+test('o concluído com "não" tem o selo Não publicado, neutro, antes dos outros; o publicado e o sem escolha não', () => {
+  const concluido = { ...processo(), situacao: 'concluido' as const, etapaAtual: null, responsavel: null }
+  expect(selosDoCartao({ ...concluido, vaiParaPublicacao: false }, HOJE))
+    .toEqual([{ tipo: 'nao_publicado', texto: 'Não publicado', tom: 'neutro' }])
+  expect(selosDoCartao({ ...concluido, vaiParaPublicacao: true, publicadoEm: HOJE }, HOJE)).toEqual([])
+  expect(selosDoCartao({ ...concluido, vaiParaPublicacao: null }, HOJE)).toEqual([])
+})
+
 test('o processo sem cartão não tem selos de cartão', () => {
   const semCartao = { ...processo({ semResponsavel: true }), cartao: undefined }
   expect(selosDoCartao(semCartao, HOJE).map((selo) => selo.tipo)).toEqual(['sem_responsavel'])

@@ -10,21 +10,25 @@ export type AcaoDeTexto = 'dispensar' | 'realizada'
 /**
  * Concluir, Dispensar ou Realizada anteriormente com etapa pendente depois, e Voltar: a janela que escolhe o
  * responsável. `proxima` é a etapa que ganha o responsável: a que o avanço inicia ou, no Voltar, a própria etapa reaberta.
- * Sem etapa pendente depois (`null`), só a conclusão da Aprovação abre a janela: ela pede o E-protocolo e não escolhe ninguém.
+ * Sem etapa pendente depois (`null`), só a conclusão da Revisão interna, da Aprovação e da Publicação abre a janela, sem escolher ninguém.
  */
 export type PedidoDeAvanco = { acao: AcaoDeAvanco; etapa: EtapaDoCaminho; proxima: EtapaDoCaminho | null }
 
 /** Dispensar e Realizada anteriormente sem etapa pendente depois: a janela que pede só a nota. */
 export type PedidoDeTexto = { acao: AcaoDeTexto; etapa: EtapaDoCaminho }
 
-/** O avanço (ou a volta) numa chamada só: o responsável (null: ninguém) vai junto da mudança da etapa. */
+/**
+ * O avanço (ou a volta) numa chamada só: o responsável (null: ninguém) vai junto da mudança da etapa, e a escolha de
+ * publicação (null sem a pergunta) junto de concluir e de registrar como realizada anteriormente.
+ */
 export function gravarAvanco(
   processos: ModuloDeProcessos, acao: AcaoDeAvanco, etapa: EtapaDoCaminho, texto: string, responsavelId: string | null,
+  vaiParaPublicacao: boolean | null = null,
 ): Promise<void> {
-  if (acao === 'concluir') return processos.concluirEtapa(etapa.id, responsavelId)
+  if (acao === 'concluir') return processos.concluirEtapa(etapa.id, responsavelId, vaiParaPublicacao)
   if (acao === 'dispensar') return processos.dispensarEtapa(etapa.id, texto, responsavelId)
   if (acao === 'voltar') return processos.voltarParaEtapa(etapa.id, texto, responsavelId)
-  return processos.registrarRealizadaAnteriormente(etapa.id, texto, responsavelId)
+  return processos.registrarRealizadaAnteriormente(etapa.id, texto, responsavelId, vaiParaPublicacao)
 }
 
 /** Sem etapa pendente depois não há responsável a escolher: o avanço leva null. */
@@ -54,11 +58,12 @@ export function gravarRevisao(
   return esperarAGravacao(() => revisoes.concluirRevisaoInterna(etapa.id, dados, responsavelId), aoSumir)
 }
 
-/** A aprovação e a conclusão da Aprovação pelo setor juntas; a janela espera. */
+/** A aprovação, a escolha de publicação e a conclusão da Aprovação pelo setor juntas; a janela espera. */
 export function gravarAprovacao(
   revisoes: ModuloDeRevisoes, etapa: EtapaDoCaminho, dados: DadosDaAprovacao, responsavelId: string | null, aoSumir: () => void,
+  vaiParaPublicacao: boolean | null = null,
 ): Promise<string | null> {
-  return esperarAGravacao(() => revisoes.concluirAprovacao(etapa.id, dados, responsavelId), aoSumir)
+  return esperarAGravacao(() => revisoes.concluirAprovacao(etapa.id, dados, responsavelId, vaiParaPublicacao), aoSumir)
 }
 
 // A edição também espera a gravação. O registro que sumiu (a aprovação desfeita por uma volta de outra pessoa) não é "o

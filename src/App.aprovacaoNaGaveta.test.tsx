@@ -5,7 +5,7 @@ import type { Aprovacao } from './revisoes/tipos'
 import { escolherNoMenuDoProcesso, gavetaDaEtapa, versoAberto } from './testes/versoDoCartao'
 import { arquivoDeTeste, versaoDeTeste } from './testes/versoesDeTeste'
 import {
-  APROVACAO, BIA, CONCLUIDA, PUBLICACAO, REVISAO_DO_SETOR, abrirAJanela, botao, campo, caminho, montar, versao, type Falsos,
+  APROVACAO, BIA, CONCLUIDA, PUBLICACAO, REVISAO_DO_SETOR, abrirAJanela, botao, campo, caminho, montar, responder, versao, type Falsos,
 } from './testes/aprovacaoNoVerso'
 
 // A aprovação na gaveta da etapa, o selo "Aprovada" em Arquivos, o aviso de voltar e o histórico (ticket 03 de
@@ -106,6 +106,7 @@ test('a aprovação registrada pela janela aparece na gaveta e a versão ganha o
   expect(destaque.queryByText('Aprovada')).toBeNull()
   const janela = await abrirAJanela()
   fireEvent.change(campo(janela, /Número do E-protocolo/), { target: { value: 'PROT-9' } })
+  responder(janela, 'Sim')
   fireEvent.click(botao(janela))
   expect(await (await gavetaDaEtapa(APROVACAO)).findByText('V8 aprovada')).toBeTruthy()
   await waitFor(() => expect(within(screen.getAllByRole('article', { name: 'V8' })[0]).getByText('Aprovada')).toBeTruthy())

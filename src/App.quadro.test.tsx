@@ -105,15 +105,17 @@ test('o cartão traz sigla, nome, macroprocesso, a pílula "A classificar" e o r
   expect(within(screen.getByRole('link', { name: /Pagar Diária/ })).queryByText('A classificar')).toBeNull()
 })
 
-test('suspenso aparece com a pílula "Suspenso"; concluído e cancelado saem do Quadro', async () => {
+test('suspenso aparece com a pílula "Suspenso"; concluído vai à coluna Concluídos e cancelado sai do Quadro', async () => {
   montar({ processos: [
     processo('Parado', { situacao: 'suspenso' }),
     processo('Pronto', { situacao: 'concluido', etapaAtual: null }),
     processo('Desistido', { situacao: 'cancelado' }),
   ] })
-  await screen.findByRole('region', { name: MODELAGEM.nome })
+  const modelagem = await screen.findByRole('region', { name: MODELAGEM.nome })
+  expect(within(modelagem.parentElement as HTMLElement).getAllByRole('region').at(-1)?.getAttribute('aria-label')).toBe('Concluídos')
   expect(within(screen.getByRole('link', { name: /Parado/ })).getByText('Suspenso')).toBeTruthy()
-  expect(screen.queryByRole('link', { name: /Pronto/ })).toBeNull()
+  expect(within(modelagem).queryByRole('link', { name: /Pronto/ })).toBeNull()
+  expect(within(screen.getByRole('region', { name: 'Concluídos' })).getByRole('link', { name: /Pronto/ })).toBeTruthy()
   expect(screen.queryByRole('link', { name: /Desistido/ })).toBeNull()
 })
 

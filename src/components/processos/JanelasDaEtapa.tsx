@@ -2,6 +2,7 @@ import type { AcoesDaEtapaEmUso } from '../../hooks/useAcoesDaEtapa'
 import { responsavelMarcado, usuariosParaAEtapa } from '../../processos/caminhoDeEtapas'
 import { fraseDoBloqueioDaConclusao } from '../../processos/frasesDaVersaoCompleta'
 import type { PedidoDeAvanco, PedidoDeTexto } from '../../processos/gravarAcoes'
+import { avisoDaEscolhaNaVolta, perguntaDaPublicacao } from '../../processos/publicacao'
 import type { EtapaDoCaminho, UltimaVersao, UsuarioResponsavel } from '../../processos/tipos'
 import { voltaDesfazAprovacao } from '../../revisoes/conferirAprovacao'
 import { fraseDoAvisoDaVolta } from '../../revisoes/frasesDeAprovacao'
@@ -55,10 +56,12 @@ type JanelasDaEtapaProps = {
   /** A aprovação do processo e as etapas dele: a janela de voltar avisa quando a volta a desfaz. Sem elas (o Quadro), sem aviso. */
   aprovacao?: Aprovacao | null
   etapasDoProcesso?: EtapaDoCaminho[]
+  /** A escolha de publicação do processo: a janela de voltar avisa quando a volta a apaga. */
+  vaiParaPublicacao?: boolean | null
 }
 
 /** As janelas das ações da etapa: a da nota (Dispensar e Realizada anteriormente sem pendente depois) e a de avanço. */
-export function JanelasDaEtapa({ acoes, usuarios, usuarioId, ultimaVersao, aprovacao, etapasDoProcesso }: JanelasDaEtapaProps) {
+export function JanelasDaEtapa({ acoes, usuarios, usuarioId, ultimaVersao, aprovacao, etapasDoProcesso, vaiParaPublicacao }: JanelasDaEtapaProps) {
   const { pedido, avanco, gravarComTexto, gravarComAvanco, gravarRevisaoDaEtapa, gravarAprovacaoDaEtapa, fecharPedido, fecharAvanco } = acoes
   const janela = pedido ? JANELA_DO_TEXTO[pedido.acao] : null
   return (
@@ -68,7 +71,7 @@ export function JanelasDaEtapa({ acoes, usuarios, usuarioId, ultimaVersao, aprov
         aoConfirmar={gravarComTexto} aoFechar={fecharPedido} />
       {avanco && (
         <JanelaDoAvancoDaEtapa avanco={avanco} usuarios={usuarios} usuarioId={usuarioId} ultimaVersao={ultimaVersao}
-          aviso={avisoDaVolta(avanco, aprovacao, etapasDoProcesso)}
+          aviso={avisoDaVolta(avanco, { aprovacao, etapas: etapasDoProcesso ?? [], vaiParaPublicacao })}
           aoConfirmar={gravarComAvanco} aoConfirmarRevisao={gravarRevisaoDaEtapa} aoConfirmarAprovacao={gravarAprovacaoDaEtapa}
           aoFechar={fecharAvanco} />
       )}
@@ -82,26 +85,39 @@ type JanelaDoAvancoDaEtapaProps = {
   usuarios?: UsuarioResponsavel[]
   usuarioId: string
   ultimaVersao: UltimaVersao | null
-  aoConfirmar: (nota: string, responsavelId: string | null) => void
+  aoConfirmar: (nota: string, responsavelId: string | null, vaiParaPublicacao: boolean | null) => void
   aoConfirmarRevisao: (dados: DadosDaRevisao, responsavelId: string | null) => Promise<string | null>
-  aoConfirmarAprovacao: (dados: DadosDaAprovacao, responsavelId: string | null) => Promise<string | null>
+  aoConfirmarAprovacao: (dados: DadosDaAprovacao, responsavelId: string | null, vaiParaPublicacao: boolean | null) => Promise<string | null>
   aoFechar: () => void
 }
 
-// Sem etapa pendente depois (só a Aprovação chega aqui assim) não há "iniciar" nem escolha de responsável.
+// Sem etapa pendente depois (Revisão interna, Aprovação e Publicação chegam aqui assim) não há "iniciar" nem escolha de
+// responsável. Com a pergunta da publicação a próxima depende da resposta: o título não a cita, e o "Sim" mostra a escolha.
 function textosDoAvanco({ acao, etapa, proxima }: PedidoDeAvanco) {
   const textos = JANELA_DO_AVANCO[acao]
   if (proxima === null) return { titulo: `Concluir ${etapa.nome}`, rotuloDaAcao: 'Concluir', pergunta: null }
+  if (perguntaDaPublicacao(acao, etapa, proxima)) return textosComAPerguntaDaPublicacao(acao, etapa.nome)
   return { titulo: textos.titulo(etapa.nome, proxima.nome), rotuloDaAcao: textos.rotuloDaAcao(proxima.nome), pergunta: textos.pergunta }
 }
 
-// Voltar para a Aprovação ou antes dela desfaz a aprovação: a janela avisa antes de confirmar.
-function avisoDaVolta({ acao, etapa }: PedidoDeAvanco, aprovacao: Aprovacao | null | undefined, etapas: EtapaDoCaminho[] | undefined): string | null {
-  if (acao !== 'voltar' || !aprovacao || !voltaDesfazAprovacao(etapas ?? [], etapa.codigo)) return null
-  return fraseDoAvisoDaVolta(aprovacao.versao)
+function textosComAPerguntaDaPublicacao(acao: PedidoDeAvanco['acao'], nome: string) {
+  if (acao === 'realizada') {
+    return { titulo: `Registrar ${nome} como realizada anteriormente`, rotuloDaAcao: 'Registrar', pergunta: PERGUNTA_DA_PROXIMA }
+  }
+  return { titulo: `Concluir ${nome}`, rotuloDaAcao: 'Concluir', pergunta: PERGUNTA_DA_PROXIMA }
 }
 
-// O banco só deixa concluir a Revisão pelo setor e a Aprovação com a versão mais recente completa; a janela já diz o que falta.
+type ContextoDaVolta = { aprovacao: Aprovacao | null | undefined; etapas: EtapaDoCaminho[]; vaiParaPublicacao: boolean | null | undefined }
+
+// Voltar para a Aprovação ou antes dela desfaz a aprovação e apaga a escolha de publicação: a janela avisa antes de confirmar.
+function avisoDaVolta({ acao, etapa }: PedidoDeAvanco, { aprovacao, etapas, vaiParaPublicacao }: ContextoDaVolta): string | null {
+  if (acao !== 'voltar') return null
+  const daAprovacao = aprovacao && voltaDesfazAprovacao(etapas, etapa.codigo) ? fraseDoAvisoDaVolta(aprovacao.versao) : null
+  const avisos = [daAprovacao, avisoDaEscolhaNaVolta(etapas, etapa.codigo, vaiParaPublicacao)].filter((aviso) => aviso !== null)
+  return avisos.length ? avisos.join(' ') : null
+}
+
+// O banco só deixa concluir a Validação com o setor e a Aprovação com a versão mais recente completa; a janela já diz o que falta.
 function bloqueioDaConclusao({ acao, etapa }: PedidoDeAvanco, ultimaVersao: UltimaVersao | null): string | null {
   const confere = acao === 'concluir' && (etapa.codigo === 'revisao_setor' || etapa.codigo === 'aprovacao_setor')
   return confere ? fraseDoBloqueioDaConclusao(ultimaVersao) : null
@@ -126,6 +142,6 @@ function JanelaDoAvancoDaEtapa({
       rotuloDoCampo={JANELA_DO_AVANCO[acao].rotuloDoCampo} pergunta={textos.pergunta} usuarios={possiveis}
       marcadoAoAbrir={proxima ? responsavelMarcado(proxima, usuarioId, possiveis) : null}
       bloqueio={bloqueioDaConclusao(avanco, ultimaVersao)} aviso={aviso} revisao={revisao} aprovacao={aprovacao}
-      aoConfirmar={aoConfirmar} aoFechar={aoFechar} />
+      perguntaDaPublicacao={perguntaDaPublicacao(acao, etapa, proxima)} aoConfirmar={aoConfirmar} aoFechar={aoFechar} />
   )
 }

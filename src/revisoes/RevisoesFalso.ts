@@ -90,7 +90,9 @@ export class RevisoesFalso implements ModuloDeRevisoes {
     this.guardar(processo, dados)
   }
 
-  async concluirAprovacao(andamentoId: string, dados: DadosDaAprovacao, responsavelId: string | null): Promise<void> {
+  async concluirAprovacao(
+    andamentoId: string, dados: DadosDaAprovacao, responsavelId: string | null, vai?: boolean | null,
+  ): Promise<void> {
     await this.esperarAGravacao()
     const processo = this.processoDaEtapa(andamentoId)
     conferirAprovacao(dados, {
@@ -98,7 +100,7 @@ export class RevisoesFalso implements ModuloDeRevisoes {
       hoje: HOJE,
     })
     // Conclui primeiro: a recusa da conclusão (processo parado, responsável) não deixa a aprovação, como no banco.
-    await (this.processos as ProcessosFalso).concluirEtapa(andamentoId, responsavelId)
+    await (this.processos as ProcessosFalso).concluirEtapa(andamentoId, responsavelId, vai)
     this.aprovacaoConcluida(andamentoId, processo, dados, responsavelId)
   }
 

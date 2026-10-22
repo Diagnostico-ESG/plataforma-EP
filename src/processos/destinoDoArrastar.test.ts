@@ -41,6 +41,16 @@ describe('colunaDeDestino', () => {
     expect(colunaDeDestino(com(6))).toBeNull()
   })
 
+  test('da Publicação em andamento, sem pendente depois, o destino é a coluna Concluídos', () => {
+    const naPublicacao = com(6, { etapaAtual: { codigo: 'publicacao', nome: 'Publicação', ordem: 6 } })
+    const caminho = naPublicacao.cartao!.caminho.map((pedaco, indice) => (indice === 5 ? { ...pedaco, codigo: 'publicacao' } : pedaco))
+    expect(colunaDeDestino({ ...naPublicacao, cartao: { ...naPublicacao.cartao!, caminho } })).toBe('concluidos')
+  })
+
+  test('não há destino no processo concluído', () => {
+    expect(colunaDeDestino(com(3, { situacao: 'concluido' }))).toBeNull()
+  })
+
   test('não há destino no processo suspenso', () => {
     expect(colunaDeDestino(com(3, { situacao: 'suspenso' }))).toBeNull()
   })
@@ -69,11 +79,16 @@ describe('avancoDoCartao', () => {
 
   test('pula a vizinha já resolvida', () => {
     const etapas = [etapa(1, 'em_andamento'), etapa(2, 'dispensada'), etapa(3, 'pendente')]
-    expect(avancoDoCartao(etapas)?.proxima.id).toBe('a3')
+    expect(avancoDoCartao(etapas)?.proxima?.id).toBe('a3')
   })
 
   test('não há avanço com a etapa atual pendente', () => {
     expect(avancoDoCartao([etapa(1, 'concluida'), etapa(2, 'pendente'), etapa(3, 'pendente')])).toBeNull()
+  })
+
+  test('a Publicação em andamento, sem pendente depois, avança sem próxima (vai a Concluídos)', () => {
+    const publicacao = { ...etapa(2, 'em_andamento'), codigo: 'publicacao' }
+    expect(avancoDoCartao([etapa(1, 'concluida'), publicacao])).toEqual({ etapa: publicacao, proxima: null })
   })
 
   test('não há avanço sem pendente depois', () => {

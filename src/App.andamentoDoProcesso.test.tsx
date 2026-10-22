@@ -134,16 +134,15 @@ test('Realizada anteriormente grava com a nota', async () => {
   expect(falso.chamadas).toEqual([{ acao: 'realizada', id: 'a4', nota: 'Feita em 2025', usuarioId: null }])
 })
 
-test('resolvidas as obrigatórias, a pílula Concluído aparece no painel e o cartão sai do Quadro', async () => {
+// Com a Publicação no caminho, o concluído depende da escolha de publicação (App.escolhaDePublicacao); aqui não há Publicação.
+test('resolvidas as obrigatórias, a pílula Concluído aparece no painel e o cartão vai para a coluna Concluídos', async () => {
   montar({ processos: [processo({ etapasDoProcesso: [
     doProcesso(4, 'modelagem', MODELAGEM, { status: 'concluida' }),
     doProcesso(5, 'relatorio', RELATORIO, { status: 'em_andamento', iniciadaEm: '2026-10-13' }),
-    doProcesso(9, 'publicacao', 'Publicação', { obrigatoria: false }),
   ], etapaAtual: { codigo: 'relatorio', nome: RELATORIO, ordem: 5 } })] })
   fireEvent.click((await agoraDoVerso()).getByRole('button', { name: `Concluir ${RELATORIO}` }))
-  fireEvent.click(within(janelaPorCima()).getByRole('button', { name: 'Concluir e iniciar Publicação' }))
   expect(await (await painel()).findByText('Concluído')).toBeTruthy()
-  expect(screen.queryByRole('link', { name: /Emitir Ofício/ })).toBeNull()
+  expect(within(screen.getByRole('region', { name: 'Concluídos' })).getByRole('link', { name: /Emitir Ofício/ })).toBeTruthy()
 })
 
 const RECUSAS = [

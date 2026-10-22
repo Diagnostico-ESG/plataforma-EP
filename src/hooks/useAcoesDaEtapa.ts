@@ -3,11 +3,14 @@ import type { AcaoDaEtapa } from '../processos/caminhoDeEtapas'
 import {
   type PedidoDeAvanco, type PedidoDeTexto, gravarAprovacao, gravarAvanco, gravarRevisao, gravarTexto,
 } from '../processos/gravarAcoes'
+import { CODIGO_DA_PUBLICACAO } from '../processos/publicacao'
 import type { EtapaDoCaminho, ModuloDeProcessos } from '../processos/tipos'
 import type { DadosDaAprovacao, DadosDaRevisao, ModuloDeRevisoes } from '../revisoes/tipos'
 import { useGravacaoComFalha } from './useGravacaoComFalha'
 
-const ETAPAS_QUE_GRAVAM_NA_JANELA = ['revisao_interna', 'aprovacao_setor']
+// Concluir estas abre a janela mesmo sem etapa pendente depois: a Revisão interna e a Aprovação gravam um registro nela
+// (resultado, E-protocolo), e a Publicação confirma a ida a Concluídos (inclusive pelo arrastar).
+const ETAPAS_QUE_CONCLUEM_NA_JANELA = ['revisao_interna', 'aprovacao_setor', CODIGO_DA_PUBLICACAO]
 
 /**
  * As ações do caminho de etapas. Iniciar grava na hora; Concluir, Dispensar e Realizada anteriormente com etapa
@@ -23,8 +26,7 @@ export function useAcoesDaEtapa(processos: ModuloDeProcessos, revisoes: ModuloDe
   function agir(acao: AcaoDaEtapa, etapa: EtapaDoCaminho, proxima: EtapaDoCaminho | null) {
     if (acao === 'iniciar') return executar(() => processos.iniciarEtapa(etapa.id), aoMudar)
     if (acao === 'voltar') return setAvanco({ acao, etapa, proxima: etapa })
-    // Concluir a Revisão interna e a Aprovação grava um registro na janela (resultado, E-protocolo), mesmo sem etapa pendente depois.
-    if (proxima || (acao === 'concluir' && ETAPAS_QUE_GRAVAM_NA_JANELA.includes(etapa.codigo))) return setAvanco({ acao, etapa, proxima })
+    if (proxima || (acao === 'concluir' && ETAPAS_QUE_CONCLUEM_NA_JANELA.includes(etapa.codigo))) return setAvanco({ acao, etapa, proxima })
     if (acao === 'concluir') return executar(() => processos.concluirEtapa(etapa.id, null), aoMudar)
     setPedido({ acao, etapa })
   }
@@ -34,8 +36,8 @@ export function useAcoesDaEtapa(processos: ModuloDeProcessos, revisoes: ModuloDe
     if (pedido) executar(() => gravarTexto(processos, pedido, texto), aoMudar)
   }
 
-  function gravarComAvanco(nota: string, responsavelId: string | null) {
-    if (avanco) executar(() => gravarAvanco(processos, avanco.acao, avanco.etapa, nota, responsavelId), aoMudar)
+  function gravarComAvanco(nota: string, responsavelId: string | null, vaiParaPublicacao: boolean | null) {
+    if (avanco) executar(() => gravarAvanco(processos, avanco.acao, avanco.etapa, nota, responsavelId, vaiParaPublicacao), aoMudar)
   }
 
   // A janela da Revisão interna espera a gravação para mostrar a falha dentro dela: devolve a frase da falha ou null.
@@ -47,9 +49,11 @@ export function useAcoesDaEtapa(processos: ModuloDeProcessos, revisoes: ModuloDe
   }
 
   // A janela da Aprovação também espera a gravação: devolve a frase da falha ou null.
-  async function gravarAprovacaoDaEtapa(dados: DadosDaAprovacao, responsavelId: string | null): Promise<string | null> {
+  async function gravarAprovacaoDaEtapa(
+    dados: DadosDaAprovacao, responsavelId: string | null, vaiParaPublicacao: boolean | null,
+  ): Promise<string | null> {
     if (!avanco) return null
-    const falhou = await gravarAprovacao(revisoes, avanco.etapa, dados, responsavelId, aoSumir)
+    const falhou = await gravarAprovacao(revisoes, avanco.etapa, dados, responsavelId, aoSumir, vaiParaPublicacao)
     if (!falhou) aoMudar()
     return falhou
   }

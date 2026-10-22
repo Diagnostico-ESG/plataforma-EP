@@ -2,10 +2,12 @@ import '../JanelaDeConfirmacao.css'
 import { useEffect, useId, useRef, useState } from 'react'
 import type { UsuarioResponsavel } from '../../processos/tipos'
 import { type AprovacaoDaJanela, useAprovacaoDaJanela } from '../../hooks/useAprovacaoDaJanela'
+import { useEscolhaDaPublicacao } from '../../hooks/useEscolhaDaPublicacao'
 import { type RevisaoDaJanela, useRevisaoDaJanela } from '../../hooks/useRevisaoDaJanela'
 import { BlocoDaAprovacao } from './BlocoDaAprovacao'
 import { BlocoDaRevisao } from './BlocoDaRevisao'
 import { EscolhaDoResponsavel, NINGUEM } from './EscolhaDoResponsavel'
+import { PerguntaDaPublicacao } from './PerguntaDaPublicacao'
 
 type JanelaDeAvancoProps = {
   titulo: string
@@ -27,8 +29,13 @@ type JanelaDeAvancoProps = {
   revisao?: RevisaoDaJanela
   /** Só na conclusão da Aprovação pelo setor: a versão aprovada e o número, o link e a data do E-protocolo entram na janela e a gravação é dela. */
   aprovacao?: AprovacaoDaJanela
-  /** A nota chega sem espaços nas pontas ("" quando não há nota); o responsável, null para "Ninguém por enquanto". */
-  aoConfirmar: (nota: string, responsavelId: string | null) => void
+  /** Ao resolver a Aprovação com a Publicação pendente depois: "Vai para publicação?", obrigatória, abaixo do E-protocolo. */
+  perguntaDaPublicacao?: boolean
+  /**
+   * A nota chega sem espaços nas pontas ("" quando não há nota); o responsável, null para "Ninguém por enquanto" (e no
+   * "Não" da publicação); a escolha de publicação, null sem a pergunta.
+   */
+  aoConfirmar: (nota: string, responsavelId: string | null, vaiParaPublicacao: boolean | null) => void
   aoFechar: () => void
 }
 
@@ -36,7 +43,8 @@ type JanelaDeAvancoProps = {
 // campo da nota (quando há) ou à opção marcada, o botão só se habilita com a nota preenchida e Esc fecha sem gravar.
 // Quem a monta a desmonta ao fechar, e a escolha recomeça marcada na próxima vez.
 export function JanelaDeAvanco({
-  titulo, rotuloDaAcao, comNota, rotuloDoCampo, pergunta, usuarios, marcadoAoAbrir, bloqueio, aviso, revisao, aprovacao, aoConfirmar, aoFechar,
+  titulo, rotuloDaAcao, comNota, rotuloDoCampo, pergunta, usuarios, marcadoAoAbrir, bloqueio, aviso, revisao, aprovacao,
+  perguntaDaPublicacao = false, aoConfirmar, aoFechar,
 }: JanelaDeAvancoProps) {
   const janela = useRef<HTMLDialogElement>(null)
   const campo = useRef<HTMLTextAreaElement>(null)
@@ -47,7 +55,8 @@ export function JanelaDeAvanco({
   const daRevisao = useRevisaoDaJanela(revisao, bloqueio, aoFechar)
   const daAprovacao = useAprovacaoDaJanela(aprovacao, bloqueio, aoFechar)
   const gravacao = aprovacao ? daAprovacao : daRevisao
-  const pronta = (!comNota || nota.trim() !== '') && gravacao.liberada
+  const publicacao = useEscolhaDaPublicacao(perguntaDaPublicacao)
+  const pronta = (!comNota || nota.trim() !== '') && gravacao.liberada && publicacao.respondida
 
   useEffect(() => {
     const dialogo = janela.current
@@ -59,14 +68,12 @@ export function JanelaDeAvanco({
 
   const confirmar = () => {
     if (!pronta) return
-    const responsavelId = responsavel === NINGUEM ? null : responsavel
+    const responsavelId = responsavel === NINGUEM || !publicacao.comResponsavel ? null : responsavel
     // A revisão e a aprovação esperam a gravação (a falha aparece na janela, com o preenchido); as outras ações fecham antes de gravar.
-    if (revisao || aprovacao) {
-      void gravacao.gravar(responsavelId)
-      return
-    }
+    if (aprovacao) return void daAprovacao.gravar(responsavelId, publicacao.escolha)
+    if (revisao) return void daRevisao.gravar(responsavelId)
     aoFechar()
-    aoConfirmar(nota.trim(), responsavelId)
+    aoConfirmar(nota.trim(), responsavelId, publicacao.escolha)
   }
 
   return (
@@ -82,10 +89,8 @@ export function JanelaDeAvanco({
       )}
       <AlertaDaJanela texto={gravacao.frase} />
       <BlocosDoRegistro revisao={revisao} aprovacao={aprovacao} daRevisao={daRevisao} daAprovacao={daAprovacao} />
-      <AlertaDaJanela texto={gravacao.falha} />
-      {pergunta !== null && (
-        <EscolhaDoResponsavel pergunta={pergunta} usuarios={usuarios} marcado={responsavel} aoEscolher={setResponsavel} aoConfirmar={confirmar} />
-      )}
+      <EscolhasDaJanela perguntaDaPublicacao={perguntaDaPublicacao} publicacao={publicacao} falha={gravacao.falha}
+        pergunta={pergunta} usuarios={usuarios} responsavel={responsavel} aoEscolher={setResponsavel} aoConfirmar={confirmar} />
       <div className="janela-confirmacao-botoes">
         <button type="button" className="botao botao-principal" disabled={!pronta} onClick={confirmar}>
           {gravacao.salvando ? 'Salvando…' : rotuloDaAcao}
@@ -93,6 +98,30 @@ export function JanelaDeAvanco({
         <button type="button" className="botao botao-secundario" onClick={aoFechar}>Cancelar</button>
       </div>
     </dialog>
+  )
+}
+
+type EscolhasDaJanelaProps = {
+  perguntaDaPublicacao: boolean
+  publicacao: ReturnType<typeof useEscolhaDaPublicacao>
+  falha: string | null
+  pergunta: string | null
+  usuarios: UsuarioResponsavel[]
+  responsavel: string
+  aoEscolher: (valor: string) => void
+  aoConfirmar: () => void
+}
+
+// "Vai para publicação?" (quando há), a falha da gravação e a escolha do responsável, que o "Não" esconde.
+function EscolhasDaJanela({ perguntaDaPublicacao, publicacao, falha, pergunta, usuarios, responsavel, aoEscolher, aoConfirmar }: EscolhasDaJanelaProps) {
+  return (
+    <>
+      {perguntaDaPublicacao && <PerguntaDaPublicacao resposta={publicacao.resposta} aoResponder={publicacao.responder} />}
+      <AlertaDaJanela texto={falha} />
+      {pergunta !== null && publicacao.comResponsavel && (
+        <EscolhaDoResponsavel pergunta={pergunta} usuarios={usuarios} marcado={responsavel} aoEscolher={aoEscolher} aoConfirmar={aoConfirmar} />
+      )}
+    </>
   )
 }
 

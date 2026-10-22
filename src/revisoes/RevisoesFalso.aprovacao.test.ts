@@ -53,7 +53,7 @@ describe('lerAprovacao', () => {
 describe('concluirAprovacao', () => {
   test('grava a aprovação da versão mais recente, conclui a etapa, inicia a próxima, marca a versão e registra o evento', async () => {
     const { processos, versoes, revisoes } = montar()
-    await revisoes.concluirAprovacao('a5', { numeroEprotocolo: 'PROT-1', link: 'https://eprotocolo.example/a', aprovadaEm: '2026-10-12' }, EU.id)
+    await revisoes.concluirAprovacao('a5', { numeroEprotocolo: 'PROT-1', link: 'https://eprotocolo.example/a', aprovadaEm: '2026-10-12' }, EU.id, true)
     expect(await revisoes.lerAprovacao('p1')).toEqual({
       id: 'ap1', versao: 8, numeroEprotocolo: 'PROT-1', link: 'https://eprotocolo.example/a', aprovadaEm: '2026-10-12',
       registradaPor: 'Bia Teste', registradaEm: '2026-10-13T12:00:00Z',
@@ -69,7 +69,7 @@ describe('concluirAprovacao', () => {
 
   test('sem os três campos também conclui', async () => {
     const { revisoes } = montar()
-    await revisoes.concluirAprovacao('a5', SEM_NADA, null)
+    await revisoes.concluirAprovacao('a5', SEM_NADA, null, true)
     expect((await revisoes.lerAprovacao('p1'))?.numeroEprotocolo).toBeNull()
   })
 
@@ -80,7 +80,7 @@ describe('concluirAprovacao', () => {
     ['data no futuro', COMPLETA, { ...SEM_NADA, aprovadaEm: '2026-10-14' }, 'A data 14/10/2026 está no futuro.'],
   ])('recusa %s e não deixa nada', async (_caso, ultima, dados, frase) => {
     const { processos, revisoes } = montar(ultima)
-    const falha = await falhaDe(revisoes.concluirAprovacao('a5', dados, null))
+    const falha = await falhaDe(revisoes.concluirAprovacao('a5', dados, null, true))
     expect(falha.message).toBe(frase)
     expect(await revisoes.lerAprovacao('p1')).toBeNull()
     expect(((await processos.lerProcesso('p1')) as ProcessoLido).etapasDoProcesso[1].status).toBe('em_andamento')
@@ -92,24 +92,24 @@ describe('concluirAprovacao', () => {
       id: 'r1', versaoRevisada: 8, versaoCorrigida: null, resultado: 'sem_alteracao', escopo: null, comentario: null,
       revisor: 'Bia Teste', revisadaEm: '2026-10-13',
     }]
-    const falha = await falhaDe(revisoes.concluirAprovacao('a5', { ...SEM_NADA, aprovadaEm: '2026-10-12' }, null))
+    const falha = await falhaDe(revisoes.concluirAprovacao('a5', { ...SEM_NADA, aprovadaEm: '2026-10-12' }, null, true))
     expect(falha.message).toBe('A data da aprovação (12/10/2026) não pode ser antes da última revisão interna (13/10/2026).')
   })
 
   test('recusa a segunda aprovação e a falha programada, antes de gravar', async () => {
     const { revisoes } = montar()
     revisoes.falhaNaGravacao = 'falha de conexão simulada'
-    expect((await falhaDe(revisoes.concluirAprovacao('a5', SEM_NADA, null))).message).toBe('falha de conexão simulada')
+    expect((await falhaDe(revisoes.concluirAprovacao('a5', SEM_NADA, null, true))).message).toBe('falha de conexão simulada')
     revisoes.falhaNaGravacao = null
-    await revisoes.concluirAprovacao('a5', SEM_NADA, null)
-    expect((await falhaDe(revisoes.concluirAprovacao('a5', SEM_NADA, null))).message).toBe('Este processo já tem aprovação registrada.')
+    await revisoes.concluirAprovacao('a5', SEM_NADA, null, true)
+    expect((await falhaDe(revisoes.concluirAprovacao('a5', SEM_NADA, null, true))).message).toBe('Este processo já tem aprovação registrada.')
   })
 })
 
 describe('voltar desfaz a aprovação', () => {
   async function aprovado() {
     const montagem = montar()
-    await montagem.revisoes.concluirAprovacao('a5', SEM_NADA, null)
+    await montagem.revisoes.concluirAprovacao('a5', SEM_NADA, null, true)
     return montagem
   }
 
@@ -136,7 +136,7 @@ describe('voltar desfaz a aprovação', () => {
 describe('editarAprovacao', () => {
   async function aprovada(dados: DadosDaAprovacao = SEM_NADA) {
     const montado = montar()
-    await montado.revisoes.concluirAprovacao('a5', dados, EU.id)
+    await montado.revisoes.concluirAprovacao('a5', dados, EU.id, true)
     return montado
   }
   const ID = 'ap1'

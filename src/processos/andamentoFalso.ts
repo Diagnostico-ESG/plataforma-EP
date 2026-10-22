@@ -1,6 +1,7 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { ehAutorBarrado, formatarData, indiceDaEtapaAtual, proximaPendente } from './caminhoDeEtapas'
 import { fraseDoBloqueioDaConclusao } from './frasesDaVersaoCompleta'
+import { CODIGO_DA_PUBLICACAO } from './publicacao'
 import type {
   DatasDaEtapa, EtapaDoProcesso, EtapaDoCaminho, ProcessoLido, ResponsavelDaEtapa, StatusDaEtapa, UltimaVersao, UsuarioResponsavel,
 } from './tipos'
@@ -9,16 +10,26 @@ const RESOLVIDOS: StatusDaEtapa[] = ['concluida', 'realizada_anteriormente', 'di
 
 type TrocaDeEtapas = <T extends EtapaDoCaminho>(etapas: T[]) => T[]
 
-/** Recalcula, como a view, a etapa atual e o "concluído" a partir das etapas do processo. */
+// Como a view: obrigatórias resolvidas e, ainda, a escolha "não" ou a Publicação resolvida (ou fora do caminho).
+function estaConcluido(processo: ProcessoLido, etapas: EtapaDoProcesso[]): boolean {
+  const resolvida = (etapa: EtapaDoProcesso) => RESOLVIDOS.includes(etapa.status)
+  const obrigatorias = etapas.every((etapa) => !etapa.obrigatoria || resolvida(etapa))
+  const publicacao = processo.vaiParaPublicacao === false
+    || etapas.every((etapa) => etapa.codigo !== CODIGO_DA_PUBLICACAO || resolvida(etapa))
+  return obrigatorias && publicacao
+}
+
+/** Recalcula, como a view, a etapa atual e o "concluído" a partir das etapas do processo; o concluído não tem etapa atual. */
 export function recalcularProcesso(processo: ProcessoLido, etapasDoProcesso: EtapaDoProcesso[]): ProcessoLido {
-  const atual = etapasDoProcesso[indiceDaEtapaAtual(etapasDoProcesso)]
-  const concluido = etapasDoProcesso.every((etapa) => !etapa.obrigatoria || RESOLVIDOS.includes(etapa.status))
   // "Concluído" é calculado: a situação guardada de quem está concluído é "em andamento".
   const guardada = processo.situacao === 'concluido' ? 'em_andamento' : processo.situacao
+  const concluido = guardada === 'em_andamento' && estaConcluido(processo, etapasDoProcesso)
+  const atual = concluido ? undefined : etapasDoProcesso[indiceDaEtapaAtual(etapasDoProcesso)]
   return {
     ...processo, etapasDoProcesso,
     etapaAtual: atual ? { codigo: atual.codigo, nome: atual.nome, ordem: atual.ordem } : null,
-    situacao: concluido && guardada === 'em_andamento' ? 'concluido' : guardada,
+    situacao: concluido ? 'concluido' : guardada,
+    ...(concluido && { responsavel: null }),
   }
 }
 
@@ -70,12 +81,15 @@ export function conferirDatasDaEtapa({ iniciadaEm, resolvidaEm }: DatasDaEtapa, 
 /**
  * Como a função de avanço do banco: a escolhida recebe as mudanças e a primeira pendente depois dela entra em
  * andamento com hoje e o responsável (null: ninguém, mesmo que a etapa já tivesse um). Sem pendente depois, só resolve.
+ * Com `pularPublicacao` (a escolha "não"), a Publicação não é a próxima.
  */
 export function avancarEtapas(
   etapas: EtapaDoProcesso[], id: string, resolvida: Partial<EtapaDoProcesso>, responsavel: UsuarioResponsavel | null, hoje: string,
+  pularPublicacao = false,
 ): EtapaDoProcesso[] {
   const indice = etapas.findIndex((etapa) => etapa.id === id)
-  const proxima = etapas.findIndex((etapa, posicao) => posicao > indice && etapa.status === 'pendente')
+  const proxima = etapas.findIndex((etapa, posicao) => posicao > indice && etapa.status === 'pendente'
+    && !(pularPublicacao && etapa.codigo === CODIGO_DA_PUBLICACAO))
   return etapas.map((etapa, posicao) => {
     if (posicao === indice) return { ...etapa, ...resolvida }
     if (posicao !== proxima) return etapa
@@ -90,7 +104,9 @@ export function avancarEtapas(
 export function avancarProcesso(
   processo: ProcessoLido, id: string, resolvida: Partial<EtapaDoProcesso>, responsavel: UsuarioResponsavel | null, hoje: string,
 ): ProcessoLido {
-  const recalculado = recalcularProcesso(processo, avancarEtapas(processo.etapasDoProcesso, id, resolvida, responsavel, hoje))
+  const pular = processo.vaiParaPublicacao === false
+  const recalculado = recalcularProcesso(processo, avancarEtapas(processo.etapasDoProcesso, id, resolvida, responsavel, hoje, pular))
+  if (recalculado.situacao === 'concluido') return recalculado
   const atual = recalculado.etapasDoProcesso[indiceDaEtapaAtual(recalculado.etapasDoProcesso)]
   const cartao = atual?.responsavelId ? { id: atual.responsavelId, nome: atual.responsavelNome ?? '', fotoUrl: null } : null
   return { ...recalculado, responsavel: cartao }
@@ -120,7 +136,7 @@ export function conferirAutorDaRevisao(ultimaVersao: UltimaVersao | null, etapa:
   throw new TravaDoBanco(`${ultimaVersao.autorNome} enviou a versão V${ultimaVersao.numero} e não pode ser responsável pela Revisão interna.`)
 }
 
-/** Como o gatilho do banco: concluir a Revisão pelo setor exige a versão mais recente completa. */
+/** Como o gatilho do banco: concluir a Validação com o setor exige a versão mais recente completa. */
 export function conferirVersaoDaRevisaoDoSetor(etapa: EtapaDoCaminho, ultimaVersao: UltimaVersao | null): void {
   if (etapa.codigo !== 'revisao_setor') return
   const frase = fraseDoBloqueioDaConclusao(ultimaVersao)

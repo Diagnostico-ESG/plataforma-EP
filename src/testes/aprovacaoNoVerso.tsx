@@ -15,11 +15,12 @@ import { agoraDoVerso } from './versoDoCartao'
 
 export const EU = { id: USUARIO_DE_TESTE.id, nome: USUARIO_DE_TESTE.nome }
 export const BIA = { id: 'u2', nome: 'Bia Teste' }
-export const REVISAO_DO_SETOR = 'Revisão pelo setor'
+export const REVISAO_DO_SETOR = 'Validação com o setor'
 export const APROVACAO = 'Aprovação pelo setor'
 export const PUBLICACAO = 'Publicação'
-export const TITULO_DA_JANELA = `Concluir ${APROVACAO} e iniciar ${PUBLICACAO}`
-export const BOTAO_DA_JANELA = `Concluir e iniciar ${PUBLICACAO}`
+// Com a Publicação pendente depois, a janela pergunta "Vai para publicação?" e o título não cita a próxima (ADR 0020).
+export const TITULO_DA_JANELA = `Concluir ${APROVACAO}`
+export const BOTAO_DA_JANELA = 'Concluir'
 export const COMPLETA = ['bpm', 'png', 'relatorio'] as const
 
 export const versao = (papeis: UltimaVersao['papeis'] = [...COMPLETA]): UltimaVersao =>
@@ -41,7 +42,7 @@ export function caminho(publicacao: Partial<EtapaDoProcesso> = {}): EtapaDoProce
     doProcesso(5, 'aprovacao_setor', APROVACAO, {
       status: 'em_andamento', iniciadaEm: '2026-10-12', responsavelId: EU.id, responsavelNome: EU.nome,
     }),
-    doProcesso(6, 'publicacao', PUBLICACAO, publicacao),
+    doProcesso(6, 'publicacao', PUBLICACAO, { obrigatoria: false, ...publicacao }),
   ]
 }
 
@@ -91,3 +92,6 @@ export const abrirAJanela = async (titulo = TITULO_DA_JANELA, concluir = `Conclu
 export type Janela = ReturnType<typeof within>
 export const botao = (janela: Janela, nome = BOTAO_DA_JANELA) => janela.getByRole('button', { name: nome }) as HTMLButtonElement
 export const campo = (janela: Janela, nome: RegExp) => janela.getByLabelText(nome) as HTMLInputElement
+/** Responde "Vai para publicação?" na janela. */
+export const responder = (janela: Janela, resposta: 'Sim' | 'Não') =>
+  fireEvent.click(within(janela.getByRole('radiogroup', { name: 'Vai para publicação?' })).getByRole('radio', { name: resposta }))

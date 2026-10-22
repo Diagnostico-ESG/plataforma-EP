@@ -5,7 +5,7 @@ import type { UltimaVersao } from './processos/tipos'
 import { cartaoDe, ETAPAS, montar as montarQuadro, processo as processoDoQuadro } from './testes/quadroDeTeste'
 import { agoraDoVerso, etapasDoVerso } from './testes/versoDoCartao'
 import {
-  APROVACAO, EU, PUBLICACAO, TITULO_DA_JANELA, abrirAJanela, botao, campo, montar, versao,
+  APROVACAO, EU, PUBLICACAO, TITULO_DA_JANELA, abrirAJanela, botao, campo, montar, responder, versao,
 } from './testes/aprovacaoNoVerso'
 
 // Concluir a Aprovação pelo setor pela janela de concluir (versão aprovada, número, link e data do E-protocolo opcionais),
@@ -24,6 +24,8 @@ test('a janela mostra a versão aprovada e os três campos opcionais, e conclui 
   expect(campo(janela, /Número do E-protocolo/).maxLength).toBe(60)
   expect(campo(janela, /^Link/).maxLength).toBe(500)
   expect(campo(janela, /Data da aprovação/).type).toBe('date')
+  expect(botao(janela).disabled).toBe(true)
+  responder(janela, 'Sim')
   expect(botao(janela).disabled).toBe(false)
   fireEvent.click(botao(janela))
   expect(await (await etapasDoVerso()).findByRole('button', { name: `${PUBLICACAO}: atual` })).toBeTruthy()
@@ -39,6 +41,7 @@ test('número, link e data preenchidos vão aparados e a data não passa de hoje
   fireEvent.change(campo(janela, /^Link/), { target: { value: ' https://eprotocolo.example/a ' } })
   fireEvent.change(campo(janela, /Data da aprovação/), { target: { value: '2026-10-12' } })
   expect(campo(janela, /Data da aprovação/).max).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+  responder(janela, 'Sim')
   fireEvent.click(botao(janela))
   await waitFor(() => expect(revisoes.aprovacoesConcluidas).toMatchObject([{
     dados: { numeroEprotocolo: 'PROT-2026-0001', link: 'https://eprotocolo.example/a', aprovadaEm: '2026-10-12' },
@@ -73,6 +76,7 @@ test('a recusa do banco aparece em vermelho na janela, que fica aberta com o pre
   const janela = await abrirAJanela()
   fireEvent.change(campo(janela, /Número do E-protocolo/), { target: { value: 'PROT-1' } })
   fireEvent.change(campo(janela, /^Link/), { target: { value: 'ftp://x.example' } })
+  responder(janela, 'Sim')
   fireEvent.click(botao(janela))
   expect((await janela.findByRole('alert')).textContent).toBe('O link do E-protocolo precisa começar com http:// ou https://.')
   expect(campo(janela, /Número do E-protocolo/).value).toBe('PROT-1')
@@ -89,6 +93,7 @@ test('a falha de conexão também aparece na janela, e enquanto grava o botão m
   const { revisoes } = montar(versao())
   revisoes.falhaNaGravacao = 'falha de conexão simulada'
   const janela = await abrirAJanela()
+  responder(janela, 'Não')
   fireEvent.click(botao(janela))
   expect((await janela.findByRole('alert')).textContent).toContain('falha de conexão simulada')
   revisoes.falhaNaGravacao = null
@@ -104,7 +109,7 @@ test('Realizada anteriormente na Aprovação, a Revisão pelo setor e o voltar n
   fireEvent.click(agora.getByRole('button', { name: 'Mais ações da etapa' }))
   fireEvent.click(agora.getByRole('menuitem', { name: 'Realizada anteriormente' }))
   const aberta = within(await screen.findByRole('dialog', {
-    name: `Registrar ${APROVACAO} como realizada anteriormente e iniciar ${PUBLICACAO}`,
+    name: `Registrar ${APROVACAO} como realizada anteriormente`,
   }))
   expect(aberta.queryByText(/Versão aprovada/)).toBeNull()
 })

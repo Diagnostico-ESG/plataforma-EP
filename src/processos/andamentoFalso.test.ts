@@ -28,11 +28,20 @@ test('concluir a etapa atual passa a atual para a seguinte', () => {
   expect(depois.situacao).toBe('em_andamento')
 })
 
-test('com as obrigatórias resolvidas o processo é concluído, mesmo com a opcional pendente', () => {
+test('com as obrigatórias resolvidas o processo é concluído, mesmo com a opcional pendente, e fica sem etapa atual', () => {
   const quase = mudarEtapaDoProcesso(PROCESSO, 'a4', { status: 'concluida' })
   const depois = mudarEtapaDoProcesso(quase, 'a5', { status: 'realizada_anteriormente' })
   expect(depois.situacao).toBe('concluido')
-  expect(depois.etapaAtual?.codigo).toBe('c9')
+  expect(depois.etapaAtual).toBeNull()
+  expect(depois.responsavel).toBeNull()
+})
+
+test('com a Publicação pendente, só conclui com a escolha "não"', () => {
+  const comPublicacao = { ...PROCESSO, etapasDoProcesso: [...PROCESSO.etapasDoProcesso.slice(0, 2), etapa(9, { codigo: 'publicacao', obrigatoria: false })] }
+  const resolvidas = mudarEtapaDoProcesso(mudarEtapaDoProcesso(comPublicacao, 'a4', { status: 'concluida' }), 'a5', { status: 'concluida' })
+  expect(resolvidas.situacao).toBe('em_andamento')
+  expect(resolvidas.etapaAtual?.codigo).toBe('publicacao')
+  expect(mudarEtapaDoProcesso({ ...resolvidas, vaiParaPublicacao: false }, 'a5', {}).situacao).toBe('concluido')
 })
 
 test('etapa de outro processo não muda nada', () => {

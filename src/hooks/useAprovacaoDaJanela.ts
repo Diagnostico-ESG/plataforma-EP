@@ -9,7 +9,7 @@ import { useGravacaoNaJanela } from './useGravacaoNaJanela'
  */
 export type AprovacaoDaJanela = {
   versao: number | null
-  aoConfirmar: (dados: DadosDaAprovacao, responsavelId: string | null) => Promise<string | null>
+  aoConfirmar: (dados: DadosDaAprovacao, responsavelId: string | null, vaiParaPublicacao: boolean | null) => Promise<string | null>
 }
 
 /**
@@ -20,7 +20,7 @@ export function useAprovacaoDaJanela(aprovacao: AprovacaoDaJanela | undefined, b
   const [rascunho, setRascunho] = useState(RASCUNHO_DA_APROVACAO_VAZIO)
   const { salvando, falha, gravar } = useGravacaoNaJanela(aoFechar)
   const frase = bloqueio ?? null
-  const confirmar = (responsavelId: string | null) =>
-    aprovacao ? gravar(() => aprovacao.aoConfirmar(dadosDaAprovacao(rascunho), responsavelId)) : Promise.resolve()
+  const confirmar = (responsavelId: string | null, vaiParaPublicacao: boolean | null) =>
+    aprovacao ? gravar(() => aprovacao.aoConfirmar(dadosDaAprovacao(rascunho), responsavelId, vaiParaPublicacao)) : Promise.resolve()
   return { rascunho, setRascunho, salvando, falha, frase, liberada: frase === null && !salvando, gravar: confirmar }
 }

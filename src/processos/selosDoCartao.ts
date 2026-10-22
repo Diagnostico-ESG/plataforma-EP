@@ -1,10 +1,11 @@
 import { formatarData } from './caminhoDeEtapas'
 import { diasNaEtapa, passouDoLimite } from './diasNaEtapa'
+import { naoPublicado } from './publicacao'
 import type { ProcessoDaLista } from './tipos'
 import { rotuloDaVersao } from '../versoes/rotulos'
 
 export type TomDoSelo = 'alerta' | 'neutro'
-export type TipoDeSelo = 'dias' | 'relatorio' | 'sem_responsavel' | 'reuniao' | 'versao' | 'subprocessos'
+export type TipoDeSelo = 'nao_publicado' | 'dias' | 'relatorio' | 'sem_responsavel' | 'reuniao' | 'versao' | 'subprocessos'
 export type Selo = { tipo: TipoDeSelo; texto: string; tom: TomDoSelo }
 
 const CODIGO_DA_REVISAO_INTERNA = 'revisao_interna'
@@ -59,10 +60,17 @@ function seloDeSubprocessos(processo: ProcessoDaLista): Selo[] {
   return [{ tipo: 'subprocessos', texto, tom: 'neutro' }]
 }
 
-/** Só o que há a dizer, na ordem da spec: dias, Relatório pendente, Sem responsável, Reunião, versão, subprocessos. */
+function seloDeNaoPublicado(processo: ProcessoDaLista): Selo[] {
+  return naoPublicado(processo) ? [{ tipo: 'nao_publicado', texto: 'Não publicado', tom: 'neutro' }] : []
+}
+
+/**
+ * Só o que há a dizer, na ordem da spec: Não publicado (só no concluído), dias, Relatório pendente, Sem responsável,
+ * Reunião, versão, subprocessos.
+ */
 export function selosDoCartao(processo: ProcessoDaLista, hoje: string): Selo[] {
   return [
-    ...seloDeDias(processo, hoje), ...seloDeRelatorio(processo), ...seloDeResponsavel(processo),
+    ...seloDeNaoPublicado(processo), ...seloDeDias(processo, hoje), ...seloDeRelatorio(processo), ...seloDeResponsavel(processo),
     ...seloDeReuniao(processo, hoje), ...seloDeVersao(processo), ...seloDeSubprocessos(processo),
   ]
 }

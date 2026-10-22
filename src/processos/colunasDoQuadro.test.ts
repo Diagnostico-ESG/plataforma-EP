@@ -21,8 +21,19 @@ const titulos = (etapas: EtapaDoCatalogo[], processos: ProcessoDaLista[]) =>
 const nomes = (chave: string, etapas: EtapaDoCatalogo[], processos: ProcessoDaLista[]) =>
   colunasDoQuadro({ etapas, processos }).find((coluna) => coluna.chave === chave)?.processos.map((p) => p.nome)
 
-test('uma coluna por etapa ativa na ordem do catálogo (mesmo vazia), sem "Aguardando o setor"', () => {
-  expect(titulos([RELATORIO, MODELAGEM], [])).toEqual([MODELAGEM.nome, RELATORIO.nome])
+test('uma coluna por etapa ativa na ordem do catálogo (mesmo vazia), sem "Aguardando o setor", e Concluídos no fim', () => {
+  expect(titulos([RELATORIO, MODELAGEM], [])).toEqual([MODELAGEM.nome, RELATORIO.nome, 'Concluídos'])
+})
+
+test('a coluna Concluídos traz os concluídos por nome, e não os cancelados', () => {
+  const processos = [processo('Zeta', { situacao: 'concluido', etapaAtual: null }), processo('Em curso'),
+    processo('alfa', { situacao: 'concluido', etapaAtual: null }), processo('Desistido', { situacao: 'cancelado' })]
+  expect(nomes('concluidos', [MODELAGEM], processos)).toEqual(['alfa', 'Zeta'])
+})
+
+test('o agrupamento por responsável não traz a coluna Concluídos', () => {
+  const processos = [processo('Pronto', { situacao: 'concluido', etapaAtual: null })]
+  expect(colunasPorResponsavel(processos)).toEqual([])
 })
 
 test('o processo fica na coluna da etapa atual', () => {
@@ -45,8 +56,8 @@ test('suspenso fica no Quadro; concluído e cancelado saem', () => {
 test('a coluna de uma etapa desativada só aparece enquanto houver processo nela', () => {
   const desativada = { ...RELATORIO, ativa: false }
   const nela = processo('Preso', { etapaAtual: { codigo: 'relatorio', nome: RELATORIO.nome, ordem: 5 } })
-  expect(titulos([MODELAGEM, desativada], [])).toEqual([MODELAGEM.nome])
-  expect(titulos([MODELAGEM, desativada], [nela])).toEqual([MODELAGEM.nome, RELATORIO.nome])
+  expect(titulos([MODELAGEM, desativada], [])).toEqual([MODELAGEM.nome, 'Concluídos'])
+  expect(titulos([MODELAGEM, desativada], [nela])).toEqual([MODELAGEM.nome, RELATORIO.nome, 'Concluídos'])
 })
 
 // ---- Agrupado por responsável

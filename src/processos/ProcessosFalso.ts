@@ -10,13 +10,16 @@ import {
 import {
   conferirPai, conferirSemSubprocessos, estruturaDoProcesso, levarMacroprocessoAosFilhos, macroprocessoDo, reclassificar,
 } from './reclassificacaoFalso'
+import { escolhaDaVolta, escolhaDoAvanco } from './publicacaoFalso'
 import { conferirProcessoEmAndamento, mudarSituacao } from './situacaoFalso'
 import type {
   DadosDoProcesso, DatasDaEtapa, EtapaDoCatalogo, EtapaDoProcesso, EtapaDoCaminho, ListaDeProcessos,
   ModuloDeProcessos, ProcessoLido, Reclassificacao, UsuarioResponsavel,
 } from './tipos'
 
-type ChamadaDeEtapa = { acao: string; id: string; nota?: string; datas?: DatasDaEtapa; usuarioId?: string | null }
+type ChamadaDeEtapa = {
+  acao: string; id: string; nota?: string; datas?: DatasDaEtapa; usuarioId?: string | null; vai?: boolean | null
+}
 type TrocaDeEtapas = <T extends EtapaDoCaminho>(etapas: T[]) => T[]
 const RESOLVIDAS = ['concluida', 'realizada_anteriormente', 'dispensada']
 
@@ -56,16 +59,16 @@ export class ProcessosFalso implements ModuloDeProcessos {
     this.mudar({ acao: 'iniciar', id }, { status: 'em_andamento', iniciadaEm: HOJE })
   }
 
-  async concluirEtapa(id: string, usuarioId: string | null): Promise<void> {
-    this.avancar({ acao: 'concluir', id, usuarioId }, { status: 'concluida', resolvidaEm: HOJE })
+  async concluirEtapa(id: string, usuarioId: string | null, vai?: boolean | null): Promise<void> {
+    this.avancar({ acao: 'concluir', id, usuarioId, ...(vai != null && { vai }) }, { status: 'concluida', resolvidaEm: HOJE })
   }
 
   async dispensarEtapa(id: string, nota: string, usuarioId: string | null): Promise<void> {
     this.avancar({ acao: 'dispensar', id, nota, usuarioId }, { status: 'dispensada', nota, resolvidaEm: HOJE })
   }
 
-  async registrarRealizadaAnteriormente(id: string, nota: string, usuarioId: string | null): Promise<void> {
-    this.avancar({ acao: 'realizada', id, nota, usuarioId }, { status: 'realizada_anteriormente', nota, resolvidaEm: HOJE })
+  async registrarRealizadaAnteriormente(id: string, nota: string, usuarioId: string | null, vai?: boolean | null): Promise<void> {
+    this.avancar({ acao: 'realizada', id, nota, usuarioId, ...(vai != null && { vai }) }, { status: 'realizada_anteriormente', nota, resolvidaEm: HOJE })
   }
 
   // Como a função de voltar do banco: a reaberta recebe o responsável (null limpa o que tinha) e a trava do autor vale aqui também.
@@ -78,6 +81,7 @@ export class ProcessosFalso implements ModuloDeProcessos {
     conferirResponsavelEscolhido(usuarioId, this.usuariosPossiveis)
     this.conferirAutorDaEtapa(etapa as EtapaDoProcesso, usuarioId)
     this.chamadas.push({ acao: 'voltar', id, nota: motivo, usuarioId })
+    this.trocarProcessoDaEtapa(id, (processo) => ({ ...processo, vaiParaPublicacao: escolhaDaVolta(processo, etapa.codigo) }))
     this.aplicar(id, (etapas) => voltarEtapas(etapas, id, HOJE))
     this.porResponsavel(id, usuarioId)
     this.aoVoltar?.(this.processoDaEtapa(id).id, etapa.codigo)
@@ -237,11 +241,11 @@ export class ProcessosFalso implements ModuloDeProcessos {
     conferirAvanco(etapa, { acao: chamada.acao, nota: chamada.nota ?? null, responsavelId }, this.usuariosPossiveis)
     if (chamada.acao === 'concluir') conferirVersaoDaRevisaoDoSetor(etapa, this.processoDaEtapa(chamada.id).ultimaVersao)
     conferirAutorDaProxima(this.processoDaEtapa(chamada.id), chamada.id, responsavelId)
+    const vaiParaPublicacao = escolhaDoAvanco(this.processoDaEtapa(chamada.id), chamada.id, chamada.vai)
     this.chamadas.push(chamada)
     const usuario = this.usuariosPossiveis.find((possivel) => possivel.id === responsavelId) ?? null
-    this.processos = this.processos.map((processo) => (
-      processo.etapasDoProcesso.some((outra) => outra.id === chamada.id)
-        ? avancarProcesso(processo, chamada.id, mudancas, usuario, HOJE) : processo))
+    this.trocarProcessoDaEtapa(chamada.id, (processo) =>
+      avancarProcesso({ ...processo, vaiParaPublicacao }, chamada.id, mudancas, usuario, HOJE))
   }
 
   private mudar(chamada: ChamadaDeEtapa, mudancas: Partial<EtapaDoProcesso>): void {
@@ -284,6 +288,11 @@ export class ProcessosFalso implements ModuloDeProcessos {
     this.conferirGravacao()
     const mudado = mudarSituacao(this.acharProcesso(id), nova, motivo)
     this.processos = this.processos.map((processo) => (processo.id === id ? mudado : processo))
+  }
+
+  private trocarProcessoDaEtapa(idDaEtapa: string, trocar: (processo: ProcessoLido) => ProcessoLido): void {
+    this.processos = this.processos.map((processo) => (
+      processo.etapasDoProcesso.some((etapa) => etapa.id === idDaEtapa) ? trocar(processo) : processo))
   }
 
   private aplicar(id: string, trocar: TrocaDeEtapas): void {
