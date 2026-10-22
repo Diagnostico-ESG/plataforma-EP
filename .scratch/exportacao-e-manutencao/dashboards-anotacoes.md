@@ -104,3 +104,10 @@ Desenho tirado do print da página 2 do Power BI (filtros Setor e Etapa, quatro 
 - **Cópia de segurança:** existe "Cópia de Dashboard interno do EP (dev)" na lista de relatórios (17h).
 - **Faltam:** filtro Setor (lista à esquerda), botões de Etapa (I a VII), segunda lista "Aguardando a etapa anterior", títulos dos painéis, cartões com o texto de apoio ("62% dos 110 processos"), brasão.
 - **Página 2, atualização (2026-10-21):** cartão "Prontos para iniciar" corrigido (mostrava 0 porque eu tinha escolhido o campo `Publicados` na lista; a dimensão de período não era a causa). Dica: ao trocar a métrica de um componente, arrastar o campo do painel Dados costuma ser mais seguro que escolher na lista. Segunda lista ("Aguardando", métrica `Aguardando` sem filtro) e controles Fase e Área (lista suspensa, campo trocado arrastando) feitos; os controles filtram a página toda. Faltam títulos dos painéis e o texto de apoio dos cartões.
+
+## Página 3 do interno — processos × etapa (2026-10-22, em construção)
+
+- **Base:** página 1 copiada; ficaram cabeçalho, 4 cartões e a tabela dinâmica alargada à página.
+- **Matriz:** linhas = `Processo` e `Área` (nessa ordem), colunas = `Fase`, métrica `Situação nº`, aparência Número, 4 regras de cor (as da página 1). **Armadilha:** ao mudar as dimensões da tabela dinâmica as regras pararam de pintar; resolveu-se editando cada regra e marcando "Aplicar quando recolhido" (ou, antes, reabrindo e salvando). Título pelo próprio título do gráfico.
+- **Cartões:** TOTAL DE PROCESSOS (`Total de processos`), CONCLUÍDOS (ETAPAS I-VII) (`Publicados`), COM ETAPA EM ANDAMENTO (novo campo `Processos com etapa em andamento` = `COUNT_DISTINCT(CASE WHEN Situação = "Em andamento" THEN Identificador END)`), ETAPAS CONCLUÍDAS (IV-VII) (`Avanço IV a VII`, Porcentagem).
+- **Faltam:** lista de Setor à esquerda, faixa "Todos os setores", coluna Situação (pílulas "Próxima · IV"), coluna Observações (a planilha ainda não a traz preenchida), textos de apoio dos cartões, rótulo do cartão 3 em maiúsculas.
