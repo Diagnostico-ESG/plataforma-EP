@@ -1,5 +1,5 @@
--- Etapas protegidas e Revisão pelo setor com versão completa (revisoes-aprovacao, ticket 01, ADR 0015): as três etapas
--- de revisão e aprovação não se desativam nem se excluem, e concluir a Revisão pelo setor exige a versão mais recente
+-- Etapas protegidas e Validação com o setor com versão completa (revisoes-aprovacao, ticket 01, ADR 0015): as três etapas
+-- de revisão e aprovação não se desativam nem se excluem, e concluir a Validação com o setor exige a versão mais recente
 -- completa (.bpm, .png e relatório).
 begin;
 create extension if not exists pgtap with schema extensions;
@@ -82,7 +82,7 @@ language sql as $$
     null, pg_temp.par()) $$;
 grant execute on function pg_temp.enviar(text) to authenticated;
 
--- Leva o processo até a Revisão pelo setor em andamento (as etapas 1 a 3 resolvidas, como a2).
+-- Leva o processo até a Validação com o setor em andamento (as etapas 1 a 3 resolvidas, como a2).
 create function pg_temp.ate_a_revisao_do_setor(nome_do_processo text) returns void
 language plpgsql as $$
 begin
@@ -101,7 +101,7 @@ insert into _tap (linha) select throws_ok(
   'P0001', 'etapa_protegida:Revisão interna', 'desativar a Revisão interna é recusado');
 insert into _tap (linha) select throws_ok(
   $sql$update public.etapas set ativa = false where codigo = 'revisao_setor'$sql$,
-  'P0001', 'etapa_protegida:Revisão pelo setor', 'desativar a Revisão pelo setor é recusado');
+  'P0001', 'etapa_protegida:Validação com o setor', 'desativar a Validação com o setor é recusado');
 insert into _tap (linha) select throws_ok(
   $sql$update public.etapas set ativa = false where codigo = 'aprovacao_setor'$sql$,
   'P0001', 'etapa_protegida:Aprovação pelo setor', 'desativar a Aprovação pelo setor é recusado');
@@ -110,7 +110,7 @@ insert into _tap (linha) select throws_ok(
   'P0001', 'etapa_protegida:Revisão interna', 'excluir a Revisão interna é recusado');
 insert into _tap (linha) select throws_ok(
   $sql$delete from public.etapas where codigo = 'revisao_setor'$sql$,
-  'P0001', 'etapa_protegida:Revisão pelo setor', 'excluir a Revisão pelo setor é recusado');
+  'P0001', 'etapa_protegida:Validação com o setor', 'excluir a Validação com o setor é recusado');
 insert into _tap (linha) select throws_ok(
   $sql$delete from public.etapas where codigo = 'aprovacao_setor'$sql$,
   'P0001', 'etapa_protegida:Aprovação pelo setor', 'excluir a Aprovação pelo setor é recusado');
@@ -119,7 +119,7 @@ insert into _tap (linha) select lives_ok(
   'renomear a Revisão interna continua aceito');
 insert into _tap (linha) select lives_ok(
   $sql$select public.mover_etapa((select id from public.etapas where codigo = 'revisao_setor'), 'subir')$sql$,
-  'mover a Revisão pelo setor continua aceito');
+  'mover a Validação com o setor continua aceito');
 insert into _tap (linha) select lives_ok(
   $sql$select public.mover_etapa((select id from public.etapas where codigo = 'revisao_setor'), 'descer')$sql$,
   'mover de volta');
@@ -129,14 +129,14 @@ insert into _tap (linha) select is(
 insert into _tap (linha) select lives_ok(
   $sql$update public.etapas set nome = 'Revisão interna' where codigo = 'revisao_interna'$sql$, 'devolve o nome');
 
--- ===== Concluir a Revisão pelo setor (integrante a2) =====
+-- ===== Concluir a Validação com o setor (integrante a2) =====
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 
 -- Sem Versao: nenhuma versão.
 select pg_temp.ate_a_revisao_do_setor('Sem Versao');
 insert into _tap (linha) select throws_ok(
   $sql$select pg_temp.agir('Sem Versao', 'revisao_setor', 'concluida')$sql$,
-  'P0001', 'sem_versao', 'concluir a Revisão pelo setor sem versão é recusado');
+  'P0001', 'sem_versao', 'concluir a Validação com o setor sem versão é recusado');
 insert into _tap (linha) select is(pg_temp.status('Sem Versao', 'revisao_setor'), 'em_andamento'::public.status_da_etapa,
   'a recusa deixa a etapa em andamento');
 
@@ -182,7 +182,7 @@ select pg_temp.ate_a_revisao_do_setor('Completa');
 insert into _tap (linha) select lives_ok(
   $sql$select pg_temp.agir('Completa', 'revisao_setor', 'concluida')$sql$, 'concluir com a versão completa é aceito');
 insert into _tap (linha) select is(pg_temp.status('Completa', 'revisao_setor'), 'concluida'::public.status_da_etapa,
-  'a Revisão pelo setor fica concluída');
+  'a Validação com o setor fica concluída');
 
 -- Nova Na Etapa: a V1 completa, a V2 (enviada na própria etapa) sem relatório, depois com relatório.
 select pg_temp.enviar('Nova Na Etapa');

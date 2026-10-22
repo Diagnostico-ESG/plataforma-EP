@@ -132,7 +132,7 @@ insert into _tap (linha) select results_eq(
 insert into _tap (linha) select is(pg_temp.status('Sem Alteracao', 'revisao_interna'), 'concluida'::public.status_da_etapa,
   'a Revisão interna fica concluída');
 insert into _tap (linha) select is(pg_temp.status('Sem Alteracao', 'revisao_setor'), 'em_andamento'::public.status_da_etapa,
-  'a Revisão pelo setor é iniciada');
+  'a Validação com o setor é iniciada');
 insert into _tap (linha) select is(pg_temp.responsavel('Sem Alteracao', 'revisao_setor'), '00000000-0000-0000-0000-0000000000a1'::uuid,
   'com o responsável escolhido');
 insert into _tap (linha) select is(
@@ -140,10 +140,10 @@ insert into _tap (linha) select is(
     and entidade_ref = pg_temp.processo('Sem Alteracao')::text and detalhes -> 'antes' = 'null'::jsonb
     and detalhes -> 'depois' ->> 'resultado' = 'sem_alteracao' and detalhes -> 'depois' ->> 'versao_revisada' = 'V1'), 1::bigint,
   'a revisão gera um evento, ligado ao processo, com o depois');
--- A trava da Revisão pelo setor do ticket 01 segue valendo (a V1 não tem relatório).
+-- A trava da Validação com o setor do ticket 01 segue valendo (a V1 não tem relatório).
 insert into _tap (linha) select throws_ok(
   $sql$select pg_temp.agir('Sem Alteracao', 'revisao_setor', 'concluida')$sql$,
-  'P0001', 'versao_incompleta:1:relatorio', 'a Revisão pelo setor continua exigindo a versão completa');
+  'P0001', 'versao_incompleta:1:relatorio', 'a Validação com o setor continua exigindo a versão completa');
 
 -- ===== Corrigida (a1 envia a V1; a2 envia a V2 e a corrige) =====
 select pg_temp.claims('a1');

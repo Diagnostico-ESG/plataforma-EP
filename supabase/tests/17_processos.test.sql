@@ -266,10 +266,10 @@ update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita a
     and etapa_id = (select id from public.etapas where codigo = 'aprovacao_setor');
 insert into _tap (linha) select is(
   (select situacao from public.processos_com_andamento where setor_id = '5e000000-0000-0000-0000-000000000004'),
-  'concluido', 'com as obrigatórias resolvidas o processo aparece como concluído');
+  'em_andamento', 'com as obrigatórias resolvidas e a Publicação pendente sem escolha, o processo segue em andamento (ADR 0020)');
 insert into _tap (linha) select is(
   (select etapa_atual_codigo from public.processos_com_andamento where setor_id = '5e000000-0000-0000-0000-000000000004'),
-  'publicacao', 'a etapa atual passa a ser a opcional que sobrou');
+  'publicacao', 'a etapa atual passa a ser a Publicação');
 -- A suspensão direta só passa com a chave que as funções do ticket 07 ligam; aqui o dono do banco a liga à mão.
 select set_config('ep.mudando_situacao', 'on', true);
 update public.processos set situacao = 'suspenso', motivo_da_situacao = 'Parado para teste'

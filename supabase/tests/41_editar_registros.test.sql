@@ -110,7 +110,8 @@ grant execute on function pg_temp.ate_a_aprovacao_corrigindo(text) to authentica
 create function pg_temp.aprovar(nome_do_processo text, numero text default null, link text default null,
   data date default null, responsavel uuid default null) returns void
 language sql as $$
-  select public.concluir_aprovacao(pg_temp.andamento(nome_do_processo, 'aprovacao_setor'), numero, link, data, responsavel) $$;
+  -- Responde "sim" à escolha de publicação (ADR 0020): a Publicação entra em andamento, como antes da escolha existir.
+  select public.concluir_aprovacao(pg_temp.andamento(nome_do_processo, 'aprovacao_setor'), numero, link, data, responsavel, true) $$;
 grant execute on function pg_temp.aprovar(text, text, text, date, uuid) to authenticated;
 
 -- Quantos eventos "editar" o processo tem para a entidade.

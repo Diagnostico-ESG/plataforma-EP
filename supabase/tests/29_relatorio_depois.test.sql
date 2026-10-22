@@ -199,6 +199,9 @@ update public.andamentos a set status = 'realizada_anteriormente', nota = 'Feita
   where e.id = a.etapa_id and a.processo_id = pg_temp.processo('e4') and e.codigo = 'revisao_setor';
 update public.andamentos a set status = 'realizada_anteriormente', nota = 'Feita antes' from public.etapas e
   where e.id = a.etapa_id and a.processo_id = pg_temp.processo('e4') and e.codigo = 'aprovacao_setor';
+-- A Publicação resolvida também: sem a escolha de publicação, a Publicação pendente mantém o processo em andamento (ADR 0020).
+update public.andamentos a set status = 'realizada_anteriormente', nota = 'Publicada antes' from public.etapas e
+  where e.id = a.etapa_id and a.processo_id = pg_temp.processo('e4') and e.codigo = 'publicacao';
 select public.suspender_processo(pg_temp.processo('e2'), 'Aguardando o setor');
 select public.cancelar_processo(pg_temp.processo('e3'), 'Não segue');
 reset role;

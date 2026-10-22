@@ -120,7 +120,8 @@ grant execute on function pg_temp.ate_a_aprovacao_revisando(text) to authenticat
 create function pg_temp.aprovar(nome_do_processo text, numero text default null, link text default null,
   data date default null, responsavel uuid default null) returns void
 language sql as $$
-  select public.concluir_aprovacao(pg_temp.andamento(nome_do_processo, 'aprovacao_setor'), numero, link, data, responsavel) $$;
+  -- Responde "sim" à escolha de publicação (ADR 0020): a Publicação entra em andamento, como antes da escolha existir.
+  select public.concluir_aprovacao(pg_temp.andamento(nome_do_processo, 'aprovacao_setor'), numero, link, data, responsavel, true) $$;
 grant execute on function pg_temp.aprovar(text, text, text, date, uuid) to authenticated;
 
 create function pg_temp.aprovacoes(nome_do_processo text) returns bigint
@@ -232,7 +233,7 @@ select pg_temp.agir('Etapa Errada', 'revisao_interna', 'realizada_anteriormente'
 select pg_temp.agir('Etapa Errada', 'revisao_setor', 'em_andamento');
 insert into _tap (linha) select throws_ok(
   $sql$insert into public.aprovacoes (processo_id) values (pg_temp.processo('Etapa Errada'))$sql$,
-  'P0001', 'aprovacao_fora_da_etapa', 'aprovação com a Revisão pelo setor em andamento é recusada');
+  'P0001', 'aprovacao_fora_da_etapa', 'aprovação com a Validação com o setor em andamento é recusada');
 select pg_temp.ate_a_aprovacao('Parado');
 select public.suspender_processo(pg_temp.processo('Parado'), 'Aguardando o setor');
 insert into _tap (linha) select throws_ok(
@@ -291,7 +292,7 @@ select pg_temp.ate_a_aprovacao('Volta Setor');
 select pg_temp.aprovar('Volta Setor');
 insert into _tap (linha) select lives_ok(
   $sql$select public.voltar_a_etapa(pg_temp.andamento('Volta Setor', 'revisao_setor'), 'Ajustar', null)$sql$,
-  'voltar à Revisão pelo setor, com aprovação, é aceito');
+  'voltar à Validação com o setor, com aprovação, é aceito');
 insert into _tap (linha) select is(pg_temp.aprovacoes('Volta Setor'), 0::bigint, 'a aprovação sai');
 insert into _tap (linha) select is(
   (select count(*) from public.eventos where entidade = 'aprovacao' and acao = 'desfazer'

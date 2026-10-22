@@ -136,8 +136,9 @@ select pg_temp.agir('Processo Ultima', 'revisao_interna', 'realizada_anteriormen
 select pg_temp.agir('Processo Ultima', 'revisao_setor', 'realizada_anteriormente', 'Feita antes');
 select pg_temp.agir('Processo Ultima', 'aprovacao_setor', 'em_andamento');
 insert into _tap (linha) select lives_ok(
-  $sql$select pg_temp.avancar('Processo Ultima', 'aprovacao_setor', 'realizada_anteriormente', 'Aprovada antes da plataforma',
-    '00000000-0000-0000-0000-0000000000a1')$sql$, 'resolver a 5 com a opcional pendente');
+  $sql$select public.avancar_etapa(pg_temp.andamento('Processo Ultima', 'aprovacao_setor'), 'realizada_anteriormente',
+    'Aprovada antes da plataforma', '00000000-0000-0000-0000-0000000000a1', true)$sql$,
+  'resolver a 5 com a Publicação pendente, respondendo "sim" à escolha de publicação (ADR 0020)');
 insert into _tap (linha) select is(pg_temp.status('Processo Ultima', 'publicacao'),
   'em_andamento'::public.status_da_etapa, 'a opcional entra em andamento como qualquer outra');
 insert into _tap (linha) select is(pg_temp.responsavel('Processo Ultima', 'publicacao'),

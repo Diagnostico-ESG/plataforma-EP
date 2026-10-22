@@ -113,9 +113,11 @@ select pg_temp.agir('Processo Concluido', 'relatorio_modelagem_tecnica', 'realiz
 select pg_temp.agir('Processo Concluido', 'revisao_interna', 'realizada_anteriormente', 'Feita antes');
 select pg_temp.agir('Processo Concluido', 'revisao_setor', 'realizada_anteriormente', 'Feita antes');
 select pg_temp.agir('Processo Concluido', 'aprovacao_setor', 'realizada_anteriormente', 'Feita antes');
+-- Sem a escolha de publicação, a Publicação pendente manteria o processo em andamento (ADR 0020).
+select pg_temp.agir('Processo Concluido', 'publicacao', 'realizada_anteriormente', 'Publicada antes');
 insert into _tap (linha) select is(
   (select situacao from public.processos_com_andamento where nome = 'Processo Concluido'), 'concluido',
-  'com as obrigatórias resolvidas o processo é concluído');
+  'com as obrigatórias e a Publicação resolvidas o processo é concluído');
 insert into _tap (linha) select lives_ok(
   $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Concluido', 'revisao_interna'), 'Faltou revisar', null)$sql$,
   'voltar numa etapa do processo concluído');

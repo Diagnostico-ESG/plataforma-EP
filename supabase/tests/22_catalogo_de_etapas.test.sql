@@ -70,15 +70,15 @@ begin
 end $$;
 grant execute on function pg_temp.entrar(text) to authenticated;
 
--- Preparação, como integrante: "Pronto" com as etapas obrigatórias resolvidas
--- (situação calculada "concluido"); "Parado" suspenso e "Cancelado" cancelado.
+-- Preparação, como integrante: "Pronto" com as etapas obrigatórias e a Publicação resolvidas
+-- (situação calculada "concluido"; sem a escolha de publicação, a Publicação pendente o manteria em andamento, ADR 0020); "Parado" suspenso e "Cancelado" cancelado.
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a2');
 set local role authenticated;
 do $$
 declare
   etapa record;
 begin
-  for etapa in select id from public.etapas where ativa and obrigatoria order by ordem loop
+  for etapa in select id from public.etapas where ativa and (obrigatoria or codigo = 'publicacao') order by ordem loop
     update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
       where processo_id = pg_temp.processo('Pronto') and etapa_id = etapa.id;
   end loop;

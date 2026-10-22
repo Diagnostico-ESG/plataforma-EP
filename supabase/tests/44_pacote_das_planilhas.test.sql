@@ -76,7 +76,8 @@ insert into _tap (linha) select is(has_function_privilege('anon', 'private.monta
 alter table public.andamentos disable trigger user;
 update public.andamentos set status = 'concluida', iniciada_em = date '2026-04-01', resolvida_em = date '2026-04-02'
   where processo_id = pg_temp.processo('T44 Concluido')
-    and etapa_id in (select id from public.etapas where obrigatoria);
+    -- A Publicação também: sem a escolha de publicação, ela pendente manteria o processo em andamento (ADR 0020).
+    and etapa_id in (select id from public.etapas where obrigatoria or codigo = 'publicacao');
 alter table public.andamentos enable trigger user;
 insert into public.etapas (codigo, nome, ordem, obrigatoria, ativa, fase)
 values ('inativa_t44', 'Inativa T44', (select max(ordem) + 1 from public.etapas), false, false, 'IX');
@@ -149,7 +150,7 @@ insert into _tap (linha) select is((select array_agg(k order by k) from jsonb_ob
   array['etapa_id', 'iniciada_em', 'processo_id', 'resolvida_em', 'status'],
   'cada andamento traz só processo, etapa, status e as duas datas (sem responsável)');
 insert into _tap (linha) select is((select count(*)::int from pg_temp.andamentos_de('T44 Concluido') a
-  where a ->> 'status' = 'concluida' and a ->> 'resolvida_em' = '2026-04-02'), (select count(*)::int from public.etapas where obrigatoria and ativa),
+  where a ->> 'status' = 'concluida' and a ->> 'resolvida_em' = '2026-04-02'), (select count(*)::int from public.etapas where (obrigatoria or codigo = 'publicacao') and ativa),
   'o status e a data de resolução das etapas concluídas vão no pacote');
 
 -- Sem pessoa.

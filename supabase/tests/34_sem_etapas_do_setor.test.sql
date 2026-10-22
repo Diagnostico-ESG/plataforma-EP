@@ -63,7 +63,7 @@ insert into _tap (linha) select results_eq(
   $sql$select ordem, codigo, nome, obrigatoria from public.etapas order by ordem$sql$,
   $sql$values (1, 'modelagem', 'Modelagem piloto', true),
     (2, 'relatorio_modelagem_tecnica', 'Relatório e modelagem técnica', true),
-    (3, 'revisao_interna', 'Revisão interna', true), (4, 'revisao_setor', 'Revisão pelo setor', true),
+    (3, 'revisao_interna', 'Revisão interna', true), (4, 'revisao_setor', 'Validação com o setor', true),
     (5, 'aprovacao_setor', 'Aprovação pelo setor', true), (6, 'publicacao', 'Publicação', false)$sql$,
   'o catálogo tem as 6 etapas, de 1 a 6, com a Modelagem piloto em primeiro');
 

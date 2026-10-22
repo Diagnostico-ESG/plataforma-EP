@@ -82,12 +82,12 @@ insert into _tap (linha) select lives_ok(
 insert into _tap (linha) select lives_ok(
   $sql$select pg_temp.agir('revisao_interna', 'realizada_anteriormente', 'Feita antes')$sql$, 'registrar a revisão interna');
 insert into _tap (linha) select lives_ok(
-  $sql$select pg_temp.agir('revisao_setor', 'realizada_anteriormente', 'Feita antes')$sql$, 'registrar a revisão pelo setor');
+  $sql$select pg_temp.agir('revisao_setor', 'realizada_anteriormente', 'Feita antes')$sql$, 'registrar a Validação com o setor');
 insert into _tap (linha) select lives_ok(
   $sql$select pg_temp.agir('aprovacao_setor', 'realizada_anteriormente', 'Feita antes')$sql$, 'registrar a aprovação');
 insert into _tap (linha) select is(
   (select situacao from public.processos_com_andamento where nome = 'Processo Andamento'),
-  'concluido', 'com as obrigatórias resolvidas o processo é concluído, mesmo com a 9 pendente');
+  'em_andamento', 'com as obrigatórias resolvidas e a Publicação pendente sem escolha, o processo segue em andamento (ADR 0020)');
 insert into _tap (linha) select is(
   (select etapa_atual_codigo from public.processos_com_andamento where nome = 'Processo Andamento'),
   'publicacao', 'a etapa atual é a opcional que sobrou');
