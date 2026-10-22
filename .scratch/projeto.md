@@ -2,15 +2,16 @@
 
 Plataforma web interna do Centro Estadual de Desburocratização (CED) para controlar o trabalho do Escritório de Processos. Ela acompanha cada processo etapa por etapa (da identificação dos responsáveis até a aprovação com E-protocolo), guarda fluxogramas (.bpmn + .png) e relatórios com versões que nunca se apagam, registra reuniões, revisões e o histórico de tudo, e, na v1.5, substitui o dashboard atual em Power BI por um painel próprio (na v1, o Power BI continua em uso). O detalhe (modelo de dados, regras de negócio, telas) está em `.scratch/especificacao.md` e vai virar o `CONTEXT.md` na sabatina do `/planejar` da primeira funcionalidade.
 
+- **Arquitetura (resumo):** aplicação web SPA em React e Vite (TypeScript), com banco de dados e funções de servidor no Supabase, arquivos no Google Drive acessado por conta de serviço do Google Cloud, autenticação SSO com a conta Google institucional e permissões por perfil impostas no banco. A aplicação também alimenta planilhas do Google Sheets, as quais são fontes de dados para dashboards no Data Studio. Hospedagem do site: ainda não definida.
 - **Problema que resolve:** hoje o andamento fica espalhado entre planilhas, arquivos e o Power BI, sem versão, sem histórico e sem prazo visível.
 - **Quem usa:** equipe interna do EP, 6 pessoas hoje (até 10). Uso em computador; layout para celular é opcional. Acesso dos responsáveis dos setores fica no backlog.
 - **Duração e manutenção:** tempo indeterminado. A manutenção pode passar à TI do CED ou a outra equipe, então a documentação precisa permitir que outra pessoa assuma o sistema: instalação, publicação, backup e restauração, modelo de dados e decisões.
 - **Região dos dados:** Supabase na região de São Paulo (sa-east-1), com um projeto de desenvolvimento e outro de produção. A validação da nuvem externa pelo jurídico e pela TI está no backlog.
 - **Dados pessoais:** nomes e e-mails de servidores e dos responsáveis dos setores, além de e-mails trocados com os setores (.eml). A LGPD se aplica.
 - **Dados compartilhados:** sim. Toda a equipe vê os mesmos dados, então o projeto usa banco de dados (Supabase).
-- **Login e perfis:** e-mail e senha, com cadastro aberto desligado. Os perfis são Administrador, Integrante do EP e Consulta. O administrador (você) cria os usuários pela própria plataforma, por meio de uma Edge Function que confere quem fez o pedido.
+- **Login e perfis:** SSO com a conta Google institucional (`@ccivil.pr.gov.br`), sem senha própria (ADR 0001); só entra quem foi autorizado por um administrador. Os perfis são Administrador, Integrante do EP e Consulta, impostos pelo banco. O administrador gere os usuários pela própria plataforma.
 - **Registro de consultas:** não está na v1. A plataforma registra só as alterações (quem, quando, o que mudou). Registrar quem consultou cada dado fica no backlog, para o caso de o jurídico ou a TI exigirem.
-- **Arquivos enviados:** fluxogramas (.bpmn, .png e, opcionalmente, o .bpm do Bizagi), relatórios (.docx, .pdf) e e-mails (.eml). Ficam num bucket privado, com versões que nunca se apagam.
+- **Arquivos enviados:** fluxogramas (.bpmn, .png e, opcionalmente, o .bpm do Bizagi), relatórios (.docx, .pdf) e e-mails (.eml). Ficam no Google Drive compartilhado do CED, acessado por conta de serviço, com versões que nunca se apagam (ADR 0008).
 - **Outros sistemas e importação:** a v1 importa os dados atuais (planilhas ou a base do Power BI; o formato está em aberto no backlog), e os nomes dos arquivos identificam o setor, a versão e o processo. A carga real é feita por você, fora da sessão. O E-protocolo é só registro do número e do link. O Google Drive fica para a v1.5 (backlog).
 
 ## Funcionalidades da v1, na ordem de planejamento
