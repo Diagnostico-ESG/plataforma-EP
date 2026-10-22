@@ -9,7 +9,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(45);
+insert into _tap (linha) select plan(47);
 
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 insert into public.autorizacoes (email, perfil) values
@@ -238,9 +238,10 @@ insert into _tap (linha) select throws_ok($sql$select pg_temp.aprovar('Perfis', 
 insert into _tap (linha) select throws_ok(
   $sql$select public.avancar_etapa(pg_temp.andamento('Perfis', 'aprovacao_setor'), 'realizada_anteriormente', 'Antes', null, true)$sql$,
   '42501', null, 'consulta não responde a escolha na "realizada anteriormente"');
-insert into _tap (linha) select throws_ok(
-  $sql$update public.processos set vai_para_publicacao = true where id = pg_temp.processo('Perfis')$sql$,
-  '42501', null, 'consulta não muda a escolha direto');
+insert into _tap (linha) select results_eq(
+  $sql$with mudadas as (update public.processos set vai_para_publicacao = true where id = pg_temp.processo('Perfis') returning 1)
+    select count(*) from mudadas$sql$,
+  $sql$values (0::bigint)$sql$, 'consulta não muda a escolha direto (a política não deixa a linha à vista)');
 
 select pg_temp.claims('a4');
 insert into _tap (linha) select is((select count(*) from public.processos_com_andamento where setor_id = '5f000000-0000-0000-0000-000000000048'),
@@ -249,9 +250,10 @@ insert into _tap (linha) select is((select count(*) from public.eventos where en
   0::bigint, 'inativo não lê os eventos da escolha');
 insert into _tap (linha) select throws_ok($sql$select pg_temp.aprovar('Perfis', true)$sql$, 'P0001', 'registro_inexistente',
   'inativo não responde a escolha (não enxerga a etapa)');
-insert into _tap (linha) select is(
-  (with mudadas as (update public.processos set vai_para_publicacao = true where id = pg_temp.processo('Perfis') returning 1)
-    select count(*) from mudadas), 0::bigint, 'inativo não muda a escolha direto (não enxerga o processo)');
+insert into _tap (linha) select results_eq(
+  $sql$with mudadas as (update public.processos set vai_para_publicacao = true where id = pg_temp.processo('Perfis') returning 1)
+    select count(*) from mudadas$sql$,
+  $sql$values (0::bigint)$sql$, 'inativo não muda a escolha direto (não enxerga o processo)');
 
 select pg_temp.claims('a2');
 insert into _tap (linha) select is(pg_temp.escolha('Perfis'), null, 'as tentativas recusadas não deixam escolha');
