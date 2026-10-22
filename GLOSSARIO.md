@@ -78,6 +78,8 @@ Termos técnicos explicados em linguagem simples, conforme foram surgindo nas co
 
 **SEO (Search Engine Optimization, otimização para buscadores)** — conjunto de cuidados para um site aparecer bem nos resultados do Google. Só importa para sites públicos; a plataforma, atrás de login, não precisa disso.
 
+**Variável de ambiente** — valor de configuração guardado fora do código, com um nome; o programa pede o valor pelo nome. Serve para o mesmo código rodar em lugares diferentes (seu computador, teste, produção) com valores diferentes, e para que segredos (chaves, senhas) não fiquem escritos no código que vai ao GitHub. No projeto há dois tipos: as que começam com `VITE_` (`VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY`), que o Vite copia para dentro do site e por isso só podem ter valores públicos; e os segredos das Edge Functions (como a chave da conta de serviço do Google), gravados no Supabase com `npx supabase secrets set`, que só o servidor lê. O `.env.example` mostra os nomes sem valores; os arquivos com valores reais (`.env.local`, `.env.banco.local`) ficam só no computador, fora do git.
+
 **Husky** — ferramenta que faz o Git obrigar checagens (lint, typecheck, testes) a rodar a cada `git commit`, bloqueando o commit se algo falhar. Configurado uma vez pelo `/setup`, roda sozinho em todo commit futuro.
 
 **lint-staged** — complemento do Husky que roda o lint só nos arquivos que entraram no commit, e não no projeto inteiro.
