@@ -21,8 +21,6 @@ language sql as $$
     iniciada_em = case when novo = 'pendente' then null else current_date - 2 end,
     resolvida_em = case when novo in ('pendente', 'em_andamento') then null else current_date - 1 end
   from public.etapas e where e.id = a.etapa_id and e.codigo = por.codigo and a.processo_id = pg_temp.processo(nome_do_processo) $$;
-create function pg_temp.escolha(nome_do_processo text) returns boolean
-language sql stable as $$ select vai_para_publicacao from public.processos where id = pg_temp.processo(nome_do_processo) $$;
 
 -- Os estados antigos: as cinco primeiras etapas resolvidas, menos no último processo (Aprovação em andamento).
 set local session_replication_role = replica;
@@ -346,6 +344,8 @@ where p.vai_para_publicacao is null
 set local session_replication_role = origin;
 
 -- ===== Conferência =====
+create function pg_temp.escolha(nome_do_processo text) returns boolean
+language sql stable as $ select vai_para_publicacao from public.processos where id = pg_temp.processo(nome_do_processo) $;
 insert into _tap (linha) select is(pg_temp.escolha('Concluida'), true, 'Publicação concluída vira "sim"');
 insert into _tap (linha) select is(pg_temp.escolha('Realizada'), true, 'Publicação realizada anteriormente vira "sim"');
 insert into _tap (linha) select is(pg_temp.escolha('Em Andamento'), true, 'Publicação em andamento vira "sim"');
