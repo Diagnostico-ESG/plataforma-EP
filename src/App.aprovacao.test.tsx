@@ -103,7 +103,7 @@ test('a falha de conexão também aparece na janela, e enquanto grava o botão m
   expect(salvando.disabled).toBe(true)
 })
 
-test('Realizada anteriormente na Aprovação, a Revisão pelo setor e o voltar não mostram a versão aprovada', async () => {
+test('Realizada anteriormente na Aprovação, a Validação com o setor e o voltar não mostram a versão aprovada', async () => {
   montar(versao())
   const agora = await agoraDoVerso()
   fireEvent.click(agora.getByRole('button', { name: 'Mais ações da etapa' }))

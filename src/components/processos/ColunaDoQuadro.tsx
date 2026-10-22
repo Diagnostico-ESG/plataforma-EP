@@ -2,6 +2,7 @@ import type { ArrastoDoQuadro } from '../../hooks/useArrastoDoQuadro'
 import type { ColunaDoQuadro as Coluna } from '../../processos/colunasDoQuadro'
 import { colunaDeDestino } from '../../processos/destinoDoArrastar'
 import type { AgruparQuadroPor } from '../../processos/enderecoDosProcessos'
+import { CHAVE_DOS_CONCLUIDOS } from '../../processos/publicacao'
 import { Pilula } from '../Pilula'
 import { CartaoDoProcesso } from './CartaoDoProcesso'
 
@@ -32,6 +33,9 @@ export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAl
         <span className="coluna-contagem">{coluna.processos.length}</span>
       </h3>
       <div className="coluna-cartoes">
+        {coluna.chave === CHAVE_DOS_CONCLUIDOS && coluna.processos.length === 0 && (
+          <p className="coluna-vazia">Nenhum processo concluído.</p>
+        )}
         {coluna.processos.map((processo) => (
           <CartaoDoProcesso key={processo.id} processo={processo} escolhido={processo.id === idEscolhido}
             href={enderecoDoProcesso(processo.id)} arrastavel={podeAlterar && agrupar === 'etapa' && colunaDeDestino(processo) !== null}

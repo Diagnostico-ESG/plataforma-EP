@@ -27,11 +27,13 @@ const TEXTO_DA_ACAO_DO_ANDAMENTO: Record<string, string> = {
 
 const TEXTO_DA_ACAO_DO_PROCESSO: Record<string, string> = {
   ...TEXTO_DA_ACAO, suspender: 'Suspendeu', cancelar: 'Cancelou', retomar: 'Retomou', reclassificar: 'Reclassificou',
+  escolher_publicacao: 'Respondeu se o processo vai para publicação',
+  apagar_escolha_de_publicacao: 'Apagou a escolha de publicação ao voltar a uma etapa',
 }
 
 // O texto livre do evento é nota (dispensar, realizada anteriormente) ou motivo (voltar, a situação do processo e a
-// reclassificação).
-const ACOES_COM_MOTIVO = new Set(['voltar', 'suspender', 'cancelar', 'retomar', 'reclassificar'])
+// reclassificação, e a escolha de publicação apagada pela volta).
+const ACOES_COM_MOTIVO = new Set(['voltar', 'suspender', 'cancelar', 'retomar', 'reclassificar', 'apagar_escolha_de_publicacao'])
 
 export function rotuloDoMotivo(acao: string): string {
   return ACOES_COM_MOTIVO.has(acao) ? 'Motivo' : 'Nota'
@@ -80,7 +82,7 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   versao_revisada: 'Versão revisada', versao_corrigida: 'Versão corrigida', resultado: 'Resultado', escopo: 'Escopo',
   comentario: 'Comentário', revisor_nome: 'Revisor', revisada_em: 'Data da revisão',
   versao: 'Versão aprovada', numero_eprotocolo: 'Número do E-protocolo', link: 'Link', aprovada_em: 'Data da aprovação',
-  registrada_por_nome: 'Registrada por',
+  registrada_por_nome: 'Registrada por', vai_para_publicacao: 'Vai para publicação',
 }
 
 // Os ids existem para o filtro; quem lê o histórico vê a sigla e o nome. Código e nome da etapa já estão no título.
@@ -171,7 +173,7 @@ function valorPorRotulo(campo: string, valor: unknown): string | null {
   const rotulos: Record<string, Record<string, string>> = {
     tipo: ROTULO_DO_TIPO, origem: ROTULO_DA_ORIGEM, situacao: ROTULO_DA_SITUACAO,
     nivel: { setor: 'Setor', processo: 'Processo' }, obrigatoria: { true: 'Sim', false: 'Não' },
-    ativa: { true: 'Ativa', false: 'Inativa' },
+    ativa: { true: 'Ativa', false: 'Inativa' }, vai_para_publicacao: { true: 'Sim', false: 'Não' },
     resultado: { sem_alteracao: 'Sem alteração', corrigida: 'Corrigida' }, escopo: ROTULO_DO_ESCOPO,
   }
   const rotulosDoCampo = rotulos[campo]

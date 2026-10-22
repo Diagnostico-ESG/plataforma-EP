@@ -193,16 +193,26 @@ test('a falha ao retomar aparece como alerta e o Agora continua suspenso', async
   expect((await agoraDoVerso()).getByText('Suspenso: Aguardando decisão')).toBeTruthy()
 })
 
-test('concluído: o Agora diz "Concluído em" com a data da última etapa obrigatória, e a opcional aberta segue à mão', async () => {
+test('concluído com "não": o Agora diz "Concluído em" e "Não publicado", sem a Publicação pendente nem botões', async () => {
   montarVerso(processoLido([
     etapaDoProcesso(4, 'modelagem', MODELAGEM, { ...CONCLUIDA, resolvidaEm: '2026-10-10' }),
     etapaDoProcesso(5, 'relatorio', RELATORIO, { ...CONCLUIDA, resolvidaEm: '2026-10-12' }),
     etapaDoProcesso(9, 'publicacao', PUBLICACAO, { obrigatoria: false }),
-  ], { situacao: 'concluido' }))
+  ], { situacao: 'concluido', etapaAtual: null, vaiParaPublicacao: false }))
   const agora = await agoraDoVerso()
   expect(agora.getByText('Concluído em 12/10/2026')).toBeTruthy()
-  expect(agora.getByRole('button', { name: `Iniciar ${PUBLICACAO}` })).toBeTruthy()
+  expect(agora.getByText('Não publicado')).toBeTruthy()
+  expect(agora.queryByText(PUBLICACAO)).toBeNull()
+  expect(agora.queryAllByRole('button')).toEqual([])
   expect(await classeDoAgora()).toContain('agora-concluido')
+})
+
+test('concluído e publicado: o Agora diz "Publicado em" com a data da Publicação', async () => {
+  montarVerso(processoLido([
+    etapaDoProcesso(4, 'modelagem', MODELAGEM, { ...CONCLUIDA, resolvidaEm: '2026-10-10' }),
+    etapaDoProcesso(9, 'publicacao', PUBLICACAO, { ...CONCLUIDA, obrigatoria: false, resolvidaEm: '2026-10-11' }),
+  ], { situacao: 'concluido', etapaAtual: null, vaiParaPublicacao: true, publicadoEm: '2026-10-11' }))
+  expect((await agoraDoVerso()).getByText('Publicado em 11/10/2026')).toBeTruthy()
 })
 
 test('concluído sem etapa aberta: só "Concluído em", sem botões', async () => {

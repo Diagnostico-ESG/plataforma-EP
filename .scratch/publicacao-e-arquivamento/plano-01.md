@@ -31,7 +31,7 @@
 
 ### Tarefa 0: Branch e marco
 
-- [ ] `git status` limpo; `git switch -c publicacao-e-arquivamento-01`; `git tag marco/2026-10-22-inicio-publicacao-e-arquivamento-01`; `git push origin "refs/tags/marco/*:refs/tags/marco/*"`.
+- [x] `git status` limpo; `git switch -c publicacao-e-arquivamento-01`; `git tag marco/2026-10-22-inicio-publicacao-e-arquivamento-01`; `git push origin "refs/tags/marco/*:refs/tags/marco/*"`.
 
 ### Tarefa 1: Teste de banco que falha
 
@@ -50,8 +50,8 @@ Casos (cada um uma asserção):
 - evento `escolher_publicacao` com antes nulo e depois `true`/`false`, autor;
 - por último, Publicação desativada (`update etapas set ativa = false` por a1): Aprovação conclui sem escolha e o processo fica concluído.
 
-- [ ] Escrever o teste.
-- [ ] Commit, `git push -u origin publicacao-e-arquivamento-01`, disparar "Testes de banco" na branch: o 48 falha (função/coluna inexistente), os demais passam.
+- [x] Escrever o teste.
+- [ ] Commit, `git push -u origin publicacao-e-arquivamento-01` (feito), disparar "Testes de banco" na branch: o 48 falha (função/coluna inexistente), os demais passam.
 
 ### Tarefa 2: Migração e ensaio
 
@@ -59,7 +59,7 @@ Casos (cada um uma asserção):
 
 Conteúdo da migração, na ordem: coluna e privilégio; `escolhendo_publicacao`; gatilho de conferência; gatilho de evento; `gravar_escolha_de_publicacao`; `conferir_sequencia_do_processo` e `iniciar_proxima_do_avanco` com o pulo; `avancar_etapa` (drop/create, revoke/grant); `concluir_aprovacao` com `p_vai_para_publicacao` (drop/create); `apagar_escolha_da_volta` e `voltar_a_etapa`; view; com `session_replication_role = replica` só no trecho: nome da `revisao_setor` (se ainda for "Revisão pelo setor") e a conversão dos dados.
 
-- [ ] Escrever a migração e os dois ensaios; push; "Testes de banco" na branch: os ensaios passam.
+- [ ] Escrever a migração e os dois ensaios (escritos e enviados); push; "Testes de banco" na branch: os ensaios passam.
 - [ ] Apagar os ensaios; commit.
 - [ ] Disparar "Migrar banco de desenvolvimento" na branch com o nome do arquivo.
 - [ ] "Testes de banco" na branch: o 48 passa; ajustar os testes antigos que falharem pela regra nova (os que concluem a Aprovação passam a responder a escolha; os que esperam o concluído antigo passam a responder "não" ou a esperar a regra nova) até todos ficarem verdes.
@@ -69,45 +69,45 @@ Conteúdo da migração, na ordem: coluna e privilégio; `escolhendo_publicacao`
 
 **Arquivos:** `src/processos/tipos.ts`, `src/processos/processoDaLinha.ts` (+ teste), `src/processos/andamentosSupabase.ts` (+ teste), `src/revisoes/tipos.ts`, `src/revisoes/revisoesSupabase.ts` (+ teste), `src/processos/frasesDeSituacao.ts` ou módulo novo de frases.
 
-- [ ] Testes: `processoDaLinha` lê `vai_para_publicacao` e `publicado_em`; `registrarRealizadaAnteriormente` e `concluirEtapa` mandam `p_vai_para_publicacao` (null quando não vem); `concluirAprovacao` manda a escolha; `escolha_de_publicacao_obrigatoria` vira "Responda se o processo vai para publicação." e `publicacao_so_pela_funcao` vira frase própria.
-- [ ] Implementar; `npm test` dos arquivos verde; commit.
+- [x] Testes: `processoDaLinha` lê `vai_para_publicacao` e `publicado_em`; `registrarRealizadaAnteriormente` e `concluirEtapa` mandam `p_vai_para_publicacao` (null quando não vem); `concluirAprovacao` manda a escolha; `escolha_de_publicacao_obrigatoria` vira "Responda se o processo vai para publicação." e `publicacao_so_pela_funcao` vira frase própria.
+- [x] Implementar; `npm test` dos arquivos verde; commit.
 
 ### Tarefa 4: Funções puras
 
 **Arquivos:** `src/processos/publicacao.ts` (novo: `CODIGO_DA_PUBLICACAO`, `CHAVE_DOS_CONCLUIDOS`, `perguntaDaPublicacao(acao, etapa, proxima)`, `linhaDaPublicacao(processo)`), `src/processos/colunasDoQuadro.ts`, `src/processos/destinoDoArrastar.ts`, `src/processos/selosDoCartao.ts`, `src/revisoes/frasesDeAprovacao.ts` (aviso da volta) — cada um com teste.
 
-- [ ] `colunasDoQuadro` acrescenta no fim `{ chave: 'concluidos', titulo: 'Concluídos' }` com os concluídos por nome, também sem processos; `colunasPorResponsavel` sem mudança (já filtra).
-- [ ] `colunaDeDestino`: Publicação em andamento sem pendente depois → `'concluidos'`; `avancoDoCartao` aceita próxima nula na Publicação.
-- [ ] Selo `nao_publicado` ("Não publicado", neutro) no concluído com `vaiParaPublicacao === false`.
-- [ ] `linhaDaPublicacao`: "Publicado em dd/mm/aaaa", "Não publicado" ou null.
-- [ ] Aviso da volta: "A escolha de publicação será apagada." junto do aviso da aprovação desfeita.
-- [ ] Testes verdes; commit.
+- [x] `colunasDoQuadro` acrescenta no fim `{ chave: 'concluidos', titulo: 'Concluídos' }` com os concluídos por nome, também sem processos; `colunasPorResponsavel` sem mudança (já filtra).
+- [x] `colunaDeDestino`: Publicação em andamento sem pendente depois → `'concluidos'`; `avancoDoCartao` aceita próxima nula na Publicação.
+- [x] Selo `nao_publicado` ("Não publicado", neutro) no concluído com `vaiParaPublicacao === false`.
+- [x] `linhaDaPublicacao`: "Publicado em dd/mm/aaaa", "Não publicado" ou null.
+- [x] Aviso da volta: "A escolha de publicação será apagada." junto do aviso da aprovação desfeita.
+- [x] Testes verdes; commit.
 
 ### Tarefa 5: Implementações falsas
 
 **Arquivos:** `src/processos/andamentoFalso.ts`, `src/processos/ProcessosFalso.ts` (a regra da escolha num módulo novo `src/processos/publicacaoFalso.ts`, para o arquivo ficar abaixo de 300 linhas), `src/revisoes/RevisoesFalso.ts`; teste novo `src/processos/ProcessosFalso.publicacao.test.ts`.
 
-- [ ] Testes: sem escolha recusa com a frase; "sim" inicia a Publicação; "não" pula a Publicação e deixa o processo concluído sem etapa atual nem responsável; concluído pela regra nova em `recalcularProcesso`; voltar até a Aprovação apaga a escolha; Publicação ausente não pede escolha; a falsa de revisões repassa a escolha.
-- [ ] Implementar; testes verdes; commit.
+- [x] Testes: sem escolha recusa com a frase; "sim" inicia a Publicação; "não" pula a Publicação e deixa o processo concluído sem etapa atual nem responsável; concluído pela regra nova em `recalcularProcesso`; voltar até a Aprovação apaga a escolha; Publicação ausente não pede escolha; a falsa de revisões repassa a escolha.
+- [x] Implementar; testes verdes; commit.
 
 ### Tarefa 6: Janela de concluir com a pergunta
 
 **Arquivos:** `src/components/processos/PerguntaDaPublicacao.tsx` (novo), `JanelaDeAvanco.tsx`, `JanelasDaEtapa.tsx`, `src/hooks/useAcoesDaEtapa.ts`, `src/hooks/useAprovacaoDaJanela.ts`, `src/processos/gravarAcoes.ts`; teste de tela `src/App.escolhaDePublicacao.test.tsx` (arte: `App.aprovacao`, `App.avancoDaEtapa`, `App.arrastarParaConcluir`).
 
-- [ ] Teste de tela: sem resposta o botão fica desabilitado; "Sim" mostra "Quem fica com a próxima etapa?" e deixa a Publicação em andamento com o responsável; "Não" esconde a escolha e o processo vai a Concluídos; o mesmo na "realizada anteriormente" e pelo arrastar; sem a Publicação no processo, sem pergunta; recusa e falha ao gravar em vermelho sem perder o preenchido; Consulta sem botões.
-- [ ] Implementar: rádio Sim | Não sem marcação inicial; título "Concluir Aprovação pelo setor" e botão "Concluir" quando há pergunta; a escolha segue até `concluirAprovacao` e `registrarRealizadaAnteriormente`; concluir a Publicação abre a janela mesmo sem pendente depois.
-- [ ] Testes verdes; ajustar os testes de tela antigos que concluem a Aprovação; commit.
+- [x] Teste de tela: sem resposta o botão fica desabilitado; "Sim" mostra "Quem fica com a próxima etapa?" e deixa a Publicação em andamento com o responsável; "Não" esconde a escolha e o processo vai a Concluídos; o mesmo na "realizada anteriormente" e pelo arrastar; sem a Publicação no processo, sem pergunta; recusa e falha ao gravar em vermelho sem perder o preenchido; Consulta sem botões.
+- [x] Implementar: rádio Sim | Não sem marcação inicial; título "Concluir Aprovação pelo setor" e botão "Concluir" quando há pergunta; a escolha segue até `concluirAprovacao` e `registrarRealizadaAnteriormente`; concluir a Publicação abre a janela mesmo sem pendente depois.
+- [x] Testes verdes; ajustar os testes de tela antigos que concluem a Aprovação; commit.
 
 ### Tarefa 7: Quadro, cartão e verso
 
 **Arquivos:** `ColunaDoQuadro.tsx`, `SelosDoCartao.tsx` (se o tipo novo pedir), `AgoraDoProcesso.tsx`, `VersoDoCartao.tsx` (passa a escolha às janelas), `src/cadastros/historicoDosCadastros.ts` (+ teste); teste de tela `src/App.concluidos.test.tsx` (arte: `App.quadro`, `App.soOsMeus`, `App.agoraDoVerso`, `App.voltarDatasResponsavel`, `App.historico`).
 
-- [ ] Teste de tela: coluna Concluídos no fim, vazia com "Nenhum processo concluído.", por nome, com filtros de setor, macroprocesso e tipo; fora do "Só os meus" e do agrupamento; cartão de lá não arrasta; arrastar a Publicação para Concluídos abre a janela e o processo termina lá; selo "Não publicado"; Agora com "Concluído" e a linha da publicação; aviso da volta; eventos da escolha no histórico ("Respondeu se o processo vai para publicação", "Vai para publicação: Sim").
-- [ ] Implementar; testes verdes; commit.
+- [x] Teste de tela: coluna Concluídos no fim, vazia com "Nenhum processo concluído.", por nome, com filtros de setor, macroprocesso e tipo; fora do "Só os meus" e do agrupamento; cartão de lá não arrasta; arrastar a Publicação para Concluídos abre a janela e o processo termina lá; selo "Não publicado"; Agora com "Concluído" e a linha da publicação; aviso da volta; eventos da escolha no histórico ("Respondeu se o processo vai para publicação", "Vai para publicação: Sim").
+- [x] Implementar; testes verdes; commit.
 
 ### Tarefa 8: "Validação com o setor" nos textos
 
-- [ ] Trocar "Revisão pelo setor" nas falsas e auxiliares de teste (`src/testes/aprovacaoNoVerso.tsx` e afins), nos comentários de código e no `vitrine.local` quando citar o nome; o nome na tela vem do catálogo. Conferir com `grep -rn "Revisão pelo setor" src`. Commit.
+- [x] Trocar "Revisão pelo setor" nas falsas e auxiliares de teste (`src/testes/aprovacaoNoVerso.tsx` e afins), nos comentários de código e no `vitrine.local` quando citar o nome; o nome na tela vem do catálogo. Conferir com `grep -rn "Revisão pelo setor" src`. Commit.
 
 ### Tarefa 9: Conferência final
 

@@ -26,7 +26,7 @@ afterEach(() => {
 const EU = { id: USUARIO_DE_TESTE.id, nome: USUARIO_DE_TESTE.nome }
 const BIA = { id: 'u2', nome: 'Bia Teste' }
 const REVISAO_INTERNA = 'Revisão interna'
-const REVISAO_DO_SETOR = 'Revisão pelo setor'
+const REVISAO_DO_SETOR = 'Validação com o setor'
 const TITULO_DA_JANELA = `Concluir ${REVISAO_INTERNA} e iniciar ${REVISAO_DO_SETOR}`
 const BOTAO_DA_JANELA = `Concluir e iniciar ${REVISAO_DO_SETOR}`
 const PAPEIS = ['bpmn', 'png', 'relatorio'] as const
@@ -325,7 +325,7 @@ test('o evento de revisão registrada aparece no histórico do processo, com tex
   expect(verso.getByText(/Resultado: Corrigida; Escopo: Fluxograma e relatório; Comentário: Ajustei o fluxo/)).toBeTruthy()
 })
 
-// Achado do /ship: sem etapa pendente depois (a Revisão pelo setor já resolvida), concluir gravava direto, sem a janela do
+// Achado do /ship: sem etapa pendente depois (a Validação com o setor já resolvida), concluir gravava direto, sem a janela do
 // Resultado, e o banco recusava por falta de revisão. A janela aparece sempre, como na Aprovação (história 5).
 test('sem etapa pendente depois a janela do Resultado aparece, sem a pergunta do responsável, e grava a revisão', async () => {
   const dispensada = { ...CAMINHO[1], status: 'dispensada' as const, nota: 'Não se aplica', resolvidaEm: '2026-10-12' }

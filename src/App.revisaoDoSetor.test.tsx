@@ -12,7 +12,7 @@ import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 import { agoraDoVerso, etapasDoVerso } from './testes/versoDoCartao'
 import { cartaoDe, ETAPAS, montar as montarQuadro, processo as processoDoQuadro } from './testes/quadroDeTeste'
 
-// Concluir a Revisão pelo setor exige a versão mais recente completa (.bpm, .png e relatório): a janela diz o que
+// Concluir a Validação com o setor exige a versão mais recente completa (.bpm, .png e relatório): a janela diz o que
 // falta e não deixa concluir (ticket 01 de revisoes-aprovacao, histórias 11 e 12).
 
 afterEach(() => {
@@ -20,7 +20,7 @@ afterEach(() => {
   window.location.hash = ''
 })
 
-const REVISAO_DO_SETOR = 'Revisão pelo setor'
+const REVISAO_DO_SETOR = 'Validação com o setor'
 const APROVACAO = 'Aprovação pelo setor'
 const TITULO_DA_JANELA = `Concluir ${REVISAO_DO_SETOR} e iniciar ${APROVACAO}`
 const BOTAO_DA_JANELA = `Concluir e iniciar ${APROVACAO}`
@@ -54,7 +54,7 @@ function processo(ultimaVersao: UltimaVersao | null): ProcessoLido {
   }
 }
 
-// O verso do processo no aplicativo inteiro, com a Revisão pelo setor em andamento.
+// O verso do processo no aplicativo inteiro, com a Validação com o setor em andamento.
 function montar(ultimaVersao: UltimaVersao | null, falha?: string | Error): ProcessosFalso {
   window.location.hash = '#/processos/p1'
   const cadastros = new CadastrosFalso()
@@ -107,7 +107,7 @@ test('a recusa que vem do banco por outro caminho aparece em vermelho e nada mud
   expect(falso.chamadas).toEqual([])
 })
 
-test('Realizada anteriormente na Revisão pelo setor não depende de versão', async () => {
+test('Realizada anteriormente na Validação com o setor não depende de versão', async () => {
   const falso = montar(null)
   const agora = await agoraDoVerso()
   fireEvent.click(agora.getByRole('button', { name: 'Mais ações da etapa' }))

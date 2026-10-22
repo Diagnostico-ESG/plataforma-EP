@@ -18,7 +18,7 @@ export function fraseDaVersaoIncompleta(numero: number | string, faltas: string[
   return `A V${numero} está sem ${lista}.`
 }
 
-/** O que a janela de concluir a Revisão pelo setor mostra no lugar do botão; null quando a versão está completa. */
+/** O que a janela de concluir a Validação com o setor mostra no lugar do botão; null quando a versão está completa. */
 export function fraseDoBloqueioDaConclusao(ultima: UltimaVersao | null): string | null {
   if (ultima === null) return FRASE_SEM_VERSAO
   const faltas = faltasDaVersao(ultima.papeis)

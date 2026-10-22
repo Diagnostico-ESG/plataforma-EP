@@ -150,7 +150,7 @@ describe('trava do autor da versão mais recente', () => {
   })
 })
 
-describe('concluir a Revisão pelo setor exige a versão mais recente completa', () => {
+describe('concluir a Validação com o setor exige a versão mais recente completa', () => {
   const SETOR = { codigo: 'revisao_setor', ...EM_ANDAMENTO }
   const versao = (papeis: PapelDoArquivo[]): UltimaVersao => ({ numero: 3, autorId: 'u1', autorNome: 'Ana Teste', papeis })
 

@@ -17,7 +17,7 @@ function etapa(ordem: number, codigo: string, mudancas: Partial<EtapaDoProcesso>
   }
 }
 
-// Revisão pelo setor (4) resolvida, Aprovação (5) em andamento e Publicação (6) pendente.
+// Validação com o setor (4) resolvida, Aprovação (5) em andamento e Publicação (6) pendente.
 function montar(ultimaVersao: UltimaVersao | null = COMPLETA) {
   const processo: ProcessoLido = {
     id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
@@ -113,7 +113,7 @@ describe('voltar desfaz a aprovação', () => {
     return montagem
   }
 
-  test('voltar à Revisão pelo setor apaga a aprovação, tira a marca e registra o evento "desfazer" com o antes', async () => {
+  test('voltar à Validação com o setor apaga a aprovação, tira a marca e registra o evento "desfazer" com o antes', async () => {
     const { processos, versoes, revisoes } = await aprovado()
     await processos.voltarParaEtapa('a4', 'Ajustar', null)
     expect(await revisoes.lerAprovacao('p1')).toBeNull()

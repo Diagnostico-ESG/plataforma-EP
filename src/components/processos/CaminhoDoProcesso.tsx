@@ -54,7 +54,8 @@ export function CaminhoDoProcesso({ processo, processos, revisoes, podeAlterar, 
         usuarioId={usuarioId} ultimaVersao={processo.ultimaVersao} acoes={acoes} aoCorrigirDatas={corrigirDatas}
         aprovacao={aprovacao.estado} aoTentarDeNovoAAprovacao={aprovacao.tentarDeNovo} aoAtualizarAAprovacao={aprovacao.recarregar} aoSumir={aoSumir} />
       <JanelasDaEtapa acoes={acoes} usuarios={usuarios} usuarioId={usuarioId} ultimaVersao={processo.ultimaVersao}
-        aprovacao={aprovacao.estado.tipo === 'pronto' ? aprovacao.estado.valor : null} etapasDoProcesso={processo.etapasDoProcesso} />
+        aprovacao={aprovacao.estado.tipo === 'pronto' ? aprovacao.estado.valor : null} etapasDoProcesso={processo.etapasDoProcesso}
+        vaiParaPublicacao={processo.vaiParaPublicacao} />
     </>
   )
 }

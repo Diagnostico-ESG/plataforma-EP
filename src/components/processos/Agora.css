@@ -100,3 +100,10 @@
   padding-top: var(--esp-3);
   border-top: 1px solid var(--linha);
 }
+
+/* Concluído: a linha da publicação ("Publicado em dd/mm/aaaa" ou "Não publicado") logo abaixo da situação. */
+.agora-publicacao {
+  margin: var(--esp-1) 0 0;
+  color: var(--texto-2);
+  font-size: var(--tam-secundario);
+}
