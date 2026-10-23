@@ -1,8 +1,10 @@
 import { USUARIO_DE_TESTE } from '../acesso/AcessoFalso'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { conferirNaoArquivado } from './arquivamentoFalso'
-import type { ProcessosFalso } from './ProcessosFalso'
-import type { AnotacoesLidas, ResultadoDaGravacaoDasAnotacoes } from './tipos'
+import type { AnotacoesLidas, ProcessoLido, ResultadoDaGravacaoDasAnotacoes } from './tipos'
+
+/** Só o que a falsa das Anotações pede à falsa de processos (importá-la inteira fecharia um ciclo). */
+type DonoDosProcessos = { processos: ProcessoLido[] }
 
 const SEM_ANOTACOES: AnotacoesLidas = { texto: null, alteradoPor: null, alteradoEm: null }
 // Hora fixa (14:30 em Brasília): os testes de tela não dependem do relógio.
@@ -21,9 +23,9 @@ export class AnotacoesFalso {
   /** O nome que o banco poria em "Alterado por" para quem está na tela. */
   autor = USUARIO_DE_TESTE.nome
   private liberacao: (() => void) | null = null
-  private readonly processos: ProcessosFalso
+  private readonly processos: DonoDosProcessos
 
-  constructor(processos: ProcessosFalso) {
+  constructor(processos: DonoDosProcessos) {
     this.processos = processos
   }
 

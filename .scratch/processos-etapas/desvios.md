@@ -386,3 +386,23 @@ Ponto de partida da revisão: marco `marco/2026-10-19-inicio-ticket-20-processos
 - **Segurança de pacotes:** pulada (`package.json` não mudou e `.scratch/security.md` já existe).
 - **Banco:** migração `20261019182327_cartao_do_quadro` não destrutiva; sem `security definer`; tipos em dia (`db:types` sem diferença real, só fim de linha).
 - **Dependências circulares:** nenhuma. Cobertura: 98,5% das instruções.
+
+## 2026-10-23 — /executar-complexo do ticket 23 (Anotações do processo)
+
+Decisões da execução (as oito do `plano-23.md`, mais o que apareceu no caminho):
+
+- **O salvamento é uma classe, `GravadorDeAnotacoes`, fora do React.** Pausa de 1 segundo, fila de uma gravação por vez, falha e conflito se testam com o relógio simulado, sem montar tela; o hook `useAnotacoesDoProcesso` só a liga ao componente (os limites do ESLint também pediam a divisão).
+- **A frase de falha é fixa** ("Não foi possível salvar. Seu texto continua aqui"), qualquer que seja o motivo (conexão, arquivado, perfil), como a spec escreve.
+- **Autor e hora vêm do banco**, com `clock_timestamp()` no gatilho (não `now()`), para a hora mudar de verdade dentro de uma transação de teste.
+- **A falsa não recusa a Consulta** (a falsa de processos não conhece o perfil, como nas outras gravações); a tela não mostra campo à Consulta e o banco é provado pelo teste pgTAP. A recusa do arquivado a falsa faz.
+- **Só os caminhos da spec guardam a saída:** botão de fechar, Esc, abrir o pai ou um subprocesso, Histórico e Editar; aba e recarga pelo aviso nativo (`beforeunload`). O botão Voltar do navegador troca o endereço sem passar pelo verso e **não** é interceptado (conhecido e aceito).
+- **A reclassificação mantém as Anotações** por construção (só muda `tipo` e `processo_pai_id`); o teste de banco 50 tem uma asserção para isso.
+- **Sem atualização ao vivo** (spec): o texto é lido ao abrir o verso e depois de "Ver o texto atual".
+- **Os tipos do banco foram escritos à mão em `src/types/database.ts`**, no formato do gerador, porque o `gh` não está autenticado nesta máquina e o workflow de migração não pôde ser disparado antes de a tela ser escrita. O `db:types` os confere depois da migração aplicada.
+- **Ordem diferente da do plano:** as Tarefas 2 a 6 (tela) foram feitas antes de o banco ser aplicado; a migração está commitada na branch e **não foi enviada**, à espera de o "Testes de banco" ser visto vermelho e de a migração ser aplicada pelo workflow.
+- **Os testes das Tarefas 2, 3 e 4 foram escritos junto da implementação** (os arquivos de teste e de código foram criados na mesma rodada), sem o vermelho separado; o vermelho de verdade foi visto nos testes de tela (Tarefas 5 e 6) e vem no teste de banco (Tarefa 1).
+- **Um teste de tela falhou por erro do próprio teste:** a busca por `/nota/i` na página do Histórico achava o título "As anotações não foram salvas" da janela de confirmação fechada; passou a olhar só a página do Histórico.
+- **Ajuste de CSS depois de ver a tela:** o aviso de falha, reaproveitando `cadastros-falha`, virava uma caixa vermelha grande que empurrava o campo para baixo; passou a ser texto vermelho pequeno (`anotacoes-falha`).
+- **Prop do ref renomeada** para `guardaRef`: a regra `react-hooks/immutability` do ESLint exige o sufixo `Ref` para poder escrever em `.current`.
+
+**Verificado na tela (vitrine local, módulos falsos, navegador do app; servidor do Vite na porta 5175, encerrado), não com login e banco:** o bloco é o primeiro da coluna direita, acima da Reunião; o campo cresce e passa a rolar por dentro (texto de 16 linhas, altura máxima cerca de 12 linhas); a linha "Alterado por Bia Teste em 12/10, 12:05" discreta abaixo; a falha em vermelho pequeno ao lado do título, com o texto mantido; o conflito em caixa amarela com [Ver o texto atual], que troca o campo pelo texto da outra pessoa; o arquivado visto pela Consulta só com o texto e a linha "Alterado por". **Presumido, não visto:** a gravação e o conflito contra o banco de verdade, o aviso nativo do navegador ao fechar a aba (o jsdom só prova o `preventDefault`), o comportamento do botão Voltar do navegador com texto pendente e a leitura por leitor de tela real.

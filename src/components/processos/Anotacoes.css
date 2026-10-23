@@ -12,6 +12,13 @@
   font-size: var(--tam-secundario);
 }
 
+/* A falha é só texto vermelho ao lado do título: uma caixa empurraria o campo para baixo a cada tentativa. */
+.anotacoes-falha {
+  color: var(--atraso-texto);
+  font-size: var(--tam-secundario);
+  font-weight: 600;
+}
+
 .anotacoes-campo {
   box-sizing: border-box;
   width: 100%;

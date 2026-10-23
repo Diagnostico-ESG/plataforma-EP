@@ -58,8 +58,8 @@
 
 **Produz:** colunas `processos.anotacoes`, `anotacoes_alteradas_em`, `anotacoes_alteradas_por`; `public.gravar_anotacoes_do_processo(p_processo uuid, p_esperado text, p_novo text) returns table (texto text, alterado_em timestamptz, alterado_por_nome text)`; recusas P0001 `anotacoes_em_conflito`, `anotacoes_longas:<n>`, `processo_arquivado` (já existente), `registro_inexistente`, e 42501 para perfil.
 
-- [ ] **Passo 1: branch e marco.** Na `main` limpa: `git switch -c processos-etapas-23`; conferir "vínculo atual: yclkzyoebpsxmgpbcbus" em `supabase/AMBIENTES.md`; criar a tag `marco/2026-10-23-inicio-ticket-23-processos-etapas` e enviá-la (`git push origin "refs/tags/marco/*:refs/tags/marco/*"`).
-- [ ] **Passo 2: o teste que falha.** Criar `supabase/tests/50_anotacoes_do_processo.test.sql` com o conteúdo abaixo. As funções `pg_temp.hoje`, `andamento`, `agir`, `arquivo`, `enviar_completa`, `ate_a_aprovacao` e `aprovar` são copiadas sem mudança do `49_arquivar_e_registrar_publicacao.test.sql` (linhas 52 a 117), no ponto marcado.
+- [x] **Passo 1: branch e marco.** Na `main` limpa: `git switch -c processos-etapas-23`; conferir "vínculo atual: yclkzyoebpsxmgpbcbus" em `supabase/AMBIENTES.md`; criar a tag `marco/2026-10-23-inicio-ticket-23-processos-etapas` e enviá-la (`git push origin "refs/tags/marco/*:refs/tags/marco/*"`).
+- [x] **Passo 2: o teste que falha.** Criar `supabase/tests/50_anotacoes_do_processo.test.sql` com o conteúdo abaixo. As funções `pg_temp.hoje`, `andamento`, `agir`, `arquivo`, `enviar_completa`, `ate_a_aprovacao` e `aprovar` são copiadas sem mudança do `49_arquivar_e_registrar_publicacao.test.sql` (linhas 52 a 117), no ponto marcado.
 
 ```sql
 -- Anotações do processo (processos-etapas, ticket 23; ADR 0021): gravar só se o texto no banco é o que a pessoa tinha,
@@ -333,7 +333,7 @@ cd "C:/Users/alexmacedo/Desktop/Projeto Aplicação Escritório de Processos" &&
 ```
 
   Ler o resultado (`gh run list --workflow "Testes de banco" --branch processos-etapas-23 --limit 1`, depois `gh run view <id> --log-failed`). Esperado: o teste 50 falha pelo motivo certo (`has_column` e `has_function` falham e a função `gravar_anotacoes_do_processo` não existe); os outros arquivos seguem verdes.
-- [ ] **Passo 4: a migração.** `npx supabase migration new anotacoes_do_processo` (só cria o arquivo; a CLI não toca no banco) e escrever nele:
+- [x] **Passo 4: a migração.** `npx supabase migration new anotacoes_do_processo` (só cria o arquivo; a CLI não toca no banco) e escrever nele:
 
 ```sql
 -- Anotações do processo (processos-etapas, ticket 23; ADR 0021). Não destrutiva. Um texto livre por processo, sem
@@ -422,7 +422,7 @@ grant execute on function private.registrar_ultima_alteracao_das_anotacoes(), pu
 
 **Produz:** `LIMITE_DAS_ANOTACOES = 2000`; `PAUSA_DA_GRAVACAO_MS = 1000`; `textoParaGravar(texto: string): string | null`; `precisaGravar(texto: string, gravado: string | null): boolean`; `contagemDasAnotacoes(texto: string): string | null`; `linhaDaUltimaAlteracao(nome: string | null, quando: string | null): string | null`.
 
-- [ ] **Passo 1: os testes que falham** em `anotacoes.test.ts`:
+- [x] **Passo 1: os testes que falham** em `anotacoes.test.ts`:
 
 ```ts
 import { expect, test } from 'vitest'
@@ -471,8 +471,8 @@ test('sem o nome do autor a linha só traz a data; sem gravação não há linha
 })
 ```
 
-- [ ] **Passo 2:** `npx vitest run src/processos/anotacoes.test.ts` — esperado: falha (módulo inexistente).
-- [ ] **Passo 3: implementar** `src/processos/anotacoes.ts`:
+- [x] **Passo 2:** `npx vitest run src/processos/anotacoes.test.ts` — esperado: falha (módulo inexistente).
+- [x] **Passo 3: implementar** `src/processos/anotacoes.ts`:
 
 ```ts
 /** As regras das Anotações do processo que não dependem da tela (spec, "Anotações do processo"; ADR 0021). */
@@ -509,7 +509,7 @@ export function linhaDaUltimaAlteracao(nome: string | null, quando: string | nul
 }
 ```
 
-- [ ] **Passo 4:** o arquivo de teste passa; `npm test`, `npm run lint`, `npm run typecheck` verdes. Commit: `Ticket 23 de processos-etapas: regras puras das Anotações`.
+- [x] **Passo 4:** o arquivo de teste passa; `npm test`, `npm run lint`, `npm run typecheck` verdes. Commit: `Ticket 23 de processos-etapas: regras puras das Anotações`.
 
 ---
 
@@ -539,15 +539,15 @@ e, em `ModuloDeProcessos`:
   gravarAnotacoes(id: string, esperado: string | null, novo: string | null): Promise<ResultadoDaGravacaoDasAnotacoes>
 ```
 
-- [ ] **Passo 1: os testes que falham.**
+- [x] **Passo 1: os testes que falham.**
   - `anotacoesSupabase.test.ts` (molde de `publicacaoSupabase.test.ts`: `criarProcessosSupabase(cliente as unknown as SupabaseClient<Database>)` e `ClienteSupabaseFalso`):
     - `lerAnotacoes('p1')` pede à tabela `processos` as colunas `anotacoes, anotacoes_alteradas_em, autor:usuarios(nome)` filtradas por `id = p1` e devolve `{ texto, alteradoPor: nome do autor, alteradoEm }` (resposta `processos.select` com uma linha); linha com `anotacoes: null` e `autor: null` devolve `{ texto: null, alteradoPor: null, alteradoEm: null }`; lista vazia devolve `null`; erro de leitura vira `Error` com "Falha ao ler as anotações do processo:" e a mensagem;
     - `gravarAnotacoes('p1', 'antes', 'depois')` chama `rpc` `gravar_anotacoes_do_processo` com `{ p_processo: 'p1', p_esperado: 'antes', p_novo: 'depois' }`, e com `null`s os manda como `null`; a resposta `rpc.gravar_anotacoes_do_processo` com `data: [{ texto: 'depois', alterado_em: '2026-10-13T17:30:00Z', alterado_por_nome: 'Ana Teste' }]` vira `{ tipo: 'gravado', anotacoes: { texto: 'depois', alteradoPor: 'Ana Teste', alteradoEm: '2026-10-13T17:30:00Z' } }`; `data` vazio lança `Error` com "O banco não devolveu a linha das anotações gravadas: recebido [], esperado uma linha com texto, alterado_em e alterado_por_nome.";
     - o erro `anotacoes_em_conflito` (P0001) devolve `{ tipo: 'conflito' }` sem lançar;
     - `test.each` das recusas: `processo_arquivado` (P0001) → `TravaDoBanco` com "Este processo está arquivado; desarquive-o para alterar."; `anotacoes_longas:2001` → `TravaDoBanco` "As anotações têm 2.001 caracteres; o limite é 2.000."; código `42501` → `TravaDoBanco` "Seu perfil não permite alterar os processos."; `registro_inexistente` → `CadastroInexistente`.
   - `AnotacoesFalso.test.ts`: `ler` devolve o vazio de processo sem anotação e `null` de processo inexistente; `gravar` com esperado certo guarda e devolve autor e hora fixos (`'2026-10-13T17:30:00Z'`); com esperado errado devolve `{ tipo: 'conflito' }` sem mudar; gravar o mesmo texto não muda autor nem hora; arquivado lança `TravaDoBanco`; `falhasProgramadas = 1` lança na próxima gravação e a seguinte funciona; `segurar = true` só responde depois de `liberar()`; `alterarComoOutraPessoa` troca texto e autor; processo e subprocesso guardam textos separados; cada gravação aparece em `gravacoes`.
-- [ ] **Passo 2:** `npx vitest run src/processos/anotacoesSupabase.test.ts src/processos/AnotacoesFalso.test.ts` — esperado: falham (módulos inexistentes).
-- [ ] **Passo 3: implementar.**
+- [x] **Passo 2:** `npx vitest run src/processos/anotacoesSupabase.test.ts src/processos/AnotacoesFalso.test.ts` — esperado: falham (módulos inexistentes).
+- [x] **Passo 3: implementar.**
   - `tipos.ts`: os dois tipos e as duas operações acima.
   - `frasesDasAnotacoes.ts`:
 
@@ -680,7 +680,7 @@ export class AnotacoesFalso {
 
   - `ProcessosFalso.ts`: `anotacoes = new AnotacoesFalso(this)` ao lado de `catalogo`, e os dois métodos da interface: `lerAnotacoes = (id: string) => this.anotacoes.ler(id)` e `gravarAnotacoes = (id: string, esperado: string | null, novo: string | null) => this.anotacoes.gravar(id, esperado, novo)`. Se o `ProcessosFalso` passar de 300 linhas contadas pelo ESLint, mova os dois para métodos comuns de uma linha cada.
   - `src/testes/processoNoVerso.tsx`: `montarVerso` ganha o quarto parâmetro `preparar?: (falso: ProcessosFalso) => void`, chamado logo depois de `falso.etapasDoCatalogo = ...` e antes do `render(...)` (o bloco lê as Anotações ao montar, então o preparo tem de vir antes). Os usos atuais não mudam.
-- [ ] **Passo 4:** os dois arquivos novos passam; `npm test`, `npm run lint`, `npm run typecheck` verdes (o typecheck aponta qualquer outro objeto tipado como `ModuloDeProcessos` que precise dos dois métodos). Commit: `Ticket 23 de processos-etapas: módulo e falsa das Anotações`.
+- [x] **Passo 4:** os dois arquivos novos passam; `npm test`, `npm run lint`, `npm run typecheck` verdes (o typecheck aponta qualquer outro objeto tipado como `ModuloDeProcessos` que precise dos dois métodos). Commit: `Ticket 23 de processos-etapas: módulo e falsa das Anotações`.
 
 ---
 
@@ -691,7 +691,7 @@ export class AnotacoesFalso {
 **Consome:** `PAUSA_DA_GRAVACAO_MS`, `precisaGravar`, `textoParaGravar` (Tarefa 2); `AnotacoesLidas`, `ResultadoDaGravacaoDasAnotacoes` (Tarefa 3).
 **Produz:** `type EstadoDaGravacao = 'ocioso' | 'salvando' | 'salvo' | 'falha' | 'conflito'`; `type SaidaDoGravador = { gravar(esperado, novo); ler(); aoSumir() }`; `class GravadorDeAnotacoes` com os campos `estado`, `digitado`, `lidas` e os métodos `digitar(texto)`, `sairDoCampo()`, `verTextoAtual()`, `pendente()`, `gravarAgora(): Promise<boolean>`, `ouvir(ouvinte): () => void`, `encerrar()`; e `useAnotacoesDoProcesso(processos, id, inicial, aoSumir): GravadorDeAnotacoes`.
 
-- [ ] **Passo 1: os testes que falham** em `GravadorDeAnotacoes.test.ts` (relógio simulado, sem React):
+- [x] **Passo 1: os testes que falham** em `GravadorDeAnotacoes.test.ts` (relógio simulado, sem React):
 
 ```ts
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
@@ -907,8 +907,8 @@ test('encerrar cancela a pausa que estava correndo', async () => {
 })
 ```
 
-- [ ] **Passo 2:** `npx vitest run src/processos/GravadorDeAnotacoes.test.ts` — esperado: falha (módulo inexistente).
-- [ ] **Passo 3: implementar** `src/processos/GravadorDeAnotacoes.ts`:
+- [x] **Passo 2:** `npx vitest run src/processos/GravadorDeAnotacoes.test.ts` — esperado: falha (módulo inexistente).
+- [x] **Passo 3: implementar** `src/processos/GravadorDeAnotacoes.ts`:
 
 ```ts
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
@@ -1031,7 +1031,7 @@ export class GravadorDeAnotacoes {
 ```
 
   Se algum teste mostrar que a falha deixou a fila rejeitada, o `catch` dentro de `gravarUmaVez` já a impede (nenhum erro sai dele).
-- [ ] **Passo 4: o hook** `src/hooks/useAnotacoesDoProcesso.ts` (até 40 linhas; sem teste próprio, os testes de tela das Tarefas 5 e 6 o exercitam):
+- [x] **Passo 4: o hook** `src/hooks/useAnotacoesDoProcesso.ts` (até 40 linhas; sem teste próprio, os testes de tela das Tarefas 5 e 6 o exercitam):
 
 ```ts
 import { useEffect, useReducer, useState } from 'react'
@@ -1074,7 +1074,7 @@ export function useAnotacoesDoProcesso(
 }
 ```
 
-- [ ] **Passo 5:** `npx vitest run src/processos/GravadorDeAnotacoes.test.ts` passa; `npm test`, `npm run lint`, `npm run typecheck` verdes. Commit: `Ticket 23 de processos-etapas: gravador das Anotações`.
+- [x] **Passo 5:** `npx vitest run src/processos/GravadorDeAnotacoes.test.ts` passa; `npm test`, `npm run lint`, `npm run typecheck` verdes. Commit: `Ticket 23 de processos-etapas: gravador das Anotações`.
 
 ---
 
@@ -1085,7 +1085,7 @@ export function useAnotacoesDoProcesso(
 **Consome:** `useAnotacoesDoProcesso`, `GravadorDeAnotacoes`, `EstadoDaGravacao` (Tarefa 4); `contagemDasAnotacoes`, `linhaDaUltimaAlteracao`, `LIMITE_DAS_ANOTACOES` (Tarefa 2); `lerAnotacoes` (Tarefa 3); `ErroAoCarregar`, `useCarregamento`.
 **Produz:** `BlocoDasAnotacoes({ processo, processos, podeEscrever, guarda, aoSumir })`; `type GuardaDasAnotacoes = Pick<GravadorDeAnotacoes, 'pendente' | 'gravarAgora'>`; `useSaidaComAnotacoes()` que devolve `{ guarda, sair, seguir, desistir }` (nesta tarefa só o `guarda` é usado; a Tarefa 6 liga o resto).
 
-- [ ] **Passo 1: as ajudas de teste** em `src/testes/anotacoesNoVerso.tsx`:
+- [x] **Passo 1: as ajudas de teste** em `src/testes/anotacoesNoVerso.tsx`:
 
 ```tsx
 import { act, fireEvent, within } from '@testing-library/react'
@@ -1109,7 +1109,7 @@ export const digitarNasAnotacoes = async (texto: string) => fireEvent.change(awa
 export const passarAPausa = () => act(() => vi.advanceTimersByTimeAsync(1000))
 ```
 
-- [ ] **Passo 2: os testes de tela que falham** em `src/App.anotacoesDoProcesso.test.tsx` (aplicativo inteiro por `montarVerso`; `shouldAdvanceTime` mantém o `findBy` funcionando com o relógio simulado):
+- [x] **Passo 2: os testes de tela que falham** em `src/App.anotacoesDoProcesso.test.tsx` (aplicativo inteiro por `montarVerso`; `shouldAdvanceTime` mantém o `findBy` funcionando com o relógio simulado):
 
 ```tsx
 import { act, cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
@@ -1268,8 +1268,8 @@ test('gravar as Anotações não põe nada no Histórico do processo', async () 
 ```
 
   O último teste é uma garantia de tela (a falsa não gera evento); a prova de verdade de "sem evento" é o teste de banco da Tarefa 1. Se `Nenhum processo com estes filtros.` não for o texto exato de uma busca sem resultado, ajuste para o texto que `BuscaDaLista`/`FiltrosDosProcessos` mostram (veja `App.buscaNaLista.test.tsx`).
-- [ ] **Passo 3:** `npx vitest run src/App.anotacoesDoProcesso.test.tsx` — esperado: falham pelo motivo certo (sem a região "Anotações").
-- [ ] **Passo 4: implementar.**
+- [x] **Passo 3:** `npx vitest run src/App.anotacoesDoProcesso.test.tsx` — esperado: falham pelo motivo certo (sem a região "Anotações").
+- [x] **Passo 4: implementar.**
   - `src/hooks/useSaidaComAnotacoes.ts`:
 
 ```ts
@@ -1515,7 +1515,7 @@ function useCampoQueCresce(texto: string) {
 ```
 
     e o `import { BlocoDasAnotacoes } from './BlocoDasAnotacoes'` e o do tipo `SaidaComAnotacoes`/`useSaidaComAnotacoes`.
-- [ ] **Passo 5:** `npx vitest run src/App.anotacoesDoProcesso.test.tsx` passa; `npm test`, `npm run lint`, `npm run typecheck` verdes (conferir também que os testes de verso antigos, como `App.versoDoCartao` e `App.reuniaoDoProcesso`, seguem verdes: a coluna direita ganhou um bloco e a falsa responde às leituras sem preparo). Commit: `Ticket 23 de processos-etapas: bloco das Anotações no verso`.
+- [x] **Passo 5:** `npx vitest run src/App.anotacoesDoProcesso.test.tsx` passa; `npm test`, `npm run lint`, `npm run typecheck` verdes (conferir também que os testes de verso antigos, como `App.versoDoCartao` e `App.reuniaoDoProcesso`, seguem verdes: a coluna direita ganhou um bloco e a falsa responde às leituras sem preparo). Commit: `Ticket 23 de processos-etapas: bloco das Anotações no verso`.
 
 ---
 
@@ -1526,7 +1526,7 @@ function useCampoQueCresce(texto: string) {
 **Consome:** `SaidaComAnotacoes` (Tarefa 5), `JanelaDeConfirmacao`.
 **Produz:** `JanelaDeConfirmacao` com a prop opcional `rotuloDoCancelar` (padrão "Cancelar"); `ConfirmarSaidaSemSalvar({ aberta, aoSair, aoContinuar })`; `EstruturaDoProcesso` com a prop `aoAbrir: (endereco: string) => void`.
 
-- [ ] **Passo 1: os testes que falham** em `src/App.anotacoesAoSair.test.tsx` (o arquivo abaixo já traz a moldura de `beforeEach`/`afterEach` da Tarefa 5):
+- [x] **Passo 1: os testes que falham** em `src/App.anotacoesAoSair.test.tsx` (o arquivo abaixo já traz a moldura de `beforeEach`/`afterEach` da Tarefa 5):
 
 ```tsx
 import { act, cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
@@ -1688,8 +1688,8 @@ test('a falha e o conflito são avisos de alerta, e "Salvando…" e "Salvo" fica
 ```
 
   O teste do Esc usa o evento `cancel` do `<dialog>` (o jsdom não converte a tecla Esc nele); se o teste de Esc de outro arquivo do projeto usar outro gesto, siga o dele.
-- [ ] **Passo 2:** `npx vitest run src/App.anotacoesAoSair.test.tsx` — esperado: a falha e o conflito (que já funcionam pelo gravador) passam; os de fechar, Esc, subprocesso e Histórico falham (nada guarda a saída ainda) — conferir que falham pelo motivo certo (o verso fecha sem gravar; nenhum diálogo "As anotações não foram salvas").
-- [ ] **Passo 3: implementar.**
+- [x] **Passo 2:** `npx vitest run src/App.anotacoesAoSair.test.tsx` — esperado: a falha e o conflito (que já funcionam pelo gravador) passam; os de fechar, Esc, subprocesso e Histórico falham (nada guarda a saída ainda) — conferir que falham pelo motivo certo (o verso fecha sem gravar; nenhum diálogo "As anotações não foram salvas").
+- [x] **Passo 3: implementar.**
   - `JanelaDeConfirmacao.tsx`: nova prop `rotuloDoCancelar?: string` (padrão `'Cancelar'`) usada no segundo botão; os usos atuais não mudam.
   - `ConfirmarSaidaSemSalvar.tsx`:
 
@@ -1723,7 +1723,7 @@ function abrirNaMesmaJanela(aoAbrir: (endereco: string) => void) {
 
     com `onClick={abrirNaMesmaJanela(aoAbrir)}` no `<a className="estrutura-link">` (importar `type MouseEvent` de `react`).
   - `VersoDoCartao.tsx`: em `VersoDoCartao`, `const fechar = () => saida.sair(aoFechar)`; passar `fechar` como `aoFechar` da `JanelaDoVerso` e `aoCancelar={modo === 'verso' ? fechar : () => aoMudarModo('verso')}`, e `aoFechar={fechar}` ao `ConteudoDoVerso` (o `...props` entra antes, o `aoFechar` guardado depois, para valer o guardado; o botão de fechar do cabeçalho, o `SemProcesso` e os demais caminhos do `aoFechar` passam a usá-lo); renderizar, depois do `ConteudoDoVerso`, dentro da `JanelaDoVerso`, `<ConfirmarSaidaSemSalvar aberta={saida.seguir !== null} aoSair={() => saida.seguir?.()} aoContinuar={saida.desistir} />`. Em `ProcessoAberto`: `aoAbrirHistorico={() => saida.sair(() => aoMudarModo('historico'))}` e `aoEditar={() => saida.sair(() => aoMudarModo('editar'))}`. Em `ColunasDoVerso`: `<EstruturaDoProcesso ... aoAbrir={(endereco) => saida.sair(() => { window.location.hash = endereco })} />`. O `aposExcluir` e os fechamentos que vêm de o processo ter sumido continuam chamando o `aoFechar` guardado ou o original conforme já estavam (excluir o processo torna o texto sem sentido; não precisa perguntar).
-- [ ] **Passo 4:** `npx vitest run src/App.anotacoesAoSair.test.tsx` passa; `npm test`, `npm run lint`, `npm run typecheck` verdes (os testes antigos que clicam nos links do pai e dos subprocessos, em `App.subprocessos.test.tsx`, seguem verdes: o clique agora acerta o `window.location.hash` em vez de seguir o link). Se `VersoDoCartao.tsx` passar de 300 linhas contadas, extraia `CorpoDoVerso`, `BotaoVoltarAoProcesso` e `EdicaoDoProcesso` para `CorpoDoVerso.tsx`. Commit: `Ticket 23 de processos-etapas: sair do verso sem perder as Anotações`.
+- [x] **Passo 4:** `npx vitest run src/App.anotacoesAoSair.test.tsx` passa; `npm test`, `npm run lint`, `npm run typecheck` verdes (os testes antigos que clicam nos links do pai e dos subprocessos, em `App.subprocessos.test.tsx`, seguem verdes: o clique agora acerta o `window.location.hash` em vez de seguir o link). Se `VersoDoCartao.tsx` passar de 300 linhas contadas, extraia `CorpoDoVerso`, `BotaoVoltarAoProcesso` e `EdicaoDoProcesso` para `CorpoDoVerso.tsx`. Commit: `Ticket 23 de processos-etapas: sair do verso sem perder as Anotações`.
 
 ---
 
@@ -1731,9 +1731,9 @@ function abrirNaMesmaJanela(aoAbrir: (endereco: string) => void) {
 
 **Arquivos:** `.scratch/processos-etapas/desvios.md` (entrada nova, datada), `.scratch/processos-etapas/plano-23.md` (as caixas), `vitrine.local/main.tsx` (fora do git).
 
-- [ ] **Passo 1: conferir a tela** pela vitrine local com módulos falsos (como no ticket 22: servidor do Vite numa porta própria, por exemplo `npx vite --port 5175`, e a página `http://localhost:5175/vitrine.local/index.html`, no navegador do app, sem editar o `.claude/launch.json`; encerrar o servidor depois). Na `vitrine.local/main.tsx` (fora do git), dar Anotações a um processo (`proc.anotacoes.porProcesso.p1 = {...}` com texto inventado e autor) e deixar outro vazio. Conferir: o bloco como primeiro da coluna direita, acima da Reunião; o título e o "Salvando…/Salvo" lado a lado; o campo crescendo até cerca de 12 linhas e depois rolando por dentro, sem empurrar a janela; a linha "Alterado por" discreta abaixo; o aviso de falha em vermelho (`proc.anotacoes.falhasProgramadas = 1`) e o de conflito em amarelo com [Ver o texto atual] (`alterarComoOutraPessoa`); a Consulta e o arquivado só lendo; o texto longo com quebras de linha. Registrar o que foi visto e o que ficou presumido.
-- [ ] **Passo 2:** `desvios.md`: entrada datada "ticket 23" com as oito decisões deste plano, o que apareceu no caminho (vermelhos que vieram pelo motivo errado, ajustes de CSS depois da tela, testes antigos que mudaram) e a conferência da tela, com o que ficou **presumido**: a gravação e o conflito contra o banco de verdade na tela (a vitrine usa módulos falsos), o aviso nativo do navegador ao fechar a aba (o jsdom só prova o `preventDefault`) e o comportamento do botão Voltar do navegador com texto pendente.
-- [ ] **Passo 3:** `npm test` inteiro, `npm run lint`, `npm run typecheck`, `npm run check:circular` e a cobertura (`npm run test:coverage`) verdes. Commit: `Ticket 23 de processos-etapas: desvios e conferência`.
+- [x] **Passo 1: conferir a tela** pela vitrine local com módulos falsos (como no ticket 22: servidor do Vite numa porta própria, por exemplo `npx vite --port 5175`, e a página `http://localhost:5175/vitrine.local/index.html`, no navegador do app, sem editar o `.claude/launch.json`; encerrar o servidor depois). Na `vitrine.local/main.tsx` (fora do git), dar Anotações a um processo (`proc.anotacoes.porProcesso.p1 = {...}` com texto inventado e autor) e deixar outro vazio. Conferir: o bloco como primeiro da coluna direita, acima da Reunião; o título e o "Salvando…/Salvo" lado a lado; o campo crescendo até cerca de 12 linhas e depois rolando por dentro, sem empurrar a janela; a linha "Alterado por" discreta abaixo; o aviso de falha em vermelho (`proc.anotacoes.falhasProgramadas = 1`) e o de conflito em amarelo com [Ver o texto atual] (`alterarComoOutraPessoa`); a Consulta e o arquivado só lendo; o texto longo com quebras de linha. Registrar o que foi visto e o que ficou presumido.
+- [x] **Passo 2:** `desvios.md`: entrada datada "ticket 23" com as oito decisões deste plano, o que apareceu no caminho (vermelhos que vieram pelo motivo errado, ajustes de CSS depois da tela, testes antigos que mudaram) e a conferência da tela, com o que ficou **presumido**: a gravação e o conflito contra o banco de verdade na tela (a vitrine usa módulos falsos), o aviso nativo do navegador ao fechar a aba (o jsdom só prova o `preventDefault`) e o comportamento do botão Voltar do navegador com texto pendente.
+- [x] **Passo 3:** `npm test` inteiro, `npm run lint`, `npm run typecheck`, `npm run check:circular` e a cobertura (`npm run test:coverage`) verdes. Commit: `Ticket 23 de processos-etapas: desvios e conferência`.
 - [ ] **Passo 4:** (fora do plano de código, na branch principal, depois do merge, como manda o `/executar-complexo`) linha `Concluído em` no ticket 23, itens de `nao-testados.md` que aconteceram em `.scratch/melhorias-protocolo.md`, `.scratch/proximo-passo.md` e commit.
 
 ---

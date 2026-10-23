@@ -103,7 +103,7 @@ const TEXTO_DO_ESTADO: Record<EstadoDaGravacao, string> = { ocioso: '', salvando
 // a falha entra como alerta, que é anunciado ao aparecer.
 function EstadoDasAnotacoes({ estado }: { estado: EstadoDaGravacao }) {
   if (estado === 'falha') {
-    return <span role="alert" className="cadastros-falha">Não foi possível salvar. Seu texto continua aqui</span>
+    return <span role="alert" className="anotacoes-falha">Não foi possível salvar. Seu texto continua aqui</span>
   }
   return <span role="status" className="anotacoes-estado">{TEXTO_DO_ESTADO[estado]}</span>
 }
