@@ -122,16 +122,16 @@ Conteúdo da migração, na ordem: coluna `arquivado_em` e privilégio; `liberan
 
 **Arquivos:** `src/components/processos/EtapaDoAgora.tsx`, `AgoraDoProcesso.tsx`, `AcoesDeSituacao.tsx`, `src/processos/pedidosDeSituacao.ts`; teste de tela `src/App.naoVaiMaisParaPublicacao.test.tsx` (arte: `App.agoraDoVerso`, `App.situacaoDoProcesso`, `App.escolhaDePublicacao`).
 
-- [ ] Teste de tela: o "⋯" da Publicação não tem Dispensar; tem "Não vai mais para publicação", que pede motivo e leva o processo a Concluídos com o selo "Não publicado"; recusa vinda de fora ("A Publicação não se dispensa…") e falha ao gravar em vermelho sem perder o motivo; Consulta sem o item.
-- [ ] Implementar; testes verdes (e os antigos que dispensavam a Publicação, ajustados para outra etapa opcional); commit.
+- [x] Teste de tela: o "⋯" da Publicação não tem Dispensar; tem "Não vai mais para publicação", que pede motivo e leva o processo a Concluídos com o selo "Não publicado"; recusa vinda de fora ("A Publicação não se dispensa…") e falha ao gravar em vermelho sem perder o motivo; Consulta sem o item. (Desvio: como Suspender, a janela de motivo fecha ao confirmar, e a recusa ou falha aparece em vermelho no verso; o motivo não fica guardado.)
+- [x] Implementar; testes verdes (e os antigos que dispensavam a Publicação, ajustados para outra etapa opcional); commit.
 
 ### Tarefa 7: Agora do concluído e do arquivado, Registrar publicação
 
 **Arquivos:** `src/components/processos/AgoraDoConcluido.tsx` (novo), `JanelaDaPublicacao.tsx` (novo), `AgoraDoProcesso.tsx`, `CaminhoDoProcesso.tsx` (passa `aprovadaEm` e trava as gavetas no arquivado), `VersoDoCartao.tsx`, `src/processos/gravarAcoes.ts` (`gravarPublicacao`), `Agora.css` se preciso; testes de tela `src/App.arquivamento.test.tsx` e `src/App.registrarPublicacao.test.tsx` (arte: `App.concluidos`, `App.agoraDoVerso`, `App.editarRegistros`, `App.historico`).
 
-- [ ] Teste de tela (arquivamento): concluído com [Arquivar] principal e [Registrar publicação] só quando não publicado; arquivar tira de Concluídos; o verso do arquivado mostra "Arquivado", [Desarquivar] e, se não publicado, [Registrar publicação], sem "⋯" de alteração, gavetas, versões ou reunião editáveis; desarquivar devolve a Concluídos; eventos no histórico; falha ao gravar em vermelho; Consulta sem botões.
-- [ ] Teste de tela (registrar): data vem com hoje, `max` hoje e `min` na aprovação; recusa de data futura e anterior à aprovação sem perder o preenchido; "Salvando…"; depois, "Publicado em dd/mm/aaaa" e o processo onde estava (Concluídos ou arquivado); botão ausente no publicado; histórico com a nota.
-- [ ] Implementar; testes verdes; commit.
+- [x] Teste de tela (arquivamento): concluído com [Arquivar] principal e [Registrar publicação] só quando não publicado; arquivar tira de Concluídos; o verso do arquivado mostra "Arquivado", [Desarquivar] e, se não publicado, [Registrar publicação], sem "⋯" de alteração, gavetas, versões ou reunião editáveis; desarquivar devolve a Concluídos; eventos no histórico; falha ao gravar em vermelho; Consulta sem botões.
+- [x] Teste de tela (registrar): data vem com hoje, `max` hoje e `min` na aprovação; recusa de data futura e anterior à aprovação sem perder o preenchido; "Salvando…"; depois, "Publicado em dd/mm/aaaa" e o processo onde estava (Concluídos ou arquivado); botão ausente no publicado; histórico com a nota. ("Salvando…" é da `JanelaDeEdicao`, já testada; não ganhou caso próprio.)
+- [x] Implementar; testes verdes; commit.
 
 ### Tarefa 8: Lista com selo e filtro
 
