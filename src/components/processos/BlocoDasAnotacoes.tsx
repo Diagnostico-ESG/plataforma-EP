@@ -3,7 +3,7 @@ import { type MutableRefObject, type ReactNode, useCallback, useEffect, useId, u
 import { useAnotacoesDoProcesso } from '../../hooks/useAnotacoesDoProcesso'
 import { useCarregamento } from '../../hooks/useCarregamento'
 import type { GuardaDasAnotacoes } from '../../hooks/useSaidaComAnotacoes'
-import { LIMITE_DAS_ANOTACOES, contagemDasAnotacoes, linhaDaUltimaAlteracao } from '../../processos/anotacoes'
+import { LIMITE_DAS_ANOTACOES, SEM_ANOTACOES, contagemDasAnotacoes, linhaDaUltimaAlteracao } from '../../processos/anotacoes'
 import type { EstadoDaGravacao, GravadorDeAnotacoes } from '../../processos/GravadorDeAnotacoes'
 import type { AnotacoesLidas, ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
@@ -17,7 +17,6 @@ type BlocoProps = {
   aoSumir: () => void
 }
 
-const SEM_ANOTACOES: AnotacoesLidas = { texto: null, alteradoPor: null, alteradoEm: null }
 
 /** "Anotações" na coluna direita do verso: texto livre do processo, sem histórico (ADR 0021; spec, "Verso do cartão"). */
 export function BlocoDasAnotacoes({ processo, processos, podeEscrever, guardaRef, aoSumir }: BlocoProps) {

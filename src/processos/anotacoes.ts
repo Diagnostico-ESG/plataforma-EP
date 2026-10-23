@@ -1,4 +1,8 @@
+import type { AnotacoesLidas } from './tipos'
+
 /** As regras das Anotações do processo que não dependem da tela (spec, "Anotações do processo"; ADR 0021). */
+/** O processo que nunca teve anotação gravada. */
+export const SEM_ANOTACOES: AnotacoesLidas = { texto: null, alteradoPor: null, alteradoEm: null }
 export const LIMITE_DAS_ANOTACOES = 2000
 export const PAUSA_DA_GRAVACAO_MS = 1000
 const CONTAGEM_A_PARTIR_DE = 1800

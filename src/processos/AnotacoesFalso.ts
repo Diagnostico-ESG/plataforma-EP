@@ -1,12 +1,12 @@
 import { USUARIO_DE_TESTE } from '../acesso/AcessoFalso'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
+import { SEM_ANOTACOES } from './anotacoes'
 import { conferirNaoArquivado } from './arquivamentoFalso'
 import type { AnotacoesLidas, ProcessoLido, ResultadoDaGravacaoDasAnotacoes } from './tipos'
 
 /** Só o que a falsa das Anotações pede à falsa de processos (importá-la inteira fecharia um ciclo). */
 type DonoDosProcessos = { processos: ProcessoLido[] }
 
-const SEM_ANOTACOES: AnotacoesLidas = { texto: null, alteradoPor: null, alteradoEm: null }
 // Hora fixa (14:30 em Brasília): os testes de tela não dependem do relógio.
 const AGORA = '2026-10-13T17:30:00Z'
 

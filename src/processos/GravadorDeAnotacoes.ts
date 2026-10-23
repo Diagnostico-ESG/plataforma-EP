@@ -92,7 +92,12 @@ export class GravadorDeAnotacoes {
 
   private async gravarUmaVez(): Promise<void> {
     const enviado = this.digitado
-    if (this.estado === 'conflito' || !precisaGravar(enviado, this.gravado)) return
+    if (this.estado === 'conflito') return
+    if (!precisaGravar(enviado, this.gravado)) {
+      // voltou ao texto já gravado: o aviso de falha deixa de valer, porque não há mais nada por gravar
+      if (this.estado === 'falha') this.mudarEstado('ocioso')
+      return
+    }
     this.mudarEstado('salvando')
     try {
       const resultado = await this.saida.gravar(this.gravado, textoParaGravar(enviado))

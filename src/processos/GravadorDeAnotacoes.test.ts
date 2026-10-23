@@ -122,6 +122,18 @@ test('a falha mostra o estado e a próxima pausa tenta de novo', async () => {
   expect(saida.gravacoes).toEqual([{ esperado: null, novo: 'A' }, { esperado: null, novo: 'AB' }])
 })
 
+test('depois de uma falha, voltar ao texto já gravado tira o aviso de falha (nada fica pendente)', async () => {
+  saida.respostas = [new Error('falha de conexão simulada')]
+  const gravador = criar()
+  gravador.digitar('A')
+  await passar(1000)
+  expect(gravador.estado).toBe('falha')
+  gravador.digitar('')
+  await passar(1000)
+  expect(gravador.estado).toBe('ocioso')
+  expect(saida.gravacoes).toHaveLength(1)
+})
+
 test('o conflito para as gravações até "Ver o texto atual", que troca o texto e o autor', async () => {
   saida.respostas = [{ tipo: 'conflito' }]
   const gravador = criar()

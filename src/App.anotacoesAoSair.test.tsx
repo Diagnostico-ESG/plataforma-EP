@@ -133,6 +133,16 @@ test('abrir o Histórico com a gravação falhando pergunta; [Sair sem salvar] a
   expect(await screen.findByRole('heading', { name: 'Histórico' })).toBeTruthy()
 })
 
+test('abrir o Editar com a gravação falhando pergunta; [Continuar escrevendo] mantém o verso e o texto', async () => {
+  const falso = montarVerso(processoDasAnotacoes())
+  falso.anotacoes.falhasProgramadas = 5
+  await digitarNasAnotacoes('Pendente')
+  await escolherNoMenuDoProcesso('Editar')
+  fireEvent.click(within(await screen.findByRole('dialog', { name: PERGUNTA })).getByRole('button', { name: 'Continuar escrevendo' }))
+  await waitFor(() => expect(janelasPorCima().filter((janela) => janela.hasAttribute('open'))).toHaveLength(0))
+  expect(await valorDoCampo()).toBe('Pendente')
+})
+
 test('com texto pendente o navegador pergunta ao fechar a aba; sem pendência, não', async () => {
   montarVerso(processoDasAnotacoes())
   await digitarNasAnotacoes('Pendente')
