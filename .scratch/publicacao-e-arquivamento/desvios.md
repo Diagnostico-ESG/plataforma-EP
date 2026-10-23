@@ -1,0 +1,8 @@
+# Desvios de publicacao-e-arquivamento
+
+## 2026-10-23 — /polir da funcionalidade (tickets 01 a 03)
+
+- **Auditoria (`impeccable audit`, escopo: os 43 arquivos de `src/` alterados desde o marco `marco/2026-10-22-inicio-publicacao-e-arquivamento`, sem testes):** o detector não apontou nada. Conferência à mão do que a funcionalidade acrescentou: `JanelaDaPublicacao` (rótulos ligados aos campos por `useId`, `type="date"` com `min`/`max`, aviso de dado pessoal), `PerguntaDaPublicacao` (grupo de rádios nativos com `role="radiogroup"` e nome acessível), `AgoraDoConcluido`, selo "Arquivado" (a `Pilula` neutra que já existia), filtro "Arquivados" (o `SeletorDoFiltro` que já existia), coluna Concluídos vazia. As classes de CSS novas usam só tokens (`--texto-2`, `--tam-secundario`, `--esp-*`), sem cor fixa; todas as classes usadas existem no CSS.
+- **Polimento (`impeccable polish`):** nada corrigido, porque a auditoria não trouxe defeito. O ticket 03 não mexeu na interface (banco e funções puras das planilhas). O polimento visual do ticket 02 já tinha sido feito em 2026-10-22.
+- **Deixado de fora, com o motivo:** (1) o filtro "Arquivados" que desce para uma segunda linha da barra a 1366×768 (já no backlog; a barra quebra por desenho e não atrapalha o uso); (2) a conferência renderizada desta passagem: não foi feita, porque exigiria login e banco, ou uma vitrine temporária com módulos falsos. **Presumido**, então, o aspecto na tela dos critérios `[visual]` dos tickets 01 e 02 além do que o `/polir` do ticket 02 já viu.
+- **Não é de design, mas ficou pendente (backlog, 2026-10-22):** a gaveta da Publicação pendente de um processo concluído com "não" ainda oferece Iniciar, Dispensar e Realizada anteriormente; regra a decidir.
