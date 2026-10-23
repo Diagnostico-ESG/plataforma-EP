@@ -335,3 +335,4 @@ A atualização dos dados roda com os gatilhos de evento desligados, como na mig
   7. Do Quadro, o arrastar a partir da Aprovação continua indo para a coluna seguinte (Publicação). Quem responde "Não" na janela vê o cartão ir para Concluídos.
   8. "Realizada anteriormente" continua permitida na Publicação em andamento.
 - **Divergências da especificação:** a especificação previa a Publicação como registro próprio na v1.5. Ela continua sendo só a etapa, com a escolha no processo (ADR 0020).
+- **Exceção na trava do arquivado:** o subprocesso arquivado aceita a propagação de `macroprocesso_id` vinda do processo pai (só dentro do gatilho do pai e sem mudar mais nada). Fora isso, o arquivado recusa tudo, menos Registrar publicação e Desarquivar.
