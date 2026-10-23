@@ -23,6 +23,7 @@ export function processoDaLinha(linha: LinhaDoProcesso): ProcessoDaLista {
     cartao: cartaoDaLinha(linha),
     vaiParaPublicacao: linha.vai_para_publicacao,
     publicadoEm: linha.publicado_em,
+    arquivadoEm: linha.arquivado_em,
   }
 }
 

@@ -6,7 +6,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(23);
+insert into _tap (linha) select plan(24);
 
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 insert into public.autorizacoes (email, perfil) values
@@ -91,8 +91,14 @@ insert into _tap (linha) select is(
 insert into _tap (linha) select is(
   (select etapa_atual_codigo from public.processos_com_andamento where nome = 'Processo Andamento'),
   'publicacao', 'a etapa atual é a opcional que sobrou');
+-- A Publicação, a única opcional do catálogo, não se dispensa (publicacao-e-arquivamento, ticket 02): a nota fica com a
+-- "realizada anteriormente".
+insert into _tap (linha) select throws_ok(
+  $sql$select pg_temp.agir('publicacao', 'dispensada', 'Sem publicação neste caso')$sql$,
+  'P0001', 'publicacao_nao_se_dispensa', 'dispensar a Publicação é recusado');
 insert into _tap (linha) select lives_ok(
-  $sql$select pg_temp.agir('publicacao', 'dispensada', 'Sem publicação neste caso')$sql$, 'dispensar etapa opcional, com nota');
+  $sql$select pg_temp.agir('publicacao', 'realizada_anteriormente', 'Sem publicação neste caso')$sql$,
+  'registrar a Publicação como realizada anteriormente, com nota');
 
 -- Eventos: um por ação aceita, com o processo legível, a referência 'processo:andamento' e a nota em "motivo".
 insert into _tap (linha) select is(
@@ -100,12 +106,14 @@ insert into _tap (linha) select is(
     where entidade = 'andamento' and entidade_ref like (select id::text from public.processos where nome = 'Processo Andamento') || ':%'),
   7, 'cada ação aceita gera um evento do andamento do processo');
 insert into _tap (linha) select is(
-  (select detalhes ->> 'motivo' from public.eventos where acao = 'dispensar'
-    and entidade_ref like (select id::text from public.processos where nome = 'Processo Andamento') || ':%'),
-  'Sem publicação neste caso', 'o evento da dispensa traz a nota em motivo');
+  (select detalhes ->> 'motivo' from public.eventos where acao = 'registrar_realizada'
+    and entidade_ref = (select id::text from public.processos where nome = 'Processo Andamento') || ':'
+      || pg_temp.andamento('Processo Andamento', 'publicacao')::text),
+  'Sem publicação neste caso', 'o evento da realizada anteriormente traz a nota em motivo');
 insert into _tap (linha) select is(
-  (select detalhes -> 'depois' ->> 'processo_nome' from public.eventos where acao = 'dispensar'
-    and entidade_ref like (select id::text from public.processos where nome = 'Processo Andamento') || ':%'),
+  (select detalhes -> 'depois' ->> 'processo_nome' from public.eventos where acao = 'registrar_realizada'
+    and entidade_ref = (select id::text from public.processos where nome = 'Processo Andamento') || ':'
+      || pg_temp.andamento('Processo Andamento', 'publicacao')::text),
   'Processo Andamento', 'o evento traz o nome do processo, legível depois de uma exclusão');
 
 -- Perfis: Consulta e inativo não alteram (nenhuma linha muda); Administrador altera; visitante nem tenta.

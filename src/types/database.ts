@@ -456,6 +456,7 @@ export type Database = {
       }
       processos: {
         Row: {
+          arquivado_em: string | null
           contexto: string | null
           criado_em: string
           data_da_reuniao: string | null
@@ -472,6 +473,7 @@ export type Database = {
           vai_para_publicacao: boolean | null
         }
         Insert: {
+          arquivado_em?: string | null
           contexto?: string | null
           criado_em?: string
           data_da_reuniao?: string | null
@@ -488,6 +490,7 @@ export type Database = {
           vai_para_publicacao?: boolean | null
         }
         Update: {
+          arquivado_em?: string | null
           contexto?: string | null
           criado_em?: string
           data_da_reuniao?: string | null
@@ -802,6 +805,7 @@ export type Database = {
     Views: {
       processos_com_andamento: {
         Row: {
+          arquivado_em: string | null
           caminho: Json | null
           contexto: string | null
           criado_em: string | null
@@ -922,6 +926,7 @@ export type Database = {
         Args: { p_arquivo: Json; p_numero: number; p_versao: string }
         Returns: string
       }
+      arquivar_processo: { Args: { p_processo: string }; Returns: undefined }
       avancar_etapa: {
         Args: {
           p_acao: string
@@ -957,6 +962,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      desarquivar_processo: { Args: { p_processo: string }; Returns: undefined }
       links_das_planilhas: {
         Args: never
         Returns: {
@@ -966,6 +972,10 @@ export type Database = {
       }
       mover_etapa: {
         Args: { p_etapa: string; p_sentido: string }
+        Returns: undefined
+      }
+      nao_vai_mais_para_publicacao: {
+        Args: { p_motivo: string; p_processo: string }
         Returns: undefined
       }
       origem_do_relatorio: {
@@ -984,6 +994,10 @@ export type Database = {
           p_processo: string
           p_tipo: Database["public"]["Enums"]["tipo_de_processo"]
         }
+        Returns: undefined
+      }
+      registrar_publicacao: {
+        Args: { p_data: string; p_nota: string; p_processo: string }
         Returns: undefined
       }
       registrar_resultado_das_planilhas: {
