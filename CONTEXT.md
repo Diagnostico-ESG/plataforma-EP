@@ -144,6 +144,10 @@ _Avoid_: finalizados (para a coluna), encerrados
 Marca de um processo concluído que sai do Quadro e fica só na Lista. Continua concluído para todo o resto, inclusive nos dashboards. Quem arquiva é um Administrador ou Integrante do EP, e quem **desarquiva** o devolve a Concluídos. Arquivado não tem etapa mexida; só se registra publicação ou se desarquiva.
 _Avoid_: encerrado, inativo, cancelado
 
+**Anotações**:
+Texto livre e único de um processo (cada subprocesso tem o seu), escrito pela equipe e guardado sozinho enquanto se escreve, sem histórico das versões anteriores. Administrador e Integrante do EP escrevem; Consulta só lê; no arquivado, só se lê. Não sai da plataforma: fica fora dos dashboards.
+_Avoid_: observações, notas, comentários
+
 **Reclassificação**:
 Mudança do tipo de um item (processo, subprocesso ou a classificar), com motivo, que preserva o mesmo item com tudo o que ele já tem.
 _Avoid_: conversão, migração, recriação
@@ -155,7 +159,7 @@ A primeira etapa de todo processo: o EP se reúne com o setor e faz o primeiro d
 _Avoid_: reunião de modelagem, oficina, workshop
 
 **Reunião**:
-Encontro do EP com o setor para a modelagem piloto de um processo, marcado no próprio processo só pela data. Pode ser marcado antes de acontecer: a data diz se é próxima ou realizada. Uma reunião que trata vários processos é marcada em cada um. Não muda o status de nenhuma etapa. Participantes, local e anotações ficam fora: a existência do relatório já pressupõe a reunião.
+Encontro do EP com o setor para a modelagem piloto de um processo, marcado no próprio processo só pela data. Pode ser marcado antes de acontecer: a data diz se é próxima ou realizada. Uma reunião que trata vários processos é marcada em cada um. Não muda o status de nenhuma etapa. Participantes, local e anotações da reunião ficam fora: a existência do relatório já pressupõe a reunião, e o que for preciso registrar vai nas Anotações do processo.
 _Avoid_: encontro, evento, agenda, oficina, reunião de sensibilização
 
 ## Documentos
