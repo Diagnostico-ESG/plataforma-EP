@@ -85,8 +85,8 @@ Casos (critério de aceite 1 do ticket, cada item uma asserção):
 
 Conteúdo da migração, na ordem: coluna `arquivado_em` e privilégio; `liberando_arquivado`; `conferir_arquivamento` e gatilho; `registrar_evento_do_arquivamento` e gatilho; `conferir_processo_em_andamento` recriada; `conferir_processo_arquivado` e gatilho; `conferir_dispensa` recriada; `preparar_andamento` e `registrar_evento_do_andamento` recriadas com a saída pela `escolhendo_publicacao`; `registrar_evento_da_escolha_de_publicacao` recriada com `ep.evento_da_publicacao`; as quatro funções públicas; `revoke`/`grant`; a view.
 
-- [ ] Escrever a migração e o ensaio; push; "Testes de banco" na branch: o ensaio passa.
-- [ ] Apagar o ensaio; commit.
+- [x] Escrever a migração e o ensaio; push; "Testes de banco" na branch: o ensaio passa.
+- [x] Apagar o ensaio; commit.
 - [ ] Disparar "Migrar banco de desenvolvimento" na branch com o nome do arquivo.
 - [ ] "Testes de banco" na branch: o 49 passa; ajustar os testes antigos que falharem pela regra nova (o 18 dispensa a Publicação por `update` direto: passa a esperar a recusa ou a usar a "realizada anteriormente") até todos ficarem verdes.
 - [ ] `npm run db:types` (ou ajuste à mão de `src/types/database.ts`, se a rede barrar); commit único da migração, testes e tipos; registrar a migração em `supabase/AMBIENTES.md`.

@@ -255,7 +255,7 @@ insert into _tap (linha) select throws_ok(
   $sql$select public.substituir_arquivo((select f.id from public.arquivos_da_versao f join public.versoes v on v.id = f.versao_id
     where v.processo_id = pg_temp.processo('Arquivado') and f.papel = 'png'),
     jsonb_build_object('formato', 'png', 'tamanho', 555, 'hash_md5', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'))$sql$,
-  'P0001', 'processo_fora_de_andamento:concluido', 'no arquivado, substituir arquivo é recusado');
+  'P0001', 'versao_aprovada:1', 'no arquivado, substituir arquivo é recusado (a versão aprovada já trava)');
 insert into _tap (linha) select lives_ok(
   $sql$select public.registrar_publicacao(pg_temp.processo('Arquivado'), pg_temp.hoje(), null)$sql$,
   'no arquivado, registrar publicação é aceito');
