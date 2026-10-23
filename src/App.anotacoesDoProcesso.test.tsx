@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import type { AnotacoesLidas, SituacaoDoProcesso } from './processos/tipos'
@@ -149,6 +149,6 @@ test('gravar as Anotações não põe nada no Histórico do processo', async () 
   await passarAPausa()
   await (await blocoDasAnotacoes()).findByText('Salvo')
   await escolherNoMenuDoProcesso('Histórico')
-  expect(await screen.findByRole('heading', { name: 'Histórico' })).toBeTruthy()
-  expect(screen.queryByText(/nota/i)).toBeNull()
+  const pagina = (await screen.findByRole('heading', { name: 'Histórico' })).closest('.verso-pagina') as HTMLElement
+  expect(within(pagina).queryByText(/anota/i)).toBeNull()
 })

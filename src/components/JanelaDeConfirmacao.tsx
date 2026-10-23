@@ -6,13 +6,17 @@ type JanelaDeConfirmacaoProps = {
   titulo: string
   texto?: string
   rotuloDaAcao: string
+  /** O texto do botão de desistir; o padrão é "Cancelar". */
+  rotuloDoCancelar?: string
   aoConfirmar: () => void
   aoFechar: () => void
 }
 
 // <dialog> nativo: o navegador cuida do fundo esmaecido, do Esc e de devolver o foco ao botão de origem.
 // O foco abre no Cancelar para que um Enter por reflexo não grave nada (ADR 0003).
-export function JanelaDeConfirmacao({ aberta, titulo, texto, rotuloDaAcao, aoConfirmar, aoFechar }: JanelaDeConfirmacaoProps) {
+export function JanelaDeConfirmacao({
+  aberta, titulo, texto, rotuloDaAcao, rotuloDoCancelar = 'Cancelar', aoConfirmar, aoFechar,
+}: JanelaDeConfirmacaoProps) {
   const janela = useRef<HTMLDialogElement>(null)
   const botaoCancelar = useRef<HTMLButtonElement>(null)
   const idDoTitulo = useId()
@@ -38,7 +42,7 @@ export function JanelaDeConfirmacao({ aberta, titulo, texto, rotuloDaAcao, aoCon
       {texto && <p>{texto}</p>}
       <div className="janela-confirmacao-botoes">
         <button type="button" className="botao botao-principal" onClick={confirmar}>{rotuloDaAcao}</button>
-        <button ref={botaoCancelar} type="button" className="botao botao-secundario" onClick={aoFechar}>Cancelar</button>
+        <button ref={botaoCancelar} type="button" className="botao botao-secundario" onClick={aoFechar}>{rotuloDoCancelar}</button>
       </div>
     </dialog>
   )

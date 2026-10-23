@@ -14,6 +14,7 @@ import { SecaoDeVersoes } from '../versoes/SecaoDeVersoes'
 import { AcoesDoProcesso } from './AcoesDoProcesso'
 import { BlocoDasAnotacoes } from './BlocoDasAnotacoes'
 import { BotaoFecharJanela, CabecalhoDoVerso } from './CabecalhoDoVerso'
+import { ConfirmarSaidaSemSalvar } from './ConfirmarSaidaSemSalvar'
 import { CabecalhoDoFormulario } from './CabecalhoDoFormulario'
 import { CaminhoDoProcesso } from './CaminhoDoProcesso'
 import { EstruturaDoProcesso } from './EstruturaDoProcesso'
@@ -61,10 +62,13 @@ export function VersoDoCartao(props: VersoDoCartaoProps) {
   }
   const atual = estadoDoVerso(estado, id, sumiu)
   const rotulo = atual.tipo === 'pronto' && atual.valor ? `Processo ${atual.valor.nome}` : 'Processo'
+  // Fechar (botão, Esc) com anotações sem gravar grava na hora e, se não der, pergunta antes de sair.
+  const fechar = () => saida.sair(aoFechar)
   return (
-    <JanelaDoVerso rotulo={rotulo} aoFechar={aoFechar} aoCancelar={modo === 'verso' ? aoFechar : () => aoMudarModo('verso')}
+    <JanelaDoVerso rotulo={rotulo} aoFechar={fechar} aoCancelar={modo === 'verso' ? fechar : () => aoMudarModo('verso')}
       estreita={atual.tipo === 'pronto' && modo === 'editar'}>
-      <ConteudoDoVerso {...props} saida={saida} modo={modo} aoMudarModo={aoMudarModo} estado={atual} aoTentarDeNovo={tentarDeNovo} aoAtualizar={recarregar} aoSumir={aoSumir} />
+      <ConteudoDoVerso {...props} aoFechar={fechar} saida={saida} modo={modo} aoMudarModo={aoMudarModo} estado={atual} aoTentarDeNovo={tentarDeNovo} aoAtualizar={recarregar} aoSumir={aoSumir} />
+      <ConfirmarSaidaSemSalvar aberta={saida.seguir !== null} aoSair={() => saida.seguir?.()} aoContinuar={saida.desistir} />
     </JanelaDoVerso>
   )
 }
@@ -137,7 +141,8 @@ function ProcessoAberto(props: ProcessoAbertoProps) {
   }
   const acoes = (
     <AcoesDoProcesso processo={processo} processos={processos} podeAlterar={podeAlterar && !processo.arquivadoEm} executar={executar}
-      aoAbrirHistorico={() => aoMudarModo('historico')} aoEditar={() => aoMudarModo('editar')} aoExcluir={aposExcluir}
+      aoAbrirHistorico={() => props.saida.sair(() => aoMudarModo('historico'))}
+      aoEditar={() => props.saida.sair(() => aoMudarModo('editar'))} aoExcluir={aposExcluir}
       aoMudar={aposMudar} />
   )
   return (
@@ -211,7 +216,8 @@ function ColunasDoVerso(props: CorpoProps) {
         <ReuniaoDoProcesso processo={processo} processos={processos} podeAlterar={alteravel} aoMudar={aposMudar}
           aoSumir={aoSumir} />
         <SobreDoProcesso processo={processo} />
-        <EstruturaDoProcesso processo={processo} enderecoDoProcesso={enderecoDoProcesso} />
+        <EstruturaDoProcesso processo={processo} enderecoDoProcesso={enderecoDoProcesso}
+          aoAbrir={(endereco) => props.saida.sair(() => { window.location.hash = endereco })} />
       </div>
     </div>
   )
