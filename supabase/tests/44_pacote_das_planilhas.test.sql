@@ -8,7 +8,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(31);
+insert into _tap (linha) select plan(36);
 
 -- Usuários inventados: a1 administrador, a2 integrante (será responsável de uma etapa, com nome conhecido).
 insert into public.autorizacoes (email, perfil) values
@@ -35,7 +35,8 @@ insert into public.processos (setor_id, macroprocesso_id, nome, tipo)
 values ('5f000000-0000-0000-0000-000000000044', 'af000000-0000-0000-0000-000000000044', 'T44 Normal', 'processo');
 insert into public.processos (setor_id, macroprocesso_id, nome)
 select '5f000000-0000-0000-0000-000000000044', 'af000000-0000-0000-0000-000000000044', nome
-from unnest(array['T44 Cancelado', 'T44 Concluido', 'T44 Versoes', 'T44 Historica', 'T44 Sem Versao']) as nome;
+from unnest(array['T44 Cancelado', 'T44 Concluido', 'T44 Versoes', 'T44 Historica', 'T44 Sem Versao',
+  'T44 Nao Publicado', 'T44 Arquivado']) as nome;
 
 create function pg_temp.processo(nome_do_processo text) returns uuid
 language sql stable as $$ select id from public.processos where nome = nome_do_processo $$;
@@ -79,6 +80,21 @@ update public.andamentos set status = 'concluida', iniciada_em = date '2026-04-0
     -- A Publicação também: sem a escolha de publicação, ela pendente manteria o processo em andamento (ADR 0020).
     and etapa_id in (select id from public.etapas where obrigatoria or codigo = 'publicacao');
 alter table public.andamentos enable trigger user;
+-- Escolha de publicação e arquivamento só mudam pelas funções da tela; aqui, como dono, direto. O "não publicado" tem a
+-- escolha "não" e a Publicação pendente; o arquivado é um concluído publicado e arquivado (publicacao-e-arquivamento, ticket 03).
+alter table public.andamentos disable trigger user;
+update public.andamentos set status = 'concluida', iniciada_em = date '2026-04-01', resolvida_em = date '2026-04-02'
+  where processo_id in (pg_temp.processo('T44 Nao Publicado'), pg_temp.processo('T44 Arquivado'))
+    and etapa_id in (select id from public.etapas where obrigatoria or codigo = 'publicacao');
+update public.andamentos set status = 'pendente', iniciada_em = null, resolvida_em = null
+  where processo_id = pg_temp.processo('T44 Nao Publicado')
+    and etapa_id = (select id from public.etapas where codigo = 'publicacao');
+alter table public.andamentos enable trigger user;
+alter table public.processos disable trigger user;
+update public.processos set vai_para_publicacao = false where id = pg_temp.processo('T44 Nao Publicado');
+update public.processos set vai_para_publicacao = true, arquivado_em = now() where id = pg_temp.processo('T44 Arquivado');
+update public.processos set vai_para_publicacao = true where id = pg_temp.processo('T44 Concluido');
+alter table public.processos enable trigger user;
 insert into public.etapas (codigo, nome, ordem, obrigatoria, ativa, fase)
 values ('inativa_t44', 'Inativa T44', (select max(ordem) + 1 from public.etapas), false, false, 'IX');
 
@@ -129,7 +145,19 @@ insert into _tap (linha) select is((pg_temp.do_processo('T44 Concluido') ->> 'co
   'o processo com as obrigatórias resolvidas está concluído');
 insert into _tap (linha) select is((select array_agg(k order by k) from jsonb_object_keys(pg_temp.do_processo('T44 Normal')) k),
   array['concluido', 'data_da_reuniao', 'id', 'macroprocesso_nome', 'nome', 'observacoes', 'setor_sigla',
-    'situacao_guardada', 'tipo', 'ultima_versao'], 'cada processo traz só os campos combinados');
+    'situacao_guardada', 'tipo', 'ultima_versao', 'vai_para_publicacao'], 'cada processo traz só os campos combinados');
+
+-- Escolha de publicação (publicacao-e-arquivamento, ticket 03): sim, não e sem resposta viajam como estão.
+insert into _tap (linha) select is((pg_temp.do_processo('T44 Nao Publicado') ->> 'vai_para_publicacao')::boolean, false,
+  'a escolha "não" vai no pacote');
+insert into _tap (linha) select is((pg_temp.do_processo('T44 Concluido') ->> 'vai_para_publicacao')::boolean, true,
+  'a escolha "sim" vai no pacote');
+insert into _tap (linha) select is(jsonb_typeof(pg_temp.do_processo('T44 Normal') -> 'vai_para_publicacao'), 'null',
+  'sem resposta, a escolha vai vazia');
+insert into _tap (linha) select is((pg_temp.do_processo('T44 Nao Publicado') ->> 'concluido')::boolean, true,
+  'o processo com a escolha "não" e a Publicação pendente está concluído');
+insert into _tap (linha) select is((pg_temp.do_processo('T44 Arquivado') ->> 'concluido')::boolean, true,
+  'o arquivado continua contado como concluído');
 
 -- Última versão não histórica.
 insert into _tap (linha) select is((pg_temp.do_processo('T44 Versoes') ->> 'ultima_versao')::int, 2,

@@ -30,6 +30,8 @@ export interface ProcessoDoPacote {
   concluido: boolean
   observacoes: string | null
   data_da_reuniao: string | null
+  /** Escolha de publicação do processo (ADR 0020): sim, não ou sem resposta. */
+  vai_para_publicacao: boolean | null
   /** Número da última versão não histórica; nulo sem versão. */
   ultima_versao: number | null
 }
@@ -80,6 +82,7 @@ const dataOuNula: Regra = {
   vale: (v) => v === null || (typeof v === 'string' && FORMATO_DATA.test(v)),
 }
 const booleano: Regra = { esperado: 'booleano', vale: (v) => typeof v === 'boolean' }
+const booleanoOuNulo: Regra = { esperado: 'booleano ou nulo', vale: (v) => v === null || typeof v === 'boolean' }
 const inteiroPositivo = (v: unknown): boolean => typeof v === 'number' && Number.isInteger(v) && v > 0
 const numeroPositivo: Regra = { esperado: 'número inteiro maior que zero', vale: inteiroPositivo }
 const numeroOuNulo: Regra = { esperado: 'número inteiro maior que zero ou nulo', vale: (v) => v === null || inteiroPositivo(v) }
@@ -131,6 +134,7 @@ const REGRAS_DO_PROCESSO: Record<string, Regra> = {
   concluido: booleano,
   observacoes: textoOuNulo,
   data_da_reuniao: dataOuNula,
+  vai_para_publicacao: booleanoOuNulo,
   ultima_versao: numeroOuNulo,
 }
 const REGRAS_DO_ANDAMENTO = {
