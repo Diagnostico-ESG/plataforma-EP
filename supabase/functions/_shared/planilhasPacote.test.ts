@@ -82,6 +82,20 @@ describe('validarPacote', () => {
     )
   })
 
+  it('aceita a escolha de publicação sim, não e sem resposta', () => {
+    for (const escolha of [true, false, null]) {
+      const pacote = copia()
+      pacote.processos[0].vai_para_publicacao = escolha
+      expect(validarPacote(pacote).ok).toBe(true)
+    }
+  })
+
+  it('recusa a escolha de publicação que não é booleano nem nulo', () => {
+    expect(recusa((p) => { p.processos[0].vai_para_publicacao = 'sim' })).toContain(
+      'campo processos[0].vai_para_publicacao: esperado booleano ou nulo, recebido string',
+    )
+  })
+
   it('recusa última versão que não é inteiro positivo nem nulo', () => {
     expect(recusa((p) => { p.processos[0].ultima_versao = 0 })).toContain('campo processos[0].ultima_versao')
     expect(recusa((p) => { p.processos[0].ultima_versao = '7' })).toContain('recebido string')

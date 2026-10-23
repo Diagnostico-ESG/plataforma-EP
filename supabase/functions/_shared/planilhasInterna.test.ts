@@ -34,7 +34,7 @@ describe('montarPlanilhaInterna: aba Processos', () => {
     const nomes = processos.linhas.slice(1).map((linha) => linha[3])
     expect(nomes).not.toContain('Cancelado')
     expect(nomes).toContain('Suspenso')
-    expect(nomes).toHaveLength(6)
+    expect(nomes).toHaveLength(7)
   })
 
   it('subprocesso e "a classificar" entram, cada um com a sua linha e o tipo numa coluna', () => {
@@ -52,7 +52,8 @@ describe('montarPlanilhaInterna: aba Processos', () => {
     expect(linhaDoProcesso('Sub')[5]).toBe('Próxima · IV')
     expect(linhaDoProcesso('Suspenso')[5]).toBe('Suspenso · V')
     expect(linhaDoProcesso('Publicado')[5]).toBe('Publicado')
-    expect(linhaDoProcesso('Sem publicacao')[5]).toBe('Concluído')
+    expect(linhaDoProcesso('Nao publicado')[5]).toBe('Concluído')
+    expect(linhaDoProcesso('Arquivado')[5]).toBe('Publicado')
   })
 
   it('a data da modelagem piloto vem da reunião ou, sem ela, da conclusão da etapa', () => {
@@ -63,7 +64,8 @@ describe('montarPlanilhaInterna: aba Processos', () => {
 
   it('a data da publicação vem da conclusão da Publicação; dispensada não dá data', () => {
     expect(linhaDoProcesso('Publicado')[7]).toBe('2026-07-01')
-    expect(linhaDoProcesso('Sem publicacao')[7]).toBe('')
+    expect(linhaDoProcesso('Nao publicado')[7]).toBe('')
+    expect(linhaDoProcesso('Arquivado')[7]).toBe('2026-07-03')
   })
 
   it('a última versão vira "V7"; sem versão fica vazia', () => {
@@ -86,7 +88,7 @@ describe('montarPlanilhaInterna: aba Fases', () => {
   it('tem uma linha por processo e fase, de I a VII, com o mesmo identificador da aba Processos', () => {
     const doComum = fasesDoProcesso('Comum')
     expect(doComum.map((linha) => linha[3])).toEqual(['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'])
-    expect(fases.linhas).toHaveLength(1 + 6 * 7)
+    expect(fases.linhas).toHaveLength(1 + 7 * 7)
   })
 
   it('as fases I a III saem concluídas e sem data', () => {
@@ -107,8 +109,16 @@ describe('montarPlanilhaInterna: aba Fases', () => {
     ])
   })
 
-  it('a Publicação dispensada aparece como "Dispensada", sem data', () => {
-    expect(fasesDoProcesso('Sem publicacao')[6].slice(4)).toEqual(['Dispensada', ''])
+  it('a fase VII com a escolha "não" aparece como "Não publicado", sem data', () => {
+    expect(fasesDoProcesso('Nao publicado')[6].slice(4)).toEqual(['Não publicado', ''])
+  })
+
+  it('o arquivado aparece com a fase VII concluída, como o concluído publicado', () => {
+    expect(fasesDoProcesso('Arquivado')[6].slice(4)).toEqual(['Concluída', '2026-07-03'])
+  })
+
+  it('"Dispensada" não aparece em nenhuma célula das fases', () => {
+    expect(JSON.stringify(fases.linhas)).not.toContain('Dispensada')
   })
 
   it('traz a área e o nome do processo, sem identificar pessoa', () => {

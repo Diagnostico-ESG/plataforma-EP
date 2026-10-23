@@ -1,5 +1,6 @@
-// Cenário inventado dos testes das duas planilhas: seis processos que entram (comum, subprocesso, a classificar,
-// suspenso, publicado, concluído sem publicação) e um cancelado que fica de fora. Só os testes importam este arquivo.
+// Cenário inventado dos testes das duas planilhas: sete processos que entram (comum, subprocesso, a classificar,
+// suspenso, publicado, não publicado, arquivado) e um cancelado que fica de fora. O arquivado não tem campo próprio no
+// pacote: ele chega como concluído (a view não muda a situação ao arquivar). Só os testes importam este arquivo.
 import { andamentosDe, pacoteDe, processoDe, type Marca } from './planilhasExemplos.ts'
 import type { AndamentoDoPacote, PacoteDasPlanilhas, ProcessoDoPacote, StatusDaEtapa } from './planilhasPacote.ts'
 
@@ -24,6 +25,24 @@ function processoComum(): ProcessoDoPacote {
   return { ...processoDe(1, campos), responsavel: 'Fulana Secreta' } as ProcessoDoPacote
 }
 
+// Os três concluídos: publicado, não publicado (escolha "não") e arquivado (concluído e publicado).
+function itensConcluidos(): Item[] {
+  return [
+    {
+      processo: processoDe(5, { nome: 'Publicado', concluido: true, setor_sigla: 'SE3', ultima_versao: 7, vai_para_publicacao: true }),
+      marcas: { ...CONCLUIDAS_ATE_A_VI, publicacao: { status: 'concluida', resolvida_em: '2026-07-01' } },
+    },
+    {
+      processo: processoDe(6, { nome: 'Nao publicado', concluido: true, vai_para_publicacao: false }),
+      marcas: CONCLUIDAS_ATE_A_VI,
+    },
+    {
+      processo: processoDe(8, { nome: 'Arquivado', concluido: true, vai_para_publicacao: true }),
+      marcas: { ...CONCLUIDAS_ATE_A_VI, publicacao: { status: 'concluida', resolvida_em: '2026-07-03' } },
+    },
+  ]
+}
+
 function itens(): Item[] {
   return [
     { processo: processoComum(), marcas: { modelagem: 'em_andamento' } },
@@ -33,14 +52,7 @@ function itens(): Item[] {
       processo: processoDe(4, { nome: 'Suspenso', situacao_guardada: 'suspenso', setor_sigla: 'SE3' }),
       marcas: { modelagem: { status: 'concluida', resolvida_em: '2026-03-05' } },
     },
-    {
-      processo: processoDe(5, { nome: 'Publicado', concluido: true, setor_sigla: 'SE3', ultima_versao: 7 }),
-      marcas: { ...CONCLUIDAS_ATE_A_VI, publicacao: { status: 'concluida', resolvida_em: '2026-07-01' } },
-    },
-    {
-      processo: processoDe(6, { nome: 'Sem publicacao', concluido: true }),
-      marcas: { ...CONCLUIDAS_ATE_A_VI, publicacao: { status: 'dispensada', resolvida_em: '2026-07-02' } },
-    },
+    ...itensConcluidos(),
     { processo: processoDe(7, { nome: 'Cancelado', situacao_guardada: 'cancelado', setor_sigla: 'SE9' }), marcas: { modelagem: 'em_andamento' } },
   ]
 }

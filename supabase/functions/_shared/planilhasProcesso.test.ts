@@ -16,7 +16,8 @@ const etapas = etapasDoCatalogo()
 
 function rotulo(marcas: Marcas, campos: Partial<ProcessoDoPacote> = {}): string {
   const processo = processoDe(1, campos)
-  return rotuloDoProcesso(processo, situacaoDasFases(etapas, andamentosDe(processo, marcas, etapas)))
+  const fases = situacaoDasFases(etapas, andamentosDe(processo, marcas, etapas), processo.vai_para_publicacao)
+  return rotuloDoProcesso(processo, fases)
 }
 
 const ATE_A_VI: Marcas = {
@@ -36,8 +37,13 @@ describe('rotuloDoProcesso', () => {
     expect(rotulo({ ...ATE_A_VI, publicacao: 'realizada_anteriormente' }, { concluido: true })).toBe('Publicado')
   })
 
-  it('"Concluído" quando o processo está concluído e a Publicação foi dispensada', () => {
-    expect(rotulo({ ...ATE_A_VI, publicacao: 'dispensada' }, { concluido: true })).toBe('Concluído')
+  it('"Publicado" com a Publicação registrada depois da escolha "não" (que passa a "sim")', () => {
+    const marcas = { ...ATE_A_VI, publicacao: { status: 'concluida', resolvida_em: '2026-08-01' } } as const
+    expect(rotulo(marcas, { concluido: true, vai_para_publicacao: true })).toBe('Publicado')
+  })
+
+  it('"Concluído" quando o processo está concluído com a escolha "não" e a Publicação pendente', () => {
+    expect(rotulo({ ...ATE_A_VI, publicacao: 'pendente' }, { concluido: true, vai_para_publicacao: false })).toBe('Concluído')
   })
 
   it('"Concluído" quando o processo está concluído e o catálogo não tem etapa na fase VII', () => {

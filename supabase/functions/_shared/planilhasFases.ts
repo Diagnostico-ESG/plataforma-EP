@@ -11,7 +11,7 @@ export type SituacaoDaFase =
   | 'Em andamento'
   | 'Pronto para iniciar'
   | 'Aguardando etapa anterior'
-  | 'Dispensada'
+  | 'Não publicado'
   | 'Sem etapa'
 
 export interface FaseDoProcesso {
@@ -31,15 +31,17 @@ type EtapaDoProcesso = Pick<AndamentoDoPacote, 'status' | 'resolvida_em'>
 const resolvida = (etapa: EtapaDoProcesso): boolean => RESOLVIDAS.includes(etapa.status)
 const comecou = (etapa: EtapaDoProcesso): boolean => etapa.status === 'em_andamento' || resolvida(etapa)
 
-// Só a Publicação tem a exceção: dispensada, ela não conta como publicada.
-function todasResolvidas(fase: FaseDaPlanilha, etapas: EtapaDoProcesso[]): SituacaoDaFase {
-  const todasDispensadas = etapas.every((etapa) => etapa.status === 'dispensada')
-  return fase === 'VII' && todasDispensadas ? 'Dispensada' : 'Concluída'
-}
-
-function situacaoDaFase(fase: FaseDaPlanilha, etapas: EtapaDoProcesso[], anteriorConcluida: boolean): SituacaoDaFase {
+// Quem respondeu "não" à escolha de publicação (ADR 0020) tem a fase VII "Não publicado", que não conta como concluída;
+// a Publicação não se dispensa mais, então "Dispensada" não existe como situação de fase.
+function situacaoDaFase(
+  fase: FaseDaPlanilha,
+  etapas: EtapaDoProcesso[],
+  anteriorConcluida: boolean,
+  vaiParaPublicacao: boolean | null,
+): SituacaoDaFase {
   if (etapas.length === 0) return 'Sem etapa'
-  if (etapas.every(resolvida)) return todasResolvidas(fase, etapas)
+  if (fase === 'VII' && vaiParaPublicacao === false) return 'Não publicado'
+  if (etapas.every(resolvida)) return 'Concluída'
   if (etapas.some(comecou)) return 'Em andamento'
   return anteriorConcluida ? 'Pronto para iniciar' : 'Aguardando etapa anterior'
 }
@@ -49,8 +51,12 @@ function dataDeConclusao(etapas: EtapaDoProcesso[]): string | null {
   return datas.length > 0 ? datas.reduce((maior, data) => (data > maior ? data : maior)) : null
 }
 
-/** `etapas` é o catálogo ativo; `andamentos`, os de um único processo. */
-export function situacaoDasFases(etapas: EtapaDoPacote[], andamentos: AndamentoDoPacote[]): FaseDoProcesso[] {
+/** `etapas` é o catálogo ativo; `andamentos`, os de um único processo; `vaiParaPublicacao`, a escolha dele. */
+export function situacaoDasFases(
+  etapas: EtapaDoPacote[],
+  andamentos: AndamentoDoPacote[],
+  vaiParaPublicacao: boolean | null = null,
+): FaseDoProcesso[] {
   const porEtapa = new Map(andamentos.map((andamento) => [andamento.etapa_id, andamento]))
   const iniciais: FaseDoProcesso[] = ['I', 'II', 'III'].map((fase) => ({
     fase: fase as FaseDaPlanilha,
@@ -60,7 +66,8 @@ export function situacaoDasFases(etapas: EtapaDoPacote[], andamentos: AndamentoD
   const resultado = [...iniciais]
   for (const fase of FASES_DAS_ETAPAS) {
     const daFase = etapas.filter((etapa) => etapa.fase === fase).map((etapa) => porEtapa.get(etapa.id) ?? SEM_ANDAMENTO)
-    const situacao = situacaoDaFase(fase, daFase, resultado[resultado.length - 1].situacao === 'Concluída')
+    const anteriorConcluida = resultado[resultado.length - 1].situacao === 'Concluída'
+    const situacao = situacaoDaFase(fase, daFase, anteriorConcluida, vaiParaPublicacao)
     resultado.push({ fase, situacao, concluidaEm: situacao === 'Concluída' ? dataDeConclusao(daFase) : null })
   }
   return resultado

@@ -90,6 +90,6 @@ export function analisarProcessos(pacote: PacoteDasPlanilhas): ProcessoAnalisado
     .filter((processo) => processo.situacao_guardada !== 'cancelado')
     .map((processo) => {
       const andamentos = porProcesso.get(processo.id) ?? []
-      return { processo, andamentos, fases: situacaoDasFases(pacote.etapas, andamentos) }
+      return { processo, andamentos, fases: situacaoDasFases(pacote.etapas, andamentos, processo.vai_para_publicacao) }
     })
 }

@@ -5,8 +5,12 @@ import { situacaoDasFases, type FaseDoProcesso } from './planilhasFases.ts'
 
 const processo = processoDe(1)
 
-function fases(marcas: Record<string, StatusDaEtapa | Marca>, etapas: EtapaDoPacote[] = etapasDoCatalogo()): FaseDoProcesso[] {
-  return situacaoDasFases(etapas, andamentosDe(processo, marcas, etapas))
+function fases(
+  marcas: Record<string, StatusDaEtapa | Marca>,
+  etapas: EtapaDoPacote[] = etapasDoCatalogo(),
+  escolha: boolean | null = null,
+): FaseDoProcesso[] {
+  return situacaoDasFases(etapas, andamentosDe(processo, marcas, etapas), escolha)
 }
 
 function situacoes(marcas: Record<string, StatusDaEtapa | Marca>, etapas?: EtapaDoPacote[]): string[] {
@@ -63,13 +67,33 @@ describe('situacaoDasFases', () => {
     expect(resultado[3].situacao).toBe('Pronto para iniciar')
   })
 
-  it('a fase VII com todas as etapas dispensadas é "Dispensada" e não conta como concluída', () => {
-    const resultado = fases({ ...TUDO_RESOLVIDO, publicacao: 'dispensada' })
-    expect(resultado[6].situacao).toBe('Dispensada')
+  it('a fase VII com a escolha "não" é "Não publicado", sem data, e não conta como concluída', () => {
+    const resultado = fases({ ...TUDO_RESOLVIDO, publicacao: 'pendente' }, undefined, false)
+    expect(resultado[6].situacao).toBe('Não publicado')
     expect(resultado[6].concluidaEm).toBeNull()
   })
 
-  it('uma fase VI toda dispensada continua concluída (só a Publicação tem a exceção)', () => {
+  it('a escolha "não" só muda a fase VII', () => {
+    const resultado = fases({ ...TUDO_RESOLVIDO, publicacao: 'pendente' }, undefined, false)
+    expect(resultado.slice(0, 6).map((f) => f.situacao)).toEqual(Array(6).fill('Concluída'))
+  })
+
+  it('a escolha "sim" ou sem resposta, com a Publicação concluída, deixa a fase VII concluída', () => {
+    const marcas = { ...TUDO_RESOLVIDO, publicacao: { status: 'concluida', resolvida_em: '2026-07-01' } } as const
+    expect(fases(marcas, undefined, true)[6]).toEqual({ fase: 'VII', situacao: 'Concluída', concluidaEm: '2026-07-01' })
+    expect(fases(marcas, undefined, null)[6].situacao).toBe('Concluída')
+  })
+
+  it('"Dispensada" não existe mais: a Publicação dispensada, sem escolha, conta como resolvida', () => {
+    expect(fases({ ...TUDO_RESOLVIDO, publicacao: 'dispensada' })[6].situacao).toBe('Concluída')
+  })
+
+  it('sem etapa na fase VII, a escolha "não" não cria situação: continua "Sem etapa"', () => {
+    const semFaseVII = etapasDoCatalogo().filter((e) => e.fase !== 'VII')
+    expect(fases({}, semFaseVII, false)[6].situacao).toBe('Sem etapa')
+  })
+
+  it('uma fase VI toda dispensada continua concluída', () => {
     const marcas = { revisao_interna: 'dispensada', revisao_setor: 'dispensada', aprovacao_setor: 'dispensada' } as const
     expect(situacoes(marcas)[5]).toBe('Concluída')
   })

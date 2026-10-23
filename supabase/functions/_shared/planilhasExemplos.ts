@@ -35,6 +35,7 @@ export function processoDe(n: number, campos: Partial<ProcessoDoPacote> = {}): P
     concluido: false,
     observacoes: null,
     data_da_reuniao: null,
+    vai_para_publicacao: null,
     ultima_versao: null,
     ...campos,
   }

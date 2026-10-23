@@ -13,24 +13,24 @@ describe('montarPlanilhaPublica', () => {
 
   it('o resumo traz o total de processos, o total de setores e a data e hora da atualização', () => {
     expect(resumo.linhas[0]).toEqual(['Total de processos', 'Total de setores', 'Atualizado em'])
-    expect(resumo.linhas[1]).toEqual([6, 3, '2026-10-20 09:00'])
+    expect(resumo.linhas[1]).toEqual([7, 3, '2026-10-20 09:00'])
   })
 
   it('o total de processos não conta o cancelado e o de setores só olha os que entram', () => {
-    expect(resumo.linhas[1][0]).toBe(6)
+    expect(resumo.linhas[1][0]).toBe(7)
     expect(resumo.linhas[1][1]).toBe(3)
   })
 
   it('a aba Fases traz uma linha por fase, de I a VII, com concluídos e total', () => {
     expect(fases.linhas[0]).toEqual(['Fase', 'Concluídos', 'Total'])
     expect(fases.linhas.slice(1)).toEqual([
-      ['I', 6, 6], ['II', 6, 6], ['III', 6, 6], ['IV', 3, 6], ['V', 2, 6], ['VI', 2, 6], ['VII', 1, 6],
+      ['I', 7, 7], ['II', 7, 7], ['III', 7, 7], ['IV', 4, 7], ['V', 3, 7], ['VI', 3, 7], ['VII', 2, 7],
     ])
   })
 
-  it('a Publicação dispensada não conta como concluída na fase VII', () => {
+  it('a fase VII conta só os concluídos: o publicado e o arquivado, não o "Não publicado"', () => {
     const fasesDeVII = fases.linhas.find((linha) => linha[0] === 'VII')
-    expect(fasesDeVII?.[1]).toBe(1)
+    expect(fasesDeVII?.[1]).toBe(2)
   })
 
   it('sem processo nenhum, traz zeros e as sete fases', () => {

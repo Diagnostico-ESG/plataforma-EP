@@ -32,7 +32,7 @@ Termos usados aqui:
 
 Regras que a plataforma aplica ao escrever (as mesmas do `supabase/functions/_shared/planilhas*.ts`):
 
-- **Situação de cada fase (IV a VII):** "Concluída" se todas as etapas da fase estão resolvidas; "Em andamento" se alguma começou; "Pronto para iniciar" se nenhuma começou e a fase anterior está concluída; "Aguardando etapa anterior" nos demais casos; "Sem etapa" se a fase não tem etapa ativa; "Dispensada" só na fase VII, quando todas as etapas dela estão dispensadas.
+- **Situação de cada fase (IV a VII):** "Concluída" se todas as etapas da fase estão resolvidas; "Em andamento" se alguma começou; "Pronto para iniciar" se nenhuma começou e a fase anterior está concluída; "Aguardando etapa anterior" nos demais casos; "Sem etapa" se a fase não tem etapa ativa; "Não publicado" só na fase VII, quando a escolha de publicação do processo é "não" (não conta como concluída). O rótulo da situação do processo é "Publicado" com a Publicação concluída e "Concluído" com a escolha "não"; o arquivado conta como concluído. Depois de mudar essas regras, publique de novo a função `planilhas-dos-dashboards` (ver `docs/planilhas-publicar-a-funcao.md`).
 - **Rótulo do processo:** "Suspenso · fase", "Publicado" (fase VII concluída), "Concluído", "Em andamento · fase" ou "Próxima · fase".
 - **Datas** em texto `AAAA-MM-DD`; vazio vira o texto `null`. O Data Studio converte o texto em data (ver `07-dashboards-no-data-studio.md`).
 - **Última versão** é a última versão **não** histórica. Quem só tem versão histórica sai com a coluna vazia.
