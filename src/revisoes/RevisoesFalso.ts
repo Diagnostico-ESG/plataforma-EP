@@ -58,14 +58,17 @@ export class RevisoesFalso implements ModuloDeRevisoes {
 
   /**
    * `processos` é a falsa onde as etapas vivem; `usuario` é quem está na tela (o revisor); `versoes` é a falsa onde a versão
-   * aprovada ganha e perde a marca. Ocupa `processos.aoVoltar` para desfazer a aprovação na volta de etapa.
+   * aprovada ganha e perde a marca. Ocupa `processos.aoVoltar` para desfazer a aprovação na volta de etapa e
+   * `processos.dataDaAprovacao` para o mínimo da publicação registrada.
    */
   constructor(processos?: ProcessosFalso, usuario: UsuarioResponsavel = { id: 'usuario-de-teste', nome: 'Pessoa de Teste' },
     versoes?: VersoesFalso) {
     this.processos = processos
     this.usuario = usuario
     this.versoes = versoes
-    if (processos) processos.aoVoltar = (processoId, etapaCodigo) => this.desfazerAprovacaoNaVolta(processoId, etapaCodigo)
+    if (!processos) return
+    processos.aoVoltar = (processoId, etapaCodigo) => this.desfazerAprovacaoNaVolta(processoId, etapaCodigo)
+    processos.dataDaAprovacao = (processoId) => this.aprovacoes[processoId]?.aprovadaEm ?? null
   }
 
   async lerAprovacao(processoId: string): Promise<Aprovacao | null> {

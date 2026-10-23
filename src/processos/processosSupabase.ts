@@ -6,6 +6,7 @@ import { criarCatalogoSupabase } from './catalogoSupabase'
 import { criarGravacaoDeProcessoSupabase } from './gravarProcessoSupabase'
 import { criarLeituraDeProcessoSupabase } from './lerProcessoSupabase'
 import { criarListaDeProcessosSupabase } from './listaDeProcessosSupabase'
+import { criarPublicacaoSupabase } from './publicacaoSupabase'
 import { criarReclassificacaoSupabase } from './reclassificacaoSupabase'
 import { criarSituacaoSupabase } from './situacaoSupabase'
 import type { ModuloDeProcessos } from './tipos'
@@ -20,6 +21,7 @@ export function criarProcessosSupabase(cliente: ClienteSupabase): ModuloDeProces
   return {
     ...criarAndamentosSupabase(cliente, RECUSAS_DOS_PROCESSOS),
     ...criarSituacaoSupabase(cliente, RECUSAS_DOS_PROCESSOS),
+    ...criarPublicacaoSupabase(cliente, RECUSAS_DOS_PROCESSOS),
     ...criarReclassificacaoSupabase(cliente, RECUSAS_DOS_PROCESSOS),
     ...criarListaDeProcessosSupabase(cliente),
     ...criarLeituraDeProcessoSupabase(cliente),

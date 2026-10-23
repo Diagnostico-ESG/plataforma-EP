@@ -97,6 +97,8 @@ export type ProcessoDaLista = {
   vaiParaPublicacao?: boolean | null
   /** O dia em que a Publicação foi concluída (AAAA-MM-DD); null sem publicação. Opcional pelo mesmo motivo. */
   publicadoEm?: string | null
+  /** Quando o processo concluído foi arquivado (data e hora); null fora do arquivo. Opcional pelo mesmo motivo. */
+  arquivadoEm?: string | null
 }
 
 export type ListaDeProcessos = { etapas: EtapaDoCatalogo[]; processos: ProcessoDaLista[] }
@@ -203,6 +205,16 @@ export type ModuloDeProcessos = {
   suspenderProcesso(id: string, motivo: string): Promise<void>
   cancelarProcesso(id: string, motivo: string): Promise<void>
   retomarProcesso(id: string, motivo: string): Promise<void>
+  /** Com a Publicação em andamento e motivo: ela volta a pendente, a escolha vira "não" e o processo vai a Concluídos. */
+  naoVaiMaisParaPublicacao(id: string, motivo: string): Promise<void>
+  /**
+   * No concluído não publicado (arquivado ou não): a Publicação fica concluída na data (AAAA-MM-DD), nem futura nem antes
+   * da aprovação, e o processo fica onde está. A nota (null ou vazia: sem nota) vai só para o histórico.
+   */
+  registrarPublicacao(id: string, data: string, nota: string | null): Promise<void>
+  /** Só o concluído não arquivado; o arquivado sai do Quadro e não aceita outra alteração além das duas abaixo. */
+  arquivar(id: string): Promise<void>
+  desarquivar(id: string): Promise<void>
   /** Muda o tipo com motivo, mantendo o mesmo item; ao virar subprocesso, ele passa ao macroprocesso do pai. */
   reclassificarProcesso(id: string, reclassificacao: Reclassificacao, motivo: string): Promise<void>
   /** Por nome. */

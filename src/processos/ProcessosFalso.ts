@@ -10,6 +10,7 @@ import {
 import {
   conferirPai, conferirSemSubprocessos, estruturaDoProcesso, levarMacroprocessoAosFilhos, macroprocessoDo, reclassificar,
 } from './reclassificacaoFalso'
+import { arquivar, conferirNaoArquivado, desarquivar, desistirDaPublicacao, registrarPublicacao } from './arquivamentoFalso'
 import { escolhaDaVolta, escolhaDoAvanco } from './publicacaoFalso'
 import { conferirProcessoEmAndamento, mudarSituacao } from './situacaoFalso'
 import type {
@@ -42,6 +43,8 @@ export class ProcessosFalso implements ModuloDeProcessos {
   historicoDosProcessos: Record<string, EventoDoCadastro[]> = {}
   /** Chamado ao fim de cada volta de etapa, com o processo e o código da etapa reaberta (a falsa de revisões desfaz a aprovação). */
   aoVoltar: ((processoId: string, etapaCodigo: string) => void) | null = null
+  /** A data da aprovação do processo (AAAA-MM-DD), mínimo da publicação registrada; a falsa de revisões a liga. */
+  dataDaAprovacao: ((processoId: string) => string | null) | null = null
   /** Sigla e nome que o banco juntaria ao cartão (pelo id do setor e do macroprocesso). */
   siglasDosSetores: Record<string, string> = {}
   nomesDosMacroprocessos: Record<string, string> = {}
@@ -99,8 +102,27 @@ export class ProcessosFalso implements ModuloDeProcessos {
     this.mudarSituacaoDoProcesso(id, 'em_andamento', motivo)
   }
 
+  async naoVaiMaisParaPublicacao(id: string, motivo: string): Promise<void> {
+    this.trocarProcesso(id, (processo) => desistirDaPublicacao(processo, motivo))
+  }
+
+  async registrarPublicacao(id: string, data: string, nota: string | null): Promise<void> {
+    const aprovadaEm = this.dataDaAprovacao?.(id) ?? null
+    this.trocarProcesso(id, (processo) => registrarPublicacao(processo, { data, hoje: HOJE, aprovadaEm }))
+    this.chamadas.push({ acao: 'registrar_publicacao', id, nota: nota ?? undefined, datas: { iniciadaEm: data, resolvidaEm: data } })
+  }
+
+  async arquivar(id: string): Promise<void> {
+    this.trocarProcesso(id, (processo) => arquivar(processo, `${HOJE}T12:00:00Z`))
+  }
+
+  async desarquivar(id: string): Promise<void> {
+    this.trocarProcesso(id, desarquivar)
+  }
+
   async reclassificarProcesso(id: string, reclassificacao: Reclassificacao, motivo: string): Promise<void> {
     this.conferirGravacao()
+    conferirNaoArquivado(this.acharProcesso(id))
     const mudado = reclassificar(this.processos, this.acharProcesso(id), reclassificacao, motivo)
     this.processos = this.processos.map((processo) => (processo.id === id ? mudado : processo))
   }
@@ -155,6 +177,7 @@ export class ProcessosFalso implements ModuloDeProcessos {
   async editarProcesso(id: string, dados: DadosDoProcesso): Promise<void> {
     this.conferirGravacao()
     const atual = this.acharProcesso(id)
+    conferirNaoArquivado(atual)
     this.conferirNomeNovo(dados, id)
     // A edição não muda tipo nem pai (a mudança é a reclassificação); o subprocesso fica no macroprocesso do pai.
     const campos: Partial<DadosDoProcesso> = { ...dados }
@@ -168,14 +191,14 @@ export class ProcessosFalso implements ModuloDeProcessos {
   // Como no banco, a data não depende da situação do processo nem mexe em etapa.
   async marcarReuniao(id: string, data: string | null): Promise<void> {
     this.conferirGravacao()
-    this.acharProcesso(id)
+    conferirNaoArquivado(this.acharProcesso(id))
     this.chamadas.push(data === null ? { acao: 'reuniao', id } : { acao: 'reuniao', id, nota: data })
     this.processos = this.processos.map((processo) => (processo.id === id ? { ...processo, dataDaReuniao: data } : processo))
   }
 
   async excluirProcesso(id: string): Promise<void> {
     this.conferirGravacao()
-    this.acharProcesso(id)
+    conferirNaoArquivado(this.acharProcesso(id))
     conferirSemSubprocessos(this.processos, id)
     this.processos = this.processos.filter((processo) => processo.id !== id)
   }
@@ -275,7 +298,9 @@ export class ProcessosFalso implements ModuloDeProcessos {
   // O processo que tem a etapa: parado, ele recusa qualquer mudança nelas.
   private conferirProcessoDaEtapa(idDaEtapa: string): void {
     const dono = this.processos.find((processo) => processo.etapasDoProcesso.some((etapa) => etapa.id === idDaEtapa))
-    if (dono) conferirProcessoEmAndamento(dono)
+    if (!dono) return
+    conferirNaoArquivado(dono)
+    conferirProcessoEmAndamento(dono)
   }
 
   private acharProcesso(id: string): ProcessoLido {
@@ -286,7 +311,15 @@ export class ProcessosFalso implements ModuloDeProcessos {
 
   private mudarSituacaoDoProcesso(id: string, nova: 'em_andamento' | 'suspenso' | 'cancelado', motivo: string): void {
     this.conferirGravacao()
+    conferirNaoArquivado(this.acharProcesso(id))
     const mudado = mudarSituacao(this.acharProcesso(id), nova, motivo)
+    this.processos = this.processos.map((processo) => (processo.id === id ? mudado : processo))
+  }
+
+  // Grava como as funções do banco: a falha programada, o processo que não existe mais e a regra da troca.
+  private trocarProcesso(id: string, trocar: (processo: ProcessoLido) => ProcessoLido): void {
+    this.conferirGravacao()
+    const mudado = trocar(this.acharProcesso(id))
     this.processos = this.processos.map((processo) => (processo.id === id ? mudado : processo))
   }
 

@@ -3,7 +3,7 @@ const SITUACAO_POR_EXTENSO: Record<string, string> = {
   em_andamento: 'em andamento', suspenso: 'suspenso', cancelado: 'cancelado', concluido: 'concluído',
 }
 
-function porExtenso(situacao: string): string {
+export function porExtenso(situacao: string): string {
   return SITUACAO_POR_EXTENSO[situacao] ?? situacao
 }
 

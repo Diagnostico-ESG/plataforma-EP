@@ -17,7 +17,13 @@ import {
   FRASE_DA_APROVACAO_FORA_DA_ETAPA, FRASE_DA_APROVACAO_NA_VOLTA, FRASE_DO_LINK_INVALIDO, FRASE_DO_PROCESSO_COM_APROVACAO,
   FRASE_DO_PROCESSO_JA_APROVADO, fraseDaAprovacaoAntesDaRevisao, fraseDaDataNoFuturo, fraseDaVersaoAprovada, fraseDaVersaoSemAprovacao,
 } from '../revisoes/frasesDeAprovacao'
-import { FRASE_DA_ESCOLHA_OBRIGATORIA, FRASE_DA_ESCOLHA_SO_PELA_FUNCAO } from './frasesDePublicacao'
+import {
+  FRASE_DA_DATA_DA_PUBLICACAO_OBRIGATORIA, FRASE_DA_ESCOLHA_OBRIGATORIA, FRASE_DA_ESCOLHA_SO_PELA_FUNCAO,
+  FRASE_DA_PUBLICACAO_FORA_DE_ANDAMENTO, FRASE_DA_PUBLICACAO_JA_REGISTRADA, FRASE_DA_PUBLICACAO_NAO_SE_DISPENSA,
+  FRASE_DO_ARQUIVAMENTO_SO_PELA_FUNCAO, FRASE_DO_PROCESSO_ARQUIVADO, FRASE_DO_PROCESSO_JA_ARQUIVADO,
+  FRASE_DO_PROCESSO_NAO_ARQUIVADO, FRASE_SEM_PUBLICACAO_PENDENTE, fraseDaPublicacaoAntesDaAprovacao,
+  fraseDaPublicacaoSoNoConcluido, fraseDoArquivarSoConcluido,
+} from './frasesDePublicacao'
 import { fraseDeSituacaoInvalida, fraseDoProcessoParado } from './frasesDeSituacao'
 import type { ModuloDeProcessos, UsuarioResponsavel } from './tipos'
 
@@ -87,7 +93,8 @@ async function listarResponsaveisPossiveis(cliente: ClienteSupabase): Promise<Us
 }
 
 // O banco recusa com "motivo:valor" (migrações etapas_do_setor, andamento_do_processo, voltar_datas_responsavel,
-// situacao_do_processo, subprocessos_e_reclassificacao, catalogo_de_etapas, versoes e revisao_interna).
+// situacao_do_processo, subprocessos_e_reclassificacao, catalogo_de_etapas, versoes, revisao_interna, aprovacao,
+// escolha_de_publicacao e arquivar_e_registrar_publicacao).
 // O motivo "motivo_obrigatorio" não tem valor; o valor vai até o fim da mensagem.
 const PADRAO_DA_RECUSA = new RegExp(
   '\\b(anterior_nao_resolvida|etapa_obrigatoria|ja_ha_etapa_em_andamento|etapa_nao_resolvida'
@@ -99,7 +106,10 @@ const PADRAO_DA_RECUSA = new RegExp(
   + '|escopo_so_na_corrigida|revisao_fora_da_etapa|sem_revisao_da_versao|processo_com_revisoes'
   + '|aprovacao_fora_da_etapa|processo_ja_aprovado|link_invalido|aprovacao_antes_da_revisao|sem_aprovacao'
   + '|aprovacao_so_se_desfaz_na_volta|versao_aprovada|processo_com_aprovacao'
-  + '|escolha_de_publicacao_obrigatoria|publicacao_so_pela_funcao)(?::(.*))?$', 'm')
+  + '|escolha_de_publicacao_obrigatoria|publicacao_so_pela_funcao'
+  + '|publicacao_nao_se_dispensa|publicacao_fora_de_andamento|publicacao_so_no_concluido|publicacao_ja_registrada'
+  + '|sem_publicacao_pendente|data_da_publicacao_obrigatoria|publicacao_antes_da_aprovacao'
+  + '|arquivar_so_concluido|ja_arquivado|nao_arquivado|processo_arquivado|arquivamento_so_pela_funcao)(?::(.*))?$', 'm')
 
 const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   anterior_nao_resolvida: (etapa) => `A etapa ${etapa} ainda não foi resolvida.`,
@@ -149,6 +159,21 @@ const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   processo_com_aprovacao: () => FRASE_DO_PROCESSO_COM_APROVACAO,
   escolha_de_publicacao_obrigatoria: () => FRASE_DA_ESCOLHA_OBRIGATORIA,
   publicacao_so_pela_funcao: () => FRASE_DA_ESCOLHA_SO_PELA_FUNCAO,
+  publicacao_nao_se_dispensa: () => FRASE_DA_PUBLICACAO_NAO_SE_DISPENSA,
+  publicacao_fora_de_andamento: () => FRASE_DA_PUBLICACAO_FORA_DE_ANDAMENTO,
+  publicacao_so_no_concluido: fraseDaPublicacaoSoNoConcluido,
+  publicacao_ja_registrada: () => FRASE_DA_PUBLICACAO_JA_REGISTRADA,
+  sem_publicacao_pendente: () => FRASE_SEM_PUBLICACAO_PENDENTE,
+  data_da_publicacao_obrigatoria: () => FRASE_DA_DATA_DA_PUBLICACAO_OBRIGATORIA,
+  publicacao_antes_da_aprovacao: (datas) => {
+    const [data, aprovadaEm] = datas.split(':')
+    return fraseDaPublicacaoAntesDaAprovacao(data, aprovadaEm)
+  },
+  arquivar_so_concluido: fraseDoArquivarSoConcluido,
+  ja_arquivado: () => FRASE_DO_PROCESSO_JA_ARQUIVADO,
+  nao_arquivado: () => FRASE_DO_PROCESSO_NAO_ARQUIVADO,
+  processo_arquivado: () => FRASE_DO_PROCESSO_ARQUIVADO,
+  arquivamento_so_pela_funcao: () => FRASE_DO_ARQUIVAMENTO_SO_PELA_FUNCAO,
   versao_incompleta: (valor) => {
     const [numero, faltas] = valor.split(':')
     return fraseDaVersaoIncompleta(numero, faltas.split(','))
