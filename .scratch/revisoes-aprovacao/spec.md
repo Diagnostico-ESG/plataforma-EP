@@ -264,4 +264,4 @@ Nenhuma migração destrutiva: tipos, tabelas, funções, gatilhos e políticas 
 
 Entregue em 2026-10-20 (commit 6ce74d6), com ressalva: critérios [visual] presumidos (selo "Aprovada" ao lado das pílulas de Arquivos, janela de edição e registro da Revisão interna na gaveta não foram vistos na tela; a janela de concluir e a gaveta da Aprovação foram vistas na vitrine local, com módulos falsos); função arquivos-no-drive com a trava de versão aprovada ainda sem publicar no desenvolvimento
 
-Em revisão desde 2026-10-22
+Entregue em 2026-10-23 (commit ae1fb54), com ressalva: critérios [visual] da mudança de publicacao-e-arquivamento presumidos (a tela não foi vista); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo

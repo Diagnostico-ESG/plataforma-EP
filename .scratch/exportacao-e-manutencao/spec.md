@@ -219,4 +219,4 @@ Nenhuma migração destrutiva: tipo, coluna, tabela, view, funções, gatilho e 
 
 Entregue em 2026-10-22 (commit 06c8052), com ressalva: critérios [visual] dos tickets 01 e 02 vistos só na vitrine local com módulos falsos e o dos dashboards (ticket 04) em aberto, a finalizar pelo usuário por fora; camada Deno da função planilhas-dos-dashboards sem teste automático; resultado atual do "Testes de banco" no GitHub não reconferido; revisão de segurança foi a de reserva (menos completa)
 
-Em revisão desde 2026-10-22
+Entregue em 2026-10-23 (commit ae1fb54), com ressalva: critérios [visual] da mudança de publicacao-e-arquivamento presumidos (a tela não foi vista); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo

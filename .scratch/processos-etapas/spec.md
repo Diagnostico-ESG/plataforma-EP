@@ -774,4 +774,4 @@ Entregue em 2026-10-19 (commit f3a12b3), com ressalva: critérios [visual] da pa
 
 Entregue em 2026-10-20 (commit 8a7efb7)
 
-Em revisão desde 2026-10-22
+Entregue em 2026-10-23 (commit ae1fb54), com ressalva: critérios [visual] da mudança de publicacao-e-arquivamento presumidos (a tela não foi vista); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo

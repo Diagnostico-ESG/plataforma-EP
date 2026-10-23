@@ -336,3 +336,5 @@ A atualização dos dados roda com os gatilhos de evento desligados, como na mig
   8. "Realizada anteriormente" continua permitida na Publicação em andamento.
 - **Divergências da especificação:** a especificação previa a Publicação como registro próprio na v1.5. Ela continua sendo só a etapa, com a escolha no processo (ADR 0020).
 - **Exceção na trava do arquivado:** o subprocesso arquivado aceita a propagação de `macroprocesso_id` vinda do processo pai (só dentro do gatilho do pai e sem mudar mais nada). Fora isso, o arquivado recusa tudo, menos Registrar publicação e Desarquivar.
+
+Entregue em 2026-10-23 (commit ae1fb54), com ressalva: critérios [visual] da publicacao-e-arquivamento presumidos (coluna Concluídos, pergunta na janela, selos "Não publicado" e "Arquivado", Agora do concluído e do arquivado não foram vistos na tela); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
