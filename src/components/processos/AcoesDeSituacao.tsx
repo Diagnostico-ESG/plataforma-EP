@@ -17,10 +17,11 @@ type JanelaDeSituacaoProps = {
 function gravarPedido(processos: ModuloDeProcessos, pedido: PedidoDeSituacao, id: string, motivo: string): Promise<void> {
   if (pedido === 'suspender') return processos.suspenderProcesso(id, motivo)
   if (pedido === 'cancelar') return processos.cancelarProcesso(id, motivo)
+  if (pedido === 'nao_publicar') return processos.naoVaiMaisParaPublicacao(id, motivo)
   return processos.retomarProcesso(id, motivo)
 }
 
-/** A janela do motivo obrigatório de Suspender, Cancelar e Retomar. */
+/** A janela do motivo obrigatório de Suspender, Cancelar, Retomar e "Não vai mais para publicação". */
 export function JanelaDeSituacao({ processo, processos, pedido, executar, aoFechar, aoMudar }: JanelaDeSituacaoProps) {
   const texto = pedido ? TEXTOS_DA_SITUACAO[pedido] : null
   // A janela fecha antes de confirmar; o pedido lido aqui é o desta renderização, ainda preenchido.

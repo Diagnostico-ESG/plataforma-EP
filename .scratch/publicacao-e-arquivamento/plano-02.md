@@ -87,34 +87,36 @@ Conteúdo da migração, na ordem: coluna `arquivado_em` e privilégio; `liberan
 
 - [x] Escrever a migração e o ensaio; push; "Testes de banco" na branch: o ensaio passa.
 - [x] Apagar o ensaio; commit.
-- [ ] Disparar "Migrar banco de desenvolvimento" na branch com o nome do arquivo.
-- [ ] "Testes de banco" na branch: o 49 passa; ajustar os testes antigos que falharem pela regra nova (o 18 dispensa a Publicação por `update` direto: passa a esperar a recusa ou a usar a "realizada anteriormente") até todos ficarem verdes.
-- [ ] `npm run db:types` (ou ajuste à mão de `src/types/database.ts`, se a rede barrar); commit único da migração, testes e tipos; registrar a migração em `supabase/AMBIENTES.md`.
+- [x] Disparar "Migrar banco de desenvolvimento" na branch com o nome do arquivo.
+- [x] "Testes de banco" na branch: o 49 passa; ajustar os testes antigos que falharem pela regra nova (o 18 dispensa a Publicação por `update` direto: passa a esperar a recusa ou a usar a "realizada anteriormente") até todos ficarem verdes.
+- [x] `npm run db:types` (ou ajuste à mão de `src/types/database.ts`, se a rede barrar); commit único da migração, testes e tipos; registrar a migração em `supabase/AMBIENTES.md`. (Desvio: a migração entrou no commit do ensaio, antes dos tipos, porque o pre-commit roda o typecheck no projeto inteiro e o trabalho da tarefa 3 estava pela metade.)
 
 ### Tarefa 3: Módulo real e frases
 
 **Arquivos:** `src/processos/tipos.ts`, `src/processos/processoDaLinha.ts` (+ teste; e a seleção em `listaDeProcessosSupabase.ts`/`lerProcessoSupabase.ts`, se listar colunas), `src/processos/publicacaoSupabase.ts` (novo, + teste), `src/processos/processosSupabase.ts`, `src/processos/andamentosSupabase.ts` (+ teste: padrão e frases), `src/processos/frasesDePublicacao.ts`, `src/processos/frasesDeSituacao.ts`.
 
-- [ ] Testes: `processoDaLinha` lê `arquivado_em`; cada método novo chama a função do banco com `p_processo` (e `p_motivo`, `p_data`, `p_nota`, nota vazia como null); cada código de recusa da lista do Desenho vira a frase (inclusive "A Publicação não se dispensa: use \"Não vai mais para publicação\"." e a data antes da aprovação com as duas datas); 42501 vira "Seu perfil não permite alterar os processos.".
-- [ ] Implementar; `npm test` dos arquivos verde; commit.
+- [x] Testes: `processoDaLinha` lê `arquivado_em`; cada método novo chama a função do banco com `p_processo` (e `p_motivo`, `p_data`, `p_nota`, nota vazia como null); cada código de recusa da lista do Desenho vira a frase (inclusive "A Publicação não se dispensa: use \"Não vai mais para publicação\"." e a data antes da aprovação com as duas datas); 42501 vira "Seu perfil não permite alterar os processos.".
+- [x] Implementar; `npm test` dos arquivos verde; commit.
 
 ### Tarefa 4: Funções puras
 
 **Arquivos:** `src/processos/caminhoDeEtapas.ts` (+ teste), `src/processos/colunasDoQuadro.ts` (+ teste), `src/processos/enderecoDosProcessos.ts` (+ teste), `src/processos/filtrosDosProcessos.ts` (+ teste), `src/processos/publicacao.ts` (+ teste), `src/cadastros/historicoDosCadastros.ts` (+ teste).
 
-- [ ] `acoesDaEtapa`: Publicação em andamento sem `dispensar`.
-- [ ] Coluna Concluídos sem os arquivados.
-- [ ] Filtro `arquivados`: lido e escrito só na Lista (`arquivados=esconder`), fora de `SEM_FILTROS`, conta em `temFiltro`; `filtrarProcessos` esconde os arquivados com `'esconder'`.
-- [ ] `publicacao.ts`: `podeRegistrarPublicacao(processo)` (= `naoPublicado`) e `textoDoArquivado` ("Arquivado").
-- [ ] Histórico: ações `nao_vai_mais_para_publicacao` ("Registrou que o processo não vai mais para publicação", com Motivo), `registrar_publicacao` ("Registrou a publicação", com Nota), `arquivar` ("Arquivou o processo"), `desarquivar` ("Desarquivou o processo"); campo `publicado_em` ("Data da publicação", em dd/mm/aaaa).
-- [ ] Testes verdes; commit.
+- [x] `acoesDaEtapa`: Publicação em andamento sem `dispensar`. (Os códigos das etapas foram para `src/processos/codigosDasEtapas.ts`, sem dependências, para `caminhoDeEtapas` e `publicacao` não se importarem em círculo.)
+- [x] Coluna Concluídos sem os arquivados.
+- [x] Filtro `arquivados`: lido e escrito só na Lista (`arquivados=esconder`), fora de `SEM_FILTROS`, conta em `temFiltro`; `filtrarProcessos` esconde os arquivados com `'esconder'`.
+- [x] `publicacao.ts`: dispensado; o `naoPublicado` que já existe serve ao [Registrar publicação], e "Arquivado" fica no componente do Agora.
+- [x] Histórico: ações `nao_vai_mais_para_publicacao` ("Registrou que o processo não vai mais para publicação", com Motivo), `registrar_publicacao` ("Registrou a publicação", com Nota), `arquivar` ("Arquivou o processo"), `desarquivar` ("Desarquivou o processo"); campo `publicado_em` ("Data da publicação", em dd/mm/aaaa).
+- [x] Testes verdes; commit.
+
 
 ### Tarefa 5: Implementação falsa
 
 **Arquivos:** `src/processos/arquivamentoFalso.ts` (novo), `src/processos/situacaoFalso.ts` (trava do arquivado em `conferirProcessoEmAndamento` e `mudarSituacao`), `src/processos/ProcessosFalso.ts`, `src/revisoes/RevisoesFalso.ts` (liga `dataDaAprovacao`); teste novo `src/processos/ProcessosFalso.arquivamento.test.ts`.
 
-- [ ] Testes: desistir sem motivo ou fora de andamento recusado, aceito deixa concluído e "não"; registrar com data futura, antes da aprovação, em andamento e já publicado recusados, aceito deixa publicado na data e onde estava; arquivar fora de concluído e duas vezes recusado; desarquivar não arquivado recusado; etapa, situação, edição e exclusão do arquivado recusadas; `falhaDeGravacao` vale nos quatro.
-- [ ] Implementar; testes verdes; commit.
+- [x] Testes: desistir sem motivo ou fora de andamento recusado, aceito deixa concluído e "não"; registrar com data futura, antes da aprovação, em andamento e já publicado recusados, aceito deixa publicado na data e onde estava; arquivar fora de concluído e duas vezes recusado; desarquivar não arquivado recusado; etapa, situação, edição e exclusão do arquivado recusadas; `falhaDeGravacao` vale nos quatro.
+- [x] Implementar; testes verdes; commit. (A trava do arquivado ficou na `ProcessosFalso`, com `conferirNaoArquivado` de `arquivamentoFalso.ts`; `situacaoFalso.ts` não mudou.)
+
 
 ### Tarefa 6: Desistir da publicação no verso
 

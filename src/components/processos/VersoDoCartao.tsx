@@ -132,7 +132,7 @@ function ProcessoAberto(props: ProcessoAbertoProps) {
     aoFechar()
   }
   const acoes = (
-    <AcoesDoProcesso processo={processo} processos={processos} podeAlterar={podeAlterar} executar={executar}
+    <AcoesDoProcesso processo={processo} processos={processos} podeAlterar={podeAlterar && !processo.arquivadoEm} executar={executar}
       aoAbrirHistorico={() => aoMudarModo('historico')} aoEditar={() => aoMudarModo('editar')} aoExcluir={aposExcluir}
       aoMudar={aposMudar} />
   )
@@ -192,15 +192,17 @@ function EdicaoDoProcesso({ processo, processos, cadastros, aoVoltar, aposMudar,
 /** Trabalho à esquerda (etapas e arquivos), contexto à direita (reunião, dados e estrutura). */
 function ColunasDoVerso(props: CorpoProps) {
   const { processo, processos, versoes, revisoes, podeAlterar, usuarioId, executar, aposMudar, aoSumir, enderecoDoProcesso } = props
+  // O arquivado não aceita alteração além das do Agora (Desarquivar, Registrar publicação), que recebe o perfil inteiro.
+  const alteravel = podeAlterar && !processo.arquivadoEm
   return (
     <div className="verso-colunas">
       <div className="verso-trabalho">
         <CaminhoDoProcesso processo={processo} processos={processos} revisoes={revisoes} podeAlterar={podeAlterar} usuarioId={usuarioId}
           executar={executar} aoSumir={aoSumir} aoMudar={aposMudar} />
-        <SecaoDeVersoes versoes={versoes} processo={processo} podeAlterar={podeAlterar} />
+        <SecaoDeVersoes versoes={versoes} processo={processo} podeAlterar={alteravel} />
       </div>
       <div className="verso-contexto">
-        <ReuniaoDoProcesso processo={processo} processos={processos} podeAlterar={podeAlterar} aoMudar={aposMudar}
+        <ReuniaoDoProcesso processo={processo} processos={processos} podeAlterar={alteravel} aoMudar={aposMudar}
           aoSumir={aoSumir} />
         <SobreDoProcesso processo={processo} />
         <EstruturaDoProcesso processo={processo} enderecoDoProcesso={enderecoDoProcesso} />

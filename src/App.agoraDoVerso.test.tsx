@@ -194,7 +194,7 @@ test('a falha ao retomar aparece como alerta e o Agora continua suspenso', async
   expect((await agoraDoVerso()).getByText('Suspenso: Aguardando decisão')).toBeTruthy()
 })
 
-test('concluído com "não": o Agora diz "Concluído em" e "Não publicado", sem a Publicação pendente nem botões', async () => {
+test('concluído com "não": o Agora diz "Concluído em" e "Não publicado", sem a Publicação pendente; [Arquivar] e [Registrar publicação]', async () => {
   montarVerso(processoLido([
     etapaDoProcesso(4, 'modelagem', MODELAGEM, { ...CONCLUIDA, resolvidaEm: '2026-10-10' }),
     etapaDoProcesso(5, 'relatorio', RELATORIO, { ...CONCLUIDA, resolvidaEm: '2026-10-12' }),
@@ -204,7 +204,7 @@ test('concluído com "não": o Agora diz "Concluído em" e "Não publicado", sem
   expect(agora.getByText('Concluído em 12/10/2026')).toBeTruthy()
   expect(agora.getByText('Não publicado')).toBeTruthy()
   expect(agora.queryByText(PUBLICACAO)).toBeNull()
-  expect(agora.queryAllByRole('button')).toEqual([])
+  expect(agora.getAllByRole('button').map((botao) => botao.textContent)).toEqual(['Arquivar', 'Registrar publicação'])
   expect(await classeDoAgora()).toContain('agora-concluido')
 })
 
@@ -216,14 +216,14 @@ test('concluído e publicado: o Agora diz "Publicado em" com a data da Publicaç
   expect((await agoraDoVerso()).getByText('Publicado em 11/10/2026')).toBeTruthy()
 })
 
-test('concluído sem etapa aberta: só "Concluído em", sem botões', async () => {
+test('concluído sem etapa aberta e sem escolha: "Concluído em" e só [Arquivar]', async () => {
   montarVerso(processoLido([
     etapaDoProcesso(4, 'modelagem', MODELAGEM, { ...CONCLUIDA, resolvidaEm: '2026-10-10' }),
     etapaDoProcesso(9, 'publicacao', PUBLICACAO, { obrigatoria: false, status: 'dispensada', nota: 'Não se aplica', resolvidaEm: '2026-10-11' }),
   ], { situacao: 'concluido' }))
   const agora = await agoraDoVerso()
   expect(agora.getByText('Concluído em 10/10/2026')).toBeTruthy()
-  expect(agora.queryAllByRole('button')).toEqual([])
+  expect(agora.getAllByRole('button').map((botao) => botao.textContent)).toEqual(['Arquivar'])
 })
 
 test('a Consulta vê o motivo do suspenso sem [Retomar], e o concluído com a data', async () => {

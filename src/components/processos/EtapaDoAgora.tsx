@@ -2,7 +2,9 @@ import type { AcoesDaEtapaEmUso } from '../../hooks/useAcoesDaEtapa'
 import {
   acoesDaEtapa, opcoesDeResponsavel, podeAssumir, proximaPendente, rotuloDoAgora, usuariosParaAEtapa,
 } from '../../processos/caminhoDeEtapas'
+import { CODIGO_DA_PUBLICACAO } from '../../processos/codigosDasEtapas'
 import { diasNaEtapa, passouDoLimite, textoDosDias } from '../../processos/diasNaEtapa'
+import { TEXTOS_DA_SITUACAO } from '../../processos/pedidosDeSituacao'
 import { hojeLocal } from '../../processos/textoDaReuniao'
 import type { EtapaDoProcesso, UltimaVersao, UsuarioResponsavel } from '../../processos/tipos'
 import { Avatar } from '../Avatar'
@@ -20,6 +22,8 @@ type EtapaDoAgoraProps = {
   usuarioId: string
   ultimaVersao: UltimaVersao | null
   acoes: AcoesDaEtapaEmUso
+  /** Abre a janela de "Não vai mais para publicação"; o item só aparece na Publicação em andamento. */
+  aoDesistirDaPublicacao: () => void
 }
 
 const ROTULO_DA_ACAO_RARA: Record<string, string> = { dispensar: 'Dispensar', realizada: 'Realizada anteriormente' }
@@ -66,13 +70,16 @@ function LinhaDaConsulta({ etapa, dias }: { etapa: EtapaDoProcesso; dias: number
   return <p className="agora-responsavel"><span>{`Com ${etapa.responsavelNome}${quando}`}</span></p>
 }
 
-function BotoesDoAgora({ etapas, indice, usuarioId, ultimaVersao, acoes }: EtapaDoAgoraProps) {
+function BotoesDoAgora({ etapas, indice, usuarioId, ultimaVersao, acoes, aoDesistirDaPublicacao }: EtapaDoAgoraProps) {
   const etapa = etapas[indice]
   const [principal, ...raras] = acoesDaEtapa(etapas, indice)
   const proxima = proximaPendente(etapas, indice)
   const menu: ItemDoMenu[] = raras.map((acao) => ({
     rotulo: ROTULO_DA_ACAO_RARA[acao], aoEscolher: () => acoes.agir(acao, etapa, proxima),
   }))
+  if (etapa.codigo === CODIGO_DA_PUBLICACAO && etapa.status === 'em_andamento') {
+    menu.push({ rotulo: TEXTOS_DA_SITUACAO.nao_publicar.item, aoEscolher: aoDesistirDaPublicacao })
+  }
   return (
     <div className="agora-botoes">
       <button type="button" className="botao botao-principal" onClick={() => acoes.agir(principal, etapa, proxima)}>

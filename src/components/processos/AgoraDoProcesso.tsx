@@ -2,12 +2,12 @@ import './Agora.css'
 import { useState } from 'react'
 import type { AcoesDaEtapaEmUso } from '../../hooks/useAcoesDaEtapa'
 import type { Executar } from '../../hooks/useGravacaoComFalha'
-import { concluidoEm, formatarData, indiceDaEtapaAtual, rotuloDoAgora } from '../../processos/caminhoDeEtapas'
+import { indiceDaEtapaAtual, rotuloDoAgora } from '../../processos/caminhoDeEtapas'
 import type { PedidoDeSituacao } from '../../processos/pedidosDeSituacao'
-import { linhaDaPublicacao } from '../../processos/publicacao'
 import { ROTULO_DA_SITUACAO } from '../../processos/rotulos'
 import type { ModuloDeProcessos, ProcessoLido, UsuarioResponsavel } from '../../processos/tipos'
 import { JanelaDeSituacao } from './AcoesDeSituacao'
+import { AgoraDoConcluido } from './AgoraDoConcluido'
 import { EtapaDoAgora } from './EtapaDoAgora'
 
 type AgoraDoProcessoProps = {
@@ -18,17 +18,21 @@ type AgoraDoProcessoProps = {
   usuarioId: string
   podeAlterar: boolean
   acoes: AcoesDaEtapaEmUso
-  /** Grava a situação (Retomar) e guarda a falha para o verso mostrar. */
+  /** Grava a situação (Retomar), o arquivamento e a desistência da publicação, e guarda a falha para o verso mostrar. */
   executar: Executar
+  /** A data da aprovação (AAAA-MM-DD), o mínimo da publicação registrada; null sem data. */
+  aprovadaEm: string | null
   aoMudar: () => void
+  aoSumir: () => void
 }
 
 /**
  * O cartão "Agora": o que há a fazer no processo, no alto da coluna esquerda do verso (spec, "Coluna esquerda — Agora").
- * Suspenso e cancelado trocam a etapa pelo motivo e [Retomar]; concluído não tem etapa atual: diz quando terminou e,
- * abaixo, se foi publicado ou não (ADR 0020).
+ * Suspenso e cancelado trocam a etapa pelo motivo e [Retomar]; concluído não tem etapa atual: diz quando terminou (ou
+ * que está arquivado), se foi publicado, e oferece arquivar ou desarquivar e registrar a publicação (ADR 0020).
  */
-export function AgoraDoProcesso({ processo, processos, usuarios, usuarioId, podeAlterar, acoes, executar, aoMudar }: AgoraDoProcessoProps) {
+export function AgoraDoProcesso(props: AgoraDoProcessoProps) {
+  const { processo, processos, usuarios, usuarioId, podeAlterar, acoes, executar, aoMudar } = props
   const [pedido, setPedido] = useState<PedidoDeSituacao | null>(null)
   const etapas = processo.etapasDoProcesso
   const indice = indiceDaEtapaAtual(etapas)
@@ -38,12 +42,12 @@ export function AgoraDoProcesso({ processo, processos, usuarios, usuarioId, pode
   if (!parado && !concluido && indice === -1) return null
   const corpo = indice === -1 || situacao !== 'em_andamento' ? null : (
     <EtapaDoAgora etapas={etapas} indice={indice} podeAlterar={podeAlterar} usuarios={usuarios} usuarioId={usuarioId}
-      ultimaVersao={processo.ultimaVersao} acoes={acoes} />
+      ultimaVersao={processo.ultimaVersao} acoes={acoes} aoDesistirDaPublicacao={() => setPedido('nao_publicar')} />
   )
   return (
     <section className={classeDoAgora(situacao, podeAlterar)} aria-label={parado ? 'Agora' : rotuloDoAgora(indice, etapas.length)}>
       {parado && <SituacaoParada processo={processo} podeAlterar={podeAlterar} aoRetomar={() => setPedido('retomar')} />}
-      {concluido && <SituacaoConcluida processo={processo} />}
+      {concluido && <AgoraDoConcluido {...props} />}
       {corpo}
       <JanelaDeSituacao processo={processo} processos={processos} pedido={pedido} executar={executar}
         aoFechar={() => setPedido(null)} aoMudar={aoMudar} />
@@ -54,21 +58,6 @@ export function AgoraDoProcesso({ processo, processos, usuarios, usuarioId, pode
 function classeDoAgora(situacao: ProcessoLido['situacao'], podeAlterar: boolean): string {
   if (situacao !== 'em_andamento') return `agora agora-${situacao}`
   return podeAlterar ? 'agora' : 'agora agora-leitura'
-}
-
-function textoDoConcluido({ etapasDoProcesso }: ProcessoLido): string {
-  const data = concluidoEm(etapasDoProcesso)
-  return data ? `Concluído em ${formatarData(data)}` : 'Concluído'
-}
-
-function SituacaoConcluida({ processo }: { processo: ProcessoLido }) {
-  const publicacao = linhaDaPublicacao(processo)
-  return (
-    <>
-      <p className="agora-situacao">{textoDoConcluido(processo)}</p>
-      {publicacao && <p className="agora-publicacao">{publicacao}</p>}
-    </>
-  )
 }
 
 type SituacaoParadaProps = { processo: ProcessoLido; podeAlterar: boolean; aoRetomar: () => void }

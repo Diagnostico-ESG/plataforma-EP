@@ -38,7 +38,9 @@ export function CaminhoDoProcesso({ processo, processos, revisoes, podeAlterar, 
   const lerAprovacao = useCallback(() => revisoes.lerAprovacao(processo.id), [revisoes, processo.id, assinatura])
   const aprovacao = useCarregamento(lerAprovacao)
   const acoes = useAcoesDaEtapa(processos, revisoes, aoMudar, aoSumir)
-  const parado = processo.situacao === 'suspenso' || processo.situacao === 'cancelado'
+  // O arquivado só lê, como o parado: o Agora dele oferece só Desarquivar e Registrar publicação.
+  const parado = processo.situacao === 'suspenso' || processo.situacao === 'cancelado' || Boolean(processo.arquivadoEm)
+  const aprovadaEm = aprovacao.estado.tipo === 'pronto' ? (aprovacao.estado.valor?.aprovadaEm ?? null) : null
 
   async function corrigirDatas(etapa: EtapaDoCaminho, datas: DatasDaEtapa) {
     await processos.corrigirDatasDaEtapa(etapa.id, datas)
@@ -48,7 +50,7 @@ export function CaminhoDoProcesso({ processo, processos, revisoes, podeAlterar, 
   return (
     <>
       <AgoraDoProcesso processo={processo} processos={processos} usuarios={usuarios} usuarioId={usuarioId}
-        podeAlterar={podeAlterar} acoes={acoes} executar={executar} aoMudar={aoMudar} />
+        podeAlterar={podeAlterar} acoes={acoes} executar={executar} aprovadaEm={aprovadaEm} aoMudar={aoMudar} aoSumir={aoSumir} />
       {acoes.falha && <p className="cadastros-falha" role="alert">{acoes.falha}</p>}
       <EtapasDoProcesso etapas={processo.etapasDoProcesso} processoId={processo.id} revisoes={revisoes} podeEditar={podeAlterar && !parado} usuarios={usuarios}
         usuarioId={usuarioId} ultimaVersao={processo.ultimaVersao} acoes={acoes} aoCorrigirDatas={corrigirDatas}

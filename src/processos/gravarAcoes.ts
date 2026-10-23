@@ -66,6 +66,13 @@ export function gravarAprovacao(
   return esperarAGravacao(() => revisoes.concluirAprovacao(etapa.id, dados, responsavelId, vaiParaPublicacao), aoSumir)
 }
 
+/** A publicação que aconteceu depois, com a data e a nota (vazia: sem nota); a janela espera. */
+export function gravarPublicacao(
+  processos: Pick<ModuloDeProcessos, 'registrarPublicacao'>, id: string, data: string, nota: string, aoSumir: () => void,
+): Promise<string | null> {
+  return esperarAGravacao(() => processos.registrarPublicacao(id, data, nota.trim() || null), aoSumir)
+}
+
 // A edição também espera a gravação. O registro que sumiu (a aprovação desfeita por uma volta de outra pessoa) não é "o
 // processo sumiu": a janela diz que o registro não existe mais, em vez de esconder o processo inteiro.
 async function esperarAEdicao(gravar: () => Promise<void>): Promise<string | null> {

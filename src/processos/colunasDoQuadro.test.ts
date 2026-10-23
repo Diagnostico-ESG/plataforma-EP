@@ -31,6 +31,12 @@ test('a coluna Concluídos traz os concluídos por nome, e não os cancelados', 
   expect(nomes('concluidos', [MODELAGEM], processos)).toEqual(['alfa', 'Zeta'])
 })
 
+test('o arquivado sai de Concluídos: fica só na Lista', () => {
+  const processos = [processo('Ativo', { situacao: 'concluido', etapaAtual: null }),
+    processo('Guardado', { situacao: 'concluido', etapaAtual: null, arquivadoEm: '2026-10-22T15:00:00+00:00' })]
+  expect(nomes('concluidos', [MODELAGEM], processos)).toEqual(['Ativo'])
+})
+
 test('o agrupamento por responsável não traz a coluna Concluídos', () => {
   const processos = [processo('Pronto', { situacao: 'concluido', etapaAtual: null })]
   expect(colunasPorResponsavel(processos)).toEqual([])
