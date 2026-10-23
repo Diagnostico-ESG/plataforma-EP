@@ -2,6 +2,7 @@ import type { LinhaDaLista } from '../../processos/linhasDaLista'
 import { textoDaEtapaAtual } from '../../processos/linhasDaLista'
 import { ROTULO_DO_TIPO } from '../../processos/rotulos'
 import { LinhaFantasma } from '../cadastros/PecasDaLista'
+import { Pilula } from '../Pilula'
 import { NomeComTrecho } from './NomeComTrecho'
 import { PilulaDaSituacao } from './PilulaDaSituacao'
 
@@ -61,7 +62,12 @@ function LinhaDoProcesso({ linha, escolhida, aoAbrir, busca }: LinhaDoProcessoPr
       <td>{linha.macroprocessoNome}</td>
       <td>{textoDaEtapaAtual(linha)}</td>
       <td>{linha.responsavel?.nome ?? '—'}</td>
-      <td><PilulaDaSituacao situacao={linha.situacao} /></td>
+      <td>
+        <span className="lista-situacao">
+          <PilulaDaSituacao situacao={linha.situacao} />
+          {linha.arquivadoEm && <Pilula situacao="neutra">Arquivado</Pilula>}
+        </span>
+      </td>
     </tr>
   )
 }

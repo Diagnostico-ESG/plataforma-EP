@@ -137,8 +137,8 @@ Conteúdo da migração, na ordem: coluna `arquivado_em` e privilégio; `liberan
 
 **Arquivos:** `src/components/processos/TabelaDeProcessos.tsx`, `FiltrosDosProcessos.tsx` (e quem monta os filtros da Lista); teste de tela `src/App.listaDosArquivados.test.tsx` (arte: `App.lista`, `App.filtrosDosProcessos`).
 
-- [ ] Teste de tela: selo "Arquivado" ao lado da situação; "Arquivados: Esconder" some com ele e põe `arquivados=esconder` no endereço; o endereço com o filtro abre a Lista filtrada; [Limpar filtros] volta a "Mostrar"; o filtro não aparece no Quadro; Consulta vê selo e filtro.
-- [ ] Implementar; testes verdes; commit.
+- [x] Teste de tela: selo "Arquivado" ao lado da situação; "Arquivados: Esconder" some com ele e põe `arquivados=esconder` no endereço; o endereço com o filtro abre a Lista filtrada; [Limpar filtros] volta a "Mostrar"; o filtro não aparece no Quadro; Consulta vê selo e filtro.
+- [x] Implementar; testes verdes; commit.
 
 ### Tarefa 9: Conferência final
 

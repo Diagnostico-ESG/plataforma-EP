@@ -203,6 +203,13 @@
   font-size: var(--tam-rotulo);
 }
 
+/* A situação e, no arquivado, o selo "Arquivado" lado a lado, quebrando quando a coluna é estreita. */
+.lista-situacao {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--esp-1);
+}
+
 .tabela-de-processos tr[aria-current='true'] {
   background: var(--azul-claro);
 }
