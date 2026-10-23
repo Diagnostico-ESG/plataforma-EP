@@ -4,6 +4,7 @@ import {
 import type { ClienteSupabase } from '../lib/supabase'
 import type { Database } from '../types/database'
 import { formatarData } from './caminhoDeEtapas'
+import { fraseDasAnotacoesLongas } from './frasesDasAnotacoes'
 import { fraseDaEtapaProtegida, fraseDaEtapaUsada } from './frasesDoCatalogo'
 import { FRASE_SEM_VERSAO, fraseDaVersaoIncompleta } from './frasesDaVersaoCompleta'
 import { FRASE_DO_PAI, fraseDeTipoInvalido, fraseDosSubprocessos } from './frasesDeReclassificacao'
@@ -94,7 +95,7 @@ async function listarResponsaveisPossiveis(cliente: ClienteSupabase): Promise<Us
 
 // O banco recusa com "motivo:valor" (migrações etapas_do_setor, andamento_do_processo, voltar_datas_responsavel,
 // situacao_do_processo, subprocessos_e_reclassificacao, catalogo_de_etapas, versoes, revisao_interna, aprovacao,
-// escolha_de_publicacao e arquivar_e_registrar_publicacao).
+// escolha_de_publicacao, arquivar_e_registrar_publicacao e anotacoes_do_processo).
 // O motivo "motivo_obrigatorio" não tem valor; o valor vai até o fim da mensagem.
 const PADRAO_DA_RECUSA = new RegExp(
   '\\b(anterior_nao_resolvida|etapa_obrigatoria|ja_ha_etapa_em_andamento|etapa_nao_resolvida'
@@ -109,7 +110,8 @@ const PADRAO_DA_RECUSA = new RegExp(
   + '|escolha_de_publicacao_obrigatoria|publicacao_so_pela_funcao'
   + '|publicacao_nao_se_dispensa|publicacao_fora_de_andamento|publicacao_so_no_concluido|publicacao_ja_registrada'
   + '|sem_publicacao_pendente|data_da_publicacao_obrigatoria|publicacao_antes_da_aprovacao'
-  + '|arquivar_so_concluido|ja_arquivado|nao_arquivado|processo_arquivado|arquivamento_so_pela_funcao)(?::(.*))?$', 'm')
+  + '|arquivar_so_concluido|ja_arquivado|nao_arquivado|processo_arquivado|arquivamento_so_pela_funcao'
+  + '|anotacoes_longas)(?::(.*))?$', 'm')
 
 const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   anterior_nao_resolvida: (etapa) => `A etapa ${etapa} ainda não foi resolvida.`,
@@ -174,6 +176,7 @@ const FRASE_DA_RECUSA: Record<string, (valor: string) => string> = {
   nao_arquivado: () => FRASE_DO_PROCESSO_NAO_ARQUIVADO,
   processo_arquivado: () => FRASE_DO_PROCESSO_ARQUIVADO,
   arquivamento_so_pela_funcao: () => FRASE_DO_ARQUIVAMENTO_SO_PELA_FUNCAO,
+  anotacoes_longas: fraseDasAnotacoesLongas,
   versao_incompleta: (valor) => {
     const [numero, faltas] = valor.split(':')
     return fraseDaVersaoIncompleta(numero, faltas.split(','))

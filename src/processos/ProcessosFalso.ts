@@ -1,6 +1,7 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import type { EventoDoCadastro } from '../cadastros/tipos'
+import { AnotacoesFalso } from './AnotacoesFalso'
 import { CatalogoFalso } from './CatalogoFalso'
 import {
   avancarProcesso, conferirAutorDaProxima, conferirAutorDaRevisao, conferirAvanco, conferirDatasDaEtapa,
@@ -56,7 +57,13 @@ export class ProcessosFalso implements ModuloDeProcessos {
   segurarHistoricoDoProcesso = false
   /** O catálogo inteiro; as gravações nele mudam `etapasDoCatalogo` e os processos. */
   catalogo = new CatalogoFalso(this)
+  /** As Anotações dos processos (texto, autor e hora), com a falha, a espera e o "outra pessoa alterou" programáveis. */
+  anotacoes = new AnotacoesFalso(this)
   private proximoId = 1
+
+  lerAnotacoes = (id: string) => this.anotacoes.ler(id)
+
+  gravarAnotacoes = (id: string, esperado: string | null, novo: string | null) => this.anotacoes.gravar(id, esperado, novo)
 
   async iniciarEtapa(id: string): Promise<void> {
     this.mudar({ acao: 'iniciar', id }, { status: 'em_andamento', iniciadaEm: HOJE })

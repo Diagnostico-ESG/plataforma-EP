@@ -456,6 +456,9 @@ export type Database = {
       }
       processos: {
         Row: {
+          anotacoes: string | null
+          anotacoes_alteradas_em: string | null
+          anotacoes_alteradas_por: string | null
           arquivado_em: string | null
           contexto: string | null
           criado_em: string
@@ -473,6 +476,9 @@ export type Database = {
           vai_para_publicacao: boolean | null
         }
         Insert: {
+          anotacoes?: string | null
+          anotacoes_alteradas_em?: string | null
+          anotacoes_alteradas_por?: string | null
           arquivado_em?: string | null
           contexto?: string | null
           criado_em?: string
@@ -490,6 +496,9 @@ export type Database = {
           vai_para_publicacao?: boolean | null
         }
         Update: {
+          anotacoes?: string | null
+          anotacoes_alteradas_em?: string | null
+          anotacoes_alteradas_por?: string | null
           arquivado_em?: string | null
           contexto?: string | null
           criado_em?: string
@@ -507,6 +516,13 @@ export type Database = {
           vai_para_publicacao?: boolean | null
         }
         Relationships: [
+          {
+            foreignKeyName: "processos_anotacoes_alteradas_por_fkey"
+            columns: ["anotacoes_alteradas_por"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "processos_envolvido_fkey"
             columns: ["macroprocesso_id", "setor_id"]
@@ -963,6 +979,14 @@ export type Database = {
         Returns: undefined
       }
       desarquivar_processo: { Args: { p_processo: string }; Returns: undefined }
+      gravar_anotacoes_do_processo: {
+        Args: { p_esperado: string; p_novo: string; p_processo: string }
+        Returns: {
+          alterado_em: string
+          alterado_por_nome: string
+          texto: string
+        }[]
+      }
       links_das_planilhas: {
         Args: never
         Returns: {

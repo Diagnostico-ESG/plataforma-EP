@@ -117,6 +117,12 @@ export type DatasDaEtapa = { iniciadaEm: string | null; resolvidaEm: string | nu
 /** Quem pode ser responsável por uma etapa: usuário ativo de perfil Administrador ou Integrante. */
 export type UsuarioResponsavel = { id: string; nome: string }
 
+/** As Anotações de um processo (texto livre, único, sem histórico; ADR 0021) e quem as alterou por último. */
+export type AnotacoesLidas = { texto: string | null; alteradoPor: string | null; alteradoEm: string | null }
+
+/** Gravado: o texto como o banco o guardou, com o novo autor e a hora. Conflito: o texto no banco já não era o esperado. */
+export type ResultadoDaGravacaoDasAnotacoes = { tipo: 'gravado'; anotacoes: AnotacoesLidas } | { tipo: 'conflito' }
+
 /** Um processo citado no painel de outro (o pai ou um subprocesso): abre o painel dele. */
 /** O pai ou um subprocesso no verso: nome em link, a etapa atual e, fora de em andamento, a situação. */
 export type ItemDaEstrutura = { id: string; nome: string; etapaAtual: string | null; situacao: SituacaoDoProcesso }
@@ -182,6 +188,13 @@ export type ModuloDeProcessos = {
   excluirProcesso(id: string): Promise<void>
   /** Marca, troca ou (com null) remove a data da reunião de modelagem piloto; vale em qualquer situação do processo. */
   marcarReuniao(id: string, data: string | null): Promise<void>
+  /** null: o processo não existe (mais). Fora do ProcessoLido: o texto só o verso lê (ADR 0021). */
+  lerAnotacoes(id: string): Promise<AnotacoesLidas | null>
+  /**
+   * Grava se o texto no banco ainda é `esperado` (o que a pessoa tinha ao começar a escrever; null: nenhum). Perfil e
+   * processo arquivado chegam como TravaDoBanco; processo excluído, como CadastroInexistente; o conflito não é erro.
+   */
+  gravarAnotacoes(id: string, esperado: string | null, novo: string | null): Promise<ResultadoDaGravacaoDasAnotacoes>
   /** Do mais recente para o mais antigo. */
   lerHistoricoDoProcesso(id: string): Promise<EventoDoCadastro[]>
   iniciarEtapa(andamentoId: string): Promise<void>
