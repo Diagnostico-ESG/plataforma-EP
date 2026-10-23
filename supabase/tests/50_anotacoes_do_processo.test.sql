@@ -67,54 +67,54 @@ language sql stable as $$
     and entidade_ref = pg_temp.processo(nome_do_processo)::text order by id desc limit 1 $$;
 grant execute on function pg_temp.ultima_edicao(text) to authenticated;
 
-create function pg_temp.hoje() returns date language sql stable as $ select (now() at time zone 'America/Sao_Paulo')::date $;
+create function pg_temp.hoje() returns date language sql stable as $$ select (now() at time zone 'America/Sao_Paulo')::date $$;
 grant execute on function pg_temp.hoje() to authenticated;
 
 create function pg_temp.andamento(nome_do_processo text, codigo_da_etapa text) returns uuid
-language sql stable as $
+language sql stable as $$
   select a.id from public.andamentos a join public.etapas e on e.id = a.etapa_id
-  where a.processo_id = pg_temp.processo(nome_do_processo) and e.codigo = codigo_da_etapa $;
+  where a.processo_id = pg_temp.processo(nome_do_processo) and e.codigo = codigo_da_etapa $$;
 grant execute on function pg_temp.andamento(text, text) to authenticated;
 
 create function pg_temp.agir(nome_do_processo text, codigo_da_etapa text, novo public.status_da_etapa,
   nova_nota text default null) returns void
-language sql as $
+language sql as $$
   update public.andamentos set status = novo, nota = nova_nota
-  where id = pg_temp.andamento(nome_do_processo, codigo_da_etapa) $;
+  where id = pg_temp.andamento(nome_do_processo, codigo_da_etapa) $$;
 grant execute on function pg_temp.agir(text, text, public.status_da_etapa, text) to authenticated;
 
 -- Um arquivo inventado no formato que registrar_versao recebe; a versão completa é o par .bpm + .png e o relatório.
 create function pg_temp.arquivo(papel text, formato text) returns jsonb
-language sql immutable as $
+language sql immutable as $$
   select jsonb_build_object('papel', papel, 'nome', 'T49_V1_Processo.' || formato, 'formato', formato,
-    'tamanho', 100, 'hash_md5', '0123456789abcdef0123456789abcdef', 'drive_id', 'drive-' || papel) $;
+    'tamanho', 100, 'hash_md5', '0123456789abcdef0123456789abcdef', 'drive_id', 'drive-' || papel) $$;
 grant execute on function pg_temp.arquivo(text, text) to authenticated;
 create function pg_temp.enviar_completa(nome_do_processo text) returns void
-language plpgsql as $
+language plpgsql as $$
 declare
   versao uuid := public.registrar_versao(pg_temp.processo(nome_do_processo), 1, null,
     jsonb_build_array(pg_temp.arquivo('bpm', 'bpm'), pg_temp.arquivo('png', 'png')));
 begin
   perform public.acrescentar_relatorio(versao, 1, pg_temp.arquivo('relatorio', 'docx'));
-end $;
+end $$;
 grant execute on function pg_temp.enviar_completa(text) to authenticated;
 
 -- As etapas 1 a 4 "realizadas anteriormente" e a Aprovação em andamento.
 create function pg_temp.ate_a_aprovacao(nome_do_processo text) returns void
-language plpgsql as $
+language plpgsql as $$
 begin
   perform pg_temp.agir(nome_do_processo, 'modelagem', 'realizada_anteriormente', 'Feita antes');
   perform pg_temp.agir(nome_do_processo, 'relatorio_modelagem_tecnica', 'realizada_anteriormente', 'Feita antes');
   perform pg_temp.agir(nome_do_processo, 'revisao_interna', 'realizada_anteriormente', 'Feita antes');
   perform pg_temp.agir(nome_do_processo, 'revisao_setor', 'realizada_anteriormente', 'Feita antes');
   perform pg_temp.agir(nome_do_processo, 'aprovacao_setor', 'em_andamento');
-end $;
+end $$;
 grant execute on function pg_temp.ate_a_aprovacao(text) to authenticated;
 
 -- A Aprovação concluída com a escolha e, quando vem, a data da aprovação.
 create function pg_temp.aprovar(nome_do_processo text, vai boolean, data date default null) returns void
-language sql as $
-  select public.concluir_aprovacao(pg_temp.andamento(nome_do_processo, 'aprovacao_setor'), null, null, data, null, vai) $;
+language sql as $$
+  select public.concluir_aprovacao(pg_temp.andamento(nome_do_processo, 'aprovacao_setor'), null, null, data, null, vai) $$;
 grant execute on function pg_temp.aprovar(text, boolean, date) to authenticated;
 
 -- Concluido e Arquivado percorrem o caminho como o "Pendente" do teste 49 (versão completa, etapas realizadas antes e
