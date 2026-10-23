@@ -4,7 +4,7 @@ Status: ready-for-agent
 
 **Como resolve o problema.** Hoje o andamento de cada processo fica espalhado entre planilhas e o Power BI, sem saber com certeza em que etapa cada um está, quem cuida dele nem o que mudou. Com esta funcionalidade, a equipe do EP cadastra na plataforma cada processo e subprocesso, ligado ao setor dono e a um macroprocesso, e registra o andamento etapa por etapa, da Modelagem piloto em diante, num caminho que o administrador configura no catálogo de etapas. A área Processos mostra o trabalho vivo num Quadro, com uma coluna por etapa, e o arquivo completo numa Lista com busca pelo nome e filtros; ao abrir um processo, o **verso do cartão**, uma janela central em duas colunas, mostra primeiro o que há para fazer agora (a etapa atual, quem cuida dela e um único botão principal), depois o caminho de etapas e os arquivos, e ao lado o contexto do processo; o que é raro (histórico, editar, reclassificar, suspender, cancelar, excluir) fica num menu. No Quadro, cada cartão mostra de relance onde o processo está (uma barra com um pedaço por etapa) e só ganha selo quando há algo a dizer (processo parado, relatório pendente, etapa sem responsável, reunião próxima, versão, subprocessos); arrastar o cartão para a coluna seguinte conclui a etapa, e a equipe pode agrupar o Quadro por responsável ou ver só os processos que estão com ela. O banco impõe a sequência das etapas, a situação do processo, as regras de reclassificação e o registro de cada mudança no histórico. As funcionalidades seguintes (reuniões, documentos, revisões, prazos e painel) se apoiam nesse andamento.
 
-Decisões de origem: `.scratch/processos-etapas/sabatina.md` (sabatina de 2026-10-13, três rodadas), `CONTEXT.md` (seções "Setores" e "Processos") e ADR 0004 (mudar o catálogo muda o caminho dos processos em andamento). Mudança de 2026-10-18 (parte 1 da iniciativa experiencia-do-quadro, `.scratch/experiencia-do-quadro/sabatina-parte-1.md`, ADR 0013): saem as etapas do setor, a coluna "Aguardando o setor", os responsáveis do setor e o nível do catálogo; a primeira etapa passa a se chamar Modelagem piloto; o processo ganha a data da reunião (spec de `reunioes`). Mudança de 2026-10-18 (parte 2, `.scratch/experiencia-do-quadro/sabatina-parte-2.md`, ADR 0014): resolver a etapa atual (concluir, dispensar ou registrar como realizada anteriormente) já **avança**, ou seja, inicia a próxima etapa pendente com o responsável escolhido na mesma janela; voltar também escolhe o responsável; [Assumir] em etapa sem responsável; quem enviou a versão mais recente não pode ser escolhido como responsável da Revisão interna. Mudança de 2026-10-19 (parte 3, "Verso do cartão", `.scratch/experiencia-do-quadro/sabatina-parte-3.md`, sem ADR nem mudança no banco): o painel lateral vira o verso do cartão, uma janela central em duas colunas com o cartão "Agora"; o Novo processo, o Editar e o Histórico abrem dentro dela; a Lista ganha busca pelo nome. Mudança de 2026-10-19 (parte 4, "Cartão do Quadro", `.scratch/experiencia-do-quadro/sabatina-parte-4.md`, sem ADR): o cartão do Quadro ganha a barra de progresso e os selos; arrastar o cartão para a coluna de destino abre a janela de avanço da parte 2; o Quadro ganha "Agrupar por: Etapa | Responsável" e "Só os meus"; a view `processos_com_andamento` ganha campos, por migração não destrutiva; `CONTEXT.md` ganha "Processo parado".
+Decisões de origem: `.scratch/processos-etapas/sabatina.md` (sabatina de 2026-10-13, três rodadas), `CONTEXT.md` (seções "Setores" e "Processos") e ADR 0004 (mudar o catálogo muda o caminho dos processos em andamento). Mudança de 2026-10-18 (parte 1 da iniciativa experiencia-do-quadro, `.scratch/experiencia-do-quadro/sabatina-parte-1.md`, ADR 0013): saem as etapas do setor, a coluna "Aguardando o setor", os responsáveis do setor e o nível do catálogo; a primeira etapa passa a se chamar Modelagem piloto; o processo ganha a data da reunião (spec de `reunioes`). Mudança de 2026-10-18 (parte 2, `.scratch/experiencia-do-quadro/sabatina-parte-2.md`, ADR 0014): resolver a etapa atual (concluir, dispensar ou registrar como realizada anteriormente) já **avança**, ou seja, inicia a próxima etapa pendente com o responsável escolhido na mesma janela; voltar também escolhe o responsável; [Assumir] em etapa sem responsável; quem enviou a versão mais recente não pode ser escolhido como responsável da Revisão interna. Mudança de 2026-10-19 (parte 3, "Verso do cartão", `.scratch/experiencia-do-quadro/sabatina-parte-3.md`, sem ADR nem mudança no banco): o painel lateral vira o verso do cartão, uma janela central em duas colunas com o cartão "Agora"; o Novo processo, o Editar e o Histórico abrem dentro dela; a Lista ganha busca pelo nome. Mudança de 2026-10-19 (parte 4, "Cartão do Quadro", `.scratch/experiencia-do-quadro/sabatina-parte-4.md`, sem ADR): o cartão do Quadro ganha a barra de progresso e os selos; arrastar o cartão para a coluna de destino abre a janela de avanço da parte 2; o Quadro ganha "Agrupar por: Etapa | Responsável" e "Só os meus"; a view `processos_com_andamento` ganha campos, por migração não destrutiva; `CONTEXT.md` ganha "Processo parado". Mudança de 2026-10-23 ("Anotações do processo", `.scratch/processos-etapas/sabatina-anotacoes.md`, ADR 0021): o verso ganha, no alto da coluna direita, as **Anotações**, um texto livre e único por processo, guardado sozinho enquanto se escreve, sem histórico, com recusa quando outra pessoa alterou antes; `CONTEXT.md` ganha "Anotações".
 
 ## Problema
 
@@ -16,12 +16,12 @@ O EP acompanha dezenas de processos de vários setores, cada um numa etapa difer
   - o **Quadro** mostra os processos em andamento e os suspensos, cada um na coluna da etapa atual; o processo novo entra na coluna Modelagem piloto. Desde a parte 4 (2026-10-19), o cartão traz a barra de progresso e os selos, arrastar o cartão conclui a etapa, e o Quadro pode ser agrupado por responsável e filtrado por "Só os meus";
   - a **Lista** mostra todos os processos, de qualquer situação, numa tabela com busca pelo nome e filtros; é o lugar dos concluídos;
   - nos dois, [Cadastrar processo] para Administrador e Integrante, e clicar num cartão ou numa linha abre o **verso do cartão** (desde 2026-10-19).
-- **Verso do cartão** (desde 2026-10-19, no lugar do painel lateral): janela central larga, com o Quadro ou a Lista escurecidos atrás. À esquerda, o trabalho: o cartão **Agora** (etapa atual, responsável ou [Assumir], dias na etapa e um único botão principal), as **Etapas** em linhas compactas (clicar abre o detalhe da etapa ali mesmo) e os **Arquivos** (a versão mais recente em destaque, com o que falta). À direita, o contexto: a data da **Reunião** de modelagem piloto (spec de `reunioes`), **Sobre** (setor, macroprocesso, tipo, origem, contexto, observações) e a **Estrutura** (subprocessos ou o processo pai). O menu "⋯" do cabeçalho traz Histórico, Editar, Reclassificar, Suspender ou Retomar, Cancelar e Excluir. Novo processo, Editar e Histórico abrem dentro da mesma janela.
+- **Verso do cartão** (desde 2026-10-19, no lugar do painel lateral): janela central larga, com o Quadro ou a Lista escurecidos atrás. À esquerda, o trabalho: o cartão **Agora** (etapa atual, responsável ou [Assumir], dias na etapa e um único botão principal), as **Etapas** em linhas compactas (clicar abre o detalhe da etapa ali mesmo) e os **Arquivos** (a versão mais recente em destaque, com o que falta). À direita, o contexto: as **Anotações** do processo (desde 2026-10-23), a data da **Reunião** de modelagem piloto (spec de `reunioes`), **Sobre** (setor, macroprocesso, tipo, origem, contexto, observações) e a **Estrutura** (subprocessos ou o processo pai). O menu "⋯" do cabeçalho traz Histórico, Editar, Reclassificar, Suspender ou Retomar, Cancelar e Excluir. Novo processo, Editar e Histórico abrem dentro da mesma janela.
 - **Avanço das etapas (desde 2026-10-18):** concluir, dispensar ou registrar como realizada anteriormente a etapa atual abre uma janela que pergunta "Quem fica com a próxima etapa?" e, ao confirmar, a próxima etapa pendente já entra em andamento com essa pessoa (ou sem ninguém, à espera de alguém assumir). Na etapa sem responsável, [Assumir] põe a própria pessoa como responsável com um clique.
 - **Tela do setor** (área Setores, que já existe): ganha a lista dos processos do setor; clicar num deles leva à Lista filtrada pelo setor, com o verso aberto.
 - **Catálogo de etapas** (área Administração, só para o administrador): a lista ordenada das etapas, com obrigatória ou opcional, e ativa.
 
-A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: quem não pode alterar é recusado mesmo que tente fora da tela, e toda mudança vira evento no histórico.
+A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: quem não pode alterar é recusado mesmo que tente fora da tela, e toda mudança vira evento no histórico. A exceção, desde 2026-10-23, são as Anotações: elas não geram evento (ADR 0021), e o que as protege é a recusa da gravação quando outra pessoa alterou o texto antes.
 
 ## Histórias de usuário
 
@@ -171,6 +171,36 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
 171. Como integrante do EP, quero que "Só os meus" sem nenhum cartão mostre "Nenhum processo com você agora." com [Ver todos], que desliga o filtro.
 172. Como Consulta, quero ver a barra, os selos e o "Agrupar por", sem "Só os meus" e sem arrastar.
 
+### Anotações do processo (2026-10-23)
+
+173. Como integrante do EP, quero um bloco "Anotações" no alto da coluna direita do verso, acima da Reunião, para registrar o que a equipe precisa lembrar sobre o processo sem procurar em outro lugar.
+174. Como integrante do EP, quero que cada processo tenha um texto único de anotações, compartilhado pela equipe, para todos lerem e completarem o mesmo bloco.
+175. Como integrante do EP, quero que o subprocesso tenha as suas próprias Anotações, separadas das do pai, porque cada um anda no seu ritmo.
+176. Como integrante do EP, quero escrever direto no campo, sem botão de salvar, e que o texto se grave cerca de 1 segundo depois que eu paro de digitar, para não perder nada nem ter um passo a mais.
+177. Como integrante do EP, quero que o texto se grave também quando saio do campo, para o que escrevi por último não ficar para trás.
+178. Como integrante do EP, quero ver "Salvando…" ao lado do título enquanto grava e "Salvo" quando terminou, para saber que posso fechar a janela.
+179. Como integrante do EP, quero que, se a gravação falhar (inclusive sem conexão), apareça "Não foi possível salvar. Seu texto continua aqui", o texto fique no campo e a plataforma tente de novo na minha próxima pausa, para não precisar redigitar.
+180. Como integrante do EP, quero que a plataforma recuse gravar por cima de uma alteração que outra pessoa fez enquanto eu escrevia, com o aviso "Outra pessoa alterou as anotações enquanto você escrevia", para que ninguém apague sem querer o texto do colega, já que não há histórico para recuperar.
+181. Como integrante do EP, quero que, nesse conflito, o meu texto continue no campo para eu copiar, e que o botão "Ver o texto atual" troque o campo pelo texto gravado, para eu juntar as duas versões.
+182. Como integrante do EP, quero que, no conflito, a plataforma pare de tentar gravar até eu clicar em "Ver o texto atual", para não insistir numa gravação que vai ser recusada.
+183. Como integrante do EP, quero ver abaixo do campo, discreto, "Alterado por {nome} em {dd/mm}, {hh:mm}", para saber quem mexeu por último e quando.
+184. Como integrante do EP, quero que, sem nenhuma anotação gravada no processo, a linha "Alterado por" não apareça.
+185. Como integrante do EP, quero ver no campo vazio a dica "Escreva aqui as anotações do processo", para entender para que serve o bloco.
+186. Como integrante do EP, quero escrever até 2.000 caracteres, e ver a contagem só quando estiver perto do limite, para o bloco ficar limpo no uso comum.
+187. Como integrante do EP, quero que o campo cresça com o texto até uma altura máxima e depois role por dentro, para ler textos curtos sem rolar e os longos sem empurrar a janela.
+188. Como integrante do EP, quero que fechar o verso (pelo botão, por Esc ou abrindo o pai ou um subprocesso) com texto ainda não gravado grave na hora e, se a gravação falhar ou houver conflito, peça confirmação antes de fechar, para eu não perder o que escrevi.
+189. Como integrante do EP, quero que fechar a aba ou recarregar a página com texto ainda não gravado mostre o aviso do navegador, pelo mesmo motivo.
+190. Como integrante do EP, quero escrever nas Anotações de processos em andamento, suspensos, cancelados e concluídos, porque é justamente no processo parado que a equipe precisa anotar o porquê.
+191. Como integrante do EP, quero que, no processo arquivado, as Anotações apareçam só para ler, com a linha "Alterado por", porque o arquivado não se edita.
+192. Como integrante do EP, quero que alterar as Anotações não gere evento no Histórico do processo, para o histórico não ficar tomado de rascunhos (ADR 0021).
+193. Como integrante do EP, quero que as Anotações fiquem só no verso: fora do cartão do Quadro, da busca da Lista e das planilhas dos dashboards, porque o texto livre pode trazer nome e e-mail de pessoas dos setores.
+194. Como integrante do EP, quero que as Anotações continuem no processo depois de uma reclassificação, como tudo o que ele já tem.
+195. Como integrante do EP que usa o teclado ou leitor de tela, quero que o campo tenha o nome "Anotações", que "Salvando…" e "Salvo" sejam anunciados sem roubar o foco, e que o aviso de falha e o de conflito sejam anunciados quando aparecem.
+196. Como Consulta, quero ler as Anotações e a linha "Alterado por", sem campo editável, e ver "Sem anotações." quando não há texto.
+197. Como responsável pela plataforma, quero que o banco recuse a gravação das Anotações vinda de Consulta, de usuário inativo e de visitante sem login, mesmo fora da tela, e que inativo e visitante não leiam as Anotações.
+198. Como responsável pela plataforma, quero que o nome e a hora da última alteração sejam gravados pelo banco, para ninguém se passar por outra pessoa nem mudar a hora fora da tela.
+199. Como integrante do EP, quero que um processo cadastrado agora mostre o bloco vazio, com a dica, pronto para escrever.
+
 ### Etapas do setor e responsáveis do setor (retirados em 2026-10-18)
 
 45. Como integrante do EP, quero que a tela do setor e o painel do processo não mostrem mais etapas do setor nem responsáveis do setor, porque esse trabalho já foi feito para todos os setores, fora da plataforma (ADR 0013).
@@ -244,7 +274,9 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
   - corrigir as datas de uma etapa, mudar o responsável de uma etapa ([Assumir] é mudar para si mesmo) e voltar a uma etapa, levando o responsável da etapa reaberta (desde 2026-10-18);
   - suspender, cancelar, retomar e reclassificar um processo;
   - ler os processos de um setor;
-  - listar e manter o catálogo de etapas.
+  - listar e manter o catálogo de etapas;
+  - ler as Anotações de um processo (o texto, o nome de quem alterou por último e quando), à parte da leitura do processo, porque elas ficam fora da view (desde 2026-10-23);
+  - gravar as Anotações, levando o texto novo e o texto que a pessoa tinha quando começou a escrever; devolve o texto gravado com o novo "alterado por" e "em", ou a recusa de conflito, distinta das outras falhas, para a tela mostrar o aviso próprio (desde 2026-10-23).
 
   Saem em 2026-10-18: ler e alterar as etapas do setor, e ler, criar, editar e excluir responsáveis do setor.
 
@@ -342,6 +374,18 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
     - [Enviar versão] no título da seção; "Registrar versão histórica" num "⋯" da seção; Substituir no "⋯" de cada arquivo, como já é;
     - as versões anteriores recolhidas em "Versões anteriores ({n})", que abre a lista que já existe;
     - os formulários de envio abrem no lugar da seção, como hoje.
+  - **Coluna direita — Anotações** (desde 2026-10-23; sabatina-anotacoes e ADR 0021), o primeiro bloco da coluna, acima da Reunião:
+    - título "Anotações" e, à direita dele, o estado da gravação: nada, "Salvando…", "Salvo", ou o aviso de falha;
+    - **campo:** uma área de texto com o nome acessível "Anotações", com a dica "Escreva aqui as anotações do processo" quando vazia; cresce com o texto até cerca de 12 linhas e depois rola por dentro; aceita até 2.000 caracteres (o próprio campo não deixa passar disso, inclusive ao colar);
+    - **contagem:** "{n} de 2.000" abaixo do campo, só a partir de 1.800 caracteres;
+    - **última alteração:** abaixo do campo, em texto secundário, "Alterado por {nome} em {dd/mm}, {hh:mm}", no horário de Brasília; não aparece enquanto o processo nunca teve anotação gravada;
+    - **salvamento automático:** grava cerca de 1 segundo depois da última tecla e ao sair do campo, se o texto mudou desde a última gravação; uma gravação por vez (o que se digitar durante uma gravação vai na seguinte); o texto que segue para o banco como "o que a pessoa tinha" é o último lido ou gravado com sucesso nesta janela;
+    - **falha (inclusive sem conexão):** o estado vira "Não foi possível salvar. Seu texto continua aqui" (vermelho, ADR 0003); o texto fica no campo; a próxima pausa ou a saída do campo tentam de novo;
+    - **conflito** (o texto no banco não é mais o que a pessoa tinha): aviso amarelo "Outra pessoa alterou as anotações enquanto você escrevia" com o botão "Ver o texto atual"; o campo continua com o texto de quem escrevia, editável para copiar; o salvamento automático para até a pessoa clicar no botão, que lê de novo e troca o campo pelo texto gravado, com a linha "Alterado por" de quem gravou;
+    - **ao fechar** o verso, ao abrir o pai ou um subprocesso na mesma janela, ou ao trocar o conteúdo pelo Histórico ou pelo Editar, com texto ainda não gravado: grava na hora; se gravar, segue; se falhar ou estiver em conflito, a confirmação simples (ADR 0003) "As anotações não foram salvas. Sair mesmo assim?" [Sair sem salvar] [Continuar escrevendo]. Fechar a aba ou recarregar com texto não gravado aciona o aviso nativo do navegador;
+    - **somente leitura** para a Consulta e, para todos, no processo arquivado: o texto em parágrafo (quebras de linha mantidas), "Sem anotações." quando vazio, e a linha "Alterado por" quando há;
+    - **leitor de tela:** "Salvando…" e "Salvo" numa região anunciada sem interromper; a falha e o conflito anunciados quando aparecem;
+    - o texto é gravado como foi digitado; só espaços e quebras de linha contam como vazio e gravam nada (nulo).
   - **Coluna direita — Reunião:** rótulo "Reunião", a data (mono, com a barrinha amarela de reunião) e "· próxima" ou "· realizada"; sem data, "Ainda não marcada". Para quem pode alterar, "Marcar data" (ou "Alterar data") vira ali mesmo o campo de data com [Salvar], [Remover] e [Cancelar] (o comportamento da spec de `reunioes`).
   - **Coluna direita — Sobre:** setor, macroprocesso, tipo, origem, contexto e observações, cada um com o rótulo pequeno em cinza acima do valor; contexto e observações longos mostram até 4 linhas e "Ler mais" (que vira "Ler menos"); campo vazio não aparece.
   - **Coluna direita — Estrutura:** "Subprocessos ({n})", cada um com o nome em link e, embaixo em cinza, a etapa atual e a situação quando não é em andamento; no subprocesso, "Faz parte de" com o pai do mesmo jeito; sem subprocessos nem pai, a seção não aparece.
@@ -384,6 +428,8 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
   - "O setor {SIGLA} tem {n} processos neste macroprocesso; mova-os ou exclua-os antes."
   - "A etapa {nome} já foi usada; desative-a em vez de excluir."
   - "Seu perfil não permite alterar os processos." (quando o banco recusa por perfil)
+  - "Outra pessoa alterou as anotações enquanto você escrevia" (conflito nas Anotações, desde 2026-10-23; mostrado no próprio bloco, não como erro de gravação)
+  - "As anotações têm {n} caracteres; o limite é 2.000." (desde 2026-10-23; a tela não deixa chegar a isso, mas o banco recusa)
 - **Estados:**
   - **Carregando:**
     - Quadro: "Carregando processos…", com colunas-fantasma;
@@ -461,6 +507,9 @@ O código é a identidade estável da etapa para as funcionalidades seguintes. P
 | observacoes | texto, até 2000 caracteres | não |
 | data_da_reuniao | data (nova em 2026-10-18; regras na spec de `reunioes`) | não |
 | criado_em | data e hora | sim |
+| anotacoes | texto, até 2000 caracteres; nulo quando vazio ou só com espaços (nova em 2026-10-23) | não |
+| anotacoes_alteradas_em | data e hora da última gravação das Anotações, preenchida pelo banco (nova em 2026-10-23) | só depois da primeira gravação |
+| anotacoes_alteradas_por | uuid, referência a `usuarios`, quem gravou por último, preenchido pelo banco (nova em 2026-10-23) | só depois da primeira gravação |
 
 O par (`macroprocesso_id`, `setor_id`) é uma referência a `setores_envolvidos` que recusa apagar. É ela que impede tirar de um macroprocesso um setor com processos ali, e garante que o setor do processo é sempre setor envolvido no macroprocesso dele.
 
@@ -505,11 +554,13 @@ A indicação "aguardando o setor" saiu da view em 2026-10-18. Desde a parte 4 (
 - A exclusão de um processo traz no "antes" todos os campos e a lista dos andamentos.
 - O evento de andamento guarda também o id do processo, para os filtros do histórico.
 - As ações de "voltar" geram um evento por andamento alterado.
+- As Anotações e as duas colunas da última alteração ficam fora do estado guardado nos eventos do processo (desde 2026-10-23, ADR 0021). Gravar só as Anotações não gera evento, porque o gatilho compara os dois estados; e o "antes" da exclusão do processo não traz o texto delas.
 
 **Dado pessoal e quem vê:**
 - `andamentos.responsavel_id` aponta para usuários, cujo nome todos os perfis ativos já veem.
 - Os eventos desta funcionalidade são lidos por todo perfil ativo. Os de usuários e autorizações seguem só do Administrador.
 - Com os responsáveis do setor apagados, a plataforma não guarda mais nome, e-mail e cargo de pessoas dos setores. Os eventos antigos deles (só dados inventados do desenvolvimento) ficam no histórico.
+- As Anotações (desde 2026-10-23) são texto livre e podem trazer nome e e-mail de pessoas dos setores. Por isso não entram na view `processos_com_andamento` (de onde leem o Quadro, a Lista e o pacote das planilhas), nem no pacote das planilhas, nem nos eventos. Só o verso as lê, direto da tabela `processos`, com o nome de quem alterou por último vindo de `usuarios`.
 
 **Privilégios padrão:** cada tabela nova nasce com `revoke all` de visitante e de logado e concede de volta só o necessário a logado, com a RLS decidindo o resto. A view nasce com `revoke all` de visitante. Assim o teste `10_privilegios_padrao` continua passando.
 
@@ -531,6 +582,9 @@ A indicação "aguardando o setor" saiu da view em 2026-10-18. Desde a parte 4 (
 | `processos` criar, alterar (inclusive a data da reunião), apagar | sim | sim | não | não | não |
 | `processos` alterar id, criado_em | não | não | não | não | não |
 | `processos` alterar tipo e pai fora da reclassificação | não | não | não | não | não |
+| `processos` ler as Anotações e a última alteração delas (desde 2026-10-23) | sim | sim | sim | não | não |
+| `processos` gravar as Anotações (pela função, em qualquer situação menos arquivado; desde 2026-10-23) | sim | sim | não | não | não |
+| `processos` alterar `anotacoes_alteradas_em` e `anotacoes_alteradas_por` direto | não (só o gatilho as preenche) | não | não | não | não |
 | `andamentos` ler | sim | sim | sim | não | não |
 | `andamentos` alterar status, nota, responsável, datas | sim | sim | não | não | não |
 | `andamentos` criar e apagar direto | não (só gatilhos e funções do catálogo e do cadastro) | não | não | não | não |
@@ -570,6 +624,12 @@ A indicação "aguardando o setor" saiu da view em 2026-10-18. Desde a parte 4 (
 | Etapa usada não se exclui; código não muda | referência de `andamentos` recusa apagar quando há andamento não pendente; gatilho | excluir etapa com andamento concluído recusado |
 | Toda mudança vira evento, com autor, antes, depois e motivo | gatilhos depois de incluir, alterar e apagar | cada ação gera o evento esperado; exclusão do processo traz os andamentos no "antes" |
 | Gravação sem mudança não vira evento | os gatilhos comparam antes e depois | salvar sem mudar nada não gera evento |
+| Anotações só se gravam se o texto no banco ainda é o que a pessoa tinha; senão, recusa de conflito sem mudar nada (desde 2026-10-23) | função de gravar as Anotações, que compara o texto atual com o recebido (nulo igual a nulo) | gravar com o texto esperado aceito; gravar depois que outra pessoa alterou recusado com o código de conflito e o texto dela intacto; primeira gravação com esperado nulo aceita |
+| Quem e quando da última alteração são do banco (desde 2026-10-23) | gatilho antes de alterar: quando as Anotações mudam, preenche `anotacoes_alteradas_por` com quem chama e `anotacoes_alteradas_em` com agora; recusa mudar as duas colunas sem mudar as Anotações | gravar preenche autor e hora; mudar só o autor recusado; gravar o mesmo texto não muda autor nem hora |
+| Anotações não viram evento (desde 2026-10-23, ADR 0021) | ficam fora do estado guardado nos eventos | gravar as Anotações não gera evento; editar o nome continua gerando, sem as Anotações no antes e depois |
+| Anotações até 2000 caracteres; só espaços grava nulo (desde 2026-10-23) | restrição e a função | 2001 caracteres recusado; texto só com espaços grava nulo |
+| Arquivado não tem as Anotações alteradas (desde 2026-10-23) | a trava do arquivado que já existe | gravar as Anotações de processo arquivado recusado; de suspenso, cancelado e concluído aceito |
+| Anotações fora da view e do pacote das planilhas (desde 2026-10-23) | a view e o pacote listam as colunas uma a uma | a view não tem coluna de Anotações; o pacote não traz o texto |
 
 As regras "etapas do setor antes das do processo", "nível não muda", "a primeira do processo exige as do setor resolvidas" e as de `responsaveis_do_setor` (e-mail no formato e em minúsculas) saíram em 2026-10-18, com as estruturas que protegiam.
 
@@ -625,6 +685,17 @@ Sem migração: nenhuma tabela, coluna, política, view ou função muda. O vers
 
 Não destrutiva: nenhuma tabela, coluna, política ou função muda; a tabela "quem pode o quê" continua a mesma. Uma migração nova recria a view `processos_com_andamento` com os campos acima acrescentados no fim (`create or replace view`, que mantém os campos atuais na mesma ordem), com `security_invoker = true` e o mesmo `revoke` de visitante. Como a view roda com a permissão de quem lê, ela só mostra versões, arquivos e subprocessos que o perfil já lê pelas próprias políticas (todo perfil ativo lê processos, andamentos, versões e arquivos da versão). O arrastar grava pela função de avanço da parte 2, sem nada novo no banco. Vai pelo workflow "Migrar banco de desenvolvimento" e entra no registro de `supabase/AMBIENTES.md`.
 
+#### Migração das Anotações (2026-10-23)
+
+Não destrutiva, numa migração nova:
+1. acrescenta a `processos` as colunas `anotacoes`, `anotacoes_alteradas_em` e `anotacoes_alteradas_por`, com as restrições da tabela acima;
+2. concede a logado a alteração só da coluna `anotacoes` (privilégio de coluna, como `data_da_reuniao` e `arquivado_em`); as duas colunas da última alteração não recebem privilégio de alteração, e o gatilho as preenche;
+3. cria o gatilho da última alteração;
+4. cria a função de gravar as Anotações (processo, texto esperado, texto novo), sem `security definer`, com a permissão de quem chama: grava só se o texto atual é o esperado e, senão, recusa com o código de conflito; devolve o texto gravado, o autor e a hora. A RLS de alteração de `processos` que já existe decide o perfil; a trava do arquivado que já existe recusa o arquivado;
+5. não toca a view `processos_com_andamento`, o pacote das planilhas nem `private.estado_do_processo`: as três listam as colunas uma a uma e já deixam as Anotações de fora.
+
+A tabela "quem pode o quê" ganha as linhas acima; o `10_privilegios_padrao` continua passando. Vai pelo workflow "Migrar banco de desenvolvimento" e entra no registro de `supabase/AMBIENTES.md`.
+
 ## Decisões de teste
 
 - **Bom teste** confere o que a pessoa vê e consegue fazer, ou o que o banco aceita e recusa, nunca detalhes internos.
@@ -679,11 +750,25 @@ Não destrutiva: nenhuma tabela, coluna, política ou função muda; a tabela "q
       - arrastar: o cartão arrastável só nos casos permitidos (não no suspenso, na etapa pendente, na última etapa, para a Consulta nem agrupado por responsável); soltar na coluna de destino abre a janela de avanço com o título dela; a coluna de destino quando a vizinha já está resolvida; confirmar move o cartão; Esc e [Cancelar] deixam tudo como estava; soltar em outra coluna mostra "Solte o cartão na coluna {etapa}."; a falha de gravação com a mensagem e nada mudado; o realce só na coluna de destino;
       - Agrupar por Responsável: colunas em ordem alfabética, "Sem responsável" no fim, pílula "Inativo", o nome da etapa no cartão, os filtros valendo, e o agrupamento no endereço (recarregar mantém);
       - Só os meus: liga e desliga, equivale ao filtro Responsável nos dois sentidos, ausente para a Consulta, e o vazio "Nenhum processo com você agora." com [Ver todos];
+    - Anotações (desde 2026-10-23), pelo aplicativo inteiro, como a pessoa usa, com o relógio simulado do Vitest para a pausa de 1 segundo:
+      - o bloco no alto da coluna direita, acima da Reunião, com o campo de nome "Anotações" e a dica no vazio;
+      - digitar e parar: "Salvando…", depois "Salvo", e o texto gravado na falsa; sair do campo grava sem esperar a pausa; digitar sem parar não grava a cada tecla;
+      - a linha "Alterado por {nome} em {dd/mm}, {hh:mm}" depois de gravar, e ausente no processo que nunca teve anotação;
+      - falha programada (inclusive de conexão): o aviso, o texto no campo e a nova tentativa na próxima pausa, que grava;
+      - conflito (a falsa altera o texto "como outra pessoa" no meio): o aviso, o texto de quem escrevia no campo, nenhuma nova tentativa ao digitar, e "Ver o texto atual" trazendo o texto e o autor da outra pessoa; depois disso, a gravação volta a funcionar;
+      - contagem ausente com 1.799 caracteres e presente com 1.800; o campo sem passar de 2.000;
+      - fechar o verso com texto pendente grava e fecha; com falha ou conflito, a confirmação, em que [Continuar escrevendo] mantém a janela e [Sair sem salvar] fecha; o mesmo ao abrir um subprocesso e ao abrir o Histórico;
+      - escrita em suspenso, cancelado e concluído; só leitura no arquivado;
+      - Consulta: texto só para ler, "Sem anotações." no vazio, sem campo;
+      - subprocesso com as suas Anotações, diferentes das do pai;
+      - o Histórico do processo sem nenhum evento depois de gravar as Anotações;
+      - o texto das Anotações ausente do cartão do Quadro e a busca da Lista sem encontrar por ele;
     - os testes de tela atuais que falam do painel (por exemplo `App.painelDoProcesso` e `App.andamentoDoProcesso`) são ajustados ao verso, mantendo os comportamentos que continuam valendo.
   - **Funções puras novas:** a busca sem acento e sem maiúsculas, a contagem de dias na etapa e o limite de 15 dias, o agrupamento do histórico por dia e a leitura e montagem do endereço com `busca` ganham testes unitários pequenos. Na parte 4: os selos de um processo (quais e em que ordem), a barra a partir do caminho, a coluna de destino do arrastar (ou nenhuma), as colunas agrupadas por responsável e o endereço com `agrupar`.
+  - **Anotações na falsa** (desde 2026-10-23): a implementação falsa do módulo de processos guarda as Anotações por processo, com autor e hora, imita a recusa de conflito comparando o texto esperado, recusa o arquivado e a Consulta como o banco, aceita falha programável e tem um gesto nomeado para "outra pessoa altera agora", usado nos testes de conflito.
   - **Arrastar nos testes:** os eventos nativos de arrastar e soltar disparados sobre o cartão e a coluna (o jsdom não faz o gesto, mas entrega os eventos), como a pessoa faria.
   - **Arte anterior:** os testes de tela de cadastros-basicos (`App.setores`, `App.macroprocessos`, `App.historicoDosCadastros`) e a janela de confirmação.
-- **Tradução entre o banco e a tela.** Testes pequenos do módulo de processos real com o cliente Supabase simulado. Eles provam que os códigos de recusa do banco viram as mensagens acima e que as linhas do banco e da view viram os tipos da tela (na parte 4, os campos novos da view, inclusive vazios). Arte anterior: os testes de `cadastrosSupabase` e `macroprocessosSupabase`.
+- **Tradução entre o banco e a tela.** Testes pequenos do módulo de processos real com o cliente Supabase simulado. Eles provam que os códigos de recusa do banco viram as mensagens acima e que as linhas do banco e da view viram os tipos da tela (na parte 4, os campos novos da view, inclusive vazios; desde 2026-10-23, a leitura das Anotações com o nome do autor, e a recusa de conflito virando um resultado próprio, separado das outras falhas). Arte anterior: os testes de `cadastrosSupabase` e `macroprocessosSupabase`.
 - **Funções puras** (filtros a partir do endereço, ordem das colunas, textos do histórico): testes unitários pequenos.
 - **Banco.**
   - **Testes:** pgTAP, um teste por célula da tabela "quem pode o quê" (com um usuário inventado de cada perfil, um inativo e um visitante) e um por regra da tabela de regras. As transições de estado ganham um teste cada.
@@ -692,6 +777,7 @@ Não destrutiva: nenhuma tabela, coluna, política ou função muda; a tabela "q
   - **Simplificação (2026-10-18):** os testes `15_etapas_do_setor` e `16_responsaveis_do_setor` são apagados; `17`, `18`, `19`, `20`, `21` e `22` são ajustados ao catálogo de 6 etapas sem nível (posições mudam: a Revisão interna passa de 6 a 3); um teste novo prova a migração (tabelas e colunas apagadas, catálogo renumerado e renomeado, setor novo sem andamento, Modelagem piloto inicia sem depender do setor, eventos antigos legíveis). Os testes da funcionalidade de documentos (`26` a `31`) que criam processos ou citam etapas pela posição também são conferidos.
   - **Parte 2 (2026-10-18):** um teste por linha nova da tabela de regras (avanço e trava do autor), e os testes de "voltar" ajustados à assinatura nova. A função de avanço também ganha os casos de perfil (Consulta, inativo e visitante recusados) e de processo suspenso.
   - **Parte 4 (2026-10-19):** um teste novo da view prova cada campo novo (início e status da etapa atual, caminho na ordem do catálogo, última versão histórica e não histórica, relatório presente e ausente, subprocesso cancelado fora da contagem, responsável inativo) e que a Consulta lê os mesmos valores; visitante e inativo continuam sem ler (o teste da view que já existe). O `10_privilegios_padrao` continua passando.
+  - **Anotações (2026-10-23):** um teste por linha nova da tabela "quem pode o quê" (cada perfil, inativo e visitante lendo e gravando; ninguém mudando direto o autor e a hora) e um por linha nova da tabela de regras (conflito, autor e hora pelo banco, sem evento, limite, só espaços, arquivado, fora da view e do pacote).
   - **Onde rodam:** os testes vêm antes da migração e rodam pelo GitHub Actions ("Testes de banco"). A migração vai pelo workflow "Migrar banco de desenvolvimento".
 - Todos os processos, setores e usuários dos testes são inventados.
 
@@ -708,7 +794,8 @@ Não destrutiva: nenhuma tabela, coluna, política ou função muda; a tabela "q
 - Campo "fase" (AS-IS ou TO-BE) no catálogo: quando existir a fase 2.
 - Mais de um nível de subprocesso.
 - Importação de processos: funcionalidade 10.
-- Edição simultânea do mesmo item por duas pessoas: vale a última gravação, e as regras de sequência continuam garantidas pelo banco.
+- Edição simultânea do mesmo item por duas pessoas: vale a última gravação, e as regras de sequência continuam garantidas pelo banco. A exceção são as Anotações (desde 2026-10-23), que recusam a gravação em conflito.
+- Anotações (2026-10-23): histórico das versões do texto (ADR 0021); ícone de anotação no cartão do Quadro e busca pelo texto das Anotações (para o backlog, se fizerem falta); atualização ao vivo do texto quando outra pessoa grava com o verso aberto (o conflito só aparece ao gravar); formatação (negrito, listas, links); Anotações nas etapas ou nas versões; Anotações nas planilhas e nos dashboards.
 - Registro de quem consultou (backlog).
 
 ## Observações
@@ -728,6 +815,7 @@ Não destrutiva: nenhuma tabela, coluna, política ou função muda; a tabela "q
   - `[visual]` (Parte 4.) O cartão normal fica limpo: a barra fina em cinza e azul e, no máximo, versão e subprocessos em texto neutro; só "{n} dias nesta etapa" e "Relatório pendente" têm cor (âmbar); os selos quebram de linha sem estourar a largura da coluna.
   - `[visual]` (Parte 4.) Durante o arrastar, só a coluna de destino ganha a borda tracejada azul; o cartão arrastado fica levemente apagado no lugar de origem.
   - `[visual]` (Parte 4.) Agrupado por responsável, as colunas têm o nome da pessoa (com "Inativo" quando cabe) e os cartões mostram o nome da etapa no lugar da foto; "Agrupar por" e "Só os meus" ficam na barra do Quadro, junto dos filtros.
+  - `[visual]` (Anotações, 2026-10-23.) O bloco Anotações é o primeiro da coluna direita, quieto como o resto do contexto: campo sem moldura pesada, "Salvando…" e "Salvo" pequenos e cinza ao lado do título, a linha "Alterado por" discreta abaixo; só a falha (vermelho) e o conflito (amarelo) têm cor; o campo cresce sem empurrar a janela para fora da tela e rola por dentro depois da altura máxima.
   - `[visual]` A Lista é uma tabela compacta, no padrão das listas de cadastros.
   - `[visual]` Para a Consulta, Quadro, Lista, painel, tela do setor e histórico não mostram campos editáveis nem botões de alteração.
   - `[visual]` As janelas de nota e de motivo seguem o padrão da janela de confirmação, com o campo de texto e o botão de confirmar desabilitado enquanto vazio.
@@ -761,6 +849,15 @@ Não destrutiva: nenhuma tabela, coluna, política ou função muda; a tabela "q
     - "Só os meus" é o filtro Responsável com o próprio id, sem parâmetro novo no endereço;
     - o arrastar usa o recurso nativo do navegador, sem biblioteca nova; por isso não funciona por toque, o que a sabatina queria;
     - [Limpar filtros] também desliga o "Só os meus" (é um filtro), mas mantém o agrupamento.
+  - **Anotações (2026-10-23):**
+    - a linha "Alterado por" aparece sempre que já houve uma gravação, inclusive quando alguém apagou todo o texto, porque, sem histórico, é o único rastro de quem apagou; só some no processo que nunca teve anotação gravada;
+    - a contagem aparece a partir de 1.800 caracteres ("perto do limite" da sabatina);
+    - o campo cresce até cerca de 12 linhas;
+    - fechar com texto pendente grava na hora e só pergunta se a gravação falhar ou houver conflito (perguntar sempre incomodaria a cada fechamento logo depois de digitar); vale também ao trocar o conteúdo da janela (pai, subprocesso, Histórico, Editar);
+    - no conflito, o salvamento automático para até "Ver o texto atual", para não repetir uma gravação que será recusada;
+    - o texto é lido ao abrir o verso e depois de "Ver o texto atual", sem atualização ao vivo;
+    - o texto se grava como digitado (sem tirar espaços das pontas), e só espaços contam como vazio;
+    - o "antes" do evento de exclusão do processo não traz as Anotações (seguem a mesma regra de ficar fora dos eventos).
   - **Entrega da parte 4 (2026-10-19):** o selo "Relatório pendente" compara a posição da Revisão interna no caminho do próprio processo (já na ordem do catálogo); processo sem a Revisão interna no caminho não ganha o selo.
 - **Tamanho:** a funcionalidade tem várias entregas. A sabatina permitiu deixar a Lista para um ticket posterior.
 - **Rede do escritório:** a migração vai pelo workflow "Migrar banco de desenvolvimento" e precisa ser registrada em `supabase/AMBIENTES.md` para o `migration repair` antes da primeira publicação em produção.
@@ -775,3 +872,5 @@ Entregue em 2026-10-19 (commit f3a12b3), com ressalva: critérios [visual] da pa
 Entregue em 2026-10-20 (commit 8a7efb7)
 
 Entregue em 2026-10-23 (commit ae1fb54), com ressalva: critérios [visual] da mudança de publicacao-e-arquivamento presumidos (a tela não foi vista); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
+
+Em revisão desde 2026-10-23
