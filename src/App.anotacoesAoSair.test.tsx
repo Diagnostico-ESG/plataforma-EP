@@ -50,6 +50,7 @@ test('o conflito avisa, mantém o texto, para de gravar e "Ver o texto atual" tr
   expect(falso.anotacoes.gravacoes).toHaveLength(1)
   fireEvent.click((await blocoDasAnotacoes()).getByRole('button', { name: 'Ver o texto atual' }))
   await waitFor(async () => expect(await valorDoCampo()).toBe('Do colega'))
+  await waitFor(async () => expect(document.activeElement).toBe(await campoDasAnotacoes()))
   expect((await blocoDasAnotacoes()).getByText('Alterado por Bia Teste em 13/10, 15:05')).toBeTruthy()
   await digitarNasAnotacoes('Do colega e eu')
   await passarAPausa()

@@ -84,6 +84,8 @@ function EditorDasAnotacoes({ idDoTitulo, inicial, processos, id, guardaRef, aoS
   }, [gravador, guardaRef])
   const campo = useCampoQueCresce(gravador.digitado)
   const contagem = contagemDasAnotacoes(gravador.digitado)
+  // O botão some quando o conflito se resolve: o foco volta ao campo, para o teclado não cair no fim da página.
+  const verTextoAtual = () => void gravador.verTextoAtual().then(() => campo.current?.focus())
   return (
     <>
       <CabecalhoDasAnotacoes idDoTitulo={idDoTitulo}><EstadoDasAnotacoes estado={gravador.estado} /></CabecalhoDasAnotacoes>
@@ -91,7 +93,7 @@ function EditorDasAnotacoes({ idDoTitulo, inicial, processos, id, guardaRef, aoS
         placeholder="Escreva aqui as anotações do processo" value={gravador.digitado}
         onChange={(mudanca) => gravador.digitar(mudanca.target.value)} onBlur={() => void gravador.sairDoCampo()} />
       {contagem && <p className="anotacoes-contagem">{contagem}</p>}
-      <AvisoDeConflito gravador={gravador} />
+      <AvisoDeConflito gravador={gravador} aoVerTextoAtual={verTextoAtual} />
       <QuemAlterouAsAnotacoes lidas={gravador.lidas} />
     </>
   )
@@ -99,21 +101,25 @@ function EditorDasAnotacoes({ idDoTitulo, inicial, processos, id, guardaRef, aoS
 
 const TEXTO_DO_ESTADO: Record<EstadoDaGravacao, string> = { ocioso: '', salvando: 'Salvando…', salvo: 'Salvo', falha: '', conflito: '' }
 
-// "Salvando…" e "Salvo" ficam numa região de status que já existe vazia (o leitor de tela a anuncia sem tirar o foco);
-// a falha entra como alerta, que é anunciado ao aparecer.
+// "Salvando…" e "Salvo" ficam numa região de status que nunca sai da tela (uma região que nasce já com texto não é
+// anunciada por vários leitores); o leitor a anuncia sem tirar o foco. A falha é um alerta à parte, anunciado ao aparecer.
 function EstadoDasAnotacoes({ estado }: { estado: EstadoDaGravacao }) {
-  if (estado === 'falha') {
-    return <span role="alert" className="anotacoes-falha">Não foi possível salvar. Seu texto continua aqui</span>
-  }
-  return <span role="status" className="anotacoes-estado">{TEXTO_DO_ESTADO[estado]}</span>
+  return (
+    <>
+      <span role="status" className="anotacoes-estado">{TEXTO_DO_ESTADO[estado]}</span>
+      {estado === 'falha' && <span role="alert" className="anotacoes-falha">Não foi possível salvar. Seu texto continua aqui</span>}
+    </>
+  )
 }
 
-function AvisoDeConflito({ gravador }: { gravador: GravadorDeAnotacoes }) {
+type AvisoDeConflitoProps = { gravador: GravadorDeAnotacoes; aoVerTextoAtual: () => void }
+
+function AvisoDeConflito({ gravador, aoVerTextoAtual }: AvisoDeConflitoProps) {
   if (gravador.estado !== 'conflito') return null
   return (
     <div className="anotacoes-conflito" role="alert">
       <p>Outra pessoa alterou as anotações enquanto você escrevia</p>
-      <button type="button" className="botao botao-secundario" onClick={() => void gravador.verTextoAtual()}>Ver o texto atual</button>
+      <button type="button" className="botao botao-secundario" onClick={aoVerTextoAtual}>Ver o texto atual</button>
     </div>
   )
 }
