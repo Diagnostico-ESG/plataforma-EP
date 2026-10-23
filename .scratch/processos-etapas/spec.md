@@ -857,7 +857,8 @@ A tabela "quem pode o quê" ganha as linhas acima; o `10_privilegios_padrao` con
     - no conflito, o salvamento automático para até "Ver o texto atual", para não repetir uma gravação que será recusada;
     - o texto é lido ao abrir o verso e depois de "Ver o texto atual", sem atualização ao vivo;
     - o texto se grava como digitado (sem tirar espaços das pontas), e só espaços contam como vazio;
-    - o "antes" do evento de exclusão do processo não traz as Anotações (seguem a mesma regra de ficar fora dos eventos).
+    - o "antes" do evento de exclusão do processo não traz as Anotações (seguem a mesma regra de ficar fora dos eventos);
+    - entregue em 2026-10-23: o botão Voltar do navegador troca o endereço sem passar pelo verso e **não** guarda a saída (só o botão de fechar, o Esc, o pai ou o subprocesso, o Histórico, o Editar e o aviso do navegador ao fechar a aba ou recarregar); a falha de gravação mostra sempre a frase fixa, qualquer que seja o motivo, e some quando o texto volta ao que já está gravado; sem o nome de quem alterou (gravação feita direto no banco), a linha diz "Alterado em {dd/mm}, {hh:mm}"; ao abrir, o bloco mostra "Carregando as anotações…" e, se a leitura falhar, o erro com [Tentar de novo]; depois de "Ver o texto atual" o foco volta ao campo; o limite de 2.000 conta unidades do navegador no campo e caracteres no banco (texto com emoji é cortado um pouco antes do limite real).
   - **Entrega da parte 4 (2026-10-19):** o selo "Relatório pendente" compara a posição da Revisão interna no caminho do próprio processo (já na ordem do catálogo); processo sem a Revisão interna no caminho não ganha o selo.
 - **Tamanho:** a funcionalidade tem várias entregas. A sabatina permitiu deixar a Lista para um ticket posterior.
 - **Rede do escritório:** a migração vai pelo workflow "Migrar banco de desenvolvimento" e precisa ser registrada em `supabase/AMBIENTES.md` para o `migration repair` antes da primeira publicação em produção.
