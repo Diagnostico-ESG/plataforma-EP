@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opções para a etapa</title>
+<style>
+:root{--fundo:#edf1f9;--folha:#fff;--linha:#e1e6ef;--texto:#1e2433;--texto-2:#5d6577;--mudo:#8c93a3;--trilho:#e6e9f0;--cheio:#6b7180}
+*{box-sizing:border-box}
+body{margin:0;padding:16px;background:var(--fundo);font-family:'Source Sans 3',system-ui,sans-serif;color:var(--texto)}
+h1{font-size:18px;margin:0 0 4px}
+.sub{font-size:13px;color:var(--texto-2);margin:0 0 8px}
+h2{font-size:15px;margin:22px 0 2px}
+.desc{font-size:13px;color:var(--texto-2);margin:0 0 8px}
+.grade{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.card{background:var(--folha);border:1px solid var(--linha);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.nm{font-size:15px;font-weight:600;line-height:1.3}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.ni{background:#eef0f4;color:#4a5163}.ea{background:#ffe9d1;color:#9a4a06}.co{background:#ddf3e1;color:#22703a}
+.av{width:22px;height:22px;border-radius:50%;background:#e8edff;color:#2a44c9;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
+.et{font-size:12px;color:var(--texto-2);display:flex;justify-content:space-between;gap:8px}
+.et b{color:var(--texto);font-weight:600}
+.seg{display:grid;grid-template-columns:repeat(8,1fr);gap:3px}
+.seg i{height:6px;border-radius:2px;background:var(--trilho)}
+.seg i.c{background:var(--cheio)}
+.seg i.a{background:var(--cheio);opacity:.45}
+.cont{height:6px;border-radius:3px;background:var(--trilho);overflow:hidden}
+.cont i{display:block;height:100%;background:var(--cheio);border-radius:3px}
+.trilha{display:flex;align-items:center}
+.trilha i{width:9px;height:9px;border-radius:50%;background:var(--trilho);flex:none}
+.trilha i.c{background:var(--cheio)}
+.trilha i.a{width:13px;height:13px;background:#fff;border:3px solid var(--cheio)}
+.trilha s{flex:1;height:2px;background:var(--trilho)}
+.trilha s.c{background:var(--cheio)}
+.legenda{background:var(--folha);border:1px solid var(--linha);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--texto-2);display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+</style>
+</head>
+<body>
+<h1>Etapa como barra de progresso, etiqueta em cor suave</h1>
+<p class="sub">Cartões da visualização por setores; dados inventados. Ordem das etapas: 1 Identificados, 2 Modelagem piloto, 3 Modelagem técnica e relatório, 4 Revisão interna, 5 Validação com o setor, 6 Aprovação, 7 Publicação, 8 Concluídos.</p>
+
+<div class="legenda"><b>Etiquetas:</b>
+ <span class="tag ni"><span class="dot"></span>A fazer</span><span class="tag ea"><span class="dot"></span>Em andamento</span><span class="tag co"><span class="dot"></span>Concluído</span>
+</div>
+
+<h2>A. Barra em blocos</h2>
+<p class="desc">Um bloco por etapa. Os anteriores ficam cheios, o atual meio cheio. Nome da etapa e posição acima da barra.</p>
+<div class="grade">
+ <div class="card"><div class="nm">Concessão de diárias</div><div class="et"><b>Modelagem piloto</b><span>2 de 8</span></div><div class="seg"><i class="c"></i><i class="a"></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="row"><span class="tag ea"><span class="dot"></span>Em andamento</span><span class="av">AM</span></div></div>
+ <div class="card"><div class="nm">Gestão de contratos</div><div class="et"><b>Revisão interna</b><span>4 de 8</span></div><div class="seg"><i class="c"></i><i class="c"></i><i class="c"></i><i class="a"></i><i></i><i></i><i></i><i></i></div><div class="row"><span class="tag co"><span class="dot"></span>Concluído</span><span class="av">JL</span></div></div>
+ <div class="card"><div class="nm">Suprimento de fundos</div><div class="et"><b>Validação com o setor</b><span>5 de 8</span></div><div class="seg"><i class="c"></i><i class="c"></i><i class="c"></i><i class="c"></i><i class="a"></i><i></i><i></i><i></i></div><div class="row"><span class="tag ni"><span class="dot"></span>A fazer</span><span class="av">RS</span></div></div>
+</div>
+
+<h2>B. Barra contínua</h2>
+<p class="desc">Uma barra fina que enche até a etapa atual. Mais limpa; a posição exata fica no número.</p>
+<div class="grade">
+ <div class="card"><div class="nm">Concessão de diárias</div><div class="et"><b>Modelagem piloto</b><span>2 de 8</span></div><div class="cont"><i style="width:25%"></i></div><div class="row"><span class="tag ea"><span class="dot"></span>Em andamento</span><span class="av">AM</span></div></div>
+ <div class="card"><div class="nm">Gestão de contratos</div><div class="et"><b>Revisão interna</b><span>4 de 8</span></div><div class="cont"><i style="width:50%"></i></div><div class="row"><span class="tag co"><span class="dot"></span>Concluído</span><span class="av">JL</span></div></div>
+ <div class="card"><div class="nm">Suprimento de fundos</div><div class="et"><b>Validação com o setor</b><span>5 de 8</span></div><div class="cont"><i style="width:62.5%"></i></div><div class="row"><span class="tag ni"><span class="dot"></span>A fazer</span><span class="av">RS</span></div></div>
+</div>
+
+<h2>C. Trilha de estações</h2>
+<p class="desc">Como linha de metrô: um ponto por etapa, ligados por um traço; o ponto atual é um anel maior.</p>
+<div class="grade">
+ <div class="card"><div class="nm">Concessão de diárias</div><div class="et"><b>Modelagem piloto</b><span>2 de 8</span></div><div class="trilha"><i class="c"></i><s class="c"></s><i class="a"></i><s></s><i></i><s></s><i></i><s></s><i></i><s></s><i></i><s></s><i></i><s></s><i></i></div><div class="row"><span class="tag ea"><span class="dot"></span>Em andamento</span><span class="av">AM</span></div></div>
+ <div class="card"><div class="nm">Gestão de contratos</div><div class="et"><b>Revisão interna</b><span>4 de 8</span></div><div class="trilha"><i class="c"></i><s class="c"></s><i class="c"></i><s class="c"></s><i class="c"></i><s class="c"></s><i class="a"></i><s></s><i></i><s></s><i></i><s></s><i></i><s></s><i></i></div><div class="row"><span class="tag co"><span class="dot"></span>Concluído</span><span class="av">JL</span></div></div>
+ <div class="card"><div class="nm">Suprimento de fundos</div><div class="et"><b>Validação com o setor</b><span>5 de 8</span></div><div class="trilha"><i class="c"></i><s class="c"></s><i class="c"></i><s class="c"></s><i class="c"></i><s class="c"></s><i class="c"></i><s class="c"></s><i class="a"></i><s></s><i></i><s></s><i></i><s></s><i></i></div><div class="row"><span class="tag ni"><span class="dot"></span>A fazer</span><span class="av">RS</span></div></div>
+</div>
+
+<p style="font-size:12px;color:var(--mudo);margin-top:18px">Barra em cinza neutro (sem azul). Como o andamento é livre, a barra mostra só a posição da etapa atual no catálogo, não etapas "feitas".</p>
+</body>
+</html>
