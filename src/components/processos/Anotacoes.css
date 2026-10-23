@@ -1,0 +1,64 @@
+/* O bloco Anotações, o primeiro da coluna direita do verso: quieto, só a falha (vermelho) e o conflito (amarelo) têm cor. */
+.anotacoes-cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--esp-1) var(--esp-3);
+}
+
+.anotacoes-estado {
+  color: var(--texto-2);
+  font-size: var(--tam-secundario);
+}
+
+.anotacoes-campo {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 3.5em;
+  /* cerca de 12 linhas; depois disso o campo rola por dentro e não empurra a janela */
+  max-height: 18em;
+  padding: var(--esp-2);
+  overflow-y: auto;
+  resize: none;
+  font: inherit;
+  line-height: 1.5;
+}
+
+.anotacoes-contagem,
+.anotacoes-autor {
+  margin: 0;
+  color: var(--texto-2);
+  font-size: var(--tam-secundario);
+}
+
+.anotacoes-contagem {
+  text-align: right;
+}
+
+.anotacoes-texto {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.anotacoes-vazio {
+  margin: 0;
+  color: var(--texto-2);
+}
+
+.anotacoes-conflito {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--esp-2);
+  padding: var(--esp-3);
+  border: 1px solid var(--pendencia-borda);
+  border-radius: var(--canto);
+  background: var(--pendencia-fundo);
+  color: var(--vencendo-texto);
+}
+
+.anotacoes-conflito p {
+  margin: 0;
+}

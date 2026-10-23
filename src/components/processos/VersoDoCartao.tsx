@@ -4,6 +4,7 @@ import { CadastroInexistente } from '../../cadastros/cadastroInexistente'
 import type { ModuloDeCadastros } from '../../cadastros/tipos'
 import { type EstadoDoCarregamento, useCarregamento } from '../../hooks/useCarregamento'
 import { type Executar, useGravacaoComFalha } from '../../hooks/useGravacaoComFalha'
+import { type SaidaComAnotacoes, useSaidaComAnotacoes } from '../../hooks/useSaidaComAnotacoes'
 import type { DadosDoProcesso, ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
@@ -11,6 +12,7 @@ import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { ItemInexistente } from '../cadastros/ItemInexistente'
 import { SecaoDeVersoes } from '../versoes/SecaoDeVersoes'
 import { AcoesDoProcesso } from './AcoesDoProcesso'
+import { BlocoDasAnotacoes } from './BlocoDasAnotacoes'
 import { BotaoFecharJanela, CabecalhoDoVerso } from './CabecalhoDoVerso'
 import { CabecalhoDoFormulario } from './CabecalhoDoFormulario'
 import { CaminhoDoProcesso } from './CaminhoDoProcesso'
@@ -48,6 +50,7 @@ export function VersoDoCartao(props: VersoDoCartaoProps) {
   const ler = useCallback(() => processos.lerProcesso(id), [processos, id])
   const { estado, tentarDeNovo, recarregar } = useCarregamento(ler)
   const [sumiu, setSumiu] = useState<string | null>(null)
+  const saida = useSaidaComAnotacoes()
   const [aberto, setAberto] = useState<{ id: string; modo: ModoDoVerso }>({ id, modo: 'verso' })
   // Trocar de processo (pai, subprocesso) volta ao verso: o modo guarda de quem ele é.
   const modo = aberto.id === id ? aberto.modo : 'verso'
@@ -61,7 +64,7 @@ export function VersoDoCartao(props: VersoDoCartaoProps) {
   return (
     <JanelaDoVerso rotulo={rotulo} aoFechar={aoFechar} aoCancelar={modo === 'verso' ? aoFechar : () => aoMudarModo('verso')}
       estreita={atual.tipo === 'pronto' && modo === 'editar'}>
-      <ConteudoDoVerso {...props} modo={modo} aoMudarModo={aoMudarModo} estado={atual} aoTentarDeNovo={tentarDeNovo} aoAtualizar={recarregar} aoSumir={aoSumir} />
+      <ConteudoDoVerso {...props} saida={saida} modo={modo} aoMudarModo={aoMudarModo} estado={atual} aoTentarDeNovo={tentarDeNovo} aoAtualizar={recarregar} aoSumir={aoSumir} />
     </JanelaDoVerso>
   )
 }
@@ -76,6 +79,7 @@ function estadoDoVerso(
 }
 
 type ConteudoProps = VersoDoCartaoProps & {
+  saida: SaidaComAnotacoes
   modo: ModoDoVerso
   aoMudarModo: (modo: ModoDoVerso) => void
   estado: EstadoDoCarregamento<ProcessoLido | null>
@@ -113,7 +117,7 @@ function SemProcesso({ aoFechar, children }: { aoFechar: () => void; children: R
 type ModoDoVerso = 'verso' | 'historico' | 'editar'
 
 type ProcessoAbertoProps = VersoDoCartaoProps & {
-  processo: ProcessoLido; modo: ModoDoVerso; aoMudarModo: (modo: ModoDoVerso) => void; aoAtualizar: () => void; aoSumir: () => void
+  saida: SaidaComAnotacoes; processo: ProcessoLido; modo: ModoDoVerso; aoMudarModo: (modo: ModoDoVerso) => void; aoAtualizar: () => void; aoSumir: () => void
 }
 
 function ProcessoAberto(props: ProcessoAbertoProps) {
@@ -202,6 +206,8 @@ function ColunasDoVerso(props: CorpoProps) {
         <SecaoDeVersoes versoes={versoes} processo={processo} podeAlterar={alteravel} />
       </div>
       <div className="verso-contexto">
+        <BlocoDasAnotacoes key={processo.id} processo={processo} processos={processos} podeEscrever={alteravel}
+          guardaRef={props.saida.guarda} aoSumir={aoSumir} />
         <ReuniaoDoProcesso processo={processo} processos={processos} podeAlterar={alteravel} aoMudar={aposMudar}
           aoSumir={aoSumir} />
         <SobreDoProcesso processo={processo} />
