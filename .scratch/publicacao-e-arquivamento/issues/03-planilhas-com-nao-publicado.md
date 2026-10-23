@@ -26,3 +26,5 @@ Spec: histórias 38 a 40.
 - [ ] "Dispensada" não aparece mais como situação de fase.
 - [ ] Testes unitários das funções puras (fases, situação do processo, interna e pública) cobrindo os casos acima.
 - [ ] Depois da republicação da função, uma atualização pela aba Planilhas mostra "Não publicado" num processo de teste. Esta conferência é sua.
+
+Concluído em 2026-10-22 (commit 9e24067)
