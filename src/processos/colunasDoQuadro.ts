@@ -19,7 +19,8 @@ function processosDoQuadro(processos: ProcessoDaLista[]): ProcessoDaLista[] {
 }
 
 function colunaDosConcluidos(processos: ProcessoDaLista[]): ColunaDoQuadro {
-  const concluidos = processos.filter((processo) => processo.situacao === 'concluido').sort(porNome)
+  // O arquivado continua concluído, mas sai do Quadro: fica só na Lista.
+  const concluidos = processos.filter((processo) => processo.situacao === 'concluido' && !processo.arquivadoEm).sort(porNome)
   return { chave: CHAVE_DOS_CONCLUIDOS, titulo: TITULO_DOS_CONCLUIDOS, processos: concluidos }
 }
 

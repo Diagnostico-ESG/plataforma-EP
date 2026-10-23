@@ -39,6 +39,16 @@ test('ida e volta com todos os filtros', () => {
   expect(montarEnderecoDosProcessos(lerEnderecoDosProcessos(endereco))).toBe(endereco)
 })
 
+test('arquivados: "esconder" vem e vai para o endereço só na Lista; outro valor vale como "Mostrar"', () => {
+  expect(lerEnderecoDosProcessos('#/processos/lista?arquivados=esconder').filtros).toEqual({ ...SEM_FILTROS, arquivados: 'esconder' })
+  expect(lerEnderecoDosProcessos('#/processos/lista?arquivados=xyz').filtros).toEqual(SEM_FILTROS)
+  expect(lerEnderecoDosProcessos('#/processos?arquivados=esconder').filtros).toEqual(SEM_FILTROS)
+  const filtros = { ...SEM_FILTROS, setor: 's1', arquivados: 'esconder' as const }
+  expect(montarEnderecoDosProcessos({ visao: 'lista', aberto: null, filtros, agrupar: 'etapa' }))
+    .toBe('#/processos/lista?setor=s1&arquivados=esconder')
+  expect(montarEnderecoDosProcessos({ visao: 'quadro', aberto: null, filtros, agrupar: 'etapa' })).toBe('#/processos?setor=s1')
+})
+
 test('a busca vem da consulta, só na Lista, e endereço sem busca continua valendo', () => {
   expect(lerEnderecoDosProcessos('#/processos/lista?busca=pagar%20di').filtros).toEqual({ ...SEM_FILTROS, busca: 'pagar di' })
   expect(lerEnderecoDosProcessos('#/processos?busca=pagar').filtros).toEqual(SEM_FILTROS)

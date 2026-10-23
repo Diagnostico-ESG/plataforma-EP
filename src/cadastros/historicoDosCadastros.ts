@@ -29,11 +29,17 @@ const TEXTO_DA_ACAO_DO_PROCESSO: Record<string, string> = {
   ...TEXTO_DA_ACAO, suspender: 'Suspendeu', cancelar: 'Cancelou', retomar: 'Retomou', reclassificar: 'Reclassificou',
   escolher_publicacao: 'Respondeu se o processo vai para publicação',
   apagar_escolha_de_publicacao: 'Apagou a escolha de publicação ao voltar a uma etapa',
+  nao_vai_mais_para_publicacao: 'Registrou que o processo não vai mais para publicação',
+  registrar_publicacao: 'Registrou a publicação',
+  arquivar: 'Arquivou o processo',
+  desarquivar: 'Desarquivou o processo',
 }
 
-// O texto livre do evento é nota (dispensar, realizada anteriormente) ou motivo (voltar, a situação do processo e a
-// reclassificação, e a escolha de publicação apagada pela volta).
-const ACOES_COM_MOTIVO = new Set(['voltar', 'suspender', 'cancelar', 'retomar', 'reclassificar', 'apagar_escolha_de_publicacao'])
+// O texto livre do evento é nota (dispensar, realizada anteriormente, publicação registrada) ou motivo (voltar, a
+// situação do processo e a reclassificação, a escolha de publicação apagada pela volta e a desistência da publicação).
+const ACOES_COM_MOTIVO = new Set([
+  'voltar', 'suspender', 'cancelar', 'retomar', 'reclassificar', 'apagar_escolha_de_publicacao', 'nao_vai_mais_para_publicacao',
+])
 
 export function rotuloDoMotivo(acao: string): string {
   return ACOES_COM_MOTIVO.has(acao) ? 'Motivo' : 'Nota'
@@ -82,7 +88,7 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   versao_revisada: 'Versão revisada', versao_corrigida: 'Versão corrigida', resultado: 'Resultado', escopo: 'Escopo',
   comentario: 'Comentário', revisor_nome: 'Revisor', revisada_em: 'Data da revisão',
   versao: 'Versão aprovada', numero_eprotocolo: 'Número do E-protocolo', link: 'Link', aprovada_em: 'Data da aprovação',
-  registrada_por_nome: 'Registrada por', vai_para_publicacao: 'Vai para publicação',
+  registrada_por_nome: 'Registrada por', vai_para_publicacao: 'Vai para publicação', publicado_em: 'Data da publicação',
 }
 
 // Os ids existem para o filtro; quem lê o histórico vê a sigla e o nome. Código e nome da etapa já estão no título.
@@ -158,7 +164,7 @@ function itemDaLista(item: unknown): string {
 }
 
 // As datas do andamento, a da reunião do processo e a da revisão aparecem em DD/MM/AAAA.
-const CAMPOS_DE_DATA = new Set(['iniciada_em', 'resolvida_em', 'data_da_reuniao', 'revisada_em', 'aprovada_em'])
+const CAMPOS_DE_DATA = new Set(['iniciada_em', 'resolvida_em', 'data_da_reuniao', 'revisada_em', 'aprovada_em', 'publicado_em'])
 
 // Campos do andamento (status pelo rótulo da tela) e as datas; null se não for deles.
 function valorDaEtapa(campo: string, valor: unknown): string | null {

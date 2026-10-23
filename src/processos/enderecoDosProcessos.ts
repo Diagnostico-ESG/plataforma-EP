@@ -13,6 +13,8 @@ export type FiltrosDosProcessos = {
   situacao: SituacaoDoProcesso | null
   /** Só na Lista: trecho do nome do processo. */
   busca: string | null
+  /** Só na Lista: null mostra os arquivados (o padrão); 'esconder' os tira. */
+  arquivados: 'esconder' | null
 }
 
 export type AgruparQuadroPor = 'etapa' | 'responsavel'
@@ -26,11 +28,12 @@ export type EnderecoDosProcessos = {
 }
 
 export const SEM_FILTROS: FiltrosDosProcessos = {
-  setor: null, macroprocesso: null, etapa: null, tipo: null, responsavel: null, situacao: null, busca: null,
+  setor: null, macroprocesso: null, etapa: null, tipo: null, responsavel: null, situacao: null, busca: null, arquivados: null,
 }
 
 // A ordem fixa deixa o mesmo filtro sempre com o mesmo endereço, para recarregar ou compartilhar.
-const NOMES_DOS_FILTROS = ['setor', 'macroprocesso', 'etapa', 'tipo', 'responsavel', 'situacao', 'busca'] as const
+const NOMES_DOS_FILTROS = ['setor', 'macroprocesso', 'etapa', 'tipo', 'responsavel', 'situacao', 'busca', 'arquivados'] as const
+const SO_DA_LISTA = new Set<string>(['situacao', 'busca', 'arquivados'])
 const TIPOS = new Set<string>(['processo', 'subprocesso', 'a_classificar'])
 const SITUACOES = new Set<string>(['em_andamento', 'suspenso', 'cancelado', 'concluido'])
 
@@ -56,6 +59,7 @@ function filtrosDaConsulta(consulta: URLSearchParams, visao: VisaoDosProcessos):
     tipo: conhecido('tipo', TIPOS) as TipoDeProcesso | null, responsavel: valor('responsavel'),
     situacao: visao === 'lista' ? conhecido('situacao', SITUACOES) as SituacaoDoProcesso | null : null,
     busca: visao === 'lista' ? valor('busca') : null,
+    arquivados: visao === 'lista' && valor('arquivados') === 'esconder' ? 'esconder' : null,
   }
 }
 
@@ -68,8 +72,7 @@ export function montarEnderecoDosProcessos({ visao, aberto, filtros, agrupar }: 
   const trechos = ['#/processos', visao === 'lista' ? 'lista' : null, aberto].filter((trecho) => trecho !== null)
   const consulta = new URLSearchParams()
   for (const nome of NOMES_DOS_FILTROS) {
-    const soDaLista = nome === 'situacao' || nome === 'busca'
-    const valor = soDaLista && visao === 'quadro' ? null : filtros[nome]
+    const valor = SO_DA_LISTA.has(nome) && visao === 'quadro' ? null : filtros[nome]
     if (valor) consulta.set(nome, valor)
   }
   if (visao === 'quadro' && agrupar === 'responsavel') consulta.set('agrupar', 'responsavel')

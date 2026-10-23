@@ -214,6 +214,26 @@ describe('situação do processo no histórico', () => {
   })
 })
 
+describe('desistência, publicação registrada e arquivamento no histórico', () => {
+  test('textos das ações novas do processo', () => {
+    const acoes = ['nao_vai_mais_para_publicacao', 'registrar_publicacao', 'arquivar', 'desarquivar']
+    expect(acoes.map((acao) => textoDaAcaoDoCadastro(acao, 'processo'))).toEqual([
+      'Registrou que o processo não vai mais para publicação', 'Registrou a publicação', 'Arquivou o processo',
+      'Desarquivou o processo',
+    ])
+  })
+
+  test('o texto livre da desistência se chama Motivo e o do registro, Nota', () => {
+    expect(rotuloDoMotivo('nao_vai_mais_para_publicacao')).toBe('Motivo')
+    expect(rotuloDoMotivo('registrar_publicacao')).toBe('Nota')
+  })
+
+  test('a data da publicação sai em DD/MM/AAAA', () => {
+    expect(descreverEstadoDoCadastro({ vai_para_publicacao: true, publicado_em: '2026-10-17' }))
+      .toBe('Vai para publicação: Sim; Data da publicação: 17/10/2026')
+  })
+})
+
 describe('reclassificação no histórico', () => {
   test('"Reclassificou", com o texto livre chamado Motivo', () => {
     expect(textoDaAcaoDoCadastro('reclassificar', 'processo')).toBe('Reclassificou')

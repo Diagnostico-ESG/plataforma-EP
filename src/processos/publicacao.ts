@@ -1,11 +1,11 @@
 import { voltaDesfazAprovacao } from '../revisoes/conferirAprovacao'
 import { formatarData } from './caminhoDeEtapas'
+import { CODIGO_DA_APROVACAO, CODIGO_DA_PUBLICACAO } from './codigosDasEtapas'
 import type { AcaoDeAvanco } from './gravarAcoes'
 import type { ProcessoDaLista } from './tipos'
 
-// A escolha de publicação (ADR 0020): os códigos das etapas e a chave da coluna do Quadro num ponto só.
-export const CODIGO_DA_APROVACAO = 'aprovacao_setor'
-export const CODIGO_DA_PUBLICACAO = 'publicacao'
+// A escolha de publicação (ADR 0020): a chave da coluna do Quadro num ponto só (os códigos vêm de codigosDasEtapas).
+export { CODIGO_DA_APROVACAO, CODIGO_DA_PUBLICACAO }
 export const CHAVE_DOS_CONCLUIDOS = 'concluidos'
 export const TITULO_DOS_CONCLUIDOS = 'Concluídos'
 

@@ -155,14 +155,15 @@ test('sem etapa pendente depois, Concluir grava direto e o processo fica conclu�
   expect(falso.chamadas).toEqual([{ acao: 'concluir', id: 'a5', usuarioId: null }])
 })
 
+// Uma etapa opcional inventada: a Publicação, a opcional do catálogo, não se dispensa (App.naoVaiMaisParaPublicacao).
 test('sem etapa pendente depois, Dispensar mostra só a nota', async () => {
-  const falso = montar([MODELAGEM_CONCLUIDA, { ...PUBLICACAO, obrigatoria: false }])
-  await clicar('Publicação', 'Dispensar')
-  const aberta = janela('Dispensar a etapa Publicação?')
+  const falso = montar([MODELAGEM_CONCLUIDA, doProcesso(9, 'divulgacao', 'Divulgação', { obrigatoria: false })])
+  await clicar('Divulgação', 'Dispensar')
+  const aberta = janela('Dispensar a etapa Divulgação?')
   expect(aberta.queryByRole('radiogroup')).toBeNull()
   fireEvent.change(aberta.getByLabelText('Nota'), { target: { value: 'Sem publicação' } })
   fireEvent.click(aberta.getByRole('button', { name: 'Dispensar' }))
-  expect(await linha('Publicação', 'dispensada')).toBeTruthy()
+  expect(await linha('Divulgação', 'dispensada')).toBeTruthy()
   expect(falso.chamadas).toEqual([{ acao: 'dispensar', id: 'a9', nota: 'Sem publicação', usuarioId: null }])
 })
 

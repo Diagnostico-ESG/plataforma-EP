@@ -42,6 +42,14 @@ test('cada filtro sozinho', () => {
   expect(nomes({ situacao: 'suspenso' })).toEqual(['Épsilon'])
 })
 
+test('arquivados: "esconder" tira o arquivado; sem o filtro ele aparece', () => {
+  const arquivado = processo('Zeta', { situacao: 'concluido', etapaAtual: null, arquivadoEm: '2026-10-22T15:00:00+00:00' })
+  const todos = [...PROCESSOS, arquivado]
+  expect(filtrarProcessos(todos, { ...SEM_FILTROS, arquivados: 'esconder' }).map((p) => p.nome)).not.toContain('Zeta')
+  expect(filtrarProcessos(todos, SEM_FILTROS).map((p) => p.nome)).toContain('Zeta')
+  expect(temFiltro({ ...SEM_FILTROS, arquivados: 'esconder' })).toBe(true)
+})
+
 test('etapa: pega quem está na etapa atual escolhida', () => {
   expect(nomes({ etapa: 'modelagem' })).toEqual(['Alfa', 'Beta'])
 })

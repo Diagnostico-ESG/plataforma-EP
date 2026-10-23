@@ -1,3 +1,4 @@
+import { CODIGO_DA_PUBLICACAO } from './codigosDasEtapas'
 import type { EtapaDoProcesso, EtapaDoCaminho, StatusDaEtapa, UltimaVersao, UsuarioResponsavel } from './tipos'
 
 export type AcaoDaEtapa = 'iniciar' | 'concluir' | 'dispensar' | 'realizada' | 'voltar'
@@ -31,7 +32,8 @@ export function acoesDaEtapa(etapas: EtapaDoCaminho[], indice: number): AcaoDaEt
   const etapa = etapas[indice]
   if (indice !== atual) return RESOLVIDOS.has(etapa.status) && (atual === -1 || indice < atual) ? ['voltar'] : []
   const avancar: AcaoDaEtapa = etapa.status === 'pendente' ? 'iniciar' : 'concluir'
-  return etapa.obrigatoria ? [avancar, 'realizada'] : [avancar, 'dispensar', 'realizada']
+  // A Publicação não se dispensa: quem desiste usa "Não vai mais para publicação" (ADR 0020).
+  return etapa.obrigatoria || etapa.codigo === CODIGO_DA_PUBLICACAO ? [avancar, 'realizada'] : [avancar, 'dispensar', 'realizada']
 }
 
 /** A etapa que o avanço inicia: a primeira pendente depois da do índice, pulando as já resolvidas. O banco decide de novo. */

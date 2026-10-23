@@ -31,6 +31,11 @@ describe('ações da etapa', () => {
     expect(acoesDaEtapa([etapa(1, 'concluida'), etapa(2, 'em_andamento', true)], 1)).toEqual(['concluir', 'realizada'])
   })
 
+  test('a Publicação, opcional, não oferece dispensar (ADR 0020)', () => {
+    const publicacao = { ...etapa(2, 'em_andamento'), codigo: 'publicacao' }
+    expect(acoesDaEtapa([etapa(1, 'concluida'), publicacao], 1)).toEqual(['concluir', 'realizada'])
+  })
+
   test('a pendente depois da atual não tem ação', () => {
     const etapas = [etapa(1, 'concluida'), etapa(2, 'pendente'), etapa(3, 'pendente')]
     expect(acoesDaEtapa(etapas, 2)).toEqual([])

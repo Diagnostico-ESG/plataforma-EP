@@ -31,6 +31,7 @@ const CONFERENCIAS: Record<keyof FiltrosDosProcessos, (processo: ProcessoDaLista
   responsavel: (processo, valor) => processo.responsavel?.id === valor,
   situacao: (processo, valor) => processo.situacao === valor,
   busca: (processo, valor) => contemTrecho(processo.nome, valor),
+  arquivados: (processo, valor) => valor !== 'esconder' || !processo.arquivadoEm,
 }
 
 function passaNosFiltros(processo: ProcessoDaLista, filtros: FiltrosDosProcessos): boolean {

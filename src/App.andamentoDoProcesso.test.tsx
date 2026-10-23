@@ -75,10 +75,11 @@ test('a etapa atual pendente tem Iniciar e, no "⋯", só Realizada anteriorment
   expect(gaveta.getByRole('button', { name: `Assumir ${RELATORIO}` })).toBeTruthy()
 })
 
+// Uma etapa opcional inventada: a Publicação, a opcional do catálogo, não se dispensa (App.naoVaiMaisParaPublicacao).
 test('a etapa atual opcional tem Dispensar', async () => {
   montar({ processos: [processo({ etapasDoProcesso: [
     doProcesso(4, 'modelagem', MODELAGEM, { status: 'concluida' }),
-    doProcesso(9, 'publicacao', 'Publicação', { obrigatoria: false }),
+    doProcesso(9, 'divulgacao', 'Divulgação', { obrigatoria: false }),
   ] })] })
   const atual = await agoraDoVerso()
   fireEvent.click(atual.getByRole('button', { name: 'Mais ações da etapa' }))
@@ -108,16 +109,16 @@ test('Concluir passa a etapa atual para a seguinte e o cartão muda de coluna no
 test('Dispensar e Realizada anteriormente pedem nota: vazia não grava, com nota grava e mostra a nota', async () => {
   const falso = montar({ processos: [processo({ etapasDoProcesso: [
     doProcesso(4, 'modelagem', MODELAGEM, { status: 'concluida' }),
-    doProcesso(9, 'publicacao', 'Publicação', { obrigatoria: false }),
+    doProcesso(9, 'divulgacao', 'Divulgação', { obrigatoria: false }),
   ] })] })
   const atual = await agoraDoVerso()
   fireEvent.click(atual.getByRole('button', { name: 'Mais ações da etapa' }))
   fireEvent.click(atual.getByRole('menuitem', { name: 'Dispensar' }))
-  const janela = within(screen.getByRole('dialog', { name: 'Dispensar a etapa Publicação?' }))
+  const janela = within(screen.getByRole('dialog', { name: 'Dispensar a etapa Divulgação?' }))
   expect((janela.getByRole('button', { name: 'Dispensar' }) as HTMLButtonElement).disabled).toBe(true)
   fireEvent.change(janela.getByLabelText('Nota'), { target: { value: 'Sem publicação' } })
   fireEvent.click(janela.getByRole('button', { name: 'Dispensar' }))
-  expect(await (await gavetaDaEtapa('Publicação')).findByText('Nota: Sem publicação')).toBeTruthy()
+  expect(await (await gavetaDaEtapa('Divulgação')).findByText('Nota: Sem publicação')).toBeTruthy()
   expect(falso.chamadas).toEqual([{ acao: 'dispensar', id: 'a9', nota: 'Sem publicação', usuarioId: null }])
 })
 

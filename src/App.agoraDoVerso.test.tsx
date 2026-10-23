@@ -61,17 +61,18 @@ test('o "⋯" do Agora tem Realizada anteriormente e, só na etapa opcional, Dis
     name: `Registrar ${MODELAGEM} como realizada anteriormente e iniciar ${RELATORIO}` })).toBeTruthy()
 })
 
+// Uma etapa opcional inventada: a Publicação, a opcional do catálogo, não se dispensa (App.naoVaiMaisParaPublicacao).
 test('na etapa opcional, o "⋯" também tem Dispensar', async () => {
   montarVerso(processoLido([
     etapaDoProcesso(4, 'modelagem', MODELAGEM, CONCLUIDA),
     etapaDoProcesso(5, 'relatorio', RELATORIO, CONCLUIDA),
-    etapaDoProcesso(9, 'publicacao', PUBLICACAO, { obrigatoria: false }),
+    etapaDoProcesso(9, 'divulgacao', 'Divulgação', { obrigatoria: false }),
   ]))
   const agora = await agoraDoVerso()
   fireEvent.click(agora.getByRole('button', { name: 'Mais ações da etapa' }))
   expect(agora.getAllByRole('menuitem').map((item) => item.textContent)).toEqual(['Dispensar', 'Realizada anteriormente'])
   fireEvent.click(agora.getByRole('menuitem', { name: 'Dispensar' }))
-  expect(screen.getByRole('dialog', { name: `Dispensar a etapa ${PUBLICACAO}?` })).toBeTruthy()
+  expect(screen.getByRole('dialog', { name: 'Dispensar a etapa Divulgação?' })).toBeTruthy()
 })
 
 test('sem responsável, o Agora diz isso e oferece [Assumir], que põe quem está na tela', async () => {
