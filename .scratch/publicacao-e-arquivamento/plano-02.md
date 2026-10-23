@@ -142,7 +142,7 @@ Conteúdo da migração, na ordem: coluna `arquivado_em` e privilégio; `liberan
 
 ### Tarefa 9: Conferência final
 
-- [ ] `npm test`, `npm run lint`, `npm run typecheck`, `npm run check:circular` verdes.
-- [ ] [visual] na vitrine local (falsas), a 1366×768: Agora do concluído e do arquivado alinhados no verso; selo "Arquivado" no estilo das pílulas; janela de Registrar publicação.
-- [ ] Backlog: o que surgir fora do escopo.
+- [x] `npm test`, `npm run lint`, `npm run typecheck`, `npm run check:circular` verdes.
+- [x] [visual] na vitrine local (falsas), a 1366×768: Agora do concluído e do arquivado alinhados no verso; selo "Arquivado" no estilo das pílulas; janela de Registrar publicação.
+- [x] Backlog: o que surgir fora do escopo.
 - [ ] Merge na `main` (`git switch main`, `git merge publicacao-e-arquivamento-02`), `git branch -d`, push da `main` e conferência do "Testes de banco" na `main`.
