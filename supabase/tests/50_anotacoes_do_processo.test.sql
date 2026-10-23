@@ -299,7 +299,7 @@ insert into _tap (linha) select is_empty(
   $sql$select column_name from information_schema.columns
     where table_schema = 'public' and table_name = 'processos_com_andamento' and column_name like 'anotacoes%'$sql$,
   'a view do Quadro e da Lista não tem coluna de Anotações');
-insert into _tap (linha) select unlike((select private.montar_pacote_das_planilhas()::text), '%Texto do pai%',
+insert into _tap (linha) select ok(position('Texto do pai' in (select private.montar_pacote_das_planilhas()::text)) = 0,
   'o pacote das planilhas não traz o texto das Anotações');
 
 insert into _tap (linha) select * from finish();
