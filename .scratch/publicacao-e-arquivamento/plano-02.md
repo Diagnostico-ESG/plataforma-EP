@@ -76,8 +76,8 @@ Casos (critério de aceite 1 do ticket, cada item uma asserção):
 - subprocesso arquivado sem mexer no pai; editar o macroprocesso do pai com o filho arquivado aceito, e o filho acompanha;
 - quem pode o quê: desistir, registrar, arquivar e desarquivar aceitos para a1 e a2, recusados para a3 (42501), a4 (`registro_inexistente`) e visitante (42501); ler `arquivado_em` (a1, a2, a3 sim; a4 e visitante não); eventos novos lidos por a3 e não por a4.
 
-- [ ] Escrever o teste.
-- [ ] Commit, `git push -u origin publicacao-e-arquivamento-02`, disparar "Testes de banco" na branch: o 49 falha (função ou coluna inexistente), os demais passam.
+- [x] Escrever o teste.
+- [x] Commit, `git push -u origin publicacao-e-arquivamento-02`, disparar "Testes de banco" na branch: o 49 falha (função ou coluna inexistente), os demais passam.
 
 ### Tarefa 2: Migração e ensaio
 
