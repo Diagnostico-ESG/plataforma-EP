@@ -49,3 +49,5 @@ Spec: histórias 13 a 15, 23 a 34, 41 a 43 e 45 (no que toca a esta parte).
 - [ ] A Consulta vê o selo, o filtro e os registros sem botões.
 - [ ] Testes do módulo real, das funções puras e da tela inteira com as falsas, cobrindo os itens acima, inclusive recusas e falhas ao gravar.
 - [ ] [visual] O Agora do concluído e do arquivado não quebra o alinhamento do verso. O selo "Arquivado" segue o estilo das pílulas.
+
+Concluído em 2026-10-22 (commit 1f9353a)
