@@ -166,3 +166,7 @@ Os cinco rótulos padrão (`needs-triage`, `needs-info`, `ready-for-agent`, `rea
 
 Single-context: um `CONTEXT.md` e `docs/adr/` na raiz. See `docs/agents/domain.md`.
 
+
+### Registro do próximo passo
+
+Decidido em 2026-10-23. Toda sessão que terminar recomendando um próximo passo (comando, modelo e o que falta) grava isso em `.scratch/proximo-passo.md` antes de encerrar, sobrescrevendo o conteúdo anterior, e comita junto com o resto da etapa. O `/situação` lê esse arquivo e, se divergir do git ou dos tickets, valem os arquivos e eu aviso. Isso vale também para sessões de conversa e de `/situação`, não só para etapas do funil.
