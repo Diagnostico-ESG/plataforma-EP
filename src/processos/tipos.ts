@@ -79,6 +79,10 @@ export type ProcessoDaLista = {
   cartao?: DadosDoCartao
   /** O dia da publicação (AAAA-MM-DD); null sem a data. Opcional pelo mesmo motivo. */
   publicadoEm?: string | null
+  /** O link da publicação (http ou https); null sem link. Opcional pelo mesmo motivo. */
+  linkDaPublicacao?: string | null
+  /** Por que o processo foi concluído sem publicação; null com a data da publicação ou fora de Concluídos. Opcional pelo mesmo motivo. */
+  explicacaoSemPublicacao?: string | null
   /** Quando o processo concluído foi arquivado (data e hora); null fora do arquivo. Opcional pelo mesmo motivo. */
   arquivadoEm?: string | null
 }
@@ -197,9 +201,14 @@ export type ModuloDeProcessos = {
   suspenderProcesso(id: string, motivo: string): Promise<void>
   cancelarProcesso(id: string, motivo: string): Promise<void>
   retomarProcesso(id: string, motivo: string): Promise<void>
-  /** Só o concluído não arquivado; o arquivado sai do Quadro e não aceita outra alteração além de desarquivar. */
+  /** O concluído, o suspenso e o cancelado, não arquivados; o arquivado sai do Quadro e só aceita registrar a publicação e desarquivar. */
   arquivar(id: string): Promise<void>
   desarquivar(id: string): Promise<void>
+  /**
+   * Registra a data da publicação (com o link, se houver) ou, já registrada, a corrige; o processo fica onde está. Vale na
+   * Publicação e em Concluídos; no arquivado, só sem data. A data não é futura nem anterior à aprovação.
+   */
+  registrarPublicacao(id: string, data: string, link: string | null): Promise<void>
   /** Muda o tipo com motivo, mantendo o mesmo item; ao virar subprocesso, ele passa ao macroprocesso do pai. */
   reclassificarProcesso(id: string, reclassificacao: Reclassificacao, motivo: string): Promise<void>
   /** Por nome. */

@@ -6,8 +6,10 @@ import { CatalogoFalso } from './CatalogoFalso'
 import { arquivar, conferirNaoArquivado, desarquivar } from './arquivamentoFalso'
 import { CODIGO_CONCLUIDOS, CODIGO_NAO_INICIADOS } from './codigosDasEtapas'
 import {
-  conferirEtapaAtiva, conferirEtiquetaMutavel, etapaAtualNoCatalogo, etapasDoVersoDe, publicacaoDaChegada, registrarPassagem,
+  conferirEtapaAtiva, conferirEtiquetaMutavel, etapaAtualNoCatalogo, etapasDoVersoDe, publicacaoDaChegada, publicacaoDaSaida,
+  registrarPassagem,
 } from './movimentoFalso'
+import { registrarPublicacao } from './publicacaoFalso'
 import {
   conferirPai, conferirSemSubprocessos, estruturaDoProcesso, levarMacroprocessoAosFilhos, macroprocessoDo, reclassificar,
 } from './reclassificacaoFalso'
@@ -73,7 +75,7 @@ export class ProcessosFalso implements ModuloDeProcessos {
     conferirEtapaAtiva(destino)
     if (processo.etapaAtual?.codigo === destino.codigo) return
     const emConcluidos = destino.codigo === CODIGO_CONCLUIDOS
-    const publicacao = emConcluidos ? publicacaoDaChegada(processo, chegada, hojeLocal()) : {}
+    const publicacao = emConcluidos ? publicacaoDaChegada(processo, chegada, hojeLocal()) : publicacaoDaSaida(processo)
     this.chamadas.push({ acao: 'mover', id, etapaId, ...(chegada && { chegada }) })
     this.trocarProcesso(id, (atual) => this.movido(atual, destino, publicacao))
   }
@@ -119,6 +121,11 @@ export class ProcessosFalso implements ModuloDeProcessos {
 
   async desarquivar(id: string): Promise<void> {
     this.trocarProcesso(id, desarquivar)
+  }
+
+  async registrarPublicacao(id: string, data: string, link: string | null): Promise<void> {
+    this.trocarProcesso(id, (processo) => registrarPublicacao(processo, data, link, hojeLocal()))
+    this.chamadas.push({ acao: 'publicacao', id, nota: data })
   }
 
   async reclassificarProcesso(id: string, reclassificacao: Reclassificacao, motivo: string): Promise<void> {

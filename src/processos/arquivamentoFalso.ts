@@ -6,15 +6,15 @@ import type { ProcessoLido } from './tipos'
 
 // As regras das funções do banco da migração arquivar_e_registrar_publicacao, para a implementação falsa.
 
-/** Como a trava do banco: o arquivado não aceita outra alteração além de desarquivar (e, no ticket 04, registrar a publicação). */
+/** Como a trava do banco: o arquivado não aceita outra alteração além de desarquivar (e registrar a publicação sem data). */
 export function conferirNaoArquivado(processo: ProcessoLido): void {
   if (processo.arquivadoEm) throw new TravaDoBanco(FRASE_DO_PROCESSO_ARQUIVADO)
 }
 
-/** Como arquivar_processo: só o concluído não arquivado. */
+/** Como arquivar_processo: o concluído, o suspenso e o cancelado, não arquivados. */
 export function arquivar(processo: ProcessoLido, agora: string): ProcessoLido {
   if (processo.arquivadoEm) throw new TravaDoBanco(FRASE_DO_PROCESSO_JA_ARQUIVADO)
-  if (processo.situacao !== 'concluido') throw new TravaDoBanco(fraseDoArquivarSoConcluido(processo.situacao))
+  if (processo.situacao === 'em_andamento') throw new TravaDoBanco(fraseDoArquivarSoConcluido())
   return { ...processo, arquivadoEm: agora }
 }
 

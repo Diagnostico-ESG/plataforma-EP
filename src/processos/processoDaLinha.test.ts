@@ -17,6 +17,12 @@ test('traduz a data da publicação', () => {
   expect(processoDaLinha(VAZIA, 8)).toMatchObject({ publicadoEm: null })
 })
 
+test('traduz o link da publicação e a explicação de concluir sem publicação', () => {
+  expect(processoDaLinha({ ...VAZIA, link_da_publicacao: 'https://diario.exemplo/1', explicacao_sem_publicacao: 'Não será publicado' }, 8))
+    .toMatchObject({ linkDaPublicacao: 'https://diario.exemplo/1', explicacaoSemPublicacao: 'Não será publicado' })
+  expect(processoDaLinha(VAZIA, 8)).toMatchObject({ linkDaPublicacao: null, explicacaoSemPublicacao: null })
+})
+
 test('traduz a marca de arquivado', () => {
   expect(processoDaLinha({ ...VAZIA, arquivado_em: '2026-10-22T15:00:00+00:00' }, 8))
     .toMatchObject({ arquivadoEm: '2026-10-22T15:00:00+00:00' })

@@ -44,8 +44,8 @@ describe('mover', () => {
     ['processo_arquivado', 'Este processo está arquivado; desarquive-o para alterar.'],
     ['etapa_inativa:Publicação', 'A etapa Publicação está inativa.'],
     ['publicacao_ou_explicacao_obrigatoria',
-      'Para concluir, informe a data da publicação ou a explicação de concluir sem publicação.'],
-    ['explicacao_obrigatoria', 'A explicação é obrigatória.'],
+      'Para ir a Concluídos, informe a data da publicação ou conclua sem publicação.'],
+    ['explicacao_obrigatoria', 'A explicação é obrigatória para concluir sem publicação.'],
     ['explicacao_longa:2001', 'A explicação tem 2001 caracteres; o máximo é 2.000.'],
   ])('a recusa %s vira a frase', async (mensagem, frase) => {
     const cliente = clienteQueRecusa('rpc.mover_processo', { message: mensagem, code: 'P0001' })

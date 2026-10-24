@@ -126,7 +126,7 @@ describe('chegada a Concluídos', () => {
   test('sem a data registrada e sem dados da chegada, o banco recusa', async () => {
     const modulo = falso()
     const erro = await falhaDe(modulo.moverProcesso('p1', idDa('concluidos')))
-    expect(erro.message).toBe('Para concluir, informe a data da publicação ou a explicação de concluir sem publicação.')
+    expect(erro.message).toBe('Para ir a Concluídos, informe a data da publicação ou conclua sem publicação.')
     expect((await lido(modulo)).etapaAtual?.codigo).toBe('revisao_interna')
   })
 
@@ -138,16 +138,32 @@ describe('chegada a Concluídos', () => {
     })
   })
 
-  test('com a explicação o processo chega sem data de publicação', async () => {
+  test('com a explicação o processo chega sem data de publicação, com a explicação aparada guardada', async () => {
     const modulo = falso()
-    await modulo.moverProcesso('p1', idDa('concluidos'), { ...CHEGADA_VAZIA, explicacao: 'Foi cancelada a publicação' })
-    expect(await lido(modulo)).toMatchObject({ situacao: 'concluido', etiqueta: 'concluido' })
+    await modulo.moverProcesso('p1', idDa('concluidos'), { ...CHEGADA_VAZIA, explicacao: '  Foi cancelada a publicação ' })
+    expect(await lido(modulo)).toMatchObject({
+      situacao: 'concluido', etiqueta: 'concluido', publicadoEm: null, explicacaoSemPublicacao: 'Foi cancelada a publicação',
+    })
+  })
+
+  test('com a data e o link, os dois ficam no processo', async () => {
+    const modulo = falso()
+    await modulo.moverProcesso('p1', idDa('concluidos'), { ...CHEGADA_VAZIA, dataDaPublicacao: '2026-10-10', linkDaPublicacao: 'https://diario.exemplo/1' })
+    expect(await lido(modulo)).toMatchObject({ publicadoEm: '2026-10-10', linkDaPublicacao: 'https://diario.exemplo/1', explicacaoSemPublicacao: null })
+  })
+
+  test('sair de Concluídos apaga a explicação', async () => {
+    const modulo = falso(umProcessoLido('Emitir Ofício', {
+      id: 'p1', situacao: 'concluido', etiqueta: 'concluido', explicacaoSemPublicacao: 'Não será publicado',
+    }, 'concluidos'))
+    await modulo.moverProcesso('p1', idDa('publicacao'))
+    expect(await lido(modulo)).toMatchObject({ situacao: 'em_andamento', explicacaoSemPublicacao: null })
   })
 
   test('a explicação vazia, a longa, a data no futuro e o link inválido são recusados', async () => {
     const modulo = falso()
     const tentar = (chegada: Partial<DadosDaChegada>) => falhaDe(modulo.moverProcesso('p1', idDa('concluidos'), { ...CHEGADA_VAZIA, ...chegada }))
-    expect((await tentar({ explicacao: '   ' })).message).toBe('A explicação é obrigatória.')
+    expect((await tentar({ explicacao: '   ' })).message).toBe('A explicação é obrigatória para concluir sem publicação.')
     expect((await tentar({ explicacao: 'x'.repeat(2001) })).message).toBe('A explicação tem 2001 caracteres; o máximo é 2.000.')
     expect(await tentar({ dataDaPublicacao: '2099-01-01' })).toBeInstanceOf(TravaDoBanco)
     expect(await tentar({ dataDaPublicacao: '2026-10-10', linkDaPublicacao: 'ftp://x' })).toBeInstanceOf(TravaDoBanco)

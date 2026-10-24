@@ -26,11 +26,23 @@ async function recusa(promessa: Promise<void>): Promise<string> {
 describe('arquivar e desarquivar', () => {
   test('arquivar fora de concluído e duas vezes é recusado; desarquivar o não arquivado também', async () => {
     expect(await recusa(falso('revisao_interna').arquivar('p1')))
-      .toBe('Só um processo concluído pode ser arquivado; este está em andamento.')
+      .toBe('Só se arquiva processo concluído, suspenso ou cancelado.')
     const modulo = falso('concluidos')
     expect(await recusa(modulo.desarquivar('p1'))).toBe('Este processo não está arquivado.')
     await modulo.arquivar('p1')
     expect(await recusa(modulo.arquivar('p1'))).toBe('Este processo já está arquivado.')
+  })
+
+  test('o suspenso e o cancelado se arquivam, guardam a situação e a etapa, e desarquivar os devolve como estavam', async () => {
+    for (const situacao of ['suspenso', 'cancelado'] as const) {
+      const modulo = falso('modelagem', { situacao })
+      await modulo.arquivar('p1')
+      expect(await lido(modulo)).toMatchObject({ situacao, etapaAtual: { codigo: 'modelagem' } })
+      expect((await lido(modulo)).arquivadoEm).toBeTruthy()
+      expect(await recusa(modulo.moverProcesso('p1', 'e4'))).toBe('Este processo está arquivado; desarquive-o para alterar.')
+      await modulo.desarquivar('p1')
+      expect(await lido(modulo)).toMatchObject({ situacao, etapaAtual: { codigo: 'modelagem' }, arquivadoEm: null })
+    }
   })
 
   test('arquivar marca o processo e desarquivar tira a marca', async () => {

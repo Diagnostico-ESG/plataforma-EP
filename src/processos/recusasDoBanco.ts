@@ -17,7 +17,8 @@ import {
 import { FRASE_DO_PAI, fraseDeTipoInvalido, fraseDosSubprocessos } from './frasesDeReclassificacao'
 import {
   FRASE_DO_ARQUIVAMENTO_SO_PELA_FUNCAO, FRASE_DO_PROCESSO_ARQUIVADO, FRASE_DO_PROCESSO_JA_ARQUIVADO,
-  FRASE_DO_PROCESSO_NAO_ARQUIVADO, fraseDoArquivarSoConcluido,
+  FRASE_DO_PROCESSO_NAO_ARQUIVADO, FRASE_DA_DATA_DA_PUBLICACAO_OBRIGATORIA, FRASE_DA_PUBLICACAO_FORA_DA_ETAPA,
+  FRASE_DO_ARQUIVADO_JA_PUBLICADO, fraseDaPublicacaoAntesDaAprovacao, fraseDoArquivarSoConcluido,
 } from './frasesDePublicacao'
 import { fraseDoAutorDaVersao, fraseDoProcessoComVersoes } from './frasesDeVersao'
 import { fraseDeSituacaoInvalida, fraseDoProcessoParado } from './frasesDeSituacao'
@@ -40,6 +41,7 @@ const PADRAO_DA_RECUSA = new RegExp(
   + '|aprovacao_fora_da_etapa|processo_ja_aprovado|aprovacao_so_pela_funcao|link_invalido'
   + '|versao_aprovada|processo_com_aprovacao'
   + '|arquivar_so_concluido|ja_arquivado|nao_arquivado|processo_arquivado|arquivamento_so_pela_funcao'
+  + '|publicacao_fora_da_etapa|arquivado_ja_publicado|data_da_publicacao_obrigatoria|publicacao_antes_da_aprovacao'
   + '|anotacoes_longas)(?::(.*))?$', 'm')
 
 type FraseDaRecusa = (valor: string, contexto: ContextoDaRecusa) => string
@@ -98,6 +100,10 @@ const FRASE_DA_RECUSA: Record<string, FraseDaRecusa> = {
   nao_arquivado: () => FRASE_DO_PROCESSO_NAO_ARQUIVADO,
   processo_arquivado: () => FRASE_DO_PROCESSO_ARQUIVADO,
   arquivamento_so_pela_funcao: () => FRASE_DO_ARQUIVAMENTO_SO_PELA_FUNCAO,
+  publicacao_fora_da_etapa: () => FRASE_DA_PUBLICACAO_FORA_DA_ETAPA,
+  arquivado_ja_publicado: () => FRASE_DO_ARQUIVADO_JA_PUBLICADO,
+  data_da_publicacao_obrigatoria: () => FRASE_DA_DATA_DA_PUBLICACAO_OBRIGATORIA,
+  publicacao_antes_da_aprovacao: fraseDaPublicacaoAntesDaAprovacao,
   anotacoes_longas: fraseDasAnotacoesLongas,
   versao_incompleta: (valor) => {
     const [numero, faltas] = valor.split(':')

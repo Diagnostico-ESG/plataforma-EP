@@ -6,10 +6,9 @@ export function fraseDaEtapaInativa(nome: string): string {
 }
 
 /** O banco pede a data da publicação (com o link) ou a explicação ao chegar a Concluídos sem a data já registrada. */
-export const FRASE_DA_CHEGADA_OBRIGATORIA =
-  'Para concluir, informe a data da publicação ou a explicação de concluir sem publicação.'
+export const FRASE_DA_CHEGADA_OBRIGATORIA = 'Para ir a Concluídos, informe a data da publicação ou conclua sem publicação.'
 
-export const FRASE_DA_EXPLICACAO_OBRIGATORIA = 'A explicação é obrigatória.'
+export const FRASE_DA_EXPLICACAO_OBRIGATORIA = 'A explicação é obrigatória para concluir sem publicação.'
 
 export function fraseDaExplicacaoLonga(tamanho: number | string): string {
   return `A explicação tem ${tamanho} caracteres; o máximo é 2.000.`

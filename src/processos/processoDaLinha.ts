@@ -17,6 +17,8 @@ export function processoDaLinha(linha: LinhaDoProcesso, totalDeEtapas: number): 
     dataDaReuniao: linha.data_da_reuniao,
     cartao: cartaoDaLinha(linha),
     publicadoEm: linha.publicado_em,
+    linkDaPublicacao: linha.link_da_publicacao,
+    explicacaoSemPublicacao: linha.explicacao_sem_publicacao,
     arquivadoEm: linha.arquivado_em,
   }
 }

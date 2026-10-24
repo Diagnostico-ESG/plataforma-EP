@@ -57,7 +57,7 @@
 - [x] **Passo 5: ver tudo verde.** `npx supabase test db`: 0 `not ok` em todos os arquivos (hoje 1266 `ok`).
 - [x] **Passo 6: tipos e commit.** `npx supabase gen types --local` para `src/types/database.ts` (entram `registrar_publicacao` em `Functions` e `explicacao_sem_publicacao` na view; conferir que o resto não mudou além do que o ticket 05 escreveu à mão). Commit: `publicacao-e-arquivamento 04: registrar publicação e arquivar suspenso e cancelado (migração, testes 49 e 55, tipos)`.
 
-### Tarefa 2 — Módulo: link, explicação, registrar publicação e as frases
+### Tarefa 2 — Módulo: link, explicação, registrar publicação e as frases (feita; `npm test` 2372 verdes, lint e tsc limpos. Ruling: o falso não simula "antes da aprovação" porque não tem aprovações; essa recusa vem do banco e tem teste de tradução em `publicacaoSupabase.test.ts`. As frases `data_da_publicacao_obrigatoria` e `publicacao_antes_da_aprovacao` ganharam texto porque ainda não tinham.)
 
 **Arquivos:** alterar `src/processos/tipos.ts`, `processoDaLinha.ts` (+ teste), `frasesDePublicacao.ts`, `frasesDoMovimento.ts`, `recusasDoBanco.ts` (+ teste), `arquivamentoFalso.ts`, `movimentoFalso.ts`, `ProcessosFalso.ts`, `processosSupabase.ts`; criar `publicacaoSupabase.ts`, `publicacaoFalso.ts` e `publicacaoSupabase.test.ts`; alterar `ProcessosFalso.arquivamento.test.ts` e `ProcessosFalso.mover.test.ts`; criar `ProcessosFalso.publicacao.test.ts`.
 

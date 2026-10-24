@@ -24,28 +24,38 @@ export function conferirEtapaAtiva(etapa: EtapaDoCatalogo): void {
 
 const LINK_DA_PUBLICACAO = /^https?:\/\/.+/i
 
-function publicacaoPelaData(data: string, link: string | null, hoje: string): Pick<ProcessoLido, 'publicadoEm'> {
+/** Como conferir_data_da_publicacao e o link do banco: a data não é futura e o link, quando há, é http ou https. */
+export function publicacaoPelaData(data: string, link: string | null, hoje: string): Pick<ProcessoLido, 'publicadoEm' | 'linkDaPublicacao'> {
   if (data > hoje) throw new TravaDoBanco(fraseDaDataNoFuturo(data))
-  if (link?.trim() && !LINK_DA_PUBLICACAO.test(link.trim())) throw new TravaDoBanco(FRASE_DO_LINK_INVALIDO)
-  return { publicadoEm: data }
+  const limpo = link?.trim() || null
+  if (limpo && !LINK_DA_PUBLICACAO.test(limpo)) throw new TravaDoBanco(FRASE_DO_LINK_INVALIDO)
+  return { publicadoEm: data, linkDaPublicacao: limpo }
 }
 
-function conferirExplicacao(explicacao: string | null): void {
+// Devolve a explicação aparada.
+function conferirExplicacao(explicacao: string | null): string {
   if (explicacao === null) throw new TravaDoBanco(FRASE_DA_CHEGADA_OBRIGATORIA)
   const texto = explicacao.trim()
   if (texto === '') throw new TravaDoBanco(FRASE_DA_EXPLICACAO_OBRIGATORIA)
   if (texto.length > 2000) throw new TravaDoBanco(fraseDaExplicacaoLonga(texto.length))
+  return texto
 }
 
 /**
  * Como publicacao_da_chegada: com a data já registrada nada se pede; senão, a data (nunca no futuro, com o link http ou
  * https) ou a explicação (não vazia, até 2.000 caracteres). Devolve o que muda no processo.
  */
-export function publicacaoDaChegada(processo: ProcessoLido, chegada: DadosDaChegada | undefined, hoje: string): Pick<ProcessoLido, 'publicadoEm'> {
-  if (processo.publicadoEm) return { publicadoEm: processo.publicadoEm }
-  if (chegada?.dataDaPublicacao) return publicacaoPelaData(chegada.dataDaPublicacao, chegada.linkDaPublicacao, hoje)
-  conferirExplicacao(chegada?.explicacao ?? null)
-  return { publicadoEm: null }
+export function publicacaoDaChegada(processo: ProcessoLido, chegada: DadosDaChegada | undefined, hoje: string): Partial<ProcessoLido> {
+  if (processo.publicadoEm) return {}
+  if (chegada?.dataDaPublicacao) {
+    return { ...publicacaoPelaData(chegada.dataDaPublicacao, chegada.linkDaPublicacao, hoje), explicacaoSemPublicacao: null }
+  }
+  return { publicadoEm: null, explicacaoSemPublicacao: conferirExplicacao(chegada?.explicacao ?? null) }
+}
+
+/** Ao sair de Concluídos, a explicação de concluir sem publicação se apaga; a data da publicação fica. */
+export function publicacaoDaSaida(processo: ProcessoLido): Partial<ProcessoLido> {
+  return processo.etapaAtual?.codigo === CODIGO_CONCLUIDOS ? { explicacaoSemPublicacao: null } : {}
 }
 
 /** Em Concluídos a etiqueta é Concluído e não muda. */
