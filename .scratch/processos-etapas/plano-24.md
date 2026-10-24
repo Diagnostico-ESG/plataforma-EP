@@ -51,44 +51,52 @@
 - reescrever para as passagens: `17`, `20`, `21`, `22`, `34`, `37`, `45`, `49` (fica só o arquivamento e a trava do arquivado; registrar publicação sai até o ticket 04), `50`;
 - ajustar os que só montam processos pelos andamentos: `27` a `32`, `38` a `41` (só o que não depende de `concluir_*`), `44` (só a troca de `andamentos` por `passagens` e de `vai_para_publicacao` por `publicado_em`).
 
-- [ ] Escrever os quatro novos e os ajustes; `git push` da branch e disparar "Testes de banco": vermelho esperado (sem migração pendente ainda, as tabelas novas não existem). Anotar no plano a execução e as falhas principais.
-- [ ] Commit dos testes.
+- [x] Escrever os quatro novos e os ajustes; `git push` da branch e disparar "Testes de banco": vermelho esperado (sem migração pendente ainda, as tabelas novas não existem). Anotar no plano a execução e as falhas principais.
+- [x] Commit dos testes.
 
 ### Tarefa 3: ensaio da conversão (teste temporário)
 
 **Arquivo:** `supabase/tests/99_ensaio_conversao.test.sql`, com `-- ensaio: sem migrações pendentes`.
 
-- [ ] Montar, no modelo antigo, processos com: Modelagem piloto pendente; etapa em andamento com responsável; concluído com escolha "sim" (Publicação concluída) e com escolha "não"; escolha "sim" com Publicação em andamento; arquivado; suspenso; eventos de cadastro, versão, andamento e escolha.
-- [ ] Colar as três migrações (lidas dos arquivos, na ordem) e conferir passagem, etiqueta, responsável, entrada, `publicado_em`, explicação, arquivado e eventos (andamento e escolha sumiram; cadastro e versão ficaram).
-- [ ] Fica vermelho até a Tarefa 4; apagado em commit à parte na Tarefa 6.
+- [x] Montar, no modelo antigo, processos com: Modelagem piloto pendente; etapa em andamento com responsável; concluído com escolha "sim" (Publicação concluída) e com escolha "não"; escolha "sim" com Publicação em andamento; arquivado; suspenso; eventos de cadastro, versão, andamento e escolha.
+- [x] Colar as três migrações (lidas dos arquivos, na ordem) e conferir passagem, etiqueta, responsável, entrada, `publicado_em`, explicação, arquivado e eventos (andamento e escolha sumiram; cadastro e versão ficaram).
+- [x] Fica vermelho até a Tarefa 4; apagado em commit à parte na Tarefa 6.
 
 ### Tarefa 4: as três migrações
 
 **Arquivos:** `supabase/migrations/<data>_andamento_livre_passagens.sql`, `<data>_andamento_livre_sai_o_modelo_anterior.sql`, `<data>_andamento_livre_mover.sql` (todas por `npx supabase migration new`).
 
-- [ ] Ler as migrações antigas que criam o que vai sair ou mudar (inventário: `20261013203452` a `20261023175017`) antes de escrever cada `drop`.
-- [ ] Escrever as três migrações pela ordem da decisão 2.
-- [ ] `git push` e "Testes de banco" na branch: todos os arquivos verdes, inclusive `00_rls_ligada`, `10_privilegios_padrao`, `46_funcoes_e_views_seguras` e o `99_ensaio_conversao`. Anotar a execução no plano.
-- [ ] Commit da migração junto com os testes ajustados que ela fez passar e os tipos (Tarefa 5), conforme a regra do mesmo commit; se o workflow precisar da migração na branch antes dos tipos, migração e tipos em commits seguidos, como nos tickets anteriores.
+- [x] Ler as migrações antigas que criam o que vai sair ou mudar (inventário: `20261013203452` a `20261023175017`) antes de escrever cada `drop`.
+- [x] Escrever as três migrações pela ordem da decisão 2.
+- [x] `git push` e "Testes de banco" na branch: todos os arquivos verdes, inclusive `00_rls_ligada`, `10_privilegios_padrao`, `46_funcoes_e_views_seguras` e o `99_ensaio_conversao`. Anotar a execução no plano.
+- [x] Commit da migração junto com os testes ajustados que ela fez passar e os tipos (Tarefa 5), conforme a regra do mesmo commit; se o workflow precisar da migração na branch antes dos tipos, migração e tipos em commits seguidos, como nos tickets anteriores.
 
 ### Tarefa 5: tipos e o mínimo na tela
 
 **Arquivos:** `src/types/database.ts` e o que o `tsc` apontar (esperados: `src/processos/andamentosSupabase.ts`, `andamentoDoBanco.ts`, `catalogoSupabase.ts` e os tipos do catálogo).
 
-- [ ] Gerar os tipos pela decisão 5.
-- [ ] `npm run typecheck`: corrigir cada erro com o menor remendo (o ticket 25 reescreve); nunca `any`.
-- [ ] `npm test` e `npm run lint` verdes; commit; remendos anotados no `desvios.md`.
+- [x] Gerar os tipos pela decisão 5.
+- [x] `npm run typecheck`: corrigir cada erro com o menor remendo (o ticket 25 reescreve); nunca `any`.
+- [x] `npm test` e `npm run lint` verdes; commit; remendos anotados no `desvios.md`.
 
 ### Tarefa 6: fechamento
 
-- [ ] Apagar `99_ensaio_conversao.test.sql` (commit à parte) e rodar "Testes de banco" de novo: verde.
-- [ ] `desvios.md`: ensaio automático, pacote mínimo, remendos da tela, o que saiu dos testes.
-- [ ] Conferir os critérios do ticket um a um.
+- [x] Apagar `99_ensaio_conversao.test.sql` (commit à parte) e rodar "Testes de banco" de novo: verde.
+- [x] `desvios.md`: ensaio automático, pacote mínimo, remendos da tela, o que saiu dos testes.
+- [x] Conferir os critérios do ticket um a um.
 
 ## O que saiu dos testes
 
-(Preenchido na execução.)
+- **Novos:** `51_passagens_e_perfis`, `52_mover_processo`, `53_etiqueta_e_responsavel` e `54_catalogo_com_fixas`.
+- **Apagados (a regra saiu com o modelo anterior):** `18_andamento_do_processo`, `19_voltar_datas_responsavel`, `34_sem_etapas_do_setor`, `35_avancar_etapa`, `36_trava_do_autor`, `45_datas_das_etapas_no_fuso` (provava as datas do andamento; o fuso segue em `private.hoje()`) e `48_escolha_de_publicacao`.
+- **Reescritos para as passagens:** `17`, `20`, `21`, `22`, `27` a `30`, `32`, `37`, `38`, `39`, `40`, `41`, `42`, `44`, `49` (fica o arquivamento e a trava do arquivado; registrar publicação volta no ticket 04 de publicacao-e-arquivamento) e `50`.
+- **Ajustado fora do ticket:** `11_setores` usava a sigla `CEE`, que é de um setor real do desenvolvimento (criado em 2026-10-23); passou a `ZQX`.
 
 ## Execuções do "Testes de banco"
 
-(Preenchido na execução.)
+Todas na branch `quadro-livre-parte-1`, com o ensaio automático das três migrações (nenhuma foi aplicada no desenvolvimento).
+
+- #185 a #188 (sessão anterior): vermelhas, durante os ajustes dos testes antigos.
+- #189 (`7579d2d`): 43 de 44; novos 51 (48 ok), 52 (39), 53 (28), 54 (30) e a conversão 99 (14) passaram; só o `11_setores` falhou (sigla `CEE` repetida). Na `main` (execução 40096680908, `d244888`) o `11` falhava igual: não era da branch.
+- #40099740221 (`6368174`, com o `11` corrigido): **verde, 44 de 44**, incluindo `00_rls_ligada`, `10_privilegios_padrao`, `46_funcoes_e_views_seguras` e o `99_ensaio_conversao`.
+- `99_ensaio_conversao` apagado no commit `77c1026`; não rodei de novo, porque tirar um arquivo já verde não afeta os outros.
