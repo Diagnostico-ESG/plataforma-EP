@@ -11,11 +11,11 @@ afterEach(() => {
   window.location.hash = ''
 })
 
-const CONCLUIDO: Partial<ProcessoLido> = { situacao: 'concluido', etapaAtual: null, responsavel: null, vaiParaPublicacao: true }
+const CONCLUIDO: Partial<ProcessoLido> = { situacao: 'concluido', etiqueta: 'concluido', responsavel: null, publicadoEm: '2026-10-05' }
 const PROCESSOS = [
   processo('Em Curso'),
-  processo('Guardado', { posicao: 6, processo: { ...CONCLUIDO, arquivadoEm: '2026-10-12T12:00:00Z' } }),
-  processo('Pronto', { posicao: 6, processo: CONCLUIDO }),
+  processo('Guardado', { etapa: 'concluidos', processo: { ...CONCLUIDO, arquivadoEm: '2026-10-12T12:00:00Z' } }),
+  processo('Pronto', { etapa: 'concluidos', processo: CONCLUIDO }),
 ]
 
 async function nomesNaLista(): Promise<string[]> {

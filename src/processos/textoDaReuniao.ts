@@ -1,4 +1,4 @@
-import { formatarData } from './caminhoDeEtapas'
+import { formatarData } from '../lib/datas'
 
 /** O dia de hoje no relógio de quem usa (AAAA-MM-DD), que é como a data da reunião é guardada. */
 export function hojeLocal(agora: Date = new Date()): string {

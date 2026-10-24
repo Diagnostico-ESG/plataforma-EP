@@ -1,9 +1,8 @@
-import { formatarData } from '../processos/caminhoDeEtapas'
+import { formatarData } from '../lib/datas'
 
 export const FRASE_DA_APROVACAO_FORA_DA_ETAPA = 'A aprovação só pode ser registrada com a Aprovação pelo setor em andamento.'
 export const FRASE_DO_PROCESSO_JA_APROVADO = 'Este processo já tem aprovação registrada.'
 export const FRASE_DO_LINK_INVALIDO = 'O link do E-protocolo precisa começar com http:// ou https://.'
-export const FRASE_DA_APROVACAO_NA_VOLTA = 'A aprovação só é desfeita ao voltar para a Aprovação pelo setor ou para antes dela.'
 export const FRASE_DO_PROCESSO_COM_APROVACAO =
   'Não é possível excluir: processo tem aprovação registrada. Cancele o processo em vez de excluí-lo.'
 
@@ -29,9 +28,4 @@ export function fraseDaVersaoSemAprovacao(numero: number | string): string {
  */
 export function fraseDaVersaoAprovada(valor: string): string {
   return `A versão V${valor.match(/\d+/)?.[0] ?? '?'} foi aprovada e seus arquivos não podem ser substituídos.`
-}
-
-/** O aviso da janela de voltar quando a volta desfaz a aprovação. */
-export function fraseDoAvisoDaVolta(versao: number): string {
-  return `A aprovação da V${versao} será desfeita.`
 }

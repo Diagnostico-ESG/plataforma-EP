@@ -2,7 +2,7 @@ import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/re
 import { afterEach, expect, test } from 'vitest'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { ProcessosFalso } from './processos/ProcessosFalso'
-import type { ProcessoLido } from './processos/tipos'
+import { umProcessoLido } from './testes/processoDaLista'
 import { abrirCatalogo, linhasDoCatalogo, montarComCatalogo } from './testes/catalogoDeTeste'
 
 afterEach(() => {
@@ -16,26 +16,26 @@ function janelaAberta() {
   return within(screen.getByRole('dialog'))
 }
 
-test('Editar muda nome, obrigatória e fase', async () => {
+test('Editar muda nome e fase, sem o campo obrigatória', async () => {
   const processos = montarComCatalogo()
   const secao = await abrirCatalogo()
-  fireEvent.click(await secao.findByRole('button', { name: 'Editar Publicação' }))
+  fireEvent.click(await secao.findByRole('button', { name: 'Editar Divulgação' }))
   const formulario = within(secao.getByRole('form', { name: 'Editar etapa' }))
-  expect((formulario.getByLabelText('Nome') as HTMLInputElement).value).toBe('Publicação')
+  expect((formulario.getByLabelText('Nome') as HTMLInputElement).value).toBe('Divulgação')
   expect(formulario.queryByLabelText('Código')).toBeNull()
+  expect(formulario.queryByLabelText('Obrigatória')).toBeNull()
   expect((formulario.getByLabelText('Fase do Regimento') as HTMLSelectElement).value).toBe('VII')
   fireEvent.change(formulario.getByLabelText('Fase do Regimento'), { target: { value: 'IX' } })
-  fireEvent.change(formulario.getByLabelText('Nome'), { target: { value: 'Publicação final' } })
-  fireEvent.click(formulario.getByLabelText('Obrigatória'))
+  fireEvent.change(formulario.getByLabelText('Nome'), { target: { value: 'Divulgação final' } })
   fireEvent.click(formulario.getByRole('button', { name: 'Salvar' }))
-  await waitFor(() => expect(processos.catalogo.etapas[2]).toMatchObject({ nome: 'Publicação final', obrigatoria: true, fase: 'IX' }))
-  expect((await linhasDoCatalogo(secao))[2]).toMatch(/^Publicação finalObrigatóriaIX/)
+  await waitFor(() => expect(processos.catalogo.etapas.find((etapa) => etapa.codigo === 'divulgacao')).toMatchObject({ nome: 'Divulgação final', fase: 'IX' }))
+  expect((await linhasDoCatalogo(secao))[3]).toMatch(/^Divulgação finalIXAtiva/)
 })
 
 test('falha ao editar mostra o motivo no formulário', async () => {
   const processos = montarComCatalogo()
   const secao = await abrirCatalogo()
-  fireEvent.click(await secao.findByRole('button', { name: 'Editar Publicação' }))
+  fireEvent.click(await secao.findByRole('button', { name: 'Editar Divulgação' }))
   processos.catalogo.falhaDeGravacao = 'sem conexão'
   const formulario = within(secao.getByRole('form', { name: 'Editar etapa' }))
   fireEvent.click(formulario.getByRole('button', { name: 'Salvar' }))
@@ -43,16 +43,16 @@ test('falha ao editar mostra o motivo no formulário', async () => {
     .toBe('A alteração não foi salva: sem conexão. Seus dados continuam no formulário.')
 })
 
-test('Subir e Descer trocam a etapa com a vizinha', async () => {
+test('Subir e Descer trocam a etapa com a vizinha, sem atravessar as fixas', async () => {
   const processos = montarComCatalogo()
   const secao = await abrirCatalogo()
-  fireEvent.click(await secao.findByRole('button', { name: 'Subir Publicação' }))
-  await waitFor(() => expect(nomesEmOrdem(processos)[1]).toBe('Publicação'))
+  fireEvent.click(await secao.findByRole('button', { name: 'Subir Divulgação' }))
+  await waitFor(() => expect(nomesEmOrdem(processos)[2]).toBe('Divulgação'))
   fireEvent.click(await secao.findByRole('button', { name: 'Descer Relatório e modelagem técnica' }))
   await waitFor(() => expect(nomesEmOrdem(processos)).toEqual([
-    'Modelagem piloto', 'Publicação', 'Arquivamento', 'Relatório e modelagem técnica',
+    'Não iniciados', 'Modelagem piloto', 'Divulgação', 'Arquivamento', 'Relatório e modelagem técnica', 'Concluídos',
   ]))
-  await waitFor(async () => expect((await linhasDoCatalogo(secao))[3]).toMatch(/^Relatório e modelagem técnica/))
+  await waitFor(async () => expect((await linhasDoCatalogo(secao))[4]).toMatch(/^Relatório e modelagem técnica/))
 })
 
 test('a recusa ao mover aparece em vermelho, ao lado da lista', async () => {
@@ -64,29 +64,29 @@ test('a recusa ao mover aparece em vermelho, ao lado da lista', async () => {
   expect((await secao.findByRole('alert')).textContent).toBe('Seu perfil não permite alterar os processos.')
 })
 
-test('Subir fica desabilitado na primeira etapa e Descer na última', async () => {
+test('Subir fica desabilitado na primeira etapa de trabalho e Descer na última', async () => {
   montarComCatalogo()
   const secao = await abrirCatalogo()
   expect((await secao.findByRole('button', { name: 'Subir Modelagem piloto' })).hasAttribute('disabled')).toBe(true)
   expect(secao.getByRole('button', { name: 'Descer Arquivamento' }).hasAttribute('disabled')).toBe(true)
 })
 
-test('Desativar e Reativar trocam a pílula Inativa', async () => {
+test('Desativar e Reativar trocam a situação', async () => {
   montarComCatalogo()
   const secao = await abrirCatalogo()
-  fireEvent.click(await secao.findByRole('button', { name: 'Desativar Publicação' }))
-  await waitFor(async () => expect((await linhasDoCatalogo(secao))[2]).toMatch(/^PublicaçãoInativa/))
+  fireEvent.click(await secao.findByRole('button', { name: 'Desativar Divulgação' }))
+  await waitFor(async () => expect((await linhasDoCatalogo(secao))[3]).toMatch(/^DivulgaçãoVIIInativa/))
   fireEvent.click(secao.getByRole('button', { name: 'Reativar Arquivamento' }))
-  await waitFor(async () => expect((await linhasDoCatalogo(secao))[3]).toMatch(/^ArquivamentoOpcional/))
+  await waitFor(async () => expect((await linhasDoCatalogo(secao))[4]).toMatch(/^ArquivamentoVIIAtiva/))
 })
 
 test('falha ao desativar mostra o motivo e não muda a lista', async () => {
   const processos = montarComCatalogo()
   const secao = await abrirCatalogo()
   processos.catalogo.falhaDeGravacao = 'sem conexão'
-  fireEvent.click(await secao.findByRole('button', { name: 'Desativar Publicação' }))
+  fireEvent.click(await secao.findByRole('button', { name: 'Desativar Divulgação' }))
   expect((await secao.findByRole('alert')).textContent).toBe('A alteração não foi salva: sem conexão.')
-  expect(processos.catalogo.etapas[2].ativa).toBe(true)
+  expect(processos.catalogo.etapas.find((etapa) => etapa.codigo === 'divulgacao')?.ativa).toBe(true)
 })
 
 test('Excluir pede confirmação com o nome da etapa e exclui a nunca usada', async () => {
@@ -95,8 +95,8 @@ test('Excluir pede confirmação com o nome da etapa e exclui a nunca usada', as
   fireEvent.click(await secao.findByRole('button', { name: 'Excluir Arquivamento' }))
   expect(janelaAberta().getByRole('heading').textContent).toBe('Excluir a etapa Arquivamento do catálogo?')
   fireEvent.click(janelaAberta().getByRole('button', { name: 'Excluir etapa' }))
-  await waitFor(() => expect(processos.catalogo.etapas).toHaveLength(3))
-  await waitFor(async () => expect(await linhasDoCatalogo(secao)).toHaveLength(3))
+  await waitFor(() => expect(processos.catalogo.etapas).toHaveLength(5))
+  await waitFor(async () => expect(await linhasDoCatalogo(secao)).toHaveLength(5))
 })
 
 test('Cancelar na confirmação não exclui', async () => {
@@ -104,62 +104,66 @@ test('Cancelar na confirmação não exclui', async () => {
   const secao = await abrirCatalogo()
   fireEvent.click(await secao.findByRole('button', { name: 'Excluir Arquivamento' }))
   fireEvent.click(janelaAberta().getByRole('button', { name: 'Cancelar' }))
-  expect(processos.catalogo.etapas).toHaveLength(4)
+  expect(processos.catalogo.etapas).toHaveLength(6)
 })
 
-// Um processo que já concluiu a Modelagem piloto: a etapa está usada.
-const PROCESSO_QUE_USOU_A_MODELAGEM: ProcessoLido = {
-  id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
-  macroprocessoNome: 'Macro', processoPaiId: null, situacao: 'em_andamento', etapaAtual: null, responsavel: null,
-  origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null, processoPai: null, subprocessos: [],
-  dataDaReuniao: null, ultimaVersao: null, etapasDoProcesso: [{
-    id: 'a1', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 1, obrigatoria: true, status: 'concluida',
-    nota: null, iniciadaEm: '2026-10-01', resolvidaEm: '2026-10-02', responsavelId: null, responsavelNome: null,
-    responsavelInativo: false,
-  }],
-}
+// ---- Etapa com processo dentro e etapa por onde um processo passou
 
-test('excluir etapa já usada é recusado, sugerindo desativar', async () => {
-  montarComCatalogo({ ajustar: (processos) => {
-    processos.processos = [PROCESSO_QUE_USOU_A_MODELAGEM]
-  } })
+const DIVULGACAO = { id: 'e9', codigo: 'divulgacao', nome: 'Divulgação', ordem: 6, posicao: 4, total: 5 }
+const processoNaDivulgacao = (id: string) => umProcessoLido(`Processo ${id}`, { id, etapaAtual: DIVULGACAO })
+
+test('desativar e excluir a etapa com processo dentro são recusados, com a contagem', async () => {
+  const processos = montarComCatalogo({ ajustar: (falso) => { falso.processos = [processoNaDivulgacao('a'), processoNaDivulgacao('b')] } })
+  const secao = await abrirCatalogo()
+  fireEvent.click(await secao.findByRole('button', { name: 'Desativar Divulgação' }))
+  expect((await secao.findByRole('alert')).textContent).toBe('A etapa Divulgação tem 2 processos; mova-os antes de desativar.')
+  fireEvent.click(secao.getByRole('button', { name: 'Excluir Divulgação' }))
+  fireEvent.click(janelaAberta().getByRole('button', { name: 'Excluir etapa' }))
+  await waitFor(() => expect(screen.getByRole('alert').textContent).toBe('A etapa Divulgação tem 2 processos; mova-os antes de excluir.'))
+  expect(processos.catalogo.etapas.find((etapa) => etapa.codigo === 'divulgacao')?.ativa).toBe(true)
+})
+
+test('excluir a etapa por onde um processo passou é recusado, sugerindo desativar; desativar vale', async () => {
+  const visitada = umProcessoLido('Visitou', {
+    id: 'v', etapaAtual: { id: 'e1', codigo: 'nao_iniciados', nome: 'Não iniciados', ordem: 1, posicao: 1, total: 5 },
+    etapasDoVerso: [{ id: 'e9', codigo: 'divulgacao', nome: 'Divulgação', ordem: 6, passagens: [{ entrouEm: '2026-10-01', saiuEm: '2026-10-02' }] }],
+  })
+  const processos = montarComCatalogo({ ajustar: (falso) => { falso.processos = [visitada] } })
+  const secao = await abrirCatalogo()
+  fireEvent.click(await secao.findByRole('button', { name: 'Excluir Divulgação' }))
+  fireEvent.click(janelaAberta().getByRole('button', { name: 'Excluir etapa' }))
+  expect((await secao.findByRole('alert')).textContent).toBe('A etapa Divulgação já recebeu processos; desative-a em vez de excluir.')
+  fireEvent.click(secao.getByRole('button', { name: 'Desativar Divulgação' }))
+  await waitFor(() => expect(processos.catalogo.etapas.find((etapa) => etapa.codigo === 'divulgacao')?.ativa).toBe(false))
+})
+
+// ---- As seis etapas com campos próprios não saem do catálogo (revisoes-aprovacao, ticket 01, história 26, ampliada)
+
+const FRASE_DA_PROTEGIDA = (nome: string) => `A etapa ${nome} tem campos próprios e não pode ser desativada nem excluída.`
+
+test.each(['Modelagem piloto', 'Relatório e modelagem técnica'])('desativar a %s é recusado com a frase, e a etapa continua ativa', async (nome) => {
+  const processos = montarComCatalogo()
+  const secao = await abrirCatalogo()
+  fireEvent.click(await secao.findByRole('button', { name: `Desativar ${nome}` }))
+  expect((await secao.findByRole('alert')).textContent).toBe(FRASE_DA_PROTEGIDA(nome))
+  expect(processos.catalogo.etapas.find((etapa) => etapa.nome === nome)?.ativa).toBe(true)
+})
+
+test('excluir a Modelagem piloto é recusado com a frase, e a etapa continua no catálogo', async () => {
+  const processos = montarComCatalogo()
   const secao = await abrirCatalogo()
   fireEvent.click(await secao.findByRole('button', { name: 'Excluir Modelagem piloto' }))
   fireEvent.click(janelaAberta().getByRole('button', { name: 'Excluir etapa' }))
-  expect((await secao.findByRole('alert')).textContent)
-    .toBe('A etapa Modelagem piloto já foi usada; desative-a em vez de excluir.')
+  expect((await secao.findByRole('alert')).textContent).toBe(FRASE_DA_PROTEGIDA('Modelagem piloto'))
+  expect(processos.catalogo.etapas.some((etapa) => etapa.codigo === 'modelagem')).toBe(true)
 })
 
-// As três etapas de revisão e aprovação não saem do catálogo (revisoes-aprovacao, ticket 01, história 26).
-const REVISAO_INTERNA = { id: 'e5', codigo: 'revisao_interna', nome: 'Revisão interna', ordem: 3, obrigatoria: true, fase: 'VI' as const, ativa: true }
-const FRASE_DA_PROTEGIDA = 'A etapa Revisão interna é obrigatória no fluxo: não pode ser desativada nem excluída.'
-const comRevisaoInterna = (processos: ProcessosFalso) => {
-  processos.catalogo.etapas = [...processos.catalogo.etapas, REVISAO_INTERNA]
-}
-
-test('desativar a Revisão interna é recusado com a frase, e a etapa continua ativa', async () => {
-  const processos = montarComCatalogo({ ajustar: comRevisaoInterna })
+test('renomear a Modelagem piloto continua aceito', async () => {
+  const processos = montarComCatalogo()
   const secao = await abrirCatalogo()
-  fireEvent.click(await secao.findByRole('button', { name: 'Desativar Revisão interna' }))
-  expect((await secao.findByRole('alert')).textContent).toBe(FRASE_DA_PROTEGIDA)
-  expect(processos.catalogo.etapas.find((etapa) => etapa.codigo === 'revisao_interna')?.ativa).toBe(true)
-})
-
-test('excluir a Revisão interna é recusado com a frase, e a etapa continua no catálogo', async () => {
-  const processos = montarComCatalogo({ ajustar: comRevisaoInterna })
-  const secao = await abrirCatalogo()
-  fireEvent.click(await secao.findByRole('button', { name: 'Excluir Revisão interna' }))
-  fireEvent.click(janelaAberta().getByRole('button', { name: 'Excluir etapa' }))
-  expect((await secao.findByRole('alert')).textContent).toBe(FRASE_DA_PROTEGIDA)
-  expect(processos.catalogo.etapas.some((etapa) => etapa.codigo === 'revisao_interna')).toBe(true)
-})
-
-test('renomear a Revisão interna continua aceito', async () => {
-  const processos = montarComCatalogo({ ajustar: comRevisaoInterna })
-  const secao = await abrirCatalogo()
-  fireEvent.click(await secao.findByRole('button', { name: 'Editar Revisão interna' }))
+  fireEvent.click(await secao.findByRole('button', { name: 'Editar Modelagem piloto' }))
   const formulario = within(secao.getByRole('form', { name: 'Editar etapa' }))
-  fireEvent.change(formulario.getByLabelText('Nome'), { target: { value: 'Revisão interna do EP' } })
+  fireEvent.change(formulario.getByLabelText('Nome'), { target: { value: 'Modelagem inicial' } })
   fireEvent.click(formulario.getByRole('button', { name: 'Salvar' }))
-  await waitFor(() => expect(processos.catalogo.etapas.find((etapa) => etapa.codigo === 'revisao_interna')?.nome).toBe('Revisão interna do EP'))
+  await waitFor(() => expect(processos.catalogo.etapas.find((etapa) => etapa.codigo === 'modelagem')?.nome).toBe('Modelagem inicial'))
 })

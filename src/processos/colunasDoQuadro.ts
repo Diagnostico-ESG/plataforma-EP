@@ -1,4 +1,3 @@
-import { CHAVE_DOS_CONCLUIDOS, TITULO_DOS_CONCLUIDOS } from './publicacao'
 import type { ListaDeProcessos, ProcessoDaLista, SituacaoDoProcesso } from './tipos'
 
 export type ColunaDoQuadro = {
@@ -7,35 +6,29 @@ export type ColunaDoQuadro = {
   inativo?: boolean
 }
 
-// Nas colunas das etapas só em andamento e suspensos; o concluído vai à coluna Concluídos e o cancelado fica só na Lista.
-const SITUACOES_NO_QUADRO = new Set<SituacaoDoProcesso>(['em_andamento', 'suspenso'])
+// No Quadro: em andamento, suspensos e concluídos (já em Concluídos); o cancelado e o arquivado ficam só na Lista.
+const SITUACOES_NO_QUADRO = new Set<SituacaoDoProcesso>(['em_andamento', 'suspenso', 'concluido'])
 
 function porNome(a: ProcessoDaLista, b: ProcessoDaLista): number {
   return a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' })
 }
 
 function processosDoQuadro(processos: ProcessoDaLista[]): ProcessoDaLista[] {
-  return processos.filter((processo) => SITUACOES_NO_QUADRO.has(processo.situacao)).sort(porNome)
-}
-
-function colunaDosConcluidos(processos: ProcessoDaLista[]): ColunaDoQuadro {
-  // O arquivado continua concluído, mas sai do Quadro: fica só na Lista.
-  const concluidos = processos.filter((processo) => processo.situacao === 'concluido' && !processo.arquivadoEm).sort(porNome)
-  return { chave: CHAVE_DOS_CONCLUIDOS, titulo: TITULO_DOS_CONCLUIDOS, processos: concluidos }
+  return processos.filter((processo) => SITUACOES_NO_QUADRO.has(processo.situacao) && !processo.arquivadoEm).sort(porNome)
 }
 
 /**
- * Uma coluna por etapa ativa, na ordem do catálogo, e Concluídos no fim, sempre. A coluna de uma etapa desativada
- * aparece enquanto houver processo nela. Em cada coluna, os processos saem em ordem de nome.
+ * Uma coluna por etapa ativa, na ordem do catálogo, de Não iniciados a Concluídos, mesmo vazia. Em cada coluna, os
+ * processos saem em ordem de nome.
  */
 export function colunasDoQuadro({ etapas, processos }: ListaDeProcessos): ColunaDoQuadro[] {
   const noQuadro = processosDoQuadro(processos)
-  const daEtapa = (codigo: string) => noQuadro.filter((processo) => processo.etapaAtual?.codigo === codigo)
-  const colunasDasEtapas = etapas
-    .filter((etapa) => etapa.ativa || daEtapa(etapa.codigo).length > 0)
+  return etapas
+    .filter((etapa) => etapa.ativa)
     .sort((a, b) => a.ordem - b.ordem)
-    .map((etapa) => ({ chave: etapa.codigo, titulo: etapa.nome, processos: daEtapa(etapa.codigo) }))
-  return [...colunasDasEtapas, colunaDosConcluidos(processos)]
+    .map((etapa) => ({
+      chave: etapa.codigo, titulo: etapa.nome, processos: noQuadro.filter((processo) => processo.etapaAtual?.codigo === etapa.codigo),
+    }))
 }
 
 function porTitulo(a: ColunaDoQuadro, b: ColunaDoQuadro): number {
@@ -55,9 +48,12 @@ function agruparPorPessoa(processos: ProcessoDaLista[]): ColunaDoQuadro[] {
   return [...pessoas.values()].sort(porTitulo)
 }
 
-/** Uma coluna por pessoa que responde pela etapa atual de algum cartão, em ordem de nome; "Sem responsável" por último. */
+/**
+ * Uma coluna por pessoa que responde por algum cartão (inclusive os de Não iniciados e de Concluídos), em ordem de
+ * nome; "Sem responsável" por último.
+ */
 export function colunasPorResponsavel(processos: ProcessoDaLista[]): ColunaDoQuadro[] {
-  const noQuadro = processosDoQuadro(processos).filter((processo) => processo.etapaAtual !== null)
+  const noQuadro = processosDoQuadro(processos)
   const colunas = agruparPorPessoa(noQuadro)
   const semResponsavel = noQuadro.filter((processo) => processo.responsavel === null)
   if (semResponsavel.length === 0) return colunas

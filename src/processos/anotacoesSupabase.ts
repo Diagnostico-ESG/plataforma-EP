@@ -1,6 +1,6 @@
 import type { RecusasDoModulo } from '../acesso/falhasDeGravacao'
 import type { ClienteSupabase } from '../lib/supabase'
-import { falhaDoAndamento } from './andamentosSupabase'
+import { falhaDoBanco } from './recusasDoBanco'
 import type { ModuloDeProcessos } from './tipos'
 
 type OperacoesDasAnotacoes = Pick<ModuloDeProcessos, 'lerAnotacoes' | 'gravarAnotacoes'>
@@ -25,7 +25,7 @@ export function criarAnotacoesSupabase(cliente: ClienteSupabase, recusas: Recusa
       const { data, error } = await cliente.rpc('gravar_anotacoes_do_processo',
         { p_processo: id, p_esperado: esperado as string, p_novo: novo as string })
       if (error?.message.includes(CODIGO_DO_CONFLITO)) return { tipo: 'conflito' }
-      if (error) throw falhaDoAndamento(error, recusas)
+      if (error) throw falhaDoBanco(error, recusas)
       return { tipo: 'gravado', anotacoes: anotacoesGravadas(data) }
     },
   }

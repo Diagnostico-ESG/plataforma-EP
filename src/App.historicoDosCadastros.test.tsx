@@ -163,14 +163,14 @@ test.each<Perfil>(['consulta', 'integrante_ep', 'administrador'])('o perfil %s l
   expect(screen.queryByRole('button', { name: /novo|excluir|desativar|editar/i })).toBeNull()
 })
 
-test('um processo excluído continua no Histórico, com o que tinha, inclusive as etapas', async () => {
+test('um processo excluído continua no Histórico, com o que tinha, inclusive a etapa, a etiqueta e o responsável', async () => {
   const antes = {
     nome: 'Emitir Ofício', setor_sigla: 'TSA', macroprocesso_nome: 'Macro Teste Um', tipo: 'a_classificar', origem: 'novo',
-    situacao: 'em_andamento', andamentos: [{ etapa_nome: 'Reunião de modelagem', status: 'concluida' }],
+    situacao: 'em_andamento', etapa_codigo: 'modelagem', etapa_nome: 'Modelagem piloto', etiqueta: 'em_andamento', responsavel_nome: 'Ana Teste',
   }
   montar('integrante_ep', [evento(9, { acao: 'excluir', entidade: 'processo', entidadeRef: 'p1', antes })])
   const itens = await itensDaLista()
   expect(itens[0].textContent).toContain('Excluiu')
   expect(itens[0].textContent).toContain('TSA — Emitir Ofício')
-  expect(itens[0].textContent).toContain('Etapas: Reunião de modelagem (Concluída)')
+  expect(itens[0].textContent).toContain('Etiqueta: Em andamento; Responsável: Ana Teste')
 })

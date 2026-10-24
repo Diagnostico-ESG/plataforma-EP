@@ -1,22 +1,21 @@
-import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, fireEvent, within } from '@testing-library/react'
 import { afterEach, expect, test } from 'vitest'
-import type { EtapaDoProcesso } from './processos/tipos'
 import type { Aprovacao } from './revisoes/tipos'
 import { escolherNoMenuDoProcesso, gavetaDaEtapa, versoAberto } from './testes/versoDoCartao'
 import { arquivoDeTeste, versaoDeTeste } from './testes/versoesDeTeste'
-import {
-  APROVACAO, BIA, CONCLUIDA, PUBLICACAO, REVISAO_DO_SETOR, abrirAJanela, botao, campo, caminho, montar, responder, versao, type Falsos,
-} from './testes/aprovacaoNoVerso'
+import { APROVACAO, REVISAO_DO_SETOR, montar, versao, type Falsos } from './testes/aprovacaoNoVerso'
+import { BIA } from './testes/processoNoVerso'
 
-// A aprovação na gaveta da etapa, o selo "Aprovada" em Arquivos, o aviso de voltar e o histórico (ticket 03 de
-// revisoes-aprovacao, histórias 17 a 20, 24, 25 e 28 a 30).
+// A aprovação na gaveta da etapa, o selo "Aprovada" em Arquivos e o histórico (ticket 03 de revisoes-aprovacao, histórias
+// 17 a 20, 24, 25 e 28 a 30). Registrar a aprovação e o aviso de voltar saíram com o andamento livre; o registro volta no
+// ticket 05 de revisoes-aprovacao.
 
 afterEach(() => {
   cleanup()
   window.location.hash = ''
 })
 
-// ---- A aprovação na gaveta, o selo em Arquivos, o aviso de voltar e o histórico
+// ---- A aprovação na gaveta e o selo em Arquivos
 
 const APROVADA: Aprovacao = {
   id: 'ap1', versao: 8, numeroEprotocolo: 'PROT-2026-0001', link: 'https://eprotocolo.example/a', aprovadaEm: '2026-10-09',
@@ -35,8 +34,6 @@ const aprovadaNasVersoes = (falsos: Falsos) => {
   falsos.revisoes.aprovacoes.p1 = APROVADA
   falsos.versoes.aprovadas.p1 = 8
 }
-const aprovacaoConcluida = (): EtapaDoProcesso[] =>
-  caminho().map((etapa) => (etapa.codigo === 'aprovacao_setor' ? { ...etapa, ...CONCLUIDA } : etapa))
 
 test('a gaveta da Aprovação mostra a versão aprovada, o número como link em aba nova, a data e quem registrou', async () => {
   montar(versao(), { ajustar: aprovadaCom({}) })
@@ -100,18 +97,6 @@ test('o subprocesso mostra a própria aprovação', async () => {
 
 const abrirOsArquivos = async () => within(await (await versoAberto()).findByRole('region', { name: 'Arquivos' }))
 
-test('a aprovação registrada pela janela aparece na gaveta e a versão ganha o selo "Aprovada"', async () => {
-  montar(versao(), { ajustar: comAsVersoes })
-  const destaque = within(await (await abrirOsArquivos()).findByRole('article', { name: 'V8' }))
-  expect(destaque.queryByText('Aprovada')).toBeNull()
-  const janela = await abrirAJanela()
-  fireEvent.change(campo(janela, /Número do E-protocolo/), { target: { value: 'PROT-9' } })
-  responder(janela, 'Sim')
-  fireEvent.click(botao(janela))
-  expect(await (await gavetaDaEtapa(APROVACAO)).findByText('V8 aprovada')).toBeTruthy()
-  await waitFor(() => expect(within(screen.getAllByRole('article', { name: 'V8' })[0]).getByText('Aprovada')).toBeTruthy())
-})
-
 test('a versão aprovada tem o selo "Aprovada" e nenhum [Substituir]; a anterior continua com o [Substituir]', async () => {
   montar(versao(), { ajustar: aprovadaNasVersoes })
   const arquivos = await abrirOsArquivos()
@@ -129,54 +114,6 @@ test('sem aprovação a versão mais recente mantém o [Substituir] e não tem s
   const destaque = within(await (await abrirOsArquivos()).findByRole('article', { name: 'V8' }))
   expect(destaque.queryByText('Aprovada')).toBeNull()
   expect(destaque.getAllByRole('button', { name: /^Ações de / }).length).toBeGreaterThan(0)
-})
-
-// ---- Voltar para a Aprovação ou antes dela desfaz a aprovação, com aviso
-
-const AVISO = 'A aprovação da V8 será desfeita.'
-
-async function abrirAJanelaDeVoltar(etapa: string) {
-  const gaveta = await gavetaDaEtapa(etapa)
-  fireEvent.click(gaveta.getByRole('button', { name: 'Voltar a esta etapa' }))
-  return within(await screen.findByRole('dialog', { name: `Voltar à etapa ${etapa}?` }))
-}
-
-test.each([['Revisão interna'], [REVISAO_DO_SETOR], [APROVACAO]])('voltar para %s, com aprovação, avisa que ela será desfeita', async (etapa) => {
-  montar(versao(), { etapas: aprovacaoConcluida(), ajustar: aprovadaNasVersoes })
-  const janela = await abrirAJanelaDeVoltar(etapa)
-  expect(await janela.findByText(AVISO)).toBeTruthy()
-})
-
-test('voltar para uma etapa depois da Aprovação, ou sem aprovação, não mostra o aviso', async () => {
-  const resolvidas = aprovacaoConcluida().map((etapa) => (etapa.codigo === 'publicacao' ? { ...etapa, ...CONCLUIDA } : etapa))
-  montar(versao(), { etapas: resolvidas, ajustar: aprovadaNasVersoes })
-  const depois = await abrirAJanelaDeVoltar(PUBLICACAO)
-  await (await gavetaDaEtapa(APROVACAO)).findByText('V8 aprovada')
-  expect(depois.queryByText(AVISO)).toBeNull()
-  cleanup()
-  montar(versao(), { etapas: resolvidas })
-  const semAprovacao = await abrirAJanelaDeVoltar(REVISAO_DO_SETOR)
-  expect(semAprovacao.queryByText(AVISO)).toBeNull()
-})
-
-test('com a leitura da aprovação falhando a janela de voltar abre sem o aviso e sem erro', async () => {
-  montar(versao(), {
-    etapas: aprovacaoConcluida(),
-    ajustar: (falsos) => { aprovadaNasVersoes(falsos); falsos.revisoes.falharLeitura = true },
-  })
-  const janela = await abrirAJanelaDeVoltar(REVISAO_DO_SETOR)
-  expect(janela.queryByText(AVISO)).toBeNull()
-  expect(janela.queryByRole('alert')).toBeNull()
-})
-
-test('confirmar a volta desfaz a aprovação: a gaveta passa a "Sem aprovação registrada." e o selo some', async () => {
-  montar(versao(), { etapas: aprovacaoConcluida(), ajustar: aprovadaNasVersoes })
-  expect(await (await abrirOsArquivos()).findByText('Aprovada')).toBeTruthy()
-  const janela = await abrirAJanelaDeVoltar(REVISAO_DO_SETOR)
-  fireEvent.change(janela.getByLabelText('Motivo'), { target: { value: 'O setor pediu ajustes' } })
-  fireEvent.click(janela.getByRole('button', { name: 'Voltar' }))
-  expect(await (await gavetaDaEtapa(APROVACAO)).findByText('Sem aprovação registrada.')).toBeTruthy()
-  await waitFor(() => expect((screen.queryAllByText('Aprovada'))).toHaveLength(0))
 })
 
 // ---- O histórico do processo

@@ -5,20 +5,14 @@ import type { Perfil } from '../acesso/tipos'
 import { CadastrosFalso } from '../cadastros/CadastrosFalso'
 import { ProcessosFalso } from '../processos/ProcessosFalso'
 import { hojeLocal } from '../processos/textoDaReuniao'
-import type { EtapaDoProcesso, ProcessoLido, UsuarioResponsavel } from '../processos/tipos'
+import type { ProcessoLido, UsuarioResponsavel } from '../processos/tipos'
 import { VersoesFalso } from '../versoes/VersoesFalso'
 import { RevisoesFalso } from '../revisoes/RevisoesFalso'
 import { PlanilhasFalso } from '../planilhas/PlanilhasFalso'
+import { CATALOGO_DE_TESTE, umProcessoLido } from './processoDaLista'
 
 export const EU: UsuarioResponsavel = { id: USUARIO_DE_TESTE.id, nome: USUARIO_DE_TESTE.nome }
 export const BIA: UsuarioResponsavel = { id: 'u2', nome: 'Bia Teste' }
-
-export function etapaDoProcesso(ordem: number, codigo: string, nome: string, mudancas: Partial<EtapaDoProcesso> = {}): EtapaDoProcesso {
-  return {
-    id: `a${ordem}`, codigo, nome, ordem, obrigatoria: true, status: 'pendente', nota: null, iniciadaEm: null,
-    resolvidaEm: null, responsavelId: null, responsavelNome: null, responsavelInativo: false, ...mudancas,
-  }
-}
 
 /** A data (AAAA-MM-DD) de `dias` dias atrás, no relógio de quem usa. */
 export function diasAtras(dias: number): string {
@@ -27,15 +21,12 @@ export function diasAtras(dias: number): string {
   return hojeLocal(dia)
 }
 
-export function processoLido(etapas: EtapaDoProcesso[], mudancas: Partial<ProcessoLido> = {}): ProcessoLido {
-  const atual = etapas.find((etapa) => etapa.status === 'em_andamento' || etapa.status === 'pendente') ?? etapas[0]
-  return {
-    id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
-    macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento',
-    etapaAtual: { codigo: atual.codigo, nome: atual.nome, ordem: atual.ordem },
-    processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null, origem: 'novo', contexto: null,
-    observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, ultimaVersao: null, etapasDoProcesso: etapas, ...mudancas,
-  }
+/**
+ * O processo "Emitir Ofício" (p1) na etapa pedida (Revisão interna por padrão), sem responsável, com A fazer e entrada de
+ * hoje. As etapas do verso saem do catálogo de teste quando a falsa lê o processo.
+ */
+export function processoLido(mudancas: Partial<ProcessoLido> = {}, etapa = 'revisao_interna'): ProcessoLido {
+  return umProcessoLido('Emitir Ofício', { id: 'p1', responsavel: null, entrouNaEtapaEm: diasAtras(0), ...mudancas }, etapa)
 }
 
 /** O aplicativo inteiro com o processo aberto no verso (endereço #/processos/{id}); `outros` são o pai e os subprocessos. */
@@ -50,9 +41,8 @@ export function montarVerso(
   const falso = new ProcessosFalso()
   falso.processos = [processo, ...outros]
   falso.usuariosPossiveis = [EU, BIA]
-  falso.etapasDoCatalogo = processo.etapasDoProcesso.map((etapa) => ({
-    id: `e${etapa.ordem}`, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, ativa: true,
-  }))
+  falso.quemChama = EU
+  falso.etapasDoCatalogo = CATALOGO_DE_TESTE
   preparar?.(falso)
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso(falso)} planilhas={new PlanilhasFalso()} />)
   return falso

@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import {
   descreverEstadoDoCadastro, ehRegistroRetirado, eventosDoItem, itensDoFiltro, nomeDoItem, rotuloDoMotivo, textoDaAcaoDoCadastro,
+  tituloDoEvento,
 } from './historicoDosCadastros'
 import type { EventoDoCadastro } from './tipos'
 
@@ -152,52 +153,55 @@ describe('eventosDoItem', () => {
 })
 
 
-const ETAPA_PENDENTE = {
-  setor_id: 's1', setor_sigla: 'TSA', etapa_codigo: 'sensibilizacao', etapa_nome: 'Reunião de sensibilização',
-  status: 'pendente', iniciada_em: null, resolvida_em: null,
-}
-const ETAPA_DISPENSADA: EventoDoCadastro = {
-  id: 20, ocorridoEm: '2026-10-13T15:00:00Z', autor: 'Pessoa Fictícia', acao: 'dispensar', entidade: 'andamento',
-  entidadeRef: 's1:a2', antes: ETAPA_PENDENTE,
-  depois: { ...ETAPA_PENDENTE, status: 'dispensada', resolvida_em: '2026-10-13' }, motivo: 'Setor já conhecido',
-}
+const MOVIMENTO_ANTES = { processo_nome: 'Emitir Ofício', etapa_codigo: 'revisao_interna', etapa_nome: 'Revisão interna', responsavel_id: 'u1', responsavel_nome: 'Ana Teste' }
+const MOVIMENTO_DEPOIS = { processo_nome: 'Emitir Ofício', etapa_codigo: 'publicacao', etapa_nome: 'Publicação', responsavel_id: 'u2', responsavel_nome: 'Bia Teste' }
+const MOVEU = evento({ entidade: 'passagem', entidadeRef: 'p1', acao: 'mover', antes: MOVIMENTO_ANTES, depois: MOVIMENTO_DEPOIS })
 
-describe('registros antigos de etapa do setor (recurso retirado da plataforma)', () => {
-  test('texto de cada ação', () => {
-    expect(['iniciar', 'concluir', 'dispensar', 'registrar_realizada'].map((acao) => textoDaAcaoDoCadastro(acao, 'andamento')))
-      .toEqual(['Iniciou a etapa', 'Concluiu a etapa', 'Dispensou a etapa', 'Registrou a etapa como realizada anteriormente'])
+describe('movimento, etiqueta e responsável no histórico (Andamento livre)', () => {
+  test('o movimento diz de onde e para onde, e o item é o nome do processo', () => {
+    expect(tituloDoEvento(MOVEU)).toBe('Moveu de Revisão interna para Publicação')
+    expect(nomeDoItem(MOVEU)).toBe('Emitir Ofício')
   })
 
-  test('o andamento sem processo é a linha simples; o do processo continua com o nome da etapa', () => {
-    expect(nomeDoItem(ETAPA_DISPENSADA)).toBe('Registro de etapa do setor (recurso retirado da plataforma)')
-    expect(ehRegistroRetirado(ETAPA_DISPENSADA)).toBe(true)
-    const doProcesso = evento({ entidade: 'andamento', entidadeRef: 'p1:a4', depois: { processo_id: 'p1', etapa_nome: 'Modelagem piloto' } })
-    expect(ehRegistroRetirado(doProcesso)).toBe(false)
+  test('o antes e o depois do movimento mostram o responsável e escondem a etapa (já está no título) e o id', () => {
+    expect(descreverEstadoDoCadastro(MOVEU.antes)).toBe('Processo: Emitir Ofício; Responsável: Ana Teste')
+    expect(descreverEstadoDoCadastro(MOVEU.depois)).toBe('Processo: Emitir Ofício; Responsável: Bia Teste')
   })
 
-  test('o evento continua no filtro pelo setor', () => {
-    expect(itensDoFiltro([ETAPA_DISPENSADA])).toEqual([{ id: 's1', nome: 'TSA' }])
-    expect(eventosDoItem([ETAPA_DISPENSADA], 's1')).toEqual([ETAPA_DISPENSADA])
-  })
-})
-
-describe('voltar, datas e responsável da etapa no histórico', () => {
-  test('texto de cada ação', () => {
-    expect(['voltar', 'corrigir_datas', 'mudar_responsavel'].map((acao) => textoDaAcaoDoCadastro(acao, 'andamento')))
-      .toEqual(['Voltou à etapa', 'Corrigiu as datas da etapa', 'Mudou o responsável da etapa'])
+  test('a chegada a Concluídos mostra a data, o link e a explicação que chegaram', () => {
+    const depois = { ...MOVIMENTO_DEPOIS, publicado_em: '2026-10-10', link_da_publicacao: 'https://exemplo.test/d', explicacao_sem_publicacao: 'Sem DO' }
+    expect(descreverEstadoDoCadastro(depois)).toBe(
+      'Processo: Emitir Ofício; Responsável: Bia Teste; Data da publicação: 10/10/2026; Link da publicação: https://exemplo.test/d; Explicação de concluir sem publicação: Sem DO')
   })
 
-  test('antes e depois mostram o responsável pelo nome; sem responsável nos dois, o campo nem aparece', () => {
-    expect(descreverEstadoDoCadastro({ ...ETAPA_PENDENTE, responsavel_nome: 'Ana Teste' }))
-      .toBe('Setor: TSA; Situação da etapa: Pendente; Início: —; Conclusão: —; Responsável: Ana Teste')
-    expect(descreverEstadoDoCadastro({ ...ETAPA_PENDENTE, responsavel_nome: null }))
-      .toContain('Responsável: —')
-    expect(descreverEstadoDoCadastro(ETAPA_PENDENTE)).not.toContain('Responsável')
+  test('mudar a etiqueta mostra a etiqueta pelo rótulo da tela', () => {
+    const mudou = evento({
+      entidade: 'passagem', entidadeRef: 'p1', acao: 'mudar_etiqueta', antes: { ...MOVIMENTO_ANTES, etiqueta: 'a_fazer' },
+      depois: { ...MOVIMENTO_ANTES, etiqueta: 'concluido' },
+    })
+    expect(tituloDoEvento(mudou)).toBe('Mudou a etiqueta')
+    expect(descreverEstadoDoCadastro(mudou.antes)).toBe('Processo: Emitir Ofício; Responsável: Ana Teste; Etiqueta: A fazer')
+    expect(descreverEstadoDoCadastro(mudou.depois)).toBe('Processo: Emitir Ofício; Responsável: Ana Teste; Etiqueta: Concluído')
   })
 
-  test('o motivo da volta se chama Motivo; a nota das outras ações, Nota', () => {
-    expect(rotuloDoMotivo('voltar')).toBe('Motivo')
-    expect(rotuloDoMotivo('dispensar')).toBe('Nota')
+  test('mudar o responsável é do processo e mostra de quem para quem', () => {
+    const mudou = evento({
+      entidade: 'processo', entidadeRef: 'p1', acao: 'mudar_responsavel',
+      antes: { nome: 'Emitir Ofício', setor_sigla: 'TSA', responsavel_id: 'u1', responsavel_nome: 'Ana Teste' },
+      depois: { nome: 'Emitir Ofício', setor_sigla: 'TSA', responsavel_id: null, responsavel_nome: null },
+    })
+    expect(tituloDoEvento(mudou)).toBe('Mudou o responsável')
+    expect(descreverEstadoDoCadastro(mudou.antes)).toBe('Nome: Emitir Ofício; Setor: TSA; Responsável: Ana Teste')
+    expect(descreverEstadoDoCadastro(mudou.depois)).toBe('Nome: Emitir Ofício; Setor: TSA; Responsável: —')
+  })
+
+  test('o movimento entra no filtro pelo processo', () => {
+    expect(eventosDoItem([MOVEU], 'p1')).toEqual([MOVEU])
+    expect(itensDoFiltro([MOVEU])).toEqual([{ id: 'p1', nome: 'Emitir Ofício' }])
+  })
+
+  test('o texto livre do movimento é nota', () => {
+    expect(rotuloDoMotivo('mover')).toBe('Nota')
   })
 })
 
@@ -214,23 +218,15 @@ describe('situação do processo no histórico', () => {
   })
 })
 
-describe('desistência, publicação registrada e arquivamento no histórico', () => {
-  test('textos das ações novas do processo', () => {
-    const acoes = ['nao_vai_mais_para_publicacao', 'registrar_publicacao', 'arquivar', 'desarquivar']
-    expect(acoes.map((acao) => textoDaAcaoDoCadastro(acao, 'processo'))).toEqual([
-      'Registrou que o processo não vai mais para publicação', 'Registrou a publicação', 'Arquivou o processo',
-      'Desarquivou o processo',
+describe('arquivamento no histórico', () => {
+  test('textos de arquivar e desarquivar', () => {
+    expect(['arquivar', 'desarquivar'].map((acao) => textoDaAcaoDoCadastro(acao, 'processo'))).toEqual([
+      'Arquivou o processo', 'Desarquivou o processo',
     ])
   })
 
-  test('o texto livre da desistência se chama Motivo e o do registro, Nota', () => {
-    expect(rotuloDoMotivo('nao_vai_mais_para_publicacao')).toBe('Motivo')
-    expect(rotuloDoMotivo('registrar_publicacao')).toBe('Nota')
-  })
-
   test('a data da publicação sai em DD/MM/AAAA', () => {
-    expect(descreverEstadoDoCadastro({ vai_para_publicacao: true, publicado_em: '2026-10-17' }))
-      .toBe('Vai para publicação: Sim; Data da publicação: 17/10/2026')
+    expect(descreverEstadoDoCadastro({ publicado_em: '2026-10-17' })).toBe('Data da publicação: 17/10/2026')
   })
 })
 
@@ -281,17 +277,6 @@ describe('processos', () => {
     expect(nomeDoItem(evento({ entidade: 'processo', entidadeRef: 'p1', acao: 'excluir', antes: PROCESSO }))).toBe('TSA — Emitir Ofício')
   })
 
-  test('o evento de etapa de processo traz o processo no nome do item e nos campos, sem o id', () => {
-    const depois = {
-      processo_id: 'p1', processo_nome: 'Emitir Ofício', setor_sigla: 'TSA', etapa_codigo: 'modelagem',
-      etapa_nome: 'Reunião de modelagem', status: 'em_andamento', iniciada_em: '2026-10-14', resolvida_em: null,
-    }
-    expect(nomeDoItem(evento({ entidade: 'andamento', entidadeRef: 'p1:a4', acao: 'iniciar', depois })))
-      .toBe('Reunião de modelagem — Emitir Ofício')
-    expect(descreverEstadoDoCadastro(depois)).toBe(
-      'Processo: Emitir Ofício; Setor: TSA; Situação da etapa: Em andamento; Início: 14/10/2026; Conclusão: —')
-  })
-
   test('os campos aparecem legíveis, com tipo, origem e situação pelo rótulo da tela', () => {
     expect(descreverEstadoDoCadastro(PROCESSO)).toBe(
       'Nome: Emitir Ofício; Setor: TSA; Macroprocesso: Macro A; Tipo: A classificar; Origem: Novo; Situação: Em andamento; Contexto: —; Observações: —')
@@ -299,13 +284,9 @@ describe('processos', () => {
     expect(textoDaAcaoDoCadastro('excluir', 'processo')).toBe('Excluiu')
   })
 
-  test('a exclusão lista as etapas do processo com o nome e o status', () => {
-    const andamentos = [
-      { etapa_codigo: 'modelagem', etapa_nome: 'Reunião de modelagem', status: 'concluida' },
-      { etapa_codigo: 'revisao_interna', etapa_nome: 'Revisão interna', status: 'pendente' },
-    ]
-    expect(descreverEstadoDoCadastro({ nome: 'Emitir Ofício', andamentos }))
-      .toBe('Nome: Emitir Ofício; Etapas: Reunião de modelagem (Concluída), Revisão interna (Pendente)')
+  test('a exclusão traz a etapa atual, a etiqueta e o responsável do processo', () => {
+    expect(descreverEstadoDoCadastro({ nome: 'Emitir Ofício', etapa_codigo: 'publicacao', etapa_nome: 'Publicação', etiqueta: 'em_andamento', responsavel_nome: 'Ana Teste' }))
+      .toBe('Nome: Emitir Ofício; Etiqueta: Em andamento; Responsável: Ana Teste')
   })
 
   test('o processo excluído continua no filtro pelo nome', () => {

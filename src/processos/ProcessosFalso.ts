@@ -3,49 +3,42 @@ import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import type { EventoDoCadastro } from '../cadastros/tipos'
 import { AnotacoesFalso } from './AnotacoesFalso'
 import { CatalogoFalso } from './CatalogoFalso'
+import { arquivar, conferirNaoArquivado, desarquivar } from './arquivamentoFalso'
+import { CODIGO_CONCLUIDOS, CODIGO_NAO_INICIADOS } from './codigosDasEtapas'
 import {
-  avancarProcesso, conferirAutorDaProxima, conferirAutorDaRevisao, conferirAvanco, conferirDatasDaEtapa,
-  conferirResponsavelEscolhido, conferirVersaoDaRevisaoDoSetor, mudarEtapaDoProcesso, responsavelDoCartao, trocarEtapaDoProcesso, voltarEtapas,
-  type PedidoDeAvanco,
-} from './andamentoFalso'
+  conferirEtapaAtiva, conferirEtiquetaMutavel, etapaAtualNoCatalogo, etapasDoVersoDe, publicacaoDaChegada, registrarPassagem,
+} from './movimentoFalso'
 import {
   conferirPai, conferirSemSubprocessos, estruturaDoProcesso, levarMacroprocessoAosFilhos, macroprocessoDo, reclassificar,
 } from './reclassificacaoFalso'
-import { arquivar, conferirNaoArquivado, desarquivar, desistirDaPublicacao, registrarPublicacao } from './arquivamentoFalso'
-import { escolhaDaVolta, escolhaDoAvanco } from './publicacaoFalso'
 import { conferirProcessoEmAndamento, mudarSituacao } from './situacaoFalso'
+import { hojeLocal } from './textoDaReuniao'
 import type {
-  DadosDoProcesso, DatasDaEtapa, EtapaDoCatalogo, EtapaDoProcesso, EtapaDoCaminho, ListaDeProcessos,
-  ModuloDeProcessos, ProcessoLido, Reclassificacao, UsuarioResponsavel,
+  DadosDaChegada, DadosDoProcesso, EtapaDoCatalogo, EtiquetaDaEtapa, ListaDeProcessos, ModuloDeProcessos, ProcessoLido,
+  Reclassificacao, UsuarioResponsavel,
 } from './tipos'
 
-type ChamadaDeEtapa = {
-  acao: string; id: string; nota?: string; datas?: DatasDaEtapa; usuarioId?: string | null; vai?: boolean | null
+type ChamadaDeProcesso = {
+  acao: string; id: string; nota?: string; etapaId?: string; etiqueta?: EtiquetaDaEtapa; usuarioId?: string | null
+  chegada?: DadosDaChegada
 }
-type TrocaDeEtapas = <T extends EtapaDoCaminho>(etapas: T[]) => T[]
-const RESOLVIDAS = ['concluida', 'realizada_anteriormente', 'dispensada']
-
-// Dia fixo: os testes de tela não dependem da data em que rodam.
-const HOJE = '2026-10-13'
 
 /** Implementação falsa de processos para os testes de tela: sem rede, com falhas e esperas simuladas. */
 export class ProcessosFalso implements ModuloDeProcessos {
   /** Texto: motivo em português (falha genérica). Error: a recusa pronta (TravaDoBanco), como o módulo real. */
   falhaDeGravacao: string | Error | null = null
   /** As ações gravadas, na ordem. */
-  chamadas: ChamadaDeEtapa[] = []
-  /** Quem pode ser escolhido como responsável de uma etapa (ativos, Administrador ou Integrante). */
+  chamadas: ChamadaDeProcesso[] = []
+  /** Quem pode ser escolhido como responsável do processo (ativos, Administrador ou Integrante). */
   usuariosPossiveis: UsuarioResponsavel[] = []
+  /** Quem está na tela: ao mover, esta pessoa vira o responsável (como `auth.uid()` no banco). */
+  quemChama: UsuarioResponsavel = { id: 'usuario-de-teste', nome: 'Pessoa de Teste' }
   /** Os processos cadastrados; a lista e a leitura partem daqui. */
   processos: ProcessoLido[] = []
-  /** As etapas de nível processo do catálogo, na ordem dele (as colunas do Quadro). */
+  /** As etapas do catálogo, na ordem dele (as colunas do Quadro). */
   etapasDoCatalogo: EtapaDoCatalogo[] = []
   /** O histórico de cada processo (pelo id do processo), do mais recente para o mais antigo. */
   historicoDosProcessos: Record<string, EventoDoCadastro[]> = {}
-  /** Chamado ao fim de cada volta de etapa, com o processo e o código da etapa reaberta (a falsa de revisões desfaz a aprovação). */
-  aoVoltar: ((processoId: string, etapaCodigo: string) => void) | null = null
-  /** A data da aprovação do processo (AAAA-MM-DD), mínimo da publicação registrada; a falsa de revisões a liga. */
-  dataDaAprovacao: ((processoId: string) => string | null) | null = null
   /** Sigla e nome que o banco juntaria ao cartão (pelo id do setor e do macroprocesso). */
   siglasDosSetores: Record<string, string> = {}
   nomesDosMacroprocessos: Record<string, string> = {}
@@ -55,6 +48,8 @@ export class ProcessosFalso implements ModuloDeProcessos {
   segurarLeituraDoProcesso = false
   falharHistoricoDoProcesso = false
   segurarHistoricoDoProcesso = false
+  /** Segura as gravações de mover até o teste liberar (para ver o estado "gravando" e a ordem das respostas). */
+  segurarMovimento: Promise<void> | null = null
   /** O catálogo inteiro; as gravações nele mudam `etapasDoCatalogo` e os processos. */
   catalogo = new CatalogoFalso(this)
   /** As Anotações dos processos (texto, autor e hora), com a falha, a espera e o "outra pessoa alterou" programáveis. */
@@ -65,36 +60,45 @@ export class ProcessosFalso implements ModuloDeProcessos {
 
   gravarAnotacoes = (id: string, esperado: string | null, novo: string | null) => this.anotacoes.gravar(id, esperado, novo)
 
-  async iniciarEtapa(id: string): Promise<void> {
-    this.mudar({ acao: 'iniciar', id }, { status: 'em_andamento', iniciadaEm: HOJE })
-  }
-
-  async concluirEtapa(id: string, usuarioId: string | null, vai?: boolean | null): Promise<void> {
-    this.avancar({ acao: 'concluir', id, usuarioId, ...(vai != null && { vai }) }, { status: 'concluida', resolvidaEm: HOJE })
-  }
-
-  async dispensarEtapa(id: string, nota: string, usuarioId: string | null): Promise<void> {
-    this.avancar({ acao: 'dispensar', id, nota, usuarioId }, { status: 'dispensada', nota, resolvidaEm: HOJE })
-  }
-
-  async registrarRealizadaAnteriormente(id: string, nota: string, usuarioId: string | null, vai?: boolean | null): Promise<void> {
-    this.avancar({ acao: 'realizada', id, nota, usuarioId, ...(vai != null && { vai }) }, { status: 'realizada_anteriormente', nota, resolvidaEm: HOJE })
-  }
-
-  // Como a função de voltar do banco: a reaberta recebe o responsável (null limpa o que tinha) e a trava do autor vale aqui também.
-  async voltarParaEtapa(id: string, motivo: string, usuarioId: string | null): Promise<void> {
+  // Como mover_processo: confere o processo e a etapa, e a própria etapa não grava nada. Quem move vira o responsável, a
+  // etiqueta volta a A fazer (em Concluídos, Concluído) e a passagem aberta passa a ser a do destino.
+  async moverProcesso(id: string, etapaId: string, chegada?: DadosDaChegada): Promise<void> {
+    await this.segurarMovimento
     this.conferirGravacao()
-    const etapa = this.acharEtapa(id)
-    this.conferirProcessoDaEtapa(id)
-    if (motivo.trim() === '') throw new TravaDoBanco('O motivo é obrigatório.')
-    if (!RESOLVIDAS.includes(etapa.status)) throw new TravaDoBanco(`A etapa ${etapa.nome} ainda não foi resolvida.`)
-    conferirResponsavelEscolhido(usuarioId, this.usuariosPossiveis)
-    this.conferirAutorDaEtapa(etapa as EtapaDoProcesso, usuarioId)
-    this.chamadas.push({ acao: 'voltar', id, nota: motivo, usuarioId })
-    this.trocarProcessoDaEtapa(id, (processo) => ({ ...processo, vaiParaPublicacao: escolhaDaVolta(processo, etapa.codigo) }))
-    this.aplicar(id, (etapas) => voltarEtapas(etapas, id, HOJE))
-    this.porResponsavel(id, usuarioId)
-    this.aoVoltar?.(this.processoDaEtapa(id).id, etapa.codigo)
+    const processo = this.acharProcesso(id)
+    conferirNaoArquivado(processo)
+    conferirProcessoEmAndamento(processo)
+    const destino = this.etapasDoCatalogo.find((etapa) => etapa.id === etapaId)
+    if (!destino) throw new CadastroInexistente()
+    conferirEtapaAtiva(destino)
+    if (processo.etapaAtual?.codigo === destino.codigo) return
+    const emConcluidos = destino.codigo === CODIGO_CONCLUIDOS
+    const publicacao = emConcluidos ? publicacaoDaChegada(processo, chegada, hojeLocal()) : {}
+    this.chamadas.push({ acao: 'mover', id, etapaId, ...(chegada && { chegada }) })
+    this.trocarProcesso(id, (atual) => this.movido(atual, destino, publicacao))
+  }
+
+  async mudarEtiqueta(id: string, etiqueta: EtiquetaDaEtapa): Promise<void> {
+    this.conferirGravacao()
+    const processo = this.acharProcesso(id)
+    conferirNaoArquivado(processo)
+    conferirProcessoEmAndamento(processo)
+    conferirEtiquetaMutavel(processo, etiqueta)
+    this.chamadas.push({ acao: 'etiqueta', id, etiqueta })
+    this.trocarProcesso(id, (atual) => ({ ...atual, etiqueta }))
+  }
+
+  async mudarResponsavel(id: string, usuarioId: string | null): Promise<void> {
+    this.conferirGravacao()
+    const processo = this.acharProcesso(id)
+    conferirNaoArquivado(processo)
+    conferirProcessoEmAndamento(processo)
+    const usuario = this.usuariosPossiveis.find((possivel) => possivel.id === usuarioId) ?? null
+    if (usuarioId !== null && usuario === null) {
+      throw new TravaDoBanco(`${usuarioId} não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP.`)
+    }
+    this.chamadas.push({ acao: 'responsavel', id, usuarioId })
+    this.trocarProcesso(id, (atual) => ({ ...atual, ...this.comResponsavel(atual, usuario) }))
   }
 
   async suspenderProcesso(id: string, motivo: string): Promise<void> {
@@ -109,18 +113,8 @@ export class ProcessosFalso implements ModuloDeProcessos {
     this.mudarSituacaoDoProcesso(id, 'em_andamento', motivo)
   }
 
-  async naoVaiMaisParaPublicacao(id: string, motivo: string): Promise<void> {
-    this.trocarProcesso(id, (processo) => desistirDaPublicacao(processo, motivo))
-  }
-
-  async registrarPublicacao(id: string, data: string, nota: string | null): Promise<void> {
-    const aprovadaEm = this.dataDaAprovacao?.(id) ?? null
-    this.trocarProcesso(id, (processo) => registrarPublicacao(processo, { data, hoje: HOJE, aprovadaEm }))
-    this.chamadas.push({ acao: 'registrar_publicacao', id, nota: nota ?? undefined, datas: { iniciadaEm: data, resolvidaEm: data } })
-  }
-
   async arquivar(id: string): Promise<void> {
-    this.trocarProcesso(id, (processo) => arquivar(processo, `${HOJE}T12:00:00Z`))
+    this.trocarProcesso(id, (processo) => arquivar(processo, `${hojeLocal()}T12:00:00Z`))
   }
 
   async desarquivar(id: string): Promise<void> {
@@ -132,20 +126,6 @@ export class ProcessosFalso implements ModuloDeProcessos {
     conferirNaoArquivado(this.acharProcesso(id))
     const mudado = reclassificar(this.processos, this.acharProcesso(id), reclassificacao, motivo)
     this.processos = this.processos.map((processo) => (processo.id === id ? mudado : processo))
-  }
-
-  async corrigirDatasDaEtapa(id: string, datas: DatasDaEtapa): Promise<void> {
-    this.conferirGravacao()
-    this.acharEtapa(id)
-    conferirDatasDaEtapa(datas, HOJE)
-    this.mudar({ acao: 'datas', id, datas }, { iniciadaEm: datas.iniciadaEm, resolvidaEm: datas.resolvidaEm })
-  }
-
-  async mudarResponsavelDaEtapa(id: string, usuarioId: string | null): Promise<void> {
-    this.conferirGravacao()
-    this.conferirAutorDaEtapa(this.acharEtapa(id) as EtapaDoProcesso, usuarioId)
-    this.mudar({ acao: 'responsavel', id, usuarioId }, {})
-    this.porResponsavel(id, usuarioId)
   }
 
   async listarResponsaveisPossiveis(): Promise<UsuarioResponsavel[]> {
@@ -162,7 +142,9 @@ export class ProcessosFalso implements ModuloDeProcessos {
     if (this.segurarLeituraDoProcesso) return new Promise<never>(() => {})
     if (this.falharLeituraDoProcesso) throw new Error('falha de conexão simulada')
     const processo = this.processos.find((outro) => outro.id === id)
-    return processo ? { ...processo, ...estruturaDoProcesso(this.processos, processo) } : null
+    if (!processo) return null
+    const etapasDoVerso = etapasDoVersoDe(processo, this.etapasDoCatalogo, hojeLocal())
+    return { ...processo, ...estruturaDoProcesso(this.processos, processo), etapasDoVerso }
   }
 
   async lerHistoricoDoProcesso(id: string): Promise<EventoDoCadastro[]> {
@@ -226,7 +208,6 @@ export class ProcessosFalso implements ModuloDeProcessos {
     }
   }
 
-  // O processo novo nasce com todas as etapas ativas do catálogo pendentes.
   // Os testes carregam processos com ids fixos (p1, p2…): o processo novo não pode repetir um deles.
   private idLivreDeProcesso(): string {
     let id = `p${this.proximoId++}`
@@ -234,18 +215,15 @@ export class ProcessosFalso implements ModuloDeProcessos {
     return id
   }
 
+  // O processo novo entra em Não iniciados, com A fazer e sem responsável (cadastrar não é mover).
   private processoNovo(dados: DadosDoProcesso): ProcessoLido {
-    const etapas = this.etapasDoCatalogo.filter((etapa) => etapa.ativa)
-    const primeira = etapas[0]
+    const entrada = this.etapasDoCatalogo.find((etapa) => etapa.codigo === CODIGO_NAO_INICIADOS)
+      ?? this.etapasDoCatalogo.find((etapa) => etapa.ativa)
     return {
       ...dados, ...this.nomesDoCartao(dados), id: this.idLivreDeProcesso(), situacao: 'em_andamento',
-      etapaAtual: primeira ? { codigo: primeira.codigo, nome: primeira.nome, ordem: primeira.ordem } : null,
-      responsavel: null, motivoDaSituacao: null, processoPai: null, subprocessos: [], dataDaReuniao: null, ultimaVersao: null,
-      etapasDoProcesso: etapas.map((etapa) => ({
-        id: `a${this.proximoId++}`, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, obrigatoria: true,
-        status: 'pendente', nota: null, iniciadaEm: null, resolvidaEm: null, responsavelId: null, responsavelNome: null,
-        responsavelInativo: false,
-      })),
+      etapaAtual: entrada ? etapaAtualNoCatalogo(entrada, this.etapasDoCatalogo) : null, etiqueta: 'a_fazer',
+      entrouNaEtapaEm: hojeLocal(), responsavel: null, motivoDaSituacao: null, processoPai: null, subprocessos: [],
+      etapasDoVerso: [], dataDaReuniao: null, ultimaVersao: null,
     }
   }
 
@@ -254,66 +232,28 @@ export class ProcessosFalso implements ModuloDeProcessos {
     throw typeof this.falhaDeGravacao === 'string' ? new Error(this.falhaDeGravacao) : this.falhaDeGravacao
   }
 
-  // A etapa de algum processo; que ela não existe (mais) é o aviso de cadastro inexistente.
-  private acharEtapa(id: string): EtapaDoCaminho {
-    const todas: EtapaDoCaminho[] = this.processos.flatMap((processo) => processo.etapasDoProcesso)
-    const etapa = todas.find((candidata) => candidata.id === id)
-    if (!etapa) throw new CadastroInexistente()
-    return etapa
-  }
-
-  // Como a função de avanço do banco: confere, resolve a etapa e inicia a próxima, ou não muda nada.
-  private avancar(chamada: ChamadaDeEtapa & { acao: PedidoDeAvanco['acao'] }, mudancas: Partial<EtapaDoProcesso>): void {
-    this.conferirGravacao()
-    const etapa = this.acharEtapa(chamada.id)
-    this.conferirProcessoDaEtapa(chamada.id)
-    const responsavelId = chamada.usuarioId ?? null
-    conferirAvanco(etapa, { acao: chamada.acao, nota: chamada.nota ?? null, responsavelId }, this.usuariosPossiveis)
-    if (chamada.acao === 'concluir') conferirVersaoDaRevisaoDoSetor(etapa, this.processoDaEtapa(chamada.id).ultimaVersao)
-    conferirAutorDaProxima(this.processoDaEtapa(chamada.id), chamada.id, responsavelId)
-    const vaiParaPublicacao = escolhaDoAvanco(this.processoDaEtapa(chamada.id), chamada.id, chamada.vai)
-    this.chamadas.push(chamada)
-    const usuario = this.usuariosPossiveis.find((possivel) => possivel.id === responsavelId) ?? null
-    this.trocarProcessoDaEtapa(chamada.id, (processo) =>
-      avancarProcesso({ ...processo, vaiParaPublicacao }, chamada.id, mudancas, usuario, HOJE))
-  }
-
-  private mudar(chamada: ChamadaDeEtapa, mudancas: Partial<EtapaDoProcesso>): void {
-    this.conferirGravacao()
-    this.conferirProcessoDaEtapa(chamada.id)
-    this.chamadas.push(chamada)
-    this.aplicar(chamada.id, (etapas) => etapas.map((etapa) => (etapa.id === chamada.id ? { ...etapa, ...mudancas } : etapa)))
-  }
-
-  // O responsável da etapa e, sendo ela a atual, o do cartão (quem não está entre os possíveis fica sem nome).
-  private porResponsavel(id: string, usuarioId: string | null): void {
-    const usuario = this.usuariosPossiveis.find((possivel) => possivel.id === usuarioId) ?? null
-    const mudancas = { responsavelId: usuarioId, responsavelNome: usuario?.nome ?? null, responsavelInativo: false }
-    const cartao = usuario ? { id: usuario.id, nome: usuario.nome, fotoUrl: null } : null
-    this.processos = this.processos.map((processo) => responsavelDoCartao(mudarEtapaDoProcesso(processo, id, mudancas), id, cartao))
-  }
-
-  // A trava do autor da versão mais recente na Revisão interna, como o gatilho do banco.
-  private conferirAutorDaEtapa(etapa: EtapaDoProcesso, usuarioId: string | null): void {
-    conferirAutorDaRevisao(this.processoDaEtapa(etapa.id).ultimaVersao, etapa, usuarioId)
-  }
-
-  private processoDaEtapa(idDaEtapa: string): ProcessoLido {
-    return this.processos.find((processo) => processo.etapasDoProcesso.some((etapa) => etapa.id === idDaEtapa)) as ProcessoLido
-  }
-
-  // O processo que tem a etapa: parado, ele recusa qualquer mudança nelas.
-  private conferirProcessoDaEtapa(idDaEtapa: string): void {
-    const dono = this.processos.find((processo) => processo.etapasDoProcesso.some((etapa) => etapa.id === idDaEtapa))
-    if (!dono) return
-    conferirNaoArquivado(dono)
-    conferirProcessoEmAndamento(dono)
-  }
-
   private acharProcesso(id: string): ProcessoLido {
     const processo = this.processos.find((outro) => outro.id === id)
     if (!processo) throw new CadastroInexistente()
     return processo
+  }
+
+  // O processo na etapa de destino: etiqueta, responsável e entrada novos, a passagem aberta trocada e a publicação da chegada.
+  private movido(processo: ProcessoLido, destino: EtapaDoCatalogo, publicacao: Partial<ProcessoLido>): ProcessoLido {
+    const hoje = hojeLocal()
+    const emConcluidos = destino.codigo === CODIGO_CONCLUIDOS
+    const origem = processo.etapaAtual?.codigo ?? ''
+    const etapasDoVerso = registrarPassagem(etapasDoVersoDe(processo, this.etapasDoCatalogo, hoje), origem, destino.codigo, hoje)
+    return {
+      ...processo, ...publicacao, ...this.comResponsavel(processo, this.quemChama), etapasDoVerso,
+      etapaAtual: etapaAtualNoCatalogo(destino, this.etapasDoCatalogo), etiqueta: emConcluidos ? 'concluido' : 'a_fazer',
+      entrouNaEtapaEm: hoje, situacao: emConcluidos ? 'concluido' : 'em_andamento',
+    }
+  }
+
+  private comResponsavel(processo: ProcessoLido, usuario: UsuarioResponsavel | null): Partial<ProcessoLido> {
+    const responsavel = usuario ? { id: usuario.id, nome: usuario.nome, fotoUrl: null } : null
+    return { responsavel, ...(processo.cartao && { cartao: { ...processo.cartao, responsavelAtivo: usuario ? true : null } }) }
   }
 
   private mudarSituacaoDoProcesso(id: string, nova: 'em_andamento' | 'suspenso' | 'cancelado', motivo: string): void {
@@ -328,14 +268,5 @@ export class ProcessosFalso implements ModuloDeProcessos {
     this.conferirGravacao()
     const mudado = trocar(this.acharProcesso(id))
     this.processos = this.processos.map((processo) => (processo.id === id ? mudado : processo))
-  }
-
-  private trocarProcessoDaEtapa(idDaEtapa: string, trocar: (processo: ProcessoLido) => ProcessoLido): void {
-    this.processos = this.processos.map((processo) => (
-      processo.etapasDoProcesso.some((etapa) => etapa.id === idDaEtapa) ? trocar(processo) : processo))
-  }
-
-  private aplicar(id: string, trocar: TrocaDeEtapas): void {
-    this.processos = this.processos.map((processo) => trocarEtapaDoProcesso(processo, id, trocar))
   }
 }

@@ -3,8 +3,8 @@ import { SEM_FILTROS, type FiltrosDosProcessos } from './enderecoDosProcessos'
 import { filtrarProcessos, opcoesDosFiltros, temFiltro } from './filtrosDosProcessos'
 import type { EtapaDoCatalogo, ProcessoDaLista } from './tipos'
 
-const MODELAGEM = { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 }
-const RELATORIO = { codigo: 'relatorio', nome: 'Relatório', ordem: 5 }
+const MODELAGEM = { id: 'e4', codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, posicao: 2, total: 3 }
+const RELATORIO = { id: 'e5', codigo: 'relatorio', nome: 'Relatório', ordem: 5, posicao: 3, total: 3 }
 
 function processo(nome: string, mudancas: Partial<ProcessoDaLista> = {}): ProcessoDaLista {
   return {
@@ -59,18 +59,22 @@ test('a combinação de filtros é "e"', () => {
   expect(nomes({ setor: 's2', tipo: 'processo' })).toEqual([])
 })
 
-test('opções: sem repetição, na ordem certa', () => {
+test('opções: sem repetição, na ordem certa; a etapa de filtro é só das ativas, inclusive as fixas', () => {
   const etapas: EtapaDoCatalogo[] = [
-    { id: 'e5', ...RELATORIO, ativa: true },
-    { id: 'e4', ...MODELAGEM, ativa: true },
-    { id: 'e6', codigo: 'parada', nome: 'Desativada sem processo', ordem: 6, ativa: false },
+    { id: 'e5', codigo: RELATORIO.codigo, nome: RELATORIO.nome, ordem: RELATORIO.ordem, ativa: true },
+    { id: 'e4', codigo: MODELAGEM.codigo, nome: MODELAGEM.nome, ordem: MODELAGEM.ordem, ativa: true },
+    { id: 'e6', codigo: 'parada', nome: 'Desativada', ordem: 6, ativa: false },
+    { id: 'e1', codigo: 'nao_iniciados', nome: 'Não iniciados', ordem: 1, ativa: true },
+    { id: 'e9', codigo: 'concluidos', nome: 'Concluídos', ordem: 9, ativa: true },
   ]
   const opcoes = opcoesDosFiltros({ etapas, processos: [...PROCESSOS].reverse() })
   expect(opcoes.setores).toEqual([{ valor: 's1', rotulo: 'TSA' }, { valor: 's2', rotulo: 'TSB' }])
   expect(opcoes.macroprocessos).toEqual([{ valor: 'm2', rotulo: 'Macro Dois' }, { valor: 'm1', rotulo: 'Macro Um' }])
   expect(opcoes.etapas).toEqual([
+    { valor: 'nao_iniciados', rotulo: 'Não iniciados' },
     { valor: 'modelagem', rotulo: 'Reunião de modelagem' },
     { valor: 'relatorio', rotulo: 'Relatório' },
+    { valor: 'concluidos', rotulo: 'Concluídos' },
   ])
   expect(opcoes.responsaveis).toEqual([{ valor: 'u1', rotulo: 'Ana Teste' }, { valor: 'u2', rotulo: 'Bruno Teste' }])
   expect(opcoes.tipos.map((o) => o.rotulo)).toEqual(['Processo', 'Subprocesso', 'A classificar'])

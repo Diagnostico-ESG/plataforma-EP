@@ -11,14 +11,6 @@ function criar(cliente: ClienteSupabaseFalso) {
   return criarRevisoesSupabase(cliente as unknown as SupabaseClient<Database>, RECUSAS_DOS_PROCESSOS)
 }
 
-function clienteQueRecusa(erro: { message: string; code?: string }) {
-  const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['rpc.concluir_revisao_interna'] = { data: null, error: erro }
-  return cliente
-}
-
-const DADOS = { resultado: 'corrigida', escopo: 'ambos', comentario: 'Ajustei' } as const
-
 test('listar lê as revisões do processo, da mais recente para a mais antiga, com o revisor e as versões', async () => {
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas['revisoes_internas.select'] = {
@@ -48,51 +40,6 @@ test('falha ao ler as revisões vira erro com o processo e o motivo do banco', a
   await expect(criar(cliente).listarRevisoes('p1')).rejects.toThrow('Falha ao ler as revisões do processo p1: sem conexão')
 })
 
-test('concluir chama a função do banco com o andamento, o resultado e o responsável', async () => {
-  const cliente = new ClienteSupabaseFalso()
-  await criar(cliente).concluirRevisaoInterna('a3', DADOS, 'u2')
-  expect(cliente.pedidos).toEqual([{
-    tabela: 'rpc', operacao: 'concluir_revisao_interna',
-    valores: { p_andamento: 'a3', p_resultado: 'corrigida', p_escopo: 'ambos', p_comentario: 'Ajustei', p_responsavel: 'u2' },
-  }])
-})
-
-test('sem escopo, comentário e responsável, vão como null', async () => {
-  const cliente = new ClienteSupabaseFalso()
-  await criar(cliente).concluirRevisaoInterna('a3', { resultado: 'sem_alteracao', escopo: null, comentario: null }, null)
-  expect(cliente.pedidos[0].valores).toEqual({
-    p_andamento: 'a3', p_resultado: 'sem_alteracao', p_escopo: null, p_comentario: null, p_responsavel: null,
-  })
-})
-
-test('o autor da versão recusado pelo banco vira a frase da tela', async () => {
-  const cliente = clienteQueRecusa({ message: 'revisor_e_autor:7', code: 'P0001' })
-  const falha = await criar(cliente).concluirRevisaoInterna('a3', DADOS, null).catch((erro: unknown) => erro)
-  expect(falha).toBeInstanceOf(TravaDoBanco)
-  expect((falha as Error).message).toBe('Quem enviou a versão V7 não pode revisá-la.')
-})
-
-test('falta de privilégio vira a frase do perfil', async () => {
-  const cliente = clienteQueRecusa({ message: 'sem permissão para registrar a revisão', code: '42501' })
-  const falha = await criar(cliente).concluirRevisaoInterna('a3', DADOS, null).catch((erro: unknown) => erro)
-  expect(falha).toBeInstanceOf(TravaDoBanco)
-  expect((falha as Error).message).toBe('Seu perfil não permite alterar os processos.')
-})
-
-test('etapa que já não existe vira o aviso de cadastro inexistente', async () => {
-  const cliente = clienteQueRecusa({ message: 'registro_inexistente', code: 'P0001' })
-  const falha = await criar(cliente).concluirRevisaoInterna('a3', DADOS, null).catch((erro: unknown) => erro)
-  expect(falha).toBeInstanceOf(CadastroInexistente)
-})
-
-const DADOS_DA_APROVACAO = { numeroEprotocolo: 'PROT-1', link: null, aprovadaEm: '2026-10-13' }
-
-function clienteQueRecusaAAprovacao(erro: { message: string; code?: string }) {
-  const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['rpc.concluir_aprovacao'] = { data: null, error: erro }
-  return cliente
-}
-
 test('lerAprovacao lê a aprovação do processo com a versão e quem registrou', async () => {
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas['aprovacoes.select'] = {
@@ -115,41 +62,6 @@ test('falha ao ler a aprovação vira erro com o processo e o motivo do banco', 
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas['aprovacoes.select'] = { data: null, error: { message: 'sem conexão' } }
   await expect(criar(cliente).lerAprovacao('p1')).rejects.toThrow('Falha ao ler a aprovação do processo p1: sem conexão')
-})
-
-test('concluirAprovacao chama a função do banco com o andamento, os três campos, o responsável e a escolha', async () => {
-  const cliente = new ClienteSupabaseFalso()
-  await criar(cliente).concluirAprovacao('a5', DADOS_DA_APROVACAO, 'u2', true)
-  await criar(cliente).concluirAprovacao('a5', DADOS_DA_APROVACAO, null, null)
-  expect(cliente.pedidos).toEqual([{
-    tabela: 'rpc', operacao: 'concluir_aprovacao',
-    valores: { p_andamento: 'a5', p_numero: 'PROT-1', p_link: null, p_data: '2026-10-13', p_responsavel: 'u2', p_vai_para_publicacao: true },
-  }, {
-    tabela: 'rpc', operacao: 'concluir_aprovacao',
-    valores: { p_andamento: 'a5', p_numero: 'PROT-1', p_link: null, p_data: '2026-10-13', p_responsavel: null, p_vai_para_publicacao: null },
-  }])
-})
-
-test.each([
-  ['versao_incompleta:8:relatorio', 'A V8 está sem relatório.'],
-  ['link_invalido', 'O link do E-protocolo precisa começar com http:// ou https://.'],
-  ['aprovacao_antes_da_revisao:2026-10-12:2026-10-13',
-    'A data da aprovação (12/10/2026) não pode ser antes da última revisão interna (13/10/2026).'],
-  ['sem_aprovacao:8', 'A V8 ainda não tem aprovação registrada. Conclua a Aprovação pelo setor pela janela de concluir.'],
-])('a recusa %s do banco vira a frase da tela', async (codigo, frase) => {
-  const falha = await criar(clienteQueRecusaAAprovacao({ message: codigo, code: 'P0001' }))
-    .concluirAprovacao('a5', DADOS_DA_APROVACAO, null).catch((erro: unknown) => erro)
-  expect(falha).toBeInstanceOf(TravaDoBanco)
-  expect((falha as Error).message).toBe(frase)
-})
-
-test('falta de privilégio na aprovação vira a frase do perfil e etapa que sumiu, o aviso de cadastro inexistente', async () => {
-  const semPermissao = await criar(clienteQueRecusaAAprovacao({ message: 'x', code: '42501' }))
-    .concluirAprovacao('a5', DADOS_DA_APROVACAO, null).catch((erro: unknown) => erro)
-  expect((semPermissao as Error).message).toBe('Seu perfil não permite alterar os processos.')
-  const sumiu = await criar(clienteQueRecusaAAprovacao({ message: 'registro_inexistente', code: 'P0001' }))
-    .concluirAprovacao('a5', DADOS_DA_APROVACAO, null).catch((erro: unknown) => erro)
-  expect(sumiu).toBeInstanceOf(CadastroInexistente)
 })
 
 // ---- Editar a revisão e a aprovação (ticket 04)
@@ -188,7 +100,7 @@ test('editarAprovacao altera o número, o link e a data da aprovação pelo id',
 test.each([
   ['revisoes_internas', 'escopo_obrigatorio', 'Escolha o escopo da correção.'],
   ['revisoes_internas', 'escopo_so_na_corrigida', 'O escopo só vale na revisão corrigida.'],
-  ['revisoes_internas', 'processo_parado:suspenso', 'Este processo está suspenso; retome-o para registrar o andamento.'],
+  ['revisoes_internas', 'processo_parado:suspenso', 'Este processo está suspenso; retome-o para mudar a etapa, a etiqueta ou o responsável.'],
   ['aprovacoes', 'link_invalido', 'O link do E-protocolo precisa começar com http:// ou https://.'],
   ['aprovacoes', 'data_no_futuro:2026-10-20', 'A data 20/10/2026 está no futuro.'],
   ['aprovacoes', 'aprovacao_antes_da_revisao:2026-10-12:2026-10-13',

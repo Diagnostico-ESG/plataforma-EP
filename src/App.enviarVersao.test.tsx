@@ -90,7 +90,7 @@ test('enviar registra a versão, fecha o formulário e a lista mostra a V3 no al
   fireEvent.click(botaoEnviar(form))
   const v3 = within(await secao.findByRole('article', { name: 'V3' }))
   expect(secao.getAllByRole('article', { name: /^V\d/ })[0].getAttribute('aria-label')).toBe('V3')
-  expect(v3.getByText('Reunião de modelagem')).toBeTruthy()
+  expect(v3.getByText('Modelagem piloto')).toBeTruthy()
   expect(v3.getByText('Primeira técnica')).toBeTruthy()
   expect(secao.queryByRole('form', { name: 'Enviar versão' })).toBeNull()
   expect(versoes.envios[0]).toMatchObject({ processoId: 'p1', numero: 3, observacao: 'Primeira técnica' })

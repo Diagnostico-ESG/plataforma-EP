@@ -30,7 +30,7 @@ function processo(mudancas: Partial<ProcessoLido> = {}): ProcessoLido {
     id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
     macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento', etapaAtual: null,
     responsavel: null, origem: 'novo', contexto: null, observacoes: null, processoPaiId: null, processoPai: null,
-    subprocessos: [], motivoDaSituacao: null, dataDaReuniao: null, ultimaVersao: null, etapasDoProcesso: [], ...mudancas,
+    subprocessos: [], motivoDaSituacao: null, dataDaReuniao: null, ultimaVersao: null, etapasDoVerso: [], ...mudancas,
   }
 }
 

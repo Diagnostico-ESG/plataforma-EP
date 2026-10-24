@@ -1,52 +1,77 @@
-import { cleanup, fireEvent, screen, within } from '@testing-library/react'
+import { cleanup, fireEvent, screen } from '@testing-library/react'
 import { afterEach, expect, test } from 'vitest'
-import { formatarData } from './processos/caminhoDeEtapas'
-import { BIA, EU, diasAtras, etapaDoProcesso, montarVerso, processoLido } from './testes/processoNoVerso'
-import { etapasDoVerso, gavetaDaEtapa } from './testes/versoDoCartao'
+import { formatarData } from './lib/datas'
+import type { EtapaDoVerso } from './processos/tipos'
+import { CATALOGO_DE_TESTE } from './testes/processoDaLista'
+import { diasAtras, montarVerso, processoLido } from './testes/processoNoVerso'
+import { agoraDoVerso, etapasDoVerso, gavetaDaEtapa } from './testes/versoDoCartao'
 
-// As Etapas do verso (ticket 17 de processos-etapas): linhas compactas e a gaveta do detalhe, uma por vez.
+// As Etapas do verso (ticket 25 de processos-etapas, Andamento livre): as etapas ativas só para leitura, com a atual
+// destacada, as visitadas marcadas e a gaveta das entradas e saídas, uma por vez.
 
 afterEach(() => {
   cleanup()
   window.location.hash = ''
 })
 
-const MODELAGEM = 'Modelagem piloto'
-const RELATORIO = 'Relatório e modelagem técnica'
-const EXTRA = 'Extra'
-const REVISAO = 'Revisão interna'
-const APROVACAO = 'Aprovação'
-const PUBLICACAO = 'Publicação'
+const NOMES = CATALOGO_DE_TESTE.map((etapa) => etapa.nome)
 
-// Uma etapa de cada status; a Revisão interna é a atual.
-const caminho = () => [
-  etapaDoProcesso(1, 'modelagem', MODELAGEM, {
-    status: 'concluida', iniciadaEm: '2026-10-01', resolvidaEm: '2026-10-02', nota: 'Feito', responsavelId: BIA.id, responsavelNome: BIA.nome,
-  }),
-  etapaDoProcesso(2, 'relatorio', RELATORIO, { status: 'realizada_anteriormente', resolvidaEm: '2026-10-03', nota: 'Feita em 2025' }),
-  etapaDoProcesso(3, 'extra', EXTRA, { status: 'dispensada', obrigatoria: false, resolvidaEm: '2026-10-04', nota: 'Não se aplica' }),
-  etapaDoProcesso(4, 'revisao_interna', REVISAO, { status: 'em_andamento', iniciadaEm: diasAtras(3), responsavelId: EU.id, responsavelNome: EU.nome }),
-  etapaDoProcesso(5, 'aprovacao', APROVACAO),
-  etapaDoProcesso(6, 'publicacao', PUBLICACAO, { obrigatoria: false }),
-]
+// O processo está em Revisão interna desde há 3 dias; passou pela Modelagem piloto duas vezes e pelo Relatório uma vez.
+const passagens = (): EtapaDoVerso[] => CATALOGO_DE_TESTE.map(({ id, codigo, nome, ordem }) => ({ id, codigo, nome, ordem, passagens: [] }))
+  .map((etapa) => {
+    if (etapa.codigo === 'nao_iniciados') return { ...etapa, passagens: [{ entrouEm: '2026-09-28', saiuEm: '2026-10-01' }] }
+    if (etapa.codigo === 'modelagem') {
+      return { ...etapa, passagens: [{ entrouEm: '2026-10-06', saiuEm: '2026-10-08' }, { entrouEm: '2026-10-01', saiuEm: '2026-10-04' }] }
+    }
+    if (etapa.codigo === 'relatorio_modelagem_tecnica') return { ...etapa, passagens: [{ entrouEm: '2026-10-04', saiuEm: '2026-10-06' }] }
+    if (etapa.codigo === 'revisao_interna') return { ...etapa, passagens: [{ entrouEm: diasAtras(3), saiuEm: null }] }
+    return etapa
+  })
 
-test('cada linha tem o nome acessível do status, e os selos e a data aparecem', async () => {
-  montarVerso(processoLido(caminho()))
+const montar = (perfil: 'integrante_ep' | 'consulta' = 'integrante_ep', mudancas = {}) =>
+  montarVerso(processoLido({ entrouNaEtapaEm: diasAtras(3), etapasDoVerso: passagens(), ...mudancas }), perfil)
+
+test('lista só as etapas ativas, na ordem do catálogo, de Não iniciados a Concluídos', async () => {
+  montar()
+  const linhas = (await etapasDoVerso()).getAllByRole('listitem')
+  expect(linhas.map((linha) => linha.querySelector('.etapa-nome')?.textContent)).toEqual(NOMES)
+})
+
+test('a etapa desativada não aparece', async () => {
+  montarVerso(processoLido(), 'integrante_ep', [], (falso) => {
+    falso.etapasDoCatalogo = CATALOGO_DE_TESTE.map((etapa) => (etapa.codigo === 'publicacao' ? { ...etapa, ativa: false } : etapa))
+  })
+  const nomes = (await etapasDoVerso()).getAllByRole('listitem').map((linha) => linha.querySelector('.etapa-nome')?.textContent)
+  expect(nomes).not.toContain('Publicação')
+  expect(nomes).toHaveLength(7)
+})
+
+test('cada linha diz se é a atual, uma etapa visitada (com a data da última saída) ou uma que o processo nunca visitou', async () => {
+  montar()
   const etapas = await etapasDoVerso()
   expect(etapas.getAllByRole('button').map((linha) => linha.getAttribute('aria-label'))).toEqual([
-    'Modelagem piloto: concluída', 'Relatório e modelagem técnica: realizada anteriormente', 'Extra: dispensada',
-    'Revisão interna: atual', 'Aprovação: pendente', 'Publicação: opcional, pendente',
+    'Não iniciados: visitada', 'Modelagem piloto: visitada', 'Relatório e modelagem técnica: visitada', 'Revisão interna: atual',
+    'Validação com o setor: ainda não visitada', 'Aprovação pelo setor: ainda não visitada', 'Publicação: ainda não visitada',
+    'Concluídos: ainda não visitada',
   ])
-  for (const selo of ['anterior', 'dispensada', 'opcional']) expect(etapas.getByText(selo)).toBeTruthy()
-  expect(etapas.getByText(`desde ${formatarData(diasAtras(3))}`)).toBeTruthy()
-  expect(etapas.getByText('02/10/2026')).toBeTruthy()
+  const quando = (nome: string) => etapas.getByRole('button', { name: new RegExp(`^${nome}:`) }).querySelector('.etapa-quando')?.textContent
+  expect(quando('Modelagem piloto')).toBe('08/10/2026')
+  expect(quando('Não iniciados')).toBe('01/10/2026')
+  expect(quando('Revisão interna')).toBe(`desde ${formatarData(diasAtras(3))}`)
+  expect(quando('Publicação')).toBe('')
+})
+
+test('só a atual está marcada como passo atual', async () => {
+  montar()
+  const atuais = (await etapasDoVerso()).getAllByRole('listitem').filter((linha) => linha.getAttribute('aria-current') === 'step')
+  expect(atuais.map((linha) => linha.querySelector('.etapa-nome')?.textContent)).toEqual(['Revisão interna'])
 })
 
 test('a gaveta abre uma por vez, pelo botão da linha, com o estado anunciado', async () => {
-  montarVerso(processoLido(caminho()))
+  montar()
   const etapas = await etapasDoVerso()
-  const modelagem = etapas.getByRole('button', { name: `${MODELAGEM}: concluída` })
-  const relatorio = etapas.getByRole('button', { name: `${RELATORIO}: realizada anteriormente` })
+  const modelagem = etapas.getByRole('button', { name: 'Modelagem piloto: visitada' })
+  const relatorio = etapas.getByRole('button', { name: 'Relatório e modelagem técnica: visitada' })
   expect(modelagem.getAttribute('aria-expanded')).toBe('false')
   fireEvent.click(modelagem)
   expect(modelagem.getAttribute('aria-expanded')).toBe('true')
@@ -58,74 +83,56 @@ test('a gaveta abre uma por vez, pelo botão da linha, com o estado anunciado', 
   expect(relatorio.getAttribute('aria-expanded')).toBe('false')
 })
 
-test('a gaveta de uma resolvida anterior à atual mostra datas, nota e responsável, com Corrigir datas e Voltar a esta etapa', async () => {
-  montarVerso(processoLido(caminho()))
-  const gaveta = await gavetaDaEtapa(MODELAGEM)
-  expect(gaveta.getByText('Início: 01/10/2026 · Conclusão: 02/10/2026')).toBeTruthy()
-  expect(gaveta.getByText('Nota: Feito')).toBeTruthy()
-  expect(gaveta.getByText(`Responsável: ${BIA.nome}`)).toBeTruthy()
-  fireEvent.click(gaveta.getByRole('button', { name: 'Corrigir datas' }))
-  expect(gaveta.getByLabelText(`Início da etapa ${MODELAGEM}`)).toBeTruthy()
-  fireEvent.click(gaveta.getByRole('button', { name: 'Voltar a esta etapa' }))
-  expect(screen.getByRole('dialog', { name: `Voltar à etapa ${MODELAGEM}?` })).toBeTruthy()
+test('a gaveta mostra as entradas e saídas, da mais recente para a mais antiga', async () => {
+  montar()
+  const gaveta = await gavetaDaEtapa('Modelagem piloto')
+  expect(gaveta.getAllByRole('listitem').map((item) => item.textContent)).toEqual([
+    'Entrou em 06/10/2026 · saiu em 08/10/2026', 'Entrou em 01/10/2026 · saiu em 04/10/2026',
+  ])
 })
 
-test('Corrigir datas grava e a gaveta mostra a data nova', async () => {
-  const falso = montarVerso(processoLido(caminho()))
-  const gaveta = await gavetaDaEtapa(MODELAGEM)
-  fireEvent.click(gaveta.getByRole('button', { name: 'Corrigir datas' }))
-  fireEvent.change(gaveta.getByLabelText(`Conclusão da etapa ${MODELAGEM}`), { target: { value: '2026-10-05' } })
-  fireEvent.click(gaveta.getByRole('button', { name: 'Salvar datas' }))
-  expect(await gaveta.findByText('Início: 01/10/2026 · Conclusão: 05/10/2026')).toBeTruthy()
-  expect(falso.chamadas).toHaveLength(1)
+test('a gaveta da etapa atual mostra a entrada e que o processo ainda está nela', async () => {
+  montar()
+  const gaveta = await gavetaDaEtapa('Revisão interna')
+  expect(gaveta.getByText(`Entrou em ${formatarData(diasAtras(3))} · ainda nesta etapa`)).toBeTruthy()
 })
 
-test('a gaveta da atual mostra só datas e nota, com Corrigir datas; o responsável e as ações ficam no Agora', async () => {
-  montarVerso(processoLido(caminho()))
-  const gaveta = await gavetaDaEtapa(REVISAO)
-  expect(gaveta.getByText(new RegExp(`^Início: ${formatarData(diasAtras(3))}`))).toBeTruthy()
-  expect(gaveta.queryByText(/^Responsável/)).toBeNull()
-  expect(gaveta.getAllByRole('button').map((botao) => botao.textContent)).toContain('Corrigir datas')
-  for (const nome of ['Voltar a esta etapa', 'Assumir', 'Trocar']) expect(gaveta.queryByRole('button', { name: new RegExp(nome) })).toBeNull()
+test('a gaveta de uma etapa nunca visitada diz que o processo ainda não passou por ela', async () => {
+  montar()
+  expect((await gavetaDaEtapa('Publicação')).getByText('Ainda não passou por esta etapa')).toBeTruthy()
 })
 
-test('a gaveta de uma pendente depois da atual tem Trocar e Assumir', async () => {
-  const falso = montarVerso(processoLido(caminho()))
-  const gaveta = await gavetaDaEtapa(APROVACAO)
-  fireEvent.click(gaveta.getByRole('button', { name: `Trocar o responsável de ${APROVACAO}` }))
-  fireEvent.change(gaveta.getByRole('combobox', { name: `Responsável de ${APROVACAO}` }), { target: { value: BIA.id } })
-  expect(await gaveta.findByText(`Responsável: ${BIA.nome}`)).toBeTruthy()
-  expect(falso.chamadas).toEqual([{ acao: 'responsavel', id: 'a5', usuarioId: BIA.id }])
-  const outra = await gavetaDaEtapa(PUBLICACAO)
-  fireEvent.click(outra.getByRole('button', { name: `Assumir ${PUBLICACAO}` }))
-  expect(await outra.findByText(`Responsável: ${EU.nome}`)).toBeTruthy()
+test('a gaveta não tem botões do modelo anterior: nada de corrigir datas, voltar, responsável ou nota', async () => {
+  montar()
+  const gaveta = await gavetaDaEtapa('Modelagem piloto')
+  expect(gaveta.queryByRole('button', { name: /Corrigir datas|Voltar a esta etapa|Assumir|Trocar/ })).toBeNull()
+  expect(gaveta.queryByText(/^Responsável|^Nota:|^Início:/)).toBeNull()
 })
 
-test('suspenso: as gavetas mostram só a leitura, sem botões', async () => {
-  montarVerso(processoLido(caminho(), { situacao: 'suspenso', motivoDaSituacao: 'Aguardando decisão' }))
-  for (const nome of [MODELAGEM, APROVACAO, REVISAO]) {
-    const gaveta = await gavetaDaEtapa(nome)
-    expect(gaveta.getAllByRole('button')).toHaveLength(1)
-  }
-  expect((await gavetaDaEtapa(APROVACAO)).getByText('Responsável: —')).toBeTruthy()
-  expect(screen.queryByText(/Retome-o para registrar o andamento/)).toBeNull()
-})
-
-test('a Consulta lê as gavetas sem botões', async () => {
-  montarVerso(processoLido(caminho()), 'consulta')
-  const gaveta = await gavetaDaEtapa(MODELAGEM)
-  expect(gaveta.getByText(`Responsável: ${BIA.nome}`)).toBeTruthy()
-  expect(gaveta.getAllByRole('button')).toHaveLength(1)
-  expect(within(await (await etapasDoVerso()).findByRole('list')).getAllByRole('listitem')).toHaveLength(6)
+test('a Consulta e o suspenso leem as mesmas gavetas', async () => {
+  montar('consulta')
+  expect((await gavetaDaEtapa('Modelagem piloto')).getAllByRole('listitem')).toHaveLength(2)
+  cleanup()
+  montar('integrante_ep', { situacao: 'suspenso', motivoDaSituacao: 'Aguardando decisão' })
+  expect((await gavetaDaEtapa('Modelagem piloto')).getAllByRole('listitem')).toHaveLength(2)
 })
 
 test('cada linha é um botão nativo, que abre e fecha pelo teclado (Enter e Espaço) com o estado anunciado', async () => {
-  montarVerso(processoLido(caminho()))
+  montar()
   const linhas = (await etapasDoVerso()).getAllByRole('button')
-  expect(linhas).toHaveLength(6)
+  expect(linhas).toHaveLength(8)
   for (const linha of linhas) {
     expect(linha.tagName).toBe('BUTTON')
     expect(linha.getAttribute('type')).toBe('button')
     expect(linha.hasAttribute('aria-expanded')).toBe(true)
   }
+})
+
+test('mover o processo pelo Agora atualiza a seção Etapas: a nova atual, e a antiga passa a visitada', async () => {
+  montar()
+  fireEvent.change((await agoraDoVerso()).getByRole('combobox', { name: 'Etapa' }), { target: { value: 'e6' } })
+  const etapas = await etapasDoVerso()
+  expect(await etapas.findByRole('button', { name: 'Aprovação pelo setor: atual' })).toBeTruthy()
+  expect(etapas.getByRole('button', { name: 'Revisão interna: visitada' })).toBeTruthy()
+  expect(screen.queryByText('Revisão interna: atual')).toBeNull()
 })

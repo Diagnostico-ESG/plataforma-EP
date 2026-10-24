@@ -57,18 +57,7 @@
   text-align: right;
 }
 
-.etapa-selo {
-  flex: none;
-  padding: 0 var(--esp-2);
-  border-radius: 999px;
-  background: var(--neutra-fundo);
-  color: var(--neutra-texto);
-  font-size: var(--tam-rotulo);
-  line-height: 1.6;
-}
-
-/* O sinal de cada status: ✓ verde (concluída), ✓ cinza (anterior), ponto azul (atual), círculo (pendente), círculo
-   tracejado (opcional) e traço (dispensada). */
+/* O sinal de cada linha: ponto azul (atual), ✓ cinza (visitada) e círculo vazio (nunca visitada). */
 .etapa-sinal {
   flex: none;
   display: inline-grid;
@@ -80,25 +69,16 @@
   border-radius: 50%;
 }
 
-.etapa-concluida .etapa-sinal,
-.etapa-anterior .etapa-sinal {
+.etapa-visitada .etapa-sinal {
   border: 0;
   border-radius: 0;
+  color: var(--icone-inativo);
 }
 
-.etapa-concluida .etapa-sinal::before,
-.etapa-anterior .etapa-sinal::before {
+.etapa-visitada .etapa-sinal::before {
   content: '✓';
   font-weight: 700;
   line-height: 1;
-}
-
-.etapa-concluida .etapa-sinal {
-  color: var(--aprovado-texto);
-}
-
-.etapa-anterior .etapa-sinal {
-  color: var(--icone-inativo);
 }
 
 .etapa-atual {
@@ -115,20 +95,6 @@
   background: var(--azul);
 }
 
-.etapa-opcional .etapa-sinal {
-  border-style: dashed;
-}
-
-.etapa-dispensada .etapa-sinal {
-  height: 0;
-  border-width: 1px 0 0;
-  border-radius: 0;
-}
-
-.etapa-dispensada .etapa-nome {
-  text-decoration: line-through;
-}
-
 /* A gaveta: recuada sob o nome, com a mesma largura da linha. */
 .etapa-gaveta {
   display: flex;
@@ -143,34 +109,14 @@
   margin: 0;
 }
 
-.etapa-responsavel {
+/* As entradas e saídas do processo na etapa, da mais recente para a mais antiga. */
+.etapa-passagens {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--esp-1) var(--esp-3);
-}
-
-.etapa-gaveta-acoes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--esp-2);
-}
-
-.etapa-gaveta-acoes:empty {
-  display: none;
-}
-
-.etapa-datas-form {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--esp-2) var(--esp-3);
-}
-
-.etapa-campo-de-data {
-  display: flex;
-  align-items: center;
-  gap: var(--esp-2);
+  flex-direction: column;
+  gap: var(--esp-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 /* As revisões na gaveta da Revisão interna: uma por item, no mesmo tom das datas e da nota da gaveta. */

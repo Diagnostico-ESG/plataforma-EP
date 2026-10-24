@@ -5,7 +5,6 @@ import {
 import { filtrarProcessos, opcoesDosFiltros, temFiltro } from '../../processos/filtrosDosProcessos'
 import { linhasDaLista } from '../../processos/linhasDaLista'
 import type { ListaDeProcessos, ModuloDeProcessos } from '../../processos/tipos'
-import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { Icone } from '../Icone'
 import { QuadroVazio } from '../quadro/QuadroVazio'
@@ -29,10 +28,9 @@ type VisaoDosProcessosProps = {
   agrupar: AgruparQuadroPor
   aoMudarAgrupar: (agrupar: AgruparQuadroPor) => void
   processos: ModuloDeProcessos
-  revisoes: ModuloDeRevisoes
-  /** Quem está na tela, para a janela de avanço do arrastar o marcar como responsável. */
+  /** Quem está na tela, para o "Só os meus". */
   usuarioId: string
-  /** O Quadro mudou (um cartão foi concluído): a lista de processos precisa recarregar. */
+  /** O Quadro mudou (um cartão foi movido): a lista de processos precisa recarregar. */
   aoMudar: () => void
 }
 
@@ -65,7 +63,7 @@ type ControlesNaBarraProps = {
   filtros: Filtros; aoMudarFiltros: (filtros: Filtros) => void; usuarioId: string; podeAlterar: boolean
 }
 
-// "Só os meus" é o filtro Responsável com o próprio id; a Consulta não tem o botão (ela não é responsável de etapa).
+// "Só os meus" é o filtro Responsável com o próprio id (o responsável do processo); a Consulta não tem o botão (ela não é responsável).
 function ControlesDoQuadroNaBarra({ agrupar, aoMudarAgrupar, filtros, aoMudarFiltros, usuarioId, podeAlterar }: ControlesNaBarraProps) {
   const ligado = filtros.responsavel === usuarioId
   return (
@@ -88,11 +86,11 @@ function SemResultado({ filtros, usuarioId, aoMudarFiltros }: SemResultadoProps)
 type ConteudoDaVisaoProps = VisaoDosProcessosProps & { lista: ListaDeProcessos; todos: ListaDeProcessos['processos'] }
 
 function ConteudoDaVisao(props: ConteudoDaVisaoProps) {
-  const { visao, lista, todos, idEscolhido, enderecoDoProcesso, aoAbrir, filtros, podeAlterar, processos, revisoes, usuarioId, aoMudar, agrupar } = props
+  const { visao, lista, todos, idEscolhido, enderecoDoProcesso, aoAbrir, filtros, podeAlterar, processos, aoMudar, agrupar } = props
   if (visao === 'quadro') {
     return (
       <QuadroDeProcessos lista={lista} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso} podeAlterar={podeAlterar}
-        processos={processos} revisoes={revisoes} usuarioId={usuarioId} aoMudar={aoMudar} agrupar={agrupar} />
+        processos={processos} aoMudar={aoMudar} agrupar={agrupar} />
     )
   }
   return (

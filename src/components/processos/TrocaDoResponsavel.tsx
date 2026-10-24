@@ -1,19 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
-import type { OpcaoDeResponsavel } from '../../processos/caminhoDeEtapas'
-import type { EtapaDoProcesso } from '../../processos/tipos'
+import type { OpcaoDeResponsavel } from '../../processos/agoraDoProcesso'
 
 type TrocaDoResponsavelProps = {
-  etapa: EtapaDoProcesso
+  /** O responsável de agora (null: ninguém); a lista mostra sempre o valor vindo daqui. */
+  responsavelId: string | null
   opcoes: OpcaoDeResponsavel[]
+  desabilitada: boolean
   /** Grava ao escolher, sem confirmação; null é "Ninguém por enquanto". */
   aoEscolher: (usuarioId: string | null) => void
 }
 
 /**
- * O link "Trocar": abre a lista suspensa do responsável da etapa. Escolher grava e fecha; Esc fecha só a lista.
- * O valor mostrado vem sempre da etapa, então uma gravação que falha deixa o responsável como estava.
+ * O link "Trocar": abre a lista suspensa do responsável do processo. Escolher grava e fecha; Esc fecha só a lista.
+ * O valor mostrado vem sempre do processo, então uma gravação que falha deixa o responsável como estava.
  */
-export function TrocaDoResponsavel({ etapa, opcoes, aoEscolher }: TrocaDoResponsavelProps) {
+export function TrocaDoResponsavel({ responsavelId, opcoes, desabilitada, aoEscolher }: TrocaDoResponsavelProps) {
   const [trocando, setTrocando] = useState(false)
   const botao = useRef<HTMLButtonElement>(null)
   const lista = useRef<HTMLSelectElement>(null)
@@ -29,14 +30,14 @@ export function TrocaDoResponsavel({ etapa, opcoes, aoEscolher }: TrocaDoRespons
 
   if (!trocando) {
     return (
-      <button ref={botao} type="button" className="agora-trocar" aria-label={`Trocar o responsável de ${etapa.nome}`}
+      <button ref={botao} type="button" className="agora-trocar" aria-label="Trocar o responsável" disabled={desabilitada}
         onClick={() => setTrocando(true)}>
         Trocar
       </button>
     )
   }
   return (
-    <select ref={lista} className="agora-lista" aria-label={`Responsável de ${etapa.nome}`} value={etapa.responsavelId ?? ''}
+    <select ref={lista} className="agora-lista" aria-label="Responsável" value={responsavelId ?? ''} disabled={desabilitada}
       onChange={(mudanca) => {
         setTrocando(false)
         aoEscolher(mudanca.target.value === '' ? null : mudanca.target.value)

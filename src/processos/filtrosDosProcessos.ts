@@ -44,7 +44,7 @@ export function opcoesDosFiltros({ etapas, processos }: ListaDeProcessos): Opcoe
   return {
     setores: semRepetir(processos.map((p) => ({ valor: p.setorId, rotulo: p.setorSigla }))),
     macroprocessos: semRepetir(processos.map((p) => ({ valor: p.macroprocessoId, rotulo: p.macroprocessoNome }))),
-    etapas: opcoesDeEtapa(etapas, processos),
+    etapas: opcoesDeEtapa(etapas),
     tipos: Object.entries(ROTULO_DO_TIPO).map(([valor, rotulo]) => ({ valor, rotulo })),
     responsaveis: semRepetir(processos.flatMap((p) => (p.responsavel ? [{ valor: p.responsavel.id, rotulo: p.responsavel.nome }] : []))),
     situacoes: Object.entries(ROTULO_DA_SITUACAO).map(([valor, rotulo]) => ({ valor, rotulo })),
@@ -56,11 +56,10 @@ function semRepetir(opcoes: OpcaoDoFiltro[]): OpcaoDoFiltro[] {
   return [...porValor.values()].sort((a, b) => a.rotulo.localeCompare(b.rotulo, 'pt-BR', { sensitivity: 'base' }))
 }
 
-// As mesmas etapas que viram coluna no Quadro: as ativas e a desativada que ainda tem processo.
-function opcoesDeEtapa(etapas: EtapaDoCatalogo[], processos: ProcessoDaLista[]): OpcaoDoFiltro[] {
-  const emUso = new Set(processos.map((processo) => processo.etapaAtual?.codigo))
+// As mesmas etapas que viram coluna no Quadro: as ativas, inclusive Não iniciados e Concluídos.
+function opcoesDeEtapa(etapas: EtapaDoCatalogo[]): OpcaoDoFiltro[] {
   return etapas
-    .filter((etapa) => etapa.ativa || emUso.has(etapa.codigo))
+    .filter((etapa) => etapa.ativa)
     .sort((a, b) => a.ordem - b.ordem)
     .map((etapa) => ({ valor: etapa.codigo, rotulo: etapa.nome }))
 }

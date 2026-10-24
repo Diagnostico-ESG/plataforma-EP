@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
-import { falhaDoAndamento } from './processos/andamentosSupabase'
+import { falhaDoBanco } from './processos/recusasDoBanco'
 import { RECUSAS_DOS_PROCESSOS } from './processos/processosSupabase'
 import { montarNosCadastros } from './testes/processosNosCadastros'
 import { BPM_VALIDO, PNG_VALIDO } from './testes/versoesDeTeste'
@@ -57,7 +57,7 @@ test('excluir processo com versões mostra em vermelho a contagem e o caminho (c
   const { processos } = montarNosCadastros()
   const painel = await painelAberto()
   await escolherNoMenuDoProcesso('Excluir')
-  processos.falhaDeGravacao = falhaDoAndamento({ code: 'P0001', message: 'processo_com_versoes:2' }, RECUSAS_DOS_PROCESSOS)
+  processos.falhaDeGravacao = falhaDoBanco({ code: 'P0001', message: 'processo_com_versoes:2' }, RECUSAS_DOS_PROCESSOS)
   fireEvent.click(screen.getByRole('button', { name: 'Excluir processo' }))
   expect((await painel.findByRole('alert')).textContent)
     .toBe('Não é possível excluir: processo tem 2 versões enviadas. Cancele o processo em vez de excluí-lo.')

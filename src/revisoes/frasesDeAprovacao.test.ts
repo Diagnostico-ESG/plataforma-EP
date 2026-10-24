@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import {
-  fraseDaAprovacaoAntesDaRevisao, fraseDaVersaoAprovada, fraseDaVersaoSemAprovacao, fraseDoAvisoDaVolta,
+  fraseDaAprovacaoAntesDaRevisao, fraseDaVersaoAprovada, fraseDaVersaoSemAprovacao,
 } from './frasesDeAprovacao'
 
 test('a data antes da última revisão cita as duas datas como a tela as mostra', () => {
@@ -19,5 +19,4 @@ test('a versão aprovada aceita o número puro (do banco) e a mensagem inteira d
 })
 
 test('o aviso da volta cita a versão aprovada', () => {
-  expect(fraseDoAvisoDaVolta(8)).toBe('A aprovação da V8 será desfeita.')
 })

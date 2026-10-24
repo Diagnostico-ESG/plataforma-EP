@@ -1,6 +1,6 @@
 import type { RecusasDoModulo } from '../acesso/falhasDeGravacao'
 import type { ClienteSupabase } from '../lib/supabase'
-import { falhaDoAndamento } from './andamentosSupabase'
+import { falhaDoBanco } from './recusasDoBanco'
 import type { ModuloDeProcessos } from './tipos'
 
 // As recusas chegam de fora (as de processos), como em situacaoSupabase.
@@ -14,7 +14,7 @@ export function criarReclassificacaoSupabase(
       const { error } = await cliente.rpc('reclassificar_processo', {
         p_processo: id, p_tipo: tipo, p_pai: processoPaiId as string, p_motivo: motivo,
       })
-      if (error) throw falhaDoAndamento(error, recusas)
+      if (error) throw falhaDoBanco(error, recusas)
     },
   }
 }

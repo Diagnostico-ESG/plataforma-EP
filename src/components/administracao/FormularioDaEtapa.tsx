@@ -6,11 +6,10 @@ import { problemaNaEtapa } from '../../processos/validacaoDaEtapa'
 import { CampoDaFase } from './CampoDaFase'
 import { CamposDaEtapaNova } from './CamposDaEtapaNova'
 
-/** O que o formulário entrega; na edição só nome, obrigatória e fase valem. */
+/** O que o formulário entrega; na edição só nome e fase valem. */
 export type DadosDoFormularioDaEtapa = {
   nome: string
   codigo: string
-  obrigatoria: boolean
   fase: FaseDoRegimento
   antesDe: string | null
 }
@@ -28,7 +27,6 @@ export function FormularioDaEtapa({ titulo, inicial, etapas, aoSalvar, aoCancela
   const [nome, setNome] = useState(inicial?.nome ?? '')
   const [codigo, setCodigo] = useState('')
   const [posicao, setPosicao] = useState('')
-  const [obrigatoria, setObrigatoria] = useState(inicial?.obrigatoria ?? false)
   const [fase, setFase] = useState<string>(inicial?.fase ?? '')
   const [aviso, setAviso] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
@@ -41,7 +39,7 @@ export function FormularioDaEtapa({ titulo, inicial, etapas, aoSalvar, aoCancela
     if (problema || !ehFaseDoRegimento(fase)) return
     setEnviando(true)
     try {
-      await aoSalvar({ nome: nome.trim(), codigo, obrigatoria, fase, antesDe: posicao === '' ? null : posicao })
+      await aoSalvar({ nome: nome.trim(), codigo, fase, antesDe: posicao === '' ? null : posicao })
     } catch (erro) {
       setAviso(textoDaFalhaNoFormulario(erro))
     }
@@ -56,9 +54,6 @@ export function FormularioDaEtapa({ titulo, inicial, etapas, aoSalvar, aoCancela
       {!inicial && <CamposDaEtapaNova id={id} etapas={etapas} codigo={codigo} posicao={posicao}
         aoMudarCodigo={setCodigo} aoMudarPosicao={setPosicao} />}
       <CampoDaFase id={id} fase={fase} aoMudar={setFase} />
-      <label className="campo-marcar">
-        <input type="checkbox" checked={obrigatoria} onChange={(e) => setObrigatoria(e.target.checked)} /> Obrigatória
-      </label>
       <div className="form-setor-botoes">
         <button type="submit" className="botao botao-principal" disabled={enviando}>Salvar</button>
         <button type="button" className="botao botao-secundario" onClick={aoCancelar}>Cancelar</button>

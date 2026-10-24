@@ -1,11 +1,9 @@
 import { useArrastoDoQuadro } from '../../hooks/useArrastoDoQuadro'
-import { useConclusaoPeloQuadro } from '../../hooks/useConclusaoPeloQuadro'
+import { useMovimentoDoProcesso } from '../../hooks/useMovimentoDoProcesso'
 import { colunasDoQuadro, colunasPorResponsavel } from '../../processos/colunasDoQuadro'
 import type { AgruparQuadroPor } from '../../processos/enderecoDosProcessos'
 import type { ListaDeProcessos, ModuloDeProcessos } from '../../processos/tipos'
-import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import { ColunaDoQuadro } from './ColunaDoQuadro'
-import { JanelasDaEtapa } from './JanelasDaEtapa'
 import './Quadro.css'
 
 type QuadroDeProcessosProps = {
@@ -15,32 +13,28 @@ type QuadroDeProcessosProps = {
   enderecoDoProcesso: (id: string) => string
   podeAlterar: boolean
   processos: ModuloDeProcessos
-  revisoes: ModuloDeRevisoes
-  /** Quem está na tela: a janela de avanço do arrastar o marca como responsável. */
-  usuarioId: string
-  /** Um cartão foi concluído: a lista de processos precisa recarregar. */
+  /** Um cartão foi movido: a lista de processos precisa recarregar. */
   aoMudar: () => void
   agrupar: AgruparQuadroPor
 }
 
 const COLUNAS_FANTASMA = [0, 1, 2, 3]
 
-export function QuadroDeProcessos({ lista, idEscolhido, enderecoDoProcesso, podeAlterar, processos, revisoes, usuarioId, aoMudar, agrupar }: QuadroDeProcessosProps) {
+export function QuadroDeProcessos({ lista, idEscolhido, enderecoDoProcesso, podeAlterar, processos, aoMudar, agrupar }: QuadroDeProcessosProps) {
   const colunas = agrupar === 'responsavel' ? colunasPorResponsavel(lista.processos) : colunasDoQuadro(lista)
-  const { acoes, usuarios, ultimaVersao, falhaDaLeitura, concluirDoCartao } = useConclusaoPeloQuadro(processos, revisoes, podeAlterar, aoMudar)
-  const arrasto = useArrastoDoQuadro(colunas, concluirDoCartao)
-  const falha = falhaDaLeitura ?? acoes.falha
+  // O processo some do Quadro (excluído por outra pessoa) é o mesmo que mudou: o Quadro só recarrega.
+  const movimento = useMovimentoDoProcesso(processos, aoMudar, aoMudar)
+  const arrasto = useArrastoDoQuadro(lista.etapas, movimento.mover)
   return (
     <>
-      {arrasto.aviso && <p className="quadro-aviso" role="status">{arrasto.aviso}</p>}
-      {falha && <p className="cadastros-falha" role="alert">{falha}</p>}
+      {movimento.aviso && <p className="quadro-aviso" role="status">{movimento.aviso}</p>}
+      {movimento.falha && <p className="cadastros-falha" role="alert">{movimento.falha}</p>}
       <div className="quadro-colunas">
         {colunas.map((coluna) => (
           <ColunaDoQuadro key={coluna.chave} coluna={coluna} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso}
-            podeAlterar={podeAlterar} arrasto={arrasto} agrupar={agrupar} />
+            podeAlterar={podeAlterar && !movimento.gravando} arrasto={arrasto} agrupar={agrupar} etapas={lista.etapas} />
         ))}
       </div>
-      <JanelasDaEtapa acoes={acoes} usuarios={usuarios} usuarioId={usuarioId} ultimaVersao={ultimaVersao} />
     </>
   )
 }

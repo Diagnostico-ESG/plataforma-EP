@@ -4,6 +4,8 @@ export type Pedido = {
   tabela: string; operacao: string; colunas?: string; valores?: unknown; filtro?: [string, string]
   /** Todos os `eq` em ordem; `filtro` guarda só o último. */
   filtros?: [string, string][]
+  /** O filtro `is` (coluna e valor, como null). */
+  ehNulo?: [string, unknown]
   /** O filtro `in` (coluna e valores aceitos). */
   dentro?: [string, string[]]
   /** O filtro `like` (coluna e padrão). */
@@ -43,9 +45,14 @@ export class ClienteSupabaseFalso {
     return this.filaDeRespostas[chave]?.shift() ?? this.respostas[chave] ?? { data: [], error: null }
   }
 
-  from(tabela: string) {
+  private novoPedido(tabela: string): Pedido {
     const pedido: Pedido = { tabela, operacao: 'select' }
     this.pedidos.push(pedido)
+    return pedido
+  }
+
+  from(tabela: string) {
+    const pedido = this.novoPedido(tabela)
     const resposta = () => this.respostaDe(`${tabela}.${pedido.operacao}`)
     const consulta = {
       select: (colunas?: string) => Object.assign(pedido, { colunas: pedido.colunas ?? colunas }) && consulta,
@@ -55,6 +62,7 @@ export class ClienteSupabaseFalso {
       update: (valores: unknown) => Object.assign(pedido, { operacao: 'update', valores }) && consulta,
       delete: () => Object.assign(pedido, { operacao: 'delete' }) && consulta,
       eq: (coluna: string, valor: string) => guardarFiltro(pedido, coluna, valor) && consulta,
+      is: (coluna: string, valor: unknown) => Object.assign(pedido, { ehNulo: [coluna, valor] }) && consulta,
       in: (coluna: string, valores: string[]) => Object.assign(pedido, { dentro: [coluna, valores] }) && consulta,
       like: (coluna: string, padrao: string) => Object.assign(pedido, { parecido: [coluna, padrao] }) && consulta,
       or: (filtro: string) => Object.assign(pedido, { ou: filtro }) && consulta,

@@ -48,12 +48,12 @@ test('a transição que o banco recusa vira a frase com a situação recebida', 
     .toBe('Um processo cancelado não pode passar a suspenso.')
 })
 
-test('etapa de processo parado vira "Este processo está {situação}; retome-o para registrar o andamento."', async () => {
+test('mudança de etiqueta de processo parado vira "Este processo está {situação}; retome-o para mudar a etapa, a etiqueta ou o responsável."', async () => {
   const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['andamentos.update'] = { data: null, error: { message: 'processo_parado:suspenso', code: 'P0001' } }
-  const falha = await falhaDe(criar(cliente).iniciarEtapa('a4'))
+  cliente.respostas['passagens.update'] = { data: null, error: { message: 'processo_parado:suspenso', code: 'P0001' } }
+  const falha = await falhaDe(criar(cliente).mudarEtiqueta('p1', 'em_andamento'))
   expect(falha).toBeInstanceOf(TravaDoBanco)
-  expect(falha.message).toBe('Este processo está suspenso; retome-o para registrar o andamento.')
+  expect(falha.message).toBe('Este processo está suspenso; retome-o para mudar a etapa, a etiqueta ou o responsável.')
 })
 
 test('a situação recusada pela permissão (42501) vira "Seu perfil não permite alterar os processos."', async () => {

@@ -6,7 +6,8 @@ import type { Perfil } from './acesso/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import type { EventoDoCadastro } from './cadastros/tipos'
 import { ProcessosFalso } from './processos/ProcessosFalso'
-import type { EtapaDoProcesso, ProcessoLido, SituacaoDoProcesso } from './processos/tipos'
+import type { ProcessoLido, SituacaoDoProcesso } from './processos/tipos'
+import { CATALOGO_DE_TESTE, umProcessoLido } from './testes/processoDaLista'
 import { agoraDoVerso, escolherNoMenuDoProcesso, etapasDoVerso, gavetaDaEtapa, janelaPorCima, versoAberto } from './testes/versoDoCartao'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
@@ -21,28 +22,12 @@ afterEach(() => {
   window.location.hash = ''
 })
 
-function etapaDoProcesso(ordem: number, codigo: string, nome: string, mudancas: Partial<EtapaDoProcesso> = {}): EtapaDoProcesso {
-  return {
-    id: `a${ordem}`, codigo, nome, ordem, obrigatoria: true, status: 'pendente', nota: null, iniciadaEm: null,
-    resolvidaEm: null, responsavelId: null, responsavelNome: null, responsavelInativo: false, ...mudancas,
-  }
-}
-
-const PROCESSO: ProcessoLido = {
-  id: 'p1', nome: 'Emitir Ofício', tipo: 'a_classificar', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
-  macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento',
-  etapaAtual: { codigo: 'relatorio', nome: 'Relatório e modelagem técnica', ordem: 5 },
-  responsavel: null, origem: 'retomado', contexto: 'Contexto inventado', observacoes: 'Observação inventada',
-  processoPaiId: null, processoPai: null, subprocessos: [],
-  motivoDaSituacao: null,
-  dataDaReuniao: null, ultimaVersao: null,
-  etapasDoProcesso: [
-    etapaDoProcesso(4, 'modelagem', 'Modelagem piloto', {
-      status: 'concluida', iniciadaEm: '2026-10-11', resolvidaEm: '2026-10-12', responsavelNome: 'Ana Teste' }),
-    etapaDoProcesso(5, 'relatorio', 'Relatório e modelagem técnica', { status: 'em_andamento', iniciadaEm: '2026-10-13' }),
-    etapaDoProcesso(6, 'revisao_interna', 'Revisão interna'),
-  ],
-}
+// Em Relatório e modelagem técnica; a Modelagem piloto já foi visitada (de 11 a 12/10).
+const PROCESSO: ProcessoLido = umProcessoLido('Emitir Ofício', {
+  id: 'p1', tipo: 'a_classificar', origem: 'retomado', contexto: 'Contexto inventado', observacoes: 'Observação inventada',
+  responsavel: null, entrouNaEtapaEm: '2026-10-13',
+  etapasDoVerso: [{ id: 'e2', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 2, passagens: [{ entrouEm: '2026-10-11', saiuEm: '2026-10-12' }] }],
+}, 'relatorio_modelagem_tecnica')
 
 const PAI: ProcessoLido = { ...PROCESSO, id: 'p2', nome: 'Gerir Ofícios', tipo: 'processo' }
 const FILHO: ProcessoLido = { ...PROCESSO, id: 'p3', nome: 'Conferir Ofício', tipo: 'subprocesso', processoPaiId: 'p2' }
@@ -59,7 +44,8 @@ function montar({ perfil = 'integrante_ep', processos = [PROCESSO, PAI, FILHO], 
   cadastros.setores = [{ id: 's1', sigla: 'TSA', nome: 'Setor Teste A', observacoes: null, ativo: true }]
   const falso = new ProcessosFalso()
   falso.processos = processos
-  falso.etapasDoCatalogo = [{ id: 'e5', codigo: 'relatorio', nome: 'Relatório e modelagem técnica', ordem: 5, ativa: true }]
+  falso.etapasDoCatalogo = CATALOGO_DE_TESTE
+  falso.usuariosPossiveis = [{ id: USUARIO_DE_TESTE.id, nome: USUARIO_DE_TESTE.nome }]
   falso.historicoDosProcessos = { p1: [EVENTO] }
   ajustar?.(falso)
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
@@ -251,27 +237,26 @@ test('os dados do processo aparecem no verso', async () => {
   for (const texto of ['Retomado', 'Contexto inventado', 'Observação inventada']) expect(aberto.getByText(texto)).toBeTruthy()
 })
 
-test('as etapas começam na Modelagem piloto, com a atual destacada, e as ações da atual ficam no Agora', async () => {
+test('as Etapas listam todas as etapas ativas na ordem do catálogo, com a atual destacada, e as ações ficam no Agora', async () => {
   montar()
   const caminho = within(await (await versoAberto()).findByRole('region', { name: 'Etapas' }))
   const nomes = caminho.getAllByRole('listitem').map((item) => item.querySelector('.etapa-nome')?.textContent)
-  expect(nomes).toEqual(['Modelagem piloto', 'Relatório e modelagem técnica', 'Revisão interna'])
+  expect(nomes).toEqual(CATALOGO_DE_TESTE.map((etapa) => etapa.nome))
   const atuais = caminho.getAllByRole('listitem').filter((item) => item.getAttribute('aria-current') === 'step')
   expect(atuais.map((item) => item.querySelector('.etapa-nome')?.textContent)).toEqual(['Relatório e modelagem técnica'])
   const agora = await agoraDoVerso()
-  expect(agora.getByRole('button', { name: 'Concluir Relatório e modelagem técnica' })).toBeTruthy()
-  expect(agora.getByRole('button', { name: 'Assumir Relatório e modelagem técnica' })).toBeTruthy()
-  expect(agora.getByRole('button', { name: 'Mais ações da etapa' })).toBeTruthy()
+  expect(agora.getByRole('combobox', { name: 'Etapa' })).toBeTruthy()
+  expect(agora.getByRole('combobox', { name: 'Etiqueta' })).toBeTruthy()
+  expect(agora.getByRole('button', { name: 'Assumir' })).toBeTruthy()
 })
 
-test('a gaveta mostra status, responsável, datas e nota das etapas do processo', async () => {
+test('a gaveta mostra as entradas e saídas do processo na etapa, ou que ainda não passou por ela', async () => {
   montar({ perfil: 'consulta' })
   const modelagem = await gavetaDaEtapa('Modelagem piloto')
-  expect(await (await etapasDoVerso()).findByRole('button', { name: 'Modelagem piloto: concluída' })).toBeTruthy()
-  expect(modelagem.getByText('Responsável: Ana Teste')).toBeTruthy()
-  expect(modelagem.getByText('Início: 11/10/2026 · Conclusão: 12/10/2026')).toBeTruthy()
+  expect(await (await etapasDoVerso()).findByRole('button', { name: 'Modelagem piloto: visitada' })).toBeTruthy()
+  expect(modelagem.getByText('Entrou em 11/10/2026 · saiu em 12/10/2026')).toBeTruthy()
   const revisao = await gavetaDaEtapa('Revisão interna')
-  expect(revisao.getByText('Responsável: —')).toBeTruthy()
+  expect(revisao.getByText('Ainda não passou por esta etapa')).toBeTruthy()
 })
 
 test('o Histórico: carregando, erro com [Tentar de novo] e vazio', async () => {

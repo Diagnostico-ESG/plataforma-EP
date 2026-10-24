@@ -1,6 +1,5 @@
 import { type ReactNode, useCallback, useId, useState } from 'react'
 import { useCarregamento } from '../../hooks/useCarregamento'
-import { assinaturaDasEtapas } from '../../processos/caminhoDeEtapas'
 import { useConferenciaNoDrive } from '../../hooks/useConferenciaNoDrive'
 import type { ProcessoLido } from '../../processos/tipos'
 import type { ModoDoFormulario } from '../../versoes/formularioDeVersao'
@@ -23,10 +22,10 @@ type SecaoDeVersoesProps = { versoes: ModuloDeVersoes; processo: ProcessoLido; p
  * andamento; esconder o botão é conveniência, quem recusa é a função do servidor e o banco.
  */
 export function SecaoDeVersoes({ versoes, processo, podeAlterar }: SecaoDeVersoesProps) {
-  // Lê de novo quando as etapas mudam: concluir a Aprovação põe o selo "Aprovada" na versão e a volta o tira.
-  const assinatura = assinaturaDasEtapas(processo.etapasDoProcesso)
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- a assinatura não é usada dentro: só faz a leitura se refazer quando as etapas mudam
-  const ler = useCallback(() => versoes.listarVersoes(processo.id), [versoes, processo.id, assinatura])
+  // Lê de novo quando o processo muda de etapa: registrar a aprovação põe o selo "Aprovada" na versão.
+  const etapaAtual = processo.etapaAtual?.id
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- a etapa atual não é usada dentro: só faz a leitura se refazer quando ela muda
+  const ler = useCallback(() => versoes.listarVersoes(processo.id), [versoes, processo.id, etapaAtual])
   const { estado, tentarDeNovo, recarregar } = useCarregamento(ler)
   const idDoTitulo = useId()
   const podeEnviar = podeAlterar && processo.situacao === 'em_andamento'

@@ -9,45 +9,56 @@ const LINHA = {
   situacao_guardada: 'em_andamento', motivo_da_situacao: null, contexto: 'Contexto inventado', observacoes: null,
   criado_em: '2026-10-14T10:00:00Z', setor_id: 's1', setor_sigla: 'TSA', macroprocesso_id: 'm1',
   macroprocesso_nome: 'Macro de Teste', situacao: 'em_andamento', etapa_atual_id: 'e4', etapa_atual_codigo: 'modelagem',
-  etapa_atual_nome: 'Reunião de modelagem', etapa_atual_ordem: 4,
-  responsavel_id: null, responsavel_nome: null, responsavel_foto_url: null,
+  etapa_atual_nome: 'Modelagem piloto', etapa_atual_ordem: 2, etapa_atual_posicao: 2, etiqueta: 'a_fazer',
+  entrou_na_etapa_em: '2026-10-04T12:00:00+00:00', responsavel_id: null, responsavel_nome: null, responsavel_foto_url: null,
 }
-const MODELAGEM = {
-  id: 'a4', status: 'pendente', nota: null, iniciada_em: null, resolvida_em: null, responsavel: { id: 'u1', nome: 'Ana Teste', ativo: true },
-  etapas: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, obrigatoria: true },
-}
-const RELATORIO = {
-  id: 'a5', status: 'pendente', nota: null, iniciada_em: null, resolvida_em: null, responsavel: null,
-  etapas: { codigo: 'relatorio_modelagem_tecnica', nome: 'Relatório e modelagem técnica', ordem: 5, obrigatoria: true },
-}
+const ETAPAS = [
+  { id: 'e1', codigo: 'nao_iniciados', nome: 'Não iniciados', ordem: 1 },
+  { id: 'e4', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 2 },
+  { id: 'e8', codigo: 'concluidos', nome: 'Concluídos', ordem: 3 },
+]
 
 function criar(cliente: ClienteSupabaseFalso) {
   return criarProcessosSupabase(cliente as unknown as SupabaseClient<Database>)
 }
 
-test('lê o processo com as etapas do processo (ordem do catálogo, com o responsável), sem ler etapas do setor', async () => {
+test('lê o processo com as etapas ativas (ordem do catálogo) e as passagens dele em dias de Brasília, a mais recente primeiro', async () => {
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
-  cliente.respostas['andamentos.select'] = { data: [RELATORIO, MODELAGEM], error: null }
+  cliente.respostas['etapas.select'] = { data: ETAPAS, error: null }
+  cliente.respostas['passagens.select'] = { data: [
+    { etapa_id: 'e4', entrou_em: '2026-10-05T02:00:00+00:00', saiu_em: null },
+    { etapa_id: 'e1', entrou_em: '2026-10-01T15:00:00+00:00', saiu_em: '2026-10-05T02:00:00+00:00' },
+  ], error: null }
   const lido = await criar(cliente).lerProcesso('p1')
   expect(lido).toMatchObject({
     id: 'p1', nome: 'Emitir Ofício Fictício', origem: 'retomado', contexto: 'Contexto inventado', observacoes: null,
-    motivoDaSituacao: null,
+    motivoDaSituacao: null, etapaAtual: { codigo: 'modelagem', posicao: 2, total: 3 },
   })
-  expect(lido?.etapasDoProcesso.map((etapa) => [etapa.codigo, etapa.responsavelNome])).toEqual([
-    ['modelagem', 'Ana Teste'], ['relatorio_modelagem_tecnica', null]])
-  expect(cliente.pedidos.filter((pedido) => pedido.tabela === 'andamentos').map((pedido) => pedido.filtro)).toEqual(
-    [['processo_id', 'p1']])
+  expect(lido?.etapasDoVerso).toEqual([
+    { id: 'e1', codigo: 'nao_iniciados', nome: 'Não iniciados', ordem: 1, passagens: [{ entrouEm: '2026-10-01', saiuEm: '2026-10-04' }] },
+    { id: 'e4', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 2, passagens: [{ entrouEm: '2026-10-04', saiuEm: null }] },
+    { id: 'e8', codigo: 'concluidos', nome: 'Concluídos', ordem: 3, passagens: [] },
+  ])
+  expect(cliente.pedidos.find((pedido) => pedido.tabela === 'passagens')).toMatchObject({
+    filtro: ['processo_id', 'p1'], ordem: [['entrou_em', false]],
+  })
+  expect(cliente.pedidos.find((pedido) => pedido.tabela === 'etapas')).toMatchObject({ filtro: ['ativa', true], ordem: [['ordem', true]] })
 })
 
-test('a etapa traz o id do responsável e se ele foi desativado depois de escolhido', async () => {
+test('a etapa nunca visitada vem sem passagens', async () => {
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
-  const inativo = { ...MODELAGEM, responsavel: { id: 'u2', nome: 'Caio Teste', ativo: false } }
-  cliente.respostas['andamentos.select'] = { data: [inativo, RELATORIO, MODELAGEM], error: null }
+  cliente.respostas['etapas.select'] = { data: ETAPAS, error: null }
   const lido = await criar(cliente).lerProcesso('p1')
-  expect(lido?.etapasDoProcesso.map((etapa) => [etapa.responsavelId, etapa.responsavelInativo])).toEqual([
-    ['u2', true], ['u1', false], [null, false]])
+  expect(lido?.etapasDoVerso.map((etapa) => etapa.passagens)).toEqual([[], [], []])
+})
+
+test.each(['etapas', 'passagens'])('falha ao ler %s vira erro com o motivo do banco', async (tabela) => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
+  cliente.respostas[`${tabela}.select`] = { data: null, error: { message: 'sem conexão' } }
+  await expect(criar(cliente).lerProcesso('p1')).rejects.toThrow(/sem conexão/)
 })
 
 const VIEW = 'processos_com_andamento.select'
@@ -113,7 +124,7 @@ test('o histórico do processo vem do mais recente ao mais antigo, só dos event
     entidadeRef: 'p1', antes: null, depois: { nome: 'Emitir Ofício Fictício' }, motivo: undefined,
   }])
   expect(cliente.pedidos[0]).toMatchObject({
-    tabela: 'eventos', dentro: ['entidade', ['processo', 'andamento', 'versao', 'revisao_interna', 'aprovacao']], parecido: ['entidade_ref', 'p1%'],
+    tabela: 'eventos', dentro: ['entidade', ['processo', 'passagem', 'versao', 'revisao_interna', 'aprovacao']], parecido: ['entidade_ref', 'p1%'],
     ordem: [['ocorrido_em', false], ['id', false]],
   })
 })
@@ -127,7 +138,7 @@ test('falha ao ler o histórico vira erro com o motivo do banco', async () => {
 test.each([['2026-10-20'], [null]])('a data da reunião (%s) chega com o processo', async (data) => {
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas['processos_com_andamento.select'] = { data: [{ ...LINHA, data_da_reuniao: data }], error: null }
-  cliente.respostas['andamentos.select'] = { data: [], error: null }
+
   expect((await criar(cliente).lerProcesso('p1'))?.dataDaReuniao).toBe(data)
 })
 

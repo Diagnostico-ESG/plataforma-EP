@@ -3,7 +3,7 @@ import { afterEach, expect, test, vi } from 'vitest'
 import { CadastrosFalso } from '../../cadastros/CadastrosFalso'
 import type { SetorDaLista } from '../../cadastros/tipos'
 import { ProcessosFalso } from '../../processos/ProcessosFalso'
-import { etapaDoProcesso, processoLido } from '../../testes/processoNoVerso'
+import { processoLido } from '../../testes/processoNoVerso'
 import { FormularioDoProcesso } from './FormularioDoProcesso'
 
 afterEach(cleanup)
@@ -34,7 +34,7 @@ test('carregando: o cadastro reserva o lugar do Tipo, a edição não', () => {
   abrirCarregando()
   const noCadastro = document.querySelectorAll('.formulario-fantasma-campo').length
   cleanup()
-  abrirCarregando(processoLido([etapaDoProcesso(1, 'modelagem', 'Modelagem piloto')]))
+  abrirCarregando(processoLido({}, 'modelagem'))
   const naEdicao = document.querySelectorAll('.formulario-fantasma-campo').length
   expect(noCadastro).toBe(naEdicao + 1)
 })

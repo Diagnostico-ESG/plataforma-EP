@@ -1,115 +1,113 @@
 import { describe, expect, test } from 'vitest'
+import { CATALOGO_DE_TESTE, etapaAtualDe, umProcesso } from '../testes/processoDaLista'
 import { selosDoCartao } from './selosDoCartao'
-import type { DadosDoCartao, ProcessoDaLista, StatusDaEtapa } from './tipos'
+import type { ProcessoDaLista } from './tipos'
 
 const HOJE = '2026-10-19'
-const CODIGOS = ['modelagem', 'relatorio_modelagem_tecnica', 'revisao_interna', 'revisao_do_setor', 'aprovacao', 'eprotocolo']
 
-type Mudancas = {
-  cartao?: Partial<DadosDoCartao>
-  atual?: string
-  situacao?: ProcessoDaLista['situacao']
-  semResponsavel?: boolean
-  dataDaReuniao?: string | null
-}
+const selos = (processo: ProcessoDaLista) => selosDoCartao(processo, HOJE, CATALOGO_DE_TESTE)
+const textos = (processo: ProcessoDaLista) => selos(processo).map((selo) => selo.texto)
+const tipos = (processo: ProcessoDaLista) => selos(processo).map((selo) => selo.tipo)
+const semRelatorio = { ultimaVersao: { numero: 3, historica: false, temRelatorio: false }, responsavelAtivo: true, subprocessos: 0 }
 
-function processo({ cartao = {}, atual = 'revisao_interna', situacao = 'em_andamento', semResponsavel = false, dataDaReuniao = null }: Mudancas = {}): ProcessoDaLista {
-  const caminho = CODIGOS.map((codigo) => ({ codigo, status: 'pendente' as StatusDaEtapa }))
-  return {
-    id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
-    macroprocessoNome: 'Macro', processoPaiId: null, situacao, dataDaReuniao,
-    etapaAtual: { codigo: atual, nome: 'Etapa', ordem: 3 },
-    responsavel: semResponsavel ? null : { id: 'u1', nome: 'Ana', fotoUrl: null },
-    cartao: {
-      etapaAtualStatus: 'em_andamento', etapaAtualIniciadaEm: HOJE, responsavelAtivo: true, caminho,
-      ultimaVersao: null, subprocessos: 0, ...cartao,
-    },
-  }
-}
-
-const textos = (...argumentos: Parameters<typeof processo>) => selosDoCartao(processo(...argumentos), HOJE).map((selo) => selo.texto)
-const tipos = (...argumentos: Parameters<typeof processo>) => selosDoCartao(processo(...argumentos), HOJE).map((selo) => selo.tipo)
-const semRelatorio = { ultimaVersao: { numero: 3, historica: false, temRelatorio: false } }
-
-describe('selo de dias', () => {
-  test('ausente com 15 dias, presente e âmbar com 16', () => {
-    expect(textos({ cartao: { etapaAtualIniciadaEm: '2026-10-04' } })).toEqual([])
-    const selos = selosDoCartao(processo({ cartao: { etapaAtualIniciadaEm: '2026-10-03' } }), HOJE)
-    expect(selos).toEqual([{ tipo: 'dias', texto: '16 dias nesta etapa', tom: 'alerta' }])
+describe('selo de dias (processo parado)', () => {
+  test('ausente com 7 dias, presente e âmbar com 8', () => {
+    expect(textos(umProcesso('A', { entrouNaEtapaEm: '2026-10-12' }))).toEqual([])
+    expect(selos(umProcesso('A', { entrouNaEtapaEm: '2026-10-11' })))
+      .toEqual([{ tipo: 'dias', texto: '8 dias nesta etapa', tom: 'alerta' }])
   })
 
-  test('nunca no suspenso nem na etapa atual pendente ou sem início', () => {
-    expect(textos({ situacao: 'suspenso', cartao: { etapaAtualIniciadaEm: '2026-09-01' } })).toEqual([])
-    expect(textos({ cartao: { etapaAtualStatus: 'pendente', etapaAtualIniciadaEm: '2026-09-01' } })).toEqual([])
-    expect(textos({ cartao: { etapaAtualIniciadaEm: null } })).toEqual([])
+  test('mudar só a etiqueta não zera a contagem: o selo vem da entrada na etapa', () => {
+    expect(textos(umProcesso('A', { entrouNaEtapaEm: '2026-10-01', etiqueta: 'concluido' }))).toEqual(['18 dias nesta etapa'])
+  })
+
+  test('nunca em Não iniciados, em Concluídos, no suspenso, no cancelado nem sem entrada', () => {
+    const antigo = '2026-09-01'
+    expect(textos(umProcesso('A', { entrouNaEtapaEm: antigo }, 'nao_iniciados'))).toEqual([])
+    expect(tipos(umProcesso('A', { entrouNaEtapaEm: antigo, situacao: 'concluido', publicadoEm: '2026-09-02' }, 'concluidos'))).toEqual([])
+    expect(tipos(umProcesso('A', { entrouNaEtapaEm: antigo, situacao: 'suspenso' }))).not.toContain('dias')
+    expect(tipos(umProcesso('A', { entrouNaEtapaEm: antigo, situacao: 'cancelado' }))).not.toContain('dias')
+    expect(tipos(umProcesso('A', { entrouNaEtapaEm: null }))).not.toContain('dias')
   })
 })
 
 describe('selo de Relatório pendente', () => {
-  test('ausente antes da Revisão interna, presente nela e depois', () => {
-    expect(textos({ atual: 'relatorio_modelagem_tecnica', cartao: semRelatorio })).toEqual(['V3'])
-    expect(selosDoCartao(processo({ atual: 'revisao_interna', cartao: semRelatorio }), HOJE)[0])
-      .toEqual({ tipo: 'relatorio', texto: 'Relatório pendente', tom: 'alerta' })
-    expect(tipos({ atual: 'aprovacao', cartao: semRelatorio })).toContain('relatorio')
+  const com = (etapa: string) => umProcesso('A', { cartao: semRelatorio }, etapa)
+
+  test('ausente antes da Revisão interna, presente nela e depois, e ausente em Concluídos', () => {
+    expect(tipos(com('relatorio_modelagem_tecnica'))).not.toContain('relatorio')
+    expect(tipos(com('nao_iniciados'))).not.toContain('relatorio')
+    expect(selos(com('revisao_interna'))[0]).toEqual({ tipo: 'relatorio', texto: 'Relatório pendente', tom: 'alerta' })
+    expect(tipos(com('aprovacao_setor'))).toContain('relatorio')
+    expect(tipos(com('publicacao'))).toContain('relatorio')
+    expect(tipos({ ...com('concluidos'), publicadoEm: '2026-10-01' })).not.toContain('relatorio')
   })
 
-  test('ausente com relatório, na versão histórica, sem versão e sem a Revisão interna no caminho', () => {
-    expect(tipos({ cartao: { ultimaVersao: { numero: 3, historica: false, temRelatorio: true } } })).not.toContain('relatorio')
-    expect(tipos({ cartao: { ultimaVersao: { numero: 5, historica: true, temRelatorio: false } } })).not.toContain('relatorio')
-    expect(tipos({ cartao: {} })).not.toContain('relatorio')
-    expect(tipos({ cartao: { ...semRelatorio, caminho: [{ codigo: 'modelagem', status: 'pendente' }] }, atual: 'modelagem' }))
-      .not.toContain('relatorio')
+  test('ausente com relatório, na versão histórica e sem versão', () => {
+    const com2 = (versao: NonNullable<ProcessoDaLista['cartao']>['ultimaVersao']) =>
+      tipos(umProcesso('A', { cartao: { ...semRelatorio, ultimaVersao: versao } }))
+    expect(com2({ numero: 3, historica: false, temRelatorio: true })).not.toContain('relatorio')
+    expect(com2({ numero: 5, historica: true, temRelatorio: false })).not.toContain('relatorio')
+    expect(com2(null)).not.toContain('relatorio')
   })
 
   test('o suspenso mantém o selo, que não é de tempo', () => {
-    expect(tipos({ situacao: 'suspenso', cartao: semRelatorio })).toContain('relatorio')
+    expect(tipos({ ...com('revisao_interna'), situacao: 'suspenso' })).toContain('relatorio')
+  })
+})
+
+describe('Sem publicação', () => {
+  test('em Concluídos sem a data da publicação, neutro e antes dos outros; com a data, não', () => {
+    const concluido = umProcesso('A', { situacao: 'concluido', entrouNaEtapaEm: '2026-10-19' }, 'concluidos')
+    expect(selos(concluido)).toEqual([{ tipo: 'sem_publicacao', texto: 'Sem publicação', tom: 'neutro' }])
+    expect(selos({ ...concluido, publicadoEm: '2026-10-10' })).toEqual([])
+  })
+
+  test('fora de Concluídos o selo não existe', () => {
+    expect(tipos(umProcesso('A'))).not.toContain('sem_publicacao')
   })
 })
 
 describe('demais selos', () => {
   test('Sem responsável, neutro, só sem responsável', () => {
-    expect(selosDoCartao(processo({ semResponsavel: true }), HOJE)).toEqual([{ tipo: 'sem_responsavel', texto: 'Sem responsável', tom: 'neutro' }])
-    expect(tipos()).not.toContain('sem_responsavel')
+    expect(selos(umProcesso('A', { responsavel: null }))).toEqual([{ tipo: 'sem_responsavel', texto: 'Sem responsável', tom: 'neutro' }])
+    expect(tipos(umProcesso('A'))).not.toContain('sem_responsavel')
   })
 
   test('Reunião hoje, futura e passada', () => {
-    expect(textos({ dataDaReuniao: HOJE })).toEqual(['Reunião hoje'])
-    expect(textos({ dataDaReuniao: '2026-10-25' })).toEqual(['Reunião 25/10'])
-    expect(textos({ dataDaReuniao: '2026-10-18' })).toEqual([])
-    expect(textos({ dataDaReuniao: null })).toEqual([])
+    expect(textos(umProcesso('A', { dataDaReuniao: HOJE }))).toEqual(['Reunião hoje'])
+    expect(textos(umProcesso('A', { dataDaReuniao: '2026-10-25' }))).toEqual(['Reunião 25/10'])
+    expect(textos(umProcesso('A', { dataDaReuniao: '2026-10-18' }))).toEqual([])
+    expect(textos(umProcesso('A', { dataDaReuniao: null }))).toEqual([])
   })
 
   test('versão: V3, V5F e ausente sem versão', () => {
-    expect(textos({ cartao: { ultimaVersao: { numero: 3, historica: false, temRelatorio: true } } })).toEqual(['V3'])
-    expect(textos({ cartao: { ultimaVersao: { numero: 5, historica: true, temRelatorio: false } } })).toEqual(['V5F'])
-    expect(textos()).toEqual([])
+    const versao = (numero: number, historica: boolean) =>
+      umProcesso('A', { cartao: { responsavelAtivo: true, subprocessos: 0, ultimaVersao: { numero, historica, temRelatorio: true } } })
+    expect(textos(versao(3, false))).toEqual(['V3'])
+    expect(textos(versao(5, true))).toEqual(['V5F'])
+    expect(textos(umProcesso('A'))).toEqual([])
   })
 
   test('subprocessos no singular e no plural, e nada com zero', () => {
-    expect(textos({ cartao: { subprocessos: 1 } })).toEqual(['1 subprocesso'])
-    expect(textos({ cartao: { subprocessos: 3 } })).toEqual(['3 subprocessos'])
-    expect(textos({ cartao: { subprocessos: 0 } })).toEqual([])
+    const subs = (subprocessos: number) => umProcesso('A', { cartao: { responsavelAtivo: true, ultimaVersao: null, subprocessos } })
+    expect(textos(subs(1))).toEqual(['1 subprocesso'])
+    expect(textos(subs(3))).toEqual(['3 subprocessos'])
+    expect(textos(subs(0))).toEqual([])
   })
 })
 
 test('a ordem: dias, Relatório pendente, Sem responsável, Reunião, versão, subprocessos', () => {
-  const todos = processo({
-    semResponsavel: true, dataDaReuniao: HOJE,
-    cartao: { etapaAtualIniciadaEm: '2026-09-01', ...semRelatorio, subprocessos: 2 },
+  const todos = umProcesso('A', {
+    responsavel: null, dataDaReuniao: HOJE, entrouNaEtapaEm: '2026-09-01', cartao: { ...semRelatorio, subprocessos: 2 },
   })
-  expect(selosDoCartao(todos, HOJE).map((selo) => selo.tipo))
-    .toEqual(['dias', 'relatorio', 'sem_responsavel', 'reuniao', 'versao', 'subprocessos'])
-})
-
-test('o concluído com "não" tem o selo Não publicado, neutro, antes dos outros; o publicado e o sem escolha não', () => {
-  const concluido = { ...processo(), situacao: 'concluido' as const, etapaAtual: null, responsavel: null }
-  expect(selosDoCartao({ ...concluido, vaiParaPublicacao: false }, HOJE))
-    .toEqual([{ tipo: 'nao_publicado', texto: 'Não publicado', tom: 'neutro' }])
-  expect(selosDoCartao({ ...concluido, vaiParaPublicacao: true, publicadoEm: HOJE }, HOJE)).toEqual([])
-  expect(selosDoCartao({ ...concluido, vaiParaPublicacao: null }, HOJE)).toEqual([])
+  expect(tipos(todos)).toEqual(['dias', 'relatorio', 'sem_responsavel', 'reuniao', 'versao', 'subprocessos'])
 })
 
 test('o processo sem cartão não tem selos de cartão', () => {
-  const semCartao = { ...processo({ semResponsavel: true }), cartao: undefined }
-  expect(selosDoCartao(semCartao, HOJE).map((selo) => selo.tipo)).toEqual(['sem_responsavel'])
+  expect(tipos({ ...umProcesso('A', { responsavel: null }), cartao: undefined })).toEqual(['sem_responsavel'])
+})
+
+test('a etapa atual vem do catálogo de teste', () => {
+  expect(etapaAtualDe('concluidos').posicao).toBe(8)
 })

@@ -1,7 +1,7 @@
 import type { DragEvent } from 'react'
-import { ROTULO_DO_TIPO } from '../../processos/rotulos'
+import { ROTULO_DA_ETIQUETA, ROTULO_DO_TIPO } from '../../processos/rotulos'
 import { hojeLocal } from '../../processos/textoDaReuniao'
-import type { ProcessoDaLista } from '../../processos/tipos'
+import type { EtapaDoCatalogo, ProcessoDaLista } from '../../processos/tipos'
 import { Avatar } from '../Avatar'
 import { Pilula } from '../Pilula'
 import { BarraDeProgresso } from './BarraDeProgresso'
@@ -11,18 +11,20 @@ type CartaoDoProcessoProps = {
   processo: ProcessoDaLista
   escolhido: boolean
   href: string
-  /** Só Administrador e Integrante, com a etapa em andamento e etapa pendente depois (spec, "Arrastar para concluir"). */
+  /** Só Administrador e Integrante, só agrupado por etapa e só o processo em andamento ou concluído não arquivado. */
   arrastavel: boolean
   /** O cartão arrastado fica levemente apagado no lugar de origem. */
   apagado: boolean
   /** O Quadro por responsável: a coluna já diz quem é, então o cartão diz a etapa e dispensa o selo Sem responsável. */
   agrupadoPorResponsavel: boolean
+  /** As etapas do catálogo: o selo de relatório pendente compara a posição da etapa atual com a da Revisão interna. */
+  etapas: EtapaDoCatalogo[]
   aoLevantar: () => void
   aoBaixar: () => void
 }
 
 /** O cartão do Quadro é um link: focável, e Enter abre o painel do processo. Arrastar usa o recurso nativo do navegador. */
-export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagado, agrupadoPorResponsavel, aoLevantar, aoBaixar }: CartaoDoProcessoProps) {
+export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagado, agrupadoPorResponsavel, etapas, aoLevantar, aoBaixar }: CartaoDoProcessoProps) {
   const { id, nome, tipo, setorSigla, macroprocessoNome, situacao } = processo
   function comecarAArrastar(evento: DragEvent<HTMLAnchorElement>) {
     // O Firefox só inicia o arrastar se houver algum dado na transferência.
@@ -40,11 +42,12 @@ export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagad
       </span>
       <span className="cartao-nome">{nome}</span>
       <BarraDeProgresso processo={processo} />
-      <SelosDoCartao processo={processo} hoje={hojeLocal()} semSeloDeResponsavel={agrupadoPorResponsavel} />
+      <SelosDoCartao processo={processo} hoje={hojeLocal()} etapas={etapas} semSeloDeResponsavel={agrupadoPorResponsavel} />
       <span className="cartao-rodape">
         <span className="cartao-pilulas">
           {tipo !== 'processo' && <Pilula situacao="neutra">{ROTULO_DO_TIPO[tipo]}</Pilula>}
           {situacao === 'suspenso' && <Pilula situacao="vencendo">Suspenso</Pilula>}
+          <Pilula situacao="neutra">{ROTULO_DA_ETIQUETA[processo.etiqueta ?? 'a_fazer']}</Pilula>
         </span>
         <QuemOuOndeNoRodape processo={processo} agrupadoPorResponsavel={agrupadoPorResponsavel} />
       </span>

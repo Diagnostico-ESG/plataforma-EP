@@ -25,9 +25,9 @@ const ANA = { id: 'u1', nome: 'Ana Teste', fotoUrl: null }
 function processo(id: string, nome: string, mudancas: Partial<ProcessoLido> = {}): ProcessoLido {
   return {
     id, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1', macroprocessoNome: 'Macro Um',
-    situacao: 'em_andamento', etapaAtual: { codigo: MODELAGEM.codigo, nome: MODELAGEM.nome, ordem: MODELAGEM.ordem },
+    situacao: 'em_andamento', etapaAtual: { codigo: MODELAGEM.codigo, nome: MODELAGEM.nome, ordem: MODELAGEM.ordem, id: 'e', posicao: 1, total: 1 },
     processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null, origem: 'novo',
-    contexto: null, observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, ultimaVersao: null, etapasDoProcesso: [], ...mudancas,
+    contexto: null, observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, ultimaVersao: null, etapasDoVerso: [], ...mudancas,
   }
 }
 
@@ -37,7 +37,7 @@ const PROCESSOS: ProcessoLido[] = [
   processo('p3', 'Emitir Ofício', { setorId: 's2', setorSigla: 'TSB', situacao: 'concluido', etapaAtual: null }),
   processo('p4', 'Arquivar Pasta', {
     setorId: 's2', setorSigla: 'TSB', macroprocessoId: 'm2', macroprocessoNome: 'Macro Dois',
-    etapaAtual: { codigo: RELATORIO.codigo, nome: RELATORIO.nome, ordem: RELATORIO.ordem }, tipo: 'a_classificar',
+    etapaAtual: { codigo: RELATORIO.codigo, nome: RELATORIO.nome, ordem: RELATORIO.ordem, id: 'e', posicao: 1, total: 1 }, tipo: 'a_classificar',
   }),
   processo('p5', 'Cadastrar Bem', { responsavel: ANA }),
 ]

@@ -23,9 +23,9 @@ const MODELAGEM: EtapaDoCatalogo = { id: 'e4', codigo: 'modelagem', nome: 'Reuni
 function processo(id: string, nome: string, mudancas: Partial<ProcessoLido> = {}): ProcessoLido {
   return {
     id, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1', macroprocessoNome: 'Macro de Teste',
-    situacao: 'em_andamento', etapaAtual: { codigo: MODELAGEM.codigo, nome: MODELAGEM.nome, ordem: MODELAGEM.ordem },
+    situacao: 'em_andamento', etapaAtual: { codigo: MODELAGEM.codigo, nome: MODELAGEM.nome, ordem: MODELAGEM.ordem, id: 'e', posicao: 1, total: 1 },
     processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null, origem: 'novo',
-    contexto: null, observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, ultimaVersao: null, etapasDoProcesso: [], ...mudancas,
+    contexto: null, observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, ultimaVersao: null, etapasDoVerso: [], ...mudancas,
   }
 }
 
@@ -33,9 +33,9 @@ const PROCESSOS: ProcessoLido[] = [
   processo('p1', 'Pagar Diária', { setorId: 's2', setorSigla: 'TSB', subprocessos: [{ id: 'p2', nome: 'Conferir Recibo', etapaAtual: null, situacao: 'em_andamento' }] }),
   processo('p2', 'Conferir Recibo', {
     setorId: 's2', setorSigla: 'TSB', tipo: 'subprocesso', processoPaiId: 'p1',
-    processoPai: { id: 'p1', nome: 'Pagar Diária', etapaAtual: null, situacao: 'em_andamento' }, responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null },
+    processoPai: { id: 'p1', nome: 'Pagar Diária', etapaAtual: null, situacao: 'em_andamento' }, responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null }, etiqueta: 'em_andamento',
   }),
-  processo('p3', 'Emitir Ofício', { situacao: 'concluido', etapaAtual: null }),
+  processo('p3', 'Emitir Ofício', { situacao: 'concluido', etapaAtual: null, etiqueta: 'concluido' }),
   processo('p4', 'Arquivar Pasta', { situacao: 'cancelado' }),
   processo('p5', 'Cadastrar Bem', { etapaAtual: null }),
 ]
@@ -64,15 +64,15 @@ const faixa = () => within(screen.getByRole('navigation', { name: 'Áreas do sis
 test('as colunas, a ordem por sigla e nome, todas as situações e o pai do subprocesso', async () => {
   montar()
   const [cabecalho, ...corpo] = await linhas()
-  expect(cabecalho).toEqual(['Nome', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Responsável', 'Situação'])
+  expect(cabecalho).toEqual(['Nome', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Etiqueta', 'Responsável', 'Situação'])
   expect(corpo).toEqual([
-    ['Arquivar Pasta', 'Processo', 'TSA', 'Macro de Teste', 'Reunião de modelagem', '—', 'Cancelado'],
-    ['Cadastrar Bem', 'Processo', 'TSA', 'Macro de Teste', '—', '—', 'Em andamento'],
-    ['Emitir Ofício', 'Processo', 'TSA', 'Macro de Teste', '—', '—', 'Concluído'],
-    ['Conferir Recibo↳ Pagar Diária', 'Subprocesso', 'TSB', 'Macro de Teste', 'Reunião de modelagem', 'Ana Teste', 'Em andamento'],
-    ['Pagar Diária', 'Processo', 'TSB', 'Macro de Teste', 'Reunião de modelagem', '—', 'Em andamento'],
+    ['Arquivar Pasta', 'Processo', 'TSA', 'Macro de Teste', 'Reunião de modelagem', 'A fazer', '—', 'Cancelado'],
+    ['Cadastrar Bem', 'Processo', 'TSA', 'Macro de Teste', '—', 'A fazer', '—', 'Em andamento'],
+    ['Emitir Ofício', 'Processo', 'TSA', 'Macro de Teste', '—', 'Concluído', '—', 'Concluído'],
+    ['Conferir Recibo↳ Pagar Diária', 'Subprocesso', 'TSB', 'Macro de Teste', 'Reunião de modelagem', 'Em andamento', 'Ana Teste', 'Em andamento'],
+    ['Pagar Diária', 'Processo', 'TSB', 'Macro de Teste', 'Reunião de modelagem', 'A fazer', '—', 'Em andamento'],
   ])
-  expect(within(screen.getByRole('table')).getByText('Concluído').className).toContain('pilula')
+  expect(within(screen.getByRole('table')).getAllByText('Concluído').some((elemento) => elemento.className.includes('pilula'))).toBe(true)
 })
 
 test('clicar na linha abre o verso com a Lista escurecida atrás; fechar volta à Lista e ao botão da linha', async () => {

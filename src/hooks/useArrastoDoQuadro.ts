@@ -1,37 +1,44 @@
 import { useState } from 'react'
-import type { ColunaDoQuadro } from '../processos/colunasDoQuadro'
-import { colunaDeDestino } from '../processos/destinoDoArrastar'
-import type { ProcessoDaLista } from '../processos/tipos'
+import { etapaDeDestino } from '../processos/destinoDoArrastar'
+import type { EtapaDoCatalogo, ProcessoDaLista } from '../processos/tipos'
+import type { DestinoDoMovimento } from './useMovimentoDoProcesso'
 
 export type ArrastoDoQuadro = {
   /** O cartão que está sendo arrastado; null fora do arrastar. */
   levantado: ProcessoDaLista | null
-  aviso: string | null
+  /** A coluna sob o cartão (a que recebe o realce); null fora do arrastar. */
+  sobre: string | null
   levantar: (processo: ProcessoDaLista) => void
   baixar: () => void
+  /** O cartão passou por cima de uma coluna: ela ganha o realce. */
+  passarPor: (codigoDaColuna: string) => void
   soltarEm: (codigoDaColuna: string) => void
 }
 
-/** O estado do arrastar para concluir: quem foi levantado, o aviso de soltura errada e o que fazer ao soltar. */
-export function useArrastoDoQuadro(colunas: ColunaDoQuadro[], aoSoltarNoDestino: (id: string) => void): ArrastoDoQuadro {
+/**
+ * O estado do arrastar para mover: quem foi levantado, a coluna sob o cartão e o que fazer ao soltar. Toda coluna é etapa
+ * ativa e recebe o cartão; soltar na própria coluna não grava (spec, "Arrastar").
+ */
+export function useArrastoDoQuadro(
+  etapas: EtapaDoCatalogo[], aoSoltarNoDestino: (processo: ProcessoDaLista, destino: DestinoDoMovimento) => void,
+): ArrastoDoQuadro {
   const [levantado, setLevantado] = useState<ProcessoDaLista | null>(null)
-  const [aviso, setAviso] = useState<string | null>(null)
+  const [sobre, setSobre] = useState<string | null>(null)
 
   function soltarEm(codigoDaColuna: string) {
-    const destino = levantado ? colunaDeDestino(levantado) : null
+    const cartao = levantado
     setLevantado(null)
-    if (!levantado || destino === null) return
-    if (codigoDaColuna === destino) return aoSoltarNoDestino(levantado.id)
-    const titulo = colunas.find((coluna) => coluna.chave === destino)?.titulo ?? ''
-    setAviso(`Solte o cartão na coluna ${titulo}.`)
+    setSobre(null)
+    const destino = cartao ? etapaDeDestino(cartao, codigoDaColuna, etapas) : null
+    if (cartao && destino) aoSoltarNoDestino(cartao, destino)
   }
 
   return {
-    levantado, aviso, soltarEm,
-    levantar: (processo) => {
-      setAviso(null)
-      setLevantado(processo)
+    levantado, sobre, soltarEm, passarPor: setSobre,
+    levantar: setLevantado,
+    baixar: () => {
+      setLevantado(null)
+      setSobre(null)
     },
-    baixar: () => setLevantado(null),
   }
 }

@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
-import type { DadosDoCartao, ResponsavelDaEtapa } from './processos/tipos'
+import type { DadosDoCartao, ResponsavelDoProcesso } from './processos/tipos'
 import { cartaoDe, montar, processo } from './testes/quadroDeTeste'
 
 beforeEach(() => {
@@ -11,12 +11,12 @@ afterEach(() => {
   window.location.hash = ''
 })
 
-type Pessoa = { responsavel: ResponsavelDaEtapa; cartao: Partial<DadosDoCartao> }
+type Pessoa = { responsavel: ResponsavelDoProcesso; cartao: Partial<DadosDoCartao> }
 const de = (id: string, nome: string, ativo = true): Pessoa => ({
   responsavel: { id, nome, fotoUrl: null }, cartao: { responsavelAtivo: ativo },
 })
-const com = (nome: string, quem: Pessoa, posicao = 3) =>
-  processo(nome, { posicao, processo: { responsavel: quem.responsavel }, cartao: quem.cartao })
+const com = (nome: string, quem: Pessoa, etapa = 'revisao_interna') =>
+  processo(nome, { etapa, processo: { responsavel: quem.responsavel }, cartao: quem.cartao })
 
 const ANA = de('u1', 'Ana Teste')
 const BIA_INATIVA = de('u2', 'Bia Teste', false)
@@ -84,7 +84,7 @@ test('por responsável nenhum cartão se arrasta; voltando para Etapa, o arrasta
 
 test('o filtro de etapa continua valendo no Quadro por responsável', async () => {
   window.location.hash = '#/processos?etapa=revisao_interna&agrupar=responsavel'
-  montar([com('Na Revisão', ANA, 3), com('Na Aprovação', CAIO, 5)])
+  montar([com('Na Revisão', ANA), com('Na Aprovação', CAIO, 'aprovacao_setor')])
   await cartaoDe('Na Revisão')
   expect(titulos()).toEqual(['Ana Teste 1'])
 })

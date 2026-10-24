@@ -1,22 +1,32 @@
 import './Etapas.css'
 import { useId, useState } from 'react'
-import { ROTULO_DO_SINAL, type SinalDaEtapa, formatarData, sinalDaEtapa } from '../../processos/caminhoDeEtapas'
-import { iniciais } from '../../lib/iniciais'
-import type { EtapaDoProcesso } from '../../processos/tipos'
+import { formatarData } from '../../lib/datas'
+import type { EtapaDoVerso, ProcessoLido } from '../../processos/tipos'
 import { type DadosDasEtapas, DetalheDaEtapa } from './DetalheDaEtapa'
 
-type EtapasDoProcessoProps = DadosDasEtapas
+type EtapasDoProcessoProps = DadosDasEtapas & { processo: ProcessoLido }
 
-const SELO_DO_SINAL: Partial<Record<SinalDaEtapa, string>> = { opcional: 'opcional', dispensada: 'dispensada', anterior: 'anterior' }
+type SinalDaEtapa = 'atual' | 'visitada' | 'nao-visitada'
 
-// A data à direita da linha: na atual, desde quando; nas resolvidas, quando; nas pendentes, nada.
-function quandoDaEtapa(etapa: EtapaDoProcesso, sinal: SinalDaEtapa): string {
-  if (sinal === 'atual') return etapa.iniciadaEm ? `desde ${formatarData(etapa.iniciadaEm)}` : ''
-  if (sinal === 'pendente' || sinal === 'opcional') return ''
-  return formatarData(etapa.resolvidaEm)
+const ROTULO_DO_SINAL: Record<SinalDaEtapa, string> = { atual: 'atual', visitada: 'visitada', 'nao-visitada': 'ainda não visitada' }
+
+// A atual vale mais que o resto; visitada é a que o processo já deixou alguma vez.
+function sinalDaEtapa(etapa: EtapaDoVerso, atual: boolean): SinalDaEtapa {
+  if (atual) return 'atual'
+  return etapa.passagens.some((passagem) => passagem.saiuEm !== null) ? 'visitada' : 'nao-visitada'
 }
 
-/** As Etapas: uma linha compacta por etapa; clicar abre o detalhe logo abaixo dela, uma de cada vez (spec, "Etapas"). */
+// A data à direita da linha: na atual, desde quando; nas visitadas, a da última saída; nas outras, nada.
+function quandoDaEtapa(etapa: EtapaDoVerso, sinal: SinalDaEtapa): string {
+  if (sinal === 'atual') return `desde ${formatarData(etapa.passagens.find((passagem) => passagem.saiuEm === null)?.entrouEm ?? null)}`
+  if (sinal === 'visitada') return formatarData(etapa.passagens.find((passagem) => passagem.saiuEm !== null)?.saiuEm ?? null)
+  return ''
+}
+
+/**
+ * As Etapas: as etapas ativas do catálogo, só leitura, com a atual destacada e as visitadas marcadas; clicar abre a
+ * gaveta logo abaixo da linha, uma de cada vez, com as entradas e saídas do processo naquela etapa (spec, "Etapas do verso").
+ */
 export function EtapasDoProcesso(props: EtapasDoProcessoProps) {
   const idDoTitulo = useId()
   const [aberta, setAberta] = useState<string | null>(null)
@@ -24,8 +34,8 @@ export function EtapasDoProcesso(props: EtapasDoProcessoProps) {
     <section className="etapas" aria-labelledby={idDoTitulo}>
       <h3 id={idDoTitulo} className="painel-subtitulo">Etapas</h3>
       <ol className="etapas-lista">
-        {props.etapas.map((etapa, indice) => (
-          <LinhaCompactaDaEtapa key={etapa.id} {...props} indice={indice} aberta={aberta === etapa.id}
+        {props.processo.etapasDoVerso.map((etapa) => (
+          <LinhaDaEtapa key={etapa.id} {...props} etapa={etapa} aberta={aberta === etapa.id}
             aoAlternar={() => setAberta(aberta === etapa.id ? null : etapa.id)} />
         ))}
       </ol>
@@ -33,24 +43,20 @@ export function EtapasDoProcesso(props: EtapasDoProcessoProps) {
   )
 }
 
-type LinhaCompactaProps = EtapasDoProcessoProps & { indice: number; aberta: boolean; aoAlternar: () => void }
+type LinhaDaEtapaProps = EtapasDoProcessoProps & { etapa: EtapaDoVerso; aberta: boolean; aoAlternar: () => void }
 
-function LinhaCompactaDaEtapa({ indice, aberta, aoAlternar, ...resto }: LinhaCompactaProps) {
-  const etapa = resto.etapas[indice]
-  const sinal = sinalDaEtapa(resto.etapas, indice)
+function LinhaDaEtapa({ etapa, aberta, aoAlternar, ...resto }: LinhaDaEtapaProps) {
   const idDaGaveta = useId()
-  const selo = SELO_DO_SINAL[sinal]
+  const sinal = sinalDaEtapa(etapa, resto.processo.etapaAtual?.codigo === etapa.codigo)
   return (
     <li className={`etapa-linha etapa-${sinal}`} aria-current={sinal === 'atual' ? 'step' : undefined}>
       <button type="button" className="etapa-cabeca" aria-expanded={aberta} aria-controls={aberta ? idDaGaveta : undefined}
         aria-label={`${etapa.nome}: ${ROTULO_DO_SINAL[sinal]}`} onClick={aoAlternar}>
         <span className="etapa-sinal" aria-hidden="true" />
         <span className="etapa-nome">{etapa.nome}</span>
-        {selo && <span className="etapa-selo">{selo}</span>}
         <span className="etapa-quando">{quandoDaEtapa(etapa, sinal)}</span>
-        <span className="etapa-iniciais" aria-hidden="true">{etapa.responsavelNome ? iniciais(etapa.responsavelNome) : ''}</span>
       </button>
-      {aberta && <DetalheDaEtapa id={idDaGaveta} indice={indice} sinal={sinal} {...resto} />}
+      {aberta && <DetalheDaEtapa id={idDaGaveta} etapa={etapa} {...resto} />}
     </li>
   )
 }

@@ -23,14 +23,17 @@ const RELATORIO: EtapaDoCatalogo = {
   id: 'e5', codigo: 'relatorio_modelagem_tecnica', nome: 'Relatório e modelagem técnica', ordem: 5, ativa: true,
 }
 
+const NAO_INICIADOS: EtapaDoCatalogo = { id: 'e1', codigo: 'nao_iniciados', nome: 'Não iniciados', ordem: 1, ativa: true }
+const CONCLUIDOS: EtapaDoCatalogo = { id: 'e9', codigo: 'concluidos', nome: 'Concluídos', ordem: 9, ativa: true }
+
 function processo(nome: string, mudancas: Partial<ProcessoLido> = {}): ProcessoLido {
   return {
     id: `p-${nome.toLowerCase().replace(/[^a-z]/g, '')}`, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
     macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento',
-    etapaAtual: { codigo: MODELAGEM.codigo, nome: MODELAGEM.nome, ordem: MODELAGEM.ordem },
+    etapaAtual: { codigo: MODELAGEM.codigo, nome: MODELAGEM.nome, ordem: MODELAGEM.ordem, id: 'e', posicao: 1, total: 1 },
     processoPaiId: null, processoPai: null, subprocessos: [],
     responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
-    dataDaReuniao: null, ultimaVersao: null, etapasDoProcesso: [], ...mudancas,
+    dataDaReuniao: null, ultimaVersao: null, etapasDoVerso: [], ...mudancas,
   }
 }
 
@@ -38,7 +41,7 @@ type Montagem = { perfil?: Perfil; processos?: ProcessoLido[]; ajustar?: (proces
 
 function montar({ perfil = 'integrante_ep', processos = [], ajustar }: Montagem = {}) {
   const falso = new ProcessosFalso()
-  falso.etapasDoCatalogo = [RELATORIO, MODELAGEM]
+  falso.etapasDoCatalogo = [CONCLUIDOS, RELATORIO, MODELAGEM, NAO_INICIADOS]
   falso.processos = processos
   ajustar?.(falso)
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
@@ -73,18 +76,18 @@ test('sem processos: o aviso de vazio, com [Cadastrar processo] só para quem po
   expect(screen.queryByRole('button', { name: 'Cadastrar processo' })).toBeNull()
 })
 
-test('as colunas: uma por etapa ativa, na ordem do catálogo, sem "Aguardando o setor"', async () => {
+test('as colunas: uma por etapa ativa, de Não iniciados a Concluídos, na ordem do catálogo, sem "Aguardando o setor"', async () => {
   montar({ processos: [processo('Emitir Ofício')] })
   await screen.findByRole('region', { name: MODELAGEM.nome })
   const titulos = screen.getAllByRole('region').map((regiao) => regiao.getAttribute('aria-label'))
-  expect(titulos.filter((titulo) => titulo === MODELAGEM.nome || titulo === RELATORIO.nome)).toEqual([MODELAGEM.nome, RELATORIO.nome])
+  expect(titulos.filter((titulo) => titulo !== 'Processos')).toEqual([NAO_INICIADOS.nome, MODELAGEM.nome, RELATORIO.nome, CONCLUIDOS.nome])
   expect(screen.queryByRole('region', { name: 'Aguardando o setor' })).toBeNull()
 })
 
 test('cada processo fica na coluna da etapa atual, em ordem de nome', async () => {
   montar({ processos: [
     processo('Zeta'), processo('Alfa'),
-    processo('Gama', { etapaAtual: { codigo: RELATORIO.codigo, nome: RELATORIO.nome, ordem: 5 } }),
+    processo('Gama', { etapaAtual: { codigo: RELATORIO.codigo, nome: RELATORIO.nome, ordem: 5, id: 'e', posicao: 1, total: 1 } }),
   ] })
   await screen.findByRole('region', { name: MODELAGEM.nome })
   expect(cartoesDa(MODELAGEM.nome).map((texto) => texto?.includes('Alfa'))).toEqual([true, false])
@@ -108,7 +111,7 @@ test('o cartão traz sigla, nome, macroprocesso, a pílula "A classificar" e o r
 test('suspenso aparece com a pílula "Suspenso"; concluído vai à coluna Concluídos e cancelado sai do Quadro', async () => {
   montar({ processos: [
     processo('Parado', { situacao: 'suspenso' }),
-    processo('Pronto', { situacao: 'concluido', etapaAtual: null }),
+    processo('Pronto', { situacao: 'concluido', etapaAtual: { codigo: 'concluidos', nome: 'Concluídos', ordem: 9, id: 'e9', posicao: 4, total: 4 } }),
     processo('Desistido', { situacao: 'cancelado' }),
   ] })
   const modelagem = await screen.findByRole('region', { name: MODELAGEM.nome })

@@ -6,7 +6,7 @@ function processo(nome: string, mudancas: Partial<ProcessoDaLista> = {}): Proces
   return {
     id: `p-${nome}`, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
     macroprocessoNome: 'Macro Um', processoPaiId: null, situacao: 'em_andamento',
-    etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 }, responsavel: null,
+    etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, id: 'e', posicao: 1, total: 1 }, responsavel: null,
     ...mudancas,
   }
 }

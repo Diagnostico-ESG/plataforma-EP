@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { useCarregamento } from '../../hooks/useCarregamento'
-import { formatarData } from '../../processos/caminhoDeEtapas'
+import { formatarData } from '../../lib/datas'
 import { ROTULO_DO_ESCOPO, rotuloDoResultado } from '../../revisoes/frasesDeRevisao'
 import type { ModuloDeRevisoes, RevisaoInterna } from '../../revisoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'

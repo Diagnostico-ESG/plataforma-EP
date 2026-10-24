@@ -1,22 +1,16 @@
 import { describe, expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
+import { umProcessoLido } from '../testes/processoDaLista'
 import { ProcessosFalso } from './ProcessosFalso'
-import type { DadosDoProcesso, EtapaDoProcesso, ProcessoLido, TipoDeProcesso } from './tipos'
 
-const CONCLUIDA: EtapaDoProcesso = {
-  id: 'a4', codigo: 'c4', nome: 'Etapa 4', ordem: 4, obrigatoria: true, status: 'concluida', nota: null,
-  iniciadaEm: '2026-10-10', resolvidaEm: '2026-10-11', responsavelId: null, responsavelNome: null, responsavelInativo: false,
-}
+import type { DadosDoProcesso, ProcessoLido, TipoDeProcesso } from './tipos'
 
 type Montagem = { id: string; tipo: TipoDeProcesso; macro?: string; pai?: string | null }
 
 function processo({ id, tipo, macro = 'm1', pai = null }: Montagem): ProcessoLido {
-  return {
-    id, nome: `Processo ${id}`, tipo, setorId: 's1', setorSigla: 'TSA', macroprocessoId: macro,
-    macroprocessoNome: `Macro ${macro}`, processoPaiId: pai, situacao: 'em_andamento', etapaAtual: null,
-    responsavel: null, origem: 'novo', contexto: null, observacoes: null,
-    motivoDaSituacao: null, processoPai: null, subprocessos: [], dataDaReuniao: null, ultimaVersao: null, etapasDoProcesso: [CONCLUIDA],
-  }
+  return umProcessoLido(`Processo ${id}`, {
+    id, tipo, macroprocessoId: macro, macroprocessoNome: `Macro ${macro}`, processoPaiId: pai, responsavel: null,
+  })
 }
 
 // p1 e p4 são processos (Macro m1 e m2), p2 é subprocesso de p1, p3 está "a classificar" em m2.
@@ -78,7 +72,7 @@ describe('reclassificar', () => {
     const modulo = falso()
     await modulo.reclassificarProcesso('p3', { tipo: 'subprocesso', processoPaiId: 'p1' }, 'Faz parte do p1')
     expect(await lido(modulo, 'p3')).toMatchObject({
-      id: 'p3', tipo: 'subprocesso', processoPaiId: 'p1', macroprocessoId: 'm1', etapasDoProcesso: [CONCLUIDA],
+      id: 'p3', tipo: 'subprocesso', processoPaiId: 'p1', macroprocessoId: 'm1', etapaAtual: { codigo: 'revisao_interna' },
     })
   })
 

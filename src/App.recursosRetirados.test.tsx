@@ -20,13 +20,6 @@ const RESPONSAVEL_ANTIGO: EventoDoCadastro = {
   entidadeRef: 's1:r1', antes: null, depois: { setor_id: 's1', setor_sigla: 'TSA', nome: 'Ana Teste', email: null, cargo: 'Chefe' },
 }
 
-const ETAPA_DO_SETOR_ANTIGA: EventoDoCadastro = {
-  id: 11, ocorridoEm: '2026-10-13T17:00:00Z', autor: 'Pessoa Fictícia', acao: 'dispensar', entidade: 'andamento',
-  entidadeRef: 's1:a1', antes: { setor_id: 's1', setor_sigla: 'TSA', etapa_nome: 'Reunião de sensibilização', status: 'pendente' },
-  depois: { setor_id: 's1', setor_sigla: 'TSA', etapa_nome: 'Reunião de sensibilização', status: 'dispensada' },
-  motivo: 'Setor já conhecido',
-}
-
 test('a faixa lateral não tem mais o item Reuniões', async () => {
   montarNosCadastros()
   const faixa = within(await screen.findByRole('navigation', { name: 'Áreas do sistema' }))
@@ -107,17 +100,3 @@ test('o setor aberto não tem a seção de etapas do setor, para quem altera e p
   }
 })
 
-test('no histórico geral, o registro antigo de etapa do setor aparece numa linha simples e segue no filtro do setor', async () => {
-  window.location.hash = '#/setores/historico'
-  montarNosCadastros({ ajustarCadastros: (cadastros) => { cadastros.historico = [ETAPA_DO_SETOR_ANTIGA] } })
-  const filtro = await screen.findByRole('combobox', { name: 'Item' })
-  const [item] = screen.getAllByRole('listitem')
-  expect(item.textContent).toContain('Dispensou a etapa Registro de etapa do setor (recurso retirado da plataforma)')
-  expect(within(item).getByText('Pessoa Fictícia')).toBeTruthy()
-  expect(item.textContent).toMatch(/13\/10\/2026/)
-  expect(item.textContent).not.toContain('Reunião de sensibilização')
-  expect(item.textContent).not.toContain('Antes:')
-  expect(item.textContent).not.toContain('Setor já conhecido')
-  fireEvent.change(filtro, { target: { value: 's1' } })
-  expect(screen.getAllByRole('listitem')).toHaveLength(1)
-})

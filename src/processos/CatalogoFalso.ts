@@ -1,42 +1,34 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
-import { recalcularProcesso } from './andamentoFalso'
-import { fraseDaEtapaProtegida, fraseDaEtapaUsada, fraseDeCodigoRepetido, fraseDeNomeRepetido } from './frasesDoCatalogo'
+import { CODIGO_NAO_INICIADOS, CODIGO_CONCLUIDOS, ehEtapaFixa } from './codigosDasEtapas'
+import {
+  FRASE_DAS_ETAPAS_FIXAS, fraseDaEtapaComProcessos, fraseDaEtapaProtegida, fraseDaEtapaUsada, fraseDeCodigoRepetido,
+  fraseDeNomeRepetido,
+} from './frasesDoCatalogo'
 import type {
-  DadosDaEtapa, EtapaDoCatalogo, EtapaDoProcesso, EtapaDoCaminho, EtapaNoCatalogo, EtapaNova, ModuloDoCatalogo,
-  ProcessoLido, SentidoDaOrdem, SituacaoDoProcesso,
+  DadosDaEtapa, EtapaDoCatalogo, EtapaNoCatalogo, EtapaNova, ModuloDoCatalogo, ProcessoLido, SentidoDaOrdem,
 } from './tipos'
 
-/** O que o catálogo falso mexe no `ProcessosFalso` (sem importá-lo, para não criar dependência circular). */
+/** O que o catálogo falso lê e mexe no `ProcessosFalso` (sem importá-lo, para não criar dependência circular). */
 export type DonoDoCatalogo = {
   processos: ProcessoLido[]
   etapasDoCatalogo: EtapaDoCatalogo[]
 }
 
-// Como a função do banco: a etapa entra nos processos não concluídos e não cancelados (ADR 0004).
-const SITUACOES_QUE_RECEBEM = new Set<SituacaoDoProcesso>(['em_andamento', 'suspenso'])
-
-// Como o gatilho do banco: as três etapas de revisão e aprovação não se desativam nem se excluem.
-const PROTEGIDAS = ['revisao_interna', 'revisao_setor', 'aprovacao_setor']
-
-function conferirNaoProtegida(etapa: EtapaNoCatalogo): void {
-  if (PROTEGIDAS.includes(etapa.codigo ?? '')) throw new TravaDoBanco(fraseDaEtapaProtegida(etapa.nome))
-}
+// Como o gatilho do banco: as seis etapas com campos próprios não se desativam nem se excluem.
+const PROTEGIDAS = ['modelagem', 'relatorio_modelagem_tecnica', 'revisao_interna', 'revisao_setor', 'aprovacao_setor', 'publicacao']
 
 const porOrdem = <T extends { ordem: number }>(a: T, b: T) => a.ordem - b.ordem
 
-function pendente(etapa: EtapaNoCatalogo, id: string): EtapaDoCaminho {
-  return {
-    id, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, obrigatoria: etapa.obrigatoria, status: 'pendente',
-    nota: null, iniciadaEm: null, resolvidaEm: null,
-  }
+function conferirNaoFixa(etapa: EtapaNoCatalogo): void {
+  if (ehEtapaFixa(etapa.codigo)) throw new TravaDoBanco(FRASE_DAS_ETAPAS_FIXAS)
 }
 
-function pendenteDoProcesso(etapa: EtapaNoCatalogo, id: string): EtapaDoProcesso {
-  return { ...pendente(etapa, id), responsavelId: null, responsavelNome: null, responsavelInativo: false }
+function conferirNaoProtegida(etapa: EtapaNoCatalogo): void {
+  if (PROTEGIDAS.includes(etapa.codigo)) throw new TravaDoBanco(fraseDaEtapaProtegida(etapa.nome))
 }
 
-/** Implementação falsa do catálogo para os testes: muda as colunas do Quadro e o caminho dos processos do dono. */
+/** Implementação falsa do catálogo para os testes: muda as colunas do Quadro e confere os processos do dono. */
 export class CatalogoFalso implements ModuloDoCatalogo {
   /** O catálogo inteiro, ativas e inativas. */
   etapas: EtapaNoCatalogo[] = []
@@ -57,25 +49,27 @@ export class CatalogoFalso implements ModuloDoCatalogo {
     return [...this.etapas].sort(porOrdem)
   }
 
+  // Sem posição, a etapa nova entra logo antes de Concluídos; nunca antes de Não iniciados.
   async acrescentarEtapa(dados: EtapaNova): Promise<void> {
     this.conferirGravacao()
     this.conferirRepetida(dados.nome, dados.codigo)
-    const antes = this.etapas.find((etapa) => etapa.id === dados.antesDe)
-    const posicao = antes?.ordem ?? Math.max(0, ...this.etapas.map((etapa) => etapa.ordem)) + 1
+    const concluidos = this.etapas.find((etapa) => etapa.codigo === CODIGO_CONCLUIDOS)
+    const antes = this.etapas.find((etapa) => etapa.id === dados.antesDe) ?? concluidos
+    if (!antes) throw new CadastroInexistente()
+    if (antes.codigo === CODIGO_NAO_INICIADOS) throw new TravaDoBanco(FRASE_DAS_ETAPAS_FIXAS)
     const nova: EtapaNoCatalogo = {
-      id: `c${this.proximoId++}`, codigo: dados.codigo, nome: dados.nome.trim(), ordem: posicao,
-      obrigatoria: dados.obrigatoria, fase: dados.fase, ativa: true,
+      id: `c${this.proximoId++}`, codigo: dados.codigo, nome: dados.nome.trim(), ordem: antes.ordem, fase: dados.fase, ativa: true,
     }
-    const abertas = this.etapas.map((etapa) => (etapa.ordem >= posicao ? { ...etapa, ordem: etapa.ordem + 1 } : etapa))
+    const abertas = this.etapas.map((etapa) => (etapa.ordem >= antes.ordem ? { ...etapa, ordem: etapa.ordem + 1 } : etapa))
     this.gravar([...abertas, nova])
-    this.incluirPendentes(nova)
   }
 
   async editarEtapa(id: string, dados: DadosDaEtapa): Promise<void> {
     this.conferirGravacao()
-    this.acharEtapa(id)
+    const etapa = this.acharEtapa(id)
+    conferirNaoFixa(etapa)
     this.conferirRepetida(dados.nome, null, id)
-    this.gravar(this.etapas.map((etapa) => (etapa.id === id ? { ...etapa, ...dados, nome: dados.nome.trim() } : etapa)))
+    this.gravar(this.etapas.map((outra) => (outra.id === id ? { ...outra, ...dados, nome: dados.nome.trim() } : outra)))
   }
 
   async moverEtapa(id: string, sentido: SentidoDaOrdem): Promise<void> {
@@ -84,6 +78,8 @@ export class CatalogoFalso implements ModuloDoCatalogo {
     const ordenadas = [...this.etapas].sort(porOrdem)
     const vizinha = ordenadas[ordenadas.indexOf(movida) + (sentido === 'subir' ? -1 : 1)]
     if (!vizinha) return
+    // As fixas ficam nas pontas: trocar com uma delas, ou mover uma delas, desfaria isso.
+    if (ehEtapaFixa(movida.codigo) || ehEtapaFixa(vizinha.codigo)) throw new TravaDoBanco(FRASE_DAS_ETAPAS_FIXAS)
     const trocar = (etapa: EtapaNoCatalogo) => {
       if (etapa.id === movida.id) return { ...etapa, ordem: vizinha.ordem }
       return etapa.id === vizinha.id ? { ...etapa, ordem: movida.ordem } : etapa
@@ -94,27 +90,26 @@ export class CatalogoFalso implements ModuloDoCatalogo {
   async desativarEtapa(id: string): Promise<void> {
     this.conferirGravacao()
     const etapa = this.acharEtapa(id)
+    conferirNaoFixa(etapa)
     conferirNaoProtegida(etapa)
+    this.conferirSemProcessos(etapa, 'desativar')
     this.gravar(this.etapas.map((outra) => (outra.id === id ? { ...outra, ativa: false } : outra)))
-    this.tirarPendentes(etapa.codigo)
   }
 
   async reativarEtapa(id: string): Promise<void> {
     this.conferirGravacao()
-    const etapa = this.acharEtapa(id)
+    this.acharEtapa(id)
     this.gravar(this.etapas.map((outra) => (outra.id === id ? { ...outra, ativa: true } : outra)))
-    this.incluirPendentes(etapa)
   }
 
   async excluirEtapa(id: string): Promise<void> {
     this.conferirGravacao()
     const etapa = this.acharEtapa(id)
+    conferirNaoFixa(etapa)
     conferirNaoProtegida(etapa)
-    if (this.andamentosDe(etapa.codigo).some((andamento) => andamento.status !== 'pendente')) {
-      throw new TravaDoBanco(fraseDaEtapaUsada(etapa.nome))
-    }
+    this.conferirSemProcessos(etapa, 'excluir')
+    if (this.jaRecebeuProcessos(etapa)) throw new TravaDoBanco(fraseDaEtapaUsada(etapa.nome))
     this.gravar(this.etapas.filter((outra) => outra.id !== id))
-    this.tirarPendentes(etapa.codigo)
   }
 
   private conferirGravacao(): void {
@@ -135,30 +130,25 @@ export class CatalogoFalso implements ModuloDoCatalogo {
     if (outras.some((etapa) => etapa.codigo === codigo)) throw new TravaDoBanco(fraseDeCodigoRepetido(codigo ?? ''))
   }
 
+  // Os processos que estão na etapa agora (a passagem aberta), de qualquer situação.
+  private processosNaEtapa(etapa: EtapaNoCatalogo): number {
+    return this.dono.processos.filter((processo) => processo.etapaAtual?.codigo === etapa.codigo).length
+  }
+
+  private conferirSemProcessos(etapa: EtapaNoCatalogo, acao: 'desativar' | 'excluir'): void {
+    const dentro = this.processosNaEtapa(etapa)
+    if (dentro > 0) throw new TravaDoBanco(fraseDaEtapaComProcessos(etapa.nome, dentro, acao))
+  }
+
+  // Por onde passou algum processo, aberta ou fechada: a que já recebeu processo não se apaga.
+  private jaRecebeuProcessos(etapa: EtapaNoCatalogo): boolean {
+    return this.dono.processos.some((processo) => processo.etapasDoVerso.some((visitada) => visitada.codigo === etapa.codigo && visitada.passagens.length > 0))
+  }
+
   // O Quadro passa a mostrar as etapas na ordem nova.
   private gravar(etapas: EtapaNoCatalogo[]): void {
     this.etapas = etapas
     this.dono.etapasDoCatalogo = [...etapas].sort(porOrdem)
       .map(({ id, codigo, nome, ordem, ativa }) => ({ id, codigo, nome, ordem, ativa }))
-  }
-
-  private andamentosDe(codigo: string): EtapaDoCaminho[] {
-    const todos = this.dono.processos.flatMap((processo) => processo.etapasDoProcesso)
-    return todos.filter((andamento) => andamento.codigo === codigo)
-  }
-
-  private incluirPendentes(etapa: EtapaNoCatalogo): void {
-    this.dono.processos = this.dono.processos.map((processo) => {
-      if (!SITUACOES_QUE_RECEBEM.has(processo.situacao) || processo.etapasDoProcesso.some((outra) => outra.codigo === etapa.codigo)) return processo
-      return recalcularProcesso(processo, [...processo.etapasDoProcesso, pendenteDoProcesso(etapa, `a${this.proximoId++}`)].sort(porOrdem))
-    })
-  }
-
-  private tirarPendentes(codigo: string): void {
-    const ficam = (andamento: EtapaDoCaminho) => andamento.codigo !== codigo || andamento.status !== 'pendente'
-    this.dono.processos = this.dono.processos.map((processo) => {
-      const restantes = processo.etapasDoProcesso.filter(ficam)
-      return restantes.length === processo.etapasDoProcesso.length ? processo : recalcularProcesso(processo, restantes)
-    })
   }
 }

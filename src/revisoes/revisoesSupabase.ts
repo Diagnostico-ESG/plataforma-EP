@@ -1,10 +1,7 @@
 import { type RecusasDoModulo, porQueNadaMudou } from '../acesso/falhasDeGravacao'
 import type { ClienteSupabase } from '../lib/supabase'
-import { falhaDoAndamento } from '../processos/andamentosSupabase'
-import { semTipos } from '../processos/clienteSemTipos'
-import type {
-  Aprovacao, DadosDaAprovacao, DadosDaEdicaoDaRevisao, DadosDaRevisao, ModuloDeRevisoes, RevisaoInterna,
-} from './tipos'
+import { falhaDoBanco } from '../processos/recusasDoBanco'
+import type { Aprovacao, DadosDaAprovacao, DadosDaEdicaoDaRevisao, ModuloDeRevisoes, RevisaoInterna } from './tipos'
 
 // O revisor e as duas versões (a revisada e, na "corrigida", a corrigida) vêm junto, pelas chaves estrangeiras.
 const COLUNAS = 'id, resultado, escopo, comentario, revisada_em, revisor:usuarios(nome), '
@@ -29,15 +26,11 @@ function revisaoDaLinha(linha: LinhaDaRevisao): RevisaoInterna {
   }
 }
 
-// As recusas chegam de fora (as de processos): a revisão grava numa função que também conclui a etapa.
+// As recusas chegam de fora (as de processos). Registrar revisão e aprovação sem trava chega no ticket 05 de revisoes-aprovacao.
 export function criarRevisoesSupabase(cliente: ClienteSupabase, recusas: RecusasDoModulo): ModuloDeRevisoes {
   return {
     listarRevisoes: (processoId) => listarRevisoes(cliente, processoId),
-    concluirRevisaoInterna: (andamentoId, dados, responsavelId) =>
-      concluirRevisaoInterna(cliente, andamentoId, dados, responsavelId, recusas),
     lerAprovacao: (processoId) => lerAprovacao(cliente, processoId),
-    concluirAprovacao: (andamentoId, dados, responsavelId, vai) =>
-      concluirAprovacao(cliente, { andamentoId, dados, responsavelId, vai: vai ?? null }, recusas),
     editarRevisao: (id, dados) => editarRevisao(cliente, id, dados, recusas),
     editarAprovacao: (id, dados) => editarAprovacao(cliente, id, dados, recusas),
   }
@@ -48,18 +41,6 @@ async function listarRevisoes(cliente: ClienteSupabase, processoId: string): Pro
     .eq('processo_id', processoId).order('registrada_em', { ascending: false })
   if (error) throw new Error(`Falha ao ler as revisões do processo ${processoId}: ${error.message}`)
   return (data as unknown as LinhaDaRevisao[]).map(revisaoDaLinha)
-}
-
-// A revisão e a conclusão se gravam juntas, numa função do banco. O supabase-js manda null como null; o tipo gerado
-// não o admite nos parâmetros, como em avancar_etapa.
-async function concluirRevisaoInterna(
-  cliente: ClienteSupabase, andamentoId: string, dados: DadosDaRevisao, responsavelId: string | null, recusas: RecusasDoModulo,
-): Promise<void> {
-  const { error } = await semTipos(cliente).rpc('concluir_revisao_interna', {
-    p_andamento: andamentoId, p_resultado: dados.resultado, p_escopo: dados.escopo as 'ambos',
-    p_comentario: dados.comentario as string, p_responsavel: responsavelId as string,
-  })
-  if (error) throw falhaDoAndamento(error, recusas)
 }
 
 // A versão aprovada e quem registrou vêm junto, pelas chaves estrangeiras. Uma aprovação por processo.
@@ -90,18 +71,6 @@ async function lerAprovacao(cliente: ClienteSupabase, processoId: string): Promi
   return linha ? aprovacaoDaLinha(linha) : null
 }
 
-// A aprovação e a conclusão se gravam juntas, numa função do banco. Os campos vazios vão como null (o tipo gerado não o admite).
-type PedidoDaAprovacao = { andamentoId: string; dados: DadosDaAprovacao; responsavelId: string | null; vai: boolean | null }
-
-async function concluirAprovacao(cliente: ClienteSupabase, pedido: PedidoDaAprovacao, recusas: RecusasDoModulo): Promise<void> {
-  const { andamentoId, dados } = pedido
-  const { error } = await semTipos(cliente).rpc('concluir_aprovacao', {
-    p_andamento: andamentoId, p_numero: dados.numeroEprotocolo as string, p_link: dados.link as string,
-    p_data: dados.aprovadaEm as string, p_responsavel: pedido.responsavelId as string, p_vai_para_publicacao: pedido.vai as boolean,
-  })
-  if (error) throw falhaDoAndamento(error, recusas)
-}
-
 // Só o escopo e o comentário se alteram (o resto não tem privilégio). A RLS não acusa erro ao filtrar: zero linhas com o
 // registro ainda legível é perfil; ilegível, o registro sumiu.
 async function editarRevisao(
@@ -109,7 +78,7 @@ async function editarRevisao(
 ): Promise<void> {
   const { data, error } = await cliente.from('revisoes_internas')
     .update({ escopo: dados.escopo, comentario: dados.comentario }).eq('id', id).select('id')
-  if (error) throw falhaDoAndamento(error, recusas)
+  if (error) throw falhaDoBanco(error, recusas)
   if (data.length) return
   const existe = Boolean((await cliente.from('revisoes_internas').select('id').eq('id', id)).data?.length)
   throw porQueNadaMudou(existe, recusas)
@@ -122,7 +91,7 @@ async function editarAprovacao(
   const { data, error } = await cliente.from('aprovacoes')
     .update({ numero_eprotocolo: dados.numeroEprotocolo, link: dados.link, aprovada_em: dados.aprovadaEm })
     .eq('id', id).select('id')
-  if (error) throw falhaDoAndamento(error, recusas)
+  if (error) throw falhaDoBanco(error, recusas)
   if (data.length) return
   const existe = Boolean((await cliente.from('aprovacoes').select('id').eq('id', id)).data?.length)
   throw porQueNadaMudou(existe, recusas)

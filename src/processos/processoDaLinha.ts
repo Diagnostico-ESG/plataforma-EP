@@ -1,10 +1,27 @@
+import { diaDeBrasilia } from '../lib/datas'
 import type { Database } from '../types/database'
-import type { DadosDoCartao, ProcessoDaLista, ResponsavelDaEtapa, SituacaoDoProcesso } from './tipos'
+import type { DadosDoCartao, EtapaAtual, ProcessoDaLista, ResponsavelDoProcesso, SituacaoDoProcesso } from './tipos'
 
 export type LinhaDoProcesso = Database['public']['Views']['processos_com_andamento']['Row']
 
-// A view devolve tudo como "pode ser nulo"; os campos que a tela exige nascem preenchidos pelo banco.
-export function processoDaLinha(linha: LinhaDoProcesso): ProcessoDaLista {
+// A view devolve tudo como "pode ser nulo"; os campos que a tela exige nascem preenchidos pelo banco. O total de etapas
+// ativas não está na view: quem lê o catálogo o informa.
+export function processoDaLinha(linha: LinhaDoProcesso, totalDeEtapas: number): ProcessoDaLista {
+  return {
+    ...identificacaoDaLinha(linha),
+    situacao: (linha.situacao ?? 'em_andamento') as SituacaoDoProcesso,
+    etapaAtual: etapaAtualDaLinha(linha, totalDeEtapas),
+    etiqueta: linha.etiqueta ?? 'a_fazer',
+    entrouNaEtapaEm: linha.entrou_na_etapa_em ? diaDeBrasilia(linha.entrou_na_etapa_em) : null,
+    responsavel: responsavelDaLinha(linha),
+    dataDaReuniao: linha.data_da_reuniao,
+    cartao: cartaoDaLinha(linha),
+    publicadoEm: linha.publicado_em,
+    arquivadoEm: linha.arquivado_em,
+  }
+}
+
+function identificacaoDaLinha(linha: LinhaDoProcesso) {
   return {
     id: linha.id ?? '',
     nome: linha.nome ?? '',
@@ -14,13 +31,6 @@ export function processoDaLinha(linha: LinhaDoProcesso): ProcessoDaLista {
     macroprocessoId: linha.macroprocesso_id ?? '',
     macroprocessoNome: linha.macroprocesso_nome ?? '',
     processoPaiId: linha.processo_pai_id,
-    situacao: (linha.situacao ?? 'em_andamento') as SituacaoDoProcesso,
-    etapaAtual: etapaAtualDaLinha(linha),
-    responsavel: responsavelDaLinha(linha),
-    dataDaReuniao: linha.data_da_reuniao,
-    cartao: cartaoDaLinha(linha),
-    publicadoEm: linha.publicado_em,
-    arquivadoEm: linha.arquivado_em,
   }
 }
 
@@ -34,22 +44,21 @@ function ultimaVersaoDaLinha(linha: LinhaDoProcesso): DadosDoCartao['ultimaVersa
 
 function cartaoDaLinha(linha: LinhaDoProcesso): DadosDoCartao {
   return {
-    // Remendo do ticket 24: sem status por etapa nem caminho (a view tem etiqueta e entrada na etapa); o ticket 25 refaz o cartão.
-    etapaAtualStatus: null,
-    etapaAtualIniciadaEm: linha.entrou_na_etapa_em?.slice(0, 10) ?? null,
     responsavelAtivo: linha.responsavel_ativo ?? null,
-    caminho: [],
     ultimaVersao: ultimaVersaoDaLinha(linha),
     subprocessos: linha.subprocessos_quantidade ?? 0,
   }
 }
 
-function etapaAtualDaLinha(linha: LinhaDoProcesso): ProcessoDaLista['etapaAtual'] {
+function etapaAtualDaLinha(linha: LinhaDoProcesso, total: number): EtapaAtual | null {
   if (linha.etapa_atual_codigo === null) return null
-  return { codigo: linha.etapa_atual_codigo, nome: linha.etapa_atual_nome ?? '', ordem: linha.etapa_atual_ordem ?? 0 }
+  return {
+    id: linha.etapa_atual_id ?? '', codigo: linha.etapa_atual_codigo, nome: linha.etapa_atual_nome ?? '',
+    ordem: linha.etapa_atual_ordem ?? 0, posicao: linha.etapa_atual_posicao ?? 0, total,
+  }
 }
 
-function responsavelDaLinha(linha: LinhaDoProcesso): ResponsavelDaEtapa | null {
+function responsavelDaLinha(linha: LinhaDoProcesso): ResponsavelDoProcesso | null {
   if (linha.responsavel_id === null) return null
   return { id: linha.responsavel_id, nome: linha.responsavel_nome ?? '', fotoUrl: linha.responsavel_foto_url }
 }

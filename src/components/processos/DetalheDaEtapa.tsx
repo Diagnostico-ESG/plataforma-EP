@@ -1,103 +1,63 @@
-import { useState } from 'react'
-import {
-  type SinalDaEtapa, acoesDaEtapa, formatarData, opcoesDeResponsavel, podeAssumir, usuariosParaAEtapa,
-} from '../../processos/caminhoDeEtapas'
-import type { AcoesDaEtapaEmUso } from '../../hooks/useAcoesDaEtapa'
 import type { EstadoDoCarregamento } from '../../hooks/useCarregamento'
-import type { DatasDaEtapa, EtapaDoCaminho, EtapaDoProcesso, UltimaVersao, UsuarioResponsavel } from '../../processos/tipos'
+import { formatarData } from '../../lib/datas'
+import { CODIGO_DA_APROVACAO, CODIGO_DA_REVISAO_INTERNA } from '../../processos/codigosDasEtapas'
+import type { EtapaDoVerso } from '../../processos/tipos'
 import type { Aprovacao, ModuloDeRevisoes } from '../../revisoes/tipos'
 import { AprovacaoDaEtapa } from './AprovacaoDaEtapa'
-import { FormularioDeDatas } from './FormularioDeDatas'
 import { RevisoesDaEtapa } from './RevisoesDaEtapa'
-import { TrocaDoResponsavel } from './TrocaDoResponsavel'
 
 export type DadosDasEtapas = {
-  etapas: EtapaDoProcesso[]
   /** O processo das etapas e o módulo de revisões: a gaveta da Revisão interna lista as revisões dele. */
   processoId: string
   revisoes: ModuloDeRevisoes
-  /** Quem pode alterar, com o processo em andamento ou concluído; suspenso, cancelado e Consulta só leem. */
+  /** Quem pode alterar, com o processo em andamento ou concluído; suspenso, cancelado, arquivado e Consulta só leem. */
   podeEditar: boolean
-  usuarios: UsuarioResponsavel[]
-  /** Quem está na tela. */
-  usuarioId: string
-  ultimaVersao: UltimaVersao | null
-  acoes: AcoesDaEtapaEmUso
   /** A aprovação do processo (lida pelo verso): a gaveta da Aprovação a mostra, com os estados de carregando e de erro. */
   aprovacao: EstadoDoCarregamento<Aprovacao | null>
   aoTentarDeNovoAAprovacao: () => void
   /** Lê a aprovação de novo, sem piscar, depois de editar. */
   aoAtualizarAAprovacao: () => void
-  aoCorrigirDatas: (etapa: EtapaDoCaminho, datas: DatasDaEtapa) => Promise<void>
-  aoSumir: () => void
 }
 
-type DetalheDaEtapaProps = DadosDasEtapas & { id: string; indice: number; sinal: SinalDaEtapa }
+type DetalheDaEtapaProps = DadosDasEtapas & { id: string; etapa: EtapaDoVerso }
 
 /**
- * A gaveta de uma etapa: datas e nota; o responsável (com Trocar e Assumir nas pendentes depois da atual, que o
- * Agora não cobre); Corrigir datas e Voltar a esta etapa para quem pode editar. A atual não repete o que o Agora tem.
+ * A gaveta de uma etapa: as entradas e saídas do processo nela, da mais recente para a mais antiga, e, na Revisão interna e
+ * na Aprovação pelo setor, os registros. Só leitura: mover, etiqueta e responsável são do Agora.
  */
 export function DetalheDaEtapa(props: DetalheDaEtapaProps) {
-  const { id, etapas, indice, sinal, podeEditar, acoes, aoCorrigirDatas, aoSumir } = props
-  const etapa = etapas[indice]
-  const [corrigindo, setCorrigindo] = useState(false)
-  const voltar = podeEditar && acoesDaEtapa(etapas, indice).includes('voltar')
-
-  async function salvarDatas(datas: DatasDaEtapa) {
-    await aoCorrigirDatas(etapa, datas)
-    setCorrigindo(false)
-  }
-
+  const { id, etapa } = props
   return (
     <div id={id} className="etapa-gaveta">
-      <p className="etapa-datas">Início: {formatarData(etapa.iniciadaEm)} · Conclusão: {formatarData(etapa.resolvidaEm)}</p>
-      {etapa.nota && <p className="etapa-nota">Nota: {etapa.nota}</p>}
-      <RegistrosDaEtapa codigo={etapa.codigo} {...props} />
-      {sinal !== 'atual' && <ResponsavelNaGaveta {...props} />}
-      <div className="etapa-gaveta-acoes">
-        {podeEditar && etapa.status !== 'pendente' && !corrigindo && (
-          <button type="button" className="botao botao-secundario" onClick={() => setCorrigindo(true)}>Corrigir datas</button>
-        )}
-        {voltar && (
-          <button type="button" className="botao botao-secundario" onClick={() => acoes.agir('voltar', etapa, null)}>
-            Voltar a esta etapa
-          </button>
-        )}
-      </div>
-      {corrigindo && <FormularioDeDatas etapa={etapa} aoSalvar={salvarDatas} aoCancelar={() => setCorrigindo(false)} aoSumir={aoSumir} />}
+      <Passagens etapa={etapa} />
+      <RegistrosDaEtapa {...props} />
     </div>
   )
 }
 
+function Passagens({ etapa }: { etapa: EtapaDoVerso }) {
+  if (etapa.passagens.length === 0) return <p className="etapa-datas">Ainda não passou por esta etapa</p>
+  return (
+    <ul className="etapa-passagens">
+      {etapa.passagens.map((passagem) => (
+        <li key={passagem.entrouEm + (passagem.saiuEm ?? 'aberta')} className="etapa-datas">
+          Entrou em {formatarData(passagem.entrouEm)} · {passagem.saiuEm ? `saiu em ${formatarData(passagem.saiuEm)}` : 'ainda nesta etapa'}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 // Os registros que a gaveta mostra: as revisões na Revisão interna e a aprovação na Aprovação pelo setor.
-function RegistrosDaEtapa({ codigo, ...props }: DetalheDaEtapaProps & { codigo: string }) {
-  if (codigo === 'revisao_interna') return <RevisoesDaEtapa revisoes={props.revisoes} processoId={props.processoId} podeEditar={props.podeEditar} />
-  if (codigo === 'aprovacao_setor') {
+function RegistrosDaEtapa({ etapa, ...props }: DetalheDaEtapaProps) {
+  if (etapa.codigo === CODIGO_DA_REVISAO_INTERNA) {
+    return <RevisoesDaEtapa revisoes={props.revisoes} processoId={props.processoId} podeEditar={props.podeEditar} />
+  }
+  if (etapa.codigo === CODIGO_DA_APROVACAO) {
     return (
       <AprovacaoDaEtapa estado={props.aprovacao} aoTentarDeNovo={props.aoTentarDeNovoAAprovacao} revisoes={props.revisoes}
         podeEditar={props.podeEditar} aoAtualizar={props.aoAtualizarAAprovacao} />
     )
   }
   return null
-}
-
-function ResponsavelNaGaveta({ etapas, indice, sinal, podeEditar, usuarios, usuarioId, ultimaVersao, acoes }: DetalheDaEtapaProps) {
-  const etapa = etapas[indice]
-  const nome = `${etapa.responsavelNome ?? '—'}${etapa.responsavelInativo ? ' (Inativo)' : ''}`
-  const pendente = sinal === 'pendente' || sinal === 'opcional'
-  if (!podeEditar || !pendente) return <p className="etapa-responsavel">Responsável: {nome}</p>
-  const opcoes = opcoesDeResponsavel(etapa, usuariosParaAEtapa(etapa, usuarios, ultimaVersao), usuarioId)
-  return (
-    <p className="etapa-responsavel">
-      Responsável: {nome}
-      <TrocaDoResponsavel etapa={etapa} opcoes={opcoes} aoEscolher={(escolhido) => acoes.mudarResponsavel(etapa, escolhido)} />
-      {!etapa.responsavelNome && podeAssumir(etapa, usuarioId, ultimaVersao) && (
-        <button type="button" className="botao botao-secundario" aria-label={`Assumir ${etapa.nome}`}
-          onClick={() => acoes.mudarResponsavel(etapa, usuarioId)}>
-          Assumir
-        </button>
-      )}
-    </p>
-  )
 }
