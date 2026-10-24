@@ -87,7 +87,7 @@
 - [ ] **Passo 3: implementar** na ordem: `rascunhoDaChegada.ts`; o hook; a janela; montar `<JanelaDaChegada>` no `QuadroDeProcessos` e no `CaminhoDoProcesso` (uma linha cada, só quando `movimento.chegada`), com `aoGravar` chamando o `aoMudar` que já existe e `aoFechar` = `fecharChegada`. Apague `FRASE_DA_CHEGADA_PENDENTE` e os `movimento.aviso` que sobrarem sem uso (`QuadroDeProcessos`, `CorpoDoAgora`), junto com seus testes e estilos órfãos (`.quadro-aviso` só se nada mais o usar).
 - [ ] **Passo 4: `npx vitest run`, `npx tsc --noEmit` e `npx eslint src` verdes. Commit.**
 
-### Tarefa 4 — Registrar e corrigir publicação; Agora de Concluídos, do suspenso, do cancelado e do arquivado
+### Tarefa 4 — Registrar e corrigir publicação; Agora de Concluídos, do suspenso, do cancelado e do arquivado (feita; 2402 testes de tela verdes, sem dependência circular. Rulings: o arquivado concluído sem data mostra "Concluído sem publicação: …" e, com data, só "Publicado em …" (os testes antigos dependem do texto); o botão secundário vem antes do principal em Concluídos, no arquivado e no suspenso; o `CamposDaPublicacao` é compartilhado pela janela da chegada e pela de registrar.)
 
 **Arquivos:** criar `src/components/processos/JanelaDaPublicacao.tsx`, `src/processos/rascunhoDaPublicacao.ts` (+ teste), `src/App.registrarPublicacao.test.tsx`; alterar `src/processos/publicacao.ts` (+ teste), `AgoraDoConcluido.tsx`, `CorpoDoAgora.tsx`, `AgoraDoProcesso.tsx`, `src/App.arquivamento.test.tsx`, `src/App.listaDosArquivados.test.tsx`, `src/App.concluidos.test.tsx`.
 

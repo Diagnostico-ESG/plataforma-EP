@@ -69,3 +69,17 @@ test('a Consulta vê o selo e o filtro', async () => {
   expect(linhaDe('Guardado').getByText('Arquivado')).toBeTruthy()
   expect(arquivados()).toBeTruthy()
 })
+
+test('o suspenso e o cancelado arquivados mostram a pílula da situação e o selo "Arquivado" juntos, na mesma célula', async () => {
+  window.location.hash = '#/processos/lista'
+  const arquivadoEm = '2026-10-12T12:00:00Z'
+  montar([
+    processo('Parado', { processo: { situacao: 'suspenso', arquivadoEm } }),
+    processo('Desistido', { processo: { situacao: 'cancelado', arquivadoEm } }),
+  ])
+  await nomesNaLista()
+  for (const [nome, situacao] of [['Parado', 'Suspenso'], ['Desistido', 'Cancelado']]) {
+    const celula = linhaDe(nome).getByText('Arquivado').closest('.lista-situacao') as HTMLElement
+    expect(within(celula).getByText(situacao)).toBeTruthy()
+  }
+})

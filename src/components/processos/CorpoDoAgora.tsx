@@ -3,13 +3,14 @@ import type { MovimentoDoProcessoEmUso } from '../../hooks/useMovimentoDoProcess
 import type { RegistrosDoProcesso } from '../../hooks/useRegistrosDoProcesso'
 import type { Executar } from '../../hooks/useGravacaoComFalha'
 import { avisoDoRevisor, opcoesDeResponsavel, podeAssumir } from '../../processos/agoraDoProcesso'
-import { CODIGO_CONCLUIDOS } from '../../processos/codigosDasEtapas'
+import { CODIGO_CONCLUIDOS, CODIGO_DA_PUBLICACAO } from '../../processos/codigosDasEtapas'
 import { diasDoProcessoNaEtapa } from '../../processos/diasNaEtapa'
 import { ETIQUETAS, ROTULO_DA_ETIQUETA } from '../../processos/rotulos'
 import { hojeLocal } from '../../processos/textoDaReuniao'
 import type { EtiquetaDaEtapa, ModuloDeProcessos, ProcessoLido, UsuarioResponsavel } from '../../processos/tipos'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import { Avatar } from '../Avatar'
+import { PublicacaoNoAgora } from './AgoraDaPublicacao'
 import { AcoesDoConcluido } from './AgoraDoConcluido'
 import { DiasNaEtapa } from './DiasNaEtapa'
 import { RegistrosDoAgora } from './RegistrosDoAgora'
@@ -43,6 +44,7 @@ export function CorpoDoAgora(props: CorpoDoAgoraProps) {
       <ResponsavelDoAgora {...props} />
       <RegistrosDoAgora processo={processo} revisoes={props.revisoes} registros={props.registros} usuarioId={props.usuarioId} podeAlterar />
       {aviso && <p className="agora-aviso" role="status">{aviso}</p>}
+      {processo.etapaAtual?.codigo === CODIGO_DA_PUBLICACAO && <PublicacaoNoAgora processo={processo} processos={props.processos} aoMudar={props.aoMudar} />}
       {processo.etapaAtual?.codigo === CODIGO_CONCLUIDOS && <AcoesDoConcluido {...props} />}
     </>
   )

@@ -1,6 +1,8 @@
 import type { Executar } from '../../hooks/useGravacaoComFalha'
-import { linhaDaPublicacao } from '../../processos/publicacao'
+import { textoDaPublicacaoNoAgora, textoDaPublicacaoNoArquivado } from '../../processos/publicacao'
+import { ROTULO_DA_SITUACAO } from '../../processos/rotulos'
 import type { ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
+import { BotaoDaPublicacao, LinhaDaPublicacao } from './AgoraDaPublicacao'
 
 type AcoesDoConcluidoProps = {
   processo: ProcessoLido
@@ -11,17 +13,17 @@ type AcoesDoConcluidoProps = {
 }
 
 /**
- * O que o processo concluído (na etapa Concluídos) acrescenta ao Agora: a linha da publicação e [Arquivar]. A janela da
- * chegada, o registro da publicação e o arquivamento do suspenso e do cancelado chegam no ticket 04 de
- * publicacao-e-arquivamento.
+ * O que o processo em Concluídos acrescenta ao Agora: a linha da publicação (a data ou a explicação), [Registrar publicação]
+ * ou [Corrigir publicação] e [Arquivar], que é o botão principal.
  */
 export function AcoesDoConcluido({ processo, processos, executar, aoMudar }: AcoesDoConcluidoProps) {
-  const publicacao = linhaDaPublicacao(processo)
+  const texto = textoDaPublicacaoNoAgora(processo)
   return (
     <>
-      {publicacao && <p className="agora-publicacao">{publicacao}</p>}
+      {texto && <LinhaDaPublicacao texto={texto} link={processo.linkDaPublicacao} />}
       <div className="agora-botoes">
-        <button type="button" className="botao botao-secundario" onClick={() => executar(() => processos.arquivar(processo.id), aoMudar)}>
+        <BotaoDaPublicacao processo={processo} processos={processos} aoMudar={aoMudar} />
+        <button type="button" className="botao botao-principal" onClick={() => executar(() => processos.arquivar(processo.id), aoMudar)}>
           Arquivar
         </button>
       </div>
@@ -31,15 +33,26 @@ export function AcoesDoConcluido({ processo, processos, executar, aoMudar }: Aco
 
 type AgoraDoArquivadoProps = AcoesDoConcluidoProps & { podeAlterar: boolean }
 
-/** O Agora do arquivado: só diz que está arquivado e, para quem altera, oferece [Desarquivar] (ADR 0020). */
+/** "Arquivado" e, no suspenso e no cancelado, a situação e o motivo que ele guardou. */
+function situacaoDoArquivado({ situacao, motivoDaSituacao }: ProcessoLido): string {
+  if (situacao !== 'suspenso' && situacao !== 'cancelado') return 'Arquivado'
+  const rotulo = `Arquivado · ${ROTULO_DA_SITUACAO[situacao]}`
+  return motivoDaSituacao ? `${rotulo}: ${motivoDaSituacao}` : rotulo
+}
+
+/**
+ * O Agora do arquivado: a situação que ele guardou, a publicação e, para quem altera, [Registrar publicação] (só sem a
+ * data) e [Desarquivar]. Não há outro botão de alteração (ADR 0024).
+ */
 export function AgoraDoArquivado({ processo, processos, podeAlterar, executar, aoMudar }: AgoraDoArquivadoProps) {
-  const publicacao = linhaDaPublicacao(processo)
+  const texto = textoDaPublicacaoNoArquivado(processo)
   return (
     <>
-      <p className="agora-situacao">Arquivado</p>
-      {publicacao && <p className="agora-publicacao">{publicacao}</p>}
+      <p className="agora-situacao">{situacaoDoArquivado(processo)}</p>
+      {texto && <LinhaDaPublicacao texto={texto} link={processo.linkDaPublicacao} />}
       {podeAlterar && (
         <div className="agora-botoes">
+          <BotaoDaPublicacao processo={processo} processos={processos} aoMudar={aoMudar} />
           <button type="button" className="botao botao-principal" onClick={() => executar(() => processos.desarquivar(processo.id), aoMudar)}>
             Desarquivar
           </button>

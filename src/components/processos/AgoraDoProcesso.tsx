@@ -7,10 +7,12 @@ import { fraseDaConsulta, rotuloDoAgora } from '../../processos/agoraDoProcesso'
 import { diasDoProcessoNaEtapa, passouDoLimite } from '../../processos/diasNaEtapa'
 import type { PedidoDeSituacao } from '../../processos/pedidosDeSituacao'
 import { ROTULO_DA_SITUACAO } from '../../processos/rotulos'
+import { textoDaPublicacaoNoAgora } from '../../processos/publicacao'
 import { hojeLocal } from '../../processos/textoDaReuniao'
 import type { ModuloDeProcessos, ProcessoLido, UsuarioResponsavel } from '../../processos/tipos'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import { JanelaDeSituacao } from './AcoesDeSituacao'
+import { LinhaDaPublicacao } from './AgoraDaPublicacao'
 import { AgoraDoArquivado } from './AgoraDoConcluido'
 import { CorpoDoAgora } from './CorpoDoAgora'
 import { DiasNaEtapa } from './DiasNaEtapa'
@@ -62,7 +64,9 @@ function ConteudoDoAgora(props: ConteudoDoAgoraProps) {
   if (props.arquivado) {
     return <AgoraDoArquivado processo={processo} processos={processos} podeAlterar={podeAlterar} executar={executar} aoMudar={aoMudar} />
   }
-  if (props.parado) return <SituacaoParada processo={processo} podeAlterar={podeAlterar} aoRetomar={props.aoRetomar} />
+  if (props.parado) {
+    return <SituacaoParada processo={processo} processos={processos} podeAlterar={podeAlterar} executar={executar} aoMudar={aoMudar} aoRetomar={props.aoRetomar} />
+  }
   if (!podeAlterar) return <AgoraDaConsulta processo={processo} rotulo={rotulo} revisoes={props.revisoes} registros={props.registros} usuarioId={props.usuarioId} />
   return <CorpoDoAgora {...props} rotulo={rotulo} />
 }
@@ -73,10 +77,11 @@ function classeDoAgora(situacao: ProcessoLido['situacao'], podeAlterar: boolean,
   return podeAlterar ? 'agora' : 'agora agora-leitura'
 }
 
-type SituacaoParadaProps = { processo: ProcessoLido; podeAlterar: boolean; aoRetomar: () => void }
+type SituacaoParadaProps = Pick<AgoraDoProcessoProps, 'processo' | 'processos' | 'podeAlterar' | 'executar' | 'aoMudar'> & { aoRetomar: () => void }
 
-// Suspenso e cancelado congelam a etapa, a etiqueta e o responsável; a tela diz onde o processo parou e por quê.
-function SituacaoParada({ processo, podeAlterar, aoRetomar }: SituacaoParadaProps) {
+// Suspenso e cancelado congelam a etapa, a etiqueta e o responsável; a tela diz onde o processo parou e por quê, e oferece
+// [Arquivar] ao lado de [Retomar].
+function SituacaoParada({ processo, processos, podeAlterar, executar, aoMudar, aoRetomar }: SituacaoParadaProps) {
   const rotulo = ROTULO_DA_SITUACAO[processo.situacao]
   return (
     <>
@@ -86,6 +91,9 @@ function SituacaoParada({ processo, podeAlterar, aoRetomar }: SituacaoParadaProp
       <p className="agora-explicacao">Retome o processo para mudar a etapa, a etiqueta ou o responsável.</p>
       {podeAlterar && (
         <div className="agora-botoes">
+          <button type="button" className="botao botao-secundario" onClick={() => executar(() => processos.arquivar(processo.id), aoMudar)}>
+            Arquivar
+          </button>
           <button type="button" className="botao botao-principal" onClick={aoRetomar}>Retomar</button>
         </div>
       )}
@@ -98,6 +106,7 @@ type AgoraDaConsultaProps = Pick<AgoraDoProcessoProps, 'processo' | 'revisoes' |
 
 function AgoraDaConsulta({ processo, rotulo, revisoes, registros, usuarioId }: AgoraDaConsultaProps) {
   const dias = diasDoProcessoNaEtapa(processo, hojeLocal())
+  const publicacao = textoDaPublicacaoNoAgora(processo)
   return (
     <>
       <p className="agora-rotulo">{rotulo}</p>
@@ -105,6 +114,7 @@ function AgoraDaConsulta({ processo, rotulo, revisoes, registros, usuarioId }: A
         <span>{fraseDaConsulta(processo, hojeLocal())}</span>
         {dias !== null && passouDoLimite(dias) && <DiasNaEtapa dias={dias} />}
       </p>
+      {publicacao && <LinhaDaPublicacao texto={publicacao} link={processo.linkDaPublicacao} />}
       <RegistrosDoAgora processo={processo} revisoes={revisoes} registros={registros} usuarioId={usuarioId} podeAlterar={false} />
     </>
   )

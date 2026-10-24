@@ -3,8 +3,8 @@ import type { PedidoDeChegada } from '../../hooks/useMovimentoDoProcesso'
 import { useGravacaoNaJanela } from '../../hooks/useGravacaoNaJanela'
 import { gravarChegada } from '../../processos/gravarAcoes'
 import { type OpcaoDaChegada, type RascunhoDaChegada, chegadaCompleta, dadosDaChegada, rascunhoDaChegadaVazio } from '../../processos/rascunhoDaChegada'
-import { hojeLocal } from '../../processos/textoDaReuniao'
 import type { ModuloDeProcessos } from '../../processos/tipos'
+import { CamposDaPublicacao } from './CamposDaPublicacao'
 import { JanelaDeEdicao } from './JanelaDeEdicao'
 
 type JanelaDaChegadaProps = {
@@ -20,21 +20,6 @@ const OPCOES: { opcao: OpcaoDaChegada; rotulo: string }[] = [
 ]
 
 type CamposProps = { rascunho: RascunhoDaChegada; aoMudar: (rascunho: RascunhoDaChegada) => void }
-
-function CamposDaPublicacao({ rascunho, aoMudar }: CamposProps) {
-  const idDaData = useId()
-  const idDoLink = useId()
-  return (
-    <>
-      <label htmlFor={idDaData} className="janela-escolha-pergunta janela-revisao-rotulo">Data da publicação</label>
-      <input id={idDaData} type="date" className="janela-campo" max={hojeLocal()} value={rascunho.data}
-        onChange={(mudanca) => aoMudar({ ...rascunho, data: mudanca.target.value })} />
-      <label htmlFor={idDoLink} className="janela-escolha-pergunta janela-revisao-rotulo">Link (opcional)</label>
-      <input id={idDoLink} type="url" className="janela-campo" maxLength={500} value={rascunho.link}
-        onChange={(mudanca) => aoMudar({ ...rascunho, link: mudanca.target.value })} />
-    </>
-  )
-}
 
 function CampoDaExplicacao({ rascunho, aoMudar }: CamposProps) {
   const id = useId()
@@ -76,7 +61,7 @@ export function JanelaDaChegada({ chegada, processos, aoGravar, aoFechar }: Jane
           </label>
         ))}
       </fieldset>
-      {rascunho.opcao === 'publicado' && <CamposDaPublicacao rascunho={rascunho} aoMudar={setRascunho} />}
+      {rascunho.opcao === 'publicado' && <CamposDaPublicacao valor={rascunho} aoMudar={setRascunho} />}
       {rascunho.opcao === 'sem_publicacao' && <CampoDaExplicacao rascunho={rascunho} aoMudar={setRascunho} />}
     </JanelaDeEdicao>
   )

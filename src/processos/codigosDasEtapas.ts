@@ -4,6 +4,7 @@ export const CODIGO_NAO_INICIADOS = 'nao_iniciados'
 export const CODIGO_CONCLUIDOS = 'concluidos'
 export const CODIGO_DA_REVISAO_INTERNA = 'revisao_interna'
 export const CODIGO_DA_APROVACAO = 'aprovacao_setor'
+export const CODIGO_DA_PUBLICACAO = 'publicacao'
 
 /** Não iniciados e Concluídos: o tempo ali não é atraso, e a etapa não se muda no catálogo. */
 export function ehEtapaFixa(codigo: string): boolean {

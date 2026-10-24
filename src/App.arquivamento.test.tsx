@@ -25,7 +25,7 @@ test('o concluído tem [Arquivar] no Agora; arquivar tira o processo de Concluí
   expect(await botoesDoAgora()).toContain('Arquivar')
   fireEvent.click((await agoraDoVerso()).getByRole('button', { name: 'Arquivar' }))
   expect(await (await agoraDoVerso()).findByText('Arquivado')).toBeTruthy()
-  expect(await botoesDoAgora()).toEqual(['Desarquivar'])
+  expect(await botoesDoAgora()).toEqual(['Registrar publicação', 'Desarquivar'])
   expect(falso.processos[0].arquivadoEm).toBeTruthy()
   expect((await concluidos()).queryByText('Emitir Ofício')).toBeNull()
 })
@@ -79,4 +79,30 @@ test('a Consulta vê "Arquivado" e a linha da publicação, sem botões', async 
   expect(agora.getByText('Arquivado')).toBeTruthy()
   expect(agora.getByText('Publicado em 11/10/2026')).toBeTruthy()
   expect(agora.queryAllByRole('button')).toEqual([])
+})
+
+// ---- O suspenso e o cancelado também se arquivam (ticket 04 de publicacao-e-arquivamento, história 58 a 60)
+
+const botoes = async () => (await agoraDoVerso()).getAllByRole('button').map((botao) => botao.textContent)
+
+test.each([
+  ['suspenso', 'Suspenso', 'Aguardando o setor'],
+  ['cancelado', 'Cancelado', 'Desistiu'],
+] as const)('o %s tem [Arquivar] ao lado de [Retomar]; arquivado, guarda a situação e a etapa, e [Desarquivar] devolve tudo', async (situacao, rotulo, motivo) => {
+  const { falso } = montar(null, { etapa: 'modelagem', mudancas: { situacao, motivoDaSituacao: motivo } })
+  expect(await (await agoraDoVerso()).findByText(`${rotulo}: ${motivo}`)).toBeTruthy()
+  expect(await botoes()).toEqual(['Arquivar', 'Retomar'])
+  fireEvent.click((await agoraDoVerso()).getByRole('button', { name: 'Arquivar' }))
+  expect(await (await agoraDoVerso()).findByText(`Arquivado · ${rotulo}: ${motivo}`)).toBeTruthy()
+  expect(await botoes()).toEqual(['Desarquivar'])
+  expect(falso.processos[0]).toMatchObject({ situacao, etapaAtual: { codigo: 'modelagem' } })
+  fireEvent.click((await agoraDoVerso()).getByRole('button', { name: 'Desarquivar' }))
+  expect(await (await agoraDoVerso()).findByText(`${rotulo}: ${motivo}`)).toBeTruthy()
+  expect(await botoes()).toEqual(['Arquivar', 'Retomar'])
+  expect(falso.processos[0]).toMatchObject({ situacao, etapaAtual: { codigo: 'modelagem' }, arquivadoEm: null })
+})
+
+test('a Consulta não vê [Arquivar] no suspenso', async () => {
+  montar(null, { perfil: 'consulta', etapa: 'modelagem', mudancas: { situacao: 'suspenso', motivoDaSituacao: 'Aguardando o setor' } })
+  expect((await agoraDoVerso()).queryAllByRole('button')).toEqual([])
 })
