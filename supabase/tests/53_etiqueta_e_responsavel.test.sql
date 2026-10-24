@@ -108,11 +108,11 @@ insert into _tap (linha) select throws_ok($sql$select pg_temp.etiquetar('Etiquet
 
 -- ===== Uma só passagem aberta =====
 reset role;
-select set_config('ep.movendo_processo', 'on', true);
+select set_config('ep.movendo_processo', 'mover', true);
 insert into _tap (linha) select throws_ok(
   $sql$insert into public.passagens (processo_id, etapa_id) values (pg_temp.processo('Etiqueta'), pg_temp.etapa('publicacao'))$sql$,
   '23505', null, 'uma segunda passagem aberta no mesmo processo é recusada');
-select set_config('ep.movendo_processo', 'off', true);
+select set_config('ep.movendo_processo', '', true);
 set local role authenticated;
 
 -- ===== Responsável =====
