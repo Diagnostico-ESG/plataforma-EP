@@ -29,7 +29,12 @@ test('sem pendências, o teste vai intacto', () => {
   expect(comEnsaio('select 1;', [])).toBe('select 1;')
 })
 
-test('o teste marcado fica fora do ensaio', () => {
-  const teste = '-- ensaio: sem migrações pendentes\nselect 1;'
-  expect(comEnsaio(teste, ['create table x();'])).toBe(teste)
+test('o teste marcado recebe as migrações no ponto da marca, sem outro begin', () => {
+  const teste = 'begin;\ninsert into a values (1);\n-- ensaio: migrações pendentes aqui\nselect 1;'
+  expect(comEnsaio(teste, ['create table x();', 'drop table y;']))
+    .toBe('begin;\ninsert into a values (1);\ncreate table x();\ndrop table y;\nselect 1;')
+})
+
+test('a migração com $ no texto entra sem ser lida como padrão de troca', () => {
+  expect(comEnsaio('-- ensaio: migrações pendentes aqui', ["select $$a$$, '$&';"])).toBe("select $$a$$, '$&';")
 })

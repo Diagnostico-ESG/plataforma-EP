@@ -3,7 +3,8 @@
 // sem mudar o banco. Pendente é a migração com versão maior que a última registrada; as mais antigas,
 // aplicadas à mão sem registro, ficam de fora.
 const FORMATO = /^(\d{14})_[a-z0-9_]+\.sql$/
-export const MARCA_SEM_ENSAIO = '-- ensaio: sem migrações pendentes'
+// O teste da conversão monta os dados no modelo antigo e marca onde as migrações entram.
+export const MARCA_DO_PONTO = '-- ensaio: migrações pendentes aqui'
 
 export function migracoesPendentes(arquivos, ultimaAplicada) {
   if (!ultimaAplicada) {
@@ -15,8 +16,10 @@ export function migracoesPendentes(arquivos, ultimaAplicada) {
     .sort()
 }
 
-// O "begin" do próprio teste vira só um aviso, e o erro do fim do teste desfaz também as migrações.
+// Sem marca, as migrações vão antes do teste: o "begin" do próprio teste vira só um aviso, e o erro do fim do teste
+// desfaz também as migrações. Com a marca, entram no ponto dela, já dentro da transação do teste.
 export function comEnsaio(sqlDoTeste, sqlDasPendentes) {
-  if (sqlDasPendentes.length === 0 || sqlDoTeste.includes(MARCA_SEM_ENSAIO)) return sqlDoTeste
+  if (sqlDoTeste.includes(MARCA_DO_PONTO)) return sqlDoTeste.replace(MARCA_DO_PONTO, () => sqlDasPendentes.join('\n'))
+  if (sqlDasPendentes.length === 0) return sqlDoTeste
   return ['begin;', ...sqlDasPendentes, sqlDoTeste].join('\n')
 }
