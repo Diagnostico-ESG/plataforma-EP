@@ -313,7 +313,8 @@ insert into _tap (linha) select is(pg_temp.eventos_dos_processos('00000000-0000-
 -- Restrições do dono: toda passagem é de um processo, e só uma fica aberta por processo.
 insert into _tap (linha) select throws_ok(
   $sql$update public.passagens set processo_id = null
-    where processo_id = (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004')$sql$,
+    where processo_id = (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004')
+      and saiu_em is null$sql$,
   '23502', null, 'passagem sem processo é recusada');
 select set_config('ep.movendo_processo', 'mover', true);
 insert into _tap (linha) select throws_ok(

@@ -85,7 +85,7 @@ insert into _tap (linha) select is(
   (select numero from public.versoes where processo_id = pg_temp.processo('e1')), 1, 'processo sem versão recebe V1');
 insert into _tap (linha) select is(
   (select e.codigo from public.versoes v join public.etapas e on e.id = v.etapa_id where v.processo_id = pg_temp.processo('e1')),
-  'modelagem', 'a versão guarda a etapa atual do processo');
+  'nao_iniciados', 'a versão guarda a etapa atual do processo (Não iniciados, no cadastro)');
 insert into _tap (linha) select is(
   (select observacao from public.versoes where processo_id = pg_temp.processo('e1')), 'Primeira versão',
   'a observação é gravada sem espaços nas pontas');

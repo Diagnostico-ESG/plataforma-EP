@@ -122,7 +122,7 @@ insert into _tap (linha) select lives_ok($sql$select public.registrar_versao(pg_
   jsonb_build_array(pg_temp.arquivo('bpm', 'bpm'), pg_temp.arquivo('png', 'png')))$sql$, 'versão nova depois da V5F é aceita');
 insert into _tap (linha) select is((select max(numero) from public.versoes where processo_id = pg_temp.processo('e1') and not historica), 6, 'a versão nova depois de V5F recebe V6');
 insert into _tap (linha) select is((select e.codigo from public.versoes v join public.etapas e on e.id = v.etapa_id
-    where v.processo_id = pg_temp.processo('e1') and v.numero = 6), 'modelagem', 'a versão nova guarda a etapa atual');
+    where v.processo_id = pg_temp.processo('e1') and v.numero = 6), 'nao_iniciados', 'a versão nova guarda a etapa atual');
 insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 7, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$,
   'P0001', 'historica_depois_de_versao_nova', 'histórica depois de versão nova é recusada');
 

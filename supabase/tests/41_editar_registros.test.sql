@@ -31,13 +31,13 @@ select '5f000000-0000-0000-0000-000000000041', 'af000000-0000-0000-0000-00000000
 from unnest(array['Corrigida', 'Sem Alteracao', 'Sem Numero', 'Parado', 'Cancelado']) as nome;
 
 create function pg_temp.processo(nome_do_processo text) returns uuid
-language sql stable as $
-  select id from public.processos where nome = nome_do_processo and setor_id = '5f000000-0000-0000-0000-000000000041' $;
+language sql stable as $$
+  select id from public.processos where nome = nome_do_processo and setor_id = '5f000000-0000-0000-0000-000000000041' $$;
 grant execute on function pg_temp.processo(text) to authenticated;
 
 create function pg_temp.mover(nome_do_processo text, codigo_da_etapa text) returns void
-language sql as $
-  select public.mover_processo(pg_temp.processo(nome_do_processo), (select id from public.etapas where codigo = codigo_da_etapa)) $;
+language sql as $$
+  select public.mover_processo(pg_temp.processo(nome_do_processo), (select id from public.etapas where codigo = codigo_da_etapa)) $$;
 grant execute on function pg_temp.mover(text, text) to authenticated;
 
 -- Um arquivo inventado no formato que registrar_versao recebe, e o par .bpm + .png de uma versão nova.
