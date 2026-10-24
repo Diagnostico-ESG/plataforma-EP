@@ -85,63 +85,55 @@ Tipo provisório do item identificado (ou importado) que ainda não se sabe se �
 _Avoid_: indefinido, rascunho
 
 **Catálogo de etapas**:
-A lista ordenada de etapas, mantida pelo administrador, que todo processo percorre, da modelagem piloto em diante. Não há etapas do setor: identificação dos responsáveis, sensibilização e identificação dos processos já foram feitas para todos os setores e ficam fora da plataforma.
+A lista ordenada de etapas, mantida pelo administrador, em que o processo pode estar: começa sempre em **Não iniciados** e termina sempre em **Concluídos**, fixas no lugar e no nome; entre elas, as etapas de trabalho, da modelagem piloto em diante. A ordem não obriga ninguém a seguir a sequência. Uma etapa nova só acrescenta uma coluna, sem mexer em nenhum processo. Etapa com processo dentro não se desativa nem se exclui; etapa por onde algum processo já passou só se desativa; as etapas que têm campos próprios (Modelagem piloto, Relatório e modelagem técnica, Revisão interna, Validação com o setor, Aprovação pelo setor e Publicação) se renomeiam e se reordenam, mas não se desativam nem se excluem. Não há etapas do setor: identificação dos responsáveis, sensibilização e identificação dos processos já foram feitas para todos os setores e ficam fora da plataforma.
 _Avoid_: workflow, fluxo de etapas, etapa do setor
 
+**Não iniciados**:
+A primeira etapa do catálogo, onde entra todo processo cadastrado e fica o que ainda não começou. Não pertence a nenhuma fase do Regimento.
+_Avoid_: backlog, a fazer (para a etapa), pendentes
+
 **Fase do Regimento**:
-Cada uma das nove fases do mapeamento definidas no art. 8º do Regimento Interno do EP (I a IX), pelas quais os dashboards contam o andamento. Cada etapa do catálogo pertence a uma fase; uma fase pode juntar várias etapas (a VI junta Revisão interna, Validação com o setor e Aprovação pelo setor). As fases I a III não têm etapa, porque foram feitas fora da plataforma para todos os setores, e contam sempre como concluídas.
+Cada uma das nove fases do mapeamento definidas no art. 8º do Regimento Interno do EP (I a IX), pelas quais os dashboards contam o andamento. Cada etapa do catálogo pertence a uma fase; uma fase pode juntar várias etapas (a VI junta Revisão interna, Validação com o setor e Aprovação pelo setor). As fases I a III não têm etapa, porque foram feitas fora da plataforma para todos os setores, e contam sempre como concluídas. As outras contam pela posição do processo no catálogo: concluída quando ele está numa etapa depois dela, na última etapa dela com a etiqueta Concluído, ou em Concluídos (a VII, só com a publicação registrada); em andamento quando ele está numa etapa dela; não iniciada no resto.
 _Avoid_: etapa (para a fase), etapa do Regimento, macroetapa
 
-**Etapa obrigatória / Etapa opcional**:
-Marcação do catálogo. Só a etapa opcional pode ser dispensada; o processo só se conclui com todas as obrigatórias resolvidas.
-_Avoid_: etapa facultativa, etapa pulável
-
-**Status da etapa**:
-Pendente, em andamento, concluída, realizada anteriormente (feita fora da plataforma, com nota) ou dispensada (opcional que não será feita, com nota). As três últimas contam como **resolvida**.
-_Avoid_: estado, fase (para status)
-
 **Etapa atual**:
-A etapa em andamento do processo ou, se nenhuma estiver, a primeira pendente. Cada processo tem no máximo uma etapa em andamento.
-_Avoid_: etapa corrente, passo atual
+A etapa do catálogo em que o processo está. Todo processo está em exatamente uma.
+_Avoid_: etapa corrente, passo atual, status da etapa
+
+**Mover**:
+Levar o processo para qualquer etapa do catálogo, para a frente ou para trás, pela lista de etapas ou arrastando o cartão, sem motivo e sem trava de sequência. A combinação da equipe decide quando mover, não a plataforma. Ao mover, a etiqueta volta a A fazer. Cada mudança fica no histórico.
+_Avoid_: avançar, voltar a uma etapa, concluir a etapa, iniciar a etapa, dispensar
+
+**Etiqueta**:
+Marca da etapa atual do processo: **A fazer**, **Em andamento** ou **Concluído**. Concluído quer dizer que a parte de quem estava na etapa terminou e o processo espera o próximo pegá-lo; não conclui o processo.
+_Avoid_: tag, status, situação (para a etiqueta)
 
 **Processo parado**:
-Processo em andamento cuja etapa atual começou há mais de 15 dias. O limite é um número único até os prazos por etapa.
+Processo em andamento que está na mesma etapa há mais de 7 dias, contados de quando entrou nela; mudar só a etiqueta não zera a contagem. Não vale em Não iniciados nem em Concluídos. A tela o destaca. O limite é um número único até os prazos por etapa.
 _Avoid_: atrasado, vencido, esquecido
 
-**Avançar**:
-O que acontece quando a etapa atual é concluída, dispensada ou registrada como realizada anteriormente: a primeira etapa pendente depois dela entra em andamento, com o responsável escolhido por quem resolveu (ou sem responsável). Sem etapa pendente depois, não há avanço. A etapa atual pendente (como a primeira de um processo novo) continua se iniciando à mão.
-_Avoid_: pular, passar de fase
-
-**Voltar a uma etapa**:
-Reabrir uma etapa anterior, com motivo; as etapas seguintes já concluídas voltam a pendente. Quem volta escolhe o responsável da etapa reaberta. Nada se apaga do histórico.
-_Avoid_: retroceder, desfazer, reabrir processo
-
-**Responsável da etapa**:
-Usuário (Administrador ou Integrante do EP) que cuida de uma etapa de um processo. Quem conclui, dispensa ou registra como realizada anteriormente uma etapa escolhe o responsável da seguinte (pode não escolher ninguém); depois, qualquer integrante pode trocá-lo por qualquer outro. A plataforma não guarda os contatos dos setores.
-_Avoid_: dono da etapa, executor
+**Responsável do processo**:
+Usuário (Administrador ou Integrante do EP) que cuida do processo agora; um só por processo, não por etapa. Quem move o processo, para qualquer etapa, passa a ser o responsável; depois, qualquer integrante pode trocá-lo por outro ou por ninguém. O histórico guarda quem esteve com o processo em cada etapa. A plataforma não guarda os contatos dos setores.
+_Avoid_: responsável da etapa, dono, executor
 
 **Situação do processo**:
-Em andamento, suspenso, cancelado ou concluído. Suspender, cancelar e **retomar** exigem motivo e congelam ou liberam o andamento; concluído não se marca, acontece quando todas as etapas obrigatórias estão resolvidas e o processo não vai para publicação ou já teve a Publicação resolvida.
+Em andamento, suspenso, cancelado ou concluído. Suspender, cancelar e **retomar** exigem motivo; suspenso e cancelado congelam a etapa, a etiqueta e o responsável, e retomar devolve o processo à mesma etapa. Concluído não se marca: é o processo que está em Concluídos. Suspensos e cancelados ficam fora das planilhas dos dashboards.
 _Avoid_: status do processo, estado
 
-**Vai para publicação**:
-A escolha, feita ao concluir a Aprovação, entre levar o processo à etapa Publicação ou direto a Concluídos (ADR 0020). Fica sem resposta até a Aprovação e volta a ficar sem resposta quando se volta à Aprovação ou antes. A Publicação não se dispensa: quem desiste dela no meio registra "Não vai mais para publicação", com motivo.
-_Avoid_: dispensar a publicação
+**Concluídos**:
+A última etapa do catálogo, fixa: o processo que chega a ela está concluído. Para chegar, o processo precisa ter a data da publicação ou ser concluído sem publicação.
+_Avoid_: finalizados, encerrados
 
-**Não publicado**:
-Processo concluído cuja escolha foi não ir para publicação. Ainda pode ser publicado. Nos dashboards, a fase VII dele não conta como concluída.
-_Avoid_: dispensado (para a publicação), sem publicação
+**Concluir sem publicação**:
+Levar o processo a Concluídos sem publicá-lo, com uma explicação obrigatória, porque há processos que não se quer divulgar. Nos dashboards, a fase VII dele aparece "Sem publicação" e não conta como concluída. Ainda pode ser publicado depois.
+_Avoid_: não publicado, dispensar a publicação, vai para publicação
 
 **Registrar publicação**:
-Registrar, num processo não publicado, concluído ou arquivado, que ele foi publicado, com a data em que isso aconteceu. O processo fica onde está.
+Informar a data em que o processo foi publicado (com o link, se houver), na etapa Publicação ou depois, num processo concluído sem publicação ou arquivado. O processo fica onde está.
 _Avoid_: publicar depois, republicar
 
-**Concluídos**:
-A última coluna do Quadro, com os processos concluídos que ainda não foram arquivados.
-_Avoid_: finalizados (para a coluna), encerrados
-
 **Arquivado**:
-Marca de um processo concluído que sai do Quadro e fica só na Lista. Continua concluído para todo o resto, inclusive nos dashboards. Quem arquiva é um Administrador ou Integrante do EP, e quem **desarquiva** o devolve a Concluídos. Arquivado não tem etapa mexida; só se registra publicação ou se desarquiva.
+Marca de um processo concluído, suspenso ou cancelado que sai do Quadro e fica só na Lista, guardando a situação e a etapa que tinha. Quem arquiva é um Administrador ou Integrante do EP, e quem **desarquiva** o devolve como estava. Arquivado não tem etapa mexida; só se registra publicação ou se desarquiva.
 _Avoid_: encerrado, inativo, cancelado
 
 **Anotações**:
@@ -155,7 +147,7 @@ _Avoid_: conversão, migração, recriação
 ## Reuniões
 
 **Modelagem piloto**:
-A primeira etapa de todo processo: o EP se reúne com o setor e faz o primeiro desenho do fluxo.
+A primeira etapa de trabalho de todo processo, logo depois de Não iniciados: o EP se reúne com o setor e faz o primeiro desenho do fluxo.
 _Avoid_: reunião de modelagem, oficina, workshop
 
 **Reunião**:
@@ -191,23 +183,23 @@ _Avoid_: versão antiga, versão importada, versão final
 ## Revisões e aprovação
 
 **Assumir**:
-O integrante pôr a si mesmo como responsável de uma etapa, de qualquer tipo, pendente ou em andamento, que está sem responsável.
+O integrante pôr a si mesmo como responsável do processo, sem movê-lo.
 _Avoid_: capturar, pegar, puxar
 
 **Revisão interna**:
-Conferência, por um integrante diferente do autor, da última versão do processo antes de ela ir ao setor. O revisor corrige ele mesmo: o resultado é "sem alteração" (segue a versão revisada) ou "corrigida" (o revisor enviou uma versão nova).
+Conferência, por um integrante diferente do autor, da última versão do processo antes de ela ir ao setor, registrada com o processo na etapa Revisão interna. O revisor corrige ele mesmo: o resultado é "sem alteração" (segue a versão revisada) ou "corrigida" (a versão enviada nessa etapa é a correção). Registrar não move o processo, e mover não exige registro; cada passagem pela etapa pode ter o seu registro.
 _Avoid_: conferência, aprovação interna
 
 **Revisor**:
-Integrante que registra a revisão interna; nunca é o autor da versão revisada. Por isso, quem enviou a versão mais recente (fora as versões históricas) não pode ser escolhido como responsável da revisão interna. A conferência vale no momento da escolha: o revisor que corrige e envia uma versão nova continua responsável.
+Integrante que registra a revisão interna; não deveria ser o autor da versão revisada. A plataforma avisa, sem impedir, quando o autor da versão mais recente (fora as versões históricas) registra a revisão ou fica responsável do processo na Revisão interna.
 _Avoid_: aprovador, conferente
 
 **Validação com o setor**:
-A etapa em que a versão completa (.bpm, .png e relatório) está com o setor. Em andamento quer dizer "com o setor"; se o setor pede ajustes, o EP volta à revisão interna, e a ida seguinte é a etapa recomeçando. A plataforma não registra cada envio nem a resposta (ADR 0012): o histórico das etapas diz quando foi e voltou, e os e-mails ficam fora (a resposta pode vir pessoalmente).
+A etapa em que a versão está com o setor. Se o setor pede ajustes, o EP move o processo de volta à revisão interna, e a ida seguinte é o processo voltando a esta etapa. A plataforma não registra cada envio nem a resposta: o histórico das mudanças de etapa diz quando foi e voltou, e os e-mails ficam fora (a resposta pode vir pessoalmente).
 _Avoid_: revisão pelo setor, rodada, ciclo, envio ao setor
 
 **Aprovação**:
-O registro de que o setor aprovou a versão mais recente do processo, feito ao concluir a etapa de aprovação, com o número, o link e a data do E-protocolo quando houver (o número pode entrar depois). Pode vir depois de ajustes pequenos feitos sem nova ida ao setor, que o setor só vê de novo no E-protocolo. Uma por processo; a versão aprovada não tem arquivo substituído, e voltar para a etapa de aprovação ou antes dela a desfaz.
+O registro de que o setor aprovou a versão mais recente do processo, feito com o processo na etapa Aprovação pelo setor, com o número, o link e a data do E-protocolo quando houver (o número pode entrar depois). Registrar não move o processo. Pode vir depois de ajustes pequenos feitos sem nova ida ao setor, que o setor só vê de novo no E-protocolo. Vale uma por processo: mover o processo para trás não a desfaz, e uma aprovação registrada depois, da mesma versão ou de outra, toma o lugar da anterior, que fica no histórico. A versão aprovada não tem arquivo substituído.
 _Avoid_: homologação, validação final
 
 **E-protocolo**:
