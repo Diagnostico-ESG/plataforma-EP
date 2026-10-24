@@ -33,12 +33,14 @@ Spec: `.scratch/exportacao-e-manutencao/spec.md`, seção "Andamento livre (muda
 
 ## Critérios de aceite
 
-- [ ] Funções puras testadas no Vitest antes, com pacotes inventados:
+- [x] Funções puras testadas no Vitest antes, com pacotes inventados:
   - cada situação da fase: depois da fase, última etapa com Concluído e com A fazer, Concluídos, a VII com e sem data, Não iniciados e uma fase sem etapa;
   - a data de conclusão, inclusive o processo que volta e conclui de novo;
   - cada rótulo;
   - os suspensos e os cancelados fora;
   - a validação da fase vazia e da passagem aberta;
   - nenhum nome de pessoa nas linhas.
-- [ ] O cenário de exemplo e os testes antigos das planilhas estão ajustados.
+- [x] O cenário de exemplo e os testes antigos das planilhas estão ajustados.
 - [ ] O teste `44_pacote_das_planilhas` foi reescrito antes da migração e visto falhar (passagens, suspensos fora, sem nome de pessoa), e o workflow "Testes de banco" passa na branch.
+
+Concluído em 2026-10-24 (commit 4a0350f)

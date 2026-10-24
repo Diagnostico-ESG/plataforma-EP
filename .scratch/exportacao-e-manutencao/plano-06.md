@@ -76,7 +76,7 @@
 
 ### Tarefa 6: documentação e fechamento
 
-- [ ] `docs/manutencao/06-planilhas-e-dashboards.md`, linhas de "Situação de cada fase" e "Rótulo do processo": reescrever pela posição no catálogo (decisões 1 e 3); acrescentar a linha de backlog da decisão 6.
-- [ ] Rodar o workflow "Testes de banco" na branch (push da branch e disparo, autorizados na seção "Testes de banco no GitHub Actions" do `CLAUDE.md`) e ler o resultado; se falhar por causa do ticket, corrigir; se for a regressão conhecida das migrações do ticket 24 não aplicadas no remoto, registrar em `desvios.md`.
-- [ ] `desvios.md` da funcionalidade (entradas novas, datadas), `plano-06.md` com as caixas marcadas, linha `Concluído em` no ticket, `.scratch/proximo-passo.md`, `.scratch/melhorias-protocolo.md` (itens não testados do `/executar-complexo` que aconteceram). Commit e `git push origin quadro-livre-parte-1`.
-- [ ] **Não** juntar à `main` nem apagar a branch (passo 4 do comando não se aplica a ticket de branch de integração; ver ticket 24).
+- [x] `docs/manutencao/06-planilhas-e-dashboards.md`, linhas de "Situação de cada fase" e "Rótulo do processo": reescrever pela posição no catálogo (decisões 1 e 3); acrescentar a linha de backlog da decisão 6.
+- [ ] (PENDENTE: navegador do app sem login no GitHub; o usuário dispara) Rodar o workflow "Testes de banco" na branch (push da branch e disparo, autorizados na seção "Testes de banco no GitHub Actions" do `CLAUDE.md`) e ler o resultado; se falhar por causa do ticket, corrigir; se for a regressão conhecida das migrações do ticket 24 não aplicadas no remoto, registrar em `desvios.md`.
+- [x] `desvios.md` da funcionalidade (entradas novas, datadas), `plano-06.md` com as caixas marcadas, linha `Concluído em` no ticket, `.scratch/proximo-passo.md`, `.scratch/melhorias-protocolo.md` (itens não testados do `/executar-complexo` que aconteceram). Commit e `git push origin quadro-livre-parte-1`.
+- [x] **Não** juntar à `main` nem apagar a branch (passo 4 do comando não se aplica a ticket de branch de integração; ver ticket 24).
