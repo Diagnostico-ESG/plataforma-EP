@@ -1,16 +1,16 @@
 -- Pacote das planilhas (exportacao-e-manutencao, ticket 03; spec, "Modelo de dados" e "Quem pode o quê"; ADR 0018):
 -- a função que monta os dados enviados à Edge Function não é chamável pela tela; o pacote traz as etapas ativas com a
--- fase, os processos (inclusive o cancelado, que a montagem da função tira), as passagens e os identificadores das
--- planilhas, e nenhum nome nem e-mail de usuário. O núcleo do pedido (ticket 02) passa a enviar o pacote. Andamento
--- livre (processos-etapas 24): passagens no lugar dos andamentos e a data da publicação no lugar da escolha; o resto
--- do pacote novo (suspensos fora, validação) é do ticket 06 de exportacao-e-manutencao.
+-- fase (vazia nas duas fixas), os processos em andamento (o suspenso e o cancelado ficam de fora), as passagens e os
+-- identificadores das planilhas, e nenhum nome nem e-mail de usuário. O núcleo do pedido (ticket 02) passa a enviar o
+-- pacote. Andamento livre (ticket 06 de exportacao-e-manutencao): a etapa atual, a etiqueta e a data da publicação no
+-- lugar de `concluido` e da escolha de publicação; passagens no lugar dos andamentos.
 begin;
 create extension if not exists pgtap with schema extensions;
 -- As linhas do pgTAP vão para _tap e saem na exceção do fim (ver scripts/relatorio-tap.mjs).
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(36);
+insert into _tap (linha) select plan(37);
 
 -- Usuários inventados: a1 administrador, a2 integrante (será responsável de um processo, com nome conhecido).
 insert into public.autorizacoes (email, perfil) values
@@ -38,7 +38,7 @@ values ('5f000000-0000-0000-0000-000000000044', 'af000000-0000-0000-0000-0000000
 insert into public.processos (setor_id, macroprocesso_id, nome)
 select '5f000000-0000-0000-0000-000000000044', 'af000000-0000-0000-0000-000000000044', nome
 from unnest(array['T44 Cancelado', 'T44 Concluido', 'T44 Versoes', 'T44 Historica', 'T44 Sem Versao',
-  'T44 Nao Publicado', 'T44 Arquivado']) as nome;
+  'T44 Nao Publicado', 'T44 Arquivado', 'T44 Suspenso']) as nome;
 
 create function pg_temp.processo(nome_do_processo text) returns uuid
 language sql stable as $$
@@ -68,6 +68,7 @@ select public.mover_processo(pg_temp.processo('T44 Arquivado'), (select id from 
   date '2026-04-02');
 select public.arquivar_processo(pg_temp.processo('T44 Arquivado'));
 select public.cancelar_processo(pg_temp.processo('T44 Cancelado'), 'Motivo inventado');
+select public.suspender_processo(pg_temp.processo('T44 Suspenso'), 'Motivo inventado');
 select public.registrar_versao(pg_temp.processo('T44 Versoes'), 1, null, pg_temp.par());
 select public.registrar_versao(pg_temp.processo('T44 Versoes'), 2, null, pg_temp.par());
 select public.registrar_versao_historica(pg_temp.processo('T44 Historica'), 5, null,
@@ -112,11 +113,16 @@ insert into _tap (linha) select is((select array_agg(k order by k) from jsonb_ob
 insert into _tap (linha) select is((select e ->> 'fase' from jsonb_array_elements(pg_temp.pacote() -> 'etapas') e
   where e ->> 'codigo' = 'modelagem'), 'IV', 'a Modelagem piloto vai com a fase IV');
 
+insert into _tap (linha) select is((select jsonb_typeof(e -> 'fase') from jsonb_array_elements(pg_temp.pacote() -> 'etapas') e
+  where e ->> 'codigo' = 'nao_iniciados'), 'null', 'Não iniciados vai sem fase');
+insert into _tap (linha) select is((select jsonb_typeof(e -> 'fase') from jsonb_array_elements(pg_temp.pacote() -> 'etapas') e
+  where e ->> 'codigo' = 'concluidos'), 'null', 'Concluídos vai sem fase');
+
 -- Processos.
-insert into _tap (linha) select is(jsonb_typeof(pg_temp.do_processo('T44 Cancelado')), 'object',
-  'o cancelado entra no pacote (a montagem da função é que o tira)');
-insert into _tap (linha) select is(pg_temp.do_processo('T44 Cancelado') ->> 'situacao_guardada', 'cancelado',
-  'o cancelado vai com a situação guardada');
+insert into _tap (linha) select is(pg_temp.do_processo('T44 Cancelado'), null,
+  'o cancelado fica fora do pacote');
+insert into _tap (linha) select is(pg_temp.do_processo('T44 Suspenso'), null,
+  'o suspenso fica fora do pacote');
 insert into _tap (linha) select is(pg_temp.do_processo('T44 Normal') ->> 'situacao_guardada', 'em_andamento',
   'o processo comum vai em andamento');
 insert into _tap (linha) select is(pg_temp.do_processo('T44 Normal') ->> 'tipo', 'processo', 'o tipo do processo vai no pacote');
@@ -127,12 +133,8 @@ insert into _tap (linha) select is(pg_temp.do_processo('T44 Normal') ->> 'observ
   'as observações do processo vão no pacote');
 insert into _tap (linha) select is(pg_temp.do_processo('T44 Normal') ->> 'data_da_reuniao', '2026-03-10',
   'a data da reunião vai no pacote como AAAA-MM-DD');
-insert into _tap (linha) select is((pg_temp.do_processo('T44 Normal') ->> 'concluido')::boolean, false,
-  'o processo fora de Concluídos não está concluído');
-insert into _tap (linha) select is((pg_temp.do_processo('T44 Concluido') ->> 'concluido')::boolean, true,
-  'o processo em Concluídos está concluído');
 insert into _tap (linha) select is((select array_agg(k order by k) from jsonb_object_keys(pg_temp.do_processo('T44 Normal')) k),
-  array['concluido', 'data_da_reuniao', 'etapa_atual_id', 'etiqueta', 'id', 'macroprocesso_nome', 'nome', 'observacoes',
+  array['data_da_reuniao', 'etapa_atual_id', 'etiqueta', 'id', 'macroprocesso_nome', 'nome', 'observacoes',
     'publicado_em', 'setor_sigla', 'situacao_guardada', 'tipo', 'ultima_versao'], 'cada processo traz só os campos combinados');
 
 -- Publicação e etapa atual (Andamento livre): a data da publicação, a etapa e a etiqueta viajam como estão.
@@ -144,10 +146,12 @@ insert into _tap (linha) select results_eq(
   $sql$select pg_temp.do_processo('T44 Normal') ->> 'etapa_atual_id', pg_temp.do_processo('T44 Normal') ->> 'etiqueta'$sql$,
   $sql$select (select id::text from public.etapas where codigo = 'nao_iniciados'), 'a_fazer'$sql$,
   'a etapa atual e a etiqueta vão no pacote');
-insert into _tap (linha) select is((pg_temp.do_processo('T44 Nao Publicado') ->> 'concluido')::boolean, true,
-  'o concluído sem publicação está concluído');
-insert into _tap (linha) select is((pg_temp.do_processo('T44 Arquivado') ->> 'concluido')::boolean, true,
-  'o arquivado continua contado como concluído');
+insert into _tap (linha) select is(pg_temp.do_processo('T44 Concluido') ->> 'etapa_atual_id',
+  (select id::text from public.etapas where codigo = 'concluidos'), 'o concluído vai com a etapa atual Concluídos');
+insert into _tap (linha) select is(pg_temp.do_processo('T44 Nao Publicado') ->> 'etapa_atual_id',
+  (select id::text from public.etapas where codigo = 'concluidos'), 'o concluído sem publicação vai em Concluídos');
+insert into _tap (linha) select is(pg_temp.do_processo('T44 Arquivado') ->> 'etapa_atual_id',
+  (select id::text from public.etapas where codigo = 'concluidos'), 'o arquivado continua no pacote, em Concluídos');
 
 -- Última versão não histórica.
 insert into _tap (linha) select is((pg_temp.do_processo('T44 Versoes') ->> 'ultima_versao')::int, 2,
