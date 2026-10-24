@@ -103,14 +103,14 @@ insert into _tap (linha) select throws_ok(
 reset role;
 
 -- Regras da sigla e do nome (valem para qualquer um, inclusive o dono do banco).
-insert into public.setores (nome, sigla) values ('Coordenação Inventada', ' cee ');
-insert into _tap (linha) select is((select sigla from public.setores where nome = 'Coordenação Inventada'), 'CEE',
-  'sigla " cee " é guardada como "CEE"');
+insert into public.setores (nome, sigla) values ('Coordenação Inventada', ' zqx ');
+insert into _tap (linha) select is((select sigla from public.setores where nome = 'Coordenação Inventada'), 'ZQX',
+  'sigla " zqx " é guardada como "ZQX"');
 insert into _tap (linha) select throws_ok(
   $sql$insert into public.setores (nome, sigla) values ('Setor Um', 'C E')$sql$, '23514', null,
   'sigla com espaço é recusada');
 insert into _tap (linha) select throws_ok(
-  $sql$insert into public.setores (nome, sigla) values ('Setor Dois', 'CEE_PR')$sql$, '23514', null,
+  $sql$insert into public.setores (nome, sigla) values ('Setor Dois', 'ZQX_PR')$sql$, '23514', null,
   'sigla com sublinhado é recusada');
 insert into _tap (linha) select throws_ok(
   $sql$insert into public.setores (nome, sigla) values ('Setor Três', 'CÊE')$sql$, '23514', null,
@@ -122,7 +122,7 @@ insert into _tap (linha) select throws_ok(
   format('insert into public.setores (nome, sigla) values (%L, %L)', 'Setor Cinco', repeat('A', 16)), '23514', null,
   'sigla de 16 caracteres é recusada');
 insert into _tap (linha) select throws_ok(
-  $sql$insert into public.setores (nome, sigla) values ('Setor Seis', 'cee')$sql$, '23505', null,
+  $sql$insert into public.setores (nome, sigla) values ('Setor Seis', 'zqx')$sql$, '23505', null,
   'sigla repetida, mesmo em minúsculas, é recusada');
 insert into public.setores (nome, sigla) values ('Assessoria Jurídica', 'AJ');
 insert into _tap (linha) select throws_ok(
