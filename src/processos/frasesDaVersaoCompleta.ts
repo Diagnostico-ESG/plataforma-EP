@@ -4,7 +4,7 @@ import type { PapelDoArquivo } from '../versoes/tipos'
 const EXIGIDOS: PapelDoArquivo[] = ['bpm', 'png', 'relatorio']
 const ROTULO: Record<string, string> = { bpm: '.bpm', png: '.png', relatorio: 'relatório' }
 
-export const FRASE_SEM_VERSAO = 'O processo ainda não tem versão enviada.'
+export const FRASE_SEM_VERSAO = 'O processo ainda não tem versão.'
 
 export function faltasDaVersao(papeis: PapelDoArquivo[]): PapelDoArquivo[] {
   return EXIGIDOS.filter((papel) => !papeis.includes(papel))

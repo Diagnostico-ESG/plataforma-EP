@@ -64,7 +64,7 @@ test('a revisão corrigida abre com o escopo e o comentário gravados; salvar ma
   fireEvent.change(janela.getByLabelText('Comentário (opcional)'), { target: { value: '  Só o relatório  ' } })
   salvar(janela)
   await waitFor(() => expect(aoFechar).toHaveBeenCalled())
-  expect(revisoes.edicoesDaRevisao).toEqual([['r1', { escopo: 'relatorio', comentario: 'Só o relatório' }]])
+  expect(revisoes.edicoesDaRevisao).toEqual([['r1', { resultado: 'corrigida', escopo: 'relatorio', comentario: 'Só o relatório' }]])
   expect(aoGravar).toHaveBeenCalled()
 })
 
@@ -74,7 +74,7 @@ test('a revisão sem alteração não tem escopo, e o comentário só com espaç
   fireEvent.change(janela.getByLabelText('Comentário (opcional)'), { target: { value: '   ' } })
   salvar(janela)
   await waitFor(() => expect(aoFechar).toHaveBeenCalled())
-  expect(revisoes.edicoesDaRevisao).toEqual([['r2', { escopo: null, comentario: null }]])
+  expect(revisoes.edicoesDaRevisao).toEqual([['r2', { resultado: 'sem_alteracao', escopo: null, comentario: null }]])
 })
 
 test('a aprovação abre com o link e a data gravados e o número vazio; salvar acrescenta o número', async () => {
@@ -136,4 +136,18 @@ test('Cancelar e Esc fecham sem gravar', () => {
   fireEvent(screen.getByRole('dialog'), new Event('close'))
   expect(aoFechar).toHaveBeenCalledTimes(2)
   expect(revisoes.edicoesDaRevisao).toEqual([])
+})
+
+test('na revisão da passagem aberta o resultado se troca; "corrigida" sem versão na passagem fica desabilitada', async () => {
+  const revisoes = new RevisoesQueGravam()
+  const ultima = { numero: 8, autorId: 'u1', autorNome: 'Ana', papeis: [], anterior: { numero: 7, autorId: 'u3' }, enviadaNestaPassagem: false }
+  render(<JanelaDaRevisao revisao={{ ...SEM_ALTERACAO, daPassagemAberta: true }} ultimaVersao={ultima} revisoes={revisoes} aoGravar={vi.fn()} aoFechar={vi.fn()} />)
+  const janela = within(screen.getByRole('dialog', { name: 'Editar a revisão da V7' }))
+  expect((janela.getByRole('radio', { name: /^Corrigida/ }) as HTMLInputElement).disabled).toBe(true)
+  expect((janela.getByRole('radio', { name: /^Sem alteração/ }) as HTMLInputElement).checked).toBe(true)
+})
+
+test('na revisão de uma passagem que passou o resultado não se troca', () => {
+  abrirARevisao(CORRIGIDA)
+  expect(screen.queryByRole('radio', { name: /^Sem alteração/ })).toBeNull()
 })

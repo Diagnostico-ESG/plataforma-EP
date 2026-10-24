@@ -105,6 +105,8 @@ export type UltimaVersao = {
   numero: number; autorId: string; autorNome: string; papeis: PapelDoArquivo[]
   /** A não histórica de número imediatamente menor (a que a Revisão interna "corrigida" corrige); ausente sem anterior. */
   anterior?: { numero: number; autorId: string }
+  /** Verdadeiro quando esta versão foi enviada com o processo na Revisão interna, depois de ele entrar na passagem atual (a "corrigida" só vale então). */
+  enviadaNestaPassagem?: boolean
 }
 
 /** Uma estadia do processo numa etapa (AAAA-MM-DD, dia de Brasília); `saiuEm` é null na passagem aberta. */

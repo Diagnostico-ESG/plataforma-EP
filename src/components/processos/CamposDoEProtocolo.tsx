@@ -6,7 +6,7 @@ type CamposDoEProtocoloProps = { valor: RascunhoDaAprovacao; aoMudar: (valor: Ra
 
 /**
  * O número, o link e a data do E-protocolo, os três opcionais (a data nunca passa de hoje; o banco confere as regras): a
- * janela de concluir a Aprovação e a de editar a aprovação os usam.
+ * janela de registrar a aprovação e a de editar a aprovação os usam.
  */
 export function CamposDoEProtocolo({ valor, aoMudar }: CamposDoEProtocoloProps) {
   const idDoNumero = useId()

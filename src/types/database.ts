@@ -582,6 +582,7 @@ export type Database = {
           registrada_em: string
           resultado: Database["public"]["Enums"]["resultado_da_revisao"]
           revisada_em: string
+          passagem_id: string | null
           revisor_id: string
           versao_corrigida_id: string | null
           versao_revisada_id: string
@@ -591,6 +592,7 @@ export type Database = {
           escopo?: Database["public"]["Enums"]["escopo_da_correcao"] | null
           id?: string
           processo_id: string
+          passagem_id?: string | null
           registrada_em?: string
           resultado: Database["public"]["Enums"]["resultado_da_revisao"]
           revisada_em: string
@@ -609,6 +611,7 @@ export type Database = {
           revisor_id?: string
           versao_corrigida_id?: string | null
           versao_revisada_id?: string
+          passagem_id?: string | null
         }
         Relationships: [
           {
@@ -1013,6 +1016,10 @@ export type Database = {
           p_motivo: string
           p_tentativa: string
         }
+        Returns: undefined
+      }
+      registrar_aprovacao: {
+        Args: { p_data: string; p_link: string; p_numero: string; p_processo: string }
         Returns: undefined
       }
       registrar_sem_alteracao: {

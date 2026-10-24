@@ -1,13 +1,13 @@
 import { expect, test } from 'vitest'
-import { fraseDaVersaoSemRevisao, fraseDoProcessoComRevisoes, fraseDoRevisorQueEAutor, rotuloDoResultado } from './frasesDeRevisao'
+import {
+  FRASE_DA_CORRIGIDA_SEM_VERSAO_NA_PASSAGEM, FRASE_DA_REVISAO_FORA_DA_ETAPA, FRASE_DA_REVISAO_JA_REGISTRADA,
+  fraseDoProcessoComRevisoes, rotuloDoResultado,
+} from './frasesDeRevisao'
 
-test('a frase do autor cita a versão', () => {
-  expect(fraseDoRevisorQueEAutor(7)).toBe('Quem enviou a versão V7 não pode revisá-la.')
-  expect(fraseDoRevisorQueEAutor('2')).toBe('Quem enviou a versão V2 não pode revisá-la.')
-})
-
-test('a frase da versão sem revisão manda concluir pela janela', () => {
-  expect(fraseDaVersaoSemRevisao(8)).toBe('A V8 ainda não tem revisão registrada. Conclua a Revisão interna pela janela de concluir.')
+test('as recusas de registrar a revisão dizem onde o processo precisa estar e o que fazer', () => {
+  expect(FRASE_DA_REVISAO_FORA_DA_ETAPA).toBe('Registre a revisão com o processo na Revisão interna.')
+  expect(FRASE_DA_REVISAO_JA_REGISTRADA).toBe('Já há uma revisão registrada nesta passagem pela Revisão interna; edite-a.')
+  expect(FRASE_DA_CORRIGIDA_SEM_VERSAO_NA_PASSAGEM).toBe("Para 'corrigida', envie a versão corrigida com o processo na Revisão interna.")
 })
 
 test('a exclusão diz quantas revisões o processo tem', () => {

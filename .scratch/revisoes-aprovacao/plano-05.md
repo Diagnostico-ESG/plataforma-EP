@@ -29,46 +29,46 @@
 
 **Arquivos:** `supabase/tests/39_revisao_interna.test.sql`, `40_aprovacao.test.sql`, `41_editar_registros.test.sql` (reescritos; o 38 já está certo).
 
-- [ ] 39: revisão pelo gatilho com `passagem_id`; segunda na mesma passagem recusada e nova depois de sair e voltar aceita; "corrigida" sem versão na passagem recusada e com ela aceita (versões certas); processo sem versão, fora da etapa, suspenso, cancelado, concluído e arquivado recusados; o autor aceito (revisando a própria versão); nada se apaga; perfis (administrador, integrante, consulta, inativo, visitante); mover não mexe na revisão.
-- [ ] 40: `registrar_aprovacao` na Aprovação pelo setor; sem versão e fora da etapa recusados; segunda chamada troca a versão e os campos e gera o evento `substituir` com o antes; versão incompleta aceita; data de ontem antes da revisão aceita, amanhã e `ftp://` recusados; mover da Aprovação à Revisão interna mantém a aprovação; apagar recusado a todos; versão aprovada sem arquivo substituído; perfis; estrutura.
-- [ ] 41: edição da revisão (comentário, escopo, resultado com versões recalculadas) em andamento e concluído aceita, em suspenso, cancelado e arquivado recusada; edição da aprovação idem; as colunas fixas (revisor, data, versão revisada, passagem) sem privilégio; as três colunas da função recusadas fora dela; eventos de edição.
-- [ ] Rodar no Docker local: os três falham (a migração não existe).
+- [x] 39: revisão pelo gatilho com `passagem_id`; segunda na mesma passagem recusada e nova depois de sair e voltar aceita; "corrigida" sem versão na passagem recusada e com ela aceita (versões certas); processo sem versão, fora da etapa, suspenso, cancelado, concluído e arquivado recusados; o autor aceito (revisando a própria versão); nada se apaga; perfis (administrador, integrante, consulta, inativo, visitante); mover não mexe na revisão.
+- [x] 40: `registrar_aprovacao` na Aprovação pelo setor; sem versão e fora da etapa recusados; segunda chamada troca a versão e os campos e gera o evento `substituir` com o antes; versão incompleta aceita; data de ontem antes da revisão aceita, amanhã e `ftp://` recusados; mover da Aprovação à Revisão interna mantém a aprovação; apagar recusado a todos; versão aprovada sem arquivo substituído; perfis; estrutura.
+- [x] 41: edição da revisão (comentário, escopo, resultado com versões recalculadas) em andamento e concluído aceita, em suspenso, cancelado e arquivado recusada; edição da aprovação idem; as colunas fixas (revisor, data, versão revisada, passagem) sem privilégio; as três colunas da função recusadas fora dela; eventos de edição.
+- [x] Rodar no Docker local: os três falham (a migração não existe).
 
 ### Tarefa 2: migração
 
 **Arquivo:** `supabase/migrations/<data>_registrar_revisao_e_aprovacao.sql` (+ `supabase/AMBIENTES.md`).
 
-- [ ] Revisão: `passagem_id`, índice único, privilégio de `update (resultado, escopo, comentario)`, gatilhos de inclusão e de edição novos, funções que saem (`preparar_sem_alteracao`, `preparar_corrigida`, `autor_da_versao`, `id_da_versao_anterior` se nada mais as usar), evento da edição com o resultado e as versões de antes.
-- [ ] Aprovação: sem apagar (privilégio, política, gatilhos e função do evento "desfazer"), `update` das colunas da função, marca, gatilhos de inclusão e de edição novos, `conferir_data_da_aprovacao(date)`, `registrar_aprovacao`, evento `substituir`.
-- [ ] Rodar o Docker local até 0 `not ok` (as 54 baterias): `db reset` só se preciso; conferir os testes 44, 46 e 51 a 54 ao fim.
+- [x] Revisão: `passagem_id`, índice único, privilégio de `update (resultado, escopo, comentario)`, gatilhos de inclusão e de edição novos, funções que saem (`preparar_sem_alteracao`, `preparar_corrigida`, `autor_da_versao`, `id_da_versao_anterior` se nada mais as usar), evento da edição com o resultado e as versões de antes.
+- [x] Aprovação: sem apagar (privilégio, política, gatilhos e função do evento "desfazer"), `update` das colunas da função, marca, gatilhos de inclusão e de edição novos, `conferir_data_da_aprovacao(date)`, `registrar_aprovacao`, evento `substituir`.
+- [x] Rodar o Docker local até 0 `not ok` (as 54 baterias): `db reset` só se preciso; conferir os testes 44, 46 e 51 a 54 ao fim.
 
 ### Tarefa 3: tipos do banco
 
-- [ ] `npx supabase gen types --local` para `src/types/database.ts` (via `scripts/gerar-tipos.mjs`, se aceitar `--local`; senão o comando direto). Conferir o diff: só `passagem_id` e `registrar_aprovacao`.
+- [x] `npx supabase gen types --local` para `src/types/database.ts` (via `scripts/gerar-tipos.mjs`, se aceitar `--local`; senão o comando direto). Conferir o diff: só `passagem_id` e `registrar_aprovacao`.
 
 ### Tarefa 4: módulo de revisões, frases e recusas (testes primeiro)
 
 **Arquivos:** `src/revisoes/tipos.ts`, `frasesDeRevisao.ts`, `frasesDeAprovacao.ts`, `revisoesSupabase.ts`, `RevisoesFalso.ts`, `conferirAprovacao.ts`, `eventoDaRevisao.ts`, `eventoDaAprovacao.ts`, `src/processos/recusasDoBanco.ts`, `gravarAcoes.ts` e os testes (`revisoesSupabase.test.ts`, `RevisoesFalso*.test.ts`, `frasesDe*.test.ts`).
 
-- [ ] Testes que falham: `registrarRevisao` (insert em `revisoes_internas`) e `registrarAprovacao` (rpc `registrar_aprovacao`) no módulo real com o cliente simulado; `editarRevisao` levando o resultado; a leitura com `daPassagemAberta`; cada frase nova; a falsa recusando como o banco (fora da etapa, sem versão, segunda na passagem, "corrigida" sem versão da passagem, aprovação substituindo com o evento).
-- [ ] Implementar; `npm test -- src/revisoes src/processos/recusasDoBanco` verde.
+- [x] Testes que falham: `registrarRevisao` (insert em `revisoes_internas`) e `registrarAprovacao` (rpc `registrar_aprovacao`) no módulo real com o cliente simulado; `editarRevisao` levando o resultado; a leitura com `daPassagemAberta`; cada frase nova; a falsa recusando como o banco (fora da etapa, sem versão, segunda na passagem, "corrigida" sem versão da passagem, aprovação substituindo com o evento).
+- [x] Implementar; `npm test -- src/revisoes src/processos/recusasDoBanco` verde.
 
 ### Tarefa 5: funções puras e leitura do processo (testes primeiro)
 
 **Arquivos:** `src/revisoes/opcoesDaRevisao.ts` (novo), `rascunhoDaRevisao.ts`, `src/processos/tipos.ts`, `lerProcessoSupabase.ts`, `agoraDoProcesso.ts` e os testes.
 
-- [ ] Testes que falham: opções de resultado com a versão da passagem (V7 "sem alteração"; V8 corrige V7; desabilitada com o motivo), aviso do autor por opção, aviso da aprovação que toma o lugar da anterior, resumo do registro da passagem; `lerUltimaVersao` com `enviadaNestaPassagem`.
-- [ ] Implementar; verde.
+- [x] Testes que falham: opções de resultado com a versão da passagem (V7 "sem alteração"; V8 corrige V7; desabilitada com o motivo), aviso do autor por opção, aviso da aprovação que toma o lugar da anterior, resumo do registro da passagem; `lerUltimaVersao` com `enviadaNestaPassagem`.
+- [x] Implementar; verde.
 
 ### Tarefa 6: tela
 
 **Arquivos:** `AgoraDoProcesso.tsx`/`CorpoDoAgora.tsx` (+ `RegistrosDoAgora.tsx` novo), `JanelaDeRegistroDaRevisao.tsx` e `JanelaDeRegistroDaAprovacao.tsx` (novos), `JanelaDaRevisao.tsx` (edição com resultado), `RevisoesDaEtapa.tsx`, `AprovacaoDaEtapa.tsx`, `CamposDaRevisao.tsx`, `CaminhoDoProcesso.tsx`, `SecaoDeVersoes.tsx`, `VersoDoCartao.tsx`, `historicoDosCadastros.ts`, `Agora.css`, e os testes de tela.
 
-- [ ] Testes de tela que falham (aplicativo inteiro): `src/App.registrarRevisao.test.tsx`, `src/App.registrarAprovacao.test.tsx`; ajustes em `App.editarRegistros.test.tsx`, `App.aprovacaoNaGaveta.test.tsx`, `JanelasDeEdicao.test.tsx`, `historicoDasRevisoes.test.ts`.
-- [ ] Implementar; `npm test` inteiro, `npm run typecheck`, `npm run lint` e `npm run check:circular` verdes.
+- [x] Testes de tela que falham (aplicativo inteiro): `src/App.registrarRevisao.test.tsx`, `src/App.registrarAprovacao.test.tsx`; ajustes em `App.editarRegistros.test.tsx`, `App.aprovacaoNaGaveta.test.tsx`, `JanelasDeEdicao.test.tsx`, `historicoDasRevisoes.test.ts`.
+- [x] Implementar; `npm test` inteiro, `npm run typecheck`, `npm run lint` e `npm run check:circular` verdes.
 
 ### Tarefa 7: fecho
 
-- [ ] Docs: `desvios.md` (decisões 1 a 3), spec (decisões a confirmar), ticket (`Concluído em`), `.scratch/proximo-passo.md`, `.claude/regras/nao-testados.md` → `.scratch/melhorias-protocolo.md`.
-- [ ] Commits por assunto (o pre-commit roda a bateria), `git push origin quadro-livre-parte-1`.
-- [ ] Juntar à `main`? **Não**: a branch de integração segue aberta (ticket 04 de publicacao-e-arquivamento). O passo 4 do comando fica registrado como não aplicável.
+- [x] Docs: `desvios.md` (decisões 1 a 3), spec (decisões a confirmar), ticket (`Concluído em`), `.scratch/proximo-passo.md`, `.claude/regras/nao-testados.md` → `.scratch/melhorias-protocolo.md`.
+- [x] Commits por assunto (o pre-commit roda a bateria), `git push origin quadro-livre-parte-1`.
+- [x] Juntar à `main`? **Não**: a branch de integração segue aberta (ticket 04 de publicacao-e-arquivamento). O passo 4 do comando fica registrado como não aplicável.

@@ -1,5 +1,6 @@
 import { useId } from 'react'
 import type { MovimentoDoProcessoEmUso } from '../../hooks/useMovimentoDoProcesso'
+import type { RegistrosDoProcesso } from '../../hooks/useRegistrosDoProcesso'
 import type { Executar } from '../../hooks/useGravacaoComFalha'
 import { avisoDoRevisor, opcoesDeResponsavel, podeAssumir } from '../../processos/agoraDoProcesso'
 import { CODIGO_CONCLUIDOS } from '../../processos/codigosDasEtapas'
@@ -7,9 +8,11 @@ import { diasDoProcessoNaEtapa } from '../../processos/diasNaEtapa'
 import { ETIQUETAS, ROTULO_DA_ETIQUETA } from '../../processos/rotulos'
 import { hojeLocal } from '../../processos/textoDaReuniao'
 import type { EtiquetaDaEtapa, ModuloDeProcessos, ProcessoLido, UsuarioResponsavel } from '../../processos/tipos'
+import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import { Avatar } from '../Avatar'
 import { AcoesDoConcluido } from './AgoraDoConcluido'
 import { DiasNaEtapa } from './DiasNaEtapa'
+import { RegistrosDoAgora } from './RegistrosDoAgora'
 import { TrocaDoResponsavel } from './TrocaDoResponsavel'
 
 type CorpoDoAgoraProps = {
@@ -19,6 +22,8 @@ type CorpoDoAgoraProps = {
   /** Quem está na tela. */
   usuarioId: string
   movimento: MovimentoDoProcessoEmUso
+  revisoes: ModuloDeRevisoes
+  registros: RegistrosDoProcesso
   executar: Executar
   aoMudar: () => void
   rotulo: string
@@ -36,6 +41,7 @@ export function CorpoDoAgora(props: CorpoDoAgoraProps) {
       <p className="agora-rotulo">{rotulo}</p>
       <ListasDoAgora processo={processo} movimento={movimento} />
       <ResponsavelDoAgora {...props} />
+      <RegistrosDoAgora processo={processo} revisoes={props.revisoes} registros={props.registros} usuarioId={props.usuarioId} podeAlterar />
       {aviso && <p className="agora-aviso" role="status">{aviso}</p>}
       {movimento.aviso && <p className="agora-aviso" role="status">{movimento.aviso}</p>}
       {processo.etapaAtual?.codigo === CODIGO_CONCLUIDOS && <AcoesDoConcluido {...props} />}

@@ -14,14 +14,20 @@ import { ListaDeVersoes } from './ListaDeVersoes'
 import { VersaoEmDestaque } from './VersaoEmDestaque'
 import './Versoes.css'
 
-type SecaoDeVersoesProps = { versoes: ModuloDeVersoes; processo: ProcessoLido; podeAlterar: boolean }
+type SecaoDeVersoesProps = {
+  versoes: ModuloDeVersoes
+  processo: ProcessoLido
+  podeAlterar: boolean
+  /** Avisa o verso quando as versões mudam (envio, relatório, substituição): o processo é lido de novo, para a última versão e a da passagem. */
+  aoAlterarVersoes?: () => void
+}
 
 /**
  * Seção "Arquivos" do verso (as versões do processo e do subprocesso): a mais recente em destaque e as anteriores
  * recolhidas. Enviar, registrar histórica e acrescentar relatório só para Administrador e Integrante com o processo em
  * andamento; esconder o botão é conveniência, quem recusa é a função do servidor e o banco.
  */
-export function SecaoDeVersoes({ versoes, processo, podeAlterar }: SecaoDeVersoesProps) {
+export function SecaoDeVersoes({ versoes, processo, podeAlterar, aoAlterarVersoes }: SecaoDeVersoesProps) {
   // Lê de novo quando o processo muda de etapa: registrar a aprovação põe o selo "Aprovada" na versão.
   const etapaAtual = processo.etapaAtual?.id
   // eslint-disable-next-line react-hooks/exhaustive-deps -- a etapa atual não é usada dentro: só faz a leitura se refazer quando ela muda
@@ -32,7 +38,11 @@ export function SecaoDeVersoes({ versoes, processo, podeAlterar }: SecaoDeVersoe
   return (
     <section className="painel-estrutura secao-de-versoes" aria-labelledby={idDoTitulo}>
       {estado.tipo === 'pronto'
-        ? <VersoesProntas versoes={versoes} processo={processo} lidas={estado.valor} podeEnviar={podeEnviar} aoAlterada={recarregar}
+        ? <VersoesProntas versoes={versoes} processo={processo} lidas={estado.valor} podeEnviar={podeEnviar}
+            aoAlterada={() => {
+              recarregar()
+              aoAlterarVersoes?.()
+            }}
             idDoTitulo={idDoTitulo} />
         : <TituloDosArquivos id={idDoTitulo} />}
       {estado.tipo === 'carregando' && <p className="cadastros-vazio" role="status">Carregando…</p>}

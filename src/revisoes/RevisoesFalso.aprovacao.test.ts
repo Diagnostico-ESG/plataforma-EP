@@ -71,16 +71,6 @@ describe('editarAprovacao', () => {
     expect(falha.message).toBe(frase)
   })
 
-  test('recusa a data antes da última revisão interna', async () => {
-    const { revisoes } = await aprovada()
-    revisoes.revisoes.p1 = [{
-      id: 'r1', versaoRevisada: 8, versaoCorrigida: null, resultado: 'sem_alteracao', escopo: null, comentario: null,
-      revisor: 'Ana Teste', revisadaEm: '2026-10-13',
-    }]
-    const falha = await falhaDe(revisoes.editarAprovacao(ID, { numeroEprotocolo: null, link: null, aprovadaEm: '2026-10-12' }))
-    expect(falha.message).toBe('A data da aprovação (12/10/2026) não pode ser antes da última revisão interna (13/10/2026).')
-  })
-
   test('aprovação que não existe (desfeita por uma volta) é cadastro inexistente', async () => {
     const { revisoes } = montar()
     expect(await falhaDe(revisoes.editarAprovacao(ID, SEM_NADA))).toBeInstanceOf(CadastroInexistente)

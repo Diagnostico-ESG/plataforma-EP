@@ -149,7 +149,7 @@ test('o processo traz a versão mais recente não histórica, com o autor e os p
     data: [{ numero: 3, enviada_por: 'u1', autor: { nome: 'Ana Teste' }, arquivos: [{ papel: 'bpmn' }, { papel: 'png' }] }], error: null,
   }
   const lido = await criar(cliente).lerProcesso('p1')
-  expect(lido?.ultimaVersao).toEqual({ numero: 3, autorId: 'u1', autorNome: 'Ana Teste', papeis: ['bpmn', 'png'] })
+  expect(lido?.ultimaVersao).toEqual({ numero: 3, autorId: 'u1', autorNome: 'Ana Teste', papeis: ['bpmn', 'png'], enviadaNestaPassagem: false })
   expect(cliente.pedidos.find((pedido) => pedido.tabela === 'versoes')).toMatchObject({
     filtros: [['processo_id', 'p1'], ['historica', false]], ordem: [['numero', false]], limite: 2,
   })
@@ -168,7 +168,24 @@ test('com duas versões, a anterior (número e autor) vem junto, para a revisão
   const lido = await criar(cliente).lerProcesso('p1')
   expect(lido?.ultimaVersao).toEqual({
     numero: 8, autorId: 'u1', autorNome: 'Ana Teste', papeis: ['bpmn'], anterior: { numero: 7, autorId: 'u2' },
+    enviadaNestaPassagem: false,
   })
+})
+
+// A "corrigida" só vale para a versão enviada pela Revisão interna depois da entrada na passagem aberta.
+test.each([
+  ['enviada pela Revisão interna depois da entrada', 'revisao_interna', '2026-10-20T15:00:00Z', true],
+  ['enviada antes da entrada na passagem', 'revisao_interna', '2026-10-20T09:00:00Z', false],
+  ['enviada por outra etapa', 'modelagem', '2026-10-20T15:00:00Z', false],
+])('a última versão %s: enviadaNestaPassagem', async (_nome, etapa, enviadaEm, esperado) => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
+  cliente.respostas['versoes.select'] = {
+    data: [{ numero: 8, enviada_por: 'u1', enviada_em: enviadaEm, autor: { nome: 'Ana Teste' }, etapa: { codigo: etapa }, arquivos: [] }],
+    error: null,
+  }
+  cliente.respostas['passagens.select'] = { data: [{ entrou_em: '2026-10-20T12:00:00Z' }], error: null }
+  expect((await criar(cliente).lerProcesso('p1'))?.ultimaVersao?.enviadaNestaPassagem).toBe(esperado)
 })
 
 test('sem versão não histórica, o processo não tem última versão', async () => {

@@ -42,10 +42,10 @@ const TEXTO_DA_ACAO_DA_VERSAO: Record<string, string> = {
   substituir: 'Substituiu o arquivo da versão',
 }
 
-const TEXTO_DA_ACAO_DA_REVISAO: Record<string, string> = { registrar: 'Registrou a revisão interna', editar: 'Editou a revisão interna' }
+const TEXTO_DA_ACAO_DA_REVISAO: Record<string, string> = { registrar: 'Registrou a revisão', editar: 'Editou a revisão' }
 
 const TEXTO_DA_ACAO_DA_APROVACAO: Record<string, string> = {
-  registrar: 'Registrou a aprovação', desfazer: 'Desfez a aprovação', editar: 'Editou a aprovação',
+  registrar: 'Registrou a aprovação', substituir: 'Substituiu a aprovação', desfazer: 'Desfez a aprovação', editar: 'Editou a aprovação',
 }
 
 const TEXTOS_DA_ENTIDADE: Record<string, Record<string, string>> = {

@@ -2,6 +2,7 @@ import { type EventoDoBanco, eventoDoCadastro } from '../cadastros/historicoSupa
 import { diaDeBrasilia } from '../lib/datas'
 import type { ClienteSupabase } from '../lib/supabase'
 import type { PapelDoArquivo } from '../versoes/tipos'
+import { CODIGO_DA_REVISAO_INTERNA } from './codigosDasEtapas'
 import { type LinhaDoProcesso, processoDaLinha } from './processoDaLinha'
 import type { EtapaDoVerso, ItemDaEstrutura, ModuloDeProcessos, ProcessoLido, SituacaoDoProcesso, UltimaVersao } from './tipos'
 
@@ -27,13 +28,16 @@ async function lerProcesso(cliente: ClienteSupabase, id: string): Promise<Proces
 }
 
 type LinhaDaUltimaVersao = {
-  numero: number; enviada_por: string; autor: { nome: string } | null; arquivos: { papel: PapelDoArquivo }[]
+  numero: number; enviada_por: string; enviada_em: string; autor: { nome: string } | null; etapa: { codigo: string } | null
+  arquivos: { papel: PapelDoArquivo }[]
 }
 
 // A versão não histórica de maior número e a anterior a ela: o aviso do revisor compara o responsável com quem enviou a
-// mais recente, e a revisão "corrigida" corrige a anterior.
+// mais recente, e a revisão "corrigida" liga a mais recente à anterior quando ela foi enviada pela Revisão interna depois
+// de o processo entrar na passagem atual.
 async function lerUltimaVersao(cliente: ClienteSupabase, id: string): Promise<UltimaVersao | null> {
-  const { data, error } = await cliente.from('versoes').select('numero, enviada_por, autor:usuarios(nome), arquivos:arquivos_da_versao(papel)')
+  const { data, error } = await cliente.from('versoes')
+    .select('numero, enviada_por, enviada_em, autor:usuarios(nome), etapa:etapas(codigo), arquivos:arquivos_da_versao(papel)')
     .eq('processo_id', id).eq('historica', false).order('numero', { ascending: false }).limit(2)
   if (error) throw new Error(`Falha ao ler a versão mais recente do processo: ${error.message}`)
   const [ultima, anterior] = data as unknown as LinhaDaUltimaVersao[]
@@ -42,7 +46,17 @@ async function lerUltimaVersao(cliente: ClienteSupabase, id: string): Promise<Ul
     numero: ultima.numero, autorId: ultima.enviada_por, autorNome: ultima.autor?.nome ?? '',
     papeis: ultima.arquivos.map((arquivo) => arquivo.papel),
     ...(anterior && { anterior: { numero: anterior.numero, autorId: anterior.enviada_por } }),
+    enviadaNestaPassagem: await enviadaNestaPassagem(cliente, id, ultima),
   }
+}
+
+// Enviada pela Revisão interna depois da entrada na passagem aberta (que tem de ser a da Revisão interna).
+async function enviadaNestaPassagem(cliente: ClienteSupabase, id: string, versao: LinhaDaUltimaVersao): Promise<boolean> {
+  if (versao.etapa?.codigo !== CODIGO_DA_REVISAO_INTERNA) return false
+  const { data, error } = await cliente.from('passagens').select('entrou_em').eq('processo_id', id).is('saiu_em', null)
+  if (error) throw new Error(`Falha ao ler a passagem aberta do processo: ${error.message}`)
+  const [aberta] = data as unknown as { entrou_em: string }[]
+  return Boolean(aberta) && Date.parse(versao.enviada_em) >= Date.parse(aberta.entrou_em)
 }
 
 type LinhaDaEstrutura = Pick<LinhaDoProcesso, 'id' | 'nome' | 'processo_pai_id' | 'situacao' | 'etapa_atual_nome'>

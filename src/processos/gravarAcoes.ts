@@ -1,7 +1,7 @@
 import { textoDaFalha } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { FRASE_DO_REGISTRO_QUE_SUMIU } from '../revisoes/frasesDeRevisao'
-import type { DadosDaAprovacao, DadosDaEdicaoDaRevisao, ModuloDeRevisoes } from '../revisoes/tipos'
+import type { DadosDaAprovacao, DadosDaEdicaoDaRevisao, DadosDaRevisao, ModuloDeRevisoes } from '../revisoes/tipos'
 
 // A edição espera a gravação. O registro que sumiu (a aprovação desfeita por outra pessoa) não é "o processo sumiu": a
 // janela diz que o registro não existe mais, em vez de esconder o processo inteiro.
@@ -14,7 +14,21 @@ async function esperarAEdicao(gravar: () => Promise<void>): Promise<string | nul
   return null
 }
 
-/** A edição do escopo e do comentário de uma revisão; a janela espera: a frase da falha ou null quando gravou. */
+/** Registrar a revisão da passagem; a janela espera: a frase da falha ou null quando gravou. */
+export function gravarRevisao(
+  revisoes: Pick<ModuloDeRevisoes, 'registrarRevisao'>, processoId: string, dados: DadosDaRevisao,
+): Promise<string | null> {
+  return esperarAEdicao(() => revisoes.registrarRevisao(processoId, dados))
+}
+
+/** Registrar a aprovação (ela toma o lugar da anterior); a janela espera: a frase da falha ou null quando gravou. */
+export function gravarAprovacao(
+  revisoes: Pick<ModuloDeRevisoes, 'registrarAprovacao'>, processoId: string, dados: DadosDaAprovacao,
+): Promise<string | null> {
+  return esperarAEdicao(() => revisoes.registrarAprovacao(processoId, dados))
+}
+
+/** A edição do resultado, do escopo e do comentário de uma revisão; a janela espera: a frase da falha ou null quando gravou. */
 export function gravarEdicaoDaRevisao(
   revisoes: Pick<ModuloDeRevisoes, 'editarRevisao'>, id: string, dados: DadosDaEdicaoDaRevisao,
 ): Promise<string | null> {

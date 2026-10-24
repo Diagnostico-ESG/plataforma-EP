@@ -1,12 +1,11 @@
 import { type ErroDoBanco, type RecusasDoModulo, TravaDoBanco, recusaPorPerfil } from '../acesso/falhasDeGravacao'
 import {
   FRASE_DA_APROVACAO_FORA_DA_ETAPA, FRASE_DO_LINK_INVALIDO, FRASE_DO_PROCESSO_COM_APROVACAO, FRASE_DO_PROCESSO_JA_APROVADO,
-  fraseDaAprovacaoAntesDaRevisao, fraseDaDataNoFuturo, fraseDaVersaoAprovada, fraseDaVersaoSemAprovacao,
+  fraseDaDataNoFuturo, fraseDaVersaoAprovada,
 } from '../revisoes/frasesDeAprovacao'
 import {
-  FRASE_DA_CORRIGIDA_SEM_ANTERIOR, FRASE_DA_CORRIGIDA_SEM_VERSAO_DO_REVISOR, FRASE_DA_REVISAO_FORA_DA_ETAPA,
-  FRASE_DO_ESCOPO_OBRIGATORIO, FRASE_DO_ESCOPO_SO_NA_CORRIGIDA, fraseDaVersaoSemRevisao, fraseDoProcessoComRevisoes,
-  fraseDoRevisorQueEAutor,
+  FRASE_DA_CORRIGIDA_SEM_VERSAO_NA_PASSAGEM, FRASE_DA_REVISAO_FORA_DA_ETAPA, FRASE_DA_REVISAO_JA_REGISTRADA,
+  FRASE_DO_ESCOPO_OBRIGATORIO, FRASE_DO_ESCOPO_SO_NA_CORRIGIDA, fraseDoProcessoComRevisoes,
 } from '../revisoes/frasesDeRevisao'
 import { fraseDasAnotacoesLongas } from './frasesDasAnotacoes'
 import { FRASE_DAS_ETAPAS_FIXAS, fraseDaEtapaComProcessos, fraseDaEtapaProtegida, fraseDaEtapaUsada } from './frasesDoCatalogo'
@@ -36,10 +35,10 @@ const PADRAO_DA_RECUSA = new RegExp(
   + '|etapa_inativa|publicacao_ou_explicacao_obrigatoria|explicacao_obrigatoria|explicacao_longa'
   + '|etiqueta_fixa_em_concluidos|passagem_fechada|passagem_so_pela_funcao'
   + '|processo_com_versoes|autor_da_versao|sem_versao|versao_incompleta'
-  + '|revisor_e_autor|corrigida_sem_versao_do_revisor|corrigida_sem_versao_anterior|escopo_obrigatorio'
-  + '|escopo_so_na_corrigida|revisao_fora_da_etapa|sem_revisao_da_versao|processo_com_revisoes'
-  + '|aprovacao_fora_da_etapa|processo_ja_aprovado|link_invalido|aprovacao_antes_da_revisao|sem_aprovacao'
-  + '|aprovacao_nao_se_apaga|versao_aprovada|processo_com_aprovacao'
+  + '|corrigida_sem_versao_na_passagem|revisao_ja_registrada|escopo_obrigatorio'
+  + '|escopo_so_na_corrigida|revisao_fora_da_etapa|processo_com_revisoes'
+  + '|aprovacao_fora_da_etapa|processo_ja_aprovado|aprovacao_so_pela_funcao|link_invalido'
+  + '|versao_aprovada|processo_com_aprovacao'
   + '|arquivar_so_concluido|ja_arquivado|nao_arquivado|processo_arquivado|arquivamento_so_pela_funcao'
   + '|anotacoes_longas)(?::(.*))?$', 'm')
 
@@ -82,20 +81,16 @@ const FRASE_DA_RECUSA: Record<string, FraseDaRecusa> = {
   processo_com_versoes: fraseDoProcessoComVersoes,
   autor_da_versao: fraseDoAutorDaVersao,
   sem_versao: () => FRASE_SEM_VERSAO,
-  revisor_e_autor: fraseDoRevisorQueEAutor,
-  corrigida_sem_versao_do_revisor: () => FRASE_DA_CORRIGIDA_SEM_VERSAO_DO_REVISOR,
-  corrigida_sem_versao_anterior: () => FRASE_DA_CORRIGIDA_SEM_ANTERIOR,
+  corrigida_sem_versao_na_passagem: () => FRASE_DA_CORRIGIDA_SEM_VERSAO_NA_PASSAGEM,
+  revisao_ja_registrada: () => FRASE_DA_REVISAO_JA_REGISTRADA,
   escopo_obrigatorio: () => FRASE_DO_ESCOPO_OBRIGATORIO,
   escopo_so_na_corrigida: () => FRASE_DO_ESCOPO_SO_NA_CORRIGIDA,
   revisao_fora_da_etapa: () => FRASE_DA_REVISAO_FORA_DA_ETAPA,
-  sem_revisao_da_versao: fraseDaVersaoSemRevisao,
   processo_com_revisoes: fraseDoProcessoComRevisoes,
   aprovacao_fora_da_etapa: () => FRASE_DA_APROVACAO_FORA_DA_ETAPA,
   processo_ja_aprovado: () => FRASE_DO_PROCESSO_JA_APROVADO,
   link_invalido: () => FRASE_DO_LINK_INVALIDO,
-  aprovacao_antes_da_revisao: fraseDaAprovacaoAntesDaRevisao,
-  sem_aprovacao: fraseDaVersaoSemAprovacao,
-  aprovacao_nao_se_apaga: () => 'A aprovação registrada não se apaga; edite-a para corrigir.',
+  aprovacao_so_pela_funcao: () => 'A versão e o registro da aprovação mudam só ao registrar uma aprovação nova.',
   versao_aprovada: fraseDaVersaoAprovada,
   processo_com_aprovacao: () => FRASE_DO_PROCESSO_COM_APROVACAO,
   arquivar_so_concluido: fraseDoArquivarSoConcluido,

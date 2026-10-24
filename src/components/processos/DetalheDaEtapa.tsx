@@ -1,22 +1,19 @@
-import type { EstadoDoCarregamento } from '../../hooks/useCarregamento'
+import type { RegistrosDoProcesso } from '../../hooks/useRegistrosDoProcesso'
 import { formatarData } from '../../lib/datas'
 import { CODIGO_DA_APROVACAO, CODIGO_DA_REVISAO_INTERNA } from '../../processos/codigosDasEtapas'
-import type { EtapaDoVerso } from '../../processos/tipos'
-import type { Aprovacao, ModuloDeRevisoes } from '../../revisoes/tipos'
+import type { EtapaDoVerso, UltimaVersao } from '../../processos/tipos'
+import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import { AprovacaoDaEtapa } from './AprovacaoDaEtapa'
 import { RevisoesDaEtapa } from './RevisoesDaEtapa'
 
 export type DadosDasEtapas = {
-  /** O processo das etapas e o módulo de revisões: a gaveta da Revisão interna lista as revisões dele. */
-  processoId: string
+  /** O módulo de revisões e os registros lidos pelo verso: a gaveta da Revisão interna lista as revisões e a da Aprovação mostra a atual. */
   revisoes: ModuloDeRevisoes
+  registros: RegistrosDoProcesso
+  /** A versão mais recente e a da passagem, para a janela de editar a revisão. */
+  ultimaVersao: UltimaVersao | null
   /** Quem pode alterar, com o processo em andamento ou concluído; suspenso, cancelado, arquivado e Consulta só leem. */
   podeEditar: boolean
-  /** A aprovação do processo (lida pelo verso): a gaveta da Aprovação a mostra, com os estados de carregando e de erro. */
-  aprovacao: EstadoDoCarregamento<Aprovacao | null>
-  aoTentarDeNovoAAprovacao: () => void
-  /** Lê a aprovação de novo, sem piscar, depois de editar. */
-  aoAtualizarAAprovacao: () => void
 }
 
 type DetalheDaEtapaProps = DadosDasEtapas & { id: string; etapa: EtapaDoVerso }
@@ -51,12 +48,12 @@ function Passagens({ etapa }: { etapa: EtapaDoVerso }) {
 // Os registros que a gaveta mostra: as revisões na Revisão interna e a aprovação na Aprovação pelo setor.
 function RegistrosDaEtapa({ etapa, ...props }: DetalheDaEtapaProps) {
   if (etapa.codigo === CODIGO_DA_REVISAO_INTERNA) {
-    return <RevisoesDaEtapa revisoes={props.revisoes} processoId={props.processoId} podeEditar={props.podeEditar} />
+    return <RevisoesDaEtapa revisoes={props.revisoes} registros={props.registros} ultimaVersao={props.ultimaVersao} podeEditar={props.podeEditar} />
   }
   if (etapa.codigo === CODIGO_DA_APROVACAO) {
     return (
-      <AprovacaoDaEtapa estado={props.aprovacao} aoTentarDeNovo={props.aoTentarDeNovoAAprovacao} revisoes={props.revisoes}
-        podeEditar={props.podeEditar} aoAtualizar={props.aoAtualizarAAprovacao} />
+      <AprovacaoDaEtapa estado={props.registros.aprovacao} aoTentarDeNovo={props.registros.tentarDeNovo} revisoes={props.revisoes}
+        podeEditar={props.podeEditar} aoAtualizar={props.registros.atualizar} />
     )
   }
   return null

@@ -130,6 +130,13 @@
   overflow-wrap: anywhere;
 }
 
+/* O resumo do registro da etapa (revisão da passagem, aprovação): cabe numa linha, com o botão de editar abaixo. */
+.agora-registro {
+  margin: 0;
+  font-size: var(--tam-secundario);
+  overflow-wrap: anywhere;
+}
+
 /* Suspenso e cancelado: onde o processo parou e por que não se mexe nele. */
 .agora-linha-de-texto {
   margin: 0;

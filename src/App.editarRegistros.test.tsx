@@ -180,7 +180,7 @@ test('as edições aparecem no histórico do processo com o antes e o depois', a
   await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Editar a aprovação da V8' })).toBeNull())
   await escolherNoMenuDoProcesso('Histórico')
   const verso = await versoAberto()
-  expect(await verso.findByText('Editou a revisão interna')).toBeTruthy()
+  expect(await verso.findByText('Editou a revisão')).toBeTruthy()
   expect(verso.getByText(/Escopo: Fluxograma e relatório/)).toBeTruthy()
   expect(verso.getByText(/Escopo: Relatório/)).toBeTruthy()
   expect(verso.getByText('Editou a aprovação')).toBeTruthy()

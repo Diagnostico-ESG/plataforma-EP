@@ -1,6 +1,7 @@
 import './Agora.css'
 import { useState } from 'react'
 import type { MovimentoDoProcessoEmUso } from '../../hooks/useMovimentoDoProcesso'
+import type { RegistrosDoProcesso } from '../../hooks/useRegistrosDoProcesso'
 import type { Executar } from '../../hooks/useGravacaoComFalha'
 import { fraseDaConsulta, rotuloDoAgora } from '../../processos/agoraDoProcesso'
 import { diasDoProcessoNaEtapa, passouDoLimite } from '../../processos/diasNaEtapa'
@@ -8,10 +9,12 @@ import type { PedidoDeSituacao } from '../../processos/pedidosDeSituacao'
 import { ROTULO_DA_SITUACAO } from '../../processos/rotulos'
 import { hojeLocal } from '../../processos/textoDaReuniao'
 import type { ModuloDeProcessos, ProcessoLido, UsuarioResponsavel } from '../../processos/tipos'
+import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import { JanelaDeSituacao } from './AcoesDeSituacao'
 import { AgoraDoArquivado } from './AgoraDoConcluido'
 import { CorpoDoAgora } from './CorpoDoAgora'
 import { DiasNaEtapa } from './DiasNaEtapa'
+import { RegistrosDoAgora } from './RegistrosDoAgora'
 
 type AgoraDoProcessoProps = {
   processo: ProcessoLido
@@ -21,6 +24,9 @@ type AgoraDoProcessoProps = {
   usuarioId: string
   podeAlterar: boolean
   movimento: MovimentoDoProcessoEmUso
+  /** O módulo e os registros (revisões e aprovação) que o Agora mostra e grava na Revisão interna e na Aprovação pelo setor. */
+  revisoes: ModuloDeRevisoes
+  registros: RegistrosDoProcesso
   /** Grava a situação (Retomar) e o arquivamento, e guarda a falha para o verso mostrar. */
   executar: Executar
   aoMudar: () => void
@@ -57,7 +63,7 @@ function ConteudoDoAgora(props: ConteudoDoAgoraProps) {
     return <AgoraDoArquivado processo={processo} processos={processos} podeAlterar={podeAlterar} executar={executar} aoMudar={aoMudar} />
   }
   if (props.parado) return <SituacaoParada processo={processo} podeAlterar={podeAlterar} aoRetomar={props.aoRetomar} />
-  if (!podeAlterar) return <AgoraDaConsulta processo={processo} rotulo={rotulo} />
+  if (!podeAlterar) return <AgoraDaConsulta processo={processo} rotulo={rotulo} revisoes={props.revisoes} registros={props.registros} usuarioId={props.usuarioId} />
   return <CorpoDoAgora {...props} rotulo={rotulo} />
 }
 
@@ -88,7 +94,9 @@ function SituacaoParada({ processo, podeAlterar, aoRetomar }: SituacaoParadaProp
 }
 
 // A Consulta só lê: a frase com a etapa, a etiqueta e o responsável, e o selo âmbar quando o processo está parado.
-function AgoraDaConsulta({ processo, rotulo }: { processo: ProcessoLido; rotulo: string }) {
+type AgoraDaConsultaProps = Pick<AgoraDoProcessoProps, 'processo' | 'revisoes' | 'registros' | 'usuarioId'> & { rotulo: string }
+
+function AgoraDaConsulta({ processo, rotulo, revisoes, registros, usuarioId }: AgoraDaConsultaProps) {
   const dias = diasDoProcessoNaEtapa(processo, hojeLocal())
   return (
     <>
@@ -97,6 +105,7 @@ function AgoraDaConsulta({ processo, rotulo }: { processo: ProcessoLido; rotulo:
         <span>{fraseDaConsulta(processo, hojeLocal())}</span>
         {dias !== null && passouDoLimite(dias) && <DiasNaEtapa dias={dias} />}
       </p>
+      <RegistrosDoAgora processo={processo} revisoes={revisoes} registros={registros} usuarioId={usuarioId} podeAlterar={false} />
     </>
   )
 }
