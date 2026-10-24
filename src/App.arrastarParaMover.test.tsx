@@ -135,18 +135,7 @@ test('a recusa do banco aparece com a frase pronta e o cartão não sai do lugar
   expect(cartoesDa('Revisão interna')).toHaveLength(1)
 })
 
-// ---- Chegada a Concluídos (a janela é do ticket 04 de publicacao-e-arquivamento)
-
-test('soltar em Concluídos sem a data da publicação ainda não tem janela: o aviso explica e o cartão volta', async () => {
-  const falso = montar([processo('Emitir Ofício')])
-  levantar(await cartaoDe('Emitir Ofício'))
-  soltarEm('Concluídos')
-  expect((await screen.findByText(/A chegada a Concluídos pede a data da publicação ou a explicação de concluir sem publicação/))
-    .getAttribute('role')).toBe('status')
-  expect(falso.chamadas).toEqual([])
-  expect(cartoesDa('Revisão interna')).toHaveLength(1)
-  expect(cartoesDa('Concluídos')).toEqual([])
-})
+// ---- Chegada a Concluídos (a janela está em App.chegadaAConcluidos.test.tsx)
 
 test('soltar em Concluídos com a data da publicação já registrada vai direto', async () => {
   const falso = montar([processo('Emitir Ofício', { etapa: 'publicacao', processo: { publicadoEm: dia(-2) } })])

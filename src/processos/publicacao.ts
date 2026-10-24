@@ -15,13 +15,6 @@ export function linhaDaPublicacao({ publicadoEm }: Pick<ProcessoDaLista, 'public
   return publicadoEm ? `Publicado em ${formatarData(publicadoEm)}` : null
 }
 
-/**
- * A janela da chegada a Concluídos é do ticket 04 de publicacao-e-arquivamento. Até lá, mover para Concluídos sem a data
- * da publicação já registrada não chama o banco: a tela diz o que a chegada pede e o processo fica onde estava.
- */
-export const FRASE_DA_CHEGADA_PENDENTE =
-  'A chegada a Concluídos pede a data da publicação ou a explicação de concluir sem publicação; essa janela ainda não está disponível.'
-
 /** Concluídos sem a data registrada precisa da janela da chegada; com a data, o processo vai direto. */
 export function chegadaPedeJanela(processo: Pick<ProcessoDaLista, 'publicadoEm'>, destino: { codigo: string }): boolean {
   return destino.codigo === CODIGO_CONCLUIDOS && !processo.publicadoEm

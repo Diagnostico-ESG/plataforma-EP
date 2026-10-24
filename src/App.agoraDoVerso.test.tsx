@@ -70,20 +70,7 @@ test('a recusa do banco aparece com a frase pronta', async () => {
   expect((await screen.findByRole('alert')).textContent).toBe('A etapa Publicação está inativa.')
 })
 
-test('mover para Concluídos sem a data da publicação ainda não tem janela: a tela explica e o processo fica', async () => {
-  const falso = montarVerso(processoLido())
-  fireEvent.change(await lista('Etapa'), { target: { value: 'e8' } })
-  expect(await screen.findByText(/A chegada a Concluídos pede a data da publicação ou a explicação de concluir sem publicação/)).toBeTruthy()
-  expect(falso.chamadas).toEqual([])
-  expect((await lista('Etapa')).selectedOptions[0].textContent).toBe('Revisão interna')
-})
-
-test('mover para Concluídos com a data da publicação já registrada vai direto', async () => {
-  const falso = montarVerso(processoLido({ publicadoEm: '2026-10-05' }, 'publicacao'))
-  fireEvent.change(await lista('Etapa'), { target: { value: 'e8' } })
-  await screen.findByText('Agora · etapa 8 de 8')
-  expect(falso.chamadas).toEqual([{ acao: 'mover', id: 'p1', etapaId: 'e8' }])
-})
+// Mover para Concluídos (a janela da chegada e a ida direta com a data registrada) está em App.chegadaAConcluidos.test.tsx.
 
 // ---- Etiqueta
 

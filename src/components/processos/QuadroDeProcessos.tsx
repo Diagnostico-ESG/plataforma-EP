@@ -4,6 +4,7 @@ import { colunasDoQuadro, colunasPorResponsavel } from '../../processos/colunasD
 import type { AgruparQuadroPor } from '../../processos/enderecoDosProcessos'
 import type { ListaDeProcessos, ModuloDeProcessos } from '../../processos/tipos'
 import { ColunaDoQuadro } from './ColunaDoQuadro'
+import { JanelaDaChegada } from './JanelaDaChegada'
 import './Quadro.css'
 
 type QuadroDeProcessosProps = {
@@ -27,7 +28,9 @@ export function QuadroDeProcessos({ lista, idEscolhido, enderecoDoProcesso, pode
   const arrasto = useArrastoDoQuadro(lista.etapas, movimento.mover)
   return (
     <>
-      {movimento.aviso && <p className="quadro-aviso" role="status">{movimento.aviso}</p>}
+      {movimento.chegada && (
+        <JanelaDaChegada chegada={movimento.chegada} processos={processos} aoGravar={aoMudar} aoFechar={movimento.fecharChegada} />
+      )}
       {movimento.falha && <p className="cadastros-falha" role="alert">{movimento.falha}</p>}
       <div className="quadro-colunas">
         {colunas.map((coluna) => (

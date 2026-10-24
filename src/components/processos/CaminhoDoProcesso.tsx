@@ -7,6 +7,7 @@ import type { ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import { AgoraDoProcesso } from './AgoraDoProcesso'
 import { EtapasDoProcesso } from './EtapasDoProcesso'
+import { JanelaDaChegada } from './JanelaDaChegada'
 
 type CaminhoDoProcessoProps = {
   processo: ProcessoLido
@@ -40,6 +41,9 @@ export function CaminhoDoProcesso({ processo, processos, revisoes, registros, po
     <>
       <AgoraDoProcesso processo={processo} processos={processos} usuarios={usuarios} usuarioId={usuarioId}
         podeAlterar={podeAlterar} movimento={movimento} executar={executar} aoMudar={aoMudar} revisoes={revisoes} registros={registros} />
+      {movimento.chegada && (
+        <JanelaDaChegada chegada={movimento.chegada} processos={processos} aoGravar={aoMudar} aoFechar={movimento.fecharChegada} />
+      )}
       {movimento.falha && <p className="cadastros-falha" role="alert">{movimento.falha}</p>}
       <EtapasDoProcesso processo={processo} revisoes={revisoes} registros={registros} ultimaVersao={processo.ultimaVersao}
         podeEditar={podeAlterar && !parado} />

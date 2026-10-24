@@ -43,7 +43,6 @@ export function CorpoDoAgora(props: CorpoDoAgoraProps) {
       <ResponsavelDoAgora {...props} />
       <RegistrosDoAgora processo={processo} revisoes={props.revisoes} registros={props.registros} usuarioId={props.usuarioId} podeAlterar />
       {aviso && <p className="agora-aviso" role="status">{aviso}</p>}
-      {movimento.aviso && <p className="agora-aviso" role="status">{movimento.aviso}</p>}
       {processo.etapaAtual?.codigo === CODIGO_CONCLUIDOS && <AcoesDoConcluido {...props} />}
     </>
   )
