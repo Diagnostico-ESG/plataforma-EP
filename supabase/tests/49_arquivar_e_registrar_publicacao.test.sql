@@ -9,7 +9,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(45);
+insert into _tap (linha) select plan(51);
 
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 insert into public.autorizacoes (email, perfil) values
@@ -105,10 +105,17 @@ select public.cancelar_processo(pg_temp.processo('Cancelado'), 'Desistiu');
 -- ===== Arquivar =====
 insert into _tap (linha) select throws_ok($sql$select public.arquivar_processo(pg_temp.processo('Andamento'))$sql$,
   'P0001', 'arquivar_so_concluido:em_andamento', 'arquivar processo em andamento fora de Concluídos é recusado');
-insert into _tap (linha) select throws_ok($sql$select public.arquivar_processo(pg_temp.processo('Suspenso'))$sql$,
-  'P0001', 'arquivar_so_concluido:suspenso', 'arquivar processo suspenso é recusado (até o ticket 04 de publicação)');
-insert into _tap (linha) select throws_ok($sql$select public.arquivar_processo(pg_temp.processo('Cancelado'))$sql$,
-  'P0001', 'arquivar_so_concluido:cancelado', 'arquivar processo cancelado é recusado (até o ticket 04 de publicação)');
+insert into _tap (linha) select lives_ok($sql$select public.arquivar_processo(pg_temp.processo('Suspenso'))$sql$,
+  'arquivar processo suspenso é aceito');
+insert into _tap (linha) select lives_ok($sql$select public.arquivar_processo(pg_temp.processo('Cancelado'))$sql$,
+  'arquivar processo cancelado é aceito');
+insert into _tap (linha) select results_eq(
+  $sql$select situacao, etapa_atual_codigo, arquivado_em is not null from public.processos_com_andamento
+    where id = pg_temp.processo('Suspenso')$sql$,
+  $sql$values ('suspenso', 'nao_iniciados', true)$sql$, 'o suspenso arquivado guarda a situação e a etapa');
+insert into _tap (linha) select throws_ok(
+  $sql$select public.mover_processo(pg_temp.processo('Suspenso'), pg_temp.etapa('publicacao'))$sql$,
+  'P0001', 'processo_arquivado', 'no suspenso arquivado, mover é recusado');
 insert into _tap (linha) select lives_ok($sql$select public.arquivar_processo(pg_temp.processo('Arquivado'))$sql$,
   'arquivar processo em Concluídos é aceito');
 insert into _tap (linha) select results_eq(
@@ -160,6 +167,16 @@ insert into _tap (linha) select throws_ok(
     where v.processo_id = pg_temp.processo('Arquivado') and f.papel = 'png'),
     jsonb_build_object('formato', 'png', 'tamanho', 555, 'hash_md5', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'))$sql$,
   'P0001', 'versao_aprovada:1', 'no arquivado, substituir arquivo é recusado (a versão aprovada já trava)');
+insert into _tap (linha) select lives_ok($sql$select public.desarquivar_processo(pg_temp.processo('Suspenso'))$sql$,
+  'desarquivar o suspenso é aceito');
+insert into _tap (linha) select results_eq(
+  $sql$select situacao, etapa_atual_codigo, arquivado_em from public.processos_com_andamento where id = pg_temp.processo('Suspenso')$sql$,
+  $sql$values ('suspenso', 'nao_iniciados', null::timestamptz)$sql$, 'o suspenso desarquivado continua suspenso na mesma etapa');
+insert into _tap (linha) select lives_ok($sql$select public.desarquivar_processo(pg_temp.processo('Cancelado'))$sql$,
+  'desarquivar o cancelado é aceito');
+insert into _tap (linha) select results_eq(
+  $sql$select situacao, etapa_atual_codigo, arquivado_em from public.processos_com_andamento where id = pg_temp.processo('Cancelado')$sql$,
+  $sql$values ('cancelado', 'nao_iniciados', null::timestamptz)$sql$, 'o cancelado desarquivado continua cancelado na mesma etapa');
 insert into _tap (linha) select lives_ok($sql$select public.desarquivar_processo(pg_temp.processo('Arquivado'))$sql$,
   'desarquivar o arquivado é aceito');
 insert into _tap (linha) select results_eq(
@@ -233,7 +250,8 @@ insert into _tap (linha) select is(
     and proname in ('arquivar_processo', 'desarquivar_processo')),
   0::bigint, 'as funções de arquivar não usam security definer');
 insert into _tap (linha) select hasnt_function('public', 'nao_vai_mais_para_publicacao', '"não vai mais para publicação" saiu');
-insert into _tap (linha) select hasnt_function('public', 'registrar_publicacao', 'a registrar_publicacao antiga saiu');
+insert into _tap (linha) select has_function('public', 'registrar_publicacao', array['uuid', 'date', 'text'],
+  'a registrar_publicacao nova existe');
 insert into _tap (linha) select * from finish();
 do $$ begin
   raise exception E'RESULTADO DOS TESTES\n%', (select string_agg(linha, E'\n' order by n) from _tap);

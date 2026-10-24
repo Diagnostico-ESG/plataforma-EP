@@ -9,7 +9,7 @@ const VAZIA: LinhaDoProcesso = {
   contexto: null, criado_em: null, motivo_da_situacao: null, observacoes: null, origem: 'novo',
   responsavel_ativo: null, etiqueta: null, entrou_na_etapa_em: null, etapa_atual_posicao: null,
   ultima_versao_numero: null, ultima_versao_historica: null, ultima_versao_tem_relatorio: null, subprocessos_quantidade: 0,
-  publicado_em: null, link_da_publicacao: null, sem_publicacao: null, arquivado_em: null,
+  publicado_em: null, link_da_publicacao: null, sem_publicacao: null, arquivado_em: null, explicacao_sem_publicacao: null,
 }
 
 test('traduz a data da publicação', () => {

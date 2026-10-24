@@ -841,6 +841,7 @@ export type Database = {
           contexto: string | null
           criado_em: string | null
           data_da_reuniao: string | null
+          explicacao_sem_publicacao: string | null
           etapa_atual_codigo: string | null
           etapa_atual_id: string | null
           entrou_na_etapa_em: string | null
@@ -1007,6 +1008,10 @@ export type Database = {
           p_processo: string
           p_tipo: Database["public"]["Enums"]["tipo_de_processo"]
         }
+        Returns: undefined
+      }
+      registrar_publicacao: {
+        Args: { p_data: string; p_link?: string; p_processo: string }
         Returns: undefined
       }
       registrar_resultado_das_planilhas: {
