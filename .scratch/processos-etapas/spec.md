@@ -2,9 +2,377 @@
 
 Status: ready-for-agent
 
-**Como resolve o problema.** Hoje o andamento de cada processo fica espalhado entre planilhas e o Power BI, sem saber com certeza em que etapa cada um está, quem cuida dele nem o que mudou. Com esta funcionalidade, a equipe do EP cadastra na plataforma cada processo e subprocesso, ligado ao setor dono e a um macroprocesso, e registra o andamento etapa por etapa, da Modelagem piloto em diante, num caminho que o administrador configura no catálogo de etapas. A área Processos mostra o trabalho vivo num Quadro, com uma coluna por etapa, e o arquivo completo numa Lista com busca pelo nome e filtros; ao abrir um processo, o **verso do cartão**, uma janela central em duas colunas, mostra primeiro o que há para fazer agora (a etapa atual, quem cuida dela e um único botão principal), depois o caminho de etapas e os arquivos, e ao lado o contexto do processo; o que é raro (histórico, editar, reclassificar, suspender, cancelar, excluir) fica num menu. No Quadro, cada cartão mostra de relance onde o processo está (uma barra com um pedaço por etapa) e só ganha selo quando há algo a dizer (processo parado, relatório pendente, etapa sem responsável, reunião próxima, versão, subprocessos); arrastar o cartão para a coluna seguinte conclui a etapa, e a equipe pode agrupar o Quadro por responsável ou ver só os processos que estão com ela. O banco impõe a sequência das etapas, a situação do processo, as regras de reclassificação e o registro de cada mudança no histórico. As funcionalidades seguintes (reuniões, documentos, revisões, prazos e painel) se apoiam nesse andamento.
+**Como resolve o problema (desde 2026-10-23, Andamento livre).** Hoje o andamento de cada processo fica espalhado entre planilhas e o Power BI, sem saber com certeza em que etapa cada um está, quem cuida dele nem o que mudou. Com esta funcionalidade, a equipe do EP cadastra na plataforma cada processo e subprocesso, ligado ao setor dono e a um macroprocesso. O processo entra na etapa **Não iniciados** e anda pelo catálogo de etapas como um cartão no Planner: qualquer integrante o leva a qualquer etapa, para a frente ou para trás, pela lista de etapas ou arrastando o cartão, sem motivo e sem trava de sequência. A etapa atual tem uma **etiqueta** (A fazer, Em andamento ou Concluído), e o processo tem um **responsável**, que passa a ser quem o move. Quem termina a sua parte marca Concluído, e o próximo vê e pega o processo. O processo termina na etapa **Concluídos**. O histórico guarda cada mudança de etapa, etiqueta e responsável, e o processo que fica mais de 7 dias na mesma etapa ganha um aviso. A seção "Andamento livre", logo abaixo, descreve o modelo atual e vale sobre o resto desta spec no que divergir. O texto que segue a ela é o registro das entregas anteriores.
+
+**Como resolvia antes de 2026-10-23.** A equipe registrava o andamento etapa por etapa, da Modelagem piloto em diante, num caminho que o administrador configura no catálogo de etapas. A área Processos mostra o trabalho vivo num Quadro, com uma coluna por etapa, e o arquivo completo numa Lista com busca pelo nome e filtros; ao abrir um processo, o **verso do cartão**, uma janela central em duas colunas, mostra primeiro o que há para fazer agora (a etapa atual, quem cuida dela e um único botão principal), depois o caminho de etapas e os arquivos, e ao lado o contexto do processo; o que é raro (histórico, editar, reclassificar, suspender, cancelar, excluir) fica num menu. No Quadro, cada cartão mostra de relance onde o processo está (uma barra com um pedaço por etapa) e só ganha selo quando há algo a dizer (processo parado, relatório pendente, etapa sem responsável, reunião próxima, versão, subprocessos); arrastar o cartão para a coluna seguinte conclui a etapa, e a equipe pode agrupar o Quadro por responsável ou ver só os processos que estão com ela. O banco impõe a sequência das etapas, a situação do processo, as regras de reclassificação e o registro de cada mudança no histórico. As funcionalidades seguintes (reuniões, documentos, revisões, prazos e painel) se apoiam nesse andamento.
 
 Decisões de origem: `.scratch/processos-etapas/sabatina.md` (sabatina de 2026-10-13, três rodadas), `CONTEXT.md` (seções "Setores" e "Processos") e ADR 0004 (mudar o catálogo muda o caminho dos processos em andamento). Mudança de 2026-10-18 (parte 1 da iniciativa experiencia-do-quadro, `.scratch/experiencia-do-quadro/sabatina-parte-1.md`, ADR 0013): saem as etapas do setor, a coluna "Aguardando o setor", os responsáveis do setor e o nível do catálogo; a primeira etapa passa a se chamar Modelagem piloto; o processo ganha a data da reunião (spec de `reunioes`). Mudança de 2026-10-18 (parte 2, `.scratch/experiencia-do-quadro/sabatina-parte-2.md`, ADR 0014): resolver a etapa atual (concluir, dispensar ou registrar como realizada anteriormente) já **avança**, ou seja, inicia a próxima etapa pendente com o responsável escolhido na mesma janela; voltar também escolhe o responsável; [Assumir] em etapa sem responsável; quem enviou a versão mais recente não pode ser escolhido como responsável da Revisão interna. Mudança de 2026-10-19 (parte 3, "Verso do cartão", `.scratch/experiencia-do-quadro/sabatina-parte-3.md`, sem ADR nem mudança no banco): o painel lateral vira o verso do cartão, uma janela central em duas colunas com o cartão "Agora"; o Novo processo, o Editar e o Histórico abrem dentro dela; a Lista ganha busca pelo nome. Mudança de 2026-10-19 (parte 4, "Cartão do Quadro", `.scratch/experiencia-do-quadro/sabatina-parte-4.md`, sem ADR): o cartão do Quadro ganha a barra de progresso e os selos; arrastar o cartão para a coluna de destino abre a janela de avanço da parte 2; o Quadro ganha "Agrupar por: Etapa | Responsável" e "Só os meus"; a view `processos_com_andamento` ganha campos, por migração não destrutiva; `CONTEXT.md` ganha "Processo parado". Mudança de 2026-10-23 ("Anotações do processo", `.scratch/processos-etapas/sabatina-anotacoes.md`, ADR 0021): o verso ganha, no alto da coluna direita, as **Anotações**, um texto livre e único por processo, guardado sozinho enquanto se escreve, sem histórico, com recusa quando outra pessoa alterou antes; `CONTEXT.md` ganha "Anotações".
+
+## Andamento livre (mudança de 2026-10-23)
+
+Parte 1 da iniciativa quadro-livre. Decisões de origem: `.scratch/quadro-livre/sabatina-parte-1.md`, o mapa `.scratch/quadro-livre/mapa.md` e os ADRs 0022 (andamento livre), 0023 (revisão e aprovação sem trava) e 0024 (Concluídos pede publicação ou explicação). O ADR 0022 substitui os ADRs 0004 e 0014 e a trava do ADR 0012. Termos no `CONTEXT.md`: Catálogo de etapas, Não iniciados, Etapa atual, Mover, Etiqueta, Processo parado, Responsável do processo, Assumir, Situação do processo, Concluídos e Arquivado.
+
+A mesma mudança atualiza outras três specs. Cada uma tem a sua seção "Andamento livre (mudança de 2026-10-23)":
+
+- `revisoes-aprovacao`: [Registrar revisão] e [Registrar aprovação], sem trava;
+- `publicacao-e-arquivamento`: a chegada a Concluídos, Registrar publicação e o arquivamento de suspensos e cancelados;
+- `exportacao-e-manutencao`: as fases pela posição no catálogo e os suspensos fora das planilhas.
+
+Esta seção traz o modelo comum: mover, etiqueta, responsável, catálogo, processo parado, histórico, Quadro, Lista, verso e a conversão dos dados.
+
+### O que deixa de valer no resto desta spec
+
+O modelo de andamento por etapa sai inteiro. Saem a tabela `andamentos`, os status pendente, em andamento, concluída, dispensada e realizada anteriormente, iniciar, concluir, dispensar, "realizada anteriormente", voltar com motivo, corrigir datas, o responsável por etapa, a janela de avanço, obrigatória e opcional, e a regra "concluído = obrigatórias resolvidas".
+
+- **Histórias substituídas:** 19, 29 a 44, 56 a 58, 68 a 72, 74, 89 a 107, 112 a 122, 141, 142, 144 a 146, 155 a 163 e 169 a 171. As histórias 20, 24, 25, 42, 43, 151 e 164 a 168 continuam valendo, com "responsável da etapa atual" lido como "responsável do processo".
+- **Decisões de implementação:** saem a operação de iniciar etapa, a de concluir, dispensar e registrar como realizada anteriormente, a de corrigir as datas de uma etapa, a de mudar o responsável de uma etapa e a de voltar a uma etapa. Saem também a janela de avanço, as janelas de nota e a regra do arrastar para a "primeira pendente". Na parte do banco, saem as regras de sequência, de transição, de dispensa, de avanço, de voltar e de etapa nova entrando como pendente (ADR 0004), a trava do autor na escolha do responsável (ADR 0014) e as regras de estado da etapa.
+- **Limite de processo parado:** passa de 15 para 7 dias, contados da entrada na etapa (não mais do início).
+
+O que não está listado continua valendo: cadastro, edição, exclusão, reclassificação, situação, Anotações, busca, filtros, verso e histórico, com os ajustes abaixo.
+
+### Solução
+
+- **Catálogo:** começa em **Não iniciados** e termina em **Concluídos**, as duas fixas no lugar e no nome. Entre elas ficam as etapas de trabalho: Modelagem piloto, Relatório e modelagem técnica, Revisão interna, Validação com o setor, Aprovação pelo setor, Publicação e as que o Administrador acrescentar. Sai obrigatória/opcional.
+- **Cadastro:** todo processo cadastrado entra em Não iniciados, com a etiqueta A fazer e sem responsável.
+- **Mover:**
+  - O processo vai para qualquer etapa ativa, pela lista "Etapa" do Agora ou arrastando o cartão no Quadro, sem motivo nem confirmação.
+  - Ao mover, a etiqueta volta a A fazer, e quem moveu vira o responsável.
+  - A única trava é a chegada a Concluídos, que pede a data da publicação ou a explicação de concluir sem publicação (spec de `publicacao-e-arquivamento`).
+- **Etiqueta:** A fazer, Em andamento ou Concluído, escolhida no Agora a qualquer momento. Concluído quer dizer que a parte de quem estava na etapa terminou; não conclui o processo.
+- **Responsável do processo:** um só por processo. Qualquer integrante o troca por outro ou por ninguém pelo "Trocar" do Agora, e [Assumir] põe a própria pessoa como responsável sem mover o processo.
+- **Processo parado:** mais de 7 dias na mesma etapa ganha o selo âmbar "{n} dias nesta etapa", no cartão e no Agora. Não vale em Não iniciados nem em Concluídos, nem para suspensos e cancelados.
+- **Suspenso e cancelado** congelam a etapa, a etiqueta e o responsável, e a tela diz por quê. Retomar devolve o processo à mesma etapa.
+- **Histórico:** cada mudança de etapa, de etiqueta e de responsável vira um evento. Os eventos do modelo anterior (andamento de etapa e escolha de publicação) são apagados na migração (ADR 0022).
+- **Consulta:** vê o Quadro, a Lista, a etapa, a etiqueta, o responsável e o histórico. Não arrasta, não tem as listas de escolha e não pode ser responsável. O banco recusa qualquer alteração dela.
+
+### Histórias de usuário
+
+#### Catálogo
+
+200. Como Administrador, quero que o catálogo comece em Não iniciados e termine em Concluídos, para que todo processo tenha onde entrar e onde terminar.
+201. Como Administrador, quero que Não iniciados e Concluídos não se renomeiem, não saiam do lugar, não se desativem nem se excluam, e que a tela não ofereça essas ações nelas, para que a entrada e a saída do Quadro nunca mudem.
+202. Como Administrador, quero acrescentar uma etapa escolhendo a posição entre Não iniciados e Concluídos, com nome, código e fase do Regimento, para mudar o caminho do trabalho sem mexer em nenhum processo.
+203. Como Administrador, quero que a etapa nova só acrescente uma coluna ao Quadro, sem mudar a etapa de nenhum processo.
+204. Como Administrador, quero renomear e reordenar qualquer etapa de trabalho, inclusive as seis de fábrica, sem atravessar Não iniciados nem Concluídos.
+205. Como Administrador, quero que a plataforma recuse desativar ou excluir uma etapa com processo dentro, dizendo quantos são, para que nenhum processo fique numa coluna escondida.
+206. Como Administrador, quero excluir só a etapa por onde nenhum processo passou, e que a plataforma sugira desativar as outras.
+207. Como Administrador, quero que as seis etapas com campos próprios (Modelagem piloto, Relatório e modelagem técnica, Revisão interna, Validação com o setor, Aprovação pelo setor e Publicação) não se desativem nem se excluam, com a frase dizendo por quê.
+208. Como Administrador, quero que o catálogo não tenha mais obrigatória nem opcional, porque a ordem não obriga ninguém a seguir a sequência.
+209. Como Administrador, quero reativar uma etapa desativada, que volta a ter coluna no Quadro, sem mexer em nenhum processo.
+210. Como Administrador, quero ver no catálogo, ao lado de Não iniciados e de Concluídos, o selo "Fixa" no lugar dos botões.
+
+#### Mover
+
+211. Como integrante do EP, quero que o processo cadastrado entre em Não iniciados, com a etiqueta A fazer e sem responsável, porque ainda não começou.
+212. Como integrante do EP, quero escolher a etapa do processo numa lista "Etapa" do Agora, com todas as etapas ativas na ordem do catálogo, para levá-lo para a frente ou para trás.
+213. Como integrante do EP, quero que escolher a etapa na lista mova o processo na hora, sem confirmação, para o gesto ser tão rápido quanto no Planner.
+214. Como integrante do EP, quero arrastar o cartão no Quadro para a coluna de qualquer etapa, para a frente ou para trás.
+215. Como integrante do EP, quero que, enquanto arrasto, a coluna sob o cartão fique destacada, para saber onde ele vai cair.
+216. Como integrante do EP, quero que soltar o cartão na própria coluna não grave nada.
+217. Como integrante do EP, quero que, ao mover, a etiqueta volte a A fazer, porque o trabalho da etapa nova ainda não começou.
+218. Como integrante do EP, quero passar a ser o responsável do processo que movo, em qualquer etapa, inclusive em Não iniciados e em Concluídos, porque quem move é quase sempre quem vai trabalhar nele.
+219. Como integrante do EP, quero que a plataforma não peça motivo nem confira a sequência ao mover, porque a ordem das etapas é combinação da equipe.
+220. Como integrante do EP, quero que a falha ao mover (inclusive por falta de conexão) mostre a mensagem de erro de gravação e deixe o processo onde estava, com o cartão de volta à coluna de origem.
+221. Como integrante do EP, quero que o processo suspenso, cancelado ou arquivado não se mova: o cartão não se arrasta, a lista não aparece, a tela explica por quê e o banco recusa fora da tela.
+222. Como integrante do EP, quero que só etapas ativas apareçam na lista e recebam o cartão.
+223. Como integrante do EP que usa o teclado, quero mover pela lista "Etapa" do Agora, abrindo o verso com Enter no cartão, sem precisar arrastar.
+
+#### Etiqueta
+
+224. Como integrante do EP, quero marcar a etiqueta da etapa atual como A fazer, Em andamento ou Concluído, no Agora, gravando ao escolher, para dizer à equipe em que pé está a minha parte.
+225. Como integrante do EP, quero ver a etiqueta no cartão do Quadro, na Lista e no Agora, para saber de relance o que está parado esperando alguém.
+226. Como integrante do EP, quero que mudar a etiqueta não mude a etapa nem o responsável.
+227. Como integrante do EP, quero que, em Concluídos, a etiqueta seja sempre Concluído, sem lista para mudá-la, porque ali o processo terminou.
+228. Como integrante do EP, quero que a falha ao mudar a etiqueta mostre a mensagem de erro de gravação e deixe a etiqueta como estava.
+
+#### Responsável
+
+229. Como integrante do EP, quero trocar o responsável do processo pelo "Trocar" do Agora, entre os usuários ativos Administrador ou Integrante, ou deixá-lo sem ninguém, gravando ao escolher.
+230. Como integrante do EP, quero [Assumir] o processo quando não sou o responsável, para me pôr como responsável com um clique, sem movê-lo.
+231. Como integrante do EP, quero ver o responsável no cartão (a foto do Google), na Lista e no Agora.
+232. Como integrante do EP, quero que o responsável que foi desativado apareça com "Inativo", sem poder ser escolhido de novo.
+233. Como integrante do EP, quero um aviso amarelo no Agora quando o processo está na Revisão interna e o responsável é quem enviou a versão mais recente (fora as históricas), "{nome} enviou a V{n}; a revisão interna deveria ser de outra pessoa.", sem impedir nada, porque a regra do revisor virou combinação da equipe (ADR 0023).
+234. Como Consulta, quero ver o responsável, sem "Trocar" nem [Assumir].
+
+#### Processo parado
+
+235. Como integrante do EP, quero que o processo com mais de 7 dias na mesma etapa ganhe o selo âmbar "{n} dias nesta etapa" no cartão e no Agora, para notar o que está demorando.
+236. Como integrante do EP, quero que os dias contem da entrada na etapa, e que mudar só a etiqueta não zere a contagem.
+237. Como integrante do EP, quero que Não iniciados, Concluídos, os suspensos e os cancelados não ganhem o selo, porque ali o tempo não é atraso.
+238. Como integrante do EP, quero ver no Agora "há {n} dias nesta etapa" em cinza até 7 dias, e o selo âmbar a partir do oitavo.
+
+#### Quadro, Lista e verso
+
+239. Como integrante do EP, quero no Quadro uma coluna por etapa ativa, de Não iniciados a Concluídos, na ordem do catálogo.
+240. Como integrante do EP, quero que o cartão mostre a etiqueta como pílula neutra com o texto ("A fazer", "Em andamento", "Concluído").
+241. Como integrante do EP, quero que a barra do cartão tenha um pedaço por etapa ativa, com as anteriores à atual preenchidas e a atual destacada, para ver a posição do processo de relance.
+242. Como integrante do EP, quero que "Agrupar por: Responsável" e "Só os meus" usem o responsável do processo e incluam os processos de Não iniciados e de Concluídos.
+243. Como integrante do EP, quero na Lista as colunas etapa atual, etiqueta e responsável, e o filtro de etapa com Não iniciados e Concluídos.
+244. Como integrante do EP, quero que o Agora mostre "Agora · etapa {n} de {total}", a etapa com a lista para mover, a etiqueta com a lista para mudar, e o responsável com "Trocar" e [Assumir].
+245. Como integrante do EP, quero que, na Revisão interna, na Aprovação pelo setor, na Publicação e em Concluídos, o Agora traga os botões dos registros daquela etapa (specs de `revisoes-aprovacao` e de `publicacao-e-arquivamento`).
+246. Como integrante do EP, quero ver na seção Etapas do verso a lista das etapas ativas, com a atual destacada e as que o processo já visitou marcadas, e abrir cada uma para ver quando o processo entrou e saiu dela.
+247. Como Consulta, quero ver o Agora com a etapa, a etiqueta e o responsável em texto, sem listas nem botões.
+
+#### Histórico
+
+248. Como integrante do EP, quero ver no Histórico "Moveu de {etapa} para {etapa}", com quem moveu (que passou a ser o responsável), para saber o caminho real do processo.
+249. Como integrante do EP, quero ver "Mudou a etiqueta: {de} → {para}" e "Mudou o responsável: {de} → {para}".
+250. Como integrante do EP, quero que um movimento apareça como um só evento, com a etapa e o responsável, sem um segundo evento para a etiqueta que voltou a A fazer.
+251. Como integrante do EP, quero que os eventos de iniciar, concluir, dispensar, "realizada anteriormente", voltar, avançar e trocar o responsável da etapa, e os de escolha de publicação, não apareçam mais, porque saíram com o modelo anterior (ADR 0022).
+252. Como integrante do EP, quero que os outros eventos antigos (cadastro, edição, situação, reclassificação, catálogo, versões, revisões e aprovações) continuem como estão.
+
+#### Conversão dos dados
+
+253. Como integrante do EP, quero que os processos que já existem no desenvolvimento apareçam na etapa em que estavam, com a etiqueta e o responsável que correspondem, sem nada a fazer à mão.
+
+#### Perfis
+
+254. Como responsável pela plataforma, quero que o banco recuse mover, mudar a etiqueta e trocar o responsável vindos da Consulta, de usuário inativo e de visitante, mesmo fora da tela, e que inativo e visitante não leiam a etapa, a etiqueta nem as entradas e saídas.
+
+### Decisões de implementação
+
+#### Interface
+
+- **Módulo de processos.** Saem iniciar etapa, concluir etapa, dispensar etapa, voltar para etapa, corrigir as datas da etapa, mudar o responsável da etapa e "não vai mais para publicação". Entram:
+  - **mover o processo** (processo e etapa de destino; para Concluídos, também a data e o link da publicação ou a explicação de concluir sem publicação, ver `publicacao-e-arquivamento`);
+  - **mudar a etiqueta** (processo e etiqueta);
+  - **mudar o responsável do processo** (processo e usuário, ou nenhum; [Assumir] é mudar para si mesmo).
+
+  A leitura do processo passa a trazer a etapa atual com a posição no catálogo, a etiqueta, a entrada na etapa, o responsável do processo e as entradas e saídas de cada etapa. A lista dos processos traz a etapa atual, a etiqueta, a entrada na etapa e o responsável.
+- **Quadro:**
+  - **Colunas:** uma por etapa ativa, na ordem do catálogo. Não iniciados é a primeira, e Concluídos a última, sempre visível (spec de `publicacao-e-arquivamento`).
+  - **Cartões:** os processos em andamento, suspensos e concluídos que não estão arquivados, cada um na coluna da etapa atual. Os cancelados continuam só na Lista.
+  - **Cartão:** a etiqueta (pílula neutra com o texto, sem azul; as cores ficam para a parte 2) e, no lugar do responsável da etapa, o avatar do responsável do processo.
+  - **Barra:** um pedaço por etapa ativa; as anteriores à atual em cinza-escuro, a atual em `azul` e as seguintes em cinza-claro. Em Concluídos, toda preenchida. Nome acessível: "Etapa {n} de {total}: {etapa}". A barra em blocos com o nome fica para a parte 2.
+  - **Selos:** "{n} dias nesta etapa" a partir de 8 dias (regra de processo parado); "Relatório pendente" com a etapa atual na Revisão interna ou depois dela e antes de Concluídos, pela ordem do catálogo; "Sem responsável"; "Sem publicação" em Concluídos sem a data (no lugar de "Não publicado"); depois Reunião, versão e subprocessos, como hoje.
+- **Arrastar** (arrastar nativo do navegador, sem biblioteca, como na parte 4):
+  - só Administrador e Integrante, só agrupado por etapa, e só o cartão de processo em andamento ou concluído não arquivado;
+  - toda coluna recebe o cartão, e a coluna sob o cartão ganha o realce (borda tracejada em `azul`);
+  - soltar na própria coluna não grava;
+  - soltar em Concluídos, sem a data da publicação registrada, abre a janela de chegada a Concluídos (spec de `publicacao-e-arquivamento`); Esc ou [Cancelar] devolvem o cartão;
+  - soltar em qualquer outra coluna grava na hora, e o Quadro recarrega com o cartão na coluna nova;
+  - a falha mostra a mensagem de erro de gravação, e o cartão volta;
+  - por toque, o arrastar não acontece; o caminho é o verso.
+- **Agora do verso** (processo em andamento ou concluído não arquivado):
+  - rótulo "Agora · etapa {n} de {total}" (posição entre as etapas ativas);
+  - **Etapa:** lista suspensa com as etapas ativas, na atual; escolher outra move na hora, e Concluídos sem a data registrada abre a janela de chegada;
+  - **Etiqueta:** lista com A fazer, Em andamento e Concluído, gravando ao escolher; em Concluídos, só o texto "Concluído";
+  - **Responsável:** avatar e nome (ou "Sem responsável"), "há {n} dias nesta etapa" (o selo âmbar a partir de 8 dias, fora de Não iniciados e de Concluídos), o "Trocar" (com quem está na tela primeiro, "(você)", e "Ninguém por enquanto" no fim) e [Assumir] quando quem está na tela não é o responsável;
+  - **aviso do revisor:** na Revisão interna, quando o responsável é o autor da versão mais recente não histórica, o aviso amarelo da história 233, que some quando a condição deixa de valer;
+  - **botões dos registros** da etapa atual: Revisão interna, Aprovação pelo setor e Publicação (specs de `revisoes-aprovacao` e de `publicacao-e-arquivamento`). O botão de registro é o principal quando existe; nas outras etapas, o Agora não tem botão principal;
+  - **suspenso ou cancelado:** motivo, [Retomar] e [Arquivar], sem as listas (spec de `publicacao-e-arquivamento`);
+  - **Consulta:** borda cinza e a frase "Em {etapa} · {etiqueta} · com {nome} há {n} dias" (ou "sem responsável").
+- **Etapas do verso:** lista só de leitura das etapas ativas, com a atual com o ponto azul, as já visitadas com ✓ cinza e a data da última saída, e as nunca visitadas em cinza, sem marca. Clicar abre a gaveta, uma por vez, com as entradas e saídas do processo naquela etapa ("Entrou em {dd/mm/aaaa} · saiu em {dd/mm/aaaa}", da mais recente para a mais antiga, ou "Ainda não passou por esta etapa") e, na Revisão interna e na Aprovação pelo setor, os registros (spec de `revisoes-aprovacao`). Saem da gaveta [Corrigir datas], [Voltar a esta etapa], nota, "Trocar" e [Assumir].
+- **Lista:**
+  - **Colunas:** nome, tipo, setor, macroprocesso, etapa atual, etiqueta, responsável e situação.
+  - **Filtros:** os de hoje. O filtro de etapa oferece todas as etapas ativas, inclusive Não iniciados e Concluídos.
+- **Catálogo** (aba da Administração):
+  - **Tabela:** nome, fase (vazia nas duas fixas, "—") e situação; Não iniciados e Concluídos com o selo "Fixa" e sem botões.
+  - **Nova etapa:** nome, código, fase e posição entre as duas fixas.
+  - **Editar:** nome e fase. Sai o campo obrigatória.
+  - **Subir e Descer** não atravessam as fixas. Desativar, Reativar e Excluir continuam, com as recusas novas.
+- **Mensagens de recusa novas,** vindas do banco e traduzidas pela interface:
+  - "Este processo está {suspenso | cancelado}; retome-o para mudar a etapa, a etiqueta ou o responsável."
+  - "A etapa {nome} está inativa."
+  - "A etapa {nome} tem {n} processos; mova-os antes de {desativar | excluir}."
+  - "A etapa {nome} já recebeu processos; desative-a em vez de excluir."
+  - "As etapas Não iniciados e Concluídos não mudam de nome nem de lugar e não saem do catálogo."
+  - "A etapa {nome} tem campos próprios e não pode ser desativada nem excluída."
+  - "A etiqueta {valor} não existe; use A fazer, Em andamento ou Concluído."
+
+  Saem as recusas de sequência, de etapa em andamento, de dispensa, de datas da etapa e a da trava do autor.
+- **Estados:** os de hoje no Quadro, na Lista, no verso e no catálogo, inclusive o erro de conexão com [Tentar de novo]. As gravações de mover, etiqueta e responsável não abrem janela: a lista fica desabilitada enquanto grava, e a falha aparece em vermelho no Agora ("A alteração não foi salva: {motivo}.") ou, no Quadro, no aviso que já existe.
+- **Histórico (textos):** "Moveu de {de} para {para}" (com o responsável no "depois"); "Mudou a etiqueta"; "Mudou o responsável"; "Desativou a etapa", "Reativou a etapa", "Acrescentou a etapa ao catálogo" e "Mudou a ordem do catálogo", como hoje. Saem os textos de andamento de etapa.
+
+#### Modelo de dados
+
+**Tipos:** novo `etiqueta_da_etapa` = `a_fazer`, `em_andamento` e `concluido`. Sai `status_da_etapa`, junto com `andamentos`.
+
+**`etapas`:**
+- sai a coluna `obrigatoria`;
+- entram as etapas `nao_iniciados` ("Não iniciados"), com a menor ordem, e `concluidos` ("Concluídos"), com a maior;
+- `fase` fica vazia nessas duas e obrigatória nas outras, por uma restrição que olha o código;
+- as duas fixas não mudam de nome, de ordem, de fase nem de `ativa` e não se apagam;
+- nenhuma etapa se coloca antes de Não iniciados nem depois de Concluídos;
+- os oito códigos de fábrica (as duas fixas e as seis com campos próprios) não se desativam nem se apagam;
+- etapa com processo na passagem aberta não se desativa nem se apaga, e a recusa traz a contagem;
+- etapa com qualquer passagem, aberta ou fechada, não se apaga.
+
+**`processos`:**
+- nova coluna `responsavel_id`: uuid, referência a `usuarios`, opcional; usuário ativo Administrador ou Integrante, pelo gatilho que hoje confere o responsável da etapa;
+- muda pela função de mover e por atualização direta da coluna (privilégio de coluna a logado);
+- as colunas de publicação ficam na spec de `publicacao-e-arquivamento`.
+
+**`passagens`** (nova, com RLS): cada estadia do processo numa etapa. A passagem aberta é a etapa atual: a etapa atual não se guarda em outro lugar ("não guarde o que se calcula").
+
+| Coluna | Tipo | Obrigatória |
+|---|---|---|
+| id | uuid gerado | sim |
+| processo_id | uuid, referência a `processos`, apaga junto | sim |
+| etapa_id | uuid, referência a `etapas`, recusa apagar | sim |
+| entrou_em | data e hora, preenchida pelo banco | sim |
+| saiu_em | data e hora, preenchida pelo banco ao mover | não (vazia na passagem aberta) |
+| etiqueta | etiqueta_da_etapa, padrão `a_fazer` | sim |
+| concluido_em | data e hora em que a etiqueta virou Concluído nesta passagem, preenchida pelo banco; volta a vazia quando a etiqueta sai de Concluído | não |
+| movido_por | uuid, referência a `usuarios`, quem moveu para cá, preenchido pelo banco | não (vazio no cadastro e na conversão) |
+
+- Um índice único parcial garante uma só passagem aberta por processo.
+- Um gatilho depois de incluir em `processos` abre a primeira passagem, em Não iniciados.
+- Passagem fechada não muda.
+- Na aberta, só a etiqueta muda, por atualização direta da coluna ou por função, à escolha da execução.
+- Ninguém inclui nem apaga passagem direto: só a função de mover e o gatilho do cadastro.
+- `concluido_em` serve à data de conclusão das fases nas planilhas (spec de `exportacao-e-manutencao`).
+
+**Função `mover_processo(p_processo, p_etapa, p_data_da_publicacao, p_link_da_publicacao, p_explicacao_sem_publicacao)`.** Sem `security definer`; roda com a permissão de quem chama, e a RLS decide. Numa transação só:
+- recusa processo suspenso, cancelado ou arquivado, e etapa inativa;
+- com a etapa de destino igual à atual, não faz nada;
+- fecha a passagem aberta (`saiu_em` agora) e abre outra no destino, com a etiqueta A fazer (em Concluídos, Concluído, com `concluido_em` agora) e `movido_por` igual a quem chama;
+- põe quem chama como `responsavel_id`;
+- aplica as regras de chegada a Concluídos e de saída de lá (spec de `publicacao-e-arquivamento`);
+- gera um só evento de movimento.
+
+**View `processos_com_andamento`.** É recriada (apagada e criada de novo, porque perde colunas), com `security_invoker = true`, o mesmo `revoke` de visitante e o `grant` de leitura a logado. Os nomes que outras partes leem continuam: `etapa_atual_id`, `etapa_atual_codigo`, `etapa_atual_nome`, `etapa_atual_ordem`, `responsavel_id`, `responsavel_nome`, `responsavel_foto_url`, `responsavel_ativo` e `situacao`. A função `arquivos-no-drive` e o gatilho das versões leem `situacao` e `etapa_atual_id` e não mudam.
+- **Etapa atual:** a da passagem aberta.
+- **Responsável:** o do processo.
+- **`situacao`:** `concluido` quando a guardada é `em_andamento` e a etapa atual é `concluidos`; senão, a guardada.
+- **Campos novos:** `etiqueta`, `entrou_na_etapa_em` e `etapa_atual_posicao` (a posição entre as etapas ativas), mais os de publicação da spec de `publicacao-e-arquivamento`.
+- **Campos que saem:** `etapa_atual_status`, `etapa_atual_iniciada_em`, `caminho` e `vai_para_publicacao`.
+
+**Eventos:**
+- **Entidade nova `passagem`,** com o id do processo, para os filtros do histórico. O movimento leva no antes e no depois a etapa (nome e código) e o responsável; a mudança de etiqueta leva a etiqueta.
+- **Responsável:** a mudança direta de `responsavel_id` gera evento do processo. A mudança feita dentro do movimento não gera, porque o evento do movimento já a leva.
+- **Exclusão do processo:** o "antes" traz a etapa atual, a etiqueta e o responsável, no lugar da lista de andamentos.
+- **Leitura:** todo perfil ativo lê os eventos novos.
+
+**Dado pessoal:** `processos.responsavel_id` e `passagens.movido_por` apontam para usuários, cujo nome todo perfil ativo já vê. Nada novo vai às planilhas.
+
+**Gravações com várias linhas** passam pelas funções do banco, sem `security definer`.
+
+#### Quem pode o quê (cada célula vira um teste pgTAP)
+
+| Tabela e ação | Administrador | Integrante do EP | Consulta | Inativo | Visitante |
+|---|---|---|---|---|---|
+| `passagens` ler | sim | sim | sim | não | não |
+| mover (pela função) | sim | sim | não | não | não |
+| `passagens` alterar a etiqueta da passagem aberta | sim | sim | não | não | não |
+| `passagens` incluir, apagar ou alterar outra coluna direto | não (só a função e o gatilho) | não | não | não | não |
+| `processos` alterar `responsavel_id` | sim | sim | não | não | não |
+| `etapas` criar, renomear, reordenar, desativar e apagar (com as regras) | sim | não | não | não | não |
+| `processos_com_andamento` ler os campos novos | sim | sim | sim | não | não |
+| `eventos` de passagem e de responsável ler | sim | sim | sim | não | não |
+
+#### Regras que o banco impõe
+
+| Regra | Como | Caso de teste que a prova |
+|---|---|---|
+| Processo novo entra em Não iniciados, A fazer, sem responsável | gatilho depois de incluir | processo criado tem uma passagem aberta em `nao_iniciados`, etiqueta `a_fazer`, `responsavel_id` vazio |
+| Uma só passagem aberta por processo | índice único parcial | segunda passagem aberta recusada |
+| Mover vai a qualquer etapa ativa, para a frente ou para trás | `mover_processo` | de Não iniciados à Revisão interna aceito; da Aprovação à Modelagem piloto aceito; etapa inativa recusada |
+| Mover fecha a passagem, abre outra com A fazer e põe quem move como responsável | `mover_processo` | depois de mover: passagem anterior com `saiu_em`, nova com `a_fazer`, `movido_por` e `responsavel_id` iguais a quem chamou |
+| Mover para a própria etapa não muda nada | `mover_processo` | nenhuma passagem nova, nenhum evento |
+| Suspenso, cancelado e arquivado não se movem nem mudam etiqueta e responsável | função e gatilhos | os três recusados em cada caso |
+| Etiqueta só muda na passagem aberta; Concluído preenche `concluido_em`; sair de Concluído o esvazia | gatilho antes de alterar | etiqueta da passagem fechada recusada; Concluído → Em andamento esvazia a data |
+| Em Concluídos a etiqueta é Concluído e não muda | função e gatilho | mudar a etiqueta em Concluídos recusado |
+| Responsável é usuário ativo Administrador ou Integrante | gatilho que já existe, levado a `processos` | Consulta ou inativo recusados |
+| Não iniciados e Concluídos fixos | gatilhos em `etapas` | renomear, mudar a ordem, desativar e apagar as duas recusados; etapa nova antes de Não iniciados ou depois de Concluídos recusada |
+| Etapa com processo dentro não se desativa nem se apaga | gatilho em `etapas` | recusado com a contagem |
+| Etapa com passagem não se apaga | referência de `passagens` recusa apagar | etapa por onde um processo passou: apagar recusado, desativar aceito |
+| As seis etapas com campos próprios não se desativam nem se apagam | gatilho que já existe, ampliado às seis | desativar a Modelagem piloto recusado; renomear aceito |
+| Fase vazia só nas duas fixas | restrição | etapa de trabalho sem fase recusada |
+| Etapa nova não muda nenhum processo | `acrescentar_etapa` sem criar linhas por processo | etapa nova: nenhuma passagem criada |
+| Cada movimento, etiqueta e troca de responsável vira evento; o movimento gera um só | gatilhos de evento | um evento por ação; mover não gera evento separado de responsável |
+| Eventos do modelo anterior apagados; os outros ficam | migração | depois da migração: nenhum evento de `andamento` nem de escolha de publicação; os de cadastro, situação e versão continuam |
+
+#### Regras de estado
+
+```
+cadastro ──▶ Não iniciados (A fazer, sem responsável)
+etapa X ──mover (qualquer etapa ativa; quem move vira responsável)──▶ etapa Y (A fazer)
+etapa Y ──mover para Concluídos (data da publicação ou explicação)──▶ Concluídos (Concluído)
+etiqueta: A fazer ⇄ Em andamento ⇄ Concluído (só na passagem aberta; em Concluídos, fixa)
+```
+
+Suspenso e cancelado congelam a passagem aberta e o responsável; retomar não mexe neles. "Concluído" é estar em Concluídos, com a situação guardada em andamento. Os dias na etapa contam de `entrou_em` (dias de calendário no fuso de Brasília). Processo parado: mais de 7 dias, situação em andamento, fora de Não iniciados e de Concluídos.
+
+#### Migração (destrutiva, ADR 0022)
+
+A produção não existe; só se perdem dados inventados do desenvolvimento. Uma ou mais migrações novas, cada uma numa transação, com os gatilhos de evento desligados enquanto converte e apaga (`session_replication_role = replica`, como em 2026-10-18):
+
+1. tipo, tabela `passagens` (com RLS, políticas e o `revoke` padrão) e a coluna `processos.responsavel_id`;
+2. as etapas `nao_iniciados` e `concluidos`, com o catálogo renumerado (as atuais mantêm a ordem relativa entre as duas);
+3. **conversão** de cada processo, numa passagem aberta:
+   - **etapa:** a etapa atual de hoje, a em andamento ou a primeira pendente. A Modelagem piloto ainda pendente vai para Não iniciados, e o processo concluído vai para Concluídos;
+   - **etiqueta:** Em andamento para quem tinha a etapa em andamento, A fazer para os outros e Concluído em Concluídos;
+   - **responsável do processo:** o responsável da etapa atual;
+   - **entrada:** o `iniciada_em` da etapa em andamento (meia-noite de Brasília) ou a hora da migração;
+   - os arquivados continuam arquivados, e a publicação se converte pela spec de `publicacao-e-arquivamento`;
+4. apaga os eventos do modelo anterior: entidade `andamento` e os de escolha de publicação, "não vai mais para publicação" e publicação registrada do modelo anterior;
+5. apaga `andamentos`, `status_da_etapa`, `etapas.obrigatoria` e as funções e gatilhos do modelo anterior: iniciar, avançar, voltar, sequência, transição, dispensa, nota, uma em andamento, autor da Revisão interna, conclusão das etapas de revisão, criação de andamentos no cadastro e no catálogo, e "não vai mais para publicação";
+6. recria a view, a função de acrescentar etapa (sem obrigatória), os gatilhos do catálogo e o estado guardado nos eventos do processo, com `responsavel_id`.
+
+O teste de migração monta processos nos estados antigos (Modelagem piloto pendente, etapa em andamento com responsável, concluído, arquivado, suspenso) e confere a passagem, a etiqueta, o responsável e os eventos depois, ensaiado num teste temporário antes de aplicar. A migração vai pelo workflow "Migrar banco de desenvolvimento" e entra no registro de `supabase/AMBIENTES.md`.
+
+### Decisões de teste
+
+- **Bom teste** confere o que a pessoa vê e consegue fazer, ou o que o banco aceita e recusa, nunca detalhes internos.
+- **Interface (ponto de teste principal: a tela inteira).** Vitest com Testing Library, renderizando o aplicativo inteiro com as falsas nomeadas. A falsa de processos troca os andamentos pelas passagens, imita `mover_processo`, a etiqueta, o responsável, o congelamento, a chegada a Concluídos e as recusas do catálogo, e aceita falhas programáveis. O que cobre:
+  - cadastro em Não iniciados, A fazer, sem responsável;
+  - mover pela lista do Agora para a frente e para trás, com a etiqueta voltando a A fazer e quem move virando responsável; a falha com o processo onde estava;
+  - arrastar para qualquer coluna, a própria coluna sem gravar, o realce da coluna sob o cartão, a falha com o cartão de volta, nada arrastável para a Consulta, no suspenso, no arquivado e agrupado por responsável;
+  - etiqueta no Agora, no cartão e na Lista; Concluídos sem lista de etiqueta;
+  - "Trocar", [Assumir] para quem não é o responsável, "Ninguém por enquanto", responsável inativo;
+  - o aviso do revisor na Revisão interna, aparecendo e sumindo;
+  - processo parado com 7 dias (sem selo) e 8 (com selo), sem selo em Não iniciados, em Concluídos e no suspenso, e mudar a etiqueta sem zerar;
+  - colunas de Não iniciados a Concluídos, a barra com o nome acessível, os selos novos;
+  - Agrupar por responsável e Só os meus com o responsável do processo;
+  - Lista com etapa, etiqueta e responsável, e o filtro de etapa;
+  - Etapas do verso com a atual, as visitadas e a gaveta das entradas e saídas;
+  - catálogo com as fixas sem botões, as recusas de desativar e excluir com processo dentro, a etapa nova entre as fixas, sem o campo obrigatória;
+  - suspenso e cancelado congelados, com a explicação;
+  - histórico com os eventos novos e sem os do modelo anterior;
+  - Consulta só lendo;
+  - os testes de tela do modelo anterior (`App.andamentoDoProcesso`, `App.avancoDaEtapa`, `App.arrastarParaConcluir`, `App.assumirEAutor`, `App.etapasDoVerso`, `App.voltarDatasResponsavel`, `App.catalogoNosProcessos`, `App.agoraDoVerso`, `App.cartaoDoQuadro`) são reescritos para o modelo novo ou apagados quando o comportamento saiu, mantendo o que continua valendo.
+- **Tradução entre o banco e a tela.** Testes pequenos do módulo de processos real com o cliente simulado: as chamadas de mover, etiqueta e responsável; cada código de recusa novo virando a frase; as linhas da view com os campos novos. Arte anterior: `andamentosSupabase`, `processosSupabase`, `catalogoSupabase`.
+- **Funções puras:** a barra a partir da posição, os selos (processo parado com 7 dias), as colunas do Quadro com as fixas e o destino do arrastar ganham testes unitários pequenos. Arte anterior: `barraDoCartao`, `selosDoCartao`, `colunasDoQuadro`, `destinoDoArrastar`, `diasNaEtapa`.
+- **Banco.** pgTAP, um teste por célula da tabela "quem pode o quê" e um por regra, o teste da conversão e os testes gerais `00_rls_ligada` e `10_privilegios_padrao`. Os testes antigos do modelo anterior (`18`, `19`, `20`, `22`, `34`, `35`, `36`, `37` e os que montam processos pelos andamentos, como `27` a `30`, `38` a `41` e `44` a `50`) são reescritos para as passagens ou apagados quando a regra saiu. Os testes vêm antes da migração e rodam pelo GitHub Actions ("Testes de banco").
+- Todos os processos, setores e usuários dos testes são inventados.
+
+### Fora do escopo desta parte
+
+- Cores das etiquetas, barra em blocos com o nome da etapa, desenho final do aviso de processo parado e Data da modelagem piloto: parte 2.
+- Arquivos próprios de cada etapa, travas de arquivo na Modelagem piloto e na Modelagem técnica, envio opcional: parte 3 (ADR 0016).
+- Outros anexos (parte 4) e visualização por setores (parte 5).
+- Filtro por etiqueta na Lista; mover vários processos de uma vez; desfazer um movimento por botão (mover de volta faz isso).
+- Prazos por etapa: v1.5 (o limite de processo parado é o número único 7).
+
+### Decisões tomadas ao escrever esta seção, a confirmar na leitura
+
+1. A etapa atual e a etiqueta ficam numa tabela de passagens, uma linha por estadia na etapa. A passagem aberta é a etapa atual. Ela dá a contagem de dias, as datas das fases nas planilhas e o "cada passagem pela Revisão interna tem o seu registro".
+2. O processo cadastrado entra sem responsável: cadastrar não é mover.
+3. Em Concluídos, a etiqueta é sempre Concluído e não muda, uma exceção a "volta a A fazer". Em Não iniciados, a etiqueta muda normalmente.
+4. [Assumir] aparece sempre que quem está na tela não é o responsável. Antes, aparecia só quando não havia responsável.
+5. Mover pela lista do Agora grava ao escolher, sem confirmação, como o "Trocar". A exceção é a chegada a Concluídos sem a data da publicação.
+6. Um movimento gera um só evento, com a etapa e o responsável. A etiqueta que volta a A fazer não gera evento próprio.
+7. Os dias na etapa são de calendário, contados da entrada. Suspender não desconta, e retomar não zera.
+8. A seção Etapas do verso mostra só as etapas ativas. Uma etapa visitada que depois foi desativada aparece só no histórico.
+9. Agrupar por responsável e Só os meus incluem os processos de Não iniciados e de Concluídos, que agora têm responsável.
+10. Os cancelados continuam só na Lista.
+11. O aviso do revisor fica no Agora enquanto a condição vale, em vez de aparecer só no momento de mover ou assumir.
+12. Na conversão, cada processo ganha só a passagem atual: as passagens antigas não são reconstruídas a partir dos andamentos, que são dados inventados.
+13. A barra tem um pedaço por etapa ativa, incluindo as duas fixas, até o redesenho da parte 2.
+
+### Divergência com `.scratch/especificacao.md`
+
+A especificação previa etapas em sequência obrigatória, com etapas opcionais dispensáveis e conclusão por etapa. O Andamento livre tira a sequência, as obrigatórias e a dispensa (ADR 0022), por decisão do usuário na sabatina de 2026-10-23.
+
+### Critérios conferidos olhando a tela
+
+- `[visual]` O Agora mostra, sem apertar a coluna, a etapa com a lista, a etiqueta com a lista e o responsável com "Trocar" e [Assumir]; na Consulta, a frase em texto.
+- `[visual]` A etiqueta aparece como pílula neutra com texto no cartão e na Lista, sem azul e sem depender só de cor.
+- `[visual]` Durante o arrastar, a coluna sob o cartão ganha a borda tracejada azul; o cartão arrastado fica levemente apagado no lugar de origem.
+- `[visual]` O Quadro com Não iniciados e Concluídos nas pontas mantém a largura fixa das colunas e a rolagem lateral de hoje.
+- `[visual]` No catálogo, Não iniciados e Concluídos aparecem com o selo "Fixa", sem botões, alinhados com as outras linhas.
+- `[visual]` O aviso do revisor no Agora é amarelo (aviso), não vermelho.
 
 ## Problema
 
@@ -875,3 +1243,4 @@ Entregue em 2026-10-20 (commit 8a7efb7)
 Entregue em 2026-10-23 (commit ae1fb54), com ressalva: critérios [visual] da mudança de publicacao-e-arquivamento presumidos (a tela não foi vista); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
 
 Entregue em 2026-10-23 (commit fa00e9a)
+Em revisão desde 2026-10-23

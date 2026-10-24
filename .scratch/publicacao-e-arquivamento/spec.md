@@ -2,7 +2,14 @@
 
 Status: ready-for-agent
 
-**Como resolve o problema.** Hoje o processo some do Quadro assim que a Aprovação pelo setor se conclui, mesmo que a Publicação ainda esteja em andamento. "Não vai ser publicado" só se diz dispensando a etapa, o que parece definitivo e faz as planilhas mostrarem "Dispensada". E um processo concluído não tem outro lugar além da Lista. Com esta funcionalidade:
+**Como resolve o problema (desde 2026-10-23, Andamento livre).** Concluídos passa a ser a última etapa do catálogo, e o processo chega lá movido como em qualquer outra etapa. Para que não se conte como publicado o que não foi, a chegada pede uma de duas coisas:
+
+- a **data da publicação**, com o link se houver; ou
+- **Concluir sem publicação**, com uma explicação obrigatória, porque há processos que não se quer divulgar.
+
+A data também se registra antes, na etapa Publicação, ou depois, no processo concluído sem publicação, mesmo arquivado. O processo **suspenso** ou **cancelado** também pode ser arquivado: ele guarda a situação e a etapa, e desarquivar devolve tudo como estava. Somem a pergunta "Vai para publicação?", o "Não vai mais para publicação" e o "Não publicado". A seção "Andamento livre", logo abaixo, vale sobre o resto desta spec no que divergir.
+
+**Como resolvia antes de 2026-10-23.** Hoje o processo some do Quadro assim que a Aprovação pelo setor se conclui, mesmo que a Publicação ainda esteja em andamento. "Não vai ser publicado" só se diz dispensando a etapa, o que parece definitivo e faz as planilhas mostrarem "Dispensada". E um processo concluído não tem outro lugar além da Lista. Com esta funcionalidade:
 
 - Quem conclui a Aprovação responde, na mesma janela, **"Vai para publicação?"**.
 - Com "sim", a Publicação entra em andamento e o processo segue no Quadro até ela se resolver.
@@ -16,6 +23,214 @@ O banco garante a escolha, a regra do concluído e a trava do arquivado. Toda mu
 Decisões de origem: sabatina de 2026-10-22 (`.scratch/publicacao-e-arquivamento/sabatina.md`); `CONTEXT.md` (Validação com o setor, Vai para publicação, Não publicado, Registrar publicação, Concluídos, Arquivado, Situação do processo); ADR 0020 (escolha de publicação em campo próprio), que se apoia nos ADRs 0004, 0012, 0014, 0015 e 0017.
 
 Esta funcionalidade muda as specs já entregues de `processos-etapas` (Quadro, Lista, verso, situação), `revisoes-aprovacao` (nome da Validação com o setor, janela de concluir a Aprovação, voltar) e `exportacao-e-manutencao` (fase VII e rótulo da situação nas planilhas). Cada uma ganhou uma nota apontando para esta spec e a linha `Em revisão desde 2026-10-22`.
+
+## Andamento livre (mudança de 2026-10-23)
+
+Parte 1 da iniciativa quadro-livre. Decisões de origem: `.scratch/quadro-livre/sabatina-parte-1.md` (itens 4, 7 e 11) e o ADR 0024, que substitui o ADR 0020. Termos no `CONTEXT.md`: Concluídos, Concluir sem publicação, Registrar publicação, Arquivado e Situação do processo. O modelo comum (mover, etiqueta, responsável, passagens, a etapa Concluídos no catálogo) está na seção "Andamento livre" da spec de `processos-etapas`.
+
+### O que deixa de valer no resto desta spec
+
+- **A escolha de publicação sai inteira:**
+  - a pergunta "Vai para publicação?" e a coluna `vai_para_publicacao`;
+  - "Não vai mais para publicação";
+  - a recusa de dispensar a Publicação (não há mais dispensa);
+  - "voltar apaga a escolha";
+  - o selo "Não publicado".
+- **O concluído calculado pela escolha:** concluído passa a ser estar em Concluídos.
+- **A Publicação como andamento:** a data da publicação passa a ser campo do processo.
+- **Histórias substituídas:** 3 a 15, 18 (o cartão de Concluídos agora se arrasta), 20, 21, 22 (o selo), 27 (o suspenso e o cancelado também se arquivam), 33 (a Publicação "concluída"), 35 a 38 e 44.
+
+Continuam valendo:
+- a Validação com o setor;
+- a coluna Concluídos sempre visível, com a frase do vazio, em ordem de nome e com os filtros;
+- arquivar e desarquivar, com o selo e o filtro "Arquivados" na Lista;
+- o arquivado sem outras alterações;
+- Registrar publicação, com as recusas de data;
+- a Consulta só lendo.
+
+### Solução
+
+- **Chegada a Concluídos** (pela lista "Etapa" do Agora ou arrastando, spec de `processos-etapas`). Se o processo já tem a data da publicação, ele vai direto. Senão, abre a janela "Levar {processo} a Concluídos", com duas opções em botões de escolha, nenhuma marcada ao abrir:
+  - **"Publicado"**: Data da publicação (`input type="date"`, hoje por padrão, sem data futura, e não antes da data da aprovação quando há) e Link (opcional, `http://` ou `https://`, até 500 caracteres);
+  - **"Concluir sem publicação"**: Explicação (obrigatória, até 2.000 caracteres), com a dica "Por que este processo não será publicado?".
+
+  [Levar a Concluídos] fica desabilitado até a opção escolhida estar completa. Esc ou [Cancelar] não gravam, e o cartão volta. A recusa ou falha aparece em vermelho, sem perder o preenchido.
+- **Registrar publicação:**
+  - na etapa Publicação, o Agora traz [Registrar publicação], com a mesma Data e o Link;
+  - em Concluídos sem publicação e no arquivado sem publicação, o mesmo botão;
+  - o processo fica onde está;
+  - registrada a data, o botão vira [Corrigir publicação], com a janela preenchida (não no arquivado).
+- **Sair de Concluídos** (mover de volta) apaga a explicação de concluir sem publicação, que era a condição daquela chegada. A data da publicação fica, porque a publicação aconteceu.
+- **Agora em Concluídos:**
+  - "Concluído · Publicado em dd/mm/aaaa" (com o link, numa aba nova, quando há) ou "Concluído sem publicação: {explicação}";
+  - [Registrar publicação] quando sem publicação;
+  - [Arquivar], que é o principal.
+- **Cartão em Concluídos:** selo "Sem publicação" quando não há data, no lugar de "Não publicado".
+- **Arquivar:**
+  - vale para o processo concluído, suspenso ou cancelado, sem motivo;
+  - o arquivado sai do Quadro e guarda a situação e a etapa;
+  - a Lista mostra a situação e o selo juntos ("Arquivado · Cancelado", "Arquivado · Suspenso", "Arquivado · Concluído");
+  - o verso do suspenso e do cancelado traz [Arquivar] ao lado de [Retomar].
+- **Desarquivar** devolve tudo como estava: o suspenso volta ao Quadro na etapa dele, o cancelado continua só na Lista, e o concluído volta a Concluídos.
+- **O arquivado** só registra a publicação (quando não tem data) e desarquiva. Não se move, não muda a etiqueta, o responsável nem as Anotações, não retoma e não edita.
+- **Histórico:**
+  - "Concluiu sem publicação", com a explicação como motivo;
+  - "Registrou a publicação" e "Corrigiu a publicação", com a data e o link;
+  - "Arquivou" e "Desarquivou", como hoje;
+  - a explicação apagada ao sair de Concluídos vai no "antes" do evento do movimento.
+
+### Histórias de usuário
+
+46. Como integrante do EP, quero que levar o processo a Concluídos peça a data da publicação ou a explicação de concluir sem publicação, para não contar como publicado o que não foi.
+47. Como integrante do EP, quero que o processo que já tem a data da publicação vá a Concluídos direto, sem janela.
+48. Como integrante do EP, quero a mesma janela ao arrastar o cartão para Concluídos e ao escolher Concluídos na lista do Agora.
+49. Como integrante do EP, quero que, sem escolher uma das duas opções completas, o botão fique desabilitado e o processo não vá.
+50. Como integrante do EP, quero concluir sem publicação com uma explicação obrigatória, para os processos que não se quer divulgar.
+51. Como integrante do EP, quero que Esc ou [Cancelar] deixem o processo e o cartão onde estavam.
+52. Como integrante do EP, quero registrar a data da publicação (com o link) com o processo na etapa Publicação, sem movê-lo.
+53. Como integrante do EP, quero registrar a publicação depois, num processo concluído sem publicação, mesmo arquivado, e que ele deixe de ser "sem publicação".
+54. Como integrante do EP, quero corrigir a data ou o link de uma publicação registrada, fora do arquivado.
+55. Como integrante do EP, quero ser recusado com data futura, antes da data da aprovação ou com link fora de `http(s)`, com a frase e o preenchido mantido.
+56. Como integrante do EP, quero que tirar o processo de Concluídos apague a explicação de concluir sem publicação, e que a data da publicação fique.
+57. Como integrante do EP, quero ver em Concluídos "Publicado em dd/mm/aaaa" ou "Concluído sem publicação: {explicação}", e o selo "Sem publicação" no cartão.
+58. Como integrante do EP, quero arquivar um processo suspenso ou cancelado, além do concluído, para tirá-lo do Quadro sem perder a situação.
+59. Como integrante do EP, quero ver na Lista "Arquivado · Cancelado" (ou Suspenso, ou Concluído), para saber como o processo estava.
+60. Como integrante do EP, quero que desarquivar devolva o processo à situação e à etapa que tinha.
+61. Como integrante do EP, quero que o arquivado não aceite nada além de registrar a publicação e desarquivar, nem pela tela nem fora dela.
+62. Como integrante do EP, quero que os processos do desenvolvimento ganhem a data da publicação ou a explicação que corresponde à escolha que tinham, sem nada a fazer à mão.
+63. Como Consulta, quero ver a linha da publicação, a explicação e os selos, sem botões nem janelas.
+
+### Decisões de implementação
+
+#### Interface
+
+- **Janela de chegada a Concluídos:** nova, no padrão da janela nativa do ADR 0003. É aberta pelo módulo de processos ao mover para Concluídos sem data e grava por `mover_processo` com a data e o link ou com a explicação.
+- **Janela de Registrar publicação:** a de hoje troca a Nota pelo Link e ganha o modo "Corrigir publicação", com a janela preenchida.
+- **Saem:**
+  - `PerguntaDaPublicacao`;
+  - a pergunta na janela de concluir a Aprovação;
+  - "Não vai mais para publicação";
+  - o aviso "A escolha de publicação será apagada";
+  - o selo "Não publicado".
+- **Agora:**
+  - Concluídos e arquivado como em "Solução";
+  - suspenso e cancelado com [Arquivar];
+  - arquivado suspenso ou cancelado com "Arquivado · {situação}: {motivo}" e [Desarquivar].
+- **Lista:** a pílula de situação e o selo "Arquivado" lado a lado. O filtro "Arquivados" continua.
+- **Módulo de processos:**
+  - `registrarPublicacao(id, data, link)` troca a nota pelo link e serve também para corrigir;
+  - a chegada a Concluídos vai em mover o processo;
+  - sai `naoVaiMaisParaPublicacao`.
+- **Recusas novas:**
+  - "Para ir a Concluídos, informe a data da publicação ou conclua sem publicação."
+  - "A explicação é obrigatória para concluir sem publicação."
+  - "Registre a publicação com o processo na Publicação ou em Concluídos."
+  - "O processo arquivado já tem a publicação registrada."
+  - "Só se arquiva processo concluído, suspenso ou cancelado."
+
+  Saem as recusas da escolha.
+- **Estados:** a janela mostra "Salvando…" e a recusa ou falha em vermelho, sem perder o preenchido. A coluna Concluídos vazia continua com "Nenhum processo concluído.".
+
+#### Modelo de dados
+
+**`processos`:**
+- sai `vai_para_publicacao`;
+- entram:
+  - `publicado_em`, data, não futura e não antes de `aprovacoes.aprovada_em` quando há;
+  - `link_da_publicacao`, texto, `http(s)`, até 500 caracteres, vazio vira nulo;
+  - `explicacao_sem_publicacao`, texto, até 2.000 caracteres, sem espaços nas pontas, vazio vira nulo;
+- as três mudam só pelas funções (`mover_processo` e `registrar_publicacao`), com o gatilho que já recusa mudança fora delas (marca da transação, como hoje);
+- `arquivado_em` continua.
+
+**Regras da chegada e da saída** (dentro de `mover_processo`):
+- para Concluídos sem `publicado_em`, exige a data (grava `publicado_em` e o link) ou a explicação (grava `explicacao_sem_publicacao`); sem nenhuma, recusa;
+- ao sair de Concluídos, apaga `explicacao_sem_publicacao`;
+- invariante: processo em Concluídos tem `publicado_em` ou `explicacao_sem_publicacao`.
+
+**`registrar_publicacao(p_processo, p_data, p_link)`:**
+- só com o processo na Publicação, em andamento, ou em Concluídos (arquivado ou não);
+- no arquivado, só sem `publicado_em`;
+- grava a data e o link, e o processo fica onde está.
+
+**`arquivar_processo` e `desarquivar_processo`:**
+- arquivar aceita processo concluído (em Concluídos), suspenso ou cancelado, não arquivado;
+- desarquivar só limpa `arquivado_em`;
+- a trava do arquivado continua em todos os gatilhos de hoje e passa a valer em `passagens` (mover e etiqueta) e em `responsavel_id`.
+
+**View `processos_com_andamento`:**
+- `publicado_em` passa a ser a coluna do processo;
+- entram `link_da_publicacao` e `sem_publicacao` (verdadeiro em Concluídos sem `publicado_em`);
+- sai `vai_para_publicacao`.
+
+**Funções que saem:** `nao_vai_mais_para_publicacao`, a conferência da escolha e a da dispensa da Publicação.
+
+**Pacote das planilhas:** troca a escolha pela data da publicação (spec de `exportacao-e-manutencao`).
+
+**Dado pessoal:** a explicação é texto livre, e a tela orienta a não anotar dado pessoal de pessoas do setor. Ela fica fora das planilhas.
+
+#### Quem pode o quê (cada célula vira um teste pgTAP)
+
+| Ação | Administrador | Integrante do EP | Consulta | Inativo | Visitante |
+|---|---|---|---|---|---|
+| ler `publicado_em`, `link_da_publicacao`, `explicacao_sem_publicacao`, `arquivado_em` | sim | sim | sim | não | não |
+| levar a Concluídos com data ou explicação | sim | sim | não | não | não |
+| registrar ou corrigir publicação | sim | sim | não | não | não |
+| arquivar e desarquivar | sim | sim | não | não | não |
+| alterar as colunas de publicação ou `arquivado_em` direto | não | não | não | não | não |
+
+#### Regras que o banco impõe
+
+| Regra | Como | Caso de teste que a prova |
+|---|---|---|
+| Chegar a Concluídos exige data ou explicação | `mover_processo` | sem nenhuma recusado; com data aceito; com explicação aceito; com data já registrada aceito sem parâmetros |
+| Explicação obrigatória e com limite | restrição e função | explicação vazia recusada; 2.001 caracteres recusados |
+| Data da publicação não futura e não antes da aprovação; link `http(s)` | restrições e funções | amanhã recusada; antes de `aprovada_em` recusada; `ftp://` recusado |
+| Sair de Concluídos apaga a explicação e mantém a data | `mover_processo` | os dois casos |
+| Registrar publicação só na Publicação ou em Concluídos; no arquivado, só sem data | `registrar_publicacao` | em Não iniciados recusado; arquivado com data recusado; arquivado sem data aceito e continua arquivado |
+| Arquivar concluído, suspenso ou cancelado; desarquivar devolve como estava | funções | em andamento fora de Concluídos recusado; suspenso arquivado e desarquivado continua suspenso na mesma etapa |
+| Arquivado não se move nem muda etiqueta, responsável e Anotações | gatilhos | os quatro recusados |
+| Colunas de publicação só pelas funções | gatilho em `processos` | `update` direto recusado mesmo para Administrador |
+| Toda mudança vira evento | gatilhos de evento | concluir sem publicação, registrar e corrigir publicação, arquivar e desarquivar geram evento |
+
+#### Migração dos dados (dentro da migração do Andamento livre)
+
+| Estado antes | Depois |
+|---|---|
+| escolha "sim" e Publicação concluída ou realizada anteriormente | `publicado_em` = a data de resolução da Publicação; processo em Concluídos |
+| escolha "sim" e Publicação em andamento | sem data; processo na etapa Publicação |
+| escolha "não" (concluído) | `explicacao_sem_publicacao` = "Concluído sem publicação no modelo anterior da plataforma."; processo em Concluídos |
+| concluído sem escolha (Publicação desativada ou ausente do caminho) | a mesma explicação |
+| sem escolha e não concluído | nada |
+
+Depois da conversão, apaga `vai_para_publicacao` e as funções da escolha. Roda com os gatilhos de evento desligados.
+
+### Decisões de teste
+
+- **Interface (a tela inteira):**
+  - a janela de chegada a Concluídos, pela lista e pelo arrastar: o botão desabilitado sem opção completa, as duas opções, Esc com o cartão de volta, a ida direta com a data já registrada;
+  - Registrar e Corrigir publicação na Publicação, em Concluídos e no arquivado, com as recusas;
+  - sair de Concluídos apagando a explicação;
+  - o Agora de Concluídos e o selo "Sem publicação";
+  - arquivar o suspenso e o cancelado, a Lista com "Arquivado · {situação}", desarquivar de volta;
+  - o arquivado sem outras alterações;
+  - Consulta sem botões.
+
+  Arte anterior: `App.concluidos`, `App.arquivamento`, `App.listaDosArquivados`, `App.registrarPublicacao`. `App.escolhaDePublicacao` e `App.naoVaiMaisParaPublicacao` são apagados.
+- **Tradução:** mover com os dados da chegada, `registrarPublicacao` com o link, e as frases novas. Arte anterior: `publicacaoSupabase`, `situacaoSupabase`.
+- **Funções puras:** o texto do Agora de Concluídos, o selo "Sem publicação" e a opção completa da janela. Arte anterior: `publicacao`.
+- **Banco:** pgTAP, um teste por célula e por regra, e a conversão. Os testes `48` e `49` são reescritos (a escolha sai; o arquivamento ganha suspenso e cancelado).
+
+### Decisões tomadas ao escrever esta seção, a confirmar na leitura
+
+1. Sair de Concluídos apaga a explicação e mantém a data da publicação.
+2. Uma publicação registrada se corrige pelo mesmo botão, que vira [Corrigir publicação], fora do arquivado. A Nota da janela antiga vira o Link, que a sabatina pediu.
+3. Registrar publicação também vale na etapa Publicação, antes de chegar a Concluídos, como diz o `CONTEXT.md`.
+4. A explicação dos processos convertidos é um texto fixo, que diz que vieram do modelo anterior.
+
+### Critérios conferidos olhando a tela
+
+- `[visual]` A janela de chegada a Concluídos mostra as duas opções lado a lado ou uma embaixo da outra, com só os campos da escolhida, sem passar da altura do notebook (1366×768).
+- `[visual]` Na Lista, "Arquivado" e a pílula da situação ficam juntos, sem quebrar a linha da tabela.
 
 ## Problema
 
@@ -338,3 +553,4 @@ A atualização dos dados roda com os gatilhos de evento desligados, como na mig
 - **Exceção na trava do arquivado:** o subprocesso arquivado aceita a propagação de `macroprocesso_id` vinda do processo pai (só dentro do gatilho do pai e sem mudar mais nada). Fora isso, o arquivado recusa tudo, menos Registrar publicação e Desarquivar.
 
 Entregue em 2026-10-23 (commit ae1fb54), com ressalva: critérios [visual] da publicacao-e-arquivamento presumidos (coluna Concluídos, pergunta na janela, selos "Não publicado" e "Arquivado", Agora do concluído e do arquivado não foram vistos na tela); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
+Em revisão desde 2026-10-23

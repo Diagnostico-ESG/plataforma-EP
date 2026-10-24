@@ -2,9 +2,156 @@
 
 Status: ready-for-agent
 
-**Como resolve o problema.** Hoje a revisão interna e a aprovação de cada processo ficam na memória da equipe, em e-mails e no Power BI: não se sabe com segurança quem revisou qual versão, se mudou algo, nem qual versão foi aprovada. Com esta funcionalidade, quem conclui a **Revisão interna** diz, na mesma janela do [Concluir], se a versão passou "sem alteração" ou foi "corrigida". Quem conclui a **Aprovação pelo setor** vê qual versão está sendo aprovada e anota, se já tiver, o número, o link e a data do E-protocolo. Revisão e conclusão se gravam juntas, sem botão nem formulário a mais. O banco garante que ninguém revise a própria versão, que nada vá ao setor ou seja aprovado com versão incompleta, e que a versão aprovada não tenha arquivo trocado. Os registros aparecem na gaveta da etapa, no verso do cartão, e toda mudança entra no histórico do processo.
+**Como resolve o problema (desde 2026-10-23, Andamento livre).** A equipe precisa saber quem revisou cada versão, se mudou algo e qual versão o setor aprovou. Os dois registros deixam de estar presos a um "Concluir" que já não existe. Com o processo na **Revisão interna**, o Agora oferece [Registrar revisão], com um só botão para os dois resultados: "sem alteração" ou "corrigida". Com o processo na **Aprovação pelo setor**, o Agora oferece [Registrar aprovação], com a versão aprovada e o E-protocolo opcional. Registrar não move o processo, e mover não exige registro. Quando o autor da versão faz a própria revisão, a plataforma avisa, mas não impede. A versão aprovada continua sem arquivo substituído. A seção "Andamento livre", logo abaixo, vale sobre o resto desta spec no que divergir.
+
+**Como resolvia antes de 2026-10-23.** Hoje a revisão interna e a aprovação de cada processo ficam na memória da equipe, em e-mails e no Power BI: não se sabe com segurança quem revisou qual versão, se mudou algo, nem qual versão foi aprovada. Com esta funcionalidade, quem conclui a **Revisão interna** diz, na mesma janela do [Concluir], se a versão passou "sem alteração" ou foi "corrigida". Quem conclui a **Aprovação pelo setor** vê qual versão está sendo aprovada e anota, se já tiver, o número, o link e a data do E-protocolo. Revisão e conclusão se gravam juntas, sem botão nem formulário a mais. O banco garante que ninguém revise a própria versão, que nada vá ao setor ou seja aprovado com versão incompleta, e que a versão aprovada não tenha arquivo trocado. Os registros aparecem na gaveta da etapa, no verso do cartão, e toda mudança entra no histórico do processo.
 
 Decisões de origem: sabatina de 2026-10-16 (`.scratch/revisoes-aprovacao/sabatina.md`), revista no `/to-tickets` de 2026-10-17 e no `/planejar` de 2026-10-19; `CONTEXT.md` (seções "Processos", "Documentos" e "Revisões e aprovação"); ADRs 0006 (envio não muda a etapa), 0011 (versão aprovada não tem arquivo substituído), 0012 (revisão pelo setor sem rodadas), 0013 (etapas do setor saem), 0014 (resolver avança; trava do autor na escolha) e 0015 (revisão e aprovação gravadas no Concluir; E-protocolo opcional), que substitui em parte o 0009.
+
+## Andamento livre (mudança de 2026-10-23)
+
+Parte 1 da iniciativa quadro-livre. Decisões de origem: `.scratch/quadro-livre/sabatina-parte-1.md` (itens 5 e 6) e o ADR 0023, que substitui os ADRs 0009 e 0015. O ADR 0011 continua valendo, e o ADR 0022 tira a trava da Validação com o setor que vinha do ADR 0012. O modelo comum (mover, etiqueta, responsável, passagens) está na seção "Andamento livre" da spec de `processos-etapas`.
+
+### O que deixa de valer no resto desta spec
+
+- **Revisão e aprovação no Concluir:** saem os blocos da janela de concluir e as funções `concluir_revisao_interna` e `concluir_aprovacao`.
+- **Travas que saem:**
+  - a de concluir a Revisão interna sem a revisão;
+  - a de concluir a Validação com o setor com a versão incompleta;
+  - a de concluir a Aprovação sem a aprovação;
+  - a do autor, que impedia quem enviou a versão de revisá-la e agora vira aviso;
+  - a de "corrigida" só quando a versão mais recente é de quem revisa;
+  - a da data da aprovação antes da última revisão interna;
+  - a da aprovação só com a versão completa.
+- **Voltar a uma etapa** não existe mais. Mover para trás não desfaz a aprovação, e a aprovação não se apaga mais.
+- **Histórias substituídas:** 1 a 9, 11, 12, 15 (só a data antes da revisão), 16, 20 e 25 (o congelamento no concluído).
+
+Continuam valendo: a gaveta com os registros, o selo "Aprovada" com o [Substituir] escondido e a recusa da substituição (ADR 0011), a edição dos registros, a Consulta só lendo, os registros que ficam com o item na reclassificação, e os estados da gaveta.
+
+### Solução
+
+- **Revisão interna:** com o processo na etapa Revisão interna, em andamento e não arquivado, o Agora traz [Registrar revisão] como botão principal. A janela "Registrar revisão" tem:
+  - **Resultado:**
+    - "Sem alteração: vale para a V7" (a versão mais recente);
+    - "Corrigida: a V8 corrige a V7", com a V8 sendo a versão mais recente enviada com o processo nesta passagem pela Revisão interna, e a V7 a anterior a ela. "Corrigida" só fica disponível quando há uma versão enviada nesta passagem e uma anterior a ela; senão, fica desabilitada, com o motivo ao lado ("Nenhuma versão foi enviada desde que o processo entrou na Revisão interna.");
+  - **Escopo** (fluxograma, relatório ou ambos), só em "Corrigida";
+  - **Comentário** opcional;
+  - **aviso amarelo** que não impede: "Você enviou a V7. A revisão interna deveria ser de outra pessoa.", quando quem está na tela é o autor da versão revisada.
+- **Um registro por passagem:** registrada a revisão, o botão vira [Editar revisão] enquanto o processo segue na mesma passagem. Quando o processo sai e volta à Revisão interna, a passagem nova pode ter o seu registro. Corrige-se editando, sem excluir.
+- **Aprovação:** com o processo na Aprovação pelo setor, em andamento e não arquivado, o Agora traz [Registrar aprovação]. A janela mostra "Versão aprovada: V8" (a mais recente) e pede o Número do E-protocolo, o Link e a Data da aprovação, os três opcionais. Sem versão, a janela diz "O processo ainda não tem versão." e o botão fica desabilitado.
+- **Uma aprovação por processo:** se já há uma (de outra passagem ou desta), a janela avisa "Esta aprovação toma o lugar da aprovação da V7, registrada em {dd/mm/aaaa}." A nova toma o lugar, e a anterior fica no histórico. Com o processo na Aprovação e a aprovação já registrada, o Agora mostra "V8 aprovada" com [Editar aprovação] e [Registrar aprovação] para uma nova.
+- **Registrar não move o processo;** mover não exige nem desfaz registro.
+- **Editar:** o [Editar] da gaveta continua, para Administrador e Integrante, com o processo em andamento ou concluído não arquivado. A revisão edita o resultado, o escopo e o comentário, e as versões se recalculam como no registro. A aprovação edita o número, o link e a data.
+- **Histórico:** "Registrou a revisão", "Editou a revisão", "Registrou a aprovação", "Substituiu a aprovação" (com a anterior no "antes") e "Editou a aprovação".
+
+### Histórias de usuário
+
+32. Como revisor, quero [Registrar revisão] no Agora com o processo na Revisão interna, sem precisar mover o processo, para registrar o resultado quando terminar.
+33. Como revisor, quero escolher "Sem alteração", que vale para a versão mais recente, ou "Corrigida", que liga a versão que enviei nesta passagem à anterior, num só botão.
+34. Como revisor, quero ver, em cada opção, qual versão é revisada e qual corrige, antes de confirmar.
+35. Como revisor, quero que "Corrigida" fique desabilitada, com o motivo, quando nenhuma versão foi enviada desde que o processo entrou na Revisão interna.
+36. Como revisor, quero o escopo só em "Corrigida" e um comentário opcional, como antes.
+37. Como autor da versão, quero ser avisado, sem ser impedido, quando registro a revisão da minha própria versão, porque a regra do revisor virou combinação da equipe.
+38. Como integrante do EP, quero que, depois de registrar, o botão vire [Editar revisão] enquanto o processo segue na mesma passagem pela Revisão interna.
+39. Como integrante do EP, quero que, quando o processo volta à Revisão interna depois de ir ao setor, eu possa registrar uma revisão nova, sem apagar a anterior.
+40. Como integrante do EP, quero [Registrar aprovação] no Agora com o processo na Aprovação pelo setor, com a versão mais recente e o número, o link e a data do E-protocolo opcionais.
+41. Como integrante do EP, quero registrar de novo a aprovação depois de um ajuste, da mesma versão ou de outra, com o aviso de que ela toma o lugar da anterior, e ver a anterior no histórico.
+42. Como integrante do EP, quero que mover o processo para trás não desfaça a aprovação, para que um engano ao arrastar não apague nada.
+43. Como integrante do EP, quero que registrar a revisão ou a aprovação não mova o processo, e que mover não exija registro.
+44. Como integrante do EP, quero ser recusado ao registrar a revisão fora da Revisão interna ou a aprovação fora da Aprovação pelo setor, mesmo fora da tela, com a frase dizendo onde o processo precisa estar.
+45. Como integrante do EP, quero editar o resultado da revisão (com as versões recalculadas), o escopo e o comentário, e o número, o link e a data da aprovação, com o processo em andamento ou concluído não arquivado.
+46. Como integrante do EP, quero que a recusa da data da aprovação no futuro e do link fora de `http(s)` continue, com a frase e o preenchido mantido.
+47. Como Consulta, quero ver os registros na gaveta e no Agora, sem botões.
+48. Como integrante do EP, quero ver no histórico os eventos de revisão registrada e editada e de aprovação registrada, substituída e editada.
+
+### Decisões de implementação
+
+#### Interface
+
+- **Agora** (spec de `processos-etapas`): na Revisão interna, [Registrar revisão] ou [Editar revisão], com o resumo do registro da passagem ("Sem alteração · V7 · Ana M." ou "Corrigida · V8 corrige a V7 · fluxograma"). Na Aprovação pelo setor, [Registrar aprovação] e, quando há aprovação, "V{n} aprovada · E-protocolo {número}" com [Editar aprovação].
+- **Janelas:**
+  - "Registrar revisão" e "Registrar aprovação" reusam os campos de hoje (`CamposDaRevisao`, `CamposDoEProtocolo`), sem a escolha do responsável e sem a pergunta de publicação;
+  - as janelas de edição continuam;
+  - a `JanelaDeAvanco` e os blocos de revisão e de aprovação dentro dela saem.
+- **Gaveta:** a da Revisão interna lista todas as revisões, de todas as passagens, da mais recente para a mais antiga. A da Aprovação pelo setor mostra a aprovação atual.
+- **Módulo de revisões:** saem `concluirRevisaoInterna` e `concluirAprovacao`. Entram `registrarRevisao(processoId, dados)` e `registrarAprovacao(processoId, dados)`. Continuam a listagem e as edições, com a edição da revisão levando também o resultado.
+- **Recusas novas:**
+  - "Registre a revisão com o processo na Revisão interna."
+  - "Registre a aprovação com o processo na Aprovação pelo setor."
+  - "Já há uma revisão registrada nesta passagem pela Revisão interna; edite-a."
+  - "Para 'corrigida', envie a versão corrigida com o processo na Revisão interna."
+  - "O processo ainda não tem versão."
+
+  Saem as recusas das travas listadas acima.
+
+#### Modelo de dados
+
+- **`revisoes_internas`:**
+  - nova coluna `passagem_id`: uuid, referência a `passagens`, preenchida pelo banco com a passagem aberta, única quando preenchida; vazia só nas revisões registradas antes da mudança;
+  - `resultado` passa a ser editável (privilégio de coluna);
+  - as versões continuam preenchidas pelo banco, ao incluir e ao mudar o resultado. "Sem alteração": revisada = a mais recente. "Corrigida": corrigida = a versão mais recente com `etapa_id` da Revisão interna e criada desde `entrou_em` da passagem, e revisada = a anterior a ela;
+  - sai a recusa do autor.
+- **Registrar a revisão:** inclusão direta, como hoje, com os gatilhos decidindo. Recusa fora da Revisão interna, com o processo suspenso, cancelado, concluído ou arquivado, sem versão e com revisão já registrada na passagem.
+- **`aprovacoes`:**
+  - continua uma por processo;
+  - a função nova `registrar_aprovacao(p_processo, p_numero, p_link, p_data)`, sem `security definer`, inclui ou, se já há, troca `versao_id` (a mais recente), o número, o link, a data, `registrada_por` e `registrada_em`, gerando o evento "substituiu" com o antes. Ela recusa fora da Aprovação pelo setor e sem versão;
+  - sai a exigência da versão completa e a da data contra a última revisão;
+  - a data continua sem poder ser futura, e o link continua `http(s)`;
+  - sai o privilégio de apagar e o gatilho da volta de etapa.
+- **Edição:** a das duas tabelas é aceita com o processo em andamento ou concluído e recusada no suspenso, no cancelado e no arquivado.
+- **Funções e gatilhos que saem:** `concluir_revisao_interna`, `concluir_aprovacao`, a conferência da conclusão das etapas de revisão, a da versão completa na Validação com o setor e o apagar da aprovação em `voltar_a_etapa`, que sai inteira (spec de `processos-etapas`).
+- **Versão aprovada:** continua sem arquivo substituído, pelo mesmo gatilho (ADR 0011).
+
+#### Quem pode o quê (cada célula vira um teste pgTAP)
+
+| Tabela e ação | Administrador | Integrante do EP | Consulta | Inativo | Visitante |
+|---|---|---|---|---|---|
+| `revisoes_internas` ler | sim | sim | sim | não | não |
+| `revisoes_internas` registrar (na Revisão interna) e editar | sim | sim | não | não | não |
+| `revisoes_internas` apagar | não | não | não | não | não |
+| `aprovacoes` ler | sim | sim | sim | não | não |
+| `aprovacoes` registrar (pela função, na Aprovação pelo setor) e editar | sim | sim | não | não | não |
+| `aprovacoes` apagar | não | não | não | não | não |
+
+#### Regras que o banco impõe
+
+| Regra | Como | Caso de teste que a prova |
+|---|---|---|
+| Revisão só com o processo na Revisão interna, em andamento e não arquivado | gatilho antes de incluir | processo na Validação com o setor recusado; suspenso, concluído e arquivado recusados |
+| Uma revisão por passagem | índice único em `passagem_id` | segunda revisão na mesma passagem recusada; depois de sair e voltar, aceita |
+| "Sem alteração" vale para a mais recente; "corrigida" liga a versão enviada nesta passagem à anterior | gatilho antes de incluir e de alterar o resultado | "corrigida" sem versão enviada desde a entrada recusada; com ela, aceita e versões certas; processo sem versão recusado |
+| O autor da versão pode registrar | sem trava | autor registrando "sem alteração" da própria versão aceito |
+| Aprovação só com o processo na Aprovação pelo setor, em andamento e não arquivado | `registrar_aprovacao` | fora da etapa recusado; sem versão recusado |
+| Aprovação nova toma o lugar da anterior | `registrar_aprovacao` | segunda chamada troca a versão e os campos; evento com o antes |
+| Mover não mexe nos registros | nada liga os registros ao movimento | mover da Aprovação à Revisão interna mantém a aprovação |
+| Edição em andamento ou concluído; recusada em suspenso, cancelado e arquivado | gatilho antes de alterar | os cinco casos |
+| Data da aprovação não futura; link `http(s)` | o que já existe | data de amanhã e `ftp://` recusados |
+| Nada se apaga | sem privilégio de apagar | apagar aprovação recusado mesmo para Administrador |
+| Versão aprovada sem arquivo substituído | gatilho que já existe | substituir arquivo da versão aprovada recusado |
+
+#### Migração
+
+As revisões e a aprovação que já existem ficam como estão, com `passagem_id` vazia. As funções e os gatilhos que saem são apagados, e `registrar_aprovacao` é criada na mesma migração do Andamento livre, ou numa seguinte, com os gatilhos de evento recriados para "Substituiu a aprovação".
+
+### Decisões de teste
+
+- **Interface (a tela inteira):** [Registrar revisão] e [Registrar aprovação] no Agora só na etapa certa; os dois resultados, "Corrigida" desabilitada com o motivo e disponível depois de enviar a versão na passagem; o aviso do autor sem impedir; [Editar revisão] depois de registrar e o registro novo depois de sair e voltar; a aprovação substituindo a anterior com o aviso; mover para trás mantendo a aprovação; edição em concluído e recusa no arquivado; Consulta sem botões; histórico. A falsa de revisões passa a ler a passagem aberta da falsa de processos. Arte anterior: `App.revisaoInterna`, `App.aprovacao`, `App.aprovacaoNaGaveta`, `App.editarRegistros`, que são reescritos para o registro pelo Agora.
+- **Tradução:** `registrarRevisao` e `registrarAprovacao` no módulo real com o cliente simulado, e as frases das recusas novas. Arte anterior: `revisoesSupabase`, `frasesDeRevisao`, `frasesDeAprovacao`.
+- **Funções puras:** as opções de resultado (versão enviada na passagem) e o aviso do autor. Arte anterior: `opcoesDaRevisao`.
+- **Banco:** pgTAP, um teste por célula e por regra. Os testes `38` a `41` são reescritos para o registro sem conclusão, e os casos das travas que saíram são apagados.
+
+### Decisões tomadas ao escrever esta seção, a confirmar na leitura
+
+1. O resultado da revisão passa a ser editável, com as versões recalculadas, porque não há mais como excluir e registrar de novo na mesma passagem.
+2. A aprovação vale para a versão mais recente de qualquer tipo, sem exigir a versão completa: a trava de arquivos fica para a parte 3.
+3. A data da aprovação deixa de ser conferida contra a última revisão interna, porque a ordem dos registros ficou livre.
+4. A edição dos registros vale também no processo concluído não arquivado, para acrescentar o número do E-protocolo que chegou depois.
+5. "Corrigida" reconhece a versão enviada nesta passagem pela etapa em que a versão foi registrada (Revisão interna) e pela hora de envio desde a entrada.
+
+### Critérios conferidos olhando a tela
+
+- `[visual]` As janelas "Registrar revisão" e "Registrar aprovação" mostram a versão revisada ou aprovada antes de confirmar, sem passar da altura do notebook (1366×768); o aviso do autor em amarelo.
+- `[visual]` O resumo do registro no Agora cabe numa linha, com o botão de editar ao lado, sem disputar com o botão principal.
 
 ## Problema
 
@@ -265,3 +412,4 @@ Nenhuma migração destrutiva: tipos, tabelas, funções, gatilhos e políticas 
 Entregue em 2026-10-20 (commit 6ce74d6), com ressalva: critérios [visual] presumidos (selo "Aprovada" ao lado das pílulas de Arquivos, janela de edição e registro da Revisão interna na gaveta não foram vistos na tela; a janela de concluir e a gaveta da Aprovação foram vistas na vitrine local, com módulos falsos); função arquivos-no-drive com a trava de versão aprovada ainda sem publicar no desenvolvimento
 
 Entregue em 2026-10-23 (commit ae1fb54), com ressalva: critérios [visual] da mudança de publicacao-e-arquivamento presumidos (a tela não foi vista); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
+Em revisão desde 2026-10-23

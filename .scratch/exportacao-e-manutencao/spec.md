@@ -2,9 +2,102 @@
 
 Status: ready-for-agent
 
+**Mudança de 2026-10-23 (Andamento livre).** As fases do Regimento passam a contar pela posição do processo no catálogo, e não mais pelo status de cada etapa. Os suspensos saem das planilhas, como os cancelados. A fase VII só conclui com a data da publicação registrada. O detalhe está na seção "Andamento livre", logo abaixo, que vale sobre o resto desta spec no que divergir.
+
 **Como resolve o problema.** Hoje a planilha que alimenta o dashboard em Power BI é preenchida à mão, e o dashboard depende de uma licença de outra instituição. Com esta funcionalidade, a plataforma escreve sozinha duas planilhas do Google todo dia às 6h: a **Planilha interna**, com o andamento de cada processo e de cada **Fase do Regimento**, e a **Planilha pública**, só com contagens. Os dois dashboards passam ao Data Studio da conta do CED. O Administrador acompanha as tentativas e pede uma atualização na hora pela aba **Planilhas** da Administração, e escolhe a fase de cada etapa no catálogo. Quem assumir o sistema depois encontra em `docs/manutencao/` o necessário para instalar, publicar, fazer backup, restaurar e manter as planilhas e os dashboards.
 
 Decisões de origem: sabatina de 2026-10-20 (`.scratch/exportacao-e-manutencao/sabatina.md`); `CONTEXT.md` (Fase do Regimento e a seção "Dashboards"); ADRs 0004 (catálogo configurável), 0008 (Drive pela conta de serviço), 0017 (planilhas alimentadas pela plataforma e dashboards no Data Studio) e 0018 (o banco agenda e entrega os dados, sem chave secreta).
+
+## Andamento livre (mudança de 2026-10-23)
+
+Parte 1 da iniciativa quadro-livre. Decisões de origem: `.scratch/quadro-livre/sabatina-parte-1.md` (itens 4, 7 e 9) e os ADRs 0022 e 0024. Termo no `CONTEXT.md`: Fase do Regimento. O modelo comum (etapa atual, etiqueta, passagens, Não iniciados e Concluídos) está na seção "Andamento livre" da spec de `processos-etapas`.
+
+### O que deixa de valer no resto desta spec
+
+- **Histórias substituídas:**
+  - 11: os suspensos saem;
+  - 12: os rótulos mudam;
+  - 13: a data da modelagem piloto, sem reunião, vem da fase IV;
+  - 14: a data da publicação vem do processo;
+  - 18: a regra das fases;
+  - 20: a exceção da Publicação;
+  - 21: a data de conclusão.
+- **Pacote:** os andamentos e a escolha de publicação saem dele.
+- **Situações da fase que saem:** "Pronto para iniciar", "Aguardando etapa anterior" e "Não publicado".
+
+Continuam valendo a aba Planilhas, o botão, as tentativas, o cofre, a Edge Function, a planilha pública (com as contagens) e a documentação de manutenção.
+
+### Solução
+
+- **Quem entra nas planilhas:** os processos em andamento e os concluídos, arquivados ou não. Saem os suspensos e os cancelados, arquivados ou não.
+- **Situação de cada fase IV a VII**, pela posição da etapa atual no catálogo ativo:
+  - **"Sem etapa"**: a fase não tem etapa ativa (como hoje);
+  - **"Concluída"**: o processo está numa etapa depois da última etapa da fase; ou está na última etapa da fase com a etiqueta Concluído; ou está em Concluídos. A fase VII só conclui com a data da publicação registrada;
+  - **"Sem publicação"**: só na fase VII, quando a regra acima a concluiria mas não há data da publicação, inclusive em Concluídos sem publicação. Não conta como concluída;
+  - **"Em andamento"**: o processo está numa etapa da fase (e a fase não está concluída);
+  - **"Não iniciada"**: no resto, inclusive em Não iniciados.
+- **Fases I a III:** sempre concluídas, como hoje.
+- **Data de conclusão da fase:** a mais recente em que a fase passou a contar como concluída, calculada das passagens do processo (entradas, saídas e o momento em que a etiqueta virou Concluído). Na fase VII, é a data da publicação.
+- **Rótulo da situação do processo:**
+  - "Publicado": em Concluídos, com a data da publicação;
+  - "Concluído": em Concluídos, sem publicação;
+  - "Não iniciado": em Não iniciados;
+  - "Em andamento · {fase}": a fase da etapa atual.
+
+  Saem "Próxima" e "Suspenso".
+- **Data da modelagem piloto:** a data da reunião; sem ela, a data de conclusão da fase IV.
+- **Data da publicação:** `publicado_em` do processo.
+- **Catálogo:** a fase continua obrigatória nas etapas de trabalho. Não iniciados e Concluídos não têm fase, e o catálogo mostra "—" nelas.
+
+### Histórias de usuário
+
+56. Como leitor dos dashboards, quero que os suspensos fiquem fora das planilhas, como os cancelados, arquivados ou não, para que as contagens mostrem só o trabalho que anda ou terminou.
+57. Como leitor dos dashboards, quero cada fase contada pela posição do processo no catálogo, porque o processo pode pular ou voltar etapas.
+58. Como leitor dos dashboards, quero que a última etapa da fase com a etiqueta Concluído já conte a fase como concluída, porque é o sinal de que aquela parte terminou.
+59. Como leitor dos dashboards, quero que a fase VII só conte como concluída com a data da publicação, e apareça "Sem publicação" quando o processo foi concluído sem ela, para não inflar os publicados.
+60. Como leitor dos dashboards, quero "Não iniciada" no lugar de "Pronto para iniciar" e de "Aguardando etapa anterior".
+61. Como leitor dos dashboards, quero a data de conclusão de cada fase como a mais recente em que ela passou a contar como concluída, para contar as conclusões por mês.
+62. Como leitor dos dashboards, quero os rótulos "Publicado", "Concluído", "Não iniciado" e "Em andamento · {fase}".
+63. Como Administrador, quero que Não iniciados e Concluídos fiquem sem fase no catálogo, porque não pertencem a nenhuma fase do Regimento.
+
+### Decisões de implementação
+
+- **Pacote** (`private.montar_pacote_das_planilhas`):
+  - **etapas:** passam a ter `fase` vazia nas duas fixas, e o código identifica `nao_iniciados` e `concluidos`;
+  - **processos:**
+    - trocam `concluido` e `vai_para_publicacao` por `etapa_atual_id`, `etiqueta` e `publicado_em`;
+    - só entram os de situação guardada em andamento (concluído é em andamento em Concluídos);
+    - nenhum nome de pessoa, como hoje;
+  - **passagens:** `andamentos` dá lugar a elas, com `processo_id`, `etapa_id`, `entrou_em`, `saiu_em` e `concluido_em`, sem `movido_por`.
+- **Validação do pacote** (pura): aceita a fase vazia só nas etapas de código `nao_iniciados` e `concluidos`, e exige uma passagem aberta por processo. A recusa diz o campo, o valor recebido e o esperado, como hoje.
+- **Funções puras:**
+  - a situação das fases, a data de conclusão, o rótulo e as duas datas mudam para as regras acima;
+  - as contagens públicas continuam: concluídos da fase e total;
+  - a função `planilhas-dos-dashboards` precisa ser publicada de novo no desenvolvimento, e esse passo é seu.
+- **Banco:** o pacote é recriado na migração do Andamento livre. Nada muda no cofre, nas tentativas nem no agendamento.
+
+### Decisões de teste
+
+- **Edge Function (a decisão pura):** Vitest com pacotes inventados, provando:
+  - cada situação da fase: depois da fase, última etapa com Concluído, a mesma com A fazer, em Concluídos, a VII com e sem data, Não iniciados e uma fase sem etapa;
+  - a data de conclusão a partir das passagens, inclusive o processo que volta e conclui de novo (vale a mais recente);
+  - cada rótulo;
+  - os suspensos e os cancelados fora;
+  - a validação da fase vazia e da passagem aberta.
+
+  Arte anterior: `planilhasFases`, `planilhasProcesso`, `planilhasPacote`, `planilhasPublica` e o cenário `planilhasCenario`, que são ajustados.
+- **Banco:** o teste `44_pacote_das_planilhas` é reescrito: passagens no lugar de andamentos, suspensos fora, nenhum nome de pessoa.
+- **Interface:** o catálogo mostra "—" na fase das duas fixas (`App.catalogoDeEtapas`).
+
+### Decisões tomadas ao escrever esta seção, a confirmar na leitura
+
+1. A fase VII aparece "Sem publicação" sempre que a posição a concluiria sem a data, e não só em Concluídos.
+2. A data de conclusão da fase VII é a data da publicação, não o dia em que ela foi registrada.
+3. A data da modelagem piloto, sem reunião, passa a ser a da conclusão da fase IV. A parte 2 troca a reunião pela Data da modelagem piloto.
+
+### Critérios conferidos olhando a tela
+
+- `[visual]` No catálogo, a fase "—" das duas etapas fixas fica alinhada com as outras linhas.
 
 ## Problema
 
@@ -220,3 +313,4 @@ Nenhuma migração destrutiva: tipo, coluna, tabela, view, funções, gatilho e 
 Entregue em 2026-10-22 (commit 06c8052), com ressalva: critérios [visual] dos tickets 01 e 02 vistos só na vitrine local com módulos falsos e o dos dashboards (ticket 04) em aberto, a finalizar pelo usuário por fora; camada Deno da função planilhas-dos-dashboards sem teste automático; resultado atual do "Testes de banco" no GitHub não reconferido; revisão de segurança foi a de reserva (menos completa)
 
 Entregue em 2026-10-23 (commit ae1fb54), com ressalva: critérios [visual] da mudança de publicacao-e-arquivamento presumidos (a tela não foi vista); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
+Em revisão desde 2026-10-23
