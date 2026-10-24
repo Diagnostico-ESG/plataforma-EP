@@ -2,8 +2,8 @@ import {
   type ErroDoBanco, type RecusasDoModulo, TravaDoBanco, porQueNadaMudou, recusaPorPerfil,
 } from '../acesso/falhasDeGravacao'
 import type { ClienteSupabase } from '../lib/supabase'
-import type { Database } from '../types/database'
 import { formatarData } from './caminhoDeEtapas'
+import { semTipos } from './clienteSemTipos'
 import { fraseDasAnotacoesLongas } from './frasesDasAnotacoes'
 import { fraseDaEtapaProtegida, fraseDaEtapaUsada } from './frasesDoCatalogo'
 import { FRASE_SEM_VERSAO, fraseDaVersaoIncompleta } from './frasesDaVersaoCompleta'
@@ -30,7 +30,9 @@ import type { ModuloDeProcessos, UsuarioResponsavel } from './tipos'
 
 type OperacoesDoAndamento = 'iniciarEtapa' | 'concluirEtapa' | 'dispensarEtapa' | 'registrarRealizadaAnteriormente'
   | 'voltarParaEtapa' | 'corrigirDatasDaEtapa' | 'mudarResponsavelDaEtapa' | 'listarResponsaveisPossiveis'
-type MudancaDoAndamento = Database['public']['Tables']['andamentos']['Update']
+type MudancaDoAndamento = {
+  status?: string; iniciada_em?: string | null; resolvida_em?: string | null; responsavel_id?: string | null
+}
 
 // As recusas chegam de fora (as de processos) para este módulo não importar quem o monta.
 export function criarAndamentosSupabase(
@@ -53,7 +55,7 @@ export function criarAndamentosSupabase(
 async function mudarAndamento(
   cliente: ClienteSupabase, id: string, mudanca: MudancaDoAndamento, recusas: RecusasDoModulo,
 ): Promise<void> {
-  const { data, error } = await cliente.from('andamentos').update(mudanca).eq('id', id).select('id')
+  const { data, error } = await semTipos(cliente).from('andamentos').update(mudanca).eq('id', id).select('id')
   if (error) throw falhaDoAndamento(error, recusas)
   if (!data.length) throw porQueNadaMudou(await andamentoExiste(cliente, id), recusas)
 }
@@ -66,7 +68,7 @@ type PedidoDoAvanco = {
 // A função do banco resolve a etapa, grava a escolha de publicação (só a Aprovação a usa) e inicia a próxima numa
 // transação só. O supabase-js manda null como null; o tipo gerado não o admite nos parâmetros, como em reclassificar_processo.
 async function avancar(cliente: ClienteSupabase, pedido: PedidoDoAvanco, recusas: RecusasDoModulo): Promise<void> {
-  const { error } = await cliente.rpc('avancar_etapa', {
+  const { error } = await semTipos(cliente).rpc('avancar_etapa', {
     p_andamento: pedido.id, p_acao: pedido.acao, p_nota: pedido.nota as string, p_responsavel: pedido.responsavelId as string,
     p_vai_para_publicacao: (pedido.vai ?? null) as boolean,
   })
@@ -74,7 +76,7 @@ async function avancar(cliente: ClienteSupabase, pedido: PedidoDoAvanco, recusas
 }
 
 async function andamentoExiste(cliente: ClienteSupabase, id: string): Promise<boolean> {
-  const { data } = await cliente.from('andamentos').select('id').eq('id', id)
+  const { data } = await semTipos(cliente).from('andamentos').select('id').eq('id', id)
   return Boolean(data?.length)
 }
 
@@ -82,7 +84,7 @@ async function andamentoExiste(cliente: ClienteSupabase, id: string): Promise<bo
 async function voltarParaEtapa(
   cliente: ClienteSupabase, id: string, motivo: string, responsavelId: string | null, recusas: RecusasDoModulo,
 ): Promise<void> {
-  const { error } = await cliente.rpc('voltar_a_etapa', { p_andamento: id, p_motivo: motivo, p_responsavel: responsavelId as string })
+  const { error } = await semTipos(cliente).rpc('voltar_a_etapa', { p_andamento: id, p_motivo: motivo, p_responsavel: responsavelId as string })
   if (error) throw falhaDoAndamento(error, recusas)
 }
 

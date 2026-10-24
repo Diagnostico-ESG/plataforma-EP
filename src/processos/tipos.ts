@@ -29,7 +29,7 @@ export type SituacaoDoProcesso = 'em_andamento' | 'suspenso' | 'cancelado' | 'co
 export type EtapaDoCatalogo = { id: string; codigo: string; nome: string; ordem: number; ativa: boolean }
 
 /** Uma etapa do catálogo como a Administração a mostra: ativa ou não. */
-export type EtapaNoCatalogo = EtapaDoCatalogo & { obrigatoria: boolean; fase: FaseDoRegimento }
+export type EtapaNoCatalogo = EtapaDoCatalogo & { obrigatoria: boolean; fase: FaseDoRegimento | null }
 
 /** O que o formulário de etapa nova grava; `antesDe` null põe a etapa no fim. */
 export type EtapaNova = { codigo: string; nome: string; obrigatoria: boolean; fase: FaseDoRegimento; antesDe: string | null }

@@ -1,6 +1,7 @@
 import { type RecusasDoModulo, porQueNadaMudou } from '../acesso/falhasDeGravacao'
 import type { ClienteSupabase } from '../lib/supabase'
 import { falhaDoAndamento } from '../processos/andamentosSupabase'
+import { semTipos } from '../processos/clienteSemTipos'
 import type {
   Aprovacao, DadosDaAprovacao, DadosDaEdicaoDaRevisao, DadosDaRevisao, ModuloDeRevisoes, RevisaoInterna,
 } from './tipos'
@@ -54,7 +55,7 @@ async function listarRevisoes(cliente: ClienteSupabase, processoId: string): Pro
 async function concluirRevisaoInterna(
   cliente: ClienteSupabase, andamentoId: string, dados: DadosDaRevisao, responsavelId: string | null, recusas: RecusasDoModulo,
 ): Promise<void> {
-  const { error } = await cliente.rpc('concluir_revisao_interna', {
+  const { error } = await semTipos(cliente).rpc('concluir_revisao_interna', {
     p_andamento: andamentoId, p_resultado: dados.resultado, p_escopo: dados.escopo as 'ambos',
     p_comentario: dados.comentario as string, p_responsavel: responsavelId as string,
   })
@@ -94,7 +95,7 @@ type PedidoDaAprovacao = { andamentoId: string; dados: DadosDaAprovacao; respons
 
 async function concluirAprovacao(cliente: ClienteSupabase, pedido: PedidoDaAprovacao, recusas: RecusasDoModulo): Promise<void> {
   const { andamentoId, dados } = pedido
-  const { error } = await cliente.rpc('concluir_aprovacao', {
+  const { error } = await semTipos(cliente).rpc('concluir_aprovacao', {
     p_andamento: andamentoId, p_numero: dados.numeroEprotocolo as string, p_link: dados.link as string,
     p_data: dados.aprovadaEm as string, p_responsavel: pedido.responsavelId as string, p_vai_para_publicacao: pedido.vai as boolean,
   })

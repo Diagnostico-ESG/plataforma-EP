@@ -1,7 +1,5 @@
 import type { Database } from '../types/database'
-import type {
-  DadosDoCartao, PedacoDoCaminho, ProcessoDaLista, ResponsavelDaEtapa, SituacaoDoProcesso, StatusDaEtapa,
-} from './tipos'
+import type { DadosDoCartao, ProcessoDaLista, ResponsavelDaEtapa, SituacaoDoProcesso } from './tipos'
 
 export type LinhaDoProcesso = Database['public']['Views']['processos_com_andamento']['Row']
 
@@ -21,21 +19,9 @@ export function processoDaLinha(linha: LinhaDoProcesso): ProcessoDaLista {
     responsavel: responsavelDaLinha(linha),
     dataDaReuniao: linha.data_da_reuniao,
     cartao: cartaoDaLinha(linha),
-    vaiParaPublicacao: linha.vai_para_publicacao,
     publicadoEm: linha.publicado_em,
     arquivadoEm: linha.arquivado_em,
   }
-}
-
-// O banco devolve o caminho como JSON solto (`Json`): é o único ponto onde ele vira a lista tipada, e o que não for lista
-// de {codigo, status} vira lista vazia, para o cartão só ficar sem barra em vez de quebrar a tela.
-function caminhoDaLinha(caminho: LinhaDoProcesso['caminho']): PedacoDoCaminho[] {
-  if (!Array.isArray(caminho)) return []
-  return caminho.flatMap((item) => {
-    if (item === null || typeof item !== 'object' || Array.isArray(item)) return []
-    const { codigo, status } = item
-    return typeof codigo === 'string' && typeof status === 'string' ? [{ codigo, status: status as StatusDaEtapa }] : []
-  })
 }
 
 function ultimaVersaoDaLinha(linha: LinhaDoProcesso): DadosDoCartao['ultimaVersao'] {
@@ -48,11 +34,11 @@ function ultimaVersaoDaLinha(linha: LinhaDoProcesso): DadosDoCartao['ultimaVersa
 
 function cartaoDaLinha(linha: LinhaDoProcesso): DadosDoCartao {
   return {
-    etapaAtualStatus: linha.etapa_atual_status === 'pendente' || linha.etapa_atual_status === 'em_andamento'
-      ? linha.etapa_atual_status : null,
-    etapaAtualIniciadaEm: linha.etapa_atual_iniciada_em ?? null,
+    // Remendo do ticket 24: sem status por etapa nem caminho (a view tem etiqueta e entrada na etapa); o ticket 25 refaz o cartão.
+    etapaAtualStatus: null,
+    etapaAtualIniciadaEm: linha.entrou_na_etapa_em?.slice(0, 10) ?? null,
     responsavelAtivo: linha.responsavel_ativo ?? null,
-    caminho: caminhoDaLinha(linha.caminho),
+    caminho: [],
     ultimaVersao: ultimaVersaoDaLinha(linha),
     subprocessos: linha.subprocessos_quantidade ?? 0,
   }

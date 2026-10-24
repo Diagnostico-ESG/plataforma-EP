@@ -1,6 +1,7 @@
 import { type EventoDoBanco, eventoDoCadastro } from '../cadastros/historicoSupabase'
 import type { ClienteSupabase } from '../lib/supabase'
 import type { PapelDoArquivo } from '../versoes/tipos'
+import { semTipos } from './clienteSemTipos'
 import { type AndamentoLido, COLUNAS_DO_ANDAMENTO, etapaDoAndamento } from './andamentoDoBanco'
 import { type LinhaDoProcesso, processoDaLinha } from './processoDaLinha'
 import type { EtapaDoProcesso, ItemDaEstrutura, ModuloDeProcessos, ProcessoLido, SituacaoDoProcesso, UltimaVersao } from './tipos'
@@ -79,7 +80,7 @@ function dadosDoProcesso(linha: LinhaDoProcesso) {
 type AndamentoDoProcessoLido = AndamentoLido & { responsavel: { id: string; nome: string; ativo: boolean } | null }
 
 async function lerAndamentosDoProcesso(cliente: ClienteSupabase, id: string): Promise<EtapaDoProcesso[]> {
-  const { data, error } = await cliente.from('andamentos')
+  const { data, error } = await semTipos(cliente).from('andamentos')
     .select(`${COLUNAS_DO_ANDAMENTO}, responsavel:usuarios(id, nome, ativo)`).eq('processo_id', id)
   if (error) throw new Error(`Falha ao ler as etapas do processo: ${error.message}`)
   return (data as unknown as AndamentoDoProcessoLido[])

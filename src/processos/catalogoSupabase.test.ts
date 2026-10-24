@@ -7,7 +7,7 @@ import type { Database } from '../types/database'
 import { criarProcessosSupabase } from './processosSupabase'
 
 const MODELAGEM = {
-  id: 'e4', codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, obrigatoria: true, fase: 'IV' as const, ativa: true,
+  id: 'e4', codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, fase: 'IV' as const, ativa: true,
 }
 const NOVA = { codigo: 'nova', nome: 'Nova', obrigatoria: false, fase: 'VI' as const, antesDe: null }
 
@@ -18,9 +18,9 @@ function criar(cliente: ClienteSupabaseFalso) {
 test('lista o catálogo inteiro em ordem', async () => {
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas['etapas.select'] = { data: [MODELAGEM], error: null }
-  expect(await criar(cliente).listarCatalogo()).toEqual([MODELAGEM])
+  expect(await criar(cliente).listarCatalogo()).toEqual([{ ...MODELAGEM, obrigatoria: false }])
   expect(cliente.pedidos[0]).toMatchObject({
-    tabela: 'etapas', colunas: 'id, codigo, nome, ordem, obrigatoria, fase, ativa', ordem: [['ordem', true]],
+    tabela: 'etapas', colunas: 'id, codigo, nome, ordem, fase, ativa', ordem: [['ordem', true]],
   })
 })
 
@@ -36,7 +36,7 @@ test('acrescentar chama a função do banco; "No fim" vai como posição nula', 
   await criar(cliente).acrescentarEtapa({ ...NOVA, antesDe: 'e9' })
   expect(cliente.pedidos).toMatchObject([
     { tabela: 'rpc', operacao: 'acrescentar_etapa', valores: {
-      p_codigo: 'nova', p_nome: 'Nova', p_obrigatoria: false, p_fase: 'VI', p_antes_de: null } },
+      p_codigo: 'nova', p_nome: 'Nova', p_fase: 'VI', p_antes_de: null } },
     { tabela: 'rpc', operacao: 'acrescentar_etapa', valores: { p_antes_de: 'e9' } },
   ])
 })
@@ -57,7 +57,7 @@ test('editar, desativar, reativar e excluir mexem só na etapa escolhida', async
   await catalogo.reativarEtapa('e4')
   await catalogo.excluirEtapa('e4')
   expect(cliente.pedidos).toMatchObject([
-    { operacao: 'update', valores: { nome: 'Modelagem', obrigatoria: false, fase: 'V' }, filtro: ['id', 'e4'] },
+    { operacao: 'update', valores: { nome: 'Modelagem', fase: 'V' }, filtro: ['id', 'e4'] },
     { operacao: 'update', valores: { ativa: false }, filtro: ['id', 'e4'] },
     { operacao: 'update', valores: { ativa: true }, filtro: ['id', 'e4'] },
     { operacao: 'delete', filtro: ['id', 'e4'] },

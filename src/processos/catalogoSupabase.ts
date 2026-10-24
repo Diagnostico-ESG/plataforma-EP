@@ -16,7 +16,7 @@ export function criarCatalogoSupabase(cliente: ClienteSupabase, recusas: Recusas
   return {
     listarCatalogo: () => listarCatalogo(cliente),
     acrescentarEtapa: (etapa) => acrescentarEtapa(cliente, etapa, recusas),
-    editarEtapa: (id, dados) => mudar(id, dados),
+    editarEtapa: (id, { nome, fase }) => mudar(id, { nome, fase }), // remendo do ticket 24: sem a coluna obrigatória
     desativarEtapa: (id) => mudar(id, { ativa: false }),
     reativarEtapa: (id) => mudar(id, { ativa: true }),
     moverEtapa: async (id, sentido) => {
@@ -31,15 +31,16 @@ export function criarCatalogoSupabase(cliente: ClienteSupabase, recusas: Recusas
 }
 
 async function listarCatalogo(cliente: ClienteSupabase): Promise<EtapaNoCatalogo[]> {
-  const { data, error } = await cliente.from('etapas').select('id, codigo, nome, ordem, obrigatoria, fase, ativa').order('ordem')
+  const { data, error } = await cliente.from('etapas').select('id, codigo, nome, ordem, fase, ativa').order('ordem')
   if (error) throw new Error(`Falha ao ler o catálogo de etapas: ${error.message}`)
-  return data
+  // Remendo do ticket 24: a coluna obrigatória saiu do banco; o ticket 25 tira o campo da tela.
+  return data.map((etapa) => ({ ...etapa, obrigatoria: false }))
 }
 
 async function acrescentarEtapa(cliente: ClienteSupabase, etapa: EtapaNova, recusas: RecusasDoModulo): Promise<void> {
   // O gerador de tipos do Supabase não marca parâmetro de função como anulável; o banco aceita a posição nula ("No fim").
   const { error } = await cliente.rpc('acrescentar_etapa', {
-    p_codigo: etapa.codigo, p_nome: etapa.nome, p_obrigatoria: etapa.obrigatoria, p_fase: etapa.fase,
+    p_codigo: etapa.codigo, p_nome: etapa.nome, p_fase: etapa.fase,
     p_antes_de: etapa.antesDe as string,
   })
   if (error) throw falhaDoCatalogo(error, recusas, etapa)
