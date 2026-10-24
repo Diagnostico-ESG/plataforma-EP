@@ -6,8 +6,10 @@ import { FORMATO_UUID, eCorpo, falhar, tipoDe, type Validacao } from './decisao.
 
 export const FASES_DO_CATALOGO = ['IV', 'V', 'VI', 'VII', 'VIII', 'IX'] as const
 export type FaseDoRegimento = (typeof FASES_DO_CATALOGO)[number]
-export const STATUS_DA_ETAPA = ['pendente', 'em_andamento', 'concluida', 'realizada_anteriormente', 'dispensada'] as const
-export type StatusDaEtapa = (typeof STATUS_DA_ETAPA)[number]
+export const ETIQUETAS_DA_ETAPA = ['a_fazer', 'em_andamento', 'concluido'] as const
+export type EtiquetaDaEtapa = (typeof ETIQUETAS_DA_ETAPA)[number]
+// As duas etapas fixas do catálogo (Não iniciados e Concluídos): as únicas sem fase.
+export const CODIGOS_DAS_FIXAS = ['nao_iniciados', 'concluidos']
 export const TIPOS_DE_PROCESSO = ['processo', 'subprocesso', 'a_classificar'] as const
 export type TipoDeProcesso = (typeof TIPOS_DE_PROCESSO)[number]
 export const SITUACOES_GUARDADAS = ['em_andamento', 'suspenso', 'cancelado'] as const
@@ -17,7 +19,8 @@ export interface EtapaDoPacote {
   id: string
   codigo: string
   ordem: number
-  fase: FaseDoRegimento
+  /** Vazia só nas duas fixas. */
+  fase: FaseDoRegimento | null
 }
 
 export interface ProcessoDoPacote {
@@ -27,21 +30,25 @@ export interface ProcessoDoPacote {
   setor_sigla: string
   macroprocesso_nome: string
   situacao_guardada: SituacaoGuardada
-  concluido: boolean
   observacoes: string | null
   data_da_reuniao: string | null
-  /** Escolha de publicação do processo (ADR 0020): sim, não ou sem resposta. */
-  vai_para_publicacao: boolean | null
+  /** A etapa da passagem aberta e a etiqueta dela: a posição do processo no catálogo. */
+  etapa_atual_id: string
+  etiqueta: EtiquetaDaEtapa
+  /** Dia da publicação (AAAA-MM-DD); nulo sem publicação. */
+  publicado_em: string | null
   /** Número da última versão não histórica; nulo sem versão. */
   ultima_versao: number | null
 }
 
-export interface AndamentoDoPacote {
+/** Cada estadia de um processo numa etapa; a aberta (sem `saiu_em`) é a etapa atual. */
+export interface PassagemDoPacote {
   processo_id: string
   etapa_id: string
-  status: StatusDaEtapa
-  iniciada_em: string | null
-  resolvida_em: string | null
+  entrou_em: string
+  saiu_em: string | null
+  etiqueta: EtiquetaDaEtapa
+  concluido_em: string | null
 }
 
 export interface PacoteDasPlanilhas {
@@ -51,7 +58,7 @@ export interface PacoteDasPlanilhas {
   planilhas: { interna: string; publica: string }
   etapas: EtapaDoPacote[]
   processos: ProcessoDoPacote[]
-  andamentos: AndamentoDoPacote[]
+  passagens: PassagemDoPacote[]
 }
 
 /** Uma aba pronta para gravar: o título e as linhas (a primeira é o cabeçalho). */
@@ -81,18 +88,15 @@ const dataOuNula: Regra = {
   esperado: 'AAAA-MM-DD ou nulo',
   vale: (v) => v === null || (typeof v === 'string' && FORMATO_DATA.test(v)),
 }
-const booleano: Regra = { esperado: 'booleano', vale: (v) => typeof v === 'boolean' }
-const booleanoOuNulo: Regra = { esperado: 'booleano ou nulo', vale: (v) => v === null || typeof v === 'boolean' }
 const inteiroPositivo = (v: unknown): boolean => typeof v === 'number' && Number.isInteger(v) && v > 0
 const numeroPositivo: Regra = { esperado: 'número inteiro maior que zero', vale: inteiroPositivo }
 const numeroOuNulo: Regra = { esperado: 'número inteiro maior que zero ou nulo', vale: (v) => v === null || inteiroPositivo(v) }
-const dataEHora: Regra = {
-  esperado: 'data e hora ISO',
-  vale: (v) => typeof v === 'string' && !Number.isNaN(Date.parse(v)),
-}
-const daLista = (lista: readonly string[]): Regra => ({
+const eDataEHora = (v: unknown): boolean => typeof v === 'string' && !Number.isNaN(Date.parse(v))
+const dataEHora: Regra = { esperado: 'data e hora ISO', vale: eDataEHora }
+const dataEHoraOuNula: Regra = { esperado: 'data e hora ISO ou nulo', vale: (v) => v === null || eDataEHora(v) }
+const daLista = (lista: readonly string[], aceitaNulo = false): Regra => ({
   esperado: lista.length > 2 ? `${lista.slice(0, -1).join(', ')} ou ${lista[lista.length - 1]}` : lista.join(' ou '),
-  vale: (valor) => typeof valor === 'string' && lista.includes(valor),
+  vale: (valor) => (aceitaNulo && valor === null) || (typeof valor === 'string' && lista.includes(valor)),
   mostraValor: true,
 })
 
@@ -123,7 +127,9 @@ function conferirLista(valor: unknown, regras: Record<string, Regra>, onde: stri
   return null
 }
 
-const REGRAS_DA_ETAPA = { id: uuid, codigo: comFormato(FORMATO_CODIGO, 'código da etapa'), ordem: numeroPositivo, fase: daLista(FASES_DO_CATALOGO) }
+// A fase vazia só vale nas fixas: `erroDaFaseDasEtapas` confere isso junto com o código, depois destas regras.
+const FASE_DA_ETAPA = daLista(FASES_DO_CATALOGO, true)
+const REGRAS_DA_ETAPA = { id: uuid, codigo: comFormato(FORMATO_CODIGO, 'código da etapa'), ordem: numeroPositivo, fase: FASE_DA_ETAPA }
 const REGRAS_DO_PROCESSO: Record<string, Regra> = {
   id: uuid,
   nome: textoNaoVazio,
@@ -131,18 +137,43 @@ const REGRAS_DO_PROCESSO: Record<string, Regra> = {
   setor_sigla: textoNaoVazio,
   macroprocesso_nome: textoNaoVazio,
   situacao_guardada: daLista(SITUACOES_GUARDADAS),
-  concluido: booleano,
   observacoes: textoOuNulo,
   data_da_reuniao: dataOuNula,
-  vai_para_publicacao: booleanoOuNulo,
+  etapa_atual_id: uuid,
+  etiqueta: daLista(ETIQUETAS_DA_ETAPA),
+  publicado_em: dataOuNula,
   ultima_versao: numeroOuNulo,
 }
-const REGRAS_DO_ANDAMENTO = {
+const REGRAS_DA_PASSAGEM = {
   processo_id: uuid,
   etapa_id: uuid,
-  status: daLista(STATUS_DA_ETAPA),
-  iniciada_em: dataOuNula,
-  resolvida_em: dataOuNula,
+  entrou_em: dataEHora,
+  saiu_em: dataEHoraOuNula,
+  etiqueta: daLista(ETIQUETAS_DA_ETAPA),
+  concluido_em: dataEHoraOuNula,
+}
+
+// Etapa fixa sem fase, etapa de trabalho com fase. Chamada com as etapas já conferidas campo a campo.
+function erroDaFaseDasEtapas(etapas: EtapaDoPacote[]): string | null {
+  for (const [posicao, etapa] of etapas.entries()) {
+    const fixa = CODIGOS_DAS_FIXAS.includes(etapa.codigo)
+    if (fixa && etapa.fase !== null) {
+      return `campo etapas[${posicao}].fase: esperado vazio nas etapas fixas, recebido "${etapa.fase}"`
+    }
+    if (!fixa && etapa.fase === null) {
+      return `campo etapas[${posicao}].fase: esperado ${FASE_DA_ETAPA.esperado}, recebido null`
+    }
+  }
+  return null
+}
+
+// Cada processo tem exatamente uma passagem aberta: é a etapa atual dele. A recusa cita a posição, nunca o nome.
+function erroDasPassagensAbertas(processos: ProcessoDoPacote[], passagens: PassagemDoPacote[]): string | null {
+  for (const [posicao, processo] of processos.entries()) {
+    const abertas = passagens.filter((p) => p.processo_id === processo.id && p.saiu_em === null).length
+    if (abertas !== 1) return `campo passagens: esperado uma passagem aberta por processo, recebido ${abertas} em processos[${posicao}]`
+  }
+  return null
 }
 
 function erroDoPacote(corpo: unknown): string | null {
@@ -153,7 +184,9 @@ function erroDoPacote(corpo: unknown): string | null {
     conferirObjeto(corpo.planilhas, { interna: idDaPlanilha, publica: idDaPlanilha }, 'planilhas') ??
     conferirLista(corpo.etapas, REGRAS_DA_ETAPA, 'etapas') ??
     conferirLista(corpo.processos, REGRAS_DO_PROCESSO, 'processos') ??
-    conferirLista(corpo.andamentos, REGRAS_DO_ANDAMENTO, 'andamentos')
+    conferirLista(corpo.passagens, REGRAS_DA_PASSAGEM, 'passagens') ??
+    erroDaFaseDasEtapas(corpo.etapas as EtapaDoPacote[]) ??
+    erroDasPassagensAbertas(corpo.processos as ProcessoDoPacote[], corpo.passagens as PassagemDoPacote[])
   )
 }
 

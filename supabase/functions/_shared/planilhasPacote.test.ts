@@ -57,43 +57,80 @@ describe('validarPacote', () => {
   })
 
   it('recusa a fase fora de IV a IX, citando o valor recebido', () => {
-    expect(recusa((p) => { p.etapas[0].fase = 'III' })).toContain(
-      'campo etapas[0].fase: esperado IV, V, VI, VII, VIII ou IX, recebido "III"',
+    expect(recusa((p) => { p.etapas[1].fase = 'III' })).toContain(
+      'campo etapas[1].fase: esperado IV, V, VI, VII, VIII ou IX, recebido "III"',
     )
   })
 
   it('aceita a fase VIII e IX', () => {
     const pacote = copia()
-    pacote.etapas[0].fase = 'IX'
+    pacote.etapas[1].fase = 'IX'
     expect(validarPacote(pacote).ok).toBe(true)
   })
 
-  it('recusa tipo, situação guardada e status fora da lista, citando o valor', () => {
+  it('aceita a fase vazia nas duas fixas', () => {
+    const fixas = copia().etapas.filter((etapa: Pacote) => etapa.fase === null).map((etapa: Pacote) => etapa.codigo)
+    expect(fixas).toEqual(['nao_iniciados', 'concluidos'])
+    expect(validarPacote(pacoteMinimo()).ok).toBe(true)
+  })
+
+  it('recusa fase preenchida numa fixa, citando o valor recebido', () => {
+    expect(recusa((p) => { p.etapas[0].fase = 'IV' })).toContain(
+      'campo etapas[0].fase: esperado vazio nas etapas fixas, recebido "IV"',
+    )
+    expect(recusa((p) => { p.etapas[7].fase = 'VII' })).toContain('campo etapas[7].fase: esperado vazio nas etapas fixas')
+  })
+
+  it('recusa fase vazia numa etapa de trabalho', () => {
+    expect(recusa((p) => { p.etapas[1].fase = null })).toContain(
+      'campo etapas[1].fase: esperado IV, V, VI, VII, VIII ou IX, recebido null',
+    )
+  })
+
+  it('recusa tipo, situação guardada e etiqueta fora da lista, citando o valor', () => {
     const tipo = recusa((p) => { p.processos[0].tipo = 'outro' })
     expect(tipo).toContain('campo processos[0].tipo')
     expect(tipo).toContain('recebido "outro"')
     expect(recusa((p) => { p.processos[0].situacao_guardada = 'apagado' })).toContain('recebido "apagado"')
-    expect(recusa((p) => { p.andamentos[0].status = 'feito' })).toContain('campo andamentos[0].status')
+    expect(recusa((p) => { p.passagens[0].etiqueta = 'feito' })).toContain('campo passagens[0].etiqueta')
   })
 
-  it('recusa concluido que não é booleano', () => {
-    expect(recusa((p) => { p.processos[0].concluido = 'sim' })).toContain(
-      'campo processos[0].concluido: esperado booleano, recebido string',
+  it('recusa etapa atual que não é uuid e etiqueta do processo fora da lista', () => {
+    expect(recusa((p) => { p.processos[0].etapa_atual_id = null })).toContain(
+      'campo processos[0].etapa_atual_id: esperado uuid, recebido null',
+    )
+    expect(recusa((p) => { p.processos[0].etiqueta = 'parado' })).toContain('recebido "parado"')
+  })
+
+  it('aceita a data da publicação e recusa a que está fora do formato AAAA-MM-DD', () => {
+    const pacote = copia()
+    pacote.processos[0].publicado_em = '2026-07-01'
+    expect(validarPacote(pacote).ok).toBe(true)
+    expect(recusa((p) => { p.processos[0].publicado_em = '01/07/2026' })).toContain(
+      'campo processos[0].publicado_em: esperado AAAA-MM-DD ou nulo',
     )
   })
 
-  it('aceita a escolha de publicação sim, não e sem resposta', () => {
-    for (const escolha of [true, false, null]) {
-      const pacote = copia()
-      pacote.processos[0].vai_para_publicacao = escolha
-      expect(validarPacote(pacote).ok).toBe(true)
-    }
+  it('recusa processo sem passagem aberta, sem citar o nome', () => {
+    const mensagem = recusa((p) => { p.passagens[0].saiu_em = '2026-03-02T12:00:00Z' })
+    expect(mensagem).toContain('campo passagens: esperado uma passagem aberta por processo, recebido 0 em processos[0]')
+    expect(mensagem).not.toContain('Processo 10')
   })
 
-  it('recusa a escolha de publicação que não é booleano nem nulo', () => {
-    expect(recusa((p) => { p.processos[0].vai_para_publicacao = 'sim' })).toContain(
-      'campo processos[0].vai_para_publicacao: esperado booleano ou nulo, recebido string',
+  it('recusa processo com duas passagens abertas', () => {
+    expect(recusa((p) => { p.passagens.push({ ...p.passagens[0] }) })).toContain(
+      'esperado uma passagem aberta por processo, recebido 2 em processos[0]',
     )
+  })
+
+  it('aceita data e hora de passagem com fuso e recusa a que não é data', () => {
+    const pacote = copia()
+    pacote.passagens[0].entrou_em = '2026-10-24T12:00:00.123456+00:00'
+    expect(validarPacote(pacote).ok).toBe(true)
+    expect(recusa((p) => { p.passagens[0].entrou_em = 'ontem' })).toContain(
+      'campo passagens[0].entrou_em: esperado data e hora ISO',
+    )
+    expect(recusa((p) => { p.passagens[0].concluido_em = 'ontem' })).toContain('campo passagens[0].concluido_em')
   })
 
   it('recusa última versão que não é inteiro positivo nem nulo', () => {
@@ -110,12 +147,6 @@ describe('validarPacote', () => {
   it('recusa data da reunião fora do formato AAAA-MM-DD', () => {
     expect(recusa((p) => { p.processos[0].data_da_reuniao = '10/03/2026' })).toContain(
       'campo processos[0].data_da_reuniao: esperado AAAA-MM-DD ou nulo',
-    )
-  })
-
-  it('recusa data de andamento fora do formato AAAA-MM-DD', () => {
-    expect(recusa((p) => { p.andamentos[0].resolvida_em = '2026-10-20T10:00:00Z' })).toContain(
-      'campo andamentos[0].resolvida_em',
     )
   })
 

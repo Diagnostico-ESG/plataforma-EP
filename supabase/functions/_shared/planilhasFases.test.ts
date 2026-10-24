@@ -1,140 +1,168 @@
 import { describe, expect, it } from 'vitest'
-import { andamentosDe, etapasDoCatalogo, processoDe, type Marca } from './planilhasExemplos.ts'
-import type { EtapaDoPacote, StatusDaEtapa } from './planilhasPacote.ts'
+import { etapasDoCatalogo, processoNaTrilha, uuid, type PassoDaTrilha } from './planilhasExemplos.ts'
 import { situacaoDasFases, type FaseDoProcesso } from './planilhasFases.ts'
+import type { EtapaDoPacote, ProcessoDoPacote } from './planilhasPacote.ts'
 
-const processo = processoDe(1)
+const passo = (etapa: string, dia: string, extra: Partial<PassoDaTrilha> = {}): PassoDaTrilha => ({
+  etapa,
+  entrou: `${dia}T12:00:00Z`,
+  ...extra,
+})
+const concluido = (dia: string): Partial<PassoDaTrilha> => ({ etiqueta: 'concluido', concluidoEm: `${dia}T12:00:00Z` })
 
-function fases(
-  marcas: Record<string, StatusDaEtapa | Marca>,
+// O caminho até a Revisão interna: a IV e a V ficaram para trás (entradas em 2026-04-01 e 2026-05-01).
+const ATE_REVISAO_INTERNA = [
+  passo('nao_iniciados', '2026-03-01'),
+  passo('modelagem', '2026-03-02'),
+  passo('relatorio_modelagem_tecnica', '2026-04-01'),
+  passo('revisao_interna', '2026-05-01'),
+]
+const ATE_APROVACAO = [...ATE_REVISAO_INTERNA, passo('revisao_setor', '2026-05-10'), passo('aprovacao_setor', '2026-06-01')]
+
+function fasesDe(
+  passos: PassoDaTrilha[],
+  campos: Partial<ProcessoDoPacote> = {},
   etapas: EtapaDoPacote[] = etapasDoCatalogo(),
-  escolha: boolean | null = null,
 ): FaseDoProcesso[] {
-  return situacaoDasFases(etapas, andamentosDe(processo, marcas, etapas), escolha)
+  const { processo, passagens } = processoNaTrilha(1, passos, campos)
+  return situacaoDasFases(etapas, processo, passagens)
 }
 
-function situacoes(marcas: Record<string, StatusDaEtapa | Marca>, etapas?: EtapaDoPacote[]): string[] {
-  return fases(marcas, etapas).map((f) => f.situacao)
-}
+const situacoes = (fases: FaseDoProcesso[]): string[] => fases.slice(3).map((fase) => fase.situacao)
+const datas = (fases: FaseDoProcesso[]): (string | null)[] => fases.slice(3).map((fase) => fase.concluidaEm)
 
-const TUDO_RESOLVIDO: Record<string, StatusDaEtapa> = {
-  modelagem: 'concluida',
-  relatorio_modelagem_tecnica: 'concluida',
-  revisao_interna: 'concluida',
-  revisao_setor: 'concluida',
-  aprovacao_setor: 'concluida',
-  publicacao: 'concluida',
-}
-
-describe('situacaoDasFases', () => {
-  it('devolve as fases I a VII, nessa ordem', () => {
-    expect(fases({}).map((f) => f.fase)).toEqual(['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'])
+describe('situacaoDasFases: o que a posição no catálogo diz de cada fase', () => {
+  it('sempre devolve as sete fases, de I a VII', () => {
+    expect(fasesDe([passo('nao_iniciados', '2026-03-01')]).map((fase) => fase.fase)).toEqual(
+      ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'],
+    )
   })
 
-  it('as fases I a III saem sempre concluídas, sem data', () => {
-    const iniciais = fases({}).slice(0, 3)
-    expect(iniciais.map((f) => f.situacao)).toEqual(['Concluída', 'Concluída', 'Concluída'])
-    expect(iniciais.map((f) => f.concluidaEm)).toEqual([null, null, null])
+  it('dá as fases I a III como concluídas, sem data, em qualquer posição', () => {
+    for (const passos of [[passo('nao_iniciados', '2026-03-01')], ATE_REVISAO_INTERNA]) {
+      for (const fase of fasesDe(passos).slice(0, 3)) {
+        expect(fase.situacao).toBe('Concluída')
+        expect(fase.concluidaEm).toBeNull()
+      }
+    }
   })
 
-  it('a fase IV nunca começada fica pronta para iniciar, porque a III é sempre concluída', () => {
-    expect(situacoes({})).toEqual(['Concluída', 'Concluída', 'Concluída', 'Pronto para iniciar', 'Aguardando etapa anterior', 'Aguardando etapa anterior', 'Aguardando etapa anterior'])
+  it('em Não iniciados nenhuma fase foi iniciada', () => {
+    const fases = fasesDe([passo('nao_iniciados', '2026-03-01')])
+    expect(situacoes(fases)).toEqual(['Não iniciada', 'Não iniciada', 'Não iniciada', 'Não iniciada'])
+    expect(datas(fases)).toEqual([null, null, null, null])
   })
 
-  it('uma etapa em andamento deixa a fase em andamento', () => {
-    expect(situacoes({ modelagem: 'em_andamento' })[3]).toBe('Em andamento')
+  it('numa etapa da fase, ela está em andamento e as anteriores, concluídas pela entrada na etapa depois delas', () => {
+    const fases = fasesDe(ATE_REVISAO_INTERNA)
+    expect(situacoes(fases)).toEqual(['Concluída', 'Concluída', 'Em andamento', 'Não iniciada'])
+    expect(datas(fases)).toEqual(['2026-04-01', '2026-05-01', null, null])
   })
 
-  it('a fase seguinte fica pronta para iniciar quando a anterior está concluída e nada nela começou', () => {
-    expect(situacoes({ modelagem: 'concluida' }).slice(3)).toEqual(['Concluída', 'Pronto para iniciar', 'Aguardando etapa anterior', 'Aguardando etapa anterior'])
+  it('na primeira etapa de uma fase, a fase anterior já está concluída', () => {
+    expect(situacoes(fasesDe([passo('nao_iniciados', '2026-03-01'), passo('modelagem', '2026-03-02')]))).toEqual(
+      ['Em andamento', 'Não iniciada', 'Não iniciada', 'Não iniciada'],
+    )
   })
 
-  it('concluída, realizada anteriormente e dispensada contam como resolvidas', () => {
-    const marcas = { revisao_interna: 'concluida', revisao_setor: 'realizada_anteriormente', aprovacao_setor: 'dispensada' } as const
-    expect(situacoes(marcas)[5]).toBe('Concluída')
+  it('na última etapa da fase com A fazer, a fase segue em andamento', () => {
+    const fases = fasesDe(ATE_APROVACAO)
+    expect(situacoes(fases)).toEqual(['Concluída', 'Concluída', 'Em andamento', 'Não iniciada'])
+    expect(fases[5].concluidaEm).toBeNull()
   })
 
-  it('uma etapa resolvida e outra pendente deixam a fase em andamento', () => {
-    expect(situacoes({ revisao_interna: 'concluida' })[5]).toBe('Em andamento')
+  it('na última etapa da fase com Concluído, a fase conta como concluída, na data do Concluído', () => {
+    const fases = fasesDe([...ATE_REVISAO_INTERNA, passo('revisao_setor', '2026-05-10'), passo('aprovacao_setor', '2026-06-01', concluido('2026-06-03'))])
+    expect(situacoes(fases)).toEqual(['Concluída', 'Concluída', 'Concluída', 'Não iniciada'])
+    expect(datas(fases)).toEqual(['2026-04-01', '2026-05-01', '2026-06-03', null])
   })
 
-  it('a fase que nada começou, com a anterior não concluída, aguarda a etapa anterior', () => {
-    expect(situacoes({ modelagem: 'em_andamento' })[4]).toBe('Aguardando etapa anterior')
+  it('numa etapa do meio da fase com Concluído, a fase ainda não terminou', () => {
+    const passos = [...ATE_REVISAO_INTERNA.slice(0, 3), passo('revisao_interna', '2026-05-01', concluido('2026-05-02'))]
+    expect(situacoes(fasesDe(passos))[2]).toBe('Em andamento')
   })
 
-  it('etapa sem andamento no processo conta como pendente', () => {
-    const resultado = situacaoDasFases(etapasDoCatalogo(), [])
-    expect(resultado[3].situacao).toBe('Pronto para iniciar')
+  it('na Publicação sem a data da publicação, a VII está em andamento e a VI, concluída pela entrada', () => {
+    const fases = fasesDe([...ATE_APROVACAO, passo('publicacao', '2026-07-01')])
+    expect(situacoes(fases)).toEqual(['Concluída', 'Concluída', 'Concluída', 'Em andamento'])
+    expect(datas(fases)).toEqual(['2026-04-01', '2026-05-01', '2026-07-01', null])
   })
 
-  it('a fase VII com a escolha "não" é "Não publicado", sem data, e não conta como concluída', () => {
-    const resultado = fases({ ...TUDO_RESOLVIDO, publicacao: 'pendente' }, undefined, false)
-    expect(resultado[6].situacao).toBe('Não publicado')
-    expect(resultado[6].concluidaEm).toBeNull()
+  it('na Publicação com Concluído mas sem a data da publicação, a VII fica "Sem publicação"', () => {
+    const fases = fasesDe([...ATE_APROVACAO, passo('publicacao', '2026-07-01', concluido('2026-07-02'))])
+    expect(fases[6].situacao).toBe('Sem publicação')
+    expect(fases[6].concluidaEm).toBeNull()
   })
 
-  it('a escolha "não" só muda a fase VII', () => {
-    const resultado = fases({ ...TUDO_RESOLVIDO, publicacao: 'pendente' }, undefined, false)
-    expect(resultado.slice(0, 6).map((f) => f.situacao)).toEqual(Array(6).fill('Concluída'))
-  })
-
-  it('a escolha "sim" ou sem resposta, com a Publicação concluída, deixa a fase VII concluída', () => {
-    const marcas = { ...TUDO_RESOLVIDO, publicacao: { status: 'concluida', resolvida_em: '2026-07-01' } } as const
-    expect(fases(marcas, undefined, true)[6]).toEqual({ fase: 'VII', situacao: 'Concluída', concluidaEm: '2026-07-01' })
-    expect(fases(marcas, undefined, null)[6].situacao).toBe('Concluída')
-  })
-
-  it('"Dispensada" não existe mais: a Publicação dispensada, sem escolha, conta como resolvida', () => {
-    expect(fases({ ...TUDO_RESOLVIDO, publicacao: 'dispensada' })[6].situacao).toBe('Concluída')
-  })
-
-  it('sem etapa na fase VII, a escolha "não" não cria situação: continua "Sem etapa"', () => {
-    const semFaseVII = etapasDoCatalogo().filter((e) => e.fase !== 'VII')
-    expect(fases({}, semFaseVII, false)[6].situacao).toBe('Sem etapa')
-  })
-
-  it('uma fase VI toda dispensada continua concluída', () => {
-    const marcas = { revisao_interna: 'dispensada', revisao_setor: 'dispensada', aprovacao_setor: 'dispensada' } as const
-    expect(situacoes(marcas)[5]).toBe('Concluída')
-  })
-
-  it('a Publicação realizada anteriormente conta como concluída', () => {
-    expect(situacoes({ ...TUDO_RESOLVIDO, publicacao: 'realizada_anteriormente' })[6]).toBe('Concluída')
-  })
-
-  it('a data de conclusão da fase é a maior data de resolução entre as etapas dela', () => {
-    const resultado = fases({
-      ...TUDO_RESOLVIDO,
-      revisao_interna: { status: 'concluida', resolvida_em: '2026-05-10' },
-      revisao_setor: { status: 'concluida', resolvida_em: '2026-06-20' },
-      aprovacao_setor: { status: 'concluida', resolvida_em: '2026-06-01' },
+  it('na Publicação com Concluído e a data da publicação, a VII está concluída nessa data', () => {
+    const fases = fasesDe([...ATE_APROVACAO, passo('publicacao', '2026-07-01', concluido('2026-07-02'))], {
+      publicado_em: '2026-07-10',
     })
-    expect(resultado[5].concluidaEm).toBe('2026-06-20')
+    expect(fases[6]).toEqual({ fase: 'VII', situacao: 'Concluída', concluidaEm: '2026-07-10' })
   })
 
-  it('a fase concluída sem data de resolução fica sem data', () => {
-    expect(fases(TUDO_RESOLVIDO)[3].concluidaEm).toBeNull()
+  it('em Concluídos com a data da publicação, todas as fases estão concluídas', () => {
+    const fases = fasesDe([...ATE_APROVACAO, passo('publicacao', '2026-07-01'), passo('concluidos', '2026-07-12')], {
+      publicado_em: '2026-07-10',
+    })
+    expect(situacoes(fases)).toEqual(['Concluída', 'Concluída', 'Concluída', 'Concluída'])
+    expect(datas(fases)).toEqual(['2026-04-01', '2026-05-01', '2026-07-01', '2026-07-10'])
   })
 
-  it('a fase não concluída não tem data de conclusão', () => {
-    const resultado = fases({ modelagem: { status: 'em_andamento', resolvida_em: '2026-05-10' } })
-    expect(resultado[3].concluidaEm).toBeNull()
+  it('em Concluídos sem a data da publicação, a VII é "Sem publicação" e as outras estão concluídas', () => {
+    const fases = fasesDe([...ATE_APROVACAO, passo('publicacao', '2026-07-01'), passo('concluidos', '2026-07-12')])
+    expect(situacoes(fases)).toEqual(['Concluída', 'Concluída', 'Concluída', 'Sem publicação'])
+    expect(datas(fases)).toEqual(['2026-04-01', '2026-05-01', '2026-07-01', null])
   })
 
-  it('a fase sem etapa ativa é "Sem etapa" e a seguinte aguarda a etapa anterior', () => {
-    const semFaseV = etapasDoCatalogo().filter((e) => e.fase !== 'V')
-    const resultado = situacoes({ modelagem: 'concluida' }, semFaseV)
-    expect(resultado.slice(3)).toEqual(['Concluída', 'Sem etapa', 'Aguardando etapa anterior', 'Aguardando etapa anterior'])
+  it('uma fase sem etapa ativa é "Sem etapa" e a seguinte segue a regra', () => {
+    const semFaseVI = etapasDoCatalogo().filter((etapa) => etapa.fase !== 'VI')
+    const fases = fasesDe([passo('nao_iniciados', '2026-03-01'), passo('modelagem', '2026-03-02'), passo('publicacao', '2026-07-01')], {}, semFaseVI)
+    expect(situacoes(fases)).toEqual(['Concluída', 'Concluída', 'Sem etapa', 'Em andamento'])
+    expect(fases[5].concluidaEm).toBeNull()
   })
 
-  it('ignora as etapas das fases VIII e IX', () => {
-    const comFaseIX: EtapaDoPacote[] = [...etapasDoCatalogo(), { id: '00000000-0000-4000-8000-000000000999', codigo: 'remodelagem', ordem: 7, fase: 'IX' }]
-    expect(situacoes({ ...TUDO_RESOLVIDO }, comFaseIX)).toEqual(Array(7).fill('Concluída'))
+  it('com a etapa atual fora do catálogo, nenhuma fase foi iniciada e nada quebra', () => {
+    const fases = fasesDe(ATE_REVISAO_INTERNA, { etapa_atual_id: uuid(999) })
+    expect(situacoes(fases)).toEqual(['Não iniciada', 'Não iniciada', 'Não iniciada', 'Não iniciada'])
+  })
+})
+
+describe('situacaoDasFases: a data de conclusão', () => {
+  it('mantém a data do Concluído quando o processo segue em frente', () => {
+    const passos = [...ATE_APROVACAO.slice(0, 5), passo('aprovacao_setor', '2026-06-01', concluido('2026-06-03')), passo('publicacao', '2026-06-20')]
+    expect(fasesDe(passos)[5].concluidaEm).toBe('2026-06-03')
   })
 
-  it('ignora o andamento de uma etapa que não está no catálogo ativo', () => {
-    const andamentos = andamentosDe(processo, { modelagem: 'concluida' })
-    andamentos.push({ processo_id: processo.id, etapa_id: '00000000-0000-4000-8000-000000000888', status: 'em_andamento', iniciada_em: null, resolvida_em: null })
-    expect(situacaoDasFases(etapasDoCatalogo(), andamentos)[4].situacao).toBe('Pronto para iniciar')
+  it('vale a data mais recente quando o processo volta e conclui de novo', () => {
+    const passos = [
+      ...ATE_APROVACAO.slice(0, 5),
+      passo('aprovacao_setor', '2026-06-01', concluido('2026-06-03')),
+      passo('publicacao', '2026-06-20'),
+      passo('aprovacao_setor', '2026-06-25', concluido('2026-06-26')),
+    ]
+    expect(fasesDe(passos)[5]).toEqual({ fase: 'VI', situacao: 'Concluída', concluidaEm: '2026-06-26' })
+  })
+
+  it('vale a entrada mais recente depois da fase quando o processo voltou, e sai de novo sem concluir', () => {
+    const passos = [...ATE_APROVACAO, passo('publicacao', '2026-06-20'), passo('revisao_interna', '2026-06-22'), passo('publicacao', '2026-06-30')]
+    expect(fasesDe(passos)[5].concluidaEm).toBe('2026-06-30')
+  })
+
+  it('deixa a fase sem data enquanto o processo voltou para dentro dela', () => {
+    const passos = [...ATE_APROVACAO, passo('publicacao', '2026-06-20'), passo('revisao_setor', '2026-06-22')]
+    const fases = fasesDe(passos)
+    expect(fases[5]).toEqual({ fase: 'VI', situacao: 'Em andamento', concluidaEm: null })
+    expect(fases[4].concluidaEm).toBe('2026-05-01')
+  })
+
+  it('conta o dia de Brasília, não o de Greenwich', () => {
+    const passos = [passo('nao_iniciados', '2026-03-01'), passo('modelagem', '2026-03-02'), { etapa: 'relatorio_modelagem_tecnica', entrou: '2026-05-02T01:30:00Z' }]
+    expect(fasesDe(passos)[3].concluidaEm).toBe('2026-05-01')
+  })
+
+  it('deixa a data vazia, sem erro, se o Concluído veio sem a data (dado incoerente)', () => {
+    const passos = [...ATE_APROVACAO.slice(0, 5), { ...passo('aprovacao_setor', '2026-06-01'), etiqueta: 'concluido' as const }]
+    expect(fasesDe(passos)[5]).toEqual({ fase: 'VI', situacao: 'Concluída', concluidaEm: null })
   })
 })
