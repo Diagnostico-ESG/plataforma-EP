@@ -32,9 +32,9 @@
 
 **Arquivos:** `scripts/migracoesPendentes.mjs` (novo, função pura), `scripts/migracoesPendentes.test.mjs` (novo), `scripts/testar-banco.mjs`.
 
-- [ ] Teste Vitest que falha: `migracoesPendentes(arquivos, ultimaAplicada)` devolve, em ordem, só os `AAAAMMDDHHMMSS_nome.sql` com versão maior que `ultimaAplicada`; sem registro (`null`) recusa com mensagem que cita o valor recebido (rodar tudo apagaria o banco); ignora nomes fora do formato. E `comEnsaio(sqlDoTeste, pendentes)` devolve o teste intacto quando ele tem a linha `-- ensaio: sem migrações pendentes` ou quando não há pendentes, e senão `begin;` + migrações + teste.
-- [ ] Implementar as duas funções; `testar-banco.mjs` lê `max(version)` de `supabase_migrations.schema_migrations` uma vez, lista as pendentes e mostra quais vão no ensaio (só os nomes).
-- [ ] `npm test` verde; commit.
+- [x] Teste Vitest que falha: `migracoesPendentes(arquivos, ultimaAplicada)` devolve, em ordem, só os `AAAAMMDDHHMMSS_nome.sql` com versão maior que `ultimaAplicada`; sem registro (`null`) recusa com mensagem que cita o valor recebido (rodar tudo apagaria o banco); ignora nomes fora do formato. E `comEnsaio(sqlDoTeste, pendentes)` devolve o teste intacto quando ele tem a linha `-- ensaio: sem migrações pendentes` ou quando não há pendentes, e senão `begin;` + migrações + teste.
+- [x] Implementar as duas funções; `testar-banco.mjs` lê `max(version)` de `supabase_migrations.schema_migrations` uma vez, lista as pendentes e mostra quais vão no ensaio (só os nomes).
+- [x] `npm test` verde; commit.
 
 ### Tarefa 2: testes de banco do modelo novo, vistos falhar
 
