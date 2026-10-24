@@ -65,23 +65,11 @@ end $$;
 grant execute on function pg_temp.arquivo(text, text, bigint), pg_temp.par(), pg_temp.processo(text),
   pg_temp.versao(uuid, integer), pg_temp.alterar_tamanhos(bigint) to authenticated;
 
--- Preparação, como integrante: o "Processo Concluido V" com as obrigatórias resolvidas.
+-- Preparação, como integrante: o "Processo Concluido V" em Concluídos (Andamento livre: concluído é estar lá).
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 set local role authenticated;
--- Na ordem do caminho, uma por vez (a sequência das etapas é conferida a cada mudança).
-update public.andamentos a set status = 'realizada_anteriormente', nota = 'Feita antes' from public.etapas e
-  where e.id = a.etapa_id and a.processo_id = pg_temp.processo('e4') and e.codigo = 'modelagem';
-update public.andamentos a set status = 'realizada_anteriormente', nota = 'Feita antes' from public.etapas e
-  where e.id = a.etapa_id and a.processo_id = pg_temp.processo('e4') and e.codigo = 'relatorio_modelagem_tecnica';
-update public.andamentos a set status = 'realizada_anteriormente', nota = 'Feita antes' from public.etapas e
-  where e.id = a.etapa_id and a.processo_id = pg_temp.processo('e4') and e.codigo = 'revisao_interna';
-update public.andamentos a set status = 'realizada_anteriormente', nota = 'Feita antes' from public.etapas e
-  where e.id = a.etapa_id and a.processo_id = pg_temp.processo('e4') and e.codigo = 'revisao_setor';
-update public.andamentos a set status = 'realizada_anteriormente', nota = 'Feita antes' from public.etapas e
-  where e.id = a.etapa_id and a.processo_id = pg_temp.processo('e4') and e.codigo = 'aprovacao_setor';
--- A Publicação resolvida também: sem a escolha de publicação, a Publicação pendente mantém o processo em andamento (ADR 0020).
-update public.andamentos a set status = 'realizada_anteriormente', nota = 'Publicada antes' from public.etapas e
-  where e.id = a.etapa_id and a.processo_id = pg_temp.processo('e4') and e.codigo = 'publicacao';
+select public.mover_processo(pg_temp.processo('e4'), (select id from public.etapas where codigo = 'concluidos'),
+  null, null, 'Não será publicado');
 select public.suspender_processo(pg_temp.processo('e2'), 'Aguardando o setor');
 select public.cancelar_processo(pg_temp.processo('e3'), 'Não segue');
 

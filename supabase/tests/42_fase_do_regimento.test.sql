@@ -1,5 +1,6 @@
 -- Fase do Regimento no catálogo (exportacao-e-manutencao, ticket 01; spec, histórias 1 a 8): cada etapa tem uma fase
--- de IV a IX, obrigatória; as seis etapas atuais já vêm com a fase; a mudança de fase vira evento do catálogo; só o
+-- de IV a IX, obrigatória fora das fixas Não iniciados e Concluídos (Andamento livre, processos-etapas 24); as seis
+-- etapas de trabalho de fábrica já vêm com a fase; a mudança de fase vira evento do catálogo; só o
 -- administrador ativo muda a fase (inclusive a de uma etapa protegida).
 begin;
 create extension if not exists pgtap with schema extensions;
@@ -45,7 +46,8 @@ grant execute on function pg_temp.fase(text) to authenticated;
 -- A coluna e a carga das seis etapas atuais (história 5), lidas como administrador.
 select pg_temp.entrar('00000000-0000-0000-0000-0000000000a1');
 set local role authenticated;
-insert into _tap (linha) select col_not_null('public', 'etapas', 'fase', 'a fase da etapa é obrigatória');
+insert into _tap (linha) select is((select count(*)::int from public.etapas where fase is null
+  and codigo not in ('nao_iniciados', 'concluidos')), 0, 'toda etapa de trabalho tem fase');
 insert into _tap (linha) select is(pg_temp.fase('modelagem'), 'IV', 'Modelagem piloto está na fase IV');
 insert into _tap (linha) select is(pg_temp.fase('relatorio_modelagem_tecnica'), 'V',
   'Relatório e modelagem técnica está na fase V');
@@ -56,15 +58,15 @@ insert into _tap (linha) select is(pg_temp.fase('publicacao'), 'VII', 'Publicaç
 
 -- Etapa sem fase e fase fora de IV a IX são recusadas (histórias 1 e 2).
 insert into _tap (linha) select throws_ok(
-  $sql$select public.acrescentar_etapa('teste_sem_fase', 'Etapa Sem Fase', true, null, null)$sql$,
-  '23502', null, 'etapa sem fase é recusada');
+  $sql$select public.acrescentar_etapa('teste_sem_fase', 'Etapa Sem Fase', null, null)$sql$,
+  '23514', null, 'etapa sem fase é recusada');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.acrescentar_etapa('teste_fase_3', 'Etapa Fase Tres', true, 'III', null)$sql$,
+  $sql$select public.acrescentar_etapa('teste_fase_3', 'Etapa Fase Tres', 'III', null)$sql$,
   '22P02', null, 'fase fora de IV a IX é recusada');
 
 -- Acrescentar grava a fase, e o evento do catálogo a leva no depois.
 insert into _tap (linha) select lives_ok(
-  $sql$select public.acrescentar_etapa('teste_fase', 'Etapa da Fase', false, 'VIII', null)$sql$,
+  $sql$select public.acrescentar_etapa('teste_fase', 'Etapa da Fase', 'VIII', null)$sql$,
   'o administrador acrescenta uma etapa com fase');
 insert into _tap (linha) select is(pg_temp.fase('teste_fase'), 'VIII', 'a etapa nova guarda a fase escolhida');
 insert into _tap (linha) select is(
@@ -87,23 +89,24 @@ insert into _tap (linha) select is(pg_temp.fase('revisao_interna'), 'V', 'a etap
 reset role;
 
 -- Os outros perfis não acrescentam etapa nem mudam a fase (história 7).
-create function pg_temp.conferir_perfil(id_usuario text, quem text) returns void
+create function pg_temp.conferir_perfil(id_usuario text, quem text, recusa text default '42501') returns void
 language plpgsql as $$
 begin
   perform pg_temp.entrar(id_usuario);
   set local role authenticated;
   insert into _tap (linha) select throws_ok(
-    $sql$select public.acrescentar_etapa('teste_outro', 'Etapa de Outro', false, 'VI', null)$sql$,
-    '42501', null, quem || ' não acrescenta etapa com fase');
+    $sql$select public.acrescentar_etapa('teste_outro', 'Etapa de Outro', 'VI', null)$sql$,
+    recusa, null, quem || ' não acrescenta etapa com fase');
   with alteradas as (update public.etapas set fase = 'IX' where codigo = 'publicacao' returning 1)
   insert into _tap (linha) select is((select count(*)::int from alteradas), 0, quem || ' não muda a fase');
   reset role;
 end $$;
-grant execute on function pg_temp.conferir_perfil(text, text) to authenticated;
+grant execute on function pg_temp.conferir_perfil(text, text, text) to authenticated;
 
 select pg_temp.conferir_perfil('00000000-0000-0000-0000-0000000000a2', 'Integrante');
 select pg_temp.conferir_perfil('00000000-0000-0000-0000-0000000000a3', 'Consulta');
-select pg_temp.conferir_perfil('00000000-0000-0000-0000-0000000000a4', 'Inativo');
+-- O inativo nem lê o catálogo: para ele, a posição de Concluídos não existe.
+select pg_temp.conferir_perfil('00000000-0000-0000-0000-0000000000a4', 'Inativo', 'P0001');
 
 -- Visitante.
 select set_config('request.jwt.claims', '{"role":"anon"}', true);

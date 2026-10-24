@@ -1,6 +1,6 @@
--- Cartão do Quadro (processos-etapas, ticket 20): os campos novos da view processos_com_andamento — início e status da
--- etapa atual, responsável ativo, caminho de etapas, última versão (histórica ou não, com ou sem relatório) e a
--- contagem de subprocessos não cancelados.
+-- Cartão do Quadro (processos-etapas, ticket 20; Andamento livre no ticket 24): os campos da view
+-- processos_com_andamento que o cartão usa — etiqueta, entrada e posição da etapa atual, responsável ativo, última
+-- versão (histórica ou não, com ou sem relatório) e a contagem de subprocessos não cancelados.
 begin;
 create extension if not exists pgtap with schema extensions;
 -- As linhas do pgTAP vão para _tap e saem na exceção do fim (ver scripts/relatorio-tap.mjs).
@@ -45,22 +45,9 @@ create function pg_temp.linha(nome_do_processo text) returns public.processos_co
 language sql stable as $$ select * from public.processos_com_andamento where nome = nome_do_processo $$;
 grant execute on function pg_temp.linha(text) to authenticated;
 
-create function pg_temp.andamento(nome_do_processo text, codigo_da_etapa text) returns uuid
-language sql stable as $$
-  select a.id from public.andamentos a
-  join public.etapas e on e.id = a.etapa_id
-  where a.processo_id = pg_temp.processo(nome_do_processo) and e.codigo = codigo_da_etapa $$;
-grant execute on function pg_temp.andamento(text, text) to authenticated;
-
-create function pg_temp.iniciar(nome_do_processo text, codigo_da_etapa text) returns void
-language sql as $$
-  update public.andamentos set status = 'em_andamento' where id = pg_temp.andamento(nome_do_processo, codigo_da_etapa) $$;
-grant execute on function pg_temp.iniciar(text, text) to authenticated;
-
-create function pg_temp.escolher(nome_do_processo text, codigo_da_etapa text, usuario uuid) returns void
-language sql as $$
-  update public.andamentos set responsavel_id = usuario where id = pg_temp.andamento(nome_do_processo, codigo_da_etapa) $$;
-grant execute on function pg_temp.escolher(text, text, uuid) to authenticated;
+create function pg_temp.escolher(nome_do_processo text, usuario uuid) returns void
+language sql as $$ update public.processos set responsavel_id = usuario where id = pg_temp.processo(nome_do_processo) $$;
+grant execute on function pg_temp.escolher(text, uuid) to authenticated;
 
 create function pg_temp.arquivo(papel text, formato text) returns jsonb
 language sql immutable as $$
@@ -82,9 +69,10 @@ grant execute on function pg_temp.arquivo(text, text), pg_temp.par(), pg_temp.re
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
 set local role authenticated;
 
-select pg_temp.iniciar('Parado', 'modelagem');
-select pg_temp.escolher('Resp Ativo', 'modelagem', '00000000-0000-0000-0000-0000000000a2');
-select pg_temp.escolher('Resp Inativo', 'modelagem', '00000000-0000-0000-0000-0000000000a4');
+select public.mover_processo(pg_temp.processo('Parado'), (select id from public.etapas where codigo = 'modelagem'));
+update public.passagens set etiqueta = 'em_andamento' where processo_id = pg_temp.processo('Parado') and saiu_em is null;
+select pg_temp.escolher('Resp Ativo', '00000000-0000-0000-0000-0000000000a2');
+select pg_temp.escolher('Resp Inativo', '00000000-0000-0000-0000-0000000000a4');
 select public.registrar_versao(pg_temp.processo('V1 Sem'), 1, null, pg_temp.par());
 select public.registrar_versao(pg_temp.processo('V1 Com'), 1, null, pg_temp.par() || pg_temp.relatorio('T20_V1_Com_Relatório.pdf'));
 select public.registrar_versao(pg_temp.processo('Relatorio Depois'), 1, null, pg_temp.par());
@@ -93,30 +81,26 @@ select public.registrar_versao(pg_temp.processo('V2 Sem'), 2, null, pg_temp.par(
 select public.registrar_versao_historica(pg_temp.processo('Historica'), 5, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')));
 select public.cancelar_processo(pg_temp.processo('Filho C'), 'Não segue');
 
--- Etapa atual: início e status.
-insert into _tap (linha) select is((pg_temp.linha('Parado')).etapa_atual_status::text, 'em_andamento',
-  'a etapa atual iniciada aparece como em andamento');
-insert into _tap (linha) select is((pg_temp.linha('Parado')).etapa_atual_iniciada_em, private.hoje(),
-  'o início da etapa atual é a data em que ela foi iniciada');
-insert into _tap (linha) select is((pg_temp.linha('Pendente')).etapa_atual_status::text, 'pendente',
-  'a etapa atual não iniciada aparece como pendente');
-insert into _tap (linha) select is((pg_temp.linha('Pendente')).etapa_atual_iniciada_em, null::date,
-  'a etapa atual pendente não tem início');
+-- Etapa atual: etiqueta e entrada.
+insert into _tap (linha) select is((pg_temp.linha('Parado')).etiqueta::text, 'em_andamento',
+  'a view traz a etiqueta da etapa atual');
+insert into _tap (linha) select is(((pg_temp.linha('Parado')).entrou_na_etapa_em at time zone 'America/Sao_Paulo')::date,
+  private.hoje(), 'a entrada na etapa atual é a data do movimento');
+insert into _tap (linha) select is((pg_temp.linha('Pendente')).etiqueta::text, 'a_fazer',
+  'o processo cadastrado está em A fazer');
+insert into _tap (linha) select is((pg_temp.linha('Pendente')).etapa_atual_codigo, 'nao_iniciados',
+  'o processo cadastrado está em Não iniciados');
 
--- Caminho: um item por andamento, na ordem do catálogo.
-insert into _tap (linha) select is(jsonb_array_length((pg_temp.linha('Parado')).caminho),
-  (select count(*)::int from public.andamentos where processo_id = pg_temp.processo('Parado')),
-  'o caminho tem um item por andamento do processo');
+-- Posição: entre as etapas ativas, na ordem do catálogo.
+insert into _tap (linha) select is((pg_temp.linha('Pendente')).etapa_atual_posicao, 1, 'Não iniciados é a posição 1');
+insert into _tap (linha) select is((pg_temp.linha('Parado')).etapa_atual_posicao,
+  (select count(*)::int from public.etapas where ativa and ordem <= (select ordem from public.etapas where codigo = 'modelagem')),
+  'a posição conta as etapas ativas até a atual');
+insert into _tap (linha) select is((pg_temp.linha('Parado')).etapa_atual_codigo, 'modelagem', 'a etapa atual é a da passagem aberta');
 insert into _tap (linha) select is(
-  (select array_agg(item ->> 'codigo' order by ordem) from jsonb_array_elements((pg_temp.linha('Parado')).caminho)
-    with ordinality as t(item, ordem)),
-  (select array_agg(codigo order by ordem) from public.etapas where id in
-    (select etapa_id from public.andamentos where processo_id = pg_temp.processo('Parado'))),
-  'o caminho segue a ordem do catálogo');
-insert into _tap (linha) select is((pg_temp.linha('Parado')).caminho -> 0 ->> 'status', 'em_andamento',
-  'o item do caminho traz o status do andamento');
-insert into _tap (linha) select ok((pg_temp.linha('Parado')).caminho -> 0 ? 'etapa_id',
-  'o item do caminho traz o id da etapa');
+  (select count(*)::int from information_schema.columns where table_schema = 'public' and table_name = 'processos_com_andamento'
+    and column_name in ('caminho', 'etapa_atual_status', 'etapa_atual_iniciada_em', 'vai_para_publicacao')),
+  0, 'a view não traz mais o caminho, o status, o início da etapa nem a escolha de publicação');
 
 -- Última versão.
 insert into _tap (linha) select is((pg_temp.linha('V1 Sem')).ultima_versao_numero, 1, 'a última versão é a V1');
@@ -156,7 +140,7 @@ select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000
 insert into _tap (linha) select is((pg_temp.linha('V2 Sem')).ultima_versao_numero, 2, 'o integrante lê a última versão');
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a3","role":"authenticated"}', true);
 insert into _tap (linha) select is((pg_temp.linha('V2 Sem')).ultima_versao_numero, 2, 'a consulta lê a mesma última versão');
-insert into _tap (linha) select is((pg_temp.linha('Parado')).etapa_atual_iniciada_em, private.hoje(), 'a consulta lê o mesmo início da etapa');
+insert into _tap (linha) select is((pg_temp.linha('Parado')).etiqueta::text, 'em_andamento', 'a consulta lê a mesma etiqueta');
 insert into _tap (linha) select is((pg_temp.linha('Pai')).subprocessos_quantidade, 2, 'a consulta lê a mesma contagem de subprocessos');
 
 -- O usuário desativado e o visitante não leem.

@@ -30,24 +30,15 @@ insert into public.processos (setor_id, macroprocesso_id, nome)
 select '5f000000-0000-0000-0000-000000000041', 'af000000-0000-0000-0000-000000000041', nome
 from unnest(array['Corrigida', 'Sem Alteracao', 'Sem Numero', 'Parado', 'Cancelado']) as nome;
 
-create function pg_temp.andamento(nome_do_processo text, codigo_da_etapa text) returns uuid
-language sql stable as $$
-  select a.id from public.andamentos a
-  join public.processos p on p.id = a.processo_id
-  join public.etapas e on e.id = a.etapa_id
-  where p.nome = nome_do_processo and e.codigo = codigo_da_etapa $$;
-grant execute on function pg_temp.andamento(text, text) to authenticated;
-
-create function pg_temp.agir(nome_do_processo text, codigo_da_etapa text, novo public.status_da_etapa,
-  nova_nota text default null) returns void
-language sql as $$
-  update public.andamentos set status = novo, nota = nova_nota
-  where id = pg_temp.andamento(nome_do_processo, codigo_da_etapa) $$;
-grant execute on function pg_temp.agir(text, text, public.status_da_etapa, text) to authenticated;
-
 create function pg_temp.processo(nome_do_processo text) returns uuid
-language sql stable as $$ select id from public.processos where nome = nome_do_processo $$;
+language sql stable as $
+  select id from public.processos where nome = nome_do_processo and setor_id = '5f000000-0000-0000-0000-000000000041' $;
 grant execute on function pg_temp.processo(text) to authenticated;
+
+create function pg_temp.mover(nome_do_processo text, codigo_da_etapa text) returns void
+language sql as $
+  select public.mover_processo(pg_temp.processo(nome_do_processo), (select id from public.etapas where codigo = codigo_da_etapa)) $;
+grant execute on function pg_temp.mover(text, text) to authenticated;
 
 -- Um arquivo inventado no formato que registrar_versao recebe, e o par .bpm + .png de uma versão nova.
 create function pg_temp.arquivo(papel text, formato text, tamanho bigint default 100) returns jsonb
@@ -78,41 +69,38 @@ create function pg_temp.claims(usuario text) returns void language sql as $$
   select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000' || usuario || '","role":"authenticated"}', true) $$;
 grant execute on function pg_temp.claims(text) to authenticated;
 
--- A V1 completa de a1 revisada "sem alteração" por a2, até a Aprovação em andamento (sem aprovar).
+-- A V1 completa de a1 revisada "sem alteração" por a2, até a Aprovação pelo setor (sem aprovar). A revisão e a aprovação
+-- entram direto na tabela, como farão as funções do ticket 05 de revisoes-aprovacao (o "concluir" saiu, ADR 0023).
 create function pg_temp.ate_a_aprovacao_revisando(nome_do_processo text) returns void
 language plpgsql as $$
 begin
-  perform pg_temp.agir(nome_do_processo, 'modelagem', 'realizada_anteriormente', 'Feita antes');
-  perform pg_temp.agir(nome_do_processo, 'relatorio_modelagem_tecnica', 'realizada_anteriormente', 'Feita antes');
-  perform pg_temp.agir(nome_do_processo, 'revisao_interna', 'em_andamento');
-  perform public.concluir_revisao_interna(pg_temp.andamento(nome_do_processo, 'revisao_interna'), 'sem_alteracao', null, null, null);
-  perform public.avancar_etapa(pg_temp.andamento(nome_do_processo, 'revisao_setor'), 'concluir', null, null);
+  perform pg_temp.mover(nome_do_processo, 'revisao_interna');
+  insert into public.revisoes_internas (processo_id, resultado) values (pg_temp.processo(nome_do_processo), 'sem_alteracao');
+  perform pg_temp.mover(nome_do_processo, 'aprovacao_setor');
 end $$;
 grant execute on function pg_temp.ate_a_aprovacao_revisando(text) to authenticated;
 
--- A V1 de a1 e a V2 completa de a2, que a corrige (revisão "corrigida", escopo fluxograma), até a Aprovação em andamento.
+-- A V1 de a1 e a V2 completa de a2, que a corrige (revisão "corrigida", escopo fluxograma), até a Aprovação pelo setor.
 create function pg_temp.ate_a_aprovacao_corrigindo(nome_do_processo text) returns void
 language plpgsql as $$
 begin
   perform pg_temp.claims('a1');
   perform pg_temp.enviar(nome_do_processo);
   perform pg_temp.claims('a2');
-  perform pg_temp.agir(nome_do_processo, 'modelagem', 'realizada_anteriormente', 'Feita antes');
-  perform pg_temp.agir(nome_do_processo, 'relatorio_modelagem_tecnica', 'realizada_anteriormente', 'Feita antes');
-  perform pg_temp.agir(nome_do_processo, 'revisao_interna', 'em_andamento');
+  perform pg_temp.mover(nome_do_processo, 'revisao_interna');
   perform pg_temp.enviar_completa(nome_do_processo);
-  perform public.concluir_revisao_interna(pg_temp.andamento(nome_do_processo, 'revisao_interna'), 'corrigida', 'fluxograma',
-    'Ajustei o fluxo', null);
-  perform public.avancar_etapa(pg_temp.andamento(nome_do_processo, 'revisao_setor'), 'concluir', null, null);
+  insert into public.revisoes_internas (processo_id, resultado, escopo, comentario)
+  values (pg_temp.processo(nome_do_processo), 'corrigida', 'fluxograma', 'Ajustei o fluxo');
+  perform pg_temp.mover(nome_do_processo, 'aprovacao_setor');
 end $$;
 grant execute on function pg_temp.ate_a_aprovacao_corrigindo(text) to authenticated;
 
 create function pg_temp.aprovar(nome_do_processo text, numero text default null, link text default null,
-  data date default null, responsavel uuid default null) returns void
+  data date default null) returns void
 language sql as $$
-  -- Responde "sim" à escolha de publicação (ADR 0020): a Publicação entra em andamento, como antes da escolha existir.
-  select public.concluir_aprovacao(pg_temp.andamento(nome_do_processo, 'aprovacao_setor'), numero, link, data, responsavel, true) $$;
-grant execute on function pg_temp.aprovar(text, text, text, date, uuid) to authenticated;
+  insert into public.aprovacoes (processo_id, numero_eprotocolo, link, aprovada_em)
+  values (pg_temp.processo(nome_do_processo), numero, link, data) $$;
+grant execute on function pg_temp.aprovar(text, text, text, date) to authenticated;
 
 -- Quantos eventos "editar" o processo tem para a entidade.
 create function pg_temp.edicoes(a_entidade text, nome_do_processo text) returns bigint

@@ -152,7 +152,7 @@ insert into _tap (linha) select throws_ok($sql$select pg_temp.etiquetar('Cancela
   'P0001', 'processo_parado:cancelado', 'o cancelado não muda a etiqueta');
 insert into _tap (linha) select throws_ok($sql$select pg_temp.responsavel('Cancelado', null)$sql$,
   'P0001', 'processo_parado:cancelado', 'o cancelado não muda o responsável');
-insert into _tap (linha) select throws_ok($sql$select pg_temp.etiquetar('Arquivado', 'concluido')$sql$,
+insert into _tap (linha) select throws_ok($sql$select pg_temp.etiquetar('Arquivado', 'em_andamento')$sql$,
   'P0001', 'processo_arquivado', 'o arquivado não muda a etiqueta');
 insert into _tap (linha) select throws_ok($sql$select pg_temp.responsavel('Arquivado', null)$sql$,
   'P0001', 'processo_arquivado', 'o arquivado não muda o responsável');

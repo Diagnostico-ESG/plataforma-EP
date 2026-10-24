@@ -1,5 +1,5 @@
--- Situação do processo (processos-etapas, ticket 07): suspender, cancelar e retomar com motivo, congelamento dos
--- andamentos, eventos e perfis.
+-- Situação do processo (processos-etapas, ticket 07): suspender, cancelar e retomar com motivo, congelamento da
+-- etapa, da etiqueta e do responsável (Andamento livre, ticket 24), eventos e perfis.
 begin;
 create extension if not exists pgtap with schema extensions;
 -- As linhas do pgTAP vão para _tap e saem na exceção do fim (ver scripts/relatorio-tap.mjs).
@@ -33,20 +33,10 @@ create function pg_temp.processo(nome_do_processo text) returns uuid
 language sql stable as $$ select id from public.processos where nome = nome_do_processo $$;
 grant execute on function pg_temp.processo(text) to authenticated;
 
-create function pg_temp.andamento(nome_do_processo text, codigo_da_etapa text) returns uuid
-language sql stable as $$
-  select a.id from public.andamentos a
-  join public.processos p on p.id = a.processo_id
-  join public.etapas e on e.id = a.etapa_id
-  where p.nome = nome_do_processo and e.codigo = codigo_da_etapa $$;
-grant execute on function pg_temp.andamento(text, text) to authenticated;
-
-create function pg_temp.agir(nome_do_processo text, codigo_da_etapa text, novo public.status_da_etapa,
-  nova_nota text default null) returns void
+create function pg_temp.mover(nome_do_processo text, codigo_da_etapa text) returns void
 language sql as $$
-  update public.andamentos set status = novo, nota = nova_nota
-  where id = pg_temp.andamento(nome_do_processo, codigo_da_etapa) $$;
-grant execute on function pg_temp.agir(text, text, public.status_da_etapa, text) to authenticated;
+  select public.mover_processo(pg_temp.processo(nome_do_processo), (select id from public.etapas where codigo = codigo_da_etapa)) $$;
+grant execute on function pg_temp.mover(text, text) to authenticated;
 
 create function pg_temp.situacao(nome_do_processo text) returns text
 language sql stable as $$ select situacao from public.processos_com_andamento where nome = nome_do_processo $$;
@@ -55,9 +45,8 @@ grant execute on function pg_temp.situacao(text) to authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 set local role authenticated;
 
--- Preparação: no "Processo Parado", a modelagem concluída.
-select pg_temp.agir('Processo Parado', 'modelagem', 'em_andamento');
-select pg_temp.agir('Processo Parado', 'modelagem', 'concluida');
+-- Preparação: o "Processo Parado" na Modelagem piloto.
+select pg_temp.mover('Processo Parado', 'modelagem');
 
 -- Suspender.
 insert into _tap (linha) select lives_ok(
@@ -79,17 +68,18 @@ insert into _tap (linha) select throws_ok(
   $sql$select public.suspender_processo(pg_temp.processo('Processo Parado'), 'De novo')$sql$,
   'P0001', 'situacao_invalida:suspenso:suspenso', 'suspender um processo suspenso é recusado');
 
--- Congelamento: nenhuma etapa do processo suspenso muda.
+-- Congelamento: o processo suspenso não muda de etapa, de responsável nem de etiqueta.
 insert into _tap (linha) select throws_ok(
-  $sql$select pg_temp.agir('Processo Parado', 'relatorio_modelagem_tecnica', 'em_andamento')$sql$,
-  'P0001', 'processo_parado:suspenso', 'iniciar etapa de processo suspenso é recusado');
+  $sql$select pg_temp.mover('Processo Parado', 'relatorio_modelagem_tecnica')$sql$,
+  'P0001', 'processo_parado:suspenso', 'mover processo suspenso é recusado');
 insert into _tap (linha) select throws_ok(
-  $sql$update public.andamentos set responsavel_id = '00000000-0000-0000-0000-0000000000a2'
-    where id = pg_temp.andamento('Processo Parado', 'modelagem')$sql$,
-  'P0001', 'processo_parado:suspenso', 'mudar o responsável de etapa de processo suspenso é recusado');
+  $sql$update public.processos set responsavel_id = '00000000-0000-0000-0000-0000000000a1'
+    where id = pg_temp.processo('Processo Parado')$sql$,
+  'P0001', 'processo_parado:suspenso', 'mudar o responsável de processo suspenso é recusado');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.voltar_a_etapa(pg_temp.andamento('Processo Parado', 'modelagem'), 'Tentativa', null)$sql$,
-  'P0001', 'processo_parado:suspenso', 'voltar a etapa de processo suspenso é recusado');
+  $sql$update public.passagens set etiqueta = 'em_andamento'
+    where processo_id = pg_temp.processo('Processo Parado') and saiu_em is null$sql$,
+  'P0001', 'processo_parado:suspenso', 'mudar a etiqueta de processo suspenso é recusado');
 
 -- Retomar.
 insert into _tap (linha) select throws_ok(
@@ -106,8 +96,8 @@ insert into _tap (linha) select is(
     and entidade_ref = pg_temp.processo('Processo Parado')::text),
   'Decisão tomada', 'o evento de retomar traz o motivo');
 insert into _tap (linha) select lives_ok(
-  $sql$select pg_temp.agir('Processo Parado', 'relatorio_modelagem_tecnica', 'em_andamento')$sql$,
-  'retomado, a etapa volta a andar');
+  $sql$select pg_temp.mover('Processo Parado', 'relatorio_modelagem_tecnica')$sql$,
+  'retomado, o processo volta a andar');
 
 -- Cancelar.
 insert into _tap (linha) select lives_ok(
@@ -122,8 +112,8 @@ insert into _tap (linha) select throws_ok(
   $sql$select public.suspender_processo(pg_temp.processo('Processo Parado'), 'Tentativa')$sql$,
   'P0001', 'situacao_invalida:cancelado:suspenso', 'suspender um processo cancelado é recusado');
 insert into _tap (linha) select throws_ok(
-  $sql$select pg_temp.agir('Processo Parado', 'relatorio_modelagem_tecnica', 'concluida')$sql$,
-  'P0001', 'processo_parado:cancelado', 'concluir etapa de processo cancelado é recusado');
+  $sql$select pg_temp.mover('Processo Parado', 'revisao_interna')$sql$,
+  'P0001', 'processo_parado:cancelado', 'mover processo cancelado é recusado');
 insert into _tap (linha) select lives_ok(
   $sql$select public.retomar_processo(pg_temp.processo('Processo Parado'), 'Voltou a valer')$sql$,
   'retomar um processo cancelado');

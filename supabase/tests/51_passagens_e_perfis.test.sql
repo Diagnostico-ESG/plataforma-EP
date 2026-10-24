@@ -131,11 +131,11 @@ insert into _tap (linha) select throws_ok($sql$delete from public.passagens wher
 select pg_temp.claims('a3');
 insert into _tap (linha) select throws_ok(
   $sql$insert into public.passagens (processo_id, etapa_id) values (pg_temp.processo('Admin'), pg_temp.etapa('publicacao'))$sql$,
-  '42501', null, 'consulta não inclui passagem');
+  'P0001', 'passagem_so_pela_funcao', 'consulta não inclui passagem (o gatilho recusa antes da RLS)');
 select pg_temp.claims('a4');
 insert into _tap (linha) select throws_ok(
   $sql$insert into public.passagens (processo_id, etapa_id) values (pg_temp.processo('Admin'), pg_temp.etapa('publicacao'))$sql$,
-  '42501', null, 'inativo não inclui passagem');
+  'P0001', 'passagem_so_pela_funcao', 'inativo não inclui passagem (o gatilho recusa antes da RLS)');
 
 -- ===== processos: alterar responsavel_id =====
 select pg_temp.claims('a1');
@@ -180,8 +180,8 @@ insert into _tap (linha) select throws_ok(
   'consulta não acrescenta etapa');
 select pg_temp.claims('a4');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.acrescentar_etapa('etapa_t51d', 'Etapa T51d', 'V', pg_temp.etapa('publicacao'))$sql$, '42501', null,
-  'inativo não acrescenta etapa');
+  $sql$select public.acrescentar_etapa('etapa_t51d', 'Etapa T51d', 'V', pg_temp.etapa('publicacao'))$sql$,
+  'P0001', 'registro_inexistente', 'inativo não acrescenta etapa (não enxerga o catálogo)');
 
 -- ===== processos_com_andamento: ler os campos novos =====
 select pg_temp.claims('a1');
