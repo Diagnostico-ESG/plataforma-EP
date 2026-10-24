@@ -23,62 +23,68 @@
 
 **Arquivos:** `src/processos/tipos.ts`, `diasNaEtapa.ts`, `selosDoCartao.ts`, `barraDoCartao.ts`, `colunasDoQuadro.ts`, `destinoDoArrastar.ts`, `caminhoDeEtapas.ts` (reduzido às peças de responsável e data), `rotulos.ts` (etiquetas), `publicacao.ts`, e os testes de cada um.
 
-- [ ] Testes novos que falham: limite de 7 dias (7 sem selo, 8 com), sem selo em Não iniciados, Concluídos e suspenso; selos "Sem publicação" e "Relatório pendente" pela posição no catálogo; barra com um pedaço por etapa ativa e o nome "Etapa {n} de {total}: {etapa}"; colunas de Não iniciados a Concluídos com cartões de em andamento, suspenso e concluído não arquivado; por responsável incluindo as fixas; destino do arrastar (qualquer coluna, nada para Consulta/suspenso/arquivado/próprio lugar).
-- [ ] Implementar. `npm test -- <arquivos>` verde.
+- [x] Testes novos que falham: limite de 7 dias (7 sem selo, 8 com), sem selo em Não iniciados, Concluídos e suspenso; selos "Sem publicação" e "Relatório pendente" pela posição no catálogo; barra com um pedaço por etapa ativa e o nome "Etapa {n} de {total}: {etapa}"; colunas de Não iniciados a Concluídos com cartões de em andamento, suspenso e concluído não arquivado; por responsável incluindo as fixas; destino do arrastar (qualquer coluna, nada para Consulta/suspenso/arquivado/próprio lugar).
+- [x] Implementar. `npm test -- <arquivos>` verde.
 
 ### Tarefa 2: módulo falso de processos
 
 **Arquivos:** `ProcessosFalso.ts`, `arquivamentoFalso.ts`, `situacaoFalso.ts`, `CatalogoFalso.ts`, `reclassificacaoFalso.ts` (ajustes), removidos `andamentoFalso.ts`, `publicacaoFalso.ts`; testes `ProcessosFalso.mover.test.ts` e ajustes.
 
-- [ ] Testes que falham: cadastro em Não iniciados/A fazer/sem responsável; mover (qualquer etapa, etiqueta volta a A fazer, quem move vira responsável, própria etapa não grava, etapa inativa, suspenso/cancelado/arquivado recusados, passagens fechadas e abertas, Concluídos sem a data recusado e com a data aceito, sair de Concluídos limpa a explicação); etiqueta (fixa em Concluídos, congelada no suspenso); responsável (só ativo Administrador/Integrante, congelado); catálogo com as fixas e as recusas novas.
-- [ ] Implementar; verde.
+- [x] Testes que falham: cadastro em Não iniciados/A fazer/sem responsável; mover (qualquer etapa, etiqueta volta a A fazer, quem move vira responsável, própria etapa não grava, etapa inativa, suspenso/cancelado/arquivado recusados, passagens fechadas e abertas, Concluídos sem a data recusado e com a data aceito, sair de Concluídos limpa a explicação); etiqueta (fixa em Concluídos, congelada no suspenso); responsável (só ativo Administrador/Integrante, congelado); catálogo com as fixas e as recusas novas.
+- [x] Implementar; verde.
 
 ### Tarefa 3: módulo real
 
 **Arquivos:** `processoDaLinha.ts`, `listaDeProcessosSupabase.ts`, `lerProcessoSupabase.ts`, `andamentosSupabase.ts` (vira `movimentoSupabase.ts` + `frasesDaRecusa`), `publicacaoSupabase.ts`, `catalogoSupabase.ts`, `gravarProcessoSupabase.ts`, `reclassificacaoSupabase.ts`, `situacaoSupabase.ts`, `anotacoesSupabase.ts`, `revisoesSupabase.ts`, `clienteSemTipos.ts` (apagado quando nenhum módulo o usar), testes do cliente simulado.
 
-- [ ] Testes que falham: `mover_processo` com e sem dados da chegada, etiqueta (update da passagem aberta), responsável (update do processo), linha da view com os campos novos, passagens da leitura, cada recusa nova virando a frase.
-- [ ] Implementar; verde.
+- [x] Testes que falham: `mover_processo` com e sem dados da chegada, etiqueta (update da passagem aberta), responsável (update do processo), linha da view com os campos novos, passagens da leitura, cada recusa nova virando a frase.
+- [x] Implementar; verde.
 
 ### Tarefa 4: histórico
 
 **Arquivos:** `src/cadastros/historicoDosCadastros.ts`, `lerProcessoSupabase.ts` (entidade `passagem`), testes.
 
-- [ ] Teste que falha: "Moveu de … para …", "Mudou a etiqueta", "Mudou o responsável"; sem os textos de andamento.
-- [ ] Implementar; verde.
+- [x] Teste que falha: "Moveu de … para …", "Mudou a etiqueta", "Mudou o responsável"; sem os textos de andamento.
+- [x] Implementar; verde.
 
 ### Tarefa 5: verso (Agora, Etapas, janelas)
 
 **Arquivos:** `AgoraDoProcesso.tsx`, `EtapaDoAgora.tsx` (reescrito), `AgoraDoConcluido.tsx`, `EtapasDoProcesso.tsx`, `DetalheDaEtapa.tsx`, `CaminhoDoProcesso.tsx`, `TrocaDoResponsavel.tsx`, `hooks/useAcoesDoProcesso.ts` (no lugar de `useAcoesDaEtapa`), `DiasNaEtapa.tsx`; apagados `JanelaDeAvanco`, `JanelasDaEtapa`, `FormularioDeDatas`, `PerguntaDaPublicacao`, `JanelaDaPublicacao`, `useEscolhaDaPublicacao`, `gravarAcoes.ts` (a parte do avanço).
 
-- [ ] Testes de tela que falham (reescrevem `App.agoraDoVerso`, `App.etapasDoVerso`, `App.assumirEAutor`, `App.versoDoCartao` e afins).
-- [ ] Implementar; verde.
+- [x] Testes de tela que falham (reescrevem `App.agoraDoVerso`, `App.etapasDoVerso`, `App.assumirEAutor`, `App.versoDoCartao` e afins).
+- [x] Implementar; verde.
 
 ### Tarefa 6: Quadro
 
 **Arquivos:** `QuadroDeProcessos.tsx`, `ColunaDoQuadro.tsx`, `CartaoDoProcesso.tsx`, `BarraDeProgresso.tsx`, `SelosDoCartao.tsx`, `useArrastoDoQuadro.ts`, `useMoverPeloQuadro.ts` (no lugar de `useConclusaoPeloQuadro`), `Quadro.css`.
 
-- [ ] Testes que falham (`App.quadro`, `App.cartaoDoQuadro`, `App.arrastarParaMover`, `App.agruparPorResponsavel`, `App.soOsMeus`).
-- [ ] Implementar; verde.
+- [x] Testes que falham (`App.quadro`, `App.cartaoDoQuadro`, `App.arrastarParaMover`, `App.agruparPorResponsavel`, `App.soOsMeus`).
+- [x] Implementar; verde.
 
 ### Tarefa 7: Lista e filtro
 
 **Arquivos:** `TabelaDeProcessos.tsx`, `FiltrosDosProcessos.tsx`, `filtrosDosProcessos.ts`, `linhasDaLista.ts`, `ProcessosDoSetor.tsx`.
 
-- [ ] Testes que falham (`App.lista`, `App.filtrosDosProcessos`, `App.processosDoSetor`); implementar; verde.
+- [x] Testes que falham (`App.lista`, `App.filtrosDosProcessos`, `App.processosDoSetor`); implementar; verde.
 
 ### Tarefa 8: catálogo na Administração
 
 **Arquivos:** `TabelaDoCatalogo.tsx`, `FormularioDaEtapa.tsx`, `CatalogoEditavel.tsx`, `CamposDaEtapaNova.tsx`, `frasesDoCatalogo.ts`, `testes/catalogoDeTeste.tsx`.
 
-- [ ] Testes que falham (`App.catalogoDeEtapas`, `App.catalogoAcoes`, `App.catalogoNosProcessos`); implementar; verde.
+- [x] Testes que falham (`App.catalogoDeEtapas`, `App.catalogoAcoes`, `App.catalogoNosProcessos`); implementar; verde.
 
 ### Tarefa 9: fecho
 
-- [ ] `tsc`, ESLint, `npm test`, `npm run check:circular`, cobertura (≥ 70%).
-- [ ] Vitrine local (navegador do app, módulos falsos) para os critérios `[visual]`; anotar o que foi visto e o que foi presumido.
-- [ ] `desvios.md`, linha `Concluído em` no ticket, `proximo-passo.md`, `nao-testados`/melhorias, commits por assunto, push da branch (sem `--force`).
+- [x] `tsc`, ESLint, `npm test`, `npm run check:circular`, cobertura (≥ 70%).
+- [x] Vitrine local (navegador do app, módulos falsos) para os critérios `[visual]`; anotar o que foi visto e o que foi presumido.
+- [x] `desvios.md`, linha `Concluído em` no ticket, `proximo-passo.md`, `nao-testados`/melhorias, commits por assunto, push da branch (sem `--force`).
 
 ## O que saiu dos testes
 
-(preenchido ao fim da Tarefa 10)
+Apagados (o comportamento saiu com o modelo anterior): `App.andamentoDoProcesso`, `App.aprovacao`, `App.arrastarParaConcluir`, `App.assumirEAutor`, `App.avancoDaEtapa`, `App.escolhaDePublicacao`, `App.naoVaiMaisParaPublicacao`, `App.registrarPublicacao`, `App.revisaoDoSetor`, `App.revisaoInterna`, `App.voltarDatasResponsavel`, `ProcessosFalso.avanco`, `ProcessosFalso.publicacao`, `ProcessosFalso.voltar`, `andamentoFalso`, `andamentosSupabase`, `caminhoDeEtapas`, `publicacao`, `publicacaoSupabase`, `opcoesDaRevisao`.
+
+Novos: `App.arrastarParaMover`, `ProcessosFalso.mover`, `agoraDoProcesso`, `lib/datas`.
+
+Reescritos para o modelo novo: `App.agoraDoVerso`, `App.etapasDoVerso`, `App.cartaoDoQuadro`, `App.catalogoAcoes`, `App.catalogoDeEtapas`, `App.catalogoNosProcessos`, `App.concluidos`, `App.arquivamento`, `App.aprovacaoNaGaveta`, `App.quadro`, `App.lista` e os testes de `src/processos` e `src/revisoes` listados no commit `9b0f997`; os demais `App.*` só tiveram o dado de teste ajustado.
+
+Caixas marcadas na retomada de 2026-10-24: as tarefas 1 a 8 já estavam no commit `9b0f997` (feito sem marcar o plano); conferidas por `tsc`, ESLint, `check:circular`, `npm test` (173 arquivos, 2310 testes) e cobertura (97,88% das instruções, 98,59% das linhas).

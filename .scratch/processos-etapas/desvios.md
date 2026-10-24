@@ -440,3 +440,16 @@ Branch de integração `quadro-livre-parte-1` (marco `marco/2026-10-24-inicio-qu
 - **Identidade de git:** a máquina desta sessão não tinha e-mail configurado; os commits foram feitos com `-c user.name` e `-c user.email` do mesmo autor dos anteriores, sem gravar configuração.
 
 **Verificado:** "Testes de banco" verde (44 de 44, execução 40099740221, commit `6368174`), `tsc`, `eslint` e `npm test` (2553) verdes na branch. **Presumido:** o comportamento da tela contra o banco migrado (nada a verificar até o ticket 25); a aplicação real da migração nos dados de desenvolvimento (a conversão foi provada só dentro da transação do ensaio, com dados inventados).
+
+## 2026-10-24 — /executar-complexo do ticket 25 (tela do andamento livre)
+
+Branch de integração `quadro-livre-parte-1`, que **não** foi juntada à `main` (o passo 4 do comando não se aplica enquanto o ticket 04 de publicacao-e-arquivamento não fechar a branch). Nada foi aplicado no banco.
+
+- **Retomada.** O código das tarefas 1 a 8 já estava no commit `9b0f997`, feito numa sessão anterior que não marcou as caixas do `plano-25.md`. Nesta retomada conferi o commit em vez de refazer: `tsc`, ESLint, `check:circular`, `npm test` e cobertura, e marquei o plano.
+- **Chegada a Concluídos.** Como a janela é do ticket 04, mover para Concluídos sem a data da publicação não chama o banco e mostra a frase combinada; com a data, move direto (decisão 4 do plano).
+- **Revisão e aprovação.** `concluirRevisaoInterna` e `concluirAprovacao` saíram da tela; os registros voltam no ticket 05 de revisoes-aprovacao.
+- **`clienteSemTipos.ts`** já foi apagado (nenhum módulo o usa mais). O ticket 04 de publicacao-e-arquivamento só precisa regenerar os tipos.
+- **Testes.** Dos modelo anterior, vinte arquivos apagados e quatro novos; a lista está no fim do `plano-25.md`. Total: 2310 testes (eram 2553 antes, pelos testes do modelo anterior que saíram).
+
+**Verificado:** `tsc`, ESLint, circulares (nenhuma), `npm test` (173 arquivos, 2310 testes) e cobertura (97,88% das instruções). Na vitrine local, com módulos falsos: Quadro com as colunas de Não iniciados a Concluídos, selo de 9 dias no processo em Revisão interna, sem selo de dias no suspenso e nos Concluídos, "Sem publicação", avatar e etiqueta no cartão; verso com "Agora · etapa 4 de 8", listas Etapa e Etiqueta, "9 dias nesta etapa", Trocar e Assumir, aviso amarelo do revisor, Etapas com as datas de saída; mover pela lista levou o processo à Modelagem piloto (etapa 2 de 8, quem moveu virou responsável, "desde 24/10/2026").
+**Presumido:** o arrastar no Quadro e as janelas de erro vistos só pelos testes (a tela não foi arrastada na vitrine); o comportamento contra o banco migrado (as migrações só vão ao desenvolvimento no ticket 04 de publicacao-e-arquivamento); os critérios `[visual]` de Lista, catálogo e Consulta, que não foram olhados na vitrine; revisão de segurança, de código e `/polir` ainda não rodados nesta iniciativa.
