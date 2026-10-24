@@ -102,14 +102,14 @@
 - [ ] **Passo 3: implementar** `publicacao.ts`, `rascunhoDaPublicacao.ts`, a janela (no molde de `JanelaDeRegistroDaAprovacao`, com `useGravacaoNaJanela`), e os botões em `AgoraDoConcluido.tsx` (separe `AcoesDaPublicacao` dos outros componentes para o arquivo ficar abaixo de 300 linhas e as funções abaixo de 20), `CorpoDoAgora.tsx` (o botão na etapa Publicação) e `AgoraDoProcesso.tsx` (`SituacaoParada` ganha [Arquivar]; a Consulta, a linha). O link da publicação é de fora: só `http(s)` vira `<a>`, o banco já garante.
 - [ ] **Passo 4: `npx vitest run`, `npx tsc --noEmit` e `npx eslint src` verdes. Commit.**
 
-### Tarefa 5 — Histórico
+### Tarefa 5 — Histórico (feita. Ruling: o verbo "Concluiu sem publicação" vem de o `depois` do movimento trazer `explicacao_sem_publicacao`; a explicação aparece no depois, como os outros campos, em vez de um campo "motivo" à parte.)
 
 **Arquivos:** alterar `src/cadastros/historicoDosCadastros.ts` (+ `historicoDosCadastros.test.ts`) e, se o texto vier de outro módulo, `src/processos/agrupamentoDoHistorico.ts`.
 
 - [ ] **Passo 1: teste que falha.** Evento `registrar_publicacao` do processo mostra "Registrou a publicação" com a data (dd/mm/aaaa) e o link; `corrigir_publicacao` mostra "Corrigiu a publicação" com antes e depois; evento `mover` cujo `depois` traz `explicacao_sem_publicacao` mostra "Concluiu sem publicação" com a explicação como motivo; evento `mover` que sai de Concluídos com a explicação no `antes` continua "Moveu o processo" e mostra a explicação apagada; `arquivar` e `desarquivar` seguem como estão.
 - [ ] **Passo 2: ver falhar, implementar** (as chaves `publicado_em`, `link_da_publicacao` e `explicacao_sem_publicacao` já têm rótulo; falta o verbo das duas ações novas e a troca do verbo do movimento), **ver passar, commit.**
 
-### Tarefa 6 — Verificação do conjunto
+### Tarefa 6 — Verificação do conjunto (feita: `npm test` 2405 verdes, tsc, lint e build limpos, sem dependência circular; a bateria de banco do Docker local deu 1299 `ok` e 0 `not ok` na tarefa 1 e a migração não mudou depois)
 
 - [ ] **Passo 1:** `npm test` (todos verdes, cobertura mínima de 70% mantida), `npx tsc --noEmit`, `npm run lint` e `npm run build`, tudo sem erro.
 - [ ] **Passo 2:** bateria de banco no Docker local: `npx supabase db reset` e `npx supabase test db`; conte `ok` e `not ok` (esperado 0 `not ok`; anote o total de `ok`).

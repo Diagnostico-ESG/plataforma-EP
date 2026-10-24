@@ -230,6 +230,36 @@ describe('arquivamento no histórico', () => {
   })
 })
 
+describe('publicação no histórico (ticket 04 de publicacao-e-arquivamento)', () => {
+  const PROCESSO = { nome: 'Emitir Ofício', setor_sigla: 'TSA' }
+
+  test('registrar e corrigir a publicação têm o verbo e mostram a data e o link', () => {
+    expect(['registrar_publicacao', 'corrigir_publicacao'].map((acao) => textoDaAcaoDoCadastro(acao, 'processo')))
+      .toEqual(['Registrou a publicação', 'Corrigiu a publicação'])
+    const depois = { ...PROCESSO, publicado_em: '2026-10-10', link_da_publicacao: 'https://exemplo.test/d' }
+    expect(descreverEstadoDoCadastro(depois)).toBe('Nome: Emitir Ofício; Setor: TSA; Data da publicação: 10/10/2026; Link da publicação: https://exemplo.test/d')
+  })
+
+  test('o movimento que chega com a explicação é "Concluiu sem publicação", com a explicação no depois', () => {
+    const concluiu = evento({
+      entidade: 'passagem', entidadeRef: 'p1', acao: 'mover', antes: MOVIMENTO_ANTES,
+      depois: { ...MOVIMENTO_DEPOIS, etapa_nome: 'Concluídos', explicacao_sem_publicacao: 'Não será divulgado' },
+    })
+    expect(tituloDoEvento(concluiu)).toBe('Concluiu sem publicação')
+    expect(descreverEstadoDoCadastro(concluiu.depois)).toContain('Explicação de concluir sem publicação: Não será divulgado')
+  })
+
+  test('sair de Concluídos mostra a explicação apagada no antes e continua "Moveu"', () => {
+    const saiu = evento({
+      entidade: 'passagem', entidadeRef: 'p1', acao: 'mover',
+      antes: { ...MOVIMENTO_DEPOIS, etapa_nome: 'Concluídos', explicacao_sem_publicacao: 'Não será divulgado' },
+      depois: MOVIMENTO_ANTES,
+    })
+    expect(tituloDoEvento(saiu)).toBe('Moveu de Concluídos para Revisão interna')
+    expect(descreverEstadoDoCadastro(saiu.antes)).toContain('Explicação de concluir sem publicação: Não será divulgado')
+  })
+})
+
 describe('reclassificação no histórico', () => {
   test('"Reclassificou", com o texto livre chamado Motivo', () => {
     expect(textoDaAcaoDoCadastro('reclassificar', 'processo')).toBe('Reclassificou')

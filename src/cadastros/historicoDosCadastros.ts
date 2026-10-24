@@ -22,6 +22,8 @@ const TEXTO_DA_ACAO_DO_PROCESSO: Record<string, string> = {
   mudar_responsavel: 'Mudou o responsável',
   arquivar: 'Arquivou o processo',
   desarquivar: 'Desarquivou o processo',
+  registrar_publicacao: 'Registrou a publicação',
+  corrigir_publicacao: 'Corrigiu a publicação',
 }
 
 // O texto livre do evento é motivo (a situação do processo e a reclassificação) ou nota (o resto).
@@ -105,6 +107,7 @@ function estadoLegivel(evento: EventoDoCadastro): Record<string, unknown> {
  */
 export function tituloDoEvento(evento: EventoDoCadastro): string {
   if (evento.entidade === 'passagem' && evento.acao === 'mover') {
+    if (registro(evento.depois).explicacao_sem_publicacao !== undefined) return 'Concluiu sem publicação'
     return `Moveu de ${texto(registro(evento.antes).etapa_nome)} para ${texto(registro(evento.depois).etapa_nome)}`
   }
   return textoDaAcaoDoCadastro(evento.acao, evento.entidade)
