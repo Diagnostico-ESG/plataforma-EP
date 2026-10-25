@@ -2,11 +2,164 @@
 
 Status: ready-for-agent
 
-**Como resolve o problema (desde 2026-10-23, Andamento livre).** Hoje o andamento de cada processo fica espalhado entre planilhas e o Power BI, sem saber com certeza em que etapa cada um está, quem cuida dele nem o que mudou. Com esta funcionalidade, a equipe do EP cadastra na plataforma cada processo e subprocesso, ligado ao setor dono e a um macroprocesso. O processo entra na etapa **Não iniciados** e anda pelo catálogo de etapas como um cartão no Planner: qualquer integrante o leva a qualquer etapa, para a frente ou para trás, pela lista de etapas ou arrastando o cartão, sem motivo e sem trava de sequência. A etapa atual tem uma **etiqueta** (A fazer, Em andamento ou Concluído), e o processo tem um **responsável**, que passa a ser quem o move. Quem termina a sua parte marca Concluído, e o próximo vê e pega o processo. O processo termina na etapa **Concluídos**. O histórico guarda cada mudança de etapa, etiqueta e responsável, e o processo que fica mais de 7 dias na mesma etapa ganha um aviso. A seção "Andamento livre", logo abaixo, descreve o modelo atual e vale sobre o resto desta spec no que divergir. O texto que segue a ela é o registro das entregas anteriores.
+**Como resolve o problema (desde 2026-10-23, Andamento livre; cartão e verso ajustados em 2026-10-25).** Hoje o andamento de cada processo fica espalhado entre planilhas e o Power BI, sem saber com certeza em que etapa cada um está, quem cuida dele nem o que mudou. Com esta funcionalidade, a equipe do EP cadastra na plataforma cada processo e subprocesso, ligado ao setor dono e a um macroprocesso. O processo entra na etapa **Não iniciados** e anda pelo catálogo de etapas como um cartão no Planner: qualquer integrante o leva a qualquer etapa, para a frente ou para trás, pela lista de etapas ou arrastando o cartão, sem motivo e sem trava de sequência. A etapa atual tem uma **etiqueta** (A fazer, Em andamento ou Concluído), e o processo tem um **responsável**, que passa a ser quem o move. Quem termina a sua parte marca Concluído, e o próximo vê e pega o processo. O processo termina na etapa **Concluídos**. O histórico guarda cada mudança de etapa, etiqueta e responsável, e o processo que fica mais de 7 dias na mesma etapa ganha um aviso. As seções "Cartão e verso" (2026-10-25) e "Andamento livre", logo abaixo, descrevem o modelo atual e valem sobre o resto desta spec no que divergirem; a mais nova vale sobre a mais antiga. O texto que segue a ela é o registro das entregas anteriores.
 
 **Como resolvia antes de 2026-10-23.** A equipe registrava o andamento etapa por etapa, da Modelagem piloto em diante, num caminho que o administrador configura no catálogo de etapas. A área Processos mostra o trabalho vivo num Quadro, com uma coluna por etapa, e o arquivo completo numa Lista com busca pelo nome e filtros; ao abrir um processo, o **verso do cartão**, uma janela central em duas colunas, mostra primeiro o que há para fazer agora (a etapa atual, quem cuida dela e um único botão principal), depois o caminho de etapas e os arquivos, e ao lado o contexto do processo; o que é raro (histórico, editar, reclassificar, suspender, cancelar, excluir) fica num menu. No Quadro, cada cartão mostra de relance onde o processo está (uma barra com um pedaço por etapa) e só ganha selo quando há algo a dizer (processo parado, relatório pendente, etapa sem responsável, reunião próxima, versão, subprocessos); arrastar o cartão para a coluna seguinte conclui a etapa, e a equipe pode agrupar o Quadro por responsável ou ver só os processos que estão com ela. O banco impõe a sequência das etapas, a situação do processo, as regras de reclassificação e o registro de cada mudança no histórico. As funcionalidades seguintes (reuniões, documentos, revisões, prazos e painel) se apoiam nesse andamento.
 
 Decisões de origem: `.scratch/processos-etapas/sabatina.md` (sabatina de 2026-10-13, três rodadas), `CONTEXT.md` (seções "Setores" e "Processos") e ADR 0004 (mudar o catálogo muda o caminho dos processos em andamento). Mudança de 2026-10-18 (parte 1 da iniciativa experiencia-do-quadro, `.scratch/experiencia-do-quadro/sabatina-parte-1.md`, ADR 0013): saem as etapas do setor, a coluna "Aguardando o setor", os responsáveis do setor e o nível do catálogo; a primeira etapa passa a se chamar Modelagem piloto; o processo ganha a data da reunião (spec de `reunioes`). Mudança de 2026-10-18 (parte 2, `.scratch/experiencia-do-quadro/sabatina-parte-2.md`, ADR 0014): resolver a etapa atual (concluir, dispensar ou registrar como realizada anteriormente) já **avança**, ou seja, inicia a próxima etapa pendente com o responsável escolhido na mesma janela; voltar também escolhe o responsável; [Assumir] em etapa sem responsável; quem enviou a versão mais recente não pode ser escolhido como responsável da Revisão interna. Mudança de 2026-10-19 (parte 3, "Verso do cartão", `.scratch/experiencia-do-quadro/sabatina-parte-3.md`, sem ADR nem mudança no banco): o painel lateral vira o verso do cartão, uma janela central em duas colunas com o cartão "Agora"; o Novo processo, o Editar e o Histórico abrem dentro dela; a Lista ganha busca pelo nome. Mudança de 2026-10-19 (parte 4, "Cartão do Quadro", `.scratch/experiencia-do-quadro/sabatina-parte-4.md`, sem ADR): o cartão do Quadro ganha a barra de progresso e os selos; arrastar o cartão para a coluna de destino abre a janela de avanço da parte 2; o Quadro ganha "Agrupar por: Etapa | Responsável" e "Só os meus"; a view `processos_com_andamento` ganha campos, por migração não destrutiva; `CONTEXT.md` ganha "Processo parado". Mudança de 2026-10-23 ("Anotações do processo", `.scratch/processos-etapas/sabatina-anotacoes.md`, ADR 0021): o verso ganha, no alto da coluna direita, as **Anotações**, um texto livre e único por processo, guardado sozinho enquanto se escreve, sem histórico, com recusa quando outra pessoa alterou antes; `CONTEXT.md` ganha "Anotações".
+
+## Cartão e verso (mudança de 2026-10-25)
+
+Parte 2 da iniciativa quadro-livre. Decisões de origem: `.scratch/quadro-livre/sabatina-parte-2.md` e o esboço `.scratch/quadro-livre/esboco-cartao.html` (opção A). Sem ADR novo. Termo no `CONTEXT.md`: **Data da modelagem piloto** (substitui **Reunião**). Esta seção vale sobre a "Andamento livre" e o resto desta spec no que divergir.
+
+**Como resolve o problema.** Depois do Andamento livre, a equipe vê o processo andar pelas etapas, mas o cartão ainda fala a língua antiga: a data se chama "reunião", a etiqueta é uma pílula cinza igual às outras, a barra repete no Quadro por etapa o que a coluna já diz e falta onde a coluna não diz a etapa, e o processo parado tem o mesmo âmbar que a etiqueta Em andamento passaria a ter. Esta parte ajusta o cartão e o verso: a data passa a ser a **Data da modelagem piloto**, sugerida com o dia do cadastro; a barra em blocos, com o nome e a posição da etapa, aparece só onde a etapa não está dita (Quadro por responsável, Lista e Processos do setor); as etiquetas ganham cor suave própria; o processo parado ganha um aviso vermelho que salta aos olhos; e as Anotações ganham espaço para escrever.
+
+### O que muda no resto desta spec
+
+- "Reunião" e "data da reunião", onde aparecerem nesta spec e nas telas, passam a ser "Data da modelagem piloto". A coluna `processos.data_da_reuniao` passa a `processos.data_da_modelagem_piloto`.
+- A barra de progresso do cartão (parte 4 de experiencia-do-quadro e decisão 13 do Andamento livre) sai do Quadro por etapa e muda de desenho.
+- O selo âmbar de processo parado vira vermelho suave, com faixa na borda do cartão, e aparece também na Lista.
+- A etiqueta deixa de ser "pílula neutra" (critério `[visual]` do Andamento livre): ganha cor por valor.
+
+### Solução
+
+- **Data da modelagem piloto:** o mesmo dado da antiga reunião, com o nome novo em toda a plataforma. O formulário de Novo processo abre com a data de hoje preenchida; a pessoa altera ou apaga, e ela continua opcional. No verso, a seção "Data da modelagem piloto" mostra "12/11/2026 · próxima" ou "· realizada", como a antiga Reunião. No cartão, o selo "Modelagem 12/11" ou "Modelagem hoje" aparece só enquanto a data é hoje ou futura e o processo está em Não iniciados ou na Modelagem piloto. O histórico, inclusive nos eventos antigos, diz "Data da modelagem piloto".
+- **Barra da etapa:** um bloco por etapa ativa do catálogo, de Não iniciados a Concluídos. Os blocos das etapas antes da atual ficam em cinza cheio, o da atual meio cheio e os seguintes vazios; em Concluídos, todos cheios. Acima dos blocos, "Nome da etapa · 2 de 8". Só cinza neutro, sem azul. Aparece no cartão do Quadro agrupado por responsável (no lugar do nome da etapa no rodapé), na coluna "Etapa atual" da Lista e na de Processos do setor. Sai do cartão do Quadro agrupado por etapa.
+- **Etiquetas:** pílula com uma bolinha da cor antes do texto: A fazer em cinza, Em andamento em laranja suave, Concluído em verde suave. Aparece no cartão e na coluna Etiqueta da Lista. No Agora, a etiqueta continua uma lista de escolha.
+- **Processo parado:** o selo "12 dias nesta etapa" passa a vermelho suave, e o cartão ganha uma faixa vermelha na borda esquerda. O mesmo selo aparece ao lado do nome na Lista e continua no Agora. As regras de quando vale (mais de 7 dias, fora de Não iniciados, de Concluídos, de suspensos e de cancelados) não mudam.
+- **Anotações:** o campo começa com cerca de 7 linhas (o triplo de hoje); o máximo continua em cerca de 12 linhas, e depois rola por dentro.
+
+### Histórias de usuário
+
+#### Data da modelagem piloto
+
+1. Como Integrante do EP, quero que o formulário de Novo processo já venha com a data de hoje na Data da modelagem piloto, para não digitar a data no caso mais comum, em que o processo nasce da reunião com o setor.
+2. Como Integrante do EP, quero alterar a data sugerida antes de salvar, para marcar uma modelagem piloto que ainda vai acontecer ou que aconteceu em outro dia.
+3. Como Integrante do EP, quero apagar a data sugerida antes de salvar, para cadastrar um processo cuja modelagem piloto ainda não foi marcada.
+4. Como Integrante do EP, quero ver no verso a seção "Data da modelagem piloto" com a data e "· próxima" ou "· realizada", para saber de relance se o encontro já aconteceu.
+5. Como Integrante do EP, quero marcar, alterar ou apagar a Data da modelagem piloto no verso, como fazia com a reunião, para manter a data certa depois do cadastro.
+6. Como Integrante do EP, quero ver no cartão o selo "Modelagem 12/11" quando a data é futura e o processo está em Não iniciados ou na Modelagem piloto, para lembrar do encontro que vem.
+7. Como Integrante do EP, quero ver "Modelagem hoje" no cartão no dia da data, para não esquecer o encontro do dia.
+8. Como Integrante do EP, quero que o selo some quando a data passa, para o cartão só falar do que ainda vai acontecer.
+9. Como Integrante do EP, quero que o selo some quando o processo sai de Não iniciados e da Modelagem piloto, mesmo com a data futura, para o cartão não trazer uma notícia que já não importa naquela etapa.
+10. Como Integrante do EP, quero que o histórico diga "Data da modelagem piloto" nas mudanças da data, inclusive nas feitas antes da troca de nome, para ler o histórico numa língua só.
+11. Como Consulta, quero ver a Data da modelagem piloto no verso e o selo no cartão, sem conseguir alterar, para acompanhar o processo sem mexer nele.
+12. Como Integrante do EP, quero que a Data da modelagem piloto continue chegando às planilhas dos dashboards como antes, para os dashboards não perderem a data.
+13. Como Administrador, quero que os processos do desenvolvimento que estavam sem data continuem sem data depois da troca de nome, para nenhum dado ser inventado.
+
+#### Barra da etapa
+
+14. Como Integrante do EP, quero que o cartão do Quadro agrupado por etapa não traga a barra, para não repetir o que a coluna já diz.
+15. Como Integrante do EP, quero ver no cartão do Quadro agrupado por responsável a barra com "Nome da etapa · 2 de 8", para saber em que etapa está cada processo da pessoa.
+16. Como Integrante do EP, quero ver na coluna "Etapa atual" da Lista a barra com o nome e a posição, para comparar de relance o quanto cada processo andou.
+17. Como Integrante do EP, quero ver a mesma barra na lista de Processos do setor, para ter a mesma leitura na página do setor.
+18. Como Integrante do EP, quero que os blocos antes da etapa atual fiquem cheios, o da atual meio cheio e os seguintes vazios, para ver a posição sem ler o número.
+19. Como Integrante do EP, quero que o processo em Concluídos tenha todos os blocos cheios, para reconhecer o processo terminado.
+20. Como Integrante do EP, quero que o processo em Não iniciados tenha só o primeiro bloco meio cheio, para reconhecer o processo que ainda não começou.
+21. Como Integrante do EP, quero que a barra conte só as etapas ativas, para a posição bater com as colunas do Quadro.
+22. Como Integrante do EP, quero que a barra do suspenso e do cancelado mostre a etapa onde ele parou, ao lado da pílula da situação, para saber onde ele vai continuar.
+23. Como pessoa que usa leitor de tela, quero que a barra seja lida como "Etapa 2 de 8: Relatório e modelagem técnica", para ter a mesma informação sem ver os blocos.
+24. Como Integrante do EP, quero que a barra seja cinza, sem azul, para ela não competir com os botões e os links da plataforma.
+
+#### Etiquetas
+
+25. Como Integrante do EP, quero ver A fazer em cinza, Em andamento em laranja suave e Concluído em verde suave no cartão, para separar de relance o que espera, o que anda e o que terminou.
+26. Como Integrante do EP, quero as mesmas cores na coluna Etiqueta da Lista, para ler a Lista como leio o Quadro.
+27. Como pessoa que não distingue cores, quero que a etiqueta continue com o texto ao lado da bolinha, para não depender da cor.
+28. Como Integrante do EP, quero que a etiqueta no Agora continue uma lista de escolha, para mudá-la como hoje.
+
+#### Processo parado
+
+29. Como Integrante do EP, quero que o processo parado tenha o selo "12 dias nesta etapa" em vermelho suave, para ele não se confundir com a etiqueta Em andamento.
+30. Como Integrante do EP, quero que o cartão do processo parado tenha uma faixa vermelha na borda esquerda, para achá-lo numa coluna cheia sem ler os selos.
+31. Como Integrante do EP, quero ver o selo de parado ao lado do nome na Lista, para achar os parados também lá.
+32. Como Integrante do EP, quero continuar vendo o selo de parado no Agora, agora em vermelho suave, para a cor ser a mesma em todo lugar.
+33. Como Integrante do EP, quero que o processo com 7 dias na etapa não tenha selo nem faixa, e o com 8 tenha, para o limite continuar o de hoje.
+34. Como Integrante do EP, quero que o processo em Não iniciados, em Concluídos, suspenso ou cancelado nunca ganhe selo nem faixa, para o aviso só aparecer onde há trabalho parado.
+
+#### Anotações
+
+35. Como Integrante do EP, quero que o campo das Anotações comece com cerca de 7 linhas, para escrever sem o campo parecer apertado.
+36. Como Integrante do EP, quero que o campo das Anotações pare de crescer em cerca de 12 linhas e role por dentro, para o verso não ficar comprido demais.
+
+### Decisões de implementação
+
+#### Interface
+
+- **Data da modelagem piloto no verso:** o componente da antiga Reunião troca de nome e de textos ("Data da modelagem piloto", "Marcar data", "Alterar data", "A Data da modelagem piloto não foi salva: …"), sem mudar o comportamento de leitura e edição. A Consulta e o arquivado só leem.
+- **Novo processo:** o campo "Data da modelagem piloto" entra no formulário de Novo processo (hoje a data só se marca no verso), preenchido com o hoje de Brasília (o mesmo `hojeEmBrasilia` dos dias na etapa), editável e apagável. O Editar continua sem o campo: a data se altera no verso.
+- **Selo do cartão:** o selo da reunião passa a selo da modelagem, com texto "Modelagem {DD/MM}" ou "Modelagem hoje", e a condição ganha a etapa atual: só em Não iniciados ou na Modelagem piloto (pelos códigos das etapas). A cor de destaque do selo (a borda à esquerda) segue a de hoje.
+- **Histórico:** o rótulo do campo da data no histórico passa a "Data da modelagem piloto", lido tanto com a chave nova como com a antiga, para os eventos gravados antes da migração (que não são reescritos).
+- **Barra:** a função da barra passa a devolver também o texto visível "Nome · {posição} de {total}"; os estados dos blocos ficam (anteriores, atual, seguintes), com o desenho novo: anteriores cinza cheio, atual meio cheio, seguintes vazios com borda. Um único componente de barra, com o texto acima, serve o cartão do Quadro por responsável, a Lista e Processos do setor (e, depois, a parte 5). O cartão recebe se o Quadro está agrupado por etapa e, nesse caso, não mostra a barra.
+- **Etiqueta:** um componente de etiqueta (bolinha e texto), com três tokens de cor novos em pares de fundo e texto, tirados do esboço (cinza, laranja suave e verde suave), conferidos com contraste mínimo de 4,5:1 no texto. Usado no cartão e na Lista.
+- **Processo parado:** o selo de dias passa ao tom de atraso (vermelho suave, tokens já existentes `--atraso-fundo` e `--atraso-texto`); o cartão com o selo ganha uma classe que desenha a faixa na borda esquerda. A Lista mostra o mesmo selo ao lado do nome, pela mesma regra dos selos (uma função só decide se o processo está parado).
+- **Anotações:** só a altura mínima do campo muda, para cerca de 7 linhas; o máximo e a rolagem ficam.
+- **Estados de carregamento, vazio e erro:** nenhuma tela nova. O formulário de Novo processo, o verso, o Quadro, a Lista e Processos do setor mantêm os seus estados de hoje (carregando, vazio, erro com tentar de novo, inclusive falha de conexão). A falha ao salvar a data no verso mostra "A Data da modelagem piloto não foi salva: {motivo}.", e a do cadastro segue a mensagem de falha do cadastro de hoje.
+
+#### Modelo de dados
+
+- **Coluna renomeada:** `processos.data_da_reuniao` (date, opcional) passa a `processos.data_da_modelagem_piloto` (date, opcional). Sem valor padrão no banco: a sugestão do dia é da tela. Os valores existentes são preservados pelo próprio rename; os nulos continuam nulos.
+- **Views e funções que leem a coluna:** a view `processos_com_andamento` (com `security_invoker = true`) e a função que monta o pacote das planilhas são recriadas com o nome novo, e a chave do pacote passa a `data_da_modelagem_piloto`. Os gatilhos de evento do processo passam a gravar a chave nova nos eventos seguintes; os eventos antigos ficam como estão.
+- **Função das planilhas (Edge Function `planilhas-dos-dashboards`):** a validação e a leitura do pacote passam a usar a chave nova; a função precisa ser publicada de novo no desenvolvimento, pelo roteiro `docs/planilhas-publicar-a-funcao.md`, passo do usuário. Até a publicação, a atualização das planilhas recusa o pacote novo.
+- **Quem pode o quê:** igual a hoje para a coluna. O privilégio por coluna de alterar acompanha o nome novo.
+
+| Tabela e ação | Administrador | Integrante do EP | Consulta | Usuário desativado | Visitante sem login |
+| --- | --- | --- | --- | --- | --- |
+| `processos.data_da_modelagem_piloto`: ler | sim | sim | sim | não | não |
+| `processos.data_da_modelagem_piloto`: preencher no cadastro | sim | sim | não | não | não |
+| `processos.data_da_modelagem_piloto`: alterar ou apagar | sim (processo não arquivado) | sim (processo não arquivado) | não | não | não |
+
+- **Dado pessoal:** nenhum novo.
+- **Regras que o banco impõe:** as mesmas da antiga data da reunião (alterar só com o processo não arquivado; cada mudança vira evento), agora com o nome novo. Caso de teste: o teste da antiga data da reunião passa para o nome novo e prova as mesmas regras.
+- **Migração:** não destrutiva (rename de coluna, com os dados preservados), mas muda um nome que a tela e a Edge Function leem: a tela, os tipos (`db:types`), a migração e a função mudam juntos.
+
+### Decisões de teste
+
+- **Bom teste** confere o que a pessoa vê e consegue fazer, ou o que o banco aceita e recusa, nunca detalhes internos.
+- **Interface (ponto de teste principal: a tela inteira).** Vitest com Testing Library, renderizando o aplicativo inteiro com as falsas nomeadas, como nos testes `App.*` de hoje. O que cobre:
+  - Novo processo com a data de hoje preenchida, salvando com ela, com outra data e com o campo vazio;
+  - o verso com "Data da modelagem piloto", "· próxima" e "· realizada", marcar, alterar e apagar, a falha ao salvar e a Consulta só lendo (reescrita de `App.reuniaoDoProcesso`);
+  - o selo "Modelagem {DD/MM}" e "Modelagem hoje" em Não iniciados e na Modelagem piloto, sumindo com a data passada e em outra etapa com a data futura;
+  - o histórico com "Data da modelagem piloto" para um evento novo e para um antigo;
+  - o cartão do Quadro por etapa sem barra, o do Quadro por responsável com a barra e o texto "Nome · n de N", a Lista e Processos do setor com a barra e o nome acessível;
+  - as etiquetas no cartão e na Lista com o texto e a classe de cor de cada valor;
+  - o processo parado com selo e faixa no cartão, selo na Lista e no Agora, com 7 dias sem nada e 8 com tudo, e nada em Não iniciados, Concluídos, suspenso e cancelado;
+  - os testes de tela que procuram "Reunião" (`App.cartaoDoQuadro`, `App.quadro`, `App.lista`, `App.historicoNaJanela`, `App.cadastrarProcesso` e os outros que montam a data) passam para o nome novo.
+- **Funções puras:** a barra (blocos e texto "Nome · n de N", Não iniciados, Concluídos, catálogo com etapa desativada) e os selos (modelagem por data e etapa, parado) ganham ou ajustam testes unitários pequenos. Arte anterior: `barraDoCartao`, `selosDoCartao`, `diasNaEtapa`, `textoDaReuniao`.
+- **Tradução entre o banco e a tela:** os testes do módulo de processos real com o cliente simulado passam a ler e gravar `data_da_modelagem_piloto` (cadastro, leitura, linha da Lista). Arte anterior: `gravarProcessoSupabase`, `lerProcessoSupabase`, `listaDeProcessosSupabase`, `processoDaLinha`.
+- **Planilhas:** os testes do pacote em Deno/Vitest (`planilhasPacote`, `planilhasInterna`, cenário e exemplos) passam à chave nova, incluindo a recusa de data fora do formato.
+- **Banco:** pgTAP. O teste `32_data_da_reuniao` vira o teste da Data da modelagem piloto (mesmas regras, nome novo) e falha antes da migração (coluna inexistente); o `17_processos` e o `44_pacote_das_planilhas` passam ao nome novo; mais os gerais `00_rls_ligada` e `10_privilegios_padrao`. Rodam no Docker local durante o desenvolvimento e pelo GitHub Actions ("Testes de banco") na conferência final.
+- Todos os processos, setores e usuários dos testes são inventados.
+
+### Fora do escopo desta parte
+
+- Filtro "Só os parados" na Lista ou no Quadro.
+- Data da modelagem piloto no Editar do processo (fica no verso).
+- Reescrever os eventos antigos do histórico para a chave nova.
+- Arquivos por etapa (parte 3), outros anexos (parte 4) e visualização por setores (parte 5), que reaproveita a barra desta parte.
+- Prazos por etapa: v1.5.
+
+### Decisões tomadas ao escrever esta seção, a confirmar na leitura
+
+1. O campo entra no formulário de Novo processo (hoje a data só se marca no verso), porque "vem com a data de hoje" só faz sentido no cadastro; o Editar continua sem ele.
+2. "Hoje" é o de Brasília, como nos dias na etapa.
+3. Os eventos antigos do histórico não são reescritos; a tela lê a chave antiga e a nova com o mesmo rótulo.
+4. O texto do selo é "Modelagem {DD/MM}" (curto, para caber no cartão), não "Data da modelagem piloto {DD/MM}".
+5. A faixa do processo parado fica só no cartão do Quadro; na Lista, só o selo ao lado do nome.
+6. A barra na Lista substitui o texto da coluna "Etapa atual" (o nome continua visível acima dos blocos), sem coluna nova.
+7. A cor de destaque do selo da modelagem (borda à esquerda) continua a da antiga reunião.
+
+### Divergência com `.scratch/especificacao.md`
+
+Nenhuma nova. A especificação falava em reunião da modelagem piloto; o nome do dado muda, o sentido não.
+
+### Critérios conferidos olhando a tela
+
+- `[visual]` A barra em blocos segue o esboço A: blocos iguais, cinza, o atual meio cheio, "Nome · n de N" acima, sem azul, no cartão por responsável, na Lista e em Processos do setor, sem estourar a largura da coluna.
+- `[visual]` As etiquetas aparecem como pílula com bolinha, A fazer cinza, Em andamento laranja suave e Concluído verde suave, legíveis e sem azul.
+- `[visual]` O processo parado salta aos olhos no Quadro: faixa vermelha à esquerda e selo vermelho suave, sem confundir com o laranja de Em andamento.
+- `[visual]` O campo das Anotações abre com cerca de 7 linhas e rola por dentro depois de cerca de 12, sem empurrar a janela do verso.
+- `[visual]` O formulário de Novo processo mostra a Data da modelagem piloto alinhada aos outros campos.
 
 ## Andamento livre (mudança de 2026-10-23)
 
@@ -1244,3 +1397,4 @@ Entregue em 2026-10-23 (commit ae1fb54), com ressalva: critérios [visual] da mu
 
 Entregue em 2026-10-23 (commit fa00e9a)
 Entregue em 2026-10-25 (commit cc17e13), com ressalva: critérios [visual] vistos só na vitrine local, com módulos falsos (as janelas de registrar revisão e aprovação e qualquer tela com o login real não foram vistas); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
+Em revisão desde 2026-10-25
