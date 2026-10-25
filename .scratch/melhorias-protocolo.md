@@ -915,3 +915,10 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **2026-10-25 · Ocorrência: sem `gh` nesta máquina, os dois workflows foram disparados pelo navegador do app** (menu "Run workflow" aberto por `javascript_tool`, campos preenchidos pelo setter nativo com eventos `input`/`change` e clique no botão de envio). A primeira tentativa, por `fetch` do formulário, deu 422.
 - **2026-10-25 · Ocorrência: a trava de git bloqueou outro `sed -i` comum** (mensagem de "apagar a pasta .git") quando o comando trazia dois arquivos de teste `.sql` e vários trechos; refiz com a ferramenta Edit. Repete a de 2026-10-24.
 - **2026-10-25 · Ocorrência: o `git branch -d` recusou apagar a branch integrada** porque o último commit dela não estava no GitHub (a branch remota ficava atrás); resolvido enviando a branch antes. Vale o roteiro do passo 4 mandar enviar a branch antes do `-d`.
+
+## 2026-10-25 — /executar-simples do ticket 27 de processos-etapas (cara do cartão)
+
+- **Item não testado: `/executar-simples` com `/mattpocock-skills:implement` e linha `Concluído em` no ticket.** Esperado: o comando devolve o resumo para eu colar no `/implement`, e depois grava a linha e comita. Aconteceu: o usuário colou o texto do comando como mensagem comum, e o `/implement` só disparou depois que ele o digitou como comando; a linha `Concluído em` foi gravada em seguida, na mesma sessão.
+- Ocorrência: o `/code-review` do Matt pede um ponto fixo (`HEAD...HEAD` fica vazio com mudanças não comitadas); revisei por conta própria, sem os dois sub-agentes. Achou o CSS que não tinha sido gravado (substituição por `perl` não casou com o CRLF dos arquivos `.css`/`.tsx`): em arquivos com CRLF, edite por script que normaliza as quebras de linha.
+- Ocorrência: sem vitrine local pronta, os critérios `[visual]` do ticket 27 não foram vistos na tela.
+- Ocorrência: o git deste ambiente continua sem user.name/user.email; commit com `-c`, sem gravar config.

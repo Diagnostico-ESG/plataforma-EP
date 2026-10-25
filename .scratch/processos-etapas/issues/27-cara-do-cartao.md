@@ -23,3 +23,5 @@
 - [ ] `[visual]` As etiquetas aparecem como pílula com bolinha, legíveis e sem azul.
 - [ ] `[visual]` O processo parado salta aos olhos no Quadro, sem confundir com o laranja de Em andamento.
 - [ ] `[visual]` O campo das Anotações abre com cerca de 7 linhas e rola por dentro depois de cerca de 12, sem empurrar a janela do verso.
+
+Concluído em 2026-10-25 (commit d26d585)
