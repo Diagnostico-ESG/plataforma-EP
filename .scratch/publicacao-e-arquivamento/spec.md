@@ -60,7 +60,7 @@ Continuam valendo:
   - em Concluídos sem publicação e no arquivado sem publicação, o mesmo botão;
   - o processo fica onde está;
   - registrada a data, o botão vira [Corrigir publicação], com a janela preenchida (não no arquivado).
-- **Sair de Concluídos** (mover de volta) apaga a explicação de concluir sem publicação, que era a condição daquela chegada. A data da publicação fica, porque a publicação aconteceu.
+- **Sair de Concluídos** (mover de volta) apaga a explicação de concluir sem publicação, que era a condição daquela chegada. A data da publicação fica, porque a publicação aconteceu. Registrar a publicação num processo já concluído sem publicação grava a data e não apaga a explicação: a tela passa a mostrar "Publicado", e a explicação antiga só sai na próxima saída de Concluídos (decisão da implementação, `desvios.md` de 2026-10-25).
 - **Agora em Concluídos:**
   - "Concluído · Publicado em dd/mm/aaaa" (com o link, numa aba nova, quando há) ou "Concluído sem publicação: {explicação}";
   - [Registrar publicação] quando sem publicação;

@@ -41,6 +41,6 @@ Spec: `.scratch/exportacao-e-manutencao/spec.md`, seção "Andamento livre (muda
   - a validação da fase vazia e da passagem aberta;
   - nenhum nome de pessoa nas linhas.
 - [x] O cenário de exemplo e os testes antigos das planilhas estão ajustados.
-- [ ] O teste `44_pacote_das_planilhas` foi reescrito antes da migração e visto falhar (passagens, suspensos fora, sem nome de pessoa), e o workflow "Testes de banco" passa na branch.
+- [x] O teste `44_pacote_das_planilhas` foi reescrito antes da migração e visto falhar (passagens, suspensos fora, sem nome de pessoa), e o workflow "Testes de banco" passa na branch.
 
 Concluído em 2026-10-24 (commit 4a0350f)

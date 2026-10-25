@@ -105,3 +105,7 @@ Decisões tomadas na execução, sem mudar a spec:
 - **Verificado:** Docker local, bateria inteira 1266 `ok`, 0 `not ok` (os testes 39, 40 e 41 dão 47, 55 e 57); Vitest 2356 testes; `tsc`, ESLint e dependência circular limpos. O workflow "Testes de banco" do GitHub ainda não rodou nesta migração (fica para o `git push` e a conferência do usuário).
 - **Critérios `[visual]` da spec** (janelas sem passar de 1366×768, resumo numa linha) seguem presumidos: sem `.claude/launch.json` não há vitrine local; entram na ressalva do `/ship`.
 - **Revisão final:** autorrevisão (a regra do projeto não permite abrir subagente sem o usuário pedir). Nada Crítico ou Importante achado; o que ficou: o teste 53 do banco local termina com `ultimo_administrador` (já era assim antes deste ticket, a contagem de 28 asserções fecha) e a edição de revisão de passagem antiga não permite trocar o resultado pela tela.
+
+## 2026-10-25 · /ship do Andamento livre
+
+Entrega coberta pelo `/ship` registrado em `.scratch/processos-etapas/desvios.md` (entrada de 2026-10-25): revisão de código, revisão de segurança de reserva, banco, tela e as divergências aceitas. Nenhum achado próprio desta funcionalidade além do que consta lá.

@@ -81,3 +81,7 @@
 - **Ainda é seu:** republicar a função `planilhas-dos-dashboards` no desenvolvimento depois do ticket 04 de publicacao-e-arquivamento (que aplica as migrações), com o roteiro de `docs/planilhas-publicar-a-funcao.md`, e refazer no Data Studio os cartões que usavam as situações antigas.
 
 **Verificado:** TDD do teste 44 (vermelho e verde no Docker local), Vitest (2309 testes, 173 arquivos), `tsc` e ESLint limpos. **Presumido:** a função publicada no Google (nada foi republicado nem escrito em planilha real) e o "Testes de banco" do GitHub.
+
+## 2026-10-25 · /ship do Andamento livre
+
+Entrega coberta pelo `/ship` registrado em `.scratch/processos-etapas/desvios.md` (entrada de 2026-10-25): revisão de código, revisão de segurança de reserva, banco, tela e as divergências aceitas. Nenhum achado próprio desta funcionalidade além do que consta lá.

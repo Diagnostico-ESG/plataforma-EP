@@ -43,12 +43,12 @@ Spec: `.scratch/publicacao-e-arquivamento/spec.md`, seção "Andamento livre (mu
 
 ## Critérios de aceite
 
-- [ ] Testes pgTAP escritos antes e vistos falhar: cada célula e cada regra da seção Andamento livre. Inclui registrar publicação na Publicação, em Concluídos e no arquivado (com e sem data), a data futura ou antes da aprovação, o link fora de `http(s)`, arquivar suspenso e cancelado, desarquivar como estava, o arquivado sem mover, sem etiqueta, sem responsável e sem Anotações, e as colunas só pelas funções. Os testes `48` e `49` estão ajustados.
-- [ ] Testes de interface com o aplicativo inteiro: a janela de chegada pela lista e pelo arrastar (botão desabilitado, as duas opções, Esc com o cartão de volta, ida direta com a data registrada); registrar e corrigir a publicação; sair de Concluídos apagando a explicação; o Agora de Concluídos; o selo "Sem publicação"; arquivar o suspenso e o cancelado; a Lista com "Arquivado · {situação}"; desarquivar; Consulta sem botões.
-- [ ] Os testes do módulo real com o cliente simulado provam mover com os dados da chegada, `registrarPublicacao` com o link e as frases novas.
-- [ ] O workflow "Testes de banco" passa na branch inteira.
-- [ ] As migrações foram aplicadas no desenvolvimento pelo workflow (com o alvo conferido) e registradas em `AMBIENTES.md`.
+- [x] Testes pgTAP escritos antes e vistos falhar: cada célula e cada regra da seção Andamento livre. Inclui registrar publicação na Publicação, em Concluídos e no arquivado (com e sem data), a data futura ou antes da aprovação, o link fora de `http(s)`, arquivar suspenso e cancelado, desarquivar como estava, o arquivado sem mover, sem etiqueta, sem responsável e sem Anotações, e as colunas só pelas funções. Os testes `48` e `49` estão ajustados.
+- [x] Testes de interface com o aplicativo inteiro: a janela de chegada pela lista e pelo arrastar (botão desabilitado, as duas opções, Esc com o cartão de volta, ida direta com a data registrada); registrar e corrigir a publicação; sair de Concluídos apagando a explicação; o Agora de Concluídos; o selo "Sem publicação"; arquivar o suspenso e o cancelado; a Lista com "Arquivado · {situação}"; desarquivar; Consulta sem botões.
+- [x] Os testes do módulo real com o cliente simulado provam mover com os dados da chegada, `registrarPublicacao` com o link e as frases novas.
+- [x] O workflow "Testes de banco" passa na branch inteira.
+- [x] As migrações foram aplicadas no desenvolvimento pelo workflow (com o alvo conferido) e registradas em `AMBIENTES.md`.
 - [ ] A conferência na tela está feita, com o que foi visto e o que foi presumido anotado no plano.
-- [ ] A branch foi levada à `main` e enviada ao GitHub, e o "Testes de banco" passa na `main`.
+- [x] A branch foi levada à `main` e enviada ao GitHub, e o "Testes de banco" passa na `main`.
 
 Concluído em 2026-10-24 (commit 80781d1)

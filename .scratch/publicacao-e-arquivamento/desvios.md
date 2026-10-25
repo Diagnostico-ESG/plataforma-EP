@@ -33,3 +33,7 @@
   - Botão de confirmar desabilitado sem dizer por quê (nas duas janelas): padrão já existente em todas as `JanelaDeEdicao`; o campo obrigatório agora é anunciado, o que cobre o essencial.
   - `.selo-reuniao` com borda esquerda de 3px: já existia antes desta funcionalidade e é o marcador de tipo do DESIGN.md.
 - **Conferência:** `npm run typecheck` sem erros; `npm test`: 184 arquivos, 2405 testes verdes.
+
+## 2026-10-25 · /ship do Andamento livre
+
+Entrega coberta pelo `/ship` registrado em `.scratch/processos-etapas/desvios.md` (entrada de 2026-10-25): revisão de código, revisão de segurança de reserva, banco, tela e as divergências aceitas. Nenhum achado próprio desta funcionalidade além do que consta lá.
