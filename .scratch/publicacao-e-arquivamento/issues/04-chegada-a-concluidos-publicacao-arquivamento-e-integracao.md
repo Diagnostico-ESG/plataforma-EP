@@ -50,3 +50,5 @@ Spec: `.scratch/publicacao-e-arquivamento/spec.md`, seção "Andamento livre (mu
 - [ ] As migrações foram aplicadas no desenvolvimento pelo workflow (com o alvo conferido) e registradas em `AMBIENTES.md`.
 - [ ] A conferência na tela está feita, com o que foi visto e o que foi presumido anotado no plano.
 - [ ] A branch foi levada à `main` e enviada ao GitHub, e o "Testes de banco" passa na `main`.
+
+Concluído em 2026-10-24 (commit 80781d1)
