@@ -144,15 +144,15 @@ _Avoid_: observações, notas, comentários
 Mudança do tipo de um item (processo, subprocesso ou a classificar), com motivo, que preserva o mesmo item com tudo o que ele já tem.
 _Avoid_: conversão, migração, recriação
 
-## Reuniões
+## Modelagem piloto
 
 **Modelagem piloto**:
 A primeira etapa de trabalho de todo processo, logo depois de Não iniciados: o EP se reúne com o setor e faz o primeiro desenho do fluxo.
 _Avoid_: reunião de modelagem, oficina, workshop
 
-**Reunião**:
-Encontro do EP com o setor para a modelagem piloto de um processo, marcado no próprio processo só pela data. Pode ser marcado antes de acontecer: a data diz se é próxima ou realizada. Uma reunião que trata vários processos é marcada em cada um. Não muda o status de nenhuma etapa. Participantes, local e anotações da reunião ficam fora: a existência do relatório já pressupõe a reunião, e o que for preciso registrar vai nas Anotações do processo.
-_Avoid_: encontro, evento, agenda, oficina, reunião de sensibilização
+**Data da modelagem piloto**:
+Dia em que o EP se reúne com o setor para a Modelagem piloto de um processo, guardado no próprio processo. Opcional; o cadastro já a sugere com a data de hoje. Pode ser marcada antes de acontecer: a data diz se é próxima ou realizada. Um encontro que trata vários processos é marcado em cada um. Não move o processo nem muda a etiqueta. Participantes, local e anotações do encontro ficam fora: o que for preciso registrar vai nas Anotações do processo.
+_Avoid_: reunião, data da reunião, encontro, agenda, oficina
 
 ## Documentos
 

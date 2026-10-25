@@ -2,8 +2,8 @@
 
 Registro de onde a última sessão parou e do que vem a seguir. Cada sessão que terminar recomendando um próximo passo sobrescreve este arquivo antes de encerrar. Valem os arquivos se divergir do git.
 
-Atualizado em 2026-10-25 (fim do /ship do Andamento livre, quadro-livre parte 1)
+Atualizado em 2026-10-25 (/planejar da parte 2 do quadro-livre, "Cartão e verso", sabatina concluída)
 
-- **Entregue:** processos-etapas, revisoes-aprovacao, exportacao-e-manutencao e publicacao-e-arquivamento ganharam `Entregue em 2026-10-25`, com ressalva (`[visual]` vistos só na vitrine local com módulos falsos; revisão de segurança de reserva). Marcos `marco/2026-10-25-entrega-<funcionalidade>` das quatro. Detalhes e divergências aceitas: `.scratch/processos-etapas/desvios.md`, entrada de 2026-10-25.
-- **Próximo comando:** em sessão com o Opus, `/planejar` para a parte 2 do quadro-livre, "Cartão e verso" (ver `.scratch/quadro-livre/mapa.md`). As partes 2 a 5 seguem a ordem do mapa.
-- **Pendente do usuário:** conferir na tela com o login real (principalmente as janelas de registrar revisão e aprovação e o arrastar do cartão); republicar a função `planilhas-dos-dashboards` pelo roteiro `docs/planilhas-publicar-a-funcao.md`, atualizar as planilhas e refazer os dashboards; apagar ou refazer o handoff antigo `.scratch/handoff-2026-10-20.md`; ler as "Decisões tomadas ao escrever esta seção" das quatro specs.
+- **Feito:** marco `marco/2026-10-25-inicio-quadro-livre-parte-2`; sabatina em `.scratch/quadro-livre/sabatina-parte-2.md`; `CONTEXT.md` com "Data da modelagem piloto" no lugar de "Reunião".
+- **Próximo comando:** no Opus, `/mattpocock-skills:to-spec ponto de teste: a tela inteira (testes pela interface, como a pessoa usa)`, atualizando `.scratch/processos-etapas/spec.md` (com `Em revisão desde 2026-10-25` abaixo da última marca de entrega). Depois, conferência da spec e `to-tickets` (tickets a partir do 26).
+- **Pendente do usuário (de antes):** conferir na tela com o login real; republicar a função `planilhas-dos-dashboards` (esta parte vai exigir nova publicação, pela coluna renomeada); apagar ou refazer o handoff antigo `.scratch/handoff-2026-10-20.md`.
