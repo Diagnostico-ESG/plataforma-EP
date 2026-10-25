@@ -23,3 +23,13 @@
 - **Divergência: o módulo falso não simula "data antes da aprovação"** (não tem aprovações); a recusa vem do banco e a tradução dela tem teste em `publicacaoSupabase.test.ts`.
 - **Divergência: tipos escritos à mão** (`registrar_publicacao` e `explicacao_sem_publicacao` na view). O `gen types --local` sai em formato diferente do arquivo, gerado pelo remoto; a regeneração de verdade fica na integração (tarefa 7).
 - **Não feito nesta sessão (depende do GitHub e do usuário):** workflows "Testes de banco" e "Migrar banco de desenvolvimento" (o navegador do app não está logado no GitHub), conferência na tela com login real, republicação da função das planilhas e a junção à `main`.
+
+## 2026-10-25 · /polir (Andamento livre, parte 1: janelas de chegada e de publicação, Agora de Concluídos, selos)
+
+- **Auditoria (impeccable audit), código das telas novas:** o detector não achou nada em `processos/`, `administracao/` e `versoes/`; cores todas por token, foco visível e movimento reduzido globais em `index.css`, janela nativa com título ligado, fieldset/legend nos rádios, rótulos ligados aos campos, falha em `role="alert"`, link da publicação só http/https com `rel="noopener noreferrer"`. A tela não foi aberta (sem vitrine com login real), então os critérios `[visual]` seguem presumidos.
+- **Corrigido:** a data da publicação (`CamposDaPublicacao`) e a explicação de "Concluir sem publicação" (`JanelaDaChegada`) ganharam `required`, para o leitor de tela anunciar o campo como obrigatório (o botão já só habilitava com eles preenchidos).
+- **Deixado de fora, com o motivo:**
+  - Borda dos campos (`--linha` sobre branco, cerca de 1,3:1, abaixo dos 3:1 do WCAG 1.4.11): vale para os 16 usos de `border: 1px solid var(--linha)` em todo o sistema, não só para as janelas novas; pede decisão de token (um tom de borda de campo mais escuro), não um ajuste local. Vai para o backlog.
+  - Botão de confirmar desabilitado sem dizer por quê (nas duas janelas): padrão já existente em todas as `JanelaDeEdicao`; o campo obrigatório agora é anunciado, o que cobre o essencial.
+  - `.selo-reuniao` com borda esquerda de 3px: já existia antes desta funcionalidade e é o marcador de tipo do DESIGN.md.
+- **Conferência:** `npm run typecheck` sem erros; `npm test`: 184 arquivos, 2405 testes verdes.

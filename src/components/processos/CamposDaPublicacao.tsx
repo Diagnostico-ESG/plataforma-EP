@@ -14,7 +14,7 @@ export function CamposDaPublicacao<T extends ValorDosCampos>({ valor, aoMudar }:
   return (
     <>
       <label htmlFor={idDaData} className="janela-escolha-pergunta janela-revisao-rotulo">Data da publicação</label>
-      <input id={idDaData} type="date" className="janela-campo" max={hojeLocal()} value={valor.data}
+      <input id={idDaData} type="date" className="janela-campo" required max={hojeLocal()} value={valor.data}
         onChange={(mudanca) => aoMudar({ ...valor, data: mudanca.target.value })} />
       <label htmlFor={idDoLink} className="janela-escolha-pergunta janela-revisao-rotulo">Link (opcional)</label>
       <input id={idDoLink} type="url" className="janela-campo" maxLength={500} value={valor.link}

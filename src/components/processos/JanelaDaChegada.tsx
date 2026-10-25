@@ -26,7 +26,7 @@ function CampoDaExplicacao({ rascunho, aoMudar }: CamposProps) {
   return (
     <>
       <label htmlFor={id} className="janela-escolha-pergunta janela-revisao-rotulo">Explicação</label>
-      <textarea id={id} className="janela-campo" rows={3} maxLength={2000} placeholder="Por que este processo não será publicado?"
+      <textarea id={id} className="janela-campo" rows={3} maxLength={2000} required placeholder="Por que este processo não será publicado?"
         value={rascunho.explicacao} onChange={(mudanca) => aoMudar({ ...rascunho, explicacao: mudanca.target.value })} />
       <p className="janela-ajuda">Não anote dado pessoal de pessoas do setor.</p>
     </>
