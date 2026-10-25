@@ -1,10 +1,12 @@
 import type { LinhaDaLista } from '../../processos/linhasDaLista'
-import { textoDaEtapaAtual } from '../../processos/linhasDaLista'
-import { ROTULO_DA_ETIQUETA, ROTULO_DO_TIPO } from '../../processos/rotulos'
+import { ROTULO_DO_TIPO } from '../../processos/rotulos'
 import { LinhaFantasma } from '../cadastros/PecasDaLista'
 import { Pilula } from '../Pilula'
+import { BarraDeProgresso } from './BarraDeProgresso'
+import { EtiquetaDoProcesso } from './EtiquetaDoProcesso'
 import { NomeComTrecho } from './NomeComTrecho'
 import { PilulaDaSituacao } from './PilulaDaSituacao'
+import { SeloDeParado } from './SeloDeParado'
 
 const COLUNAS = ['Nome', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Etiqueta', 'Responsável', 'Situação']
 const LINHAS_FANTASMA = 3
@@ -56,12 +58,13 @@ function LinhaDoProcesso({ linha, escolhida, aoAbrir, busca }: LinhaDoProcessoPr
           <NomeComTrecho nome={linha.nome} busca={busca} />
         </button>
         {linha.nomeDoPai && <span className="lista-pai">↳ {linha.nomeDoPai}</span>}
+        <SeloDeParado processo={linha} />
       </td>
       <td>{ROTULO_DO_TIPO[linha.tipo]}</td>
       <td>{linha.setorSigla}</td>
       <td>{linha.macroprocessoNome}</td>
-      <td>{textoDaEtapaAtual(linha)}</td>
-      <td>{ROTULO_DA_ETIQUETA[linha.etiqueta ?? 'a_fazer']}</td>
+      <td>{linha.etapaAtual ? <BarraDeProgresso processo={linha} /> : '—'}</td>
+      <td><EtiquetaDoProcesso etiqueta={linha.etiqueta} /></td>
       <td>{linha.responsavel?.nome ?? '—'}</td>
       <td>
         <span className="lista-situacao">

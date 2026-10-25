@@ -1,4 +1,4 @@
-import { cleanup } from '@testing-library/react'
+import { cleanup, fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import { cartaoDe, dia, montar, processo } from './testes/quadroDeTeste'
 
@@ -12,43 +12,59 @@ afterEach(() => {
 
 const selos = (cartao: HTMLElement) => Array.from(cartao.querySelectorAll('.cartao-selos > *')).map((selo) => selo.textContent)
 
+const porResponsavel = async () => fireEvent.click(await screen.findByRole('button', { name: 'Responsável' }))
+const barraDe = (cartao: HTMLElement) => cartao.querySelector('.barra-etapa')
+
 const SEM_RELATORIO = { ultimaVersao: { numero: 3, historica: false, temRelatorio: false } }
 
 // ---- A barra e a etiqueta
 
-test('a barra tem um pedaço por etapa ativa, com as anteriores preenchidas, a atual destacada e o nome acessível', async () => {
+test('por etapa o cartão não traz a barra; a coluna já diz a etapa', async () => {
   montar([processo('Emitir Ofício', { etapa: 'revisao_interna' })])
-  const cartao = await cartaoDe('Emitir Ofício')
-  const barra = cartao.querySelector('[role="img"]')
+  expect(barraDe(await cartaoDe('Emitir Ofício'))).toBeNull()
+})
+
+test('por responsável a barra diz "Nome · n de N", tem um bloco por etapa ativa e o nome acessível', async () => {
+  montar([processo('Emitir Ofício', { etapa: 'revisao_interna' })])
+  await cartaoDe('Emitir Ofício')
+  await porResponsavel()
+  const barra = barraDe(await cartaoDe('Emitir Ofício'))
   expect(barra?.getAttribute('aria-label')).toBe('Etapa 4 de 8: Revisão interna')
-  expect(Array.from(barra?.children ?? []).map((pedaco) => pedaco.className.replace('pedaco pedaco-', ''))).toEqual([
+  expect(barra?.querySelector('.barra-etapa-texto')?.textContent).toBe('Revisão interna · 4 de 8')
+  expect(Array.from(barra?.querySelectorAll('.pedaco') ?? []).map((pedaco) => pedaco.className.replace('pedaco pedaco-', ''))).toEqual([
     'resolvida', 'resolvida', 'resolvida', 'atual', 'seguinte', 'seguinte', 'seguinte', 'seguinte',
   ])
 })
 
 test('em Concluídos a barra está toda preenchida', async () => {
   montar([processo('Pronto', { etapa: 'concluidos', processo: { situacao: 'concluido', etiqueta: 'concluido' } })])
-  const barra = (await cartaoDe('Pronto')).querySelector('[role="img"]')
+  await cartaoDe('Pronto')
+  await porResponsavel()
+  const barra = barraDe(await cartaoDe('Pronto'))
   expect(barra?.getAttribute('aria-label')).toBe('Etapa 8 de 8: Concluídos')
-  expect(Array.from(barra?.children ?? []).every((pedaco) => pedaco.className.includes('pedaco-resolvida'))).toBe(true)
+  expect(Array.from(barra?.querySelectorAll('.pedaco') ?? []).every((pedaco) => pedaco.className.includes('pedaco-resolvida'))).toBe(true)
 })
 
-test('o processo suspenso também tem barra, com a pílula Suspenso', async () => {
+test('o processo suspenso mostra a barra da etapa onde parou, com a pílula Suspenso', async () => {
   montar([processo('Suspenso Teste', { processo: { situacao: 'suspenso' } })])
+  await cartaoDe('Suspenso Teste')
+  await porResponsavel()
   const cartao = await cartaoDe('Suspenso Teste')
-  expect(cartao.querySelector('[role="img"]')?.getAttribute('aria-label')).toBe('Etapa 4 de 8: Revisão interna')
+  expect(barraDe(cartao)?.getAttribute('aria-label')).toBe('Etapa 4 de 8: Revisão interna')
   expect(cartao.textContent).toContain('Suspenso')
 })
 
-test('o cartão mostra a etiqueta como pílula neutra com o texto, e o avatar do responsável do processo', async () => {
+test('a etiqueta é uma pílula com bolinha e o texto, na cor de cada valor, e o avatar do responsável do processo', async () => {
   montar([
     processo('A Fazer'), processo('Em Andamento', { processo: { etiqueta: 'em_andamento' } }),
     processo('Feita', { processo: { etiqueta: 'concluido' } }),
   ])
-  for (const [nome, etiqueta] of [['A Fazer', 'A fazer'], ['Em Andamento', 'Em andamento'], ['Feita', 'Concluído']]) {
+  for (const [nome, etiqueta, classe] of [['A Fazer', 'A fazer', 'a_fazer'], ['Em Andamento', 'Em andamento', 'em_andamento'], ['Feita', 'Concluído', 'concluido']]) {
     const cartao = await cartaoDe(nome)
-    const pilula = Array.from(cartao.querySelectorAll('.pilula')).find((elemento) => elemento.textContent === etiqueta)
-    expect(pilula?.className).toContain('pilula-neutra')
+    const pilula = cartao.querySelector('.etiqueta')
+    expect(pilula?.textContent).toBe(etiqueta)
+    expect(pilula?.className).toContain(`etiqueta-${classe}`)
+    expect(pilula?.querySelector('.etiqueta-bolinha')).not.toBeNull()
     expect(cartao.querySelector('[role="img"][aria-label="Ana Teste"], .avatar')).not.toBeNull()
   }
 })
@@ -66,7 +82,11 @@ test('dias na etapa: sem selo com 7 dias, "8 dias nesta etapa" com 8; nunca no s
     }),
   ])
   expect(selos(await cartaoDe('Sete Dias'))).toEqual([])
-  expect(selos(await cartaoDe('Oito Dias'))).toEqual(['8 dias nesta etapa'])
+  const oito = await cartaoDe('Oito Dias')
+  expect(selos(oito)).toEqual(['8 dias nesta etapa'])
+  expect(oito.querySelector('.cartao-selos .pilula')?.className).toContain('pilula-atraso')
+  expect(oito.className).toContain('cartao-parado')
+  expect((await cartaoDe('Sete Dias')).className).not.toContain('cartao-parado')
   expect(selos(await cartaoDe('Suspenso Antigo'))).toEqual([])
   expect(selos(await cartaoDe('Parado Antigo'))).toEqual([])
   expect(selos(await cartaoDe('Concluído Antigo'))).toEqual([])
@@ -149,16 +169,16 @@ test('a ordem dos selos: dias, Sem responsável, Modelagem, versão e subprocess
   ])
 })
 
-test('o cartão normal fica limpo: sem selos, mas com a barra', async () => {
+test('o cartão normal fica limpo: sem selos, sem faixa de parado e sem barra por etapa', async () => {
   montar([processo('Cartão Normal')])
   const cartao = await cartaoDe('Cartão Normal')
   expect(cartao.querySelector('.cartao-selos')).toBeNull()
-  expect(cartao.querySelector('[role="img"]')).not.toBeNull()
+  expect(cartao.className).not.toContain('cartao-parado')
 })
 
-test('a Consulta vê a mesma barra e os mesmos selos', async () => {
+test('a Consulta vê os mesmos selos e a mesma faixa de parado', async () => {
   montar([processo('Para a Consulta', { cartao: SEM_RELATORIO, processo: { entrouNaEtapaEm: dia(-8) } })], 'consulta')
   const cartao = await cartaoDe('Para a Consulta')
-  expect(cartao.querySelector('[role="img"]')?.getAttribute('aria-label')).toBe('Etapa 4 de 8: Revisão interna')
+  expect(cartao.className).toContain('cartao-parado')
   expect(selos(cartao)).toEqual(['8 dias nesta etapa', 'Relatório pendente', 'V3'])
 })

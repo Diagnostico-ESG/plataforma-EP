@@ -5,6 +5,7 @@ import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import type { Perfil } from './acesso/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
+import { hojeLocal } from './processos/textoDaModelagemPiloto'
 import type { EtapaDoCatalogo, ProcessoLido } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
@@ -66,11 +67,11 @@ test('as colunas, a ordem por sigla e nome, todas as situações e o pai do subp
   const [cabecalho, ...corpo] = await linhas()
   expect(cabecalho).toEqual(['Nome', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Etiqueta', 'Responsável', 'Situação'])
   expect(corpo).toEqual([
-    ['Arquivar Pasta', 'Processo', 'TSA', 'Macro de Teste', 'Reunião de modelagem', 'A fazer', '—', 'Cancelado'],
+    ['Arquivar Pasta', 'Processo', 'TSA', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', 'A fazer', '—', 'Cancelado'],
     ['Cadastrar Bem', 'Processo', 'TSA', 'Macro de Teste', '—', 'A fazer', '—', 'Em andamento'],
     ['Emitir Ofício', 'Processo', 'TSA', 'Macro de Teste', '—', 'Concluído', '—', 'Concluído'],
-    ['Conferir Recibo↳ Pagar Diária', 'Subprocesso', 'TSB', 'Macro de Teste', 'Reunião de modelagem', 'Em andamento', 'Ana Teste', 'Em andamento'],
-    ['Pagar Diária', 'Processo', 'TSB', 'Macro de Teste', 'Reunião de modelagem', 'A fazer', '—', 'Em andamento'],
+    ['Conferir Recibo↳ Pagar Diária', 'Subprocesso', 'TSB', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', 'Em andamento', 'Ana Teste', 'Em andamento'],
+    ['Pagar Diária', 'Processo', 'TSB', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', 'A fazer', '—', 'Em andamento'],
   ])
   expect(within(screen.getByRole('table')).getAllByText('Concluído').some((elemento) => elemento.className.includes('pilula'))).toBe(true)
 })
@@ -148,4 +149,34 @@ test('Integrante cadastra a partir da Lista; a Consulta vê a Lista sem o botão
   montar({ perfil: 'consulta' })
   await screen.findByRole('table')
   expect(screen.queryByRole('button', { name: 'Cadastrar processo' })).toBeNull()
+})
+
+function diaDeslocado(deslocamento: number): string {
+  const data = new Date()
+  data.setDate(data.getDate() + deslocamento)
+  return hojeLocal(data)
+}
+
+test('a coluna Etapa atual traz a barra com o nome acessível "Etapa n de N: nome", e Etiqueta traz a pílula na cor do valor', async () => {
+  montar()
+  const linha = (await screen.findByRole('button', { name: 'Conferir Recibo' })).closest('tr') as HTMLElement
+  expect(within(linha).getByRole('img', { name: 'Etapa 1 de 1: Reunião de modelagem' })).toBeTruthy()
+  const etiqueta = linha.querySelector('.etiqueta')
+  expect(etiqueta?.textContent).toBe('Em andamento')
+  expect(etiqueta?.className).toContain('etiqueta-em_andamento')
+})
+
+test('o selo de parado aparece ao lado do nome com 8 dias na etapa e não com 7, nem em processo concluído', async () => {
+  montar({
+    processos: [
+      processo('p1', 'Oito Dias', { entrouNaEtapaEm: diaDeslocado(-8) }),
+      processo('p2', 'Sete Dias', { entrouNaEtapaEm: diaDeslocado(-7) }),
+      processo('p3', 'Concluído Antigo', { situacao: 'concluido', etapaAtual: null, entrouNaEtapaEm: diaDeslocado(-40) }),
+    ],
+  })
+  const selo = async (nome: string) => ((await screen.findByRole('button', { name: nome })).closest('tr') as HTMLElement).querySelector('.lista-parado')
+  expect((await selo('Oito Dias'))?.textContent).toBe('8 dias nesta etapa')
+  expect((await selo('Oito Dias'))?.querySelector('.pilula-atraso')).not.toBeNull()
+  expect(await selo('Sete Dias')).toBeNull()
+  expect(await selo('Concluído Antigo')).toBeNull()
 })

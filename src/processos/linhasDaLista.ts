@@ -19,7 +19,3 @@ export function linhasDaLista(processos: ProcessoDaLista[], todos: ProcessoDaLis
 function nomeDoPai(processo: ProcessoDaLista, nomePorId: Map<string, string>): string | null {
   return processo.processoPaiId === null ? null : nomePorId.get(processo.processoPaiId) ?? null
 }
-
-export function textoDaEtapaAtual(processo: ProcessoDaLista): string {
-  return processo.etapaAtual?.nome ?? '—'
-}

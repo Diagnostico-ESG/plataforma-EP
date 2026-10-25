@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { linhasDaLista, textoDaEtapaAtual } from './linhasDaLista'
+import { linhasDaLista } from './linhasDaLista'
 import type { ProcessoDaLista } from './tipos'
 
 function processo(nome: string, mudancas: Partial<ProcessoDaLista> = {}): ProcessoDaLista {
@@ -30,9 +30,4 @@ test('o pai filtrado fora da Lista continua com o nome ao lado do subprocesso', 
   const pai = processo('Pai')
   const filho = processo('Filho', { tipo: 'subprocesso', processoPaiId: 'p-Pai' })
   expect(linhasDaLista([filho], [pai, filho]).map((l) => l.nomeDoPai)).toEqual(['Pai'])
-})
-
-test('texto da etapa atual: o nome da etapa ou "—"', () => {
-  expect(textoDaEtapaAtual(processo('B'))).toBe('Reunião de modelagem')
-  expect(textoDaEtapaAtual(processo('C', { etapaAtual: null }))).toBe('—')
 })

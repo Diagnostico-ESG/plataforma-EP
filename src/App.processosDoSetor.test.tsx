@@ -61,9 +61,9 @@ test('só os processos do setor, por nome, com tipo, etapa atual e situação', 
   montar()
   const secao = await abrirProcessosDoSetor()
   expect(await linhasDa(secao)).toEqual([
-    ['Arquivar Pasta', 'Processo', 'Relatório técnico', 'Cancelado'],
+    ['Arquivar Pasta', 'Processo', 'Relatório técnico · 1 de 1', 'Cancelado'],
     ['Conferir Recibo', 'Subprocesso', '—', 'Concluído'],
-    ['Pagar Diária', 'Processo', 'Reunião de modelagem', 'Em andamento'],
+    ['Pagar Diária', 'Processo', 'Reunião de modelagem · 1 de 1', 'Em andamento'],
   ])
   expect(secao.getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Nome', 'Tipo', 'Etapa atual', 'Situação'])
 })
@@ -93,7 +93,7 @@ test('erro: a mensagem e [Tentar de novo], que carrega de novo', async () => {
 test('clicar num processo abre o painel dele sobre a Lista do setor', async () => {
   montar()
   const secao = await abrirProcessosDoSetor()
-  fireEvent.click(await secao.findByRole('cell', { name: 'Reunião de modelagem' }))
+  fireEvent.click(await secao.findByRole('cell', { name: 'Etapa 1 de 1: Reunião de modelagem' }))
   await waitFor(() => expect(window.location.hash).toBe('#/processos/lista/p1?setor=s1'))
   expect(await screen.findByRole('dialog', { name: /^Processo( |$)/ })).toBeTruthy()
 })

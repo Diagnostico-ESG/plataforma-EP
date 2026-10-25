@@ -60,6 +60,14 @@
   --neutra-texto: #4a5163;
   --neutra-fundo: #eef0f4;
 
+  /* Etiquetas da etapa (cartão e Lista): pares tirados do esboço da opção A; texto com 4,5:1 ou mais sobre o fundo */
+  --etiqueta-a-fazer-texto: #4a5163;
+  --etiqueta-a-fazer-fundo: #eef0f4;
+  --etiqueta-em-andamento-texto: #9a4a06;
+  --etiqueta-em-andamento-fundo: #ffe9d1;
+  --etiqueta-concluido-texto: #22703a;
+  --etiqueta-concluido-fundo: #ddf3e1;
+
   /* Caixas de aviso */
   --ajuda-fundo: #eef2ff;
   --ajuda-borda: #c9d3ff;

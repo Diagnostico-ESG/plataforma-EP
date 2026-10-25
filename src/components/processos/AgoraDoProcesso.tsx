@@ -101,7 +101,7 @@ function SituacaoParada({ processo, processos, podeAlterar, executar, aoMudar, a
   )
 }
 
-// A Consulta só lê: a frase com a etapa, a etiqueta e o responsável, e o selo âmbar quando o processo está parado.
+// A Consulta só lê: a frase com a etapa, a etiqueta e o responsável, e o selo vermelho quando o processo está parado.
 type AgoraDaConsultaProps = Pick<AgoraDoProcessoProps, 'processo' | 'revisoes' | 'registros' | 'usuarioId'> & { rotulo: string }
 
 function AgoraDaConsulta({ processo, rotulo, revisoes, registros, usuarioId }: AgoraDaConsultaProps) {

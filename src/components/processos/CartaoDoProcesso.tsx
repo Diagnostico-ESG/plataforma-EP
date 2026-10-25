@@ -1,10 +1,12 @@
 import type { DragEvent } from 'react'
-import { ROTULO_DA_ETIQUETA, ROTULO_DO_TIPO } from '../../processos/rotulos'
+import { diasDoProcessoParado } from '../../processos/diasNaEtapa'
+import { ROTULO_DO_TIPO } from '../../processos/rotulos'
 import { hojeEmBrasilia } from '../../lib/datas'
 import type { EtapaDoCatalogo, ProcessoDaLista } from '../../processos/tipos'
 import { Avatar } from '../Avatar'
 import { Pilula } from '../Pilula'
 import { BarraDeProgresso } from './BarraDeProgresso'
+import { EtiquetaDoProcesso } from './EtiquetaDoProcesso'
 import { SelosDoCartao } from './SelosDoCartao'
 
 type CartaoDoProcessoProps = {
@@ -15,7 +17,7 @@ type CartaoDoProcessoProps = {
   arrastavel: boolean
   /** O cartão arrastado fica levemente apagado no lugar de origem. */
   apagado: boolean
-  /** O Quadro por responsável: a coluna já diz quem é, então o cartão diz a etapa e dispensa o selo Sem responsável. */
+  /** O Quadro por responsável: a coluna já diz quem é, então o cartão traz a barra da etapa e dispensa o selo Sem responsável. */
   agrupadoPorResponsavel: boolean
   /** As etapas do catálogo: o selo de relatório pendente compara a posição da etapa atual com a da Revisão interna. */
   etapas: EtapaDoCatalogo[]
@@ -34,30 +36,35 @@ export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagad
   }
   return (
     // O <a> se arrasta por padrão (leva o endereço): fora dos casos permitidos, draggable="false" a impede.
-    <a id={`cartao-${id}`} className={apagado ? 'cartao cartao-apagado' : 'cartao'} href={href} aria-current={escolhido ? 'true' : undefined}
+    <a id={`cartao-${id}`} className={classesDoCartao(processo, apagado)} href={href} aria-current={escolhido ? 'true' : undefined}
       draggable={arrastavel} onDragStart={arrastavel ? comecarAArrastar : undefined} onDragEnd={arrastavel ? aoBaixar : undefined}>
       <span className="cartao-topo">
         <span className="cartao-sigla">{setorSigla}</span>
         <span className="cartao-macroprocesso">{macroprocessoNome}</span>
       </span>
       <span className="cartao-nome">{nome}</span>
-      <BarraDeProgresso processo={processo} />
+      {agrupadoPorResponsavel && <BarraDeProgresso processo={processo} />}
       <SelosDoCartao processo={processo} hoje={hojeEmBrasilia()} etapas={etapas} semSeloDeResponsavel={agrupadoPorResponsavel} />
       <span className="cartao-rodape">
         <span className="cartao-pilulas">
           {tipo !== 'processo' && <Pilula situacao="neutra">{ROTULO_DO_TIPO[tipo]}</Pilula>}
           {situacao === 'suspenso' && <Pilula situacao="vencendo">Suspenso</Pilula>}
-          <Pilula situacao="neutra">{ROTULO_DA_ETIQUETA[processo.etiqueta ?? 'a_fazer']}</Pilula>
+          <EtiquetaDoProcesso etiqueta={processo.etiqueta} />
         </span>
-        <QuemOuOndeNoRodape processo={processo} agrupadoPorResponsavel={agrupadoPorResponsavel} />
+        {!agrupadoPorResponsavel && <QuemCuida responsavel={processo.responsavel} />}
       </span>
     </a>
   )
 }
 
-/** No rodapé: o avatar de quem cuida; no Quadro por responsável, a etapa atual no lugar dele. */
-function QuemOuOndeNoRodape({ processo, agrupadoPorResponsavel }: { processo: ProcessoDaLista; agrupadoPorResponsavel: boolean }) {
-  const { responsavel, etapaAtual } = processo
-  if (agrupadoPorResponsavel) return <span className="cartao-etapa">{etapaAtual?.nome}</span>
+
+/** Processo parado ganha a faixa vermelha na borda; o cartão arrastado fica apagado. */
+function classesDoCartao(processo: ProcessoDaLista, apagado: boolean): string {
+  const parado = diasDoProcessoParado(processo, hojeEmBrasilia()) !== null
+  return ['cartao', apagado && 'cartao-apagado', parado && 'cartao-parado'].filter(Boolean).join(' ')
+}
+
+/** No rodapé: o avatar de quem cuida do processo. */
+function QuemCuida({ responsavel }: { responsavel: ProcessoDaLista['responsavel'] }) {
   return responsavel && <Avatar nome={responsavel.nome} fotoUrl={responsavel.fotoUrl ?? undefined} tamanho={20} />
 }

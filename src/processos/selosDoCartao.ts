@@ -1,6 +1,6 @@
 import { formatarData } from '../lib/datas'
 import { CODIGO_CONCLUIDOS, CODIGO_DA_MODELAGEM_PILOTO, CODIGO_DA_REVISAO_INTERNA, CODIGO_NAO_INICIADOS } from './codigosDasEtapas'
-import { diasDoProcessoNaEtapa, passouDoLimite } from './diasNaEtapa'
+import { diasDoProcessoParado } from './diasNaEtapa'
 import { semPublicacao } from './publicacao'
 import type { EtapaDoCatalogo, ProcessoDaLista } from './tipos'
 import { rotuloDaVersao } from '../versoes/rotulos'
@@ -11,8 +11,8 @@ export type Selo = { tipo: TipoDeSelo; texto: string; tom: TomDoSelo }
 
 /** Processo parado: mais de 7 dias na etapa atual (a conta do Agora); nunca em Não iniciados, Concluídos, suspenso ou cancelado. */
 function seloDeDias(processo: ProcessoDaLista, hoje: string): Selo[] {
-  const dias = diasDoProcessoNaEtapa(processo, hoje)
-  if (dias === null || !passouDoLimite(dias)) return []
+  const dias = diasDoProcessoParado(processo, hoje)
+  if (dias === null) return []
   return [{ tipo: 'dias', texto: `${dias} dias nesta etapa`, tom: 'alerta' }]
 }
 

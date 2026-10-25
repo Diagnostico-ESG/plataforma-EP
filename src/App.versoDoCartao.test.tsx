@@ -72,7 +72,7 @@ test('o verso abre pelo cartão do Quadro, e fechar volta ao Quadro com o foco n
 test('o verso abre pela linha da Lista, e Esc volta à Lista com o foco na linha', async () => {
   window.location.hash = '#/processos/lista'
   montar()
-  fireEvent.click((await screen.findAllByRole('cell', { name: 'Emitir Ofício' }))[0])
+  fireEvent.click((await screen.findAllByRole('button', { name: 'Emitir Ofício' }))[0])
   await waitFor(() => expect(window.location.hash).toBe('#/processos/lista/p1'))
   fireEvent.keyDown(await nomeDoProcesso(), { key: 'Escape' })
   await waitFor(() => expect(window.location.hash).toBe('#/processos/lista'))

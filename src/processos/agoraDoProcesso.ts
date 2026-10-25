@@ -46,7 +46,7 @@ export function avisoDoRevisor({ etapaAtual, responsavel, ultimaVersao }: Pick<P
 
 /**
  * A frase do Agora da Consulta: "Em {etapa} · {etiqueta} · com {nome} há {n} dias" (ou "sem responsável"). Depois do
- * limite de 7 dias o selo âmbar diz os dias, então a frase não os repete.
+ * limite de 7 dias o selo vermelho diz os dias, então a frase não os repete.
  */
 export function fraseDaConsulta(processo: ProcessoLido, hoje: string): string {
   const { etapaAtual, responsavel } = processo

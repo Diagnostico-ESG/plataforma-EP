@@ -128,15 +128,32 @@
   font-weight: 600;
 }
 
-/* Barra de progresso: fina e discreta (cinza e azul); só o azul da etapa atual chama a atenção. */
-.cartao-barra {
+/* Barra da etapa: o nome e a posição acima, um bloco por etapa; só cinza, sem azul (o normal não é alerta). */
+.barra-etapa {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+  min-width: 0;
+}
+
+.barra-etapa-texto {
+  overflow: hidden;
+  color: var(--texto-2);
+  font-size: var(--tam-rotulo);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.barra-etapa-blocos {
   display: flex;
   gap: 2px;
 }
 
 .pedaco {
+  box-sizing: border-box;
   flex: 1;
-  height: 4px;
+  height: 6px;
+  border: 1px solid var(--texto-2);
   border-radius: 2px;
 }
 
@@ -144,14 +161,14 @@
   background: var(--texto-2);
 }
 
+/* Meio cheio: a metade esquerda preenchida. */
 .pedaco-atual {
-  background: var(--azul);
+  background: linear-gradient(to right, var(--texto-2) 50%, transparent 50%);
 }
 
 /* Oco, com borda no cinza dos ícones (3:1 sobre o cartão branco): o cinza claro de antes ficava em 1,6:1 e sumia. */
 .pedaco-seguinte {
-  box-sizing: border-box;
-  border: 1px solid var(--icone-inativo);
+  border-color: var(--icone-inativo);
 }
 
 /* Selos: quebram de linha sem estourar a coluna; versão e subprocessos são texto neutro, sem fundo. */
@@ -309,14 +326,56 @@
   gap: var(--esp-1);
 }
 
-/* Quadro por responsável: no rodapé do cartão, o nome da etapa ocupa o lugar do avatar. */
-.cartao-etapa {
-  min-width: 0;
-  overflow: hidden;
-  color: var(--texto-2);
+/* Processo parado: faixa vermelha na borda esquerda, para achá-lo numa coluna cheia sem ler os selos. */
+.cartao-parado {
+  border-left-width: 4px;
+}
+
+/* Mais específico que o hover e o realce do painel aberto, que trocam a cor da borda toda. */
+.cartao.cartao-parado,
+.cartao.cartao-parado:hover,
+.cartao.cartao-parado[aria-current='true'] {
+  border-left-color: var(--atraso-texto);
+}
+
+/* Lista: o selo de parado fica ao lado do nome. */
+.lista-parado {
+  margin-left: var(--esp-2);
+}
+
+/* Etiqueta: pílula com bolinha da cor; o texto sempre diz o valor. */
+.etiqueta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px var(--esp-2);
+  border-radius: 999px;
   font-size: var(--tam-rotulo);
-  text-overflow: ellipsis;
+  font-weight: 600;
+  line-height: 1.4;
   white-space: nowrap;
+}
+
+.etiqueta-bolinha {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.etiqueta-a_fazer {
+  background: var(--etiqueta-a-fazer-fundo);
+  color: var(--etiqueta-a-fazer-texto);
+}
+
+.etiqueta-em_andamento {
+  background: var(--etiqueta-em-andamento-fundo);
+  color: var(--etiqueta-em-andamento-texto);
+}
+
+.etiqueta-concluido {
+  background: var(--etiqueta-concluido-fundo);
+  color: var(--etiqueta-concluido-texto);
 }
 
 /* A coluna Concluídos aparece sempre; vazia, diz que não há processo. */

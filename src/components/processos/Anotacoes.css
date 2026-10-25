@@ -22,9 +22,9 @@
 .anotacoes-campo {
   box-sizing: border-box;
   width: 100%;
-  min-height: 3.5em;
-  /* cerca de 12 linhas; depois disso o campo rola por dentro e não empurra a janela */
-  max-height: 18em;
+  min-height: calc(10.5em + 2 * var(--esp-2));
+  /* começa com cerca de 7 linhas; passa de cerca de 12 e rola por dentro, sem empurrar a janela */
+  max-height: calc(18em + 2 * var(--esp-2));
   padding: var(--esp-2);
   overflow-y: auto;
   resize: none;

@@ -1,10 +1,11 @@
 import { useCallback } from 'react'
 import { useCarregamento } from '../../hooks/useCarregamento'
 import { montarEnderecoDosProcessos, SEM_FILTROS } from '../../processos/enderecoDosProcessos'
-import { linhasDaLista, textoDaEtapaAtual } from '../../processos/linhasDaLista'
+import { linhasDaLista } from '../../processos/linhasDaLista'
 import { ROTULO_DO_TIPO } from '../../processos/rotulos'
 import type { ModuloDeProcessos, ProcessoDaLista } from '../../processos/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
+import { BarraDeProgresso } from './BarraDeProgresso'
 import { PilulaDaSituacao } from './PilulaDaSituacao'
 
 type ProcessosDoSetorProps = { processos: ModuloDeProcessos; setorId: string }
@@ -50,7 +51,7 @@ function TabelaDoSetor({ processos, aoAbrir }: TabelaDoSetorProps) {
           <tr key={processo.id} className="linha-clicavel" onClick={() => aoAbrir(processo.id)}>
             <td><button type="button" className="cadastros-abrir">{processo.nome}</button></td>
             <td>{ROTULO_DO_TIPO[processo.tipo]}</td>
-            <td>{textoDaEtapaAtual(processo)}</td>
+            <td>{processo.etapaAtual ? <BarraDeProgresso processo={processo} /> : '—'}</td>
             <td><PilulaDaSituacao situacao={processo.situacao} /></td>
           </tr>
         ))}

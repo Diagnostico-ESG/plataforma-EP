@@ -31,6 +31,10 @@ describe('barraDoCartao', () => {
     expect(barraDoCartao(processo(4))?.nome).toBe('Etapa 4 de 8: Revisão interna')
   })
 
+  test('o texto visível diz o nome e a posição da etapa', () => {
+    expect(barraDoCartao(processo(4))?.texto).toBe('Revisão interna · 4 de 8')
+  })
+
   test('sem etapa atual não há o que desenhar', () => {
     expect(barraDoCartao(processo(null))).toBeNull()
   })

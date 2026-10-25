@@ -38,3 +38,9 @@ export function diasDoProcessoNaEtapa(processo: DadosDaContagem, hoje: string): 
   if (situacao !== 'em_andamento' || !etapaAtual || ehEtapaFixa(etapaAtual.codigo)) return null
   return diasNaEtapa(processo.entrouNaEtapaEm ?? null, hoje)
 }
+
+/** Os dias do processo parado (mais de 7 na etapa); null quando não está parado. Cartão, Lista e Agora decidem por aqui. */
+export function diasDoProcessoParado(processo: DadosDaContagem, hoje: string): number | null {
+  const dias = diasDoProcessoNaEtapa(processo, hoje)
+  return dias !== null && passouDoLimite(dias) ? dias : null
+}
