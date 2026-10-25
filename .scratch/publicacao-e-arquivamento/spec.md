@@ -553,4 +553,4 @@ A atualização dos dados roda com os gatilhos de evento desligados, como na mig
 - **Exceção na trava do arquivado:** o subprocesso arquivado aceita a propagação de `macroprocesso_id` vinda do processo pai (só dentro do gatilho do pai e sem mudar mais nada). Fora isso, o arquivado recusa tudo, menos Registrar publicação e Desarquivar.
 
 Entregue em 2026-10-23 (commit ae1fb54), com ressalva: critérios [visual] da publicacao-e-arquivamento presumidos (coluna Concluídos, pergunta na janela, selos "Não publicado" e "Arquivado", Agora do concluído e do arquivado não foram vistos na tela); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
-Em revisão desde 2026-10-23
+Entregue em 2026-10-25 (commit cc17e13), com ressalva: critérios [visual] vistos só na vitrine local, com módulos falsos (as janelas de registrar revisão e aprovação e qualquer tela com o login real não foram vistas); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
