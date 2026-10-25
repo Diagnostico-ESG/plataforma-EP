@@ -171,6 +171,26 @@
   border-color: var(--icone-inativo);
 }
 
+/* Na célula da Lista a barra não encolhe a ponto de os blocos virarem risco. */
+td .barra-etapa {
+  min-width: 8rem;
+}
+
+/* Contraste forçado apaga fundos: o bloco cheio vira CanvasText e o meio cheio, a metade dele. */
+@media (forced-colors: active) {
+  .pedaco {
+    border-color: CanvasText;
+  }
+
+  .pedaco-resolvida {
+    background: CanvasText;
+  }
+
+  .pedaco-atual {
+    background: linear-gradient(to right, CanvasText 50%, Canvas 50%);
+  }
+}
+
 /* Selos: quebram de linha sem estourar a coluna; versão e subprocessos são texto neutro, sem fundo. */
 .cartao-selos {
   display: flex;
@@ -327,7 +347,9 @@
 }
 
 /* Processo parado: faixa vermelha na borda esquerda, para achá-lo numa coluna cheia sem ler os selos. */
+/* A borda de 4px tira 3px do miolo: o padding encolhe junto, para o texto não pular de lugar. */
 .cartao-parado {
+  padding-left: calc(var(--esp-3) - 3px);
   border-left-width: 4px;
 }
 

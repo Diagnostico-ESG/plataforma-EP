@@ -474,3 +474,12 @@ Ponto de partida da revisão: `marco/2026-10-23-inicio-andamento-livre` (35 comm
 - **Dependência circular:** nenhuma. `package.json` não mudou (auditoria de pacotes e `.scratch/security.md` não rodaram).
 - **Tela:** vista na vitrine local (módulos falsos, sem o login real) a 1366×768: Quadro com a coluna Concluídos e o selo "Sem publicação", Agora do concluído (Corrigir publicação e Arquivar), janela de chegada a Concluídos (as duas opções, nenhuma marcada, botão desabilitado, campo de explicação) e janela de registrar publicação. **Não vistas:** as janelas de registrar revisão e aprovação, e qualquer tela com o login real.
 - **Conferido por teste e não pela tela:** o arrastar do cartão e a chegada por ele (teste de interface com o aplicativo inteiro).
+
+## 2026-10-25 — /polir do ticket 27 (cara do cartão)
+
+- **Audit (impeccable):** o detector automático não acusou nada nos arquivos do ticket. Revisão de código, sem tela: acessibilidade boa (a barra tem nome acessível "Etapa n de N: nome", a etiqueta e o selo de parado sempre trazem texto ao lado da cor, contraste do texto das etiquetas de 5,2:1 a 7:1, borda do bloco vazio com 3:1). Sem tema escuro no projeto; cores todas por token.
+- **Corrigido no `polish` (só CSS, `Quadro.css`):**
+  - a faixa vermelha de 4px do cartão parado empurrava o conteúdo 3px para a direita; o padding esquerdo agora encolhe junto;
+  - a barra na célula da Lista ganhou largura mínima de 8rem, para os blocos não virarem risco numa coluna estreita;
+  - no modo de contraste forçado do sistema (que apaga fundos), os blocos cheio e meio cheio passam a usar `CanvasText`, e o bloco continua distinguível.
+- **Deixado de fora:** nenhuma checagem em tela (não há vitrine local pronta e o login real é do usuário), então os cinco critérios `[visual]` do ticket 27 seguem presumidos e a largura mínima de 8rem e a faixa vermelha não foram vistas renderizadas; tema escuro e toque (ferramenta de uso em computador, sem tema escuro previsto).
