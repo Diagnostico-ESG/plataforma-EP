@@ -16,12 +16,14 @@
 
 **Status:** ready-for-agent
 
-- [ ] O teste pgTAP da antiga data da reunião, passado ao nome novo (mesmas regras: Administrador e Integrante alteram, Consulta só lê, desativado e visitante nada, processo arquivado recusado, cada mudança vira evento), falha antes da migração e passa depois; `17_processos`, `44_pacote_das_planilhas`, `00_rls_ligada` e `10_privilegios_padrao` verdes (Docker local e, na conferência final, "Testes de banco" do GitHub Actions).
-- [ ] A migração aplicada no desenvolvimento pelo workflow "Migrar banco de desenvolvimento", com os dados existentes preservados.
-- [ ] Os testes do pacote das planilhas usam a chave nova, inclusive a recusa de data fora do formato AAAA-MM-DD.
-- [ ] O formulário de Novo processo abre com a data de hoje; salvar com ela, com outra data e com o campo vazio grava o que estava no campo.
-- [ ] O verso mostra "Data da modelagem piloto" com "· próxima" ou "· realizada"; marcar, alterar e apagar funcionam; a falha mostra "A Data da modelagem piloto não foi salva: {motivo}."; a Consulta só lê.
-- [ ] O cartão mostra "Modelagem {DD/MM}" (data futura) e "Modelagem hoje" em Não iniciados e na Modelagem piloto; não mostra com a data passada nem em outra etapa com a data futura.
-- [ ] O histórico mostra "Data da modelagem piloto" num evento novo e num evento antigo (chave `data_da_reuniao`).
-- [ ] Nenhum texto "Reunião" sobra na tela (testes `App.*` ajustados ao nome novo).
-- [ ] `[visual]` O formulário de Novo processo mostra a Data da modelagem piloto alinhada aos outros campos.
+- [x] O teste pgTAP da antiga data da reunião, passado ao nome novo (mesmas regras: Administrador e Integrante alteram, Consulta só lê, desativado e visitante nada, processo arquivado recusado, cada mudança vira evento), falha antes da migração e passa depois; `17_processos`, `44_pacote_das_planilhas`, `00_rls_ligada` e `10_privilegios_padrao` verdes (Docker local e, na conferência final, "Testes de banco" do GitHub Actions).
+- [x] A migração aplicada no desenvolvimento pelo workflow "Migrar banco de desenvolvimento", com os dados existentes preservados.
+- [x] Os testes do pacote das planilhas usam a chave nova, inclusive a recusa de data fora do formato AAAA-MM-DD.
+- [x] O formulário de Novo processo abre com a data de hoje; salvar com ela, com outra data e com o campo vazio grava o que estava no campo.
+- [x] O verso mostra "Data da modelagem piloto" com "· próxima" ou "· realizada"; marcar, alterar e apagar funcionam; a falha mostra "A Data da modelagem piloto não foi salva: {motivo}."; a Consulta só lê.
+- [x] O cartão mostra "Modelagem {DD/MM}" (data futura) e "Modelagem hoje" em Não iniciados e na Modelagem piloto; não mostra com a data passada nem em outra etapa com a data futura.
+- [x] O histórico mostra "Data da modelagem piloto" num evento novo e num evento antigo (chave `data_da_reuniao`).
+- [x] Nenhum texto "Reunião" sobra na tela (testes `App.*` ajustados ao nome novo).
+- [x] `[visual]` O formulário de Novo processo mostra a Data da modelagem piloto alinhada aos outros campos.
+
+Concluído em 2026-10-25 (commit 6e65833)
