@@ -11,3 +11,8 @@ const FORMATO_DO_DIA = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao
 export function diaDeBrasilia(instante: string): string {
   return FORMATO_DO_DIA.format(new Date(instante))
 }
+
+/** O dia de hoje no fuso de Brasília, para contar os dias na etapa como o banco conta (e não pelo relógio de quem abre a tela). */
+export function hojeEmBrasilia(agora: Date = new Date()): string {
+  return diaDeBrasilia(agora.toISOString())
+}

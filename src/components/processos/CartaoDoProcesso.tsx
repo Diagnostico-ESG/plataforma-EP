@@ -1,6 +1,6 @@
 import type { DragEvent } from 'react'
 import { ROTULO_DA_ETIQUETA, ROTULO_DO_TIPO } from '../../processos/rotulos'
-import { hojeLocal } from '../../processos/textoDaReuniao'
+import { hojeEmBrasilia } from '../../lib/datas'
 import type { EtapaDoCatalogo, ProcessoDaLista } from '../../processos/tipos'
 import { Avatar } from '../Avatar'
 import { Pilula } from '../Pilula'
@@ -42,7 +42,7 @@ export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagad
       </span>
       <span className="cartao-nome">{nome}</span>
       <BarraDeProgresso processo={processo} />
-      <SelosDoCartao processo={processo} hoje={hojeLocal()} etapas={etapas} semSeloDeResponsavel={agrupadoPorResponsavel} />
+      <SelosDoCartao processo={processo} hoje={hojeEmBrasilia()} etapas={etapas} semSeloDeResponsavel={agrupadoPorResponsavel} />
       <span className="cartao-rodape">
         <span className="cartao-pilulas">
           {tipo !== 'processo' && <Pilula situacao="neutra">{ROTULO_DO_TIPO[tipo]}</Pilula>}

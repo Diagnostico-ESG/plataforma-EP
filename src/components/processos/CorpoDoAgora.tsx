@@ -6,7 +6,7 @@ import { avisoDoRevisor, opcoesDeResponsavel, podeAssumir } from '../../processo
 import { CODIGO_CONCLUIDOS, CODIGO_DA_PUBLICACAO } from '../../processos/codigosDasEtapas'
 import { diasDoProcessoNaEtapa } from '../../processos/diasNaEtapa'
 import { ETIQUETAS, ROTULO_DA_ETIQUETA } from '../../processos/rotulos'
-import { hojeLocal } from '../../processos/textoDaReuniao'
+import { hojeEmBrasilia } from '../../lib/datas'
 import type { EtiquetaDaEtapa, ModuloDeProcessos, ProcessoLido, UsuarioResponsavel } from '../../processos/tipos'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import { Avatar } from '../Avatar'
@@ -86,7 +86,7 @@ function ListasDoAgora({ processo, movimento }: Pick<CorpoDoAgoraProps, 'process
 
 function ResponsavelDoAgora({ processo, usuarios, usuarioId, movimento }: CorpoDoAgoraProps) {
   const { responsavel } = processo
-  const dias = diasDoProcessoNaEtapa(processo, hojeLocal())
+  const dias = diasDoProcessoNaEtapa(processo, hojeEmBrasilia())
   const opcoes = opcoesDeResponsavel(processo, usuarios, usuarioId)
   return (
     <p className="agora-responsavel">

@@ -8,7 +8,7 @@ import { diasDoProcessoNaEtapa, passouDoLimite } from '../../processos/diasNaEta
 import type { PedidoDeSituacao } from '../../processos/pedidosDeSituacao'
 import { ROTULO_DA_SITUACAO } from '../../processos/rotulos'
 import { textoDaPublicacaoNoAgora } from '../../processos/publicacao'
-import { hojeLocal } from '../../processos/textoDaReuniao'
+import { hojeEmBrasilia } from '../../lib/datas'
 import type { ModuloDeProcessos, ProcessoLido, UsuarioResponsavel } from '../../processos/tipos'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import { JanelaDeSituacao } from './AcoesDeSituacao'
@@ -87,7 +87,7 @@ function SituacaoParada({ processo, processos, podeAlterar, executar, aoMudar, a
     <>
       <p className="agora-rotulo">Agora</p>
       <p className="agora-situacao">{processo.motivoDaSituacao ? `${rotulo}: ${processo.motivoDaSituacao}` : rotulo}</p>
-      <p className="agora-linha-de-texto">{fraseDaConsulta(processo, hojeLocal())}</p>
+      <p className="agora-linha-de-texto">{fraseDaConsulta(processo, hojeEmBrasilia())}</p>
       <p className="agora-explicacao">Retome o processo para mudar a etapa, a etiqueta ou o responsável.</p>
       {podeAlterar && (
         <div className="agora-botoes">
@@ -105,13 +105,13 @@ function SituacaoParada({ processo, processos, podeAlterar, executar, aoMudar, a
 type AgoraDaConsultaProps = Pick<AgoraDoProcessoProps, 'processo' | 'revisoes' | 'registros' | 'usuarioId'> & { rotulo: string }
 
 function AgoraDaConsulta({ processo, rotulo, revisoes, registros, usuarioId }: AgoraDaConsultaProps) {
-  const dias = diasDoProcessoNaEtapa(processo, hojeLocal())
+  const dias = diasDoProcessoNaEtapa(processo, hojeEmBrasilia())
   const publicacao = textoDaPublicacaoNoAgora(processo)
   return (
     <>
       <p className="agora-rotulo">{rotulo}</p>
       <p className="agora-responsavel">
-        <span>{fraseDaConsulta(processo, hojeLocal())}</span>
+        <span>{fraseDaConsulta(processo, hojeEmBrasilia())}</span>
         {dias !== null && passouDoLimite(dias) && <DiasNaEtapa dias={dias} />}
       </p>
       {publicacao && <LinhaDaPublicacao texto={publicacao} link={processo.linkDaPublicacao} />}
