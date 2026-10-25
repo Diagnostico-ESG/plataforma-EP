@@ -68,6 +68,10 @@ Migrações aplicadas à mão no dev pelo SQL Editor (fora do histórico da CLI;
 
 - 20261023175017_anotacoes_do_processo (2026-10-23; processos-etapas, ticket 23, ADR 0021: `processos.anotacoes`, `anotacoes_alteradas_em` e `anotacoes_alteradas_por`, gatilho da última alteração e `public.gravar_anotacoes_do_processo`; teste 50 falhou antes, coluna inexistente, e passou depois, 57 de 57, com os 46 arquivos verdes; aplicada pelo workflow "Migrar banco de desenvolvimento" e testada pelo "Testes de banco" na branch)
 
-Migrações criadas e **ainda não aplicadas** no desenvolvimento (Andamento livre, processos-etapas ticket 24; vão juntas no ticket 04 de publicacao-e-arquivamento; o "Testes de banco" as ensaia dentro da transação de cada teste): 20261024040938_andamento_livre_passagens, 20261024040942_andamento_livre_sai_o_modelo_anterior e 20261024040945_andamento_livre_mover (44 de 44 arquivos verdes no ensaio, execução 40099740221, branch quadro-livre-parte-1).
-
-Também **não aplicada** no desenvolvimento: 20261024182706_registrar_revisao_e_aprovacao (revisoes-aprovacao, ticket 05; vai junto no ticket 04 de publicacao-e-arquivamento; Docker local: bateria inteira com 0 not ok).
+- Andamento livre, aplicadas em 2026-10-24 no desenvolvimento (yclkzyoebpsxmgpbcbus) pelo workflow "Migrar banco de desenvolvimento", na branch `quadro-livre-parte-1`, uma por disparo e em ordem, todas com sucesso, depois do "Testes de banco" #192 verde (commit 3d8a280, 44 de 44 arquivos). Tipos regenerados com `npm run db:types`.
+  - 20261024040938_andamento_livre_passagens (processos-etapas, ticket 24; execução #43)
+  - 20261024040942_andamento_livre_sai_o_modelo_anterior (processos-etapas, ticket 24; destrutiva por decisão do ADR 0022: apaga os eventos, as tabelas e as funções do modelo anterior; execução #44)
+  - 20261024040945_andamento_livre_mover (processos-etapas, ticket 24; execução #45)
+  - 20261024173606_pacote_pela_posicao_no_catalogo (exportacao-e-manutencao, ticket 06; execução #46)
+  - 20261024182706_registrar_revisao_e_aprovacao (revisoes-aprovacao, ticket 05; execução #47)
+  - 20261024193536_registrar_publicacao_e_arquivar_tudo (publicacao-e-arquivamento, ticket 04: `registrar_publicacao`, arquivar suspenso e cancelado, evento da publicação, explicação na view; testes 49 e 55; Docker local 1299 ok, 0 not ok; execução #48)

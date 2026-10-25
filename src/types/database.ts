@@ -258,7 +258,7 @@ export type Database = {
           ativa?: boolean
           codigo?: string
           criado_em?: string
-          fase?: Database["public"]["Enums"]["fase_do_regimento"]
+          fase?: Database["public"]["Enums"]["fase_do_regimento"] | null
           id?: string
           nome?: string
           ordem?: number
@@ -339,49 +339,6 @@ export type Database = {
         }
         Relationships: []
       }
-      pastas_no_drive: {
-        Row: {
-          drive_id: string
-          id: string
-          processo_id: string | null
-          setor_id: string | null
-        }
-        Insert: {
-          drive_id: string
-          id?: string
-          processo_id?: string | null
-          setor_id?: string | null
-        }
-        Update: {
-          drive_id?: string
-          id?: string
-          processo_id?: string | null
-          setor_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "pastas_no_drive_processo_id_fkey"
-            columns: ["processo_id"]
-            isOneToOne: true
-            referencedRelation: "processos"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pastas_no_drive_processo_id_fkey"
-            columns: ["processo_id"]
-            isOneToOne: true
-            referencedRelation: "processos_com_andamento"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pastas_no_drive_setor_id_fkey"
-            columns: ["setor_id"]
-            isOneToOne: true
-            referencedRelation: "setores"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       passagens: {
         Row: {
           concluido_em: string | null
@@ -447,6 +404,49 @@ export type Database = {
             columns: ["processo_id"]
             isOneToOne: false
             referencedRelation: "processos_com_andamento"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pastas_no_drive: {
+        Row: {
+          drive_id: string
+          id: string
+          processo_id: string | null
+          setor_id: string | null
+        }
+        Insert: {
+          drive_id: string
+          id?: string
+          processo_id?: string | null
+          setor_id?: string | null
+        }
+        Update: {
+          drive_id?: string
+          id?: string
+          processo_id?: string | null
+          setor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pastas_no_drive_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: true
+            referencedRelation: "processos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pastas_no_drive_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: true
+            referencedRelation: "processos_com_andamento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pastas_no_drive_setor_id_fkey"
+            columns: ["setor_id"]
+            isOneToOne: true
+            referencedRelation: "setores"
             referencedColumns: ["id"]
           },
         ]
@@ -578,11 +578,11 @@ export type Database = {
           comentario: string | null
           escopo: Database["public"]["Enums"]["escopo_da_correcao"] | null
           id: string
+          passagem_id: string | null
           processo_id: string
           registrada_em: string
           resultado: Database["public"]["Enums"]["resultado_da_revisao"]
           revisada_em: string
-          passagem_id: string | null
           revisor_id: string
           versao_corrigida_id: string | null
           versao_revisada_id: string
@@ -591,8 +591,8 @@ export type Database = {
           comentario?: string | null
           escopo?: Database["public"]["Enums"]["escopo_da_correcao"] | null
           id?: string
-          processo_id: string
           passagem_id?: string | null
+          processo_id: string
           registrada_em?: string
           resultado: Database["public"]["Enums"]["resultado_da_revisao"]
           revisada_em: string
@@ -604,6 +604,7 @@ export type Database = {
           comentario?: string | null
           escopo?: Database["public"]["Enums"]["escopo_da_correcao"] | null
           id?: string
+          passagem_id?: string | null
           processo_id?: string
           registrada_em?: string
           resultado?: Database["public"]["Enums"]["resultado_da_revisao"]
@@ -611,9 +612,15 @@ export type Database = {
           revisor_id?: string
           versao_corrigida_id?: string | null
           versao_revisada_id?: string
-          passagem_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "revisoes_internas_passagem_id_fkey"
+            columns: ["passagem_id"]
+            isOneToOne: false
+            referencedRelation: "passagens"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "revisoes_internas_processo_id_fkey"
             columns: ["processo_id"]
@@ -841,14 +848,14 @@ export type Database = {
           contexto: string | null
           criado_em: string | null
           data_da_reuniao: string | null
-          explicacao_sem_publicacao: string | null
+          entrou_na_etapa_em: string | null
           etapa_atual_codigo: string | null
           etapa_atual_id: string | null
-          entrou_na_etapa_em: string | null
           etapa_atual_nome: string | null
           etapa_atual_ordem: number | null
-          etiqueta: Database["public"]["Enums"]["etiqueta_da_etapa"] | null
           etapa_atual_posicao: number | null
+          etiqueta: Database["public"]["Enums"]["etiqueta_da_etapa"] | null
+          explicacao_sem_publicacao: string | null
           id: string | null
           link_da_publicacao: string | null
           macroprocesso_id: string | null
@@ -878,13 +885,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "processos_responsavel_id_fkey"
-            columns: ["responsavel_id"]
-            isOneToOne: false
-            referencedRelation: "usuarios"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "processos_envolvido_fkey"
             columns: ["macroprocesso_id", "setor_id"]
             isOneToOne: false
@@ -910,6 +910,13 @@ export type Database = {
             columns: ["processo_pai_id"]
             isOneToOne: false
             referencedRelation: "processos_com_andamento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "processos_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
             referencedColumns: ["id"]
           },
           {
@@ -1010,6 +1017,15 @@ export type Database = {
         }
         Returns: undefined
       }
+      registrar_aprovacao: {
+        Args: {
+          p_data: string
+          p_link: string
+          p_numero: string
+          p_processo: string
+        }
+        Returns: undefined
+      }
       registrar_publicacao: {
         Args: { p_data: string; p_link?: string; p_processo: string }
         Returns: undefined
@@ -1021,10 +1037,6 @@ export type Database = {
           p_motivo: string
           p_tentativa: string
         }
-        Returns: undefined
-      }
-      registrar_aprovacao: {
-        Args: { p_data: string; p_link: string; p_numero: string; p_processo: string }
         Returns: undefined
       }
       registrar_sem_alteracao: {
