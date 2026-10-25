@@ -39,5 +39,5 @@
 
 - [x] 5.1 `docs/manutencao/04-modelo-de-dados.md` e `supabase/AMBIENTES.md` (migração nova aplicada à mão/workflow, a registrar) com o nome novo.
 - [x] 5.2 `npm test` e `npm run lint` (e `npx tsc --noEmit`) verdes.
-- [ ] 5.3 Push da branch e disparo do "Testes de banco" (autorizado); depois, o workflow "Migrar banco de desenvolvimento" na branch com a migração; ler os resultados.
+- [x] 5.3 Push da branch e disparo do "Testes de banco" (autorizado); depois, o workflow "Migrar banco de desenvolvimento" na branch com a migração; ler os resultados.
 - [ ] 5.4 Merge na `main` (`git switch main`, `git merge`), `git branch -d`, linha `Concluído em` no ticket, `proximo-passo.md`, push da `main`.
