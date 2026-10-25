@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { LIMITE_DE_DIAS_NA_ETAPA, diasDoProcessoNaEtapa, diasNaEtapa, passouDoLimite, textoDosDias } from './diasNaEtapa'
+import { LIMITE_DE_DIAS_NA_ETAPA, diasDoProcessoNaEtapa, diasDoProcessoParado, diasNaEtapa, passouDoLimite, textoDosDias } from './diasNaEtapa'
 import type { ProcessoDaLista } from './tipos'
 
 test('conta os dias da entrada até hoje, atravessando mês e ano', () => {
@@ -43,4 +43,13 @@ test('Não iniciados, Concluídos, suspenso, cancelado e sem entrada não contam
   expect(contagem('revisao_interna', 'cancelado')).toBeNull()
   expect(contagem('revisao_interna', 'em_andamento', null)).toBeNull()
   expect(diasDoProcessoNaEtapa({ situacao: 'em_andamento', etapaAtual: null }, '2026-10-09')).toBeNull()
+})
+
+test('parado é só quem passou de 7 dias: 7 não, 8 sim, e nunca onde a contagem é null', () => {
+  const parado = (codigo: string, entrouNaEtapaEm: string, situacao: ProcessoDaLista['situacao'] = 'em_andamento') =>
+    diasDoProcessoParado({ situacao, etapaAtual: etapa(codigo), entrouNaEtapaEm }, '2026-10-09')
+  expect(parado('revisao_interna', '2026-10-02')).toBeNull()
+  expect(parado('revisao_interna', '2026-10-01')).toBe(8)
+  expect(parado('nao_iniciados', '2026-09-01')).toBeNull()
+  expect(parado('revisao_interna', '2026-09-01', 'suspenso')).toBeNull()
 })
