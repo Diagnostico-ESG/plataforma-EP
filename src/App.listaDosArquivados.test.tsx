@@ -11,11 +11,11 @@ afterEach(() => {
   window.location.hash = ''
 })
 
-const CONCLUIDO: Partial<ProcessoLido> = { situacao: 'concluido', etapaAtual: null, responsavel: null, vaiParaPublicacao: true }
+const CONCLUIDO: Partial<ProcessoLido> = { situacao: 'concluido', etiqueta: 'concluido', responsavel: null, publicadoEm: '2026-10-05' }
 const PROCESSOS = [
   processo('Em Curso'),
-  processo('Guardado', { posicao: 6, processo: { ...CONCLUIDO, arquivadoEm: '2026-10-12T12:00:00Z' } }),
-  processo('Pronto', { posicao: 6, processo: CONCLUIDO }),
+  processo('Guardado', { etapa: 'concluidos', processo: { ...CONCLUIDO, arquivadoEm: '2026-10-12T12:00:00Z' } }),
+  processo('Pronto', { etapa: 'concluidos', processo: CONCLUIDO }),
 ]
 
 async function nomesNaLista(): Promise<string[]> {
@@ -68,4 +68,18 @@ test('a Consulta vê o selo e o filtro', async () => {
   await nomesNaLista()
   expect(linhaDe('Guardado').getByText('Arquivado')).toBeTruthy()
   expect(arquivados()).toBeTruthy()
+})
+
+test('o suspenso e o cancelado arquivados mostram a pílula da situação e o selo "Arquivado" juntos, na mesma célula', async () => {
+  window.location.hash = '#/processos/lista'
+  const arquivadoEm = '2026-10-12T12:00:00Z'
+  montar([
+    processo('Parado', { processo: { situacao: 'suspenso', arquivadoEm } }),
+    processo('Desistido', { processo: { situacao: 'cancelado', arquivadoEm } }),
+  ])
+  await nomesNaLista()
+  for (const [nome, situacao] of [['Parado', 'Suspenso'], ['Desistido', 'Cancelado']]) {
+    const celula = linhaDe(nome).getByText('Arquivado').closest('.lista-situacao') as HTMLElement
+    expect(within(celula).getByText(situacao)).toBeTruthy()
+  }
 })

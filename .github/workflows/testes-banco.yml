@@ -8,6 +8,7 @@ on:
     paths:
       - 'supabase/**'
       - 'scripts/testar-banco.mjs'
+      - 'scripts/migracoesPendentes.mjs'
       - 'scripts/relatorio-tap.mjs'
       - 'scripts/travaDoProjeto.mjs'
       - 'package.json'

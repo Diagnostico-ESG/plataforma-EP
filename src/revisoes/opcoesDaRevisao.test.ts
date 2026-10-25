@@ -1,43 +1,66 @@
-import { expect, test } from 'vitest'
-import { FRASE_SEM_VERSAO } from '../processos/frasesDaVersaoCompleta'
+import { describe, expect, test } from 'vitest'
 import type { UltimaVersao } from '../processos/tipos'
-import { opcoesDaRevisao } from './opcoesDaRevisao'
+import {
+  MOTIVO_SEM_VERSAO, MOTIVO_SEM_VERSAO_NA_PASSAGEM, avisoDaAprovacaoSubstituida, avisoDoAutorDaRevisao, opcoesDoResultado,
+  resumoDaAprovacao, resumoDaRevisao,
+} from './opcoesDaRevisao'
 
-const PAPEIS: UltimaVersao['papeis'] = ['bpmn', 'png', 'relatorio']
-const versao = (numero: number, autorId: string, anterior?: UltimaVersao['anterior']): UltimaVersao =>
-  ({ numero, autorId, autorNome: autorId, papeis: PAPEIS, anterior })
+const ULTIMA: UltimaVersao = { numero: 8, autorId: 'u1', autorNome: 'Ana', papeis: [], anterior: { numero: 7, autorId: 'u3' }, enviadaNestaPassagem: true }
 
-test('sem versão, nenhuma opção cabe e a frase manda enviar uma', () => {
-  const opcoes = opcoesDaRevisao(null, 'eu')
-  expect(opcoes.semAlteracao.disponivel).toBe(false)
-  expect(opcoes.corrigida.disponivel).toBe(false)
-  expect(opcoes.bloqueio).toBe(FRASE_SEM_VERSAO)
+describe('opcoesDoResultado', () => {
+  test('mostra a versão de cada opção', () => {
+    expect(opcoesDoResultado(ULTIMA).map((opcao) => [opcao.rotulo, opcao.desabilitada])).toEqual([
+      ['Sem alteração: vale para a V8', false], ['Corrigida: a V8 corrige a V7', false],
+    ])
+  })
+
+  test('"Corrigida" fica desabilitada, com o motivo, sem versão enviada na passagem ou sem anterior', () => {
+    for (const ultima of [{ ...ULTIMA, enviadaNestaPassagem: false }, { ...ULTIMA, anterior: undefined }]) {
+      const [sem, corrigida] = opcoesDoResultado(ultima)
+      expect(sem.desabilitada).toBe(false)
+      expect(corrigida).toMatchObject({ rotulo: 'Corrigida', desabilitada: true, motivo: MOTIVO_SEM_VERSAO_NA_PASSAGEM })
+    }
+  })
+
+  test('sem versão nenhuma, as duas ficam desabilitadas com o motivo', () => {
+    expect(opcoesDoResultado(null).map((opcao) => [opcao.desabilitada, opcao.motivo])).toEqual([[true, MOTIVO_SEM_VERSAO], [true, MOTIVO_SEM_VERSAO]])
+  })
 })
 
-test('quem não enviou a versão revisa "sem alteração"; "corrigida" pede a versão corrigida do revisor', () => {
-  const opcoes = opcoesDaRevisao(versao(7, 'ana', { numero: 6, autorId: 'ana' }), 'eu')
-  expect(opcoes.semAlteracao).toEqual({ disponivel: true, previa: 'segue a V7', motivo: null })
-  expect(opcoes.corrigida.disponivel).toBe(false)
-  expect(opcoes.corrigida.motivo).toBe(
-    'Para marcar como corrigida, a versão mais recente precisa ser sua: envie a versão corrigida em Arquivos.')
-  expect(opcoes.bloqueio).toBeNull()
+describe('avisoDoAutorDaRevisao', () => {
+  test('na "sem alteração" avisa quem enviou a mais recente', () => {
+    expect(avisoDoAutorDaRevisao(ULTIMA, 'sem_alteracao', 'u1')).toBe('Você enviou a V8. A revisão interna deveria ser de outra pessoa.')
+    expect(avisoDoAutorDaRevisao(ULTIMA, 'sem_alteracao', 'u2')).toBeNull()
+  })
+
+  test('na "corrigida" avisa quem enviou a versão revisada (a anterior), não a corrigida', () => {
+    expect(avisoDoAutorDaRevisao(ULTIMA, 'corrigida', 'u3')).toBe('Você enviou a V7. A revisão interna deveria ser de outra pessoa.')
+    expect(avisoDoAutorDaRevisao(ULTIMA, 'corrigida', 'u1')).toBeNull()
+  })
+
+  test('sem versão aplicável não há aviso', () => {
+    expect(avisoDoAutorDaRevisao(null, 'sem_alteracao', 'u1')).toBeNull()
+    expect(avisoDoAutorDaRevisao({ ...ULTIMA, enviadaNestaPassagem: false }, 'corrigida', 'u3')).toBeNull()
+  })
 })
 
-test('quem enviou a mais recente só corrige, e só a versão de outra pessoa', () => {
-  const opcoes = opcoesDaRevisao(versao(8, 'eu', { numero: 7, autorId: 'ana' }), 'eu')
-  expect(opcoes.semAlteracao).toMatchObject({ disponivel: false, motivo: 'Quem enviou a versão V8 não pode revisá-la.' })
-  expect(opcoes.corrigida).toEqual({ disponivel: true, previa: 'a V8, enviada por você, corrige a V7', motivo: null })
-  expect(opcoes.bloqueio).toBeNull()
+test('o aviso da aprovação diz qual aprovação ela substitui e quando foi registrada', () => {
+  const anterior = { id: 'a', versao: 7, numeroEprotocolo: null, link: null, aprovadaEm: null, registradaPor: 'Ana', registradaEm: '2026-10-13T12:00:00Z' }
+  expect(avisoDaAprovacaoSubstituida(anterior)).toBe('Esta aprovação toma o lugar da aprovação da V7, registrada em 13/10/2026.')
+  expect(avisoDaAprovacaoSubstituida(null)).toBeNull()
 })
 
-test('autor das duas versões: nenhuma cabe, e a frase é a da mais recente', () => {
-  const opcoes = opcoesDaRevisao(versao(8, 'eu', { numero: 7, autorId: 'eu' }), 'eu')
-  expect(opcoes.corrigida).toMatchObject({ disponivel: false, motivo: 'Quem enviou a versão V7 não pode revisá-la.' })
-  expect(opcoes.bloqueio).toBe('Quem enviou a versão V8 não pode revisá-la.')
-})
+describe('resumos do Agora', () => {
+  const base = { id: 'r', comentario: null, revisor: 'Ana', revisadaEm: '2026-10-13' }
+  test('revisão', () => {
+    expect(resumoDaRevisao({ ...base, versaoRevisada: 7, versaoCorrigida: null, resultado: 'sem_alteracao', escopo: null })).toBe('Sem alteração · V7 · Ana')
+    expect(resumoDaRevisao({ ...base, versaoRevisada: 7, versaoCorrigida: 8, resultado: 'corrigida', escopo: 'ambos' }))
+      .toBe('Corrigida · V8 corrige a V7 · fluxograma e relatório')
+  })
 
-test('autor da única versão: não há versão anterior para corrigir', () => {
-  const opcoes = opcoesDaRevisao(versao(1, 'eu'), 'eu')
-  expect(opcoes.corrigida).toMatchObject({ disponivel: false, motivo: 'Não há versão anterior para corrigir.' })
-  expect(opcoes.bloqueio).toBe('Quem enviou a versão V1 não pode revisá-la.')
+  test('aprovação, com e sem número', () => {
+    const aprovacao = { id: 'a', versao: 8, numeroEprotocolo: 'PROT-1', link: null, aprovadaEm: null, registradaPor: null, registradaEm: '' }
+    expect(resumoDaAprovacao(aprovacao)).toBe('V8 aprovada · E-protocolo PROT-1')
+    expect(resumoDaAprovacao({ ...aprovacao, numeroEprotocolo: null })).toBe('V8 aprovada')
+  })
 })

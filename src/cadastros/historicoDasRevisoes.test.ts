@@ -13,7 +13,9 @@ const REVISAO: EventoDoCadastro = {
 }
 
 test('o registro da revisão tem texto próprio', () => {
-  expect(textoDaAcaoDoCadastro('registrar', 'revisao_interna')).toBe('Registrou a revisão interna')
+  expect(textoDaAcaoDoCadastro('registrar', 'revisao_interna')).toBe('Registrou a revisão')
+  expect(textoDaAcaoDoCadastro('editar', 'revisao_interna')).toBe('Editou a revisão')
+  expect(textoDaAcaoDoCadastro('substituir', 'aprovacao')).toBe('Substituiu a aprovação')
 })
 
 test('o item é a versão revisada com o processo', () => {

@@ -1,29 +1,39 @@
 // Pacotes inventados para os testes das planilhas (nenhum dado real). Só os testes importam este arquivo.
 import type {
-  AndamentoDoPacote,
   EtapaDoPacote,
+  EtiquetaDaEtapa,
   PacoteDasPlanilhas,
+  PassagemDoPacote,
   ProcessoDoPacote,
-  StatusDaEtapa,
 } from './planilhasPacote.ts'
 
 export function uuid(n: number): string {
   return `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`
 }
 
+// O catálogo de fábrica: as duas fixas nas pontas, sem fase, e as seis etapas de trabalho.
 const CATALOGO: [string, EtapaDoPacote['fase']][] = [
+  ['nao_iniciados', null],
   ['modelagem', 'IV'],
   ['relatorio_modelagem_tecnica', 'V'],
   ['revisao_interna', 'VI'],
   ['revisao_setor', 'VI'],
   ['aprovacao_setor', 'VI'],
   ['publicacao', 'VII'],
+  ['concluidos', null],
 ]
 
 export function etapasDoCatalogo(): EtapaDoPacote[] {
   return CATALOGO.map(([codigo, fase], i) => ({ id: uuid(100 + i), codigo, ordem: i + 1, fase }))
 }
 
+export function idDaEtapa(codigo: string): string {
+  const etapa = etapasDoCatalogo().find((candidata) => candidata.codigo === codigo)
+  if (!etapa) throw new Error(`etapa de exemplo inexistente: "${codigo}"`)
+  return etapa.id
+}
+
+/** Um processo em Não iniciados, sem publicação; `campos` sobrescreve o que o teste quiser. */
 export function processoDe(n: number, campos: Partial<ProcessoDoPacote> = {}): ProcessoDoPacote {
   return {
     id: uuid(n),
@@ -32,37 +42,50 @@ export function processoDe(n: number, campos: Partial<ProcessoDoPacote> = {}): P
     setor_sigla: 'SET',
     macroprocesso_nome: 'Macro Inventado',
     situacao_guardada: 'em_andamento',
-    concluido: false,
     observacoes: null,
     data_da_reuniao: null,
-    vai_para_publicacao: null,
+    etapa_atual_id: idDaEtapa('nao_iniciados'),
+    etiqueta: 'a_fazer',
+    publicado_em: null,
     ultima_versao: null,
     ...campos,
   }
 }
 
-export interface Marca {
-  status: StatusDaEtapa
-  iniciada_em?: string | null
-  resolvida_em?: string | null
+/** Uma estadia do processo numa etapa: o código dela, quando entrou (ISO) e, se houver, a etiqueta e o Concluído. */
+export interface PassoDaTrilha {
+  etapa: string
+  entrou: string
+  etiqueta?: EtiquetaDaEtapa
+  concluidoEm?: string
 }
 
-/** Um andamento por etapa do catálogo; o que não está em `marcas` fica pendente. */
-export function andamentosDe(
-  processo: ProcessoDoPacote,
-  marcas: Record<string, StatusDaEtapa | Marca>,
-  etapas: EtapaDoPacote[] = etapasDoCatalogo(),
-): AndamentoDoPacote[] {
-  return etapas.map((etapa) => {
-    const marca = marcas[etapa.codigo] ?? 'pendente'
-    const { status, iniciada_em = null, resolvida_em = null } = typeof marca === 'string' ? { status: marca } : marca
-    return { processo_id: processo.id, etapa_id: etapa.id, status, iniciada_em, resolvida_em }
-  })
+export interface ProcessoComPassagens {
+  processo: ProcessoDoPacote
+  passagens: PassagemDoPacote[]
+}
+
+/** Cada passo vira uma passagem que fecha na entrada do seguinte; a última fica aberta e é a etapa atual. */
+export function processoNaTrilha(
+  n: number,
+  passos: PassoDaTrilha[],
+  campos: Partial<ProcessoDoPacote> = {},
+): ProcessoComPassagens {
+  const passagens = passos.map((passo, i): PassagemDoPacote => ({
+    processo_id: uuid(n),
+    etapa_id: idDaEtapa(passo.etapa),
+    entrou_em: passo.entrou,
+    saiu_em: passos[i + 1]?.entrou ?? null,
+    etiqueta: passo.etiqueta ?? 'a_fazer',
+    concluido_em: passo.concluidoEm ?? null,
+  }))
+  const atual = passos[passos.length - 1]
+  const processo = processoDe(n, { etapa_atual_id: idDaEtapa(atual.etapa), etiqueta: atual.etiqueta ?? 'a_fazer', ...campos })
+  return { processo, passagens }
 }
 
 export function pacoteDe(
-  processos: ProcessoDoPacote[],
-  andamentos: AndamentoDoPacote[],
+  lista: ProcessoComPassagens[],
   etapas: EtapaDoPacote[] = etapasDoCatalogo(),
 ): PacoteDasPlanilhas {
   return {
@@ -71,13 +94,13 @@ export function pacoteDe(
     gerado_em: '2026-10-20T12:00:00Z',
     planilhas: { interna: 'id-da-planilha-interna', publica: 'id-da-planilha-publica' },
     etapas,
-    processos,
-    andamentos,
+    processos: lista.map((item) => item.processo),
+    passagens: lista.flatMap((item) => item.passagens),
   }
 }
 
 /** Um pacote pequeno e válido: um processo com a Modelagem piloto em andamento. */
 export function pacoteMinimo(): PacoteDasPlanilhas {
-  const processo = processoDe(10)
-  return pacoteDe([processo], andamentosDe(processo, { modelagem: 'em_andamento' }))
+  const modelagem = { etapa: 'modelagem', entrou: '2026-03-01T12:00:00Z', etiqueta: 'em_andamento' } as const
+  return pacoteDe([processoNaTrilha(10, [modelagem])])
 }

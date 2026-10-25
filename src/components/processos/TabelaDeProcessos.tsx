@@ -1,12 +1,12 @@
 import type { LinhaDaLista } from '../../processos/linhasDaLista'
 import { textoDaEtapaAtual } from '../../processos/linhasDaLista'
-import { ROTULO_DO_TIPO } from '../../processos/rotulos'
+import { ROTULO_DA_ETIQUETA, ROTULO_DO_TIPO } from '../../processos/rotulos'
 import { LinhaFantasma } from '../cadastros/PecasDaLista'
 import { Pilula } from '../Pilula'
 import { NomeComTrecho } from './NomeComTrecho'
 import { PilulaDaSituacao } from './PilulaDaSituacao'
 
-const COLUNAS = ['Nome', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Responsável', 'Situação']
+const COLUNAS = ['Nome', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Etiqueta', 'Responsável', 'Situação']
 const LINHAS_FANTASMA = 3
 
 type TabelaDeProcessosProps = { linhas: LinhaDaLista[]; idEscolhido: string | null; aoAbrir: (id: string) => void; busca: string | null }
@@ -61,6 +61,7 @@ function LinhaDoProcesso({ linha, escolhida, aoAbrir, busca }: LinhaDoProcessoPr
       <td>{linha.setorSigla}</td>
       <td>{linha.macroprocessoNome}</td>
       <td>{textoDaEtapaAtual(linha)}</td>
+      <td>{ROTULO_DA_ETIQUETA[linha.etiqueta ?? 'a_fazer']}</td>
       <td>{linha.responsavel?.nome ?? '—'}</td>
       <td>
         <span className="lista-situacao">

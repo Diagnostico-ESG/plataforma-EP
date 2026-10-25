@@ -1,63 +1,52 @@
 import { useCallback } from 'react'
-import { useAcoesDaEtapa } from '../../hooks/useAcoesDaEtapa'
 import { useCarregamento } from '../../hooks/useCarregamento'
-import { assinaturaDasEtapas } from '../../processos/caminhoDeEtapas'
+import type { RegistrosDoProcesso } from '../../hooks/useRegistrosDoProcesso'
+import { useMovimentoDoProcesso } from '../../hooks/useMovimentoDoProcesso'
 import type { Executar } from '../../hooks/useGravacaoComFalha'
-import type { DatasDaEtapa, EtapaDoCaminho, ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
+import type { ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import { AgoraDoProcesso } from './AgoraDoProcesso'
 import { EtapasDoProcesso } from './EtapasDoProcesso'
-import { JanelasDaEtapa } from './JanelasDaEtapa'
+import { JanelaDaChegada } from './JanelaDaChegada'
 
 type CaminhoDoProcessoProps = {
   processo: ProcessoLido
   processos: ModuloDeProcessos
   revisoes: ModuloDeRevisoes
+  /** As revisões e a aprovação lidas pelo verso: o Agora registra e a gaveta lista. */
+  registros: RegistrosDoProcesso
   podeAlterar: boolean
-  /** Quem está na tela, para a janela de avanço o marcar como responsável. */
+  /** Quem está na tela, para o [Assumir] e o "(você)" da lista de responsáveis. */
   usuarioId: string
-  /** Grava a situação (Retomar do Agora) e guarda a falha para o verso mostrar. */
+  /** Grava a situação (Retomar do Agora) e o arquivamento, e guarda a falha para o verso mostrar. */
   executar: Executar
   aoMudar: () => void
   aoSumir: () => void
 }
 
 /**
- * O trabalho do processo no verso: o cartão Agora, as Etapas e as janelas das ações. Quem pode alterar age pelo Agora
- * e pela gaveta das etapas (a RLS é quem protege); suspenso e cancelado só leem, até o Retomar.
+ * O trabalho do processo no verso: o cartão Agora e as Etapas. Quem pode alterar age pelo Agora (a RLS é quem protege);
+ * suspenso, cancelado e arquivado só leem, até o Retomar ou o Desarquivar.
  */
-export function CaminhoDoProcesso({ processo, processos, revisoes, podeAlterar, usuarioId, executar, aoMudar, aoSumir }: CaminhoDoProcessoProps) {
+export function CaminhoDoProcesso({ processo, processos, revisoes, registros, podeAlterar, usuarioId, executar, aoMudar, aoSumir }: CaminhoDoProcessoProps) {
   // Quem não altera não escolhe responsável: não precisa da lista. Falha ao lê-la deixa a escolha só com "Ninguém".
   const ler = useCallback(
     () => (podeAlterar ? processos.listarResponsaveisPossiveis() : Promise.resolve([])), [processos, podeAlterar])
   const { estado } = useCarregamento(ler)
   const usuarios = estado.tipo === 'pronto' ? estado.valor : []
-  // A aprovação alimenta a gaveta da Aprovação e o aviso de voltar; lê de novo quando as etapas mudam (conclusão ou volta).
-  const assinatura = assinaturaDasEtapas(processo.etapasDoProcesso)
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- a assinatura não é usada dentro: só faz a leitura se refazer quando as etapas mudam
-  const lerAprovacao = useCallback(() => revisoes.lerAprovacao(processo.id), [revisoes, processo.id, assinatura])
-  const aprovacao = useCarregamento(lerAprovacao)
-  const acoes = useAcoesDaEtapa(processos, revisoes, aoMudar, aoSumir)
-  // O arquivado só lê, como o parado: o Agora dele oferece só Desarquivar e Registrar publicação.
+  const movimento = useMovimentoDoProcesso(processos, aoMudar, aoSumir)
+  // O arquivado só lê, como o parado: o Agora dele oferece só Desarquivar.
   const parado = processo.situacao === 'suspenso' || processo.situacao === 'cancelado' || Boolean(processo.arquivadoEm)
-  const aprovadaEm = aprovacao.estado.tipo === 'pronto' ? (aprovacao.estado.valor?.aprovadaEm ?? null) : null
-
-  async function corrigirDatas(etapa: EtapaDoCaminho, datas: DatasDaEtapa) {
-    await processos.corrigirDatasDaEtapa(etapa.id, datas)
-    aoMudar()
-  }
-
   return (
     <>
       <AgoraDoProcesso processo={processo} processos={processos} usuarios={usuarios} usuarioId={usuarioId}
-        podeAlterar={podeAlterar} acoes={acoes} executar={executar} aprovadaEm={aprovadaEm} aoMudar={aoMudar} aoSumir={aoSumir} />
-      {acoes.falha && <p className="cadastros-falha" role="alert">{acoes.falha}</p>}
-      <EtapasDoProcesso etapas={processo.etapasDoProcesso} processoId={processo.id} revisoes={revisoes} podeEditar={podeAlterar && !parado} usuarios={usuarios}
-        usuarioId={usuarioId} ultimaVersao={processo.ultimaVersao} acoes={acoes} aoCorrigirDatas={corrigirDatas}
-        aprovacao={aprovacao.estado} aoTentarDeNovoAAprovacao={aprovacao.tentarDeNovo} aoAtualizarAAprovacao={aprovacao.recarregar} aoSumir={aoSumir} />
-      <JanelasDaEtapa acoes={acoes} usuarios={usuarios} usuarioId={usuarioId} ultimaVersao={processo.ultimaVersao}
-        aprovacao={aprovacao.estado.tipo === 'pronto' ? aprovacao.estado.valor : null} etapasDoProcesso={processo.etapasDoProcesso}
-        vaiParaPublicacao={processo.vaiParaPublicacao} />
+        podeAlterar={podeAlterar} movimento={movimento} executar={executar} aoMudar={aoMudar} revisoes={revisoes} registros={registros} />
+      {movimento.chegada && (
+        <JanelaDaChegada chegada={movimento.chegada} processos={processos} aoGravar={aoMudar} aoFechar={movimento.fecharChegada} />
+      )}
+      {movimento.falha && <p className="cadastros-falha" role="alert">{movimento.falha}</p>}
+      <EtapasDoProcesso processo={processo} revisoes={revisoes} registros={registros} ultimaVersao={processo.ultimaVersao}
+        podeEditar={podeAlterar && !parado} />
     </>
   )
 }

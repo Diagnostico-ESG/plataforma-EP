@@ -2,14 +2,13 @@
 
 Registro de onde a última sessão parou e do que vem a seguir. Cada sessão que terminar recomendando um próximo passo sobrescreve este arquivo antes de encerrar. Valem os arquivos se divergir do git.
 
-Atualizado em 2026-10-24 (sessão do `to-tickets` do quadro-livre parte 1, Andamento livre)
+Atualizado em 2026-10-24 (sessão do /executar-complexo do ticket 04 de publicacao-e-arquivamento, depois da migração do desenvolvimento)
 
-- **Funcionalidade:** quadro-livre, parte 1 (Andamento livre). O planejamento terminou: specs atualizadas e 5 tickets, todos `ready-for-agent`, feitos na branch de integração `quadro-livre-parte-1` (criada no primeiro ticket). As migrações vão ao banco de desenvolvimento só no último ticket.
-- **Ordem dos tickets:**
-  1. `.scratch/processos-etapas/issues/24-banco-das-passagens.md` (não depende de nenhum);
-  2. `.scratch/processos-etapas/issues/25-tela-do-andamento-livre.md` (depende do 24);
-  3. `.scratch/revisoes-aprovacao/issues/05-registrar-revisao-e-aprovacao-sem-trava.md` (depende do 25);
-  4. `.scratch/exportacao-e-manutencao/issues/06-planilhas-pela-posicao-no-catalogo.md` (depende do 24, pode ser feito antes do 25);
-  5. `.scratch/publicacao-e-arquivamento/issues/04-chegada-a-concluidos-publicacao-arquivamento-e-integracao.md` (depende do 25, do 05 e do 06; termina a branch).
-- **Próximo comando:** em sessão nova com o Sonnet, `/executar-complexo` no ticket 24 de processos-etapas. Todos os tickets são complexos: têm várias partes interligadas (banco, módulo, tela) em que a ordem importa.
-- **Pendente do usuário:** ler as "Decisões tomadas ao escrever esta seção, a confirmar na leitura" das quatro specs antes do ticket 24; apagar ou refazer o handoff desatualizado `.scratch/handoff-2026-10-20.md`.
+- **Funcionalidade:** quadro-livre, parte 1 (Andamento livre), branch de integração `quadro-livre-parte-1`, enviada ao GitHub; **ainda não** foi juntada à `main`.
+- **Feito no ticket 04:** o código (migração `20261024193536_registrar_publicacao_e_arquivar_tudo`, testes `49` e `55`, módulo, janela da chegada, registrar e corrigir publicação, Agora, histórico); o "Testes de banco" #192 verde na branch (commit `3d8a280`); as **seis migrações do Andamento livre aplicadas no desenvolvimento** pelo workflow (execuções #43 a #48, todas com sucesso), registradas em `supabase/AMBIENTES.md`; tipos regenerados do remoto com `npm run db:types` (`npm test` 2405 verdes, tsc limpo). Plano em `.scratch/publicacao-e-arquivamento/plano-04.md`.
+- **Falta do ticket 04 (o ticket ainda NÃO tem a linha `Concluído em`):**
+  1. **Do usuário:** conferir na tela com o login real, no app apontado para o desenvolvimento: mover pela lista e arrastando, etiqueta, responsável, revisão, aprovação, chegada a Concluídos pelas duas opções, registrar e corrigir publicação, arquivar e desarquivar concluído, suspenso e cancelado; e os dois critérios `[visual]` (janela de chegada em 1366×768; "Arquivado" e a pílula juntos na Lista). Anotar no plano (seção "Conferência na tela") o que foi visto e o que foi presumido.
+  2. **Do usuário:** republicar `planilhas-dos-dashboards` (roteiro `docs/planilhas-publicar-a-funcao.md`) e atualizar as planilhas pela aba Planilhas.
+  3. Juntar à `main` sem `--force`, enviar, conferir o "Testes de banco" na `main` (a execução #190, de hoje, na `main` estava vermelha antes desta junção), criar e enviar o marco, apagar a branch com `git branch -d`, gravar `Concluído em` no ticket 04 e comitar.
+- **Próximo comando:** retomar com `/executar-complexo` no ticket 04 (o plano tem caixas marcadas) em sessão com o Sonnet, depois da conferência na tela; depois, `/polir` e `/ship` (o `/ship` ainda tem as ressalvas `[visual]` das janelas de chegada, de registrar publicação e de registrar revisão e aprovação).
+- **Pendente do usuário:** ler as "Decisões tomadas ao escrever esta seção, a confirmar na leitura" das quatro specs; apagar ou refazer o handoff desatualizado `.scratch/handoff-2026-10-20.md`; refazer os dashboards no Data Studio (linha nova do backlog).

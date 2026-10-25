@@ -9,12 +9,14 @@ import { VersoesFalso } from '../versoes/VersoesFalso'
 import { RevisoesFalso } from '../revisoes/RevisoesFalso'
 import { PlanilhasFalso } from '../planilhas/PlanilhasFalso'
 
-/** Um catálogo inventado: três etapas ativas, a Modelagem piloto em primeiro, e uma desativada. */
+/** Um catálogo inventado: as duas fixas nas pontas, duas das seis etapas com campos próprios, duas livres (a Divulgação ativa, o Arquivamento desativado). */
 export const ETAPAS_DE_TESTE: EtapaNoCatalogo[] = [
-  { id: 'e1', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 1, obrigatoria: true, fase: 'IV', ativa: true },
-  { id: 'e2', codigo: 'relatorio_modelagem_tecnica', nome: 'Relatório e modelagem técnica', ordem: 2, obrigatoria: true, fase: 'V', ativa: true },
-  { id: 'e9', codigo: 'publicacao', nome: 'Publicação', ordem: 6, obrigatoria: false, fase: 'VII', ativa: true },
-  { id: 'e10', codigo: 'arquivamento', nome: 'Arquivamento', ordem: 7, obrigatoria: false, fase: 'VII', ativa: false },
+  { id: 'e1', codigo: 'nao_iniciados', nome: 'Não iniciados', ordem: 1, fase: null, ativa: true },
+  { id: 'e2', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 2, fase: 'IV', ativa: true },
+  { id: 'e3', codigo: 'relatorio_modelagem_tecnica', nome: 'Relatório e modelagem técnica', ordem: 3, fase: 'V', ativa: true },
+  { id: 'e9', codigo: 'divulgacao', nome: 'Divulgação', ordem: 6, fase: 'VII', ativa: true },
+  { id: 'e10', codigo: 'arquivamento', nome: 'Arquivamento', ordem: 7, fase: 'VII', ativa: false },
+  { id: 'e11', codigo: 'concluidos', nome: 'Concluídos', ordem: 8, fase: null, ativa: true },
 ]
 
 type MontagemDoCatalogo = { perfil?: Perfil; ajustar?: (processos: ProcessosFalso) => void }
@@ -23,6 +25,7 @@ type MontagemDoCatalogo = { perfil?: Perfil; ajustar?: (processos: ProcessosFals
 export function montarComCatalogo({ perfil = 'administrador', ajustar }: MontagemDoCatalogo = {}): ProcessosFalso {
   const processos = new ProcessosFalso()
   processos.catalogo.etapas = [...ETAPAS_DE_TESTE]
+  processos.etapasDoCatalogo = ETAPAS_DE_TESTE.map(({ id, codigo, nome, ordem, ativa }) => ({ id, codigo, nome, ordem, ativa }))
   ajustar?.(processos)
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={processos} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
   return processos

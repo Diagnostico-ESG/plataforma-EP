@@ -1,37 +1,33 @@
-import { formatarData } from './caminhoDeEtapas'
-import { diasNaEtapa, passouDoLimite } from './diasNaEtapa'
-import { naoPublicado } from './publicacao'
-import type { ProcessoDaLista } from './tipos'
+import { formatarData } from '../lib/datas'
+import { CODIGO_CONCLUIDOS, CODIGO_DA_REVISAO_INTERNA } from './codigosDasEtapas'
+import { diasDoProcessoNaEtapa, passouDoLimite } from './diasNaEtapa'
+import { semPublicacao } from './publicacao'
+import type { EtapaDoCatalogo, ProcessoDaLista } from './tipos'
 import { rotuloDaVersao } from '../versoes/rotulos'
 
 export type TomDoSelo = 'alerta' | 'neutro'
-export type TipoDeSelo = 'nao_publicado' | 'dias' | 'relatorio' | 'sem_responsavel' | 'reuniao' | 'versao' | 'subprocessos'
+export type TipoDeSelo = 'sem_publicacao' | 'dias' | 'relatorio' | 'sem_responsavel' | 'reuniao' | 'versao' | 'subprocessos'
 export type Selo = { tipo: TipoDeSelo; texto: string; tom: TomDoSelo }
 
-const CODIGO_DA_REVISAO_INTERNA = 'revisao_interna'
-
-/** Processo parado: etapa atual em andamento há mais de 15 dias (a conta do Agora); nunca no suspenso. */
+/** Processo parado: mais de 7 dias na etapa atual (a conta do Agora); nunca em Não iniciados, Concluídos, suspenso ou cancelado. */
 function seloDeDias(processo: ProcessoDaLista, hoje: string): Selo[] {
-  const cartao = processo.cartao
-  if (!cartao || processo.situacao === 'suspenso' || cartao.etapaAtualStatus !== 'em_andamento') return []
-  const dias = diasNaEtapa(cartao.etapaAtualIniciadaEm, hoje)
+  const dias = diasDoProcessoNaEtapa(processo, hoje)
   if (dias === null || !passouDoLimite(dias)) return []
   return [{ tipo: 'dias', texto: `${dias} dias nesta etapa`, tom: 'alerta' }]
 }
 
-// A posição vem da ordem do caminho, que já é a do catálogo.
-function estaNaRevisaoInternaOuDepois(processo: ProcessoDaLista): boolean {
-  const caminho = processo.cartao?.caminho ?? []
-  const revisao = caminho.findIndex((pedaco) => pedaco.codigo === CODIGO_DA_REVISAO_INTERNA)
-  const atual = caminho.findIndex((pedaco) => pedaco.codigo === processo.etapaAtual?.codigo)
-  return revisao >= 0 && atual >= revisao
+// Da Revisão interna em diante e antes de Concluídos, pela ordem do catálogo.
+function estaNaRevisaoInternaOuDepois(processo: ProcessoDaLista, etapas: EtapaDoCatalogo[]): boolean {
+  const revisao = etapas.find((etapa) => etapa.codigo === CODIGO_DA_REVISAO_INTERNA)
+  const atual = processo.etapaAtual
+  return Boolean(revisao && atual && atual.codigo !== CODIGO_CONCLUIDOS && atual.ordem >= revisao.ordem)
 }
 
 /** A última versão (não histórica) sem relatório só pesa da Revisão interna em diante. */
-function seloDeRelatorio(processo: ProcessoDaLista): Selo[] {
+function seloDeRelatorio(processo: ProcessoDaLista, etapas: EtapaDoCatalogo[]): Selo[] {
   const versao = processo.cartao?.ultimaVersao
   if (!versao || versao.historica || versao.temRelatorio) return []
-  if (!estaNaRevisaoInternaOuDepois(processo)) return []
+  if (!estaNaRevisaoInternaOuDepois(processo, etapas)) return []
   return [{ tipo: 'relatorio', texto: 'Relatório pendente', tom: 'alerta' }]
 }
 
@@ -60,17 +56,17 @@ function seloDeSubprocessos(processo: ProcessoDaLista): Selo[] {
   return [{ tipo: 'subprocessos', texto, tom: 'neutro' }]
 }
 
-function seloDeNaoPublicado(processo: ProcessoDaLista): Selo[] {
-  return naoPublicado(processo) ? [{ tipo: 'nao_publicado', texto: 'Não publicado', tom: 'neutro' }] : []
+function seloDeSemPublicacao(processo: ProcessoDaLista): Selo[] {
+  return semPublicacao(processo) ? [{ tipo: 'sem_publicacao', texto: 'Sem publicação', tom: 'neutro' }] : []
 }
 
 /**
- * Só o que há a dizer, na ordem da spec: Não publicado (só no concluído), dias, Relatório pendente, Sem responsável,
+ * Só o que há a dizer, na ordem da spec: Sem publicação (só em Concluídos), dias, Relatório pendente, Sem responsável,
  * Reunião, versão, subprocessos.
  */
-export function selosDoCartao(processo: ProcessoDaLista, hoje: string): Selo[] {
+export function selosDoCartao(processo: ProcessoDaLista, hoje: string, etapas: EtapaDoCatalogo[]): Selo[] {
   return [
-    ...seloDeNaoPublicado(processo), ...seloDeDias(processo, hoje), ...seloDeRelatorio(processo), ...seloDeResponsavel(processo),
-    ...seloDeReuniao(processo, hoje), ...seloDeVersao(processo), ...seloDeSubprocessos(processo),
+    ...seloDeSemPublicacao(processo), ...seloDeDias(processo, hoje), ...seloDeRelatorio(processo, etapas),
+    ...seloDeResponsavel(processo), ...seloDeReuniao(processo, hoje), ...seloDeVersao(processo), ...seloDeSubprocessos(processo),
   ]
 }

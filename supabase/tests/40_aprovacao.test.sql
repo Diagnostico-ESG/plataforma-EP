@@ -1,15 +1,15 @@
--- Aprovação na janela de concluir (revisoes-aprovacao, ticket 03, ADRs 0011 e 0015): quem pode o quê em aprovacoes e
--- nos eventos dela, as regras do banco (processo e etapa em andamento, versão mais recente e completa, uma aprovação por
--- processo, link http(s), data nunca no futuro e no dia da última revisão interna ou depois, conclusão que exige a
--- aprovação, aprovação e conclusão juntas, apagar só na volta de etapa, arquivo de versão aprovada não se substitui,
--- processo com aprovação não se exclui, um evento por mudança). A edição da aprovação é do ticket 04.
+-- Registrar a aprovação sem trava (revisoes-aprovacao, ticket 05, ADRs 0011 e 0023): quem pode o quê em aprovacoes e nos
+-- eventos dela, e as regras de registrar_aprovacao (processo em andamento e na Aprovação pelo setor, versão mais recente
+-- de qualquer tipo, sem exigir a versão completa nem a data contra a última revisão; link http(s); data nunca no futuro;
+-- a aprovação nova toma o lugar da anterior com o evento "substituir"; nada se apaga; mover não mexe; arquivo de versão
+-- aprovada não se substitui; processo com aprovação não se exclui). A edição da aprovação é do teste 41.
 begin;
 create extension if not exists pgtap with schema extensions;
 -- As linhas do pgTAP vão para _tap e saem na exceção do fim (ver scripts/relatorio-tap.mjs).
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(69);
+insert into _tap (linha) select plan(55);
 
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 insert into public.autorizacoes (email, perfil) values
@@ -24,42 +24,28 @@ insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-0000000000a4', 'inativo.teste@ccivil.pr.gov.br', 'authenticated', 'authenticated');
 update public.usuarios set ativo = false where id = '00000000-0000-0000-0000-0000000000a4';
 
--- Um setor, um macroprocesso e os processos (6 etapas cada, a Publicação depois da Aprovação); o Filho é subprocesso do Pai.
+-- Um setor, um macroprocesso e os processos; o Filho é subprocesso do Pai.
 insert into public.setores (id, sigla, nome) values ('5f000000-0000-0000-0000-000000000040', 'T40', 'Setor Aprovacao');
 insert into public.macroprocessos (id, codigo, nome) values ('af000000-0000-0000-0000-000000000040', null, 'Macro Aprovacao');
 insert into public.processos (setor_id, macroprocesso_id, nome)
 select '5f000000-0000-0000-0000-000000000040', 'af000000-0000-0000-0000-000000000040', nome
 from unnest(array['Aprovada', 'Etapa Errada', 'Parado', 'Sem Versao', 'Incompleta', 'Segunda', 'Link', 'Datas', 'Datas Antes',
-  'Datas Futuro', 'Fuso', 'Direta', 'Realizada', 'Volta Setor', 'Volta Propria', 'Volta Publicacao', 'Troca', 'Livre', 'Perfis',
-  'Excluir']) as nome;
+  'Datas Futuro', 'Fuso', 'Move', 'Troca', 'Livre', 'Perfis', 'Excluir']) as nome;
 insert into public.processos (setor_id, macroprocesso_id, nome, tipo)
 values ('5f000000-0000-0000-0000-000000000040', 'af000000-0000-0000-0000-000000000040', 'Pai', 'processo');
 insert into public.processos (setor_id, macroprocesso_id, nome, tipo, processo_pai_id)
 select '5f000000-0000-0000-0000-000000000040', 'af000000-0000-0000-0000-000000000040', 'Filho', 'subprocesso', id
-from public.processos where nome = 'Pai';
-
-create function pg_temp.andamento(nome_do_processo text, codigo_da_etapa text) returns uuid
-language sql stable as $$
-  select a.id from public.andamentos a
-  join public.processos p on p.id = a.processo_id
-  join public.etapas e on e.id = a.etapa_id
-  where p.nome = nome_do_processo and e.codigo = codigo_da_etapa $$;
-grant execute on function pg_temp.andamento(text, text) to authenticated;
-
-create function pg_temp.agir(nome_do_processo text, codigo_da_etapa text, novo public.status_da_etapa,
-  nova_nota text default null) returns void
-language sql as $$
-  update public.andamentos set status = novo, nota = nova_nota
-  where id = pg_temp.andamento(nome_do_processo, codigo_da_etapa) $$;
-grant execute on function pg_temp.agir(text, text, public.status_da_etapa, text) to authenticated;
-
-create function pg_temp.status(nome_do_processo text, codigo_da_etapa text) returns public.status_da_etapa
-language sql stable as $$ select status from public.andamentos where id = pg_temp.andamento(nome_do_processo, codigo_da_etapa) $$;
-grant execute on function pg_temp.status(text, text) to authenticated;
+from public.processos where nome = 'Pai' and setor_id = '5f000000-0000-0000-0000-000000000040';
 
 create function pg_temp.processo(nome_do_processo text) returns uuid
-language sql stable as $$ select id from public.processos where nome = nome_do_processo $$;
+language sql stable as $$
+  select id from public.processos where nome = nome_do_processo and setor_id = '5f000000-0000-0000-0000-000000000040' $$;
 grant execute on function pg_temp.processo(text) to authenticated;
+
+create function pg_temp.mover(nome_do_processo text, codigo_da_etapa text) returns void
+language sql as $$
+  select public.mover_processo(pg_temp.processo(nome_do_processo), (select id from public.etapas where codigo = codigo_da_etapa)) $$;
+grant execute on function pg_temp.mover(text, text) to authenticated;
 
 -- Um arquivo inventado no formato que registrar_versao recebe, e o par .bpm + .png de uma versão nova.
 create function pg_temp.arquivo(papel text, formato text, tamanho bigint default 100) returns jsonb
@@ -92,37 +78,22 @@ create function pg_temp.claims(usuario text) returns void language sql as $$
   select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000' || usuario || '","role":"authenticated"}', true) $$;
 grant execute on function pg_temp.claims(text) to authenticated;
 
--- Leva o processo até a Aprovação em andamento: as etapas 1 a 4 "realizadas anteriormente" (sem registro nem trava).
-create function pg_temp.ate_a_aprovacao(nome_do_processo text) returns void
-language plpgsql as $$
-begin
-  perform pg_temp.agir(nome_do_processo, 'modelagem', 'realizada_anteriormente', 'Feita antes');
-  perform pg_temp.agir(nome_do_processo, 'relatorio_modelagem_tecnica', 'realizada_anteriormente', 'Feita antes');
-  perform pg_temp.agir(nome_do_processo, 'revisao_interna', 'realizada_anteriormente', 'Feita antes');
-  perform pg_temp.agir(nome_do_processo, 'revisao_setor', 'realizada_anteriormente', 'Feita antes');
-  perform pg_temp.agir(nome_do_processo, 'aprovacao_setor', 'em_andamento');
-end $$;
-grant execute on function pg_temp.ate_a_aprovacao(text) to authenticated;
-
--- O mesmo caminho pela tela, com a revisão interna registrada hoje (a versão é de outra pessoa que quem chama).
+-- Passa pela Revisão interna com a revisão registrada hoje (a versão é de outra pessoa que quem chama) e vai à Aprovação.
 create function pg_temp.ate_a_aprovacao_revisando(nome_do_processo text) returns void
 language plpgsql as $$
 begin
-  perform pg_temp.agir(nome_do_processo, 'modelagem', 'realizada_anteriormente', 'Feita antes');
-  perform pg_temp.agir(nome_do_processo, 'relatorio_modelagem_tecnica', 'realizada_anteriormente', 'Feita antes');
-  perform pg_temp.agir(nome_do_processo, 'revisao_interna', 'em_andamento');
-  perform public.concluir_revisao_interna(pg_temp.andamento(nome_do_processo, 'revisao_interna'), 'sem_alteracao', null, null, null);
-  perform public.avancar_etapa(pg_temp.andamento(nome_do_processo, 'revisao_setor'), 'concluir', null, null);
+  perform pg_temp.mover(nome_do_processo, 'revisao_interna');
+  insert into public.revisoes_internas (processo_id, resultado) values (pg_temp.processo(nome_do_processo), 'sem_alteracao');
+  perform pg_temp.mover(nome_do_processo, 'aprovacao_setor');
 end $$;
 grant execute on function pg_temp.ate_a_aprovacao_revisando(text) to authenticated;
 
--- A chamada da tela: a aprovação e a conclusão numa função só.
+-- A aprovação pela função, como a tela a chama.
 create function pg_temp.aprovar(nome_do_processo text, numero text default null, link text default null,
-  data date default null, responsavel uuid default null) returns void
+  data date default null) returns void
 language sql as $$
-  -- Responde "sim" à escolha de publicação (ADR 0020): a Publicação entra em andamento, como antes da escolha existir.
-  select public.concluir_aprovacao(pg_temp.andamento(nome_do_processo, 'aprovacao_setor'), numero, link, data, responsavel, true) $$;
-grant execute on function pg_temp.aprovar(text, text, text, date, uuid) to authenticated;
+  select public.registrar_aprovacao(pg_temp.processo(nome_do_processo), numero, link, data) $$;
+grant execute on function pg_temp.aprovar(text, text, text, date) to authenticated;
 
 create function pg_temp.aprovacoes(nome_do_processo text) returns bigint
 language sql stable as $$ select count(*) from public.aprovacoes where processo_id = pg_temp.processo(nome_do_processo) $$;
@@ -144,19 +115,18 @@ set local role authenticated;
 select pg_temp.claims('a1');
 select pg_temp.enviar_completa('Aprovada');
 select pg_temp.claims('a2');
-select pg_temp.ate_a_aprovacao('Aprovada');
+select pg_temp.mover('Aprovada', 'aprovacao_setor');
 insert into _tap (linha) select lives_ok(
-  $sql$select pg_temp.aprovar('Aprovada')$sql$, 'concluir a Aprovação sem número, link e data é aceito');
+  $sql$select pg_temp.aprovar('Aprovada')$sql$, 'registrar a aprovação sem número, link e data é aceito');
 insert into _tap (linha) select results_eq(
   $sql$select numero_eprotocolo is null, link is null, aprovada_em is null, registrada_por::text,
     (versao_id = (select id from public.versoes where processo_id = pg_temp.processo('Aprovada') and numero = 1))
     from public.aprovacoes where processo_id = pg_temp.processo('Aprovada')$sql$,
   $sql$values (true, true, true, '00000000-0000-0000-0000-0000000000a2', true)$sql$,
   'a aprovação guarda a versão mais recente e quem a registrou, com os três campos vazios');
-insert into _tap (linha) select is(pg_temp.status('Aprovada', 'aprovacao_setor'), 'concluida'::public.status_da_etapa,
-  'a Aprovação fica concluída');
-insert into _tap (linha) select is(pg_temp.status('Aprovada', 'publicacao'), 'em_andamento'::public.status_da_etapa,
-  'a Publicação é iniciada');
+insert into _tap (linha) select is(
+  (select etapa_atual_codigo from public.processos_com_andamento where id = pg_temp.processo('Aprovada')),
+  'aprovacao_setor', 'registrar a aprovação não move o processo');
 insert into _tap (linha) select results_eq(
   $sql$select acao, (entidade_ref = pg_temp.processo('Aprovada')::text), detalhes->'depois'->>'versao',
     (jsonb_typeof(detalhes->'antes') = 'null')
@@ -164,7 +134,7 @@ insert into _tap (linha) select results_eq(
   $sql$values ('registrar', true, 'V1', true)$sql$,
   'um evento "registrar" liga a aprovação ao processo, com o antes vazio');
 
--- ===== Número, link e data; data contra a última revisão interna =====
+-- ===== Número, link e data; a data não é conferida contra a revisão =====
 select pg_temp.claims('a1');
 select pg_temp.enviar_completa('Datas');
 select pg_temp.enviar_completa('Datas Antes');
@@ -180,12 +150,9 @@ insert into _tap (linha) select results_eq(
   $sql$select numero_eprotocolo, link, aprovada_em from public.aprovacoes where processo_id = pg_temp.processo('Datas')$sql$,
   $sql$values ('PROT-2026-0001', 'https://eprotocolo.example/abc', (now() at time zone 'America/Sao_Paulo')::date)$sql$,
   'número e link vêm aparados');
-insert into _tap (linha) select throws_ok(
-  $sql$select pg_temp.aprovar('Datas Antes', null, null, (now() at time zone 'America/Sao_Paulo')::date - 1)$sql$,
-  'P0001', 'aprovacao_antes_da_revisao:' || ((now() at time zone 'America/Sao_Paulo')::date - 1)::text || ':' || (now() at time zone 'America/Sao_Paulo')::date::text,
-  'data antes da última revisão interna é recusada, com as duas datas');
 insert into _tap (linha) select lives_ok(
-  $sql$select pg_temp.aprovar('Datas Antes', null, null, (now() at time zone 'America/Sao_Paulo')::date)$sql$, 'a data do dia da revisão é aceita');
+  $sql$select pg_temp.aprovar('Datas Antes', null, null, (now() at time zone 'America/Sao_Paulo')::date - 1)$sql$,
+  'a data de antes da última revisão interna é aceita: a ordem dos registros é livre');
 insert into _tap (linha) select throws_ok(
   $sql$select pg_temp.aprovar('Datas Futuro', null, null, (now() at time zone 'America/Sao_Paulo')::date + 1)$sql$,
   'P0001', 'data_no_futuro:' || ((now() at time zone 'America/Sao_Paulo')::date + 1)::text, 'data no futuro é recusada');
@@ -211,7 +178,7 @@ reset timezone;
 select pg_temp.claims('a1');
 select pg_temp.enviar_completa('Link');
 select pg_temp.claims('a2');
-select pg_temp.ate_a_aprovacao('Link');
+select pg_temp.mover('Link', 'aprovacao_setor');
 insert into _tap (linha) select throws_ok(
   $sql$select pg_temp.aprovar('Link', null, 'ftp://x.example/a')$sql$, 'P0001', 'link_invalido', 'link ftp:// é recusado');
 insert into _tap (linha) select throws_ok(
@@ -227,94 +194,62 @@ select pg_temp.enviar_completa('Etapa Errada');
 select pg_temp.enviar_completa('Parado');
 select pg_temp.enviar('Incompleta');
 select pg_temp.claims('a2');
-select pg_temp.agir('Etapa Errada', 'modelagem', 'realizada_anteriormente', 'Feita antes');
-select pg_temp.agir('Etapa Errada', 'relatorio_modelagem_tecnica', 'realizada_anteriormente', 'Feita antes');
-select pg_temp.agir('Etapa Errada', 'revisao_interna', 'realizada_anteriormente', 'Feita antes');
-select pg_temp.agir('Etapa Errada', 'revisao_setor', 'em_andamento');
+select pg_temp.mover('Etapa Errada', 'revisao_setor');
 insert into _tap (linha) select throws_ok(
-  $sql$insert into public.aprovacoes (processo_id) values (pg_temp.processo('Etapa Errada'))$sql$,
-  'P0001', 'aprovacao_fora_da_etapa', 'aprovação com a Validação com o setor em andamento é recusada');
-select pg_temp.ate_a_aprovacao('Parado');
+  $sql$select pg_temp.aprovar('Etapa Errada')$sql$,
+  'P0001', 'aprovacao_fora_da_etapa', 'aprovação com o processo na Validação com o setor é recusada');
+select pg_temp.mover('Parado', 'aprovacao_setor');
 select public.suspender_processo(pg_temp.processo('Parado'), 'Aguardando o setor');
 insert into _tap (linha) select throws_ok(
   $sql$select pg_temp.aprovar('Parado')$sql$, 'P0001', 'processo_parado:suspenso', 'aprovação com o processo suspenso é recusada');
-select pg_temp.ate_a_aprovacao('Sem Versao');
+select pg_temp.mover('Sem Versao', 'aprovacao_setor');
 insert into _tap (linha) select throws_ok(
   $sql$select pg_temp.aprovar('Sem Versao')$sql$, 'P0001', 'sem_versao', 'aprovação de processo sem versão é recusada');
-select pg_temp.ate_a_aprovacao('Incompleta');
-insert into _tap (linha) select throws_ok(
-  $sql$select pg_temp.aprovar('Incompleta')$sql$, 'P0001', 'versao_incompleta:1:relatorio',
-  'aprovação com a versão sem relatório é recusada, com o que falta');
-insert into _tap (linha) select is(pg_temp.aprovacoes('Incompleta'), 0::bigint, 'a recusa não deixa aprovação');
-insert into _tap (linha) select is(pg_temp.status('Incompleta', 'aprovacao_setor'), 'em_andamento'::public.status_da_etapa,
-  'a Aprovação segue em andamento');
+select pg_temp.mover('Incompleta', 'aprovacao_setor');
+insert into _tap (linha) select lives_ok(
+  $sql$select pg_temp.aprovar('Incompleta')$sql$, 'a versão sem relatório pode ser aprovada: a trava de arquivos fica para a parte 3');
+insert into _tap (linha) select is(pg_temp.aprovacoes('Incompleta'), 1::bigint, 'e a aprovação fica');
 
--- ===== Uma aprovação por processo =====
+-- ===== A aprovação nova toma o lugar da anterior =====
 select pg_temp.claims('a1');
 select pg_temp.enviar_completa('Segunda');
 select pg_temp.claims('a2');
-select pg_temp.ate_a_aprovacao('Segunda');
-insert into _tap (linha) select lives_ok(
-  $sql$insert into public.aprovacoes (processo_id) values (pg_temp.processo('Segunda'))$sql$,
-  'a aprovação direta, com a etapa em andamento, é aceita');
-insert into _tap (linha) select throws_ok(
-  $sql$insert into public.aprovacoes (processo_id) values (pg_temp.processo('Segunda'))$sql$,
-  'P0001', 'processo_ja_aprovado', 'a segunda aprovação do processo é recusada');
-
--- ===== Concluir exige a aprovação =====
+select pg_temp.mover('Segunda', 'aprovacao_setor');
+insert into _tap (linha) select lives_ok($sql$select pg_temp.aprovar('Segunda', 'PROT-1')$sql$, 'a primeira aprovação é aceita');
 select pg_temp.claims('a1');
-select pg_temp.enviar_completa('Direta');
-select pg_temp.enviar_completa('Realizada');
+select pg_temp.enviar_completa('Segunda');
+insert into _tap (linha) select lives_ok($sql$select pg_temp.aprovar('Segunda', 'PROT-2', 'https://x.example/b')$sql$,
+  'a segunda aprovação do processo é aceita e toma o lugar da primeira');
+insert into _tap (linha) select results_eq(
+  $sql$select count(*)::int, max(numero_eprotocolo), max(link),
+    max(versao_id::text) = (select id::text from public.versoes where processo_id = pg_temp.processo('Segunda') and numero = 2),
+    max(registrada_por::text)
+    from public.aprovacoes where processo_id = pg_temp.processo('Segunda')$sql$,
+  $sql$values (1, 'PROT-2', 'https://x.example/b', true, '00000000-0000-0000-0000-0000000000a1')$sql$,
+  'continua uma aprovação só, com a versão mais recente, os campos novos e quem a registrou');
+insert into _tap (linha) select results_eq(
+  $sql$select acao, detalhes->'antes'->>'versao', detalhes->'depois'->>'versao', detalhes->'antes'->>'numero_eprotocolo',
+    detalhes->'depois'->>'numero_eprotocolo'
+    from public.eventos where entidade = 'aprovacao' and entidade_ref = pg_temp.processo('Segunda')::text and acao = 'substituir'$sql$,
+  $sql$values ('substituir', 'V1', 'V2', 'PROT-1', 'PROT-2')$sql$,
+  'um evento "substituir" guarda a aprovação anterior no antes');
 select pg_temp.claims('a2');
-select pg_temp.ate_a_aprovacao('Direta');
-insert into _tap (linha) select throws_ok(
-  $sql$select public.avancar_etapa(pg_temp.andamento('Direta', 'aprovacao_setor'), 'concluir', null, null)$sql$,
-  'P0001', 'sem_aprovacao:1', 'o avanço direto, sem aprovação, é recusado');
-insert into _tap (linha) select throws_ok(
-  $sql$select pg_temp.agir('Direta', 'aprovacao_setor', 'concluida')$sql$,
-  'P0001', 'sem_aprovacao:1', 'concluir a etapa direto, sem aprovação, é recusado');
-insert into _tap (linha) select lives_ok($sql$select pg_temp.aprovar('Direta')$sql$, 'concluir_aprovacao é aceito');
-insert into _tap (linha) select is(pg_temp.status('Direta', 'aprovacao_setor'), 'concluida'::public.status_da_etapa,
-  'a Aprovação fica concluída');
-select pg_temp.ate_a_aprovacao('Realizada');
-insert into _tap (linha) select lives_ok(
-  $sql$select pg_temp.agir('Realizada', 'aprovacao_setor', 'realizada_anteriormente', 'Aprovada antes da plataforma')$sql$,
-  '"realizada anteriormente" na Aprovação segue aceita, sem registro');
-insert into _tap (linha) select is(pg_temp.aprovacoes('Realizada'), 0::bigint, 'e não deixa aprovação');
 
--- ===== Voltar desfaz a aprovação =====
+-- ===== Mover não mexe na aprovação, e ela não se apaga =====
 select pg_temp.claims('a1');
-select pg_temp.enviar_completa('Volta Setor');
-select pg_temp.enviar_completa('Volta Propria');
-select pg_temp.enviar_completa('Volta Publicacao');
+select pg_temp.enviar_completa('Move');
 select pg_temp.claims('a2');
-select pg_temp.ate_a_aprovacao('Volta Setor');
-select pg_temp.aprovar('Volta Setor');
-insert into _tap (linha) select lives_ok(
-  $sql$select public.voltar_a_etapa(pg_temp.andamento('Volta Setor', 'revisao_setor'), 'Ajustar', null)$sql$,
-  'voltar à Validação com o setor, com aprovação, é aceito');
-insert into _tap (linha) select is(pg_temp.aprovacoes('Volta Setor'), 0::bigint, 'a aprovação sai');
-insert into _tap (linha) select is(
-  (select count(*) from public.eventos where entidade = 'aprovacao' and acao = 'desfazer'
-    and entidade_ref = pg_temp.processo('Volta Setor')::text and detalhes->'antes'->>'versao' = 'V1'
-    and jsonb_typeof(detalhes->'depois') = 'null'), 1::bigint,
-  'um evento "desfazer" guarda o que a aprovação era');
-select pg_temp.ate_a_aprovacao('Volta Propria');
-select pg_temp.aprovar('Volta Propria');
-insert into _tap (linha) select lives_ok(
-  $sql$select public.voltar_a_etapa(pg_temp.andamento('Volta Propria', 'aprovacao_setor'), 'Rever', null)$sql$,
-  'voltar à própria Aprovação é aceito');
-insert into _tap (linha) select is(pg_temp.aprovacoes('Volta Propria'), 0::bigint, 'a aprovação sai');
-select pg_temp.ate_a_aprovacao('Volta Publicacao');
-select pg_temp.aprovar('Volta Publicacao');
-select pg_temp.agir('Volta Publicacao', 'publicacao', 'concluida');
-insert into _tap (linha) select lives_ok(
-  $sql$select public.voltar_a_etapa(pg_temp.andamento('Volta Publicacao', 'publicacao'), 'Rever', null)$sql$,
-  'voltar à Publicação (depois da Aprovação) é aceito');
-insert into _tap (linha) select is(pg_temp.aprovacoes('Volta Publicacao'), 1::bigint, 'a aprovação fica');
+select pg_temp.mover('Move', 'aprovacao_setor');
+select pg_temp.aprovar('Move');
+insert into _tap (linha) select lives_ok($sql$select pg_temp.mover('Move', 'revisao_setor')$sql$,
+  'mover o processo aprovado para trás é aceito');
+insert into _tap (linha) select is(pg_temp.aprovacoes('Move'), 1::bigint, 'a aprovação fica');
 insert into _tap (linha) select throws_ok(
-  $sql$delete from public.aprovacoes where processo_id = pg_temp.processo('Volta Publicacao')$sql$,
-  'P0001', 'aprovacao_so_se_desfaz_na_volta', 'apagar a aprovação direto é recusado');
+  $sql$delete from public.aprovacoes where processo_id = pg_temp.processo('Move')$sql$,
+  '42501', null, 'integrante não apaga a aprovação');
+select pg_temp.claims('a1');
+insert into _tap (linha) select throws_ok($sql$delete from public.aprovacoes$sql$, '42501', null, 'administrador não apaga a aprovação');
+select pg_temp.claims('a2');
 
 -- ===== Quem registra e a versão não são escolhidos (a edição de número, link e data é provada no teste 41) =====
 insert into _tap (linha) select throws_ok(
@@ -330,7 +265,7 @@ select pg_temp.claims('a1');
 select pg_temp.enviar_completa('Troca');
 select pg_temp.enviar_completa('Livre');
 select pg_temp.claims('a2');
-select pg_temp.ate_a_aprovacao('Troca');
+select pg_temp.mover('Troca', 'aprovacao_setor');
 select pg_temp.aprovar('Troca');
 insert into _tap (linha) select throws_ok(
   $sql$select public.substituir_arquivo(pg_temp.arquivo_da('Troca', 1, 'relatorio'), pg_temp.novo('docx'))$sql$,
@@ -338,10 +273,6 @@ insert into _tap (linha) select throws_ok(
 insert into _tap (linha) select throws_ok(
   $sql$update public.arquivos_da_versao set tamanho = 5 where id = pg_temp.arquivo_da('Troca', 1, 'png')$sql$,
   'P0001', 'versao_aprovada:1', 'alterar um arquivo da versão aprovada direto também é recusado');
-select public.voltar_a_etapa(pg_temp.andamento('Troca', 'revisao_setor'), 'Ajustar', null);
-insert into _tap (linha) select lives_ok(
-  $sql$select public.substituir_arquivo(pg_temp.arquivo_da('Troca', 1, 'relatorio'), pg_temp.novo('docx'))$sql$,
-  'depois da volta que desfaz a aprovação, substituir é aceito');
 insert into _tap (linha) select lives_ok(
   $sql$select public.substituir_arquivo(pg_temp.arquivo_da('Livre', 1, 'relatorio'), pg_temp.novo('docx'))$sql$,
   'substituir arquivo de versão não aprovada é aceito');
@@ -350,17 +281,17 @@ insert into _tap (linha) select lives_ok(
 select pg_temp.claims('a1');
 select pg_temp.enviar_completa('Excluir');
 select pg_temp.claims('a2');
-select pg_temp.ate_a_aprovacao('Excluir');
+select pg_temp.mover('Excluir', 'aprovacao_setor');
 select pg_temp.aprovar('Excluir');
 insert into _tap (linha) select throws_ok(
-  $sql$delete from public.processos where nome = 'Excluir'$sql$, 'P0001', 'processo_com_aprovacao',
+  $sql$delete from public.processos where id = pg_temp.processo('Excluir')$sql$, 'P0001', 'processo_com_aprovacao',
   'excluir processo com aprovação é recusado');
 
 -- ===== Subprocesso e reclassificação =====
 select pg_temp.claims('a1');
 select pg_temp.enviar_completa('Filho');
 select pg_temp.claims('a2');
-select pg_temp.ate_a_aprovacao('Filho');
+select pg_temp.mover('Filho', 'aprovacao_setor');
 insert into _tap (linha) select lives_ok(
   $sql$select pg_temp.aprovar('Filho')$sql$, 'o subprocesso registra a aprovação do mesmo jeito');
 select public.reclassificar_processo(pg_temp.processo('Filho'), 'processo', null, 'Virou processo');
@@ -370,19 +301,15 @@ insert into _tap (linha) select is(pg_temp.aprovacoes('Filho'), 1::bigint, 'depo
 select pg_temp.claims('a1');
 select pg_temp.enviar_completa('Perfis');
 select pg_temp.claims('a2');
-select pg_temp.ate_a_aprovacao('Perfis');
+select pg_temp.mover('Perfis', 'aprovacao_setor');
 select pg_temp.claims('a3');
 insert into _tap (linha) select ok((select count(*) from public.aprovacoes) > 0, 'consulta lê as aprovações');
 insert into _tap (linha) select ok((select count(*) from public.eventos where entidade = 'aprovacao') > 0,
   'consulta lê os eventos de aprovação');
 insert into _tap (linha) select throws_ok(
   $sql$select pg_temp.aprovar('Perfis')$sql$, '42501', null, 'consulta não registra aprovação');
-insert into _tap (linha) select throws_ok(
-  $sql$insert into public.aprovacoes (processo_id) values (pg_temp.processo('Perfis'))$sql$, '42501', null,
-  'consulta não inclui aprovação direto');
-insert into _tap (linha) select lives_ok($sql$delete from public.aprovacoes$sql$,
-  'consulta tenta apagar sem erro: a política não deixa nenhuma linha à vista para apagar');
-insert into _tap (linha) select ok((select count(*) from public.aprovacoes where processo_id = pg_temp.processo('Volta Publicacao')) = 1,
+insert into _tap (linha) select throws_ok($sql$delete from public.aprovacoes$sql$, '42501', null, 'consulta não apaga aprovação');
+insert into _tap (linha) select ok((select count(*) from public.aprovacoes where processo_id = pg_temp.processo('Move')) = 1,
   'e a aprovação continua');
 
 select pg_temp.claims('a4');
@@ -390,10 +317,8 @@ insert into _tap (linha) select is((select count(*) from public.aprovacoes), 0::
 insert into _tap (linha) select is((select count(*) from public.eventos where entidade = 'aprovacao'), 0::bigint,
   'inativo não lê os eventos de aprovação');
 insert into _tap (linha) select throws_ok(
-  $sql$select pg_temp.aprovar('Perfis')$sql$, 'P0001', 'registro_inexistente', 'inativo não registra aprovação (não enxerga a etapa)');
-insert into _tap (linha) select throws_ok(
   $sql$insert into public.aprovacoes (processo_id) values (pg_temp.processo('Perfis'))$sql$, '42501', null,
-  'inativo não inclui aprovação direto');
+  'inativo não registra aprovação');
 
 select pg_temp.claims('a2');
 insert into _tap (linha) select throws_ok(
@@ -409,22 +334,16 @@ set local role anon;
 insert into _tap (linha) select throws_ok($sql$select count(*) from public.aprovacoes$sql$, '42501', null,
   'visitante não lê as aprovações');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.concluir_aprovacao('00000000-0000-0000-0000-000000000000', null, null, null, null)$sql$, '42501', null,
-  'visitante não executa a conclusão da aprovação');
+  $sql$insert into public.aprovacoes (processo_id) values ('00000000-0000-0000-0000-000000000000')$sql$, '42501', null,
+  'visitante não registra aprovação');
 insert into _tap (linha) select throws_ok($sql$select count(*) from public.eventos$sql$, '42501', null,
   'visitante não lê os eventos');
 
 -- ===== Estrutura =====
 reset role;
 insert into _tap (linha) select is(
-  (select count(*)::int from pg_trigger where tgname = 'conferir_conclusao_da_etapa' and tgrelid = 'public.andamentos'::regclass), 1,
-  'o gatilho de conclusão continua em andamentos');
-insert into _tap (linha) select is(
   (select count(*)::int from pg_trigger where tgname = 'preparar_aprovacao' and tgrelid = 'public.aprovacoes'::regclass), 1,
   'existe o gatilho que prepara a aprovação');
-insert into _tap (linha) select is(
-  (select count(*)::int from pg_trigger where tgname = 'bloquear_apagar_aprovacao' and tgrelid = 'public.aprovacoes'::regclass), 1,
-  'existe o gatilho que só deixa apagar na volta');
 insert into _tap (linha) select is(
   (select count(*)::int from pg_trigger where tgname = 'bloquear_troca_em_versao_aprovada'
     and tgrelid = 'public.arquivos_da_versao'::regclass), 1,
@@ -432,9 +351,9 @@ insert into _tap (linha) select is(
 insert into _tap (linha) select is(
   (select count(*)::int from pg_trigger where tgname = 'conferir_processo_sem_aprovacao' and tgrelid = 'public.processos'::regclass), 1,
   'existe o gatilho de exclusão do processo com aprovação');
-insert into _tap (linha) select is(
-  (select prosecdef from pg_proc where proname = 'concluir_aprovacao' and pronamespace = 'public'::regnamespace), false,
-  'a conclusão da aprovação não é security definer');
+insert into _tap (linha) select hasnt_function('public', 'concluir_aprovacao', 'o "concluir" da aprovação saiu');
+insert into _tap (linha) select has_function('public', 'registrar_aprovacao', array['uuid', 'text', 'text', 'date'], 'existe registrar_aprovacao');
+insert into _tap (linha) select is((select prosecdef from pg_proc where proname = 'registrar_aprovacao' and pronamespace = 'public'::regnamespace), false, 'registrar_aprovacao não é security definer');
 insert into _tap (linha) select * from finish();
 do $$ begin
   raise exception E'RESULTADO DOS TESTES\n%', (select string_agg(linha, E'\n' order by n) from _tap);

@@ -23,9 +23,20 @@
   text-transform: uppercase;
 }
 
-.agora-etapa {
-  margin: 0;
-  font-size: var(--tam-painel);
+/* A etapa e a etiqueta: rótulo à esquerda, lista (ou o texto fixo de Concluídos) à direita. */
+.agora-listas {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--esp-2) var(--esp-3);
+}
+
+.agora-campo {
+  color: var(--texto-2);
+  font-size: var(--tam-secundario);
+}
+
+.agora-etiqueta {
   font-weight: 600;
 }
 
@@ -104,6 +115,35 @@
 /* Concluído: a linha da publicação ("Publicado em dd/mm/aaaa" ou "Não publicado") logo abaixo da situação. */
 .agora-publicacao {
   margin: var(--esp-1) 0 0;
+  color: var(--texto-2);
+  font-size: var(--tam-secundario);
+}
+
+/* O aviso amarelo (revisor que enviou a versão, chegada a Concluídos): informa, não impede. */
+.agora-aviso {
+  margin: 0;
+  padding: var(--esp-2) var(--esp-3);
+  border: 1px solid var(--pendencia-borda);
+  border-radius: var(--canto-botao);
+  background: var(--pendencia-fundo);
+  font-size: var(--tam-secundario);
+  overflow-wrap: anywhere;
+}
+
+/* O resumo do registro da etapa (revisão da passagem, aprovação): cabe numa linha, com o botão de editar abaixo. */
+.agora-registro {
+  margin: 0;
+  font-size: var(--tam-secundario);
+  overflow-wrap: anywhere;
+}
+
+/* Suspenso e cancelado: onde o processo parou e por que não se mexe nele. */
+.agora-linha-de-texto {
+  margin: 0;
+}
+
+.agora-explicacao {
+  margin: 0;
   color: var(--texto-2);
   font-size: var(--tam-secundario);
 }

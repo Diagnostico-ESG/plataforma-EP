@@ -1,109 +1,108 @@
-import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, fireEvent, screen, within } from '@testing-library/react'
 import { afterEach, expect, test } from 'vitest'
+import { TravaDoBanco } from './acesso/falhasDeGravacao'
+import type { ProcessoLido } from './processos/tipos'
 import { hojeLocal } from './processos/textoDaReuniao'
-import type { EtapaDoProcesso, ProcessoLido } from './processos/tipos'
-import { CONCLUIDA, caminho, montar } from './testes/aprovacaoNoVerso'
-import type { Falsos } from './testes/aprovacaoNoVerso'
-import { agoraDoVerso, escolherNoMenuDoProcesso, versoAberto } from './testes/versoDoCartao'
+import { montar } from './testes/aprovacaoNoVerso'
+import { agoraDoVerso } from './testes/versoDoCartao'
 
-// Registrar a publicação que aconteceu depois, no concluído e no arquivado, com as recusas de data (publicacao-e-
-// arquivamento, ticket 02, histórias 30 a 34 e 43). A falsa de processos trata 13/10/2026 como hoje.
+// Registrar e corrigir a publicação (ticket 04 de publicacao-e-arquivamento, histórias 52 a 55, 57 e 63): o botão na
+// Publicação, em Concluídos sem publicação e no arquivado sem data; a janela com a Data e o Link; o modo Corrigir
+// publicação, preenchido, fora do arquivado; as recusas em vermelho sem perder o preenchido; a Consulta sem botões.
 
 afterEach(() => {
   cleanup()
   window.location.hash = ''
 })
 
-function concluidoNaoPublicado(): EtapaDoProcesso[] {
-  return caminho().map((etapa) => (etapa.codigo === 'aprovacao_setor' ? { ...etapa, ...CONCLUIDA } : etapa))
+const SEM_PUBLICACAO: Partial<ProcessoLido> = {
+  situacao: 'concluido', etiqueta: 'concluido', publicadoEm: null, explicacaoSemPublicacao: 'Não será divulgado',
+}
+const PUBLICADO: Partial<ProcessoLido> = {
+  situacao: 'concluido', etiqueta: 'concluido', publicadoEm: '2026-10-05', linkDaPublicacao: 'https://diario.exemplo/1',
+}
+const ARQUIVADO = { arquivadoEm: '2026-10-12T12:00:00Z' }
+// Os botões da publicação e do arquivamento; Trocar e Assumir (o responsável) não entram na conta.
+const DA_PUBLICACAO = ['Registrar publicação', 'Corrigir publicação', 'Arquivar', 'Desarquivar']
+const botoesDoAgora = async () => (await agoraDoVerso()).getAllByRole('button')
+  .map((botao) => botao.textContent ?? '').filter((nome) => DA_PUBLICACAO.includes(nome))
+const janela = async (nome: string) => within(await screen.findByRole('dialog', { name: nome }))
+
+async function abrir(botao: string, titulo = botao) {
+  fireEvent.click((await agoraDoVerso()).getByRole('button', { name: botao }))
+  return janela(titulo)
 }
 
-const CONCLUIDO: Partial<ProcessoLido> = { situacao: 'concluido', etapaAtual: null, vaiParaPublicacao: false }
-
-// A aprovação gravada em 05/10/2026: a data da publicação não pode ser antes dela.
-function comAprovacao({ revisoes }: Falsos): void {
-  revisoes.aprovacoes.p1 = {
-    id: 'ap1', versao: 8, numeroEprotocolo: null, link: null, aprovadaEm: '2026-10-05', registradaPor: 'Bia Teste',
-    registradaEm: '2026-10-05T12:00:00Z',
-  }
-}
-
-async function abrirAJanela() {
-  fireEvent.click((await agoraDoVerso()).getByRole('button', { name: 'Registrar publicação' }))
-  return within(screen.getByRole('dialog', { name: 'Registrar publicação' }))
-}
-
-const dataDa = (janela: ReturnType<typeof within>) => janela.getByLabelText('Data da publicação') as HTMLInputElement
-
-test('a data vem com hoje, com hoje como máximo e a data da aprovação como mínimo', async () => {
-  montar(null, { etapas: concluidoNaoPublicado(), mudancas: CONCLUIDO, ajustar: comAprovacao })
-  await waitFor(async () => {
-    const janela = await abrirAJanela()
-    expect(dataDa(janela).min).toBe('2026-10-05')
-  })
-  const data = dataDa(within(screen.getByRole('dialog', { name: 'Registrar publicação' })))
-  expect(data.value).toBe(hojeLocal(new Date()))
-  expect(data.max).toBe(hojeLocal(new Date()))
+test('na Publicação, [Registrar publicação] abre a janela com hoje e grava a data e o link sem mover o processo', async () => {
+  const { falso } = montar(null, { etapa: 'publicacao' })
+  const aberta = await abrir('Registrar publicação')
+  expect((aberta.getByLabelText('Data da publicação') as HTMLInputElement).value).toBe(hojeLocal())
+  fireEvent.change(aberta.getByLabelText('Data da publicação'), { target: { value: '2026-10-10' } })
+  fireEvent.change(aberta.getByLabelText('Link (opcional)'), { target: { value: 'https://diario.exemplo/p' } })
+  fireEvent.click(aberta.getByRole('button', { name: 'Registrar' }))
+  expect(await (await agoraDoVerso()).findByText('Publicado em 10/10/2026')).toBeTruthy()
+  expect(await botoesDoAgora()).toContain('Corrigir publicação')
+  expect(falso.processos[0]).toMatchObject({ publicadoEm: '2026-10-10', linkDaPublicacao: 'https://diario.exemplo/p' })
+  expect((await agoraDoVerso()).getByText('Agora · etapa 7 de 8')).toBeTruthy()
 })
 
-test('data futura e anterior à aprovação são recusadas, e a janela fica com o preenchido', async () => {
-  montar(null, { etapas: concluidoNaoPublicado(), mudancas: CONCLUIDO, ajustar: comAprovacao })
-  const janela = await abrirAJanela()
-  fireEvent.change(janela.getByLabelText('Nota (opcional)'), { target: { value: 'Diário Oficial' } })
-  fireEvent.change(dataDa(janela), { target: { value: '2026-10-20' } })
-  fireEvent.click(janela.getByRole('button', { name: 'Salvar' }))
-  expect(await janela.findByText('A data 20/10/2026 está no futuro.')).toBeTruthy()
-  fireEvent.change(dataDa(janela), { target: { value: '2026-10-01' } })
-  fireEvent.click(janela.getByRole('button', { name: 'Salvar' }))
-  expect(await janela.findByText('A data da publicação (01/10/2026) não pode ser antes da aprovação (05/10/2026).')).toBeTruthy()
-  expect((janela.getByLabelText('Nota (opcional)') as HTMLTextAreaElement).value).toBe('Diário Oficial')
-})
-
-test('registrada, o processo fica em Concluídos como "Publicado em", sem o botão', async () => {
-  const { falso } = montar(null, { etapas: concluidoNaoPublicado(), mudancas: CONCLUIDO, ajustar: comAprovacao })
-  const janela = await abrirAJanela()
-  fireEvent.change(dataDa(janela), { target: { value: '2026-10-10' } })
-  fireEvent.change(janela.getByLabelText('Nota (opcional)'), { target: { value: '  Diário Oficial nº 1  ' } })
-  fireEvent.click(janela.getByRole('button', { name: 'Salvar' }))
+test('em Concluídos sem publicação: a explicação no Agora, [Registrar publicação] e [Arquivar] como principal', async () => {
+  montar(null, { etapa: 'concluidos', mudancas: SEM_PUBLICACAO })
   const agora = await agoraDoVerso()
-  expect(await agora.findByText('Publicado em 10/10/2026')).toBeTruthy()
-  expect(agora.queryByRole('button', { name: 'Registrar publicação' })).toBeNull()
-  expect(falso.processos[0]).toMatchObject({ situacao: 'concluido', vaiParaPublicacao: true, publicadoEm: '2026-10-10' })
-  expect(falso.chamadas.at(-1)).toMatchObject({ acao: 'registrar_publicacao', id: 'p1', nota: 'Diário Oficial nº 1' })
+  expect(await agora.findByText('Concluído sem publicação: Não será divulgado')).toBeTruthy()
+  expect(await botoesDoAgora()).toEqual(['Registrar publicação', 'Arquivar'])
+  expect(agora.getByRole('button', { name: 'Arquivar' }).classList.contains('botao-principal')).toBe(true)
 })
 
-test('no arquivado, o registro deixa o processo arquivado', async () => {
-  const { falso } = montar(null, { etapas: concluidoNaoPublicado(), mudancas: { ...CONCLUIDO, arquivadoEm: '2026-10-12T12:00:00Z' } })
-  const janela = await abrirAJanela()
-  fireEvent.change(dataDa(janela), { target: { value: '2026-10-10' } })
-  fireEvent.click(janela.getByRole('button', { name: 'Salvar' }))
+test('registrar em Concluídos troca a explicação pela linha "Concluído · Publicado em" e o botão vira [Corrigir publicação]', async () => {
+  montar(null, { etapa: 'concluidos', mudancas: SEM_PUBLICACAO })
+  const aberta = await abrir('Registrar publicação')
+  fireEvent.change(aberta.getByLabelText('Data da publicação'), { target: { value: '2026-10-11' } })
+  fireEvent.click(aberta.getByRole('button', { name: 'Registrar' }))
+  expect(await (await agoraDoVerso()).findByText('Concluído · Publicado em 11/10/2026')).toBeTruthy()
+  expect(await botoesDoAgora()).toEqual(['Corrigir publicação', 'Arquivar'])
+})
+
+test('publicado: a linha traz o link numa aba nova, e [Corrigir publicação] abre a janela preenchida e grava a correção', async () => {
+  const { falso } = montar(null, { etapa: 'concluidos', mudancas: PUBLICADO })
   const agora = await agoraDoVerso()
-  expect(await agora.findByText('Publicado em 10/10/2026')).toBeTruthy()
-  expect(agora.getByText('Arquivado')).toBeTruthy()
-  expect(falso.processos[0].arquivadoEm).toBe('2026-10-12T12:00:00Z')
+  expect(await agora.findByText('Concluído · Publicado em 05/10/2026')).toBeTruthy()
+  const link = agora.getByRole('link', { name: 'Abrir o link' })
+  expect(link.getAttribute('href')).toBe('https://diario.exemplo/1')
+  expect(link.getAttribute('target')).toBe('_blank')
+  expect(link.getAttribute('rel')).toBe('noopener noreferrer')
+  const aberta = await abrir('Corrigir publicação')
+  expect((aberta.getByLabelText('Data da publicação') as HTMLInputElement).value).toBe('2026-10-05')
+  expect((aberta.getByLabelText('Link (opcional)') as HTMLInputElement).value).toBe('https://diario.exemplo/1')
+  fireEvent.change(aberta.getByLabelText('Data da publicação'), { target: { value: '2026-10-06' } })
+  fireEvent.click(aberta.getByRole('button', { name: 'Corrigir' }))
+  expect(await (await agoraDoVerso()).findByText('Concluído · Publicado em 06/10/2026')).toBeTruthy()
+  expect(falso.processos[0].publicadoEm).toBe('2026-10-06')
 })
 
-test('a falha ao gravar aparece em vermelho na janela, que fica aberta', async () => {
-  montar(null, { etapas: concluidoNaoPublicado(), mudancas: CONCLUIDO, ajustar: ({ falso }) => { falso.falhaDeGravacao = 'sem conexão' } })
-  const janela = await abrirAJanela()
-  fireEvent.change(dataDa(janela), { target: { value: '2026-10-10' } })
-  fireEvent.click(janela.getByRole('button', { name: 'Salvar' }))
-  expect((await janela.findByRole('alert')).textContent).toMatch(/sem conexão/)
-  expect(dataDa(janela).value).toBe('2026-10-10')
+test('o arquivado sem data registra a publicação e continua arquivado; com data, não há botão de corrigir', async () => {
+  const { falso } = montar(null, { etapa: 'concluidos', mudancas: { ...SEM_PUBLICACAO, ...ARQUIVADO } })
+  expect(await botoesDoAgora()).toEqual(['Registrar publicação', 'Desarquivar'])
+  const aberta = await abrir('Registrar publicação')
+  fireEvent.click(aberta.getByRole('button', { name: 'Registrar' }))
+  expect(await (await agoraDoVerso()).findByText(/^Publicado em/)).toBeTruthy()
+  expect(await botoesDoAgora()).toEqual(['Desarquivar'])
+  expect(falso.processos[0].arquivadoEm).toBe(ARQUIVADO.arquivadoEm)
 })
 
-test('o registro aparece no histórico do processo, com a nota', async () => {
-  montar(null, { etapas: concluidoNaoPublicado(), mudancas: { ...CONCLUIDO, vaiParaPublicacao: true, publicadoEm: '2026-10-10' },
-    ajustar: ({ falso }) => {
-      falso.historicoDosProcessos.p1 = [{
-        id: 1, ocorridoEm: '2026-10-13T15:00:00Z', autor: 'Bia Teste', acao: 'registrar_publicacao', entidade: 'processo',
-        entidadeRef: 'p1', motivo: 'Diário Oficial nº 1',
-        antes: { nome: 'Emitir Ofício', vai_para_publicacao: false, publicado_em: null },
-        depois: { nome: 'Emitir Ofício', vai_para_publicacao: true, publicado_em: '2026-10-10' },
-      }]
-    } })
-  await escolherNoMenuDoProcesso('Histórico')
-  const verso = await versoAberto()
-  expect(await verso.findByText('Registrou a publicação')).toBeTruthy()
-  expect(verso.getByText(/Diário Oficial nº 1/)).toBeTruthy()
+test('a recusa aparece em vermelho na janela e o preenchido fica', async () => {
+  const { falso } = montar(null, { etapa: 'publicacao' })
+  falso.falhaDeGravacao = new TravaDoBanco('O link do E-protocolo precisa começar com http:// ou https://.')
+  const aberta = await abrir('Registrar publicação')
+  fireEvent.change(aberta.getByLabelText('Link (opcional)'), { target: { value: 'ftp://diario.exemplo' } })
+  fireEvent.click(aberta.getByRole('button', { name: 'Registrar' }))
+  expect((await aberta.findByRole('alert')).textContent).toBe('O link do E-protocolo precisa começar com http:// ou https://.')
+  expect((aberta.getByLabelText('Link (opcional)') as HTMLInputElement).value).toBe('ftp://diario.exemplo')
+})
+
+test('a Consulta lê a linha da publicação e a explicação, sem botões', async () => {
+  montar(null, { perfil: 'consulta', etapa: 'concluidos', mudancas: SEM_PUBLICACAO })
+  const agora = await agoraDoVerso()
+  expect(await agora.findByText('Concluído sem publicação: Não será divulgado')).toBeTruthy()
+  expect(agora.queryAllByRole('button')).toEqual([])
 })

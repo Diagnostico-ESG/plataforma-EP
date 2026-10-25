@@ -4,6 +4,7 @@ import { CadastroInexistente } from '../../cadastros/cadastroInexistente'
 import type { ModuloDeCadastros } from '../../cadastros/tipos'
 import { type EstadoDoCarregamento, useCarregamento } from '../../hooks/useCarregamento'
 import { type Executar, useGravacaoComFalha } from '../../hooks/useGravacaoComFalha'
+import { useRegistrosDoProcesso } from '../../hooks/useRegistrosDoProcesso'
 import { type SaidaComAnotacoes, useSaidaComAnotacoes } from '../../hooks/useSaidaComAnotacoes'
 import type { DadosDoProcesso, ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
@@ -203,12 +204,15 @@ function ColunasDoVerso(props: CorpoProps) {
   const { processo, processos, versoes, revisoes, podeAlterar, usuarioId, executar, aposMudar, aoSumir, enderecoDoProcesso } = props
   // O arquivado não aceita alteração além das do Agora (Desarquivar, Registrar publicação), que recebe o perfil inteiro.
   const alteravel = podeAlterar && !processo.arquivadoEm
+  const registros = useRegistrosDoProcesso(revisoes, processo.id, processo.etapaAtual?.id)
+  // A versão aprovada ganha o selo "Aprovada": registrar ou trocar a aprovação refaz a leitura das versões.
+  const versaoAprovada = registros.aprovacao.tipo === 'pronto' ? registros.aprovacao.valor?.versao ?? 0 : 0
   return (
     <div className="verso-colunas">
       <div className="verso-trabalho">
-        <CaminhoDoProcesso processo={processo} processos={processos} revisoes={revisoes} podeAlterar={podeAlterar} usuarioId={usuarioId}
+        <CaminhoDoProcesso processo={processo} processos={processos} revisoes={revisoes} registros={registros} podeAlterar={podeAlterar} usuarioId={usuarioId}
           executar={executar} aoSumir={aoSumir} aoMudar={aposMudar} />
-        <SecaoDeVersoes versoes={versoes} processo={processo} podeAlterar={alteravel} />
+        <SecaoDeVersoes key={versaoAprovada} versoes={versoes} processo={processo} podeAlterar={alteravel} aoAlterarVersoes={aposMudar} />
       </div>
       <div className="verso-contexto">
         <BlocoDasAnotacoes key={processo.id} processo={processo} processos={processos} podeEscrever={alteravel}

@@ -2,11 +2,10 @@ import { expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { ProcessosFalso } from './ProcessosFalso'
-import { etapaDoProcesso, processoLido } from '../testes/processoNoVerso'
+import { umProcessoLido } from '../testes/processoDaLista'
 import type { ProcessoLido } from './tipos'
 
-const ETAPAS = [etapaDoProcesso(1, 'modelagem', 'Modelagem piloto', { status: 'em_andamento' })]
-const processo = (mudancas: Partial<ProcessoLido> = {}) => processoLido(ETAPAS, mudancas)
+const processo = (mudancas: Partial<ProcessoLido> = {}) => umProcessoLido('Emitir Ofício', { id: 'p1', ...mudancas }, 'modelagem')
 
 function criar(...processos: ProcessoLido[]): ProcessosFalso {
   const falso = new ProcessosFalso()

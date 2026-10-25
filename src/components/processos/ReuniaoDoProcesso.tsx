@@ -2,7 +2,7 @@ import './Contexto.css'
 import { useEffect, useId, useRef, useState } from 'react'
 import { TravaDoBanco } from '../../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../../cadastros/cadastroInexistente'
-import { formatarData } from '../../processos/caminhoDeEtapas'
+import { formatarData } from '../../lib/datas'
 import { hojeLocal, momentoDaReuniao } from '../../processos/textoDaReuniao'
 import type { ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 

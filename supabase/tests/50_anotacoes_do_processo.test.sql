@@ -70,19 +70,6 @@ grant execute on function pg_temp.ultima_edicao(text) to authenticated;
 create function pg_temp.hoje() returns date language sql stable as $$ select (now() at time zone 'America/Sao_Paulo')::date $$;
 grant execute on function pg_temp.hoje() to authenticated;
 
-create function pg_temp.andamento(nome_do_processo text, codigo_da_etapa text) returns uuid
-language sql stable as $$
-  select a.id from public.andamentos a join public.etapas e on e.id = a.etapa_id
-  where a.processo_id = pg_temp.processo(nome_do_processo) and e.codigo = codigo_da_etapa $$;
-grant execute on function pg_temp.andamento(text, text) to authenticated;
-
-create function pg_temp.agir(nome_do_processo text, codigo_da_etapa text, novo public.status_da_etapa,
-  nova_nota text default null) returns void
-language sql as $$
-  update public.andamentos set status = novo, nota = nova_nota
-  where id = pg_temp.andamento(nome_do_processo, codigo_da_etapa) $$;
-grant execute on function pg_temp.agir(text, text, public.status_da_etapa, text) to authenticated;
-
 -- Um arquivo inventado no formato que registrar_versao recebe; a versão completa é o par .bpm + .png e o relatório.
 create function pg_temp.arquivo(papel text, formato text) returns jsonb
 language sql immutable as $$
@@ -99,32 +86,19 @@ begin
 end $$;
 grant execute on function pg_temp.enviar_completa(text) to authenticated;
 
--- As etapas 1 a 4 "realizadas anteriormente" e a Aprovação em andamento.
-create function pg_temp.ate_a_aprovacao(nome_do_processo text) returns void
-language plpgsql as $$
-begin
-  perform pg_temp.agir(nome_do_processo, 'modelagem', 'realizada_anteriormente', 'Feita antes');
-  perform pg_temp.agir(nome_do_processo, 'relatorio_modelagem_tecnica', 'realizada_anteriormente', 'Feita antes');
-  perform pg_temp.agir(nome_do_processo, 'revisao_interna', 'realizada_anteriormente', 'Feita antes');
-  perform pg_temp.agir(nome_do_processo, 'revisao_setor', 'realizada_anteriormente', 'Feita antes');
-  perform pg_temp.agir(nome_do_processo, 'aprovacao_setor', 'em_andamento');
-end $$;
-grant execute on function pg_temp.ate_a_aprovacao(text) to authenticated;
-
--- A Aprovação concluída com a escolha e, quando vem, a data da aprovação.
-create function pg_temp.aprovar(nome_do_processo text, vai boolean, data date default null) returns void
+-- Levado a Concluídos sem publicação (Andamento livre, processos-etapas 24).
+create function pg_temp.concluir(nome_do_processo text) returns void
 language sql as $$
-  select public.concluir_aprovacao(pg_temp.andamento(nome_do_processo, 'aprovacao_setor'), null, null, data, null, vai) $$;
-grant execute on function pg_temp.aprovar(text, boolean, date) to authenticated;
+  select public.mover_processo(pg_temp.processo(nome_do_processo), (select id from public.etapas where codigo = 'concluidos'),
+    null, null, 'Não será publicado') $$;
+grant execute on function pg_temp.concluir(text) to authenticated;
 
--- Concluido e Arquivado percorrem o caminho como o "Pendente" do teste 49 (versão completa, etapas realizadas antes e
--- Aprovação sem publicação); depois, cada processo vai ao estado do caso.
+-- Concluido e Arquivado em Concluídos, com a versão completa; depois, cada processo vai ao estado do caso.
 set local role authenticated;
 select pg_temp.claims('a1');
 select pg_temp.enviar_completa(nome) from unnest(array['Concluido', 'Arquivado']) as nome;
 select pg_temp.claims('a2');
-select pg_temp.ate_a_aprovacao(nome) from unnest(array['Concluido', 'Arquivado']) as nome;
-select pg_temp.aprovar(nome, false, pg_temp.hoje() - 10) from unnest(array['Concluido', 'Arquivado']) as nome;
+select pg_temp.concluir(nome) from unnest(array['Concluido', 'Arquivado']) as nome;
 select public.arquivar_processo(pg_temp.processo('Arquivado'));
 select public.suspender_processo(pg_temp.processo('Suspenso'), 'Aguardando o setor');
 select public.cancelar_processo(pg_temp.processo('Cancelado'), 'Cancelado no teste');

@@ -1,5 +1,5 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
-import { recalcularProcesso } from './andamentoFalso'
+import { CODIGO_CONCLUIDOS } from './codigosDasEtapas'
 import { fraseDeSituacaoInvalida, fraseDoProcessoParado } from './frasesDeSituacao'
 import type { ProcessoLido } from './tipos'
 
@@ -15,17 +15,18 @@ function situacaoGuardada(processo: ProcessoLido): SituacaoGuardada {
   return processo.situacao === 'concluido' ? 'em_andamento' : processo.situacao
 }
 
-/** Como as funções do banco: motivo obrigatório, transição da spec; retomar limpa o motivo e recalcula o concluído. */
+/** Como as funções do banco: motivo obrigatório, transição da spec; retomar limpa o motivo e, em Concluídos, volta a ser concluído. */
 export function mudarSituacao(processo: ProcessoLido, nova: SituacaoGuardada, motivo: string): ProcessoLido {
   const texto = motivo.trim()
   if (texto === '') throw new TravaDoBanco('O motivo é obrigatório.')
   const atual = situacaoGuardada(processo)
   if (!TRANSICOES[atual].includes(nova)) throw new TravaDoBanco(fraseDeSituacaoInvalida(atual, nova))
-  const mudado = { ...processo, situacao: nova, motivoDaSituacao: nova === 'em_andamento' ? null : texto }
-  return recalcularProcesso(mudado, processo.etapasDoProcesso)
+  const emConcluidos = processo.etapaAtual?.codigo === CODIGO_CONCLUIDOS
+  const situacao = nova === 'em_andamento' && emConcluidos ? 'concluido' : nova
+  return { ...processo, situacao, motivoDaSituacao: nova === 'em_andamento' ? null : texto }
 }
 
-/** Processo suspenso ou cancelado congela as etapas dele: o banco recusa qualquer mudança. */
+/** Processo suspenso ou cancelado congela a etapa, a etiqueta e o responsável: o banco recusa qualquer mudança. */
 export function conferirProcessoEmAndamento(processo: ProcessoLido): void {
   if (situacaoGuardada(processo) !== 'em_andamento') throw new TravaDoBanco(fraseDoProcessoParado(processo.situacao))
 }

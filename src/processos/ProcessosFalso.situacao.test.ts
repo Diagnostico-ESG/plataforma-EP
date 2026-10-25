@@ -1,29 +1,17 @@
 import { describe, expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
+import { CATALOGO_DE_TESTE, umProcessoLido } from '../testes/processoDaLista'
 import { ProcessosFalso } from './ProcessosFalso'
-import type { EtapaDoProcesso, ProcessoLido, SituacaoDoProcesso } from './tipos'
+import type { ProcessoLido, SituacaoDoProcesso } from './tipos'
 
-function doProcesso(ordem: number, mudancas: Partial<EtapaDoProcesso> = {}): EtapaDoProcesso {
-  return {
-    id: `a${ordem}`, codigo: `c${ordem}`, nome: `Etapa ${ordem}`, ordem, obrigatoria: true, status: 'pendente',
-    nota: null, iniciadaEm: null, resolvidaEm: null, responsavelId: null, responsavelNome: null, responsavelInativo: false,
-    ...mudancas,
-  }
-}
-
-function falso(situacao: SituacaoDoProcesso = 'em_andamento', etapas: EtapaDoProcesso[] = [
-  doProcesso(4, { status: 'concluida', iniciadaEm: '2026-10-10', resolvidaEm: '2026-10-11' }), doProcesso(5)]): ProcessosFalso {
-  const processo: ProcessoLido = {
-    id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 'set1', setorSigla: 'TSA', macroprocessoId: 'm1',
-    macroprocessoNome: 'Macro', situacao, etapaAtual: { codigo: 'c5', nome: 'Etapa 5', ordem: 5 },
-    responsavel: null, origem: 'novo', contexto: null, observacoes: null,
-    processoPaiId: null, processoPai: null, subprocessos: [],
-    motivoDaSituacao: situacao === 'suspenso' || situacao === 'cancelado' ? 'Motivo antigo' : null,
-    dataDaReuniao: null, ultimaVersao: null, etapasDoProcesso: etapas,
-  }
+function falso(situacao: SituacaoDoProcesso = 'em_andamento', etapa = 'revisao_interna'): ProcessosFalso {
   const modulo = new ProcessosFalso()
-  modulo.processos = [processo]
+  modulo.etapasDoCatalogo = CATALOGO_DE_TESTE
+  modulo.usuariosPossiveis = [{ id: 'u1', nome: 'Ana Teste' }]
+  modulo.processos = [umProcessoLido('Emitir Ofício', {
+    id: 'p1', situacao, motivoDaSituacao: situacao === 'suspenso' || situacao === 'cancelado' ? 'Motivo antigo' : null,
+  }, etapa)]
   return modulo
 }
 
@@ -33,30 +21,28 @@ async function falhaDe(promessa: Promise<void>): Promise<Error> {
 }
 
 describe('suspender, cancelar e retomar', () => {
-  test('suspender guarda a situação e o motivo', async () => {
+  test('suspender guarda a situação e o motivo, e a etapa e a etiqueta ficam', async () => {
     const modulo = falso()
     await modulo.suspenderProcesso('p1', 'Aguardando decisão')
-    expect(await lido(modulo)).toMatchObject({ situacao: 'suspenso', motivoDaSituacao: 'Aguardando decisão' })
+    expect(await lido(modulo)).toMatchObject({
+      situacao: 'suspenso', motivoDaSituacao: 'Aguardando decisão', etapaAtual: { codigo: 'revisao_interna' }, etiqueta: 'a_fazer',
+    })
   })
 
-  test('cancelar um processo suspenso é aceito, e retomar limpa o motivo', async () => {
+  test('cancelar um processo suspenso é aceito, e retomar limpa o motivo e volta à mesma etapa', async () => {
     const modulo = falso('suspenso')
     await modulo.cancelarProcesso('p1', 'Desistiram')
     expect(await lido(modulo)).toMatchObject({ situacao: 'cancelado', motivoDaSituacao: 'Desistiram' })
     await modulo.retomarProcesso('p1', 'Voltou a valer')
-    expect(await lido(modulo)).toMatchObject({ situacao: 'em_andamento', motivoDaSituacao: null })
+    expect(await lido(modulo)).toMatchObject({ situacao: 'em_andamento', motivoDaSituacao: null, etapaAtual: { codigo: 'revisao_interna' } })
   })
 
-  test('retomar um processo com as obrigatórias resolvidas volta a ser concluído', async () => {
-    const modulo = falso('suspenso', [doProcesso(4, { status: 'concluida', iniciadaEm: '2026-10-10', resolvidaEm: '2026-10-11' })])
-    await modulo.retomarProcesso('p1', 'Segue')
-    expect((await lido(modulo)).situacao).toBe('concluido')
-  })
-
-  test('o concluído conta como em andamento: pode ser suspenso', async () => {
-    const modulo = falso('concluido')
+  test('o concluído conta como em andamento: pode ser suspenso e, retomado, volta a ser concluído', async () => {
+    const modulo = falso('concluido', 'concluidos')
     await modulo.suspenderProcesso('p1', 'Parou')
     expect((await lido(modulo)).situacao).toBe('suspenso')
+    await modulo.retomarProcesso('p1', 'Segue')
+    expect((await lido(modulo)).situacao).toBe('concluido')
   })
 
   test('a lista mostra a situação nova', async () => {
@@ -91,25 +77,22 @@ describe('recusas', () => {
   })
 })
 
-describe('congelamento das etapas', () => {
-  test.each(['suspenso', 'cancelado'] as const)('com o processo %s, nenhuma ação de etapa grava', async (situacao) => {
+describe('congelamento', () => {
+  test.each(['suspenso', 'cancelado'] as const)('com o processo %s, mover, etiqueta e responsável não gravam', async (situacao) => {
     const modulo = falso(situacao)
-    const frase = `Este processo está ${situacao}; retome-o para registrar o andamento.`
+    const frase = `Este processo está ${situacao}; retome-o para mudar a etapa, a etiqueta ou o responsável.`
     const tentativas = [
-      () => modulo.iniciarEtapa('a5'), () => modulo.concluirEtapa('a5', null), () => modulo.dispensarEtapa('a5', 'n', null),
-      () => modulo.registrarRealizadaAnteriormente('a5', 'n', null), () => modulo.voltarParaEtapa('a4', 'M', null),
-      () => modulo.corrigirDatasDaEtapa('a4', { iniciadaEm: '2026-10-09', resolvidaEm: null }),
-      () => modulo.mudarResponsavelDaEtapa('a4', null),
+      () => modulo.moverProcesso('p1', 'e2'), () => modulo.mudarEtiqueta('p1', 'concluido'), () => modulo.mudarResponsavel('p1', 'u1'),
     ]
     for (const tentar of tentativas) expect((await falhaDe(tentar())).message).toBe(frase)
     expect(modulo.chamadas).toEqual([])
   })
 
-  test('retomado, a etapa volta a andar', async () => {
+  test('retomado, o processo volta a andar', async () => {
     const modulo = falso('suspenso')
     await modulo.retomarProcesso('p1', 'Segue')
-    await modulo.iniciarEtapa('a5')
-    expect(modulo.chamadas).toEqual([{ acao: 'iniciar', id: 'a5' }])
+    await modulo.mudarEtiqueta('p1', 'em_andamento')
+    expect(modulo.chamadas).toEqual([{ acao: 'etiqueta', id: 'p1', etiqueta: 'em_andamento' }])
   })
 })
 

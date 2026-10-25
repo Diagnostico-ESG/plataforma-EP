@@ -170,3 +170,7 @@ Single-context: um `CONTEXT.md` e `docs/adr/` na raiz. See `docs/agents/domain.m
 ### Registro do próximo passo
 
 Decidido em 2026-10-23. Toda sessão que terminar recomendando um próximo passo (comando, modelo e o que falta) grava isso em `.scratch/proximo-passo.md` antes de encerrar, sobrescrevendo o conteúdo anterior, e comita junto com o resto da etapa. O `/situação` lê esse arquivo e, se divergir do git ou dos tickets, valem os arquivos e eu aviso. Isso vale também para sessões de conversa e de `/situação`, não só para etapas do funil.
+
+### Testes de banco e tipos pelo Docker
+
+Decidido em 2026-10-24. O Docker funciona nesta máquina. Durante o desenvolvimento, os testes de banco (pgTAP) rodam no banco local do Docker (`npx supabase start`, depois `npx supabase test db`) e os tipos saem dele (`npx supabase gen types --local`) enquanto o banco remoto de desenvolvimento não tiver as migrações novas. O resultado "FAIL" do `supabase test db` é do formato dos testes (devolvem o resultado como exceção, para o SQL Editor): vale contar as linhas `ok` e `not ok`. O workflow "Testes de banco" do GitHub Actions continua como conferência final, e o `npm run test:db` e o `db:types` continuam apontando para o remoto. Aplicar migração no remoto de desenvolvimento segue pelo workflow "Migrar banco de desenvolvimento"; produção segue só pelos roteiros do `/ship`. Saída de `supabase start` e `status` traz chaves: não repetir.

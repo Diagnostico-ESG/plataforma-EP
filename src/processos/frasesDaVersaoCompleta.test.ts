@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { FRASE_SEM_VERSAO, faltasDaVersao, fraseDaVersaoIncompleta, fraseDoBloqueioDaConclusao } from './frasesDaVersaoCompleta'
+import { faltasDaVersao, fraseDaVersaoIncompleta } from './frasesDaVersaoCompleta'
 
 describe('frasesDaVersaoCompleta', () => {
   it('lista o que falta na ordem .bpm, .png e relatório; o .bpmn não é exigido', () => {
@@ -15,9 +15,4 @@ describe('frasesDaVersaoCompleta', () => {
     expect(fraseDaVersaoIncompleta(8, ['bpm', 'relatorio'])).toBe('A V8 está sem .bpm e relatório.')
   })
 
-  it('sem versão, a frase manda enviar uma; com versão completa, não há bloqueio', () => {
-    expect(fraseDoBloqueioDaConclusao(null)).toBe(FRASE_SEM_VERSAO)
-    expect(fraseDoBloqueioDaConclusao({ numero: 3, autorId: 'u', autorNome: 'Ana', papeis: ['bpm', 'png', 'relatorio'] })).toBeNull()
-    expect(fraseDoBloqueioDaConclusao({ numero: 3, autorId: 'u', autorNome: 'Ana', papeis: ['bpm', 'png'] })).toBe('A V3 está sem relatório.')
-  })
 })

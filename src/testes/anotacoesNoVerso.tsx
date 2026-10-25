@@ -1,12 +1,10 @@
 import { act, fireEvent, within } from '@testing-library/react'
 import { vi } from 'vitest'
-import { etapaDoProcesso, processoLido } from './processoNoVerso'
+import { processoLido } from './processoNoVerso'
 import { versoAberto } from './versoDoCartao'
 import type { ProcessoLido } from '../processos/tipos'
 
-export const ETAPAS_DAS_ANOTACOES = [etapaDoProcesso(1, 'modelagem', 'Modelagem piloto', { status: 'em_andamento', iniciadaEm: '2026-10-01' })]
-
-export const processoDasAnotacoes = (mudancas: Partial<ProcessoLido> = {}): ProcessoLido => processoLido(ETAPAS_DAS_ANOTACOES, mudancas)
+export const processoDasAnotacoes = (mudancas: Partial<ProcessoLido> = {}): ProcessoLido => processoLido(mudancas, 'modelagem')
 
 /** O bloco "Anotações" do verso aberto. */
 export const blocoDasAnotacoes = async () => within(await (await versoAberto()).findByRole('region', { name: 'Anotações' }))

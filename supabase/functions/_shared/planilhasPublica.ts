@@ -2,25 +2,12 @@
 // de processo, de setor nem de pessoa, e sem identificador. A porcentagem se calcula no dashboard. Arquivo puro,
 // testado no Vitest.
 import { FASES_DA_PLANILHA } from './planilhasFases.ts'
+import { dataEHoraDeBrasilia } from './planilhasFuso.ts'
 import type { AbaDeValores, PacoteDasPlanilhas } from './planilhasPacote.ts'
 import { analisarProcessos, type ProcessoAnalisado } from './planilhasProcesso.ts'
 
-const FUSO_DO_ESCRITORIO = 'America/Sao_Paulo'
-
-// O formato sueco é AAAA-MM-DD HH:MM; h23 evita "24:00" na meia-noite.
-const FORMATO_DA_ATUALIZACAO = new Intl.DateTimeFormat('sv-SE', {
-  timeZone: FUSO_DO_ESCRITORIO,
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-  hourCycle: 'h23',
-})
-
-export function dataEHoraDeBrasilia(instanteIso: string): string {
-  return FORMATO_DA_ATUALIZACAO.format(new Date(instanteIso))
-}
+// Os testes da hora de Brasília importam a função daqui desde que ela foi para planilhasFuso.ts.
+export { dataEHoraDeBrasilia }
 
 function concluidosDaFase(processos: ProcessoAnalisado[], posicao: number): number {
   return processos.filter(({ fases }) => fases[posicao].situacao === 'Concluída').length

@@ -7,7 +7,8 @@ import type { Perfil } from './acesso/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import type { EventoDoCadastro } from './cadastros/tipos'
 import { ProcessosFalso } from './processos/ProcessosFalso'
-import type { EtapaDoProcesso, ProcessoLido, SituacaoDoProcesso } from './processos/tipos'
+import type { ProcessoLido, SituacaoDoProcesso } from './processos/tipos'
+import { CATALOGO_DE_TESTE, umProcessoLido } from './testes/processoDaLista'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
 import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
@@ -21,30 +22,12 @@ afterEach(() => {
   window.location.hash = ''
 })
 
-const MODELAGEM = 'Reunião de modelagem'
-const RELATORIO = 'Relatório e modelagem técnica'
-
-function doProcesso(ordem: number, nome: string, mudancas: Partial<EtapaDoProcesso> = {}): EtapaDoProcesso {
-  return {
-    id: `a${ordem}`, codigo: `c${ordem}`, nome, ordem, obrigatoria: true, status: 'pendente', nota: null, iniciadaEm: null,
-    resolvidaEm: null, responsavelId: null, responsavelNome: null, responsavelInativo: false, ...mudancas,
-  }
-}
-
-// A modelagem concluída e o relatório em andamento, como no ticket 06.
+// Em Relatório e modelagem técnica; suspenso e cancelado levam um motivo.
 function processo(situacao: SituacaoDoProcesso = 'em_andamento'): ProcessoLido {
   const parado = situacao === 'suspenso' || situacao === 'cancelado'
-  return {
-    id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
-    macroprocessoNome: 'Macro de Teste', situacao, etapaAtual: { codigo: 'c5', nome: RELATORIO, ordem: 5 },
-    responsavel: null, origem: 'novo', contexto: null, observacoes: null,
-    processoPaiId: null, processoPai: null, subprocessos: [],
-    motivoDaSituacao: parado ? 'Aguardando decisão' : null, dataDaReuniao: null, ultimaVersao: null,
-    etapasDoProcesso: [
-      doProcesso(4, MODELAGEM, { status: 'concluida', iniciadaEm: '2026-10-10', resolvidaEm: '2026-10-11' }),
-      doProcesso(5, RELATORIO, { status: 'em_andamento', iniciadaEm: '2026-10-12' }),
-    ],
-  }
+  return umProcessoLido('Emitir Ofício', {
+    id: 'p1', situacao, responsavel: null, motivoDaSituacao: parado ? 'Aguardando decisão' : null,
+  }, situacao === 'concluido' ? 'concluidos' : 'relatorio_modelagem_tecnica')
 }
 
 type Montagem = { perfil?: Perfil; situacao?: SituacaoDoProcesso; ajustar?: (falso: ProcessosFalso) => void }
@@ -52,10 +35,7 @@ type Montagem = { perfil?: Perfil; situacao?: SituacaoDoProcesso; ajustar?: (fal
 function montar({ perfil = 'integrante_ep', situacao = 'em_andamento', ajustar }: Montagem = {}) {
   const falso = new ProcessosFalso()
   falso.processos = [processo(situacao)]
-  falso.etapasDoCatalogo = [
-    { id: 'e4', codigo: 'c4', nome: MODELAGEM, ordem: 4, ativa: true },
-    { id: 'e5', codigo: 'c5', nome: RELATORIO, ordem: 5, ativa: true },
-  ]
+  falso.etapasDoCatalogo = CATALOGO_DE_TESTE
   ajustar?.(falso)
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
   return falso
@@ -128,26 +108,25 @@ test('cancelar tira o cartão do Quadro e mostra o aviso de cancelado', async ()
   await waitFor(() => expect(screen.queryByRole('link', { name: /Emitir Ofício/ })).toBeNull())
 })
 
-test('retomar limpa o aviso, devolve as ações das etapas e o botão de suspender', async () => {
+test('retomar limpa o aviso, devolve as listas do Agora e o botão de suspender', async () => {
   const falso = montar({ situacao: 'suspenso' })
   await pedir('Retomar', 'Retomar o processo Emitir Ofício?', 'Decisão tomada', 'Retomar processo')
   const aberto = await painel()
   await waitFor(() => expect(aberto.queryByText(/^Suspenso:/)).toBeNull())
   expect(await botoesDeSituacao()).toEqual(['Suspender', 'Cancelar processo'])
-  expect(aberto.getAllByRole('button', { name: /^Concluir / }).length).toBeGreaterThan(0)
+  expect(aberto.getByRole('combobox', { name: 'Etapa' })).toBeTruthy()
   expect(falso.processos[0]).toMatchObject({ situacao: 'em_andamento', motivoDaSituacao: null })
 })
 
 test.each([
   ['suspenso', 'Suspenso: Aguardando decisão'],
   ['cancelado', 'Cancelado: Aguardando decisão'],
-] as const)('com o processo %s, as ações das etapas somem e o aviso aparece', async (situacao, aviso) => {
+] as const)('com o processo %s, as listas do Agora somem e o aviso aparece', async (situacao, aviso) => {
   montar({ situacao })
   const aberto = await painel()
   expect(await aberto.findByText(aviso)).toBeTruthy()
-  for (const nome of ['Concluir', 'Iniciar', 'Dispensar', 'Voltar a esta etapa', 'Corrigir datas']) {
-    expect(aberto.queryByRole('button', { name: new RegExp(`^${nome}`) })).toBeNull()
-  }
+  expect(aberto.queryByRole('combobox')).toBeNull()
+  expect(aberto.queryByRole('button', { name: 'Assumir' })).toBeNull()
 })
 
 test('a Consulta também vê o aviso do processo parado', async () => {

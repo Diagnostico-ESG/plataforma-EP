@@ -12,12 +12,15 @@ function estadoDaRevisao(processo: ProcessoLido, revisao: RevisaoInterna): Recor
   }
 }
 
-/** O evento "editar" que o gatilho do banco grava (migração editar_registros): entidade "revisao_interna", antes e depois. */
-export function eventoDaRevisaoEditada(
-  processo: ProcessoLido, antes: RevisaoInterna, depois: RevisaoInterna, autor: string,
+/**
+ * O evento que o gatilho do banco grava (migrações revisao_interna, editar_registros e registrar_revisao_e_aprovacao):
+ * entidade "revisao_interna", referência no processo. "Registrar" tem o antes vazio; "editar" leva o estado anterior.
+ */
+export function eventoDaRevisao(
+  processo: ProcessoLido, acao: 'registrar' | 'editar', depois: RevisaoInterna, autor: string, antes?: RevisaoInterna,
 ): EventoDoCadastro {
   return {
-    id: Date.now(), ocorridoEm: `${depois.revisadaEm}T12:00:00Z`, autor, acao: 'editar', entidade: 'revisao_interna',
-    entidadeRef: processo.id, antes: estadoDaRevisao(processo, antes), depois: estadoDaRevisao(processo, depois),
+    id: Date.now(), ocorridoEm: `${depois.revisadaEm}T12:00:00Z`, autor, acao, entidade: 'revisao_interna',
+    entidadeRef: processo.id, antes: antes ? estadoDaRevisao(processo, antes) : null, depois: estadoDaRevisao(processo, depois),
   }
 }

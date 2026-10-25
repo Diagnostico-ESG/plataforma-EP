@@ -21,16 +21,16 @@ afterEach(() => {
 function processo(id: string, nome: string, mudancas: Partial<ProcessoLido> = {}): ProcessoLido {
   return {
     id, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1', macroprocessoNome: 'Macro Um',
-    situacao: 'em_andamento', etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 },
+    situacao: 'em_andamento', etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, id: 'e', posicao: 1, total: 1 },
     processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null, origem: 'novo',
-    contexto: null, observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, ultimaVersao: null, etapasDoProcesso: [], ...mudancas,
+    contexto: null, observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, ultimaVersao: null, etapasDoVerso: [], ...mudancas,
   }
 }
 
 const PROCESSOS: ProcessoLido[] = [
   processo('p1', 'Pagar Diária'),
   processo('p2', 'Conferir Recibo', { tipo: 'subprocesso', processoPaiId: 'p1', situacao: 'concluido', etapaAtual: null }),
-  processo('p3', 'Arquivar Pasta', { situacao: 'cancelado', etapaAtual: { codigo: 'relatorio', nome: 'Relatório técnico', ordem: 5 } }),
+  processo('p3', 'Arquivar Pasta', { situacao: 'cancelado', etapaAtual: { codigo: 'relatorio', nome: 'Relatório técnico', ordem: 5, id: 'e', posicao: 1, total: 1 } }),
   processo('p4', 'Emitir Ofício', { setorId: 's2', setorSigla: 'TSB' }),
 ]
 

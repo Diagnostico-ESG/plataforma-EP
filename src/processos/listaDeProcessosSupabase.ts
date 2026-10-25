@@ -1,20 +1,21 @@
 import type { ClienteSupabase } from '../lib/supabase'
-import { processoDaLinha } from './processoDaLinha'
-import type { EtapaDoCatalogo, ListaDeProcessos, ModuloDeProcessos, ProcessoDaLista } from './tipos'
+import { type LinhaDoProcesso, processoDaLinha } from './processoDaLinha'
+import type { EtapaDoCatalogo, ListaDeProcessos, ModuloDeProcessos } from './tipos'
 
 export function criarListaDeProcessosSupabase(cliente: ClienteSupabase): Pick<ModuloDeProcessos, 'listarProcessos'> {
   return { listarProcessos: () => listarProcessos(cliente) }
 }
 
 async function listarProcessos(cliente: ClienteSupabase): Promise<ListaDeProcessos> {
-  const [processos, etapas] = await Promise.all([lerProcessos(cliente), lerEtapasDoCatalogo(cliente)])
-  return { etapas, processos }
+  const [linhas, etapas] = await Promise.all([lerLinhas(cliente), lerEtapasDoCatalogo(cliente)])
+  const total = etapas.filter((etapa) => etapa.ativa).length
+  return { etapas, processos: linhas.map((linha) => processoDaLinha(linha, total)) }
 }
 
-async function lerProcessos(cliente: ClienteSupabase): Promise<ProcessoDaLista[]> {
+async function lerLinhas(cliente: ClienteSupabase): Promise<LinhaDoProcesso[]> {
   const { data, error } = await cliente.from('processos_com_andamento').select('*').order('nome')
   if (error) throw new Error(`Falha ao ler os processos: ${error.message}`)
-  return data.map(processoDaLinha)
+  return data
 }
 
 async function lerEtapasDoCatalogo(cliente: ClienteSupabase): Promise<EtapaDoCatalogo[]> {

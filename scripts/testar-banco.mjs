@@ -8,10 +8,12 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import pg from 'pg'
+import { comEnsaio, migracoesPendentes } from './migracoesPendentes.mjs'
 import { linhasDoRelatorio } from './relatorio-tap.mjs'
 import { conferirProjeto } from './travaDoProjeto.mjs'
 
 const PASTA = 'supabase/tests'
+const PASTA_DAS_MIGRACOES = 'supabase/migrations'
 const ARQUIVO_ENV = '.env.banco.local'
 
 function lerConfiguracao() {
@@ -40,14 +42,32 @@ function linhasDoTap(resultados) {
 
 const falhou = (linha) => /^not ok\b/.test(linha) || /^# Looks like/.test(linha)
 
-async function rodarArquivo(url, caminho) {
+function novoCliente(url) {
   const local = /@(localhost|127\.0\.0\.1)[:/]/.test(url) || url.includes('host=/')
-  const cliente = new pg.Client({ connectionString: url, ssl: local ? false : { rejectUnauthorized: false } })
+  return new pg.Client({ connectionString: url, ssl: local ? false : { rejectUnauthorized: false } })
+}
+
+// Migrações da branch ainda não aplicadas no banco: vão dentro da transação de cada teste (ver migracoesPendentes.mjs).
+async function lerPendentes(url) {
+  const cliente = novoCliente(url)
+  await cliente.connect()
+  try {
+    const { rows } = await cliente.query('select max(version) as ultima from supabase_migrations.schema_migrations')
+    const nomes = migracoesPendentes(readdirSync(PASTA_DAS_MIGRACOES), rows[0].ultima)
+    if (nomes.length) console.log(`Ensaio das migrações não aplicadas: ${nomes.join(', ')}\n`)
+    return nomes.map((nome) => readFileSync(join(PASTA_DAS_MIGRACOES, nome), 'utf8'))
+  } finally {
+    await cliente.end()
+  }
+}
+
+async function rodarArquivo(url, caminho, pendentes) {
+  const cliente = novoCliente(url)
   await cliente.connect()
   try {
     // O pgTAP fica no schema "extensions" do Supabase.
     await cliente.query("select set_config('search_path', current_setting('search_path') || ', extensions', false)")
-    const linhas = linhasDoTap(await cliente.query(readFileSync(caminho, 'utf8')))
+    const linhas = linhasDoTap(await cliente.query(comEnsaio(readFileSync(caminho, 'utf8'), pendentes)))
     const temPlano = linhas.some((l) => /^1\.\.\d+/.test(l))
     const falhas = linhas.filter(falhou)
     if (!temPlano) falhas.push('o arquivo não devolveu um plano de testes (falta "select plan(n)" ou "select * from finish()"?)')
@@ -65,9 +85,10 @@ async function principal() {
   const { url, arquivos } = lerConfiguracao()
   const testes = listarTestes(arquivos)
   if (testes.length === 0) throw new Error(`Nenhum teste encontrado em ${PASTA}.`)
+  const pendentes = await lerPendentes(url)
   let comFalha = 0
   for (const caminho of testes) {
-    const { linhas, falhas } = await rodarArquivo(url, caminho)
+    const { linhas, falhas } = await rodarArquivo(url, caminho, pendentes)
     const ok = linhas.filter((l) => /^ok\b/.test(l)).length
     const reprovados = linhas.filter((l) => /^not ok\b/.test(l)).length
     console.log(`${falhas.length ? 'FALHOU' : 'passou'}  ${caminho}  (${ok} ok, ${reprovados} reprovado(s))`)

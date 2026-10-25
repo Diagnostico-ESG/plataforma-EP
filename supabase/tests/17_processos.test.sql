@@ -1,12 +1,12 @@
--- Processos: quem pode o quê, regras, andamentos do processo, view do Quadro, eventos e recusas de exclusão
--- (processos-etapas, ticket 04).
+-- Processos: quem pode o quê, regras, passagens do processo, view do Quadro, eventos e recusas de exclusão
+-- (processos-etapas, ticket 04; passagens no lugar dos andamentos no ticket 24).
 begin;
 create extension if not exists pgtap with schema extensions;
 -- As linhas do pgTAP vão para _tap e saem na exceção do fim (ver scripts/relatorio-tap.mjs).
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
--- O processo que a exclusão vai apagar, guardado antes para conferir os andamentos depois.
+-- O processo que a exclusão vai apagar, guardado antes para conferir as passagens depois.
 create temp table _alvo (id uuid);
 grant all on _alvo to authenticated;
 insert into _tap (linha) select plan(77);
@@ -167,22 +167,20 @@ insert into _tap (linha) select throws_ok(
       (select id from public.processos limit 1))$sql$,
   '23514', null, '"a classificar" com pai é recusado (o pai só vale no subprocesso)');
 
--- Andamentos do processo: nascem pendentes; ninguém cria nem apaga direto.
+-- Passagens do processo (Andamento livre, ticket 24): nasce uma, aberta em Não iniciados; ninguém cria nem apaga direto.
 insert into _tap (linha) select is(
-  (select count(*)::int from public.andamentos a join public.etapas e on e.id = a.etapa_id
-    where a.processo_id = (select id from public.processos
+  (select count(*)::int from public.passagens pa join public.etapas e on e.id = pa.etapa_id
+    where pa.processo_id = (select id from public.processos
       where setor_id = '5e000000-0000-0000-0000-000000000004' and nome = 'Emitir Oficio')
-      and a.status = 'pendente'),
-  6, 'processo novo nasce com 6 andamentos pendentes');
+      and pa.saiu_em is null and e.codigo = 'nao_iniciados'),
+  1, 'processo novo nasce com uma passagem aberta em Não iniciados');
 insert into _tap (linha) select throws_ok(
-  $sql$insert into public.andamentos (etapa_id, processo_id)
+  $sql$insert into public.passagens (etapa_id, processo_id)
     values ((select id from public.etapas where codigo = 'modelagem'),
       (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004'))$sql$,
-  '42501', null, 'andamento de processo não se cria direto');
--- Desde o ticket 10 o logado tem o privilégio de apagar (o catálogo usa), e a RLS filtra sem erro: nada é apagado.
-with apagados as (delete from public.andamentos where processo_id is not null returning 1)
-insert into _tap (linha) select is((select count(*)::int from apagados), 0,
-  'andamento de processo não se apaga direto');
+  'P0001', 'passagem_so_pela_funcao', 'passagem não se cria direto');
+insert into _tap (linha) select throws_ok($sql$delete from public.passagens$sql$, '42501', null,
+  'passagem não se apaga direto');
 
 -- Eventos do cadastro: o criar traz os campos legíveis (com a data da reunião, vazia: reunioes, ticket 05), o vínculo
 -- do setor incluído também.
@@ -239,37 +237,26 @@ reset role;
 insert into _tap (linha) select is(
   (select etapa_atual_codigo from public.processos_com_andamento
     where setor_id = '5e000000-0000-0000-0000-000000000004'),
-  'modelagem', 'a etapa atual é a primeira pendente');
-update public.andamentos set responsavel_id = '00000000-0000-0000-0000-0000000000a2'
-  where processo_id = (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004')
-    and etapa_id = (select id from public.etapas where codigo = 'modelagem');
+  'nao_iniciados', 'a etapa atual é a da passagem aberta (Não iniciados, no cadastro)');
+update public.processos set responsavel_id = '00000000-0000-0000-0000-0000000000a2'
+  where setor_id = '5e000000-0000-0000-0000-000000000004';
 insert into _tap (linha) select is(
   (select responsavel_id from public.processos_com_andamento where setor_id = '5e000000-0000-0000-0000-000000000004'),
-  '00000000-0000-0000-0000-0000000000a2'::uuid, 'a view traz o responsável da etapa atual');
+  '00000000-0000-0000-0000-0000000000a2'::uuid, 'a view traz o responsável do processo');
 insert into _tap (linha) select is(
   (select situacao from public.processos_com_andamento where setor_id = '5e000000-0000-0000-0000-000000000004'),
-  'em_andamento', 'com etapas obrigatórias pendentes o processo está em andamento');
-update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
-  where processo_id = (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004')
-    and etapa_id = (select id from public.etapas where codigo = 'modelagem');
-update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
-  where processo_id = (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004')
-    and etapa_id = (select id from public.etapas where codigo = 'relatorio_modelagem_tecnica');
-update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
-  where processo_id = (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004')
-    and etapa_id = (select id from public.etapas where codigo = 'revisao_interna');
-update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
-  where processo_id = (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004')
-    and etapa_id = (select id from public.etapas where codigo = 'revisao_setor');
-update public.andamentos set status = 'realizada_anteriormente', nota = 'Feita antes'
-  where processo_id = (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004')
-    and etapa_id = (select id from public.etapas where codigo = 'aprovacao_setor');
+  'em_andamento', 'fora de Concluídos o processo está em andamento');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
+set local role authenticated;
+select public.mover_processo((select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004'),
+  (select id from public.etapas where codigo = 'concluidos'), null, null, 'Não será publicado');
+reset role;
 insert into _tap (linha) select is(
   (select situacao from public.processos_com_andamento where setor_id = '5e000000-0000-0000-0000-000000000004'),
-  'em_andamento', 'com as obrigatórias resolvidas e a Publicação pendente sem escolha, o processo segue em andamento (ADR 0020)');
+  'concluido', 'em Concluídos o processo está concluído');
 insert into _tap (linha) select is(
   (select etapa_atual_codigo from public.processos_com_andamento where setor_id = '5e000000-0000-0000-0000-000000000004'),
-  'publicacao', 'a etapa atual passa a ser a Publicação');
+  'concluidos', 'a etapa atual passa a ser Concluídos');
 -- A suspensão direta só passa com a chave que as funções do ticket 07 ligam; aqui o dono do banco a liga à mão.
 select set_config('ep.mudando_situacao', 'on', true);
 update public.processos set situacao = 'suspenso', motivo_da_situacao = 'Parado para teste'
@@ -284,24 +271,24 @@ update public.processos set situacao = 'em_andamento', motivo_da_situacao = null
   where setor_id = '5e000000-0000-0000-0000-000000000004';
 select set_config('ep.mudando_situacao', 'off', true);
 
--- Excluir o processo, como Integrante: o evento guarda os andamentos e eles vão junto.
+-- Excluir o processo, como Integrante: o evento guarda a etapa atual e a etiqueta, e as passagens vão junto.
 insert into _alvo select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000005';
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 set local role authenticated;
 delete from public.processos where setor_id = '5e000000-0000-0000-0000-000000000005';
 insert into _tap (linha) select is(
-  (select jsonb_array_length(detalhes -> 'antes' -> 'andamentos') from public.eventos
+  (select detalhes -> 'antes' ->> 'etapa_codigo' from public.eventos
     where entidade = 'processo' and acao = 'excluir'
       and detalhes -> 'antes' ->> 'setor_sigla' = 'TRX'),
-  6, 'excluir o processo grava no antes os 6 andamentos');
+  'nao_iniciados', 'excluir o processo grava no antes a etapa atual');
 insert into _tap (linha) select is(
-  (select detalhes -> 'antes' -> 'andamentos' -> 0 ->> 'etapa_codigo' from public.eventos
+  (select detalhes -> 'antes' ->> 'etiqueta' from public.eventos
     where entidade = 'processo' and acao = 'excluir'
       and detalhes -> 'antes' ->> 'setor_sigla' = 'TRX'),
-  'modelagem', 'os andamentos do antes vêm na ordem do catálogo');
+  'a_fazer', 'e a etiqueta');
 insert into _tap (linha) select is(
-  (select count(*)::int from public.andamentos where processo_id = (select id from _alvo)),
-  0, 'excluir o processo apaga os andamentos dele');
+  (select count(*)::int from public.passagens where processo_id = (select id from _alvo)),
+  0, 'excluir o processo apaga as passagens dele');
 reset role;
 
 -- Quem lê os eventos dos processos: todo perfil ativo.
@@ -323,17 +310,19 @@ insert into _tap (linha) select is(pg_temp.eventos_dos_processos('00000000-0000-
 insert into _tap (linha) select is(pg_temp.eventos_dos_processos('00000000-0000-0000-0000-0000000000a4'), 0,
   'Inativo não lê os eventos dos processos');
 
--- Restrições do dono: todo andamento é de um processo, e a etapa não se repete no processo.
+-- Restrições do dono: toda passagem é de um processo, e só uma fica aberta por processo.
 insert into _tap (linha) select throws_ok(
-  $sql$update public.andamentos set processo_id = null
+  $sql$update public.passagens set processo_id = null
     where processo_id = (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004')
-      and etapa_id = (select id from public.etapas where codigo = 'modelagem')$sql$,
-  '23502', null, 'andamento sem processo é recusado');
+      and saiu_em is null$sql$,
+  '23502', null, 'passagem sem processo é recusada');
+select set_config('ep.movendo_processo', 'mover', true);
 insert into _tap (linha) select throws_ok(
-  $sql$insert into public.andamentos (etapa_id, processo_id)
+  $sql$insert into public.passagens (etapa_id, processo_id)
     values ((select id from public.etapas where codigo = 'modelagem'),
       (select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004'))$sql$,
-  '23505', null, 'a mesma etapa duas vezes no processo é recusada');
+  '23505', null, 'uma segunda passagem aberta no processo é recusada');
+select set_config('ep.movendo_processo', '', true);
 
 insert into _tap (linha) select * from finish();
 do $$ begin

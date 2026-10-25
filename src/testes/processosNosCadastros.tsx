@@ -5,6 +5,7 @@ import type { Perfil } from '../acesso/tipos'
 import { CadastrosFalso } from '../cadastros/CadastrosFalso'
 import { ProcessosFalso } from '../processos/ProcessosFalso'
 import type { ProcessoLido } from '../processos/tipos'
+import { CATALOGO_DE_TESTE, umProcessoLido } from './processoDaLista'
 import { RevisoesFalso } from '../revisoes/RevisoesFalso'
 import { PlanilhasFalso } from '../planilhas/PlanilhasFalso'
 import { VersoesFalso } from '../versoes/VersoesFalso'
@@ -16,18 +17,13 @@ const SETORES_DE_TESTE = [
 ]
 
 function processo(id: string, nome: string, mudancas: Partial<ProcessoLido> = {}): ProcessoLido {
-  return {
-    id, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1', macroprocessoNome: 'Macro Um',
-    situacao: 'em_andamento', etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4 },
-    processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null, origem: 'novo',
-    contexto: null, observacoes: null, motivoDaSituacao: null, dataDaReuniao: null, ultimaVersao: null, etapasDoProcesso: [], ...mudancas,
-  }
+  return umProcessoLido(nome, { id, macroprocessoNome: 'Macro Um', responsavel: null, ...mudancas }, 'modelagem')
 }
 
 /** Processos em dois setores (s1 e s2), um deles cancelado. */
 export const PROCESSOS_DOS_CADASTROS: ProcessoLido[] = [
   processo('p1', 'Emitir Ofício'),
-  processo('p2', 'Arquivar Pasta', { situacao: 'cancelado', etapaAtual: null }),
+  processo('p2', 'Arquivar Pasta', { situacao: 'cancelado' }),
   processo('p3', 'Pagar Diária', { setorId: 's2', setorSigla: 'TSB' }),
   processo('p4', 'Conferir Recibo'),
 ]
@@ -61,6 +57,7 @@ export function montarNosCadastros(
   ajustarCadastros?.(cadastros)
   const processos = new ProcessosFalso()
   processos.processos = PROCESSOS_DOS_CADASTROS
+  processos.etapasDoCatalogo = CATALOGO_DE_TESTE
   ajustarProcessos?.(processos)
   const versoes = falsoDeVersoes(processos)
   ajustarVersoes?.(versoes)

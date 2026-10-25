@@ -1,140 +1,114 @@
 import { describe, expect, it } from 'vitest'
-import { situacaoDasFases } from './planilhasFases.ts'
+import type { FaseDoProcesso } from './planilhasFases.ts'
 import {
+  analisarProcessos,
   dataDaModelagemPiloto,
   dataDaPublicacao,
   rotuloDaVersao,
   rotuloDoProcesso,
   rotuloDoTipo,
 } from './planilhasProcesso.ts'
-import { andamentosDe, etapasDoCatalogo, processoDe, type Marca } from './planilhasExemplos.ts'
-import type { ProcessoDoPacote, StatusDaEtapa } from './planilhasPacote.ts'
-
-type Marcas = Record<string, StatusDaEtapa | Marca>
+import { etapasDoCatalogo, pacoteDe, processoDe, processoNaTrilha, uuid, type PassoDaTrilha } from './planilhasExemplos.ts'
+import type { ProcessoDoPacote } from './planilhasPacote.ts'
 
 const etapas = etapasDoCatalogo()
+const passo = (etapa: string, dia: string): PassoDaTrilha => ({ etapa, entrou: `${dia}T12:00:00Z` })
 
-function rotulo(marcas: Marcas, campos: Partial<ProcessoDoPacote> = {}): string {
-  const processo = processoDe(1, campos)
-  const fases = situacaoDasFases(etapas, andamentosDe(processo, marcas, etapas), processo.vai_para_publicacao)
-  return rotuloDoProcesso(processo, fases)
-}
-
-const ATE_A_VI: Marcas = {
-  modelagem: 'concluida',
-  relatorio_modelagem_tecnica: 'concluida',
-  revisao_interna: 'concluida',
-  revisao_setor: 'concluida',
-  aprovacao_setor: 'concluida',
+function rotulo(codigoDaEtapaAtual: string, campos: Partial<ProcessoDoPacote> = {}): string {
+  return rotuloDoProcesso(processoNaTrilha(1, [passo(codigoDaEtapaAtual, '2026-03-01')], campos).processo, etapas)
 }
 
 describe('rotuloDoProcesso', () => {
-  it('"Publicado" quando a fase VII está concluída', () => {
-    expect(rotulo({ ...ATE_A_VI, publicacao: 'concluida' }, { concluido: true })).toBe('Publicado')
+  it('"Publicado" em Concluídos com a data da publicação', () => {
+    expect(rotulo('concluidos', { publicado_em: '2026-07-10' })).toBe('Publicado')
   })
 
-  it('"Publicado" também com a Publicação realizada anteriormente', () => {
-    expect(rotulo({ ...ATE_A_VI, publicacao: 'realizada_anteriormente' }, { concluido: true })).toBe('Publicado')
+  it('"Concluído" em Concluídos sem a data da publicação', () => {
+    expect(rotulo('concluidos')).toBe('Concluído')
   })
 
-  it('"Publicado" com a Publicação registrada depois da escolha "não" (que passa a "sim")', () => {
-    const marcas = { ...ATE_A_VI, publicacao: { status: 'concluida', resolvida_em: '2026-08-01' } } as const
-    expect(rotulo(marcas, { concluido: true, vai_para_publicacao: true })).toBe('Publicado')
+  it('"Não iniciado" em Não iniciados', () => {
+    expect(rotulo('nao_iniciados')).toBe('Não iniciado')
   })
 
-  it('"Concluído" quando o processo está concluído com a escolha "não" e a Publicação pendente', () => {
-    expect(rotulo({ ...ATE_A_VI, publicacao: 'pendente' }, { concluido: true, vai_para_publicacao: false })).toBe('Concluído')
+  it.each([
+    ['modelagem', 'IV'],
+    ['relatorio_modelagem_tecnica', 'V'],
+    ['revisao_setor', 'VI'],
+    ['publicacao', 'VII'],
+  ])('"Em andamento · fase" numa etapa de trabalho: %s é a fase %s', (etapa, fase) => {
+    expect(rotulo(etapa)).toBe(`Em andamento · ${fase}`)
   })
 
-  it('"Concluído" quando o processo está concluído e o catálogo não tem etapa na fase VII', () => {
-    const semFaseVII = etapas.filter((e) => e.fase !== 'VII')
-    const processo = processoDe(1, { concluido: true })
-    const fases = situacaoDasFases(semFaseVII, andamentosDe(processo, ATE_A_VI, semFaseVII))
-    expect(rotuloDoProcesso(processo, fases)).toBe('Concluído')
+  it('"Em andamento · fase" também com a etiqueta Concluído ou A fazer (a fase é a da etapa atual)', () => {
+    const concluido = { ...processoNaTrilha(1, [passo('revisao_interna', '2026-03-01')]).processo, etiqueta: 'concluido' as const }
+    expect(rotuloDoProcesso(concluido, etapas)).toBe('Em andamento · VI')
   })
 
-  it('"Em andamento · fase" quando a fase atual tem etapa em andamento', () => {
-    expect(rotulo({ modelagem: 'concluida', relatorio_modelagem_tecnica: 'em_andamento' })).toBe('Em andamento · V')
-  })
-
-  it('"Em andamento · IV" com a Modelagem piloto em andamento', () => {
-    expect(rotulo({ modelagem: 'em_andamento' })).toBe('Em andamento · IV')
-  })
-
-  it('"Próxima · fase" quando a fase anterior terminou e a atual não começou', () => {
-    expect(rotulo({ modelagem: 'concluida', relatorio_modelagem_tecnica: 'concluida' })).toBe('Próxima · VI')
-  })
-
-  it('"Próxima · IV" para o processo novo, sem nada iniciado', () => {
-    expect(rotulo({})).toBe('Próxima · IV')
-  })
-
-  it('"Suspenso · fase" com a fase atual, antes de qualquer outro rótulo', () => {
-    expect(rotulo({ modelagem: 'em_andamento' }, { situacao_guardada: 'suspenso' })).toBe('Suspenso · IV')
-    expect(rotulo({ modelagem: 'concluida' }, { situacao_guardada: 'suspenso' })).toBe('Suspenso · V')
-  })
-
-  it('"Suspenso" sem fase quando o processo já terminou todas as fases', () => {
-    const marcas = { ...ATE_A_VI, publicacao: 'concluida' } as const
-    expect(rotulo(marcas, { situacao_guardada: 'suspenso' })).toBe('Suspenso')
-  })
-
-  it('sem fase atual e sem estar concluído, o rótulo é "Em andamento", sem fase', () => {
-    const semEtapas = [] as typeof etapas
-    const processo = processoDe(1)
-    expect(rotuloDoProcesso(processo, situacaoDasFases(semEtapas, []))).toBe('Em andamento')
+  it('com a etapa atual fora do catálogo, o rótulo é "Em andamento", sem fase', () => {
+    expect(rotulo('modelagem', { etapa_atual_id: uuid(999) })).toBe('Em andamento')
   })
 })
 
+// As sete fases, com a conclusão da IV na posição certa (a quarta).
+function completas(concluidaEmDaIV: string | null): FaseDoProcesso[] {
+  const sete: FaseDoProcesso[] = (['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'] as const).map((fase) => ({
+    fase,
+    situacao: 'Não iniciada',
+    concluidaEm: null,
+  }))
+  sete[3] = { fase: 'IV', situacao: 'Concluída', concluidaEm: concluidaEmDaIV }
+  return sete
+}
+
 describe('dataDaModelagemPiloto', () => {
-  const processo = processoDe(1)
-
-  it('é a data da reunião', () => {
-    const andamentos = andamentosDe(processo, { modelagem: { status: 'concluida', resolvida_em: '2026-04-02' } })
-    expect(dataDaModelagemPiloto({ ...processo, data_da_reuniao: '2026-03-10' }, etapas, andamentos)).toBe('2026-03-10')
+  it('é a data da reunião, mesmo com a fase IV concluída em outro dia', () => {
+    expect(dataDaModelagemPiloto(processoDe(1, { data_da_reuniao: '2026-02-20' }), completas('2026-03-01'))).toBe('2026-02-20')
   })
 
-  it('sem reunião, é a conclusão da etapa Modelagem piloto', () => {
-    const andamentos = andamentosDe(processo, { modelagem: { status: 'concluida', resolvida_em: '2026-04-02' } })
-    expect(dataDaModelagemPiloto(processo, etapas, andamentos)).toBe('2026-04-02')
+  it('sem reunião, é a data de conclusão da fase IV', () => {
+    expect(dataDaModelagemPiloto(processoDe(1), completas('2026-03-01'))).toBe('2026-03-01')
   })
 
-  it('a etapa realizada anteriormente também dá a data', () => {
-    const andamentos = andamentosDe(processo, { modelagem: { status: 'realizada_anteriormente', resolvida_em: '2026-01-15' } })
-    expect(dataDaModelagemPiloto(processo, etapas, andamentos)).toBe('2026-01-15')
-  })
-
-  it('a etapa dispensada não dá data', () => {
-    const andamentos = andamentosDe(processo, { modelagem: { status: 'dispensada', resolvida_em: '2026-04-02' } })
-    expect(dataDaModelagemPiloto(processo, etapas, andamentos)).toBe('')
-  })
-
-  it('sem reunião e sem conclusão, fica vazia', () => {
-    expect(dataDaModelagemPiloto(processo, etapas, andamentosDe(processo, { modelagem: 'em_andamento' }))).toBe('')
+  it('sem reunião e sem conclusão da fase IV, fica vazia', () => {
+    expect(dataDaModelagemPiloto(processoDe(1), completas(null))).toBe('')
   })
 })
 
 describe('dataDaPublicacao', () => {
-  const processo = processoDe(1)
-
-  it('é a conclusão da etapa Publicação', () => {
-    const andamentos = andamentosDe(processo, { publicacao: { status: 'concluida', resolvida_em: '2026-09-01' } })
-    expect(dataDaPublicacao(etapas, andamentos)).toBe('2026-09-01')
+  it('é a data da publicação do processo', () => {
+    expect(dataDaPublicacao(processoDe(1, { publicado_em: '2026-07-10' }))).toBe('2026-07-10')
   })
 
-  it('Publicação dispensada não dá data', () => {
-    const andamentos = andamentosDe(processo, { publicacao: { status: 'dispensada', resolvida_em: '2026-09-01' } })
-    expect(dataDaPublicacao(etapas, andamentos)).toBe('')
+  it('sem publicação, fica vazia', () => {
+    expect(dataDaPublicacao(processoDe(1))).toBe('')
+  })
+})
+
+describe('analisarProcessos: quem entra nas planilhas', () => {
+  const novo = (n: number, campos: Partial<ProcessoDoPacote> = {}) =>
+    processoNaTrilha(n, [passo('modelagem', '2026-03-01')], campos)
+
+  it('deixa de fora os suspensos e os cancelados, e mantém a ordem do pacote', () => {
+    const pacote = pacoteDe([
+      novo(1),
+      novo(2, { situacao_guardada: 'suspenso' }),
+      novo(3, { situacao_guardada: 'cancelado' }),
+      novo(4),
+    ])
+    expect(analisarProcessos(pacote).map(({ processo }) => processo.id)).toEqual([uuid(1), uuid(4)])
   })
 
-  it('só a etapa Publicação conta, não outra concluída', () => {
-    const andamentos = andamentosDe(processo, { aprovacao_setor: { status: 'concluida', resolvida_em: '2026-08-01' } })
-    expect(dataDaPublicacao(etapas, andamentos)).toBe('')
+  it('mantém o concluído e o arquivado (que chega em Concluídos)', () => {
+    const concluido = processoNaTrilha(5, [passo('modelagem', '2026-03-01'), passo('concluidos', '2026-04-01')])
+    expect(analisarProcessos(pacoteDe([concluido]))).toHaveLength(1)
   })
 
-  it('catálogo sem a etapa Publicação deixa a data vazia', () => {
-    const semPublicacao = etapas.filter((e) => e.codigo !== 'publicacao')
-    expect(dataDaPublicacao(semPublicacao, andamentosDe(processo, {}, semPublicacao))).toBe('')
+  it('calcula as sete fases de cada processo pelas passagens dele', () => {
+    const analisados = analisarProcessos(pacoteDe([novo(1), processoNaTrilha(2, [passo('nao_iniciados', '2026-03-01')])]))
+    expect(analisados[0].fases[3].situacao).toBe('Em andamento')
+    expect(analisados[1].fases[3].situacao).toBe('Não iniciada')
+    expect(analisados[0].fases).toHaveLength(7)
   })
 })
 

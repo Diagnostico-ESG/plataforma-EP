@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { EstadoDoCarregamento } from '../../hooks/useCarregamento'
-import { formatarData } from '../../processos/caminhoDeEtapas'
+import { formatarData } from '../../lib/datas'
 import type { Aprovacao, ModuloDeRevisoes } from '../../revisoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { JanelaDaAprovacao } from './JanelaDaAprovacao'

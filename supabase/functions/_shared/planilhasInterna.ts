@@ -1,4 +1,4 @@
-// As duas abas da planilha interna (exportacao-e-manutencao, ticket 03; spec, histórias 9 a 23): Processos, uma linha por
+// As duas abas da planilha interna (exportacao-e-manutencao, tickets 03 e 06; spec, histórias 9 a 23 e 56 a 63): Processos, uma linha por
 // processo, e Fases, uma linha por processo e fase I a VII. Arquivo puro, testado no Vitest. Nenhum nome de pessoa
 // entra: só os campos do pacote que a planilha precisa são lidos, um a um. Texto vai como texto (não como fórmula).
 import type { AbaDeValores, PacoteDasPlanilhas } from './planilhasPacote.ts'
@@ -19,16 +19,16 @@ const CABECALHO_DOS_PROCESSOS = [
 const CABECALHO_DAS_FASES = ['Identificador', 'Área', 'Processo', 'Fase', 'Situação', 'Data de conclusão']
 
 function linhaDoProcesso(analisado: ProcessoAnalisado, pacote: PacoteDasPlanilhas): (string | number)[] {
-  const { processo, andamentos, fases } = analisado
+  const { processo, fases } = analisado
   return [
     processo.id,
     processo.setor_sigla,
     processo.macroprocesso_nome,
     processo.nome,
     rotuloDoTipo(processo.tipo),
-    rotuloDoProcesso(processo, fases),
-    dataDaModelagemPiloto(processo, pacote.etapas, andamentos),
-    dataDaPublicacao(pacote.etapas, andamentos),
+    rotuloDoProcesso(processo, pacote.etapas),
+    dataDaModelagemPiloto(processo, fases),
+    dataDaPublicacao(processo),
     rotuloDaVersao(processo.ultima_versao),
     processo.observacoes ?? '',
   ]

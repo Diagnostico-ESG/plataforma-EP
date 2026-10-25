@@ -56,10 +56,10 @@ export function CatalogoEditavel({ catalogo, etapas, aoMudar }: CatalogoEditavel
   )
 }
 
-function dadosDaEdicao({ nome, obrigatoria, fase }: DadosDoFormularioDaEtapa): DadosDaEtapa {
-  return { nome, obrigatoria, fase }
+function dadosDaEdicao({ nome, fase }: DadosDoFormularioDaEtapa): DadosDaEtapa {
+  return { nome, fase }
 }
 
-function etapaNova({ nome, codigo, obrigatoria, fase, antesDe }: DadosDoFormularioDaEtapa): EtapaNova {
-  return { nome, codigo, obrigatoria, fase, antesDe }
+function etapaNova({ nome, codigo, fase, antesDe }: DadosDoFormularioDaEtapa): EtapaNova {
+  return { nome, codigo, fase, antesDe }
 }

@@ -58,8 +58,12 @@ Spec: `.scratch/processos-etapas/spec.md`, seção "Andamento livre (mudança de
 
 ## Critérios de aceite
 
-- [ ] Testes pgTAP escritos antes da migração e vistos falhar: uma célula por linha da tabela "quem pode o quê" da seção Andamento livre (cada perfil, inativo e visitante) e uma regra por linha da tabela de regras, inclusive a chegada a Concluídos com data, com explicação e sem nenhuma, e a saída de Concluídos.
-- [ ] Teste da conversão, ensaiado num teste temporário antes de aplicar: processos com a Modelagem piloto pendente, com a etapa em andamento e responsável, concluído com escolha "sim" e com escolha "não", arquivado e suspenso. Depois da conversão, a passagem, a etiqueta, o responsável, a data ou a explicação da publicação estão certos, e os eventos antigos de andamento sumiram enquanto os de cadastro e versão ficaram.
-- [ ] A view devolve os campos novos para a Consulta. Inativo e visitante não leem. `00_rls_ligada` e `10_privilegios_padrao` passam.
-- [ ] Os testes antigos que dependiam de `andamentos` foram reescritos ou apagados (o que saiu está anotado no plano), e o workflow "Testes de banco" passa na branch.
-- [ ] Os tipos do banco usados pela tela (`db:types`) foram regenerados a partir das migrações, e `npm test` e `tsc` passam. A tela pode ficar sem as funções novas até o ticket 25.
+> Provas no ensaio automático (migrações coladas dentro da transação de cada teste), porque a migração só vai ao banco no ticket 04 de publicacao-e-arquivamento: "Testes de banco" verde, 44 de 44, execução 40099740221. Os testes antigos reescritos ou apagados estão listados no `plano-24.md`. Os tipos foram ajustados à mão (decisão registrada no `desvios.md`).
+
+- [x] Testes pgTAP escritos antes da migração e vistos falhar: uma célula por linha da tabela "quem pode o quê" da seção Andamento livre (cada perfil, inativo e visitante) e uma regra por linha da tabela de regras, inclusive a chegada a Concluídos com data, com explicação e sem nenhuma, e a saída de Concluídos.
+- [x] Teste da conversão, ensaiado num teste temporário antes de aplicar: processos com a Modelagem piloto pendente, com a etapa em andamento e responsável, concluído com escolha "sim" e com escolha "não", arquivado e suspenso. Depois da conversão, a passagem, a etiqueta, o responsável, a data ou a explicação da publicação estão certos, e os eventos antigos de andamento sumiram enquanto os de cadastro e versão ficaram.
+- [x] A view devolve os campos novos para a Consulta. Inativo e visitante não leem. `00_rls_ligada` e `10_privilegios_padrao` passam.
+- [x] Os testes antigos que dependiam de `andamentos` foram reescritos ou apagados (o que saiu está anotado no plano), e o workflow "Testes de banco" passa na branch.
+- [x] Os tipos do banco usados pela tela (`db:types`) foram regenerados a partir das migrações, e `npm test` e `tsc` passam. A tela pode ficar sem as funções novas até o ticket 25.
+
+Concluído em 2026-10-24 (commit 77c1026)

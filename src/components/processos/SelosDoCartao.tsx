@@ -1,5 +1,5 @@
 import { selosDoCartao, type Selo } from '../../processos/selosDoCartao'
-import type { ProcessoDaLista } from '../../processos/tipos'
+import type { EtapaDoCatalogo, ProcessoDaLista } from '../../processos/tipos'
 import { Pilula } from '../Pilula'
 
 /** Versão e subprocessos são só texto neutro, sem fundo; os demais são pílulas (âmbar só nos dois alertas). */
@@ -10,9 +10,11 @@ function SeloDoCartao({ selo }: { selo: Selo }) {
   return <Pilula situacao={selo.tom === 'alerta' ? 'vencendo' : 'neutra'}>{corpo}</Pilula>
 }
 
+type SelosDoCartaoProps = { processo: ProcessoDaLista; hoje: string; etapas: EtapaDoCatalogo[]; semSeloDeResponsavel: boolean }
+
 /** Só o que há a dizer, na ordem da spec; o cartão normal não ganha nada. */
-export function SelosDoCartao({ processo, hoje, semSeloDeResponsavel }: { processo: ProcessoDaLista; hoje: string; semSeloDeResponsavel: boolean }) {
-  const selos = selosDoCartao(processo, hoje).filter((selo) => !(semSeloDeResponsavel && selo.tipo === 'sem_responsavel'))
+export function SelosDoCartao({ processo, hoje, etapas, semSeloDeResponsavel }: SelosDoCartaoProps) {
+  const selos = selosDoCartao(processo, hoje, etapas).filter((selo) => !(semSeloDeResponsavel && selo.tipo === 'sem_responsavel'))
   if (selos.length === 0) return null
   return (
     <span className="cartao-selos">

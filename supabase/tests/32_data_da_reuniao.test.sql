@@ -86,9 +86,8 @@ insert into _tap (linha) select lives_ok(
   $sql$update public.processos set data_da_reuniao = '2026-10-20' where nome = 'Proc Data'$sql$, 'gravar a mesma data');
 insert into _tap (linha) select is(pg_temp.edicoes('Proc Data'), 2::bigint, 'gravar a mesma data não gera evento');
 insert into _tap (linha) select is(
-  (select a.status::text from public.andamentos a join public.etapas e on e.id = a.etapa_id
-    where a.processo_id = pg_temp.processo('Proc Data') order by e.ordem limit 1),
-  'pendente', 'marcar a data não mexe na primeira etapa');
+  (select etapa_atual_codigo from public.processos_com_andamento where id = pg_temp.processo('Proc Data')),
+  'nao_iniciados', 'marcar a data não mexe na etapa do processo');
 insert into _tap (linha) select lives_ok(
   $sql$update public.processos set data_da_reuniao = null where nome = 'Proc Data'$sql$, 'integrante remove a data');
 insert into _tap (linha) select is(pg_temp.data('Proc Data'), null::date, 'a data foi removida');

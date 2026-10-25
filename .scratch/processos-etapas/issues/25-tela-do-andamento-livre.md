@@ -53,7 +53,7 @@ Spec: `.scratch/processos-etapas/spec.md`, seção "Andamento livre (mudança de
 
 ## Critérios de aceite
 
-- [ ] Testes de interface com o aplicativo inteiro, escritos antes e vistos falhar, cobrindo:
+- [x] Testes de interface com o aplicativo inteiro, escritos antes e vistos falhar, cobrindo:
   - cadastro em Não iniciados;
   - mover pela lista para a frente e para trás, com a etiqueta e o responsável;
   - arrastar para qualquer coluna, a própria coluna, a falha e quem não arrasta (Consulta, suspenso, arquivado, agrupado);
@@ -68,7 +68,9 @@ Spec: `.scratch/processos-etapas/spec.md`, seção "Andamento livre (mudança de
   - catálogo com as fixas e as recusas;
   - histórico novo;
   - Consulta só lendo.
-- [ ] Os testes de tela do modelo anterior foram reescritos para o modelo novo ou apagados quando o comportamento saiu, com a lista anotada no plano.
-- [ ] Os testes do módulo real com o cliente simulado provam as chamadas de mover, etiqueta e responsável, as linhas da view com os campos novos e cada recusa nova virando a frase.
-- [ ] As funções puras (barra, selos com o limite de 7 dias, colunas com as fixas, destino do arrastar) têm testes unitários.
-- [ ] `npm test`, `tsc` e o ESLint passam no pre-commit.
+- [x] Os testes de tela do modelo anterior foram reescritos para o modelo novo ou apagados quando o comportamento saiu, com a lista anotada no plano.
+- [x] Os testes do módulo real com o cliente simulado provam as chamadas de mover, etiqueta e responsável, as linhas da view com os campos novos e cada recusa nova virando a frase.
+- [x] As funções puras (barra, selos com o limite de 7 dias, colunas com as fixas, destino do arrastar) têm testes unitários.
+- [x] `npm test`, `tsc` e o ESLint passam no pre-commit.
+
+Concluído em 2026-10-24 (commit 9b0f997)

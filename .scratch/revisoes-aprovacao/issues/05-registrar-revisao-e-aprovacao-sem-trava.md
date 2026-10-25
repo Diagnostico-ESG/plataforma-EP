@@ -40,8 +40,10 @@ Spec: `.scratch/revisoes-aprovacao/spec.md`, seção "Andamento livre (mudança 
 
 ## Critérios de aceite
 
-- [ ] Testes pgTAP escritos antes da migração e vistos falhar: cada célula da tabela "quem pode o quê" e cada regra da seção Andamento livre. Inclui a revisão por passagem (segunda recusada, nova depois de sair e voltar), "corrigida" com e sem versão na passagem, o autor aceito, a aprovação substituída com o evento, mover sem mexer na aprovação, a edição em concluído aceita e no arquivado recusada, e nada apagado.
-- [ ] Os testes antigos `38` a `41` estão ajustados, e o workflow "Testes de banco" passa na branch.
-- [ ] Testes de interface com o aplicativo inteiro: os botões só na etapa certa, os dois resultados, "Corrigida" desabilitada e depois disponível, o aviso do autor, [Editar revisão], a aprovação substituindo a anterior com o aviso, a gaveta, a Consulta sem botões, o histórico, e a recusa e a falha sem perder o preenchido.
-- [ ] Os testes do módulo real com o cliente simulado provam as chamadas novas e as frases das recusas novas.
-- [ ] As funções puras (opções de resultado com a versão da passagem, aviso do autor) têm testes unitários.
+- [x] Testes pgTAP escritos antes da migração e vistos falhar: cada célula da tabela "quem pode o quê" e cada regra da seção Andamento livre. Inclui a revisão por passagem (segunda recusada, nova depois de sair e voltar), "corrigida" com e sem versão na passagem, o autor aceito, a aprovação substituída com o evento, mover sem mexer na aprovação, a edição em concluído aceita e no arquivado recusada, e nada apagado.
+- [x] Os testes antigos `38` a `41` estão ajustados (Docker local: 1266 ok, 0 not ok); **o workflow "Testes de banco" na branch fica por conferir**.
+- [x] Testes de interface com o aplicativo inteiro: os botões só na etapa certa, os dois resultados, "Corrigida" desabilitada e depois disponível, o aviso do autor, [Editar revisão], a aprovação substituindo a anterior com o aviso, a gaveta, a Consulta sem botões, o histórico, e a recusa e a falha sem perder o preenchido.
+- [x] Os testes do módulo real com o cliente simulado provam as chamadas novas e as frases das recusas novas.
+- [x] As funções puras (opções de resultado com a versão da passagem, aviso do autor) têm testes unitários.
+
+Concluído em 2026-10-24 (commit d44976a)

@@ -9,7 +9,7 @@ export function porExtenso(situacao: string): string {
 
 /** O banco recusa a etapa de um processo suspenso ou cancelado: ele precisa ser retomado antes. */
 export function fraseDoProcessoParado(situacao: string): string {
-  return `Este processo está ${porExtenso(situacao)}; retome-o para registrar o andamento.`
+  return `Este processo está ${porExtenso(situacao)}; retome-o para mudar a etapa, a etiqueta ou o responsável.`
 }
 
 /** A transição que a spec não prevê, com as duas situações recebidas. */

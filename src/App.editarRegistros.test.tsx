@@ -3,7 +3,8 @@ import { afterEach, expect, test } from 'vitest'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { Aprovacao, RevisaoInterna } from './revisoes/tipos'
 import { escolherNoMenuDoProcesso, gavetaDaEtapa, versoAberto } from './testes/versoDoCartao'
-import { APROVACAO, BIA, CONCLUIDA, caminho, montar, versao, type Falsos } from './testes/aprovacaoNoVerso'
+import { APROVACAO, montar, versao, type Falsos } from './testes/aprovacaoNoVerso'
+import { BIA } from './testes/processoNoVerso'
 
 // Editar as revisões e a aprovação na gaveta da etapa (ticket 04 de revisoes-aprovacao, histórias 21 a 23 e 31): o [Editar]
 // de cada registro, a janela com o preenchido, as recusas, quem vê o botão e o histórico com o antes e o depois.
@@ -26,7 +27,7 @@ const APROVADA: Aprovacao = {
 
 const comRevisao = (revisao: RevisaoInterna) => ({ revisoes }: Falsos) => { revisoes.revisoes.p1 = [revisao] }
 const aprovadaCom = (mudancas: Partial<Aprovacao>) => ({ revisoes }: Falsos) => { revisoes.aprovacoes.p1 = { ...APROVADA, ...mudancas } }
-const concluidas = () => caminho().map((etapa) => (etapa.codigo === 'aprovacao_setor' ? { ...etapa, ...CONCLUIDA } : etapa))
+const CONCLUIDO = { etapa: 'concluidos', mudancas: { situacao: 'concluido' as const, etiqueta: 'concluido' as const } }
 
 async function abrirAEdicao(etapa: string, titulo: string) {
   const gaveta = await gavetaDaEtapa(etapa)
@@ -66,9 +67,9 @@ test('a recusa ao gravar a revisão aparece em vermelho, sem perder o preenchido
   const { revisoes } = montar(versao(), { ajustar: comRevisao(REVISAO) })
   const { janela } = await abrirAEdicao(REVISAO_INTERNA, 'Editar a revisão da V7')
   fireEvent.change(campo(janela, /Comentário/), { target: { value: 'Novo texto' } })
-  revisoes.falhaNaGravacao = new TravaDoBanco('Este processo está suspenso; retome-o para registrar o andamento.')
+  revisoes.falhaNaGravacao = new TravaDoBanco('Este processo está suspenso; retome-o para mudar a etapa, a etiqueta ou o responsável.')
   salvar(janela)
-  expect((await janela.findByRole('alert')).textContent).toBe('Este processo está suspenso; retome-o para registrar o andamento.')
+  expect((await janela.findByRole('alert')).textContent).toBe('Este processo está suspenso; retome-o para mudar a etapa, a etiqueta ou o responsável.')
   expect(campo(janela, /Comentário/).value).toBe('Novo texto')
   revisoes.falhaNaGravacao = 'sem conexão'
   salvar(janela)
@@ -87,7 +88,7 @@ test('enquanto a revisão grava, o botão mostra "Salvando…"', async () => {
 // ---- Aprovação
 
 test('acrescentar o número a uma aprovação concluída sem ele aparece na gaveta', async () => {
-  montar(versao(), { etapas: concluidas(), ajustar: aprovadaCom({ numeroEprotocolo: null, link: null }) })
+  montar(versao(), { ...CONCLUIDO, ajustar: aprovadaCom({ numeroEprotocolo: null, link: null }) })
   const { gaveta, janela } = await abrirAEdicao(APROVACAO, 'Editar a aprovação da V8')
   expect(gaveta.getByText('Sem número do E-protocolo')).toBeTruthy()
   expect(campo(janela, /Número do E-protocolo/).value).toBe('')
@@ -134,7 +135,7 @@ test('a aprovação desfeita antes de salvar mostra que o registro não existe m
 
 test.each([
   ['Administrador', { perfil: 'administrador' as const }, true],
-  ['Integrante com o processo concluído', { etapas: concluidas() }, true],
+  ['Integrante com o processo concluído', CONCLUIDO, true],
   ['Consulta', { perfil: 'consulta' as const }, false],
   ['processo suspenso', { mudancas: { situacao: 'suspenso' as const } }, false],
   ['processo cancelado', { mudancas: { situacao: 'cancelado' as const } }, false],
@@ -179,7 +180,7 @@ test('as edições aparecem no histórico do processo com o antes e o depois', a
   await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Editar a aprovação da V8' })).toBeNull())
   await escolherNoMenuDoProcesso('Histórico')
   const verso = await versoAberto()
-  expect(await verso.findByText('Editou a revisão interna')).toBeTruthy()
+  expect(await verso.findByText('Editou a revisão')).toBeTruthy()
   expect(verso.getByText(/Escopo: Fluxograma e relatório/)).toBeTruthy()
   expect(verso.getByText(/Escopo: Relatório/)).toBeTruthy()
   expect(verso.getByText('Editou a aprovação')).toBeTruthy()

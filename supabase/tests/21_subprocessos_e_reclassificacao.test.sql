@@ -60,20 +60,16 @@ language sql stable as $$
     and entidade_ref = pg_temp.processo(nome_do_processo)::text order by ocorrido_em desc, id desc limit 1 $$;
 grant execute on function pg_temp.evento(text, text) to authenticated;
 
-create function pg_temp.status(nome_do_processo text, codigo_da_etapa text) returns text
+create function pg_temp.etapa_atual(nome_do_processo text) returns text
 language sql stable as $$
-  select a.status::text from public.andamentos a join public.etapas e on e.id = a.etapa_id
-  where a.processo_id = pg_temp.processo(nome_do_processo) and e.codigo = codigo_da_etapa $$;
-grant execute on function pg_temp.status(text, text) to authenticated;
+  select etapa_atual_codigo from public.processos_com_andamento where id = pg_temp.processo(nome_do_processo) $$;
+grant execute on function pg_temp.etapa_atual(text) to authenticated;
 
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 set local role authenticated;
 
--- Preparação: a modelagem do "Solto" concluída.
-update public.andamentos set status = 'em_andamento' where processo_id = pg_temp.processo('Solto')
-  and etapa_id = (select id from public.etapas where codigo = 'modelagem');
-update public.andamentos set status = 'concluida' where processo_id = pg_temp.processo('Solto')
-  and etapa_id = (select id from public.etapas where codigo = 'modelagem');
+-- Preparação: o "Solto" movido para a Modelagem piloto.
+select public.mover_processo(pg_temp.processo('Solto'), (select id from public.etapas where codigo = 'modelagem'));
 
 -- Cadastro do subprocesso: adota o macroprocesso do pai e inclui o setor dele como envolvido.
 insert into _tap (linha) select lives_ok(
@@ -169,10 +165,10 @@ insert into _tap (linha) select ok(
    from public.processos where nome = 'Solto'),
   'ao virar subprocesso, o item passa ao macroprocesso do pai');
 insert into _tap (linha) select is(
-  (select count(*)::int from public.andamentos where processo_id = (select id from _solto)), 6,
-  'o item reclassificado mantém o id e os andamentos');
-insert into _tap (linha) select is(pg_temp.status('Solto', 'modelagem'), 'concluida',
-  'o andamento concluído continua concluído');
+  (select count(*)::int from public.passagens where processo_id = (select id from _solto)), 2,
+  'o item reclassificado mantém o id e as passagens');
+insert into _tap (linha) select is(pg_temp.etapa_atual('Solto'), 'modelagem',
+  'e continua na mesma etapa');
 insert into _tap (linha) select is(
   (select array[d -> 'antes' ->> 'tipo', d -> 'depois' ->> 'processo_pai_nome', d ->> 'motivo']
    from pg_temp.evento('Solto', 'reclassificar') d),

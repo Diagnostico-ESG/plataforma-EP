@@ -32,8 +32,10 @@ Termos usados aqui:
 
 Regras que a plataforma aplica ao escrever (as mesmas do `supabase/functions/_shared/planilhas*.ts`):
 
-- **Situação de cada fase (IV a VII):** "Concluída" se todas as etapas da fase estão resolvidas; "Em andamento" se alguma começou; "Pronto para iniciar" se nenhuma começou e a fase anterior está concluída; "Aguardando etapa anterior" nos demais casos; "Sem etapa" se a fase não tem etapa ativa; "Não publicado" só na fase VII, quando a escolha de publicação do processo é "não" (não conta como concluída). O rótulo da situação do processo é "Publicado" com a Publicação concluída e "Concluído" com a escolha "não"; o arquivado conta como concluído. Depois de mudar essas regras, publique de novo a função `planilhas-dos-dashboards` (ver `docs/planilhas-publicar-a-funcao.md`).
-- **Rótulo do processo:** "Suspenso · fase", "Publicado" (fase VII concluída), "Concluído", "Em andamento · fase" ou "Próxima · fase".
+- **Quem entra:** os processos em andamento e os concluídos, arquivados ou não. O suspenso e o cancelado ficam de fora das duas planilhas.
+- **Situação de cada fase (IV a VII)**, pela posição do processo no catálogo ativo (o processo pode pular ou voltar etapas): "Concluída" se o processo está numa etapa depois da última da fase, ou na última etapa da fase com a etiqueta Concluído, ou em Concluídos; "Em andamento" se está numa etapa da fase; "Não iniciada" no resto, inclusive em Não iniciados; "Sem etapa" se a fase não tem etapa ativa; "Sem publicação" só na fase VII, quando a regra concluiria a fase mas o processo não tem a data da publicação (não conta como concluída). Depois de mudar essas regras, publique de novo a função `planilhas-dos-dashboards` (ver `docs/planilhas-publicar-a-funcao.md`).
+- **Data de conclusão da fase:** o dia, em Brasília, em que a fase passou a contar como concluída, calculado das passagens do processo; se ele volta e conclui de novo, vale a mais recente. Na fase VII é a data da publicação.
+- **Rótulo do processo:** "Publicado" (em Concluídos, com a data da publicação), "Concluído" (em Concluídos, sem ela), "Não iniciado" ou "Em andamento · fase" (a fase da etapa atual).
 - **Datas** em texto `AAAA-MM-DD`; vazio vira o texto `null`. O Data Studio converte o texto em data (ver `07-dashboards-no-data-studio.md`).
 - **Última versão** é a última versão **não** histórica. Quem só tem versão histórica sai com a coluna vazia.
 - A coluna **Observações** pode chegar vazia; o Data Studio a descarta quando toda a coluna está vazia.

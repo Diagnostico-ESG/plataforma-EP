@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { expect, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { ClienteSupabaseFalso } from '../testes/ClienteSupabaseFalso'
@@ -10,103 +10,151 @@ function criar(cliente: ClienteSupabaseFalso) {
   return criarProcessosSupabase(cliente as unknown as SupabaseClient<Database>)
 }
 
-function clienteQueRecusa(erro: { message: string; code?: string }) {
+function clienteQueRecusa(tabela: string, erro: { message: string; code?: string }) {
   const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['andamentos.update'] = { data: null, error: erro }
+  cliente.respostas[tabela] = { data: null, error: erro }
   return cliente
 }
 
-test('iniciar grava o status no andamento escolhido', async () => {
+async function falhaDe(promessa: Promise<unknown>): Promise<Error> {
+  return (await promessa.catch((erro: unknown) => erro)) as Error
+}
+
+describe('mover', () => {
+  test('chama a função do banco só com o processo e a etapa quando não há dados da chegada', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    await criar(cliente).moverProcesso('p1', 'e4')
+    expect(cliente.pedidos).toEqual([{ tabela: 'rpc', operacao: 'mover_processo', valores: { p_processo: 'p1', p_etapa: 'e4' } }])
+  })
+
+  test('leva a data e o link da publicação, ou a explicação, quando a chegada os traz', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    const modulo = criar(cliente)
+    await modulo.moverProcesso('p1', 'e8', { dataDaPublicacao: '2026-10-10', linkDaPublicacao: 'https://exemplo.test/d', explicacao: null })
+    await modulo.moverProcesso('p1', 'e8', { dataDaPublicacao: null, linkDaPublicacao: null, explicacao: 'O setor desistiu' })
+    expect(cliente.pedidos.map((pedido) => pedido.valores)).toEqual([
+      { p_processo: 'p1', p_etapa: 'e8', p_data_da_publicacao: '2026-10-10', p_link_da_publicacao: 'https://exemplo.test/d' },
+      { p_processo: 'p1', p_etapa: 'e8', p_explicacao_sem_publicacao: 'O setor desistiu' },
+    ])
+  })
+
+  test.each([
+    ['processo_parado:suspenso', 'Este processo está suspenso; retome-o para mudar a etapa, a etiqueta ou o responsável.'],
+    ['processo_parado:cancelado', 'Este processo está cancelado; retome-o para mudar a etapa, a etiqueta ou o responsável.'],
+    ['processo_arquivado', 'Este processo está arquivado; desarquive-o para alterar.'],
+    ['etapa_inativa:Publicação', 'A etapa Publicação está inativa.'],
+    ['publicacao_ou_explicacao_obrigatoria',
+      'Para ir a Concluídos, informe a data da publicação ou conclua sem publicação.'],
+    ['explicacao_obrigatoria', 'A explicação é obrigatória para concluir sem publicação.'],
+    ['explicacao_longa:2001', 'A explicação tem 2001 caracteres; o máximo é 2.000.'],
+  ])('a recusa %s vira a frase', async (mensagem, frase) => {
+    const cliente = clienteQueRecusa('rpc.mover_processo', { message: mensagem, code: 'P0001' })
+    const falha = await falhaDe(criar(cliente).moverProcesso('p1', 'e4'))
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect(falha.message).toBe(frase)
+  })
+
+  test('a recusa por perfil (42501) vira "Seu perfil não permite alterar os processos."', async () => {
+    const cliente = clienteQueRecusa('rpc.mover_processo', { message: 'sem permissão para mover o processo', code: '42501' })
+    expect((await falhaDe(criar(cliente).moverProcesso('p1', 'e4'))).message).toBe('Seu perfil não permite alterar os processos.')
+  })
+
+  test('processo ou etapa que já não existe avisa como cadastro inexistente', async () => {
+    const cliente = clienteQueRecusa('rpc.mover_processo', { message: 'registro_inexistente', code: 'P0001' })
+    expect(await falhaDe(criar(cliente).moverProcesso('p1', 'e4'))).toBeInstanceOf(CadastroInexistente)
+  })
+
+  test('outra falha vira erro com o motivo do banco', async () => {
+    const cliente = clienteQueRecusa('rpc.mover_processo', { message: 'conexão perdida' })
+    expect((await falhaDe(criar(cliente).moverProcesso('p1', 'e4'))).message).toBe('erro inesperado do banco (conexão perdida)')
+  })
+})
+
+describe('etiqueta', () => {
+  test('grava na passagem aberta do processo (a que ainda não tem saída)', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['passagens.update'] = { data: [{ id: 'g1' }], error: null }
+    await criar(cliente).mudarEtiqueta('p1', 'em_andamento')
+    expect(cliente.pedidos[0]).toMatchObject({
+      tabela: 'passagens', operacao: 'update', valores: { etiqueta: 'em_andamento' }, filtro: ['processo_id', 'p1'],
+      ehNulo: ['saiu_em', null],
+    })
+  })
+
+  test('em Concluídos a etiqueta é fixa: a recusa vira a frase', async () => {
+    const cliente = clienteQueRecusa('passagens.update', { message: 'etiqueta_fixa_em_concluidos', code: 'P0001' })
+    expect((await falhaDe(criar(cliente).mudarEtiqueta('p1', 'a_fazer'))).message)
+      .toBe('Em Concluídos a etiqueta é sempre Concluído e não muda.')
+  })
+
+  test('processo parado, passagem fechada e etiqueta que não existe viram frases', async () => {
+    const parado = clienteQueRecusa('passagens.update', { message: 'processo_parado:suspenso', code: 'P0001' })
+    expect((await falhaDe(criar(parado).mudarEtiqueta('p1', 'a_fazer'))).message).toContain('Este processo está suspenso')
+    const fechada = clienteQueRecusa('passagens.update', { message: 'passagem_fechada', code: 'P0001' })
+    expect(await falhaDe(criar(fechada).mudarEtiqueta('p1', 'a_fazer'))).toBeInstanceOf(TravaDoBanco)
+    const invalida = clienteQueRecusa('passagens.update', { message: 'invalid input value for enum etiqueta_da_etapa: "x"', code: '22P02' })
+    expect((await falhaDe(criar(invalida).mudarEtiqueta('p1', 'x' as 'a_fazer'))).message)
+      .toBe('A etiqueta x não existe; use A fazer, Em andamento ou Concluído.')
+  })
+
+  test('nada mudou com o processo ainda legível: a RLS recusou pelo perfil', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['passagens.update'] = { data: [], error: null }
+    cliente.respostas['processos.select'] = { data: [{ id: 'p1' }], error: null }
+    const falha = await falhaDe(criar(cliente).mudarEtiqueta('p1', 'concluido'))
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect(falha.message).toBe('Seu perfil não permite alterar os processos.')
+  })
+
+  test('nada mudou e o processo sumiu: aviso de cadastro inexistente', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['passagens.update'] = { data: [], error: null }
+    expect(await falhaDe(criar(cliente).mudarEtiqueta('p1', 'concluido'))).toBeInstanceOf(CadastroInexistente)
+  })
+})
+
+describe('responsável do processo', () => {
+  test('grava o usuário no processo, e null o tira', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['processos.update'] = { data: [{ id: 'p1' }], error: null }
+    const modulo = criar(cliente)
+    await modulo.mudarResponsavel('p1', 'u1')
+    await modulo.mudarResponsavel('p1', null)
+    expect(cliente.pedidos.map(({ tabela, valores, filtro }) => [tabela, valores, filtro])).toEqual([
+      ['processos', { responsavel_id: 'u1' }, ['id', 'p1']], ['processos', { responsavel_id: null }, ['id', 'p1']],
+    ])
+  })
+
+  test('responsável inválido vira a frase com o nome do usuário', async () => {
+    const cliente = clienteQueRecusa('processos.update', { message: 'responsavel_invalido:Maria Teste', code: 'P0001' })
+    const falha = await falhaDe(criar(cliente).mudarResponsavel('p1', 'u3'))
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect(falha.message).toBe('Maria Teste não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP.')
+  })
+
+  test('processo parado vira a frase do congelamento', async () => {
+    const cliente = clienteQueRecusa('processos.update', { message: 'processo_parado:cancelado', code: 'P0001' })
+    expect((await falhaDe(criar(cliente).mudarResponsavel('p1', 'u1'))).message)
+      .toBe('Este processo está cancelado; retome-o para mudar a etapa, a etiqueta ou o responsável.')
+  })
+
+  test('nada mudou: perfil quando o processo ainda é legível, cadastro inexistente quando sumiu', async () => {
+    const legivel = new ClienteSupabaseFalso()
+    legivel.respostas['processos.update'] = { data: [], error: null }
+    legivel.respostas['processos.select'] = { data: [{ id: 'p1' }], error: null }
+    expect((await falhaDe(criar(legivel).mudarResponsavel('p1', 'u1'))).message).toBe('Seu perfil não permite alterar os processos.')
+    const sumiu = new ClienteSupabaseFalso()
+    sumiu.respostas['processos.update'] = { data: [], error: null }
+    expect(await falhaDe(criar(sumiu).mudarResponsavel('p1', 'u1'))).toBeInstanceOf(CadastroInexistente)
+  })
+})
+
+test('quem pode ser responsável: usuários ativos Administrador ou Integrante, por nome', async () => {
   const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['andamentos.update'] = { data: [{ id: 'a1' }], error: null }
-  await criar(cliente).iniciarEtapa('a1')
-  expect(cliente.pedidos.map(({ operacao, valores, filtro }) => [operacao, valores, filtro])).toEqual([
-    ['update', { status: 'em_andamento' }, ['id', 'a1']],
-  ])
-})
-
-test('concluir, dispensar e registrar como realizada anteriormente chamam a função de avanço, com o responsável da próxima', async () => {
-  const cliente = new ClienteSupabaseFalso()
-  const modulo = criar(cliente)
-  await modulo.concluirEtapa('a1', 'u1')
-  await modulo.dispensarEtapa('a1', 'Setor já conhecido', null)
-  await modulo.registrarRealizadaAnteriormente('a1', 'Feita em 2025', 'u2')
-  expect(cliente.pedidos.map(({ tabela, operacao, valores }) => [tabela, operacao, valores])).toEqual([
-    ['rpc', 'avancar_etapa', { p_andamento: 'a1', p_acao: 'concluir', p_nota: null, p_responsavel: 'u1', p_vai_para_publicacao: null }],
-    ['rpc', 'avancar_etapa',
-      { p_andamento: 'a1', p_acao: 'dispensar', p_nota: 'Setor já conhecido', p_responsavel: null, p_vai_para_publicacao: null }],
-    ['rpc', 'avancar_etapa',
-      { p_andamento: 'a1', p_acao: 'realizada_anteriormente', p_nota: 'Feita em 2025', p_responsavel: 'u2', p_vai_para_publicacao: null }],
-  ])
-})
-
-test('concluir e registrar como realizada anteriormente levam a escolha de publicação, quando há', async () => {
-  const cliente = new ClienteSupabaseFalso()
-  const modulo = criar(cliente)
-  await modulo.concluirEtapa('a5', 'u1', true)
-  await modulo.registrarRealizadaAnteriormente('a5', 'Aprovada em 2025', null, false)
-  expect(cliente.pedidos.map(({ valores }) => valores)).toEqual([
-    { p_andamento: 'a5', p_acao: 'concluir', p_nota: null, p_responsavel: 'u1', p_vai_para_publicacao: true },
-    { p_andamento: 'a5', p_acao: 'realizada_anteriormente', p_nota: 'Aprovada em 2025', p_responsavel: null, p_vai_para_publicacao: false },
-  ])
-})
-
-test.each([
-  ['etapa_obrigatoria:Publicação', 'A etapa Publicação é obrigatória e não pode ser dispensada.'],
-  ['responsavel_invalido:Maria Teste',
-    'Maria Teste não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP.'],
-  ['anterior_nao_resolvida:Reunião de modelagem', 'A etapa Reunião de modelagem ainda não foi resolvida.'],
-  ['processo_parado:suspenso', 'Este processo está suspenso; retome-o para registrar o andamento.'],
-  ['nota_obrigatoria', 'A nota é obrigatória.'],
-])('o avanço recusado pelo banco (%s) vira a frase da spec', async (mensagem, frase) => {
-  const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['rpc.avancar_etapa'] = { data: null, error: { message: mensagem, code: 'P0001' } }
-  const falha = await criar(cliente).concluirEtapa('a1', null).catch((erro: unknown) => erro)
-  expect(falha).toBeInstanceOf(TravaDoBanco)
-  expect((falha as Error).message).toBe(frase)
-})
-
-test('o avanço recusado pela permissão (42501) vira "Seu perfil não permite alterar os processos."', async () => {
-  const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['rpc.avancar_etapa'] = { data: null, error: { message: 'sem permissão para resolver a etapa', code: '42501' } }
-  await expect(criar(cliente).concluirEtapa('a1', null)).rejects.toThrow('Seu perfil não permite alterar os processos.')
-})
-
-test('o avanço de uma etapa que já não existe avisa como cadastro inexistente', async () => {
-  const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['rpc.avancar_etapa'] = { data: null, error: { message: 'registro_inexistente', code: 'P0001' } }
-  await expect(criar(cliente).concluirEtapa('a1', null)).rejects.toBeInstanceOf(CadastroInexistente)
-})
-
-test('a recusa de sequência vira a frase com o nome da etapa anterior', async () => {
-  const cliente = clienteQueRecusa({ message: 'anterior_nao_resolvida:Identificação dos responsáveis', code: 'P0001' })
-  const falha = await criar(cliente).iniciarEtapa('a2').catch((erro: unknown) => erro)
-  expect(falha).toBeInstanceOf(TravaDoBanco)
-  expect((falha as Error).message).toBe('A etapa Identificação dos responsáveis ainda não foi resolvida.')
-})
-
-test('segunda etapa em andamento vira a frase com o nome da que está em andamento', async () => {
-  const cliente = clienteQueRecusa({ message: 'ja_ha_etapa_em_andamento:Reunião de modelagem', code: 'P0001' })
-  await expect(criar(cliente).iniciarEtapa('a5')).rejects
-    .toThrow('Já há uma etapa em andamento neste processo: Reunião de modelagem.')
-})
-
-test('recusa por perfil (42501) vira "Seu perfil não permite alterar os processos."', async () => {
-  const cliente = clienteQueRecusa({ message: 'permission denied for table andamentos', code: '42501' })
-  await expect(criar(cliente).iniciarEtapa('a1')).rejects.toThrow('Seu perfil não permite alterar os processos.')
-})
-
-test('nada mudou com a etapa ainda legível: a RLS recusou pelo perfil', async () => {
-  const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['andamentos.update'] = { data: [], error: null }
-  cliente.respostas['andamentos.select'] = { data: [{ id: 'a1' }], error: null }
-  const falha = await criar(cliente).iniciarEtapa('a1').catch((erro: unknown) => erro)
-  expect(falha).toBeInstanceOf(TravaDoBanco)
-  expect((falha as Error).message).toBe('Seu perfil não permite alterar os processos.')
-})
-
-test('nada mudou e a etapa sumiu (o setor foi excluído): aviso de cadastro inexistente', async () => {
-  const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['andamentos.update'] = { data: [], error: null }
-  await expect(criar(cliente).iniciarEtapa('a1')).rejects.toBeInstanceOf(CadastroInexistente)
+  cliente.respostas['usuarios.select'] = { data: [{ id: 'u1', nome: 'Ana' }], error: null }
+  expect(await criar(cliente).listarResponsaveisPossiveis()).toEqual([{ id: 'u1', nome: 'Ana' }])
+  expect(cliente.pedidos[0]).toMatchObject({
+    tabela: 'usuarios', filtro: ['ativo', true],
+    dentro: ['perfil', ['administrador', 'integrante_ep']], ordem: [['nome', true]],
+  })
 })
