@@ -69,7 +69,7 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   tipo: 'Tipo', origem: 'Origem', situacao: 'Situação', contexto: 'Contexto',
   processo_nome: 'Processo', responsavel_nome: 'Responsável', processo_pai_nome: 'Processo pai', etiqueta: 'Etiqueta',
   nivel: 'Nível', obrigatoria: 'Obrigatória', fase: 'Fase', ativa: 'Situação', ordem: 'Posição',
-  data_da_reuniao: 'Reunião de modelagem piloto',
+  data_da_modelagem_piloto: 'Data da modelagem piloto', data_da_reuniao: 'Data da modelagem piloto',
   rotulo: 'Versão', etapa: 'Etapa', arquivos: 'Arquivos', relatorio_de: 'Relatório copiado da versão',
   hash_md5: 'Impressão digital (MD5)',
   versao_revisada: 'Versão revisada', versao_corrigida: 'Versão corrigida', resultado: 'Resultado', escopo: 'Escopo',
@@ -158,8 +158,9 @@ function itemDaLista(item: unknown): string {
   return typeof observacao === 'string' && observacao !== '' ? `${nomeCompleto} (${observacao})` : nomeCompleto
 }
 
-// As datas da reunião do processo, da revisão, da aprovação e da publicação aparecem em DD/MM/AAAA.
-const CAMPOS_DE_DATA = new Set(['data_da_reuniao', 'revisada_em', 'aprovada_em', 'publicado_em'])
+// As datas da modelagem piloto (e a chave antiga dela, dos eventos gravados antes da troca de nome), da revisão, da aprovação
+// e da publicação aparecem em DD/MM/AAAA.
+const CAMPOS_DE_DATA = new Set(['data_da_modelagem_piloto', 'data_da_reuniao', 'revisada_em', 'aprovada_em', 'publicado_em'])
 
 // Campos do processo (tipo, origem, situação, etiqueta) e da etapa do catálogo (obrigatória, ativa; o nível só nos eventos
 // antigos) pelo rótulo da tela; null se não for deles.

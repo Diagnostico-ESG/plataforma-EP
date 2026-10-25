@@ -33,6 +33,6 @@ export function umProcesso(nome = 'Emitir Ofício', mudancas: Partial<ProcessoDa
 export function umProcessoLido(nome = 'Emitir Ofício', mudancas: Partial<ProcessoLido> = {}, etapa = 'revisao_interna'): ProcessoLido {
   return {
     ...umProcesso(nome, {}, etapa), origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null, processoPai: null,
-    subprocessos: [], etapasDoVerso: [], dataDaReuniao: null, ultimaVersao: null, ...mudancas,
+    subprocessos: [], etapasDoVerso: [], dataDaModelagemPiloto: null, ultimaVersao: null, ...mudancas,
   }
 }

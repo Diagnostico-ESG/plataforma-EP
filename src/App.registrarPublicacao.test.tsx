@@ -2,7 +2,7 @@ import { cleanup, fireEvent, screen, within } from '@testing-library/react'
 import { afterEach, expect, test } from 'vitest'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { ProcessoLido } from './processos/tipos'
-import { hojeLocal } from './processos/textoDaReuniao'
+import { hojeLocal } from './processos/textoDaModelagemPiloto'
 import { montar } from './testes/aprovacaoNoVerso'
 import { agoraDoVerso } from './testes/versoDoCartao'
 

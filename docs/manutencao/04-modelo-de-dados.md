@@ -109,6 +109,8 @@ As funções do schema `private` (conferências, gatilhos, a montagem do pacote 
 
 Por decisão do usuário (ADR 0013), as migrações `20261018123613_data_da_reuniao`, `20261018132857_responsaveis_do_setor_saem` e `20261018141346_sem_etapas_do_setor` apagaram as tabelas de reuniões, de participantes, de responsáveis do setor e as etapas do setor. Se você as encontrar nas primeiras migrações, é histórico; não existem mais no banco.
 
+A data do encontro do EP com o setor é a **Data da modelagem piloto**, a coluna `processos.data_da_modelagem_piloto` (opcional). Ela se chamava `data_da_reuniao` até a migração `20261025194034_data_da_modelagem_piloto`, que só renomeou a coluna e recriou a view `processos_com_andamento` e a função do pacote das planilhas. Os eventos do histórico gravados antes dessa migração continuam com a chave antiga `data_da_reuniao`; a tela lê as duas.
+
 ## Como conferir o banco real
 
 1. No painel do Supabase do ambiente, abra **SQL Editor**.

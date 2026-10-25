@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CATALOGO_DE_TESTE, umProcessoLido } from '../testes/processoDaLista'
 import { ProcessosFalso } from './ProcessosFalso'
-import { hojeLocal } from './textoDaReuniao'
+import { hojeLocal } from './textoDaModelagemPiloto'
 import type { ProcessoLido } from './tipos'
 
 function falso(etapa: string, mudancas: Partial<ProcessoLido> = {}): ProcessosFalso {

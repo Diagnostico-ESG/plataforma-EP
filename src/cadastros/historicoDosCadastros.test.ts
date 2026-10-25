@@ -347,9 +347,10 @@ describe('registros antigos de reunião (recurso retirado da plataforma)', () =>
   })
 })
 
-describe('data da reunião no estado do processo', () => {
+// Os eventos gravados antes da troca de nome guardam a chave antiga (data_da_reuniao) e não são reescritos.
+describe.each(['data_da_modelagem_piloto', 'data_da_reuniao'])('Data da modelagem piloto no estado do processo (chave %s)', (chave) => {
   test('aparece com o rótulo da tela e a data em DD/MM/AAAA', () => {
-    expect(descreverEstadoDoCadastro({ data_da_reuniao: '2026-10-20' })).toBe('Reunião de modelagem piloto: 20/10/2026')
-    expect(descreverEstadoDoCadastro({ data_da_reuniao: null })).toBe('Reunião de modelagem piloto: —')
+    expect(descreverEstadoDoCadastro({ [chave]: '2026-10-20' })).toBe('Data da modelagem piloto: 20/10/2026')
+    expect(descreverEstadoDoCadastro({ [chave]: null })).toBe('Data da modelagem piloto: —')
   })
 })

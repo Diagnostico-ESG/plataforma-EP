@@ -31,7 +31,7 @@ export interface ProcessoDoPacote {
   macroprocesso_nome: string
   situacao_guardada: SituacaoGuardada
   observacoes: string | null
-  data_da_reuniao: string | null
+  data_da_modelagem_piloto: string | null
   /** A etapa da passagem aberta e a etiqueta dela: a posição do processo no catálogo. */
   etapa_atual_id: string
   etiqueta: EtiquetaDaEtapa
@@ -138,7 +138,7 @@ const REGRAS_DO_PROCESSO: Record<string, Regra> = {
   macroprocesso_nome: textoNaoVazio,
   situacao_guardada: daLista(SITUACOES_GUARDADAS),
   observacoes: textoOuNulo,
-  data_da_reuniao: dataOuNula,
+  data_da_modelagem_piloto: dataOuNula,
   etapa_atual_id: uuid,
   etiqueta: daLista(ETIQUETAS_DA_ETAPA),
   publicado_em: dataOuNula,

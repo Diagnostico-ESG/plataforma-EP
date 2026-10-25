@@ -5,7 +5,7 @@ const VAZIA: LinhaDoProcesso = {
   id: 'p1', nome: 'Emitir Ofício Fictício', tipo: 'processo', setor_id: 's1', setor_sigla: 'TSA', macroprocesso_id: 'm1',
   macroprocesso_nome: 'Macro Fictício', processo_pai_id: null, situacao: 'em_andamento', situacao_guardada: 'em_andamento',
   etapa_atual_id: null, etapa_atual_codigo: null, etapa_atual_nome: null, etapa_atual_ordem: null,
-  responsavel_id: null, responsavel_nome: null, responsavel_foto_url: null, data_da_reuniao: null,
+  responsavel_id: null, responsavel_nome: null, responsavel_foto_url: null, data_da_modelagem_piloto: null,
   contexto: null, criado_em: null, motivo_da_situacao: null, observacoes: null, origem: 'novo',
   responsavel_ativo: null, etiqueta: null, entrou_na_etapa_em: null, etapa_atual_posicao: null,
   ultima_versao_numero: null, ultima_versao_historica: null, ultima_versao_tem_relatorio: null, subprocessos_quantidade: 0,
@@ -52,10 +52,10 @@ test('sem etiqueta na linha, o processo fica em A fazer', () => {
 
 test('traduz os campos do cartão: responsável ativo, última versão, subprocessos e reunião', () => {
   const processo = processoDaLinha({
-    ...VAZIA, responsavel_id: 'u1', responsavel_nome: 'Ana Teste', responsavel_ativo: true, data_da_reuniao: '2026-10-25',
+    ...VAZIA, responsavel_id: 'u1', responsavel_nome: 'Ana Teste', responsavel_ativo: true, data_da_modelagem_piloto: '2026-10-25',
     ultima_versao_numero: 5, ultima_versao_historica: true, ultima_versao_tem_relatorio: false, subprocessos_quantidade: 2,
   }, 8)
-  expect(processo.dataDaReuniao).toBe('2026-10-25')
+  expect(processo.dataDaModelagemPiloto).toBe('2026-10-25')
   expect(processo.cartao).toEqual({
     responsavelAtivo: true, ultimaVersao: { numero: 5, historica: true, temRelatorio: false }, subprocessos: 2,
   })
@@ -64,7 +64,7 @@ test('traduz os campos do cartão: responsável ativo, última versão, subproce
 test('a linha vazia vira um cartão vazio: sem etapa atual, sem versão, sem responsável, zero subprocessos', () => {
   const processo = processoDaLinha(VAZIA, 8)
   expect(processo.etapaAtual).toBeNull()
-  expect(processo.dataDaReuniao).toBeNull()
+  expect(processo.dataDaModelagemPiloto).toBeNull()
   expect(processo.cartao).toEqual({ responsavelAtivo: null, ultimaVersao: null, subprocessos: 0 })
 })
 

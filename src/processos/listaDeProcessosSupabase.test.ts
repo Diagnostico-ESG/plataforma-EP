@@ -57,11 +57,11 @@ test('processo sem etapa atual e sem responsável chega com nulos', async () => 
 test('os campos novos da view chegam ao cartão do processo na lista', async () => {
   const cliente = new ClienteSupabaseFalso()
   const completa = { ...LINHA, responsavel_ativo: false, ultima_versao_numero: 2,
-    ultima_versao_historica: false, ultima_versao_tem_relatorio: true, subprocessos_quantidade: 3, data_da_reuniao: '2026-10-25',
+    ultima_versao_historica: false, ultima_versao_tem_relatorio: true, subprocessos_quantidade: 3, data_da_modelagem_piloto: '2026-10-25',
     publicado_em: '2026-10-20' }
   cliente.respostas['processos_com_andamento.select'] = { data: [completa], error: null }
   const { processos } = await criar(cliente).listarProcessos()
-  expect(processos[0].dataDaReuniao).toBe('2026-10-25')
+  expect(processos[0].dataDaModelagemPiloto).toBe('2026-10-25')
   expect(processos[0].publicadoEm).toBe('2026-10-20')
   expect(processos[0].cartao).toEqual({ responsavelAtivo: false, ultimaVersao: { numero: 2, historica: false, temRelatorio: true }, subprocessos: 3 })
 })

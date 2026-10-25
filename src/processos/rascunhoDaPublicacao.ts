@@ -1,4 +1,4 @@
-import { hojeLocal } from './textoDaReuniao'
+import { hojeLocal } from './textoDaModelagemPiloto'
 import type { ProcessoDaLista } from './tipos'
 
 /** O que a janela de registrar ou corrigir a publicação guarda enquanto a pessoa preenche. */

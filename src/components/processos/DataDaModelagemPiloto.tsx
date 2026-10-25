@@ -3,10 +3,10 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { TravaDoBanco } from '../../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../../cadastros/cadastroInexistente'
 import { formatarData } from '../../lib/datas'
-import { hojeLocal, momentoDaReuniao } from '../../processos/textoDaReuniao'
+import { hojeLocal, momentoDaModelagemPiloto } from '../../processos/textoDaModelagemPiloto'
 import type { ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 
-type ReuniaoDoProcessoProps = {
+type DataDaModelagemPilotoProps = {
   processo: ProcessoLido
   processos: ModuloDeProcessos
   podeAlterar: boolean
@@ -16,16 +16,16 @@ type ReuniaoDoProcessoProps = {
 
 const TEXTO_DO_MOMENTO = { proxima: '· próxima', realizada: '· realizada' } as const
 
-function textoDaFalhaDaReuniao(erro: unknown): string {
+function textoDaFalhaDaModelagemPiloto(erro: unknown): string {
   if (erro instanceof TravaDoBanco) return erro.message
-  return `A data da reunião não foi salva: ${erro instanceof Error ? erro.message : String(erro)}.`
+  return `A Data da modelagem piloto não foi salva: ${erro instanceof Error ? erro.message : String(erro)}.`
 }
 
 /**
  * A data da modelagem piloto na coluna direita do verso: só um dado do processo, sem efeito nas etapas (ADR 0013).
- * "Marcar data" ou "Alterar data" vira ali mesmo o campo (spec, "Verso do cartão", Reunião).
+ * "Marcar data" ou "Alterar data" vira ali mesmo o campo (spec, "Cartão e verso", Data da modelagem piloto).
  */
-export function ReuniaoDoProcesso(props: ReuniaoDoProcessoProps) {
+export function DataDaModelagemPiloto(props: DataDaModelagemPilotoProps) {
   const { processo, podeAlterar } = props
   const idDoTitulo = useId()
   const [editando, setEditando] = useState(false)
@@ -37,11 +37,11 @@ export function ReuniaoDoProcesso(props: ReuniaoDoProcessoProps) {
   }
   return (
     <section className="contexto-secao" aria-labelledby={idDoTitulo}>
-      <h3 id={idDoTitulo} className="contexto-titulo">Reunião</h3>
+      <h3 id={idDoTitulo} className="contexto-titulo">Data da modelagem piloto</h3>
       {editando
-        ? <EdicaoDaReuniao {...props} aoTerminar={terminar} />
+        ? <EdicaoDaModelagemPiloto {...props} aoTerminar={terminar} />
         : (
-            <LeituraDaReuniao data={processo.dataDaReuniao} podeAlterar={podeAlterar} focar={voltouDaEdicao}
+            <LeituraDaModelagemPiloto data={processo.dataDaModelagemPiloto} podeAlterar={podeAlterar} focar={voltouDaEdicao}
               aoEditar={() => setEditando(true)} />
           )}
     </section>
@@ -50,22 +50,22 @@ export function ReuniaoDoProcesso(props: ReuniaoDoProcessoProps) {
 
 type LeituraProps = { data: string | null; podeAlterar: boolean; focar: boolean; aoEditar: () => void }
 
-function LeituraDaReuniao({ data, podeAlterar, focar, aoEditar }: LeituraProps) {
-  const momento = momentoDaReuniao(data, hojeLocal())
+function LeituraDaModelagemPiloto({ data, podeAlterar, focar, aoEditar }: LeituraProps) {
+  const momento = momentoDaModelagemPiloto(data, hojeLocal())
   const botao = useRef<HTMLButtonElement>(null)
   useEffect(() => {
     if (focar) botao.current?.focus()
   }, [focar])
   return (
-    <div className="reuniao-linha">
+    <div className="modelagem-linha">
       {data && momento
         ? (
-            <p className="reuniao-data">
+            <p className="modelagem-data">
               <time dateTime={data}>{formatarData(data)}</time>
-              <span className="reuniao-momento">{TEXTO_DO_MOMENTO[momento]}</span>
+              <span className="modelagem-momento">{TEXTO_DO_MOMENTO[momento]}</span>
             </p>
           )
-        : <p className="reuniao-sem-data">Ainda não marcada</p>}
+        : <p className="modelagem-sem-data">Ainda não marcada</p>}
       {podeAlterar && (
         <button ref={botao} type="button" className="contexto-link" onClick={aoEditar}>{data ? 'Alterar data' : 'Marcar data'}</button>
       )}
@@ -73,11 +73,11 @@ function LeituraDaReuniao({ data, podeAlterar, focar, aoEditar }: LeituraProps) 
   )
 }
 
-type EdicaoProps = ReuniaoDoProcessoProps & { aoTerminar: () => void }
+type EdicaoProps = DataDaModelagemPilotoProps & { aoTerminar: () => void }
 
 // Remover não pede confirmação: a data volta com dois cliques e o histórico guarda a antiga.
-function EdicaoDaReuniao({ processo, processos, aoMudar, aoSumir, aoTerminar }: EdicaoProps) {
-  const gravada = processo.dataDaReuniao
+function EdicaoDaModelagemPiloto({ processo, processos, aoMudar, aoSumir, aoTerminar }: EdicaoProps) {
+  const gravada = processo.dataDaModelagemPiloto
   const [data, setData] = useState(gravada ?? '')
   const [gravando, setGravando] = useState(false)
   const [falha, setFalha] = useState<string | null>(null)
@@ -88,21 +88,21 @@ function EdicaoDaReuniao({ processo, processos, aoMudar, aoSumir, aoTerminar }: 
     setFalha(null)
     setGravando(true)
     try {
-      await processos.marcarReuniao(processo.id, nova)
+      await processos.marcarDataDaModelagemPiloto(processo.id, nova)
     } catch (erro) {
       setGravando(false)
       if (erro instanceof CadastroInexistente) return aoSumir()
-      return setFalha(textoDaFalhaDaReuniao(erro))
+      return setFalha(textoDaFalhaDaModelagemPiloto(erro))
     }
     aoTerminar()
     aoMudar()
   }
 
   return (
-    <div className="reuniao-edicao">
-      <input ref={campo} type="date" aria-label="Data da reunião de modelagem piloto" value={data}
+    <div className="modelagem-edicao">
+      <input ref={campo} type="date" aria-label="Data da modelagem piloto" value={data}
         onChange={(mudanca) => setData(mudanca.target.value)} />
-      <div className="reuniao-botoes">
+      <div className="modelagem-botoes">
         <button type="button" className="botao botao-principal" disabled={gravando || data === '' || data === gravada}
           onClick={() => gravar(data)}>Salvar</button>
         {gravada !== null && (

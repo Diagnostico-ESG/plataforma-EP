@@ -46,6 +46,26 @@ describe('gravação de processos no módulo real', () => {
       origem: 'novo', contexto: 'Contexto inventado', observacoes: null } })
   })
 
+  test('criar grava a Data da modelagem piloto que veio no cadastro e null quando veio vazia ou sem ela', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['processos.insert'] = { data: [{ id: 'p9' }], error: null }
+    await criar(cliente).criarProcesso({ ...DADOS, dataDaModelagemPiloto: '2026-11-12' })
+    await criar(cliente).criarProcesso({ ...DADOS, dataDaModelagemPiloto: null })
+    await criar(cliente).criarProcesso(DADOS)
+    expect(cliente.pedidos.map((pedido) => pedido.valores)).toEqual([
+      expect.objectContaining({ data_da_modelagem_piloto: '2026-11-12' }),
+      expect.objectContaining({ data_da_modelagem_piloto: null }),
+      expect.objectContaining({ data_da_modelagem_piloto: null }),
+    ])
+  })
+
+  test('editar não manda a Data da modelagem piloto: ela se altera no verso', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['processos.update'] = { data: [{ id: 'p1' }], error: null }
+    await criar(cliente).editarProcesso('p1', { ...DADOS, dataDaModelagemPiloto: '2026-11-12' })
+    expect(cliente.pedidos[0].valores).not.toHaveProperty('data_da_modelagem_piloto')
+  })
+
   test('criar um subprocesso manda o pai', async () => {
     const cliente = new ClienteSupabaseFalso()
     cliente.respostas['processos.insert'] = { data: [{ id: 'p9' }], error: null }
@@ -135,9 +155,9 @@ describe('gravação de processos no módulo real', () => {
   test.each([['2026-10-20'], [null]])('marcar a reunião grava a data (%s) pelo id', async (data) => {
     const cliente = new ClienteSupabaseFalso()
     cliente.respostas['processos.update'] = { data: [{ id: 'p1' }], error: null }
-    await criar(cliente).marcarReuniao('p1', data)
+    await criar(cliente).marcarDataDaModelagemPiloto('p1', data)
     expect(cliente.pedidos[0]).toMatchObject({
-      tabela: 'processos', operacao: 'update', filtro: ['id', 'p1'], valores: { data_da_reuniao: data },
+      tabela: 'processos', operacao: 'update', filtro: ['id', 'p1'], valores: { data_da_modelagem_piloto: data },
     })
   })
 
@@ -145,14 +165,14 @@ describe('gravação de processos no módulo real', () => {
     const cliente = new ClienteSupabaseFalso()
     cliente.respostas['processos.update'] = { data: [], error: null }
     cliente.respostas['processos.select'] = { data: [{ id: 'p1' }], error: null }
-    expect((await falhaDe(criar(cliente).marcarReuniao('p1', '2026-10-20'))).message).toBe(PERFIL)
+    expect((await falhaDe(criar(cliente).marcarDataDaModelagemPiloto('p1', '2026-10-20'))).message).toBe(PERFIL)
     cliente.respostas['processos.select'] = { data: [], error: null }
-    await expect(criar(cliente).marcarReuniao('p1', null)).rejects.toBeInstanceOf(CadastroInexistente)
+    await expect(criar(cliente).marcarDataDaModelagemPiloto('p1', null)).rejects.toBeInstanceOf(CadastroInexistente)
   })
 
   test('falha do banco ao marcar a reunião vira Error com o motivo', async () => {
     const cliente = new ClienteSupabaseFalso()
     cliente.respostas['processos.update'] = { data: null, error: { code: '08006', message: 'conexão caiu' } }
-    expect((await falhaDe(criar(cliente).marcarReuniao('p1', '2026-10-20'))).message).toContain('conexão caiu')
+    expect((await falhaDe(criar(cliente).marcarDataDaModelagemPiloto('p1', '2026-10-20'))).message).toContain('conexão caiu')
   })
 })

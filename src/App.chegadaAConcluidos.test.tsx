@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, expect, test } from 'vitest'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
-import { hojeLocal } from './processos/textoDaReuniao'
+import { hojeLocal } from './processos/textoDaModelagemPiloto'
 import { cartaoDe, dia, ETAPAS, montar, processo } from './testes/quadroDeTeste'
 import { montarVerso, processoLido } from './testes/processoNoVerso'
 import { agoraDoVerso } from './testes/versoDoCartao'

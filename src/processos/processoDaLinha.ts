@@ -14,7 +14,7 @@ export function processoDaLinha(linha: LinhaDoProcesso, totalDeEtapas: number): 
     etiqueta: linha.etiqueta ?? 'a_fazer',
     entrouNaEtapaEm: linha.entrou_na_etapa_em ? diaDeBrasilia(linha.entrou_na_etapa_em) : null,
     responsavel: responsavelDaLinha(linha),
-    dataDaReuniao: linha.data_da_reuniao,
+    dataDaModelagemPiloto: linha.data_da_modelagem_piloto,
     cartao: cartaoDaLinha(linha),
     publicadoEm: linha.publicado_em,
     linkDaPublicacao: linha.link_da_publicacao,

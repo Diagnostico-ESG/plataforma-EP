@@ -22,7 +22,7 @@ const ATE_A_APROVACAO = [
 const ATE_CONCLUIDOS = [...ATE_A_APROVACAO, passo('publicacao', '2026-06-20'), passo('concluidos', '2026-07-02')]
 
 function itens(): ProcessoComPassagens[] {
-  const campos = { nome: 'Comum', observacoes: 'Obs inventada', data_da_reuniao: '2026-02-20', ultima_versao: 3 }
+  const campos = { nome: 'Comum', observacoes: 'Obs inventada', data_da_modelagem_piloto: '2026-02-20', ultima_versao: 3 }
   const emModelagem = [passo('nao_iniciados', '2026-02-01'), passo('modelagem', '2026-03-01', { etiqueta: 'em_andamento' })]
   return [
     processoNaTrilha(1, emModelagem, campos),

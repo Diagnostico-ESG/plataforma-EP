@@ -5,7 +5,7 @@ import type { ClienteSupabase } from '../lib/supabase'
 import { falhaDoBanco } from './recusasDoBanco'
 import type { DadosDoProcesso, ModuloDeProcessos } from './tipos'
 
-type OperacoesDeGravacao = Pick<ModuloDeProcessos, 'criarProcesso' | 'editarProcesso' | 'excluirProcesso' | 'marcarReuniao'>
+type OperacoesDeGravacao = Pick<ModuloDeProcessos, 'criarProcesso' | 'editarProcesso' | 'excluirProcesso' | 'marcarDataDaModelagemPiloto'>
 type DadosDaFalha = Pick<DadosDoProcesso, 'nome' | 'setorId'>
 type RespostaDaGravacao = { data: { id: string }[] | null; error: ErroDoBanco | null }
 
@@ -25,8 +25,8 @@ export function criarGravacaoDeProcessoSupabase(
     editarProcesso: async (id, dados) =>
       conferir(id, await tabela().update(valoresDaEdicao(dados)).eq('id', id).select('id'), dados),
     excluirProcesso: async (id) => conferir(id, await tabela().delete().eq('id', id).select('id')),
-    marcarReuniao: async (id, data) =>
-      conferir(id, await tabela().update({ data_da_reuniao: data }).eq('id', id).select('id')),
+    marcarDataDaModelagemPiloto: async (id, data) =>
+      conferir(id, await tabela().update({ data_da_modelagem_piloto: data }).eq('id', id).select('id')),
   }
 }
 
@@ -43,9 +43,10 @@ function valoresDaEdicao(dados: DadosDoProcesso) {
   }
 }
 
-// Tipo e pai só entram no cadastro: depois dele mudam pela reclassificação.
+// Tipo, pai e Data da modelagem piloto só entram no cadastro: o tipo e o pai mudam depois pela reclassificação, e a data, no verso.
 function valoresDoCadastro(dados: DadosDoProcesso) {
-  return { ...valoresDaEdicao(dados), tipo: dados.tipo, processo_pai_id: dados.processoPaiId }
+  return { ...valoresDaEdicao(dados), tipo: dados.tipo, processo_pai_id: dados.processoPaiId,
+    data_da_modelagem_piloto: dados.dataDaModelagemPiloto ?? null }
 }
 
 // A RLS não acusa erro ao filtrar: sem linha afetada, a leitura decide entre perfil e processo que sumiu.

@@ -7,15 +7,15 @@ export function hojeLocal(agora: Date = new Date()): string {
 }
 
 /** A linha do painel: a data de hoje ainda está "marcada para"; só a de antes de hoje foi "realizada em". */
-export function textoDaReuniao(data: string | null, hoje: string): string {
+export function textoDaModelagemPiloto(data: string | null, hoje: string): string {
   if (data === null) return 'não marcada'
   return data >= hoje ? `marcada para ${formatarData(data)}` : `realizada em ${formatarData(data)}`
 }
 
-export type MomentoDaReuniao = 'proxima' | 'realizada'
+export type MomentoDaModelagemPiloto = 'proxima' | 'realizada'
 
 /** No verso: a data de hoje ainda é a próxima; só a de antes de hoje foi realizada. Sem data, nenhum. */
-export function momentoDaReuniao(data: string | null, hoje: string): MomentoDaReuniao | null {
+export function momentoDaModelagemPiloto(data: string | null, hoje: string): MomentoDaModelagemPiloto | null {
   if (data === null) return null
   return data >= hoje ? 'proxima' : 'realizada'
 }

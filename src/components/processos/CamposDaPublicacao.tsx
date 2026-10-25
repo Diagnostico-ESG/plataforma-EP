@@ -1,5 +1,5 @@
 import { useId } from 'react'
-import { hojeLocal } from '../../processos/textoDaReuniao'
+import { hojeLocal } from '../../processos/textoDaModelagemPiloto'
 
 type ValorDosCampos = { data: string; link: string }
 type CamposDaPublicacaoProps<T extends ValorDosCampos> = { valor: T; aoMudar: (valor: T) => void }

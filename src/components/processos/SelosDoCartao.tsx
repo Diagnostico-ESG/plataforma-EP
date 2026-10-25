@@ -6,7 +6,7 @@ import { Pilula } from '../Pilula'
 function SeloDoCartao({ selo }: { selo: Selo }) {
   if (selo.tipo === 'versao') return <span className="selo-texto selo-versao">{selo.texto}</span>
   if (selo.tipo === 'subprocessos') return <span className="selo-texto">{selo.texto}</span>
-  const corpo = selo.tipo === 'reuniao' ? <span className="selo-reuniao">{selo.texto}</span> : selo.texto
+  const corpo = selo.tipo === 'modelagem' ? <span className="selo-modelagem">{selo.texto}</span> : selo.texto
   return <Pilula situacao={selo.tom === 'alerta' ? 'vencendo' : 'neutra'}>{corpo}</Pilula>
 }
 

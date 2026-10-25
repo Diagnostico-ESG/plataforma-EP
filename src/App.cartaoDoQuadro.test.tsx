@@ -106,17 +106,19 @@ test('Sem responsável aparece só sem responsável', async () => {
   expect(selos(await cartaoDe('Com Dono'))).toEqual([])
 })
 
-test('Reunião: hoje, futura com dia e mês, e nada depois que passou', async () => {
+test('Modelagem: hoje, futura com dia e mês, e nada depois que passou nem fora de Não iniciados e da Modelagem piloto', async () => {
   const futura = dia(6)
   const [, mes, diaDoMes] = futura.split('-')
   montar([
-    processo('Reunião Hoje', { processo: { dataDaReuniao: dia(0) } }),
-    processo('Reunião Futura', { processo: { dataDaReuniao: futura } }),
-    processo('Reunião Passada', { processo: { dataDaReuniao: dia(-1) } }),
+    processo('Modelagem Hoje', { etapa: 'modelagem', processo: { dataDaModelagemPiloto: dia(0) } }),
+    processo('Modelagem Futura', { etapa: 'nao_iniciados', processo: { dataDaModelagemPiloto: futura } }),
+    processo('Modelagem Passada', { etapa: 'modelagem', processo: { dataDaModelagemPiloto: dia(-1) } }),
+    processo('Outra Etapa', { etapa: 'revisao_interna', processo: { dataDaModelagemPiloto: futura } }),
   ])
-  expect(selos(await cartaoDe('Reunião Hoje'))).toEqual(['Reunião hoje'])
-  expect(selos(await cartaoDe('Reunião Futura'))).toEqual([`Reunião ${diaDoMes}/${mes}`])
-  expect(selos(await cartaoDe('Reunião Passada'))).toEqual([])
+  expect(selos(await cartaoDe('Modelagem Hoje'))).toEqual(['Modelagem hoje'])
+  expect(selos(await cartaoDe('Modelagem Futura'))).toEqual([`Modelagem ${diaDoMes}/${mes}`])
+  expect(selos(await cartaoDe('Modelagem Passada'))).toEqual([])
+  expect(selos(await cartaoDe('Outra Etapa'))).toEqual([])
 })
 
 test('versão: V3 e V5F em texto neutro, e nada sem versão', async () => {
@@ -137,13 +139,13 @@ test('subprocessos no singular e no plural, sem contar os cancelados (a view já
   expect(selos(await cartaoDe('Pai Zero'))).toEqual([])
 })
 
-test('a ordem dos selos: dias, Relatório pendente, Sem responsável, Reunião, versão e subprocessos', async () => {
+test('a ordem dos selos: dias, Sem responsável, Modelagem, versão e subprocessos', async () => {
   montar([processo('Tudo Junto', {
-    cartao: { ...SEM_RELATORIO, subprocessos: 2 },
-    processo: { entrouNaEtapaEm: dia(-20), responsavel: null, dataDaReuniao: dia(0) },
+    etapa: 'modelagem', cartao: { ...SEM_RELATORIO, subprocessos: 2 },
+    processo: { entrouNaEtapaEm: dia(-20), responsavel: null, dataDaModelagemPiloto: dia(0) },
   })])
   expect(selos(await cartaoDe('Tudo Junto'))).toEqual([
-    '20 dias nesta etapa', 'Relatório pendente', 'Sem responsável', 'Reunião hoje', 'V3', '2 subprocessos',
+    '20 dias nesta etapa', 'Sem responsável', 'Modelagem hoje', 'V3', '2 subprocessos',
   ])
 })
 

@@ -99,18 +99,18 @@ describe('congelamento', () => {
 describe('data da reunião de modelagem piloto', () => {
   test('marca, troca e remove, em qualquer situação', async () => {
     const modulo = falso('cancelado')
-    await modulo.marcarReuniao('p1', '2026-10-20')
-    expect((await lido(modulo)).dataDaReuniao).toBe('2026-10-20')
-    await modulo.marcarReuniao('p1', null)
-    expect((await lido(modulo)).dataDaReuniao).toBeNull()
-    expect(modulo.chamadas).toEqual([{ acao: 'reuniao', id: 'p1', nota: '2026-10-20' }, { acao: 'reuniao', id: 'p1' }])
+    await modulo.marcarDataDaModelagemPiloto('p1', '2026-10-20')
+    expect((await lido(modulo)).dataDaModelagemPiloto).toBe('2026-10-20')
+    await modulo.marcarDataDaModelagemPiloto('p1', null)
+    expect((await lido(modulo)).dataDaModelagemPiloto).toBeNull()
+    expect(modulo.chamadas).toEqual([{ acao: 'data_da_modelagem_piloto', id: 'p1', nota: '2026-10-20' }, { acao: 'data_da_modelagem_piloto', id: 'p1' }])
   })
 
   test('a falha programada e o processo que sumiu chegam como no módulo real', async () => {
     const modulo = falso()
-    await expect(modulo.marcarReuniao('px', '2026-10-20')).rejects.toBeInstanceOf(CadastroInexistente)
+    await expect(modulo.marcarDataDaModelagemPiloto('px', '2026-10-20')).rejects.toBeInstanceOf(CadastroInexistente)
     modulo.falhaDeGravacao = new TravaDoBanco('Seu perfil não permite alterar os processos.')
-    expect((await falhaDe(modulo.marcarReuniao('p1', '2026-10-20'))).message).toBe('Seu perfil não permite alterar os processos.')
+    expect((await falhaDe(modulo.marcarDataDaModelagemPiloto('p1', '2026-10-20'))).message).toBe('Seu perfil não permite alterar os processos.')
   })
 
   test('o processo novo nasce sem data', async () => {
@@ -119,6 +119,6 @@ describe('data da reunião de modelagem piloto', () => {
       nome: 'Novo', setorId: 's1', macroprocessoId: 'm1', tipo: 'processo', processoPaiId: null, origem: 'novo',
       contexto: null, observacoes: null,
     })
-    expect(modulo.processos[0].dataDaReuniao).toBeNull()
+    expect(modulo.processos[0].dataDaModelagemPiloto).toBeNull()
   })
 })

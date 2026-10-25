@@ -137,9 +137,9 @@ test('falha ao ler o histórico vira erro com o motivo do banco', async () => {
 
 test.each([['2026-10-20'], [null]])('a data da reunião (%s) chega com o processo', async (data) => {
   const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['processos_com_andamento.select'] = { data: [{ ...LINHA, data_da_reuniao: data }], error: null }
+  cliente.respostas['processos_com_andamento.select'] = { data: [{ ...LINHA, data_da_modelagem_piloto: data }], error: null }
 
-  expect((await criar(cliente).lerProcesso('p1'))?.dataDaReuniao).toBe(data)
+  expect((await criar(cliente).lerProcesso('p1'))?.dataDaModelagemPiloto).toBe(data)
 })
 
 test('o processo traz a versão mais recente não histórica, com o autor e os papéis dos arquivos', async () => {

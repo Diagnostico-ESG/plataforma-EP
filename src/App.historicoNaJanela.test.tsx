@@ -27,7 +27,7 @@ const PROCESSO: ProcessoLido = {
   macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento',
   etapaAtual: { codigo: 'relatorio', nome: 'Relatório e modelagem técnica', ordem: 5, id: 'e', posicao: 1, total: 1 },
   responsavel: null, origem: 'retomado', contexto: 'Contexto inventado', observacoes: null,
-  processoPaiId: null, processoPai: null, subprocessos: [], motivoDaSituacao: null, dataDaReuniao: null, ultimaVersao: null,
+  processoPaiId: null, processoPai: null, subprocessos: [], motivoDaSituacao: null, dataDaModelagemPiloto: null, ultimaVersao: null,
   etapasDoVerso: [],
 }
 
@@ -127,3 +127,11 @@ test('recarregar com o Histórico aberto volta ao verso', async () => {
   expect(await (await versoAberto()).findByRole('region', { name: 'Etapas' })).toBeTruthy()
   expect(screen.queryByRole('heading', { name: 'Histórico' })).toBeNull()
 })
+
+test.each(['data_da_modelagem_piloto', 'data_da_reuniao'])(
+  'o Histórico diz "Data da modelagem piloto" no evento com a chave %s, inclusive nos antigos', async (chave) => {
+    montar([evento(4, '2026-10-19T10:00:00', { acao: 'editar', antes: { [chave]: null }, depois: { [chave]: '2026-11-12' } })])
+    const verso = await abrirHistorico()
+    expect(await verso.findAllByText(/Data da modelagem piloto/)).toBeTruthy()
+    expect(verso.queryByText(/Reunião/)).toBeNull()
+  })

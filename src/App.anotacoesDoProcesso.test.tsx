@@ -20,14 +20,14 @@ afterEach(() => {
 
 const DA_BIA: AnotacoesLidas = { texto: 'Linha 1\nLinha 2', alteradoPor: 'Bia Teste', alteradoEm: '2026-10-12T15:05:00Z' }
 
-test('o bloco é o primeiro da coluna direita, acima da Reunião, com o campo "Anotações" e a dica no vazio', async () => {
+test('o bloco é o primeiro da coluna direita, acima da Data da modelagem piloto, com o campo "Anotações" e a dica no vazio', async () => {
   montarVerso(processoDasAnotacoes())
   const campo = await campoDasAnotacoes()
   const coluna = campo.closest('.verso-contexto') as HTMLElement
   expect(coluna.firstElementChild?.querySelector('h3')?.textContent).toBe('Anotações')
   expect(campo.getAttribute('placeholder')).toBe('Escreva aqui as anotações do processo')
   const titulos = (await (await versoAberto()).findAllByRole('heading', { level: 3 })).map((titulo) => titulo.textContent)
-  expect(titulos.indexOf('Anotações')).toBeLessThan(titulos.indexOf('Reunião'))
+  expect(titulos.indexOf('Anotações')).toBeLessThan(titulos.indexOf('Data da modelagem piloto'))
 })
 
 test('sem anotação gravada, a linha "Alterado por" não aparece; o estado fica vazio mas existe para o leitor de tela', async () => {

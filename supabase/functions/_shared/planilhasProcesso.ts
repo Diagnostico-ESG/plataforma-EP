@@ -25,9 +25,9 @@ export function rotuloDoProcesso(processo: ProcessoDoPacote, etapas: EtapaDoPaco
   return atual?.fase ? `Em andamento · ${atual.fase}` : 'Em andamento'
 }
 
-/** A data da reunião; sem ela, o dia em que a fase IV (Modelagem piloto) passou a contar como concluída. */
+/** A data da modelagem piloto; sem ela, o dia em que a fase IV (Modelagem piloto) passou a contar como concluída. */
 export function dataDaModelagemPiloto(processo: ProcessoDoPacote, fases: FaseDoProcesso[]): string {
-  return processo.data_da_reuniao ?? fases.find((fase) => fase.fase === 'IV')?.concluidaEm ?? ''
+  return processo.data_da_modelagem_piloto ?? fases.find((fase) => fase.fase === 'IV')?.concluidaEm ?? ''
 }
 
 export function dataDaPublicacao(processo: ProcessoDoPacote): string {

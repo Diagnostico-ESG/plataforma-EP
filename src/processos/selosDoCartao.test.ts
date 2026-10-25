@@ -74,11 +74,18 @@ describe('demais selos', () => {
     expect(tipos(umProcesso('A'))).not.toContain('sem_responsavel')
   })
 
-  test('Reunião hoje, futura e passada', () => {
-    expect(textos(umProcesso('A', { dataDaReuniao: HOJE }))).toEqual(['Reunião hoje'])
-    expect(textos(umProcesso('A', { dataDaReuniao: '2026-10-25' }))).toEqual(['Reunião 25/10'])
-    expect(textos(umProcesso('A', { dataDaReuniao: '2026-10-18' }))).toEqual([])
-    expect(textos(umProcesso('A', { dataDaReuniao: null }))).toEqual([])
+  test.each(['nao_iniciados', 'modelagem'])('Modelagem hoje, futura e passada em %s', (etapa) => {
+    const com = (data: string | null) => textos(umProcesso('A', { dataDaModelagemPiloto: data }, etapa))
+    expect(com(HOJE)).toEqual(['Modelagem hoje'])
+    expect(com('2026-10-25')).toEqual(['Modelagem 25/10'])
+    expect(com('2026-10-18')).toEqual([])
+    expect(com(null)).toEqual([])
+  })
+
+  test('com a data futura, o selo some fora de Não iniciados e da Modelagem piloto', () => {
+    for (const etapa of ['relatorio_modelagem_tecnica', 'revisao_interna', 'publicacao', 'concluidos']) {
+      expect(tipos(umProcesso('A', { dataDaModelagemPiloto: '2026-10-25' }, etapa))).not.toContain('modelagem')
+    }
   })
 
   test('versão: V3, V5F e ausente sem versão', () => {
@@ -97,11 +104,17 @@ describe('demais selos', () => {
   })
 })
 
-test('a ordem: dias, Relatório pendente, Sem responsável, Reunião, versão, subprocessos', () => {
+// O Relatório pendente (da Revisão interna em diante) e a Modelagem (só até a Modelagem piloto) não convivem: a ordem se confere em duas partes.
+test('a ordem: dias, Sem responsável, Modelagem, versão, subprocessos', () => {
   const todos = umProcesso('A', {
-    responsavel: null, dataDaReuniao: HOJE, entrouNaEtapaEm: '2026-09-01', cartao: { ...semRelatorio, subprocessos: 2 },
-  })
-  expect(tipos(todos)).toEqual(['dias', 'relatorio', 'sem_responsavel', 'reuniao', 'versao', 'subprocessos'])
+    responsavel: null, dataDaModelagemPiloto: HOJE, entrouNaEtapaEm: '2026-09-01', cartao: { ...semRelatorio, subprocessos: 2 },
+  }, 'modelagem')
+  expect(tipos(todos)).toEqual(['dias', 'sem_responsavel', 'modelagem', 'versao', 'subprocessos'])
+})
+
+test('a ordem: dias, Relatório pendente, Sem responsável, versão, subprocessos', () => {
+  const todos = umProcesso('A', { responsavel: null, entrouNaEtapaEm: '2026-09-01', cartao: { ...semRelatorio, subprocessos: 2 } })
+  expect(tipos(todos)).toEqual(['dias', 'relatorio', 'sem_responsavel', 'versao', 'subprocessos'])
 })
 
 test('o processo sem cartão não tem selos de cartão', () => {

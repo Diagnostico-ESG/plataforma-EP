@@ -10,6 +10,7 @@ import type { ProcessoLido } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
 import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
+import { hojeEmBrasilia } from './lib/datas'
 import { escolherNoMenuDoProcesso, janelasPorCima } from './testes/versoDoCartao'
 
 beforeEach(() => {
@@ -25,7 +26,7 @@ const EMITIR: ProcessoLido = {
   macroprocessoNome: 'Macro A', situacao: 'em_andamento', etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, id: 'e', posicao: 1, total: 1 },
   responsavel: null, origem: 'retomado', contexto: 'Contexto inventado', observacoes: null,
   processoPaiId: null, processoPai: null, subprocessos: [],
-  motivoDaSituacao: null, dataDaReuniao: null, ultimaVersao: null, etapasDoVerso: [],
+  motivoDaSituacao: null, dataDaModelagemPiloto: null, ultimaVersao: null, etapasDoVerso: [],
 }
 
 type Montagem = { perfil?: Perfil; processos?: ProcessoLido[] }
@@ -108,6 +109,33 @@ test('cadastrar grava os dados e abre o verso do criado; ao fechar, o cartão ap
   fireEvent.keyDown(within(verso).getByRole('heading', { name: 'Emitir Ofício', level: 2 }), { key: 'Escape' })
   const coluna = within(await screen.findByRole('region', { name: 'Reunião de modelagem' }))
   expect(await coluna.findByRole('link', { name: /Emitir Ofício/ })).toBeTruthy()
+})
+
+const DATA = 'Data da modelagem piloto'
+const campoDaData = (form: ReturnType<typeof within>) => form.getByLabelText(DATA) as HTMLInputElement
+
+test('o Novo processo abre com a Data da modelagem piloto de hoje em Brasília, num campo de data', async () => {
+  montar()
+  const campo = campoDaData(await formulario())
+  expect([campo.type, campo.value]).toEqual(['date', hojeEmBrasilia()])
+})
+
+test.each([
+  ['com a data de hoje', undefined, hojeEmBrasilia()],
+  ['com outra data', '2026-11-12', '2026-11-12'],
+  ['com o campo vazio', '', null],
+])('cadastrar %s grava o que estava no campo', async (_caso, digitada, gravada) => {
+  const falso = montar()
+  const form = await formulario()
+  preencher(form, { nome: 'Emitir Ofício', setor: 's1', macro: 'm1' })
+  if (digitada !== undefined) escrever(campoDaData(form), digitada)
+  cadastrar(form)
+  await waitFor(() => expect(falso.processos).toHaveLength(1))
+  expect(falso.processos[0].dataDaModelagemPiloto).toBe(gravada)
+})
+
+test('o Editar não tem o campo da Data da modelagem piloto: ela se altera no verso', async () => {
+  expect((await abrirEdicao()).form.queryByLabelText(DATA)).toBeNull()
 })
 
 test('o aviso "Processo cadastrado" só vale para o verso recém-aberto pelo cadastro', async () => {

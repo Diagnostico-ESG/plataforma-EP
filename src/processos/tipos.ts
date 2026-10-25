@@ -74,7 +74,7 @@ export type ProcessoDaLista = {
   entrouNaEtapaEm?: string | null
   responsavel: ResponsavelDoProcesso | null
   /** A data da reunião de modelagem piloto (AAAA-MM-DD). Opcional para quem monta o processo à mão; o ProcessoLido a exige. */
-  dataDaReuniao?: string | null
+  dataDaModelagemPiloto?: string | null
   /** Opcional pelo mesmo motivo: sem ele o cartão não tem selos de versão nem de subprocessos. */
   cartao?: DadosDoCartao
   /** O dia da publicação (AAAA-MM-DD); null sem a data. Opcional pelo mesmo motivo. */
@@ -131,7 +131,7 @@ export type ProcessoLido = ProcessoDaLista & {
   /** As etapas ativas, na ordem do catálogo. */
   etapasDoVerso: EtapaDoVerso[]
   /** A data da reunião de modelagem piloto (AAAA-MM-DD), passada ou futura; null quando não marcada. */
-  dataDaReuniao: string | null
+  dataDaModelagemPiloto: string | null
   /** Null sem versão não histórica. */
   ultimaVersao: UltimaVersao | null
 }
@@ -150,6 +150,8 @@ export type DadosDoProcesso = {
   origem: OrigemDoProcesso
   contexto: string | null
   observacoes: string | null
+  /** Só no cadastro (AAAA-MM-DD; null ou ausente = sem data): depois dele a data se altera no verso. */
+  dataDaModelagemPiloto?: string | null
 }
 
 /** O tipo novo de uma reclassificação; o pai só no subprocesso. Nada volta a "a classificar". */
@@ -177,7 +179,7 @@ export type ModuloDeProcessos = {
   editarProcesso(id: string, dados: DadosDoProcesso): Promise<void>
   excluirProcesso(id: string): Promise<void>
   /** Marca, troca ou (com null) remove a data da reunião de modelagem piloto; vale em qualquer situação do processo. */
-  marcarReuniao(id: string, data: string | null): Promise<void>
+  marcarDataDaModelagemPiloto(id: string, data: string | null): Promise<void>
   /** null: o processo não existe (mais). Fora do ProcessoLido: o texto só o verso lê (ADR 0021). */
   lerAnotacoes(id: string): Promise<AnotacoesLidas | null>
   /**

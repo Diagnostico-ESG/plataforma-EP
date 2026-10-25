@@ -14,7 +14,7 @@ import {
   conferirPai, conferirSemSubprocessos, estruturaDoProcesso, levarMacroprocessoAosFilhos, macroprocessoDo, reclassificar,
 } from './reclassificacaoFalso'
 import { conferirProcessoEmAndamento, mudarSituacao } from './situacaoFalso'
-import { hojeLocal } from './textoDaReuniao'
+import { hojeLocal } from './textoDaModelagemPiloto'
 import type {
   DadosDaChegada, DadosDoProcesso, EtapaDoCatalogo, EtiquetaDaEtapa, ListaDeProcessos, ModuloDeProcessos, ProcessoLido,
   Reclassificacao, UsuarioResponsavel,
@@ -179,17 +179,18 @@ export class ProcessosFalso implements ModuloDeProcessos {
     const campos: Partial<DadosDoProcesso> = { ...dados }
     delete campos.tipo
     delete campos.processoPaiId
+    delete campos.dataDaModelagemPiloto
     const pai = this.processos.find((processo) => processo.id === atual.processoPaiId)
     const editado = { ...atual, ...this.nomesDoCartao(dados), ...campos, ...(pai ? macroprocessoDo(pai) : {}) }
     this.processos = levarMacroprocessoAosFilhos(this.processos.map((processo) => (processo.id === id ? editado : processo)), editado)
   }
 
   // Como no banco, a data não depende da situação do processo nem mexe em etapa.
-  async marcarReuniao(id: string, data: string | null): Promise<void> {
+  async marcarDataDaModelagemPiloto(id: string, data: string | null): Promise<void> {
     this.conferirGravacao()
     conferirNaoArquivado(this.acharProcesso(id))
-    this.chamadas.push(data === null ? { acao: 'reuniao', id } : { acao: 'reuniao', id, nota: data })
-    this.processos = this.processos.map((processo) => (processo.id === id ? { ...processo, dataDaReuniao: data } : processo))
+    this.chamadas.push(data === null ? { acao: 'data_da_modelagem_piloto', id } : { acao: 'data_da_modelagem_piloto', id, nota: data })
+    this.processos = this.processos.map((processo) => (processo.id === id ? { ...processo, dataDaModelagemPiloto: data } : processo))
   }
 
   async excluirProcesso(id: string): Promise<void> {
@@ -230,7 +231,7 @@ export class ProcessosFalso implements ModuloDeProcessos {
       ...dados, ...this.nomesDoCartao(dados), id: this.idLivreDeProcesso(), situacao: 'em_andamento',
       etapaAtual: entrada ? etapaAtualNoCatalogo(entrada, this.etapasDoCatalogo) : null, etiqueta: 'a_fazer',
       entrouNaEtapaEm: hojeLocal(), responsavel: null, motivoDaSituacao: null, processoPai: null, subprocessos: [],
-      etapasDoVerso: [], dataDaReuniao: null, ultimaVersao: null,
+      etapasDoVerso: [], ultimaVersao: null, dataDaModelagemPiloto: dados.dataDaModelagemPiloto ?? null,
     }
   }
 

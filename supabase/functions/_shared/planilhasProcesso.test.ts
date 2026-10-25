@@ -62,15 +62,15 @@ function completas(concluidaEmDaIV: string | null): FaseDoProcesso[] {
 }
 
 describe('dataDaModelagemPiloto', () => {
-  it('é a data da reunião, mesmo com a fase IV concluída em outro dia', () => {
-    expect(dataDaModelagemPiloto(processoDe(1, { data_da_reuniao: '2026-02-20' }), completas('2026-03-01'))).toBe('2026-02-20')
+  it('é a data da modelagem piloto, mesmo com a fase IV concluída em outro dia', () => {
+    expect(dataDaModelagemPiloto(processoDe(1, { data_da_modelagem_piloto: '2026-02-20' }), completas('2026-03-01'))).toBe('2026-02-20')
   })
 
-  it('sem reunião, é a data de conclusão da fase IV', () => {
+  it('sem a data da modelagem piloto, é a data de conclusão da fase IV', () => {
     expect(dataDaModelagemPiloto(processoDe(1), completas('2026-03-01'))).toBe('2026-03-01')
   })
 
-  it('sem reunião e sem conclusão da fase IV, fica vazia', () => {
+  it('sem a data da modelagem piloto e sem conclusão da fase IV, fica vazia', () => {
     expect(dataDaModelagemPiloto(processoDe(1), completas(null))).toBe('')
   })
 })

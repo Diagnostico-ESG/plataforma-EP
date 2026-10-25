@@ -22,7 +22,7 @@ import { EstruturaDoProcesso } from './EstruturaDoProcesso'
 import { FormularioDoProcesso } from './FormularioDoProcesso'
 import { HistoricoDoProcesso } from './HistoricoDoProcesso'
 import { JanelaDoVerso } from './JanelaDoVerso'
-import { ReuniaoDoProcesso } from './ReuniaoDoProcesso'
+import { DataDaModelagemPiloto } from './DataDaModelagemPiloto'
 import { SobreDoProcesso } from './SobreDoProcesso'
 import { VersoCarregando } from './VersoCarregando'
 
@@ -199,7 +199,7 @@ function EdicaoDoProcesso({ processo, processos, cadastros, aoVoltar, aposMudar,
   )
 }
 
-/** Trabalho à esquerda (etapas e arquivos), contexto à direita (reunião, dados e estrutura). */
+/** Trabalho à esquerda (etapas e arquivos), contexto à direita (Data da modelagem piloto, dados e estrutura). */
 function ColunasDoVerso(props: CorpoProps) {
   const { processo, processos, versoes, revisoes, podeAlterar, usuarioId, executar, aposMudar, aoSumir, enderecoDoProcesso } = props
   // O arquivado não aceita alteração além das do Agora (Desarquivar, Registrar publicação), que recebe o perfil inteiro.
@@ -217,7 +217,7 @@ function ColunasDoVerso(props: CorpoProps) {
       <div className="verso-contexto">
         <BlocoDasAnotacoes key={processo.id} processo={processo} processos={processos} podeEscrever={alteravel}
           guardaRef={props.saida.guarda} aoSumir={aoSumir} />
-        <ReuniaoDoProcesso processo={processo} processos={processos} podeAlterar={alteravel} aoMudar={aposMudar}
+        <DataDaModelagemPiloto processo={processo} processos={processos} podeAlterar={alteravel} aoMudar={aposMudar}
           aoSumir={aoSumir} />
         <SobreDoProcesso processo={processo} />
         <EstruturaDoProcesso processo={processo} enderecoDoProcesso={enderecoDoProcesso}

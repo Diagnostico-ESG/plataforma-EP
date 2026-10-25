@@ -1,4 +1,4 @@
-import { hojeLocal } from './textoDaReuniao'
+import { hojeLocal } from './textoDaModelagemPiloto'
 import type { DadosDaChegada } from './tipos'
 
 export type OpcaoDaChegada = 'publicado' | 'sem_publicacao'

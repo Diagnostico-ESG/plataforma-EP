@@ -11,7 +11,7 @@ function lido(mudancas: Partial<ProcessoLido> = {}): ProcessoLido {
     id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1', macroprocessoNome: 'Macro',
     processoPaiId: null, situacao: 'em_andamento', etapaAtual: etapaAtualDe('revisao_interna'), etiqueta: 'em_andamento',
     entrouNaEtapaEm: '2026-10-10', responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null }, origem: 'novo', contexto: null,
-    observacoes: null, motivoDaSituacao: null, processoPai: null, subprocessos: [], etapasDoVerso: [], dataDaReuniao: null,
+    observacoes: null, motivoDaSituacao: null, processoPai: null, subprocessos: [], etapasDoVerso: [], dataDaModelagemPiloto: null,
     ultimaVersao: null, ...mudancas,
   }
 }

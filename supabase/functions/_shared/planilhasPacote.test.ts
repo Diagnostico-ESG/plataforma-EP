@@ -144,9 +144,9 @@ describe('validarPacote', () => {
     expect(validarPacote(pacote).ok).toBe(true)
   })
 
-  it('recusa data da reunião fora do formato AAAA-MM-DD', () => {
-    expect(recusa((p) => { p.processos[0].data_da_reuniao = '10/03/2026' })).toContain(
-      'campo processos[0].data_da_reuniao: esperado AAAA-MM-DD ou nulo',
+  it('recusa data da modelagem piloto fora do formato AAAA-MM-DD', () => {
+    expect(recusa((p) => { p.processos[0].data_da_modelagem_piloto = '10/03/2026' })).toContain(
+      'campo processos[0].data_da_modelagem_piloto: esperado AAAA-MM-DD ou nulo',
     )
   })
 

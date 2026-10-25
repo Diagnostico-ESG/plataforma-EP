@@ -4,7 +4,7 @@ import { dadosDoProcesso, problemaNoProcesso } from './validacaoDoProcesso'
 
 const CAMPOS = {
   nome: 'Emitir Ofício', setorId: 's1', macroprocessoId: 'm1', tipo: 'a_classificar' as TipoDeProcesso, processoPaiId: '',
-  origem: 'novo' as const, contexto: '', observacoes: '',
+  origem: 'novo' as const, contexto: '', observacoes: '', dataDaModelagemPiloto: '',
 }
 
 test('campos obrigatórios preenchidos: nenhum problema', () => {
@@ -23,8 +23,13 @@ test.each([
 test('dados saem sem espaços nas pontas e com textos vazios como nulos', () => {
   expect(dadosDoProcesso({ ...CAMPOS, nome: ' Emitir Ofício ', contexto: ' ', observacoes: ' Nota ' })).toEqual({
     nome: 'Emitir Ofício', setorId: 's1', macroprocessoId: 'm1', tipo: 'a_classificar', processoPaiId: null,
-    origem: 'novo', contexto: null, observacoes: 'Nota',
+    origem: 'novo', contexto: null, observacoes: 'Nota', dataDaModelagemPiloto: null,
   })
+})
+
+test('a Data da modelagem piloto sai como veio, e o campo vazio sai como nulo', () => {
+  expect(dadosDoProcesso({ ...CAMPOS, dataDaModelagemPiloto: '2026-11-12' }).dataDaModelagemPiloto).toBe('2026-11-12')
+  expect(dadosDoProcesso(CAMPOS).dataDaModelagemPiloto).toBeNull()
 })
 
 test('o pai só sai no subprocesso', () => {

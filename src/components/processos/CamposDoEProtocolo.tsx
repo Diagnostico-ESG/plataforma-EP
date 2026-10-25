@@ -1,5 +1,5 @@
 import { useId } from 'react'
-import { hojeLocal } from '../../processos/textoDaReuniao'
+import { hojeLocal } from '../../processos/textoDaModelagemPiloto'
 import type { RascunhoDaAprovacao } from '../../revisoes/rascunhoDaAprovacao'
 
 type CamposDoEProtocoloProps = { valor: RascunhoDaAprovacao; aoMudar: (valor: RascunhoDaAprovacao) => void }

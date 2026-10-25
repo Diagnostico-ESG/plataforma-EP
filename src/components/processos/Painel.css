@@ -91,7 +91,7 @@
 
 /* Os campos de data do painel no desenho dos outros campos (32px, borda de token), alinhados aos botões ao lado;
    sem isto ficavam com a borda e a altura padrão do navegador. */
-.reuniao-edicao input,
+.modelagem-edicao input,
 .etapa-campo-de-data input {
   min-height: 32px;
   padding: var(--esp-1) var(--esp-2);

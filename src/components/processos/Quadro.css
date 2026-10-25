@@ -173,9 +173,9 @@
   font-family: var(--fonte-mono);
 }
 
-.selo-reuniao {
+.selo-modelagem {
   padding-left: var(--esp-1);
-  border-left: 3px solid var(--tipo-reuniao);
+  border-left: 3px solid var(--tipo-modelagem);
 }
 
 .cartao-rodape {

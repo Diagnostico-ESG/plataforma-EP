@@ -191,7 +191,7 @@ insert into _tap (linha) select is(
     'nome', 'Emitir Oficio', 'setor_id', '5e000000-0000-0000-0000-000000000004', 'setor_sigla', 'TRS',
     'macroprocesso_id', 'ab000000-0000-0000-0000-000000000002', 'macroprocesso_nome', 'Macro Teste B',
     'tipo', 'a_classificar', 'origem', 'novo', 'situacao', 'em_andamento', 'contexto', null, 'observacoes', null,
-    'data_da_reuniao', null)),
+    'data_da_modelagem_piloto', null)),
   'criar gera o evento com os campos legíveis');
 insert into _tap (linha) select is(
   (select count(*)::int from public.eventos where entidade = 'setor_envolvido' and acao = 'criar'

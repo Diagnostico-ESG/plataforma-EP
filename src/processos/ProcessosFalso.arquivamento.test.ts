@@ -60,7 +60,7 @@ describe('arquivar e desarquivar', () => {
     expect(await recusa(modulo.mudarEtiqueta('p1', 'a_fazer'))).toBe(frase)
     expect(await recusa(modulo.mudarResponsavel('p1', null))).toBe(frase)
     expect(await recusa(modulo.suspenderProcesso('p1', 'Parar'))).toBe(frase)
-    expect(await recusa(modulo.marcarReuniao('p1', '2026-10-20'))).toBe(frase)
+    expect(await recusa(modulo.marcarDataDaModelagemPiloto('p1', '2026-10-20'))).toBe(frase)
     expect(await recusa(modulo.excluirProcesso('p1'))).toBe(frase)
   })
 

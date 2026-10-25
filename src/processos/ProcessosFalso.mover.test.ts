@@ -3,7 +3,7 @@ import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { CATALOGO_DE_TESTE, umProcessoLido } from '../testes/processoDaLista'
 import { ProcessosFalso } from './ProcessosFalso'
-import { hojeLocal } from './textoDaReuniao'
+import { hojeLocal } from './textoDaModelagemPiloto'
 import type { DadosDaChegada, DadosDoProcesso, ProcessoLido } from './tipos'
 
 const ANA = { id: 'u1', nome: 'Ana Teste' }

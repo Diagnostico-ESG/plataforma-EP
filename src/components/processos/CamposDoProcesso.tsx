@@ -10,8 +10,8 @@ export type OpcoesDoProcesso = { setores: Setor[]; macroprocessos: Macroprocesso
 type CamposDoFormularioProps = {
   campos: CamposDoProcesso
   opcoes: OpcoesDoProcesso
-  /** Tipo e pai só se escolhem no cadastro: depois dele, só a reclassificação os muda. */
-  mostrarTipo: boolean
+  /** Tipo, pai e Data da modelagem piloto só se escolhem no cadastro: o tipo e o pai mudam depois pela reclassificação, a data no verso. */
+  cadastrando: boolean
   aoMudar: (mudanca: Partial<CamposDoProcesso>) => void
 }
 
@@ -22,7 +22,7 @@ const TIPOS: TipoDeProcesso[] = ['processo', 'subprocesso', 'a_classificar']
  * Os campos do formulário do processo. Setor e macroprocesso: só os ativos (e o atual, se já foi desativado).
  * No subprocesso, o macroprocesso fica fixo no do pai.
  */
-export function CamposDoFormulario({ campos, opcoes, mostrarTipo, aoMudar }: CamposDoFormularioProps) {
+export function CamposDoFormulario({ campos, opcoes, cadastrando, aoMudar }: CamposDoFormularioProps) {
   const id = useId()
   return (
     <>
@@ -37,8 +37,8 @@ export function CamposDoFormulario({ campos, opcoes, mostrarTipo, aoMudar }: Cam
         ))}
       </select>
       <CampoDoMacroprocesso id={id} campos={campos} macroprocessos={opcoes.macroprocessos} aoMudar={aoMudar} />
-      {mostrarTipo && <CampoDoTipo id={id} valor={campos.tipo} aoMudar={aoMudar} />}
-      {mostrarTipo && campos.tipo === 'subprocesso' && (
+      {cadastrando && <CampoDoTipo id={id} valor={campos.tipo} aoMudar={aoMudar} />}
+      {cadastrando && campos.tipo === 'subprocesso' && (
         <CampoDoPai id={id} valor={campos.processoPaiId} pais={opcoes.pais} aoMudar={aoMudar} />
       )}
       <label htmlFor={`${id}-origem`}>Origem</label>
@@ -46,6 +46,13 @@ export function CamposDoFormulario({ campos, opcoes, mostrarTipo, aoMudar }: Cam
         onChange={(evento) => aoMudar({ origem: evento.target.value as OrigemDoProcesso })}>
         {ORIGENS.map((origem) => <option key={origem} value={origem}>{ROTULO_DA_ORIGEM[origem]}</option>)}
       </select>
+      {cadastrando && (
+        <>
+          <label htmlFor={`${id}-data`}>Data da modelagem piloto</label>
+          <input id={`${id}-data`} type="date" value={campos.dataDaModelagemPiloto}
+            onChange={(evento) => aoMudar({ dataDaModelagemPiloto: evento.target.value })} />
+        </>
+      )}
       <label htmlFor={`${id}-contexto`}>Contexto</label>
       <textarea id={`${id}-contexto`} value={campos.contexto} maxLength={4000} rows={3}
         onChange={(evento) => aoMudar({ contexto: evento.target.value })} />

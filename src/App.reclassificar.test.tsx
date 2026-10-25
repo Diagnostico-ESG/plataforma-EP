@@ -25,7 +25,7 @@ function processo({ id, nome, tipo, macro, pai = null }: Item): ProcessoLido {
     id, nome, tipo, setorId: 's1', setorSigla: 'TSA', macroprocessoId: macro,
     macroprocessoNome: macro === 'm1' ? 'Macro A' : 'Macro B', processoPaiId: pai, situacao: 'em_andamento',
     etapaAtual: null, responsavel: null, origem: 'novo', contexto: null, observacoes: null,
-    motivoDaSituacao: null, processoPai: null, subprocessos: [], dataDaReuniao: null, ultimaVersao: null, etapasDoVerso: [],
+    motivoDaSituacao: null, processoPai: null, subprocessos: [], dataDaModelagemPiloto: null, ultimaVersao: null, etapasDoVerso: [],
   }
 }
 

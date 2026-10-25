@@ -1,6 +1,7 @@
 import { type FormEvent, useState } from 'react'
 import { textoDaFalhaNoFormulario } from '../../acesso/falhasDeGravacao'
 import type { ModuloDeCadastros } from '../../cadastros/tipos'
+import { hojeEmBrasilia } from '../../lib/datas'
 import type { DadosDoProcesso, ProcessoLido } from '../../processos/tipos'
 import { type CamposDoProcesso, dadosDoProcesso, problemaNoProcesso } from '../../processos/validacaoDoProcesso'
 import { AvisoDeSetorIncluido } from './AvisoDeSetorIncluido'
@@ -15,17 +16,18 @@ type FormularioProntoProps = {
   aoCancelar: () => void
 }
 
-const CAMPOS_EM_BRANCO: CamposDoProcesso = {
+// O processo nasce, no caso mais comum, da reunião com o setor: a Data da modelagem piloto já vem com o dia de hoje.
+const camposEmBranco = (): CamposDoProcesso => ({
   nome: '', setorId: '', macroprocessoId: '', tipo: 'a_classificar', processoPaiId: '', origem: 'novo', contexto: '',
-  observacoes: '',
-}
+  observacoes: '', dataDaModelagemPiloto: hojeEmBrasilia(),
+})
 
 function camposIniciais(inicial?: ProcessoLido): CamposDoProcesso {
-  if (!inicial) return CAMPOS_EM_BRANCO
+  if (!inicial) return camposEmBranco()
   return {
     nome: inicial.nome, setorId: inicial.setorId, macroprocessoId: inicial.macroprocessoId,
     tipo: inicial.tipo, processoPaiId: inicial.processoPaiId ?? '', origem: inicial.origem,
-    contexto: inicial.contexto ?? '', observacoes: inicial.observacoes ?? '',
+    contexto: inicial.contexto ?? '', observacoes: inicial.observacoes ?? '', dataDaModelagemPiloto: '',
   }
 }
 
@@ -59,7 +61,7 @@ export function FormularioPronto({ cadastros, opcoes, titulo, inicial, aoSalvar,
   const macroprocesso = opcoes.macroprocessos.find((outro) => outro.id === campos.macroprocessoId)
   return (
     <form className="formulario-do-processo" aria-label={titulo} noValidate onSubmit={enviar}>
-      <CamposDoFormulario campos={campos} opcoes={opcoes} mostrarTipo={!inicial}
+      <CamposDoFormulario campos={campos} opcoes={opcoes} cadastrando={!inicial}
         aoMudar={(mudanca) => setCampos((atuais) => comMacroprocessoDoPai({ ...atuais, ...mudanca }, opcoes.pais))} />
       {setor && macroprocesso && (
         <AvisoDeSetorIncluido key={macroprocesso.id} cadastros={cadastros} setorId={setor.id} setorSigla={setor.sigla}

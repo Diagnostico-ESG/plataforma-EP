@@ -459,7 +459,7 @@ export type Database = {
           arquivado_em: string | null
           contexto: string | null
           criado_em: string
-          data_da_reuniao: string | null
+          data_da_modelagem_piloto: string | null
           explicacao_sem_publicacao: string | null
           id: string
           link_da_publicacao: string | null
@@ -482,7 +482,7 @@ export type Database = {
           arquivado_em?: string | null
           contexto?: string | null
           criado_em?: string
-          data_da_reuniao?: string | null
+          data_da_modelagem_piloto?: string | null
           explicacao_sem_publicacao?: string | null
           id?: string
           link_da_publicacao?: string | null
@@ -505,7 +505,7 @@ export type Database = {
           arquivado_em?: string | null
           contexto?: string | null
           criado_em?: string
-          data_da_reuniao?: string | null
+          data_da_modelagem_piloto?: string | null
           explicacao_sem_publicacao?: string | null
           id?: string
           link_da_publicacao?: string | null
@@ -847,7 +847,7 @@ export type Database = {
           arquivado_em: string | null
           contexto: string | null
           criado_em: string | null
-          data_da_reuniao: string | null
+          data_da_modelagem_piloto: string | null
           entrou_na_etapa_em: string | null
           etapa_atual_codigo: string | null
           etapa_atual_id: string | null

@@ -56,7 +56,7 @@ describe('montarPlanilhaInterna: aba Processos', () => {
     expect(linhaDoProcesso('Arquivado')[5]).toBe('Publicado')
   })
 
-  it('a data da modelagem piloto vem da reunião ou, sem ela, da conclusão da fase IV', () => {
+  it('a data da modelagem piloto vem da data marcada ou, sem ela, da conclusão da fase IV', () => {
     expect(linhaDoProcesso('Comum')[6]).toBe('2026-02-20')
     expect(linhaDoProcesso('Publicado')[6]).toBe('2026-04-01')
     expect(linhaDoProcesso('Sub')[6]).toBe('')
