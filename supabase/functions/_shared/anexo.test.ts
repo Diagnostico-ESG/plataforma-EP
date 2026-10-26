@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { LIMITE_DE_TAMANHO } from './decisao.ts'
-import { LIMITE_DO_NOME, nomeDoAnexoNoDrive, validarEnvio, validarIniciarEnvioDoAnexo } from './anexo.ts'
+import { LIMITE_DE_TAMANHO, conferirChamador, conferirProcessoEmAndamento, lerAcao, type Perfil } from './decisao.ts'
+import {
+  LIMITE_DO_NOME, RECUSA_ANEXO_JA_RETIRADO, nomeDoAnexoNoDrive, validarEnvio, validarIniciarEnvioDoAnexo, validarRetirar,
+} from './anexo.ts'
 
 const PROCESSO = '9f000000-0000-0000-0000-0000000000b1'
 
@@ -97,5 +99,53 @@ describe('validarEnvio', () => {
   it('recusa corpo que não é objeto', () => {
     const resultado = validarEnvio(null)
     expect(resultado.ok).toBe(false)
+  })
+})
+
+const ANEXO = '7e000000-0000-0000-0000-0000000000c1'
+
+describe('validarRetirar', () => {
+  it('aceita o pedido com o identificador do anexo e ignora o resto', () => {
+    const resultado = validarRetirar({ acao: 'retirar', anexo_id: ANEXO, motivo: 'engano', nome: 'resposta.eml' })
+    expect(resultado).toEqual({ ok: true, valor: { anexoId: ANEXO } })
+  })
+
+  it.each([null, 'texto', 7, [ANEXO]])('recusa corpo que não é objeto (%j)', (corpo) => {
+    const resultado = validarRetirar(corpo)
+    expect(resultado.ok ? null : resultado.recusa.codigo).toBe('entrada_invalida')
+  })
+
+  it.each([undefined, null, 5, 'não-é-uuid', '', ' '])('recusa anexo_id %j, sem repetir o valor recebido', (valor) => {
+    const resultado = validarRetirar({ acao: 'retirar', anexo_id: valor })
+    expect(resultado.ok).toBe(false)
+    if (!resultado.ok) expect(resultado.recusa.mensagem).toContain('campo anexo_id: esperado uuid')
+    if (!resultado.ok && typeof valor === 'string' && valor.trim() !== '') expect(resultado.recusa.mensagem).not.toContain(valor)
+  })
+})
+
+describe('a ação retirar', () => {
+  it('é reconhecida pela função', () => {
+    expect(lerAcao({ acao: 'retirar' })).toBe('retirar')
+  })
+
+  it.each<[Perfil, string | null]>([['administrador', null], ['integrante_ep', null], ['consulta', 'sem_permissao']])(
+    'perfil %s: %s',
+    (perfil, esperado) => {
+      expect(conferirChamador({ perfil, ativo: true }, 'retirar')?.codigo ?? null).toBe(esperado)
+    },
+  )
+
+  it('recusa o usuário desativado, mesmo administrador, e quem não entrou', () => {
+    expect(conferirChamador({ perfil: 'administrador', ativo: false }, 'retirar')?.codigo).toBe('usuario_inativo')
+    expect(conferirChamador(null, 'retirar')?.codigo).toBe('sem_login')
+  })
+
+  it.each(['suspenso', 'cancelado', 'concluido'])('o processo %s não retira anexo; em andamento retira', (situacao) => {
+    expect(conferirProcessoEmAndamento(situacao)?.codigo).toBe('processo_fora_de_andamento')
+    expect(conferirProcessoEmAndamento('em_andamento')).toBeNull()
+  })
+
+  it('o anexo que já não existe tem recusa própria, com a frase e o código que a tela traduz', () => {
+    expect(RECUSA_ANEXO_JA_RETIRADO).toEqual({ codigo: 'anexo_ja_retirado', mensagem: 'O anexo já foi retirado.' })
   })
 })

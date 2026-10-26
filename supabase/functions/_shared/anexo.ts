@@ -16,6 +16,7 @@ import {
   type Validacao,
 } from './decisao.ts'
 import { EXTENSOES_DO_ANEXO, limparParaNomeDeArquivo } from './nomePadrao.ts'
+import type { RecusaDoBanco } from './registro.ts'
 
 /** Também o limite da coluna `anexos.nome`. */
 export const LIMITE_DO_NOME = 300
@@ -57,6 +58,23 @@ export function validarIniciarEnvioDoAnexo(corpo: unknown): Validacao<EntradaIni
   if (!tamanho.ok) return tamanho
   const entrada = { processoId: processoId.valor, nomeOriginal: nomeOriginal.valor, tamanho: tamanho.valor }
   return conferirArquivoDoAnexo(entrada) ?? { ok: true, valor: entrada }
+}
+
+export interface EntradaRetirarAnexo {
+  anexoId: string
+}
+
+/**
+ * O anexo que a retirada não acha (já retirado, por exemplo em duas abas). Fora de `CodigoDeRecusa` porque o decisao.ts
+ * está no limite de linhas; sai no formato das recusas do banco, que a tela já traduz por código.
+ */
+export const RECUSA_ANEXO_JA_RETIRADO: RecusaDoBanco = { codigo: 'anexo_ja_retirado', mensagem: 'O anexo já foi retirado.' }
+
+/** O pedido de retirada: só o identificador do anexo (o resto, inclusive o nome, não é lido). */
+export function validarRetirar(corpo: unknown): Validacao<EntradaRetirarAnexo> {
+  if (!eCorpo(corpo)) return falhar('entrada_invalida', `corpo: esperado objeto, recebido ${tipoDe(corpo)}`)
+  const anexoId = lerTexto(corpo, 'anexo_id', FORMATO_UUID, 'uuid')
+  return anexoId.ok ? { ok: true, valor: { anexoId: anexoId.valor } } : anexoId
 }
 
 export type EnvioValidado =
