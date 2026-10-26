@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { primeiraTravaQueFalta } from './travaDeArquivos'
+import { primeiraTravaQueFalta, travaDaIda } from './travaDeArquivos'
 import type { ArquivosDoProcesso, EtapaDoCatalogo } from './tipos'
 
 const etapa = (ordem: number, codigo: string, nome: string, ativa = true): EtapaDoCatalogo => ({ id: `id-${codigo}`, codigo, nome, ordem, ativa })
@@ -72,5 +72,20 @@ describe('primeiraTravaQueFalta', () => {
     const comNova = [...CATALOGO, nova]
     expect(trava(nova, REVISAO, NADA, comNova)?.codigo).toBe('relatorio_modelagem_tecnica')
     expect(trava(MODELAGEM, nova, NADA, comNova)?.codigo).toBe('modelagem')
+  })
+})
+
+describe('travaDaIda', () => {
+  const processo = (etapa: EtapaDoCatalogo, arquivos?: ArquivosDoProcesso) => ({
+    etapaAtual: { id: etapa.id, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, posicao: 1, total: 6 }, arquivos,
+  })
+
+  it('usa a etapa atual do processo como origem', () => {
+    expect(travaDaIda(processo(MODELAGEM, NADA), TECNICA, CATALOGO)?.codigo).toBe('modelagem')
+  })
+
+  it('não trava processo sem etapa atual nem sem o que ele tem', () => {
+    expect(travaDaIda({ etapaAtual: null, arquivos: NADA }, TECNICA, CATALOGO)).toBeNull()
+    expect(travaDaIda(processo(MODELAGEM), TECNICA, CATALOGO)).toBeNull()
   })
 })

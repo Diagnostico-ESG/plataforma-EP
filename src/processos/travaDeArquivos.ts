@@ -1,5 +1,5 @@
 import { CODIGO_DA_MODELAGEM_PILOTO, CODIGO_DA_TECNICA } from './codigosDasEtapas'
-import type { ArquivosDoProcesso, EtapaDoCatalogo } from './tipos'
+import type { ArquivosDoProcesso, EtapaDoCatalogo, ProcessoDaLista } from './tipos'
 
 /** O que falta para sair da etapa: a versão piloto; ou a versão em sequência e o relatório numerado. */
 export type PecaQueFalta = 'versao_piloto' | 'versao' | 'relatorio'
@@ -38,4 +38,12 @@ export function primeiraTravaQueFalta({ de, para, catalogo, arquivos }: Ida): Tr
     if (falta.length > 0) return { codigo: etapa.codigo, nome: etapa.nome, falta }
   }
   return null
+}
+
+/** A trava da ida do processo à etapa de destino; null sem etapa atual, sem o que o processo tem ou sem arquivo faltando. */
+export function travaDaIda(
+  processo: Pick<ProcessoDaLista, 'etapaAtual' | 'arquivos'>, para: Pick<EtapaDoCatalogo, 'ordem'>, catalogo: EtapaDoCatalogo[],
+): TravaDeArquivos | null {
+  if (!processo.etapaAtual) return null
+  return primeiraTravaQueFalta({ de: processo.etapaAtual, para, catalogo, arquivos: processo.arquivos })
 }

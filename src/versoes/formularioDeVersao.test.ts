@@ -2,9 +2,10 @@ import { expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import {
   arquivosDoPedido, papeisDoFormulario, lerNumeroDigitado, nomeNaPrevia, textoDaFalhaDoAcrescimo, podeEnviarRelatorio, previaDoRelatorio, podeEnviar, podeRegistrarHistorica, podeSubmeter,
-  podeTrocarArquivo, recusaDoTipoNaTroca, textoDaFalhaDaTroca, textoDaFalhaDoEnvio, textoDaFalhaDoRelatorio,
+  modoParaEnviar, podeTrocarArquivo, recusaDoTipoNaTroca, textoDaFalhaDaTroca, textoDaFalhaDoEnvio, textoDaFalhaDoRelatorio,
   textoDoProgresso,
 } from './formularioDeVersao'
+import { relatorioNumeradoDeTeste, versaoDeTeste } from '../testes/versoesDeTeste'
 
 const bpmn = new File(['x'], 'fluxo.bpmn')
 const png = new File(['y'], 'fluxo.PNG')
@@ -143,4 +144,20 @@ test('a falha da troca: a frase pronta da recusa, ou o motivo com o aviso do for
     .toBe('A versão histórica é somente leitura: não recebe arquivos.')
   expect(textoDaFalhaDaTroca(new Error('sem rede')))
     .toBe('A troca não foi registrada: sem rede. O arquivo escolhido continua no formulário.')
+})
+
+// A janela da trava de arquivos (ticket 11) usa o mesmo formulário: a prévia dos números e o relatório obrigatório.
+test('modoParaEnviar prevê o número da piloto e, na em sequência, o da versão e o do relatório', () => {
+  const v6 = versaoDeTeste(6, { arquivos: [relatorioNumeradoDeTeste(6, 2)] })
+  expect(modoParaEnviar('piloto', [versaoDeTeste(5, { historica: true })])).toEqual({ tipo: 'piloto', numeroSugerido: 6 })
+  expect(modoParaEnviar('sequencia', [v6])).toEqual({ tipo: 'sequencia', numero: 7, numeroDoRelatorio: 3 })
+  expect(modoParaEnviar('sequencia', [])).toEqual({ tipo: 'sequencia', numero: 1, numeroDoRelatorio: 1 })
+})
+
+test('com o relatório obrigatório, a versão em sequência só se habilita com o .bpm e o relatório', () => {
+  const modo = { tipo: 'sequencia', numero: 3, numeroDoRelatorio: 1 } as const
+  const sem = { recusas: {}, conferindo: false }
+  expect(podeSubmeter(modo, { ...sem, escolhidos: { bpm } }, 3, true)).toBe(false)
+  expect(podeSubmeter(modo, { ...sem, escolhidos: { bpm, relatorio } }, 3, true)).toBe(true)
+  expect(podeSubmeter(modo, { ...sem, escolhidos: { bpm } }, 3)).toBe(true)
 })

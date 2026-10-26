@@ -1,8 +1,9 @@
 import { extensaoDoNome } from '../../supabase/functions/_shared/decisao.ts'
 import { nomePadrao } from '../../supabase/functions/_shared/nomePadrao.ts'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
-import { PAPEIS } from './rotulos'
-import type { ArquivoEscolhido, PapelDoArquivo } from './tipos'
+import { proximoNumeroDoRelatorio } from './relatorioQueVale'
+import { PAPEIS, proximoNumero } from './rotulos'
+import type { ArquivoEscolhido, PapelDoArquivo, Versao } from './tipos'
 
 /** O arquivo escolhido em cada campo do formulário. */
 export type Escolhidos = Partial<Record<PapelDoArquivo, File>>
@@ -18,6 +19,13 @@ export type ModoDoFormulario =
   | { tipo: 'sequencia'; numero: number; numeroDoRelatorio: number } | { tipo: 'piloto'; numeroSugerido: number } | { tipo: 'historica' }
 
 export const PAPEIS_OBRIGATORIOS: readonly PapelDoArquivo[] = ['bpm']
+
+/** O modo do formulário de enviar versão piloto ou em sequência, a partir das versões que o processo já tem (a prévia dos números). */
+export function modoParaEnviar(tipo: 'piloto' | 'sequencia', lidas: Versao[]): ModoDoFormulario {
+  const numero = proximoNumero(lidas)
+  if (tipo === 'piloto') return { tipo: 'piloto', numeroSugerido: numero }
+  return { tipo: 'sequencia', numero, numeroDoRelatorio: proximoNumeroDoRelatorio(lidas) }
+}
 
 /** Os campos de arquivo do formulário: a piloto não leva relatório (ele se envia sozinho); a histórica leva o dela, sem número. */
 export function papeisDoFormulario(modo: ModoDoFormulario): readonly PapelDoArquivo[] {
@@ -52,10 +60,11 @@ export function podeRegistrarHistorica(escolhidos: Escolhidos, recusas: RecusasD
 
 /** Se o botão do formulário se habilita: a em sequência pede o .bpm, a piloto o número e o .bpm, a histórica o número e o .bpm (ou o par). */
 export function podeSubmeter(modo: ModoDoFormulario, arquivos: { escolhidos: Escolhidos; recusas: RecusasDosCampos; conferindo: boolean },
-  numero: number | null): boolean {
+  numero: number | null, relatorioObrigatorio = false): boolean {
   const { escolhidos, recusas, conferindo } = arquivos
   if (modo.tipo === 'historica') return podeRegistrarHistorica(escolhidos, recusas, conferindo, numero)
   if (modo.tipo === 'piloto' && numero === null) return false
+  if (relatorioObrigatorio && !escolhidos.relatorio) return false
   return podeEnviar(escolhidos, recusas, conferindo)
 }
 

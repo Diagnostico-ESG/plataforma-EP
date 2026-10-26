@@ -1,7 +1,7 @@
 import { type FormEvent, useState } from 'react'
 import { useArquivosDaVersao } from '../../hooks/useArquivosDaVersao'
 import { useRolarAteAparecer } from '../../hooks/useRolarAteAparecer'
-import type { ProcessoLido } from '../../processos/tipos'
+import type { ProcessoDaLista } from '../../processos/tipos'
 import {
   type Progresso, nomeNaPrevia, podeEnviarRelatorio, previaDoRelatorio, textoDaFalhaDoRelatorio, textoDoProgresso,
 } from '../../versoes/formularioDeVersao'
@@ -12,15 +12,17 @@ import { CampoDeArquivo } from './CampoDeArquivo'
 
 type FormularioDeRelatorioProps = {
   modulo: ModuloDeVersoes
-  processo: ProcessoLido
+  processo: Pick<ProcessoDaLista, 'id' | 'nome' | 'setorSigla'>
   /** Todas as versões do processo: o relatório acompanha a mais recente que não é histórica e recebe o próximo número. */
   versoes: Versao[]
+  /** O botão de enviar; sem ele, "Enviar". A janela da trava de arquivos diz "Enviar e mover". */
+  rotuloDoEnvio?: string
   aoEnviada: () => void
   aoCancelar: () => void
 }
 
 // noValidate: as mensagens são as nossas. O arquivo fica travado durante o envio; na falha, continua escolhido.
-export function FormularioDeRelatorio({ modulo, processo, versoes, aoEnviada, aoCancelar }: FormularioDeRelatorioProps) {
+export function FormularioDeRelatorio({ modulo, processo, versoes, rotuloDoEnvio = 'Enviar', aoEnviada, aoCancelar }: FormularioDeRelatorioProps) {
   const arquivos = useArquivosDaVersao()
   const [progresso, setProgresso] = useState<Progresso | null>(null)
   const [aviso, setAviso] = useState<string | null>(null)
@@ -59,7 +61,7 @@ export function FormularioDeRelatorio({ modulo, processo, versoes, aoEnviada, ao
       </fieldset>
       {progresso && <p className="formulario-de-versao-progresso" role="status">{textoDoProgresso(progresso)}</p>}
       <div className="formulario-do-processo-botoes">
-        <button type="submit" className="botao botao-principal" disabled={enviando || !pronto}>Enviar</button>
+        <button type="submit" className="botao botao-principal" disabled={enviando || !pronto}>{rotuloDoEnvio}</button>
         <button type="button" className="botao botao-secundario" disabled={enviando} onClick={aoCancelar}>Cancelar</button>
       </div>
       {aviso && <p className="cadastros-falha" role="alert">{aviso}</p>}

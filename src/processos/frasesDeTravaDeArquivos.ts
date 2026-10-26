@@ -2,6 +2,9 @@
 // ou da Relatório e modelagem técnica.
 import type { TravaDeArquivos } from './travaDeArquivos'
 
+/** O envio deu certo e o movimento depois dele não: os arquivos já estão no processo, e a trava não abre de novo. */
+export const FRASE_DOS_ARQUIVOS_ENVIADOS = 'Os arquivos foram enviados, mas o processo não foi movido.'
+
 export const FRASE_DA_TRAVA_DA_MODELAGEM = 'Para sair da Modelagem piloto, envie a versão piloto (.bpm).'
 
 const O_QUE_FALTA_NA_TECNICA: Record<string, string> = {

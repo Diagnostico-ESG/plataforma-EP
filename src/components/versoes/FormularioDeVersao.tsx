@@ -1,7 +1,7 @@
 import { type FormEvent, useId, useState } from 'react'
 import { useArquivosDaVersao } from '../../hooks/useArquivosDaVersao'
 import { useRolarAteAparecer } from '../../hooks/useRolarAteAparecer'
-import type { ProcessoLido } from '../../processos/tipos'
+import type { ProcessoDaLista } from '../../processos/tipos'
 import {
   type ModoDoFormulario, PAPEIS_OBRIGATORIOS, type Progresso, arquivosDoPedido, lerNumeroDigitado, nomeNaPrevia, papeisDoFormulario,
   podeSubmeter, textoDaFalhaDoEnvio, textoDoProgresso,
@@ -13,14 +13,19 @@ import { CampoDoNumeroDaVersao } from './CampoDoNumeroDaVersao'
 
 type FormularioDeVersaoProps = {
   modulo: ModuloDeVersoes
-  processo: ProcessoLido
+  processo: Pick<ProcessoDaLista, 'id' | 'nome' | 'setorSigla'>
   /**
    * Em sequência: o número da prévia (maior + 1) e o do relatório que vai junto, com que os arquivos são nomeados no Drive. Piloto: o número é digitado
    * e vem preenchido com o menor aceito (6 vira V6P). Histórica: o número é digitado (5 vira V5F) e os arquivos são os
    * que existirem.
    */
   modo: ModoDoFormulario
-  aoEnviada: () => void
+  /** O botão de enviar; sem ele, "Enviar" ("Registrar" na histórica). A janela da trava de arquivos diz "Enviar e mover". */
+  rotuloDoEnvio?: string
+  /** Só na versão em sequência: o relatório (.docx) também é obrigatório (a trava da técnica pede a versão e o relatório). */
+  relatorioObrigatorio?: boolean
+  /** Chamado depois do registro, com o que foi enviado. */
+  aoEnviada: (pedido: PedidoDeVersao) => void
   aoCancelar: () => void
 }
 
@@ -50,7 +55,8 @@ function numeroDoRelatorioDoPedido(modo: ModoDoFormulario, escolhidos: { relator
 }
 
 // noValidate: as mensagens são as nossas. Os campos ficam travados durante o envio; na falha, continuam preenchidos.
-export function FormularioDeVersao({ modulo, processo, modo, aoEnviada, aoCancelar }: FormularioDeVersaoProps) {
+export function FormularioDeVersao(props: FormularioDeVersaoProps) {
+  const { modulo, processo, modo, rotuloDoEnvio, relatorioObrigatorio = false, aoEnviada, aoCancelar } = props
   const arquivos = useArquivosDaVersao(modo.tipo === 'historica')
   const [textoDoNumero, setTextoDoNumero] = useState(numeroInicial(modo))
   const [progresso, setProgresso] = useState<Progresso | null>(null)
@@ -72,7 +78,7 @@ export function FormularioDeVersao({ modulo, processo, modo, aoEnviada, aoCancel
     const aoProgredir = (enviados: number, total: number) => setProgresso({ enviados, total })
     try {
       await (historica ? modulo.registrarVersaoHistorica(pedido, aoProgredir) : modulo.enviarVersao(pedido, aoProgredir))
-      aoEnviada()
+      aoEnviada(pedido)
     } catch (erro) {
       setAviso(textoDaFalhaDoEnvio(erro))
       setProgresso(null)
@@ -80,7 +86,7 @@ export function FormularioDeVersao({ modulo, processo, modo, aoEnviada, aoCancel
   }
 
   const enviando = progresso !== null
-  const pronto = podeSubmeter(modo, arquivos, numero)
+  const pronto = podeSubmeter(modo, arquivos, numero, relatorioObrigatorio)
   const { titulo, botao } = TEXTOS_DO_MODO[modo.tipo]
   const dica = DICA_DO_MODO[modo.tipo]
   return (
@@ -99,7 +105,7 @@ export function FormularioDeVersao({ modulo, processo, modo, aoEnviada, aoCancel
           const arquivo = arquivos.escolhidos[papel]
           const doRelatorio = modo.tipo === 'sequencia' && papel === 'relatorio' ? modo.numeroDoRelatorio : undefined
           return (
-            <CampoDeArquivo key={papel} papel={papel} obrigatorio={!historica && PAPEIS_OBRIGATORIOS.includes(papel)}
+            <CampoDeArquivo key={papel} papel={papel} obrigatorio={!historica && (PAPEIS_OBRIGATORIOS.includes(papel) || (relatorioObrigatorio && papel === 'relatorio'))}
               relatorioSemNumero={historica}
               nomePrevisto={arquivo && numero !== null ? nomeNaPrevia(processo, numero, papel, arquivo, modo.tipo, doRelatorio) : null}
               recusa={arquivos.recusas[papel] ?? null} aoEscolher={(escolhido) => void arquivos.escolher(papel, escolhido)} />
@@ -109,7 +115,7 @@ export function FormularioDeVersao({ modulo, processo, modo, aoEnviada, aoCancel
       {progresso && <p className="formulario-de-versao-progresso" role="status">{textoDoProgresso(progresso)}</p>}
       <div className="formulario-do-processo-botoes">
         <button type="submit" className="botao botao-principal" disabled={enviando || !pronto}>
-          {botao}
+          {rotuloDoEnvio ?? botao}
         </button>
         <button type="button" className="botao botao-secundario" disabled={enviando} onClick={aoCancelar}>Cancelar</button>
       </div>

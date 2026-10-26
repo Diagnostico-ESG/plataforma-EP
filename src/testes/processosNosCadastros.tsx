@@ -5,6 +5,7 @@ import type { Perfil } from '../acesso/tipos'
 import { CadastrosFalso } from '../cadastros/CadastrosFalso'
 import { ProcessosFalso } from '../processos/ProcessosFalso'
 import type { ProcessoLido } from '../processos/tipos'
+import { ligarArquivosDoProcesso } from './arquivosDoProcesso'
 import { CATALOGO_DE_TESTE, etapaAtualDe, umProcessoLido } from './processoDaLista'
 import { RevisoesFalso } from '../revisoes/RevisoesFalso'
 import { PlanilhasFalso } from '../planilhas/PlanilhasFalso'
@@ -68,6 +69,7 @@ export function montarNosCadastros(
   ajustarProcessos?.(processos)
   const versoes = falsoDeVersoes(processos)
   ajustarVersoes?.(versoes)
+  ligarArquivosDoProcesso(processos, versoes)
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={processos}
     versoes={versoes} revisoes={new RevisoesFalso(processos)} planilhas={new PlanilhasFalso()} />)
   return { cadastros, processos, versoes }

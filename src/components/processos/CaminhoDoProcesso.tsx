@@ -3,15 +3,18 @@ import { useCarregamento } from '../../hooks/useCarregamento'
 import type { RegistrosDoProcesso } from '../../hooks/useRegistrosDoProcesso'
 import { useMovimentoDoProcesso } from '../../hooks/useMovimentoDoProcesso'
 import type { Executar } from '../../hooks/useGravacaoComFalha'
-import type { ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
+import type { EtapaDoCatalogo, ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
+import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { AgoraDoProcesso } from './AgoraDoProcesso'
 import { EtapasDoProcesso } from './EtapasDoProcesso'
-import { JanelaDaChegada } from './JanelaDaChegada'
+import { JanelasDoMovimento } from './JanelasDoMovimento'
 
 type CaminhoDoProcessoProps = {
   processo: ProcessoLido
   processos: ModuloDeProcessos
+  /** A janela da trava de arquivos envia as versões e o relatório. */
+  versoes: ModuloDeVersoes
   revisoes: ModuloDeRevisoes
   /** As revisões e a aprovação lidas pelo verso: o Agora registra e a gaveta lista. */
   registros: RegistrosDoProcesso
@@ -24,26 +27,29 @@ type CaminhoDoProcessoProps = {
   aoSumir: () => void
 }
 
+// O verso só tem as etapas ativas do catálogo, que é o que a trava de arquivos confere.
+function etapasAtivasDoVerso({ etapasDoVerso }: ProcessoLido): EtapaDoCatalogo[] {
+  return etapasDoVerso.map(({ id, codigo, nome, ordem }) => ({ id, codigo, nome, ordem, ativa: true }))
+}
+
 /**
  * O trabalho do processo no verso: o cartão Agora e as Etapas. Quem pode alterar age pelo Agora (a RLS é quem protege);
  * suspenso, cancelado e arquivado só leem, até o Retomar ou o Desarquivar.
  */
-export function CaminhoDoProcesso({ processo, processos, revisoes, registros, podeAlterar, usuarioId, executar, aoMudar, aoSumir }: CaminhoDoProcessoProps) {
+export function CaminhoDoProcesso({ processo, processos, versoes, revisoes, registros, podeAlterar, usuarioId, executar, aoMudar, aoSumir }: CaminhoDoProcessoProps) {
   // Quem não altera não escolhe responsável: não precisa da lista. Falha ao lê-la deixa a escolha só com "Ninguém".
   const ler = useCallback(
     () => (podeAlterar ? processos.listarResponsaveisPossiveis() : Promise.resolve([])), [processos, podeAlterar])
   const { estado } = useCarregamento(ler)
   const usuarios = estado.tipo === 'pronto' ? estado.valor : []
-  const movimento = useMovimentoDoProcesso(processos, aoMudar, aoSumir)
+  const movimento = useMovimentoDoProcesso(processos, etapasAtivasDoVerso(processo), aoMudar, aoSumir)
   // O arquivado só lê, como o parado: o Agora dele oferece só Desarquivar.
   const parado = processo.situacao === 'suspenso' || processo.situacao === 'cancelado' || Boolean(processo.arquivadoEm)
   return (
     <>
       <AgoraDoProcesso processo={processo} processos={processos} usuarios={usuarios} usuarioId={usuarioId}
         podeAlterar={podeAlterar} movimento={movimento} executar={executar} aoMudar={aoMudar} revisoes={revisoes} registros={registros} />
-      {movimento.chegada && (
-        <JanelaDaChegada chegada={movimento.chegada} processos={processos} aoGravar={aoMudar} aoFechar={movimento.fecharChegada} />
-      )}
+      <JanelasDoMovimento movimento={movimento} processos={processos} versoes={versoes} aoGravar={aoMudar} />
       {movimento.falha && <p className="cadastros-falha" role="alert">{movimento.falha}</p>}
       <EtapasDoProcesso processo={processo} revisoes={revisoes} registros={registros} ultimaVersao={processo.ultimaVersao}
         podeEditar={podeAlterar && !parado} />

@@ -2,9 +2,8 @@ import { type ReactNode, useCallback, useId, useState } from 'react'
 import { useCarregamento } from '../../hooks/useCarregamento'
 import { useConferenciaNoDrive } from '../../hooks/useConferenciaNoDrive'
 import type { ProcessoLido } from '../../processos/tipos'
-import type { ModoDoFormulario } from '../../versoes/formularioDeVersao'
-import { proximoNumeroDoRelatorio } from '../../versoes/relatorioQueVale'
-import { type EnvioDaEtapa, envioDaEtapa, ordenarVersoes, podeEnviarRelatorioNaEtapa, proximoNumero } from '../../versoes/rotulos'
+import { type ModoDoFormulario, modoParaEnviar } from '../../versoes/formularioDeVersao'
+import { type EnvioDaEtapa, envioDaEtapa, ordenarVersoes, podeEnviarRelatorioNaEtapa } from '../../versoes/rotulos'
 import type { ModuloDeVersoes, Versao } from '../../versoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import '../processos/Painel.css'
@@ -120,9 +119,7 @@ const ROTULO_DO_ENVIO: Record<EnvioDaEtapa, string> = {
 }
 
 function modoDoEnvio(envio: EnvioDaEtapa, lidas: Versao[]): ModoDoFormulario {
-  if (envio === 'historica') return { tipo: 'historica' }
-  const numero = proximoNumero(lidas)
-  return envio === 'piloto' ? { tipo: 'piloto', numeroSugerido: numero } : { tipo: 'sequencia', numero, numeroDoRelatorio: proximoNumeroDoRelatorio(lidas) }
+  return envio === 'historica' ? { tipo: 'historica' } : modoParaEnviar(envio, lidas)
 }
 
 type AcoesDaSecaoProps = {
