@@ -21,6 +21,7 @@ import {
   FRASE_DO_ARQUIVADO_JA_PUBLICADO, fraseDaPublicacaoAntesDaAprovacao, fraseDoArquivarSoConcluido,
 } from './frasesDePublicacao'
 import { fraseDoAutorDaVersao, fraseDoProcessoComVersoes } from './frasesDeVersao'
+import { FRASE_DA_TRAVA_DA_MODELAGEM, fraseDaTravaDaTecnica } from './frasesDeTravaDeArquivos'
 import { fraseDeSituacaoInvalida, fraseDoProcessoParado } from './frasesDeSituacao'
 
 /** O que a pessoa tentava fazer, para as frases que o banco não diz (desativar ou excluir a etapa). */
@@ -42,6 +43,7 @@ const PADRAO_DA_RECUSA = new RegExp(
   + '|versao_aprovada|processo_com_aprovacao'
   + '|arquivar_so_concluido|ja_arquivado|nao_arquivado|processo_arquivado|arquivamento_so_pela_funcao'
   + '|publicacao_fora_da_etapa|arquivado_ja_publicado|data_da_publicacao_obrigatoria|publicacao_antes_da_aprovacao'
+  + '|trava_piloto|trava_tecnica'
   + '|anotacoes_longas)(?::(.*))?$', 'm')
 
 type FraseDaRecusa = (valor: string, contexto: ContextoDaRecusa) => string
@@ -105,6 +107,8 @@ const FRASE_DA_RECUSA: Record<string, FraseDaRecusa> = {
   data_da_publicacao_obrigatoria: () => FRASE_DA_DATA_DA_PUBLICACAO_OBRIGATORIA,
   publicacao_antes_da_aprovacao: fraseDaPublicacaoAntesDaAprovacao,
   anotacoes_longas: fraseDasAnotacoesLongas,
+  trava_piloto: () => FRASE_DA_TRAVA_DA_MODELAGEM,
+  trava_tecnica: fraseDaTravaDaTecnica,
   versao_incompleta: (valor) => {
     const [numero, faltas] = valor.split(':')
     return fraseDaVersaoIncompleta(numero, faltas.split(','))

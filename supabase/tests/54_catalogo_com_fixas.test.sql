@@ -14,7 +14,7 @@ insert into _tap (linha) select plan(30);
 -- função desliga, só durante o movimento e com o dono do banco, as etapas com trava que ficam antes do destino.
 create function pg_temp.mover_sem_trava(p_processo uuid, p_etapa uuid, p_data date default null, p_link text default null,
   p_explicacao text default null) returns void
-language plpgsql security definer as $
+language plpgsql security definer as $$
 begin
   set local session_replication_role = replica;
   update public.etapas set ativa = false
@@ -24,7 +24,7 @@ begin
   set local session_replication_role = replica;
   update public.etapas set ativa = true where codigo in ('modelagem', 'relatorio_modelagem_tecnica');
   set local session_replication_role = origin;
-end $;
+end $$;
 grant execute on function pg_temp.mover_sem_trava(uuid, uuid, date, text, text) to authenticated;
 
 -- Usuário inventado: a1 administrador.
