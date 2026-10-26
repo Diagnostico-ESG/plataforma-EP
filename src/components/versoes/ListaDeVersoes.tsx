@@ -1,9 +1,10 @@
 import { formatarMomento } from '../../acesso/historico'
-import { emOrdemDeExibicao, origemDoRelatorio, podeCopiarRelatorio, relatorioPendente, rotuloDaAnterior, rotuloDaVersao } from '../../versoes/rotulos'
-import type { ConferenciaDosArquivos, ModuloDeVersoes, Versao } from '../../versoes/tipos'
+import { relatoriosDaVersao, textoDoRelatorio } from '../../versoes/relatorioQueVale'
+import { emOrdemDeExibicao, papeisQueSePodeAcrescentar, rotuloDaVersao } from '../../versoes/rotulos'
+import type { ArquivoDaVersao, ConferenciaDosArquivos, ModuloDeVersoes, Versao } from '../../versoes/tipos'
 import { Pilula } from '../Pilula'
-import { AcaoSemAlteracao } from './AcaoSemAlteracao'
 import { AcaoSubstituir } from './AcaoSubstituir'
+import { AcrescentarArquivo } from './AcrescentarArquivo'
 import { LinkDoArquivo } from './LinkDoArquivo'
 import { MarcaNoDrive } from './MarcaNoDrive'
 
@@ -11,7 +12,7 @@ type ListaDeVersoesProps = {
   modulo: ModuloDeVersoes
   processoId: string
   versoes: Versao[]
-  /** Todas as versões do processo: a origem do relatório copiado e a versão anterior podem estar fora da lista. */
+  /** Todas as versões do processo: o relatório que vale numa versão pode ser o de uma anterior, que pode estar fora da lista. */
   todas: Versao[]
   /** Administrador ou Integrante, com o processo em andamento (quem recusa é a função do servidor e o banco). */
   podeAlterar: boolean
@@ -31,9 +32,41 @@ export function ListaDeVersoes({ versoes, todas, ...resto }: ListaDeVersoesProps
 
 type BlocoDaVersaoProps = Omit<ListaDeVersoesProps, 'versoes' | 'todas'> & { versao: Versao; versoes: Versao[] }
 
-function BlocoDaVersao({ modulo, processoId, versao, versoes, podeAlterar, aoAlterada, situacoes }: BlocoDaVersaoProps) {
+function PilulasDaVersao({ versao }: { versao: Versao }) {
+  return (
+    <>
+      {versao.historica && <Pilula situacao="neutra">Histórica · somente leitura</Pilula>}
+      {versao.piloto && <Pilula situacao="neutra">Piloto</Pilula>}
+      {versao.aprovada && <Pilula situacao="aprovado">Aprovada</Pilula>}
+    </>
+  )
+}
+
+type ArquivoDoBlocoProps = BlocoDaVersaoProps & {
+  arquivo: ArquivoDaVersao
+  /** O texto do link do relatório ("Relatório V2 (da V7)"); sem ele, o link mostra o nome do arquivo. */
+  rotulo?: string
+  /** Falso no relatório que vale por vir de outra versão: ele se substitui lá, na versão dele. */
+  daPropriaVersao: boolean
+}
+
+function ArquivoDoBloco({ modulo, processoId, versao, podeAlterar, aoAlterada, situacoes, arquivo, rotulo, daPropriaVersao }: ArquivoDoBlocoProps) {
+  return (
+    <li>
+      <LinkDoArquivo versoes={modulo} arquivo={arquivo} rotulo={rotulo} />
+      <MarcaNoDrive situacao={situacoes?.[arquivo.id]} />
+      {podeAlterar && daPropriaVersao && !versao.historica && !versao.aprovada && (
+        <AcaoSubstituir modulo={modulo} processoId={processoId} versao={versao} arquivo={arquivo} aoConcluir={aoAlterada} />
+      )}
+    </li>
+  )
+}
+
+function BlocoDaVersao(props: BlocoDaVersaoProps) {
+  const { modulo, processoId, versao, versoes, podeAlterar, aoAlterada } = props
   const rotulo = rotuloDaVersao(versao)
-  const rotuloDaOrigem = rotuloDaAnterior(versao, versoes)
+  const fluxogramas = emOrdemDeExibicao(versao.arquivos.filter(({ papel }) => papel !== 'relatorio'))
+  const doFluxo = (arquivo: ArquivoDaVersao) => <ArquivoDoBloco key={arquivo.id} {...props} arquivo={arquivo} daPropriaVersao />
   return (
     <article className="bloco-da-versao" aria-label={rotulo}>
       <p className="bloco-da-versao-cabecalho">
@@ -41,29 +74,19 @@ function BlocoDaVersao({ modulo, processoId, versao, versoes, podeAlterar, aoAlt
         <time dateTime={versao.enviadaEm}>{formatarMomento(versao.enviadaEm)}</time>
         <span>{versao.autor ?? '—'}</span>
         {versao.etapa && <span>{versao.etapa}</span>}
-        {versao.historica && <Pilula situacao="neutra">Histórica · somente leitura</Pilula>}
-        {versao.aprovada && <Pilula situacao="aprovado">Aprovada</Pilula>}
-        {relatorioPendente(versao) && <Pilula situacao="vencendo">Relatório pendente</Pilula>}
+        <PilulasDaVersao versao={versao} />
       </p>
-      {versao.observacao && <p className="bloco-da-versao-observacao">{versao.observacao}</p>}
       <ul className="bloco-da-versao-arquivos">
-        {emOrdemDeExibicao(versao.arquivos).map((arquivo) => {
-          const origem = origemDoRelatorio(arquivo, versoes)
-          return (
-            <li key={arquivo.id}>
-              <LinkDoArquivo versoes={modulo} arquivo={arquivo} />
-              <MarcaNoDrive situacao={situacoes?.[arquivo.id]} />
-              {origem && <span className="bloco-da-versao-origem">{`Sem alteração de conteúdo · relatório da ${origem}`}</span>}
-              {podeAlterar && !versao.historica && !versao.aprovada && (
-                <AcaoSubstituir modulo={modulo} processoId={processoId} versao={versao} arquivo={arquivo} aoConcluir={aoAlterada} />
-              )}
-            </li>
-          )
-        })}
+        {fluxogramas.filter(({ papel }) => papel !== 'bpmn').map(doFluxo)}
+        {relatoriosDaVersao(versao, versoes).map((relatorio) => (
+          <ArquivoDoBloco key={relatorio.arquivo.id} {...props} arquivo={relatorio.arquivo} rotulo={textoDoRelatorio(relatorio)}
+            daPropriaVersao={relatorio.daVersao === null} />
+        ))}
+        {fluxogramas.filter(({ papel }) => papel === 'bpmn').map(doFluxo)}
+        {podeAlterar && papeisQueSePodeAcrescentar(versao).map((papel) => (
+          <AcrescentarArquivo key={papel} modulo={modulo} processoId={processoId} versao={versao} papel={papel} aoConcluir={aoAlterada} />
+        ))}
       </ul>
-      {podeAlterar && rotuloDaOrigem && podeCopiarRelatorio(versao, versoes) && (
-        <AcaoSemAlteracao modulo={modulo} processoId={processoId} versao={versao} rotuloDaOrigem={rotuloDaOrigem} aoConcluir={aoAlterada} />
-      )}
     </article>
   )
 }

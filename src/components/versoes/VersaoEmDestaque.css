@@ -131,11 +131,6 @@
   text-decoration: underline;
 }
 
-.arquivo-origem {
-  color: var(--texto-2);
-  font-size: var(--tam-rotulo);
-}
-
 /* As anteriores recolhidas: o resumo é um botão discreto que abre a lista que já existia. */
 .versoes-anteriores {
   width: 100%;

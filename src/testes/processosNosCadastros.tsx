@@ -5,7 +5,8 @@ import type { Perfil } from '../acesso/tipos'
 import { CadastrosFalso } from '../cadastros/CadastrosFalso'
 import { ProcessosFalso } from '../processos/ProcessosFalso'
 import type { ProcessoLido } from '../processos/tipos'
-import { CATALOGO_DE_TESTE, umProcessoLido } from './processoDaLista'
+import { ligarArquivosDoProcesso } from './arquivosDoProcesso'
+import { CATALOGO_DE_TESTE, etapaAtualDe, umProcessoLido } from './processoDaLista'
 import { RevisoesFalso } from '../revisoes/RevisoesFalso'
 import { PlanilhasFalso } from '../planilhas/PlanilhasFalso'
 import { VersoesFalso } from '../versoes/VersoesFalso'
@@ -28,7 +29,14 @@ export const PROCESSOS_DOS_CADASTROS: ProcessoLido[] = [
   processo('p4', 'Conferir Recibo'),
 ]
 
-type Montagem = {
+/** Põe o processo p1 na etapa de código dado (o envio de versão que o verso oferece depende da etapa). */
+export function naEtapa(codigo: string): (falso: ProcessosFalso) => void {
+  return (falso) => {
+    falso.processos = falso.processos.map((processo) => (processo.id === 'p1' ? { ...processo, etapaAtual: etapaAtualDe(codigo) } : processo))
+  }
+}
+
+export type Montagem = {
   perfil?: Perfil
   ajustarProcessos?: (falso: ProcessosFalso) => void
   ajustarCadastros?: (falso: CadastrosFalso) => void
@@ -61,6 +69,7 @@ export function montarNosCadastros(
   ajustarProcessos?.(processos)
   const versoes = falsoDeVersoes(processos)
   ajustarVersoes?.(versoes)
+  ligarArquivosDoProcesso(processos, versoes)
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={processos}
     versoes={versoes} revisoes={new RevisoesFalso(processos)} planilhas={new PlanilhasFalso()} />)
   return { cadastros, processos, versoes }

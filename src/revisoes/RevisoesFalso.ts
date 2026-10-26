@@ -1,21 +1,27 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import type { EventoDoCadastro } from '../cadastros/tipos'
-import { CODIGO_DA_APROVACAO, CODIGO_DA_REVISAO_INTERNA } from '../processos/codigosDasEtapas'
+import { CODIGO_DA_APROVACAO, CODIGO_DA_REVISAO_INTERNA, CODIGO_DA_VALIDACAO } from '../processos/codigosDasEtapas'
+import { conferirNaoArquivado } from '../processos/arquivamentoFalso'
 import { FRASE_SEM_VERSAO } from '../processos/frasesDaVersaoCompleta'
 import { etapasDoVersoDe } from '../processos/movimentoFalso'
 import { hojeLocal } from '../processos/textoDaModelagemPiloto'
 import type { ProcessosFalso } from '../processos/ProcessosFalso'
 import { conferirProcessoEmAndamento } from '../processos/situacaoFalso'
 import type { ProcessoLido, UsuarioResponsavel } from '../processos/tipos'
+import type { VersoesFalso } from '../versoes/VersoesFalso'
 import { conferirLinkEData } from './conferirAprovacao'
 import { eventoDaAprovacao } from './eventoDaAprovacao'
+import { eventoDaDataDaValidacao } from './eventosDaValidacaoEDoPdf'
 import { eventoDaRevisao } from './eventoDaRevisao'
 import {
   FRASE_DA_CORRIGIDA_SEM_VERSAO_NA_PASSAGEM, FRASE_DA_REVISAO_FORA_DA_ETAPA, FRASE_DA_REVISAO_JA_REGISTRADA,
   FRASE_DO_ESCOPO_OBRIGATORIO, FRASE_DO_ESCOPO_SO_NA_CORRIGIDA,
 } from './frasesDeRevisao'
 import { FRASE_DA_APROVACAO_FORA_DA_ETAPA } from './frasesDeAprovacao'
+import {
+  FRASE_DA_DATA_DA_VALIDACAO_NO_FUTURO, FRASE_DA_DATA_FORA_DA_VALIDACAO, FRASE_DO_PDF_SEM_APROVACAO,
+} from './frasesDaValidacao'
 import type {
   Aprovacao, DadosDaAprovacao, DadosDaEdicaoDaRevisao, DadosDaRevisao, ModuloDeRevisoes, RevisaoInterna,
 } from './tipos'
@@ -59,17 +65,51 @@ export class RevisoesFalso implements ModuloDeRevisoes {
   private proximoId = 1
   private readonly processos: ProcessosFalso | undefined
   private readonly usuario: UsuarioResponsavel
+  private readonly versoes: VersoesFalso | undefined
 
-  /** `processos` é a falsa onde os processos vivem; `usuario` é quem está na tela (quem registra e edita). */
-  constructor(processos?: ProcessosFalso, usuario: UsuarioResponsavel = { id: 'usuario-de-teste', nome: 'Pessoa de Teste' }) {
+  /**
+   * `processos` é a falsa onde os processos vivem; `usuario` é quem está na tela (quem registra e edita); `versoes`, a falsa
+   * que guarda os .pdfs da aprovação (ela passa a conferir a aprovação pelo .pdf, e a aprovação nova guarda o .pdf da anterior).
+   */
+  constructor(processos?: ProcessosFalso, usuario: UsuarioResponsavel = { id: 'usuario-de-teste', nome: 'Pessoa de Teste' },
+    versoes?: VersoesFalso) {
     this.processos = processos
     this.usuario = usuario
+    this.versoes = versoes
+    if (versoes) versoes.conferirAprovacaoDoPdf = (processoId) => this.versaoAprovadaParaOPdf(processoId)
   }
 
   async lerAprovacao(processoId: string): Promise<Aprovacao | null> {
     if (this.segurarLeitura) return new Promise<never>(() => {})
     if (this.falharLeitura) throw new Error('falha de conexão simulada')
-    return this.aprovacoes[processoId] ?? null
+    const aprovacao = this.aprovacoes[processoId] ?? null
+    if (!aprovacao || !this.versoes) return aprovacao
+    return { ...aprovacao, pdf: this.versoes.pdfsDaAprovacao[processoId]?.atual ?? null }
+  }
+
+  // Como o banco: a data só se grava com o processo na Validação com o setor, em andamento e não arquivado, e nunca no futuro;
+  // mudar a data (inclusive apagá-la) vira evento, e gravar a mesma não.
+  async registrarDataDaValidacao(processoId: string, data: string | null): Promise<void> {
+    await this.esperarAGravacao()
+    const processo = this.processoPorId(processoId)
+    conferirNaoArquivado(processo)
+    conferirProcessoEmAndamento(processo)
+    if (processo.etapaAtual?.codigo !== CODIGO_DA_VALIDACAO) throw new TravaDoBanco(FRASE_DA_DATA_FORA_DA_VALIDACAO)
+    if (data !== null && data > HOJE) throw new TravaDoBanco(FRASE_DA_DATA_DA_VALIDACAO_NO_FUTURO)
+    const antes = processo.dataDaValidacao ?? null
+    const falso = this.processos as ProcessosFalso
+    falso.processos = falso.processos.map((outro) => (outro.id === processoId ? { ...outro, dataDaValidacao: data } : outro))
+    if (antes !== data) this.noHistorico(processo, eventoDaDataDaValidacao(processo, antes, data, this.usuario.nome, `${HOJE}T12:00:00Z`))
+  }
+
+  // O que o .pdf confere (como a regra do editar a aprovação): processo em andamento ou concluído, não arquivado, com aprovação.
+  private versaoAprovadaParaOPdf(processoId: string): number {
+    const processo = this.processoPorId(processoId)
+    conferirNaoArquivado(processo)
+    conferirProcessoEmAndamento(processo)
+    const aprovacao = this.aprovacoes[processoId]
+    if (!aprovacao) throw new TravaDoBanco(FRASE_DO_PDF_SEM_APROVACAO)
+    return aprovacao.versao
   }
 
   async listarRevisoes(processoId: string): Promise<RevisaoInterna[]> {
@@ -112,7 +152,8 @@ export class RevisoesFalso implements ModuloDeRevisoes {
       link: dados.link, aprovadaEm: dados.aprovadaEm, registradaPor: this.usuario.nome, registradaEm: `${HOJE}T12:00:00Z`,
     }
     this.aprovacoes[processoId] = nova
-    this.noHistorico(processo, eventoDaAprovacao(processo, anterior ? 'substituir' : 'registrar', nova, anterior))
+    const pdfGuardado = anterior ? this.versoes?.guardarPdfAtual(processoId) : null
+    this.noHistorico(processo, eventoDaAprovacao(processo, anterior ? 'substituir' : 'registrar', nova, anterior, pdfGuardado))
   }
 
   async editarRevisao(revisaoId: string, dados: DadosDaEdicaoDaRevisao): Promise<void> {

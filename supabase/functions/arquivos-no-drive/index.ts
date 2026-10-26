@@ -12,14 +12,12 @@ import {
 import { cabecalhosDeOrigem } from '../_shared/drive.ts'
 import { validarConferir } from '../_shared/conferencia.ts'
 import { validarRegistrar } from '../_shared/registro.ts'
-import { validarSemAlteracao } from '../_shared/semAlteracao.ts'
 import { baixar, iniciarEnvio } from './acoes.ts'
 import { identificarChamador, type ContextoDoChamador } from './chamador.ts'
 import { conferir } from './conferir.ts'
 import { lerConfiguracao, type Configuracao } from './configuracao.ts'
 import { ErroDoDrive, obterToken } from './google.ts'
 import { registrar } from './registrar.ts'
-import { semAlteracao } from './semAlteracao.ts'
 import { comCabecalhos, responderErroInterno, responderJson, responderRecusa } from './respostas.ts'
 
 async function lerCorpo(req: Request): Promise<unknown> {
@@ -45,11 +43,6 @@ async function executar(acao: Acao, corpo: unknown, chamador: ContextoDoChamador
     if (!entrada.ok) return responderRecusa(entrada.recusa)
     return await registrar({ cliente: chamador.cliente, token: await obterToken(config), config }, entrada.valor)
   }
-  if (acao === 'sem_alteracao') {
-    const entrada = validarSemAlteracao(corpo)
-    if (!entrada.ok) return responderRecusa(entrada.recusa)
-    return await semAlteracao({ cliente: chamador.cliente, token: await obterToken(config), config }, entrada.valor)
-  }
   if (acao === 'conferir') return await executarConferir(corpo, chamador, config)
   if (acao === 'baixar') return await executarBaixar(corpo, chamador, config)
   const entrada = validarIniciarEnvio(corpo)
@@ -64,7 +57,7 @@ async function atender(req: Request, config: Configuracao): Promise<Response> {
   if (!chamador) return responderRecusa(recusar('sem_login'))
   const corpo = await lerCorpo(req)
   const acao = lerAcao(corpo)
-  if (!acao) return responderRecusa(recusar('entrada_invalida', 'campo acao: esperado iniciar_envio, baixar, registrar, sem_alteracao ou conferir'))
+  if (!acao) return responderRecusa(recusar('entrada_invalida', 'campo acao: esperado iniciar_envio, baixar, registrar ou conferir'))
   const recusa = conferirChamador(chamador.chamador, acao)
   if (recusa) return responderRecusa(recusa)
   return await executar(acao, corpo, chamador, config, req.headers.get('Origin'))

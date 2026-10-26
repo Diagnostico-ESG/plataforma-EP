@@ -58,9 +58,25 @@ language sql stable as $$
     and entidade_ref = pg_temp.processo(nome_do_processo)::text $$;
 grant execute on function pg_temp.movimentos(text) to authenticated;
 
+-- Trava de arquivos (ticket 11): quem atravessa a Modelagem piloto e a técnica precisa de versão piloto, versão em sequência
+-- e relatório numerado. Os processos que o teste leva adiante recebem os três antes (arquivos inventados).
+create function pg_temp.arquivo(papel text, formato text) returns jsonb
+language sql immutable as $$
+  select jsonb_build_object('papel', papel, 'nome', 'T52_V1_Processo.' || formato, 'formato', formato,
+    'tamanho', 100, 'hash_md5', '0123456789abcdef0123456789abcdef', 'drive_id', 'drive-' || papel) $$;
+create function pg_temp.com_arquivos(nome_do_processo text) returns void
+language plpgsql as $$
+begin
+  perform public.registrar_versao(pg_temp.processo(nome_do_processo), 1, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')), true);
+  perform public.registrar_versao(pg_temp.processo(nome_do_processo), 2,
+    jsonb_build_array(pg_temp.arquivo('bpm', 'bpm'), pg_temp.arquivo('relatorio', 'docx')), false, 1);
+end $$;
+grant execute on function pg_temp.arquivo(text, text), pg_temp.com_arquivos(text) to authenticated;
+
 -- ===== Cadastro =====
 set local role authenticated;
 select pg_temp.claims('a2');
+select pg_temp.com_arquivos(nome) from unnest(array['Anda', 'Arquivado', 'Chega', 'Publicado', 'Sai']) as nome;
 insert into _tap (linha) select results_eq(
   $sql$select p.etapa_id = pg_temp.etapa('nao_iniciados'), p.etiqueta::text, p.saiu_em, p.movido_por, p.concluido_em,
     (select responsavel_id from public.processos where id = p.processo_id)

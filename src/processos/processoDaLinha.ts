@@ -1,6 +1,6 @@
 import { diaDeBrasilia } from '../lib/datas'
 import type { Database } from '../types/database'
-import type { DadosDoCartao, EtapaAtual, ProcessoDaLista, ResponsavelDoProcesso, SituacaoDoProcesso } from './tipos'
+import type { ArquivosDoProcesso, DadosDoCartao, EtapaAtual, ProcessoDaLista, ResponsavelDoProcesso, SituacaoDoProcesso } from './tipos'
 
 export type LinhaDoProcesso = Database['public']['Views']['processos_com_andamento']['Row']
 
@@ -15,7 +15,9 @@ export function processoDaLinha(linha: LinhaDoProcesso, totalDeEtapas: number): 
     entrouNaEtapaEm: linha.entrou_na_etapa_em ? diaDeBrasilia(linha.entrou_na_etapa_em) : null,
     responsavel: responsavelDaLinha(linha),
     dataDaModelagemPiloto: linha.data_da_modelagem_piloto,
+    dataDaValidacao: linha.data_da_validacao,
     cartao: cartaoDaLinha(linha),
+    arquivos: arquivosDaLinha(linha),
     publicadoEm: linha.publicado_em,
     linkDaPublicacao: linha.link_da_publicacao,
     explicacaoSemPublicacao: linha.explicacao_sem_publicacao,
@@ -41,6 +43,14 @@ function ultimaVersaoDaLinha(linha: LinhaDoProcesso): DadosDoCartao['ultimaVersa
   return {
     numero: linha.ultima_versao_numero, historica: linha.ultima_versao_historica ?? false,
     temRelatorio: linha.ultima_versao_tem_relatorio ?? false,
+  }
+}
+
+// O que o processo tem de arquivos, para a trava de arquivos decidir a janela antes de mover.
+function arquivosDaLinha(linha: LinhaDoProcesso): ArquivosDoProcesso {
+  return {
+    versaoPiloto: linha.tem_versao_piloto === true, versaoEmSequencia: linha.tem_versao_em_sequencia === true,
+    relatorioNumerado: linha.tem_relatorio_numerado === true,
   }
 }
 

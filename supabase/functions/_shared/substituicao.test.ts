@@ -35,6 +35,14 @@ describe('conferirAlvoDoEnvio', () => {
     expect(codigo(conferirAlvoDoEnvio({ ...alvo, historica: true }, pedidoDeEnvio))).toBe('versao_historica_somente_leitura')
   })
 
+  it('o relatório numerado (.docx) se substitui por outro .docx; o ligado à versão aprovada, não', () => {
+    const numerado = { ...alvo, formato: 'docx', nome: 'TSA_V3_Emitir Ofício_Relatório V2.docx' }
+    const novo = { ...pedidoDeEnvio, nomeOriginal: 'relatório revisado.docx' }
+    expect(codigo(conferirAlvoDoEnvio(numerado, novo))).toBeNull()
+    expect(codigo(conferirAlvoDoEnvio(numerado, pedidoDeEnvio))).toBe('tipo_de_arquivo_diferente')
+    expect(codigo(conferirAlvoDoEnvio({ ...numerado, aprovada: true }, novo))).toBe('versao_aprovada')
+  })
+
   it('recusa arquivo de versão aprovada, citando o número da versão, antes de o arquivo subir ao Drive', () => {
     const recusa = conferirAlvoDoEnvio({ ...alvo, aprovada: true }, pedidoDeEnvio)
     expect(codigo(recusa)).toBe('versao_aprovada')

@@ -10,6 +10,7 @@ const VAZIA: LinhaDoProcesso = {
   responsavel_ativo: null, etiqueta: null, entrou_na_etapa_em: null, etapa_atual_posicao: null,
   ultima_versao_numero: null, ultima_versao_historica: null, ultima_versao_tem_relatorio: null, subprocessos_quantidade: 0,
   publicado_em: null, link_da_publicacao: null, sem_publicacao: null, arquivado_em: null, explicacao_sem_publicacao: null,
+  tem_versao_piloto: null, tem_versao_em_sequencia: null, tem_relatorio_numerado: null, data_da_validacao: null,
 }
 
 test('traduz a data da publicação', () => {
@@ -71,4 +72,9 @@ test('a linha vazia vira um cartão vazio: sem etapa atual, sem versão, sem res
 test('sem o número da versão não há última versão, mesmo com as outras colunas preenchidas', () => {
   const processo = processoDaLinha({ ...VAZIA, ultima_versao_historica: false, ultima_versao_tem_relatorio: true }, 8)
   expect(processo.cartao?.ultimaVersao).toBeNull()
+})
+
+test('traduz a data da validação', () => {
+  expect(processoDaLinha({ ...VAZIA, data_da_validacao: '2026-10-12' }, 8)).toMatchObject({ dataDaValidacao: '2026-10-12' })
+  expect(processoDaLinha(VAZIA, 8)).toMatchObject({ dataDaValidacao: null })
 })

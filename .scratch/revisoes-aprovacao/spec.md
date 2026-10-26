@@ -147,6 +147,8 @@ Não destrutiva: coluna nova em `processos`, tabela nova, função nova, `regist
 4. **O nome do .pdf leva a versão aprovada** no momento do envio; se a aprovação for trocada por outra versão, o .pdf anterior fica guardado com o nome antigo.
 5. **O envio do .pdf vai pelo módulo de versões**, que já fala com a função do Drive, e não por um caminho novo.
 
+Decisões da execução (2026-10-26, ticket 06; o detalhe está em `desvios.md`): o .pdf passa pelas quatro ações da função `arquivos-no-drive` com um papel novo, e vale também com o processo concluído; `guardado_em` é preenchido por um gatilho que a marca de `registrar_aprovacao` aciona; ao registrar a aprovação com o .pdf, o arquivo sobe ao Drive antes de a aprovação ser registrada (falha do envio: nada registrado); a janela de registrar mostra a frase "A aprovação foi registrada, mas o .pdf não foi guardado…" se só o último passo falhar.
+
 ### Critérios conferidos olhando a tela
 
 - `[visual]` O campo da data da validação no Agora fica alinhado aos outros campos e cabe numa linha.

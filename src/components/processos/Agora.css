@@ -147,3 +147,11 @@
   color: var(--texto-2);
   font-size: var(--tam-secundario);
 }
+
+/* A Data da validação no Agora da Validação com o setor: o rótulo e o campo da data na mesma linha, como as listas acima. */
+.agora-validacao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-2) var(--esp-3);
+}

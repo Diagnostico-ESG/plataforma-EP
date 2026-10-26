@@ -1,8 +1,8 @@
 import { cleanup, fireEvent, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import type { SituacaoDoProcesso } from './processos/tipos'
-import { montarNosCadastros } from './testes/processosNosCadastros'
-import { arquivoDeTeste, comNome, versaoDeTeste } from './testes/versoesDeTeste'
+import { montarNosCadastros, naEtapa } from './testes/processosNosCadastros'
+import { arquivoDeTeste, comNome, relatorioNumeradoDeTeste, versaoDeTeste } from './testes/versoesDeTeste'
 import type { Versao } from './versoes/tipos'
 import type { VersoesFalso } from './versoes/VersoesFalso'
 
@@ -44,24 +44,24 @@ function itensDoMenu(secao: Secao, rotulo: string): string[] {
   return screen.getAllByRole('menuitem').map((item) => item.textContent ?? '')
 }
 
-test('a versão mais recente em destaque: "V2 · 02/10 · falta relatório", os botões dos arquivos e o espaço do relatório', async () => {
+test('a versão mais recente em destaque: "V2 · 02/10", os botões dos arquivos, sem marca de relatório pendente', async () => {
   montarNosCadastros(comVersoes([versaoDeTeste(1), versaoDeTeste(2)]))
   const v2 = await destaque(await arquivos(), 'V2')
   expect(v2.getByText('V2')).toBeTruthy()
   expect(v2.getByText('02/10').tagName).toBe('TIME')
-  expect(v2.getByText('falta relatório')).toBeTruthy()
+  expect(v2.queryByText('falta relatório')).toBeNull()
   expect(v2.getAllByRole('link').map((link) => link.getAttribute('aria-label'))).toEqual([
     'Baixar Imagem .png (TSA_V2_Emitir Ofício.png)', 'Baixar Fluxograma .bpm (TSA_V2_Emitir Ofício.bpm)',
   ])
   expect(v2.getByRole('link', { name: comNome('TSA_V2_Emitir Ofício.bpm') }).textContent).toContain('Fluxograma .bpm')
 })
 
-test('[+ Acrescentar relatório] abre o formulário do relatório com a versão em destaque escolhida', async () => {
-  montarNosCadastros(comVersoes([comRelatorio(1), versaoDeTeste(2)]))
-  const secao = await arquivos()
-  fireEvent.click((await destaque(secao, 'V2')).getByRole('button', { name: 'Acrescentar relatório' }))
-  const form = within(await secao.findByRole('form', { name: 'Acrescentar relatório' }))
-  expect((form.getByLabelText('Versão') as HTMLSelectElement).value).toBe('v2')
+test('a versão sem relatório próprio mostra o último, dizendo de qual versão ele é: "Relatório V1 (da V1)"', async () => {
+  const v1 = versaoDeTeste(1, { arquivos: [...versaoDeTeste(1).arquivos, relatorioNumeradoDeTeste(1, 1)] })
+  montarNosCadastros(comVersoes([v1, versaoDeTeste(2)]))
+  const v2 = await destaque(await arquivos(), 'V2')
+  expect(v2.getByRole('link', { name: comNome('Relatório V1 (da V1)') })).toBeTruthy()
+  expect(v2.queryByRole('button', { name: 'Acrescentar relatório' })).toBeNull()
 })
 
 test('com relatório, sem a pílula nem o espaço, e com o botão do relatório', async () => {
@@ -89,20 +89,13 @@ test('as anteriores ficam recolhidas em "Versões anteriores (2)", da mais recen
   expect(within(recolhidas).getAllByRole('article').map((versao) => versao.getAttribute('aria-label'))).toEqual(['V2', 'V1F'])
 })
 
-test('o "⋯" da seção tem "Registrar versão histórica" só sem versão nova', async () => {
-  montarNosCadastros(comVersoes([historica(1)]))
+test('[Registrar versão histórica] é o botão de Não iniciados, só sem versão piloto nem em sequência, e não está no "⋯"', async () => {
+  montarNosCadastros({ ...comVersoes([historica(1)]), ajustarProcessos: naEtapa('nao_iniciados') })
   const secao = await arquivos()
   await destaque(secao, 'V1F')
-  expect(itensDoMenu(secao, 'Mais ações dos arquivos')).toEqual(['Registrar versão histórica'])
-  fireEvent.click(screen.getByRole('menuitem', { name: 'Registrar versão histórica' }))
+  fireEvent.click(secao.getByRole('button', { name: 'Registrar versão histórica' }))
   expect(await secao.findByRole('form', { name: 'Registrar versão histórica' })).toBeTruthy()
-})
-
-test('o "⋯" da seção tem "Acrescentar relatório" quando só uma anterior está sem relatório', async () => {
-  montarNosCadastros(comVersoes([versaoDeTeste(1), comRelatorio(2)]))
-  const secao = await arquivos()
-  await destaque(secao, 'V2')
-  expect(itensDoMenu(secao, 'Mais ações dos arquivos')).toEqual(['Acrescentar relatório'])
+  expect(secao.queryByRole('button', { name: 'Mais ações dos arquivos' })).toBeNull()
 })
 
 test('sem ação rara, a seção não tem "⋯"', async () => {

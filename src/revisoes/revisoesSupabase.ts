@@ -1,6 +1,7 @@
 import { type RecusasDoModulo, porQueNadaMudou } from '../acesso/falhasDeGravacao'
 import type { ClienteSupabase } from '../lib/supabase'
 import { falhaDoBanco } from '../processos/recusasDoBanco'
+import type { ArquivoDaVersao } from '../versoes/tipos'
 import type { Database } from '../types/database'
 import type { Aprovacao, DadosDaAprovacao, DadosDaEdicaoDaRevisao, DadosDaRevisao, ModuloDeRevisoes, RevisaoInterna } from './tipos'
 
@@ -38,6 +39,7 @@ export function criarRevisoesSupabase(cliente: ClienteSupabase, recusas: Recusas
     registrarAprovacao: (processoId, dados) => registrarAprovacao(cliente, processoId, dados, recusas),
     editarRevisao: (id, dados) => editarRevisao(cliente, id, dados, recusas),
     editarAprovacao: (id, dados) => editarAprovacao(cliente, id, dados, recusas),
+    registrarDataDaValidacao: (processoId, data) => registrarDataDaValidacao(cliente, processoId, data, recusas),
   }
 }
 
@@ -48,9 +50,10 @@ async function listarRevisoes(cliente: ClienteSupabase, processoId: string): Pro
   return (data as unknown as LinhaDaRevisao[]).map(revisaoDaLinha)
 }
 
-// A versão aprovada e quem registrou vêm junto, pelas chaves estrangeiras. Uma aprovação por processo.
+// A versão aprovada, quem registrou e os .pdfs (o atual e os guardados) vêm junto, pelas chaves estrangeiras. Uma aprovação
+// por processo.
 const COLUNAS_DA_APROVACAO = 'id, numero_eprotocolo, link, aprovada_em, registrada_em, '
-  + 'versao:versoes(numero), registrador:usuarios!registrada_por(nome)'
+  + 'versao:versoes(numero), registrador:usuarios!registrada_por(nome), pdfs:pdfs_da_aprovacao(id, nome, tamanho, guardado_em)'
 
 type LinhaDaAprovacao = {
   id: string
@@ -60,12 +63,20 @@ type LinhaDaAprovacao = {
   registrada_em: string
   versao: { numero: number }
   registrador: { nome: string } | null
+  pdfs?: { id: string; nome: string; tamanho: number; guardado_em: string | null }[]
+}
+
+// O .pdf atual é o que não foi guardado (a aprovação trocada deixa o dela guardado, para o histórico).
+function pdfAtualDaLinha(linha: LinhaDaAprovacao): ArquivoDaVersao | null {
+  const atual = (linha.pdfs ?? []).find((pdf) => pdf.guardado_em === null)
+  return atual ? { id: atual.id, papel: 'pdf_da_aprovacao', nome: atual.nome, formato: 'pdf', tamanho: atual.tamanho } : null
 }
 
 function aprovacaoDaLinha(linha: LinhaDaAprovacao): Aprovacao {
   return {
     id: linha.id, versao: linha.versao.numero, numeroEprotocolo: linha.numero_eprotocolo, link: linha.link,
     aprovadaEm: linha.aprovada_em, registradaPor: linha.registrador?.nome ?? null, registradaEm: linha.registrada_em,
+    pdf: pdfAtualDaLinha(linha),
   }
 }
 
@@ -95,6 +106,14 @@ async function registrarAprovacao(
     p_processo: processoId, p_numero: dados.numeroEprotocolo as string, p_link: dados.link as string, p_data: dados.aprovadaEm as string,
   })
   if (error) throw falhaDoBanco(error, recusas)
+}
+
+// A data da validação (ou null para apagar): só a função do banco a grava, com o processo na Validação com o setor.
+async function registrarDataDaValidacao(
+  cliente: ClienteSupabase, processoId: string, data: string | null, recusas: RecusasDoModulo,
+): Promise<void> {
+  const { error } = await cliente.rpc('registrar_data_da_validacao', { p_processo: processoId, p_data: data as string })
+  if (error) throw falhaDoBanco(error, recusas, { data: 'validacao' })
 }
 
 // O resultado, o escopo e o comentário se alteram (o resto não tem privilégio). A RLS não acusa erro ao filtrar: zero

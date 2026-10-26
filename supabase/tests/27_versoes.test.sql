@@ -1,5 +1,5 @@
 -- Versões (documentos-versoes, ticket 02): quem pode o quê em versoes, arquivos_da_versao e nos eventos de versão,
--- e as regras do banco (número, etapa, processo em andamento, par .bpm e .png, um arquivo por papel, formato e
+-- e as regras do banco (número, etapa, processo em andamento, só o .bpm exigido, um arquivo por papel, formato e
 -- tamanho, nada se apaga, processo com versão não se exclui, um evento por envio). O caso "processo com versão não
 -- se exclui" fica aqui, ao lado das versões, como o 23 tem o caso das reuniões.
 begin;
@@ -8,7 +8,24 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(53);
+insert into _tap (linha) select plan(51);
+
+-- Trava de arquivos (ticket 11): este teste monta o cenário e não prova a trava (ela é do 59), então move sem ela. A
+-- função desliga, só durante o movimento e com o dono do banco, as etapas com trava que ficam antes do destino.
+create function pg_temp.mover_sem_trava(p_processo uuid, p_etapa uuid, p_data date default null, p_link text default null,
+  p_explicacao text default null) returns void
+language plpgsql security definer as $$
+begin
+  set local session_replication_role = replica;
+  update public.etapas set ativa = false
+  where codigo in ('modelagem', 'relatorio_modelagem_tecnica') and ordem < (select ordem from public.etapas where id = p_etapa);
+  set local session_replication_role = origin;
+  perform public.mover_processo(p_processo, p_etapa, p_data, p_link, p_explicacao);
+  set local session_replication_role = replica;
+  update public.etapas set ativa = true where codigo in ('modelagem', 'relatorio_modelagem_tecnica');
+  set local session_replication_role = origin;
+end $$;
+grant execute on function pg_temp.mover_sem_trava(uuid, uuid, date, text, text) to authenticated;
 
 -- Isola o teste dos dados que já existem no banco (a prova do Drive deixa versões, arquivos, eventos e pastas de teste
 -- no desenvolvimento): a limpeza vale só nesta transação, que é desfeita no fim. replica desliga os gatilhos que
@@ -68,9 +85,9 @@ grant execute on function pg_temp.arquivo(text, text, bigint), pg_temp.par(), pg
 -- Preparação, como integrante: o "Processo Concluido V" em Concluídos (Andamento livre: concluído é estar lá).
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 set local role authenticated;
-select public.mover_processo(pg_temp.processo('e4'), (select id from public.etapas where codigo = 'concluidos'),
+select pg_temp.mover_sem_trava(pg_temp.processo('e4'), (select id from public.etapas where codigo = 'concluidos'),
   null, null, 'Não será publicado');
-select public.registrar_versao(pg_temp.processo('e2'), 1, null, pg_temp.par());
+select public.registrar_versao(pg_temp.processo('e2'), 1, pg_temp.par());
 select public.suspender_processo(pg_temp.processo('e2'), 'Aguardando o setor');
 select public.cancelar_processo(pg_temp.processo('e3'), 'Não segue');
 
@@ -79,16 +96,13 @@ reset role;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
 set local role authenticated;
 insert into _tap (linha) select lives_ok(
-  $sql$select public.registrar_versao(pg_temp.processo('e1'), 1, '  Primeira versão  ', pg_temp.par())$sql$,
+  $sql$select public.registrar_versao(pg_temp.processo('e1'), 1, pg_temp.par())$sql$,
   'administrador registra uma versão com .bpm e .png, sem .bpmn');
 insert into _tap (linha) select is(
   (select numero from public.versoes where processo_id = pg_temp.processo('e1')), 1, 'processo sem versão recebe V1');
 insert into _tap (linha) select is(
   (select e.codigo from public.versoes v join public.etapas e on e.id = v.etapa_id where v.processo_id = pg_temp.processo('e1')),
   'nao_iniciados', 'a versão guarda a etapa atual do processo (Não iniciados, no cadastro)');
-insert into _tap (linha) select is(
-  (select observacao from public.versoes where processo_id = pg_temp.processo('e1')), 'Primeira versão',
-  'a observação é gravada sem espaços nas pontas');
 insert into _tap (linha) select is(
   (select enviada_por::text from public.versoes where processo_id = pg_temp.processo('e1')),
   '00000000-0000-0000-0000-0000000000a1', 'quem enviou é quem chamou');
@@ -113,31 +127,28 @@ insert into _tap (linha) select is(
   (select max(numero) from public.versoes where processo_id = pg_temp.processo('e1')), 2, 'o número enviado é ignorado: V2');
 
 insert into _tap (linha) select throws_ok(
-  $sql$select public.registrar_versao(pg_temp.processo('e1'), 3, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$,
-  'P0001', 'versao_sem_bpm_e_png', 'versão sem .png é recusada');
+  $sql$select public.registrar_versao(pg_temp.processo('e1'), 3, jsonb_build_array(pg_temp.arquivo('png', 'png')))$sql$,
+  'P0001', 'versao_sem_bpm', 'versão sem .bpm é recusada');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.registrar_versao(pg_temp.processo('e1'), 3, null, jsonb_build_array(pg_temp.arquivo('png', 'png')))$sql$,
-  'P0001', 'versao_sem_bpm_e_png', 'versão sem .bpm é recusada');
-insert into _tap (linha) select throws_ok(
-  $sql$select public.registrar_versao(pg_temp.processo('e1'), 3, null,
+  $sql$select public.registrar_versao(pg_temp.processo('e1'), 3,
     jsonb_build_array(pg_temp.arquivo('bpmn', 'bpmn'), pg_temp.arquivo('png', 'png')))$sql$,
-  'P0001', 'versao_sem_bpm_e_png', 'versão com .bpmn e .png, sem .bpm, é recusada');
+  'P0001', 'versao_sem_bpm', 'versão com .bpmn e .png, sem .bpm, é recusada');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.registrar_versao(pg_temp.processo('e1'), 3, null, pg_temp.par() || pg_temp.arquivo('bpm', 'bpm'))$sql$,
+  $sql$select public.registrar_versao(pg_temp.processo('e1'), 3, pg_temp.par() || pg_temp.arquivo('bpm', 'bpm'))$sql$,
   '23505', null, 'segundo arquivo do mesmo papel é recusado');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.registrar_versao(pg_temp.processo('e1'), 3, null, pg_temp.par() || pg_temp.arquivo('relatorio', 'png'))$sql$,
-  '23514', null, 'relatório .png é recusado');
+  $sql$select public.registrar_versao(pg_temp.processo('e1'), 3, pg_temp.par() || pg_temp.arquivo('relatorio', 'png'))$sql$,
+  'P0001', 'relatorio_so_docx', 'relatório .png é recusado: o relatório novo só vale em .docx');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.registrar_versao(pg_temp.processo('e1'), 3, null,
+  $sql$select public.registrar_versao(pg_temp.processo('e1'), 3,
     jsonb_build_array(pg_temp.arquivo('bpmn', 'bpmn', 20971521), pg_temp.arquivo('png', 'png')))$sql$,
   '23514', null, 'arquivo de 20 MB + 1 byte é recusado');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.registrar_versao(pg_temp.processo('e1'), 7, null, pg_temp.par())$sql$,
+  $sql$select public.registrar_versao(pg_temp.processo('e1'), 7, pg_temp.par())$sql$,
   'P0001', 'numero_da_versao_mudou:3', 'número esperado diferente do que o banco dá é recusado');
 insert into _tap (linha) select lives_ok(
-  $sql$select public.registrar_versao(pg_temp.processo('e1'), 3, null,
-    pg_temp.par() || pg_temp.arquivo('bpmn', 'bpmn') || pg_temp.arquivo('relatorio', 'pdf'))$sql$,
+  $sql$select public.registrar_versao(pg_temp.processo('e1'), 3,
+    pg_temp.par() || pg_temp.arquivo('bpmn', 'bpmn') || pg_temp.arquivo('relatorio', 'docx'))$sql$,
   'versão com o .bpmn opcional e relatório é aceita');
 insert into _tap (linha) select is(
   (select count(*) from public.arquivos_da_versao where versao_id = pg_temp.versao(pg_temp.processo('e1'), 3)), 4::bigint,
@@ -151,7 +162,7 @@ insert into _tap (linha) select throws_ok(
 insert into _tap (linha) select throws_ok(
   $sql$update public.arquivos_da_versao set drive_id = 'outro'$sql$, '42501', null, 'ninguém altera o drive_id do arquivo');
 insert into _tap (linha) select throws_ok(
-  $sql$update public.versoes set observacao = 'Outra'$sql$, '42501', null, 'administrador não altera versão');
+  $sql$update public.versoes set numero = 9$sql$, '42501', null, 'administrador não altera versão');
 insert into _tap (linha) select throws_ok(
   $sql$delete from public.versoes$sql$, '42501', null, 'administrador não apaga versão');
 insert into _tap (linha) select throws_ok(
@@ -159,13 +170,13 @@ insert into _tap (linha) select throws_ok(
 
 -- Processo fora de andamento.
 insert into _tap (linha) select throws_ok(
-  $sql$select public.registrar_versao(pg_temp.processo('e2'), 2, null, pg_temp.par())$sql$,
+  $sql$select public.registrar_versao(pg_temp.processo('e2'), 2, pg_temp.par())$sql$,
   'P0001', 'processo_fora_de_andamento:suspenso', 'versão em processo suspenso é recusada');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.registrar_versao(pg_temp.processo('e3'), 1, null, pg_temp.par())$sql$,
+  $sql$select public.registrar_versao(pg_temp.processo('e3'), 1, pg_temp.par())$sql$,
   'P0001', 'processo_fora_de_andamento:cancelado', 'versão em processo cancelado é recusada');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.registrar_versao(pg_temp.processo('e4'), 1, null, pg_temp.par())$sql$,
+  $sql$select public.registrar_versao(pg_temp.processo('e4'), 1, pg_temp.par())$sql$,
   'P0001', 'processo_fora_de_andamento:concluido', 'versão em processo concluído é recusada');
 insert into _tap (linha) select throws_ok(
   $sql$insert into public.arquivos_da_versao (versao_id, papel, nome, formato, tamanho, hash_md5, drive_id)
@@ -179,10 +190,11 @@ set local role authenticated;
 insert into _tap (linha) select is((select count(*) from public.versoes where processo_id = pg_temp.processo('e1')), 3::bigint,
   'integrante lê as versões');
 insert into _tap (linha) select lives_ok(
-  $sql$select public.registrar_versao(pg_temp.processo('e5'), 1, null, pg_temp.par())$sql$, 'integrante registra uma versão');
+  $sql$select public.registrar_versao(pg_temp.processo('e5'), 1, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$,
+  'integrante registra uma versão só com o .bpm (ADR 0025)');
 insert into _tap (linha) select lives_ok(
-  $sql$select public.registrar_versao(pg_temp.processo('e5'), 2, null, pg_temp.par())$sql$, 'integrante registra a segunda');
-insert into _tap (linha) select is(pg_temp.alterar_tamanhos(300), 12::bigint, 'integrante altera o tamanho dos arquivos');
+  $sql$select public.registrar_versao(pg_temp.processo('e5'), 2, pg_temp.par())$sql$, 'integrante registra a segunda');
+insert into _tap (linha) select is(pg_temp.alterar_tamanhos(300), 11::bigint, 'integrante altera o tamanho dos arquivos');
 insert into _tap (linha) select throws_ok(
   $sql$delete from public.versoes$sql$, '42501', null, 'integrante não apaga versão');
 insert into _tap (linha) select throws_ok(
@@ -202,7 +214,7 @@ insert into _tap (linha) select is(
   (select count(*) from public.arquivos_da_versao where versao_id = pg_temp.versao(pg_temp.processo('e1'), 3)), 4::bigint,
   'consulta lê os arquivos');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.registrar_versao(pg_temp.processo('e1'), 4, null, pg_temp.par())$sql$, '42501', null,
+  $sql$select public.registrar_versao(pg_temp.processo('e1'), 4, pg_temp.par())$sql$, '42501', null,
   'consulta não registra versão');
 insert into _tap (linha) select is(pg_temp.alterar_tamanhos(400), 0::bigint, 'consulta não altera arquivo');
 insert into _tap (linha) select throws_ok(
@@ -233,7 +245,7 @@ insert into _tap (linha) select is((select count(*) from public.arquivos_da_vers
 insert into _tap (linha) select is((select count(*) from public.eventos where entidade = 'versao'), 0::bigint,
   'inativo não lê os eventos de versão');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.registrar_versao(pg_temp.processo('e1'), 4, null, pg_temp.par())$sql$, '42501', null,
+  $sql$select public.registrar_versao(pg_temp.processo('e1'), 4, pg_temp.par())$sql$, '42501', null,
   'inativo não registra versão');
 insert into _tap (linha) select is(pg_temp.alterar_tamanhos(500), 0::bigint, 'inativo não altera arquivo');
 
@@ -245,7 +257,7 @@ insert into _tap (linha) select throws_ok(
 insert into _tap (linha) select throws_ok(
   $sql$select count(*) from public.arquivos_da_versao$sql$, '42501', null, 'visitante não lê arquivos');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.registrar_versao('9f000000-0000-0000-0000-0000000000e1', 4, null, '[]'::jsonb)$sql$, '42501', null,
+  $sql$select public.registrar_versao('9f000000-0000-0000-0000-0000000000e1', 4, '[]'::jsonb)$sql$, '42501', null,
   'visitante não registra versão');
 
 reset role;

@@ -1,8 +1,9 @@
 import { extensaoDoNome } from '../../supabase/functions/_shared/decisao.ts'
 import { nomePadrao } from '../../supabase/functions/_shared/nomePadrao.ts'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
-import { PAPEIS } from './rotulos'
-import type { ArquivoEscolhido, PapelDoArquivo } from './tipos'
+import { proximoNumeroDoRelatorio } from './relatorioQueVale'
+import { PAPEIS, proximoNumero } from './rotulos'
+import type { ArquivoEscolhido, PapelDoArquivo, Versao } from './tipos'
 
 /** O arquivo escolhido em cada campo do formulário. */
 export type Escolhidos = Partial<Record<PapelDoArquivo, File>>
@@ -10,10 +11,26 @@ export type Escolhidos = Partial<Record<PapelDoArquivo, File>>
 export type RecusasDosCampos = Partial<Record<PapelDoArquivo, string>>
 export type Progresso = { enviados: number; total: number }
 
-/** Nova: o número é o da prévia (maior + 1). Histórica: o número é digitado, e os arquivos são os que existirem. */
-export type ModoDoFormulario = { tipo: 'nova'; numero: number } | { tipo: 'historica' }
+/**
+ * Em sequência: o número é o da prévia (maior + 1). Piloto e histórica: o número é digitado; a histórica leva os arquivos
+ * que existirem, a piloto e a em sequência, o .bpm (ADR 0025).
+ */
+export type ModoDoFormulario =
+  | { tipo: 'sequencia'; numero: number; numeroDoRelatorio: number } | { tipo: 'piloto'; numeroSugerido: number } | { tipo: 'historica' }
 
-export const PAPEIS_OBRIGATORIOS: readonly PapelDoArquivo[] = ['bpm', 'png']
+export const PAPEIS_OBRIGATORIOS: readonly PapelDoArquivo[] = ['bpm']
+
+/** O modo do formulário de enviar versão piloto ou em sequência, a partir das versões que o processo já tem (a prévia dos números). */
+export function modoParaEnviar(tipo: 'piloto' | 'sequencia', lidas: Versao[]): ModoDoFormulario {
+  const numero = proximoNumero(lidas)
+  if (tipo === 'piloto') return { tipo: 'piloto', numeroSugerido: numero }
+  return { tipo: 'sequencia', numero, numeroDoRelatorio: proximoNumeroDoRelatorio(lidas) }
+}
+
+/** Os campos de arquivo do formulário: a piloto não leva relatório (ele se envia sozinho); a histórica leva o dela, sem número. */
+export function papeisDoFormulario(modo: ModoDoFormulario): readonly PapelDoArquivo[] {
+  return modo.tipo === 'piloto' ? PAPEIS.filter((papel) => papel !== 'relatorio') : PAPEIS
+}
 
 export function arquivosDoPedido(escolhidos: Escolhidos): ArquivoEscolhido[] {
   return PAPEIS.flatMap((papel) => {
@@ -27,8 +44,8 @@ export function podeEnviar(escolhidos: Escolhidos, recusas: RecusasDosCampos, co
   return PAPEIS_OBRIGATORIOS.every((papel) => escolhidos[papel])
 }
 
-/** O número digitado da versão histórica: só dígitos, inteiro maior que zero; senão null. */
-export function lerNumeroHistorico(texto: string): number | null {
+/** O número digitado da versão histórica ou piloto: só dígitos, inteiro maior que zero; senão null. */
+export function lerNumeroDigitado(texto: string): number | null {
   if (!/^[0-9]+$/.test(texto)) return null
   const numero = Number(texto)
   return numero > 0 ? numero : null
@@ -41,11 +58,13 @@ export function podeRegistrarHistorica(escolhidos: Escolhidos, recusas: RecusasD
   return Boolean(escolhidos.bpm || (escolhidos.bpmn && escolhidos.png))
 }
 
-/** Se o botão do formulário se habilita: a nova pede o .bpm e o .png, a histórica pede o número e o .bpm (ou o par). */
+/** Se o botão do formulário se habilita: a em sequência pede o .bpm, a piloto o número e o .bpm, a histórica o número e o .bpm (ou o par). */
 export function podeSubmeter(modo: ModoDoFormulario, arquivos: { escolhidos: Escolhidos; recusas: RecusasDosCampos; conferindo: boolean },
-  numero: number | null): boolean {
+  numero: number | null, relatorioObrigatorio = false): boolean {
   const { escolhidos, recusas, conferindo } = arquivos
   if (modo.tipo === 'historica') return podeRegistrarHistorica(escolhidos, recusas, conferindo, numero)
+  if (modo.tipo === 'piloto' && numero === null) return false
+  if (relatorioObrigatorio && !escolhidos.relatorio) return false
   return podeEnviar(escolhidos, recusas, conferindo)
 }
 
@@ -56,11 +75,16 @@ export function textoDoProgresso({ enviados, total }: Progresso): string {
 
 /** O nome que o arquivo vai ter no Drive e na lista (a mesma função que a função do servidor usa). */
 export function nomeNaPrevia(processo: { setorSigla: string; nome: string }, numero: number, papel: PapelDoArquivo,
-  arquivo: File, historica = false): string {
+  arquivo: File, tipo: 'historica' | 'piloto' | 'sequencia' = 'sequencia', numeroDoRelatorio?: number): string {
   return nomePadrao({
-    sigla: processo.setorSigla, numero, historica, nomeDoProcesso: processo.nome, papel,
-    extensao: extensaoDoNome(arquivo.name),
+    sigla: processo.setorSigla, numero, historica: tipo === 'historica', piloto: tipo === 'piloto', numeroDoRelatorio,
+    nomeDoProcesso: processo.nome, papel, extensao: extensaoDoNome(arquivo.name),
   })
+}
+
+/** "Relatório V3, acompanha a V8": o que o formulário do relatório diz antes do envio (a versão é a mais recente que não é histórica). */
+export function previaDoRelatorio({ numeroDaVersao, piloto, numeroDoRelatorio }: { numeroDaVersao: number; piloto: boolean; numeroDoRelatorio: number }): string {
+  return `Relatório V${numeroDoRelatorio}, acompanha a V${numeroDaVersao}${piloto ? 'P' : ''}`
 }
 
 export function textoDaFalhaDoEnvio(erro: unknown): string {
@@ -69,8 +93,14 @@ export function textoDaFalhaDoEnvio(erro: unknown): string {
   return `A versão não foi registrada: ${motivo}. Os arquivos escolhidos continuam no formulário.`
 }
 
-/** O relatório depois pede só o arquivo do relatório, sem recusa e sem conferência em andamento. */
-export function podeAcrescentarRelatorio(escolhidos: Escolhidos, recusas: RecusasDosCampos, conferindo: boolean): boolean {
+export function textoDaFalhaDoAcrescimo(erro: unknown): string {
+  if (erro instanceof TravaDoBanco) return erro.message
+  const motivo = erro instanceof Error ? erro.message : String(erro)
+  return `O arquivo não foi registrado: ${motivo}. Tente de novo.`
+}
+
+/** O relatório sozinho pede só o arquivo do relatório, sem recusa e sem conferência em andamento. */
+export function podeEnviarRelatorio(escolhidos: Escolhidos, recusas: RecusasDosCampos, conferindo: boolean): boolean {
   if (conferindo || Object.values(recusas).some(Boolean)) return false
   return Boolean(escolhidos.relatorio)
 }

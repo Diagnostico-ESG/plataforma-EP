@@ -9,7 +9,24 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(55);
+insert into _tap (linha) select plan(57);
+
+-- Trava de arquivos (ticket 11): este teste monta o cenário e não prova a trava (ela é do 59), então move sem ela. A
+-- função desliga, só durante o movimento e com o dono do banco, as etapas com trava que ficam antes do destino.
+create function pg_temp.mover_sem_trava(p_processo uuid, p_etapa uuid, p_data date default null, p_link text default null,
+  p_explicacao text default null) returns void
+language plpgsql security definer as $$
+begin
+  set local session_replication_role = replica;
+  update public.etapas set ativa = false
+  where codigo in ('modelagem', 'relatorio_modelagem_tecnica') and ordem < (select ordem from public.etapas where id = p_etapa);
+  set local session_replication_role = origin;
+  perform public.mover_processo(p_processo, p_etapa, p_data, p_link, p_explicacao);
+  set local session_replication_role = replica;
+  update public.etapas set ativa = true where codigo in ('modelagem', 'relatorio_modelagem_tecnica');
+  set local session_replication_role = origin;
+end $$;
+grant execute on function pg_temp.mover_sem_trava(uuid, uuid, date, text, text) to authenticated;
 
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 insert into public.autorizacoes (email, perfil) values
@@ -44,7 +61,7 @@ grant execute on function pg_temp.processo(text) to authenticated;
 
 create function pg_temp.mover(nome_do_processo text, codigo_da_etapa text) returns void
 language sql as $$
-  select public.mover_processo(pg_temp.processo(nome_do_processo), (select id from public.etapas where codigo = codigo_da_etapa)) $$;
+  select pg_temp.mover_sem_trava(pg_temp.processo(nome_do_processo), (select id from public.etapas where codigo = codigo_da_etapa)) $$;
 grant execute on function pg_temp.mover(text, text) to authenticated;
 
 -- Um arquivo inventado no formato que registrar_versao recebe, e o par .bpm + .png de uma versão nova.
@@ -60,7 +77,7 @@ create function pg_temp.enviar(nome_do_processo text) returns uuid
 language sql as $$
   select public.registrar_versao(pg_temp.processo(nome_do_processo),
     (select coalesce(max(numero), 0) + 1 from public.versoes where processo_id = pg_temp.processo(nome_do_processo)),
-    null, pg_temp.par()) $$;
+    pg_temp.par()) $$;
 grant execute on function pg_temp.enviar(text) to authenticated;
 
 -- A versão completa: o par .bpm + .png e o relatório acrescentado depois (registrar_versao só exige o par).
@@ -68,8 +85,11 @@ create function pg_temp.enviar_completa(nome_do_processo text) returns void
 language plpgsql as $$
 declare
   versao uuid := pg_temp.enviar(nome_do_processo);
+  processo uuid := pg_temp.processo(nome_do_processo);
 begin
-  perform public.acrescentar_relatorio(versao, (select numero from public.versoes where id = versao),
+  perform public.enviar_relatorio(processo, (select numero from public.versoes where id = versao),
+    (select coalesce(max(a.numero_do_relatorio), 0) + 1 from public.arquivos_da_versao a
+      join public.versoes v on v.id = a.versao_id where v.processo_id = processo),
     pg_temp.arquivo('relatorio', 'docx'));
 end $$;
 grant execute on function pg_temp.enviar_completa(text) to authenticated;
@@ -216,8 +236,15 @@ select pg_temp.enviar_completa('Segunda');
 select pg_temp.claims('a2');
 select pg_temp.mover('Segunda', 'aprovacao_setor');
 insert into _tap (linha) select lives_ok($sql$select pg_temp.aprovar('Segunda', 'PROT-1')$sql$, 'a primeira aprovação é aceita');
+-- O .pdf protocolado da primeira aprovação (o teste 60 prova as regras dele): a segunda aprovação o deixa guardado.
+select public.registrar_pdf_da_aprovacao(pg_temp.processo('Segunda'), jsonb_build_object('papel', 'pdf_da_aprovacao',
+  'nome', 'T40_V1_Segunda_Aprovação.pdf', 'formato', 'pdf', 'tamanho', 100, 'hash_md5', '0123456789abcdef0123456789abcdef',
+  'drive_id', 'drive-pdf-segunda'));
 select pg_temp.claims('a1');
+-- A versão nova só entra até a Revisão interna (ADR 0025): o processo volta a ela, recebe a V2 e segue à Aprovação.
+select pg_temp.mover('Segunda', 'revisao_interna');
 select pg_temp.enviar_completa('Segunda');
+select pg_temp.mover('Segunda', 'aprovacao_setor');
 insert into _tap (linha) select lives_ok($sql$select pg_temp.aprovar('Segunda', 'PROT-2', 'https://x.example/b')$sql$,
   'a segunda aprovação do processo é aceita e toma o lugar da primeira');
 insert into _tap (linha) select results_eq(
@@ -233,6 +260,15 @@ insert into _tap (linha) select results_eq(
     from public.eventos where entidade = 'aprovacao' and entidade_ref = pg_temp.processo('Segunda')::text and acao = 'substituir'$sql$,
   $sql$values ('substituir', 'V1', 'V2', 'PROT-1', 'PROT-2')$sql$,
   'um evento "substituir" guarda a aprovação anterior no antes');
+insert into _tap (linha) select results_eq(
+  $sql$select count(*)::int, count(*) filter (where p.guardado_em is not null)::int
+    from public.pdfs_da_aprovacao p join public.aprovacoes a on a.id = p.aprovacao_id
+    where a.processo_id = pg_temp.processo('Segunda')$sql$,
+  $sql$values (1, 1)$sql$, 'o .pdf da primeira aprovação fica guardado, sem .pdf atual, na segunda');
+insert into _tap (linha) select results_eq(
+  $sql$select detalhes->'antes'->>'pdf_nome' from public.eventos
+    where entidade = 'aprovacao' and entidade_ref = pg_temp.processo('Segunda')::text and acao = 'substituir'$sql$,
+  $sql$values ('T40_V1_Segunda_Aprovação.pdf')$sql$, 'o evento "substituir" traz o nome do .pdf guardado');
 select pg_temp.claims('a2');
 
 -- ===== Mover não mexe na aprovação, e ela não se apaga =====

@@ -52,6 +52,9 @@ export type DadosDoCartao = {
   subprocessos: number
 }
 
+/** O que o processo já tem de arquivos, lido da view: a trava de arquivos (ADR 0025) decide por isto. */
+export type ArquivosDoProcesso = { versaoPiloto: boolean; versaoEmSequencia: boolean; relatorioNumerado: boolean }
+
 /** A etapa atual do processo (a passagem aberta) e o lugar dela entre as etapas ativas do catálogo. */
 export type EtapaAtual = { id: string; codigo: string; nome: string; ordem: number; posicao: number; total: number }
 
@@ -75,8 +78,12 @@ export type ProcessoDaLista = {
   responsavel: ResponsavelDoProcesso | null
   /** A data da reunião de modelagem piloto (AAAA-MM-DD). Opcional para quem monta o processo à mão; o ProcessoLido a exige. */
   dataDaModelagemPiloto?: string | null
+  /** O dia em que o setor validou o fluxo (AAAA-MM-DD, nunca futuro); null sem a data. Opcional pelo mesmo motivo. */
+  dataDaValidacao?: string | null
   /** Opcional pelo mesmo motivo: sem ele o cartão não tem selos de versão nem de subprocessos. */
   cartao?: DadosDoCartao
+  /** O que o processo tem de arquivos, para a trava de arquivos. Opcional pelo mesmo motivo: sem ele a tela não trava. */
+  arquivos?: ArquivosDoProcesso
   /** O dia da publicação (AAAA-MM-DD); null sem a data. Opcional pelo mesmo motivo. */
   publicadoEm?: string | null
   /** O link da publicação (http ou https); null sem link. Opcional pelo mesmo motivo. */

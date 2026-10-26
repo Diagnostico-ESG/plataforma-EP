@@ -8,8 +8,8 @@ function arquivo(numero: number, papel: PapelDoArquivo, formato: string): Arquiv
 /** Uma versão inventada do "Emitir Ofício" (p1), com o .bpm e o .png (os obrigatórios). */
 export function versaoDeTeste(numero: number, mudancas: Partial<Versao> = {}): Versao {
   return {
-    id: `v${numero}`, numero, historica: false, enviadaEm: `2026-10-0${numero}T13:00:00Z`, autor: 'Ana Teste',
-    etapa: 'Reunião de modelagem', observacao: null, arquivos: [arquivo(numero, 'bpm', 'bpm'), arquivo(numero, 'png', 'png')],
+    id: `v${numero}`, numero, historica: false, piloto: false, enviadaEm: `2026-10-0${numero}T13:00:00Z`, autor: 'Ana Teste',
+    etapa: 'Reunião de modelagem', arquivos: [arquivo(numero, 'bpm', 'bpm'), arquivo(numero, 'png', 'png')],
     ...mudancas,
   }
 }
@@ -27,3 +27,11 @@ export const PNG_VALIDO =new File([new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d,
 
 /** Para achar um arquivo pelo nome dentro do nome acessível do botão ("Baixar Imagem .png (TSA_V1_...png)"). */
 export const comNome = (trecho: string) => (nome: string) => nome.includes(trecho)
+
+/** O relatório numerado (Relatório V2) ligado à versão `numeroDaVersao`: o .docx que o relatório novo sempre é. */
+export function relatorioNumeradoDeTeste(numeroDaVersao: number, numeroDoRelatorio: number): ArquivoDaVersao {
+  return {
+    id: `r${numeroDoRelatorio}`, papel: 'relatorio', nome: `TSA_V${numeroDaVersao}_Emitir Ofício_Relatório V${numeroDoRelatorio}.docx`,
+    formato: 'docx', tamanho: 100, numeroDoRelatorio,
+  }
+}

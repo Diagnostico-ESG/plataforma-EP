@@ -13,9 +13,14 @@ function megabytes(bytes: number): string {
   return (bytes / (1024 * 1024)).toFixed(1).replace('.', ',')
 }
 
-function recusaDaExtensao(papel: PapelDoArquivo, nome: string): string | null {
+// O relatório novo só vale em .docx (ADR 0026); o da histórica, que não é numerado, aceita .docx e .pdf.
+function extensoesDoPapel(papel: PapelDoArquivo, relatorioDaHistorica: boolean): readonly string[] {
+  return papel === 'relatorio' && !relatorioDaHistorica ? ['docx'] : EXTENSOES_POR_PAPEL[papel]
+}
+
+function recusaDaExtensao(papel: PapelDoArquivo, nome: string, relatorioDaHistorica: boolean): string | null {
   const extensao = extensaoDoNome(nome)
-  const aceitas = EXTENSOES_POR_PAPEL[papel]
+  const aceitas = extensoesDoPapel(papel, relatorioDaHistorica)
   if (aceitas.includes(extensao)) return null
   const recebida = extensao ? `.${extensao}` : 'sem extensão'
   return `Escolha um arquivo .${aceitas.join(' ou .')}. Recebido: ${recebida}.`
@@ -47,6 +52,6 @@ async function recusaDoConteudo(papel: PapelDoArquivo, arquivo: File): Promise<s
 }
 
 /** null se o arquivo serve para o papel; senão, a frase que aparece ao lado do campo. */
-export async function conferirArquivo(papel: PapelDoArquivo, arquivo: File): Promise<string | null> {
-  return recusaDaExtensao(papel, arquivo.name) ?? recusaDoTamanho(arquivo.size) ?? (await recusaDoConteudo(papel, arquivo))
+export async function conferirArquivo(papel: PapelDoArquivo, arquivo: File, relatorioDaHistorica = false): Promise<string | null> {
+  return recusaDaExtensao(papel, arquivo.name, relatorioDaHistorica) ?? recusaDoTamanho(arquivo.size) ?? (await recusaDoConteudo(papel, arquivo))
 }

@@ -21,9 +21,35 @@ describe('nomePadrao', () => {
     )
   })
 
+  it('põe o P na versão piloto, com os três arquivos', () => {
+    expect(nomePadrao({ ...base, piloto: true, papel: 'bpm', extensao: 'bpm' })).toBe('CEE_V6P_Nome do processo.bpm')
+    expect(nomePadrao({ ...base, piloto: true, papel: 'png', extensao: 'png' })).toBe('CEE_V6P_Nome do processo.png')
+    expect(nomePadrao({ ...base, piloto: true })).toBe('CEE_V6P_Nome do processo.bpmn')
+  })
+
   it('acrescenta _Relatório no relatório', () => {
     expect(nomePadrao({ ...base, papel: 'relatorio', extensao: 'pdf' })).toBe(
       'CEE_V6_Nome do processo_Relatório.pdf',
+    )
+  })
+
+  it('numera o relatório com o número do relatório, depois da versão que ele acompanha', () => {
+    const relatorio = { ...base, numero: 8, papel: 'relatorio' as const, extensao: 'docx' }
+    expect(nomePadrao({ ...relatorio, numeroDoRelatorio: 3 })).toBe('CEE_V8_Nome do processo_Relatório V3.docx')
+    expect(nomePadrao({ ...relatorio, numero: 6, piloto: true, numeroDoRelatorio: 1 })).toBe(
+      'CEE_V6P_Nome do processo_Relatório V1.docx',
+    )
+  })
+
+  it('o relatório da histórica não tem número', () => {
+    expect(nomePadrao({ ...base, numero: 5, historica: true, papel: 'relatorio', extensao: 'docx' })).toBe(
+      'CEE_V5F_Nome do processo_Relatório.docx',
+    )
+  })
+
+  it.each([0, -1, 1.5])('recusa o número de relatório %s com o valor recebido e o formato esperado', (numeroDoRelatorio) => {
+    expect(() => nomePadrao({ ...base, papel: 'relatorio', extensao: 'docx', numeroDoRelatorio })).toThrow(
+      `número do relatório inválido (recebido: ${numeroDoRelatorio}); esperado: número inteiro maior que zero`,
     )
   })
 
@@ -55,5 +81,19 @@ describe('limparParaNomeDeArquivo', () => {
 
   it('reduz espaços repetidos e apara as pontas', () => {
     expect(limparParaNomeDeArquivo('  Nome   do   processo  ')).toBe('Nome do processo')
+  })
+})
+
+describe('nomePadrao do .pdf da aprovação', () => {
+  it('leva a versão aprovada e o sufixo _Aprovação', () => {
+    expect(nomePadrao({ ...base, numero: 8, papel: 'pdf_da_aprovacao', extensao: 'pdf' })).toBe(
+      'CEE_V8_Nome do processo_Aprovação.pdf',
+    )
+  })
+
+  it('limpa os caracteres que o Drive não aceita no nome do processo', () => {
+    expect(nomePadrao({ ...base, numero: 2, nomeDoProcesso: 'Emitir: ofício/guia', papel: 'pdf_da_aprovacao', extensao: 'PDF' })).toBe(
+      'CEE_V2_Emitir- ofício-guia_Aprovação.pdf',
+    )
   })
 })

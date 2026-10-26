@@ -9,6 +9,7 @@ import { ETIQUETAS, ROTULO_DA_ETIQUETA } from '../../processos/rotulos'
 import { hojeEmBrasilia } from '../../lib/datas'
 import type { EtiquetaDaEtapa, ModuloDeProcessos, ProcessoLido, UsuarioResponsavel } from '../../processos/tipos'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
+import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { Avatar } from '../Avatar'
 import { PublicacaoNoAgora } from './AgoraDaPublicacao'
 import { AcoesDoConcluido } from './AgoraDoConcluido'
@@ -24,6 +25,7 @@ type CorpoDoAgoraProps = {
   usuarioId: string
   movimento: MovimentoDoProcessoEmUso
   revisoes: ModuloDeRevisoes
+  versoes: ModuloDeVersoes
   registros: RegistrosDoProcesso
   executar: Executar
   aoMudar: () => void
@@ -42,7 +44,8 @@ export function CorpoDoAgora(props: CorpoDoAgoraProps) {
       <p className="agora-rotulo">{rotulo}</p>
       <ListasDoAgora processo={processo} movimento={movimento} />
       <ResponsavelDoAgora {...props} />
-      <RegistrosDoAgora processo={processo} revisoes={props.revisoes} registros={props.registros} usuarioId={props.usuarioId} podeAlterar />
+      <RegistrosDoAgora processo={processo} revisoes={props.revisoes} versoes={props.versoes} registros={props.registros} usuarioId={props.usuarioId}
+        podeAlterar aoMudar={props.aoMudar} />
       {aviso && <p className="agora-aviso" role="status">{aviso}</p>}
       {processo.etapaAtual?.codigo === CODIGO_DA_PUBLICACAO && <PublicacaoNoAgora processo={processo} processos={props.processos} aoMudar={props.aoMudar} />}
       {processo.etapaAtual?.codigo === CODIGO_CONCLUIDOS && <AcoesDoConcluido {...props} />}

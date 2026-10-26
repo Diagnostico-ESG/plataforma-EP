@@ -30,8 +30,11 @@ Spec: `.scratch/documentos-versoes/spec.md`, seção "Arquivos por etapa (mudan�
 
 ## Critérios de aceite
 
-- [ ] Testes pgTAP escritos antes da migração e vistos falhar: número do relatório por processo, ligação à versão mais recente, dois relatórios na mesma versão, .pdf recusado, relatório sem versão piloto nem em sequência recusado, relatório depois da Revisão interna recusado, substituição recusada nos ligados à versão aprovada, a migração (cópias apagadas, números na ordem, .pdf e histórica sem número), o evento. O teste `29` reescrito e o `30` ajustado.
-- [ ] Testes de interface com o aplicativo inteiro: relatório sozinho com a prévia, junto com a versão, .pdf recusado, o relatório que vale com "(da V7)", nenhuma marca de pendência, "Relatório da V5F", substituir relatório numerado e sem [Substituir] na aprovada, Consulta sem botões, eventos novos e antigos no histórico. `App.relatorioDepois` e os testes que usam "sem alteração" passam ao modelo novo.
-- [ ] O arquivo puro de decisão da função e o nome padrão têm testes do relatório numerado; os testes do módulo real provam a chamada e as frases.
-- [ ] A função pura do relatório que vale tem testes unitários.
+- [x] Testes pgTAP escritos antes da migração e vistos falhar: número do relatório por processo, ligação à versão mais recente, dois relatórios na mesma versão, .pdf recusado, relatório sem versão piloto nem em sequência recusado, relatório depois da Revisão interna recusado, substituição recusada nos ligados à versão aprovada, a migração (cópias apagadas, números na ordem, .pdf e histórica sem número), o evento. O teste `29` reescrito e o `30` ajustado.
+- [x] Testes de interface com o aplicativo inteiro: relatório sozinho com a prévia, junto com a versão, .pdf recusado, o relatório que vale com "(da V7)", nenhuma marca de pendência, "Relatório da V5F", substituir relatório numerado e sem [Substituir] na aprovada, Consulta sem botões, eventos novos e antigos no histórico. `App.relatorioDepois` e os testes que usam "sem alteração" passam ao modelo novo.
+- [x] O arquivo puro de decisão da função e o nome padrão têm testes do relatório numerado; os testes do módulo real provam a chamada e as frases.
+- [x] A função pura do relatório que vale tem testes unitários.
 - [ ] `[visual]` A linha do relatório no destaque mostra "Relatório V2" ou "Relatório V2 (da V7)" sem quebrar a linha dos arquivos.
+
+O critério `[visual]` fica sem marca: a tela não foi vista no app real (ver `.scratch/documentos-versoes/desvios.md`, 2026-10-26).
+Concluído em 2026-10-26 (commit 1ebaecf)

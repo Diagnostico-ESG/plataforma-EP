@@ -1,14 +1,16 @@
 // As ações deste ticket: iniciar_envio (sessão de envio resumível; os bytes vão do navegador direto ao Google)
 // e baixar (os bytes passam pela função). Tudo o que lê do banco usa o login de quem chamou.
 import {
+  conferirProcessoDoPdf,
   conferirProcessoEmAndamento,
   extensaoDoNome,
   recusar,
   type EntradaBaixar,
   type EntradaIniciarEnvio,
+  type Recusa,
 } from '../_shared/decisao.ts'
 import { tipoMimeDaExtensao } from '../_shared/drive.ts'
-import { nomePadrao } from '../_shared/nomePadrao.ts'
+import { nomePadrao, type PapelDoArquivo } from '../_shared/nomePadrao.ts'
 import { conferirAlvoDoEnvio, type AlvoDaSubstituicao } from '../_shared/substituicao.ts'
 import { chamarDrive } from './google.ts'
 import {
@@ -20,12 +22,19 @@ const API_DE_ENVIO = 'https://www.googleapis.com/upload/drive/v3/files'
 
 export interface ProcessoDoEnvio extends ProcessoDaPasta {
   situacao: string
+  arquivado_em: string | null
+}
+
+/** A regra do processo para o papel: o .pdf da aprovação vale também concluído (e nunca arquivado); os demais, só em andamento. */
+export function recusaDoProcesso(processo: Pick<ProcessoDoEnvio, 'situacao' | 'arquivado_em'>, papel: PapelDoArquivo): Recusa | null {
+  if (papel === 'pdf_da_aprovacao') return conferirProcessoDoPdf(processo.situacao, processo.arquivado_em !== null)
+  return conferirProcessoEmAndamento(processo.situacao)
 }
 
 export async function lerProcesso(contexto: ContextoDoDrive, id: string): Promise<ProcessoDoEnvio | null> {
   const { data, error } = await contexto.cliente
     .from('processos_com_andamento')
-    .select('id, nome, setor_id, setor_sigla, situacao')
+    .select('id, nome, setor_id, setor_sigla, situacao, arquivado_em')
     .eq('id', id)
     .maybeSingle()
   if (error) throw new Error(`leitura de processos_com_andamento falhou (código ${error.code}); esperado: processo visível`)
@@ -67,6 +76,8 @@ function nomeDoArquivo(processo: ProcessoDoEnvio, entrada: EntradaIniciarEnvio):
     sigla: processo.setor_sigla,
     numero: entrada.numero,
     historica: entrada.historica,
+    piloto: entrada.piloto,
+    numeroDoRelatorio: entrada.numeroDoRelatorio ?? undefined,
     nomeDoProcesso: processo.nome,
     papel: entrada.papel,
     extensao: extensaoDoNome(entrada.nomeOriginal),
@@ -80,7 +91,7 @@ export async function iniciarEnvio(
 ): Promise<Response> {
   const processo = await lerProcesso(contexto, entrada.processoId)
   if (!processo) return responderRecusa(recusar('entrada_invalida', 'processo não encontrado'))
-  const foraDeAndamento = conferirProcessoEmAndamento(processo.situacao)
+  const foraDeAndamento = recusaDoProcesso(processo, entrada.papel)
   if (foraDeAndamento) return responderRecusa(foraDeAndamento)
   if (entrada.arquivoId !== null) return await iniciarSubstituicao(contexto, entrada, entrada.arquivoId, origem)
   const pastaId = await garantirPastaDoProcesso(contexto, processo)
@@ -115,6 +126,36 @@ export async function lerAlvoDaSubstituicao(contexto: ContextoDoDrive, arquivoId
   }
 }
 
+interface LinhaDoPdf {
+  nome: string
+  drive_id: string
+  versoes: { numero: number } | null
+  aprovacoes: { processo_id: string } | null
+}
+
+// O .pdf atual da aprovação (o guardado de uma aprovação trocada não se substitui), lido pela RLS com o login de quem chamou.
+// O .pdf não tem versão aprovada nem histórica a conferir: a versão só dá o número no nome.
+async function lerAlvoDoPdfDaAprovacao(contexto: ContextoDoDrive, pdfId: string): Promise<AlvoDaSubstituicao | null> {
+  const { data, error } = await contexto.cliente
+    .from('pdfs_da_aprovacao')
+    .select('nome, drive_id, versoes(numero), aprovacoes(processo_id)')
+    .eq('id', pdfId)
+    .is('guardado_em', null)
+    .maybeSingle()
+  if (error) throw new Error(`leitura de pdfs_da_aprovacao falhou (código ${error.code}); esperado: .pdf visível`)
+  const linha = data as unknown as LinhaDoPdf | null
+  if (!linha?.versoes || !linha.aprovacoes) return null
+  return {
+    papel: 'pdf_da_aprovacao', formato: 'pdf', nome: linha.nome, driveId: linha.drive_id, processoId: linha.aprovacoes.processo_id,
+    historica: false, numero: linha.versoes.numero, aprovada: false,
+  }
+}
+
+/** O alvo da substituição no que o papel pede: o .pdf da aprovação vem da tabela dele; os demais, dos arquivos da versão. */
+export function lerAlvoPorPapel(contexto: ContextoDoDrive, papel: PapelDoArquivo, arquivoId: string): Promise<AlvoDaSubstituicao | null> {
+  return papel === 'pdf_da_aprovacao' ? lerAlvoDoPdfDaAprovacao(contexto, arquivoId) : lerAlvoDaSubstituicao(contexto, arquivoId)
+}
+
 // O processo de uma versão, lido pela RLS com o login de quem chamou (null: a versão não existe ou não aparece).
 export async function lerProcessoDaVersao(contexto: ContextoDoDrive, versaoId: string): Promise<string | null> {
   const { data, error } = await contexto.cliente.from('versoes').select('processo_id').eq('id', versaoId).maybeSingle()
@@ -127,7 +168,7 @@ export async function lerProcessoDaVersao(contexto: ContextoDoDrive, versaoId: s
 async function iniciarSubstituicao(
   contexto: ContextoDoDrive, entrada: EntradaIniciarEnvio, arquivoId: string, origem: string | null,
 ): Promise<Response> {
-  const conferido = conferirAlvoDoEnvio(await lerAlvoDaSubstituicao(contexto, arquivoId), entrada)
+  const conferido = conferirAlvoDoEnvio(await lerAlvoPorPapel(contexto, entrada.papel, arquivoId), entrada)
   if (!conferido.ok) return responderRecusa(conferido.recusa)
   if (!(await conferidorDaRaiz(contexto).itemSobARaiz(conferido.valor.driveId))) return responderRecusa(recusar('sem_permissao'))
   const uploadUrl = await abrirSessaoDeEnvio(contexto.token, { destino: { atualizar: conferido.valor.driveId }, entrada, origem })
@@ -139,16 +180,19 @@ interface ArquivoDaLinha {
   drive_id: string
 }
 
-// A conferência é a RLS de arquivos_da_versao, com o login de quem chamou: o que ela não mostra não sai.
-// Sem linha visível, a recusa é a mesma de "sem permissão", para não revelar se o arquivo existe.
-async function lerArquivoDaVersao(contexto: ContextoDoDrive, arquivoId: string): Promise<ArquivoDaLinha | null> {
-  const { data, error } = await contexto.cliente
-    .from('arquivos_da_versao')
-    .select('nome, drive_id')
-    .eq('id', arquivoId)
-    .maybeSingle()
-  if (error) throw new Error(`leitura de arquivos_da_versao falhou (código ${error.code}); esperado: arquivo visível`)
+// A conferência é a RLS da tabela, com o login de quem chamou: o que ela não mostra não sai.
+async function lerNomeEDriveId(contexto: ContextoDoDrive, tabela: string, id: string): Promise<ArquivoDaLinha | null> {
+  const { data, error } = await contexto.cliente.from(tabela).select('nome, drive_id').eq('id', id).maybeSingle()
+  if (error) throw new Error(`leitura de ${tabela} falhou (código ${error.code}); esperado: arquivo visível`)
   return data as ArquivoDaLinha | null
+}
+
+// O arquivo é de uma versão ou o .pdf da aprovação (atual ou guardado: o histórico baixa o que ficou guardado); os
+// identificadores são uuids sorteados, então um id só existe numa das duas tabelas. Sem linha visível, a recusa é a mesma
+// de "sem permissão", para não revelar se o arquivo existe.
+async function lerArquivoDaVersao(contexto: ContextoDoDrive, arquivoId: string): Promise<ArquivoDaLinha | null> {
+  return (await lerNomeEDriveId(contexto, 'arquivos_da_versao', arquivoId))
+    ?? (await lerNomeEDriveId(contexto, 'pdfs_da_aprovacao', arquivoId))
 }
 
 // Sempre application/octet-stream: o supabase-js do navegador só devolve Blob para esse tipo (e PDF); qualquer

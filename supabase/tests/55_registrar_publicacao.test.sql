@@ -68,10 +68,10 @@ grant execute on function pg_temp.arquivo(text, text) to authenticated;
 create function pg_temp.enviar_completa(nome_do_processo text) returns void
 language plpgsql as $$
 declare
-  versao uuid := public.registrar_versao(pg_temp.processo(nome_do_processo), 1, null,
+  versao uuid := public.registrar_versao(pg_temp.processo(nome_do_processo), 1,
     jsonb_build_array(pg_temp.arquivo('bpm', 'bpm'), pg_temp.arquivo('png', 'png')));
 begin
-  perform public.acrescentar_relatorio(versao, 1, pg_temp.arquivo('relatorio', 'docx'));
+  perform public.enviar_relatorio(pg_temp.processo(nome_do_processo), 1, 1, pg_temp.arquivo('relatorio', 'docx'));
 end $$;
 grant execute on function pg_temp.enviar_completa(text) to authenticated;
 

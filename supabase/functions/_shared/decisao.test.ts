@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   conferirChamador,
+  conferirProcessoDoPdf,
   conferirProcessoEmAndamento,
   extensaoDoNome,
   lerAcao,
@@ -55,11 +56,11 @@ describe('conferirChamador', () => {
     ['consulta não registra', consulta, 'registrar', 'sem_permissao'],
     ['inativo não registra', inativo, 'registrar', 'usuario_inativo'],
     ['sem login não registra', null, 'registrar', 'sem_login'],
-    ['administrador marca sem alteração', administrador, 'sem_alteracao', null],
-    ['integrante marca sem alteração', integrante, 'sem_alteracao', null],
-    ['consulta não marca sem alteração', consulta, 'sem_alteracao', 'sem_permissao'],
-    ['inativo não marca sem alteração', inativo, 'sem_alteracao', 'usuario_inativo'],
-    ['sem login não marca sem alteração', null, 'sem_alteracao', 'sem_login'],
+    ['administrador confere', administrador, 'conferir', null],
+    ['integrante confere', integrante, 'conferir', null],
+    ['consulta confere', consulta, 'conferir', null],
+    ['inativo não confere', inativo, 'conferir', 'usuario_inativo'],
+    ['sem login não confere', null, 'conferir', 'sem_login'],
   ]
 
   it.each(casos)('%s', (_nome, chamador, acao, esperado) => {
@@ -92,9 +93,25 @@ describe('validarIniciarEnvio', () => {
         tamanho: 1024,
         numero: 6,
         historica: false,
+        piloto: false,
         arquivoId: null,
+        numeroDoRelatorio: null,
       },
     })
+  })
+
+  it('piloto é opcional: ausente vale falso, e true é lido (a versão piloto)', () => {
+    const lido = (mudancas: Record<string, unknown>) => {
+      const resultado = validarIniciarEnvio(entradaDeEnvio(mudancas))
+      return resultado.ok ? resultado.valor.piloto : 'recusada'
+    }
+    expect(lido({})).toBe(false)
+    expect(lido({ piloto: true })).toBe(true)
+    expect(lido({ piloto: 'sim' })).toBe('recusada')
+  })
+
+  it('piloto junto com histórica é recusada como entrada inválida', () => {
+    expect(codigoDaRecusa(entradaDeEnvio({ piloto: true, historica: true }))).toBe('entrada_invalida')
   })
 
   it('arquivo_id é opcional: ausente ou nulo vale null, e um uuid é lido (a substituição do arquivo)', () => {
@@ -110,11 +127,36 @@ describe('validarIniciarEnvio', () => {
     expect(lido({ arquivo_id: 7 })).toBe('recusada')
   })
 
+  it('o relatório de versão que não é histórica exige o número do relatório e só aceita .docx', () => {
+    const relatorio = { papel: 'relatorio', nome_original: 'relatorio.docx', numero_do_relatorio: 3 }
+    const lido = (mudancas: Record<string, unknown>) => {
+      const resultado = validarIniciarEnvio(entradaDeEnvio({ ...relatorio, ...mudancas }))
+      return resultado.ok ? resultado.valor.numeroDoRelatorio : resultado.recusa.codigo
+    }
+    expect(lido({})).toBe(3)
+    expect(lido({ numero_do_relatorio: undefined })).toBe('entrada_invalida')
+    expect(lido({ numero_do_relatorio: 0 })).toBe('entrada_invalida')
+    expect(lido({ numero_do_relatorio: '3' })).toBe('entrada_invalida')
+    expect(lido({ nome_original: 'relatorio.pdf' })).toBe('extensao_nao_aceita')
+  })
+
+  it('o relatório da histórica e a troca do arquivo não têm número e aceitam .docx e .pdf', () => {
+    const ARQUIVO = '8f000000-0000-0000-0000-0000000000d1'
+    for (const nome of ['relatorio.docx', 'relatorio.pdf']) {
+      expect(codigoDaRecusa(entradaDeEnvio({ papel: 'relatorio', nome_original: nome, historica: true }))).toBeNull()
+      expect(codigoDaRecusa(entradaDeEnvio({ papel: 'relatorio', nome_original: nome, arquivo_id: ARQUIVO }))).toBeNull()
+    }
+    expect(codigoDaRecusa(entradaDeEnvio({ papel: 'relatorio', nome_original: 'r.docx', historica: true, numero_do_relatorio: 1 })))
+      .toBe('entrada_invalida')
+  })
+
+  it('o número do relatório só vale no relatório', () => {
+    expect(codigoDaRecusa(entradaDeEnvio({ numero_do_relatorio: 2 }))).toBe('entrada_invalida')
+  })
+
   it.each([
     ['png', 'imagem.png'],
     ['bpm', 'fonte.bpm'],
-    ['relatorio', 'relatorio.docx'],
-    ['relatorio', 'relatorio.pdf'],
     ['bpmn', 'FLUXO.BPMN'],
   ])('aceita o papel %s com %s', (papel, nome) => {
     expect(codigoDaRecusa(entradaDeEnvio({ papel, nome_original: nome }))).toBeNull()
@@ -122,6 +164,7 @@ describe('validarIniciarEnvio', () => {
 
   it.each([
     ['relatorio', 'relatorio.png'],
+    ['relatorio', 'relatorio.pdf'],
     ['bpmn', 'fluxo.xml'],
     ['png', 'imagem'],
   ])('recusa o papel %s com %s', (papel, nome) => {
@@ -202,8 +245,12 @@ describe('extensaoDoNome', () => {
 })
 
 describe('lerAcao', () => {
-  it.each(['iniciar_envio', 'baixar', 'registrar', 'sem_alteracao'])('lê a ação %s', (acao) => {
+  it.each(['iniciar_envio', 'baixar', 'registrar', 'conferir'])('lê a ação %s', (acao) => {
     expect(lerAcao({ acao })).toBe(acao)
+  })
+
+  it('a ação sem_alteracao saiu (ADR 0026)', () => {
+    expect(lerAcao({ acao: 'sem_alteracao' })).toBeNull()
   })
 
   it.each([null, 'baixar', {}, { acao: 'apagar' }, { acao: 3 }, { acao: 'constructor' }])('devolve null para %j', (corpo) => {
@@ -222,5 +269,60 @@ describe('statusDaRecusa', () => {
     ['arquivo_grande', 400],
   ] as const)('%s → %i', (codigo, status) => {
     expect(statusDaRecusa(recusar(codigo))).toBe(status)
+  })
+})
+
+describe('validarIniciarEnvio: o .pdf da aprovação', () => {
+  const pdf = (mudancas: Record<string, unknown> = {}) =>
+    entradaDeEnvio({ papel: 'pdf_da_aprovacao', nome_original: 'protocolo.PDF', numero: 8, ...mudancas })
+
+  it('aceita o .pdf da versão aprovada, em qualquer caixa da extensão', () => {
+    const resultado = validarIniciarEnvio(pdf())
+    expect(resultado.ok && resultado.valor).toMatchObject({ papel: 'pdf_da_aprovacao', numero: 8, historica: false, piloto: false })
+  })
+
+  it('aceita a troca do .pdf atual, com o arquivo_id', () => {
+    const resultado = validarIniciarEnvio(pdf({ arquivo_id: '8f000000-0000-0000-0000-0000000000d1' }))
+    expect(resultado.ok && resultado.valor.arquivoId).toBe('8f000000-0000-0000-0000-0000000000d1')
+  })
+
+  it('recusa outra extensão, citando a recebida e a esperada', () => {
+    const resultado = validarIniciarEnvio(pdf({ nome_original: 'protocolo.docx' }))
+    expect(resultado.ok).toBe(false)
+    expect(!resultado.ok && resultado.recusa).toMatchObject({ codigo: 'extensao_nao_aceita' })
+    expect(!resultado.ok && resultado.recusa.mensagem).toContain('recebido .docx; esperado .pdf')
+  })
+
+  it('aceita exatamente 20 MB e recusa um byte a mais', () => {
+    expect(codigoDaRecusa(pdf({ tamanho: LIMITE_DE_TAMANHO }))).toBeNull()
+    expect(codigoDaRecusa(pdf({ tamanho: LIMITE_DE_TAMANHO + 1 }))).toBe('arquivo_grande')
+  })
+
+  it.each([
+    ['histórica', { historica: true }],
+    ['piloto', { piloto: true }],
+    ['número do relatório', { numero_do_relatorio: 2 }],
+  ])('recusa o .pdf com %s', (_nome, mudancas) => {
+    expect(codigoDaRecusa(pdf(mudancas))).toBe('entrada_invalida')
+  })
+
+  it('a recusa do papel desconhecido cita o .pdf da aprovação entre os aceitos', () => {
+    const resultado = validarIniciarEnvio(entradaDeEnvio({ papel: 'zip' }))
+    expect(!resultado.ok && resultado.recusa.mensagem).toContain('pdf_da_aprovacao')
+  })
+})
+
+describe('conferirProcessoDoPdf', () => {
+  it('aceita o processo em andamento e o concluído, como o editar a aprovação', () => {
+    expect(conferirProcessoDoPdf('em_andamento', false)).toBeNull()
+    expect(conferirProcessoDoPdf('concluido', false)).toBeNull()
+  })
+
+  it.each(['suspenso', 'cancelado'])('recusa o processo %s', (situacao) => {
+    expect(conferirProcessoDoPdf(situacao, false)?.codigo).toBe('processo_fora_de_andamento')
+  })
+
+  it('recusa o processo arquivado, mesmo concluído', () => {
+    expect(conferirProcessoDoPdf('concluido', true)?.codigo).toBe('processo_fora_de_andamento')
   })
 })

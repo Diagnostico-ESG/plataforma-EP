@@ -57,7 +57,7 @@ create function pg_temp.par() returns jsonb
 language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('bpm', 'bpm'), pg_temp.arquivo('png', 'png')) $$;
 create function pg_temp.relatorio(nome text) returns jsonb
 language sql immutable as $$
-  select jsonb_build_object('papel', 'relatorio', 'nome', nome, 'formato', 'pdf', 'tamanho', 100,
+  select jsonb_build_object('papel', 'relatorio', 'nome', nome, 'formato', 'docx', 'tamanho', 100,
     'hash_md5', 'abcdef0123456789abcdef0123456789', 'drive_id', 'drive-' || md5(nome)) $$;
 create function pg_temp.versao(nome_do_processo text, numero_da_versao integer) returns uuid
 language sql stable as $$
@@ -73,12 +73,12 @@ select public.mover_processo(pg_temp.processo('Parado'), (select id from public.
 update public.passagens set etiqueta = 'em_andamento' where processo_id = pg_temp.processo('Parado') and saiu_em is null;
 select pg_temp.escolher('Resp Ativo', '00000000-0000-0000-0000-0000000000a2');
 select pg_temp.escolher('Resp Inativo', '00000000-0000-0000-0000-0000000000a4');
-select public.registrar_versao(pg_temp.processo('V1 Sem'), 1, null, pg_temp.par());
-select public.registrar_versao(pg_temp.processo('V1 Com'), 1, null, pg_temp.par() || pg_temp.relatorio('T20_V1_Com_Relatório.pdf'));
-select public.registrar_versao(pg_temp.processo('Relatorio Depois'), 1, null, pg_temp.par());
-select public.registrar_versao(pg_temp.processo('V2 Sem'), 1, null, pg_temp.par() || pg_temp.relatorio('T20_V2_Sem_Relatório.pdf'));
-select public.registrar_versao(pg_temp.processo('V2 Sem'), 2, null, pg_temp.par());
-select public.registrar_versao_historica(pg_temp.processo('Historica'), 5, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')));
+select public.registrar_versao(pg_temp.processo('V1 Sem'), 1, pg_temp.par());
+select public.registrar_versao(pg_temp.processo('V1 Com'), 1, pg_temp.par() || pg_temp.relatorio('T20_V1_Com_Relatório.docx'));
+select public.registrar_versao(pg_temp.processo('Relatorio Depois'), 1, pg_temp.par());
+select public.registrar_versao(pg_temp.processo('V2 Sem'), 1, pg_temp.par() || pg_temp.relatorio('T20_V2_Sem_Relatório.docx'));
+select public.registrar_versao(pg_temp.processo('V2 Sem'), 2, pg_temp.par());
+select public.registrar_versao_historica(pg_temp.processo('Historica'), 5, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')));
 select public.cancelar_processo(pg_temp.processo('Filho C'), 'Não segue');
 
 -- Etapa atual: etiqueta e entrada.
@@ -109,7 +109,7 @@ insert into _tap (linha) select is((pg_temp.linha('V1 Sem')).ultima_versao_tem_r
 insert into _tap (linha) select is((pg_temp.linha('V1 Com')).ultima_versao_tem_relatorio, true, 'a V1 com relatório tem relatório');
 insert into _tap (linha) select is((pg_temp.linha('Relatorio Depois')).ultima_versao_tem_relatorio, false,
   'antes de acrescentar o relatório, a versão não o tem');
-select public.acrescentar_relatorio(pg_temp.versao('Relatorio Depois', 1), 1, pg_temp.relatorio('T20_RD_Relatório.pdf'));
+select public.enviar_relatorio(pg_temp.processo('Relatorio Depois'), 1, 1, pg_temp.relatorio('T20_RD_Relatório.docx'));
 insert into _tap (linha) select is((pg_temp.linha('Relatorio Depois')).ultima_versao_tem_relatorio, true,
   'depois de acrescentar o relatório, a versão o tem');
 insert into _tap (linha) select is((pg_temp.linha('V2 Sem')).ultima_versao_numero, 2, 'a última versão é a de maior número');

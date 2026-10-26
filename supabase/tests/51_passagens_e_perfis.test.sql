@@ -81,17 +81,17 @@ insert into _tap (linha) select is((select count(*) from public.passagens), 0::b
 -- ===== mover (pela função) =====
 select pg_temp.claims('a1');
 insert into _tap (linha) select lives_ok(
-  $sql$select public.mover_processo(pg_temp.processo('Admin'), pg_temp.etapa('revisao_interna'))$sql$, 'administrador move');
+  $sql$select public.mover_processo(pg_temp.processo('Admin'), pg_temp.etapa('modelagem'))$sql$, 'administrador move');
 select pg_temp.claims('a2');
 insert into _tap (linha) select lives_ok(
-  $sql$select public.mover_processo(pg_temp.processo('Integrante'), pg_temp.etapa('revisao_interna'))$sql$, 'integrante move');
+  $sql$select public.mover_processo(pg_temp.processo('Integrante'), pg_temp.etapa('modelagem'))$sql$, 'integrante move');
 select pg_temp.claims('a3');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.mover_processo(pg_temp.processo('Consulta'), pg_temp.etapa('revisao_interna'))$sql$, '42501', null,
+  $sql$select public.mover_processo(pg_temp.processo('Consulta'), pg_temp.etapa('modelagem'))$sql$, '42501', null,
   'consulta não move');
 select pg_temp.claims('a4');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.mover_processo(pg_temp.processo('Inativo'), pg_temp.etapa('revisao_interna'))$sql$,
+  $sql$select public.mover_processo(pg_temp.processo('Inativo'), pg_temp.etapa('modelagem'))$sql$,
   'P0001', 'registro_inexistente', 'inativo não move (não enxerga o processo)');
 insert into _tap (linha) select is(pg_temp.passagens_do_setor(), 8::bigint,
   'só os movimentos do administrador e do integrante abriram passagem (5 do cadastro + 3 movimentos)');
@@ -188,7 +188,7 @@ select pg_temp.claims('a1');
 insert into _tap (linha) select results_eq(
   $sql$select etapa_atual_codigo, etiqueta::text, entrou_na_etapa_em is not null, etapa_atual_posicao > 1, sem_publicacao
     from public.processos_com_andamento where id = pg_temp.processo('Admin')$sql$,
-  $sql$values ('revisao_interna', 'a_fazer', true, true, false)$sql$, 'administrador lê os campos novos da view');
+  $sql$values ('modelagem', 'a_fazer', true, true, false)$sql$, 'administrador lê os campos novos da view');
 select pg_temp.claims('a2');
 insert into _tap (linha) select results_eq(
   $sql$select etapa_atual_codigo, etiqueta::text from public.processos_com_andamento where id = pg_temp.processo('Inativo')$sql$,

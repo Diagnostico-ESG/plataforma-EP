@@ -1,5 +1,9 @@
 import { type ErroDoBanco, type RecusasDoModulo, TravaDoBanco, recusaPorPerfil } from '../acesso/falhasDeGravacao'
 import {
+  FRASE_DA_DATA_DA_VALIDACAO_NO_FUTURO, FRASE_DA_DATA_DA_VALIDACAO_SO_PELA_FUNCAO, FRASE_DA_DATA_FORA_DA_VALIDACAO,
+  FRASE_DO_PDF_GUARDADO, FRASE_DO_PDF_JA_ENVIADO, FRASE_DO_PDF_SEM_A_VERSAO, FRASE_DO_PDF_SEM_APROVACAO,
+} from '../revisoes/frasesDaValidacao'
+import {
   FRASE_DA_APROVACAO_FORA_DA_ETAPA, FRASE_DO_LINK_INVALIDO, FRASE_DO_PROCESSO_COM_APROVACAO, FRASE_DO_PROCESSO_JA_APROVADO,
   fraseDaDataNoFuturo, fraseDaVersaoAprovada,
 } from '../revisoes/frasesDeAprovacao'
@@ -21,10 +25,11 @@ import {
   FRASE_DO_ARQUIVADO_JA_PUBLICADO, fraseDaPublicacaoAntesDaAprovacao, fraseDoArquivarSoConcluido,
 } from './frasesDePublicacao'
 import { fraseDoAutorDaVersao, fraseDoProcessoComVersoes } from './frasesDeVersao'
+import { FRASE_DA_TRAVA_DA_MODELAGEM, fraseDaTravaDaTecnica } from './frasesDeTravaDeArquivos'
 import { fraseDeSituacaoInvalida, fraseDoProcessoParado } from './frasesDeSituacao'
 
 /** O que a pessoa tentava fazer, para as frases que o banco não diz (desativar ou excluir a etapa). */
-export type ContextoDaRecusa = { acao?: 'desativar' | 'excluir' }
+export type ContextoDaRecusa = { acao?: 'desativar' | 'excluir'; data?: 'validacao' }
 
 // O banco recusa com "motivo:valor" (migrações do modelo de processos, do catálogo, das versões, das revisões, da
 // aprovação, do arquivamento, das anotações e do Andamento livre). O motivo "motivo_obrigatorio" não tem valor; o valor
@@ -42,6 +47,9 @@ const PADRAO_DA_RECUSA = new RegExp(
   + '|versao_aprovada|processo_com_aprovacao'
   + '|arquivar_so_concluido|ja_arquivado|nao_arquivado|processo_arquivado|arquivamento_so_pela_funcao'
   + '|publicacao_fora_da_etapa|arquivado_ja_publicado|data_da_publicacao_obrigatoria|publicacao_antes_da_aprovacao'
+  + '|trava_piloto|trava_tecnica'
+  + '|data_so_na_validacao|data_da_validacao_so_pela_funcao'
+  + '|sem_aprovacao_para_o_pdf|pdf_ja_enviado|pdf_nome_sem_versao|pdf_guardado_nao_se_altera'
   + '|anotacoes_longas)(?::(.*))?$', 'm')
 
 type FraseDaRecusa = (valor: string, contexto: ContextoDaRecusa) => string
@@ -53,7 +61,13 @@ function etapaComProcessos(valor: string, { acao = 'desativar' }: ContextoDaRecu
 }
 
 const FRASE_DA_RECUSA: Record<string, FraseDaRecusa> = {
-  data_no_futuro: fraseDaDataNoFuturo,
+  data_no_futuro: (data, contexto) => (contexto.data === 'validacao' ? FRASE_DA_DATA_DA_VALIDACAO_NO_FUTURO : fraseDaDataNoFuturo(data)),
+  data_so_na_validacao: () => FRASE_DA_DATA_FORA_DA_VALIDACAO,
+  data_da_validacao_so_pela_funcao: () => FRASE_DA_DATA_DA_VALIDACAO_SO_PELA_FUNCAO,
+  sem_aprovacao_para_o_pdf: () => FRASE_DO_PDF_SEM_APROVACAO,
+  pdf_ja_enviado: () => FRASE_DO_PDF_JA_ENVIADO,
+  pdf_nome_sem_versao: () => FRASE_DO_PDF_SEM_A_VERSAO,
+  pdf_guardado_nao_se_altera: () => FRASE_DO_PDF_GUARDADO,
   motivo_obrigatorio: () => 'O motivo é obrigatório.',
   responsavel_invalido: (nome) =>
     `${nome} não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP.`,
@@ -105,6 +119,8 @@ const FRASE_DA_RECUSA: Record<string, FraseDaRecusa> = {
   data_da_publicacao_obrigatoria: () => FRASE_DA_DATA_DA_PUBLICACAO_OBRIGATORIA,
   publicacao_antes_da_aprovacao: fraseDaPublicacaoAntesDaAprovacao,
   anotacoes_longas: fraseDasAnotacoesLongas,
+  trava_piloto: () => FRASE_DA_TRAVA_DA_MODELAGEM,
+  trava_tecnica: fraseDaTravaDaTecnica,
   versao_incompleta: (valor) => {
     const [numero, faltas] = valor.split(':')
     return fraseDaVersaoIncompleta(numero, faltas.split(','))

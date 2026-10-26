@@ -51,3 +51,10 @@
   color: var(--texto-2);
   font-style: italic;
 }
+
+/* O link do .pdf que ficou guardado quando a aprovação foi trocada. */
+.linha-do-tempo-pdf {
+  color: var(--texto-2);
+  font-size: var(--tam-secundario);
+  overflow-wrap: anywhere;
+}

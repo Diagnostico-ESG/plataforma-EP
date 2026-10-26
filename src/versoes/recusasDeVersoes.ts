@@ -1,18 +1,29 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
+import { FRASE_DO_PROCESSO_ARQUIVADO } from '../processos/frasesDePublicacao'
+import { fraseDoProcessoParado } from '../processos/frasesDeSituacao'
 import { fraseDaVersaoAprovada } from '../revisoes/frasesDeAprovacao'
+import {
+  FRASE_DO_PDF_GUARDADO, FRASE_DO_PDF_JA_ENVIADO, FRASE_DO_PDF_SEM_A_VERSAO, FRASE_DO_PDF_SEM_APROVACAO,
+} from '../revisoes/frasesDaValidacao'
 
 // Códigos que chegam da função arquivos-no-drive: os dela (decisao.ts, google.ts) e os do banco, que ela repassa
 // como "motivo" de "motivo:valor" (migração versoes), com o valor na mensagem.
 const ARQUIVO_NAO_CHEGOU = 'Um dos arquivos não chegou ao Drive. Envie de novo.'
-
-const FALHA_DA_COPIA = 'Não foi possível copiar o relatório da versão anterior. Envie o relatório.'
 
 const FRASE_DO_CODIGO: Record<string, (valor: string) => string> = {
   sem_permissao: () => 'Seu perfil não permite enviar versões.',
   usuario_inativo: () => 'Seu usuário está desativado; não é possível enviar versões.',
   sem_login: () => 'Sua sessão terminou. Entre de novo para enviar a versão.',
   processo_fora_de_andamento: () => 'O processo não está em andamento; não é possível enviar versão.',
-  versao_sem_bpm_e_png: () => 'A versão precisa do .bpm e do .png.',
+  versao_sem_bpm: () => 'A versão precisa do .bpm.',
+  numero_da_piloto_nao_maior: (numero) => `O número da versão piloto precisa ser maior que ${numero}.`,
+  piloto_depois_de_versao_em_sequencia: () =>
+    'O processo já tem versão em sequência; a versão piloto só pode ser enviada antes dela.',
+  piloto_fora_da_etapa: () => 'A versão piloto só pode ser enviada até a Modelagem piloto.',
+  versao_fora_da_etapa: () => 'A versão só pode ser enviada até a Revisão interna.',
+  historica_fora_de_nao_iniciados: () => 'A versão histórica só pode ser registrada em Não iniciados.',
+  arquivo_ja_existe: () => 'A versão já tem esse arquivo.',
+  papel_nao_acrescentavel: () => 'Só o .png e o .bpmn podem ser acrescentados depois.',
   numero_da_versao_mudou: (numero) =>
     `Outra pessoa enviou uma versão enquanto você enviava; esta seria a V${numero}. Envie de novo.`,
   extensao_nao_aceita: () => 'Um dos arquivos tem um tipo que não é aceito no campo dele.',
@@ -25,14 +36,21 @@ const FRASE_DO_CODIGO: Record<string, (valor: string) => string> = {
   historica_depois_de_versao_nova: () => 'O processo já tem versão nova; versões históricas só podem ser registradas antes dela.',
   numero_historico_repetido: (numero) => `O processo já tem a versão histórica V${numero}F. Use outro número.`,
   historica_sem_arquivo_de_fluxograma: () => 'A versão histórica precisa do arquivo .bpm, ou do .bpmn com o .png.',
-  relatorio_ja_existe: () => 'Esta versão já tem relatório.',
-  versao_anterior_sem_relatorio: () => 'A versão anterior não tem relatório para copiar. Envie o relatório.',
+  numero_do_relatorio_mudou: (numero) =>
+    `Outra pessoa enviou um relatório enquanto você enviava; este seria o Relatório V${numero}. Envie de novo.`,
+  relatorio_so_docx: () => 'O relatório precisa ser um arquivo .docx.',
+  relatorio_sem_versao: () => 'Não há versão para receber o relatório: envie a versão piloto ou uma versão primeiro.',
+  relatorio_fora_da_etapa: () => 'O relatório só pode ser enviado até a Revisão interna.',
+  relatorio_fora_da_versao_mais_recente: () => 'O relatório precisa acompanhar a versão mais recente.',
   versao_historica_somente_leitura: () => 'A versão histórica é somente leitura: não recebe arquivos.',
-  copia_so_de_relatorio: () => FALHA_DA_COPIA,
-  copia_de_versao_que_nao_e_a_anterior: () => FALHA_DA_COPIA,
-  copia_diferente_do_original: () => FALHA_DA_COPIA,
   versao_aprovada: fraseDaVersaoAprovada,
   tipo_de_arquivo_diferente: () => 'O arquivo novo precisa ser do mesmo tipo do que sai.',
+  sem_aprovacao_para_o_pdf: () => FRASE_DO_PDF_SEM_APROVACAO,
+  pdf_ja_enviado: () => FRASE_DO_PDF_JA_ENVIADO,
+  pdf_nome_sem_versao: () => FRASE_DO_PDF_SEM_A_VERSAO,
+  pdf_guardado_nao_se_altera: () => FRASE_DO_PDF_GUARDADO,
+  processo_arquivado: () => FRASE_DO_PROCESSO_ARQUIVADO,
+  processo_parado: fraseDoProcessoParado,
   entrada_invalida: () => 'Os dados do envio não foram aceitos. Confira os campos e os arquivos e envie de novo.',
 }
 

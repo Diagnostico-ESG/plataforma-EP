@@ -167,7 +167,7 @@ function CorpoDoVerso(props: CorpoProps) {
       <div className="verso-pagina">
         <BotaoVoltarAoProcesso aoVoltar={aoVoltar} />
         <h3 className="verso-pagina-titulo">Histórico</h3>
-        <HistoricoDoProcesso processos={processos} id={processo.id} />
+        <HistoricoDoProcesso processos={processos} id={processo.id} versoes={props.versoes} />
       </div>
     )
   }
@@ -210,7 +210,7 @@ function ColunasDoVerso(props: CorpoProps) {
   return (
     <div className="verso-colunas">
       <div className="verso-trabalho">
-        <CaminhoDoProcesso processo={processo} processos={processos} revisoes={revisoes} registros={registros} podeAlterar={podeAlterar} usuarioId={usuarioId}
+        <CaminhoDoProcesso processo={processo} processos={processos} versoes={versoes} revisoes={revisoes} registros={registros} podeAlterar={podeAlterar} usuarioId={usuarioId}
           executar={executar} aoSumir={aoSumir} aoMudar={aposMudar} />
         <SecaoDeVersoes key={versaoAprovada} versoes={versoes} processo={processo} podeAlterar={alteravel} aoAlterarVersoes={aposMudar} />
       </div>

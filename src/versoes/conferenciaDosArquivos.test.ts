@@ -14,16 +14,21 @@ test('aceita o .bpmn com o elemento definitions do BPMN 2.0', async () => {
   expect(await conferirArquivo('bpmn', arquivo('fluxo.bpmn', [BPMN]))).toBeNull()
 })
 
-test('aceita o .png com a assinatura do formato, o .bpm e o relatório .docx ou .pdf', async () => {
+test('aceita o .png com a assinatura do formato, o .bpm e o relatório .docx', async () => {
   expect(await conferirArquivo('png', png())).toBeNull()
   expect(await conferirArquivo('bpm', arquivo('fluxo.bpm'))).toBeNull()
   expect(await conferirArquivo('relatorio', arquivo('relatorio.docx'))).toBeNull()
-  expect(await conferirArquivo('relatorio', arquivo('Relatorio.PDF'))).toBeNull()
+})
+
+test('o relatório novo recusa o .pdf; o relatório da histórica, que não é numerado, ainda o aceita', async () => {
+  expect(await conferirArquivo('relatorio', arquivo('Relatorio.PDF'))).toBe('Escolha um arquivo .docx. Recebido: .pdf.')
+  expect(await conferirArquivo('relatorio', arquivo('Relatorio.PDF'), true)).toBeNull()
+  expect(await conferirArquivo('relatorio', arquivo('relatorio.docx'), true)).toBeNull()
 })
 
 test('recusa a extensão errada, dizendo a esperada e a recebida', async () => {
   expect(await conferirArquivo('bpmn', arquivo('fluxo.xml', [BPMN]))).toBe('Escolha um arquivo .bpmn. Recebido: .xml.')
-  expect(await conferirArquivo('relatorio', arquivo('relatorio.odt'))).toBe('Escolha um arquivo .docx ou .pdf. Recebido: .odt.')
+  expect(await conferirArquivo('relatorio', arquivo('relatorio.odt'), true)).toBe('Escolha um arquivo .docx ou .pdf. Recebido: .odt.')
   expect(await conferirArquivo('bpm', arquivo('sem-extensao'))).toBe('Escolha um arquivo .bpm. Recebido: sem extensão.')
 })
 

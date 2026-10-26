@@ -1,14 +1,20 @@
 import { useState } from 'react'
 import type { EstadoDoCarregamento } from '../../hooks/useCarregamento'
 import { formatarData } from '../../lib/datas'
+import type { ProcessoLido } from '../../processos/tipos'
 import type { Aprovacao, ModuloDeRevisoes } from '../../revisoes/tipos'
+import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { JanelaDaAprovacao } from './JanelaDaAprovacao'
+import { PdfDaAprovacao } from './PdfDaAprovacao'
 
 type AprovacaoDaEtapaProps = {
   estado: EstadoDoCarregamento<Aprovacao | null>
   aoTentarDeNovo: () => void
   revisoes: ModuloDeRevisoes
+  /** O módulo de versões e o processo: o .pdf protocolado da aprovação é enviado, trocado e baixado por eles. */
+  versoes: ModuloDeVersoes
+  processo: Pick<ProcessoLido, 'id' | 'nome' | 'setorSigla'>
   podeEditar: boolean
   /** Lê a aprovação de novo (sem piscar o "Carregando…"), depois de editar. */
   aoAtualizar: () => void
@@ -21,10 +27,10 @@ function linkSeguro(link: string | null): string | null {
 
 /**
  * A aprovação na gaveta da Aprovação pelo setor: a versão aprovada, o número do E-protocolo (link em aba nova, quando há
- * link), a data e quem registrou, com o [Editar] para quem pode alterar. A leitura é do verso, que a refaz quando as
- * etapas mudam (conclusão ou volta) e depois de editar.
+ * link), a data e quem registrou, com o [Editar] para quem pode alterar, e o .pdf protocolado. A leitura é do verso, que a
+ * refaz quando as etapas mudam (conclusão ou volta) e depois de editar.
  */
-export function AprovacaoDaEtapa({ estado, aoTentarDeNovo, revisoes, podeEditar, aoAtualizar }: AprovacaoDaEtapaProps) {
+export function AprovacaoDaEtapa({ estado, aoTentarDeNovo, revisoes, versoes, processo, podeEditar, aoAtualizar }: AprovacaoDaEtapaProps) {
   const [editando, setEditando] = useState(false)
   if (estado.tipo === 'carregando') return <p className="etapa-registros-aviso" role="status">Carregando…</p>
   if (estado.tipo === 'erro') return <ErroAoCarregar alvo="a aprovação" aoTentarDeNovo={aoTentarDeNovo} />
@@ -34,6 +40,7 @@ export function AprovacaoDaEtapa({ estado, aoTentarDeNovo, revisoes, podeEditar,
       <ul className="etapa-registros">
         <RegistroDaAprovacao aprovacao={estado.valor} aoEditar={podeEditar ? () => setEditando(true) : null} />
       </ul>
+      <PdfDaAprovacao versoes={versoes} processo={processo} aprovacao={estado.valor} podeEditar={podeEditar} aoAlterar={aoAtualizar} />
       {editando && (
         <JanelaDaAprovacao aprovacao={estado.valor} revisoes={revisoes} aoGravar={aoAtualizar} aoFechar={() => setEditando(false)} />
       )}

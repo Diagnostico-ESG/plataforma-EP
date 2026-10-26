@@ -59,7 +59,7 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes, reviso
           enderecoDoProcesso={enderecoDoProcesso} aoAbrir={(id) => irParaVisao({ aberto: id })}
           filtros={atual.filtros} aoMudarFiltros={(filtros) => irParaVisao({ filtros, aberto: null }, filtros.busca !== atual.filtros.busca)}
           agrupar={atual.agrupar} aoMudarAgrupar={(agrupar) => irParaVisao({ agrupar, aberto: null })}
-          processos={processos} usuarioId={usuario.id} aoMudar={recarregar} />
+          processos={processos} versoes={versoes} usuarioId={usuario.id} aoMudar={recarregar} />
       </div>
       {idAberto && (
         <VersoDoCartao processos={processos} cadastros={cadastros} versoes={versoes} revisoes={revisoes} id={idAberto}

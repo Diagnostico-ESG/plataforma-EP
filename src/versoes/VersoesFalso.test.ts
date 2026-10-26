@@ -5,7 +5,7 @@ import type { ArquivoDaVersao, PedidoDeVersao } from './tipos'
 import { VersoesFalso } from './VersoesFalso'
 
 const PEDIDO: PedidoDeVersao = {
-  processoId: 'p1', numero: 1, observacao: 'Primeira',
+  processoId: 'p1', numero: 1,
   arquivos: [{ papel: 'bpm', arquivo: new File(['x'], 'a.bpm') }, { papel: 'png', arquivo: new File(['y'], 'a.png') }],
 }
 
@@ -22,7 +22,7 @@ test('o envio registra a versão com o número do banco, os nomes padrão, a eta
   const progresso: string[] = []
   await versoes.enviarVersao(PEDIDO, (enviados, total) => progresso.push(`${enviados}/${total}`))
   const [versao] = await versoes.listarVersoes('p1')
-  expect(versao).toMatchObject({ numero: 1, historica: false, etapa: 'Reunião de modelagem', observacao: 'Primeira', autor: 'Pessoa de Teste' })
+  expect(versao).toMatchObject({ numero: 1, historica: false, piloto: false, etapa: 'Reunião de modelagem', autor: 'Pessoa de Teste' })
   expect(versao.arquivos.map((arquivo) => arquivo.nome)).toEqual(['TSA_V1_Emitir Ofício.bpm', 'TSA_V1_Emitir Ofício.png'])
   expect(progresso).toEqual(['1/2', '2/2'])
   expect(versoes.envios).toEqual([PEDIDO])
@@ -31,7 +31,7 @@ test('o envio registra a versão com o número do banco, os nomes padrão, a eta
 })
 
 const HISTORICA: PedidoDeVersao = {
-  processoId: 'p1', numero: 5, observacao: null, arquivos: [{ papel: 'bpm', arquivo: new File(['z'], 'fonte.bpm') }],
+  processoId: 'p1', numero: 5, arquivos: [{ papel: 'bpm', arquivo: new File(['z'], 'fonte.bpm') }],
 }
 
 test('a histórica guarda o número digitado, sem etapa, com o F nos nomes, e gera o evento próprio', async () => {
@@ -72,18 +72,17 @@ test('recusa a histórica sem .bpm nem o par .bpmn e .png', async () => {
   expect(await versoes.listarVersoes('p1')).toEqual([])
 })
 
-test('recusa a versão nova sem .bpm ou sem .png, como o banco, e aceita sem .bpmn', async () => {
+test('recusa a versão sem .bpm, como o banco, e aceita só com o .bpm (o .png e o .bpmn são opcionais)', async () => {
   const versoes = falso()
   const semBpm: PedidoDeVersao = { ...PEDIDO, arquivos: [
     { papel: 'bpmn', arquivo: new File(['x'], 'a.bpmn') }, { papel: 'png', arquivo: new File(['y'], 'a.png') },
   ] }
-  const semPng: PedidoDeVersao = { ...PEDIDO, arquivos: [{ papel: 'bpm', arquivo: new File(['x'], 'a.bpm') }] }
-  for (const pedido of [semBpm, semPng]) {
-    await expect(versoes.enviarVersao(pedido, () => {})).rejects.toThrow('A versão precisa do .bpm e do .png.')
-  }
+  const soBpm: PedidoDeVersao = { ...PEDIDO, arquivos: [{ papel: 'bpm', arquivo: new File(['x'], 'a.bpm') }] }
+  await expect(versoes.enviarVersao(semBpm, () => {})).rejects.toThrow('A versão precisa do .bpm.')
   expect(await versoes.listarVersoes('p1')).toEqual([])
+  await versoes.enviarVersao(soBpm, () => {})
   await versoes.enviarVersao(PEDIDO, () => {})
-  expect(await versoes.listarVersoes('p1')).toHaveLength(1)
+  expect(await versoes.listarVersoes('p1')).toHaveLength(2)
 })
 
 test('as falhas programadas valem também para a histórica', async () => {
@@ -112,7 +111,7 @@ test('falha no envio de um arquivo não registra nada', async () => {
 
 test('a falha programada no registro chega como foi programada', async () => {
   const versoes = falso()
-  versoes.falhaNoRegistro = new TravaDoBanco('A versão precisa do .bpmn e do .png.')
+  versoes.falhaNoRegistro = new TravaDoBanco('A versão precisa do .bpm.')
   await expect(versoes.enviarVersao(PEDIDO, () => {})).rejects.toBeInstanceOf(TravaDoBanco)
   expect(await versoes.listarVersoes('p1')).toEqual([])
 })
@@ -139,99 +138,6 @@ test('a falha programada no download chega como foi programada', async () => {
   versoes.falharNoDownload = true
   await expect(versoes.baixarArquivo(ARQUIVO)).rejects.toThrow('falha de conexão simulada')
   expect(versoes.baixados).toEqual([])
-})
-
-const PEDIDO_COM_RELATORIO: PedidoDeVersao = {
-  ...PEDIDO, arquivos: [...PEDIDO.arquivos, { papel: 'relatorio', arquivo: new File(['r'], 'rel.docx') }],
-}
-const RELATORIO = (versaoId: string, numero = 1) => ({ processoId: 'p1', versaoId, numero, arquivo: new File(['rel'], 'depois.pdf') })
-
-async function primeiraVersaoId(versoes: VersoesFalso): Promise<string> {
-  return (await versoes.listarVersoes('p1'))[0].id
-}
-
-test('o relatório depois entra na versão sem relatório, com o nome padrão, e gera o evento', async () => {
-  const versoes = falso()
-  await versoes.enviarVersao(PEDIDO, () => {})
-  const eventos: EventoDoCadastro[] = []
-  versoes.aoRegistrar = (_processoId, evento) => eventos.push(evento)
-  const progresso: string[] = []
-  await versoes.acrescentarRelatorio(RELATORIO(await primeiraVersaoId(versoes)), (enviados, total) => progresso.push(`${enviados}/${total}`))
-  const [versao] = await versoes.listarVersoes('p1')
-  expect(versao.arquivos.map((arquivo) => arquivo.nome)).toEqual([
-    'TSA_V1_Emitir Ofício.bpm', 'TSA_V1_Emitir Ofício.png', 'TSA_V1_Emitir Ofício_Relatório.pdf',
-  ])
-  expect(progresso).toEqual(['1/1'])
-  expect(eventos[0]).toMatchObject({ acao: 'acrescentar_relatorio', entidade: 'versao', entidadeRef: 'p1', depois: { rotulo: 'V1' } })
-})
-
-test('recusa o relatório numa versão que já tem, com a frase do módulo real', async () => {
-  const versoes = falso()
-  await versoes.enviarVersao(PEDIDO_COM_RELATORIO, () => {})
-  await expect(versoes.acrescentarRelatorio(RELATORIO(await primeiraVersaoId(versoes)), () => {}))
-    .rejects.toThrow('Esta versão já tem relatório.')
-})
-
-test('recusa o relatório na versão histórica', async () => {
-  const versoes = falso()
-  await versoes.registrarVersaoHistorica(HISTORICA, () => {})
-  await expect(versoes.acrescentarRelatorio(RELATORIO(await primeiraVersaoId(versoes), 5), () => {}))
-    .rejects.toThrow('A versão histórica é somente leitura: não recebe arquivos.')
-})
-
-test('as falhas programadas valem também para o relatório depois', async () => {
-  const versoes = falso()
-  await versoes.enviarVersao(PEDIDO, () => {})
-  const pedido = RELATORIO(await primeiraVersaoId(versoes))
-  versoes.falharNoArquivo = 1
-  await expect(versoes.acrescentarRelatorio(pedido, () => {})).rejects.toThrow('o arquivo depois.pdf não chegou ao Drive')
-  versoes.falharNoArquivo = null
-  versoes.falhaNoRegistro = 'sem espaço'
-  await expect(versoes.acrescentarRelatorio(pedido, () => {})).rejects.toThrow('sem espaço')
-  expect((await versoes.listarVersoes('p1'))[0].arquivos).toHaveLength(2)
-})
-
-async function comDuasVersoes(anteriorComRelatorio: boolean): Promise<VersoesFalso> {
-  const versoes = falso()
-  await versoes.enviarVersao(anteriorComRelatorio ? PEDIDO_COM_RELATORIO : PEDIDO, () => {})
-  await versoes.enviarVersao(PEDIDO, () => {})
-  return versoes
-}
-
-test('"sem alteração" copia o relatório da versão anterior, com o nome da versão nova, ligado ao original, e gera o evento', async () => {
-  const versoes = await comDuasVersoes(true)
-  const eventos: EventoDoCadastro[] = []
-  versoes.aoRegistrar = (_processoId, evento) => eventos.push(evento)
-  const [segunda, primeira] = await versoes.listarVersoes('p1')
-  await versoes.semAlteracaoDeConteudo('p1', segunda.id)
-  const copia = (await versoes.listarVersoes('p1'))[0].arquivos.find((arquivo) => arquivo.papel === 'relatorio')
-  const original = primeira.arquivos.find((arquivo) => arquivo.papel === 'relatorio')
-  expect(copia).toMatchObject({ nome: 'TSA_V2_Emitir Ofício_Relatório.docx', formato: 'docx', copiadoDe: original?.id })
-  expect(eventos[0]).toMatchObject({ acao: 'sem_alteracao', entidade: 'versao', depois: { rotulo: 'V2', relatorio_de: 'V1' } })
-})
-
-test('"sem alteração" recusa a versão cuja anterior não tem relatório, a que não tem anterior, a que já tem relatório e a histórica', async () => {
-  const semRelatorioAntes = await comDuasVersoes(false)
-  const [segunda, primeira] = await semRelatorioAntes.listarVersoes('p1')
-  await expect(semRelatorioAntes.semAlteracaoDeConteudo('p1', segunda.id))
-    .rejects.toThrow('A versão anterior não tem relatório para copiar. Envie o relatório.')
-  await expect(semRelatorioAntes.semAlteracaoDeConteudo('p1', primeira.id))
-    .rejects.toThrow('A versão anterior não tem relatório para copiar. Envie o relatório.')
-  const comRelatorio = await comDuasVersoes(true)
-  const [nova] = await comRelatorio.listarVersoes('p1')
-  await comRelatorio.semAlteracaoDeConteudo('p1', nova.id)
-  await expect(comRelatorio.semAlteracaoDeConteudo('p1', nova.id)).rejects.toThrow('Esta versão já tem relatório.')
-  const historica = falso()
-  await historica.registrarVersaoHistorica(HISTORICA, () => {})
-  await expect(historica.semAlteracaoDeConteudo('p1', await primeiraVersaoId(historica)))
-    .rejects.toThrow('A versão histórica é somente leitura: não recebe arquivos.')
-})
-
-test('a falha programada no registro vale também para o "sem alteração"', async () => {
-  const versoes = await comDuasVersoes(true)
-  versoes.falhaNoRegistro = new TravaDoBanco('Seu perfil não permite enviar versões.')
-  await expect(versoes.semAlteracaoDeConteudo('p1', (await versoes.listarVersoes('p1'))[0].id))
-    .rejects.toThrow('Seu perfil não permite enviar versões.')
 })
 
 const NOVO_PNG = new File(['png novo'], 'trocado.png')

@@ -1,12 +1,12 @@
 import { useId } from 'react'
-import { lerNumeroHistorico } from '../../versoes/formularioDeVersao'
+import { lerNumeroDigitado } from '../../versoes/formularioDeVersao'
 
-type CampoDoNumeroHistoricoProps = { texto: string; aoMudar: (texto: string) => void }
+type CampoDoNumeroDaVersaoProps = { texto: string; aoMudar: (texto: string) => void }
 
-/** O número digitado da versão histórica (5 vira V5F); a frase da recusa aparece ao lado quando o texto não vale. */
-export function CampoDoNumeroHistorico({ texto, aoMudar }: CampoDoNumeroHistoricoProps) {
+/** O número digitado da versão histórica ou piloto (5 vira V5F, 6 vira V6P); a frase aparece ao lado quando o texto não vale. */
+export function CampoDoNumeroDaVersao({ texto, aoMudar }: CampoDoNumeroDaVersaoProps) {
   const id = useId()
-  const invalido = texto !== '' && lerNumeroHistorico(texto) === null
+  const invalido = texto !== '' && lerNumeroDigitado(texto) === null
   return (
     <div className="campo-de-arquivo">
       <label htmlFor={id}>Número da versão</label>
