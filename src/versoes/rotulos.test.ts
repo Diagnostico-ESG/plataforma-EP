@@ -127,3 +127,9 @@ test('o dia e o mês da versão saem no horário de Brasília', () => {
   expect(formatarDiaEMes('2026-10-02T13:00:00Z')).toBe('02/10')
   expect(formatarDiaEMes('2026-10-03T01:00:00Z')).toBe('02/10')
 })
+
+test('o .pdf protocolado da aprovação tem rótulo, accept e nome curto próprios', () => {
+  expect(ROTULO_DO_PAPEL.pdf_da_aprovacao).toBe('.pdf protocolado')
+  expect(acceptDoCampo('pdf_da_aprovacao', false)).toBe('.pdf,application/pdf')
+  expect(rotuloCurtoDoArquivo(arquivoCom('pdf_da_aprovacao', 'pdf'))).toBe('Aprovação .pdf')
+})

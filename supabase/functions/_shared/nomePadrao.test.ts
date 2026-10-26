@@ -83,3 +83,17 @@ describe('limparParaNomeDeArquivo', () => {
     expect(limparParaNomeDeArquivo('  Nome   do   processo  ')).toBe('Nome do processo')
   })
 })
+
+describe('nomePadrao do .pdf da aprovação', () => {
+  it('leva a versão aprovada e o sufixo _Aprovação', () => {
+    expect(nomePadrao({ ...base, numero: 8, papel: 'pdf_da_aprovacao', extensao: 'pdf' })).toBe(
+      'CEE_V8_Nome do processo_Aprovação.pdf',
+    )
+  })
+
+  it('limpa os caracteres que o Drive não aceita no nome do processo', () => {
+    expect(nomePadrao({ ...base, numero: 2, nomeDoProcesso: 'Emitir: ofício/guia', papel: 'pdf_da_aprovacao', extensao: 'PDF' })).toBe(
+      'CEE_V2_Emitir- ofício-guia_Aprovação.pdf',
+    )
+  })
+})

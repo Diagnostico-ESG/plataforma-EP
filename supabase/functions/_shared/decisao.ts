@@ -59,6 +59,7 @@ export const EXTENSOES_POR_PAPEL: Record<PapelDoArquivo, readonly string[]> = {
   png: ['png'],
   bpm: ['bpm'],
   relatorio: ['docx', 'pdf'],
+  pdf_da_aprovacao: ['pdf'],
 }
 
 const MENSAGENS: Record<CodigoDeRecusa, string> = {
@@ -114,6 +115,12 @@ export function conferirChamador(chamador: Chamador | null, acao: Acao): Recusa 
 
 export function conferirProcessoEmAndamento(situacao: string): Recusa | null {
   return situacao === 'em_andamento' ? null : recusar('processo_fora_de_andamento')
+}
+
+/** O .pdf da aprovação segue a regra do editar a aprovação: processo em andamento ou concluído, não arquivado. */
+export function conferirProcessoDoPdf(situacao: string, arquivado: boolean): Recusa | null {
+  const aceita = situacao === 'em_andamento' || situacao === 'concluido'
+  return aceita && !arquivado ? null : recusar('processo_fora_de_andamento')
 }
 
 export function extensaoDoNome(nome: string): string {
@@ -172,7 +179,7 @@ export function lerBooleanoOpcional(corpo: Corpo, campo: string): Validacao<bool
 export function lerPapel(corpo: Corpo): Validacao<PapelDoArquivo> {
   const valor = corpo.papel
   if (typeof valor !== 'string' || !(valor in EXTENSOES_POR_PAPEL)) {
-    return campoInvalido(corpo, 'papel', 'bpmn, png, bpm ou relatorio')
+    return campoInvalido(corpo, 'papel', 'bpmn, png, bpm, relatorio ou pdf_da_aprovacao')
   }
   return { ok: true, valor: valor as PapelDoArquivo }
 }
@@ -263,11 +270,21 @@ function conferirArquivo(entrada: EntradaIniciarEnvio): Validacao<EntradaIniciar
   return { ok: true, valor: entrada }
 }
 
+// O .pdf da aprovação não é de versão histórica nem piloto: o número no nome é o da versão aprovada.
+function conferirPdfDaAprovacao(entrada: EntradaIniciarEnvio): Validacao<EntradaIniciarEnvio> {
+  if (entrada.papel === 'pdf_da_aprovacao' && (entrada.historica || entrada.piloto)) {
+    return falhar('entrada_invalida', 'campo papel: pdf_da_aprovacao esperado sem historica nem piloto')
+  }
+  return { ok: true, valor: entrada }
+}
+
 export function validarIniciarEnvio(entrada: unknown): Validacao<EntradaIniciarEnvio> {
   if (!eCorpo(entrada)) return falhar('entrada_invalida', `corpo: esperado objeto, recebido ${tipoDe(entrada)}`)
   const campos = lerCamposDoEnvio(entrada)
   if (!campos.ok) return campos
-  const arquivo = conferirArquivo(campos.valor)
+  const pdf = conferirPdfDaAprovacao(campos.valor)
+  if (!pdf.ok) return pdf
+  const arquivo = conferirArquivo(pdf.valor)
   return arquivo.ok ? conferirNumeroDoRelatorio(arquivo.valor) : arquivo
 }
 

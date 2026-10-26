@@ -18,11 +18,12 @@ export const ROTULO_DO_PAPEL: Record<PapelDoArquivo, string> = {
   png: 'Imagem do fluxo (.png)',
   bpmn: '.bpmn',
   relatorio: 'Relatório (.docx)',
+  pdf_da_aprovacao: '.pdf protocolado',
 }
 
 /** O `accept` de cada campo de arquivo (o navegador só sugere; a conferência é que decide). */
 export const ACCEPT_DO_PAPEL: Record<PapelDoArquivo, string> = {
-  bpmn: '.bpmn', png: '.png,image/png', bpm: '.bpm', relatorio: '.docx',
+  bpmn: '.bpmn', png: '.png,image/png', bpm: '.bpm', relatorio: '.docx', pdf_da_aprovacao: '.pdf,application/pdf',
 }
 
 /** O relatório da histórica, que não é numerado, ainda aceita o .pdf; nos demais envios o relatório é só .docx (ADR 0026). */
@@ -85,7 +86,7 @@ export function ordenarVersoes(versoes: Versao[]): Versao[] {
 }
 
 const NOME_CURTO_DO_PAPEL: Record<PapelDoArquivo, string> = {
-  bpm: 'Fluxograma', png: 'Imagem', bpmn: 'BPMN', relatorio: 'Relatório',
+  bpm: 'Fluxograma', png: 'Imagem', bpmn: 'BPMN', relatorio: 'Relatório', pdf_da_aprovacao: 'Aprovação',
 }
 
 /** "Fluxograma .bpm", "Relatório V2" (o numerado), "Relatório .pdf" (o antigo): o botão do arquivo no destaque da versão. */

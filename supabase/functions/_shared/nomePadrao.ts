@@ -1,5 +1,6 @@
 // Arquivo puro (sem Deno nem npm:): usado pela função do servidor e, no ticket 02, pela prévia do formulário.
-export type PapelDoArquivo = 'bpmn' | 'png' | 'bpm' | 'relatorio'
+/** `pdf_da_aprovacao` é o .pdf protocolado da aprovação (revisoes-aprovacao, ticket 06): não é papel de arquivo de versão no banco. */
+export type PapelDoArquivo = 'bpmn' | 'png' | 'bpm' | 'relatorio' | 'pdf_da_aprovacao'
 
 export interface DadosDoNome {
   sigla: string
@@ -30,7 +31,8 @@ function conferirNumero(numero: number, rotulo: string): void {
   )
 }
 
-function sufixoDoRelatorio(dados: DadosDoNome): string {
+function sufixoDoPapel(dados: DadosDoNome): string {
+  if (dados.papel === 'pdf_da_aprovacao') return '_Aprovação'
   if (dados.papel !== 'relatorio') return ''
   if (dados.numeroDoRelatorio === undefined) return '_Relatório'
   conferirNumero(dados.numeroDoRelatorio, 'do relatório')
@@ -41,7 +43,7 @@ export function nomePadrao(dados: DadosDoNome): string {
   conferirNumero(dados.numero, 'da versão')
   const letra = dados.historica ? 'F' : dados.piloto ? 'P' : ''
   const rotulo = `V${dados.numero}${letra}`
-  const sufixo = sufixoDoRelatorio(dados)
+  const sufixo = sufixoDoPapel(dados)
   const sigla = limparParaNomeDeArquivo(dados.sigla)
   const nome = limparParaNomeDeArquivo(dados.nomeDoProcesso)
   return `${sigla}_${rotulo}_${nome}${sufixo}.${dados.extensao.toLowerCase()}`

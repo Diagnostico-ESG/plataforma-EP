@@ -124,6 +124,13 @@ function lerArquivosPedidos(corpo: Corpo): Validacao<ArquivoPedido[]> {
 
 type ModoDoRegistro = Pick<EntradaRegistrar, 'historica' | 'piloto' | 'versaoId' | 'arquivoId' | 'numeroDoRelatorio' | 'arquivos'>
 
+// O .pdf da aprovação entra sozinho (um arquivo), sem versão, histórica nem piloto: o banco o liga à aprovação do processo.
+function conferirPdfDaAprovacao(modo: ModoDoRegistro): Falha | null {
+  if (!modo.arquivos.some((arquivo) => arquivo.papel === 'pdf_da_aprovacao')) return null
+  if (modo.arquivos.length === 1 && modo.versaoId === null && !modo.historica && !modo.piloto) return null
+  return falhar('entrada_invalida', 'campo arquivos: pdf_da_aprovacao esperado sozinho, sem versao_id, historica nem piloto')
+}
+
 // O número do relatório vai com o relatório novo de versão que não é histórica (sozinho ou junto) e só com ele.
 function conferirNumeroDoRelatorio(modo: ModoDoRegistro): Falha | null {
   const temRelatorio = modo.arquivos.some((arquivo) => arquivo.papel === 'relatorio')
@@ -159,7 +166,7 @@ function lerModoDoRegistro(corpo: Corpo): Validacao<ModoDoRegistro> {
   if (!arquivos.ok) return arquivos
   const modo = { historica: historica.valor, piloto: piloto.valor, ...alvo.valor, arquivos: arquivos.valor }
   const recusa = conferirArquivoDepois(modo.versaoId, modo.historica, modo.arquivos) ?? conferirSubstituicao(modo)
-    ?? conferirNumeroDoRelatorio(modo)
+    ?? conferirNumeroDoRelatorio(modo) ?? conferirPdfDaAprovacao(modo)
   return recusa ?? { ok: true, valor: modo }
 }
 
@@ -177,6 +184,11 @@ export function validarRegistrar(corpo: unknown): Validacao<EntradaRegistrar> {
 
 export type FuncaoDeRegistro =
   | 'registrar_versao' | 'registrar_versao_historica' | 'enviar_relatorio' | 'acrescentar_arquivo' | 'substituir_arquivo'
+  | 'registrar_pdf_da_aprovacao' | 'substituir_pdf_da_aprovacao'
+
+function ehPdfDaAprovacao({ arquivos }: Pick<EntradaRegistrar, 'arquivos'>): boolean {
+  return arquivos.some((arquivo) => arquivo.papel === 'pdf_da_aprovacao')
+}
 
 /** Só o relatório, sem versão que o acompanhe no pedido: o banco o liga à versão mais recente que não é histórica. */
 function ehRelatorioSozinho({ historica, arquivos }: Pick<EntradaRegistrar, 'historica' | 'arquivos'>): boolean {
@@ -187,6 +199,7 @@ function ehRelatorioSozinho({ historica, arquivos }: Pick<EntradaRegistrar, 'his
 export function funcaoDoBancoPara(
   entrada: Pick<EntradaRegistrar, 'historica' | 'versaoId' | 'arquivoId' | 'arquivos'>,
 ): FuncaoDeRegistro {
+  if (ehPdfDaAprovacao(entrada)) return entrada.arquivoId !== null ? 'substituir_pdf_da_aprovacao' : 'registrar_pdf_da_aprovacao'
   if (entrada.arquivoId !== null) return 'substituir_arquivo'
   if (entrada.versaoId !== null) return 'acrescentar_arquivo'
   if (entrada.historica) return 'registrar_versao_historica'
@@ -195,6 +208,9 @@ export function funcaoDoBancoPara(
 
 /** Os parâmetros da função do banco escolhida (o arquivo depois e a troca levam o alvo e o único arquivo). */
 export function parametrosDoBanco(entrada: EntradaRegistrar, arquivos: ArquivoParaGravar[]): Record<string, unknown> {
+  if (ehPdfDaAprovacao(entrada)) {
+    return entrada.arquivoId !== null ? { p_pdf: entrada.arquivoId, p_novo: arquivos[0] } : { p_processo: entrada.processoId, p_arquivo: arquivos[0] }
+  }
   if (entrada.arquivoId !== null) return { p_arquivo: entrada.arquivoId, p_novo: arquivos[0] }
   if (entrada.versaoId !== null) return { p_versao: entrada.versaoId, p_arquivo: arquivos[0] }
   if (funcaoDoBancoPara(entrada) === 'enviar_relatorio') {

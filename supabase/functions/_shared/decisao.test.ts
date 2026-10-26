@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   conferirChamador,
+  conferirProcessoDoPdf,
   conferirProcessoEmAndamento,
   extensaoDoNome,
   lerAcao,
@@ -268,5 +269,60 @@ describe('statusDaRecusa', () => {
     ['arquivo_grande', 400],
   ] as const)('%s → %i', (codigo, status) => {
     expect(statusDaRecusa(recusar(codigo))).toBe(status)
+  })
+})
+
+describe('validarIniciarEnvio: o .pdf da aprovação', () => {
+  const pdf = (mudancas: Record<string, unknown> = {}) =>
+    entradaDeEnvio({ papel: 'pdf_da_aprovacao', nome_original: 'protocolo.PDF', numero: 8, ...mudancas })
+
+  it('aceita o .pdf da versão aprovada, em qualquer caixa da extensão', () => {
+    const resultado = validarIniciarEnvio(pdf())
+    expect(resultado.ok && resultado.valor).toMatchObject({ papel: 'pdf_da_aprovacao', numero: 8, historica: false, piloto: false })
+  })
+
+  it('aceita a troca do .pdf atual, com o arquivo_id', () => {
+    const resultado = validarIniciarEnvio(pdf({ arquivo_id: '8f000000-0000-0000-0000-0000000000d1' }))
+    expect(resultado.ok && resultado.valor.arquivoId).toBe('8f000000-0000-0000-0000-0000000000d1')
+  })
+
+  it('recusa outra extensão, citando a recebida e a esperada', () => {
+    const resultado = validarIniciarEnvio(pdf({ nome_original: 'protocolo.docx' }))
+    expect(resultado.ok).toBe(false)
+    expect(!resultado.ok && resultado.recusa).toMatchObject({ codigo: 'extensao_nao_aceita' })
+    expect(!resultado.ok && resultado.recusa.mensagem).toContain('recebido .docx; esperado .pdf')
+  })
+
+  it('aceita exatamente 20 MB e recusa um byte a mais', () => {
+    expect(codigoDaRecusa(pdf({ tamanho: LIMITE_DE_TAMANHO }))).toBeNull()
+    expect(codigoDaRecusa(pdf({ tamanho: LIMITE_DE_TAMANHO + 1 }))).toBe('arquivo_grande')
+  })
+
+  it.each([
+    ['histórica', { historica: true }],
+    ['piloto', { piloto: true }],
+    ['número do relatório', { numero_do_relatorio: 2 }],
+  ])('recusa o .pdf com %s', (_nome, mudancas) => {
+    expect(codigoDaRecusa(pdf(mudancas))).toBe('entrada_invalida')
+  })
+
+  it('a recusa do papel desconhecido cita o .pdf da aprovação entre os aceitos', () => {
+    const resultado = validarIniciarEnvio(entradaDeEnvio({ papel: 'zip' }))
+    expect(!resultado.ok && resultado.recusa.mensagem).toContain('pdf_da_aprovacao')
+  })
+})
+
+describe('conferirProcessoDoPdf', () => {
+  it('aceita o processo em andamento e o concluído, como o editar a aprovação', () => {
+    expect(conferirProcessoDoPdf('em_andamento', false)).toBeNull()
+    expect(conferirProcessoDoPdf('concluido', false)).toBeNull()
+  })
+
+  it.each(['suspenso', 'cancelado'])('recusa o processo %s', (situacao) => {
+    expect(conferirProcessoDoPdf(situacao, false)?.codigo).toBe('processo_fora_de_andamento')
+  })
+
+  it('recusa o processo arquivado, mesmo concluído', () => {
+    expect(conferirProcessoDoPdf('concluido', true)?.codigo).toBe('processo_fora_de_andamento')
   })
 })

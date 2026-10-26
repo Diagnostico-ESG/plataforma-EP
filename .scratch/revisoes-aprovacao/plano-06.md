@@ -51,17 +51,17 @@
 
 **Arquivos:** `supabase/functions/_shared/nomePadrao.ts`, `decisao.ts`, `registro.ts`, `substituicao.ts`, `conferencia.ts` e os `.test.ts` ao lado (`nomePadrao.test.ts`, `decisao.test.ts`, `registro.test.ts`, `substituicao.test.ts`, `conferencia.test.ts`).
 
-- [ ] Testes que falham: `nomePadrao({ papel: 'pdf_da_aprovacao', ... })` devolve `CEE_V8_Nome do processo_Aprovação.pdf` (e limpa caracteres inválidos); `EXTENSOES_POR_PAPEL.pdf_da_aprovacao` só `pdf` e `.docx` recusado; `lerPapel` aceita o papel novo e a mensagem de recusa o cita; o papel novo nunca com `historica` nem `piloto` (campo inválido); `arquivo_grande` acima de 20 MB; `funcaoDoBancoPara` escolhe `registrar_pdf_da_aprovacao` (sem `arquivoId`) e `substituir_pdf_da_aprovacao` (com `arquivoId`); `parametrosDoBanco` devolve `{ p_processo, p_arquivo }` e `{ p_pdf, p_novo }`; `conferirArquivosNoDrive` aceita o nome com o rótulo `_V8_` e o formato `pdf`; a substituição do .pdf: alvo de outro processo e arquivo de outro papel recusados, `versao_aprovada` e `versao_historica_somente_leitura` não valem para o .pdf (ele se substitui mesmo com a versão aprovada); a conferência devolve a mesma situação para o .pdf.
-- [ ] Implementar o mínimo; `npm test -- supabase/functions` verde.
+- [x] Testes que falham: `nomePadrao({ papel: 'pdf_da_aprovacao', ... })` devolve `CEE_V8_Nome do processo_Aprovação.pdf` (e limpa caracteres inválidos); `EXTENSOES_POR_PAPEL.pdf_da_aprovacao` só `pdf` e `.docx` recusado; `lerPapel` aceita o papel novo e a mensagem de recusa o cita; o papel novo nunca com `historica` nem `piloto` (campo inválido); `arquivo_grande` acima de 20 MB; `funcaoDoBancoPara` escolhe `registrar_pdf_da_aprovacao` (sem `arquivoId`) e `substituir_pdf_da_aprovacao` (com `arquivoId`); `parametrosDoBanco` devolve `{ p_processo, p_arquivo }` e `{ p_pdf, p_novo }`; `conferirArquivosNoDrive` aceita o nome com o rótulo `_V8_` e o formato `pdf`; a substituição do .pdf: alvo de outro processo e arquivo de outro papel recusados, `versao_aprovada` e `versao_historica_somente_leitura` não valem para o .pdf (ele se substitui mesmo com a versão aprovada); a conferência devolve a mesma situação para o .pdf.
+- [x] Implementar o mínimo; `npm test -- supabase/functions` verde.
 
 ### Tarefa 5: função do servidor, ligação com o Deno e o banco
 
 **Arquivos:** `supabase/functions/arquivos-no-drive/acoes.ts`, `registrar.ts`, `conferir.ts` (e `index.ts` só se a mensagem de ação mudar). Sem teste automático da camada Deno (como nas anteriores; fica registrado em `melhorias-protocolo`).
 
-- [ ] `acoes.ts`: `lerAlvoDaSubstituicao` lê `pdfs_da_aprovacao` quando o papel pedido é o do .pdf (`select drive_id, nome, aprovacoes(processo_id)`), com o `AlvoDaSubstituicao` do .pdf (`aprovada` sempre falso, `historica` falso); `baixar` e `lerArquivoDaVersao` tentam `arquivos_da_versao` e, sem linha, `pdfs_da_aprovacao`; recusa igual à de "sem permissão" quando nenhuma aparece.
-- [ ] `registrar.ts`: o papel novo segue o mesmo caminho (situação do processo, pasta registrada, leitura no Drive, conferência pelo arquivo puro) e grava pela função do banco da decisão 2 (`responderResultadoDoBanco` com o campo `pdf_id`).
-- [ ] `conferir.ts`: `lerArquivosDoProcesso` também lê `pdfs_da_aprovacao` (`select id, drive_id, hash_md5, aprovacoes!inner(processo_id)`), atuais e guardados.
-- [ ] `npm run typecheck` e `npm run lint` verdes. No fim do ticket, o roteiro para o usuário publicar a função: `npx supabase functions deploy arquivos-no-drive --use-api`, no terminal dele, com o vínculo do desenvolvimento conferido (a publicação não é minha).
+- [x] `acoes.ts`: `lerAlvoDaSubstituicao` lê `pdfs_da_aprovacao` quando o papel pedido é o do .pdf (`select drive_id, nome, aprovacoes(processo_id)`), com o `AlvoDaSubstituicao` do .pdf (`aprovada` sempre falso, `historica` falso); `baixar` e `lerArquivoDaVersao` tentam `arquivos_da_versao` e, sem linha, `pdfs_da_aprovacao`; recusa igual à de "sem permissão" quando nenhuma aparece.
+- [x] `registrar.ts`: o papel novo segue o mesmo caminho (situação do processo, pasta registrada, leitura no Drive, conferência pelo arquivo puro) e grava pela função do banco da decisão 2 (`responderResultadoDoBanco` com o campo `pdf_id`).
+- [x] `conferir.ts`: `lerArquivosDoProcesso` também lê `pdfs_da_aprovacao` (`select id, drive_id, hash_md5, aprovacoes!inner(processo_id)`), atuais e guardados.
+- [x] `npm run typecheck` e `npm run lint` verdes. No fim do ticket, o roteiro para o usuário publicar a função: `npx supabase functions deploy arquivos-no-drive --use-api`, no terminal dele, com o vínculo do desenvolvimento conferido (a publicação não é minha).
 
 ### Tarefa 6: módulos da interface e falsas (testes primeiro)
 
