@@ -73,3 +73,8 @@ test('sem o número da versão não há última versão, mesmo com as outras col
   const processo = processoDaLinha({ ...VAZIA, ultima_versao_historica: false, ultima_versao_tem_relatorio: true }, 8)
   expect(processo.cartao?.ultimaVersao).toBeNull()
 })
+
+test('traduz a data da validação', () => {
+  expect(processoDaLinha({ ...VAZIA, data_da_validacao: '2026-10-12' }, 8)).toMatchObject({ dataDaValidacao: '2026-10-12' })
+  expect(processoDaLinha(VAZIA, 8)).toMatchObject({ dataDaValidacao: null })
+})

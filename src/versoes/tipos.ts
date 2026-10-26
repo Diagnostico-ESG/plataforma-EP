@@ -70,6 +70,18 @@ export type PedidoDeRelatorio = {
   arquivo: File
 }
 
+/**
+ * O .pdf protocolado da aprovação (revisoes-aprovacao, ticket 06): `numero` é o da versão aprovada, com que o arquivo é
+ * nomeado no Drive. `antesDeRegistrar` roda depois de o arquivo chegar ao Drive e antes do registro do .pdf: quem registra a
+ * aprovação junto com o .pdf a passa aqui, para a falha do envio não deixar a aprovação registrada.
+ */
+export type PedidoDePdfDaAprovacao = {
+  processoId: string
+  numero: number
+  arquivo: File
+  antesDeRegistrar?: () => Promise<void>
+}
+
 /** A troca do conteúdo de um arquivo de versão nova; `numero` é o da versão, que a função do servidor repete no pedido. */
 export type PedidoDeSubstituicao = { processoId: string; numero: number; arquivo: ArquivoDaVersao; novo: File }
 
@@ -104,11 +116,16 @@ export type ModuloDeVersoes = {
    */
   enviarRelatorio(pedido: PedidoDeRelatorio, aoProgredir: (enviados: number, total: number) => void): Promise<void>
   /**
-   * Troca o conteúdo de um arquivo de versão nova pelo de `pedido.novo` (do mesmo papel e formato): envia direto ao Drive,
+   * Troca o conteúdo de um arquivo de versão nova, ou do .pdf atual da aprovação, pelo de `pedido.novo` (do mesmo papel e formato): envia direto ao Drive,
    * no mesmo arquivo, e só então registra a troca. O arquivo anterior não fica guardado (ADR 0007). `aoProgredir` avisa
    * quando o arquivo chegou. Se algo falhar, nada é registrado.
    */
   substituirArquivo(pedido: PedidoDeSubstituicao, aoProgredir: (enviados: number, total: number) => void): Promise<void>
+  /**
+   * Envia o .pdf protocolado direto ao Drive e só então o registra na aprovação do processo (um atual por aprovação).
+   * `aoProgredir` avisa quando o arquivo chegou. Se algo falhar, o .pdf não é registrado.
+   */
+  enviarPdfDaAprovacao(pedido: PedidoDePdfDaAprovacao, aoProgredir: (enviados: number, total: number) => void): Promise<void>
   /**
    * Como cada arquivo do processo está no Drive agora: o MD5 e a existência são comparados com o que o banco guarda; nada é
    * gravado. Falha de conexão ou do Drive rejeita (a tela mostra o aviso, sem marcas).

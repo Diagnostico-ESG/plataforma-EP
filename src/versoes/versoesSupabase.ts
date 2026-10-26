@@ -3,8 +3,8 @@ import { extensaoDoNome } from '../../supabase/functions/_shared/decisao.ts'
 import type { ClienteSupabase } from '../lib/supabase'
 import { falhaDaFuncao, falhaDoDownload } from './recusasDeVersoes'
 import type {
-  ArquivoDaVersao, ArquivoEscolhido, ConferenciaDosArquivos, ModuloDeVersoes, PedidoDeAcrescimo, PedidoDeRelatorio,
-  PedidoDeSubstituicao, PedidoDeVersao, Versao,
+  ArquivoDaVersao, ArquivoEscolhido, ConferenciaDosArquivos, ModuloDeVersoes, PedidoDeAcrescimo, PedidoDePdfDaAprovacao,
+  PedidoDeRelatorio, PedidoDeSubstituicao, PedidoDeVersao, Versao,
 } from './tipos'
 import { COLUNAS_DA_VERSAO, type LinhaDaVersao, versaoDaLinha } from './versaoDaLinha'
 
@@ -22,6 +22,7 @@ export function criarVersoesSupabase(cliente: ClienteSupabase, enviarBytes: Envi
     registrarVersaoHistorica: (pedido, aoProgredir) => enviarVersao(cliente, enviarBytes, pedido, aoProgredir, true),
     acrescentarArquivo: (pedido, aoProgredir) => acrescentarArquivo(cliente, enviarBytes, pedido, aoProgredir),
     enviarRelatorio: (pedido, aoProgredir) => enviarRelatorio(cliente, enviarBytes, pedido, aoProgredir),
+    enviarPdfDaAprovacao: (pedido, aoProgredir) => enviarPdfDaAprovacao(cliente, enviarBytes, pedido, aoProgredir),
     substituirArquivo: (pedido, aoProgredir) => substituirArquivo(cliente, enviarBytes, pedido, aoProgredir),
     conferirArquivos: (processoId) => conferirArquivos(cliente, processoId),
     baixarArquivo: (arquivo) => baixarArquivo(cliente, arquivo),
@@ -109,6 +110,21 @@ async function acrescentarArquivo(cliente: ClienteSupabase, enviarBytes: EnviarB
   await chamarFuncao(cliente, {
     acao: 'registrar', processo_id: pedido.processoId, numero: pedido.numero, historica: false, piloto: pedido.piloto,
     versao_id: pedido.versaoId, arquivos: [{ papel: pedido.papel, drive_id: id }],
+  })
+}
+
+// O .pdf da aprovação: o mesmo caminho, com um arquivo só. O que o pedido manda fazer antes de registrar (registrar a aprovação)
+// roda depois de o .pdf chegar ao Drive: se o envio falhar, nada foi registrado; o banco liga o .pdf à aprovação do processo.
+async function enviarPdfDaAprovacao(cliente: ClienteSupabase, enviarBytes: EnviarBytes, pedido: PedidoDePdfDaAprovacao,
+  aoProgredir: (enviados: number, total: number) => void): Promise<void> {
+  const escolhido: ArquivoEscolhido = { papel: 'pdf_da_aprovacao', arquivo: pedido.arquivo }
+  const { processoId, numero } = pedido
+  const id = await enviarUmArquivo(cliente, enviarBytes, { processoId, numero, arquivos: [escolhido] }, escolhido, false)
+  aoProgredir(1, 1)
+  await pedido.antesDeRegistrar?.()
+  await chamarFuncao(cliente, {
+    acao: 'registrar', processo_id: processoId, numero, historica: false, piloto: false,
+    arquivos: [{ papel: 'pdf_da_aprovacao', drive_id: id }],
   })
 }
 

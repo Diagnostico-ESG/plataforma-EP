@@ -78,6 +78,8 @@ export type ProcessoDaLista = {
   responsavel: ResponsavelDoProcesso | null
   /** A data da reunião de modelagem piloto (AAAA-MM-DD). Opcional para quem monta o processo à mão; o ProcessoLido a exige. */
   dataDaModelagemPiloto?: string | null
+  /** O dia em que o setor validou o fluxo (AAAA-MM-DD, nunca futuro); null sem a data. Opcional pelo mesmo motivo. */
+  dataDaValidacao?: string | null
   /** Opcional pelo mesmo motivo: sem ele o cartão não tem selos de versão nem de subprocessos. */
   cartao?: DadosDoCartao
   /** O que o processo tem de arquivos, para a trava de arquivos. Opcional pelo mesmo motivo: sem ele a tela não trava. */

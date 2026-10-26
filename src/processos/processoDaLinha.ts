@@ -15,6 +15,7 @@ export function processoDaLinha(linha: LinhaDoProcesso, totalDeEtapas: number): 
     entrouNaEtapaEm: linha.entrou_na_etapa_em ? diaDeBrasilia(linha.entrou_na_etapa_em) : null,
     responsavel: responsavelDaLinha(linha),
     dataDaModelagemPiloto: linha.data_da_modelagem_piloto,
+    dataDaValidacao: linha.data_da_validacao,
     cartao: cartaoDaLinha(linha),
     arquivos: arquivosDaLinha(linha),
     publicadoEm: linha.publicado_em,

@@ -1,5 +1,10 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
+import { FRASE_DO_PROCESSO_ARQUIVADO } from '../processos/frasesDePublicacao'
+import { fraseDoProcessoParado } from '../processos/frasesDeSituacao'
 import { fraseDaVersaoAprovada } from '../revisoes/frasesDeAprovacao'
+import {
+  FRASE_DO_PDF_GUARDADO, FRASE_DO_PDF_JA_ENVIADO, FRASE_DO_PDF_SEM_A_VERSAO, FRASE_DO_PDF_SEM_APROVACAO,
+} from '../revisoes/frasesDaValidacao'
 
 // Códigos que chegam da função arquivos-no-drive: os dela (decisao.ts, google.ts) e os do banco, que ela repassa
 // como "motivo" de "motivo:valor" (migração versoes), com o valor na mensagem.
@@ -40,6 +45,12 @@ const FRASE_DO_CODIGO: Record<string, (valor: string) => string> = {
   versao_historica_somente_leitura: () => 'A versão histórica é somente leitura: não recebe arquivos.',
   versao_aprovada: fraseDaVersaoAprovada,
   tipo_de_arquivo_diferente: () => 'O arquivo novo precisa ser do mesmo tipo do que sai.',
+  sem_aprovacao_para_o_pdf: () => FRASE_DO_PDF_SEM_APROVACAO,
+  pdf_ja_enviado: () => FRASE_DO_PDF_JA_ENVIADO,
+  pdf_nome_sem_versao: () => FRASE_DO_PDF_SEM_A_VERSAO,
+  pdf_guardado_nao_se_altera: () => FRASE_DO_PDF_GUARDADO,
+  processo_arquivado: () => FRASE_DO_PROCESSO_ARQUIVADO,
+  processo_parado: fraseDoProcessoParado,
   entrada_invalida: () => 'Os dados do envio não foram aceitos. Confira os campos e os arquivos e envie de novo.',
 }
 

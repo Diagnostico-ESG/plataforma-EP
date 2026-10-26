@@ -1,3 +1,5 @@
+import type { ArquivoDaVersao } from '../versoes/tipos'
+
 export type ResultadoDaRevisao = 'sem_alteracao' | 'corrigida'
 export type EscopoDaCorrecao = 'fluxograma' | 'relatorio' | 'ambos'
 
@@ -40,6 +42,11 @@ export type ModuloDeRevisoes = {
   editarRevisao(revisaoId: string, dados: DadosDaEdicaoDaRevisao): Promise<void>
   /** Corrige o número, o link e a data da aprovação (inclusive acrescentando o número que chegou depois da conclusão). */
   editarAprovacao(aprovacaoId: string, dados: DadosDaAprovacao): Promise<void>
+  /**
+   * Registra, altera ou (com null) apaga a data da validação, AAAA-MM-DD e nunca futura. O banco só aceita com o processo na
+   * Validação com o setor e em andamento.
+   */
+  registrarDataDaValidacao(processoId: string, data: string | null): Promise<void>
 }
 
 /** O que a janela de registrar ou editar a aprovação grava; os três campos são opcionais (null: sem), e a data vem em AAAA-MM-DD. */
@@ -55,4 +62,6 @@ export type Aprovacao = {
   /** Nome de quem registrou; null se o usuário não puder ser lido. */
   registradaPor: string | null
   registradaEm: string
+  /** O .pdf protocolado atual da aprovação; null sem ele. Ausente: quem monta a aprovação à mão não o informou. */
+  pdf?: ArquivoDaVersao | null
 }

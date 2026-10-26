@@ -49,7 +49,7 @@ test('lerAprovacao lê a aprovação do processo com a versão e quem registrou'
   }
   expect(await criar(cliente).lerAprovacao('p1')).toEqual({
     id: 'ap1', versao: 8, numeroEprotocolo: 'PROT-1', link: 'https://eprotocolo.example/a', aprovadaEm: '2026-10-13',
-    registradaPor: 'Bia Teste', registradaEm: '2026-10-13T12:00:00Z',
+    registradaPor: 'Bia Teste', registradaEm: '2026-10-13T12:00:00Z', pdf: null,
   })
   expect(cliente.pedidos[0]).toMatchObject({ tabela: 'aprovacoes', filtros: [['processo_id', 'p1']] })
 })

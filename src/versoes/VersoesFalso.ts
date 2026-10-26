@@ -1,7 +1,9 @@
 import { extensaoDoNome } from '../../supabase/functions/_shared/decisao.ts'
 import { tipoMimeDaExtensao } from '../../supabase/functions/_shared/drive.ts'
 import { nomePadrao } from '../../supabase/functions/_shared/nomePadrao.ts'
+import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import type { EventoDoCadastro } from '../cadastros/tipos'
+import { type DonoDoPdf, eventoDoPdfDaAprovacao } from '../revisoes/eventosDaValidacaoEDoPdf'
 import { falhaDaFuncao } from './recusasDeVersoes'
 import { proximoNumeroDoRelatorio } from './relatorioQueVale'
 import {
@@ -9,11 +11,14 @@ import {
 } from './regrasDoFalso'
 import { ordenarVersoes, proximoNumero } from './rotulos'
 import type {
-  ArquivoDaVersao, ConferenciaDosArquivos, ModuloDeVersoes, PedidoDeAcrescimo, PedidoDeRelatorio, PedidoDeSubstituicao,
-  PedidoDeVersao, Versao,
+  ArquivoDaVersao, ConferenciaDosArquivos, ModuloDeVersoes, PedidoDeAcrescimo, PedidoDePdfDaAprovacao, PedidoDeRelatorio,
+  PedidoDeSubstituicao, PedidoDeVersao, Versao,
 } from './tipos'
 
 export type { ProcessoDoFalso }
+
+/** Os .pdfs da aprovação de um processo: o atual (um por aprovação) e os guardados das aprovações trocadas. */
+export type PdfsDaAprovacao = { atual: ArquivoDaVersao | null; guardados: ArquivoDaVersao[] }
 
 /** Implementação falsa de versões para os testes de tela: sem rede, com falhas e esperas programáveis. */
 export class VersoesFalso implements ModuloDeVersoes {
@@ -41,6 +46,13 @@ export class VersoesFalso implements ModuloDeVersoes {
   conferidos: string[] = []
   /** O número da versão aprovada de cada processo (a falsa de revisões o preenche ao concluir a Aprovação e o apaga na volta). */
   aprovadas: Record<string, number> = {}
+  /** Os .pdfs da aprovação, por processo (o histórico baixa os guardados). */
+  pdfsDaAprovacao: Record<string, PdfsDaAprovacao> = {}
+  /**
+   * Quem liga a falsa de revisões: confere como o banco que o processo aceita o .pdf (andamento ou concluído, não arquivado) e
+   * que a aprovação existe, e devolve o número da versão aprovada. Sem ela, o .pdf da aprovação não está disponível.
+   */
+  conferirAprovacaoDoPdf: ((processoId: string) => number) | null = null
   /** Os envios que chegaram ao registro, na ordem. */
   envios: PedidoDeVersao[] = []
   /** Chamado com o evento de cada versão registrada (o histórico do processo fica no falso de processos). */
@@ -102,25 +114,91 @@ export class VersoesFalso implements ModuloDeVersoes {
   // Como o banco (função substituir_arquivo): o arquivo novo troca o conteúdo no mesmo registro, sem versão nova; a versão
   // histórica e o tipo diferente são recusados antes de o arquivo subir, como na sessão de envio da função.
   async substituirArquivo(pedido: PedidoDeSubstituicao, aoProgredir: (enviados: number, total: number) => void): Promise<void> {
-    const { processoId, arquivo, novo } = pedido
+    if (pedido.arquivo.papel === 'pdf_da_aprovacao') return await this.substituirPdf(pedido, aoProgredir)
+    const { versao, atual } = this.alvoDaTroca(pedido)
+    if (this.falharNoArquivo === 1) throw new Error(`o arquivo ${pedido.novo.name} não chegou ao Drive`)
+    aoProgredir(1, 1)
+    if (this.segurarDepoisDe === 1) await new Promise<never>(() => {})
+    this.falharNoRegistroSeConfigurado()
+    this.guardarTroca(pedido.processoId, versao, atual, pedido.novo.size)
+  }
+
+  // O arquivo a trocar com a versão dele, ou a recusa do banco (histórica, aprovada, tipo diferente).
+  private alvoDaTroca({ processoId, arquivo, novo }: PedidoDeSubstituicao): { versao: Versao; atual: ArquivoDaVersao } {
     const versao = (this.versoes[processoId] ?? []).find((outra) => outra.arquivos.some((outro) => outro.id === arquivo.id))
     const atual = versao?.arquivos.find((outro) => outro.id === arquivo.id)
     if (!versao || !atual) throw new Error(`arquivo ${arquivo.id} não encontrado no processo ${processoId}`)
     if (versao.historica) throw falhaDaFuncao('versao_historica_somente_leitura', '')
     if (this.aprovadas[processoId] === versao.numero) throw falhaDaFuncao('versao_aprovada', String(versao.numero))
     if (extensaoDoNome(novo.name) !== atual.formato) throw falhaDaFuncao('tipo_de_arquivo_diferente', atual.formato)
+    return { versao, atual }
+  }
+
+  // Como o banco (função registrar_pdf_da_aprovacao): o .pdf entra na aprovação do processo, na falta de um atual, depois de
+  // o arquivo chegar ao Drive e de rodar o que o pedido mandava fazer antes (registrar a aprovação).
+  async enviarPdfDaAprovacao(pedido: PedidoDePdfDaAprovacao, aoProgredir: (enviados: number, total: number) => void): Promise<void> {
+    if (this.falharNoArquivo === 1) throw new Error(`o arquivo ${pedido.arquivo.name} não chegou ao Drive`)
+    aoProgredir(1, 1)
+    if (this.segurarDepoisDe === 1) await new Promise<never>(() => {})
+    await pedido.antesDeRegistrar?.()
+    this.falharNoRegistroSeConfigurado()
+    const { processoId } = pedido
+    const versao = this.aprovacaoDoPdf(processoId)
+    const pdfs = this.pdfsDaAprovacao[processoId] ?? { atual: null, guardados: [] }
+    if (pdfs.atual) throw falhaDaFuncao('pdf_ja_enviado', '')
+    const processo = this.processos[processoId] ?? { sigla: 'TSA', nome: processoId, etapa: null }
+    const nome = nomePadrao({
+      sigla: processo.sigla, numero: versao, historica: false, nomeDoProcesso: processo.nome, papel: 'pdf_da_aprovacao', extensao: 'pdf',
+    })
+    const novo: ArquivoDaVersao = { id: `pdf${this.proximoId++}`, papel: 'pdf_da_aprovacao', nome, formato: 'pdf', tamanho: pedido.arquivo.size }
+    this.pdfsDaAprovacao[processoId] = { ...pdfs, atual: novo }
+    this.aoRegistrar?.(processoId, eventoDoPdfDaAprovacao(processoId, 'enviar_pdf', this.donoDoPdf(processoId, versao), { nome, hash: this.hashDe(novo.id) }))
+  }
+
+  /** Como registrar_aprovacao ao tomar o lugar da anterior: o .pdf atual fica guardado. Devolve o que ficou guardado, ou null. */
+  guardarPdfAtual(processoId: string): ArquivoDaVersao | null {
+    const pdfs = this.pdfsDaAprovacao[processoId]
+    if (!pdfs?.atual) return null
+    this.pdfsDaAprovacao[processoId] = { atual: null, guardados: [pdfs.atual, ...pdfs.guardados] }
+    return pdfs.atual
+  }
+
+  // A troca do .pdf atual: o mesmo registro e o mesmo nome, outro tamanho e outro hash; só .pdf, e só enquanto o processo aceita.
+  private async substituirPdf(pedido: PedidoDeSubstituicao, aoProgredir: (enviados: number, total: number) => void): Promise<void> {
+    const { processoId, arquivo, novo } = pedido
+    const atual = this.pdfsDaAprovacao[processoId]?.atual
+    if (!atual || atual.id !== arquivo.id) throw new Error(`arquivo ${arquivo.id} não encontrado no processo ${processoId}`)
+    if (extensaoDoNome(novo.name) !== 'pdf') throw falhaDaFuncao('tipo_de_arquivo_diferente', 'pdf')
     if (this.falharNoArquivo === 1) throw new Error(`o arquivo ${novo.name} não chegou ao Drive`)
     aoProgredir(1, 1)
     if (this.segurarDepoisDe === 1) await new Promise<never>(() => {})
     this.falharNoRegistroSeConfigurado()
-    this.guardarTroca(processoId, versao, atual, novo.size)
+    const versao = this.aprovacaoDoPdf(processoId)
+    const hashQueSaiu = this.hashDe(atual.id)
+    this.trocas[atual.id] = (this.trocas[atual.id] ?? 0) + 1
+    delete this.conferencia[atual.id]
+    this.pdfsDaAprovacao[processoId] = { ...this.pdfsDaAprovacao[processoId], atual: { ...atual, tamanho: novo.size } }
+    const pdf = { nome: atual.nome, hash: this.hashDe(atual.id), hashQueSaiu }
+    this.aoRegistrar?.(processoId, eventoDoPdfDaAprovacao(processoId, 'substituir_pdf', this.donoDoPdf(processoId, versao), pdf))
+  }
+
+  private aprovacaoDoPdf(processoId: string): number {
+    if (!this.conferirAprovacaoDoPdf) throw new TravaDoBanco('A falsa de revisões não está ligada à falsa de versões.')
+    return this.conferirAprovacaoDoPdf(processoId)
+  }
+
+  private donoDoPdf(processoId: string, versao: number): DonoDoPdf {
+    const processo = this.processos[processoId] ?? { sigla: 'TSA', nome: processoId, etapa: null }
+    return { versao, nomeDoProcesso: processo.nome, sigla: processo.sigla, autor: 'Pessoa de Teste' }
   }
 
   // Como a ação conferir da função: uma situação por arquivo do processo, `ok` quando nada foi programado.
   async conferirArquivos(processoId: string): Promise<ConferenciaDosArquivos> {
     this.conferidos.push(processoId)
     if (this.falharConferencia) throw new Error('falha de conexão simulada')
-    const arquivos = (this.versoes[processoId] ?? []).flatMap((versao) => versao.arquivos)
+    const pdfs = this.pdfsDaAprovacao[processoId]
+    const doPdf = pdfs ? [...(pdfs.atual ? [pdfs.atual] : []), ...pdfs.guardados] : []
+    const arquivos = [...(this.versoes[processoId] ?? []).flatMap((versao) => versao.arquivos), ...doPdf]
     return Object.fromEntries(arquivos.map((arquivo) => [arquivo.id, this.conferencia[arquivo.id] ?? 'ok']))
   }
 
