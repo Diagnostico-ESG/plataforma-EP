@@ -99,3 +99,22 @@ test('processo com anexo não se exclui, e a tela diz quantos há e o caminho', 
     .toBe('Não é possível excluir: processo tem 2 anexos. Cancele o processo em vez de excluí-lo.')
   expect(processos.processos.map((processo) => processo.id)).toContain('p1')
 })
+
+test('a Consulta vê os anexos sem [Retirar]', async () => {
+  montarNosCadastros({ perfil: 'consulta', ajustarVersoes: comAnexo })
+  const secao = await secaoDeAnexos()
+  expect(await secao.findByRole('link', { name: 'Baixar resposta.eml' })).toBeTruthy()
+  expect(secao.queryByRole('button', { name: /^Retirar/ })).toBeNull()
+})
+
+test.each<[string, Partial<ProcessoLido>]>([
+  ['suspenso', { situacao: 'suspenso' }],
+  ['cancelado', { situacao: 'cancelado' }],
+  ['concluído', { situacao: 'concluido' }],
+  ['arquivado', { situacao: 'concluido', arquivadoEm: '2026-10-12T12:00:00Z' }],
+])('processo %s: o anexo só se lê e se baixa, sem [Retirar]', async (_nome, mudancas) => {
+  montarNosCadastros({ ajustarProcessos: doProcesso(mudancas), ajustarVersoes: comAnexo })
+  const secao = await secaoDeAnexos()
+  expect(await secao.findByRole('link', { name: 'Baixar resposta.eml' })).toBeTruthy()
+  expect(secao.queryByRole('button', { name: /^Retirar/ })).toBeNull()
+})

@@ -14,6 +14,8 @@
 .janela-confirmacao-titulo {
   margin: 0 0 var(--esp-2);
   font-size: var(--tam-base);
+  /* O nome de um arquivo longo, sem espaços, quebra em vez de estourar a janela. */
+  overflow-wrap: anywhere;
 }
 
 .janela-confirmacao-botoes {

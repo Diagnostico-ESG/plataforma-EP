@@ -12,10 +12,13 @@ type ListaDeAnexosProps = {
   anexos: Anexo[]
   /** O que a conferência com o Drive achou de cada arquivo; sem ela (ainda não respondeu, ou falhou), sem marcas. */
   situacoes?: ConferenciaDosArquivos
+  /** Administrador ou Integrante, com o processo em andamento: cada linha ganha [Retirar]. */
+  podeRetirar: boolean
+  aoPedirRetirada: (anexo: Anexo) => void
 }
 
-/** Uma linha por anexo: o nome original, a etapa do envio, quem enviou, o momento e [Baixar]. O nome longo se corta. */
-export function ListaDeAnexos({ versoes, anexos, situacoes }: ListaDeAnexosProps) {
+/** Uma linha por anexo: o nome original, a etapa do envio, quem enviou, o momento, [Baixar] e [Retirar]. O nome longo se corta. */
+export function ListaDeAnexos({ versoes, anexos, situacoes, podeRetirar, aoPedirRetirada }: ListaDeAnexosProps) {
   return (
     <ul className="lista-de-anexos">
       {anexos.map((anexo) => (
@@ -26,6 +29,11 @@ export function ListaDeAnexos({ versoes, anexos, situacoes }: ListaDeAnexosProps
           <time className="anexo-data" dateTime={anexo.enviadoEm}>{formatarMomento(anexo.enviadoEm)}</time>
           <MarcaNoDrive situacao={situacoes?.[anexo.id]} />
           <LinkDoArquivo versoes={versoes} arquivo={anexo} rotulo="Baixar" nomeAcessivel={`Baixar ${anexo.nome}`} />
+          {podeRetirar && (
+            <button type="button" className="anexo-retirar" aria-label={`Retirar ${anexo.nome}`} onClick={() => aoPedirRetirada(anexo)}>
+              Retirar
+            </button>
+          )}
         </li>
       ))}
     </ul>
