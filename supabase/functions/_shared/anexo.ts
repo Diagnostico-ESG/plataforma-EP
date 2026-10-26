@@ -90,3 +90,17 @@ export function validarEnvio(corpo: unknown): Validacao<EnvioValidado> {
   const arquivo = validarIniciarEnvio(corpo)
   return arquivo.ok ? { ok: true, valor: { tipo: 'arquivo', entrada: arquivo.valor } } : arquivo
 }
+
+/** A subpasta "Anexos" como o Drive a devolve: o identificador registrado no banco e o nome lido de lá. */
+export interface SubpastaDosAnexos {
+  id: string
+  nome: string
+}
+
+/**
+ * O drive_id do anexo e o da subpasta são gravados por quem tem perfil de escrita; a retirada e o download só agem num arquivo
+ * que está dentro da subpasta chamada "Anexos" do processo (e não, por exemplo, num arquivo de versão ou do .pdf da aprovação).
+ */
+export function anexoEstaNaSubpasta(subpasta: SubpastaDosAnexos | null, paisDoArquivo: string[]): boolean {
+  return subpasta !== null && subpasta.nome === NOME_DA_SUBPASTA_DOS_ANEXOS && paisDoArquivo.includes(subpasta.id)
+}

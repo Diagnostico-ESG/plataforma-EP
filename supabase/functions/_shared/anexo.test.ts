@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { LIMITE_DE_TAMANHO, conferirChamador, conferirProcessoEmAndamento, lerAcao, type Perfil } from './decisao.ts'
 import {
-  LIMITE_DO_NOME, RECUSA_ANEXO_JA_RETIRADO, nomeDoAnexoNoDrive, validarEnvio, validarIniciarEnvioDoAnexo, validarRetirar,
+  LIMITE_DO_NOME, RECUSA_ANEXO_JA_RETIRADO, anexoEstaNaSubpasta, nomeDoAnexoNoDrive, validarEnvio, validarIniciarEnvioDoAnexo, validarRetirar,
 } from './anexo.ts'
 
 const PROCESSO = '9f000000-0000-0000-0000-0000000000b1'
@@ -147,5 +147,28 @@ describe('a ação retirar', () => {
 
   it('o anexo que já não existe tem recusa própria, com a frase e o código que a tela traduz', () => {
     expect(RECUSA_ANEXO_JA_RETIRADO).toEqual({ codigo: 'anexo_ja_retirado', mensagem: 'O anexo já foi retirado.' })
+  })
+})
+
+// Regressão da revisão de segurança (2026-10-26): o drive_id do anexo é gravado por quem tem perfil de escrita, então a
+// retirada e o download só agem num arquivo que está de fato dentro da subpasta "Anexos" do processo.
+describe('anexoEstaNaSubpasta', () => {
+  const SUBPASTA = { id: 'pastaAnexos1', nome: 'Anexos' }
+
+  it('vale para o arquivo cujo pai é a subpasta registrada, chamada "Anexos"', () => {
+    expect(anexoEstaNaSubpasta(SUBPASTA, ['pastaAnexos1'])).toBe(true)
+  })
+
+  it('recusa o arquivo de uma versão ou do .pdf da aprovação, que está em outra pasta', () => {
+    expect(anexoEstaNaSubpasta(SUBPASTA, ['pastaDoProcesso1'])).toBe(false)
+    expect(anexoEstaNaSubpasta(SUBPASTA, [])).toBe(false)
+  })
+
+  it('recusa a pasta registrada que não se chama "Anexos" (por exemplo, a pasta do processo apontada à mão)', () => {
+    expect(anexoEstaNaSubpasta({ id: 'pastaDoProcesso1', nome: 'Processo de teste' }, ['pastaDoProcesso1'])).toBe(false)
+  })
+
+  it('recusa quando não há pasta registrada ou o Drive não a acha', () => {
+    expect(anexoEstaNaSubpasta(null, ['pastaAnexos1'])).toBe(false)
   })
 })

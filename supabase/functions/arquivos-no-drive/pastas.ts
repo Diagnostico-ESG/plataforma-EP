@@ -3,7 +3,7 @@
 // A cada envio, a pasta acompanha a sigla e o nome atuais (renomeia ou move). A função nunca apaga pasta.
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { consultaDePastaPorNome } from '../_shared/drive.ts'
-import { NOME_DA_SUBPASTA_DOS_ANEXOS } from '../_shared/anexo.ts'
+import { NOME_DA_SUBPASTA_DOS_ANEXOS, anexoEstaNaSubpasta, type SubpastaDosAnexos } from '../_shared/anexo.ts'
 import { limparParaNomeDeArquivo } from '../_shared/nomePadrao.ts'
 import { decidirAjusteDaPasta } from '../_shared/pasta.ts'
 import { estaSobARaiz, type LerPais } from '../_shared/raiz.ts'
@@ -155,6 +155,25 @@ export async function lerPastaDosAnexos(cliente: SupabaseClient, processoId: str
   const { data, error } = await cliente.from('processos').select('drive_pasta_dos_anexos').eq('id', processoId).maybeSingle()
   if (error) throw new Error(`leitura de processos falhou (código ${error.code}); esperado: processo visível`)
   return (data as { drive_pasta_dos_anexos: string | null } | null)?.drive_pasta_dos_anexos ?? null
+}
+
+// A subpasta registrada só vale se o Drive a acha, ela se chama "Anexos" e está debaixo da raiz do ambiente.
+async function lerSubpastaConferida(contexto: ContextoDoDrive, registrada: string): Promise<SubpastaDosAnexos | null> {
+  const pasta = await lerNoDriveOuNulo<{ name: string; parents?: string[] }>(
+    contexto.token, `${API_DE_ARQUIVOS}/${encodeURIComponent(registrada)}?fields=name,parents`,
+  )
+  if (!pasta || !(await conferidorDaRaiz(contexto).paisSobARaiz(pasta.parents ?? []))) return null
+  return { id: registrada, nome: pasta.name }
+}
+
+// O arquivo do anexo está dentro da subpasta "Anexos" registrada do processo? (retirar e baixar; ver anexoEstaNaSubpasta)
+export async function anexoNaSubpastaDoProcesso(contexto: ContextoDoDrive, processoId: string, driveId: string): Promise<boolean> {
+  const registrada = await lerPastaDosAnexos(contexto.cliente, processoId)
+  if (!registrada) return false
+  const arquivo = await lerNoDriveOuNulo<{ parents?: string[] }>(
+    contexto.token, `${API_DE_ARQUIVOS}/${encodeURIComponent(driveId)}?fields=parents`,
+  )
+  return arquivo !== null && anexoEstaNaSubpasta(await lerSubpastaConferida(contexto, registrada), arquivo.parents ?? [])
 }
 
 async function registrarPastaDosAnexos(cliente: SupabaseClient, processoId: string, driveId: string): Promise<void> {

@@ -14,7 +14,7 @@ import { nomePadrao, type PapelDoArquivo } from '../_shared/nomePadrao.ts'
 import { conferirAlvoDoEnvio, type AlvoDaSubstituicao } from '../_shared/substituicao.ts'
 import { chamarDrive } from './google.ts'
 import {
-  API_DE_ARQUIVOS, conferidorDaRaiz, garantirPastaDoProcesso, type ContextoDoDrive, type ProcessoDaPasta,
+  API_DE_ARQUIVOS, anexoNaSubpastaDoProcesso, conferidorDaRaiz, garantirPastaDoProcesso, type ContextoDoDrive, type ProcessoDaPasta,
 } from './pastas.ts'
 import { responderJson, responderRecusa } from './respostas.ts'
 
@@ -193,14 +193,20 @@ async function lerNomeEDriveId(contexto: ContextoDoDrive, tabela: string, id: st
 async function lerArquivoDaVersao(contexto: ContextoDoDrive, arquivoId: string): Promise<ArquivoDaLinha | null> {
   return (await lerNomeEDriveId(contexto, 'arquivos_da_versao', arquivoId))
     ?? (await lerNomeEDriveId(contexto, 'pdfs_da_aprovacao', arquivoId))
-    ?? (await lerNomeEDriveId(contexto, 'anexos', arquivoId))
+    ?? (await lerNomeEDriveId(contexto, 'anexos', arquivoId, 'nome, drive_id, processo_id'))
+}
+
+// Versão e .pdf da aprovação: debaixo da raiz do ambiente. Anexo: dentro da subpasta "Anexos" do processo (revisão de segurança de 2026-10-26).
+async function arquivoPodeSerLido(contexto: ContextoDoDrive, arquivo: ArquivoDaLinha): Promise<boolean> {
+  if (arquivo.processo_id) return await anexoNaSubpastaDoProcesso(contexto, arquivo.processo_id, arquivo.drive_id)
+  return await conferidorDaRaiz(contexto).itemSobARaiz(arquivo.drive_id)
 }
 
 // Sempre application/octet-stream: o supabase-js do navegador só devolve Blob para esse tipo (e PDF); qualquer
 // outro vira texto e estraga os bytes. O navegador reconstrói o tipo pelo formato do arquivo.
 export async function baixar(contexto: ContextoDoDrive, entrada: EntradaBaixar): Promise<Response> {
   const arquivo = await lerArquivoDaVersao(contexto, entrada.arquivoId)
-  if (!arquivo || !(await conferidorDaRaiz(contexto).itemSobARaiz(arquivo.drive_id))) return responderRecusa(recusar('sem_permissao'))
+  if (!arquivo || !(await arquivoPodeSerLido(contexto, arquivo))) return responderRecusa(recusar('sem_permissao'))
   const conteudo = await chamarDrive(contexto.token, `${API_DE_ARQUIVOS}/${encodeURIComponent(arquivo.drive_id)}?alt=media`)
   return new Response(conteudo.body, {
     headers: {
