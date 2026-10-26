@@ -444,6 +444,67 @@ export type Database = {
           },
         ]
       }
+      pdfs_da_aprovacao: {
+        Row: {
+          aprovacao_id: string
+          drive_id: string
+          enviado_em: string
+          enviado_por: string
+          guardado_em: string | null
+          hash_md5: string
+          id: string
+          nome: string
+          tamanho: number
+          versao_id: string
+        }
+        Insert: {
+          aprovacao_id: string
+          drive_id: string
+          enviado_em?: string
+          enviado_por: string
+          guardado_em?: string | null
+          hash_md5: string
+          id?: string
+          nome: string
+          tamanho: number
+          versao_id: string
+        }
+        Update: {
+          aprovacao_id?: string
+          drive_id?: string
+          enviado_em?: string
+          enviado_por?: string
+          guardado_em?: string | null
+          hash_md5?: string
+          id?: string
+          nome?: string
+          tamanho?: number
+          versao_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pdfs_da_aprovacao_aprovacao_id_fkey"
+            columns: ["aprovacao_id"]
+            isOneToOne: false
+            referencedRelation: "aprovacoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pdfs_da_aprovacao_enviado_por_fkey"
+            columns: ["enviado_por"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pdfs_da_aprovacao_versao_id_fkey"
+            columns: ["versao_id"]
+            isOneToOne: false
+            referencedRelation: "versoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       processos: {
         Row: {
           anotacoes: string | null
@@ -453,6 +514,7 @@ export type Database = {
           contexto: string | null
           criado_em: string
           data_da_modelagem_piloto: string | null
+          data_da_validacao: string | null
           explicacao_sem_publicacao: string | null
           id: string
           link_da_publicacao: string | null
@@ -476,6 +538,7 @@ export type Database = {
           contexto?: string | null
           criado_em?: string
           data_da_modelagem_piloto?: string | null
+          data_da_validacao?: string | null
           explicacao_sem_publicacao?: string | null
           id?: string
           link_da_publicacao?: string | null
@@ -499,6 +562,7 @@ export type Database = {
           contexto?: string | null
           criado_em?: string
           data_da_modelagem_piloto?: string | null
+          data_da_validacao?: string | null
           explicacao_sem_publicacao?: string | null
           id?: string
           link_da_publicacao?: string | null
@@ -841,6 +905,7 @@ export type Database = {
           contexto: string | null
           criado_em: string | null
           data_da_modelagem_piloto: string | null
+          data_da_validacao: string | null
           entrou_na_etapa_em: string | null
           etapa_atual_codigo: string | null
           etapa_atual_id: string | null
@@ -1023,6 +1088,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      registrar_data_da_validacao: {
+        Args: { p_data: string; p_processo: string }
+        Returns: undefined
+      }
+      registrar_pdf_da_aprovacao: {
+        Args: { p_arquivo: Json; p_processo: string }
+        Returns: string
+      }
       registrar_publicacao: {
         Args: { p_data: string; p_link?: string; p_processo: string }
         Returns: undefined
@@ -1056,6 +1129,10 @@ export type Database = {
       }
       substituir_arquivo: {
         Args: { p_arquivo: string; p_novo: Json }
+        Returns: string
+      }
+      substituir_pdf_da_aprovacao: {
+        Args: { p_novo: Json; p_pdf: string }
         Returns: string
       }
       suspender_processo: {
