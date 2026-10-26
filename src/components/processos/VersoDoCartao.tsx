@@ -11,6 +11,7 @@ import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { ItemInexistente } from '../cadastros/ItemInexistente'
+import { SecaoDeAnexos } from '../anexos/SecaoDeAnexos'
 import { SecaoDeVersoes } from '../versoes/SecaoDeVersoes'
 import { AcoesDoProcesso } from './AcoesDoProcesso'
 import { BlocoDasAnotacoes } from './BlocoDasAnotacoes'
@@ -213,6 +214,7 @@ function ColunasDoVerso(props: CorpoProps) {
         <CaminhoDoProcesso processo={processo} processos={processos} versoes={versoes} revisoes={revisoes} registros={registros} podeAlterar={podeAlterar} usuarioId={usuarioId}
           executar={executar} aoSumir={aoSumir} aoMudar={aposMudar} />
         <SecaoDeVersoes key={versaoAprovada} versoes={versoes} processo={processo} podeAlterar={alteravel} aoAlterarVersoes={aposMudar} />
+        <SecaoDeAnexos versoes={versoes} processo={processo} podeAlterar={alteravel} />
       </div>
       <div className="verso-contexto">
         <BlocoDasAnotacoes key={processo.id} processo={processo} processos={processos} podeEscrever={alteravel}

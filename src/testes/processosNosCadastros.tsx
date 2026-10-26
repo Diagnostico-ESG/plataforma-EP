@@ -53,6 +53,8 @@ function falsoDeVersoes(processos: ProcessosFalso): VersoesFalso {
   versoes.aoRegistrar = (processoId, evento) => {
     processos.historicoDosProcessos[processoId] = [evento, ...(processos.historicoDosProcessos[processoId] ?? [])]
   }
+  // O anexo guarda a etapa em que o processo está no momento do envio (o banco a lê da view), não a de quando a tela abriu.
+  versoes.anexos.etapaAtual = (processoId) => processos.processos.find((processo) => processo.id === processoId)?.etapaAtual?.nome ?? null
   return versoes
 }
 
