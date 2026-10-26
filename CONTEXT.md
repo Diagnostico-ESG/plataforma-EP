@@ -184,6 +184,14 @@ _Avoid_: bloqueio, pré-requisito, obrigatoriedade da etapa
 Trocar um arquivo de uma versão, de um relatório ou da aprovação por outro do mesmo tipo. O arquivo anterior não fica guardado; o histórico registra a troca. A versão histórica e a versão aprovada, com o relatório que a acompanha, não têm arquivo substituído.
 _Avoid_: corrigir versão, reenviar, atualizar arquivo
 
+**Anexo**:
+Arquivo avulso de um processo (.pdf, .docx, .xlsx, .png, .jpg, .jpeg ou .eml), fora da numeração de versões e sem trava, guardado com o nome original e marcado com a etapa em que o processo estava no envio, que não muda depois. Envia-se em qualquer etapa com o processo em andamento; aparece numa lista única em todas as etapas. Cada subprocesso tem os seus. Não se substitui: retira-se e envia-se de novo.
+_Avoid_: outro documento, arquivo extra, documento de apoio
+
+**Retirar anexo**:
+Tirar um anexo do processo, com confirmação e sem motivo, por Administrador ou Integrante do EP, com o processo em andamento. O arquivo vai para a lixeira do Drive e some de vez em 30 dias; o histórico guarda o nome, quem retirou e quando. Só o anexo se retira: versão, relatório e .pdf da aprovação nunca saem.
+_Avoid_: excluir, apagar, remover (para o anexo)
+
 ## Revisões e aprovação
 
 **Assumir**:
