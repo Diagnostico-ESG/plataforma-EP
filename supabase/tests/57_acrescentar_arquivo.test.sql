@@ -70,8 +70,12 @@ select public.registrar_aprovacao(pg_temp.processo('e3'), null, null, null);
 select public.suspender_processo(pg_temp.processo('e4'), 'Aguardando o setor');
 select public.mover_processo(pg_temp.processo('e5'), pg_temp.etapa('publicacao'));
 
--- Administrador.
+-- Os arquivos entram numa chamada posterior à da versão (o banco reconhece "a mesma chamada" por enviada_em = now(), e o
+-- pgTAP roda tudo numa transação só): recua enviada_em como superusuário, como o 28 faz.
 reset role;
+update public.versoes set enviada_em = now() - interval '1 day';
+
+-- Administrador.
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
 set local role authenticated;
 insert into _tap (linha) select lives_ok(
