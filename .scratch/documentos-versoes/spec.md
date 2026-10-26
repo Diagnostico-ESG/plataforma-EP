@@ -2,11 +2,179 @@
 
 Status: ready-for-agent
 
-**Como resolve o problema (desde 2026-10-26, Arquivos por etapa).** Com o quadro livre, o processo anda pelas etapas sem trava, mas cada etapa tem um produto: o .bpm do piloto na Modelagem piloto, o .bpm técnico e o relatório na Relatório e modelagem técnica. O verso passa a mostrar só o envio que cabe na etapa atual: versão histórica (V5F) em Não iniciados, **versão piloto** (V6P, número digitado) na Modelagem piloto, **versão em sequência** (V7, número dado pela plataforma) e **relatório** com numeração própria (Relatório V2) na técnica e na Revisão interna. Toda versão que não é histórica exige só o .bpm; o .png e o .bpmn entram junto ou depois. O relatório vale para as versões seguintes até sair outro, e somem "relatório pendente" e "sem alteração de conteúdo". A **trava de arquivos** recusa passar da Modelagem piloto sem versão piloto e da técnica sem versão em sequência e relatório, e a janela da trava oferece o envio ali mesmo. A seção "Arquivos por etapa", logo abaixo, vale sobre o resto desta spec no que divergir.
+**Como resolve o problema (desde 2026-10-26, Outros anexos).** Além das versões e dos relatórios, cada processo junta arquivos avulsos: o e-mail com a resposta do setor, a planilha que o setor mandou, a foto do quadro da reunião, um .pdf de apoio. Hoje eles ficam fora da plataforma, sem ligação com o processo. O verso ganha a seção **Outros anexos**, em todas as etapas: Administrador e Integrante enviam .pdf, .docx, .xlsx, .png, .jpg, .jpeg ou .eml de até 20 MB, com o nome original, e cada **anexo** fica marcado com a etapa em que o processo estava. Todo perfil vê e baixa. O anexo não tem número nem trava, e não se substitui: o enviado por engano se **retira**, vai para a lixeira do Drive e some de vez em 30 dias (ADR 0027). O histórico guarda envios e retiradas. A seção "Outros anexos", logo abaixo, descreve a mudança.
+
+**Como resolvia antes (Arquivos por etapa, 2026-10-26).** Com o quadro livre, o processo anda pelas etapas sem trava, mas cada etapa tem um produto: o .bpm do piloto na Modelagem piloto, o .bpm técnico e o relatório na Relatório e modelagem técnica. O verso passa a mostrar só o envio que cabe na etapa atual: versão histórica (V5F) em Não iniciados, **versão piloto** (V6P, número digitado) na Modelagem piloto, **versão em sequência** (V7, número dado pela plataforma) e **relatório** com numeração própria (Relatório V2) na técnica e na Revisão interna. Toda versão que não é histórica exige só o .bpm; o .png e o .bpmn entram junto ou depois. O relatório vale para as versões seguintes até sair outro, e somem "relatório pendente" e "sem alteração de conteúdo". A **trava de arquivos** recusa passar da Modelagem piloto sem versão piloto e da técnica sem versão em sequência e relatório, e a janela da trava oferece o envio ali mesmo. A seção "Arquivos por etapa", logo abaixo, vale sobre o resto desta spec no que divergir.
 
 **Como resolvia antes de 2026-10-26.** Hoje os fluxogramas (.bpmn, .png e o .bpm do Bizagi) e os relatórios de cada processo ficam em pastas e e-mails, sem numeração confiável, sem saber quem enviou o quê e quando, e sem ligação com o andamento do processo. Com esta funcionalidade, o painel do processo ganha a seção **Versões**: a equipe envia cada versão (V1, V2…) com o .bpm do Bizagi e o .png, o .bpmn opcional e o relatório, junto ou depois (ADR 0016: o fluxo se vê pelo .png); registra as versões históricas da primeira etapa do trabalho (V5F); acrescenta o relatório que ficou pendente ou marca "sem alteração de conteúdo"; substitui um arquivo enviado por engano; e baixa qualquer arquivo com o nome padrão (`CEE_V6_Nome do processo`). Os arquivos ficam no Drive compartilhado do CED, numa pasta aberta à equipe e organizada por setor e processo; a plataforma entra no Drive por uma conta de serviço do EP, cuja chave fica só numa função do servidor, e o banco guarda apenas os dados de cada arquivo. A plataforma avisa quando um arquivo foi alterado ou apagado direto no Drive. O banco impõe as regras (numeração, versão histórica só antes da primeira nova, processo em andamento, quem pode) e toda mudança entra no histórico do processo.
 
 Decisões de origem: sabatina de 2026-10-15 (`.scratch/documentos-versoes/sabatina.md`), `CONTEXT.md` (seção "Documentos") e ADRs 0005 (versão do processo com os arquivos dentro), 0006 (envio não muda a etapa), 0007 (arquivo se substitui sem guardar o anterior) e 0008 (arquivos no Drive compartilhado por conta de serviço). Mudança de 2026-10-20 (sabatina do visualizador, que saiu da v1): ADR 0016 (versão exige .bpm e .png; .bpmn opcional); ver a seção "Mudança de 2026-10-20".
+
+## Outros anexos (mudança de 2026-10-26)
+
+Parte 4 da iniciativa quadro-livre. Decisões de origem: `.scratch/quadro-livre/sabatina-parte-4.md` (itens 1 a 14), o mapa (`.scratch/quadro-livre/mapa.md`, Q17) e o ADR 0027 (o anexo se retira e vai para a lixeira do Drive). Continuam valendo os ADRs 0008 (Drive compartilhado por conta de serviço) e 0022 (andamento livre). Termos no `CONTEXT.md`: **Anexo** e **Retirar anexo**. Nada da seção "Arquivos por etapa" muda: versões e relatórios seguem como estão, e o anexo nunca entra na versão.
+
+### Solução
+
+- **Seção "Outros anexos" no verso**, na coluna esquerda, abaixo das versões, em todas as etapas e para todos os perfis: lista única, do mais recente ao mais antigo; cada linha com o nome original, a etapa do envio, quem enviou, a data e [Baixar]; para Administrador e Integrante, com o processo em andamento, [Retirar] em cada linha e [Enviar anexo] no topo da seção.
+- **Enviar anexo:** formulário que abre e fecha pelo mesmo botão e rola até aparecer inteiro (o padrão da parte 3), com um campo de arquivo (um arquivo por envio) e [Enviar]. Aceita .pdf, .docx, .xlsx, .png, .jpg, .jpeg e .eml, até 20 MB; o aviso de extensão errada ou tamanho maior vem antes do envio. Sem descrição. O anexo guarda a etapa atual do processo no envio, que não muda depois.
+- **Retirar:** confirmação "Retirar 'resposta.eml'? O arquivo vai para a lixeira do Drive e some em 30 dias.", sem motivo. O anexo sai da lista; o arquivo vai para a lixeira do Drive.
+- **Drive:** subpasta "Anexos" dentro da pasta do processo, criada no primeiro anexo; o arquivo fica com o nome original. A subpasta acompanha a pasta do processo quando ela é renomeada ou movida.
+- **Conferência com o Drive:** os anexos entram na conferência que já existe (arquivo sumido, alterado ou fora da subpasta), com as mesmas marcas da lista de versões.
+- **Histórico do processo:** "Enviou o anexo 'resposta.eml' (Modelagem piloto)" e "Retirou o anexo 'resposta.eml'".
+
+A Consulta vê a seção e baixa, sem botões. Processo suspenso, cancelado, concluído ou arquivado: só ler e baixar (por isso, em Concluídos não entra anexo; diverge do "em todas as etapas" do mapa, por decisão do usuário, sabatina item 7). O subprocesso tem os próprios anexos, na subpasta "Anexos" da pasta dele; o pai não mostra os dos filhos. Os anexos ficam fora das planilhas dos dashboards.
+
+### Histórias de usuário
+
+#### Enviar
+
+112. Como integrante do EP, quero anexar ao processo o e-mail, a planilha, a imagem ou o documento que recebi, para que fiquem junto do processo e não em pastas soltas.
+113. Como integrante do EP, quero enviar anexo em qualquer etapa, de Não iniciados à Publicação, com o processo em andamento.
+114. Como integrante do EP, quero que o anexo guarde a etapa em que o processo estava no envio, e que ela não mude quando o processo se move.
+115. Como integrante do EP, quero que o anexo fique com o nome original, para reconhecê-lo como veio.
+116. Como integrante do EP, quero ser avisado antes do envio se o arquivo tem extensão fora da lista (.pdf, .docx, .xlsx, .png, .jpg, .jpeg, .eml) ou passa de 20 MB, com a frase dizendo o recebido e o esperado.
+117. Como integrante do EP, quero que o formulário abra e feche pelo mesmo botão e role até aparecer inteiro.
+118. Como integrante do EP, quero ver o progresso do envio e, se falhar, a mensagem sem perder o arquivo escolhido.
+119. Como integrante do EP, quero poder enviar dois anexos com o mesmo nome, porque e-mails costumam ter nomes iguais.
+120. Como integrante do EP, quero que enviar um anexo não mova o processo, não mude a etiqueta nem o responsável.
+
+#### Ver e baixar
+
+121. Como usuário (inclusive Consulta), quero ver todos os anexos do processo numa lista só, em todas as etapas, do mais recente ao mais antigo, com a etapa, quem enviou e a data.
+122. Como usuário (inclusive Consulta), quero baixar qualquer anexo com o nome original, sem precisar ser membro do Drive.
+123. Como usuário, quero ver "Nenhum anexo." quando o processo não tem anexos.
+124. Como usuário, quero ver o anexo sumido, alterado ou fora da pasta no Drive marcado na conferência, como as versões.
+
+#### Retirar
+
+125. Como integrante do EP, quero retirar um anexo enviado por engano, com uma confirmação, para que ele saia da lista.
+126. Como integrante do EP, quero que qualquer Administrador ou Integrante possa retirar, não só quem enviou.
+127. Como integrante do EP, quero que o arquivo retirado vá para a lixeira do Drive, para ainda dar para recuperá-lo direto no Drive por 30 dias, e depois sumir.
+128. Como integrante do EP, quero que, se a retirada falhar, o anexo continue na lista e eu veja a mensagem.
+129. Como integrante do EP, quero que versão, relatório e .pdf da aprovação continuem sem retirada.
+
+#### Perfis, situação, histórico, subprocesso
+
+130. Como Consulta, quero ver e baixar os anexos, sem [Enviar anexo] nem [Retirar].
+131. Como integrante do EP, quero que o processo suspenso, cancelado, concluído ou arquivado não tenha envio nem retirada de anexo, e que a plataforma recuse mesmo fora da tela.
+132. Como usuário, quero ver no histórico do processo cada anexo enviado (com a etapa) e cada anexo retirado, com quem e quando.
+133. Como integrante do EP, quero que o subprocesso tenha os próprios anexos, na própria pasta, e que o pai não mostre os dos filhos.
+134. Como administrador, quero que o banco e a função do servidor recusem envio e retirada de quem não pode, mesmo fora da tela.
+
+### Decisões de implementação
+
+#### Interface
+
+- **Componente da seção de anexos** no verso, abaixo da seção de versões, com o formulário de envio (campo de arquivo nativo com `accept` dos sete formatos) e a confirmação da retirada na moldura de confirmação que já existe.
+- **Módulo de anexos** próprio (listar, enviar, baixar, retirar), com a tradução das recusas em frases e uma falsa nomeada que imita as recusas do banco e da função. Baixar e conferir reaproveitam o caminho das versões.
+- **Estados da seção:** carregando (junto com o verso), "Nenhum anexo.", erro com [Tentar de novo] (inclui falha de conexão), conferência que falhou, "Enviando…" com o progresso, falha do envio em vermelho sem perder o arquivo escolhido, falha da retirada em vermelho com o anexo ainda na lista.
+- **Recusas, com a frase:**
+  - formato fora da lista: "O anexo precisa ser .pdf, .docx, .xlsx, .png, .jpg, .jpeg ou .eml; recebido: {extensão}.";
+  - tamanho: "O anexo pode ter até 20 MB; recebido: {tamanho}.";
+  - processo fora de andamento ou arquivado;
+  - perfil sem permissão;
+  - anexo já retirado (retirada repetida, por exemplo em duas abas).
+
+#### Função do servidor (`arquivos-no-drive`)
+
+- Novo papel `anexo` em `iniciar_envio`, `registrar`, `baixar` e `conferir`, e uma ação nova `retirar`.
+- **Nome:** o original, sem o nome padrão (só o limite de 300 caracteres e a troca dos caracteres que o Drive não aceita, pela regra de caracteres que já existe); a conferência do registro não exige o rótulo da versão no nome, só que o arquivo esteja na subpasta "Anexos" do processo e tenha ao menos 1 byte.
+- **Subpasta:** criada no primeiro envio dentro da pasta do processo, e o identificador dela guardado no banco, como o da pasta do processo.
+- **Retirar:** confere quem pede (Administrador ou Integrante ativo) e a situação do processo, manda o arquivo para a lixeira do Drive pelo `drive_id` guardado (conferindo antes que ele está debaixo da raiz do ambiente, como nas demais ações) e então apaga o registro no banco com o token de quem pediu. Se o banco falhar, a função tira o arquivo da lixeira e devolve a recusa.
+- O arquivo puro de decisão ganha o papel e a ação, com a tabela de perfis de sempre: Administrador e Integrante enviam e retiram; Consulta só baixa e confere; inativo e sem login, nada.
+- **Precisa ser publicada de novo no desenvolvimento** (passo do usuário).
+
+#### Modelo de dados
+
+**Tabela nova `anexos`:**
+
+| Coluna | Tipo | Obrigatória | Observação |
+|---|---|---|---|
+| `id` | uuid | sim | |
+| `processo_id` | uuid | sim | o processo ou subprocesso dono |
+| `etapa_id` | uuid | sim | a etapa atual do processo no envio, preenchida pelo banco |
+| `nome` | text | sim | nome original, até 300 caracteres |
+| `formato` | text | sim | pdf, docx, xlsx, png, jpg, jpeg ou eml |
+| `tamanho` | bigint | sim | em bytes, de 1 a 20 MB |
+| `hash_md5` | text | sim | para a conferência com o Drive |
+| `drive_id` | text | sim | |
+| `enviado_por` | uuid | sim | preenchido pelo banco |
+| `enviado_em` | timestamptz | sim | preenchido pelo banco |
+
+**Tabela `processos`, alterada:** coluna nova `drive_pasta_dos_anexos` (text, opcional), o identificador da subpasta "Anexos", preenchida no primeiro envio.
+
+**Quem pode o quê** (RLS):
+
+| Tabela e ação | Administrador | Integrante do EP | Consulta | Inativo | Visitante sem login |
+|---|---|---|---|---|---|
+| `anexos` ler | sim | sim | sim | não | não |
+| `anexos` criar (processo em andamento, não arquivado) | sim | sim | não | não | não |
+| `anexos` alterar | não | não | não | não | não |
+| `anexos` apagar (retirar; processo em andamento, não arquivado) | sim | sim | não | não | não |
+
+**Dado pessoal:** o nome do arquivo e o conteúdo do .eml podem ter nome, e-mail e conversa de pessoas reais; todo perfil ativo vê e baixa (sabatina item 8; validação de LGPD pelo jurídico segue no backlog). O conteúdo fica só no Drive, nunca no banco.
+
+**Arquivos (no Drive, sem Storage):** .pdf, .docx, .xlsx, .png, .jpg, .jpeg e .eml; até 20 MB; Administrador e Integrante enviam e retiram; todo perfil ativo vê e baixa; sem substituição; a retirada manda o arquivo à lixeira do Drive (apagado de vez em 30 dias, ADR 0027). Nenhum bucket.
+
+**Regras que o banco impõe:**
+
+| Regra | Como | Caso de teste que a prova |
+|---|---|---|
+| Só Administrador e Integrante ativos enviam e retiram; todo perfil ativo lê | políticas de RLS e privilégios | Consulta lê e não inclui nem apaga; inativo e visitante não leem |
+| Envio e retirada só com o processo em andamento e não arquivado | gatilho antes de incluir e de apagar | suspenso, cancelado, concluído e arquivado recusados nas duas ações |
+| Formato da lista, tamanho de 1 byte a 20 MB, nome até 300 caracteres | restrições | .exe recusado; 20 MB + 1 byte recusado; 0 byte recusado |
+| Etapa, autor e data preenchidos pelo banco | gatilho antes de incluir | etapa enviada pela tela ignorada; anexo guarda a etapa atual |
+| Anexo não se altera | sem privilégio de alteração | alteração do nome recusada |
+| Processo com anexo não se exclui | ligação com recusa na exclusão | excluir processo com um anexo recusado; depois de retirado, aceito |
+| Envio e retirada viram evento no histórico, com o nome e a etapa | gatilhos depois de incluir e de apagar | um evento por envio e por retirada, com o nome guardado mesmo depois de apagada a linha |
+
+**Regras de estado:** o anexo não tem situação; mover o processo não mexe nos anexos; a etapa do anexo nunca muda. O processo com anexo não se exclui, como o processo com versão (a ligação recusa a exclusão, e a recusa diz quantos anexos há); a etapa do catálogo com anexo também não, o que já vale porque um processo passou por ela.
+
+**Migração:** só cria (tabela, coluna, políticas, gatilhos, eventos), nada destrutivo. Teste pgTAP antes; vai pelo workflow "Migrar banco de desenvolvimento".
+
+### Decisões de teste
+
+- **Bom teste** confere o que a pessoa vê e consegue fazer, ou o que a função e o banco aceitam e recusam, nunca detalhes internos.
+- **Interface (ponto de teste principal: a tela inteira).** Vitest com Testing Library, renderizando o aplicativo inteiro com as falsas nomeadas, como nos `App.*` de hoje (arte anterior: `App.pdfDaAprovacao`, `App.enviarVersao`, `App.baixarArquivo`, `App.conferenciaNoDrive`, `App.versoesNoHistorico`). O que cobre: a seção em várias etapas (Não iniciados, Modelagem piloto, Validação com o setor, Concluídos); enviar com sucesso e a linha nova com a etapa; o anexo mantendo a etapa depois de mover; extensão e tamanho recusados antes do envio; falha do envio sem perder o arquivo; dois anexos com o mesmo nome; baixar; retirar com a confirmação, cancelar a confirmação, falha da retirada; Consulta sem botões; suspenso, concluído e arquivado sem botões; subprocesso com os próprios anexos; os eventos no histórico; a marca da conferência.
+- **Funções puras:** formato e tamanho aceitos, texto dos eventos, ordem da lista. Arte anterior: `formularioDeVersao`, `eventosDaValidacaoEDoPdf`.
+- **Função do servidor:** o arquivo puro de decisão, no Vitest, com o papel `anexo` e a ação `retirar` por perfil e situação, e a regra do nome original. A ponta a ponta (lixeira e volta da lixeira) se confere publicando no desenvolvimento. Arte anterior: `decisao.test`.
+- **Tradução entre o servidor e a tela:** o módulo real com o cliente e o `fetch` simulados, para enviar, retirar e as frases das recusas. Arte anterior: `versoesSupabase.pdf.test`.
+- **Banco:** pgTAP, um teste novo cobrindo cada linha da tabela de regras e cada célula de "quem pode o quê", no Docker local e pelo "Testes de banco" na conferência final; `10_privilegios_padrao` e `46_funcoes_e_views_seguras` continuam passando.
+- Todos os processos, setores, usuários, nomes e conteúdos de arquivo dos testes são inventados, inclusive os .eml.
+
+### Fora do escopo desta parte
+
+- Substituir anexo; descrição do anexo; enviar vários arquivos de uma vez.
+- Restringir o .eml a alguns perfis (fica para a validação de LGPD, no backlog).
+- Ver o conteúdo do anexo na plataforma (abre-se o arquivo baixado).
+- Anexo em processo concluído ou arquivado.
+- Anexos nas planilhas dos dashboards e na exportação em CSV (que está no backlog).
+- Recuperar da lixeira pela plataforma (só direto no Drive).
+
+### Decisões tomadas ao escrever esta seção, a confirmar na leitura
+
+1. **A retirada apaga a linha do banco**, e o histórico guarda o nome e a etapa no evento; não há marca de "retirado" na tabela.
+2. **A ordem da retirada é Drive primeiro, banco depois**, com volta da lixeira se o banco falhar, para nunca ficar um registro apontando para um arquivo na lixeira sem aviso nem um arquivo com dado pessoal fora da lixeira sem registro.
+3. **O identificador da subpasta "Anexos" fica guardado no processo**, como o da pasta do processo, para ela ser achada depois de renomeada.
+4. **Um arquivo por envio**, para manter o formulário e o progresso iguais aos das versões.
+5. **A seção fica abaixo das versões, na coluna esquerda do verso.**
+6. **A conta de serviço precisa poder mandar arquivos à lixeira** no Drive compartilhado (papel de "Gerente de conteúdo" ou acima); se o papel atual não permitir, o ticket diz o passo ao usuário.
+
+### Divergência com `.scratch/especificacao.md`
+
+- A especificação previa o .eml como anexo dos registros de envio e resposta ao setor (seção 4, e-mails do setor). Esses registros saíram (ADR 0012), e o .eml entra agora como anexo do processo, marcado com a etapa.
+- A especificação não prevê retirar arquivo. O anexo se retira (ADR 0027); versões e relatórios continuam sem.
+
+### Critérios conferidos olhando a tela
+
+- `[visual]` A seção "Outros anexos" fica abaixo das versões, com as linhas no padrão da lista de versões (nome, etapa, autor, data em mono), e o nome longo se corta sem quebrar a linha.
+- `[visual]` O formulário de envio aberto rola até aparecer inteiro e fecha pelo mesmo botão.
+- `[visual]` A confirmação da retirada mostra o nome do arquivo e a frase da lixeira sem passar da altura do notebook (1366×768).
+
+### Outras specs afetadas
+
+- Nenhuma. O histórico do processo (spec de `processos-etapas`) só ganha os dois textos de evento, descritos aqui.
 
 ## Arquivos por etapa (mudança de 2026-10-26)
 
@@ -716,3 +884,5 @@ Entregue em 2026-10-19 (commit 8ef4091), com ressalva: as provas no Drive real (
 Implementado em 2026-10-20 (commit 95f2881)
 Entregue em 2026-10-20 (commit 02c0aa7), com ressalva: os dois critérios [visual] da mudança do .bpm (ordem dos campos do formulário e ordem dos arquivos no destaque) presumidos, a tela foi vista só na vitrine local, com módulos falsos; as provas no Drive real da entrega anterior seguem pendentes
 Entregue em 2026-10-26 (commit d971dfc), com ressalva: critérios [visual] presumidos (a tela nunca foi vista com o login real: verso e janela da trava, linha do relatório, campo da data da validação, .pdf na gaveta e janela "Registrar aprovação" em 1366×768); função arquivos-no-drive ainda não publicada no desenvolvimento, com a camada Deno sem teste automático, e provas no Drive real pendentes; revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
+
+Em revisão desde 2026-10-26
