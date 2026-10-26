@@ -103,7 +103,6 @@ export type Database = {
       }
       arquivos_da_versao: {
         Row: {
-          copiado_de: string | null
           drive_id: string
           enviado_em: string
           enviado_por: string
@@ -111,12 +110,12 @@ export type Database = {
           hash_md5: string
           id: string
           nome: string
+          numero_do_relatorio: number | null
           papel: Database["public"]["Enums"]["papel_do_arquivo"]
           tamanho: number
           versao_id: string
         }
         Insert: {
-          copiado_de?: string | null
           drive_id: string
           enviado_em?: string
           enviado_por: string
@@ -124,12 +123,12 @@ export type Database = {
           hash_md5: string
           id?: string
           nome: string
+          numero_do_relatorio?: number | null
           papel: Database["public"]["Enums"]["papel_do_arquivo"]
           tamanho: number
           versao_id: string
         }
         Update: {
-          copiado_de?: string | null
           drive_id?: string
           enviado_em?: string
           enviado_por?: string
@@ -137,18 +136,12 @@ export type Database = {
           hash_md5?: string
           id?: string
           nome?: string
+          numero_do_relatorio?: number | null
           papel?: Database["public"]["Enums"]["papel_do_arquivo"]
           tamanho?: number
           versao_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "arquivos_da_versao_copiado_de_fkey"
-            columns: ["copiado_de"]
-            isOneToOne: false
-            referencedRelation: "arquivos_da_versao"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "arquivos_da_versao_enviado_por_fkey"
             columns: ["enviado_por"]
@@ -964,16 +957,21 @@ export type Database = {
         }
         Returns: string
       }
-      acrescentar_relatorio: {
-        Args: { p_arquivo: Json; p_numero: number; p_versao: string }
-        Returns: string
-      }
       arquivar_processo: { Args: { p_processo: string }; Returns: undefined }
       cancelar_processo: {
         Args: { p_motivo: string; p_processo: string }
         Returns: undefined
       }
       desarquivar_processo: { Args: { p_processo: string }; Returns: undefined }
+      enviar_relatorio: {
+        Args: {
+          p_arquivo: Json
+          p_numero_da_versao: number
+          p_numero_do_relatorio: number
+          p_processo: string
+        }
+        Returns: string
+      }
       gravar_anotacoes_do_processo: {
         Args: { p_esperado: string; p_novo: string; p_processo: string }
         Returns: {
@@ -1002,14 +1000,6 @@ export type Database = {
           p_processo: string
         }
         Returns: undefined
-      }
-      origem_do_relatorio: {
-        Args: { p_versao: string }
-        Returns: {
-          arquivo_id: string
-          drive_id: string
-          formato: string
-        }[]
       }
       pedir_atualizacao_das_planilhas: { Args: never; Returns: string }
       reclassificar_processo: {
@@ -1043,14 +1033,11 @@ export type Database = {
         }
         Returns: undefined
       }
-      registrar_sem_alteracao: {
-        Args: { p_arquivo: Json; p_versao: string }
-        Returns: string
-      }
       registrar_versao: {
         Args: {
           p_arquivos: Json
           p_numero: number
+          p_numero_do_relatorio?: number
           p_piloto?: boolean
           p_processo: string
         }
