@@ -1,20 +1,62 @@
 import { expect, test } from 'vitest'
 import {
-  PAPEIS, ROTULO_DO_PAPEL, emOrdemDeExibicao, formatarDiaEMes, haVersaoNova, ordenarVersoes, origemDoRelatorio, podeCopiarRelatorio, proximoNumero, relatorioPendente, rotuloCurtoDoArquivo, rotuloDaAnterior, rotuloDaVersao,
-  versoesComRelatorioPendente,
+  PAPEIS, ROTULO_DO_PAPEL, emOrdemDeExibicao, envioDaEtapa, formatarDiaEMes, haVersaoEmSequencia, haVersaoNova, ordenarVersoes,
+  origemDoRelatorio, papeisQueSePodeAcrescentar, podeCopiarRelatorio, proximoNumero, relatorioPendente, rotuloCurtoDoArquivo,
+  rotuloDaAnterior, rotuloDaVersao, versoesComRelatorioPendente,
 } from './rotulos'
 import type { ArquivoDaVersao, Versao } from './tipos'
 
-function versao(numero: number, historica = false): Versao {
+function versao(numero: number, historica = false, piloto = false): Versao {
   return {
-    id: `v${numero}`, numero, historica, enviadaEm: '2026-10-15T12:00:00Z', autor: 'Ana Teste', etapa: null,
-    observacao: null, arquivos: [],
+    id: `v${numero}`, numero, historica, piloto, enviadaEm: '2026-10-15T12:00:00Z', autor: 'Ana Teste', etapa: null,
+    arquivos: [],
   }
 }
 
-test('o rótulo é V e o número, com F na versão histórica', () => {
+test('o rótulo é V e o número, com F na versão histórica e P na piloto', () => {
   expect(rotuloDaVersao(versao(7))).toBe('V7')
   expect(rotuloDaVersao(versao(5, true))).toBe('V5F')
+  expect(rotuloDaVersao(versao(6, false, true))).toBe('V6P')
+})
+
+test('há versão em sequência quando alguma não é histórica nem piloto', () => {
+  expect(haVersaoEmSequencia([])).toBe(false)
+  expect(haVersaoEmSequencia([versao(5, true), versao(6, false, true)])).toBe(false)
+  expect(haVersaoEmSequencia([versao(6, false, true), versao(7)])).toBe(true)
+})
+
+test('o número mínimo da piloto é o mesmo da próxima versão: a maior + 1, de qualquer tipo', () => {
+  expect(proximoNumero([versao(5, true), versao(6, false, true)])).toBe(7)
+})
+
+test.each([
+  ['nao_iniciados', [], 'historica'],
+  ['nao_iniciados', [versao(5, true)], 'historica'],
+  ['nao_iniciados', [versao(6, false, true)], null],
+  ['nao_iniciados', [versao(7)], null],
+  ['modelagem', [], 'piloto'],
+  ['modelagem', [versao(6, false, true)], 'piloto'],
+  ['modelagem', [versao(7)], null],
+  ['relatorio_modelagem_tecnica', [], 'sequencia'],
+  ['revisao_interna', [versao(7)], 'sequencia'],
+  ['revisao_setor', [], null],
+  ['aprovacao_setor', [], null],
+  ['publicacao', [], null],
+  ['concluidos', [], null],
+  ['etapa_nova_do_catalogo', [], null],
+])('o envio da etapa %s com as versões %j é %s', (etapa, versoes, esperado) => {
+  expect(envioDaEtapa(etapa, versoes as Versao[])).toBe(esperado)
+})
+
+test('acrescentar .png e .bpmn só cabe na versão piloto ou em sequência, fora da aprovada, e só o que falta', () => {
+  const arquivo = (papel: 'bpm' | 'png' | 'bpmn') => ({ id: `a-${papel}`, papel, nome: papel, formato: papel, tamanho: 1 })
+  const comBpm = { ...versao(7), arquivos: [arquivo('bpm')] }
+  expect(papeisQueSePodeAcrescentar(comBpm)).toEqual(['png', 'bpmn'])
+  expect(papeisQueSePodeAcrescentar({ ...comBpm, arquivos: [arquivo('bpm'), arquivo('png')] })).toEqual(['bpmn'])
+  expect(papeisQueSePodeAcrescentar({ ...comBpm, arquivos: [arquivo('bpm'), arquivo('png'), arquivo('bpmn')] })).toEqual([])
+  expect(papeisQueSePodeAcrescentar({ ...versao(6, false, true), arquivos: [arquivo('bpm')] })).toEqual(['png', 'bpmn'])
+  expect(papeisQueSePodeAcrescentar({ ...comBpm, aprovada: true })).toEqual([])
+  expect(papeisQueSePodeAcrescentar({ ...versao(5, true), arquivos: [arquivo('bpm')] })).toEqual([])
 })
 
 test('a próxima versão é a maior + 1, contando as históricas; sem versão, é a V1', () => {

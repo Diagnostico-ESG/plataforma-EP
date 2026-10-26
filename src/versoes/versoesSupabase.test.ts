@@ -1,57 +1,21 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
 import { expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { ClienteSupabaseFalso } from '../testes/ClienteSupabaseFalso'
-import type { Database } from '../types/database'
 import type { PedidoDeRelatorio, PedidoDeVersao } from './tipos'
-import { criarVersoesSupabase, type EnviarBytes } from './versoesSupabase'
+import { EnvioAoDriveFalso, LINHA, comSessoes, criar, recusa } from '../testes/versoesSupabaseDeTeste'
 
-const LINHA = {
-  id: 'v3', numero: 3, historica: false, enviada_em: '2026-10-15T13:00:00+00:00', observacao: 'Corrigido',
-  autor: { nome: 'Ana Teste' }, etapa: { nome: 'Reunião de modelagem' },
-  arquivos_da_versao: [
-    { id: 'a1', papel: 'bpmn', nome: 'TSA_V3_Emitir Ofício.bpmn', formato: 'bpmn', tamanho: 10 },
-    { id: 'a2', papel: 'png', nome: 'TSA_V3_Emitir Ofício.png', formato: 'png', tamanho: 20 },
-    { id: 'a3', papel: 'bpm', nome: 'TSA_V3_Emitir Ofício.bpm', formato: 'bpm', tamanho: 30 },
-  ],
-}
-
-/** Envio ao Google simulado: guarda os endereços e devolve o id do arquivo, ou falha no endereço pedido. */
-class EnvioAoDriveFalso {
-  enderecos: string[] = []
-  falharEm: string | null = null
-  enviar: EnviarBytes = (endereco) => {
-    this.enderecos.push(endereco)
-    if (endereco === this.falharEm) return Promise.resolve(new Response('erro', { status: 503 }))
-    return Promise.resolve(new Response(JSON.stringify({ id: `id-${endereco}` }), { status: 200 }))
-  }
-}
-
-function criar(cliente: ClienteSupabaseFalso, envio = new EnvioAoDriveFalso()) {
-  return criarVersoesSupabase(cliente as unknown as SupabaseClient<Database>, envio.enviar)
-}
 
 const PEDIDO: PedidoDeVersao = {
-  processoId: 'p1', numero: 3, observacao: 'Corrigido',
+  processoId: 'p1', numero: 3,
   arquivos: [{ papel: 'bpmn', arquivo: new File(['<x/>'], 'fluxo.bpmn') }, { papel: 'png', arquivo: new File(['png'], 'fluxo.png') }],
-}
-
-function comSessoes(cliente: ClienteSupabaseFalso) {
-  // Cada iniciar_envio devolve o mesmo endereço no falso; a ordem das chamadas mostra a sequência.
-  cliente.respostasDaFuncao['funcao.iniciar_envio'] = { data: { upload_url: 'sessao', nome: 'x' }, error: null }
-  cliente.respostasDaFuncao['funcao.registrar'] = { data: { versao_id: 'v3' }, error: null }
-}
-
-function recusa(codigo: string, mensagem = '', status = 409) {
-  return { data: null, error: { message: 'Edge Function returned a non-2xx status code', context: new Response(JSON.stringify({ codigo, mensagem }), { status }) } }
 }
 
 test('lista as versões do processo com autor, etapa e os arquivos na ordem de exibição (.png, .bpm, relatório, .bpmn)', async () => {
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas['versoes.select'] = { data: [LINHA], error: null }
   expect(await criar(cliente).listarVersoes('p1')).toEqual([{
-    id: 'v3', numero: 3, historica: false, enviadaEm: '2026-10-15T13:00:00+00:00', autor: 'Ana Teste',
-    etapa: 'Reunião de modelagem', observacao: 'Corrigido',
+    id: 'v3', numero: 3, historica: false, piloto: false, enviadaEm: '2026-10-15T13:00:00+00:00', autor: 'Ana Teste',
+    etapa: 'Reunião de modelagem',
     arquivos: [
       { id: 'a2', papel: 'png', nome: 'TSA_V3_Emitir Ofício.png', formato: 'png', tamanho: 20 },
       { id: 'a3', papel: 'bpm', nome: 'TSA_V3_Emitir Ofício.bpm', formato: 'bpm', tamanho: 30 },
@@ -82,10 +46,10 @@ test('envia cada arquivo pela sessão devolvida, avisa o progresso e só então 
   const progresso: string[] = []
   await criar(cliente, envio).enviarVersao(PEDIDO, (enviados, total) => progresso.push(`${enviados}/${total}`))
   expect(cliente.chamadasDaFuncao).toEqual([
-    { acao: 'iniciar_envio', processo_id: 'p1', papel: 'bpmn', nome_original: 'fluxo.bpmn', tamanho: 4, numero: 3, historica: false },
-    { acao: 'iniciar_envio', processo_id: 'p1', papel: 'png', nome_original: 'fluxo.png', tamanho: 3, numero: 3, historica: false },
+    { acao: 'iniciar_envio', processo_id: 'p1', papel: 'bpmn', nome_original: 'fluxo.bpmn', tamanho: 4, numero: 3, historica: false, piloto: false },
+    { acao: 'iniciar_envio', processo_id: 'p1', papel: 'png', nome_original: 'fluxo.png', tamanho: 3, numero: 3, historica: false, piloto: false },
     {
-      acao: 'registrar', processo_id: 'p1', numero: 3, observacao: 'Corrigido', historica: false,
+      acao: 'registrar', processo_id: 'p1', numero: 3, historica: false, piloto: false,
       arquivos: [{ papel: 'bpmn', drive_id: 'id-sessao' }, { papel: 'png', drive_id: 'id-sessao' }],
     },
   ])
@@ -94,7 +58,7 @@ test('envia cada arquivo pela sessão devolvida, avisa o progresso e só então 
 })
 
 const PEDIDO_HISTORICO: PedidoDeVersao = {
-  processoId: 'p1', numero: 5, observacao: null, arquivos: [{ papel: 'bpm', arquivo: new File(['bizagi'], 'fonte.bpm') }],
+  processoId: 'p1', numero: 5, arquivos: [{ papel: 'bpm', arquivo: new File(['bizagi'], 'fonte.bpm') }],
 }
 
 test('a versão histórica abre a sessão e registra com historica verdadeiro e o número digitado', async () => {
@@ -104,8 +68,8 @@ test('a versão histórica abre a sessão e registra com historica verdadeiro e 
   const progresso: string[] = []
   await criar(cliente, envio).registrarVersaoHistorica(PEDIDO_HISTORICO, (enviados, total) => progresso.push(enviados + '/' + total))
   expect(cliente.chamadasDaFuncao).toEqual([
-    { acao: 'iniciar_envio', processo_id: 'p1', papel: 'bpm', nome_original: 'fonte.bpm', tamanho: 6, numero: 5, historica: true },
-    { acao: 'registrar', processo_id: 'p1', numero: 5, observacao: null, historica: true, arquivos: [{ papel: 'bpm', drive_id: 'id-sessao' }] },
+    { acao: 'iniciar_envio', processo_id: 'p1', papel: 'bpm', nome_original: 'fonte.bpm', tamanho: 6, numero: 5, historica: true, piloto: false },
+    { acao: 'registrar', processo_id: 'p1', numero: 5, historica: true, piloto: false, arquivos: [{ papel: 'bpm', drive_id: 'id-sessao' }] },
   ])
   expect(progresso).toEqual(['1/1'])
 })
@@ -215,9 +179,9 @@ test('o relatório depois abre a sessão com o número da versão, envia, avisa 
   const progresso: string[] = []
   await criar(cliente, envio).acrescentarRelatorio(PEDIDO_DE_RELATORIO, (enviados, total) => progresso.push(`${enviados}/${total}`))
   expect(cliente.chamadasDaFuncao).toEqual([
-    { acao: 'iniciar_envio', processo_id: 'p1', papel: 'relatorio', nome_original: 'relatorio.pdf', tamanho: 3, numero: 3, historica: false },
+    { acao: 'iniciar_envio', processo_id: 'p1', papel: 'relatorio', nome_original: 'relatorio.pdf', tamanho: 3, numero: 3, historica: false, piloto: false },
     {
-      acao: 'registrar', processo_id: 'p1', numero: 3, observacao: null, historica: false, versao_id: 'v3',
+      acao: 'registrar', processo_id: 'p1', numero: 3, historica: false, piloto: false, versao_id: 'v3',
       arquivos: [{ papel: 'relatorio', drive_id: 'id-sessao' }],
     },
   ])
@@ -281,11 +245,11 @@ test('a substituição abre a sessão do arquivo, envia, avisa o progresso e reg
   await criar(cliente, envio).substituirArquivo(PEDIDO_DE_SUBSTITUICAO, (enviados, total) => progresso.push(`${enviados}/${total}`))
   expect(cliente.chamadasDaFuncao).toEqual([
     {
-      acao: 'iniciar_envio', processo_id: 'p1', papel: 'relatorio', nome_original: 'outro.pdf', tamanho: 4, numero: 3, historica: false,
+      acao: 'iniciar_envio', processo_id: 'p1', papel: 'relatorio', nome_original: 'outro.pdf', tamanho: 4, numero: 3, historica: false, piloto: false,
       arquivo_id: 'a3',
     },
     {
-      acao: 'registrar', processo_id: 'p1', numero: 3, observacao: null, historica: false, arquivo_id: 'a3',
+      acao: 'registrar', processo_id: 'p1', numero: 3, historica: false, piloto: false, arquivo_id: 'a3',
       arquivos: [{ papel: 'relatorio', drive_id: 'id-sessao' }],
     },
   ])

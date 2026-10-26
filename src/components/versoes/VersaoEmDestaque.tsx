@@ -1,13 +1,14 @@
 import './VersaoEmDestaque.css'
 import { formatarMomento } from '../../acesso/historico'
 import {
-  emOrdemDeExibicao, formatarDiaEMes, origemDoRelatorio, podeCopiarRelatorio, relatorioPendente, rotuloCurtoDoArquivo, rotuloDaAnterior,
-  rotuloDaVersao,
+  emOrdemDeExibicao, formatarDiaEMes, origemDoRelatorio, papeisQueSePodeAcrescentar, podeCopiarRelatorio, relatorioPendente,
+  rotuloCurtoDoArquivo, rotuloDaAnterior, rotuloDaVersao,
 } from '../../versoes/rotulos'
 import type { ArquivoDaVersao, ConferenciaDosArquivos, ModuloDeVersoes, Versao } from '../../versoes/tipos'
 import { Pilula } from '../Pilula'
 import { AcaoSemAlteracao } from './AcaoSemAlteracao'
 import { AcaoSubstituir } from './AcaoSubstituir'
+import { AcrescentarArquivo } from './AcrescentarArquivo'
 import { LinkDoArquivo } from './LinkDoArquivo'
 import { MarcaNoDrive } from './MarcaNoDrive'
 
@@ -47,6 +48,7 @@ function LinhaDoDestaque({ versao }: { versao: Versao }) {
       <span className="versao-destaque-ponto" aria-hidden="true">·</span>
       <time dateTime={versao.enviadaEm} title={formatarMomento(versao.enviadaEm)}>{formatarDiaEMes(versao.enviadaEm)}</time>
       {versao.historica && <Pilula situacao="neutra">Histórica · somente leitura</Pilula>}
+      {versao.piloto && <Pilula situacao="neutra">Piloto</Pilula>}
       {versao.aprovada && <Pilula situacao="aprovado">Aprovada</Pilula>}
       {relatorioPendente(versao) && <Pilula situacao="vencendo">falta relatório</Pilula>}
     </p>
@@ -59,7 +61,6 @@ function AutoriaDoDestaque({ versao }: { versao: Versao }) {
   return (
     <>
       {autoria.length > 0 && <p className="versao-destaque-autoria">{autoria.map((parte) => <span key={parte}>{parte}</span>)}</p>}
-      {versao.observacao && <p className="versao-destaque-observacao">{versao.observacao}</p>}
     </>
   )
 }
@@ -80,9 +81,12 @@ function ArquivoDoDestaque({ modulo, processoId, versao, versoes, podeAlterar, s
   )
 }
 
-/** Na ordem .png, .bpm, relatório e .bpmn: o relatório que falta fica no lugar dele, antes do .bpmn opcional. */
+/**
+ * Na ordem .png, .bpm, relatório e .bpmn: o relatório que falta fica no lugar dele, antes do .bpmn opcional; o .png e o
+ * .bpmn que a versão ainda não tem ficam no fim, no espaço tracejado de acrescentar.
+ */
 function ArquivosDoDestaque(props: VersaoEmDestaqueProps) {
-  const { versao, podeAlterar, aoAcrescentarRelatorio } = props
+  const { modulo, processoId, versao, podeAlterar, aoAlterada, aoAcrescentarRelatorio } = props
   const arquivos = emOrdemDeExibicao(versao.arquivos)
   const item = (arquivo: ArquivoDaVersao) => <ArquivoDoDestaque key={arquivo.id} {...props} arquivo={arquivo} />
   return (
@@ -96,6 +100,9 @@ function ArquivosDoDestaque(props: VersaoEmDestaqueProps) {
         </li>
       )}
       {arquivos.filter(({ papel }) => papel === 'bpmn').map(item)}
+      {podeAlterar && papeisQueSePodeAcrescentar(versao).map((papel) => (
+        <AcrescentarArquivo key={papel} modulo={modulo} processoId={processoId} versao={versao} papel={papel} aoConcluir={aoAlterada} />
+      ))}
     </ul>
   )
 }

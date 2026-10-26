@@ -88,8 +88,8 @@ async function enviarUmArquivo(config, token, pedido, bytes, tipo) {
 
 async function registrarVersao(config, integrante, processoId, numero, ids) {
   const corpo = {
-    acao: 'registrar', processo_id: processoId, numero, observacao: 'Prova de ponta a ponta',
-    arquivos: [{ papel: 'bpmn', drive_id: ids[0] }, { papel: 'png', drive_id: ids[1] }],
+    acao: 'registrar', processo_id: processoId, numero,
+    arquivos: [{ papel: 'bpmn', drive_id: ids[0] }, { papel: 'png', drive_id: ids[1] }, { papel: 'bpm', drive_id: ids[2] }],
   }
   const resposta = await chamarFuncao(config, integrante.token, corpo)
   if (resposta.status !== 200) return relatar('integrante registra a versão', false, await codigoDe(resposta))
@@ -110,7 +110,10 @@ async function enviarComoIntegrante(config, integrante) {
   if (!bpmn) return null
   const png = await enviarUmArquivo(config, integrante.token, pedidoDeEnvio(processoId, numero, 'png', PNG), PNG, 'image/png')
   if (!png) return null
-  await registrarVersao(config, integrante, processoId, numero, [bpmn, png])
+  // Desde a mudança de 2026-10-26 a versão exige só o .bpm (ADR 0025): o .bpmn e o .png entram além dele.
+  const bpm = await enviarUmArquivo(config, integrante.token, pedidoDeEnvio(processoId, numero, 'bpm', CONTEUDO), CONTEUDO, 'application/octet-stream')
+  if (!bpm) return null
+  await registrarVersao(config, integrante, processoId, numero, [bpmn, png, bpm])
   const arquivoId = await arquivoDoDrive(integrante.cliente, bpmn)
   if (!arquivoId) return relatar('arquivo registrado visível ao integrante', false, 'sem linha em arquivos_da_versao')
   return { processoId, arquivoId, numero }
@@ -131,7 +134,7 @@ async function registrarHistorica(config, integrante) {
   const numero = await proximoNumero(integrante.cliente, processoId)
   const bpm = await enviarUmArquivo(config, integrante.token, pedidoDeEnvio(processoId, numero, 'bpm', CONTEUDO, true), CONTEUDO, 'application/octet-stream')
   if (!bpm) return null
-  const corpo = { acao: 'registrar', processo_id: processoId, numero, historica: true, observacao: null, arquivos: [{ papel: 'bpm', drive_id: bpm }] }
+  const corpo = { acao: 'registrar', processo_id: processoId, numero, historica: true, arquivos: [{ papel: 'bpm', drive_id: bpm }] }
   const resposta = await chamarFuncao(config, integrante.token, corpo)
   if (resposta.status !== 200) return relatar('integrante registra a versão histórica', false, await codigoDe(resposta))
   const { data } = await integrante.cliente.from('versoes').select('numero').eq('processo_id', processoId).eq('numero', numero).eq('historica', true)
@@ -163,7 +166,7 @@ async function provarRelatorioDepois(config, integrante, { processoId, numero })
   const pedido = pedidoDeEnvio(processoId, numero, 'relatorio', CONTEUDO, false, 'pdf')
   const relatorio = await enviarUmArquivo(config, integrante.token, pedido, CONTEUDO, 'application/pdf')
   if (!relatorio) return
-  const corpo = { acao: 'registrar', processo_id: processoId, numero, versao_id: versaoId, historica: false, observacao: null, arquivos: [{ papel: 'relatorio', drive_id: relatorio }] }
+  const corpo = { acao: 'registrar', processo_id: processoId, numero, versao_id: versaoId, historica: false, arquivos: [{ papel: 'relatorio', drive_id: relatorio }] }
   const resposta = await chamarFuncao(config, integrante.token, corpo)
   if (resposta.status !== 200) return relatar('integrante acrescenta o relatório depois', false, await codigoDe(resposta))
   relatar('integrante acrescenta o relatório depois', true, `V${numero}`)
@@ -183,7 +186,7 @@ async function provarSubstituicao(config, integrante, { processoId, arquivoId, n
   const idNoDrive = await enviarUmArquivo(config, integrante.token, { ...pedido, tamanho: novos.length }, novos, 'application/xml')
   if (!idNoDrive) return
   relatar('a substituição usa o mesmo arquivo do Drive', idNoDrive === antes.drive_id, idNoDrive === antes.drive_id ? 'mesmo identificador' : 'identificador diferente')
-  const corpo = { acao: 'registrar', processo_id: processoId, numero, observacao: null, historica: false, arquivo_id: arquivoId, arquivos: [{ papel: 'bpmn', drive_id: idNoDrive }] }
+  const corpo = { acao: 'registrar', processo_id: processoId, numero, historica: false, arquivo_id: arquivoId, arquivos: [{ papel: 'bpmn', drive_id: idNoDrive }] }
   const resposta = await chamarFuncao(config, integrante.token, corpo)
   if (resposta.status !== 200) return relatar('integrante substitui o arquivo', false, await codigoDe(resposta))
   const { data: depois } = await integrante.cliente.from('arquivos_da_versao').select(colunas).eq('id', arquivoId).single()

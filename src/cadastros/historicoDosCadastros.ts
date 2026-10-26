@@ -39,7 +39,8 @@ const TEXTO_DA_ACAO_DA_ETAPA: Record<string, string> = {
 }
 
 const TEXTO_DA_ACAO_DA_VERSAO: Record<string, string> = {
-  enviar: 'Enviou a versão', registrar_historica: 'Registrou a versão histórica',
+  enviar: 'Enviou a versão', enviar_piloto: 'Enviou a versão piloto', registrar_historica: 'Registrou a versão histórica',
+  acrescentar_arquivo: 'Acrescentou um arquivo à versão',
   acrescentar_relatorio: 'Acrescentou o relatório à versão', sem_alteracao: 'Marcou sem alteração de conteúdo na versão',
   substituir: 'Substituiu o arquivo da versão',
 }
@@ -70,7 +71,7 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   processo_nome: 'Processo', responsavel_nome: 'Responsável', processo_pai_nome: 'Processo pai', etiqueta: 'Etiqueta',
   nivel: 'Nível', obrigatoria: 'Obrigatória', fase: 'Fase', ativa: 'Situação', ordem: 'Posição',
   data_da_modelagem_piloto: 'Data da modelagem piloto', data_da_reuniao: 'Data da modelagem piloto',
-  rotulo: 'Versão', etapa: 'Etapa', arquivos: 'Arquivos', relatorio_de: 'Relatório copiado da versão',
+  rotulo: 'Versão', etapa: 'Etapa', arquivos: 'Arquivos', relatorio_de: 'Relatório copiado da versão', papel: 'Arquivo acrescentado',
   hash_md5: 'Impressão digital (MD5)',
   versao_revisada: 'Versão revisada', versao_corrigida: 'Versão corrigida', resultado: 'Resultado', escopo: 'Escopo',
   comentario: 'Comentário', revisor_nome: 'Revisor', revisada_em: 'Data da revisão',
@@ -81,6 +82,15 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
 
 // Os ids existem para o filtro; quem lê o histórico vê a sigla e o nome. Código e nome da etapa já estão no título.
 const CAMPOS_ESCONDIDOS = new Set(['setor_id', 'processo_id', 'macroprocesso_id', 'etapa_codigo', 'etapa_nome', 'responsavel_id'])
+
+/** O texto do evento no histórico: o da ação e, no arquivo acrescentado à versão, qual arquivo foi ("Acrescentou o .png à versão"). */
+export function textoDoEvento(evento: EventoDoCadastro): string {
+  if (evento.entidade === 'versao' && evento.acao === 'acrescentar_arquivo') {
+    const papel = registro(evento.depois).papel
+    if (typeof papel === 'string' && papel !== '') return `Acrescentou o .${papel} à versão`
+  }
+  return textoDaAcaoDoCadastro(evento.acao, evento.entidade)
+}
 
 // Ação desconhecida (de uma funcionalidade futura) aparece pelo código: sumir do histórico é pior que texto cru.
 export function textoDaAcaoDoCadastro(acao: string, entidade: string): string {

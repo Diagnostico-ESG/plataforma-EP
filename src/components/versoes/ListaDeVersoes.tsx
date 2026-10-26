@@ -1,9 +1,13 @@
 import { formatarMomento } from '../../acesso/historico'
-import { emOrdemDeExibicao, origemDoRelatorio, podeCopiarRelatorio, relatorioPendente, rotuloDaAnterior, rotuloDaVersao } from '../../versoes/rotulos'
+import {
+  emOrdemDeExibicao, origemDoRelatorio, papeisQueSePodeAcrescentar, podeCopiarRelatorio, relatorioPendente, rotuloDaAnterior,
+  rotuloDaVersao,
+} from '../../versoes/rotulos'
 import type { ConferenciaDosArquivos, ModuloDeVersoes, Versao } from '../../versoes/tipos'
 import { Pilula } from '../Pilula'
 import { AcaoSemAlteracao } from './AcaoSemAlteracao'
 import { AcaoSubstituir } from './AcaoSubstituir'
+import { AcrescentarArquivo } from './AcrescentarArquivo'
 import { LinkDoArquivo } from './LinkDoArquivo'
 import { MarcaNoDrive } from './MarcaNoDrive'
 
@@ -31,6 +35,17 @@ export function ListaDeVersoes({ versoes, todas, ...resto }: ListaDeVersoesProps
 
 type BlocoDaVersaoProps = Omit<ListaDeVersoesProps, 'versoes' | 'todas'> & { versao: Versao; versoes: Versao[] }
 
+function PilulasDaVersao({ versao }: { versao: Versao }) {
+  return (
+    <>
+      {versao.historica && <Pilula situacao="neutra">Histórica · somente leitura</Pilula>}
+      {versao.piloto && <Pilula situacao="neutra">Piloto</Pilula>}
+      {versao.aprovada && <Pilula situacao="aprovado">Aprovada</Pilula>}
+      {relatorioPendente(versao) && <Pilula situacao="vencendo">Relatório pendente</Pilula>}
+    </>
+  )
+}
+
 function BlocoDaVersao({ modulo, processoId, versao, versoes, podeAlterar, aoAlterada, situacoes }: BlocoDaVersaoProps) {
   const rotulo = rotuloDaVersao(versao)
   const rotuloDaOrigem = rotuloDaAnterior(versao, versoes)
@@ -41,11 +56,8 @@ function BlocoDaVersao({ modulo, processoId, versao, versoes, podeAlterar, aoAlt
         <time dateTime={versao.enviadaEm}>{formatarMomento(versao.enviadaEm)}</time>
         <span>{versao.autor ?? '—'}</span>
         {versao.etapa && <span>{versao.etapa}</span>}
-        {versao.historica && <Pilula situacao="neutra">Histórica · somente leitura</Pilula>}
-        {versao.aprovada && <Pilula situacao="aprovado">Aprovada</Pilula>}
-        {relatorioPendente(versao) && <Pilula situacao="vencendo">Relatório pendente</Pilula>}
+        <PilulasDaVersao versao={versao} />
       </p>
-      {versao.observacao && <p className="bloco-da-versao-observacao">{versao.observacao}</p>}
       <ul className="bloco-da-versao-arquivos">
         {emOrdemDeExibicao(versao.arquivos).map((arquivo) => {
           const origem = origemDoRelatorio(arquivo, versoes)
@@ -60,6 +72,9 @@ function BlocoDaVersao({ modulo, processoId, versao, versoes, podeAlterar, aoAlt
             </li>
           )
         })}
+        {podeAlterar && papeisQueSePodeAcrescentar(versao).map((papel) => (
+          <AcrescentarArquivo key={papel} modulo={modulo} processoId={processoId} versao={versao} papel={papel} aoConcluir={aoAlterada} />
+        ))}
       </ul>
       {podeAlterar && rotuloDaOrigem && podeCopiarRelatorio(versao, versoes) && (
         <AcaoSemAlteracao modulo={modulo} processoId={processoId} versao={versao} rotuloDaOrigem={rotuloDaOrigem} aoConcluir={aoAlterada} />

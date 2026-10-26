@@ -2,9 +2,9 @@ import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/re
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import { falhaDoBanco } from './processos/recusasDoBanco'
 import { RECUSAS_DOS_PROCESSOS } from './processos/processosSupabase'
-import { montarNosCadastros } from './testes/processosNosCadastros'
+import { montarNosCadastros, naEtapa } from './testes/processosNosCadastros'
 import { BPM_VALIDO, PNG_VALIDO } from './testes/versoesDeTeste'
-import { MENU_DOS_ARQUIVOS, escolherNoMenu, escolherNoMenuDoProcesso } from './testes/versoDoCartao'
+import { escolherNoMenuDoProcesso } from './testes/versoDoCartao'
 
 beforeEach(() => {
   window.location.hash = '#/processos/p1'
@@ -17,13 +17,13 @@ afterEach(() => {
 const painelAberto = async () => within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
 
 test('a versão enviada aparece no histórico do processo, com texto próprio', async () => {
-  montarNosCadastros()
+  montarNosCadastros({ ajustarProcessos: naEtapa('revisao_interna') })
   const painel = await painelAberto()
   const secao = within(await painel.findByRole('region', { name: 'Arquivos' }))
   fireEvent.click(await secao.findByRole('button', { name: 'Enviar versão' }))
   const form = within(await secao.findByRole('form', { name: 'Enviar versão' }))
   fireEvent.change(form.getByLabelText('Fluxograma Bizagi (.bpm)'), { target: { files: [BPM_VALIDO] } })
-  fireEvent.change(form.getByLabelText('Imagem do fluxo (.png)'), { target: { files: [PNG_VALIDO] } })
+  fireEvent.change(form.getByLabelText('Imagem do fluxo (.png) (opcional)'), { target: { files: [PNG_VALIDO] } })
   const enviar = form.getByRole('button', { name: 'Enviar' }) as HTMLButtonElement
   await waitFor(() => expect(enviar.disabled).toBe(false))
   fireEvent.click(enviar)
@@ -35,10 +35,10 @@ test('a versão enviada aparece no histórico do processo, com texto próprio', 
 })
 
 test('a versão histórica registrada aparece no histórico do processo, com texto próprio', async () => {
-  montarNosCadastros()
+  montarNosCadastros({ ajustarProcessos: naEtapa('nao_iniciados') })
   const painel = await painelAberto()
   const secao = within(await painel.findByRole('region', { name: 'Arquivos' }))
-  await escolherNoMenu(MENU_DOS_ARQUIVOS, 'Registrar versão histórica')
+  fireEvent.click(await secao.findByRole('button', { name: 'Registrar versão histórica' }))
   const form = within(await secao.findByRole('form', { name: 'Registrar versão histórica' }))
   fireEvent.change(form.getByLabelText('Número da versão'), { target: { value: '5' } })
   fireEvent.change(form.getByLabelText('Fluxograma Bizagi (.bpm) (opcional)'), { target: { files: [new File(['b'], 'fonte.bpm')] } })

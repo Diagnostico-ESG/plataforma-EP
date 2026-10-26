@@ -12,7 +12,15 @@ const FRASE_DO_CODIGO: Record<string, (valor: string) => string> = {
   usuario_inativo: () => 'Seu usuário está desativado; não é possível enviar versões.',
   sem_login: () => 'Sua sessão terminou. Entre de novo para enviar a versão.',
   processo_fora_de_andamento: () => 'O processo não está em andamento; não é possível enviar versão.',
-  versao_sem_bpm_e_png: () => 'A versão precisa do .bpm e do .png.',
+  versao_sem_bpm: () => 'A versão precisa do .bpm.',
+  numero_da_piloto_nao_maior: (numero) => `O número da versão piloto precisa ser maior que ${numero}.`,
+  piloto_depois_de_versao_em_sequencia: () =>
+    'O processo já tem versão em sequência; a versão piloto só pode ser enviada antes dela.',
+  piloto_fora_da_etapa: () => 'A versão piloto só pode ser enviada até a Modelagem piloto.',
+  versao_fora_da_etapa: () => 'A versão só pode ser enviada até a Revisão interna.',
+  historica_fora_de_nao_iniciados: () => 'A versão histórica só pode ser registrada em Não iniciados.',
+  arquivo_ja_existe: () => 'A versão já tem esse arquivo.',
+  papel_nao_acrescentavel: () => 'Só o .png e o .bpmn podem ser acrescentados depois.',
   numero_da_versao_mudou: (numero) =>
     `Outra pessoa enviou uma versão enquanto você enviava; esta seria a V${numero}. Envie de novo.`,
   extensao_nao_aceita: () => 'Um dos arquivos tem um tipo que não é aceito no campo dele.',

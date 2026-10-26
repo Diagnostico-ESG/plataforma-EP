@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import type { SituacaoDoProcesso } from './processos/tipos'
-import { montarNosCadastros } from './testes/processosNosCadastros'
+import { montarNosCadastros, naEtapa } from './testes/processosNosCadastros'
 import { arquivoDeTeste, comNome, versaoDeTeste } from './testes/versoesDeTeste'
 import type { Versao } from './versoes/tipos'
 import type { VersoesFalso } from './versoes/VersoesFalso'
@@ -89,13 +89,13 @@ test('as anteriores ficam recolhidas em "Versões anteriores (2)", da mais recen
   expect(within(recolhidas).getAllByRole('article').map((versao) => versao.getAttribute('aria-label'))).toEqual(['V2', 'V1F'])
 })
 
-test('o "⋯" da seção tem "Registrar versão histórica" só sem versão nova', async () => {
-  montarNosCadastros(comVersoes([historica(1)]))
+test('[Registrar versão histórica] é o botão de Não iniciados, só sem versão piloto nem em sequência, e não está no "⋯"', async () => {
+  montarNosCadastros({ ...comVersoes([historica(1)]), ajustarProcessos: naEtapa('nao_iniciados') })
   const secao = await arquivos()
   await destaque(secao, 'V1F')
-  expect(itensDoMenu(secao, 'Mais ações dos arquivos')).toEqual(['Registrar versão histórica'])
-  fireEvent.click(screen.getByRole('menuitem', { name: 'Registrar versão histórica' }))
+  fireEvent.click(secao.getByRole('button', { name: 'Registrar versão histórica' }))
   expect(await secao.findByRole('form', { name: 'Registrar versão histórica' })).toBeTruthy()
+  expect(secao.queryByRole('button', { name: 'Mais ações dos arquivos' })).toBeNull()
 })
 
 test('o "⋯" da seção tem "Acrescentar relatório" quando só uma anterior está sem relatório', async () => {

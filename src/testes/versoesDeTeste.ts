@@ -8,8 +8,8 @@ function arquivo(numero: number, papel: PapelDoArquivo, formato: string): Arquiv
 /** Uma versão inventada do "Emitir Ofício" (p1), com o .bpm e o .png (os obrigatórios). */
 export function versaoDeTeste(numero: number, mudancas: Partial<Versao> = {}): Versao {
   return {
-    id: `v${numero}`, numero, historica: false, enviadaEm: `2026-10-0${numero}T13:00:00Z`, autor: 'Ana Teste',
-    etapa: 'Reunião de modelagem', observacao: null, arquivos: [arquivo(numero, 'bpm', 'bpm'), arquivo(numero, 'png', 'png')],
+    id: `v${numero}`, numero, historica: false, piloto: false, enviadaEm: `2026-10-0${numero}T13:00:00Z`, autor: 'Ana Teste',
+    etapa: 'Reunião de modelagem', arquivos: [arquivo(numero, 'bpm', 'bpm'), arquivo(numero, 'png', 'png')],
     ...mudancas,
   }
 }

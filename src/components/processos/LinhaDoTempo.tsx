@@ -1,6 +1,6 @@
 import './LinhaDoTempo.css'
 import {
-  ehRegistroRetirado, nomeDoItem, rotuloDoMotivo, textoDaAcaoDoCadastro,
+  ehRegistroRetirado, nomeDoItem, rotuloDoMotivo, textoDoEvento,
 } from '../../cadastros/historicoDosCadastros'
 import type { EventoDoCadastro } from '../../cadastros/tipos'
 import { agruparPorDia } from '../../processos/agrupamentoDoHistorico'
@@ -34,7 +34,7 @@ function EventoDaLinhaDoTempo({ evento }: { evento: EventoDoCadastro }) {
       <time className="linha-do-tempo-hora" dateTime={evento.ocorridoEm}>{HORA.format(new Date(evento.ocorridoEm))}</time>
       <Avatar nome={evento.autor ?? AUTOR_DO_BANCO} tamanho={24} />
       <div className="linha-do-tempo-texto">
-        <span><strong>{textoDaAcaoDoCadastro(evento.acao, evento.entidade)}</strong> {nomeDoItem(evento)}</span>
+        <span><strong>{textoDoEvento(evento)}</strong> {nomeDoItem(evento)}</span>
         {/* O registro de um recurso retirado mostra só a ação (ADR 0013). */}
         {!ehRegistroRetirado(evento) && <span className="linha-do-tempo-mudanca"><AntesEDepoisDoEvento evento={evento} /></span>}
         {evento.motivo && <span className="linha-do-tempo-motivo">{rotuloDoMotivo(evento.acao)}: {evento.motivo}</span>}

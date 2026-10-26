@@ -2,7 +2,7 @@ import { cleanup, fireEvent, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import { formatarMomento } from './acesso/historico'
 import type { SituacaoDoProcesso } from './processos/tipos'
-import { PROCESSOS_DOS_CADASTROS, montarNosCadastros } from './testes/processosNosCadastros'
+import { PROCESSOS_DOS_CADASTROS, montarNosCadastros, naEtapa } from './testes/processosNosCadastros'
 import { arquivoDeTeste, versaoDeTeste } from './testes/versoesDeTeste'
 
 beforeEach(() => {
@@ -24,12 +24,12 @@ const comSituacao = (situacao: SituacaoDoProcesso) => ({
   },
 })
 
-test('a seção mostra a mais recente em destaque, com rótulo, dia, autor, etapa, observação e arquivos, e as anteriores depois', async () => {
+test('a seção mostra a mais recente em destaque, com rótulo, dia, autor, etapa e arquivos, e as anteriores depois', async () => {
   montarNosCadastros({ ajustarVersoes: (falso) => {
     falso.versoes.p1 = [
       versaoDeTeste(1, { arquivos: [arquivoDeTeste(1, 'bpmn', 'bpmn'), ...versaoDeTeste(1).arquivos] }),
       versaoDeTeste(2, {
-        autor: 'Bia Teste', etapa: 'Relatório e modelagem técnica', observacao: 'Ajustada a raia do setor',
+        autor: 'Bia Teste', etapa: 'Relatório e modelagem técnica',
         arquivos: [arquivoDeTeste(2, 'bpmn', 'bpmn'), arquivoDeTeste(2, 'relatorio', 'pdf'), arquivoDeTeste(2, 'bpm', 'bpm'),
           arquivoDeTeste(2, 'png', 'png')],
       }),
@@ -42,7 +42,6 @@ test('a seção mostra a mais recente em destaque, com rótulo, dia, autor, etap
   expect(v2.getByText('02/10').getAttribute('title')).toBe(formatarMomento('2026-10-02T13:00:00Z'))
   expect(v2.getByText('Bia Teste')).toBeTruthy()
   expect(v2.getByText('Relatório e modelagem técnica')).toBeTruthy()
-  expect(v2.getByText('Ajustada a raia do setor')).toBeTruthy()
   // Na ordem .png, .bpm, relatório e .bpmn, no destaque e nas anteriores.
   expect(v2.getAllByRole('link').map((link) => link.getAttribute('title'))).toEqual([
     'TSA_V2_Emitir Ofício.png', 'TSA_V2_Emitir Ofício.bpm', 'TSA_V2_Emitir Ofício_Relatório.pdf', 'TSA_V2_Emitir Ofício.bpmn',
@@ -75,8 +74,8 @@ test('o subprocesso tem a sua seção Versões', async () => {
   expect(await (await secao()).findByRole('article', { name: 'V1' })).toBeTruthy()
 })
 
-test('sem versão, a seção diz "Nenhuma versão enviada." e mostra [Enviar versão] a quem pode', async () => {
-  montarNosCadastros()
+test('sem versão, a seção diz "Nenhuma versão enviada." e mostra [Enviar versão] a quem pode, na Revisão interna', async () => {
+  montarNosCadastros({ ajustarProcessos: naEtapa('revisao_interna') })
   const tela = await secao()
   expect(await tela.findByText('Nenhuma versão enviada.')).toBeTruthy()
   expect(tela.getByRole('button', { name: 'Enviar versão' })).toBeTruthy()
@@ -100,14 +99,22 @@ test('se a leitura falha, mostra o erro e [Tentar de novo] recarrega', async () 
 })
 
 test('a Consulta vê as versões, sem [Enviar versão]', async () => {
-  montarNosCadastros({ perfil: 'consulta', ajustarVersoes: (falso) => { falso.versoes.p1 = [versaoDeTeste(1)] } })
+  montarNosCadastros({
+    perfil: 'consulta', ajustarProcessos: naEtapa('revisao_interna'), ajustarVersoes: (falso) => { falso.versoes.p1 = [versaoDeTeste(1)] },
+  })
   const tela = await secao()
   expect(await tela.findByRole('article', { name: 'V1' })).toBeTruthy()
   expect(tela.queryByRole('button', { name: 'Enviar versão' })).toBeNull()
 })
 
 test.each(['suspenso', 'cancelado', 'concluido'] as const)('processo %s mostra as versões, sem [Enviar versão]', async (situacao) => {
-  montarNosCadastros({ ...comSituacao(situacao), ajustarVersoes: (falso) => { falso.versoes.p1 = [versaoDeTeste(1)] } })
+  montarNosCadastros({
+    ajustarProcessos: (falso) => {
+      naEtapa('revisao_interna')(falso)
+      comSituacao(situacao).ajustarProcessos(falso)
+    },
+    ajustarVersoes: (falso) => { falso.versoes.p1 = [versaoDeTeste(1)] },
+  })
   const tela = await secao()
   expect(await tela.findByRole('article', { name: 'V1' })).toBeTruthy()
   expect(tela.queryByRole('button', { name: 'Enviar versão' })).toBeNull()

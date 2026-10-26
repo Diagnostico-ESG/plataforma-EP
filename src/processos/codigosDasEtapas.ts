@@ -3,6 +3,7 @@
 export const CODIGO_NAO_INICIADOS = 'nao_iniciados'
 export const CODIGO_CONCLUIDOS = 'concluidos'
 export const CODIGO_DA_MODELAGEM_PILOTO = 'modelagem'
+export const CODIGO_DA_TECNICA = 'relatorio_modelagem_tecnica'
 export const CODIGO_DA_REVISAO_INTERNA = 'revisao_interna'
 export const CODIGO_DA_APROVACAO = 'aprovacao_setor'
 export const CODIGO_DA_PUBLICACAO = 'publicacao'

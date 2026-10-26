@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
-import { montarNosCadastros } from './testes/processosNosCadastros'
+import { montarNosCadastros, naEtapa } from './testes/processosNosCadastros'
 import { BPMN_VALIDO, BPM_VALIDO, PNG_VALIDO, versaoDeTeste } from './testes/versoesDeTeste'
 import type { VersoesFalso } from './versoes/VersoesFalso'
 
@@ -13,7 +13,9 @@ afterEach(() => {
   window.location.hash = ''
 })
 
+// A versão em sequência se oferece na técnica e na Revisão interna (ADR 0025): o processo p1 fica na Revisão interna.
 const comDuasVersoes = (ajuste?: (falso: VersoesFalso) => void) => ({
+  ajustarProcessos: naEtapa('revisao_interna'),
   ajustarVersoes: (falso: VersoesFalso) => {
     falso.versoes.p1 = [versaoDeTeste(1), versaoDeTeste(2)]
     ajuste?.(falso)
@@ -34,7 +36,7 @@ function escolher(form: Form, rotulo: string, arquivo: File) {
 }
 
 const BPM = 'Fluxograma Bizagi (.bpm)'
-const PNG = 'Imagem do fluxo (.png)'
+const PNG = 'Imagem do fluxo (.png) (opcional)'
 const BPMN = '.bpmn (opcional)'
 const RELATORIO = 'Relatório (.docx ou .pdf) (opcional)'
 
@@ -46,20 +48,20 @@ async function escolherOPar(form: Form) {
   await waitFor(() => expect(botaoEnviar(form).disabled).toBe(false))
 }
 
-test('[Enviar versão] abre o formulário com os quatro campos, a observação e o número da versão', async () => {
+test('[Enviar versão] abre o formulário com os quatro campos e o número da versão, sem observação', async () => {
   montarNosCadastros(comDuasVersoes())
   const { form } = await abrirFormulario()
   for (const rotulo of [BPM, PNG, BPMN, RELATORIO]) expect((form.getByLabelText(rotulo) as HTMLInputElement).type).toBe('file')
-  expect((form.getByLabelText('Observação (opcional)') as HTMLTextAreaElement).maxLength).toBe(2000)
+  expect(form.queryByLabelText('Observação (opcional)')).toBeNull()
   expect(form.getByText(/Esta versão será a/).textContent).toBe('Esta versão será a V3.')
   expect(botaoEnviar(form).disabled).toBe(true)
 })
 
-test('os campos vêm na ordem .bpm, .png, .bpmn, relatório e observação', async () => {
+test('os campos vêm na ordem .bpm, .png, .bpmn e relatório', async () => {
   montarNosCadastros(comDuasVersoes())
   const { form } = await abrirFormulario()
   const rotulos = form.getAllByText((_texto, elemento) => elemento?.tagName === 'LABEL').map((rotulo) => rotulo.textContent)
-  expect(rotulos).toEqual([BPM, PNG, BPMN, RELATORIO, 'Observação (opcional)'])
+  expect(rotulos).toEqual([BPM, PNG, BPMN, RELATORIO])
 })
 
 test('sem o .bpm o envio fica desabilitado, mesmo com o .bpmn e o .png', async () => {
@@ -71,29 +73,38 @@ test('sem o .bpm o envio fica desabilitado, mesmo com o .bpmn e o .png', async (
   expect(botaoEnviar(form).disabled).toBe(true)
 })
 
-test('o botão de enviar se habilita com o .bpm e o .png, sem o .bpmn; a prévia mostra o nome de cada arquivo', async () => {
+test('o botão de enviar se habilita só com o .bpm; a prévia mostra o nome de cada arquivo escolhido', async () => {
   montarNosCadastros(comDuasVersoes())
   const { form } = await abrirFormulario()
+  expect(botaoEnviar(form).disabled).toBe(true)
   escolher(form, BPM, BPM_VALIDO)
   expect(await form.findByText('Será gravado como: TSA_V3_Emitir Ofício.bpm')).toBeTruthy()
-  expect(botaoEnviar(form).disabled).toBe(true)
+  await waitFor(() => expect(botaoEnviar(form).disabled).toBe(false))
   escolher(form, PNG, PNG_VALIDO)
   expect(await form.findByText('Será gravado como: TSA_V3_Emitir Ofício.png')).toBeTruthy()
+  expect(botaoEnviar(form).disabled).toBe(false)
+})
+
+test('com os campos opcionais vazios, só o .bpm vai no envio', async () => {
+  const { versoes } = montarNosCadastros(comDuasVersoes())
+  const { secao, form } = await abrirFormulario()
+  escolher(form, BPM, BPM_VALIDO)
   await waitFor(() => expect(botaoEnviar(form).disabled).toBe(false))
+  fireEvent.click(botaoEnviar(form))
+  await secao.findByRole('article', { name: 'V3' })
+  expect(versoes.envios[0].arquivos.map((arquivo) => arquivo.papel)).toEqual(['bpm'])
 })
 
 test('enviar registra a versão, fecha o formulário e a lista mostra a V3 no alto, com a etapa atual', async () => {
   const { versoes } = montarNosCadastros(comDuasVersoes())
   const { secao, form } = await abrirFormulario()
   await escolherOPar(form)
-  fireEvent.change(form.getByLabelText('Observação (opcional)'), { target: { value: 'Primeira técnica' } })
   fireEvent.click(botaoEnviar(form))
   const v3 = within(await secao.findByRole('article', { name: 'V3' }))
   expect(secao.getAllByRole('article', { name: /^V\d/ })[0].getAttribute('aria-label')).toBe('V3')
-  expect(v3.getByText('Modelagem piloto')).toBeTruthy()
-  expect(v3.getByText('Primeira técnica')).toBeTruthy()
+  expect(v3.getByText('Revisão interna')).toBeTruthy()
   expect(secao.queryByRole('form', { name: 'Enviar versão' })).toBeNull()
-  expect(versoes.envios[0]).toMatchObject({ processoId: 'p1', numero: 3, observacao: 'Primeira técnica' })
+  expect(versoes.envios[0]).toMatchObject({ processoId: 'p1', numero: 3 })
   expect(versoes.envios[0].arquivos.map((arquivo) => arquivo.papel)).toEqual(['bpm', 'png'])
 })
 
@@ -133,7 +144,7 @@ test('durante o envio, o progresso aparece e os campos ficam travados', async ()
   expect((await form.findByRole('status')).textContent).toBe('Enviando 2 de 2…')
   // Os campos ficam travados pelo grupo (fieldset desabilitado): o estado é :disabled, não a propriedade do campo.
   expect(form.getByLabelText(BPM).matches(':disabled')).toBe(true)
-  expect(form.getByLabelText('Observação (opcional)').matches(':disabled')).toBe(true)
+  expect(form.getByLabelText(PNG).matches(':disabled')).toBe(true)
   expect(botaoEnviar(form).disabled).toBe(true)
 })
 
@@ -141,13 +152,11 @@ test('se um arquivo falha, nada é registrado, a mensagem aparece em vermelho e 
   const { versoes } = montarNosCadastros(comDuasVersoes((falso) => { falso.falharNoArquivo = 2 }))
   const { secao, form } = await abrirFormulario()
   await escolherOPar(form)
-  fireEvent.change(form.getByLabelText('Observação (opcional)'), { target: { value: 'Mantida' } })
   fireEvent.click(botaoEnviar(form))
   const alerta = await form.findByRole('alert')
   expect(alerta.textContent).toBe(
     'A versão não foi registrada: o arquivo fluxo.png não chegou ao Drive. Os arquivos escolhidos continuam no formulário.')
   expect(alerta.className).toContain('cadastros-falha')
-  expect((form.getByLabelText('Observação (opcional)') as HTMLTextAreaElement).value).toBe('Mantida')
   expect(form.getByText('Será gravado como: TSA_V3_Emitir Ofício.png')).toBeTruthy()
   expect(botaoEnviar(form).disabled).toBe(false)
   expect(versoes.envios).toEqual([])

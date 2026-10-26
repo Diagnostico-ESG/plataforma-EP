@@ -19,12 +19,13 @@ export type Versao = {
   id: string
   numero: number
   historica: boolean
+  /** Versão piloto (V6P), da Modelagem piloto: número digitado, antes da primeira versão em sequência. */
+  piloto: boolean
   enviadaEm: string
   /** Nome de quem enviou; null se o usuário não puder ser lido. */
   autor: string | null
   /** Nome da etapa em que o processo estava no envio; a histórica não tem. */
   etapa: string | null
-  observacao: string | null
   /** Na ordem de exibição (.png, .bpm, relatório, .bpmn). */
   arquivos: ArquivoDaVersao[]
   /** Verdadeiro na versão que o setor aprovou (ADR 0011): ganha o selo "Aprovada" e não tem arquivo substituído. Ausente: não. */
@@ -34,16 +35,29 @@ export type Versao = {
 /** Um arquivo escolhido no formulário, para um papel. */
 export type ArquivoEscolhido = { papel: PapelDoArquivo; arquivo: File }
 
-/** O envio de uma versão: `numero` é o da prévia (nova) ou o digitado (histórica), com que os arquivos são nomeados no Drive. */
+/**
+ * O envio de uma versão: `numero` é o da prévia (em sequência) ou o digitado (histórica e piloto), com que os arquivos são
+ * nomeados no Drive. `piloto` vale falso quando omitido.
+ */
 export type PedidoDeVersao = {
   processoId: string
   numero: number
-  observacao: string | null
+  piloto?: boolean
   arquivos: ArquivoEscolhido[]
 }
 
+/** O .png ou .bpmn que entra depois numa versão piloto ou em sequência; `numero` e `piloto` são da versão (o nome no Drive). */
+export type PedidoDeAcrescimo = {
+  processoId: string
+  versaoId: string
+  numero: number
+  piloto: boolean
+  papel: 'png' | 'bpmn'
+  arquivo: File
+}
+
 /** O relatório que entra numa versão nova que ainda não tem; `numero` é o da versão, com que o arquivo é nomeado no Drive. */
-export type PedidoDeRelatorio = { processoId: string; versaoId: string; numero: number; arquivo: File }
+export type PedidoDeRelatorio = { processoId: string; versaoId: string; numero: number; piloto?: boolean; arquivo: File }
 
 /** A troca do conteúdo de um arquivo de versão nova; `numero` é o da versão, que a função do servidor repete no pedido. */
 export type PedidoDeSubstituicao = { processoId: string; numero: number; arquivo: ArquivoDaVersao; novo: File }
@@ -59,13 +73,18 @@ export type ModuloDeVersoes = {
   /** As versões do processo, da mais recente para a mais antiga. */
   listarVersoes(processoId: string): Promise<Versao[]>
   /**
-   * Envia cada arquivo direto ao Drive e só então registra a versão. `aoProgredir` avisa quantos arquivos já
+   * Envia cada arquivo direto ao Drive e só então registra a versão (em sequência, ou piloto com `pedido.piloto`). `aoProgredir` avisa quantos arquivos já
    * chegaram. Se algo falhar, nada é registrado.
    */
   enviarVersao(pedido: PedidoDeVersao, aoProgredir: (enviados: number, total: number) => void): Promise<void>
   /**
+   * Envia o .png ou o .bpmn direto ao Drive e só então o registra na versão piloto ou em sequência que ainda não o tem.
+   * `aoProgredir` avisa quando o arquivo chegou. Se algo falhar, nada é registrado.
+   */
+  acrescentarArquivo(pedido: PedidoDeAcrescimo, aoProgredir: (enviados: number, total: number) => void): Promise<void>
+  /**
    * Registra uma versão histórica (V5F) com o número digitado em `pedido.numero`: o mesmo caminho do envio, com as
-   * regras da histórica (só antes da versão nova, número que ainda não existe, .bpm ou .bpmn e .png).
+   * regras da histórica (só em Não iniciados e antes da piloto e da em sequência, número que ainda não existe, .bpm ou .bpmn e .png).
    */
   registrarVersaoHistorica(pedido: PedidoDeVersao, aoProgredir: (enviados: number, total: number) => void): Promise<void>
   /**

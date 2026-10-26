@@ -1,5 +1,6 @@
 import { type FormEvent, useId, useState } from 'react'
 import { useArquivosDaVersao } from '../../hooks/useArquivosDaVersao'
+import { useRolarAteAparecer } from '../../hooks/useRolarAteAparecer'
 import type { ProcessoLido } from '../../processos/tipos'
 import { type Progresso, nomeNaPrevia, podeAcrescentarRelatorio, textoDaFalhaDoRelatorio, textoDoProgresso } from '../../versoes/formularioDeVersao'
 import { rotuloDaVersao } from '../../versoes/rotulos'
@@ -22,6 +23,7 @@ export function FormularioDeRelatorio({ modulo, processo, pendentes, aoEnviada, 
   const [progresso, setProgresso] = useState<Progresso | null>(null)
   const [aviso, setAviso] = useState<string | null>(null)
   const id = useId()
+  const ref = useRolarAteAparecer<HTMLFormElement>()
   const versao = pendentes.find((outra) => outra.id === versaoId) ?? pendentes[0]
   const escolhido = arquivos.escolhidos.relatorio
 
@@ -32,7 +34,7 @@ export function FormularioDeRelatorio({ modulo, processo, pendentes, aoEnviada, 
     setProgresso({ enviados: 0, total: 1 })
     try {
       await modulo.acrescentarRelatorio(
-        { processoId: processo.id, versaoId: versao.id, numero: versao.numero, arquivo: escolhido },
+        { processoId: processo.id, versaoId: versao.id, numero: versao.numero, piloto: versao.piloto, arquivo: escolhido },
         (enviados, total) => setProgresso({ enviados, total }),
       )
       aoEnviada()
@@ -45,7 +47,7 @@ export function FormularioDeRelatorio({ modulo, processo, pendentes, aoEnviada, 
   const enviando = progresso !== null
   const pronto = podeAcrescentarRelatorio(arquivos.escolhidos, arquivos.recusas, arquivos.conferindo)
   return (
-    <form className="formulario-do-processo formulario-de-versao" aria-label="Acrescentar relatório" noValidate onSubmit={enviar}>
+    <form ref={ref} className="formulario-do-processo formulario-de-versao" aria-label="Acrescentar relatório" noValidate onSubmit={enviar}>
       <h3 className="painel-subtitulo">Acrescentar relatório</h3>
       <fieldset className="formulario-de-versao-campos" disabled={enviando}>
         <legend>Relatório</legend>
@@ -54,7 +56,7 @@ export function FormularioDeRelatorio({ modulo, processo, pendentes, aoEnviada, 
           {pendentes.map((pendente) => <option key={pendente.id} value={pendente.id}>{rotuloDaVersao(pendente)}</option>)}
         </select>
         <CampoDeArquivo papel="relatorio" obrigatorio
-          nomePrevisto={escolhido ? nomeNaPrevia(processo, versao.numero, 'relatorio', escolhido) : null}
+          nomePrevisto={escolhido ? nomeNaPrevia(processo, versao.numero, 'relatorio', escolhido, versao.piloto ? 'piloto' : 'sequencia') : null}
           recusa={arquivos.recusas.relatorio ?? null} aoEscolher={(arquivo) => void arquivos.escolher('relatorio', arquivo)} />
       </fieldset>
       {progresso && <p className="formulario-de-versao-progresso" role="status">{textoDoProgresso(progresso)}</p>}

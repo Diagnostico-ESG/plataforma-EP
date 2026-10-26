@@ -3,7 +3,7 @@ import { useCarregamento } from '../../hooks/useCarregamento'
 import { useConferenciaNoDrive } from '../../hooks/useConferenciaNoDrive'
 import type { ProcessoLido } from '../../processos/tipos'
 import type { ModoDoFormulario } from '../../versoes/formularioDeVersao'
-import { haVersaoNova, ordenarVersoes, proximoNumero, versoesComRelatorioPendente } from '../../versoes/rotulos'
+import { type EnvioDaEtapa, envioDaEtapa, ordenarVersoes, proximoNumero, versoesComRelatorioPendente } from '../../versoes/rotulos'
 import type { ModuloDeVersoes, Versao } from '../../versoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { type ItemDoMenu, MenuDeAcoes } from '../MenuDeAcoes'
@@ -24,8 +24,9 @@ type SecaoDeVersoesProps = {
 
 /**
  * Seção "Arquivos" do verso (as versões do processo e do subprocesso): a mais recente em destaque e as anteriores
- * recolhidas. Enviar, registrar histórica e acrescentar relatório só para Administrador e Integrante com o processo em
- * andamento; esconder o botão é conveniência, quem recusa é a função do servidor e o banco.
+ * recolhidas. O envio de versão que cabe na etapa atual (histórica, piloto ou em sequência), o relatório depois e acrescentar o
+ * .png ou o .bpmn só para Administrador e Integrante com o processo em andamento; esconder o botão é conveniência, quem
+ * recusa é a função do servidor e o banco.
  */
 export function SecaoDeVersoes({ versoes, processo, podeAlterar, aoAlterarVersoes }: SecaoDeVersoesProps) {
   // Lê de novo quando o processo muda de etapa: registrar a aprovação põe o selo "Aprovada" na versão.
@@ -64,7 +65,7 @@ type VersoesProntasProps = {
   versoes: ModuloDeVersoes; processo: ProcessoLido; lidas: Versao[]; podeEnviar: boolean; aoAlterada: () => void; idDoTitulo: string
 }
 
-/** O formulário que está aberto na seção: o de enviar ou registrar a histórica, ou o do relatório depois. */
+/** O formulário que está aberto na seção: o de enviar a versão da etapa (ou registrar a histórica), ou o do relatório depois. */
 type Aberto = ModoDoFormulario | { tipo: 'relatorio' }
 
 function VersoesProntas({ versoes, processo, lidas, podeEnviar, aoAlterada, idDoTitulo }: VersoesProntasProps) {
@@ -79,7 +80,11 @@ function VersoesProntas({ versoes, processo, lidas, podeEnviar, aoAlterada, idDo
   const comum = { modulo: versoes, processoId: processo.id, podeAlterar: podeEnviar, aoAlterada, situacoes }
   return (
     <>
-      <TituloDosArquivos id={idDoTitulo}>{podeEnviar && !aberto && <AcoesDaSecao lidas={lidas} aoAbrir={setAberto} />}</TituloDosArquivos>
+      <TituloDosArquivos id={idDoTitulo}>
+        {podeEnviar && (
+          <AcoesDaSecao lidas={lidas} codigoDaEtapa={processo.etapaAtual?.codigo ?? ''} aberto={aberto} aoAbrir={setAberto} />
+        )}
+      </TituloDosArquivos>
       {aberto && (
         <FormularioAberto aberto={aberto} versoes={versoes} processo={processo} lidas={lidas} aoEnviada={aposEnviar}
           aoCancelar={() => setAberto(null)} />
@@ -113,27 +118,40 @@ function FormularioAberto({ aberto, versoes, processo, lidas, aoEnviada, aoCance
   return <FormularioDeVersao modulo={versoes} processo={processo} modo={aberto} aoEnviada={aoEnviada} aoCancelar={aoCancelar} />
 }
 
-/**
- * As ações raras do "⋯" da seção: a versão histórica (só sem versão nova) e o relatório de uma versão anterior, quando
- * só ela está sem relatório (o da mais recente se acrescenta no espaço tracejado, no lugar dele).
- */
+/** O relatório de uma versão anterior, quando só ela está sem relatório (o da mais recente se acrescenta no espaço tracejado). */
 function itensRaros(lidas: Versao[], aoAbrir: (aberto: Aberto) => void): ItemDoMenu[] {
-  const itens: ItemDoMenu[] = []
-  if (!haVersaoNova(lidas)) itens.push({ rotulo: 'Registrar versão histórica', aoEscolher: () => aoAbrir({ tipo: 'historica' }) })
   const pendentes = versoesComRelatorioPendente(lidas)
-  if (pendentes.length > 0 && pendentes[0].id !== ordenarVersoes(lidas)[0].id) {
-    itens.push({ rotulo: 'Acrescentar relatório', aoEscolher: () => aoAbrir({ tipo: 'relatorio' }) })
-  }
-  return itens
+  if (pendentes.length === 0 || pendentes[0].id === ordenarVersoes(lidas)[0].id) return []
+  return [{ rotulo: 'Acrescentar relatório', aoEscolher: () => aoAbrir({ tipo: 'relatorio' }) }]
 }
 
-function AcoesDaSecao({ lidas, aoAbrir }: { lidas: Versao[]; aoAbrir: (aberto: Aberto) => void }) {
+const ROTULO_DO_ENVIO: Record<EnvioDaEtapa, string> = {
+  historica: 'Registrar versão histórica', piloto: 'Enviar versão piloto', sequencia: 'Enviar versão',
+}
+
+function modoDoEnvio(envio: EnvioDaEtapa, lidas: Versao[]): ModoDoFormulario {
+  if (envio === 'historica') return { tipo: 'historica' }
+  const numero = proximoNumero(lidas)
+  return envio === 'piloto' ? { tipo: 'piloto', numeroSugerido: numero } : { tipo: 'sequencia', numero }
+}
+
+type AcoesDaSecaoProps = {
+  lidas: Versao[]; codigoDaEtapa: string; aberto: Aberto | null; aoAbrir: (aberto: Aberto | null) => void
+}
+
+/** O botão do envio da etapa atual (o mesmo botão abre e fecha o formulário) e o "⋯" das ações raras; nada se não há. */
+function AcoesDaSecao({ lidas, codigoDaEtapa, aberto, aoAbrir }: AcoesDaSecaoProps) {
+  const envio = envioDaEtapa(codigoDaEtapa, lidas)
   const raros = itensRaros(lidas, aoAbrir)
+  if (!envio && raros.length === 0) return null
   return (
     <div className="secao-de-versoes-acoes">
-      <button type="button" className="botao botao-secundario" onClick={() => aoAbrir({ tipo: 'nova', numero: proximoNumero(lidas) })}>
-        Enviar versão
-      </button>
+      {envio && (
+        <button type="button" className="botao botao-secundario" aria-expanded={aberto?.tipo === envio}
+          onClick={() => aoAbrir(aberto?.tipo === envio ? null : modoDoEnvio(envio, lidas))}>
+          {ROTULO_DO_ENVIO[envio]}
+        </button>
+      )}
       {raros.length > 0 && <MenuDeAcoes rotulo="Mais ações dos arquivos" grupos={[raros]} />}
     </div>
   )

@@ -779,7 +779,7 @@ export type Database = {
           historica: boolean
           id: string
           numero: number
-          observacao: string | null
+          piloto: boolean
           processo_id: string
         }
         Insert: {
@@ -789,7 +789,7 @@ export type Database = {
           historica?: boolean
           id?: string
           numero: number
-          observacao?: string | null
+          piloto?: boolean
           processo_id: string
         }
         Update: {
@@ -799,7 +799,7 @@ export type Database = {
           historica?: boolean
           id?: string
           numero?: number
-          observacao?: string | null
+          piloto?: boolean
           processo_id?: string
         }
         Relationships: [
@@ -951,6 +951,10 @@ export type Database = {
       }
     }
     Functions: {
+      acrescentar_arquivo: {
+        Args: { p_arquivo: Json; p_versao: string }
+        Returns: string
+      }
       acrescentar_etapa: {
         Args: {
           p_antes_de: string
@@ -1047,18 +1051,13 @@ export type Database = {
         Args: {
           p_arquivos: Json
           p_numero: number
-          p_observacao: string
+          p_piloto?: boolean
           p_processo: string
         }
         Returns: string
       }
       registrar_versao_historica: {
-        Args: {
-          p_arquivos: Json
-          p_numero: number
-          p_observacao: string
-          p_processo: string
-        }
+        Args: { p_arquivos: Json; p_numero: number; p_processo: string }
         Returns: string
       }
       retomar_processo: {
