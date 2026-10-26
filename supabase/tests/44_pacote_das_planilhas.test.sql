@@ -69,9 +69,9 @@ select public.mover_processo(pg_temp.processo('T44 Arquivado'), (select id from 
 select public.arquivar_processo(pg_temp.processo('T44 Arquivado'));
 select public.cancelar_processo(pg_temp.processo('T44 Cancelado'), 'Motivo inventado');
 select public.suspender_processo(pg_temp.processo('T44 Suspenso'), 'Motivo inventado');
-select public.registrar_versao(pg_temp.processo('T44 Versoes'), 1, null, pg_temp.par());
-select public.registrar_versao(pg_temp.processo('T44 Versoes'), 2, null, pg_temp.par());
-select public.registrar_versao_historica(pg_temp.processo('T44 Historica'), 5, null,
+select public.registrar_versao(pg_temp.processo('T44 Versoes'), 1, pg_temp.par());
+select public.registrar_versao(pg_temp.processo('T44 Versoes'), 2, pg_temp.par());
+select public.registrar_versao_historica(pg_temp.processo('T44 Historica'), 5,
   jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')));
 
 -- Provas de quem não pode (a1 é Administrador, mas o pacote não é da tela de ninguém).

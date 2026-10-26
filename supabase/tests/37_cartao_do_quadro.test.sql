@@ -73,12 +73,12 @@ select public.mover_processo(pg_temp.processo('Parado'), (select id from public.
 update public.passagens set etiqueta = 'em_andamento' where processo_id = pg_temp.processo('Parado') and saiu_em is null;
 select pg_temp.escolher('Resp Ativo', '00000000-0000-0000-0000-0000000000a2');
 select pg_temp.escolher('Resp Inativo', '00000000-0000-0000-0000-0000000000a4');
-select public.registrar_versao(pg_temp.processo('V1 Sem'), 1, null, pg_temp.par());
-select public.registrar_versao(pg_temp.processo('V1 Com'), 1, null, pg_temp.par() || pg_temp.relatorio('T20_V1_Com_Relatório.pdf'));
-select public.registrar_versao(pg_temp.processo('Relatorio Depois'), 1, null, pg_temp.par());
-select public.registrar_versao(pg_temp.processo('V2 Sem'), 1, null, pg_temp.par() || pg_temp.relatorio('T20_V2_Sem_Relatório.pdf'));
-select public.registrar_versao(pg_temp.processo('V2 Sem'), 2, null, pg_temp.par());
-select public.registrar_versao_historica(pg_temp.processo('Historica'), 5, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')));
+select public.registrar_versao(pg_temp.processo('V1 Sem'), 1, pg_temp.par());
+select public.registrar_versao(pg_temp.processo('V1 Com'), 1, pg_temp.par() || pg_temp.relatorio('T20_V1_Com_Relatório.pdf'));
+select public.registrar_versao(pg_temp.processo('Relatorio Depois'), 1, pg_temp.par());
+select public.registrar_versao(pg_temp.processo('V2 Sem'), 1, pg_temp.par() || pg_temp.relatorio('T20_V2_Sem_Relatório.pdf'));
+select public.registrar_versao(pg_temp.processo('V2 Sem'), 2, pg_temp.par());
+select public.registrar_versao_historica(pg_temp.processo('Historica'), 5, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')));
 select public.cancelar_processo(pg_temp.processo('Filho C'), 'Não segue');
 
 -- Etapa atual: etiqueta e entrada.

@@ -73,23 +73,23 @@ grant execute on function pg_temp.arquivo(text, text, bigint), pg_temp.par(), pg
 -- Versões, como administrador (os processos ainda estão em andamento). e1: V1 sem relatório, V2 com, V3 a V5 sem.
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
 set local role authenticated;
-select public.registrar_versao(pg_temp.processo('e1'), 1, null, pg_temp.par());
-select public.registrar_versao(pg_temp.processo('e1'), 2, null, pg_temp.par() || pg_temp.relatorio('RD1_V2_Processo Relatorio_Relatório.pdf'));
-select public.registrar_versao(pg_temp.processo('e1'), 3, null, pg_temp.par());
-select public.registrar_versao(pg_temp.processo('e1'), 4, null, pg_temp.par());
-select public.registrar_versao(pg_temp.processo('e1'), 5, null, pg_temp.par());
+select public.registrar_versao(pg_temp.processo('e1'), 1, pg_temp.par());
+select public.registrar_versao(pg_temp.processo('e1'), 2, pg_temp.par() || pg_temp.relatorio('RD1_V2_Processo Relatorio_Relatório.pdf'));
+select public.registrar_versao(pg_temp.processo('e1'), 3, pg_temp.par());
+select public.registrar_versao(pg_temp.processo('e1'), 4, pg_temp.par());
+select public.registrar_versao(pg_temp.processo('e1'), 5, pg_temp.par());
 -- e2, e3 e e4 ganham uma versão sem relatório antes de mudar de situação.
-select public.registrar_versao(pg_temp.processo('e2'), 1, null, pg_temp.par());
-select public.registrar_versao(pg_temp.processo('e3'), 1, null, pg_temp.par());
-select public.registrar_versao(pg_temp.processo('e4'), 1, null, pg_temp.par());
+select public.registrar_versao(pg_temp.processo('e2'), 1, pg_temp.par());
+select public.registrar_versao(pg_temp.processo('e3'), 1, pg_temp.par());
+select public.registrar_versao(pg_temp.processo('e4'), 1, pg_temp.par());
 -- e5: a histórica V1F com relatório e a V2F sem.
-select public.registrar_versao_historica(pg_temp.processo('e5'), 1, null, pg_temp.par() || pg_temp.relatorio('RD1_V1F_Processo Historico R_Relatório.pdf'));
-select public.registrar_versao_historica(pg_temp.processo('e5'), 2, null, pg_temp.par());
+select public.registrar_versao_historica(pg_temp.processo('e5'), 1, pg_temp.par() || pg_temp.relatorio('RD1_V1F_Processo Historico R_Relatório.pdf'));
+select public.registrar_versao_historica(pg_temp.processo('e5'), 2, pg_temp.par());
 -- e6: V1 com relatório, V2 e V3 sem. e7: V1 sem relatório.
-select public.registrar_versao(pg_temp.processo('e6'), 1, null, pg_temp.par() || pg_temp.relatorio('RD1_V1_Processo Perfis R_Relatório.pdf'));
-select public.registrar_versao(pg_temp.processo('e6'), 2, null, pg_temp.par());
-select public.registrar_versao(pg_temp.processo('e6'), 3, null, pg_temp.par());
-select public.registrar_versao(pg_temp.processo('e7'), 1, null, pg_temp.par());
+select public.registrar_versao(pg_temp.processo('e6'), 1, pg_temp.par() || pg_temp.relatorio('RD1_V1_Processo Perfis R_Relatório.pdf'));
+select public.registrar_versao(pg_temp.processo('e6'), 2, pg_temp.par());
+select public.registrar_versao(pg_temp.processo('e6'), 3, pg_temp.par());
+select public.registrar_versao(pg_temp.processo('e7'), 1, pg_temp.par());
 
 -- Outra chamada: as versões já existem há um dia.
 reset role;

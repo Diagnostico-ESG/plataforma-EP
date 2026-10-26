@@ -57,7 +57,7 @@ create function pg_temp.enviar(nome_do_processo text) returns uuid
 language sql as $$
   select public.registrar_versao(pg_temp.processo(nome_do_processo),
     (select coalesce(max(numero), 0) + 1 from public.versoes where processo_id = pg_temp.processo(nome_do_processo)),
-    null, pg_temp.par()) $$;
+    pg_temp.par()) $$;
 grant execute on function pg_temp.enviar(text) to authenticated;
 
 -- Numa transação só, `enviada_em` é o início dela (now()) e a entrada da passagem é clock_timestamp(): uma versão enviada

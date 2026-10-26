@@ -78,30 +78,28 @@ reset role;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
 set local role authenticated;
 insert into _tap (linha) select lives_ok(
-  $sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 5, '  Da primeira etapa  ', jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$,
+  $sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 5, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$,
   'administrador registra a V5F só com o .bpm');
 insert into _tap (linha) select is((select numero from public.versoes where processo_id = pg_temp.processo('e1') and historica), 5, 'a histórica guarda o número digitado');
 insert into _tap (linha) select ok((select etapa_id is null from public.versoes where processo_id = pg_temp.processo('e1') and numero = 5), 'a histórica não tem etapa');
 insert into _tap (linha) select is((select enviada_por::text from public.versoes where processo_id = pg_temp.processo('e1') and numero = 5),
   '00000000-0000-0000-0000-0000000000a1', 'quem registrou é quem chamou');
-insert into _tap (linha) select is((select observacao from public.versoes where processo_id = pg_temp.processo('e1') and numero = 5), 'Da primeira etapa',
-  'a observação é gravada sem espaços nas pontas');
-insert into _tap (linha) select lives_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 3, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$, 'registra também a V3F');
-insert into _tap (linha) select lives_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 4, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$, 'registra também a V4F');
+insert into _tap (linha) select lives_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 3, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$, 'registra também a V3F');
+insert into _tap (linha) select lives_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 4, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$, 'registra também a V4F');
 insert into _tap (linha) select is((select count(*) from public.versoes where processo_id = pg_temp.processo('e1') and historica), 3::bigint, 'o processo tem três históricas');
-insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 5, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$,
+insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 5, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$,
   'P0001', 'numero_historico_repetido:5', 'número de histórica repetido é recusado');
-insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 9, null, jsonb_build_array(pg_temp.arquivo('png', 'png')))$sql$,
+insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 9, jsonb_build_array(pg_temp.arquivo('png', 'png')))$sql$,
   'P0001', 'historica_sem_arquivo_de_fluxograma', 'histórica só com .png é recusada');
-insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 9, null, jsonb_build_array(pg_temp.arquivo('bpmn', 'bpmn')))$sql$,
+insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 9, jsonb_build_array(pg_temp.arquivo('bpmn', 'bpmn')))$sql$,
   'P0001', 'historica_sem_arquivo_de_fluxograma', 'histórica só com .bpmn é recusada');
-insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 9, null, jsonb_build_array(pg_temp.arquivo('relatorio', 'pdf')))$sql$,
+insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 9, jsonb_build_array(pg_temp.arquivo('relatorio', 'pdf')))$sql$,
   'P0001', 'historica_sem_arquivo_de_fluxograma', 'histórica só com relatório é recusada');
-insert into _tap (linha) select lives_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 2, null, pg_temp.par())$sql$, 'histórica com .bpmn e .png é aceita (V2F)');
-insert into _tap (linha) select lives_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 1, null, pg_temp.par() || pg_temp.arquivo('relatorio', 'pdf'))$sql$,
+insert into _tap (linha) select lives_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 2, pg_temp.par())$sql$, 'histórica com .bpmn e .png é aceita (V2F)');
+insert into _tap (linha) select lives_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 1, pg_temp.par() || pg_temp.arquivo('relatorio', 'pdf'))$sql$,
   'o relatório opcional entra na criação da histórica (V1F)');
 insert into _tap (linha) select is((select count(*) from public.arquivos_da_versao where versao_id = pg_temp.versao(pg_temp.processo('e1'), 1)), 3::bigint, 'a V1F tem os três arquivos');
-insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 0, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$, '23514', null, 'número zero é recusado');
+insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 0, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$, '23514', null, 'número zero é recusado');
 
 -- Somente leitura: depois da criação (outra chamada), nada entra nem muda na histórica.
 reset role;
@@ -118,20 +116,20 @@ insert into _tap (linha) select throws_ok(
   'P0001', 'versao_historica_somente_leitura', 'arquivo de histórica não é substituído');
 
 -- Numeração: a primeira versão nova continua depois da histórica; depois dela, histórica não entra mais.
-insert into _tap (linha) select lives_ok($sql$select public.registrar_versao(pg_temp.processo('e1'), 6, null,
+insert into _tap (linha) select lives_ok($sql$select public.registrar_versao(pg_temp.processo('e1'), 6,
   jsonb_build_array(pg_temp.arquivo('bpm', 'bpm'), pg_temp.arquivo('png', 'png')))$sql$, 'versão nova depois da V5F é aceita');
 insert into _tap (linha) select is((select max(numero) from public.versoes where processo_id = pg_temp.processo('e1') and not historica), 6, 'a versão nova depois de V5F recebe V6');
 insert into _tap (linha) select is((select e.codigo from public.versoes v join public.etapas e on e.id = v.etapa_id
     where v.processo_id = pg_temp.processo('e1') and v.numero = 6), 'nao_iniciados', 'a versão nova guarda a etapa atual');
-insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 7, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$,
+insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e1'), 7, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$,
   'P0001', 'historica_depois_de_versao_nova', 'histórica depois de versão nova é recusada');
 
 -- Processo fora de andamento.
-insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e2'), 1, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$,
+insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e2'), 1, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$,
   'P0001', 'processo_fora_de_andamento:suspenso', 'histórica em processo suspenso é recusada');
-insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e3'), 1, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$,
+insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e3'), 1, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$,
   'P0001', 'processo_fora_de_andamento:cancelado', 'histórica em processo cancelado é recusada');
-insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e4'), 1, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$,
+insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e4'), 1, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$,
   'P0001', 'processo_fora_de_andamento:concluido', 'histórica em processo concluído é recusada');
 
 -- Eventos: um por registro, com evento próprio; a nova continua com "enviar".
@@ -148,27 +146,31 @@ insert into _tap (linha) select is((select count(*) from public.eventos where en
 reset role;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 set local role authenticated;
-insert into _tap (linha) select lives_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e5'), 2, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$, 'integrante registra uma histórica');
+insert into _tap (linha) select lives_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e5'), 2, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$, 'integrante registra uma histórica');
 insert into _tap (linha) select is((select count(*) from public.versoes where processo_id = pg_temp.processo('e1') and historica), 5::bigint, 'integrante lê as históricas');
+-- Histórica só em Não iniciados (ADR 0025): o e5 sai de lá e a histórica passa a ser recusada.
+select public.mover_processo(pg_temp.processo('e5'), (select id from public.etapas where codigo = 'modelagem'));
+insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e5'), 3, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$,
+  'P0001', 'historica_fora_de_nao_iniciados', 'histórica fora de Não iniciados é recusada');
 
 -- Consulta.
 reset role;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a3","role":"authenticated"}', true);
 set local role authenticated;
-insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e5'), 8, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$, '42501', null, 'consulta não registra histórica');
+insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e5'), 8, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$, '42501', null, 'consulta não registra histórica');
 insert into _tap (linha) select is((select count(*) from public.eventos where entidade = 'versao' and acao = 'registrar_historica'), 6::bigint, 'consulta lê os eventos de histórica');
 
 -- Inativo.
 reset role;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a4","role":"authenticated"}', true);
 set local role authenticated;
-insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e5'), 8, null, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$, '42501', null, 'inativo não registra histórica');
+insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e5'), 8, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$, '42501', null, 'inativo não registra histórica');
 insert into _tap (linha) select is((select count(*) from public.eventos where entidade = 'versao' and acao = 'registrar_historica'), 0::bigint, 'inativo não lê os eventos de histórica');
 
 -- Visitante.
 reset role;
 set local role anon;
-insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica('9f000000-0000-0000-0000-0000000000e1', 8, null, '[]'::jsonb)$sql$, '42501', null,
+insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica('9f000000-0000-0000-0000-0000000000e1', 8, '[]'::jsonb)$sql$, '42501', null,
   'visitante não registra histórica');
 
 reset role;
