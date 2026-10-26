@@ -12,12 +12,11 @@ alter table public.arquivos_da_versao add column numero_do_relatorio integer
 
 -- Dá o número aos relatórios .docx das versões que não são históricas, na ordem do envio, por processo; o .pdf antigo e o
 -- relatório da histórica ficam sem número. Idempotente: só numera o que ainda não tem, a partir do maior do processo.
--- Roda com os gatilhos desligados (a troca de autor e data deles estragaria o histórico): só superusuário (a migração).
+-- Quem chama desliga os gatilhos antes (session_replication_role = replica): a troca de autor e data deles estragaria o
+-- histórico. A migração e o teste 58 fazem isso.
 create function private.numerar_relatorios_antigos() returns void
-language plpgsql set search_path = ''
+language sql set search_path = ''
 as $$
-begin
-  perform set_config('session_replication_role', 'replica', true);
   update public.arquivos_da_versao a set numero_do_relatorio = n.numero
   from (
     select a2.id, coalesce((select max(x.numero_do_relatorio) from public.arquivos_da_versao x
@@ -26,17 +25,15 @@ begin
     from public.arquivos_da_versao a2 join public.versoes v on v.id = a2.versao_id
     where a2.papel = 'relatorio' and a2.formato = 'docx' and a2.numero_do_relatorio is null and not v.historica
   ) n
-  where a.id = n.id;
-  perform set_config('session_replication_role', 'origin', true);
-end $$;
+  where a.id = n.id $$;
 revoke execute on function private.numerar_relatorios_antigos() from public, anon, authenticated;
 
 -- As cópias de "sem alteração de conteúdo" saem (as cópias no Drive ficam na pasta, como os órfãos; os eventos antigos
 -- ficam com o texto), e depois a coluna.
-select set_config('session_replication_role', 'replica', true);
+set local session_replication_role = replica;
 delete from public.arquivos_da_versao where copiado_de is not null;
-select set_config('session_replication_role', 'origin', true);
 select private.numerar_relatorios_antigos();
+set local session_replication_role = origin;
 
 -- Onde cabe, agora também para o relatório: até a Revisão interna, pela ordem do catálogo.
 create or replace function private.conferir_onde_cabe_a_versao(processo uuid, tipo text) returns void

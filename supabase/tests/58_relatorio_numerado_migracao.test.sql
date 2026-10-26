@@ -57,9 +57,10 @@ select pg_temp.versao(pg_temp.processo('e1'), 4, false, interval '2 days');
 select pg_temp.relatorio(pg_temp.processo('e1'), 4, 'pdf', interval '2 days');
 select pg_temp.versao(pg_temp.processo('e2'), 1, false, interval '3 days');
 select pg_temp.relatorio(pg_temp.processo('e2'), 1, 'docx', interval '3 days');
-set local session_replication_role = origin;
 
+-- Como na migração: gatilhos desligados enquanto a função numera.
 select private.numerar_relatorios_antigos();
+set local session_replication_role = origin;
 
 insert into _tap (linha) select is(pg_temp.numero(pg_temp.processo('e1'), 2), 1, 'o relatório enviado primeiro (V2) é o Relatório V1');
 insert into _tap (linha) select is(pg_temp.numero(pg_temp.processo('e1'), 3), 2, 'e o enviado depois (V3), mesmo gravado antes, é o Relatório V2');
@@ -67,7 +68,9 @@ insert into _tap (linha) select is(pg_temp.numero(pg_temp.processo('e1'), 4), nu
 insert into _tap (linha) select is(pg_temp.numero(pg_temp.processo('e1'), 1), null::integer, 'o relatório da versão histórica fica sem número');
 insert into _tap (linha) select is(pg_temp.numero(pg_temp.processo('e2'), 1), 1, 'cada processo tem a sua numeração');
 
+set local session_replication_role = replica;
 select private.numerar_relatorios_antigos();
+set local session_replication_role = origin;
 insert into _tap (linha) select is(pg_temp.numero(pg_temp.processo('e1'), 3), 2, 'rodar de novo não renumera');
 insert into _tap (linha) select is((select count(*) from public.arquivos_da_versao where numero_do_relatorio is not null), 3::bigint,
   'ao todo, três relatórios numerados');
