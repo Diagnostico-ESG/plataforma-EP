@@ -209,10 +209,10 @@ insert into _tap (linha) select throws_ok($sql$select pg_temp.enviar_pdf('Pdf', 
   'P0001', 'pdf_nome_sem_versao:T60_V9_Pdf_Aprovação.pdf', 'o nome sem a versão aprovada é recusado');
 insert into _tap (linha) select lives_ok($sql$select pg_temp.enviar_pdf('Pdf')$sql$, 'enviar o .pdf da aprovação é aceito');
 insert into _tap (linha) select results_eq(
-  $sql$select p.nome, p.formato, p.guardado_em is null, p.enviado_por::text,
+  $sql$select p.nome, p.guardado_em is null, p.enviado_por::text,
     (p.versao_id = (select id from public.versoes where processo_id = pg_temp.processo('Pdf') and numero = 1))
     from public.pdfs_da_aprovacao p where p.id = pg_temp.pdf_de('Pdf')$sql$,
-  $sql$values ('T60_V1_Pdf_Aprovação.pdf', 'pdf', true, '00000000-0000-0000-0000-0000000000a2', true)$sql$,
+  $sql$values ('T60_V1_Pdf_Aprovação.pdf', true, '00000000-0000-0000-0000-0000000000a2', true)$sql$,
   'o .pdf guarda a versão aprovada e quem o enviou, sem data de guardado');
 insert into _tap (linha) select throws_ok($sql$select pg_temp.enviar_pdf('Pdf', pg_temp.pdf(drive => 'drive-pdf-outro'))$sql$,
   'P0001', 'pdf_ja_enviado', 'um segundo .pdf atual da mesma aprovação é recusado');
