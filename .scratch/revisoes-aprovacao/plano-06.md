@@ -86,7 +86,7 @@
 
 ### Tarefa 9: fecho
 
-- [ ] Docs: `desvios.md` de revisoes-aprovacao (decisões de execução 1 a 8 e o que mudou em relação à spec), spec (decisões a confirmar da seção), `docs/` da função e do banco (onde já se descreve `arquivos-no-drive` e a tabela de eventos), ticket (`Concluído em`), backlog (o que surgir), `.scratch/proximo-passo.md`, `.claude/regras/nao-testados.md` → `.scratch/melhorias-protocolo.md`.
-- [ ] Commits por assunto (o pre-commit roda a bateria), `git push origin quadro-livre-parte-3`; conferir o "Testes de banco" verde na branch.
-- [ ] Aplicar a migração no desenvolvimento pelo workflow "Migrar banco de desenvolvimento" (autorizado), conferindo o vínculo, se ainda não foi aplicada; `db:types` do remoto igual aos tipos do commit.
+- [x] Docs: `desvios.md` de revisoes-aprovacao (decisões de execução 1 a 8 e o que mudou em relação à spec), spec (decisões a confirmar da seção), `docs/` da função e do banco (onde já se descreve `arquivos-no-drive` e a tabela de eventos), ticket (`Concluído em`), backlog (o que surgir), `.scratch/proximo-passo.md`, `.claude/regras/nao-testados.md` → `.scratch/melhorias-protocolo.md`.
+- [x] Commits por assunto (o pre-commit roda a bateria), `git push origin quadro-livre-parte-3`; conferir o "Testes de banco" verde na branch.
+- [x] Aplicar a migração no desenvolvimento pelo workflow "Migrar banco de desenvolvimento" (autorizado), conferindo o vínculo, se ainda não foi aplicada; `db:types` do remoto igual aos tipos do commit.
 - [ ] Juntar `quadro-livre-parte-3` à `main`: **só com a aprovação do usuário**, depois de dizer o que entra (as três partes da iniciativa, a migração e a função a publicar). O passo 4 do comando (merge e `git branch -d`) segue o que ele responder.

@@ -56,7 +56,7 @@ A tabela "quem pode o quê" completa de cada funcionalidade está na spec dela, 
 
 | Tabela / view | O que guarda |
 | --- | --- |
-| `processos` | Cada processo, subprocesso ou item "a classificar": nome, tipo, setor, macroprocesso, processo pai, situação guardada (`em_andamento`, `suspenso`, `cancelado`), motivo, observações, origem (`novo` ou `retomado`) e a data da modelagem piloto (campo único, pode ficar vazio). |
+| `processos` | Cada processo, subprocesso ou item "a classificar": nome, tipo, setor, macroprocesso, processo pai, situação guardada (`em_andamento`, `suspenso`, `cancelado`), motivo, observações, origem (`novo` ou `retomado`) a data da modelagem piloto (campo único, pode ficar vazio) e a **data da validação** (o dia em que o setor validou o fluxo; opcional, só se grava pela função `registrar_data_da_validacao`, com o processo na Validação com o setor, e nunca no futuro). |
 | `etapas` | O **catálogo de etapas**: código, nome, ordem, obrigatória ou opcional, ativa e a **fase do Regimento** (IV a IX). O Administrador muda o catálogo sem mexer no código (ADR 0004). |
 | `andamentos` | Uma linha por processo e etapa: status (`pendente`, `em_andamento`, `concluida`, `realizada_anteriormente`, `dispensada`), responsável, datas e nota. |
 | `processos_com_andamento` (view) | O que a tela lê: o processo com a etapa atual, o responsável, o setor, o macroprocesso, a última versão e a situação já calculada. Traz também `tem_versao_piloto`, `tem_versao_em_sequencia` e `tem_relatorio_numerado`, que a tela lê para decidir a janela da trava de arquivos. |
@@ -71,6 +71,7 @@ A tabela "quem pode o quê" completa de cada funcionalidade está na spec dela, 
 | `pastas_no_drive` | A pasta do Drive de cada processo e setor, criada no primeiro envio. |
 | `revisoes_internas` | Cada revisão interna: versão revisada, resultado (`sem_alteracao` ou `corrigida`), escopo, comentário e revisor (ADRs 0009 e 0015). |
 | `aprovacoes` | A aprovação: versão aprovada, número e link do E-protocolo e data (todos opcionais, ADR 0015). |
+| `pdfs_da_aprovacao` | O .pdf protocolado de cada aprovação, no Drive (nome `{sigla}_V8_{processo}_Aprovação.pdf`, tamanho, MD5 e identificador no Drive). Um atual por aprovação; quando uma aprovação nova toma o lugar da anterior, o .pdf da anterior fica guardado (`guardado_em`) e aparece no histórico. Nada se apaga. |
 
 ### Planilhas dos dashboards
 
@@ -91,6 +92,7 @@ Cada uma faz a regra inteira de uma vez: ou tudo acontece, ou nada muda.
 | Processo | `suspender_processo`, `retomar_processo`, `cancelar_processo`, `reclassificar_processo` |
 | Versões | `registrar_versao`, `registrar_versao_historica`, `enviar_relatorio`, `acrescentar_arquivo`, `substituir_arquivo` |
 | Revisão e aprovação | `concluir_revisao_interna`, `concluir_aprovacao` |
+| Data da validação e .pdf da aprovação | `registrar_data_da_validacao`, `registrar_pdf_da_aprovacao`, `substituir_pdf_da_aprovacao` |
 | Planilhas | `pedir_atualizacao_das_planilhas` (botão), `links_das_planilhas`, `registrar_resultado_das_planilhas` (chamada pela função do servidor, sem login) |
 
 As funções do schema `private` (conferências, gatilhos, a montagem do pacote das planilhas) não aparecem para a tela.
@@ -100,6 +102,7 @@ As funções do schema `private` (conferências, gatilhos, a montagem do pacote 
 - **No máximo uma etapa em andamento por processo** (índice único em `andamentos`).
 - **Revisão e aprovação travam a conclusão**: não se conclui a revisão interna sem uma revisão da versão mais recente; revisão pelo setor e aprovação exigem versão completa (`.bpm`, `.png` e relatório); a aprovação não se faz sem versão (ADRs 0009, 0012, 0015 e 0016).
 - **Trava de arquivos** (ADR 0025): `mover_processo` recusa mover o processo para a frente da Modelagem piloto sem uma versão piloto (uma versão em sequência também basta) e para a frente da Relatório e modelagem técnica sem uma versão em sequência e um relatório numerado (`private.conferir_trava_de_arquivos`). Voltar, a mesma etapa, o processo que já estava adiante e a etapa desativada no catálogo não travam. A recusa vem como `trava_piloto` ou `trava_tecnica:versao|relatorio|versao_e_relatorio`.
+- **Data da validação e .pdf da aprovação** (migração `20261026164641_data_da_validacao_e_pdf_da_aprovacao`): a data só se grava na Validação com o setor, com o processo em andamento, e não pode ser futura; o .pdf só entra numa aprovação que existe, com a versão aprovada no nome, com o processo em andamento ou concluído (nunca arquivado), e se substitui sem guardar o conteúdo anterior (ADR 0007); o .pdf de uma aprovação trocada fica guardado.
 - **Autor não revisa a própria versão** (ADR 0014), conferido na hora de escolher o responsável.
 - **Versão aprovada não tem arquivo substituído** (ADR 0011).
 - **Etapas de revisão e de aprovação não se desativam nem se excluem** (gatilho `bloquear_etapa_protegida`).

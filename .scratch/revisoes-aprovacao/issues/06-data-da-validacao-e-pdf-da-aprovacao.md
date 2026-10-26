@@ -28,8 +28,12 @@ Spec: `.scratch/revisoes-aprovacao/spec.md`, seção "Data da validação e .pdf
 
 ## Critérios de aceite
 
-- [ ] Testes pgTAP escritos antes da migração e vistos falhar: cada célula da tabela "quem pode o quê" e cada regra da seção (data só na Validação, não futura, alterada e apagada; .pdf só de aprovação existente, um atual, regra do editar, guardado na troca, só conteúdo substituído, nada apagado; eventos). O `40_aprovacao` ganha os casos do .pdf guardado; `10_privilegios_padrao` cobre a tabela nova.
-- [ ] Testes de interface com o aplicativo inteiro: a data no Agora só na Validação, marcar, alterar, apagar, futura recusada, falha ao gravar, a linha na gaveta depois de sair, Consulta só lendo; registrar a aprovação com e sem .pdf, formato errado e tamanho grande recusados, falha no envio sem registrar; [Enviar .pdf] e [Substituir] na gaveta, sumindo no arquivado e para a Consulta; o .pdf anterior no histórico; as marcas da conferência; os eventos novos.
-- [ ] O arquivo puro de decisão da função e o nome padrão do .pdf têm testes; os testes dos módulos reais provam as chamadas e as frases das recusas novas.
+- [x] Testes pgTAP escritos antes da migração e vistos falhar: cada célula da tabela "quem pode o quê" e cada regra da seção (data só na Validação, não futura, alterada e apagada; .pdf só de aprovação existente, um atual, regra do editar, guardado na troca, só conteúdo substituído, nada apagado; eventos). O `40_aprovacao` ganha os casos do .pdf guardado; `10_privilegios_padrao` cobre a tabela nova.
+- [x] Testes de interface com o aplicativo inteiro: a data no Agora só na Validação, marcar, alterar, apagar, futura recusada, falha ao gravar, a linha na gaveta depois de sair, Consulta só lendo; registrar a aprovação com e sem .pdf, formato errado e tamanho grande recusados, falha no envio sem registrar; [Enviar .pdf] e [Substituir] na gaveta, sumindo no arquivado e para a Consulta; o .pdf anterior no histórico; as marcas da conferência; os eventos novos.
+- [x] O arquivo puro de decisão da função e o nome padrão do .pdf têm testes; os testes dos módulos reais provam as chamadas e as frases das recusas novas.
 - [ ] `[visual]` O campo da data da validação no Agora fica alinhado aos outros campos e cabe numa linha.
 - [ ] `[visual]` Na gaveta da Aprovação pelo setor, o .pdf aparece como os arquivos das versões; a janela "Registrar aprovação" com o campo do .pdf não passa da altura do notebook (1366×768).
+
+Concluído em 2026-10-26 (commit d7bf043)
+
+Os dois critérios `[visual]` ficam sem marca: a tela foi vista só pelos testes com módulos falsos (a vitrine local está desatualizada e o login real não foi usado). Ver `.scratch/revisoes-aprovacao/desvios.md`, 2026-10-26.
