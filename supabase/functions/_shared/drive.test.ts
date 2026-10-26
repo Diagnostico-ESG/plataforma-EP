@@ -78,6 +78,10 @@ describe('tipoMimeDaExtensao', () => {
     ['docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
     ['bpmn', 'application/xml'],
     ['bpm', 'application/octet-stream'],
+    ['xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+    ['jpg', 'image/jpeg'],
+    ['jpeg', 'image/jpeg'],
+    ['eml', 'message/rfc822'],
   ])('%s → %s', (extensao, tipo) => {
     expect(tipoMimeDaExtensao(extensao)).toBe(tipo)
   })

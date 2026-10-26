@@ -1,6 +1,12 @@
 // Arquivo puro (sem Deno nem npm:): usado pela função do servidor e, no ticket 02, pela prévia do formulário.
-/** `pdf_da_aprovacao` é o .pdf protocolado da aprovação (revisoes-aprovacao, ticket 06): não é papel de arquivo de versão no banco. */
-export type PapelDoArquivo = 'bpmn' | 'png' | 'bpm' | 'relatorio' | 'pdf_da_aprovacao'
+/**
+ * `pdf_da_aprovacao` é o .pdf protocolado da aprovação (revisoes-aprovacao, ticket 06) e `anexo` o arquivo avulso do processo
+ * (documentos-versoes, ticket 12): nenhum dos dois é papel de arquivo de versão no banco, e nenhum dos dois usa o nome padrão.
+ */
+export type PapelDoArquivo = 'bpmn' | 'png' | 'bpm' | 'relatorio' | 'pdf_da_aprovacao' | 'anexo'
+
+/** Os formatos do anexo (ADR 0027); o banco os repete na restrição `anexos_formato`. */
+export const EXTENSOES_DO_ANEXO: readonly string[] = ['pdf', 'docx', 'xlsx', 'png', 'jpg', 'jpeg', 'eml']
 
 export interface DadosDoNome {
   sigla: string

@@ -1,6 +1,6 @@
 // Decisão da função arquivos-no-drive (quem pode, qual entrada vale). Arquivo puro, sem Deno nem npm:,
 // testado no Vitest (regra "Edge Functions" de .claude/regras/banco.md). A entrada é dado de fora.
-import type { PapelDoArquivo } from './nomePadrao.ts'
+import { EXTENSOES_DO_ANEXO, type PapelDoArquivo } from './nomePadrao.ts'
 
 export type Perfil = 'administrador' | 'integrante_ep' | 'consulta'
 export type Acao = 'iniciar_envio' | 'baixar' | 'registrar' | 'conferir'
@@ -60,6 +60,7 @@ export const EXTENSOES_POR_PAPEL: Record<PapelDoArquivo, readonly string[]> = {
   bpm: ['bpm'],
   relatorio: ['docx', 'pdf'],
   pdf_da_aprovacao: ['pdf'],
+  anexo: EXTENSOES_DO_ANEXO,
 }
 
 const MENSAGENS: Record<CodigoDeRecusa, string> = {
@@ -179,7 +180,7 @@ export function lerBooleanoOpcional(corpo: Corpo, campo: string): Validacao<bool
 export function lerPapel(corpo: Corpo): Validacao<PapelDoArquivo> {
   const valor = corpo.papel
   if (typeof valor !== 'string' || !(valor in EXTENSOES_POR_PAPEL)) {
-    return campoInvalido(corpo, 'papel', 'bpmn, png, bpm, relatorio ou pdf_da_aprovacao')
+    return campoInvalido(corpo, 'papel', 'bpmn, png, bpm, relatorio, pdf_da_aprovacao ou anexo')
   }
   return { ok: true, valor: valor as PapelDoArquivo }
 }

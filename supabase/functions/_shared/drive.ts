@@ -31,6 +31,10 @@ const TIPOS_MIME: Record<string, string> = {
   pdf: 'application/pdf',
   docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   bpmn: 'application/xml',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  eml: 'message/rfc822',
 }
 
 // O .bpm do Bizagi não tem tipo registrado; vai como binário genérico.
