@@ -21,7 +21,8 @@ const AVISO_DA_TROCA = 'O arquivo anterior não fica guardado: o histórico regi
  * de confirmação; o campo fica travado durante o envio e, na falha, o arquivo escolhido continua no formulário.
  */
 export function FormularioDeSubstituicao({ modulo, processoId, versao, arquivo, aoSubstituido, aoCancelar }: FormularioDeSubstituicaoProps) {
-  const arquivos = useArquivosDaVersao()
+  const semNumero = arquivo.papel === 'relatorio' && arquivo.numeroDoRelatorio === undefined
+  const arquivos = useArquivosDaVersao(semNumero)
   const [confirmando, setConfirmando] = useState(false)
   const [progresso, setProgresso] = useState<Progresso | null>(null)
   const [aviso, setAviso] = useState<string | null>(null)
@@ -54,7 +55,7 @@ export function FormularioDeSubstituicao({ modulo, processoId, versao, arquivo, 
         <fieldset className="formulario-de-versao-campos" disabled={enviando}>
           <legend>Substituir {arquivo.nome}</legend>
           <CampoDeArquivo papel={arquivo.papel} obrigatorio nomePrevisto={escolhido ? arquivo.nome : null} recusa={recusa}
-            aoEscolher={(novo) => void arquivos.escolher(arquivo.papel, novo)} />
+            relatorioSemNumero={semNumero} aoEscolher={(novo) => void arquivos.escolher(arquivo.papel, novo)} />
         </fieldset>
         {progresso && <p className="formulario-de-versao-progresso" role="status">{textoDoProgresso(progresso)}</p>}
         <div className="formulario-do-processo-botoes">

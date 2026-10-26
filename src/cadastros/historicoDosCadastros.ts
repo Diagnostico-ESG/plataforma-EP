@@ -41,6 +41,7 @@ const TEXTO_DA_ACAO_DA_ETAPA: Record<string, string> = {
 const TEXTO_DA_ACAO_DA_VERSAO: Record<string, string> = {
   enviar: 'Enviou a versão', enviar_piloto: 'Enviou a versão piloto', registrar_historica: 'Registrou a versão histórica',
   acrescentar_arquivo: 'Acrescentou um arquivo à versão',
+  enviar_relatorio: 'Enviou o Relatório',
   acrescentar_relatorio: 'Acrescentou o relatório à versão', sem_alteracao: 'Marcou sem alteração de conteúdo na versão',
   substituir: 'Substituiu o arquivo da versão',
 }
@@ -71,7 +72,7 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   processo_nome: 'Processo', responsavel_nome: 'Responsável', processo_pai_nome: 'Processo pai', etiqueta: 'Etiqueta',
   nivel: 'Nível', obrigatoria: 'Obrigatória', fase: 'Fase', ativa: 'Situação', ordem: 'Posição',
   data_da_modelagem_piloto: 'Data da modelagem piloto', data_da_reuniao: 'Data da modelagem piloto',
-  rotulo: 'Versão', etapa: 'Etapa', arquivos: 'Arquivos', relatorio_de: 'Relatório copiado da versão', papel: 'Arquivo acrescentado',
+  rotulo: 'Versão', etapa: 'Etapa', arquivos: 'Arquivos', relatorio_de: 'Relatório copiado da versão', papel: 'Arquivo acrescentado', numero_do_relatorio: 'Número do relatório',
   hash_md5: 'Impressão digital (MD5)',
   versao_revisada: 'Versão revisada', versao_corrigida: 'Versão corrigida', resultado: 'Resultado', escopo: 'Escopo',
   comentario: 'Comentário', revisor_nome: 'Revisor', revisada_em: 'Data da revisão',
@@ -88,6 +89,10 @@ export function textoDoEvento(evento: EventoDoCadastro): string {
   if (evento.entidade === 'versao' && evento.acao === 'acrescentar_arquivo') {
     const papel = registro(evento.depois).papel
     if (typeof papel === 'string' && papel !== '') return `Acrescentou o .${papel} à versão`
+  }
+  if (evento.entidade === 'versao' && evento.acao === 'enviar_relatorio') {
+    const { numero_do_relatorio: numero, rotulo } = registro(evento.depois)
+    if (typeof numero === 'number' && typeof rotulo === 'string') return `Enviou o Relatório V${numero} (acompanha a ${rotulo})`
   }
   return textoDaAcaoDoCadastro(evento.acao, evento.entidade)
 }

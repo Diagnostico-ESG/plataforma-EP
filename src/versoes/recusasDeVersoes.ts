@@ -5,8 +5,6 @@ import { fraseDaVersaoAprovada } from '../revisoes/frasesDeAprovacao'
 // como "motivo" de "motivo:valor" (migração versoes), com o valor na mensagem.
 const ARQUIVO_NAO_CHEGOU = 'Um dos arquivos não chegou ao Drive. Envie de novo.'
 
-const FALHA_DA_COPIA = 'Não foi possível copiar o relatório da versão anterior. Envie o relatório.'
-
 const FRASE_DO_CODIGO: Record<string, (valor: string) => string> = {
   sem_permissao: () => 'Seu perfil não permite enviar versões.',
   usuario_inativo: () => 'Seu usuário está desativado; não é possível enviar versões.',
@@ -33,12 +31,13 @@ const FRASE_DO_CODIGO: Record<string, (valor: string) => string> = {
   historica_depois_de_versao_nova: () => 'O processo já tem versão nova; versões históricas só podem ser registradas antes dela.',
   numero_historico_repetido: (numero) => `O processo já tem a versão histórica V${numero}F. Use outro número.`,
   historica_sem_arquivo_de_fluxograma: () => 'A versão histórica precisa do arquivo .bpm, ou do .bpmn com o .png.',
-  relatorio_ja_existe: () => 'Esta versão já tem relatório.',
-  versao_anterior_sem_relatorio: () => 'A versão anterior não tem relatório para copiar. Envie o relatório.',
+  numero_do_relatorio_mudou: (numero) =>
+    `Outra pessoa enviou um relatório enquanto você enviava; este seria o Relatório V${numero}. Envie de novo.`,
+  relatorio_so_docx: () => 'O relatório precisa ser um arquivo .docx.',
+  relatorio_sem_versao: () => 'Não há versão para receber o relatório: envie a versão piloto ou uma versão primeiro.',
+  relatorio_fora_da_etapa: () => 'O relatório só pode ser enviado até a Revisão interna.',
+  relatorio_fora_da_versao_mais_recente: () => 'O relatório precisa acompanhar a versão mais recente.',
   versao_historica_somente_leitura: () => 'A versão histórica é somente leitura: não recebe arquivos.',
-  copia_so_de_relatorio: () => FALHA_DA_COPIA,
-  copia_de_versao_que_nao_e_a_anterior: () => FALHA_DA_COPIA,
-  copia_diferente_do_original: () => FALHA_DA_COPIA,
   versao_aprovada: fraseDaVersaoAprovada,
   tipo_de_arquivo_diferente: () => 'O arquivo novo precisa ser do mesmo tipo do que sai.',
   entrada_invalida: () => 'Os dados do envio não foram aceitos. Confira os campos e os arquivos e envie de novo.',

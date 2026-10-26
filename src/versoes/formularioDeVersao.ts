@@ -15,9 +15,14 @@ export type Progresso = { enviados: number; total: number }
  * que existirem, a piloto e a em sequência, o .bpm (ADR 0025).
  */
 export type ModoDoFormulario =
-  | { tipo: 'sequencia'; numero: number } | { tipo: 'piloto'; numeroSugerido: number } | { tipo: 'historica' }
+  | { tipo: 'sequencia'; numero: number; numeroDoRelatorio: number } | { tipo: 'piloto'; numeroSugerido: number } | { tipo: 'historica' }
 
 export const PAPEIS_OBRIGATORIOS: readonly PapelDoArquivo[] = ['bpm']
+
+/** Os campos de arquivo do formulário: a piloto não leva relatório (ele se envia sozinho); a histórica leva o dela, sem número. */
+export function papeisDoFormulario(modo: ModoDoFormulario): readonly PapelDoArquivo[] {
+  return modo.tipo === 'piloto' ? PAPEIS.filter((papel) => papel !== 'relatorio') : PAPEIS
+}
 
 export function arquivosDoPedido(escolhidos: Escolhidos): ArquivoEscolhido[] {
   return PAPEIS.flatMap((papel) => {
@@ -61,11 +66,16 @@ export function textoDoProgresso({ enviados, total }: Progresso): string {
 
 /** O nome que o arquivo vai ter no Drive e na lista (a mesma função que a função do servidor usa). */
 export function nomeNaPrevia(processo: { setorSigla: string; nome: string }, numero: number, papel: PapelDoArquivo,
-  arquivo: File, tipo: 'historica' | 'piloto' | 'sequencia' = 'sequencia'): string {
+  arquivo: File, tipo: 'historica' | 'piloto' | 'sequencia' = 'sequencia', numeroDoRelatorio?: number): string {
   return nomePadrao({
-    sigla: processo.setorSigla, numero, historica: tipo === 'historica', piloto: tipo === 'piloto',
+    sigla: processo.setorSigla, numero, historica: tipo === 'historica', piloto: tipo === 'piloto', numeroDoRelatorio,
     nomeDoProcesso: processo.nome, papel, extensao: extensaoDoNome(arquivo.name),
   })
+}
+
+/** "Relatório V3, acompanha a V8": o que o formulário do relatório diz antes do envio (a versão é a mais recente que não é histórica). */
+export function previaDoRelatorio({ numeroDaVersao, piloto, numeroDoRelatorio }: { numeroDaVersao: number; piloto: boolean; numeroDoRelatorio: number }): string {
+  return `Relatório V${numeroDoRelatorio}, acompanha a V${numeroDaVersao}${piloto ? 'P' : ''}`
 }
 
 export function textoDaFalhaDoEnvio(erro: unknown): string {
@@ -80,8 +90,8 @@ export function textoDaFalhaDoAcrescimo(erro: unknown): string {
   return `O arquivo não foi registrado: ${motivo}. Tente de novo.`
 }
 
-/** O relatório depois pede só o arquivo do relatório, sem recusa e sem conferência em andamento. */
-export function podeAcrescentarRelatorio(escolhidos: Escolhidos, recusas: RecusasDosCampos, conferindo: boolean): boolean {
+/** O relatório sozinho pede só o arquivo do relatório, sem recusa e sem conferência em andamento. */
+export function podeEnviarRelatorio(escolhidos: Escolhidos, recusas: RecusasDosCampos, conferindo: boolean): boolean {
   if (conferindo || Object.values(recusas).some(Boolean)) return false
   return Boolean(escolhidos.relatorio)
 }

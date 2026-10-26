@@ -38,7 +38,7 @@ function escolher(form: Form, rotulo: string, arquivo: File) {
 const BPM = 'Fluxograma Bizagi (.bpm)'
 const PNG = 'Imagem do fluxo (.png) (opcional)'
 const BPMN = '.bpmn (opcional)'
-const RELATORIO = 'Relatório (.docx ou .pdf) (opcional)'
+const RELATORIO = 'Relatório (.docx) (opcional)'
 
 const botaoEnviar = (form: Form) => form.getByRole('button', { name: 'Enviar' }) as HTMLButtonElement
 

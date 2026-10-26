@@ -1,8 +1,7 @@
 import { expect, test } from 'vitest'
 import {
-  PAPEIS, ROTULO_DO_PAPEL, emOrdemDeExibicao, envioDaEtapa, formatarDiaEMes, haVersaoEmSequencia, haVersaoNova, ordenarVersoes,
-  origemDoRelatorio, papeisQueSePodeAcrescentar, podeCopiarRelatorio, proximoNumero, relatorioPendente, rotuloCurtoDoArquivo,
-  rotuloDaAnterior, rotuloDaVersao, versoesComRelatorioPendente,
+  PAPEIS, ROTULO_DO_PAPEL, acceptDoCampo, emOrdemDeExibicao, envioDaEtapa, formatarDiaEMes, haVersaoEmSequencia, haVersaoNova,
+  ordenarVersoes, papeisQueSePodeAcrescentar, podeEnviarRelatorioNaEtapa, proximoNumero, rotuloCurtoDoArquivo, rotuloDaVersao, rotuloDoCampo,
 } from './rotulos'
 import type { ArquivoDaVersao, Versao } from './tipos'
 
@@ -48,6 +47,22 @@ test.each([
   expect(envioDaEtapa(etapa, versoes as Versao[])).toBe(esperado)
 })
 
+test.each([
+  ['relatorio_modelagem_tecnica', [versao(7)], true],
+  ['relatorio_modelagem_tecnica', [versao(6, false, true)], true],
+  ['revisao_interna', [versao(5, true), versao(7)], true],
+  ['relatorio_modelagem_tecnica', [versao(5, true)], false],
+  ['relatorio_modelagem_tecnica', [], false],
+  ['modelagem', [versao(6, false, true)], false],
+  ['nao_iniciados', [versao(7)], false],
+  ['revisao_setor', [versao(7)], false],
+  ['publicacao', [versao(7)], false],
+  ['concluidos', [versao(7)], false],
+  ['etapa_nova_do_catalogo', [versao(7)], false],
+])('o [Enviar relatório] na etapa %s com as versões %j: %s', (etapa, versoes, esperado) => {
+  expect(podeEnviarRelatorioNaEtapa(etapa, versoes as Versao[])).toBe(esperado)
+})
+
 test('acrescentar .png e .bpmn só cabe na versão piloto ou em sequência, fora da aprovada, e só o que falta', () => {
   const arquivo = (papel: 'bpm' | 'png' | 'bpmn') => ({ id: `a-${papel}`, papel, nome: papel, formato: papel, tamanho: 1 })
   const comBpm = { ...versao(7), arquivos: [arquivo('bpm')] }
@@ -75,52 +90,6 @@ test('as versões vão da mais recente (maior número) para a mais antiga', () =
   expect(ordenarVersoes([versao(5, true), versao(7), versao(6)]).map(rotuloDaVersao)).toEqual(['V7', 'V6', 'V5F'])
 })
 
-function relatorioDe(numero: number, copiadoDe?: string) {
-  return { id: `r${numero}`, papel: 'relatorio' as const, nome: `TSA_V${numero}_Relatório.pdf`, formato: 'pdf', tamanho: 10, copiadoDe }
-}
-
-function comRelatorio(numero: number, copiadoDe?: string): Versao {
-  return { ...versao(numero), arquivos: [relatorioDe(numero, copiadoDe)] }
-}
-
-test('o relatório está pendente na versão nova sem relatório, nunca na histórica', () => {
-  expect(relatorioPendente(versao(6))).toBe(true)
-  expect(relatorioPendente(comRelatorio(6))).toBe(false)
-  expect(relatorioPendente(versao(5, true))).toBe(false)
-})
-
-test('as versões com relatório pendente vêm da mais recente para a mais antiga', () => {
-  const versoes = [comRelatorio(2), versao(1), versao(3), versao(4, true), versao(5)]
-  expect(versoesComRelatorioPendente(versoes).map(rotuloDaVersao)).toEqual(['V5', 'V3', 'V1'])
-})
-
-test('"sem alteração" só cabe na versão pendente cuja anterior tem relatório', () => {
-  const versoes = [versao(1), comRelatorio(2), versao(3), versao(4), versao(5, true)]
-  expect(podeCopiarRelatorio(versoes[2], versoes)).toBe(true) // V3: a V2 tem relatório
-  expect(podeCopiarRelatorio(versoes[3], versoes)).toBe(false) // V4: a V3 não tem
-  expect(podeCopiarRelatorio(versoes[0], versoes)).toBe(false) // V1: não há anterior
-  expect(podeCopiarRelatorio(comRelatorio(6), [...versoes, comRelatorio(6)])).toBe(false) // já tem relatório
-  expect(podeCopiarRelatorio(versoes[4], versoes)).toBe(false) // histórica
-})
-
-test('a anterior é a de maior número menor, mesmo com números saltados', () => {
-  const versoes = [comRelatorio(2), versao(7)]
-  expect(podeCopiarRelatorio(versoes[1], versoes)).toBe(true)
-})
-
-test('a origem do relatório copiado é o rótulo da versão de onde veio', () => {
-  const versoes = [comRelatorio(2), { ...versao(3), arquivos: [relatorioDe(3, 'r2')] }]
-  expect(origemDoRelatorio(versoes[1].arquivos[0], versoes)).toBe('V2')
-  expect(origemDoRelatorio(versoes[0].arquivos[0], versoes)).toBeNull()
-  expect(origemDoRelatorio({ ...relatorioDe(4, 'r9') }, versoes)).toBeNull()
-})
-
-test('o rótulo da versão anterior é o da de maior número menor; sem anterior, null', () => {
-  const versoes = [versao(2), versao(5, true), versao(7)]
-  expect(rotuloDaAnterior(versoes[2], versoes)).toBe('V5F')
-  expect(rotuloDaAnterior(versoes[0], versoes)).toBeNull()
-})
-
 function arquivoCom(papel: ArquivoDaVersao['papel'], formato: string): ArquivoDaVersao {
   return { id: `a-${papel}`, papel, nome: `TSA_V2_Emitir Ofício.${formato}`, formato, tamanho: 10 }
 }
@@ -128,8 +97,16 @@ function arquivoCom(papel: ArquivoDaVersao['papel'], formato: string): ArquivoDa
 test('o formulário pede .bpm, .png, .bpmn e relatório, nessa ordem e com esses rótulos', () => {
   expect(PAPEIS).toEqual(['bpm', 'png', 'bpmn', 'relatorio'])
   expect(PAPEIS.map((papel) => ROTULO_DO_PAPEL[papel])).toEqual([
-    'Fluxograma Bizagi (.bpm)', 'Imagem do fluxo (.png)', '.bpmn', 'Relatório (.docx ou .pdf)',
+    'Fluxograma Bizagi (.bpm)', 'Imagem do fluxo (.png)', '.bpmn', 'Relatório (.docx)',
   ])
+})
+
+test('o relatório novo só aceita .docx; o da histórica, que não é numerado, ainda aceita .pdf', () => {
+  expect(acceptDoCampo('relatorio', false)).toBe('.docx')
+  expect(acceptDoCampo('relatorio', true)).toBe('.docx,.pdf')
+  expect(acceptDoCampo('png', true)).toBe('.png,image/png')
+  expect(rotuloDoCampo('relatorio', true)).toBe('Relatório (.docx ou .pdf)')
+  expect(rotuloDoCampo('relatorio', false)).toBe('Relatório (.docx)')
 })
 
 test('os arquivos da versão aparecem na ordem .png, .bpm, relatório e .bpmn', () => {
@@ -143,6 +120,7 @@ test('o rótulo curto do arquivo diz o que ele é e a extensão', () => {
   expect(rotuloCurtoDoArquivo(arquivoCom('bpmn', 'bpmn'))).toBe('BPMN .bpmn')
   expect(rotuloCurtoDoArquivo(arquivoCom('relatorio', 'docx'))).toBe('Relatório .docx')
   expect(rotuloCurtoDoArquivo(arquivoCom('relatorio', 'PDF'))).toBe('Relatório .pdf')
+  expect(rotuloCurtoDoArquivo({ ...arquivoCom('relatorio', 'docx'), numeroDoRelatorio: 2 })).toBe('Relatório V2')
 })
 
 test('o dia e o mês da versão saem no horário de Brasília', () => {

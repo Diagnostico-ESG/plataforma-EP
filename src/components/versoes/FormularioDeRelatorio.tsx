@@ -1,31 +1,34 @@
-import { type FormEvent, useId, useState } from 'react'
+import { type FormEvent, useState } from 'react'
 import { useArquivosDaVersao } from '../../hooks/useArquivosDaVersao'
 import { useRolarAteAparecer } from '../../hooks/useRolarAteAparecer'
 import type { ProcessoLido } from '../../processos/tipos'
-import { type Progresso, nomeNaPrevia, podeAcrescentarRelatorio, textoDaFalhaDoRelatorio, textoDoProgresso } from '../../versoes/formularioDeVersao'
-import { rotuloDaVersao } from '../../versoes/rotulos'
+import {
+  type Progresso, nomeNaPrevia, podeEnviarRelatorio, previaDoRelatorio, textoDaFalhaDoRelatorio, textoDoProgresso,
+} from '../../versoes/formularioDeVersao'
+import { proximoNumeroDoRelatorio } from '../../versoes/relatorioQueVale'
+import { ordenarVersoes } from '../../versoes/rotulos'
 import type { ModuloDeVersoes, Versao } from '../../versoes/tipos'
 import { CampoDeArquivo } from './CampoDeArquivo'
 
 type FormularioDeRelatorioProps = {
   modulo: ModuloDeVersoes
   processo: ProcessoLido
-  /** As versões com relatório pendente, da mais recente para a mais antiga: a primeira vem escolhida. */
-  pendentes: Versao[]
+  /** Todas as versões do processo: o relatório acompanha a mais recente que não é histórica e recebe o próximo número. */
+  versoes: Versao[]
   aoEnviada: () => void
   aoCancelar: () => void
 }
 
-// noValidate: as mensagens são as nossas. A versão e o arquivo ficam travados durante o envio; na falha, continuam.
-export function FormularioDeRelatorio({ modulo, processo, pendentes, aoEnviada, aoCancelar }: FormularioDeRelatorioProps) {
+// noValidate: as mensagens são as nossas. O arquivo fica travado durante o envio; na falha, continua escolhido.
+export function FormularioDeRelatorio({ modulo, processo, versoes, aoEnviada, aoCancelar }: FormularioDeRelatorioProps) {
   const arquivos = useArquivosDaVersao()
-  const [versaoId, setVersaoId] = useState(pendentes[0].id)
   const [progresso, setProgresso] = useState<Progresso | null>(null)
   const [aviso, setAviso] = useState<string | null>(null)
-  const id = useId()
   const ref = useRolarAteAparecer<HTMLFormElement>()
-  const versao = pendentes.find((outra) => outra.id === versaoId) ?? pendentes[0]
+  const alvo = ordenarVersoes(versoes).find((versao) => !versao.historica)
   const escolhido = arquivos.escolhidos.relatorio
+  if (!alvo) return null
+  const previa = { numeroDaVersao: alvo.numero, piloto: alvo.piloto, numeroDoRelatorio: proximoNumeroDoRelatorio(versoes) }
 
   async function enviar(evento: FormEvent) {
     evento.preventDefault()
@@ -33,10 +36,7 @@ export function FormularioDeRelatorio({ modulo, processo, pendentes, aoEnviada, 
     setAviso(null)
     setProgresso({ enviados: 0, total: 1 })
     try {
-      await modulo.acrescentarRelatorio(
-        { processoId: processo.id, versaoId: versao.id, numero: versao.numero, piloto: versao.piloto, arquivo: escolhido },
-        (enviados, total) => setProgresso({ enviados, total }),
-      )
+      await modulo.enviarRelatorio({ processoId: processo.id, ...previa, arquivo: escolhido }, (enviados, total) => setProgresso({ enviados, total }))
       aoEnviada()
     } catch (erro) {
       setAviso(textoDaFalhaDoRelatorio(erro))
@@ -45,23 +45,21 @@ export function FormularioDeRelatorio({ modulo, processo, pendentes, aoEnviada, 
   }
 
   const enviando = progresso !== null
-  const pronto = podeAcrescentarRelatorio(arquivos.escolhidos, arquivos.recusas, arquivos.conferindo)
+  const pronto = podeEnviarRelatorio(arquivos.escolhidos, arquivos.recusas, arquivos.conferindo)
+  const tipo = alvo.piloto ? 'piloto' : 'sequencia'
   return (
-    <form ref={ref} className="formulario-do-processo formulario-de-versao" aria-label="Acrescentar relatório" noValidate onSubmit={enviar}>
-      <h3 className="painel-subtitulo">Acrescentar relatório</h3>
+    <form ref={ref} className="formulario-do-processo formulario-de-versao" aria-label="Enviar relatório" noValidate onSubmit={enviar}>
+      <h3 className="painel-subtitulo">Enviar relatório</h3>
+      <p className="formulario-de-versao-previa"><strong>{previaDoRelatorio(previa)}</strong></p>
       <fieldset className="formulario-de-versao-campos" disabled={enviando}>
         <legend>Relatório</legend>
-        <label htmlFor={`${id}-versao`}>Versão</label>
-        <select id={`${id}-versao`} value={versao.id} onChange={(mudanca) => setVersaoId(mudanca.target.value)}>
-          {pendentes.map((pendente) => <option key={pendente.id} value={pendente.id}>{rotuloDaVersao(pendente)}</option>)}
-        </select>
         <CampoDeArquivo papel="relatorio" obrigatorio
-          nomePrevisto={escolhido ? nomeNaPrevia(processo, versao.numero, 'relatorio', escolhido, versao.piloto ? 'piloto' : 'sequencia') : null}
+          nomePrevisto={escolhido ? nomeNaPrevia(processo, alvo.numero, 'relatorio', escolhido, tipo, previa.numeroDoRelatorio) : null}
           recusa={arquivos.recusas.relatorio ?? null} aoEscolher={(arquivo) => void arquivos.escolher('relatorio', arquivo)} />
       </fieldset>
       {progresso && <p className="formulario-de-versao-progresso" role="status">{textoDoProgresso(progresso)}</p>}
       <div className="formulario-do-processo-botoes">
-        <button type="submit" className="botao botao-principal" disabled={enviando || !pronto}>Acrescentar</button>
+        <button type="submit" className="botao botao-principal" disabled={enviando || !pronto}>Enviar</button>
         <button type="button" className="botao botao-secundario" disabled={enviando} onClick={aoCancelar}>Cancelar</button>
       </div>
       {aviso && <p className="cadastros-falha" role="alert">{aviso}</p>}

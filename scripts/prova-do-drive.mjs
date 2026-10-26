@@ -141,36 +141,30 @@ async function registrarHistorica(config, integrante) {
   relatar('integrante registra a versão histórica', data?.length === 1, `V${numero}F`)
 }
 
-async function versaoDoProcesso(cliente, processoId, numero) {
-  const { data } = await cliente.from('versoes').select('id').eq('processo_id', processoId).eq('numero', numero).maybeSingle()
-  return data?.id ?? null
+// O relatório numerado (ADR 0026): o próximo número do processo é o maior + 1; o arquivo leva o número no nome (_Relatório V3).
+async function proximoNumeroDoRelatorio(cliente, processoId) {
+  const { data, error } = await cliente.from('arquivos_da_versao').select('numero_do_relatorio, versoes!inner(processo_id)').eq('versoes.processo_id', processoId)
+  if (error) throw new Error('leitura dos relatórios falhou')
+  return Math.max(0, ...data.map((arquivo) => arquivo.numero_do_relatorio ?? 0)) + 1
 }
 
-// A versão seguinte, sem relatório, copia o da anterior pela ação sem_alteracao: o arquivo novo fica ligado ao original.
-async function provarSemAlteracao(config, integrante, processoId) {
-  const numero = await proximoNumero(integrante.cliente, processoId)
-  const bpmn = await enviarUmArquivo(config, integrante.token, pedidoDeEnvio(processoId, numero), CONTEUDO, 'application/xml')
-  const png = await enviarUmArquivo(config, integrante.token, pedidoDeEnvio(processoId, numero, 'png', PNG), PNG, 'image/png')
-  if (!bpmn || !png) return
-  await registrarVersao(config, integrante, processoId, numero, [bpmn, png])
-  const versaoId = await versaoDoProcesso(integrante.cliente, processoId, numero)
-  const resposta = await chamarFuncao(config, integrante.token, { acao: 'sem_alteracao', processo_id: processoId, versao_id: versaoId })
-  if (resposta.status !== 200) return relatar('integrante marca sem alteração de conteúdo', false, await codigoDe(resposta))
-  const { data } = await integrante.cliente.from('arquivos_da_versao').select('copiado_de').eq('versao_id', versaoId).eq('papel', 'relatorio').maybeSingle()
-  relatar('integrante marca sem alteração de conteúdo', Boolean(data?.copiado_de), `V${numero} copiou o relatório da V${numero - 1}`)
-}
-
-// O relatório que ficou pendente entra depois (registrar com versao_id); só então a próxima versão pode copiá-lo.
-async function provarRelatorioDepois(config, integrante, { processoId, numero }) {
-  const versaoId = await versaoDoProcesso(integrante.cliente, processoId, numero)
-  const pedido = pedidoDeEnvio(processoId, numero, 'relatorio', CONTEUDO, false, 'pdf')
-  const relatorio = await enviarUmArquivo(config, integrante.token, pedido, CONTEUDO, 'application/pdf')
+// O relatório sozinho entra pela ação registrar, sem versao_id: o banco o liga à versão mais recente que não é histórica.
+// O .pdf é recusado (o relatório novo só vale em .docx).
+async function provarRelatorioSozinho(config, integrante, { processoId, numero }) {
+  const numeroDoRelatorio = await proximoNumeroDoRelatorio(integrante.cliente, processoId)
+  const pedido = { ...pedidoDeEnvio(processoId, numero, 'relatorio', CONTEUDO, false, 'docx'), numero_do_relatorio: numeroDoRelatorio }
+  const tipo = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  const relatorio = await enviarUmArquivo(config, integrante.token, pedido, CONTEUDO, tipo)
   if (!relatorio) return
-  const corpo = { acao: 'registrar', processo_id: processoId, numero, versao_id: versaoId, historica: false, arquivos: [{ papel: 'relatorio', drive_id: relatorio }] }
+  const corpo = {
+    acao: 'registrar', processo_id: processoId, numero, historica: false, numero_do_relatorio: numeroDoRelatorio,
+    arquivos: [{ papel: 'relatorio', drive_id: relatorio }],
+  }
   const resposta = await chamarFuncao(config, integrante.token, corpo)
-  if (resposta.status !== 200) return relatar('integrante acrescenta o relatório depois', false, await codigoDe(resposta))
-  relatar('integrante acrescenta o relatório depois', true, `V${numero}`)
-  await provarSemAlteracao(config, integrante, processoId)
+  if (resposta.status !== 200) return relatar('integrante envia o relatório sozinho', false, await codigoDe(resposta))
+  relatar('integrante envia o relatório sozinho', true, `Relatório V${numeroDoRelatorio} na V${numero}`)
+  const pdf = { ...pedidoDeEnvio(processoId, numero, 'relatorio', CONTEUDO, false, 'pdf'), numero_do_relatorio: numeroDoRelatorio + 1 }
+  await esperarRecusa(await chamarFuncao(config, integrante.token, pdf), 'relatório .pdf é recusado', '400 extensao_nao_aceita')
 }
 
 // Substituir (ticket 06): o arquivo novo entra no MESMO arquivo do Drive (o id que o Drive devolve no envio é o que o
@@ -224,7 +218,7 @@ async function provar() {
   await conferirDownload(config, integrante.token, enviado.arquivoId, 'integrante baixa o arquivo de volta')
   await conferirNoDrive(config, integrante.token, enviado, 'integrante confere o arquivo enviado com o Drive')
   await registrarHistorica(config, integrante)
-  await provarRelatorioDepois(config, integrante, enviado)
+  await provarRelatorioSozinho(config, integrante, enviado)
   const consulta = await entrar(config, leitor, 'Consulta')
   leitor.close()
   await esperarRecusa(await chamarFuncao(config, consulta.token, pedidoDeEnvio(enviado.processoId)), 'consulta é recusada no envio', '403 sem_permissao')

@@ -21,8 +21,7 @@ export function criarVersoesSupabase(cliente: ClienteSupabase, enviarBytes: Envi
     enviarVersao: (pedido, aoProgredir) => enviarVersao(cliente, enviarBytes, pedido, aoProgredir, false),
     registrarVersaoHistorica: (pedido, aoProgredir) => enviarVersao(cliente, enviarBytes, pedido, aoProgredir, true),
     acrescentarArquivo: (pedido, aoProgredir) => acrescentarArquivo(cliente, enviarBytes, pedido, aoProgredir),
-    acrescentarRelatorio: (pedido, aoProgredir) => acrescentarRelatorio(cliente, enviarBytes, pedido, aoProgredir),
-    semAlteracaoDeConteudo: (processoId, versaoId) => semAlteracao(cliente, processoId, versaoId),
+    enviarRelatorio: (pedido, aoProgredir) => enviarRelatorio(cliente, enviarBytes, pedido, aoProgredir),
     substituirArquivo: (pedido, aoProgredir) => substituirArquivo(cliente, enviarBytes, pedido, aoProgredir),
     conferirArquivos: (processoId) => conferirArquivos(cliente, processoId),
     baixarArquivo: (arquivo) => baixarArquivo(cliente, arquivo),
@@ -73,31 +72,34 @@ async function enviarUmArquivo(cliente: ClienteSupabase, enviarBytes: EnviarByte
 async function enviarVersao(cliente: ClienteSupabase, enviarBytes: EnviarBytes, pedido: PedidoDeVersao,
   aoProgredir: (enviados: number, total: number) => void, historica: boolean): Promise<void> {
   const ids: string[] = []
+  const doRelatorio = pedido.numeroDoRelatorio === undefined ? {} : { numero_do_relatorio: pedido.numeroDoRelatorio }
   for (const escolhido of pedido.arquivos) {
-    ids.push(await enviarUmArquivo(cliente, enviarBytes, pedido, escolhido, historica))
+    const extras = escolhido.papel === 'relatorio' ? doRelatorio : {}
+    ids.push(await enviarUmArquivo(cliente, enviarBytes, pedido, escolhido, historica, extras))
     aoProgredir(ids.length, pedido.arquivos.length)
   }
   await chamarFuncao(cliente, {
     acao: 'registrar', processo_id: pedido.processoId, numero: pedido.numero, historica, piloto: pedido.piloto ?? false,
-    arquivos: pedido.arquivos.map(({ papel }, posicao) => ({ papel, drive_id: ids[posicao] })),
+    ...doRelatorio, arquivos: pedido.arquivos.map(({ papel }, posicao) => ({ papel, drive_id: ids[posicao] })),
   })
 }
 
-// O relatório que ficou pendente: o mesmo caminho do envio, com um arquivo só, registrado na versão que já existe.
-async function acrescentarRelatorio(cliente: ClienteSupabase, enviarBytes: EnviarBytes, pedido: PedidoDeRelatorio,
+// O relatório sozinho: o mesmo caminho do envio, com um arquivo só; o banco o liga à versão mais recente que não é histórica
+// e confere que os números da prévia (da versão e do relatório) ainda valem.
+async function enviarRelatorio(cliente: ClienteSupabase, enviarBytes: EnviarBytes, pedido: PedidoDeRelatorio,
   aoProgredir: (enviados: number, total: number) => void): Promise<void> {
   const relatorio: ArquivoEscolhido = { papel: 'relatorio', arquivo: pedido.arquivo }
-  const piloto = pedido.piloto ?? false
-  const envio = { processoId: pedido.processoId, numero: pedido.numero, piloto, arquivos: [relatorio] }
-  const id = await enviarUmArquivo(cliente, enviarBytes, envio, relatorio, false)
+  const { processoId, numeroDaVersao: numero, piloto, numeroDoRelatorio } = pedido
+  const envio = { processoId, numero, piloto, arquivos: [relatorio] }
+  const id = await enviarUmArquivo(cliente, enviarBytes, envio, relatorio, false, { numero_do_relatorio: numeroDoRelatorio })
   aoProgredir(1, 1)
   await chamarFuncao(cliente, {
-    acao: 'registrar', processo_id: pedido.processoId, numero: pedido.numero, historica: false, piloto,
-    versao_id: pedido.versaoId, arquivos: [{ papel: 'relatorio', drive_id: id }],
+    acao: 'registrar', processo_id: processoId, numero, historica: false, piloto, numero_do_relatorio: numeroDoRelatorio,
+    arquivos: [{ papel: 'relatorio', drive_id: id }],
   })
 }
 
-// O .png ou o .bpmn que entra depois: o mesmo caminho do relatório depois, com o P da versão piloto no nome do Drive.
+// O .png ou o .bpmn que entra depois, numa versão que já existe: com o P da versão piloto no nome do Drive.
 async function acrescentarArquivo(cliente: ClienteSupabase, enviarBytes: EnviarBytes, pedido: PedidoDeAcrescimo,
   aoProgredir: (enviados: number, total: number) => void): Promise<void> {
   const escolhido: ArquivoEscolhido = { papel: pedido.papel, arquivo: pedido.arquivo }
@@ -122,11 +124,6 @@ async function substituirArquivo(cliente: ClienteSupabase, enviarBytes: EnviarBy
     acao: 'registrar', processo_id: processoId, numero, historica: false, piloto: false, arquivo_id: arquivo.id,
     arquivos: [{ papel: arquivo.papel, drive_id: id }],
   })
-}
-
-// A cópia é feita pela função, no Drive: aqui só se pede, e a recusa volta como frase da tela.
-async function semAlteracao(cliente: ClienteSupabase, processoId: string, versaoId: string): Promise<void> {
-  await chamarFuncao(cliente, { acao: 'sem_alteracao', processo_id: processoId, versao_id: versaoId })
 }
 
 // Só pergunta: a função compara com o Drive e devolve a situação de cada arquivo; nada é gravado.

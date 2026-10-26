@@ -7,7 +7,7 @@ import type { PapelDoArquivo } from '../versoes/tipos'
  * Os arquivos escolhidos no formulário da versão e a conferência de cada um. A conferência lê o arquivo (assíncrona):
  * se outro arquivo for escolhido no mesmo campo antes de ela terminar, o resultado antigo é descartado.
  */
-export function useArquivosDaVersao() {
+export function useArquivosDaVersao(relatorioDaHistorica = false) {
   const [escolhidos, setEscolhidos] = useState<Escolhidos>({})
   const [recusas, setRecusas] = useState<RecusasDosCampos>({})
   const [conferindo, setConferindo] = useState(0)
@@ -19,11 +19,11 @@ export function useArquivosDaVersao() {
     setRecusas((atuais) => ({ ...atuais, [papel]: undefined }))
     if (!arquivo) return
     setConferindo((quantos) => quantos + 1)
-    const recusa = await conferirArquivo(papel, arquivo)
+    const recusa = await conferirArquivo(papel, arquivo, relatorioDaHistorica)
     setConferindo((quantos) => quantos - 1)
     if (ultimos.current[papel] !== arquivo) return
     setRecusas((atuais) => ({ ...atuais, [papel]: recusa ?? undefined }))
-  }, [])
+  }, [relatorioDaHistorica])
 
   return { escolhidos, recusas, conferindo: conferindo > 0, escolher }
 }

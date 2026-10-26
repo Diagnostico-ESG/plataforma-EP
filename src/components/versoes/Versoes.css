@@ -128,7 +128,7 @@
   font-size: var(--tam-rotulo);
 }
 
-/* Cada arquivo das anteriores: o nome (link), a origem da cópia e o "⋯" numa linha que quebra; o formulário da troca ocupa a linha toda. */
+/* Cada arquivo das anteriores: o nome (link) e o "⋯" numa linha que quebra; o formulário da troca ocupa a linha toda. */
 .bloco-da-versao-arquivos > li {
   display: flex;
   flex-wrap: wrap;
@@ -140,9 +140,3 @@
   flex-basis: 100%;
 }
 
-/* De onde veio o relatório copiado ("Sem alteração de conteúdo · relatório da V3"): texto discreto ao lado do nome. */
-.bloco-da-versao-origem {
-  margin-left: var(--esp-2);
-  color: var(--texto-2);
-  font-size: var(--tam-rotulo);
-}

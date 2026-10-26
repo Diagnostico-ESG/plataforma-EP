@@ -3,10 +3,10 @@ import { useCarregamento } from '../../hooks/useCarregamento'
 import { useConferenciaNoDrive } from '../../hooks/useConferenciaNoDrive'
 import type { ProcessoLido } from '../../processos/tipos'
 import type { ModoDoFormulario } from '../../versoes/formularioDeVersao'
-import { type EnvioDaEtapa, envioDaEtapa, ordenarVersoes, proximoNumero, versoesComRelatorioPendente } from '../../versoes/rotulos'
+import { proximoNumeroDoRelatorio } from '../../versoes/relatorioQueVale'
+import { type EnvioDaEtapa, envioDaEtapa, ordenarVersoes, podeEnviarRelatorioNaEtapa, proximoNumero } from '../../versoes/rotulos'
 import type { ModuloDeVersoes, Versao } from '../../versoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
-import { type ItemDoMenu, MenuDeAcoes } from '../MenuDeAcoes'
 import '../processos/Painel.css'
 import { FormularioDeRelatorio } from './FormularioDeRelatorio'
 import { FormularioDeVersao } from './FormularioDeVersao'
@@ -24,9 +24,9 @@ type SecaoDeVersoesProps = {
 
 /**
  * Seção "Arquivos" do verso (as versões do processo e do subprocesso): a mais recente em destaque e as anteriores
- * recolhidas. O envio de versão que cabe na etapa atual (histórica, piloto ou em sequência), o relatório depois e acrescentar o
- * .png ou o .bpmn só para Administrador e Integrante com o processo em andamento; esconder o botão é conveniência, quem
- * recusa é a função do servidor e o banco.
+ * recolhidas. O envio de versão que cabe na etapa atual (histórica, piloto ou em sequência), o relatório (sozinho, na técnica e
+ * na Revisão interna) e acrescentar o .png ou o .bpmn só para Administrador e Integrante com o processo em andamento;
+ * esconder o botão é conveniência, quem recusa é a função do servidor e o banco.
  */
 export function SecaoDeVersoes({ versoes, processo, podeAlterar, aoAlterarVersoes }: SecaoDeVersoesProps) {
   // Lê de novo quando o processo muda de etapa: registrar a aprovação põe o selo "Aprovada" na versão.
@@ -65,7 +65,7 @@ type VersoesProntasProps = {
   versoes: ModuloDeVersoes; processo: ProcessoLido; lidas: Versao[]; podeEnviar: boolean; aoAlterada: () => void; idDoTitulo: string
 }
 
-/** O formulário que está aberto na seção: o de enviar a versão da etapa (ou registrar a histórica), ou o do relatório depois. */
+/** O formulário que está aberto na seção: o de enviar a versão da etapa (ou registrar a histórica), ou o do relatório. */
 type Aberto = ModoDoFormulario | { tipo: 'relatorio' }
 
 function VersoesProntas({ versoes, processo, lidas, podeEnviar, aoAlterada, idDoTitulo }: VersoesProntasProps) {
@@ -92,7 +92,7 @@ function VersoesProntas({ versoes, processo, lidas, podeEnviar, aoAlterada, idDo
       {conferencia.tipo === 'falhou' && <p className="secao-de-versoes-aviso" role="status">Não foi possível conferir os arquivos no Drive.</p>}
       {!maisRecente && <p className="cadastros-vazio">Nenhuma versão enviada.</p>}
       {maisRecente && (
-        <VersaoEmDestaque {...comum} versao={maisRecente} versoes={lidas} aoAcrescentarRelatorio={() => setAberto({ tipo: 'relatorio' })} />
+        <VersaoEmDestaque {...comum} versao={maisRecente} versoes={lidas} />
       )}
       {anteriores.length > 0 && (
         <details className="versoes-anteriores">
@@ -110,19 +110,9 @@ type FormularioAbertoProps = {
 
 function FormularioAberto({ aberto, versoes, processo, lidas, aoEnviada, aoCancelar }: FormularioAbertoProps) {
   if (aberto.tipo === 'relatorio') {
-    return (
-      <FormularioDeRelatorio modulo={versoes} processo={processo} pendentes={versoesComRelatorioPendente(lidas)} aoEnviada={aoEnviada}
-        aoCancelar={aoCancelar} />
-    )
+    return <FormularioDeRelatorio modulo={versoes} processo={processo} versoes={lidas} aoEnviada={aoEnviada} aoCancelar={aoCancelar} />
   }
   return <FormularioDeVersao modulo={versoes} processo={processo} modo={aberto} aoEnviada={aoEnviada} aoCancelar={aoCancelar} />
-}
-
-/** O relatório de uma versão anterior, quando só ela está sem relatório (o da mais recente se acrescenta no espaço tracejado). */
-function itensRaros(lidas: Versao[], aoAbrir: (aberto: Aberto) => void): ItemDoMenu[] {
-  const pendentes = versoesComRelatorioPendente(lidas)
-  if (pendentes.length === 0 || pendentes[0].id === ordenarVersoes(lidas)[0].id) return []
-  return [{ rotulo: 'Acrescentar relatório', aoEscolher: () => aoAbrir({ tipo: 'relatorio' }) }]
 }
 
 const ROTULO_DO_ENVIO: Record<EnvioDaEtapa, string> = {
@@ -132,18 +122,18 @@ const ROTULO_DO_ENVIO: Record<EnvioDaEtapa, string> = {
 function modoDoEnvio(envio: EnvioDaEtapa, lidas: Versao[]): ModoDoFormulario {
   if (envio === 'historica') return { tipo: 'historica' }
   const numero = proximoNumero(lidas)
-  return envio === 'piloto' ? { tipo: 'piloto', numeroSugerido: numero } : { tipo: 'sequencia', numero }
+  return envio === 'piloto' ? { tipo: 'piloto', numeroSugerido: numero } : { tipo: 'sequencia', numero, numeroDoRelatorio: proximoNumeroDoRelatorio(lidas) }
 }
 
 type AcoesDaSecaoProps = {
   lidas: Versao[]; codigoDaEtapa: string; aberto: Aberto | null; aoAbrir: (aberto: Aberto | null) => void
 }
 
-/** O botão do envio da etapa atual (o mesmo botão abre e fecha o formulário) e o "⋯" das ações raras; nada se não há. */
+/** Os botões do envio da etapa atual (o mesmo botão abre e fecha o formulário); nada se a etapa não tem envio. */
 function AcoesDaSecao({ lidas, codigoDaEtapa, aberto, aoAbrir }: AcoesDaSecaoProps) {
   const envio = envioDaEtapa(codigoDaEtapa, lidas)
-  const raros = itensRaros(lidas, aoAbrir)
-  if (!envio && raros.length === 0) return null
+  const relatorio = podeEnviarRelatorioNaEtapa(codigoDaEtapa, lidas)
+  if (!envio && !relatorio) return null
   return (
     <div className="secao-de-versoes-acoes">
       {envio && (
@@ -152,7 +142,12 @@ function AcoesDaSecao({ lidas, codigoDaEtapa, aberto, aoAbrir }: AcoesDaSecaoPro
           {ROTULO_DO_ENVIO[envio]}
         </button>
       )}
-      {raros.length > 0 && <MenuDeAcoes rotulo="Mais ações dos arquivos" grupos={[raros]} />}
+      {relatorio && (
+        <button type="button" className="botao botao-secundario" aria-expanded={aberto?.tipo === 'relatorio'}
+          onClick={() => aoAbrir(aberto?.tipo === 'relatorio' ? null : { tipo: 'relatorio' })}>
+          Enviar relatório
+        </button>
+      )}
     </div>
   )
 }

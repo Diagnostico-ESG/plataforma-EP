@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import {
-  arquivosDoPedido, lerNumeroDigitado, nomeNaPrevia, textoDaFalhaDoAcrescimo, podeAcrescentarRelatorio, podeEnviar, podeRegistrarHistorica, podeSubmeter,
+  arquivosDoPedido, papeisDoFormulario, lerNumeroDigitado, nomeNaPrevia, textoDaFalhaDoAcrescimo, podeEnviarRelatorio, previaDoRelatorio, podeEnviar, podeRegistrarHistorica, podeSubmeter,
   podeTrocarArquivo, recusaDoTipoNaTroca, textoDaFalhaDaTroca, textoDaFalhaDoEnvio, textoDaFalhaDoRelatorio,
   textoDoProgresso,
 } from './formularioDeVersao'
@@ -52,8 +52,8 @@ test('registrar a histórica não habilita sem número, com recusa ou com confer
 
 test('o botão do formulário segue a regra do modo: em sequência pede o .bpm; piloto e histórica pedem também o número', () => {
   const sem = { recusas: {}, conferindo: false }
-  expect(podeSubmeter({ tipo: 'sequencia', numero: 3 }, { ...sem, escolhidos: { bpm } }, 3)).toBe(true)
-  expect(podeSubmeter({ tipo: 'sequencia', numero: 3 }, { ...sem, escolhidos: { bpmn, png } }, 3)).toBe(false)
+  expect(podeSubmeter({ tipo: 'sequencia', numero: 3, numeroDoRelatorio: 1 }, { ...sem, escolhidos: { bpm } }, 3)).toBe(true)
+  expect(podeSubmeter({ tipo: 'sequencia', numero: 3, numeroDoRelatorio: 1 }, { ...sem, escolhidos: { bpmn, png } }, 3)).toBe(false)
   expect(podeSubmeter({ tipo: 'piloto', numeroSugerido: 6 }, { ...sem, escolhidos: { bpm } }, 6)).toBe(true)
   expect(podeSubmeter({ tipo: 'piloto', numeroSugerido: 6 }, { ...sem, escolhidos: { bpm } }, null)).toBe(false)
   expect(podeSubmeter({ tipo: 'piloto', numeroSugerido: 6 }, { ...sem, escolhidos: { png } }, 6)).toBe(false)
@@ -92,11 +92,29 @@ test('a recusa aparece como veio; outra falha diz que a versão não foi registr
     .toBe('A versão não foi registrada: o arquivo fluxo.png não chegou ao Drive. Os arquivos escolhidos continuam no formulário.')
 })
 
-test('acrescentar relatório só se habilita com o relatório escolhido, sem recusa e sem conferência em andamento', () => {
-  expect(podeAcrescentarRelatorio({}, {}, false)).toBe(false)
-  expect(podeAcrescentarRelatorio({ relatorio }, {}, false)).toBe(true)
-  expect(podeAcrescentarRelatorio({ relatorio }, { relatorio: 'Escolha um arquivo .docx ou .pdf.' }, false)).toBe(false)
-  expect(podeAcrescentarRelatorio({ relatorio }, {}, true)).toBe(false)
+test('a piloto não tem campo de relatório; a em sequência e a histórica têm', () => {
+  expect(papeisDoFormulario({ tipo: 'piloto', numeroSugerido: 6 })).toEqual(['bpm', 'png', 'bpmn'])
+  expect(papeisDoFormulario({ tipo: 'sequencia', numero: 7, numeroDoRelatorio: 3 })).toEqual(['bpm', 'png', 'bpmn', 'relatorio'])
+  expect(papeisDoFormulario({ tipo: 'historica' })).toEqual(['bpm', 'png', 'bpmn', 'relatorio'])
+})
+
+test('enviar o relatório só se habilita com o relatório escolhido, sem recusa e sem conferência em andamento', () => {
+  expect(podeEnviarRelatorio({}, {}, false)).toBe(false)
+  expect(podeEnviarRelatorio({ relatorio }, {}, false)).toBe(true)
+  expect(podeEnviarRelatorio({ relatorio }, { relatorio: 'Escolha um arquivo .docx. Recebido: .pdf.' }, false)).toBe(false)
+  expect(podeEnviarRelatorio({ relatorio }, {}, true)).toBe(false)
+})
+
+test('a prévia do relatório diz o número dele e a versão que ele acompanha', () => {
+  expect(previaDoRelatorio({ numeroDaVersao: 8, piloto: false, numeroDoRelatorio: 3 })).toBe('Relatório V3, acompanha a V8')
+  expect(previaDoRelatorio({ numeroDaVersao: 6, piloto: true, numeroDoRelatorio: 1 })).toBe('Relatório V1, acompanha a V6P')
+})
+
+test('a prévia do nome do relatório numerado traz o número do relatório depois do nome do processo', () => {
+  const processo = { setorSigla: 'TSA', nome: 'Emitir Ofício' }
+  const docx = new File(['x'], 'relatório.docx')
+  expect(nomeNaPrevia(processo, 8, 'relatorio', docx, 'sequencia', 3)).toBe('TSA_V8_Emitir Ofício_Relatório V3.docx')
+  expect(nomeNaPrevia(processo, 6, 'relatorio', docx, 'piloto', 1)).toBe('TSA_V6P_Emitir Ofício_Relatório V1.docx')
 })
 
 test('a falha do relatório depois: a frase pronta da recusa, ou o motivo com o aviso do formulário', () => {

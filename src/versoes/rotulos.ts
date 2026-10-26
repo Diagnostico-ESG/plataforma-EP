@@ -17,12 +17,21 @@ export const ROTULO_DO_PAPEL: Record<PapelDoArquivo, string> = {
   bpm: 'Fluxograma Bizagi (.bpm)',
   png: 'Imagem do fluxo (.png)',
   bpmn: '.bpmn',
-  relatorio: 'Relatório (.docx ou .pdf)',
+  relatorio: 'Relatório (.docx)',
 }
 
 /** O `accept` de cada campo de arquivo (o navegador só sugere; a conferência é que decide). */
 export const ACCEPT_DO_PAPEL: Record<PapelDoArquivo, string> = {
-  bpmn: '.bpmn', png: '.png,image/png', bpm: '.bpm', relatorio: '.docx,.pdf',
+  bpmn: '.bpmn', png: '.png,image/png', bpm: '.bpm', relatorio: '.docx',
+}
+
+/** O relatório da histórica, que não é numerado, ainda aceita o .pdf; nos demais envios o relatório é só .docx (ADR 0026). */
+export function acceptDoCampo(papel: PapelDoArquivo, historica: boolean): string {
+  return papel === 'relatorio' && historica ? '.docx,.pdf' : ACCEPT_DO_PAPEL[papel]
+}
+
+export function rotuloDoCampo(papel: PapelDoArquivo, historica: boolean): string {
+  return papel === 'relatorio' && historica ? 'Relatório (.docx ou .pdf)' : ROTULO_DO_PAPEL[papel]
 }
 
 /** "V7" na versão em sequência, "V5F" na histórica, "V6P" na piloto. */
@@ -58,6 +67,11 @@ export function envioDaEtapa(codigoDaEtapa: string, versoes: Pick<Versao, 'histo
   return null
 }
 
+/** O [Enviar relatório] aparece na técnica e na Revisão interna, quando há versão piloto ou em sequência para recebê-lo (ADR 0026). */
+export function podeEnviarRelatorioNaEtapa(codigoDaEtapa: string, versoes: Pick<Versao, 'historica'>[]): boolean {
+  return (codigoDaEtapa === CODIGO_DA_TECNICA || codigoDaEtapa === CODIGO_DA_REVISAO_INTERNA) && versoes.some((versao) => !versao.historica)
+}
+
 /** O .png e o .bpmn que ainda se pode acrescentar: só na versão piloto ou em sequência, fora da aprovada, e só o que falta. */
 export function papeisQueSePodeAcrescentar(versao: Pick<Versao, 'historica' | 'aprovada' | 'arquivos'>): ('png' | 'bpmn')[] {
   if (versao.historica || versao.aprovada) return []
@@ -70,51 +84,13 @@ export function ordenarVersoes(versoes: Versao[]): Versao[] {
   return [...versoes].sort((a, b) => b.numero - a.numero)
 }
 
-/** "Relatório pendente": versão nova sem o arquivo do relatório (calculado na tela, não guardado). */
-export function relatorioPendente(versao: Pick<Versao, 'historica' | 'arquivos'>): boolean {
-  return !versao.historica && !versao.arquivos.some((arquivo) => arquivo.papel === 'relatorio')
-}
-
-/** As versões com relatório pendente, da mais recente para a mais antiga (a primeira é a escolhida no formulário). */
-export function versoesComRelatorioPendente(versoes: Versao[]): Versao[] {
-  return ordenarVersoes(versoes).filter(relatorioPendente)
-}
-
-function relatorioDaVersao(versao: Versao): ArquivoDaVersao | undefined {
-  return versao.arquivos.find((arquivo) => arquivo.papel === 'relatorio')
-}
-
-/** A versão imediatamente anterior: a de maior número menor que o da versão (o banco usa a mesma regra). */
-function versaoAnterior(versao: Versao, versoes: Versao[]): Versao | undefined {
-  return ordenarVersoes(versoes).find((outra) => outra.numero < versao.numero)
-}
-
-/** [Sem alteração de conteúdo]: versão pendente cuja versão anterior tem relatório para copiar. */
-export function podeCopiarRelatorio(versao: Versao, versoes: Versao[]): boolean {
-  if (!relatorioPendente(versao)) return false
-  const anterior = versaoAnterior(versao, versoes)
-  return anterior !== undefined && relatorioDaVersao(anterior) !== undefined
-}
-
-/** O rótulo da versão de onde veio o relatório copiado ("V4"); null se o arquivo não é cópia (ou a origem não está na lista). */
-export function origemDoRelatorio(arquivo: ArquivoDaVersao, versoes: Versao[]): string | null {
-  if (!arquivo.copiadoDe) return null
-  const origem = versoes.find((versao) => versao.arquivos.some((outro) => outro.id === arquivo.copiadoDe))
-  return origem ? rotuloDaVersao(origem) : null
-}
-
-/** O rótulo da versão imediatamente anterior ("V3"); null se a versão é a primeira. */
-export function rotuloDaAnterior(versao: Versao, versoes: Versao[]): string | null {
-  const anterior = versaoAnterior(versao, versoes)
-  return anterior ? rotuloDaVersao(anterior) : null
-}
-
 const NOME_CURTO_DO_PAPEL: Record<PapelDoArquivo, string> = {
   bpm: 'Fluxograma', png: 'Imagem', bpmn: 'BPMN', relatorio: 'Relatório',
 }
 
-/** "Fluxograma .bpm", "Relatório .pdf": o botão do arquivo no destaque da versão. */
-export function rotuloCurtoDoArquivo({ papel, formato }: Pick<ArquivoDaVersao, 'papel' | 'formato'>): string {
+/** "Fluxograma .bpm", "Relatório V2" (o numerado), "Relatório .pdf" (o antigo): o botão do arquivo no destaque da versão. */
+export function rotuloCurtoDoArquivo({ papel, formato, numeroDoRelatorio }: Pick<ArquivoDaVersao, 'papel' | 'formato' | 'numeroDoRelatorio'>): string {
+  if (numeroDoRelatorio !== undefined) return `${NOME_CURTO_DO_PAPEL[papel]} V${numeroDoRelatorio}`
   return `${NOME_CURTO_DO_PAPEL[papel]} .${formato.toLowerCase()}`
 }
 

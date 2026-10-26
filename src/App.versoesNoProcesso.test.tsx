@@ -3,7 +3,7 @@ import { afterEach, beforeEach, expect, test } from 'vitest'
 import { formatarMomento } from './acesso/historico'
 import type { SituacaoDoProcesso } from './processos/tipos'
 import { PROCESSOS_DOS_CADASTROS, montarNosCadastros, naEtapa } from './testes/processosNosCadastros'
-import { arquivoDeTeste, versaoDeTeste } from './testes/versoesDeTeste'
+import { arquivoDeTeste, relatorioNumeradoDeTeste, versaoDeTeste } from './testes/versoesDeTeste'
 
 beforeEach(() => {
   window.location.hash = '#/processos/p1'
@@ -51,13 +51,15 @@ test('a seção mostra a mais recente em destaque, com rótulo, dia, autor, etap
   ])
 })
 
-test('no destaque, o [Acrescentar relatório] fica no lugar do relatório, antes do .bpmn', async () => {
+test('no destaque, o relatório fica no lugar dele, depois do .bpm e antes do .bpmn', async () => {
   montarNosCadastros({ ajustarVersoes: (falso) => {
-    falso.versoes.p1 = [versaoDeTeste(1, { arquivos: [arquivoDeTeste(1, 'bpmn', 'bpmn'), ...versaoDeTeste(1).arquivos] })]
+    falso.versoes.p1 = [versaoDeTeste(1, {
+      arquivos: [arquivoDeTeste(1, 'bpmn', 'bpmn'), relatorioNumeradoDeTeste(1, 1), ...versaoDeTeste(1).arquivos],
+    })]
   } })
   const v1 = await (await secao()).findByRole('article', { name: 'V1' })
   const texto = v1.textContent ?? ''
-  const posicoes = ['Imagem .png', 'Fluxograma .bpm', 'Acrescentar relatório', 'BPMN .bpmn'].map((trecho) => texto.indexOf(trecho))
+  const posicoes = ['Imagem .png', 'Fluxograma .bpm', 'Relatório V1', 'BPMN .bpmn'].map((trecho) => texto.indexOf(trecho))
   expect(posicoes.every((posicao) => posicao >= 0)).toBe(true)
   expect([...posicoes].sort((a, b) => a - b)).toEqual(posicoes)
 })

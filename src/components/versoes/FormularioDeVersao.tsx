@@ -3,10 +3,10 @@ import { useArquivosDaVersao } from '../../hooks/useArquivosDaVersao'
 import { useRolarAteAparecer } from '../../hooks/useRolarAteAparecer'
 import type { ProcessoLido } from '../../processos/tipos'
 import {
-  type ModoDoFormulario, PAPEIS_OBRIGATORIOS, type Progresso, arquivosDoPedido, lerNumeroDigitado, nomeNaPrevia, podeSubmeter,
-  textoDaFalhaDoEnvio, textoDoProgresso,
+  type ModoDoFormulario, PAPEIS_OBRIGATORIOS, type Progresso, arquivosDoPedido, lerNumeroDigitado, nomeNaPrevia, papeisDoFormulario,
+  podeSubmeter, textoDaFalhaDoEnvio, textoDoProgresso,
 } from '../../versoes/formularioDeVersao'
-import { PAPEIS, rotuloDaVersao } from '../../versoes/rotulos'
+import { rotuloDaVersao } from '../../versoes/rotulos'
 import type { ModuloDeVersoes, PedidoDeVersao } from '../../versoes/tipos'
 import { CampoDeArquivo } from './CampoDeArquivo'
 import { CampoDoNumeroDaVersao } from './CampoDoNumeroDaVersao'
@@ -15,7 +15,7 @@ type FormularioDeVersaoProps = {
   modulo: ModuloDeVersoes
   processo: ProcessoLido
   /**
-   * Em sequência: o número da prévia (maior + 1), com que os arquivos são nomeados no Drive. Piloto: o número é digitado
+   * Em sequência: o número da prévia (maior + 1) e o do relatório que vai junto, com que os arquivos são nomeados no Drive. Piloto: o número é digitado
    * e vem preenchido com o menor aceito (6 vira V6P). Histórica: o número é digitado (5 vira V5F) e os arquivos são os
    * que existirem.
    */
@@ -44,9 +44,14 @@ function numeroInicial(modo: ModoDoFormulario): string {
   return modo.tipo === 'piloto' ? String(modo.numeroSugerido) : ''
 }
 
+// O relatório que vai junto com a versão em sequência leva o número que ele vai receber (a prévia).
+function numeroDoRelatorioDoPedido(modo: ModoDoFormulario, escolhidos: { relatorio?: File }): { numeroDoRelatorio?: number } {
+  return modo.tipo === 'sequencia' && escolhidos.relatorio ? { numeroDoRelatorio: modo.numeroDoRelatorio } : {}
+}
+
 // noValidate: as mensagens são as nossas. Os campos ficam travados durante o envio; na falha, continuam preenchidos.
 export function FormularioDeVersao({ modulo, processo, modo, aoEnviada, aoCancelar }: FormularioDeVersaoProps) {
-  const arquivos = useArquivosDaVersao()
+  const arquivos = useArquivosDaVersao(modo.tipo === 'historica')
   const [textoDoNumero, setTextoDoNumero] = useState(numeroInicial(modo))
   const [progresso, setProgresso] = useState<Progresso | null>(null)
   const [aviso, setAviso] = useState<string | null>(null)
@@ -60,7 +65,9 @@ export function FormularioDeVersao({ modulo, processo, modo, aoEnviada, aoCancel
     evento.preventDefault()
     if (numero === null) return
     setAviso(null)
-    const pedido: PedidoDeVersao = { processoId: processo.id, numero, piloto, arquivos: arquivosDoPedido(arquivos.escolhidos) }
+    const pedido: PedidoDeVersao = {
+      processoId: processo.id, numero, piloto, arquivos: arquivosDoPedido(arquivos.escolhidos), ...numeroDoRelatorioDoPedido(modo, arquivos.escolhidos),
+    }
     setProgresso({ enviados: 0, total: pedido.arquivos.length })
     const aoProgredir = (enviados: number, total: number) => setProgresso({ enviados, total })
     try {
@@ -88,11 +95,13 @@ export function FormularioDeVersao({ modulo, processo, modo, aoEnviada, aoCancel
         <legend>Arquivos</legend>
         {modo.tipo !== 'sequencia' && <CampoDoNumeroDaVersao texto={textoDoNumero} aoMudar={setTextoDoNumero} />}
         {dica && <p id={`${id}-dica`} className="formulario-de-versao-dica">{dica}</p>}
-        {PAPEIS.map((papel) => {
+        {papeisDoFormulario(modo).map((papel) => {
           const arquivo = arquivos.escolhidos[papel]
+          const doRelatorio = modo.tipo === 'sequencia' && papel === 'relatorio' ? modo.numeroDoRelatorio : undefined
           return (
             <CampoDeArquivo key={papel} papel={papel} obrigatorio={!historica && PAPEIS_OBRIGATORIOS.includes(papel)}
-              nomePrevisto={arquivo && numero !== null ? nomeNaPrevia(processo, numero, papel, arquivo, modo.tipo) : null}
+              relatorioSemNumero={historica}
+              nomePrevisto={arquivo && numero !== null ? nomeNaPrevia(processo, numero, papel, arquivo, modo.tipo, doRelatorio) : null}
               recusa={arquivos.recusas[papel] ?? null} aoEscolher={(escolhido) => void arquivos.escolher(papel, escolhido)} />
           )
         })}

@@ -4,10 +4,10 @@ import type { ArquivoDaVersao, PapelDoArquivo, Versao } from './tipos'
 /** A leitura de `versoes` com o autor, a etapa e os arquivos (o tipo gerado do Supabase não acompanha as ligações). */
 export const COLUNAS_DA_VERSAO =
   'id, numero, historica, piloto, enviada_em, autor:usuarios(nome), etapa:etapas(nome), ' +
-  'arquivos_da_versao(id, papel, nome, formato, tamanho, copiado_de), aprovacao:aprovacoes(id)'
+  'arquivos_da_versao(id, papel, nome, formato, tamanho, numero_do_relatorio), aprovacao:aprovacoes(id)'
 
 type LinhaDoArquivo = {
-  id: string; papel: PapelDoArquivo; nome: string; formato: string; tamanho: number; copiado_de: string | null
+  id: string; papel: PapelDoArquivo; nome: string; formato: string; tamanho: number; numero_do_relatorio: number | null
 }
 
 export type LinhaDaVersao = {
@@ -23,8 +23,8 @@ export type LinhaDaVersao = {
   aprovacao?: { id: string }[]
 }
 
-function arquivoDaLinha({ copiado_de: copiadoDe, ...arquivo }: LinhaDoArquivo): ArquivoDaVersao {
-  return copiadoDe ? { ...arquivo, copiadoDe } : arquivo
+function arquivoDaLinha({ numero_do_relatorio: numeroDoRelatorio, ...arquivo }: LinhaDoArquivo): ArquivoDaVersao {
+  return numeroDoRelatorio === null ? arquivo : { ...arquivo, numeroDoRelatorio }
 }
 
 export function versaoDaLinha(linha: LinhaDaVersao): Versao {

@@ -10,8 +10,8 @@ export type ArquivoDaVersao = {
   nome: string
   formato: string
   tamanho: number
-  /** Só no relatório de "sem alteração de conteúdo": o id do relatório da versão anterior, de onde veio. */
-  copiadoDe?: string
+  /** Só no relatório novo de versão que não é histórica (Relatório V3): o número próprio dele no processo (ADR 0026). */
+  numeroDoRelatorio?: number
 }
 
 /** Versão do processo (V7, ou V5F na histórica); `enviadaEm` é o instante ISO do envio. */
@@ -37,12 +37,14 @@ export type ArquivoEscolhido = { papel: PapelDoArquivo; arquivo: File }
 
 /**
  * O envio de uma versão: `numero` é o da prévia (em sequência) ou o digitado (histórica e piloto), com que os arquivos são
- * nomeados no Drive. `piloto` vale falso quando omitido.
+ * nomeados no Drive. `piloto` vale falso quando omitido. `numeroDoRelatorio` é o da prévia do relatório que vai junto
+ * (só na versão em sequência), com que o arquivo é nomeado.
  */
 export type PedidoDeVersao = {
   processoId: string
   numero: number
   piloto?: boolean
+  numeroDoRelatorio?: number
   arquivos: ArquivoEscolhido[]
 }
 
@@ -56,8 +58,17 @@ export type PedidoDeAcrescimo = {
   arquivo: File
 }
 
-/** O relatório que entra numa versão nova que ainda não tem; `numero` é o da versão, com que o arquivo é nomeado no Drive. */
-export type PedidoDeRelatorio = { processoId: string; versaoId: string; numero: number; piloto?: boolean; arquivo: File }
+/**
+ * O relatório enviado sozinho (ADR 0026): vai para a versão mais recente que não é histórica. `numeroDaVersao` (e `piloto`)
+ * e `numeroDoRelatorio` são os da prévia, com que o arquivo é nomeado no Drive; o banco recusa se mudaram.
+ */
+export type PedidoDeRelatorio = {
+  processoId: string
+  numeroDaVersao: number
+  piloto: boolean
+  numeroDoRelatorio: number
+  arquivo: File
+}
 
 /** A troca do conteúdo de um arquivo de versão nova; `numero` é o da versão, que a função do servidor repete no pedido. */
 export type PedidoDeSubstituicao = { processoId: string; numero: number; arquivo: ArquivoDaVersao; novo: File }
@@ -88,15 +99,10 @@ export type ModuloDeVersoes = {
    */
   registrarVersaoHistorica(pedido: PedidoDeVersao, aoProgredir: (enviados: number, total: number) => void): Promise<void>
   /**
-   * Envia o relatório direto ao Drive e só então o registra na versão (que ainda não tem relatório). `aoProgredir`
-   * avisa quando o arquivo chegou. Se algo falhar, nada é registrado.
+   * Envia o relatório (.docx) direto ao Drive e só então o registra, com a numeração própria, na versão mais recente que
+   * não é histórica. `aoProgredir` avisa quando o arquivo chegou. Se algo falhar, nada é registrado.
    */
-  acrescentarRelatorio(pedido: PedidoDeRelatorio, aoProgredir: (enviados: number, total: number) => void): Promise<void>
-  /**
-   * "Sem alteração de conteúdo": a função copia no Drive o relatório da versão anterior, com o nome desta versão, e o
-   * registra ligado ao original. Só vale na versão nova sem relatório, cuja anterior tem relatório.
-   */
-  semAlteracaoDeConteudo(processoId: string, versaoId: string): Promise<void>
+  enviarRelatorio(pedido: PedidoDeRelatorio, aoProgredir: (enviados: number, total: number) => void): Promise<void>
   /**
    * Troca o conteúdo de um arquivo de versão nova pelo de `pedido.novo` (do mesmo papel e formato): envia direto ao Drive,
    * no mesmo arquivo, e só então registra a troca. O arquivo anterior não fica guardado (ADR 0007). `aoProgredir` avisa

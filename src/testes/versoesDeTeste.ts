@@ -27,3 +27,11 @@ export const PNG_VALIDO =new File([new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d,
 
 /** Para achar um arquivo pelo nome dentro do nome acessível do botão ("Baixar Imagem .png (TSA_V1_...png)"). */
 export const comNome = (trecho: string) => (nome: string) => nome.includes(trecho)
+
+/** O relatório numerado (Relatório V2) ligado à versão `numeroDaVersao`: o .docx que o relatório novo sempre é. */
+export function relatorioNumeradoDeTeste(numeroDaVersao: number, numeroDoRelatorio: number): ArquivoDaVersao {
+  return {
+    id: `r${numeroDoRelatorio}`, papel: 'relatorio', nome: `TSA_V${numeroDaVersao}_Emitir Ofício_Relatório V${numeroDoRelatorio}.docx`,
+    formato: 'docx', tamanho: 100, numeroDoRelatorio,
+  }
+}

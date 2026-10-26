@@ -3,14 +3,17 @@ import { tipoMimeDaExtensao } from '../../supabase/functions/_shared/drive.ts'
 import { nomePadrao } from '../../supabase/functions/_shared/nomePadrao.ts'
 import type { EventoDoCadastro } from '../cadastros/tipos'
 import { falhaDaFuncao } from './recusasDeVersoes'
-import { haVersaoEmSequencia, haVersaoNova, ordenarVersoes, proximoNumero, relatorioPendente, rotuloDaVersao } from './rotulos'
+import { proximoNumeroDoRelatorio } from './relatorioQueVale'
+import {
+  type ProcessoDoFalso, conferirPedido, conferirRelatorioSozinho, eventoDaSubstituicao, eventoDaVersao,
+} from './regrasDoFalso'
+import { ordenarVersoes, proximoNumero } from './rotulos'
 import type {
   ArquivoDaVersao, ConferenciaDosArquivos, ModuloDeVersoes, PedidoDeAcrescimo, PedidoDeRelatorio, PedidoDeSubstituicao,
   PedidoDeVersao, Versao,
 } from './tipos'
 
-/** O que o falso precisa saber do processo para nomear os arquivos e guardar a etapa, como o banco. */
-export type ProcessoDoFalso = { sigla: string; nome: string; etapa: string | null }
+export type { ProcessoDoFalso }
 
 /** Implementação falsa de versões para os testes de tela: sem rede, com falhas e esperas programáveis. */
 export class VersoesFalso implements ModuloDeVersoes {
@@ -86,27 +89,14 @@ export class VersoesFalso implements ModuloDeVersoes {
     this.guardarArquivo(pedido.processoId, versao, pedido.papel, pedido.arquivo)
   }
 
-  // Como o relatório depois do banco (função acrescentar_relatorio): só na versão nova que ainda não tem relatório.
-  async acrescentarRelatorio(pedido: PedidoDeRelatorio, aoProgredir: (enviados: number, total: number) => void): Promise<void> {
+  // Como o banco (função enviar_relatorio): o relatório vai para a versão mais recente que não é histórica, com o próximo número do processo.
+  async enviarRelatorio(pedido: PedidoDeRelatorio, aoProgredir: (enviados: number, total: number) => void): Promise<void> {
     if (this.falharNoArquivo === 1) throw new Error(`o arquivo ${pedido.arquivo.name} não chegou ao Drive`)
     aoProgredir(1, 1)
     if (this.segurarDepoisDe === 1) await new Promise<never>(() => {})
     this.falharNoRegistroSeConfigurado()
-    const versao = this.versaoDoPedido(pedido.processoId, pedido.versaoId)
-    conferirRelatorioNovo(versao)
-    this.guardarRelatorio(pedido.processoId, versao, { formato: extensaoDoNome(pedido.arquivo.name), tamanho: pedido.arquivo.size })
-  }
-
-  // Como o banco (funções origem_do_relatorio e registrar_sem_alteracao): copia o relatório da versão imediatamente
-  // anterior, com o nome da versão nova, ligado ao original.
-  async semAlteracaoDeConteudo(processoId: string, versaoId: string): Promise<void> {
-    this.falharNoRegistroSeConfigurado()
-    const versao = this.versaoDoPedido(processoId, versaoId)
-    if (versao.historica) throw falhaDaFuncao('versao_historica_somente_leitura', '')
-    const origem = relatorioDaAnterior(versao, this.versoes[processoId] ?? [])
-    if (!origem) throw falhaDaFuncao('versao_anterior_sem_relatorio', '')
-    conferirRelatorioNovo(versao)
-    this.guardarRelatorio(processoId, versao, origem.arquivo, origem)
+    const alvo = conferirRelatorioSozinho(this.versoes[pedido.processoId] ?? [], pedido)
+    this.guardarRelatorio(pedido.processoId, alvo, pedido.arquivo, pedido.numeroDoRelatorio)
   }
 
   // Como o banco (função substituir_arquivo): o arquivo novo troca o conteúdo no mesmo registro, sem versão nova; a versão
@@ -147,17 +137,18 @@ export class VersoesFalso implements ModuloDeVersoes {
     return versao
   }
 
-  // O relatório entra na versão (último na ordem dos papéis); o evento traz, na cópia, a versão de onde veio.
-  private guardarRelatorio(processoId: string, versao: Versao, { formato, tamanho }: Pick<ArquivoDaVersao, 'formato' | 'tamanho'>,
-    origem?: OrigemDaCopia): void {
+  // O relatório numerado entra na versão (último na ordem dos papéis); o evento traz o número do relatório.
+  private guardarRelatorio(processoId: string, versao: Versao, arquivo: File, numeroDoRelatorio: number): void {
     const processo = this.processos[processoId] ?? { sigla: 'TSA', nome: processoId, etapa: null }
-    const nome = nomePadrao({ sigla: processo.sigla, numero: versao.numero, historica: false, piloto: versao.piloto, nomeDoProcesso: processo.nome, papel: 'relatorio', extensao: formato })
-    const copia = origem ? { copiadoDe: origem.arquivo.id } : {}
-    const novo: ArquivoDaVersao = { id: `a${this.proximoId++}`, papel: 'relatorio', nome, formato, tamanho, ...copia }
+    const formato = extensaoDoNome(arquivo.name)
+    const nome = nomePadrao({
+      sigla: processo.sigla, numero: versao.numero, historica: false, piloto: versao.piloto, numeroDoRelatorio,
+      nomeDoProcesso: processo.nome, papel: 'relatorio', extensao: formato,
+    })
+    const novo: ArquivoDaVersao = { id: `a${this.proximoId++}`, papel: 'relatorio', nome, formato, tamanho: arquivo.size, numeroDoRelatorio }
     const atualizada: Versao = { ...versao, arquivos: [...versao.arquivos, novo] }
     this.versoes[processoId] = (this.versoes[processoId] ?? []).map((outra) => (outra.id === versao.id ? atualizada : outra))
-    this.aoRegistrar?.(processoId, eventoDaVersao(processoId, atualizada, processo, origem ? 'sem_alteracao' : 'acrescentar_relatorio',
-      origem ? { relatorio_de: origem.rotulo } : {}))
+    this.aoRegistrar?.(processoId, eventoDaVersao(processoId, atualizada, processo, 'enviar_relatorio', { numero_do_relatorio: numeroDoRelatorio }))
   }
 
   // O .png ou o .bpmn entra na versão (na ordem dos papéis, no fim da lista); o evento traz o papel.
@@ -210,85 +201,16 @@ export class VersoesFalso implements ModuloDeVersoes {
     this.aoRegistrar?.(pedido.processoId, eventoDaVersao(pedido.processoId, versao, processo, acao))
   }
 
+  // O relatório que entra junto com a versão que não é histórica recebe o próximo número do processo (a histórica não numera).
   private arquivos(pedido: PedidoDeVersao, processo: ProcessoDoFalso, numero: number, historica: boolean): ArquivoDaVersao[] {
+    const numeroDoRelatorio = proximoNumeroDoRelatorio(this.versoes[pedido.processoId] ?? [])
     return pedido.arquivos.map(({ papel, arquivo }) => {
       const formato = extensaoDoNome(arquivo.name)
-      const nome = nomePadrao({ sigla: processo.sigla, numero, historica, piloto: pedido.piloto === true, nomeDoProcesso: processo.nome, papel, extensao: formato })
-      return { id: `a${this.proximoId++}`, papel, nome, formato, tamanho: arquivo.size }
+      const doRelatorio = papel === 'relatorio' && !historica ? { numeroDoRelatorio } : {}
+      const nome = nomePadrao({
+        sigla: processo.sigla, numero, historica, piloto: pedido.piloto === true, ...doRelatorio, nomeDoProcesso: processo.nome, papel, extensao: formato,
+      })
+      return { id: `a${this.proximoId++}`, papel, nome, formato, tamanho: arquivo.size, ...doRelatorio }
     })
-  }
-}
-
-// As regras do banco para o tipo de versão do pedido: histórica, piloto ou em sequência.
-function conferirPedido(doProcesso: Versao[], pedido: PedidoDeVersao, historica: boolean, piloto: boolean): void {
-  if (historica) conferirHistorica(doProcesso, pedido)
-  else if (piloto) conferirPiloto(doProcesso, pedido)
-  else conferirBpm(pedido)
-}
-
-// A versão piloto e a em sequência precisam só do .bpm; o .png e o .bpmn são opcionais (migração versoes_por_etapa).
-function conferirBpm(pedido: PedidoDeVersao): void {
-  if (!pedido.arquivos.some(({ papel }) => papel === 'bpm')) throw falhaDaFuncao('versao_sem_bpm', '')
-}
-
-
-// A piloto só entra antes da primeira em sequência, com número maior que o de todas as versões do processo.
-function conferirPiloto(doProcesso: Versao[], pedido: PedidoDeVersao): void {
-  if (haVersaoEmSequencia(doProcesso)) throw falhaDaFuncao('piloto_depois_de_versao_em_sequencia', '')
-  const maior = proximoNumero(doProcesso) - 1
-  if (pedido.numero <= maior) throw falhaDaFuncao('numero_da_piloto_nao_maior', String(maior))
-  conferirBpm(pedido)
-}
-
-// As regras que o banco impõe à histórica (migração versoes_historicas), com as mesmas frases do módulo real.
-function conferirHistorica(doProcesso: Versao[], pedido: PedidoDeVersao): void {
-  if (haVersaoNova(doProcesso)) throw falhaDaFuncao('historica_depois_de_versao_nova', '')
-  if (doProcesso.some((versao) => versao.numero === pedido.numero)) {
-    throw falhaDaFuncao('numero_historico_repetido', String(pedido.numero))
-  }
-  const papeis = pedido.arquivos.map(({ papel }) => papel)
-  if (!papeis.includes('bpm') && !(papeis.includes('bpmn') && papeis.includes('png'))) {
-    throw falhaDaFuncao('historica_sem_arquivo_de_fluxograma', '')
-  }
-}
-
-// O relatório só entra na versão nova que ainda não tem relatório (migração relatorio_depois_e_sem_alteracao).
-function conferirRelatorioNovo(versao: Versao): void {
-  if (versao.historica) throw falhaDaFuncao('versao_historica_somente_leitura', '')
-  if (!relatorioPendente(versao)) throw falhaDaFuncao('relatorio_ja_existe', '')
-}
-
-type OrigemDaCopia = { arquivo: ArquivoDaVersao; rotulo: string }
-
-// O relatório da versão imediatamente anterior (a de maior número menor), com o rótulo dela.
-function relatorioDaAnterior(versao: Versao, doProcesso: Versao[]): OrigemDaCopia | undefined {
-  const anterior = ordenarVersoes(doProcesso).find((outra) => outra.numero < versao.numero)
-  const arquivo = anterior?.arquivos.find((outro) => outro.papel === 'relatorio')
-  return anterior && arquivo ? { arquivo, rotulo: rotuloDaVersao(anterior) } : undefined
-}
-
-// O evento do gatilho da substituição (migração substituir_arquivo): o antes guarda o nome e o hash do que saiu.
-function eventoDaSubstituicao(processoId: string, versao: Versao, processo: ProcessoDoFalso, nome: string,
-  hashes: { saiu: string; entrou: string }): EventoDoCadastro {
-  return {
-    id: Date.now(), ocorridoEm: new Date().toISOString(), autor: 'Pessoa de Teste', acao: 'substituir', entidade: 'versao',
-    entidadeRef: processoId, antes: { nome, hash_md5: hashes.saiu },
-    depois: {
-      rotulo: rotuloDaVersao(versao), processo_nome: processo.nome, setor_sigla: processo.sigla, nome, hash_md5: hashes.entrou,
-    },
-  }
-}
-
-// O evento que o gatilho do banco grava (migração versoes): entidade "versao", referência no processo; `extras` leva o que
-// o evento acrescenta ao estado (o relatório copiado de, o papel do arquivo acrescentado).
-function eventoDaVersao(processoId: string, versao: Versao, processo: ProcessoDoFalso, acao: string,
-  extras: Record<string, string> = {}): EventoDoCadastro {
-  const depois = {
-    rotulo: rotuloDaVersao(versao), processo_nome: processo.nome, setor_sigla: processo.sigla, etapa: versao.etapa,
-    arquivos: versao.arquivos.map(({ papel, nome }) => ({ papel, nome })), ...extras,
-  }
-  return {
-    id: Date.now(), ocorridoEm: versao.enviadaEm, autor: 'Pessoa de Teste', acao, entidade: 'versao',
-    entidadeRef: processoId, antes: null, depois,
   }
 }
