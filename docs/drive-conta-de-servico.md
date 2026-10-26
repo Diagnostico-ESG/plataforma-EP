@@ -26,6 +26,7 @@ Se o Google recusar a criação da chave por uma política da organização, par
 1. No Google Drive do CED, clique em **Novo → Drive compartilhado** e crie **EP – desenvolvimento**. Repita para **EP – produção**.
 2. Em cada um, abra **Gerenciar membros** e adicione o e-mail da conta de serviço com o papel **Gerente de conteúdo**. Desmarque o aviso por e-mail.
    - Por que esse papel: o Gerente de conteúdo inclui, edita e move arquivos e pastas, e só manda para a lixeira (não apaga de vez). O Colaborador não move pastas, e a plataforma precisa mover a pasta quando um processo muda de setor. O Administrador pode apagar de vez, o que a plataforma não precisa. Fonte: página de ajuda do Google "Níveis de acesso nos drives compartilhados" (support.google.com/a/users/answer/12380484).
+   - **A retirada de anexo usa esse papel** (ADR 0027): ao retirar um anexo, a plataforma manda o arquivo para a lixeira do Drive compartilhado, que o apaga de vez em 30 dias; para tirá-lo de lá antes disso, restaure-o pela lixeira do próprio Drive. Com o papel de Colaborador, a retirada falha com "Não foi possível falar com o Drive". **Passo seu:** confira, em cada Drive compartilhado, que a conta de serviço está como **Gerente de conteúdo** (ou acima).
 3. Mantenha as permissões da equipe direto no Drive: Integrantes como **Colaborador**, você como **Administrador**. A plataforma não sincroniza membros.
 4. Abra o **EP – desenvolvimento** no navegador e copie o trecho final do endereço, depois de `/folders/`. Esse é o **identificador do Drive de desenvolvimento**.
 

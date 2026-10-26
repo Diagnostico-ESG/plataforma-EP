@@ -26,7 +26,10 @@ Spec: `.scratch/documentos-versoes/spec.md`, seção "Outros anexos (mudança de
 
 ## Critérios de aceite
 
-- [ ] Testes pgTAP escritos antes da migração e vistos falhar: apagar em `anexos` com Administrador e Integrante aceito; com Consulta, inativo e visitante recusado; com o processo suspenso, cancelado, concluído e arquivado recusado; evento da retirada com o nome; exclusão do processo aceita depois de retirado o último anexo.
-- [ ] Testes de interface com o aplicativo inteiro: retirar com a confirmação e a linha sumindo; cancelar a confirmação; falha da retirada com o anexo na lista e a mensagem; anexo já retirado; Consulta e processo suspenso, concluído e arquivado sem [Retirar]; o evento no histórico; versão, relatório e .pdf da aprovação continuam sem retirada.
-- [ ] O arquivo puro de decisão tem testes da ação `retirar` por perfil e situação; os testes do módulo real provam a retirada e as frases das recusas.
+- [x] Testes pgTAP escritos antes da migração e vistos falhar: apagar em `anexos` com Administrador e Integrante aceito; com Consulta, inativo e visitante recusado; com o processo suspenso, cancelado, concluído e arquivado recusado; evento da retirada com o nome; exclusão do processo aceita depois de retirado o último anexo.
+- [x] Testes de interface com o aplicativo inteiro: retirar com a confirmação e a linha sumindo; cancelar a confirmação; falha da retirada com o anexo na lista e a mensagem; anexo já retirado; Consulta e processo suspenso, concluído e arquivado sem [Retirar]; o evento no histórico; versão, relatório e .pdf da aprovação continuam sem retirada.
+- [x] O arquivo puro de decisão tem testes da ação `retirar` por perfil e situação; os testes do módulo real provam a retirada e as frases das recusas.
 - [ ] `[visual]` A confirmação da retirada mostra o nome do arquivo e a frase da lixeira sem passar da altura do notebook (1366×768).
+
+O critério `[visual]` fica sem marca: a janela de confirmação foi montada numa vitrine local com um nome de 118 caracteres e só medida (258 px de altura em 768 px, 328 px de largura, sem estouro lateral, foco no Cancelar; a captura de tela deu tempo esgotado), não vista no app real nem com o login real (ver `.scratch/documentos-versoes/desvios.md`, 2026-10-26, ticket 13). A função `arquivos-no-drive` precisa ser publicada de novo pelo usuário, e a lixeira se prova no Drive real.
+Concluído em 2026-10-26 (commit df2f0cf)
