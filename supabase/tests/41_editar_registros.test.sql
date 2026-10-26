@@ -60,8 +60,11 @@ create function pg_temp.enviar_completa(nome_do_processo text) returns void
 language plpgsql as $$
 declare
   versao uuid := pg_temp.enviar(nome_do_processo);
+  processo uuid := pg_temp.processo(nome_do_processo);
 begin
-  perform public.acrescentar_relatorio(versao, (select numero from public.versoes where id = versao),
+  perform public.enviar_relatorio(processo, (select numero from public.versoes where id = versao),
+    (select coalesce(max(a.numero_do_relatorio), 0) + 1 from public.arquivos_da_versao a
+      join public.versoes v on v.id = a.versao_id where v.processo_id = processo),
     pg_temp.arquivo('relatorio', 'docx'));
 end $$;
 grant execute on function pg_temp.enviar_completa(text) to authenticated;

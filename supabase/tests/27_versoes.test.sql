@@ -121,7 +121,7 @@ insert into _tap (linha) select throws_ok(
   '23505', null, 'segundo arquivo do mesmo papel é recusado');
 insert into _tap (linha) select throws_ok(
   $sql$select public.registrar_versao(pg_temp.processo('e1'), 3, pg_temp.par() || pg_temp.arquivo('relatorio', 'png'))$sql$,
-  '23514', null, 'relatório .png é recusado');
+  'P0001', 'relatorio_so_docx', 'relatório .png é recusado: o relatório novo só vale em .docx');
 insert into _tap (linha) select throws_ok(
   $sql$select public.registrar_versao(pg_temp.processo('e1'), 3,
     jsonb_build_array(pg_temp.arquivo('bpmn', 'bpmn', 20971521), pg_temp.arquivo('png', 'png')))$sql$,
@@ -131,7 +131,7 @@ insert into _tap (linha) select throws_ok(
   'P0001', 'numero_da_versao_mudou:3', 'número esperado diferente do que o banco dá é recusado');
 insert into _tap (linha) select lives_ok(
   $sql$select public.registrar_versao(pg_temp.processo('e1'), 3,
-    pg_temp.par() || pg_temp.arquivo('bpmn', 'bpmn') || pg_temp.arquivo('relatorio', 'pdf'))$sql$,
+    pg_temp.par() || pg_temp.arquivo('bpmn', 'bpmn') || pg_temp.arquivo('relatorio', 'docx'))$sql$,
   'versão com o .bpmn opcional e relatório é aceita');
 insert into _tap (linha) select is(
   (select count(*) from public.arquivos_da_versao where versao_id = pg_temp.versao(pg_temp.processo('e1'), 3)), 4::bigint,

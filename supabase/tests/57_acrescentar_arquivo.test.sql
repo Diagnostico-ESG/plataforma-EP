@@ -118,12 +118,12 @@ insert into _tap (linha) select is(
     and detalhes -> 'depois' ->> 'rotulo' = 'V6P' and detalhes -> 'depois' ->> 'papel' = 'png'
     and autor_id = '00000000-0000-0000-0000-0000000000a1'), 1::bigint,
   'o evento traz o rótulo da versão, o papel e o autor');
-insert into _tap (linha) select lives_ok(
-  $sql$select public.acrescentar_relatorio(pg_temp.versao(pg_temp.processo('e5'), 1), 1, pg_temp.arquivo('relatorio', 'pdf'))$sql$,
-  'o relatório continua se acrescentando como antes');
+insert into _tap (linha) select throws_ok(
+  $sql$select public.enviar_relatorio(pg_temp.processo('e5'), 1, 1, pg_temp.arquivo('relatorio', 'docx'))$sql$,
+  'P0001', 'relatorio_fora_da_etapa', 'o relatório tem a sua própria função (e a Publicação não o recebe)');
 insert into _tap (linha) select is(
-  (select count(*) from public.eventos where entidade = 'versao' and acao = 'acrescentar_relatorio' and entidade_ref = pg_temp.processo('e5')::text),
-  1::bigint, 'o relatório gera o evento acrescentar_relatorio');
+  (select count(*) from public.eventos where entidade = 'versao' and acao in ('acrescentar_relatorio', 'enviar_relatorio') and entidade_ref = pg_temp.processo('e5')::text),
+  0::bigint, 'nenhum evento de relatório nasce de acrescentar arquivo');
 insert into _tap (linha) select is(
   (select count(*) from public.eventos where entidade = 'versao' and acao = 'acrescentar_arquivo' and entidade_ref = pg_temp.processo('e5')::text),
   1::bigint, 'e só o .png gerou acrescentar_arquivo, não o relatório');

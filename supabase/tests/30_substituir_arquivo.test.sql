@@ -7,7 +7,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(25);
+insert into _tap (linha) select plan(29);
 
 -- Isola o teste dos dados que já existem no banco (a prova do Drive deixa versões, arquivos, eventos e pastas de teste
 -- no desenvolvimento): a limpeza vale só nesta transação, que é desfeita no fim. replica desliga os gatilhos que
@@ -40,7 +40,9 @@ insert into public.processos (id, setor_id, macroprocesso_id, nome) values
   ('9f000000-0000-0000-0000-0000000000f3', '5f000000-0000-0000-0000-0000000000f1', 'af000000-0000-0000-0000-0000000000f1', 'Processo Cancelado S'),
   ('9f000000-0000-0000-0000-0000000000f4', '5f000000-0000-0000-0000-0000000000f1', 'af000000-0000-0000-0000-0000000000f1', 'Processo Concluido S'),
   ('9f000000-0000-0000-0000-0000000000f5', '5f000000-0000-0000-0000-0000000000f1', 'af000000-0000-0000-0000-0000000000f1', 'Processo Historico S'),
-  ('9f000000-0000-0000-0000-0000000000f6', '5f000000-0000-0000-0000-0000000000f1', 'af000000-0000-0000-0000-0000000000f1', 'Processo Perfis S');
+  ('9f000000-0000-0000-0000-0000000000f6', '5f000000-0000-0000-0000-0000000000f1', 'af000000-0000-0000-0000-0000000000f1', 'Processo Perfis S'),
+  ('9f000000-0000-0000-0000-0000000000f7', '5f000000-0000-0000-0000-0000000000f1', 'af000000-0000-0000-0000-0000000000f1', 'Processo Antigo S'),
+  ('9f000000-0000-0000-0000-0000000000f8', '5f000000-0000-0000-0000-0000000000f1', 'af000000-0000-0000-0000-0000000000f1', 'Processo Aprovado S');
 
 -- Um arquivo inventado no formato que registrar_versao recebe; o nome é o padrão da versão.
 create function pg_temp.arquivo(papel text, formato text) returns jsonb
@@ -50,7 +52,7 @@ language sql immutable as $$
 create function pg_temp.par() returns jsonb
 language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('bpm', 'bpm'), pg_temp.arquivo('png', 'png')) $$;
 create function pg_temp.relatorio() returns jsonb
-language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('relatorio', 'pdf')) $$;
+language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('relatorio', 'docx')) $$;
 -- O que a função do servidor entrega à substituição: o que o Drive informou do arquivo novo.
 create function pg_temp.novo(formato text, hash text default 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb') returns jsonb
 language sql immutable as $$
@@ -69,7 +71,21 @@ grant execute on function pg_temp.arquivo(text, text), pg_temp.par(), pg_temp.re
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
 set local role authenticated;
 select public.registrar_versao(pg_temp.processo(sufixo), 1, pg_temp.par() || pg_temp.arquivo('bpmn', 'bpmn') || pg_temp.relatorio())
-  from (values ('f1'), ('f2'), ('f3'), ('f4'), ('f6')) as processos (sufixo);
+  from (values ('f1'), ('f2'), ('f3'), ('f4'), ('f6'), ('f8')) as processos (sufixo);
+-- f7: o relatório antigo em .pdf, sem número, como o desenvolvimento ainda tem (o envio novo só aceita .docx).
+select public.registrar_versao(pg_temp.processo('f7'), 1, pg_temp.par());
+-- f8: a versão com relatório é aprovada (ADR 0011).
+select public.mover_processo(pg_temp.processo('f8'), (select id from public.etapas where codigo = 'aprovacao_setor'));
+select public.registrar_aprovacao(pg_temp.processo('f8'), null, null, null);
+reset role;
+set local session_replication_role = replica;
+insert into public.arquivos_da_versao (versao_id, papel, nome, formato, tamanho, hash_md5, drive_id, enviado_por, enviado_em)
+  select id, 'relatorio', 'SB1_V1_Processo Antigo S_Relatório.pdf', 'pdf', 100, '0123456789abcdef0123456789abcdef', 'drive-antigo',
+    '00000000-0000-0000-0000-0000000000a1', now()
+  from public.versoes where processo_id = pg_temp.processo('f7');
+set local session_replication_role = origin;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
+set local role authenticated;
 select public.registrar_versao_historica(pg_temp.processo('f5'), 1, pg_temp.par() || pg_temp.arquivo('bpmn', 'bpmn') || pg_temp.relatorio());
 
 -- Administrador, no processo f1.
@@ -82,14 +98,26 @@ insert into _tap (linha) select is((select count(*) from public.arquivos_da_vers
       and enviado_por = '00000000-0000-0000-0000-0000000000a1'), 1::bigint,
   'o arquivo troca tamanho e hash e continua com o mesmo nome e o mesmo identificador do Drive');
 insert into _tap (linha) select lives_ok(
-  $sql$select public.substituir_arquivo(pg_temp.arquivo_da(pg_temp.processo('f1'), 1, 'relatorio'), pg_temp.novo('pdf', 'cccccccccccccccccccccccccccccccc'))$sql$,
-  'administrador substitui o relatório da V1');
+  $sql$select public.substituir_arquivo(pg_temp.arquivo_da(pg_temp.processo('f1'), 1, 'relatorio'), pg_temp.novo('docx', 'cccccccccccccccccccccccccccccccc'))$sql$,
+  'administrador substitui o relatório numerado da V1');
 insert into _tap (linha) select is((select count(*) from public.arquivos_da_versao v
     where v.versao_id in (select id from public.versoes where processo_id = pg_temp.processo('f1'))), 4::bigint,
   'a substituição não cria arquivo: a V1 continua com os quatro');
 insert into _tap (linha) select throws_ok(
-  $sql$select public.substituir_arquivo(pg_temp.arquivo_da(pg_temp.processo('f1'), 1, 'relatorio'), pg_temp.novo('docx'))$sql$,
-  'P0001', 'tipo_de_arquivo_diferente:pdf', 'o relatório .pdf não é trocado por um .docx');
+  $sql$select public.substituir_arquivo(pg_temp.arquivo_da(pg_temp.processo('f1'), 1, 'relatorio'), pg_temp.novo('pdf'))$sql$,
+  'P0001', 'tipo_de_arquivo_diferente:docx', 'o relatório .docx não é trocado por um .pdf');
+insert into _tap (linha) select is((select numero_do_relatorio from public.arquivos_da_versao
+    where id = pg_temp.arquivo_da(pg_temp.processo('f1'), 1, 'relatorio')), 1,
+  'a substituição não muda o número do relatório');
+insert into _tap (linha) select lives_ok(
+  $sql$select public.substituir_arquivo(pg_temp.arquivo_da(pg_temp.processo('f7'), 1, 'relatorio'), pg_temp.novo('pdf', 'dddddddddddddddddddddddddddddddd'))$sql$,
+  'o relatório antigo em .pdf, sem número, se substitui por outro .pdf');
+insert into _tap (linha) select throws_ok(
+  $sql$select public.substituir_arquivo(pg_temp.arquivo_da(pg_temp.processo('f7'), 1, 'relatorio'), pg_temp.novo('docx'))$sql$,
+  'P0001', 'tipo_de_arquivo_diferente:pdf', 'e não por um .docx');
+insert into _tap (linha) select throws_ok(
+  $sql$select public.substituir_arquivo(pg_temp.arquivo_da(pg_temp.processo('f8'), 1, 'relatorio'), pg_temp.novo('docx'))$sql$,
+  'P0001', 'versao_aprovada:1', 'o relatório ligado à versão aprovada não se substitui');
 
 -- Histórica: somente leitura.
 insert into _tap (linha) select throws_ok(
@@ -170,7 +198,7 @@ insert into _tap (linha) select is((select count(*) from public.arquivos_da_vers
     where id = pg_temp.arquivo_da(pg_temp.processo('f6'), 1, 'bpmn') and tamanho = 100), 1::bigint,
   'o arquivo recusado à consulta continua como estava');
 insert into _tap (linha) select is((select count(*) from public.eventos where entidade = 'versao' and acao = 'substituir'),
-  3::bigint, 'consulta lê os eventos de substituição');
+  4::bigint, 'consulta lê os eventos de substituição');
 
 -- Inativo.
 reset role;
