@@ -266,9 +266,9 @@ insert into _tap (linha) select throws_ok(
   $sql$update public.processos set drive_pasta_dos_anexos = 'pasta com espaço!' where id = pg_temp.processo('Andamento')$sql$,
   '23514', null, 'identificador da subpasta fora do formato é recusado');
 select pg_temp.claims('a3');
+update public.processos set drive_pasta_dos_anexos = 'pasta-da-consulta' where id = pg_temp.processo('Andamento');
 insert into _tap (linha) select is(
-  (with alterado as (update public.processos set drive_pasta_dos_anexos = 'pasta-da-consulta'
-    where id = pg_temp.processo('Andamento') returning 1) select count(*) from alterado), 0::bigint,
+  (select drive_pasta_dos_anexos from public.processos where id = pg_temp.processo('Andamento')), 'pasta-anexos-1',
   'consulta não grava a subpasta (a política de alterar não deixa nenhuma linha)');
 
 reset role;
