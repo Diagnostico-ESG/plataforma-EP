@@ -132,3 +132,20 @@ test('versão e relatório continuam sem retirada: só os anexos têm [Retirar]'
   expect(verso.getAllByRole('button', { name: /^Retirar/ }).map((botao) => botao.getAttribute('aria-label')))
     .toEqual(['Retirar resposta.eml'])
 })
+
+test('depois de retirar, o foco vai para o título da seção (a linha que o tinha sumiu)', async () => {
+  montarNosCadastros(comAnexos(resposta()))
+  const { secao, janela } = await pedirRetirada()
+  fireEvent.click(janela.getByRole('button', { name: 'Retirar' }))
+  await secao.findByText('Nenhum anexo.')
+  expect(document.activeElement).toBe(secao.getByRole('heading', { name: 'Outros anexos' }))
+})
+
+test('se a retirada falha, o foco não é tirado do lugar (o anexo continua na lista)', async () => {
+  const { versoes } = montarNosCadastros(comAnexos(resposta()))
+  versoes.anexos.falhaNaRetirada = 'Drive fora do ar'
+  const { secao, janela } = await pedirRetirada()
+  fireEvent.click(janela.getByRole('button', { name: 'Retirar' }))
+  await secao.findByRole('alert')
+  expect(document.activeElement).not.toBe(secao.getByRole('heading', { name: 'Outros anexos' }))
+})

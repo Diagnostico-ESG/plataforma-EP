@@ -46,7 +46,7 @@ export function SecaoDeAnexos({ versoes, processo, podeAlterar }: SecaoDeAnexosP
 function TituloDosAnexos({ id, children }: { id: string; children?: ReactNode }) {
   return (
     <div className="secao-de-versoes-titulo">
-      <h3 id={id} className="painel-subtitulo">Outros anexos</h3>
+      <h3 id={id} tabIndex={-1} className="painel-subtitulo">Outros anexos</h3>
       {children}
     </div>
   )
@@ -59,7 +59,11 @@ type AnexosProntosProps = {
 // Quem pode enviar também pode retirar (mesmo perfil, mesmo processo em andamento); a lista é lida de novo a cada mudança.
 function AnexosProntos({ versoes, processoId, lidos, podeEnviar, aoMudar, idDoTitulo }: AnexosProntosProps) {
   const [aberto, setAberto] = useState(false)
-  const retirada = useRetiradaDeAnexo(versoes.anexos, aoMudar)
+  // A linha retirada leva o foco com ela (o <dialog> o devolveria a um botão que já não existe): ele vai para o título da seção.
+  const retirada = useRetiradaDeAnexo(versoes.anexos, (retirou) => {
+    aoMudar()
+    if (retirou) document.getElementById(idDoTitulo)?.focus()
+  })
   // A conferência com o Drive devolve o mapa de todos os arquivos do processo (versões, .pdfs e anexos), pelo id.
   // ponytail: segunda chamada de conferir por verso (a das versões já faz uma); subir a conferência para o verso se o custo pesar.
   const conferencia = useConferenciaNoDrive(versoes, processoId, lidos)
