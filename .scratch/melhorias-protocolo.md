@@ -922,3 +922,11 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - Ocorrência: o `/code-review` do Matt pede um ponto fixo (`HEAD...HEAD` fica vazio com mudanças não comitadas); revisei por conta própria, sem os dois sub-agentes. Achou o CSS que não tinha sido gravado (substituição por `perl` não casou com o CRLF dos arquivos `.css`/`.tsx`): em arquivos com CRLF, edite por script que normaliza as quebras de linha.
 - Ocorrência: sem vitrine local pronta, os critérios `[visual]` do ticket 27 não foram vistos na tela.
 - Ocorrência: o git deste ambiente continua sem user.name/user.email; commit com `-c`, sem gravar config.
+
+## 2026-10-26 — /executar-complexo (documentos-versoes, ticket 09)
+
+- **2026-10-26 · Itens não testados que aconteceram:** Edge Function com a decisão em arquivo puro testado no Vitest (operações novas por entrada e por perfil); TDD de banco com o teste visto falhar no "Testes de banco" antes da migração (vermelho pelo motivo certo, #40330206339); migração aplicada pelo workflow "Migrar banco de desenvolvimento" depois do ensaio automático do `test:db`; `plano-<número>.md`; branch de integração com mais de um ticket (`quadro-livre-parte-3`), em que a junção à `main` e a linha `Concluído em` ficam para o último ticket da parte.
+- **2026-10-26 · Ocorrência: o `/executar-complexo` manda juntar a branch à principal e apagá-la ao fim do ticket, e o ticket 09 manda ficar na branch da parte (`quadro-livre-parte-3`).** Segui o ticket (ficou na branch; `Concluído em` gravado nela), como na parte 1.
+- **2026-10-26 · Ocorrência: o pre-commit (typecheck e ESLint) barrou o commit duas vezes** (testes novos já usando campos que o código ainda não tinha; complexidade e 300 linhas num teste). Corrigi a causa; sem `--no-verify`.
+- **2026-10-26 · Ocorrência: o `python` do ambiente é o atalho da Microsoft Store (não roda) e o shell recusou textos longos com aspas dentro de `bash`;** as edições em lote foram feitas com Node e com a ferramenta de arquivos. `cd` num comando do shell muda o diretório primário da sessão: voltei à raiz a cada comando.
+- **2026-10-26 · Ocorrência: `gh` voltou autenticado** (a pendência de 2026-10-23 se resolveu); os workflows "Testes de banco" e "Migrar banco de desenvolvimento" foram disparados por `gh workflow run`.

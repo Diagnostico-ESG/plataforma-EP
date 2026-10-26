@@ -34,9 +34,12 @@ Spec: `.scratch/documentos-versoes/spec.md`, seção "Arquivos por etapa (mudan�
 
 ## Critérios de aceite
 
-- [ ] Testes pgTAP escritos antes da migração e vistos falhar: numeração da piloto (maior que todas, a partir de 1 sem histórica, várias, recusada depois da V7), em sequência depois da piloto, onde cada envio cabe, só o .bpm exigido, acrescentar .png e .bpmn (aceito, repetido recusado, aprovada e histórica recusadas), eventos novos. Os testes `27` e `28` ajustados.
-- [ ] Testes de interface com o aplicativo inteiro: os botões em cada etapa (Não iniciados, Modelagem piloto, técnica, Revisão interna, Validação, Concluídos, etapa nova); a piloto com o número preenchido, trocado e recusado; a em sequência só com .bpm; acrescentar .png e .bpmn; formulário que abre, fecha e rola; Consulta e processo suspenso sem botões; eventos no histórico. Os testes de hoje que usam a observação ou o .png obrigatório passam ao modelo novo.
-- [ ] O arquivo puro de decisão da função e o nome padrão têm testes das operações novas; os testes do módulo real provam as chamadas e as frases das recusas novas.
-- [ ] Funções puras (rótulo V6P, número mínimo da piloto, papéis exigidos por tipo, botões por etapa) com testes unitários.
+- [x] Testes pgTAP escritos antes da migração e vistos falhar: numeração da piloto (maior que todas, a partir de 1 sem histórica, várias, recusada depois da V7), em sequência depois da piloto, onde cada envio cabe, só o .bpm exigido, acrescentar .png e .bpmn (aceito, repetido recusado, aprovada e histórica recusadas), eventos novos. Os testes `27` e `28` ajustados.
+- [x] Testes de interface com o aplicativo inteiro: os botões em cada etapa (Não iniciados, Modelagem piloto, técnica, Revisão interna, Validação, Concluídos, etapa nova); a piloto com o número preenchido, trocado e recusado; a em sequência só com .bpm; acrescentar .png e .bpmn; formulário que abre, fecha e rola; Consulta e processo suspenso sem botões; eventos no histórico. Os testes de hoje que usam a observação ou o .png obrigatório passam ao modelo novo.
+- [x] O arquivo puro de decisão da função e o nome padrão têm testes das operações novas; os testes do módulo real provam as chamadas e as frases das recusas novas.
+- [x] Funções puras (rótulo V6P, número mínimo da piloto, papéis exigidos por tipo, botões por etapa) com testes unitários.
 - [ ] `[visual]` O verso mostra só o botão de envio da etapa atual, sem espaço vazio nas etapas sem envio.
 - [ ] `[visual]` O formulário aberto rola até aparecer inteiro e fecha pelo mesmo botão; [+ Acrescentar .png] e [+ Acrescentar .bpmn] no padrão tracejado de hoje.
+
+Os dois critérios `[visual]` ficam sem marca: a tela não foi vista no app real (ver `.scratch/documentos-versoes/desvios.md`, 2026-10-26).
+Concluído em 2026-10-26 (commit 5fd95cc)
