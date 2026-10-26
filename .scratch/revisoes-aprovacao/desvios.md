@@ -125,3 +125,14 @@ Decisões tomadas na execução, sem mudar a spec (a lista completa está no `pl
 - **Critérios `[visual]`** (o campo da data no Agora alinhado e numa linha; o .pdf na gaveta como os arquivos das versões; a janela "Registrar aprovação" cabendo em 1366×768) **seguem presumidos:** a vitrine local está desatualizada e não compila, e a tela com o login real não foi vista. Entram na ressalva do `/ship`.
 - **Verificado:** "Testes de banco" #40363979091, 49 arquivos verdes (o 60 com 73 ok e o 40 com 57); Vitest 205 arquivos e 2690 testes; `tsc`, ESLint e dependência circular limpos. A migração `20261026164641_data_da_validacao_e_pdf_da_aprovacao` foi aplicada no desenvolvimento (execução #40363056688) e os tipos saíram do `db:types` do remoto.
 - **Revisão final:** autorrevisão (a regra do projeto não permite abrir subagente sem o usuário pedir). Nada Crítico ou Importante achado; o que ficou está no backlog.
+
+## 2026-10-26 — /polir das telas da parte 3 do quadro livre (audit e polish)
+
+Escopo: os arquivos de `src/components/` mudados pela junção da parte 3 (`902ef2c..db02daf`): `processos/` (Agora, DataDaValidacao, PdfDaAprovacao, FormularioDoPdf, JanelaDaTrava, JanelaDeRegistroDaAprovacao, gaveta, linha do tempo, histórico) e `versoes/`.
+
+- **Audit (só leitura do código; o detector do Impeccable não achou nada):** acessibilidade 3, desempenho 4, responsividade 3 (o produto é de desktop), tema 4, integridade 4: **18/20, excelente**. Nenhum P0, P1 ou P2. Os pontos de contraste, foco visível (`:focus-visible` global) e áreas de toque (24 a 36 px, acima do mínimo de 24 px da WCAG 2.2 AA) estão dentro do que o projeto pede; as cores todas vêm dos tokens, sem valor fixo.
+- **Deixado de fora (P3, sem ganho que pague a mudança):**
+  - O botão [Substituir] do .pdf na gaveta tem o mesmo nome acessível do [Substituir] dos arquivos das versões; na gaveta o contexto (a seção da Aprovação) o distingue, e trocar o nome quebraria os testes que o buscam por `name: 'Substituir'`.
+  - O aviso "a nova aprovação toma o lugar da anterior" (`role="status"`) já nasce na tela quando a janela abre, então o leitor de tela pode não anunciá-lo; é o mesmo padrão das outras janelas de registro.
+- **Polish: nenhum código alterado.** Sem defeito verificável a corrigir, não mexi nas telas para não criar mudança sem motivo.
+- **Não verificado:** a aparência renderizada. A tela só abre com o login real e a vitrine local está desatualizada (não compila). Os critérios `[visual]` seguem presumidos e entram na ressalva do `/ship`. A conferência na tela com o login real continua com o usuário (lista em `.scratch/proximo-passo.md`).
