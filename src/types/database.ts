@@ -871,6 +871,9 @@ export type Database = {
             | Database["public"]["Enums"]["situacao_guardada"]
             | null
           subprocessos_quantidade: number | null
+          tem_relatorio_numerado: boolean | null
+          tem_versao_em_sequencia: boolean | null
+          tem_versao_piloto: boolean | null
           tipo: Database["public"]["Enums"]["tipo_de_processo"] | null
           ultima_versao_historica: boolean | null
           ultima_versao_numero: number | null

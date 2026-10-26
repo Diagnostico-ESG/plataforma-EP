@@ -37,6 +37,7 @@ test('lista os processos por nome e as etapas na ordem do catálogo, com a posi�
       etiqueta: 'em_andamento', entrouNaEtapaEm: '2026-10-01',
       responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null },
       cartao: { responsavelAtivo: null, ultimaVersao: null, subprocessos: 0 },
+      arquivos: { versaoPiloto: false, versaoEmSequencia: false, relatorioNumerado: false },
     }],
   })
   expect(cliente.pedidos).toMatchObject([
@@ -64,6 +65,14 @@ test('os campos novos da view chegam ao cartão do processo na lista', async () 
   expect(processos[0].dataDaModelagemPiloto).toBe('2026-10-25')
   expect(processos[0].publicadoEm).toBe('2026-10-20')
   expect(processos[0].cartao).toEqual({ responsavelAtivo: false, ultimaVersao: { numero: 2, historica: false, temRelatorio: true }, subprocessos: 3 })
+})
+
+test('o que o processo tem de arquivos chega para a trava de arquivos', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  const comArquivos = { ...LINHA, tem_versao_piloto: true, tem_versao_em_sequencia: false, tem_relatorio_numerado: true }
+  cliente.respostas['processos_com_andamento.select'] = { data: [comArquivos], error: null }
+  const { processos } = await criar(cliente).listarProcessos()
+  expect(processos[0].arquivos).toEqual({ versaoPiloto: true, versaoEmSequencia: false, relatorioNumerado: true })
 })
 
 test('a situação calculada "concluido" chega como está', async () => {
