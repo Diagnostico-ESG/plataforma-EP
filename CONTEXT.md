@@ -157,28 +157,32 @@ _Avoid_: reunião, data da reunião, encontro, agenda, oficina
 ## Documentos
 
 **Versão**:
-Conjunto de arquivos do fluxograma de um processo, com número sequencial por processo (V1, V2…). Nasce com o .bpm (arquivo-fonte do Bizagi) e o .png (o .bpmn é opcional) e pode receber o relatório depois. Nunca se apaga, mas um arquivo dela pode ser substituído. Registra a etapa atual do processo no momento do envio, mas não muda nenhuma etapa.
+Conjunto de arquivos do fluxograma de um processo, numa numeração única por processo: as versões históricas (V5F) e as versões piloto (V6P) têm o número digitado, e as versões em sequência (V7, V8…) continuam a partir do maior número que já existe. Toda versão que não é histórica exige o .bpm (arquivo-fonte do Bizagi); o .png e o .bpmn são opcionais e podem ser acrescentados depois. Cada tipo de versão se envia na sua etapa e aparece em todas. Nunca se apaga, mas um arquivo dela pode ser substituído. Registra a etapa atual do processo no momento do envio, mas não move o processo.
 _Avoid_: documento, revisão (para versão), arquivo
 
-**Relatório**:
-Arquivo (.docx ou .pdf) que acompanha uma versão e usa o número dela; não tem numeração própria.
-_Avoid_: laudo, documento técnico
+**Versão em sequência**:
+Versão sem letra (V7), enviada na Relatório e modelagem técnica ou na Revisão interna, com o número dado pela plataforma. Depois da primeira, não se registra mais versão histórica nem versão piloto.
+_Avoid_: versão nova, versão técnica, versão definitiva
 
-**Substituir arquivo**:
-Trocar um arquivo de uma versão por outro do mesmo tipo. O arquivo anterior não fica guardado; o histórico registra a troca.
-_Avoid_: corrigir versão, reenviar, atualizar arquivo
-
-**Relatório pendente**:
-Situação da versão que ainda não tem relatório.
-_Avoid_: relatório faltando, versão incompleta
-
-**Sem alteração de conteúdo**:
-Registro, numa versão nova, do mesmo relatório da versão anterior, com o nome da versão nova.
-_Avoid_: cópia do relatório, relatório repetido
+**Versão piloto**:
+Versão com o sufixo P (V6P), o primeiro desenho do fluxo, enviada na Modelagem piloto com o .bpm e o número digitado, maior que o de todas as versões anteriores. Pode haver mais de uma, enquanto não houver versão em sequência.
+_Avoid_: rascunho, versão preliminar, versão zero
 
 **Versão histórica**:
-Versão da primeira etapa do trabalho, feita antes da plataforma, somente leitura, com o sufixo F no rótulo (V5F). Só se registra enquanto o processo não tem versão nova, e a primeira versão nova continua a numeração (V5F → V6). Pode ter só o .bpm.
+Versão da primeira etapa do trabalho, feita antes da plataforma, somente leitura, com o sufixo F no rótulo (V5F). Só se registra com o processo em Não iniciados e enquanto ele não tem versão piloto nem versão em sequência. Pode ter só o .bpm, e o relatório dela não tem número próprio.
 _Avoid_: versão antiga, versão importada, versão final
+
+**Relatório**:
+Arquivo .docx com numeração própria por processo (Relatório V1, V2…), enviado sozinho ou junto com uma versão, na Relatório e modelagem técnica ou na Revisão interna, e ligado à versão mais recente no momento do envio. Uma versão sem relatório próprio continua valendo com o último relatório. Os relatórios .pdf antigos e o relatório da versão histórica ficam sem número próprio.
+_Avoid_: laudo, documento técnico, relatório pendente, sem alteração de conteúdo
+
+**Trava de arquivos**:
+A recusa de mover o processo para a frente de uma etapa, quando ele vem dela ou de antes e vai para depois dela, enquanto faltam os arquivos dela: na Modelagem piloto, uma versão piloto; na Relatório e modelagem técnica, uma versão em sequência e um relatório. A janela diz o que falta e oferece o envio ali mesmo. Voltar, mudar a etiqueta e processo que já estava depois da etapa não travam.
+_Avoid_: bloqueio, pré-requisito, obrigatoriedade da etapa
+
+**Substituir arquivo**:
+Trocar um arquivo de uma versão, de um relatório ou da aprovação por outro do mesmo tipo. O arquivo anterior não fica guardado; o histórico registra a troca. A versão histórica e a versão aprovada, com o relatório que a acompanha, não têm arquivo substituído.
+_Avoid_: corrigir versão, reenviar, atualizar arquivo
 
 ## Revisões e aprovação
 
@@ -195,11 +199,11 @@ Integrante que registra a revisão interna; não deveria ser o autor da versão 
 _Avoid_: aprovador, conferente
 
 **Validação com o setor**:
-A etapa em que a versão está com o setor. Se o setor pede ajustes, o EP move o processo de volta à revisão interna, e a ida seguinte é o processo voltando a esta etapa. A plataforma não registra cada envio nem a resposta: o histórico das mudanças de etapa diz quando foi e voltou, e os e-mails ficam fora (a resposta pode vir pessoalmente).
+A etapa em que a versão está com o setor. Se o setor pede ajustes, o EP move o processo de volta à revisão interna, e a ida seguinte é o processo voltando a esta etapa. A plataforma não registra cada envio nem a resposta: o histórico das mudanças de etapa diz quando foi e voltou, e os e-mails ficam fora (a resposta pode vir pessoalmente). Guarda só a **data da validação**, opcional, uma por processo: o dia em que o setor validou o fluxo, diferente da data do E-protocolo na Aprovação.
 _Avoid_: revisão pelo setor, rodada, ciclo, envio ao setor
 
 **Aprovação**:
-O registro de que o setor aprovou a versão mais recente do processo, feito com o processo na etapa Aprovação pelo setor, com o número, o link e a data do E-protocolo quando houver (o número pode entrar depois). Registrar não move o processo. Pode vir depois de ajustes pequenos feitos sem nova ida ao setor, que o setor só vê de novo no E-protocolo. Vale uma por processo: mover o processo para trás não a desfaz, e uma aprovação registrada depois, da mesma versão ou de outra, toma o lugar da anterior, que fica no histórico. A versão aprovada não tem arquivo substituído.
+O registro de que o setor aprovou a versão mais recente do processo, feito com o processo na etapa Aprovação pelo setor, com o número, o link e a data do E-protocolo quando houver (o número pode entrar depois) e, se houver, o .pdf protocolado (fluxo e relatório juntos). Registrar não move o processo. Pode vir depois de ajustes pequenos feitos sem nova ida ao setor, que o setor só vê de novo no E-protocolo. Vale uma por processo: mover o processo para trás não a desfaz, e uma aprovação registrada depois, da mesma versão ou de outra, toma o lugar da anterior, que fica no histórico. A versão aprovada não tem arquivo substituído.
 _Avoid_: homologação, validação final
 
 **E-protocolo**:
