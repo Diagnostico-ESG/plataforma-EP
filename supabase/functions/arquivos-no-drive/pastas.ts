@@ -3,6 +3,7 @@
 // A cada envio, a pasta acompanha a sigla e o nome atuais (renomeia ou move). A função nunca apaga pasta.
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { consultaDePastaPorNome } from '../_shared/drive.ts'
+import { NOME_DA_SUBPASTA_DOS_ANEXOS } from '../_shared/anexo.ts'
 import { limparParaNomeDeArquivo } from '../_shared/nomePadrao.ts'
 import { decidirAjusteDaPasta } from '../_shared/pasta.ts'
 import { estaSobARaiz, type LerPais } from '../_shared/raiz.ts'
@@ -146,4 +147,33 @@ export async function garantirPastaDoProcesso(contexto: ContextoDoDrive, process
   const pastaDoSetor = await garantirPasta(contexto, setor, limparParaNomeDeArquivo(processo.setor_sigla), contexto.config.raizId)
   const dono: Dono = { coluna: 'processo_id', id: processo.id }
   return await garantirPasta(contexto, dono, limparParaNomeDeArquivo(processo.nome), pastaDoSetor)
+}
+
+// A subpasta "Anexos" (documentos-versoes, ticket 12) é filha da pasta do processo, então acompanha o nome e o lugar dela
+// sem a função fazer nada. O identificador fica em processos.drive_pasta_dos_anexos, gravado com o login de quem chamou.
+export async function lerPastaDosAnexos(cliente: SupabaseClient, processoId: string): Promise<string | null> {
+  const { data, error } = await cliente.from('processos').select('drive_pasta_dos_anexos').eq('id', processoId).maybeSingle()
+  if (error) throw new Error(`leitura de processos falhou (código ${error.code}); esperado: processo visível`)
+  return (data as { drive_pasta_dos_anexos: string | null } | null)?.drive_pasta_dos_anexos ?? null
+}
+
+async function registrarPastaDosAnexos(cliente: SupabaseClient, processoId: string, driveId: string): Promise<void> {
+  const { error } = await cliente.from('processos').update({ drive_pasta_dos_anexos: driveId }).eq('id', processoId)
+  if (error) throw new Error(`gravação de drive_pasta_dos_anexos falhou (código ${error.code}); esperado: perfil que altera processos`)
+}
+
+// ponytail: dois primeiros anexos simultâneos do mesmo processo podem criar duas subpastas "Anexos"; a segunda gravação do
+// identificador vence e os arquivos da primeira ficam na outra (a conferência os marca fora da pasta). Travar por processo se acontecer.
+export async function garantirPastaDosAnexos(contexto: ContextoDoDrive, processo: ProcessoDaPasta): Promise<string> {
+  const pastaDoProcesso = await garantirPastaDoProcesso(contexto, processo)
+  const registrada = await lerPastaDosAnexos(contexto.cliente, processo.id)
+  if (registrada) {
+    // O identificador é escrito por quem tem perfil de escrita: só se grava arquivo em pasta debaixo da raiz do ambiente.
+    if (await conferidorDaRaiz(contexto).itemSobARaiz(registrada)) return registrada
+    throw new Error(`subpasta de anexos registrada (${registrada}) fora da raiz do ambiente; esperado: pasta debaixo da raiz`)
+  }
+  const driveId = (await procurarPasta(contexto.token, NOME_DA_SUBPASTA_DOS_ANEXOS, pastaDoProcesso))
+    ?? (await criarPasta(contexto.token, NOME_DA_SUBPASTA_DOS_ANEXOS, pastaDoProcesso))
+  await registrarPastaDosAnexos(contexto.cliente, processo.id, driveId)
+  return driveId
 }

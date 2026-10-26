@@ -41,10 +41,10 @@ export async function lerProcesso(contexto: ContextoDoDrive, id: string): Promis
   return data as ProcessoDoEnvio | null
 }
 
-interface PedidoDaSessao {
+export interface PedidoDaSessao {
   /** Criar um arquivo novo (POST, com nome e pasta) ou atualizar o conteúdo de um que existe (PATCH, sem mexer em nome nem pasta). */
   destino: { criar: { nome: string; pastaId: string } } | { atualizar: string }
-  entrada: EntradaIniciarEnvio
+  entrada: Pick<EntradaIniciarEnvio, 'tamanho' | 'nomeOriginal'>
   origem: string | null
 }
 
@@ -57,7 +57,7 @@ function requisicaoDaSessao({ destino }: PedidoDaSessao): { endereco: string; me
 }
 
 // O Origin do navegador vai junto: sem ele, o Google recusa o PUT direto do navegador (CORS).
-async function abrirSessaoDeEnvio(token: string, pedido: PedidoDaSessao): Promise<string> {
+export async function abrirSessaoDeEnvio(token: string, pedido: PedidoDaSessao): Promise<string> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json; charset=UTF-8',
     'X-Upload-Content-Length': String(pedido.entrada.tamanho),
@@ -187,12 +187,13 @@ async function lerNomeEDriveId(contexto: ContextoDoDrive, tabela: string, id: st
   return data as ArquivoDaLinha | null
 }
 
-// O arquivo é de uma versão ou o .pdf da aprovação (atual ou guardado: o histórico baixa o que ficou guardado); os
-// identificadores são uuids sorteados, então um id só existe numa das duas tabelas. Sem linha visível, a recusa é a mesma
+// O arquivo é de uma versão, o .pdf da aprovação (atual ou guardado: o histórico baixa o que ficou guardado) ou um anexo; os
+// identificadores são uuids sorteados, então um id só existe numa das três tabelas. Sem linha visível, a recusa é a mesma
 // de "sem permissão", para não revelar se o arquivo existe.
 async function lerArquivoDaVersao(contexto: ContextoDoDrive, arquivoId: string): Promise<ArquivoDaLinha | null> {
   return (await lerNomeEDriveId(contexto, 'arquivos_da_versao', arquivoId))
     ?? (await lerNomeEDriveId(contexto, 'pdfs_da_aprovacao', arquivoId))
+    ?? (await lerNomeEDriveId(contexto, 'anexos', arquivoId))
 }
 
 // Sempre application/octet-stream: o supabase-js do navegador só devolve Blob para esse tipo (e PDF); qualquer

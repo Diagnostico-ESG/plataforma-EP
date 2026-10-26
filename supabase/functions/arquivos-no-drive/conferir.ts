@@ -31,6 +31,13 @@ async function lerPdfsDoProcesso(contexto: ContextoDoDrive, processoId: string):
   return data as unknown as ArquivoGuardado[]
 }
 
+// Os anexos do processo (ticket 12), pelo mesmo caminho da RLS; entram no mesmo mapa por id.
+async function lerAnexosDoProcesso(contexto: ContextoDoDrive, processoId: string): Promise<ArquivoGuardado[]> {
+  const { data, error } = await contexto.cliente.from('anexos').select('id, drive_id, hash_md5').eq('processo_id', processoId)
+  if (error) throw new Error(`leitura de anexos falhou (código ${error.code}); esperado: anexos do processo visíveis`)
+  return data as unknown as ArquivoGuardado[]
+}
+
 // Arquivo fora da raiz do ambiente conta como não encontrado: a função não o lê com a conta de serviço.
 async function situacaoNoDrive(contexto: ContextoDoDrive, raiz: ConferidorDaRaiz, arquivo: ArquivoGuardado): Promise<[string, string]> {
   const endereco = `${API_DE_ARQUIVOS}/${encodeURIComponent(arquivo.drive_id)}?fields=id,md5Checksum,trashed,parents`
@@ -41,10 +48,10 @@ async function situacaoNoDrive(contexto: ContextoDoDrive, raiz: ConferidorDaRaiz
 
 // ponytail: uma leitura do Drive por arquivo, todas ao mesmo tempo; processo com centenas de arquivos pede lotes.
 export async function conferir(contexto: ContextoDoDrive, entrada: EntradaConferir): Promise<Response> {
-  const [dasVersoes, dasAprovacoes] = await Promise.all([
+  const guardados = (await Promise.all([
     lerArquivosDoProcesso(contexto, entrada.processoId), lerPdfsDoProcesso(contexto, entrada.processoId),
-  ])
-  const guardados = [...dasVersoes, ...dasAprovacoes]
+    lerAnexosDoProcesso(contexto, entrada.processoId),
+  ])).flat()
   const raiz = conferidorDaRaiz(contexto)
   const situacoes = await Promise.all(guardados.map((arquivo) => situacaoNoDrive(contexto, raiz, arquivo)))
   return responderJson(200, { arquivos: Object.fromEntries(situacoes) })

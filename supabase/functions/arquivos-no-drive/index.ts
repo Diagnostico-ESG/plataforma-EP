@@ -1,18 +1,19 @@
 // Função arquivos-no-drive (documentos-versoes, tickets 01 a 07). Ordem fixa: configuração → quem chamou →
 // perfil e situação (decisao.ts) → entrada → Drive. Nenhuma ação toca o Drive antes de conferir quem chamou.
 import '@supabase/functions-js/edge-runtime.d.ts'
+import { validarEnvio } from '../_shared/anexo.ts'
 import {
   conferirChamador,
   lerAcao,
   recusar,
   validarBaixar,
-  validarIniciarEnvio,
   type Acao,
 } from '../_shared/decisao.ts'
 import { cabecalhosDeOrigem } from '../_shared/drive.ts'
 import { validarConferir } from '../_shared/conferencia.ts'
-import { validarRegistrar } from '../_shared/registro.ts'
+import { validarRegistro } from '../_shared/registroAnexo.ts'
 import { baixar, iniciarEnvio } from './acoes.ts'
+import { iniciarEnvioDoAnexo, registrarAnexo } from './anexos.ts'
 import { identificarChamador, type ContextoDoChamador } from './chamador.ts'
 import { conferir } from './conferir.ts'
 import { lerConfiguracao, type Configuracao } from './configuracao.ts'
@@ -37,17 +38,28 @@ async function executarConferir(corpo: unknown, chamador: ContextoDoChamador, co
   return await conferir({ cliente: chamador.cliente, token: await obterToken(config), config }, entrada.valor)
 }
 
+// O papel anexo tem entrada própria (sem número nem versão); o resto segue a regra de sempre.
+async function executarRegistrar(corpo: unknown, chamador: ContextoDoChamador, config: Configuracao): Promise<Response> {
+  const pedido = validarRegistro(corpo)
+  if (!pedido.ok) return responderRecusa(pedido.recusa)
+  const contexto = { cliente: chamador.cliente, token: await obterToken(config), config }
+  if (pedido.valor.tipo === 'anexo') return await registrarAnexo(contexto, pedido.valor.entrada)
+  return await registrar(contexto, pedido.valor.entrada)
+}
+
+async function executarIniciarEnvio(corpo: unknown, chamador: ContextoDoChamador, config: Configuracao, origem: string | null): Promise<Response> {
+  const pedido = validarEnvio(corpo)
+  if (!pedido.ok) return responderRecusa(pedido.recusa)
+  const contexto = { cliente: chamador.cliente, token: await obterToken(config), config }
+  if (pedido.valor.tipo === 'anexo') return await iniciarEnvioDoAnexo(contexto, pedido.valor.entrada, origem)
+  return await iniciarEnvio(contexto, pedido.valor.entrada, origem)
+}
+
 async function executar(acao: Acao, corpo: unknown, chamador: ContextoDoChamador, config: Configuracao, origem: string | null): Promise<Response> {
-  if (acao === 'registrar') {
-    const entrada = validarRegistrar(corpo)
-    if (!entrada.ok) return responderRecusa(entrada.recusa)
-    return await registrar({ cliente: chamador.cliente, token: await obterToken(config), config }, entrada.valor)
-  }
+  if (acao === 'registrar') return await executarRegistrar(corpo, chamador, config)
   if (acao === 'conferir') return await executarConferir(corpo, chamador, config)
   if (acao === 'baixar') return await executarBaixar(corpo, chamador, config)
-  const entrada = validarIniciarEnvio(corpo)
-  if (!entrada.ok) return responderRecusa(entrada.recusa)
-  return await iniciarEnvio({ cliente: chamador.cliente, token: await obterToken(config), config }, entrada.valor, origem)
+  return await executarIniciarEnvio(corpo, chamador, config, origem)
 }
 
 async function atender(req: Request, config: Configuracao): Promise<Response> {
