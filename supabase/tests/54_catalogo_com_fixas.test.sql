@@ -10,6 +10,23 @@ grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
 insert into _tap (linha) select plan(30);
 
+-- Trava de arquivos (ticket 11): este teste monta o cenário e não prova a trava (ela é do 59), então move sem ela. A
+-- função desliga, só durante o movimento e com o dono do banco, as etapas com trava que ficam antes do destino.
+create function pg_temp.mover_sem_trava(p_processo uuid, p_etapa uuid, p_data date default null, p_link text default null,
+  p_explicacao text default null) returns void
+language plpgsql security definer as $
+begin
+  set local session_replication_role = replica;
+  update public.etapas set ativa = false
+  where codigo in ('modelagem', 'relatorio_modelagem_tecnica') and ordem < (select ordem from public.etapas where id = p_etapa);
+  set local session_replication_role = origin;
+  perform public.mover_processo(p_processo, p_etapa, p_data, p_link, p_explicacao);
+  set local session_replication_role = replica;
+  update public.etapas set ativa = true where codigo in ('modelagem', 'relatorio_modelagem_tecnica');
+  set local session_replication_role = origin;
+end $;
+grant execute on function pg_temp.mover_sem_trava(uuid, uuid, date, text, text) to authenticated;
+
 -- Usuário inventado: a1 administrador.
 insert into public.autorizacoes (email, perfil) values ('admin.teste@ccivil.pr.gov.br', 'administrador');
 insert into auth.users (id, email, aud, role) values
@@ -89,12 +106,12 @@ insert into _tap (linha) select throws_ok($sql$select public.acrescentar_etapa('
   '23514', null, 'etapa de trabalho sem fase é recusada');
 
 -- ===== Etapa com processo dentro e etapa com passagem =====
-select public.mover_processo(pg_temp.dentro(), pg_temp.etapa('etapa_t54'));
+select pg_temp.mover_sem_trava(pg_temp.dentro(), pg_temp.etapa('etapa_t54'));
 insert into _tap (linha) select throws_ok($sql$update public.etapas set ativa = false where codigo = 'etapa_t54'$sql$,
   'P0001', 'etapa_com_processos:Etapa T54:1', 'desativar a etapa com um processo dentro é recusado, com a contagem');
 insert into _tap (linha) select throws_ok($sql$delete from public.etapas where codigo = 'etapa_t54'$sql$,
   'P0001', 'etapa_com_processos:Etapa T54:1', 'apagar a etapa com um processo dentro é recusado, com a contagem');
-select public.mover_processo(pg_temp.dentro(), pg_temp.etapa('modelagem'));
+select pg_temp.mover_sem_trava(pg_temp.dentro(), pg_temp.etapa('modelagem'));
 insert into _tap (linha) select throws_ok($sql$delete from public.etapas where codigo = 'etapa_t54'$sql$,
   'P0001', 'etapa_usada:Etapa T54', 'apagar a etapa por onde um processo passou é recusado');
 insert into _tap (linha) select lives_ok($sql$update public.etapas set ativa = false where codigo = 'etapa_t54'$sql$,

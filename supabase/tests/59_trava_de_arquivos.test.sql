@@ -57,18 +57,18 @@ language sql immutable as $$ select jsonb_build_array(pg_temp.arquivo('bpm', 'bp
 create function pg_temp.por_fora(nome_do_processo text, codigo_da_etapa text) returns void
 language plpgsql as $$
 begin
-  perform set_config('session_replication_role', 'replica', true);
+  set local session_replication_role = replica;
   update public.passagens set etapa_id = pg_temp.etapa(codigo_da_etapa)
   where processo_id = pg_temp.processo(nome_do_processo) and saiu_em is null;
-  perform set_config('session_replication_role', 'origin', true);
+  set local session_replication_role = origin;
 end $$;
 -- Liga ou desliga uma etapa do catálogo, sem passar pelas regras do catálogo (só o dono do banco, sem gatilhos).
 create function pg_temp.ativar(codigo_da_etapa text, ligada boolean) returns void
 language plpgsql as $$
 begin
-  perform set_config('session_replication_role', 'replica', true);
+  set local session_replication_role = replica;
   update public.etapas set ativa = ligada where codigo = codigo_da_etapa;
-  perform set_config('session_replication_role', 'origin', true);
+  set local session_replication_role = origin;
 end $$;
 grant execute on function pg_temp.processo(text), pg_temp.etapa(text), pg_temp.mover(text, text), pg_temp.passagens(text),
   pg_temp.arquivos_da_view(text), pg_temp.arquivo(text, text), pg_temp.so_bpm() to authenticated;

@@ -10,6 +10,23 @@ grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
 insert into _tap (linha) select plan(35);
 
+-- Trava de arquivos (ticket 11): este teste monta o cenário e não prova a trava (ela é do 59), então move sem ela. A
+-- função desliga, só durante o movimento e com o dono do banco, as etapas com trava que ficam antes do destino.
+create function pg_temp.mover_sem_trava(p_processo uuid, p_etapa uuid, p_data date default null, p_link text default null,
+  p_explicacao text default null) returns void
+language plpgsql security definer as $
+begin
+  set local session_replication_role = replica;
+  update public.etapas set ativa = false
+  where codigo in ('modelagem', 'relatorio_modelagem_tecnica') and ordem < (select ordem from public.etapas where id = p_etapa);
+  set local session_replication_role = origin;
+  perform public.mover_processo(p_processo, p_etapa, p_data, p_link, p_explicacao);
+  set local session_replication_role = replica;
+  update public.etapas set ativa = true where codigo in ('modelagem', 'relatorio_modelagem_tecnica');
+  set local session_replication_role = origin;
+end $;
+grant execute on function pg_temp.mover_sem_trava(uuid, uuid, date, text, text) to authenticated;
+
 -- Isola o teste dos dados que já existem no banco (a prova do Drive deixa versões, arquivos, eventos e pastas de teste
 -- no desenvolvimento): a limpeza vale só nesta transação, que é desfeita no fim. replica desliga os gatilhos que
 -- impedem apagar; a volta a origin liga todos de novo antes das preparações do teste.
@@ -68,7 +85,7 @@ grant execute on function pg_temp.arquivo(text, text, bigint), pg_temp.par(), pg
 -- Preparação, como integrante: o "Processo Concluido V" em Concluídos (Andamento livre: concluído é estar lá).
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 set local role authenticated;
-select public.mover_processo(pg_temp.processo('e4'), (select id from public.etapas where codigo = 'concluidos'),
+select pg_temp.mover_sem_trava(pg_temp.processo('e4'), (select id from public.etapas where codigo = 'concluidos'),
   null, null, 'Não será publicado');
 select public.suspender_processo(pg_temp.processo('e2'), 'Aguardando o setor');
 select public.cancelar_processo(pg_temp.processo('e3'), 'Não segue');
@@ -173,7 +190,7 @@ insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_hi
 reset role;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 set local role authenticated;
-select public.mover_processo(pg_temp.processo('e5'), (select id from public.etapas where codigo = 'modelagem'));
+select pg_temp.mover_sem_trava(pg_temp.processo('e5'), (select id from public.etapas where codigo = 'modelagem'));
 insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e5'), 3, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$,
   'P0001', 'historica_fora_de_nao_iniciados', 'histórica fora de Não iniciados é recusada');
 

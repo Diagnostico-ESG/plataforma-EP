@@ -8,6 +8,23 @@ grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
 insert into _tap (linha) select plan(31);
 
+-- Trava de arquivos (ticket 11): este teste monta o cenário e não prova a trava (ela é do 59), então move sem ela. A
+-- função desliga, só durante o movimento e com o dono do banco, as etapas com trava que ficam antes do destino.
+create function pg_temp.mover_sem_trava(p_processo uuid, p_etapa uuid, p_data date default null, p_link text default null,
+  p_explicacao text default null) returns void
+language plpgsql security definer as $
+begin
+  set local session_replication_role = replica;
+  update public.etapas set ativa = false
+  where codigo in ('modelagem', 'relatorio_modelagem_tecnica') and ordem < (select ordem from public.etapas where id = p_etapa);
+  set local session_replication_role = origin;
+  perform public.mover_processo(p_processo, p_etapa, p_data, p_link, p_explicacao);
+  set local session_replication_role = replica;
+  update public.etapas set ativa = true where codigo in ('modelagem', 'relatorio_modelagem_tecnica');
+  set local session_replication_role = origin;
+end $;
+grant execute on function pg_temp.mover_sem_trava(uuid, uuid, date, text, text) to authenticated;
+
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 insert into public.autorizacoes (email, perfil) values
   ('admin.teste@ccivil.pr.gov.br', 'administrador'),
@@ -35,7 +52,7 @@ grant execute on function pg_temp.processo(text) to authenticated;
 
 create function pg_temp.mover(nome_do_processo text, codigo_da_etapa text) returns void
 language sql as $$
-  select public.mover_processo(pg_temp.processo(nome_do_processo), (select id from public.etapas where codigo = codigo_da_etapa)) $$;
+  select pg_temp.mover_sem_trava(pg_temp.processo(nome_do_processo), (select id from public.etapas where codigo = codigo_da_etapa)) $$;
 grant execute on function pg_temp.mover(text, text) to authenticated;
 
 create function pg_temp.situacao(nome_do_processo text) returns text

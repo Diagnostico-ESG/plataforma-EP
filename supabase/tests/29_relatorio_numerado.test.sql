@@ -11,6 +11,23 @@ grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
 insert into _tap (linha) select plan(34);
 
+-- Trava de arquivos (ticket 11): este teste monta o cenário e não prova a trava (ela é do 59), então move sem ela. A
+-- função desliga, só durante o movimento e com o dono do banco, as etapas com trava que ficam antes do destino.
+create function pg_temp.mover_sem_trava(p_processo uuid, p_etapa uuid, p_data date default null, p_link text default null,
+  p_explicacao text default null) returns void
+language plpgsql security definer as $
+begin
+  set local session_replication_role = replica;
+  update public.etapas set ativa = false
+  where codigo in ('modelagem', 'relatorio_modelagem_tecnica') and ordem < (select ordem from public.etapas where id = p_etapa);
+  set local session_replication_role = origin;
+  perform public.mover_processo(p_processo, p_etapa, p_data, p_link, p_explicacao);
+  set local session_replication_role = replica;
+  update public.etapas set ativa = true where codigo in ('modelagem', 'relatorio_modelagem_tecnica');
+  set local session_replication_role = origin;
+end $;
+grant execute on function pg_temp.mover_sem_trava(uuid, uuid, date, text, text) to authenticated;
+
 -- Isola o teste dos dados que já existem no banco (a prova do Drive deixa versões, arquivos, eventos e pastas de teste
 -- no desenvolvimento): a limpeza vale só nesta transação, que é desfeita no fim. replica desliga os gatilhos que
 -- impedem apagar; a volta a origin liga todos de novo antes das preparações do teste.
@@ -102,13 +119,13 @@ insert into _tap (linha) select throws_ok(
   'P0001', 'relatorio_so_docx', 'o relatório novo só vale em .docx');
 
 -- Etapas: e4 vai à técnica, e3 à Publicação.
-select public.mover_processo(pg_temp.processo('e4'), pg_temp.etapa('relatorio_modelagem_tecnica'));
-select public.mover_processo(pg_temp.processo('e3'), pg_temp.etapa('publicacao'));
+select pg_temp.mover_sem_trava(pg_temp.processo('e4'), pg_temp.etapa('relatorio_modelagem_tecnica'));
+select pg_temp.mover_sem_trava(pg_temp.processo('e3'), pg_temp.etapa('publicacao'));
 -- e2, e6 e e8 mudam de situação (as versões foram criadas antes).
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 select public.suspender_processo(pg_temp.processo('e2'), 'Aguardando o setor');
 select public.cancelar_processo(pg_temp.processo('e6'), 'Não segue');
-select public.mover_processo(pg_temp.processo('e8'), pg_temp.etapa('concluidos'), null, null, 'Não será publicado');
+select pg_temp.mover_sem_trava(pg_temp.processo('e8'), pg_temp.etapa('concluidos'), null, null, 'Não será publicado');
 
 -- Outra chamada: as versões já existem há um dia.
 reset role;
@@ -175,7 +192,7 @@ insert into _tap (linha) select lives_ok(
   'o relatório sozinho vale na técnica');
 insert into _tap (linha) select is(pg_temp.numeros(pg_temp.processo('e4'), 1), array[1],
   'cada processo tem a sua numeração: o e4 começa no Relatório V1');
-select public.mover_processo(pg_temp.processo('e4'), pg_temp.etapa('revisao_interna'));
+select pg_temp.mover_sem_trava(pg_temp.processo('e4'), pg_temp.etapa('revisao_interna'));
 insert into _tap (linha) select lives_ok(
   $sql$select public.enviar_relatorio(pg_temp.processo('e4'), 1, 2, pg_temp.relatorio())$sql$,
   'o relatório sozinho vale na Revisão interna');

@@ -9,6 +9,23 @@ grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
 insert into _tap (linha) select plan(19);
 
+-- Trava de arquivos (ticket 11): este teste monta o cenário e não prova a trava (ela é do 59), então move sem ela. A
+-- função desliga, só durante o movimento e com o dono do banco, as etapas com trava que ficam antes do destino.
+create function pg_temp.mover_sem_trava(p_processo uuid, p_etapa uuid, p_data date default null, p_link text default null,
+  p_explicacao text default null) returns void
+language plpgsql security definer as $
+begin
+  set local session_replication_role = replica;
+  update public.etapas set ativa = false
+  where codigo in ('modelagem', 'relatorio_modelagem_tecnica') and ordem < (select ordem from public.etapas where id = p_etapa);
+  set local session_replication_role = origin;
+  perform public.mover_processo(p_processo, p_etapa, p_data, p_link, p_explicacao);
+  set local session_replication_role = replica;
+  update public.etapas set ativa = true where codigo in ('modelagem', 'relatorio_modelagem_tecnica');
+  set local session_replication_role = origin;
+end $;
+grant execute on function pg_temp.mover_sem_trava(uuid, uuid, date, text, text) to authenticated;
+
 -- Isola o teste dos dados que já existem no banco (a prova do Drive deixa versões, arquivos, eventos e pastas de teste
 -- no desenvolvimento): a limpeza vale só nesta transação, que é desfeita no fim.
 set local session_replication_role = replica;
@@ -65,10 +82,10 @@ select public.registrar_versao_historica(pg_temp.processo('e2'), 5, pg_temp.so_b
 select public.registrar_versao(pg_temp.processo('e3'), 1, pg_temp.so_bpm());
 select public.registrar_versao(pg_temp.processo('e4'), 1, pg_temp.so_bpm());
 select public.registrar_versao(pg_temp.processo('e5'), 1, pg_temp.so_bpm());
-select public.mover_processo(pg_temp.processo('e3'), pg_temp.etapa('aprovacao_setor'));
+select pg_temp.mover_sem_trava(pg_temp.processo('e3'), pg_temp.etapa('aprovacao_setor'));
 select public.registrar_aprovacao(pg_temp.processo('e3'), null, null, null);
 select public.suspender_processo(pg_temp.processo('e4'), 'Aguardando o setor');
-select public.mover_processo(pg_temp.processo('e5'), pg_temp.etapa('publicacao'));
+select pg_temp.mover_sem_trava(pg_temp.processo('e5'), pg_temp.etapa('publicacao'));
 
 -- Os arquivos entram numa chamada posterior à da versão (o banco reconhece "a mesma chamada" por enviada_em = now(), e o
 -- pgTAP roda tudo numa transação só): recua enviada_em como superusuário, como o 28 faz.

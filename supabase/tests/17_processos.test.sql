@@ -11,6 +11,23 @@ create temp table _alvo (id uuid);
 grant all on _alvo to authenticated;
 insert into _tap (linha) select plan(77);
 
+-- Trava de arquivos (ticket 11): este teste monta o cenário e não prova a trava (ela é do 59), então move sem ela. A
+-- função desliga, só durante o movimento e com o dono do banco, as etapas com trava que ficam antes do destino.
+create function pg_temp.mover_sem_trava(p_processo uuid, p_etapa uuid, p_data date default null, p_link text default null,
+  p_explicacao text default null) returns void
+language plpgsql security definer as $
+begin
+  set local session_replication_role = replica;
+  update public.etapas set ativa = false
+  where codigo in ('modelagem', 'relatorio_modelagem_tecnica') and ordem < (select ordem from public.etapas where id = p_etapa);
+  set local session_replication_role = origin;
+  perform public.mover_processo(p_processo, p_etapa, p_data, p_link, p_explicacao);
+  set local session_replication_role = replica;
+  update public.etapas set ativa = true where codigo in ('modelagem', 'relatorio_modelagem_tecnica');
+  set local session_replication_role = origin;
+end $;
+grant execute on function pg_temp.mover_sem_trava(uuid, uuid, date, text, text) to authenticated;
+
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 -- O inativo é administrador de propósito: a recusa dele só pode vir de estar inativo.
 insert into public.autorizacoes (email, perfil) values
@@ -248,7 +265,7 @@ insert into _tap (linha) select is(
   'em_andamento', 'fora de Concluídos o processo está em andamento');
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 set local role authenticated;
-select public.mover_processo((select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004'),
+select pg_temp.mover_sem_trava((select id from public.processos where setor_id = '5e000000-0000-0000-0000-000000000004'),
   (select id from public.etapas where codigo = 'concluidos'), null, null, 'Não será publicado');
 reset role;
 insert into _tap (linha) select is(

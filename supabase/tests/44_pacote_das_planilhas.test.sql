@@ -12,6 +12,23 @@ grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
 insert into _tap (linha) select plan(37);
 
+-- Trava de arquivos (ticket 11): este teste monta o cenário e não prova a trava (ela é do 59), então move sem ela. A
+-- função desliga, só durante o movimento e com o dono do banco, as etapas com trava que ficam antes do destino.
+create function pg_temp.mover_sem_trava(p_processo uuid, p_etapa uuid, p_data date default null, p_link text default null,
+  p_explicacao text default null) returns void
+language plpgsql security definer as $
+begin
+  set local session_replication_role = replica;
+  update public.etapas set ativa = false
+  where codigo in ('modelagem', 'relatorio_modelagem_tecnica') and ordem < (select ordem from public.etapas where id = p_etapa);
+  set local session_replication_role = origin;
+  perform public.mover_processo(p_processo, p_etapa, p_data, p_link, p_explicacao);
+  set local session_replication_role = replica;
+  update public.etapas set ativa = true where codigo in ('modelagem', 'relatorio_modelagem_tecnica');
+  set local session_replication_role = origin;
+end $;
+grant execute on function pg_temp.mover_sem_trava(uuid, uuid, date, text, text) to authenticated;
+
 -- Usuários inventados: a1 administrador, a2 integrante (será responsável de um processo, com nome conhecido).
 insert into public.autorizacoes (email, perfil) values
   ('admin.teste@ccivil.pr.gov.br', 'administrador'),
@@ -60,11 +77,11 @@ update public.processos set observacoes = 'Observacao inventada', data_da_modela
   where id = pg_temp.processo('T44 Normal');
 update public.processos set responsavel_id = '00000000-0000-0000-0000-0000000000a2' where id = pg_temp.processo('T44 Normal');
 -- Concluídos: com a data da publicação, sem ela (com a explicação) e o arquivado.
-select public.mover_processo(pg_temp.processo('T44 Concluido'), (select id from public.etapas where codigo = 'concluidos'),
+select pg_temp.mover_sem_trava(pg_temp.processo('T44 Concluido'), (select id from public.etapas where codigo = 'concluidos'),
   date '2026-04-02');
-select public.mover_processo(pg_temp.processo('T44 Nao Publicado'), (select id from public.etapas where codigo = 'concluidos'),
+select pg_temp.mover_sem_trava(pg_temp.processo('T44 Nao Publicado'), (select id from public.etapas where codigo = 'concluidos'),
   null, null, 'Explicacao inventada');
-select public.mover_processo(pg_temp.processo('T44 Arquivado'), (select id from public.etapas where codigo = 'concluidos'),
+select pg_temp.mover_sem_trava(pg_temp.processo('T44 Arquivado'), (select id from public.etapas where codigo = 'concluidos'),
   date '2026-04-02');
 select public.arquivar_processo(pg_temp.processo('T44 Arquivado'));
 select public.cancelar_processo(pg_temp.processo('T44 Cancelado'), 'Motivo inventado');

@@ -11,6 +11,23 @@ grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
 insert into _tap (linha) select plan(31);
 
+-- Trava de arquivos (ticket 11): este teste monta o cenário e não prova a trava (ela é do 59), então move sem ela. A
+-- função desliga, só durante o movimento e com o dono do banco, as etapas com trava que ficam antes do destino.
+create function pg_temp.mover_sem_trava(p_processo uuid, p_etapa uuid, p_data date default null, p_link text default null,
+  p_explicacao text default null) returns void
+language plpgsql security definer as $
+begin
+  set local session_replication_role = replica;
+  update public.etapas set ativa = false
+  where codigo in ('modelagem', 'relatorio_modelagem_tecnica') and ordem < (select ordem from public.etapas where id = p_etapa);
+  set local session_replication_role = origin;
+  perform public.mover_processo(p_processo, p_etapa, p_data, p_link, p_explicacao);
+  set local session_replication_role = replica;
+  update public.etapas set ativa = true where codigo in ('modelagem', 'relatorio_modelagem_tecnica');
+  set local session_replication_role = origin;
+end $;
+grant execute on function pg_temp.mover_sem_trava(uuid, uuid, date, text, text) to authenticated;
+
 -- Isola o teste dos dados que já existem no banco (a prova do Drive deixa versões, arquivos, eventos e pastas de teste
 -- no desenvolvimento): a limpeza vale só nesta transação, que é desfeita no fim.
 set local session_replication_role = replica;
@@ -75,11 +92,11 @@ reset role;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 set local role authenticated;
 select public.registrar_versao_historica(pg_temp.processo('e1'), 5, pg_temp.so_bpm());
-select public.mover_processo(pg_temp.processo('e1'), pg_temp.etapa('modelagem'));
-select public.mover_processo(pg_temp.processo('e5'), pg_temp.etapa('relatorio_modelagem_tecnica'));
-select public.mover_processo(pg_temp.processo('e6'), pg_temp.etapa('revisao_interna'));
-select public.mover_processo(pg_temp.processo('e7'), pg_temp.etapa('revisao_setor'));
-select public.mover_processo(pg_temp.processo('e8'), pg_temp.etapa('etapa_t56'));
+select pg_temp.mover_sem_trava(pg_temp.processo('e1'), pg_temp.etapa('modelagem'));
+select pg_temp.mover_sem_trava(pg_temp.processo('e5'), pg_temp.etapa('relatorio_modelagem_tecnica'));
+select pg_temp.mover_sem_trava(pg_temp.processo('e6'), pg_temp.etapa('revisao_interna'));
+select pg_temp.mover_sem_trava(pg_temp.processo('e7'), pg_temp.etapa('revisao_setor'));
+select pg_temp.mover_sem_trava(pg_temp.processo('e8'), pg_temp.etapa('etapa_t56'));
 
 -- Administrador: a numeração da piloto e da versão em sequência, no e1 (V5F → V6P → V7P → V8P → V9).
 reset role;
