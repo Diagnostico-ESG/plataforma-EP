@@ -113,7 +113,7 @@ A Consulta vê a seção e baixa, sem botões. Processo suspenso, cancelado, con
 | `anexos` alterar | não | não | não | não | não |
 | `anexos` apagar (retirar; processo em andamento, não arquivado) | sim | sim | não | não | não |
 
-**Dado pessoal:** o nome do arquivo e o conteúdo do .eml podem ter nome, e-mail e conversa de pessoas reais; todo perfil ativo vê e baixa (sabatina item 8; validação de LGPD pelo jurídico segue no backlog). O conteúdo fica só no Drive, nunca no banco.
+**Dado pessoal:** o nome do arquivo e o conteúdo do .eml podem ter nome, e-mail e conversa de pessoas reais; todo perfil ativo vê e baixa (sabatina item 8; validação de LGPD pelo jurídico segue no backlog). O conteúdo fica só no Drive, nunca no banco. O nome original pode trazer nome de pessoa e vai assim ao Drive e ao banco (a regra de guardar por identificador é a do Storage, que o projeto não usa; ADR 0008); por isso, os logs e as mensagens de erro da função nunca trazem o nome do anexo, só o identificador.
 
 **Arquivos (no Drive, sem Storage):** .pdf, .docx, .xlsx, .png, .jpg, .jpeg e .eml; até 20 MB; Administrador e Integrante enviam e retiram; todo perfil ativo vê e baixa; sem substituição; a retirada manda o arquivo à lixeira do Drive (apagado de vez em 30 dias, ADR 0027). Nenhum bucket.
 
