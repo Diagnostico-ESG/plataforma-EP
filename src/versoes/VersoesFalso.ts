@@ -2,6 +2,7 @@ import { extensaoDoNome } from '../../supabase/functions/_shared/decisao.ts'
 import { tipoMimeDaExtensao } from '../../supabase/functions/_shared/drive.ts'
 import { nomePadrao } from '../../supabase/functions/_shared/nomePadrao.ts'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
+import { AnexosFalso } from '../anexos/AnexosFalso'
 import type { EventoDoCadastro } from '../cadastros/tipos'
 import { type DonoDoPdf, eventoDoPdfDaAprovacao } from '../revisoes/eventosDaValidacaoEDoPdf'
 import { falhaDaFuncao } from './recusasDeVersoes'
@@ -57,6 +58,8 @@ export class VersoesFalso implements ModuloDeVersoes {
   envios: PedidoDeVersao[] = []
   /** Chamado com o evento de cada versão registrada (o histórico do processo fica no falso de processos). */
   aoRegistrar: ((processoId: string, evento: EventoDoCadastro) => void) | null = null
+  /** Os anexos (módulo próprio): dividem o mapa de processos e o histórico com as versões. */
+  anexos = new AnexosFalso(this.processos, (processoId, evento) => this.aoRegistrar?.(processoId, evento))
   private proximoId = 1
   /** Quantas vezes cada arquivo foi trocado: o hash (que o banco guarda) muda a cada troca. */
   private trocas: Record<string, number> = {}
@@ -198,7 +201,7 @@ export class VersoesFalso implements ModuloDeVersoes {
     if (this.falharConferencia) throw new Error('falha de conexão simulada')
     const pdfs = this.pdfsDaAprovacao[processoId]
     const doPdf = pdfs ? [...(pdfs.atual ? [pdfs.atual] : []), ...pdfs.guardados] : []
-    const arquivos = [...(this.versoes[processoId] ?? []).flatMap((versao) => versao.arquivos), ...doPdf]
+    const arquivos = [...(this.versoes[processoId] ?? []).flatMap((versao) => versao.arquivos), ...doPdf, ...(this.anexos.anexos[processoId] ?? [])]
     return Object.fromEntries(arquivos.map((arquivo) => [arquivo.id, this.conferencia[arquivo.id] ?? 'ok']))
   }
 

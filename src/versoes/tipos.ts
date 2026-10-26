@@ -1,5 +1,6 @@
 import type { SituacaoNoDrive } from '../../supabase/functions/_shared/conferencia.ts'
 import type { PapelDoArquivo } from '../../supabase/functions/_shared/nomePadrao.ts'
+import type { ModuloDeAnexos } from '../anexos/tipos'
 
 export type { PapelDoArquivo, SituacaoNoDrive }
 
@@ -133,4 +134,6 @@ export type ModuloDeVersoes = {
   conferirArquivos(processoId: string): Promise<ConferenciaDosArquivos>
   /** Os bytes do arquivo, com o tipo do formato (o navegador o mostra se souber). Qualquer perfil ativo pode. */
   baixarArquivo(arquivo: ArquivoDaVersao): Promise<Blob>
+  /** Os anexos do processo (documentos-versoes, ticket 12): módulo próprio, que chega à tela junto com o das versões. */
+  anexos: ModuloDeAnexos
 }

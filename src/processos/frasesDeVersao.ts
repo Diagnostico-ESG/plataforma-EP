@@ -4,6 +4,12 @@ export function fraseDoProcessoComVersoes(total: string | number): string {
   return `Não é possível excluir: processo tem ${versoes}. Cancele o processo em vez de excluí-lo.`
 }
 
+/** Processo com anexo não se exclui: o total vem do banco (migração anexos), e o caminho é cancelar o processo. */
+export function fraseDoProcessoComAnexos(total: string | number): string {
+  const anexos = Number(total) === 1 ? '1 anexo' : `${total} anexos`
+  return `Não é possível excluir: processo tem ${anexos}. Cancele o processo em vez de excluí-lo.`
+}
+
 /** Trava do autor (migração trava_do_autor_e_voltar_com_responsavel): o banco manda "numero:nome", o nome pode ter dois-pontos. */
 export function fraseDoAutorDaVersao(valor: string): string {
   const separador = valor.indexOf(':')

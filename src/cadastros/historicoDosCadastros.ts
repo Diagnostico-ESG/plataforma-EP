@@ -48,6 +48,8 @@ const TEXTO_DA_ACAO_DA_VERSAO: Record<string, string> = {
   substituir: 'Substituiu o arquivo da versão',
 }
 
+const TEXTO_DA_ACAO_DO_ANEXO: Record<string, string> = { enviar: 'Enviou o anexo' }
+
 const TEXTO_DA_ACAO_DA_REVISAO: Record<string, string> = { registrar: 'Registrou a revisão', editar: 'Editou a revisão' }
 
 const TEXTO_DA_ACAO_DA_APROVACAO: Record<string, string> = {
@@ -58,7 +60,7 @@ const TEXTO_DA_ACAO_DA_APROVACAO: Record<string, string> = {
 const TEXTOS_DA_ENTIDADE: Record<string, Record<string, string>> = {
   setor_envolvido: TEXTO_DA_ACAO_DO_VINCULO, passagem: TEXTO_DA_ACAO_DA_PASSAGEM, processo: TEXTO_DA_ACAO_DO_PROCESSO,
   etapa: TEXTO_DA_ACAO_DA_ETAPA, versao: TEXTO_DA_ACAO_DA_VERSAO, revisao_interna: TEXTO_DA_ACAO_DA_REVISAO,
-  aprovacao: TEXTO_DA_ACAO_DA_APROVACAO,
+  aprovacao: TEXTO_DA_ACAO_DA_APROVACAO, anexo: TEXTO_DA_ACAO_DO_ANEXO,
 }
 
 // Macroprocesso e etapa do catálogo aparecem como "código — nome".
@@ -77,7 +79,7 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   data_da_modelagem_piloto: 'Data da modelagem piloto', data_da_reuniao: 'Data da modelagem piloto',
   data_da_validacao: 'Data da validação', pdf_nome: '.pdf da aprovação',
   rotulo: 'Versão', etapa: 'Etapa', arquivos: 'Arquivos', relatorio_de: 'Relatório copiado da versão', papel: 'Arquivo acrescentado', numero_do_relatorio: 'Número do relatório',
-  hash_md5: 'Impressão digital (MD5)',
+  hash_md5: 'Impressão digital (MD5)', formato: 'Formato',
   versao_revisada: 'Versão revisada', versao_corrigida: 'Versão corrigida', resultado: 'Resultado', escopo: 'Escopo',
   comentario: 'Comentário', revisor_nome: 'Revisor', revisada_em: 'Data da revisão',
   versao: 'Versão aprovada', numero_eprotocolo: 'Número do E-protocolo', link: 'Link', aprovada_em: 'Data da aprovação',
@@ -90,15 +92,29 @@ const CAMPOS_ESCONDIDOS = new Set(['setor_id', 'processo_id', 'macroprocesso_id'
 
 /** O texto do evento no histórico: o da ação e, no arquivo acrescentado à versão, qual arquivo foi ("Acrescentou o .png à versão"). */
 export function textoDoEvento(evento: EventoDoCadastro): string {
-  if (evento.entidade === 'versao' && evento.acao === 'acrescentar_arquivo') {
+  const proprio = evento.entidade === 'anexo' ? textoDoAnexo(evento) : textoDaVersao(evento)
+  return proprio ?? textoDaAcaoDoCadastro(evento.acao, evento.entidade)
+}
+
+// "Enviou o anexo 'resposta.eml' (Modelagem piloto)": o nome e a etapa do envio, guardados no evento.
+function textoDoAnexo(evento: EventoDoCadastro): string | null {
+  if (evento.acao !== 'enviar') return null
+  const { nome, etapa } = registro(evento.depois)
+  if (typeof nome !== 'string') return null
+  return `Enviou o anexo '${nome}'${typeof etapa === 'string' && etapa !== '' ? ` (${etapa})` : ''}`
+}
+
+function textoDaVersao(evento: EventoDoCadastro): string | null {
+  if (evento.entidade !== 'versao') return null
+  if (evento.acao === 'acrescentar_arquivo') {
     const papel = registro(evento.depois).papel
     if (typeof papel === 'string' && papel !== '') return `Acrescentou o .${papel} à versão`
   }
-  if (evento.entidade === 'versao' && evento.acao === 'enviar_relatorio') {
+  if (evento.acao === 'enviar_relatorio') {
     const { numero_do_relatorio: numero, rotulo } = registro(evento.depois)
     if (typeof numero === 'number' && typeof rotulo === 'string') return `Enviou o Relatório V${numero} (acompanha a ${rotulo})`
   }
-  return textoDaAcaoDoCadastro(evento.acao, evento.entidade)
+  return null
 }
 
 // Ação desconhecida (de uma funcionalidade futura) aparece pelo código: sumir do histórico é pior que texto cru.
@@ -154,6 +170,7 @@ function nomeDoItemComDono(evento: EventoDoCadastro, estado: Record<string, unkn
   if (evento.entidade === 'versao') return `${texto(estado.rotulo)} — ${texto(estado.processo_nome)}`
   if (evento.entidade === 'revisao_interna') return `${texto(estado.versao_revisada)} — ${texto(estado.processo_nome)}`
   if (evento.entidade === 'aprovacao') return `${texto(estado.versao)} — ${texto(estado.processo_nome)}`
+  if (evento.entidade === 'anexo') return `Anexos — ${texto(estado.processo_nome)}`
   return null
 }
 

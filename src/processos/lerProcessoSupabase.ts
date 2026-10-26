@@ -119,7 +119,7 @@ async function lerHistoricoDoProcesso(cliente: ClienteSupabase, id: string) {
   const { data, error } = await cliente.from('eventos')
     .select('id, ocorrido_em, acao, entidade, entidade_ref, detalhes, autor:usuarios(nome)')
     // A referência do processo é o id (também a das passagens, das versões e das revisões dele).
-    .in('entidade', ['processo', 'passagem', 'versao', 'revisao_interna', 'aprovacao']).like('entidade_ref', `${id}%`)
+    .in('entidade', ['processo', 'passagem', 'versao', 'revisao_interna', 'aprovacao', 'anexo']).like('entidade_ref', `${id}%`)
     .order('ocorrido_em', { ascending: false }).order('id', { ascending: false })
   if (error) throw new Error(`Falha ao ler o histórico do processo: ${error.message}`)
   return (data as unknown as EventoDoBanco[]).map(eventoDoCadastro)
