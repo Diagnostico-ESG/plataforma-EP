@@ -1,4 +1,4 @@
-// A resposta da função a uma gravação no banco (registrar, relatório depois e sem alteração): o resultado da gravação,
+// A resposta da função a uma gravação no banco (registrar, relatório sozinho, arquivo depois e troca): o resultado da gravação,
 // a recusa de uma regra do banco (P0001 "motivo:valor", 409; 42501, 403) ou, se o erro não for recusa, erro interno.
 import { recusaDoBanco, statusDaRecusaDoBanco } from '../_shared/registro.ts'
 import { responderJson } from './respostas.ts'

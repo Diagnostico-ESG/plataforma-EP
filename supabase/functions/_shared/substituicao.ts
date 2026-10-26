@@ -37,7 +37,7 @@ function conferirAlvo(alvo: AlvoDaSubstituicao | null, processoId: string): Vali
   return { ok: true, valor: alvo }
 }
 
-/** Relatório depois: a versão do pedido precisa ser do processo do pedido (a pasta e a situação conferidas são as dele). */
+/** Arquivo depois (.png ou .bpmn): a versão do pedido precisa ser do processo do pedido (a pasta e a situação conferidas são as dele). */
 export function conferirVersaoDoProcesso(processoDaVersao: string | null, processoId: string): Validacao<string> {
   if (processoDaVersao !== processoId) return falhar('entrada_invalida', 'versão não encontrada neste processo')
   return { ok: true, valor: processoId }

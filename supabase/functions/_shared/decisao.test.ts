@@ -55,11 +55,11 @@ describe('conferirChamador', () => {
     ['consulta não registra', consulta, 'registrar', 'sem_permissao'],
     ['inativo não registra', inativo, 'registrar', 'usuario_inativo'],
     ['sem login não registra', null, 'registrar', 'sem_login'],
-    ['administrador marca sem alteração', administrador, 'sem_alteracao', null],
-    ['integrante marca sem alteração', integrante, 'sem_alteracao', null],
-    ['consulta não marca sem alteração', consulta, 'sem_alteracao', 'sem_permissao'],
-    ['inativo não marca sem alteração', inativo, 'sem_alteracao', 'usuario_inativo'],
-    ['sem login não marca sem alteração', null, 'sem_alteracao', 'sem_login'],
+    ['administrador confere', administrador, 'conferir', null],
+    ['integrante confere', integrante, 'conferir', null],
+    ['consulta confere', consulta, 'conferir', null],
+    ['inativo não confere', inativo, 'conferir', 'usuario_inativo'],
+    ['sem login não confere', null, 'conferir', 'sem_login'],
   ]
 
   it.each(casos)('%s', (_nome, chamador, acao, esperado) => {
@@ -94,6 +94,7 @@ describe('validarIniciarEnvio', () => {
         historica: false,
         piloto: false,
         arquivoId: null,
+        numeroDoRelatorio: null,
       },
     })
   })
@@ -125,11 +126,36 @@ describe('validarIniciarEnvio', () => {
     expect(lido({ arquivo_id: 7 })).toBe('recusada')
   })
 
+  it('o relatório de versão que não é histórica exige o número do relatório e só aceita .docx', () => {
+    const relatorio = { papel: 'relatorio', nome_original: 'relatorio.docx', numero_do_relatorio: 3 }
+    const lido = (mudancas: Record<string, unknown>) => {
+      const resultado = validarIniciarEnvio(entradaDeEnvio({ ...relatorio, ...mudancas }))
+      return resultado.ok ? resultado.valor.numeroDoRelatorio : resultado.recusa.codigo
+    }
+    expect(lido({})).toBe(3)
+    expect(lido({ numero_do_relatorio: undefined })).toBe('entrada_invalida')
+    expect(lido({ numero_do_relatorio: 0 })).toBe('entrada_invalida')
+    expect(lido({ numero_do_relatorio: '3' })).toBe('entrada_invalida')
+    expect(lido({ nome_original: 'relatorio.pdf' })).toBe('extensao_nao_aceita')
+  })
+
+  it('o relatório da histórica e a troca do arquivo não têm número e aceitam .docx e .pdf', () => {
+    const ARQUIVO = '8f000000-0000-0000-0000-0000000000d1'
+    for (const nome of ['relatorio.docx', 'relatorio.pdf']) {
+      expect(codigoDaRecusa(entradaDeEnvio({ papel: 'relatorio', nome_original: nome, historica: true }))).toBeNull()
+      expect(codigoDaRecusa(entradaDeEnvio({ papel: 'relatorio', nome_original: nome, arquivo_id: ARQUIVO }))).toBeNull()
+    }
+    expect(codigoDaRecusa(entradaDeEnvio({ papel: 'relatorio', nome_original: 'r.docx', historica: true, numero_do_relatorio: 1 })))
+      .toBe('entrada_invalida')
+  })
+
+  it('o número do relatório só vale no relatório', () => {
+    expect(codigoDaRecusa(entradaDeEnvio({ numero_do_relatorio: 2 }))).toBe('entrada_invalida')
+  })
+
   it.each([
     ['png', 'imagem.png'],
     ['bpm', 'fonte.bpm'],
-    ['relatorio', 'relatorio.docx'],
-    ['relatorio', 'relatorio.pdf'],
     ['bpmn', 'FLUXO.BPMN'],
   ])('aceita o papel %s com %s', (papel, nome) => {
     expect(codigoDaRecusa(entradaDeEnvio({ papel, nome_original: nome }))).toBeNull()
@@ -137,6 +163,7 @@ describe('validarIniciarEnvio', () => {
 
   it.each([
     ['relatorio', 'relatorio.png'],
+    ['relatorio', 'relatorio.pdf'],
     ['bpmn', 'fluxo.xml'],
     ['png', 'imagem'],
   ])('recusa o papel %s com %s', (papel, nome) => {
@@ -217,8 +244,12 @@ describe('extensaoDoNome', () => {
 })
 
 describe('lerAcao', () => {
-  it.each(['iniciar_envio', 'baixar', 'registrar', 'sem_alteracao'])('lê a ação %s', (acao) => {
+  it.each(['iniciar_envio', 'baixar', 'registrar', 'conferir'])('lê a ação %s', (acao) => {
     expect(lerAcao({ acao })).toBe(acao)
+  })
+
+  it('a ação sem_alteracao saiu (ADR 0026)', () => {
+    expect(lerAcao({ acao: 'sem_alteracao' })).toBeNull()
   })
 
   it.each([null, 'baixar', {}, { acao: 'apagar' }, { acao: 3 }, { acao: 'constructor' }])('devolve null para %j', (corpo) => {

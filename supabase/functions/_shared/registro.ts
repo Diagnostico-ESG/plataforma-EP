@@ -12,6 +12,7 @@ import {
   falhar,
   lerBooleano,
   lerInteiroPositivo,
+  lerNumeroDoRelatorio,
   lerPilotoDaVersao,
   lerPapel,
   lerTexto,
@@ -39,6 +40,11 @@ export interface EntradaRegistrar {
   versaoId: string | null
   /** Com o arquivo: troca o conteúdo dele (o `arquivos` é só o arquivo novo, de qualquer papel); sem: registra. */
   arquivoId: string | null
+  /**
+   * O número do relatório novo de versão que não é histórica (Relatório V3), com que o arquivo foi nomeado: o relatório
+   * sozinho (`numero` é então o da versão que ele acompanha) ou junto com a versão. Nulo nos outros pedidos.
+   */
+  numeroDoRelatorio: number | null
   arquivos: ArquivoPedido[]
 }
 /** O que o Drive devolve de um arquivo (`fields=id,name,size,md5Checksum,parents`). */
@@ -65,18 +71,19 @@ export interface RecusaDoBanco {
 }
 
 const MAXIMO_DE_ARQUIVOS = 4
-const PAPEIS_ACRESCENTADOS_DEPOIS: readonly PapelDoArquivo[] = ['relatorio', 'png', 'bpmn']
+const PAPEIS_ACRESCENTADOS_DEPOIS: readonly PapelDoArquivo[] = ['png', 'bpmn']
 
 // Quem não manda `historica` registra uma versão nova (o pedido do ticket 02).
 function lerHistorica(corpo: Corpo): Validacao<boolean> {
   return corpo.historica === undefined ? { ok: true, valor: false } : lerBooleano(corpo, 'historica')
 }
 
-// O arquivo depois entra numa versão que já existe: um arquivo só, o relatório, o .png ou o .bpmn (o banco confere o resto).
+// O arquivo depois entra numa versão que já existe: um arquivo só, o .png ou o .bpmn (o banco confere o resto). O relatório
+// tem o seu caminho (enviar_relatorio, ADR 0026).
 function conferirArquivoDepois(versaoId: string | null, historica: boolean, arquivos: ArquivoPedido[]): Falha | null {
   if (versaoId === null) return null
   if (historica || arquivos.length !== 1 || !PAPEIS_ACRESCENTADOS_DEPOIS.includes(arquivos[0].papel)) {
-    return falhar('entrada_invalida', 'campo versao_id: esperado um único arquivo, o relatorio, o png ou o bpmn, sem historica')
+    return falhar('entrada_invalida', 'campo versao_id: esperado um único arquivo, o png ou o bpmn, sem historica')
   }
   return null
 }
@@ -115,7 +122,30 @@ function lerArquivosPedidos(corpo: Corpo): Validacao<ArquivoPedido[]> {
   return { ok: true, valor: arquivos }
 }
 
-type ModoDoRegistro = Pick<EntradaRegistrar, 'historica' | 'piloto' | 'versaoId' | 'arquivoId' | 'arquivos'>
+type ModoDoRegistro = Pick<EntradaRegistrar, 'historica' | 'piloto' | 'versaoId' | 'arquivoId' | 'numeroDoRelatorio' | 'arquivos'>
+
+// O número do relatório vai com o relatório novo de versão que não é histórica (sozinho ou junto) e só com ele.
+function conferirNumeroDoRelatorio(modo: ModoDoRegistro): Falha | null {
+  const temRelatorio = modo.arquivos.some((arquivo) => arquivo.papel === 'relatorio')
+  const esperado = temRelatorio && !modo.historica && modo.arquivoId === null
+  if (esperado === (modo.numeroDoRelatorio !== null)) return null
+  return falhar('entrada_invalida', esperado
+    ? 'campo numero_do_relatorio: esperado número inteiro maior que zero no relatório novo, recebido ausente'
+    : 'campo numero_do_relatorio: esperado ausente fora do relatório de versão que não é histórica')
+}
+
+type AlvoDoRegistro = Pick<EntradaRegistrar, 'versaoId' | 'arquivoId' | 'numeroDoRelatorio'>
+
+// O que o pedido aponta: a versão que recebe o arquivo, o arquivo a trocar e o número do relatório novo (todos opcionais).
+function lerAlvoDoRegistro(corpo: Corpo): Validacao<AlvoDoRegistro> {
+  const versaoId = lerUuidOpcional(corpo, 'versao_id')
+  if (!versaoId.ok) return versaoId
+  const arquivoId = lerUuidOpcional(corpo, 'arquivo_id')
+  if (!arquivoId.ok) return arquivoId
+  const numeroDoRelatorio = lerNumeroDoRelatorio(corpo)
+  if (!numeroDoRelatorio.ok) return numeroDoRelatorio
+  return { ok: true, valor: { versaoId: versaoId.valor, arquivoId: arquivoId.valor, numeroDoRelatorio: numeroDoRelatorio.valor } }
+}
 
 // O que o registro faz: versão nova, piloto ou histórica (sem alvo), arquivo depois (versao_id) ou troca de arquivo (arquivo_id).
 function lerModoDoRegistro(corpo: Corpo): Validacao<ModoDoRegistro> {
@@ -123,16 +153,13 @@ function lerModoDoRegistro(corpo: Corpo): Validacao<ModoDoRegistro> {
   if (!historica.ok) return historica
   const piloto = lerPilotoDaVersao(corpo, historica.valor)
   if (!piloto.ok) return piloto
-  const versaoId = lerUuidOpcional(corpo, 'versao_id')
-  if (!versaoId.ok) return versaoId
-  const arquivoId = lerUuidOpcional(corpo, 'arquivo_id')
-  if (!arquivoId.ok) return arquivoId
+  const alvo = lerAlvoDoRegistro(corpo)
+  if (!alvo.ok) return alvo
   const arquivos = lerArquivosPedidos(corpo)
   if (!arquivos.ok) return arquivos
-  const modo = {
-    historica: historica.valor, piloto: piloto.valor, versaoId: versaoId.valor, arquivoId: arquivoId.valor, arquivos: arquivos.valor,
-  }
+  const modo = { historica: historica.valor, piloto: piloto.valor, ...alvo.valor, arquivos: arquivos.valor }
   const recusa = conferirArquivoDepois(modo.versaoId, modo.historica, modo.arquivos) ?? conferirSubstituicao(modo)
+    ?? conferirNumeroDoRelatorio(modo)
   return recusa ?? { ok: true, valor: modo }
 }
 
@@ -149,26 +176,37 @@ export function validarRegistrar(corpo: unknown): Validacao<EntradaRegistrar> {
 }
 
 export type FuncaoDeRegistro =
-  | 'registrar_versao' | 'registrar_versao_historica' | 'acrescentar_relatorio' | 'acrescentar_arquivo' | 'substituir_arquivo'
+  | 'registrar_versao' | 'registrar_versao_historica' | 'enviar_relatorio' | 'acrescentar_arquivo' | 'substituir_arquivo'
 
-/** A função do banco que grava: a troca do arquivo, o arquivo depois (relatório, ou .png e .bpmn), a histórica ou a versão nova (e a piloto). */
+/** Só o relatório, sem versão que o acompanhe no pedido: o banco o liga à versão mais recente que não é histórica. */
+function ehRelatorioSozinho({ historica, arquivos }: Pick<EntradaRegistrar, 'historica' | 'arquivos'>): boolean {
+  return !historica && arquivos.length === 1 && arquivos[0].papel === 'relatorio'
+}
+
+/** A função do banco que grava: a troca do arquivo, o .png ou .bpmn depois, a histórica, o relatório sozinho ou a versão nova (e a piloto). */
 export function funcaoDoBancoPara(
-  { historica, versaoId, arquivoId, arquivos }: Pick<EntradaRegistrar, 'historica' | 'versaoId' | 'arquivoId' | 'arquivos'>,
+  entrada: Pick<EntradaRegistrar, 'historica' | 'versaoId' | 'arquivoId' | 'arquivos'>,
 ): FuncaoDeRegistro {
-  if (arquivoId !== null) return 'substituir_arquivo'
-  if (versaoId !== null) return arquivos[0]?.papel === 'relatorio' ? 'acrescentar_relatorio' : 'acrescentar_arquivo'
-  return historica ? 'registrar_versao_historica' : 'registrar_versao'
+  if (entrada.arquivoId !== null) return 'substituir_arquivo'
+  if (entrada.versaoId !== null) return 'acrescentar_arquivo'
+  if (entrada.historica) return 'registrar_versao_historica'
+  return ehRelatorioSozinho(entrada) ? 'enviar_relatorio' : 'registrar_versao'
 }
 
 /** Os parâmetros da função do banco escolhida (o arquivo depois e a troca levam o alvo e o único arquivo). */
 export function parametrosDoBanco(entrada: EntradaRegistrar, arquivos: ArquivoParaGravar[]): Record<string, unknown> {
   if (entrada.arquivoId !== null) return { p_arquivo: entrada.arquivoId, p_novo: arquivos[0] }
-  if (entrada.versaoId !== null) {
-    const alvo = { p_versao: entrada.versaoId, p_arquivo: arquivos[0] }
-    return funcaoDoBancoPara(entrada) === 'acrescentar_relatorio' ? { ...alvo, p_numero: entrada.numero } : alvo
+  if (entrada.versaoId !== null) return { p_versao: entrada.versaoId, p_arquivo: arquivos[0] }
+  if (funcaoDoBancoPara(entrada) === 'enviar_relatorio') {
+    return {
+      p_processo: entrada.processoId, p_numero_da_versao: entrada.numero, p_numero_do_relatorio: entrada.numeroDoRelatorio,
+      p_arquivo: arquivos[0],
+    }
   }
   const versao = { p_processo: entrada.processoId, p_numero: entrada.numero, p_arquivos: arquivos }
-  return entrada.historica ? versao : { ...versao, p_piloto: entrada.piloto }
+  if (entrada.historica) return versao
+  const nova = { ...versao, p_piloto: entrada.piloto }
+  return entrada.numeroDoRelatorio === null ? nova : { ...nova, p_numero_do_relatorio: entrada.numeroDoRelatorio }
 }
 
 // O nome foi dado por iniciar_envio com o número e o F da tela: um pedido montado fora dela não grava um nome que mente.
@@ -177,16 +215,37 @@ function conferirRotuloNoNome(nome: string, rotulo: string | null): Validacao<nu
   return falhar('arquivo_nao_chegou', `nome ${nome}; esperado o rótulo ${rotulo}`)
 }
 
+// O relatório numerado traz o seu número no nome (_Relatório V3) e só vale em .docx.
+function conferirNumeroNoNome(nome: string, numeroDoRelatorio: number): Validacao<null> {
+  if (nome.includes(`_Relatório V${numeroDoRelatorio}.`)) return { ok: true, valor: null }
+  return falhar('arquivo_nao_chegou', `nome ${nome}; esperado o relatório V${numeroDoRelatorio}`)
+}
+
+// O nome que a função deu ao arquivo no Drive: o rótulo da versão, o número do relatório novo (que só vale em .docx) e a
+// extensão do papel; devolve o formato.
+function conferirNomeDoArquivo(
+  papel: PapelDoArquivo, nome: string, rotulo: string | null, numeroDoRelatorio: number | null,
+): Validacao<string> {
+  const rotuloConferido = conferirRotuloNoNome(nome, rotulo)
+  if (!rotuloConferido.ok) return rotuloConferido
+  const numerado = papel === 'relatorio' && numeroDoRelatorio !== null
+  const numeroConferido = numerado ? conferirNumeroNoNome(nome, numeroDoRelatorio) : rotuloConferido
+  if (!numeroConferido.ok) return numeroConferido
+  const formato = extensaoDoNome(nome)
+  const aceitas = numerado ? ['docx'] : EXTENSOES_POR_PAPEL[papel]
+  if (!aceitas.includes(formato)) return falhar('extensao_nao_aceita', `recebido .${formato}; esperado .${aceitas.join(' ou .')}`)
+  return { ok: true, valor: formato }
+}
+
 // O formato vem do nome que a função deu ao arquivo no Drive; o tamanho e o MD5, do próprio Drive.
 function conferirUmArquivo(
-  pedido: ArquivoPedido, lido: ArquivoNoDrive | null, pastaId: string, rotulo: string | null,
+  pedido: ArquivoPedido, lido: ArquivoNoDrive | null, pastaId: string, rotulo: string | null, numeroDoRelatorio: number | null,
 ): Validacao<ArquivoParaGravar> {
   if (!lido || lido.id !== pedido.driveId || !lido.md5Checksum) return falhar('arquivo_nao_chegou')
   if (!(lido.parents ?? []).includes(pastaId)) return falhar('arquivo_fora_da_pasta')
-  const rotuloConferido = conferirRotuloNoNome(lido.name, rotulo)
-  if (!rotuloConferido.ok) return rotuloConferido
-  const formato = extensaoDoNome(lido.name)
-  if (!EXTENSOES_POR_PAPEL[pedido.papel].includes(formato)) return falhar('extensao_nao_aceita', `recebido .${formato}`)
+  const nomeConferido = conferirNomeDoArquivo(pedido.papel, lido.name, rotulo, numeroDoRelatorio)
+  if (!nomeConferido.ok) return nomeConferido
+  const formato = nomeConferido.valor
   const tamanho = Number(lido.size)
   if (tamanho < 1) return falhar('arquivo_nao_chegou', `recebido ${lido.size} bytes; esperado ao menos 1`)
   if (!(tamanho <= LIMITE_DE_TAMANHO)) return falhar('arquivo_grande', `recebido ${lido.size} bytes; esperado até ${LIMITE_DE_TAMANHO}`)
@@ -194,16 +253,20 @@ function conferirUmArquivo(
   return { ok: true, valor: { ...valor, hash_md5: lido.md5Checksum, drive_id: lido.id } }
 }
 
-/** `lidos[i]` é o que o Drive informou de `pedidos[i]` (null: o Drive não achou o arquivo). `rotulo` (V5, V5F): o que o nome precisa ter; null na substituição, em que o nome fica. */
+/**
+ * `lidos[i]` é o que o Drive informou de `pedidos[i]` (null: o Drive não achou o arquivo). `rotulo` (V5, V5F): o que o nome
+ * precisa ter; null na substituição, em que o nome fica. `numeroDoRelatorio`: o do relatório novo, que o nome também traz.
+ */
 export function conferirArquivosNoDrive(
   pedidos: ArquivoPedido[],
   lidos: (ArquivoNoDrive | null)[],
   pastaId: string,
   rotulo: string | null = null,
+  numeroDoRelatorio: number | null = null,
 ): Validacao<ArquivoParaGravar[]> {
   const arquivos: ArquivoParaGravar[] = []
   for (const [indice, pedido] of pedidos.entries()) {
-    const arquivo = conferirUmArquivo(pedido, lidos[indice] ?? null, pastaId, rotulo)
+    const arquivo = conferirUmArquivo(pedido, lidos[indice] ?? null, pastaId, rotulo, numeroDoRelatorio)
     if (!arquivo.ok) return arquivo
     arquivos.push(arquivo.valor)
   }

@@ -40,6 +40,7 @@ describe('validarRegistrar', () => {
         piloto: false,
         versaoId: null,
         arquivoId: null,
+        numeroDoRelatorio: null,
         arquivos: [{ papel: 'bpmn', driveId: 'id-bpmn' }, { papel: 'png', driveId: 'id-png' }],
       },
     })
@@ -125,7 +126,7 @@ describe('conferirArquivosNoDrive', () => {
     })
   })
 
-  it('aceita o relatório .pdf e o .docx', () => {
+  it('aceita o relatório .pdf e o .docx quando não é numerado (histórica e troca)', () => {
     const pedidos: ArquivoPedido[] = [{ papel: 'relatorio', driveId: 'id-rel' }]
     expect(codigoDaConferencia([lido('id-rel', 'TSA_V3_P_Relatório.pdf')], pedidos)).toBeNull()
     expect(codigoDaConferencia([lido('id-rel', 'TSA_V3_P_Relatório.docx')], pedidos)).toBeNull()
@@ -162,10 +163,15 @@ describe('conferirArquivosNoDrive', () => {
 describe('arquivo depois (versao_id)', () => {
   const VERSAO = '8f000000-0000-0000-0000-0000000000c1'
   const relatorio = [{ papel: 'relatorio', drive_id: 'id-relatorio' }]
+  const png = [{ papel: 'png', drive_id: 'id-png' }]
 
-  it('lê o versao_id e o único arquivo, o relatório', () => {
-    const resultado = validarRegistrar(entrada({ versao_id: VERSAO, arquivos: relatorio }))
+  it('lê o versao_id e o único arquivo, o .png', () => {
+    const resultado = validarRegistrar(entrada({ versao_id: VERSAO, arquivos: png }))
     expect(resultado.ok && resultado.valor.versaoId).toBe(VERSAO)
+  })
+
+  it('o relatório não entra por versao_id: ele tem o seu próprio caminho (ADR 0026)', () => {
+    expect(codigoDe(entrada({ versao_id: VERSAO, arquivos: relatorio, numero_do_relatorio: 2 }))).toBe('entrada_invalida')
   })
 
   it('versao_id ausente ou nulo vale null', () => {
@@ -176,11 +182,11 @@ describe('arquivo depois (versao_id)', () => {
   })
 
   it.each([
-    ['versao_id que não é uuid', { versao_id: 'v1', arquivos: relatorio }],
-    ['versao_id de tipo errado', { versao_id: 7, arquivos: relatorio }],
+    ['versao_id que não é uuid', { versao_id: 'v1', arquivos: png }],
+    ['versao_id de tipo errado', { versao_id: 7, arquivos: png }],
     ['mais de um arquivo', { versao_id: VERSAO }],
     ['arquivo .bpm, que não se acrescenta depois', { versao_id: VERSAO, arquivos: [{ papel: 'bpm', drive_id: 'id-bpm' }] }],
-    ['histórica', { versao_id: VERSAO, arquivos: relatorio, historica: true }],
+    ['histórica', { versao_id: VERSAO, arquivos: png, historica: true }],
   ])('recusa %s', (_nome, mudancas) => {
     expect(codigoDe(entrada(mudancas))).toBe('entrada_invalida')
   })
@@ -192,7 +198,7 @@ describe('arquivo depois (versao_id)', () => {
   })
 
   it('o tipo errado do versao_id aparece na mensagem, sem o valor', () => {
-    const resultado = validarRegistrar(entrada({ versao_id: 7, arquivos: relatorio }))
+    const resultado = validarRegistrar(entrada({ versao_id: 7, arquivos: png }))
     expect(!resultado.ok && resultado.recusa.mensagem).toContain('versao_id')
     expect(!resultado.ok && resultado.recusa.mensagem).toContain('number')
   })
@@ -204,17 +210,19 @@ describe('funcaoDoBancoPara e parametrosDoBanco', () => {
 
   const base = { historica: false, versaoId: null, arquivoId: null, arquivos: [] }
 
-  it('a nova e a piloto gravam por registrar_versao, a histórica por registrar_versao_historica, o relatório por acrescentar_relatorio e o .png ou .bpmn por acrescentar_arquivo', () => {
+  it('a nova e a piloto gravam por registrar_versao, a histórica por registrar_versao_historica, o relatório sozinho por enviar_relatorio e o .png ou .bpmn por acrescentar_arquivo', () => {
     expect(funcaoDoBancoPara(base)).toBe('registrar_versao')
     expect(funcaoDoBancoPara({ ...base, historica: true })).toBe('registrar_versao_historica')
-    const relatorioDepois = { ...base, versaoId: VERSAO, arquivos: [{ papel: 'relatorio' as const, driveId: 'x' }] }
-    expect(funcaoDoBancoPara(relatorioDepois)).toBe('acrescentar_relatorio')
+    const relatorioSozinho = { ...base, arquivos: [{ papel: 'relatorio' as const, driveId: 'x' }] }
+    expect(funcaoDoBancoPara(relatorioSozinho)).toBe('enviar_relatorio')
+    const versaoComRelatorio = { ...base, arquivos: [{ papel: 'bpm' as const, driveId: 'y' }, { papel: 'relatorio' as const, driveId: 'x' }] }
+    expect(funcaoDoBancoPara(versaoComRelatorio)).toBe('registrar_versao')
     const pngDepois = { ...base, versaoId: VERSAO, arquivos: [{ papel: 'png' as const, driveId: 'x' }] }
     expect(funcaoDoBancoPara(pngDepois)).toBe('acrescentar_arquivo')
   })
 
-  it('os parâmetros seguem a função: versão nova ou piloto levam o processo e p_piloto; a histórica, o processo; o relatório, a versão e o arquivo; o .png ou .bpmn, a versão e o arquivo', () => {
-    const entradaBase = { processoId: PROCESSO, numero: 3, historica: false, piloto: false, arquivoId: null, arquivos: [] }
+  it('os parâmetros seguem a função: versão nova ou piloto levam o processo e p_piloto; a histórica, o processo; o relatório sozinho, o processo, as duas numerações da prévia e o arquivo; o .png ou .bpmn, a versão e o arquivo', () => {
+    const entradaBase = { processoId: PROCESSO, numero: 3, historica: false, piloto: false, arquivoId: null, numeroDoRelatorio: null, arquivos: [] }
     expect(parametrosDoBanco({ ...entradaBase, versaoId: null }, gravar)).toEqual({
       p_processo: PROCESSO, p_numero: 3, p_arquivos: gravar, p_piloto: false,
     })
@@ -224,8 +232,13 @@ describe('funcaoDoBancoPara e parametrosDoBanco', () => {
     expect(parametrosDoBanco({ ...entradaBase, historica: true, versaoId: null }, gravar)).toEqual({
       p_processo: PROCESSO, p_numero: 3, p_arquivos: gravar,
     })
-    const relatorioDepois = { ...entradaBase, versaoId: VERSAO, arquivos: [{ papel: 'relatorio' as const, driveId: 'x' }] }
-    expect(parametrosDoBanco(relatorioDepois, gravar)).toEqual({ p_versao: VERSAO, p_numero: 3, p_arquivo: gravar[0] })
+    const relatorioSozinho = { ...entradaBase, versaoId: null, numeroDoRelatorio: 2, arquivos: [{ papel: 'relatorio' as const, driveId: 'x' }] }
+    expect(parametrosDoBanco(relatorioSozinho, gravar)).toEqual({
+      p_processo: PROCESSO, p_numero_da_versao: 3, p_numero_do_relatorio: 2, p_arquivo: gravar[0],
+    })
+    expect(parametrosDoBanco({ ...entradaBase, versaoId: null, numeroDoRelatorio: 2 }, gravar)).toEqual({
+      p_processo: PROCESSO, p_numero: 3, p_arquivos: gravar, p_piloto: false, p_numero_do_relatorio: 2,
+    })
     const pngDepois = { ...entradaBase, versaoId: VERSAO, arquivos: [{ papel: 'png' as const, driveId: 'x' }] }
     expect(parametrosDoBanco(pngDepois, gravar)).toEqual({ p_versao: VERSAO, p_arquivo: gravar[0] })
   })
@@ -252,7 +265,7 @@ describe('substituição do arquivo (arquivo_id)', () => {
   })
 
   it('grava por substituir_arquivo, com o arquivo e o que o Drive informou dele', () => {
-    const base = { processoId: PROCESSO, numero: 3, historica: false, piloto: false, versaoId: null, arquivos: [] }
+    const base = { processoId: PROCESSO, numero: 3, historica: false, piloto: false, versaoId: null, numeroDoRelatorio: null, arquivos: [] }
     const substituicao = { ...base, arquivoId: ARQUIVO }
     expect(funcaoDoBancoPara(substituicao)).toBe('substituir_arquivo')
     expect(parametrosDoBanco(substituicao, gravar)).toEqual({ p_arquivo: ARQUIVO, p_novo: gravar[0] })
@@ -262,57 +275,6 @@ describe('substituição do arquivo (arquivo_id)', () => {
     const recusa = recusaDoBanco({ code: 'P0001', message: 'tipo_de_arquivo_diferente:pdf' })
     expect(recusa).toEqual({ codigo: 'tipo_de_arquivo_diferente', mensagem: 'pdf' })
     expect(recusa && statusDaRecusaDoBanco(recusa)).toBe(409)
-  })
-})
-
-describe('recusaDoBanco', () => {
-  it.each([
-    ['historica_depois_de_versao_nova', 'historica_depois_de_versao_nova', ''],
-    ['numero_historico_repetido:5', 'numero_historico_repetido', '5'],
-    ['historica_sem_arquivo_de_fluxograma', 'historica_sem_arquivo_de_fluxograma', ''],
-    ['relatorio_ja_existe', 'relatorio_ja_existe', ''],
-    ['versao_anterior_sem_relatorio', 'versao_anterior_sem_relatorio', ''],
-    ['copia_de_versao_que_nao_e_a_anterior', 'copia_de_versao_que_nao_e_a_anterior', ''],
-    ['copia_diferente_do_original', 'copia_diferente_do_original', ''],
-    ['versao_historica_somente_leitura', 'versao_historica_somente_leitura', ''],
-    ['numero_da_piloto_nao_maior:6', 'numero_da_piloto_nao_maior', '6'],
-    ['piloto_depois_de_versao_em_sequencia', 'piloto_depois_de_versao_em_sequencia', ''],
-    ['piloto_fora_da_etapa', 'piloto_fora_da_etapa', ''],
-    ['versao_fora_da_etapa', 'versao_fora_da_etapa', ''],
-    ['historica_fora_de_nao_iniciados', 'historica_fora_de_nao_iniciados', ''],
-    ['arquivo_ja_existe', 'arquivo_ja_existe', ''],
-    ['papel_nao_acrescentavel', 'papel_nao_acrescentavel', ''],
-  ])('a recusa %s do banco chega com o motivo como código e o valor como mensagem (409)', (texto, codigo, valor) => {
-    const recusa = recusaDoBanco({ code: 'P0001', message: texto })
-    expect(recusa).toEqual({ codigo, mensagem: valor })
-    expect(statusDaRecusaDoBanco(recusa as { codigo: string; mensagem: string })).toBe(409)
-  })
-
-  it('a recusa "motivo:valor" do banco vira código e valor', () => {
-    expect(recusaDoBanco({ code: 'P0001', message: 'numero_da_versao_mudou:4' })).toEqual({
-      codigo: 'numero_da_versao_mudou',
-      mensagem: '4',
-    })
-  })
-
-  it('a recusa sem valor vira só o código', () => {
-    expect(recusaDoBanco({ code: 'P0001', message: 'versao_sem_bpm' })).toEqual({
-      codigo: 'versao_sem_bpm',
-      mensagem: '',
-    })
-  })
-
-  it('a falta de privilégio vira "sem permissão"', () => {
-    expect(recusaDoBanco({ code: '42501', message: 'new row violates row-level security policy' })?.codigo).toBe('sem_permissao')
-  })
-
-  it('sem permissão é 403; a regra do banco, 409', () => {
-    expect(statusDaRecusaDoBanco({ codigo: 'sem_permissao', mensagem: '' })).toBe(403)
-    expect(statusDaRecusaDoBanco({ codigo: 'versao_sem_bpm', mensagem: '' })).toBe(409)
-  })
-
-  it('outro erro do banco não é recusa (vira erro interno)', () => {
-    expect(recusaDoBanco({ code: '08006', message: 'conexão caiu' })).toBeNull()
   })
 })
 

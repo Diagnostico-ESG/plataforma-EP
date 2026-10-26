@@ -7,6 +7,8 @@ export interface DadosDoNome {
   historica: boolean
   /** Versão piloto (V6P); omitida vale falso. Nunca junto com `historica`. */
   piloto?: boolean
+  /** Só no relatório de versão que não é histórica (Relatório V3): o número próprio do relatório no processo. */
+  numeroDoRelatorio?: number
   nomeDoProcesso: string
   papel: PapelDoArquivo
   extensao: string
@@ -21,18 +23,25 @@ export function limparParaNomeDeArquivo(texto: string): string {
     .trim()
 }
 
-function conferirNumero(numero: number): void {
+function conferirNumero(numero: number, rotulo: string): void {
   if (Number.isInteger(numero) && numero > 0) return
   throw new Error(
-    `número da versão inválido (recebido: ${numero}); esperado: número inteiro maior que zero`,
+    `número ${rotulo} inválido (recebido: ${numero}); esperado: número inteiro maior que zero`,
   )
 }
 
+function sufixoDoRelatorio(dados: DadosDoNome): string {
+  if (dados.papel !== 'relatorio') return ''
+  if (dados.numeroDoRelatorio === undefined) return '_Relatório'
+  conferirNumero(dados.numeroDoRelatorio, 'do relatório')
+  return `_Relatório V${dados.numeroDoRelatorio}`
+}
+
 export function nomePadrao(dados: DadosDoNome): string {
-  conferirNumero(dados.numero)
+  conferirNumero(dados.numero, 'da versão')
   const letra = dados.historica ? 'F' : dados.piloto ? 'P' : ''
   const rotulo = `V${dados.numero}${letra}`
-  const sufixo = dados.papel === 'relatorio' ? '_Relatório' : ''
+  const sufixo = sufixoDoRelatorio(dados)
   const sigla = limparParaNomeDeArquivo(dados.sigla)
   const nome = limparParaNomeDeArquivo(dados.nomeDoProcesso)
   return `${sigla}_${rotulo}_${nome}${sufixo}.${dados.extensao.toLowerCase()}`

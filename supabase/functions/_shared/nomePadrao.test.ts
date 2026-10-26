@@ -33,6 +33,26 @@ describe('nomePadrao', () => {
     )
   })
 
+  it('numera o relatório com o número do relatório, depois da versão que ele acompanha', () => {
+    const relatorio = { ...base, numero: 8, papel: 'relatorio' as const, extensao: 'docx' }
+    expect(nomePadrao({ ...relatorio, numeroDoRelatorio: 3 })).toBe('CEE_V8_Nome do processo_Relatório V3.docx')
+    expect(nomePadrao({ ...relatorio, numero: 6, piloto: true, numeroDoRelatorio: 1 })).toBe(
+      'CEE_V6P_Nome do processo_Relatório V1.docx',
+    )
+  })
+
+  it('o relatório da histórica não tem número', () => {
+    expect(nomePadrao({ ...base, numero: 5, historica: true, papel: 'relatorio', extensao: 'docx' })).toBe(
+      'CEE_V5F_Nome do processo_Relatório.docx',
+    )
+  })
+
+  it.each([0, -1, 1.5])('recusa o número de relatório %s com o valor recebido e o formato esperado', (numeroDoRelatorio) => {
+    expect(() => nomePadrao({ ...base, papel: 'relatorio', extensao: 'docx', numeroDoRelatorio })).toThrow(
+      `número do relatório inválido (recebido: ${numeroDoRelatorio}); esperado: número inteiro maior que zero`,
+    )
+  })
+
   it('mantém os acentos', () => {
     expect(nomePadrao({ ...base, nomeDoProcesso: 'Concessão de Licença' })).toBe(
       'CEE_V6_Concessão de Licença.bpmn',

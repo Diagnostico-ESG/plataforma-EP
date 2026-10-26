@@ -35,7 +35,7 @@ function lerArquivoNoDrive(token: string, driveId: string): Promise<ArquivoNoDri
 async function gravar(contexto: ContextoDoDrive, entrada: EntradaRegistrar, arquivos: ArquivoParaGravar[]): Promise<Response> {
   const funcao = funcaoDoBancoPara(entrada)
   const resultado = await contexto.cliente.rpc(funcao, parametrosDoBanco(entrada, arquivos))
-  return responderResultadoDoBanco(funcao, resultado, entrada.versaoId === null && entrada.arquivoId === null ? 'versao_id' : 'arquivo_id')
+  return responderResultadoDoBanco(funcao, resultado, funcao === 'registrar_versao' || funcao === 'registrar_versao_historica' ? 'versao_id' : 'arquivo_id')
 }
 
 // O arquivo que chegou ao Drive precisa ser o do alvo: senão o hash de outro arquivo da pasta entraria nele.
@@ -45,7 +45,7 @@ async function conferirSubstituicao(contexto: ContextoDoDrive, entrada: EntradaR
   return conferido.ok ? null : responderRecusa(conferido.recusa)
 }
 
-// Arquivo depois (relatório, .png ou .bpmn): a versão tem de ser do processo do pedido, senão o arquivo da pasta de um processo entraria na de outro.
+// Arquivo depois (.png ou .bpmn): a versão tem de ser do processo do pedido, senão o arquivo da pasta de um processo entraria na de outro.
 async function conferirRelatorioDepois(contexto: ContextoDoDrive, entrada: EntradaRegistrar, versaoId: string): Promise<Response | null> {
   const conferido = conferirVersaoDoProcesso(await lerProcessoDaVersao(contexto, versaoId), entrada.processoId)
   return conferido.ok ? null : responderRecusa(conferido.recusa)
@@ -74,7 +74,7 @@ export async function registrar(contexto: ContextoDoDrive, entrada: EntradaRegis
   const pastaId = await lerPastaRegistrada(contexto.cliente, { coluna: 'processo_id', id: entrada.processoId })
   if (!pastaId) return responderRecusa(recusar('arquivo_fora_da_pasta'))
   const lidos = await Promise.all(entrada.arquivos.map((arquivo) => lerArquivoNoDrive(contexto.token, arquivo.driveId)))
-  const conferidos = conferirArquivosNoDrive(entrada.arquivos, lidos, pastaId, rotuloEsperado(entrada))
+  const conferidos = conferirArquivosNoDrive(entrada.arquivos, lidos, pastaId, rotuloEsperado(entrada), entrada.numeroDoRelatorio)
   if (!conferidos.ok) return responderRecusa(conferidos.recusa)
   return await gravar(contexto, entrada, conferidos.valor)
 }

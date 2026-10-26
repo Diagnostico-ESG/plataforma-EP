@@ -3,7 +3,7 @@
 import type { PapelDoArquivo } from './nomePadrao.ts'
 
 export type Perfil = 'administrador' | 'integrante_ep' | 'consulta'
-export type Acao = 'iniciar_envio' | 'baixar' | 'registrar' | 'sem_alteracao' | 'conferir'
+export type Acao = 'iniciar_envio' | 'baixar' | 'registrar' | 'conferir'
 export interface Chamador {
   perfil: Perfil
   ativo: boolean
@@ -35,6 +35,8 @@ export interface EntradaIniciarEnvio {
   piloto: boolean
   /** Com o arquivo: troca o conteúdo dele (mesmo arquivo do Drive); sem: cria um arquivo novo. */
   arquivoId: string | null
+  /** Só no relatório de versão que não é histórica (Relatório V3): o número próprio dele, com que o arquivo é nomeado. */
+  numeroDoRelatorio: number | null
 }
 export interface EntradaBaixar {
   arquivoId: string
@@ -49,7 +51,6 @@ const PERFIS_POR_ACAO: Record<Acao, readonly Perfil[]> = {
   iniciar_envio: ['administrador', 'integrante_ep'],
   baixar: ['administrador', 'integrante_ep', 'consulta'],
   registrar: ['administrador', 'integrante_ep'],
-  sem_alteracao: ['administrador', 'integrante_ep'],
   conferir: ['administrador', 'integrante_ep', 'consulta'],
 }
 
@@ -176,6 +177,12 @@ export function lerPapel(corpo: Corpo): Validacao<PapelDoArquivo> {
   return { ok: true, valor: valor as PapelDoArquivo }
 }
 
+/** O número do relatório (Relatório V3) é opcional: ausente ou nulo vale null; presente e fora do formato, recusa. */
+export function lerNumeroDoRelatorio(corpo: Corpo): Validacao<number | null> {
+  if (corpo.numero_do_relatorio === undefined || corpo.numero_do_relatorio === null) return { ok: true, valor: null }
+  return lerInteiroPositivo(corpo, 'numero_do_relatorio')
+}
+
 /** A versão piloto (V6P) é opcional e nunca histórica: ausente vale falso; junto com a histórica, recusa. */
 export function lerPilotoDaVersao(corpo: Corpo, historica: boolean): Validacao<boolean> {
   const piloto = lerBooleanoOpcional(corpo, 'piloto')
@@ -185,7 +192,7 @@ export function lerPilotoDaVersao(corpo: Corpo, historica: boolean): Validacao<b
 }
 
 type DoArquivo = Pick<EntradaIniciarEnvio, 'processoId' | 'papel' | 'nomeOriginal'>
-type DaVersao = Pick<EntradaIniciarEnvio, 'tamanho' | 'numero' | 'historica' | 'piloto' | 'arquivoId'>
+type DaVersao = Pick<EntradaIniciarEnvio, 'tamanho' | 'numero' | 'historica' | 'piloto' | 'arquivoId' | 'numeroDoRelatorio'>
 
 function lerDoArquivo(corpo: Corpo): Validacao<DoArquivo> {
   const processoId = lerTexto(corpo, 'processo_id', FORMATO_UUID, 'uuid')
@@ -208,8 +215,10 @@ function lerDaVersao(corpo: Corpo): Validacao<DaVersao> {
   if (!piloto.ok) return piloto
   const arquivoId = lerUuidOpcional(corpo, 'arquivo_id')
   if (!arquivoId.ok) return arquivoId
+  const numeroDoRelatorio = lerNumeroDoRelatorio(corpo)
+  if (!numeroDoRelatorio.ok) return numeroDoRelatorio
   const valor = { tamanho: tamanho.valor, numero: numero.valor, historica: historica.valor, piloto: piloto.valor }
-  return { ok: true, valor: { ...valor, arquivoId: arquivoId.valor } }
+  return { ok: true, valor: { ...valor, arquivoId: arquivoId.valor, numeroDoRelatorio: numeroDoRelatorio.valor } }
 }
 
 function lerCamposDoEnvio(corpo: Corpo): Validacao<EntradaIniciarEnvio> {
@@ -220,9 +229,31 @@ function lerCamposDoEnvio(corpo: Corpo): Validacao<EntradaIniciarEnvio> {
   return { ok: true, valor: { ...doArquivo.valor, ...daVersao.valor } }
 }
 
+/** O relatório novo de uma versão que não é histórica (ADR 0026): é numerado e só vale em .docx. */
+export function ehRelatorioNumerado({ papel, historica, arquivoId }: Pick<EntradaIniciarEnvio, 'papel' | 'historica' | 'arquivoId'>): boolean {
+  return papel === 'relatorio' && !historica && arquivoId === null
+}
+
+/** As extensões que o arquivo aceita: o relatório numerado só .docx; a histórica e a troca mantêm .docx e .pdf. */
+export function extensoesAceitas(entrada: Pick<EntradaIniciarEnvio, 'papel' | 'historica' | 'arquivoId'>): readonly string[] {
+  return ehRelatorioNumerado(entrada) ? ['docx'] : EXTENSOES_POR_PAPEL[entrada.papel]
+}
+
+// O número do relatório vai com o relatório numerado e só com ele.
+function conferirNumeroDoRelatorio(entrada: EntradaIniciarEnvio): Validacao<EntradaIniciarEnvio> {
+  const esperado = ehRelatorioNumerado(entrada)
+  if (esperado && entrada.numeroDoRelatorio === null) {
+    return falhar('entrada_invalida', 'campo numero_do_relatorio: esperado número inteiro maior que zero, recebido ausente')
+  }
+  if (!esperado && entrada.numeroDoRelatorio !== null) {
+    return falhar('entrada_invalida', 'campo numero_do_relatorio: esperado ausente fora do relatório de versão que não é histórica')
+  }
+  return { ok: true, valor: entrada }
+}
+
 function conferirArquivo(entrada: EntradaIniciarEnvio): Validacao<EntradaIniciarEnvio> {
   const extensao = extensaoDoNome(entrada.nomeOriginal)
-  const aceitas = EXTENSOES_POR_PAPEL[entrada.papel]
+  const aceitas = extensoesAceitas(entrada)
   if (!aceitas.includes(extensao)) {
     return falhar('extensao_nao_aceita', `recebido .${extensao}; esperado .${aceitas.join(' ou .')}`)
   }
@@ -236,7 +267,8 @@ export function validarIniciarEnvio(entrada: unknown): Validacao<EntradaIniciarE
   if (!eCorpo(entrada)) return falhar('entrada_invalida', `corpo: esperado objeto, recebido ${tipoDe(entrada)}`)
   const campos = lerCamposDoEnvio(entrada)
   if (!campos.ok) return campos
-  return conferirArquivo(campos.valor)
+  const arquivo = conferirArquivo(campos.valor)
+  return arquivo.ok ? conferirNumeroDoRelatorio(arquivo.valor) : arquivo
 }
 
 export function validarBaixar(entrada: unknown): Validacao<EntradaBaixar> {
