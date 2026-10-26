@@ -48,10 +48,10 @@ export function CaminhoDoProcesso({ processo, processos, versoes, revisoes, regi
   return (
     <>
       <AgoraDoProcesso processo={processo} processos={processos} usuarios={usuarios} usuarioId={usuarioId}
-        podeAlterar={podeAlterar} movimento={movimento} executar={executar} aoMudar={aoMudar} revisoes={revisoes} registros={registros} />
+        podeAlterar={podeAlterar} movimento={movimento} executar={executar} aoMudar={aoMudar} revisoes={revisoes} versoes={versoes} registros={registros} />
       <JanelasDoMovimento movimento={movimento} processos={processos} versoes={versoes} aoGravar={aoMudar} />
       {movimento.falha && <p className="cadastros-falha" role="alert">{movimento.falha}</p>}
-      <EtapasDoProcesso processo={processo} revisoes={revisoes} registros={registros} ultimaVersao={processo.ultimaVersao}
+      <EtapasDoProcesso processo={processo} revisoes={revisoes} versoes={versoes} registros={registros} ultimaVersao={processo.ultimaVersao}
         podeEditar={podeAlterar && !parado} />
     </>
   )

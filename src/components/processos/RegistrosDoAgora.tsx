@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import type { RegistrosDoProcesso } from '../../hooks/useRegistrosDoProcesso'
-import { CODIGO_DA_APROVACAO, CODIGO_DA_REVISAO_INTERNA } from '../../processos/codigosDasEtapas'
+import { CODIGO_DA_APROVACAO, CODIGO_DA_REVISAO_INTERNA, CODIGO_DA_VALIDACAO } from '../../processos/codigosDasEtapas'
 import type { ProcessoLido } from '../../processos/tipos'
 import { resumoDaAprovacao, resumoDaRevisao } from '../../revisoes/opcoesDaRevisao'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
+import type { ModuloDeVersoes } from '../../versoes/tipos'
+import { DataDaValidacao } from './DataDaValidacao'
 import { JanelaDaAprovacao } from './JanelaDaAprovacao'
 import { JanelaDaRevisao } from './JanelaDaRevisao'
 import { JanelaDeRegistroDaAprovacao } from './JanelaDeRegistroDaAprovacao'
@@ -12,21 +14,28 @@ import { JanelaDeRegistroDaRevisao } from './JanelaDeRegistroDaRevisao'
 type RegistrosDoAgoraProps = {
   processo: ProcessoLido
   revisoes: ModuloDeRevisoes
+  /** O módulo de versões: a janela de registrar a aprovação envia o .pdf protocolado por ele. */
+  versoes: ModuloDeVersoes
   registros: RegistrosDoProcesso
   /** Quem está na tela. */
   usuarioId: string
   /** A Consulta lê o resumo do registro, sem botões. */
   podeAlterar: boolean
+  /** Lê o processo de novo, depois de gravar a data da validação. */
+  aoMudar: () => void
 }
 
 type Janela = 'registrar' | 'editar' | null
 
 /**
- * O que o Agora acrescenta na Revisão interna e na Aprovação pelo setor (ADR 0023): o registro da passagem ou da
- * aprovação, em resumo, e os botões para registrar e editar. Registrar não move o processo.
+ * O que o Agora acrescenta na Revisão interna, na Validação com o setor e na Aprovação pelo setor (ADR 0023): o registro da
+ * passagem ou da aprovação, em resumo, e os botões para registrar e editar, e a data da validação. Registrar não move o processo.
  */
 export function RegistrosDoAgora(props: RegistrosDoAgoraProps) {
   const codigo = props.processo.etapaAtual?.codigo
+  if (codigo === CODIGO_DA_VALIDACAO) {
+    return <DataDaValidacao processo={props.processo} revisoes={props.revisoes} podeAlterar={props.podeAlterar} aoMudar={props.aoMudar} />
+  }
   if (codigo === CODIGO_DA_REVISAO_INTERNA) return <RevisaoDoAgora {...props} />
   if (codigo === CODIGO_DA_APROVACAO) return <AprovacaoDoAgora {...props} />
   return null
@@ -61,7 +70,7 @@ function RevisaoDoAgora({ processo, revisoes, registros, usuarioId, podeAlterar 
 }
 
 // A aprovação do processo: "V8 aprovada" com [Editar aprovação] quando há, e [Registrar aprovação] para uma nova.
-function AprovacaoDoAgora({ processo, revisoes, registros, podeAlterar }: RegistrosDoAgoraProps) {
+function AprovacaoDoAgora({ processo, revisoes, versoes, registros, podeAlterar }: RegistrosDoAgoraProps) {
   const [janela, setJanela] = useState<Janela>(null)
   if (registros.aprovacao.tipo !== 'pronto') return null
   const atual = registros.aprovacao.valor
@@ -78,8 +87,8 @@ function AprovacaoDoAgora({ processo, revisoes, registros, podeAlterar }: Regist
         </div>
       )}
       {janela === 'registrar' && (
-        <JanelaDeRegistroDaAprovacao processoId={processo.id} ultimaVersao={processo.ultimaVersao} anterior={atual}
-          revisoes={revisoes} aoGravar={registros.atualizar} aoFechar={fechar} />
+        <JanelaDeRegistroDaAprovacao processo={processo} ultimaVersao={processo.ultimaVersao} anterior={atual}
+          revisoes={revisoes} versoes={versoes} aoGravar={registros.atualizar} aoFechar={fechar} />
       )}
       {janela === 'editar' && atual && (
         <JanelaDaAprovacao aprovacao={atual} revisoes={revisoes} aoGravar={registros.atualizar} aoFechar={fechar} />

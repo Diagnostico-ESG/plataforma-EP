@@ -1,7 +1,9 @@
 import { textoDaFalha } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { FRASE_DO_REGISTRO_QUE_SUMIU } from '../revisoes/frasesDeRevisao'
+import { textoDaFalhaDoEnvioDoPdf, textoDaFalhaDoPdfDepoisDaAprovacao } from '../revisoes/pdfDaAprovacao'
 import type { DadosDaAprovacao, DadosDaEdicaoDaRevisao, DadosDaRevisao, ModuloDeRevisoes } from '../revisoes/tipos'
+import type { ModuloDeVersoes } from '../versoes/tipos'
 import type { DadosDaChegada, ModuloDeProcessos } from './tipos'
 
 // A edição espera a gravação. O registro que sumiu (a aprovação desfeita por outra pessoa) não é "o processo sumiu": a
@@ -27,6 +29,45 @@ export function gravarAprovacao(
   revisoes: Pick<ModuloDeRevisoes, 'registrarAprovacao'>, processoId: string, dados: DadosDaAprovacao,
 ): Promise<string | null> {
   return esperarAEdicao(() => revisoes.registrarAprovacao(processoId, dados))
+}
+
+// A recusa da aprovação que o envio do .pdf repassa: a janela a mostra como a de qualquer registro da aprovação.
+class RecusaDaAprovacao extends Error {}
+
+// O que roda entre o .pdf chegar ao Drive e o registro dele: registrar a aprovação (a recusa dela interrompe o envio).
+function registrarAAprovacaoDoPedido(
+  revisoes: Pick<ModuloDeRevisoes, 'registrarAprovacao'>, processoId: string, dados: DadosDaAprovacao, aoRegistrar: () => void,
+): () => Promise<void> {
+  return async () => {
+    const falhou = await gravarAprovacao(revisoes, processoId, dados)
+    if (falhou !== null) throw new RecusaDaAprovacao(falhou)
+    aoRegistrar()
+  }
+}
+
+/**
+ * Registrar a aprovação junto com o .pdf protocolado: o .pdf sobe ao Drive primeiro, depois a aprovação é registrada e então o
+ * .pdf é ligado a ela. Falha do envio: nada registrado. Falha só do registro do .pdf: a aprovação já está registrada e a frase manda
+ * enviar o .pdf pela gaveta. `aoRegistrar` roda quando a aprovação ficou registrada (com ou sem o .pdf), para quem mostra os
+ * registros ler de novo já com tudo o que ficou gravado.
+ */
+export async function gravarAprovacaoComPdf(
+  revisoes: Pick<ModuloDeRevisoes, 'registrarAprovacao'>, versoes: Pick<ModuloDeVersoes, 'enviarPdfDaAprovacao'>,
+  pedido: { processoId: string; numero: number; arquivo: File; dados: DadosDaAprovacao }, aoRegistrar: () => void,
+): Promise<string | null> {
+  let registrada = false
+  const { processoId, numero, arquivo, dados } = pedido
+  const antesDeRegistrar = registrarAAprovacaoDoPedido(revisoes, processoId, dados, () => { registrada = true })
+  try {
+    await versoes.enviarPdfDaAprovacao({ processoId, numero, arquivo, antesDeRegistrar }, () => {})
+  } catch (erro) {
+    if (erro instanceof RecusaDaAprovacao) return erro.message
+    if (!registrada) return textoDaFalhaDoEnvioDoPdf(erro)
+    aoRegistrar()
+    return textoDaFalhaDoPdfDepoisDaAprovacao(erro)
+  }
+  aoRegistrar()
+  return null
 }
 
 /** A edição do resultado, do escopo e do comentário de uma revisão; a janela espera: a frase da falha ou null quando gravou. */

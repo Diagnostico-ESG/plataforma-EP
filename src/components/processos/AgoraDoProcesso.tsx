@@ -11,6 +11,7 @@ import { textoDaPublicacaoNoAgora } from '../../processos/publicacao'
 import { hojeEmBrasilia } from '../../lib/datas'
 import type { ModuloDeProcessos, ProcessoLido, UsuarioResponsavel } from '../../processos/tipos'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
+import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { JanelaDeSituacao } from './AcoesDeSituacao'
 import { LinhaDaPublicacao } from './AgoraDaPublicacao'
 import { AgoraDoArquivado } from './AgoraDoConcluido'
@@ -28,6 +29,8 @@ type AgoraDoProcessoProps = {
   movimento: MovimentoDoProcessoEmUso
   /** O módulo e os registros (revisões e aprovação) que o Agora mostra e grava na Revisão interna e na Aprovação pelo setor. */
   revisoes: ModuloDeRevisoes
+  /** O módulo de versões: a janela de registrar a aprovação envia o .pdf protocolado por ele. */
+  versoes: ModuloDeVersoes
   registros: RegistrosDoProcesso
   /** Grava a situação (Retomar) e o arquivamento, e guarda a falha para o verso mostrar. */
   executar: Executar
@@ -67,7 +70,9 @@ function ConteudoDoAgora(props: ConteudoDoAgoraProps) {
   if (props.parado) {
     return <SituacaoParada processo={processo} processos={processos} podeAlterar={podeAlterar} executar={executar} aoMudar={aoMudar} aoRetomar={props.aoRetomar} />
   }
-  if (!podeAlterar) return <AgoraDaConsulta processo={processo} rotulo={rotulo} revisoes={props.revisoes} registros={props.registros} usuarioId={props.usuarioId} />
+  if (!podeAlterar) {
+    return <AgoraDaConsulta processo={processo} rotulo={rotulo} revisoes={props.revisoes} versoes={props.versoes} registros={props.registros} usuarioId={props.usuarioId} />
+  }
   return <CorpoDoAgora {...props} rotulo={rotulo} />
 }
 
@@ -102,9 +107,9 @@ function SituacaoParada({ processo, processos, podeAlterar, executar, aoMudar, a
 }
 
 // A Consulta só lê: a frase com a etapa, a etiqueta e o responsável, e o selo vermelho quando o processo está parado.
-type AgoraDaConsultaProps = Pick<AgoraDoProcessoProps, 'processo' | 'revisoes' | 'registros' | 'usuarioId'> & { rotulo: string }
+type AgoraDaConsultaProps = Pick<AgoraDoProcessoProps, 'processo' | 'revisoes' | 'versoes' | 'registros' | 'usuarioId'> & { rotulo: string }
 
-function AgoraDaConsulta({ processo, rotulo, revisoes, registros, usuarioId }: AgoraDaConsultaProps) {
+function AgoraDaConsulta({ processo, rotulo, revisoes, versoes, registros, usuarioId }: AgoraDaConsultaProps) {
   const dias = diasDoProcessoNaEtapa(processo, hojeEmBrasilia())
   const publicacao = textoDaPublicacaoNoAgora(processo)
   return (
@@ -115,7 +120,8 @@ function AgoraDaConsulta({ processo, rotulo, revisoes, registros, usuarioId }: A
         {dias !== null && passouDoLimite(dias) && <DiasNaEtapa dias={dias} />}
       </p>
       {publicacao && <LinhaDaPublicacao texto={publicacao} link={processo.linkDaPublicacao} />}
-      <RegistrosDoAgora processo={processo} revisoes={revisoes} registros={registros} usuarioId={usuarioId} podeAlterar={false} />
+      <RegistrosDoAgora processo={processo} revisoes={revisoes} versoes={versoes} registros={registros} usuarioId={usuarioId} podeAlterar={false}
+        aoMudar={() => {}} />
     </>
   )
 }

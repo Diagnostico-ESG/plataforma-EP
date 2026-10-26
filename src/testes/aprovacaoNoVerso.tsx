@@ -43,7 +43,7 @@ export function montar(ultimaVersao: UltimaVersao | null, { perfil = 'integrante
   falso.quemChama = EU
   falso.etapasDoCatalogo = CATALOGO_DE_TESTE
   const versoes = new VersoesFalso()
-  const revisoes = new RevisoesFalso(falso, EU)
+  const revisoes = new RevisoesFalso(falso, EU, versoes)
   ajustar?.({ falso, revisoes, versoes })
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso}
     versoes={versoes} revisoes={revisoes} planilhas={new PlanilhasFalso()} />)

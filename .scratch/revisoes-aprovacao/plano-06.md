@@ -74,15 +74,15 @@
 
 **Arquivos:** `src/revisoes/textoDaValidacao.ts` (novo: "Validado pelo setor em {dd/mm/aaaa}" e "Data da validação não registrada."), `src/revisoes/pdfDaAprovacao.ts` (novo: nome previsto do .pdf, conferência no navegador de extensão e 20 MB com a frase "O .pdf da aprovação precisa ser .pdf, até 20 MB."), `src/revisoes/eventoDaAprovacao.ts`, `src/cadastros/historicoDosCadastros.ts` (textos "Registrou a data da validação", "Alterou a data da validação", "Enviou o .pdf da aprovação", "Substituiu o .pdf da aprovação"; `data_da_validacao` em `CAMPOS_DE_DATA` e no rótulo de campo; o `pdf_nome` do evento "Substituiu a aprovação") e os testes ao lado.
 
-- [ ] Testes que falham e implementação, `npm test -- src/revisoes src/cadastros` verde.
+- [x] Testes que falham e implementação, `npm test -- src/revisoes src/cadastros` verde.
 
 ### Tarefa 8: tela
 
 **Arquivos:** `src/processos/codigosDasEtapas.ts` (`CODIGO_DA_VALIDACAO`), `src/components/processos/DataDaValidacao.tsx` (novo, no padrão de `DataDaModelagemPiloto.tsx`: marcar, alterar e apagar gravam na hora, falha em vermelho com o valor anterior de volta), `RegistrosDoAgora.tsx` (o campo na Validação com o setor, só para quem altera; Consulta lê), `DetalheDaEtapa.tsx` e `DadosDasEtapas` (a linha "Validado pelo setor em ..." na gaveta da Validação), `AprovacaoDaEtapa.tsx` (o .pdf atual: link `LinkDoArquivo`, `MarcaNoDrive`, [Substituir]; ou [Enviar .pdf]; some no arquivado e para a Consulta), `PdfDaAprovacao.tsx` (novo: o bloco do .pdf da gaveta), `JanelaDeRegistroDaAprovacao.tsx` (campo ".pdf protocolado (opcional)" com `CampoDeArquivo`, progresso "Enviando…", ordem da decisão 4), `HistoricoDoProcesso.tsx` (o link do .pdf guardado no evento "Substituiu a aprovação"), `Agora.css` e `Etapas.css` (alinhamento da data e janela até 1366×768) e os testes de tela.
 
-- [ ] Testes de tela que falham (aplicativo inteiro): `src/App.dataDaValidacao.test.tsx` e `src/App.pdfDaAprovacao.test.tsx` (novos, no padrão de `App.dataDaModelagemPiloto`, `App.registrarAprovacao`, `App.aprovacaoNaGaveta`, `App.editarRegistros`, `App.substituirArquivo`, `App.conferenciaNoDrive`), cobrindo cada item do segundo critério do ticket; ajustes em `App.registrarAprovacao.test.tsx`, `App.aprovacaoNaGaveta.test.tsx` e `src/testes/aprovacaoNoVerso.tsx` se a falsa mudou de forma.
-- [ ] Implementar; `npm test` inteiro, `npm run typecheck`, `npm run lint` e `npm run check:circular` verdes. Cada arquivo até 300 linhas e função de 4 a 20 (extrair em vez de comprimir).
-- [ ] Os dois critérios `[visual]`: conferir na vitrine local (a de `vitrine.local/`, fora do git, está desatualizada e não compila: se não der para atualizá-la sem custo, registrar como presumido, como nos tickets anteriores).
+- [x] Testes de tela que falham (aplicativo inteiro): `src/App.dataDaValidacao.test.tsx` e `src/App.pdfDaAprovacao.test.tsx` (novos, no padrão de `App.dataDaModelagemPiloto`, `App.registrarAprovacao`, `App.aprovacaoNaGaveta`, `App.editarRegistros`, `App.substituirArquivo`, `App.conferenciaNoDrive`), cobrindo cada item do segundo critério do ticket; ajustes em `App.registrarAprovacao.test.tsx`, `App.aprovacaoNaGaveta.test.tsx` e `src/testes/aprovacaoNoVerso.tsx` se a falsa mudou de forma.
+- [x] Implementar; `npm test` inteiro, `npm run typecheck`, `npm run lint` e `npm run check:circular` verdes. Cada arquivo até 300 linhas e função de 4 a 20 (extrair em vez de comprimir).
+- [x] (presumido, ver desvios.md) Os dois critérios `[visual]`: conferir na vitrine local (a de `vitrine.local/`, fora do git, está desatualizada e não compila: se não der para atualizá-la sem custo, registrar como presumido, como nos tickets anteriores).
 
 ### Tarefa 9: fecho
 

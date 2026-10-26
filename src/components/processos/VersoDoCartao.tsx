@@ -167,7 +167,7 @@ function CorpoDoVerso(props: CorpoProps) {
       <div className="verso-pagina">
         <BotaoVoltarAoProcesso aoVoltar={aoVoltar} />
         <h3 className="verso-pagina-titulo">Histórico</h3>
-        <HistoricoDoProcesso processos={processos} id={processo.id} />
+        <HistoricoDoProcesso processos={processos} id={processo.id} versoes={props.versoes} />
       </div>
     )
   }
