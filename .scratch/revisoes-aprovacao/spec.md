@@ -2,11 +2,156 @@
 
 Status: ready-for-agent
 
-**Como resolve o problema (desde 2026-10-23, Andamento livre).** A equipe precisa saber quem revisou cada versão, se mudou algo e qual versão o setor aprovou. Os dois registros deixam de estar presos a um "Concluir" que já não existe. Com o processo na **Revisão interna**, o Agora oferece [Registrar revisão], com um só botão para os dois resultados: "sem alteração" ou "corrigida". Com o processo na **Aprovação pelo setor**, o Agora oferece [Registrar aprovação], com a versão aprovada e o E-protocolo opcional. Registrar não move o processo, e mover não exige registro. Quando o autor da versão faz a própria revisão, a plataforma avisa, mas não impede. A versão aprovada continua sem arquivo substituído. A seção "Andamento livre", logo abaixo, vale sobre o resto desta spec no que divergir.
+**Como resolve o problema (desde 2026-10-23, Andamento livre).** A equipe precisa saber quem revisou cada versão, se mudou algo e qual versão o setor aprovou. Os dois registros deixam de estar presos a um "Concluir" que já não existe. Com o processo na **Revisão interna**, o Agora oferece [Registrar revisão], com um só botão para os dois resultados: "sem alteração" ou "corrigida". Com o processo na **Aprovação pelo setor**, o Agora oferece [Registrar aprovação], com a versão aprovada e o E-protocolo opcional. Registrar não move o processo, e mover não exige registro. Quando o autor da versão faz a própria revisão, a plataforma avisa, mas não impede. A versão aprovada continua sem arquivo substituído. A seção "Andamento livre", logo abaixo, vale sobre o resto desta spec no que divergir. Desde 2026-10-26 (Arquivos por etapa), a Validação com o setor guarda a **data da validação**, e a aprovação pode levar o **.pdf protocolado**; a seção "Data da validação e .pdf da aprovação" vale sobre as anteriores no que divergir.
 
 **Como resolvia antes de 2026-10-23.** Hoje a revisão interna e a aprovação de cada processo ficam na memória da equipe, em e-mails e no Power BI: não se sabe com segurança quem revisou qual versão, se mudou algo, nem qual versão foi aprovada. Com esta funcionalidade, quem conclui a **Revisão interna** diz, na mesma janela do [Concluir], se a versão passou "sem alteração" ou foi "corrigida". Quem conclui a **Aprovação pelo setor** vê qual versão está sendo aprovada e anota, se já tiver, o número, o link e a data do E-protocolo. Revisão e conclusão se gravam juntas, sem botão nem formulário a mais. O banco garante que ninguém revise a própria versão, que nada vá ao setor ou seja aprovado com versão incompleta, e que a versão aprovada não tenha arquivo trocado. Os registros aparecem na gaveta da etapa, no verso do cartão, e toda mudança entra no histórico do processo.
 
 Decisões de origem: sabatina de 2026-10-16 (`.scratch/revisoes-aprovacao/sabatina.md`), revista no `/to-tickets` de 2026-10-17 e no `/planejar` de 2026-10-19; `CONTEXT.md` (seções "Processos", "Documentos" e "Revisões e aprovação"); ADRs 0006 (envio não muda a etapa), 0011 (versão aprovada não tem arquivo substituído), 0012 (revisão pelo setor sem rodadas), 0013 (etapas do setor saem), 0014 (resolver avança; trava do autor na escolha) e 0015 (revisão e aprovação gravadas no Concluir; E-protocolo opcional), que substitui em parte o 0009.
+
+## Data da validação e .pdf da aprovação (mudança de 2026-10-26)
+
+Parte 3 da iniciativa quadro-livre. Decisões de origem: `.scratch/quadro-livre/sabatina-parte-3.md` (itens 12 a 17, 19, 21 e 22) e o mapa (Q16 e Q17). Continuam valendo o ADR 0023 (registros sem trava), o 0011 (versão aprovada sem arquivo substituído) e o 0012 (sem registro de cada envio ao setor). Termos no `CONTEXT.md`: data da validação (em Validação com o setor) e .pdf protocolado (em Aprovação). As versões, os relatórios e a trava de arquivos estão na spec de `documentos-versoes` (seção "Arquivos por etapa"), que também descreve o que muda na função do servidor.
+
+**Como resolve o problema.** O setor valida o fluxo num dia e protocola a aprovação noutro, e o documento protocolado (fluxo e relatório juntos) fica hoje no e-mail ou no E-protocolo. Com esta mudança, a Validação com o setor guarda a **data da validação**, opcional e editável, e a aprovação ganha o **.pdf protocolado**, opcional e substituível, guardado na pasta do processo no Drive. Quando uma aprovação nova toma o lugar da anterior, o .pdf da anterior fica guardado e aparece no histórico. A Publicação não muda (data e link, ADR 0024), e Concluídos não tem campos.
+
+### Solução
+
+- **Data da validação:** com o processo na Validação com o setor, em andamento, o Agora mostra "Data da validação" com um campo de data (vazio até alguém preencher), no padrão da Data da modelagem piloto: marcar, alterar e apagar gravam na hora. Não aceita data futura. Fora dessa etapa, a data aparece só para leitura, na gaveta da Validação com o setor ("Validado pelo setor em 12/11/2026"). Uma por processo. Fica fora das planilhas dos dashboards por ora.
+- **.pdf da aprovação:**
+  - a janela "Registrar aprovação" ganha o campo ".pdf protocolado (opcional)", só .pdf até 20 MB;
+  - na gaveta da Aprovação pelo setor, a aprovação atual mostra o .pdf, com o nome padrão como link de download, [Substituir] e, se ainda não há, [Enviar .pdf]. Ambos com a mesma regra do [Editar] da aprovação: processo em andamento ou concluído, não arquivado;
+  - nome no Drive: `CEE_V8_Nome do processo_Aprovação.pdf` (a versão aprovada);
+  - substituir grava no mesmo arquivo do Drive, sem guardar o anterior (ADR 0007), com a conferência "alterado fora da plataforma" e "não encontrado no Drive" como nos outros arquivos;
+  - o .pdf não entra na versão aprovada (ADR 0011 continua: a versão aprovada segue sem arquivo substituído, mas o .pdf da aprovação se substitui).
+- **Aprovação nova toma o lugar da anterior** (como hoje): o .pdf da anterior não some; fica guardado, deixa de aparecer na aprovação atual e aparece no evento "Substituiu a aprovação" do histórico, com o nome como link de download.
+- **Histórico:** "Registrou a data da validação", "Alterou a data da validação" (inclusive para vazia), "Enviou o .pdf da aprovação" e "Substituiu o .pdf da aprovação".
+- **Consulta** vê a data e baixa o .pdf, sem botões.
+- **Subprocesso:** as mesmas regras, com a sua data e a sua aprovação.
+
+### Histórias de usuário
+
+49. Como integrante do EP, quero registrar no Agora o dia em que o setor validou o fluxo, com o processo na Validação com o setor, para separar a validação da data do E-protocolo.
+50. Como integrante do EP, quero alterar ou apagar a data da validação, porque ela é opcional e pode ter sido digitada errada.
+51. Como integrante do EP, quero que a plataforma recuse data da validação no futuro, com a frase e o preenchido mantido.
+52. Como integrante do EP, quero que a data da validação só se grave com o processo na Validação com o setor, mesmo fora da tela.
+53. Como usuário, quero ver a data da validação na gaveta da Validação com o setor depois que o processo sair da etapa.
+54. Como integrante do EP, quero enviar o .pdf protocolado junto com o registro da aprovação, se já o tiver.
+55. Como integrante do EP, quero enviar o .pdf depois, na gaveta da Aprovação pelo setor, porque o documento protocolado pode chegar dias depois.
+56. Como integrante do EP, quero substituir o .pdf enviado por engano, com a confirmação de que o anterior não fica guardado.
+57. Como integrante do EP, quero que só .pdf até 20 MB seja aceito, com a frase do formato e do tamanho esperados.
+58. Como usuário, quero baixar o .pdf da aprovação com o nome padrão (`CEE_V8_Nome do processo_Aprovação.pdf`), inclusive na Consulta.
+59. Como integrante do EP, quero que, quando uma aprovação nova toma o lugar da anterior, o .pdf da anterior fique guardado e apareça no histórico, para não perder o documento protocolado.
+60. Como integrante do EP, quero ver as marcas "alterado fora da plataforma" e "não encontrado no Drive" no .pdf da aprovação, como nos outros arquivos.
+61. Como integrante do EP, quero que enviar e substituir o .pdf sigam a regra do [Editar] da aprovação (em andamento ou concluído, não arquivado).
+62. Como usuário, quero ver no histórico os eventos da data da validação e do .pdf da aprovação.
+
+### Decisões de implementação
+
+#### Interface
+
+- **Agora da Validação com o setor:** o campo da data da validação, reaproveitando o padrão da Data da modelagem piloto (o mesmo modo de gravar na hora e as mesmas mensagens de falha).
+- **Gaveta da Validação com o setor:** a linha "Validado pelo setor em {dd/mm/aaaa}" ou "Data da validação não registrada.".
+- **Janela "Registrar aprovação":** o campo de arquivo `.pdf`, com a conferência no navegador (extensão e tamanho), o progresso do envio e, na falha do envio, nada registrado e o preenchido mantido.
+- **Gaveta da Aprovação pelo setor:** o .pdf da aprovação atual (link, marca da conferência, [Substituir]) ou [Enviar .pdf].
+- **Estados:** a data grava como a Data da modelagem piloto (falha em vermelho, valor anterior de volta). O .pdf tem os estados dos envios de `documentos-versoes`: "Enviando…", falha em vermelho sem perder o escolhido, conferência que falhou sem marcas. A gaveta continua com carregando, vazio e erro com [Tentar de novo].
+- **Módulos:** o de revisões ganha `registrarDataDaValidacao(processoId, data | null)` e lê a data e o .pdf da aprovação (e os guardados, para o histórico); o envio e a substituição do .pdf vão pelo módulo de versões, que já fala com a função do Drive (`enviarPdfDaAprovacao`, e `substituirArquivo` aceitando o .pdf). As falsas nomeadas acompanham.
+- **Recusas novas:**
+  - "Registre a data da validação com o processo na Validação com o setor.";
+  - "A data da validação não pode ser futura.";
+  - "O .pdf da aprovação precisa ser .pdf, até 20 MB.";
+  - "Registre a aprovação antes de enviar o .pdf.";
+  - e a de processo arquivado.
+
+#### Modelo de dados
+
+**Tabela `processos`, alterada:** `data_da_validacao` (date, não obrigatória; não futura no fuso de Brasília). Gravada só pela função `registrar_data_da_validacao(p_processo, p_data)`, sem `security definer`, que recusa fora da Validação com o setor e com o processo fora de andamento. Lida na view `processos_com_andamento` por todo perfil ativo.
+
+**Tabela nova `pdfs_da_aprovacao`:**
+
+| Coluna | Tipo | Obrigatória | Observação |
+|---|---|---|---|
+| `id` | uuid | sim | gerado |
+| `aprovacao_id` | uuid → `aprovacoes` | sim | |
+| `versao_id` | uuid → `versoes` | sim | a versão aprovada quando o .pdf entrou, preenchida pelo banco (dá o nome) |
+| `nome` | text | sim | nome padrão, até 300 caracteres |
+| `tamanho` | bigint | sim | até 20 MB |
+| `hash_md5` | text | sim | MD5 informado pelo Drive |
+| `drive_id` | text | sim | no formato dos outros `drive_id` |
+| `enviado_por` | uuid → `usuarios` | sim | preenchido pelo banco; muda na substituição |
+| `enviado_em` | timestamptz | sim | gerado; muda na substituição |
+| `guardado_em` | timestamptz | não | preenchido pelo banco quando uma aprovação nova toma o lugar; o .pdf atual é o da aprovação com `guardado_em` vazio |
+
+- Um .pdf atual por aprovação (índice único em `aprovacao_id` quando `guardado_em` está vazio).
+- `registrar_aprovacao` passa a preencher `guardado_em` do .pdf atual quando troca a aprovação, e a aceitar o .pdf enviado junto (pela função do servidor, como as versões).
+- Nasce com `revoke all` e concede a logado só ler, incluir e alterar `tamanho`, `hash_md5`, `enviado_por` e `enviado_em`.
+
+**Arquivos (no Drive, sem Storage):** só .pdf, até 20 MB, na pasta do processo no Drive. Administrador e Integrante enviam e substituem; todo perfil ativo vê e baixa; a substituição grava no mesmo arquivo do Drive, sem guardar o anterior (ADR 0007); o .pdf de uma aprovação substituída fica guardado (nunca se apaga). Nenhum bucket.
+
+**Dado pessoal:** o .pdf protocolado pode ter nomes de servidores do setor (como os relatórios); todo perfil ativo o baixa, como já baixa os relatórios.
+
+#### Quem pode o quê (cada célula vira um teste pgTAP)
+
+| Tabela e ação | Administrador | Integrante do EP | Consulta | Inativo | Visitante |
+|---|---|---|---|---|---|
+| `processos.data_da_validacao` ler | sim | sim | sim | não | não |
+| `processos.data_da_validacao` gravar (pela função, na Validação com o setor) | sim | sim | não | não | não |
+| `pdfs_da_aprovacao` ler | sim | sim | sim | não | não |
+| `pdfs_da_aprovacao` criar | sim | sim | não | não | não |
+| `pdfs_da_aprovacao` alterar (substituir: tamanho, hash, autor, data) | sim | sim | não | não | não |
+| `pdfs_da_aprovacao` alterar nome, versão, drive_id, guardado_em; apagar | não | não | não | não | não |
+
+Na função do servidor, enviar e substituir o .pdf seguem a linha de `iniciar_envio`/`registrar` (Administrador e Integrante); baixar e conferir, a de `baixar`/`conferir` (todo perfil ativo).
+
+#### Regras que o banco impõe
+
+| Regra | Como | Caso de teste que a prova |
+|---|---|---|
+| Data da validação só com o processo na Validação com o setor, em andamento | `registrar_data_da_validacao` | na Aprovação recusada; suspenso recusado; na Validação aceita, alterada e apagada |
+| Data da validação não futura | restrição na função | amanhã recusado; hoje aceito |
+| .pdf só de aprovação existente; um atual por aprovação | referência e índice único parcial | segundo .pdf atual recusado; .pdf sem aprovação recusado |
+| .pdf com a regra do editar a aprovação | gatilho antes de incluir e de alterar | em andamento e concluído aceitos; suspenso, cancelado e arquivado recusados |
+| Aprovação nova guarda o .pdf da anterior | `registrar_aprovacao` | segunda aprovação deixa o .pdf antigo com `guardado_em` e sem .pdf atual |
+| .pdf substitui só o conteúdo e nunca se apaga | privilégio de coluna, sem privilégio de apagar | alterar `nome` recusado; apagar recusado para todo perfil |
+| Toda mudança vira evento | gatilhos | data registrada, alterada e apagada; .pdf enviado e substituído: um evento cada |
+
+#### Migração
+
+Não destrutiva: coluna nova em `processos`, tabela nova, função nova, `registrar_aprovacao` e a view recriadas, gatilhos de evento. Nenhum dado existente muda.
+
+### Decisões de teste
+
+- **Interface (ponto de teste principal: a tela inteira).** Vitest com Testing Library e as falsas nomeadas:
+  - a data da validação no Agora só na Validação com o setor; marcar, alterar, apagar, data futura recusada, falha ao gravar; a linha na gaveta depois de sair da etapa; Consulta só lendo;
+  - registrar a aprovação com e sem .pdf, .pdf com formato errado ou grande demais, falha no envio sem registrar nada;
+  - [Enviar .pdf] e [Substituir] na gaveta, sumindo no arquivado e para a Consulta;
+  - a segunda aprovação guardando o .pdf da anterior, que aparece no histórico com o link;
+  - as marcas da conferência no .pdf;
+  - os eventos novos no histórico.
+  - Arte anterior: `App.registrarAprovacao`, `App.aprovacaoNaGaveta`, `App.editarRegistros`, `App.dataDaModelagemPiloto`, `App.substituirArquivo`, `App.conferenciaNoDrive`.
+- **Funções puras:** nome padrão do .pdf, texto da data na gaveta, textos do histórico. Arte anterior: `textoDaModelagemPiloto`, `eventoDaAprovacao`.
+- **Tradução:** `registrarDataDaValidacao`, a leitura do .pdf e o envio pelo módulo real com o cliente simulado, e as frases das recusas novas. Arte anterior: `revisoesSupabase`, `frasesDeAprovacao`, `versoesSupabase`.
+- **Banco:** pgTAP, um teste por célula e por regra, antes da migração; o `40_aprovacao` ganha os casos do .pdf guardado; `10_privilegios_padrao` cobre a tabela nova.
+
+### Fora do escopo desta parte
+
+- Data da validação nas planilhas dos dashboards.
+- Registro de cada envio ao setor e da resposta (ADR 0012).
+- Mais de um .pdf por aprovação.
+- Campos em Concluídos e mudanças na Publicação.
+
+### Decisões tomadas ao escrever esta seção, a confirmar na leitura
+
+1. **A data da validação grava só com o processo na Validação com o setor**; depois, só leitura na gaveta. Pode ser apagada (fica vazia).
+2. **O .pdf se envia na janela de registrar a aprovação ou depois, na gaveta**, com a regra do [Editar] da aprovação (em andamento ou concluído, não arquivado), porque o documento protocolado costuma chegar depois do registro, às vezes com o processo já em Concluídos.
+3. **O .pdf fica numa tabela própria, ligada à aprovação**, e o da aprovação substituída fica guardado ali, baixável pelo histórico, em vez de só o nome no evento.
+4. **O nome do .pdf leva a versão aprovada** no momento do envio; se a aprovação for trocada por outra versão, o .pdf anterior fica guardado com o nome antigo.
+5. **O envio do .pdf vai pelo módulo de versões**, que já fala com a função do Drive, e não por um caminho novo.
+
+### Critérios conferidos olhando a tela
+
+- `[visual]` O campo da data da validação no Agora fica alinhado aos outros campos e cabe numa linha.
+- `[visual]` Na gaveta da Aprovação pelo setor, o .pdf aparece como os arquivos das versões (link com o nome padrão, marca, [Substituir]).
+- `[visual]` A janela "Registrar aprovação" com o campo do .pdf não passa da altura do notebook (1366×768).
 
 ## Andamento livre (mudança de 2026-10-23)
 
@@ -413,3 +558,4 @@ Entregue em 2026-10-20 (commit 6ce74d6), com ressalva: critérios [visual] presu
 
 Entregue em 2026-10-23 (commit ae1fb54), com ressalva: critérios [visual] da mudança de publicacao-e-arquivamento presumidos (a tela não foi vista); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
 Entregue em 2026-10-25 (commit cc17e13), com ressalva: critérios [visual] vistos só na vitrine local, com módulos falsos (as janelas de registrar revisão e aprovação e qualquer tela com o login real não foram vistas); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
+Em revisão desde 2026-10-26

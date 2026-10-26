@@ -2,9 +2,286 @@
 
 Status: ready-for-agent
 
-**Como resolve o problema.** Hoje os fluxogramas (.bpmn, .png e o .bpm do Bizagi) e os relatórios de cada processo ficam em pastas e e-mails, sem numeração confiável, sem saber quem enviou o quê e quando, e sem ligação com o andamento do processo. Com esta funcionalidade, o painel do processo ganha a seção **Versões**: a equipe envia cada versão (V1, V2…) com o .bpm do Bizagi e o .png, o .bpmn opcional e o relatório, junto ou depois (ADR 0016: o fluxo se vê pelo .png); registra as versões históricas da primeira etapa do trabalho (V5F); acrescenta o relatório que ficou pendente ou marca "sem alteração de conteúdo"; substitui um arquivo enviado por engano; e baixa qualquer arquivo com o nome padrão (`CEE_V6_Nome do processo`). Os arquivos ficam no Drive compartilhado do CED, numa pasta aberta à equipe e organizada por setor e processo; a plataforma entra no Drive por uma conta de serviço do EP, cuja chave fica só numa função do servidor, e o banco guarda apenas os dados de cada arquivo. A plataforma avisa quando um arquivo foi alterado ou apagado direto no Drive. O banco impõe as regras (numeração, versão histórica só antes da primeira nova, processo em andamento, quem pode) e toda mudança entra no histórico do processo.
+**Como resolve o problema (desde 2026-10-26, Arquivos por etapa).** Com o quadro livre, o processo anda pelas etapas sem trava, mas cada etapa tem um produto: o .bpm do piloto na Modelagem piloto, o .bpm técnico e o relatório na Relatório e modelagem técnica. O verso passa a mostrar só o envio que cabe na etapa atual: versão histórica (V5F) em Não iniciados, **versão piloto** (V6P, número digitado) na Modelagem piloto, **versão em sequência** (V7, número dado pela plataforma) e **relatório** com numeração própria (Relatório V2) na técnica e na Revisão interna. Toda versão que não é histórica exige só o .bpm; o .png e o .bpmn entram junto ou depois. O relatório vale para as versões seguintes até sair outro, e somem "relatório pendente" e "sem alteração de conteúdo". A **trava de arquivos** recusa passar da Modelagem piloto sem versão piloto e da técnica sem versão em sequência e relatório, e a janela da trava oferece o envio ali mesmo. A seção "Arquivos por etapa", logo abaixo, vale sobre o resto desta spec no que divergir.
+
+**Como resolvia antes de 2026-10-26.** Hoje os fluxogramas (.bpmn, .png e o .bpm do Bizagi) e os relatórios de cada processo ficam em pastas e e-mails, sem numeração confiável, sem saber quem enviou o quê e quando, e sem ligação com o andamento do processo. Com esta funcionalidade, o painel do processo ganha a seção **Versões**: a equipe envia cada versão (V1, V2…) com o .bpm do Bizagi e o .png, o .bpmn opcional e o relatório, junto ou depois (ADR 0016: o fluxo se vê pelo .png); registra as versões históricas da primeira etapa do trabalho (V5F); acrescenta o relatório que ficou pendente ou marca "sem alteração de conteúdo"; substitui um arquivo enviado por engano; e baixa qualquer arquivo com o nome padrão (`CEE_V6_Nome do processo`). Os arquivos ficam no Drive compartilhado do CED, numa pasta aberta à equipe e organizada por setor e processo; a plataforma entra no Drive por uma conta de serviço do EP, cuja chave fica só numa função do servidor, e o banco guarda apenas os dados de cada arquivo. A plataforma avisa quando um arquivo foi alterado ou apagado direto no Drive. O banco impõe as regras (numeração, versão histórica só antes da primeira nova, processo em andamento, quem pode) e toda mudança entra no histórico do processo.
 
 Decisões de origem: sabatina de 2026-10-15 (`.scratch/documentos-versoes/sabatina.md`), `CONTEXT.md` (seção "Documentos") e ADRs 0005 (versão do processo com os arquivos dentro), 0006 (envio não muda a etapa), 0007 (arquivo se substitui sem guardar o anterior) e 0008 (arquivos no Drive compartilhado por conta de serviço). Mudança de 2026-10-20 (sabatina do visualizador, que saiu da v1): ADR 0016 (versão exige .bpm e .png; .bpmn opcional); ver a seção "Mudança de 2026-10-20".
+
+## Arquivos por etapa (mudança de 2026-10-26)
+
+Parte 3 da iniciativa quadro-livre. Decisões de origem: `.scratch/quadro-livre/sabatina-parte-3.md` (itens 1 a 11 e 15 a 22), o mapa (`.scratch/quadro-livre/mapa.md`, Q14 e Q15) e os ADRs 0025 (arquivos por etapa, só o .bpm exigido, trava na Modelagem piloto e na técnica; substitui o 0016) e 0026 (relatório com numeração própria; muda o 0005 só no relatório). Continuam valendo os ADRs 0007, 0008 e 0011, o 0022 (andamento livre) e o 0024 (trava de Concluídos). Termos no `CONTEXT.md`: Versão, Versão em sequência, Versão piloto, Versão histórica, Relatório, Trava de arquivos e Substituir arquivo. A data da validação e o .pdf da aprovação, da mesma parte, estão na spec de `revisoes-aprovacao` (seção "Data da validação e .pdf da aprovação"); esta seção descreve o que muda na função do servidor para o .pdf. A mudança no movimento (trava ao mover) é descrita aqui e afeta a spec de `processos-etapas`.
+
+### O que deixa de valer no resto desta spec
+
+- **"Versão nova"** passa a ser de dois tipos: a versão piloto (V6P) e a versão em sequência (V7). Onde o texto antigo diz "versão nova", vale "versão em sequência", salvo nas regras de numeração e de arquivos abaixo.
+- **Arquivos exigidos (ADR 0016 e histórias 51 a 62):** a versão piloto e a versão em sequência exigem só o .bpm; .png e .bpmn são opcionais. A versão histórica continua como está. A "versão completa" (.bpm, .png e relatório) já não trava nada desde o ADR 0023 e sai também de `private.papeis_que_faltam`, que fica sem uso.
+- **Relatório:** saem "relatório pendente", [Acrescentar relatório], [Sem alteração de conteúdo], a marca "copiado de" e a ação `sem_alteracao` da função. O relatório deixa de ter o número da versão e passa a ter o seu (Relatório V1, V2…). Só .docx nos envios novos. Histórias 5, 22 a 27 e 45 (na parte do relatório) substituídas.
+- **Observação da versão:** sai do formulário, da lista e do banco (história 6).
+- **Onde se envia:** os botões de envio deixam de aparecer em qualquer etapa (história 13 continua: qualquer integrante envia, sendo ou não o responsável).
+- **Formulários** abrem e fecham pelo mesmo botão e rolam até aparecer inteiros.
+- **"Acrescentar o .bpmn depois"**, que estava fora do escopo, entra: [Acrescentar .png] e [Acrescentar .bpmn].
+
+### Solução
+
+- **O verso mostra só o envio da etapa atual** (para Administrador e Integrante, com o processo em andamento); a lista de versões aparece em todas as etapas, para todos:
+  - **Não iniciados:** [Registrar versão histórica], enquanto não há versão piloto nem em sequência.
+  - **Modelagem piloto:** [Enviar versão piloto], enquanto não há versão em sequência.
+  - **Relatório e modelagem técnica** e **Revisão interna:** [Enviar versão] e [Enviar relatório].
+  - **Validação com o setor, Aprovação pelo setor, Publicação, Concluídos e etapas novas do catálogo:** nenhum envio de versão nem de relatório. Correção pedida pelo setor: o processo volta à Revisão interna.
+- **Enviar versão piloto:** número digitado (vem preenchido com o menor aceito, maior que o de todas as versões do processo), .bpm obrigatório, .png e .bpmn opcionais. Prévia do rótulo (V6P) e dos nomes. Pode haver mais de uma, cada uma com número maior que o das anteriores.
+- **Enviar versão** (em sequência): número dado pela plataforma, a partir do maior que já existe, de qualquer tipo (V5F → V6P → V7). .bpm obrigatório; .png, .bpmn e relatório (.docx) opcionais. Com o relatório junto, ele recebe o próximo número de relatório e fica ligado a esta versão.
+- **Enviar relatório:** só o .docx, sem versão; a prévia diz "Relatório V3, acompanha a V8" (a versão mais recente, de qualquer tipo que não seja histórica).
+- **Relatório que vale:** cada versão mostra os relatórios enviados com ela ou depois dela, enquanto era a mais recente ("Relatório V2", "Relatório V3"); a versão sem relatório próprio mostra o último anterior, "Relatório V2 (da V7)"; antes do primeiro relatório, nada. O relatório da versão histórica aparece como "Relatório da V5F", e os .pdf antigos continuam como estão, sem número.
+- **Acrescentar depois:** na versão piloto ou em sequência que não tem .png ou .bpmn, [Acrescentar .png] e [Acrescentar .bpmn], exceto na versão aprovada. Valem em qualquer etapa com o processo em andamento, porque completam uma versão que já existe.
+- **Substituir:** nos arquivos da versão piloto e da versão em sequência e em cada relatório numerado. A versão histórica e a versão aprovada, com os relatórios ligados a ela, continuam sem [Substituir] (ADR 0011).
+- **Trava de arquivos (ADR 0025):** ao mover o processo para a frente (pela lista do Agora ou arrastando), se ele vem de uma etapa com trava ou de antes dela e vai para depois dela, faltando o que ela exige:
+  - **Modelagem piloto:** uma versão piloto;
+  - **Relatório e modelagem técnica:** uma versão em sequência e um relatório numerado, sem importar a ligação entre os dois.
+
+  O processo não se move e abre a janela "Para sair da Modelagem piloto, envie a versão piloto (.bpm)" (ou "… da Relatório e modelagem técnica, envie a versão e o relatório", dizendo só o que falta), com o formulário de envio ali mesmo e o botão [Enviar e mover]. Depois do envio, o processo se move. Se a ida passa por duas etapas com trava, a janela da segunda abre depois da primeira; se o destino é Concluídos, a janela da chegada (ADR 0024) vem por último. Voltar, mudar a etiqueta e mover o processo que já estava depois da etapa não travam.
+- **Histórico:** eventos novos de versão piloto enviada, relatório enviado e arquivo acrescentado; os eventos antigos ("relatório acrescentado", "sem alteração de conteúdo") mantêm o texto.
+
+A Consulta vê tudo (versões, relatórios, rótulos, o relatório que vale) e baixa, sem nenhum botão. O subprocesso tem as mesmas regras, com numeração e travas próprias, sem herdar do pai.
+
+### Histórias de usuário
+
+#### Envio por etapa
+
+63. Como integrante do EP, quero ver no verso só o envio que cabe na etapa em que o processo está, para não ter de escolher entre formulários de todas as etapas.
+64. Como usuário, quero ver a lista de versões e relatórios em todas as etapas, inclusive nas que não têm envio.
+65. Como integrante do EP, quero que [Registrar versão histórica] apareça só em Não iniciados e só enquanto o processo não tem versão piloto nem em sequência.
+66. Como integrante do EP, quero que [Enviar versão piloto] apareça só na Modelagem piloto e só enquanto não há versão em sequência.
+67. Como integrante do EP, quero [Enviar versão] e [Enviar relatório] na Relatório e modelagem técnica e na Revisão interna.
+68. Como integrante do EP, quero que a Validação com o setor, a Aprovação pelo setor, a Publicação, Concluídos e as etapas novas do catálogo não tenham envio de versão nem de relatório, para que a correção pedida pelo setor volte à Revisão interna.
+69. Como integrante do EP que esqueceu um arquivo, quero mover o processo de volta à etapa e enviar ali, sem a plataforma me impedir de voltar.
+70. Como integrante do EP, quero que o formulário abra e feche pelo mesmo botão e role até aparecer inteiro, para não perder o fim dele abaixo da dobra.
+
+#### Versão piloto
+
+71. Como integrante do EP, quero enviar a versão piloto com o número digitado e o sufixo P (V6P), para seguir a numeração que a equipe já usa.
+72. Como integrante do EP, quero que o número venha preenchido com o menor aceito, e poder trocá-lo por um maior.
+73. Como integrante do EP, quero que a plataforma recuse um número que não seja maior que o de todas as versões do processo, com a frase dizendo o mínimo.
+74. Como integrante do EP, quero, num processo sem versão histórica, poder começar a versão piloto de qualquer número a partir de 1.
+75. Como integrante do EP, quero enviar mais de uma versão piloto (V6P, V7P), cada uma maior que as anteriores.
+76. Como integrante do EP, quero que a versão piloto exija só o .bpm e aceite o .png e o .bpmn junto, se eu tiver.
+77. Como integrante do EP, quero que a plataforma recuse versão piloto depois da primeira versão em sequência.
+78. Como integrante do EP, quero ver na prévia o rótulo V6P e o nome de cada arquivo (`CEE_V6P_Nome do processo.bpm`).
+
+#### Versão em sequência
+
+79. Como integrante do EP, quero que a versão em sequência continue do maior número que existe, de qualquer tipo (V6P → V7), sem eu digitar.
+80. Como integrante do EP, quero que a versão em sequência exija só o .bpm.
+81. Como integrante do EP, quero enviar o .png, o .bpmn e o relatório junto, se tiver.
+82. Como integrante do EP, quero que, depois da primeira versão em sequência, não entrem mais versões históricas nem piloto.
+83. Como integrante do EP, quero que o botão de enviar fique desabilitado só enquanto falta o .bpm (ou o número da piloto, ou o .docx no envio de relatório).
+
+#### Relatório
+
+84. Como integrante do EP, quero enviar o relatório sozinho, sem versão nova, porque o relatório muda menos que o fluxograma.
+85. Como integrante do EP, quero que o relatório receba a numeração própria do processo (Relatório V1, V2…), dada pela plataforma.
+86. Como integrante do EP, quero ver na prévia o número do relatório e a versão que ele acompanha ("Relatório V3, acompanha a V8") e o nome do arquivo (`CEE_V8_Nome do processo_Relatório V3.docx`).
+87. Como integrante do EP, quero que o relatório enviado junto com uma versão fique ligado a ela.
+88. Como integrante do EP, quero que só o .docx seja aceito no relatório, com a frase dizendo o formato esperado.
+89. Como usuário, quero ver em cada versão o relatório que vale para ela: o seu, ou o último anterior com "(da V7)".
+90. Como usuário, quero que a versão nova sem relatório próprio não tenha marca de pendência.
+91. Como usuário, quero ver o relatório da versão histórica como "Relatório da V5F" e os .pdf antigos como estão.
+92. Como integrante do EP, quero que o primeiro relatório enviado pela plataforma seja o Relatório V1, mesmo que a versão histórica tenha relatório.
+
+#### Acrescentar e substituir
+
+93. Como integrante do EP, quero [Acrescentar .png] e [Acrescentar .bpmn] na versão piloto ou em sequência que não os tem, para completar a versão depois.
+94. Como integrante do EP, quero que acrescentar não apareça na versão aprovada nem na histórica, e que a plataforma recuse mesmo fora da tela.
+95. Como integrante do EP, quero substituir um arquivo da versão piloto, da versão em sequência ou um relatório numerado enviado por engano.
+96. Como integrante do EP, quero que a versão aprovada e os relatórios ligados a ela continuem sem [Substituir].
+
+#### Trava de arquivos
+
+97. Como integrante do EP, quero ser impedido de passar da Modelagem piloto sem versão piloto, para o processo não seguir sem o produto da etapa.
+98. Como integrante do EP, quero ser impedido de passar da Relatório e modelagem técnica sem versão em sequência e relatório.
+99. Como integrante do EP, quero que a trava valha pela lista do Agora e ao arrastar o cartão, inclusive quando o destino pula por cima da etapa.
+100. Como integrante do EP, quero ver numa janela o que falta, só o que falta, e enviar ali mesmo, para o processo se mover logo depois do envio.
+101. Como integrante do EP, quero que, ao fechar a janela sem enviar, o processo fique onde estava.
+102. Como integrante do EP, quero que, se o envio falhar na janela, o processo fique onde estava e eu veja a mensagem sem perder o que escolhi.
+103. Como integrante do EP, quero que voltar, mudar a etiqueta e mover um processo que já estava depois da etapa não travem.
+104. Como integrante do EP, quero que os processos que passaram da Modelagem piloto antes desta mudança, sem versão piloto, continuem andando sem aviso.
+105. Como integrante do EP, quero que a ida que passa pelas duas etapas com trava peça uma de cada vez, e que a chegada a Concluídos venha depois.
+106. Como administrador, quero que o banco recuse o movimento sem os arquivos mesmo fora da tela.
+
+#### Perfis, histórico, subprocesso
+
+107. Como Consulta, quero ver versões, relatórios e o relatório que vale e baixar tudo, sem nenhum botão.
+108. Como integrante do EP, quero que o processo suspenso, cancelado ou concluído não tenha envio, acréscimo nem substituição.
+109. Como usuário, quero ver no histórico "Enviou a versão piloto V6P", "Enviou o Relatório V3 (acompanha a V8)" e "Acrescentou o .png à V7", e os eventos antigos com o texto de antes.
+110. Como integrante do EP, quero que o subprocesso tenha numeração de versões e relatórios e travas próprias, sem herdar do pai.
+
+#### Dados do desenvolvimento
+
+111. Como integrante do EP, quero que as versões em sequência que já existem continuem em sequência, que os relatórios .docx atuais ganhem número na ordem do envio, e que os "sem alteração de conteúdo" deixem de ser relatórios próprios.
+
+### Decisões de implementação
+
+#### Interface
+
+- **Seção de versões no verso** (coluna esquerda, a de hoje): o destaque e as "Versões anteriores (n)" continuam. Mudam:
+  - os botões de envio, que passam a depender da etapa atual (lista da Solução);
+  - o rótulo, V6P na piloto;
+  - a linha do relatório, com o relatório que vale;
+  - a pílula "falta relatório" e o espaço tracejado [+ Acrescentar relatório], que saem;
+  - o espaço tracejado, que passa a ser [+ Acrescentar .png] e [+ Acrescentar .bpmn] quando faltam;
+  - a observação, que sai.
+- **Formulários:** um componente de formulário de versão com três modos (histórica, piloto, em sequência), mais o formulário de relatório, que perde a escolha da versão. Campos de arquivo nativos com `accept`. O botão do envio abre e fecha o formulário, e ao abrir ele rola até aparecer inteiro.
+- **Janela da trava:** no padrão da janela da chegada a Concluídos (mesma moldura, `JanelaDeEdicao`), com o título "Para sair da {etapa}, envie…", o formulário do que falta (versão piloto; ou versão e relatório, ou só um dos dois) e [Enviar e mover]. Envia, mostra o progresso, e só então move.
+- **Decisão de travar na tela:** uma função pura recebe o processo (o que ele tem: versão piloto, versão em sequência, relatório numerado), a etapa de origem, a de destino e o catálogo, e devolve a primeira etapa com trava que falta, ou nada. O movimento consulta essa função antes da regra da chegada a Concluídos. O banco recusa do mesmo jeito (defesa contra a tela).
+- **Relatório que vale:** função pura sobre a lista de versões.
+- **Módulo de versões:** sai `semAlteracaoDeConteudo`; `acrescentarRelatorio` vira `enviarRelatorio(processoId, numeroDaVersao, numeroDoRelatorio, arquivo)`; `enviarVersao` ganha o tipo (piloto ou em sequência); entra `acrescentarArquivo(versao, papel, arquivo)`. A falsa nomeada acompanha, imitando as recusas do banco.
+- **Recusas novas, com a frase:**
+  - versão piloto com número que não é maior que o de todas: "O número da versão piloto precisa ser maior que {n}.";
+  - versão piloto ou histórica depois da versão em sequência;
+  - versão sem .bpm: "A versão precisa do .bpm.";
+  - relatório que não é .docx;
+  - acrescentar arquivo que a versão já tem;
+  - acrescentar ou substituir na versão aprovada;
+  - envio fora das etapas em que cabe (banco);
+  - trava: "Para sair da Modelagem piloto, envie a versão piloto (.bpm)." e "Para sair da Relatório e modelagem técnica, envie {a versão | o relatório | a versão e o relatório}.".
+
+  Saem as recusas de "relatório já existente", "versão anterior sem relatório" e `versao_sem_bpm_e_png`.
+- **Estados da tela:** os da seção continuam (carregando, "Nenhuma versão enviada.", erro com [Tentar de novo], conferência que falhou, "Enviando 2 de 3…", falha em vermelho sem perder o preenchido). A janela da trava tem os mesmos estados do envio e, na falha do movimento depois do envio, diz "Os arquivos foram enviados, mas o processo não foi movido." com o movimento podendo ser refeito (os arquivos já estão registrados, e a trava não abre de novo).
+
+#### Nome padrão dos arquivos
+
+- Versão piloto: `{SIGLA}_V{n}P_{Nome do processo}.{bpm|png|bpmn}`.
+- Relatório numerado: `{SIGLA}_V{n}[P]_{Nome do processo}_Relatório V{r}.docx`, com a versão que ele acompanha.
+- A regra de caracteres e o nome guardado no envio não mudam; nomes já gravados não mudam.
+
+#### Função do servidor (`arquivos-no-drive`)
+
+- `iniciar_envio` e `registrar` passam a aceitar as operações:
+  - versão piloto, com o número digitado;
+  - relatório numerado, sem versão escolhida: a função repete na conferência o número do relatório e a versão da prévia, e o banco recusa se mudaram, como já faz com o número da versão;
+  - acrescentar arquivo (.png ou .bpmn) a uma versão existente;
+  - e o .pdf da aprovação (enviar e substituir; spec de `revisoes-aprovacao`).
+- Sai a ação `sem_alteracao`.
+- `conferir` e `baixar` passam a cobrir o .pdf da aprovação.
+- O arquivo puro de decisão ganha as operações novas, com a mesma tabela de perfis: Administrador e Integrante enviam; Consulta só baixa e confere; inativo e sem login, nada.
+- A extensão aceita no relatório novo passa a ser só .docx.
+- **Precisa ser publicada de novo no desenvolvimento** (passo do usuário, roteiro em `docs/`).
+
+#### Modelo de dados
+
+**Tabela `versoes`, alterada:**
+
+| Coluna | Tipo | Obrigatória | Observação |
+|---|---|---|---|
+| `piloto` | boolean | sim | nova; falso por padrão; nunca verdadeira junto com `historica` |
+| `numero` | integer | sim | na histórica e na piloto, digitado; na em sequência, dado pelo banco (maior do processo + 1, de qualquer tipo) |
+| `observacao` | — | — | **sai** |
+
+**Tabela `arquivos_da_versao`, alterada:**
+
+| Coluna | Tipo | Obrigatória | Observação |
+|---|---|---|---|
+| `numero_do_relatorio` | integer | não | nova; no relatório de versão piloto ou em sequência, dado pelo banco (maior do processo + 1); nula nos outros papéis, no relatório da histórica e nos .pdf antigos |
+| `copiado_de` | — | — | **sai** |
+
+- A unicidade (versão, papel) passa a valer para todo papel menos o relatório numerado: uma versão pode ter mais de um relatório numerado (enviados enquanto ela era a mais recente).
+- O número do relatório é único por processo.
+
+**View `processos_com_andamento`:** ganha `tem_versao_piloto`, `tem_versao_em_sequencia` e `tem_relatorio_numerado` (calculados, não guardados), lidos pela tela para decidir a janela da trava antes de mover.
+
+**Quem pode o quê:** a tabela "quem pode o quê" desta spec continua valendo. A coluna `numero_do_relatorio` não é alterável por ninguém (só o banco a preenche), e a substituição continua alterando só tamanho, hash, autor e data. O .pdf da aprovação tem a sua tabela na spec de `revisoes-aprovacao`.
+
+**Arquivos (no Drive, sem Storage):** .bpm, .png e .bpmn na versão piloto e na em sequência; .docx no relatório numerado; até 20 MB cada; Administrador e Integrante enviam, acrescentam e substituem; todo perfil ativo vê e baixa; a substituição grava no mesmo arquivo do Drive, sem guardar o anterior (ADR 0007). Nenhum bucket.
+
+**Regras que o banco impõe** (novas ou alteradas):
+
+| Regra | Como | Caso de teste que a prova |
+|---|---|---|
+| Versão histórica só com o processo em Não iniciados e sem versão piloto nem em sequência | gatilho antes de incluir em `versoes` | histórica em Não iniciados aceita; na Modelagem piloto recusada; depois da V6P recusada |
+| Versão piloto com número maior que o de todas as versões do processo e só antes da primeira em sequência | gatilho antes de incluir | V6P depois da V5F aceita; V5P depois da V5F recusada; V3P sem versão aceita; V7P depois da V6P aceita; piloto depois da V7 recusada |
+| Versão piloto só até a Modelagem piloto; versão em sequência e relatório só até a Revisão interna (pela ordem do catálogo) | gatilho antes de incluir em `versoes` e em `arquivos_da_versao` | piloto em Não iniciados aceita (envio da janela da trava); piloto na técnica recusada; versão e relatório na Validação com o setor recusados; em etapa nova do catálogo depois da Revisão interna recusados |
+| Versão em sequência: maior número do processo + 1, de qualquer tipo | gatilho que já existe, ajustado | V6P → V7; V5F → V6; sem versão → V1 |
+| Versão piloto e em sequência exigem só o .bpm; histórica como antes | gatilho adiado, recriado | piloto só com .bpm aceita; em sequência só com .bpm aceita; sem .bpm recusada; histórica só com .png recusada |
+| Relatório numerado: só .docx, número do processo + 1, ligado à versão mais recente que não é histórica | gatilho antes de incluir em `arquivos_da_versao` | relatório sozinho com V8 mais recente fica na V8 com o próximo número; .pdf recusado; relatório sem versão piloto nem em sequência recusado; segundo relatório na mesma versão aceito |
+| Acrescentar .png ou .bpmn só na versão piloto ou em sequência que não o tem, fora da aprovada | gatilho antes de incluir | acrescentar .png à V7 sem .png aceito; à V7 que já tem recusado; à versão aprovada recusado; à histórica recusado |
+| Versão aprovada e relatórios ligados a ela sem substituição | gatilho que já existe (ADR 0011), estendido ao relatório numerado | substituir relatório ligado à versão aprovada recusado |
+| Trava de arquivos ao mover para a frente | `mover_processo` | da Modelagem piloto à técnica sem piloto recusado; de Não iniciados à Revisão interna sem piloto recusado; da técnica à Validação sem relatório recusado; com versão e relatório (ligados a versões diferentes) aceito; voltar da Validação à Modelagem piloto sem nada aceito; processo já na Validação sem piloto movido a Publicação aceito; etapa com trava desativada no catálogo não trava |
+| Toda mudança vira evento | gatilhos que já existem, com textos novos | versão piloto, relatório enviado e arquivo acrescentado geram um evento cada |
+
+**Regras de estado:** a versão continua sem situação guardada; o "relatório que vale" e "tem versão piloto, em sequência e relatório" são calculados. Mover para trás não apaga versão nem relatório. Nenhuma versão muda a etapa (ADR 0006).
+
+**Migração (destrutiva, só dados inventados do desenvolvimento):**
+
+- apaga `versoes.observacao`;
+- apaga as linhas de relatório com `copiado_de` preenchido (os "sem alteração de conteúdo") e depois a coluna (as cópias no Drive ficam na pasta, como os órfãos; os eventos antigos ficam com o texto);
+- numera os relatórios .docx das versões que não são históricas na ordem do envio, por processo;
+- deixa sem número os .pdf e o relatório da histórica;
+- as versões em sequência atuais continuam em sequência (nenhuma vira piloto);
+- recria os gatilhos, a view e `mover_processo`.
+
+A produção ainda não existe; o teste pgTAP de cada regra vem antes, e a migração vai pelo workflow "Migrar banco de desenvolvimento".
+
+### Decisões de teste
+
+- **Bom teste** confere o que a pessoa vê e consegue fazer, ou o que a função do servidor e o banco aceitam e recusam, nunca detalhes internos.
+- **Interface (ponto de teste principal: a tela inteira).** Vitest com Testing Library, renderizando o aplicativo inteiro com as falsas nomeadas (versões, processos, revisões, acesso), como nos `App.*` de hoje. A falsa de versões aprende a versão piloto, o relatório numerado e o acrescentar, e imita as recusas novas. A de processos recusa o movimento sem os arquivos, como o banco. O que cobre:
+  - os botões de envio em cada etapa (Não iniciados, Modelagem piloto, técnica, Revisão interna, Validação, Concluídos, etapa nova) e a lista em todas;
+  - versão piloto com o número preenchido, número trocado, número baixo recusado, piloto sem histórica a partir de 1, duas pilotos, sumindo depois da V7;
+  - versão em sequência só com .bpm, com .png, .bpmn e relatório, numeração depois da P;
+  - relatório sozinho com a prévia "Relatório V3, acompanha a V8", .pdf recusado, dois relatórios na mesma versão;
+  - o relatório que vale ("(da V7)"), a versão sem marca de pendência, "Relatório da V5F" e o .pdf antigo;
+  - acrescentar .png e .bpmn, sumindo na versão aprovada e na histórica;
+  - substituir relatório numerado, e sem [Substituir] nos ligados à versão aprovada;
+  - a trava pela lista e ao arrastar, com o texto de só o que falta, enviar e mover, fechar sem enviar, falha no envio, falha no movimento depois do envio, as duas travas em sequência, depois a chegada a Concluídos; voltar sem trava; processo já adiante sem trava;
+  - formulário que abre e fecha e rola até aparecer;
+  - Consulta sem botões; processo suspenso sem envio;
+  - os eventos novos e os antigos no histórico;
+  - os testes de hoje que usam observação, relatório pendente, sem alteração ou versão nova sem tipo passam ao modelo novo (`App.enviarVersao`, `App.versoesNoProcesso`, `App.relatorioDepois`, `App.arquivosDoVerso`, `App.versoesNoHistorico`, `App.substituirArquivo`, `App.registrarVersaoHistorica`, `App.arrastarParaMover`, `App.agoraDoVerso`).
+  - Arte anterior: esses mesmos e `App.chegadaAConcluidos` (janela no movimento).
+- **Funções puras:** rótulo (V6P), número mínimo da piloto, relatório que vale, primeira trava que falta (com catálogo de etapa desativada e etapa nova), papéis exigidos por tipo, nome padrão (piloto e relatório numerado), textos do histórico. Arte anterior: `rotulos`, `formularioDeVersao`, `destinoDoArrastar`, `publicacao` (`chegadaPedeJanela`), e o teste do nome padrão da função.
+- **Função do servidor:** o arquivo puro de decisão, no Vitest, com as operações novas por perfil e as entradas inválidas; a ponta a ponta se confere publicando no desenvolvimento.
+- **Tradução entre o servidor e a tela:** o módulo real com o cliente e o `fetch` simulados, para enviar versão piloto, relatório, acrescentar e as frases das recusas novas. Arte anterior: `versoesSupabase`, `recusasDeVersoes`.
+- **Banco:** pgTAP, um teste por regra da tabela acima, no Docker local durante o desenvolvimento e pelo "Testes de banco" na conferência final. Os testes `27` (versões), `28` (históricas), `29` (relatório depois, reescrito para o relatório numerado), `30` (substituir) e `52` (mover) mudam; `10_privilegios_padrao` e `46_funcoes_e_views_seguras` continuam passando.
+- Todos os processos, setores, usuários e arquivos dos testes são inventados.
+
+### Fora do escopo desta parte
+
+- Outros anexos (parte 4) e visualização por setores (parte 5).
+- Numerar o relatório da versão histórica e os .pdf antigos.
+- Rever versões já gravadas (nenhuma vira piloto; os processos adiante sem piloto ficam assim).
+- "Corrigida" para correção só do relatório: a revisão "corrigida" continua apontando para a versão enviada na passagem (sabatina, item 3).
+- Limpar no Drive as cópias dos "sem alteração" apagadas do banco.
+- Pendência "versão sem relatório" no painel geral (deixou de existir).
+
+### Decisões tomadas ao escrever esta seção, a confirmar na leitura
+
+1. **O banco limita onde cada envio cabe pela ordem do catálogo, não pela etapa exata:** versão piloto até a Modelagem piloto, versão em sequência e relatório até a Revisão interna, histórica só em Não iniciados. Assim a janela da trava pode enviar a versão piloto com o processo ainda em Não iniciados. A tela mostra só o envio da etapa atual.
+2. **A versão enviada pela janela da trava registra a etapa em que o processo estava** (por exemplo, Não iniciados), e não a etapa da trava.
+3. **Uma janela por etapa com trava**, na ordem do catálogo, e a da chegada a Concluídos por último, em vez de uma janela só com tudo.
+4. **Etapa com trava desativada no catálogo não trava.**
+5. **O relatório numerado fica junto dos arquivos da versão** (papel relatório, com o número próprio), e não numa tabela nova: baixar, substituir e conferir no Drive continuam pelo mesmo caminho.
+6. **O relatório que vale numa versão** é o de maior número entre os ligados a ela ou a versões anteriores.
+7. **O relatório pode acompanhar uma versão piloto**, quando enviado na técnica antes da primeira versão em sequência ("Relatório V1, acompanha a V6P").
+8. **O número da versão piloto vem preenchido** com o menor aceito, em vez de vazio.
+9. **Acrescentar .png e .bpmn vale em qualquer etapa** com o processo em andamento, porque completa uma versão que já existe.
+10. **A tela decide a janela pela view** (campos novos) antes de mover, além da recusa do banco, para a trava vir antes da janela da chegada a Concluídos.
+
+### Divergência com `.scratch/especificacao.md`
+
+- A especificação numera o piloto como versão comum (V6) e o relatório com o número da versão que ele acompanha, com "relatório pendente" e "sem alteração de conteúdo" (seção 4, itens 16 e 19, e o campo de versão do documento). Agora: piloto com sufixo P e número digitado; relatório com numeração própria (ADR 0026).
+- A especificação pede .bpmn e .png no piloto e três arquivos na versão que vai ao setor. Agora: só o .bpm é exigido (ADR 0025).
+
+### Critérios conferidos olhando a tela
+
+- `[visual]` O verso mostra só o botão de envio da etapa atual; nas etapas sem envio, a lista de versões aparece sem espaço vazio no lugar dos botões.
+- `[visual]` A janela da trava diz o que falta na primeira linha e mostra o formulário inteiro sem passar da altura do notebook (1366×768).
+- `[visual]` A linha do relatório no destaque mostra "Relatório V2" ou "Relatório V2 (da V7)" sem quebrar a linha dos arquivos; [+ Acrescentar .png] e [+ Acrescentar .bpmn] no padrão tracejado de hoje.
+- `[visual]` O formulário aberto rola até aparecer inteiro e fecha pelo mesmo botão.
+
+### Outras specs afetadas
+
+- `revisoes-aprovacao`: data da validação e .pdf da aprovação (seção própria, da mesma data).
+- `processos-etapas`: o movimento ganha a trava de arquivos (`mover_processo`, a view e o Quadro ao arrastar). Esta seção é a que vale; a spec de `processos-etapas` não foi alterada.
 
 ## Problema
 
@@ -438,3 +715,4 @@ Entregue em 2026-10-16 (commit 869901d), com ressalva: critérios [visual] presu
 Entregue em 2026-10-19 (commit 8ef4091), com ressalva: as provas no Drive real (critérios 3 e 4 do ticket 08 e a saída do Integrante dos tickets 01, 02, 04 e 05) seguem pendentes; a tela dos arquivos foi vista só na vitrine local, com módulos falsos
 Implementado em 2026-10-20 (commit 95f2881)
 Entregue em 2026-10-20 (commit 02c0aa7), com ressalva: os dois critérios [visual] da mudança do .bpm (ordem dos campos do formulário e ordem dos arquivos no destaque) presumidos, a tela foi vista só na vitrine local, com módulos falsos; as provas no Drive real da entrega anterior seguem pendentes
+Em revisão desde 2026-10-26
