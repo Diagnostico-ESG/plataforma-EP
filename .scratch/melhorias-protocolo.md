@@ -930,3 +930,10 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **2026-10-26 · Ocorrência: o pre-commit (typecheck e ESLint) barrou o commit duas vezes** (testes novos já usando campos que o código ainda não tinha; complexidade e 300 linhas num teste). Corrigi a causa; sem `--no-verify`.
 - **2026-10-26 · Ocorrência: o `python` do ambiente é o atalho da Microsoft Store (não roda) e o shell recusou textos longos com aspas dentro de `bash`;** as edições em lote foram feitas com Node e com a ferramenta de arquivos. `cd` num comando do shell muda o diretório primário da sessão: voltei à raiz a cada comando.
 - **2026-10-26 · Ocorrência: `gh` voltou autenticado** (a pendência de 2026-10-23 se resolveu); os workflows "Testes de banco" e "Migrar banco de desenvolvimento" foram disparados por `gh workflow run`.
+
+## 2026-10-26 — /executar-complexo (documentos-versoes, ticket 10)
+
+- **2026-10-26 · Itens não testados que aconteceram:** Edge Function com a decisão em arquivo puro testado no Vitest (relatório numerado por entrada e por perfil); TDD de banco com o teste visto falhar no "Testes de banco" antes da migração (#40338940180); migração aplicada pelo workflow "Migrar banco de desenvolvimento"; branch comum no `/executar-complexo` (a da parte); `plano-10.md`; linha `Concluído em` no ticket.
+- **2026-10-26 · Ocorrência: a trava de git bloqueou um `sed -i "6s/.*/…/"` como se fosse apagar a pasta `.git`** (falso positivo; o padrão `.*` foi lido como mexer em `.git`). Não contornei: refiz a edição com a ferramenta de edição. A trava pode estar casando `.*` junto de `/` como caminho.
+- **2026-10-26 · Ocorrência: o pre-commit barrou o commit da função do servidor** por limite de linhas e de complexidade (`registro.ts`, `registro.test.ts`); corrigi extraindo funções e dividindo o arquivo de teste, sem `--no-verify`.
+- **2026-10-26 · Ocorrência: o banco de desenvolvimento só aceita `SET LOCAL session_replication_role`; `set_config(…)` com o mesmo parâmetro falha ("permission denied to set parameter").** Vale para migrações e testes; registrado na migração.
