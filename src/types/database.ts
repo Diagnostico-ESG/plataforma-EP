@@ -39,6 +39,81 @@ export type Database = {
   }
   public: {
     Tables: {
+      anexos: {
+        Row: {
+          drive_id: string
+          enviado_em: string
+          enviado_por: string
+          etapa_id: string
+          formato: string
+          hash_md5: string
+          id: string
+          nome: string
+          processo_id: string
+          tamanho: number
+        }
+        Insert: {
+          drive_id: string
+          enviado_em?: string
+          enviado_por: string
+          etapa_id: string
+          formato: string
+          hash_md5: string
+          id?: string
+          nome: string
+          processo_id: string
+          tamanho: number
+        }
+        Update: {
+          drive_id?: string
+          enviado_em?: string
+          enviado_por?: string
+          etapa_id?: string
+          formato?: string
+          hash_md5?: string
+          id?: string
+          nome?: string
+          processo_id?: string
+          tamanho?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anexos_enviado_por_fkey"
+            columns: ["enviado_por"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "anexos_etapa_id_fkey"
+            columns: ["etapa_id"]
+            isOneToOne: false
+            referencedRelation: "etapas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "anexos_etapa_id_fkey"
+            columns: ["etapa_id"]
+            isOneToOne: false
+            referencedRelation: "processos_com_andamento"
+            referencedColumns: ["etapa_atual_id"]
+          },
+          {
+            foreignKeyName: "anexos_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: false
+            referencedRelation: "processos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "anexos_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: false
+            referencedRelation: "processos_com_andamento"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       aprovacoes: {
         Row: {
           aprovada_em: string | null
@@ -515,6 +590,7 @@ export type Database = {
           criado_em: string
           data_da_modelagem_piloto: string | null
           data_da_validacao: string | null
+          drive_pasta_dos_anexos: string | null
           explicacao_sem_publicacao: string | null
           id: string
           link_da_publicacao: string | null
@@ -539,6 +615,7 @@ export type Database = {
           criado_em?: string
           data_da_modelagem_piloto?: string | null
           data_da_validacao?: string | null
+          drive_pasta_dos_anexos?: string | null
           explicacao_sem_publicacao?: string | null
           id?: string
           link_da_publicacao?: string | null
@@ -563,6 +640,7 @@ export type Database = {
           criado_em?: string
           data_da_modelagem_piloto?: string | null
           data_da_validacao?: string | null
+          drive_pasta_dos_anexos?: string | null
           explicacao_sem_publicacao?: string | null
           id?: string
           link_da_publicacao?: string | null
@@ -1078,6 +1156,10 @@ export type Database = {
           p_tipo: Database["public"]["Enums"]["tipo_de_processo"]
         }
         Returns: undefined
+      }
+      registrar_anexo: {
+        Args: { p_arquivo: Json; p_processo: string }
+        Returns: string
       }
       registrar_aprovacao: {
         Args: {
