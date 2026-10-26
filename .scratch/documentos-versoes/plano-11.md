@@ -41,51 +41,51 @@
 
 ## Tarefa 1: Testes de banco antes da migração (critério 1 do ticket)
 
-- [ ] Ler `supabase/tests/52_mover_processo.test.sql` inteiro e `56_versao_piloto.test.sql` (como se cria versão piloto/em sequência/relatório numerado nos testes) para copiar o padrão (`plan(N)`, `_tap`, usuários fictícios, `pg_temp.*`).
-- [ ] `59_trava_de_arquivos.test.sql` (novo): Modelagem piloto → técnica sem piloto recusado (`trava_piloto`); Não iniciados → Revisão interna sem piloto recusado (pula por cima); com versão piloto aceito; com versão em sequência e sem piloto aceito (decisão 2); técnica → Validação sem nada recusado (`trava_tecnica:versao_e_relatorio`), só com versão `…:relatorio`, só com relatório `…:versao`; versão e relatório ligados a versões diferentes aceito; Revisão interna → Aprovação também confere a técnica? **(não: Revisão interna tem ordem maior que a técnica, não trava)**; voltar sem nada aceito; processo que já estava adiante (Validação → Publicação) sem nada aceito; mudar a etiqueta sem nada aceito; etapa desativada no catálogo não trava (`update etapas set ativa = false`, desfeito no fim); relatório sem número (pdf antigo) não conta; Consulta e visitante continuam recusados antes da trava (perfil primeiro); os três campos da view (`tem_versao_piloto`, `tem_versao_em_sequencia`, `tem_relatorio_numerado`) nos casos sem nada, só piloto, só sequência e relatório, e dois processos independentes (subprocesso sem herdar do pai).
-- [ ] Rodar `grep -rln "mover_processo" supabase/tests` e, para cada teste que **move para além da Modelagem piloto ou da técnica** sem ter os arquivos (52, 17, 20, 21, 37, 39, 40, 41, 44, 49, 50, 51, 53, 54, 55, 57…), listar o que precisa de ajuste. O ajuste mecânico é montar o piloto, a versão e o relatório do processo antes do movimento (função de apoio por teste, dados inventados). Não ajustar ainda: o vermelho primeiro mostra os que quebram de verdade (Tarefa 2 os conserta).
-- [ ] `52_mover_processo`: ajustado onde o movimento atravessa as etapas com trava; os casos novos da trava ficam no 59.
-- [ ] Commit só dos testes novos e do 52 (`git add supabase/tests`), `git push` da branch e disparar o workflow "Testes de banco" na branch. **Esperado: vermelho pelo motivo certo** (a recusa não existe; coluna da view inexistente). Anotar o número da execução em `desvios.md`.
+- [x] Ler `supabase/tests/52_mover_processo.test.sql` inteiro e `56_versao_piloto.test.sql` (como se cria versão piloto/em sequência/relatório numerado nos testes) para copiar o padrão (`plan(N)`, `_tap`, usuários fictícios, `pg_temp.*`).
+- [x] `59_trava_de_arquivos.test.sql` (novo): Modelagem piloto → técnica sem piloto recusado (`trava_piloto`); Não iniciados → Revisão interna sem piloto recusado (pula por cima); com versão piloto aceito; com versão em sequência e sem piloto aceito (decisão 2); técnica → Validação sem nada recusado (`trava_tecnica:versao_e_relatorio`), só com versão `…:relatorio`, só com relatório `…:versao`; versão e relatório ligados a versões diferentes aceito; Revisão interna → Aprovação também confere a técnica? **(não: Revisão interna tem ordem maior que a técnica, não trava)**; voltar sem nada aceito; processo que já estava adiante (Validação → Publicação) sem nada aceito; mudar a etiqueta sem nada aceito; etapa desativada no catálogo não trava (`update etapas set ativa = false`, desfeito no fim); relatório sem número (pdf antigo) não conta; Consulta e visitante continuam recusados antes da trava (perfil primeiro); os três campos da view (`tem_versao_piloto`, `tem_versao_em_sequencia`, `tem_relatorio_numerado`) nos casos sem nada, só piloto, só sequência e relatório, e dois processos independentes (subprocesso sem herdar do pai).
+- [x] Rodar `grep -rln "mover_processo" supabase/tests` e, para cada teste que **move para além da Modelagem piloto ou da técnica** sem ter os arquivos (52, 17, 20, 21, 37, 39, 40, 41, 44, 49, 50, 51, 53, 54, 55, 57…), listar o que precisa de ajuste. O ajuste mecânico é montar o piloto, a versão e o relatório do processo antes do movimento (função de apoio por teste, dados inventados). Não ajustar ainda: o vermelho primeiro mostra os que quebram de verdade (Tarefa 2 os conserta).
+- [x] `52_mover_processo`: ajustado onde o movimento atravessa as etapas com trava; os casos novos da trava ficam no 59.
+- [x] Commit só dos testes novos e do 52 (`git add supabase/tests`), `git push` da branch e disparar o workflow "Testes de banco" na branch. **Esperado: vermelho pelo motivo certo** (a recusa não existe; coluna da view inexistente). Anotar o número da execução em `desvios.md`.
 
 ## Tarefa 2: Migração (critério 1 do ticket)
 
-- [ ] Conferir o alvo (`supabase/AMBIENTES.md`: vínculo atual = desenvolvimento, igual ao `project-ref`).
-- [ ] `npx supabase migration new trava_de_arquivos`; conferir que o horário é depois de `20261026140000` (senão escolher à mão).
-- [ ] Escrever, nesta ordem: `create or replace view public.processos_com_andamento` com as três colunas no fim (decisão 6; `revoke all … from anon, authenticated; grant select … to authenticated` repetidos); `private.arquivos_que_faltam(p_processo uuid, p_etapa text)` (o que falta para sair da etapa: `null` ou o texto do valor); `private.conferir_trava_de_arquivos(p_processo uuid, de public.etapas, para public.etapas)` (percorre as duas etapas com trava em ordem, decisão 1); `mover_processo` recriada com a chamada nova logo depois do `if de.id = para.id` (decisão 4), igual à da migração `20261024040945` em todo o resto; `revoke`/`grant` das funções novas e da recriada.
-- [ ] Migração não destrutiva: só funções e view; registrar no cabeçalho.
-- [ ] Commit da migração e dos testes ajustados; `git push` e "Testes de banco" na branch. **Todos os arquivos verdes**, inclusive `00_rls_ligada`, `10_privilegios_padrao` e `46_funcoes_e_views_seguras`. Teste de outro ticket que quebre pela trava: ajustar (mecânico, Tarefa 1) ou parar e perguntar se o motivo for outro.
+- [x] Conferir o alvo (`supabase/AMBIENTES.md`: vínculo atual = desenvolvimento, igual ao `project-ref`).
+- [x] `npx supabase migration new trava_de_arquivos`; conferir que o horário é depois de `20261026140000` (senão escolher à mão).
+- [x] Escrever, nesta ordem: `create or replace view public.processos_com_andamento` com as três colunas no fim (decisão 6; `revoke all … from anon, authenticated; grant select … to authenticated` repetidos); `private.arquivos_que_faltam(p_processo uuid, p_etapa text)` (o que falta para sair da etapa: `null` ou o texto do valor); `private.conferir_trava_de_arquivos(p_processo uuid, de public.etapas, para public.etapas)` (percorre as duas etapas com trava em ordem, decisão 1); `mover_processo` recriada com a chamada nova logo depois do `if de.id = para.id` (decisão 4), igual à da migração `20261024040945` em todo o resto; `revoke`/`grant` das funções novas e da recriada.
+- [x] Migração não destrutiva: só funções e view; registrar no cabeçalho.
+- [x] Commit da migração e dos testes ajustados; `git push` e "Testes de banco" na branch. **Todos os arquivos verdes**, inclusive `00_rls_ligada`, `10_privilegios_padrao` e `46_funcoes_e_views_seguras`. Teste de outro ticket que quebre pela trava: ajustar (mecânico, Tarefa 1) ou parar e perguntar se o motivo for outro.
 
 ## Tarefa 3: Aplicar no desenvolvimento e regenerar os tipos
 
-- [ ] Disparar o workflow "Migrar banco de desenvolvimento" na branch com o nome da migração e ler o resultado.
-- [ ] `npm run db:types` (alvo conferido). Se o arquivo vier "modificado" só por quebra de linha, `git add`.
-- [ ] Atualizar a lista de migrações em `supabase/AMBIENTES.md`. Commit.
+- [x] Disparar o workflow "Migrar banco de desenvolvimento" na branch com o nome da migração e ler o resultado.
+- [x] `npm run db:types` (alvo conferido). Se o arquivo vier "modificado" só por quebra de linha, `git add`.
+- [x] Atualizar a lista de migrações em `supabase/AMBIENTES.md`. Commit.
 
 ## Tarefa 4: Função pura, frases e recusas (critério 3 do ticket)
 
 Teste primeiro, visto falhar, em Vitest.
 
-- [ ] `src/processos/travaDeArquivos.test.ts` + `travaDeArquivos.ts` (decisões 1 a 3 e 8): sem trava quando `arquivos` é indefinido; Modelagem piloto → técnica sem piloto → `falta: ['versao_piloto']`; com versão em sequência e sem piloto → sem trava; Não iniciados → Validação sem nada → primeiro a Modelagem piloto, depois (com `versaoPiloto` verdadeiro) a técnica com `['versao','relatorio']`; só o relatório, só a versão; voltar e mesma etapa, `null`; etapa travada desativada no catálogo, `null`; catálogo com **etapa nova** entre as duas travas (a ida atravessa e confere as duas); destino Concluídos passa pelas duas.
-- [ ] `src/processos/frasesDeTravaDeArquivos.ts` (teste junto): as frases da decisão 5 e `fraseDaTravaDoBanco`.
-- [ ] `recusasDoBanco.ts`: `trava_piloto` e `trava_tecnica` entram no padrão e na tabela; `recusasDoBanco.test.ts` prova a frase (o teste do módulo real, critério 3).
-- [ ] `tipos.ts`: `ArquivosDoProcesso` e `ProcessoDaLista.arquivos?`; leitura da view em `processosSupabase.ts` (e o teste dele: os três campos).
-- [ ] `movimentoFalso.ts` + `ProcessosFalso.ts`: `moverProcesso` recusa pela mesma função pura, com as mesmas frases, quando o processo tem `arquivos`; teste em `ProcessosFalso.mover.test.ts`.
-- [ ] `npx vitest run src/processos` verde; commit.
+- [x] `src/processos/travaDeArquivos.test.ts` + `travaDeArquivos.ts` (decisões 1 a 3 e 8): sem trava quando `arquivos` é indefinido; Modelagem piloto → técnica sem piloto → `falta: ['versao_piloto']`; com versão em sequência e sem piloto → sem trava; Não iniciados → Validação sem nada → primeiro a Modelagem piloto, depois (com `versaoPiloto` verdadeiro) a técnica com `['versao','relatorio']`; só o relatório, só a versão; voltar e mesma etapa, `null`; etapa travada desativada no catálogo, `null`; catálogo com **etapa nova** entre as duas travas (a ida atravessa e confere as duas); destino Concluídos passa pelas duas.
+- [x] `src/processos/frasesDeTravaDeArquivos.ts` (teste junto): as frases da decisão 5 e `fraseDaTravaDoBanco`.
+- [x] `recusasDoBanco.ts`: `trava_piloto` e `trava_tecnica` entram no padrão e na tabela; `recusasDoBanco.test.ts` prova a frase (o teste do módulo real, critério 3).
+- [x] `tipos.ts`: `ArquivosDoProcesso` e `ProcessoDaLista.arquivos?`; leitura da view em `processosSupabase.ts` (e o teste dele: os três campos).
+- [x] `movimentoFalso.ts` + `ProcessosFalso.ts`: `moverProcesso` recusa pela mesma função pura, com as mesmas frases, quando o processo tem `arquivos`; teste em `ProcessosFalso.mover.test.ts`.
+- [x] `npx vitest run src/processos` verde; commit.
 
 ## Tarefa 5: A tela (critério 2 do ticket)
 
 Teste de tela primeiro, com o aplicativo inteiro (`src/App.travaDeArquivos.test.tsx`), visto falhar.
 
-- [ ] Casos: a trava pela lista do Agora (a janela abre, o processo não se move); a trava ao arrastar; a janela com só o que falta (versão piloto; versão e relatório; só um dos dois); enviar e mover (o formulário envia pelo módulo de versões falso e o processo se move); fechar sem enviar (continua onde estava); falha no envio (nada move, o preenchido fica); falha no movimento depois do envio ("Os arquivos foram enviados, mas o processo não foi movido."); as duas travas em sequência e depois a chegada a Concluídos; voltar sem trava; processo adiante sem trava.
-- [ ] `src/versoes/formularioDeVersao.ts`: `modoDoEnvio` sai de `SecaoDeVersoes.tsx` para cá (teste existente do arquivo cobre).
-- [ ] `FormularioDeVersao`/`FormularioDeRelatorio`: `rotuloDoEnvio` opcional, `relatorioObrigatorio` opcional no modo em sequência (o botão só habilita com o .docx; teste em `formularioDeVersao.test.ts`), `processo` como `Pick` (decisão 10).
-- [ ] `JanelaDaTrava.tsx` (decisão 10) e o hook (decisão 9); `QuadroDeProcessos`, `CaminhoDoProcesso` e quem os monta passam o módulo de versões.
-- [ ] `App.arrastarParaMover`, `App.agoraDoVerso`, `App.chegadaAConcluidos` ajustados só onde a trava muda o caminho (processo montado à mão sem `arquivos` não trava, então a maioria não muda).
-- [ ] `npm test`, `npm run lint`, `npm run typecheck` e a checagem de circulares limpos; commit.
+- [x] Casos: a trava pela lista do Agora (a janela abre, o processo não se move); a trava ao arrastar; a janela com só o que falta (versão piloto; versão e relatório; só um dos dois); enviar e mover (o formulário envia pelo módulo de versões falso e o processo se move); fechar sem enviar (continua onde estava); falha no envio (nada move, o preenchido fica); falha no movimento depois do envio ("Os arquivos foram enviados, mas o processo não foi movido."); as duas travas em sequência e depois a chegada a Concluídos; voltar sem trava; processo adiante sem trava.
+- [x] `src/versoes/formularioDeVersao.ts`: `modoDoEnvio` sai de `SecaoDeVersoes.tsx` para cá (teste existente do arquivo cobre).
+- [x] `FormularioDeVersao`/`FormularioDeRelatorio`: `rotuloDoEnvio` opcional, `relatorioObrigatorio` opcional no modo em sequência (o botão só habilita com o .docx; teste em `formularioDeVersao.test.ts`), `processo` como `Pick` (decisão 10).
+- [x] `JanelaDaTrava.tsx` (decisão 10) e o hook (decisão 9); `QuadroDeProcessos`, `CaminhoDoProcesso` e quem os monta passam o módulo de versões.
+- [x] `App.arrastarParaMover`, `App.agoraDoVerso`, `App.chegadaAConcluidos` ajustados só onde a trava muda o caminho (processo montado à mão sem `arquivos` não trava, então a maioria não muda).
+- [x] `npm test`, `npm run lint`, `npm run typecheck` e a checagem de circulares limpos; commit.
 
 ## Tarefa 6: Fechamento
 
-- [ ] `[visual]` do critério 4: a janela da trava vista na vitrine local (1366×768), se der para subir a vitrine; senão presumido e dito. Registrar o que foi visto e o que foi presumido.
-- [ ] `docs/manutencao/04-modelo-de-dados.md` (view e trava); `CONTEXT.md` conferido.
-- [ ] `desvios.md` do documentos-versoes: decisões de execução (2 em especial), números das execuções do "Testes de banco", ajustes mecânicos nos testes antigos. `melhorias-protocolo.md`: itens não testados que aconteceram e ocorrências. `backlog.md`: o que surgir (inclusive a decisão pendente do selo "Relatório pendente" e da coluna `ultima_versao_tem_relatorio`: a trava não depende deles, ficam como estão).
-- [ ] Marcar as caixas do plano, `Concluído em AAAA-MM-DD (commit <hash>)` no fim do ticket 11, `.scratch/proximo-passo.md` sobrescrito, commit e `git push` da branch.
+- [x] `[visual]` do critério 4: a janela da trava vista na vitrine local (1366×768), se der para subir a vitrine; senão presumido e dito. Registrar o que foi visto e o que foi presumido.
+- [x] `docs/manutencao/04-modelo-de-dados.md` (view e trava); `CONTEXT.md` conferido.
+- [x] `desvios.md` do documentos-versoes: decisões de execução (2 em especial), números das execuções do "Testes de banco", ajustes mecânicos nos testes antigos. `melhorias-protocolo.md`: itens não testados que aconteceram e ocorrências. `backlog.md`: o que surgir (inclusive a decisão pendente do selo "Relatório pendente" e da coluna `ultima_versao_tem_relatorio`: a trava não depende deles, ficam como estão).
+- [x] Marcar as caixas do plano, `Concluído em AAAA-MM-DD (commit <hash>)` no fim do ticket 11, `.scratch/proximo-passo.md` sobrescrito, commit e `git push` da branch.

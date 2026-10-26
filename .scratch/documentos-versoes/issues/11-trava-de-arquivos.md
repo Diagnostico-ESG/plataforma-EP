@@ -27,7 +27,10 @@ Spec: `.scratch/documentos-versoes/spec.md`, seção "Arquivos por etapa (mudan�
 
 ## Critérios de aceite
 
-- [ ] Testes pgTAP escritos antes da migração e vistos falhar: Modelagem piloto → técnica sem piloto recusado; Não iniciados → Revisão interna sem piloto recusado; técnica → Validação sem relatório recusado; com versão e relatório ligados a versões diferentes aceito; voltar sem nada aceito; processo já adiante sem piloto aceito; etapa desativada não trava; os campos novos da view. O teste `52` ajustado; `46_funcoes_e_views_seguras` continua passando.
-- [ ] Testes de interface com o aplicativo inteiro: a trava pela lista e ao arrastar, a janela com só o que falta, enviar e mover, fechar sem enviar, falha no envio, falha no movimento depois do envio, as duas travas em sequência, depois a chegada a Concluídos, voltar sem trava, processo adiante sem trava. `App.arrastarParaMover`, `App.agoraDoVerso` e `App.chegadaAConcluidos` ajustados onde a trava muda o caminho.
-- [ ] A função pura da trava tem testes unitários (catálogo com etapa desativada e etapa nova); os testes do módulo real provam a frase da recusa.
+- [x] Testes pgTAP escritos antes da migração e vistos falhar: Modelagem piloto → técnica sem piloto recusado; Não iniciados → Revisão interna sem piloto recusado; técnica → Validação sem relatório recusado; com versão e relatório ligados a versões diferentes aceito; voltar sem nada aceito; processo já adiante sem piloto aceito; etapa desativada não trava; os campos novos da view. O teste `52` ajustado; `46_funcoes_e_views_seguras` continua passando.
+- [x] Testes de interface com o aplicativo inteiro: a trava pela lista e ao arrastar, a janela com só o que falta, enviar e mover, fechar sem enviar, falha no envio, falha no movimento depois do envio, as duas travas em sequência, depois a chegada a Concluídos, voltar sem trava, processo adiante sem trava. `App.arrastarParaMover`, `App.agoraDoVerso` e `App.chegadaAConcluidos` ajustados onde a trava muda o caminho.
+- [x] A função pura da trava tem testes unitários (catálogo com etapa desativada e etapa nova); os testes do módulo real provam a frase da recusa.
 - [ ] `[visual]` A janela da trava diz o que falta na primeira linha e mostra o formulário inteiro sem passar da altura do notebook (1366×768).
+
+O critério `[visual]` fica sem marca: a janela foi montada numa vitrine local com módulos falsos e só medida (a captura de tela não funcionou), não vista no app real (ver `.scratch/documentos-versoes/desvios.md`, 2026-10-26).
+Concluído em 2026-10-26 (commit 557b696)
