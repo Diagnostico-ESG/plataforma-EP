@@ -1,14 +1,14 @@
 -- Anexos (documentos-versoes, ticket 12; ADR 0027): o arquivo avulso do processo, enviado em qualquer etapa com o
 -- processo em andamento. Quem pode o quê (ler, criar, alterar, apagar), a situação do processo, as restrições de formato,
 -- tamanho e nome, o que o banco preenche (etapa, autor, data), o evento, a exclusão do processo e a coluna da subpasta
--- "Anexos". A retirada (apagar) é do ticket 13: aqui ninguém apaga.
+-- "Anexos". A retirada (apagar) é do ticket 13 e tem o teste 62.
 begin;
 create extension if not exists pgtap with schema extensions;
 -- As linhas do pgTAP vão para _tap e saem na exceção do fim (ver scripts/relatorio-tap.mjs).
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(44);
+insert into _tap (linha) select plan(43);
 
 -- Isola o teste dos dados que já existem no banco (a prova do Drive deixa versões, arquivos, eventos e pastas de teste
 -- no desenvolvimento): a limpeza vale só nesta transação, que é desfeita no fim.
@@ -202,9 +202,6 @@ insert into _tap (linha) select is(
 insert into _tap (linha) select throws_ok(
   $sql$update public.anexos set nome = 'outro.eml' where processo_id = pg_temp.processo('Andamento')$sql$,
   '42501', null, 'o anexo não se altera (nome), nem pelo administrador');
-insert into _tap (linha) select throws_ok(
-  $sql$delete from public.anexos where processo_id = pg_temp.processo('Andamento')$sql$,
-  '42501', null, 'o anexo não se apaga neste ticket (a retirada é do ticket 13)');
 select pg_temp.claims('a4');
 insert into _tap (linha) select is(
   (select count(*) from public.anexos), 0::bigint, 'usuário inativo não lê anexo');
