@@ -48,7 +48,7 @@ const TEXTO_DA_ACAO_DA_VERSAO: Record<string, string> = {
   substituir: 'Substituiu o arquivo da versão',
 }
 
-const TEXTO_DA_ACAO_DO_ANEXO: Record<string, string> = { enviar: 'Enviou o anexo' }
+const TEXTO_DA_ACAO_DO_ANEXO: Record<string, string> = { enviar: 'Enviou o anexo', retirar: 'Retirou o anexo' }
 
 const TEXTO_DA_ACAO_DA_REVISAO: Record<string, string> = { registrar: 'Registrou a revisão', editar: 'Editou a revisão' }
 
@@ -98,10 +98,17 @@ export function textoDoEvento(evento: EventoDoCadastro): string {
 
 // "Enviou o anexo 'resposta.eml' (Modelagem piloto)": o nome e a etapa do envio, guardados no evento.
 function textoDoAnexo(evento: EventoDoCadastro): string | null {
+  if (evento.acao === 'retirar') return textoDaRetirada(evento)
   if (evento.acao !== 'enviar') return null
   const { nome, etapa } = registro(evento.depois)
   if (typeof nome !== 'string') return null
   return `Enviou o anexo '${nome}'${typeof etapa === 'string' && etapa !== '' ? ` (${etapa})` : ''}`
+}
+
+// "Retirou o anexo 'resposta.eml'": o nome fica guardado no estado de antes, porque a linha já não existe.
+function textoDaRetirada(evento: EventoDoCadastro): string | null {
+  const { nome } = registro(evento.antes)
+  return typeof nome === 'string' ? `Retirou o anexo '${nome}'` : null
 }
 
 function textoDaVersao(evento: EventoDoCadastro): string | null {

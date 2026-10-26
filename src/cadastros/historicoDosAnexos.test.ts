@@ -35,3 +35,29 @@ describe('eventos de anexo no histórico', () => {
     }
   })
 })
+
+// O evento que o gatilho do banco grava ao retirar um anexo (migração retirar_anexo): o estado fica no antes.
+const RETIRADA: EventoDoCadastro = {
+  id: 2, ocorridoEm: '2026-10-26T16:00:00Z', autor: 'Pessoa Fictícia', acao: 'retirar', entidade: 'anexo', entidadeRef: 'p1',
+  antes: { nome: 'resposta.eml', formato: 'eml', etapa: 'Modelagem piloto', processo_nome: 'Emitir Ofício', setor_sigla: 'TSA' },
+  depois: null,
+}
+
+describe('eventos de retirada de anexo no histórico', () => {
+  test('a retirada diz o nome do anexo, lido do estado de antes', () => {
+    expect(textoDoEvento(RETIRADA)).toBe("Retirou o anexo 'resposta.eml'")
+    expect(tituloDoEvento(RETIRADA)).toBe('Retirou o anexo')
+  })
+
+  test('o texto da ação sozinha é "Retirou o anexo"', () => {
+    expect(textoDaAcaoDoCadastro('retirar', 'anexo')).toBe('Retirou o anexo')
+  })
+
+  test('o item continua sendo o processo dono dos anexos, mesmo sem o estado de depois', () => {
+    expect(nomeDoItem(RETIRADA)).toBe('Anexos — Emitir Ofício')
+  })
+
+  test('o estado descrito traz o que foi retirado', () => {
+    expect(descreverEstadoDoCadastro(RETIRADA.antes)).toContain('Nome: resposta.eml')
+  })
+})

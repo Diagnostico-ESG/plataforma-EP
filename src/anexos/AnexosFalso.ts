@@ -1,4 +1,5 @@
 import { extensaoDoNome } from '../../supabase/functions/_shared/decisao.ts'
+import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import type { EventoDoCadastro } from '../cadastros/tipos'
 import type { ProcessoDoFalso } from '../versoes/regrasDoFalso'
 import { ordenarAnexos } from './regrasDoAnexo'
@@ -16,6 +17,10 @@ export class AnexosFalso implements ModuloDeAnexos {
   segurarEnvio = false
   /** Os pedidos de envio que chegaram, na ordem. */
   envios: PedidoDeAnexo[] = []
+  /** Como `falhaNoEnvio`, para a retirada. */
+  falhaNaRetirada: string | Error | null = null
+  /** Os identificadores dos anexos retirados, na ordem. */
+  retiradas: string[] = []
   /** A etapa em que o processo está agora, como o banco a lê no envio; quem liga a falsa à de processos a troca. */
   etapaAtual: (processoId: string) => string | null = (processoId) => this.processos[processoId]?.etapa ?? null
   private proximoId = 1
@@ -42,6 +47,29 @@ export class AnexosFalso implements ModuloDeAnexos {
     aoProgredir(1, 1)
     if (this.segurarEnvio) await new Promise<never>(() => {})
     this.guardar(pedido)
+  }
+
+  async retirarAnexo(anexoId: string): Promise<void> {
+    if (typeof this.falhaNaRetirada === 'string') throw new Error(this.falhaNaRetirada)
+    if (this.falhaNaRetirada) throw this.falhaNaRetirada
+    const processoId = Object.keys(this.anexos).find((id) => this.anexos[id].some((anexo) => anexo.id === anexoId))
+    const retirado = processoId ? this.anexos[processoId].find((anexo) => anexo.id === anexoId) : undefined
+    // Como a função: o anexo que já não está na lista é recusado com a frase do anexo já retirado.
+    if (!processoId || !retirado) throw new TravaDoBanco('O anexo já foi retirado.')
+    this.anexos[processoId] = this.anexos[processoId].filter((anexo) => anexo.id !== anexoId)
+    this.retiradas.push(anexoId)
+    this.registrarRetirada(processoId, retirado)
+  }
+
+  // O evento que o gatilho do banco grava: o estado do anexo no antes, nada no depois.
+  private registrarRetirada(processoId: string, retirado: Anexo): void {
+    const processo = this.processos[processoId] ?? { sigla: 'TSA', nome: processoId, etapa: null }
+    const numero = this.proximoId++
+    this.aoRegistrar(processoId, {
+      id: Date.now() + numero, ocorridoEm: new Date(Date.now() + numero).toISOString(), autor: 'Pessoa de Teste', acao: 'retirar',
+      entidade: 'anexo', entidadeRef: processoId, depois: null,
+      antes: { nome: retirado.nome, formato: retirado.formato, etapa: retirado.etapa, processo_nome: processo.nome, setor_sigla: processo.sigla },
+    })
   }
 
   // O mais recente vai para o começo da lista; o instante cresce a cada envio, como o relógio do banco.

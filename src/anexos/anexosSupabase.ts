@@ -1,6 +1,6 @@
 import type { ClienteSupabase } from '../lib/supabase'
 import { type EnviarBytes, chamarFuncao } from '../versoes/funcaoDoDrive'
-import { falhaDaFuncaoDoAnexo } from './recusasDeAnexos'
+import { falhaDaFuncaoDoAnexo, falhaDaRetiradaDoAnexo } from './recusasDeAnexos'
 import { ordenarAnexos } from './regrasDoAnexo'
 import type { Anexo, ModuloDeAnexos, PedidoDeAnexo } from './tipos'
 
@@ -22,7 +22,13 @@ export function criarAnexosSupabase(cliente: ClienteSupabase, enviarBytes: Envia
   return {
     listarAnexos: (processoId) => listarAnexos(cliente, processoId),
     enviarAnexo: (pedido, aoProgredir) => enviarAnexo(cliente, enviarBytes, pedido, aoProgredir),
+    retirarAnexo: (anexoId) => retirarAnexo(cliente, anexoId),
   }
+}
+
+// A função manda o arquivo à lixeira do Drive e apaga a linha com o login de quem pediu; só o identificador viaja.
+async function retirarAnexo(cliente: ClienteSupabase, anexoId: string): Promise<void> {
+  await chamarFuncao(cliente, { acao: 'retirar', anexo_id: anexoId }, falhaDaRetiradaDoAnexo)
 }
 
 async function listarAnexos(cliente: ClienteSupabase, processoId: string): Promise<Anexo[]> {

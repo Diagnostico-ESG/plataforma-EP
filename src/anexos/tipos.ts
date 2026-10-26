@@ -31,4 +31,9 @@ export type ModuloDeAnexos = {
    * `aoProgredir` avisa quando o arquivo chegou. Se algo falhar, nada é registrado.
    */
   enviarAnexo(pedido: PedidoDeAnexo, aoProgredir: (enviados: number, total: number) => void): Promise<void>
+  /**
+   * Retira o anexo (ADR 0027): o arquivo vai para a lixeira do Drive e a linha sai da lista. Anexo que já não existe, processo
+   * fora de andamento e perfil sem permissão chegam como TravaDoBanco, com a frase pronta.
+   */
+  retirarAnexo(anexoId: string): Promise<void>
 }
