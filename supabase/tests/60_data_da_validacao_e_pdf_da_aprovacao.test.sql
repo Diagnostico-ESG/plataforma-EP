@@ -277,7 +277,10 @@ insert into _tap (linha) select lives_ok($sql$select pg_temp.enviar_pdf('Pdf Seg
 insert into _tap (linha) select results_eq(
   $sql$select pg_temp.pdfs('Pdf Segunda'), pg_temp.pdfs('Pdf Segunda', true)$sql$, $sql$values (2::bigint, 1::bigint)$sql$,
   'o guardado continua e o novo é o atual');
+-- A versão nova só entra até a Revisão interna (ADR 0025): o processo volta a ela, recebe a V2 e segue à Aprovação.
+select pg_temp.mover('Pdf Segunda', 'revisao_interna');
 select pg_temp.enviar('Pdf Segunda');
+select pg_temp.mover('Pdf Segunda', 'aprovacao_setor');
 select public.registrar_aprovacao(pg_temp.processo('Pdf Segunda'), 'PROT-3', null, null);
 insert into _tap (linha) select throws_ok(
   $sql$select pg_temp.enviar_pdf('Pdf Segunda', pg_temp.pdf(drive => 'drive-pdf-3'))$sql$, 'P0001',
