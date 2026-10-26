@@ -136,3 +136,11 @@ Escopo: os arquivos de `src/components/` mudados pela junção da parte 3 (`902e
   - O aviso "a nova aprovação toma o lugar da anterior" (`role="status"`) já nasce na tela quando a janela abre, então o leitor de tela pode não anunciá-lo; é o mesmo padrão das outras janelas de registro.
 - **Polish: nenhum código alterado.** Sem defeito verificável a corrigir, não mexi nas telas para não criar mudança sem motivo.
 - **Não verificado:** a aparência renderizada. A tela só abre com o login real e a vitrine local está desatualizada (não compila). Os critérios `[visual]` seguem presumidos e entram na ressalva do `/ship`. A conferência na tela com o login real continua com o usuário (lista em `.scratch/proximo-passo.md`).
+
+## 2026-10-26 — /ship da parte 3 do quadro livre (ticket 06), junto com documentos-versoes
+
+Ponto de partida da revisão: `marco/2026-10-25-inicio-quadro-livre-parte-3`. A revisão de código, a de segurança (de reserva), a cobertura, as circulares, os tipos e a migração destrutiva confirmada estão na entrada de mesma data de `.scratch/documentos-versoes/desvios.md`.
+
+- **Ticket 06:** a migração `20261026164641` é aditiva (coluna, tabela e funções novas; a view recriada); sem remoção. Tabela `pdfs_da_aprovacao` com RLS e testes por perfil (teste 60: 73 ok; teste 40: 57 ok). "Testes de banco" verde na `main`.
+- **Ficam presumidos:** os dois critérios `[visual]` do ticket (o campo da data no Agora e o .pdf na gaveta com a janela em 1366×768); a função ainda não publicada no desenvolvimento; a prova do .pdf no Drive real.
+- **`/polir`:** audit 18/20 sem P0 a P2 e nenhum código alterado (entrada de 2026-10-26 acima).

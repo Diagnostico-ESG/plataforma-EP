@@ -196,3 +196,14 @@ Método: detector do Impeccable em `src/components/versoes` (sem achados) e leit
 - **TDD:** o vermelho foi observado nos testes de banco (59, antes da migração) e na função pura (módulo inexistente). O teste de tela e os da falsa de processos foram escritos antes do código; o da falsa passou de primeira, e o de tela rodou vermelho (janela inexistente) antes de passar.
 - **Fora do ticket, como combinado:** o selo "Relatório pendente" e a coluna `ultima_versao_tem_relatorio`, e o "P" da versão piloto no cartão do quadro, seguem como estão (backlog); a view ganhou só os três campos da trava.
 - **Presumido:** o critério `[visual]` do ticket. A janela foi montada numa vitrine local temporária (apagada), com módulos falsos; a captura de tela não funcionou (janela do app oculta) e só medi: o formulário de "versão e relatório", o maior, tem cerca de 500 px de altura, abaixo dos cerca de 720 px que cabem em 1366×768, e a janela rola por dentro se faltar altura. Não vi a tela com o login real nem o envio real ao Drive.
+
+## 2026-10-26 — /ship da parte 3 do quadro livre (tickets 09, 10 e 11), junto com revisoes-aprovacao
+
+Ponto de partida da revisão: `marco/2026-10-25-inicio-quadro-livre-parte-3` (38 commits, 181 arquivos).
+
+- **Migração destrutiva confirmada pelo usuário (2026-10-26):** `versoes.observacao` (ticket 09) e `arquivos_da_versao.copiado_de`, com a apagada das linhas "sem alteração de conteúdo" (ticket 10, ADR 0026). Produção não existe: só dados inventados do desenvolvimento.
+- **Revisão de código:** autorrevisão (o projeto só permite subagente a pedido do usuário), com atenção às migrações, à função `arquivos-no-drive` e à tabela `pdfs_da_aprovacao`. Nada Crítico ou Importante.
+- **Revisão de segurança:** o `/security-review` não achou mudanças (a `main` já estava integrada), então foi a **revisão de reserva** (menos completa), por arquivo: nenhum achado de confiança alta. Todo `security definer` fica no schema `private`, com `search_path` vazio; as views novas têm `security_invoker`; nenhuma chave secreta no código; `baixar` e a substituição só servem item sob a raiz do Drive.
+- **Dependências:** `package.json` não mudou e `.scratch/security.md` existe; o `security-auditor` não rodou. **Circulares:** nenhuma. **Tipos do banco:** em dia (só fim de linha difere).
+- **Cobertura:** 98,1% de instruções, 94,3% de ramos, 98,6% de funções, 99,0% de linhas.
+- **Ficam presumidos:** os critérios `[visual]` dos tickets 09 (2), 10 (1) e 11 (1) (a tela nunca foi vista com o login real); a camada Deno da função (`acoes.ts`, `registrar.ts`, `conferir.ts`) sem teste automático e a função ainda não publicada no desenvolvimento; as provas no Drive real.
