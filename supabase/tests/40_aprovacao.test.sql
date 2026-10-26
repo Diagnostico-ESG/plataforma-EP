@@ -9,7 +9,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(55);
+insert into _tap (linha) select plan(57);
 
 -- Trava de arquivos (ticket 11): este teste monta o cenário e não prova a trava (ela é do 59), então move sem ela. A
 -- função desliga, só durante o movimento e com o dono do banco, as etapas com trava que ficam antes do destino.
@@ -236,6 +236,10 @@ select pg_temp.enviar_completa('Segunda');
 select pg_temp.claims('a2');
 select pg_temp.mover('Segunda', 'aprovacao_setor');
 insert into _tap (linha) select lives_ok($sql$select pg_temp.aprovar('Segunda', 'PROT-1')$sql$, 'a primeira aprovação é aceita');
+-- O .pdf protocolado da primeira aprovação (o teste 60 prova as regras dele): a segunda aprovação o deixa guardado.
+select public.registrar_pdf_da_aprovacao(pg_temp.processo('Segunda'), jsonb_build_object('papel', 'pdf_da_aprovacao',
+  'nome', 'T40_V1_Segunda_Aprovação.pdf', 'formato', 'pdf', 'tamanho', 100, 'hash_md5', '0123456789abcdef0123456789abcdef',
+  'drive_id', 'drive-pdf-segunda'));
 select pg_temp.claims('a1');
 -- A versão nova só entra até a Revisão interna (ADR 0025): o processo volta a ela, recebe a V2 e segue à Aprovação.
 select pg_temp.mover('Segunda', 'revisao_interna');
@@ -256,6 +260,15 @@ insert into _tap (linha) select results_eq(
     from public.eventos where entidade = 'aprovacao' and entidade_ref = pg_temp.processo('Segunda')::text and acao = 'substituir'$sql$,
   $sql$values ('substituir', 'V1', 'V2', 'PROT-1', 'PROT-2')$sql$,
   'um evento "substituir" guarda a aprovação anterior no antes');
+insert into _tap (linha) select results_eq(
+  $sql$select count(*)::int, count(*) filter (where p.guardado_em is not null)::int
+    from public.pdfs_da_aprovacao p join public.aprovacoes a on a.id = p.aprovacao_id
+    where a.processo_id = pg_temp.processo('Segunda')$sql$,
+  $sql$values (1, 1)$sql$, 'o .pdf da primeira aprovação fica guardado, sem .pdf atual, na segunda');
+insert into _tap (linha) select results_eq(
+  $sql$select detalhes->'antes'->>'pdf_nome' from public.eventos
+    where entidade = 'aprovacao' and entidade_ref = pg_temp.processo('Segunda')::text and acao = 'substituir'$sql$,
+  $sql$values ('T40_V1_Segunda_Aprovação.pdf')$sql$, 'o evento "substituir" traz o nome do .pdf guardado');
 select pg_temp.claims('a2');
 
 -- ===== Mover não mexe na aprovação, e ela não se apaga =====
