@@ -92,9 +92,24 @@ describe('validarIniciarEnvio', () => {
         tamanho: 1024,
         numero: 6,
         historica: false,
+        piloto: false,
         arquivoId: null,
       },
     })
+  })
+
+  it('piloto é opcional: ausente vale falso, e true é lido (a versão piloto)', () => {
+    const lido = (mudancas: Record<string, unknown>) => {
+      const resultado = validarIniciarEnvio(entradaDeEnvio(mudancas))
+      return resultado.ok ? resultado.valor.piloto : 'recusada'
+    }
+    expect(lido({})).toBe(false)
+    expect(lido({ piloto: true })).toBe(true)
+    expect(lido({ piloto: 'sim' })).toBe('recusada')
+  })
+
+  it('piloto junto com histórica é recusada como entrada inválida', () => {
+    expect(codigoDaRecusa(entradaDeEnvio({ piloto: true, historica: true }))).toBe('entrada_invalida')
   })
 
   it('arquivo_id é opcional: ausente ou nulo vale null, e um uuid é lido (a substituição do arquivo)', () => {

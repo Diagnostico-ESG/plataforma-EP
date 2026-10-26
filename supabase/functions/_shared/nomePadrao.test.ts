@@ -21,6 +21,12 @@ describe('nomePadrao', () => {
     )
   })
 
+  it('põe o P na versão piloto, com os três arquivos', () => {
+    expect(nomePadrao({ ...base, piloto: true, papel: 'bpm', extensao: 'bpm' })).toBe('CEE_V6P_Nome do processo.bpm')
+    expect(nomePadrao({ ...base, piloto: true, papel: 'png', extensao: 'png' })).toBe('CEE_V6P_Nome do processo.png')
+    expect(nomePadrao({ ...base, piloto: true })).toBe('CEE_V6P_Nome do processo.bpmn')
+  })
+
   it('acrescenta _Relatório no relatório', () => {
     expect(nomePadrao({ ...base, papel: 'relatorio', extensao: 'pdf' })).toBe(
       'CEE_V6_Nome do processo_Relatório.pdf',

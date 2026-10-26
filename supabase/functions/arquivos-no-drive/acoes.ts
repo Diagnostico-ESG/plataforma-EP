@@ -67,6 +67,7 @@ function nomeDoArquivo(processo: ProcessoDoEnvio, entrada: EntradaIniciarEnvio):
     sigla: processo.setor_sigla,
     numero: entrada.numero,
     historica: entrada.historica,
+    piloto: entrada.piloto,
     nomeDoProcesso: processo.nome,
     papel: entrada.papel,
     extensao: extensaoDoNome(entrada.nomeOriginal),

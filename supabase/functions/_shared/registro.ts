@@ -12,6 +12,7 @@ import {
   falhar,
   lerBooleano,
   lerInteiroPositivo,
+  lerPilotoDaVersao,
   lerPapel,
   lerTexto,
   lerUuidOpcional,
@@ -30,10 +31,11 @@ export interface ArquivoPedido {
 export interface EntradaRegistrar {
   processoId: string
   numero: number
-  observacao: string | null
   /** Versão da primeira etapa do trabalho (V5F): o número é o digitado, não o que o banco daria. */
   historica: boolean
-  /** Com a versão: acrescenta o relatório a ela (o `arquivos` é só o relatório); sem: registra uma versão. */
+  /** Versão piloto (V6P): o número também é o digitado. Com `versaoId`, diz que a versão que recebe o arquivo é piloto. */
+  piloto: boolean
+  /** Com a versão: acrescenta a ela um arquivo (o `arquivos` é só o relatório, o .png ou o .bpmn); sem: registra uma versão. */
   versaoId: string | null
   /** Com o arquivo: troca o conteúdo dele (o `arquivos` é só o arquivo novo, de qualquer papel); sem: registra. */
   arquivoId: string | null
@@ -62,28 +64,19 @@ export interface RecusaDoBanco {
   mensagem: string
 }
 
-const LIMITE_DA_OBSERVACAO = 2000
 const MAXIMO_DE_ARQUIVOS = 4
-
-function lerObservacao(corpo: Corpo): Validacao<string | null> {
-  const valor = corpo.observacao
-  if (valor === undefined || valor === null) return { ok: true, valor: null }
-  if (typeof valor !== 'string' || valor.length > LIMITE_DA_OBSERVACAO) {
-    return campoInvalido(corpo, 'observacao', `texto de até ${LIMITE_DA_OBSERVACAO} caracteres`)
-  }
-  return { ok: true, valor }
-}
+const PAPEIS_ACRESCENTADOS_DEPOIS: readonly PapelDoArquivo[] = ['relatorio', 'png', 'bpmn']
 
 // Quem não manda `historica` registra uma versão nova (o pedido do ticket 02).
 function lerHistorica(corpo: Corpo): Validacao<boolean> {
   return corpo.historica === undefined ? { ok: true, valor: false } : lerBooleano(corpo, 'historica')
 }
 
-// O relatório depois entra numa versão nova que já existe: um arquivo só, o relatório (o banco confere o resto).
-function conferirRelatorioDepois(versaoId: string | null, historica: boolean, arquivos: ArquivoPedido[]): Falha | null {
+// O arquivo depois entra numa versão que já existe: um arquivo só, o relatório, o .png ou o .bpmn (o banco confere o resto).
+function conferirArquivoDepois(versaoId: string | null, historica: boolean, arquivos: ArquivoPedido[]): Falha | null {
   if (versaoId === null) return null
-  if (historica || arquivos.length !== 1 || arquivos[0].papel !== 'relatorio') {
-    return falhar('entrada_invalida', 'campo versao_id: esperado um único arquivo, o relatorio, sem historica')
+  if (historica || arquivos.length !== 1 || !PAPEIS_ACRESCENTADOS_DEPOIS.includes(arquivos[0].papel)) {
+    return falhar('entrada_invalida', 'campo versao_id: esperado um único arquivo, o relatorio, o png ou o bpmn, sem historica')
   }
   return null
 }
@@ -122,20 +115,24 @@ function lerArquivosPedidos(corpo: Corpo): Validacao<ArquivoPedido[]> {
   return { ok: true, valor: arquivos }
 }
 
-type ModoDoRegistro = Pick<EntradaRegistrar, 'historica' | 'versaoId' | 'arquivoId' | 'arquivos'>
+type ModoDoRegistro = Pick<EntradaRegistrar, 'historica' | 'piloto' | 'versaoId' | 'arquivoId' | 'arquivos'>
 
-// O que o registro faz: versão nova ou histórica (sem alvo), relatório depois (versao_id) ou troca de arquivo (arquivo_id).
+// O que o registro faz: versão nova, piloto ou histórica (sem alvo), arquivo depois (versao_id) ou troca de arquivo (arquivo_id).
 function lerModoDoRegistro(corpo: Corpo): Validacao<ModoDoRegistro> {
   const historica = lerHistorica(corpo)
   if (!historica.ok) return historica
+  const piloto = lerPilotoDaVersao(corpo, historica.valor)
+  if (!piloto.ok) return piloto
   const versaoId = lerUuidOpcional(corpo, 'versao_id')
   if (!versaoId.ok) return versaoId
   const arquivoId = lerUuidOpcional(corpo, 'arquivo_id')
   if (!arquivoId.ok) return arquivoId
   const arquivos = lerArquivosPedidos(corpo)
   if (!arquivos.ok) return arquivos
-  const modo = { historica: historica.valor, versaoId: versaoId.valor, arquivoId: arquivoId.valor, arquivos: arquivos.valor }
-  const recusa = conferirRelatorioDepois(modo.versaoId, modo.historica, modo.arquivos) ?? conferirSubstituicao(modo)
+  const modo = {
+    historica: historica.valor, piloto: piloto.valor, versaoId: versaoId.valor, arquivoId: arquivoId.valor, arquivos: arquivos.valor,
+  }
+  const recusa = conferirArquivoDepois(modo.versaoId, modo.historica, modo.arquivos) ?? conferirSubstituicao(modo)
   return recusa ?? { ok: true, valor: modo }
 }
 
@@ -145,31 +142,33 @@ export function validarRegistrar(corpo: unknown): Validacao<EntradaRegistrar> {
   if (!processoId.ok) return processoId
   const numero = lerInteiroPositivo(corpo, 'numero')
   if (!numero.ok) return numero
-  const observacao = lerObservacao(corpo)
-  if (!observacao.ok) return observacao
   const modo = lerModoDoRegistro(corpo)
   if (!modo.ok) return modo
-  const valor = { processoId: processoId.valor, numero: numero.valor, observacao: observacao.valor }
+  const valor = { processoId: processoId.valor, numero: numero.valor }
   return { ok: true, valor: { ...valor, ...modo.valor } }
 }
 
 export type FuncaoDeRegistro =
-  | 'registrar_versao' | 'registrar_versao_historica' | 'acrescentar_relatorio' | 'substituir_arquivo'
+  | 'registrar_versao' | 'registrar_versao_historica' | 'acrescentar_relatorio' | 'acrescentar_arquivo' | 'substituir_arquivo'
 
-/** A função do banco que grava: a troca do arquivo, o relatório depois, a histórica (regras próprias) ou a versão nova. */
+/** A função do banco que grava: a troca do arquivo, o arquivo depois (relatório, ou .png e .bpmn), a histórica ou a versão nova (e a piloto). */
 export function funcaoDoBancoPara(
-  { historica, versaoId, arquivoId }: Pick<EntradaRegistrar, 'historica' | 'versaoId' | 'arquivoId'>,
+  { historica, versaoId, arquivoId, arquivos }: Pick<EntradaRegistrar, 'historica' | 'versaoId' | 'arquivoId' | 'arquivos'>,
 ): FuncaoDeRegistro {
   if (arquivoId !== null) return 'substituir_arquivo'
-  if (versaoId !== null) return 'acrescentar_relatorio'
+  if (versaoId !== null) return arquivos[0]?.papel === 'relatorio' ? 'acrescentar_relatorio' : 'acrescentar_arquivo'
   return historica ? 'registrar_versao_historica' : 'registrar_versao'
 }
 
-/** Os parâmetros da função do banco escolhida (o relatório depois e a troca levam o alvo e o único arquivo). */
+/** Os parâmetros da função do banco escolhida (o arquivo depois e a troca levam o alvo e o único arquivo). */
 export function parametrosDoBanco(entrada: EntradaRegistrar, arquivos: ArquivoParaGravar[]): Record<string, unknown> {
   if (entrada.arquivoId !== null) return { p_arquivo: entrada.arquivoId, p_novo: arquivos[0] }
-  if (entrada.versaoId !== null) return { p_versao: entrada.versaoId, p_numero: entrada.numero, p_arquivo: arquivos[0] }
-  return { p_processo: entrada.processoId, p_numero: entrada.numero, p_observacao: entrada.observacao, p_arquivos: arquivos }
+  if (entrada.versaoId !== null) {
+    const alvo = { p_versao: entrada.versaoId, p_arquivo: arquivos[0] }
+    return funcaoDoBancoPara(entrada) === 'acrescentar_relatorio' ? { ...alvo, p_numero: entrada.numero } : alvo
+  }
+  const versao = { p_processo: entrada.processoId, p_numero: entrada.numero, p_arquivos: arquivos }
+  return entrada.historica ? versao : { ...versao, p_piloto: entrada.piloto }
 }
 
 // O nome foi dado por iniciar_envio com o número e o F da tela: um pedido montado fora dela não grava um nome que mente.

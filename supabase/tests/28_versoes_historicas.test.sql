@@ -148,10 +148,6 @@ select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000
 set local role authenticated;
 insert into _tap (linha) select lives_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e5'), 2, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$, 'integrante registra uma histórica');
 insert into _tap (linha) select is((select count(*) from public.versoes where processo_id = pg_temp.processo('e1') and historica), 5::bigint, 'integrante lê as históricas');
--- Histórica só em Não iniciados (ADR 0025): o e5 sai de lá e a histórica passa a ser recusada.
-select public.mover_processo(pg_temp.processo('e5'), (select id from public.etapas where codigo = 'modelagem'));
-insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e5'), 3, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$,
-  'P0001', 'historica_fora_de_nao_iniciados', 'histórica fora de Não iniciados é recusada');
 
 -- Consulta.
 reset role;
@@ -172,6 +168,14 @@ reset role;
 set local role anon;
 insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica('9f000000-0000-0000-0000-0000000000e1', 8, '[]'::jsonb)$sql$, '42501', null,
   'visitante não registra histórica');
+
+-- Histórica só em Não iniciados (ADR 0025): o e5 sai de lá, como integrante, e a histórica passa a ser recusada.
+reset role;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
+set local role authenticated;
+select public.mover_processo(pg_temp.processo('e5'), (select id from public.etapas where codigo = 'modelagem'));
+insert into _tap (linha) select throws_ok($sql$select public.registrar_versao_historica(pg_temp.processo('e5'), 3, jsonb_build_array(pg_temp.arquivo('bpm', 'bpm')))$sql$,
+  'P0001', 'historica_fora_de_nao_iniciados', 'histórica fora de Não iniciados é recusada');
 
 reset role;
 insert into _tap (linha) select * from finish();

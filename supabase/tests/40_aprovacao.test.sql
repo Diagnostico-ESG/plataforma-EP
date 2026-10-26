@@ -217,7 +217,10 @@ select pg_temp.claims('a2');
 select pg_temp.mover('Segunda', 'aprovacao_setor');
 insert into _tap (linha) select lives_ok($sql$select pg_temp.aprovar('Segunda', 'PROT-1')$sql$, 'a primeira aprovação é aceita');
 select pg_temp.claims('a1');
+-- A versão nova só entra até a Revisão interna (ADR 0025): o processo volta a ela, recebe a V2 e segue à Aprovação.
+select pg_temp.mover('Segunda', 'revisao_interna');
 select pg_temp.enviar_completa('Segunda');
+select pg_temp.mover('Segunda', 'aprovacao_setor');
 insert into _tap (linha) select lives_ok($sql$select pg_temp.aprovar('Segunda', 'PROT-2', 'https://x.example/b')$sql$,
   'a segunda aprovação do processo é aceita e toma o lugar da primeira');
 insert into _tap (linha) select results_eq(

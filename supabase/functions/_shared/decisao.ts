@@ -32,6 +32,7 @@ export interface EntradaIniciarEnvio {
   tamanho: number
   numero: number
   historica: boolean
+  piloto: boolean
   /** Com o arquivo: troca o conteúdo dele (mesmo arquivo do Drive); sem: cria um arquivo novo. */
   arquivoId: string | null
 }
@@ -162,6 +163,11 @@ export function lerBooleano(corpo: Corpo, campo: string): Validacao<boolean> {
   return { ok: true, valor }
 }
 
+/** Booleano que pode faltar: ausente vale falso; presente e de outro tipo, recusa. */
+export function lerBooleanoOpcional(corpo: Corpo, campo: string): Validacao<boolean> {
+  return corpo[campo] === undefined ? { ok: true, valor: false } : lerBooleano(corpo, campo)
+}
+
 export function lerPapel(corpo: Corpo): Validacao<PapelDoArquivo> {
   const valor = corpo.papel
   if (typeof valor !== 'string' || !(valor in EXTENSOES_POR_PAPEL)) {
@@ -170,24 +176,48 @@ export function lerPapel(corpo: Corpo): Validacao<PapelDoArquivo> {
   return { ok: true, valor: valor as PapelDoArquivo }
 }
 
-function lerCamposDoEnvio(corpo: Corpo): Validacao<EntradaIniciarEnvio> {
+/** A versão piloto (V6P) é opcional e nunca histórica: ausente vale falso; junto com a histórica, recusa. */
+export function lerPilotoDaVersao(corpo: Corpo, historica: boolean): Validacao<boolean> {
+  const piloto = lerBooleanoOpcional(corpo, 'piloto')
+  if (!piloto.ok) return piloto
+  if (historica && piloto.valor) return campoInvalido(corpo, 'piloto', 'falso quando a versão é histórica')
+  return piloto
+}
+
+type DoArquivo = Pick<EntradaIniciarEnvio, 'processoId' | 'papel' | 'nomeOriginal'>
+type DaVersao = Pick<EntradaIniciarEnvio, 'tamanho' | 'numero' | 'historica' | 'piloto' | 'arquivoId'>
+
+function lerDoArquivo(corpo: Corpo): Validacao<DoArquivo> {
   const processoId = lerTexto(corpo, 'processo_id', FORMATO_UUID, 'uuid')
   if (!processoId.ok) return processoId
   const papel = lerPapel(corpo)
   if (!papel.ok) return papel
   const nomeOriginal = lerTexto(corpo, 'nome_original', /\S/, 'texto não vazio')
   if (!nomeOriginal.ok) return nomeOriginal
+  return { ok: true, valor: { processoId: processoId.valor, papel: papel.valor, nomeOriginal: nomeOriginal.valor } }
+}
+
+function lerDaVersao(corpo: Corpo): Validacao<DaVersao> {
   const tamanho = lerInteiroPositivo(corpo, 'tamanho')
   if (!tamanho.ok) return tamanho
   const numero = lerInteiroPositivo(corpo, 'numero')
   if (!numero.ok) return numero
   const historica = lerBooleano(corpo, 'historica')
   if (!historica.ok) return historica
+  const piloto = lerPilotoDaVersao(corpo, historica.valor)
+  if (!piloto.ok) return piloto
   const arquivoId = lerUuidOpcional(corpo, 'arquivo_id')
   if (!arquivoId.ok) return arquivoId
-  const valor = { processoId: processoId.valor, papel: papel.valor, nomeOriginal: nomeOriginal.valor }
-  const numeros = { tamanho: tamanho.valor, numero: numero.valor, historica: historica.valor, arquivoId: arquivoId.valor }
-  return { ok: true, valor: { ...valor, ...numeros } }
+  const valor = { tamanho: tamanho.valor, numero: numero.valor, historica: historica.valor, piloto: piloto.valor }
+  return { ok: true, valor: { ...valor, arquivoId: arquivoId.valor } }
+}
+
+function lerCamposDoEnvio(corpo: Corpo): Validacao<EntradaIniciarEnvio> {
+  const doArquivo = lerDoArquivo(corpo)
+  if (!doArquivo.ok) return doArquivo
+  const daVersao = lerDaVersao(corpo)
+  if (!daVersao.ok) return daVersao
+  return { ok: true, valor: { ...doArquivo.valor, ...daVersao.valor } }
 }
 
 function conferirArquivo(entrada: EntradaIniciarEnvio): Validacao<EntradaIniciarEnvio> {

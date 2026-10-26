@@ -68,7 +68,7 @@ grant execute on function pg_temp.arquivo(text, text), pg_temp.par(), pg_temp.re
 -- em f5, a histórica V1F com o mesmo conteúdo.
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
 set local role authenticated;
-select public.registrar_versao(pg_temp.processo(sufixo), 1, null, pg_temp.par() || pg_temp.arquivo('bpmn', 'bpmn') || pg_temp.relatorio())
+select public.registrar_versao(pg_temp.processo(sufixo), 1, pg_temp.par() || pg_temp.arquivo('bpmn', 'bpmn') || pg_temp.relatorio())
   from (values ('f1'), ('f2'), ('f3'), ('f4'), ('f6')) as processos (sufixo);
 select public.registrar_versao_historica(pg_temp.processo('f5'), 1, pg_temp.par() || pg_temp.arquivo('bpmn', 'bpmn') || pg_temp.relatorio());
 

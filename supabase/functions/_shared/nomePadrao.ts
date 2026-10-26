@@ -5,6 +5,8 @@ export interface DadosDoNome {
   sigla: string
   numero: number
   historica: boolean
+  /** Versão piloto (V6P); omitida vale falso. Nunca junto com `historica`. */
+  piloto?: boolean
   nomeDoProcesso: string
   papel: PapelDoArquivo
   extensao: string
@@ -28,7 +30,8 @@ function conferirNumero(numero: number): void {
 
 export function nomePadrao(dados: DadosDoNome): string {
   conferirNumero(dados.numero)
-  const rotulo = `V${dados.numero}${dados.historica ? 'F' : ''}`
+  const letra = dados.historica ? 'F' : dados.piloto ? 'P' : ''
+  const rotulo = `V${dados.numero}${letra}`
   const sufixo = dados.papel === 'relatorio' ? '_Relatório' : ''
   const sigla = limparParaNomeDeArquivo(dados.sigla)
   const nome = limparParaNomeDeArquivo(dados.nomeDoProcesso)

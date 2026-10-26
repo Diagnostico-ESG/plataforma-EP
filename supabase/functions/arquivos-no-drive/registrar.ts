@@ -45,15 +45,16 @@ async function conferirSubstituicao(contexto: ContextoDoDrive, entrada: EntradaR
   return conferido.ok ? null : responderRecusa(conferido.recusa)
 }
 
-// Relatório depois: a versão tem de ser do processo do pedido, senão o arquivo da pasta de um processo entraria na de outro.
+// Arquivo depois (relatório, .png ou .bpmn): a versão tem de ser do processo do pedido, senão o arquivo da pasta de um processo entraria na de outro.
 async function conferirRelatorioDepois(contexto: ContextoDoDrive, entrada: EntradaRegistrar, versaoId: string): Promise<Response | null> {
   const conferido = conferirVersaoDoProcesso(await lerProcessoDaVersao(contexto, versaoId), entrada.processoId)
   return conferido.ok ? null : responderRecusa(conferido.recusa)
 }
 
-// Na troca o nome fica; nos demais, o nome do Drive precisa ter o número (e o F) com que a versão será gravada.
+// Na troca o nome fica; nos demais, o nome do Drive precisa ter o número (e o F ou o P) com que a versão será gravada.
 function rotuloEsperado(entrada: EntradaRegistrar): string | null {
-  return entrada.arquivoId === null ? `V${entrada.numero}${entrada.historica ? 'F' : ''}` : null
+  if (entrada.arquivoId !== null) return null
+  return `V${entrada.numero}${entrada.historica ? 'F' : entrada.piloto ? 'P' : ''}`
 }
 
 // As conferências do alvo que o pedido nomeia (arquivo a trocar ou versão a completar); null quando passa ou não há alvo.
