@@ -1,0 +1,20 @@
+.selo-do-setor {
+  background: linear-gradient(90deg, var(--cor-claro), var(--cor-escuro));
+  color: var(--texto);
+  font-weight: 600;
+  /* Sem isto, o modo de contraste forçado apaga a cor da identidade do setor. */
+  forced-color-adjust: none;
+}
+
+.selo-do-setor-pequeno {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--canto);
+}
+
+.selo-do-setor-faixa {
+  display: block;
+  padding: 6px 12px;
+  text-align: center;
+  font-size: 1.125rem;
+}
