@@ -2,11 +2,90 @@
 
 Status: ready-for-agent
 
-**Como resolve o problema (desde 2026-10-23, Andamento livre; cartão e verso ajustados em 2026-10-25).** Hoje o andamento de cada processo fica espalhado entre planilhas e o Power BI, sem saber com certeza em que etapa cada um está, quem cuida dele nem o que mudou. Com esta funcionalidade, a equipe do EP cadastra na plataforma cada processo e subprocesso, ligado ao setor dono e a um macroprocesso. O processo entra na etapa **Não iniciados** e anda pelo catálogo de etapas como um cartão no Planner: qualquer integrante o leva a qualquer etapa, para a frente ou para trás, pela lista de etapas ou arrastando o cartão, sem motivo e sem trava de sequência. A etapa atual tem uma **etiqueta** (A fazer, Em andamento ou Concluído), e o processo tem um **responsável**, que passa a ser quem o move. Quem termina a sua parte marca Concluído, e o próximo vê e pega o processo. O processo termina na etapa **Concluídos**. O histórico guarda cada mudança de etapa, etiqueta e responsável, e o processo que fica mais de 7 dias na mesma etapa ganha um aviso. As seções "Cartão e verso" (2026-10-25) e "Andamento livre", logo abaixo, descrevem o modelo atual e valem sobre o resto desta spec no que divergirem; a mais nova vale sobre a mais antiga. O texto que segue a ela é o registro das entregas anteriores.
+**Como resolve o problema (desde 2026-10-23, Andamento livre; cartão e verso ajustados em 2026-10-25; visualização por setores em 2026-10-26).** Hoje o andamento de cada processo fica espalhado entre planilhas e o Power BI, sem saber com certeza em que etapa cada um está, quem cuida dele nem o que mudou. Com esta funcionalidade, a equipe do EP cadastra na plataforma cada processo e subprocesso, ligado ao setor dono e a um macroprocesso. O processo entra na etapa **Não iniciados** e anda pelo catálogo de etapas como um cartão no Planner: qualquer integrante o leva a qualquer etapa, para a frente ou para trás, pela lista de etapas ou arrastando o cartão, sem motivo e sem trava de sequência. A etapa atual tem uma **etiqueta** (A fazer, Em andamento ou Concluído), e o processo tem um **responsável**, que passa a ser quem o move. Quem termina a sua parte marca Concluído, e o próximo vê e pega o processo. O processo termina na etapa **Concluídos**. O histórico guarda cada mudança de etapa, etiqueta e responsável, e o processo que fica mais de 7 dias na mesma etapa ganha um aviso. As seções "Visualização por setores" (2026-10-26), "Cartão e verso" (2026-10-25) e "Andamento livre", logo abaixo, descrevem o modelo atual e valem sobre o resto desta spec no que divergirem; a mais nova vale sobre a mais antiga. O texto que segue a ela é o registro das entregas anteriores.
 
 **Como resolvia antes de 2026-10-23.** A equipe registrava o andamento etapa por etapa, da Modelagem piloto em diante, num caminho que o administrador configura no catálogo de etapas. A área Processos mostra o trabalho vivo num Quadro, com uma coluna por etapa, e o arquivo completo numa Lista com busca pelo nome e filtros; ao abrir um processo, o **verso do cartão**, uma janela central em duas colunas, mostra primeiro o que há para fazer agora (a etapa atual, quem cuida dela e um único botão principal), depois o caminho de etapas e os arquivos, e ao lado o contexto do processo; o que é raro (histórico, editar, reclassificar, suspender, cancelar, excluir) fica num menu. No Quadro, cada cartão mostra de relance onde o processo está (uma barra com um pedaço por etapa) e só ganha selo quando há algo a dizer (processo parado, relatório pendente, etapa sem responsável, reunião próxima, versão, subprocessos); arrastar o cartão para a coluna seguinte conclui a etapa, e a equipe pode agrupar o Quadro por responsável ou ver só os processos que estão com ela. O banco impõe a sequência das etapas, a situação do processo, as regras de reclassificação e o registro de cada mudança no histórico. As funcionalidades seguintes (reuniões, documentos, revisões, prazos e painel) se apoiam nesse andamento.
 
 Decisões de origem: `.scratch/processos-etapas/sabatina.md` (sabatina de 2026-10-13, três rodadas), `CONTEXT.md` (seções "Setores" e "Processos") e ADR 0004 (mudar o catálogo muda o caminho dos processos em andamento). Mudança de 2026-10-18 (parte 1 da iniciativa experiencia-do-quadro, `.scratch/experiencia-do-quadro/sabatina-parte-1.md`, ADR 0013): saem as etapas do setor, a coluna "Aguardando o setor", os responsáveis do setor e o nível do catálogo; a primeira etapa passa a se chamar Modelagem piloto; o processo ganha a data da reunião (spec de `reunioes`). Mudança de 2026-10-18 (parte 2, `.scratch/experiencia-do-quadro/sabatina-parte-2.md`, ADR 0014): resolver a etapa atual (concluir, dispensar ou registrar como realizada anteriormente) já **avança**, ou seja, inicia a próxima etapa pendente com o responsável escolhido na mesma janela; voltar também escolhe o responsável; [Assumir] em etapa sem responsável; quem enviou a versão mais recente não pode ser escolhido como responsável da Revisão interna. Mudança de 2026-10-19 (parte 3, "Verso do cartão", `.scratch/experiencia-do-quadro/sabatina-parte-3.md`, sem ADR nem mudança no banco): o painel lateral vira o verso do cartão, uma janela central em duas colunas com o cartão "Agora"; o Novo processo, o Editar e o Histórico abrem dentro dela; a Lista ganha busca pelo nome. Mudança de 2026-10-19 (parte 4, "Cartão do Quadro", `.scratch/experiencia-do-quadro/sabatina-parte-4.md`, sem ADR): o cartão do Quadro ganha a barra de progresso e os selos; arrastar o cartão para a coluna de destino abre a janela de avanço da parte 2; o Quadro ganha "Agrupar por: Etapa | Responsável" e "Só os meus"; a view `processos_com_andamento` ganha campos, por migração não destrutiva; `CONTEXT.md` ganha "Processo parado". Mudança de 2026-10-23 ("Anotações do processo", `.scratch/processos-etapas/sabatina-anotacoes.md`, ADR 0021): o verso ganha, no alto da coluna direita, as **Anotações**, um texto livre e único por processo, guardado sozinho enquanto se escreve, sem histórico, com recusa quando outra pessoa alterou antes; `CONTEXT.md` ganha "Anotações".
+
+## Visualização por setores (mudança de 2026-10-26)
+
+Parte 5 da iniciativa quadro-livre, planejada no modo curto do `/planejar` (uma tela, sem regra de negócio nova, sem mudança no banco). Decisões de origem: as cinco perguntas desta seção, respondidas pelo usuário em 2026-10-26, e o mapa `.scratch/quadro-livre/mapa.md` (parte 5). Sem ADR novo nem termo novo no `CONTEXT.md`. Esta seção vale sobre a "Cartão e verso", a "Andamento livre" e o resto desta spec no que divergir.
+
+**Como resolve o problema.** O Quadro já mostra o trabalho por etapa e por pessoa, mas a equipe também precisa ver o andamento de cada setor de uma vez, sem filtrar setor por setor. O "Agrupar por" do Quadro ganha a opção **Setor**: uma coluna por setor ativo, mesmo sem processo, com a sigla em destaque e o nome embaixo, em ordem de sigla. Cada cartão mostra a barra da etapa e a etiqueta, como no Quadro por responsável, e não se arrasta: a troca de setor continua pela reclassificação do verso.
+
+### Solução
+
+- **Agrupar por:** "Etapa | Responsável | Setor". A escolha fica no endereço (`agrupar=setor`), como a de responsável, e só vale no Quadro.
+- **Colunas:** uma por setor ativo, em ordem alfabética da sigla, mesmo vazia. Título com a sigla em destaque e o nome do setor menor, abaixo. Setor inativo só ganha coluna enquanto tiver processo no Quadro, marcada "inativo" como a coluna de responsável desativado, na mesma ordem de sigla.
+- **Processos em cada coluna:** os mesmos do Quadro de hoje (em andamento, suspensos e os de Concluídos não arquivados), cada um na coluna do setor dono, em ordem de nome.
+- **Cartão:** igual ao do Quadro por responsável: barra da etapa ("Nome · 2 de 8") e etiqueta; o avatar de quem cuida continua no rodapé; a sigla do setor sai do cartão, porque a coluna já diz.
+- **Sem arrastar:** no Quadro por setor nenhum cartão se arrasta; clicar abre o verso, como hoje.
+- **Filtros:** com o filtro Setor escolhido, só a coluna desse setor. Com os outros filtros (Macroprocesso, Responsável, Só os meus, busca), todas as colunas dos setores ativos continuam, mesmo as que ficarem vazias. Quando nenhum processo passa nos filtros, vale a mensagem de "nenhum processo" de hoje.
+- **Coluna vazia:** "Nenhum processo deste setor no Quadro.", no estilo da coluna vazia de hoje.
+
+### Histórias de usuário
+
+1. Como Integrante do EP, quero escolher "Agrupar por: Setor" no Quadro, para ver o andamento de cada setor de uma vez.
+2. Como Integrante do EP, quero uma coluna por setor ativo, em ordem de sigla, mesmo sem processo, para ver também os setores que ainda não têm nada em andamento.
+3. Como Integrante do EP, quero ver no título da coluna a sigla em destaque e o nome do setor abaixo, para reconhecer o setor sem decorar as siglas.
+4. Como Integrante do EP, quero ver a coluna de um setor inativo que ainda tem processo, marcada "inativo", para nenhum processo sumir do Quadro.
+5. Como Integrante do EP, quero que o setor inativo sem processo não ganhe coluna, para o Quadro não mostrar setor que já não se usa.
+6. Como Integrante do EP, quero que cada cartão mostre a barra da etapa e a etiqueta, para saber onde cada processo do setor está.
+7. Como Integrante do EP, quero os cartões de cada coluna em ordem de nome, como nas outras colunas do Quadro.
+8. Como Integrante do EP, quero que o cartão não se arraste agrupado por setor, para não trocar o setor dono de um processo por engano.
+9. Como Integrante do EP, quero que, com o filtro Setor escolhido, só a coluna desse setor apareça.
+10. Como Integrante do EP, quero que, com os outros filtros ou "Só os meus", as colunas dos setores ativos continuem, mesmo vazias.
+11. Como Integrante do EP, quero que o agrupamento por setor fique no endereço, para voltar, recarregar ou compartilhar a página e continuar nele.
+12. Como Consulta, quero agrupar por setor e abrir os cartões, sem arrastar, como nos outros agrupamentos.
+13. Como pessoa que usa leitor de tela, quero que cada coluna seja anunciada pela sigla e pelo nome do setor (e "inativo", quando for), para saber em que coluna estou.
+
+### Decisões de implementação
+
+#### Interface
+
+- **Opção nova:** `AgruparQuadroPor` ganha `'setor'`; `AgruparPor` ganha o botão "Setor"; o endereço lê e grava `agrupar=setor` (só no Quadro), como faz com `responsavel`.
+- **Colunas:** uma função pura nova em `colunasDoQuadro.ts`, `colunasPorSetor`, ao lado de `colunasPorResponsavel`, recebe os setores e os processos já filtrados e devolve as colunas pela regra da Solução. A coluna ganha o subtítulo (nome do setor) para o título em duas linhas.
+- **Cartão:** o que hoje é "agrupado por responsável" no cartão (barra no lugar do nome da etapa, sem selo de responsável, sem arrastar) passa a valer para todo agrupamento que não é por etapa; no agrupamento por setor, a sigla sai e o avatar fica.
+- **Setores na Lista de processos:** `listarProcessos` passa a ler também os setores (id, sigla, nome, ativo), em paralelo com as linhas e o catálogo; `ListaDeProcessos` ganha `setores`. A falsa `ProcessosFalso` acompanha.
+- **Estados de carregamento, vazio e erro:** os do Quadro de hoje. A falha ao ler os setores é falha ao carregar os processos (mesma mensagem e "Tentar de novo", inclusive falha de conexão). Sem nenhum processo cadastrado, vale o Quadro vazio de hoje.
+
+#### Modelo de dados
+
+Nenhuma mudança: sem tabela, coluna, view, política nem migração. A tabela `setores` já pode ser lida por todo usuário ativo (política "setores: ativo lê"), que é quem vê o Quadro. Nenhum dado pessoal novo.
+
+### Decisões de teste
+
+- **Interface (a tela inteira):** um teste novo `App.agruparPorSetor` (arte anterior: `App.agruparPorResponsavel`) cobre o botão Setor, as colunas em ordem de sigla com sigla e nome, a coluna vazia, o setor inativo com e sem processo, os cartões com barra e etiqueta e sem sigla, nada arrastável, o filtro Setor com uma coluna só, Só os meus com as colunas vazias mantidas, o endereço ao recarregar e a Consulta.
+- **Funções puras:** `colunasPorSetor` (ordem de sigla, setor vazio, inativo com e sem processo, cancelado e arquivado fora) e o endereço (`agrupar=setor` lido e gravado, ignorado na Lista).
+- **Tradução entre o banco e a tela:** o teste de `listaDeProcessosSupabase` com o cliente simulado passa a conferir a leitura dos setores e a falha dela.
+- Todos os processos e setores dos testes são inventados.
+
+### Fora do escopo desta parte
+
+- Arrastar entre setores (trocar o setor dono continua pela reclassificação).
+- Agrupar por macroprocesso.
+- Ordem dos cartões pela etapa.
+
+### Decisões tomadas ao escrever esta seção, a confirmar na leitura
+
+1. A sigla sai do cartão no Quadro por setor, pela mesma razão da barra no Quadro por etapa: a coluna já diz. O avatar de quem cuida fica, porque a coluna não diz.
+2. O setor inativo com processo entra na mesma ordem de sigla dos ativos, não no fim.
+3. O texto da coluna vazia é "Nenhum processo deste setor no Quadro."
+
+### Divergência com `.scratch/especificacao.md`
+
+Nenhuma.
+
+### Critérios conferidos olhando a tela
+
+- `[visual]` As colunas por setor mostram a sigla em destaque e o nome menor abaixo, sem estourar a largura da coluna, inclusive com nome longo.
+- `[visual]` A marca "inativo" da coluna de setor segue a da coluna de responsável desativado.
+
+### Critérios de pronto
+
+- "Agrupar por: Setor" monta as colunas pela regra da Solução, com os filtros como descritos, e o endereço guarda a escolha.
+- `npm test` verde, com os testes desta seção.
 
 ## Cartão e verso (mudança de 2026-10-25)
 
@@ -1398,3 +1477,4 @@ Entregue em 2026-10-23 (commit ae1fb54), com ressalva: critérios [visual] da mu
 Entregue em 2026-10-23 (commit fa00e9a)
 Entregue em 2026-10-25 (commit cc17e13), com ressalva: critérios [visual] vistos só na vitrine local, com módulos falsos (as janelas de registrar revisão e aprovação e qualquer tela com o login real não foram vistas); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
 Entregue em 2026-10-25 (commit 4ce3e40), com ressalva: critérios [visual] dos tickets 26 e 27 presumidos (a tela não foi vista, nem na vitrine local); revisão de segurança foi a de reserva (menos completa); a Edge Function planilhas-dos-dashboards ainda precisa ser republicada no desenvolvimento; as ressalvas das entregas anteriores seguem valendo
+Em revisão desde 2026-10-26

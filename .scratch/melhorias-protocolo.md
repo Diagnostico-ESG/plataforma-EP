@@ -973,3 +973,8 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **2026-10-26 · Ocorrência: aspas e crases quebram `node -e "..."` em bloco longo** (duas vezes: um comentário com crase saiu sem o texto e uma mensagem de erro saiu vazia, sem aviso do shell além de uma linha de erro). Passei a gravar os scripts de edição com a ferramenta Write e a rodá-los por arquivo.
 - **2026-10-26 · Ocorrência: o Docker continuou desligado** (daemon fora do ar); testes de banco e migração pelo Actions, cerca de 2 a 3 minutos por ciclo.
 - **2026-10-26 · Ocorrência: a captura de tela da vitrine local não funcionou de novo** (tempo esgotado; janela do app oculta); só medi o diálogo com `javascript_tool`, e o critério `[visual]` ficou presumido.
+
+## 2026-10-26 — /planejar modo curto (processos-etapas, parte 5 do quadro livre)
+
+- **2026-10-26 · Ocorrência: o marco de início já existia** (`marco/2026-10-26-inicio-quadro-livre-parte-5`, criado pela sessão anterior no fim do `/ship`, no mesmo commit). Usei esse em vez de criar `marco/2026-10-26-inicio-processos-etapas`. Sugestão: o passo 0/1 do `/planejar` dizer que um marco de início já criado sobre o commit atual vale como o da etapa.
+- **2026-10-26 · Ocorrência: claude-mem sem cota** desde o início da sessão; seguiu sem ele.
