@@ -993,3 +993,9 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 ## 2026-10-27 — /planejar modo curto (caixas-de-selecao)
 
 - **2026-10-27 · Ocorrência: a opção escolhida no `/demanda` trazia "etapa com sua cor", mas as etapas não têm cor no código** (a barra é cinza de propósito). O `/planejar` levou isso como pergunta, e o usuário escolheu só o acabamento. Sugestão: o `/demanda`, ao descrever uma opção visual, conferir no código ou na identidade que cada elemento citado existe.
+
+## 2026-10-27 — /executar-simples (caixas-de-selecao)
+
+- **2026-10-27 · Itens não testados que aconteceram:** linha `Implementado em` na spec de uma funcionalidade sem pasta de tickets (a spec é o único ticket). Esperado: gravada no fim da spec com o hash do commit. Aconteceu: gravada em commit separado, depois do commit do código.
+- **2026-10-27 · Ocorrência: o `/implement` rodou na `main`, sem branch**, como nos `/executar-simples` anteriores.
+- **2026-10-27 · Ocorrência: o `/code-review` do `/implement` devolveu 9 achados; 1 corrigido (CSS), os demais dispensados ou aceitos com motivo** (escopo global do estilo é da spec; foto quebrada na cópia do `<selectedcontent>` aceita). Sugestão: nenhuma.

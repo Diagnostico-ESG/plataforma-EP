@@ -50,3 +50,5 @@ As caixas não buscam dados por conta própria: as opções vêm das listas que 
 
 - O jsdom dos testes não desenha a caixa personalizável; os testes provam comportamento, e a aparência se confere no navegador (`[visual]`).
 - O conteúdo rico dentro de `<option>` (selo, Avatar) e o elemento `<selectedcontent>` (que repete na caixa fechada o visual da opção escolhida) dependem de o React 19.3 aceitá-los sem aviso. Se não aceitar, pare e me mostre as opções antes de qualquer contorno.
+
+Implementado em 2026-10-27 (commit 87bc03a)
