@@ -83,7 +83,7 @@ grant execute on function pg_temp.rotulos(text) to authenticated;
 
 create function pg_temp.nomes(nome_do_processo text, numero_da_versao integer) returns text
 language sql stable as $$
-  select string_agg(nome, '|' order by nome) from public.arquivos_da_versao where versao_id = pg_temp.versao(nome_do_processo, numero_da_versao) $$;
+  select string_agg(nome, '|' order by nome collate "C") from public.arquivos_da_versao where versao_id = pg_temp.versao(nome_do_processo, numero_da_versao) $$;
 grant execute on function pg_temp.nomes(text, integer) to authenticated;
 
 create function pg_temp.edicoes(nome_do_processo text) returns bigint
@@ -265,13 +265,13 @@ insert into _tap (linha) select throws_ok(
 -- ===== O número e o nome só mudam pela função =====
 insert into _tap (linha) select throws_ok(
   $sql$update public.versoes set numero = 50 where id = pg_temp.versao('Andamento', 7)$sql$,
-  'P0001', 'numero_so_pela_funcao', 'a escrita direta no número é recusada');
+  '42501', 'numero_so_pela_funcao', 'a escrita direta no número é recusada');
 insert into _tap (linha) select throws_ok(
   $sql$update public.arquivos_da_versao set nome = 'outro.bpm' where nome = 'T65_V7_Andamento.bpm'$sql$,
-  'P0001', 'nome_so_pela_funcao', 'a escrita direta no nome do arquivo é recusada');
+  '42501', 'nome_so_pela_funcao', 'a escrita direta no nome do arquivo é recusada');
 insert into _tap (linha) select throws_ok(
   $sql$update public.pdfs_da_aprovacao set nome = 'outro.pdf' where nome = 'T65_V3_Aprovado_Aprovação.pdf'$sql$,
-  'P0001', 'nome_so_pela_funcao', 'a escrita direta no nome do .pdf é recusada');
+  '42501', 'nome_so_pela_funcao', 'a escrita direta no nome do .pdf é recusada');
 insert into _tap (linha) select throws_ok(
   $sql$update public.versoes set historica = true where id = pg_temp.versao('Andamento', 7)$sql$,
   '42501', null, 'o tipo da versão não se escreve: sem privilégio');
