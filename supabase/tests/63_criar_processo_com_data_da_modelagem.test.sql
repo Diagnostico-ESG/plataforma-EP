@@ -68,7 +68,7 @@ reset role;
 insert into _tap (linha) select is(pg_temp.existe('Criado Visitante'), 0::bigint, 'visitante não deixou processo');
 
 -- A coluna continua fechada para a criação de outros campos de controle (a data da validação só entra pela função).
-insert into _tap (linha) select col_privs_are('public', 'processos', 'data_da_validacao', 'authenticated', array['UPDATE'], 'data_da_validacao segue só com alterar');
+insert into _tap (linha) select column_privs_are('public', 'processos', 'data_da_validacao', 'authenticated', array['UPDATE'], 'data_da_validacao segue só com alterar');
 
 insert into _tap (linha) select * from finish();
 do $$ begin
