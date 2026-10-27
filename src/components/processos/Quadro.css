@@ -44,7 +44,8 @@
 
 .coluna-titulo {
   display: flex;
-  align-items: center;
+  /* Pela linha de base: no título de duas linhas (por setor) a contagem fica na linha da sigla, igual em todas as colunas. */
+  align-items: baseline;
   justify-content: space-between;
   margin: 0;
   padding: 0 var(--esp-1);

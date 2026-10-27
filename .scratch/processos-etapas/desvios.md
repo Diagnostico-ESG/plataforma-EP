@@ -498,3 +498,13 @@ Ponto de partida da revisão: `marco/2026-10-25-inicio-quadro-livre-parte-2`.
 - **Banco:** `db reset` e `supabase test db` no Docker local: 1299 `ok`, 0 `not ok`. O workflow "Testes de banco" #194 passou na `main` no ticket 26.
 - **Cobertura:** 98,25% das linhas, 94,44% dos ramos. **Dependência circular:** nenhuma. `package.json` não mudou (auditoria de pacotes não rodou; o `.scratch/security.md` segue valendo).
 - **Tela:** os critérios `[visual]` dos tickets 26 e 27 não foram vistos no aplicativo (sem vitrine local pronta e sem o login real); a Edge Function `planilhas-dos-dashboards` ainda precisa ser republicada no desenvolvimento pelo usuário.
+
+## 2026-10-26 — /polir da Visualização por setores (parte 5 do quadro livre)
+
+Visto na vitrine local (`vitrine.local/setores.html`, fora do git, módulos falsos e dados inventados: cinco setores, um de nome longo, dois inativos, um deles sem processo), em 1280 px de largura.
+
+- **`audit`:** 18/20. Acessibilidade 4 (cada coluna anunciada por sigla, nome e "inativo"; nome do setor em `--texto-2` sobre o fundo com contraste de 5,2:1), desempenho 4, tema 4 (só tokens existentes), responsivo 3 (uso em monitor; colunas rolam na horizontal como nos outros agrupamentos), coerência 3.
+- **Corrigido (P2):** a contagem da coluna ficava centralizada no bloco de duas linhas do título por setor, de 9 a 19 px abaixo da sigla e desencontrada entre as colunas. O título passou a alinhar pela linha de base (`align-items: baseline` em `.coluna-titulo`): a contagem fica na linha da sigla em todas as colunas, conferido também nos agrupamentos por etapa e por responsável.
+- **Deixado de fora (P3):** a coluna de setor com nome longo tem o título mais alto (61 px contra 42 px), e os cartões dela começam um pouco mais abaixo. Cortar o nome numa linha esconderia o que a escolha "sigla e nome" (pergunta 1 do `/planejar`) quis mostrar.
+- **Conferido sem achado:** coluna vazia com "Nenhum processo deste setor no Quadro.", setor inativo sem processo fora, "Só os meus" sem processo com a mensagem de hoje, cartão com barra, etiqueta e avatar e sem sigla, console sem erros.
+- **Critérios `[visual]`:** os dois da seção (título em duas linhas sem estourar a coluna com nome longo; marca "inativo" igual à do responsável desativado) vistos na vitrine local, com módulos falsos; não vistos com o login real.
