@@ -978,3 +978,9 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 
 - **2026-10-26 · Ocorrência: o marco de início já existia** (`marco/2026-10-26-inicio-quadro-livre-parte-5`, criado pela sessão anterior no fim do `/ship`, no mesmo commit). Usei esse em vez de criar `marco/2026-10-26-inicio-processos-etapas`. Sugestão: o passo 0/1 do `/planejar` dizer que um marco de início já criado sobre o commit atual vale como o da etapa.
 - **2026-10-26 · Ocorrência: claude-mem sem cota** desde o início da sessão; seguiu sem ele.
+
+## 2026-10-26 — /executar-simples (processos-etapas, visualização por setores)
+
+- **2026-10-26 · Itens não testados que aconteceram:** linha `Implementado em` na spec de uma funcionalidade que tem pasta de tickets (todos concluídos), porque a parte nova foi planejada no modo curto, sem ticket novo. Esperado: o `/executar-simples` pega "o ticket de menor número sem `Concluído em`, sem a pasta, a spec"; aconteceu: a pasta existia com todos concluídos, e a spec foi tratada como o ticket, como combinado no `/planejar`. Sugestão: o `/executar-simples` prever "pasta com todos os tickets concluídos e seção nova na spec, do modo curto: a seção é o ticket".
+- **2026-10-26 · Ocorrência: a trava de git bloqueou um `sed` que só editava `src/processos/colunasDoQuadro.ts`** (as barras escapadas `\/` do `sed` foram lidas como caminho da pasta `.git`; falso positivo já registrado). Não contornei a trava: fiz a mesma edição com a ferramenta de edição de arquivos.
+- **2026-10-26 · Ocorrência: o `/implement` rodou na `main`, sem branch**, como nos `/executar-simples` anteriores.
