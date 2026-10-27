@@ -35,6 +35,7 @@ Plataforma web interna do Centro Estadual de Desburocratização (CED) para cont
    3. **Arquivos por etapa** (documentos-versoes, revisoes-aprovacao): campos de arquivo próprios de cada etapa, versões F, P e em sequência, travas na Modelagem piloto e na Modelagem técnica, relatório com numeração própria, formulário que abre e fecha, sem Observação.
    4. **Outros anexos** (documentos-versoes): anexos livres em todas as etapas, marcados com a etapa.
    5. **Visualização por setores** (processos-etapas): uma coluna por setor.
+10. **Caixas de seleção** (caixas-de-selecao)**:** todas as caixas de seleção com a caixa personalizável do navegador (Chrome e Edge; Firefox e Safari ficam com a caixa comum), no acabamento da identidade; as que têm o que mostrar exibem o visual real da opção (demanda de 2026-10-27, opção B).
 
 A importação (era a funcionalidade 7) saiu da v1 por decisão do usuário em 2026-10-20: os dados atuais (planilhas, Power BI e nomes dos arquivos) não seguem a organização da plataforma, então um importador deixaria quase tudo como pendência ou exigiria arrumar os dados antes, o mesmo trabalho de cadastrar pela tela. A equipe cadastra os dados atuais à mão pelas telas que já existem (as versões antigas como versão histórica, e a plataforma dá o nome padrão aos arquivos no envio). A importação está no backlog.
 
