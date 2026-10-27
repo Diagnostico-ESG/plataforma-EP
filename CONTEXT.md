@@ -157,8 +157,12 @@ _Avoid_: reunião, data da reunião, encontro, agenda, oficina
 ## Documentos
 
 **Versão**:
-Conjunto de arquivos do fluxograma de um processo, numa numeração única por processo: as versões históricas (V5F) e as versões piloto (V6P) têm o número digitado, e as versões em sequência (V7, V8…) continuam a partir do maior número que já existe. Toda versão que não é histórica exige o .bpm (arquivo-fonte do Bizagi); o .png e o .bpmn são opcionais e podem ser acrescentados depois. Cada tipo de versão se envia na sua etapa e aparece em todas. Nunca se apaga, mas um arquivo dela pode ser substituído. Registra a etapa atual do processo no momento do envio, mas não move o processo.
+Conjunto de arquivos do fluxograma de um processo, numa numeração única por processo: as versões históricas (V5F) e as versões piloto (V6P) têm o número digitado, e as versões em sequência (V7, V8…) continuam a partir do maior número que já existe. Toda versão que não é histórica exige o .bpm (arquivo-fonte do Bizagi); o .png e o .bpmn são opcionais e podem ser acrescentados depois. Cada tipo de versão se envia na sua etapa e aparece em todas. Nunca se apaga, mas um arquivo dela pode ser substituído. Registra a etapa atual do processo no momento do envio, mas não move o processo. A **versão mais recente** é a de maior número, fora as históricas.
 _Avoid_: documento, revisão (para versão), arquivo
+
+**Editar número da versão**:
+Trocar o número de uma versão já registrada (qualquer uma, inclusive a histórica e a aprovada, e inclusive o número dado pela plataforma), por Administrador ou Integrante do EP, com o processo em andamento e sem motivo. Avisa, sem impedir, quando a ordem pelo número deixa de ser histórica, piloto, em sequência, ou quando uma versão em sequência não vem logo depois da anterior. O tipo (histórica, piloto, em sequência) não muda, e o número não pode repetir o de outra versão do processo. Pode mudar qual é a versão mais recente. Os arquivos no Drive passam a ter o número novo no nome, e o histórico guarda o número anterior.
+_Avoid_: renumerar, corrigir versão
 
 **Versão em sequência**:
 Versão sem letra (V7), enviada na Relatório e modelagem técnica ou na Revisão interna, com o número dado pela plataforma. Depois da primeira, não se registra mais versão histórica nem versão piloto.
@@ -176,9 +180,9 @@ _Avoid_: versão antiga, versão importada, versão final
 Arquivo .docx com numeração própria por processo (Relatório V1, V2…), enviado sozinho ou junto com uma versão, na Relatório e modelagem técnica ou na Revisão interna, e ligado à versão mais recente no momento do envio. Uma versão sem relatório próprio continua valendo com o último relatório. Os relatórios .pdf antigos e o relatório da versão histórica ficam sem número próprio.
 _Avoid_: laudo, documento técnico, relatório pendente, sem alteração de conteúdo
 
-**Trava de arquivos**:
-A recusa de mover o processo para a frente de uma etapa, quando ele vem dela ou de antes e vai para depois dela, enquanto faltam os arquivos dela: na Modelagem piloto, uma versão piloto; na Relatório e modelagem técnica, uma versão em sequência e um relatório. A janela diz o que falta e oferece o envio ali mesmo. Voltar, mudar a etiqueta e processo que já estava depois da etapa não travam.
-_Avoid_: bloqueio, pré-requisito, obrigatoriedade da etapa
+**Confirmação de arquivos**:
+A pergunta feita ao mover o processo para a frente de uma etapa, quando ele vem dela ou de antes e vai para depois dela, enquanto faltam os arquivos dela: na Modelagem piloto, uma versão piloto; na Relatório e modelagem técnica, uma versão em sequência e um relatório. Diz o que falta (numa só pergunta, se a ida passa pelas duas) e oferece enviar agora, avançar mesmo assim ou cancelar; não impede. Depois do envio, se ainda falta algo, a pergunta volta com o que sobrou. O histórico do movimento guarda o que faltava. Voltar, mudar a etiqueta e processo que já estava depois da etapa não perguntam.
+_Avoid_: trava de arquivos, bloqueio, pré-requisito, obrigatoriedade da etapa
 
 **Substituir arquivo**:
 Trocar um arquivo de uma versão, de um relatório ou da aprovação por outro do mesmo tipo. O arquivo anterior não fica guardado; o histórico registra a troca. A versão histórica e a versão aprovada, com o relatório que a acompanha, não têm arquivo substituído.
