@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useGravacaoNaJanela } from '../../hooks/useGravacaoNaJanela'
+import { avisosDoNumero } from '../../versoes/avisosDoNumero'
 import { gravarNumeroDaVersao, numeroNovoValido, previaDoNumero } from '../../versoes/numeroDaVersao'
 import { rotuloDaVersao } from '../../versoes/rotulos'
 import type { ModuloDeVersoes, Versao } from '../../versoes/tipos'
@@ -9,6 +10,8 @@ import { CampoDoNumeroDaVersao } from './CampoDoNumeroDaVersao'
 type JanelaDoNumeroDaVersaoProps = {
   modulo: Pick<ModuloDeVersoes, 'editarNumero'>
   versao: Versao
+  /** Todas as versões do processo: os avisos comparam o número novo com as outras. */
+  versoes: Versao[]
   /** Chamado quando gravou, antes de a janela fechar: quem mostra as versões lê de novo. */
   aoGravar: () => void
   aoFechar: () => void
@@ -17,9 +20,9 @@ type JanelaDoNumeroDaVersaoProps = {
 /**
  * "Editar número da V7" (ADR 0028): o campo do número (preenchido com o atual), a prévia do rótulo e dos nomes novos dos
  * arquivos, e [Gravar]. Só o número muda, nunca o tipo. Enquanto os arquivos são renomeados no Drive os campos ficam
- * travados; na recusa a janela fica aberta com o número digitado.
+ * travados; os avisos (amarelos, sem impedir) aparecem enquanto se digita, e [Gravar] grava com eles; na recusa a janela fica aberta com o número digitado.
  */
-export function JanelaDoNumeroDaVersao({ modulo, versao, aoGravar, aoFechar }: JanelaDoNumeroDaVersaoProps) {
+export function JanelaDoNumeroDaVersao({ modulo, versao, versoes, aoGravar, aoFechar }: JanelaDoNumeroDaVersaoProps) {
   const [texto, setTexto] = useState(String(versao.numero))
   const { salvando, falha, gravar } = useGravacaoNaJanela(aoFechar)
   const numeroNovo = numeroNovoValido(texto, versao)
@@ -40,6 +43,7 @@ export function JanelaDoNumeroDaVersao({ modulo, versao, aoGravar, aoFechar }: J
         <CampoDoNumeroDaVersao texto={texto} aoMudar={setTexto} />
       </fieldset>
       {numeroNovo !== null && <PreviaDoNumero versao={versao} numeroNovo={numeroNovo} />}
+      {numeroNovo !== null && <AvisosDoNumero avisos={avisosDoNumero(versoes, versao, numeroNovo)} />}
       {salvando && <p className="formulario-de-versao-progresso" role="status">Renomeando os arquivos no Drive…</p>}
     </JanelaDeEdicao>
   )
@@ -55,6 +59,18 @@ function PreviaDoNumero({ versao, numeroNovo }: { versao: Versao; numeroNovo: nu
           {nomes.map((nome) => <li key={nome}>{nome}</li>)}
         </ul>
       )}
+    </div>
+  )
+}
+
+function AvisosDoNumero({ avisos }: { avisos: string[] }) {
+  if (avisos.length === 0) return null
+  return (
+    <div className="formulario-de-versao-avisos" role="status">
+      <ul>
+        {avisos.map((aviso) => <li key={aviso}>{aviso}</li>)}
+      </ul>
+      <p>Gravar assim mesmo?</p>
     </div>
   )
 }

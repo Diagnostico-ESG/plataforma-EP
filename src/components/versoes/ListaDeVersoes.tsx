@@ -72,7 +72,7 @@ function BlocoDaVersao(props: BlocoDaVersaoProps) {
     <article className="bloco-da-versao" aria-label={rotulo}>
       <div className="bloco-da-versao-cabecalho">
         <strong>{rotulo}</strong>
-        {podeAlterar && <AcaoEditarNumero modulo={modulo} versao={versao} aoGravar={aoAlterada} />}
+        {podeAlterar && <AcaoEditarNumero modulo={modulo} versao={versao} versoes={versoes} aoGravar={aoAlterada} />}
         <time dateTime={versao.enviadaEm}>{formatarMomento(versao.enviadaEm)}</time>
         <span>{versao.autor ?? '—'}</span>
         {versao.etapa && <span>{versao.etapa}</span>}

@@ -27,20 +27,20 @@ export function VersaoEmDestaque(props: VersaoEmDestaqueProps) {
   const { versao } = props
   return (
     <article className="versao-destaque" aria-label={rotuloDaVersao(versao)}>
-      <LinhaDoDestaque versao={versao} modulo={props.modulo} podeAlterar={props.podeAlterar} aoGravar={props.aoAlterada} />
+      <LinhaDoDestaque versao={versao} versoes={props.versoes} modulo={props.modulo} podeAlterar={props.podeAlterar} aoGravar={props.aoAlterada} />
       <AutoriaDoDestaque versao={versao} />
       <ArquivosDoDestaque {...props} />
     </article>
   )
 }
 
-type LinhaDoDestaqueProps = { versao: Versao; modulo: ModuloDeVersoes; podeAlterar: boolean; aoGravar: () => void }
+type LinhaDoDestaqueProps = { versao: Versao; versoes: Versao[]; modulo: ModuloDeVersoes; podeAlterar: boolean; aoGravar: () => void }
 
-function LinhaDoDestaque({ versao, modulo, podeAlterar, aoGravar }: LinhaDoDestaqueProps) {
+function LinhaDoDestaque({ versao, versoes, modulo, podeAlterar, aoGravar }: LinhaDoDestaqueProps) {
   return (
     <div className="versao-destaque-linha">
       <strong className="versao-destaque-numero">{rotuloDaVersao(versao)}</strong>
-      {podeAlterar && <AcaoEditarNumero modulo={modulo} versao={versao} aoGravar={aoGravar} />}
+      {podeAlterar && <AcaoEditarNumero modulo={modulo} versao={versao} versoes={versoes} aoGravar={aoGravar} />}
       <span className="versao-destaque-ponto" aria-hidden="true">·</span>
       <time dateTime={versao.enviadaEm} title={formatarMomento(versao.enviadaEm)}>{formatarDiaEMes(versao.enviadaEm)}</time>
       {versao.historica && <Pilula situacao="neutra">Histórica · somente leitura</Pilula>}
