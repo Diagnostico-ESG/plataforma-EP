@@ -16,3 +16,5 @@
 - [x] Saem as recusas `trava_piloto`, `trava_tecnica:<falta>` e `autor_da_versao`, com as frases delas; nenhuma tela traz "Quem enviou a versão… não pode…".
 - [x] Falsa de processos deixa de recusar e guarda o que faltava; testes `App.*` da trava, do arrastar e da chegada a Concluídos passam ao modelo novo.
 - [ ] `[visual]` A pergunta cabe em 1366×768, também com a lista das duas etapas.
+
+Concluído em 2026-10-27 (commit 479793b)
