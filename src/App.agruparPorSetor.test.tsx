@@ -61,6 +61,16 @@ test('o cartão traz a barra da etapa, a etiqueta e o avatar, sem a sigla, e nã
   expect(cartao.getAttribute('draggable')).toBe('false')
 })
 
+test('o cartão não mostra o nome do macroprocesso em nenhum agrupamento, e por setor não tem linha de topo vazia', async () => {
+  abrir([doSetor('Emitir Ofício', TSA)])
+  expect((await cartaoDe('Emitir Ofício')).textContent).not.toContain('Macro de Teste')
+  expect((await cartaoDe('Emitir Ofício')).querySelector('.cartao-sigla')?.textContent).toBe('TSA')
+  await trocar('Setor')
+  const porSetor = await cartaoDe('Emitir Ofício')
+  expect(porSetor.textContent).not.toContain('Macro de Teste')
+  expect(porSetor.querySelector('.cartao-topo')).toBeNull()
+})
+
 test('com o filtro Setor, só a coluna desse setor', async () => {
   window.location.hash = '#/processos?setor=s1&agrupar=setor'
   abrir([doSetor('Emitir Ofício', TSA), doSetor('Pagar Diária', ABC)])

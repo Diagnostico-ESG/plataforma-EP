@@ -31,7 +31,7 @@ type CartaoDoProcessoProps = {
 
 /** O cartão do Quadro é um link: focável, e Enter abre o painel do processo. Arrastar usa o recurso nativo do navegador. */
 export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagado, agrupar, etapas, aoLevantar, aoBaixar }: CartaoDoProcessoProps) {
-  const { id, nome, tipo, setorSigla, macroprocessoNome, situacao } = processo
+  const { id, nome, tipo, setorSigla, situacao } = processo
   const porResponsavel = agrupar === 'responsavel'
   function comecarAArrastar(evento: DragEvent<HTMLAnchorElement>) {
     // O Firefox só inicia o arrastar se houver algum dado na transferência.
@@ -43,10 +43,11 @@ export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagad
     // O <a> se arrasta por padrão (leva o endereço): fora dos casos permitidos, draggable="false" a impede.
     <a id={`cartao-${id}`} className={classesDoCartao(processo, apagado)} href={href} aria-current={escolhido ? 'true' : undefined}
       draggable={arrastavel} onDragStart={arrastavel ? comecarAArrastar : undefined} onDragEnd={arrastavel ? aoBaixar : undefined}>
-      <span className="cartao-topo">
-        {agrupar !== 'setor' && <span className="cartao-sigla">{setorSigla}</span>}
-        <span className="cartao-macroprocesso">{macroprocessoNome}</span>
-      </span>
+      {agrupar !== 'setor' && (
+        <span className="cartao-topo">
+          <span className="cartao-sigla">{setorSigla}</span>
+        </span>
+      )}
       <span className="cartao-nome">{nome}</span>
       {agrupar !== 'etapa' && <BarraDeProgresso processo={processo} />}
       <SelosDoCartao processo={processo} hoje={hojeEmBrasilia()} etapas={etapas} semSeloDeResponsavel={porResponsavel} />

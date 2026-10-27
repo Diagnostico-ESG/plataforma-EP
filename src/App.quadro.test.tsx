@@ -94,7 +94,7 @@ test('cada processo fica na coluna da etapa atual, em ordem de nome', async () =
   expect(cartoesDa(RELATORIO.nome)).toHaveLength(1)
 })
 
-test('o cartão traz sigla, nome, macroprocesso, a pílula "A classificar" e o responsável', async () => {
+test('o cartão traz sigla, nome, a pílula "A classificar" e o responsável, sem o macroprocesso (ADR 0029)', async () => {
   montar({ processos: [
     processo('Emitir Ofício', { tipo: 'a_classificar', responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null } }),
     processo('Pagar Diária', { tipo: 'processo' }),
@@ -102,7 +102,7 @@ test('o cartão traz sigla, nome, macroprocesso, a pílula "A classificar" e o r
   await screen.findByRole('region', { name: MODELAGEM.nome })
   const cartao = within(screen.getByRole('link', { name: /Emitir Ofício/ }))
   expect(cartao.getByText('TSA')).toBeTruthy()
-  expect(cartao.getByText('Macro de Teste')).toBeTruthy()
+  expect(cartao.queryByText('Macro de Teste')).toBeNull()
   expect(cartao.getByText('A classificar')).toBeTruthy()
   expect(cartao.getByRole('img', { name: 'Ana Teste' })).toBeTruthy()
   expect(within(screen.getByRole('link', { name: /Pagar Diária/ })).queryByText('A classificar')).toBeNull()
