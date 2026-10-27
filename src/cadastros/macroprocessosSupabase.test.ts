@@ -13,7 +13,7 @@ const NOVO: DadosDoMacroprocesso = {
 const LINHA = { id: 'm1', ...NOVO, ativo: true }
 const COLUNAS = 'id, codigo, nome, descricao, categoria, ativo'
 const COLUNAS_COM_CONTAGEM = `${COLUNAS}, setores_envolvidos(count)`
-const COLUNAS_COM_SETORES = `${COLUNAS}, setores_envolvidos(observacao, setores(id, sigla, nome, ativo))`
+const COLUNAS_COM_SETORES = `${COLUNAS}, setores_envolvidos(observacao, setores(id, sigla, nome, ativo, cor))`
 const LINHA_LIDA = { ...LINHA, setores_envolvidos: [] }
 
 function criar(cliente: ClienteSupabaseFalso) {
@@ -70,12 +70,12 @@ describe('macroprocessos no módulo real', () => {
   test('ler pede o macroprocesso pelo id e devolve a linha com os setores envolvidos pela sigla', async () => {
     const cliente = new ClienteSupabaseFalso()
     cliente.respostas['macroprocessos.select'] = { data: [{ ...LINHA, setores_envolvidos: [
-      { observacao: null, setores: { id: 's2', sigla: 'TSB', nome: 'Setor B', ativo: false } },
-      { observacao: 'Papel A', setores: { id: 's1', sigla: 'TSA', nome: 'Setor A', ativo: true } },
+      { observacao: null, setores: { id: 's2', sigla: 'TSB', nome: 'Setor B', ativo: false, cor: 4 } },
+      { observacao: 'Papel A', setores: { id: 's1', sigla: 'TSA', nome: 'Setor A', ativo: true, cor: 3 } },
     ] }], error: null }
     expect(await criar(cliente).lerMacroprocesso('m1')).toEqual({ ...LINHA, setoresEnvolvidos: [
-      { setorId: 's1', sigla: 'TSA', nome: 'Setor A', ativo: true, observacao: 'Papel A' },
-      { setorId: 's2', sigla: 'TSB', nome: 'Setor B', ativo: false, observacao: null },
+      { setorId: 's1', sigla: 'TSA', nome: 'Setor A', ativo: true, cor: 3, observacao: 'Papel A' },
+      { setorId: 's2', sigla: 'TSB', nome: 'Setor B', ativo: false, cor: 4, observacao: null },
     ] })
     expect(cliente.pedidos[0]).toMatchObject({ tabela: 'macroprocessos', colunas: COLUNAS_COM_SETORES,
       filtro: ['id', 'm1'] })

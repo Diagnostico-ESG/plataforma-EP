@@ -1,5 +1,6 @@
 import { type ErroDoBanco, TravaDoBanco, porQueNadaMudou, recusaPorPerfil } from '../acesso/falhasDeGravacao'
 import type { ClienteSupabase } from '../lib/supabase'
+import type { TablesInsert } from '../types/database'
 import { RECUSAS_DOS_CADASTROS } from './cadastroInexistente'
 import { criarHistoricoSupabase } from './historicoSupabase'
 import { criarMacroprocessosSupabase } from './macroprocessosSupabase'
@@ -37,7 +38,7 @@ function criarSetoresSupabase(cliente: ClienteSupabase): OperacoesDeSetor {
 
 async function listarSetores(cliente: ClienteSupabase): Promise<SetorDaLista[]> {
   const { data, error } = await cliente.from('setores')
-    .select('id, sigla, nome, observacoes, ativo, setores_envolvidos(count)').order('sigla')
+    .select('id, sigla, nome, observacoes, ativo, cor, setores_envolvidos(count)').order('sigla')
   if (error) throw new Error(`Falha ao listar os setores: ${error.message}`)
   return data.map(({ setores_envolvidos: contagem, ...setor }) => ({
     ...setor, quantidadeDeMacroprocessos: contagem[0]?.count ?? 0,
@@ -51,7 +52,7 @@ type VinculoLido = {
 
 async function lerSetor(cliente: ClienteSupabase, id: string): Promise<SetorComMacroprocessos | null> {
   const { data, error } = await cliente.from('setores')
-    .select('id, sigla, nome, observacoes, ativo, setores_envolvidos(observacao, macroprocessos(id, codigo, nome))')
+    .select('id, sigla, nome, observacoes, ativo, cor, setores_envolvidos(observacao, macroprocessos(id, codigo, nome))')
     .eq('id', id)
   if (error) throw new Error(`Falha ao ler o setor: ${error.message}`)
   if (!data[0]) return null
@@ -67,7 +68,8 @@ function macroprocessosDoSetor(vinculos: VinculoLido[]): MacroprocessoDoSetor[] 
 }
 
 async function criarSetor(cliente: ClienteSupabase, dados: DadosDoSetor): Promise<void> {
-  const { error } = await cliente.from('setores').insert(dados)
+  // Sem cor: o gatilho do banco dá ao setor novo a primeira cor livre. Os tipos gerados a pedem porque a coluna é obrigatória.
+  const { error } = await cliente.from('setores').insert(dados as TablesInsert<'setores'>)
   if (error) throw falhaDoSetor(error, dados)
 }
 

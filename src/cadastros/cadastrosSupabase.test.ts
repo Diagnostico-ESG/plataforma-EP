@@ -15,14 +15,14 @@ function criar(cliente: ClienteSupabaseFalso) {
 describe('criarCadastrosSupabase', () => {
   test('lista os setores com a quantidade de macroprocessos, pedindo ao banco a ordem pela sigla', async () => {
     const cliente = new ClienteSupabaseFalso()
-    const linha = { id: 's1', sigla: 'NFT', nome: NOVO.nome, observacoes: null, ativo: true }
+    const linha = { id: 's1', sigla: 'NFT', nome: NOVO.nome, observacoes: null, ativo: true, cor: 3 }
     const outra = { ...linha, id: 's2', sigla: 'OUT' }
     cliente.respostas['setores.select'] = { data: [
       { ...linha, setores_envolvidos: [{ count: 2 }] }, { ...outra, setores_envolvidos: [] }], error: null }
     expect(await criar(cliente).listarSetores()).toEqual([
       { ...linha, quantidadeDeMacroprocessos: 2 }, { ...outra, quantidadeDeMacroprocessos: 0 }])
     expect(cliente.pedidos[0]).toMatchObject({ tabela: 'setores',
-      colunas: 'id, sigla, nome, observacoes, ativo, setores_envolvidos(count)', ordem: [['sigla', true]] })
+      colunas: 'id, sigla, nome, observacoes, ativo, cor, setores_envolvidos(count)', ordem: [['sigla', true]] })
   })
 
   test('falha ao listar vira erro com o motivo do banco', async () => {
@@ -35,6 +35,8 @@ describe('criarCadastrosSupabase', () => {
     const cliente = new ClienteSupabaseFalso()
     await criar(cliente).criarSetor(NOVO)
     expect(cliente.pedidos[0]).toMatchObject({ tabela: 'setores', operacao: 'insert', valores: NOVO })
+    // A cor é escolhida pelo banco (gatilho da primeira cor livre).
+    expect(cliente.pedidos[0].valores).not.toHaveProperty('cor')
   })
 
   test.each([
@@ -58,7 +60,7 @@ describe('criarCadastrosSupabase', () => {
     expect((falha as Error).message).toBe('erro inesperado do banco (conexão perdida)')
   })
 
-  const LINHA = { id: 's1', sigla: 'NFT', nome: NOVO.nome, observacoes: null, ativo: true }
+  const LINHA = { id: 's1', sigla: 'NFT', nome: NOVO.nome, observacoes: null, ativo: true, cor: 3 }
   const LINHA_LIDA = { ...LINHA, setores_envolvidos: [] }
   type Modulo = ReturnType<typeof criar>
 
@@ -73,7 +75,7 @@ describe('criarCadastrosSupabase', () => {
       { id: 'm2', codigo: null, nome: 'Beta Fictício', observacao: 'Papel B' },
     ] })
     expect(cliente.pedidos[0]).toMatchObject({ tabela: 'setores', filtro: ['id', 's1'],
-      colunas: 'id, sigla, nome, observacoes, ativo, setores_envolvidos(observacao, macroprocessos(id, codigo, nome))' })
+      colunas: 'id, sigla, nome, observacoes, ativo, cor, setores_envolvidos(observacao, macroprocessos(id, codigo, nome))' })
   })
 
   test('ler um setor que não existe devolve null', async () => {

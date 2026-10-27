@@ -796,6 +796,7 @@ export type Database = {
       setores: {
         Row: {
           ativo: boolean
+          cor: number
           criado_em: string
           id: string
           nome: string
@@ -804,6 +805,7 @@ export type Database = {
         }
         Insert: {
           ativo?: boolean
+          cor: number
           criado_em?: string
           id?: string
           nome: string
@@ -812,6 +814,7 @@ export type Database = {
         }
         Update: {
           ativo?: boolean
+          cor?: number
           criado_em?: string
           id?: string
           nome?: string

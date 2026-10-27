@@ -6,11 +6,14 @@ import type {
   ModuloDeCadastros, Setor, SetorComMacroprocessos, SetorDaLista,
 } from './tipos'
 
+/** Setor como as fixtures dos testes o escrevem: sem `cor`, vale a 1 ao ler. */
+export type SetorDoTeste = Omit<Setor, 'cor'> & { cor?: number }
+
 type Vinculo = { macroprocessoId: string; setorId: string; observacao: string | null }
 
 /** Implementação falsa dos cadastros para os testes de tela: sem rede, com falhas e esperas simuladas. */
 export class CadastrosFalso implements ModuloDeCadastros {
-  setores: Setor[] = []
+  setores: SetorDoTeste[] = []
   macroprocessos: Macroprocesso[] = []
   /** Os setores envolvidos em cada macroprocesso; as contagens e as leituras partem daqui. */
   vinculos: Vinculo[] = []
@@ -29,7 +32,7 @@ export class CadastrosFalso implements ModuloDeCadastros {
     if (this.segurarLista) return new Promise<never>(() => {})
     if (this.falharLista) throw new Error('falha de conexão simulada')
     return this.setores.map((setor) => ({
-      ...setor, quantidadeDeMacroprocessos: this.vinculos.filter((vinculo) => vinculo.setorId === setor.id).length,
+      ...this.comCor(setor), quantidadeDeMacroprocessos: this.vinculos.filter((vinculo) => vinculo.setorId === setor.id).length,
     }))
   }
 
@@ -42,12 +45,12 @@ export class CadastrosFalso implements ModuloDeCadastros {
         ? [{ id: macroprocesso.id, codigo: macroprocesso.codigo, nome: macroprocesso.nome, observacao: vinculo.observacao }]
         : []
     })
-    return { ...setor, macroprocessos: macroprocessos.sort(compararMacroprocessos) }
+    return { ...this.comCor(setor), macroprocessos: macroprocessos.sort(compararMacroprocessos) }
   }
 
   async criarSetor(dados: DadosDoSetor): Promise<void> {
     this.falharSeConfigurado()
-    this.setores = [...this.setores, { id: `setor-${this.setores.length + 1}`, ativo: true, ...dados }]
+    this.setores = [...this.setores, { id: `setor-${this.setores.length + 1}`, ativo: true, cor: this.primeiraCorLivre(), ...dados }]
   }
 
   async editarSetor(id: string, dados: DadosDoSetor): Promise<void> {
@@ -86,7 +89,7 @@ export class CadastrosFalso implements ModuloDeCadastros {
     const setoresEnvolvidos = this.vinculos.filter((vinculo) => vinculo.macroprocessoId === id).flatMap((vinculo) => {
       const setor = this.setores.find((outro) => outro.id === vinculo.setorId)
       return setor
-        ? [{ setorId: setor.id, sigla: setor.sigla, nome: setor.nome, ativo: setor.ativo, observacao: vinculo.observacao }]
+        ? [{ setorId: setor.id, sigla: setor.sigla, nome: setor.nome, ativo: setor.ativo, cor: this.comCor(setor).cor, observacao: vinculo.observacao }]
         : []
     })
     return { ...macroprocesso, setoresEnvolvidos: setoresEnvolvidos.sort((a, b) => a.sigla.localeCompare(b.sigla, 'pt-BR')) }
@@ -156,13 +159,23 @@ export class CadastrosFalso implements ModuloDeCadastros {
     throw typeof this.falhaDeGravacao === 'string' ? new Error(this.falhaDeGravacao) : this.falhaDeGravacao
   }
 
-  private acharSetor(id: string): Setor {
+  private comCor(setor: SetorDoTeste): Setor {
+    return { ...setor, cor: setor.cor ?? 1 }
+  }
+
+  /** Imita o gatilho do banco: a menor cor de 1 a 30 que nenhum setor tem (ativo ou inativo); com as 30 em uso, a 1. */
+  private primeiraCorLivre(): number {
+    const emUso = new Set(this.setores.map((setor) => this.comCor(setor).cor))
+    return Array.from({ length: 30 }, (_, i) => i + 1).find((cor) => !emUso.has(cor)) ?? 1
+  }
+
+  private acharSetor(id: string): SetorDoTeste {
     const setor = this.setores.find((outro) => outro.id === id)
     if (!setor) throw new CadastroInexistente()
     return setor
   }
 
-  private trocarSetor(id: string, mudancas: Partial<Setor>): void {
+  private trocarSetor(id: string, mudancas: Partial<SetorDoTeste>): void {
     this.falharSeConfigurado()
     const setor = this.acharSetor(id)
     this.setores = this.setores.map((outro) => (outro === setor ? { ...outro, ...mudancas } : outro))
