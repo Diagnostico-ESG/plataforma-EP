@@ -5,6 +5,7 @@ import { emOrdemDeExibicao, formatarDiaEMes, papeisQueSePodeAcrescentar, rotuloC
 import type { ArquivoDaVersao, ConferenciaDosArquivos, ModuloDeVersoes, Versao } from '../../versoes/tipos'
 import { Pilula } from '../Pilula'
 import { AcaoSubstituir } from './AcaoSubstituir'
+import { AcaoEditarNumero } from './AcaoEditarNumero'
 import { AcrescentarArquivo } from './AcrescentarArquivo'
 import { LinkDoArquivo } from './LinkDoArquivo'
 import { MarcaNoDrive } from './MarcaNoDrive'
@@ -26,23 +27,26 @@ export function VersaoEmDestaque(props: VersaoEmDestaqueProps) {
   const { versao } = props
   return (
     <article className="versao-destaque" aria-label={rotuloDaVersao(versao)}>
-      <LinhaDoDestaque versao={versao} />
+      <LinhaDoDestaque versao={versao} modulo={props.modulo} podeAlterar={props.podeAlterar} aoGravar={props.aoAlterada} />
       <AutoriaDoDestaque versao={versao} />
       <ArquivosDoDestaque {...props} />
     </article>
   )
 }
 
-function LinhaDoDestaque({ versao }: { versao: Versao }) {
+type LinhaDoDestaqueProps = { versao: Versao; modulo: ModuloDeVersoes; podeAlterar: boolean; aoGravar: () => void }
+
+function LinhaDoDestaque({ versao, modulo, podeAlterar, aoGravar }: LinhaDoDestaqueProps) {
   return (
-    <p className="versao-destaque-linha">
+    <div className="versao-destaque-linha">
       <strong className="versao-destaque-numero">{rotuloDaVersao(versao)}</strong>
+      {podeAlterar && <AcaoEditarNumero modulo={modulo} versao={versao} aoGravar={aoGravar} />}
       <span className="versao-destaque-ponto" aria-hidden="true">·</span>
       <time dateTime={versao.enviadaEm} title={formatarMomento(versao.enviadaEm)}>{formatarDiaEMes(versao.enviadaEm)}</time>
       {versao.historica && <Pilula situacao="neutra">Histórica · somente leitura</Pilula>}
       {versao.piloto && <Pilula situacao="neutra">Piloto</Pilula>}
       {versao.aprovada && <Pilula situacao="aprovado">Aprovada</Pilula>}
-    </p>
+    </div>
   )
 }
 

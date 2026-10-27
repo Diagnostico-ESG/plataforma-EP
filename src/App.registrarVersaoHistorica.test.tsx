@@ -174,7 +174,8 @@ test('registrar a V5F fecha o formulário e a lista mostra a V5F, sem etapa, com
   expect(v5f.getByText('Histórica · somente leitura')).toBeTruthy()
   expect(v5f.queryByText('Reunião de modelagem')).toBeNull()
   expect(v5f.getByRole('link', { name: comNome('TSA_V5F_Emitir Ofício.bpm') })).toBeTruthy()
-  expect(v5f.queryByRole('button')).toBeNull()
+  // Somente leitura para arquivos: o único botão é o ⋯ do Editar número (ADR 0028), que não troca arquivo.
+  expect(v5f.getAllByRole('button').map((botao) => botao.getAttribute('aria-label'))).toEqual(['Ações da V5F'])
   expect(secao.queryByRole('form', { name: BOTAO })).toBeNull()
   expect(versoes.envios[0]).toMatchObject({ processoId: 'p1', numero: 5 })
 })

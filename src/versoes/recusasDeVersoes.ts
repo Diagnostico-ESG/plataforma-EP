@@ -26,6 +26,11 @@ const FRASE_DO_CODIGO: Record<string, (valor: string) => string> = {
   papel_nao_acrescentavel: () => 'Só o .png e o .bpmn podem ser acrescentados depois.',
   numero_da_versao_mudou: (numero) =>
     `Outra pessoa enviou uma versão enquanto você enviava; esta seria a V${numero}. Envie de novo.`,
+  numero_ja_usado: (rotulo) => `Este processo já tem a ${rotulo}.`,
+  numero_da_versao_alterado: () => 'O número desta versão mudou enquanto você editava. Feche e abra de novo.',
+  numero_invalido: (valor) => `O número da versão precisa ser um inteiro maior que zero; recebido: ${valor}.`,
+  renomeacao_no_drive_falhou: (rotulo) => `Os arquivos não puderam ser renomeados no Drive; a versão continua ${rotulo}.`,
+  renomeacao_incompleta: () => 'Alguns arquivos ficaram com o nome novo no Drive. Repita a edição para corrigir os nomes.',
   extensao_nao_aceita: () => 'Um dos arquivos tem um tipo que não é aceito no campo dele.',
   arquivo_grande: () => 'Um dos arquivos passa de 20 MB.',
   sem_espaco_no_drive: () => 'Não há espaço no Drive. Avise o administrador.',

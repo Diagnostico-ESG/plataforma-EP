@@ -46,8 +46,8 @@ export function rotuloDaVersao(versao: VersaoDoProcesso): string {
 // Recusas no formato do banco ("motivo:valor"), que a tela já traduz por código (src/versoes/recusasDeVersoes.ts).
 export const recusaNumeroJaUsado = (rotulo: string): RecusaDoBanco => ({ codigo: 'numero_ja_usado', mensagem: rotulo })
 export const recusaNumeroAlterado = (atual: number): RecusaDoBanco => ({ codigo: 'numero_da_versao_alterado', mensagem: String(atual) })
-export const recusaDeRenomeacaoNoDrive = (numeroAtual: number): RecusaDoBanco =>
-  ({ codigo: 'renomeacao_no_drive_falhou', mensagem: String(numeroAtual) })
+export const recusaDeRenomeacaoNoDrive = (rotuloAtual: string): RecusaDoBanco =>
+  ({ codigo: 'renomeacao_no_drive_falhou', mensagem: rotuloAtual })
 /** Os nomes não voltaram todos ao que eram: repetir a edição leva todos ao número pedido. */
 export const RECUSA_DE_RENOMEACAO_INCOMPLETA: RecusaDoBanco =
   { codigo: 'renomeacao_incompleta', mensagem: 'Repita a edição para corrigir os nomes no Drive.' }

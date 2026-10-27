@@ -74,7 +74,7 @@ test('a versão histórica não tem [Substituir]', async () => {
   montarNosCadastros(COM_VERSOES)
   const secao = await secaoDeVersoes()
   const historica = within(await secao.findByRole('article', { name: 'V2F' }))
-  expect(historica.queryByRole('button')).toBeNull()
+  expect(historica.getAllByRole('button').map((botao) => botao.getAttribute('aria-label'))).toEqual(['Ações da V2F'])
 })
 
 test('a Consulta vê os links dos arquivos, sem [Substituir]', async () => {

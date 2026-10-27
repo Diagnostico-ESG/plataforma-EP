@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { conferirChamador, conferirProcessoEmAndamento, lerAcao } from './decisao.ts'
 import {
-  arquivosParaRenomear, conferirNumeroDaVersao, nomeComORotuloNovo, rotuloDaVersao, validarRenumerar, type VersaoDoProcesso,
+  RECUSA_DE_RENOMEACAO_INCOMPLETA, arquivosParaRenomear, conferirNumeroDaVersao, nomeComORotuloNovo, recusaDeRenomeacaoNoDrive,
+  rotuloDaVersao, validarRenumerar, type VersaoDoProcesso,
 } from './renumerar.ts'
 
 const UUID = '3f2b8c1e-0000-4000-8000-000000000001'
@@ -76,6 +77,13 @@ describe('conferirNumeroDaVersao', () => {
       .toEqual({ codigo: 'numero_ja_usado', mensagem: 'V3F' })
     expect(conferirNumeroDaVersao(EM_SEQUENCIA, { numeroEsperado: 5, numeroNovo: 4 }, doProcesso))
       .toEqual({ codigo: 'numero_ja_usado', mensagem: 'V4P' })
+  })
+})
+
+describe('recusas da renomeação no Drive', () => {
+  it('a falha diz o rótulo que continua valendo, e a volta incompleta pede para repetir a edição', () => {
+    expect(recusaDeRenomeacaoNoDrive('V5F')).toEqual({ codigo: 'renomeacao_no_drive_falhou', mensagem: 'V5F' })
+    expect(RECUSA_DE_RENOMEACAO_INCOMPLETA.codigo).toBe('renomeacao_incompleta')
   })
 })
 

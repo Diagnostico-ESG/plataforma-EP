@@ -20,6 +20,7 @@ export function criarVersoesSupabase(cliente: ClienteSupabase, enviarBytes: Envi
     enviarRelatorio: (pedido, aoProgredir) => enviarRelatorio(cliente, enviarBytes, pedido, aoProgredir),
     enviarPdfDaAprovacao: (pedido, aoProgredir) => enviarPdfDaAprovacao(cliente, enviarBytes, pedido, aoProgredir),
     substituirArquivo: (pedido, aoProgredir) => substituirArquivo(cliente, enviarBytes, pedido, aoProgredir),
+    editarNumero: (versaoId, numeroEsperado, numeroNovo) => editarNumero(cliente, versaoId, numeroEsperado, numeroNovo),
     conferirArquivos: (processoId) => conferirArquivos(cliente, processoId),
     baixarArquivo: (arquivo) => baixarArquivo(cliente, arquivo),
     anexos: criarAnexosSupabase(cliente, enviarBytes),
@@ -118,6 +119,11 @@ async function substituirArquivo(cliente: ClienteSupabase, enviarBytes: EnviarBy
     acao: 'registrar', processo_id: processoId, numero, historica: false, piloto: false, arquivo_id: arquivo.id,
     arquivos: [{ papel: arquivo.papel, drive_id: id }],
   })
+}
+
+// A função confere quem pede, o número e a pasta de cada arquivo, renomeia no Drive e então grava no banco; qualquer recusa volta com a frase pronta.
+async function editarNumero(cliente: ClienteSupabase, versaoId: string, numeroEsperado: number, numeroNovo: number): Promise<void> {
+  await chamarFuncao(cliente, { acao: 'renumerar', versao_id: versaoId, numero_esperado: numeroEsperado, numero_novo: numeroNovo })
 }
 
 // Só pergunta: a função compara com o Drive e devolve a situação de cada arquivo; nada é gravado.

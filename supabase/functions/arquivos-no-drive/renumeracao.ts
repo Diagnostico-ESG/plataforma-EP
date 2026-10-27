@@ -5,7 +5,7 @@
 import { recusar } from '../_shared/decisao.ts'
 import { recusaDoBanco, statusDaRecusaDoBanco, type RecusaDoBanco } from '../_shared/registro.ts'
 import {
-  RECUSA_DE_RENOMEACAO_INCOMPLETA, arquivosParaRenomear, conferirNumeroDaVersao, recusaDeRenomeacaoNoDrive,
+  RECUSA_DE_RENOMEACAO_INCOMPLETA, arquivosParaRenomear, conferirNumeroDaVersao, recusaDeRenomeacaoNoDrive, rotuloDaVersao,
   type ArquivoParaRenomear, type EntradaRenumerar, type VersaoDoProcesso,
 } from '../_shared/renumerar.ts'
 import { lerProcesso, recusaDoProcesso } from './acoes.ts'
@@ -132,7 +132,7 @@ export async function renumerarVersao(contexto: ContextoDoDrive, entrada: Entrad
   const { feitos, falhou } = await renomearTodos(contexto.token, preparo.plano)
   if (falhou) {
     const voltou = await devolverNomes(contexto.token, feitos)
-    return responderRecusaDoBanco(voltou ? recusaDeRenomeacaoNoDrive(preparo.versao.numero) : RECUSA_DE_RENOMEACAO_INCOMPLETA)
+    return responderRecusaDoBanco(voltou ? recusaDeRenomeacaoNoDrive(rotuloDaVersao(preparo.versao)) : RECUSA_DE_RENOMEACAO_INCOMPLETA)
   }
   const recusaNaGravacao = await gravarOuDevolver(contexto, entrada, feitos)
   if (!recusaNaGravacao) return responderJson(200, { numero: entrada.numeroNovo })

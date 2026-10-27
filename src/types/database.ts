@@ -1109,6 +1109,14 @@ export type Database = {
         Returns: undefined
       }
       desarquivar_processo: { Args: { p_processo: string }; Returns: undefined }
+      editar_numero_da_versao: {
+        Args: {
+          p_numero_esperado: number
+          p_numero_novo: number
+          p_versao: string
+        }
+        Returns: undefined
+      }
       enviar_relatorio: {
         Args: {
           p_arquivo: Json

@@ -100,3 +100,25 @@ describe('evento de substituição no histórico', () => {
     expect(nomeDoItem(SUBSTITUICAO)).toBe('V3 — Emitir Ofício')
   })
 })
+
+describe('edição do número da versão no histórico', () => {
+  const EDICAO: EventoDoCadastro = {
+    ...ENVIO, acao: 'alterar_numero',
+    antes: { rotulo: 'V7', processo_nome: 'Emitir Ofício', setor_sigla: 'TSA' },
+    depois: { rotulo: 'V5', processo_nome: 'Emitir Ofício', setor_sigla: 'TSA' },
+  }
+
+  test('diz de que número para que número, com a letra do tipo', () => {
+    expect(textoDoEvento(EDICAO)).toBe('Alterou o número da V7 para V5')
+    const historica = { ...EDICAO, antes: { rotulo: 'V3F' }, depois: { rotulo: 'V2F' } }
+    expect(textoDoEvento(historica)).toBe('Alterou o número da V3F para V2F')
+  })
+
+  test('o item do evento é a versão com o número novo', () => {
+    expect(nomeDoItem(EDICAO)).toBe('V5 — Emitir Ofício')
+  })
+
+  test('sem os rótulos no evento, cai no texto da ação', () => {
+    expect(textoDoEvento({ ...EDICAO, antes: null })).toBe('Alterou o número da versão')
+  })
+})

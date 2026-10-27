@@ -45,7 +45,7 @@ const TEXTO_DA_ACAO_DA_VERSAO: Record<string, string> = {
   acrescentar_arquivo: 'Acrescentou um arquivo à versão',
   enviar_relatorio: 'Enviou o Relatório',
   acrescentar_relatorio: 'Acrescentou o relatório à versão', sem_alteracao: 'Marcou sem alteração de conteúdo na versão',
-  substituir: 'Substituiu o arquivo da versão',
+  substituir: 'Substituiu o arquivo da versão', alterar_numero: 'Alterou o número da versão',
 }
 
 const TEXTO_DA_ACAO_DO_ANEXO: Record<string, string> = { enviar: 'Enviou o anexo', retirar: 'Retirou o anexo' }
@@ -111,12 +111,20 @@ function textoDaRetirada(evento: EventoDoCadastro): string | null {
   return typeof nome === 'string' ? `Retirou o anexo '${nome}'` : null
 }
 
+// "Alterou o número da V7 para V5": os rótulos de antes e de depois, guardados no evento.
+function textoDaEdicaoDoNumero(evento: EventoDoCadastro): string | null {
+  const antes = registro(evento.antes).rotulo
+  const depois = registro(evento.depois).rotulo
+  return typeof antes === 'string' && typeof depois === 'string' ? `Alterou o número da ${antes} para ${depois}` : null
+}
+
 function textoDaVersao(evento: EventoDoCadastro): string | null {
   if (evento.entidade !== 'versao') return null
   if (evento.acao === 'acrescentar_arquivo') {
     const papel = registro(evento.depois).papel
     if (typeof papel === 'string' && papel !== '') return `Acrescentou o .${papel} à versão`
   }
+  if (evento.acao === 'alterar_numero') return textoDaEdicaoDoNumero(evento)
   if (evento.acao === 'enviar_relatorio') {
     const { numero_do_relatorio: numero, rotulo } = registro(evento.depois)
     if (typeof numero === 'number' && typeof rotulo === 'string') return `Enviou o Relatório V${numero} (acompanha a ${rotulo})`

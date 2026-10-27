@@ -999,3 +999,8 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **2026-10-27 · Itens não testados que aconteceram:** linha `Implementado em` na spec de uma funcionalidade sem pasta de tickets (a spec é o único ticket). Esperado: gravada no fim da spec com o hash do commit. Aconteceu: gravada em commit separado, depois do commit do código.
 - **2026-10-27 · Ocorrência: o `/implement` rodou na `main`, sem branch**, como nos `/executar-simples` anteriores.
 - **2026-10-27 · Ocorrência: o `/code-review` do `/implement` devolveu 9 achados; 1 corrigido (CSS), os demais dispensados ou aceitos com motivo** (escopo global do estilo é da spec; foto quebrada na cópia do `<selectedcontent>` aceita). Sugestão: nenhuma.
+
+## 2026-10-27 — /executar-complexo (travas-em-avisos, ticket 03)
+
+- **2026-10-27 · Itens não testados que aconteceram:** `/executar-complexo` em worktree, a pedido de outra sessão (execução em paralelo com o ticket 01), no lugar da branch comum; plano gravado em `plano-03.md` durante a execução, e não antes; migração corrigida por migração nova (a primeira, já aplicada no desenvolvimento, devolvia P0001 onde os testes 27, 30 e 60 pedem 42501); pgTAP só pelo workflow, sem Docker. Esperado: pgTAP no Docker local, plano antes do código. Aconteceu: o Docker Desktop não sobe nesta máquina (WSL não instalado), então a bateria rodou só no "Testes de banco" do GitHub; o único reprovado foi o teste 59, do ticket 01.
+- **2026-10-27 · Ocorrência: o hook de pre-commit rodou a bateria inteira duas vezes por falha de tempo (testes de tela estouraram o limite com o computador ocupado)**; os mesmos testes passam isolados e na repetição.
