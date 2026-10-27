@@ -1480,3 +1480,5 @@ Entregue em 2026-10-25 (commit cc17e13), com ressalva: critérios [visual] visto
 Entregue em 2026-10-25 (commit 4ce3e40), com ressalva: critérios [visual] dos tickets 26 e 27 presumidos (a tela não foi vista, nem na vitrine local); revisão de segurança foi a de reserva (menos completa); a Edge Function planilhas-dos-dashboards ainda precisa ser republicada no desenvolvimento; as ressalvas das entregas anteriores seguem valendo
 Entregue em 2026-10-26 (commit 2c4ff1d), com ressalva: critérios [visual] da visualização por setores (título em duas linhas com nome longo, marca "inativo") vistos só na vitrine local, com módulos falsos, nunca com o login real; revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
 Implementado em 2026-10-26 (commit 6052a4f)
+
+Entregue em 2026-10-27 (commit 17ce602), correção do bug de criar processo (permissão da coluna da data da modelagem piloto); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
