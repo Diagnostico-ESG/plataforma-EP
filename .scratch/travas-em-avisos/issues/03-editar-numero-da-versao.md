@@ -15,11 +15,13 @@
 - [x] Versão mais recente, relatório que vale e próxima versão em sequência seguem o número novo; subprocesso com os próprios números.
 - [x] Histórico mostra "Alterou o número da V{antes} para V{depois}", com quem e quando.
 - [x] Passo do usuário anotado: publicar de novo `arquivos-no-drive` no desenvolvimento e provar a renomeação no Drive real (abaixo).
-- [ ] `[visual]` O "⋯" fica ao lado do rótulo sem empurrar a linha dos arquivos. (Não conferido na tela: a execução em paralelo não tinha o app aberto com login. A linha do rótulo é um `flex` com `align-items: center`; conferir a olho.)
+- [x] `[visual]` O "⋯" fica ao lado do rótulo sem empurrar a linha dos arquivos. (Conferido pelo Alex na tela em 2026-10-27; o menu cortado pelo painel foi corrigido abrindo-o para a direita.)
 
 ## Passo do usuário (função do servidor)
 
-O código da ação `renumerar` está no repositório, mas **a função publicada no Supabase ainda é a antiga**. Antes de usar a edição na tela de verdade:
+**Feito em 2026-10-27:** o Alex publicou a função a partir da pasta da branch e a edição funcionou na tela, com o Drive real. Duas lições da prova: (1) publicar a função da pasta que tem o código novo (a primeira publicação saiu da `main` e a função antiga recusou `renumerar` com "Os dados do envio não foram aceitos"); (2) a função só aceita pedidos das origens do segredo `EP_ORIGENS_ACEITAS`, então o app da branch precisa rodar na porta 5173, e outra porta aparece na tela como "sem conexão".
+
+Roteiro original, para repetir em outro ambiente: o código da ação `renumerar` está no repositório, mas a função publicada pode ser a antiga. Antes de usar a edição na tela de verdade:
 
 1. No seu terminal, com o vínculo conferido (`supabase/AMBIENTES.md`): `npx supabase functions deploy arquivos-no-drive --use-api` (projeto de desenvolvimento).
 2. Prova no Drive real: numa versão de teste, abrir o "⋯" → Editar número, trocar o número, gravar e conferir no Drive compartilhado que os arquivos da versão (e o .pdf da aprovação, se houver) ganharam o número novo no nome. Depois voltar ao número original.
