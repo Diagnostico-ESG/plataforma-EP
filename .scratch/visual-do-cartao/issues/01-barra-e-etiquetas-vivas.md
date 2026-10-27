@@ -13,3 +13,5 @@
 - [ ] `npm test` verde.
 - [ ] `[visual]` A barra é uma faixa lisa em degradê azul, cheia em Concluídos, sem estourar a largura no cartão, na Lista e em Processos do setor.
 - [ ] `[visual]` A fazer em violeta cheio é a etiqueta mais destacada do cartão; Em andamento e Concluído vivos, sem confundir com as pílulas de Situação.
+
+Concluído em 2026-10-27 (commit e5e9b4c)
