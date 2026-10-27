@@ -21,12 +21,22 @@
   color: var(--texto-2);
 }
 
+/* O Quadro ocupa a altura toda da área de trabalho: a coluna recebe o cartão em qualquer altura (não só sobre o título) e a
+   rolagem lateral fica na base da tela. Quem rola na vertical são os cartões, dentro de cada coluna. */
+.area-de-processos:has(.quadro-colunas),
+.area-de-processos:has(.quadro-colunas) > div,
+.quadro:has(> .quadro-colunas) {
+  height: 100%;
+}
+
 /* Sombra de rolagem em CSS puro: aparece na borda onde ainda há colunas fora da vista. */
 .quadro-colunas {
   display: flex;
-  align-items: flex-start;
+  flex: 1;
+  min-height: 0;
   gap: var(--esp-3);
   overflow-x: auto;
+  overflow-y: hidden;
   padding-bottom: var(--esp-3);
   background:
     linear-gradient(to right, var(--fundo) 30%, transparent) left center / 40px 100% no-repeat local,
@@ -40,6 +50,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--esp-2);
+  min-height: 0;
 }
 
 .coluna-titulo {
@@ -73,10 +84,15 @@
   font-weight: 600;
 }
 
+/* O respiro de 2px é para o overflow não cortar o anel de foco e a sombra do cartão. */
 .coluna-cartoes {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
   gap: var(--esp-2);
+  padding: 2px;
+  overflow-y: auto;
 }
 
 /* Arrastar para concluir: só a coluna de destino acende; o cartão arrastado fica apagado no lugar de origem. */
