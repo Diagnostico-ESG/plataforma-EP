@@ -29,11 +29,17 @@
   height: 100%;
 }
 
+/* Sem o respiro de baixo, a barra de rolagem lateral encosta na base da tela. */
+.quadro:has(> .quadro-colunas) {
+  padding-bottom: 0;
+}
+
 /* Sombra de rolagem em CSS puro: aparece na borda onde ainda há colunas fora da vista. */
 .quadro-colunas {
   display: flex;
   flex: 1;
-  min-height: 0;
+  /* Em janela baixa a coluna não encolhe até sumir: abaixo disso a página volta a rolar. */
+  min-height: 320px;
   gap: var(--esp-3);
   overflow-x: auto;
   overflow-y: hidden;
@@ -84,14 +90,14 @@
   font-weight: 600;
 }
 
-/* O respiro de 2px é para o overflow não cortar o anel de foco e a sombra do cartão. */
+/* O respiro de 4px é para o overflow não cortar o anel de foco do teclado (2px de contorno e 2px de afastamento, em index.css). */
 .coluna-cartoes {
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 0;
   gap: var(--esp-2);
-  padding: 2px;
+  padding: var(--esp-1);
   overflow-y: auto;
 }
 

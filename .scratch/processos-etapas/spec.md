@@ -922,6 +922,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
     - o filtro de etapa continua valendo nos dois modos.
   - **Só os meus** (parte 4): botão de liga e desliga na barra do Quadro, só para Administrador e Integrante, com o estado anunciado (aria-pressed). Ligado, põe o filtro Responsável em quem está na tela; desligado, limpa esse filtro. Escolher a si mesmo no filtro Responsável liga o botão; escolher outra pessoa o desliga.
   - **Largura** (decidido pelo usuário em 2026-10-14): o Quadro ocupa toda a largura à direita da faixa lateral, sem largura máxima (diferente dos 1280px de Cadastros e Administração); cada coluna tem largura fixa de 310px (token `--largura-coluna-quadro`, escala da interface de 2026-10-14; antes cerca de 272px), e o que não cabe na tela fica na rolagem lateral.
+  - **Altura** (bug de 2026-10-27): o Quadro ocupa a altura toda da área de trabalho, e a coluna recebe o cartão em qualquer altura, não só sobre o título. A barra de rolagem lateral fica na base da tela; a rolagem vertical passa a ser **dentro de cada coluna** (os cartões rolam, o título fica), e a página só rola em janela muito baixa (coluna com mínimo de 320px).
 - **Lista:**
   - **Colunas:** nome (com "↳ pai" no subprocesso), tipo, setor, macroprocesso, etapa atual, responsável e situação em pílula.
   - **Ordem:** pela sigla do setor e pelo nome.

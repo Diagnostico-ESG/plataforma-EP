@@ -535,3 +535,8 @@ Ponto de partida da revisão: `marco/2026-10-26-inicio-quadro-livre-parte-5`.
 - **Causa:** a leitura das Anotações pedia `autor:usuarios(nome)`; com `processos.responsavel_id` (migração de 2026-10-24) a tabela passou a ter duas ligações com `usuarios`, e o Supabase recusa o pedido como ambíguo. Nenhum teste pegou, porque o cliente falso não imita a recusa.
 - **Correção:** `autor:usuarios!anotacoes_alteradas_por(nome)` em `src/processos/anotacoesSupabase.ts`; teste de regressão no `anotacoesSupabase.test.ts` (confere o pedido). Sem migração. Spec ajustada (seção de dados pessoais das Anotações). As outras leituras com `usuarios(nome)` partem de tabelas com uma ligação só.
 - **Limite:** a prova com o Supabase real é abrir as Anotações na tela. **Risco latente:** `movido_por` (passagens) e qualquer tabela que ganhe segunda ligação com `usuarios` pede o mesmo cuidado em embeds.
+
+## 2026-10-27 · Bug: soltar o cartão só em cima do título e barra de rolagem no meio da tela
+
+- **Causa:** `.quadro-colunas` usava `align-items: flex-start`, então cada coluna tinha só a altura dos cartões (29 px numa coluna vazia, medido com o CSS real numa maquete); a `<section>` que recebe o cartão não cobria o resto. A barra de rolagem lateral ficava logo abaixo da coluna mais comprida.
+- **Correção (só `Quadro.css`):** a cadeia da área de trabalho até o Quadro ganha altura 100
