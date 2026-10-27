@@ -109,6 +109,27 @@
   font-weight: 700;
 }
 
+/* Avisos da edição do número: amarelos, na própria janela, sem impedir o [Gravar]. */
+.formulario-de-versao-avisos {
+  display: grid;
+  gap: var(--esp-1);
+  padding: var(--esp-2) var(--esp-3);
+  border: 1px solid var(--pendencia-borda);
+  border-radius: var(--canto);
+  background: var(--pendencia-fundo);
+  font-size: var(--tam-rotulo);
+}
+
+.formulario-de-versao-avisos ul {
+  margin: 0;
+  padding-left: var(--esp-4);
+}
+
+.formulario-de-versao-avisos p {
+  margin: 0;
+  font-weight: 700;
+}
+
 /* [Enviar versão] e o "⋯" da seção, no título; a dica do formulário da histórica. */
 .secao-de-versoes-acoes {
   display: flex;
