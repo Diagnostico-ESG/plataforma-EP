@@ -49,7 +49,7 @@
 
 **Arquivos:** criar `supabase/tests/66_cor_do_setor.test.sql`.
 
-- [ ] **Passo 1: escrever o teste** (29 asserções). Cobre: as 15 células (5 perfis × ler, criar com cor, alterar), restrição 0/31/1/30, primeira livre (1,2→3; 1,3→2), inativo ocupa, 30 em uso→1, cor informada repetida respeitada, trocar só a cor sem evento, cor+nome com evento sem `cor`, preenchimento pela ordem da sigla.
+- [ ] **Passo 1: escrever o teste** (28 asserções). Cobre: as 15 células (5 perfis × ler, criar com cor, alterar), restrição 0/31/1/30, primeira livre (1,2→3; 1,3→2), inativo ocupa, 30 em uso→1, cor informada repetida respeitada, trocar só a cor sem evento, cor+nome com evento sem `cor`, preenchimento pela ordem da sigla.
 
 ```sql
 -- Cor do setor: quem pode o quê e regras do banco (visual-do-cartao, ticket 02).
@@ -58,7 +58,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(29);
+insert into _tap (linha) select plan(28);
 
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 insert into public.autorizacoes (email, perfil) values
@@ -242,7 +242,7 @@ grant insert (cor) on public.setores to authenticated;
 grant update (cor) on public.setores to authenticated;
 ```
 
-- [ ] **Passo 2: rodar.** `npm run db:reset` e `npx supabase test db`. Esperado: 66 com 29 de 29 `ok`; `11_setores`, `00_rls_ligada`, `10_privilegios_padrao` e os demais arquivos sem `not ok`. Se `RLS` impedir o gatilho de ver os setores de outros (não deve: o ativo lê todos), investigar antes de mexer.
+- [ ] **Passo 2: rodar.** `npm run db:reset` e `npx supabase test db`. Esperado: 66 com 28 de 28 `ok`; `11_setores`, `00_rls_ligada`, `10_privilegios_padrao` e os demais arquivos sem `not ok`. Se `RLS` impedir o gatilho de ver os setores de outros (não deve: o ativo lê todos), investigar antes de mexer.
 - [ ] **Passo 3: tipos.** `npx supabase gen types typescript --local > src/types/database.ts` (usar o mesmo recurso de `scripts/gerar-tipos.mjs`, trocando o alvo por `--local`; confira que o arquivo começa com `export type` e que `setores.Row` ganhou `cor: number`, `Insert` com `cor?: number`, `Update` com `cor?: number`). Atenção: `src/types/database.ts` aparece modificado só por fim de linha (anotação antiga); mantenha o fim de linha que o arquivo já tem.
 - [ ] **Passo 4: comitar** migração, teste e tipos juntos (regra: mesmo commit). `git add supabase/migrations supabase/tests src/types/database.ts && git commit -m "visual-do-cartao 02: coluna cor do setor, primeira cor livre e privilégios"`.
 
@@ -561,7 +561,7 @@ test('o histórico dos cadastros não mostra a cor', async () => {
 
 ### Tarefa 8: Banco remoto de desenvolvimento e conferência final
 
-- [ ] `git push -u origin visual-do-cartao-02` (autorizado). Disparar "Testes de banco" na branch e ler o resultado: 66 com 29 de 29, `11`, `00`, `10` verdes e todos os arquivos sem `not ok`. Esperado antes da migração no remoto: o 66 só passa depois dela; por isso:
+- [ ] `git push -u origin visual-do-cartao-02` (autorizado). Disparar "Testes de banco" na branch e ler o resultado: 66 com 28 de 28, `11`, `00`, `10` verdes e todos os arquivos sem `not ok`. Esperado antes da migração no remoto: o 66 só passa depois dela; por isso:
 - [ ] Disparar o workflow "Migrar banco de desenvolvimento" na branch, com a migração `<ts>_cor_do_setor` (autorizado; ele recusa outro projeto e avisa se já foi aplicada). Depois, "Testes de banco" de novo. Conferir antes: `supabase/AMBIENTES.md` (vínculo atual = desenvolvimento).
 - [ ] `npm run db:types` contra o remoto (alvo conferido) e verificar que `src/types/database.ts` não muda além de fim de linha; se mudar, comitar.
 - [ ] Acrescentar a migração à lista de `supabase/AMBIENTES.md` (formato das linhas anteriores) e registrar o desvio de `OpcaoDaCaixa` (`corDoSetor`) em `.scratch/visual-do-cartao/desvios.md` (entrada nova, datada).
