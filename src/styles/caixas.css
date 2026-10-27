@@ -46,7 +46,8 @@
     min-height: 32px;
     padding: var(--esp-1) var(--esp-2);
     /* O respiro da linha acesa fica reservado, para a opção marcada não "pular". */
-    border-left: 2px solid transparent;
+    border-left: var(--linha-acesa);
+    border-left-color: transparent;
     border-radius: var(--canto-botao);
     color: var(--texto);
     cursor: pointer;
