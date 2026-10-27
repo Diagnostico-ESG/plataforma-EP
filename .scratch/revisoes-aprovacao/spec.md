@@ -8,6 +8,10 @@ Status: ready-for-agent
 
 Decisões de origem: sabatina de 2026-10-16 (`.scratch/revisoes-aprovacao/sabatina.md`), revista no `/to-tickets` de 2026-10-17 e no `/planejar` de 2026-10-19; `CONTEXT.md` (seções "Processos", "Documentos" e "Revisões e aprovação"); ADRs 0006 (envio não muda a etapa), 0011 (versão aprovada não tem arquivo substituído), 0012 (revisão pelo setor sem rodadas), 0013 (etapas do setor saem), 0014 (resolver avança; trava do autor na escolha) e 0015 (revisão e aprovação gravadas no Concluir; E-protocolo opcional), que substitui em parte o 0009.
 
+## Sobra da trava do autor (mudança de 2026-10-27)
+
+Demanda travas-em-avisos; ADR 0028. A trava do autor na Revisão interna já tinha saído no ADR 0023, e o aviso amarelo de hoje fica como está. Sai só a sobra: a recusa `autor_da_versao` na tradução das recusas do banco e a frase dela ("Quem enviou a versão … não pode …"), que nenhum caminho do banco devolve mais. Nenhuma tela muda. A seção "Travas em avisos" da spec de `documentos-versoes` traz a história (167) e a decisão de teste: o teste da tradução das recusas deixa de esperar o código.
+
 ## Data da validação e .pdf da aprovação (mudança de 2026-10-26)
 
 Parte 3 da iniciativa quadro-livre. Decisões de origem: `.scratch/quadro-livre/sabatina-parte-3.md` (itens 12 a 17, 19, 21 e 22) e o mapa (Q16 e Q17). Continuam valendo o ADR 0023 (registros sem trava), o 0011 (versão aprovada sem arquivo substituído) e o 0012 (sem registro de cada envio ao setor). Termos no `CONTEXT.md`: data da validação (em Validação com o setor) e .pdf protocolado (em Aprovação). As versões, os relatórios e a trava de arquivos estão na spec de `documentos-versoes` (seção "Arquivos por etapa"), que também descreve o que muda na função do servidor.
@@ -561,3 +565,5 @@ Entregue em 2026-10-20 (commit 6ce74d6), com ressalva: critérios [visual] presu
 Entregue em 2026-10-23 (commit ae1fb54), com ressalva: critérios [visual] da mudança de publicacao-e-arquivamento presumidos (a tela não foi vista); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
 Entregue em 2026-10-25 (commit cc17e13), com ressalva: critérios [visual] vistos só na vitrine local, com módulos falsos (as janelas de registrar revisão e aprovação e qualquer tela com o login real não foram vistas); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
 Entregue em 2026-10-26 (commit d971dfc), com ressalva: critérios [visual] presumidos (a tela nunca foi vista com o login real: verso e janela da trava, linha do relatório, campo da data da validação, .pdf na gaveta e janela "Registrar aprovação" em 1366×768); função arquivos-no-drive ainda não publicada no desenvolvimento, com a camada Deno sem teste automático, e provas no Drive real pendentes; revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
+
+Em revisão desde 2026-10-27

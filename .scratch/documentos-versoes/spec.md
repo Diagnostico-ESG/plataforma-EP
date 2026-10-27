@@ -2,13 +2,231 @@
 
 Status: ready-for-agent
 
-**Como resolve o problema (desde 2026-10-26, Outros anexos).** Além das versões e dos relatórios, cada processo junta arquivos avulsos: o e-mail com a resposta do setor, a planilha que o setor mandou, a foto do quadro da reunião, um .pdf de apoio. Hoje eles ficam fora da plataforma, sem ligação com o processo. O verso ganha a seção **Outros anexos**, em todas as etapas: Administrador e Integrante enviam .pdf, .docx, .xlsx, .png, .jpg, .jpeg ou .eml de até 20 MB, com o nome original, e cada **anexo** fica marcado com a etapa em que o processo estava. Todo perfil vê e baixa. O anexo não tem número nem trava, e não se substitui: o enviado por engano se **retira**, vai para a lixeira do Drive e some de vez em 30 dias (ADR 0027). O histórico guarda envios e retiradas. A seção "Outros anexos", logo abaixo, descreve a mudança.
+**Como resolve o problema (desde 2026-10-27, Travas em avisos).** O trabalho real nem sempre segue a ordem dos arquivos: às vezes o processo precisa avançar e o fluxograma ou o relatório chega depois, e às vezes uma versão foi numerada errado (uma V9 que devia ser V8, uma V1F que devia ser V2F). A trava de arquivos obrigava a contornar a plataforma, e o número dado no envio não tinha conserto. Com esta mudança, mover para a frente da Modelagem piloto ou da Relatório e modelagem técnica sem os arquivos delas deixa de ser recusado: a tela pergunta, com [Enviar arquivos agora] [Avançar mesmo assim] [Cancelar], e o histórico guarda que o processo avançou sem eles (**Confirmação de arquivos**). E todo número de versão passa a se editar pelo "⋯" ao lado do rótulo, inclusive o da versão histórica, o da aprovada e o dado pela plataforma: a tela avisa, sem impedir, quando o número novo quebra a ordem ou deixa um salto, os arquivos no Drive ganham o nome com o número novo e o histórico guarda o número anterior (**Editar número da versão**, ADR 0028). A seção "Travas em avisos", logo abaixo, vale sobre o resto desta spec no que divergir.
+
+**Como resolvia antes (Outros anexos, 2026-10-26).** Além das versões e dos relatórios, cada processo junta arquivos avulsos: o e-mail com a resposta do setor, a planilha que o setor mandou, a foto do quadro da reunião, um .pdf de apoio. Hoje eles ficam fora da plataforma, sem ligação com o processo. O verso ganha a seção **Outros anexos**, em todas as etapas: Administrador e Integrante enviam .pdf, .docx, .xlsx, .png, .jpg, .jpeg ou .eml de até 20 MB, com o nome original, e cada **anexo** fica marcado com a etapa em que o processo estava. Todo perfil vê e baixa. O anexo não tem número nem trava, e não se substitui: o enviado por engano se **retira**, vai para a lixeira do Drive e some de vez em 30 dias (ADR 0027). O histórico guarda envios e retiradas. A seção "Outros anexos", logo abaixo, descreve a mudança.
 
 **Como resolvia antes (Arquivos por etapa, 2026-10-26).** Com o quadro livre, o processo anda pelas etapas sem trava, mas cada etapa tem um produto: o .bpm do piloto na Modelagem piloto, o .bpm técnico e o relatório na Relatório e modelagem técnica. O verso passa a mostrar só o envio que cabe na etapa atual: versão histórica (V5F) em Não iniciados, **versão piloto** (V6P, número digitado) na Modelagem piloto, **versão em sequência** (V7, número dado pela plataforma) e **relatório** com numeração própria (Relatório V2) na técnica e na Revisão interna. Toda versão que não é histórica exige só o .bpm; o .png e o .bpmn entram junto ou depois. O relatório vale para as versões seguintes até sair outro, e somem "relatório pendente" e "sem alteração de conteúdo". A **trava de arquivos** recusa passar da Modelagem piloto sem versão piloto e da técnica sem versão em sequência e relatório, e a janela da trava oferece o envio ali mesmo. A seção "Arquivos por etapa", logo abaixo, vale sobre o resto desta spec no que divergir.
 
 **Como resolvia antes de 2026-10-26.** Hoje os fluxogramas (.bpmn, .png e o .bpm do Bizagi) e os relatórios de cada processo ficam em pastas e e-mails, sem numeração confiável, sem saber quem enviou o quê e quando, e sem ligação com o andamento do processo. Com esta funcionalidade, o painel do processo ganha a seção **Versões**: a equipe envia cada versão (V1, V2…) com o .bpm do Bizagi e o .png, o .bpmn opcional e o relatório, junto ou depois (ADR 0016: o fluxo se vê pelo .png); registra as versões históricas da primeira etapa do trabalho (V5F); acrescenta o relatório que ficou pendente ou marca "sem alteração de conteúdo"; substitui um arquivo enviado por engano; e baixa qualquer arquivo com o nome padrão (`CEE_V6_Nome do processo`). Os arquivos ficam no Drive compartilhado do CED, numa pasta aberta à equipe e organizada por setor e processo; a plataforma entra no Drive por uma conta de serviço do EP, cuja chave fica só numa função do servidor, e o banco guarda apenas os dados de cada arquivo. A plataforma avisa quando um arquivo foi alterado ou apagado direto no Drive. O banco impõe as regras (numeração, versão histórica só antes da primeira nova, processo em andamento, quem pode) e toda mudança entra no histórico do processo.
 
 Decisões de origem: sabatina de 2026-10-15 (`.scratch/documentos-versoes/sabatina.md`), `CONTEXT.md` (seção "Documentos") e ADRs 0005 (versão do processo com os arquivos dentro), 0006 (envio não muda a etapa), 0007 (arquivo se substitui sem guardar o anterior) e 0008 (arquivos no Drive compartilhado por conta de serviço). Mudança de 2026-10-20 (sabatina do visualizador, que saiu da v1): ADR 0016 (versão exige .bpm e .png; .bpmn opcional); ver a seção "Mudança de 2026-10-20".
+
+## Travas em avisos (mudança de 2026-10-27)
+
+Demanda de 2026-10-27 (`.scratch/travas-em-avisos/demanda.md`, item 11 do `projeto.md`). Decisões de origem: a sabatina (`.scratch/travas-em-avisos/sabatina.md`, Q1 a Q16) e o ADR 0028, que substitui a parte de trava do ADR 0025. As regras de envio do ADR 0025 (onde cada tipo de versão entra, o número da piloto) e os ADRs 0007, 0008, 0011 e 0027 continuam valendo. Termos no `CONTEXT.md`: **Confirmação de arquivos**, **Editar número da versão** e **versão mais recente**. Esta seção descreve também o que muda no movimento do processo (spec de `processos-etapas`) e a sobra da trava do autor (spec de `revisoes-aprovacao`).
+
+### O que deixa de valer no resto desta spec
+
+- **Trava de arquivos** (seção "Arquivos por etapa": o item da Solução, as histórias 97 a 106, a janela da trava, a regra do banco "Trava de arquivos ao mover para a frente", as frases da trava e as decisões 3 e 10): o banco deixa de recusar, e a janela da trava passa a ser o envio aberto por [Enviar arquivos agora]. As etapas, os arquivos que cada uma espera e quando a pergunta aparece **não mudam**.
+- **"O número não se edita"**: desde esta mudança, o número de qualquer versão se edita (o tipo não). "Nomes já gravados não mudam" (seção "Nome padrão dos arquivos") deixa de valer para a edição do número, que renomeia os arquivos.
+- **Recusas que saem:** `trava_piloto` e `trava_tecnica:<falta>` (movimento) e `autor_da_versao` (sobra da trava do autor, que saiu no ADR 0023), com as frases delas.
+
+### Solução
+
+#### Confirmação de arquivos
+
+- **Quando pergunta** (como a trava de hoje): ao mover o processo para a frente pela lista do Agora ou arrastando o cartão, quando a ida sai de uma destas etapas, ou de antes dela, para depois dela, e faltam os arquivos que ela espera:
+  - **Modelagem piloto:** uma versão piloto (uma versão em sequência também basta);
+  - **Relatório e modelagem técnica:** uma versão em sequência e um relatório numerado, sem importar a ligação entre os dois.
+
+  Voltar, mover para a mesma etapa, mudar a etiqueta, mover o processo que já estava depois da etapa e a etapa desativada no catálogo não perguntam.
+- **A pergunta**, numa janela de confirmação, com o texto da etapa e só o que falta:
+  - "**Faltam os arquivos da Modelagem piloto.** Este processo ainda não tem a versão piloto. Você pode avançar agora e enviá-la depois."
+  - "**Faltam os arquivos da Modelagem técnica.** Este processo ainda não tem {o fluxograma nem o relatório | o fluxograma | o relatório} desta etapa. Você pode avançar agora e enviá-los depois."
+  - Ida que atravessa as duas etapas: uma pergunta só, com a lista de tudo o que falta, etapa por etapa.
+
+  Botões: [Enviar arquivos agora] (o principal) [Avançar mesmo assim] [Cancelar].
+- **[Enviar arquivos agora]** abre a janela de envio de hoje (a da trava), com o formulário do que falta na primeira etapa da lista. Depois do envio, a tela relê o processo: se ainda faltar algo (a outra etapa, ou a outra peça), a pergunta volta só com o que sobrou; se não faltar nada, o movimento segue (a chegada a Concluídos, quando o destino é Concluídos, e então a gravação).
+- **[Avançar mesmo assim]** move o processo na hora (ou abre a chegada a Concluídos, quando é o destino), sem enviar nada.
+- **[Cancelar]** ou Esc: o processo fica onde estava.
+- **Histórico:** o evento do movimento guarda o que faltava, calculado pelo banco no momento de mover, e o histórico mostra "Moveu para Revisão interna sem o relatório" (ou "sem a versão piloto", "sem a versão", "sem a versão e o relatório", e a lista das duas etapas quando a ida atravessou as duas). Sem marca no cartão nem no verso.
+
+#### Editar número da versão
+
+- **Onde:** um "⋯" ao lado do rótulo de cada versão (no destaque e nas "Versões anteriores"), com o item **Editar número**, para Administrador e Integrante, com o processo em andamento. A Consulta e o processo suspenso, cancelado, concluído ou arquivado não têm o "⋯".
+- **A janela** "Editar número da V7": o campo do número (inteiro maior que zero, preenchido com o atual), a prévia do rótulo novo (V5, V5F ou V5P, com a letra do tipo, que não muda) e dos nomes novos dos arquivos, e [Gravar] [Cancelar]. Sem motivo. [Gravar] fica desabilitado com o número igual ao atual ou inválido.
+- **Aviso, sem impedir** (amarelo, na própria janela, enquanto se digita), quando, pela ordem do número, com a versão já no número novo:
+  - a ordem dos tipos deixa de ser histórica → piloto → em sequência: "A V3F ficará depois da V4P. Gravar assim mesmo?";
+  - uma versão em sequência não vem logo depois da anterior: "A V9 ficará depois da V7, sem a V8. Gravar assim mesmo?";
+  - a versão é a aprovada: "A V7 foi aprovada, e o E-protocolo cita esse número. Gravar assim mesmo?".
+
+  Mais de um aviso aparecem juntos. Históricas e piloto podem ter saltos entre si sem aviso.
+- **Recusado:** número já usado por outra versão do mesmo processo ("Este processo já tem a V5."); número que mudou enquanto a janela estava aberta (outra pessoa editou: "O número desta versão mudou enquanto você editava. Feche e abra de novo."); processo fora de andamento ou arquivado; perfil sem permissão.
+- **Drive:** os arquivos que levam o rótulo da versão no nome ganham o nome padrão com o número novo: os fluxogramas da versão, os relatórios ligados a ela e o .pdf da aprovação dela. Tudo ou nada: se algum nome não troca, ou se o banco recusa, os nomes voltam e o número fica o que era.
+- **Efeitos:** a versão mais recente continua a de maior número, fora as históricas, então a edição pode mudá-la (e, com ela, o relatório que vale e a versão que o próximo relatório acompanha). A próxima versão em sequência segue o maior número + 1; o número mínimo da piloto segue maior que o de todas. As regras de envio continuam recusando como hoje (a edição não passa por elas).
+- **Histórico:** "Alterou o número da V7 para V5", com o antes e o depois.
+
+O subprocesso tem as mesmas regras, com os próprios números. A trava do autor na Revisão interna já tinha saído (ADR 0023): o aviso amarelo de hoje fica como está, e sai só a sobra da recusa.
+
+### Histórias de usuário
+
+#### Confirmação de arquivos
+
+135. Como integrante do EP, quero mover o processo para a frente da Modelagem piloto sem a versão piloto, depois de confirmar, porque às vezes o processo precisa avançar e o arquivo chega depois.
+136. Como integrante do EP, quero mover o processo para a frente da Relatório e modelagem técnica sem a versão ou sem o relatório, depois de confirmar.
+137. Como integrante do EP, quero que a pergunta diga a etapa e só o que falta, para saber o que fica pendente.
+138. Como integrante do EP, quero que a ida que atravessa as duas etapas faça uma pergunta só, com tudo o que falta.
+139. Como integrante do EP, quero [Enviar arquivos agora] na pergunta, abrindo o envio que já conheço, porque o caminho mais comum é enviar ali mesmo.
+140. Como integrante do EP, quero que, depois do envio, a pergunta volte só com o que ainda falta, e que o processo se mova quando não faltar nada.
+141. Como integrante do EP, quero [Avançar mesmo assim] para mover sem enviar nada.
+142. Como integrante do EP, quero que [Cancelar] ou Esc deixem o processo onde estava.
+143. Como integrante do EP, quero a mesma pergunta pela lista do Agora e ao arrastar o cartão, inclusive quando o destino pula por cima da etapa.
+144. Como integrante do EP, quero que voltar, mudar a etiqueta, mover o processo que já estava adiante e a etapa desativada no catálogo não perguntem nada.
+145. Como integrante do EP, quero que, com destino Concluídos, a chegada (data da publicação ou explicação) venha depois da pergunta.
+146. Como usuário, quero ver no histórico "Moveu para Revisão interna sem o relatório", para saber que o processo avançou sem os arquivos e quais.
+147. Como integrante do EP, quero que o banco aceite o movimento sem os arquivos mesmo fora da tela, e registre o que faltava, para o histórico não depender da tela.
+148. Como integrante do EP, quero que, se o envio falhar, a pergunta não feche o processo num movimento e eu veja a mensagem sem perder o que escolhi.
+149. Como integrante do EP, quero que, se o movimento falhar depois do envio, a tela diga que os arquivos foram enviados e que o processo não foi movido.
+
+#### Editar número da versão
+
+150. Como integrante do EP, quero editar o número de uma versão numerada errado, para corrigir sem precisar de quem cuida do banco.
+151. Como integrante do EP, quero editar o número de qualquer versão: histórica, piloto, em sequência, a dada pela plataforma e a aprovada.
+152. Como integrante do EP, quero que só o número mude e o tipo continue (V1F vira V2F, nunca V2).
+153. Como integrante do EP, quero achar a edição num "⋯" ao lado do rótulo, sem um botão a mais em cada versão.
+154. Como integrante do EP, quero ver na janela a prévia do rótulo e dos nomes novos dos arquivos antes de gravar.
+155. Como integrante do EP, quero ser avisado, sem ser impedido, quando o número novo quebra a ordem histórica → piloto → em sequência.
+156. Como integrante do EP, quero ser avisado, sem ser impedido, quando uma versão em sequência fica sem a anterior logo antes ("sem a V8").
+157. Como integrante do EP, quero ser lembrado de que o E-protocolo cita o número antigo quando edito a versão aprovada.
+158. Como integrante do EP, quero que a plataforma recuse um número que outra versão do processo já usa, com a frase dizendo qual.
+159. Como integrante do EP, quero que, se outra pessoa editou o número enquanto eu editava, a minha gravação seja recusada com a frase, em vez de apagar a dela.
+160. Como integrante do EP, quero que os arquivos no Drive passem a ter o número novo no nome, para o Drive compartilhado não mostrar um número diferente do da plataforma.
+161. Como integrante do EP, quero que, se a troca de nome no Drive falhar, nada mude (nem os nomes, nem o número) e eu veja a mensagem.
+162. Como integrante do EP, quero que a versão mais recente, o relatório que vale e a próxima versão em sequência sigam o número novo.
+163. Como usuário, quero ver no histórico "Alterou o número da V7 para V5", com quem e quando.
+164. Como Consulta, quero ver o número corrigido, sem o "⋯".
+165. Como integrante do EP, quero que o processo suspenso, cancelado, concluído ou arquivado não tenha edição do número, e que a plataforma recuse mesmo fora da tela.
+166. Como administrador, quero que o banco e a função do servidor recusem a edição de quem não pode, mesmo fora da tela.
+
+#### Sobra da trava do autor
+
+167. Como integrante do EP, quero que nenhuma tela traga mais a frase "Quem enviou a versão… não pode…", porque a trava do autor já saiu e o aviso amarelo de hoje basta.
+
+### Decisões de implementação
+
+#### Interface
+
+- **Janela da confirmação de arquivos:** a moldura de confirmação que já existe, com o título em negrito, a frase e, na ida que atravessa as duas etapas, a lista por etapa; [Enviar arquivos agora] é o botão principal. Os textos saem de uma função pura que recebe a lista das etapas e o que falta em cada uma.
+- **Fluxo do movimento** (o hook do movimento): a ordem das conferências continua (arquivos, chegada a Concluídos, gravação), mas a trava que falta abre a **pergunta**, e não o envio. A pergunta tem três saídas: enviar (abre a janela de envio de hoje para a primeira etapa da lista; ao voltar do envio, a tela relê o processo e confere de novo, perguntando só o que sobrou); avançar (segue para a chegada ou a gravação, sem conferir arquivos de novo); cancelar.
+- **A decisão pura de hoje** (primeira trava que falta) passa a devolver **todas** as etapas que faltam na ida, em ordem, para a pergunta única.
+- **Janela de envio** (a da trava de hoje): mantém o formulário, os estados e o "Os arquivos foram enviados, mas o processo não foi movido."; muda o título para "Enviar os arquivos da {etapa}" e o botão para [Enviar e continuar], porque depois do envio pode vir a pergunta de novo.
+- **Histórico:** o texto do movimento ganha o "sem {o que faltava}", lido do evento.
+- **"⋯" da versão:** reaproveita o menu de ações que já existe, com um item, ao lado do rótulo no destaque e em cada linha das "Versões anteriores".
+- **Janela "Editar número":** a moldura de edição que já existe, com o campo do número (o mesmo campo do número da versão piloto e da histórica), a prévia (função de nome padrão que já existe), os avisos e [Gravar]. Os avisos saem de uma função pura que recebe as versões do processo (número, tipo, se é a aprovada), a versão editada e o número novo, e devolve a lista de avisos.
+- **Módulo de versões:** ganha `editarNumero(versao, numeroEsperado, numeroNovo)`; a falsa nomeada acompanha, imitando as recusas (número repetido, número que mudou, processo fora de andamento, perfil) e a falha do Drive.
+- **Recusas, com a frase:**
+  - número repetido: "Este processo já tem a V{n}.";
+  - número que mudou: "O número desta versão mudou enquanto você editava. Feche e abra de novo.";
+  - número inválido: "O número da versão precisa ser um inteiro maior que zero; recebido: {valor}.";
+  - Drive: "Os arquivos não puderam ser renomeados no Drive; a versão continua V{n}.";
+  - processo fora de andamento ou arquivado, e perfil sem permissão (as frases de hoje).
+
+  Saem as frases da trava ("Para sair da …") e a do autor da versão.
+- **Estados da tela:**
+  - pergunta: sem carregamento próprio (usa o que o processo já tem); a falha do movimento depois de [Avançar mesmo assim] mostra a mensagem de erro de gravação de hoje e deixa o processo onde estava;
+  - janela de envio: os estados de hoje;
+  - edição do número: "Renomeando os arquivos no Drive…" com os campos travados; a falha em vermelho, com o número digitado mantido; falha de conexão com a mesma frase de erro de gravação de hoje; ao gravar, a janela fecha e a lista de versões relê.
+
+#### Função do servidor (`arquivos-no-drive`)
+
+- **Ação nova `renumerar`**, com a versão, o número esperado e o número novo:
+  1. confere quem pede (Administrador ou Integrante ativo, lido da tabela de perfis) e a situação do processo;
+  2. confere a entrada (inteiro maior que zero, diferente do atual) e, lendo o banco, que o número esperado é o atual e que nenhuma outra versão do processo tem o número novo;
+  3. renomeia no Drive, pelo `drive_id` guardado e com a mesma conferência de pasta do `baixar` (o arquivo está debaixo da raiz do ambiente), cada arquivo que leva o rótulo: fluxogramas da versão, relatórios ligados a ela e o .pdf da aprovação dela, para o nome padrão com o número novo;
+  4. grava no banco com o token de quem pediu (a função do banco abaixo);
+  5. se algo falha no passo 3 ou 4, devolve os nomes antigos aos arquivos já renomeados e devolve a recusa.
+- O arquivo puro de decisão ganha a ação, com a tabela de perfis de sempre: Administrador e Integrante renumeram; Consulta, inativo e sem login, não.
+- A conferência do registro e a conferência com o Drive passam a aceitar o nome guardado novo.
+- **Precisa ser publicada de novo no desenvolvimento** (passo do usuário).
+
+#### Modelo de dados
+
+Nenhuma tabela nem coluna nova.
+
+**Movimento (`mover_processo`, recriada com a mesma assinatura):** a conferência da trava deixa de recusar e passa a devolver o que falta em cada etapa atravessada (a mesma conta de `private.arquivos_que_faltam`, que fica); o evento do movimento ganha, no lado "depois", a lista do que faltava (etapa e peça), só quando falta algo. Nenhuma outra regra do movimento muda (a chegada a Concluídos continua pedindo a data ou a explicação).
+
+**Editar número:** uma função do banco nova (sem `security definer`, com a permissão de quem chama) recebe a versão, o número esperado e o número novo e, numa transação: confere o perfil e o processo em andamento (`private.conferir_processo_que_recebe_versao`); recusa se o número atual não é o esperado (código de conflito); troca o número (a restrição `versoes_numero_unico` recusa o repetido, com o número); atualiza o nome guardado dos arquivos que levam o rótulo (fluxogramas e relatórios ligados à versão, .pdf da aprovação dela); e grava o evento. A trava da versão aprovada sobre os arquivos (ADR 0011) passa a deixar trocar o nome, e só o nome, dentro dessa operação.
+
+**Quem pode o quê** (linha nova; o resto da tabela desta spec continua valendo):
+
+| Tabela e ação | Administrador | Integrante do EP | Consulta | Inativo | Visitante sem login |
+|---|---|---|---|---|---|
+| `versoes` alterar o número (processo em andamento, não arquivado) | sim | sim | não | não | não |
+| `arquivos_da_versao` e `pdfs_da_aprovacao` alterar o nome (só junto com o número da versão) | sim | sim | não | não | não |
+
+O tipo da versão (`historica`, `piloto`), o processo e o autor continuam sem alteração por ninguém.
+
+**Dado pessoal:** nada novo. O evento guarda os números e o nome do processo, como os de versão de hoje.
+
+**Regras que o banco impõe** (novas ou alteradas):
+
+| Regra | Como | Caso de teste que a prova |
+|---|---|---|
+| Mover para a frente sem os arquivos é aceito e registrado | `mover_processo` recriada | da Modelagem piloto à técnica sem piloto aceito, com o evento dizendo `piloto`; de Não iniciados à Revisão interna sem nada aceito, com as duas etapas no evento; da técnica à Validação sem relatório aceito, com `relatorio`; com tudo, evento sem a lista; voltar sem nada, evento sem a lista; etapa desativada fora da lista |
+| Só Administrador e Integrante ativos editam o número | função nova e privilégios | Consulta, inativo e visitante recusados |
+| Edição só com o processo em andamento e não arquivado | `private.conferir_processo_que_recebe_versao` | suspenso, cancelado, concluído e arquivado recusados |
+| Número repetido no processo recusado | `versoes_numero_unico` | V7 para V5 com V5 existente recusado; para V5 em outro processo aceito |
+| Número que mudou recusado | número esperado | editar com o esperado errado recusado, número mantido |
+| Só o número muda, nunca o tipo | sem privilégio de alterar `historica` e `piloto` | alterar `piloto` direto recusado |
+| O nome guardado dos arquivos acompanha o número | a função nova | fluxograma, relatório ligado e .pdf da aprovação com o rótulo novo; relatório ligado a outra versão sem mudança |
+| Versão aprovada aceita o número novo, e os arquivos dela continuam sem substituição | trava do ADR 0011 ajustada | editar o número da aprovada aceito; substituir arquivo dela continua recusado |
+| A edição pode mudar a versão mais recente | sem regra nova (calculada pelo número) | depois de V7 → V5 com V6 existente, o relatório novo acompanha a V6 e a próxima em sequência é a V7 |
+| Toda edição vira evento, com o número anterior | evento na função nova | um evento por edição, com antes e depois |
+
+**Regras de estado:** nenhuma nova. A versão continua sem situação guardada; "versão mais recente" e "relatório que vale" continuam calculados pelo número.
+
+**Migração:** não destrutiva. Recria `mover_processo` e a conferência da trava, cria a função de editar o número, ajusta a trava da versão aprovada e os privilégios. Nenhum dado muda. Teste pgTAP antes; vai pelo workflow "Migrar banco de desenvolvimento".
+
+### Decisões de teste
+
+- **Bom teste** confere o que a pessoa vê e consegue fazer, ou o que a função e o banco aceitam e recusam, nunca detalhes internos.
+- **Interface (ponto de teste principal: a tela inteira).** Vitest com Testing Library, renderizando o aplicativo inteiro com as falsas nomeadas, como nos `App.*` de hoje. A falsa de processos deixa de recusar o movimento sem os arquivos e passa a guardar o que faltava no evento; a de versões aprende a edição do número. O que cobre:
+  - a pergunta pela lista do Agora e ao arrastar, com o texto de cada etapa e só o que falta; a pergunta única da ida que atravessa as duas; [Avançar mesmo assim] movendo; [Cancelar] e Esc sem mover; [Enviar arquivos agora] enviando e movendo; o envio de uma parte e a pergunta voltando com o resto; falha no envio; falha no movimento depois do envio; a chegada a Concluídos depois da pergunta; voltar, etapa desativada e processo já adiante sem pergunta; o "sem o relatório" no histórico;
+  - o "⋯" com Editar número em cada tipo de versão (histórica, piloto, em sequência, aprovada); a prévia; cada aviso (ordem dos tipos, salto, aprovada) e os avisos juntos; gravar com aviso; número repetido, número que mudou e falha do Drive recusados com a frase e a versão como estava; a versão mais recente e o relatório que vale mudando depois da edição; o evento no histórico; Consulta e processo suspenso sem o "⋯"; subprocesso com os próprios números;
+  - os testes de hoje da trava passam ao modelo novo.
+  - Arte anterior: `App.travaDeArquivos`, `App.arrastarParaMover`, `App.chegadaAConcluidos`, `App.versoesNoProcesso`, `App.versoesNoHistorico`, `App.substituirArquivo`, `App.anotacoesDoProcesso` (conflito pelo texto esperado).
+- **Funções puras:** as etapas que faltam na ida (a de hoje, devolvendo todas), os textos da pergunta e do histórico, os avisos da edição do número. Arte anterior: `travaDeArquivos`, `moverDepoisDoEnvio`, `rotulos`.
+- **Função do servidor:** o arquivo puro de decisão, no Vitest, com a ação `renumerar` por perfil e situação e as entradas inválidas; a lista de arquivos a renomear e os nomes novos (nome padrão). A ponta a ponta (renomear e voltar os nomes) se confere publicando no desenvolvimento. Arte anterior: `decisao.test` e o teste do nome padrão.
+- **Tradução entre o servidor e a tela:** o módulo real com o cliente e o `fetch` simulados, para editar o número e as frases das recusas. Arte anterior: `versoesSupabase`, `recusasDeVersoes`.
+- **Banco:** pgTAP, um teste por linha da tabela de regras e por célula nova de "quem pode o quê", no Docker local e pelo "Testes de banco" na conferência final. O `59_trava_de_arquivos` passa a provar o aceite com o registro do que faltava; `52_mover_processo`, `27_versoes` e o da aprovação continuam passando; `10_privilegios_padrao` e `46_funcoes_e_views_seguras` também.
+- Todos os processos, setores, usuários e arquivos dos testes são inventados.
+
+### Fora do escopo desta parte
+
+- Editar o tipo da versão (V1F para V1).
+- Editar o número do relatório (backlog).
+- Motivo na edição do número.
+- Marca no cartão ou no verso do processo que avançou sem os arquivos.
+- Mudar quais etapas esperam arquivos e quais arquivos elas esperam.
+- Corrigir o E-protocolo que cita o número antigo (só o aviso).
+- Trava do autor na Revisão interna (já saiu no ADR 0023; o aviso fica como está).
+
+### Decisões tomadas ao escrever esta seção, a confirmar na leitura
+
+1. **A renomeação no Drive vem antes da gravação no banco**, com a volta dos nomes se o banco recusar, no padrão da retirada de anexo, para nunca ficar o banco com um número e o Drive com outro sem aviso. A função confere o número repetido e o esperado antes de mexer no Drive, para a recusa mais comum não renomear à toa.
+2. **Se a volta dos nomes também falhar**, a resposta diz que os nomes no Drive podem ter ficado com o número novo e que repetir a edição corrige (renomear de novo para o mesmo nome não muda nada).
+3. **O número esperado na edição**, como o texto esperado das Anotações, para duas pessoas não gravarem uma por cima da outra.
+4. **O .pdf da aprovação e os relatórios ligados à versão são renomeados junto**, porque o nome deles leva o rótulo; os relatórios ligados a outra versão não, mesmo os que "valem" para ela.
+5. **Os avisos ficam na própria janela de edição**, em amarelo, enquanto se digita, e [Gravar] grava com eles; não há segunda janela de confirmação.
+6. **A janela de envio passa a dizer [Enviar e continuar]**, porque depois do envio pode vir a pergunta de novo.
+7. **[Avançar mesmo assim] não confere os arquivos de novo** antes de gravar: se outra pessoa enviou nesse meio-tempo, o banco calcula o que faltava de verdade e o histórico mostra isso.
+8. **A pergunta usa o que a tela já leu do processo** (os campos de hoje da view); quem decide o que entra no histórico é o banco.
+
+### Divergência com `.scratch/especificacao.md`
+
+- A especificação prevê o número da versão dado no envio, sem edição, e nomes de arquivo que não mudam. Agora o número se edita, e os nomes acompanham (ADR 0028).
+
+### Critérios conferidos olhando a tela
+
+- `[visual]` A pergunta da confirmação de arquivos mostra o título em negrito, a frase e os três botões, com [Enviar arquivos agora] como principal, sem passar da altura do notebook (1366×768), também com a lista das duas etapas.
+- `[visual]` O "⋯" fica ao lado do rótulo sem empurrar a linha dos arquivos, no destaque e nas "Versões anteriores".
+- `[visual]` A janela "Editar número" mostra a prévia e os avisos em amarelo sem passar da altura do notebook.
+
+### Outras specs afetadas
+
+- `processos-etapas`: o movimento deixa de ter trava de arquivos e ganha a pergunta (nota apontando para esta seção).
+- `revisoes-aprovacao`: sai a sobra da recusa do autor (nota apontando para esta seção).
 
 ## Outros anexos (mudança de 2026-10-26)
 
@@ -886,3 +1104,5 @@ Entregue em 2026-10-20 (commit 02c0aa7), com ressalva: os dois critérios [visua
 Entregue em 2026-10-26 (commit d971dfc), com ressalva: critérios [visual] presumidos (a tela nunca foi vista com o login real: verso e janela da trava, linha do relatório, campo da data da validação, .pdf na gaveta e janela "Registrar aprovação" em 1366×768); função arquivos-no-drive ainda não publicada no desenvolvimento, com a camada Deno sem teste automático, e provas no Drive real pendentes; revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
 
 Entregue em 2026-10-26 (commit 817dcb3), com ressalva: critérios [visual] da parte 4 (seção Outros anexos, formulário, lista e janela de retirada) presumidos, a tela nunca foi vista com o login real; função arquivos-no-drive (com a correção da subpasta Anexos) ainda não publicada no desenvolvimento, com a camada Deno sem teste automático, e provas no Drive real (enviar, retirar, restaurar da lixeira) pendentes; revisão de segurança foi a de reserva (menos completa), com o risco restante de gravação direta do drive_id no backlog; as ressalvas das entregas anteriores seguem valendo
+
+Em revisão desde 2026-10-27
