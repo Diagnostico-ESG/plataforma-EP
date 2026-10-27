@@ -54,6 +54,10 @@ _Avoid_: área, departamento, unidade
 O identificador curto e único do setor, que entra no nome dos arquivos. Pode mudar; os arquivos já enviados mantêm a sigla antiga no nome.
 _Avoid_: código do setor, abreviação
 
+**Cor do setor**:
+Cor clara, escolhida numa paleta fixa, que acompanha a sigla do setor em toda a plataforma. O setor novo recebe a primeira cor ainda livre, e ela pode ser trocada no cadastro do setor. Dois setores podem ter a mesma cor, se quem cadastra escolher assim; o setor inativo continua com a sua.
+_Avoid_: cor da sigla, tema do setor
+
 **Macroprocesso**:
 Grande agrupamento de processos da Cadeia de Valor, identificado por um código. Pode ter uma categoria: finalístico, apoio ou gerencial.
 _Avoid_: área de atuação, eixo
