@@ -29,3 +29,5 @@ O código da ação `renumerar` está no repositório, mas **a função publicad
 - O Docker não sobe nesta máquina (falta o WSL): o pgTAP rodou só no workflow "Testes de banco" (65: 53 ok; 27, 30, 46, 60 passam). O único reprovado da bateria foi o `59_trava_de_arquivos`, que é do ticket 01 (tira a trava de arquivos).
 - A prévia mostra os nomes dos arquivos da versão; o nome do .pdf da aprovação é renomeado, mas não aparece na prévia (o módulo de versões não lê esse nome).
 - O .pdf guardado de uma aprovação trocada (histórico) não é renomeado.
+
+Concluído em 2026-10-27 (commit 4d81637)
