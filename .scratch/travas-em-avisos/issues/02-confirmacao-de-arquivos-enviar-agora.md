@@ -13,3 +13,5 @@
 - [x] Falha no envio: a mensagem aparece, nada se move e o que foi escolhido não se perde.
 - [x] Falha no movimento depois do envio: "Os arquivos foram enviados, mas o processo não foi movido."
 - [x] Funções puras (`moverDepoisDoEnvio` e a de etapas que faltam) com teste; testes `App.*` cobrindo os casos acima, pela lista do Agora e ao arrastar.
+
+Concluído em 2026-10-27 (commit 0638456)
