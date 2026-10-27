@@ -1161,7 +1161,7 @@ A indicação "aguardando o setor" saiu da view em 2026-10-18. Desde a parte 4 (
 - `andamentos.responsavel_id` aponta para usuários, cujo nome todos os perfis ativos já veem.
 - Os eventos desta funcionalidade são lidos por todo perfil ativo. Os de usuários e autorizações seguem só do Administrador.
 - Com os responsáveis do setor apagados, a plataforma não guarda mais nome, e-mail e cargo de pessoas dos setores. Os eventos antigos deles (só dados inventados do desenvolvimento) ficam no histórico.
-- As Anotações (desde 2026-10-23) são texto livre e podem trazer nome e e-mail de pessoas dos setores. Por isso não entram na view `processos_com_andamento` (de onde leem o Quadro, a Lista e o pacote das planilhas), nem no pacote das planilhas, nem nos eventos. Só o verso as lê, direto da tabela `processos`, com o nome de quem alterou por último vindo de `usuarios`.
+- As Anotações (desde 2026-10-23) são texto livre e podem trazer nome e e-mail de pessoas dos setores. Por isso não entram na view `processos_com_andamento` (de onde leem o Quadro, a Lista e o pacote das planilhas), nem no pacote das planilhas, nem nos eventos. Só o verso as lê, direto da tabela `processos`, com o nome de quem alterou por último vindo de `usuarios`, pela coluna `anotacoes_alteradas_por` dita no pedido (a tabela também liga a `usuarios` por `responsavel_id`, e sem a coluna o Supabase recusa a leitura por ambígua; bug de 2026-10-27).
 
 **Privilégios padrão:** cada tabela nova nasce com `revoke all` de visitante e de logado e concede de volta só o necessário a logado, com a RLS decidindo o resto. A view nasce com `revoke all` de visitante. Assim o teste `10_privilegios_padrao` continua passando.
 
