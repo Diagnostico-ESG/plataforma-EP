@@ -17,7 +17,14 @@ export type FiltrosDosProcessos = {
   arquivados: 'esconder' | null
 }
 
-export type AgruparQuadroPor = 'etapa' | 'responsavel'
+export type AgruparQuadroPor = 'etapa' | 'responsavel' | 'setor'
+
+// O Record obriga a listar cada agrupamento: um novo em AgruparQuadroPor sem entrada aqui não compila.
+const AGRUPAMENTOS: Record<AgruparQuadroPor, true> = { etapa: true, responsavel: true, setor: true }
+
+function ehAgrupamento(lido: string): lido is AgruparQuadroPor {
+  return Object.hasOwn(AGRUPAMENTOS, lido)
+}
 
 /**
  * aberto: o id do processo no painel, 'novo' no cadastro, null sem painel.
@@ -44,7 +51,8 @@ export function lerEnderecoDosProcessos(endereco: string): EnderecoDosProcessos 
   const visao: VisaoDosProcessos = trechos[0] === 'lista' ? 'lista' : 'quadro'
   const aberto = (visao === 'lista' ? trechos[1] : trechos[0]) || null
   const parametros = new URLSearchParams(consulta)
-  const agrupar = visao === 'quadro' && parametros.get('agrupar') === 'responsavel' ? 'responsavel' : 'etapa'
+  const lido = parametros.get('agrupar') ?? ''
+  const agrupar = visao === 'quadro' && ehAgrupamento(lido) ? lido : 'etapa'
   return { visao, aberto, filtros: filtrosDaConsulta(parametros, visao), agrupar }
 }
 
@@ -75,7 +83,7 @@ export function montarEnderecoDosProcessos({ visao, aberto, filtros, agrupar }: 
     const valor = SO_DA_LISTA.has(nome) && visao === 'quadro' ? null : filtros[nome]
     if (valor) consulta.set(nome, valor)
   }
-  if (visao === 'quadro' && agrupar === 'responsavel') consulta.set('agrupar', 'responsavel')
+  if (visao === 'quadro' && agrupar !== 'etapa') consulta.set('agrupar', agrupar)
   const texto = consulta.toString()
   return trechos.join('/') + (texto ? `?${texto}` : '')
 }

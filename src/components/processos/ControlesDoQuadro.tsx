@@ -1,12 +1,12 @@
 import type { AgruparQuadroPor } from '../../processos/enderecoDosProcessos'
 
 const OPCOES: { valor: AgruparQuadroPor; rotulo: string }[] = [
-  { valor: 'etapa', rotulo: 'Etapa' }, { valor: 'responsavel', rotulo: 'Responsável' },
+  { valor: 'etapa', rotulo: 'Etapa' }, { valor: 'responsavel', rotulo: 'Responsável' }, { valor: 'setor', rotulo: 'Setor' },
 ]
 
 type AgruparPorProps = { agrupar: AgruparQuadroPor; aoMudar: (agrupar: AgruparQuadroPor) => void }
 
-/** "Agrupar por: Etapa | Responsável": dois botões, o escolhido anunciado por aria-pressed. */
+/** "Agrupar por: Etapa | Responsável | Setor": um botão por opção, a escolhida anunciada por aria-pressed. */
 export function AgruparPor({ agrupar, aoMudar }: AgruparPorProps) {
   return (
     <div className="controle-do-quadro" role="group" aria-label="Agrupar por">

@@ -39,10 +39,12 @@ test('lista os processos por nome e as etapas na ordem do catálogo, com a posi�
       cartao: { responsavelAtivo: null, ultimaVersao: null, subprocessos: 0 },
       arquivos: { versaoPiloto: false, versaoEmSequencia: false, relatorioNumerado: false },
     }],
+    setores: [],
   })
   expect(cliente.pedidos).toMatchObject([
     { tabela: 'processos_com_andamento', ordem: [['nome', true]] },
     { tabela: 'etapas', ordem: [['ordem', true]] },
+    { tabela: 'setores' },
   ])
 })
 
@@ -81,8 +83,16 @@ test('a situação calculada "concluido" chega como está', async () => {
   expect((await criar(cliente).listarProcessos()).processos[0].situacao).toBe('concluido')
 })
 
-test.each(['processos_com_andamento', 'etapas'])('falha ao ler %s vira erro com o motivo do banco', async (tabela) => {
+test.each(['processos_com_andamento', 'etapas', 'setores'])('falha ao ler %s vira erro com o motivo do banco', async (tabela) => {
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas[`${tabela}.select`] = { data: null, error: { message: 'sem conexão' } }
   await expect(criar(cliente).listarProcessos()).rejects.toThrow(/sem conexão/)
+})
+
+test('lê os setores (id, sigla, nome, ativo) em ordem de sigla, para as colunas do Quadro por setor', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  const setores = [{ id: 's2', sigla: 'ABC', nome: 'Assessoria Fictícia', ativo: true }, { id: 's1', sigla: 'TSA', nome: 'Setor de Testes A', ativo: false }]
+  cliente.respostas['setores.select'] = { data: setores, error: null }
+  expect((await criar(cliente).listarProcessos()).setores).toEqual(setores)
+  expect(cliente.pedidos).toContainEqual(expect.objectContaining({ tabela: 'setores', colunas: 'id, sigla, nome, ativo', ordem: [['sigla', true]] }))
 })

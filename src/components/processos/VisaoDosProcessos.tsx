@@ -93,7 +93,7 @@ function ConteudoDaVisao(props: ConteudoDaVisaoProps) {
   if (visao === 'quadro') {
     return (
       <QuadroDeProcessos lista={lista} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso} podeAlterar={podeAlterar}
-        processos={processos} versoes={versoes} aoMudar={aoMudar} agrupar={agrupar} />
+        processos={processos} versoes={versoes} aoMudar={aoMudar} agrupar={agrupar} setorFiltrado={filtros.setor} />
     )
   }
   return (

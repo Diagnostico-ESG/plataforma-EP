@@ -40,7 +40,7 @@ function passaNosFiltros(processo: ProcessoDaLista, filtros: FiltrosDosProcessos
 }
 
 /** As opções saem da lista carregada: só aparece o setor, o macroprocesso ou o responsável que tem processo. */
-export function opcoesDosFiltros({ etapas, processos }: ListaDeProcessos): OpcoesDosFiltros {
+export function opcoesDosFiltros({ etapas, processos }: Pick<ListaDeProcessos, 'etapas' | 'processos'>): OpcoesDosFiltros {
   return {
     setores: semRepetir(processos.map((p) => ({ valor: p.setorId, rotulo: p.setorSigla }))),
     macroprocessos: semRepetir(processos.map((p) => ({ valor: p.macroprocessoId, rotulo: p.macroprocessoNome }))),

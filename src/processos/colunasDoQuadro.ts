@@ -1,8 +1,10 @@
-import type { ListaDeProcessos, ProcessoDaLista, SituacaoDoProcesso } from './tipos'
+import type { ListaDeProcessos, ProcessoDaLista, SetorDoQuadro, SituacaoDoProcesso } from './tipos'
 
 export type ColunaDoQuadro = {
   chave: string; titulo: string; processos: ProcessoDaLista[]
-  /** Só no Quadro por responsável: a pessoa da coluna foi desativada. */
+  /** Só no Quadro por setor: o nome do setor, abaixo da sigla do título. */
+  subtitulo?: string
+  /** No Quadro por responsável e por setor: a pessoa ou o setor da coluna foi desativado. */
   inativo?: boolean
 }
 
@@ -21,7 +23,7 @@ function processosDoQuadro(processos: ProcessoDaLista[]): ProcessoDaLista[] {
  * Uma coluna por etapa ativa, na ordem do catálogo, de Não iniciados a Concluídos, mesmo vazia. Em cada coluna, os
  * processos saem em ordem de nome.
  */
-export function colunasDoQuadro({ etapas, processos }: ListaDeProcessos): ColunaDoQuadro[] {
+export function colunasDoQuadro({ etapas, processos }: Pick<ListaDeProcessos, 'etapas' | 'processos'>): ColunaDoQuadro[] {
   const noQuadro = processosDoQuadro(processos)
   return etapas
     .filter((etapa) => etapa.ativa)
@@ -58,4 +60,23 @@ export function colunasPorResponsavel(processos: ProcessoDaLista[]): ColunaDoQua
   const semResponsavel = noQuadro.filter((processo) => processo.responsavel === null)
   if (semResponsavel.length === 0) return colunas
   return [...colunas, { chave: 'sem-responsavel', titulo: 'Sem responsável', processos: semResponsavel }]
+}
+
+function porSigla(a: SetorDoQuadro, b: SetorDoQuadro): number {
+  return a.sigla.localeCompare(b.sigla, 'pt-BR', { sensitivity: 'base' })
+}
+
+/**
+ * Uma coluna por setor ativo, mesmo vazia, e por setor inativo que ainda tem processo no Quadro, em ordem de sigla.
+ * Com o filtro de setor (setorFiltrado), só a coluna dele. Em cada coluna, os processos saem em ordem de nome.
+ */
+export function colunasPorSetor(setores: SetorDoQuadro[], processos: ProcessoDaLista[], setorFiltrado: string | null): ColunaDoQuadro[] {
+  const noQuadro = processosDoQuadro(processos)
+  return [...setores]
+    .sort(porSigla)
+    .map((setor) => ({
+      chave: setor.id, titulo: setor.sigla, subtitulo: setor.nome, inativo: !setor.ativo,
+      processos: noQuadro.filter((processo) => processo.setorId === setor.id),
+    }))
+    .filter((coluna) => (setorFiltrado === null ? !coluna.inativo || coluna.processos.length > 0 : coluna.chave === setorFiltrado))
 }

@@ -19,7 +19,7 @@ import { conferirProcessoEmAndamento, mudarSituacao } from './situacaoFalso'
 import { hojeLocal } from './textoDaModelagemPiloto'
 import type {
   DadosDaChegada, DadosDoProcesso, EtapaDoCatalogo, EtiquetaDaEtapa, ListaDeProcessos, ModuloDeProcessos, ProcessoLido,
-  Reclassificacao, UsuarioResponsavel,
+  Reclassificacao, SetorDoQuadro, UsuarioResponsavel,
 } from './tipos'
 
 type ChamadaDeProcesso = {
@@ -46,6 +46,8 @@ export class ProcessosFalso implements ModuloDeProcessos {
   /** Sigla e nome que o banco juntaria ao cartão (pelo id do setor e do macroprocesso). */
   siglasDosSetores: Record<string, string> = {}
   nomesDosMacroprocessos: Record<string, string> = {}
+  /** Os setores que a lista devolve para o Quadro por setor (ativos e inativos). */
+  setores: SetorDoQuadro[] = []
   falharListaDeProcessos = false
   segurarListaDeProcessos = false
   falharLeituraDoProcesso = false
@@ -152,7 +154,7 @@ export class ProcessosFalso implements ModuloDeProcessos {
   async listarProcessos(): Promise<ListaDeProcessos> {
     if (this.segurarListaDeProcessos) return new Promise<never>(() => {})
     if (this.falharListaDeProcessos) throw new Error('falha de conexão simulada')
-    return { etapas: [...this.etapasDoCatalogo], processos: [...this.processos] }
+    return { etapas: [...this.etapasDoCatalogo], processos: [...this.processos], setores: [...this.setores] }
   }
 
   async lerProcesso(id: string): Promise<ProcessoLido | null> {

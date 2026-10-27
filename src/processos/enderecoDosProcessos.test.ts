@@ -80,3 +80,11 @@ test('montar o agrupamento: depois dos filtros, só no Quadro, com ida e volta',
   const endereco = '#/processos/p1?responsavel=u1&agrupar=responsavel'
   expect(montarEnderecoDosProcessos(lerEnderecoDosProcessos(endereco))).toBe(endereco)
 })
+
+test('agrupar=setor vale só no Quadro, lido e montado com ida e volta', () => {
+  expect(lerEnderecoDosProcessos('#/processos?agrupar=setor').agrupar).toBe('setor')
+  expect(lerEnderecoDosProcessos('#/processos/lista?agrupar=setor').agrupar).toBe('etapa')
+  expect(montarEnderecoDosProcessos({ visao: 'lista', aberto: null, filtros: SEM_FILTROS, agrupar: 'setor' })).toBe('#/processos/lista')
+  const endereco = '#/processos/p1?macroprocesso=m1&agrupar=setor'
+  expect(montarEnderecoDosProcessos(lerEnderecoDosProcessos(endereco))).toBe(endereco)
+})

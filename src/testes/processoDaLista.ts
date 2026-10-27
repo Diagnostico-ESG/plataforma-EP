@@ -1,4 +1,4 @@
-import type { EtapaDoCatalogo, ProcessoDaLista, ProcessoLido } from '../processos/tipos'
+import type { EtapaDoCatalogo, ProcessoDaLista, ProcessoLido, SetorDoQuadro } from '../processos/tipos'
 
 /** O catálogo de teste do Andamento livre: as duas fixas nas pontas e seis de trabalho entre elas. */
 export const CATALOGO_DE_TESTE: EtapaDoCatalogo[] = [
@@ -27,6 +27,11 @@ export function umProcesso(nome = 'Emitir Ofício', mudancas: Partial<ProcessoDa
     processoPaiId: null, situacao: 'em_andamento', etapaAtual: etapaAtualDe(etapa), etiqueta: 'a_fazer',
     entrouNaEtapaEm: '2026-10-19', responsavel: { id: 'u1', nome: 'Ana', fotoUrl: null }, ...mudancas,
   }
+}
+
+/** Um setor inventado para o Quadro por setor (ativo, a menos que se peça o contrário). */
+export function umSetor(id: string, sigla: string, nome: string, ativo = true): SetorDoQuadro {
+  return { id, sigla, nome, ativo }
 }
 
 /** Um processo lido inventado (o verso): como `umProcesso`, mais o que só a leitura traz. */

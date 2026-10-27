@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
-import { CATALOGO_DE_TESTE, umProcesso } from '../testes/processoDaLista'
-import { colunasDoQuadro, colunasPorResponsavel } from './colunasDoQuadro'
-import type { EtapaDoCatalogo, ProcessoDaLista } from './tipos'
+import { CATALOGO_DE_TESTE, umProcesso, umSetor } from '../testes/processoDaLista'
+import { colunasDoQuadro, colunasPorResponsavel, colunasPorSetor } from './colunasDoQuadro'
+import type { EtapaDoCatalogo, ProcessoDaLista, SetorDoQuadro } from './tipos'
 
 const colunas = (processos: ProcessoDaLista[], etapas: EtapaDoCatalogo[] = CATALOGO_DE_TESTE) => colunasDoQuadro({ etapas, processos })
 const nomes = (chave: string, processos: ProcessoDaLista[], etapas?: EtapaDoCatalogo[]) =>
@@ -84,5 +84,44 @@ describe('agrupado por responsável', () => {
       umProcesso('b', { ...pessoa('u1', 'Ana'), situacao: 'concluido', arquivadoEm: '2026-10-22T15:00:00+00:00' }, 'concluidos'),
     ])
     expect(resultado).toEqual([])
+  })
+})
+
+describe('agrupado por setor', () => {
+  const TSA = umSetor('s1', 'TSA', 'Setor de Testes A')
+  const ABC = umSetor('s2', 'abc', 'Assessoria Fictícia')
+  const VELHO = umSetor('s3', 'MNO', 'Setor Antigo', false)
+  const OUTRO_VELHO = umSetor('s4', 'XYZ', 'Setor Esquecido', false)
+  const doSetor = (nome: string, { id, sigla }: SetorDoQuadro, mudancas: Partial<ProcessoDaLista> = {}) =>
+    umProcesso(nome, { setorId: id, setorSigla: sigla, ...mudancas })
+
+  test('uma coluna por setor ativo, em ordem de sigla, mesmo vazia, com a sigla no título e o nome abaixo', () => {
+    const resultado = colunasPorSetor([TSA, ABC], [], null)
+    expect(resultado.map((coluna) => [coluna.titulo, coluna.subtitulo])).toEqual([['abc', 'Assessoria Fictícia'], ['TSA', 'Setor de Testes A']])
+    expect(resultado.every((coluna) => coluna.processos.length === 0)).toBe(true)
+  })
+
+  test('cada processo na coluna do setor dono, em ordem de nome', () => {
+    const resultado = colunasPorSetor([TSA, ABC], [doSetor('Zeta', TSA), doSetor('alfa', TSA), doSetor('Beta', ABC)], null)
+    expect(resultado.map((coluna) => coluna.processos.map((processo) => processo.nome))).toEqual([['Beta'], ['alfa', 'Zeta']])
+  })
+
+  test('o setor inativo só tem coluna com processo, marcada inativa, na mesma ordem de sigla', () => {
+    const resultado = colunasPorSetor([TSA, VELHO, OUTRO_VELHO, ABC], [doSetor('Antigo', VELHO)], null)
+    expect(resultado.map((coluna) => coluna.titulo)).toEqual(['abc', 'MNO', 'TSA'])
+    expect(resultado.map((coluna) => coluna.inativo)).toEqual([false, true, false])
+  })
+
+  test('o arquivado e o cancelado ficam de fora, e o setor inativo só com eles não tem coluna', () => {
+    const resultado = colunasPorSetor([TSA, VELHO], [
+      doSetor('Desistido', VELHO, { situacao: 'cancelado' }),
+      doSetor('Guardado', TSA, { situacao: 'concluido', arquivadoEm: '2026-10-22T15:00:00+00:00' }),
+    ], null)
+    expect(resultado.map((coluna) => [coluna.titulo, coluna.processos.length])).toEqual([['TSA', 0]])
+  })
+
+  test('com o filtro de setor, só a coluna desse setor', () => {
+    expect(colunasPorSetor([TSA, ABC], [doSetor('Beta', ABC)], 's1').map((coluna) => coluna.titulo)).toEqual(['TSA'])
+    expect(colunasPorSetor([TSA, VELHO], [doSetor('Antigo', VELHO)], 's3').map((coluna) => coluna.titulo)).toEqual(['MNO'])
   })
 })

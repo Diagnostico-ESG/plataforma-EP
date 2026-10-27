@@ -5,7 +5,7 @@ import type { Perfil } from '../acesso/tipos'
 import { CadastrosFalso } from '../cadastros/CadastrosFalso'
 import { ProcessosFalso } from '../processos/ProcessosFalso'
 import { hojeLocal } from '../processos/textoDaModelagemPiloto'
-import type { DadosDoCartao, EtapaDoCatalogo, ProcessoLido, UsuarioResponsavel } from '../processos/tipos'
+import type { DadosDoCartao, EtapaDoCatalogo, ProcessoLido, SetorDoQuadro, UsuarioResponsavel } from '../processos/tipos'
 import { VersoesFalso } from '../versoes/VersoesFalso'
 import { ligarArquivosDoProcesso } from './arquivosDoProcesso'
 import { RevisoesFalso } from '../revisoes/RevisoesFalso'
@@ -46,10 +46,12 @@ export function processo(nome: string, { etapa = 'revisao_interna', cartao = {},
 /** O Quadro no aplicativo inteiro, com os processos dados; devolve o módulo falso para o teste conferir as gravações. */
 export function montar(
   processos: ProcessoLido[], perfil: Perfil = 'integrante_ep', usuarios: UsuarioResponsavel[] = [], versoes = new VersoesFalso(),
+  setores: SetorDoQuadro[] = [],
 ): ProcessosFalso {
   const falso = new ProcessosFalso()
   falso.etapasDoCatalogo = ETAPAS
   falso.processos = processos
+  falso.setores = setores
   falso.usuariosPossiveis = usuarios
   falso.quemChama = { id: USUARIO_DE_TESTE.id, nome: USUARIO_DE_TESTE.nome }
   ligarArquivosDoProcesso(falso, versoes)

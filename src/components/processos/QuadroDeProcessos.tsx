@@ -1,6 +1,6 @@
 import { useArrastoDoQuadro } from '../../hooks/useArrastoDoQuadro'
 import { useMovimentoDoProcesso } from '../../hooks/useMovimentoDoProcesso'
-import { colunasDoQuadro, colunasPorResponsavel } from '../../processos/colunasDoQuadro'
+import { type ColunaDoQuadro as Coluna, colunasDoQuadro, colunasPorResponsavel, colunasPorSetor } from '../../processos/colunasDoQuadro'
 import type { AgruparQuadroPor } from '../../processos/enderecoDosProcessos'
 import type { ListaDeProcessos, ModuloDeProcessos } from '../../processos/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
@@ -20,12 +20,21 @@ type QuadroDeProcessosProps = {
   /** Um cartão foi movido: a lista de processos precisa recarregar. */
   aoMudar: () => void
   agrupar: AgruparQuadroPor
+  /** O filtro Setor: no Quadro por setor, só a coluna dele aparece. */
+  setorFiltrado: string | null
 }
 
 const COLUNAS_FANTASMA = [0, 1, 2, 3]
 
-export function QuadroDeProcessos({ lista, idEscolhido, enderecoDoProcesso, podeAlterar, processos, versoes, aoMudar, agrupar }: QuadroDeProcessosProps) {
-  const colunas = agrupar === 'responsavel' ? colunasPorResponsavel(lista.processos) : colunasDoQuadro(lista)
+function colunasDoAgrupamento(lista: ListaDeProcessos, agrupar: AgruparQuadroPor, setorFiltrado: string | null): Coluna[] {
+  if (agrupar === 'responsavel') return colunasPorResponsavel(lista.processos)
+  if (agrupar === 'setor') return colunasPorSetor(lista.setores, lista.processos, setorFiltrado)
+  return colunasDoQuadro(lista)
+}
+
+export function QuadroDeProcessos(props: QuadroDeProcessosProps) {
+  const { lista, idEscolhido, enderecoDoProcesso, podeAlterar, processos, versoes, aoMudar, agrupar, setorFiltrado } = props
+  const colunas = colunasDoAgrupamento(lista, agrupar, setorFiltrado)
   // O processo some do Quadro (excluído por outra pessoa) é o mesmo que mudou: o Quadro só recarrega.
   const movimento = useMovimentoDoProcesso(processos, lista.etapas, aoMudar, aoMudar)
   const arrasto = useArrastoDoQuadro(lista.etapas, movimento.mover)

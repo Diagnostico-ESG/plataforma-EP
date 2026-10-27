@@ -14,7 +14,7 @@ type ColunaDoQuadroProps = {
   /** Quem não altera (Consulta) não arrasta cartão. */
   podeAlterar: boolean
   arrasto: ArrastoDoQuadro
-  /** Por responsável o cartão mostra a etapa no lugar do avatar e não se arrasta. */
+  /** Fora do Quadro por etapa o cartão mostra a barra da etapa e não se arrasta. */
   agrupar: AgruparQuadroPor
   /** As etapas do catálogo: o cartão e os selos precisam delas. */
   etapas: EtapaDoCatalogo[]
@@ -22,11 +22,11 @@ type ColunaDoQuadroProps = {
 
 export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAlterar, arrasto, agrupar, etapas }: ColunaDoQuadroProps) {
   const { levantado } = arrasto
-  // Só as colunas de etapa recebem o cartão (o Quadro por responsável não arrasta), e a coluna sob o cartão ganha o realce.
+  // Só as colunas de etapa recebem o cartão (por responsável e por setor não se arrasta), e a coluna sob o cartão ganha o realce.
   const recebe = levantado !== null && agrupar === 'etapa'
   const realce = recebe && arrasto.sobre === coluna.chave
   return (
-    <section className={realce ? 'coluna coluna-destino' : 'coluna'} aria-label={coluna.titulo}
+    <section className={realce ? 'coluna coluna-destino' : 'coluna'} aria-label={rotuloDaColuna(coluna)}
       onDragEnter={() => recebe && arrasto.passarPor(coluna.chave)}
       onDragOver={(evento) => {
         if (!recebe) return
@@ -38,20 +38,35 @@ export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAl
         arrasto.soltarEm(coluna.chave)
       }}>
       <h3 className="coluna-titulo">
-        <span>{coluna.titulo}{coluna.inativo && <> <Pilula situacao="neutra">Inativo</Pilula></>}</span>
+        <span className="coluna-titulo-texto">
+          <span className="coluna-titulo-principal">{coluna.titulo}{coluna.inativo && <> <Pilula situacao="neutra">Inativo</Pilula></>}</span>
+          {coluna.subtitulo && <span className="coluna-titulo-nome">{coluna.subtitulo}</span>}
+        </span>
         <span className="coluna-contagem">{coluna.processos.length}</span>
       </h3>
       <div className="coluna-cartoes">
-        {coluna.chave === CHAVE_DOS_CONCLUIDOS && coluna.processos.length === 0 && (
-          <p className="coluna-vazia">Nenhum processo concluído.</p>
-        )}
+        <AvisoDaColunaVazia coluna={coluna} agrupar={agrupar} />
         {coluna.processos.map((processo) => (
           <CartaoDoProcesso key={processo.id} processo={processo} escolhido={processo.id === idEscolhido}
             href={enderecoDoProcesso(processo.id)} arrastavel={podeAlterar && agrupar === 'etapa' && podeArrastar(processo)}
-            agrupadoPorResponsavel={agrupar === 'responsavel'} etapas={etapas} apagado={levantado?.id === processo.id}
+            agrupar={agrupar} etapas={etapas} apagado={levantado?.id === processo.id}
             aoLevantar={() => arrasto.levantar(processo)} aoBaixar={arrasto.baixar} />
         ))}
       </div>
     </section>
   )
+}
+
+// Por setor a coluna é anunciada pela sigla, pelo nome e, no setor desativado, por "inativo": o aria-label encobre a pílula.
+function rotuloDaColuna({ titulo, subtitulo, inativo }: Coluna): string {
+  if (!subtitulo) return titulo
+  return inativo ? `${titulo} · ${subtitulo} · inativo` : `${titulo} · ${subtitulo}`
+}
+
+// Por etapa, só Concluídos vazia ganha frase; por setor, toda coluna vazia (os setores sem processo também aparecem).
+function AvisoDaColunaVazia({ coluna, agrupar }: { coluna: Coluna; agrupar: AgruparQuadroPor }) {
+  if (coluna.processos.length > 0) return null
+  if (agrupar === 'setor') return <p className="coluna-vazia">Nenhum processo deste setor no Quadro.</p>
+  if (coluna.chave === CHAVE_DOS_CONCLUIDOS) return <p className="coluna-vazia">Nenhum processo concluído.</p>
+  return null
 }

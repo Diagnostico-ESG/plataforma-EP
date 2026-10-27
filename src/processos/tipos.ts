@@ -94,7 +94,10 @@ export type ProcessoDaLista = {
   arquivadoEm?: string | null
 }
 
-export type ListaDeProcessos = { etapas: EtapaDoCatalogo[]; processos: ProcessoDaLista[] }
+/** Um setor como o Quadro agrupado por setor o mostra: as colunas saem daqui, inclusive as vazias. */
+export type SetorDoQuadro = { id: string; sigla: string; nome: string; ativo: boolean }
+
+export type ListaDeProcessos = { etapas: EtapaDoCatalogo[]; processos: ProcessoDaLista[]; setores: SetorDoQuadro[] }
 
 /** Quem pode ser responsável por um processo: usuário ativo de perfil Administrador ou Integrante. */
 export type UsuarioResponsavel = { id: string; nome: string }

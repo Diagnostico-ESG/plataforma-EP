@@ -1,15 +1,22 @@
 import type { ClienteSupabase } from '../lib/supabase'
 import { type LinhaDoProcesso, processoDaLinha } from './processoDaLinha'
-import type { EtapaDoCatalogo, ListaDeProcessos, ModuloDeProcessos } from './tipos'
+import type { EtapaDoCatalogo, ListaDeProcessos, ModuloDeProcessos, SetorDoQuadro } from './tipos'
 
 export function criarListaDeProcessosSupabase(cliente: ClienteSupabase): Pick<ModuloDeProcessos, 'listarProcessos'> {
   return { listarProcessos: () => listarProcessos(cliente) }
 }
 
 async function listarProcessos(cliente: ClienteSupabase): Promise<ListaDeProcessos> {
-  const [linhas, etapas] = await Promise.all([lerLinhas(cliente), lerEtapasDoCatalogo(cliente)])
+  const [linhas, etapas, setores] = await Promise.all([lerLinhas(cliente), lerEtapasDoCatalogo(cliente), lerSetores(cliente)])
   const total = etapas.filter((etapa) => etapa.ativa).length
-  return { etapas, processos: linhas.map((linha) => processoDaLinha(linha, total)) }
+  return { etapas, processos: linhas.map((linha) => processoDaLinha(linha, total)), setores }
+}
+
+// O Quadro por setor mostra também os setores sem processo, que a view dos processos não traz.
+async function lerSetores(cliente: ClienteSupabase): Promise<SetorDoQuadro[]> {
+  const { data, error } = await cliente.from('setores').select('id, sigla, nome, ativo').order('sigla')
+  if (error) throw new Error(`Falha ao ler os setores: ${error.message}`)
+  return data
 }
 
 async function lerLinhas(cliente: ClienteSupabase): Promise<LinhaDoProcesso[]> {
