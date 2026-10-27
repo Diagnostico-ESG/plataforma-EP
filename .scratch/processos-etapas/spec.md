@@ -178,6 +178,7 @@ Parte 2 da iniciativa quadro-livre. Decisões de origem: `.scratch/quadro-livre/
 #### Modelo de dados
 
 - **Coluna renomeada:** `processos.data_da_reuniao` (date, opcional) passa a `processos.data_da_modelagem_piloto` (date, opcional). Sem valor padrão no banco: a sugestão do dia é da tela. Os valores existentes são preservados pelo próprio rename; os nulos continuam nulos.
+- **Permissão da coluna:** a coluna precisa de permissão de **criar** (`insert`) além da de alterar, porque o formulário de Novo processo a envia em toda criação (nula se o campo está vazio). A permissão por coluna não acompanha o rename sozinha para a criação: migração `20261027104500_criar_processo_com_data_da_modelagem` (bug de 2026-10-27, teste de banco 63).
 - **Views e funções que leem a coluna:** a view `processos_com_andamento` (com `security_invoker = true`) e a função que monta o pacote das planilhas são recriadas com o nome novo, e a chave do pacote passa a `data_da_modelagem_piloto`. Os gatilhos de evento do processo passam a gravar a chave nova nos eventos seguintes; os eventos antigos ficam como estão.
 - **Função das planilhas (Edge Function `planilhas-dos-dashboards`):** a validação e a leitura do pacote passam a usar a chave nova; a função precisa ser publicada de novo no desenvolvimento, pelo roteiro `docs/planilhas-publicar-a-funcao.md`, passo do usuário. Até a publicação, a atualização das planilhas recusa o pacote novo.
 - **Quem pode o quê:** igual a hoje para a coluna. O privilégio por coluna de alterar acompanha o nome novo.

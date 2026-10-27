@@ -521,3 +521,10 @@ Ponto de partida da revisão: `marco/2026-10-26-inicio-quadro-livre-parte-5`.
 - **Revisão de segurança do código:** a de **reserva** (o `/security-review` embutido compara a branch atual com a `main`, e a entrega está na `main`). Sem achado: `agrupar` do endereço só vale entre os três valores conhecidos (`Object.hasOwn`, sem cair em nomes do protótipo); `setor` do endereço só é comparado com os ids; a leitura de `setores` passa pela política "setores: ativo lê", que já existia; nenhuma chave nem HTML montado à mão.
 - **Sem banco:** nenhuma migração, teste de banco ou função mudou; `package.json` não mudou (o `.scratch/security.md` segue valendo).
 - **Cobertura:** 98,97% das linhas, 94,22% dos ramos. **Dependência circular:** nenhuma. **Build:** passa (só o aviso de pacote acima de 500 kB, que já existia).
+
+## 2026-10-27 · Bug: criar processo recusado (permissão da coluna da data da modelagem piloto)
+
+- **O que a spec não dizia:** o ticket 26 renomeou `data_da_reuniao` para `data_da_modelagem_piloto` e fez o cadastro enviar a coluna em toda criação, mas a spec só falava da permissão de alterar. O banco recusava toda criação com 42501 ("permission denied for table processos"), e a tela mostrava "Seu perfil não permite alterar os processos".
+- **Correção:** migração `20261027104500_criar_processo_com_data_da_modelagem` (`grant insert` só nessa coluna) e teste de banco 63 (vermelho antes, 11 de 11 depois); spec atualizada na seção Modelo de dados. Aplicada no desenvolvimento pelo workflow "Migrar banco de desenvolvimento".
+- **Por que passou:** o teste 32 só marcava a data por alteração, e os testes de tela usam o banco falso, sem permissão por coluna.
+- **Julgamentos do code-review (deixados de fora):** o teste 63 não cobre integrante desativado nem subprocesso (caminhos que a correção não toca); `pg_temp.data` repete o nome do teste 32; `pg_temp.criar` recebe a data como literal.

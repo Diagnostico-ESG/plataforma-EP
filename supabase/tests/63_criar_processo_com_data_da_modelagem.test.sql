@@ -52,7 +52,7 @@ insert into _tap (linha) select is(pg_temp.data('Criado Admin Sem'), null::date,
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
 insert into _tap (linha) select lives_ok(pg_temp.criar('Criado Integrante', 'null'), 'integrante cria processo com a data vazia');
 
--- Consulta e administrador inativo não criam (a recusa continua sendo da RLS).
+-- Consulta e administrador inativo não criam (a recusa é da RLS, agora que a coluna tem permissão); o visitante é barrado antes, pela tabela.
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a3","role":"authenticated"}', true);
 insert into _tap (linha) select throws_ok(pg_temp.criar('Criado Consulta', 'null'), '42501', null, 'consulta não cria processo');
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a4","role":"authenticated"}', true);
