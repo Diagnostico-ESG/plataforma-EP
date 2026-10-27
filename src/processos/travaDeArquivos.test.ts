@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { primeiraTravaQueFalta, travaDaIda } from './travaDeArquivos'
+import { travasDaIda, travasQueFaltam } from './travaDeArquivos'
 import type { ArquivosDoProcesso, EtapaDoCatalogo } from './tipos'
 
 const etapa = (ordem: number, codigo: string, nome: string, ativa = true): EtapaDoCatalogo => ({ id: `id-${codigo}`, codigo, nome, ordem, ativa })
@@ -14,78 +14,79 @@ const CATALOGO = [NAO_INICIADOS, MODELAGEM, TECNICA, REVISAO, VALIDACAO, CONCLUI
 
 const NADA: ArquivosDoProcesso = { versaoPiloto: false, versaoEmSequencia: false, relatorioNumerado: false }
 
-function trava(de: EtapaDoCatalogo, para: EtapaDoCatalogo, arquivos?: ArquivosDoProcesso, catalogo = CATALOGO) {
-  return primeiraTravaQueFalta({ de, para, catalogo, arquivos })
+function travas(de: EtapaDoCatalogo, para: EtapaDoCatalogo, arquivos?: ArquivosDoProcesso, catalogo = CATALOGO) {
+  return travasQueFaltam({ de, para, catalogo, arquivos })
 }
+const codigos = (lista: ReturnType<typeof travas>) => lista.map((trava) => trava.codigo)
 
-describe('primeiraTravaQueFalta', () => {
-  it('não trava quando a tela não sabe o que o processo tem', () => {
-    expect(trava(MODELAGEM, TECNICA)).toBeNull()
+describe('travasQueFaltam', () => {
+  it('não pergunta quando a tela não sabe o que o processo tem', () => {
+    expect(travas(MODELAGEM, TECNICA)).toEqual([])
   })
 
   it('pede a versão piloto ao sair da Modelagem piloto', () => {
-    expect(trava(MODELAGEM, TECNICA, NADA)).toEqual({ codigo: 'modelagem', nome: 'Modelagem piloto', falta: ['versao_piloto'] })
+    expect(travas(MODELAGEM, TECNICA, NADA)).toEqual([{ codigo: 'modelagem', nome: 'Modelagem piloto', falta: ['versao_piloto'] }])
   })
 
   it('aceita a versão em sequência no lugar da piloto, que já não pode entrar depois dela', () => {
-    expect(trava(MODELAGEM, TECNICA, { ...NADA, versaoEmSequencia: true })).toBeNull()
+    expect(travas(MODELAGEM, TECNICA, { ...NADA, versaoEmSequencia: true })).toEqual([])
   })
 
   it('pede a versão e o relatório ao sair da técnica, dizendo só o que falta', () => {
-    expect(trava(TECNICA, REVISAO, { ...NADA, versaoPiloto: true })?.falta).toEqual(['versao', 'relatorio'])
-    expect(trava(TECNICA, REVISAO, { ...NADA, versaoEmSequencia: true })?.falta).toEqual(['relatorio'])
-    expect(trava(TECNICA, REVISAO, { ...NADA, relatorioNumerado: true })?.falta).toEqual(['versao'])
+    expect(travas(TECNICA, REVISAO, { ...NADA, versaoPiloto: true })[0].falta).toEqual(['versao', 'relatorio'])
+    expect(travas(TECNICA, REVISAO, { ...NADA, versaoEmSequencia: true })[0].falta).toEqual(['relatorio'])
+    expect(travas(TECNICA, REVISAO, { ...NADA, relatorioNumerado: true })[0].falta).toEqual(['versao'])
   })
 
   it('deixa sair da técnica com a versão e o relatório, ligados ou não', () => {
-    expect(trava(TECNICA, REVISAO, { versaoPiloto: false, versaoEmSequencia: true, relatorioNumerado: true })).toBeNull()
+    expect(travas(TECNICA, REVISAO, { versaoPiloto: false, versaoEmSequencia: true, relatorioNumerado: true })).toEqual([])
   })
 
-  it('passando por cima das duas etapas confere primeiro a Modelagem piloto e depois a técnica', () => {
-    expect(trava(NAO_INICIADOS, CONCLUIDOS, NADA)?.codigo).toBe('modelagem')
-    expect(trava(NAO_INICIADOS, CONCLUIDOS, { ...NADA, versaoPiloto: true })).toEqual({
+  it('passando por cima das duas etapas devolve as duas, a Modelagem piloto primeiro', () => {
+    expect(codigos(travas(NAO_INICIADOS, CONCLUIDOS, NADA))).toEqual(['modelagem', 'relatorio_modelagem_tecnica'])
+    expect(travas(NAO_INICIADOS, CONCLUIDOS, { ...NADA, versaoPiloto: true })).toEqual([{
       codigo: 'relatorio_modelagem_tecnica', nome: 'Relatório e modelagem técnica', falta: ['versao', 'relatorio'],
-    })
+    }])
   })
 
-  it('não trava voltar, a mesma etapa nem o processo que já estava adiante', () => {
-    expect(trava(REVISAO, MODELAGEM, NADA)).toBeNull()
-    expect(trava(TECNICA, TECNICA, NADA)).toBeNull()
-    expect(trava(REVISAO, VALIDACAO, NADA)).toBeNull()
-    expect(trava(CONCLUIDOS, REVISAO, NADA)).toBeNull()
+  it('não pergunta ao voltar, na mesma etapa nem com o processo que já estava adiante', () => {
+    expect(travas(REVISAO, MODELAGEM, NADA)).toEqual([])
+    expect(travas(TECNICA, TECNICA, NADA)).toEqual([])
+    expect(travas(REVISAO, VALIDACAO, NADA)).toEqual([])
+    expect(travas(CONCLUIDOS, REVISAO, NADA)).toEqual([])
   })
 
-  it('não trava ao chegar na etapa com trava, só ao sair dela', () => {
-    expect(trava(NAO_INICIADOS, MODELAGEM, NADA)).toBeNull()
-    expect(trava(MODELAGEM, TECNICA, { ...NADA, versaoPiloto: true })).toBeNull()
+  it('não pergunta ao chegar na etapa com arquivos, só ao sair dela', () => {
+    expect(travas(NAO_INICIADOS, MODELAGEM, NADA)).toEqual([])
+    expect(travas(MODELAGEM, TECNICA, { ...NADA, versaoPiloto: true })).toEqual([])
   })
 
-  it('ignora a etapa com trava desativada no catálogo', () => {
+  it('ignora a etapa desativada no catálogo', () => {
     const semModelagem = CATALOGO.map((e) => (e.codigo === 'modelagem' ? { ...e, ativa: false } : e))
-    expect(trava(NAO_INICIADOS, REVISAO, NADA, semModelagem)?.codigo).toBe('relatorio_modelagem_tecnica')
+    expect(codigos(travas(NAO_INICIADOS, REVISAO, NADA, semModelagem))).toEqual(['relatorio_modelagem_tecnica'])
     const semAsDuas = semModelagem.map((e) => (e.codigo === TECNICA.codigo ? { ...e, ativa: false } : e))
-    expect(trava(NAO_INICIADOS, CONCLUIDOS, NADA, semAsDuas)).toBeNull()
+    expect(travas(NAO_INICIADOS, CONCLUIDOS, NADA, semAsDuas)).toEqual([])
   })
 
   it('segue a ordem do catálogo quando uma etapa nova entra entre as duas', () => {
     const nova = etapa(2.5, 'etapa_nova', 'Etapa nova')
     const comNova = [...CATALOGO, nova]
-    expect(trava(nova, REVISAO, NADA, comNova)?.codigo).toBe('relatorio_modelagem_tecnica')
-    expect(trava(MODELAGEM, nova, NADA, comNova)?.codigo).toBe('modelagem')
+    expect(codigos(travas(nova, REVISAO, NADA, comNova))).toEqual(['relatorio_modelagem_tecnica'])
+    expect(codigos(travas(MODELAGEM, nova, NADA, comNova))).toEqual(['modelagem'])
   })
 })
 
-describe('travaDaIda', () => {
+describe('travasDaIda', () => {
   const processo = (etapa: EtapaDoCatalogo, arquivos?: ArquivosDoProcesso) => ({
     etapaAtual: { id: etapa.id, codigo: etapa.codigo, nome: etapa.nome, ordem: etapa.ordem, posicao: 1, total: 6 }, arquivos,
   })
 
   it('usa a etapa atual do processo como origem', () => {
-    expect(travaDaIda(processo(MODELAGEM, NADA), TECNICA, CATALOGO)?.codigo).toBe('modelagem')
+    expect(codigos(travasDaIda(processo(MODELAGEM, NADA), TECNICA, CATALOGO))).toEqual(['modelagem'])
   })
 
-  it('não trava processo sem etapa atual nem sem o que ele tem', () => {
-    expect(travaDaIda({ etapaAtual: null, arquivos: NADA }, TECNICA, CATALOGO)).toBeNull()
-    expect(travaDaIda(processo(MODELAGEM), TECNICA, CATALOGO)).toBeNull()
+  it('não pergunta para processo sem etapa atual nem sem o que ele tem', () => {
+    expect(travasDaIda({ etapaAtual: null, arquivos: NADA }, TECNICA, CATALOGO)).toEqual([])
+    expect(travasDaIda(processo(MODELAGEM), TECNICA, CATALOGO)).toEqual([])
   })
 })

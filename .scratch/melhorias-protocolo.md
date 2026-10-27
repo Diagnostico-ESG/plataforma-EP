@@ -999,3 +999,7 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **2026-10-27 · Itens não testados que aconteceram:** linha `Implementado em` na spec de uma funcionalidade sem pasta de tickets (a spec é o único ticket). Esperado: gravada no fim da spec com o hash do commit. Aconteceu: gravada em commit separado, depois do commit do código.
 - **2026-10-27 · Ocorrência: o `/implement` rodou na `main`, sem branch**, como nos `/executar-simples` anteriores.
 - **2026-10-27 · Ocorrência: o `/code-review` do `/implement` devolveu 9 achados; 1 corrigido (CSS), os demais dispensados ou aceitos com motivo** (escopo global do estilo é da spec; foto quebrada na cópia do `<selectedcontent>` aceita). Sugestão: nenhuma.
+
+## 2026-10-27 — /executar-complexo (travas-em-avisos, ticket 01)
+
+- **2026-10-27 · Itens não testados que aconteceram:** TDD de banco, migração aplicada e linha `Concluído em` num ticket. Esperado: teste pgTAP no Docker local; aconteceu pelos workflows do GitHub, porque o Docker não funciona nesta máquina (decisão do Alex nesta sessão). Branch no worktree (sessão paralela), não branch comum.

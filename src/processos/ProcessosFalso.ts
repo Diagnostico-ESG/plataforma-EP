@@ -10,8 +10,7 @@ import {
   registrarPassagem,
 } from './movimentoFalso'
 import { registrarPublicacao } from './publicacaoFalso'
-import { fraseDaTrava } from './frasesDeTravaDeArquivos'
-import { primeiraTravaQueFalta } from './travaDeArquivos'
+import { travasQueFaltam } from './travaDeArquivos'
 import {
   conferirPai, conferirSemSubprocessos, estruturaDoProcesso, levarMacroprocessoAosFilhos, macroprocessoDo, reclassificar,
 } from './reclassificacaoFalso'
@@ -25,6 +24,7 @@ import type {
 type ChamadaDeProcesso = {
   acao: string; id: string; nota?: string; etapaId?: string; etiqueta?: EtiquetaDaEtapa; usuarioId?: string | null
   chegada?: DadosDaChegada
+  semArquivos?: { etapa: string; pecas: string[] }[]
 }
 
 /** Implementação falsa de processos para os testes de tela: sem rede, com falhas e esperas simuladas. */
@@ -78,18 +78,18 @@ export class ProcessosFalso implements ModuloDeProcessos {
     if (!destino) throw new CadastroInexistente()
     conferirEtapaAtiva(destino)
     if (processo.etapaAtual?.codigo === destino.codigo) return
-    this.conferirTravaDeArquivos(processo, destino)
     const emConcluidos = destino.codigo === CODIGO_CONCLUIDOS
     const publicacao = emConcluidos ? publicacaoDaChegada(processo, chegada, hojeLocal()) : publicacaoDaSaida(processo)
-    this.chamadas.push({ acao: 'mover', id, etapaId, ...(chegada && { chegada }) })
+    const semArquivos = this.arquivosQueFaltavam(processo, destino)
+    this.chamadas.push({ acao: 'mover', id, etapaId, ...(chegada && { chegada }), ...(semArquivos.length > 0 && { semArquivos }) })
     this.trocarProcesso(id, (atual) => this.movido(atual, destino, publicacao))
   }
 
-  // Como conferir_trava_de_arquivos: só confere quando o processo traz o que tem (o processo montado à mão não traz).
-  private conferirTravaDeArquivos(processo: ProcessoLido, destino: EtapaDoCatalogo): void {
-    if (!processo.etapaAtual) return
-    const trava = primeiraTravaQueFalta({ de: processo.etapaAtual, para: destino, catalogo: this.etapasDoCatalogo, arquivos: processo.arquivos })
-    if (trava) throw new TravaDoBanco(fraseDaTrava(trava))
+  // Como arquivos_que_faltam_na_ida: só sabe o que faltava quando o processo traz o que tem (o processo montado à mão não traz).
+  private arquivosQueFaltavam(processo: ProcessoLido, destino: EtapaDoCatalogo): { etapa: string; pecas: string[] }[] {
+    if (!processo.etapaAtual) return []
+    const travas = travasQueFaltam({ de: processo.etapaAtual, para: destino, catalogo: this.etapasDoCatalogo, arquivos: processo.arquivos })
+    return travas.map((trava) => ({ etapa: trava.codigo, pecas: trava.falta }))
   }
 
   async mudarEtiqueta(id: string, etiqueta: EtiquetaDaEtapa): Promise<void> {

@@ -1,4 +1,5 @@
 import { formatarData } from '../lib/datas'
+import { oQueFaltouNoHistorico } from '../processos/frasesDaConfirmacaoDeArquivos'
 import { ROTULO_DA_ETIQUETA, ROTULO_DA_ORIGEM, ROTULO_DA_SITUACAO, ROTULO_DO_TIPO } from '../processos/rotulos'
 import { ROTULO_DO_ESCOPO } from '../revisoes/frasesDeRevisao'
 import { rotuloDaCategoria } from './categorias'
@@ -143,14 +144,30 @@ function estadoLegivel(evento: EventoDoCadastro): Record<string, unknown> {
   return registro(evento.depois ?? evento.antes)
 }
 
+// A Confirmação de arquivos (ADR 0028): o banco guarda em depois.sem_arquivos a lista [{etapa_codigo, etapa_nome, pecas}].
+// Uma etapa só: "sem o relatório"; as duas: "sem a versão piloto (Modelagem piloto) e sem a versão e o relatório (...)".
+// Vazio quando não há lista.
+function textoDoQueFaltou(lista: unknown): string {
+  const etapas = Array.isArray(lista) ? lista.map(registro) : []
+  const frases = etapas.map((etapa) => {
+    const pecas = Array.isArray(etapa.pecas) ? etapa.pecas.map(String) : []
+    const faltou = oQueFaltouNoHistorico(String(etapa.etapa_codigo), pecas)
+    return etapas.length > 1 ? `sem ${faltou} (${texto(etapa.etapa_nome)})` : `sem ${faltou}`
+  })
+  return frases.join(' e ')
+}
+
 /**
  * O que o histórico escreve em negrito: o texto da ação e, no movimento do processo, de onde e para onde ele foi
  * ("Moveu de Revisão interna para Publicação").
  */
 export function tituloDoEvento(evento: EventoDoCadastro): string {
   if (evento.entidade === 'passagem' && evento.acao === 'mover') {
-    if (registro(evento.depois).explicacao_sem_publicacao !== undefined) return 'Concluiu sem publicação'
-    return `Moveu de ${texto(registro(evento.antes).etapa_nome)} para ${texto(registro(evento.depois).etapa_nome)}`
+    const depois = registro(evento.depois)
+    if (depois.explicacao_sem_publicacao !== undefined) return 'Concluiu sem publicação'
+    const semArquivos = textoDoQueFaltou(depois.sem_arquivos)
+    if (semArquivos) return `Moveu para ${texto(depois.etapa_nome)} ${semArquivos}`
+    return `Moveu de ${texto(registro(evento.antes).etapa_nome)} para ${texto(depois.etapa_nome)}`
   }
   return textoDaAcaoDoCadastro(evento.acao, evento.entidade)
 }
