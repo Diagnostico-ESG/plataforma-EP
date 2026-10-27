@@ -3,7 +3,7 @@ import { etapaAtualDe } from '../testes/processoDaLista'
 import { avisoDoRevisor, fraseDaConsulta, opcoesDeResponsavel, podeAssumir, rotuloDoAgora } from './agoraDoProcesso'
 import type { ProcessoLido, UltimaVersao, UsuarioResponsavel } from './tipos'
 
-const ANA: UsuarioResponsavel = { id: 'u1', nome: 'Ana Teste' }
+const ANA: UsuarioResponsavel = { id: 'u1', nome: 'Ana Teste', fotoUrl: 'https://fotos.exemplo/ana.png' }
 const BIA: UsuarioResponsavel = { id: 'u2', nome: 'Bia Teste' }
 
 function lido(mudancas: Partial<ProcessoLido> = {}): ProcessoLido {
@@ -29,10 +29,17 @@ describe('opcoesDeResponsavel', () => {
     expect(opcoes.at(-1)?.valor).toBe('')
   })
 
+  test('cada pessoa leva o nome sem o "(você)" e a foto para o Avatar; Ninguém não leva', () => {
+    const opcoes = opcoesDeResponsavel(lido(), [ANA, BIA], 'u1')
+    expect(opcoes[0].pessoa).toEqual({ nome: 'Ana Teste', fotoUrl: 'https://fotos.exemplo/ana.png' })
+    expect(opcoes[1].pessoa).toEqual({ nome: 'Bia Teste', fotoUrl: null })
+    expect(opcoes.at(-1)?.pessoa).toBeUndefined()
+  })
+
   test('o responsável desativado aparece marcado "(Inativo)" e não se escolhe de novo', () => {
     const inativo = lido({ responsavel: { id: 'u9', nome: 'Caio Antigo', fotoUrl: null }, cartao: { responsavelAtivo: false, ultimaVersao: null, subprocessos: 0 } })
     const opcao = opcoesDeResponsavel(inativo, [ANA], 'u1').find((o) => o.valor === 'u9')
-    expect(opcao).toEqual({ valor: 'u9', rotulo: 'Caio Antigo (Inativo)', desabilitada: true })
+    expect(opcao).toEqual({ valor: 'u9', rotulo: 'Caio Antigo (Inativo)', desabilitada: true, pessoa: { nome: 'Caio Antigo', fotoUrl: null } })
   })
 
   test('sem responsável não há opção extra', () => {

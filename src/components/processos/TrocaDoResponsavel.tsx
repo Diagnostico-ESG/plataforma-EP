@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { OpcaoDeResponsavel } from '../../processos/agoraDoProcesso'
+import { BotaoDaCaixa, OpcaoDaCaixa } from '../OpcaoDaCaixa'
 
 type TrocaDoResponsavelProps = {
   /** O responsável de agora (null: ninguém); a lista mostra sempre o valor vindo daqui. */
@@ -49,7 +50,8 @@ export function TrocaDoResponsavel({ responsavelId, opcoes, desabilitada, aoEsco
         tecla.stopPropagation()
         setTrocando(false)
       }}>
-      {opcoes.map((opcao) => <option key={opcao.valor} value={opcao.valor} disabled={opcao.desabilitada}>{opcao.rotulo}</option>)}
+      <BotaoDaCaixa />
+      {opcoes.map((opcao) => <OpcaoDaCaixa key={opcao.valor} {...opcao} />)}
     </select>
   )
 }

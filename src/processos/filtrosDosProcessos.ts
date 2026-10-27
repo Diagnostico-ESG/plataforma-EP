@@ -1,9 +1,11 @@
 import { contemTrecho } from './buscaNaLista'
 import type { FiltrosDosProcessos } from './enderecoDosProcessos'
 import { ROTULO_DA_SITUACAO, ROTULO_DO_TIPO } from './rotulos'
-import type { EtapaDoCatalogo, ListaDeProcessos, ProcessoDaLista } from './tipos'
+import { corDoMacroprocesso } from './corDoMacroprocesso'
+import type { EtapaDoCatalogo, ListaDeProcessos, PessoaDaOpcao, ProcessoDaLista, ResponsavelDoProcesso } from './tipos'
 
-export type OpcaoDoFiltro = { valor: string; rotulo: string }
+/** `cor` é a marca do macroprocesso; `pessoa`, o Avatar do responsável. As demais opções só têm o texto. */
+export type OpcaoDoFiltro = { valor: string; rotulo: string; cor?: string; pessoa?: PessoaDaOpcao }
 
 export type OpcoesDosFiltros = {
   setores: OpcaoDoFiltro[]
@@ -43,10 +45,10 @@ function passaNosFiltros(processo: ProcessoDaLista, filtros: FiltrosDosProcessos
 export function opcoesDosFiltros({ etapas, processos }: Pick<ListaDeProcessos, 'etapas' | 'processos'>): OpcoesDosFiltros {
   return {
     setores: semRepetir(processos.map((p) => ({ valor: p.setorId, rotulo: p.setorSigla }))),
-    macroprocessos: semRepetir(processos.map((p) => ({ valor: p.macroprocessoId, rotulo: p.macroprocessoNome }))),
+    macroprocessos: semRepetir(processos.map((p) => ({ valor: p.macroprocessoId, rotulo: p.macroprocessoNome, cor: corDoMacroprocesso(p.macroprocessoId) }))),
     etapas: opcoesDeEtapa(etapas),
     tipos: Object.entries(ROTULO_DO_TIPO).map(([valor, rotulo]) => ({ valor, rotulo })),
-    responsaveis: semRepetir(processos.flatMap((p) => (p.responsavel ? [{ valor: p.responsavel.id, rotulo: p.responsavel.nome }] : []))),
+    responsaveis: semRepetir(processos.flatMap((p) => (p.responsavel ? [opcaoDeResponsavel(p.responsavel)] : []))),
     situacoes: Object.entries(ROTULO_DA_SITUACAO).map(([valor, rotulo]) => ({ valor, rotulo })),
   }
 }
@@ -62,4 +64,8 @@ function opcoesDeEtapa(etapas: EtapaDoCatalogo[]): OpcaoDoFiltro[] {
     .filter((etapa) => etapa.ativa)
     .sort((a, b) => a.ordem - b.ordem)
     .map((etapa) => ({ valor: etapa.codigo, rotulo: etapa.nome }))
+}
+
+function opcaoDeResponsavel({ id, nome, fotoUrl }: ResponsavelDoProcesso): OpcaoDoFiltro {
+  return { valor: id, rotulo: nome, pessoa: { nome, fotoUrl } }
 }

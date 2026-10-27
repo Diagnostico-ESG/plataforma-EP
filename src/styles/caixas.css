@@ -1,0 +1,103 @@
+/*
+ * Caixas de seleção como classes sobre o <select> nativo, sem componente nem biblioteca: a caixa personalizável do
+ * navegador (appearance: base-select, Chrome e Edge) deixa estilizar também a lista aberta. Onde o recurso não existe
+ * (Firefox, Safari), nada aqui vale e o <select> segue comum, com o acabamento que cada tela já lhe dá.
+ * A borda, o fundo e a fonte da caixa fechada continuam nas regras de cada tela; aqui fica a lista aberta.
+ */
+
+@supports (appearance: base-select) {
+  select,
+  ::picker(select) {
+    appearance: base-select;
+  }
+
+  select {
+    cursor: pointer;
+  }
+
+  select:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  select::picker-icon {
+    color: var(--texto-2);
+  }
+
+  /* Repete na caixa fechada o visual da opção escolhida (selo, marca de cor, Avatar). */
+  selectedcontent {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--esp-2);
+  }
+
+  ::picker(select) {
+    padding: var(--esp-1);
+    border: 1px solid var(--linha);
+    border-radius: var(--canto);
+    background: var(--folha);
+    box-shadow: var(--sombra-flutuante);
+  }
+
+  option {
+    display: flex;
+    align-items: center;
+    gap: var(--esp-2);
+    min-height: 32px;
+    padding: var(--esp-1) var(--esp-2);
+    /* O respiro da linha acesa fica reservado, para a opção marcada não "pular". */
+    border-left: 2px solid transparent;
+    border-radius: var(--canto-botao);
+    color: var(--texto);
+    cursor: pointer;
+  }
+
+  /* A marca de seleção padrão sai: a opção escolhida e o foco usam a linha acesa. */
+  option::checkmark {
+    display: none;
+  }
+
+  option:hover:not(:disabled),
+  option:focus {
+    background: var(--azul-claro);
+  }
+
+  option:checked,
+  option:focus-visible {
+    border-left-color: var(--azul);
+  }
+
+  option:disabled {
+    color: var(--texto-2);
+    cursor: not-allowed;
+  }
+
+  @media (forced-colors: active) {
+    ::picker(select) {
+      border-color: CanvasText;
+    }
+
+    option:checked,
+    option:focus,
+    option:hover:not(:disabled) {
+      forced-color-adjust: none;
+      background: Highlight;
+      color: HighlightText;
+    }
+  }
+}
+
+/* Marca na frente do texto de uma opção (OpcaoDaCaixa): o quadradinho do macroprocesso ou o Avatar. */
+.opcao-marca {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+}
+
+.opcao-cor {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--canto-macro);
+  /* Sem isto, o modo de contraste forçado apaga a cor, que é a única informação da marca. */
+  forced-color-adjust: none;
+}

@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { BotaoDaCaixa, OpcaoDaCaixa } from '../OpcaoDaCaixa'
 import { BuscaDaLista } from './BuscaDaLista'
 import type { FiltrosDosProcessos as Filtros, VisaoDosProcessos } from '../../processos/enderecoDosProcessos'
 import { SEM_FILTROS } from '../../processos/enderecoDosProcessos'
@@ -55,8 +56,9 @@ function SeletorDoFiltro({ rotulo, todos, opcoes, valor, aoMudar }: SeletorDoFil
     <div className="filtro">
       <label htmlFor={id} className="filtro-rotulo">{rotulo}</label>
       <select id={id} className="filtro-seletor" value={valor ?? ''} onChange={(evento) => aoMudar(evento.target.value)}>
+        <BotaoDaCaixa />
         <option value="">{todos}</option>
-        {opcoes.map((opcao) => <option key={opcao.valor} value={opcao.valor}>{opcao.rotulo}</option>)}
+        {opcoes.map((opcao) => <OpcaoDaCaixa key={opcao.valor} {...opcao} />)}
       </select>
     </div>
   )

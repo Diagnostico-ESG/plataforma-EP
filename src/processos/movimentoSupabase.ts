@@ -59,8 +59,8 @@ async function processoExiste(cliente: ClienteSupabase, id: string): Promise<boo
 }
 
 async function listarResponsaveisPossiveis(cliente: ClienteSupabase): Promise<UsuarioResponsavel[]> {
-  const { data, error } = await cliente.from('usuarios').select('id, nome')
+  const { data, error } = await cliente.from('usuarios').select('id, nome, foto_url')
     .eq('ativo', true).in('perfil', ['administrador', 'integrante_ep']).order('nome')
   if (error) throw new Error(`Falha ao ler os usuários que podem ser responsáveis: ${error.message}`)
-  return data
+  return data.map(({ id, nome, foto_url }) => ({ id, nome, fotoUrl: foto_url }))
 }

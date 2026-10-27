@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest'
 import { SEM_FILTROS, type FiltrosDosProcessos } from './enderecoDosProcessos'
+import { corDoMacroprocesso } from './corDoMacroprocesso'
 import { filtrarProcessos, opcoesDosFiltros, temFiltro } from './filtrosDosProcessos'
 import type { EtapaDoCatalogo, ProcessoDaLista } from './tipos'
 
@@ -15,7 +16,7 @@ function processo(nome: string, mudancas: Partial<ProcessoDaLista> = {}): Proces
 }
 
 const ANA = { id: 'u1', nome: 'Ana Teste', fotoUrl: null }
-const BRUNO = { id: 'u2', nome: 'Bruno Teste', fotoUrl: null }
+const BRUNO = { id: 'u2', nome: 'Bruno Teste', fotoUrl: 'https://fotos.exemplo/bruno.png' }
 
 const PROCESSOS = [
   processo('Alfa'),
@@ -69,14 +70,21 @@ test('opções: sem repetição, na ordem certa; a etapa de filtro é só das at
   ]
   const opcoes = opcoesDosFiltros({ etapas, processos: [...PROCESSOS].reverse() })
   expect(opcoes.setores).toEqual([{ valor: 's1', rotulo: 'TSA' }, { valor: 's2', rotulo: 'TSB' }])
-  expect(opcoes.macroprocessos).toEqual([{ valor: 'm2', rotulo: 'Macro Dois' }, { valor: 'm1', rotulo: 'Macro Um' }])
+  expect(opcoes.macroprocessos).toEqual([
+    { valor: 'm2', rotulo: 'Macro Dois', cor: corDoMacroprocesso('m2') },
+    { valor: 'm1', rotulo: 'Macro Um', cor: corDoMacroprocesso('m1') },
+  ])
   expect(opcoes.etapas).toEqual([
     { valor: 'nao_iniciados', rotulo: 'Não iniciados' },
     { valor: 'modelagem', rotulo: 'Reunião de modelagem' },
     { valor: 'relatorio', rotulo: 'Relatório' },
     { valor: 'concluidos', rotulo: 'Concluídos' },
   ])
-  expect(opcoes.responsaveis).toEqual([{ valor: 'u1', rotulo: 'Ana Teste' }, { valor: 'u2', rotulo: 'Bruno Teste' }])
+  // Cada responsável leva a foto (ou a falta dela) para a caixa mostrar o Avatar ao lado do nome.
+  expect(opcoes.responsaveis).toEqual([
+    { valor: 'u1', rotulo: 'Ana Teste', pessoa: { nome: 'Ana Teste', fotoUrl: null } },
+    { valor: 'u2', rotulo: 'Bruno Teste', pessoa: { nome: 'Bruno Teste', fotoUrl: 'https://fotos.exemplo/bruno.png' } },
+  ])
   expect(opcoes.tipos.map((o) => o.rotulo)).toEqual(['Processo', 'Subprocesso', 'A classificar'])
   expect(opcoes.situacoes.map((o) => o.rotulo)).toEqual(['Em andamento', 'Suspenso', 'Cancelado', 'Concluído'])
 })

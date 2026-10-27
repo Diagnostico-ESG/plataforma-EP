@@ -13,7 +13,9 @@ import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { Avatar } from '../Avatar'
 import { PublicacaoNoAgora } from './AgoraDaPublicacao'
 import { AcoesDoConcluido } from './AgoraDoConcluido'
+import { BotaoDaCaixa } from '../OpcaoDaCaixa'
 import { DiasNaEtapa } from './DiasNaEtapa'
+import { EtiquetaDoProcesso } from './EtiquetaDoProcesso'
 import { RegistrosDoAgora } from './RegistrosDoAgora'
 import { TrocaDoResponsavel } from './TrocaDoResponsavel'
 
@@ -79,7 +81,8 @@ function ListasDoAgora({ processo, movimento }: Pick<CorpoDoAgoraProps, 'process
           <label className="agora-campo" htmlFor={idDaEtiqueta}>Etiqueta</label>
           <select id={idDaEtiqueta} className="agora-lista" value={etiqueta} disabled={movimento.gravando}
             onChange={(mudanca) => movimento.mudarEtiqueta(processo.id, mudanca.target.value as EtiquetaDaEtapa)}>
-            {ETIQUETAS.map((opcao) => <option key={opcao} value={opcao}>{ROTULO_DA_ETIQUETA[opcao]}</option>)}
+            <BotaoDaCaixa />
+            {ETIQUETAS.map((opcao) => <option key={opcao} value={opcao}><EtiquetaDoProcesso etiqueta={opcao} /></option>)}
           </select>
         </>
       )}

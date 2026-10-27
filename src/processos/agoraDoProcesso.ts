@@ -1,14 +1,18 @@
 import { CODIGO_DA_REVISAO_INTERNA } from './codigosDasEtapas'
 import { diasDoProcessoNaEtapa, passouDoLimite, textoDosDias } from './diasNaEtapa'
 import { ROTULO_DA_ETIQUETA } from './rotulos'
-import type { ProcessoLido, UsuarioResponsavel } from './tipos'
+import type { PessoaDaOpcao, ProcessoLido, UsuarioResponsavel } from './tipos'
 
 /** O rótulo do cartão Agora: a posição da etapa atual entre as etapas ativas ("etapa 2 de 8"). */
 export function rotuloDoAgora(posicao: number, total: number): string {
   return `Agora · etapa ${posicao} de ${total}`
 }
 
-export type OpcaoDeResponsavel = { valor: string; rotulo: string; desabilitada?: boolean }
+export type OpcaoDeResponsavel = { valor: string; rotulo: string; desabilitada?: boolean; pessoa?: PessoaDaOpcao }
+
+function opcaoDePessoa({ id, nome, fotoUrl }: UsuarioResponsavel, rotulo: string): OpcaoDeResponsavel {
+  return { valor: id, rotulo, pessoa: { nome, fotoUrl: fotoUrl ?? null } }
+}
 
 type DadosDoResponsavel = Pick<ProcessoLido, 'responsavel' | 'cartao'>
 
@@ -16,7 +20,7 @@ type DadosDoResponsavel = Pick<ProcessoLido, 'responsavel' | 'cartao'>
 function responsavelForaDaLista({ responsavel, cartao }: DadosDoResponsavel, usuarios: UsuarioResponsavel[]): OpcaoDeResponsavel[] {
   if (responsavel === null || usuarios.some((usuario) => usuario.id === responsavel.id)) return []
   const inativo = cartao?.responsavelAtivo === false
-  return [{ valor: responsavel.id, rotulo: `${responsavel.nome}${inativo ? ' (Inativo)' : ''}`, desabilitada: inativo }]
+  return [{ valor: responsavel.id, rotulo: `${responsavel.nome}${inativo ? ' (Inativo)' : ''}`, desabilitada: inativo, pessoa: { nome: responsavel.nome, fotoUrl: responsavel.fotoUrl } }]
 }
 
 /**
@@ -24,8 +28,8 @@ function responsavelForaDaLista({ responsavel, cartao }: DadosDoResponsavel, usu
  * (desativado) e, por último, "Ninguém por enquanto" (valor "").
  */
 export function opcoesDeResponsavel(processo: DadosDoResponsavel, usuarios: UsuarioResponsavel[], usuarioId: string): OpcaoDeResponsavel[] {
-  const eu = usuarios.filter((usuario) => usuario.id === usuarioId).map((usuario) => ({ valor: usuario.id, rotulo: `${usuario.nome} (você)` }))
-  const outros = usuarios.filter((usuario) => usuario.id !== usuarioId).map((usuario) => ({ valor: usuario.id, rotulo: usuario.nome }))
+  const eu = usuarios.filter((usuario) => usuario.id === usuarioId).map((usuario) => opcaoDePessoa(usuario, `${usuario.nome} (você)`))
+  const outros = usuarios.filter((usuario) => usuario.id !== usuarioId).map((usuario) => opcaoDePessoa(usuario, usuario.nome))
   return [...eu, ...outros, ...responsavelForaDaLista(processo, usuarios), { valor: '', rotulo: 'Ninguém por enquanto' }]
 }
 

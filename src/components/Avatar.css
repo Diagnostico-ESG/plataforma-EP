@@ -13,3 +13,7 @@
   line-height: 1;
   user-select: none;
 }
+
+.avatar-iniciais[data-iniciais]::before {
+  content: attr(data-iniciais);
+}

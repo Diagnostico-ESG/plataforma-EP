@@ -155,8 +155,8 @@ describe('responsável do processo', () => {
 
 test('quem pode ser responsável: usuários ativos Administrador ou Integrante, por nome', async () => {
   const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['usuarios.select'] = { data: [{ id: 'u1', nome: 'Ana' }], error: null }
-  expect(await criar(cliente).listarResponsaveisPossiveis()).toEqual([{ id: 'u1', nome: 'Ana' }])
+  cliente.respostas['usuarios.select'] = { data: [{ id: 'u1', nome: 'Ana', foto_url: 'https://fotos.exemplo/ana.png' }], error: null }
+  expect(await criar(cliente).listarResponsaveisPossiveis()).toEqual([{ id: 'u1', nome: 'Ana', fotoUrl: 'https://fotos.exemplo/ana.png' }])
   expect(cliente.pedidos[0]).toMatchObject({
     tabela: 'usuarios', filtro: ['ativo', true],
     dentro: ['perfil', ['administrador', 'integrante_ep']], ordem: [['nome', true]],

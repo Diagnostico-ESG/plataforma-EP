@@ -1,8 +1,10 @@
 import { useId } from 'react'
 import type { Macroprocesso, Setor } from '../../cadastros/tipos'
+import { corDoMacroprocesso } from '../../processos/corDoMacroprocesso'
 import { ROTULO_DA_ORIGEM, ROTULO_DO_TIPO } from '../../processos/rotulos'
 import type { OrigemDoProcesso, ProcessoDaLista, TipoDeProcesso } from '../../processos/tipos'
 import type { CamposDoProcesso } from '../../processos/validacaoDoProcesso'
+import { BotaoDaCaixa, OpcaoDaCaixa } from '../OpcaoDaCaixa'
 
 /** Os pais possíveis são os processos do tipo Processo (só no cadastro; na edição a lista fica vazia). */
 export type OpcoesDoProcesso = { setores: Setor[]; macroprocessos: Macroprocesso[]; pais: ProcessoDaLista[] }
@@ -96,9 +98,10 @@ function CampoDoMacroprocesso({ id, campos, macroprocessos, aoMudar }: CampoDoMa
       <label htmlFor={`${id}-macroprocesso`}>Macroprocesso</label>
       <select id={`${id}-macroprocesso`} aria-required="true" value={campos.macroprocessoId} disabled={campos.tipo === 'subprocesso'}
         onChange={(evento) => aoMudar({ macroprocessoId: evento.target.value })}>
+        <BotaoDaCaixa />
         <option value="">Escolha o macroprocesso</option>
         {macroprocessos.filter((macro) => macro.ativo || macro.id === campos.macroprocessoId).map((macro) => (
-          <option key={macro.id} value={macro.id}>{macro.nome}</option>
+          <OpcaoDaCaixa key={macro.id} valor={macro.id} rotulo={macro.nome} cor={corDoMacroprocesso(macro.id)} />
         ))}
       </select>
     </>

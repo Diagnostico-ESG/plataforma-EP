@@ -100,7 +100,7 @@ export type SetorDoQuadro = { id: string; sigla: string; nome: string; ativo: bo
 export type ListaDeProcessos = { etapas: EtapaDoCatalogo[]; processos: ProcessoDaLista[]; setores: SetorDoQuadro[] }
 
 /** Quem pode ser responsável por um processo: usuário ativo de perfil Administrador ou Integrante. */
-export type UsuarioResponsavel = { id: string; nome: string }
+export type UsuarioResponsavel = { id: string; nome: string; fotoUrl?: string | null }
 
 /** As Anotações de um processo (texto livre, único, sem histórico; ADR 0021) e quem as alterou por último. */
 export type AnotacoesLidas = { texto: string | null; alteradoPor: string | null; alteradoEm: string | null }
@@ -227,3 +227,6 @@ export type ModuloDeProcessos = {
   listarResponsaveisPossiveis(): Promise<UsuarioResponsavel[]>
   catalogo: ModuloDoCatalogo
 }
+
+/** Quem aparece com o Avatar numa opção das caixas de seleção: o nome puro (sem "(você)") e a foto, se houver. */
+export type PessoaDaOpcao = { nome: string; fotoUrl: string | null }

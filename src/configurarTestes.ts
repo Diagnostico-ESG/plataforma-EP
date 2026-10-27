@@ -23,3 +23,12 @@ if (typeof HTMLDialogElement !== 'undefined') {
     if (deCima && deCima.dispatchEvent(new Event('cancel', { cancelable: true }))) deCima.close()
   })
 }
+
+// O jsdom não conhece o <selectedcontent> da caixa de seleção personalizável (BotaoDaCaixa) e o React avisaria "tag
+// desconhecida" em todo teste que renderiza uma caixa; no Chrome e no Edge, que conhecem o elemento, não há aviso.
+const registrarErro = console.error.bind(console)
+console.error = (...argumentos: unknown[]) => {
+  const [mensagem, tag] = argumentos
+  if (tag === 'selectedcontent' && String(mensagem).includes('is unrecognized in this browser')) return
+  registrarErro(...argumentos)
+}
