@@ -508,3 +508,16 @@ Visto na vitrine local (`vitrine.local/setores.html`, fora do git, módulos fals
 - **Deixado de fora (P3):** a coluna de setor com nome longo tem o título mais alto (61 px contra 42 px), e os cartões dela começam um pouco mais abaixo. Cortar o nome numa linha esconderia o que a escolha "sigla e nome" (pergunta 1 do `/planejar`) quis mostrar.
 - **Conferido sem achado:** coluna vazia com "Nenhum processo deste setor no Quadro.", setor inativo sem processo fora, "Só os meus" sem processo com a mensagem de hoje, cartão com barra, etiqueta e avatar e sem sigla, console sem erros.
 - **Critérios `[visual]`:** os dois da seção (título em duas linhas sem estourar a coluna com nome longo; marca "inativo" igual à do responsável desativado) vistos na vitrine local, com módulos falsos; não vistos com o login real.
+
+## 2026-10-26 — /ship da Visualização por setores (parte 5 do quadro livre)
+
+Ponto de partida da revisão: `marco/2026-10-26-inicio-quadro-livre-parte-5`.
+
+- **Divergência da spec (esclarecida na spec):** no Quadro por setor o cartão mantém o selo "Sem responsável" junto do avatar, porque a coluna não diz quem cuida; a spec dizia "igual ao do Quadro por responsável", que dispensa o selo. A linha "Cartão" da seção passou a dizer isso.
+- **Alinhamento da contagem (do `/polir`):** o `align-items: baseline` vale para o título de todas as colunas (etapa, responsável e setor), não só as por setor; medido na vitrine, a contagem fica na linha do título nos três agrupamentos.
+- **`/code-review` do `/implement` (corrigido):** o leitor de tela não ouvia "inativo" na coluna do setor desativado (o `aria-label` encobria a pílula; história 13); a leitura de `agrupar` no endereço usava conversão de tipo à força (trocada por checagem que o compilador acompanha); a fábrica de setor dos testes estava repetida (virou `umSetor`).
+- **`/code-review` do `/ship`, eixo Standards (deixado de fora, são julgamentos):** `agrupar` é ramificado em quatro arquivos (cartão, coluna, Quadro, endereço); um mapa único por agrupamento vale a pena se surgir um quarto. `ListaDeProcessos` ganhou `setores` e duas funções passaram a pedir só `etapas` e `processos`; a lista dos setores é lida a cada carga, mesmo fora do Quadro por setor (uma consulta pequena a mais).
+- **`/code-review` do `/ship`, eixo Spec:** sem requisito faltando. O filtro Setor com setor inativo sem processo mostra a coluna dele, caso que a lista de filtros não oferece (ela só traz setores com processo).
+- **Revisão de segurança do código:** a de **reserva** (o `/security-review` embutido compara a branch atual com a `main`, e a entrega está na `main`). Sem achado: `agrupar` do endereço só vale entre os três valores conhecidos (`Object.hasOwn`, sem cair em nomes do protótipo); `setor` do endereço só é comparado com os ids; a leitura de `setores` passa pela política "setores: ativo lê", que já existia; nenhuma chave nem HTML montado à mão.
+- **Sem banco:** nenhuma migração, teste de banco ou função mudou; `package.json` não mudou (o `.scratch/security.md` segue valendo).
+- **Cobertura:** 98,97% das linhas, 94,22% dos ramos. **Dependência circular:** nenhuma. **Build:** passa (só o aviso de pacote acima de 500 kB, que já existia).

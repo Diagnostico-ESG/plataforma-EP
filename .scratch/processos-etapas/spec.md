@@ -19,7 +19,7 @@ Parte 5 da iniciativa quadro-livre, planejada no modo curto do `/planejar` (uma 
 - **Agrupar por:** "Etapa | Responsável | Setor". A escolha fica no endereço (`agrupar=setor`), como a de responsável, e só vale no Quadro.
 - **Colunas:** uma por setor ativo, em ordem alfabética da sigla, mesmo vazia. Título com a sigla em destaque e o nome do setor menor, abaixo. Setor inativo só ganha coluna enquanto tiver processo no Quadro, marcada "inativo" como a coluna de responsável desativado, na mesma ordem de sigla.
 - **Processos em cada coluna:** os mesmos do Quadro de hoje (em andamento, suspensos e os de Concluídos não arquivados), cada um na coluna do setor dono, em ordem de nome.
-- **Cartão:** igual ao do Quadro por responsável: barra da etapa ("Nome · 2 de 8") e etiqueta; o avatar de quem cuida continua no rodapé; a sigla do setor sai do cartão, porque a coluna já diz.
+- **Cartão:** igual ao do Quadro por responsável: barra da etapa ("Nome · 2 de 8") e etiqueta; o avatar de quem cuida continua no rodapé, e com ele o selo "Sem responsável" quando não há ninguém (a coluna não diz quem cuida); a sigla do setor sai do cartão, porque a coluna já diz.
 - **Sem arrastar:** no Quadro por setor nenhum cartão se arrasta; clicar abre o verso, como hoje.
 - **Filtros:** com o filtro Setor escolhido, só a coluna desse setor. Com os outros filtros (Macroprocesso, Responsável, Só os meus, busca), todas as colunas dos setores ativos continuam, mesmo as que ficarem vazias. Quando nenhum processo passa nos filtros, vale a mensagem de "nenhum processo" de hoje.
 - **Coluna vazia:** "Nenhum processo deste setor no Quadro.", no estilo da coluna vazia de hoje.
