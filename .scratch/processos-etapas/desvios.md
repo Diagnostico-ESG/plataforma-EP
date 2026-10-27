@@ -559,3 +559,9 @@ Ponto de partida da revisão: `marco/2026-10-26-inicio-quadro-livre-parte-5`.
   - `:has()` acopla o CSS à estrutura do DOM (já registrado nos desvios anteriores).
   - Não há modo escuro no projeto; o realce usa só tokens (`--azul`, `--azul-claro`), então herda um modo escuro futuro. A `color-mix` da sombra interna é o único valor derivado de token.
 - **Não conferido na tela:** o arrastar exige login; o resultado visual depende da conferência do usuário.
+
+## 2026-10-27 · `/polir` do macroprocesso fora do cartão (ADR 0029)
+
+- **Audit (impeccable):** detector sem achados em `CartaoDoProcesso.tsx` e `Quadro.css`. Nenhum P0, P1, P2 ou P3 novo. O `polish` não encontrou o que aplicar; nada foi alterado em código.
+- **Verificado no código:** o cartão é coluna flex com `gap`, então tirar a linha do topo (no agrupamento por setor) não deixa espaço vazio; a sigla segue com contraste e tokens como antes. Sem cor nem tamanho novos.
+- **Não conferido na tela:** o critério `[visual]` 5 (espaçamento regular e cartões alinhados) depende de login; fica para a conferência do usuário.
