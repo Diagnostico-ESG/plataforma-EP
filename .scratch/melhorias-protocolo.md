@@ -989,3 +989,7 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 
 - **2026-10-26 · Ocorrência: fui direto à revisão de segurança de reserva, sem devolver o `/security-review` para o usuário rodar.** O passo 4 manda parar e devolver o comando; como a entrega está na `main` e o comando compara a branch atual com a `main`, ele não acharia mudanças (como nas entregas anteriores). Sugestão: o passo 4 prever "na `main`, sem branch de trabalho, ir direto à revisão de reserva e dizer isso no relatório", ou o `/executar-*` passar a trabalhar numa branch para o `/security-review` ter o que comparar.
 - **2026-10-26 · Ocorrência: o `/code-review` rodou duas vezes nesta funcionalidade** (no fim do `/implement` e no `/ship`, porque o código mudou depois: correções da própria revisão e o CSS do `/polir`). A segunda não trouxe achado novo de spec. Sugestão: o passo 2 dispensar a segunda revisão quando a mudança depois dela é só CSS ou só correção dos achados dela, registrada no `desvios.md`.
+
+## 2026-10-27 — /planejar modo curto (caixas-de-selecao)
+
+- **2026-10-27 · Ocorrência: a opção escolhida no `/demanda` trazia "etapa com sua cor", mas as etapas não têm cor no código** (a barra é cinza de propósito). O `/planejar` levou isso como pergunta, e o usuário escolheu só o acabamento. Sugestão: o `/demanda`, ao descrever uma opção visual, conferir no código ou na identidade que cada elemento citado existe.
