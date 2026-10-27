@@ -549,3 +549,13 @@ Ponto de partida da revisão: `marco/2026-10-26-inicio-quadro-livre-parte-5`.
 - **Só `Quadro.css`:** nenhum componente mudou. A borda é `box-shadow: inset`, não `border`, para a coluna não mudar de tamanho; tudo fica para dentro porque a rolagem lateral cortaria o que sai da coluna. `prefers-reduced-motion` já zera transições na regra global de `index.css`; em contraste forçado o destino volta a ter contorno `Highlight`.
 - **Julgamento:** o esmaecimento usa `.quadro-colunas:has(.coluna-destino)`, então só acontece quando o cartão está sobre uma coluna (não no instante entre colunas). Segundo `:has()` do projeto, mesma ressalva do desvio anterior. Sem teste automático (jsdom não calcula estilo); depende de conferência na tela.
 - **Fora de escopo, como pedido:** espaço "Soltar aqui" e cartão suspenso.
+
+## 2026-10-27 · `/polir` do Quadro (refinamento visual do arrastar)
+
+- **Audit (impeccable):** detector sem achados em `Quadro.css` e `ColunaDoQuadro.tsx`. Nenhum P0, P1 ou P2. Nada foi alterado em código.
+- **Deixado de fora (P3, com motivo):**
+  - O texto cinza das colunas esmaecidas (opacidade 0,6) cai abaixo de 4,5:1 enquanto o cartão está sobre outra coluna. É um estado de segundos, o conteúdo já era lido antes de arrastar, e o pedido era esmaecer "levemente"; subir a opacidade enfraquece o efeito. Reavaliar se a equipe reclamar.
+  - O arrastar usa o arrastar nativo do navegador (HTML5), que não funciona por toque. Já era assim antes; o produto é de uso em desktop (PRODUCT.md), e o celular é opcional.
+  - `:has()` acopla o CSS à estrutura do DOM (já registrado nos desvios anteriores).
+  - Não há modo escuro no projeto; o realce usa só tokens (`--azul`, `--azul-claro`), então herda um modo escuro futuro. A `color-mix` da sombra interna é o único valor derivado de token.
+- **Não conferido na tela:** o arrastar exige login; o resultado visual depende da conferência do usuário.
