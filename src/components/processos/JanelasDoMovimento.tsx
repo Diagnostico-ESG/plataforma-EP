@@ -2,7 +2,8 @@ import type { MovimentoDoProcessoEmUso } from '../../hooks/useMovimentoDoProcess
 import type { ModuloDeProcessos } from '../../processos/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { JanelaDaChegada } from './JanelaDaChegada'
-import { JanelaDaTrava } from './JanelaDaTrava'
+import { JanelaDaConfirmacaoDeArquivos } from './JanelaDaConfirmacaoDeArquivos'
+import { JanelaDeEnvioDeArquivos } from './JanelaDeEnvioDeArquivos'
 
 type JanelasDoMovimentoProps = {
   movimento: MovimentoDoProcessoEmUso
@@ -12,12 +13,15 @@ type JanelasDoMovimentoProps = {
   aoGravar: () => void
 }
 
-/** As janelas que o movimento pode abrir, uma de cada vez: a trava de arquivos e, por último, a chegada a Concluídos. */
+/** As janelas que o movimento pode abrir, uma de cada vez: a Confirmação de arquivos, o envio que ela abre e, depois, a chegada a Concluídos. */
 export function JanelasDoMovimento({ movimento, processos, versoes, aoGravar }: JanelasDoMovimentoProps) {
   return (
     <>
-      {movimento.trava && (
-        <JanelaDaTrava key={movimento.trava.trava.codigo} pedido={movimento.trava} versoes={versoes} aoEnviar={movimento.arquivosEnviados} aoFechar={movimento.fecharTrava} />
+      {movimento.confirmacao && (
+        <JanelaDaConfirmacaoDeArquivos pedido={movimento.confirmacao} aoEnviar={movimento.enviarAgora} aoAvancar={movimento.avancarSemArquivos} aoFechar={movimento.fecharConfirmacao} />
+      )}
+      {movimento.envio && (
+        <JanelaDeEnvioDeArquivos key={movimento.envio.faltas[0].codigo} pedido={movimento.envio} versoes={versoes} aoEnviar={movimento.arquivosEnviados} aoFechar={movimento.fecharEnvio} />
       )}
       {movimento.chegada && (
         <JanelaDaChegada chegada={movimento.chegada} processos={processos} aoGravar={aoGravar} aoFechar={movimento.fecharChegada} />

@@ -1,12 +1,12 @@
-/* A janela da trava de arquivos traz o formulário de envio inteiro: mais larga que as de confirmação e com rolagem própria,
+/* A janela de envio de arquivos traz o formulário de envio inteiro: mais larga que as de confirmação e com rolagem própria,
    para o formulário caber na altura de um notebook (1366×768) sem empurrar o botão para fora da tela. */
-.janela-da-trava {
+.janela-de-envio {
   width: min(56ch, calc(100vw - var(--esp-5) * 2));
   max-width: none;
   max-height: calc(100vh - var(--esp-5) * 2);
   overflow-y: auto;
 }
 
-.janela-da-trava .formulario-de-versao {
+.janela-de-envio .formulario-de-versao {
   margin-top: var(--esp-3);
 }

@@ -1,14 +1,15 @@
--- Trava de arquivos (documentos-versoes, ticket 11; ADR 0025): mover o processo para a frente da Modelagem piloto exige
--- uma versão piloto (ou, para não prender o processo antigo, uma versão em sequência); mover para a frente da Relatório e
--- modelagem técnica exige uma versão em sequência e um relatório numerado, sem importar a ligação entre os dois. Voltar,
--- a etiqueta, o processo que já estava adiante e a etapa desativada não travam. A view traz os três campos que a tela lê.
+-- Confirmação de arquivos (travas-em-avisos, ticket 01; ADR 0028, que substitui a trava do ADR 0025): mover o processo para a
+-- frente da Modelagem piloto ou da Relatório e modelagem técnica sem os arquivos delas é aceito, e o evento do movimento
+-- guarda, no lado "depois", a lista do que faltava (etapa e peça), só quando falta algo. A Modelagem piloto pede uma versão
+-- piloto (uma em sequência também basta); a técnica pede uma versão em sequência e um relatório numerado. A view traz os
+-- três campos que a tela lê.
 begin;
 create extension if not exists pgtap with schema extensions;
 -- As linhas do pgTAP vão para _tap e saem na exceção do fim (ver scripts/relatorio-tap.mjs).
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(25);
+insert into _tap (linha) select plan(37);
 
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta.
 insert into public.autorizacoes (email, perfil) values
@@ -70,7 +71,15 @@ begin
   update public.etapas set ativa = ligada where codigo = codigo_da_etapa;
   set local session_replication_role = origin;
 end $$;
-grant execute on function pg_temp.processo(text), pg_temp.etapa(text), pg_temp.mover(text, text), pg_temp.passagens(text),
+-- O que o último evento de movimento do processo diz que faltava: "etapa=peca+peca | etapa=peca", ou null sem a lista.
+create function pg_temp.faltou(nome_do_processo text) returns text
+language sql stable as $$
+  select string_agg((e.item->>'etapa_codigo') || '=' || (select string_agg(p, '+') from jsonb_array_elements_text(e.item->'pecas') p),
+    ' | ' order by e.n)
+  from (select detalhes from public.eventos where entidade = 'passagem' and acao = 'mover'
+      and entidade_ref = pg_temp.processo(nome_do_processo)::text order by id desc limit 1) ev,
+    jsonb_array_elements(ev.detalhes->'depois'->'sem_arquivos') with ordinality as e(item, n) $$;
+grant execute on function pg_temp.faltou(text), pg_temp.processo(text), pg_temp.etapa(text), pg_temp.mover(text, text), pg_temp.passagens(text),
   pg_temp.arquivos_da_view(text), pg_temp.arquivo(text, text), pg_temp.so_bpm() to authenticated;
 
 -- Preparação: o integrante envia os arquivos de cada processo (ainda em Não iniciados, onde tudo cabe) e o dono do banco
@@ -100,41 +109,52 @@ select pg_temp.por_fora('t12', 'revisao_setor');
 select pg_temp.por_fora('t13', 'relatorio_modelagem_tecnica');
 select pg_temp.por_fora('t14', 'modelagem');
 
--- ===== A Modelagem piloto exige a versão piloto =====
+-- ===== A Modelagem piloto pede a versão piloto =====
 set local role authenticated;
 select pg_temp.claims('a2');
 insert into _tap (linha) select lives_ok($sql$select pg_temp.mover('t01', 'modelagem')$sql$,
-  'chegar à Modelagem piloto sem arquivos é aceito (a trava é na saída)');
-insert into _tap (linha) select throws_ok($sql$select pg_temp.mover('t01', 'relatorio_modelagem_tecnica')$sql$,
-  'P0001', 'trava_piloto', 'sair da Modelagem piloto sem versão piloto é recusado');
+  'chegar à Modelagem piloto sem arquivos é aceito');
+insert into _tap (linha) select is(pg_temp.faltou('t01'), null, 'chegar a ela não registra falta (a etapa só confere na saída)');
+insert into _tap (linha) select lives_ok($sql$select pg_temp.mover('t01', 'relatorio_modelagem_tecnica')$sql$,
+  'sair da Modelagem piloto sem versão piloto é aceito');
+insert into _tap (linha) select is(pg_temp.faltou('t01'), 'modelagem=versao_piloto', 'o evento guarda que faltava a versão piloto');
 insert into _tap (linha) select results_eq($sql$select (select etapa_atual_codigo from public.processos_com_andamento
-  where id = pg_temp.processo('t01')), pg_temp.passagens('t01')$sql$, $sql$values ('modelagem', 2::bigint)$sql$,
-  'a recusa deixa o processo onde estava, sem passagem nova');
-insert into _tap (linha) select throws_ok($sql$select pg_temp.mover('t11', 'revisao_interna')$sql$,
-  'P0001', 'trava_piloto', 'ir de Não iniciados à Revisão interna sem versão piloto é recusado (passa por cima da etapa)');
-insert into _tap (linha) select throws_ok($sql$select pg_temp.mover('t11', 'concluidos')$sql$,
-  'P0001', 'trava_piloto', 'a trava vem antes da regra da chegada a Concluídos');
+  where id = pg_temp.processo('t01')), pg_temp.passagens('t01')$sql$, $sql$values ('relatorio_modelagem_tecnica', 3::bigint)$sql$,
+  'o processo andou: passagem nova na técnica');
+insert into _tap (linha) select lives_ok($sql$select pg_temp.mover('t11', 'revisao_interna')$sql$,
+  'ir de Não iniciados à Revisão interna sem nada é aceito (passa por cima das duas etapas)');
+insert into _tap (linha) select is(pg_temp.faltou('t11'), 'modelagem=versao_piloto | relatorio_modelagem_tecnica=versao+relatorio',
+  'o evento guarda as duas etapas, em ordem');
+insert into _tap (linha) select lives_ok(
+  $sql$select public.mover_processo(pg_temp.processo('t09'), pg_temp.etapa('concluidos'), null, null, 'Sem divulgação')$sql$,
+  'ir da técnica a Concluídos sem arquivos é aceito, com a chegada de sempre');
+insert into _tap (linha) select is(pg_temp.faltou('t09'), 'relatorio_modelagem_tecnica=versao+relatorio',
+  'o evento da chegada a Concluídos também guarda o que faltava');
 insert into _tap (linha) select lives_ok($sql$select pg_temp.mover('t03', 'relatorio_modelagem_tecnica')$sql$,
   'com a versão piloto, sair da Modelagem piloto é aceito');
+insert into _tap (linha) select is(pg_temp.faltou('t03'), null, 'com a piloto, nada falta');
 insert into _tap (linha) select lives_ok($sql$select pg_temp.mover('t07', 'relatorio_modelagem_tecnica')$sql$,
-  'só com a versão em sequência, sair da Modelagem piloto também é aceito (a piloto já não pode entrar)');
+  'só com a versão em sequência, sair da Modelagem piloto também é aceito');
+insert into _tap (linha) select is(pg_temp.faltou('t07'), null, 'a versão em sequência basta: nada falta');
 
--- ===== A técnica exige a versão em sequência e o relatório =====
-insert into _tap (linha) select throws_ok($sql$select pg_temp.mover('t03', 'revisao_interna')$sql$,
-  'P0001', 'trava_tecnica:versao_e_relatorio', 'sair da técnica só com a piloto é recusado, faltando a versão e o relatório');
-insert into _tap (linha) select throws_ok($sql$select pg_temp.mover('t04', 'revisao_interna')$sql$,
-  'P0001', 'trava_tecnica:relatorio', 'sair da técnica sem relatório é recusado');
-insert into _tap (linha) select throws_ok($sql$select pg_temp.mover('t05', 'revisao_interna')$sql$,
-  'P0001', 'trava_tecnica:versao', 'sair da técnica sem versão em sequência (só a piloto e o relatório) é recusado');
+-- ===== A técnica pede a versão em sequência e o relatório =====
+insert into _tap (linha) select lives_ok($sql$select pg_temp.mover('t03', 'revisao_interna')$sql$,
+  'sair da técnica só com a piloto é aceito');
+insert into _tap (linha) select is(pg_temp.faltou('t03'), 'relatorio_modelagem_tecnica=versao+relatorio', 'faltavam a versão e o relatório');
+insert into _tap (linha) select lives_ok($sql$select pg_temp.mover('t04', 'revisao_interna')$sql$, 'sair da técnica sem relatório é aceito');
+insert into _tap (linha) select is(pg_temp.faltou('t04'), 'relatorio_modelagem_tecnica=relatorio', 'faltava o relatório');
+insert into _tap (linha) select lives_ok($sql$select pg_temp.mover('t05', 'revisao_interna')$sql$,
+  'sair da técnica sem versão em sequência é aceito');
+insert into _tap (linha) select is(pg_temp.faltou('t05'), 'relatorio_modelagem_tecnica=versao', 'faltava a versão');
 insert into _tap (linha) select lives_ok($sql$select pg_temp.mover('t06', 'revisao_interna')$sql$,
   'com versão em sequência e relatório ligados a versões diferentes, sair da técnica é aceito');
-insert into _tap (linha) select throws_ok($sql$select pg_temp.mover('t09', 'concluidos')$sql$,
-  'P0001', 'trava_tecnica:versao_e_relatorio', 'ir da técnica a Concluídos sem arquivos é recusado, antes da regra da chegada');
+insert into _tap (linha) select is(pg_temp.faltou('t06'), null, 'com tudo, o evento não traz lista');
 
--- ===== O que não trava =====
+-- ===== O que não registra falta =====
 insert into _tap (linha) select lives_ok($sql$select pg_temp.mover('t12', 'publicacao')$sql$,
   'o processo que já estava adiante das duas etapas anda sem arquivos');
 insert into _tap (linha) select lives_ok($sql$select pg_temp.mover('t12', 'modelagem')$sql$, 'voltar sem arquivos é aceito');
+insert into _tap (linha) select is(pg_temp.faltou('t12'), null, 'adiante ou voltando, nada é registrado');
 insert into _tap (linha) select lives_ok(
   $sql$update public.passagens set etiqueta = 'em_andamento'
     where processo_id = pg_temp.processo('t13') and saiu_em is null$sql$, 'mudar a etiqueta sem arquivos é aceito');
@@ -143,14 +163,16 @@ select pg_temp.ativar('modelagem', false);
 set local role authenticated;
 select pg_temp.claims('a2');
 insert into _tap (linha) select lives_ok($sql$select pg_temp.mover('t02', 'relatorio_modelagem_tecnica')$sql$,
-  'a Modelagem piloto desativada no catálogo não trava');
+  'a Modelagem piloto desativada no catálogo é aceita');
+insert into _tap (linha) select is(pg_temp.faltou('t02'), null, 'a etapa desativada fica fora da lista');
 reset role;
 select pg_temp.ativar('modelagem', true);
 select pg_temp.ativar('relatorio_modelagem_tecnica', false);
 set local role authenticated;
 select pg_temp.claims('a2');
-insert into _tap (linha) select lives_ok($sql$select pg_temp.mover('t09', 'revisao_interna')$sql$,
-  'a técnica desativada no catálogo não trava');
+insert into _tap (linha) select lives_ok($sql$select pg_temp.mover('t13', 'revisao_interna')$sql$,
+  'a técnica desativada no catálogo é aceita');
+insert into _tap (linha) select is(pg_temp.faltou('t13'), null, 'e também fica fora da lista');
 reset role;
 select pg_temp.ativar('relatorio_modelagem_tecnica', true);
 

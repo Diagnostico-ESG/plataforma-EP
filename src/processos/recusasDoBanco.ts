@@ -24,8 +24,7 @@ import {
   FRASE_DO_PROCESSO_NAO_ARQUIVADO, FRASE_DA_DATA_DA_PUBLICACAO_OBRIGATORIA, FRASE_DA_PUBLICACAO_FORA_DA_ETAPA,
   FRASE_DO_ARQUIVADO_JA_PUBLICADO, fraseDaPublicacaoAntesDaAprovacao, fraseDoArquivarSoConcluido,
 } from './frasesDePublicacao'
-import { fraseDoAutorDaVersao, fraseDoProcessoComAnexos, fraseDoProcessoComVersoes } from './frasesDeVersao'
-import { FRASE_DA_TRAVA_DA_MODELAGEM, fraseDaTravaDaTecnica } from './frasesDeTravaDeArquivos'
+import { fraseDoProcessoComAnexos, fraseDoProcessoComVersoes } from './frasesDeVersao'
 import { fraseDeSituacaoInvalida, fraseDoProcessoParado } from './frasesDeSituacao'
 
 /** O que a pessoa tentava fazer, para as frases que o banco não diz (desativar ou excluir a etapa). */
@@ -40,14 +39,13 @@ const PADRAO_DA_RECUSA = new RegExp(
   + '|etapa_usada|etapa_protegida|etapa_fixa|etapas_fixas_nas_pontas|etapa_com_processos'
   + '|etapa_inativa|publicacao_ou_explicacao_obrigatoria|explicacao_obrigatoria|explicacao_longa'
   + '|etiqueta_fixa_em_concluidos|passagem_fechada|passagem_so_pela_funcao'
-  + '|processo_com_versoes|processo_com_anexos|autor_da_versao|sem_versao|versao_incompleta'
+  + '|processo_com_versoes|processo_com_anexos|sem_versao|versao_incompleta'
   + '|corrigida_sem_versao_na_passagem|revisao_ja_registrada|escopo_obrigatorio'
   + '|escopo_so_na_corrigida|revisao_fora_da_etapa|processo_com_revisoes'
   + '|aprovacao_fora_da_etapa|processo_ja_aprovado|aprovacao_so_pela_funcao|link_invalido'
   + '|versao_aprovada|processo_com_aprovacao'
   + '|arquivar_so_concluido|ja_arquivado|nao_arquivado|processo_arquivado|arquivamento_so_pela_funcao'
   + '|publicacao_fora_da_etapa|arquivado_ja_publicado|data_da_publicacao_obrigatoria|publicacao_antes_da_aprovacao'
-  + '|trava_piloto|trava_tecnica'
   + '|data_so_na_validacao|data_da_validacao_so_pela_funcao'
   + '|sem_aprovacao_para_o_pdf|pdf_ja_enviado|pdf_nome_sem_versao|pdf_guardado_nao_se_altera'
   + '|anotacoes_longas)(?::(.*))?$', 'm')
@@ -96,7 +94,6 @@ const FRASE_DA_RECUSA: Record<string, FraseDaRecusa> = {
   passagem_so_pela_funcao: () => FRASE_DA_PASSAGEM_SO_PELA_FUNCAO,
   processo_com_versoes: fraseDoProcessoComVersoes,
   processo_com_anexos: fraseDoProcessoComAnexos,
-  autor_da_versao: fraseDoAutorDaVersao,
   sem_versao: () => FRASE_SEM_VERSAO,
   corrigida_sem_versao_na_passagem: () => FRASE_DA_CORRIGIDA_SEM_VERSAO_NA_PASSAGEM,
   revisao_ja_registrada: () => FRASE_DA_REVISAO_JA_REGISTRADA,
@@ -120,8 +117,6 @@ const FRASE_DA_RECUSA: Record<string, FraseDaRecusa> = {
   data_da_publicacao_obrigatoria: () => FRASE_DA_DATA_DA_PUBLICACAO_OBRIGATORIA,
   publicacao_antes_da_aprovacao: fraseDaPublicacaoAntesDaAprovacao,
   anotacoes_longas: fraseDasAnotacoesLongas,
-  trava_piloto: () => FRASE_DA_TRAVA_DA_MODELAGEM,
-  trava_tecnica: fraseDaTravaDaTecnica,
   versao_incompleta: (valor) => {
     const [numero, faltas] = valor.split(':')
     return fraseDaVersaoIncompleta(numero, faltas.split(','))

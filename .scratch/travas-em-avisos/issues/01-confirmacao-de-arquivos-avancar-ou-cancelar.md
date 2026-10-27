@@ -6,13 +6,15 @@
 
 **Status:** ready-for-agent
 
-- [ ] Teste pgTAP antes da migração: `mover_processo` (mesma assinatura) aceita mover para a frente sem os arquivos e grava, no lado "depois" do evento, a lista do que faltava (etapa e peça), só quando falta algo; casos da tabela de regras da spec (piloto sem piloto; Não iniciados → Revisão interna com as duas etapas; técnica → Validação sem relatório; com tudo, sem lista; voltar, sem lista; etapa desativada fora da lista). `59_trava_de_arquivos` passa ao modelo novo; `52_mover_processo`, `10_privilegios_padrao` e `46_funcoes_e_views_seguras` continuam passando.
-- [ ] Migração não destrutiva, aplicada no desenvolvimento pelo workflow "Migrar banco de desenvolvimento"; tipos atualizados.
-- [ ] A decisão pura de hoje devolve todas as etapas que faltam na ida, em ordem.
-- [ ] Janela de confirmação com o título em negrito e a frase da etapa (textos da spec, só o que falta; lista por etapa quando atravessa as duas), saída de uma função pura com teste.
-- [ ] [Avançar mesmo assim] move na hora (ou abre a chegada a Concluídos, quando é o destino), sem conferir os arquivos de novo; [Cancelar] e Esc deixam o processo onde estava; falha da gravação mostra a mensagem de erro de hoje.
-- [ ] Mesma pergunta pela lista do Agora e ao arrastar, inclusive quando o destino pula a etapa; voltar, mesma etapa, etiqueta, processo já adiante e etapa desativada não perguntam.
-- [ ] Histórico mostra "Moveu para {etapa} sem {o que faltava}", lido do evento (inclusive a lista das duas etapas).
-- [ ] Saem as recusas `trava_piloto`, `trava_tecnica:<falta>` e `autor_da_versao`, com as frases delas; nenhuma tela traz "Quem enviou a versão… não pode…".
-- [ ] Falsa de processos deixa de recusar e guarda o que faltava; testes `App.*` da trava, do arrastar e da chegada a Concluídos passam ao modelo novo.
+- [x] Teste pgTAP antes da migração: `mover_processo` (mesma assinatura) aceita mover para a frente sem os arquivos e grava, no lado "depois" do evento, a lista do que faltava (etapa e peça), só quando falta algo; casos da tabela de regras da spec (piloto sem piloto; Não iniciados → Revisão interna com as duas etapas; técnica → Validação sem relatório; com tudo, sem lista; voltar, sem lista; etapa desativada fora da lista). `59_trava_de_arquivos` passa ao modelo novo; `52_mover_processo`, `10_privilegios_padrao` e `46_funcoes_e_views_seguras` continuam passando.
+- [x] Migração não destrutiva, aplicada no desenvolvimento pelo workflow "Migrar banco de desenvolvimento"; tipos atualizados.
+- [x] A decisão pura de hoje devolve todas as etapas que faltam na ida, em ordem.
+- [x] Janela de confirmação com o título em negrito e a frase da etapa (textos da spec, só o que falta; lista por etapa quando atravessa as duas), saída de uma função pura com teste.
+- [x] [Avançar mesmo assim] move na hora (ou abre a chegada a Concluídos, quando é o destino), sem conferir os arquivos de novo; [Cancelar] e Esc deixam o processo onde estava; falha da gravação mostra a mensagem de erro de hoje.
+- [x] Mesma pergunta pela lista do Agora e ao arrastar, inclusive quando o destino pula a etapa; voltar, mesma etapa, etiqueta, processo já adiante e etapa desativada não perguntam.
+- [x] Histórico mostra "Moveu para {etapa} sem {o que faltava}", lido do evento (inclusive a lista das duas etapas).
+- [x] Saem as recusas `trava_piloto`, `trava_tecnica:<falta>` e `autor_da_versao`, com as frases delas; nenhuma tela traz "Quem enviou a versão… não pode…".
+- [x] Falsa de processos deixa de recusar e guarda o que faltava; testes `App.*` da trava, do arrastar e da chegada a Concluídos passam ao modelo novo.
 - [ ] `[visual]` A pergunta cabe em 1366×768, também com a lista das duas etapas.
+
+Concluído em 2026-10-27 (commit 479793b)

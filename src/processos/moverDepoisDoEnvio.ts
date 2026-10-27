@@ -1,6 +1,6 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
-import { FRASE_DOS_ARQUIVOS_ENVIADOS } from './frasesDeTravaDeArquivos'
+import { FRASE_DOS_ARQUIVOS_ENVIADOS } from './frasesDaConfirmacaoDeArquivos'
 import type { ModuloDeProcessos } from './tipos'
 
 /**

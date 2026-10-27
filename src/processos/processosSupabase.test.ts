@@ -47,10 +47,6 @@ describe('mover', () => {
       'Para ir a Concluídos, informe a data da publicação ou conclua sem publicação.'],
     ['explicacao_obrigatoria', 'A explicação é obrigatória para concluir sem publicação.'],
     ['explicacao_longa:2001', 'A explicação tem 2001 caracteres; o máximo é 2.000.'],
-    ['trava_piloto', 'Para sair da Modelagem piloto, envie a versão piloto (.bpm).'],
-    ['trava_tecnica:versao', 'Para sair da Relatório e modelagem técnica, envie a versão.'],
-    ['trava_tecnica:relatorio', 'Para sair da Relatório e modelagem técnica, envie o relatório.'],
-    ['trava_tecnica:versao_e_relatorio', 'Para sair da Relatório e modelagem técnica, envie a versão e o relatório.'],
   ])('a recusa %s vira a frase', async (mensagem, frase) => {
     const cliente = clienteQueRecusa('rpc.mover_processo', { message: mensagem, code: 'P0001' })
     const falha = await falhaDe(criar(cliente).moverProcesso('p1', 'e4'))

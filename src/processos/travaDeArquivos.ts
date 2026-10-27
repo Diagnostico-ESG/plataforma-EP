@@ -4,13 +4,14 @@ import type { ArquivosDoProcesso, EtapaDoCatalogo, ProcessoDaLista } from './tip
 /** O que falta para sair da etapa: a versão piloto; ou a versão em sequência e o relatório numerado. */
 export type PecaQueFalta = 'versao_piloto' | 'versao' | 'relatorio'
 
+/** Uma etapa da ida a que faltam arquivos (ADR 0028): a tela pergunta antes de mover, e o banco grava o que faltava. */
 export type TravaDeArquivos = { codigo: string; nome: string; falta: PecaQueFalta[] }
 
 type Ida = {
   de: Pick<EtapaDoCatalogo, 'ordem'>
   para: Pick<EtapaDoCatalogo, 'ordem'>
   catalogo: EtapaDoCatalogo[]
-  /** Sem ele a tela não sabe o que o processo tem e não trava; quem recusa, no fim, é o banco. */
+  /** Sem ele a tela não sabe o que o processo tem e não pergunta; o banco aceita o movimento de qualquer jeito. */
   arquivos?: ArquivosDoProcesso
 }
 
@@ -24,26 +25,24 @@ function pecasQueFaltam(codigo: string, arquivos: ArquivosDoProcesso): PecaQueFa
 }
 
 /**
- * A primeira etapa com trava que a ida atravessa e a que faltam arquivos (ADR 0025), ou null. Uma etapa ativa com trava
- * confere quando a ida sai dela, ou de antes dela, para depois dela; voltar e o processo que já estava adiante não travam.
+ * Todas as etapas com arquivos que a ida atravessa e a que faltam arquivos, em ordem (ADR 0028). Uma etapa ativa confere
+ * quando a ida sai dela, ou de antes dela, para depois dela; voltar e o processo que já estava adiante não perguntam.
  */
-export function primeiraTravaQueFalta({ de, para, catalogo, arquivos }: Ida): TravaDeArquivos | null {
-  if (!arquivos) return null
-  const comTrava = catalogo
+export function travasQueFaltam({ de, para, catalogo, arquivos }: Ida): TravaDeArquivos[] {
+  if (!arquivos) return []
+  const comArquivos = catalogo
     .filter((etapa) => etapa.ativa && (etapa.codigo === CODIGO_DA_MODELAGEM_PILOTO || etapa.codigo === CODIGO_DA_TECNICA))
     .sort((a, b) => a.ordem - b.ordem)
-  for (const etapa of comTrava) {
-    if (de.ordem > etapa.ordem || para.ordem <= etapa.ordem) continue
-    const falta = pecasQueFaltam(etapa.codigo, arquivos)
-    if (falta.length > 0) return { codigo: etapa.codigo, nome: etapa.nome, falta }
-  }
-  return null
+  return comArquivos
+    .filter((etapa) => de.ordem <= etapa.ordem && para.ordem > etapa.ordem)
+    .map((etapa) => ({ codigo: etapa.codigo, nome: etapa.nome, falta: pecasQueFaltam(etapa.codigo, arquivos) }))
+    .filter((trava) => trava.falta.length > 0)
 }
 
-/** A trava da ida do processo à etapa de destino; null sem etapa atual, sem o que o processo tem ou sem arquivo faltando. */
-export function travaDaIda(
+/** As etapas a que faltam arquivos na ida do processo ao destino; vazio sem etapa atual, sem o que o processo tem ou sem falta. */
+export function travasDaIda(
   processo: Pick<ProcessoDaLista, 'etapaAtual' | 'arquivos'>, para: Pick<EtapaDoCatalogo, 'ordem'>, catalogo: EtapaDoCatalogo[],
-): TravaDeArquivos | null {
-  if (!processo.etapaAtual) return null
-  return primeiraTravaQueFalta({ de: processo.etapaAtual, para, catalogo, arquivos: processo.arquivos })
+): TravaDeArquivos[] {
+  if (!processo.etapaAtual) return []
+  return travasQueFaltam({ de: processo.etapaAtual, para, catalogo, arquivos: processo.arquivos })
 }
