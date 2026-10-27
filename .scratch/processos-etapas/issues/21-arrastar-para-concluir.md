@@ -19,6 +19,6 @@
 - [ ] A falha de gravação mostra a mensagem e nada muda.
 - [ ] Clique e Enter no cartão continuam abrindo o verso.
 - [ ] Testes de interface com o aplicativo inteiro, disparando os eventos nativos de arrastar e soltar, cobrindo os itens acima.
-- [ ] `[visual]` Durante o arrastar, só a coluna de destino ganha a borda tracejada azul; o cartão arrastado fica levemente apagado no lugar de origem.
+- [ ] `[visual]` Durante o arrastar, só a coluna de destino ganha fundo azul claro, borda contínua azul e sombra interna, e as demais colunas esmaecem; o cartão arrastado fica levemente apagado no lugar de origem.
 
 Concluído em 2026-10-19 (commit ce858dc)

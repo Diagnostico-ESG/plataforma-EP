@@ -102,12 +102,36 @@
 }
 
 /* Arrastar para concluir: só a coluna de destino acende; o cartão arrastado fica apagado no lugar de origem. */
-/* O contorno vai para dentro: a rolagem lateral cortaria o que sai da coluna. A altura mínima dá alvo à coluna vazia. */
+/* Fundo azul claro, borda contínua de 1px e sombra suave, tudo para dentro (box-shadow inset): a rolagem lateral cortaria o que
+   sai da coluna. A borda é sombra, não border, para a coluna não mudar de tamanho. A altura mínima dá alvo à coluna vazia.
+   A transição some com prefers-reduced-motion (regra global em index.css). */
+.coluna {
+  transition:
+    background-color 150ms var(--curva-saida),
+    box-shadow 150ms var(--curva-saida),
+    opacity 150ms var(--curva-saida);
+}
+
 .coluna-destino {
-  outline: 2px dashed var(--azul);
-  outline-offset: -2px;
+  background: var(--azul-claro);
+  box-shadow:
+    inset 0 0 0 1px var(--azul),
+    inset 0 0 12px color-mix(in srgb, var(--azul) 20%, transparent);
   border-radius: var(--canto);
   min-height: 160px;
+}
+
+/* Enquanto uma coluna recebe o cartão, as outras esmaecem: o olho vai para o destino. */
+.quadro-colunas:has(.coluna-destino) .coluna:not(.coluna-destino) {
+  opacity: 0.6;
+}
+
+/* Contraste forçado apaga fundo e sombra: o destino volta a ter contorno do sistema. */
+@media (forced-colors: active) {
+  .coluna-destino {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
 }
 
 .cartao-apagado {

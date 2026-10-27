@@ -380,7 +380,7 @@ O que não está listado continua valendo: cadastro, edição, exclusão, reclas
   - **Selos:** "{n} dias nesta etapa" a partir de 8 dias (regra de processo parado); "Relatório pendente" com a etapa atual na Revisão interna ou depois dela e antes de Concluídos, pela ordem do catálogo; "Sem responsável"; "Sem publicação" em Concluídos sem a data (no lugar de "Não publicado"); depois Reunião, versão e subprocessos, como hoje.
 - **Arrastar** (arrastar nativo do navegador, sem biblioteca, como na parte 4):
   - só Administrador e Integrante, só agrupado por etapa, e só o cartão de processo em andamento ou concluído não arquivado;
-  - toda coluna recebe o cartão, e a coluna sob o cartão ganha o realce (borda tracejada em `azul`);
+  - toda coluna recebe o cartão, e a coluna sob o cartão ganha o realce (fundo `azul-claro`, borda contínua de 1px em `azul` e sombra interna suave, com transição de 150 ms), e as demais colunas esmaecem;
   - soltar na própria coluna não grava;
   - soltar em Concluídos, sem a data da publicação registrada, abre a janela de chegada a Concluídos (spec de `publicacao-e-arquivamento`); Esc ou [Cancelar] devolvem o cartão;
   - soltar em qualquer outra coluna grava na hora, e o Quadro recarrega com o cartão na coluna nova;
@@ -602,7 +602,7 @@ A especificação previa etapas em sequência obrigatória, com etapas opcionais
 
 - `[visual]` O Agora mostra, sem apertar a coluna, a etapa com a lista, a etiqueta com a lista e o responsável com "Trocar" e [Assumir]; na Consulta, a frase em texto.
 - `[visual]` A etiqueta aparece como pílula neutra com texto no cartão e na Lista, sem azul e sem depender só de cor.
-- `[visual]` Durante o arrastar, a coluna sob o cartão ganha a borda tracejada azul; o cartão arrastado fica levemente apagado no lugar de origem.
+- `[visual]` Durante o arrastar, a coluna sob o cartão ganha fundo azul claro, borda contínua azul e sombra interna, e as demais colunas esmaecem; o cartão arrastado fica levemente apagado no lugar de origem.
 - `[visual]` O Quadro com Não iniciados e Concluídos nas pontas mantém a largura fixa das colunas e a rolagem lateral de hoje.
 - `[visual]` No catálogo, Não iniciados e Concluídos aparecem com o selo "Fixa", sem botões, alinhados com as outras linhas.
 - `[visual]` O aviso do revisor no Agora é amarelo (aviso), não vermelho.
@@ -910,7 +910,7 @@ A Consulta vê tudo sem nenhum botão de alteração. O banco impõe as regras: 
     6. **Subprocessos:** texto neutro "{n} subprocesso(s)", no processo pai com pelo menos um subprocesso não cancelado.
   - **Arrastar para concluir** (parte 4), com o arrastar nativo do navegador, sem biblioteca:
     - só Administrador e Integrante; só cartão com a etapa atual em andamento, de processo em andamento, com etapa pendente depois da atual; nos demais, o cartão não é arrastável;
-    - **coluna de destino:** a da primeira etapa pendente depois da atual; durante o arrastar, só ela recebe o realce (borda tracejada em `azul`);
+    - **coluna de destino:** a da primeira etapa pendente depois da atual; durante o arrastar, só ela recebe o realce (fundo `azul-claro`, borda contínua em `azul`, sombra interna), e as demais colunas esmaecem;
     - soltar no destino abre a janela de avanço da parte 2, como o [Concluir] do Agora, com as mesmas opções, a mesma opção marcada e a mesma trava do autor; confirmar grava pela mesma função de avanço; Esc ou [Cancelar] não grava;
     - soltar em outra coluna devolve o cartão e mostra o aviso "Solte o cartão na coluna {etapa}.";
     - em tela de toque o arrastar não acontece (o arrastar nativo não funciona por toque, e isso é o desejado: rolar o Quadro não conclui nada); o caminho é o verso;
@@ -1415,7 +1415,7 @@ A tabela "quem pode o quê" ganha as linhas acima; o `10_privilegios_padrao` con
   - `[visual]` O caminho de etapas mostra as resolvidas com ✓, a atual em azul com o sublinhado aceso e as futuras apagadas; sem etapas do setor (desde 2026-10-18). Desde 2026-10-19, vale a lista compacta do verso, descrita acima.
   - `[visual]` As pílulas (Suspenso, Cancelado, Concluído, Subprocesso, A classificar, Inativo, Inativa) têm cor e texto, nunca só cor.
   - `[visual]` (Parte 4.) O cartão normal fica limpo: a barra fina em cinza e azul e, no máximo, versão e subprocessos em texto neutro; só "{n} dias nesta etapa" e "Relatório pendente" têm cor (âmbar); os selos quebram de linha sem estourar a largura da coluna.
-  - `[visual]` (Parte 4.) Durante o arrastar, só a coluna de destino ganha a borda tracejada azul; o cartão arrastado fica levemente apagado no lugar de origem.
+  - `[visual]` (Parte 4.) Durante o arrastar, só a coluna de destino ganha fundo azul claro, borda contínua azul e sombra interna, e as demais colunas esmaecem; o cartão arrastado fica levemente apagado no lugar de origem.
   - `[visual]` (Parte 4.) Agrupado por responsável, as colunas têm o nome da pessoa (com "Inativo" quando cabe) e os cartões mostram o nome da etapa no lugar da foto; "Agrupar por" e "Só os meus" ficam na barra do Quadro, junto dos filtros.
   - `[visual]` (Anotações, 2026-10-23.) O bloco Anotações é o primeiro da coluna direita, quieto como o resto do contexto: campo sem moldura pesada, "Salvando…" e "Salvo" pequenos e cinza ao lado do título, a linha "Alterado por" discreta abaixo; só a falha (vermelho) e o conflito (amarelo) têm cor; o campo cresce sem empurrar a janela para fora da tela e rola por dentro depois da altura máxima.
   - `[visual]` A Lista é uma tabela compacta, no padrão das listas de cadastros.
