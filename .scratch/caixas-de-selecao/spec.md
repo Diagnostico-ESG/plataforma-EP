@@ -32,7 +32,7 @@ Escolhas padrão (não perguntadas): a caixa fechada mostra o mesmo visual da op
 
 ## Estados de tela
 
-As caixas não buscam dados por conta própria: as opções vêm das listas que a tela já carregou, e os estados de carregando, vazio e erro de cada tela ficam como estão. Opção com foto que falha cai nas iniciais, como o Avatar já faz.
+As caixas não buscam dados por conta própria: as opções vêm das listas que a tela já carregou, e os estados de carregando, vazio e erro de cada tela ficam como estão. Opção com foto que falha cai nas iniciais, como o Avatar já faz, na lista aberta; a cópia que o navegador mostra na caixa fechada (`<selectedcontent>`) não tem o tratamento de erro do React, e ali a foto quebrada aparece sem imagem (decisão do `/polir` e do `/ship`, 2026-10-27: raro, aceito).
 
 ## Critérios de pronto
 

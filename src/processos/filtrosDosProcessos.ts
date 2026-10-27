@@ -2,6 +2,7 @@ import { contemTrecho } from './buscaNaLista'
 import type { FiltrosDosProcessos } from './enderecoDosProcessos'
 import { ROTULO_DA_SITUACAO, ROTULO_DO_TIPO } from './rotulos'
 import { corDoMacroprocesso } from './corDoMacroprocesso'
+import { pessoaDaOpcao } from './pessoaDaOpcao'
 import type { EtapaDoCatalogo, ListaDeProcessos, PessoaDaOpcao, ProcessoDaLista, ResponsavelDoProcesso } from './tipos'
 
 /** `cor` é a marca do macroprocesso; `pessoa`, o Avatar do responsável. As demais opções só têm o texto. */
@@ -66,6 +67,6 @@ function opcoesDeEtapa(etapas: EtapaDoCatalogo[]): OpcaoDoFiltro[] {
     .map((etapa) => ({ valor: etapa.codigo, rotulo: etapa.nome }))
 }
 
-function opcaoDeResponsavel({ id, nome, fotoUrl }: ResponsavelDoProcesso): OpcaoDoFiltro {
-  return { valor: id, rotulo: nome, pessoa: { nome, fotoUrl } }
+function opcaoDeResponsavel(responsavel: ResponsavelDoProcesso): OpcaoDoFiltro {
+  return { valor: responsavel.id, rotulo: responsavel.nome, pessoa: pessoaDaOpcao(responsavel) }
 }

@@ -1,6 +1,7 @@
 import { CODIGO_DA_REVISAO_INTERNA } from './codigosDasEtapas'
 import { diasDoProcessoNaEtapa, passouDoLimite, textoDosDias } from './diasNaEtapa'
 import { ROTULO_DA_ETIQUETA } from './rotulos'
+import { pessoaDaOpcao } from './pessoaDaOpcao'
 import type { PessoaDaOpcao, ProcessoLido, UsuarioResponsavel } from './tipos'
 
 /** O rótulo do cartão Agora: a posição da etapa atual entre as etapas ativas ("etapa 2 de 8"). */
@@ -10,8 +11,8 @@ export function rotuloDoAgora(posicao: number, total: number): string {
 
 export type OpcaoDeResponsavel = { valor: string; rotulo: string; desabilitada?: boolean; pessoa?: PessoaDaOpcao }
 
-function opcaoDePessoa({ id, nome, fotoUrl }: UsuarioResponsavel, rotulo: string): OpcaoDeResponsavel {
-  return { valor: id, rotulo, pessoa: { nome, fotoUrl: fotoUrl ?? null } }
+function opcaoDePessoa(usuario: UsuarioResponsavel, rotulo: string): OpcaoDeResponsavel {
+  return { valor: usuario.id, rotulo, pessoa: pessoaDaOpcao(usuario) }
 }
 
 type DadosDoResponsavel = Pick<ProcessoLido, 'responsavel' | 'cartao'>
@@ -20,7 +21,7 @@ type DadosDoResponsavel = Pick<ProcessoLido, 'responsavel' | 'cartao'>
 function responsavelForaDaLista({ responsavel, cartao }: DadosDoResponsavel, usuarios: UsuarioResponsavel[]): OpcaoDeResponsavel[] {
   if (responsavel === null || usuarios.some((usuario) => usuario.id === responsavel.id)) return []
   const inativo = cartao?.responsavelAtivo === false
-  return [{ valor: responsavel.id, rotulo: `${responsavel.nome}${inativo ? ' (Inativo)' : ''}`, desabilitada: inativo, pessoa: { nome: responsavel.nome, fotoUrl: responsavel.fotoUrl } }]
+  return [{ valor: responsavel.id, rotulo: `${responsavel.nome}${inativo ? ' (Inativo)' : ''}`, desabilitada: inativo, pessoa: pessoaDaOpcao(responsavel) }]
 }
 
 /**
