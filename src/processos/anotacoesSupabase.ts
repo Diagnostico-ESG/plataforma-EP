@@ -10,12 +10,13 @@ type RetornoDaGravacao = { texto: string | null; alterado_em: string | null; alt
 const CODIGO_DO_CONFLITO = 'anotacoes_em_conflito'
 
 // As Anotações ficam fora da view do processo (ADR 0021): o verso as lê direto da tabela, com o nome de quem alterou.
+// A coluna do autor é dita no pedido: processos também liga a usuarios por responsavel_id, e sem ela o Supabase recusa por ambíguo.
 // O supabase-js manda null como null; o tipo gerado não o admite nos parâmetros, como em avancar_etapa.
 export function criarAnotacoesSupabase(cliente: ClienteSupabase, recusas: RecusasDoModulo): OperacoesDasAnotacoes {
   return {
     lerAnotacoes: async (id) => {
       const { data, error } = await cliente.from('processos')
-        .select('anotacoes, anotacoes_alteradas_em, autor:usuarios(nome)').eq('id', id)
+        .select('anotacoes, anotacoes_alteradas_em, autor:usuarios!anotacoes_alteradas_por(nome)').eq('id', id)
       if (error) throw new Error(`Falha ao ler as anotações do processo: ${error.message}`)
       const linha = (data as unknown as LinhaDasAnotacoes[])[0]
       if (!linha) return null

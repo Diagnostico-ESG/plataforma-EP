@@ -18,6 +18,8 @@ function clienteQueRecusa(erro: { message: string; code?: string }) {
   return cliente
 }
 
+// Regressão de 2026-10-27: com processos.responsavel_id, a tabela tem duas ligações com usuarios e `usuarios(nome)` volta
+// ambíguo no Supabase real (PGRST201); a leitura precisa dizer qual coluna leva ao autor.
 test('lerAnotacoes pede o texto, a hora e o nome do autor à tabela de processos, pelo id', async () => {
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas['processos.select'] = {
@@ -26,7 +28,7 @@ test('lerAnotacoes pede o texto, a hora e o nome do autor à tabela de processos
   const lidas = await criar(cliente).lerAnotacoes('p1')
   expect(lidas).toEqual({ texto: 'Texto', alteradoPor: 'Ana Teste', alteradoEm: '2026-10-13T17:30:00Z' })
   expect(cliente.pedidos).toEqual([{
-    tabela: 'processos', operacao: 'select', colunas: 'anotacoes, anotacoes_alteradas_em, autor:usuarios(nome)',
+    tabela: 'processos', operacao: 'select', colunas: 'anotacoes, anotacoes_alteradas_em, autor:usuarios!anotacoes_alteradas_por(nome)',
     filtro: ['id', 'p1'], filtros: [['id', 'p1']],
   }])
 })
