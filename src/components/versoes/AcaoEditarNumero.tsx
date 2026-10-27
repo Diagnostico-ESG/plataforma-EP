@@ -17,7 +17,7 @@ export function AcaoEditarNumero({ modulo, versao, aoGravar }: AcaoEditarNumeroP
   const rotulo = rotuloDaVersao(versao)
   return (
     <>
-      <MenuDeAcoes rotulo={`Ações da ${rotulo}`} grupos={[[{ rotulo: 'Editar número', aoEscolher: () => setAberta(true) }]]} />
+      <MenuDeAcoes rotulo={`Ações da ${rotulo}`} paraDireita grupos={[[{ rotulo: 'Editar número', aoEscolher: () => setAberta(true) }]]} />
       {aberta && <JanelaDoNumeroDaVersao modulo={modulo} versao={versao} aoGravar={aoGravar} aoFechar={() => setAberta(false)} />}
     </>
   )
