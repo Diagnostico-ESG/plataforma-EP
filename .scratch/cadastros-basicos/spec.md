@@ -4,7 +4,133 @@ Status: ready-for-agent
 
 **Como resolve o problema.** Hoje os setores atendidos e os macroprocessos da Cadeia de Valor vivem em planilhas soltas, sem uma lista única nem o registro de quem mudou o quê. Com esta funcionalidade, a equipe do EP passa a ter, na área Setores da plataforma, um cadastro único de setores (com a sigla que vai para o nome dos arquivos), de macroprocessos e dos setores envolvidos em cada macroprocesso. Administrador e Integrante do EP mantêm os cadastros; a Consulta só vê. Toda alteração, inclusive uma exclusão, fica no histórico com o que o item tinha. As funcionalidades seguintes se apoiam nesses cadastros: o processo nasce ligado a um setor e a um macroprocesso, os arquivos recebem o nome pela sigla, e o painel monta a matriz macroprocesso × setor.
 
-Decisões de origem: `.scratch/cadastros-basicos/sabatina.md` (sabatina de 2026-10-10) e `CONTEXT.md` (seção "Setores"). Sem ADR novo: nenhuma decisão é difícil de desfazer.
+Decisões de origem: `.scratch/cadastros-basicos/sabatina.md` (sabatina de 2026-10-10) e `CONTEXT.md` (seção "Setores"). Sem ADR novo: nenhuma decisão é difícil de desfazer. Mudança de 2026-10-27 (seção "Cor do setor", logo abaixo, ADR 0030): o setor ganha uma cor; ela vale sobre o resto desta spec no que divergir.
+
+## Cor do setor (mudança de 2026-10-27)
+
+Demanda visual-do-cartao (`.scratch/visual-do-cartao/demanda.md`), decidida na sabatina `.scratch/visual-do-cartao/sabatina.md` e no ADR 0030; tons da paleta no acréscimo de 2026-10-27 em `.scratch/identidade-visual.md`. Termo no `CONTEXT.md`: **Cor do setor**. O uso da cor na área Processos (faixa do cartão, barra, etiquetas, Lista, verso) está na seção "Visual do cartão" da spec de `processos-etapas`.
+
+**Como resolve o problema.** A sigla é o que identifica o setor em toda a plataforma, mas, sendo só texto, a equipe precisa ler cada sigla para reconhecer o setor. Com a **cor do setor**, cada setor ganha uma cor clara própria, guardada no cadastro, que acompanha a sigla em todo lugar. O setor novo já nasce com uma cor ainda livre, e quem cuida dos cadastros pode trocá-la no formulário do setor.
+
+### Solução
+
+- **Paleta fixa de 30 cores claras**, na ordem de distribuição registrada na identidade visual (15 tons em duas intensidades, cores vizinhas bem diferentes entre si). Pode haver vermelho, verde e âmbar em pastel: a cor do setor é identidade, não alerta.
+- **Setor novo:** recebe a primeira cor da paleta que nenhum setor usa (ativo ou inativo); com as 30 em uso, a cor 1. A pessoa não escolhe ao criar; vê a cor ao abrir o setor salvo e pode trocá-la ali.
+- **Troca:** no setor aberto, Administrador e Integrante do EP veem uma grade com as 30 amostras e escolhem uma; as que outro setor já usa aparecem marcadas ("em uso por {SIGLA}"), sem impedir a escolha. Dois setores podem ficar com a mesma cor. A troca grava junto com o [Salvar] do formulário.
+- **Setor inativo** continua com a sua cor, e ela continua contando como "em uso" para o setor novo.
+- **Onde aparece nos cadastros:** a sigla na lista de setores, no setor aberto e nas linhas de setor envolvido do macroprocesso vira um selo com a sigla em texto escuro sobre a cor do setor, em degradê (do tom da cor para um tom um pouco mais escuro dela); o seletor [Pôr setor] mostra o quadradinho da cor antes de cada setor. O histórico e os textos das janelas continuam só texto.
+- **Histórico:** a cor é aparência e não entra no histórico. Gravar só a cor não cria evento, e os eventos do setor continuam listando nome, sigla, observações e ativo.
+- **Setores existentes:** recebem cor na migração, pela ordem alfabética da sigla (o primeiro fica com a cor 1, o segundo com a 2, e assim por diante), sem gerar eventos.
+
+### Histórias de usuário
+
+1. Como Integrante do EP, quero que cada setor tenha uma cor própria, guardada no cadastro, para reconhecer o setor de relance em toda a plataforma.
+2. Como Integrante do EP, quero que o setor novo já nasça com uma cor que nenhum outro setor usa, para não ter de escolher nada ao criar e as cores não se repetirem sem querer.
+3. Como Integrante do EP, quero que, com as 30 cores em uso, o setor novo receba a primeira da paleta, para o cadastro nunca ser recusado por falta de cor.
+4. Como Integrante do EP, quero que a cor de um setor inativo continue reservada para ele, para que, se ele voltar, não divida a cor com um setor criado nesse meio-tempo.
+5. Como Integrante do EP, quero ver no setor aberto as 30 amostras da paleta, com a cor atual marcada, para trocar a cor do setor.
+6. Como Integrante do EP, quero ver quais amostras já estão em uso por outro setor, e por qual, para evitar repetir sem querer.
+7. Como Integrante do EP, quero poder escolher uma cor já usada por outro setor, para decidir eu mesmo quando a repetição não atrapalha.
+8. Como Integrante do EP, quero que a troca da cor grave com o [Salvar] do formulário, junto com o resto do setor, para não haver um botão a mais.
+9. Como Integrante do EP, quero que, se a gravação falhar, a cor escolhida continue marcada no formulário com a mensagem de falha de hoje, para tentar de novo sem escolher de novo.
+10. Como Administrador, quero trocar a cor do setor com as mesmas permissões do Integrante do EP, como o resto do cadastro.
+11. Como Consulta, quero ver a cor do setor nas listas e no setor aberto, sem a grade de escolha, para acompanhar sem alterar.
+12. Como responsável pela plataforma, quero que o banco recuse a troca de cor feita pela Consulta, por usuário desativado ou por visitante, mesmo fora da tela.
+13. Como responsável pela plataforma, quero que o banco recuse uma cor fora de 1 a 30, para nenhum setor ficar sem tom na tela.
+14. Como Integrante do EP, quero ver a sigla sobre a cor do setor na lista de setores, para varrer a lista pela cor.
+15. Como Integrante do EP, quero ver a sigla sobre a cor do setor no setor aberto, para conferir a cor que ele tem.
+16. Como Integrante do EP, quero ver a sigla sobre a cor de cada setor envolvido no macroprocesso aberto, inclusive dos inativos (com a pílula "Inativo"), para reconhecer os setores do mapeamento.
+17. Como Integrante do EP, quero ver o quadradinho da cor antes de cada setor no seletor [Pôr setor], para achar o setor pela cor.
+18. Como pessoa que usa leitor de tela, quero que cada amostra da grade tenha um nome acessível (o nome da cor e, se for o caso, "em uso por {SIGLA}"), para escolher a cor sem vê-la.
+19. Como pessoa que usa leitor de tela, quero que o selo e o quadradinho não acrescentem nada ao nome do setor, para a leitura continuar só pela sigla e pelo nome.
+20. Como pessoa que não distingue cores, quero que a sigla esteja sempre escrita sobre a cor, para nunca depender dela.
+21. Como Integrante do EP, quero que a sigla em texto escuro tenha contraste AA nas duas pontas do degradê, em qualquer das 30 cores.
+22. Como Integrante do EP, quero que trocar só a cor não apareça no histórico, para o histórico continuar falando do que importa no cadastro.
+23. Como Integrante do EP, quero que salvar o setor mudando a cor e o nome registre no histórico só a mudança do nome, para o evento não trazer a cor.
+24. Como Integrante do EP, quero que os 22 setores já cadastrados recebam cor na ordem alfabética da sigla, sem eventos no histórico, para a plataforma já começar colorida.
+25. Como Integrante do EP, quero que a cor de um setor excluído fique livre para o próximo setor novo.
+
+### Decisões de implementação
+
+#### Interface
+
+- **Grade de amostras:** no setor aberto (não no Novo setor), um grupo de 30 botões de rádio nativos com legenda "Cor do setor", cada um desenhado como a amostra em degradê, com nome acessível "{nome da cor}" ou "{nome da cor}, em uso por {SIGLA}" (a primeira sigla, em ordem, quando mais de um setor usa). A amostra escolhida tem a linha acesa. Para a Consulta, a grade não aparece; o selo mostra a cor.
+- **Paleta num único ponto:** os nomes e os tons das 30 cores ficam no mesmo módulo puro da cor do setor que a área Processos usa (spec de `processos-etapas`, "Visual do cartão"). O banco só conhece o número.
+- **Módulo de cadastros:** `Setor` e os setores envolvidos ganham `cor` (número); listar setores, ler um setor e ler um macroprocesso com os setores envolvidos passam a trazê-la; editar setor passa a enviá-la. Criar setor não envia cor (o banco escolhe). A falsa `CadastrosFalso` imita a regra da primeira cor livre.
+- **Selo e quadradinho:** o selo do setor e `OpcaoDaCaixa` com `cor`, os mesmos da área Processos.
+- **Mensagens:** nenhuma nova. A falha ao salvar é a de hoje ("A alteração não foi salva: {motivo}. Seus dados continuam no formulário."); a recusa por perfil é a de hoje. Uma cor fora da faixa só chega fora da tela; a recusa do banco aparece como erro de gravação.
+- **Estados de carregamento, vazio e erro:** os de hoje, sem tela nova.
+
+#### Modelo de dados
+
+**`setores`** ganha:
+
+| Coluna | Tipo | Obrigatória |
+|---|---|---|
+| cor | número inteiro de 1 a 30 (posição na paleta) | sim; quando não vem na criação, o banco escolhe |
+
+- **Primeira cor livre:** gatilho antes de incluir. Se a cor não veio, grava o menor número de 1 a 30 que nenhum setor tem (ativo ou inativo); se todos estão em uso, 1. Duas criações ao mesmo tempo podem receber a mesma cor: aceito, porque a repetição é permitida.
+- **Histórico:** os gatilhos de evento de `setores` deixam de fora a coluna `cor`, tanto na comparação (gravar só a cor não cria evento) como no antes e depois guardados (inclusive no "antes" da exclusão).
+- **Migração (não destrutiva):** acrescenta a coluna, preenche os setores existentes pela ordem alfabética da sigla (posição 1, 2, 3…; acima de 30 recomeça em 1), depois a torna obrigatória com a restrição de 1 a 30, cria o gatilho e concede `cor` nos privilégios por coluna de criar e alterar a quem já tem os outros. O preenchimento não gera eventos, pela regra acima. A view `processos_com_andamento` ganha `setor_cor` na mesma leva (spec de `processos-etapas`).
+- **Dado pessoal:** nenhum.
+
+#### Quem pode o quê (cada célula vira um teste pgTAP)
+
+| Tabela e ação | Administrador | Integrante do EP | Consulta | Inativo | Visitante |
+|---|---|---|---|---|---|
+| `setores.cor` ler | sim | sim | sim | não | não |
+| `setores.cor` informar na criação | sim | sim | não | não | não |
+| `setores.cor` alterar | sim | sim | não | não | não |
+
+#### Regras que o banco impõe
+
+| Regra | Como | Caso de teste que a prova |
+|---|---|---|
+| Cor de 1 a 30 | restrição na coluna | 0 e 31 recusados; 1 e 30 aceitos |
+| Setor novo sem cor recebe a primeira livre | gatilho antes de incluir | com as cores 1 e 2 em uso, o novo recebe 3; com 1 e 3, recebe 2 |
+| Setor inativo continua ocupando a cor | o gatilho conta todos os setores | com a cor 1 num setor inativo, o novo recebe 2 |
+| Com as 30 em uso, a cor 1 | gatilho | com 30 setores cobrindo 1 a 30, o 31º recebe 1 |
+| Cor informada na criação é respeitada, mesmo repetida | o gatilho só age quando a cor não veio | criar com a cor 5 já em uso grava 5 |
+| Trocar só a cor não vira evento | gatilho de evento sem a coluna `cor` | alterar só a cor não cria evento; alterar cor e nome cria um evento sem `cor` no antes e depois |
+| Setores existentes coloridos pela ordem da sigla | migração | depois da migração, nenhum setor sem cor; os setores do teste, em ordem de sigla, têm 1, 2, 3… |
+
+### Decisões de teste
+
+- **Interface (a tela inteira):** com a `CadastrosFalso`: o setor novo aparece com a primeira cor livre; a grade no setor aberto com a cor atual marcada e as em uso com o nome acessível "em uso por {SIGLA}"; trocar e salvar, inclusive por uma cor em uso; falha ao salvar mantendo a escolha; a Consulta sem grade; o selo na lista, no setor aberto e nos setores envolvidos; o quadradinho no seletor [Pôr setor]; o histórico sem evento ao trocar só a cor. Arte anterior: `App.editarSetor`, `App.novoSetor`, `App.setoresEnvolvidos`, `App.historicoDosCadastros`.
+- **Tradução entre o banco e a tela:** os testes de `cadastrosSupabase` e `macroprocessosSupabase` com o cliente simulado passam a ler e enviar `cor`.
+- **Funções puras:** a paleta (spec de `processos-etapas`) e, se existir, a que monta o nome acessível da amostra com as siglas em uso.
+- **Banco:** pgTAP, um teste por célula e por regra das tabelas acima, mais os de `11_setores` que olham os eventos do setor (sem `cor`). Os testes vêm antes da migração e falham sem ela. Rodam no Docker local durante o desenvolvimento e pelo GitHub Actions ("Testes de banco") na conferência final.
+- Todos os setores dos testes são inventados.
+
+### Fora do escopo desta parte
+
+- Escolher a cor no Novo setor (ela é escolhida pelo banco e trocada depois).
+- Proibir cores repetidas, ou ampliar a paleta além de 30.
+- Cor do macroprocesso: continua calculada como hoje (`corDoMacroprocesso`).
+- Cor no histórico, nos textos das janelas e nos nomes de arquivo.
+- Ajustar os tons da paleta: muda só o módulo da tela, sem migração, quando for preciso.
+
+### Decisões tomadas ao escrever esta seção, a confirmar na leitura
+
+1. A grade só aparece no setor aberto; no Novo setor, o banco escolhe e a pessoa troca depois, se quiser. Assim a regra da primeira cor livre mora só no banco.
+2. A grade é feita de botões de rádio nativos (um grupo com legenda), cada um com nome acessível.
+3. Com mais de 30 setores na migração, a cor recomeça em 1 (hoje são 22).
+4. A amostra em uso por mais de um setor diz só a primeira sigla, em ordem.
+
+### Divergência com `.scratch/especificacao.md`
+
+Nenhuma: a especificação não trata de cores do setor.
+
+### Critérios conferidos olhando a tela
+
+- `[visual]` A grade das 30 amostras cabe no formulário do setor sem rolar para os lados, com a escolhida em linha acesa e as em uso marcadas de forma discreta, inclusive em 1366×768.
+- `[visual]` O selo da sigla na lista de setores, no setor aberto e nos setores envolvidos tem o mesmo tamanho e a mesma cor do selo da Lista de processos, legível nas 30 cores.
+- `[visual]` O quadradinho do seletor [Pôr setor] segue o do macroprocesso nas caixas de seleção.
+
+### Critérios de pronto
+
+- Setor novo com a primeira cor livre, troca pela grade, cor fora do histórico e os 22 setores coloridos pela migração, como descrito.
+- `npm test` verde; testes de banco verdes no Docker local e no "Testes de banco".
 
 ## Problema
 
@@ -244,3 +370,5 @@ Setor e macroprocesso: Ativo ⇄ (desativar / reativar) ⇄ Inativo; nos dois es
 - Na rede do escritório, a migração vai à mão pelo SQL Editor e precisa ser registrada em `supabase/AMBIENTES.md` para o `migration repair` antes da primeira publicação em produção.
 
 Entregue em 2026-10-13 (commit 3a552d3)
+
+Em revisão desde 2026-10-27

@@ -2,11 +2,160 @@
 
 Status: ready-for-agent
 
-**Como resolve o problema (desde 2026-10-23, Andamento livre; cartão e verso ajustados em 2026-10-25; visualização por setores em 2026-10-26; macroprocesso fora da frente do cartão em 2026-10-27).** Hoje o andamento de cada processo fica espalhado entre planilhas e o Power BI, sem saber com certeza em que etapa cada um está, quem cuida dele nem o que mudou. Com esta funcionalidade, a equipe do EP cadastra na plataforma cada processo e subprocesso, ligado ao setor dono e a um macroprocesso. O processo entra na etapa **Não iniciados** e anda pelo catálogo de etapas como um cartão no Planner: qualquer integrante o leva a qualquer etapa, para a frente ou para trás, pela lista de etapas ou arrastando o cartão, sem motivo e sem trava de sequência. A etapa atual tem uma **etiqueta** (A fazer, Em andamento ou Concluído), e o processo tem um **responsável**, que passa a ser quem o move. Quem termina a sua parte marca Concluído, e o próximo vê e pega o processo. O processo termina na etapa **Concluídos**. O histórico guarda cada mudança de etapa, etiqueta e responsável, e o processo que fica mais de 7 dias na mesma etapa ganha um aviso. As seções "Visualização por setores" (2026-10-26), "Cartão e verso" (2026-10-25) e "Andamento livre", logo abaixo, descrevem o modelo atual e valem sobre o resto desta spec no que divergirem; a mais nova vale sobre a mais antiga. O texto que segue a ela é o registro das entregas anteriores.
+**Como resolve o problema (desde 2026-10-23, Andamento livre; cartão e verso ajustados em 2026-10-25; visualização por setores em 2026-10-26; macroprocesso fora da frente do cartão em 2026-10-27; visual do cartão, com a cor do setor, em 2026-10-27).** Hoje o andamento de cada processo fica espalhado entre planilhas e o Power BI, sem saber com certeza em que etapa cada um está, quem cuida dele nem o que mudou. Com esta funcionalidade, a equipe do EP cadastra na plataforma cada processo e subprocesso, ligado ao setor dono e a um macroprocesso. O processo entra na etapa **Não iniciados** e anda pelo catálogo de etapas como um cartão no Planner: qualquer integrante o leva a qualquer etapa, para a frente ou para trás, pela lista de etapas ou arrastando o cartão, sem motivo e sem trava de sequência. A etapa atual tem uma **etiqueta** (A fazer, Em andamento ou Concluído), e o processo tem um **responsável**, que passa a ser quem o move. Quem termina a sua parte marca Concluído, e o próximo vê e pega o processo. O processo termina na etapa **Concluídos**. O histórico guarda cada mudança de etapa, etiqueta e responsável, e o processo que fica mais de 7 dias na mesma etapa ganha um aviso. As seções "Visual do cartão" (2026-10-27), "Visualização por setores" (2026-10-26), "Cartão e verso" (2026-10-25) e "Andamento livre", logo abaixo, descrevem o modelo atual e valem sobre o resto desta spec no que divergirem; a mais nova vale sobre a mais antiga. O texto que segue a ela é o registro das entregas anteriores.
 
 **Como resolvia antes de 2026-10-23.** A equipe registrava o andamento etapa por etapa, da Modelagem piloto em diante, num caminho que o administrador configura no catálogo de etapas. A área Processos mostra o trabalho vivo num Quadro, com uma coluna por etapa, e o arquivo completo numa Lista com busca pelo nome e filtros; ao abrir um processo, o **verso do cartão**, uma janela central em duas colunas, mostra primeiro o que há para fazer agora (a etapa atual, quem cuida dela e um único botão principal), depois o caminho de etapas e os arquivos, e ao lado o contexto do processo; o que é raro (histórico, editar, reclassificar, suspender, cancelar, excluir) fica num menu. No Quadro, cada cartão mostra de relance onde o processo está (uma barra com um pedaço por etapa) e só ganha selo quando há algo a dizer (processo parado, relatório pendente, etapa sem responsável, reunião próxima, versão, subprocessos); arrastar o cartão para a coluna seguinte conclui a etapa, e a equipe pode agrupar o Quadro por responsável ou ver só os processos que estão com ela. O banco impõe a sequência das etapas, a situação do processo, as regras de reclassificação e o registro de cada mudança no histórico. As funcionalidades seguintes (reuniões, documentos, revisões, prazos e painel) se apoiam nesse andamento.
 
 Decisões de origem: `.scratch/processos-etapas/sabatina.md` (sabatina de 2026-10-13, três rodadas), `CONTEXT.md` (seções "Setores" e "Processos") e ADR 0004 (mudar o catálogo muda o caminho dos processos em andamento). Mudança de 2026-10-18 (parte 1 da iniciativa experiencia-do-quadro, `.scratch/experiencia-do-quadro/sabatina-parte-1.md`, ADR 0013): saem as etapas do setor, a coluna "Aguardando o setor", os responsáveis do setor e o nível do catálogo; a primeira etapa passa a se chamar Modelagem piloto; o processo ganha a data da reunião (spec de `reunioes`). Mudança de 2026-10-18 (parte 2, `.scratch/experiencia-do-quadro/sabatina-parte-2.md`, ADR 0014): resolver a etapa atual (concluir, dispensar ou registrar como realizada anteriormente) já **avança**, ou seja, inicia a próxima etapa pendente com o responsável escolhido na mesma janela; voltar também escolhe o responsável; [Assumir] em etapa sem responsável; quem enviou a versão mais recente não pode ser escolhido como responsável da Revisão interna. Mudança de 2026-10-19 (parte 3, "Verso do cartão", `.scratch/experiencia-do-quadro/sabatina-parte-3.md`, sem ADR nem mudança no banco): o painel lateral vira o verso do cartão, uma janela central em duas colunas com o cartão "Agora"; o Novo processo, o Editar e o Histórico abrem dentro dela; a Lista ganha busca pelo nome. Mudança de 2026-10-19 (parte 4, "Cartão do Quadro", `.scratch/experiencia-do-quadro/sabatina-parte-4.md`, sem ADR): o cartão do Quadro ganha a barra de progresso e os selos; arrastar o cartão para a coluna de destino abre a janela de avanço da parte 2; o Quadro ganha "Agrupar por: Etapa | Responsável" e "Só os meus"; a view `processos_com_andamento` ganha campos, por migração não destrutiva; `CONTEXT.md` ganha "Processo parado". Mudança de 2026-10-23 ("Anotações do processo", `.scratch/processos-etapas/sabatina-anotacoes.md`, ADR 0021): o verso ganha, no alto da coluna direita, as **Anotações**, um texto livre e único por processo, guardado sozinho enquanto se escreve, sem histórico, com recusa quando outra pessoa alterou antes; `CONTEXT.md` ganha "Anotações".
+
+## Visual do cartão (mudança de 2026-10-27)
+
+Demanda visual-do-cartao (`.scratch/visual-do-cartao/demanda.md`), decidida na sabatina `.scratch/visual-do-cartao/sabatina.md` e no ADR 0030; acréscimo datado em `.scratch/identidade-visual.md` (tons, medidas e contrastes). Termo no `CONTEXT.md`: **Cor do setor**. A cor em si (coluna, paleta, escolha no formulário do setor) está na seção "Cor do setor" da spec de `cadastros-basicos`, que é a que vale para ela; esta seção trata do que muda na área Processos. Vale sobre a "Macroprocesso fora da frente do cartão", a "Visualização por setores", a "Cartão e verso" e o resto desta spec no que divergir.
+
+**Como resolve o problema.** O cartão do Quadro é todo cinza: a barra de etapas é cinza de propósito, as etiquetas têm cor suave e a sigla do setor é um texto miúdo no topo. Numa coluna cheia, a equipe não reconhece o setor de relance e o cartão "parece sem vida". Agora cada cartão ganha no topo uma faixa na cor do setor, a barra de etapas vira uma faixa azul em degradê que se enche até a etapa atual, e a etiqueta que pede ação (A fazer) salta aos olhos. A cor do setor acompanha a sigla também na Lista, no verso e nas caixas de seleção de setor.
+
+### O que muda no resto desta spec
+
+- **Frente do cartão (ADR 0029, revisto):** a linha do topo com a sigla miúda vira uma faixa colorida de lado a lado. No agrupamento por setor ela não some mais: leva o nome do processo. Substitui o primeiro item da seção "Macroprocesso fora da frente do cartão" e a frase "a sigla do setor sai do cartão" da "Visualização por setores" (a sigla continua fora: no lugar dela entra o nome).
+- **Barra da etapa:** deixa de ser blocos cinza (seção "Cartão e verso", histórias 18 a 20 e 24, e o critério `[visual]` da barra). Onde aparece não muda.
+- **Etiquetas:** deixam de ser "cor suave" (seção "Cartão e verso", história 25 e o critério `[visual]` das etiquetas).
+- **Fica como está:** as pílulas de Situação (Suspenso, atraso, aprovado, tipo), o selo e a faixa vermelha à esquerda do processo parado, o selo da modelagem, o avatar no rodapé, o quadradinho do macroprocesso no verso, a coluna Macroprocesso da Lista, os nomes de arquivo e os textos corridos (histórico, avisos, opções "SIGLA — Nome do processo" dos processos pai), que continuam só texto.
+
+### Solução
+
+- **Faixa do setor no cartão:** no topo do cartão do Quadro, de lado a lado, uma faixa na cor do setor em degradê (do tom da cor, à esquerda, para um tom um pouco mais escuro dela, à direita). Nos agrupamentos por etapa e por responsável, a faixa leva a sigla maior e centralizada, e o nome do processo segue no corpo do cartão como hoje. No agrupamento por setor, a faixa leva o nome do processo em destaque (16px, negrito), e o nome sai do corpo do cartão; a sigla já está no título da coluna.
+- **Título da coluna no agrupamento por setor:** a sigla em destaque ganha o mesmo selo colorido em degradê; o nome do setor continua abaixo, sem cor. A coluna de setor inativo mantém a marca "inativo" e a sua cor.
+- **Selo do setor:** a sigla em texto escuro sobre a cor do setor em degradê, pequeno, no cabeçalho do verso (no lugar da sigla de hoje) e na coluna Setor da Lista.
+- **Caixas de seleção de setor:** o filtro Setor (Quadro e Lista) e o campo Setor do formulário do processo (Novo processo, Editar e Reclassificar) mostram, antes do texto de cada opção, um quadradinho na cor do setor em degradê, como o quadradinho do macroprocesso.
+- **Barra da etapa:** uma faixa contínua lisa, sem divisões, com cantos redondos, sobre um trilho cinza claro. Ela se preenche da esquerda até a etapa atual, em degradê do azul claro ao azul escuro; a ponta mais escura marca onde o processo está. Em Não iniciados, só o primeiro trecho (1 de N); em Concluídos, cheia. O texto "Nome da etapa · n de N" continua acima e o nome acessível continua "Etapa n de N: Nome". Aparece onde aparece hoje: cartão do Quadro agrupado por responsável e por setor, coluna "Etapa atual" da Lista e Processos do setor; continua fora do Quadro agrupado por etapa.
+- **Etiquetas vivas:** A fazer em violeta cheio, com texto e bolinha brancos (é a de maior destaque, por ser a que pede ação); Em andamento em laranja vivo, com texto marrom-escuro; Concluído em verde vivo, com texto verde-escuro. Todas com contraste AA. Vale no cartão, na coluna Etiqueta da Lista e nas opções da etiqueta no Agora.
+
+### Histórias de usuário
+
+#### Faixa do setor no cartão
+
+1. Como Integrante do EP, quero que cada cartão do Quadro tenha no topo uma faixa na cor do setor, de lado a lado, para reconhecer o setor de relance numa coluna cheia.
+2. Como Integrante do EP, quero que, no Quadro agrupado por etapa, a faixa traga a sigla do setor maior e centralizada, para ler a sigla sem esforço.
+3. Como Integrante do EP, quero que, no Quadro agrupado por responsável, a faixa também traga a sigla maior e centralizada, porque a coluna não diz o setor.
+4. Como Integrante do EP, quero que, no Quadro agrupado por setor, a faixa traga o nome do processo em destaque, no lugar da sigla, para não repetir a sigla que já está no título da coluna.
+5. Como Integrante do EP, quero que, no agrupamento por setor, o nome do processo não apareça duas vezes no cartão (faixa e corpo), para o cartão não ficar redundante.
+6. Como Integrante do EP, quero que, nos agrupamentos por etapa e por responsável, o nome do processo continue no corpo do cartão como hoje, para não mudar a leitura que já conheço.
+7. Como Integrante do EP, quero que a faixa use a cor gravada no cadastro do setor, a mesma em todo lugar, para associar cor e setor com o tempo.
+8. Como Integrante do EP, quero que a faixa seja em degradê do tom da cor para um tom um pouco mais escuro dela, para combinar com a barra de etapas.
+9. Como Integrante do EP, quero que a sigla e o nome na faixa fiquem em texto escuro com contraste AA nas duas pontas do degradê, para ler em qualquer cor da paleta.
+10. Como Integrante do EP, quero que um processo de setor inativo continue com a cor do setor na faixa, para o cartão não mudar só porque o setor foi desativado.
+11. Como Integrante do EP, quero que o processo parado continue com a faixa vermelha na borda esquerda e o selo de dias, junto com a faixa do setor no topo, para o alerta não se perder no meio da cor.
+12. Como Integrante do EP, quero que a faixa do setor não se confunda com as pílulas de Situação (atraso em vermelho, aprovado em verde), por ficar sempre no topo e de lado a lado, para não ler cor de setor como alerta.
+13. Como pessoa que usa leitor de tela, quero que o cartão continue anunciado pelo nome do processo e pela sigla do setor, sem anunciar a cor, para a faixa não acrescentar ruído.
+14. Como pessoa que não distingue cores, quero que a sigla esteja sempre escrita na faixa (ou o título da coluna, no agrupamento por setor), para nunca depender da cor para saber o setor.
+15. Como Integrante do EP, quero que o nome longo de um processo na faixa quebre linha dentro dela, sem estourar a largura do cartão, para ler o nome inteiro.
+
+#### Coluna, verso, Lista e caixas de seleção
+
+16. Como Integrante do EP, quero que o título da coluna no Quadro agrupado por setor mostre a sigla sobre a cor do setor, com o nome abaixo, para ligar a coluna à cor dos cartões.
+17. Como Integrante do EP, quero que a coluna de um setor inativo com processo continue marcada "inativo" e com a cor dele, para reconhecê-la como hoje.
+18. Como Integrante do EP, quero ver no cabeçalho do verso a sigla do setor sobre a cor dele, para saber o setor ao abrir o processo.
+19. Como Integrante do EP, quero ver na coluna Setor da Lista a sigla sobre a cor do setor, para varrer a Lista por setor como varro o Quadro.
+20. Como Integrante do EP, quero ver um quadradinho da cor do setor antes de cada opção do filtro Setor, para achar o setor pela cor.
+21. Como Integrante do EP, quero ver o mesmo quadradinho no campo Setor do Novo processo, do Editar e da Reclassificação, para escolher o setor certo de relance.
+22. Como pessoa que usa leitor de tela, quero que o quadradinho e a cor do selo não entrem no nome da opção nem do selo, para a leitura continuar só pelo texto.
+23. Como Integrante do EP, quero que, quando o cadastro troca a cor de um setor, a nova cor apareça no Quadro, na Lista e no verso na próxima vez que carregam, sem nada a fazer nos processos.
+24. Como Consulta, quero ver as mesmas cores do setor no Quadro, na Lista e no verso, sem poder trocá-las, para acompanhar como a equipe.
+
+#### Barra da etapa
+
+25. Como Integrante do EP, quero que a barra da etapa seja uma faixa contínua que se preenche até a etapa atual, para ver de relance o quanto o processo andou.
+26. Como Integrante do EP, quero que o preenchimento vá do azul claro ao azul escuro, com a ponta mais escura na etapa atual, para a barra ter vida sem precisar de divisões.
+27. Como Integrante do EP, quero que a barra não tenha divisões entre etapas, para continuar legível com 8 ou mais etapas num cartão estreito.
+28. Como Integrante do EP, quero continuar lendo "Nome da etapa · n de N" acima da barra, para saber a posição exata.
+29. Como Integrante do EP, quero que o processo em Não iniciados tenha só o primeiro trecho preenchido, para reconhecer o processo que ainda não começou.
+30. Como Integrante do EP, quero que o processo em Concluídos tenha a barra cheia, para reconhecer o processo terminado.
+31. Como Integrante do EP, quero que o trilho vazio seja cinza claro, para distinguir o que falta do que já foi.
+32. Como Integrante do EP, quero que a barra continue fora do Quadro agrupado por etapa, para não repetir o que a coluna diz.
+33. Como Integrante do EP, quero a mesma barra no cartão por responsável e por setor, na Lista e em Processos do setor, para ler a posição igual em todo lugar.
+34. Como Integrante do EP, quero que a barra do suspenso e do cancelado continue mostrando a etapa onde ele parou, ao lado da pílula da situação, como hoje.
+35. Como pessoa que usa leitor de tela, quero que a barra continue lida como "Etapa n de N: Nome", para ter a mesma informação sem ver o preenchimento.
+36. Como Integrante do EP, quero que a barra conte só as etapas ativas, como hoje, para a posição bater com as colunas do Quadro.
+
+#### Etiquetas
+
+37. Como Integrante do EP, quero que a etiqueta A fazer seja violeta cheio com texto branco, para o que pede ação saltar aos olhos.
+38. Como Integrante do EP, quero que Em andamento seja laranja vivo e Concluído verde vivo, com texto escuro do mesmo tom, para separar de relance o que anda do que terminou.
+39. Como Integrante do EP, quero que nenhuma outra pílula use o violeta, para ele significar só "A fazer".
+40. Como Integrante do EP, quero as mesmas cores no cartão, na coluna Etiqueta da Lista e nas opções da etiqueta no Agora, para ler a etiqueta igual em todo lugar.
+41. Como pessoa que não distingue cores, quero que a etiqueta continue com o texto ao lado da bolinha, para não depender da cor.
+42. Como pessoa com baixa visão, quero que o texto de cada etiqueta tenha contraste AA com o fundo, para ler sem esforço.
+43. Como Integrante do EP, quero que as pílulas de Situação (Suspenso, atraso, aprovado, tipo) fiquem como estão, para os alertas não perderem o destaque no meio de tudo colorido.
+
+### Decisões de implementação
+
+#### Interface
+
+- **Paleta num único ponto:** um módulo puro da cor do setor recebe o número da cor (1 a 30) e devolve o par de tons do degradê (o tom da paleta e o tom um pouco mais escuro, calculado por uma regra fixa, a mesma para as 30). É o único lugar do código com os tons; o número fora de 1 a 30 cai na cor 1 (rede de segurança: o banco já recusa). Fica em `cadastros` ou num lugar comum às duas áreas, porque processos e cadastros o usam. Os tons são os do acréscimo de 2026-10-27 em `.scratch/identidade-visual.md`.
+- **Selo do setor:** um componente compartilhado (sigla sobre a cor em degradê, texto escuro) em dois tamanhos: o pequeno (verso, Lista, título da coluna e cadastros) e o da faixa do cartão. A cor é enfeite: o componente não acrescenta nada ao nome acessível.
+- **Cartão:** a linha do topo com a sigla vira a faixa. O cartão já sabe se o Quadro está agrupado por etapa; passa a saber também se está agrupado por setor, para escolher entre sigla na faixa (etapa e responsável) e nome na faixa (setor, com o nome fora do corpo).
+- **Título da coluna por setor:** a sigla do título passa a usar o selo pequeno; o nome do setor e a marca "inativo" ficam como estão.
+- **Caixas de seleção de setor:** as opções passam a usar `OpcaoDaCaixa` com `cor` (o degradê da cor do setor) e `BotaoDaCaixa`, no padrão das caixas personalizáveis (`.scratch/identidade-visual.md`, 2026-10-27). A cor vem dos setores que a tela já carregou, sem busca própria.
+- **Barra:** a função da barra passa a devolver a fração preenchida (posição sobre total; Concluídos cheia) junto com o texto e o nome acessível que já devolve; os estados de bloco (anteriores, atual, seguintes) deixam de existir. O componente da barra passa a desenhar o trilho e o preenchimento em degradê; os lugares que o usam não mudam.
+- **Etiqueta:** só os três pares de tokens de cor (fundo, texto, bolinha) mudam, para os valores do acréscimo de 2026-10-27; o componente e os lugares onde aparece não mudam.
+- **Estados de carregamento, vazio e erro:** nenhuma tela nova; Quadro, Lista, verso e formulários mantêm os seus estados de hoje (carregando, vazio, erro com "Tentar de novo", inclusive falha de conexão). A cor chega junto com os dados que já são lidos; se não chegar (dado antigo em cache da tela), vale a cor 1.
+
+#### Modelo de dados
+
+- **A cor viaja com a sigla:** a view `processos_com_andamento` ganha a coluna `setor_cor` (o número da cor do setor dono), ao lado de `setor_sigla`, recriada com `security_invoker = true`. É dela que o Quadro, a Lista e o verso tiram a cor. A leitura dos setores da Lista de processos (`listarProcessos`) passa a trazer também `cor`, para o título das colunas por setor e o filtro Setor. Os tipos da tela (`db:types`) acompanham.
+- **Migração:** não destrutiva, só recria a view com a coluna nova; vem depois da migração da coluna `setores.cor` (spec de `cadastros-basicos`), e as duas podem ser uma só.
+- **Quem pode o quê:** sem mudança. A view lê com o perfil de quem chama; `setores` já é lida por todo usuário ativo; visitante e desativado continuam sem ler nada.
+- **Dado pessoal:** nenhum novo.
+
+### Decisões de teste
+
+- **Bom teste** confere o que a pessoa vê e consegue fazer, ou o que o banco aceita e recusa, nunca detalhes internos (classe CSS de cor só onde a cor é o próprio comportamento, como no teste das etiquetas de hoje).
+- **Interface (ponto de teste principal: a tela inteira).** Vitest com Testing Library, renderizando o aplicativo inteiro com as falsas nomeadas (`ProcessosFalso` e `CadastrosFalso` passam a ter a cor de cada setor). Cobre:
+  - a faixa com a sigla no cartão por etapa e por responsável, e com o nome do processo (sem o nome no corpo) por setor (arte anterior: `App.cartaoDoQuadro`, `App.agruparPorSetor`);
+  - o título da coluna por setor com o selo e o nome, inclusive a coluna de setor inativo;
+  - o selo do setor no verso e na coluna Setor da Lista (`App.versoDoCartao`, `App.lista`);
+  - o quadradinho nas opções do filtro Setor e do campo Setor do processo, sem a cor no nome da opção;
+  - a cor trocada no cadastro aparecendo no Quadro depois de recarregar;
+  - a barra com o texto "Nome · n de N" e o nome acessível de hoje, em Não iniciados, numa etapa do meio e em Concluídos;
+  - as etiquetas com o texto e a cor de cada valor no cartão, na Lista e no Agora.
+- **Funções puras:** a da barra (fração em Não iniciados, no meio, em Concluídos, com etapa desativada no catálogo; arte anterior: `barraDoCartao`) e a da paleta (30 cores distintas, número fora da faixa cai na 1, e o contraste do texto escuro de pelo menos 4,5:1 nas duas pontas do degradê, para as 30 cores).
+- **Tradução entre o banco e a tela:** o teste de `listaDeProcessosSupabase` e o da linha do processo (`processoDaLinha`) com o cliente simulado passam a ler `setor_cor` e a `cor` dos setores.
+- **Banco:** pgTAP: a view entrega `setor_cor` igual à cor do setor dono, para cada perfil que lê (Administrador, Integrante, Consulta) e nada para desativado e visitante; os gerais `00_rls_ligada` e `10_privilegios_padrao` continuam passando. O teste vem antes da migração e falha sem ela. Rodam no Docker local e pelo GitHub Actions ("Testes de banco") na conferência final.
+- Todos os processos e setores dos testes são inventados.
+
+### Fora do escopo desta parte
+
+- Cor nas pílulas de Situação e no tipo do processo.
+- Cor do setor nos nomes de arquivo, no histórico, nos avisos e nas opções de processo pai ("SIGLA — Nome").
+- Barra no Quadro agrupado por etapa.
+- Seção "Sobre" do verso: o dado "Setor" continua texto (o selo fica no cabeçalho).
+- Processos do setor (página do setor): a sigla já é a da página; nada muda além da barra.
+- Planilhas dos dashboards: a cor não vai ao pacote.
+
+### Decisões tomadas ao escrever esta seção, a confirmar na leitura
+
+1. A cor chega ao Quadro, à Lista e ao verso pela view `processos_com_andamento` (coluna nova `setor_cor`), e não por uma busca à parte: a sigla já vem por ali.
+2. O tom mais escuro do degradê é calculado em código por uma regra fixa, e não listado à mão; um teste confere o contraste nas duas pontas para as 30 cores.
+3. No agrupamento por setor o nome sai do corpo do cartão, para não aparecer duas vezes.
+4. O quadradinho entra também no Reclassificar, que usa o mesmo campo Setor do formulário.
+5. A seção "Sobre" do verso continua com o setor em texto.
+
+### Divergência com `.scratch/especificacao.md`
+
+Nenhuma: a especificação não trata de cores, da barra de etapas nem das etiquetas.
+
+### Critérios conferidos olhando a tela
+
+- `[visual]` A faixa do setor ocupa o topo do cartão de lado a lado, em degradê, com a sigla maior e centralizada (por etapa e por responsável) ou o nome do processo em 16px negrito (por setor), legível nas 30 cores, inclusive com nome longo.
+- `[visual]` A faixa vermelha do processo parado continua visível à esquerda, junto com a faixa do setor no topo.
+- `[visual]` O título da coluna por setor, o selo no verso e na Lista e o quadradinho das caixas de seleção mostram a mesma cor do cartão, sem estourar a largura.
+- `[visual]` A barra é uma faixa lisa de 8px, cantos redondos, trilho cinza claro e preenchimento do azul claro ao azul escuro, cheia em Concluídos, no cartão, na Lista e em Processos do setor.
+- `[visual]` A etiqueta A fazer em violeta cheio com texto branco é a mais destacada do cartão; Em andamento laranja e Concluído verde vivos, sem confundir com as pílulas de Situação.
+
+### Critérios de pronto
+
+- A faixa, os selos, o quadradinho, a barra e as etiquetas seguem a Solução, nos lugares listados, e a cor trocada no cadastro aparece em todos eles.
+- `npm test` verde, com os testes desta seção; testes de banco verdes no Docker local e no "Testes de banco".
 
 ## Macroprocesso fora da frente do cartão (mudança de 2026-10-27)
 
@@ -1502,3 +1651,5 @@ Entregue em 2026-10-27 (commit c2b089f), com ressalva: critérios [visual] da mu
 Implementado em 2026-10-27 (commit 29e2804): macroprocesso fora da frente do cartão do Quadro; [visual] item 5 presumido (não visto na tela).
 
 Entregue em 2026-10-27 (commit 69f8b43), com ressalva: critério [visual] 5 da mudança "macroprocesso fora do cartão" presumido (espaçamento regular e alinhamento dos cartões não vistos na tela, que exige login); revisão de segurança dispensada (mudança só de exibição, sem login, dado de fora nem banco); as ressalvas das entregas anteriores seguem valendo
+
+Em revisão desde 2026-10-27
