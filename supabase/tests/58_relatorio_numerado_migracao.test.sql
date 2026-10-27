@@ -20,7 +20,7 @@ delete from public.eventos where entidade = 'versao';
 insert into public.autorizacoes (email, perfil) values ('admin.teste@ccivil.pr.gov.br', 'administrador');
 insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-0000000000a1', 'admin.teste@ccivil.pr.gov.br', 'authenticated', 'authenticated');
-insert into public.setores (id, sigla, nome) values ('5f000000-0000-0000-0000-000000000058', 'MG1', 'Setor Migração');
+insert into public.setores (id, sigla, nome, cor) values ('5f000000-0000-0000-0000-000000000058', 'MG1', 'Setor Migração', 1);
 insert into public.macroprocessos (id, codigo, nome) values ('af000000-0000-0000-0000-000000000058', null, 'Macro Migração');
 insert into public.processos (id, setor_id, macroprocesso_id, nome) values
   ('9f000000-0000-0000-0000-0000000000e1', '5f000000-0000-0000-0000-000000000058', 'af000000-0000-0000-0000-000000000058', 'Processo Migracao 1'),

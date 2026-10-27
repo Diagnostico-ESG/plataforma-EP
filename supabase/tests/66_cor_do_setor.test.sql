@@ -28,7 +28,8 @@ create function pg_temp.cor_como(papel text, id_usuario text, quem text, sigla_n
 language plpgsql as $$
 begin
   perform set_config('request.jwt.claims',
-    coalesce(format('{"sub":"%s","role":"authenticated"}', id_usuario), '{"role":"anon"}'), true);
+    case when id_usuario is null then '{"role":"anon"}'
+      else format('{"sub":"%s","role":"authenticated"}', id_usuario) end, true);
   execute format('set local role %s', papel);
   if pode_ler then
     insert into _tap (linha) select is((select cor from public.setores where sigla = 'SFT'), 5, quem || ' lê a cor');
