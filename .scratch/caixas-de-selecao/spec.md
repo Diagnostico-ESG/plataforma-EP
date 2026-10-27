@@ -52,3 +52,5 @@ As caixas não buscam dados por conta própria: as opções vêm das listas que 
 - O conteúdo rico dentro de `<option>` (selo, Avatar) e o elemento `<selectedcontent>` (que repete na caixa fechada o visual da opção escolhida) dependem de o React 19.3 aceitá-los sem aviso. Se não aceitar, pare e me mostre as opções antes de qualquer contorno.
 
 Implementado em 2026-10-27 (commit 87bc03a)
+
+Entregue em 2026-10-27 (commit 5b967a1), com ressalva: critérios [visual] presumidos (lista aberta vista só pelos estilos aplicados no Chrome, sem imagem; verso do cartão com Etiqueta e "Trocar"/Esc, modo de contraste forçado do Windows e Firefox/Safari não vistos); revisão de segurança foi a de reserva (menos completa)
