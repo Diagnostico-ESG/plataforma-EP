@@ -4,6 +4,7 @@ import { emOrdemDeExibicao, papeisQueSePodeAcrescentar, rotuloDaVersao } from '.
 import type { ArquivoDaVersao, ConferenciaDosArquivos, ModuloDeVersoes, Versao } from '../../versoes/tipos'
 import { Pilula } from '../Pilula'
 import { AcaoSubstituir } from './AcaoSubstituir'
+import { AcaoEditarNumero } from './AcaoEditarNumero'
 import { AcrescentarArquivo } from './AcrescentarArquivo'
 import { LinkDoArquivo } from './LinkDoArquivo'
 import { MarcaNoDrive } from './MarcaNoDrive'
@@ -69,13 +70,14 @@ function BlocoDaVersao(props: BlocoDaVersaoProps) {
   const doFluxo = (arquivo: ArquivoDaVersao) => <ArquivoDoBloco key={arquivo.id} {...props} arquivo={arquivo} daPropriaVersao />
   return (
     <article className="bloco-da-versao" aria-label={rotulo}>
-      <p className="bloco-da-versao-cabecalho">
+      <div className="bloco-da-versao-cabecalho">
         <strong>{rotulo}</strong>
+        {podeAlterar && <AcaoEditarNumero modulo={modulo} versao={versao} aoGravar={aoAlterada} />}
         <time dateTime={versao.enviadaEm}>{formatarMomento(versao.enviadaEm)}</time>
         <span>{versao.autor ?? '—'}</span>
         {versao.etapa && <span>{versao.etapa}</span>}
         <PilulasDaVersao versao={versao} />
-      </p>
+      </div>
       <ul className="bloco-da-versao-arquivos">
         {fluxogramas.filter(({ papel }) => papel !== 'bpmn').map(doFluxo)}
         {relatoriosDaVersao(versao, versoes).map((relatorio) => (

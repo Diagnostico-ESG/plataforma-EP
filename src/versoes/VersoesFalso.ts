@@ -1,6 +1,7 @@
 import { extensaoDoNome } from '../../supabase/functions/_shared/decisao.ts'
 import { tipoMimeDaExtensao } from '../../supabase/functions/_shared/drive.ts'
 import { nomePadrao } from '../../supabase/functions/_shared/nomePadrao.ts'
+import { nomeComORotuloNovo } from '../../supabase/functions/_shared/renumerar.ts'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { AnexosFalso } from '../anexos/AnexosFalso'
 import type { EventoDoCadastro } from '../cadastros/tipos'
@@ -8,7 +9,7 @@ import { type DonoDoPdf, eventoDoPdfDaAprovacao } from '../revisoes/eventosDaVal
 import { falhaDaFuncao } from './recusasDeVersoes'
 import { proximoNumeroDoRelatorio } from './relatorioQueVale'
 import {
-  type ProcessoDoFalso, conferirPedido, conferirRelatorioSozinho, eventoDaSubstituicao, eventoDaVersao,
+  type ProcessoDoFalso, conferirPedido, conferirRelatorioSozinho, eventoDaSubstituicao, eventoDaVersao, eventoDoNumero, versaoRenumerada,
 } from './regrasDoFalso'
 import { ordenarVersoes, proximoNumero } from './rotulos'
 import type {
@@ -54,6 +55,8 @@ export class VersoesFalso implements ModuloDeVersoes {
    * que a aprovação existe, e devolve o número da versão aprovada. Sem ela, o .pdf da aprovação não está disponível.
    */
   conferirAprovacaoDoPdf: ((processoId: string) => number) | null = null
+  /** Falha a renomeação no Drive ao editar o número: Error é a recusa pronta (TravaDoBanco); nada muda. Null: o Drive aceita. */
+  falharNaRenomeacao: Error | null = null
   /** Os envios que chegaram ao registro, na ordem. */
   envios: PedidoDeVersao[] = []
   /** Chamado com o evento de cada versão registrada (o histórico do processo fica no falso de processos). */
@@ -193,6 +196,29 @@ export class VersoesFalso implements ModuloDeVersoes {
   private donoDoPdf(processoId: string, versao: number): DonoDoPdf {
     const processo = this.processos[processoId] ?? { sigla: 'TSA', nome: processoId, etapa: null }
     return { versao, nomeDoProcesso: processo.nome, sigla: processo.sigla, autor: 'Pessoa de Teste' }
+  }
+
+  // Como a ação renumerar da função: confere o número, renomeia no Drive (a falha deixa tudo como estava) e então grava; o nome do
+  // .pdf atual da aprovação acompanha, e o evento traz o rótulo de antes e o de depois.
+  async editarNumero(versaoId: string, numeroEsperado: number, numeroNovo: number): Promise<void> {
+    const processoId = Object.keys(this.versoes).find((id) => this.versoes[id].some((versao) => versao.id === versaoId))
+    const versao = processoId === undefined ? undefined : this.versoes[processoId].find((outra) => outra.id === versaoId)
+    if (processoId === undefined || !versao) throw new Error(`versão ${versaoId} não encontrada`)
+    const nova = versaoRenumerada(this.versoes[processoId], versao, numeroEsperado, numeroNovo)
+    if (this.falharNaRenomeacao) throw this.falharNaRenomeacao
+    this.falharNoRegistroSeConfigurado()
+    this.versoes[processoId] = this.versoes[processoId].map((outra) => (outra.id === versaoId ? nova : outra))
+    const processo = this.processos[processoId] ?? { sigla: 'TSA', nome: processoId, etapa: null }
+    this.aoRegistrar?.(processoId, eventoDoNumero(processoId, versao, nova, processo))
+    this.acompanharAprovacao(processoId, versao.numero, nova.numero)
+  }
+
+  // A versão aprovada e o nome do .pdf atual dela seguem o número novo.
+  private acompanharAprovacao(processoId: string, antigo: number, novo: number): void {
+    if (this.aprovadas[processoId] !== antigo) return
+    this.aprovadas[processoId] = novo
+    const atual = this.pdfsDaAprovacao[processoId]?.atual
+    if (atual) this.pdfsDaAprovacao[processoId].atual = { ...atual, nome: nomeComORotuloNovo(atual.nome, `_V${antigo}_`, `_V${novo}_`) }
   }
 
   // Como a ação conferir da função: uma situação por arquivo do processo, `ok` quando nada foi programado.

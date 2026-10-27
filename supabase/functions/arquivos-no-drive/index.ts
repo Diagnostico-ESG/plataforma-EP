@@ -12,6 +12,7 @@ import {
 import { cabecalhosDeOrigem } from '../_shared/drive.ts'
 import { validarConferir } from '../_shared/conferencia.ts'
 import { validarRegistro } from '../_shared/registroAnexo.ts'
+import { validarRenumerar } from '../_shared/renumerar.ts'
 import { baixar, iniciarEnvio } from './acoes.ts'
 import { iniciarEnvioDoAnexo, registrarAnexo } from './anexos.ts'
 import { identificarChamador, type ContextoDoChamador } from './chamador.ts'
@@ -19,6 +20,7 @@ import { conferir } from './conferir.ts'
 import { lerConfiguracao, type Configuracao } from './configuracao.ts'
 import { ErroDoDrive, obterToken } from './google.ts'
 import { registrar } from './registrar.ts'
+import { renumerarVersao } from './renumeracao.ts'
 import { retirarAnexo } from './retirada.ts'
 import { comCabecalhos, responderErroInterno, responderJson, responderRecusa } from './respostas.ts'
 
@@ -46,6 +48,13 @@ async function executarRetirar(corpo: unknown, chamador: ContextoDoChamador, con
   return await retirarAnexo({ cliente: chamador.cliente, token: await obterToken(config), config }, entrada.valor)
 }
 
+// Renumerar (travas-em-avisos, ticket 03): os arquivos da versão ganham o número novo no Drive e então o banco troca o número.
+async function executarRenumerar(corpo: unknown, chamador: ContextoDoChamador, config: Configuracao): Promise<Response> {
+  const entrada = validarRenumerar(corpo)
+  if (!entrada.ok) return responderRecusa(entrada.recusa)
+  return await renumerarVersao({ cliente: chamador.cliente, token: await obterToken(config), config }, entrada.valor)
+}
+
 // O papel anexo tem entrada própria (sem número nem versão); o resto segue a regra de sempre.
 async function executarRegistrar(corpo: unknown, chamador: ContextoDoChamador, config: Configuracao): Promise<Response> {
   const pedido = validarRegistro(corpo)
@@ -68,6 +77,7 @@ async function executar(acao: Acao, corpo: unknown, chamador: ContextoDoChamador
   if (acao === 'conferir') return await executarConferir(corpo, chamador, config)
   if (acao === 'baixar') return await executarBaixar(corpo, chamador, config)
   if (acao === 'retirar') return await executarRetirar(corpo, chamador, config)
+  if (acao === 'renumerar') return await executarRenumerar(corpo, chamador, config)
   return await executarIniciarEnvio(corpo, chamador, config, origem)
 }
 
@@ -78,7 +88,7 @@ async function atender(req: Request, config: Configuracao): Promise<Response> {
   if (!chamador) return responderRecusa(recusar('sem_login'))
   const corpo = await lerCorpo(req)
   const acao = lerAcao(corpo)
-  if (!acao) return responderRecusa(recusar('entrada_invalida', 'campo acao: esperado iniciar_envio, baixar, registrar, conferir ou retirar'))
+  if (!acao) return responderRecusa(recusar('entrada_invalida', 'campo acao: esperado iniciar_envio, baixar, registrar, conferir, retirar ou renumerar'))
   const recusa = conferirChamador(chamador.chamador, acao)
   if (recusa) return responderRecusa(recusa)
   return await executar(acao, corpo, chamador, config, req.headers.get('Origin'))

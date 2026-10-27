@@ -5,13 +5,18 @@ import { Icone } from './Icone'
 
 export type ItemDoMenu = { rotulo: string; aoEscolher: () => void; perigoso?: boolean }
 type Ponta = 'primeiro' | 'ultimo'
-type MenuDeAcoesProps = { rotulo: string; grupos: ItemDoMenu[][] }
+type MenuDeAcoesProps = {
+  rotulo: string
+  grupos: ItemDoMenu[][]
+  /** A lista abre para a direita do botão (botão perto da borda esquerda do painel); o padrão é para a esquerda. */
+  paraDireita?: boolean
+}
 
 /**
  * O botão "⋯" com as ações raras, em grupos separados por linha (padrão de menu da WAI-ARIA): abre com o foco no
  * primeiro item, as setas, Home e End movem o foco, Esc fecha e volta ao botão, Tab e clique fora fecham.
  */
-export function MenuDeAcoes({ rotulo, grupos }: MenuDeAcoesProps) {
+export function MenuDeAcoes({ rotulo, grupos, paraDireita = false }: MenuDeAcoesProps) {
   const [aberto, setAberto] = useState<Ponta | null>(null)
   const raiz = useRef<HTMLDivElement>(null)
   const botao = useRef<HTMLButtonElement>(null)
@@ -28,7 +33,7 @@ export function MenuDeAcoes({ rotulo, grupos }: MenuDeAcoesProps) {
     item.aoEscolher()
   }
   return (
-    <div ref={raiz} className="menu-de-acoes">
+    <div ref={raiz} className={paraDireita ? 'menu-de-acoes menu-de-acoes-para-direita' : 'menu-de-acoes'}>
       <button ref={botao} type="button" className="botao-icone menu-de-acoes-botao" aria-label={rotulo} title={rotulo}
         aria-haspopup="menu" aria-expanded={aberto !== null} aria-controls={aberto ? idDoMenu : undefined}
         onClick={() => setAberto(aberto ? null : 'primeiro')} onKeyDown={abrirPelaSeta(setAberto)}>

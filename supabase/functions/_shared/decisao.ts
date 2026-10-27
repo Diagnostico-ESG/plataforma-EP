@@ -3,7 +3,7 @@
 import { EXTENSOES_DO_ANEXO, type PapelDoArquivo } from './nomePadrao.ts'
 
 export type Perfil = 'administrador' | 'integrante_ep' | 'consulta'
-export type Acao = 'iniciar_envio' | 'baixar' | 'registrar' | 'conferir' | 'retirar'
+export type Acao = 'iniciar_envio' | 'baixar' | 'registrar' | 'conferir' | 'retirar' | 'renumerar'
 export interface Chamador {
   perfil: Perfil
   ativo: boolean
@@ -53,6 +53,7 @@ const PERFIS_POR_ACAO: Record<Acao, readonly Perfil[]> = {
   registrar: ['administrador', 'integrante_ep'],
   conferir: ['administrador', 'integrante_ep', 'consulta'],
   retirar: ['administrador', 'integrante_ep'],
+  renumerar: ['administrador', 'integrante_ep'],
 }
 
 export const EXTENSOES_POR_PAPEL: Record<PapelDoArquivo, readonly string[]> = {

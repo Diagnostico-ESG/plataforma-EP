@@ -128,6 +128,11 @@ export type ModuloDeVersoes = {
    */
   enviarPdfDaAprovacao(pedido: PedidoDePdfDaAprovacao, aoProgredir: (enviados: number, total: number) => void): Promise<void>
   /**
+   * Troca o número da versão (ADR 0028): a função do servidor renomeia no Drive os arquivos que levam o rótulo e o banco grava o
+   * número novo, tudo ou nada. `numeroEsperado` é o que a tela viu: se já mudou, é recusado. Só o número muda, nunca o tipo.
+   */
+  editarNumero(versaoId: string, numeroEsperado: number, numeroNovo: number): Promise<void>
+  /**
    * Como cada arquivo do processo está no Drive agora: o MD5 e a existência são comparados com o que o banco guarda; nada é
    * gravado. Falha de conexão ou do Drive rejeita (a tela mostra o aviso, sem marcas).
    */

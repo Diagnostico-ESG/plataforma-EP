@@ -3,6 +3,12 @@
   position: relative;
 }
 
+/* O "⋯" perto da borda esquerda (ao lado do rótulo da versão): a lista abre para a direita, para o painel não cortá-la. */
+.menu-de-acoes-para-direita .menu-de-acoes-lista {
+  right: auto;
+  left: 0;
+}
+
 .menu-de-acoes-botao {
   color: var(--texto-2);
 }

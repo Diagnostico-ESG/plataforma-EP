@@ -1,4 +1,5 @@
 import { extensaoDoNome } from '../../supabase/functions/_shared/decisao.ts'
+import { nomeComORotuloNovo } from '../../supabase/functions/_shared/renumerar.ts'
 import type { EventoDoCadastro } from '../cadastros/tipos'
 import { falhaDaFuncao } from './recusasDeVersoes'
 import { proximoNumeroDoRelatorio } from './relatorioQueVale'
@@ -93,5 +94,30 @@ export function eventoDaVersao(processoId: string, versao: Versao, processo: Pro
   return {
     id: Date.now(), ocorridoEm: versao.enviadaEm, autor: 'Pessoa de Teste', acao, entidade: 'versao',
     entidadeRef: processoId, antes: null, depois,
+  }
+}
+
+/**
+ * As regras do banco para editar o número (função editar_numero_da_versao) e o efeito dela: a versão com o número novo e o nome
+ * dos arquivos com o rótulo novo; o tipo não muda. Recusa o número inválido, o que a tela viu e já mudou, e o de outra versão.
+ */
+export function versaoRenumerada(doProcesso: Versao[], versao: Versao, numeroEsperado: number, numeroNovo: number): Versao {
+  if (!Number.isInteger(numeroNovo) || numeroNovo < 1 || numeroNovo === versao.numero) throw falhaDaFuncao('numero_invalido', String(numeroNovo))
+  if (numeroEsperado !== versao.numero) throw falhaDaFuncao('numero_da_versao_alterado', String(versao.numero))
+  const repetida = doProcesso.find((outra) => outra.numero === numeroNovo)
+  if (repetida) throw falhaDaFuncao('numero_ja_usado', rotuloDaVersao(repetida))
+  const letra = versao.historica ? 'F' : versao.piloto ? 'P' : ''
+  const arquivos = versao.arquivos.map((arquivo) => ({
+    ...arquivo, nome: nomeComORotuloNovo(arquivo.nome, `_V${versao.numero}${letra}_`, `_V${numeroNovo}${letra}_`),
+  }))
+  return { ...versao, numero: numeroNovo, arquivos }
+}
+
+// O evento do gatilho da edição (migração editar_numero_da_versao): o rótulo de antes e o de depois, com o processo e o setor.
+export function eventoDoNumero(processoId: string, antes: Versao, depois: Versao, processo: ProcessoDoFalso): EventoDoCadastro {
+  const base = { processo_nome: processo.nome, setor_sigla: processo.sigla }
+  return {
+    id: Date.now(), ocorridoEm: new Date().toISOString(), autor: 'Pessoa de Teste', acao: 'alterar_numero', entidade: 'versao',
+    entidadeRef: processoId, antes: { ...base, rotulo: rotuloDaVersao(antes) }, depois: { ...base, rotulo: rotuloDaVersao(depois) },
   }
 }

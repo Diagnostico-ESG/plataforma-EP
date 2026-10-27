@@ -1003,3 +1003,8 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 ## 2026-10-27 — /executar-complexo (travas-em-avisos, ticket 01)
 
 - **2026-10-27 · Itens não testados que aconteceram:** TDD de banco, migração aplicada e linha `Concluído em` num ticket. Esperado: teste pgTAP no Docker local; aconteceu pelos workflows do GitHub, porque o Docker não funciona nesta máquina (decisão do Alex nesta sessão). Branch no worktree (sessão paralela), não branch comum.
+
+## 2026-10-27 — /executar-complexo (travas-em-avisos, ticket 03)
+
+- **2026-10-27 · Itens não testados que aconteceram:** `/executar-complexo` em worktree, a pedido de outra sessão (execução em paralelo com o ticket 01), no lugar da branch comum; plano gravado em `plano-03.md` durante a execução, e não antes; migração corrigida por migração nova (a primeira, já aplicada no desenvolvimento, devolvia P0001 onde os testes 27, 30 e 60 pedem 42501); pgTAP só pelo workflow, sem Docker. Esperado: pgTAP no Docker local, plano antes do código. Aconteceu: o Docker Desktop não sobe nesta máquina (WSL não instalado), então a bateria rodou só no "Testes de banco" do GitHub; o único reprovado foi o teste 59, do ticket 01.
+- **2026-10-27 · Ocorrência: o hook de pre-commit rodou a bateria inteira duas vezes por falha de tempo (testes de tela estouraram o limite com o computador ocupado)**; os mesmos testes passam isolados e na repetição.
