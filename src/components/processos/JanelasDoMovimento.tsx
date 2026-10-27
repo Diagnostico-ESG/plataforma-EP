@@ -3,22 +3,25 @@ import type { ModuloDeProcessos } from '../../processos/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { JanelaDaChegada } from './JanelaDaChegada'
 import { JanelaDaConfirmacaoDeArquivos } from './JanelaDaConfirmacaoDeArquivos'
+import { JanelaDeEnvioDeArquivos } from './JanelaDeEnvioDeArquivos'
 
 type JanelasDoMovimentoProps = {
   movimento: MovimentoDoProcessoEmUso
   processos: ModuloDeProcessos
-  /** Ainda sem uso aqui: [Enviar arquivos agora] (ticket 02 de travas-em-avisos) volta a precisar do envio de versões. */
-  versoes?: ModuloDeVersoes
+  versoes: ModuloDeVersoes
   /** Chamado quando a janela da chegada gravou, antes de fechar: o Quadro e o verso leem de novo. */
   aoGravar: () => void
 }
 
-/** As janelas que o movimento pode abrir, uma de cada vez: a Confirmação de arquivos e, depois dela, a chegada a Concluídos. */
-export function JanelasDoMovimento({ movimento, processos, aoGravar }: JanelasDoMovimentoProps) {
+/** As janelas que o movimento pode abrir, uma de cada vez: a Confirmação de arquivos, o envio que ela abre e, depois, a chegada a Concluídos. */
+export function JanelasDoMovimento({ movimento, processos, versoes, aoGravar }: JanelasDoMovimentoProps) {
   return (
     <>
       {movimento.confirmacao && (
-        <JanelaDaConfirmacaoDeArquivos pedido={movimento.confirmacao} aoAvancar={movimento.avancarSemArquivos} aoFechar={movimento.fecharConfirmacao} />
+        <JanelaDaConfirmacaoDeArquivos pedido={movimento.confirmacao} aoEnviar={movimento.enviarAgora} aoAvancar={movimento.avancarSemArquivos} aoFechar={movimento.fecharConfirmacao} />
+      )}
+      {movimento.envio && (
+        <JanelaDeEnvioDeArquivos key={movimento.envio.faltas[0].codigo} pedido={movimento.envio} versoes={versoes} aoEnviar={movimento.arquivosEnviados} aoFechar={movimento.fecharEnvio} />
       )}
       {movimento.chegada && (
         <JanelaDaChegada chegada={movimento.chegada} processos={processos} aoGravar={aoGravar} aoFechar={movimento.fecharChegada} />

@@ -1,8 +1,7 @@
 import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
-import type { ArquivosDoProcesso } from './processos/tipos'
 import { cartaoDe, ETAPAS, montar, processo } from './testes/quadroDeTeste'
-import { type Montagem, montarNosCadastros, naEtapa } from './testes/processosNosCadastros'
+import { irPara, janela, montarVerso, NADA } from './testes/versoComArquivos'
 import { agoraDoVerso } from './testes/versoDoCartao'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
@@ -10,7 +9,6 @@ import { VersoesFalso } from './versoes/VersoesFalso'
 // da Modelagem piloto ou da Relatório e modelagem técnica, faltando o que a etapa pede, pergunta antes, e o processo só se move
 // com [Avançar mesmo assim]. Pela lista Etapa do Agora e ao arrastar o cartão.
 
-const NADA: ArquivosDoProcesso = { versaoPiloto: false, versaoEmSequencia: false, relatorioNumerado: false }
 const TITULO_DA_PILOTO = 'Faltam os arquivos da Modelagem piloto.'
 const TITULO_DA_TECNICA = 'Faltam os arquivos da Modelagem técnica.'
 const TITULO_DAS_DUAS = 'Faltam os arquivos de duas etapas.'
@@ -24,20 +22,6 @@ afterEach(() => {
   window.location.hash = ''
 })
 
-/** O verso do p1 na etapa dada, com o que ele tem de arquivos. */
-function montarVerso(etapa: string, arquivos: ArquivosDoProcesso, mais: Montagem = {}) {
-  return montarNosCadastros({
-    ...mais,
-    ajustarProcessos: (falso) => {
-      naEtapa(etapa)(falso)
-      falso.processos = falso.processos.map((processo) => (processo.id === 'p1' ? { ...processo, arquivos } : processo))
-      mais.ajustarProcessos?.(falso)
-    },
-  })
-}
-
-const irPara = async (id: string) => fireEvent.change((await agoraDoVerso()).getByRole('combobox', { name: 'Etapa' }), { target: { value: id } })
-const janela = async (nome: string) => within(await screen.findByRole('dialog', { name: nome }))
 const avancar = (aberta: ReturnType<typeof within>) => fireEvent.click(aberta.getByRole('button', { name: 'Avançar mesmo assim' }))
 
 test('sair da Modelagem piloto sem versão piloto pergunta, com o texto da etapa, e o processo não se move', async () => {
@@ -45,7 +29,7 @@ test('sair da Modelagem piloto sem versão piloto pergunta, com o texto da etapa
   await irPara('e3')
   const aberta = await janela(TITULO_DA_PILOTO)
   expect(aberta.getByText('Este processo ainda não tem a versão piloto. Você pode avançar agora e enviá-la depois.')).toBeTruthy()
-  expect(aberta.queryByRole('button', { name: 'Enviar arquivos agora' })).toBeNull()
+  expect(aberta.getByRole('button', { name: 'Enviar arquivos agora' })).toBeTruthy()
   expect(processos.chamadas).toEqual([])
 })
 

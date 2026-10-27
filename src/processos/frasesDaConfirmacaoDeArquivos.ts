@@ -3,6 +3,9 @@
 import { CODIGO_DA_MODELAGEM_PILOTO } from './codigosDasEtapas'
 import type { PecaQueFalta, TravaDeArquivos } from './travaDeArquivos'
 
+/** O envio deu certo e o movimento depois dele não: os arquivos já estão no processo, e a pergunta não volta por eles. */
+export const FRASE_DOS_ARQUIVOS_ENVIADOS = 'Os arquivos foram enviados, mas o processo não foi movido.'
+
 export type PerguntaDeArquivos = { titulo: string; paragrafos: string[] }
 
 /** O que falta na técnica, como a pergunta diz: o fluxograma é a versão do processo. */
@@ -21,7 +24,8 @@ function oQueAindaNaoTem({ codigo, falta }: TravaDeArquivos): string {
 
 const NOME_NA_PERGUNTA: Record<string, string> = { modelagem: 'Modelagem piloto', relatorio_modelagem_tecnica: 'Modelagem técnica' }
 
-function nomeNaPergunta({ codigo, nome }: TravaDeArquivos): string {
+/** O nome da etapa como a pergunta e a janela de envio o dizem. */
+export function nomeNaPergunta({ codigo, nome }: TravaDeArquivos): string {
   return NOME_NA_PERGUNTA[codigo] ?? nome
 }
 
