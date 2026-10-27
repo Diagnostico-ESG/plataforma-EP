@@ -2,8 +2,9 @@
 
 Registro de onde a última sessão parou e do que vem a seguir. Cada sessão que terminar recomendando um próximo passo sobrescreve este arquivo antes de encerrar. Valem os arquivos se divergir do git.
 
-Atualizado em 2026-10-26 (fim do `/polir` da parte 5 do quadro livre)
+Atualizado em 2026-10-26 (fim do `/ship` da parte 5 do quadro livre, Visualização por setores)
 
-- **Feito:** Visualização por setores implementada (commit `6052a4f`) e polida: auditoria 18/20; a contagem da coluna passou a ficar na linha da sigla (alinhamento pela linha de base). Registro em `.scratch/processos-etapas/desvios.md` (2026-10-26). Critérios `[visual]` vistos na vitrine local (`vitrine.local/setores.html`, fora do git), não com o login real. `npm test`: 2905 verdes.
-- **Pendente do usuário (da parte 4, segue valendo):** publicar de novo `arquivos-no-drive` no desenvolvimento; conferir o papel da conta de serviço nos Drives compartilhados; provar anexos no Drive real; conferir as telas com o login real; republicar `planilhas-dos-dashboards`; apagar `.scratch/handoff-2026-10-20.md` (desatualizado).
-- **Próximo comando:** `/ship` da Visualização por setores (processos-etapas), em **Sonnet**, numa sessão nova começando pelo `/situação`. Sem migração, sem função, sem dependência nova.
+- **Feito:** a iniciativa **Quadro livre** está completa: parte 5 (Visualização por setores, processos-etapas) **entregue com ressalva** (commit `2c4ff1d`, marco `marco/2026-10-26-entrega-processos-etapas`). Sem banco, sem função, sem dependência nova. `npm test`: 2905 verdes; cobertura 98,97%; circulares limpas; build passa.
+- **Ressalvas na marca:** critérios `[visual]` vistos só na vitrine local (`vitrine.local/setores.html`, fora do git); revisão de segurança de reserva.
+- **Pendente do usuário (das partes anteriores, segue valendo):** publicar de novo `arquivos-no-drive` no desenvolvimento; conferir o papel da conta de serviço nos Drives compartilhados; provar anexos no Drive real; conferir as telas com o login real (inclusive o Quadro por setor); republicar `planilhas-dos-dashboards`; apagar `.scratch/handoff-2026-10-20.md` (desatualizado).
+- **Próximo comando:** todas as funcionalidades da lista de `.scratch/projeto.md` estão entregues. O que vier agora entra pelo `/demanda` (Opus para classificar) ou, se a ideia do projeto mudou, pelo `/projeto`. Antes de produção: a revisão de segurança para produção (roteiro do fim do `/ship`), quando o usuário pedir.
