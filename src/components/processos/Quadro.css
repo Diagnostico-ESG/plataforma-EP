@@ -189,7 +189,7 @@
   font-weight: 600;
 }
 
-/* Barra da etapa: o nome e a posição acima, um bloco por etapa; só cinza, sem azul (o normal não é alerta). */
+/* Barra da etapa: o nome e a posição acima, e uma faixa lisa em degradê azul que se enche até a etapa atual. */
 .barra-etapa {
   display: flex;
   flex-direction: column;
@@ -205,50 +205,36 @@
   white-space: nowrap;
 }
 
-.barra-etapa-blocos {
-  display: flex;
-  gap: 2px;
+.barra-etapa-trilho {
+  display: block;
+  overflow: hidden;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--barra-etapa-trilho);
 }
 
-.pedaco {
-  box-sizing: border-box;
-  flex: 1;
-  height: 6px;
-  border: 1px solid var(--texto-2);
-  border-radius: 2px;
+/* O degradê cobre só o trecho preenchido: a ponta mais escura marca a etapa atual. */
+.barra-etapa-preenchida {
+  display: block;
+  width: var(--barra-fracao);
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--barra-etapa-inicio), var(--barra-etapa-fim));
 }
 
-.pedaco-resolvida {
-  background: var(--texto-2);
-}
-
-/* Meio cheio: a metade esquerda preenchida. */
-.pedaco-atual {
-  background: linear-gradient(to right, var(--texto-2) 50%, transparent 50%);
-}
-
-/* Oco, com borda no cinza dos ícones (3:1 sobre o cartão branco): o cinza claro de antes ficava em 1,6:1 e sumia. */
-.pedaco-seguinte {
-  border-color: var(--icone-inativo);
-}
-
-/* Na célula da Lista a barra não encolhe a ponto de os blocos virarem risco. */
+/* Na célula da Lista a barra não encolhe a ponto de virar risco. */
 td .barra-etapa {
   min-width: 8rem;
 }
 
-/* Contraste forçado apaga fundos: o bloco cheio vira CanvasText e o meio cheio, a metade dele. */
+/* Contraste forçado apaga fundos: o trilho ganha borda e o preenchimento vira CanvasText. */
 @media (forced-colors: active) {
-  .pedaco {
-    border-color: CanvasText;
+  .barra-etapa-trilho {
+    border: 1px solid CanvasText;
   }
 
-  .pedaco-resolvida {
+  .barra-etapa-preenchida {
     background: CanvasText;
-  }
-
-  .pedaco-atual {
-    background: linear-gradient(to right, CanvasText 50%, Canvas 50%);
   }
 }
 
@@ -446,20 +432,23 @@ td .barra-etapa {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: currentColor;
+  background: var(--bolinha, currentColor);
 }
 
 .etiqueta-a_fazer {
+  --bolinha: var(--etiqueta-a-fazer-bolinha);
   background: var(--etiqueta-a-fazer-fundo);
   color: var(--etiqueta-a-fazer-texto);
 }
 
 .etiqueta-em_andamento {
+  --bolinha: var(--etiqueta-em-andamento-bolinha);
   background: var(--etiqueta-em-andamento-fundo);
   color: var(--etiqueta-em-andamento-texto);
 }
 
 .etiqueta-concluido {
+  --bolinha: var(--etiqueta-concluido-bolinha);
   background: var(--etiqueta-concluido-fundo);
   color: var(--etiqueta-concluido-texto);
 }

@@ -24,25 +24,34 @@ test('por etapa o cartão não traz a barra; a coluna já diz a etapa', async ()
   expect(barraDe(await cartaoDe('Emitir Ofício'))).toBeNull()
 })
 
-test('por responsável a barra diz "Nome · n de N", tem um bloco por etapa ativa e o nome acessível', async () => {
+const preenchimentoDe = (barra: Element | null) => (barra?.querySelector('.barra-etapa-preenchida') as HTMLElement | null)?.style.getPropertyValue('--barra-fracao')
+
+test('por responsável a barra diz "Nome · n de N", é uma faixa lisa preenchida até a etapa atual e tem o nome acessível', async () => {
   montar([processo('Emitir Ofício', { etapa: 'revisao_interna' })])
   await cartaoDe('Emitir Ofício')
   await porResponsavel()
   const barra = barraDe(await cartaoDe('Emitir Ofício'))
   expect(barra?.getAttribute('aria-label')).toBe('Etapa 4 de 8: Revisão interna')
   expect(barra?.querySelector('.barra-etapa-texto')?.textContent).toBe('Revisão interna · 4 de 8')
-  expect(Array.from(barra?.querySelectorAll('.pedaco') ?? []).map((pedaco) => pedaco.className.replace('pedaco pedaco-', ''))).toEqual([
-    'resolvida', 'resolvida', 'resolvida', 'atual', 'seguinte', 'seguinte', 'seguinte', 'seguinte',
-  ])
+  expect(barra?.querySelectorAll('.barra-etapa-trilho')).toHaveLength(1)
+  expect(barra?.querySelector('.pedaco')).toBeNull()
+  expect(preenchimentoDe(barra)).toBe('50%')
 })
 
-test('em Concluídos a barra está toda preenchida', async () => {
+test('em Não iniciados só o primeiro trecho da barra está preenchido', async () => {
+  montar([processo('Novo', { etapa: 'nao_iniciados' })])
+  await cartaoDe('Novo')
+  await porResponsavel()
+  expect(preenchimentoDe(barraDe(await cartaoDe('Novo')))).toBe('12.5%')
+})
+
+test('em Concluídos a barra está cheia', async () => {
   montar([processo('Pronto', { etapa: 'concluidos', processo: { situacao: 'concluido', etiqueta: 'concluido' } })])
   await cartaoDe('Pronto')
   await porResponsavel()
   const barra = barraDe(await cartaoDe('Pronto'))
   expect(barra?.getAttribute('aria-label')).toBe('Etapa 8 de 8: Concluídos')
-  expect(Array.from(barra?.querySelectorAll('.pedaco') ?? []).every((pedaco) => pedaco.className.includes('pedaco-resolvida'))).toBe(true)
+  expect(preenchimentoDe(barra)).toBe('100%')
 })
 
 test('o processo suspenso mostra a barra da etapa onde parou, com a pílula Suspenso', async () => {
