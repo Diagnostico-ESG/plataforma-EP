@@ -1499,6 +1499,6 @@ Entregue em 2026-10-27 (commit 17ce602), correção do bug de criar processo (pe
 
 Entregue em 2026-10-27 (commit c2b089f), com ressalva: critérios [visual] da mudança travas-em-avisos presumidos (a pergunta da confirmação de arquivos com a lista das duas etapas e a janela "Editar número" com prévia e avisos em 1366×768 não foram vistas; o "⋯" ao lado do rótulo foi visto na tela real); revisão de segurança foi a de reserva (menos completa: o /security-review não achou mudanças a revisar), com a leitura de chamador.ts, pastas.ts e dos módulos de tela por fazer; função arquivos-no-drive (ação renumerar) provada no Drive real em 2026-10-27, mas a publicação a partir da main não foi reconferida; as ressalvas das entregas anteriores seguem valendo
 
-Em revisão desde 2026-10-27
-
 Implementado em 2026-10-27 (commit 29e2804): macroprocesso fora da frente do cartão do Quadro; [visual] item 5 presumido (não visto na tela).
+
+Entregue em 2026-10-27 (commit 69f8b43), com ressalva: critério [visual] 5 da mudança "macroprocesso fora do cartão" presumido (espaçamento regular e alinhamento dos cartões não vistos na tela, que exige login); revisão de segurança dispensada (mudança só de exibição, sem login, dado de fora nem banco); as ressalvas das entregas anteriores seguem valendo
