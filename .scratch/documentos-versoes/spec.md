@@ -47,11 +47,11 @@ Demanda de 2026-10-27 (`.scratch/travas-em-avisos/demanda.md`, item 11 do `proje
 - **Onde:** um "⋯" ao lado do rótulo de cada versão (no destaque e nas "Versões anteriores"), com o item **Editar número**, para Administrador e Integrante, com o processo em andamento. A Consulta e o processo suspenso, cancelado, concluído ou arquivado não têm o "⋯".
 - **A janela** "Editar número da V7": o campo do número (inteiro maior que zero, preenchido com o atual), a prévia do rótulo novo (V5, V5F ou V5P, com a letra do tipo, que não muda) e dos nomes novos dos arquivos, e [Gravar] [Cancelar]. Sem motivo. [Gravar] fica desabilitado com o número igual ao atual ou inválido.
 - **Aviso, sem impedir** (amarelo, na própria janela, enquanto se digita), quando, pela ordem do número, com a versão já no número novo:
-  - a ordem dos tipos deixa de ser histórica → piloto → em sequência: "A V3F ficará depois da V4P. Gravar assim mesmo?";
-  - uma versão em sequência não vem logo depois da anterior: "A V9 ficará depois da V7, sem a V8. Gravar assim mesmo?";
-  - a versão é a aprovada: "A V7 foi aprovada, e o E-protocolo cita esse número. Gravar assim mesmo?".
+  - a ordem dos tipos deixa de ser histórica → piloto → em sequência: "A V5F ficará depois da V4P." (ou "A V2 ficará antes da V3P.", quando o número novo fica antes de uma versão de tipo posterior; o aviso aponta a versão mais próxima do número novo);
+  - uma versão em sequência não vem logo depois da anterior: "A V9 ficará depois da V7, sem a V8.";
+  - a versão é a aprovada: "A V7 foi aprovada, e o E-protocolo cita esse número." (com o número antigo, que é o que o E-protocolo cita).
 
-  Mais de um aviso aparecem juntos. Históricas e piloto podem ter saltos entre si sem aviso.
+  Mais de um aviso aparecem juntos, em lista, seguidos de uma só pergunta, "Gravar assim mesmo?". Históricas e piloto podem ter saltos entre si sem aviso. Os avisos valem só para a versão editada: a seguinte que perde a anterior com a edição não ganha aviso.
 - **Recusado:** número já usado por outra versão do mesmo processo ("Este processo já tem a V5."); número que mudou enquanto a janela estava aberta (outra pessoa editou: "O número desta versão mudou enquanto você editava. Feche e abra de novo."); processo fora de andamento ou arquivado; perfil sem permissão.
 - **Drive:** os arquivos que levam o rótulo da versão no nome ganham o nome padrão com o número novo: os fluxogramas da versão, os relatórios ligados a ela e o .pdf da aprovação dela. Tudo ou nada: se algum nome não troca, ou se o banco recusa, os nomes voltam e o número fica o que era.
 - **Efeitos:** a versão mais recente continua a de maior número, fora as históricas, então a edição pode mudá-la (e, com ela, o relatório que vale e a versão que o próximo relatório acompanha). A próxima versão em sequência segue o maior número + 1; o número mínimo da piloto segue maior que o de todas. As regras de envio continuam recusando como hoje (a edição não passa por elas).
