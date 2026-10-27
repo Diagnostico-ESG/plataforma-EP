@@ -6,8 +6,10 @@
 
 **Status:** ready-for-agent
 
-- [ ] Função pura que recebe as versões do processo (número, tipo, se é a aprovada), a versão editada e o número novo e devolve a lista de avisos, com teste de cada caso, dos avisos juntos e de históricas e piloto com saltos entre si sem aviso.
-- [ ] Os avisos aparecem na própria janela enquanto se digita, com os textos da spec; mais de um aparecem juntos; não há segunda janela de confirmação.
-- [ ] [Gravar] grava com os avisos à vista.
-- [ ] Testes `App.*` com cada aviso e com os avisos juntos.
-- [ ] `[visual]` A janela com a prévia e os avisos cabe em 1366×768.
+- [x] Função pura que recebe as versões do processo (número, tipo, se é a aprovada), a versão editada e o número novo e devolve a lista de avisos, com teste de cada caso, dos avisos juntos e de históricas e piloto com saltos entre si sem aviso.
+- [x] Os avisos aparecem na própria janela enquanto se digita, com os textos da spec; mais de um aparecem juntos; não há segunda janela de confirmação.
+- [x] [Gravar] grava com os avisos à vista.
+- [x] Testes `App.*` com cada aviso e com os avisos juntos.
+- [ ] `[visual]` A janela com a prévia e os avisos cabe em 1366×768. (Presumido: a tela só abre com o login real; conferir na tela.)
+
+Concluído em 2026-10-27 (commit 9e4a80d)
