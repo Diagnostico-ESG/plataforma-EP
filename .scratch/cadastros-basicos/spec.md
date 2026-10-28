@@ -4,6 +4,8 @@ Status: ready-for-agent
 
 **Como resolve o problema.** Hoje os setores atendidos e os macroprocessos da Cadeia de Valor vivem em planilhas soltas, sem uma lista única nem o registro de quem mudou o quê. Com esta funcionalidade, a equipe do EP passa a ter, na área Setores da plataforma, um cadastro único de setores (com a sigla que vai para o nome dos arquivos), de macroprocessos e dos setores envolvidos em cada macroprocesso. Administrador e Integrante do EP mantêm os cadastros; a Consulta só vê. Toda alteração, inclusive uma exclusão, fica no histórico com o que o item tinha. As funcionalidades seguintes se apoiam nesses cadastros: o processo nasce ligado a um setor e a um macroprocesso, os arquivos recebem o nome pela sigla, e o painel monta a matriz macroprocesso × setor.
 
+**Cor sólida do setor (mudança de 2026-10-28, spec própria).** A funcionalidade 13, `.scratch/cor-solida-do-setor/spec.md` (ADR 0033), troca o degradê da cor do setor pela cor lisa no tom claro, inclusive no selo dos cadastros, no quadradinho do [Pôr setor] e nas amostras da grade do setor aberto. Onde a seção "Cor do setor" fala em degradê ou nas "duas pontas do degradê", vale aquela.
+
 Decisões de origem: `.scratch/cadastros-basicos/sabatina.md` (sabatina de 2026-10-10) e `CONTEXT.md` (seção "Setores"). Sem ADR novo: nenhuma decisão é difícil de desfazer. Mudança de 2026-10-27 (seção "Cor do setor", logo abaixo, ADR 0030): o setor ganha uma cor; ela vale sobre o resto desta spec no que divergir.
 
 ## Cor do setor (mudança de 2026-10-27)
@@ -372,3 +374,5 @@ Setor e macroprocesso: Ativo ⇄ (desativar / reativar) ⇄ Inativo; nos dois es
 Entregue em 2026-10-13 (commit 3a552d3)
 
 Entregue em 2026-10-27 (commit 764e74d), com ressalva: critérios [visual] da mudança visual-do-cartao presumidos (a tela nunca foi vista com o login real; vista só a faixa por etapa na cor 1, na vitrine local com módulos falsos: faltam o nome na faixa por setor, a faixa do parado, as 30 cores e nome longo, os selos do verso, da Lista e do título da coluna, o quadradinho das caixas, a grade de cores, a barra lisa e as etiquetas vivas); revisão de segurança foi a de reserva (menos completa: o /security-review só viu documentação); painel do Supabase de desenvolvimento não reconferido; função arquivos-no-drive ainda sem nova publicação no desenvolvimento; as ressalvas das entregas anteriores seguem valendo
+
+Em revisão desde 2026-10-28
