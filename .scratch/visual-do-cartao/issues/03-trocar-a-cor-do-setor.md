@@ -6,9 +6,11 @@
 
 **Status:** ready-for-agent
 
-- [ ] Editar setor envia `cor`; teste do módulo de cadastros com o cliente simulado.
-- [ ] Grade no setor aberto com a cor atual marcada e as em uso com o nome acessível (a primeira sigla em ordem, quando mais de um setor usa); função pura do nome acessível com teste, se existir.
-- [ ] Trocar e salvar, inclusive por uma cor em uso; falha mantendo a escolha; Consulta sem a grade; Novo setor sem a grade; testes de tela (arte anterior: `App.editarSetor`).
-- [ ] A recusa do banco para Consulta, inativo e visitante, provada no ticket 02, continua passando.
-- [ ] `npm test` verde.
+- [x] Editar setor envia `cor`; teste do módulo de cadastros com o cliente simulado.
+- [x] Grade no setor aberto com a cor atual marcada e as em uso com o nome acessível (a primeira sigla em ordem, quando mais de um setor usa); função pura do nome acessível com teste, se existir.
+- [x] Trocar e salvar, inclusive por uma cor em uso; falha mantendo a escolha; Consulta sem a grade; Novo setor sem a grade; testes de tela (arte anterior: `App.editarSetor`).
+- [x] A recusa do banco para Consulta, inativo e visitante, provada no ticket 02, continua passando.
+- [x] `npm test` verde.
 - [ ] `[visual]` A grade cabe no formulário do setor sem rolar para os lados, com a escolhida em linha acesa e as em uso marcadas de forma discreta, inclusive em 1366×768.
+
+Concluído em 2026-10-27 (commit 25d194a)
