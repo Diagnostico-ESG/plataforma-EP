@@ -46,3 +46,13 @@ Só recebe entradas novas, datadas.
 - **Corrigido na entrega, antes do polimento (revisão do `/implement`):** sigla de 18px passou a usar o token `--tam-painel`; folga lateral no cabeçalho para o nome do setor não passar por baixo da contagem; `forced-color-adjust` só na coluna colorida.
 - **Polimento:** nada a mudar no código; nenhuma correção nova.
 - **Deixado de fora:** o aviso do raio de 1px (é da barra da etapa, anterior a esta mudança). Os critérios `[visual]` 6 a 8 da spec (coluna até a base, sigla nas 30 cores, inativo distinto) não foram vistos na tela, que exige login: seguem presumidos, para você conferir com o login real.
+
+## 2026-10-28 — /ship de visual-do-cartao (coluna tingida e etiquetas fortes, ADR 0031)
+
+- **Ponto de partida da revisão:** marco `marco/2026-10-28-inicio-visual-do-cartao`. `/mattpocock-skills:code-review` rodado de novo sobre o diff final (o CSS mudou depois da revisão do `/implement`), nos dois eixos.
+- **Padrões:** nenhuma violação dura. Cheiros de julgamento, aceitos: a decisão "coluna de setor, ativa ou inativa" repetida em três pontos de `ColunaDoQuadro.tsx` (pequena demais para um tipo próprio); os seis tokens `--etiqueta-*-texto` e `-bolinha` agora iguais (`#ffffff`), mantidos por serem um token por papel e já cobertos por teste; `--barra-coluna-trilho` reaproveitado como cabeçalho da coluna inativa (cinza já existente, sem token novo); nome do arquivo `etiquetasVivas.test.ts` e chave `concluido` mantidos (o rótulo muda só na tela); 30% da mistura e `Quadro.css` acima de 300 linhas (já passava antes; CSS fora do limite do ESLint).
+- **Spec:** a revisão achou uma lacuna: sem teste de contraste da frase da coluna vazia sobre o fundo tingido. Corrigido: teste novo em `corDoSetor.test.ts`, nas 30 cores (≥ 4,5:1). O texto escuro sobre as duas pontas do degradê já tinha teste. Nada fora de escopo.
+- **Dúvidas que só a tela resolve (seguem presumidas):** pílula "Inativo" neutra sobre o cabeçalho cinza; cabeçalho "colado no alto"; coluna até a base do Quadro; sigla legível nas 30 cores.
+- **Segurança:** `package.json` não mudou e `.scratch/security.md` já existe: `security-auditor` pulado. Revisão de segurança do código pulada: mudança só visual, sem login, permissão, dado de fora nem migração.
+- **Banco:** nada em `supabase/`; passo 7 pulado. Dependência circular: nenhuma. Cobertura 98,1% (instruções), 94,2% (ramos), 98,6% (funções), 99,1% (linhas); 3.137 testes passam.
+- **Observação:** um teste de `App.editarRegistros` e um de `App.anexos` estouram o tempo quando a máquina está ocupada com outra tarefa, e passam sozinhos; não é da mudança.

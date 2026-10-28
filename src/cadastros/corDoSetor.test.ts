@@ -35,6 +35,14 @@ describe('corDoSetor', () => {
       expect(contraste(TEXTO, escuro as string)).toBeGreaterThanOrEqual(4.5)
     })
 
+  // A coluna do Quadro por setor mistura 30% do tom claro com a folha branca; a frase da coluna vazia é texto-2 sobre esse fundo.
+  test.each(TODAS_AS_CORES.map((cor) => [cor.numero, cor.nome, cor.claro]))(
+    'cor %i (%s): a frase da coluna vazia (texto-2) passa de 4,5:1 sobre o fundo tingido', (_numero, _nome, claro) => {
+      const canais = [1, 3, 5].map((i) => Math.round(parseInt((claro as string).slice(i, i + 2), 16) * 0.3 + 255 * 0.7))
+      const fundo = `#${canais.map((c) => c.toString(16).padStart(2, '0')).join('')}`
+      expect(contraste('#5D6577', fundo)).toBeGreaterThanOrEqual(4.5)
+    })
+
   test('o estilo leva os dois tons em variáveis CSS', () => {
     expect(estiloDaCor(13)).toEqual({ '--cor-claro': '#C4D9F8', '--cor-escuro': corDoSetor(13).escuro })
   })
