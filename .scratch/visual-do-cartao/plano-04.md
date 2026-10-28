@@ -44,15 +44,15 @@
 
 ### Tarefa 0: Branch, marco e plano
 
-- [ ] `git status` limpo (conferido no início: limpo). `git switch -c visual-do-cartao-04` a partir da `main`.
-- [ ] Marco: `git tag marco/2026-10-27-inicio-cor-do-setor-na-area-processos` e `git push origin "refs/tags/marco/*:refs/tags/marco/*"` (autorizado).
-- [ ] Comitar este plano: `git add .scratch/visual-do-cartao/plano-04.md && git commit -m "visual-do-cartao 04: plano de execução"`.
+- [x] `git status` limpo (conferido no início: limpo). `git switch -c visual-do-cartao-04` a partir da `main`.
+- [x] Marco: `git tag marco/2026-10-27-inicio-cor-do-setor-na-area-processos` e `git push origin "refs/tags/marco/*:refs/tags/marco/*"` (autorizado).
+- [x] Comitar este plano: `git add .scratch/visual-do-cartao/plano-04.md && git commit -m "visual-do-cartao 04: plano de execução"`.
 
 ### Tarefa 1: Banco — teste que falha, migração, tipos
 
 **Arquivos:** criar `supabase/tests/67_cor_do_setor_na_view.test.sql` e a migração; regenerar `src/types/database.ts`.
 
-- [ ] **Passo 1: escrever o teste** (7 asserções; usa o formato de `63_*` e `66_*`):
+- [x] **Passo 1: escrever o teste** (7 asserções; usa o formato de `63_*` e `66_*`):
 
 ```sql
 -- Cor do setor na view dos processos (visual-do-cartao, ticket 04): setor_cor igual à cor do setor dono.
@@ -123,8 +123,8 @@ do $$ begin
 end $$;
 ```
 
-- [ ] **Passo 2: ver o teste falhar.** Docker ligado: `npx supabase start` (descarte a saída: traz chaves), depois `npx supabase test db`; esperado: `not ok` por `setor_cor` inexistente (código 42703). Sem Docker: seguir para o Passo 5 e ver a falha no "Testes de banco" da branch.
-- [ ] **Passo 3: criar a migração** com `npx supabase migration new cor_do_setor_na_view_dos_processos` e colar:
+- [x] **Passo 2: ver o teste falhar.** Docker ligado: `npx supabase start` (descarte a saída: traz chaves), depois `npx supabase test db`; esperado: `not ok` por `setor_cor` inexistente (código 42703). Sem Docker: seguir para o Passo 5 e ver a falha no "Testes de banco" da branch.
+- [x] **Passo 3: criar a migração** com `npx supabase migration new cor_do_setor_na_view_dos_processos` e colar:
 
 ```sql
 -- A view dos processos passa a entregar a cor do setor dono (visual-do-cartao, ticket 04). Não destrutiva: create or replace
@@ -174,11 +174,11 @@ grant select on public.processos_com_andamento to authenticated;
 ```
 
   Conferir antes de salvar: `diff` mental com as linhas 95–135 de `supabase/migrations/20261026164641_data_da_validacao_e_pdf_da_aprovacao.sql` (a única diferença é `, s.cor as setor_cor`). Se alguma migração **posterior** a essa recriou a view, copie dela.
-- [ ] **Passo 4 (com Docker): rodar tudo local.** `npm run db:reset` (local; confira que o alvo é o banco local), `npx supabase test db`. Esperado: o 67 com 7 `ok` e nenhum `not ok` em todos os arquivos (inclusive `00_rls_ligada`, `10_privilegios_padrao`, `46_funcoes_e_views_seguras`).
-- [ ] **Passo 5: empurrar a branch** (`git push -u origin visual-do-cartao-04`, autorizado) e rodar o workflow "Testes de banco" na branch; ler o resultado. Se o 67 ainda não tiver visto a falha (sem Docker), ele falha antes da migração só se a migração não tiver sido enviada: então faça o push do **teste sozinho primeiro** (commit 1), veja o vermelho, e só depois comite a migração (commit 2).
-- [ ] **Passo 6: aplicar no desenvolvimento** pelo workflow "Migrar banco de desenvolvimento" na branch (autorizado), informando a migração criada; ler o resultado. Depois "Testes de banco" de novo: tudo verde.
-- [ ] **Passo 7: tipos.** Conferir `supabase/.temp/project-ref` e a linha "vínculo atual"; `npm run db:types`. Esperado no diff de `src/types/database.ts`: só `setor_cor: number | null` em `Views.processos_com_andamento.Row` (ignore mudança de fim de linha). Registrar a migração em `supabase/AMBIENTES.md` (padrão das linhas anteriores: data, ticket, teste que falhou antes e passou depois, workflow usado).
-- [ ] **Passo 8: commit.** `git add supabase/tests/67_cor_do_setor_na_view.test.sql supabase/migrations/*cor_do_setor_na_view* src/types/database.ts supabase/AMBIENTES.md && git commit -m "visual-do-cartao 04: view dos processos entrega setor_cor (teste, migração e tipos)"`.
+- [x] **Passo 4 (com Docker): rodar tudo local.** `npm run db:reset` (local; confira que o alvo é o banco local), `npx supabase test db`. Esperado: o 67 com 7 `ok` e nenhum `not ok` em todos os arquivos (inclusive `00_rls_ligada`, `10_privilegios_padrao`, `46_funcoes_e_views_seguras`).
+- [x] **Passo 5: empurrar a branch** (`git push -u origin visual-do-cartao-04`, autorizado) e rodar o workflow "Testes de banco" na branch; ler o resultado. Se o 67 ainda não tiver visto a falha (sem Docker), ele falha antes da migração só se a migração não tiver sido enviada: então faça o push do **teste sozinho primeiro** (commit 1), veja o vermelho, e só depois comite a migração (commit 2).
+- [x] **Passo 6: aplicar no desenvolvimento** pelo workflow "Migrar banco de desenvolvimento" na branch (autorizado), informando a migração criada; ler o resultado. Depois "Testes de banco" de novo: tudo verde.
+- [x] **Passo 7: tipos.** Conferir `supabase/.temp/project-ref` e a linha "vínculo atual"; `npm run db:types`. Esperado no diff de `src/types/database.ts`: só `setor_cor: number | null` em `Views.processos_com_andamento.Row` (ignore mudança de fim de linha). Registrar a migração em `supabase/AMBIENTES.md` (padrão das linhas anteriores: data, ticket, teste que falhou antes e passou depois, workflow usado).
+- [x] **Passo 8: commit.** `git add supabase/tests/67_cor_do_setor_na_view.test.sql supabase/migrations/*cor_do_setor_na_view* src/types/database.ts supabase/AMBIENTES.md && git commit -m "visual-do-cartao 04: view dos processos entrega setor_cor (teste, migração e tipos)"`.
 
 ### Tarefa 2: A cor viaja do banco para o processo e para o setor do Quadro
 
@@ -186,7 +186,7 @@ grant select on public.processos_com_andamento to authenticated;
 
 **Produz:** `ProcessoDaLista.setorCor?: number`; `SetorDoQuadro.cor: number`; `ProcessosFalso.coresDosSetores` e `ProcessosFalso.corDoSetor(setorId): number`; `umSetor(id, sigla, nome, ativo = true, cor = 1)`.
 
-- [ ] **Passo 1: testes que falham** em `src/processos/processoDaLinha.test.ts` (acrescentar `setor_cor: null` ao `VAZIA`):
+- [x] **Passo 1: testes que falham** em `src/processos/processoDaLinha.test.ts` (acrescentar `setor_cor: null` ao `VAZIA`):
 
 ```ts
 test('traduz a cor do setor; sem ela vale a cor 1', () => {
@@ -196,8 +196,8 @@ test('traduz a cor do setor; sem ela vale a cor 1', () => {
 ```
 
   Em `listaDeProcessosSupabase.test.ts`: a resposta `setores.select` passa a trazer `cor` (ex.: `{ id: 's1', sigla: 'TSA', nome: 'Setor de Testes A', ativo: true, cor: 13 }`) e o teste confere que `setores` sai com `cor: 13` e que o `select` dos setores pediu `'id, sigla, nome, ativo, cor'` (use o registro de chamadas do `ClienteSupabaseFalso`, como os testes vizinhos fazem). Em `processosSupabase.test.ts`, a `LINHA` ganha `setor_cor: 13` e a expectativa do processo `setorCor: 13`.
-- [ ] **Passo 2: ver falhar** — `npx vitest run src/processos/processoDaLinha.test.ts src/processos/listaDeProcessosSupabase.test.ts src/processos/processosSupabase.test.ts`. Esperado: FAIL (propriedade `setorCor` ausente / erro de tipo).
-- [ ] **Passo 3: implementar.**
+- [x] **Passo 2: ver falhar** — `npx vitest run src/processos/processoDaLinha.test.ts src/processos/listaDeProcessosSupabase.test.ts src/processos/processosSupabase.test.ts`. Esperado: FAIL (propriedade `setorCor` ausente / erro de tipo).
+- [x] **Passo 3: implementar.**
   - `tipos.ts`: em `ProcessoDaLista`, depois de `setorSigla`: `/** Número da cor do setor (1 a 30), vindo da view; opcional para quem monta o processo à mão: sem ele vale a cor 1. */ setorCor?: number`. `SetorDoQuadro` vira `{ id: string; sigla: string; nome: string; ativo: boolean; cor: number }`.
   - `processoDaLinha.ts`, em `identificacaoDaLinha`: `setorCor: linha.setor_cor ?? 1,` depois de `setorSigla`.
   - `listaDeProcessosSupabase.ts`: `.select('id, sigla, nome, ativo, cor')` em `lerSetores`.
@@ -212,8 +212,8 @@ test('traduz a cor do setor; sem ela vale a cor 1', () => {
 
     em `listarProcessos` (linha ~157): `processos: this.processos.map((processo) => ({ ...processo, setorCor: processo.setorCor ?? this.corDoSetor(processo.setorId) }))`; em `nomesDoCartao`: acrescentar `setorCor: this.corDoSetor(dados.setorId)`.
   - Corrigir os demais pontos que o `npm run typecheck` apontar por causa de `SetorDoQuadro.cor` obrigatório (literais `{ id, sigla, nome, ativo }` em testes): acrescentar `cor`.
-- [ ] **Passo 4: passar** — mesmos testes; depois `npm run typecheck` e `npm run lint`.
-- [ ] **Passo 5: commit** — `git add -A src && git commit -m "visual-do-cartao 04: a cor do setor chega ao processo e ao setor do Quadro"`.
+- [x] **Passo 4: passar** — mesmos testes; depois `npm run typecheck` e `npm run lint`.
+- [x] **Passo 5: commit** — `git add -A src && git commit -m "visual-do-cartao 04: a cor do setor chega ao processo e ao setor do Quadro"`.
 
 ### Tarefa 3: Quadradinho nas caixas de seleção de setor
 
@@ -221,7 +221,7 @@ test('traduz a cor do setor; sem ela vale a cor 1', () => {
 
 **Consome:** `OpcaoDaCaixa({ valor, rotulo, corDoSetor })`, `BotaoDaCaixa`, `Setor.cor` (cadastros).
 
-- [ ] **Passo 1: testes que falham.**
+- [x] **Passo 1: testes que falham.**
   - `filtrosDosProcessos.test.ts`: `opcoesDosFiltros({ etapas, processos }).setores` traz `corDoSetor` (processo com `setorCor: 13` → `{ valor: 's1', rotulo: 'TSA', corDoSetor: 13 }`; processo sem `setorCor` → `corDoSetor: 1`).
   - `src/App.corDoSetorNoQuadro.test.tsx` (novo, cabeçalho no padrão de `App.agruparPorSetor.test.tsx`: `beforeEach` com `window.location.hash = '#/processos'`, `afterEach(cleanup)`), dois testes:
 
@@ -237,8 +237,8 @@ test('o filtro Setor mostra o quadradinho da cor do setor, sem a cor no nome da 
 ```
 
     e, usando `montarNosCadastros({ ajustarCadastros })` de `src/testes/processosNosCadastros.tsx` com `cadastros.setores` de cor 13 e 1 (ver `SETORES_DE_TESTE`; passe `cor`), o teste "o campo Setor do Novo processo e do Editar mostra o quadradinho": abra a janela de Novo processo como em `src/App.cadastrarProcesso.test.tsx` e confira `within(screen.getByLabelText('Setor')).getByRole('option', { name: 'TSA — Setor A' })` com `corClaraDe(...)` igual a `'#C4D9F8'`; repita no Editar do processo `p1` (abra como em `App.editarProcesso*` — procure com `grep -l "Editar" src/App.*rocesso*.test.tsx`).
-- [ ] **Passo 2: ver falhar** — `npx vitest run src/processos/filtrosDosProcessos.test.ts src/App.corDoSetorNoQuadro.test.tsx`. Esperado: FAIL (sem quadradinho).
-- [ ] **Passo 3: implementar.**
+- [x] **Passo 2: ver falhar** — `npx vitest run src/processos/filtrosDosProcessos.test.ts src/App.corDoSetorNoQuadro.test.tsx`. Esperado: FAIL (sem quadradinho).
+- [x] **Passo 3: implementar.**
   - `filtrosDosProcessos.ts`: `OpcaoDoFiltro` ganha `corDoSetor?: number` (atualize o comentário: "`corDoSetor`, a do setor"); em `opcoesDosFiltros`: `setores: semRepetir(processos.map((p) => ({ valor: p.setorId, rotulo: p.setorSigla, corDoSetor: p.setorCor ?? 1 })))`. O `SeletorDoFiltro` já espalha a opção em `OpcaoDaCaixa`: nada a mudar em `FiltrosDosProcessos.tsx`.
   - `CamposDoProcesso.tsx`, campo Setor (import `{ BotaoDaCaixa, OpcaoDaCaixa }` já existe no arquivo para o macroprocesso):
 
@@ -253,14 +253,14 @@ test('o filtro Setor mostra o quadradinho da cor do setor, sem a cor no nome da 
 ```
 
   - **Reclassificar:** a spec (decisão 4) diz que a janela de Reclassificar usa o mesmo campo Setor, mas `JanelaDeReclassificacao.tsx` só troca o tipo e o processo pai (as opções de pai são "SIGLA — Nome", fora do escopo). Não há campo Setor para colorir ali; registre isso em `desvios.md` (Tarefa 8) como divergência spec × código, sem mexer na janela.
-- [ ] **Passo 4: passar** — mesmos testes, mais `npx vitest run src/App.cadastrarProcesso.test.tsx src/App.lista.test.tsx` (opções com o rótulo de sempre) e `npm run lint && npm run typecheck`.
-- [ ] **Passo 5: commit** — `git add -A src && git commit -m "visual-do-cartao 04: quadradinho da cor nas caixas de setor"`.
+- [x] **Passo 4: passar** — mesmos testes, mais `npx vitest run src/App.cadastrarProcesso.test.tsx src/App.lista.test.tsx` (opções com o rótulo de sempre) e `npm run lint && npm run typecheck`.
+- [x] **Passo 5: commit** — `git add -A src && git commit -m "visual-do-cartao 04: quadradinho da cor nas caixas de setor"`.
 
 ### Tarefa 4: Título da coluna por setor com o selo
 
 **Arquivos:** `src/processos/colunasDoQuadro.ts` (+ `colunasDoQuadro.test.ts`), `src/components/processos/ColunaDoQuadro.tsx`, `src/App.corDoSetorNoQuadro.test.tsx`.
 
-- [ ] **Passo 1: testes que falham.** `colunasDoQuadro.test.ts`: `colunasPorSetor([umSetor('s1', 'TSA', 'Setor A', true, 13)], [], null)[0]` tem `cor: 13`; as colunas de etapa e de responsável não têm `cor`. Tela (`App.corDoSetorNoQuadro.test.tsx`):
+- [x] **Passo 1: testes que falham.** `colunasDoQuadro.test.ts`: `colunasPorSetor([umSetor('s1', 'TSA', 'Setor A', true, 13)], [], null)[0]` tem `cor: 13`; as colunas de etapa e de responsável não têm `cor`. Tela (`App.corDoSetorNoQuadro.test.tsx`):
 
 ```ts
 test('no agrupamento por setor, a sigla do título leva o selo da cor, e a coluna inativa mantém a marca e a cor', async () => {
@@ -278,12 +278,12 @@ test('no agrupamento por setor, a sigla do título leva o selo da cor, e a colun
 ```
 
   Importe `corDoSetor` de `./cadastros/corDoSetor` no arquivo de teste (também usado nas Tarefas 5 e 7), em vez de fixar hexadecimais.
-- [ ] **Passo 2: ver falhar** — `npx vitest run src/processos/colunasDoQuadro.test.ts src/App.corDoSetorNoQuadro.test.tsx`.
-- [ ] **Passo 3: implementar.**
+- [x] **Passo 2: ver falhar** — `npx vitest run src/processos/colunasDoQuadro.test.ts src/App.corDoSetorNoQuadro.test.tsx`.
+- [x] **Passo 3: implementar.**
   - `colunasDoQuadro.ts`: `ColunaDoQuadro` ganha `/** Só no Quadro por setor: o número da cor do setor, para o selo do título. */ cor?: number`; em `colunasPorSetor`, no objeto da coluna: `cor: setor.cor`.
   - `ColunaDoQuadro.tsx`: no título, trocar `{coluna.titulo}` por `{coluna.cor === undefined ? coluna.titulo : <SeloDoSetor sigla={coluna.titulo} cor={coluna.cor} />}` (import `{ SeloDoSetor } from '../SeloDoSetor'`). O `aria-label` da seção (`rotuloDaColuna`) não muda.
-- [ ] **Passo 4: passar** — mesmos testes mais `npx vitest run src/App.agruparPorSetor.test.tsx` (o teste dos títulos por `textContent` segue igual).
-- [ ] **Passo 5: commit** — `git add -A src && git commit -m "visual-do-cartao 04: selo da cor no título da coluna por setor"`.
+- [x] **Passo 4: passar** — mesmos testes mais `npx vitest run src/App.agruparPorSetor.test.tsx` (o teste dos títulos por `textContent` segue igual).
+- [x] **Passo 5: commit** — `git add -A src && git commit -m "visual-do-cartao 04: selo da cor no título da coluna por setor"`.
 
 ### Tarefa 5: Faixa do setor no cartão do Quadro
 
@@ -291,7 +291,7 @@ test('no agrupamento por setor, a sigla do título leva o selo da cor, e a colun
 
 **Produz:** `FaixaDoCartao({ processo, agrupar })`.
 
-- [ ] **Passo 1: testes que falham** (`App.corDoSetorNoQuadro.test.tsx`; história citada em cada nome):
+- [x] **Passo 1: testes que falham** (`App.corDoSetorNoQuadro.test.tsx`; história citada em cada nome):
 
 ```ts
 test('por etapa, a faixa traz a sigla na cor do setor e o nome do processo segue no corpo (histórias 1, 2, 6, 7)', async () => {
@@ -329,8 +329,8 @@ test('o processo de setor inativo mantém a cor na faixa, e o parado continua co
 ```
 
   Se `dia(-30)` não bastar para o parado (a regra de dias vem de `diasDoProcessoParado`), use os mesmos campos do teste de parado de `App.cartaoDoQuadro.test.tsx`. Nos testes antigos que leem `.cartao-sigla` (`grep -rn "cartao-sigla" src --include=*.test.tsx`), trocar o seletor por `.cartao-faixa` (cartão) ou `.verso-cabecalho .selo-do-setor` (verso, Tarefa 6).
-- [ ] **Passo 2: ver falhar** — `npx vitest run src/App.corDoSetorNoQuadro.test.tsx`.
-- [ ] **Passo 3: implementar.**
+- [x] **Passo 2: ver falhar** — `npx vitest run src/App.corDoSetorNoQuadro.test.tsx`.
+- [x] **Passo 3: implementar.**
   - `SeloDoSetor.tsx`: prop opcional `className?: string`, concatenada: `` className={`selo-do-setor selo-do-setor-${variante}${className ? ` ${className}` : ''}`} ``.
   - `FaixaDoCartao.tsx`:
 
@@ -382,28 +382,28 @@ export function FaixaDoCartao({ processo, agrupar }: FaixaDoCartaoProps) {
 }
 ```
 
-- [ ] **Passo 4: passar** — `npx vitest run src/App.corDoSetorNoQuadro.test.tsx src/App.cartaoDoQuadro.test.tsx src/App.agruparPorSetor.test.tsx src/App.agruparPorResponsavel.test.tsx src/App.arrastarCartao*.test.tsx` (use o glob que existir) e `npm run lint && npm run typecheck`.
-- [ ] **Passo 5: commit** — `git add -A src && git commit -m "visual-do-cartao 04: faixa do setor no topo do cartão"`.
+- [x] **Passo 4: passar** — `npx vitest run src/App.corDoSetorNoQuadro.test.tsx src/App.cartaoDoQuadro.test.tsx src/App.agruparPorSetor.test.tsx src/App.agruparPorResponsavel.test.tsx src/App.arrastarCartao*.test.tsx` (use o glob que existir) e `npm run lint && npm run typecheck`.
+- [x] **Passo 5: commit** — `git add -A src && git commit -m "visual-do-cartao 04: faixa do setor no topo do cartão"`.
 
 ### Tarefa 6: Selo no cabeçalho do verso e na coluna Setor da Lista
 
 **Arquivos:** `CabecalhoDoVerso.tsx`, `TabelaDeProcessos.tsx`, `Verso.css`, `Quadro.css` (remover `.cartao-sigla`), testes `App.versoDoCartao.test.tsx` / `App.lista.test.tsx` ajustados e novos casos em `App.corDoSetorNoQuadro.test.tsx`.
 
-- [ ] **Passo 1: testes que falham.** Verso: abrir o processo (como em `App.versoDoCartao.test.tsx`) e conferir `.verso-cabecalho .selo-do-setor` com texto `TSA` e `--cor-claro` igual a `corDoSetor(13).claro`; a seção "Sobre" continua com o dado "Setor" em texto simples (`TSA`), sem `.selo-do-setor` dentro dela. Lista (`#/processos/lista`, como em `App.lista.test.tsx`): na linha do processo, a célula Setor contém `.selo-do-setor` com `TSA` e a cor; o nome acessível da célula continua `TSA`.
-- [ ] **Passo 2: ver falhar** — `npx vitest run src/App.corDoSetorNoQuadro.test.tsx`.
-- [ ] **Passo 3: implementar.**
+- [x] **Passo 1: testes que falham.** Verso: abrir o processo (como em `App.versoDoCartao.test.tsx`) e conferir `.verso-cabecalho .selo-do-setor` com texto `TSA` e `--cor-claro` igual a `corDoSetor(13).claro`; a seção "Sobre" continua com o dado "Setor" em texto simples (`TSA`), sem `.selo-do-setor` dentro dela. Lista (`#/processos/lista`, como em `App.lista.test.tsx`): na linha do processo, a célula Setor contém `.selo-do-setor` com `TSA` e a cor; o nome acessível da célula continua `TSA`.
+- [x] **Passo 2: ver falhar** — `npx vitest run src/App.corDoSetorNoQuadro.test.tsx`.
+- [x] **Passo 3: implementar.**
   - `CabecalhoDoVerso.tsx`: `<span className="cartao-sigla">{processo.setorSigla}</span>` → `<SeloDoSetor sigla={processo.setorSigla} cor={processo.setorCor ?? 1} className="verso-selo-do-setor" />` (import `{ SeloDoSetor } from '../SeloDoSetor'`).
   - `Verso.css`: `.verso-cabecalho .cartao-sigla { flex: none; margin-top: 2px; }` → `.verso-cabecalho .verso-selo-do-setor { flex: none; margin-top: 2px; }`.
   - `TabelaDeProcessos.tsx`: `<td>{linha.setorSigla}</td>` → `<td><SeloDoSetor sigla={linha.setorSigla} cor={linha.setorCor ?? 1} /></td>`.
   - `Quadro.css`: agora que nada usa `.cartao-sigla`, apagar a regra (`grep -rn "cartao-sigla" src` deve voltar vazio).
-- [ ] **Passo 4: passar** — `npx vitest run src/App.corDoSetorNoQuadro.test.tsx src/App.versoDoCartao.test.tsx src/App.lista.test.tsx` e, por segurança, a suíte de telas de processos: `npx vitest run src/App.*.test.tsx` (pode levar minutos); `npm run lint && npm run typecheck`.
-- [ ] **Passo 5: commit** — `git add -A src && git commit -m "visual-do-cartao 04: selo do setor no verso e na Lista"`.
+- [x] **Passo 4: passar** — `npx vitest run src/App.corDoSetorNoQuadro.test.tsx src/App.versoDoCartao.test.tsx src/App.lista.test.tsx` e, por segurança, a suíte de telas de processos: `npx vitest run src/App.*.test.tsx` (pode levar minutos); `npm run lint && npm run typecheck`.
+- [x] **Passo 5: commit** — `git add -A src && git commit -m "visual-do-cartao 04: selo do setor no verso e na Lista"`.
 
 ### Tarefa 7: A cor trocada no cadastro aparece no Quadro depois de recarregar
 
 **Arquivos:** `src/testes/processosNosCadastros.tsx`, `src/App.corDoSetorNoQuadro.test.tsx`.
 
-- [ ] **Passo 1: teste que falha** (história 23; depende da troca de cor do ticket 03, já na `main`):
+- [x] **Passo 1: teste que falha** (história 23; depende da troca de cor do ticket 03, já na `main`):
 
 ```ts
 test('trocar a cor do setor no cadastro muda a faixa do cartão na próxima vez que o Quadro carrega', async () => {
@@ -423,16 +423,16 @@ test('trocar a cor do setor no cadastro muda a faixa do cartão na próxima vez 
 ```
 
   Se a amostra "água claro" vier com o sufixo "em uso por …" no nome, use a cor 2 pelo nome que `grade.getAllByRole('radio')[1]` tiver (a ordem das amostras é a da paleta). O processo "Emitir Ofício" é o `p1` de `PROCESSOS_DOS_CADASTROS`, do setor `s1` (TSA).
-- [ ] **Passo 2: ver falhar** — a faixa ainda sai com a cor 1 (a falsa de processos não conhece os cadastros).
-- [ ] **Passo 3: implementar.** Em `montarNosCadastros`, depois de criar `processos`: `processos.corDoSetor = (setorId) => cadastros.setores.find((setor) => setor.id === setorId)?.cor ?? 1`. Em `SETORES_DE_TESTE`/no `.map` que cria `cadastros.setores`, passar `cor` (as fixtures sem cor valem 1).
-- [ ] **Passo 4: passar** — o teste novo e `npx vitest run src/App.corDoSetor.test.tsx`.
-- [ ] **Passo 5: commit** — `git add -A src && git commit -m "visual-do-cartao 04: a falsa de processos lê a cor atual dos cadastros"`.
+- [x] **Passo 2: ver falhar** — a faixa ainda sai com a cor 1 (a falsa de processos não conhece os cadastros).
+- [x] **Passo 3: implementar.** Em `montarNosCadastros`, depois de criar `processos`: `processos.corDoSetor = (setorId) => cadastros.setores.find((setor) => setor.id === setorId)?.cor ?? 1`. Em `SETORES_DE_TESTE`/no `.map` que cria `cadastros.setores`, passar `cor` (as fixtures sem cor valem 1).
+- [x] **Passo 4: passar** — o teste novo e `npx vitest run src/App.corDoSetor.test.tsx`.
+- [x] **Passo 5: commit** — `git add -A src && git commit -m "visual-do-cartao 04: a falsa de processos lê a cor atual dos cadastros"`.
 
 ### Tarefa 8: Fechamento
 
-- [ ] **Passo 1: gates.** `npm run lint`, `npm run typecheck`, `npm test` (tudo verde, anotar o total de testes); cobertura não cai (o pre-commit e o `/ship` conferem).
-- [ ] **Passo 2: banco no GitHub.** Branch já enviada; rodar "Testes de banco" na branch pela última vez e ler o resultado (todos os arquivos verdes, o 67 com 7 de 7).
-- [ ] **Passo 3: `[visual]` (critérios 9 e 10 do ticket).** Se a vitrine local subir (veja o `.claude/launch.json`; usa módulos falsos), conferir em 1366×768: faixa de lado a lado nas 30 cores incluindo nome longo, faixa vermelha do parado visível, título/selo do verso/selo da Lista/quadradinho com a mesma cor, sem estourar a largura. Sem login real, o que não for visto fica **presumido** e anotado no `desvios.md` e no `proximo-passo.md`.
-- [ ] **Passo 4: registros.** Em `.scratch/visual-do-cartao/desvios.md` (só acrescentar, com data): a divergência do Reclassificar (sem campo Setor ali), qualquer ajuste que o código pediu, e o que ficou presumido. Marcar as caixas do ticket 04 que foram cumpridas.
+- [x] **Passo 1: gates.** `npm run lint`, `npm run typecheck`, `npm test` (tudo verde, anotar o total de testes); cobertura não cai (o pre-commit e o `/ship` conferem).
+- [x] **Passo 2: banco no GitHub.** Branch já enviada; rodar "Testes de banco" na branch pela última vez e ler o resultado (todos os arquivos verdes, o 67 com 7 de 7).
+- [x] **Passo 3: `[visual]` (critérios 9 e 10 do ticket).** Se a vitrine local subir (veja o `.claude/launch.json`; usa módulos falsos), conferir em 1366×768: faixa de lado a lado nas 30 cores incluindo nome longo, faixa vermelha do parado visível, título/selo do verso/selo da Lista/quadradinho com a mesma cor, sem estourar a largura. Sem login real, o que não for visto fica **presumido** e anotado no `desvios.md` e no `proximo-passo.md`.
+- [x] **Passo 4: registros.** Em `.scratch/visual-do-cartao/desvios.md` (só acrescentar, com data): a divergência do Reclassificar (sem campo Setor ali), qualquer ajuste que o código pediu, e o que ficou presumido. Marcar as caixas do ticket 04 que foram cumpridas.
 - [ ] **Passo 5: juntar à principal** (`git switch main`, `git merge visual-do-cartao-04` por `finishing-a-development-branch`, `git branch -d visual-do-cartao-04`; se o `-d` recusar, pare e pergunte), enviar a `main` ao GitHub (autorizado) e conferir o "Testes de banco" na `main`.
 - [ ] **Passo 6: linha de conclusão** no fim do ticket 04 (`Concluído em 2026-10-27 (commit <hash>)`), `.scratch/proximo-passo.md` atualizado (próximo: `/polir` e depois `/ship`, obrigatório pela migração; o `[visual]` da grade, do 01, 02 e 04 ainda a conferir com o login real), anotação em `.scratch/melhorias-protocolo.md` do que aconteceu dos itens não testados do `/executar-complexo`, e commit.
