@@ -16,5 +16,5 @@
   display: block;
   padding: 6px 12px;
   text-align: center;
-  font-size: 1.125rem;
+  font-size: var(--tam-painel);
 }

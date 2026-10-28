@@ -168,6 +168,7 @@
 }
 
 /* Faixa do setor: de lado a lado no topo do cartão, por cima do padding. */
+/* O raio vale o do cartão menos a borda de 1px, para a faixa encostar no canto de dentro. */
 .cartao-faixa {
   margin: calc(-1 * var(--esp-3)) calc(-1 * var(--esp-3)) 0;
   border-radius: calc(var(--canto) - 1px) calc(var(--canto) - 1px) 0 0;
@@ -175,7 +176,7 @@
 
 /* Por setor a faixa leva o nome do processo: 16px, negrito, quebrando linha dentro dela. */
 .cartao-faixa-nome {
-  font-size: 1rem;
+  font-size: var(--tam-coluna);
   font-weight: 700;
   overflow-wrap: anywhere;
 }
