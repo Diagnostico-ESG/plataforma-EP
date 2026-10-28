@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maquete: altura da cor</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--fundo:#edf1f9;--folha:#fff;--linha:#e1e6ef;--texto:#1e2433;--texto-2:#5d6577;--canto:8px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fundo);font-family:'Source Sans 3',system-ui,sans-serif;color:var(--texto);padding:24px 16px}
+h1{font-size:22px;margin:0 0 4px}
+.intro{color:var(--texto-2);margin:0 0 24px;font-size:15px;max-width:780px}
+.opcao{margin-bottom:32px}
+.opcao h2{font-size:18px;margin:0 0 2px}
+.opcao p{margin:0 0 12px;color:var(--texto-2);font-size:14px;max-width:780px}
+/* A área do Quadro: altura fixa, como a tela de 1366x768 menos o topo */
+.quadro{display:flex;gap:16px;overflow-x:auto;height:560px;padding:12px;background:var(--fundo);border:1px dashed #c3cad8;border-radius:12px}
+.col{flex:0 0 260px;display:flex;flex-direction:column;gap:8px;border-radius:12px;padding-bottom:4px}
+.tinta{background:color-mix(in srgb,var(--c1) 30%,#fff)}
+.b .col{align-self:flex-start}
+.tit{border-radius:12px 12px 0 0;background:linear-gradient(90deg,var(--c1),var(--c2));padding:8px 12px;text-align:center;position:relative}
+.tit b{display:block;font-size:18px}
+.tit .cont{position:absolute;right:12px;top:10px;font-size:13px;font-weight:600}
+.sub{font-size:13px;color:var(--texto-2)}
+.cards{display:flex;flex-direction:column;gap:8px;padding:4px 8px}
+.vazia{margin:4px 12px 8px;font-size:13px;color:var(--texto-2);text-align:center}
+.card{background:var(--folha);border:1px solid var(--linha);border-radius:var(--canto);padding:12px;display:flex;flex-direction:column;gap:8px}
+.nome{font-size:15px;font-weight:600;line-height:1.25}
+.barra-t{display:flex;justify-content:space-between;font-size:12px;color:var(--texto-2)}
+.trilho{height:6px;border-radius:3px;background:#e1e6ef;overflow:hidden}
+.trilho i{display:block;height:100%;background:linear-gradient(90deg,#c9d3ff,#2238c8);border-radius:3px}
+.rodape{display:flex;justify-content:space-between;align-items:center}
+.av{width:20px;height:20px;border-radius:50%;background:#d9dfff;font-size:10px;display:grid;place-items:center;color:#2a44c9;font-weight:700}
+.et{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:2px 9px 2px 7px;border-radius:999px;color:#fff}
+.et::before{content:"";width:6px;height:6px;border-radius:50%;background:#fff}
+.faz{background:#be185d}.and{background:#4338ca}.ok{background:#0f766e}
+</style></head><body>
+<h1>Quadro por setor: até onde vai a cor da coluna</h1>
+<p class="intro">Dados inventados. Etiquetas já com as cores escolhidas (A fazer magenta, Em andamento índigo, Finalizado verde-petróleo). A área tracejada é a altura do Quadro numa tela de 1366×768; role para o lado para ver mais setores.</p>
+<div id="opcoes"></div>
+<script>
+const SETORES=[
+ ['SAF','Secretaria de Apoio Financeiro','#C4D9F8','#ACBFDA',[['Pagamento de diárias','Modelagem',4,'and','MR'],['Conciliação bancária mensal','Levantamento',2,'faz','JC']]],
+ ['SCI','Secretaria de Controle Interno','#C4F8D9','#ACDABF',[]],
+ ['SGP','Secretaria de Gestão de Pessoas','#F8D9C4','#DABFAC',[['Concessão de férias','Validação',7,'ok','AL'],['Admissão de servidores','Modelagem',3,'and','RS'],['Avaliação de desempenho','Levantamento',1,'faz','TP']]],
+ ['SJU','Secretaria Jurídica','#EDC4F8','#D0ACDA',[]],
+ ['SLC','Secretaria de Licitações','#F8EDC4','#DAD0AC',[['Pregão eletrônico','Revisão interna',6,'and','BF']]],
+ ['STI','Secretaria de Tecnologia','#C4EDF8','#ACD0DA',[]],
+];
+const ROT={faz:'A fazer',and:'Em andamento',ok:'Finalizado'};
+const coluna=([sig,nome,c1,c2,cs])=>`<div class="col tinta" style="--c1:${c1};--c2:${c2}"><div class="tit"><b>${sig}</b><span class="sub">${nome}</span><span class="cont">${cs.length}</span></div>
+${cs.length?`<div class="cards">${cs.map(([n,e,p,k,a])=>`<div class="card"><span class="nome">${n}</span><div><div class="barra-t"><span>${e}</span><span>${p}/8</span></div><div class="trilho"><i style="width:${p/8*100}%"></i></div></div><div class="rodape"><span class="et ${k}">${ROT[k]}</span><span class="av">${a}</span></div></div>`).join('')}</div>`:'<p class="vazia">Nenhum processo deste setor no Quadro.</p>'}</div>`;
+const OPCOES=[['a','A · Altura toda','Cada coluna é uma faixa colorida até a base do Quadro, mesmo vazia.'],
+ ['b','B · Só até o último cartão','A cor envolve o cabeçalho e os cartões; abaixo, o cinza do fundo. A coluna vazia fica só com o cabeçalho e a frase.']];
+document.getElementById('opcoes').innerHTML=OPCOES.map(([c,t,d])=>`<section class="opcao ${c}"><h2>${t}</h2><p>${d}</p><div class="quadro">${SETORES.map(coluna).join('')}</div></section>`).join('');
+</script>
+</body></html>

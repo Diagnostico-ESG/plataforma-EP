@@ -29,6 +29,15 @@
         ],
         "createdAt": "2026-10-19T18:51:03.807Z",
         "reason": "assistant: a barrinha amarela do selo Reunião é pedida pela spec de processos-etapas (Selos, item 4) e repete a marca de .reuniao-data; não é borda de cartão"
+      },
+      {
+        "rule": "ai-color-palette",
+        "value": "*",
+        "files": [
+          ".scratch/visual-do-cartao/imagens/maquete-etiquetas.html"
+        ],
+        "createdAt": "2026-10-28T13:36:20.041Z",
+        "reason": "Claude: degradê violeta é a opção 4 descartada numa maquete de comparação; a opção escolhida (2) não usa degradê"
       }
     ]
   }

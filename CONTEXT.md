@@ -97,7 +97,7 @@ A primeira etapa do catálogo, onde entra todo processo cadastrado e fica o que 
 _Avoid_: backlog, a fazer (para a etapa), pendentes
 
 **Fase do Regimento**:
-Cada uma das nove fases do mapeamento definidas no art. 8º do Regimento Interno do EP (I a IX), pelas quais os dashboards contam o andamento. Cada etapa do catálogo pertence a uma fase; uma fase pode juntar várias etapas (a VI junta Revisão interna, Validação com o setor e Aprovação pelo setor). As fases I a III não têm etapa, porque foram feitas fora da plataforma para todos os setores, e contam sempre como concluídas. As outras contam pela posição do processo no catálogo: concluída quando ele está numa etapa depois dela, na última etapa dela com a etiqueta Concluído, ou em Concluídos (a VII, só com a publicação registrada); em andamento quando ele está numa etapa dela; não iniciada no resto.
+Cada uma das nove fases do mapeamento definidas no art. 8º do Regimento Interno do EP (I a IX), pelas quais os dashboards contam o andamento. Cada etapa do catálogo pertence a uma fase; uma fase pode juntar várias etapas (a VI junta Revisão interna, Validação com o setor e Aprovação pelo setor). As fases I a III não têm etapa, porque foram feitas fora da plataforma para todos os setores, e contam sempre como concluídas. As outras contam pela posição do processo no catálogo: concluída quando ele está numa etapa depois dela, na última etapa dela com a etiqueta Finalizado, ou em Concluídos (a VII, só com a publicação registrada); em andamento quando ele está numa etapa dela; não iniciada no resto.
 _Avoid_: etapa (para a fase), etapa do Regimento, macroetapa
 
 **Etapa atual**:
@@ -109,7 +109,7 @@ Levar o processo para qualquer etapa do catálogo, para a frente ou para trás, 
 _Avoid_: avançar, voltar a uma etapa, concluir a etapa, iniciar a etapa, dispensar
 
 **Etiqueta**:
-Marca da etapa atual do processo: **A fazer**, **Em andamento** ou **Concluído**. Concluído quer dizer que a parte de quem estava na etapa terminou e o processo espera o próximo pegá-lo; não conclui o processo.
+Marca da etapa atual do processo: **A fazer**, **Em andamento** ou **Finalizado**. Finalizado quer dizer que a parte de quem estava na etapa terminou e o processo espera o próximo pegá-lo; não conclui o processo (isso é a etapa Concluídos). No banco, o valor continua `concluido`.
 _Avoid_: tag, status, situação (para a etiqueta)
 
 **Processo parado**:
