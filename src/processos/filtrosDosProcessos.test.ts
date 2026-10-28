@@ -69,7 +69,7 @@ test('opções: sem repetição, na ordem certa; a etapa de filtro é só das at
     { id: 'e9', codigo: 'concluidos', nome: 'Concluídos', ordem: 9, ativa: true },
   ]
   const opcoes = opcoesDosFiltros({ etapas, processos: [...PROCESSOS].reverse() })
-  expect(opcoes.setores).toEqual([{ valor: 's1', rotulo: 'TSA' }, { valor: 's2', rotulo: 'TSB' }])
+  expect(opcoes.setores).toEqual([{ valor: 's1', rotulo: 'TSA', corDoSetor: 1 }, { valor: 's2', rotulo: 'TSB', corDoSetor: 1 }])
   expect(opcoes.macroprocessos).toEqual([
     { valor: 'm2', rotulo: 'Macro Dois', cor: corDoMacroprocesso('m2') },
     { valor: 'm1', rotulo: 'Macro Um', cor: corDoMacroprocesso('m1') },
@@ -87,4 +87,9 @@ test('opções: sem repetição, na ordem certa; a etapa de filtro é só das at
   ])
   expect(opcoes.tipos.map((o) => o.rotulo)).toEqual(['Processo', 'Subprocesso', 'A classificar'])
   expect(opcoes.situacoes.map((o) => o.rotulo)).toEqual(['Em andamento', 'Suspenso', 'Cancelado', 'Concluído'])
+})
+
+test('a opção do filtro Setor leva a cor do setor; sem a cor vale a 1', () => {
+  const opcoes = opcoesDosFiltros({ etapas: [], processos: [processo('Um', { setorCor: 13 }), processo('Dois', { setorId: 's2', setorSigla: 'TSB' })] })
+  expect(opcoes.setores).toEqual([{ valor: 's1', rotulo: 'TSA', corDoSetor: 13 }, { valor: 's2', rotulo: 'TSB', corDoSetor: 1 }])
 })

@@ -33,9 +33,10 @@ export function CamposDoFormulario({ campos, opcoes, cadastrando, aoMudar }: Cam
         onChange={(evento) => aoMudar({ nome: evento.target.value })} />
       <label htmlFor={`${id}-setor`}>Setor</label>
       <select id={`${id}-setor`} aria-required="true" value={campos.setorId} onChange={(evento) => aoMudar({ setorId: evento.target.value })}>
+        <BotaoDaCaixa />
         <option value="">Escolha o setor</option>
         {opcoes.setores.filter((setor) => setor.ativo || setor.id === campos.setorId).map((setor) => (
-          <option key={setor.id} value={setor.id}>{setor.sigla} — {setor.nome}</option>
+          <OpcaoDaCaixa key={setor.id} valor={setor.id} rotulo={`${setor.sigla} — ${setor.nome}`} corDoSetor={setor.cor} />
         ))}
       </select>
       <CampoDoMacroprocesso id={id} campos={campos} macroprocessos={opcoes.macroprocessos} aoMudar={aoMudar} />
