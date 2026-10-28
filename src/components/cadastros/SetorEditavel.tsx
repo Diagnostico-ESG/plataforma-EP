@@ -1,6 +1,7 @@
 import { CadastroInexistente } from '../../cadastros/cadastroInexistente'
 import type { DadosDoSetor, ModuloDeCadastros, SetorComMacroprocessos } from '../../cadastros/tipos'
 import { textoDaExclusaoDoSetor } from '../../cadastros/textosDeExclusao'
+import { SeloDoSetor } from '../SeloDoSetor'
 import { AcoesDoCadastro } from './AcoesDoCadastro'
 import { FormularioDeSetor } from './FormularioDeSetor'
 import { MacroprocessosDoSetor } from './MacroprocessosDoSetor'
@@ -27,6 +28,7 @@ export function SetorEditavel({ cadastros, setor, aoVoltar, aoSumir, aoMudar }: 
 
   return (
     <div className="cadastros-secao">
+      <SeloDoSetor sigla={setor.sigla} cor={setor.cor} />
       <FormularioDeSetor titulo={`Setor ${setor.sigla}`} inicial={setor} rotuloDoCancelar="Voltar à lista"
         aoSalvar={salvar} aoCancelar={aoVoltar} />
       <MacroprocessosDoSetor macroprocessos={setor.macroprocessos} />

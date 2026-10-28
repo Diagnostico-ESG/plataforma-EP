@@ -60,13 +60,21 @@
   --neutra-texto: #4a5163;
   --neutra-fundo: #eef0f4;
 
-  /* Etiquetas da etapa (cartão e Lista): pares tirados do esboço da opção A; texto com 4,5:1 ou mais sobre o fundo */
-  --etiqueta-a-fazer-texto: #4a5163;
-  --etiqueta-a-fazer-fundo: #eef0f4;
-  --etiqueta-em-andamento-texto: #9a4a06;
-  --etiqueta-em-andamento-fundo: #ffe9d1;
-  --etiqueta-concluido-texto: #22703a;
-  --etiqueta-concluido-fundo: #ddf3e1;
+  /* Etiquetas da etapa (cartão, Lista e Agora): cores vivas, texto com 4,5:1 ou mais sobre o fundo (identidade, acréscimo de 2026-10-27) */
+  --etiqueta-a-fazer-texto: #ffffff;
+  --etiqueta-a-fazer-fundo: #6a3fd9;
+  --etiqueta-a-fazer-bolinha: #ffffff;
+  --etiqueta-em-andamento-texto: #5e2c00;
+  --etiqueta-em-andamento-fundo: #ffc27a;
+  --etiqueta-em-andamento-bolinha: #c85f00;
+  --etiqueta-concluido-texto: #0d4a22;
+  --etiqueta-concluido-fundo: #9ee0b4;
+  --etiqueta-concluido-bolinha: #178a3e;
+
+  /* Barra da etapa: trilho cinza claro e degradê do azul claro ao azul escuro */
+  --barra-etapa-trilho: #e1e6ef;
+  --barra-etapa-inicio: #c9d3ff;
+  --barra-etapa-fim: #2238c8;
 
   /* Caixas de aviso */
   --ajuda-fundo: #eef2ff;

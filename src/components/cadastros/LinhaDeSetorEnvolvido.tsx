@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { ModuloDeCadastros, SetorEnvolvido } from '../../cadastros/tipos'
 import { useGravacaoComFalha } from '../../hooks/useGravacaoComFalha'
 import { Pilula } from '../Pilula'
+import { SeloDoSetor } from '../SeloDoSetor'
 
 type LinhaDeSetorEnvolvidoProps = {
   cadastros: ModuloDeCadastros
@@ -24,7 +25,7 @@ export function LinhaDeSetorEnvolvido({ cadastros, macroprocessoId, setor, aoMud
 
   return (
     <tr>
-      <td>{setor.sigla}</td>
+      <td><SeloDoSetor sigla={setor.sigla} cor={setor.cor} /></td>
       <td>{setor.nome}{!setor.ativo && <> <Pilula situacao="neutra">Inativo</Pilula></>}</td>
       <td>
         <input className="observacao-do-setor" aria-label={`Observação de ${setor.sigla}`} value={texto}

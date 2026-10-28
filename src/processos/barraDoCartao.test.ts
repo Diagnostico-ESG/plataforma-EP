@@ -2,29 +2,29 @@ import { describe, expect, test } from 'vitest'
 import { barraDoCartao } from './barraDoCartao'
 import type { ProcessoDaLista } from './tipos'
 
-function processo(posicao: number | null, total = 8): ProcessoDaLista {
+function processo(posicao: number | null, total = 8, nome = 'Revisão interna'): ProcessoDaLista {
   return {
     id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
     macroprocessoNome: 'Macro', processoPaiId: null, situacao: 'em_andamento', responsavel: null,
-    etapaAtual: posicao === null ? null : { id: 'e', codigo: 'revisao_interna', nome: 'Revisão interna', ordem: posicao, posicao, total },
+    etapaAtual: posicao === null ? null : { id: 'e', codigo: 'revisao_interna', nome, ordem: posicao, posicao, total },
   }
 }
 
 describe('barraDoCartao', () => {
-  test('um pedaço por etapa ativa: anteriores preenchidas, a atual destacada e as seguintes vazias', () => {
-    const barra = barraDoCartao(processo(4))
-    expect(barra?.pedacos).toHaveLength(8)
-    expect(barra?.pedacos.map((pedaco) => pedaco.estado)).toEqual([
-      'resolvida', 'resolvida', 'resolvida', 'atual', 'seguinte', 'seguinte', 'seguinte', 'seguinte',
-    ])
+  test('a fração preenchida é a posição da etapa atual sobre o total', () => {
+    expect(barraDoCartao(processo(4))?.fracao).toBe(0.5)
   })
 
-  test('em Não iniciados só a primeira está destacada', () => {
-    expect(barraDoCartao(processo(1))?.pedacos.map((pedaco) => pedaco.estado).slice(0, 2)).toEqual(['atual', 'seguinte'])
+  test('em Não iniciados só o primeiro trecho está preenchido', () => {
+    expect(barraDoCartao(processo(1))?.fracao).toBe(1 / 8)
   })
 
-  test('em Concluídos, a barra inteira está preenchida', () => {
-    expect(barraDoCartao(processo(8))?.pedacos.every((pedaco) => pedaco.estado === 'resolvida')).toBe(true)
+  test('em Concluídos, a barra está cheia', () => {
+    expect(barraDoCartao(processo(8, 8, 'Concluídos'))?.fracao).toBe(1)
+  })
+
+  test('com etapa desativada no catálogo, a fração usa só as etapas ativas que restaram', () => {
+    expect(barraDoCartao(processo(3, 6))?.fracao).toBe(0.5)
   })
 
   test('o nome acessível diz a posição, o total e a etapa atual', () => {

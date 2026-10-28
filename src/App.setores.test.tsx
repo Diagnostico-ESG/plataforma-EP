@@ -3,9 +3,8 @@ import { afterEach, beforeEach, expect, test } from 'vitest'
 import App from './App'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import type { Perfil } from './acesso/tipos'
-import { CadastrosFalso } from './cadastros/CadastrosFalso'
+import { CadastrosFalso, type SetorDoTeste } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
-import type { Setor } from './cadastros/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
 import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
@@ -18,7 +17,7 @@ afterEach(() => {
   window.location.hash = ''
 })
 
-const SETORES: Setor[] = [
+const SETORES: SetorDoTeste[] = [
   { id: 's1', sigla: 'AFT', nome: 'Assessoria Fictícia de Teste', observacoes: null, ativo: true },
   { id: 's2', sigla: 'CIT', nome: 'Coordenação Inventada de Teste', observacoes: 'Nota inventada', ativo: true },
   { id: 's3', sigla: 'EXT', nome: 'Setor Extinto de Teste', observacoes: null, ativo: false },

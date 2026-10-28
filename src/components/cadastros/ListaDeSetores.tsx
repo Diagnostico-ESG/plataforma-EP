@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { SetorDaLista } from '../../cadastros/tipos'
 import type { EstadoDoCarregamento } from '../../hooks/useCarregamento'
 import { Pilula } from '../Pilula'
+import { SeloDoSetor } from '../SeloDoSetor'
 import { ErroAoCarregar } from './ErroAoCarregar'
 import { CaixaMostrarInativos, LinhaFantasma } from './PecasDaLista'
 
@@ -55,7 +56,9 @@ function TabelaDeSetores({ carregando, setores, aoAbrir }: TabelaDeSetoresProps)
 function LinhaDeSetor({ setor, aoAbrir }: { setor: SetorDaLista; aoAbrir: (id: string) => void }) {
   return (
     <tr className="linha-clicavel" onClick={() => aoAbrir(setor.id)}>
-      <td><button type="button" className="cadastros-abrir">{setor.sigla}</button></td>
+      <td><button type="button" className="cadastros-abrir">
+        <SeloDoSetor sigla={setor.sigla} cor={setor.cor} />
+      </button></td>
       <td>{setor.nome}</td>
       <td>{setor.quantidadeDeMacroprocessos}</td>
       <td>{!setor.ativo && <Pilula situacao="neutra">Inativo</Pilula>}</td>
