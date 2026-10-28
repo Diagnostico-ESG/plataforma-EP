@@ -2,6 +2,8 @@
 
 Status: ready-for-agent
 
+**Repositório de processos (mudança de 2026-10-28, spec própria).** A funcionalidade 14, `.scratch/repositorio-de-processos/spec.md` (ADR 0034), acaba com o Arquivado (marca, trava, selo, filtro, Arquivar e Desarquivar): onde esta spec fala em arquivado, vale aquela. Ela também traz Tirar do Quadro, a coluna Concluídos com saída após 30 dias, Todos | Concluídos, os cancelados fora das visualizações, a Lista com filtro e ordenação por coluna e Agrupar por Macroprocesso, e a etiqueta Iniciado.
+
 **Como resolve o problema (desde 2026-10-23, Andamento livre).** Concluídos passa a ser a última etapa do catálogo, e o processo chega lá movido como em qualquer outra etapa. Para que não se conte como publicado o que não foi, a chegada pede uma de duas coisas:
 
 - a **data da publicação**, com o link se houver; ou
@@ -554,3 +556,5 @@ A atualização dos dados roda com os gatilhos de evento desligados, como na mig
 
 Entregue em 2026-10-23 (commit ae1fb54), com ressalva: critérios [visual] da publicacao-e-arquivamento presumidos (coluna Concluídos, pergunta na janela, selos "Não publicado" e "Arquivado", Agora do concluído e do arquivado não foram vistos na tela); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
 Entregue em 2026-10-25 (commit cc17e13), com ressalva: critérios [visual] vistos só na vitrine local, com módulos falsos (as janelas de registrar revisão e aprovação e qualquer tela com o login real não foram vistas); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
+
+Em revisão desde 2026-10-28
