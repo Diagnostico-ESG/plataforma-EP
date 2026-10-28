@@ -1718,3 +1718,5 @@ Entregue em 2026-10-28 (commit 1af2485), com ressalva: critérios [visual] 6 a 8
 Implementado em 2026-10-28 (commit f1d045f) — seção "Coluna tingida e etiquetas fortes"; polida em 2026-10-28; os critérios [visual] 6 a 8 seguem por conferir com o login real.
 
 Em revisão desde 2026-10-28
+
+Implementado em 2026-10-28 (commit 8d8cb7a) — seção "Ajustes do Quadro e da Lista"; os critérios [visual] 4 a 7 seguem por conferir com o login real.
