@@ -8,6 +8,7 @@ import { Avatar } from '../Avatar'
 import { Pilula } from '../Pilula'
 import { BarraDeProgresso } from './BarraDeProgresso'
 import { EtiquetaDoProcesso } from './EtiquetaDoProcesso'
+import { FaixaDoCartao } from './FaixaDoCartao'
 import { SelosDoCartao } from './SelosDoCartao'
 
 type CartaoDoProcessoProps = {
@@ -20,7 +21,7 @@ type CartaoDoProcessoProps = {
   apagado: boolean
   /**
    * O cartão não repete o que a coluna já diz: fora do Quadro por etapa traz a barra da etapa; por responsável dispensa o
-   * avatar e o selo Sem responsável; por setor dispensa a sigla.
+   * avatar e o selo Sem responsável; por setor a faixa leva o nome do processo no lugar da sigla.
    */
   agrupar: AgruparQuadroPor
   /** As etapas do catálogo: o selo de relatório pendente compara a posição da etapa atual com a da Revisão interna. */
@@ -31,7 +32,7 @@ type CartaoDoProcessoProps = {
 
 /** O cartão do Quadro é um link: focável, e Enter abre o painel do processo. Arrastar usa o recurso nativo do navegador. */
 export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagado, agrupar, etapas, aoLevantar, aoBaixar }: CartaoDoProcessoProps) {
-  const { id, nome, tipo, setorSigla, situacao } = processo
+  const { id, nome, tipo, situacao } = processo
   const porResponsavel = agrupar === 'responsavel'
   function comecarAArrastar(evento: DragEvent<HTMLAnchorElement>) {
     // O Firefox só inicia o arrastar se houver algum dado na transferência.
@@ -43,12 +44,8 @@ export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagad
     // O <a> se arrasta por padrão (leva o endereço): fora dos casos permitidos, draggable="false" a impede.
     <a id={`cartao-${id}`} className={classesDoCartao(processo, apagado)} href={href} aria-current={escolhido ? 'true' : undefined}
       draggable={arrastavel} onDragStart={arrastavel ? comecarAArrastar : undefined} onDragEnd={arrastavel ? aoBaixar : undefined}>
-      {agrupar !== 'setor' && (
-        <span className="cartao-topo">
-          <span className="cartao-sigla">{setorSigla}</span>
-        </span>
-      )}
-      <span className="cartao-nome">{nome}</span>
+      <FaixaDoCartao processo={processo} agrupar={agrupar} />
+      {agrupar !== 'setor' && <span className="cartao-nome">{nome}</span>}
       {agrupar !== 'etapa' && <BarraDeProgresso processo={processo} />}
       <SelosDoCartao processo={processo} hoje={hojeEmBrasilia()} etapas={etapas} semSeloDeResponsavel={porResponsavel} />
       <span className="cartao-rodape">

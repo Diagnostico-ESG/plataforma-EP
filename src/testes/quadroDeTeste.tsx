@@ -61,6 +61,7 @@ export function montar(
 
 /** O cartão do processo pelo nome, depois que o Quadro carregou. */
 export async function cartaoDe(nome: string): Promise<HTMLElement> {
-  const nomeNoCartao = await screen.findByText(nome, { selector: '.cartao-nome' })
+  // Por setor o nome do processo fica na faixa do cartão, e não no corpo.
+  const nomeNoCartao = await screen.findByText(nome, { selector: '.cartao-nome, .cartao-faixa-nome' })
   return nomeNoCartao.closest('a') as HTMLElement
 }

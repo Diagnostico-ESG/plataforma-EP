@@ -51,20 +51,21 @@ test('o setor inativo só tem coluna com processo, marcada Inativo, na ordem de 
 
 test('o cartão traz a barra da etapa, a etiqueta e o avatar, sem a sigla, e não se arrasta', async () => {
   abrir([doSetor('Emitir Ofício', TSA)])
-  expect((await cartaoDe('Emitir Ofício')).querySelector('.cartao-sigla')?.textContent).toBe('TSA')
+  expect((await cartaoDe('Emitir Ofício')).querySelector('.cartao-faixa')?.textContent).toBe('TSA')
   await trocar('Setor')
   const cartao = await cartaoDe('Emitir Ofício')
   expect(cartao.querySelector('.barra-etapa-texto')?.textContent).toBe('Revisão interna · 4 de 8')
   expect(cartao.querySelector('.etiqueta')?.textContent).toBe('A fazer')
   expect(cartao.querySelector('.avatar')).not.toBeNull()
-  expect(cartao.querySelector('.cartao-sigla')).toBeNull()
+  expect(cartao.querySelector('.cartao-faixa')?.textContent).toBe('Emitir Ofício')
+  expect(cartao.textContent).not.toContain('TSA')
   expect(cartao.getAttribute('draggable')).toBe('false')
 })
 
 test('o cartão não mostra o nome do macroprocesso em nenhum agrupamento, e por setor não tem linha de topo vazia', async () => {
   abrir([doSetor('Emitir Ofício', TSA)])
   expect((await cartaoDe('Emitir Ofício')).textContent).not.toContain('Macro de Teste')
-  expect((await cartaoDe('Emitir Ofício')).querySelector('.cartao-sigla')?.textContent).toBe('TSA')
+  expect((await cartaoDe('Emitir Ofício')).querySelector('.cartao-faixa')?.textContent).toBe('TSA')
   await trocar('Setor')
   const porSetor = await cartaoDe('Emitir Ofício')
   expect(porSetor.textContent).not.toContain('Macro de Teste')

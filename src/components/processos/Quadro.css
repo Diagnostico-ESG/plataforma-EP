@@ -167,12 +167,17 @@
   box-shadow: 0 0 0 1px var(--azul);
 }
 
-.cartao-topo {
-  display: flex;
-  align-items: center;
-  gap: var(--esp-2);
-  color: var(--texto-2);
-  font-size: var(--tam-secundario);
+/* Faixa do setor: de lado a lado no topo do cartão, por cima do padding. */
+.cartao-faixa {
+  margin: calc(-1 * var(--esp-3)) calc(-1 * var(--esp-3)) 0;
+  border-radius: calc(var(--canto) - 1px) calc(var(--canto) - 1px) 0 0;
+}
+
+/* Por setor a faixa leva o nome do processo: 16px, negrito, quebrando linha dentro dela. */
+.cartao-faixa-nome {
+  font-size: 1rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
 .cartao-sigla {
@@ -408,6 +413,12 @@ td .barra-etapa {
 .cartao.cartao-parado:hover,
 .cartao.cartao-parado[aria-current='true'] {
   border-left-color: var(--atraso-texto);
+}
+
+/* A faixa do setor recua o mesmo que o padding do parado perdeu, e a ponta esquerda fica reta junto da borda vermelha. */
+.cartao-parado .cartao-faixa {
+  margin-left: calc(-1 * (var(--esp-3) - 3px));
+  border-top-left-radius: 0;
 }
 
 /* Lista: o selo de parado fica ao lado do nome. */

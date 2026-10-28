@@ -8,7 +8,7 @@ import { ProcessosFalso } from './processos/ProcessosFalso'
 import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
 import { umSetor } from './testes/processoDaLista'
-import { montar, processo } from './testes/quadroDeTeste'
+import { cartaoDe, dia, montar, processo } from './testes/quadroDeTeste'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
 beforeEach(() => {
@@ -55,4 +55,38 @@ test('no agrupamento por setor, a sigla do título leva o selo da cor, e a colun
   expect(seloDe('MNO')?.style.getPropertyValue('--cor-claro')).toBe(corDoSetor(22).claro)
   expect(coluna.getByText('Inativo')).toBeTruthy()
   expect(coluna.getByText('Setor Antigo')).toBeTruthy()
+})
+
+const faixaDe = (cartao: HTMLElement) => cartao.querySelector('.cartao-faixa') as HTMLElement
+
+test('por etapa, a faixa traz a sigla na cor do setor e o nome do processo segue no corpo', async () => {
+  montar([processo('Emitir Ofício', { processo: { setorSigla: 'TSA', setorCor: 13 } })])
+  const cartao = await cartaoDe('Emitir Ofício')
+  expect(faixaDe(cartao).textContent).toBe('TSA')
+  expect(faixaDe(cartao).style.getPropertyValue('--cor-claro')).toBe(corDoSetor(13).claro)
+  expect(cartao.querySelector('.cartao-nome')?.textContent).toBe('Emitir Ofício')
+})
+
+test('por responsável a faixa também traz a sigla', async () => {
+  montar([processo('Emitir Ofício', { processo: { setorSigla: 'TSA', setorCor: 13 } })])
+  fireEvent.click(await screen.findByRole('button', { name: 'Responsável' }))
+  expect(faixaDe(await cartaoDe('Emitir Ofício')).textContent).toBe('TSA')
+})
+
+test('por setor a faixa traz o nome do processo e o corpo não o repete', async () => {
+  const setor = umSetor('s1', 'TSA', 'Setor A', true, 13)
+  montar([processo('Emitir Ofício', { processo: { setorId: 's1', setorSigla: 'TSA', setorCor: 13 } })], 'integrante_ep', [], new VersoesFalso(), [setor])
+  fireEvent.click(await screen.findByRole('button', { name: 'Setor' }))
+  const cartao = await screen.findByRole('link', { name: /Emitir Ofício/ })
+  expect(faixaDe(cartao).textContent).toBe('Emitir Ofício')
+  expect(faixaDe(cartao).style.getPropertyValue('--cor-claro')).toBe(corDoSetor(13).claro)
+  expect(cartao.querySelector('.cartao-nome')).toBeNull()
+  expect(within(cartao).getAllByText('Emitir Ofício')).toHaveLength(1)
+})
+
+test('o processo de setor inativo mantém a cor na faixa, e o parado continua com a marca de parado', async () => {
+  montar([processo('Processo Parado', { processo: { setorSigla: 'MNO', setorCor: 22, entrouNaEtapaEm: dia(-30) } })])
+  const cartao = await cartaoDe('Processo Parado')
+  expect(faixaDe(cartao).style.getPropertyValue('--cor-claro')).toBe(corDoSetor(22).claro)
+  expect(cartao.className).toContain('cartao-parado')
 })
