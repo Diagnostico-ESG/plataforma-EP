@@ -1716,3 +1716,5 @@ Entregue em 2026-10-27 (commit 764e74d), com ressalva: critérios [visual] da mu
 Entregue em 2026-10-28 (commit 1af2485), com ressalva: critérios [visual] 6 a 8 da seção "Coluna tingida e etiquetas fortes" presumidos (não vistos na tela, que exige login)
 
 Implementado em 2026-10-28 (commit f1d045f) — seção "Coluna tingida e etiquetas fortes"; polida em 2026-10-28; os critérios [visual] 6 a 8 seguem por conferir com o login real.
+
+Em revisão desde 2026-10-28
