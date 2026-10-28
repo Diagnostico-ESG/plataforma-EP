@@ -83,3 +83,5 @@ Não mudam:
 
 - O motivo da preferência pelo liso não foi detalhado na sabatina. O ADR 0033 registra só que o usuário preferiu a prévia lisa (escolha padrão).
 - Os critérios `[visual]` das entregas anteriores com a cor do setor seguem por conferir com o login real; esta entrega pode aproveitar a mesma conferência.
+
+Implementado em 2026-10-28 (commit 39cd830)
