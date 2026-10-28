@@ -2,6 +2,7 @@ import type { LinhaDaLista } from '../../processos/linhasDaLista'
 import { ROTULO_DO_TIPO } from '../../processos/rotulos'
 import { LinhaFantasma } from '../cadastros/PecasDaLista'
 import { Pilula } from '../Pilula'
+import { SeloDoSetor } from '../SeloDoSetor'
 import { BarraDeProgresso } from './BarraDeProgresso'
 import { EtiquetaDoProcesso } from './EtiquetaDoProcesso'
 import { NomeComTrecho } from './NomeComTrecho'
@@ -61,7 +62,7 @@ function LinhaDoProcesso({ linha, escolhida, aoAbrir, busca }: LinhaDoProcessoPr
         <SeloDeParado processo={linha} />
       </td>
       <td>{ROTULO_DO_TIPO[linha.tipo]}</td>
-      <td>{linha.setorSigla}</td>
+      <td><SeloDoSetor sigla={linha.setorSigla} cor={linha.setorCor ?? 1} /></td>
       <td>{linha.macroprocessoNome}</td>
       <td>{linha.etapaAtual ? <BarraDeProgresso processo={linha} /> : '—'}</td>
       <td><EtiquetaDoProcesso etiqueta={linha.etiqueta} /></td>

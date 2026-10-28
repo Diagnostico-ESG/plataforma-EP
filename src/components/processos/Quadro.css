@@ -180,15 +180,6 @@
   overflow-wrap: anywhere;
 }
 
-.cartao-sigla {
-  padding: 1px var(--esp-2);
-  border-radius: var(--canto-macro);
-  background: var(--azul);
-  color: var(--folha);
-  font-family: var(--fonte-mono);
-  font-weight: 500;
-}
-
 .cartao-nome {
   font-size: var(--tam-base);
   font-weight: 600;

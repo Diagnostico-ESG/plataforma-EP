@@ -4,6 +4,7 @@ import { ROTULO_DA_SITUACAO, ROTULO_DO_TIPO } from '../../processos/rotulos'
 import type { ProcessoLido, SituacaoDoProcesso } from '../../processos/tipos'
 import { Icone } from '../Icone'
 import { Pilula, type SituacaoPilula } from '../Pilula'
+import { SeloDoSetor } from '../SeloDoSetor'
 
 type CabecalhoDoVersoProps = {
   processo: ProcessoLido
@@ -23,7 +24,7 @@ export function CabecalhoDoVerso({ processo, titulo, acoes, aoFechar }: Cabecalh
   const pilula = PILULA_FORA_DO_NORMAL[processo.situacao]
   return (
     <header className="verso-cabecalho">
-      <span className="cartao-sigla">{processo.setorSigla}</span>
+      <SeloDoSetor sigla={processo.setorSigla} cor={processo.setorCor ?? 1} className="verso-selo-do-setor" />
       <div className="verso-identificacao">
         <h2 ref={titulo} tabIndex={-1} className="verso-titulo">{processo.nome}</h2>
         <p className="verso-subtitulo">

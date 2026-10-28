@@ -8,6 +8,8 @@ import { ProcessosFalso } from './processos/ProcessosFalso'
 import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
 import { umSetor } from './testes/processoDaLista'
+import { montarVerso, processoLido } from './testes/processoNoVerso'
+import { versoAberto } from './testes/versoDoCartao'
 import { cartaoDe, dia, montar, processo } from './testes/quadroDeTeste'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
@@ -89,4 +91,24 @@ test('o processo de setor inativo mantém a cor na faixa, e o parado continua co
   const cartao = await cartaoDe('Processo Parado')
   expect(faixaDe(cartao).style.getPropertyValue('--cor-claro')).toBe(corDoSetor(22).claro)
   expect(cartao.className).toContain('cartao-parado')
+})
+
+test('o cabeçalho do verso mostra o selo do setor; a seção Sobre continua com o setor em texto', async () => {
+  montarVerso(processoLido({ setorSigla: 'TSA', setorCor: 13 }))
+  await versoAberto()
+  // Um só selo no verso inteiro (o Quadro atrás tem os seus): o do cabeçalho. A seção Sobre fica com o setor em texto.
+  const selos = (document.querySelector('dialog.verso') as HTMLElement).querySelectorAll<HTMLElement>('.selo-do-setor')
+  expect(selos).toHaveLength(1)
+  expect(selos[0].closest('.verso-cabecalho')).not.toBeNull()
+  expect(selos[0].textContent).toBe('TSA')
+  expect(selos[0].style.getPropertyValue('--cor-claro')).toBe(corDoSetor(13).claro)
+})
+
+test('a coluna Setor da Lista mostra o selo da cor, e o nome da célula segue sendo a sigla', async () => {
+  window.location.hash = '#/processos/lista'
+  montar([processo('Emitir Ofício', { processo: { setorSigla: 'TSA', setorCor: 13 } })])
+  const celula = await screen.findByRole('cell', { name: 'TSA' })
+  const selo = celula.querySelector('.selo-do-setor') as HTMLElement
+  expect(selo.textContent).toBe('TSA')
+  expect(selo.style.getPropertyValue('--cor-claro')).toBe(corDoSetor(13).claro)
 })

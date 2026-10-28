@@ -59,7 +59,7 @@
   background: var(--folha);
 }
 
-.verso-cabecalho .cartao-sigla {
+.verso-cabecalho .verso-selo-do-setor {
   flex: none;
   margin-top: 2px;
 }
