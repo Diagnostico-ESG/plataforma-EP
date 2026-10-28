@@ -8,6 +8,35 @@ Status: ready-for-agent
 
 Decisões de origem: `.scratch/processos-etapas/sabatina.md` (sabatina de 2026-10-13, três rodadas), `CONTEXT.md` (seções "Setores" e "Processos") e ADR 0004 (mudar o catálogo muda o caminho dos processos em andamento). Mudança de 2026-10-18 (parte 1 da iniciativa experiencia-do-quadro, `.scratch/experiencia-do-quadro/sabatina-parte-1.md`, ADR 0013): saem as etapas do setor, a coluna "Aguardando o setor", os responsáveis do setor e o nível do catálogo; a primeira etapa passa a se chamar Modelagem piloto; o processo ganha a data da reunião (spec de `reunioes`). Mudança de 2026-10-18 (parte 2, `.scratch/experiencia-do-quadro/sabatina-parte-2.md`, ADR 0014): resolver a etapa atual (concluir, dispensar ou registrar como realizada anteriormente) já **avança**, ou seja, inicia a próxima etapa pendente com o responsável escolhido na mesma janela; voltar também escolhe o responsável; [Assumir] em etapa sem responsável; quem enviou a versão mais recente não pode ser escolhido como responsável da Revisão interna. Mudança de 2026-10-19 (parte 3, "Verso do cartão", `.scratch/experiencia-do-quadro/sabatina-parte-3.md`, sem ADR nem mudança no banco): o painel lateral vira o verso do cartão, uma janela central em duas colunas com o cartão "Agora"; o Novo processo, o Editar e o Histórico abrem dentro dela; a Lista ganha busca pelo nome. Mudança de 2026-10-19 (parte 4, "Cartão do Quadro", `.scratch/experiencia-do-quadro/sabatina-parte-4.md`, sem ADR): o cartão do Quadro ganha a barra de progresso e os selos; arrastar o cartão para a coluna de destino abre a janela de avanço da parte 2; o Quadro ganha "Agrupar por: Etapa | Responsável" e "Só os meus"; a view `processos_com_andamento` ganha campos, por migração não destrutiva; `CONTEXT.md` ganha "Processo parado". Mudança de 2026-10-23 ("Anotações do processo", `.scratch/processos-etapas/sabatina-anotacoes.md`, ADR 0021): o verso ganha, no alto da coluna direita, as **Anotações**, um texto livre e único por processo, guardado sozinho enquanto se escreve, sem histórico, com recusa quando outra pessoa alterou antes; `CONTEXT.md` ganha "Anotações".
 
+## Ajustes do Quadro e da Lista (mudança de 2026-10-28)
+
+Demanda de 2026-10-28, planejada no `/planejar` modo curto (`ajustes-quadro-lista`); ADR 0032; acréscimo datado em `.scratch/identidade-visual.md`. Vale sobre a seção "Coluna tingida e etiquetas fortes" e o resto desta spec no que divergir. Sem mudança no banco.
+
+**Como resolve o problema.** Depois da coluna tingida, a tela ainda tinha seis arestas. No Quadro por etapa e por responsável, os títulos das colunas ficavam à esquerda, enquanto no Quadro por setor ficavam centralizados. A etiqueta Em andamento, em índigo, lia como "azul" e não como "em movimento"; um âmbar cheio diz isso melhor. No Quadro por setor, a cor na altura toda pintava grandes áreas vazias, e os setores sem processo apareciam misturados aos que têm, obrigando a procurar onde há trabalho. Na Lista, a coluna Etiqueta ocupava espaço com uma informação de uso do Quadro, e alguns nomes apareciam centralizados. Agora os títulos ficam centralizados em todo agrupamento, a etiqueta Em andamento fica âmbar, a cor da coluna vai só até o último cartão, os setores vazios vão para o fim, a Lista perde a coluna Etiqueta e todos os nomes ficam à esquerda.
+
+### O que muda
+
+- **Título das colunas no Quadro por etapa e por responsável:** o título fica centralizado na coluna, como no Quadro por setor; a contagem continua à direita, na mesma linha do título, sem passar por cima de título longo. O nome acessível da coluna não muda.
+- **Etiqueta Em andamento:** fundo âmbar cheio `#F59E0B`, texto e bolinha marrom-escuros `#451A03` (7,0:1). É a única das três com letra escura (o branco não tem contraste AA sobre o âmbar). A fazer (magenta) e Finalizado (verde-petróleo) não mudam. Vale em todo lugar onde a etiqueta aparece (cartão e opções da etiqueta no Agora). Só mudam os três tokens de cor de Em andamento; o componente não muda.
+- **Altura da cor no Quadro por setor:** o fundo tingido da coluna vai só até o fim do último cartão (com a mesma folga de baixo que as outras colunas têm), não mais até a base do Quadro. A coluna **vazia** fica só com o cabeçalho colorido, sem área tingida, e a frase de coluna vazia aparece logo abaixo, sobre o fundo da página. O setor inativo segue a mesma regra, em cinza.
+- **Ordem das colunas no Quadro por setor:** primeiro os setores que têm ao menos um cartão **na tela** (depois dos filtros e de "Só os meus"), em ordem alfabética de sigla; depois os vazios, também em ordem de sigla. Ao ligar ou desligar um filtro, as colunas mudam de lugar para manter os vazios no fim. O setor inativo entra na regra como os outros (ele só aparece quando tem processo). Com o filtro Setor, a coluna é uma só, como hoje.
+- **Lista:** sai a coluna Etiqueta. As colunas ficam Nome, Tipo, Setor, Macroprocesso, Etapa atual, Responsável, Situação. A etiqueta continua no cartão do Quadro e no Agora do verso.
+- **Coluna Nome da Lista:** todas as linhas alinhadas à esquerda, inclusive o nome que quebra em mais de uma linha, o que tem processo pai ("↳ …") e o que tem selo de parado. Causa provável, a confirmar na execução: o nome está dentro de um botão (`cadastros-abrir`), e o navegador centraliza o texto de botão quando ele quebra de linha.
+
+### Estados de tela
+
+Sem mudança: a tela não passa a carregar nada novo. Carregando, sem processos e com erro seguem como hoje (a Lista carregando passa a ter uma coluna a menos nas linhas fantasma). A coluna vazia do Quadro por setor mostra o cabeçalho colorido e a frase abaixo.
+
+### Critérios de pronto
+
+1. No Quadro por setor, as colunas com cartão vêm antes das vazias, cada grupo em ordem de sigla; com "Só os meus" ou outro filtro, um setor sem cartão visível vai para o grupo dos vazios.
+2. A Lista não tem a coluna Etiqueta (cabeçalho, linhas e linhas fantasma do carregando).
+3. Teste de contraste: o texto da etiqueta Em andamento tem pelo menos 4,5:1 sobre o âmbar; A fazer e Finalizado seguem com o branco acima de 4,5:1.
+4. `[visual]` No Quadro por etapa e por responsável, o título de cada coluna fica centralizado, com a contagem à direita, inclusive com título longo.
+5. `[visual]` A etiqueta Em andamento aparece em âmbar cheio com letra escura, no cartão e no Agora, e se distingue da pílula "vencendo" (âmbar claro).
+6. `[visual]` No Quadro por setor, a cor de cada coluna vai até o fim do último cartão; a coluna vazia mostra só o cabeçalho colorido e a frase abaixo, sobre o fundo da página.
+7. `[visual]` Na Lista, todos os nomes ficam alinhados à esquerda, inclusive nome longo que quebra de linha, com processo pai e com selo de parado.
+
 ## Coluna tingida e etiquetas fortes (mudança de 2026-10-28)
 
 Demanda de 2026-10-28 pelo `/demanda` (mudança em funcionalidade existente, `visual-do-cartao`), planejada no modo curto; ADR 0031; acréscimo datado em `.scratch/identidade-visual.md`. Maquetes aprovadas em `.scratch/visual-do-cartao/imagens/`: `maquete-por-setor.html` (opção B), `maquete-altura-da-cor.html` (opção A) e `maquete-etiquetas.html` (opção 2, com magenta e índigo trocados). Vale sobre a seção "Visual do cartão" e o resto desta spec no que divergir. Sem mudança no banco.
@@ -1684,6 +1713,6 @@ Entregue em 2026-10-27 (commit 69f8b43), com ressalva: critério [visual] 5 da m
 
 Entregue em 2026-10-27 (commit 764e74d), com ressalva: critérios [visual] da mudança visual-do-cartao presumidos (a tela nunca foi vista com o login real; vista só a faixa por etapa na cor 1, na vitrine local com módulos falsos: faltam o nome na faixa por setor, a faixa do parado, as 30 cores e nome longo, os selos do verso, da Lista e do título da coluna, o quadradinho das caixas, a grade de cores, a barra lisa e as etiquetas vivas); revisão de segurança foi a de reserva (menos completa: o /security-review só viu documentação); painel do Supabase de desenvolvimento não reconferido; função arquivos-no-drive ainda sem nova publicação no desenvolvimento; as ressalvas das entregas anteriores seguem valendo
 
-Em revisão desde 2026-10-28
+Entregue em 2026-10-28 (commit 1af2485), com ressalva: critérios [visual] 6 a 8 da seção "Coluna tingida e etiquetas fortes" presumidos (não vistos na tela, que exige login)
 
 Implementado em 2026-10-28 (commit f1d045f) — seção "Coluna tingida e etiquetas fortes"; polida em 2026-10-28; os critérios [visual] 6 a 8 seguem por conferir com o login real.
