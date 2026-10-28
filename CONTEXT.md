@@ -109,8 +109,8 @@ Levar o processo para qualquer etapa do catálogo, para a frente ou para trás, 
 _Avoid_: avançar, voltar a uma etapa, concluir a etapa, iniciar a etapa, dispensar
 
 **Etiqueta**:
-Marca da etapa atual do processo: **A fazer**, **Em andamento** ou **Finalizado**. Finalizado quer dizer que a parte de quem estava na etapa terminou e o processo espera o próximo pegá-lo; não conclui o processo (isso é a etapa Concluídos). No banco, o valor continua `concluido`.
-_Avoid_: tag, status, situação (para a etiqueta)
+Marca da etapa atual do processo: **A fazer**, **Iniciado** ou **Finalizado**. Finalizado quer dizer que a parte de quem estava na etapa terminou e o processo espera o próximo pegá-lo; não conclui o processo (isso é a etapa Concluídos). No banco, os valores continuam `em_andamento` (Iniciado) e `concluido` (Finalizado).
+_Avoid_: tag, status, situação (para a etiqueta), em andamento (para a etiqueta, que é a situação do processo)
 
 **Processo parado**:
 Processo em andamento que está na mesma etapa há mais de 7 dias, contados de quando entrou nela; mudar só a etiqueta não zera a contagem. Não vale em Não iniciados nem em Concluídos. A tela o destaca. O limite é um número único até os prazos por etapa.
@@ -121,27 +121,27 @@ Usuário (Administrador ou Integrante do EP) que cuida do processo agora; um só
 _Avoid_: responsável da etapa, dono, executor
 
 **Situação do processo**:
-Em andamento, suspenso, cancelado ou concluído. Suspender, cancelar e **retomar** exigem motivo; suspenso e cancelado congelam a etapa, a etiqueta e o responsável, e retomar devolve o processo à mesma etapa. Concluído não se marca: é o processo que está em Concluídos. Suspensos e cancelados ficam fora das planilhas dos dashboards.
+Em andamento, suspenso, cancelado ou concluído. Suspender, cancelar e **retomar** exigem motivo; suspenso e cancelado congelam a etapa, a etiqueta e o responsável, e retomar devolve o processo à mesma etapa. Concluído não se marca: é o processo que está em Concluídos. Suspensos e cancelados ficam fora das planilhas dos dashboards. O cancelado não aparece em nenhuma visualização, só na Lista, quando se pede para mostrar os cancelados.
 _Avoid_: status do processo, estado
 
 **Concluídos**:
-A última etapa do catálogo, fixa: o processo que chega a ela está concluído. Para chegar, o processo precisa ter a data da publicação ou ser concluído sem publicação.
-_Avoid_: finalizados, encerrados
+A última etapa do catálogo, fixa: o processo que chega a ela está concluído. Para chegar, o processo precisa ter a data da publicação ou ser concluído sem publicação. O Quadro por etapa e o Quadro por responsável mostram o trabalho em curso; a visualização por setor e a Lista mostram o portfólio de processos, com os concluídos sempre presentes. No Quadro por responsável o concluído não aparece; no Quadro por etapa, fica na coluna Concluídos até alguém **tirar do Quadro** ou até completar 30 dias em Concluídos.
+_Avoid_: finalizados, encerrados, arquivados
+
+**Tirar do Quadro**:
+Retirar o cartão de um processo concluído da coluna Concluídos do Quadro por etapa, para toda a equipe, por Administrador ou Integrante do EP. Não muda nada no processo, que continua concluído na Lista e na visualização por setor, e não entra no histórico. Se o processo sair de Concluídos e voltar, o cartão volta à coluna e os 30 dias recomeçam.
+_Avoid_: arquivar, recolher, dispensar
 
 **Concluir sem publicação**:
 Levar o processo a Concluídos sem publicá-lo, com uma explicação obrigatória, porque há processos que não se quer divulgar. Nos dashboards, a fase VII dele aparece "Sem publicação" e não conta como concluída. Ainda pode ser publicado depois.
 _Avoid_: não publicado, dispensar a publicação, vai para publicação
 
 **Registrar publicação**:
-Informar a data em que o processo foi publicado (com o link, se houver), na etapa Publicação ou depois, num processo concluído sem publicação ou arquivado. O processo fica onde está.
+Informar a data em que o processo foi publicado (com o link, se houver), na etapa Publicação ou depois, num processo concluído sem publicação. O processo fica onde está.
 _Avoid_: publicar depois, republicar
 
-**Arquivado**:
-Marca de um processo concluído, suspenso ou cancelado que sai do Quadro e fica só na Lista, guardando a situação e a etapa que tinha. Quem arquiva é um Administrador ou Integrante do EP, e quem **desarquiva** o devolve como estava. Arquivado não tem etapa mexida; só se registra publicação ou se desarquiva.
-_Avoid_: encerrado, inativo, cancelado
-
 **Anotações**:
-Texto livre e único de um processo (cada subprocesso tem o seu), escrito pela equipe e guardado sozinho enquanto se escreve, sem histórico das versões anteriores. Administrador e Integrante do EP escrevem; Consulta só lê; no arquivado, só se lê. Não sai da plataforma: fica fora dos dashboards.
+Texto livre e único de um processo (cada subprocesso tem o seu), escrito pela equipe e guardado sozinho enquanto se escreve, sem histórico das versões anteriores. Administrador e Integrante do EP escrevem; Consulta só lê. Não sai da plataforma: fica fora dos dashboards.
 _Avoid_: observações, notas, comentários
 
 **Reclassificação**:

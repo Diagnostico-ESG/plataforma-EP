@@ -2,7 +2,11 @@
 
 Registro de onde a última sessão parou e do que vem a seguir. Cada sessão que terminar recomendando um próximo passo sobrescreve este arquivo antes de encerrar. Valem os arquivos se divergir do git.
 
-Atualizado em 2026-10-28 (/planejar repositorio-de-processos, modo completo, passo 2)
+Atualizado em 2026-10-28 (/planejar repositorio-de-processos, modo completo, sabatina concluída)
+
+- **Sabatina feita:** decisões em `.scratch/repositorio-de-processos/sabatina.md`, ADR 0034 e `CONTEXT.md` atualizados. Próximo: `/mattpocock-skills:to-spec ponto de teste: a tela inteira (testes pela interface, como a pessoa usa)`, com **Opus**. A spec atualiza `publicacao-e-arquivamento` e `processos-etapas` (com a linha `Em revisão desde 2026-10-28` abaixo da última `Entregue em`).
+
+Registro anterior desta sessão:
 
 - **Feito:** `repositorio-de-processos` anotada como item 14 em `.scratch/projeto.md`; marco `marco/2026-10-28-inicio-repositorio-de-processos` criado e enviado. Brainstorming pulado (abordagem da árvore já decidida no `/demanda`; o conceito de Arquivado é pergunta de domínio, vai para a sabatina). A spec ainda não foi alterada: a linha `Em revisão desde` entra em `publicacao-e-arquivamento` e `processos-etapas` no passo do `to-spec`.
 - **Próximo:** a sabatina, com **Opus**:
