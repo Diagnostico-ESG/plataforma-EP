@@ -42,11 +42,11 @@ test('Concluídos traz os concluídos por nome, com os filtros do Quadro, e o ar
   expect(nomesEm(concluidos())).toEqual(['alfa', 'Zeta'])
 })
 
-test('o cartão de Concluídos mostra a etiqueta Concluído e o responsável que moveu o processo até lá', async () => {
+test('o cartão de Concluídos mostra a etiqueta Finalizado e o responsável que moveu o processo até lá', async () => {
   window.location.hash = '#/processos'
   montar([concluido('Pronto', { responsavel: EU })])
   const cartao = await cartaoDe('Pronto')
-  expect(cartao.textContent).toContain('Concluído')
+  expect(cartao.textContent).toContain('Finalizado')
   expect(within(cartao).getByRole('img', { name: EU.nome })).toBeTruthy()
 })
 

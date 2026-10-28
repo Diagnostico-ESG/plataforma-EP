@@ -69,7 +69,7 @@ test('as colunas, a ordem por sigla e nome, todas as situações e o pai do subp
   expect(corpo).toEqual([
     ['Arquivar Pasta', 'Processo', 'TSA', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', 'A fazer', '—', 'Cancelado'],
     ['Cadastrar Bem', 'Processo', 'TSA', 'Macro de Teste', '—', 'A fazer', '—', 'Em andamento'],
-    ['Emitir Ofício', 'Processo', 'TSA', 'Macro de Teste', '—', 'Concluído', '—', 'Concluído'],
+    ['Emitir Ofício', 'Processo', 'TSA', 'Macro de Teste', '—', 'Finalizado', '—', 'Concluído'],
     ['Conferir Recibo↳ Pagar Diária', 'Subprocesso', 'TSB', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', 'Em andamento', 'Ana Teste', 'Em andamento'],
     ['Pagar Diária', 'Processo', 'TSB', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', 'A fazer', '—', 'Em andamento'],
   ])

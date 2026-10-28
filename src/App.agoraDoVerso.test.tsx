@@ -74,10 +74,10 @@ test('a recusa do banco aparece com a frase pronta', async () => {
 
 // ---- Etiqueta
 
-test('a lista Etiqueta tem A fazer, Em andamento e Concluído, grava ao escolher e não mexe na etapa nem no responsável', async () => {
+test('a lista Etiqueta tem A fazer, Em andamento e Finalizado, grava ao escolher e não mexe na etapa nem no responsável', async () => {
   const falso = montarVerso(processoLido(COM_BIA))
   const etiqueta = await lista('Etiqueta')
-  expect([...etiqueta.options].map((opcao) => opcao.textContent)).toEqual(['A fazer', 'Em andamento', 'Concluído'])
+  expect([...etiqueta.options].map((opcao) => opcao.textContent)).toEqual(['A fazer', 'Em andamento', 'Finalizado'])
   fireEvent.change(etiqueta, { target: { value: 'em_andamento' } })
   await waitFor(() => expect(falso.chamadas).toEqual([{ acao: 'etiqueta', id: 'p1', etiqueta: 'em_andamento' }]))
   expect((await lista('Etiqueta')).value).toBe('em_andamento')
@@ -93,11 +93,11 @@ test('a falha ao mudar a etiqueta aparece em vermelho e a etiqueta fica como est
   expect((await lista('Etiqueta')).value).toBe('a_fazer')
 })
 
-test('em Concluídos a etiqueta é só o texto "Concluído", sem lista', async () => {
+test('em Concluídos a etiqueta é só o texto "Finalizado", sem lista', async () => {
   montarVerso(processoLido({ situacao: 'concluido', etiqueta: 'concluido', publicadoEm: '2026-10-05' }, 'concluidos'))
   const agora = await agoraDoVerso()
   expect(agora.queryByRole('combobox', { name: 'Etiqueta' })).toBeNull()
-  expect(agora.getByText('Concluído', { selector: '.agora-etiqueta' })).toBeTruthy()
+  expect(agora.getByText('Finalizado', { selector: '.agora-etiqueta' })).toBeTruthy()
   expect(agora.getByRole('combobox', { name: 'Etapa' })).toBeTruthy()
 })
 

@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react'
+import { estiloDaCor } from '../../cadastros/corDoSetor'
 import type { ArrastoDoQuadro } from '../../hooks/useArrastoDoQuadro'
 import type { ColunaDoQuadro as Coluna } from '../../processos/colunasDoQuadro'
 import { podeArrastar } from '../../processos/destinoDoArrastar'
@@ -5,7 +7,6 @@ import type { AgruparQuadroPor } from '../../processos/enderecoDosProcessos'
 import { CHAVE_DOS_CONCLUIDOS } from '../../processos/publicacao'
 import type { EtapaDoCatalogo } from '../../processos/tipos'
 import { Pilula } from '../Pilula'
-import { SeloDoSetor } from '../SeloDoSetor'
 import { CartaoDoProcesso } from './CartaoDoProcesso'
 
 type ColunaDoQuadroProps = {
@@ -27,7 +28,7 @@ export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAl
   const recebe = levantado !== null && agrupar === 'etapa'
   const realce = recebe && arrasto.sobre === coluna.chave
   return (
-    <section className={realce ? 'coluna coluna-destino' : 'coluna'} aria-label={rotuloDaColuna(coluna)}
+    <section className={classesDaColuna(coluna, realce)} style={estiloDaColuna(coluna)} aria-label={rotuloDaColuna(coluna)}
       onDragEnter={() => recebe && arrasto.passarPor(coluna.chave)}
       onDragOver={(evento) => {
         if (!recebe) return
@@ -38,9 +39,9 @@ export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAl
         evento.preventDefault()
         arrasto.soltarEm(coluna.chave)
       }}>
-      <h3 className="coluna-titulo">
+      <h3 className={coluna.cor === undefined ? 'coluna-titulo' : 'coluna-titulo coluna-titulo-setor'}>
         <span className="coluna-titulo-texto">
-          <span className="coluna-titulo-principal">{tituloDaColuna(coluna)}{coluna.inativo && <> <Pilula situacao="neutra">Inativo</Pilula></>}</span>
+          <span className="coluna-titulo-principal">{coluna.titulo}{coluna.inativo && <> <Pilula situacao="neutra">Inativo</Pilula></>}</span>
           {coluna.subtitulo && <span className="coluna-titulo-nome">{coluna.subtitulo}</span>}
         </span>
         <span className="coluna-contagem">{coluna.processos.length}</span>
@@ -72,7 +73,15 @@ function AvisoDaColunaVazia({ coluna, agrupar }: { coluna: Coluna; agrupar: Agru
   return null
 }
 
-// Por setor a sigla do título leva o selo da cor do setor; nas demais colunas o título é só texto.
-function tituloDaColuna({ titulo, cor }: Coluna) {
-  return cor === undefined ? titulo : <SeloDoSetor sigla={titulo} cor={cor} />
+// Por setor a coluna inteira leva a cor do setor (ADR 0031); a do setor inativo fica cinza, sem a cor.
+function classesDaColuna({ cor, inativo }: Coluna, realce: boolean): string {
+  return [
+    'coluna',
+    realce && 'coluna-destino',
+    cor !== undefined && (inativo ? 'coluna-inativa' : 'coluna-do-setor'),
+  ].filter(Boolean).join(' ')
+}
+
+function estiloDaColuna({ cor, inativo }: Coluna): CSSProperties | undefined {
+  return cor === undefined || inativo ? undefined : (estiloDaCor(cor) as CSSProperties)
 }

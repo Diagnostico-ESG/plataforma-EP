@@ -47,17 +47,21 @@ test('o campo Setor do Novo processo mostra o quadradinho da cor de cada setor a
   expect(corClaraDaMarca(within(campo).getByRole('option', { name: 'TSB — Setor Teste B' }))).toBe(corDoSetor(22).claro)
 })
 
-test('no agrupamento por setor, a sigla do título leva o selo da cor, e a coluna inativa mantém a marca e a cor', async () => {
+test('no agrupamento por setor, a coluna leva a cor do setor, e a coluna inativa fica cinza com a marca Inativo', async () => {
   const ativo = umSetor('s1', 'TSA', 'Setor de Testes A', true, 13)
   const inativo = umSetor('s3', 'MNO', 'Setor Antigo', false, 22)
   montar([processo('Processo Antigo', { processo: { setorId: 's3', setorSigla: 'MNO', setorCor: 22 } })], 'integrante_ep', [], new VersoesFalso(), [ativo, inativo])
   fireEvent.click(await screen.findByRole('button', { name: 'Setor' }))
-  const coluna = within(await screen.findByRole('region', { name: 'MNO · Setor Antigo · inativo' }))
-  const seloDe = (sigla: string) => Array.from(document.querySelectorAll<HTMLElement>('.coluna-titulo .selo-do-setor')).find((el) => el.textContent === sigla)
-  expect(seloDe('TSA')?.style.getPropertyValue('--cor-claro')).toBe(corDoSetor(13).claro)
-  expect(seloDe('MNO')?.style.getPropertyValue('--cor-claro')).toBe(corDoSetor(22).claro)
+  const regiao = await screen.findByRole('region', { name: 'MNO · Setor Antigo · inativo' })
+  const coluna = within(regiao)
+  const colunaDe = (sigla: string) => screen.getByRole('region', { name: new RegExp(`^${sigla} ·`) })
+  expect(colunaDe('TSA').style.getPropertyValue('--cor-claro')).toBe(corDoSetor(13).claro)
+  expect(colunaDe('TSA').className).toContain('coluna-do-setor')
+  expect(regiao.className).toContain('coluna-inativa')
+  expect(regiao.style.getPropertyValue('--cor-claro')).toBe('')
   expect(coluna.getByText('Inativo')).toBeTruthy()
   expect(coluna.getByText('Setor Antigo')).toBeTruthy()
+  expect(document.querySelector('.coluna-titulo .selo-do-setor')).toBeNull()
 })
 
 const faixaDe = (cartao: HTMLElement) => cartao.querySelector('.cartao-faixa') as HTMLElement
@@ -76,15 +80,26 @@ test('por responsável a faixa também traz a sigla', async () => {
   expect(faixaDe(await cartaoDe('Emitir Ofício')).textContent).toBe('TSA')
 })
 
-test('por setor a faixa traz o nome do processo e o corpo não o repete', async () => {
+test('por setor o cartão não leva faixa: o nome do processo fica no corpo, como por etapa', async () => {
   const setor = umSetor('s1', 'TSA', 'Setor A', true, 13)
   montar([processo('Emitir Ofício', { processo: { setorId: 's1', setorSigla: 'TSA', setorCor: 13 } })], 'integrante_ep', [], new VersoesFalso(), [setor])
   fireEvent.click(await screen.findByRole('button', { name: 'Setor' }))
-  const cartao = await screen.findByRole('link', { name: /Emitir Ofício/ })
-  expect(faixaDe(cartao).textContent).toBe('Emitir Ofício')
-  expect(faixaDe(cartao).style.getPropertyValue('--cor-claro')).toBe(corDoSetor(13).claro)
-  expect(cartao.querySelector('.cartao-nome')).toBeNull()
+  const cartao = await cartaoDe('Emitir Ofício')
+  expect(cartao.querySelector('.cartao-faixa')).toBeNull()
+  expect(cartao.querySelector('.cartao-nome')?.textContent).toBe('Emitir Ofício')
   expect(within(cartao).getAllByText('Emitir Ofício')).toHaveLength(1)
+})
+
+test('por setor o cabeçalho da coluna traz a sigla e o nome do setor, e a coluna vazia mantém a cor e a frase', async () => {
+  const setor = umSetor('s1', 'TSA', 'Setor A', true, 13)
+  const outro = umSetor('s2', 'TSB', 'Setor B', true, 22)
+  montar([processo('Emitir Ofício', { processo: { setorId: 's2', setorSigla: 'TSB', setorCor: 22 } })], 'integrante_ep', [], new VersoesFalso(), [setor, outro])
+  fireEvent.click(await screen.findByRole('button', { name: 'Setor' }))
+  const regiao = await screen.findByRole('region', { name: 'TSA · Setor A' })
+  expect(regiao.style.getPropertyValue('--cor-claro')).toBe(corDoSetor(13).claro)
+  expect(regiao.querySelector('.coluna-titulo-principal')?.textContent).toBe('TSA')
+  expect(regiao.querySelector('.coluna-titulo-nome')?.textContent).toBe('Setor A')
+  expect(within(regiao).getByText('Nenhum processo deste setor no Quadro.')).toBeTruthy()
 })
 
 test('o processo de setor inativo mantém a cor na faixa, e o parado continua com a marca de parado', async () => {

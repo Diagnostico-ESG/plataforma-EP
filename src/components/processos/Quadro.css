@@ -90,6 +90,62 @@
   font-weight: 600;
 }
 
+/* Por setor (ADR 0031): a coluna toda, na altura do Quadro e mesmo vazia, ganha o tom do setor misturado com branco, e o
+   cabeçalho é uma faixa no degradê do setor de lado a lado, colada no alto. Nome e contagem em `texto`: o cinza médio não tem
+   contraste AA sobre os tons médios da paleta. O setor inativo não tem cor: cabeçalho um tom acima do fundo, ambos em cinza. */
+.coluna-do-setor,
+.coluna-inativa {
+  gap: 0;
+  border-radius: var(--canto);
+}
+
+.coluna-do-setor {
+  background: color-mix(in srgb, var(--cor-claro) 30%, var(--folha));
+  /* Sem isto, o modo de contraste forçado apaga a cor da identidade do setor. */
+  forced-color-adjust: none;
+}
+
+.coluna-inativa {
+  background: var(--neutra-fundo);
+}
+
+.coluna-titulo-setor {
+  position: relative;
+  justify-content: center;
+  /* Folga dos lados para o nome do setor, centralizado, nunca passar por baixo da contagem posicionada à direita. */
+  padding: var(--esp-2) var(--esp-6);
+  border-radius: var(--canto) var(--canto) 0 0;
+  color: var(--texto);
+  text-align: center;
+}
+
+.coluna-do-setor .coluna-titulo-setor {
+  background: linear-gradient(90deg, var(--cor-claro), var(--cor-escuro));
+}
+
+.coluna-inativa .coluna-titulo-setor {
+  background: var(--barra-coluna-trilho);
+}
+
+.coluna-titulo-setor .coluna-titulo-texto {
+  align-items: center;
+}
+
+.coluna-titulo-setor .coluna-titulo-principal {
+  font-size: var(--tam-painel);
+}
+
+.coluna-titulo-setor .coluna-titulo-nome {
+  color: var(--texto);
+}
+
+.coluna-titulo-setor .coluna-contagem {
+  position: absolute;
+  top: var(--esp-2);
+  right: var(--esp-3);
+  color: var(--texto);
+}
+
 /* O respiro de 4px é para o overflow não cortar o anel de foco do teclado (2px de contorno e 2px de afastamento, em index.css). */
 .coluna-cartoes {
   display: flex;
@@ -172,13 +228,6 @@
 .cartao-faixa {
   margin: calc(-1 * var(--esp-3)) calc(-1 * var(--esp-3)) 0;
   border-radius: calc(var(--canto) - 1px) calc(var(--canto) - 1px) 0 0;
-}
-
-/* Por setor a faixa leva o nome do processo: 16px, negrito, quebrando linha dentro dela. */
-.cartao-faixa-nome {
-  font-size: var(--tam-coluna);
-  font-weight: 700;
-  overflow-wrap: anywhere;
 }
 
 .cartao-nome {

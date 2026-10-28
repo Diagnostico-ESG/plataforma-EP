@@ -60,16 +60,17 @@
   --neutra-texto: #4a5163;
   --neutra-fundo: #eef0f4;
 
-  /* Etiquetas da etapa (cartão, Lista e Agora): cores vivas, texto com 4,5:1 ou mais sobre o fundo (identidade, acréscimo de 2026-10-27) */
+  /* Etiquetas da etapa (cartão, Lista e Agora): fundo forte, texto e bolinha brancos com 4,5:1 ou mais (ADR 0031, 2026-10-28).
+     Fora da paleta dos setores e das pílulas de prazo, para não se confundirem com elas. */
   --etiqueta-a-fazer-texto: #ffffff;
-  --etiqueta-a-fazer-fundo: #6a3fd9;
+  --etiqueta-a-fazer-fundo: #be185d;
   --etiqueta-a-fazer-bolinha: #ffffff;
-  --etiqueta-em-andamento-texto: #5e2c00;
-  --etiqueta-em-andamento-fundo: #ffc27a;
-  --etiqueta-em-andamento-bolinha: #c85f00;
-  --etiqueta-concluido-texto: #0d4a22;
-  --etiqueta-concluido-fundo: #9ee0b4;
-  --etiqueta-concluido-bolinha: #178a3e;
+  --etiqueta-em-andamento-texto: #ffffff;
+  --etiqueta-em-andamento-fundo: #4338ca;
+  --etiqueta-em-andamento-bolinha: #ffffff;
+  --etiqueta-concluido-texto: #ffffff;
+  --etiqueta-concluido-fundo: #0f766e;
+  --etiqueta-concluido-bolinha: #ffffff;
 
   /* Barra da etapa: trilho cinza claro e degradê do azul claro ao azul escuro */
   --barra-etapa-trilho: #e1e6ef;

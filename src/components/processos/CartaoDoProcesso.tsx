@@ -21,7 +21,7 @@ type CartaoDoProcessoProps = {
   apagado: boolean
   /**
    * O cartão não repete o que a coluna já diz: fora do Quadro por etapa traz a barra da etapa; por responsável dispensa o
-   * avatar e o selo Sem responsável; por setor a faixa leva o nome do processo no lugar da sigla.
+   * avatar e o selo Sem responsável; por setor dispensa a faixa, porque a cor do setor está na coluna.
    */
   agrupar: AgruparQuadroPor
   /** As etapas do catálogo: o selo de relatório pendente compara a posição da etapa atual com a da Revisão interna. */
@@ -44,8 +44,8 @@ export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagad
     // O <a> se arrasta por padrão (leva o endereço): fora dos casos permitidos, draggable="false" a impede.
     <a id={`cartao-${id}`} className={classesDoCartao(processo, apagado)} href={href} aria-current={escolhido ? 'true' : undefined}
       draggable={arrastavel} onDragStart={arrastavel ? comecarAArrastar : undefined} onDragEnd={arrastavel ? aoBaixar : undefined}>
-      <FaixaDoCartao processo={processo} agrupar={agrupar} />
-      {agrupar !== 'setor' && <span className="cartao-nome">{nome}</span>}
+      {agrupar !== 'setor' && <FaixaDoCartao processo={processo} />}
+      <span className="cartao-nome">{nome}</span>
       {agrupar !== 'etapa' && <BarraDeProgresso processo={processo} />}
       <SelosDoCartao processo={processo} hoje={hojeEmBrasilia()} etapas={etapas} semSeloDeResponsavel={porResponsavel} />
       <span className="cartao-rodape">

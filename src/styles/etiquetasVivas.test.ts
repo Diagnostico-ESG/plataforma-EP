@@ -8,22 +8,16 @@ const valorDe = (token: string): string => {
   return achado[1].toLowerCase()
 }
 
-describe('etiquetas vivas', () => {
+describe('etiquetas fortes (ADR 0031)', () => {
   test.each([
-    ['a-fazer', '#6a3fd9', '#ffffff', '#ffffff'],
-    ['em-andamento', '#ffc27a', '#5e2c00', '#c85f00'],
-    ['concluido', '#9ee0b4', '#0d4a22', '#178a3e'],
-  ])('%s: fundo, texto e bolinha da identidade, com texto AA sobre o fundo', (valor, fundo, texto, bolinha) => {
+    ['a-fazer', '#be185d'],
+    ['em-andamento', '#4338ca'],
+    ['concluido', '#0f766e'],
+  ])('%s: fundo forte da identidade, texto e bolinha brancos, com texto AA sobre o fundo', (valor, fundo) => {
     expect(valorDe(`etiqueta-${valor}-fundo`)).toBe(fundo)
-    expect(valorDe(`etiqueta-${valor}-texto`)).toBe(texto)
-    expect(valorDe(`etiqueta-${valor}-bolinha`)).toBe(bolinha)
-    expect(contraste(texto, fundo)).toBeGreaterThanOrEqual(4.5)
-  })
-
-  test('A fazer é a etiqueta de maior destaque: a de maior contraste com o cartão branco', () => {
-    const contrasteComBranco = (valor: string) => contraste(valorDe(`etiqueta-${valor}-fundo`), '#ffffff')
-    expect(contrasteComBranco('a-fazer')).toBeGreaterThan(contrasteComBranco('em-andamento'))
-    expect(contrasteComBranco('a-fazer')).toBeGreaterThan(contrasteComBranco('concluido'))
+    expect(valorDe(`etiqueta-${valor}-texto`)).toBe('#ffffff')
+    expect(valorDe(`etiqueta-${valor}-bolinha`)).toBe('#ffffff')
+    expect(contraste('#ffffff', fundo)).toBeGreaterThanOrEqual(4.5)
   })
 })
 

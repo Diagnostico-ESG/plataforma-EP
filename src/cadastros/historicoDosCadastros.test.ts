@@ -181,7 +181,7 @@ describe('movimento, etiqueta e responsável no histórico (Andamento livre)', (
     })
     expect(tituloDoEvento(mudou)).toBe('Mudou a etiqueta')
     expect(descreverEstadoDoCadastro(mudou.antes)).toBe('Processo: Emitir Ofício; Responsável: Ana Teste; Etiqueta: A fazer')
-    expect(descreverEstadoDoCadastro(mudou.depois)).toBe('Processo: Emitir Ofício; Responsável: Ana Teste; Etiqueta: Concluído')
+    expect(descreverEstadoDoCadastro(mudou.depois)).toBe('Processo: Emitir Ofício; Responsável: Ana Teste; Etiqueta: Finalizado')
   })
 
   test('mudar o responsável é do processo e mostra de quem para quem', () => {
