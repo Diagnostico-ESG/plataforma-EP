@@ -12,5 +12,7 @@
 - [x] Componente compartilhado do selo do setor (pequeno e de faixa), sem nada no nome acessível.
 - [x] Módulo de cadastros lê `cor` em setores, setor aberto e setores envolvidos (criar não envia cor); `CadastrosFalso` imita a primeira livre; testes de `cadastrosSupabase` e `macroprocessosSupabase` com a cor.
 - [x] Selo na lista de setores, no setor aberto e nos setores envolvidos (inclusive inativos); quadradinho no [Pôr setor] por `OpcaoDaCaixa` com `cor` e `BotaoDaCaixa`; testes de tela (setor novo com a primeira cor livre, selos, quadradinho sem cor no nome da opção, histórico sem `cor`).
-- [x] `npm test` verde; testes de banco verdes no Docker local e no "Testes de banco".
+- [x] `npm test` verde; testes de banco verdes no Docker local e no "Testes de banco" (o Docker local não subiu: só no "Testes de banco", 54 de 54).
 - [ ] `[visual]` O selo da sigla é legível nas 30 cores e o quadradinho do [Pôr setor] segue o do macroprocesso. (presumido: precisa do login real; contraste provado por teste)
+
+Concluído em 2026-10-27 (commit 88b3f53)
