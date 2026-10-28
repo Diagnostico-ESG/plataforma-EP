@@ -1717,6 +1717,7 @@ Entregue em 2026-10-28 (commit 1af2485), com ressalva: critérios [visual] 6 a 8
 
 Implementado em 2026-10-28 (commit f1d045f) — seção "Coluna tingida e etiquetas fortes"; polida em 2026-10-28; os critérios [visual] 6 a 8 seguem por conferir com o login real.
 
-Em revisão desde 2026-10-28
 
 Implementado em 2026-10-28 (commit 8d8cb7a) — seção "Ajustes do Quadro e da Lista"; os critérios [visual] 4 a 7 seguem por conferir com o login real.
+
+Entregue em 2026-10-28 (commit 7ea4c43), com ressalva: critérios [visual] 4 a 7 da seção "Ajustes do Quadro e da Lista" presumidos (não vistos na tela, que exige login), em especial a altura da coluna por setor (`max-height: 100%`) com muitos cartões; revisão de segurança dispensada (mudança só de aparência, sem login, dado de fora, migração ou dependência); as ressalvas das entregas anteriores seguem valendo
