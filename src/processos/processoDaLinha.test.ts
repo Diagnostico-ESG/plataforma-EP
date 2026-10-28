@@ -10,7 +10,7 @@ const VAZIA: LinhaDoProcesso = {
   responsavel_ativo: null, etiqueta: null, entrou_na_etapa_em: null, etapa_atual_posicao: null,
   ultima_versao_numero: null, ultima_versao_historica: null, ultima_versao_tem_relatorio: null, subprocessos_quantidade: 0,
   publicado_em: null, link_da_publicacao: null, sem_publicacao: null, arquivado_em: null, explicacao_sem_publicacao: null,
-  tem_versao_piloto: null, tem_versao_em_sequencia: null, tem_relatorio_numerado: null, data_da_validacao: null,
+  tem_versao_piloto: null, tem_versao_em_sequencia: null, tem_relatorio_numerado: null, data_da_validacao: null, setor_cor: null,
 }
 
 test('traduz a data da publicação', () => {
@@ -77,4 +77,9 @@ test('sem o número da versão não há última versão, mesmo com as outras col
 test('traduz a data da validação', () => {
   expect(processoDaLinha({ ...VAZIA, data_da_validacao: '2026-10-12' }, 8)).toMatchObject({ dataDaValidacao: '2026-10-12' })
   expect(processoDaLinha(VAZIA, 8)).toMatchObject({ dataDaValidacao: null })
+})
+
+test('traduz a cor do setor; sem ela vale a cor 1', () => {
+  expect(processoDaLinha({ ...VAZIA, setor_cor: 17 }, 8)).toMatchObject({ setorCor: 17 })
+  expect(processoDaLinha(VAZIA, 8)).toMatchObject({ setorCor: 1 })
 })

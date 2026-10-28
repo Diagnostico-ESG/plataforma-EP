@@ -32,6 +32,7 @@ function identificacaoDaLinha(linha: LinhaDoProcesso) {
     tipo: linha.tipo ?? 'a_classificar',
     setorId: linha.setor_id ?? '',
     setorSigla: linha.setor_sigla ?? '',
+    setorCor: linha.setor_cor ?? 1,
     macroprocessoId: linha.macroprocesso_id ?? '',
     macroprocessoNome: linha.macroprocesso_nome ?? '',
     processoPaiId: linha.processo_pai_id,

@@ -7,7 +7,7 @@ import { criarProcessosSupabase } from './processosSupabase'
 const LINHA = {
   id: 'p1', nome: 'Emitir Ofício Fictício', tipo: 'a_classificar', processo_pai_id: null, origem: 'novo',
   situacao_guardada: 'em_andamento', motivo_da_situacao: null, contexto: null, observacoes: null,
-  criado_em: '2026-10-14T10:00:00Z', setor_id: 's1', setor_sigla: 'TSA', macroprocesso_id: 'm1',
+  criado_em: '2026-10-14T10:00:00Z', setor_id: 's1', setor_sigla: 'TSA', setor_cor: 13, macroprocesso_id: 'm1',
   macroprocesso_nome: 'Macro de Teste', situacao: 'em_andamento', etapa_atual_id: 'e4', etapa_atual_codigo: 'modelagem',
   etapa_atual_nome: 'Modelagem piloto', etapa_atual_ordem: 2, etapa_atual_posicao: 2, etiqueta: 'em_andamento',
   entrou_na_etapa_em: '2026-10-01T15:30:00+00:00',
@@ -31,7 +31,7 @@ test('lista os processos por nome e as etapas na ordem do catálogo, com a posi�
   expect(await criar(cliente).listarProcessos()).toEqual({
     etapas: ETAPAS,
     processos: [{
-      id: 'p1', nome: 'Emitir Ofício Fictício', tipo: 'a_classificar', setorId: 's1', setorSigla: 'TSA',
+      id: 'p1', nome: 'Emitir Ofício Fictício', tipo: 'a_classificar', setorId: 's1', setorSigla: 'TSA', setorCor: 13,
       macroprocessoId: 'm1', macroprocessoNome: 'Macro de Teste', processoPaiId: null, situacao: 'em_andamento',
       etapaAtual: { id: 'e4', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 2, posicao: 2, total: 3 },
       etiqueta: 'em_andamento', entrouNaEtapaEm: '2026-10-01',
@@ -89,10 +89,13 @@ test.each(['processos_com_andamento', 'etapas', 'setores'])('falha ao ler %s vir
   await expect(criar(cliente).listarProcessos()).rejects.toThrow(/sem conexão/)
 })
 
-test('lê os setores (id, sigla, nome, ativo) em ordem de sigla, para as colunas do Quadro por setor', async () => {
+test('lê os setores (id, sigla, nome, ativo, cor) em ordem de sigla, para as colunas e os selos do Quadro por setor', async () => {
   const cliente = new ClienteSupabaseFalso()
-  const setores = [{ id: 's2', sigla: 'ABC', nome: 'Assessoria Fictícia', ativo: true }, { id: 's1', sigla: 'TSA', nome: 'Setor de Testes A', ativo: false }]
+  const setores = [
+    { id: 's2', sigla: 'ABC', nome: 'Assessoria Fictícia', ativo: true, cor: 13 },
+    { id: 's1', sigla: 'TSA', nome: 'Setor de Testes A', ativo: false, cor: 22 },
+  ]
   cliente.respostas['setores.select'] = { data: setores, error: null }
   expect((await criar(cliente).listarProcessos()).setores).toEqual(setores)
-  expect(cliente.pedidos).toContainEqual(expect.objectContaining({ tabela: 'setores', colunas: 'id, sigla, nome, ativo', ordem: [['sigla', true]] }))
+  expect(cliente.pedidos).toContainEqual(expect.objectContaining({ tabela: 'setores', colunas: 'id, sigla, nome, ativo, cor', ordem: [['sigla', true]] }))
 })

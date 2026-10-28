@@ -14,7 +14,7 @@ async function listarProcessos(cliente: ClienteSupabase): Promise<ListaDeProcess
 
 // O Quadro por setor mostra também os setores sem processo, que a view dos processos não traz.
 async function lerSetores(cliente: ClienteSupabase): Promise<SetorDoQuadro[]> {
-  const { data, error } = await cliente.from('setores').select('id, sigla, nome, ativo').order('sigla')
+  const { data, error } = await cliente.from('setores').select('id, sigla, nome, ativo, cor').order('sigla')
   if (error) throw new Error(`Falha ao ler os setores: ${error.message}`)
   return data
 }

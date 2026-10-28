@@ -65,6 +65,8 @@ export type ProcessoDaLista = {
   tipo: TipoDeProcesso
   setorId: string
   setorSigla: string
+  /** Número da cor do setor (1 a 30), vindo da view. Opcional para quem monta o processo à mão: sem ele vale a cor 1. */
+  setorCor?: number
   macroprocessoId: string
   macroprocessoNome: string
   /** Só no subprocesso. */
@@ -95,7 +97,7 @@ export type ProcessoDaLista = {
 }
 
 /** Um setor como o Quadro agrupado por setor o mostra: as colunas saem daqui, inclusive as vazias. */
-export type SetorDoQuadro = { id: string; sigla: string; nome: string; ativo: boolean }
+export type SetorDoQuadro = { id: string; sigla: string; nome: string; ativo: boolean; cor: number }
 
 export type ListaDeProcessos = { etapas: EtapaDoCatalogo[]; processos: ProcessoDaLista[]; setores: SetorDoQuadro[] }
 

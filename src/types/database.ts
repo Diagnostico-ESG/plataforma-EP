@@ -1010,6 +1010,7 @@ export type Database = {
           responsavel_id: string | null
           responsavel_nome: string | null
           sem_publicacao: boolean | null
+          setor_cor: number | null
           setor_id: string | null
           setor_sigla: string | null
           situacao: string | null

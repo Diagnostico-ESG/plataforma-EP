@@ -45,6 +45,9 @@ export class ProcessosFalso implements ModuloDeProcessos {
   historicoDosProcessos: Record<string, EventoDoCadastro[]> = {}
   /** Sigla e nome que o banco juntaria ao cartão (pelo id do setor e do macroprocesso). */
   siglasDosSetores: Record<string, string> = {}
+  /** A cor de cada setor (1 a 30), como a view a juntaria ao cartão; sem ela, a cor 1. Os testes com cadastros trocam `corDoSetor`. */
+  coresDosSetores: Record<string, number> = {}
+  corDoSetor = (setorId: string): number => this.coresDosSetores[setorId] ?? 1
   nomesDosMacroprocessos: Record<string, string> = {}
   /** Os setores que a lista devolve para o Quadro por setor (ativos e inativos). */
   setores: SetorDoQuadro[] = []
@@ -154,7 +157,8 @@ export class ProcessosFalso implements ModuloDeProcessos {
   async listarProcessos(): Promise<ListaDeProcessos> {
     if (this.segurarListaDeProcessos) return new Promise<never>(() => {})
     if (this.falharListaDeProcessos) throw new Error('falha de conexão simulada')
-    return { etapas: [...this.etapasDoCatalogo], processos: [...this.processos], setores: [...this.setores] }
+    const processos = this.processos.map((processo) => ({ ...processo, setorCor: processo.setorCor ?? this.corDoSetor(processo.setorId) }))
+    return { etapas: [...this.etapasDoCatalogo], processos, setores: [...this.setores] }
   }
 
   async lerProcesso(id: string): Promise<ProcessoLido | null> {
@@ -224,6 +228,7 @@ export class ProcessosFalso implements ModuloDeProcessos {
   private nomesDoCartao(dados: DadosDoProcesso) {
     return {
       setorSigla: this.siglasDosSetores[dados.setorId] ?? dados.setorId,
+      setorCor: this.corDoSetor(dados.setorId),
       macroprocessoNome: this.nomesDosMacroprocessos[dados.macroprocessoId] ?? dados.macroprocessoId,
     }
   }
