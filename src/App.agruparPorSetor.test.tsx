@@ -34,7 +34,7 @@ test('Agrupar por: Setor monta uma coluna por setor ativo em ordem de sigla, com
   abrir([doSetor('Emitir Ofício', TSA)])
   await trocar('Setor')
   expect((await screen.findByRole('button', { name: 'Setor' })).getAttribute('aria-pressed')).toBe('true')
-  expect(titulos()).toEqual(['ABCAssessoria Fictícia0', 'TSASetor de Testes A1'])
+  expect(titulos()).toEqual(['TSASetor de Testes A1', 'ABCAssessoria Fictícia0'])
   const vazia = screen.getByRole('region', { name: 'ABC · Assessoria Fictícia' })
   expect(within(vazia).getByText('Nenhum processo deste setor no Quadro.')).toBeTruthy()
   expect(within(screen.getByRole('region', { name: 'TSA · Setor de Testes A' })).queryByText(/Nenhum processo/)).toBeNull()
@@ -46,7 +46,7 @@ test('o setor inativo só tem coluna com processo, marcada Inativo, na ordem de 
   await waitFor(() => expect(titulos()).toHaveLength(3))
   expect(within(screen.getByRole('region', { name: 'MNO · Setor Antigo · inativo' })).getByText('Inativo')).toBeTruthy()
   expect(screen.queryByRole('region', { name: 'XYZ · Setor Esquecido' })).toBeNull()
-  expect(Array.from(document.querySelectorAll('.coluna-titulo-principal')).map((sigla) => sigla.textContent)).toEqual(['ABC', 'MNO Inativo', 'TSA'])
+  expect(Array.from(document.querySelectorAll('.coluna-titulo-principal')).map((sigla) => sigla.textContent)).toEqual(['MNO Inativo', 'ABC', 'TSA'])
 })
 
 test('o cartão traz a barra da etapa, a etiqueta e o avatar, sem a sigla, e não se arrasta', async () => {
@@ -86,7 +86,7 @@ test('com o Só os meus, as colunas dos setores ativos continuam, mesmo vazias',
   await cartaoDe('Processo Dela')
   fireEvent.click(await screen.findByRole('button', { name: 'Só os meus' }))
   await waitFor(() => expect(screen.queryByText('Processo Dela')).toBeNull())
-  expect(titulos()).toEqual(['ABCAssessoria Fictícia0', 'TSASetor de Testes A1'])
+  expect(titulos()).toEqual(['TSASetor de Testes A1', 'ABCAssessoria Fictícia0'])
 })
 
 test('o agrupamento por setor fica no endereço, e abrir já agrupado mantém', async () => {

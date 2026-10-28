@@ -101,6 +101,8 @@
   font: inherit;
   font-weight: 600;
   cursor: pointer;
+  /* O navegador centraliza o texto de botão; sem isto o nome que quebra de linha sai centralizado na coluna. */
+  text-align: left;
 }
 
 .setor-leitura {

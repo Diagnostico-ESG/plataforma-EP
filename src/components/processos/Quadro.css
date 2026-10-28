@@ -59,13 +59,15 @@
   min-height: 0;
 }
 
+/* Título centralizado em todo agrupamento (ADR 0032); a contagem fica à direita, fora do fluxo, e a folga dos lados impede o
+   título longo de passar por baixo dela. */
 .coluna-titulo {
+  position: relative;
   display: flex;
-  /* Pela linha de base: no título de duas linhas (por setor) a contagem fica na linha da sigla, igual em todas as colunas. */
-  align-items: baseline;
-  justify-content: space-between;
+  justify-content: center;
   margin: 0;
-  padding: 0 var(--esp-1);
+  padding: 0 var(--esp-6);
+  text-align: center;
   font-size: var(--tam-coluna);
   font-weight: 700;
 }
@@ -85,6 +87,9 @@
 }
 
 .coluna-contagem {
+  position: absolute;
+  top: 0;
+  right: var(--esp-1);
   color: var(--texto-2);
   font-size: var(--tam-secundario);
   font-weight: 600;
@@ -97,6 +102,10 @@
 .coluna-inativa {
   gap: 0;
   border-radius: var(--canto);
+  /* A cor vai só até o fim do último cartão (ADR 0032), com a folga de baixo; a rolagem continua dentro da coluna. */
+  align-self: flex-start;
+  max-height: 100%;
+  padding-bottom: var(--esp-2);
 }
 
 .coluna-do-setor {
@@ -110,13 +119,21 @@
 }
 
 .coluna-titulo-setor {
-  position: relative;
-  justify-content: center;
   /* Folga dos lados para o nome do setor, centralizado, nunca passar por baixo da contagem posicionada à direita. */
   padding: var(--esp-2) var(--esp-6);
   border-radius: var(--canto) var(--canto) 0 0;
   color: var(--texto);
-  text-align: center;
+}
+
+/* Coluna vazia (ADR 0032): só o cabeçalho colorido; a frase fica logo abaixo, sobre o fundo da página. */
+.coluna-do-setor.coluna-sem-cartao,
+.coluna-inativa.coluna-sem-cartao {
+  background: none;
+  padding-bottom: 0;
+}
+
+.coluna-sem-cartao .coluna-titulo-setor {
+  border-radius: var(--canto);
 }
 
 .coluna-do-setor .coluna-titulo-setor {
@@ -140,7 +157,6 @@
 }
 
 .coluna-titulo-setor .coluna-contagem {
-  position: absolute;
   top: var(--esp-2);
   right: var(--esp-3);
   color: var(--texto);

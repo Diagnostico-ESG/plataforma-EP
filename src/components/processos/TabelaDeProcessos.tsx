@@ -4,12 +4,11 @@ import { LinhaFantasma } from '../cadastros/PecasDaLista'
 import { Pilula } from '../Pilula'
 import { SeloDoSetor } from '../SeloDoSetor'
 import { BarraDeProgresso } from './BarraDeProgresso'
-import { EtiquetaDoProcesso } from './EtiquetaDoProcesso'
 import { NomeComTrecho } from './NomeComTrecho'
 import { PilulaDaSituacao } from './PilulaDaSituacao'
 import { SeloDeParado } from './SeloDeParado'
 
-const COLUNAS = ['Nome', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Etiqueta', 'Responsável', 'Situação']
+const COLUNAS = ['Nome', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Responsável', 'Situação']
 const LINHAS_FANTASMA = 3
 
 type TabelaDeProcessosProps = { linhas: LinhaDaLista[]; idEscolhido: string | null; aoAbrir: (id: string) => void; busca: string | null }
@@ -65,7 +64,6 @@ function LinhaDoProcesso({ linha, escolhida, aoAbrir, busca }: LinhaDoProcessoPr
       <td><SeloDoSetor sigla={linha.setorSigla} cor={linha.setorCor ?? 1} /></td>
       <td>{linha.macroprocessoNome}</td>
       <td>{linha.etapaAtual ? <BarraDeProgresso processo={linha} /> : '—'}</td>
-      <td><EtiquetaDoProcesso etiqueta={linha.etiqueta} /></td>
       <td>{linha.responsavel?.nome ?? '—'}</td>
       <td>
         <span className="lista-situacao">

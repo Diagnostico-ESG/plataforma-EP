@@ -65,13 +65,13 @@ const faixa = () => within(screen.getByRole('navigation', { name: 'Áreas do sis
 test('as colunas, a ordem por sigla e nome, todas as situações e o pai do subprocesso', async () => {
   montar()
   const [cabecalho, ...corpo] = await linhas()
-  expect(cabecalho).toEqual(['Nome', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Etiqueta', 'Responsável', 'Situação'])
+  expect(cabecalho).toEqual(['Nome', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Responsável', 'Situação'])
   expect(corpo).toEqual([
-    ['Arquivar Pasta', 'Processo', 'TSA', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', 'A fazer', '—', 'Cancelado'],
-    ['Cadastrar Bem', 'Processo', 'TSA', 'Macro de Teste', '—', 'A fazer', '—', 'Em andamento'],
-    ['Emitir Ofício', 'Processo', 'TSA', 'Macro de Teste', '—', 'Finalizado', '—', 'Concluído'],
-    ['Conferir Recibo↳ Pagar Diária', 'Subprocesso', 'TSB', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', 'Em andamento', 'Ana Teste', 'Em andamento'],
-    ['Pagar Diária', 'Processo', 'TSB', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', 'A fazer', '—', 'Em andamento'],
+    ['Arquivar Pasta', 'Processo', 'TSA', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', '—', 'Cancelado'],
+    ['Cadastrar Bem', 'Processo', 'TSA', 'Macro de Teste', '—', '—', 'Em andamento'],
+    ['Emitir Ofício', 'Processo', 'TSA', 'Macro de Teste', '—', '—', 'Concluído'],
+    ['Conferir Recibo↳ Pagar Diária', 'Subprocesso', 'TSB', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', 'Ana Teste', 'Em andamento'],
+    ['Pagar Diária', 'Processo', 'TSB', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', '—', 'Em andamento'],
   ])
   expect(within(screen.getByRole('table')).getAllByText('Concluído').some((elemento) => elemento.className.includes('pilula'))).toBe(true)
 })
@@ -101,6 +101,8 @@ test('carregando: o aviso e as linhas-fantasma', async () => {
   montar({ ajustar: (falso) => { falso.segurarListaDeProcessos = true } })
   expect((await screen.findByText('Carregando processos…')).getAttribute('role')).toBe('status')
   expect(document.querySelectorAll('.linha-fantasma').length).toBeGreaterThan(0)
+  expect(document.querySelectorAll('thead th')).toHaveLength(7)
+  expect(document.querySelector('.linha-fantasma')?.querySelectorAll('td')).toHaveLength(7)
 })
 
 test('erro ao carregar: a mensagem e [Tentar de novo], que carrega de novo', async () => {
@@ -157,13 +159,11 @@ function diaDeslocado(deslocamento: number): string {
   return hojeLocal(data)
 }
 
-test('a coluna Etapa atual traz a barra com o nome acessível "Etapa n de N: nome", e Etiqueta traz a pílula na cor do valor', async () => {
+test('a coluna Etapa atual traz a barra com o nome acessível "Etapa n de N: nome", e a Lista não tem etiqueta', async () => {
   montar()
   const linha = (await screen.findByRole('button', { name: 'Conferir Recibo' })).closest('tr') as HTMLElement
   expect(within(linha).getByRole('img', { name: 'Etapa 1 de 1: Reunião de modelagem' })).toBeTruthy()
-  const etiqueta = linha.querySelector('.etiqueta')
-  expect(etiqueta?.textContent).toBe('Em andamento')
-  expect(etiqueta?.className).toContain('etiqueta-em_andamento')
+  expect(linha.querySelector('.etiqueta')).toBeNull()
 })
 
 test('o selo de parado aparece ao lado do nome com 8 dias na etapa e não com 7, nem em processo concluído', async () => {

@@ -106,10 +106,16 @@ describe('agrupado por setor', () => {
     expect(resultado.map((coluna) => coluna.processos.map((processo) => processo.nome))).toEqual([['Beta'], ['alfa', 'Zeta']])
   })
 
-  test('o setor inativo só tem coluna com processo, marcada inativa, na mesma ordem de sigla', () => {
+  test('o setor inativo só tem coluna com processo, marcada inativa, e entra na ordem dos que têm processo', () => {
     const resultado = colunasPorSetor([TSA, VELHO, OUTRO_VELHO, ABC], [doSetor('Antigo', VELHO)], null)
-    expect(resultado.map((coluna) => coluna.titulo)).toEqual(['abc', 'MNO', 'TSA'])
-    expect(resultado.map((coluna) => coluna.inativo)).toEqual([false, true, false])
+    expect(resultado.map((coluna) => coluna.titulo)).toEqual(['MNO', 'abc', 'TSA'])
+    expect(resultado.map((coluna) => coluna.inativo)).toEqual([true, false, false])
+  })
+
+  test('os setores com processo vêm antes dos vazios, cada grupo em ordem de sigla', () => {
+    const XPT = umSetor('s5', 'XPT', 'Setor de Testes C')
+    const resultado = colunasPorSetor([XPT, TSA, ABC, VELHO], [doSetor('Um', XPT), doSetor('Dois', VELHO)], null)
+    expect(resultado.map((coluna) => coluna.titulo)).toEqual(['MNO', 'XPT', 'abc', 'TSA'])
   })
 
   test('o arquivado e o cancelado ficam de fora, e o setor inativo só com eles não tem coluna', () => {

@@ -73,12 +73,14 @@ function AvisoDaColunaVazia({ coluna, agrupar }: { coluna: Coluna; agrupar: Agru
   return null
 }
 
-// Por setor a coluna inteira leva a cor do setor (ADR 0031); a do setor inativo fica cinza, sem a cor.
-function classesDaColuna({ cor, inativo }: Coluna, realce: boolean): string {
+// Por setor a coluna leva a cor do setor até o último cartão (ADR 0031 e 0032); vazia, só o cabeçalho é colorido. A do setor
+// inativo fica cinza, sem a cor.
+function classesDaColuna({ cor, inativo, processos }: Coluna, realce: boolean): string {
   return [
     'coluna',
     realce && 'coluna-destino',
     cor !== undefined && (inativo ? 'coluna-inativa' : 'coluna-do-setor'),
+    cor !== undefined && processos.length === 0 && 'coluna-sem-cartao',
   ].filter(Boolean).join(' ')
 }
 

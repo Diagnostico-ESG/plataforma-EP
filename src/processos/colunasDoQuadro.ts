@@ -69,16 +69,19 @@ function porSigla(a: SetorDoQuadro, b: SetorDoQuadro): number {
 }
 
 /**
- * Uma coluna por setor ativo, mesmo vazia, e por setor inativo que ainda tem processo no Quadro, em ordem de sigla.
+ * Uma coluna por setor ativo, mesmo vazia, e por setor inativo que ainda tem processo no Quadro. Primeiro os setores que têm
+ * processo na tela, depois os vazios (ADR 0032), cada grupo em ordem de sigla.
  * Com o filtro de setor (setorFiltrado), só a coluna dele. Em cada coluna, os processos saem em ordem de nome.
  */
 export function colunasPorSetor(setores: SetorDoQuadro[], processos: ProcessoDaLista[], setorFiltrado: string | null): ColunaDoQuadro[] {
   const noQuadro = processosDoQuadro(processos)
-  return [...setores]
+  const colunas = [...setores]
     .sort(porSigla)
     .map((setor) => ({
       chave: setor.id, titulo: setor.sigla, subtitulo: setor.nome, inativo: !setor.ativo, cor: setor.cor,
       processos: noQuadro.filter((processo) => processo.setorId === setor.id),
     }))
     .filter((coluna) => (setorFiltrado === null ? !coluna.inativo || coluna.processos.length > 0 : coluna.chave === setorFiltrado))
+  // O filter mantém a ordem de sigla dentro de cada grupo.
+  return [...colunas.filter((coluna) => coluna.processos.length > 0), ...colunas.filter((coluna) => coluna.processos.length === 0)]
 }

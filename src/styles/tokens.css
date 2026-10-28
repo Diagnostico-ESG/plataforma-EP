@@ -60,14 +60,15 @@
   --neutra-texto: #4a5163;
   --neutra-fundo: #eef0f4;
 
-  /* Etiquetas da etapa (cartão, Lista e Agora): fundo forte, texto e bolinha brancos com 4,5:1 ou mais (ADR 0031, 2026-10-28).
+  /* Etiquetas da etapa (cartão e Agora): fundo forte com texto e bolinha a 4,5:1 ou mais (ADR 0031, 2026-10-28). Em andamento é âmbar
+     cheio com letra marrom-escura, porque o branco não tem contraste AA sobre o âmbar (ADR 0032).
      Fora da paleta dos setores e das pílulas de prazo, para não se confundirem com elas. */
   --etiqueta-a-fazer-texto: #ffffff;
   --etiqueta-a-fazer-fundo: #be185d;
   --etiqueta-a-fazer-bolinha: #ffffff;
-  --etiqueta-em-andamento-texto: #ffffff;
-  --etiqueta-em-andamento-fundo: #4338ca;
-  --etiqueta-em-andamento-bolinha: #ffffff;
+  --etiqueta-em-andamento-texto: #451a03;
+  --etiqueta-em-andamento-fundo: #f59e0b;
+  --etiqueta-em-andamento-bolinha: #451a03;
   --etiqueta-concluido-texto: #ffffff;
   --etiqueta-concluido-fundo: #0f766e;
   --etiqueta-concluido-bolinha: #ffffff;
