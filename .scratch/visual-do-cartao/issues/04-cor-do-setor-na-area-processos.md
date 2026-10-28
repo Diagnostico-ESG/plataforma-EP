@@ -16,3 +16,5 @@
 - [x] `npm test` verde; testes de banco verdes no Docker local e no "Testes de banco". (Docker local desligado: só no "Testes de banco")
 - [ ] `[visual]` A faixa ocupa o topo do cartão de lado a lado, legível nas 30 cores, inclusive com nome longo, e a faixa vermelha do parado continua visível.
 - [ ] `[visual]` Título da coluna, selo do verso e da Lista e quadradinho mostram a mesma cor do cartão, sem estourar a largura.
+
+Concluído em 2026-10-27 (commit 7a423cc)
