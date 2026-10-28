@@ -9,6 +9,7 @@ import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
 import { umSetor } from './testes/processoDaLista'
 import { montarVerso, processoLido } from './testes/processoNoVerso'
+import { montarNosCadastros } from './testes/processosNosCadastros'
 import { versoAberto } from './testes/versoDoCartao'
 import { cartaoDe, dia, montar, processo } from './testes/quadroDeTeste'
 import { VersoesFalso } from './versoes/VersoesFalso'
@@ -111,4 +112,17 @@ test('a coluna Setor da Lista mostra o selo da cor, e o nome da célula segue se
   const selo = celula.querySelector('.selo-do-setor') as HTMLElement
   expect(selo.textContent).toBe('TSA')
   expect(selo.style.getPropertyValue('--cor-claro')).toBe(corDoSetor(13).claro)
+})
+
+test('trocar a cor do setor no cadastro muda a faixa do cartão na próxima vez que o Quadro carrega', async () => {
+  window.location.hash = '#/setores'
+  montarNosCadastros()
+  fireEvent.click(await screen.findByRole('button', { name: 'TSA' }))
+  const grade = within(await screen.findByRole('group', { name: 'Cor do setor' }))
+  fireEvent.click(grade.getByRole('radio', { name: 'água claro' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
+  await screen.findByRole('button', { name: 'TSB' })
+  window.location.hash = '#/processos'
+  const cartao = await cartaoDe('Emitir Ofício')
+  expect((cartao.querySelector('.cartao-faixa') as HTMLElement).style.getPropertyValue('--cor-claro')).toBe(corDoSetor(2).claro)
 })

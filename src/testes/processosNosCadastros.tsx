@@ -68,6 +68,8 @@ export function montarNosCadastros(
   const processos = new ProcessosFalso()
   processos.processos = PROCESSOS_DOS_CADASTROS
   processos.etapasDoCatalogo = CATALOGO_DE_TESTE
+  // A view dos processos traz a cor que o cadastro do setor tem na hora da leitura.
+  processos.corDoSetor = (setorId) => cadastros.setores.find((setor) => setor.id === setorId)?.cor ?? 1
   ajustarProcessos?.(processos)
   const versoes = falsoDeVersoes(processos)
   ajustarVersoes?.(versoes)
