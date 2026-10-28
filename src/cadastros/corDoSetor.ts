@@ -35,3 +35,18 @@ export function estiloDaCor(numero: number): Record<'--cor-claro' | '--cor-escur
   const { claro, escuro } = corDoSetor(numero)
   return { '--cor-claro': claro, '--cor-escuro': escuro }
 }
+
+/** Nome acessível da amostra da grade: o da cor e, se outro setor a usa, a sigla dele. */
+export function nomeDaAmostra(numero: number, siglaEmUso?: string): string {
+  const { nome } = corDoSetor(numero)
+  return siglaEmUso ? `${nome}, em uso por ${siglaEmUso}` : nome
+}
+
+/** Cor → primeira sigla em ordem entre os setores que a usam; a lista que chega já sem o setor aberto. */
+export function coresEmUso(setores: readonly { sigla: string; cor: number }[]): Map<number, string> {
+  const emUso = new Map<number, string>()
+  for (const { sigla, cor } of [...setores].sort((a, b) => (a.sigla < b.sigla ? -1 : Number(a.sigla > b.sigla)))) {
+    if (!emUso.has(cor)) emUso.set(cor, sigla)
+  }
+  return emUso
+}

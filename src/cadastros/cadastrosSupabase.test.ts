@@ -99,6 +99,13 @@ describe('criarCadastrosSupabase', () => {
     expect(cliente.pedidos[0]).toMatchObject({ tabela: 'setores', operacao: 'update', valores, filtro: ['id', 's1'] })
   })
 
+  test('editar envia a cor escolhida junto com o resto do setor', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['setores.update'] = { data: [{ id: 's1' }], error: null }
+    await criar(cliente).editarSetor('s1', { ...NOVO, cor: 7 })
+    expect(cliente.pedidos[0]).toMatchObject({ operacao: 'update', valores: { ...NOVO, cor: 7 } })
+  })
+
   test('excluir apaga pelo id', async () => {
     const cliente = new ClienteSupabaseFalso()
     cliente.respostas['setores.delete'] = { data: [{ id: 's1' }], error: null }

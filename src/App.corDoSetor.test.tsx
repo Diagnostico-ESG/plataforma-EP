@@ -103,3 +103,107 @@ test('o histórico dos cadastros não mostra a cor', async () => {
   await screen.findByRole('combobox', { name: 'Item' })
   expect(screen.getAllByRole('listitem')[0].textContent).not.toMatch(/cor/i)
 })
+
+async function abrirSetor(sigla: string) {
+  fireEvent.click(await screen.findByRole('button', { name: sigla }))
+  return within(await screen.findByRole('group', { name: 'Cor do setor' }))
+}
+
+test('o setor aberto traz a grade de 30 amostras com a cor atual marcada', async () => {
+  montar()
+  const grade = await abrirSetor('TSA')
+  expect(grade.getAllByRole('radio')).toHaveLength(30)
+  expect((grade.getByRole('radio', { name: 'azul claro' }) as HTMLInputElement).checked).toBe(true)
+})
+
+test('as cores de outros setores trazem "em uso por" e a própria cor não', async () => {
+  montar()
+  const grade = await abrirSetor('TSA')
+  expect(grade.getByRole('radio', { name: 'coral claro, em uso por TSB' })).toBeTruthy()
+  expect(grade.getByRole('radio', { name: 'coral médio, em uso por TSX' })).toBeTruthy()
+  expect(grade.queryByRole('radio', { name: /em uso por TSA/ })).toBeNull()
+})
+
+test('trocar a cor e salvar grava a cor escolhida', async () => {
+  const cadastros = montar()
+  const grade = await abrirSetor('TSA')
+  fireEvent.click(grade.getByRole('radio', { name: 'menta claro' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
+  await screen.findByRole('button', { name: 'TSB' })
+  expect(cadastros.setores[0].cor).toBe(4)
+})
+
+test('uma cor já usada por outro setor pode ser escolhida', async () => {
+  const cadastros = montar()
+  const grade = await abrirSetor('TSA')
+  fireEvent.click(grade.getByRole('radio', { name: 'coral claro, em uso por TSB' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
+  await screen.findByRole('button', { name: 'TSB' })
+  expect(cadastros.setores[0].cor).toBe(1)
+  expect(cadastros.setores[1].cor).toBe(1)
+})
+
+test('se a gravação falha, a cor escolhida continua marcada com a mensagem de hoje', async () => {
+  const cadastros = montar()
+  cadastros.falhaDeGravacao = 'sem conexão'
+  const grade = await abrirSetor('TSA')
+  fireEvent.click(grade.getByRole('radio', { name: 'menta claro' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
+  expect((await screen.findByRole('alert')).textContent).toContain('A alteração não foi salva')
+  expect((grade.getByRole('radio', { name: 'menta claro' }) as HTMLInputElement).checked).toBe(true)
+  expect(cadastros.setores[0].cor).toBe(13)
+})
+
+test('a Consulta não vê a grade', async () => {
+  montar('consulta')
+  fireEvent.click(await screen.findByRole('button', { name: 'TSA' }))
+  await screen.findByRole('button', { name: 'Voltar à lista' })
+  expect(screen.queryByRole('group', { name: 'Cor do setor' })).toBeNull()
+})
+
+test('o Novo setor não tem a grade', async () => {
+  montar()
+  fireEvent.click(await screen.findByRole('button', { name: 'Novo setor' }))
+  await screen.findByLabelText('Nome')
+  expect(screen.queryByRole('group', { name: 'Cor do setor' })).toBeNull()
+})
+
+test('salvar só o nome mantém a cor do setor', async () => {
+  const cadastros = montar()
+  await abrirSetor('TSA')
+  fireEvent.change(screen.getByLabelText('Nome'), { target: { value: 'Setor Teste Renomeado' } })
+  fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
+  await screen.findByRole('button', { name: 'TSB' })
+  expect(cadastros.setores[0]).toMatchObject({ nome: 'Setor Teste Renomeado', cor: 13 })
+})
+
+test('salvar só o nome não envia a cor', async () => {
+  const cadastros = montar()
+  const enviados: unknown[] = []
+  const editar = cadastros.editarSetor.bind(cadastros)
+  cadastros.editarSetor = (id, dados) => { enviados.push(dados); return editar(id, dados) }
+  await abrirSetor('TSA')
+  fireEvent.change(screen.getByLabelText('Nome'), { target: { value: 'Setor Teste Renomeado' } })
+  fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
+  await screen.findByRole('button', { name: 'TSB' })
+  expect(enviados).toEqual([{ nome: 'Setor Teste Renomeado', sigla: 'TSA', observacoes: null }])
+})
+
+test('se a lista de setores falha, a grade aparece sem as marcas de "em uso"', async () => {
+  const cadastros = montar()
+  const botao = await screen.findByRole('button', { name: 'TSA' })
+  cadastros.falharLista = true
+  fireEvent.click(botao)
+  const grade = within(await screen.findByRole('group', { name: 'Cor do setor' }))
+  expect(grade.getByRole('radio', { name: 'coral claro' })).toBeTruthy()
+  expect(grade.queryByRole('radio', { name: /em uso por/ })).toBeNull()
+})
+
+test('com a lista de setores demorando, o formulário já aparece e a grade espera', async () => {
+  const cadastros = montar()
+  const botao = await screen.findByRole('button', { name: 'TSA' })
+  cadastros.segurarLista = true
+  fireEvent.click(botao)
+  expect(await screen.findByLabelText('Nome')).toBeTruthy()
+  expect(screen.queryByRole('group', { name: 'Cor do setor' })).toBeNull()
+})

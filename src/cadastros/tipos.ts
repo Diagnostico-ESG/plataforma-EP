@@ -1,6 +1,7 @@
 /** `cor`: posição do setor na paleta de 30 cores (1 a 30), o número que o banco guarda. */
 export type Setor = { id: string; sigla: string; nome: string; observacoes: string | null; ativo: boolean; cor: number }
-export type DadosDoSetor = { nome: string; sigla: string; observacoes: string | null }
+/** `cor` só vai na troca do setor aberto; ao criar, o banco escolhe a primeira cor livre. */
+export type DadosDoSetor = { nome: string; sigla: string; observacoes: string | null; cor?: number }
 
 export type CategoriaDoMacroprocesso = 'finalistico' | 'apoio' | 'gerencial'
 export type Macroprocesso = {

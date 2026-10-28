@@ -1,0 +1,54 @@
+.grade-de-cores {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: var(--esp-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.grade-de-cores legend {
+  padding: 0;
+  margin-bottom: var(--esp-2);
+}
+
+.amostra-de-cor {
+  position: relative;
+  display: block;
+}
+
+/* O rádio fica por cima da amostra, invisível, para receber o clique e o foco do teclado. */
+.amostra-de-cor input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.amostra-de-cor-tom {
+  display: block;
+  height: 28px;
+  border-radius: var(--canto-macro);
+  background: linear-gradient(90deg, var(--cor-claro), var(--cor-escuro));
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  /* Sem isto, o modo de contraste forçado apaga a cor, que é o que a amostra mostra. */
+  forced-color-adjust: none;
+}
+
+/* Em uso por outro setor: ponto discreto no canto, sem impedir a escolha. */
+.amostra-em-uso .amostra-de-cor-tom {
+  background-image: radial-gradient(circle at 85% 20%, var(--texto) 0 2px, transparent 3px),
+    linear-gradient(90deg, var(--cor-claro), var(--cor-escuro));
+}
+
+.amostra-de-cor input:checked + .amostra-de-cor-tom {
+  outline-color: var(--texto);
+}
+
+.amostra-de-cor input:focus-visible + .amostra-de-cor-tom {
+  outline-color: var(--azul);
+  outline-offset: 3px;
+}

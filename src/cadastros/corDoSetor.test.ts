@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { TODAS_AS_CORES, corDoSetor, estiloDaCor } from './corDoSetor'
+import { TODAS_AS_CORES, coresEmUso, corDoSetor, estiloDaCor, nomeDaAmostra } from './corDoSetor'
 
 const TEXTO = '#1E2433'
 
@@ -37,5 +37,17 @@ describe('corDoSetor', () => {
 
   test('o estilo leva os dois tons em variáveis CSS', () => {
     expect(estiloDaCor(13)).toEqual({ '--cor-claro': '#C4D9F8', '--cor-escuro': corDoSetor(13).escuro })
+  })
+
+  test('o nome da amostra é o da cor, com "em uso por" quando outro setor a usa', () => {
+    expect(nomeDaAmostra(13)).toBe('azul claro')
+    expect(nomeDaAmostra(13, 'TSA')).toBe('azul claro, em uso por TSA')
+  })
+
+  test('as cores em uso guardam a primeira sigla em ordem, quando mais de um setor usa a cor', () => {
+    const emUso = coresEmUso([{ sigla: 'TSC', cor: 5 }, { sigla: 'TSA', cor: 5 }, { sigla: 'TSB', cor: 2 }])
+    expect(emUso.get(5)).toBe('TSA')
+    expect(emUso.get(2)).toBe('TSB')
+    expect(emUso.has(1)).toBe(false)
   })
 })
