@@ -565,3 +565,11 @@ Ponto de partida da revisão: `marco/2026-10-26-inicio-quadro-livre-parte-5`.
 - **Audit (impeccable):** detector sem achados em `CartaoDoProcesso.tsx` e `Quadro.css`. Nenhum P0, P1, P2 ou P3 novo. O `polish` não encontrou o que aplicar; nada foi alterado em código.
 - **Verificado no código:** o cartão é coluna flex com `gap`, então tirar a linha do topo (no agrupamento por setor) não deixa espaço vazio; a sigla segue com contraste e tokens como antes. Sem cor nem tamanho novos.
 - **Não conferido na tela:** o critério `[visual]` 5 (espaçamento regular e cartões alinhados) depende de login; fica para a conferência do usuário.
+
+## 2026-10-28 — /polir de "Ajustes do Quadro e da Lista" (ADR 0032)
+
+- **Audit (impeccable):** detector sem achados novos; o único aviso (`border-radius: 1px` na faixa do cartão, `Quadro.css`) já existia e é o raio de dentro da borda do cartão, intencional. Contraste da etiqueta Em andamento (`#451A03` sobre `#F59E0B`) e da frase da coluna vazia (`texto-2` sobre `fundo`) cobertos por teste. Nenhum P0 ou P1.
+- **Corrigido (P2):** comentário de `Quadro.css` ainda dizia que a coluna por setor vai "na altura do Quadro e mesmo vazia"; passou a dizer o que vale desde a ADR 0032.
+- **Corrigido (P3):** a contagem de itens do título (posição absoluta, `top: 0`) ficava colada no alto quando o título quebrava em duas linhas; agora é centralizada na altura do título (no Quadro por setor mantém a posição própria).
+- **Deixado de fora, com o motivo:** a altura da coluna por setor depende de `align-self: flex-start` com `max-height: 100%`, que só se prova no navegador; não foi vista (a tela exige login). Se não resolver a altura, a coluna cheia deixa de rolar por dentro. Fica para a conferência do usuário, com os critérios `[visual]` 4 a 7.
+- **Deixado de fora:** reordenação das colunas ao filtrar e ausência de realce de soltura em coluna de setor vazia (apontadas pelo `/code-review`): a reordenação é a regra da spec e o arrastar só existe no Quadro por etapa.

@@ -89,14 +89,18 @@
 .coluna-contagem {
   position: absolute;
   top: 0;
+  bottom: 0;
   right: var(--esp-1);
+  /* Centrada na altura do título, qualquer que seja o número de linhas dele. */
+  display: flex;
+  align-items: center;
   color: var(--texto-2);
   font-size: var(--tam-secundario);
   font-weight: 600;
 }
 
-/* Por setor (ADR 0031): a coluna toda, na altura do Quadro e mesmo vazia, ganha o tom do setor misturado com branco, e o
-   cabeçalho é uma faixa no degradê do setor de lado a lado, colada no alto. Nome e contagem em `texto`: o cinza médio não tem
+/* Por setor (ADR 0031 e 0032): a coluna ganha o tom do setor misturado com branco só até o fim do último cartão (vazia, fica só
+   o cabeçalho), e o cabeçalho é uma faixa no degradê do setor de lado a lado, colada no alto. Nome e contagem em `texto`: o cinza médio não tem
    contraste AA sobre os tons médios da paleta. O setor inativo não tem cor: cabeçalho um tom acima do fundo, ambos em cinza. */
 .coluna-do-setor,
 .coluna-inativa {
@@ -158,6 +162,8 @@
 
 .coluna-titulo-setor .coluna-contagem {
   top: var(--esp-2);
+  bottom: auto;
+  display: block;
   right: var(--esp-3);
   color: var(--texto);
 }
