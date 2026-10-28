@@ -26,7 +26,7 @@ Demanda visual-do-cartao (`.scratch/visual-do-cartao/demanda.md`), decidida na s
 - **Faixa do setor no cartão:** no topo do cartão do Quadro, de lado a lado, uma faixa na cor do setor em degradê (do tom da cor, à esquerda, para um tom um pouco mais escuro dela, à direita). Nos agrupamentos por etapa e por responsável, a faixa leva a sigla maior e centralizada, e o nome do processo segue no corpo do cartão como hoje. No agrupamento por setor, a faixa leva o nome do processo em destaque (16px, negrito), e o nome sai do corpo do cartão; a sigla já está no título da coluna.
 - **Título da coluna no agrupamento por setor:** a sigla em destaque ganha o mesmo selo colorido em degradê; o nome do setor continua abaixo, sem cor. A coluna de setor inativo mantém a marca "inativo" e a sua cor.
 - **Selo do setor:** a sigla em texto escuro sobre a cor do setor em degradê, pequeno, no cabeçalho do verso (no lugar da sigla de hoje) e na coluna Setor da Lista.
-- **Caixas de seleção de setor:** o filtro Setor (Quadro e Lista) e o campo Setor do formulário do processo (Novo processo, Editar e Reclassificar) mostram, antes do texto de cada opção, um quadradinho na cor do setor em degradê, como o quadradinho do macroprocesso.
+- **Caixas de seleção de setor:** o filtro Setor (Quadro e Lista) e o campo Setor do formulário do processo (Novo processo e Editar) mostram, antes do texto de cada opção, um quadradinho na cor do setor em degradê, como o quadradinho do macroprocesso.
 - **Barra da etapa:** uma faixa contínua lisa, sem divisões, com cantos redondos, sobre um trilho cinza claro. Ela se preenche da esquerda até a etapa atual, em degradê do azul claro ao azul escuro; a ponta mais escura marca onde o processo está. Em Não iniciados, só o primeiro trecho (1 de N); em Concluídos, cheia. O texto "Nome da etapa · n de N" continua acima e o nome acessível continua "Etapa n de N: Nome". Aparece onde aparece hoje: cartão do Quadro agrupado por responsável e por setor, coluna "Etapa atual" da Lista e Processos do setor; continua fora do Quadro agrupado por etapa.
 - **Etiquetas vivas:** A fazer em violeta cheio, com texto e bolinha brancos (é a de maior destaque, por ser a que pede ação); Em andamento em laranja vivo, com texto marrom-escuro; Concluído em verde vivo, com texto verde-escuro. Todas com contraste AA. Vale no cartão, na coluna Etiqueta da Lista e nas opções da etiqueta no Agora.
 
@@ -57,7 +57,7 @@ Demanda visual-do-cartao (`.scratch/visual-do-cartao/demanda.md`), decidida na s
 18. Como Integrante do EP, quero ver no cabeçalho do verso a sigla do setor sobre a cor dele, para saber o setor ao abrir o processo.
 19. Como Integrante do EP, quero ver na coluna Setor da Lista a sigla sobre a cor do setor, para varrer a Lista por setor como varro o Quadro.
 20. Como Integrante do EP, quero ver um quadradinho da cor do setor antes de cada opção do filtro Setor, para achar o setor pela cor.
-21. Como Integrante do EP, quero ver o mesmo quadradinho no campo Setor do Novo processo, do Editar e da Reclassificação, para escolher o setor certo de relance.
+21. Como Integrante do EP, quero ver o mesmo quadradinho no campo Setor do Novo processo e do Editar, para escolher o setor certo de relance.
 22. Como pessoa que usa leitor de tela, quero que o quadradinho e a cor do selo não entrem no nome da opção nem do selo, para a leitura continuar só pelo texto.
 23. Como Integrante do EP, quero que, quando o cadastro troca a cor de um setor, a nova cor apareça no Quadro, na Lista e no verso na próxima vez que carregam, sem nada a fazer nos processos.
 24. Como Consulta, quero ver as mesmas cores do setor no Quadro, na Lista e no verso, sem poder trocá-las, para acompanhar como a equipe.
@@ -137,7 +137,7 @@ Demanda visual-do-cartao (`.scratch/visual-do-cartao/demanda.md`), decidida na s
 1. A cor chega ao Quadro, à Lista e ao verso pela view `processos_com_andamento` (coluna nova `setor_cor`), e não por uma busca à parte: a sigla já vem por ali.
 2. O tom mais escuro do degradê é calculado em código por uma regra fixa, e não listado à mão; um teste confere o contraste nas duas pontas para as 30 cores.
 3. No agrupamento por setor o nome sai do corpo do cartão, para não aparecer duas vezes.
-4. O quadradinho entra também no Reclassificar, que usa o mesmo campo Setor do formulário.
+4. O quadradinho entra no Novo processo e no Editar, que usam o mesmo campo Setor. A janela de Reclassificar não tem campo Setor (só troca o tipo e o processo pai), então não leva o quadradinho (corrigido na entrega, 2026-10-27; ver `desvios.md` de visual-do-cartao).
 5. A seção "Sobre" do verso continua com o setor em texto.
 
 ### Divergência com `.scratch/especificacao.md`

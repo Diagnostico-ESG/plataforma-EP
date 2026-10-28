@@ -6,11 +6,11 @@
 
 **Status:** ready-for-agent
 
-- [ ] A função da barra devolve a fração preenchida (posição sobre total, Concluídos cheia) com o texto e o nome acessível de hoje; os estados de bloco deixam de existir; testes unitários em Não iniciados, no meio, em Concluídos e com etapa desativada no catálogo.
-- [ ] O componente da barra desenha trilho e preenchimento em degradê (8px, cantos redondos); os lugares que o usam não mudam; testes de tela da barra (cartão, Lista, Processos do setor) passam com o texto e o nome acessível.
-- [ ] Os três pares de tokens da etiqueta (fundo, texto, bolinha) passam aos valores da identidade, com contraste AA; testes das etiquetas no cartão, na Lista e no Agora conferem texto e cor de cada valor.
-- [ ] Pílulas de Situação, selo e faixa do processo parado sem mudança.
-- [ ] `npm test` verde.
+- [x] A função da barra devolve a fração preenchida (posição sobre total, Concluídos cheia) com o texto e o nome acessível de hoje; os estados de bloco deixam de existir; testes unitários em Não iniciados, no meio, em Concluídos e com etapa desativada no catálogo.
+- [x] O componente da barra desenha trilho e preenchimento em degradê (8px, cantos redondos); os lugares que o usam não mudam; testes de tela da barra (cartão, Lista, Processos do setor) passam com o texto e o nome acessível.
+- [x] Os três pares de tokens da etiqueta (fundo, texto, bolinha) passam aos valores da identidade, com contraste AA; testes das etiquetas no cartão, na Lista e no Agora conferem texto e cor de cada valor.
+- [x] Pílulas de Situação, selo e faixa do processo parado sem mudança.
+- [x] `npm test` verde.
 - [ ] `[visual]` A barra é uma faixa lisa em degradê azul, cheia em Concluídos, sem estourar a largura no cartão, na Lista e em Processos do setor.
 - [ ] `[visual]` A fazer em violeta cheio é a etiqueta mais destacada do cartão; Em andamento e Concluído vivos, sem confundir com as pílulas de Situação.
 
