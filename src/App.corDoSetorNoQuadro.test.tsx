@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import App from './App'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
@@ -7,6 +7,7 @@ import { corDoSetor } from './cadastros/corDoSetor'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
+import { umSetor } from './testes/processoDaLista'
 import { montar, processo } from './testes/quadroDeTeste'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
@@ -41,4 +42,17 @@ test('o campo Setor do Novo processo mostra o quadradinho da cor de cada setor a
   await waitFor(() => expect(within(campo).getAllByRole('option').length).toBeGreaterThan(1))
   expect(corClaraDaMarca(within(campo).getByRole('option', { name: 'TSA — Setor Teste A' }))).toBe(corDoSetor(13).claro)
   expect(corClaraDaMarca(within(campo).getByRole('option', { name: 'TSB — Setor Teste B' }))).toBe(corDoSetor(22).claro)
+})
+
+test('no agrupamento por setor, a sigla do título leva o selo da cor, e a coluna inativa mantém a marca e a cor', async () => {
+  const ativo = umSetor('s1', 'TSA', 'Setor de Testes A', true, 13)
+  const inativo = umSetor('s3', 'MNO', 'Setor Antigo', false, 22)
+  montar([processo('Processo Antigo', { processo: { setorId: 's3', setorSigla: 'MNO', setorCor: 22 } })], 'integrante_ep', [], new VersoesFalso(), [ativo, inativo])
+  fireEvent.click(await screen.findByRole('button', { name: 'Setor' }))
+  const coluna = within(await screen.findByRole('region', { name: 'MNO · Setor Antigo · inativo' }))
+  const seloDe = (sigla: string) => Array.from(document.querySelectorAll<HTMLElement>('.coluna-titulo .selo-do-setor')).find((el) => el.textContent === sigla)
+  expect(seloDe('TSA')?.style.getPropertyValue('--cor-claro')).toBe(corDoSetor(13).claro)
+  expect(seloDe('MNO')?.style.getPropertyValue('--cor-claro')).toBe(corDoSetor(22).claro)
+  expect(coluna.getByText('Inativo')).toBeTruthy()
+  expect(coluna.getByText('Setor Antigo')).toBeTruthy()
 })

@@ -5,6 +5,7 @@ import type { AgruparQuadroPor } from '../../processos/enderecoDosProcessos'
 import { CHAVE_DOS_CONCLUIDOS } from '../../processos/publicacao'
 import type { EtapaDoCatalogo } from '../../processos/tipos'
 import { Pilula } from '../Pilula'
+import { SeloDoSetor } from '../SeloDoSetor'
 import { CartaoDoProcesso } from './CartaoDoProcesso'
 
 type ColunaDoQuadroProps = {
@@ -39,7 +40,7 @@ export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAl
       }}>
       <h3 className="coluna-titulo">
         <span className="coluna-titulo-texto">
-          <span className="coluna-titulo-principal">{coluna.titulo}{coluna.inativo && <> <Pilula situacao="neutra">Inativo</Pilula></>}</span>
+          <span className="coluna-titulo-principal">{tituloDaColuna(coluna)}{coluna.inativo && <> <Pilula situacao="neutra">Inativo</Pilula></>}</span>
           {coluna.subtitulo && <span className="coluna-titulo-nome">{coluna.subtitulo}</span>}
         </span>
         <span className="coluna-contagem">{coluna.processos.length}</span>
@@ -69,4 +70,9 @@ function AvisoDaColunaVazia({ coluna, agrupar }: { coluna: Coluna; agrupar: Agru
   if (agrupar === 'setor') return <p className="coluna-vazia">Nenhum processo deste setor no Quadro.</p>
   if (coluna.chave === CHAVE_DOS_CONCLUIDOS) return <p className="coluna-vazia">Nenhum processo concluído.</p>
   return null
+}
+
+// Por setor a sigla do título leva o selo da cor do setor; nas demais colunas o título é só texto.
+function tituloDaColuna({ titulo, cor }: Coluna) {
+  return cor === undefined ? titulo : <SeloDoSetor sigla={titulo} cor={cor} />
 }

@@ -125,3 +125,9 @@ describe('agrupado por setor', () => {
     expect(colunasPorSetor([TSA, VELHO], [doSetor('Antigo', VELHO)], 's3').map((coluna) => coluna.titulo)).toEqual(['MNO'])
   })
 })
+
+test('a coluna por setor leva a cor do setor; as de etapa e de responsável não têm cor', () => {
+  expect(colunasPorSetor([umSetor('s1', 'TSA', 'Setor A', true, 13)], [], null)[0].cor).toBe(13)
+  expect(colunas([umProcesso()]).every((coluna) => coluna.cor === undefined)).toBe(true)
+  expect(colunasPorResponsavel([umProcesso()]).every((coluna) => coluna.cor === undefined)).toBe(true)
+})
