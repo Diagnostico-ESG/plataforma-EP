@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import type { ModuloDeCadastros, SetorEnvolvido } from '../../cadastros/tipos'
 import { useCarregamento } from '../../hooks/useCarregamento'
 import { useGravacaoComFalha } from '../../hooks/useGravacaoComFalha'
+import { BotaoDaCaixa, OpcaoDaCaixa } from '../OpcaoDaCaixa'
 import { ErroAoCarregar } from './ErroAoCarregar'
 
 type PorSetorProps = {
@@ -28,8 +29,11 @@ export function PorSetor({ cadastros, macroprocessoId, envolvidos, aoMudar, aoSu
   return (
     <div className="por-setor">
       <select aria-label="Setor a pôr" value={escolhido} onChange={(evento) => setEscolhido(evento.target.value)}>
+        <BotaoDaCaixa />
         <option value="">Escolha um setor</option>
-        {opcoes.map((setor) => <option key={setor.id} value={setor.id}>{setor.sigla} — {setor.nome}</option>)}
+        {opcoes.map((setor) => (
+          <OpcaoDaCaixa key={setor.id} valor={setor.id} rotulo={`${setor.sigla} — ${setor.nome}`} corDoSetor={setor.cor} />
+        ))}
       </select>
       <button type="button" className="botao botao-principal" disabled={escolhido === ''}
         onClick={() => executar(
