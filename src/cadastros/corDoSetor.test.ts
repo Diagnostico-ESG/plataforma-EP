@@ -25,18 +25,17 @@ describe('corDoSetor', () => {
     expect(corDoSetor(numero).numero).toBe(1)
   })
 
-  test('o tom escuro é cada canal do claro vezes 0,88, arredondado', () => {
-    expect(corDoSetor(1)).toMatchObject({ nome: 'coral claro', claro: '#F8C4C4', escuro: '#DAACAC' })
+  test('a cor tem só número, nome e tom claro, sem tom escuro', () => {
+    expect(corDoSetor(1)).toEqual({ numero: 1, nome: 'coral claro', claro: '#F8C4C4' })
   })
 
-  test.each(TODAS_AS_CORES.map((cor) => [cor.numero, cor.nome, cor.claro, cor.escuro]))(
-    'cor %i (%s): o texto escuro passa de 4,5:1 nas duas pontas', (_numero, _nome, claro, escuro) => {
+  test.each(TODAS_AS_CORES.map((cor) => [cor.numero, cor.nome, cor.claro]))(
+    'cor %i (%s): o texto escuro passa de 4,5:1 sobre o tom claro', (_numero, _nome, claro) => {
       expect(contraste(TEXTO, claro as string)).toBeGreaterThanOrEqual(4.5)
-      expect(contraste(TEXTO, escuro as string)).toBeGreaterThanOrEqual(4.5)
     })
 
-  test('o estilo leva os dois tons em variáveis CSS', () => {
-    expect(estiloDaCor(13)).toEqual({ '--cor-claro': '#C4D9F8', '--cor-escuro': corDoSetor(13).escuro })
+  test('o estilo leva só o tom claro em variável CSS', () => {
+    expect(estiloDaCor(13)).toEqual({ '--cor-claro': '#C4D9F8' })
   })
 
   test('o nome da amostra é o da cor, com "em uso por" quando outro setor a usa', () => {

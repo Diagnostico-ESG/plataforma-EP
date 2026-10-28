@@ -104,5 +104,5 @@
 }
 
 .opcao-cor-do-setor {
-  background: linear-gradient(90deg, var(--cor-claro), var(--cor-escuro));
+  background: var(--cor-claro);
 }

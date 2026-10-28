@@ -11,7 +11,7 @@ type SeloDoSetorProps = {
   className?: string
 }
 
-/** A sigla em texto escuro sobre a cor do setor, em degradê. A sigla é o único texto: o selo não acrescenta nome acessível. */
+/** A sigla em texto escuro sobre a cor lisa do setor. A sigla é o único texto: o selo não acrescenta nome acessível. */
 export function SeloDoSetor({ sigla, cor, variante = 'pequeno', className }: SeloDoSetorProps) {
   return <span className={`selo-do-setor selo-do-setor-${variante}${className ? ` ${className}` : ''}`} style={estiloDaCor(cor) as CSSProperties}>{sigla}</span>
 }

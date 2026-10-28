@@ -100,7 +100,7 @@
 }
 
 /* Por setor (ADR 0031 e 0032): a coluna ganha o tom do setor misturado com branco só até o fim do último cartão (vazia, fica só
-   o cabeçalho), e o cabeçalho é uma faixa no degradê do setor de lado a lado, colada no alto. Nome e contagem em `texto`: o cinza médio não tem
+   o cabeçalho), e o cabeçalho é uma faixa na cor lisa do setor de lado a lado, colada no alto. Nome e contagem em `texto`: o cinza médio não tem
    contraste AA sobre os tons médios da paleta. O setor inativo não tem cor: cabeçalho um tom acima do fundo, ambos em cinza. */
 .coluna-do-setor,
 .coluna-inativa {
@@ -141,7 +141,7 @@
 }
 
 .coluna-do-setor .coluna-titulo-setor {
-  background: linear-gradient(90deg, var(--cor-claro), var(--cor-escuro));
+  background: var(--cor-claro);
 }
 
 .coluna-inativa .coluna-titulo-setor {

@@ -1,7 +1,7 @@
 export const TOTAL_DE_CORES = 30
-const FATOR_DO_TOM_ESCURO = 0.88
 
-export type CorDoSetor = { numero: number; nome: string; claro: string; escuro: string }
+// A cor do setor é lisa, no tom claro da paleta (ADR 0033): não há tom escuro calculado.
+export type CorDoSetor = { numero: number; nome: string; claro: string }
 
 // A ordem é a de distribuição da identidade visual (vizinhas bem diferentes); o banco guarda só o número.
 const TONS: readonly (readonly [string, string])[] = [
@@ -15,25 +15,16 @@ const TONS: readonly (readonly [string, string])[] = [
   ['pistache médio', '#C0E7A6'], ['lavanda médio', '#C0A6E7'],
 ]
 
-// Regra fixa do tom escuro: cada canal vezes 0,88. Se um contraste cair abaixo de 4,5:1, o teste acusa e o fator sobe.
-function escurecer(hex: string): string {
-  const canais = [1, 3, 5].map((i) => Math.round(parseInt(hex.slice(i, i + 2), 16) * FATOR_DO_TOM_ESCURO))
-  return `#${canais.map((c) => c.toString(16).padStart(2, '0')).join('').toUpperCase()}`
-}
-
-export const TODAS_AS_CORES: readonly CorDoSetor[] = TONS.map(([nome, claro], i) => ({
-  numero: i + 1, nome, claro, escuro: escurecer(claro),
-}))
+export const TODAS_AS_CORES: readonly CorDoSetor[] = TONS.map(([nome, claro], i) => ({ numero: i + 1, nome, claro }))
 
 /** Número fora de 1 a 30 (ou não inteiro) cai na cor 1, para a tela nunca ficar sem tom. */
 export function corDoSetor(numero: number): CorDoSetor {
   return TODAS_AS_CORES[Number.isInteger(numero) && numero >= 1 && numero <= TOTAL_DE_CORES ? numero - 1 : 0]
 }
 
-/** Variáveis CSS que o selo e o quadradinho usam para o degradê do tom claro ao escuro. */
-export function estiloDaCor(numero: number): Record<'--cor-claro' | '--cor-escuro', string> {
-  const { claro, escuro } = corDoSetor(numero)
-  return { '--cor-claro': claro, '--cor-escuro': escuro }
+/** Variável CSS do tom claro, que o selo, o quadradinho, o cabeçalho e a amostra usam como cor lisa. */
+export function estiloDaCor(numero: number): Record<'--cor-claro', string> {
+  return { '--cor-claro': corDoSetor(numero).claro }
 }
 
 /** Nome acessível da amostra da grade: o da cor e, se outro setor a usa, a sigla dele. */

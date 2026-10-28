@@ -1,5 +1,5 @@
 .selo-do-setor {
-  background: linear-gradient(90deg, var(--cor-claro), var(--cor-escuro));
+  background: var(--cor-claro);
   color: var(--texto);
   font-weight: 600;
   /* Sem isto, o modo de contraste forçado apaga a cor da identidade do setor. */

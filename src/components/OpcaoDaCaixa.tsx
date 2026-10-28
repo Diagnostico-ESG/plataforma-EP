@@ -11,7 +11,7 @@ type OpcaoDaCaixaProps = {
   cor?: string
   /** O Avatar de quem a opção nomeia. */
   pessoa?: PessoaDaOpcao
-  /** Número da cor do setor: quadradinho em degradê, o mesmo do selo. */
+  /** Número da cor do setor: quadradinho na cor lisa, a mesma do selo. */
   corDoSetor?: number
 }
 
