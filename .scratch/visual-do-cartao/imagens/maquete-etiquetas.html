@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maquete: etiquetas fortes</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--fundo:#edf1f9;--folha:#fff;--linha:#e1e6ef;--texto:#1e2433;--texto-2:#5d6577;--canto:8px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fundo);font-family:'Source Sans 3',system-ui,sans-serif;color:var(--texto);padding:24px 16px}
+h1{font-size:22px;margin:0 0 4px}
+.intro{color:var(--texto-2);margin:0 0 24px;font-size:15px;max-width:780px}
+.opcao{background:#f7f8fb;border:1px solid var(--linha);border-radius:12px;padding:16px;margin-bottom:24px}
+.opcao h2{font-size:18px;margin:0 0 2px}
+.opcao p{margin:0 0 14px;color:var(--texto-2);font-size:14px;max-width:780px}
+.quadro{display:flex;gap:16px;overflow-x:auto;padding-bottom:4px}
+.col{flex:0 0 260px;display:flex;flex-direction:column;gap:8px;background:color-mix(in srgb,var(--c1) 30%,#fff);border-radius:12px;padding:0 0 4px}
+.tit{border-radius:12px 12px 0 0;background:linear-gradient(90deg,var(--c1),var(--c2));padding:8px 12px;text-align:center;position:relative}
+.tit b{display:block;font-size:18px}
+.tit .cont{position:absolute;right:12px;top:10px;font-size:13px;font-weight:600}
+.sub{font-size:13px;color:var(--texto-2)}
+.cards{display:flex;flex-direction:column;gap:8px;padding:4px 8px}
+.card{background:var(--folha);border:1px solid var(--linha);border-radius:var(--canto);padding:12px;display:flex;flex-direction:column;gap:8px}
+.nome{font-size:15px;font-weight:600;line-height:1.25}
+.barra-t{display:flex;justify-content:space-between;font-size:12px;color:var(--texto-2)}
+.trilho{height:6px;border-radius:3px;background:#e1e6ef;overflow:hidden}
+.trilho i{display:block;height:100%;background:linear-gradient(90deg,#c9d3ff,#2238c8);border-radius:3px}
+.rodape{display:flex;justify-content:space-between;align-items:center}
+.av{width:20px;height:20px;border-radius:50%;background:#d9dfff;font-size:10px;display:grid;place-items:center;color:#2a44c9;font-weight:700}
+.s1{--c1:#C4D9F8;--c2:#ACBFDA}.s2{--c1:#F8D9C4;--c2:#DABFAC}.s3{--c1:#C4F8D9;--c2:#ACDABF}
+
+.et{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:2px 9px 2px 7px;border-radius:999px;color:#fff}
+.et::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--bol,#fff)}
+/* Hoje */
+.o0 .faz{background:#6a3fd9}.o0 .and{background:#ffc27a;color:#5e2c00;--bol:#c85f00}.o0 .ok{background:#9ee0b4;color:#0d4a22;--bol:#178a3e}
+/* 1 Semáforo forte */
+.o1 .faz{background:#6a3fd9}.o1 .and{background:#b45309}.o1 .ok{background:#15803d}
+/* 2 Joias */
+.o2 .faz{background:#4338ca}.o2 .and{background:#be185d}.o2 .ok{background:#0f766e}
+/* 3 Grafite com bolinha */
+.o3 .et{background:#1e2433}.o3 .faz{--bol:#a78bfa}.o3 .and{--bol:#fb923c}.o3 .ok{--bol:#4ade80}
+/* 4 Degradê */
+.o4 .faz{background:linear-gradient(90deg,#7c3aed,#4338ca)}.o4 .and{background:linear-gradient(90deg,#c2410c,#9a3412)}.o4 .ok{background:linear-gradient(90deg,#15803d,#065f46)}
+.amostras{display:flex;gap:8px;margin:0 0 12px;flex-wrap:wrap}
+</style></head><body>
+<h1>Etiquetas mais fortes, sobre a opção B (coluna tingida)</h1>
+<p class="intro">Dados inventados. Todas as opções novas têm texto branco com contraste de 4,5:1 ou mais (o mínimo da acessibilidade WCAG AA). Os setores de exemplo usam as cores pêssego e menta da paleta, que são as que mais se confundem com as etiquetas de hoje.</p>
+<div id="opcoes"></div>
+<script>
+const OPCOES=[
+ ['o0','Hoje','Laranja e verde claros, quase da mesma família das cores pêssego e menta dos setores: a etiqueta some dentro da coluna.'],
+ ['o1','1 · Semáforo forte','As mesmas famílias de hoje (violeta, laranja, verde), só que escuras e com letra branca. Quem já usa o sistema reconhece de imediato. Contraste: 6,3 · 5,0 · 5,0.'],
+ ['o2','2 · Pedras preciosas','Índigo, magenta e verde-petróleo: fora do laranja e do verde-claro que a paleta dos setores usa e longe das pílulas de prazo (âmbar e vermelho). Nenhuma confusão com "vencendo". Contraste: 7,9 · 6,0 · 5,5.'],
+ ['o3','3 · Grafite com bolinha','Todas as etiquetas em grafite escuro, letra branca, e só a bolinha colorida diz qual é. Nunca briga com nenhuma das 30 cores de setor, e fica sóbria. A diferença entre elas é menor: lê-se pelo texto.'],
+ ['o4','4 · Degradê','Como a 1, mas com o mesmo degradê suave da barra de etapas: conversa com o visual "premium" do cartão. Contraste mínimo: 5,0.'],
+];
+const CARTOES={s1:['SAF','Secretaria de Apoio Financeiro',[['Pagamento de diárias','Modelagem',4,'and','MR'],['Conciliação bancária mensal','Levantamento',2,'faz','JC']]],
+ s2:['SGP','Secretaria de Gestão de Pessoas',[['Concessão de férias','Validação',7,'ok','AL'],['Admissão de servidores','Modelagem',3,'and','RS'],['Avaliação de desempenho','Levantamento',1,'faz','TP']]],
+ s3:['SCI','Secretaria de Controle Interno',[['Auditoria de contratos','Revisão interna',6,'and','BF'],['Plano anual de auditoria','Validação',8,'ok','CM']]]};
+const ROT={faz:'A fazer',and:'Em andamento',ok:'Concluído'};
+const et=k=>`<span class="et ${k}">${ROT[k]}</span>`;
+document.getElementById('opcoes').innerHTML=OPCOES.map(([cls,t,d])=>`<section class="opcao ${cls}"><h2>${t}</h2><p>${d}</p>
+<div class="amostras">${et('faz')}${et('and')}${et('ok')}</div><div class="quadro">${Object.entries(CARTOES).map(([s,[sig,nome,cs]])=>`
+<div class="col ${s}"><div class="tit"><b>${sig}</b><span class="sub">${nome}</span><span class="cont">${cs.length}</span></div><div class="cards">${cs.map(([n,e,p,k,a])=>`
+<div class="card"><span class="nome">${n}</span><div><div class="barra-t"><span>${e}</span><span>${p}/8</span></div><div class="trilho"><i style="width:${p/8*100}%"></i></div></div><div class="rodape">${et(k)}<span class="av">${a}</span></div></div>`).join('')}</div></div>`).join('')}</div></section>`).join('');
+</script>
+</body></html>

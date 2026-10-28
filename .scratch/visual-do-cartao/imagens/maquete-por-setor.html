@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maquete: Quadro por setor</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--azul:#3a5afe;--fundo:#edf1f9;--folha:#fff;--linha:#e1e6ef;--texto:#1e2433;--texto-2:#5d6577;--canto:8px;
+--trilho:#e1e6ef;--b1:#c9d3ff;--b2:#2238c8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fundo);font-family:'Source Sans 3',system-ui,sans-serif;color:var(--texto);padding:24px 16px}
+h1{font-size:22px;margin:0 0 4px}
+.intro{color:var(--texto-2);margin:0 0 24px;font-size:15px}
+.opcao{background:#f7f8fb;border:1px solid var(--linha);border-radius:12px;padding:16px;margin-bottom:24px}
+.opcao h2{font-size:18px;margin:0 0 2px}
+.opcao p{margin:0 0 14px;color:var(--texto-2);font-size:14px;max-width:760px}
+.quadro{display:flex;gap:16px;overflow-x:auto;padding-bottom:4px}
+.col{flex:0 0 260px;display:flex;flex-direction:column;gap:8px}
+.cards{display:flex;flex-direction:column;gap:8px;padding:4px}
+.card{background:var(--folha);border:1px solid var(--linha);border-radius:var(--canto);padding:12px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden}
+.nome{font-size:15px;font-weight:600;line-height:1.25}
+.barra-t{display:flex;justify-content:space-between;font-size:12px;color:var(--texto-2)}
+.trilho{height:6px;border-radius:3px;background:var(--trilho);overflow:hidden}
+.trilho i{display:block;height:100%;background:linear-gradient(90deg,var(--b1),var(--b2));border-radius:3px}
+.rodape{display:flex;justify-content:space-between;align-items:center}
+.pill{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px}
+.p-and{background:#ffc27a;color:#5e2c00}.p-faz{background:#6a3fd9;color:#fff}.p-ok{background:#9ee0b4;color:#0d4a22}
+.av{width:20px;height:20px;border-radius:50%;background:#d9dfff;font-size:10px;display:grid;place-items:center;color:#2a44c9;font-weight:700}
+.cont{font-size:13px;font-weight:600;color:var(--texto-2)}
+.sub{font-size:13px;color:var(--texto-2);font-weight:400}
+
+/* cores de setor (tom claro -> escuro, como o selo atual) */
+.s1{--c1:#C4D9F8;--c2:#ACBFDA}.s2{--c1:#F8D9C4;--c2:#DABFAC}.s3{--c1:#C4F8D9;--c2:#ACDABF}
+
+/* Hoje */
+.h-tit{display:flex;justify-content:space-between;align-items:baseline;padding:0 4px;font-weight:700;font-size:16px}
+.h-tit span:first-child{display:flex;flex-direction:column}
+.h-faixa{margin:-12px -12px 0;padding:6px 12px;text-align:center;font-weight:700;font-size:16px;background:linear-gradient(90deg,var(--c1),var(--c2))}
+
+/* A: pedido */
+.a-tit{border-radius:var(--canto);background:linear-gradient(90deg,var(--c1),var(--c2));padding:8px 12px;text-align:center;position:relative}
+.a-tit b{display:block;font-size:18px}
+.a-tit .cont{position:absolute;right:12px;top:10px;color:var(--texto)}
+.a-card::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:linear-gradient(90deg,var(--c1),var(--c2))}
+
+/* B: coluna tingida */
+.b-col{background:color-mix(in srgb,var(--c1) 30%,#fff);border-radius:12px;padding:0 0 4px}
+.b-tit{border-radius:12px 12px 0 0;background:linear-gradient(90deg,var(--c1),var(--c2));padding:8px 12px;text-align:center;position:relative}
+.b-tit b{display:block;font-size:18px}
+.b-tit .cont{position:absolute;right:12px;top:10px;color:var(--texto)}
+.b-col .cards{padding:4px 8px}
+
+/* C: aba de pasta */
+.c-col{border-top:4px solid var(--c2);border-radius:0;padding-top:0}
+.c-tab{align-self:center;margin-top:-4px;background:linear-gradient(90deg,var(--c1),var(--c2));border-radius:0 0 12px 12px;padding:4px 20px 8px;text-align:center;min-width:60%}
+.c-tab b{display:block;font-size:18px}
+.c-tab .sub{display:block}
+.c-card::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--c2)}
+.c-meta{text-align:center;font-size:13px;color:var(--texto-2)}
+
+/* D: sigla com contador em pílula + bolinha no cartão */
+.d-tit{border-radius:var(--canto);background:linear-gradient(90deg,var(--c1),var(--c2));padding:10px 12px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
+.d-tit b{font-size:20px;letter-spacing:.04em;text-align:center}
+.d-tit .sub{grid-column:1/-1;text-align:center;color:var(--texto)}
+.d-num{justify-self:end;background:#fff;border-radius:999px;font-size:13px;font-weight:700;padding:1px 9px}
+.d-card{border-top:4px solid var(--c2)}
+</style></head><body>
+<h1>Quadro agrupado por setor: maquete</h1>
+<p class="intro">Dados inventados. Cores tiradas da paleta atual dos setores. A largura das colunas é a do Quadro.</p>
+
+<!-- HOJE -->
+<section class="opcao"><h2>Hoje</h2><p>Faixa larga colorida no cartão com o nome do processo, centralizado e em 16px. O título da coluna não tem cor.</p>
+<div class="quadro">
+ <div class="col s1"><div class="h-tit"><span>SAF<span class="sub">Secretaria de Apoio Financeiro</span></span><span class="cont">2</span></div>
+  <div class="cards">
+   <div class="card"><div class="h-faixa">Pagamento de diárias</div><div><div class="barra-t"><span>Modelagem</span><span>4/8</span></div><div class="trilho"><i style="width:50%"></i></div></div><div class="rodape"><span class="pill p-and">Em andamento</span><span class="av">MR</span></div></div>
+   <div class="card"><div class="h-faixa">Conciliação bancária mensal</div><div><div class="barra-t"><span>Levantamento</span><span>2/8</span></div><div class="trilho"><i style="width:25%"></i></div></div><div class="rodape"><span class="pill p-faz">A fazer</span><span class="av">JC</span></div></div>
+  </div></div>
+ <div class="col s2"><div class="h-tit"><span>SGP<span class="sub">Secretaria de Gestão de Pessoas</span></span><span class="cont">1</span></div>
+  <div class="cards"><div class="card"><div class="h-faixa">Concessão de férias</div><div><div class="barra-t"><span>Validação</span><span>7/8</span></div><div class="trilho"><i style="width:88%"></i></div></div><div class="rodape"><span class="pill p-ok">Concluído</span><span class="av">AL</span></div></div></div></div>
+</div></section>
+
+<!-- A -->
+<section class="opcao"><h2>A · O que você pediu</h2><p>O título da coluna vira uma faixa na cor do setor, de ponta a ponta, com a sigla centralizada e o nome do setor embaixo. No cartão, só um fio de 4px da cor no alto; o nome do processo volta ao normal (15px, à esquerda), igual ao Quadro por etapa.</p>
+<div class="quadro">
+ <div class="col s1"><div class="a-tit"><b>SAF</b><span class="sub">Secretaria de Apoio Financeiro</span><span class="cont">2</span></div>
+  <div class="cards">
+   <div class="card a-card"><span class="nome">Pagamento de diárias</span><div><div class="barra-t"><span>Modelagem</span><span>4/8</span></div><div class="trilho"><i style="width:50%"></i></div></div><div class="rodape"><span class="pill p-and">Em andamento</span><span class="av">MR</span></div></div>
+   <div class="card a-card"><span class="nome">Conciliação bancária mensal</span><div><div class="barra-t"><span>Levantamento</span><span>2/8</span></div><div class="trilho"><i style="width:25%"></i></div></div><div class="rodape"><span class="pill p-faz">A fazer</span><span class="av">JC</span></div></div>
+  </div></div>
+ <div class="col s2"><div class="a-tit"><b>SGP</b><span class="sub">Secretaria de Gestão de Pessoas</span><span class="cont">1</span></div>
+  <div class="cards"><div class="card a-card"><span class="nome">Concessão de férias</span><div><div class="barra-t"><span>Validação</span><span>7/8</span></div><div class="trilho"><i style="width:88%"></i></div></div><div class="rodape"><span class="pill p-ok">Concluído</span><span class="av">AL</span></div></div></div></div>
+ <div class="col s3"><div class="a-tit"><b>SCI</b><span class="sub">Secretaria de Controle Interno</span><span class="cont">0</span></div><div class="cards"></div></div>
+</div></section>
+
+<!-- B -->
+<section class="opcao"><h2>B · Coluna tingida</h2><p>A coluna inteira ganha um fundo bem claro da cor do setor, com o cabeçalho colorido no alto. Os cartões ficam brancos, sem faixa nenhuma: a cor está em volta deles. É a opção de leitura mais rápida numa tela cheia, e a mais "colorida".</p>
+<div class="quadro">
+ <div class="col b-col s1"><div class="b-tit"><b>SAF</b><span class="sub">Secretaria de Apoio Financeiro</span><span class="cont">2</span></div>
+  <div class="cards">
+   <div class="card"><span class="nome">Pagamento de diárias</span><div><div class="barra-t"><span>Modelagem</span><span>4/8</span></div><div class="trilho"><i style="width:50%"></i></div></div><div class="rodape"><span class="pill p-and">Em andamento</span><span class="av">MR</span></div></div>
+   <div class="card"><span class="nome">Conciliação bancária mensal</span><div><div class="barra-t"><span>Levantamento</span><span>2/8</span></div><div class="trilho"><i style="width:25%"></i></div></div><div class="rodape"><span class="pill p-faz">A fazer</span><span class="av">JC</span></div></div>
+  </div></div>
+ <div class="col b-col s2"><div class="b-tit"><b>SGP</b><span class="sub">Secretaria de Gestão de Pessoas</span><span class="cont">1</span></div>
+  <div class="cards"><div class="card"><span class="nome">Concessão de férias</span><div><div class="barra-t"><span>Validação</span><span>7/8</span></div><div class="trilho"><i style="width:88%"></i></div></div><div class="rodape"><span class="pill p-ok">Concluído</span><span class="av">AL</span></div></div></div></div>
+</div></section>
+
+<!-- C -->
+<section class="opcao"><h2>C · Aba de pasta</h2><p>Um fio da cor corre por cima da coluna toda e, no meio, desce uma "aba" com a sigla, como a etiqueta de uma pasta de arquivo. Os cartões levam um fio fino da mesma cor. Mais discreta que a A, com um toque de papelaria.</p>
+<div class="quadro">
+ <div class="col c-col s1"><div class="c-tab"><b>SAF</b><span class="sub">Apoio Financeiro</span></div><div class="c-meta">2 processos</div>
+  <div class="cards">
+   <div class="card c-card"><span class="nome">Pagamento de diárias</span><div><div class="barra-t"><span>Modelagem</span><span>4/8</span></div><div class="trilho"><i style="width:50%"></i></div></div><div class="rodape"><span class="pill p-and">Em andamento</span><span class="av">MR</span></div></div>
+   <div class="card c-card"><span class="nome">Conciliação bancária mensal</span><div><div class="barra-t"><span>Levantamento</span><span>2/8</span></div><div class="trilho"><i style="width:25%"></i></div></div><div class="rodape"><span class="pill p-faz">A fazer</span><span class="av">JC</span></div></div>
+  </div></div>
+ <div class="col c-col s2"><div class="c-tab"><b>SGP</b><span class="sub">Gestão de Pessoas</span></div><div class="c-meta">1 processo</div>
+  <div class="cards"><div class="card c-card"><span class="nome">Concessão de férias</span><div><div class="barra-t"><span>Validação</span><span>7/8</span></div><div class="trilho"><i style="width:88%"></i></div></div><div class="rodape"><span class="pill p-ok">Concluído</span><span class="av">AL</span></div></div></div></div>
+</div></section>
+
+<!-- D -->
+<section class="opcao"><h2>D · Placa do setor</h2><p>Como a A, mas o cabeçalho vira uma "placa": sigla maior e espaçada, contagem numa pílula branca à direita, nome do setor centralizado embaixo. No cartão, a borda superior inteira fica colorida (4px), seguindo o arredondado do canto.</p>
+<div class="quadro">
+ <div class="col s1"><div class="d-tit"><span></span><b>SAF</b><span class="d-num">2</span><span class="sub">Secretaria de Apoio Financeiro</span></div>
+  <div class="cards">
+   <div class="card d-card"><span class="nome">Pagamento de diárias</span><div><div class="barra-t"><span>Modelagem</span><span>4/8</span></div><div class="trilho"><i style="width:50%"></i></div></div><div class="rodape"><span class="pill p-and">Em andamento</span><span class="av">MR</span></div></div>
+   <div class="card d-card"><span class="nome">Conciliação bancária mensal</span><div><div class="barra-t"><span>Levantamento</span><span>2/8</span></div><div class="trilho"><i style="width:25%"></i></div></div><div class="rodape"><span class="pill p-faz">A fazer</span><span class="av">JC</span></div></div>
+  </div></div>
+ <div class="col s2"><div class="d-tit"><span></span><b>SGP</b><span class="d-num">1</span><span class="sub">Secretaria de Gestão de Pessoas</span></div>
+  <div class="cards"><div class="card d-card"><span class="nome">Concessão de férias</span><div><div class="barra-t"><span>Validação</span><span>7/8</span></div><div class="trilho"><i style="width:88%"></i></div></div><div class="rodape"><span class="pill p-ok">Concluído</span><span class="av">AL</span></div></div></div></div>
+</div></section>
+</body></html>
