@@ -1724,4 +1724,4 @@ Implementado em 2026-10-28 (commit 8d8cb7a) — seção "Ajustes do Quadro e da 
 
 Entregue em 2026-10-28 (commit 7ea4c43), com ressalva: critérios [visual] 4 a 7 da seção "Ajustes do Quadro e da Lista" presumidos (não vistos na tela, que exige login), em especial a altura da coluna por setor (`max-height: 100%`) com muitos cartões; revisão de segurança dispensada (mudança só de aparência, sem login, dado de fora, migração ou dependência); as ressalvas das entregas anteriores seguem valendo
 
-Em revisão desde 2026-10-28
+Entregue em 2026-10-28 (commit 31544ac), com ressalva: critérios [visual] 5 a 7 de cor-solida-do-setor presumidos no app real (vistos só numa página de teste com as folhas de estilo reais e marcação montada à mão; a tela com o login real não foi vista); revisão de segurança dispensada (só CSS e um módulo puro de cor, sem login, dado de fora ou banco)

@@ -85,3 +85,5 @@ Não mudam:
 - Os critérios `[visual]` das entregas anteriores com a cor do setor seguem por conferir com o login real; esta entrega pode aproveitar a mesma conferência.
 
 Implementado em 2026-10-28 (commit 39cd830)
+
+Entregue em 2026-10-28 (commit 31544ac), com ressalva: critérios [visual] 5 a 7 de cor-solida-do-setor presumidos no app real (vistos só numa página de teste com as folhas de estilo reais e marcação montada à mão; a tela com o login real não foi vista); revisão de segurança dispensada (só CSS e um módulo puro de cor, sem login, dado de fora ou banco)

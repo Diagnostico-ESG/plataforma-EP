@@ -375,4 +375,4 @@ Entregue em 2026-10-13 (commit 3a552d3)
 
 Entregue em 2026-10-27 (commit 764e74d), com ressalva: critérios [visual] da mudança visual-do-cartao presumidos (a tela nunca foi vista com o login real; vista só a faixa por etapa na cor 1, na vitrine local com módulos falsos: faltam o nome na faixa por setor, a faixa do parado, as 30 cores e nome longo, os selos do verso, da Lista e do título da coluna, o quadradinho das caixas, a grade de cores, a barra lisa e as etiquetas vivas); revisão de segurança foi a de reserva (menos completa: o /security-review só viu documentação); painel do Supabase de desenvolvimento não reconferido; função arquivos-no-drive ainda sem nova publicação no desenvolvimento; as ressalvas das entregas anteriores seguem valendo
 
-Em revisão desde 2026-10-28
+Entregue em 2026-10-28 (commit 31544ac), com ressalva: critérios [visual] 5 a 7 de cor-solida-do-setor presumidos no app real (vistos só numa página de teste com as folhas de estilo reais e marcação montada à mão; a tela com o login real não foi vista); revisão de segurança dispensada (só CSS e um módulo puro de cor, sem login, dado de fora ou banco)
