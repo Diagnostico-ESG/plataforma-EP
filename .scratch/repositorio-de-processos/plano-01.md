@@ -198,7 +198,7 @@
 - Histórico antigo legível → 5.4 (rótulos de `arquivar`/`desarquivar` mantidos).
 - Efeito intermediário aceito: com `no_quadro` filtrando o Quadro, o concluído com mais de 30 dias sai de todas as colunas do Quadro já neste ticket; os tickets 02 (Quadro por setor mostra concluídos sempre) e 03 (botão, aviso, pé) completam o desenho.
 
-## Registro da execução (2026-10-29)
+## Registro da execução (2026-10-28)
 
 Decisões tomadas durante a execução, com o que custam se estiverem erradas:
 

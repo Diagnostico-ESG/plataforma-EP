@@ -14,12 +14,14 @@
 
 **Status:** ready-for-agent
 
-- [ ] A migração cria `tirado_do_quadro_em`, copia o dos concluídos arquivados e apaga `arquivado_em`; suspensos e cancelados que estavam arquivados viram comuns
-- [ ] A view traz `tirado_do_quadro_em` e `no_quadro` (falso com `entrou_em` de 31 dias atrás, verdadeiro com 29; sair de Concluídos e voltar recomeça a contagem)
-- [ ] `tirado_do_quadro_em` não se grava direto, nem pelo Administrador
-- [ ] As funções e os gatilhos do arquivado e as travas "não arquivado" não existem mais; o concluído que estava arquivado aceita mover, etiqueta, responsável, Anotações, registrar publicação, anexo e editar número da versão
-- [ ] Não há mais Arquivar, Desarquivar, selo "Arquivado" nem filtro "Arquivados" na tela; endereço antigo com `arquivados=esconder` é ignorado
-- [ ] O histórico antigo de arquivar e desarquivar continua legível
-- [ ] pgTAP cobre cada célula de "Quem pode o quê" com os cinco tipos de usuário; todos os arquivos de teste de banco verdes
-- [ ] `conferirProcessoDoPdf` sem a regra do arquivado, com teste
-- [ ] Tipos regenerados; `npm test` verde
+- [x] A migração cria `tirado_do_quadro_em`, copia o dos concluídos arquivados e apaga `arquivado_em`; suspensos e cancelados que estavam arquivados viram comuns
+- [x] A view traz `tirado_do_quadro_em` e `no_quadro` (falso com `entrou_em` de 31 dias atrás, verdadeiro com 29; sair de Concluídos e voltar recomeça a contagem)
+- [x] `tirado_do_quadro_em` não se grava direto, nem pelo Administrador
+- [x] As funções e os gatilhos do arquivado e as travas "não arquivado" não existem mais; o concluído que estava arquivado aceita mover, etiqueta, responsável, Anotações, registrar publicação, anexo e editar número da versão
+- [x] Não há mais Arquivar, Desarquivar, selo "Arquivado" nem filtro "Arquivados" na tela; endereço antigo com `arquivados=esconder` é ignorado
+- [x] O histórico antigo de arquivar e desarquivar continua legível
+- [x] pgTAP cobre cada célula de "Quem pode o quê" com os cinco tipos de usuário; todos os arquivos de teste de banco verdes
+- [x] `conferirProcessoDoPdf` sem a regra do arquivado, com teste
+- [x] Tipos regenerados; `npm test` verde
+
+Concluído em 2026-10-28 (commit 6333ef3)
