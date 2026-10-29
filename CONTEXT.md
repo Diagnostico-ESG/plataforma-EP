@@ -141,8 +141,8 @@ Informar a data em que o processo foi publicado (com o link, se houver), na etap
 _Avoid_: publicar depois, republicar
 
 **Anotações**:
-Texto livre e único de um processo (cada subprocesso tem o seu), escrito pela equipe e guardado sozinho enquanto se escreve, sem histórico das versões anteriores. Administrador e Integrante do EP escrevem; Consulta só lê. Não sai da plataforma: fica fora dos dashboards.
-_Avoid_: observações, notas, comentários
+Texto livre e único de um processo (cada subprocesso tem o seu), escrito pela equipe já no cadastro ou depois, e guardado sozinho enquanto se escreve, sem histórico das versões anteriores. É o lugar do contexto do processo e de qualquer observação: não há outro texto livre no processo. Administrador e Integrante do EP escrevem; Consulta só lê. Não sai da plataforma: fica fora dos dashboards.
+_Avoid_: observações, contexto, notas, comentários
 
 **Reclassificação**:
 Mudança do tipo de um item (processo, subprocesso ou a classificar), com motivo, que preserva o mesmo item com tudo o que ele já tem.
@@ -155,8 +155,8 @@ A primeira etapa de trabalho de todo processo, logo depois de Não iniciados: o 
 _Avoid_: reunião de modelagem, oficina, workshop
 
 **Data da modelagem piloto**:
-Dia em que o EP se reúne com o setor para a Modelagem piloto de um processo, guardado no próprio processo. Opcional; o cadastro já a sugere com a data de hoje. Pode ser marcada antes de acontecer: a data diz se é próxima ou realizada. Um encontro que trata vários processos é marcado em cada um. Não move o processo nem muda a etiqueta. Participantes, local e anotações do encontro ficam fora: o que for preciso registrar vai nas Anotações do processo.
-_Avoid_: reunião, data da reunião, encontro, agenda, oficina
+Dia em que a Modelagem piloto de um processo aconteceu, registrado na própria etapa Modelagem piloto, depois do fato, quando o processo está nela ou numa etapa depois dela no catálogo: nunca no futuro, e a plataforma não guarda data agendada. Opcional, uma por processo. Um encontro que trata vários processos é registrado em cada um. Não move o processo nem muda a etiqueta. Participantes, local e anotações do encontro ficam fora: o que for preciso registrar vai nas Anotações do processo.
+_Avoid_: data agendada, reunião, data da reunião, encontro, agenda, oficina
 
 ## Documentos
 
