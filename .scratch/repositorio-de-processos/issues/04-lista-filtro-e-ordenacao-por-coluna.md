@@ -24,3 +24,5 @@
 - [ ] Filtros e ordenação ficam no endereço e recarregar mantém a visão
 - [ ] O menu abre dentro da tela em 1366×768 e funciona pelo teclado
 - [ ] Testes verdes; `npm test` verde
+
+Concluído em 2026-10-29 (commit 5e55142), com ressalva: critério 8 [visual] visto só numa vitrine provisória com os módulos falsos (o menu cabe e rola em 1366×768); a tela com o login real não foi vista.
