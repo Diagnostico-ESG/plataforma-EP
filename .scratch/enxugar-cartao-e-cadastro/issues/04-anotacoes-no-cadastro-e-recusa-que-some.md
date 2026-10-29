@@ -12,3 +12,5 @@
 - [ ] O Editar processo não tem o campo Anotações.
 - [ ] Depois de "Escolha o setor do processo.", escolher o setor faz a mensagem sumir. Qualquer mudança de campo apaga a recusa, de validação ou do banco, e ela volta ao enviar de novo se o problema continuar. Há um teste de regressão.
 - [ ] `npm test` verde. pgTAP com as linhas `ok` no Docker local e o workflow "Testes de banco" verde.
+
+Concluído em 2026-10-29 (commit e958e0c)

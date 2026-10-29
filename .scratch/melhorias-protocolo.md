@@ -1059,3 +1059,11 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 
 - **Perguntas antes de classificar.** Esperado: no máximo duas. Aconteceu: nenhuma; a descrição bastou.
 - **Classificação.** Demanda com itens de três tipos (ajustes pequenos, um bug e mudança com migração). Esperado: o tipo mais rigoroso. Aconteceu: mudança em funcionalidade existente; o bug foi oferecido à parte ou dentro do `/planejar`, e o usuário escolheu dentro (como ticket). Sugestão: o `/demanda` dizer o que fazer com um bug que chega junto de uma mudança maior na mesma tela.
+
+## 2026-10-29 — /executar-complexo (enxugar-cartao-e-cadastro, ticket 04)
+
+- **TDD de políticas e testes por perfil.** Esperado: teste de banco antes da migração, com Administrador, Integrante, Consulta, desativado e visitante. Aconteceu: teste 71 escrito antes da migração e atualizado o 50 (limite novo); a prova de "falha antes" não foi vista (sem Docker), só o verde no workflow (50: 57 ok; 71: 17 ok).
+- **Docker.** Esperado (Ajustes do projeto): pgTAP no banco local. Aconteceu: o Docker Desktop não sobe (WSL não instalado), então o `supabase test db` local não rodou; valeu o workflow "Testes de banco", que ensaia a migração pendente antes de testar.
+- **Migração aplicada no remoto de desenvolvimento.** Pelo workflow "Migrar banco de desenvolvimento" (não `db push`), com sucesso.
+- **Branch comum, `plano-04.md`, linha `Concluído em`.** Branch criada, plano salvo, merge na `main` e branch apagada com `-d` sem recusa.
+- **Erro do plano.** Marquei as caixas do plano como feitas antes de executar; corrigi depois, deixando 1.3 e 1.5 abertas com o motivo.
