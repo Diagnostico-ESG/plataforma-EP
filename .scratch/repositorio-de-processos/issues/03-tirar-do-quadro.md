@@ -14,12 +14,14 @@
 
 **Status:** ready-for-agent
 
-- [ ] `tirar_do_quadro` e `voltar_ao_quadro` funcionam para Administrador e Integrante do EP e são recusadas para Consulta, desativado e visitante; as recusas de regra têm os códigos da spec
-- [ ] Tirar e desfazer não criam evento no histórico
-- [ ] A coluna Concluídos mostra só o que está no Quadro; some sozinho o que passou de 30 dias; mover para trás e voltar traz o cartão de volta
-- [ ] O botão "Tirar do Quadro" está no cartão e no verso, só para quem altera, e funciona pelo teclado
-- [ ] O aviso "Tirado do Quadro · Desfazer" aparece, é anunciado a leitores de tela e Desfazer devolve o cartão
-- [ ] O pé conta corretamente com os filtros do Quadro e "Ver na Lista" abre a Lista em Concluídos com os mesmos filtros
-- [ ] O Quadro por responsável não mostra concluídos
-- [ ] Falha ao tirar ou desfazer deixa o cartão no lugar certo com mensagem de erro
-- [ ] Testes de banco e de tela verdes; `npm test` verde
+- [x] `tirar_do_quadro` e `voltar_ao_quadro` funcionam para Administrador e Integrante do EP e são recusadas para Consulta, desativado e visitante; as recusas de regra têm os códigos da spec
+- [x] Tirar e desfazer não criam evento no histórico
+- [x] A coluna Concluídos mostra só o que está no Quadro; some sozinho o que passou de 30 dias; mover para trás e voltar traz o cartão de volta
+- [x] O botão "Tirar do Quadro" está no cartão e no verso, só para quem altera, e funciona pelo teclado
+- [x] O aviso "Tirado do Quadro · Desfazer" aparece, é anunciado a leitores de tela e Desfazer devolve o cartão
+- [x] O pé conta corretamente com os filtros do Quadro e "Ver na Lista" abre a Lista em Concluídos com os mesmos filtros
+- [x] O Quadro por responsável não mostra concluídos
+- [x] Falha ao tirar ou desfazer deixa o cartão no lugar certo com mensagem de erro
+- [x] Testes de banco e de tela verdes; `npm test` verde
+
+Concluído em 2026-10-29 (commit 27daa95), com ressalva: banco verificado no Docker local (1671 ok, 0 not ok); a migração `20261029021159_tirar_e_voltar_ao_quadro` ainda não foi aplicada no remoto de desenvolvimento (GitHub Actions bloqueado por cobrança).
