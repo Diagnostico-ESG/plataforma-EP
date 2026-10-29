@@ -221,6 +221,13 @@ export type ModuloDeProcessos = {
   cancelarProcesso(id: string, motivo: string): Promise<void>
   retomarProcesso(id: string, motivo: string): Promise<void>
   /**
+   * Tira o concluído da coluna Concluídos do Quadro (só Administrador e Integrante); o processo não muda e nada vai para o
+   * histórico. Só o concluído que ainda está no Quadro; o resto chega como TravaDoBanco.
+   */
+  tirarDoQuadro(id: string): Promise<void>
+  /** O Desfazer do aviso: devolve o concluído à coluna. Só o concluído. */
+  voltarAoQuadro(id: string): Promise<void>
+  /**
    * Registra a data da publicação (com o link, se houver) ou, já registrada, a corrige; o processo fica onde está. Vale na
    * Publicação e em Concluídos. A data não é futura nem anterior à aprovação.
    */

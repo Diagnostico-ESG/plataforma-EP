@@ -1,6 +1,8 @@
 import { useArrastoDoQuadro } from '../../hooks/useArrastoDoQuadro'
 import { useMovimentoDoProcesso } from '../../hooks/useMovimentoDoProcesso'
-import { type ColunaDoQuadro as Coluna, colunasDoQuadro, colunasPorResponsavel, colunasPorSetor } from '../../processos/colunasDoQuadro'
+import {
+  type ColunaDoQuadro as Coluna, colunasDoQuadro, colunasPorResponsavel, colunasPorSetor, quantosForaDoQuadro,
+} from '../../processos/colunasDoQuadro'
 import type { AgruparQuadroPor, MostrarNoPortfolio } from '../../processos/enderecoDosProcessos'
 import type { ListaDeProcessos, ModuloDeProcessos } from '../../processos/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
@@ -24,6 +26,8 @@ type QuadroDeProcessosProps = {
   setorFiltrado: string | null
   /** Só no Quadro por setor (o portfólio): todos os concluídos ou só eles. */
   mostrar: MostrarNoPortfolio
+  /** A Lista em Concluídos com os filtros do Quadro: o "Ver na Lista" do pé da coluna Concluídos. */
+  enderecoDosConcluidosNaLista: string
 }
 
 const COLUNAS_FANTASMA = [0, 1, 2, 3]
@@ -37,11 +41,12 @@ function colunasDoAgrupamento(
 }
 
 export function QuadroDeProcessos(props: QuadroDeProcessosProps) {
-  const { lista, idEscolhido, enderecoDoProcesso, podeAlterar, processos, versoes, aoMudar, agrupar, setorFiltrado, mostrar } = props
+  const { lista, idEscolhido, enderecoDoProcesso, podeAlterar, processos, versoes, aoMudar, agrupar, setorFiltrado, mostrar, enderecoDosConcluidosNaLista } = props
   const colunas = colunasDoAgrupamento(lista, agrupar, setorFiltrado, mostrar)
   // O processo some do Quadro (excluído por outra pessoa) é o mesmo que mudou: o Quadro só recarrega.
   const movimento = useMovimentoDoProcesso(processos, lista.etapas, aoMudar, aoMudar)
   const arrasto = useArrastoDoQuadro(lista.etapas, movimento.mover)
+  const foraDoQuadro = { quantos: quantosForaDoQuadro(lista.processos), enderecoDaLista: enderecoDosConcluidosNaLista }
   return (
     <>
       <JanelasDoMovimento movimento={movimento} processos={processos} versoes={versoes} aoGravar={aoMudar} />
@@ -49,7 +54,8 @@ export function QuadroDeProcessos(props: QuadroDeProcessosProps) {
       <div className="quadro-colunas">
         {colunas.map((coluna) => (
           <ColunaDoQuadro key={coluna.chave} coluna={coluna} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso}
-            podeAlterar={podeAlterar && !movimento.gravando} arrasto={arrasto} agrupar={agrupar} etapas={lista.etapas} />
+            podeAlterar={podeAlterar && !movimento.gravando} arrasto={arrasto} agrupar={agrupar} etapas={lista.etapas}
+            foraDoQuadro={foraDoQuadro} />
         ))}
       </div>
     </>

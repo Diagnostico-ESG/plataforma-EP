@@ -66,7 +66,7 @@ test('o concluído sem a data da publicação tem o selo Sem publicação; o pub
   expect(within(await cartaoDe('Publicado')).queryByText('Sem publicação')).toBeNull()
 })
 
-test('"Só os meus" e o agrupamento por responsável incluem os concluídos que têm responsável', async () => {
+test('"Só os meus" mantém os concluídos do responsável na coluna Concluídos, mas o agrupamento por responsável não os mostra', async () => {
   window.location.hash = `#/processos?responsavel=${EU.id}`
   montar([concluido('Pronto', { responsavel: EU }), processo('Meu', { processo: { responsavel: EU } }), concluido('De Outra', {
     responsavel: { id: 'u9', nome: 'Outra Pessoa', fotoUrl: null },
@@ -78,5 +78,5 @@ test('"Só os meus" e o agrupamento por responsável incluem os concluídos que 
   montar([concluido('Pronto', { responsavel: EU }), processo('Meu', { processo: { responsavel: EU } })])
   await cartaoDe('Meu')
   const daPessoa = within(screen.getByRole('region', { name: EU.nome }))
-  expect(daPessoa.getAllByRole('link').map((cartao) => cartao.textContent).join(' ')).toContain('Pronto')
+  expect(daPessoa.getAllByRole('link').map((cartao) => cartao.textContent).join(' ')).not.toContain('Pronto')
 })

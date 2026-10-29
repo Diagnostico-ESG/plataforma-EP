@@ -60,11 +60,17 @@ function agruparPorPessoa(processos: ProcessoDaLista[]): ColunaDoQuadro[] {
  * nome; "Sem responsável" por último.
  */
 export function colunasPorResponsavel(processos: ProcessoDaLista[]): ColunaDoQuadro[] {
-  const noQuadro = processosDoQuadro(processos)
+  // É o trabalho em curso: o concluído não aparece em nenhuma coluna (spec, S6).
+  const noQuadro = processosDoQuadro(processos).filter((processo) => processo.situacao !== 'concluido')
   const colunas = agruparPorPessoa(noQuadro)
   const semResponsavel = noQuadro.filter((processo) => processo.responsavel === null)
   if (semResponsavel.length === 0) return colunas
   return [...colunas, { chave: 'sem-responsavel', titulo: 'Sem responsável', processos: semResponsavel }]
+}
+
+/** Quantos concluídos saíram da coluna Concluídos (tirados ou com mais de 30 dias); o ausente conta como no Quadro. */
+export function quantosForaDoQuadro(processos: ProcessoDaLista[]): number {
+  return processos.filter((processo) => processo.situacao === 'concluido' && processo.noQuadro === false).length
 }
 
 function porSigla(a: SetorDoQuadro, b: SetorDoQuadro): number {

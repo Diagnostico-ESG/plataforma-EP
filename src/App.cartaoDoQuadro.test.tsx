@@ -1,6 +1,8 @@
 import { cleanup, fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
+import { umSetor } from './testes/processoDaLista'
 import { cartaoDe, dia, montar, processo } from './testes/quadroDeTeste'
+import { VersoesFalso } from './versoes/VersoesFalso'
 
 beforeEach(() => {
   window.location.hash = '#/processos'
@@ -45,10 +47,12 @@ test('em Não iniciados só o primeiro trecho da barra está preenchido', async 
   expect(preenchimentoDe(barraDe(await cartaoDe('Novo')))).toBe('12.5%')
 })
 
+// O Quadro por responsável não mostra concluídos (ticket 03 de repositorio-de-processos): a barra cheia se vê por setor.
 test('em Concluídos a barra está cheia', async () => {
-  montar([processo('Pronto', { etapa: 'concluidos', processo: { situacao: 'concluido', etiqueta: 'concluido' } })])
+  montar([processo('Pronto', { etapa: 'concluidos', processo: { situacao: 'concluido', etiqueta: 'concluido' } })], 'integrante_ep', [],
+    new VersoesFalso(), [umSetor('s1', 'TSA', 'Setor de Testes A')])
   await cartaoDe('Pronto')
-  await porResponsavel()
+  fireEvent.click(await screen.findByRole('button', { name: 'Setor' }))
   const barra = barraDe(await cartaoDe('Pronto'))
   expect(barra?.getAttribute('aria-label')).toBe('Etapa 8 de 8: Concluídos')
   expect(preenchimentoDe(barra)).toBe('100%')

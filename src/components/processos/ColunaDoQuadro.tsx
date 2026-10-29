@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import { estiloDaCor } from '../../cadastros/corDoSetor'
 import type { ArrastoDoQuadro } from '../../hooks/useArrastoDoQuadro'
+import { useTirarDoQuadroDaTela } from '../../hooks/useTirarDoQuadro'
 import type { ColunaDoQuadro as Coluna } from '../../processos/colunasDoQuadro'
 import { podeArrastar } from '../../processos/destinoDoArrastar'
 import type { AgruparQuadroPor } from '../../processos/enderecoDosProcessos'
@@ -8,6 +9,7 @@ import { CHAVE_DOS_CONCLUIDOS } from '../../processos/publicacao'
 import type { EtapaDoCatalogo } from '../../processos/tipos'
 import { Pilula } from '../Pilula'
 import { CartaoDoProcesso } from './CartaoDoProcesso'
+import { PeDaColunaDosConcluidos } from './PeDaColunaDosConcluidos'
 
 type ColunaDoQuadroProps = {
   coluna: Coluna
@@ -20,10 +22,14 @@ type ColunaDoQuadroProps = {
   agrupar: AgruparQuadroPor
   /** As etapas do catálogo: o cartão e os selos precisam delas. */
   etapas: EtapaDoCatalogo[]
+  /** Só a coluna Concluídos do Quadro por etapa: os concluídos fora do Quadro e a Lista que os mostra. */
+  foraDoQuadro?: { quantos: number; enderecoDaLista: string }
 }
 
-export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAlterar, arrasto, agrupar, etapas }: ColunaDoQuadroProps) {
+export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAlterar, arrasto, agrupar, etapas, foraDoQuadro }: ColunaDoQuadroProps) {
   const { levantado } = arrasto
+  const tirar = useTirarDoQuadroDaTela()
+  const dosConcluidos = agrupar === 'etapa' && coluna.chave === CHAVE_DOS_CONCLUIDOS
   // Só as colunas de etapa recebem o cartão (por responsável e por setor não se arrasta), e a coluna sob o cartão ganha o realce.
   const recebe = levantado !== null && agrupar === 'etapa'
   const realce = recebe && arrasto.sobre === coluna.chave
@@ -48,12 +54,26 @@ export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAl
       </h3>
       <div className="coluna-cartoes">
         <AvisoDaColunaVazia coluna={coluna} agrupar={agrupar} />
-        {coluna.processos.map((processo) => (
-          <CartaoDoProcesso key={processo.id} processo={processo} escolhido={processo.id === idEscolhido}
-            href={enderecoDoProcesso(processo.id)} arrastavel={podeAlterar && agrupar === 'etapa' && podeArrastar(processo)}
-            agrupar={agrupar} etapas={etapas} apagado={levantado?.id === processo.id}
-            aoLevantar={() => arrasto.levantar(processo)} aoBaixar={arrasto.baixar} />
-        ))}
+        {coluna.processos.map((processo) => {
+          const cartao = (
+            <CartaoDoProcesso key={processo.id} processo={processo} escolhido={processo.id === idEscolhido}
+              href={enderecoDoProcesso(processo.id)} arrastavel={podeAlterar && agrupar === 'etapa' && podeArrastar(processo)}
+              agrupar={agrupar} etapas={etapas} apagado={levantado?.id === processo.id}
+              aoLevantar={() => arrasto.levantar(processo)} aoBaixar={arrasto.baixar} />
+          )
+          if (!dosConcluidos || !podeAlterar || !tirar) return cartao
+          // O botão não pode ficar dentro do <a> do cartão: vai logo abaixo dele, num envoltório.
+          return (
+            <div key={processo.id} className="cartao-com-acao">
+              {cartao}
+              <button type="button" className="botao botao-secundario cartao-tirar" aria-label={`Tirar do Quadro: ${processo.nome}`}
+                onClick={() => tirar({ id: processo.id, nome: processo.nome })}>
+                Tirar do Quadro
+              </button>
+            </div>
+          )
+        })}
+        {dosConcluidos && foraDoQuadro && <PeDaColunaDosConcluidos {...foraDoQuadro} />}
       </div>
     </section>
   )

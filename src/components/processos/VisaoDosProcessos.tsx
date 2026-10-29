@@ -35,6 +35,8 @@ type VisaoDosProcessosProps = {
   aoMudarMostrar: (mostrar: MostrarNoPortfolio) => void
   /** Sem filtros e de volta a Todos, de uma vez só (o endereço muda uma vez). */
   aoLimparTudo: () => void
+  /** A Lista em Concluídos com os filtros do Quadro (o "Ver na Lista" do pé da coluna Concluídos). */
+  enderecoDosConcluidosNaLista: string
   processos: ModuloDeProcessos
   /** A janela da trava de arquivos, no Quadro, envia as versões e o relatório. */
   versoes: ModuloDeVersoes
@@ -117,7 +119,8 @@ function ConteudoDaVisao(props: ConteudoDaVisaoProps) {
   if (visao === 'quadro') {
     return (
       <QuadroDeProcessos lista={lista} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso} podeAlterar={podeAlterar}
-        processos={processos} versoes={versoes} aoMudar={aoMudar} agrupar={agrupar} setorFiltrado={filtros.setor} mostrar={props.mostrar} />
+        processos={processos} versoes={versoes} aoMudar={aoMudar} agrupar={agrupar} setorFiltrado={filtros.setor} mostrar={props.mostrar}
+        enderecoDosConcluidosNaLista={props.enderecoDosConcluidosNaLista} />
     )
   }
   return (

@@ -22,6 +22,7 @@ import { FRASE_DO_PAI, fraseDeTipoInvalido, fraseDosSubprocessos } from './frase
 import {
   FRASE_DA_DATA_DA_PUBLICACAO_OBRIGATORIA, FRASE_DA_PUBLICACAO_FORA_DA_ETAPA, fraseDaPublicacaoAntesDaAprovacao,
 } from './frasesDePublicacao'
+import { FRASE_DE_JA_FORA_DO_QUADRO, FRASE_DE_TIRAR_SO_CONCLUIDO, FRASE_DE_VOLTAR_SO_CONCLUIDO } from './frasesDoQuadro'
 import { fraseDoProcessoComAnexos, fraseDoProcessoComVersoes } from './frasesDeVersao'
 import { fraseDeSituacaoInvalida, fraseDoProcessoParado } from './frasesDeSituacao'
 
@@ -45,6 +46,7 @@ const PADRAO_DA_RECUSA = new RegExp(
   + '|publicacao_fora_da_etapa|data_da_publicacao_obrigatoria|publicacao_antes_da_aprovacao'
   + '|data_so_na_validacao|data_da_validacao_so_pela_funcao'
   + '|sem_aprovacao_para_o_pdf|pdf_ja_enviado|pdf_nome_sem_versao|pdf_guardado_nao_se_altera'
+  + '|tirar_do_quadro_so_concluido|ja_fora_do_quadro|voltar_ao_quadro_so_concluido'
   + '|anotacoes_longas)(?::(.*))?$', 'm')
 
 type FraseDaRecusa = (valor: string, contexto: ContextoDaRecusa) => string
@@ -105,6 +107,9 @@ const FRASE_DA_RECUSA: Record<string, FraseDaRecusa> = {
   versao_aprovada: fraseDaVersaoAprovada,
   processo_com_aprovacao: () => FRASE_DO_PROCESSO_COM_APROVACAO,
   publicacao_fora_da_etapa: () => FRASE_DA_PUBLICACAO_FORA_DA_ETAPA,
+  tirar_do_quadro_so_concluido: () => FRASE_DE_TIRAR_SO_CONCLUIDO,
+  ja_fora_do_quadro: () => FRASE_DE_JA_FORA_DO_QUADRO,
+  voltar_ao_quadro_so_concluido: () => FRASE_DE_VOLTAR_SO_CONCLUIDO,
   data_da_publicacao_obrigatoria: () => FRASE_DA_DATA_DA_PUBLICACAO_OBRIGATORIA,
   publicacao_antes_da_aprovacao: fraseDaPublicacaoAntesDaAprovacao,
   anotacoes_longas: fraseDasAnotacoesLongas,

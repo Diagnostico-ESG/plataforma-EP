@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { CATALOGO_DE_TESTE, umProcesso, umSetor } from '../testes/processoDaLista'
-import { colunasDoQuadro, colunasPorResponsavel, colunasPorSetor } from './colunasDoQuadro'
+import { colunasDoQuadro, colunasPorResponsavel, colunasPorSetor, quantosForaDoQuadro } from './colunasDoQuadro'
 import type { EtapaDoCatalogo, ProcessoDaLista, SetorDoQuadro } from './tipos'
 
 const colunas = (processos: ProcessoDaLista[], etapas: EtapaDoCatalogo[] = CATALOGO_DE_TESTE) => colunasDoQuadro({ etapas, processos })
@@ -58,14 +58,14 @@ describe('agrupado por responsável', () => {
     expect(resultado.map((coluna) => coluna.titulo)).toEqual(['ana', 'Bruno', 'Zélia'])
   })
 
-  test('inclui os processos de Não iniciados e de Concluídos, que agora têm responsável', () => {
+  test('inclui os processos de Não iniciados, mas não os de Concluídos', () => {
     const resultado = colunasPorResponsavel([
       umProcesso('a', pessoa('u1', 'Ana'), 'nao_iniciados'),
       umProcesso('b', { ...pessoa('u1', 'Ana'), situacao: 'concluido' }, 'concluidos'),
       umProcesso('c', pessoa('u1', 'Ana')),
     ])
     expect(resultado).toHaveLength(1)
-    expect(resultado[0].processos.map((processo) => processo.nome)).toEqual(['a', 'b', 'c'])
+    expect(resultado[0].processos.map((processo) => processo.nome)).toEqual(['a', 'c'])
   })
 
   test('"Sem responsável" é a última coluna e só existe quando há cartão sem ninguém', () => {
@@ -79,12 +79,18 @@ describe('agrupado por responsável', () => {
     expect(colunasPorResponsavel([umProcesso('a', pessoa('u1', 'Ana', false))])[0].inativo).toBe(true)
   })
 
-  test('o concluído fora do Quadro e o cancelado ficam de fora', () => {
+  test('o concluído (esteja ou não no Quadro) e o cancelado ficam de fora, e a pessoa só com eles não tem coluna', () => {
     const resultado = colunasPorResponsavel([
       umProcesso('a', { ...pessoa('u1', 'Ana'), situacao: 'cancelado' }),
       umProcesso('b', { ...pessoa('u1', 'Ana'), situacao: 'concluido', noQuadro: false }, 'concluidos'),
+      umProcesso('c', { ...pessoa('u2', 'Bia'), situacao: 'concluido', noQuadro: true }, 'concluidos'),
     ])
     expect(resultado).toEqual([])
+  })
+
+  test('o concluído sem responsável também não vai para "Sem responsável"', () => {
+    const resultado = colunasPorResponsavel([umProcesso('d', { situacao: 'concluido', responsavel: null }, 'concluidos'), umProcesso('e', { responsavel: null })])
+    expect(resultado.map((coluna) => [coluna.titulo, coluna.processos.map((processo) => processo.nome)])).toEqual([['Sem responsável', ['e']]])
   })
 })
 
@@ -146,4 +152,18 @@ test('a coluna por setor leva a cor do setor; as de etapa e de responsável não
   expect(colunasPorSetor([umSetor('s1', 'TSA', 'Setor A', true, 13)], [], null)[0].cor).toBe(13)
   expect(colunas([umProcesso()]).every((coluna) => coluna.cor === undefined)).toBe(true)
   expect(colunasPorResponsavel([umProcesso()]).every((coluna) => coluna.cor === undefined)).toBe(true)
+})
+
+describe('quantosForaDoQuadro', () => {
+  test('conta os concluídos fora do Quadro; o ausente conta como no Quadro e o resto não conta', () => {
+    const processos = [
+      umProcesso('Fora', { situacao: 'concluido', noQuadro: false }, 'concluidos'),
+      umProcesso('Fora Dois', { situacao: 'concluido', noQuadro: false }, 'concluidos'),
+      umProcesso('Dentro', { situacao: 'concluido', noQuadro: true }, 'concluidos'),
+      umProcesso('Sem informação', { situacao: 'concluido' }, 'concluidos'),
+      umProcesso('Andando', {}, 'modelagem'),
+    ]
+    expect(quantosForaDoQuadro(processos)).toBe(2)
+    expect(quantosForaDoQuadro([])).toBe(0)
+  })
 })

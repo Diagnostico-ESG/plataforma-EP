@@ -3,12 +3,14 @@ import type { UsuarioAtual } from '../../acesso/tipos'
 import type { ModuloDeCadastros } from '../../cadastros/tipos'
 import { useCarregamento } from '../../hooks/useCarregamento'
 import { useEndereco } from '../../hooks/useEndereco'
+import { ContextoDoTirarDoQuadro, useTirarDoQuadro } from '../../hooks/useTirarDoQuadro'
 import {
   lerEnderecoDosProcessos, montarEnderecoDosProcessos, SEM_FILTROS, type EnderecoDosProcessos,
 } from '../../processos/enderecoDosProcessos'
 import type { ModuloDeProcessos } from '../../processos/tipos'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
+import { AvisoDoQuadro } from './AvisoDoQuadro'
 import { JanelaDoNovoProcesso } from './JanelaDoNovoProcesso'
 import { VersoDoCartao } from './VersoDoCartao'
 import { VisaoDosProcessos } from './VisaoDosProcessos'
@@ -36,6 +38,11 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes, reviso
   const idAberto = atual.aberto === 'novo' ? null : atual.aberto
   const irParaVisao = (mudancas: Partial<EnderecoDosProcessos>, substituir = false) => irPara(montarEnderecoDosProcessos({ ...atual, ...mudancas }), substituir)
   const enderecoDoProcesso = (id: string) => montarEnderecoDosProcessos({ ...atual, aberto: id })
+  // Situação e busca só existem na Lista: o Quadro não as tem, e a Lista abre em Concluídos com os mesmos filtros dele.
+  const enderecoDosConcluidosNaLista = montarEnderecoDosProcessos({
+    visao: 'lista', aberto: null, filtros: { ...atual.filtros, situacao: null, busca: null }, agrupar: 'etapa', mostrar: 'concluidos',
+  })
+  const tirada = useTirarDoQuadro(processos, recarregar)
 
   function fechar() {
     setRecemCriado(null)
@@ -51,7 +58,9 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes, reviso
   }
 
   return (
+    <ContextoDoTirarDoQuadro.Provider value={podeAlterar ? tirada.tirar : null}>
     <section className="area-de-processos" aria-label="Processos">
+      <AvisoDoQuadro aviso={tirada.aviso} falha={tirada.falha} aoDesfazer={tirada.desfazer} aoFechar={tirada.fechar} />
       {/* O fundo da janela (::backdrop) já escurece a visão; o inert a tira do Tab e do leitor de tela. */}
       <div inert={idAberto !== null || cadastrando}>
         <VisaoDosProcessos visao={atual.visao} estado={estado} aoTentarDeNovo={tentarDeNovo} podeAlterar={podeAlterar}
@@ -59,7 +68,7 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes, reviso
           enderecoDoProcesso={enderecoDoProcesso} aoAbrir={(id) => irParaVisao({ aberto: id })}
           filtros={atual.filtros} aoMudarFiltros={(filtros) => irParaVisao({ filtros, aberto: null }, filtros.busca !== atual.filtros.busca)}
           agrupar={atual.agrupar} aoMudarAgrupar={(agrupar) => irParaVisao({ agrupar, aberto: null })}
-          mostrar={atual.mostrar} aoLimparTudo={() => irParaVisao({ filtros: SEM_FILTROS, mostrar: 'todos', aberto: null })}
+          enderecoDosConcluidosNaLista={enderecoDosConcluidosNaLista} mostrar={atual.mostrar} aoLimparTudo={() => irParaVisao({ filtros: SEM_FILTROS, mostrar: 'todos', aberto: null })}
           aoMudarMostrar={(mostrar) => irParaVisao({ mostrar, filtros: { ...atual.filtros, situacao: null }, aberto: null })}
           processos={processos} versoes={versoes} usuarioId={usuario.id} aoMudar={recarregar} />
       </div>
@@ -73,5 +82,6 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes, reviso
           aoCriado={aoCriar} />
       )}
     </section>
+    </ContextoDoTirarDoQuadro.Provider>
   )
 }

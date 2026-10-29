@@ -1232,6 +1232,8 @@ export type Database = {
         Args: { p_motivo: string; p_processo: string }
         Returns: undefined
       }
+      tirar_do_quadro: { Args: { p_processo: string }; Returns: undefined }
+      voltar_ao_quadro: { Args: { p_processo: string }; Returns: undefined }
     }
     Enums: {
       categoria_macroprocesso: "finalistico" | "apoio" | "gerencial"

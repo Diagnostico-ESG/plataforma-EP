@@ -9,6 +9,7 @@ import {
   registrarPassagem,
 } from './movimentoFalso'
 import { registrarPublicacao } from './publicacaoFalso'
+import { tirarDoQuadro, voltarAoQuadro } from './tirarDoQuadroFalso'
 import { travasQueFaltam } from './travaDeArquivos'
 import {
   conferirPai, conferirSemSubprocessos, estruturaDoProcesso, levarMacroprocessoAosFilhos, macroprocessoDo, reclassificar,
@@ -124,6 +125,18 @@ export class ProcessosFalso implements ModuloDeProcessos {
 
   async retomarProcesso(id: string, motivo: string): Promise<void> {
     this.mudarSituacaoDoProcesso(id, 'em_andamento', motivo)
+  }
+
+  async tirarDoQuadro(id: string): Promise<void> {
+    this.conferirGravacao()
+    this.chamadas.push({ acao: 'tirar_do_quadro', id })
+    this.trocarProcesso(id, (processo) => tirarDoQuadro(processo, new Date().toISOString()))
+  }
+
+  async voltarAoQuadro(id: string): Promise<void> {
+    this.conferirGravacao()
+    this.chamadas.push({ acao: 'voltar_ao_quadro', id })
+    this.trocarProcesso(id, voltarAoQuadro)
   }
 
   async registrarPublicacao(id: string, data: string, link: string | null): Promise<void> {
@@ -259,6 +272,8 @@ export class ProcessosFalso implements ModuloDeProcessos {
       ...processo, ...publicacao, ...this.comResponsavel(processo, this.quemChama), etapasDoVerso,
       etapaAtual: etapaAtualNoCatalogo(destino, this.etapasDoCatalogo), etiqueta: emConcluidos ? 'concluido' : 'a_fazer',
       entrouNaEtapaEm: hoje, situacao: emConcluidos ? 'concluido' : 'em_andamento',
+      // Sair de Concluídos e voltar devolve o cartão ao Quadro (a marca fica antes da entrada nova).
+      ...(emConcluidos && { noQuadro: true }),
     }
   }
 

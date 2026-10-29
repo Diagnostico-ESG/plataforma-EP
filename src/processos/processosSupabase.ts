@@ -10,6 +10,7 @@ import { criarMovimentoSupabase } from './movimentoSupabase'
 import { criarPublicacaoSupabase } from './publicacaoSupabase'
 import { criarReclassificacaoSupabase } from './reclassificacaoSupabase'
 import { criarSituacaoSupabase } from './situacaoSupabase'
+import { criarTirarDoQuadroSupabase } from './tirarDoQuadroSupabase'
 import type { ModuloDeProcessos } from './tipos'
 
 // A etapa do setor só some junto com o setor, e o processo, quando outra pessoa o exclui: o aviso é o do item excluído.
@@ -24,6 +25,7 @@ export function criarProcessosSupabase(cliente: ClienteSupabase): ModuloDeProces
     ...criarAnotacoesSupabase(cliente, RECUSAS_DOS_PROCESSOS),
     ...criarSituacaoSupabase(cliente, RECUSAS_DOS_PROCESSOS),
     ...criarPublicacaoSupabase(cliente, RECUSAS_DOS_PROCESSOS),
+    ...criarTirarDoQuadroSupabase(cliente, RECUSAS_DOS_PROCESSOS),
     ...criarReclassificacaoSupabase(cliente, RECUSAS_DOS_PROCESSOS),
     ...criarListaDeProcessosSupabase(cliente),
     ...criarLeituraDeProcessoSupabase(cliente),
