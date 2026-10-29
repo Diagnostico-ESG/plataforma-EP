@@ -153,6 +153,12 @@ export function DataDaModelagemPiloto({ processo, processos, podeAlterar, aoMuda
 
 - [x] **Passo 1:** `npm test` (tudo verde), `npx tsc --noEmit`, `npx eslint .` (limites de arquivo, função e complexidade).
 - [x] **Passo 2:** `grep -rn "Marcar data\|· próxima\|· realizada" src` sem sobra do desenho antigo (fora da Validação); corrigir nomes de testes e comentários velhos (`reunião`, "marcada para").
-- [x] **Passo 3: `[visual]`** abrir o verso na pré-visualização (`preview_start`), se o login institucional deixar; se não deixar, registrar no `.scratch/proximo-passo.md` que o critério visual do ticket 03 ficou para o login real ou o `/polir`.
-- [x] **Passo 4:** `git push` da branch do ticket e disparo do workflow "Testes de banco" nela (autorizado em "Ajustes deste Projeto"); ler o resultado. Se a máquina não tiver `gh` autenticado, devolver o comando ao usuário.
-- [x] **Passo 5:** comitar o que sobrar; marcar as caixas do plano.
+- [ ] **Passo 3: `[visual]`** abrir o verso na pré-visualização (`preview_start`), se o login institucional deixar; se não deixar, registrar no `.scratch/proximo-passo.md` que o critério visual do ticket 03 ficou para o login real ou o `/polir`.
+- [ ] **Passo 4:** `git push` da branch do ticket e disparo do workflow "Testes de banco" nela (autorizado em "Ajustes deste Projeto"); ler o resultado. Se a máquina não tiver `gh` autenticado, devolver o comando ao usuário.
+- [ ] **Passo 5:** comitar o que sobrar; marcar as caixas do plano.
+
+## Estado ao parar (2026-10-29)
+
+- Tarefas 1 a 4 e os passos 1 e 2 da 5 feitos (commits f6505e3 e c8c0d3a); `npm test` (3.207), `tsc` e ESLint verdes.
+- **Banco sem prova:** a migração `20261029205934_data_da_modelagem_so_realizada.sql` e os testes 32, 63 e 70 nunca rodaram. Não há Docker nesta máquina, e o "Testes de banco" no GitHub (run 40955861490) quebra antes, ensaiando `20261029021159_tirar_e_voltar_ao_quadro.sql`, que já existe no remoto de desenvolvimento ("function gravar_tirada_do_quadro already exists") sem estar registrada. O mesmo erro derruba o workflow na `main`. Falta também a prova da limpeza das datas futuras (passo 3 da Tarefa 1).
+- `[visual]` do ticket não visto (exige o login institucional). Branch `enxugar-cartao-e-cadastro` enviada ao GitHub, **não** juntada à `main`; ticket **não** marcado como concluído.
