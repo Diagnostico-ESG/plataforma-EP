@@ -37,7 +37,7 @@ create function pg_temp.criar(nome_do_processo text) returns text
 language sql as $$
   select format($sql$insert into public.processos (setor_id, macroprocesso_id, nome, tipo)
     values ('5f000000-0000-0000-0000-0000000000e1', 'af000000-0000-0000-0000-0000000000e1', %L, 'processo')$sql$,
-    nome_do_processo) $;
+    nome_do_processo) $$;
 grant execute on function pg_temp.criar(text) to authenticated;
 
 -- Citar a coluna na criação (até com null) é recusado: o cadastro não grava a data.
@@ -45,7 +45,7 @@ create function pg_temp.criar_citando_a_data(nome_do_processo text) returns text
 language sql as $$
   select format($sql$insert into public.processos (setor_id, macroprocesso_id, nome, tipo, data_da_modelagem_piloto)
     values ('5f000000-0000-0000-0000-0000000000e1', 'af000000-0000-0000-0000-0000000000e1', %L, 'processo', null)$sql$,
-    nome_do_processo) $;
+    nome_do_processo) $$;
 grant execute on function pg_temp.criar_citando_a_data(text) to authenticated;
 
 -- Administrador cria sem data e não consegue citá-la.
