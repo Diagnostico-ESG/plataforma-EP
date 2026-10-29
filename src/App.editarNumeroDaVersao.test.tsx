@@ -27,7 +27,7 @@ const COM_VERSOES = {
 
 async function secaoDeVersoes() {
   const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-  return within(await painel.findByRole('region', { name: 'Arquivos' }))
+  return within(await painel.findByRole('region', { name: 'Documentos do Mapeamento' }))
 }
 
 async function abrirJanela(rotulo = 'V4', montagem: Parameters<typeof montarNosCadastros>[0] = COM_VERSOES) {

@@ -5,6 +5,8 @@ import { BotaoDaCaixa, OpcaoDaCaixa } from '../OpcaoDaCaixa'
 type TrocaDoResponsavelProps = {
   /** O responsável de agora (null: ninguém); a lista mostra sempre o valor vindo daqui. */
   responsavelId: string | null
+  /** O nome que o botão mostra, já com "(Inativo)" quando é o caso; null: ninguém. */
+  nome: string | null
   opcoes: OpcaoDeResponsavel[]
   desabilitada: boolean
   /** Grava ao escolher, sem confirmação; null é "Ninguém por enquanto". */
@@ -12,16 +14,16 @@ type TrocaDoResponsavelProps = {
 }
 
 /**
- * O link "Trocar": abre a lista suspensa do responsável do processo. Escolher grava e fecha; Esc fecha só a lista.
- * O valor mostrado vem sempre do processo, então uma gravação que falha deixa o responsável como estava.
+ * O nome do responsável (ou "Escolher responsável", sem ninguém) é o botão que abre a lista suspensa. Escolher grava e
+ * fecha; Esc fecha só a lista. O valor mostrado vem sempre do processo, então uma gravação que falha deixa o responsável como estava.
  */
-export function TrocaDoResponsavel({ responsavelId, opcoes, desabilitada, aoEscolher }: TrocaDoResponsavelProps) {
+export function TrocaDoResponsavel({ responsavelId, nome, opcoes, desabilitada, aoEscolher }: TrocaDoResponsavelProps) {
   const [trocando, setTrocando] = useState(false)
   const botao = useRef<HTMLButtonElement>(null)
   const lista = useRef<HTMLSelectElement>(null)
   const jaAbriu = useRef(false)
 
-  // O foco acompanha a troca: vai à lista ao abrir e volta ao link ao fechar, para o teclado não se perder.
+  // O foco acompanha a troca: vai à lista ao abrir e volta ao nome ao fechar, para o teclado não se perder.
   useEffect(() => {
     if (trocando) {
       jaAbriu.current = true
@@ -30,10 +32,11 @@ export function TrocaDoResponsavel({ responsavelId, opcoes, desabilitada, aoEsco
   }, [trocando])
 
   if (!trocando) {
+    // Sem ninguém, o texto "Escolher responsável" já é o nome acessível; com alguém, o nome diz a ação junto.
     return (
-      <button ref={botao} type="button" className="agora-trocar" aria-label="Trocar o responsável" disabled={desabilitada}
-        onClick={() => setTrocando(true)}>
-        Trocar
+      <button ref={botao} type="button" className={nome ? 'agora-responsavel-nome' : 'agora-escolher'}
+        aria-label={nome ? `Trocar o responsável: ${nome}` : undefined} disabled={desabilitada} onClick={() => setTrocando(true)}>
+        {nome ?? 'Escolher responsável'}
       </button>
     )
   }

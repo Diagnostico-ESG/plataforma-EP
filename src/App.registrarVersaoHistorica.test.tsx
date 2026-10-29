@@ -37,7 +37,7 @@ const comHistoricas = (...numeros: number[]) => ({
 
 async function secaoDeVersoes() {
   const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-  return within(await painel.findByRole('region', { name: 'Arquivos' }))
+  return within(await painel.findByRole('region', { name: 'Documentos do Mapeamento' }))
 }
 
 const BOTAO = 'Registrar versão histórica'

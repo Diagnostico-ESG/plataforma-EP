@@ -276,8 +276,8 @@ test('mover de macroprocesso: o aviso do setor que será incluído e o painel co
   preencher(form, { macro: 'm2' })
   expect(await form.findByText('O setor TSA ainda não está no macroprocesso Macro B; ele será incluído ao salvar.')).toBeTruthy()
   salvar(form)
-  const cabecalho = await screen.findByRole('heading', { name: 'Emitir Ofício' })
-  await waitFor(() => expect(within(cabecalho.closest('header') as HTMLElement).getByText('Macro B')).toBeTruthy())
+  const sobre = within(await screen.findByRole('region', { name: 'Sobre' }))
+  await waitFor(() => expect(sobre.getByText('Macro B')).toBeTruthy())
 })
 
 test('editar um processo que já foi excluído por outra pessoa mostra o aviso próprio', async () => {

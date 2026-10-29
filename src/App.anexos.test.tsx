@@ -47,7 +47,7 @@ test.each([
   montarNosCadastros({ ajustarProcessos: naEtapa(codigo) })
   const secao = await secaoDeAnexos()
   expect(secao.getByRole('heading', { name: 'Outros anexos' })).toBeTruthy()
-  const versoes = screen.getByRole('region', { name: 'Arquivos' })
+  const versoes = screen.getByRole('region', { name: 'Documentos do Mapeamento' })
   const anexos = screen.getByRole('region', { name: 'Outros anexos' })
   expect(versoes.compareDocumentPosition(anexos) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
 })

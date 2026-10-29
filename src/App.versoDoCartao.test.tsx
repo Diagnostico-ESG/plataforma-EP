@@ -103,12 +103,12 @@ test('pai e subprocesso abrem na mesma janela, com o endereço e o nome da janel
 
 // Cabeçalho
 
-test('cabeçalho: sigla, nome, macroprocesso e tipo em texto; sem pílula em andamento', async () => {
+test('cabeçalho: sigla e nome, sem macroprocesso nem tipo; sem pílula em andamento', async () => {
   montar()
   const cabecalho = within((await nomeDoProcesso()).closest('header') as HTMLElement)
   expect(cabecalho.getByText('TSA')).toBeTruthy()
-  expect(cabecalho.getByText('Macro de Teste')).toBeTruthy()
-  expect(cabecalho.getByText('A classificar')).toBeTruthy()
+  expect(cabecalho.queryByText('Macro de Teste')).toBeNull()
+  expect(cabecalho.queryByText('A classificar')).toBeNull()
   expect(cabecalho.queryByText('Em andamento')).toBeNull()
 })
 

@@ -33,7 +33,7 @@ const com = (versoes: Versao[], mais: Montagem & { aprovada?: number } = {}): Mo
 
 async function destaqueDa(rotulo: string) {
   const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-  const secao = within(await painel.findByRole('region', { name: 'Arquivos' }))
+  const secao = within(await painel.findByRole('region', { name: 'Documentos do Mapeamento' }))
   return { painel, secao, versao: within(await secao.findByRole('article', { name: rotulo })) }
 }
 

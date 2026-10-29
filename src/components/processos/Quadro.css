@@ -335,11 +335,6 @@ td .barra-etapa {
   font-family: var(--fonte-mono);
 }
 
-.selo-modelagem {
-  padding-left: var(--esp-1);
-  border-left: 3px solid var(--tipo-modelagem);
-}
-
 .cartao-rodape {
   display: flex;
   align-items: center;

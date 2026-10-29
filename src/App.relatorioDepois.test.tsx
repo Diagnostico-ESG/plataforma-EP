@@ -47,7 +47,7 @@ const montagem = (etapa = 'relatorio_modelagem_tecnica', mais: Montagem = {}): M
 
 async function secaoDeVersoes() {
   const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-  return within(await painel.findByRole('region', { name: 'Arquivos' }))
+  return within(await painel.findByRole('region', { name: 'Documentos do Mapeamento' }))
 }
 
 async function abrirFormulario(mais: Montagem = {}) {

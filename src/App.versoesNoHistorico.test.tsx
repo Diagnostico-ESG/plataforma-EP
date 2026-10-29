@@ -19,7 +19,7 @@ const painelAberto = async () => within(await screen.findByRole('dialog', { name
 test('a versão enviada aparece no histórico do processo, com texto próprio', async () => {
   montarNosCadastros({ ajustarProcessos: naEtapa('revisao_interna') })
   const painel = await painelAberto()
-  const secao = within(await painel.findByRole('region', { name: 'Arquivos' }))
+  const secao = within(await painel.findByRole('region', { name: 'Documentos do Mapeamento' }))
   fireEvent.click(await secao.findByRole('button', { name: 'Enviar versão' }))
   const form = within(await secao.findByRole('form', { name: 'Enviar versão' }))
   fireEvent.change(form.getByLabelText('Fluxograma Bizagi (.bpm)'), { target: { files: [BPM_VALIDO] } })
@@ -37,7 +37,7 @@ test('a versão enviada aparece no histórico do processo, com texto próprio', 
 test('a versão histórica registrada aparece no histórico do processo, com texto próprio', async () => {
   montarNosCadastros({ ajustarProcessos: naEtapa('nao_iniciados') })
   const painel = await painelAberto()
-  const secao = within(await painel.findByRole('region', { name: 'Arquivos' }))
+  const secao = within(await painel.findByRole('region', { name: 'Documentos do Mapeamento' }))
   fireEvent.click(await secao.findByRole('button', { name: 'Registrar versão histórica' }))
   const form = within(await secao.findByRole('form', { name: 'Registrar versão histórica' }))
   fireEvent.change(form.getByLabelText('Número da versão'), { target: { value: '5' } })

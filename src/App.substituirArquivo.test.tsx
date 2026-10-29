@@ -34,7 +34,7 @@ const ROTULO_DO_PNG = 'Imagem do fluxo (.png)'
 
 async function secaoDeVersoes() {
   const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-  return within(await painel.findByRole('region', { name: 'Arquivos' }))
+  return within(await painel.findByRole('region', { name: 'Documentos do Mapeamento' }))
 }
 
 /** O "⋯" do arquivo, onde fica o Substituir. */

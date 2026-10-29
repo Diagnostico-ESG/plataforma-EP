@@ -5,10 +5,10 @@ import './Avatar.css'
 type AvatarProps = {
   nome: string
   fotoUrl?: string
-  /** 20px no cartão, 24px em listas, 32px em cabeçalhos. */
+  /** 20px nas opções de lista, 24px no cartão, 32px em cabeçalhos e no Agora do verso. */
   tamanho?: 20 | 24 | 32
   /**
-   * Só enfeite, para dentro de uma <option>: as iniciais saem por CSS (data-iniciais) e não entram no texto da opção,
+   * Só enfeite, para dentro de uma <option> ou ao lado do nome escrito: as iniciais saem por CSS (data-iniciais) e não entram no texto da opção,
    * que o navegador usa para achar a opção quando se digita; a foto fica sem texto alternativo.
    */
   decorativo?: boolean

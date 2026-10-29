@@ -61,10 +61,9 @@ test('a coluna da pessoa desativada leva a pílula Inativo; a da ativa, não', a
   expect(within(screen.getByRole('region', { name: 'Ana Teste' })).queryByText('Inativo')).toBeNull()
 })
 
-test('o cartão mostra a barra da etapa no lugar do avatar e perde o selo Sem responsável', async () => {
+test('o cartão mostra a barra da etapa no lugar do avatar; sem responsável, nunca há selo', async () => {
   montar([com('Emitir Ofício', ANA), sem('Sem Dono')])
-  const semDono = await cartaoDe('Sem Dono')
-  expect(semDono.querySelector('.cartao-selos')?.textContent).toContain('Sem responsável')
+  expect((await cartaoDe('Sem Dono')).querySelector('.cartao-selos')).toBeNull()
   expect((await cartaoDe('Emitir Ofício')).querySelector('.avatar')).not.toBeNull()
   await trocar('Responsável')
   const cartao = await cartaoDe('Emitir Ofício')
