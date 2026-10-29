@@ -127,6 +127,6 @@
 
 ### Tarefa 6: tela real e registros
 
-- [ ] **Passo 1:** ver a árvore numa vitrine provisória com os módulos falsos no navegador (macro, setor, subprocesso recuado, linha dos arquivos aberta, 1366×768) e conferir o critério 6 `[visual]`; remover a vitrine. Se não for possível, registrar em `desvios.md`.
-- [ ] **Passo 2:** acrescentar a `desvios.md` a entrada datada do ticket 05 (decisões de execução acima, o que ficou de fora, a ressalva visual); marcar as caixas deste plano.
-- [ ] **Passo 3:** commit `repositorio-de-processos 05: plano marcado e desvios`.
+- [x] **Passo 1:** ver a árvore numa vitrine provisória com os módulos falsos no navegador (macro, setor, subprocesso recuado, linha dos arquivos aberta, 1366×768) e conferir o critério 6 `[visual]`; remover a vitrine. Se não for possível, registrar em `desvios.md`.
+- [x] **Passo 2:** acrescentar a `desvios.md` a entrada datada do ticket 05 (decisões de execução acima, o que ficou de fora, a ressalva visual); marcar as caixas deste plano.
+- [x] **Passo 3:** commit `repositorio-de-processos 05: plano marcado e desvios`.

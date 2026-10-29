@@ -1047,3 +1047,10 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Workflows do GitHub.** Esperado: "Testes de banco" e "Migrar banco de desenvolvimento" disparados na branch. Aconteceu: o GitHub não iniciou nenhum job (cobrança da conta); o ticket foi verificado só no Docker local (1671 ok, 0 not ok) e fechado com ressalva, migração pendente no remoto.
 - **Tipos pelo Docker.** Esperado: `gen types --local` igual ao arquivo comitado. Aconteceu: mesmos tipos nas duas funções novas; o gerador local não grava o bloco `__InternalSupabase` e formata diferente (oxfmt), então o arquivo comitado foi mantido.
 - **Sugestão.** O `scripts/gerar-tipos.mjs --local` sobrescreve `src/types/database.ts` com formato diferente do repositório; vale um aviso no script ou o formatador no mesmo passo.
+
+## 2026-10-29 — /executar-complexo (repositorio-de-processos, ticket 05)
+
+- **Plano sem banco.** Esperado: pular a Tarefa de banco e as regras de `banco.md`. Aconteceu: o plano declarou isso nas restrições; nada de banco foi tocado.
+- **Branch nova por ticket.** Esperado: criar a branch no passo 2. Aconteceu: `git switch -c repositorio-de-processos` a partir da `main`, marco `marco/2026-10-29-inicio-repositorio-de-processos-05` criado e enviado ao GitHub.
+- **Pre-commit lento.** O pre-commit roda a suíte inteira (cerca de 3,5 minutos por commit) e já barrou um commit por complexidade acima de 10 (`lerEnderecoDosProcessos`, corrigido). Sugestão: no `/executar-complexo`, juntar as tarefas pequenas em menos commits, ou rodar `npx eslint src` antes de cada commit.
+- **Revisão final inline.** O `executing-plans` pede um revisor independente no fim; sem autorização para subagente, fiz autorrevisão e registrei no `desvios.md`.

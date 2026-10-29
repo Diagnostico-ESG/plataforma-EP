@@ -15,14 +15,15 @@
 
 **Status:** ready-for-agent
 
-- [ ] "Agrupar por: Macroprocesso" mostra macroprocesso → setor → processo com contagens e setas; Nenhum volta à tabela
-- [ ] Um setor aparece sob cada macroprocesso de que participa com processos; ramos vazios não aparecem
-- [ ] Subprocessos aparecem recuados sob o pai, mesmo de outro setor; o subprocesso cujo pai foi filtrado aparece com "subprocesso de <pai>"
-- [ ] Filtros, busca, Todos | Concluídos e ordenação valem na árvore
-- [ ] Abrir todos / Fechar todos abre e fecha todos os níveis e os arquivos
-- [ ] A linha dos arquivos mostra o rótulo da versão mais recente, "Aprovada" quando for o caso, os arquivos e o relatório, cada um abrindo no Drive; "Sem versão ainda." quando não há
-- [ ] "Carregando arquivos…" e o erro com "Tentar de novo" funcionam sem fechar a linha nem perder a árvore
-- [ ] Os cancelados aparecem numa lista simples no fim, com setor e macroprocesso
-- [ ] `agrupar=macroprocesso` fica no endereço
-- [ ] Consulta vê a árvore e abre os arquivos sem editar nada
-- [ ] Testes verdes; `npm test` verde
+- [x] "Agrupar por: Macroprocesso" mostra macroprocesso → setor → processo com contagens e setas; Nenhum volta à tabela
+- [x] Um setor aparece sob cada macroprocesso de que participa com processos; ramos vazios não aparecem
+- [x] Subprocessos aparecem recuados sob o pai, mesmo de outro setor; o subprocesso cujo pai foi filtrado aparece com "subprocesso de <pai>"
+- [x] Filtros, busca, Todos | Concluídos e ordenação valem na árvore
+- [x] Abrir todos / Fechar todos abre e fecha todos os níveis e os arquivos
+- [x] A linha dos arquivos mostra o rótulo da versão mais recente, "Aprovada" quando for o caso, os arquivos e o relatório, cada um abrindo no Drive; "Sem versão ainda." quando não há
+- [x] "Carregando arquivos…" e o erro com "Tentar de novo" funcionam sem fechar a linha nem perder a árvore
+- [x] Os cancelados aparecem numa lista simples no fim, com setor e macroprocesso
+- [x] `agrupar=macroprocesso` fica no endereço
+- [x] Consulta vê a árvore e abre os arquivos sem editar nada
+- [x] Testes verdes; `npm test` verde
+Concluído em 2026-10-29 (commit 990d4a7), com ressalva: critério [visual] da árvore (macro e setor distintos, subprocesso recuado, linha dos arquivos como parte do processo) presumido; o painel do navegador estava oculto e a captura não funcionou (visto só o texto e os estilos calculados na vitrine local com módulos falsos); a tela com o login real não foi vista.
