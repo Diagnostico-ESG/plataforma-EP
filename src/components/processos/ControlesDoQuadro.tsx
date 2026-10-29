@@ -1,4 +1,4 @@
-import type { AgruparQuadroPor, MostrarNoPortfolio } from '../../processos/enderecoDosProcessos'
+import type { AgruparListaPor, AgruparQuadroPor, MostrarNoPortfolio } from '../../processos/enderecoDosProcessos'
 
 const OPCOES: { valor: AgruparQuadroPor; rotulo: string }[] = [
   { valor: 'etapa', rotulo: 'Etapa' }, { valor: 'responsavel', rotulo: 'Responsável' }, { valor: 'setor', rotulo: 'Setor' },
@@ -53,4 +53,15 @@ export function SoOsMeus({ ligado, aoAlternar }: SoOsMeusProps) {
       Só os meus
     </button>
   )
+}
+
+const OPCOES_DA_LISTA: { valor: AgruparListaPor; rotulo: string }[] = [
+  { valor: 'nenhum', rotulo: 'Nenhum' }, { valor: 'macroprocesso', rotulo: 'Macroprocesso' },
+]
+
+type AgruparAListaPorProps = { agrupar: AgruparListaPor; aoMudar: (agrupar: AgruparListaPor) => void }
+
+/** "Agrupar por: Nenhum | Macroprocesso", só na Lista: a tabela comum ou a árvore. */
+export function AgruparAListaPor({ agrupar, aoMudar }: AgruparAListaPorProps) {
+  return <ControleDeOpcoes rotulo="Agrupar por" opcoes={OPCOES_DA_LISTA} escolhida={agrupar} aoMudar={aoMudar} />
 }

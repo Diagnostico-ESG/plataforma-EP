@@ -110,7 +110,7 @@
 - Consome: tarefas 1 a 4; `VisaoDosProcessosProps` ganha `agruparLista` e `aoMudarAgruparLista`.
 - `ArvoreDaLista({ cabecalho, linhas, todos, setores, cancelados, idEscolhido, aoAbrir, busca, modulo })`: monta a árvore, tem o botão "Abrir todos" / "Fechar todos" acima da tabela e liga o estado aberto/fechado à busca dos arquivos (abrir um processo ou "Abrir todos" chama `buscar`).
 
-- [ ] **Passo 1: testes de tela que falham** em `App.arvoreDaLista.test.tsx` (mesma montagem de `App.listaPorColuna.test.tsx`, com `VersoesFalso` preenchido):
+- [x] **Passo 1: testes de tela que falham** em `App.arvoreDaLista.test.tsx` (mesma montagem de `App.listaPorColuna.test.tsx`, com `VersoesFalso` preenchido):
   - "Agrupar por" na Lista tem `Nenhum` e `Macroprocesso`; escolher `Macroprocesso` mostra o macro (nome e quantidade) e abaixo o setor, e o endereço fica `?agrupar=macroprocesso`; `Nenhum` volta à tabela e tira o parâmetro (critérios 1 e 9);
   - o mesmo setor aparece sob dois macroprocessos quando tem processo nos dois; macro sem processo depois do filtro não aparece (critério 2);
   - subprocesso recuado sob o pai de outro setor, com o selo do setor dele; com o pai filtrado, aparece sob o próprio setor com "subprocesso de <pai>" (critério 3);
@@ -121,9 +121,9 @@
   - cancelados: "Mostrar cancelados (N)" no fim, fora dos ramos, mostra o bloco com setor e macroprocesso de cada um (critério 8);
   - Consulta vê a árvore e abre os arquivos; nenhum botão de edição (critério 10);
   - clicar no nome do processo abre o verso; recarregar com `?agrupar=macroprocesso` já mostra a árvore.
-- [ ] **Passo 2:** rodar o arquivo; FAIL.
-- [ ] **Passo 3:** implementar a ligação (`ListaDosProcessos` escolhe entre `TabelaDeProcessos` e `ArvoreDaLista`; `AgruparListaPor` reaproveita `ControleDeOpcoes`; `AreaDeProcessos` liga `aoMudarAgruparLista` a `irParaVisao({ agruparLista, aberto: null })`).
-- [ ] **Passo 4:** rodar o arquivo, depois `npm test`, `npm run lint` e `npm run typecheck`; verde. Commit `repositorio-de-processos 05: árvore por macroprocesso na Lista`.
+- [x] **Passo 2:** rodar o arquivo; FAIL.
+- [x] **Passo 3:** implementar a ligação (`ListaDosProcessos` escolhe entre `TabelaDeProcessos` e `ArvoreDaLista`; `AgruparListaPor` reaproveita `ControleDeOpcoes`; `AreaDeProcessos` liga `aoMudarAgruparLista` a `irParaVisao({ agruparLista, aberto: null })`).
+- [x] **Passo 4:** rodar o arquivo, depois `npm test`, `npm run lint` e `npm run typecheck`; verde. Commit `repositorio-de-processos 05: árvore por macroprocesso na Lista`.
 
 ### Tarefa 6: tela real e registros
 
