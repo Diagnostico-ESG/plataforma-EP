@@ -20,9 +20,10 @@
 }
 
 .botao-do-grupo {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: var(--esp-2);
+  width: 100%;
   padding: var(--esp-1) 0;
   border: 0;
   background: none;
@@ -32,6 +33,10 @@
   text-align: left;
 }
 
+.botao-do-grupo:hover .nome-do-grupo {
+  color: var(--azul);
+}
+
 .contagem-do-grupo {
   color: var(--texto-2);
   font-size: var(--tam-secundario);
@@ -39,8 +44,13 @@
 }
 
 .seta-da-arvore {
-  margin-right: var(--esp-2);
-  padding: 0 var(--esp-1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+  margin-right: var(--esp-1);
+  padding: 0;
   border: 0;
   background: none;
   color: var(--texto-2);
@@ -74,4 +84,9 @@
   display: flex;
   justify-content: flex-end;
   margin-bottom: var(--esp-2);
+}
+
+/* O processo aberto perde a linha de baixo: os arquivos logo abaixo se leem como parte dele. */
+.tabela-de-processos tr:has(+ .linha-dos-arquivos) td {
+  border-bottom: 0;
 }

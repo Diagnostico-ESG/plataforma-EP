@@ -28,3 +28,18 @@
 **Deixado de fora**
 - Critério 6 `[visual]` (macro e setor distintos, subprocesso recuado, linha dos arquivos como parte do processo) **presumido**: o painel do navegador estava oculto e a captura de tela não funcionou. Na vitrine local (módulos falsos, 1366×768) conferi pelo texto da página e pelos estilos calculados: a árvore monta, "Abrir todos" lê os arquivos de todos, a linha mostra V7, "Aprovada" e os três links, e não há rolagem lateral. A tela com o login real não foi vista.
 - Revisão final: sem ferramenta de subagente autorizada, foi uma autorrevisão do autor (mais fraca que uma revisão independente).
+
+## 2026-10-29 — /polir, ticket 05 (árvore da Lista por macroprocesso)
+
+Escopo: `ArvoreDaLista.css`, `LinhaDoProcesso`, `LinhasDeGrupo`, `LinhaDosArquivos`, `ControlesDoQuadro`. Auditoria do Impeccable: detector sem apontamentos; conferência no Chrome na vitrine local (módulos falsos, 1366×768, só pelo texto e estilos calculados: o painel do navegador estava oculto e a captura de tela não funcionou). Nota: 17/20 (Bom). Acessibilidade 3, desempenho 3, responsivo 3 (uso em desktop), tema 4, integridade 4.
+
+**Corrigido no polimento**
+- [P2] A seta que abre os arquivos tinha cerca de 18×20 px; agora tem no mínimo 24×24 px (WCAG 2.2, 2.5.8).
+- [P2] A borda entre a linha do processo aberto e a linha dos arquivos foi tirada (`tr:has(+ .linha-dos-arquivos)`), para os arquivos se lerem como parte do processo.
+- [P2] A linha de título do macroprocesso e do setor agora é clicável por inteiro (o botão ocupa a largura); antes só o texto respondia.
+- [P3] O nome do macroprocesso e do setor fica azul ao passar o mouse.
+
+**Deixado de fora**
+- [P3] A árvore é remontada a cada mudança de estado, sem memoização: no porte do projeto (dezenas de processos) não pesa; revisitar se a Lista passar de milhares de linhas.
+- Responsivo: a tela é de desktop (PRODUCT.md); a tabela não ganhou variante para celular.
+- Os critérios `[visual]` seguem presumidos (sem captura de tela); a tela com o login real não foi vista.
