@@ -4,6 +4,7 @@ import type { Perfil } from './acesso/tipos'
 import type { ProcessoLido } from './processos/tipos'
 import { umSetor } from './testes/processoDaLista'
 import { montar, processo } from './testes/quadroDeTeste'
+import { opcoesDaColuna } from './testes/cabecalhoDaLista'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
 // Todos | Concluídos na Lista e no Quadro por setor, e os cancelados fora de tudo até alguém pedir (ticket 02 de
@@ -39,6 +40,12 @@ const naLista = () => textos('.tabela-de-processos tbody:not(.bloco-de-cancelado
 const noBlocoDosCancelados = () => textos('.bloco-de-cancelados .cadastros-abrir')
 const botao = (nome: string | RegExp) => screen.findByRole('button', { name: nome })
 const esperarALista = () => screen.findAllByRole('cell')
+// Abre e fecha o menu da Situação no cabeçalho, devolvendo as opções dele.
+async function opcoesDaSituacao(): Promise<string[]> {
+  const opcoes = await opcoesDaColuna('Situação')
+  fireEvent.keyDown(screen.getByRole('menu'), { key: 'Escape' })
+  return opcoes
+}
 
 test('a Lista traz o par Todos | Concluídos, abre em Todos e não mostra o cancelado', async () => {
   abrir()
@@ -51,16 +58,16 @@ test('a Lista traz o par Todos | Concluídos, abre em Todos e não mostra o canc
 test('Concluídos mostra só os concluídos, põe mostrar=concluidos no endereço e esconde o filtro Situação; Todos desfaz', async () => {
   abrir()
   await esperarALista()
-  expect(screen.getByLabelText('Situação')).toBeTruthy()
+  expect(await opcoesDaSituacao()).toContain('Concluído')
   fireEvent.click(await botao('Concluídos'))
   await waitFor(() => expect(naLista()).toEqual(['Antigo', 'Pronto']))
   expect(window.location.hash).toBe('#/processos/lista?mostrar=concluidos')
   expect((await botao('Concluídos')).getAttribute('aria-pressed')).toBe('true')
-  expect(screen.queryByLabelText('Situação')).toBeNull()
+  expect(await opcoesDaSituacao()).toEqual(['Crescente', 'Decrescente'])
   fireEvent.click(await botao('Todos'))
   await waitFor(() => expect(naLista()).toHaveLength(4))
   expect(window.location.hash).toBe('#/processos/lista')
-  expect(screen.getByLabelText('Situação')).toBeTruthy()
+  expect(await opcoesDaSituacao()).toContain('Concluído')
 })
 
 test('recarregar com mostrar=concluidos abre a Lista já em Concluídos', async () => {
@@ -74,8 +81,7 @@ test('recarregar com mostrar=concluidos abre a Lista já em Concluídos', async 
 test('o filtro Situação não oferece Cancelado', async () => {
   abrir()
   await esperarALista()
-  const opcoes = Array.from((screen.getByLabelText('Situação') as HTMLSelectElement).options).map((opcao) => opcao.textContent)
-  expect(opcoes).toEqual(['Todas', 'Em andamento', 'Suspenso', 'Concluído'])
+  expect(await opcoesDaSituacao()).toEqual(['Crescente', 'Decrescente', 'Todas', 'Em andamento', 'Suspenso', 'Concluído'])
 })
 
 test('o Quadro por setor traz o par, mostra os concluídos sempre e, em Concluídos, só eles', async () => {

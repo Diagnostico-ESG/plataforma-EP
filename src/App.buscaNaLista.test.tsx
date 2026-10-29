@@ -1,10 +1,11 @@
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import App from './App'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { EtapaDoCatalogo, ProcessoLido } from './processos/tipos'
+import { escolherNaColuna, nomesNasLinhas } from './testes/cabecalhoDaLista'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
 import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
@@ -42,10 +43,7 @@ function montar() {
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'integrante_ep' })} cadastros={new CadastrosFalso()} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
 }
 
-async function nomesNaLista(): Promise<string[]> {
-  await screen.findAllByRole('cell')
-  return within(screen.getByRole('table')).getAllByRole('button').map((botao) => botao.textContent ?? '')
-}
+const nomesNaLista = nomesNasLinhas
 
 async function buscar(texto: string) {
   fireEvent.change(await screen.findByRole('textbox', { name: 'Buscar pelo nome' }), { target: { value: texto } })
@@ -62,8 +60,7 @@ test('digitar filtra a Lista pelo trecho do nome, sem diferenciar maiúsculas e 
 
 test('a busca se soma aos filtros', async () => {
   montar()
-  const setor = await screen.findByLabelText('Setor')
-  fireEvent.change(setor, { target: { value: 's2' } })
+  await escolherNaColuna('Setor', 'TSB')
   await buscar('pagar')
   expect(await nomesNaLista()).toEqual(['Pagar Fornecedor'])
 })
@@ -98,7 +95,7 @@ test('o "×" aparece só com texto e limpa a busca', async () => {
 
 test('sem resultado mostra a mensagem, e [Limpar filtros] limpa filtros e busca', async () => {
   montar()
-  fireEvent.change(await screen.findByLabelText('Setor'), { target: { value: 's2' } })
+  await escolherNaColuna('Setor', 'TSB')
   await buscar('zzz')
   await screen.findByText('Nenhum processo com estes filtros.')
   fireEvent.click(screen.getAllByRole('button', { name: 'Limpar filtros' })[0])

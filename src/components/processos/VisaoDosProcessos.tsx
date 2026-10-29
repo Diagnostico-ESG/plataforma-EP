@@ -3,16 +3,19 @@ import {
   ehPortfolio, SEM_FILTROS, type AgruparQuadroPor, type FiltrosDosProcessos as Filtros, type MostrarNoPortfolio,
   type VisaoDosProcessos as Visao,
 } from '../../processos/enderecoDosProcessos'
-import { filtrarProcessos, opcoesDosFiltros, temFiltro } from '../../processos/filtrosDosProcessos'
+import { filtrarProcessos, opcoesDosFiltros, temFiltro, type OpcoesDosFiltros } from '../../processos/filtrosDosProcessos'
 import { linhasDaLista } from '../../processos/linhasDaLista'
+import type { OrdenacaoDaLista } from '../../processos/ordenacaoDaLista'
 import { canceladosDe, visiveisNoPortfolio } from '../../processos/portfolio'
 import type { ListaDeProcessos, ModuloDeProcessos, ProcessoDaLista } from '../../processos/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { Icone } from '../Icone'
 import { QuadroVazio } from '../quadro/QuadroVazio'
+import { BuscaDaLista } from './BuscaDaLista'
+import { CabecalhoDaLista } from './CabecalhoDaLista'
 import { AgruparPor, SoOsMeus, TodosOuConcluidos } from './ControlesDoQuadro'
-import { FiltrosDosProcessos, NenhumProcessoComFiltros, NenhumProcessoDoUsuario } from './FiltrosDosProcessos'
+import { BotaoLimparFiltros, FiltrosDosProcessos, NenhumProcessoComFiltros, NenhumProcessoDoUsuario } from './FiltrosDosProcessos'
 import { QuadroCarregando, QuadroDeProcessos } from './QuadroDeProcessos'
 import { TabelaCarregando, TabelaDeProcessos } from './TabelaDeProcessos'
 
@@ -35,6 +38,9 @@ type VisaoDosProcessosProps = {
   aoMudarMostrar: (mostrar: MostrarNoPortfolio) => void
   /** Sem filtros e de volta a Todos, de uma vez só (o endereço muda uma vez). */
   aoLimparTudo: () => void
+  /** Só na Lista: a coluna e o sentido da ordenação, escolhidos no cabeçalho. */
+  ordenacao: OrdenacaoDaLista
+  aoOrdenar: (ordenacao: OrdenacaoDaLista) => void
   /** A Lista em Concluídos com os filtros do Quadro (o "Ver na Lista" do pé da coluna Concluídos). */
   enderecoDosConcluidosNaLista: string
   processos: ModuloDeProcessos
@@ -48,28 +54,42 @@ type VisaoDosProcessosProps = {
 
 /** Quadro ou Lista, com os estados comuns (carregando, erro, vazio), a barra de cima e os filtros. */
 export function VisaoDosProcessos(props: VisaoDosProcessosProps) {
-  const { visao, estado, aoTentarDeNovo, podeAlterar, aoCadastrar, filtros, aoMudarFiltros, agrupar, aoMudarAgrupar, usuarioId } = props
-  const { mostrar, aoMudarMostrar, aoLimparTudo } = props
+  const { visao, estado, aoTentarDeNovo, podeAlterar, aoCadastrar, filtros, aoMudarFiltros, agrupar, usuarioId } = props
+  const { mostrar, aoLimparTudo } = props
   if (estado.tipo === 'carregando') return visao === 'quadro' ? <QuadroCarregando /> : <ListaCarregando />
   if (estado.tipo === 'erro') return <ErroAoCarregar alvo="os processos" aoTentarDeNovo={aoTentarDeNovo} />
   if (estado.valor.processos.length === 0) return <QuadroVazio podeCadastrar={podeAlterar} aoCadastrar={aoCadastrar} />
   const portfolio = ehPortfolio(visao, agrupar)
   const { filtrados, visiveis, vazio } = oQueAVisaoMostra(estado.valor.processos, filtros, portfolio, mostrar)
   const lista = { ...estado.valor, processos: filtrados }
+  const opcoes = opcoesDosFiltros(estado.valor)
   return (
     <div className="quadro">
-      <div className="quadro-barra">
-        <FiltrosDosProcessos visao={visao} opcoes={opcoesDosFiltros(estado.valor)} filtros={filtros} mostrar={mostrar} aoMudar={aoMudarFiltros} />
-        {portfolio && <TodosOuConcluidos mostrar={mostrar} aoMudar={aoMudarMostrar} />}
-        {visao === 'quadro' && (
-          <ControlesDoQuadroNaBarra agrupar={agrupar} aoMudarAgrupar={aoMudarAgrupar} filtros={filtros} aoMudarFiltros={aoMudarFiltros}
-            usuarioId={usuarioId} podeAlterar={podeAlterar} />
-        )}
-        {podeAlterar && <BotaoCadastrar aoCadastrar={aoCadastrar} />}
-      </div>
+      <BarraDaVisao {...props} opcoes={opcoes} portfolio={portfolio} />
       {vazio
         ? <SemResultado filtros={filtros} usuarioId={usuarioId} aoMudarFiltros={aoMudarFiltros} aoLimparTudo={aoLimparTudo} />
-        : <ConteudoDaVisao {...props} lista={lista} visiveis={visiveis} todos={estado.valor.processos} />}
+        : <ConteudoDaVisao {...props} lista={lista} visiveis={visiveis} todos={estado.valor.processos} opcoes={opcoes} />}
+    </div>
+  )
+}
+
+type BarraDaVisaoProps = VisaoDosProcessosProps & { opcoes: OpcoesDosFiltros; portfolio: boolean }
+
+// No Quadro, os filtros e os controles dele; na Lista, a busca e o Limpar filtros (os filtros ficam no cabeçalho da tabela).
+function BarraDaVisao({ visao, opcoes, portfolio, filtros, aoMudarFiltros, mostrar, aoMudarMostrar, podeAlterar, aoCadastrar, ...props }: BarraDaVisaoProps) {
+  const naLista = visao === 'lista'
+  return (
+    <div className="quadro-barra">
+      {naLista
+        ? <BuscaDaLista valor={filtros.busca} aoMudar={(busca) => aoMudarFiltros({ ...filtros, busca: busca || null })} />
+        : <FiltrosDosProcessos opcoes={opcoes} filtros={filtros} aoMudar={aoMudarFiltros} />}
+      {portfolio && <TodosOuConcluidos mostrar={mostrar} aoMudar={aoMudarMostrar} />}
+      {naLista && temFiltro(filtros) && <BotaoLimparFiltros aoLimpar={() => aoMudarFiltros(SEM_FILTROS)} />}
+      {!naLista && (
+        <ControlesDoQuadroNaBarra agrupar={props.agrupar} aoMudarAgrupar={props.aoMudarAgrupar} filtros={filtros} aoMudarFiltros={aoMudarFiltros}
+          usuarioId={props.usuarioId} podeAlterar={podeAlterar} />
+      )}
+      {podeAlterar && <BotaoCadastrar aoCadastrar={aoCadastrar} />}
     </div>
   )
 }
@@ -112,20 +132,28 @@ type ConteudoDaVisaoProps = VisaoDosProcessosProps & {
   lista: ListaDeProcessos; todos: ListaDeProcessos['processos']
   /** O que o portfólio (a Lista) mostra depois de Todos | Concluídos e sem os cancelados. */
   visiveis: ListaDeProcessos['processos']
+  opcoes: OpcoesDosFiltros
 }
 
 function ConteudoDaVisao(props: ConteudoDaVisaoProps) {
-  const { visao, lista, visiveis, todos, idEscolhido, enderecoDoProcesso, aoAbrir, filtros, podeAlterar, processos, versoes, aoMudar, agrupar } = props
-  if (visao === 'quadro') {
-    return (
-      <QuadroDeProcessos lista={lista} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso} podeAlterar={podeAlterar}
-        processos={processos} versoes={versoes} aoMudar={aoMudar} agrupar={agrupar} setorFiltrado={filtros.setor} mostrar={props.mostrar}
-        enderecoDosConcluidosNaLista={props.enderecoDosConcluidosNaLista} />
-    )
-  }
+  const { visao, lista, idEscolhido, enderecoDoProcesso, filtros, podeAlterar, processos, versoes, aoMudar, agrupar } = props
+  if (visao === 'lista') return <ListaDosProcessos {...props} />
   return (
-    <TabelaDeProcessos linhas={linhasDaLista(visiveis, todos)} idEscolhido={idEscolhido} aoAbrir={aoAbrir} busca={filtros.busca}
-      cancelados={props.mostrar === 'todos' ? linhasDaLista(canceladosDe(lista.processos), todos) : []} />
+    <QuadroDeProcessos lista={lista} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso} podeAlterar={podeAlterar}
+      processos={processos} versoes={versoes} aoMudar={aoMudar} agrupar={agrupar} setorFiltrado={filtros.setor} mostrar={props.mostrar}
+      enderecoDosConcluidosNaLista={props.enderecoDosConcluidosNaLista} />
+  )
+}
+
+// Os cancelados seguem a mesma ordenação, no bloco do fim.
+function ListaDosProcessos({ lista, visiveis, todos, idEscolhido, aoAbrir, filtros, mostrar, ordenacao, ...props }: ConteudoDaVisaoProps) {
+  const cabecalho = (
+    <CabecalhoDaLista opcoes={props.opcoes} filtros={filtros} mostrar={mostrar} ordenacao={ordenacao}
+      aoMudarFiltros={props.aoMudarFiltros} aoOrdenar={props.aoOrdenar} />
+  )
+  return (
+    <TabelaDeProcessos cabecalho={cabecalho} linhas={linhasDaLista(visiveis, todos, ordenacao)} idEscolhido={idEscolhido} aoAbrir={aoAbrir}
+      busca={filtros.busca} cancelados={mostrar === 'todos' ? linhasDaLista(canceladosDe(lista.processos), todos, ordenacao) : []} />
   )
 }
 

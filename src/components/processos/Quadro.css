@@ -410,6 +410,56 @@ td .barra-etapa {
   align-items: center;
 }
 
+/* Na Lista, a barra de cima tem só a busca, Todos | Concluídos e Limpar filtros, à esquerda; [Cadastrar processo] fica à direita. */
+.quadro-barra:has(> .busca-da-lista) {
+  justify-content: flex-start;
+}
+
+.quadro-barra:has(> .busca-da-lista) > .botao-principal {
+  margin-left: auto;
+}
+
+/* O cabeçalho da Lista: cada coluna é um botão discreto, no mesmo texto do cabeçalho, que abre ordenação e filtro. */
+.cabecalho-da-lista-botao {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-1);
+  min-height: 24px;
+  margin: 0 calc(-1 * var(--esp-1));
+  padding: 0 var(--esp-1);
+  border: 0;
+  border-radius: var(--canto);
+  background: none;
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.cabecalho-da-lista-botao:hover,
+.cabecalho-da-lista-botao[aria-expanded='true'] {
+  background: var(--neutra-fundo);
+}
+
+/* O menu mora dentro do <th>: sem isto, as opções herdariam o negrito do cabeçalho. */
+.tabela-de-processos th .menu-de-acoes-lista {
+  font-weight: normal;
+}
+
+/* O sentido da ordenação, menor que o texto, para não disputar com o nome da coluna. */
+.cabecalho-da-lista-sentido {
+  font-size: 0.7em;
+  color: var(--texto-2);
+}
+
+/* A coluna filtrada: um ponto azul ao lado do nome (o nome do filtro vai no texto oculto do botão). */
+.cabecalho-da-lista-filtrado {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--azul);
+}
+
 .busca-lupa {
   position: absolute;
   left: var(--esp-2);

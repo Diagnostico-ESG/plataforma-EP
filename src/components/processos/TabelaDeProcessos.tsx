@@ -1,17 +1,20 @@
-import { useState } from 'react'
+import { type ReactNode, useState } from 'react'
 import type { LinhaDaLista } from '../../processos/linhasDaLista'
 import { ROTULO_DO_TIPO } from '../../processos/rotulos'
 import { LinhaFantasma } from '../cadastros/PecasDaLista'
 import { SeloDoSetor } from '../SeloDoSetor'
 import { BarraDeProgresso } from './BarraDeProgresso'
+import { COLUNAS_DA_LISTA } from '../../processos/colunasDaLista'
+import { CabecalhoCarregando } from './CabecalhoDaLista'
 import { NomeComTrecho } from './NomeComTrecho'
 import { PilulaDaSituacao } from './PilulaDaSituacao'
 import { SeloDeParado } from './SeloDeParado'
 
-const COLUNAS = ['Nome', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Responsável', 'Situação']
 const LINHAS_FANTASMA = 3
 
 type TabelaDeProcessosProps = {
+  /** O cabeçalho com os menus de ordenação e filtro (CabecalhoDaLista), montado por quem tem os filtros. */
+  cabecalho: ReactNode
   linhas: LinhaDaLista[]
   /** Os cancelados (depois dos filtros): ficam escondidos até alguém pedir; vazio, a linha de pedir não existe. */
   cancelados: LinhaDaLista[]
@@ -21,7 +24,7 @@ type TabelaDeProcessosProps = {
 }
 
 /** A Lista: tabela compacta, no padrão das listas de cadastros. */
-export function TabelaDeProcessos({ linhas, cancelados, idEscolhido, aoAbrir, busca }: TabelaDeProcessosProps) {
+export function TabelaDeProcessos({ cabecalho, linhas, cancelados, idEscolhido, aoAbrir, busca }: TabelaDeProcessosProps) {
   // O bloco dos cancelados é só da tela: não entra no endereço (spec, "Endereço da página").
   const [verCancelados, setVerCancelados] = useState(false)
   const linhaDe = (linha: LinhaDaLista) => (
@@ -29,12 +32,12 @@ export function TabelaDeProcessos({ linhas, cancelados, idEscolhido, aoAbrir, bu
   )
   return (
     <table className="tabela-cadastros tabela-de-processos">
-      <CabecalhoDaTabela />
+      {cabecalho}
       <tbody>{linhas.map(linhaDe)}</tbody>
       {cancelados.length > 0 && (
         <tbody className="linha-dos-cancelados">
           <tr>
-            <td colSpan={COLUNAS.length}>
+            <td colSpan={COLUNAS_DA_LISTA.length}>
               <button type="button" className="botao botao-secundario" aria-expanded={verCancelados} onClick={() => setVerCancelados(!verCancelados)}>
                 {verCancelados ? 'Esconder cancelados' : `Mostrar cancelados (${cancelados.length})`}
               </button>
@@ -44,7 +47,7 @@ export function TabelaDeProcessos({ linhas, cancelados, idEscolhido, aoAbrir, bu
       )}
       {cancelados.length > 0 && verCancelados && (
         <tbody className="bloco-de-cancelados">
-          <tr><th scope="rowgroup" colSpan={COLUNAS.length}>Cancelados</th></tr>
+          <tr><th scope="rowgroup" colSpan={COLUNAS_DA_LISTA.length}>Cancelados</th></tr>
           {cancelados.map(linhaDe)}
         </tbody>
       )}
@@ -56,19 +59,11 @@ export function TabelaCarregando() {
   return (
     <table className="tabela-cadastros tabela-de-processos" aria-busy="true">
       <caption role="status">Carregando processos…</caption>
-      <CabecalhoDaTabela />
+      <CabecalhoCarregando />
       <tbody>
-        {Array.from({ length: LINHAS_FANTASMA }, (_, i) => <LinhaFantasma key={i} colunas={COLUNAS.length} />)}
+        {Array.from({ length: LINHAS_FANTASMA }, (_, i) => <LinhaFantasma key={i} colunas={COLUNAS_DA_LISTA.length} />)}
       </tbody>
     </table>
-  )
-}
-
-function CabecalhoDaTabela() {
-  return (
-    <thead>
-      <tr>{COLUNAS.map((coluna) => <th key={coluna} scope="col">{coluna}</th>)}</tr>
-    </thead>
   )
 }
 

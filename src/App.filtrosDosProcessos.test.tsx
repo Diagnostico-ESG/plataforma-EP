@@ -6,6 +6,7 @@ import type { Perfil } from './acesso/tipos'
 import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { EtapaDoCatalogo, ProcessoLido } from './processos/tipos'
+import { botaoDaColuna, escolherNaColuna, nomesNasLinhas, opcoesDaColuna } from './testes/cabecalhoDaLista'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
 import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
@@ -51,13 +52,12 @@ function montar({ perfil = 'integrante_ep' }: Montagem = {}) {
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
 }
 
-// Os nomes nas linhas da Lista (o botão do nome), na ordem da tabela.
-async function nomesNaLista(): Promise<string[]> {
-  await screen.findAllByRole('cell')
-  return within(screen.getByRole('table')).getAllByRole('button').map((botao) => botao.textContent ?? '')
-}
+const nomesNaLista = nomesNasLinhas
+// Na Lista, os filtros ficam no cabeçalho de cada coluna (ticket 04 de repositorio-de-processos).
+const escolher = escolherNaColuna
 
-async function escolher(rotulo: string, opcao: string) {
+// No Quadro, a barra de filtros segue com as caixas de seleção.
+async function escolherNoQuadro(rotulo: string, opcao: string) {
   const seletor = await screen.findByLabelText(rotulo)
   const valor = within(seletor).getByRole('option', { name: opcao }).getAttribute('value')
   fireEvent.change(seletor, { target: { value: valor } })
@@ -90,7 +90,7 @@ test('as opções de etapa não têm "Aguardando o setor", e o endereço antigo 
   window.location.hash = '#/processos/lista?etapa=aguardando-o-setor'
   montar()
   expect(await nomesNaLista()).toHaveLength(PROCESSOS.length)
-  expect(within(screen.getByLabelText('Etapa atual')).queryByRole('option', { name: 'Aguardando o setor' })).toBeNull()
+  expect(await opcoesDaColuna('Etapa atual')).not.toContain('Aguardando o setor')
   expect(screen.queryByText('Nenhum processo com estes filtros.')).toBeNull()
 })
 
@@ -102,12 +102,12 @@ test('a combinação de filtros é "e", e o endereço guarda os dois', async () 
   expect(await nomesNaLista()).toEqual(['Conferir Recibo'])
 })
 
-test('recarregar com filtros no endereço: a mesma visão e os seletores preenchidos', async () => {
+test('recarregar com filtros no endereço: a mesma visão e os cabeçalhos marcados', async () => {
   window.location.hash = '#/processos/lista?setor=s2&situacao=concluido'
   montar()
   expect(await nomesNaLista()).toEqual(['Emitir Ofício'])
-  expect((screen.getByLabelText('Setor') as HTMLSelectElement).value).toBe('s2')
-  expect((screen.getByLabelText('Situação') as HTMLSelectElement).value).toBe('concluido')
+  expect((await botaoDaColuna('Setor')).textContent).toMatch(/filtrado: TSB/)
+  expect((await botaoDaColuna('Situação')).textContent).toMatch(/filtrado: Concluído/)
 })
 
 test('Quadro: os filtros sem Situação; o painel e o fechar mantêm os filtros', async () => {
@@ -115,7 +115,7 @@ test('Quadro: os filtros sem Situação; o painel e o fechar mantêm os filtros'
   montar()
   await screen.findByLabelText('Setor')
   expect(screen.queryByLabelText('Situação')).toBeNull()
-  await escolher('Setor', 'TSB')
+  await escolherNoQuadro('Setor', 'TSB')
   await waitFor(() => expect(window.location.hash).toBe('#/processos?setor=s2'))
   await waitFor(() => expect(screen.queryByRole('link', { name: /Pagar Diária/ })).toBeNull())
   fireEvent.click(screen.getByRole('link', { name: /Arquivar Pasta/ }))
@@ -138,7 +138,7 @@ test('sem resultado: a mensagem e [Limpar filtros], que volta a mostrar tudo', a
 
 test('[Limpar filtros] na barra só aparece com filtro ativo', async () => {
   montar()
-  await screen.findByLabelText('Setor')
+  await nomesNaLista()
   expect(screen.queryByRole('button', { name: 'Limpar filtros' })).toBeNull()
   await escolher('Tipo', 'Processo')
   fireEvent.click(await screen.findByRole('button', { name: 'Limpar filtros' }))

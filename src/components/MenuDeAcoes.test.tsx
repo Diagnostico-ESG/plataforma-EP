@@ -125,3 +125,12 @@ test('com conteúdo próprio, o botão mostra o conteúdo, tira o nome dele e o 
   fireEvent.click(botao)
   expect(screen.getByRole('menu', { name: 'Coluna Setor' })).toBeTruthy()
 })
+
+test('dois itens com o mesmo rótulo (duas pessoas com o mesmo nome) aparecem os dois, sem aviso do React', () => {
+  const avisos = vi.spyOn(console, 'error').mockImplementation(() => {})
+  render(<MenuDeAcoes rotulo="Coluna Responsável" grupos={[[{ rotulo: 'Ana Teste', aoEscolher: vi.fn(), marcado: false }, { rotulo: 'Ana Teste', aoEscolher: vi.fn(), marcado: false }]]} />)
+  fireEvent.click(screen.getByRole('button', { name: 'Coluna Responsável' }))
+  expect(screen.getAllByRole('menuitemradio', { name: 'Ana Teste' })).toHaveLength(2)
+  expect(avisos).not.toHaveBeenCalled()
+  avisos.mockRestore()
+})

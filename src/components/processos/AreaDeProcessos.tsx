@@ -70,6 +70,7 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes, reviso
           agrupar={atual.agrupar} aoMudarAgrupar={(agrupar) => irParaVisao({ agrupar, aberto: null })}
           enderecoDosConcluidosNaLista={enderecoDosConcluidosNaLista} mostrar={atual.mostrar} aoLimparTudo={() => irParaVisao({ filtros: SEM_FILTROS, mostrar: 'todos', aberto: null })}
           aoMudarMostrar={(mostrar) => irParaVisao({ mostrar, filtros: { ...atual.filtros, situacao: null }, aberto: null })}
+          ordenacao={atual.ordenacao} aoOrdenar={(ordenacao) => irParaVisao({ ordenacao, aberto: null })}
           processos={processos} versoes={versoes} usuarioId={usuario.id} aoMudar={recarregar} />
       </div>
       {idAberto && (

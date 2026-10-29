@@ -1,26 +1,21 @@
 import { useId } from 'react'
 import { BotaoDaCaixa, OpcaoDaCaixa } from '../OpcaoDaCaixa'
-import { BuscaDaLista } from './BuscaDaLista'
-import type { FiltrosDosProcessos as Filtros, MostrarNoPortfolio, VisaoDosProcessos } from '../../processos/enderecoDosProcessos'
+import type { FiltrosDosProcessos as Filtros } from '../../processos/enderecoDosProcessos'
 import { SEM_FILTROS } from '../../processos/enderecoDosProcessos'
 import { temFiltro, type OpcaoDoFiltro, type OpcoesDosFiltros } from '../../processos/filtrosDosProcessos'
 
 type FiltrosDosProcessosProps = {
-  visao: VisaoDosProcessos
   opcoes: OpcoesDosFiltros
   filtros: Filtros
-  /** Com "Concluídos" na Lista, a Situação não tem o que filtrar e some. */
-  mostrar: MostrarNoPortfolio
   aoMudar: (filtros: Filtros) => void
 }
 
-/** Os filtros do Quadro e da Lista; a situação só na Lista (e fora de "Concluídos"), porque o Quadro mostra apenas os vivos. */
-export function FiltrosDosProcessos({ visao, opcoes, filtros, mostrar, aoMudar }: FiltrosDosProcessosProps) {
-  // Os valores vêm das próprias opções, então o tipo e a situação escolhidos são sempre válidos.
+/** Os filtros do Quadro, sem situação nem busca (o Quadro mostra só os vivos); a Lista filtra pelo cabeçalho (CabecalhoDaLista). */
+export function FiltrosDosProcessos({ opcoes, filtros, aoMudar }: FiltrosDosProcessosProps) {
+  // Os valores vêm das próprias opções, então o tipo escolhido é sempre válido.
   const mudar = (nome: keyof Filtros) => (valor: string) => aoMudar({ ...filtros, [nome]: valor || null } as Filtros)
   return (
     <div className="filtros-dos-processos" role="group" aria-label="Filtros dos processos">
-      {visao === 'lista' && <BuscaDaLista valor={filtros.busca} aoMudar={mudar('busca')} />}
       <SeletorDoFiltro rotulo="Setor" todos="Todos" opcoes={opcoes.setores} valor={filtros.setor} aoMudar={mudar('setor')} />
       <SeletorDoFiltro rotulo="Macroprocesso" todos="Todos" opcoes={opcoes.macroprocessos} valor={filtros.macroprocesso}
         aoMudar={mudar('macroprocesso')} />
@@ -28,10 +23,6 @@ export function FiltrosDosProcessos({ visao, opcoes, filtros, mostrar, aoMudar }
       <SeletorDoFiltro rotulo="Tipo" todos="Todos" opcoes={opcoes.tipos} valor={filtros.tipo} aoMudar={mudar('tipo')} />
       <SeletorDoFiltro rotulo="Responsável" todos="Todos" opcoes={opcoes.responsaveis} valor={filtros.responsavel}
         aoMudar={mudar('responsavel')} />
-      {visao === 'lista' && mostrar === 'todos' && (
-        <SeletorDoFiltro rotulo="Situação" todos="Todas" opcoes={opcoes.situacoes} valor={filtros.situacao}
-          aoMudar={mudar('situacao')} />
-      )}
       {temFiltro(filtros) && <BotaoLimparFiltros aoLimpar={() => aoMudar(SEM_FILTROS)} />}
     </div>
   )
@@ -59,7 +50,7 @@ function SeletorDoFiltro({ rotulo, todos, opcoes, valor, aoMudar }: SeletorDoFil
   )
 }
 
-function BotaoLimparFiltros({ aoLimpar }: { aoLimpar: () => void }) {
+export function BotaoLimparFiltros({ aoLimpar }: { aoLimpar: () => void }) {
   return <button type="button" className="botao botao-secundario filtros-limpar" onClick={aoLimpar}>Limpar filtros</button>
 }
 

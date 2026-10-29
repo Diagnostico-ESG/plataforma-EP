@@ -100,8 +100,9 @@ function GrupoDoMenu({ itens, separado, aoEscolher }: { itens: ItemDoMenu[]; sep
     <>
       {separado && <div role="separator" className="menu-de-acoes-separador" />}
       <div role="group">
-        {itens.map((item) => (
-          <button key={item.rotulo} type="button" tabIndex={-1} {...papelDoItem(item)}
+        {/* A posição entra na chave: no filtro de Responsável, duas pessoas podem ter o mesmo nome. */}
+        {itens.map((item, posicao) => (
+          <button key={`${posicao}-${item.rotulo}`} type="button" tabIndex={-1} {...papelDoItem(item)}
             className={item.perigoso ? 'menu-de-acoes-item menu-de-acoes-perigoso' : 'menu-de-acoes-item'}
             onClick={() => aoEscolher(item)}>
             {item.rotulo}

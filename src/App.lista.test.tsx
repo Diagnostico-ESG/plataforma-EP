@@ -65,7 +65,8 @@ const faixa = () => within(screen.getByRole('navigation', { name: 'Áreas do sis
 test('as colunas, a ordem pelo nome, todas as situações e o subprocesso logo depois do pai', async () => {
   montar()
   const [cabecalho, ...corpo] = await linhas()
-  expect(cabecalho).toEqual(['Nome', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Responsável', 'Situação'])
+  // O cabeçalho ordenado traz ▲ e o texto oculto da ordem depois do nome da coluna.
+  expect(cabecalho.map((texto) => texto.replace(/[▲▼,].*$/, ''))).toEqual(['Processo', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Responsável', 'Situação'])
   expect(corpo).toEqual([
     ['Arquivar Pasta', 'Processo', 'TSA', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', '—', 'Suspenso'],
     ['Cadastrar Bem', 'Processo', 'TSA', 'Macro de Teste', '—', '—', 'Em andamento'],
