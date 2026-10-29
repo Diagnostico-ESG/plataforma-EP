@@ -157,7 +157,7 @@ A mudança não traz tela nova que carrega dados.
 - Novos tipos de arquivo ou anexos na árvore.
 - Exportação em CSV (não existe, ADR 0017).
 
-## Decisões tomadas ao escrever esta spec, a confirmar na leitura
+## Decisões tomadas ao escrever esta spec (confirmadas pelo usuário em 2026-10-29)
 
 - Limite das Anotações sobe para 8.000 caracteres, para a junção nunca cortar texto (a sabatina não tratou do tamanho; é a opção mais conservadora, e baixar depois é fácil enquanto não há produção).
 - O Editar processo não ganha campo de Anotações: elas continuam só no bloco do verso, para não haver dois lugares de escrever o mesmo texto depois do cadastro.
