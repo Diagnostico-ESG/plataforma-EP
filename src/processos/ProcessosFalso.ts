@@ -178,13 +178,14 @@ export class ProcessosFalso implements ModuloDeProcessos {
     return [...(this.historicoDosProcessos[id] ?? [])]
   }
 
-  async criarProcesso(dados: DadosDoProcesso): Promise<string> {
+  async criarProcesso({ anotacoes, ...dados }: DadosDoProcesso): Promise<string> {
     this.conferirGravacao()
     this.conferirNomeNovo(dados)
     // Como o gatilho do banco: o subprocesso tem pai do tipo Processo e adota o macroprocesso dele.
     const macroprocesso = dados.tipo === 'subprocesso' ? macroprocessoDo(conferirPai(this.processos, dados.processoPaiId)) : {}
     const novo = { ...this.processoNovo(dados), ...macroprocesso }
     this.processos = [...this.processos, novo]
+    this.anotacoes.gravarNoCadastro(novo.id, anotacoes)
     return novo.id
   }
 
@@ -196,6 +197,7 @@ export class ProcessosFalso implements ModuloDeProcessos {
     const campos: Partial<DadosDoProcesso> = { ...dados }
     delete campos.tipo
     delete campos.processoPaiId
+    delete campos.anotacoes
     const pai = this.processos.find((processo) => processo.id === atual.processoPaiId)
     const editado = { ...atual, ...this.nomesDoCartao(dados), ...campos, ...(pai ? macroprocessoDo(pai) : {}) }
     this.processos = levarMacroprocessoAosFilhos(this.processos.map((processo) => (processo.id === id ? editado : processo)), editado)

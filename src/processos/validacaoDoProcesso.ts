@@ -1,3 +1,4 @@
+import { textoParaGravar } from './anotacoes'
 import type { DadosDoProcesso, OrigemDoProcesso, TipoDeProcesso } from './tipos'
 
 /** O que a pessoa digitou ou escolheu no formulário, ainda sem normalizar. */
@@ -11,6 +12,8 @@ export type CamposDoProcesso = {
   origem: OrigemDoProcesso
   contexto: string
   observacoes: string
+  /** Só no cadastro. */
+  anotacoes: string
 }
 
 // O banco confere de novo (migrações processos e subprocessos_e_reclassificacao); aqui a pessoa vê o problema antes
@@ -29,5 +32,6 @@ export function dadosDoProcesso(campos: CamposDoProcesso): DadosDoProcesso {
     nome: campos.nome.trim(), setorId: campos.setorId, macroprocessoId: campos.macroprocessoId, tipo: campos.tipo,
     processoPaiId: campos.tipo === 'subprocesso' ? campos.processoPaiId : null, origem: campos.origem,
     contexto: campos.contexto.trim() || null, observacoes: campos.observacoes.trim() || null,
+    anotacoes: textoParaGravar(campos.anotacoes),
   }
 }

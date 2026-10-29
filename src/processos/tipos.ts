@@ -167,6 +167,8 @@ export type DadosDoProcesso = {
   origem: OrigemDoProcesso
   contexto: string | null
   observacoes: string | null
+  /** Só no cadastro (a edição não envia); depois, as Anotações se escrevem no verso. */
+  anotacoes?: string | null
 }
 
 /** O tipo novo de uma reclassificação; o pai só no subprocesso. Nada volta a "a classificar". */

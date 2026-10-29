@@ -60,6 +60,18 @@ describe('gravação de processos no módulo real', () => {
     expect(cliente.pedidos[0].valores).not.toHaveProperty('data_da_modelagem_piloto')
   })
 
+  test('as Anotações vão só no cadastro, nulas quando não enviadas; a edição não as manda', async () => {
+    const cliente = new ClienteSupabaseFalso()
+    cliente.respostas['processos.insert'] = { data: [{ id: 'p9' }], error: null }
+    cliente.respostas['processos.update'] = { data: [{ id: 'p1' }], error: null }
+    await criar(cliente).criarProcesso({ ...DADOS, anotacoes: 'Combinado' })
+    await criar(cliente).criarProcesso(DADOS)
+    await criar(cliente).editarProcesso('p1', { ...DADOS, anotacoes: 'Combinado' })
+    expect(cliente.pedidos[0].valores).toMatchObject({ anotacoes: 'Combinado' })
+    expect(cliente.pedidos[1].valores).toMatchObject({ anotacoes: null })
+    expect(cliente.pedidos[2].valores).not.toHaveProperty('anotacoes')
+  })
+
   test('criar um subprocesso manda o pai', async () => {
     const cliente = new ClienteSupabaseFalso()
     cliente.respostas['processos.insert'] = { data: [{ id: 'p9' }], error: null }

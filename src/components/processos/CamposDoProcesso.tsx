@@ -1,5 +1,6 @@
 import { useId } from 'react'
 import type { Macroprocesso, Setor } from '../../cadastros/tipos'
+import { LIMITE_DAS_ANOTACOES } from '../../processos/anotacoes'
 import { corDoMacroprocesso } from '../../processos/corDoMacroprocesso'
 import { ROTULO_DA_ORIGEM, ROTULO_DO_TIPO } from '../../processos/rotulos'
 import type { OrigemDoProcesso, ProcessoDaLista, TipoDeProcesso } from '../../processos/tipos'
@@ -55,6 +56,13 @@ export function CamposDoFormulario({ campos, opcoes, cadastrando, aoMudar }: Cam
       <label htmlFor={`${id}-observacoes`}>Observações</label>
       <textarea id={`${id}-observacoes`} value={campos.observacoes} maxLength={2000} rows={3}
         onChange={(evento) => aoMudar({ observacoes: evento.target.value })} />
+      {cadastrando && (
+        <>
+          <label htmlFor={`${id}-anotacoes`}>Anotações</label>
+          <textarea id={`${id}-anotacoes`} value={campos.anotacoes} maxLength={LIMITE_DAS_ANOTACOES} rows={3}
+            onChange={(evento) => aoMudar({ anotacoes: evento.target.value })} />
+        </>
+      )}
     </>
   )
 }

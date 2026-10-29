@@ -1,6 +1,6 @@
 # Ticket 04 — Anotações no cadastro e recusa que some: plano de execução
 
-> **Para quem executa:** `superpowers:executing-plans`; marque as caixas (`- [x]`) conforme cada tarefa termina.
+> **Para quem executa:** `superpowers:executing-plans`; marque as caixas (`- [ ]`) conforme cada tarefa termina.
 
 **Objetivo:** o cadastro de Novo processo ganha o campo Anotações (limite 8.000, banco e telas); a recusa do formulário some em qualquer mudança de campo.
 
@@ -24,9 +24,9 @@
 
 - [x] **1.1** No `50`: trocar `2001`→`8001` e `2000`→`8000` nas linhas do limite (e nas descrições), e `anotacoes_longas:2001`→`anotacoes_longas:8001`.
 - [x] **1.2** Criar o `71` (mesmo cabeçalho/rodapé do `63`: `_tap`, usuários a1–a4, exceção final), cobrindo: administrador e integrante inserem com Anotações e o banco registra autor (`anotacoes_alteradas_por`) e hora; inserir sem Anotações deixa autor e hora nulos; 8.000 caracteres aceitos no insert e 8.001 recusados (`23514`); Consulta e desativado recusados (`42501`) e sem linha; visitante `42501`; ler as Anotações: administrador, integrante e consulta leem, desativado e visitante não.
-- [x] **1.3** Ver falhar: `npx supabase start` (descartar a saída: traz chaves), `npx supabase test db`; contar `ok` e `not ok`.
+- [ ] **1.3** (NÃO FEITO: Docker não sobe nesta máquina, sem WSL; a prova fica com o workflow) Ver falhar: `npx supabase start` (descartar a saída: traz chaves), `npx supabase test db`; contar `ok` e `not ok`.
 - [x] **1.4** Migração: `alter table ... drop constraint processos_anotacoes_limite, add constraint ... check (char_length(anotacoes) <= 8000)`; `grant insert (anotacoes) on public.processos to authenticated`; `create or replace` do gatilho com ramo `TG_OP = 'INSERT'` e recriação como `before insert or update`; `create or replace` de `gravar_anotacoes_do_processo` com 8000 (mesmo corpo).
-- [x] **1.5** `npm run db:reset` (local), `npx supabase test db`: todas as linhas `ok`; `npx supabase gen types --local` e conferir `src/types/database.ts`.
+- [ ] **1.5** (NÃO FEITO pelo mesmo motivo; os tipos não mudam: só limite, privilégio e corpo de função) `npm run db:reset` (local), `npx supabase test db`: todas as linhas `ok`; `npx supabase gen types --local` e conferir `src/types/database.ts`.
 - [x] **1.6** Commit (migração, testes e tipos juntos).
 
 ### Tarefa 2: Limite 8.000 no bloco do verso
@@ -54,4 +54,4 @@
 ### Tarefa 5: Fechamento
 
 - [x] **5.1** `npm test`, `npm run lint`, `npx tsc --noEmit` (ou o script de typecheck do projeto) verdes.
-- [x] **5.2** Push da branch, disparar "Testes de banco" e ler o resultado (autorizado em "Ajustes deste Projeto"). Migração no remoto de desenvolvimento: pelo workflow "Migrar banco de desenvolvimento", conforme os Ajustes.
+- [ ] **5.2** Push da branch, disparar "Testes de banco" e ler o resultado (autorizado em "Ajustes deste Projeto"). Migração no remoto de desenvolvimento: pelo workflow "Migrar banco de desenvolvimento", conforme os Ajustes.

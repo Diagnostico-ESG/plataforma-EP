@@ -49,6 +49,11 @@ export class AnotacoesFalso {
     return { tipo: 'gravado', anotacoes: { ...this.porProcesso[id] } }
   }
 
+  /** O cadastro com Anotações: como o gatilho do banco, que registra quem e quando ao inserir com texto. */
+  gravarNoCadastro(id: string, texto: string | null | undefined): void {
+    if (texto) this.porProcesso[id] = { texto, alteradoPor: this.autor, alteradoEm: AGORA }
+  }
+
   liberar(): void {
     this.liberacao?.()
     this.liberacao = null

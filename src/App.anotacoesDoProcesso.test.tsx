@@ -79,13 +79,13 @@ test('o texto gravado aparece ao abrir, com quem alterou', async () => {
   expect(await (await blocoDasAnotacoes()).findByText('Alterado por Bia Teste em 12/10, 12:05')).toBeTruthy()
 })
 
-test('a contagem some com 1.799 caracteres, aparece com 1.800, e o campo não passa de 2.000', async () => {
+test('a contagem some com 7.799 caracteres, aparece com 7.800, e o campo não passa de 8.000', async () => {
   montarVerso(processoDasAnotacoes())
-  await digitarNasAnotacoes('a'.repeat(1799))
-  expect((await blocoDasAnotacoes()).queryByText(/ de 2\.000$/)).toBeNull()
-  await digitarNasAnotacoes('a'.repeat(1800))
-  expect(await (await blocoDasAnotacoes()).findByText('1.800 de 2.000')).toBeTruthy()
-  expect((await campoDasAnotacoes()).getAttribute('maxlength')).toBe('2000')
+  await digitarNasAnotacoes('a'.repeat(7799))
+  expect((await blocoDasAnotacoes()).queryByText(/ de 8\.000$/)).toBeNull()
+  await digitarNasAnotacoes('a'.repeat(7800))
+  expect(await (await blocoDasAnotacoes()).findByText('7.800 de 8.000')).toBeTruthy()
+  expect((await campoDasAnotacoes()).getAttribute('maxlength')).toBe('8000')
 })
 
 test('a Consulta lê o texto, com quebras de linha e "Alterado por", sem campo editável', async () => {

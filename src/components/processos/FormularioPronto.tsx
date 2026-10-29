@@ -17,7 +17,7 @@ type FormularioProntoProps = {
 
 const camposEmBranco = (): CamposDoProcesso => ({
   nome: '', setorId: '', macroprocessoId: '', tipo: 'a_classificar', processoPaiId: '', origem: 'novo', contexto: '',
-  observacoes: '',
+  observacoes: '', anotacoes: '',
 })
 
 function camposIniciais(inicial?: ProcessoLido): CamposDoProcesso {
@@ -25,7 +25,7 @@ function camposIniciais(inicial?: ProcessoLido): CamposDoProcesso {
   return {
     nome: inicial.nome, setorId: inicial.setorId, macroprocessoId: inicial.macroprocessoId,
     tipo: inicial.tipo, processoPaiId: inicial.processoPaiId ?? '', origem: inicial.origem,
-    contexto: inicial.contexto ?? '', observacoes: inicial.observacoes ?? '',
+    contexto: inicial.contexto ?? '', observacoes: inicial.observacoes ?? '', anotacoes: '',
   }
 }
 
@@ -55,12 +55,18 @@ export function FormularioPronto({ cadastros, opcoes, titulo, inicial, aoSalvar,
     setEnviando(false)
   }
 
+  // Qualquer mudança de campo apaga a recusa; ela volta, se for o caso, no próximo envio.
+  function mudar(mudanca: Partial<CamposDoProcesso>) {
+    setAviso(null)
+    setCampos((atuais) => comMacroprocessoDoPai({ ...atuais, ...mudanca }, opcoes.pais))
+  }
+
   const setor = opcoes.setores.find((outro) => outro.id === campos.setorId)
   const macroprocesso = opcoes.macroprocessos.find((outro) => outro.id === campos.macroprocessoId)
   return (
     <form className="formulario-do-processo" aria-label={titulo} noValidate onSubmit={enviar}>
       <CamposDoFormulario campos={campos} opcoes={opcoes} cadastrando={!inicial}
-        aoMudar={(mudanca) => setCampos((atuais) => comMacroprocessoDoPai({ ...atuais, ...mudanca }, opcoes.pais))} />
+        aoMudar={mudar} />
       {setor && macroprocesso && (
         <AvisoDeSetorIncluido key={macroprocesso.id} cadastros={cadastros} setorId={setor.id} setorSigla={setor.sigla}
           macroprocessoId={macroprocesso.id} macroprocessoNome={macroprocesso.nome} />

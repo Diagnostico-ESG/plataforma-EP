@@ -4,7 +4,7 @@ import { dadosDoProcesso, problemaNoProcesso } from './validacaoDoProcesso'
 
 const CAMPOS = {
   nome: 'Emitir Ofício', setorId: 's1', macroprocessoId: 'm1', tipo: 'a_classificar' as TipoDeProcesso, processoPaiId: '',
-  origem: 'novo' as const, contexto: '', observacoes: '',
+  origem: 'novo' as const, contexto: '', observacoes: '', anotacoes: '',
 }
 
 test('campos obrigatórios preenchidos: nenhum problema', () => {
@@ -23,7 +23,7 @@ test.each([
 test('dados saem sem espaços nas pontas e com textos vazios como nulos', () => {
   expect(dadosDoProcesso({ ...CAMPOS, nome: ' Emitir Ofício ', contexto: ' ', observacoes: ' Nota ' })).toEqual({
     nome: 'Emitir Ofício', setorId: 's1', macroprocessoId: 'm1', tipo: 'a_classificar', processoPaiId: null,
-    origem: 'novo', contexto: null, observacoes: 'Nota',
+    origem: 'novo', contexto: null, observacoes: 'Nota', anotacoes: null,
   })
 })
 
@@ -34,4 +34,9 @@ test('a Data da modelagem piloto não faz parte dos dados do cadastro', () => {
 test('o pai só sai no subprocesso', () => {
   expect(dadosDoProcesso({ ...CAMPOS, tipo: 'subprocesso', processoPaiId: 'p1' }).processoPaiId).toBe('p1')
   expect(dadosDoProcesso({ ...CAMPOS, tipo: 'processo', processoPaiId: 'p1' }).processoPaiId).toBeNull()
+})
+
+test('as Anotações saem como foram digitadas, e só espaços viram nulo', () => {
+  expect(dadosDoProcesso({ ...CAMPOS, anotacoes: '  Combinado  ' }).anotacoes).toBe('  Combinado  ')
+  expect(dadosDoProcesso({ ...CAMPOS, anotacoes: ' \n ' }).anotacoes).toBeNull()
 })

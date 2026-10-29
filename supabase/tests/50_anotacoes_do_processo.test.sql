@@ -1,5 +1,5 @@
 -- Anotações do processo (processos-etapas, ticket 23; ADR 0021): gravar só se o texto no banco é o que a pessoa tinha,
--- autor e hora preenchidos pelo banco, sem evento, limite de 2.000 caracteres, só espaços grava nulo, arquivado recusa,
+-- autor e hora preenchidos pelo banco, sem evento, limite de 8.000 caracteres, só espaços grava nulo, arquivado recusa,
 -- subprocesso e pai separados, reclassificação mantém, perfis (inclusive inativo e visitante) e ausência da view e do pacote.
 begin;
 create extension if not exists pgtap with schema extensions;
@@ -166,18 +166,18 @@ insert into _tap (linha) select is(pg_temp.edicoes('Notas'), 1::bigint, 'editar 
 insert into _tap (linha) select is(jsonb_exists(pg_temp.ultima_edicao('Notas') -> 'depois', 'anotacoes'), false,
   'o evento não traz as Anotações');
 
--- ===== Limite de 2.000 caracteres =====
+-- ===== Limite de 8.000 caracteres =====
 insert into _tap (linha) select throws_ok(
-  $sql$select * from public.gravar_anotacoes_do_processo(pg_temp.processo('Notas'), 'Terceiro texto', repeat('a', 2001))$sql$,
-  'P0001', 'anotacoes_longas:2001', '2.001 caracteres são recusados');
+  $sql$select * from public.gravar_anotacoes_do_processo(pg_temp.processo('Notas'), 'Terceiro texto', repeat('a', 8001))$sql$,
+  'P0001', 'anotacoes_longas:8001', '8.001 caracteres são recusados');
 insert into _tap (linha) select lives_ok(
-  $sql$select * from public.gravar_anotacoes_do_processo(pg_temp.processo('Notas'), 'Terceiro texto', repeat('a', 2000))$sql$,
-  '2.000 caracteres são aceitos');
-insert into _tap (linha) select is(char_length(pg_temp.texto('Notas')), 2000, 'o texto de 2.000 caracteres ficou inteiro');
+  $sql$select * from public.gravar_anotacoes_do_processo(pg_temp.processo('Notas'), 'Terceiro texto', repeat('a', 8000))$sql$,
+  '8.000 caracteres são aceitos');
+insert into _tap (linha) select is(char_length(pg_temp.texto('Notas')), 8000, 'o texto de 8.000 caracteres ficou inteiro');
 
 -- ===== Só espaços e quebras de linha gravam nulo, e o rastro de quem alterou fica =====
 insert into _tap (linha) select lives_ok(
-  $sql$select * from public.gravar_anotacoes_do_processo(pg_temp.processo('Notas'), repeat('a', 2000), E'  \n ')$sql$,
+  $sql$select * from public.gravar_anotacoes_do_processo(pg_temp.processo('Notas'), repeat('a', 8000), E'  \n ')$sql$,
   'só espaços e quebras de linha são aceitos');
 insert into _tap (linha) select is(pg_temp.texto('Notas'), null::text, 'e gravam nulo');
 insert into _tap (linha) select ok(pg_temp.momento('Notas') is not null, 'a hora da última alteração continua registrada');
@@ -190,7 +190,7 @@ insert into _tap (linha) select is(pg_temp.texto('Notas'), '  com margem  ', 'e 
 
 -- ===== Fora da função: o limite vale, e autor e hora não se mudam =====
 insert into _tap (linha) select throws_ok(
-  $sql$update public.processos set anotacoes = repeat('a', 2001) where id = pg_temp.processo('Notas')$sql$,
+  $sql$update public.processos set anotacoes = repeat('a', 8001) where id = pg_temp.processo('Notas')$sql$,
   '23514', null, 'o limite vale também no update direto');
 insert into _tap (linha) select lives_ok(
   $sql$update public.processos set anotacoes = 'Direto' where id = pg_temp.processo('Notas')$sql$,
