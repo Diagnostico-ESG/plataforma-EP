@@ -1,9 +1,10 @@
 import { expect, test } from 'vitest'
 import { lerEnderecoDosProcessos, montarEnderecoDosProcessos, SEM_FILTROS } from './enderecoDosProcessos'
+import { ORDENACAO_PADRAO } from './ordenacaoDaLista'
 
 test('o caminho dá a visão e o item aberto', () => {
-  expect(lerEnderecoDosProcessos('#/processos')).toEqual({ visao: 'quadro', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa', mostrar: 'todos' })
-  expect(lerEnderecoDosProcessos('#/processos/lista')).toEqual({ visao: 'lista', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa', mostrar: 'todos' })
+  expect(lerEnderecoDosProcessos('#/processos')).toEqual({ visao: 'quadro', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa', mostrar: 'todos', ordenacao: ORDENACAO_PADRAO })
+  expect(lerEnderecoDosProcessos('#/processos/lista')).toEqual({ visao: 'lista', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa', mostrar: 'todos', ordenacao: ORDENACAO_PADRAO })
   expect(lerEnderecoDosProcessos('#/processos/p1').aberto).toBe('p1')
   expect(lerEnderecoDosProcessos('#/processos/lista/p1')).toMatchObject({ visao: 'lista', aberto: 'p1' })
   expect(lerEnderecoDosProcessos('#/processos/novo').aberto).toBe('novo')
@@ -58,7 +59,7 @@ test('montar a busca: depois dos filtros, e fora do Quadro', () => {
   expect(montarEnderecoDosProcessos({ visao: 'lista', aberto: null, filtros, agrupar: 'etapa' })).toBe('#/processos/lista?setor=s1&busca=pagar+di')
   expect(montarEnderecoDosProcessos({ visao: 'quadro', aberto: null, filtros, agrupar: 'etapa' })).toBe('#/processos?setor=s1')
   expect(lerEnderecoDosProcessos(montarEnderecoDosProcessos({ visao: 'lista', aberto: 'p1', filtros, agrupar: 'etapa' })))
-    .toEqual({ visao: 'lista', aberto: 'p1', filtros, agrupar: 'etapa', mostrar: 'todos' })
+    .toEqual({ visao: 'lista', aberto: 'p1', filtros, agrupar: 'etapa', mostrar: 'todos', ordenacao: ORDENACAO_PADRAO })
 })
 
 test('o agrupamento do Quadro vem de agrupar=responsavel; fora do Quadro ou com outro valor é por etapa', () => {
@@ -116,4 +117,32 @@ test('ler e montar são inversos com mostrar', () => {
   for (const endereco of ['#/processos/lista?setor=s1&mostrar=concluidos', '#/processos?agrupar=setor&mostrar=concluidos']) {
     expect(montarEnderecoDosProcessos(lerEnderecoDosProcessos(endereco))).toBe(endereco)
   }
+})
+
+test('ordenar e sentido valem na Lista', () => {
+  expect(lerEnderecoDosProcessos('#/processos/lista?ordenar=etapa&sentido=decrescente').ordenacao)
+    .toEqual({ coluna: 'etapa', sentido: 'decrescente' })
+  expect(lerEnderecoDosProcessos('#/processos/lista?ordenar=responsavel').ordenacao).toEqual({ coluna: 'responsavel', sentido: 'crescente' })
+})
+
+test('coluna ou sentido desconhecidos voltam ao padrão, cada um por si; no Quadro a ordenação é ignorada', () => {
+  expect(lerEnderecoDosProcessos('#/processos/lista?ordenar=xyz&sentido=decrescente').ordenacao)
+    .toEqual({ coluna: 'processo', sentido: 'decrescente' })
+  expect(lerEnderecoDosProcessos('#/processos/lista?ordenar=setor&sentido=xyz').ordenacao).toEqual({ coluna: 'setor', sentido: 'crescente' })
+  expect(lerEnderecoDosProcessos('#/processos?ordenar=setor&sentido=decrescente').ordenacao).toEqual(ORDENACAO_PADRAO)
+})
+
+test('montar: a ordenação padrão não vai ao endereço; as outras vão, e só na Lista', () => {
+  const base = { aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa' as const }
+  expect(montarEnderecoDosProcessos({ ...base, visao: 'lista', ordenacao: ORDENACAO_PADRAO })).toBe('#/processos/lista')
+  expect(montarEnderecoDosProcessos({ ...base, visao: 'lista', ordenacao: { coluna: 'responsavel', sentido: 'crescente' } }))
+    .toBe('#/processos/lista?ordenar=responsavel')
+  expect(montarEnderecoDosProcessos({ ...base, visao: 'lista', ordenacao: { coluna: 'processo', sentido: 'decrescente' } }))
+    .toBe('#/processos/lista?sentido=decrescente')
+  expect(montarEnderecoDosProcessos({ ...base, visao: 'quadro', ordenacao: { coluna: 'setor', sentido: 'decrescente' } })).toBe('#/processos')
+})
+
+test('ler e montar são inversos com a ordenação e os filtros', () => {
+  const endereco = '#/processos/lista?tipo=processo&mostrar=concluidos&ordenar=etapa&sentido=decrescente'
+  expect(montarEnderecoDosProcessos(lerEnderecoDosProcessos(endereco))).toBe(endereco)
 })

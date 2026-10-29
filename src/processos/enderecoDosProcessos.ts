@@ -1,3 +1,4 @@
+import { ORDENACAO_PADRAO, type ColunaDaLista, type OrdenacaoDaLista } from './ordenacaoDaLista'
 import type { SituacaoDoProcesso, TipoDeProcesso } from './tipos'
 
 export type VisaoDosProcessos = 'quadro' | 'lista'
@@ -29,16 +30,18 @@ function ehAgrupamento(lido: string): lido is AgruparQuadroPor {
 
 /**
  * aberto: o id do processo no painel, 'novo' no cadastro, null sem painel.
- * agrupar e mostrar ficam fora dos filtros para o [Limpar filtros] não os desligar; agrupar só vale no Quadro, e mostrar só
- * na Lista e no Quadro por setor.
+ * agrupar, mostrar e ordenacao ficam fora dos filtros para o [Limpar filtros] não os desligar; agrupar só vale no Quadro,
+ * mostrar só na Lista e no Quadro por setor, e ordenacao só na Lista.
  */
 export type EnderecoDosProcessos = {
   visao: VisaoDosProcessos; aberto: string | null; filtros: FiltrosDosProcessos; agrupar: AgruparQuadroPor
-  mostrar: MostrarNoPortfolio
+  mostrar: MostrarNoPortfolio; ordenacao: OrdenacaoDaLista
 }
 
-/** Quem monta o endereço pode omitir mostrar: vale Todos. */
-type EnderecoParaMontar = Omit<EnderecoDosProcessos, 'mostrar'> & { mostrar?: MostrarNoPortfolio }
+/** Quem monta o endereço pode omitir mostrar (vale Todos) e ordenacao (vale a padrão). */
+type EnderecoParaMontar = Omit<EnderecoDosProcessos, 'mostrar' | 'ordenacao'> & {
+  mostrar?: MostrarNoPortfolio; ordenacao?: OrdenacaoDaLista
+}
 
 /** Lista e Quadro por setor são o portfólio: só neles Todos | Concluídos existe. */
 export function ehPortfolio(visao: VisaoDosProcessos, agrupar: AgruparQuadroPor): boolean {
@@ -55,6 +58,7 @@ const SO_DA_LISTA = new Set<string>(['situacao', 'busca'])
 const TIPOS = new Set<string>(['processo', 'subprocesso', 'a_classificar'])
 // O cancelado não é uma opção da Lista: ele só aparece pelo "Mostrar cancelados".
 const SITUACOES = new Set<string>(['em_andamento', 'suspenso', 'concluido'])
+const COLUNAS = new Set<string>(['processo', 'tipo', 'setor', 'macroprocesso', 'etapa', 'responsavel', 'situacao'])
 
 /** #/processos[/lista][/<id> | /novo][?filtros] */
 export function lerEnderecoDosProcessos(endereco: string): EnderecoDosProcessos {
@@ -66,7 +70,18 @@ export function lerEnderecoDosProcessos(endereco: string): EnderecoDosProcessos 
   const lido = parametros.get('agrupar') ?? ''
   const agrupar = visao === 'quadro' && ehAgrupamento(lido) ? lido : 'etapa'
   const mostrar = ehPortfolio(visao, agrupar) && parametros.get('mostrar') === 'concluidos' ? 'concluidos' : 'todos'
-  return { visao, aberto, filtros: filtrosDaConsulta(parametros, visao, mostrar), agrupar, mostrar }
+  const ordenacao = ordenacaoDaConsulta(parametros, visao)
+  return { visao, aberto, filtros: filtrosDaConsulta(parametros, visao, mostrar), agrupar, mostrar, ordenacao }
+}
+
+// Coluna e sentido desconhecidos voltam ao padrão, cada um por si; o Quadro não se ordena.
+function ordenacaoDaConsulta(consulta: URLSearchParams, visao: VisaoDosProcessos): OrdenacaoDaLista {
+  if (visao === 'quadro') return ORDENACAO_PADRAO
+  const coluna = consulta.get('ordenar') ?? ''
+  return {
+    coluna: COLUNAS.has(coluna) ? coluna as ColunaDaLista : ORDENACAO_PADRAO.coluna,
+    sentido: consulta.get('sentido') === 'decrescente' ? 'decrescente' : 'crescente',
+  }
 }
 
 function filtrosDaConsulta(consulta: URLSearchParams, visao: VisaoDosProcessos, mostrar: MostrarNoPortfolio): FiltrosDosProcessos {
@@ -97,8 +112,13 @@ function valorDoFiltroNoEndereco(
   return filtros[nome]
 }
 
-export function montarEnderecoDosProcessos({ visao, aberto, filtros, agrupar, mostrar = 'todos' }: EnderecoParaMontar): string {
-  const trechos = ['#/processos', visao === 'lista' ? 'lista' : null, aberto].filter((trecho) => trecho !== null)
+export function montarEnderecoDosProcessos({ mostrar = 'todos', ordenacao = ORDENACAO_PADRAO, ...resto }: EnderecoParaMontar): string {
+  const trechos = ['#/processos', resto.visao === 'lista' ? 'lista' : null, resto.aberto].filter((trecho) => trecho !== null)
+  const texto = consultaDoEndereco({ ...resto, mostrar, ordenacao }).toString()
+  return trechos.join('/') + (texto ? `?${texto}` : '')
+}
+
+function consultaDoEndereco({ visao, filtros, agrupar, mostrar, ordenacao }: EnderecoDosProcessos): URLSearchParams {
   const consulta = new URLSearchParams()
   for (const nome of NOMES_DOS_FILTROS) {
     const valor = valorDoFiltroNoEndereco(nome, filtros, visao, mostrar)
@@ -106,6 +126,12 @@ export function montarEnderecoDosProcessos({ visao, aberto, filtros, agrupar, mo
   }
   if (visao === 'quadro' && agrupar !== 'etapa') consulta.set('agrupar', agrupar)
   if (mostrar === 'concluidos' && ehPortfolio(visao, agrupar)) consulta.set('mostrar', 'concluidos')
-  const texto = consulta.toString()
-  return trechos.join('/') + (texto ? `?${texto}` : '')
+  if (visao === 'lista') gravarOrdenacao(consulta, ordenacao)
+  return consulta
+}
+
+// A padrão (Processo, crescente) não vai ao endereço: a Lista sem escolha fica com o endereço de sempre.
+function gravarOrdenacao(consulta: URLSearchParams, { coluna, sentido }: OrdenacaoDaLista) {
+  if (coluna !== ORDENACAO_PADRAO.coluna) consulta.set('ordenar', coluna)
+  if (sentido !== ORDENACAO_PADRAO.sentido) consulta.set('sentido', sentido)
 }
