@@ -27,17 +27,20 @@ begin
 end $$;
 grant execute on function pg_temp.mover_sem_trava(uuid, uuid, date, text, text) to authenticated;
 
--- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
+-- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo, a5 segundo administrador (sem ele,
+-- desativar o a1 seria recusado como último administrador num banco recém-resetado).
 insert into public.autorizacoes (email, perfil) values
   ('admin.teste@ccivil.pr.gov.br', 'administrador'),
   ('integrante.teste@ccivil.pr.gov.br', 'integrante_ep'),
   ('consulta.teste@ccivil.pr.gov.br', 'consulta'),
-  ('inativo.teste@ccivil.pr.gov.br', 'administrador');
+  ('inativo.teste@ccivil.pr.gov.br', 'administrador'),
+  ('admin2.teste@ccivil.pr.gov.br', 'administrador');
 insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-0000000000a1', 'admin.teste@ccivil.pr.gov.br', 'authenticated', 'authenticated'),
   ('00000000-0000-0000-0000-0000000000a2', 'integrante.teste@ccivil.pr.gov.br', 'authenticated', 'authenticated'),
   ('00000000-0000-0000-0000-0000000000a3', 'consulta.teste@ccivil.pr.gov.br', 'authenticated', 'authenticated'),
-  ('00000000-0000-0000-0000-0000000000a4', 'inativo.teste@ccivil.pr.gov.br', 'authenticated', 'authenticated');
+  ('00000000-0000-0000-0000-0000000000a4', 'inativo.teste@ccivil.pr.gov.br', 'authenticated', 'authenticated'),
+  ('00000000-0000-0000-0000-0000000000a5', 'admin2.teste@ccivil.pr.gov.br', 'authenticated', 'authenticated');
 update public.usuarios set ativo = false where id = '00000000-0000-0000-0000-0000000000a4';
 
 create function pg_temp.claims(usuario text) returns void language sql as $$

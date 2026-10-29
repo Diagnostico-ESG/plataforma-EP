@@ -241,3 +241,6 @@ export type ModuloDeProcessos = {
 
 /** Quem aparece com o Avatar numa opção das caixas de seleção: o nome puro (sem "(você)") e a foto, se houver. */
 export type PessoaDaOpcao = { nome: string; fotoUrl: string | null }
+
+/** Uma linha da Lista: o processo e, no subprocesso, o nome do pai ("↳ pai"). */
+export type LinhaDaLista = ProcessoDaLista & { nomeDoPai: string | null }

@@ -1,8 +1,9 @@
 import { ORDENACAO_PADRAO, ordenarLinhas, type OrdenacaoDaLista } from './ordenacaoDaLista'
-import type { ProcessoDaLista } from './tipos'
+import type { LinhaDaLista, ProcessoDaLista } from './tipos'
 
-/** Uma linha da Lista: o processo e, no subprocesso, o nome do pai ("↳ pai"). */
-export type LinhaDaLista = ProcessoDaLista & { nomeDoPai: string | null }
+// Reexportado: quem monta ou mostra a Lista importa o tipo daqui; ele mora em tipos.ts para não fechar um ciclo com a ordenação.
+export type { LinhaDaLista }
+
 
 /**
  * Na ordem escolhida (padrão: pelo nome), com cada subprocesso logo depois do pai. O nome do pai vem de todos os

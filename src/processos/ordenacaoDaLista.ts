@@ -1,4 +1,4 @@
-import type { LinhaDaLista } from './linhasDaLista'
+import type { LinhaDaLista } from './tipos'
 import { ROTULO_DO_TIPO } from './rotulos'
 import type { SituacaoDoProcesso } from './tipos'
 
