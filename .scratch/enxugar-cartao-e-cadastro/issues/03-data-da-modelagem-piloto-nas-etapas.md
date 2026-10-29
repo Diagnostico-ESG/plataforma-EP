@@ -16,3 +16,7 @@
 - [ ] Os testes de tela da data da modelagem foram reescritos para o lugar novo. `npm test` verde.
 - [ ] pgTAP com as linhas `ok` no Docker local e o workflow "Testes de banco" verde.
 - [ ] `[visual]` A data cabe na linha das Etapas sem quebrar o desenho da linha do tempo.
+
+Concluído em 2026-10-29 (commit de1627b)
+
+Ressalvas: o pgTAP rodou no workflow "Testes de banco" (ensaio sobre o remoto de desenvolvimento: 32, 63 e 70 verdes), não no Docker local, que não está instalado nesta máquina; a limpeza das datas futuras não foi vista sobre uma linha real; o critério [visual] não foi visto (exige o login institucional).
