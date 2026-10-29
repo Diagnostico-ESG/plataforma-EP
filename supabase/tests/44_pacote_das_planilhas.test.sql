@@ -73,7 +73,7 @@ grant execute on function pg_temp.arquivo(text, text), pg_temp.par() to authenti
 -- Mudanças pelas funções e colunas da tela, como administrador.
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
 set local role authenticated;
-update public.processos set observacoes = 'Observacao inventada', data_da_modelagem_piloto = '2026-03-10'
+update public.processos set data_da_modelagem_piloto = '2026-03-10'
   where id = pg_temp.processo('T44 Normal');
 update public.processos set responsavel_id = '00000000-0000-0000-0000-0000000000a2' where id = pg_temp.processo('T44 Normal');
 -- Concluídos: com a data da publicação, sem ela (com a explicação) e o arquivado.
@@ -145,12 +145,12 @@ insert into _tap (linha) select is(pg_temp.do_processo('T44 Normal') ->> 'tipo',
 insert into _tap (linha) select is(pg_temp.do_processo('T44 Normal') ->> 'setor_sigla', 'T44', 'a sigla do setor vai no pacote');
 insert into _tap (linha) select is(pg_temp.do_processo('T44 Normal') ->> 'macroprocesso_nome', 'Macro T44',
   'o nome do macroprocesso vai no pacote');
-insert into _tap (linha) select is(pg_temp.do_processo('T44 Normal') ->> 'observacoes', 'Observacao inventada',
-  'as observações do processo vão no pacote');
+insert into _tap (linha) select ok(not (pg_temp.do_processo('T44 Normal') ? 'observacoes'),
+  'o pacote não leva mais observações');
 insert into _tap (linha) select is(pg_temp.do_processo('T44 Normal') ->> 'data_da_modelagem_piloto', '2026-03-10',
   'a data da modelagem piloto vai no pacote como AAAA-MM-DD');
 insert into _tap (linha) select is((select array_agg(k order by k) from jsonb_object_keys(pg_temp.do_processo('T44 Normal')) k),
-  array['data_da_modelagem_piloto', 'etapa_atual_id', 'etiqueta', 'id', 'macroprocesso_nome', 'nome', 'observacoes',
+  array['data_da_modelagem_piloto', 'etapa_atual_id', 'etiqueta', 'id', 'macroprocesso_nome', 'nome',
     'publicado_em', 'setor_sigla', 'situacao_guardada', 'tipo', 'ultima_versao'], 'cada processo traz só os campos combinados');
 
 -- Publicação e etapa atual (Andamento livre): a data da publicação, a etapa e a etiqueta viajam como estão.

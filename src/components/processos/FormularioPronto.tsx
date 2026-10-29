@@ -16,16 +16,14 @@ type FormularioProntoProps = {
 }
 
 const camposEmBranco = (): CamposDoProcesso => ({
-  nome: '', setorId: '', macroprocessoId: '', tipo: 'a_classificar', processoPaiId: '', origem: 'novo', contexto: '',
-  observacoes: '', anotacoes: '',
+  nome: '', setorId: '', macroprocessoId: '', tipo: 'a_classificar', processoPaiId: '', anotacoes: '',
 })
 
 function camposIniciais(inicial?: ProcessoLido): CamposDoProcesso {
   if (!inicial) return camposEmBranco()
   return {
     nome: inicial.nome, setorId: inicial.setorId, macroprocessoId: inicial.macroprocessoId,
-    tipo: inicial.tipo, processoPaiId: inicial.processoPaiId ?? '', origem: inicial.origem,
-    contexto: inicial.contexto ?? '', observacoes: inicial.observacoes ?? '', anotacoes: '',
+    tipo: inicial.tipo, processoPaiId: inicial.processoPaiId ?? '', anotacoes: '',
   }
 }
 

@@ -160,11 +160,13 @@ insert into _tap (linha) select is(pg_temp.autor('Notas'), '00000000-0000-0000-0
 -- ===== Sem evento no processo; editar outro campo continua gerando, sem as Anotações =====
 insert into _tap (linha) select is(pg_temp.edicoes('Notas'), 0::bigint, 'gravar as Anotações não gera evento do processo');
 insert into _tap (linha) select lives_ok(
-  $sql$update public.processos set contexto = 'Contexto novo' where id = pg_temp.processo('Notas')$sql$,
-  'editar o contexto continua permitido');
-insert into _tap (linha) select is(pg_temp.edicoes('Notas'), 1::bigint, 'editar o contexto gera um evento');
-insert into _tap (linha) select is(jsonb_exists(pg_temp.ultima_edicao('Notas') -> 'depois', 'anotacoes'), false,
+  $sql$update public.processos set nome = 'Notas editada' where id = pg_temp.processo('Notas')$sql$,
+  'editar o nome continua permitido');
+insert into _tap (linha) select is(pg_temp.edicoes('Notas editada'), 1::bigint, 'editar o nome gera um evento');
+insert into _tap (linha) select is(jsonb_exists(pg_temp.ultima_edicao('Notas editada') -> 'depois', 'anotacoes'), false,
   'o evento não traz as Anotações');
+-- O nome volta, porque os testes seguintes buscam o processo por ele.
+update public.processos set nome = 'Notas' where id = pg_temp.processo('Notas editada');
 
 -- ===== Limite de 8.000 caracteres =====
 insert into _tap (linha) select throws_ok(

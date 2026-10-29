@@ -25,8 +25,7 @@ async function falhaDe(promessa: Promise<void>): Promise<Error> {
 }
 
 const DADOS: DadosDoProcesso = {
-  nome: 'Novo Processo', setorId: 's1', macroprocessoId: 'm1', tipo: 'processo', processoPaiId: null, origem: 'novo',
-  contexto: null, observacoes: null,
+  nome: 'Novo Processo', setorId: 's1', macroprocessoId: 'm1', tipo: 'processo', processoPaiId: null,
 }
 
 describe('cadastro', () => {

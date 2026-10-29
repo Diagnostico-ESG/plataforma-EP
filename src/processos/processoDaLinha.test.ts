@@ -6,7 +6,7 @@ const VAZIA: LinhaDoProcesso = {
   macroprocesso_nome: 'Macro Fictício', processo_pai_id: null, situacao: 'em_andamento', situacao_guardada: 'em_andamento',
   etapa_atual_id: null, etapa_atual_codigo: null, etapa_atual_nome: null, etapa_atual_ordem: null,
   responsavel_id: null, responsavel_nome: null, responsavel_foto_url: null, data_da_modelagem_piloto: null,
-  contexto: null, criado_em: null, motivo_da_situacao: null, observacoes: null, origem: 'novo',
+  criado_em: null, motivo_da_situacao: null,
   responsavel_ativo: null, etiqueta: null, entrou_na_etapa_em: null, etapa_atual_posicao: null,
   ultima_versao_numero: null, ultima_versao_historica: null, ultima_versao_tem_relatorio: null, subprocessos_quantidade: 0,
   publicado_em: null, link_da_publicacao: null, sem_publicacao: null, tirado_do_quadro_em: null, no_quadro: null, explicacao_sem_publicacao: null,

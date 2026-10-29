@@ -42,7 +42,6 @@ export function processoDe(n: number, campos: Partial<ProcessoDoPacote> = {}): P
     setor_sigla: 'SET',
     macroprocesso_nome: 'Macro Inventado',
     situacao_guardada: 'em_andamento',
-    observacoes: null,
     data_da_modelagem_piloto: null,
     etapa_atual_id: idDaEtapa('nao_iniciados'),
     etiqueta: 'a_fazer',

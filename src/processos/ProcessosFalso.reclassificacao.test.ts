@@ -30,8 +30,7 @@ async function falhaDe(promessa: Promise<unknown>): Promise<Error> {
 }
 
 const SUBPROCESSO: DadosDoProcesso = {
-  nome: 'Filho Novo', setorId: 's1', macroprocessoId: 'm2', tipo: 'subprocesso', processoPaiId: 'p1', origem: 'novo',
-  contexto: null, observacoes: null,
+  nome: 'Filho Novo', setorId: 's1', macroprocessoId: 'm2', tipo: 'subprocesso', processoPaiId: 'p1',
 }
 
 describe('estrutura', () => {

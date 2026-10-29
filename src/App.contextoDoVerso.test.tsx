@@ -13,26 +13,14 @@ const regiao = async (nome: string) => within(await (await versoAberto()).findBy
 
 // Sobre
 
-test('Sobre mostra setor, macroprocesso, tipo, origem e contexto, e omite o campo vazio', async () => {
-  montarVerso(processoLido({ contexto: 'Ofícios do setor fictício', observacoes: null }))
+test('Sobre mostra só setor, macroprocesso e tipo', async () => {
+  montarVerso(processoLido())
   const sobre = await regiao('Sobre')
-  expect(sobre.getAllByRole('term').map((rotulo) => rotulo.textContent)).toEqual(['Setor', 'Macroprocesso', 'Tipo', 'Origem', 'Contexto'])
+  expect(sobre.getAllByRole('term').map((rotulo) => rotulo.textContent)).toEqual(['Setor', 'Macroprocesso', 'Tipo'])
   expect(sobre.getByText('TSA')).toBeTruthy()
   expect(sobre.getByText('Macro de Teste')).toBeTruthy()
   expect(sobre.getByText('Processo')).toBeTruthy()
-  expect(sobre.getByText('Novo')).toBeTruthy()
-  expect(sobre.getByText('Ofícios do setor fictício')).toBeTruthy()
-  expect(sobre.queryByText('Observações')).toBeNull()
   expect(sobre.queryByRole('button')).toBeNull()
-})
-
-test('texto longo mostra [Ler mais], que vira [Ler menos]', async () => {
-  montarVerso(processoLido({ observacoes: 'Observação inventada. '.repeat(15) }))
-  const sobre = await regiao('Sobre')
-  const botao = sobre.getByRole('button', { name: 'Ler mais' })
-  expect(botao.getAttribute('aria-expanded')).toBe('false')
-  fireEvent.click(botao)
-  expect(sobre.getByRole('button', { name: 'Ler menos' }).getAttribute('aria-expanded')).toBe('true')
 })
 
 // Estrutura

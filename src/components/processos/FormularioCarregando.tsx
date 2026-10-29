@@ -3,9 +3,8 @@ type FormularioCarregandoProps = {
   comTipo: boolean
 }
 
-// Nome, Setor, Macroprocesso e Origem (e o Tipo, no cadastro); Contexto e Observações são caixas de texto.
-const CAMPOS_SIMPLES = 4
-const CAMPOS_DE_TEXTO_LONGO = 2
+// Nome, Setor e Macroprocesso (e o Tipo, no cadastro); as Anotações, só no cadastro, são uma caixa de texto.
+const CAMPOS_SIMPLES = 3
 
 /**
  * O formulário do processo enquanto setores e macroprocessos carregam: blocos cinza do tamanho dos campos e do
@@ -18,7 +17,7 @@ export function FormularioCarregando({ comTipo }: FormularioCarregandoProps) {
       <p className="visualmente-oculto" role="status">Carregando setores e macroprocessos…</p>
       <div className="formulario-do-processo" aria-hidden="true">
         {Array.from({ length: simples }, (_, i) => <CampoFantasma key={`s${i}`} />)}
-        {Array.from({ length: CAMPOS_DE_TEXTO_LONGO }, (_, i) => <CampoFantasma key={`t${i}`} longo />)}
+        {Array.from({ length: comTipo ? 1 : 0 }, (_, i) => <CampoFantasma key={`t${i}`} longo />)}
         <div className="formulario-do-processo-rodape">
           <span className="verso-fantasma formulario-fantasma-botao" />
           <span className="verso-fantasma formulario-fantasma-botao" />

@@ -1,5 +1,5 @@
 import { textoParaGravar } from './anotacoes'
-import type { DadosDoProcesso, OrigemDoProcesso, TipoDeProcesso } from './tipos'
+import type { DadosDoProcesso, TipoDeProcesso } from './tipos'
 
 /** O que a pessoa digitou ou escolheu no formulário, ainda sem normalizar. */
 export type CamposDoProcesso = {
@@ -9,9 +9,6 @@ export type CamposDoProcesso = {
   tipo: TipoDeProcesso
   /** Só vale no subprocesso; vazio enquanto não foi escolhido. */
   processoPaiId: string
-  origem: OrigemDoProcesso
-  contexto: string
-  observacoes: string
   /** Só no cadastro. */
   anotacoes: string
 }
@@ -26,12 +23,11 @@ export function problemaNoProcesso({ nome, setorId, macroprocessoId, tipo, proce
   return null
 }
 
-// Mesma normalização do banco (private.preparar_processo): sem espaços nas pontas, textos vazios como nulos.
+// Mesma normalização do banco (private.preparar_processo): sem espaços nas pontas no nome; Anotações vazias como nulas.
 export function dadosDoProcesso(campos: CamposDoProcesso): DadosDoProcesso {
   return {
     nome: campos.nome.trim(), setorId: campos.setorId, macroprocessoId: campos.macroprocessoId, tipo: campos.tipo,
-    processoPaiId: campos.tipo === 'subprocesso' ? campos.processoPaiId : null, origem: campos.origem,
-    contexto: campos.contexto.trim() || null, observacoes: campos.observacoes.trim() || null,
+    processoPaiId: campos.tipo === 'subprocesso' ? campos.processoPaiId : null,
     anotacoes: textoParaGravar(campos.anotacoes),
   }
 }

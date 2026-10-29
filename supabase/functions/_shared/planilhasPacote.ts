@@ -30,7 +30,6 @@ export interface ProcessoDoPacote {
   setor_sigla: string
   macroprocesso_nome: string
   situacao_guardada: SituacaoGuardada
-  observacoes: string | null
   data_da_modelagem_piloto: string | null
   /** A etapa da passagem aberta e a etiqueta dela: a posição do processo no catálogo. */
   etapa_atual_id: string
@@ -83,7 +82,6 @@ const comFormato = (formato: RegExp, esperado: string): Regra => ({
   vale: (valor) => typeof valor === 'string' && formato.test(valor),
 })
 const textoNaoVazio: Regra = { esperado: 'texto não vazio', vale: (v) => typeof v === 'string' && v.trim() !== '' }
-const textoOuNulo: Regra = { esperado: 'texto ou nulo', vale: (v) => v === null || typeof v === 'string' }
 const dataOuNula: Regra = {
   esperado: 'AAAA-MM-DD ou nulo',
   vale: (v) => v === null || (typeof v === 'string' && FORMATO_DATA.test(v)),
@@ -137,7 +135,6 @@ const REGRAS_DO_PROCESSO: Record<string, Regra> = {
   setor_sigla: textoNaoVazio,
   macroprocesso_nome: textoNaoVazio,
   situacao_guardada: daLista(SITUACOES_GUARDADAS),
-  observacoes: textoOuNulo,
   data_da_modelagem_piloto: dataOuNula,
   etapa_atual_id: uuid,
   etiqueta: daLista(ETIQUETAS_DA_ETAPA),

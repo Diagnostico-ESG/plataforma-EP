@@ -11,17 +11,15 @@ afterEach(() => {
   cleanup()
   window.location.hash = ''
 })
-test('o cadastro oferece só setores e macroprocessos ativos, com "A classificar" e "Novo" marcados', async () => {
+test('o cadastro oferece só setores e macroprocessos ativos, com "A classificar" marcado, e não pede Origem, Contexto nem Observações', async () => {
   montar()
   const form = await formulario()
   expect(opcoes(form.getByLabelText('Setor'))).toEqual(['Escolha o setor', 'TSA — Setor Teste A', 'TSB — Setor Teste B'])
   expect(opcoes(form.getByLabelText('Macroprocesso'))).toEqual(['Escolha o macroprocesso', 'Macro A', 'Macro B'])
   expect((form.getByLabelText('Tipo') as HTMLSelectElement).value).toBe('a_classificar')
   expect(opcoes(form.getByLabelText('Tipo'))).toEqual(['Processo', 'Subprocesso', 'A classificar'])
-  expect((form.getByLabelText('Origem') as HTMLSelectElement).value).toBe('novo')
-  expect(opcoes(form.getByLabelText('Origem'))).toEqual(['Novo', 'Retomado'])
-  expect(form.getByLabelText('Contexto')).toBeTruthy()
-  expect(form.getByLabelText('Observações')).toBeTruthy()
+  for (const rotulo of ['Origem', 'Contexto', 'Observações']) expect(form.queryByLabelText(rotulo)).toBeNull()
+  expect(form.getByLabelText('Anotações')).toBeTruthy()
 })
 
 test('cadastrar grava os dados e abre o verso do criado; ao fechar, o cartão aparece na coluna da etapa atual', async () => {
@@ -29,12 +27,10 @@ test('cadastrar grava os dados e abre o verso do criado; ao fechar, o cartão ap
   const form = await formulario()
   preencher(form, { nome: ' Emitir Ofício ', setor: 's1', macro: 'm1' })
   escrever(form.getByLabelText('Tipo'), 'processo')
-  escrever(form.getByLabelText('Contexto'), 'Contexto inventado')
   cadastrar(form)
   await waitFor(() => expect(window.location.hash).toBe(`#/processos/${falso.processos[0].id}`))
-  expect(falso.processos[0]).toMatchObject({
-    nome: 'Emitir Ofício', setorId: 's1', macroprocessoId: 'm1', tipo: 'processo', origem: 'novo',
-    contexto: 'Contexto inventado', observacoes: null })
+  expect(falso.processos[0]).toMatchObject({ nome: 'Emitir Ofício', setorId: 's1', macroprocessoId: 'm1', tipo: 'processo' })
+  for (const chave of ['origem', 'contexto', 'observacoes']) expect(falso.processos[0]).not.toHaveProperty(chave)
   const verso = await screen.findByRole('dialog', { name: 'Processo Emitir Ofício' })
   expect((await within(verso).findByText('Processo cadastrado')).getAttribute('role')).toBe('status')
   fireEvent.keyDown(within(verso).getByRole('heading', { name: 'Emitir Ofício', level: 2 }), { key: 'Escape' })
@@ -169,7 +165,7 @@ test('[Editar] troca os dados pelo formulário preenchido, sem o campo de tipo, 
   expect(screen.getByRole('dialog', { name: 'Processo Emitir Ofício' }).classList.contains('verso-estreita')).toBe(true)
   expect((form.getByLabelText('Nome') as HTMLInputElement).value).toBe('Emitir Ofício')
   expect((form.getByLabelText('Setor') as HTMLSelectElement).value).toBe('s1')
-  expect((form.getByLabelText('Origem') as HTMLSelectElement).value).toBe('retomado')
+  for (const rotulo of ['Origem', 'Contexto', 'Observações']) expect(form.queryByLabelText(rotulo)).toBeNull()
   escrever(form.getByLabelText('Nome'), 'Emitir Ofício Novo')
   salvar(form)
   const painel = within(screen.getByRole('dialog', { name: /^Processo( |$)/ }))

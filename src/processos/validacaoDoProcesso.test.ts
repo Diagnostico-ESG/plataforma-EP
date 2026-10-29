@@ -4,7 +4,7 @@ import { dadosDoProcesso, problemaNoProcesso } from './validacaoDoProcesso'
 
 const CAMPOS = {
   nome: 'Emitir Ofício', setorId: 's1', macroprocessoId: 'm1', tipo: 'a_classificar' as TipoDeProcesso, processoPaiId: '',
-  origem: 'novo' as const, contexto: '', observacoes: '', anotacoes: '',
+  anotacoes: '',
 }
 
 test('campos obrigatórios preenchidos: nenhum problema', () => {
@@ -20,10 +20,10 @@ test.each([
   expect(problemaNoProcesso({ ...CAMPOS, ...mudanca })).toBe(frase)
 })
 
-test('dados saem sem espaços nas pontas e com textos vazios como nulos', () => {
-  expect(dadosDoProcesso({ ...CAMPOS, nome: ' Emitir Ofício ', contexto: ' ', observacoes: ' Nota ' })).toEqual({
+test('dados saem sem espaços nas pontas no nome e com as Anotações vazias como nulas', () => {
+  expect(dadosDoProcesso({ ...CAMPOS, nome: ' Emitir Ofício ', anotacoes: '  ' })).toEqual({
     nome: 'Emitir Ofício', setorId: 's1', macroprocessoId: 'm1', tipo: 'a_classificar', processoPaiId: null,
-    origem: 'novo', contexto: null, observacoes: 'Nota', anotacoes: null,
+    anotacoes: null,
   })
 })
 

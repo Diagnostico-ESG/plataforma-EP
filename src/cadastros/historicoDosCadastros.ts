@@ -1,6 +1,6 @@
 import { formatarData } from '../lib/datas'
 import { oQueFaltouNoHistorico } from '../processos/frasesDaConfirmacaoDeArquivos'
-import { ROTULO_DA_ETIQUETA, ROTULO_DA_ORIGEM, ROTULO_DA_SITUACAO, ROTULO_DO_TIPO } from '../processos/rotulos'
+import { ROTULO_DA_ETIQUETA, ROTULO_DA_SITUACAO, ROTULO_DO_TIPO } from '../processos/rotulos'
 import { ROTULO_DO_ESCOPO } from '../revisoes/frasesDeRevisao'
 import { rotuloDaCategoria } from './categorias'
 import type { CategoriaDoMacroprocesso, EstadoDoCadastro, EventoDoCadastro, ItemDoFiltro } from './tipos'
@@ -69,6 +69,9 @@ const ENTIDADES_COM_CODIGO = new Set(['macroprocesso', 'etapa'])
 
 // Vínculos têm a referência 'idA:idB': o item do filtro sai dos ids gravados no evento.
 const ENTIDADES_QUE_LIGAM = new Set(['setor_envolvido'])
+
+// Eventos antigos guardam a Origem no estado; a plataforma já não a tem, mas o histórico segue legível.
+const ROTULO_DA_ORIGEM_ANTIGA: Record<string, string> = { novo: 'Novo', retomado: 'Retomado' }
 
 const ROTULO_DO_CAMPO: Record<string, string> = {
   sigla: 'Sigla', nome: 'Nome', observacoes: 'Observações', ativo: 'Situação', codigo: 'Código', descricao: 'Descrição',
@@ -234,7 +237,7 @@ const CAMPOS_DE_DATA = new Set(['data_da_modelagem_piloto', 'data_da_reuniao', '
 // antigos) pelo rótulo da tela; null se não for deles.
 function valorPorRotulo(campo: string, valor: unknown): string | null {
   const rotulos: Record<string, Record<string, string>> = {
-    tipo: ROTULO_DO_TIPO, origem: ROTULO_DA_ORIGEM, situacao: ROTULO_DA_SITUACAO, etiqueta: ROTULO_DA_ETIQUETA,
+    tipo: ROTULO_DO_TIPO, origem: ROTULO_DA_ORIGEM_ANTIGA, situacao: ROTULO_DA_SITUACAO, etiqueta: ROTULO_DA_ETIQUETA,
     nivel: { setor: 'Setor', processo: 'Processo' }, obrigatoria: { true: 'Sim', false: 'Não' },
     ativa: { true: 'Ativa', false: 'Inativa' },
     resultado: { sem_alteracao: 'Sem alteração', corrigida: 'Corrigida' }, escopo: ROTULO_DO_ESCOPO,

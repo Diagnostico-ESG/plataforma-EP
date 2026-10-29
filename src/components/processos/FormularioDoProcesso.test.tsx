@@ -30,11 +30,11 @@ test('carregando: o texto para o leitor de tela e blocos cinza no lugar dos camp
   expect(blocos.length).toBeGreaterThan(0)
 })
 
-test('carregando: o cadastro reserva o lugar do Tipo, a edição não', () => {
+test('carregando: o cadastro reserva o lugar do Tipo e das Anotações, a edição não', () => {
   abrirCarregando()
   const noCadastro = document.querySelectorAll('.formulario-fantasma-campo').length
   cleanup()
   abrirCarregando(processoLido({}, 'modelagem'))
   const naEdicao = document.querySelectorAll('.formulario-fantasma-campo').length
-  expect(noCadastro).toBe(naEdicao + 1)
+  expect(noCadastro).toBe(naEdicao + 2)
 })

@@ -585,7 +585,6 @@ export type Database = {
           anotacoes: string | null
           anotacoes_alteradas_em: string | null
           anotacoes_alteradas_por: string | null
-          contexto: string | null
           criado_em: string
           data_da_modelagem_piloto: string | null
           data_da_validacao: string | null
@@ -596,8 +595,6 @@ export type Database = {
           macroprocesso_id: string
           motivo_da_situacao: string | null
           nome: string
-          observacoes: string | null
-          origem: Database["public"]["Enums"]["origem_do_processo"]
           processo_pai_id: string | null
           publicado_em: string | null
           responsavel_id: string | null
@@ -610,7 +607,6 @@ export type Database = {
           anotacoes?: string | null
           anotacoes_alteradas_em?: string | null
           anotacoes_alteradas_por?: string | null
-          contexto?: string | null
           criado_em?: string
           data_da_modelagem_piloto?: string | null
           data_da_validacao?: string | null
@@ -621,8 +617,6 @@ export type Database = {
           macroprocesso_id: string
           motivo_da_situacao?: string | null
           nome: string
-          observacoes?: string | null
-          origem?: Database["public"]["Enums"]["origem_do_processo"]
           processo_pai_id?: string | null
           publicado_em?: string | null
           responsavel_id?: string | null
@@ -635,7 +629,6 @@ export type Database = {
           anotacoes?: string | null
           anotacoes_alteradas_em?: string | null
           anotacoes_alteradas_por?: string | null
-          contexto?: string | null
           criado_em?: string
           data_da_modelagem_piloto?: string | null
           data_da_validacao?: string | null
@@ -646,8 +639,6 @@ export type Database = {
           macroprocesso_id?: string
           motivo_da_situacao?: string | null
           nome?: string
-          observacoes?: string | null
-          origem?: Database["public"]["Enums"]["origem_do_processo"]
           processo_pai_id?: string | null
           publicado_em?: string | null
           responsavel_id?: string | null
@@ -982,7 +973,6 @@ export type Database = {
     Views: {
       processos_com_andamento: {
         Row: {
-          contexto: string | null
           criado_em: string | null
           data_da_modelagem_piloto: string | null
           data_da_validacao: string | null
@@ -1001,8 +991,6 @@ export type Database = {
           motivo_da_situacao: string | null
           no_quadro: boolean | null
           nome: string | null
-          observacoes: string | null
-          origem: Database["public"]["Enums"]["origem_do_processo"] | null
           processo_pai_id: string | null
           publicado_em: string | null
           responsavel_ativo: boolean | null
@@ -1241,7 +1229,6 @@ export type Database = {
       etiqueta_da_etapa: "a_fazer" | "em_andamento" | "concluido"
       fase_do_regimento: "IV" | "V" | "VI" | "VII" | "VIII" | "IX"
       origem_da_atualizacao: "automatica" | "botao"
-      origem_do_processo: "novo" | "retomado"
       papel_do_arquivo: "bpmn" | "png" | "bpm" | "relatorio"
       perfil: "administrador" | "integrante_ep" | "consulta"
       resultado_da_revisao: "sem_alteracao" | "corrigida"
@@ -1382,7 +1369,6 @@ export const Constants = {
       etiqueta_da_etapa: ["a_fazer", "em_andamento", "concluido"],
       fase_do_regimento: ["IV", "V", "VI", "VII", "VIII", "IX"],
       origem_da_atualizacao: ["automatica", "botao"],
-      origem_do_processo: ["novo", "retomado"],
       papel_do_arquivo: ["bpmn", "png", "bpm", "relatorio"],
       perfil: ["administrador", "integrante_ep", "consulta"],
       resultado_da_revisao: ["sem_alteracao", "corrigida"],

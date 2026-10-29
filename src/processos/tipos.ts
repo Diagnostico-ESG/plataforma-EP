@@ -6,7 +6,6 @@ import type { FaseDoRegimento } from './fasesDoRegimento'
 export type EtiquetaDaEtapa = 'a_fazer' | 'em_andamento' | 'concluido'
 
 export type TipoDeProcesso = 'processo' | 'subprocesso' | 'a_classificar'
-export type OrigemDoProcesso = 'novo' | 'retomado'
 /** A situação calculada: "concluido" não é guardado, vem de a etapa atual ser Concluídos com o processo em andamento. */
 export type SituacaoDoProcesso = 'em_andamento' | 'suspenso' | 'cancelado' | 'concluido'
 
@@ -137,9 +136,6 @@ export type PassagemDaEtapa = { entrouEm: string; saiuEm: string | null }
 export type EtapaDoVerso = { id: string; codigo: string; nome: string; ordem: number; passagens: PassagemDaEtapa[] }
 
 export type ProcessoLido = ProcessoDaLista & {
-  origem: OrigemDoProcesso
-  contexto: string | null
-  observacoes: string | null
   motivoDaSituacao: string | null
   /** O pai do subprocesso; null nos outros tipos. */
   processoPai: ItemDaEstrutura | null
@@ -164,9 +160,6 @@ export type DadosDoProcesso = {
   tipo: TipoDeProcesso
   /** Só no subprocesso. */
   processoPaiId: string | null
-  origem: OrigemDoProcesso
-  contexto: string | null
-  observacoes: string | null
   /** Só no cadastro (a edição não envia); depois, as Anotações se escrevem no verso. */
   anotacoes?: string | null
 }

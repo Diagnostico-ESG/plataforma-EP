@@ -2,8 +2,8 @@ import { useId } from 'react'
 import type { Macroprocesso, Setor } from '../../cadastros/tipos'
 import { LIMITE_DAS_ANOTACOES } from '../../processos/anotacoes'
 import { corDoMacroprocesso } from '../../processos/corDoMacroprocesso'
-import { ROTULO_DA_ORIGEM, ROTULO_DO_TIPO } from '../../processos/rotulos'
-import type { OrigemDoProcesso, ProcessoDaLista, TipoDeProcesso } from '../../processos/tipos'
+import { ROTULO_DO_TIPO } from '../../processos/rotulos'
+import type { ProcessoDaLista, TipoDeProcesso } from '../../processos/tipos'
 import type { CamposDoProcesso } from '../../processos/validacaoDoProcesso'
 import { BotaoDaCaixa, OpcaoDaCaixa } from '../OpcaoDaCaixa'
 
@@ -18,7 +18,6 @@ type CamposDoFormularioProps = {
   aoMudar: (mudanca: Partial<CamposDoProcesso>) => void
 }
 
-const ORIGENS: OrigemDoProcesso[] = ['novo', 'retomado']
 const TIPOS: TipoDeProcesso[] = ['processo', 'subprocesso', 'a_classificar']
 
 /**
@@ -45,17 +44,6 @@ export function CamposDoFormulario({ campos, opcoes, cadastrando, aoMudar }: Cam
       {cadastrando && campos.tipo === 'subprocesso' && (
         <CampoDoPai id={id} valor={campos.processoPaiId} pais={opcoes.pais} aoMudar={aoMudar} />
       )}
-      <label htmlFor={`${id}-origem`}>Origem</label>
-      <select id={`${id}-origem`} value={campos.origem}
-        onChange={(evento) => aoMudar({ origem: evento.target.value as OrigemDoProcesso })}>
-        {ORIGENS.map((origem) => <option key={origem} value={origem}>{ROTULO_DA_ORIGEM[origem]}</option>)}
-      </select>
-      <label htmlFor={`${id}-contexto`}>Contexto</label>
-      <textarea id={`${id}-contexto`} value={campos.contexto} maxLength={4000} rows={3}
-        onChange={(evento) => aoMudar({ contexto: evento.target.value })} />
-      <label htmlFor={`${id}-observacoes`}>Observações</label>
-      <textarea id={`${id}-observacoes`} value={campos.observacoes} maxLength={2000} rows={3}
-        onChange={(evento) => aoMudar({ observacoes: evento.target.value })} />
       {cadastrando && (
         <>
           <label htmlFor={`${id}-anotacoes`}>Anotações</label>

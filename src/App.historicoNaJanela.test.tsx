@@ -26,7 +26,7 @@ const PROCESSO: ProcessoLido = {
   id: 'p1', nome: 'Emitir Ofício', tipo: 'a_classificar', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
   macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento',
   etapaAtual: { codigo: 'relatorio', nome: 'Relatório e modelagem técnica', ordem: 5, id: 'e', posicao: 1, total: 1 },
-  responsavel: null, origem: 'retomado', contexto: 'Contexto inventado', observacoes: null,
+  responsavel: null,
   processoPaiId: null, processoPai: null, subprocessos: [], motivoDaSituacao: null, dataDaModelagemPiloto: null, ultimaVersao: null,
   etapasDoVerso: [],
 }

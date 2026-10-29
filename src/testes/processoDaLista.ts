@@ -37,7 +37,7 @@ export function umSetor(id: string, sigla: string, nome: string, ativo = true, c
 /** Um processo lido inventado (o verso): como `umProcesso`, mais o que só a leitura traz. */
 export function umProcessoLido(nome = 'Emitir Ofício', mudancas: Partial<ProcessoLido> = {}, etapa = 'revisao_interna'): ProcessoLido {
   return {
-    ...umProcesso(nome, {}, etapa), origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null, processoPai: null,
+    ...umProcesso(nome, {}, etapa), motivoDaSituacao: null, processoPai: null,
     subprocessos: [], etapasDoVerso: [], dataDaModelagemPiloto: null, ultimaVersao: null, ...mudancas,
   }
 }

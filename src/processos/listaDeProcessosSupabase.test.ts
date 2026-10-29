@@ -5,8 +5,8 @@ import type { Database } from '../types/database'
 import { criarProcessosSupabase } from './processosSupabase'
 
 const LINHA = {
-  id: 'p1', nome: 'Emitir Ofício Fictício', tipo: 'a_classificar', processo_pai_id: null, origem: 'novo',
-  situacao_guardada: 'em_andamento', motivo_da_situacao: null, contexto: null, observacoes: null,
+  id: 'p1', nome: 'Emitir Ofício Fictício', tipo: 'a_classificar', processo_pai_id: null,
+  situacao_guardada: 'em_andamento', motivo_da_situacao: null,
   criado_em: '2026-10-14T10:00:00Z', setor_id: 's1', setor_sigla: 'TSA', setor_cor: 13, macroprocesso_id: 'm1',
   macroprocesso_nome: 'Macro de Teste', situacao: 'em_andamento', etapa_atual_id: 'e4', etapa_atual_codigo: 'modelagem',
   etapa_atual_nome: 'Modelagem piloto', etapa_atual_ordem: 2, etapa_atual_posicao: 2, etiqueta: 'em_andamento',

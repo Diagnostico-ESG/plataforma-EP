@@ -157,7 +157,7 @@ select pg_temp.responsavel('Responsavel', '00000000-0000-0000-0000-0000000000a1'
 reset role;
 update public.usuarios set ativo = false where id = '00000000-0000-0000-0000-0000000000a1';
 set local role authenticated;
-insert into _tap (linha) select lives_ok($sql$update public.processos set observacoes = 'Outra' where id = pg_temp.processo('Responsavel')$sql$,
+insert into _tap (linha) select lives_ok($sql$update public.processos set nome = 'Outra' where id = pg_temp.processo('Responsavel')$sql$,
   'o responsável desativado depois continua no processo, e a edição é aceita');
 
 -- ===== Suspenso e cancelado congelam; o concluído segue as regras de Concluídos =====

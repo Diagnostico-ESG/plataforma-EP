@@ -24,7 +24,7 @@ afterEach(() => {
 
 // Em Relatório e modelagem técnica; a Modelagem piloto já foi visitada (de 11 a 12/10).
 const PROCESSO: ProcessoLido = umProcessoLido('Emitir Ofício', {
-  id: 'p1', tipo: 'a_classificar', origem: 'retomado', contexto: 'Contexto inventado', observacoes: 'Observação inventada',
+  id: 'p1', tipo: 'a_classificar',
   responsavel: null, entrouNaEtapaEm: '2026-10-13',
   etapasDoVerso: [{ id: 'e2', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 2, passagens: [{ entrouEm: '2026-10-11', saiuEm: '2026-10-12' }] }],
 }, 'relatorio_modelagem_tecnica')
@@ -230,11 +230,12 @@ test('as duas colunas: etapas e versões no trabalho; reunião, Sobre e estrutur
   expect(aberto.getByRole('region', { name: /^Subprocessos/ }).closest('.verso-contexto')).toBeTruthy()
 })
 
-test('os dados do processo aparecem no verso', async () => {
+test('os dados do processo aparecem no verso, sem Origem, Contexto nem Observações', async () => {
   montar()
   await nomeDoProcesso()
   const aberto = await versoAberto()
-  for (const texto of ['Retomado', 'Contexto inventado', 'Observação inventada']) expect(aberto.getByText(texto)).toBeTruthy()
+  for (const rotulo of ['Setor', 'Macroprocesso', 'Tipo']) expect(aberto.getByText(rotulo)).toBeTruthy()
+  for (const rotulo of ['Origem', 'Contexto', 'Observações']) expect(aberto.queryByText(rotulo)).toBeNull()
 })
 
 test('as Etapas listam todas as etapas ativas na ordem do catálogo, com a atual destacada, e as ações ficam no Agora', async () => {

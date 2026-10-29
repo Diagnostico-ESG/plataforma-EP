@@ -9,7 +9,6 @@ import type { DadosDoProcesso } from './tipos'
 
 const DADOS: DadosDoProcesso = {
   nome: 'Emitir Ofício Fictício', setorId: 's1', macroprocessoId: 'm1', tipo: 'a_classificar', processoPaiId: null,
-  origem: 'novo', contexto: 'Contexto inventado', observacoes: null,
 }
 const PERFIL = 'Seu perfil não permite alterar os processos.'
 
@@ -42,8 +41,9 @@ describe('gravação de processos no módulo real', () => {
     cliente.respostas['processos.insert'] = { data: [{ id: 'p9' }], error: null }
     await criar(cliente).criarProcesso(DADOS)
     expect(cliente.pedidos[0]).toMatchObject({ tabela: 'processos', operacao: 'insert', valores: {
-      setor_id: 's1', macroprocesso_id: 'm1', nome: DADOS.nome, tipo: 'a_classificar', processo_pai_id: null,
-      origem: 'novo', contexto: 'Contexto inventado', observacoes: null } })
+      setor_id: 's1', macroprocesso_id: 'm1', nome: DADOS.nome, tipo: 'a_classificar', processo_pai_id: null, anotacoes: null } })
+    const enviado = cliente.pedidos[0].valores as Record<string, unknown>
+    for (const coluna of ['origem', 'contexto', 'observacoes']) expect(enviado).not.toHaveProperty(coluna)
   })
 
   test('criar não manda a Data da modelagem piloto: o banco recusa citar a coluna na criação', async () => {

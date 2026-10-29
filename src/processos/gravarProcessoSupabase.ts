@@ -38,8 +38,7 @@ function idDoCriado(data: { id: string }[] | null): string {
 
 function valoresDaEdicao(dados: DadosDoProcesso) {
   return {
-    setor_id: dados.setorId, macroprocesso_id: dados.macroprocessoId, nome: dados.nome, origem: dados.origem,
-    contexto: dados.contexto, observacoes: dados.observacoes,
+    setor_id: dados.setorId, macroprocesso_id: dados.macroprocessoId, nome: dados.nome,
   }
 }
 

@@ -129,8 +129,7 @@ describe('data da reunião de modelagem piloto', () => {
   test('o processo novo nasce sem data', async () => {
     const modulo = new ProcessosFalso()
     await modulo.criarProcesso({
-      nome: 'Novo', setorId: 's1', macroprocessoId: 'm1', tipo: 'processo', processoPaiId: null, origem: 'novo',
-      contexto: null, observacoes: null,
+      nome: 'Novo', setorId: 's1', macroprocessoId: 'm1', tipo: 'processo', processoPaiId: null,
     })
     expect(modulo.processos[0].dataDaModelagemPiloto).toBeNull()
   })
