@@ -45,7 +45,7 @@ test('a Lista traz o par Todos | Concluídos, abre em Todos e não mostra o canc
   await esperarALista()
   expect((await botao('Todos')).getAttribute('aria-pressed')).toBe('true')
   expect((await botao('Concluídos')).getAttribute('aria-pressed')).toBe('false')
-  expect(naLista()).toEqual(['Antigo', 'Parado', 'Andando', 'Pronto'])
+  expect(naLista()).toEqual(['Andando', 'Antigo', 'Parado', 'Pronto'])
 })
 
 test('Concluídos mostra só os concluídos, põe mostrar=concluidos no endereço e esconde o filtro Situação; Todos desfaz', async () => {
@@ -107,7 +107,7 @@ test('"Mostrar cancelados (N)" abre o bloco Cancelados no fim da Lista e "Escond
   abrir([...PORTFOLIO, cancelado('Desistido Dois', ABC)])
   await esperarALista()
   fireEvent.click(await botao('Mostrar cancelados (2)'))
-  expect(noBlocoDosCancelados()).toEqual(['Desistido Dois', 'Desistido'])
+  expect(noBlocoDosCancelados()).toEqual(['Desistido', 'Desistido Dois'])
   expect(within(document.querySelector('.bloco-de-cancelados') as HTMLElement).getByText('Cancelados')).toBeTruthy()
   expect(window.location.hash).toBe('#/processos/lista')
   fireEvent.click(await botao('Esconder cancelados'))

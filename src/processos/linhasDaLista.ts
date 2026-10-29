@@ -1,19 +1,19 @@
+import { ORDENACAO_PADRAO, ordenarLinhas, type OrdenacaoDaLista } from './ordenacaoDaLista'
 import type { ProcessoDaLista } from './tipos'
 
 /** Uma linha da Lista: o processo e, no subprocesso, o nome do pai ("↳ pai"). */
 export type LinhaDaLista = ProcessoDaLista & { nomeDoPai: string | null }
 
-const comparar = (a: string, b: string): number => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' })
-
 /**
- * Na ordem da Lista: pela sigla do setor e depois pelo nome. O nome do pai vem de todos os processos, para
- * aparecer mesmo quando um filtro tirou o pai da Lista.
+ * Na ordem escolhida (padrão: pelo nome), com cada subprocesso logo depois do pai. O nome do pai vem de todos os
+ * processos, para aparecer mesmo quando um filtro tirou o pai da Lista.
  */
-export function linhasDaLista(processos: ProcessoDaLista[], todos: ProcessoDaLista[] = processos): LinhaDaLista[] {
+export function linhasDaLista(
+  processos: ProcessoDaLista[], todos: ProcessoDaLista[] = processos, ordenacao: OrdenacaoDaLista = ORDENACAO_PADRAO,
+): LinhaDaLista[] {
   const nomePorId = new Map(todos.map((processo) => [processo.id, processo.nome]))
-  return processos
-    .map((processo) => ({ ...processo, nomeDoPai: nomeDoPai(processo, nomePorId) }))
-    .sort((a, b) => comparar(a.setorSigla, b.setorSigla) || comparar(a.nome, b.nome))
+  const linhas = processos.map((processo) => ({ ...processo, nomeDoPai: nomeDoPai(processo, nomePorId) }))
+  return ordenarLinhas(linhas, ordenacao)
 }
 
 function nomeDoPai(processo: ProcessoDaLista, nomePorId: Map<string, string>): string | null {

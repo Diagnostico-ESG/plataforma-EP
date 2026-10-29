@@ -11,11 +11,16 @@ function processo(nome: string, mudancas: Partial<ProcessoDaLista> = {}): Proces
   }
 }
 
-test('ordem pela sigla do setor e depois pelo nome, sem diferenciar maiúsculas', () => {
+test('sem ordenação escolhida, a ordem é pelo nome do processo, sem diferenciar maiúsculas', () => {
   const linhas = linhasDaLista([
     processo('zeta'), processo('Beta', { setorSigla: 'TSB' }), processo('Alfa', { setorSigla: 'TSB' }), processo('Ômega'),
   ])
-  expect(linhas.map((l) => `${l.setorSigla} ${l.nome}`)).toEqual(['TSA Ômega', 'TSA zeta', 'TSB Alfa', 'TSB Beta'])
+  expect(linhas.map((l) => l.nome)).toEqual(['Alfa', 'Beta', 'Ômega', 'zeta'])
+})
+
+test('a ordenação escolhida vale', () => {
+  const linhas = linhasDaLista([processo('Alfa'), processo('Beta')], undefined, { coluna: 'processo', sentido: 'decrescente' })
+  expect(linhas.map((l) => l.nome)).toEqual(['Beta', 'Alfa'])
 })
 
 test('o subprocesso traz o nome do pai que está na lista', () => {
@@ -23,7 +28,7 @@ test('o subprocesso traz o nome do pai que está na lista', () => {
     processo('Pai'), processo('Filho', { tipo: 'subprocesso', processoPaiId: 'p-Pai' }),
     processo('Órfão', { tipo: 'subprocesso', processoPaiId: 'p-sumiu' }),
   ])
-  expect(linhas.map((l) => [l.nome, l.nomeDoPai])).toEqual([['Filho', 'Pai'], ['Órfão', null], ['Pai', null]])
+  expect(linhas.map((l) => [l.nome, l.nomeDoPai])).toEqual([['Órfão', null], ['Pai', null], ['Filho', 'Pai']])
 })
 
 test('o pai filtrado fora da Lista continua com o nome ao lado do subprocesso', () => {

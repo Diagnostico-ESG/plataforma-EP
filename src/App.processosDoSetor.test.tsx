@@ -57,13 +57,13 @@ async function linhasDa(secao: ReturnType<typeof within>): Promise<string[][]> {
     within(linha).getAllByRole('cell').map((celula) => celula.textContent ?? ''))
 }
 
-test('só os processos do setor, por nome, com tipo, etapa atual e situação', async () => {
+test('só os processos do setor, por nome e com o subprocesso logo depois do pai, com tipo, etapa atual e situação', async () => {
   montar()
   const secao = await abrirProcessosDoSetor()
   expect(await linhasDa(secao)).toEqual([
     ['Arquivar Pasta', 'Processo', 'Relatório técnico · 1 de 1', 'Cancelado'],
-    ['Conferir Recibo', 'Subprocesso', '—', 'Concluído'],
     ['Pagar Diária', 'Processo', 'Reunião de modelagem · 1 de 1', 'Em andamento'],
+    ['Conferir Recibo', 'Subprocesso', '—', 'Concluído'],
   ])
   expect(secao.getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Nome', 'Tipo', 'Etapa atual', 'Situação'])
 })

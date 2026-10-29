@@ -62,7 +62,7 @@ async function linhas(): Promise<string[][]> {
 const alternancia = () => within(screen.getByRole('group', { name: 'Forma de ver os processos' }))
 const faixa = () => within(screen.getByRole('navigation', { name: 'Áreas do sistema' }))
 
-test('as colunas, a ordem por sigla e nome, todas as situações e o pai do subprocesso', async () => {
+test('as colunas, a ordem pelo nome, todas as situações e o subprocesso logo depois do pai', async () => {
   montar()
   const [cabecalho, ...corpo] = await linhas()
   expect(cabecalho).toEqual(['Nome', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Responsável', 'Situação'])
@@ -70,8 +70,8 @@ test('as colunas, a ordem por sigla e nome, todas as situações e o pai do subp
     ['Arquivar Pasta', 'Processo', 'TSA', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', '—', 'Suspenso'],
     ['Cadastrar Bem', 'Processo', 'TSA', 'Macro de Teste', '—', '—', 'Em andamento'],
     ['Emitir Ofício', 'Processo', 'TSA', 'Macro de Teste', '—', '—', 'Concluído'],
-    ['Conferir Recibo↳ Pagar Diária', 'Subprocesso', 'TSB', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', 'Ana Teste', 'Em andamento'],
     ['Pagar Diária', 'Processo', 'TSB', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', '—', 'Em andamento'],
+    ['Conferir Recibo↳ Pagar Diária', 'Subprocesso', 'TSB', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', 'Ana Teste', 'Em andamento'],
   ])
   expect(within(screen.getByRole('table')).getAllByText('Concluído').some((elemento) => elemento.className.includes('pilula'))).toBe(true)
 })
