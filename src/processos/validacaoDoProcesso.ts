@@ -11,8 +11,6 @@ export type CamposDoProcesso = {
   origem: OrigemDoProcesso
   contexto: string
   observacoes: string
-  /** AAAA-MM-DD do campo de data; vazio quando apagada. Só o cadastro a manda: no Editar ela fica de fora. */
-  dataDaModelagemPiloto: string
 }
 
 // O banco confere de novo (migrações processos e subprocessos_e_reclassificacao); aqui a pessoa vê o problema antes
@@ -31,6 +29,5 @@ export function dadosDoProcesso(campos: CamposDoProcesso): DadosDoProcesso {
     nome: campos.nome.trim(), setorId: campos.setorId, macroprocessoId: campos.macroprocessoId, tipo: campos.tipo,
     processoPaiId: campos.tipo === 'subprocesso' ? campos.processoPaiId : null, origem: campos.origem,
     contexto: campos.contexto.trim() || null, observacoes: campos.observacoes.trim() || null,
-    dataDaModelagemPiloto: campos.dataDaModelagemPiloto || null,
   }
 }

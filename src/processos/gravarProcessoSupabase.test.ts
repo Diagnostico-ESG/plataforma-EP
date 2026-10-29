@@ -46,23 +46,17 @@ describe('gravação de processos no módulo real', () => {
       origem: 'novo', contexto: 'Contexto inventado', observacoes: null } })
   })
 
-  test('criar grava a Data da modelagem piloto que veio no cadastro e null quando veio vazia ou sem ela', async () => {
+  test('criar não manda a Data da modelagem piloto: o banco recusa citar a coluna na criação', async () => {
     const cliente = new ClienteSupabaseFalso()
     cliente.respostas['processos.insert'] = { data: [{ id: 'p9' }], error: null }
-    await criar(cliente).criarProcesso({ ...DADOS, dataDaModelagemPiloto: '2026-11-12' })
-    await criar(cliente).criarProcesso({ ...DADOS, dataDaModelagemPiloto: null })
     await criar(cliente).criarProcesso(DADOS)
-    expect(cliente.pedidos.map((pedido) => pedido.valores)).toEqual([
-      expect.objectContaining({ data_da_modelagem_piloto: '2026-11-12' }),
-      expect.objectContaining({ data_da_modelagem_piloto: null }),
-      expect.objectContaining({ data_da_modelagem_piloto: null }),
-    ])
+    expect(cliente.pedidos[0].valores).not.toHaveProperty('data_da_modelagem_piloto')
   })
 
-  test('editar não manda a Data da modelagem piloto: ela se altera no verso', async () => {
+  test('editar não manda a Data da modelagem piloto: ela se registra na linha da etapa', async () => {
     const cliente = new ClienteSupabaseFalso()
     cliente.respostas['processos.update'] = { data: [{ id: 'p1' }], error: null }
-    await criar(cliente).editarProcesso('p1', { ...DADOS, dataDaModelagemPiloto: '2026-11-12' })
+    await criar(cliente).editarProcesso('p1', DADOS)
     expect(cliente.pedidos[0].valores).not.toHaveProperty('data_da_modelagem_piloto')
   })
 

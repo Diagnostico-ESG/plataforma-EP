@@ -167,8 +167,6 @@ export type DadosDoProcesso = {
   origem: OrigemDoProcesso
   contexto: string | null
   observacoes: string | null
-  /** Só no cadastro (AAAA-MM-DD; null ou ausente = sem data): depois dele a data se altera no verso. */
-  dataDaModelagemPiloto?: string | null
 }
 
 /** O tipo novo de uma reclassificação; o pai só no subprocesso. Nada volta a "a classificar". */
@@ -195,7 +193,7 @@ export type ModuloDeProcessos = {
   criarProcesso(dados: DadosDoProcesso): Promise<string>
   editarProcesso(id: string, dados: DadosDoProcesso): Promise<void>
   excluirProcesso(id: string): Promise<void>
-  /** Marca, troca ou (com null) remove a data da reunião de modelagem piloto; vale em qualquer situação do processo. */
+  /** Registra, troca ou (com null) apaga a data em que a modelagem piloto aconteceu; o banco recusa data depois de hoje (ADR 0035). */
   marcarDataDaModelagemPiloto(id: string, data: string | null): Promise<void>
   /** null: o processo não existe (mais). Fora do ProcessoLido: o texto só o verso lê (ADR 0021). */
   lerAnotacoes(id: string): Promise<AnotacoesLidas | null>

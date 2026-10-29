@@ -43,10 +43,10 @@ function valoresDaEdicao(dados: DadosDoProcesso) {
   }
 }
 
-// Tipo, pai e Data da modelagem piloto só entram no cadastro: o tipo e o pai mudam depois pela reclassificação, e a data, no verso.
+// Tipo e pai só entram no cadastro: mudam depois pela reclassificação. A data da modelagem piloto não entra (o banco recusa
+// citar a coluna na criação): ela se registra depois, na linha da etapa.
 function valoresDoCadastro(dados: DadosDoProcesso) {
-  return { ...valoresDaEdicao(dados), tipo: dados.tipo, processo_pai_id: dados.processoPaiId,
-    data_da_modelagem_piloto: dados.dataDaModelagemPiloto ?? null }
+  return { ...valoresDaEdicao(dados), tipo: dados.tipo, processo_pai_id: dados.processoPaiId }
 }
 
 // A RLS não acusa erro ao filtrar: sem linha afetada, a leitura decide entre perfil e processo que sumiu.

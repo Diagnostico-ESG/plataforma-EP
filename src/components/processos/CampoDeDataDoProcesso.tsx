@@ -1,7 +1,11 @@
 import './Contexto.css'
-import { type ReactNode, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CadastroInexistente } from '../../cadastros/cadastroInexistente'
 import { formatarData } from '../../lib/datas'
+
+export type TextosDaData = { antes?: string; semData: string | null; registrar: string; alterar: string }
+
+const TEXTOS_PADRAO: TextosDaData = { semData: 'Ainda não marcada', registrar: 'Marcar data', alterar: 'Alterar data' }
 
 export type CampoDeDataDoProcessoProps = {
   /** A data gravada (AAAA-MM-DD); null quando não há. */
@@ -12,10 +16,12 @@ export type CampoDeDataDoProcessoProps = {
   /** Grava a data nova (null: apagar). A recusa pronta (TravaDoBanco) ou a falha vira o aviso em vermelho. */
   gravar: (nova: string | null) => Promise<void>
   textoDaFalha: (erro: unknown) => string
-  /** O que acompanha a data lida ("· próxima"). */
-  complemento?: (data: string) => ReactNode
+  /** As palavras da linha; `semData` null não escreve nada quando não há data. Padrão: "Ainda não marcada", "Marcar data". */
+  textos?: TextosDaData
   /** O maior dia que o campo aceita (AAAA-MM-DD); o banco confere de novo. */
   maximo?: string
+  /** A recusa, antes de enviar, da data digitada depois do máximo (com a data e o limite). Sem ela, o campo só limita pelo `max`. */
+  textoDaDataAlemDoMaximo?: (data: string, maximo: string) => string
   aoMudar: () => void
   aoSumir: () => void
 }
@@ -38,7 +44,7 @@ export function CampoDeDataDoProcesso(props: CampoDeDataDoProcessoProps) {
 
 type LeituraProps = CampoDeDataDoProcessoProps & { focar: boolean; aoEditar: () => void }
 
-function LeituraDaData({ data, podeAlterar, complemento, focar, aoEditar }: LeituraProps) {
+function LeituraDaData({ data, podeAlterar, textos = TEXTOS_PADRAO, focar, aoEditar }: LeituraProps) {
   const botao = useRef<HTMLButtonElement>(null)
   useEffect(() => {
     if (focar) botao.current?.focus()
@@ -48,13 +54,12 @@ function LeituraDaData({ data, podeAlterar, complemento, focar, aoEditar }: Leit
       {data
         ? (
             <p className="modelagem-data">
-              <time dateTime={data}>{formatarData(data)}</time>
-              {complemento?.(data)}
+              {textos.antes}<time dateTime={data}>{formatarData(data)}</time>
             </p>
           )
-        : <p className="modelagem-sem-data">Ainda não marcada</p>}
+        : textos.semData !== null && <p className="modelagem-sem-data">{textos.semData}</p>}
       {podeAlterar && (
-        <button ref={botao} type="button" className="contexto-link" onClick={aoEditar}>{data ? 'Alterar data' : 'Marcar data'}</button>
+        <button ref={botao} type="button" className="contexto-link" onClick={aoEditar}>{data ? textos.alterar : textos.registrar}</button>
       )}
     </div>
   )
@@ -63,7 +68,7 @@ function LeituraDaData({ data, podeAlterar, complemento, focar, aoEditar }: Leit
 type EdicaoProps = CampoDeDataDoProcessoProps & { aoTerminar: () => void }
 
 // Remover não pede confirmação: a data volta com dois cliques e o histórico guarda a antiga.
-function EdicaoDaData({ data: gravada, rotulo, gravar, textoDaFalha, maximo, aoMudar, aoSumir, aoTerminar }: EdicaoProps) {
+function EdicaoDaData({ data: gravada, rotulo, gravar, textoDaFalha, maximo, textoDaDataAlemDoMaximo, aoMudar, aoSumir, aoTerminar }: EdicaoProps) {
   const [data, setData] = useState(gravada ?? '')
   const [gravando, setGravando] = useState(false)
   const [falha, setFalha] = useState<string | null>(null)
@@ -71,6 +76,10 @@ function EdicaoDaData({ data: gravada, rotulo, gravar, textoDaFalha, maximo, aoM
   useEffect(() => campo.current?.focus(), [])
 
   async function gravarNaHora(nova: string | null) {
+    // O `max` do campo não impede a data digitada à mão: a recusa vem antes de enviar, com a data e o limite.
+    if (nova !== null && maximo !== undefined && nova > maximo && textoDaDataAlemDoMaximo) {
+      return setFalha(textoDaDataAlemDoMaximo(nova, maximo))
+    }
     setFalha(null)
     setGravando(true)
     try {
@@ -86,7 +95,7 @@ function EdicaoDaData({ data: gravada, rotulo, gravar, textoDaFalha, maximo, aoM
 
   return (
     <div className="modelagem-edicao">
-      <input ref={campo} type="date" aria-label={rotulo} max={maximo} value={data} onChange={(mudanca) => setData(mudanca.target.value)} />
+      <input ref={campo} type="date" aria-label={rotulo} max={maximo} value={data} disabled={gravando} onChange={(mudanca) => setData(mudanca.target.value)} />
       <div className="modelagem-botoes">
         <button type="button" className="botao botao-principal" disabled={gravando || data === '' || data === gravada}
           onClick={() => gravarNaHora(data)}>Salvar</button>

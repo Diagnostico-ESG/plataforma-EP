@@ -1,10 +1,19 @@
 import './Etapas.css'
 import { useId, useState } from 'react'
 import { formatarData } from '../../lib/datas'
-import type { EtapaDoVerso, ProcessoLido } from '../../processos/tipos'
+import { CODIGO_DA_MODELAGEM_PILOTO } from '../../processos/codigosDasEtapas'
+import type { EtapaDoVerso, ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
+import { DataDaModelagemPiloto } from './DataDaModelagemPiloto'
 import { type DadosDasEtapas, DetalheDaEtapa } from './DetalheDaEtapa'
 
-type EtapasDoProcessoProps = DadosDasEtapas & { processo: ProcessoLido }
+type EtapasDoProcessoProps = DadosDasEtapas & {
+  processo: ProcessoLido
+  processos: ModuloDeProcessos
+  /** Quem tem perfil para alterar (Administrador ou Integrante); a data da modelagem piloto ainda depende da situação e da etapa. */
+  podeAlterarProcesso: boolean
+  aoMudar: () => void
+  aoSumir: () => void
+}
 
 type SinalDaEtapa = 'atual' | 'visitada' | 'nao-visitada'
 
@@ -56,6 +65,10 @@ function LinhaDaEtapa({ etapa, aberta, aoAlternar, ...resto }: LinhaDaEtapaProps
         <span className="etapa-nome">{etapa.nome}</span>
         <span className="etapa-quando">{quandoDaEtapa(etapa, sinal)}</span>
       </button>
+      {etapa.codigo === CODIGO_DA_MODELAGEM_PILOTO && (
+        <DataDaModelagemPiloto processo={resto.processo} processos={resto.processos} podeAlterar={resto.podeAlterarProcesso}
+          aoMudar={resto.aoMudar} aoSumir={resto.aoSumir} />
+      )}
       {aberta && <DetalheDaEtapa id={idDaGaveta} etapa={etapa} {...resto} />}
     </li>
   )

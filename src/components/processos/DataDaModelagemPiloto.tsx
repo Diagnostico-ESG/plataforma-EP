@@ -1,42 +1,40 @@
 import './Contexto.css'
-import { useId } from 'react'
 import { TravaDoBanco } from '../../acesso/falhasDeGravacao'
-import { hojeLocal, momentoDaModelagemPiloto } from '../../processos/textoDaModelagemPiloto'
+import { hojeEmBrasilia } from '../../lib/datas'
+import { podeRegistrarDataDaModelagem } from '../../processos/dataDaModelagemPiloto'
+import { fraseDaModelagemNoFuturo } from '../../processos/frasesDaModelagemPiloto'
 import type { ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
-import { CampoDeDataDoProcesso } from './CampoDeDataDoProcesso'
+import { CampoDeDataDoProcesso, type TextosDaData } from './CampoDeDataDoProcesso'
 
 type DataDaModelagemPilotoProps = {
   processo: ProcessoLido
   processos: ModuloDeProcessos
+  /** Quem tem perfil para alterar; a situação e a etapa do processo decidem o resto. */
   podeAlterar: boolean
   aoMudar: () => void
   aoSumir: () => void
 }
 
-const TEXTO_DO_MOMENTO = { proxima: '· próxima', realizada: '· realizada' } as const
+const TEXTOS: TextosDaData = { antes: 'Realizada em ', semData: null, registrar: 'Registrar data', alterar: 'Alterar data' }
 
 function textoDaFalhaDaModelagemPiloto(erro: unknown): string {
   if (erro instanceof TravaDoBanco) return erro.message
   return `A Data da modelagem piloto não foi salva: ${erro instanceof Error ? erro.message : String(erro)}.`
 }
 
-function momentoDaData(data: string) {
-  const momento = momentoDaModelagemPiloto(data, hojeLocal())
-  return momento && <span className="modelagem-momento">{TEXTO_DO_MOMENTO[momento]}</span>
-}
-
 /**
- * A data da modelagem piloto na coluna direita do verso: só um dado do processo, sem efeito nas etapas (ADR 0013).
- * "Marcar data" ou "Alterar data" vira ali mesmo o campo (spec, "Cartão e verso", Data da modelagem piloto).
+ * A data da modelagem piloto na linha da etapa Modelagem piloto: só a de realização, nunca depois de hoje (ADR 0035). Quem pode
+ * a registra, altera ou apaga ali mesmo; para os outros ela é só leitura e só aparece se existir. Não mexe em etapa nem em etiqueta.
  */
 export function DataDaModelagemPiloto({ processo, processos, podeAlterar, aoMudar, aoSumir }: DataDaModelagemPilotoProps) {
-  const idDoTitulo = useId()
+  const editavel = podeRegistrarDataDaModelagem(processo, podeAlterar)
+  if (!editavel && !processo.dataDaModelagemPiloto) return null
   return (
-    <section className="contexto-secao" aria-labelledby={idDoTitulo}>
-      <h3 id={idDoTitulo} className="contexto-titulo">Data da modelagem piloto</h3>
-      <CampoDeDataDoProcesso data={processo.dataDaModelagemPiloto} rotulo="Data da modelagem piloto" podeAlterar={podeAlterar}
+    <div className="etapa-modelagem">
+      <CampoDeDataDoProcesso data={processo.dataDaModelagemPiloto ?? null} rotulo="Data da modelagem piloto" podeAlterar={editavel}
         gravar={(nova) => processos.marcarDataDaModelagemPiloto(processo.id, nova)} textoDaFalha={textoDaFalhaDaModelagemPiloto}
-        complemento={momentoDaData} aoMudar={aoMudar} aoSumir={aoSumir} />
-    </section>
+        maximo={hojeEmBrasilia()} textoDaDataAlemDoMaximo={fraseDaModelagemNoFuturo} textos={TEXTOS}
+        aoMudar={aoMudar} aoSumir={aoSumir} />
+    </div>
   )
 }

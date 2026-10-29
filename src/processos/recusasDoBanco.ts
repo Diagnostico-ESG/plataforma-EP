@@ -12,6 +12,7 @@ import {
   FRASE_DO_ESCOPO_OBRIGATORIO, FRASE_DO_ESCOPO_SO_NA_CORRIGIDA, fraseDoProcessoComRevisoes,
 } from '../revisoes/frasesDeRevisao'
 import { fraseDasAnotacoesLongas } from './frasesDasAnotacoes'
+import { fraseDaModelagemNoFuturo } from './frasesDaModelagemPiloto'
 import { FRASE_DAS_ETAPAS_FIXAS, fraseDaEtapaComProcessos, fraseDaEtapaProtegida, fraseDaEtapaUsada } from './frasesDoCatalogo'
 import { FRASE_SEM_VERSAO, fraseDaVersaoIncompleta } from './frasesDaVersaoCompleta'
 import {
@@ -47,7 +48,7 @@ const PADRAO_DA_RECUSA = new RegExp(
   + '|data_so_na_validacao|data_da_validacao_so_pela_funcao'
   + '|sem_aprovacao_para_o_pdf|pdf_ja_enviado|pdf_nome_sem_versao|pdf_guardado_nao_se_altera'
   + '|tirar_do_quadro_so_concluido|ja_fora_do_quadro|voltar_ao_quadro_so_concluido'
-  + '|anotacoes_longas)(?::(.*))?$', 'm')
+  + '|anotacoes_longas|modelagem_no_futuro)(?::(.*))?$', 'm')
 
 type FraseDaRecusa = (valor: string, contexto: ContextoDaRecusa) => string
 
@@ -113,6 +114,10 @@ const FRASE_DA_RECUSA: Record<string, FraseDaRecusa> = {
   data_da_publicacao_obrigatoria: () => FRASE_DA_DATA_DA_PUBLICACAO_OBRIGATORIA,
   publicacao_antes_da_aprovacao: fraseDaPublicacaoAntesDaAprovacao,
   anotacoes_longas: fraseDasAnotacoesLongas,
+  modelagem_no_futuro: (valor) => {
+    const [recebida, limite] = valor.split(':')
+    return fraseDaModelagemNoFuturo(recebida, limite)
+  },
   versao_incompleta: (valor) => {
     const [numero, faltas] = valor.split(':')
     return fraseDaVersaoIncompleta(numero, faltas.split(','))

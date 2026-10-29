@@ -10,7 +10,6 @@ import type { ProcessoLido } from './processos/tipos'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
 import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
-import { hojeEmBrasilia } from './lib/datas'
 import { escolherNoMenuDoProcesso, janelasPorCima } from './testes/versoDoCartao'
 
 beforeEach(() => {
@@ -112,29 +111,18 @@ test('cadastrar grava os dados e abre o verso do criado; ao fechar, o cartão ap
 })
 
 const DATA = 'Data da modelagem piloto'
-const campoDaData = (form: ReturnType<typeof within>) => form.getByLabelText(DATA) as HTMLInputElement
 
-test('o Novo processo abre com a Data da modelagem piloto de hoje em Brasília, num campo de data', async () => {
-  montar()
-  const campo = campoDaData(await formulario())
-  expect([campo.type, campo.value]).toEqual(['date', hojeEmBrasilia()])
-})
-
-test.each([
-  ['com a data de hoje', undefined, hojeEmBrasilia()],
-  ['com outra data', '2026-11-12', '2026-11-12'],
-  ['com o campo vazio', '', null],
-])('cadastrar %s grava o que estava no campo', async (_caso, digitada, gravada) => {
+test('o Novo processo não tem o campo da Data da modelagem piloto, e o processo nasce sem a data', async () => {
   const falso = montar()
   const form = await formulario()
+  expect(form.queryByLabelText(DATA)).toBeNull()
   preencher(form, { nome: 'Emitir Ofício', setor: 's1', macro: 'm1' })
-  if (digitada !== undefined) escrever(campoDaData(form), digitada)
   cadastrar(form)
   await waitFor(() => expect(falso.processos).toHaveLength(1))
-  expect(falso.processos[0].dataDaModelagemPiloto).toBe(gravada)
+  expect(falso.processos[0].dataDaModelagemPiloto).toBeNull()
 })
 
-test('o Editar não tem o campo da Data da modelagem piloto: ela se altera no verso', async () => {
+test('o Editar não tem o campo da Data da modelagem piloto: ela se registra na linha da etapa', async () => {
   expect((await abrirEdicao()).form.queryByLabelText(DATA)).toBeNull()
 })
 

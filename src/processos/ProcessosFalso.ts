@@ -15,6 +15,8 @@ import {
   conferirPai, conferirSemSubprocessos, estruturaDoProcesso, levarMacroprocessoAosFilhos, macroprocessoDo, reclassificar,
 } from './reclassificacaoFalso'
 import { conferirProcessoEmAndamento, mudarSituacao } from './situacaoFalso'
+import { hojeEmBrasilia } from '../lib/datas'
+import { fraseDaModelagemNoFuturo } from './frasesDaModelagemPiloto'
 import { hojeLocal } from './textoDaModelagemPiloto'
 import type {
   DadosDaChegada, DadosDoProcesso, EtapaDoCatalogo, EtiquetaDaEtapa, ListaDeProcessos, ModuloDeProcessos, ProcessoLido,
@@ -194,7 +196,6 @@ export class ProcessosFalso implements ModuloDeProcessos {
     const campos: Partial<DadosDoProcesso> = { ...dados }
     delete campos.tipo
     delete campos.processoPaiId
-    delete campos.dataDaModelagemPiloto
     const pai = this.processos.find((processo) => processo.id === atual.processoPaiId)
     const editado = { ...atual, ...this.nomesDoCartao(dados), ...campos, ...(pai ? macroprocessoDo(pai) : {}) }
     this.processos = levarMacroprocessoAosFilhos(this.processos.map((processo) => (processo.id === id ? editado : processo)), editado)
@@ -204,6 +205,8 @@ export class ProcessosFalso implements ModuloDeProcessos {
   async marcarDataDaModelagemPiloto(id: string, data: string | null): Promise<void> {
     this.conferirGravacao()
     this.acharProcesso(id)
+    // Como o banco: só a realização, nunca depois de hoje em Brasília.
+    if (data !== null && data > hojeEmBrasilia()) throw new TravaDoBanco(fraseDaModelagemNoFuturo(data, hojeEmBrasilia()))
     this.chamadas.push(data === null ? { acao: 'data_da_modelagem_piloto', id } : { acao: 'data_da_modelagem_piloto', id, nota: data })
     this.processos = this.processos.map((processo) => (processo.id === id ? { ...processo, dataDaModelagemPiloto: data } : processo))
   }
@@ -247,7 +250,7 @@ export class ProcessosFalso implements ModuloDeProcessos {
       ...dados, ...this.nomesDoCartao(dados), id: this.idLivreDeProcesso(), situacao: 'em_andamento',
       etapaAtual: entrada ? etapaAtualNoCatalogo(entrada, this.etapasDoCatalogo) : null, etiqueta: 'a_fazer',
       entrouNaEtapaEm: hojeLocal(), responsavel: null, motivoDaSituacao: null, processoPai: null, subprocessos: [],
-      etapasDoVerso: [], ultimaVersao: null, dataDaModelagemPiloto: dados.dataDaModelagemPiloto ?? null,
+      etapasDoVerso: [], ultimaVersao: null, dataDaModelagemPiloto: null,
     }
   }
 

@@ -1,7 +1,6 @@
 import { type FormEvent, useState } from 'react'
 import { textoDaFalhaNoFormulario } from '../../acesso/falhasDeGravacao'
 import type { ModuloDeCadastros } from '../../cadastros/tipos'
-import { hojeEmBrasilia } from '../../lib/datas'
 import type { DadosDoProcesso, ProcessoLido } from '../../processos/tipos'
 import { type CamposDoProcesso, dadosDoProcesso, problemaNoProcesso } from '../../processos/validacaoDoProcesso'
 import { AvisoDeSetorIncluido } from './AvisoDeSetorIncluido'
@@ -16,10 +15,9 @@ type FormularioProntoProps = {
   aoCancelar: () => void
 }
 
-// O processo nasce, no caso mais comum, da reunião com o setor: a Data da modelagem piloto já vem com o dia de hoje.
 const camposEmBranco = (): CamposDoProcesso => ({
   nome: '', setorId: '', macroprocessoId: '', tipo: 'a_classificar', processoPaiId: '', origem: 'novo', contexto: '',
-  observacoes: '', dataDaModelagemPiloto: hojeEmBrasilia(),
+  observacoes: '',
 })
 
 function camposIniciais(inicial?: ProcessoLido): CamposDoProcesso {
@@ -27,7 +25,7 @@ function camposIniciais(inicial?: ProcessoLido): CamposDoProcesso {
   return {
     nome: inicial.nome, setorId: inicial.setorId, macroprocessoId: inicial.macroprocessoId,
     tipo: inicial.tipo, processoPaiId: inicial.processoPaiId ?? '', origem: inicial.origem,
-    contexto: inicial.contexto ?? '', observacoes: inicial.observacoes ?? '', dataDaModelagemPiloto: '',
+    contexto: inicial.contexto ?? '', observacoes: inicial.observacoes ?? '',
   }
 }
 

@@ -12,7 +12,7 @@ export type OpcoesDoProcesso = { setores: Setor[]; macroprocessos: Macroprocesso
 type CamposDoFormularioProps = {
   campos: CamposDoProcesso
   opcoes: OpcoesDoProcesso
-  /** Tipo, pai e Data da modelagem piloto só se escolhem no cadastro: o tipo e o pai mudam depois pela reclassificação, a data no verso. */
+  /** Tipo e pai só se escolhem no cadastro: mudam depois pela reclassificação. */
   cadastrando: boolean
   aoMudar: (mudanca: Partial<CamposDoProcesso>) => void
 }
@@ -49,13 +49,6 @@ export function CamposDoFormulario({ campos, opcoes, cadastrando, aoMudar }: Cam
         onChange={(evento) => aoMudar({ origem: evento.target.value as OrigemDoProcesso })}>
         {ORIGENS.map((origem) => <option key={origem} value={origem}>{ROTULO_DA_ORIGEM[origem]}</option>)}
       </select>
-      {cadastrando && (
-        <>
-          <label htmlFor={`${id}-data`}>Data da modelagem piloto</label>
-          <input id={`${id}-data`} type="date" value={campos.dataDaModelagemPiloto}
-            onChange={(evento) => aoMudar({ dataDaModelagemPiloto: evento.target.value })} />
-        </>
-      )}
       <label htmlFor={`${id}-contexto`}>Contexto</label>
       <textarea id={`${id}-contexto`} value={campos.contexto} maxLength={4000} rows={3}
         onChange={(evento) => aoMudar({ contexto: evento.target.value })} />

@@ -1,4 +1,6 @@
 import { describe, expect, test } from 'vitest'
+import { hojeEmBrasilia } from '../lib/datas'
+import { fraseDaModelagemNoFuturo } from './frasesDaModelagemPiloto'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { CATALOGO_DE_TESTE, umProcessoLido } from '../testes/processoDaLista'
@@ -104,6 +106,17 @@ describe('data da reunião de modelagem piloto', () => {
     await modulo.marcarDataDaModelagemPiloto('p1', null)
     expect((await lido(modulo)).dataDaModelagemPiloto).toBeNull()
     expect(modulo.chamadas).toEqual([{ acao: 'data_da_modelagem_piloto', id: 'p1', nota: '2026-10-20' }, { acao: 'data_da_modelagem_piloto', id: 'p1' }])
+  })
+
+  test('recusa data depois de hoje em Brasília, com a data e o limite, e aceita a de hoje', async () => {
+    const modulo = falso()
+    const hoje = hojeEmBrasilia()
+    const falha = await falhaDe(modulo.marcarDataDaModelagemPiloto('p1', '2999-01-01'))
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect(falha.message).toBe(fraseDaModelagemNoFuturo('2999-01-01', hoje))
+    expect(modulo.chamadas).toEqual([])
+    await modulo.marcarDataDaModelagemPiloto('p1', hoje)
+    expect((await lido(modulo)).dataDaModelagemPiloto).toBe(hoje)
   })
 
   test('a falha programada e o processo que sumiu chegam como no módulo real', async () => {
