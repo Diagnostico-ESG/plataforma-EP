@@ -1,26 +1,46 @@
-import type { AgruparQuadroPor } from '../../processos/enderecoDosProcessos'
+import type { AgruparQuadroPor, MostrarNoPortfolio } from '../../processos/enderecoDosProcessos'
 
 const OPCOES: { valor: AgruparQuadroPor; rotulo: string }[] = [
   { valor: 'etapa', rotulo: 'Etapa' }, { valor: 'responsavel', rotulo: 'Responsável' }, { valor: 'setor', rotulo: 'Setor' },
 ]
 
-type AgruparPorProps = { agrupar: AgruparQuadroPor; aoMudar: (agrupar: AgruparQuadroPor) => void }
+const OPCOES_DO_PORTFOLIO: { valor: MostrarNoPortfolio; rotulo: string }[] = [
+  { valor: 'todos', rotulo: 'Todos' }, { valor: 'concluidos', rotulo: 'Concluídos' },
+]
 
-/** "Agrupar por: Etapa | Responsável | Setor": um botão por opção, a escolhida anunciada por aria-pressed. */
-export function AgruparPor({ agrupar, aoMudar }: AgruparPorProps) {
+type ControleDeOpcoesProps<T extends string> = {
+  rotulo: string; opcoes: { valor: T; rotulo: string }[]; escolhida: T; aoMudar: (valor: T) => void
+}
+
+// Um rótulo e um botão por opção, a escolhida em destaque e anunciada por aria-pressed.
+function ControleDeOpcoes<T extends string>({ rotulo, opcoes, escolhida, aoMudar }: ControleDeOpcoesProps<T>) {
   return (
-    <div className="controle-do-quadro" role="group" aria-label="Agrupar por">
-      <span className="filtro-rotulo" aria-hidden="true">Agrupar por</span>
+    <div className="controle-do-quadro" role="group" aria-label={rotulo}>
+      <span className="filtro-rotulo" aria-hidden="true">{rotulo}</span>
       <span className="controle-opcoes">
-        {OPCOES.map(({ valor, rotulo }) => (
-          <button key={valor} type="button" className={agrupar === valor ? 'botao botao-principal' : 'botao botao-secundario'}
-            aria-pressed={agrupar === valor} onClick={() => aoMudar(valor)}>
-            {rotulo}
+        {opcoes.map((opcao) => (
+          <button key={opcao.valor} type="button" className={escolhida === opcao.valor ? 'botao botao-principal' : 'botao botao-secundario'}
+            aria-pressed={escolhida === opcao.valor} onClick={() => aoMudar(opcao.valor)}>
+            {opcao.rotulo}
           </button>
         ))}
       </span>
     </div>
   )
+}
+
+type AgruparPorProps = { agrupar: AgruparQuadroPor; aoMudar: (agrupar: AgruparQuadroPor) => void }
+
+/** "Agrupar por: Etapa | Responsável | Setor". */
+export function AgruparPor({ agrupar, aoMudar }: AgruparPorProps) {
+  return <ControleDeOpcoes rotulo="Agrupar por" opcoes={OPCOES} escolhida={agrupar} aoMudar={aoMudar} />
+}
+
+type TodosOuConcluidosProps = { mostrar: MostrarNoPortfolio; aoMudar: (mostrar: MostrarNoPortfolio) => void }
+
+/** "Mostrar: Todos | Concluídos", na Lista e no Quadro por setor (o portfólio). */
+export function TodosOuConcluidos({ mostrar, aoMudar }: TodosOuConcluidosProps) {
+  return <ControleDeOpcoes rotulo="Mostrar" opcoes={OPCOES_DO_PORTFOLIO} escolhida={mostrar} aoMudar={aoMudar} />
 }
 
 type SoOsMeusProps = { ligado: boolean; aoAlternar: () => void }

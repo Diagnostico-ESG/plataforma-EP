@@ -37,7 +37,7 @@ const PROCESSOS: ProcessoLido[] = [
     processoPai: { id: 'p1', nome: 'Pagar Diária', etapaAtual: null, situacao: 'em_andamento' }, responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null }, etiqueta: 'em_andamento',
   }),
   processo('p3', 'Emitir Ofício', { situacao: 'concluido', etapaAtual: null, etiqueta: 'concluido' }),
-  processo('p4', 'Arquivar Pasta', { situacao: 'cancelado' }),
+  processo('p4', 'Arquivar Pasta', { situacao: 'suspenso' }),
   processo('p5', 'Cadastrar Bem', { etapaAtual: null }),
 ]
 
@@ -67,7 +67,7 @@ test('as colunas, a ordem por sigla e nome, todas as situações e o pai do subp
   const [cabecalho, ...corpo] = await linhas()
   expect(cabecalho).toEqual(['Nome', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Responsável', 'Situação'])
   expect(corpo).toEqual([
-    ['Arquivar Pasta', 'Processo', 'TSA', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', '—', 'Cancelado'],
+    ['Arquivar Pasta', 'Processo', 'TSA', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', '—', 'Suspenso'],
     ['Cadastrar Bem', 'Processo', 'TSA', 'Macro de Teste', '—', '—', 'Em andamento'],
     ['Emitir Ofício', 'Processo', 'TSA', 'Macro de Teste', '—', '—', 'Concluído'],
     ['Conferir Recibo↳ Pagar Diária', 'Subprocesso', 'TSB', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', 'Ana Teste', 'Em andamento'],

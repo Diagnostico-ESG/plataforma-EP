@@ -1,7 +1,7 @@
 import { useId } from 'react'
 import { BotaoDaCaixa, OpcaoDaCaixa } from '../OpcaoDaCaixa'
 import { BuscaDaLista } from './BuscaDaLista'
-import type { FiltrosDosProcessos as Filtros, VisaoDosProcessos } from '../../processos/enderecoDosProcessos'
+import type { FiltrosDosProcessos as Filtros, MostrarNoPortfolio, VisaoDosProcessos } from '../../processos/enderecoDosProcessos'
 import { SEM_FILTROS } from '../../processos/enderecoDosProcessos'
 import { temFiltro, type OpcaoDoFiltro, type OpcoesDosFiltros } from '../../processos/filtrosDosProcessos'
 
@@ -9,11 +9,13 @@ type FiltrosDosProcessosProps = {
   visao: VisaoDosProcessos
   opcoes: OpcoesDosFiltros
   filtros: Filtros
+  /** Com "Concluídos" na Lista, a Situação não tem o que filtrar e some. */
+  mostrar: MostrarNoPortfolio
   aoMudar: (filtros: Filtros) => void
 }
 
-/** Os filtros do Quadro e da Lista; a situação só na Lista, porque o Quadro mostra apenas os vivos. */
-export function FiltrosDosProcessos({ visao, opcoes, filtros, aoMudar }: FiltrosDosProcessosProps) {
+/** Os filtros do Quadro e da Lista; a situação só na Lista (e fora de "Concluídos"), porque o Quadro mostra apenas os vivos. */
+export function FiltrosDosProcessos({ visao, opcoes, filtros, mostrar, aoMudar }: FiltrosDosProcessosProps) {
   // Os valores vêm das próprias opções, então o tipo e a situação escolhidos são sempre válidos.
   const mudar = (nome: keyof Filtros) => (valor: string) => aoMudar({ ...filtros, [nome]: valor || null } as Filtros)
   return (
@@ -26,7 +28,7 @@ export function FiltrosDosProcessos({ visao, opcoes, filtros, aoMudar }: Filtros
       <SeletorDoFiltro rotulo="Tipo" todos="Todos" opcoes={opcoes.tipos} valor={filtros.tipo} aoMudar={mudar('tipo')} />
       <SeletorDoFiltro rotulo="Responsável" todos="Todos" opcoes={opcoes.responsaveis} valor={filtros.responsavel}
         aoMudar={mudar('responsavel')} />
-      {visao === 'lista' && (
+      {visao === 'lista' && mostrar === 'todos' && (
         <SeletorDoFiltro rotulo="Situação" todos="Todas" opcoes={opcoes.situacoes} valor={filtros.situacao}
           aoMudar={mudar('situacao')} />
       )}

@@ -2,17 +2,17 @@ import { expect, test } from 'vitest'
 import { lerEnderecoDosProcessos, montarEnderecoDosProcessos, SEM_FILTROS } from './enderecoDosProcessos'
 
 test('o caminho dá a visão e o item aberto', () => {
-  expect(lerEnderecoDosProcessos('#/processos')).toEqual({ visao: 'quadro', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa' })
-  expect(lerEnderecoDosProcessos('#/processos/lista')).toEqual({ visao: 'lista', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa' })
+  expect(lerEnderecoDosProcessos('#/processos')).toEqual({ visao: 'quadro', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa', mostrar: 'todos' })
+  expect(lerEnderecoDosProcessos('#/processos/lista')).toEqual({ visao: 'lista', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa', mostrar: 'todos' })
   expect(lerEnderecoDosProcessos('#/processos/p1').aberto).toBe('p1')
   expect(lerEnderecoDosProcessos('#/processos/lista/p1')).toMatchObject({ visao: 'lista', aberto: 'p1' })
   expect(lerEnderecoDosProcessos('#/processos/novo').aberto).toBe('novo')
 })
 
 test('os filtros vêm da consulta; a situação só vale na Lista', () => {
-  const lista = lerEnderecoDosProcessos('#/processos/lista?setor=s1&tipo=subprocesso&situacao=cancelado')
-  expect(lista.filtros).toEqual({ ...SEM_FILTROS, setor: 's1', tipo: 'subprocesso', situacao: 'cancelado' })
-  const quadro = lerEnderecoDosProcessos('#/processos?setor=s1&situacao=cancelado')
+  const lista = lerEnderecoDosProcessos('#/processos/lista?setor=s1&tipo=subprocesso&situacao=suspenso')
+  expect(lista.filtros).toEqual({ ...SEM_FILTROS, setor: 's1', tipo: 'subprocesso', situacao: 'suspenso' })
+  const quadro = lerEnderecoDosProcessos('#/processos?setor=s1&situacao=suspenso')
   expect(quadro.filtros).toEqual({ ...SEM_FILTROS, setor: 's1' })
 })
 
@@ -58,7 +58,7 @@ test('montar a busca: depois dos filtros, e fora do Quadro', () => {
   expect(montarEnderecoDosProcessos({ visao: 'lista', aberto: null, filtros, agrupar: 'etapa' })).toBe('#/processos/lista?setor=s1&busca=pagar+di')
   expect(montarEnderecoDosProcessos({ visao: 'quadro', aberto: null, filtros, agrupar: 'etapa' })).toBe('#/processos?setor=s1')
   expect(lerEnderecoDosProcessos(montarEnderecoDosProcessos({ visao: 'lista', aberto: 'p1', filtros, agrupar: 'etapa' })))
-    .toEqual({ visao: 'lista', aberto: 'p1', filtros, agrupar: 'etapa' })
+    .toEqual({ visao: 'lista', aberto: 'p1', filtros, agrupar: 'etapa', mostrar: 'todos' })
 })
 
 test('o agrupamento do Quadro vem de agrupar=responsavel; fora do Quadro ou com outro valor é por etapa', () => {
@@ -84,4 +84,36 @@ test('agrupar=setor vale só no Quadro, lido e montado com ida e volta', () => {
   expect(montarEnderecoDosProcessos({ visao: 'lista', aberto: null, filtros: SEM_FILTROS, agrupar: 'setor' })).toBe('#/processos/lista')
   const endereco = '#/processos/p1?macroprocesso=m1&agrupar=setor'
   expect(montarEnderecoDosProcessos(lerEnderecoDosProcessos(endereco))).toBe(endereco)
+})
+
+test('mostrar=concluidos vale na Lista e no Quadro por setor; nas outras visões é ignorado', () => {
+  expect(lerEnderecoDosProcessos('#/processos/lista?mostrar=concluidos').mostrar).toBe('concluidos')
+  expect(lerEnderecoDosProcessos('#/processos?agrupar=setor&mostrar=concluidos').mostrar).toBe('concluidos')
+  expect(lerEnderecoDosProcessos('#/processos?mostrar=concluidos').mostrar).toBe('todos')
+  expect(lerEnderecoDosProcessos('#/processos?agrupar=responsavel&mostrar=concluidos').mostrar).toBe('todos')
+  expect(lerEnderecoDosProcessos('#/processos/lista').mostrar).toBe('todos')
+  expect(lerEnderecoDosProcessos('#/processos/lista?mostrar=xyz').mostrar).toBe('todos')
+})
+
+test('mostrar só vai para o endereço quando é Concluídos e a visão o usa', () => {
+  const base = { aberto: null, filtros: { ...SEM_FILTROS, setor: 's1' }, agrupar: 'etapa' as const }
+  expect(montarEnderecoDosProcessos({ ...base, visao: 'lista', mostrar: 'concluidos' })).toBe('#/processos/lista?setor=s1&mostrar=concluidos')
+  expect(montarEnderecoDosProcessos({ ...base, visao: 'lista', mostrar: 'todos' })).toBe('#/processos/lista?setor=s1')
+  expect(montarEnderecoDosProcessos({ ...base, visao: 'quadro', agrupar: 'setor', mostrar: 'concluidos' }))
+    .toBe('#/processos?setor=s1&agrupar=setor&mostrar=concluidos')
+  expect(montarEnderecoDosProcessos({ ...base, visao: 'quadro', mostrar: 'concluidos' })).toBe('#/processos?setor=s1')
+})
+
+test('com Concluídos o filtro de situação é ignorado; situacao=cancelado nunca vale', () => {
+  expect(lerEnderecoDosProcessos('#/processos/lista?situacao=suspenso&mostrar=concluidos').filtros.situacao).toBeNull()
+  expect(lerEnderecoDosProcessos('#/processos/lista?situacao=cancelado').filtros.situacao).toBeNull()
+  const filtros = { ...SEM_FILTROS, situacao: 'suspenso' as const }
+  expect(montarEnderecoDosProcessos({ visao: 'lista', aberto: null, filtros, agrupar: 'etapa', mostrar: 'concluidos' }))
+    .toBe('#/processos/lista?mostrar=concluidos')
+})
+
+test('ler e montar são inversos com mostrar', () => {
+  for (const endereco of ['#/processos/lista?setor=s1&mostrar=concluidos', '#/processos?agrupar=setor&mostrar=concluidos']) {
+    expect(montarEnderecoDosProcessos(lerEnderecoDosProcessos(endereco))).toBe(endereco)
+  }
 })

@@ -17,7 +17,7 @@ export function fraseDaExplicacaoLonga(tamanho: number | string): string {
 export const FRASE_DA_ETIQUETA_FIXA = 'Em Concluídos a etiqueta é sempre Concluído e não muda.'
 
 export function fraseDaEtiquetaInexistente(valor: string): string {
-  return `A etiqueta ${valor} não existe; use A fazer, Em andamento ou Concluído.`
+  return `A etiqueta ${valor} não existe; use A fazer, Iniciado ou Finalizado.`
 }
 
 /** A passagem que já saiu não muda, nem pela API. */

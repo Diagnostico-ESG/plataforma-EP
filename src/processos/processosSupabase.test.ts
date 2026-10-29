@@ -93,7 +93,7 @@ describe('etiqueta', () => {
     expect(await falhaDe(criar(fechada).mudarEtiqueta('p1', 'a_fazer'))).toBeInstanceOf(TravaDoBanco)
     const invalida = clienteQueRecusa('passagens.update', { message: 'invalid input value for enum etiqueta_da_etapa: "x"', code: '22P02' })
     expect((await falhaDe(criar(invalida).mudarEtiqueta('p1', 'x' as 'a_fazer'))).message)
-      .toBe('A etiqueta x não existe; use A fazer, Em andamento ou Concluído.')
+      .toBe('A etiqueta x não existe; use A fazer, Iniciado ou Finalizado.')
   })
 
   test('nada mudou com o processo ainda legível: a RLS recusou pelo perfil', async () => {

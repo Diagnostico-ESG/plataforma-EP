@@ -316,7 +316,7 @@ describe('processos', () => {
 
   test('a exclusão traz a etapa atual, a etiqueta e o responsável do processo', () => {
     expect(descreverEstadoDoCadastro({ nome: 'Emitir Ofício', etapa_codigo: 'publicacao', etapa_nome: 'Publicação', etiqueta: 'em_andamento', responsavel_nome: 'Ana Teste' }))
-      .toBe('Nome: Emitir Ofício; Etiqueta: Em andamento; Responsável: Ana Teste')
+      .toBe('Nome: Emitir Ofício; Etiqueta: Iniciado; Responsável: Ana Teste')
   })
 
   test('o processo excluído continua no filtro pelo nome', () => {

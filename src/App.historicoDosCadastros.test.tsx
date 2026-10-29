@@ -172,5 +172,5 @@ test('um processo excluído continua no Histórico, com o que tinha, inclusive a
   const itens = await itensDaLista()
   expect(itens[0].textContent).toContain('Excluiu')
   expect(itens[0].textContent).toContain('TSA — Emitir Ofício')
-  expect(itens[0].textContent).toContain('Etiqueta: Em andamento; Responsável: Ana Teste')
+  expect(itens[0].textContent).toContain('Etiqueta: Iniciado; Responsável: Ana Teste')
 })

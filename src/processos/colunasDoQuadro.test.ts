@@ -119,12 +119,21 @@ describe('agrupado por setor', () => {
     expect(resultado.map((coluna) => coluna.titulo)).toEqual(['MNO', 'XPT', 'abc', 'TSA'])
   })
 
-  test('o concluído fora do Quadro e o cancelado ficam de fora, e o setor inativo só com eles não tem coluna', () => {
-    const resultado = colunasPorSetor([TSA, VELHO], [
-      doSetor('Desistido', VELHO, { situacao: 'cancelado' }),
-      doSetor('Guardado', TSA, { situacao: 'concluido', noQuadro: false }),
-    ], null)
+  test('o cancelado fica de fora, e o setor inativo só com ele não tem coluna', () => {
+    const resultado = colunasPorSetor([TSA, VELHO], [doSetor('Desistido', VELHO, { situacao: 'cancelado' })], null)
     expect(resultado.map((coluna) => [coluna.titulo, coluna.processos.length])).toEqual([['TSA', 0]])
+  })
+
+  test('o portfólio mostra o concluído sempre, mesmo o que saiu do Quadro', () => {
+    const guardado = doSetor('Guardado', TSA, { situacao: 'concluido', noQuadro: false })
+    expect(colunasPorSetor([TSA], [guardado], null)[0].processos.map((processo) => processo.nome)).toEqual(['Guardado'])
+  })
+
+  test('Concluídos tira o que não está concluído; as colunas dos setores continuam', () => {
+    const resultado = colunasPorSetor([TSA, ABC], [
+      doSetor('Pronto', TSA, { situacao: 'concluido' }), doSetor('Andando', TSA), doSetor('Parado', ABC, { situacao: 'suspenso' }),
+    ], null, 'concluidos')
+    expect(resultado.map((coluna) => [coluna.titulo, coluna.processos.map((processo) => processo.nome)])).toEqual([['TSA', ['Pronto']], ['abc', []]])
   })
 
   test('com o filtro de setor, só a coluna desse setor', () => {

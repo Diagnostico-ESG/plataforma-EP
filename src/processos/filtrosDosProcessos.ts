@@ -49,7 +49,8 @@ export function opcoesDosFiltros({ etapas, processos }: Pick<ListaDeProcessos, '
     etapas: opcoesDeEtapa(etapas),
     tipos: Object.entries(ROTULO_DO_TIPO).map(([valor, rotulo]) => ({ valor, rotulo })),
     responsaveis: semRepetir(processos.flatMap((p) => (p.responsavel ? [opcaoDeResponsavel(p.responsavel)] : []))),
-    situacoes: Object.entries(ROTULO_DA_SITUACAO).map(([valor, rotulo]) => ({ valor, rotulo })),
+    // O cancelado não é opção: ele só aparece pelo "Mostrar cancelados" da Lista.
+    situacoes: Object.entries(ROTULO_DA_SITUACAO).filter(([valor]) => valor !== 'cancelado').map(([valor, rotulo]) => ({ valor, rotulo })),
   }
 }
 

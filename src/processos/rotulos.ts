@@ -12,7 +12,7 @@ export const ROTULO_DA_SITUACAO: Record<SituacaoDoProcesso, string> = {
 
 // O valor guardado segue "concluido"; "Finalizado" evita confundir a etiqueta com a etapa Concluídos (ADR 0031).
 export const ROTULO_DA_ETIQUETA: Record<EtiquetaDaEtapa, string> = {
-  a_fazer: 'A fazer', em_andamento: 'Em andamento', concluido: 'Finalizado',
+  a_fazer: 'A fazer', em_andamento: 'Iniciado', concluido: 'Finalizado',
 }
 
 /** Na ordem em que a lista do Agora as oferece. */

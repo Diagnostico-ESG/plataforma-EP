@@ -1,3 +1,5 @@
+import type { MostrarNoPortfolio } from './enderecoDosProcessos'
+import { visiveisNoPortfolio } from './portfolio'
 import type { ListaDeProcessos, ProcessoDaLista, SetorDoQuadro, SituacaoDoProcesso } from './tipos'
 
 export type ColunaDoQuadro = {
@@ -73,9 +75,12 @@ function porSigla(a: SetorDoQuadro, b: SetorDoQuadro): number {
  * Uma coluna por setor ativo, mesmo vazia, e por setor inativo que ainda tem processo no Quadro. Primeiro os setores que têm
  * processo na tela, depois os vazios (ADR 0032), cada grupo em ordem de sigla.
  * Com o filtro de setor (setorFiltrado), só a coluna dele. Em cada coluna, os processos saem em ordem de nome.
+ * É o portfólio: mostra os concluídos sempre (sem a regra dos 30 dias) e, com mostrar = 'concluidos', só eles.
  */
-export function colunasPorSetor(setores: SetorDoQuadro[], processos: ProcessoDaLista[], setorFiltrado: string | null): ColunaDoQuadro[] {
-  const noQuadro = processosDoQuadro(processos)
+export function colunasPorSetor(
+  setores: SetorDoQuadro[], processos: ProcessoDaLista[], setorFiltrado: string | null, mostrar: MostrarNoPortfolio = 'todos',
+): ColunaDoQuadro[] {
+  const noQuadro = visiveisNoPortfolio(processos, mostrar).sort(porNome)
   const colunas = [...setores]
     .sort(porSigla)
     .map((setor) => ({

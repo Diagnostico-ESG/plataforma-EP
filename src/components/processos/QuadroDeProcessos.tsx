@@ -1,7 +1,7 @@
 import { useArrastoDoQuadro } from '../../hooks/useArrastoDoQuadro'
 import { useMovimentoDoProcesso } from '../../hooks/useMovimentoDoProcesso'
 import { type ColunaDoQuadro as Coluna, colunasDoQuadro, colunasPorResponsavel, colunasPorSetor } from '../../processos/colunasDoQuadro'
-import type { AgruparQuadroPor } from '../../processos/enderecoDosProcessos'
+import type { AgruparQuadroPor, MostrarNoPortfolio } from '../../processos/enderecoDosProcessos'
 import type { ListaDeProcessos, ModuloDeProcessos } from '../../processos/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { ColunaDoQuadro } from './ColunaDoQuadro'
@@ -22,19 +22,23 @@ type QuadroDeProcessosProps = {
   agrupar: AgruparQuadroPor
   /** O filtro Setor: no Quadro por setor, só a coluna dele aparece. */
   setorFiltrado: string | null
+  /** Só no Quadro por setor (o portfólio): todos os concluídos ou só eles. */
+  mostrar: MostrarNoPortfolio
 }
 
 const COLUNAS_FANTASMA = [0, 1, 2, 3]
 
-function colunasDoAgrupamento(lista: ListaDeProcessos, agrupar: AgruparQuadroPor, setorFiltrado: string | null): Coluna[] {
+function colunasDoAgrupamento(
+  lista: ListaDeProcessos, agrupar: AgruparQuadroPor, setorFiltrado: string | null, mostrar: MostrarNoPortfolio,
+): Coluna[] {
   if (agrupar === 'responsavel') return colunasPorResponsavel(lista.processos)
-  if (agrupar === 'setor') return colunasPorSetor(lista.setores, lista.processos, setorFiltrado)
+  if (agrupar === 'setor') return colunasPorSetor(lista.setores, lista.processos, setorFiltrado, mostrar)
   return colunasDoQuadro(lista)
 }
 
 export function QuadroDeProcessos(props: QuadroDeProcessosProps) {
-  const { lista, idEscolhido, enderecoDoProcesso, podeAlterar, processos, versoes, aoMudar, agrupar, setorFiltrado } = props
-  const colunas = colunasDoAgrupamento(lista, agrupar, setorFiltrado)
+  const { lista, idEscolhido, enderecoDoProcesso, podeAlterar, processos, versoes, aoMudar, agrupar, setorFiltrado, mostrar } = props
+  const colunas = colunasDoAgrupamento(lista, agrupar, setorFiltrado, mostrar)
   // O processo some do Quadro (excluído por outra pessoa) é o mesmo que mudou: o Quadro só recarrega.
   const movimento = useMovimentoDoProcesso(processos, lista.etapas, aoMudar, aoMudar)
   const arrasto = useArrastoDoQuadro(lista.etapas, movimento.mover)

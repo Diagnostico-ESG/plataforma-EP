@@ -361,6 +361,19 @@ td .barra-etapa {
   background: var(--azul-claro);
 }
 
+/* Os cancelados pedidos: um bloco à parte no fim da Lista, mais apagado que o resto, com o título "Cancelados". */
+.bloco-de-cancelados th[scope='rowgroup'] {
+  text-align: left;
+  font-size: var(--tam-rotulo);
+  color: var(--texto-2);
+  background: var(--fundo-contexto);
+}
+
+.bloco-de-cancelados td {
+  color: var(--texto-2);
+  background: var(--fundo-contexto);
+}
+
 /* Filtros à esquerda, numa linha que quebra quando falta espaço; [Cadastrar processo] continua à direita. */
 .quadro-barra {
   flex-wrap: wrap;

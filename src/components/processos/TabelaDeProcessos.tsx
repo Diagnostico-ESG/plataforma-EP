@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { LinhaDaLista } from '../../processos/linhasDaLista'
 import { ROTULO_DO_TIPO } from '../../processos/rotulos'
 import { LinhaFantasma } from '../cadastros/PecasDaLista'
@@ -10,18 +11,43 @@ import { SeloDeParado } from './SeloDeParado'
 const COLUNAS = ['Nome', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Responsável', 'Situação']
 const LINHAS_FANTASMA = 3
 
-type TabelaDeProcessosProps = { linhas: LinhaDaLista[]; idEscolhido: string | null; aoAbrir: (id: string) => void; busca: string | null }
+type TabelaDeProcessosProps = {
+  linhas: LinhaDaLista[]
+  /** Os cancelados (depois dos filtros): ficam escondidos até alguém pedir; vazio, a linha de pedir não existe. */
+  cancelados: LinhaDaLista[]
+  idEscolhido: string | null
+  aoAbrir: (id: string) => void
+  busca: string | null
+}
 
 /** A Lista: tabela compacta, no padrão das listas de cadastros. */
-export function TabelaDeProcessos({ linhas, idEscolhido, aoAbrir, busca }: TabelaDeProcessosProps) {
+export function TabelaDeProcessos({ linhas, cancelados, idEscolhido, aoAbrir, busca }: TabelaDeProcessosProps) {
+  // O bloco dos cancelados é só da tela: não entra no endereço (spec, "Endereço da página").
+  const [verCancelados, setVerCancelados] = useState(false)
+  const linhaDe = (linha: LinhaDaLista) => (
+    <LinhaDoProcesso key={linha.id} linha={linha} escolhida={linha.id === idEscolhido} aoAbrir={aoAbrir} busca={busca} />
+  )
   return (
     <table className="tabela-cadastros tabela-de-processos">
       <CabecalhoDaTabela />
-      <tbody>
-        {linhas.map((linha) => (
-          <LinhaDoProcesso key={linha.id} linha={linha} escolhida={linha.id === idEscolhido} aoAbrir={aoAbrir} busca={busca} />
-        ))}
-      </tbody>
+      <tbody>{linhas.map(linhaDe)}</tbody>
+      {cancelados.length > 0 && (
+        <tbody className="linha-dos-cancelados">
+          <tr>
+            <td colSpan={COLUNAS.length}>
+              <button type="button" className="botao botao-secundario" aria-expanded={verCancelados} onClick={() => setVerCancelados(!verCancelados)}>
+                {verCancelados ? 'Esconder cancelados' : `Mostrar cancelados (${cancelados.length})`}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      )}
+      {cancelados.length > 0 && verCancelados && (
+        <tbody className="bloco-de-cancelados">
+          <tr><th scope="rowgroup" colSpan={COLUNAS.length}>Cancelados</th></tr>
+          {cancelados.map(linhaDe)}
+        </tbody>
+      )}
     </table>
   )
 }

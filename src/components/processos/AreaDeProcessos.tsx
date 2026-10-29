@@ -4,7 +4,7 @@ import type { ModuloDeCadastros } from '../../cadastros/tipos'
 import { useCarregamento } from '../../hooks/useCarregamento'
 import { useEndereco } from '../../hooks/useEndereco'
 import {
-  lerEnderecoDosProcessos, montarEnderecoDosProcessos, type EnderecoDosProcessos,
+  lerEnderecoDosProcessos, montarEnderecoDosProcessos, SEM_FILTROS, type EnderecoDosProcessos,
 } from '../../processos/enderecoDosProcessos'
 import type { ModuloDeProcessos } from '../../processos/tipos'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
@@ -59,6 +59,8 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes, reviso
           enderecoDoProcesso={enderecoDoProcesso} aoAbrir={(id) => irParaVisao({ aberto: id })}
           filtros={atual.filtros} aoMudarFiltros={(filtros) => irParaVisao({ filtros, aberto: null }, filtros.busca !== atual.filtros.busca)}
           agrupar={atual.agrupar} aoMudarAgrupar={(agrupar) => irParaVisao({ agrupar, aberto: null })}
+          mostrar={atual.mostrar} aoLimparTudo={() => irParaVisao({ filtros: SEM_FILTROS, mostrar: 'todos', aberto: null })}
+          aoMudarMostrar={(mostrar) => irParaVisao({ mostrar, filtros: { ...atual.filtros, situacao: null }, aberto: null })}
           processos={processos} versoes={versoes} usuarioId={usuario.id} aoMudar={recarregar} />
       </div>
       {idAberto && (

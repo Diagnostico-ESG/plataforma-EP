@@ -74,10 +74,10 @@ test('a recusa do banco aparece com a frase pronta', async () => {
 
 // ---- Etiqueta
 
-test('a lista Etiqueta tem A fazer, Em andamento e Finalizado, grava ao escolher e não mexe na etapa nem no responsável', async () => {
+test('a lista Etiqueta tem A fazer, Iniciado e Finalizado, grava ao escolher e não mexe na etapa nem no responsável', async () => {
   const falso = montarVerso(processoLido(COM_BIA))
   const etiqueta = await lista('Etiqueta')
-  expect([...etiqueta.options].map((opcao) => opcao.textContent)).toEqual(['A fazer', 'Em andamento', 'Finalizado'])
+  expect([...etiqueta.options].map((opcao) => opcao.textContent)).toEqual(['A fazer', 'Iniciado', 'Finalizado'])
   fireEvent.change(etiqueta, { target: { value: 'em_andamento' } })
   await waitFor(() => expect(falso.chamadas).toEqual([{ acao: 'etiqueta', id: 'p1', etiqueta: 'em_andamento' }]))
   expect((await lista('Etiqueta')).value).toBe('em_andamento')
@@ -240,7 +240,7 @@ test('o suspenso não ganha o selo de dias, por mais tempo que tenha na etapa', 
 test('a Consulta vê a frase com etapa, etiqueta, responsável e dias, sem listas nem botões', async () => {
   montarVerso(processoLido({ ...COM_BIA, etiqueta: 'em_andamento', entrouNaEtapaEm: diasAtras(3) }), 'consulta')
   const agora = await agoraDoVerso()
-  expect(agora.getByText('Em Revisão interna · Em andamento · com Bia Teste há 3 dias')).toBeTruthy()
+  expect(agora.getByText('Em Revisão interna · Iniciado · com Bia Teste há 3 dias')).toBeTruthy()
   expect(agora.queryByRole('combobox')).toBeNull()
   expect(agora.queryByRole('button')).toBeNull()
 })

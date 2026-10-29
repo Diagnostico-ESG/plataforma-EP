@@ -68,7 +68,7 @@ test('a etiqueta é uma pílula com bolinha e o texto, na cor de cada valor, e o
     processo('A Fazer'), processo('Em Andamento', { processo: { etiqueta: 'em_andamento' } }),
     processo('Feita', { processo: { etiqueta: 'concluido' } }),
   ])
-  for (const [nome, etiqueta, classe] of [['A Fazer', 'A fazer', 'a_fazer'], ['Em Andamento', 'Em andamento', 'em_andamento'], ['Feita', 'Finalizado', 'concluido']]) {
+  for (const [nome, etiqueta, classe] of [['A Fazer', 'A fazer', 'a_fazer'], ['Em Andamento', 'Iniciado', 'em_andamento'], ['Feita', 'Finalizado', 'concluido']]) {
     const cartao = await cartaoDe(nome)
     const pilula = cartao.querySelector('.etiqueta')
     expect(pilula?.textContent).toBe(etiqueta)

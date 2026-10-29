@@ -68,11 +68,11 @@ describe('avisoDoRevisor', () => {
 
 describe('fraseDaConsulta', () => {
   test('etapa, etiqueta, responsável e dias', () => {
-    expect(fraseDaConsulta(lido(), '2026-10-16')).toBe('Em Revisão interna · Em andamento · com Ana Teste há 6 dias')
+    expect(fraseDaConsulta(lido(), '2026-10-16')).toBe('Em Revisão interna · Iniciado · com Ana Teste há 6 dias')
   })
 
   test('depois de 7 dias a frase não repete os dias (o selo âmbar os diz)', () => {
-    expect(fraseDaConsulta(lido({ entrouNaEtapaEm: '2026-10-01' }), '2026-10-16')).toBe('Em Revisão interna · Em andamento · com Ana Teste')
+    expect(fraseDaConsulta(lido({ entrouNaEtapaEm: '2026-10-01' }), '2026-10-16')).toBe('Em Revisão interna · Iniciado · com Ana Teste')
   })
 
   test('sem responsável', () => {
@@ -81,6 +81,6 @@ describe('fraseDaConsulta', () => {
 
   test('em Não iniciados e em Concluídos não há dias', () => {
     const fixa = lido({ etapaAtual: etapaAtualDe('nao_iniciados') })
-    expect(fraseDaConsulta(fixa, '2026-10-16')).toBe('Em Não iniciados · Em andamento · com Ana Teste')
+    expect(fraseDaConsulta(fixa, '2026-10-16')).toBe('Em Não iniciados · Iniciado · com Ana Teste')
   })
 })

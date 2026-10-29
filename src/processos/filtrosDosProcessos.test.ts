@@ -78,7 +78,7 @@ test('opções: sem repetição, na ordem certa; a etapa de filtro é só das at
     { valor: 'u2', rotulo: 'Bruno Teste', pessoa: { nome: 'Bruno Teste', fotoUrl: 'https://fotos.exemplo/bruno.png' } },
   ])
   expect(opcoes.tipos.map((o) => o.rotulo)).toEqual(['Processo', 'Subprocesso', 'A classificar'])
-  expect(opcoes.situacoes.map((o) => o.rotulo)).toEqual(['Em andamento', 'Suspenso', 'Cancelado', 'Concluído'])
+  expect(opcoes.situacoes.map((o) => o.rotulo)).toEqual(['Em andamento', 'Suspenso', 'Concluído'])
 })
 
 test('a opção do filtro Setor leva a cor do setor; sem a cor vale a 1', () => {
