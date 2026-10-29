@@ -1728,4 +1728,4 @@ Entregue em 2026-10-28 (commit 7ea4c43), com ressalva: critérios [visual] 4 a 7
 
 Entregue em 2026-10-28 (commit 31544ac), com ressalva: critérios [visual] 5 a 7 de cor-solida-do-setor presumidos no app real (vistos só numa página de teste com as folhas de estilo reais e marcação montada à mão; a tela com o login real não foi vista); revisão de segurança dispensada (só CSS e um módulo puro de cor, sem login, dado de fora ou banco)
 
-Em revisão desde 2026-10-28
+Entregue em 2026-10-29 (commit 9fc0201), com ressalva: critérios [visual] de repositorio-de-processos presumidos (nada visto com o login real; a árvore e o cabeçalho da Lista só na vitrine local com módulos falsos, sem captura de imagem); revisão de segurança foi a de reserva (menos completa: o /security-review não achou mudanças a revisar); migrações fim_do_arquivado e tirar_e_voltar_ao_quadro ainda sem aplicar no remoto de desenvolvimento e função arquivos-no-drive sem nova publicação; as ressalvas das entregas anteriores seguem valendo

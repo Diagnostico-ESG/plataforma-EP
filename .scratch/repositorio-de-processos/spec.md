@@ -256,3 +256,5 @@ Sem dado pessoal novo.
 6. [visual] Na árvore, as linhas de macroprocesso e de setor se distinguem das de processo, os subprocessos aparecem recuados e a linha dos arquivos lê-se como parte do processo acima dela.
 7. [visual] O bloco "Cancelados" no fim da Lista se distingue do resto.
 8. [visual] A etiqueta "Iniciado" cabe no cartão como cabia "Em andamento".
+
+Entregue em 2026-10-29 (commit 9fc0201), com ressalva: critérios [visual] de repositorio-de-processos presumidos (nada visto com o login real; a árvore e o cabeçalho da Lista só na vitrine local com módulos falsos, sem captura de imagem); revisão de segurança foi a de reserva (menos completa: o /security-review não achou mudanças a revisar); migrações fim_do_arquivado e tirar_e_voltar_ao_quadro ainda sem aplicar no remoto de desenvolvimento e função arquivos-no-drive sem nova publicação; as ressalvas das entregas anteriores seguem valendo
