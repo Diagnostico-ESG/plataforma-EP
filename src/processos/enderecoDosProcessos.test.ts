@@ -3,8 +3,8 @@ import { lerEnderecoDosProcessos, montarEnderecoDosProcessos, SEM_FILTROS } from
 import { ORDENACAO_PADRAO } from './ordenacaoDaLista'
 
 test('o caminho dá a visão e o item aberto', () => {
-  expect(lerEnderecoDosProcessos('#/processos')).toEqual({ visao: 'quadro', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa', mostrar: 'todos', ordenacao: ORDENACAO_PADRAO })
-  expect(lerEnderecoDosProcessos('#/processos/lista')).toEqual({ visao: 'lista', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa', mostrar: 'todos', ordenacao: ORDENACAO_PADRAO })
+  expect(lerEnderecoDosProcessos('#/processos')).toEqual({ visao: 'quadro', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa', mostrar: 'todos', ordenacao: ORDENACAO_PADRAO, agruparLista: 'nenhum' })
+  expect(lerEnderecoDosProcessos('#/processos/lista')).toEqual({ visao: 'lista', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa', mostrar: 'todos', ordenacao: ORDENACAO_PADRAO, agruparLista: 'nenhum' })
   expect(lerEnderecoDosProcessos('#/processos/p1').aberto).toBe('p1')
   expect(lerEnderecoDosProcessos('#/processos/lista/p1')).toMatchObject({ visao: 'lista', aberto: 'p1' })
   expect(lerEnderecoDosProcessos('#/processos/novo').aberto).toBe('novo')
@@ -59,7 +59,7 @@ test('montar a busca: depois dos filtros, e fora do Quadro', () => {
   expect(montarEnderecoDosProcessos({ visao: 'lista', aberto: null, filtros, agrupar: 'etapa' })).toBe('#/processos/lista?setor=s1&busca=pagar+di')
   expect(montarEnderecoDosProcessos({ visao: 'quadro', aberto: null, filtros, agrupar: 'etapa' })).toBe('#/processos?setor=s1')
   expect(lerEnderecoDosProcessos(montarEnderecoDosProcessos({ visao: 'lista', aberto: 'p1', filtros, agrupar: 'etapa' })))
-    .toEqual({ visao: 'lista', aberto: 'p1', filtros, agrupar: 'etapa', mostrar: 'todos', ordenacao: ORDENACAO_PADRAO })
+    .toEqual({ visao: 'lista', aberto: 'p1', filtros, agrupar: 'etapa', mostrar: 'todos', ordenacao: ORDENACAO_PADRAO, agruparLista: 'nenhum' })
 })
 
 test('o agrupamento do Quadro vem de agrupar=responsavel; fora do Quadro ou com outro valor é por etapa', () => {
@@ -145,4 +145,21 @@ test('montar: a ordenação padrão não vai ao endereço; as outras vão, e só
 test('ler e montar são inversos com a ordenação e os filtros', () => {
   const endereco = '#/processos/lista?tipo=processo&mostrar=concluidos&ordenar=etapa&sentido=decrescente'
   expect(montarEnderecoDosProcessos(lerEnderecoDosProcessos(endereco))).toBe(endereco)
+})
+
+test('agrupar=macroprocesso agrupa a Lista; no Quadro o parâmetro é ignorado e o agrupar do Quadro segue valendo', () => {
+  expect(lerEnderecoDosProcessos('#/processos/lista?agrupar=macroprocesso').agruparLista).toBe('macroprocesso')
+  expect(lerEnderecoDosProcessos('#/processos/lista?agrupar=outro').agruparLista).toBe('nenhum')
+  expect(lerEnderecoDosProcessos('#/processos/lista?agrupar=setor').agruparLista).toBe('nenhum')
+  expect(lerEnderecoDosProcessos('#/processos?agrupar=macroprocesso')).toMatchObject({ agruparLista: 'nenhum', agrupar: 'etapa' })
+  expect(lerEnderecoDosProcessos('#/processos?agrupar=setor')).toMatchObject({ agruparLista: 'nenhum', agrupar: 'setor' })
+})
+
+test('montar: agrupar=macroprocesso só na Lista; Nenhum não escreve nada', () => {
+  const base = { aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa' as const }
+  expect(montarEnderecoDosProcessos({ ...base, visao: 'lista', agruparLista: 'macroprocesso' })).toBe('#/processos/lista?agrupar=macroprocesso')
+  expect(montarEnderecoDosProcessos({ ...base, visao: 'lista', agruparLista: 'nenhum' })).toBe('#/processos/lista')
+  expect(montarEnderecoDosProcessos({ ...base, visao: 'quadro', agruparLista: 'macroprocesso' })).toBe('#/processos')
+  const lido = '#/processos/lista?tipo=processo&agrupar=macroprocesso'
+  expect(montarEnderecoDosProcessos(lerEnderecoDosProcessos(lido))).toBe(lido)
 })

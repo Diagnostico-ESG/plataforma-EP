@@ -53,9 +53,9 @@
   - subprocesso cujo pai não está nas linhas fica no grupo do próprio setor, dentro do macro do pai (lido de `todos`), com `subprocessoDe` igual ao nome do pai e `nivel` 0;
   - `total` do macro e `itens.length` do setor contam processos e subprocessos; macro/setor sem linha não aparecem;
   - `nome` e `cor` do setor vêm de `setores` (sem o setor na lista: sigla como nome e cor 1).
-- [ ] **Passo 2:** `npx vitest run src/processos/arvoreDaLista.test.ts`; esperado: FAIL (módulo inexistente).
-- [ ] **Passo 3:** implementar `montarArvore`. Filhos por `processoPaiId` só quando o pai está nas linhas; raízes na ordem recebida; cada raiz entra no macro (o do pai se for subprocesso sem pai nas linhas) e no setor próprio; depois do pai vêm os filhos, em ordem. Ordenar macros por nome e setores por sigla com `localeCompare('pt-BR', { sensitivity: 'base' })`.
-- [ ] **Passo 4:** rodar o arquivo; verde. Commit `repositorio-de-processos 05: montagem da árvore`.
+- [x] **Passo 2:** `npx vitest run src/processos/arvoreDaLista.test.ts`; esperado: FAIL (módulo inexistente).
+- [x] **Passo 3:** implementar `montarArvore`. Filhos por `processoPaiId` só quando o pai está nas linhas; raízes na ordem recebida; cada raiz entra no macro (o do pai se for subprocesso sem pai nas linhas) e no setor próprio; depois do pai vêm os filhos, em ordem. Ordenar macros por nome e setores por sigla com `localeCompare('pt-BR', { sensitivity: 'base' })`.
+- [x] **Passo 4:** rodar o arquivo; verde. Commit `repositorio-de-processos 05: montagem da árvore`.
 
 ### Tarefa 2: `agrupar=macroprocesso` no endereço
 
@@ -64,10 +64,10 @@
 **Interfaces:**
 - Produz: `type AgruparListaPor = 'nenhum' | 'macroprocesso'`; `EnderecoDosProcessos.agruparLista: AgruparListaPor`; em `EnderecoParaMontar`, `agruparLista?` opcional (vale `nenhum`).
 
-- [ ] **Passo 1: testes que falham:** ler `#/processos/lista?agrupar=macroprocesso` dá `agruparLista: 'macroprocesso'`; `agrupar=outro` dá `nenhum`; no Quadro (`#/processos?agrupar=macroprocesso`) dá `nenhum` e `agrupar` continua `etapa`; montar com `macroprocesso` escreve `agrupar=macroprocesso` só na Lista; montar com `nenhum` não escreve; ida e volta preserva; `agrupar=setor` no Quadro continua igual.
-- [ ] **Passo 2:** rodar o arquivo; FAIL.
-- [ ] **Passo 3:** implementar a leitura em `lerEnderecoDosProcessos` e a escrita em `consultaDoEndereco` (a Lista usa a chave `agrupar`; o Quadro, a dele).
-- [ ] **Passo 4:** `npx vitest run src/processos/enderecoDosProcessos.test.ts` e `npm run typecheck`; verde. Commit `repositorio-de-processos 05: agrupar da Lista no endereço`.
+- [x] **Passo 1: testes que falham:** ler `#/processos/lista?agrupar=macroprocesso` dá `agruparLista: 'macroprocesso'`; `agrupar=outro` dá `nenhum`; no Quadro (`#/processos?agrupar=macroprocesso`) dá `nenhum` e `agrupar` continua `etapa`; montar com `macroprocesso` escreve `agrupar=macroprocesso` só na Lista; montar com `nenhum` não escreve; ida e volta preserva; `agrupar=setor` no Quadro continua igual.
+- [x] **Passo 2:** rodar o arquivo; FAIL.
+- [x] **Passo 3:** implementar a leitura em `lerEnderecoDosProcessos` e a escrita em `consultaDoEndereco` (a Lista usa a chave `agrupar`; o Quadro, a dele).
+- [x] **Passo 4:** `npx vitest run src/processos/enderecoDosProcessos.test.ts` e `npm run typecheck`; verde. Commit `repositorio-de-processos 05: agrupar da Lista no endereço`.
 
 ### Tarefa 3: arquivos da versão mais recente (puro) e busca por processo (hook)
 
@@ -80,10 +80,10 @@
   `type EstadoDosArquivos = { tipo: 'carregando' } | { tipo: 'erro' } | { tipo: 'pronto'; versoes: Versao[] }`;
   `useArquivosDosProcessos(modulo: ModuloDeVersoes): { estados: Record<string, EstadoDosArquivos>; buscar(ids: string[]): void }`.
 
-- [ ] **Passo 1: testes que falham:** puro: lista vazia dá `null`; V7 com .png, .bpm e relatório numerado 2 dá rótulo `V7` e a ordem `Imagem .png`, `Fluxograma .bpm`, `Relatório V2`; aprovada marcada; versão piloto `V6P`; histórica `V5F` sem relatório de outra versão; relatório da versão anterior sai como `Relatório V2 (da V7)`; o `.pdf` antigo sem número sai como `Relatório .pdf`. Hook (`renderHook`): `buscar(['p1'])` passa por `carregando` e chega a `pronto` com as versões do falso; falha de leitura vira `erro` só naquele id; `buscar` de novo no id com `erro` volta a `carregando`; `buscar` de id já `pronto` mantém o `pronto` enquanto refaz.
-- [ ] **Passo 2:** rodar os dois arquivos; FAIL.
-- [ ] **Passo 3:** implementar. O hook guarda `Record` em `useState`; `buscar` marca `carregando` só para quem ainda não tem estado `pronto`, chama `modulo.listarVersoes` e grava `pronto` ou `erro`.
-- [ ] **Passo 4:** rodar os dois arquivos; verde. Commit `repositorio-de-processos 05: arquivos da versão mais recente`.
+- [x] **Passo 1: testes que falham:** puro: lista vazia dá `null`; V7 com .png, .bpm e relatório numerado 2 dá rótulo `V7` e a ordem `Imagem .png`, `Fluxograma .bpm`, `Relatório V2`; aprovada marcada; versão piloto `V6P`; histórica `V5F` sem relatório de outra versão; relatório da versão anterior sai como `Relatório V2 (da V7)`; o `.pdf` antigo sem número sai como `Relatório .pdf`. Hook (`renderHook`): `buscar(['p1'])` passa por `carregando` e chega a `pronto` com as versões do falso; falha de leitura vira `erro` só naquele id; `buscar` de novo no id com `erro` volta a `carregando`; `buscar` de id já `pronto` mantém o `pronto` enquanto refaz.
+- [x] **Passo 2:** rodar os dois arquivos; FAIL.
+- [x] **Passo 3:** implementar. O hook guarda `Record` em `useState`; `buscar` marca `carregando` só para quem ainda não tem estado `pronto`, chama `modulo.listarVersoes` e grava `pronto` ou `erro`.
+- [x] **Passo 4:** rodar os dois arquivos; verde. Commit `repositorio-de-processos 05: arquivos da versão mais recente`.
 
 ### Tarefa 4: peças da árvore (estado aberto/fechado e linhas)
 
@@ -97,10 +97,10 @@
   `LinhaDoMacro`, `LinhaDoSetor` (`<tr class="linha-de-macro|linha-de-setor">` com `<th scope="rowgroup" colSpan>` e botão `aria-expanded` de nome acessível "<nome>, N processos"; o do setor leva o `SeloDoSetor` e o nome).
   `LinhaDosArquivos({ estado, modulo, aoTentarDeNovo })`: `<tr class="linha-dos-arquivos"><td colSpan>`: carregando → `<p role="status">Carregando arquivos…</p>`; erro → `ErroAoCarregar alvo="os arquivos"` (a frase do padrão do projeto, com "Tentar de novo"); sem versão → "Sem versão ainda."; pronto → rótulo da versão, `Pilula` "Aprovada" quando for o caso e um `LinkDoArquivo` por arquivo (`rotulo` curto).
 
-- [ ] **Passo 1: testes que falham:** hook: abre com macros e setores abertos e processos fechados; `alternarProcesso` devolve `true` ao abrir; `tudoAberto` só quando tudo está aberto; `abrirTudo` devolve os ids de todos os processos da árvore; `fecharTudo` fecha macros, setores e processos. Componentes (`LinhasDeGrupo.test.tsx`, `LinhaDosArquivos.test.tsx`): o botão do macro tem o nome "Macro Um, 2 processos" e `aria-expanded`; "1 processo" no singular; a linha dos arquivos mostra cada um dos quatro estados; clicar no link do arquivo chama `baixarArquivo` do falso.
-- [ ] **Passo 2:** rodar os arquivos novos; FAIL.
-- [ ] **Passo 3:** implementar; mover `LinhaDoProcesso` para o arquivo próprio (a tabela comum a importa, sem mudar o que faz hoje); CSS: macro e setor com fundo próprio e peso de título, subprocesso com recuo, linha dos arquivos com o fundo do processo e recuo, sem borda entre o processo e ela (critério 6 `[visual]`).
-- [ ] **Passo 4:** `npx vitest run src/components src/hooks`; verde (a Lista atual não pode mudar). Commit `repositorio-de-processos 05: linhas da árvore`.
+- [x] **Passo 1: testes que falham:** hook: abre com macros e setores abertos e processos fechados; `alternarProcesso` devolve `true` ao abrir; `tudoAberto` só quando tudo está aberto; `abrirTudo` devolve os ids de todos os processos da árvore; `fecharTudo` fecha macros, setores e processos. Componentes (`LinhasDeGrupo.test.tsx`, `LinhaDosArquivos.test.tsx`): o botão do macro tem o nome "Macro Um, 2 processos" e `aria-expanded`; "1 processo" no singular; a linha dos arquivos mostra cada um dos quatro estados; clicar no link do arquivo chama `baixarArquivo` do falso.
+- [x] **Passo 2:** rodar os arquivos novos; FAIL.
+- [x] **Passo 3:** implementar; mover `LinhaDoProcesso` para o arquivo próprio (a tabela comum a importa, sem mudar o que faz hoje); CSS: macro e setor com fundo próprio e peso de título, subprocesso com recuo, linha dos arquivos com o fundo do processo e recuo, sem borda entre o processo e ela (critério 6 `[visual]`).
+- [x] **Passo 4:** `npx vitest run src/components src/hooks`; verde (a Lista atual não pode mudar). Commit `repositorio-de-processos 05: linhas da árvore`.
 
 ### Tarefa 5: a árvore na Lista
 

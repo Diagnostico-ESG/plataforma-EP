@@ -1,0 +1,77 @@
+/* Árvore da Lista: as linhas de macroprocesso e de setor se leem como títulos, o subprocesso vem recuado e a linha dos
+   arquivos fica colada ao processo acima dela, no mesmo fundo. */
+.linha-de-macro th,
+.linha-de-setor th {
+  text-align: left;
+  font-weight: 600;
+}
+
+.linha-de-macro th {
+  padding: var(--esp-2) var(--esp-3);
+  background: var(--azul-claro);
+  border-top: 2px solid var(--azul);
+  font-size: var(--tam-coluna);
+}
+
+.linha-de-setor th {
+  padding: var(--esp-1) var(--esp-3) var(--esp-1) var(--esp-5);
+  background: var(--fundo-contexto);
+  font-size: var(--tam-base);
+}
+
+.botao-do-grupo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-2);
+  padding: var(--esp-1) 0;
+  border: 0;
+  background: none;
+  color: var(--texto);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.contagem-do-grupo {
+  color: var(--texto-2);
+  font-size: var(--tam-secundario);
+  font-weight: 400;
+}
+
+.seta-da-arvore {
+  margin-right: var(--esp-2);
+  padding: 0 var(--esp-1);
+  border: 0;
+  background: none;
+  color: var(--texto-2);
+  font: inherit;
+  cursor: pointer;
+}
+
+.seta-da-arvore:hover {
+  color: var(--azul);
+}
+
+.tabela-de-processos td.processo-recuado {
+  padding-left: var(--esp-6);
+}
+
+/* A linha dos arquivos: sem borda de cima e recuada, para se ler como parte do processo acima. */
+.linha-dos-arquivos td {
+  padding: var(--esp-2) var(--esp-3) var(--esp-3) var(--esp-6);
+  border-top: 0;
+  background: var(--fundo-contexto);
+}
+
+.arquivos-da-arvore {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-3);
+}
+
+.barra-da-arvore {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--esp-2);
+}

@@ -3,6 +3,9 @@ import type { SituacaoDoProcesso, TipoDeProcesso } from './tipos'
 
 export type VisaoDosProcessos = 'quadro' | 'lista'
 
+/** Só na Lista: a tabela comum ou a árvore por macroprocesso. */
+export type AgruparListaPor = 'nenhum' | 'macroprocesso'
+
 export type FiltrosDosProcessos = {
   setor: string | null
   macroprocesso: string | null
@@ -35,12 +38,12 @@ function ehAgrupamento(lido: string): lido is AgruparQuadroPor {
  */
 export type EnderecoDosProcessos = {
   visao: VisaoDosProcessos; aberto: string | null; filtros: FiltrosDosProcessos; agrupar: AgruparQuadroPor
-  mostrar: MostrarNoPortfolio; ordenacao: OrdenacaoDaLista
+  mostrar: MostrarNoPortfolio; ordenacao: OrdenacaoDaLista; agruparLista: AgruparListaPor
 }
 
-/** Quem monta o endereço pode omitir mostrar (vale Todos) e ordenacao (vale a padrão). */
-type EnderecoParaMontar = Omit<EnderecoDosProcessos, 'mostrar' | 'ordenacao'> & {
-  mostrar?: MostrarNoPortfolio; ordenacao?: OrdenacaoDaLista
+/** Quem monta o endereço pode omitir mostrar (vale Todos), ordenacao (vale a padrão) e agruparLista (vale Nenhum). */
+type EnderecoParaMontar = Omit<EnderecoDosProcessos, 'mostrar' | 'ordenacao' | 'agruparLista'> & {
+  mostrar?: MostrarNoPortfolio; ordenacao?: OrdenacaoDaLista; agruparLista?: AgruparListaPor
 }
 
 /** Lista e Quadro por setor são o portfólio: só neles Todos | Concluídos existe. */
@@ -71,7 +74,13 @@ export function lerEnderecoDosProcessos(endereco: string): EnderecoDosProcessos 
   const agrupar = visao === 'quadro' && ehAgrupamento(lido) ? lido : 'etapa'
   const mostrar = ehPortfolio(visao, agrupar) && parametros.get('mostrar') === 'concluidos' ? 'concluidos' : 'todos'
   const ordenacao = ordenacaoDaConsulta(parametros, visao)
-  return { visao, aberto, filtros: filtrosDaConsulta(parametros, visao, mostrar), agrupar, mostrar, ordenacao }
+  const agruparLista = agruparDaLista(visao, lido)
+  return { visao, aberto, filtros: filtrosDaConsulta(parametros, visao, mostrar), agrupar, mostrar, ordenacao, agruparLista }
+}
+
+// Na Lista a chave `agrupar` é a da árvore; no Quadro, a de etapa, responsável e setor.
+function agruparDaLista(visao: VisaoDosProcessos, lido: string): AgruparListaPor {
+  return visao === 'lista' && lido === 'macroprocesso' ? 'macroprocesso' : 'nenhum'
 }
 
 // Coluna e sentido desconhecidos voltam ao padrão, cada um por si; o Quadro não se ordena.
@@ -112,13 +121,15 @@ function valorDoFiltroNoEndereco(
   return filtros[nome]
 }
 
-export function montarEnderecoDosProcessos({ mostrar = 'todos', ordenacao = ORDENACAO_PADRAO, ...resto }: EnderecoParaMontar): string {
+export function montarEnderecoDosProcessos(
+  { mostrar = 'todos', ordenacao = ORDENACAO_PADRAO, agruparLista = 'nenhum', ...resto }: EnderecoParaMontar,
+): string {
   const trechos = ['#/processos', resto.visao === 'lista' ? 'lista' : null, resto.aberto].filter((trecho) => trecho !== null)
-  const texto = consultaDoEndereco({ ...resto, mostrar, ordenacao }).toString()
+  const texto = consultaDoEndereco({ ...resto, mostrar, ordenacao, agruparLista }).toString()
   return trechos.join('/') + (texto ? `?${texto}` : '')
 }
 
-function consultaDoEndereco({ visao, filtros, agrupar, mostrar, ordenacao }: EnderecoDosProcessos): URLSearchParams {
+function consultaDoEndereco({ visao, filtros, agrupar, mostrar, ordenacao, agruparLista }: EnderecoDosProcessos): URLSearchParams {
   const consulta = new URLSearchParams()
   for (const nome of NOMES_DOS_FILTROS) {
     const valor = valorDoFiltroNoEndereco(nome, filtros, visao, mostrar)
@@ -127,6 +138,7 @@ function consultaDoEndereco({ visao, filtros, agrupar, mostrar, ordenacao }: End
   if (visao === 'quadro' && agrupar !== 'etapa') consulta.set('agrupar', agrupar)
   if (mostrar === 'concluidos' && ehPortfolio(visao, agrupar)) consulta.set('mostrar', 'concluidos')
   if (visao === 'lista') gravarOrdenacao(consulta, ordenacao)
+  if (visao === 'lista' && agruparLista === 'macroprocesso') consulta.set('agrupar', agruparLista)
   return consulta
 }
 
