@@ -1,6 +1,6 @@
 -- Andamento livre, etiqueta e responsável do processo (processos-etapas, ticket 24; ADR 0022): a etiqueta só muda na
 -- passagem aberta, preenche e esvazia concluido_em e fica fixa em Concluídos; uma só passagem aberta por processo; o
--- responsável é usuário ativo Administrador ou Integrante, com evento próprio; suspenso, cancelado e arquivado congelam
+-- responsável é usuário ativo Administrador ou Integrante, com evento próprio; suspenso e cancelado congelam
 -- os dois.
 begin;
 create extension if not exists pgtap with schema extensions;
@@ -84,7 +84,6 @@ select pg_temp.mover_sem_trava(pg_temp.processo(nome), pg_temp.etapa('modelagem'
 from unnest(array['Etiqueta', 'Responsavel', 'Suspenso', 'Cancelado']) as nome;
 select pg_temp.mover_sem_trava(pg_temp.processo(nome), pg_temp.etapa('concluidos'), null, null, 'Não será publicado')
 from unnest(array['Concluido', 'Arquivado']) as nome;
-select public.arquivar_processo(pg_temp.processo('Arquivado'));
 
 -- ===== Etiqueta =====
 insert into _tap (linha) select lives_ok($sql$select pg_temp.etiquetar('Etiqueta', 'concluido')$sql$,
@@ -158,7 +157,7 @@ set local role authenticated;
 insert into _tap (linha) select lives_ok($sql$update public.processos set observacoes = 'Outra' where id = pg_temp.processo('Responsavel')$sql$,
   'o responsável desativado depois continua no processo, e a edição é aceita');
 
--- ===== Suspenso, cancelado e arquivado congelam =====
+-- ===== Suspenso e cancelado congelam; o concluído segue as regras de Concluídos =====
 select public.suspender_processo(pg_temp.processo('Suspenso'), 'Aguardando o setor');
 select public.cancelar_processo(pg_temp.processo('Cancelado'), 'Desistiu');
 insert into _tap (linha) select throws_ok($sql$select pg_temp.etiquetar('Suspenso', 'em_andamento')$sql$,
@@ -170,9 +169,9 @@ insert into _tap (linha) select throws_ok($sql$select pg_temp.etiquetar('Cancela
 insert into _tap (linha) select throws_ok($sql$select pg_temp.responsavel('Cancelado', null)$sql$,
   'P0001', 'processo_parado:cancelado', 'o cancelado não muda o responsável');
 insert into _tap (linha) select throws_ok($sql$select pg_temp.etiquetar('Arquivado', 'em_andamento')$sql$,
-  'P0001', 'processo_arquivado', 'o arquivado não muda a etiqueta');
-insert into _tap (linha) select throws_ok($sql$select pg_temp.responsavel('Arquivado', null)$sql$,
-  'P0001', 'processo_arquivado', 'o arquivado não muda o responsável');
+  'P0001', 'etiqueta_fixa_em_concluidos', 'o concluído que estava arquivado tem a etiqueta fixa, como qualquer concluído');
+insert into _tap (linha) select lives_ok($sql$select pg_temp.responsavel('Arquivado', null)$sql$,
+  'o concluído que estava arquivado muda o responsável');
 insert into _tap (linha) select lives_ok($sql$select public.retomar_processo(pg_temp.processo('Suspenso'), 'Voltou')$sql$,
   'retomar o suspenso é aceito');
 insert into _tap (linha) select results_eq(

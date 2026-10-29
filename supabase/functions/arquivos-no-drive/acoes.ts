@@ -22,19 +22,18 @@ const API_DE_ENVIO = 'https://www.googleapis.com/upload/drive/v3/files'
 
 export interface ProcessoDoEnvio extends ProcessoDaPasta {
   situacao: string
-  arquivado_em: string | null
 }
 
-/** A regra do processo para o papel: o .pdf da aprovação vale também concluído (e nunca arquivado); os demais, só em andamento. */
-export function recusaDoProcesso(processo: Pick<ProcessoDoEnvio, 'situacao' | 'arquivado_em'>, papel: PapelDoArquivo): Recusa | null {
-  if (papel === 'pdf_da_aprovacao') return conferirProcessoDoPdf(processo.situacao, processo.arquivado_em !== null)
+/** A regra do processo para o papel: o .pdf da aprovação vale também concluído; os demais, só em andamento. */
+export function recusaDoProcesso(processo: Pick<ProcessoDoEnvio, 'situacao'>, papel: PapelDoArquivo): Recusa | null {
+  if (papel === 'pdf_da_aprovacao') return conferirProcessoDoPdf(processo.situacao)
   return conferirProcessoEmAndamento(processo.situacao)
 }
 
 export async function lerProcesso(contexto: ContextoDoDrive, id: string): Promise<ProcessoDoEnvio | null> {
   const { data, error } = await contexto.cliente
     .from('processos_com_andamento')
-    .select('id, nome, setor_id, setor_sigla, situacao, arquivado_em')
+    .select('id, nome, setor_id, setor_sigla, situacao')
     .eq('id', id)
     .maybeSingle()
   if (error) throw new Error(`leitura de processos_com_andamento falhou (código ${error.code}); esperado: processo visível`)

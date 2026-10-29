@@ -2,7 +2,6 @@ import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import type { EventoDoCadastro } from '../cadastros/tipos'
 import { CODIGO_DA_APROVACAO, CODIGO_DA_REVISAO_INTERNA, CODIGO_DA_VALIDACAO } from '../processos/codigosDasEtapas'
-import { conferirNaoArquivado } from '../processos/arquivamentoFalso'
 import { FRASE_SEM_VERSAO } from '../processos/frasesDaVersaoCompleta'
 import { etapasDoVersoDe } from '../processos/movimentoFalso'
 import { hojeLocal } from '../processos/textoDaModelagemPiloto'
@@ -87,12 +86,11 @@ export class RevisoesFalso implements ModuloDeRevisoes {
     return { ...aprovacao, pdf: this.versoes.pdfsDaAprovacao[processoId]?.atual ?? null }
   }
 
-  // Como o banco: a data só se grava com o processo na Validação com o setor, em andamento e não arquivado, e nunca no futuro;
+  // Como o banco: a data só se grava com o processo na Validação com o setor, em andamento, e nunca no futuro;
   // mudar a data (inclusive apagá-la) vira evento, e gravar a mesma não.
   async registrarDataDaValidacao(processoId: string, data: string | null): Promise<void> {
     await this.esperarAGravacao()
     const processo = this.processoPorId(processoId)
-    conferirNaoArquivado(processo)
     conferirProcessoEmAndamento(processo)
     if (processo.etapaAtual?.codigo !== CODIGO_DA_VALIDACAO) throw new TravaDoBanco(FRASE_DA_DATA_FORA_DA_VALIDACAO)
     if (data !== null && data > HOJE) throw new TravaDoBanco(FRASE_DA_DATA_DA_VALIDACAO_NO_FUTURO)
@@ -102,10 +100,9 @@ export class RevisoesFalso implements ModuloDeRevisoes {
     if (antes !== data) this.noHistorico(processo, eventoDaDataDaValidacao(processo, antes, data, this.usuario.nome, `${HOJE}T12:00:00Z`))
   }
 
-  // O que o .pdf confere (como a regra do editar a aprovação): processo em andamento ou concluído, não arquivado, com aprovação.
+  // O que o .pdf confere (como a regra do editar a aprovação): processo em andamento ou concluído, com aprovação.
   private versaoAprovadaParaOPdf(processoId: string): number {
     const processo = this.processoPorId(processoId)
-    conferirNaoArquivado(processo)
     conferirProcessoEmAndamento(processo)
     const aprovacao = this.aprovacoes[processoId]
     if (!aprovacao) throw new TravaDoBanco(FRASE_DO_PDF_SEM_APROVACAO)

@@ -1,5 +1,5 @@
 -- Registrar e corrigir a publicação (publicacao-e-arquivamento, ticket 04; ADR 0024): na Publicação e em Concluídos,
--- arquivado ou não, sem mover o processo; as recusas de etapa, data, link, situação e arquivado; os eventos; quem pode o
+-- sem mover o processo; as recusas de etapa, data, link e situação; os eventos; quem pode o
 -- quê. Mover para Concluídos com a data ou a explicação é do teste 52.
 begin;
 create extension if not exists pgtap with schema extensions;
@@ -98,9 +98,7 @@ select pg_temp.mover('Aprov', 'publicacao');
 select public.mover_processo(pg_temp.processo('Conc'), pg_temp.etapa('concluidos'), null, null, 'Não será publicado');
 select public.mover_processo(pg_temp.processo('Corrige'), pg_temp.etapa('concluidos'), pg_temp.hoje() - 2, 'https://diario.exemplo/a');
 select public.mover_processo(pg_temp.processo('Arq'), pg_temp.etapa('concluidos'), null, null, 'Não será publicado');
-select public.arquivar_processo(pg_temp.processo('Arq'));
 select public.mover_processo(pg_temp.processo('ArqPub'), pg_temp.etapa('concluidos'), pg_temp.hoje() - 2);
-select public.arquivar_processo(pg_temp.processo('ArqPub'));
 select public.mover_processo(pg_temp.processo('Move'), pg_temp.etapa('concluidos'), null, null, 'Não será publicado');
 
 -- ===== Registrar na Publicação =====
@@ -164,16 +162,16 @@ insert into _tap (linha) select throws_ok(
   $sql$select public.registrar_publicacao(pg_temp.processo('Susp'), pg_temp.hoje(), null)$sql$,
   'P0001', 'processo_parado:suspenso', 'o suspenso não registra a publicação');
 
--- ===== Arquivado =====
-insert into _tap (linha) select throws_ok(
+-- ===== Concluído que estava arquivado: registra e corrige como qualquer concluído =====
+insert into _tap (linha) select lives_ok(
   $sql$select public.registrar_publicacao(pg_temp.processo('ArqPub'), pg_temp.hoje(), null)$sql$,
-  'P0001', 'arquivado_ja_publicado', 'o arquivado com data não corrige a publicação');
+  'o concluído com data, que estava arquivado, corrige a publicação');
 insert into _tap (linha) select lives_ok(
   $sql$select public.registrar_publicacao(pg_temp.processo('Arq'), pg_temp.hoje() - 1, null)$sql$,
-  'o arquivado sem data registra a publicação');
+  'o concluído sem data, que estava arquivado, registra a publicação');
 insert into _tap (linha) select results_eq(
-  $sql$select arquivado_em is not null, sem_publicacao from public.processos_com_andamento where id = pg_temp.processo('Arq')$sql$,
-  $sql$values (true, false)$sql$, 'e continua arquivado');
+  $sql$select sem_publicacao from public.processos_com_andamento where id = pg_temp.processo('Arq')$sql$,
+  $sql$values (false)$sql$, 'e deixa de ser "sem publicação"');
 
 -- ===== O evento é o do movimento quando a data chega por mover_processo =====
 insert into _tap (linha) select is(

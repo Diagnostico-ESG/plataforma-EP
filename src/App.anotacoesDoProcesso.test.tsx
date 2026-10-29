@@ -106,15 +106,6 @@ test('a Consulta vê "Sem anotações." quando está vazio, sem a linha "Alterad
   expect(bloco.queryByText(/^Alterado/)).toBeNull()
 })
 
-test('o arquivado só se lê, com a linha "Alterado por"', async () => {
-  montarVerso(processoDasAnotacoes({ situacao: 'concluido', arquivadoEm: '2026-10-12T12:00:00Z' }), 'integrante_ep', [],
-    (falso) => { falso.anotacoes.porProcesso.p1 = DA_BIA })
-  const bloco = await blocoDasAnotacoes()
-  expect((await bloco.findByText(/Linha 1/)).textContent).toBe('Linha 1\nLinha 2')
-  expect(bloco.queryByRole('textbox')).toBeNull()
-  expect(bloco.getByText('Alterado por Bia Teste em 12/10, 12:05')).toBeTruthy()
-})
-
 test.each<SituacaoDoProcesso>(['suspenso', 'cancelado', 'concluido'])('no processo %s ainda se escreve e grava', async (situacao) => {
   const falso = montarVerso(processoDasAnotacoes({ situacao }))
   await digitarNasAnotacoes('Por que parou')

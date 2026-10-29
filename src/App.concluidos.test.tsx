@@ -1,4 +1,4 @@
-import { cleanup, screen, within } from '@testing-library/react'
+import { cleanup, fireEvent, screen, within } from '@testing-library/react'
 import { afterEach, expect, test } from 'vitest'
 import { USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import type { ProcessoLido } from './processos/tipos'
@@ -32,14 +32,23 @@ test('a coluna Concluídos fica no fim do Quadro, sempre, com a frase quando vaz
   expect(within(concluidos()).getByText('Nenhum processo concluído.')).toBeTruthy()
 })
 
-test('Concluídos traz os concluídos por nome, com os filtros do Quadro, e o arquivado fica de fora', async () => {
+test('Concluídos traz os concluídos por nome, com os filtros do Quadro, e o que saiu do Quadro fica de fora', async () => {
   window.location.hash = '#/processos?setor=s1'
   montar([
     concluido('Zeta'), concluido('alfa'), concluido('Outro Setor', { setorId: 's2', setorSigla: 'TSB' }),
-    concluido('Guardado', { arquivadoEm: '2026-10-20T12:00:00Z' }),
+    concluido('Guardado', { noQuadro: false, tiradoDoQuadroEm: '2026-10-20T12:00:00Z' }),
   ])
   await cartaoDe('Zeta')
   expect(nomesEm(concluidos())).toEqual(['alfa', 'Zeta'])
+})
+
+test('o concluído fora do Quadro aparece na Lista e o verso dele é o de qualquer concluído, sem Arquivar nem Desarquivar', async () => {
+  window.location.hash = '#/processos/lista'
+  montar([concluido('Antigo', { noQuadro: false, tiradoDoQuadroEm: '2026-10-20T12:00:00Z' })])
+  fireEvent.click((await screen.findAllByRole('cell', { name: 'TSA' }))[0])
+  await screen.findByRole('heading', { name: 'Antigo' })
+  expect(await screen.findByRole('button', { name: 'Corrigir publicação' })).toBeTruthy()
+  expect(screen.queryByRole('button', { name: /^(Arquivar|Desarquivar)$/ })).toBeNull()
 })
 
 test('o cartão de Concluídos mostra a etiqueta Finalizado e o responsável que moveu o processo até lá', async () => {

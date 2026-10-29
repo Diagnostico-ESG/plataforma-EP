@@ -25,13 +25,14 @@ test('o processo fica na coluna da etapa atual, inclusive em Não iniciados', ()
   expect(nomes('modelagem', processos)).toEqual(['Bia'])
 })
 
-test('a coluna Concluídos traz os concluídos não arquivados; o arquivado e o cancelado ficam só na Lista', () => {
+test('a coluna Concluídos traz os concluídos no Quadro; o tirado ou antigo e o cancelado ficam só na Lista', () => {
   const processos = [
     umProcesso('Zeta', { situacao: 'concluido' }, 'concluidos'), umProcesso('alfa', { situacao: 'concluido' }, 'concluidos'),
-    umProcesso('Guardado', { situacao: 'concluido', arquivadoEm: '2026-10-22T15:00:00+00:00' }, 'concluidos'),
+    umProcesso('Guardado', { situacao: 'concluido', noQuadro: false }, 'concluidos'),
+    umProcesso('SemInformacao', { situacao: 'concluido', noQuadro: undefined }, 'concluidos'),
     umProcesso('Desistido', { situacao: 'cancelado' }),
   ]
-  expect(nomes('concluidos', processos)).toEqual(['alfa', 'Zeta'])
+  expect(nomes('concluidos', processos)).toEqual(['alfa', 'SemInformacao', 'Zeta'])
   expect(colunas(processos).flatMap((coluna) => coluna.processos.map((processo) => processo.nome))).not.toContain('Desistido')
 })
 
@@ -78,10 +79,10 @@ describe('agrupado por responsável', () => {
     expect(colunasPorResponsavel([umProcesso('a', pessoa('u1', 'Ana', false))])[0].inativo).toBe(true)
   })
 
-  test('o arquivado e o cancelado ficam de fora', () => {
+  test('o concluído fora do Quadro e o cancelado ficam de fora', () => {
     const resultado = colunasPorResponsavel([
       umProcesso('a', { ...pessoa('u1', 'Ana'), situacao: 'cancelado' }),
-      umProcesso('b', { ...pessoa('u1', 'Ana'), situacao: 'concluido', arquivadoEm: '2026-10-22T15:00:00+00:00' }, 'concluidos'),
+      umProcesso('b', { ...pessoa('u1', 'Ana'), situacao: 'concluido', noQuadro: false }, 'concluidos'),
     ])
     expect(resultado).toEqual([])
   })
@@ -118,10 +119,10 @@ describe('agrupado por setor', () => {
     expect(resultado.map((coluna) => coluna.titulo)).toEqual(['MNO', 'XPT', 'abc', 'TSA'])
   })
 
-  test('o arquivado e o cancelado ficam de fora, e o setor inativo só com eles não tem coluna', () => {
+  test('o concluído fora do Quadro e o cancelado ficam de fora, e o setor inativo só com eles não tem coluna', () => {
     const resultado = colunasPorSetor([TSA, VELHO], [
       doSetor('Desistido', VELHO, { situacao: 'cancelado' }),
-      doSetor('Guardado', TSA, { situacao: 'concluido', arquivadoEm: '2026-10-22T15:00:00+00:00' }),
+      doSetor('Guardado', TSA, { situacao: 'concluido', noQuadro: false }),
     ], null)
     expect(resultado.map((coluna) => [coluna.titulo, coluna.processos.length])).toEqual([['TSA', 0]])
   })

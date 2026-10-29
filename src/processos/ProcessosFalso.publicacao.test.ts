@@ -65,13 +65,14 @@ describe('registrar publicação', () => {
     expect(await recusa(modulo.registrarPublicacao('p1', '2026-10-10', null))).toContain('Este processo está suspenso')
   })
 
-  test('o arquivado com data não corrige; sem data registra e continua arquivado', async () => {
-    const arquivado = '2026-10-20T12:00:00Z'
-    const comData = falso('concluidos', { ...CONCLUIDO, arquivadoEm: arquivado, publicadoEm: '2026-10-05' })
-    expect(await recusa(comData.registrarPublicacao('p1', '2026-10-06', null))).toBe('O processo arquivado já tem a publicação registrada.')
-    const semData = falso('concluidos', { ...CONCLUIDO, arquivadoEm: arquivado, explicacaoSemPublicacao: 'Não será publicado' })
+  test('o concluído fora do Quadro corrige a publicação e registra sem data, como qualquer concluído', async () => {
+    const tirado = '2026-10-20T12:00:00Z'
+    const comData = falso('concluidos', { ...CONCLUIDO, noQuadro: false, tiradoDoQuadroEm: tirado, publicadoEm: '2026-10-05' })
+    await comData.registrarPublicacao('p1', '2026-10-06', null)
+    expect(await lido(comData)).toMatchObject({ publicadoEm: '2026-10-06', noQuadro: false })
+    const semData = falso('concluidos', { ...CONCLUIDO, noQuadro: false, tiradoDoQuadroEm: tirado, explicacaoSemPublicacao: 'Não será publicado' })
     await semData.registrarPublicacao('p1', '2026-10-06', null)
-    expect(await lido(semData)).toMatchObject({ publicadoEm: '2026-10-06', arquivadoEm: arquivado })
+    expect(await lido(semData)).toMatchObject({ publicadoEm: '2026-10-06', tiradoDoQuadroEm: tirado })
   })
 
   test('a falha programada deixa o processo como estava', async () => {

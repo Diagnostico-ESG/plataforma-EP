@@ -1,11 +1,10 @@
 import type { EtapaDoCatalogo, ProcessoDaLista } from './tipos'
 
 /**
- * Só o cartão de processo em andamento ou concluído, não arquivado, se arrasta (spec, "Arrastar"). Suspenso, cancelado e
- * arquivado ficam parados; quem não altera e o Quadro agrupado por responsável também não arrastam (a tela decide).
+ * Só o cartão de processo em andamento ou concluído se arrasta (spec, "Arrastar"). Suspenso e cancelado ficam parados; quem não altera e o Quadro agrupado por responsável também não arrastam (a tela decide).
  */
-export function podeArrastar(processo: Pick<ProcessoDaLista, 'situacao' | 'etapaAtual' | 'arquivadoEm'>): boolean {
-  if (processo.arquivadoEm || processo.etapaAtual === null) return false
+export function podeArrastar(processo: Pick<ProcessoDaLista, 'situacao' | 'etapaAtual'>): boolean {
+  if (processo.etapaAtual === null) return false
   return processo.situacao === 'em_andamento' || processo.situacao === 'concluido'
 }
 

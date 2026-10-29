@@ -142,7 +142,7 @@ function ProcessoAberto(props: ProcessoAbertoProps) {
     aoFechar()
   }
   const acoes = (
-    <AcoesDoProcesso processo={processo} processos={processos} podeAlterar={podeAlterar && !processo.arquivadoEm} executar={executar}
+    <AcoesDoProcesso processo={processo} processos={processos} podeAlterar={podeAlterar} executar={executar}
       aoAbrirHistorico={() => props.saida.sair(() => aoMudarModo('historico'))}
       aoEditar={() => props.saida.sair(() => aoMudarModo('editar'))} aoExcluir={aposExcluir}
       aoMudar={aposMudar} />
@@ -203,8 +203,6 @@ function EdicaoDoProcesso({ processo, processos, cadastros, aoVoltar, aposMudar,
 /** Trabalho à esquerda (etapas e arquivos), contexto à direita (Data da modelagem piloto, dados e estrutura). */
 function ColunasDoVerso(props: CorpoProps) {
   const { processo, processos, versoes, revisoes, podeAlterar, usuarioId, executar, aposMudar, aoSumir, enderecoDoProcesso } = props
-  // O arquivado não aceita alteração além das do Agora (Desarquivar, Registrar publicação), que recebe o perfil inteiro.
-  const alteravel = podeAlterar && !processo.arquivadoEm
   const registros = useRegistrosDoProcesso(revisoes, processo.id, processo.etapaAtual?.id)
   // A versão aprovada ganha o selo "Aprovada": registrar ou trocar a aprovação refaz a leitura das versões.
   const versaoAprovada = registros.aprovacao.tipo === 'pronto' ? registros.aprovacao.valor?.versao ?? 0 : 0
@@ -213,13 +211,13 @@ function ColunasDoVerso(props: CorpoProps) {
       <div className="verso-trabalho">
         <CaminhoDoProcesso processo={processo} processos={processos} versoes={versoes} revisoes={revisoes} registros={registros} podeAlterar={podeAlterar} usuarioId={usuarioId}
           executar={executar} aoSumir={aoSumir} aoMudar={aposMudar} />
-        <SecaoDeVersoes key={versaoAprovada} versoes={versoes} processo={processo} podeAlterar={alteravel} aoAlterarVersoes={aposMudar} />
-        <SecaoDeAnexos versoes={versoes} processo={processo} podeAlterar={alteravel} />
+        <SecaoDeVersoes key={versaoAprovada} versoes={versoes} processo={processo} podeAlterar={podeAlterar} aoAlterarVersoes={aposMudar} />
+        <SecaoDeAnexos versoes={versoes} processo={processo} podeAlterar={podeAlterar} />
       </div>
       <div className="verso-contexto">
-        <BlocoDasAnotacoes key={processo.id} processo={processo} processos={processos} podeEscrever={alteravel}
+        <BlocoDasAnotacoes key={processo.id} processo={processo} processos={processos} podeEscrever={podeAlterar}
           guardaRef={props.saida.guarda} aoSumir={aoSumir} />
-        <DataDaModelagemPiloto processo={processo} processos={processos} podeAlterar={alteravel} aoMudar={aposMudar}
+        <DataDaModelagemPiloto processo={processo} processos={processos} podeAlterar={podeAlterar} aoMudar={aposMudar}
           aoSumir={aoSumir} />
         <SobreDoProcesso processo={processo} />
         <EstruturaDoProcesso processo={processo} enderecoDoProcesso={enderecoDoProcesso}

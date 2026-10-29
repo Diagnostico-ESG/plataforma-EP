@@ -37,7 +37,7 @@ test('lista os processos por nome e as etapas na ordem do cat√°logo, com a posi√
       etiqueta: 'em_andamento', entrouNaEtapaEm: '2026-10-01',
       responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null },
       cartao: { responsavelAtivo: null, ultimaVersao: null, subprocessos: 0 },
-      arquivos: { versaoPiloto: false, versaoEmSequencia: false, relatorioNumerado: false },
+      arquivos: { versaoPiloto: false, versaoEmSequencia: false, relatorioNumerado: false }, noQuadro: true,
     }],
     setores: [],
   })

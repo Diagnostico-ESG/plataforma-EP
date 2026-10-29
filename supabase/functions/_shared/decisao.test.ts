@@ -314,15 +314,11 @@ describe('validarIniciarEnvio: o .pdf da aprovação', () => {
 
 describe('conferirProcessoDoPdf', () => {
   it('aceita o processo em andamento e o concluído, como o editar a aprovação', () => {
-    expect(conferirProcessoDoPdf('em_andamento', false)).toBeNull()
-    expect(conferirProcessoDoPdf('concluido', false)).toBeNull()
+    expect(conferirProcessoDoPdf('em_andamento')).toBeNull()
+    expect(conferirProcessoDoPdf('concluido')).toBeNull()
   })
 
   it.each(['suspenso', 'cancelado'])('recusa o processo %s', (situacao) => {
-    expect(conferirProcessoDoPdf(situacao, false)?.codigo).toBe('processo_fora_de_andamento')
-  })
-
-  it('recusa o processo arquivado, mesmo concluído', () => {
-    expect(conferirProcessoDoPdf('concluido', true)?.codigo).toBe('processo_fora_de_andamento')
+    expect(conferirProcessoDoPdf(situacao)?.codigo).toBe('processo_fora_de_andamento')
   })
 })

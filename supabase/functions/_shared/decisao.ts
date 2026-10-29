@@ -120,10 +120,10 @@ export function conferirProcessoEmAndamento(situacao: string): Recusa | null {
   return situacao === 'em_andamento' ? null : recusar('processo_fora_de_andamento')
 }
 
-/** O .pdf da aprovação segue a regra do editar a aprovação: processo em andamento ou concluído, não arquivado. */
-export function conferirProcessoDoPdf(situacao: string, arquivado: boolean): Recusa | null {
+/** O .pdf da aprovação segue a regra do editar a aprovação: processo em andamento ou concluído. */
+export function conferirProcessoDoPdf(situacao: string): Recusa | null {
   const aceita = situacao === 'em_andamento' || situacao === 'concluido'
-  return aceita && !arquivado ? null : recusar('processo_fora_de_andamento')
+  return aceita ? null : recusar('processo_fora_de_andamento')
 }
 
 export function extensaoDoNome(nome: string): string {

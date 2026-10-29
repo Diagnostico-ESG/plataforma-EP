@@ -51,7 +51,7 @@ export class VersoesFalso implements ModuloDeVersoes {
   /** Os .pdfs da aprovação, por processo (o histórico baixa os guardados). */
   pdfsDaAprovacao: Record<string, PdfsDaAprovacao> = {}
   /**
-   * Quem liga a falsa de revisões: confere como o banco que o processo aceita o .pdf (andamento ou concluído, não arquivado) e
+   * Quem liga a falsa de revisões: confere como o banco que o processo aceita o .pdf (andamento ou concluído) e
    * que a aprovação existe, e devolve o número da versão aprovada. Sem ela, o .pdf da aprovação não está disponível.
    */
   conferirAprovacaoDoPdf: ((processoId: string) => number) | null = null

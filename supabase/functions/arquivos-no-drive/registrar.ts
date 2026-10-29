@@ -20,13 +20,12 @@ import { responderRecusa } from './respostas.ts'
 
 interface SituacaoDoProcesso {
   situacao: string
-  arquivado_em: string | null
 }
 
 async function lerSituacao(contexto: ContextoDoDrive, processoId: string): Promise<SituacaoDoProcesso | null> {
   const { data, error } = await contexto.cliente
     .from('processos_com_andamento')
-    .select('situacao, arquivado_em')
+    .select('situacao')
     .eq('id', processoId)
     .maybeSingle()
   if (error) throw new Error(`leitura de processos_com_andamento falhou (código ${error.code}); esperado: processo visível`)

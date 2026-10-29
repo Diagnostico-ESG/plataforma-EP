@@ -17,14 +17,14 @@ import './Anexos.css'
 type SecaoDeAnexosProps = {
   versoes: ModuloDeVersoes
   processo: ProcessoLido
-  /** Administrador ou Integrante (e processo não arquivado); quem recusa é a função do servidor e o banco. */
+  /** Administrador ou Integrante; quem recusa é a função do servidor e o banco. */
   podeAlterar: boolean
 }
 
 /**
  * Seção "Outros anexos" do verso, abaixo dos arquivos das versões, em todas as etapas e para todo perfil: os arquivos avulsos
  * do processo, do mais recente ao mais antigo. [Enviar anexo] só para quem altera, com o processo em andamento (suspenso,
- * cancelado, concluído e arquivado só leem e baixam), e [Retirar] em cada linha para os mesmos. Esconder os botões é conveniência.
+ * cancelado e concluído só leem e baixam), e [Retirar] em cada linha para os mesmos. Esconder os botões é conveniência.
  */
 export function SecaoDeAnexos({ versoes, processo, podeAlterar }: SecaoDeAnexosProps) {
   const modulo = versoes.anexos

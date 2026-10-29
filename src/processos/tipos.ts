@@ -92,8 +92,13 @@ export type ProcessoDaLista = {
   linkDaPublicacao?: string | null
   /** Por que o processo foi concluído sem publicação; null com a data da publicação ou fora de Concluídos. Opcional pelo mesmo motivo. */
   explicacaoSemPublicacao?: string | null
-  /** Quando o processo concluído foi arquivado (data e hora); null fora do arquivo. Opcional pelo mesmo motivo. */
-  arquivadoEm?: string | null
+  /** Quando o concluído foi tirado do Quadro (data e hora); null se nunca foi. Opcional pelo mesmo motivo. */
+  tiradoDoQuadroEm?: string | null
+  /**
+   * Falso: o concluído saiu da coluna Concluídos do Quadro (tirado, ou com mais de 30 dias lá). Ausente vale verdadeiro.
+   * Opcional pelo mesmo motivo.
+   */
+  noQuadro?: boolean
 }
 
 /** Um setor como o Quadro agrupado por setor o mostra: as colunas saem daqui, inclusive as vazias. */
@@ -196,7 +201,7 @@ export type ModuloDeProcessos = {
   lerAnotacoes(id: string): Promise<AnotacoesLidas | null>
   /**
    * Grava se o texto no banco ainda é `esperado` (o que a pessoa tinha ao começar a escrever; null: nenhum). Perfil e
-   * processo arquivado chegam como TravaDoBanco; processo excluído, como CadastroInexistente; o conflito não é erro.
+   * processo parado chegam como TravaDoBanco; processo excluído, como CadastroInexistente; o conflito não é erro.
    */
   gravarAnotacoes(id: string, esperado: string | null, novo: string | null): Promise<ResultadoDaGravacaoDasAnotacoes>
   /** Do mais recente para o mais antigo. */
@@ -215,12 +220,9 @@ export type ModuloDeProcessos = {
   suspenderProcesso(id: string, motivo: string): Promise<void>
   cancelarProcesso(id: string, motivo: string): Promise<void>
   retomarProcesso(id: string, motivo: string): Promise<void>
-  /** O concluído, o suspenso e o cancelado, não arquivados; o arquivado sai do Quadro e só aceita registrar a publicação e desarquivar. */
-  arquivar(id: string): Promise<void>
-  desarquivar(id: string): Promise<void>
   /**
    * Registra a data da publicação (com o link, se houver) ou, já registrada, a corrige; o processo fica onde está. Vale na
-   * Publicação e em Concluídos; no arquivado, só sem data. A data não é futura nem anterior à aprovação.
+   * Publicação e em Concluídos. A data não é futura nem anterior à aprovação.
    */
   registrarPublicacao(id: string, data: string, link: string | null): Promise<void>
   /** Muda o tipo com motivo, mantendo o mesmo item; ao virar subprocesso, ele passa ao macroprocesso do pai. */

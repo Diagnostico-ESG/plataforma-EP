@@ -9,7 +9,7 @@ const VAZIA: LinhaDoProcesso = {
   contexto: null, criado_em: null, motivo_da_situacao: null, observacoes: null, origem: 'novo',
   responsavel_ativo: null, etiqueta: null, entrou_na_etapa_em: null, etapa_atual_posicao: null,
   ultima_versao_numero: null, ultima_versao_historica: null, ultima_versao_tem_relatorio: null, subprocessos_quantidade: 0,
-  publicado_em: null, link_da_publicacao: null, sem_publicacao: null, arquivado_em: null, explicacao_sem_publicacao: null,
+  publicado_em: null, link_da_publicacao: null, sem_publicacao: null, tirado_do_quadro_em: null, no_quadro: null, explicacao_sem_publicacao: null,
   tem_versao_piloto: null, tem_versao_em_sequencia: null, tem_relatorio_numerado: null, data_da_validacao: null, setor_cor: null,
 }
 
@@ -24,10 +24,14 @@ test('traduz o link da publicação e a explicação de concluir sem publicaçã
   expect(processoDaLinha(VAZIA, 8)).toMatchObject({ linkDaPublicacao: null, explicacaoSemPublicacao: null })
 })
 
-test('traduz a marca de arquivado', () => {
-  expect(processoDaLinha({ ...VAZIA, arquivado_em: '2026-10-22T15:00:00+00:00' }, 8))
-    .toMatchObject({ arquivadoEm: '2026-10-22T15:00:00+00:00' })
-  expect(processoDaLinha(VAZIA, 8)).toMatchObject({ arquivadoEm: null })
+test('traduz a marca de tirado do Quadro e se está no Quadro', () => {
+  expect(processoDaLinha({ ...VAZIA, tirado_do_quadro_em: '2026-10-01T10:00:00Z', no_quadro: false }, 8))
+    .toMatchObject({ tiradoDoQuadroEm: '2026-10-01T10:00:00Z', noQuadro: false })
+  expect(processoDaLinha({ ...VAZIA, no_quadro: true }, 8)).toMatchObject({ tiradoDoQuadroEm: null, noQuadro: true })
+})
+
+test('a linha sem a informação de Quadro vale como no Quadro', () => {
+  expect(processoDaLinha(VAZIA, 8)).toMatchObject({ noQuadro: true })
 })
 
 test('traduz a etapa atual com a posição e o total, a etiqueta e o responsável do processo', () => {

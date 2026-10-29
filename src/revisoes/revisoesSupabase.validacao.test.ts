@@ -25,7 +25,6 @@ test('registrarDataDaValidacao chama a função do banco com o processo e a data
 test.each([
   ['data_so_na_validacao', 'Registre a data da validação com o processo na Validação com o setor.'],
   ['data_no_futuro:2026-10-20', 'A data da validação não pode ser futura.'],
-  ['processo_arquivado', 'Este processo está arquivado; desarquive-o para alterar.'],
   ['data_da_validacao_so_pela_funcao', 'A data da validação só muda pelo campo do Agora.'],
 ])('a recusa %s do banco ao registrar a data vira a frase pronta', async (motivo, frase) => {
   const cliente = new ClienteSupabaseFalso()

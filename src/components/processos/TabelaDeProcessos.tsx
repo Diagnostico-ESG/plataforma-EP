@@ -1,7 +1,6 @@
 import type { LinhaDaLista } from '../../processos/linhasDaLista'
 import { ROTULO_DO_TIPO } from '../../processos/rotulos'
 import { LinhaFantasma } from '../cadastros/PecasDaLista'
-import { Pilula } from '../Pilula'
 import { SeloDoSetor } from '../SeloDoSetor'
 import { BarraDeProgresso } from './BarraDeProgresso'
 import { NomeComTrecho } from './NomeComTrecho'
@@ -68,7 +67,6 @@ function LinhaDoProcesso({ linha, escolhida, aoAbrir, busca }: LinhaDoProcessoPr
       <td>
         <span className="lista-situacao">
           <PilulaDaSituacao situacao={linha.situacao} />
-          {linha.arquivadoEm && <Pilula situacao="neutra">Arquivado</Pilula>}
         </span>
       </td>
     </tr>

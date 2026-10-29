@@ -9,7 +9,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(47);
+insert into _tap (linha) select plan(46);
 
 -- Trava de arquivos (ticket 11): este teste monta o cenário e não prova a trava (ela é do 59), então move sem ela. A
 -- função desliga, só durante o movimento e com o dono do banco, as etapas com trava que ficam antes do destino.
@@ -210,9 +210,6 @@ insert into _tap (linha) select throws_ok($sql$select pg_temp.revisar('Cancelado
 select pg_temp.mover_sem_trava(pg_temp.processo('Concluido'), (select id from public.etapas where codigo = 'concluidos'), null, null, 'Sem divulgação');
 insert into _tap (linha) select throws_ok($sql$select pg_temp.revisar('Concluido', 'sem_alteracao')$sql$, 'P0001', 'revisao_fora_da_etapa',
   'processo concluído recusa a revisão');
-select public.arquivar_processo(pg_temp.processo('Concluido'));
-insert into _tap (linha) select throws_ok($sql$select pg_temp.revisar('Concluido', 'sem_alteracao')$sql$, 'P0001', 'processo_arquivado',
-  'processo arquivado recusa a revisão');
 select pg_temp.mover('Etapa Errada', 'revisao_setor');
 insert into _tap (linha) select throws_ok($sql$select pg_temp.revisar('Etapa Errada', 'sem_alteracao')$sql$, 'P0001', 'revisao_fora_da_etapa',
   'revisão com o processo fora da Revisão interna é recusada');

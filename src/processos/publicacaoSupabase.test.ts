@@ -32,7 +32,6 @@ test('sem link, o parâmetro não vai', async () => {
 test('as recusas do banco chegam como TravaDoBanco com a frase pronta', async () => {
   const frases: [string, string][] = [
     ['publicacao_fora_da_etapa', 'Registre a publicação com o processo na Publicação ou em Concluídos.'],
-    ['arquivado_ja_publicado', 'O processo arquivado já tem a publicação registrada.'],
     ['data_da_publicacao_obrigatoria', 'Informe a data da publicação.'],
     ['publicacao_antes_da_aprovacao:2026-10-01:2026-10-05', 'A data da publicação 01/10/2026 é anterior à aprovação, em 05/10/2026.'],
     ['link_invalido', 'O link do E-protocolo precisa começar com http:// ou https://.'],

@@ -350,7 +350,7 @@ td .barra-etapa {
   font-size: var(--tam-rotulo);
 }
 
-/* A situação e, no arquivado, o selo "Arquivado" lado a lado, quebrando quando a coluna é estreita. */
+/* A situação (e o que mais vier ao lado) lado a lado, quebrando quando a coluna é estreita. */
 .lista-situacao {
   display: inline-flex;
   flex-wrap: wrap;

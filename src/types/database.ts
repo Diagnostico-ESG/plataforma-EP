@@ -585,7 +585,6 @@ export type Database = {
           anotacoes: string | null
           anotacoes_alteradas_em: string | null
           anotacoes_alteradas_por: string | null
-          arquivado_em: string | null
           contexto: string | null
           criado_em: string
           data_da_modelagem_piloto: string | null
@@ -605,12 +604,12 @@ export type Database = {
           setor_id: string
           situacao: Database["public"]["Enums"]["situacao_guardada"]
           tipo: Database["public"]["Enums"]["tipo_de_processo"]
+          tirado_do_quadro_em: string | null
         }
         Insert: {
           anotacoes?: string | null
           anotacoes_alteradas_em?: string | null
           anotacoes_alteradas_por?: string | null
-          arquivado_em?: string | null
           contexto?: string | null
           criado_em?: string
           data_da_modelagem_piloto?: string | null
@@ -630,12 +629,12 @@ export type Database = {
           setor_id: string
           situacao?: Database["public"]["Enums"]["situacao_guardada"]
           tipo?: Database["public"]["Enums"]["tipo_de_processo"]
+          tirado_do_quadro_em?: string | null
         }
         Update: {
           anotacoes?: string | null
           anotacoes_alteradas_em?: string | null
           anotacoes_alteradas_por?: string | null
-          arquivado_em?: string | null
           contexto?: string | null
           criado_em?: string
           data_da_modelagem_piloto?: string | null
@@ -655,6 +654,7 @@ export type Database = {
           setor_id?: string
           situacao?: Database["public"]["Enums"]["situacao_guardada"]
           tipo?: Database["public"]["Enums"]["tipo_de_processo"]
+          tirado_do_quadro_em?: string | null
         }
         Relationships: [
           {
@@ -982,7 +982,6 @@ export type Database = {
     Views: {
       processos_com_andamento: {
         Row: {
-          arquivado_em: string | null
           contexto: string | null
           criado_em: string | null
           data_da_modelagem_piloto: string | null
@@ -1000,6 +999,7 @@ export type Database = {
           macroprocesso_id: string | null
           macroprocesso_nome: string | null
           motivo_da_situacao: string | null
+          no_quadro: boolean | null
           nome: string | null
           observacoes: string | null
           origem: Database["public"]["Enums"]["origem_do_processo"] | null
@@ -1022,6 +1022,7 @@ export type Database = {
           tem_versao_em_sequencia: boolean | null
           tem_versao_piloto: boolean | null
           tipo: Database["public"]["Enums"]["tipo_de_processo"] | null
+          tirado_do_quadro_em: string | null
           ultima_versao_historica: boolean | null
           ultima_versao_numero: number | null
           ultima_versao_tem_relatorio: boolean | null
@@ -1107,12 +1108,10 @@ export type Database = {
         }
         Returns: string
       }
-      arquivar_processo: { Args: { p_processo: string }; Returns: undefined }
       cancelar_processo: {
         Args: { p_motivo: string; p_processo: string }
         Returns: undefined
       }
-      desarquivar_processo: { Args: { p_processo: string }; Returns: undefined }
       editar_numero_da_versao: {
         Args: {
           p_numero_esperado: number

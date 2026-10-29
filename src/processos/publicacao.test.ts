@@ -36,9 +36,9 @@ test('registrar ou corrigir: na Publicação e em Concluídos, não nas outras e
   expect(acaoDaPublicacao(umProcesso('Emitir Ofício', {}, 'aprovacao_setor'))).toBeNull()
 })
 
-test('o suspenso e o cancelado não registram; o arquivado só registra, e só sem a data', () => {
+test('o suspenso e o cancelado não registram; o concluído fora do Quadro registra e corrige como qualquer concluído', () => {
   expect(acaoDaPublicacao(umProcesso('Emitir Ofício', { situacao: 'suspenso' }, 'publicacao'))).toBeNull()
   expect(acaoDaPublicacao(umProcesso('Emitir Ofício', { situacao: 'cancelado' }, 'publicacao'))).toBeNull()
-  expect(acaoDaPublicacao(concluido({ arquivadoEm: '2026-10-20T12:00:00Z' }))).toBe('registrar')
-  expect(acaoDaPublicacao(concluido({ arquivadoEm: '2026-10-20T12:00:00Z', publicadoEm: '2026-10-05' }))).toBeNull()
+  expect(acaoDaPublicacao(concluido({ noQuadro: false }))).toBe('registrar')
+  expect(acaoDaPublicacao(concluido({ noQuadro: false, publicadoEm: '2026-10-05' }))).toBe('corrigir')
 })

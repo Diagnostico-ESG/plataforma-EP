@@ -3,7 +3,7 @@ import type { ClienteSupabase } from '../lib/supabase'
 import { falhaDoBanco } from './recusasDoBanco'
 import type { ModuloDeProcessos } from './tipos'
 
-// A função do banco confere a etapa, a situação, a data, o link e o arquivado; as recusas chegam de fora (as de processos).
+// A função do banco confere a etapa, a situação, a data e o link; as recusas chegam de fora (as de processos).
 export function criarPublicacaoSupabase(
   cliente: ClienteSupabase, recusas: RecusasDoModulo,
 ): Pick<ModuloDeProcessos, 'registrarPublicacao'> {

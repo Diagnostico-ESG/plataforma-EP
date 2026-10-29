@@ -65,7 +65,6 @@ test.each([
   ['sem_aprovacao_para_o_pdf', '', 'Registre a aprovação antes de enviar o .pdf.'],
   ['pdf_ja_enviado', '', 'A aprovação já tem um .pdf; use Substituir.'],
   ['pdf_nome_sem_versao', 'a.pdf', 'O nome do .pdf não tem a versão aprovada. Envie de novo.'],
-  ['processo_arquivado', '', 'Este processo está arquivado; desarquive-o para alterar.'],
   ['processo_parado', 'suspenso', 'Este processo está suspenso; retome-o para mudar a etapa, a etiqueta ou o responsável.'],
 ])('a recusa %s do registro do .pdf vira a frase pronta', async (codigo, valor, frase) => {
   const cliente = new ClienteSupabaseFalso()

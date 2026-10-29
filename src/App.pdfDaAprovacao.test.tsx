@@ -7,7 +7,7 @@ import { aprovadaComPdf, arquivoPdf, ligarHistoricoDasVersoes } from './testes/p
 
 // O .pdf protocolado da aprovação (ticket 06 de revisoes-aprovacao, histórias 54 a 62): enviado junto com o registro da
 // aprovação ou depois, na gaveta; substituído com a confirmação; guardado quando a aprovação é trocada; com as marcas da
-// conferência; sem botões para a Consulta e para o processo arquivado.
+// conferência; sem botões para a Consulta e para o processo suspenso.
 
 afterEach(() => {
   cleanup()
@@ -175,8 +175,8 @@ test('a Consulta sem .pdf lê que ele não foi enviado, sem botão', async () =>
   expect(gaveta.queryByRole('button', { name: /Substituir|Enviar/ })).toBeNull()
 })
 
-test('o processo arquivado mostra o .pdf sem botões', async () => {
-  montar(versao(), { ajustar: aprovadaComPdf(true), mudancas: { arquivadoEm: '2026-10-12T10:00:00Z', situacao: 'concluido' } })
+test('o processo suspenso mostra o .pdf sem botões', async () => {
+  montar(versao(), { ajustar: aprovadaComPdf(true), mudancas: { situacao: 'suspenso' } })
   const gaveta = await gavetaDaEtapa(APROVACAO)
   expect(await gaveta.findByRole('link', { name: NOME_DO_PDF })).toBeTruthy()
   expect(gaveta.queryByRole('button', { name: /Substituir|Enviar/ })).toBeNull()

@@ -8,14 +8,14 @@ describe('podeArrastar', () => {
     expect(podeArrastar(umProcesso('A', {}, 'nao_iniciados'))).toBe(true)
   })
 
-  test('o concluído não arquivado arrasta (para sair de Concluídos)', () => {
+  test('o concluído arrasta (para sair de Concluídos), esteja ou não no Quadro', () => {
     expect(podeArrastar(umProcesso('A', { situacao: 'concluido' }, 'concluidos'))).toBe(true)
+    expect(podeArrastar(umProcesso('A', { situacao: 'concluido', noQuadro: false }, 'concluidos'))).toBe(true)
   })
 
-  test('suspenso, cancelado e arquivado não arrastam', () => {
+  test('suspenso e cancelado não arrastam', () => {
     expect(podeArrastar(umProcesso('A', { situacao: 'suspenso' }))).toBe(false)
     expect(podeArrastar(umProcesso('A', { situacao: 'cancelado' }))).toBe(false)
-    expect(podeArrastar(umProcesso('A', { situacao: 'concluido', arquivadoEm: '2026-10-20T12:00:00Z' }, 'concluidos'))).toBe(false)
   })
 
   test('sem etapa atual não há o que arrastar', () => {

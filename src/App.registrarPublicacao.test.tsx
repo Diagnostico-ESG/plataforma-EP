@@ -7,8 +7,8 @@ import { montar } from './testes/aprovacaoNoVerso'
 import { agoraDoVerso } from './testes/versoDoCartao'
 
 // Registrar e corrigir a publicação (ticket 04 de publicacao-e-arquivamento, histórias 52 a 55, 57 e 63): o botão na
-// Publicação, em Concluídos sem publicação e no arquivado sem data; a janela com a Data e o Link; o modo Corrigir
-// publicação, preenchido, fora do arquivado; as recusas em vermelho sem perder o preenchido; a Consulta sem botões.
+// Publicação e em Concluídos (inclusive o que saiu do Quadro); a janela com a Data e o Link; o modo Corrigir publicação,
+// preenchido; as recusas em vermelho sem perder o preenchido; a Consulta sem botões.
 
 afterEach(() => {
   cleanup()
@@ -21,9 +21,9 @@ const SEM_PUBLICACAO: Partial<ProcessoLido> = {
 const PUBLICADO: Partial<ProcessoLido> = {
   situacao: 'concluido', etiqueta: 'concluido', publicadoEm: '2026-10-05', linkDaPublicacao: 'https://diario.exemplo/1',
 }
-const ARQUIVADO = { arquivadoEm: '2026-10-12T12:00:00Z' }
-// Os botões da publicação e do arquivamento; Trocar e Assumir (o responsável) não entram na conta.
-const DA_PUBLICACAO = ['Registrar publicação', 'Corrigir publicação', 'Arquivar', 'Desarquivar']
+const FORA_DO_QUADRO = { noQuadro: false, tiradoDoQuadroEm: '2026-10-12T12:00:00Z' }
+// Os botões da publicação; Trocar e Assumir (o responsável) não entram na conta.
+const DA_PUBLICACAO = ['Registrar publicação', 'Corrigir publicação']
 const botoesDoAgora = async () => (await agoraDoVerso()).getAllByRole('button')
   .map((botao) => botao.textContent ?? '').filter((nome) => DA_PUBLICACAO.includes(nome))
 const janela = async (nome: string) => within(await screen.findByRole('dialog', { name: nome }))
@@ -46,12 +46,11 @@ test('na Publicação, [Registrar publicação] abre a janela com hoje e grava a
   expect((await agoraDoVerso()).getByText('Agora · etapa 7 de 8')).toBeTruthy()
 })
 
-test('em Concluídos sem publicação: a explicação no Agora, [Registrar publicação] e [Arquivar] como principal', async () => {
+test('em Concluídos sem publicação: a explicação no Agora e [Registrar publicação]', async () => {
   montar(null, { etapa: 'concluidos', mudancas: SEM_PUBLICACAO })
   const agora = await agoraDoVerso()
   expect(await agora.findByText('Concluído sem publicação: Não será divulgado')).toBeTruthy()
-  expect(await botoesDoAgora()).toEqual(['Registrar publicação', 'Arquivar'])
-  expect(agora.getByRole('button', { name: 'Arquivar' }).classList.contains('botao-principal')).toBe(true)
+  expect(await botoesDoAgora()).toEqual(['Registrar publicação'])
 })
 
 test('registrar em Concluídos troca a explicação pela linha "Concluído · Publicado em" e o botão vira [Corrigir publicação]', async () => {
@@ -60,7 +59,7 @@ test('registrar em Concluídos troca a explicação pela linha "Concluído · Pu
   fireEvent.change(aberta.getByLabelText('Data da publicação'), { target: { value: '2026-10-11' } })
   fireEvent.click(aberta.getByRole('button', { name: 'Registrar' }))
   expect(await (await agoraDoVerso()).findByText('Concluído · Publicado em 11/10/2026')).toBeTruthy()
-  expect(await botoesDoAgora()).toEqual(['Corrigir publicação', 'Arquivar'])
+  expect(await botoesDoAgora()).toEqual(['Corrigir publicação'])
 })
 
 test('publicado: a linha traz o link numa aba nova, e [Corrigir publicação] abre a janela preenchida e grava a correção', async () => {
@@ -80,14 +79,14 @@ test('publicado: a linha traz o link numa aba nova, e [Corrigir publicação] ab
   expect(falso.processos[0].publicadoEm).toBe('2026-10-06')
 })
 
-test('o arquivado sem data registra a publicação e continua arquivado; com data, não há botão de corrigir', async () => {
-  const { falso } = montar(null, { etapa: 'concluidos', mudancas: { ...SEM_PUBLICACAO, ...ARQUIVADO } })
-  expect(await botoesDoAgora()).toEqual(['Registrar publicação', 'Desarquivar'])
+test('o concluído fora do Quadro registra a publicação e depois a corrige, como qualquer concluído', async () => {
+  const { falso } = montar(null, { etapa: 'concluidos', mudancas: { ...SEM_PUBLICACAO, ...FORA_DO_QUADRO } })
+  expect(await botoesDoAgora()).toEqual(['Registrar publicação'])
   const aberta = await abrir('Registrar publicação')
   fireEvent.click(aberta.getByRole('button', { name: 'Registrar' }))
-  expect(await (await agoraDoVerso()).findByText(/^Publicado em/)).toBeTruthy()
-  expect(await botoesDoAgora()).toEqual(['Desarquivar'])
-  expect(falso.processos[0].arquivadoEm).toBe(ARQUIVADO.arquivadoEm)
+  expect(await (await agoraDoVerso()).findByText(/Publicado em/)).toBeTruthy()
+  expect(await botoesDoAgora()).toEqual(['Corrigir publicação'])
+  expect(falso.processos[0].tiradoDoQuadroEm).toBe(FORA_DO_QUADRO.tiradoDoQuadroEm)
 })
 
 test('a recusa aparece em vermelho na janela e o preenchido fica', async () => {

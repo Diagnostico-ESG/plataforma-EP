@@ -11,7 +11,7 @@ import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 type BlocoProps = {
   processo: ProcessoLido
   processos: ModuloDeProcessos
-  /** Perfil que altera e processo não arquivado; senão, o bloco só mostra o texto. */
+  /** Perfil que altera; senão, o bloco só mostra o texto. */
   podeEscrever: boolean
   guardaRef: MutableRefObject<GuardaDasAnotacoes | null>
   aoSumir: () => void

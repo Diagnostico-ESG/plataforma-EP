@@ -21,10 +21,6 @@ describe('falhaDaFuncaoDoAnexo', () => {
     expect(erro.message).toBe(frase)
   })
 
-  it('o processo arquivado tem a frase do arquivamento', () => {
-    expect(falhaDaFuncaoDoAnexo('processo_arquivado').message).toContain('arquivado')
-  })
-
   it('código desconhecido vira falha genérica, não frase', () => {
     const erro = falhaDaFuncaoDoAnexo('coisa_nova')
     expect(erro).not.toBeInstanceOf(TravaDoBanco)

@@ -1,7 +1,7 @@
 -- Data da validação e .pdf da aprovação (revisoes-aprovacao, ticket 06; ADRs 0007, 0011 e 0023): a data da validação só se
 -- grava pela função, com o processo na Validação com o setor e em andamento, nunca no futuro, e se apaga (vira vazia); o
 -- .pdf protocolado é de uma aprovação que existe, um atual por aprovação, com a versão aprovada no nome, com a regra do
--- editar a aprovação (em andamento ou concluído, não arquivado); a aprovação nova guarda o .pdf da anterior; o .pdf só tem
+-- editar a aprovação (em andamento ou concluído); a aprovação nova guarda o .pdf da anterior; o .pdf só tem
 -- o conteúdo substituído e nada se apaga; toda mudança vira evento. Cada célula da tabela "quem pode o quê" da spec.
 begin;
 create extension if not exists pgtap with schema extensions;
@@ -9,7 +9,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(73);
+insert into _tap (linha) select plan(72);
 
 -- Trava de arquivos (ticket 11): este teste monta o cenário e não prova a trava (ela é do 59), então move sem ela.
 create function pg_temp.mover_sem_trava(p_processo uuid, p_etapa uuid, p_data date default null, p_link text default null,
@@ -189,9 +189,8 @@ select public.suspender_processo(pg_temp.processo('Val Parado'), 'Aguardando o s
 insert into _tap (linha) select throws_ok($sql$select pg_temp.validar('Val Parado', pg_temp.hoje())$sql$,
   'P0001', 'processo_parado:suspenso', 'processo suspenso recusa a data');
 select pg_temp.concluir('Arquivado');
-select public.arquivar_processo(pg_temp.processo('Arquivado'));
 insert into _tap (linha) select throws_ok($sql$select pg_temp.validar('Arquivado', pg_temp.hoje())$sql$,
-  'P0001', 'processo_arquivado', 'processo arquivado recusa a data');
+  'P0001', 'data_so_na_validacao', 'processo concluído, que estava arquivado, recusa a data: ela é só da Validação com o setor');
 
 -- ===== Data da validação: subprocesso com a sua data =====
 select pg_temp.mover('Filho', 'revisao_setor');
@@ -295,7 +294,7 @@ select pg_temp.enviar_pdf('Pdf Edita');
 update public.aprovacoes set numero_eprotocolo = 'PROT-EDITADO' where processo_id = pg_temp.processo('Pdf Edita');
 insert into _tap (linha) select is(pg_temp.pdfs('Pdf Edita', true), 1::bigint, 'editar o número da aprovação não guarda o .pdf');
 
--- ===== .pdf: a regra do editar a aprovação (em andamento ou concluído, não arquivado) =====
+-- ===== .pdf: a regra do editar a aprovação (em andamento ou concluído) =====
 select pg_temp.aprovado('Pdf Conc');
 select pg_temp.concluir('Pdf Conc');
 insert into _tap (linha) select lives_ok($sql$select pg_temp.enviar_pdf('Pdf Conc')$sql$, 'processo concluído recebe o .pdf');
@@ -310,11 +309,6 @@ select pg_temp.aprovado('Pdf Cancelado');
 select public.cancelar_processo(pg_temp.processo('Pdf Cancelado'), 'Desistência do setor');
 insert into _tap (linha) select throws_ok($sql$select pg_temp.enviar_pdf('Pdf Cancelado')$sql$, 'P0001', 'processo_parado:cancelado',
   'processo cancelado não recebe o .pdf');
-select pg_temp.aprovado('Pdf Arq');
-select pg_temp.concluir('Pdf Arq');
-select public.arquivar_processo(pg_temp.processo('Pdf Arq'));
-insert into _tap (linha) select throws_ok($sql$select pg_temp.enviar_pdf('Pdf Arq')$sql$, 'P0001', 'processo_arquivado',
-  'processo arquivado não recebe o .pdf');
 
 -- ===== Perfis: consulta (a3), inativo (a4), administrador (a1) e visitante =====
 select pg_temp.aprovado('Pdf Perfis');

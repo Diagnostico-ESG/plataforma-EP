@@ -23,29 +23,22 @@ export function linhaDoConcluido({ publicadoEm, explicacaoSemPublicacao }: Pick<
 
 type ParaAPublicacao = Pick<ProcessoDaLista, 'etapaAtual' | 'publicadoEm' | 'explicacaoSemPublicacao'>
 
-/** O que o Agora diz da publicação fora do arquivado: Concluídos traz a linha completa; a Publicação, só a data, se houver. */
+/** O que o Agora diz da publicação: Concluídos traz a linha completa; a Publicação, só a data, se houver. */
 export function textoDaPublicacaoNoAgora(processo: ParaAPublicacao): string | null {
   return processo.etapaAtual?.codigo === CODIGO_CONCLUIDOS ? linhaDoConcluido(processo) : linhaDaPublicacao(processo)
-}
-
-/** O que o Agora do arquivado diz da publicação: a data, ou, concluído sem a data, a explicação. */
-export function textoDaPublicacaoNoArquivado(processo: ParaAPublicacao): string | null {
-  if (processo.publicadoEm) return linhaDaPublicacao(processo)
-  return processo.etapaAtual?.codigo === CODIGO_CONCLUIDOS ? linhaDoConcluido(processo) : null
 }
 
 export type AcaoDaPublicacao = 'registrar' | 'corrigir'
 
 /**
  * O botão da publicação no Agora: [Registrar publicação] sem a data, [Corrigir publicação] com ela, só na Publicação e em
- * Concluídos. O parado não registra; o arquivado só registra, e só sem a data (o banco recusa o resto).
+ * Concluídos. O parado não registra.
  */
 export function acaoDaPublicacao(
-  processo: Pick<ProcessoDaLista, 'situacao' | 'etapaAtual' | 'publicadoEm' | 'arquivadoEm'>,
+  processo: Pick<ProcessoDaLista, 'situacao' | 'etapaAtual' | 'publicadoEm'>,
 ): AcaoDaPublicacao | null {
   const etapa = processo.etapaAtual?.codigo
   if (etapa !== CODIGO_DA_PUBLICACAO && etapa !== CODIGO_CONCLUIDOS) return null
-  if (processo.arquivadoEm) return processo.publicadoEm ? null : 'registrar'
   if (processo.situacao === 'suspenso' || processo.situacao === 'cancelado') return null
   return processo.publicadoEm ? 'corrigir' : 'registrar'
 }

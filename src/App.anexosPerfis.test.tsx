@@ -45,7 +45,6 @@ test.each<[string, Partial<ProcessoLido>]>([
   ['suspenso', { situacao: 'suspenso' }],
   ['cancelado', { situacao: 'cancelado' }],
   ['concluído', { situacao: 'concluido' }],
-  ['arquivado', { situacao: 'concluido', arquivadoEm: '2026-10-12T12:00:00Z' }],
 ])('processo %s: só ler e baixar, sem [Enviar anexo]', async (_nome, mudancas) => {
   montarNosCadastros({ ajustarProcessos: doProcesso(mudancas), ajustarVersoes: comAnexo })
   const secao = await secaoDeAnexos()
@@ -111,7 +110,6 @@ test.each<[string, Partial<ProcessoLido>]>([
   ['suspenso', { situacao: 'suspenso' }],
   ['cancelado', { situacao: 'cancelado' }],
   ['concluído', { situacao: 'concluido' }],
-  ['arquivado', { situacao: 'concluido', arquivadoEm: '2026-10-12T12:00:00Z' }],
 ])('processo %s: o anexo só se lê e se baixa, sem [Retirar]', async (_nome, mudancas) => {
   montarNosCadastros({ ajustarProcessos: doProcesso(mudancas), ajustarVersoes: comAnexo })
   const secao = await secaoDeAnexos()

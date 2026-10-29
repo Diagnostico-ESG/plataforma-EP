@@ -16,7 +16,7 @@ export type DadosDasEtapas = {
   registros: RegistrosDoProcesso
   /** A versão mais recente e a da passagem, para a janela de editar a revisão. */
   ultimaVersao: UltimaVersao | null
-  /** Quem pode alterar, com o processo em andamento ou concluído; suspenso, cancelado, arquivado e Consulta só leem. */
+  /** Quem pode alterar, com o processo em andamento ou concluído; suspenso, cancelado e Consulta só leem. */
   podeEditar: boolean
 }
 

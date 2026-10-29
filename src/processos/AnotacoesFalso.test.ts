@@ -1,5 +1,4 @@
 import { expect, test } from 'vitest'
-import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { ProcessosFalso } from './ProcessosFalso'
 import { umProcessoLido } from '../testes/processoDaLista'
@@ -42,9 +41,9 @@ test('gravar o mesmo texto não muda autor nem hora', async () => {
   expect(resultado).toMatchObject({ tipo: 'gravado', anotacoes: { alteradoPor: expect.not.stringMatching('Outra Pessoa') } })
 })
 
-test('processo arquivado recusa; processo inexistente é cadastro inexistente', async () => {
-  const falso = criar(processo({ arquivadoEm: '2026-10-12T12:00:00Z' }))
-  await expect(falso.gravarAnotacoes('p1', null, 'a')).rejects.toBeInstanceOf(TravaDoBanco)
+test('processo inexistente é cadastro inexistente; o concluído fora do Quadro grava como qualquer concluído', async () => {
+  const falso = criar(processo({ situacao: 'concluido', noQuadro: false }))
+  expect((await falso.gravarAnotacoes('p1', null, 'a')).tipo).toBe('gravado')
   await expect(falso.gravarAnotacoes('p9', null, 'a')).rejects.toBeInstanceOf(CadastroInexistente)
 })
 

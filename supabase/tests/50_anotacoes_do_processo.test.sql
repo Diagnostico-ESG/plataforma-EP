@@ -99,7 +99,6 @@ select pg_temp.claims('a1');
 select pg_temp.enviar_completa(nome) from unnest(array['Concluido', 'Arquivado']) as nome;
 select pg_temp.claims('a2');
 select pg_temp.concluir(nome) from unnest(array['Concluido', 'Arquivado']) as nome;
-select public.arquivar_processo(pg_temp.processo('Arquivado'));
 select public.suspender_processo(pg_temp.processo('Suspenso'), 'Aguardando o setor');
 select public.cancelar_processo(pg_temp.processo('Cancelado'), 'Cancelado no teste');
 reset role;
@@ -221,17 +220,17 @@ insert into _tap (linha) select lives_ok(
   'reclassificar o processo com Anotações é aceito');
 insert into _tap (linha) select is(pg_temp.texto('Notas'), 'Direto', 'a reclassificação mantém as Anotações');
 
--- ===== Situações: suspenso, cancelado e concluído aceitam; arquivado recusa =====
+-- ===== Situações: suspenso, cancelado e concluído aceitam, inclusive o que estava arquivado =====
 insert into _tap (linha) select lives_ok(
   $sql$select * from public.gravar_anotacoes_do_processo(pg_temp.processo('Suspenso'), null, 'Anotado no suspenso')$sql$, 'suspenso aceita');
 insert into _tap (linha) select lives_ok(
   $sql$select * from public.gravar_anotacoes_do_processo(pg_temp.processo('Cancelado'), null, 'Anotado no cancelado')$sql$, 'cancelado aceita');
 insert into _tap (linha) select lives_ok(
   $sql$select * from public.gravar_anotacoes_do_processo(pg_temp.processo('Concluido'), null, 'Anotado no concluído')$sql$, 'concluído aceita');
-insert into _tap (linha) select throws_ok(
-  $sql$select * from public.gravar_anotacoes_do_processo(pg_temp.processo('Arquivado'), null, 'Tentativa no arquivado')$sql$,
-  'P0001', 'processo_arquivado', 'arquivado recusa');
-insert into _tap (linha) select is(pg_temp.texto('Arquivado'), null::text, 'e o arquivado ficou sem texto');
+insert into _tap (linha) select lives_ok(
+  $sql$select * from public.gravar_anotacoes_do_processo(pg_temp.processo('Arquivado'), null, 'Anotado no que estava arquivado')$sql$,
+  'o concluído que estava arquivado aceita');
+insert into _tap (linha) select is(pg_temp.texto('Arquivado'), 'Anotado no que estava arquivado', 'e o texto ficou gravado');
 
 -- ===== Consulta lê, mas não grava =====
 reset role;

@@ -107,9 +107,10 @@ describe('mover', () => {
     expect((await lido(modulo)).etapaAtual?.codigo).toBe('revisao_interna')
   })
 
-  test('o processo arquivado não se move', async () => {
-    const modulo = falso(umProcessoLido('Emitir Ofício', { id: 'p1', situacao: 'concluido', arquivadoEm: '2026-10-20T12:00:00Z' }, 'concluidos'))
-    expect((await falhaDe(modulo.moverProcesso('p1', idDa('modelagem')))).message).toBe('Este processo está arquivado; desarquive-o para alterar.')
+  test('o concluído fora do Quadro se move como qualquer concluído', async () => {
+    const modulo = falso(umProcessoLido('Emitir Ofício', { id: 'p1', situacao: 'concluido', noQuadro: false }, 'concluidos'))
+    await modulo.moverProcesso('p1', idDa('modelagem'))
+    expect((await lido(modulo)).etapaAtual?.codigo).toBe('modelagem')
   })
 
   test('a falha programada chega como erro e o processo fica onde estava', async () => {
@@ -197,11 +198,9 @@ describe('etiqueta', () => {
     expect((await falhaDe(modulo.mudarEtiqueta('p1', 'a_fazer'))).message).toBe('Em Concluídos a etiqueta é sempre Concluído e não muda.')
   })
 
-  test('suspenso, cancelado e arquivado congelam a etiqueta', async () => {
+  test('suspenso e cancelado congelam a etiqueta', async () => {
     const suspenso = falso(umProcessoLido('Emitir Ofício', { id: 'p1', situacao: 'suspenso' }))
     expect((await falhaDe(suspenso.mudarEtiqueta('p1', 'concluido'))).message).toContain('Este processo está suspenso')
-    const arquivado = falso(umProcessoLido('Emitir Ofício', { id: 'p1', situacao: 'concluido', arquivadoEm: '2026-10-20T12:00:00Z' }, 'concluidos'))
-    expect((await falhaDe(arquivado.mudarEtiqueta('p1', 'a_fazer'))).message).toContain('arquivado')
   })
 
   test('a falha programada deixa a etiqueta como estava', async () => {

@@ -41,7 +41,6 @@ describe('mover', () => {
   test.each([
     ['processo_parado:suspenso', 'Este processo está suspenso; retome-o para mudar a etapa, a etiqueta ou o responsável.'],
     ['processo_parado:cancelado', 'Este processo está cancelado; retome-o para mudar a etapa, a etiqueta ou o responsável.'],
-    ['processo_arquivado', 'Este processo está arquivado; desarquive-o para alterar.'],
     ['etapa_inativa:Publicação', 'A etapa Publicação está inativa.'],
     ['publicacao_ou_explicacao_obrigatoria',
       'Para ir a Concluídos, informe a data da publicação ou conclua sem publicação.'],

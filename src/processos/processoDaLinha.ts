@@ -21,7 +21,8 @@ export function processoDaLinha(linha: LinhaDoProcesso, totalDeEtapas: number): 
     publicadoEm: linha.publicado_em,
     linkDaPublicacao: linha.link_da_publicacao,
     explicacaoSemPublicacao: linha.explicacao_sem_publicacao,
-    arquivadoEm: linha.arquivado_em,
+    tiradoDoQuadroEm: linha.tirado_do_quadro_em,
+    noQuadro: linha.no_quadro ?? true,
   }
 }
 

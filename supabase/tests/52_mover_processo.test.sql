@@ -135,17 +135,16 @@ insert into _tap (linha) select lives_ok($sql$select pg_temp.mover('Mesma', 'mod
 insert into _tap (linha) select results_eq($sql$select pg_temp.passagens('Mesma'), pg_temp.movimentos('Mesma')$sql$,
   $sql$values (2::bigint, 1::bigint)$sql$, 'mas não abre passagem nem gera evento');
 
--- ===== Suspenso, cancelado e arquivado =====
+-- ===== Suspenso, cancelado e o concluído que estava arquivado =====
 select public.suspender_processo(pg_temp.processo('Suspenso'), 'Aguardando o setor');
 select public.cancelar_processo(pg_temp.processo('Cancelado'), 'Desistiu');
 select public.mover_processo(pg_temp.processo('Arquivado'), pg_temp.etapa('concluidos'), null, null, 'Não será publicado');
-select public.arquivar_processo(pg_temp.processo('Arquivado'));
 insert into _tap (linha) select throws_ok($sql$select pg_temp.mover('Suspenso', 'modelagem')$sql$,
   'P0001', 'processo_parado:suspenso', 'o suspenso não se move');
 insert into _tap (linha) select throws_ok($sql$select pg_temp.mover('Cancelado', 'modelagem')$sql$,
   'P0001', 'processo_parado:cancelado', 'o cancelado não se move');
-insert into _tap (linha) select throws_ok($sql$select pg_temp.mover('Arquivado', 'modelagem')$sql$,
-  'P0001', 'processo_arquivado', 'o arquivado não se move');
+insert into _tap (linha) select lives_ok($sql$select pg_temp.mover('Arquivado', 'modelagem')$sql$,
+  'o concluído que estava arquivado se move como qualquer concluído');
 insert into _tap (linha) select lives_ok($sql$select public.retomar_processo(pg_temp.processo('Suspenso'), 'Voltou')$sql$,
   'retomar o suspenso é aceito');
 insert into _tap (linha) select results_eq(

@@ -3,7 +3,6 @@ import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import type { EventoDoCadastro } from '../cadastros/tipos'
 import { AnotacoesFalso } from './AnotacoesFalso'
 import { CatalogoFalso } from './CatalogoFalso'
-import { arquivar, conferirNaoArquivado, desarquivar } from './arquivamentoFalso'
 import { CODIGO_CONCLUIDOS, CODIGO_NAO_INICIADOS } from './codigosDasEtapas'
 import {
   conferirEtapaAtiva, conferirEtiquetaMutavel, etapaAtualNoCatalogo, etapasDoVersoDe, publicacaoDaChegada, publicacaoDaSaida,
@@ -75,7 +74,6 @@ export class ProcessosFalso implements ModuloDeProcessos {
     await this.segurarMovimento
     this.conferirGravacao()
     const processo = this.acharProcesso(id)
-    conferirNaoArquivado(processo)
     conferirProcessoEmAndamento(processo)
     const destino = this.etapasDoCatalogo.find((etapa) => etapa.id === etapaId)
     if (!destino) throw new CadastroInexistente()
@@ -98,7 +96,6 @@ export class ProcessosFalso implements ModuloDeProcessos {
   async mudarEtiqueta(id: string, etiqueta: EtiquetaDaEtapa): Promise<void> {
     this.conferirGravacao()
     const processo = this.acharProcesso(id)
-    conferirNaoArquivado(processo)
     conferirProcessoEmAndamento(processo)
     conferirEtiquetaMutavel(processo, etiqueta)
     this.chamadas.push({ acao: 'etiqueta', id, etiqueta })
@@ -108,7 +105,6 @@ export class ProcessosFalso implements ModuloDeProcessos {
   async mudarResponsavel(id: string, usuarioId: string | null): Promise<void> {
     this.conferirGravacao()
     const processo = this.acharProcesso(id)
-    conferirNaoArquivado(processo)
     conferirProcessoEmAndamento(processo)
     const usuario = this.usuariosPossiveis.find((possivel) => possivel.id === usuarioId) ?? null
     if (usuarioId !== null && usuario === null) {
@@ -130,14 +126,6 @@ export class ProcessosFalso implements ModuloDeProcessos {
     this.mudarSituacaoDoProcesso(id, 'em_andamento', motivo)
   }
 
-  async arquivar(id: string): Promise<void> {
-    this.trocarProcesso(id, (processo) => arquivar(processo, `${hojeLocal()}T12:00:00Z`))
-  }
-
-  async desarquivar(id: string): Promise<void> {
-    this.trocarProcesso(id, desarquivar)
-  }
-
   async registrarPublicacao(id: string, data: string, link: string | null): Promise<void> {
     this.trocarProcesso(id, (processo) => registrarPublicacao(processo, data, link, hojeLocal()))
     this.chamadas.push({ acao: 'publicacao', id, nota: data })
@@ -145,7 +133,6 @@ export class ProcessosFalso implements ModuloDeProcessos {
 
   async reclassificarProcesso(id: string, reclassificacao: Reclassificacao, motivo: string): Promise<void> {
     this.conferirGravacao()
-    conferirNaoArquivado(this.acharProcesso(id))
     const mudado = reclassificar(this.processos, this.acharProcesso(id), reclassificacao, motivo)
     this.processos = this.processos.map((processo) => (processo.id === id ? mudado : processo))
   }
@@ -189,7 +176,6 @@ export class ProcessosFalso implements ModuloDeProcessos {
   async editarProcesso(id: string, dados: DadosDoProcesso): Promise<void> {
     this.conferirGravacao()
     const atual = this.acharProcesso(id)
-    conferirNaoArquivado(atual)
     this.conferirNomeNovo(dados, id)
     // A edição não muda tipo nem pai (a mudança é a reclassificação); o subprocesso fica no macroprocesso do pai.
     const campos: Partial<DadosDoProcesso> = { ...dados }
@@ -204,14 +190,14 @@ export class ProcessosFalso implements ModuloDeProcessos {
   // Como no banco, a data não depende da situação do processo nem mexe em etapa.
   async marcarDataDaModelagemPiloto(id: string, data: string | null): Promise<void> {
     this.conferirGravacao()
-    conferirNaoArquivado(this.acharProcesso(id))
+    this.acharProcesso(id)
     this.chamadas.push(data === null ? { acao: 'data_da_modelagem_piloto', id } : { acao: 'data_da_modelagem_piloto', id, nota: data })
     this.processos = this.processos.map((processo) => (processo.id === id ? { ...processo, dataDaModelagemPiloto: data } : processo))
   }
 
   async excluirProcesso(id: string): Promise<void> {
     this.conferirGravacao()
-    conferirNaoArquivado(this.acharProcesso(id))
+    this.acharProcesso(id)
     conferirSemSubprocessos(this.processos, id)
     this.processos = this.processos.filter((processo) => processo.id !== id)
   }
@@ -283,7 +269,6 @@ export class ProcessosFalso implements ModuloDeProcessos {
 
   private mudarSituacaoDoProcesso(id: string, nova: 'em_andamento' | 'suspenso' | 'cancelado', motivo: string): void {
     this.conferirGravacao()
-    conferirNaoArquivado(this.acharProcesso(id))
     const mudado = mudarSituacao(this.acharProcesso(id), nova, motivo)
     this.processos = this.processos.map((processo) => (processo.id === id ? mudado : processo))
   }

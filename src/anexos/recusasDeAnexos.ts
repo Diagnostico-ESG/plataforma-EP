@@ -1,5 +1,4 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
-import { FRASE_DO_PROCESSO_ARQUIVADO } from '../processos/frasesDePublicacao'
 
 // Códigos que chegam da função arquivos-no-drive no envio do anexo: os dela (decisao.ts, google.ts) e os do banco, que ela
 // repassa como "motivo" de "motivo:valor" (migração anexos). Nenhuma frase traz o nome do arquivo.
@@ -8,7 +7,6 @@ const FRASE_DO_CODIGO: Record<string, string> = {
   usuario_inativo: 'Seu usuário está desativado; não é possível enviar anexos.',
   sem_login: 'Sua sessão terminou. Entre de novo para enviar o anexo.',
   processo_fora_de_andamento: 'O processo não está em andamento; não é possível enviar anexo.',
-  processo_arquivado: FRASE_DO_PROCESSO_ARQUIVADO,
   extensao_nao_aceita: 'O anexo precisa ser .pdf, .docx, .xlsx, .png, .jpg, .jpeg ou .eml.',
   arquivo_grande: 'O anexo pode ter até 20 MB.',
   sem_espaco_no_drive: 'Não há espaço no Drive. Avise o administrador.',
@@ -25,7 +23,6 @@ const FRASE_DO_CODIGO_DA_RETIRADA: Record<string, string> = {
   usuario_inativo: 'Seu usuário está desativado; não é possível retirar anexos.',
   sem_login: 'Sua sessão terminou. Entre de novo para retirar o anexo.',
   processo_fora_de_andamento: 'O processo não está em andamento; não é possível retirar anexo.',
-  processo_arquivado: FRASE_DO_PROCESSO_ARQUIVADO,
   anexo_ja_retirado: 'O anexo já foi retirado.',
   drive_indisponivel: 'Não foi possível falar com o Drive. Tente de novo em instantes.',
   nao_encontrado_no_drive: 'O arquivo do anexo não foi encontrado no Drive. Tente de novo.',

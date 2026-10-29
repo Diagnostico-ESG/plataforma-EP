@@ -8,7 +8,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(33);
+insert into _tap (linha) select plan(32);
 
 -- Isola o teste dos dados que já existem no banco: a limpeza vale só nesta transação, que é desfeita no fim.
 set local session_replication_role = replica;
@@ -108,7 +108,6 @@ select set_config('ep.t62_etapa0', (select e.nome from public.etapas e
 select set_config('ep.t62_arquivos', (select count(*)::text from public.arquivos_da_versao), true);
 select pg_temp.claims('a2');
 select pg_temp.concluir(nome) from unnest(array['Concluido', 'Arquivado']) as nome;
-select public.arquivar_processo(pg_temp.processo('Arquivado'));
 select public.suspender_processo(pg_temp.processo('Suspenso'), 'Aguardando o setor');
 select public.cancelar_processo(pg_temp.processo('Cancelado'), 'Desistiu');
 select public.mover_processo(pg_temp.processo('Andamento'), pg_temp.etapa('modelagem'));
@@ -116,7 +115,7 @@ select public.registrar_anexo(pg_temp.processo('Andamento'), pg_temp.anexo('mode
 select public.mover_processo(pg_temp.processo('Andamento'), pg_temp.etapa('aprovacao_setor'));
 select public.registrar_anexo(pg_temp.processo('Andamento'), pg_temp.anexo('validacao.eml', 'drive-validacao'));
 
--- ===== Situação do processo: suspenso, cancelado, concluído e arquivado não retiram =====
+-- ===== Situação do processo: suspenso, cancelado e concluído não retiram =====
 select pg_temp.claims('a1');
 insert into _tap (linha) select throws_ok(
   $sql$delete from public.anexos where processo_id = pg_temp.processo('Suspenso')$sql$,
@@ -127,9 +126,6 @@ insert into _tap (linha) select throws_ok(
 insert into _tap (linha) select throws_ok(
   $sql$delete from public.anexos where processo_id = pg_temp.processo('Concluido')$sql$,
   'P0001', 'processo_fora_de_andamento:concluido', 'processo concluído não retira anexo');
-insert into _tap (linha) select throws_ok(
-  $sql$delete from public.anexos where processo_id = pg_temp.processo('Arquivado')$sql$,
-  'P0001', 'processo_arquivado', 'processo arquivado não retira anexo');
 insert into _tap (linha) select is(
   (select count(*) from public.anexos where nome in ('s.eml', 'c.eml', 'k.eml', 'a.eml')), 4::bigint,
   'os quatro anexos dos processos fora de andamento continuam na lista');

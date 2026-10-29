@@ -12,7 +12,7 @@ type PdfDaAprovacaoProps = {
   versoes: ModuloDeVersoes
   processo: Pick<ProcessoLido, 'id' | 'nome' | 'setorSigla'>
   aprovacao: Aprovacao
-  /** Administrador ou Integrante, com o processo em andamento ou concluído e não arquivado (a regra do [Editar]). */
+  /** Administrador ou Integrante, com o processo em andamento ou concluído (a regra do [Editar]). */
   podeEditar: boolean
   /** Lê a aprovação de novo (o .pdf entrou ou foi trocado). */
   aoAlterar: () => void

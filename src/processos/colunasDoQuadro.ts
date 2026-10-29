@@ -10,7 +10,8 @@ export type ColunaDoQuadro = {
   inativo?: boolean
 }
 
-// No Quadro: em andamento, suspensos e concluídos (já em Concluídos); o cancelado e o arquivado ficam só na Lista.
+// No Quadro: em andamento, suspensos e concluídos que ainda estão no Quadro (não tirados nem com mais de 30 dias em
+// Concluídos); o cancelado e o concluído fora do Quadro ficam só na Lista.
 const SITUACOES_NO_QUADRO = new Set<SituacaoDoProcesso>(['em_andamento', 'suspenso', 'concluido'])
 
 function porNome(a: ProcessoDaLista, b: ProcessoDaLista): number {
@@ -18,7 +19,7 @@ function porNome(a: ProcessoDaLista, b: ProcessoDaLista): number {
 }
 
 function processosDoQuadro(processos: ProcessoDaLista[]): ProcessoDaLista[] {
-  return processos.filter((processo) => SITUACOES_NO_QUADRO.has(processo.situacao) && !processo.arquivadoEm).sort(porNome)
+  return processos.filter((processo) => SITUACOES_NO_QUADRO.has(processo.situacao) && processo.noQuadro !== false).sort(porNome)
 }
 
 /**

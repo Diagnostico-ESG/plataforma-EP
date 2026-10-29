@@ -83,7 +83,6 @@ select pg_temp.mover_sem_trava(pg_temp.processo('T44 Nao Publicado'), (select id
   null, null, 'Explicacao inventada');
 select pg_temp.mover_sem_trava(pg_temp.processo('T44 Arquivado'), (select id from public.etapas where codigo = 'concluidos'),
   date '2026-04-02');
-select public.arquivar_processo(pg_temp.processo('T44 Arquivado'));
 select public.cancelar_processo(pg_temp.processo('T44 Cancelado'), 'Motivo inventado');
 select public.suspender_processo(pg_temp.processo('T44 Suspenso'), 'Motivo inventado');
 select public.registrar_versao(pg_temp.processo('T44 Versoes'), 1, pg_temp.par());

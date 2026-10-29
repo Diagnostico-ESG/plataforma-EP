@@ -39,15 +39,15 @@ test('o cartão em andamento arrasta em qualquer etapa, inclusive Não iniciados
   for (const nome of ['Em Curso', 'Não Iniciado', 'Pronto']) expect((await cartaoDe(nome)).getAttribute('draggable')).toBe('true')
 })
 
-test('o suspenso e o arquivado não se arrastam', async () => {
+test('o suspenso não se arrasta, e o concluído fora do Quadro nem aparece nele', async () => {
   montar([
     processo('Suspenso', { processo: { situacao: 'suspenso' } }),
-    processo('Arquivado', {
-      etapa: 'concluidos', processo: { situacao: 'concluido', arquivadoEm: '2026-10-20T12:00:00Z', etiqueta: 'concluido' },
+    processo('Fora do Quadro', {
+      etapa: 'concluidos', processo: { situacao: 'concluido', noQuadro: false, etiqueta: 'concluido' },
     }),
   ])
   expect((await cartaoDe('Suspenso')).getAttribute('draggable')).toBe('false')
-  expect(screen.queryByRole('link', { name: /Arquivado/ })).toBeNull()
+  expect(screen.queryByRole('link', { name: /Fora do Quadro/ })).toBeNull()
 })
 
 test('a Consulta não arrasta nenhum cartão', async () => {

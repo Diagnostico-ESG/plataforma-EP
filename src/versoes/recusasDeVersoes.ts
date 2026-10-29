@@ -1,5 +1,4 @@
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
-import { FRASE_DO_PROCESSO_ARQUIVADO } from '../processos/frasesDePublicacao'
 import { fraseDoProcessoParado } from '../processos/frasesDeSituacao'
 import { fraseDaVersaoAprovada } from '../revisoes/frasesDeAprovacao'
 import {
@@ -54,7 +53,6 @@ const FRASE_DO_CODIGO: Record<string, (valor: string) => string> = {
   pdf_ja_enviado: () => FRASE_DO_PDF_JA_ENVIADO,
   pdf_nome_sem_versao: () => FRASE_DO_PDF_SEM_A_VERSAO,
   pdf_guardado_nao_se_altera: () => FRASE_DO_PDF_GUARDADO,
-  processo_arquivado: () => FRASE_DO_PROCESSO_ARQUIVADO,
   processo_parado: fraseDoProcessoParado,
   entrada_invalida: () => 'Os dados do envio não foram aceitos. Confira os campos e os arquivos e envie de novo.',
 }

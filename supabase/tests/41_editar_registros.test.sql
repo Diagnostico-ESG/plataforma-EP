@@ -9,7 +9,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(57);
+insert into _tap (linha) select plan(55);
 
 -- Trava de arquivos (ticket 11): este teste monta o cenário e não prova a trava (ela é do 59), então move sem ela. A
 -- função desliga, só durante o movimento e com o dono do banco, as etapas com trava que ficam antes do destino.
@@ -307,7 +307,7 @@ insert into _tap (linha) select throws_ok(
   $sql$update public.aprovacoes set numero_eprotocolo = 'X' where processo_id = pg_temp.processo('Cancelado')$sql$,
   'P0001', 'processo_parado:cancelado', 'aprovação de processo cancelado não se edita');
 
--- ===== Concluído aceita a edição; arquivado a recusa =====
+-- ===== Concluído aceita a edição =====
 select pg_temp.mover_sem_trava(pg_temp.processo('Concluido'), (select id from public.etapas where codigo = 'concluidos'), null, null, 'Sem divulgação');
 insert into _tap (linha) select lives_ok(
   $sql$update public.revisoes_internas set comentario = 'Depois de concluído' where processo_id = pg_temp.processo('Concluido')$sql$,
@@ -315,13 +315,6 @@ insert into _tap (linha) select lives_ok(
 insert into _tap (linha) select lives_ok(
   $sql$update public.aprovacoes set numero_eprotocolo = 'PROT-Y' where processo_id = pg_temp.processo('Concluido')$sql$,
   'aprovação de processo concluído se edita');
-select public.arquivar_processo(pg_temp.processo('Concluido'));
-insert into _tap (linha) select throws_ok(
-  $sql$update public.revisoes_internas set comentario = 'x' where processo_id = pg_temp.processo('Concluido')$sql$,
-  'P0001', 'processo_arquivado', 'revisão de processo arquivado não se edita');
-insert into _tap (linha) select throws_ok(
-  $sql$update public.aprovacoes set numero_eprotocolo = 'X' where processo_id = pg_temp.processo('Concluido')$sql$,
-  'P0001', 'processo_arquivado', 'aprovação de processo arquivado não se edita');
 
 -- ===== Perfis: consulta, inativo e visitante =====
 select pg_temp.claims('a3');

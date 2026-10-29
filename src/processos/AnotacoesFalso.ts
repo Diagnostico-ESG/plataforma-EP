@@ -1,7 +1,6 @@
 import { USUARIO_DE_TESTE } from '../acesso/AcessoFalso'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { SEM_ANOTACOES } from './anotacoes'
-import { conferirNaoArquivado } from './arquivamentoFalso'
 import type { AnotacoesLidas, ProcessoLido, ResultadoDaGravacaoDasAnotacoes } from './tipos'
 
 /** Só o que a falsa das Anotações pede à falsa de processos (importá-la inteira fecharia um ciclo). */
@@ -43,7 +42,6 @@ export class AnotacoesFalso {
     }
     const processo = this.processos.processos.find((outro) => outro.id === id)
     if (!processo) throw new CadastroInexistente()
-    conferirNaoArquivado(processo)
     const atual = this.porProcesso[id] ?? SEM_ANOTACOES
     if (atual.texto !== esperado) return { tipo: 'conflito' }
     if (novo === atual.texto) return { tipo: 'gravado', anotacoes: { ...atual } }

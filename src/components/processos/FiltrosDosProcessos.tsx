@@ -12,10 +12,7 @@ type FiltrosDosProcessosProps = {
   aoMudar: (filtros: Filtros) => void
 }
 
-// "Mostrar" é o padrão (sem filtro); o arquivado só existe na Lista.
-const OPCOES_DOS_ARQUIVADOS: OpcaoDoFiltro[] = [{ valor: 'esconder', rotulo: 'Esconder' }]
-
-/** Os filtros do Quadro e da Lista; a situação e os arquivados só na Lista, porque o Quadro mostra apenas os vivos. */
+/** Os filtros do Quadro e da Lista; a situação só na Lista, porque o Quadro mostra apenas os vivos. */
 export function FiltrosDosProcessos({ visao, opcoes, filtros, aoMudar }: FiltrosDosProcessosProps) {
   // Os valores vêm das próprias opções, então o tipo e a situação escolhidos são sempre válidos.
   const mudar = (nome: keyof Filtros) => (valor: string) => aoMudar({ ...filtros, [nome]: valor || null } as Filtros)
@@ -30,12 +27,8 @@ export function FiltrosDosProcessos({ visao, opcoes, filtros, aoMudar }: Filtros
       <SeletorDoFiltro rotulo="Responsável" todos="Todos" opcoes={opcoes.responsaveis} valor={filtros.responsavel}
         aoMudar={mudar('responsavel')} />
       {visao === 'lista' && (
-        <>
-          <SeletorDoFiltro rotulo="Situação" todos="Todas" opcoes={opcoes.situacoes} valor={filtros.situacao}
-            aoMudar={mudar('situacao')} />
-          <SeletorDoFiltro rotulo="Arquivados" todos="Mostrar" opcoes={OPCOES_DOS_ARQUIVADOS} valor={filtros.arquivados}
-            aoMudar={mudar('arquivados')} />
-        </>
+        <SeletorDoFiltro rotulo="Situação" todos="Todas" opcoes={opcoes.situacoes} valor={filtros.situacao}
+          aoMudar={mudar('situacao')} />
       )}
       {temFiltro(filtros) && <BotaoLimparFiltros aoLimpar={() => aoMudar(SEM_FILTROS)} />}
     </div>

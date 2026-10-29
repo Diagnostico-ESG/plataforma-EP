@@ -1,5 +1,5 @@
 -- Editar número da versão (travas-em-avisos, ticket 03; ADR 0028): Administrador e Integrante ativos trocam o número de qualquer
--- versão (histórica, piloto, em sequência, a aprovada), só com o processo em andamento e não arquivado. Muda só o número, nunca o
+-- versão (histórica, piloto, em sequência, a aprovada), só com o processo em andamento. Muda só o número, nunca o
 -- tipo; o nome guardado dos arquivos da versão (fluxogramas, relatórios ligados a ela e o .pdf da aprovação) acompanha o rótulo; um
 -- evento por edição, com o antes e o depois. Consulta, inativo e visitante não editam. O número só muda pela função: a escrita
 -- direta em versoes.numero e nos nomes é recusada.
@@ -9,7 +9,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(53);
+insert into _tap (linha) select plan(52);
 
 -- Isola o teste dos dados que já existem no banco: a limpeza vale só nesta transação, que é desfeita no fim.
 set local session_replication_role = replica;
@@ -117,7 +117,6 @@ select pg_temp.claims('a2');
 insert into public.aprovacoes (processo_id) select pg_temp.processo(nome) from unnest(array['Concluido', 'Arquivado']) as nome;
 select public.mover_processo(pg_temp.processo(nome), pg_temp.etapa('concluidos'), null, null, 'Não será publicado')
 from unnest(array['Concluido', 'Arquivado']) as nome;
-select public.arquivar_processo(pg_temp.processo('Arquivado'));
 select public.suspender_processo(pg_temp.processo('Suspenso'), 'Aguardando o setor');
 select public.cancelar_processo(pg_temp.processo('Cancelado'), 'Desistiu');
 select set_config('ep.t65_enviado_em', (select enviado_em::text from public.arquivos_da_versao
@@ -152,7 +151,7 @@ insert into _tap (linha) select throws_ok(
   'versão que não existe é falta de permissão, como no download');
 insert into _tap (linha) select is(pg_temp.rotulos('Andamento'), 'V3F,V4P,V5', 'nenhuma tentativa recusada mudou um número');
 
--- ===== Situação do processo: suspenso, cancelado, concluído e arquivado não editam =====
+-- ===== Situação do processo: suspenso, cancelado e concluído não editam =====
 insert into _tap (linha) select throws_ok(
   $sql$select public.editar_numero_da_versao(pg_temp.versao('Suspenso', 1), 1, 2)$sql$,
   'P0001', 'processo_fora_de_andamento:suspenso', 'processo suspenso não edita o número');
@@ -162,9 +161,6 @@ insert into _tap (linha) select throws_ok(
 insert into _tap (linha) select throws_ok(
   $sql$select public.editar_numero_da_versao(pg_temp.versao('Concluido', 1), 1, 2)$sql$,
   'P0001', 'processo_fora_de_andamento:concluido', 'processo concluído não edita o número');
-insert into _tap (linha) select throws_ok(
-  $sql$select public.editar_numero_da_versao(pg_temp.versao('Arquivado', 1), 1, 2)$sql$,
-  'P0001', 'processo_arquivado', 'processo arquivado não edita o número');
 insert into _tap (linha) select is(
   pg_temp.rotulos('Suspenso') || pg_temp.rotulos('Cancelado') || pg_temp.rotulos('Concluido') || pg_temp.rotulos('Arquivado'),
   'V1V1V1V1', 'os números dos processos parados continuam V1');

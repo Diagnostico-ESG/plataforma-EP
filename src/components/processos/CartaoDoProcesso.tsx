@@ -15,7 +15,7 @@ type CartaoDoProcessoProps = {
   processo: ProcessoDaLista
   escolhido: boolean
   href: string
-  /** Só Administrador e Integrante, só agrupado por etapa e só o processo em andamento ou concluído não arquivado. */
+  /** Só Administrador e Integrante, só agrupado por etapa e só o processo em andamento ou concluído. */
   arrastavel: boolean
   /** O cartão arrastado fica levemente apagado no lugar de origem. */
   apagado: boolean

@@ -53,14 +53,10 @@ describe('registrarDataDaValidacao', () => {
       .toBe('Registre a data da validação com o processo na Validação com o setor.')
   })
 
-  test('recusa processo suspenso e processo arquivado', async () => {
+  test('recusa processo suspenso', async () => {
     const parado = montar('revisao_setor')
     parado.processos.processos = [mudarSituacao(parado.processos.processos[0], 'suspenso', 'Aguardando')]
     expect(await falhaDe(parado.revisoes.registrarDataDaValidacao('p1', '2026-10-10'))).toBeInstanceOf(TravaDoBanco)
-    const arquivado = montar('revisao_setor')
-    arquivado.processos.processos = [{ ...arquivado.processos.processos[0], arquivadoEm: '2026-10-12T10:00:00Z' }]
-    expect((await falhaDe(arquivado.revisoes.registrarDataDaValidacao('p1', '2026-10-10'))).message)
-      .toBe('Este processo está arquivado; desarquive-o para alterar.')
   })
 })
 
@@ -111,16 +107,16 @@ describe('o .pdf da aprovação nas falsas ligadas', () => {
     expect(Object.keys(await versoes.conferirArquivos('p1'))).toContain(atual.id)
   })
 
-  test('o processo suspenso ou arquivado não recebe o .pdf, e o concluído recebe', async () => {
+  test('o processo suspenso não recebe o .pdf, e o concluído recebe', async () => {
     const { processos, revisoes, versoes } = montar('aprovacao_setor')
     await revisoes.registrarAprovacao('p1', SEM_NADA)
     const pedido = { processoId: 'p1', numero: 8, arquivo: pdf() }
     processos.processos = [{ ...processos.processos[0], situacao: 'concluido' }]
     await versoes.enviarPdfDaAprovacao(pedido, () => {})
-    processos.processos = [{ ...processos.processos[0], arquivadoEm: '2026-10-12T10:00:00Z' }]
+    processos.processos = [{ ...processos.processos[0], situacao: 'suspenso' }]
     const atual = (await revisoes.lerAprovacao('p1'))?.pdf
     if (!atual) throw new Error('o .pdf deveria existir')
     const falha = await falhaDe(versoes.substituirArquivo({ processoId: 'p1', numero: 8, arquivo: atual, novo: pdf() }, () => {}))
-    expect(falha.message).toBe('Este processo está arquivado; desarquive-o para alterar.')
+    expect(falha.message).toBe('Este processo está suspenso; retome-o para mudar a etapa, a etiqueta ou o responsável.')
   })
 })

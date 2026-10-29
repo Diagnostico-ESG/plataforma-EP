@@ -14,7 +14,6 @@ import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { JanelaDeSituacao } from './AcoesDeSituacao'
 import { LinhaDaPublicacao } from './AgoraDaPublicacao'
-import { AgoraDoArquivado } from './AgoraDoConcluido'
 import { CorpoDoAgora } from './CorpoDoAgora'
 import { DiasNaEtapa } from './DiasNaEtapa'
 import { RegistrosDoAgora } from './RegistrosDoAgora'
@@ -32,7 +31,7 @@ type AgoraDoProcessoProps = {
   /** O módulo de versões: a janela de registrar a aprovação envia o .pdf protocolado por ele. */
   versoes: ModuloDeVersoes
   registros: RegistrosDoProcesso
-  /** Grava a situação (Retomar) e o arquivamento, e guarda a falha para o verso mostrar. */
+  /** Grava a situação (Retomar) e guarda a falha para o verso mostrar. */
   executar: Executar
   aoMudar: () => void
 }
@@ -40,35 +39,31 @@ type AgoraDoProcessoProps = {
 /**
  * O cartão "Agora": o que há a fazer no processo, no alto da coluna esquerda do verso (spec, "Agora do verso"). Quem altera
  * move o processo, muda a etiqueta e troca o responsável por listas que gravam ao escolher; a Consulta lê uma frase.
- * Suspenso e cancelado congelam tudo e oferecem só [Retomar]; o arquivado, só [Desarquivar].
+ * Suspenso e cancelado congelam tudo e oferecem só [Retomar].
  */
 export function AgoraDoProcesso(props: AgoraDoProcessoProps) {
   const { processo, processos, podeAlterar, executar, aoMudar } = props
   const [pedido, setPedido] = useState<PedidoDeSituacao | null>(null)
   const { situacao, etapaAtual } = processo
   if (etapaAtual === null) return null
-  const arquivado = Boolean(processo.arquivadoEm)
   const parado = situacao === 'suspenso' || situacao === 'cancelado'
-  const rotulo = parado || arquivado ? 'Agora' : rotuloDoAgora(etapaAtual.posicao, etapaAtual.total)
+  const rotulo = parado ? 'Agora' : rotuloDoAgora(etapaAtual.posicao, etapaAtual.total)
   return (
-    <section className={classeDoAgora(situacao, podeAlterar, arquivado)} aria-label={rotulo}>
-      <ConteudoDoAgora {...props} rotulo={rotulo} arquivado={arquivado} parado={parado} aoRetomar={() => setPedido('retomar')} />
+    <section className={classeDoAgora(situacao, podeAlterar)} aria-label={rotulo}>
+      <ConteudoDoAgora {...props} rotulo={rotulo} parado={parado} aoRetomar={() => setPedido('retomar')} />
       <JanelaDeSituacao processo={processo} processos={processos} pedido={pedido} executar={executar}
         aoFechar={() => setPedido(null)} aoMudar={aoMudar} />
     </section>
   )
 }
 
-type ConteudoDoAgoraProps = AgoraDoProcessoProps & { rotulo: string; arquivado: boolean; parado: boolean; aoRetomar: () => void }
+type ConteudoDoAgoraProps = AgoraDoProcessoProps & { rotulo: string; parado: boolean; aoRetomar: () => void }
 
-// Arquivado, suspenso e cancelado têm o seu texto; o resto é o corpo com as listas (quem altera) ou a frase (Consulta).
+// Suspenso e cancelado têm o seu texto; o resto é o corpo com as listas (quem altera) ou a frase (Consulta).
 function ConteudoDoAgora(props: ConteudoDoAgoraProps) {
-  const { processo, processos, podeAlterar, executar, aoMudar, rotulo } = props
-  if (props.arquivado) {
-    return <AgoraDoArquivado processo={processo} processos={processos} podeAlterar={podeAlterar} executar={executar} aoMudar={aoMudar} />
-  }
+  const { processo, podeAlterar, rotulo } = props
   if (props.parado) {
-    return <SituacaoParada processo={processo} processos={processos} podeAlterar={podeAlterar} executar={executar} aoMudar={aoMudar} aoRetomar={props.aoRetomar} />
+    return <SituacaoParada processo={processo} podeAlterar={podeAlterar} aoRetomar={props.aoRetomar} />
   }
   if (!podeAlterar) {
     return <AgoraDaConsulta processo={processo} rotulo={rotulo} revisoes={props.revisoes} versoes={props.versoes} registros={props.registros} usuarioId={props.usuarioId} />
@@ -76,17 +71,16 @@ function ConteudoDoAgora(props: ConteudoDoAgoraProps) {
   return <CorpoDoAgora {...props} rotulo={rotulo} />
 }
 
-function classeDoAgora(situacao: ProcessoLido['situacao'], podeAlterar: boolean, arquivado: boolean): string {
-  if (arquivado) return 'agora agora-concluido'
+function classeDoAgora(situacao: ProcessoLido['situacao'], podeAlterar: boolean): string {
   if (situacao === 'suspenso' || situacao === 'cancelado') return `agora agora-${situacao}`
   return podeAlterar ? 'agora' : 'agora agora-leitura'
 }
 
-type SituacaoParadaProps = Pick<AgoraDoProcessoProps, 'processo' | 'processos' | 'podeAlterar' | 'executar' | 'aoMudar'> & { aoRetomar: () => void }
+type SituacaoParadaProps = Pick<AgoraDoProcessoProps, 'processo' | 'podeAlterar'> & { aoRetomar: () => void }
 
 // Suspenso e cancelado congelam a etapa, a etiqueta e o responsável; a tela diz onde o processo parou e por quê, e oferece
-// [Arquivar] ao lado de [Retomar].
-function SituacaoParada({ processo, processos, podeAlterar, executar, aoMudar, aoRetomar }: SituacaoParadaProps) {
+// [Retomar].
+function SituacaoParada({ processo, podeAlterar, aoRetomar }: SituacaoParadaProps) {
   const rotulo = ROTULO_DA_SITUACAO[processo.situacao]
   return (
     <>
@@ -96,9 +90,6 @@ function SituacaoParada({ processo, processos, podeAlterar, executar, aoMudar, a
       <p className="agora-explicacao">Retome o processo para mudar a etapa, a etiqueta ou o responsável.</p>
       {podeAlterar && (
         <div className="agora-botoes">
-          <button type="button" className="botao botao-secundario" onClick={() => executar(() => processos.arquivar(processo.id), aoMudar)}>
-            Arquivar
-          </button>
           <button type="button" className="botao botao-principal" onClick={aoRetomar}>Retomar</button>
         </div>
       )}

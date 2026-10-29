@@ -8,7 +8,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(43);
+insert into _tap (linha) select plan(42);
 
 -- Isola o teste dos dados que já existem no banco (a prova do Drive deixa versões, arquivos, eventos e pastas de teste
 -- no desenvolvimento): a limpeza vale só nesta transação, que é desfeita no fim.
@@ -96,7 +96,6 @@ select pg_temp.claims('a1');
 select pg_temp.enviar_completa(nome) from unnest(array['Andamento', 'Concluido', 'Arquivado']) as nome;
 select pg_temp.claims('a2');
 select pg_temp.concluir(nome) from unnest(array['Concluido', 'Arquivado']) as nome;
-select public.arquivar_processo(pg_temp.processo('Arquivado'));
 select public.suspender_processo(pg_temp.processo('Suspenso'), 'Aguardando o setor');
 select public.cancelar_processo(pg_temp.processo('Cancelado'), 'Desistiu');
 
@@ -151,7 +150,7 @@ insert into _tap (linha) select throws_ok(
     values (pg_temp.processo('Vazio'), pg_temp.etapa('concluidos'), 'x.pdf', 'pdf', 10, '0123456789abcdef0123456789abcdef', 'drive-x')$sql$,
   '42501', null, 'a etapa não tem privilégio de inclusão: não se escolhe pela API');
 
--- ===== Situação do processo: só em andamento e não arquivado =====
+-- ===== Situação do processo: só em andamento =====
 insert into _tap (linha) select throws_ok(
   $sql$select public.registrar_anexo(pg_temp.processo('Suspenso'), pg_temp.anexo())$sql$,
   'P0001', 'processo_fora_de_andamento:suspenso', 'processo suspenso não recebe anexo');
@@ -161,9 +160,6 @@ insert into _tap (linha) select throws_ok(
 insert into _tap (linha) select throws_ok(
   $sql$select public.registrar_anexo(pg_temp.processo('Concluido'), pg_temp.anexo())$sql$,
   'P0001', 'processo_fora_de_andamento:concluido', 'processo concluído não recebe anexo');
-insert into _tap (linha) select throws_ok(
-  $sql$select public.registrar_anexo(pg_temp.processo('Arquivado'), pg_temp.anexo())$sql$,
-  'P0001', 'processo_arquivado', 'processo arquivado não recebe anexo');
 
 -- ===== Restrições: formato, tamanho, nome e identificador do Drive =====
 insert into _tap (linha) select throws_ok(

@@ -20,9 +20,7 @@ import {
 } from './frasesDoMovimento'
 import { FRASE_DO_PAI, fraseDeTipoInvalido, fraseDosSubprocessos } from './frasesDeReclassificacao'
 import {
-  FRASE_DO_ARQUIVAMENTO_SO_PELA_FUNCAO, FRASE_DO_PROCESSO_ARQUIVADO, FRASE_DO_PROCESSO_JA_ARQUIVADO,
-  FRASE_DO_PROCESSO_NAO_ARQUIVADO, FRASE_DA_DATA_DA_PUBLICACAO_OBRIGATORIA, FRASE_DA_PUBLICACAO_FORA_DA_ETAPA,
-  FRASE_DO_ARQUIVADO_JA_PUBLICADO, fraseDaPublicacaoAntesDaAprovacao, fraseDoArquivarSoConcluido,
+  FRASE_DA_DATA_DA_PUBLICACAO_OBRIGATORIA, FRASE_DA_PUBLICACAO_FORA_DA_ETAPA, fraseDaPublicacaoAntesDaAprovacao,
 } from './frasesDePublicacao'
 import { fraseDoProcessoComAnexos, fraseDoProcessoComVersoes } from './frasesDeVersao'
 import { fraseDeSituacaoInvalida, fraseDoProcessoParado } from './frasesDeSituacao'
@@ -44,8 +42,7 @@ const PADRAO_DA_RECUSA = new RegExp(
   + '|escopo_so_na_corrigida|revisao_fora_da_etapa|processo_com_revisoes'
   + '|aprovacao_fora_da_etapa|processo_ja_aprovado|aprovacao_so_pela_funcao|link_invalido'
   + '|versao_aprovada|processo_com_aprovacao'
-  + '|arquivar_so_concluido|ja_arquivado|nao_arquivado|processo_arquivado|arquivamento_so_pela_funcao'
-  + '|publicacao_fora_da_etapa|arquivado_ja_publicado|data_da_publicacao_obrigatoria|publicacao_antes_da_aprovacao'
+  + '|publicacao_fora_da_etapa|data_da_publicacao_obrigatoria|publicacao_antes_da_aprovacao'
   + '|data_so_na_validacao|data_da_validacao_so_pela_funcao'
   + '|sem_aprovacao_para_o_pdf|pdf_ja_enviado|pdf_nome_sem_versao|pdf_guardado_nao_se_altera'
   + '|anotacoes_longas)(?::(.*))?$', 'm')
@@ -107,13 +104,7 @@ const FRASE_DA_RECUSA: Record<string, FraseDaRecusa> = {
   aprovacao_so_pela_funcao: () => 'A versão e o registro da aprovação mudam só ao registrar uma aprovação nova.',
   versao_aprovada: fraseDaVersaoAprovada,
   processo_com_aprovacao: () => FRASE_DO_PROCESSO_COM_APROVACAO,
-  arquivar_so_concluido: fraseDoArquivarSoConcluido,
-  ja_arquivado: () => FRASE_DO_PROCESSO_JA_ARQUIVADO,
-  nao_arquivado: () => FRASE_DO_PROCESSO_NAO_ARQUIVADO,
-  processo_arquivado: () => FRASE_DO_PROCESSO_ARQUIVADO,
-  arquivamento_so_pela_funcao: () => FRASE_DO_ARQUIVAMENTO_SO_PELA_FUNCAO,
   publicacao_fora_da_etapa: () => FRASE_DA_PUBLICACAO_FORA_DA_ETAPA,
-  arquivado_ja_publicado: () => FRASE_DO_ARQUIVADO_JA_PUBLICADO,
   data_da_publicacao_obrigatoria: () => FRASE_DA_DATA_DA_PUBLICACAO_OBRIGATORIA,
   publicacao_antes_da_aprovacao: fraseDaPublicacaoAntesDaAprovacao,
   anotacoes_longas: fraseDasAnotacoesLongas,

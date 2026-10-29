@@ -2,7 +2,6 @@ import type { RecusasDoModulo } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import type { ClienteSupabase } from '../lib/supabase'
 import { criarAnotacoesSupabase } from './anotacoesSupabase'
-import { criarArquivamentoSupabase } from './arquivamentoSupabase'
 import { criarCatalogoSupabase } from './catalogoSupabase'
 import { criarGravacaoDeProcessoSupabase } from './gravarProcessoSupabase'
 import { criarLeituraDeProcessoSupabase } from './lerProcessoSupabase'
@@ -24,7 +23,6 @@ export function criarProcessosSupabase(cliente: ClienteSupabase): ModuloDeProces
     ...criarMovimentoSupabase(cliente, RECUSAS_DOS_PROCESSOS),
     ...criarAnotacoesSupabase(cliente, RECUSAS_DOS_PROCESSOS),
     ...criarSituacaoSupabase(cliente, RECUSAS_DOS_PROCESSOS),
-    ...criarArquivamentoSupabase(cliente, RECUSAS_DOS_PROCESSOS),
     ...criarPublicacaoSupabase(cliente, RECUSAS_DOS_PROCESSOS),
     ...criarReclassificacaoSupabase(cliente, RECUSAS_DOS_PROCESSOS),
     ...criarListaDeProcessosSupabase(cliente),
