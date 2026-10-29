@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import './ArvoreDaLista.css'
 import type { LinhaDaLista } from '../../processos/linhasDaLista'
 import { ROTULO_DO_TIPO } from '../../processos/rotulos'
@@ -18,7 +19,7 @@ type LinhaDoProcessoProps = {
 export function LinhaDoProcesso({ linha, escolhida, aoAbrir, busca, arvore }: LinhaDoProcessoProps) {
   return (
     <tr className="linha-clicavel" aria-current={escolhida ? 'true' : undefined} onClick={() => aoAbrir(linha.id)}>
-      <td className={arvore && arvore.nivel > 0 ? 'processo-recuado' : undefined}>
+      <td className={arvore ? `processo-na-arvore${arvore.nivel > 0 ? ' processo-recuado' : ''}` : undefined} style={arvore ? { '--nivel': arvore.nivel } as CSSProperties : undefined}>
         {arvore && <SetaDoProcesso nome={linha.nome} aberto={arvore.aberto} aoAlternar={arvore.aoAlternar} />}
         <button type="button" id={`linha-${linha.id}`} className="cadastros-abrir">
           <NomeComTrecho nome={linha.nome} busca={busca} />

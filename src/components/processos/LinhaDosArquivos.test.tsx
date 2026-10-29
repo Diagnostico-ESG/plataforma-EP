@@ -16,7 +16,7 @@ const VERSAO: Versao = {
 }
 
 function montar(estado: Parameters<typeof LinhaDosArquivos>[0]['estado'], falso = new VersoesFalso(), tentar = () => {}) {
-  render(<table><tbody><LinhaDosArquivos estado={estado} modulo={falso} aoTentarDeNovo={tentar} /></tbody></table>)
+  render(<table><tbody><LinhaDosArquivos nivel={0} estado={estado} modulo={falso} aoTentarDeNovo={tentar} /></tbody></table>)
   return falso
 }
 
@@ -34,11 +34,20 @@ test('carregando, erro com Tentar de novo e sem versão', () => {
   expect(screen.getByText('Sem versão ainda.')).toBeTruthy()
 })
 
-test('mostra a versão, o selo Aprovada e um link por arquivo, e o link baixa pelo módulo', async () => {
+test('mostra a versão, o selo Aprovada e os arquivos em lista, com o nome completo e o ícone do tipo, e o link baixa pelo módulo', async () => {
   const falso = montar({ tipo: 'pronto', versoes: [VERSAO] })
   expect(screen.getByText('V7')).toBeTruthy()
   expect(screen.getByText('Aprovada')).toBeTruthy()
-  expect(screen.getAllByRole('link').map((link) => link.textContent)).toEqual(['Imagem .png', 'Fluxograma .bpm', 'Relatório V2'])
-  fireEvent.click(screen.getByRole('link', { name: /Baixar Relatório V2/ }))
+  const itens = screen.getAllByRole('listitem')
+  expect(itens.map((item) => item.textContent)).toEqual(['fluxo.png', 'fluxo.bpm', 'relatorio.docx'])
+  expect(itens.every((item) => item.querySelector('svg'))).toBe(true)
+  const desenhos = itens.map((item) => item.querySelector('svg')?.innerHTML)
+  expect(new Set(desenhos).size).toBe(3)
+  fireEvent.click(screen.getByRole('link', { name: 'relatorio.docx' }))
   await waitFor(() => expect(falso.baixados).toEqual(['a3']))
+})
+
+test('a linha dos arquivos leva o nível do processo para o recuo', () => {
+  render(<table><tbody><LinhaDosArquivos nivel={1} estado={{ tipo: 'carregando' }} modulo={new VersoesFalso()} aoTentarDeNovo={() => {}} /></tbody></table>)
+  expect(document.querySelector<HTMLElement>('.linha-dos-arquivos td')?.style.getPropertyValue('--nivel')).toBe('1')
 })

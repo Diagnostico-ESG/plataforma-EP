@@ -92,7 +92,7 @@ function ProcessoDaArvore({ item, ...ramo }: RamoProps & { item: ItemDaArvore })
     <>
       <LinhaDoProcesso linha={linha} escolhida={linha.id === ramo.idEscolhido} aoAbrir={ramo.aoAbrir} busca={ramo.busca}
         arvore={{ nivel, aberto, subprocessoDe, aoAlternar: () => ramo.alternarProcesso(linha.id) }} />
-      {aberto && <LinhaDosArquivos estado={ramo.estados[linha.id]} modulo={ramo.modulo} aoTentarDeNovo={() => ramo.buscar([linha.id])} />}
+      {aberto && <LinhaDosArquivos nivel={nivel} estado={ramo.estados[linha.id]} modulo={ramo.modulo} aoTentarDeNovo={() => ramo.buscar([linha.id])} />}
     </>
   )
 }
