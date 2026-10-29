@@ -43,7 +43,7 @@ Funcionalidade 14 do `.scratch/projeto.md`. Decisões na sabatina `.scratch/repo
 ### Cancelados (S8)
 
 - Fora de todas as visualizações (Quadro por etapa, por responsável, por setor e Lista).
-- Na Lista, no fim, a linha **"Mostrar cancelados (N)"**, com N contado depois dos filtros. Ao clicar, aparece um bloco "Cancelados" no fim da tabela, com as mesmas colunas; a linha vira "Esconder cancelados". Na árvore, o bloco é uma lista simples no fim, fora dos ramos, com o setor e o macroprocesso de cada um.
+- Na Lista, no fim, a linha **"Mostrar cancelados (N)"**, com N contado depois dos filtros. Ao clicar, aparece um bloco "Cancelados" no fim da tabela, com as mesmas colunas; a linha vira "Esconder cancelados". Na árvore, o mesmo bloco fica no fim, fora dos ramos; as colunas Setor e Macroprocesso já dizem o setor e o macroprocesso de cada cancelado. Limite conhecido: se os filtros deixam só cancelados, a tela mostra "Nenhum processo com estes filtros." e a linha "Mostrar cancelados (N)" não aparece.
 - Com "Concluídos", a linha não aparece. O filtro da Situação não oferece "Cancelado".
 
 ### Etiqueta Iniciado (S10)
@@ -56,7 +56,7 @@ Funcionalidade 14 do `.scratch/projeto.md`. Decisões na sabatina `.scratch/repo
 - A coluna "Nome" passa a se chamar **Processo**.
 - Cada cabeçalho é um botão que abre um pequeno menu com a ordenação (crescente, decrescente) e, menos em Processo, o filtro de um valor, com "Todos". O cabeçalho mostra quando a coluna está filtrada e em que sentido está ordenada.
 - Filtros por coluna: Tipo, Setor, Macroprocesso, Etapa atual, Responsável (com as mesmas opções de hoje) e Situação (Em andamento, Suspenso, Concluído). Com "Concluídos", o filtro da Situação some do cabeçalho.
-- Ordenação: Processo, Tipo, Setor (sigla), Macroprocesso e Responsável (sem responsável por último) em ordem alfabética; Etapa atual pela ordem do catálogo; Situação em andamento, suspenso, concluído. Padrão: Processo, crescente. Subprocessos seguem o processo pai, como hoje.
+- Ordenação: Processo, Tipo, Setor (sigla), Macroprocesso e Responsável (sem responsável por último) em ordem alfabética; Etapa atual pela ordem do catálogo; Situação em andamento, suspenso, concluído. Padrão: Processo, crescente. Subprocessos vêm logo depois do processo pai em qualquer ordenação (a Lista antiga ordenava só por setor e nome, e o subprocesso não ficava junto do pai; ver `desvios.md`, ticket 04); o subprocesso cujo pai foi filtrado entra na ordem normal, com o "↳ pai". Sem responsável e sem etapa atual ficam no fim nos dois sentidos; o empate desempata pelo nome.
 
 ### Lista: Agrupar por Macroprocesso (S11 a S17)
 
