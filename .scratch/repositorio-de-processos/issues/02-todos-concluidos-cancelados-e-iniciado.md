@@ -14,11 +14,13 @@
 
 **Status:** ready-for-agent
 
-- [ ] O par Todos | Concluídos aparece na Lista e no Quadro por setor, abre em Todos e a opção escolhida fica destacada
-- [ ] Na visualização por setor, Todos mostra os concluídos sempre, mesmo os tirados do Quadro ou com mais de 30 dias; Concluídos mostra só os concluídos do setor
-- [ ] Na Lista, Concluídos mostra só os concluídos e o filtro da Situação some
-- [ ] Cancelados não aparecem no Quadro por etapa, por responsável, por setor nem na Lista; "Mostrar cancelados (N)" mostra o bloco no fim e "Esconder cancelados" o esconde; com Concluídos a linha some
-- [ ] `mostrar=concluidos` fica no endereço e recarregar mostra a mesma visão
-- [ ] A etiqueta aparece como "Iniciado" em todo lugar, inclusive no histórico antigo; o valor no banco continua `em_andamento`
-- [ ] Consulta vê tudo isso sem alterar nada
-- [ ] Testes da tela verdes; `npm test` verde
+- [x] O par Todos | Concluídos aparece na Lista e no Quadro por setor, abre em Todos e a opção escolhida fica destacada
+- [x] Na visualização por setor, Todos mostra os concluídos sempre, mesmo os tirados do Quadro ou com mais de 30 dias; Concluídos mostra só os concluídos do setor
+- [x] Na Lista, Concluídos mostra só os concluídos e o filtro da Situação some
+- [x] Cancelados não aparecem no Quadro por etapa, por responsável, por setor nem na Lista; "Mostrar cancelados (N)" mostra o bloco no fim e "Esconder cancelados" o esconde; com Concluídos a linha some
+- [x] `mostrar=concluidos` fica no endereço e recarregar mostra a mesma visão
+- [x] A etiqueta aparece como "Iniciado" em todo lugar, inclusive no histórico antigo; o valor no banco continua `em_andamento`
+- [x] Consulta vê tudo isso sem alterar nada
+- [x] Testes da tela verdes; `npm test` verde
+
+Concluído em 2026-10-28 (commit 4d8eac6)

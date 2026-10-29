@@ -1035,3 +1035,9 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Migração aplicada no remoto de desenvolvimento.** Esperado: `db push`. Aconteceu: pelo workflow "Migrar banco de desenvolvimento", disparado na branch, como manda o Ajuste do Projeto; o "Testes de banco" da branch ensaiou a migração antes (55 de 55).
 - **Edge Function.** Esperado: decisão testada no Vitest e publicação no desenvolvimento. Aconteceu: a decisão ganhou teste (537 verdes nas funções); a publicação ficou com o usuário e, por isso, a função no ar quebra até ser publicada (lê uma coluna que a migração apagou).
 - **Sugestões.** (1) O plano citou `npm run db:reset`, que não existe neste projeto: o comando é `npx supabase db reset --local`. (2) O banco do Docker pode estar num esquema antigo ao abrir a sessão; o primeiro passo "linha de base" deveria incluir o reset. (3) O pre-commit roda a suíte inteira (cerca de 200 s) e o typecheck: migração, tipos e código que mudam juntos precisam de um commit só. (4) Os arquivos do projeto misturam fim de linha Windows e Unix; edição por script precisa tratar os dois.
+
+## 2026-10-28 — /executar-complexo (repositorio-de-processos, ticket 02)
+
+- **Plano sem banco.** Esperado: pular a Tarefa de banco e as regras de `banco.md` num ticket que não mexe no banco. Aconteceu: o plano declarou isso nas restrições; nenhuma migração, workflow ou função foi tocada.
+- **Branch nova por ticket.** Esperado: criar a branch no passo 2. Aconteceu: a branch do ticket anterior tinha sido apagada na união; `git switch -c repositorio-de-processos` a partir da `main` atualizada, depois fast-forward na união e `git branch -d`.
+- **Sugestão.** O `CLAUDE.md` manda o `/situação` ao abrir sessão nova; aqui a continuação foi na mesma sessão (o usuário aprovou), com o contexto longo. Vale um aviso quando a conversa passa de um ticket para outro na mesma sessão.
