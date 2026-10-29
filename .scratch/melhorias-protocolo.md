@@ -1054,3 +1054,8 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Branch nova por ticket.** Esperado: criar a branch no passo 2. Aconteceu: `git switch -c repositorio-de-processos` a partir da `main`, marco `marco/2026-10-29-inicio-repositorio-de-processos-05` criado e enviado ao GitHub.
 - **Pre-commit lento.** O pre-commit roda a suíte inteira (cerca de 3,5 minutos por commit) e já barrou um commit por complexidade acima de 10 (`lerEnderecoDosProcessos`, corrigido). Sugestão: no `/executar-complexo`, juntar as tarefas pequenas em menos commits, ou rodar `npx eslint src` antes de cada commit.
 - **Revisão final inline.** O `executing-plans` pede um revisor independente no fim; sem autorização para subagente, fiz autorrevisão e registrei no `desvios.md`.
+
+## 2026-10-29 — /demanda (enxugar-cartao-e-cadastro)
+
+- **Perguntas antes de classificar.** Esperado: no máximo duas. Aconteceu: nenhuma; a descrição bastou.
+- **Classificação.** Demanda com itens de três tipos (ajustes pequenos, um bug e mudança com migração). Esperado: o tipo mais rigoroso. Aconteceu: mudança em funcionalidade existente; o bug foi oferecido à parte ou dentro do `/planejar`, e o usuário escolheu dentro (como ticket). Sugestão: o `/demanda` dizer o que fazer com um bug que chega junto de uma mudança maior na mesma tela.
