@@ -94,3 +94,34 @@ test('o item perigoso tem a marca de perigo', () => {
   expect(item('Excluir').classList.contains('menu-de-acoes-perigoso')).toBe(true)
   expect(item('Editar').classList.contains('menu-de-acoes-perigoso')).toBe(false)
 })
+
+function montarComMarcados() {
+  const grupos: ItemDoMenu[][] = [
+    [{ rotulo: 'Crescente', aoEscolher: vi.fn(), marcado: true }, { rotulo: 'Decrescente', aoEscolher: vi.fn(), marcado: false }],
+    [{ rotulo: 'Limpar', aoEscolher: vi.fn() }],
+  ]
+  render(<MenuDeAcoes rotulo="Coluna Setor" grupos={grupos} conteudoDoBotao={<>Setor <span>ordenado</span></>} classeDoBotao="cabecalho-botao" />)
+  return screen.getByRole('button', { name: 'Setor ordenado' })
+}
+
+test('item com marcado vira opção marcável, com aria-checked; sem marcado segue item comum', () => {
+  fireEvent.click(montarComMarcados())
+  expect(screen.getByRole('menuitemradio', { name: 'Crescente' }).getAttribute('aria-checked')).toBe('true')
+  expect(screen.getByRole('menuitemradio', { name: 'Decrescente' }).getAttribute('aria-checked')).toBe('false')
+  expect(screen.getByRole('menuitem', { name: 'Limpar' })).toBeTruthy()
+})
+
+test('as setas passam pelas opções marcáveis e pelos itens comuns', () => {
+  fireEvent.click(montarComMarcados())
+  expect(document.activeElement).toBe(screen.getByRole('menuitemradio', { name: 'Crescente' }))
+  fireEvent.keyDown(document.activeElement as Element, { key: 'End' })
+  expect(document.activeElement).toBe(screen.getByRole('menuitem', { name: 'Limpar' }))
+})
+
+test('com conteúdo próprio, o botão mostra o conteúdo, tira o nome dele e o menu fica com o rótulo', () => {
+  const botao = montarComMarcados()
+  expect(botao.getAttribute('title')).toBeNull()
+  expect(botao.classList.contains('cabecalho-botao')).toBe(true)
+  fireEvent.click(botao)
+  expect(screen.getByRole('menu', { name: 'Coluna Setor' })).toBeTruthy()
+})

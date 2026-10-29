@@ -25,11 +25,26 @@
   right: 0;
   z-index: 5;
   min-width: 200px;
+  /* Lista longa (os responsáveis no cabeçalho da Lista) rola por dentro e não sai da tela em 1366×768. */
+  max-height: min(60vh, 360px);
+  overflow-y: auto;
   padding: var(--esp-1) 0;
   border: 1px solid var(--linha);
   border-radius: var(--canto);
   background: var(--folha);
   box-shadow: var(--sombra-flutuante);
+}
+
+/* A opção marcada (ordenação e filtro do cabeçalho da Lista): o "✓" à esquerda, no espaço que todas as opções reservam. */
+.menu-de-acoes-item[role='menuitemradio'] {
+  padding-left: calc(var(--esp-4) + 1.25em);
+}
+
+.menu-de-acoes-item[aria-checked='true']::before {
+  content: '✓';
+  position: absolute;
+  margin-left: -1.25em;
+  font-weight: 600;
 }
 
 /* A linha inteira é o alvo: 32px de altura, acima dos 24px da WCAG 2.2. */

@@ -1,22 +1,26 @@
 import './MenuDeAcoes.css'
-import { type KeyboardEvent, useCallback, useEffect, useId, useRef, useState } from 'react'
+import { type KeyboardEvent, type ReactNode, useCallback, useEffect, useId, useRef, useState } from 'react'
 import { useFecharAoClicarFora } from '../hooks/useFecharAoClicarFora'
 import { Icone } from './Icone'
 
-export type ItemDoMenu = { rotulo: string; aoEscolher: () => void; perigoso?: boolean }
+/** Com `marcado`, o item é uma opção marcável (menuitemradio), como a ordenação e o filtro do cabeçalho da Lista. */
+export type ItemDoMenu = { rotulo: string; aoEscolher: () => void; perigoso?: boolean; marcado?: boolean }
 type Ponta = 'primeiro' | 'ultimo'
 type MenuDeAcoesProps = {
   rotulo: string
   grupos: ItemDoMenu[][]
   /** A lista abre para a direita do botão (botão perto da borda esquerda do painel); o padrão é para a esquerda. */
   paraDireita?: boolean
+  /** No lugar do "⋯": o botão mostra este conteúdo, que lhe dá o nome; o rótulo fica só no menu. */
+  conteudoDoBotao?: ReactNode
+  classeDoBotao?: string
 }
 
 /**
  * O botão "⋯" com as ações raras, em grupos separados por linha (padrão de menu da WAI-ARIA): abre com o foco no
  * primeiro item, as setas, Home e End movem o foco, Esc fecha e volta ao botão, Tab e clique fora fecham.
  */
-export function MenuDeAcoes({ rotulo, grupos, paraDireita = false }: MenuDeAcoesProps) {
+export function MenuDeAcoes({ rotulo, grupos, paraDireita = false, conteudoDoBotao, classeDoBotao }: MenuDeAcoesProps) {
   const [aberto, setAberto] = useState<Ponta | null>(null)
   const raiz = useRef<HTMLDivElement>(null)
   const botao = useRef<HTMLButtonElement>(null)
@@ -34,10 +38,11 @@ export function MenuDeAcoes({ rotulo, grupos, paraDireita = false }: MenuDeAcoes
   }
   return (
     <div ref={raiz} className={paraDireita ? 'menu-de-acoes menu-de-acoes-para-direita' : 'menu-de-acoes'}>
-      <button ref={botao} type="button" className="botao-icone menu-de-acoes-botao" aria-label={rotulo} title={rotulo}
+      <button ref={botao} type="button" className={classeDoBotao ?? 'botao-icone menu-de-acoes-botao'}
+        aria-label={conteudoDoBotao ? undefined : rotulo} title={conteudoDoBotao ? undefined : rotulo}
         aria-haspopup="menu" aria-expanded={aberto !== null} aria-controls={aberto ? idDoMenu : undefined}
         onClick={() => setAberto(aberto ? null : 'primeiro')} onKeyDown={abrirPelaSeta(setAberto)}>
-        <Icone nome="reticencias" />
+        {conteudoDoBotao ?? <Icone nome="reticencias" />}
       </button>
       {aberto && (
         <ListaDoMenu id={idDoMenu} rotulo={rotulo} grupos={grupos} ponta={aberto} aoEscolher={escolher}
@@ -96,7 +101,7 @@ function GrupoDoMenu({ itens, separado, aoEscolher }: { itens: ItemDoMenu[]; sep
       {separado && <div role="separator" className="menu-de-acoes-separador" />}
       <div role="group">
         {itens.map((item) => (
-          <button key={item.rotulo} type="button" role="menuitem" tabIndex={-1}
+          <button key={item.rotulo} type="button" tabIndex={-1} {...papelDoItem(item)}
             className={item.perigoso ? 'menu-de-acoes-item menu-de-acoes-perigoso' : 'menu-de-acoes-item'}
             onClick={() => aoEscolher(item)}>
             {item.rotulo}
@@ -107,8 +112,13 @@ function GrupoDoMenu({ itens, separado, aoEscolher }: { itens: ItemDoMenu[]; sep
   )
 }
 
+// A marca visual do item marcado (o "✓") vem do CSS por aria-checked; o leitor de tela lê o próprio aria-checked.
+function papelDoItem({ marcado }: ItemDoMenu) {
+  return marcado === undefined ? { role: 'menuitem' } : { role: 'menuitemradio', 'aria-checked': marcado }
+}
+
 function itensDoMenu(lista: HTMLElement | null): HTMLElement[] {
-  return lista ? Array.from(lista.querySelectorAll<HTMLElement>('[role="menuitem"]')) : []
+  return lista ? Array.from(lista.querySelectorAll<HTMLElement>('[role="menuitem"], [role="menuitemradio"]')) : []
 }
 
 function moverFoco(evento: KeyboardEvent, itens: HTMLElement[]) {
