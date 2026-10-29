@@ -17,3 +17,5 @@
 - [ ] Os testes que cobriam os selos que saem e o "Trocar" foram reescritos para o comportamento novo. `npm test` verde.
 - [ ] `[visual]` A foto está maior na frente do cartão e no verso, sem desalinhar a linha.
 - [ ] `[visual]` "Escolher responsável" aparece discreto, sem competir com o botão principal do Agora.
+
+Concluído em 2026-10-29 (commit f46916d)
