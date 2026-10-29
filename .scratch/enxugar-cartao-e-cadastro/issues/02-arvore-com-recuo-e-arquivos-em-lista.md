@@ -12,3 +12,5 @@
 - [ ] "Carregando arquivos…", o erro com "Tentar de novo" e "Sem versão ainda." continuam funcionando.
 - [ ] O teste da árvore está atualizado para o comportamento novo. `npm test` verde.
 - [ ] `[visual]` Cada nível está recuado em relação ao de cima, e a linha dos arquivos se lê como parte do processo acima.
+
+Concluído em 2026-10-29 (commit 46414cc)
