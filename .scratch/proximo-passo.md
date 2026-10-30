@@ -1,9 +1,9 @@
 # Próximo passo (2026-10-30)
 
-**Comando:** `/ship` (Sonnet; Opus na revisão de segurança) para `responsavel-inicial-por-etapa`: o `/polir` já foi feito e há migração nova.
+**Situação:** `responsavel-inicial-por-etapa` (pacote 4) entregue em 2026-10-30, com ressalva ([visual] visto só na vitrine local). Marco `marco/2026-10-30-entrega-responsavel-inicial-por-etapa`. Nada em andamento.
 
-**Já feito:** funcionalidade na `main` (merge 51b5ed2); migração aplicada no desenvolvimento; pgTAP 73 verde (local e GitHub); polimento da coluna do Catálogo com achados em `desvios.md`.
+**O pacote 5 (redesenho do verso do cartão) não entra como pacote próprio.** Por decisão do usuário em 2026-10-30, o verso do cartão passa a fazer parte de uma proposta visual que mexe em todas as telas, que ele está elaborando fora deste fluxo. As propostas `verso-1`, `verso-2` e `verso-3` em `.scratch/proposta-visual/` e a análise `.scratch/analise-de-design-verso-do-cartao-2026-10-30.md` ficam como insumo dessa proposta maior.
 
-**Depende do usuário:** conferir o Catálogo na tela real; escolher o responsável inicial de cada etapa (hoje vazias: mover e cadastrar deixam o processo sem responsável).
+**Comando quando a proposta estiver pronta:** `/concepcao-livre` ou `/concepcao-premium` (Opus), seguido de `/implementar-identidade` (Sonnet), pois ela redesenha todas as telas. Até lá, demandas pequenas entram pelo `/demanda`.
 
-**Pendências de ambiente (não desta entrega):** migrações anteriores possivelmente sem aplicar no remoto de desenvolvimento e funções arquivos-no-drive / planilhas-dos-dashboards sem nova publicação.
+**Depende do usuário:** conferir o Catálogo de etapas com o login real; escolher o responsável inicial de cada etapa (hoje vazias: mover e cadastrar deixam o processo sem responsável); olhar no painel do Supabase de desenvolvimento se o cadastro aberto segue como o ADR 0001 manda.
