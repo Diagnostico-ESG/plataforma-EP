@@ -601,3 +601,10 @@ Ponto de partida da revisão: `marco/2026-10-26-inicio-quadro-livre-parte-5`.
 - **Trava das etapas fixas:** a spec dizia que a trava passaria a liberar a coluna; a trava (`bloquear_etapa_protegida`) só olha nome, fase e ativa, então a coluna nova já passava e o único ajuste foi o privilégio de coluna.
 - **Tipos do banco:** `gerar-tipos --local` devolve o arquivo com formatação diferente da gerada contra o remoto (2.000 linhas de ruído); `src/types/database.ts` recebeu à mão só a coluna `responsavel_inicial_id` de `etapas` (Row, Insert, Update) e a relação com `usuarios`, o que o gerador local mostrou ser a única mudança de estrutura.
 - **Teste 53:** além das três expectativas do plano, a Modelagem ganhou o a2 como responsável inicial na montagem, para os processos entrarem com o a2 como o teste sempre supôs; a asserção do retomar voltou a esperar o a2 (agora o inicial da etapa).
+
+## 2026-10-30 — /polir (responsavel-inicial-por-etapa)
+
+- **Auditoria (coluna Responsável inicial do Catálogo):** 18/20. O detector não achou anti-padrão; só tokens do tema; aviso em texto, não só cor.
+- **Corrigido:** o aviso de inativo ou sem permissão não estava ligado à caixa; agora a caixa leva `aria-describedby` apontando para ele (teste novo em `App.responsavelInicial.test.tsx`). As caixas tinham a largura do nome escolhido e a coluna ficava serrilhada; agora têm largura mínima de 26ch (`.caixa-do-responsavel-inicial`).
+- **Deixado de fora:** nomes muito longos ainda alargam a caixa acima do mínimo (214 e 261 px na vitrine com nomes inventados compridos); cortar o nome seria pior para quem escolhe. Desktop apenas: celular não foi tratado (uso interno, em desktop).
+- **Presumido:** visto só na vitrine local (módulos falsos), a 1366x768, sem login real; leitor de tela não testado.

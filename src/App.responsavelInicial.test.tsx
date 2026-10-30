@@ -113,3 +113,16 @@ test.each<Perfil>(['integrante_ep', 'consulta'])('o perfil %s não vê a Adminis
   expect(within(navegacao).queryByRole('button', { name: 'Administração' })).toBeNull()
   expect(screen.queryByRole('columnheader', { name: 'Responsável inicial' })).toBeNull()
 })
+
+test('o aviso de inválido fica ligado à caixa, para o leitor de tela lê-lo ao focar', async () => {
+  montarComCatalogo({
+    ajustar: (processos) => {
+      processos.usuariosPossiveis = [ANA]
+      comResponsavelInicial('modelagem', { ...FULANO, ativo: false })(processos)
+    },
+  })
+  const secao = await abrirCatalogo()
+  const aviso = secao.getByText('Responsável inicial inativo: escolha outro ou Ninguém.')
+  expect(caixa(secao, 'Modelagem piloto').getAttribute('aria-describedby')).toBe(aviso.id)
+  expect(caixa(secao, 'Divulgação').hasAttribute('aria-describedby')).toBe(false)
+})

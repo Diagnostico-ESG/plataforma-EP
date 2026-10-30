@@ -258,3 +258,8 @@
   font-size: var(--tam-secundario);
   color: var(--atraso-texto);
 }
+
+/* Largura igual em todas as linhas: sem ela cada caixa ficaria do tamanho do nome escolhido e a coluna ficaria serrilhada. */
+.caixa-do-responsavel-inicial {
+  min-width: 26ch;
+}

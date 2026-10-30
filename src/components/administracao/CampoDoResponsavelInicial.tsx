@@ -23,16 +23,17 @@ export function CampoDoResponsavelInicial({ etapa, usuarios, aoEscolher }: Campo
   if (etapa.codigo === CODIGO_CONCLUIDOS) return <>—</>
   const atual = etapa.responsavelInicial ?? null
   const situacao = atual ? situacaoDoResponsavelInicial(atual) : 'valido'
+  const idDoAviso = `aviso-responsavel-inicial-${etapa.id}`
   return (
     <>
-      <select className="seletor-perfil" aria-label={`Responsável inicial de ${etapa.nome}`} value={atual?.id ?? ''}
+      <select className="seletor-perfil caixa-do-responsavel-inicial" aria-label={`Responsável inicial de ${etapa.nome}`} value={atual?.id ?? ''} aria-describedby={situacao === 'valido' ? undefined : idDoAviso}
         onChange={(mudanca) => aoEscolher(etapa, mudanca.target.value === '' ? null : mudanca.target.value)}>
         <BotaoDaCaixa />
         <OpcaoDaCaixa valor="" rotulo="Ninguém" />
         {atual && !usuarios.some((usuario) => usuario.id === atual.id) && <OpcaoDoAtual atual={atual} situacao={situacao} />}
         {usuarios.map((usuario) => <OpcaoDaCaixa key={usuario.id} valor={usuario.id} rotulo={usuario.nome} pessoa={pessoaDaOpcao(usuario)} />)}
       </select>
-      {situacao !== 'valido' && <p className="administracao-aviso">{AVISO[situacao]}</p>}
+      {situacao !== 'valido' && <p id={idDoAviso} className="administracao-aviso">{AVISO[situacao]}</p>}
     </>
   )
 }
