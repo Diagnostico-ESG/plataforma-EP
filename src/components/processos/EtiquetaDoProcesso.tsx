@@ -14,8 +14,8 @@ function Desenho({ valor, tamanho }: { valor: EtiquetaDaEtapa; tamanho: number }
       )}
       {valor === 'concluido' && (
         <>
-          <circle cx="12" cy="12" r="10" fill="var(--etiqueta-finalizado)" />
-          <path d="M7.5 12.5l3 3 6-6.5" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="12" cy="12" r="9.5" fill="var(--etiqueta-finalizado)" />
+          <path d="M7.5 12.5l3 3 6-6.5" stroke="var(--folha)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
         </>
       )}
     </svg>

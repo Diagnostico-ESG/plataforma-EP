@@ -56,7 +56,7 @@
 
 .faixa-item:hover {
   color: var(--folha);
-  background: rgb(255 255 255 / 8%);
+  background: var(--grafite-hover);
 }
 
 /* Item ativo: azul-claro com o ícone azul. */

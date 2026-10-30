@@ -26,6 +26,7 @@
   /* Moldura neutra: grafite na faixa lateral, branco e cinza-claro no resto */
   --grafite: #252b36;
   --grafite-icone: #9aa3b2;
+  --grafite-hover: rgb(255 255 255 / 8%);
 
   /* Azul: cheio só na ação principal; azul-claro com texto azul-escuro em tudo que está escolhido ou ligado */
   --azul: #3a5afe;
@@ -41,8 +42,6 @@
   --linha: #e3e6ec;
   --linha-leve: #f0f2f5;
   --linha-tracejada: #c3cad8;
-  --barra-coluna-trilho: #d5dbe7;
-  --barra-coluna: #9aa6be;
 
   /* Texto; `inativo` é só para ícones e enfeites (2,9:1 não serve para texto) */
   --texto: #1d2330;

@@ -69,7 +69,7 @@ function classesDoCartao(processo: ProcessoDaLista, apagado: boolean): string {
 function QuemCuida({ responsavel }: { responsavel: ProcessoDaLista['responsavel'] }) {
   return (
     <span className={responsavel ? 'cartao-responsavel' : 'cartao-responsavel cartao-responsavel-vazio'}>
-      <Icone nome="conta" tamanho={14} />
+      <Icone nome="conta" tamanho={13} />
       {responsavel ? responsavel.nome : 'Sem responsável'}
     </span>
   )

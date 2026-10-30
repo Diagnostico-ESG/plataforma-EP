@@ -189,3 +189,15 @@ Fora do `/implementar-identidade` por decisão do usuário (opção A): a aparê
 - Quadradinho de cor do macroprocesso (`--macro-violeta`) ainda existe nas caixas de seleção; a identidade manda tirá-lo → `/demanda`.
 - Selo de tipo de arquivo mono (BPMN, PNG, PDF…) e busca e avisos na barra superior → `/planejar`.
 - `.impeccable/design.json` (arquivo lateral do DESIGN.md) ainda descreve a identidade antiga → `/impeccable document`.
+
+## Achados da revisão de código da identidade (2026-10-30)
+
+Pendências visuais que ficaram fora da fase atual:
+- Selo do setor sem o nome ao passar o mouse e para o leitor de tela (a identidade pede; o cartão não traz o nome do setor) → `/demanda`.
+- Rodapé do cartão: dias e prazo ainda são pílulas com fundo; a identidade pede ícone + texto mono, o prazo nas cores `atraso`/`vence` e um contador de arquivos → `/demanda`.
+- Avatar: iniciais dos outros usuários em `#4A5163` sobre `#E9ECF1`, "sem responsável" tracejado e tamanhos 20/24/32 → `/demanda`.
+- Faixa de controles: hoje é um bloco branco com borda e canto; a identidade pede faixa de 56px de altura fixa, só com borda inferior (vem junto do botão "Filtros") → `/planejar`.
+- Plaqueta da coluna só com o nome e a descrição da etapa abaixo → `/demanda`.
+- `Quadro.css` tem mais de 300 linhas (o limite só é checado em TS): dividir Lista e Quadro em dois arquivos.
+- Cores de setor (12 hex) moram em `corDoSetor.ts`, não em `tokens.css`, por serem dado ligado ao número do banco: registrar a exceção num ADR.
+- A conversão 1–30 → 1–12 aparece em três lugares: concentrar numa função.
