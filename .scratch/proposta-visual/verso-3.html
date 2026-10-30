@@ -1,0 +1,152 @@
+<!doctype html>
+<!-- Protótipo descartável (2026-10-30): verso-3 = verso-2 (enxuto, sem abas) com a trilha de etapas da verso-1 e o histórico no menu "···".
+     Dados inventados. Visões: #fechado, #menu, #historico -->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Verso do cartão 3</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--azul:#3a5afe;--azul-claro:#e8edff;--azul-escuro:#2a44c9;--lateral:#252b36;--fundo:#f3f4f7;--linha:#e3e6ec;--texto:#1d2330;--texto-2:#5f6776;--inativo:#9098a6;
+--atraso:#d1293d;--vence:#c2620a;--mono:'IBM Plex Mono',Consolas,monospace}
+*{box-sizing:border-box;margin:0}
+body{font:13px/1.45 'Source Sans 3',system-ui,sans-serif;color:var(--texto);background:var(--fundo);height:100vh;overflow:hidden}
+svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.moldura{position:fixed;inset:0;display:grid;grid-template:52px 56px 1fr/56px 1fr}
+.moldura .l{grid-row:1/4;background:var(--lateral)}.moldura .t{background:#fff}.moldura .b{background:#fff;border-bottom:1px solid var(--linha)}
+.veu{position:fixed;inset:0;background:rgb(29 35 48/.45);display:grid;place-items:center}
+.janela{background:#fff;border-radius:12px;width:880px;max-height:850px;box-shadow:0 24px 60px rgb(29 35 48/.3);display:flex;flex-direction:column;overflow:hidden}
+.cab{padding:18px 22px 0;position:relative}
+.cab .l1{display:flex;align-items:center;gap:10px}
+.cab h1{font-size:19px;font-weight:700;line-height:1.25}.cab .dir{margin-left:auto;display:flex;gap:6px;align-items:center;position:relative}
+.dados{margin-top:4px;font-size:12.5px;color:var(--texto-2);display:flex;gap:6px;flex-wrap:wrap}.dados span+span::before{content:'·';margin-right:6px;color:var(--inativo)}
+.setor{font:700 11px 'Source Sans 3';letter-spacing:.3px;color:#fff;border-radius:4px;padding:2px 7px}
+.btn{border:1px solid var(--linha);background:#fff;font:600 13px 'Source Sans 3';color:var(--texto);height:32px;padding:0 11px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.btn.prim{background:var(--azul);border-color:var(--azul);color:#fff}.btn.leve{border-color:transparent;background:none;color:var(--texto-2)}.btn.icone{width:32px;padding:0;justify-content:center}
+.btn.on{background:var(--azul-claro);border-color:transparent;color:var(--azul-escuro)}
+.btn.peq{height:28px;font-size:12px;padding:0 9px}
+/* Trilha da verso-1 */
+.trilha{display:flex;align-items:flex-start;margin:16px 0 0;padding:12px 6px 10px;background:#fafbfc;border:1px solid var(--linha);border-radius:10px}
+.passo{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;font-size:11px;color:var(--texto-2);text-align:center;line-height:1.25;padding:0 2px}
+.passo::before{content:'';position:absolute;top:14px;left:-50%;right:50%;height:2px;background:#d5dbe7;z-index:0}.passo:first-child::before{display:none}
+.passo.feito::before,.passo.atual::before{background:#6b7a99}
+.bola{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#fff;border:1.5px solid #d5dbe7;color:var(--inativo);position:relative;z-index:1}.bola svg{width:14px;height:14px}
+.feito .bola{background:#eef0f4;border-color:#eef0f4;color:#4a5163}.atual .bola{background:var(--azul-claro);border-color:var(--azul);color:var(--azul)}
+.atual{color:var(--azul-escuro);font-weight:700}.passo small{font:400 10px var(--mono);color:var(--inativo)}.atual small{color:var(--azul-escuro)}
+.agora{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.seg{display:inline-flex;background:var(--fundo);border:1px solid var(--linha);border-radius:6px;padding:2px}
+.seg button{border:0;background:none;width:32px;height:26px;border-radius:4px;display:grid;place-items:center}.seg .sim{background:var(--azul-claro)}
+.seg.txt button{width:auto;padding:0 10px;font:600 12px 'Source Sans 3';color:var(--texto-2)}.seg.txt .sim{color:var(--azul-escuro)}
+.rotulo{font-size:12px;color:var(--texto-2)}
+.pessoa{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--linha);border-radius:999px;padding:2px 10px 2px 2px;font-weight:600}
+.av{width:24px;height:24px;border-radius:50%;background:var(--azul-claro);color:var(--azul-escuro);font:600 10px/24px 'Source Sans 3';text-align:center;display:inline-block;flex:none}.av.outro{background:#e9ecf1;color:#4a5163}
+.aviso{display:flex;gap:8px;align-items:center;font-size:12.5px;padding:7px 10px;border-radius:6px;margin-top:8px}
+.aviso.atraso{background:#fdecee;color:#8f1d2c}.aviso.revisor{background:#fff6e5;color:#7a4a00}
+.corpo{padding:18px 22px 18px;overflow:hidden}
+.secao{margin-bottom:16px}.secao:last-child{margin-bottom:0}
+.secao h3{font-size:12px;font-weight:700;color:var(--texto-2);text-transform:uppercase;letter-spacing:.4px;display:flex;align-items:center;gap:8px;margin-bottom:8px}.secao h3 .dir{margin-left:auto;text-transform:none;letter-spacing:0}
+.versao{display:flex;gap:18px;align-items:flex-start;border:1px solid var(--linha);border-radius:10px;padding:10px}
+/* Rearranjo: avisos lado a lado e recolhidos lado a lado liberam altura para a miniatura, a lista de arquivos e as anotações. */
+.avisos{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.avisos .aviso{margin-top:0}
+.recolhes{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:6px}.recolhes .recolhe{border-top:1px solid #f0f2f5}
+.lista-arq{margin-top:10px;border-top:1px solid #f0f2f5}
+.lista-arq div{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #f0f2f5}
+.lista-arq b{font:700 9px var(--mono);color:#fff;border-radius:4px;padding:3px 0;width:38px;text-align:center;flex:none}
+.lista-arq .n{font-weight:600}.lista-arq .m{font-size:11.5px;color:var(--texto-2)}.lista-arq .baixar{margin-left:auto;color:var(--texto-2)}
+.nota-caixa{border:1px solid var(--linha);border-radius:8px;padding:10px 12px;min-height:96px}
+.mini{width:360px;height:196px;border:1px solid var(--linha);border-radius:6px;background:#fbfcfe;display:grid;place-items:center;flex:none}
+.versao .info{flex:1;min-width:0}.versao .t{display:flex;align-items:center;gap:8px;font-weight:700}.versao .m{font-size:12px;color:var(--texto-2);margin-top:2px}
+.arqs{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.arq{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--linha);border-radius:6px;padding:3px 8px 3px 4px;font-size:12px;font-weight:600}
+.arq b{font:700 9px var(--mono);color:#fff;border-radius:4px;padding:2px 4px}.arq svg{width:13px;height:13px;color:var(--texto-2)}
+.ver-tag{font:700 12px var(--mono);background:var(--azul-claro);color:var(--azul-escuro);border-radius:4px;padding:1px 6px}
+.recolhe{display:flex;align-items:center;gap:8px;padding:8px 2px;border-top:1px solid #f0f2f5;color:var(--texto-2);font-weight:600}.recolhe .n{font:500 12px var(--mono);color:var(--inativo)}
+.nota{font-size:13px;line-height:1.55;border-left:3px solid var(--linha);padding-left:10px}.nota small{display:block;color:var(--inativo);font-size:11.5px;margin-top:4px}
+.menu{position:absolute;top:38px;right:38px;background:#fff;border:1px solid var(--linha);border-radius:8px;box-shadow:0 8px 24px rgb(29 35 48/.14),0 2px 6px rgb(29 35 48/.08);padding:4px;width:220px;z-index:5}
+.menu div{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:6px;font-size:13px}.menu div svg{color:var(--texto-2)}.menu .foco{background:var(--azul-claro);color:var(--azul-escuro)}.menu .foco svg{color:var(--azul)}
+.menu .perigo,.menu .perigo svg{color:var(--atraso)}.menu hr{border:0;border-top:1px solid var(--linha);margin:4px 0}
+/* Histórico da verso-1 */
+.voltar{display:flex;align-items:center;gap:10px;margin:14px 0 0}
+.evento{display:grid;grid-template-columns:52px 30px 1fr;gap:12px;padding:11px 0;border-bottom:1px solid #f0f2f5;align-items:start}
+.evento .tipo-ev{display:inline-flex;align-items:center;gap:6px;font-weight:700}.evento .tipo-ev svg{color:var(--texto-2)}
+.mud{font-size:12.5px;color:var(--texto-2);margin-top:3px}.mud s{color:var(--inativo)}.mud b{color:var(--texto)}
+.dia{font:600 12px 'Source Sans 3';color:var(--texto-2);padding:12px 0 2px;text-transform:uppercase;letter-spacing:.4px}
+.mono{font:500 12px var(--mono)}.muted{color:var(--inativo)}
+</style>
+</head>
+<body>
+<svg style="display:none">
+<symbol id="x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="pontos" viewBox="0 0 24 24"><circle cx="5" cy="12" r=".8"/><circle cx="12" cy="12" r=".8"/><circle cx="19" cy="12" r=".8"/></symbol>
+<symbol id="seta" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+<symbol id="dir" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+<symbol id="esq" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+<symbol id="ok" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
+<symbol id="baixar" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></symbol>
+<symbol id="mais" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="alerta" viewBox="0 0 24 24"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17.5h.01"/></symbol>
+<symbol id="cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+<symbol id="mover" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="lapis" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+<symbol id="historico" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></symbol>
+<symbol id="pausa" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/></symbol>
+<symbol id="cancelar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M6 6l12 12"/></symbol>
+<symbol id="lixo" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+<symbol id="camadas" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></symbol>
+<symbol id="pessoa" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+<symbol id="etiqueta" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8" r="1"/></symbol>
+<symbol id="doc" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+<symbol id="e0" viewBox="0 0 24 24"><path d="M3 13l2.5-7.5A2 2 0 0 1 7.4 4h9.2a2 2 0 0 1 1.9 1.5L21 13v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 13h5l1.5 2.5h5L16 13h5"/></symbol>
+<symbol id="e1" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+<symbol id="e2" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></symbol>
+<symbol id="e3" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8.5 11l2 2 3.5-3.5"/></symbol>
+<symbol id="e4" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></symbol>
+<symbol id="e5" viewBox="0 0 24 24"><path d="M12 3l2.4 1.8 3-.2.9 2.9 2.5 1.7-1 2.8 1 2.8-2.5 1.7-.9 2.9-3-.2L12 21l-2.4-1.8-3 .2-.9-2.9L3.2 14.8l1-2.8-1-2.8 2.5-1.7.9-2.9 3 .2z"/><path d="M8.5 12l2.3 2.3 4.7-4.6"/></symbol>
+<symbol id="e6" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></symbol>
+<symbol id="e7" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+</svg>
+<div class="moldura"><div class="l"></div><div class="t"></div><div class="b"></div></div>
+<div class="veu"><div class="janela" id="janela"></div></div>
+<script>
+const ic=n=>`<svg class="i"><use href="#${n}"/></svg>`
+const ST={a:'<circle cx="12" cy="12" r="8" fill="none" stroke="#9098a6" stroke-width="2"/>',i:'<circle cx="12" cy="12" r="8" fill="none" stroke="#3a5afe" stroke-width="2"/><path d="M12 4a8 8 0 0 1 0 16z" fill="#3a5afe"/>',
+f:'<circle cx="12" cy="12" r="9" fill="#16a34a"/><path d="M8 12.2l2.8 2.8 5.2-5.4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'}
+const ETAPAS=[['Não iniciados','14/10'],['Modelagem piloto','16/10'],['Relatório e modelagem técnica','21/10'],['Revisão interna'],['Validação com o setor'],['Aprovação pelo setor'],['Publicação'],['Concluídos']]
+const ATUAL=3
+const visao=location.hash.slice(1)||'fechado'
+const fluxo=`<svg viewBox="0 0 300 150" width="344" height="172" fill="none" stroke="#6b7a99" stroke-width="2"><circle cx="26" cy="40" r="10"/><rect x="50" y="28" width="60" height="24" rx="4"/><path d="M36 40h14M110 40h20"/><rect x="130" y="28" width="60" height="24" rx="4"/>
+ <path d="M160 52v24"/><path d="M160 76l12 12-12 12-12-12z"/><path d="M172 88h30"/><rect x="202" y="76" width="60" height="24" rx="4"/><path d="M160 100v26"/><circle cx="160" cy="134" r="8" stroke-width="3"/></svg>`
+const arq=(t,c,n)=>`<span class="arq"><b style="background:${c}">${t}</b>${n}${ic('baixar')}</span>`
+// O histórico abre pelo menu "···"; o primeiro item do menu, com o foco do teclado, é ele.
+const menu=`<div class="menu"><div class="foco">${ic('historico')}Histórico</div><div>${ic('lapis')}Editar</div><div>${ic('camadas')}Reclassificar</div><hr>
+ <div>${ic('pausa')}Suspender</div><div>${ic('cancelar')}Cancelar processo</div><hr><div class="perigo">${ic('lixo')}Excluir…</div></div>`
+const titulo=`<div class="l1"><span class="setor" style="background:#0f766e" title="Diretoria de Tecnologia">TEC</span><h1>Gestão de acessos aos sistemas</h1>
+ <div class="dir"><button class="btn prim">Registrar revisão</button><button class="btn icone ${visao==='menu'?'on':''}">${ic('pontos')}</button><button class="btn icone leve">${ic('x')}</button>${visao==='menu'?menu:''}</div></div>
+ <div class="dados"><span>Diretoria de Tecnologia</span><span>Macroprocesso a definir</span><span>Processo</span><span>Em andamento</span></div>`
+const trilha=`<div class="trilha">${ETAPAS.map(([e,d],i)=>`<div class="passo ${i<ATUAL?'feito':i===ATUAL?'atual':''}"><span class="bola">${i<ATUAL?ic('ok'):ic('e'+i)}</span>${e}${i<ATUAL?`<small>${d}</small>`:i===ATUAL?'<small>desde 28/10 · 2 dias</small>':''}</div>`).join('')}</div>`
+const agora=`<div class="agora"><span class="rotulo">Etiqueta</span><span class="seg">${['a','i','f'].map(k=>`<button class="${k==='i'?'sim':''}" title="${{a:'A fazer',i:'Iniciado',f:'Finalizado'}[k]}"><svg viewBox="0 0 24 24" width="16" height="16">${ST[k]}</svg></button>`).join('')}</span>
+ <span class="rotulo" style="margin-left:12px">Responsável</span><span class="pessoa"><span class="av">AL</span>Você${ic('seta')}</span><button class="btn peq" style="margin-left:auto">${ic('mover')}Mover para${ic('seta')}</button></div>
+ <div class="avisos"><div class="aviso atraso">${ic('cal')}<b>Prazo vencido há 3 dias</b>&nbsp;(27/10)</div>
+ <div class="aviso revisor">${ic('alerta')}A V2 é sua; a revisão deve ser de outra pessoa.</div></div>`
+const corpo=`<div class="corpo">
+ <div class="secao">
+  <div class="versao"><div class="mini">${fluxo}</div><div class="info"><div class="t"><span class="ver-tag">V2</span>Versão atual do fluxograma<button class="btn peq" style="margin-left:auto">${ic('mais')}Enviar versão</button></div>
+  <div class="m">27/10 por você · Relatório V1 vale para esta versão</div>
+  <div class="lista-arq">${[['BPMN','#4f46e5','Fluxograma','.bpmn · 48 KB'],['PNG','#0891b2','Imagem','.png · 212 KB'],['BPM','#6b7a99','Bizagi','.bpm · 96 KB'],['DOCX','#2a44c9','Relatório V1','.docx · 1,2 MB']].map(([t,c,n,m])=>`<div><b style="background:${c}">${t}</b><span class="n">${n}</span><span class="m">${m}</span><span class="baixar">${ic('baixar')}</span></div>`).join('')}</div></div></div>
+  <div class="recolhes"><div class="recolhe">${ic('dir')}Versões anteriores<span class="n">1</span></div><div class="recolhe">${ic('dir')}Outros anexos<span class="n">2</span></div></div></div>
+ <div class="secao"><h3>Anotações<span class="dir"><button class="btn peq leve">${ic('lapis')}Editar</button></span></h3>
+  <div class="nota-caixa"><p class="texto">Setor pediu para incluir o fluxo de acesso de terceirizados. Conferir com a equipe de segurança antes da validação.</p></div>
+  <p class="muted" style="font-size:11.5px;margin-top:4px">Carla Nunes · 29/10, 21:06</p></div></div>`
+function historico(){const ev=[['30/10',[['10:12','AL','etiqueta','Mudou a etiqueta',[['Etiqueta','A fazer','Iniciado']]],['09:40','CN','pessoa','Trocou o responsável',[['Responsável','Bruno Reis','Você']]]]],
+ ['28/10',[['17:37','BR','mover','Moveu o processo',[['Etapa','Relatório e modelagem técnica','Revisão interna']]]]],
+ ['27/10',[['15:05','AL','doc','Enviou o relatório V1',[['Vale para','','fluxograma V2']]],['15:02','AL','doc','Enviou a versão V2',[['Arquivos','','.bpmn, .png, .bpm']]]]]]
+ return `<div class="cab" style="padding-bottom:0"><div class="voltar"><button class="btn peq">${ic('esq')}Voltar ao processo</button><b style="font-size:15px">Histórico</b>
+ <span class="seg txt" style="margin-left:auto">${['Tudo','Etapas','Documentos','Responsável','Etiqueta'].map((o,i)=>`<button class="${i===0?'sim':''}">${o}</button>`).join('')}</span></div></div>
+ <div class="corpo" style="padding-top:4px">${ev.map(([d,es])=>`<div class="dia">${d}</div>`+es.map(([h,r,i,acao,m])=>`<div class="evento"><span class="mono muted">${h}</span><span class="av ${r==='AL'?'':'outro'}">${r}</span>
+ <div><span class="tipo-ev">${ic(i)}${acao}</span> <span class="muted">por ${r==='AL'?'você':{BR:'Bruno Reis',CN:'Carla Nunes'}[r]}</span>${m.map(([c,a,dp])=>`<div class="mud">${c}: ${a?`<s>${a}</s> → `:''}<b>${dp}</b></div>`).join('')}</div></div>`).join('')).join('')}</div>`}
+// Medida da janela gravada no body, para conferir que o rearranjo não aumenta o verso.
+requestAnimationFrame(()=>{const r=document.getElementById('janela').getBoundingClientRect();document.body.dataset.medida=`${Math.round(r.width)}x${Math.round(r.height)}`})
+document.getElementById('janela').innerHTML=visao==='historico'?`<div class="cab">${titulo}</div>`+historico():`<div class="cab">${titulo}${trilha}${agora}</div>`+corpo
+</script>
+</body>
+</html>
