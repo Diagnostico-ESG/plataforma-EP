@@ -189,3 +189,5 @@ A especificação original lista no processo os campos origem (novo | retomado),
 15. `[visual]` Na árvore, cada nível está recuado em relação ao de cima, e a linha dos arquivos se lê como parte do processo acima.
 16. `[visual]` "Escolher responsável" aparece discreto, sem competir com o botão principal do Agora.
 17. `[visual]` A data na linha da Modelagem piloto cabe na linha das Etapas sem quebrar o desenho da linha do tempo.
+
+Entregue em 2026-10-30 (commit 7a02d80), com ressalva: critérios [visual] 14 a 17 presumidos (nada visto com o login real); revisão de segurança foi a de reserva (menos completa: o /security-review só viu documentação); conferência do cadastro aberto no painel do Supabase de desenvolvimento adiada (backlog); a Edge Function planilhas-dos-dashboards ainda precisa ser publicada de novo no desenvolvimento; pgTAP só no workflow "Testes de banco" (Docker indisponível); as ressalvas das entregas anteriores seguem valendo
