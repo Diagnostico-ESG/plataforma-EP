@@ -105,8 +105,8 @@ insert into _tap (linha) select results_eq(
 insert into _tap (linha) select results_eq(
   $sql$select etapa_atual_codigo, etiqueta::text, responsavel_id::text from public.processos_com_andamento
     where id = pg_temp.processo('Anda')$sql$,
-  $sql$values ('modelagem', 'a_fazer', '00000000-0000-0000-0000-0000000000a1')$sql$,
-  'a passagem nova começa em A fazer, e quem moveu vira o responsável');
+  $sql$values ('modelagem', 'a_fazer', null::text)$sql$,
+  'a passagem nova começa em A fazer, e quem moveu não vira o responsável (sem responsável inicial, fica sem)');
 insert into _tap (linha) select is((select movido_por::text from public.passagens where processo_id = pg_temp.processo('Anda')
   and saiu_em is null), '00000000-0000-0000-0000-0000000000a1', 'a passagem aberta guarda quem moveu');
 insert into _tap (linha) select is(pg_temp.movimentos('Anda'), 3::bigint, 'cada movimento gera um evento');
@@ -118,7 +118,7 @@ insert into _tap (linha) select results_eq(
     detalhes->'depois'->>'responsavel_id', autor_id::text
     from public.eventos where entidade = 'passagem' and acao = 'mover' and entidade_ref = pg_temp.processo('Anda')::text
     order by id desc limit 1$sql$,
-  $sql$values ('aprovacao_setor', 'modelagem', '00000000-0000-0000-0000-0000000000a2', '00000000-0000-0000-0000-0000000000a1',
+  $sql$values ('aprovacao_setor', 'modelagem', null::text, null::text,
     '00000000-0000-0000-0000-0000000000a1')$sql$,
   'o evento do movimento leva a etapa e o responsável de antes e de depois');
 

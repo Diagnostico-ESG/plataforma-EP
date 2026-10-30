@@ -40,14 +40,14 @@
 ## Tarefa 0: Preparo
 
 - [ ] **0.1** Confira `git status` limpo (só o arquivo deste plano pode estar solto) e crie a branch: `git switch -c responsavel-inicial-por-etapa`. Comite este plano: `git add .scratch/processos-etapas/plano-responsavel-inicial.md && git commit -m "executar: plano de responsavel-inicial-por-etapa"`.
-- [ ] **0.2** Confira que o Docker responde: `docker info`. **Se o motor não responder** (aconteceu ao planejar: "failed to connect to the docker API"), **pare e peça ao usuário** que abra o Docker Desktop; sem ele não há teste de banco local, e o teste de banco não se pula. Com o Docker no ar: `npx supabase start > /dev/null 2>&1`.
-- [ ] **0.3** Base de comparação: `npx supabase db reset` e `npx supabase test db 2>&1 | grep -cE "^(ok|not ok)"` registrado de cabeça (quantas linhas `ok`, quantas `not ok` antes de mexer). Se já houver `not ok`, anote quais e não as confunda com as desta tarefa.
+- [x] **0.2** Confira que o Docker responde: `docker info`. **Se o motor não responder** (aconteceu ao planejar: "failed to connect to the docker API"), **pare e peça ao usuário** que abra o Docker Desktop; sem ele não há teste de banco local, e o teste de banco não se pula. Com o Docker no ar: `npx supabase start > /dev/null 2>&1`.
+- [x] **0.3** Base de comparação: `npx supabase db reset` e `npx supabase test db 2>&1 | grep -cE "^(ok|not ok)"` registrado de cabeça (quantas linhas `ok`, quantas `not ok` antes de mexer). Se já houver `not ok`, anote quais e não as confunda com as desta tarefa.
 
 ## Tarefa 1: Banco
 
 **Consome:** `private.conferir_responsavel(novo uuid, antigo uuid)` (migração `20261014143045`), `private.mudar_situacao`, `private.evento_do_movimento`, `private.trocar_passagem`, `private.gravar_processo_movido`, `private.estado_da_etapa`. **Produz:** coluna `etapas.responsavel_inicial_id`; `private.responsavel_inicial_valido(uuid) returns uuid`; recusas `responsavel_invalido:<nome>` e `responsavel_inicial_em_concluidos`; evento da etapa com `responsavel_inicial_id` e `responsavel_inicial_nome` no antes e no depois.
 
-- [ ] **1.1 Escreva o teste que falha.** Crie `supabase/tests/73_responsavel_inicial.test.sql` com o conteúdo abaixo (34 asserções, histórias 1 a 17 e 22; critérios 2 a 9). Cada célula da tabela "quem pode o quê" da spec é um teste: Administrador (1, 2), Integrante (3), Consulta (4), inativo (5) e visitante sem login (6).
+- [x] **1.1 Escreva o teste que falha.** Crie `supabase/tests/73_responsavel_inicial.test.sql` com o conteúdo abaixo (34 asserções, histórias 1 a 17 e 22; critérios 2 a 9). Cada célula da tabela "quem pode o quê" da spec é um teste: Administrador (1, 2), Integrante (3), Consulta (4), inativo (5) e visitante sem login (6).
 
 ```sql
 -- Responsável inicial por etapa (funcionalidade 17 de processos-etapas; ADR 0036): só o Administrador ativo define o
@@ -272,15 +272,15 @@ do $$ begin
 end $$;
 ```
 
-- [ ] **1.2 Ajuste os testes antigos que esperam a regra velha** (critério 4: "quem move não vira responsável"; história 14):
+- [x] **1.2 Ajuste os testes antigos que esperam a regra velha** (critério 4: "quem move não vira responsável"; história 14):
   - `52_mover_processo.test.sql`, asserção "a passagem nova começa em A fazer, e quem moveu vira o responsável": o esperado `'00000000-0000-0000-0000-0000000000a1'` passa a `null::text`; renomeie para "…e quem moveu não vira o responsável (sem responsável inicial, fica sem)".
   - `52_mover_processo.test.sql`, asserção "o evento do movimento leva a etapa e o responsável de antes e de depois": `antes.responsavel_id` era `a2` (quem moveu antes) e `depois.responsavel_id` era `a1`; ambos viram `null::text`.
   - `53_etiqueta_e_responsavel.test.sql`, "o processo retomado continua com a etapa, a etiqueta e o responsável de antes": o responsável esperado passa de `a2` para `null::text` (a Modelagem piloto não tem responsável inicial nesse teste); renomeie para "…e fica sem responsável (a etapa não tem responsável inicial)".
   - Sem a migração ainda, essas asserções continuam como estavam (verdes na regra velha); elas só ficam vermelhas e certas na 1.4. **Não** mude outras asserções à toa: depois da migração, rode a bateria inteira e mude só as que falharem *por esta regra* (as outras falhas são problema novo: pare e investigue).
 
-- [ ] **1.3 Veja o teste novo falhar.** `npx supabase test db 2>&1 | grep -E "^(ok|not ok)|responsavel_inicial"`. Esperado: o `73_` aborta logo no primeiro uso da coluna `responsavel_inicial_id` ("column … does not exist"). Esse é o motivo certo.
+- [x] **1.3 Veja o teste novo falhar.** `npx supabase test db 2>&1 | grep -E "^(ok|not ok)|responsavel_inicial"`. Esperado: o `73_` aborta logo no primeiro uso da coluna `responsavel_inicial_id` ("column … does not exist"). Esse é o motivo certo.
 
-- [ ] **1.4 Crie a migração.** `npx supabase migration new responsavel_inicial_por_etapa`; cole o conteúdo abaixo no arquivo gerado. O corpo de `mover_processo` é o da migração `20261027120000_confirmacao_de_arquivos` com uma linha trocada (a do responsável); confira que o resto está idêntico.
+- [x] **1.4 Crie a migração.** `npx supabase migration new responsavel_inicial_por_etapa`; cole o conteúdo abaixo no arquivo gerado. O corpo de `mover_processo` é o da migração `20261027120000_confirmacao_de_arquivos` com uma linha trocada (a do responsável); confira que o resto está idêntico.
 
 ```sql
 -- Responsável inicial por etapa (funcionalidade 17 de processos-etapas; ADR 0036, que substitui a parte do ADR 0022 em
@@ -416,11 +416,11 @@ revoke execute on function private.conferir_responsavel_inicial(), private.dar_r
   from public, anon, authenticated;
 ```
 
-- [ ] **1.5 Aplique no banco local e rode a bateria.** `npx supabase db reset`, depois `npx supabase test db 2>&1 | grep -E "^(ok|not ok)|RESULTADO"`. Esperado: as 34 do `73_` com `ok`; nenhum `not ok` novo. Para cada `not ok` fora do `73_`: leia a asserção; se ela espera "quem move/retomar vira ou mantém o responsável", ajuste à regra nova como na 1.2 (nada além disso). Se o `73_` falhar na mudança direta de perfil do usuário `a6` (o banco pode recusar `update public.usuarios set perfil`), troque essa linha pela função de perfil que o `05_gerir_usuarios.test.sql` usa, sem mudar o que o teste prova.
-- [ ] **1.6 Confira os testes que olham funções e permissões** (`00_rls_ligada`, `10_privilegios_padrao`, `46_funcoes_e_views_seguras`, `47_login_so_com_o_necessario`): precisam estar verdes com as funções novas (sem `security definer`, `search_path` vazio, sem execução para `anon`).
-- [ ] **1.7 Gere os tipos do banco local:** `node scripts/gerar-tipos.mjs --local` (grava `src/types/database.ts`). Confira com `git diff --stat src/types/database.ts` que só entrou `responsavel_inicial_id` em `etapas` (as três formas: Row, Insert, Update) e a relação; qualquer outra mudança grande é sinal de banco local fora de dia: pare.
-- [ ] **1.8 Se a trava das fixas já deixava a coluna passar** (era o que se esperava ao ler o gatilho, ao contrário do que a spec supunha), acrescente a entrada datada em `.scratch/processos-etapas/desvios.md`: "2026-10-30: a spec dizia que a trava das etapas fixas passaria a liberar a coluna; a trava só olha nome, fase e ativa, então a coluna nova já passava e o único ajuste foi o privilégio de coluna." Só se for o caso.
-- [ ] **1.9 Commit:** `git add supabase src/types/database.ts && git commit -m "banco: responsável inicial por etapa (coluna, regra no mover, cadastro e retomar, evento da etapa)"`. Rodar o pre-commit; se bloquear, corrija a causa.
+- [x] **1.5 Aplique no banco local e rode a bateria.** `npx supabase db reset`, depois `npx supabase test db 2>&1 | grep -E "^(ok|not ok)|RESULTADO"`. Esperado: as 34 do `73_` com `ok`; nenhum `not ok` novo. Para cada `not ok` fora do `73_`: leia a asserção; se ela espera "quem move/retomar vira ou mantém o responsável", ajuste à regra nova como na 1.2 (nada além disso). Se o `73_` falhar na mudança direta de perfil do usuário `a6` (o banco pode recusar `update public.usuarios set perfil`), troque essa linha pela função de perfil que o `05_gerir_usuarios.test.sql` usa, sem mudar o que o teste prova.
+- [x] **1.6 Confira os testes que olham funções e permissões** (`00_rls_ligada`, `10_privilegios_padrao`, `46_funcoes_e_views_seguras`, `47_login_so_com_o_necessario`): precisam estar verdes com as funções novas (sem `security definer`, `search_path` vazio, sem execução para `anon`).
+- [x] **1.7 Gere os tipos do banco local:** `node scripts/gerar-tipos.mjs --local` (grava `src/types/database.ts`). Confira com `git diff --stat src/types/database.ts` que só entrou `responsavel_inicial_id` em `etapas` (as três formas: Row, Insert, Update) e a relação; qualquer outra mudança grande é sinal de banco local fora de dia: pare.
+- [x] **1.8 Se a trava das fixas já deixava a coluna passar** (era o que se esperava ao ler o gatilho, ao contrário do que a spec supunha), acrescente a entrada datada em `.scratch/processos-etapas/desvios.md`: "2026-10-30: a spec dizia que a trava das etapas fixas passaria a liberar a coluna; a trava só olha nome, fase e ativa, então a coluna nova já passava e o único ajuste foi o privilégio de coluna." Só se for o caso.
+- [x] **1.9 Commit:** `git add supabase src/types/database.ts && git commit -m "banco: responsável inicial por etapa (coluna, regra no mover, cadastro e retomar, evento da etapa)"`. Rodar o pre-commit; se bloquear, corrija a causa.
 
 ## Tarefa 2: Tipos, regra pura, catálogo real e falso
 

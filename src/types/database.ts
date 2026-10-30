@@ -312,6 +312,7 @@ export type Database = {
           id: string
           nome: string
           ordem: number
+          responsavel_inicial_id: string | null
         }
         Insert: {
           ativa?: boolean
@@ -321,6 +322,7 @@ export type Database = {
           id?: string
           nome: string
           ordem: number
+          responsavel_inicial_id?: string | null
         }
         Update: {
           ativa?: boolean
@@ -330,8 +332,17 @@ export type Database = {
           id?: string
           nome?: string
           ordem?: number
+          responsavel_inicial_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "etapas_responsavel_inicial_id_fkey"
+            columns: ["responsavel_inicial_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       eventos: {
         Row: {

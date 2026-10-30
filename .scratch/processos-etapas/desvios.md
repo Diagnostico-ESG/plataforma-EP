@@ -595,3 +595,9 @@ Ponto de partida da revisão: `marco/2026-10-26-inicio-quadro-livre-parte-5`.
 - **Corrigido:** a ▾ e o ▲/▼ tinham a mesma cor, então a coluna que ordena não se destacava. A ▾ ficou em `--icone-inativo` (apagada) e ▲/▼ seguem em `--texto-2` (`data-ordena` no `<span>`).
 - **Deixado de fora:** aviso do detector sobre `border-radius: 1px` em `Quadro.css` (linha 262), que é anterior a este ajuste e fora do escopo.
 - **Presumido:** o visual não foi visto no navegador (a tela exige login); só typecheck, testes e leitura do CSS.
+
+## 2026-10-30 — responsavel-inicial-por-etapa, tarefa 1 (banco)
+
+- **Trava das etapas fixas:** a spec dizia que a trava passaria a liberar a coluna; a trava (`bloquear_etapa_protegida`) só olha nome, fase e ativa, então a coluna nova já passava e o único ajuste foi o privilégio de coluna.
+- **Tipos do banco:** `gerar-tipos --local` devolve o arquivo com formatação diferente da gerada contra o remoto (2.000 linhas de ruído); `src/types/database.ts` recebeu à mão só a coluna `responsavel_inicial_id` de `etapas` (Row, Insert, Update) e a relação com `usuarios`, o que o gerador local mostrou ser a única mudança de estrutura.
+- **Teste 53:** além das três expectativas do plano, a Modelagem ganhou o a2 como responsável inicial na montagem, para os processos entrarem com o a2 como o teste sempre supôs; a asserção do retomar voltou a esperar o a2 (agora o inicial da etapa).
