@@ -4,6 +4,7 @@ import {
   type ColunaDoQuadro as Coluna, colunasDoQuadro, colunasPorResponsavel, colunasPorSetor, quantosForaDoQuadro,
 } from '../../processos/colunasDoQuadro'
 import type { AgruparQuadroPor, MostrarNoPortfolio } from '../../processos/enderecoDosProcessos'
+import { passoDaRolagemNaBorda } from '../../processos/rolagemDoArrastar'
 import type { ListaDeProcessos, ModuloDeProcessos } from '../../processos/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { ColunaDoQuadro } from './ColunaDoQuadro'
@@ -51,7 +52,7 @@ export function QuadroDeProcessos(props: QuadroDeProcessosProps) {
     <>
       <JanelasDoMovimento movimento={movimento} processos={processos} versoes={versoes} aoGravar={aoMudar} />
       {movimento.falha && <p className="cadastros-falha" role="alert">{movimento.falha}</p>}
-      <div className="quadro-colunas">
+      <div className="quadro-colunas" onDragOver={(evento) => arrasto.levantado && rolarNaBorda(evento.currentTarget, evento.clientX)}>
         {colunas.map((coluna) => (
           <ColunaDoQuadro key={coluna.chave} coluna={coluna} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso}
             podeAlterar={podeAlterar && !movimento.gravando} arrasto={arrasto} agrupar={agrupar} etapas={lista.etapas}
@@ -60,6 +61,12 @@ export function QuadroDeProcessos(props: QuadroDeProcessosProps) {
       </div>
     </>
   )
+}
+
+// Com o cartão levantado junto a uma borda, o Quadro rola para mostrar as colunas que estão fora da vista.
+function rolarNaBorda(quadro: HTMLElement, x: number) {
+  const { left, right } = quadro.getBoundingClientRect()
+  quadro.scrollLeft += passoDaRolagemNaBorda(x, left, right)
 }
 
 export function QuadroCarregando() {

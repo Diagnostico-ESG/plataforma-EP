@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, createEvent, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import { USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
@@ -151,4 +151,40 @@ test('o cartão concluído se arrasta para fora de Concluídos e volta a em anda
   soltarEm('Publicação')
   await waitFor(() => expect(cartoesDa('Publicação')).toHaveLength(1))
   expect(cartoesDa('Concluídos')).toEqual([])
+})
+
+// ---- Rolar o Quadro ao chegar na borda (bug de 2026-10-30: o arrastar nativo não rolava o Quadro)
+
+/** O jsdom não mede nem rola: o Quadro ganha largura de 0 a 1000 px e uma rolagem que guarda o valor. */
+function quadroDeMilPixels(): HTMLElement {
+  const quadro = document.querySelector('.quadro-colunas') as HTMLElement
+  quadro.getBoundingClientRect = () => ({ left: 0, right: 1000, top: 0, bottom: 600, width: 1000, height: 600 }) as DOMRect
+  let rolagem = 0
+  Object.defineProperty(quadro, 'scrollLeft', { get: () => rolagem, set: (valor: number) => { rolagem = valor } })
+  return quadro
+}
+
+/** O jsdom não tem DragEvent: o evento genérico ignora o clientX, que vai à mão. */
+function passarNaAltura(nomeDaColuna: string, clientX: number) {
+  const evento = createEvent.dragOver(coluna(nomeDaColuna), { dataTransfer })
+  Object.defineProperty(evento, 'clientX', { value: clientX })
+  fireEvent(coluna(nomeDaColuna), evento)
+}
+
+test('arrastando o cartão até a borda direita, o Quadro rola; no meio, não', async () => {
+  montar([processo('Emitir Ofício')])
+  levantar(await cartaoDe('Emitir Ofício'))
+  const quadro = quadroDeMilPixels()
+  passarNaAltura('Publicação', 500)
+  expect(quadro.scrollLeft).toBe(0)
+  passarNaAltura('Publicação', 995)
+  expect(quadro.scrollLeft).toBeGreaterThan(0)
+})
+
+test('sem cartão levantado, passar o mouse na borda não rola o Quadro', async () => {
+  montar([processo('Emitir Ofício')])
+  await cartaoDe('Emitir Ofício')
+  const quadro = quadroDeMilPixels()
+  passarNaAltura('Publicação', 995)
+  expect(quadro.scrollLeft).toBe(0)
 })
