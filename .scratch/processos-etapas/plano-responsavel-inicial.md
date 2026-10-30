@@ -624,7 +624,7 @@ describe('responsável inicial', () => {
 
 **Consome:** `responsavelInicialValido` (tarefa 2) e `CatalogoFalso.etapas`. **Produz:** `ProcessosFalso` que segue a regra do banco; `src/testes/responsavelInicialDeTeste.ts` com `comResponsavelInicial(falso, codigo, responsavel)`.
 
-- [ ] **3.1 Atalho de teste** `src/testes/responsavelInicialDeTeste.ts`:
+- [x] **3.1 Atalho de teste** `src/testes/responsavelInicialDeTeste.ts`:
 
 ```ts
 import type { ProcessosFalso } from '../processos/ProcessosFalso'
@@ -637,7 +637,7 @@ export function comResponsavelInicial(falso: ProcessosFalso, codigo: string, res
 }
 ```
 
-- [ ] **3.2 Reescreva os testes do falso (falham primeiro).** Em `src/processos/ProcessosFalso.mover.test.ts`: tire `modulo.quemChama = BIA` de `falso()`; use `comResponsavelInicial(modulo, 'aprovacao_setor', { ...BIA, fotoUrl: null, ativo: true, perfil: 'integrante_ep' })` onde o teste precisa de responsável inicial. Troque/acrescente (histórias 9 a 14, 16; critérios 4, 5, 6, 7):
+- [x] **3.2 Reescreva os testes do falso (falham primeiro).** Em `src/processos/ProcessosFalso.mover.test.ts`: tire `modulo.quemChama = BIA` de `falso()`; use `comResponsavelInicial(modulo, 'aprovacao_setor', { ...BIA, fotoUrl: null, ativo: true, perfil: 'integrante_ep' })` onde o teste precisa de responsável inicial. Troque/acrescente (histórias 9 a 14, 16; critérios 4, 5, 6, 7):
 
 ```ts
 const INICIAL_BIA = { id: 'u2', nome: 'Bia Teste', fotoUrl: null, ativo: true, perfil: 'integrante_ep' as const }
@@ -692,7 +692,7 @@ describe('mover e o responsável inicial', () => {
 
   (importe `comResponsavelInicial`; ajuste os testes existentes que esperavam `{ id: 'u2', nome: 'Bia Teste' }` por "quem moveu": o primeiro de `describe('mover')` vira o primeiro caso acima.) Em `ProcessosFalso.situacao.test.ts`, acrescente: retomar suspenso e cancelado põe o responsável inicial da etapa atual (ou ninguém), e retomar quando o responsável já é o inicial não muda nada. Rode `npx vitest run src/processos`: falha (o falso ainda usa `quemChama`).
 
-- [ ] **3.3 Implemente em `ProcessosFalso.ts`:** apague o campo `quemChama` e sua doc; em `movido(...)` troque `this.comResponsavel(processo, this.quemChama)` por `this.comResponsavel(processo, this.responsavelInicialDe(destino))`; em `processoNovo` calcule `const inicial = entrada ? this.responsavelInicialDe(entrada) : null` e troque `responsavel: null` por `responsavel: inicial && { id: inicial.id, nome: inicial.nome, fotoUrl: inicial.fotoUrl }`; em `mudarSituacaoDoProcesso`, quando `nova === 'em_andamento'`, aplique depois do `mudarSituacao` o responsável inicial da etapa atual. Acrescente:
+- [x] **3.3 Implemente em `ProcessosFalso.ts`:** apague o campo `quemChama` e sua doc; em `movido(...)` troque `this.comResponsavel(processo, this.quemChama)` por `this.comResponsavel(processo, this.responsavelInicialDe(destino))`; em `processoNovo` calcule `const inicial = entrada ? this.responsavelInicialDe(entrada) : null` e troque `responsavel: null` por `responsavel: inicial && { id: inicial.id, nome: inicial.nome, fotoUrl: inicial.fotoUrl }`; em `mudarSituacaoDoProcesso`, quando `nova === 'em_andamento'`, aplique depois do `mudarSituacao` o responsável inicial da etapa atual. Acrescente:
 
 ```ts
   // Como responsavel_inicial_valido: o responsável inicial da etapa, se ainda vale; ninguém em Concluídos. A etapa vem do catálogo do falso, e sem ela ninguém.
@@ -704,11 +704,11 @@ describe('mover e o responsável inicial', () => {
 
   e, em `mudarSituacaoDoProcesso`, depois de `mudarSituacao(...)`: `const retomado = nova === 'em_andamento' ? this.comResponsavelNaChegada(mudado) : mudado`, onde `comResponsavelNaChegada` acha a etapa atual do processo em `etapasDoCatalogo` por `codigo` e devolve `{ ...processo, ...this.comResponsavel(processo, this.responsavelInicialDe(etapa)) }` (processo sem etapa atual: devolve como está). Tire `quemChama` também de `src/testes/aprovacaoNoVerso.tsx`, `processoNoVerso.tsx` e `quadroDeTeste.tsx` (a linha `falso.quemChama = …`; remova o import de `USUARIO_DE_TESTE` só se ficar sem uso). Rode `npx vitest run src/processos`: verde.
 
-- [ ] **3.4 Rode a suíte inteira** (`npm test`) e conserte, **uma falha por vez**, os testes de tela que esperavam "quem move vira o responsável" (os arquivos que usam `moverProcesso`, `Só os meus` e `Agrupar por`: `App.agruparPorResponsavel`, `App.soOsMeus`, `App.arrastarParaMover` e vizinhos). Regra: onde o teste dependia de quem moveu virar responsável, dê o responsável inicial à etapa de destino com `comResponsavelInicial` (importe de `./testes/responsavelInicialDeTeste`) e deixe a expectativa como estava; onde dependia de o cartão sair da coluna "meus", a expectativa muda para a do responsável inicial ou "Sem responsável". Não enfraqueça nenhuma expectativa para passar (nenhum `toBeTruthy` no lugar de valor). Acrescente em `App.arrastarParaMover.test.tsx` dois testes (histórias 18 e 19; critério 4):
+- [x] **3.4 Rode a suíte inteira** (`npm test`) e conserte, **uma falha por vez**, os testes de tela que esperavam "quem move vira o responsável" (os arquivos que usam `moverProcesso`, `Só os meus` e `Agrupar por`: `App.agruparPorResponsavel`, `App.soOsMeus`, `App.arrastarParaMover` e vizinhos). Regra: onde o teste dependia de quem moveu virar responsável, dê o responsável inicial à etapa de destino com `comResponsavelInicial` (importe de `./testes/responsavelInicialDeTeste`) e deixe a expectativa como estava; onde dependia de o cartão sair da coluna "meus", a expectativa muda para a do responsável inicial ou "Sem responsável". Não enfraqueça nenhuma expectativa para passar (nenhum `toBeTruthy` no lugar de valor). Acrescente em `App.arrastarParaMover.test.tsx` dois testes (histórias 18 e 19; critério 4):
   1. "arrastar o cartão para a coluna de destino o deixa com o responsável inicial dela": `comResponsavelInicial(falso, 'publicacao', { id: 'u2', nome: 'Bia Teste', fotoUrl: null, ativo: true, perfil: 'integrante_ep' })`, solta em Publicação, e o cartão passa a mostrar o responsável Bia (use o mesmo seletor que os testes vizinhos usam para o responsável do cartão; se a coluna de destino não tem etapa com responsável, o cartão fica sem).
   2. "agrupado por responsável, o processo movido sai da coluna de quem o tinha e vai para a do responsável inicial (ou para Sem responsável)": com `#/processos?agrupar=responsavel`, copie o teste vizinho que prova o agrupamento depois de um movimento. Como "agrupado por responsável nada se arrasta" (teste existente acima), o movimento nesse caso vem do verso (lista de etapas do Agora): siga o teste de `App.agruparPorResponsavel.test.tsx` que já move pelo verso, se existir, e confira a coluna depois de fechar o verso.
 
-- [ ] **3.5** `npm run typecheck`, `npm run lint`, `npm test` verdes. Commit: `git add src && git commit -m "processos falso: mover, cadastrar e retomar seguem o responsável inicial; sai quemChama"`.
+- [x] **3.5** `npm run typecheck`, `npm run lint`, `npm test` verdes. Commit: `git add src && git commit -m "processos falso: mover, cadastrar e retomar seguem o responsável inicial; sai quemChama"`.
 
 ## Tarefa 4: Tela do Catálogo
 

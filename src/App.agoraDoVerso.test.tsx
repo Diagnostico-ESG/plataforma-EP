@@ -3,6 +3,7 @@ import { afterEach, expect, test } from 'vitest'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { UltimaVersao } from './processos/tipos'
 import { BIA, EU, diasAtras, montarVerso, processoLido } from './testes/processoNoVerso'
+import { comResponsavelInicial } from './testes/responsavelInicialDeTeste'
 import { agoraDoVerso, janelasPorCima } from './testes/versoDoCartao'
 
 // O cartão "Agora" do verso (ticket 25 de processos-etapas, Andamento livre): a etapa e a etiqueta com listas que gravam ao
@@ -30,8 +31,9 @@ test('o rótulo diz a posição entre as etapas ativas, e a lista Etapa traz tod
   expect(etapa.selectedOptions[0].textContent).toBe('Revisão interna')
 })
 
-test('escolher outra etapa move na hora, sem janela: a etiqueta volta a A fazer e quem moveu vira o responsável', async () => {
+test('escolher outra etapa move na hora, sem janela: a etiqueta volta a A fazer e o responsável é o inicial da etapa nova', async () => {
   const falso = montarVerso(processoLido({ etiqueta: 'em_andamento', ...COM_BIA }))
+  comResponsavelInicial(falso, 'aprovacao_setor', { ...EU, fotoUrl: null, ativo: true, perfil: 'integrante_ep' })
   fireEvent.change(await lista('Etapa'), { target: { value: 'e6' } })
   await screen.findByText('Agora · etapa 6 de 8')
   expect(falso.chamadas).toEqual([{ acao: 'mover', id: 'p1', etapaId: 'e6' }])

@@ -53,7 +53,6 @@ export function montar(
   falso.processos = processos
   falso.setores = setores
   falso.usuariosPossiveis = usuarios
-  falso.quemChama = { id: USUARIO_DE_TESTE.id, nome: USUARIO_DE_TESTE.nome }
   ligarArquivosDoProcesso(falso, versoes)
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={new CadastrosFalso()} processos={falso} versoes={versoes} revisoes={new RevisoesFalso(falso)} planilhas={new PlanilhasFalso()} />)
   return falso

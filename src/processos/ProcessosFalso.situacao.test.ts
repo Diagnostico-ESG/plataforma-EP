@@ -4,6 +4,7 @@ import { fraseDaModelagemNoFuturo } from './frasesDaModelagemPiloto'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { CATALOGO_DE_TESTE, umProcessoLido } from '../testes/processoDaLista'
+import { comResponsavelInicial } from '../testes/responsavelInicialDeTeste'
 import { ProcessosFalso } from './ProcessosFalso'
 import type { ProcessoLido, SituacaoDoProcesso } from './tipos'
 
@@ -21,6 +22,34 @@ const lido = async (modulo: ProcessosFalso) => (await modulo.lerProcesso('p1')) 
 async function falhaDe(promessa: Promise<void>): Promise<Error> {
   return (await promessa.catch((erro: unknown) => erro)) as Error
 }
+
+const INICIAL_ANA = { id: 'u1', nome: 'Ana Teste', fotoUrl: null, ativo: true, perfil: 'integrante_ep' as const }
+
+describe('retomar e o responsável inicial', () => {
+  test('retomar o suspenso e o cancelado põe o responsável inicial da etapa atual', async () => {
+    for (const situacao of ['suspenso', 'cancelado'] as const) {
+      const modulo = falso(situacao)
+      comResponsavelInicial(modulo, 'revisao_interna', INICIAL_ANA)
+      await modulo.retomarProcesso('p1', 'Voltou')
+      expect((await lido(modulo)).responsavel).toMatchObject({ id: 'u1', nome: 'Ana Teste' })
+    }
+  })
+
+  test('etapa sem responsável inicial: retomar deixa o processo sem responsável', async () => {
+    const modulo = falso('suspenso')
+    modulo.processos = modulo.processos.map((processo) => ({ ...processo, responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null } }))
+    await modulo.retomarProcesso('p1', 'Voltou')
+    expect((await lido(modulo)).responsavel).toBeNull()
+  })
+
+  test('retomar quando o responsável já é o inicial não muda nada', async () => {
+    const modulo = falso('suspenso')
+    comResponsavelInicial(modulo, 'revisao_interna', INICIAL_ANA)
+    modulo.processos = modulo.processos.map((processo) => ({ ...processo, responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null } }))
+    await modulo.retomarProcesso('p1', 'Voltou')
+    expect((await lido(modulo)).responsavel).toEqual({ id: 'u1', nome: 'Ana Teste', fotoUrl: null })
+  })
+})
 
 describe('suspender, cancelar e retomar', () => {
   test('suspender guarda a situação e o motivo, e a etapa e a etiqueta ficam', async () => {

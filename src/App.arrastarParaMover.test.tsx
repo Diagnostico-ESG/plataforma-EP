@@ -3,6 +3,7 @@ import { afterEach, beforeEach, expect, test } from 'vitest'
 import { USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import { cartaoDe, dia, ETAPAS, montar, processo } from './testes/quadroDeTeste'
+import { comResponsavelInicial } from './testes/responsavelInicialDeTeste'
 
 // Arrastar o cartão para qualquer coluna move o processo (ticket 25 de processos-etapas, Andamento livre).
 
@@ -78,8 +79,9 @@ test('enquanto arrasta, a coluna sob o cartão ganha o realce, e some ao soltar 
 
 // ---- Soltar
 
-test('soltar em outra coluna move o processo na hora, sem janela: ele vai para a coluna nova com A fazer e quem moveu como responsável', async () => {
+test('soltar em outra coluna move o processo na hora, sem janela: ele vai para a coluna nova com A fazer e o responsável inicial dela', async () => {
   const falso = montar([processo('Emitir Ofício', { processo: { etiqueta: 'concluido' } })])
+  comResponsavelInicial(falso, 'publicacao', { id: USUARIO_DE_TESTE.id, nome: USUARIO_DE_TESTE.nome, fotoUrl: null, ativo: true, perfil: 'integrante_ep' })
   levantar(await cartaoDe('Emitir Ofício'))
   soltarEm('Publicação')
   await waitFor(() => expect(cartoesDa('Publicação')).toHaveLength(1))
@@ -89,6 +91,14 @@ test('soltar em outra coluna move o processo na hora, sem janela: ele vai para a
   const cartao = await cartaoDe('Emitir Ofício')
   expect(cartao.textContent).toContain('A fazer')
   expect(within(cartao).getByRole('img', { name: USUARIO_DE_TESTE.nome })).toBeTruthy()
+})
+
+test('sem responsável inicial na coluna de destino, o cartão chega sem responsável e quem moveu não vira o responsável', async () => {
+  montar([processo('Emitir Ofício')])
+  levantar(await cartaoDe('Emitir Ofício'))
+  soltarEm('Publicação')
+  await waitFor(() => expect(cartoesDa('Publicação')).toHaveLength(1))
+  expect(within(await cartaoDe('Emitir Ofício')).queryByRole('img', { name: USUARIO_DE_TESTE.nome })).toBeNull()
 })
 
 test('para trás também vale, inclusive para Não iniciados', async () => {
