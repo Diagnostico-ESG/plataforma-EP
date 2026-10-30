@@ -1,7 +1,11 @@
 # Próximo passo (2026-10-30)
 
-**Comando:** `/planejar` (Opus no modo completo, Sonnet no curto) para a próxima funcionalidade, ou `/demanda` para o que chegar fora do plano.
+**Em andamento:** `/planejar` de `responsavel-inicial-por-etapa` (pacote 4 da demanda de 2026-10-30), modo completo, Opus. Marco `marco/2026-10-30-inicio-responsavel-inicial-por-etapa` criado; brainstorming pulado (solução definida pelo usuário).
 
-**O que falta:** nada em `lista-por-setor`: entregue (commit 2b785d5, com ressalva do critério visual 10, visto só em página local com módulos falsos). O marco é `marco/2026-10-30-entrega-lista-por-setor`.
+**Próximo:** a sabatina, com o comando abaixo; depois `to-spec`, conferência da spec e tickets, pelo passo a passo do `/planejar`.
 
-**Redesenho visual em discussão (sessão de conversa de 2026-10-30):** análises em `.scratch/analise-de-design-2026-10-30.md` (quadro e todas as telas) e `.scratch/analise-de-design-lista-e-cadastros-2026-10-30.md` (Lista e cadastros); propostas visuais em `.scratch/proposta-visual/`, com a 6 como direção atual (estrutura de hoje, cores neutras, selos de setor vivos, situação só por ícone, interruptor "Linhas", selecionado em azul-claro). A ideia da matriz está no `backlog.md`. Caminho quando o usuário decidir: `/demanda` (Opus), classificando como redesenho.
+`/mattpocock-skills:grill-with-docs` com o resumo da abordagem (o mesmo devolvido na conversa de 2026-10-30).
+
+**Conferência pedida antes de planejar (feita em 2026-10-30):** o banco tem uma regra só para o responsável ao mover: `mover_processo` (migração `20261027120000_confirmacao_de_arquivos.sql`) grava como responsável quem move, sempre. O relato "o responsável da etapa anterior continua" acontece quando quem move já era o responsável, o caso comum (a pessoa termina a etapa e ela mesma move). Não é bug: é a regra atual, que esta funcionalidade substitui. A tela (`src/processos/movimentoSupabase.ts`) só chama `mover_processo`; a implementação falsa (`ProcessosFalso.ts`, `movimentoFalso.ts`) copia a mesma regra e precisa mudar junto.
+
+**Redesenho visual em discussão:** análises em `.scratch/analise-de-design-2026-10-30.md` e `.scratch/analise-de-design-lista-e-cadastros-2026-10-30.md`; propostas em `.scratch/proposta-visual/` (a 6 é a direção atual). Caminho quando o usuário decidir: `/demanda` (Opus).
