@@ -580,3 +580,11 @@ Ponto de partida da revisão: `marco/2026-10-26-inicio-quadro-livre-parte-5`.
 - **Corrigido na revisão anterior (polimento):** comentário de `Quadro.css` e centralização da contagem do título (ver entrada do `/polir`).
 - **Ressalva aberta:** os critérios `[visual]` 4 a 7 e a altura da coluna por setor (`max-height: 100%`) não foram vistos na tela, que exige login; a entrega leva a marca com ressalva.
 - **Sem achado:** dependências circulares (nenhuma); `package.json` e banco não mudaram, então o `security-auditor` (relatório de `.scratch/security.md` mantido) e a revisão de segurança do código não se aplicam (mudança só de aparência).
+
+## 2026-10-30 — Bug: o Quadro não rolava ao arrastar o cartão até a borda
+
+- **Causa:** o arrastar é o nativo do navegador, que não rolava o contêiner das colunas na horizontal. A causa provável (não confirmada no navegador) é que a rolagem automática do Chrome pega a lista de cartões da coluna, que só rola na vertical.
+- **Correção:** com o cartão levantado, a 60 px de uma borda do Quadro, cada aviso de arrastar rola o Quadro 20 px para aquele lado (`src/processos/rolagemDoArrastar.ts`, ligado em `QuadroDeProcessos`). Teste de regressão em `App.arrastarParaMover.test.tsx`.
+- **Spec:** a seção do arrastar não dizia nada sobre rolagem; ganhou a história 215a.
+- **Deixado de fora:** rolagem vertical dentro da coluna e da página durante o arrastar (o relato fala da lateral); velocidade proporcional à distância da borda; arrastar por toque (o arrastar nativo não funciona em toque, já era assim).
+- **Presumido:** o gesto real no navegador não foi visto (a tela exige login); só o teste em jsdom, com medida e rolagem simuladas.

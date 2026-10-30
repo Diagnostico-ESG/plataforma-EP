@@ -528,6 +528,7 @@ O que não está listado continua valendo: cadastro, edição, exclusão, reclas
 213. Como integrante do EP, quero que escolher a etapa na lista mova o processo na hora, sem confirmação, para o gesto ser tão rápido quanto no Planner.
 214. Como integrante do EP, quero arrastar o cartão no Quadro para a coluna de qualquer etapa, para a frente ou para trás.
 215. Como integrante do EP, quero que, enquanto arrasto, a coluna sob o cartão fique destacada, para saber onde ele vai cair.
+215a. Como integrante do EP, quero que, ao levar o cartão até a borda esquerda ou direita do Quadro, o Quadro role sozinho, para alcançar as colunas fora da vista (correção de 2026-10-30).
 216. Como integrante do EP, quero que soltar o cartão na própria coluna não grave nada.
 217. Como integrante do EP, quero que, ao mover, a etiqueta volte a A fazer, porque o trabalho da etapa nova ainda não começou.
 218. Como integrante do EP, quero passar a ser o responsável do processo que movo, em qualquer etapa, inclusive em Não iniciados e em Concluídos, porque quem move é quase sempre quem vai trabalhar nele.

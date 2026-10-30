@@ -52,7 +52,10 @@ export function QuadroDeProcessos(props: QuadroDeProcessosProps) {
     <>
       <JanelasDoMovimento movimento={movimento} processos={processos} versoes={versoes} aoGravar={aoMudar} />
       {movimento.falha && <p className="cadastros-falha" role="alert">{movimento.falha}</p>}
-      <div className="quadro-colunas" onDragOver={(evento) => arrasto.levantado && rolarNaBorda(evento.currentTarget, evento.clientX)}>
+      <div className="quadro-colunas" onDragOver={(evento) => {
+        if (!arrasto.levantado) return
+        rolarNaBorda(evento.currentTarget, evento.clientX)
+      }}>
         {colunas.map((coluna) => (
           <ColunaDoQuadro key={coluna.chave} coluna={coluna} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso}
             podeAlterar={podeAlterar && !movimento.gravando} arrasto={arrasto} agrupar={agrupar} etapas={lista.etapas}

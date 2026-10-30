@@ -5,8 +5,9 @@ export const PASSO_DA_ROLAGEM = 20
 
 /**
  * Quanto rolar o Quadro na horizontal com o cartão na posição x: para a esquerda perto da borda esquerda, para a direita perto
- * da direita, nada no meio. O arrastar nativo do navegador não rola o Quadro sozinho: o Chrome procura a área rolável mais
- * próxima do mouse, que é a lista de cartões da coluna (só rola na vertical), e para nela.
+ * da direita, nada no meio. O arrastar nativo do navegador não rolava o Quadro sozinho (bug de 2026-10-30). Causa provável, não
+ * confirmada no navegador: a rolagem automática do Chrome pega a área rolável mais próxima do mouse, a lista de cartões da
+ * coluna, que só rola na vertical.
  */
 export function passoDaRolagemNaBorda(x: number, esquerda: number, direita: number): number {
   if (x < esquerda + MARGEM_DA_BORDA) return -PASSO_DA_ROLAGEM

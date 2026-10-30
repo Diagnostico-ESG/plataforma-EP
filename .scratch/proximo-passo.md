@@ -2,9 +2,13 @@
 
 Registro de onde a última sessão parou e do que vem a seguir. Cada sessão que terminar recomendando um próximo passo sobrescreve este arquivo antes de encerrar. Valem os arquivos se divergir do git.
 
-Atualizado em 2026-10-30 (/ship de enxugar-cartao-e-cadastro concluído)
+Atualizado em 2026-10-30 (/demanda de 8 itens; pacote 1, bug da rolagem ao arrastar, corrigido)
 
-- **Estado:** `enxugar-cartao-e-cadastro` entregue (commit 7a02d80, marco `marco/2026-10-30-entrega-enxugar-cartao-e-cadastro`), com ressalva. `processos-etapas` e `repositorio-de-processos` reentregues no mesmo `/ship`. Todas as 15 funcionalidades do resumo do projeto têm entrega.
-- **Próximo:** nada obrigatório no funil. Nova ideia: `/planejar` (Opus no modo completo, Sonnet no curto); demanda fora do plano: `/demanda`.
-- **Pendente do usuário:** publicar de novo a `planilhas-dos-dashboards` no desenvolvimento (`npx supabase functions deploy planilhas-dos-dashboards --use-api`, no seu terminal, com o vínculo conferido); conferir com o login real o Quadro, a Lista, a árvore, a data na linha da Modelagem piloto e o campo Anotações; conferir no painel do Supabase de desenvolvimento que o cadastro aberto está ligado (ADR 0001; no backlog); decidir sobre os arquivos soltos em `.scratch/`; apagar `.scratch/handoff-2026-10-20.md`; repor o e-mail do git; resolver a cobrança do GitHub.
-- **Antes de publicar em produção (quando for a hora):** revisão de segurança para produção do `/ship`.
+- **Demanda de 2026-10-30, dividida em 5 pacotes (aprovada pelo usuário):**
+  1. Bug: o Quadro não rolava ao arrastar o cartão até a borda. **Feito** (commit da correção e registro em `.scratch/processos-etapas/desvios.md`); o gesto real no navegador fica para o usuário conferir com o login.
+  2. Ajuste pequeno: no Novo processo, "Nome" vira "Nome do Processo"; na Lista, a seta de ordenação aparece igual em todas as colunas (hoje só em Processo). `/executar-simples`, depois `/polir` (Sonnet).
+  3. Mudança em funcionalidade existente: tirar a Busca ("Buscar pelo nome") da Lista e incluir o agrupamento por Setor na árvore. `/planejar` modo curto (Sonnet).
+  4. Mudança em funcionalidade existente: responsável inicial por etapa no Catálogo de etapas (Administração), e ao trocar de etapa o processo fica sem responsável, salvo se a etapa tiver responsável inicial (substitui "quem move vira o responsável"). Pede migração, ADR e CONTEXT.md. `/planejar` completo (Opus). Conferir antes se o comportamento relatado ("o responsável da etapa anterior continua") bate com a regra atual.
+  5. Mudança em funcionalidade existente: redesenho do verso do cartão (Etapas, Documentos do Mapeamento e Outros anexos, achados pesados e desorganizados pelo usuário; imagem na conversa de 2026-10-30). `/planejar` completo, com conversa (Opus).
+- **Próximo:** pacote 2, `/executar-simples` (Sonnet).
+- **Pendente do usuário (segue valendo):** publicar de novo a `planilhas-dos-dashboards` no desenvolvimento; conferir com o login real o Quadro (inclusive arrastar até a borda), a Lista, a árvore e o verso; decidir sobre os arquivos soltos em `.scratch/`; apagar `.scratch/handoff-2026-10-20.md`; repor o e-mail do git; resolver a cobrança do GitHub.
