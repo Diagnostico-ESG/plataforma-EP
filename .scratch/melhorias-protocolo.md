@@ -1077,3 +1077,11 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Trava de git.** Dois lotes de `sed` com várias expressões foram barrados como "pasta .git" (falso alarme); refiz as edições com a ferramenta de edição, sem contornar a trava.
 - **Branch comum, `plano-05.md`, linha `Concluído em`.** Branch criada, merge (avanço rápido) na `main`, branch apagada com `-d` sem recusa.
 - **Erro do plano.** O plano prometia testes de tela antes da implementação; na prática os testes foram ajustados depois de tirar os campos.
+
+## 2026-10-30 — /planejar, modo curto (lista-por-setor)
+
+- **Classificação de tamanho e modo curto.** Esperado: demanda vinda do `/demanda` como pequena dispensa a proposta de modo. Aconteceu: segui direto para o modo curto, com três perguntas, uma de cada vez.
+- **Entregas anteriores e `Em revisão desde`.** Esperado: conferir a linha `Entregue em` de cada spec e acrescentar `Em revisão desde` às specs alteradas. Aconteceu: todas entregues; a linha entrou em `processos-etapas` e `repositorio-de-processos`.
+- **Nome da funcionalidade em `projeto.md`.** Esperado: anotar entre parênteses na lista. Aconteceu: item 16 `lista-por-setor` acrescentado.
+- **Spec com critério `[visual]` e seção Modelo de dados.** Esperado: seção presente mesmo sem banco. Aconteceu: seção escrita dizendo "nenhum"; critério 10 marcado `[visual]`.
+- **Pre-commit.** Esperado: rodar a bateria e liberar o commit de documentação. Aconteceu: levou mais de 2 minutos e o comando foi para segundo plano; o commit saiu só com os 5 arquivos do `/planejar`.
