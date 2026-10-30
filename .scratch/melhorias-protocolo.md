@@ -1092,3 +1092,12 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Marca `Implementado em`.** Esperado: hash do commit da implementação. Aconteceu: gravei o hash do commit que absorveu o código (`dcbb176`).
 - **Auditoria visual sem login.** Esperado: abrir a Lista no navegador. Aconteceu: o app real pede conta institucional, que não posso usar; montei uma página temporária com os módulos falsos, tirei capturas e apaguei os arquivos.
 - **`/impeccable polish`.** Esperado: rodar depois da auditoria. Aconteceu: a auditoria não achou nada a corrigir, então não rodei o `polish`.
+
+## 2026-10-30 — /planejar, modo completo (responsavel-inicial-por-etapa)
+
+- **Conferência de entregas anteriores e `Em revisão desde`.** Esperado: conferir `Entregue em` de cada spec anterior e marcar a spec alterada. Aconteceu: todas entregues; `Em revisão desde 2026-10-30` entrou em `processos-etapas`, no commit da spec.
+- **Nome da funcionalidade em `projeto.md`.** Aconteceu: item 17 `responsavel-inicial-por-etapa` acrescentado.
+- **Leitura de `.claude/regras/banco.md` antes de planejar migração.** Aconteceu: lido inteiro antes da sabatina.
+- **Spec com Modelo de dados, "quem pode o quê", regras de estado e `[visual]`.** Aconteceu: seção nova na spec existente, com a tabela por perfil (inclusive inativo e visitante), as três chegadas impostas pelo banco e o critério 11 marcado `[visual]`. Brainstorming pulado (solução definida pelo usuário).
+- **Pasta dos ADRs.** Aconteceu: ADR 0036 em `docs/adr/`, junto dos anteriores.
+- **Melhoria: duas sessões comitando na mesma pasta.** Esperado: cada commit levar só os arquivos da sua etapa. Aconteceu: duas vezes nesta sessão o commit de uma sessão levou arquivos que a outra tinha preparado (o `203c7bf` da análise de design levou o `CONTEXT.md` e o ADR 0036; o `2358a0d` desta spec levou duas imagens das propostas visuais), porque a área de preparação do git é uma só por pasta e o pre-commit leva mais de 2 minutos. Sugestão: o protocolo dizer que sessões simultâneas na mesma pasta não comitam ao mesmo tempo, ou que a segunda trabalha numa worktree própria.

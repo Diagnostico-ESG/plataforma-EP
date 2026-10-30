@@ -1,11 +1,11 @@
 # Próximo passo (2026-10-30)
 
-**Em andamento:** `/planejar` de `responsavel-inicial-por-etapa` (pacote 4 da demanda de 2026-10-30), modo completo, Opus. Marco `marco/2026-10-30-inicio-responsavel-inicial-por-etapa` criado; brainstorming pulado (solução definida pelo usuário). Sabatina concluída: decisões no ADR 0036 e no `CONTEXT.md` (Responsável do processo, Responsável inicial, Mover, Situação do processo).
+**Comando:** `/executar-complexo` (Sonnet) com a seção "Responsável inicial por etapa (mudança de 2026-10-30)" de `.scratch/processos-etapas/spec.md` como único ticket (`responsavel-inicial-por-etapa`; o usuário escolheu uma entrega só, sem `to-tickets`).
 
-Spec escrita: seção "Responsável inicial por etapa (mudança de 2026-10-30)" em `.scratch/processos-etapas/spec.md`, marcada `Em revisão desde 2026-10-30`.
+**O que já está em arquivo:** marco `marco/2026-10-30-inicio-responsavel-inicial-por-etapa`; item 17 em `.scratch/projeto.md`; ADR 0036; `CONTEXT.md` (Responsável do processo, Responsável inicial, Mover, Situação do processo); a spec, marcada `Em revisão desde 2026-10-30`.
 
-**Próximo:** o usuário decide o passo 5 do `/planejar` (recomendado: uma entrega só, sem `to-tickets`, porque a regra no banco sem a tela do Catálogo deixaria todo processo movido sem responsável); depois `/executar-complexo` (Sonnet) com a seção da spec como único ticket.
+**Por que complexo:** banco (coluna, trava das fixas liberando a coluna, função do responsável inicial válido em mover, cadastro e retomar, evento da etapa), implementações falsas e tela do Catálogo se conectam, e a ordem importa (pgTAP antes da migração). Testes de banco pelo Docker local (Ajustes do projeto); migração do remoto de desenvolvimento pelo workflow.
 
-**Conferência pedida antes de planejar (feita em 2026-10-30):** o banco tem uma regra só para o responsável ao mover: `mover_processo` (migração `20261027120000_confirmacao_de_arquivos.sql`) grava como responsável quem move, sempre. O relato "o responsável da etapa anterior continua" acontece quando quem move já era o responsável, o caso comum (a pessoa termina a etapa e ela mesma move). Não é bug: é a regra atual, que esta funcionalidade substitui. A tela (`src/processos/movimentoSupabase.ts`) só chama `mover_processo`; a implementação falsa (`ProcessosFalso.ts`, `movimentoFalso.ts`) copia a mesma regra e precisa mudar junto.
+**Conferência feita antes de planejar:** "o responsável da etapa anterior continua" não era bug: `mover_processo` grava quem move, que costuma ser o próprio responsável.
 
-**Redesenho visual em discussão:** análises em `.scratch/analise-de-design-2026-10-30.md` e `.scratch/analise-de-design-lista-e-cadastros-2026-10-30.md`; propostas em `.scratch/proposta-visual/` (a 6 é a direção atual). Caminho quando o usuário decidir: `/demanda` (Opus).
+**Redesenho visual em discussão:** análises em `.scratch/analise-de-design-*.md`; propostas em `.scratch/proposta-visual/` (a 6 é a direção atual). Caminho quando o usuário decidir: `/demanda` (Opus).
