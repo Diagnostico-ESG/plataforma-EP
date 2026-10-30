@@ -69,6 +69,12 @@
   text-decoration: underline;
 }
 
+/* Enquanto grava, o nome não responde: o cursor deixa de prometer clique. */
+.agora-responsavel-nome:disabled,
+.agora-escolher:disabled {
+  cursor: default;
+}
+
 /* Discreto, para não competir com o botão principal do Agora. */
 .agora-escolher {
   color: var(--texto-2);
