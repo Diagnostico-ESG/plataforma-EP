@@ -45,6 +45,7 @@ Nenhum: não há tabela, coluna, política nem migração. A mudança é só de 
 - `AgruparListaPor` passa a `'nenhum' | 'macroprocesso' | 'setor'`; o endereço lê e grava os três.
 - `montarArvore` ganha a ordem setor → macroprocesso, reaproveitando a regra do subprocesso e a contagem; o que hoje se chama macro/setor da árvore é generalizado só no que for repetido de verdade (nada de abstração a mais).
 - Remover `BuscaDaLista`, `NomeComTrecho`, `buscaNaLista` (e testes), o campo `busca` de `FiltrosDosProcessos`, de `SEM_FILTROS`, do endereço e de `temFiltro`, e o destaque em `LinhaDoProcesso`, `TabelaDeProcessos` e `ArvoreDaLista`.
+- Construído além do previsto (ver `desvios.md`): o parâmetro `substituir` de `useEndereco` e o CSS da busca (`--busca-marca`, `.busca-*`) saíram junto, por só existirem para a Busca; as linhas de grupo da árvore ganharam as classes `grupo-raiz` (primeiro nível: macroprocesso numa árvore, setor na outra) e `grupo-filho` (nível recuado), no lugar de estilo preso a "macroprocesso" e "setor"; a árvore por Macroprocesso ficou com a mesma aparência. Os cancelados e o recuo dos processos seguem iguais.
 
 ## Decisões de teste
 
