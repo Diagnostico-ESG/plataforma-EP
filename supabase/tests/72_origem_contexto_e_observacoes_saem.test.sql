@@ -55,7 +55,7 @@ insert into _tap (linha) select is(
     'no_quadro'],
   'a view não tem Origem, Contexto nem Observações e mantém as outras colunas na mesma ordem');
 insert into _tap (linha) select ok(
-  'security_invoker=true' = any ((select reloptions from pg_class where oid = 'public.processos_com_andamento'::regclass)),
+  (select reloptions from pg_class where oid = 'public.processos_com_andamento'::regclass) @> array['security_invoker=true'],
   'a view segue com security_invoker');
 
 -- ===== As colunas e o tipo da Origem não existem mais =====
