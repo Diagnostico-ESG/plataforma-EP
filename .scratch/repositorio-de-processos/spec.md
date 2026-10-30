@@ -2,6 +2,8 @@
 
 Status: ready-for-agent
 
+**Lista sem busca e por Setor (mudança de 2026-10-30, spec própria).** `.scratch/lista-por-setor/spec.md` tira a busca pelo nome da Lista e acrescenta "Agrupar por: Setor" (setor → macroprocesso → processo). Onde esta spec falar da busca ou só do agrupamento por Macroprocesso, vale aquela.
+
 **Enxugar o cartão e o cadastro (mudança de 2026-10-29, spec própria).** A funcionalidade 15, `.scratch/enxugar-cartao-e-cadastro/spec.md` (ADR 0035), recua os níveis da árvore da Lista e lista os arquivos um abaixo do outro, com o nome completo e o ícone do tipo; também enxuga o cadastro, o cartão e o verso. Onde esta spec divergir, vale aquela.
 
 Funcionalidade 14 do `.scratch/projeto.md`. Decisões na sabatina `.scratch/repositorio-de-processos/sabatina.md` (2026-10-28, numeradas de 1 a 20 e citadas aqui como "S1", "S2"…), no ADR 0034 e no `CONTEXT.md` (Concluídos, Tirar do Quadro, Situação do processo, Etiqueta). Demanda de origem: `demanda.md`, na mesma pasta. Muda as specs entregues de `publicacao-e-arquivamento` (fim do Arquivado), `processos-etapas` (Quadro, Lista, visualização por setor, etiqueta), `documentos-versoes` e `revisoes-aprovacao` (as travas "não arquivado"). Cada uma ganhou uma nota apontando para esta spec e a linha `Em revisão desde 2026-10-28`. Onde elas falam em arquivado, arquivar, desarquivar, selo "Arquivado" ou filtro "Arquivados", vale esta spec.
@@ -262,3 +264,5 @@ Sem dado pessoal novo.
 Entregue em 2026-10-29 (commit 9fc0201), com ressalva: critérios [visual] de repositorio-de-processos presumidos (nada visto com o login real; a árvore e o cabeçalho da Lista só na vitrine local com módulos falsos, sem captura de imagem); revisão de segurança foi a de reserva (menos completa: o /security-review não achou mudanças a revisar); migrações fim_do_arquivado e tirar_e_voltar_ao_quadro ainda sem aplicar no remoto de desenvolvimento e função arquivos-no-drive sem nova publicação; as ressalvas das entregas anteriores seguem valendo
 
 Entregue em 2026-10-30 (commit 7a02d80), com ressalva: critérios [visual] 14 a 17 presumidos (nada visto com o login real); revisão de segurança foi a de reserva (menos completa: o /security-review só viu documentação); conferência do cadastro aberto no painel do Supabase de desenvolvimento adiada (backlog); a Edge Function planilhas-dos-dashboards ainda precisa ser publicada de novo no desenvolvimento; pgTAP só no workflow "Testes de banco" (Docker indisponível); as ressalvas das entregas anteriores seguem valendo
+
+Em revisão desde 2026-10-30

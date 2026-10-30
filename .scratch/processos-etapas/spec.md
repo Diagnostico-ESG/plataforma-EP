@@ -2,6 +2,8 @@
 
 Status: ready-for-agent
 
+**Lista sem busca e por Setor (mudança de 2026-10-30, spec própria).** `.scratch/lista-por-setor/spec.md` tira a busca pelo nome da Lista e acrescenta "Agrupar por: Setor" (setor → macroprocesso → processo). Onde esta spec falar da busca ou só do agrupamento por Macroprocesso, vale aquela.
+
 **Enxugar o cartão e o cadastro (mudança de 2026-10-29, spec própria).** A funcionalidade 15, `.scratch/enxugar-cartao-e-cadastro/spec.md` (ADR 0035), tira a Origem, junta Contexto e Observações nas Anotações (já no cadastro), deixa só a data de realização da modelagem piloto (na linha da etapa, sem data futura, sem os selos de modelagem), tira o selo "Sem responsável", enxuga o topo e o responsável do verso e renomeia "Arquivos" para "Documentos do Mapeamento". Onde esta spec divergir, vale aquela.
 
 **Repositório de processos (mudança de 2026-10-28, spec própria).** A funcionalidade 14, `.scratch/repositorio-de-processos/spec.md` (ADR 0034), acaba com o Arquivado (marca, trava, selo, filtro, Arquivar e Desarquivar): onde esta spec fala em arquivado, vale aquela. Ela também traz Tirar do Quadro, a coluna Concluídos com saída após 30 dias, Todos | Concluídos, os cancelados fora das visualizações, a Lista com filtro e ordenação por coluna e Agrupar por Macroprocesso, e a etiqueta Iniciado.
@@ -1736,3 +1738,5 @@ Entregue em 2026-10-29 (commit 9fc0201), com ressalva: critérios [visual] de re
 Entregue em 2026-10-30 (commit 7a02d80), com ressalva: critérios [visual] 14 a 17 presumidos (nada visto com o login real); revisão de segurança foi a de reserva (menos completa: o /security-review só viu documentação); conferência do cadastro aberto no painel do Supabase de desenvolvimento adiada (backlog); a Edge Function planilhas-dos-dashboards ainda precisa ser publicada de novo no desenvolvimento; pgTAP só no workflow "Testes de banco" (Docker indisponível); as ressalvas das entregas anteriores seguem valendo
 
 Ajuste de 2026-10-30 (sem banco): o campo "Nome" do Novo processo e do Editar passa a se chamar **Nome do Processo**; no cabeçalho da Lista, toda coluna mostra uma ▾ discreta (aria-hidden) avisando que abre o menu de ordenar e filtrar, e a coluna que ordena troca a ▾ por ▲ (crescente) ou ▼ (decrescente). O texto oculto para leitor de tela não muda; o cabeçalho de carregando segue sem menus.
+
+Em revisão desde 2026-10-30
