@@ -70,3 +70,5 @@ Nenhum: não há tabela, coluna, política nem migração. A mudança é só de 
 8. A linha dos arquivos, os filtros por coluna, Todos | Concluídos e o bloco de cancelados funcionam na árvore por Setor como na por Macroprocesso.
 9. O Quadro (por etapa, responsável e setor) segue igual.
 10. [visual] A barra da Lista fica sem a Busca e com os três botões do "Agrupar por" legíveis; na árvore por Setor, as linhas de setor, macroprocesso e processo se distinguem e os subprocessos aparecem recuados.
+
+Implementado em 2026-10-30 (commit dcbb176)

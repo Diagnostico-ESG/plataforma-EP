@@ -1,5 +1,5 @@
 # Próximo passo (2026-10-30)
 
-**Comando:** `/mattpocock-skills:implement` com o resumo da spec `lista-por-setor` (sem banco), a ser rodado pelo usuário (modelo Sonnet).
+**Comando:** `/polir` (Sonnet), porque a funcionalidade `lista-por-setor` mexeu na interface da Lista.
 
-**O que falta:** implementar `.scratch/lista-por-setor/spec.md` (tirar a Busca da Lista e acrescentar Agrupar por Setor). Depois: gravar `Implementado em AAAA-MM-DD (commit <hash>)` no fim da spec, comitar, e seguir com `/polir` (Sonnet), porque a mudança é de interface.
+**O que falta:** conferir o critério visual 10 da spec (barra da Lista sem a Busca, três botões do "Agrupar por" legíveis; na árvore por Setor, linhas de setor, macroprocesso e processo distintas e subprocessos recuados) e confirmar que a árvore por Macroprocesso não mudou na tela (as classes das linhas de grupo foram renomeadas para `grupo-raiz`/`grupo-filho`). Depois, `/ship` só se as condições do `/demanda` pedirem.
