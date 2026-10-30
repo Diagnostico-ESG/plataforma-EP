@@ -441,9 +441,13 @@ td .barra-etapa {
   font-weight: normal;
 }
 
-/* O sentido da ordenação, menor que o texto, para não disputar com o nome da coluna. */
+/* A marca da coluna, menor que o texto, para não disputar com o nome: a ▾ (abre o menu) é apagada; ▲ ▼ (a coluna que ordena) ficam mais fortes. */
 .cabecalho-da-lista-sentido {
   font-size: 0.7em;
+  color: var(--icone-inativo);
+}
+
+.cabecalho-da-lista-sentido[data-ordena='true'] {
   color: var(--texto-2);
 }
 

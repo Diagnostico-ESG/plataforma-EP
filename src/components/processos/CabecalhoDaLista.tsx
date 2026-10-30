@@ -84,7 +84,7 @@ function ConteudoDoBotao({ rotulo, sentido, filtrado }: ConteudoDoBotaoProps) {
     <>
       {rotulo}
       {filtrado && <span className="cabecalho-da-lista-filtrado" aria-hidden="true" />}
-      <span className="cabecalho-da-lista-sentido" aria-hidden="true">{MARCA_DA_ORDEM[sentido ?? 'nenhum']}</span>
+      <span className="cabecalho-da-lista-sentido" data-ordena={sentido !== null} aria-hidden="true">{MARCA_DA_ORDEM[sentido ?? 'nenhum']}</span>
       {filtrado && <span className="visualmente-oculto">, filtrado: {filtrado}</span>}
       {sentido && <span className="visualmente-oculto">, ordem {sentido}</span>}
     </>

@@ -588,3 +588,10 @@ Ponto de partida da revisão: `marco/2026-10-26-inicio-quadro-livre-parte-5`.
 - **Spec:** a seção do arrastar não dizia nada sobre rolagem; ganhou a história 215a.
 - **Deixado de fora:** rolagem vertical dentro da coluna e da página durante o arrastar (o relato fala da lateral); velocidade proporcional à distância da borda; arrastar por toque (o arrastar nativo não funciona em toque, já era assim).
 - **Presumido:** o gesto real no navegador não foi visto (a tela exige login); só o teste em jsdom, com medida e rolagem simuladas.
+
+## 2026-10-30 — /polir do ajuste "Nome do Processo" e seta ▾ nas colunas da Lista
+
+- **Auditoria (CabecalhoDaLista, CamposDoProcesso, Quadro.css):** o detector não achou anti-padrão. Acessibilidade ok: marca `aria-hidden`, nome do botão e `aria-sort` iguais; `--texto-2` sobre branco passa AA; botão do cabeçalho com 24 px de altura (mínimo do WCAG 2.2).
+- **Corrigido:** a ▾ e o ▲/▼ tinham a mesma cor, então a coluna que ordena não se destacava. A ▾ ficou em `--icone-inativo` (apagada) e ▲/▼ seguem em `--texto-2` (`data-ordena` no `<span>`).
+- **Deixado de fora:** aviso do detector sobre `border-radius: 1px` em `Quadro.css` (linha 262), que é anterior a este ajuste e fora do escopo.
+- **Presumido:** o visual não foi visto no navegador (a tela exige login); só typecheck, testes e leitura do CSS.
