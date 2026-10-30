@@ -9,6 +9,13 @@ Complemento de `.scratch/analise-de-design-2026-10-30.md`. Telas vistas no app r
 
 Nada foi salvo nem alterado. Referência visual de destino: a proposta visual 6 (`.scratch/proposta-visual/proposta-6.html`).
 
+**Correção de termos (2026-10-30, apontada pelo usuário).** Os ícones A fazer, Iniciado e Finalizado são a **etiqueta** da etapa atual. A **situação do processo** (`CONTEXT.md`) é em andamento, suspenso, cancelado ou concluído; concluído é o processo que chegou à etapa Concluídos. O protótipo `lista-e-cadastros.html` foi corrigido:
+- a coluna dos ícones se chama "Etiqueta";
+- a coluna "Situação" mostra a situação do processo, com "Em andamento" discreto e as exceções (Suspenso, Concluído, Cancelado) em destaque;
+- o controle "Mostrar" virou "Situação: Todos | Em andamento | Suspensos | Concluídos | Cancelados".
+
+"Todos" segue a regra do `CONTEXT.md`: cancelados só aparecem quando pedidos. Onde este texto diz "situação" para os ícones, leia "etiqueta". A proposta de juntar "Concluídos" e "Cancelados" num só controle continua valendo, agora com "Suspensos" incluído, que faltava.
+
 ## Nota geral (heurísticas de Nielsen, 0 a 4)
 
 | # | Heurística | Lista | Cadastros | Principal problema |

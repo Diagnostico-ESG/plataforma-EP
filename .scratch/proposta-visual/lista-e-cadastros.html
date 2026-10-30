@@ -34,14 +34,14 @@ svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;str
 .busca{display:inline-flex;align-items:center;gap:8px;height:34px;width:260px;border:1px solid var(--linha);border-radius:6px;padding:0 10px;color:var(--inativo);font-size:13px}
 .area{overflow:hidden;padding:18px 24px}
 .setor{font:700 11px 'Source Sans 3';letter-spacing:.3px;color:#fff;border-radius:4px;padding:1px 7px;display:inline-block}
-.tag{font:600 11px 'Source Sans 3';border-radius:4px;padding:1px 6px;background:#eef0f4;color:#4a5163}
+.tag{white-space:nowrap;display:inline-block;font:600 11px 'Source Sans 3';border-radius:4px;padding:1px 6px;background:#eef0f4;color:#4a5163}
 .mono{font-family:var(--mono);font-size:12px}
 /* Tabela */
 .tab{background:#fff;border:1px solid var(--linha);border-radius:8px;overflow:hidden;width:100%;border-collapse:separate;border-spacing:0}
 .tab th{position:sticky;top:0;background:#fafbfc;text-align:left;font-size:12px;font-weight:700;color:var(--texto-2);padding:10px 12px;border-bottom:1px solid var(--linha);white-space:nowrap}
 .tab th .i{width:12px;height:12px;vertical-align:-2px;color:var(--inativo)}.tab th.filtrada{color:var(--azul-escuro)}.tab th.filtrada .i{color:var(--azul)}
 .tab td{padding:9px 12px;border-bottom:1px solid #eef0f4;vertical-align:middle;white-space:nowrap}
-.tab tr:last-child td{border-bottom:0}
+.tab tr:last-child td{border-bottom:0}.tab td:first-child{white-space:normal;max-width:300px}
 .nome{font-weight:600;font-size:13.5px;color:var(--texto)}
 .muted{color:var(--inativo)}
 .etapa{display:flex;flex-direction:column;gap:5px;min-width:210px}.etapa .t{display:flex;align-items:center;gap:6px;font-size:12.5px}.etapa .t svg{color:var(--texto-2)}
@@ -49,6 +49,8 @@ svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;str
 .pessoa{display:inline-flex;align-items:center;gap:8px}
 .ind{display:inline-flex;align-items:center;gap:5px;font:500 12px var(--mono);color:var(--texto-2)}.ind.atraso{color:var(--atraso)}.ind.vence{color:var(--vence)}.ind svg{width:14px;height:14px}
 .st svg{width:18px;height:18px;display:block}
+.sit{display:inline-flex;align-items:center;gap:5px;font:600 12px 'Source Sans 3';border-radius:4px;padding:2px 8px}.sit svg{width:13px;height:13px}
+.sit-suspenso{background:#eef0f4;color:#4a5163}.sit-concluido{background:#e6f4ef;color:#166a4d}.sit-cancelado{background:#f3f4f6;color:var(--inativo)}
 .grupo td{background:#f6f7f9;font-weight:700;font-size:13.5px;padding:10px 12px}
 .grupo .c{display:flex;align-items:center;gap:8px}.grupo .n{font:500 12px var(--mono);color:var(--texto-2);font-weight:500}
 .sub td{font-weight:600;color:var(--texto-2);padding:8px 12px 8px 40px;font-size:12.5px}
@@ -112,6 +114,9 @@ svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;str
 <symbol id="e2" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></symbol>
 <symbol id="e3" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8.5 11l2 2 3.5-3.5"/></symbol>
 <symbol id="e4" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></symbol>
+<symbol id="e6" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></symbol>
+<symbol id="e7" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+<symbol id="bandeira" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
 <symbol id="e5" viewBox="0 0 24 24"><path d="M12 3l2.4 1.8 3-.2.9 2.9 2.5 1.7-1 2.8 1 2.8-2.5 1.7-.9 2.9-3-.2L12 21l-2.4-1.8-3 .2-.9-2.9L3.2 14.8l1-2.8-1-2.8 2.5-1.7.9-2.9 3 .2z"/><path d="M8.5 12l2.3 2.3 4.7-4.6"/></symbol>
 </svg>
 <aside class="lateral" id="lateral"></aside>
@@ -119,7 +124,10 @@ svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;str
 <div class="barra" id="barra"></div>
 <main class="area" id="area"></main>
 <script>
-const ETAPAS=['Não iniciados','Modelagem piloto','Relatório e modelagem técnica','Revisão interna','Validação com o setor','Aprovação pelo setor']
+const ETAPAS=['Não iniciados','Modelagem piloto','Relatório e modelagem técnica','Revisão interna','Validação com o setor','Aprovação pelo setor','Publicação','Concluídos']
+// Situação do processo (CONTEXT.md): em andamento, suspenso, cancelado ou concluído; não confundir com a etiqueta da etapa (A fazer, Iniciado, Finalizado).
+const SITUACAO={andamento:['Em andamento',''],suspenso:['Suspenso','pausa'],cancelado:['Cancelado','x'],concluido:['Concluído','bandeira']}
+const situacao=s=>s==='andamento'?'<span class="muted">Em andamento</span>':`<span class="sit sit-${s}">${ic(SITUACAO[s][1])}${SITUACAO[s][0]}</span>`
 // Paleta viva só para os selos de setor (a mesma da proposta 6).
 const SETORES={SGA:['Secretaria de Gestão Administrativa','#7c3aed'],CDI:['Coordenadoria de Documentação e Informação','#0891b2'],OUV:['Ouvidoria Geral','#db2777'],
 PLN:['Diretoria de Planejamento','#9333ea'],JUR:['Assessoria Jurídica','#4f46e5'],TEC:['Diretoria de Tecnologia','#0f766e'],COM:['Assessoria de Comunicação','#c026d3']}
@@ -130,7 +138,7 @@ const P=[['Solicitação de diárias e passagens','SGA',0,'a','',null,4,null,'Ge
 ['Contratação de estagiários','SGA',1,'a','CN',null,1,null,'Gestão de pessoas'],['Emissão de pareceres jurídicos','JUR',2,'a','AL','V1',3,null,'A definir'],
 ['Gestão de acessos aos sistemas','TEC',2,'i','AL','V2',15,['atraso','27/10 · há 3 dias'],'A definir'],['Publicação de atos no diário oficial','CDI',2,'a','BR','V1',5,null,'Gestão documental'],
 ['Arquivamento de processos encerrados','CDI',2,'i','AL','V3',8,null,'A definir'],['Divulgação de campanhas institucionais','COM',3,'f','AL','V4',2,null,'Comunicação institucional'],
-['Controle de bens patrimoniais','SGA',3,'i','CN','V2',11,null,'A definir'],['Monitoramento de indicadores','PLN',4,'a','BR','V4F',3,['vence','01/11 · em 2 dias'],'A definir'],
+['Controle de bens patrimoniais','SGA',3,'i','CN','V2',11,null,'A definir',null,'suspenso'],['Gestão da frequência de servidores','SGA',7,null,'CN','V3F',null,null,'Gestão de pessoas',null,'concluido'],['Monitoramento de indicadores','PLN',4,'a','BR','V4F',3,['vence','01/11 · em 2 dias'],'A definir'],
 ['Revisão de contratos de serviços','JUR',5,'i','CN','V5',7,null,'A definir']]
 const ROT={a:'A fazer',i:'Iniciado',f:'Finalizado'}
 const ST={a:'<circle cx="12" cy="12" r="8" fill="none" stroke="#9098a6" stroke-width="2"/>',i:'<circle cx="12" cy="12" r="8" fill="none" stroke="#3a5afe" stroke-width="2"/><path d="M12 4a8 8 0 0 1 0 16z" fill="#3a5afe"/>',
@@ -152,22 +160,22 @@ function moldura(area,titulo,icone){
 function barraDaLista(agrupar){document.getElementById('barra').innerHTML=`<button class="btn prim">${ic('mais')}Cadastrar processo</button>
  <button class="btn">${ic('lista')}Lista${ic('seta')}</button><span class="sep"></span>
  <span class="rot">Agrupar</span><span class="seg">${['Nenhum','Setor','Macroprocesso'].map(o=>`<button class="${o===agrupar?'sim':''}">${o}</button>`).join('')}</span>
- <span class="rot">Mostrar</span><span class="seg">${['Em andamento','Concluídos','Cancelados (3)','Todos'].map((o,i)=>`<button class="${i===0?'sim':''}">${o}</button>`).join('')}</span>
+ <span class="rot">Situação</span><span class="seg">${['Todos','Em andamento','Suspensos','Concluídos','Cancelados'].map((o,i)=>`<button class="${i===0?'sim':''}">${o}</button>`).join('')}</span>
  <span class="dir-barra">${agrupar==='Nenhum'?'':`<button class="btn leve icone" title="Abrir todos">${ic('camadas')}</button>`}<button class="btn on">${ic('filtro')}Filtros <em>1</em></button><button class="btn leve">${ic('pessoa')}Destacar os meus</button></span>`}
 // 'setor' esconde as colunas Setor e Macroprocesso (o grupo e o subgrupo já dizem); 'macro' esconde só Macroprocesso.
-const cabecalho=esconder=>`<tr><th>Processo ${ic('ordem')}</th>${esconder==='setor'?'':`<th class="filtrada">Setor ${ic('filtro')}</th>`}${esconder?'':`<th>Macroprocesso ${ic('seta')}</th>`}<th>Etapa ${ic('seta')}</th><th>Situação</th><th>Responsável ${ic('seta')}</th><th>Indicadores</th></tr>`
-function linha(p,esconder,rec=''){const[n,s,e,sit,r,v,d,pz,m,tipo]=p
+const cabecalho=esconder=>`<tr><th>Processo ${ic('ordem')}</th>${esconder==='setor'?'':`<th class="filtrada">Setor ${ic('filtro')}</th>`}${esconder?'':`<th>Macroprocesso ${ic('seta')}</th>`}<th>Situação ${ic('seta')}</th><th>Etapa ${ic('seta')}</th><th>Etiqueta</th><th>Responsável ${ic('seta')}</th><th>Indicadores</th></tr>`
+function linha(p,esconder,rec=''){const[n,s,e,sit,r,v,d,pz,m,tipo,situ='andamento']=p
  return `<tr class="${rec}"><td><span class="nome">${n}</span>${tipo?` <span class="tag">${tipo}</span>`:''}</td>${esconder==='setor'?'':`<td>${selo(s)}</td>`}${esconder?'':`<td class="${m==='A definir'?'muted':''}">${m}</td>`}
- <td>${etapa(e)}</td><td>${st(sit)}</td><td>${pessoa(r)}</td><td><span style="display:flex;gap:12px">${v?`<span class="ind">${ic('doc')}${v}</span>`:''}<span class="ind">${ic('relogio')}${d}d</span>${pz?`<span class="ind ${pz[0]}">${ic('cal')}${pz[1]}</span>`:''}</span></td></tr>`}
-const nCols=esconder=>esconder==='setor'?5:esconder?6:7
+ <td>${situacao(situ)}</td><td>${etapa(e)}</td><td>${sit?st(sit):'<span class="muted">—</span>'}</td><td>${pessoa(r)}</td><td><span style="display:flex;gap:12px">${v?`<span class="ind">${ic('doc')}${v}</span>`:''}${d?`<span class="ind">${ic('relogio')}${d}d</span>`:''}${pz?`<span class="ind ${pz[0]}">${ic('cal')}${pz[1]}</span>`:''}</span></td></tr>`}
+const nCols=esconder=>esconder==='setor'?6:esconder?7:8
 const grupo=(conteudo,n,esconder)=>`<tr class="grupo"><td colspan="${nCols(esconder)}"><span class="c">${ic('seta')}${conteudo}<span class="n">${n}</span></span></td></tr>`
-function lista(){barraDaLista('Nenhum');return `<table class="tab">${cabecalho('')}${P.slice(0,11).map(p=>linha(p,'')).join('')}</table>`}
+function lista(){barraDaLista('Nenhum');return `<table class="tab">${cabecalho('')}${P.slice(0,12).map(p=>linha(p,'')).join('')}</table>`}
 // Setor com um só macroprocesso pula o nível; com vários, mostra os subgrupos.
 function listaPorSetor(){barraDaLista('Setor');let h=cabecalho('setor')
  Object.entries(SETORES).slice(0,5).forEach(([s,[nm]])=>{const ps=P.filter(p=>p[1]===s);const macros=[...new Set(ps.map(p=>p[8]))]
   h+=grupo(`${selo(s)}${nm}${macros.length===1?` <span class="muted" style="font-weight:600">· ${macros[0]}</span>`:''}`,ps.length,'setor')
   if(macros.length===1){h+=ps.map(p=>linha(p,'setor','rec1')).join('');return}
-  macros.forEach(m=>{const pm=ps.filter(p=>p[8]===m);h+=`<tr class="sub"><td colspan="5">${m} <span class="mono muted">${pm.length}</span></td></tr>`+pm.map(p=>linha(p,'setor','rec2')).join('')})})
+  macros.forEach(m=>{const pm=ps.filter(p=>p[8]===m);h+=`<tr class="sub"><td colspan="6">${m} <span class="mono muted">${pm.length}</span></td></tr>`+pm.map(p=>linha(p,'setor','rec2')).join('')})})
  return `<table class="tab">${h}</table>`}
 function listaPorMacro(){barraDaLista('Macroprocesso');let h=cabecalho('macro')
  const cat={'Gestão de pessoas':'Apoio','Gestão documental':'Apoio','Comunicação institucional':'Gerencial','A definir':''}
@@ -193,7 +201,7 @@ function setorAberto(){moldura('setores','Setores','predio');document.getElement
  <div class="bloco"><h3>Dados do setor</h3><div class="campos"><div class="campo"><label>Nome <i>*</i></label><div class="entrada">Coordenadoria de Documentação e Informação</div></div>
  <div class="campo"><label>Sigla <i>*</i></label><div class="entrada">CDI</div></div><div class="campo todo"><label>Cor do selo</label>${coresDoSetor(1)}</div>
  <div class="campo todo"><label>Observações</label><div class="entrada alta">Opcional</div></div></div></div>
- <div class="bloco"><h3>Processos do setor <small>${ps.length}</small></h3><table class="tab" style="border:0">${'<tr><th>Processo</th><th>Etapa</th><th>Situação</th><th>Responsável</th></tr>'+ps.map(p=>`<tr><td class="nome">${p[0]}</td><td>${etapa(p[2])}</td><td>${st(p[3])}</td><td>${pessoa(p[4])}</td></tr>`).join('')}</table></div></div>`}
+ <div class="bloco"><h3>Processos do setor <small>${ps.length}</small></h3><table class="tab" style="border:0">${'<tr><th>Processo</th><th>Etapa</th><th>Etiqueta</th><th>Responsável</th></tr>'+ps.map(p=>`<tr><td class="nome">${p[0]}</td><td>${etapa(p[2])}</td><td>${st(p[3])}</td><td>${pessoa(p[4])}</td></tr>`).join('')}</table></div></div>`}
 function novoSetor(){const fundo=setores()
  return fundo+`<div class="veu"><div class="janela"><div class="t">Novo setor${ic('x')}</div><div class="c">
  <div class="campos"><div class="campo"><label>Nome <i>*</i></label><div class="entrada"></div></div><div class="campo"><label>Sigla <i>*</i></label><div class="entrada"></div></div></div>

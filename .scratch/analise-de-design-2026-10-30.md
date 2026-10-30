@@ -2,6 +2,8 @@
 
 Sessão de conversa (fora do funil). Telas vistas no app rodando (localhost, 1440×900), com login do usuário: Quadro por etapa, por setor e por responsável, "Só os meus", Lista, cartão aberto, Novo processo, Setores (Setores, Macroprocessos, Histórico), Administração (Usuários, Catálogo de etapas, Planilhas). Método: avaliação num único contexto, sem subagentes; detector automático do Impeccable sem achados relevantes (1 aviso: canto de 1px em `Quadro.css:262`).
 
+**Correção de termos (2026-10-30, apontada pelo usuário).** Onde este texto chama de "situação" os estados A fazer, Iniciado e Finalizado, leia **etiqueta** (`CONTEXT.md`). Situação do processo é outra coisa: em andamento, suspenso, cancelado ou concluído. As propostas visuais seguem valendo, mas no texto da interface o nome é "etiqueta".
+
 ## Nota geral (heurísticas de Nielsen, 0 a 4)
 
 | # | Heurística | Nota | Principal problema |
