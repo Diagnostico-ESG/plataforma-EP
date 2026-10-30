@@ -10,7 +10,7 @@ type FiltrosDosProcessosProps = {
   aoMudar: (filtros: Filtros) => void
 }
 
-/** Os filtros do Quadro, sem situação nem busca (o Quadro mostra só os vivos); a Lista filtra pelo cabeçalho (CabecalhoDaLista). */
+/** Os filtros do Quadro, sem situação (o Quadro mostra só os vivos); a Lista filtra pelo cabeçalho (CabecalhoDaLista). */
 export function FiltrosDosProcessos({ opcoes, filtros, aoMudar }: FiltrosDosProcessosProps) {
   // Os valores vêm das próprias opções, então o tipo escolhido é sempre válido.
   const mudar = (nome: keyof Filtros) => (valor: string) => aoMudar({ ...filtros, [nome]: valor || null } as Filtros)

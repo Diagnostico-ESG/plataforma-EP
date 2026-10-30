@@ -47,17 +47,11 @@ test('o parâmetro antigo "arquivados" de um endereço guardado é ignorado e n�
   expect(montarEnderecoDosProcessos({ visao: 'lista', aberto: null, filtros, agrupar: 'etapa' })).toBe('#/processos/lista?setor=s1')
 })
 
-test('a busca vem da consulta, só na Lista, e endereço sem busca continua valendo', () => {
-  expect(lerEnderecoDosProcessos('#/processos/lista?busca=pagar%20di').filtros).toEqual({ ...SEM_FILTROS, busca: 'pagar di' })
-  expect(lerEnderecoDosProcessos('#/processos?busca=pagar').filtros).toEqual(SEM_FILTROS)
-  expect(lerEnderecoDosProcessos('#/processos/lista?busca=').filtros.busca).toBeNull()
-  expect(lerEnderecoDosProcessos('#/processos/lista?setor=s1').filtros.busca).toBeNull()
-})
-
-test('montar a busca: depois dos filtros, e fora do Quadro', () => {
-  const filtros = { ...SEM_FILTROS, setor: 's1', busca: 'pagar di' }
-  expect(montarEnderecoDosProcessos({ visao: 'lista', aberto: null, filtros, agrupar: 'etapa' })).toBe('#/processos/lista?setor=s1&busca=pagar+di')
-  expect(montarEnderecoDosProcessos({ visao: 'quadro', aberto: null, filtros, agrupar: 'etapa' })).toBe('#/processos?setor=s1')
+test('o parâmetro antigo "busca" de um endereço guardado é ignorado e não volta para o endereço', () => {
+  expect(lerEnderecoDosProcessos('#/processos/lista?busca=pagar%20di').filtros).toEqual(SEM_FILTROS)
+  expect(lerEnderecoDosProcessos('#/processos/lista?setor=s1&busca=pagar')).toMatchObject({ filtros: { ...SEM_FILTROS, setor: 's1' } })
+  const filtros = { ...SEM_FILTROS, setor: 's1' }
+  expect(montarEnderecoDosProcessos(lerEnderecoDosProcessos('#/processos/lista?setor=s1&busca=pagar'))).toBe('#/processos/lista?setor=s1')
   expect(lerEnderecoDosProcessos(montarEnderecoDosProcessos({ visao: 'lista', aberto: 'p1', filtros, agrupar: 'etapa' })))
     .toEqual({ visao: 'lista', aberto: 'p1', filtros, agrupar: 'etapa', mostrar: 'todos', ordenacao: ORDENACAO_PADRAO, agruparLista: 'nenhum' })
 })
@@ -150,7 +144,6 @@ test('ler e montar são inversos com a ordenação e os filtros', () => {
 test('agrupar=macroprocesso agrupa a Lista; no Quadro o parâmetro é ignorado e o agrupar do Quadro segue valendo', () => {
   expect(lerEnderecoDosProcessos('#/processos/lista?agrupar=macroprocesso').agruparLista).toBe('macroprocesso')
   expect(lerEnderecoDosProcessos('#/processos/lista?agrupar=outro').agruparLista).toBe('nenhum')
-  expect(lerEnderecoDosProcessos('#/processos/lista?agrupar=setor').agruparLista).toBe('nenhum')
   expect(lerEnderecoDosProcessos('#/processos?agrupar=macroprocesso')).toMatchObject({ agruparLista: 'nenhum', agrupar: 'etapa' })
   expect(lerEnderecoDosProcessos('#/processos?agrupar=setor')).toMatchObject({ agruparLista: 'nenhum', agrupar: 'setor' })
 })
@@ -161,5 +154,15 @@ test('montar: agrupar=macroprocesso só na Lista; Nenhum não escreve nada', () 
   expect(montarEnderecoDosProcessos({ ...base, visao: 'lista', agruparLista: 'nenhum' })).toBe('#/processos/lista')
   expect(montarEnderecoDosProcessos({ ...base, visao: 'quadro', agruparLista: 'macroprocesso' })).toBe('#/processos')
   const lido = '#/processos/lista?tipo=processo&agrupar=macroprocesso'
+  expect(montarEnderecoDosProcessos(lerEnderecoDosProcessos(lido))).toBe(lido)
+})
+
+test('agrupar=setor agrupa a Lista por Setor, com ida e volta; no Quadro segue sendo a visualização por setor', () => {
+  expect(lerEnderecoDosProcessos('#/processos/lista?agrupar=setor')).toMatchObject({ agruparLista: 'setor', agrupar: 'etapa' })
+  expect(lerEnderecoDosProcessos('#/processos?agrupar=setor')).toMatchObject({ agruparLista: 'nenhum', agrupar: 'setor' })
+  const base = { aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa' as const }
+  expect(montarEnderecoDosProcessos({ ...base, visao: 'lista', agruparLista: 'setor' })).toBe('#/processos/lista?agrupar=setor')
+  expect(montarEnderecoDosProcessos({ ...base, visao: 'quadro', agruparLista: 'setor' })).toBe('#/processos')
+  const lido = '#/processos/lista?tipo=processo&agrupar=setor'
   expect(montarEnderecoDosProcessos(lerEnderecoDosProcessos(lido))).toBe(lido)
 })

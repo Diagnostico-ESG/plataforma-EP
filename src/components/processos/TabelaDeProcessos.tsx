@@ -15,13 +15,12 @@ type TabelaDeProcessosProps = {
   cancelados: LinhaDaLista[]
   idEscolhido: string | null
   aoAbrir: (id: string) => void
-  busca: string | null
 }
 
 /** A Lista: tabela compacta, no padrão das listas de cadastros. */
-export function TabelaDeProcessos({ cabecalho, linhas, cancelados, idEscolhido, aoAbrir, busca }: TabelaDeProcessosProps) {
+export function TabelaDeProcessos({ cabecalho, linhas, cancelados, idEscolhido, aoAbrir }: TabelaDeProcessosProps) {
   const linhaDe = (linha: LinhaDaLista) => (
-    <LinhaDoProcesso key={linha.id} linha={linha} escolhida={linha.id === idEscolhido} aoAbrir={aoAbrir} busca={busca} />
+    <LinhaDoProcesso key={linha.id} linha={linha} escolhida={linha.id === idEscolhido} aoAbrir={aoAbrir} />
   )
   return (
     <table className="tabela-cadastros tabela-de-processos">

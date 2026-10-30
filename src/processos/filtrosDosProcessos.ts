@@ -1,4 +1,3 @@
-import { contemTrecho } from './buscaNaLista'
 import type { FiltrosDosProcessos } from './enderecoDosProcessos'
 import { ROTULO_DA_SITUACAO, ROTULO_DO_TIPO } from './rotulos'
 import { corDoMacroprocesso } from './corDoMacroprocesso'
@@ -33,7 +32,6 @@ const CONFERENCIAS: Record<keyof FiltrosDosProcessos, (processo: ProcessoDaLista
   tipo: (processo, valor) => processo.tipo === valor,
   responsavel: (processo, valor) => processo.responsavel?.id === valor,
   situacao: (processo, valor) => processo.situacao === valor,
-  busca: (processo, valor) => contemTrecho(processo.nome, valor),
 }
 
 function passaNosFiltros(processo: ProcessoDaLista, filtros: FiltrosDosProcessos): boolean {

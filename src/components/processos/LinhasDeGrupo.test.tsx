@@ -25,8 +25,13 @@ test('a contagem de um só processo fica no singular', () => {
 })
 
 test('o setor mostra o selo da sigla, o nome e a contagem', () => {
-  const itens = [1, 2, 3].map((n) => ({ linha: { id: `p${n}` } as never, nivel: 0, subprocessoDe: null }))
-  dentroDaTabela(<LinhaDoSetor setor={{ ...SETOR, itens }} aberto aoAlternar={() => {}} />)
+  dentroDaTabela(<LinhaDoSetor setor={SETOR} total={3} aberto aoAlternar={() => {}} />)
   expect(screen.getByRole('button', { name: 'TSA Setor A, 3 processos' })).toBeTruthy()
   expect(document.querySelector('.selo-do-setor')?.textContent).toBe('TSA')
+})
+
+test('a linha raiz e a recuada se distinguem pela classe, seja macroprocesso ou setor', () => {
+  dentroDaTabela(<><LinhaDoMacro macro={MACRO} aberto aoAlternar={() => {}} raiz /><LinhaDoSetor setor={SETOR} total={1} aberto aoAlternar={() => {}} /></>)
+  expect(document.querySelector('.linha-de-macro')?.classList.contains('grupo-raiz')).toBe(true)
+  expect(document.querySelector('.linha-de-setor')?.classList.contains('grupo-filho')).toBe(true)
 })

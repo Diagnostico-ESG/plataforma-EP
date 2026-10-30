@@ -36,11 +36,11 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes, reviso
   const [recemCriado, setRecemCriado] = useState<string | null>(null)
   const cadastrando = podeAlterar && atual.aberto === 'novo'
   const idAberto = atual.aberto === 'novo' ? null : atual.aberto
-  const irParaVisao = (mudancas: Partial<EnderecoDosProcessos>, substituir = false) => irPara(montarEnderecoDosProcessos({ ...atual, ...mudancas }), substituir)
+  const irParaVisao = (mudancas: Partial<EnderecoDosProcessos>) => irPara(montarEnderecoDosProcessos({ ...atual, ...mudancas }))
   const enderecoDoProcesso = (id: string) => montarEnderecoDosProcessos({ ...atual, aberto: id })
-  // Situação e busca só existem na Lista: o Quadro não as tem, e a Lista abre em Concluídos com os mesmos filtros dele.
+  // A situação só existe na Lista: o Quadro não a tem, e a Lista abre em Concluídos com os mesmos filtros dele.
   const enderecoDosConcluidosNaLista = montarEnderecoDosProcessos({
-    visao: 'lista', aberto: null, filtros: { ...atual.filtros, situacao: null, busca: null }, agrupar: 'etapa', mostrar: 'concluidos',
+    visao: 'lista', aberto: null, filtros: { ...atual.filtros, situacao: null }, agrupar: 'etapa', mostrar: 'concluidos',
   })
   const tirada = useTirarDoQuadro(processos, recarregar)
 
@@ -66,7 +66,7 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes, reviso
         <VisaoDosProcessos visao={atual.visao} estado={estado} aoTentarDeNovo={tentarDeNovo} podeAlterar={podeAlterar}
           aoCadastrar={() => irParaVisao({ aberto: 'novo' })} idEscolhido={idAberto}
           enderecoDoProcesso={enderecoDoProcesso} aoAbrir={(id) => irParaVisao({ aberto: id })}
-          filtros={atual.filtros} aoMudarFiltros={(filtros) => irParaVisao({ filtros, aberto: null }, filtros.busca !== atual.filtros.busca)}
+          filtros={atual.filtros} aoMudarFiltros={(filtros) => irParaVisao({ filtros, aberto: null })}
           agrupar={atual.agrupar} aoMudarAgrupar={(agrupar) => irParaVisao({ agrupar, aberto: null })}
           enderecoDosConcluidosNaLista={enderecoDosConcluidosNaLista} mostrar={atual.mostrar} aoLimparTudo={() => irParaVisao({ filtros: SEM_FILTROS, mostrar: 'todos', aberto: null })}
           aoMudarMostrar={(mostrar) => irParaVisao({ mostrar, filtros: { ...atual.filtros, situacao: null }, aberto: null })}

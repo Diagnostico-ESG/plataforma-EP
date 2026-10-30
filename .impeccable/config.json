@@ -38,6 +38,12 @@
         ],
         "createdAt": "2026-10-28T13:36:20.041Z",
         "reason": "Claude: degradê violeta é a opção 4 descartada numa maquete de comparação; a opção escolhida (2) não usa degradê"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "sans 3",
+        "createdAt": "2026-10-30T14:45:50.405Z",
+        "reason": "Claude: Source Sans 3 é a fonte declarada no DESIGN.md; o detector lê o nome pela metade"
       }
     ]
   }

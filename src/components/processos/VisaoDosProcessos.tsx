@@ -12,7 +12,6 @@ import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { Icone } from '../Icone'
 import { QuadroVazio } from '../quadro/QuadroVazio'
-import { BuscaDaLista } from './BuscaDaLista'
 import { CabecalhoDaLista } from './CabecalhoDaLista'
 import { AgruparAListaPor, AgruparPor, SoOsMeus, TodosOuConcluidos } from './ControlesDoQuadro'
 import { ArvoreDaLista } from './ArvoreDaLista'
@@ -39,7 +38,7 @@ type VisaoDosProcessosProps = {
   aoMudarMostrar: (mostrar: MostrarNoPortfolio) => void
   /** Sem filtros e de volta a Todos, de uma vez só (o endereço muda uma vez). */
   aoLimparTudo: () => void
-  /** Só na Lista: a tabela comum ou a árvore por macroprocesso. */
+  /** Só na Lista: a tabela comum ou a árvore por macroprocesso ou por setor. */
   agruparLista: AgruparListaPor
   aoMudarAgruparLista: (agrupar: AgruparListaPor) => void
   /** Só na Lista: a coluna e o sentido da ordenação, escolhidos no cabeçalho. */
@@ -79,14 +78,12 @@ export function VisaoDosProcessos(props: VisaoDosProcessosProps) {
 
 type BarraDaVisaoProps = VisaoDosProcessosProps & { opcoes: OpcoesDosFiltros; portfolio: boolean }
 
-// No Quadro, os filtros e os controles dele; na Lista, a busca e o Limpar filtros (os filtros ficam no cabeçalho da tabela).
+// No Quadro, os filtros e os controles dele; na Lista, o Agrupar por e o Limpar filtros (os filtros ficam no cabeçalho da tabela).
 function BarraDaVisao({ visao, opcoes, portfolio, filtros, aoMudarFiltros, mostrar, aoMudarMostrar, podeAlterar, aoCadastrar, ...props }: BarraDaVisaoProps) {
   const naLista = visao === 'lista'
   return (
-    <div className="quadro-barra">
-      {naLista
-        ? <BuscaDaLista valor={filtros.busca} aoMudar={(busca) => aoMudarFiltros({ ...filtros, busca: busca || null })} />
-        : <FiltrosDosProcessos opcoes={opcoes} filtros={filtros} aoMudar={aoMudarFiltros} />}
+    <div className={naLista ? 'quadro-barra quadro-barra-da-lista' : 'quadro-barra'}>
+      {!naLista && <FiltrosDosProcessos opcoes={opcoes} filtros={filtros} aoMudar={aoMudarFiltros} />}
       {naLista && <AgruparAListaPor agrupar={props.agruparLista} aoMudar={props.aoMudarAgruparLista} />}
       {portfolio && <TodosOuConcluidos mostrar={mostrar} aoMudar={aoMudarMostrar} />}
       {naLista && temFiltro(filtros) && <BotaoLimparFiltros aoLimpar={() => aoMudarFiltros(SEM_FILTROS)} />}
@@ -158,13 +155,13 @@ function ListaDosProcessos({ lista, visiveis, todos, idEscolhido, aoAbrir, filtr
   )
   const linhas = linhasDaLista(visiveis, todos, ordenacao)
   const cancelados = mostrar === 'todos' ? linhasDaLista(canceladosDe(lista.processos), todos, ordenacao) : []
-  if (props.agruparLista === 'macroprocesso') {
+  if (props.agruparLista !== 'nenhum') {
     return (
-      <ArvoreDaLista cabecalho={cabecalho} linhas={linhas} todos={todos} setores={lista.setores} cancelados={cancelados} idEscolhido={idEscolhido}
-        aoAbrir={aoAbrir} busca={filtros.busca} modulo={props.versoes} />
+      <ArvoreDaLista cabecalho={cabecalho} agrupar={props.agruparLista} linhas={linhas} todos={todos} setores={lista.setores} cancelados={cancelados}
+        idEscolhido={idEscolhido} aoAbrir={aoAbrir} modulo={props.versoes} />
     )
   }
-  return <TabelaDeProcessos cabecalho={cabecalho} linhas={linhas} idEscolhido={idEscolhido} aoAbrir={aoAbrir} busca={filtros.busca} cancelados={cancelados} />
+  return <TabelaDeProcessos cabecalho={cabecalho} linhas={linhas} idEscolhido={idEscolhido} aoAbrir={aoAbrir} cancelados={cancelados} />
 }
 
 function BotaoCadastrar({ aoCadastrar }: { aoCadastrar: () => void }) {

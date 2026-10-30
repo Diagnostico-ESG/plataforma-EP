@@ -3,8 +3,8 @@ import type { SituacaoDoProcesso, TipoDeProcesso } from './tipos'
 
 export type VisaoDosProcessos = 'quadro' | 'lista'
 
-/** Só na Lista: a tabela comum ou a árvore por macroprocesso. */
-export type AgruparListaPor = 'nenhum' | 'macroprocesso'
+/** Só na Lista: a tabela comum ou a árvore por macroprocesso ou por setor. */
+export type AgruparListaPor = 'nenhum' | 'macroprocesso' | 'setor'
 
 export type FiltrosDosProcessos = {
   setor: string | null
@@ -15,8 +15,6 @@ export type FiltrosDosProcessos = {
   responsavel: string | null
   /** Só na Lista: o Quadro mostra apenas os vivos. */
   situacao: SituacaoDoProcesso | null
-  /** Só na Lista: trecho do nome do processo. */
-  busca: string | null
 }
 
 export type AgruparQuadroPor = 'etapa' | 'responsavel' | 'setor'
@@ -52,12 +50,11 @@ export function ehPortfolio(visao: VisaoDosProcessos, agrupar: AgruparQuadroPor)
 }
 
 export const SEM_FILTROS: FiltrosDosProcessos = {
-  setor: null, macroprocesso: null, etapa: null, tipo: null, responsavel: null, situacao: null, busca: null,
+  setor: null, macroprocesso: null, etapa: null, tipo: null, responsavel: null, situacao: null,
 }
 
 // A ordem fixa deixa o mesmo filtro sempre com o mesmo endereço, para recarregar ou compartilhar.
-const NOMES_DOS_FILTROS = ['setor', 'macroprocesso', 'etapa', 'tipo', 'responsavel', 'situacao', 'busca'] as const
-const SO_DA_LISTA = new Set<string>(['situacao', 'busca'])
+const NOMES_DOS_FILTROS = ['setor', 'macroprocesso', 'etapa', 'tipo', 'responsavel', 'situacao'] as const
 const TIPOS = new Set<string>(['processo', 'subprocesso', 'a_classificar'])
 // O cancelado não é uma opção da Lista: ele só aparece pelo "Mostrar cancelados".
 const SITUACOES = new Set<string>(['em_andamento', 'suspenso', 'concluido'])
@@ -80,7 +77,7 @@ export function lerEnderecoDosProcessos(endereco: string): EnderecoDosProcessos 
 
 // Na Lista a chave `agrupar` é a da árvore; no Quadro, a de etapa, responsável e setor.
 function agruparDaLista(visao: VisaoDosProcessos, lido: string): AgruparListaPor {
-  return visao === 'lista' && lido === 'macroprocesso' ? 'macroprocesso' : 'nenhum'
+  return visao === 'lista' && (lido === 'macroprocesso' || lido === 'setor') ? lido : 'nenhum'
 }
 
 // Coluna e sentido desconhecidos voltam ao padrão, cada um por si; o Quadro não se ordena.
@@ -103,7 +100,6 @@ function filtrosDaConsulta(consulta: URLSearchParams, visao: VisaoDosProcessos, 
     setor: valor('setor'), macroprocesso: valor('macroprocesso'), etapa: etapaDaConsulta(valor('etapa')),
     tipo: conhecido('tipo', TIPOS) as TipoDeProcesso | null, responsavel: valor('responsavel'),
     situacao: visao === 'lista' && mostrar === 'todos' ? conhecido('situacao', SITUACOES) as SituacaoDoProcesso | null : null,
-    busca: visao === 'lista' ? valor('busca') : null,
   }
 }
 
@@ -112,12 +108,11 @@ function etapaDaConsulta(lida: string | null): string | null {
   return lida === 'aguardando-o-setor' ? null : lida
 }
 
-// Fora da Lista não há situação nem busca; com "Concluídos" a situação não tem o que filtrar.
+// Fora da Lista não há situação; com "Concluídos" a situação não tem o que filtrar.
 function valorDoFiltroNoEndereco(
   nome: (typeof NOMES_DOS_FILTROS)[number], filtros: FiltrosDosProcessos, visao: VisaoDosProcessos, mostrar: MostrarNoPortfolio,
 ): string | null {
-  if (SO_DA_LISTA.has(nome) && visao === 'quadro') return null
-  if (nome === 'situacao' && mostrar === 'concluidos') return null
+  if (nome === 'situacao' && (visao === 'quadro' || mostrar === 'concluidos')) return null
   return filtros[nome]
 }
 
@@ -138,7 +133,7 @@ function consultaDoEndereco({ visao, filtros, agrupar, mostrar, ordenacao, agrup
   if (visao === 'quadro' && agrupar !== 'etapa') consulta.set('agrupar', agrupar)
   if (mostrar === 'concluidos' && ehPortfolio(visao, agrupar)) consulta.set('mostrar', 'concluidos')
   if (visao === 'lista') gravarOrdenacao(consulta, ordenacao)
-  if (visao === 'lista' && agruparLista === 'macroprocesso') consulta.set('agrupar', agruparLista)
+  if (visao === 'lista' && agruparLista !== 'nenhum') consulta.set('agrupar', agruparLista)
   return consulta
 }
 

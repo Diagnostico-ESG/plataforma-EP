@@ -122,14 +122,15 @@ test('o subprocesso tem as suas Anotações, diferentes das do pai', async () =>
   await waitFor(async () => expect(((await campoDasAnotacoes()) as HTMLTextAreaElement).value).toBe('Do filho'))
 })
 
-test('o texto não vai ao Quadro nem à busca da Lista', async () => {
+test('o texto não vai ao Quadro nem à Lista', async () => {
   montarVerso(processoDasAnotacoes(), 'integrante_ep', [], (falso) => {
     falso.anotacoes.porProcesso.p1 = { texto: 'Segredo do setor', alteradoPor: null, alteradoEm: null }
   })
   await campoDasAnotacoes()
   expect(screen.queryAllByText(/Segredo do setor/).filter((no) => no.tagName !== 'TEXTAREA' && no.closest('dialog') === null)).toHaveLength(0)
-  window.location.hash = '#/processos/lista?busca=Segredo'
-  expect(await screen.findByText('Nenhum processo com estes filtros.')).toBeTruthy()
+  window.location.hash = '#/processos/lista'
+  await waitFor(() => expect(screen.getAllByRole('columnheader').length).toBeGreaterThan(0))
+  expect(screen.queryAllByText(/Segredo do setor/).filter((no) => no.tagName !== 'TEXTAREA' && no.closest('dialog') === null)).toHaveLength(0)
 })
 
 test('gravar as Anotações não põe nada no Histórico do processo', async () => {

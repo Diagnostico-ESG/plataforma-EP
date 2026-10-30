@@ -1,24 +1,24 @@
-/* Árvore da Lista: as linhas de macroprocesso e de setor se leem como títulos, e cada nível vem recuado um passo fixo em
-   relação ao de cima (macroprocesso 0, setor 1, processo 2 + subníveis); a linha dos arquivos fica um passo à frente do
+/* Árvore da Lista: as linhas de grupo se leem como títulos, e cada nível vem recuado um passo fixo em relação ao de cima
+   (grupo raiz 0, grupo filho 1, processo 2 + subníveis; a raiz é o macroprocesso ou, na árvore por Setor, o setor); a linha dos arquivos fica um passo à frente do
    processo dono, colada a ele, no mesmo fundo. */
 .tabela-de-processos {
   --passo-da-arvore: 20px;
 }
 
-.linha-de-macro th,
-.linha-de-setor th {
+.grupo-raiz th,
+.grupo-filho th {
   text-align: left;
   font-weight: 600;
 }
 
-.linha-de-macro th {
+.grupo-raiz th {
   padding: var(--esp-2) var(--esp-3);
   background: var(--azul-claro);
   border-top: 2px solid var(--azul);
   font-size: var(--tam-coluna);
 }
 
-.linha-de-setor th {
+.grupo-filho th {
   padding: var(--esp-1) var(--esp-3) var(--esp-1) calc(var(--esp-3) + var(--passo-da-arvore));
   background: var(--fundo-contexto);
   font-size: var(--tam-base);

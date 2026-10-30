@@ -4,7 +4,6 @@ import type { LinhaDaLista } from '../../processos/linhasDaLista'
 import { ROTULO_DO_TIPO } from '../../processos/rotulos'
 import { SeloDoSetor } from '../SeloDoSetor'
 import { BarraDeProgresso } from './BarraDeProgresso'
-import { NomeComTrecho } from './NomeComTrecho'
 import { PilulaDaSituacao } from './PilulaDaSituacao'
 import { SeloDeParado } from './SeloDeParado'
 
@@ -12,17 +11,17 @@ import { SeloDeParado } from './SeloDeParado'
 export type LinhaNaArvore = { nivel: number; aberto: boolean; subprocessoDe: string | null; aoAlternar: () => void }
 
 type LinhaDoProcessoProps = {
-  linha: LinhaDaLista; escolhida: boolean; aoAbrir: (id: string) => void; busca: string | null; arvore?: LinhaNaArvore
+  linha: LinhaDaLista; escolhida: boolean; aoAbrir: (id: string) => void; arvore?: LinhaNaArvore
 }
 
 // A linha inteira abre o painel; o botão no nome dá o mesmo caminho a quem usa o teclado e recebe o foco ao fechar.
-export function LinhaDoProcesso({ linha, escolhida, aoAbrir, busca, arvore }: LinhaDoProcessoProps) {
+export function LinhaDoProcesso({ linha, escolhida, aoAbrir, arvore }: LinhaDoProcessoProps) {
   return (
     <tr className="linha-clicavel" aria-current={escolhida ? 'true' : undefined} onClick={() => aoAbrir(linha.id)}>
       <td className={arvore ? `processo-na-arvore${arvore.nivel > 0 ? ' processo-recuado' : ''}` : undefined} style={arvore ? { '--nivel': arvore.nivel } as CSSProperties : undefined}>
         {arvore && <SetaDoProcesso nome={linha.nome} aberto={arvore.aberto} aoAlternar={arvore.aoAlternar} />}
         <button type="button" id={`linha-${linha.id}`} className="cadastros-abrir">
-          <NomeComTrecho nome={linha.nome} busca={busca} />
+          {linha.nome}
         </button>
         <IndicacaoDoPai linha={linha} arvore={arvore} />
         <SeloDeParado processo={linha} />

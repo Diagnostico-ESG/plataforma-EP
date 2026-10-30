@@ -52,11 +52,12 @@ function montar(ajustar?: (falso: ProcessosFalso) => void) {
 
 const barraDeCima = () => document.querySelector('.quadro-barra') as HTMLElement
 
-test('a Lista não tem a barra de filtros; acima da tabela ficam a busca, Todos | Concluídos e, com filtro, Limpar filtros', async () => {
+test('a Lista não tem a barra de filtros nem a busca; acima da tabela ficam Agrupar por, Todos | Concluídos e, com filtro, Limpar filtros', async () => {
   montar()
   await nomesNasLinhas()
   expect(screen.queryByRole('group', { name: 'Filtros dos processos' })).toBeNull()
-  expect(within(barraDeCima()).getByRole('textbox', { name: 'Buscar pelo nome' })).toBeTruthy()
+  expect(screen.queryByRole('textbox')).toBeNull()
+  expect(within(barraDeCima()).getByRole('group', { name: 'Agrupar por' })).toBeTruthy()
   expect(within(barraDeCima()).getByRole('button', { name: 'Todos' })).toBeTruthy()
   expect(within(barraDeCima()).queryByRole('button', { name: 'Limpar filtros' })).toBeNull()
   await escolherNaColuna('Tipo', 'Processo')

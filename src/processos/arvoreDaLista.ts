@@ -21,6 +21,36 @@ const emOrdemDeTexto = (a: string, b: string) => a.localeCompare(b, 'pt-BR', { s
  * setor, no macroprocesso do pai (lido de `todos`).
  */
 export function montarArvore(linhas: LinhaDaLista[], todos: ProcessoDaLista[], setores: SetorDoQuadro[]): MacroDaArvore[] {
+  const macros = new Map<string, MacroDaArvore>()
+  for (const { macro, raiz, itens } of ramosDaArvore(linhas, todos)) acrescentar(macros, macro, raiz, itens, setores)
+  return [...macros.values()].sort((a, b) => emOrdemDeTexto(a.nome, b.nome)).map(ordenarSetores)
+}
+
+/** O macroprocesso de um setor na árvore por Setor: só os processos daquele setor naquele macroprocesso. */
+export type MacroNoSetor = { id: string; nome: string; itens: ItemDaArvore[] }
+
+export type SetorRaizDaArvore = { id: string; sigla: string; nome: string; cor: number; total: number; macros: MacroNoSetor[] }
+
+/** Como `montarArvore`, mas setor → macroprocesso → processo; o subprocesso segue as mesmas regras (sob o pai, ou sozinho no ramo do próprio setor). */
+export function montarArvorePorSetor(linhas: LinhaDaLista[], todos: ProcessoDaLista[], setores: SetorDoQuadro[]): SetorRaizDaArvore[] {
+  const raizes = new Map<string, SetorRaizDaArvore>()
+  for (const { macro, raiz, itens } of ramosDaArvore(linhas, todos)) {
+    const setor = raizes.get(raiz.setorId) ?? { ...dadosDoSetor(raiz, setores), total: 0, macros: [] }
+    const doMacro = setor.macros.find((existente) => existente.id === macro.id) ?? { ...macro, itens: [] }
+    if (!setor.macros.includes(doMacro)) setor.macros.push(doMacro)
+    doMacro.itens.push(...itens)
+    setor.total += itens.length
+    raizes.set(raiz.setorId, setor)
+  }
+  return [...raizes.values()]
+    .sort((a, b) => emOrdemDeTexto(a.sigla, b.sigla))
+    .map((setor) => ({ ...setor, macros: [...setor.macros].sort((a, b) => emOrdemDeTexto(a.nome, b.nome)) }))
+}
+
+type RamoDaArvore = { macro: { id: string; nome: string }; raiz: LinhaDaLista; itens: ItemDaArvore[] }
+
+// Cada raiz (processo sem pai nas linhas) com os seus itens e o macroprocesso onde fica; as duas árvores só diferem em como aninham isso.
+function ramosDaArvore(linhas: LinhaDaLista[], todos: ProcessoDaLista[]): RamoDaArvore[] {
   const naLista = new Set(linhas.map((linha) => linha.id))
   const filhosDe = new Map<string, LinhaDaLista[]>()
   const raizes: LinhaDaLista[] = []
@@ -30,12 +60,7 @@ export function montarArvore(linhas: LinhaDaLista[], todos: ProcessoDaLista[], s
     else raizes.push(linha)
   }
   const porId = new Map(todos.map((processo) => [processo.id, processo]))
-  const macros = new Map<string, MacroDaArvore>()
-  for (const raiz of raizes) {
-    const itens = itensDaRaiz(raiz, filhosDe, 0)
-    acrescentar(macros, macroDaRaiz(raiz, porId), raiz, itens, setores)
-  }
-  return [...macros.values()].sort((a, b) => emOrdemDeTexto(a.nome, b.nome)).map(ordenarSetores)
+  return raizes.map((raiz) => ({ macro: macroDaRaiz(raiz, porId), raiz, itens: itensDaRaiz(raiz, filhosDe, 0) }))
 }
 
 function ordenarSetores(macro: MacroDaArvore): MacroDaArvore {
@@ -66,6 +91,10 @@ function acrescentar(
 }
 
 function novoSetor(raiz: LinhaDaLista, setores: SetorDoQuadro[]): SetorDaArvore {
+  return { ...dadosDoSetor(raiz, setores), itens: [] }
+}
+
+function dadosDoSetor(raiz: LinhaDaLista, setores: SetorDoQuadro[]) {
   const cadastrado = setores.find((setor) => setor.id === raiz.setorId)
-  return { id: raiz.setorId, sigla: raiz.setorSigla, nome: cadastrado?.nome ?? raiz.setorSigla, cor: cadastrado?.cor ?? raiz.setorCor ?? 1, itens: [] }
+  return { id: raiz.setorId, sigla: raiz.setorSigla, nome: cadastrado?.nome ?? raiz.setorSigla, cor: cadastrado?.cor ?? raiz.setorCor ?? 1 }
 }
