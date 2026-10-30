@@ -1067,3 +1067,13 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Migração aplicada no remoto de desenvolvimento.** Pelo workflow "Migrar banco de desenvolvimento" (não `db push`), com sucesso.
 - **Branch comum, `plano-04.md`, linha `Concluído em`.** Branch criada, plano salvo, merge na `main` e branch apagada com `-d` sem recusa.
 - **Erro do plano.** Marquei as caixas do plano como feitas antes de executar; corrigi depois, deixando 1.3 e 1.5 abertas com o motivo.
+
+## 2026-10-29 — /executar-complexo (enxugar-cartao-e-cadastro, ticket 05)
+
+- **TDD de banco e testes por perfil.** Esperado: teste de banco antes da migração, com cada perfil, desativado e visitante. Aconteceu: teste 72 e ajustes nos 17, 44, 50 e 53 escritos antes da migração; a falha prévia não foi vista (sem Docker). O primeiro run do workflow acusou erro de SQL no meu teste (`security_invoker`); corrigido e o segundo ficou 59 de 59.
+- **Docker.** Esperado (Ajustes do projeto): pgTAP local. Aconteceu: não sobe (sem WSL); valeu o workflow "Testes de banco", que ensaia a migração pendente.
+- **Migração no remoto de desenvolvimento.** Pelo workflow "Migrar banco de desenvolvimento", com sucesso; `npm run db:types` depois não mudou o `database.ts` (já editado à mão antes).
+- **Pre-commit exige typecheck verde.** Esperado: migração, testes e tipos no mesmo commit. Aconteceu: o commit do banco foi barrado até as telas compilarem, então banco e telas foram num commit só.
+- **Trava de git.** Dois lotes de `sed` com várias expressões foram barrados como "pasta .git" (falso alarme); refiz as edições com a ferramenta de edição, sem contornar a trava.
+- **Branch comum, `plano-05.md`, linha `Concluído em`.** Branch criada, merge (avanço rápido) na `main`, branch apagada com `-d` sem recusa.
+- **Erro do plano.** O plano prometia testes de tela antes da implementação; na prática os testes foram ajustados depois de tirar os campos.

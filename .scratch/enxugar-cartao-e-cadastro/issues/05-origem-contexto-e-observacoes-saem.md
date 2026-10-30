@@ -6,12 +6,14 @@
 
 **Status:** ready-for-agent
 
-- [ ] Testes pgTAP primeiro, depois a migração. A junção é testada com só Contexto, só Observações, os dois, os dois com Anotações já existentes e nenhum, e trechos vazios não geram rótulo. A view não tem as três colunas e mantém `security_invoker`. As colunas e o tipo da Origem não existem mais. A leitura das Anotações juntadas é testada com cada perfil, com um usuário desativado e com um visitante sem login.
-- [ ] O cadastro e o Editar processo não têm Origem, Contexto nem Observações, e os dados enviados não levam mais esses campos.
-- [ ] O "Sobre" do verso mostra só Setor, Macroprocesso e Tipo.
-- [ ] A Consulta lê as Anotações, inclusive o texto juntado, sem poder alterar.
-- [ ] O histórico antigo com `origem`, `contexto` ou `observacoes` no estado continua com os nomes legíveis.
-- [ ] O teste puro da planilha interna confere "Observações" sempre vazia, com o cabeçalho, e "Data da modelagem piloto" sem mudança.
-- [ ] Os tipos do banco foram gerados de novo, e os testes de tela que cobriam Origem, Contexto e Observações foram reescritos para o comportamento novo. `npm test` verde.
-- [ ] pgTAP com as linhas `ok` no Docker local e o workflow "Testes de banco" verde.
-- [ ] Fica avisado ao usuário que a `planilhas-dos-dashboards` precisa ser publicada de novo no desenvolvimento depois da migração.
+- [x] Testes pgTAP primeiro, depois a migração. A junção é testada com só Contexto, só Observações, os dois, os dois com Anotações já existentes e nenhum, e trechos vazios não geram rótulo. A view não tem as três colunas e mantém `security_invoker`. As colunas e o tipo da Origem não existem mais. A leitura das Anotações juntadas é testada com cada perfil, com um usuário desativado e com um visitante sem login.
+- [x] O cadastro e o Editar processo não têm Origem, Contexto nem Observações, e os dados enviados não levam mais esses campos.
+- [x] O "Sobre" do verso mostra só Setor, Macroprocesso e Tipo.
+- [x] A Consulta lê as Anotações, inclusive o texto juntado, sem poder alterar.
+- [x] O histórico antigo com `origem`, `contexto` ou `observacoes` no estado continua com os nomes legíveis.
+- [x] O teste puro da planilha interna confere "Observações" sempre vazia, com o cabeçalho, e "Data da modelagem piloto" sem mudança.
+- [x] Os tipos do banco foram gerados de novo, e os testes de tela que cobriam Origem, Contexto e Observações foram reescritos para o comportamento novo. `npm test` verde.
+- [x] pgTAP com as linhas `ok` no workflow "Testes de banco" verde (59 de 59; o Docker local não sobe).
+- [x] Fica avisado ao usuário que a `planilhas-dos-dashboards` precisa ser publicada de novo no desenvolvimento depois da migração.
+
+Concluído em 2026-10-29 (commit 0839f97)
