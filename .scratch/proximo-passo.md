@@ -1,10 +1,9 @@
-# Próximo passo
+# Próximo passo (2026-10-30)
 
-Registro de onde a última sessão parou e do que vem a seguir. Cada sessão que terminar recomendando um próximo passo sobrescreve este arquivo antes de encerrar. Valem os arquivos se divergir do git.
+**Comando:** `/executar-complexo` (Sonnet), de novo, com o mesmo argumento (`responsavel-inicial-por-etapa`). Ele é uma retomada: o plano `.scratch/processos-etapas/plano-responsavel-inicial.md` já existe e a branch `responsavel-inicial-por-etapa` já está criada; continua da primeira caixa aberta (a 0.2).
 
-Atualizado em 2026-10-29 (/ship repositorio-de-processos concluído, com ressalva)
+**O que falta antes:** abrir o Docker Desktop. O motor do Docker não respondia em 2026-10-30 ("failed to connect to the docker API"), e os testes de banco desta entrega rodam no banco local do Docker (ajuste do projeto de 2026-10-24). Sem ele a Tarefa 1 (banco) não começa.
 
-- **Estado:** `repositorio-de-processos` (funcionalidade 14, a última da lista do `.scratch/projeto.md`) entregue com ressalva, marco `marco/2026-10-29-entrega-repositorio-de-processos`. As specs de `processos-etapas`, `publicacao-e-arquivamento`, `documentos-versoes` e `revisoes-aprovacao` ganharam a marca nova no lugar do "Em revisão desde". Ressalvas e achados em `.scratch/repositorio-de-processos/desvios.md`.
-- **Próximo:** não há funcionalidade nova planejada. Demandas novas entram pelo `/demanda` (Opus para classificar; bug em Sonnet). Uma funcionalidade nova começa no `/planejar`. Antes da produção: `/ship` mandou a revisão de segurança para produção (Opus) e os roteiros de banco, backup e site, quando o usuário pedir.
-- **Backlog (segue):** renomear `claro` / `--cor-claro` para `tom` / `--cor-do-setor`; testes de "dias na etapa" que dependem do fuso; menores adiados do `/ship` (cancelados com filtro, "Abrir todos" relê tudo, Situação zerada ao trocar Todos | Concluídos).
-- **Pendente do usuário (segue valendo):** conferir com o login real o Quadro, a Lista e a árvore (critérios `[visual]` presumidos); aplicar no remoto de desenvolvimento as migrações `fim_do_arquivado` e `tirar_e_voltar_ao_quadro` (GitHub Actions parado por cobrança) e publicar de novo a função `arquivos-no-drive`; decidir sobre os arquivos soltos em `.scratch/`; apagar `.scratch/handoff-2026-10-20.md`; publicar de novo `planilhas-dos-dashboards`; conferir a conta de serviço nos Drives; provar anexos no Drive real; conferir o cadastro aberto desligado no Supabase de desenvolvimento; repor o e-mail do git; resolver a cobrança do GitHub.
+**Já feito:** plano escrito e comitado na branch; suíte de testes da `main` conferida (252 arquivos, 3.223 testes, todos verdes) antes de mexer em qualquer código.
+
+**Ordem do plano:** Tarefa 1 banco (pgTAP antes da migração), 2 tipos e catálogo, 3 mover/cadastrar/retomar nos falsos, 4 tela do Catálogo, 5 histórico, 6 fecho (push, workflows, merge, registros).

@@ -128,7 +128,7 @@ test('versão e relatório continuam sem retirada: só os anexos têm [Retirar]'
   })
   await secaoDeAnexos()
   const verso = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-  await verso.findByRole('region', { name: 'Arquivos' })
+  await verso.findByRole('region', { name: 'Documentos do Mapeamento' })
   expect(verso.getAllByRole('button', { name: /^Retirar/ }).map((botao) => botao.getAttribute('aria-label')))
     .toEqual(['Retirar resposta.eml'])
 })

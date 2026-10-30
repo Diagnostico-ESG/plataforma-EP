@@ -1,16 +1,7 @@
-import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { act, cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
-import App from './App'
-import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
-import type { Perfil } from './acesso/tipos'
-import { CadastrosFalso } from './cadastros/CadastrosFalso'
-import { ProcessosFalso } from './processos/ProcessosFalso'
-import type { ProcessoLido } from './processos/tipos'
-import { VersoesFalso } from './versoes/VersoesFalso'
-import { RevisoesFalso } from './revisoes/RevisoesFalso'
-import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
-import { hojeEmBrasilia } from './lib/datas'
+import { EMITIR, montar, opcoes, escrever, formulario, preencher, salvar, cadastrar, abrirEdicao } from './testes/cadastroDeProcesso'
 import { escolherNoMenuDoProcesso, janelasPorCima } from './testes/versoDoCartao'
 
 beforeEach(() => {
@@ -20,77 +11,15 @@ afterEach(() => {
   cleanup()
   window.location.hash = ''
 })
-
-const EMITIR: ProcessoLido = {
-  id: 'p1', nome: 'Emitir Ofício', tipo: 'a_classificar', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
-  macroprocessoNome: 'Macro A', situacao: 'em_andamento', etapaAtual: { codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, id: 'e', posicao: 1, total: 1 },
-  responsavel: null, origem: 'retomado', contexto: 'Contexto inventado', observacoes: null,
-  processoPaiId: null, processoPai: null, subprocessos: [],
-  motivoDaSituacao: null, dataDaModelagemPiloto: null, ultimaVersao: null, etapasDoVerso: [],
-}
-
-type Montagem = { perfil?: Perfil; processos?: ProcessoLido[] }
-
-function montar({ perfil = 'integrante_ep', processos = [] }: Montagem = {}) {
-  const cadastros = new CadastrosFalso()
-  cadastros.setores = [
-    { id: 's1', sigla: 'TSA', nome: 'Setor Teste A', observacoes: null, ativo: true },
-    { id: 's2', sigla: 'TSB', nome: 'Setor Teste B', observacoes: null, ativo: true },
-    { id: 's3', sigla: 'TSI', nome: 'Setor Inativo', observacoes: null, ativo: false },
-  ]
-  const comum = { codigo: null, descricao: null, categoria: null }
-  cadastros.macroprocessos = [
-    { id: 'm1', nome: 'Macro A', ativo: true, ...comum },
-    { id: 'm2', nome: 'Macro B', ativo: true, ...comum },
-    { id: 'm3', nome: 'Macro Inativo', ativo: false, ...comum },
-  ]
-  cadastros.vinculos = [{ macroprocessoId: 'm1', setorId: 's1', observacao: null }]
-  const falso = new ProcessosFalso()
-  falso.etapasDoCatalogo = [{ id: 'e4', codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, ativa: true }]
-  falso.siglasDosSetores = { s1: 'TSA', s2: 'TSB' }
-  falso.nomesDosMacroprocessos = { m1: 'Macro A', m2: 'Macro B' }
-  falso.processos = processos
-  render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
-  return falso
-}
-
-const opcoes = (seletor: HTMLElement) => Array.from((seletor as HTMLSelectElement).options).map((opcao) => opcao.textContent)
-const escrever = (campo: HTMLElement, valor: string) => fireEvent.change(campo, { target: { value: valor } })
-
-async function formulario(nome = 'Cadastrar processo') {
-  const form = within(await screen.findByRole('form', { name: nome }))
-  await waitFor(() => expect(form.getByLabelText('Setor').querySelectorAll('option').length).toBeGreaterThan(1))
-  return form
-}
-
-function preencher(form: ReturnType<typeof within>, campos: { nome?: string; setor?: string; macro?: string }) {
-  if (campos.nome !== undefined) escrever(form.getByLabelText('Nome'), campos.nome)
-  if (campos.setor !== undefined) escrever(form.getByLabelText('Setor'), campos.setor)
-  if (campos.macro !== undefined) escrever(form.getByLabelText('Macroprocesso'), campos.macro)
-}
-
-const salvar = (form: ReturnType<typeof within>) => fireEvent.click(form.getByRole('button', { name: 'Salvar' }))
-const cadastrar = (form: ReturnType<typeof within>) => fireEvent.click(form.getByRole('button', { name: 'Cadastrar' }))
-
-async function abrirEdicao() {
-  window.location.hash = '#/processos/p1'
-  const falso = montar({ processos: [EMITIR] })
-  const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-  await escolherNoMenuDoProcesso('Editar')
-  return { falso, painel, form: await formulario('Editar processo') }
-}
-
-test('o cadastro oferece só setores e macroprocessos ativos, com "A classificar" e "Novo" marcados', async () => {
+test('o cadastro oferece só setores e macroprocessos ativos, com "A classificar" marcado, e não pede Origem, Contexto nem Observações', async () => {
   montar()
   const form = await formulario()
   expect(opcoes(form.getByLabelText('Setor'))).toEqual(['Escolha o setor', 'TSA — Setor Teste A', 'TSB — Setor Teste B'])
   expect(opcoes(form.getByLabelText('Macroprocesso'))).toEqual(['Escolha o macroprocesso', 'Macro A', 'Macro B'])
   expect((form.getByLabelText('Tipo') as HTMLSelectElement).value).toBe('a_classificar')
   expect(opcoes(form.getByLabelText('Tipo'))).toEqual(['Processo', 'Subprocesso', 'A classificar'])
-  expect((form.getByLabelText('Origem') as HTMLSelectElement).value).toBe('novo')
-  expect(opcoes(form.getByLabelText('Origem'))).toEqual(['Novo', 'Retomado'])
-  expect(form.getByLabelText('Contexto')).toBeTruthy()
-  expect(form.getByLabelText('Observações')).toBeTruthy()
+  for (const rotulo of ['Origem', 'Contexto', 'Observações']) expect(form.queryByLabelText(rotulo)).toBeNull()
+  expect(form.getByLabelText('Anotações')).toBeTruthy()
 })
 
 test('cadastrar grava os dados e abre o verso do criado; ao fechar, o cartão aparece na coluna da etapa atual', async () => {
@@ -98,12 +27,10 @@ test('cadastrar grava os dados e abre o verso do criado; ao fechar, o cartão ap
   const form = await formulario()
   preencher(form, { nome: ' Emitir Ofício ', setor: 's1', macro: 'm1' })
   escrever(form.getByLabelText('Tipo'), 'processo')
-  escrever(form.getByLabelText('Contexto'), 'Contexto inventado')
   cadastrar(form)
   await waitFor(() => expect(window.location.hash).toBe(`#/processos/${falso.processos[0].id}`))
-  expect(falso.processos[0]).toMatchObject({
-    nome: 'Emitir Ofício', setorId: 's1', macroprocessoId: 'm1', tipo: 'processo', origem: 'novo',
-    contexto: 'Contexto inventado', observacoes: null })
+  expect(falso.processos[0]).toMatchObject({ nome: 'Emitir Ofício', setorId: 's1', macroprocessoId: 'm1', tipo: 'processo' })
+  for (const chave of ['origem', 'contexto', 'observacoes']) expect(falso.processos[0]).not.toHaveProperty(chave)
   const verso = await screen.findByRole('dialog', { name: 'Processo Emitir Ofício' })
   expect((await within(verso).findByText('Processo cadastrado')).getAttribute('role')).toBe('status')
   fireEvent.keyDown(within(verso).getByRole('heading', { name: 'Emitir Ofício', level: 2 }), { key: 'Escape' })
@@ -112,29 +39,18 @@ test('cadastrar grava os dados e abre o verso do criado; ao fechar, o cartão ap
 })
 
 const DATA = 'Data da modelagem piloto'
-const campoDaData = (form: ReturnType<typeof within>) => form.getByLabelText(DATA) as HTMLInputElement
 
-test('o Novo processo abre com a Data da modelagem piloto de hoje em Brasília, num campo de data', async () => {
-  montar()
-  const campo = campoDaData(await formulario())
-  expect([campo.type, campo.value]).toEqual(['date', hojeEmBrasilia()])
-})
-
-test.each([
-  ['com a data de hoje', undefined, hojeEmBrasilia()],
-  ['com outra data', '2026-11-12', '2026-11-12'],
-  ['com o campo vazio', '', null],
-])('cadastrar %s grava o que estava no campo', async (_caso, digitada, gravada) => {
+test('o Novo processo não tem o campo da Data da modelagem piloto, e o processo nasce sem a data', async () => {
   const falso = montar()
   const form = await formulario()
+  expect(form.queryByLabelText(DATA)).toBeNull()
   preencher(form, { nome: 'Emitir Ofício', setor: 's1', macro: 'm1' })
-  if (digitada !== undefined) escrever(campoDaData(form), digitada)
   cadastrar(form)
   await waitFor(() => expect(falso.processos).toHaveLength(1))
-  expect(falso.processos[0].dataDaModelagemPiloto).toBe(gravada)
+  expect(falso.processos[0].dataDaModelagemPiloto).toBeNull()
 })
 
-test('o Editar não tem o campo da Data da modelagem piloto: ela se altera no verso', async () => {
+test('o Editar não tem o campo da Data da modelagem piloto: ela se registra na linha da etapa', async () => {
   expect((await abrirEdicao()).form.queryByLabelText(DATA)).toBeNull()
 })
 
@@ -178,7 +94,7 @@ test('nome, setor e macroprocesso são obrigatórios, conferidos antes de enviar
 test('a recusa aparece dentro do rodapé fixo, e os campos obrigatórios são marcados', async () => {
   montar()
   const form = await formulario()
-  for (const campo of ['Nome', 'Setor', 'Macroprocesso']) expect(form.getByLabelText(campo).getAttribute('aria-required')).toBe('true')
+  for (const campo of ['Nome do Processo', 'Setor', 'Macroprocesso']) expect(form.getByLabelText(campo).getAttribute('aria-required')).toBe('true')
   cadastrar(form)
   const alerta = await form.findByRole('alert')
   expect(alerta.closest('.formulario-do-processo-rodape')).not.toBeNull()
@@ -192,7 +108,7 @@ test('nome repetido no mesmo setor: a recusa em vermelho e os dados continuam no
   const alerta = await form.findByRole('alert')
   expect(alerta.textContent).toBe('Já existe um processo com o nome emitir ofício no setor TSA.')
   expect(alerta.classList.contains('cadastros-falha')).toBe(true)
-  expect((form.getByLabelText('Nome') as HTMLInputElement).value).toBe('emitir ofício')
+  expect((form.getByLabelText('Nome do Processo') as HTMLInputElement).value).toBe('emitir ofício')
 })
 
 test('o mesmo nome em outro setor é aceito', async () => {
@@ -211,7 +127,7 @@ test('falha de gravação: a mensagem com o motivo e os dados continuam no formu
   cadastrar(form)
   expect((await form.findByRole('alert')).textContent)
     .toBe('A alteração não foi salva: sem conexão. Seus dados continuam no formulário.')
-  expect((form.getByLabelText('Nome') as HTMLInputElement).value).toBe('Emitir Ofício')
+  expect((form.getByLabelText('Nome do Processo') as HTMLInputElement).value).toBe('Emitir Ofício')
   expect(window.location.hash).toBe('#/processos/novo')
 })
 
@@ -247,10 +163,10 @@ test('[Editar] troca os dados pelo formulário preenchido, sem o campo de tipo, 
   expect(screen.getByRole('heading', { name: 'Editar Emitir Ofício', level: 2 })).toBeTruthy()
   expect(form.queryByRole('button', { name: 'Cadastrar' })).toBeNull()
   expect(screen.getByRole('dialog', { name: 'Processo Emitir Ofício' }).classList.contains('verso-estreita')).toBe(true)
-  expect((form.getByLabelText('Nome') as HTMLInputElement).value).toBe('Emitir Ofício')
+  expect((form.getByLabelText('Nome do Processo') as HTMLInputElement).value).toBe('Emitir Ofício')
   expect((form.getByLabelText('Setor') as HTMLSelectElement).value).toBe('s1')
-  expect((form.getByLabelText('Origem') as HTMLSelectElement).value).toBe('retomado')
-  escrever(form.getByLabelText('Nome'), 'Emitir Ofício Novo')
+  for (const rotulo of ['Origem', 'Contexto', 'Observações']) expect(form.queryByLabelText(rotulo)).toBeNull()
+  escrever(form.getByLabelText('Nome do Processo'), 'Emitir Ofício Novo')
   salvar(form)
   const painel = within(screen.getByRole('dialog', { name: /^Processo( |$)/ }))
   expect(await painel.findByRole('heading', { name: 'Emitir Ofício Novo' })).toBeTruthy()
@@ -261,11 +177,11 @@ test('[Editar] troca os dados pelo formulário preenchido, sem o campo de tipo, 
 test('falha ao editar mostra o motivo e mantém os dados; Cancelar volta aos dados sem gravar', async () => {
   const { falso, painel, form } = await abrirEdicao()
   falso.falhaDeGravacao = 'sem conexão'
-  escrever(form.getByLabelText('Nome'), 'Outro Nome')
+  escrever(form.getByLabelText('Nome do Processo'), 'Outro Nome')
   salvar(form)
   expect((await form.findByRole('alert')).textContent)
     .toBe('A alteração não foi salva: sem conexão. Seus dados continuam no formulário.')
-  expect((form.getByLabelText('Nome') as HTMLInputElement).value).toBe('Outro Nome')
+  expect((form.getByLabelText('Nome do Processo') as HTMLInputElement).value).toBe('Outro Nome')
   fireEvent.click(form.getByRole('button', { name: 'Cancelar' }))
   expect(await painel.findByRole('heading', { name: 'Emitir Ofício' })).toBeTruthy()
   expect(falso.processos[0].nome).toBe('Emitir Ofício')
@@ -276,8 +192,8 @@ test('mover de macroprocesso: o aviso do setor que será incluído e o painel co
   preencher(form, { macro: 'm2' })
   expect(await form.findByText('O setor TSA ainda não está no macroprocesso Macro B; ele será incluído ao salvar.')).toBeTruthy()
   salvar(form)
-  const cabecalho = await screen.findByRole('heading', { name: 'Emitir Ofício' })
-  await waitFor(() => expect(within(cabecalho.closest('header') as HTMLElement).getByText('Macro B')).toBeTruthy())
+  const sobre = within(await screen.findByRole('region', { name: 'Sobre' }))
+  await waitFor(() => expect(sobre.getByText('Macro B')).toBeTruthy())
 })
 
 test('editar um processo que já foi excluído por outra pessoa mostra o aviso próprio', async () => {

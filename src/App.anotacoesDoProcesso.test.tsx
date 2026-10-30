@@ -20,14 +20,12 @@ afterEach(() => {
 
 const DA_BIA: AnotacoesLidas = { texto: 'Linha 1\nLinha 2', alteradoPor: 'Bia Teste', alteradoEm: '2026-10-12T15:05:00Z' }
 
-test('o bloco é o primeiro da coluna direita, acima da Data da modelagem piloto, com o campo "Anotações" e a dica no vazio', async () => {
+test('o bloco é o primeiro da coluna direita, com o campo "Anotações" e a dica no vazio', async () => {
   montarVerso(processoDasAnotacoes())
   const campo = await campoDasAnotacoes()
   const coluna = campo.closest('.verso-contexto') as HTMLElement
   expect(coluna.firstElementChild?.querySelector('h3')?.textContent).toBe('Anotações')
   expect(campo.getAttribute('placeholder')).toBe('Escreva aqui as anotações do processo')
-  const titulos = (await (await versoAberto()).findAllByRole('heading', { level: 3 })).map((titulo) => titulo.textContent)
-  expect(titulos.indexOf('Anotações')).toBeLessThan(titulos.indexOf('Data da modelagem piloto'))
 })
 
 test('sem anotação gravada, a linha "Alterado por" não aparece; o estado fica vazio mas existe para o leitor de tela', async () => {
@@ -81,13 +79,13 @@ test('o texto gravado aparece ao abrir, com quem alterou', async () => {
   expect(await (await blocoDasAnotacoes()).findByText('Alterado por Bia Teste em 12/10, 12:05')).toBeTruthy()
 })
 
-test('a contagem some com 1.799 caracteres, aparece com 1.800, e o campo não passa de 2.000', async () => {
+test('a contagem some com 7.799 caracteres, aparece com 7.800, e o campo não passa de 8.000', async () => {
   montarVerso(processoDasAnotacoes())
-  await digitarNasAnotacoes('a'.repeat(1799))
-  expect((await blocoDasAnotacoes()).queryByText(/ de 2\.000$/)).toBeNull()
-  await digitarNasAnotacoes('a'.repeat(1800))
-  expect(await (await blocoDasAnotacoes()).findByText('1.800 de 2.000')).toBeTruthy()
-  expect((await campoDasAnotacoes()).getAttribute('maxlength')).toBe('2000')
+  await digitarNasAnotacoes('a'.repeat(7799))
+  expect((await blocoDasAnotacoes()).queryByText(/ de 8\.000$/)).toBeNull()
+  await digitarNasAnotacoes('a'.repeat(7800))
+  expect(await (await blocoDasAnotacoes()).findByText('7.800 de 8.000')).toBeTruthy()
+  expect((await campoDasAnotacoes()).getAttribute('maxlength')).toBe('8000')
 })
 
 test('a Consulta lê o texto, com quebras de linha e "Alterado por", sem campo editável', async () => {
@@ -124,14 +122,15 @@ test('o subprocesso tem as suas Anotações, diferentes das do pai', async () =>
   await waitFor(async () => expect(((await campoDasAnotacoes()) as HTMLTextAreaElement).value).toBe('Do filho'))
 })
 
-test('o texto não vai ao Quadro nem à busca da Lista', async () => {
+test('o texto não vai ao Quadro nem à Lista', async () => {
   montarVerso(processoDasAnotacoes(), 'integrante_ep', [], (falso) => {
     falso.anotacoes.porProcesso.p1 = { texto: 'Segredo do setor', alteradoPor: null, alteradoEm: null }
   })
   await campoDasAnotacoes()
   expect(screen.queryAllByText(/Segredo do setor/).filter((no) => no.tagName !== 'TEXTAREA' && no.closest('dialog') === null)).toHaveLength(0)
-  window.location.hash = '#/processos/lista?busca=Segredo'
-  expect(await screen.findByText('Nenhum processo com estes filtros.')).toBeTruthy()
+  window.location.hash = '#/processos/lista'
+  await waitFor(() => expect(screen.getAllByRole('columnheader').length).toBeGreaterThan(0))
+  expect(screen.queryAllByText(/Segredo do setor/).filter((no) => no.tagName !== 'TEXTAREA' && no.closest('dialog') === null)).toHaveLength(0)
 })
 
 test('gravar as Anotações não põe nada no Histórico do processo', async () => {

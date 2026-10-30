@@ -17,16 +17,23 @@ function opcaoDePessoa(usuario: UsuarioResponsavel, rotulo: string): OpcaoDeResp
 
 type DadosDoResponsavel = Pick<ProcessoLido, 'responsavel' | 'cartao'>
 
+/** O nome que o Agora mostra, com "(Inativo)" para quem foi desativado; null sem responsável. */
+export function nomeDoResponsavel({ responsavel, cartao }: DadosDoResponsavel): string | null {
+  if (responsavel === null) return null
+  return cartao?.responsavelAtivo === false ? `${responsavel.nome} (Inativo)` : responsavel.nome
+}
+
 // O responsável que já não está na lista (foi desativado) continua visível, marcado, e não se escolhe de novo.
-function responsavelForaDaLista({ responsavel, cartao }: DadosDoResponsavel, usuarios: UsuarioResponsavel[]): OpcaoDeResponsavel[] {
+function responsavelForaDaLista(processo: DadosDoResponsavel, usuarios: UsuarioResponsavel[]): OpcaoDeResponsavel[] {
+  const { responsavel } = processo
   if (responsavel === null || usuarios.some((usuario) => usuario.id === responsavel.id)) return []
-  const inativo = cartao?.responsavelAtivo === false
-  return [{ valor: responsavel.id, rotulo: `${responsavel.nome}${inativo ? ' (Inativo)' : ''}`, desabilitada: inativo, pessoa: pessoaDaOpcao(responsavel) }]
+  const desabilitada = processo.cartao?.responsavelAtivo === false
+  return [{ valor: responsavel.id, rotulo: nomeDoResponsavel(processo) ?? responsavel.nome, desabilitada, pessoa: pessoaDaOpcao(responsavel) }]
 }
 
 /**
- * O "Trocar": quem está na tela primeiro, com "(você)"; os demais; o responsável atual que já não está na lista
- * (desativado) e, por último, "Ninguém por enquanto" (valor "").
+ * A lista da troca do responsável: quem está na tela primeiro, com "(você)"; os demais; o responsável atual que já não
+ * está na lista (desativado) e, por último, "Ninguém por enquanto" (valor "").
  */
 export function opcoesDeResponsavel(processo: DadosDoResponsavel, usuarios: UsuarioResponsavel[], usuarioId: string): OpcaoDeResponsavel[] {
   const eu = usuarios.filter((usuario) => usuario.id === usuarioId).map((usuario) => opcaoDePessoa(usuario, `${usuario.nome} (você)`))
@@ -49,13 +56,18 @@ export function avisoDoRevisor({ etapaAtual, responsavel, ultimaVersao }: Pick<P
   return `${ultimaVersao.autorNome} enviou a V${ultimaVersao.numero}; a revisão interna deveria ser de outra pessoa.`
 }
 
+/** "Em {etapa} · {etiqueta}": o que a Consulta lê no Agora, acima da linha do responsável. */
+export function ondeEstaOProcesso(processo: ProcessoLido): string {
+  return `Em ${processo.etapaAtual?.nome ?? '—'} · ${ROTULO_DA_ETIQUETA[processo.etiqueta ?? 'a_fazer']}`
+}
+
 /**
- * A frase do Agora da Consulta: "Em {etapa} · {etiqueta} · com {nome} há {n} dias" (ou "sem responsável"). Depois do
- * limite de 7 dias o selo vermelho diz os dias, então a frase não os repete.
+ * A frase do processo suspenso ou cancelado: "Em {etapa} · {etiqueta} · com {nome} há {n} dias" (ou "sem responsável").
+ * Depois do limite de 7 dias o selo vermelho diz os dias, então a frase não os repete.
  */
-export function fraseDaConsulta(processo: ProcessoLido, hoje: string): string {
-  const { etapaAtual, responsavel } = processo
-  const onde = `Em ${etapaAtual?.nome ?? '—'} · ${ROTULO_DA_ETIQUETA[processo.etiqueta ?? 'a_fazer']}`
+export function fraseDaSituacaoParada(processo: ProcessoLido, hoje: string): string {
+  const { responsavel } = processo
+  const onde = ondeEstaOProcesso(processo)
   if (responsavel === null) return `${onde} · sem responsável`
   const dias = diasDoProcessoNaEtapa(processo, hoje)
   const quando = dias === null || passouDoLimite(dias) ? '' : ` ${textoDosDias(dias)}`

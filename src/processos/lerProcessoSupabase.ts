@@ -85,8 +85,8 @@ function itemDaEstrutura(linha: LinhaDaEstrutura): ItemDaEstrutura {
 
 function dadosDoProcesso(linha: LinhaDoProcesso, totalDeEtapas: number) {
   return {
-    ...processoDaLinha(linha, totalDeEtapas), origem: linha.origem ?? 'novo', contexto: linha.contexto,
-    observacoes: linha.observacoes, motivoDaSituacao: linha.motivo_da_situacao, dataDaModelagemPiloto: linha.data_da_modelagem_piloto,
+    ...processoDaLinha(linha, totalDeEtapas), motivoDaSituacao: linha.motivo_da_situacao,
+    dataDaModelagemPiloto: linha.data_da_modelagem_piloto,
   }
 }
 

@@ -2,9 +2,9 @@ import { useId } from 'react'
 import type { MovimentoDoProcessoEmUso } from '../../hooks/useMovimentoDoProcesso'
 import type { RegistrosDoProcesso } from '../../hooks/useRegistrosDoProcesso'
 import type { Executar } from '../../hooks/useGravacaoComFalha'
-import { avisoDoRevisor, opcoesDeResponsavel, podeAssumir } from '../../processos/agoraDoProcesso'
+import { avisoDoRevisor, nomeDoResponsavel, opcoesDeResponsavel, podeAssumir } from '../../processos/agoraDoProcesso'
 import { CODIGO_CONCLUIDOS, CODIGO_DA_PUBLICACAO } from '../../processos/codigosDasEtapas'
-import { diasDoProcessoNaEtapa } from '../../processos/diasNaEtapa'
+import { diasDoProcessoNaEtapa, passouDoLimite } from '../../processos/diasNaEtapa'
 import { ETIQUETAS, ROTULO_DA_ETIQUETA } from '../../processos/rotulos'
 import { hojeEmBrasilia } from '../../lib/datas'
 import type { EtiquetaDaEtapa, ModuloDeProcessos, ProcessoLido, UsuarioResponsavel } from '../../processos/tipos'
@@ -36,7 +36,7 @@ type CorpoDoAgoraProps = {
 
 /**
  * O corpo do Agora para quem altera: a etapa e a etiqueta em listas que gravam ao escolher (sem confirmação), o
- * responsável com "Trocar" e [Assumir], os dias na etapa e os avisos (revisor, chegada a Concluídos).
+ * responsável pelo nome (que abre a troca) e [Assumir], o selo de processo parado e os avisos (revisor, chegada a Concluídos).
  */
 export function CorpoDoAgora(props: CorpoDoAgoraProps) {
   const { processo, movimento, rotulo } = props
@@ -90,21 +90,26 @@ function ListasDoAgora({ processo, movimento }: Pick<CorpoDoAgoraProps, 'process
   )
 }
 
-function ResponsavelDoAgora({ processo, usuarios, usuarioId, movimento }: CorpoDoAgoraProps) {
+/** A foto ao lado do nome escrito: só enfeite, para o leitor de tela não ler o nome duas vezes. */
+export function FotoDoResponsavel({ processo }: { processo: ProcessoLido }) {
   const { responsavel } = processo
+  return responsavel && <Avatar nome={responsavel.nome} fotoUrl={responsavel.fotoUrl ?? undefined} tamanho={32} decorativo />
+}
+
+/** Só o selo do processo parado: o tempo até 7 dias saiu da linha do responsável. */
+export function SeloDeParadoNoAgora({ processo }: { processo: ProcessoLido }) {
   const dias = diasDoProcessoNaEtapa(processo, hojeEmBrasilia())
+  return dias !== null && passouDoLimite(dias) && <DiasNaEtapa dias={dias} />
+}
+
+function ResponsavelDoAgora({ processo, usuarios, usuarioId, movimento }: CorpoDoAgoraProps) {
   const opcoes = opcoesDeResponsavel(processo, usuarios, usuarioId)
   return (
     <p className="agora-responsavel">
-      {responsavel ? (
-        <>
-          <Avatar nome={responsavel.nome} fotoUrl={responsavel.fotoUrl ?? undefined} tamanho={24} />
-          <span>{responsavel.nome}{processo.cartao?.responsavelAtivo === false && ' (Inativo)'}</span>
-        </>
-      ) : <span>Sem responsável</span>}
-      {dias !== null && <DiasNaEtapa dias={dias} />}
-      <TrocaDoResponsavel responsavelId={responsavel?.id ?? null} opcoes={opcoes} desabilitada={movimento.gravando}
-        aoEscolher={(escolhido) => movimento.mudarResponsavel(processo.id, escolhido)} />
+      <FotoDoResponsavel processo={processo} />
+      <TrocaDoResponsavel responsavelId={processo.responsavel?.id ?? null} nome={nomeDoResponsavel(processo)} opcoes={opcoes}
+        desabilitada={movimento.gravando} aoEscolher={(escolhido) => movimento.mudarResponsavel(processo.id, escolhido)} />
+      <SeloDeParadoNoAgora processo={processo} />
       {podeAssumir(processo, usuarioId) && (
         <button type="button" className="botao botao-secundario" disabled={movimento.gravando}
           onClick={() => movimento.mudarResponsavel(processo.id, usuarioId)}>

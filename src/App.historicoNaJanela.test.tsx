@@ -26,7 +26,7 @@ const PROCESSO: ProcessoLido = {
   id: 'p1', nome: 'Emitir Ofício', tipo: 'a_classificar', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1',
   macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento',
   etapaAtual: { codigo: 'relatorio', nome: 'Relatório e modelagem técnica', ordem: 5, id: 'e', posicao: 1, total: 1 },
-  responsavel: null, origem: 'retomado', contexto: 'Contexto inventado', observacoes: null,
+  responsavel: null,
   processoPaiId: null, processoPai: null, subprocessos: [], motivoDaSituacao: null, dataDaModelagemPiloto: null, ultimaVersao: null,
   etapasDoVerso: [],
 }
@@ -113,8 +113,8 @@ test('o Esc no Editar volta ao verso sem gravar', async () => {
   const falso = montar()
   await escolherNoMenuDoProcesso('Editar')
   const form = within(await (await versoAberto()).findByRole('form', { name: 'Editar processo' }))
-  fireEvent.change(await form.findByLabelText('Nome'), { target: { value: 'Outro Nome' } })
-  esc(form.getByLabelText('Nome'))
+  fireEvent.change(await form.findByLabelText('Nome do Processo'), { target: { value: 'Outro Nome' } })
+  esc(form.getByLabelText('Nome do Processo'))
   expect(await (await versoAberto()).findByRole('region', { name: 'Etapas' })).toBeTruthy()
   expect(falso.processos[0].nome).toBe('Emitir Ofício')
 })

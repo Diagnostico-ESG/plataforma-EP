@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Cartões com cor sólida</title>
+<link rel="stylesheet" href="/src/styles/tokens.css">
+<link rel="stylesheet" href="/src/index.css">
+<link rel="stylesheet" href="/src/components/processos/Quadro.css">
+<link rel="stylesheet" href="/src/components/SeloDoSetor.css">
+<link rel="stylesheet" href="/src/components/Pilula.css">
+<link rel="stylesheet" href="/src/components/Avatar.css">
+<style>
+  /* Só para esta prévia: a faixa do setor em cor lisa, o tom claro, sem degradê. */
+  .selo-do-setor { background: var(--cor-claro); }
+  body { background: var(--fundo); }
+  #grade { display: grid; grid-template-columns: repeat(6, 230px); gap: 14px; padding: 16px; }
+</style>
+</head>
+<body>
+<div id="grade"></div>
+<script type="module">
+  const CLAROS = ['F8C4C4','C4F8ED','F8C4D9','C4F8D9','F8C4ED','C4F8C4','EDC4F8','D9F8C4','D9C4F8','EDF8C4','C4C4F8','F8EDC4','C4D9F8','F8D9C4','C4EDF8','DAE7A6','A6A6E7','E7DAA6','A6C0E7','E7C0A6','A6DAE7','E7A6A6','A6E7DA','E7A6C0','A6E7C0','E7A6DA','A6E7A6','DAA6E7','C0E7A6','C0A6E7']
+  document.getElementById('grade').innerHTML = CLAROS.map((c, i) => `
+    <a class="cartao" href="#">
+      <span class="selo-do-setor selo-do-setor-faixa cartao-faixa" style="--cor-claro:#${c}">SET ${i + 1}</span>
+      <span class="cartao-nome">Processo de exemplo ${i + 1}</span>
+      <span class="barra-etapa"><span class="barra-etapa-texto">Análise · 2 de 5</span>
+        <span class="barra-etapa-trilho"><span class="barra-etapa-preenchida" style="--barra-fracao:40%"></span></span></span>
+    </a>`).join('')
+</script>
+</body>
+</html>

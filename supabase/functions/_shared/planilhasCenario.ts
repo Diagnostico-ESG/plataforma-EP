@@ -22,7 +22,7 @@ const ATE_A_APROVACAO = [
 const ATE_CONCLUIDOS = [...ATE_A_APROVACAO, passo('publicacao', '2026-06-20'), passo('concluidos', '2026-07-02')]
 
 function itens(): ProcessoComPassagens[] {
-  const campos = { nome: 'Comum', observacoes: 'Obs inventada', data_da_modelagem_piloto: '2026-02-20', ultima_versao: 3 }
+  const campos = { nome: 'Comum', data_da_modelagem_piloto: '2026-02-20', ultima_versao: 3 }
   const emModelagem = [passo('nao_iniciados', '2026-02-01'), passo('modelagem', '2026-03-01', { etiqueta: 'em_andamento' })]
   return [
     processoNaTrilha(1, emModelagem, campos),
@@ -36,10 +36,11 @@ function itens(): ProcessoComPassagens[] {
   ]
 }
 
-// Um nome de pessoa no processo e na passagem não pode chegar às linhas (o tipo do pacote não tem esse campo).
+// Um nome de pessoa no processo e na passagem não pode chegar às linhas (o tipo do pacote não tem esse campo). O mesmo vale
+// para as observações que um pacote de antes da migração ainda trazia: a coluna «Observações» sai sempre vazia.
 function comPessoa({ processo, passagens }: ProcessoComPassagens): ProcessoComPassagens {
   return {
-    processo: { ...processo, responsavel: 'Fulana Secreta' } as ProcessoDoPacote,
+    processo: { ...processo, responsavel: 'Fulana Secreta', observacoes: 'Obs inventada' } as ProcessoDoPacote,
     passagens: passagens.map((passagem) => ({ ...passagem, movido_por: 'Fulana Secreta' }) as PassagemDoPacote),
   }
 }

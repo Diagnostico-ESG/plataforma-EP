@@ -4,7 +4,7 @@ import { dadosDoProcesso, problemaNoProcesso } from './validacaoDoProcesso'
 
 const CAMPOS = {
   nome: 'Emitir Ofício', setorId: 's1', macroprocessoId: 'm1', tipo: 'a_classificar' as TipoDeProcesso, processoPaiId: '',
-  origem: 'novo' as const, contexto: '', observacoes: '', dataDaModelagemPiloto: '',
+  anotacoes: '',
 }
 
 test('campos obrigatórios preenchidos: nenhum problema', () => {
@@ -20,19 +20,23 @@ test.each([
   expect(problemaNoProcesso({ ...CAMPOS, ...mudanca })).toBe(frase)
 })
 
-test('dados saem sem espaços nas pontas e com textos vazios como nulos', () => {
-  expect(dadosDoProcesso({ ...CAMPOS, nome: ' Emitir Ofício ', contexto: ' ', observacoes: ' Nota ' })).toEqual({
+test('dados saem sem espaços nas pontas no nome e com as Anotações vazias como nulas', () => {
+  expect(dadosDoProcesso({ ...CAMPOS, nome: ' Emitir Ofício ', anotacoes: '  ' })).toEqual({
     nome: 'Emitir Ofício', setorId: 's1', macroprocessoId: 'm1', tipo: 'a_classificar', processoPaiId: null,
-    origem: 'novo', contexto: null, observacoes: 'Nota', dataDaModelagemPiloto: null,
+    anotacoes: null,
   })
 })
 
-test('a Data da modelagem piloto sai como veio, e o campo vazio sai como nulo', () => {
-  expect(dadosDoProcesso({ ...CAMPOS, dataDaModelagemPiloto: '2026-11-12' }).dataDaModelagemPiloto).toBe('2026-11-12')
-  expect(dadosDoProcesso(CAMPOS).dataDaModelagemPiloto).toBeNull()
+test('a Data da modelagem piloto não faz parte dos dados do cadastro', () => {
+  expect(dadosDoProcesso(CAMPOS)).not.toHaveProperty('dataDaModelagemPiloto')
 })
 
 test('o pai só sai no subprocesso', () => {
   expect(dadosDoProcesso({ ...CAMPOS, tipo: 'subprocesso', processoPaiId: 'p1' }).processoPaiId).toBe('p1')
   expect(dadosDoProcesso({ ...CAMPOS, tipo: 'processo', processoPaiId: 'p1' }).processoPaiId).toBeNull()
+})
+
+test('as Anotações saem como foram digitadas, e só espaços viram nulo', () => {
+  expect(dadosDoProcesso({ ...CAMPOS, anotacoes: '  Combinado  ' }).anotacoes).toBe('  Combinado  ')
+  expect(dadosDoProcesso({ ...CAMPOS, anotacoes: ' \n ' }).anotacoes).toBeNull()
 })

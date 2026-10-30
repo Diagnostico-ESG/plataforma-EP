@@ -3,16 +3,18 @@ import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { CODIGO_NAO_INICIADOS, CODIGO_CONCLUIDOS, ehEtapaFixa } from './codigosDasEtapas'
 import {
   FRASE_DAS_ETAPAS_FIXAS, fraseDaEtapaComProcessos, fraseDaEtapaProtegida, fraseDaEtapaUsada, fraseDeCodigoRepetido,
-  fraseDeNomeRepetido,
+  FRASE_DO_RESPONSAVEL_EM_CONCLUIDOS, fraseDeNomeRepetido,
 } from './frasesDoCatalogo'
 import type {
   DadosDaEtapa, EtapaDoCatalogo, EtapaNoCatalogo, EtapaNova, ModuloDoCatalogo, ProcessoLido, SentidoDaOrdem,
+  UsuarioResponsavel,
 } from './tipos'
 
 /** O que o catálogo falso lê e mexe no `ProcessosFalso` (sem importá-lo, para não criar dependência circular). */
 export type DonoDoCatalogo = {
   processos: ProcessoLido[]
   etapasDoCatalogo: EtapaDoCatalogo[]
+  usuariosPossiveis: UsuarioResponsavel[]
 }
 
 // Como o gatilho do banco: as seis etapas com campos próprios não se desativam nem se excluem.
@@ -110,6 +112,22 @@ export class CatalogoFalso implements ModuloDoCatalogo {
     this.conferirSemProcessos(etapa, 'excluir')
     if (this.jaRecebeuProcessos(etapa)) throw new TravaDoBanco(fraseDaEtapaUsada(etapa.nome))
     this.gravar(this.etapas.filter((outra) => outra.id !== id))
+  }
+
+  // Como o gatilho do banco. O falso não conhece o perfil de quem está em usuariosPossiveis (todos são Administrador ou
+  // Integrante ativos por definição), então guarda integrante_ep.
+  async definirResponsavelInicial(id: string, usuarioId: string | null): Promise<void> {
+    this.conferirGravacao()
+    const etapa = this.acharEtapa(id)
+    const usuario = this.dono.usuariosPossiveis.find((possivel) => possivel.id === usuarioId)
+    if (usuarioId !== null && etapa.codigo === CODIGO_CONCLUIDOS) throw new TravaDoBanco(FRASE_DO_RESPONSAVEL_EM_CONCLUIDOS)
+    if (usuarioId !== null && !usuario) {
+      throw new TravaDoBanco(`${usuarioId} não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP.`)
+    }
+    const responsavelInicial = usuario
+      ? { id: usuario.id, nome: usuario.nome, fotoUrl: usuario.fotoUrl ?? null, ativo: true, perfil: 'integrante_ep' as const }
+      : null
+    this.etapas = this.etapas.map((outra) => (outra.id === id ? { ...outra, responsavelInicial } : outra))
   }
 
   private conferirGravacao(): void {

@@ -95,7 +95,7 @@ test('o subprocesso mostra a própria aprovação', async () => {
   expect(await (await gavetaDaEtapa(APROVACAO)).findByText('V8 aprovada')).toBeTruthy()
 })
 
-const abrirOsArquivos = async () => within(await (await versoAberto()).findByRole('region', { name: 'Arquivos' }))
+const abrirOsArquivos = async () => within(await (await versoAberto()).findByRole('region', { name: 'Documentos do Mapeamento' }))
 
 test('a versão aprovada tem o selo "Aprovada" e nenhum [Substituir]; a anterior continua com o [Substituir]', async () => {
   montar(versao(), { ajustar: aprovadaNasVersoes })

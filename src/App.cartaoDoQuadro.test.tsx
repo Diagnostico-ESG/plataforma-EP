@@ -133,25 +133,26 @@ test('Relatório pendente: ausente antes da Revisão interna, presente da Revis�
   expect(selos(await cartaoDe('Concluído'))).toEqual(['V3'])
 })
 
-test('Sem responsável aparece só sem responsável', async () => {
+test('o cartão sem responsável não mostra selo nem foto; o com responsável mostra a foto em 24 px', async () => {
   montar([processo('Sem Dono', { processo: { responsavel: null } }), processo('Com Dono')])
-  expect(selos(await cartaoDe('Sem Dono'))).toEqual(['Sem responsável'])
-  expect(selos(await cartaoDe('Com Dono'))).toEqual([])
+  const semDono = await cartaoDe('Sem Dono')
+  expect(semDono.querySelector('.cartao-selos')).toBeNull()
+  expect(semDono.querySelector('.avatar')).toBeNull()
+  expect(semDono.textContent).not.toContain('Sem responsável')
+  expect((await cartaoDe('Com Dono')).querySelector<HTMLElement>('.avatar')?.style.width).toBe('24px')
 })
 
-test('Modelagem: hoje, futura com dia e mês, e nada depois que passou nem fora de Não iniciados e da Modelagem piloto', async () => {
-  const futura = dia(6)
-  const [, mes, diaDoMes] = futura.split('-')
+test('nenhum cartão mostra a data da modelagem piloto, no passado, hoje ou no futuro', async () => {
   montar([
     processo('Modelagem Hoje', { etapa: 'modelagem', processo: { dataDaModelagemPiloto: dia(0) } }),
-    processo('Modelagem Futura', { etapa: 'nao_iniciados', processo: { dataDaModelagemPiloto: futura } }),
+    processo('Modelagem Futura', { etapa: 'nao_iniciados', processo: { dataDaModelagemPiloto: dia(6) } }),
     processo('Modelagem Passada', { etapa: 'modelagem', processo: { dataDaModelagemPiloto: dia(-1) } }),
-    processo('Outra Etapa', { etapa: 'revisao_interna', processo: { dataDaModelagemPiloto: futura } }),
   ])
-  expect(selos(await cartaoDe('Modelagem Hoje'))).toEqual(['Modelagem hoje'])
-  expect(selos(await cartaoDe('Modelagem Futura'))).toEqual([`Modelagem ${diaDoMes}/${mes}`])
-  expect(selos(await cartaoDe('Modelagem Passada'))).toEqual([])
-  expect(selos(await cartaoDe('Outra Etapa'))).toEqual([])
+  for (const nome of ['Modelagem Hoje', 'Modelagem Futura', 'Modelagem Passada']) {
+    const cartao = await cartaoDe(nome)
+    expect(selos(cartao)).toEqual([])
+    expect(cartao.textContent).not.toMatch(/Modelagem (hoje|\d)/)
+  }
 })
 
 test('versão: V3 e V5F em texto neutro, e nada sem versão', async () => {
@@ -172,14 +173,12 @@ test('subprocessos no singular e no plural, sem contar os cancelados (a view já
   expect(selos(await cartaoDe('Pai Zero'))).toEqual([])
 })
 
-test('a ordem dos selos: dias, Sem responsável, Modelagem, versão e subprocessos', async () => {
+test('a ordem dos selos: dias, versão e subprocessos', async () => {
   montar([processo('Tudo Junto', {
     etapa: 'modelagem', cartao: { ...SEM_RELATORIO, subprocessos: 2 },
     processo: { entrouNaEtapaEm: dia(-20), responsavel: null, dataDaModelagemPiloto: dia(0) },
   })])
-  expect(selos(await cartaoDe('Tudo Junto'))).toEqual([
-    '20 dias nesta etapa', 'Sem responsável', 'Modelagem hoje', 'V3', '2 subprocessos',
-  ])
+  expect(selos(await cartaoDe('Tudo Junto'))).toEqual(['20 dias nesta etapa', 'V3', '2 subprocessos'])
 })
 
 test('o cartão normal fica limpo: sem selos, sem faixa de parado e sem barra por etapa', async () => {

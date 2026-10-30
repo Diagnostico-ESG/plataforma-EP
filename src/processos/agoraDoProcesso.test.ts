@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { etapaAtualDe } from '../testes/processoDaLista'
-import { avisoDoRevisor, fraseDaConsulta, opcoesDeResponsavel, podeAssumir, rotuloDoAgora } from './agoraDoProcesso'
+import { avisoDoRevisor, fraseDaSituacaoParada, nomeDoResponsavel, ondeEstaOProcesso, opcoesDeResponsavel, podeAssumir, rotuloDoAgora } from './agoraDoProcesso'
 import type { ProcessoLido, UltimaVersao, UsuarioResponsavel } from './tipos'
 
 const ANA: UsuarioResponsavel = { id: 'u1', nome: 'Ana Teste', fotoUrl: 'https://fotos.exemplo/ana.png' }
@@ -10,8 +10,8 @@ function lido(mudancas: Partial<ProcessoLido> = {}): ProcessoLido {
   return {
     id: 'p1', nome: 'Emitir Ofício', tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1', macroprocessoNome: 'Macro',
     processoPaiId: null, situacao: 'em_andamento', etapaAtual: etapaAtualDe('revisao_interna'), etiqueta: 'em_andamento',
-    entrouNaEtapaEm: '2026-10-10', responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null }, origem: 'novo', contexto: null,
-    observacoes: null, motivoDaSituacao: null, processoPai: null, subprocessos: [], etapasDoVerso: [], dataDaModelagemPiloto: null,
+    entrouNaEtapaEm: '2026-10-10', responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null },
+    motivoDaSituacao: null, processoPai: null, subprocessos: [], etapasDoVerso: [], dataDaModelagemPiloto: null,
     ultimaVersao: null, ...mudancas,
   }
 }
@@ -66,21 +66,34 @@ describe('avisoDoRevisor', () => {
   })
 })
 
-describe('fraseDaConsulta', () => {
+describe('fraseDaSituacaoParada', () => {
   test('etapa, etiqueta, responsável e dias', () => {
-    expect(fraseDaConsulta(lido(), '2026-10-16')).toBe('Em Revisão interna · Iniciado · com Ana Teste há 6 dias')
+    expect(fraseDaSituacaoParada(lido(), '2026-10-16')).toBe('Em Revisão interna · Iniciado · com Ana Teste há 6 dias')
   })
 
   test('depois de 7 dias a frase não repete os dias (o selo âmbar os diz)', () => {
-    expect(fraseDaConsulta(lido({ entrouNaEtapaEm: '2026-10-01' }), '2026-10-16')).toBe('Em Revisão interna · Iniciado · com Ana Teste')
+    expect(fraseDaSituacaoParada(lido({ entrouNaEtapaEm: '2026-10-01' }), '2026-10-16')).toBe('Em Revisão interna · Iniciado · com Ana Teste')
   })
 
   test('sem responsável', () => {
-    expect(fraseDaConsulta(lido({ responsavel: null, etiqueta: 'a_fazer' }), '2026-10-16')).toBe('Em Revisão interna · A fazer · sem responsável')
+    expect(fraseDaSituacaoParada(lido({ responsavel: null, etiqueta: 'a_fazer' }), '2026-10-16')).toBe('Em Revisão interna · A fazer · sem responsável')
   })
 
   test('em Não iniciados e em Concluídos não há dias', () => {
     const fixa = lido({ etapaAtual: etapaAtualDe('nao_iniciados') })
-    expect(fraseDaConsulta(fixa, '2026-10-16')).toBe('Em Não iniciados · Iniciado · com Ana Teste')
+    expect(fraseDaSituacaoParada(fixa, '2026-10-16')).toBe('Em Não iniciados · Iniciado · com Ana Teste')
+  })
+})
+
+test('ondeEstaOProcesso: só a etapa e a etiqueta, sem o responsável', () => {
+  expect(ondeEstaOProcesso(lido())).toBe('Em Revisão interna · Iniciado')
+  expect(ondeEstaOProcesso(lido({ etiqueta: undefined, responsavel: null }))).toBe('Em Revisão interna · A fazer')
+})
+
+describe('nomeDoResponsavel', () => {
+  test('o nome, "(Inativo)" para quem foi desativado, e null sem ninguém', () => {
+    expect(nomeDoResponsavel(lido())).toBe('Ana Teste')
+    expect(nomeDoResponsavel(lido({ cartao: { responsavelAtivo: false, ultimaVersao: null, subprocessos: 0 } }))).toBe('Ana Teste (Inativo)')
+    expect(nomeDoResponsavel(lido({ responsavel: null }))).toBeNull()
   })
 })

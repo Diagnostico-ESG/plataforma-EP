@@ -41,7 +41,6 @@ export function montarVerso(
   const falso = new ProcessosFalso()
   falso.processos = [processo, ...outros]
   falso.usuariosPossiveis = [EU, BIA]
-  falso.quemChama = EU
   falso.etapasDoCatalogo = CATALOGO_DE_TESTE
   preparar?.(falso)
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil })} cadastros={cadastros} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso(falso)} planilhas={new PlanilhasFalso()} />)

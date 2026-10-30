@@ -28,7 +28,7 @@ const comVersoes = (versoes: Versao[], perfil: 'integrante_ep' | 'consulta' = 'i
 
 async function arquivos() {
   const verso = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-  return within(await verso.findByRole('region', { name: 'Arquivos' }))
+  return within(await verso.findByRole('region', { name: 'Documentos do Mapeamento' }))
 }
 
 type Secao = Awaited<ReturnType<typeof arquivos>>

@@ -1,20 +1,25 @@
-/* Árvore da Lista: as linhas de macroprocesso e de setor se leem como títulos, o subprocesso vem recuado e a linha dos
-   arquivos fica colada ao processo acima dela, no mesmo fundo. */
-.linha-de-macro th,
-.linha-de-setor th {
+/* Árvore da Lista: as linhas de grupo se leem como títulos, e cada nível vem recuado um passo fixo em relação ao de cima
+   (grupo raiz 0, grupo filho 1, processo 2 + subníveis; a raiz é o macroprocesso ou, na árvore por Setor, o setor); a linha dos arquivos fica um passo à frente do
+   processo dono, colada a ele, no mesmo fundo. */
+.tabela-de-processos {
+  --passo-da-arvore: 20px;
+}
+
+.grupo-raiz th,
+.grupo-filho th {
   text-align: left;
   font-weight: 600;
 }
 
-.linha-de-macro th {
+.grupo-raiz th {
   padding: var(--esp-2) var(--esp-3);
   background: var(--azul-claro);
   border-top: 2px solid var(--azul);
   font-size: var(--tam-coluna);
 }
 
-.linha-de-setor th {
-  padding: var(--esp-1) var(--esp-3) var(--esp-1) var(--esp-5);
+.grupo-filho th {
+  padding: var(--esp-1) var(--esp-3) var(--esp-1) calc(var(--esp-3) + var(--passo-da-arvore));
   background: var(--fundo-contexto);
   font-size: var(--tam-base);
 }
@@ -62,13 +67,13 @@
   color: var(--azul);
 }
 
-.tabela-de-processos td.processo-recuado {
-  padding-left: var(--esp-6);
+.tabela-de-processos td.processo-na-arvore {
+  padding-left: calc(var(--esp-3) + (var(--nivel) + 2) * var(--passo-da-arvore));
 }
 
 /* A linha dos arquivos: sem borda de cima e recuada, para se ler como parte do processo acima. */
 .linha-dos-arquivos td {
-  padding: var(--esp-2) var(--esp-3) var(--esp-3) var(--esp-6);
+  padding: var(--esp-2) var(--esp-3) var(--esp-3) calc(var(--esp-3) + (var(--nivel) + 3) * var(--passo-da-arvore));
   border-top: 0;
   background: var(--fundo-contexto);
 }
@@ -77,7 +82,21 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--esp-3);
+  gap: var(--esp-1) var(--esp-3);
+}
+
+/* Os arquivos um abaixo do outro: a lista ocupa a linha inteira, depois do rótulo da versão e do selo. */
+.arquivos-em-lista {
+  flex-basis: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.arquivo-com-icone {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-2);
 }
 
 .barra-da-arvore {

@@ -5,7 +5,7 @@ import type { ColunaDaLista } from './ordenacaoDaLista'
 export type ColunaDoCabecalho = {
   coluna: ColunaDaLista
   rotulo: string
-  /** O filtro da coluna, com as opções e o "Todos"; Processo não filtra (a busca faz esse papel). */
+  /** O filtro da coluna, com as opções e o "Todos"; Processo só ordena. */
   filtro: { nome: keyof FiltrosDosProcessos; opcoes: keyof OpcoesDosFiltros; todos: string } | null
 }
 

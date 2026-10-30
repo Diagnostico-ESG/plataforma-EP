@@ -27,8 +27,8 @@ function processo(id: string, nome: string, mudancas: Partial<ProcessoLido> = {}
   return {
     id, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1', macroprocessoNome: 'Macro Um',
     situacao: 'em_andamento', etapaAtual: naEtapa(MODELAGEM),
-    processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null, origem: 'novo',
-    contexto: null, observacoes: null, motivoDaSituacao: null, dataDaModelagemPiloto: null, ultimaVersao: null, etapasDoVerso: [], ...mudancas,
+    processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null,
+    motivoDaSituacao: null, dataDaModelagemPiloto: null, ultimaVersao: null, etapasDoVerso: [], ...mudancas,
   }
 }
 
@@ -52,11 +52,12 @@ function montar(ajustar?: (falso: ProcessosFalso) => void) {
 
 const barraDeCima = () => document.querySelector('.quadro-barra') as HTMLElement
 
-test('a Lista não tem a barra de filtros; acima da tabela ficam a busca, Todos | Concluídos e, com filtro, Limpar filtros', async () => {
+test('a Lista não tem a barra de filtros nem a busca; acima da tabela ficam Agrupar por, Todos | Concluídos e, com filtro, Limpar filtros', async () => {
   montar()
   await nomesNasLinhas()
   expect(screen.queryByRole('group', { name: 'Filtros dos processos' })).toBeNull()
-  expect(within(barraDeCima()).getByRole('textbox', { name: 'Buscar pelo nome' })).toBeTruthy()
+  expect(screen.queryByRole('textbox')).toBeNull()
+  expect(within(barraDeCima()).getByRole('group', { name: 'Agrupar por' })).toBeTruthy()
   expect(within(barraDeCima()).getByRole('button', { name: 'Todos' })).toBeTruthy()
   expect(within(barraDeCima()).queryByRole('button', { name: 'Limpar filtros' })).toBeNull()
   await escolherNaColuna('Tipo', 'Processo')
@@ -69,6 +70,19 @@ test('a primeira coluna se chama Processo e o menu dela só ordena', async () =>
   const cabecalhos = (await screen.findAllByRole('columnheader')).map((celula) => celula.textContent)
   expect(cabecalhos[0]).toMatch(/^Processo/)
   expect(await opcoesDaColuna('Processo')).toEqual(['Crescente', 'Decrescente'])
+})
+
+test('toda coluna mostra ▾ (aria-hidden); a que ordena troca por ▲ ou ▼ e o nome do botão não muda', async () => {
+  montar()
+  const marcas = () => Array.from(document.querySelectorAll('.tabela-de-processos thead .cabecalho-da-lista-sentido'))
+  await botaoDaColuna('Processo')
+  expect(marcas().map((marca) => marca.textContent)).toEqual(['▲', '▾', '▾', '▾', '▾', '▾', '▾'])
+  expect(marcas().every((marca) => marca.getAttribute('aria-hidden') === 'true')).toBe(true)
+  await escolherNaColuna('Setor', 'Decrescente')
+  await waitFor(async () => expect((await botaoDaColuna('Setor')).textContent).toMatch(/▼/))
+  expect(marcas().map((marca) => marca.textContent)).toEqual(['▾', '▾', '▼', '▾', '▾', '▾', '▾'])
+  expect((await botaoDaColuna('Setor')).textContent).toMatch(/, ordem decrescente$/)
+  expect(await botaoDaColuna('Tipo')).toBeTruthy()
 })
 
 test('o filtro de Setor no cabeçalho troca as linhas, vai para o endereço e aparece no cabeçalho', async () => {

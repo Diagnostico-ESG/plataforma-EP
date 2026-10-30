@@ -1,3 +1,4 @@
+import type { Perfil } from '../acesso/tipos'
 import type { EventoDoCadastro } from '../cadastros/tipos'
 import type { PapelDoArquivo } from '../versoes/tipos'
 import type { FaseDoRegimento } from './fasesDoRegimento'
@@ -6,15 +7,20 @@ import type { FaseDoRegimento } from './fasesDoRegimento'
 export type EtiquetaDaEtapa = 'a_fazer' | 'em_andamento' | 'concluido'
 
 export type TipoDeProcesso = 'processo' | 'subprocesso' | 'a_classificar'
-export type OrigemDoProcesso = 'novo' | 'retomado'
 /** A situação calculada: "concluido" não é guardado, vem de a etapa atual ser Concluídos com o processo em andamento. */
 export type SituacaoDoProcesso = 'em_andamento' | 'suspenso' | 'cancelado' | 'concluido'
 
 /** Uma etapa do catálogo, como as colunas do Quadro a usam. */
 export type EtapaDoCatalogo = { id: string; codigo: string; nome: string; ordem: number; ativa: boolean }
 
-/** Uma etapa do catálogo como a Administração a mostra: ativa ou não. `fase` é nula só nas duas fixas. */
-export type EtapaNoCatalogo = EtapaDoCatalogo & { fase: FaseDoRegimento | null }
+/** O responsável inicial como a lista do catálogo o traz: o usuário e o que decide se ainda vale. */
+export type ResponsavelInicialDaEtapa = { id: string; nome: string; fotoUrl: string | null; ativo: boolean; perfil: Perfil }
+
+/**
+ * Uma etapa do catálogo como a Administração a mostra: ativa ou não. `fase` é nula só nas duas fixas.
+ * `responsavelInicial` ausente ou nulo = ninguém (opcional para não mexer em cada fixture de teste).
+ */
+export type EtapaNoCatalogo = EtapaDoCatalogo & { fase: FaseDoRegimento | null; responsavelInicial?: ResponsavelInicialDaEtapa | null }
 
 /** O que o formulário de etapa nova grava; `antesDe` null põe a etapa logo antes de Concluídos. */
 export type EtapaNova = { codigo: string; nome: string; fase: FaseDoRegimento; antesDe: string | null }
@@ -38,6 +44,8 @@ export type ModuloDoCatalogo = {
   reativarEtapa(id: string): Promise<void>
   /** Só a etapa por onde nenhum processo passou. */
   excluirEtapa(id: string): Promise<void>
+  /** Só o Administrador (a RLS decide); o banco recusa usuário que não seja Administrador ou Integrante ativo e qualquer valor em Concluídos. Null = ninguém. */
+  definirResponsavelInicial(id: string, usuarioId: string | null): Promise<void>
 }
 
 export type ResponsavelDoProcesso = { id: string; nome: string; fotoUrl: string | null }
@@ -137,9 +145,6 @@ export type PassagemDaEtapa = { entrouEm: string; saiuEm: string | null }
 export type EtapaDoVerso = { id: string; codigo: string; nome: string; ordem: number; passagens: PassagemDaEtapa[] }
 
 export type ProcessoLido = ProcessoDaLista & {
-  origem: OrigemDoProcesso
-  contexto: string | null
-  observacoes: string | null
   motivoDaSituacao: string | null
   /** O pai do subprocesso; null nos outros tipos. */
   processoPai: ItemDaEstrutura | null
@@ -164,11 +169,8 @@ export type DadosDoProcesso = {
   tipo: TipoDeProcesso
   /** Só no subprocesso. */
   processoPaiId: string | null
-  origem: OrigemDoProcesso
-  contexto: string | null
-  observacoes: string | null
-  /** Só no cadastro (AAAA-MM-DD; null ou ausente = sem data): depois dele a data se altera no verso. */
-  dataDaModelagemPiloto?: string | null
+  /** Só no cadastro (a edição não envia); depois, as Anotações se escrevem no verso. */
+  anotacoes?: string | null
 }
 
 /** O tipo novo de uma reclassificação; o pai só no subprocesso. Nada volta a "a classificar". */
@@ -195,7 +197,7 @@ export type ModuloDeProcessos = {
   criarProcesso(dados: DadosDoProcesso): Promise<string>
   editarProcesso(id: string, dados: DadosDoProcesso): Promise<void>
   excluirProcesso(id: string): Promise<void>
-  /** Marca, troca ou (com null) remove a data da reunião de modelagem piloto; vale em qualquer situação do processo. */
+  /** Registra, troca ou (com null) apaga a data em que a modelagem piloto aconteceu; o banco recusa data depois de hoje (ADR 0035). */
   marcarDataDaModelagemPiloto(id: string, data: string | null): Promise<void>
   /** null: o processo não existe (mais). Fora do ProcessoLido: o texto só o verso lê (ADR 0021). */
   lerAnotacoes(id: string): Promise<AnotacoesLidas | null>

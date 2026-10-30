@@ -56,12 +56,12 @@ export function SoOsMeus({ ligado, aoAlternar }: SoOsMeusProps) {
 }
 
 const OPCOES_DA_LISTA: { valor: AgruparListaPor; rotulo: string }[] = [
-  { valor: 'nenhum', rotulo: 'Nenhum' }, { valor: 'macroprocesso', rotulo: 'Macroprocesso' },
+  { valor: 'nenhum', rotulo: 'Nenhum' }, { valor: 'macroprocesso', rotulo: 'Macroprocesso' }, { valor: 'setor', rotulo: 'Setor' },
 ]
 
 type AgruparAListaPorProps = { agrupar: AgruparListaPor; aoMudar: (agrupar: AgruparListaPor) => void }
 
-/** "Agrupar por: Nenhum | Macroprocesso", só na Lista: a tabela comum ou a árvore. */
+/** "Agrupar por: Nenhum | Macroprocesso | Setor", só na Lista: a tabela comum ou a árvore. */
 export function AgruparAListaPor({ agrupar, aoMudar }: AgruparAListaPorProps) {
   return <ControleDeOpcoes rotulo="Agrupar por" opcoes={OPCOES_DA_LISTA} escolhida={agrupar} aoMudar={aoMudar} />
 }

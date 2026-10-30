@@ -25,8 +25,8 @@ function processo(id: string, nome: string, mudancas: Partial<ProcessoLido> = {}
   return {
     id, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1', macroprocessoNome: 'Macro de Teste',
     situacao: 'em_andamento', etapaAtual: { codigo: MODELAGEM.codigo, nome: MODELAGEM.nome, ordem: MODELAGEM.ordem, id: 'e', posicao: 1, total: 1 },
-    processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null, origem: 'novo',
-    contexto: null, observacoes: null, motivoDaSituacao: null, dataDaModelagemPiloto: null, ultimaVersao: null, etapasDoVerso: [], ...mudancas,
+    processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null,
+    motivoDaSituacao: null, dataDaModelagemPiloto: null, ultimaVersao: null, etapasDoVerso: [], ...mudancas,
   }
 }
 
@@ -66,7 +66,7 @@ test('as colunas, a ordem pelo nome, todas as situações e o subprocesso logo d
   montar()
   const [cabecalho, ...corpo] = await linhas()
   // O cabeçalho ordenado traz ▲ e o texto oculto da ordem depois do nome da coluna.
-  expect(cabecalho.map((texto) => texto.replace(/[▲▼,].*$/, ''))).toEqual(['Processo', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Responsável', 'Situação'])
+  expect(cabecalho.map((texto) => texto.replace(/[▲▼▾,].*$/, ''))).toEqual(['Processo', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Responsável', 'Situação'])
   expect(corpo).toEqual([
     ['Arquivar Pasta', 'Processo', 'TSA', 'Macro de Teste', 'Reunião de modelagem · 1 de 1', '—', 'Suspenso'],
     ['Cadastrar Bem', 'Processo', 'TSA', 'Macro de Teste', '—', '—', 'Em andamento'],

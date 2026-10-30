@@ -40,7 +40,6 @@ export function montar(ultimaVersao: UltimaVersao | null, { perfil = 'integrante
   const falso = new ProcessosFalso()
   falso.processos = [processoLido({ responsavel: { id: EU.id, nome: EU.nome, fotoUrl: null }, ultimaVersao, ...mudancas }, etapa)]
   falso.usuariosPossiveis = [EU, BIA]
-  falso.quemChama = EU
   falso.etapasDoCatalogo = CATALOGO_DE_TESTE
   const versoes = new VersoesFalso()
   const revisoes = new RevisoesFalso(falso, EU, versoes)

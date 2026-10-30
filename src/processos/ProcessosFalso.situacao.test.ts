@@ -1,7 +1,10 @@
 import { describe, expect, test } from 'vitest'
+import { hojeEmBrasilia } from '../lib/datas'
+import { fraseDaModelagemNoFuturo } from './frasesDaModelagemPiloto'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { CATALOGO_DE_TESTE, umProcessoLido } from '../testes/processoDaLista'
+import { comResponsavelInicial } from '../testes/responsavelInicialDeTeste'
 import { ProcessosFalso } from './ProcessosFalso'
 import type { ProcessoLido, SituacaoDoProcesso } from './tipos'
 
@@ -19,6 +22,34 @@ const lido = async (modulo: ProcessosFalso) => (await modulo.lerProcesso('p1')) 
 async function falhaDe(promessa: Promise<void>): Promise<Error> {
   return (await promessa.catch((erro: unknown) => erro)) as Error
 }
+
+const INICIAL_ANA = { id: 'u1', nome: 'Ana Teste', fotoUrl: null, ativo: true, perfil: 'integrante_ep' as const }
+
+describe('retomar e o responsável inicial', () => {
+  test('retomar o suspenso e o cancelado põe o responsável inicial da etapa atual', async () => {
+    for (const situacao of ['suspenso', 'cancelado'] as const) {
+      const modulo = falso(situacao)
+      comResponsavelInicial(modulo, 'revisao_interna', INICIAL_ANA)
+      await modulo.retomarProcesso('p1', 'Voltou')
+      expect((await lido(modulo)).responsavel).toMatchObject({ id: 'u1', nome: 'Ana Teste' })
+    }
+  })
+
+  test('etapa sem responsável inicial: retomar deixa o processo sem responsável', async () => {
+    const modulo = falso('suspenso')
+    modulo.processos = modulo.processos.map((processo) => ({ ...processo, responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null } }))
+    await modulo.retomarProcesso('p1', 'Voltou')
+    expect((await lido(modulo)).responsavel).toBeNull()
+  })
+
+  test('retomar quando o responsável já é o inicial não muda nada', async () => {
+    const modulo = falso('suspenso')
+    comResponsavelInicial(modulo, 'revisao_interna', INICIAL_ANA)
+    modulo.processos = modulo.processos.map((processo) => ({ ...processo, responsavel: { id: 'u1', nome: 'Ana Teste', fotoUrl: null } }))
+    await modulo.retomarProcesso('p1', 'Voltou')
+    expect((await lido(modulo)).responsavel).toEqual({ id: 'u1', nome: 'Ana Teste', fotoUrl: null })
+  })
+})
 
 describe('suspender, cancelar e retomar', () => {
   test('suspender guarda a situação e o motivo, e a etapa e a etiqueta ficam', async () => {
@@ -106,6 +137,17 @@ describe('data da reunião de modelagem piloto', () => {
     expect(modulo.chamadas).toEqual([{ acao: 'data_da_modelagem_piloto', id: 'p1', nota: '2026-10-20' }, { acao: 'data_da_modelagem_piloto', id: 'p1' }])
   })
 
+  test('recusa data depois de hoje em Brasília, com a data e o limite, e aceita a de hoje', async () => {
+    const modulo = falso()
+    const hoje = hojeEmBrasilia()
+    const falha = await falhaDe(modulo.marcarDataDaModelagemPiloto('p1', '2999-01-01'))
+    expect(falha).toBeInstanceOf(TravaDoBanco)
+    expect(falha.message).toBe(fraseDaModelagemNoFuturo('2999-01-01', hoje))
+    expect(modulo.chamadas).toEqual([])
+    await modulo.marcarDataDaModelagemPiloto('p1', hoje)
+    expect((await lido(modulo)).dataDaModelagemPiloto).toBe(hoje)
+  })
+
   test('a falha programada e o processo que sumiu chegam como no módulo real', async () => {
     const modulo = falso()
     await expect(modulo.marcarDataDaModelagemPiloto('px', '2026-10-20')).rejects.toBeInstanceOf(CadastroInexistente)
@@ -116,8 +158,7 @@ describe('data da reunião de modelagem piloto', () => {
   test('o processo novo nasce sem data', async () => {
     const modulo = new ProcessosFalso()
     await modulo.criarProcesso({
-      nome: 'Novo', setorId: 's1', macroprocessoId: 'm1', tipo: 'processo', processoPaiId: null, origem: 'novo',
-      contexto: null, observacoes: null,
+      nome: 'Novo', setorId: 's1', macroprocessoId: 'm1', tipo: 'processo', processoPaiId: null,
     })
     expect(modulo.processos[0].dataDaModelagemPiloto).toBeNull()
   })

@@ -2,6 +2,12 @@
 
 Status: ready-for-agent
 
+**Responsável inicial por etapa (mudança de 2026-10-30, seção abaixo).** A funcionalidade 17, `responsavel-inicial-por-etapa` (ADR 0036), troca "quem move vira o responsável" pelo responsável inicial de cada etapa, definido no Catálogo de etapas. Onde esta spec disser que quem move passa a ser o responsável, vale a seção "Responsável inicial por etapa".
+
+**Lista sem busca e por Setor (mudança de 2026-10-30, spec própria).** `.scratch/lista-por-setor/spec.md` tira a busca pelo nome da Lista e acrescenta "Agrupar por: Setor" (setor → macroprocesso → processo). Onde esta spec falar da busca ou só do agrupamento por Macroprocesso, vale aquela.
+
+**Enxugar o cartão e o cadastro (mudança de 2026-10-29, spec própria).** A funcionalidade 15, `.scratch/enxugar-cartao-e-cadastro/spec.md` (ADR 0035), tira a Origem, junta Contexto e Observações nas Anotações (já no cadastro), deixa só a data de realização da modelagem piloto (na linha da etapa, sem data futura, sem os selos de modelagem), tira o selo "Sem responsável", enxuga o topo e o responsável do verso e renomeia "Arquivos" para "Documentos do Mapeamento". Onde esta spec divergir, vale aquela.
+
 **Repositório de processos (mudança de 2026-10-28, spec própria).** A funcionalidade 14, `.scratch/repositorio-de-processos/spec.md` (ADR 0034), acaba com o Arquivado (marca, trava, selo, filtro, Arquivar e Desarquivar): onde esta spec fala em arquivado, vale aquela. Ela também traz Tirar do Quadro, a coluna Concluídos com saída após 30 dias, Todos | Concluídos, os cancelados fora das visualizações, a Lista com filtro e ordenação por coluna e Agrupar por Macroprocesso, e a etiqueta Iniciado.
 
 **Como resolve o problema (desde 2026-10-23, Andamento livre; cartão e verso ajustados em 2026-10-25; visualização por setores em 2026-10-26; macroprocesso fora da frente do cartão em 2026-10-27; visual do cartão, com a cor do setor, em 2026-10-27; coluna tingida por setor e etiquetas fortes em 2026-10-28).** Hoje o andamento de cada processo fica espalhado entre planilhas e o Power BI, sem saber com certeza em que etapa cada um está, quem cuida dele nem o que mudou. Com esta funcionalidade, a equipe do EP cadastra na plataforma cada processo e subprocesso, ligado ao setor dono e a um macroprocesso. O processo entra na etapa **Não iniciados** e anda pelo catálogo de etapas como um cartão no Planner: qualquer integrante o leva a qualquer etapa, para a frente ou para trás, pela lista de etapas ou arrastando o cartão, sem motivo e sem trava de sequência. A etapa atual tem uma **etiqueta** (A fazer, Em andamento ou Finalizado), e o processo tem um **responsável**, que passa a ser quem o move. Quem termina a sua parte marca Finalizado, e o próximo vê e pega o processo. O processo termina na etapa **Concluídos**. O histórico guarda cada mudança de etapa, etiqueta e responsável, e o processo que fica mais de 7 dias na mesma etapa ganha um aviso. As seções "Coluna tingida e etiquetas fortes" (2026-10-28), "Visual do cartão" (2026-10-27), "Visualização por setores" (2026-10-26), "Cartão e verso" (2026-10-25) e "Andamento livre", logo abaixo, descrevem o modelo atual e valem sobre o resto desta spec no que divergirem; a mais nova vale sobre a mais antiga. O texto que segue a ela é o registro das entregas anteriores.
@@ -11,6 +17,103 @@ Status: ready-for-agent
 **Como resolvia antes de 2026-10-23.** A equipe registrava o andamento etapa por etapa, da Modelagem piloto em diante, num caminho que o administrador configura no catálogo de etapas. A área Processos mostra o trabalho vivo num Quadro, com uma coluna por etapa, e o arquivo completo numa Lista com busca pelo nome e filtros; ao abrir um processo, o **verso do cartão**, uma janela central em duas colunas, mostra primeiro o que há para fazer agora (a etapa atual, quem cuida dela e um único botão principal), depois o caminho de etapas e os arquivos, e ao lado o contexto do processo; o que é raro (histórico, editar, reclassificar, suspender, cancelar, excluir) fica num menu. No Quadro, cada cartão mostra de relance onde o processo está (uma barra com um pedaço por etapa) e só ganha selo quando há algo a dizer (processo parado, relatório pendente, etapa sem responsável, reunião próxima, versão, subprocessos); arrastar o cartão para a coluna seguinte conclui a etapa, e a equipe pode agrupar o Quadro por responsável ou ver só os processos que estão com ela. O banco impõe a sequência das etapas, a situação do processo, as regras de reclassificação e o registro de cada mudança no histórico. As funcionalidades seguintes (reuniões, documentos, revisões, prazos e painel) se apoiam nesse andamento.
 
 Decisões de origem: `.scratch/processos-etapas/sabatina.md` (sabatina de 2026-10-13, três rodadas), `CONTEXT.md` (seções "Setores" e "Processos") e ADR 0004 (mudar o catálogo muda o caminho dos processos em andamento). Mudança de 2026-10-18 (parte 1 da iniciativa experiencia-do-quadro, `.scratch/experiencia-do-quadro/sabatina-parte-1.md`, ADR 0013): saem as etapas do setor, a coluna "Aguardando o setor", os responsáveis do setor e o nível do catálogo; a primeira etapa passa a se chamar Modelagem piloto; o processo ganha a data da reunião (spec de `reunioes`). Mudança de 2026-10-18 (parte 2, `.scratch/experiencia-do-quadro/sabatina-parte-2.md`, ADR 0014): resolver a etapa atual (concluir, dispensar ou registrar como realizada anteriormente) já **avança**, ou seja, inicia a próxima etapa pendente com o responsável escolhido na mesma janela; voltar também escolhe o responsável; [Assumir] em etapa sem responsável; quem enviou a versão mais recente não pode ser escolhido como responsável da Revisão interna. Mudança de 2026-10-19 (parte 3, "Verso do cartão", `.scratch/experiencia-do-quadro/sabatina-parte-3.md`, sem ADR nem mudança no banco): o painel lateral vira o verso do cartão, uma janela central em duas colunas com o cartão "Agora"; o Novo processo, o Editar e o Histórico abrem dentro dela; a Lista ganha busca pelo nome. Mudança de 2026-10-19 (parte 4, "Cartão do Quadro", `.scratch/experiencia-do-quadro/sabatina-parte-4.md`, sem ADR): o cartão do Quadro ganha a barra de progresso e os selos; arrastar o cartão para a coluna de destino abre a janela de avanço da parte 2; o Quadro ganha "Agrupar por: Etapa | Responsável" e "Só os meus"; a view `processos_com_andamento` ganha campos, por migração não destrutiva; `CONTEXT.md` ganha "Processo parado". Mudança de 2026-10-23 ("Anotações do processo", `.scratch/processos-etapas/sabatina-anotacoes.md`, ADR 0021): o verso ganha, no alto da coluna direita, as **Anotações**, um texto livre e único por processo, guardado sozinho enquanto se escreve, sem histórico, com recusa quando outra pessoa alterou antes; `CONTEXT.md` ganha "Anotações".
+
+## Responsável inicial por etapa (mudança de 2026-10-30)
+
+Pacote 4 da demanda de 2026-10-30, planejado no `/planejar` modo completo (`responsavel-inicial-por-etapa`); sabatina nesta sessão, decisões no ADR 0036 (substitui a parte do ADR 0022 em que quem move vira o responsável) e no `CONTEXT.md` ("Responsável do processo", "Responsável inicial", "Mover", "Situação do processo"). Vale sobre o resto desta spec no que divergir.
+
+**Como resolve o problema.** Hoje, quem move o processo passa a ser o responsável dele. Na prática, quem move é quem acabou a sua parte na etapa anterior, então o processo chega à etapa seguinte com a pessoa errada, e a equipe relata que "o responsável da etapa anterior continua". Cada etapa costuma ter alguém da equipe que a pega. Com esta mudança, o Administrador diz, no Catálogo de etapas, quem é o **responsável inicial** de cada etapa (ou ninguém). O processo que chega a uma etapa (cadastrado, movido ou retomado) fica com o responsável inicial dela, ou sem responsável. Quem move fica só no histórico. Assumir e a troca manual continuam como estão, para os casos fora do padrão.
+
+### Histórias de usuário
+
+1. Como Administrador, quero ver no Catálogo de etapas o responsável inicial de cada etapa, para saber com quem cada etapa começa.
+2. Como Administrador, quero escolher o responsável inicial de uma etapa entre os Administradores e Integrantes do EP ativos, para que o processo que chega a ela já tenha quem cuide dele.
+3. Como Administrador, quero deixar uma etapa sem responsável inicial ("Ninguém"), para as etapas que não têm dono fixo.
+4. Como Administrador, quero definir o responsável inicial também de Não iniciados, para que os processos recém-cadastrados já entrem com alguém que os organize.
+5. Como Administrador, quero que Concluídos não ofereça responsável inicial, porque o processo concluído não tem mais quem cuide dele.
+6. Como Administrador, quero ver marcado no Catálogo o responsável inicial que ficou inativo ou passou a Consulta, para trocá-lo.
+7. Como Administrador, quero que a troca do responsável inicial fique no histórico do catálogo, com o nome de antes e o de depois, para saber quem mudou e quando.
+8. Como Administrador, quero que trocar o responsável inicial de uma etapa não mexa nos processos que já estão nela, para não tirar o trabalho de ninguém sem aviso.
+9. Como Integrante do EP, quero que, ao mover um processo, ele fique com o responsável inicial da etapa de destino, para não continuar comigo depois que terminei a minha parte.
+10. Como Integrante do EP, quero que o processo movido para uma etapa sem responsável inicial fique sem responsável, para que alguém o assuma.
+11. Como Integrante do EP, quero que o processo levado a Concluídos fique sem responsável, para que ele saia do meu nome.
+12. Como Integrante do EP, quero que mover o processo para a etapa em que ele já está não mude nada, nem o responsável.
+13. Como Integrante do EP, quero que o processo que eu cadastro entre com o responsável inicial de Não iniciados, ou sem responsável.
+14. Como Integrante do EP, quero que retomar um processo suspenso ou cancelado o deixe com o responsável inicial da etapa em que ele está, ou sem responsável, como se ele chegasse de novo a ela.
+15. Como Integrante do EP, quero continuar podendo assumir o processo ou trocar o responsável por outro ou por ninguém, depois de ele chegar à etapa.
+16. Como Integrante do EP, quero que mover um processo nunca falhe porque o responsável inicial da etapa ficou inativo; nesse caso, o processo fica sem responsável.
+17. Como Integrante do EP, quero ver no histórico do processo, a cada movimento, quem moveu e o responsável de antes e o de depois.
+18. Como Integrante do EP, quero que, ao arrastar o cartão no Quadro por etapa, ele apareça na coluna de destino já com o responsável inicial dela.
+19. Como Integrante do EP, no Quadro agrupado por responsável e com "Só os meus", quero que o processo movido saia da minha coluna e vá para a do responsável inicial (ou para Sem responsável).
+20. Como Integrante do EP, quero que o aviso amarelo do revisor apareça quando o responsável inicial da Revisão interna for o autor da versão mais recente, como já aparece com qualquer responsável.
+21. Como pessoa com perfil Consulta, quero ver o responsável de cada processo como hoje, sem ver nem mudar o Catálogo.
+22. Como equipe, quero que os processos que já existem continuem com o responsável que têm hoje, sem mudança nos dados quando a regra entrar.
+
+### Decisões de implementação
+
+#### Modelo de dados
+
+- **Tabela `etapas`, coluna nova `responsavel_inicial_id`:** `uuid`, opcional (nula = ninguém), referência a `usuarios`. Migração não destrutiva: só acrescenta a coluna, nula em todas as etapas; nenhum processo muda.
+- **Gravação do responsável inicial:** o banco recusa, com o nome recebido, um usuário que não seja Administrador ou Integrante do EP ativo no momento da gravação (a mesma conferência do responsável do processo, reaproveitada), e recusa qualquer valor em Concluídos. Gravar o mesmo valor ou nulo passa sempre. A gravação é permitida também em Não iniciados, que hoje é protegida contra mudança: a trava das etapas fixas passa a deixar só esta coluna mudar nelas.
+- **Regra do responsável na chegada (imposta pelo banco):** uma função pequena devolve o responsável inicial **válido** de uma etapa: o id dele se for Administrador ou Integrante do EP ativo agora; senão nulo (inclusive em Concluídos). Ela é usada em três lugares:
+  - **Mover** (`mover_processo`): o responsável depois do movimento passa a ser essa função aplicada à etapa de destino, no lugar de quem chama. O resto do movimento (etiqueta A fazer, confirmação de arquivos, publicação na chegada a Concluídos, evento único do movimento com o responsável de antes e o de depois) não muda. Mover para a mesma etapa continua sem efeito.
+  - **Cadastro:** o processo novo (inclusive subprocesso e "a classificar") entra em Não iniciados com o responsável inicial válido dela, posto pelo banco antes de gravar a linha (o que a tela mandar no campo é ignorado, já que o cadastro hoje não o manda).
+  - **Retomar** (suspenso ou cancelado): além de voltar à situação em andamento na mesma etapa, o responsável passa a ser o responsável inicial válido da etapa atual, ou nulo. A troca, se houver, entra no histórico como a mudança de responsável que já existe, com quem retomou como autor; se o responsável não muda, nada a mais é registrado.
+- **Histórico do catálogo:** o evento da etapa passa a levar o responsável inicial (id e nome) no "antes" e no "depois", e a troca dele é uma ação de edição da etapa, como a troca do nome ou da fase.
+- **Campos derivados:** nada novo guardado no processo. O responsável continua sendo a coluna que já existe no processo, e "responsável inicial inválido" é calculado na leitura do catálogo (perfil e situação do usuário), não guardado.
+
+**Quem pode o quê:**
+
+| Tabela e ação | Administrador | Integrante do EP | Consulta | Usuário inativo | Visitante sem login |
+|-|-|-|-|-|-|
+| `etapas`: ler, inclusive o responsável inicial | sim | sim | sim | não | não |
+| `etapas`: alterar o responsável inicial | sim | não | não | não | não |
+| `processos`: responsável posto pelo banco ao mover, cadastrar ou retomar | sim, quando pode mover, cadastrar ou retomar | sim, idem | não (não move, cadastra nem retoma) | não | não |
+
+As políticas de ler e alterar `etapas` já existem e valem para a coluna nova; a mudança é a permissão de alterar esta coluna. Dado pessoal: o responsável inicial é um nome de servidor, já visível a todo usuário ativo como responsável dos processos; a mudança não amplia quem o vê.
+
+**Regras de estado:** sem transições novas. O responsável continua congelado em suspenso e cancelado; a única mudança é que retomar aplica o responsável inicial.
+
+#### Interface
+
+- **Catálogo de etapas (Administração):** a tabela ganha a coluna **Responsável inicial**, com uma caixa de seleção em cada linha, salva ao escolher, no mesmo padrão da troca de perfil na lista de Usuários. As opções: "Ninguém" e os Administradores e Integrantes do EP ativos, em ordem de nome, com a foto, como na escolha de responsável do verso. Concluídos mostra "—", sem caixa. Não iniciados tem a caixa, embora não tenha os outros botões.
+- **Responsável inicial inválido:** se o escolhido ficou inativo ou passou a Consulta, a caixa mostra o nome dele marcado "(inativo)" ou "(sem permissão)", com um aviso discreto na linha, até o Administrador escolher outro ou "Ninguém". O nome inválido não aparece entre as opções novas.
+- **Falha ao gravar:** a caixa volta ao valor anterior e a linha mostra o motivo, no padrão das recusas do catálogo (com o nome recusado, quando é a recusa de usuário inválido).
+- **Leitura do catálogo:** a lista do catálogo passa a trazer, de cada etapa, o responsável inicial (id, nome, foto, se está ativo e o perfil), para a tela decidir a marca de inválido.
+- **Mover, cadastrar e retomar na tela:** nenhuma mudança de controle. Depois da gravação, a tela já relê o processo, e o responsável que aparece é o que o banco pôs. As implementações falsas usadas nos testes e na vitrine local (do módulo de processos, do movimento e do catálogo) passam a seguir a regra nova, no lugar de "quem move vira o responsável".
+- **Histórico do catálogo:** a troca aparece como "Responsável inicial: {antes} → {depois}", com "Ninguém" para o vazio.
+
+### Estados de tela
+
+O Catálogo de etapas já tem os três estados ("Carregando catálogo…", erro com Tentar de novo, e a lista); a coluna nova entra neles sem mudança. A lista de usuários para as opções vem da mesma leitura que já alimenta a escolha de responsável: se ela falhar, a caixa mostra só o valor atual e "Ninguém", com o aviso "Não foi possível carregar os usuários" e Tentar de novo. Falha de conexão ao gravar segue a regra do item "Falha ao gravar".
+
+### Decisões de teste
+
+- **Ponto de teste: a tela inteira**, como a pessoa usa: os testes de tela do catálogo (a partir dos que já existem para o Catálogo de etapas, com a implementação falsa) e os testes de tela do Quadro e do verso para mover, cadastrar e retomar, conferindo o responsável que aparece. Cada teste prova um comportamento visível, não a chamada interna.
+- **Banco, pgTAP**, escrito antes da migração, junto dos testes existentes do catálogo, do mover e da etiqueta e responsável: (1) só o Administrador ativo altera o responsável inicial; Integrante, Consulta, inativo e visitante não; (2) recusa usuário Consulta, inativo e inexistente, e qualquer valor em Concluídos; (3) aceita em Não iniciados; (4) mover põe o responsável inicial do destino, ou nulo sem ele, e nulo quando ele ficou inativo ou passou a Consulta; (5) mover para Concluídos deixa nulo; (6) quem move não vira responsável; (7) o evento do movimento registra o responsável de antes e o de depois; (8) cadastrar põe o responsável inicial de Não iniciados; (9) retomar (de suspenso e de cancelado) põe o responsável inicial da etapa atual, ou nulo; (10) trocar o responsável inicial não muda os processos que já estão na etapa; (11) a troca entra no histórico da etapa com os nomes.
+- Os testes atuais que esperam "quem move vira o responsável" mudam para a regra nova, no banco e na tela.
+
+### Fora do escopo
+
+- Passar em lote os processos que já estão na etapa para o novo responsável inicial.
+- Escolher o responsável a cada movimento (o andamento livre tirou essa pergunta de propósito).
+- Mais de um responsável inicial por etapa, ou responsável por setor ou por macroprocesso.
+- Avisar no movimento quando o responsável inicial da Revisão interna é o autor da versão (o aviso amarelo do verso continua cobrindo isso).
+- Mudar as planilhas dos dashboards (não levam nome de pessoa).
+
+### Critérios de pronto
+
+1. O Administrador escolhe, no Catálogo de etapas, o responsável inicial de qualquer etapa menos Concluídos, inclusive Não iniciados, entre "Ninguém" e os Administradores e Integrantes do EP ativos, e a escolha fica gravada ao recarregar.
+2. Integrante do EP e Consulta não veem a Administração; pelo banco, só o Administrador ativo altera o responsável inicial (pgTAP).
+3. O banco recusa usuário Consulta, inativo ou inexistente e qualquer valor em Concluídos; a tela mostra o motivo e volta ao valor anterior.
+4. Mover um processo deixa-o com o responsável inicial do destino, ou sem responsável; quem move não vira responsável; Concluídos deixa sem responsável; mover para a mesma etapa não muda nada.
+5. Responsável inicial inativo ou em Consulta não impede o movimento: o processo fica sem responsável, e o Catálogo mostra o nome marcado "(inativo)" ou "(sem permissão)".
+6. O processo cadastrado entra com o responsável inicial de Não iniciados, ou sem responsável.
+7. Retomar um processo suspenso ou cancelado deixa-o com o responsável inicial da etapa atual, ou sem responsável.
+8. Trocar o responsável inicial de uma etapa não muda os processos que já estão nela, e os processos que já existiam mantêm o responsável depois da migração.
+9. O histórico do processo mostra, a cada movimento, quem moveu e o responsável de antes e o de depois; o histórico do catálogo mostra a troca do responsável inicial com os dois nomes.
+10. Assumir e a troca manual de responsável funcionam como antes.
+11. `[visual]` A coluna Responsável inicial do Catálogo cabe na tabela em 1366×768 sem rolagem lateral, com a foto e o nome alinhados como na escolha de responsável do verso, e o aviso de inválido legível sem cor como única pista.
 
 ## Ajustes do Quadro e da Lista (mudança de 2026-10-28)
 
@@ -526,6 +629,7 @@ O que não está listado continua valendo: cadastro, edição, exclusão, reclas
 213. Como integrante do EP, quero que escolher a etapa na lista mova o processo na hora, sem confirmação, para o gesto ser tão rápido quanto no Planner.
 214. Como integrante do EP, quero arrastar o cartão no Quadro para a coluna de qualquer etapa, para a frente ou para trás.
 215. Como integrante do EP, quero que, enquanto arrasto, a coluna sob o cartão fique destacada, para saber onde ele vai cair.
+215a. Como integrante do EP, quero que, ao levar o cartão até a borda esquerda ou direita do Quadro, o Quadro role sozinho, para alcançar as colunas fora da vista (correção de 2026-10-30).
 216. Como integrante do EP, quero que soltar o cartão na própria coluna não grave nada.
 217. Como integrante do EP, quero que, ao mover, a etiqueta volte a A fazer, porque o trabalho da etapa nova ainda não começou.
 218. Como integrante do EP, quero passar a ser o responsável do processo que movo, em qualquer etapa, inclusive em Não iniciados e em Concluídos, porque quem move é quase sempre quem vai trabalhar nele.
@@ -1729,3 +1833,11 @@ Entregue em 2026-10-28 (commit 7ea4c43), com ressalva: critérios [visual] 4 a 7
 Entregue em 2026-10-28 (commit 31544ac), com ressalva: critérios [visual] 5 a 7 de cor-solida-do-setor presumidos no app real (vistos só numa página de teste com as folhas de estilo reais e marcação montada à mão; a tela com o login real não foi vista); revisão de segurança dispensada (só CSS e um módulo puro de cor, sem login, dado de fora ou banco)
 
 Entregue em 2026-10-29 (commit 9fc0201), com ressalva: critérios [visual] de repositorio-de-processos presumidos (nada visto com o login real; a árvore e o cabeçalho da Lista só na vitrine local com módulos falsos, sem captura de imagem); revisão de segurança foi a de reserva (menos completa: o /security-review não achou mudanças a revisar); migrações fim_do_arquivado e tirar_e_voltar_ao_quadro ainda sem aplicar no remoto de desenvolvimento e função arquivos-no-drive sem nova publicação; as ressalvas das entregas anteriores seguem valendo
+
+Entregue em 2026-10-30 (commit 7a02d80), com ressalva: critérios [visual] 14 a 17 presumidos (nada visto com o login real); revisão de segurança foi a de reserva (menos completa: o /security-review só viu documentação); conferência do cadastro aberto no painel do Supabase de desenvolvimento adiada (backlog); a Edge Function planilhas-dos-dashboards ainda precisa ser publicada de novo no desenvolvimento; pgTAP só no workflow "Testes de banco" (Docker indisponível); as ressalvas das entregas anteriores seguem valendo
+
+Ajuste de 2026-10-30 (sem banco): o campo "Nome" do Novo processo e do Editar passa a se chamar **Nome do Processo**; no cabeçalho da Lista, toda coluna mostra uma ▾ discreta (aria-hidden) avisando que abre o menu de ordenar e filtrar, e a coluna que ordena troca a ▾ por ▲ (crescente) ou ▼ (decrescente). O texto oculto para leitor de tela não muda; o cabeçalho de carregando segue sem menus.
+
+Entregue em 2026-10-30 (commit 2b785d5), com ressalva: critério [visual] 10 de lista-por-setor visto só em página local com módulos falsos (nada visto com o login real); revisão de segurança dispensada (a mudança só lê o parâmetro agrupar do endereço, sem login, dado pessoal, banco ou arquivos), com revisão de reserva por leitura; as ressalvas das entregas anteriores seguem valendo
+
+Em revisão desde 2026-10-30

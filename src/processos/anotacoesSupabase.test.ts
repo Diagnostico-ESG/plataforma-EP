@@ -82,7 +82,7 @@ test('o conflito não é erro: volta como resultado próprio', async () => {
 })
 
 const RECUSAS: [string, string, string | undefined, string][] = [
-  ['texto longo demais', 'anotacoes_longas:2001', 'P0001', 'As anotações têm 2.001 caracteres; o limite é 2.000.'],
+  ['texto longo demais', 'anotacoes_longas:8001', 'P0001', 'As anotações têm 8.001 caracteres; o limite é 8.000.'],
   ['perfil sem permissão', 'sem permissão para gravar as anotações', '42501', 'Seu perfil não permite alterar os processos.'],
 ]
 

@@ -38,15 +38,14 @@ function idDoCriado(data: { id: string }[] | null): string {
 
 function valoresDaEdicao(dados: DadosDoProcesso) {
   return {
-    setor_id: dados.setorId, macroprocesso_id: dados.macroprocessoId, nome: dados.nome, origem: dados.origem,
-    contexto: dados.contexto, observacoes: dados.observacoes,
+    setor_id: dados.setorId, macroprocesso_id: dados.macroprocessoId, nome: dados.nome,
   }
 }
 
-// Tipo, pai e Data da modelagem piloto só entram no cadastro: o tipo e o pai mudam depois pela reclassificação, e a data, no verso.
+// Tipo, pai e Anotações só entram no cadastro: o tipo muda depois pela reclassificação e as Anotações, pelo verso. A data da modelagem piloto não entra (o banco recusa
+// citar a coluna na criação): ela se registra depois, na linha da etapa.
 function valoresDoCadastro(dados: DadosDoProcesso) {
-  return { ...valoresDaEdicao(dados), tipo: dados.tipo, processo_pai_id: dados.processoPaiId,
-    data_da_modelagem_piloto: dados.dataDaModelagemPiloto ?? null }
+  return { ...valoresDaEdicao(dados), tipo: dados.tipo, processo_pai_id: dados.processoPaiId, anotacoes: dados.anotacoes ?? null }
 }
 
 // A RLS não acusa erro ao filtrar: sem linha afetada, a leitura decide entre perfil e processo que sumiu.

@@ -183,3 +183,9 @@
   font-size: var(--tam-secundario);
   overflow-wrap: anywhere;
 }
+
+/* A data da modelagem piloto na linha da etapa Modelagem piloto, recuada para ficar sob o nome da etapa (sinal de 16px + espaço). */
+.etapa-modelagem {
+  padding: 0 var(--esp-2) var(--esp-2) calc(var(--esp-2) + 16px + var(--esp-3));
+  color: var(--texto);
+}

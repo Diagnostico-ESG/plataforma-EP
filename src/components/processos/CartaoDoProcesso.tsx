@@ -21,7 +21,7 @@ type CartaoDoProcessoProps = {
   apagado: boolean
   /**
    * O cartão não repete o que a coluna já diz: fora do Quadro por etapa traz a barra da etapa; por responsável dispensa o
-   * avatar e o selo Sem responsável; por setor dispensa a faixa, porque a cor do setor está na coluna.
+   * avatar; por setor dispensa a faixa, porque a cor do setor está na coluna.
    */
   agrupar: AgruparQuadroPor
   /** As etapas do catálogo: o selo de relatório pendente compara a posição da etapa atual com a da Revisão interna. */
@@ -47,7 +47,7 @@ export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagad
       {agrupar !== 'setor' && <FaixaDoCartao processo={processo} />}
       <span className="cartao-nome">{nome}</span>
       {agrupar !== 'etapa' && <BarraDeProgresso processo={processo} />}
-      <SelosDoCartao processo={processo} hoje={hojeEmBrasilia()} etapas={etapas} semSeloDeResponsavel={porResponsavel} />
+      <SelosDoCartao processo={processo} hoje={hojeEmBrasilia()} etapas={etapas} />
       <span className="cartao-rodape">
         <span className="cartao-pilulas">
           {tipo !== 'processo' && <Pilula situacao="neutra">{ROTULO_DO_TIPO[tipo]}</Pilula>}
@@ -69,5 +69,5 @@ function classesDoCartao(processo: ProcessoDaLista, apagado: boolean): string {
 
 /** No rodapé: o avatar de quem cuida do processo. */
 function QuemCuida({ responsavel }: { responsavel: ProcessoDaLista['responsavel'] }) {
-  return responsavel && <Avatar nome={responsavel.nome} fotoUrl={responsavel.fotoUrl ?? undefined} tamanho={20} />
+  return responsavel && <Avatar nome={responsavel.nome} fotoUrl={responsavel.fotoUrl ?? undefined} tamanho={24} />
 }

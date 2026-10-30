@@ -47,6 +47,29 @@ const DESENHOS = {
   ),
   documento: <path d="M6 3h8l5 5v13H6zM14 3v5h5" />,
   baixar: <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />,
+  // Os ícones dos arquivos da árvore: a folha é a mesma do "documento"; o que muda é o sinal dentro dela.
+  arquivo: <path d="M6 3h8l5 5v13H6zM14 3v5h5" />,
+  arquivoRelatorio: <path d="M6 3h8l5 5v13H6zM14 3v5h5M9 13h6M9 17h6" />,
+  arquivoBpmn: (
+    <>
+      <path d="M6 3h8l5 5v13H6zM14 3v5h5" />
+      <circle cx="9" cy="15" r="1.5" />
+      <circle cx="15" cy="15" r="1.5" />
+      <path d="M10.5 15h3" />
+    </>
+  ),
+  arquivoBpm: (
+    <>
+      <path d="M6 3h8l5 5v13H6zM14 3v5h5" />
+      <rect x="9" y="12" width="6" height="5" rx="1" />
+    </>
+  ),
+  arquivoImagem: (
+    <>
+      <path d="M6 3h8l5 5v13H6zM14 3v5h5" />
+      <path d="M8.5 18l2.5-3 2 2 1.5-1.5 2 2.5" />
+    </>
+  ),
   rodadas: <path d="M4 12a8 8 0 0 1 14-5.3M18 3v4h-4M20 12a8 8 0 0 1-14 5.3M6 21v-4h4" />,
   // O "⋯" dos menus de ações: três pontos cheios, mais legíveis que o traço fino.
   reticencias: (

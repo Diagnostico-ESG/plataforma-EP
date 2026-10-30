@@ -15,7 +15,7 @@ afterEach(() => {
 
 const secao = async () => {
   const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-  return within(await painel.findByRole('region', { name: 'Arquivos' }))
+  return within(await painel.findByRole('region', { name: 'Documentos do Mapeamento' }))
 }
 
 const comSituacao = (situacao: SituacaoDoProcesso) => ({

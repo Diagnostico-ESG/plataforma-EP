@@ -83,7 +83,7 @@
 }
 
 /* Sobre */
-/* Os campos curtos lado a lado; contexto e observações ocupam a linha toda. */
+/* Os campos curtos lado a lado. */
 .sobre-lista {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -91,9 +91,6 @@
   margin: 0;
 }
 
-.sobre-dado-longo {
-  grid-column: 1 / -1;
-}
 
 .sobre-dado dt {
   color: var(--texto-2);
@@ -106,18 +103,7 @@
   overflow-wrap: anywhere;
 }
 
-.texto-que-se-abre {
-  margin: 0;
-  white-space: pre-line;
-}
 
-.texto-cortado {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
-  line-clamp: 4;
-}
 
 /* Estrutura */
 .estrutura-lista {

@@ -23,7 +23,6 @@ import { EstruturaDoProcesso } from './EstruturaDoProcesso'
 import { FormularioDoProcesso } from './FormularioDoProcesso'
 import { HistoricoDoProcesso } from './HistoricoDoProcesso'
 import { JanelaDoVerso } from './JanelaDoVerso'
-import { DataDaModelagemPiloto } from './DataDaModelagemPiloto'
 import { SobreDoProcesso } from './SobreDoProcesso'
 import { VersoCarregando } from './VersoCarregando'
 
@@ -200,7 +199,7 @@ function EdicaoDoProcesso({ processo, processos, cadastros, aoVoltar, aposMudar,
   )
 }
 
-/** Trabalho à esquerda (etapas e arquivos), contexto à direita (Data da modelagem piloto, dados e estrutura). */
+/** Trabalho à esquerda (etapas e arquivos), contexto à direita (anotações, dados e estrutura). */
 function ColunasDoVerso(props: CorpoProps) {
   const { processo, processos, versoes, revisoes, podeAlterar, usuarioId, executar, aposMudar, aoSumir, enderecoDoProcesso } = props
   const registros = useRegistrosDoProcesso(revisoes, processo.id, processo.etapaAtual?.id)
@@ -217,8 +216,6 @@ function ColunasDoVerso(props: CorpoProps) {
       <div className="verso-contexto">
         <BlocoDasAnotacoes key={processo.id} processo={processo} processos={processos} podeEscrever={podeAlterar}
           guardaRef={props.saida.guarda} aoSumir={aoSumir} />
-        <DataDaModelagemPiloto processo={processo} processos={processos} podeAlterar={podeAlterar} aoMudar={aposMudar}
-          aoSumir={aoSumir} />
         <SobreDoProcesso processo={processo} />
         <EstruturaDoProcesso processo={processo} enderecoDoProcesso={enderecoDoProcesso}
           aoAbrir={(endereco) => props.saida.sair(() => { window.location.hash = endereco })} />

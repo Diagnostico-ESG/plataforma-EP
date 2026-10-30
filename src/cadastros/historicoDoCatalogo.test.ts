@@ -39,3 +39,13 @@ describe('catálogo de etapas no histórico', () => {
     expect(descreverEstadoDoCadastro(antigo)).not.toContain('Fase')
   })
 })
+
+describe('responsável inicial da etapa no histórico', () => {
+  test('aparece pelo nome, "Ninguém" para o vazio, e o id fica escondido', () => {
+    const antes = { ...ETAPA, responsavel_inicial_id: null, responsavel_inicial_nome: null }
+    const depois = { ...ETAPA, responsavel_inicial_id: 'u1', responsavel_inicial_nome: 'Ana Teste' }
+    expect(descreverEstadoDoCadastro(antes)).toContain('Responsável inicial: Ninguém')
+    expect(descreverEstadoDoCadastro(depois)).toContain('Responsável inicial: Ana Teste')
+    expect(descreverEstadoDoCadastro(depois)).not.toContain('u1')
+  })
+})

@@ -1,6 +1,5 @@
 import type { ReactNode, RefObject } from 'react'
-import { corDoMacroprocesso } from '../../processos/corDoMacroprocesso'
-import { ROTULO_DA_SITUACAO, ROTULO_DO_TIPO } from '../../processos/rotulos'
+import { ROTULO_DA_SITUACAO } from '../../processos/rotulos'
 import type { ProcessoLido, SituacaoDoProcesso } from '../../processos/tipos'
 import { Icone } from '../Icone'
 import { Pilula, type SituacaoPilula } from '../Pilula'
@@ -27,13 +26,6 @@ export function CabecalhoDoVerso({ processo, titulo, acoes, aoFechar }: Cabecalh
       <SeloDoSetor sigla={processo.setorSigla} cor={processo.setorCor ?? 1} className="verso-selo-do-setor" />
       <div className="verso-identificacao">
         <h2 ref={titulo} tabIndex={-1} className="verso-titulo">{processo.nome}</h2>
-        <p className="verso-subtitulo">
-          <span className="verso-cor-do-macroprocesso" aria-hidden="true"
-            style={{ background: corDoMacroprocesso(processo.macroprocessoId) }} />
-          <span>{processo.macroprocessoNome}</span>
-          <span aria-hidden="true">·</span>
-          <span>{ROTULO_DO_TIPO[processo.tipo]}</span>
-        </p>
       </div>
       <div className="verso-ferramentas">
         {pilula && <Pilula situacao={pilula}>{ROTULO_DA_SITUACAO[processo.situacao]}</Pilula>}

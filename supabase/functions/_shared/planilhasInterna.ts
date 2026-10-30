@@ -30,7 +30,7 @@ function linhaDoProcesso(analisado: ProcessoAnalisado, pacote: PacoteDasPlanilha
     dataDaModelagemPiloto(processo, fases),
     dataDaPublicacao(processo),
     rotuloDaVersao(processo.ultima_versao),
-    processo.observacoes ?? '',
+    '', // Observações: a coluna fica para os painéis do Data Studio, mas a plataforma já não guarda o texto.
   ]
 }
 

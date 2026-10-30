@@ -15,6 +15,8 @@ export function fraseDaEtapaComProcessos(nome: string, quantidade: number | stri
   return `A etapa ${nome} tem ${dentro} antes de ${acao}.`
 }
 
+export const FRASE_DO_RESPONSAVEL_EM_CONCLUIDOS = 'Concluídos não tem responsável inicial: o processo concluído não tem mais quem cuide dele.'
+
 export const FRASE_DAS_ETAPAS_FIXAS = 'As etapas Não iniciados e Concluídos não mudam de nome nem de lugar e não saem do catálogo.'
 
 export function fraseDeNomeRepetido(nome: string): string {

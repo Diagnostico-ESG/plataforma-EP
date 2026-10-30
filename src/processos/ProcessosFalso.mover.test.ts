@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { CATALOGO_DE_TESTE, umProcessoLido } from '../testes/processoDaLista'
+import { comResponsavelInicial } from '../testes/responsavelInicialDeTeste'
 import { ProcessosFalso } from './ProcessosFalso'
 import { hojeLocal } from './textoDaModelagemPiloto'
 import type { DadosDaChegada, DadosDoProcesso, ProcessoLido } from './tipos'
@@ -14,7 +15,6 @@ function falso(...processos: ProcessoLido[]): ProcessosFalso {
   modulo.etapasDoCatalogo = CATALOGO_DE_TESTE
   modulo.processos = processos.length ? processos : [umProcessoLido('Emitir Ofício', { id: 'p1' })]
   modulo.usuariosPossiveis = [ANA, BIA]
-  modulo.quemChama = BIA
   return modulo
 }
 
@@ -25,11 +25,19 @@ async function falhaDe(promessa: Promise<void>): Promise<Error> {
 }
 
 const DADOS: DadosDoProcesso = {
-  nome: 'Novo Processo', setorId: 's1', macroprocessoId: 'm1', tipo: 'processo', processoPaiId: null, origem: 'novo',
-  contexto: null, observacoes: null,
+  nome: 'Novo Processo', setorId: 's1', macroprocessoId: 'm1', tipo: 'processo', processoPaiId: null,
 }
 
+const INICIAL_BIA = { id: 'u2', nome: 'Bia Teste', fotoUrl: null, ativo: true, perfil: 'integrante_ep' as const }
+
 describe('cadastro', () => {
+  test('entra em Não iniciados com o responsável inicial dela, ou sem responsável', async () => {
+    const modulo = falso()
+    expect((await lido(modulo, await modulo.criarProcesso(DADOS))).responsavel).toBeNull()
+    comResponsavelInicial(modulo, 'nao_iniciados', INICIAL_BIA)
+    expect((await lido(modulo, await modulo.criarProcesso({ ...DADOS, nome: 'Outro' }))).responsavel).toMatchObject({ id: 'u2', nome: 'Bia Teste' })
+  })
+
   test('o processo novo entra em Não iniciados, com A fazer e sem responsável', async () => {
     const modulo = falso()
     const id = await modulo.criarProcesso(DADOS)
@@ -40,12 +48,50 @@ describe('cadastro', () => {
   })
 })
 
+describe('mover e o responsável inicial', () => {
+  test('o processo chega com o responsável inicial do destino, não com quem moveu', async () => {
+    const modulo = falso(umProcessoLido('Emitir Ofício', { id: 'p1', etiqueta: 'concluido', responsavel: { ...ANA, fotoUrl: null } }))
+    comResponsavelInicial(modulo, 'aprovacao_setor', INICIAL_BIA)
+    await modulo.moverProcesso('p1', idDa('aprovacao_setor'))
+    expect(await lido(modulo)).toMatchObject({ etapaAtual: { codigo: 'aprovacao_setor' }, etiqueta: 'a_fazer', responsavel: { id: 'u2' } })
+  })
+
+  test('etapa sem responsável inicial deixa o processo sem responsável', async () => {
+    const modulo = falso(umProcessoLido('Emitir Ofício', { id: 'p1', responsavel: { ...ANA, fotoUrl: null } }))
+    await modulo.moverProcesso('p1', idDa('aprovacao_setor'))
+    expect((await lido(modulo)).responsavel).toBeNull()
+  })
+
+  test('responsável inicial inativo ou em Consulta não impede o movimento: o processo fica sem responsável', async () => {
+    const modulo = falso(umProcessoLido('Emitir Ofício', { id: 'p1', responsavel: { ...ANA, fotoUrl: null } }))
+    comResponsavelInicial(modulo, 'aprovacao_setor', { ...INICIAL_BIA, ativo: false })
+    await modulo.moverProcesso('p1', idDa('aprovacao_setor'))
+    expect((await lido(modulo)).responsavel).toBeNull()
+    comResponsavelInicial(modulo, 'publicacao', { ...INICIAL_BIA, perfil: 'consulta' })
+    await modulo.moverProcesso('p1', idDa('publicacao'))
+    expect((await lido(modulo)).responsavel).toBeNull()
+  })
+
+  test('Concluídos deixa sem responsável', async () => {
+    const modulo = falso(umProcessoLido('Emitir Ofício', { id: 'p1', responsavel: { ...ANA, fotoUrl: null } }))
+    await modulo.moverProcesso('p1', idDa('concluidos'), { dataDaPublicacao: null, linkDaPublicacao: null, explicacao: 'Sem publicação' })
+    expect((await lido(modulo)).responsavel).toBeNull()
+  })
+
+  test('mover para a própria etapa não muda nada, nem o responsável', async () => {
+    const modulo = falso(umProcessoLido('Emitir Ofício', { id: 'p1', responsavel: { ...ANA, fotoUrl: null } }))
+    comResponsavelInicial(modulo, 'revisao_interna', INICIAL_BIA)
+    await modulo.moverProcesso('p1', idDa('revisao_interna'))
+    expect((await lido(modulo)).responsavel).toMatchObject({ id: 'u1' })
+  })
+})
+
 describe('mover', () => {
-  test('para a frente: a etapa muda, a etiqueta volta a A fazer e quem moveu vira o responsável', async () => {
+  test('para a frente: a etapa muda e a etiqueta volta a A fazer', async () => {
     const modulo = falso(umProcessoLido('Emitir Ofício', { id: 'p1', etiqueta: 'concluido', responsavel: { ...ANA, fotoUrl: null } }))
     await modulo.moverProcesso('p1', idDa('aprovacao_setor'))
     expect(await lido(modulo)).toMatchObject({
-      etapaAtual: { codigo: 'aprovacao_setor', posicao: 6, total: 8 }, etiqueta: 'a_fazer', responsavel: { id: 'u2', nome: 'Bia Teste' },
+      etapaAtual: { codigo: 'aprovacao_setor', posicao: 6, total: 8 }, etiqueta: 'a_fazer',
       entrouNaEtapaEm: hojeLocal(),
     })
   })

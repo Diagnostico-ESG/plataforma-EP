@@ -1,7 +1,6 @@
 import { type FormEvent, useState } from 'react'
 import { textoDaFalhaNoFormulario } from '../../acesso/falhasDeGravacao'
 import type { ModuloDeCadastros } from '../../cadastros/tipos'
-import { hojeEmBrasilia } from '../../lib/datas'
 import type { DadosDoProcesso, ProcessoLido } from '../../processos/tipos'
 import { type CamposDoProcesso, dadosDoProcesso, problemaNoProcesso } from '../../processos/validacaoDoProcesso'
 import { AvisoDeSetorIncluido } from './AvisoDeSetorIncluido'
@@ -16,18 +15,15 @@ type FormularioProntoProps = {
   aoCancelar: () => void
 }
 
-// O processo nasce, no caso mais comum, da reunião com o setor: a Data da modelagem piloto já vem com o dia de hoje.
 const camposEmBranco = (): CamposDoProcesso => ({
-  nome: '', setorId: '', macroprocessoId: '', tipo: 'a_classificar', processoPaiId: '', origem: 'novo', contexto: '',
-  observacoes: '', dataDaModelagemPiloto: hojeEmBrasilia(),
+  nome: '', setorId: '', macroprocessoId: '', tipo: 'a_classificar', processoPaiId: '', anotacoes: '',
 })
 
 function camposIniciais(inicial?: ProcessoLido): CamposDoProcesso {
   if (!inicial) return camposEmBranco()
   return {
     nome: inicial.nome, setorId: inicial.setorId, macroprocessoId: inicial.macroprocessoId,
-    tipo: inicial.tipo, processoPaiId: inicial.processoPaiId ?? '', origem: inicial.origem,
-    contexto: inicial.contexto ?? '', observacoes: inicial.observacoes ?? '', dataDaModelagemPiloto: '',
+    tipo: inicial.tipo, processoPaiId: inicial.processoPaiId ?? '', anotacoes: '',
   }
 }
 
@@ -57,12 +53,18 @@ export function FormularioPronto({ cadastros, opcoes, titulo, inicial, aoSalvar,
     setEnviando(false)
   }
 
+  // Qualquer mudança de campo apaga a recusa; ela volta, se for o caso, no próximo envio.
+  function mudar(mudanca: Partial<CamposDoProcesso>) {
+    setAviso(null)
+    setCampos((atuais) => comMacroprocessoDoPai({ ...atuais, ...mudanca }, opcoes.pais))
+  }
+
   const setor = opcoes.setores.find((outro) => outro.id === campos.setorId)
   const macroprocesso = opcoes.macroprocessos.find((outro) => outro.id === campos.macroprocessoId)
   return (
     <form className="formulario-do-processo" aria-label={titulo} noValidate onSubmit={enviar}>
       <CamposDoFormulario campos={campos} opcoes={opcoes} cadastrando={!inicial}
-        aoMudar={(mudanca) => setCampos((atuais) => comMacroprocessoDoPai({ ...atuais, ...mudanca }, opcoes.pais))} />
+        aoMudar={mudar} />
       {setor && macroprocesso && (
         <AvisoDeSetorIncluido key={macroprocesso.id} cadastros={cadastros} setorId={setor.id} setorSigla={setor.sigla}
           macroprocessoId={macroprocesso.id} macroprocessoNome={macroprocesso.nome} />

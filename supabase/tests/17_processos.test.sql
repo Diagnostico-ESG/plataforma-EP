@@ -88,7 +88,7 @@ begin
   else
     insert into _tap (linha) select throws_ok(inclusao, '42501', null, quem || ' não cria processo');
   end if;
-  with alteradas as (update public.processos set contexto = 'Contexto Novo'
+  with alteradas as (update public.processos set nome = nome
     where nome = 'Processo Semente ' || sigla_do_setor returning 1)
   insert into _tap (linha) select is((select count(*)::int from alteradas), case when altera then 1 else 0 end,
     quem || case when altera then ' altera o processo' else ' não altera o processo' end);
@@ -144,7 +144,7 @@ insert into _tap (linha) select throws_ok(
     values ('5e000000-0000-0000-0000-000000000003', 'ab000000-0000-0000-0000-000000000001', 'Processo Visitante')$sql$,
   '42501', null, 'Visitante não cria processo');
 insert into _tap (linha) select throws_ok(
-  $sql$update public.processos set contexto = 'Trocado'$sql$, '42501', null, 'Visitante não altera processo');
+  $sql$update public.processos set nome = 'Trocado'$sql$, '42501', null, 'Visitante não altera processo');
 insert into _tap (linha) select throws_ok(
   $sql$delete from public.processos$sql$, '42501', null, 'Visitante não apaga processo');
 reset role;
@@ -207,7 +207,7 @@ insert into _tap (linha) select is(
   jsonb_build_object('antes', null, 'depois', jsonb_build_object(
     'nome', 'Emitir Oficio', 'setor_id', '5e000000-0000-0000-0000-000000000004', 'setor_sigla', 'TRS',
     'macroprocesso_id', 'ab000000-0000-0000-0000-000000000002', 'macroprocesso_nome', 'Macro Teste B',
-    'tipo', 'a_classificar', 'origem', 'novo', 'situacao', 'em_andamento', 'contexto', null, 'observacoes', null,
+    'tipo', 'a_classificar', 'situacao', 'em_andamento',
     'data_da_modelagem_piloto', null)),
   'criar gera o evento com os campos legíveis');
 insert into _tap (linha) select is(
@@ -227,7 +227,7 @@ insert into _tap (linha) select is(
     from public.eventos where entidade = 'processo' and acao = 'editar'
       and detalhes -> 'depois' ->> 'setor_sigla' = 'TRS'),
   'Macro Teste B > Macro Teste C', 'editar gera o evento com o macroprocesso de antes e de depois');
-update public.processos set contexto = contexto where setor_id = '5e000000-0000-0000-0000-000000000004';
+update public.processos set nome = nome where setor_id = '5e000000-0000-0000-0000-000000000004';
 insert into _tap (linha) select is(
   (select count(*)::int from public.eventos where entidade = 'processo'
     and detalhes -> 'depois' ->> 'setor_sigla' = 'TRS'),

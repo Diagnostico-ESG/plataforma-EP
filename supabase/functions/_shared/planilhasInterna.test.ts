@@ -73,12 +73,11 @@ describe('montarPlanilhaInterna: aba Processos', () => {
     expect(linhaDoProcesso('Sub')[8]).toBe('')
   })
 
-  it('as observações do processo vão só nesta aba; sem observação, vazio', () => {
-    expect(linhaDoProcesso('Comum')[9]).toBe('Obs inventada')
-    expect(linhaDoProcesso('Sub')[9]).toBe('')
-    expect(fases.linhas.flat()).not.toContain('Obs inventada')
-  })
-})
+  it('a coluna Observações tem o cabeçalho e sai sempre vazia, mesmo com observação num pacote antigo', () => {
+    expect(processos.linhas[0][9]).toBe('Observações')
+    expect(processos.linhas.slice(1).map((linha) => linha[9])).toEqual(processos.linhas.slice(1).map(() => ''))
+    expect(JSON.stringify(abas)).not.toContain('Obs inventada')
+  })})
 
 describe('montarPlanilhaInterna: aba Fases', () => {
   it('o cabeçalho tem as colunas combinadas', () => {

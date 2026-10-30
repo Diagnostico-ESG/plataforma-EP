@@ -1,8 +1,9 @@
 import { useId } from 'react'
 import type { Macroprocesso, Setor } from '../../cadastros/tipos'
+import { LIMITE_DAS_ANOTACOES } from '../../processos/anotacoes'
 import { corDoMacroprocesso } from '../../processos/corDoMacroprocesso'
-import { ROTULO_DA_ORIGEM, ROTULO_DO_TIPO } from '../../processos/rotulos'
-import type { OrigemDoProcesso, ProcessoDaLista, TipoDeProcesso } from '../../processos/tipos'
+import { ROTULO_DO_TIPO } from '../../processos/rotulos'
+import type { ProcessoDaLista, TipoDeProcesso } from '../../processos/tipos'
 import type { CamposDoProcesso } from '../../processos/validacaoDoProcesso'
 import { BotaoDaCaixa, OpcaoDaCaixa } from '../OpcaoDaCaixa'
 
@@ -12,12 +13,11 @@ export type OpcoesDoProcesso = { setores: Setor[]; macroprocessos: Macroprocesso
 type CamposDoFormularioProps = {
   campos: CamposDoProcesso
   opcoes: OpcoesDoProcesso
-  /** Tipo, pai e Data da modelagem piloto só se escolhem no cadastro: o tipo e o pai mudam depois pela reclassificação, a data no verso. */
+  /** Tipo e pai só se escolhem no cadastro: mudam depois pela reclassificação. */
   cadastrando: boolean
   aoMudar: (mudanca: Partial<CamposDoProcesso>) => void
 }
 
-const ORIGENS: OrigemDoProcesso[] = ['novo', 'retomado']
 const TIPOS: TipoDeProcesso[] = ['processo', 'subprocesso', 'a_classificar']
 
 /**
@@ -28,7 +28,7 @@ export function CamposDoFormulario({ campos, opcoes, cadastrando, aoMudar }: Cam
   const id = useId()
   return (
     <>
-      <label htmlFor={`${id}-nome`}>Nome</label>
+      <label htmlFor={`${id}-nome`}>Nome do Processo</label>
       <input id={`${id}-nome`} aria-required="true" value={campos.nome} maxLength={200} autoComplete="off"
         onChange={(evento) => aoMudar({ nome: evento.target.value })} />
       <label htmlFor={`${id}-setor`}>Setor</label>
@@ -44,24 +44,13 @@ export function CamposDoFormulario({ campos, opcoes, cadastrando, aoMudar }: Cam
       {cadastrando && campos.tipo === 'subprocesso' && (
         <CampoDoPai id={id} valor={campos.processoPaiId} pais={opcoes.pais} aoMudar={aoMudar} />
       )}
-      <label htmlFor={`${id}-origem`}>Origem</label>
-      <select id={`${id}-origem`} value={campos.origem}
-        onChange={(evento) => aoMudar({ origem: evento.target.value as OrigemDoProcesso })}>
-        {ORIGENS.map((origem) => <option key={origem} value={origem}>{ROTULO_DA_ORIGEM[origem]}</option>)}
-      </select>
       {cadastrando && (
         <>
-          <label htmlFor={`${id}-data`}>Data da modelagem piloto</label>
-          <input id={`${id}-data`} type="date" value={campos.dataDaModelagemPiloto}
-            onChange={(evento) => aoMudar({ dataDaModelagemPiloto: evento.target.value })} />
+          <label htmlFor={`${id}-anotacoes`}>Anotações</label>
+          <textarea id={`${id}-anotacoes`} value={campos.anotacoes} maxLength={LIMITE_DAS_ANOTACOES} rows={3}
+            onChange={(evento) => aoMudar({ anotacoes: evento.target.value })} />
         </>
       )}
-      <label htmlFor={`${id}-contexto`}>Contexto</label>
-      <textarea id={`${id}-contexto`} value={campos.contexto} maxLength={4000} rows={3}
-        onChange={(evento) => aoMudar({ contexto: evento.target.value })} />
-      <label htmlFor={`${id}-observacoes`}>Observações</label>
-      <textarea id={`${id}-observacoes`} value={campos.observacoes} maxLength={2000} rows={3}
-        onChange={(evento) => aoMudar({ observacoes: evento.target.value })} />
     </>
   )
 }

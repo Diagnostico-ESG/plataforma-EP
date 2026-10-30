@@ -1,8 +1,10 @@
 import { act, renderHook } from '@testing-library/react'
 import { expect, test } from 'vitest'
-import { montarArvore } from '../processos/arvoreDaLista'
+import { montarArvore, montarArvorePorSetor } from '../processos/arvoreDaLista'
 import type { LinhaDaLista } from '../processos/linhasDaLista'
-import { chaveDoMacro, chaveDoSetor, useAbertosDaArvore } from './useAbertosDaArvore'
+import {
+  chaveDoMacro, chaveDoMacroNoSetor, chaveDoSetor, chaveDoSetorRaiz, estruturaPorMacro, estruturaPorSetor, useAbertosDaArvore,
+} from './useAbertosDaArvore'
 
 function linha(id: string, setorId = 's1'): LinhaDaLista {
   return {
@@ -12,10 +14,10 @@ function linha(id: string, setorId = 's1'): LinhaDaLista {
 }
 
 const LINHAS = [linha('p1'), linha('p2', 's2')]
-const ARVORE = montarArvore(LINHAS, LINHAS, [])
+const ESTRUTURA = estruturaPorMacro(montarArvore(LINHAS, LINHAS, []))
 
 test('macros e setores abrem por padrão; os processos, fechados', () => {
-  const { result } = renderHook(() => useAbertosDaArvore(ARVORE))
+  const { result } = renderHook(() => useAbertosDaArvore(ESTRUTURA))
   expect(result.current.grupoAberto(chaveDoMacro('m1'))).toBe(true)
   expect(result.current.grupoAberto(chaveDoSetor('m1', 's1'))).toBe(true)
   expect(result.current.processoAberto('p1')).toBe(false)
@@ -23,7 +25,7 @@ test('macros e setores abrem por padrão; os processos, fechados', () => {
 })
 
 test('alternar um processo diz se ele ficou aberto; alternar um grupo o fecha', () => {
-  const { result } = renderHook(() => useAbertosDaArvore(ARVORE))
+  const { result } = renderHook(() => useAbertosDaArvore(ESTRUTURA))
   let ficouAberto = false
   act(() => { ficouAberto = result.current.alternarProcesso('p1') })
   expect(ficouAberto).toBe(true)
@@ -35,7 +37,7 @@ test('alternar um processo diz se ele ficou aberto; alternar um grupo o fecha', 
 })
 
 test('abrir tudo devolve os processos e abre todos os níveis; fechar tudo fecha macros, setores e processos', () => {
-  const { result } = renderHook(() => useAbertosDaArvore(ARVORE))
+  const { result } = renderHook(() => useAbertosDaArvore(ESTRUTURA))
   let ids: string[] = []
   act(() => { ids = result.current.abrirTudo() })
   expect(ids).toEqual(['p1', 'p2'])
@@ -45,4 +47,19 @@ test('abrir tudo devolve os processos e abre todos os níveis; fechar tudo fecha
   expect(result.current.grupoAberto(chaveDoSetor('m1', 's2'))).toBe(false)
   expect(result.current.processoAberto('p2')).toBe(false)
   expect(result.current.tudoAberto).toBe(false)
+})
+
+test('na árvore por Setor, setores e macroprocessos abrem por padrão e abrir/fechar tudo cobre todos os níveis', () => {
+  const { result } = renderHook(() => useAbertosDaArvore(estruturaPorSetor(montarArvorePorSetor(LINHAS, LINHAS, []))))
+  expect(result.current.grupoAberto(chaveDoSetorRaiz('s1'))).toBe(true)
+  expect(result.current.grupoAberto(chaveDoMacroNoSetor('s2', 'm1'))).toBe(true)
+  expect(result.current.processoAberto('p1')).toBe(false)
+  let ids: string[] = []
+  act(() => { ids = result.current.abrirTudo() })
+  expect(ids).toEqual(['p1', 'p2'])
+  expect(result.current.tudoAberto).toBe(true)
+  act(() => result.current.fecharTudo())
+  expect(result.current.grupoAberto(chaveDoSetorRaiz('s1'))).toBe(false)
+  expect(result.current.grupoAberto(chaveDoMacroNoSetor('s2', 'm1'))).toBe(false)
+  expect(result.current.processoAberto('p2')).toBe(false)
 })

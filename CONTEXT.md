@@ -105,7 +105,7 @@ A etapa do catálogo em que o processo está. Todo processo está em exatamente 
 _Avoid_: etapa corrente, passo atual, status da etapa
 
 **Mover**:
-Levar o processo para qualquer etapa do catálogo, para a frente ou para trás, pela lista de etapas ou arrastando o cartão, sem motivo e sem trava de sequência. A combinação da equipe decide quando mover, não a plataforma. Ao mover, a etiqueta volta a A fazer. Cada mudança fica no histórico.
+Levar o processo para qualquer etapa do catálogo, para a frente ou para trás, pela lista de etapas ou arrastando o cartão, sem motivo e sem trava de sequência. A combinação da equipe decide quando mover, não a plataforma. Ao mover, a etiqueta volta a A fazer e o responsável passa a ser o responsável inicial da etapa de destino, ou ninguém. Cada mudança fica no histórico.
 _Avoid_: avançar, voltar a uma etapa, concluir a etapa, iniciar a etapa, dispensar
 
 **Etiqueta**:
@@ -117,11 +117,15 @@ Processo em andamento que está na mesma etapa há mais de 7 dias, contados de q
 _Avoid_: atrasado, vencido, esquecido
 
 **Responsável do processo**:
-Usuário (Administrador ou Integrante do EP) que cuida do processo agora; um só por processo, não por etapa. Quem move o processo, para qualquer etapa, passa a ser o responsável; depois, qualquer integrante pode trocá-lo por outro ou por ninguém. O histórico guarda quem esteve com o processo em cada etapa. A plataforma não guarda os contatos dos setores.
+Usuário (Administrador ou Integrante do EP) que cuida do processo agora; um só por processo, não por etapa. Ao chegar a uma etapa (no cadastro, em Não iniciados, ou ao ser movido), o processo fica com o responsável inicial dela, ou sem responsável se ela não tiver; quem move não vira responsável por mover. Depois, qualquer integrante pode trocá-lo por outro ou por ninguém, ou assumir. O histórico guarda quem esteve com o processo em cada etapa. A plataforma não guarda os contatos dos setores.
 _Avoid_: responsável da etapa, dono, executor
 
+**Responsável inicial**:
+Usuário (Administrador ou Integrante do EP ativo) que o Administrador define, no Catálogo de etapas, para uma etapa: o processo que chega a ela fica com ele. Opcional; Concluídos não tem, e o processo que chega a Concluídos fica sem responsável. Se o responsável inicial deixar de estar ativo ou de ter um desses perfis, o processo que chega à etapa fica sem responsável, e o Catálogo mostra o problema para o Administrador trocá-lo.
+_Avoid_: responsável padrão, responsável da etapa, dono da etapa
+
 **Situação do processo**:
-Em andamento, suspenso, cancelado ou concluído. Suspender, cancelar e **retomar** exigem motivo; suspenso e cancelado congelam a etapa, a etiqueta e o responsável, e retomar devolve o processo à mesma etapa. Concluído não se marca: é o processo que está em Concluídos. Suspensos e cancelados ficam fora das planilhas dos dashboards. O cancelado não aparece em nenhuma visualização, só na Lista, quando se pede para mostrar os cancelados.
+Em andamento, suspenso, cancelado ou concluído. Suspender, cancelar e **retomar** exigem motivo; suspenso e cancelado congelam a etapa, a etiqueta e o responsável, e retomar devolve o processo à mesma etapa, com o responsável inicial dela, ou sem responsável. Concluído não se marca: é o processo que está em Concluídos. Suspensos e cancelados ficam fora das planilhas dos dashboards. O cancelado não aparece em nenhuma visualização, só na Lista, quando se pede para mostrar os cancelados.
 _Avoid_: status do processo, estado
 
 **Concluídos**:
@@ -141,8 +145,8 @@ Informar a data em que o processo foi publicado (com o link, se houver), na etap
 _Avoid_: publicar depois, republicar
 
 **Anotações**:
-Texto livre e único de um processo (cada subprocesso tem o seu), escrito pela equipe e guardado sozinho enquanto se escreve, sem histórico das versões anteriores. Administrador e Integrante do EP escrevem; Consulta só lê. Não sai da plataforma: fica fora dos dashboards.
-_Avoid_: observações, notas, comentários
+Texto livre e único de um processo (cada subprocesso tem o seu), escrito pela equipe já no cadastro ou depois, e guardado sozinho enquanto se escreve, sem histórico das versões anteriores. É o lugar do contexto do processo e de qualquer observação: não há outro texto livre no processo. Administrador e Integrante do EP escrevem; Consulta só lê. Não sai da plataforma: fica fora dos dashboards.
+_Avoid_: observações, contexto, notas, comentários
 
 **Reclassificação**:
 Mudança do tipo de um item (processo, subprocesso ou a classificar), com motivo, que preserva o mesmo item com tudo o que ele já tem.
@@ -155,8 +159,8 @@ A primeira etapa de trabalho de todo processo, logo depois de Não iniciados: o 
 _Avoid_: reunião de modelagem, oficina, workshop
 
 **Data da modelagem piloto**:
-Dia em que o EP se reúne com o setor para a Modelagem piloto de um processo, guardado no próprio processo. Opcional; o cadastro já a sugere com a data de hoje. Pode ser marcada antes de acontecer: a data diz se é próxima ou realizada. Um encontro que trata vários processos é marcado em cada um. Não move o processo nem muda a etiqueta. Participantes, local e anotações do encontro ficam fora: o que for preciso registrar vai nas Anotações do processo.
-_Avoid_: reunião, data da reunião, encontro, agenda, oficina
+Dia em que a Modelagem piloto de um processo aconteceu, registrado na própria etapa Modelagem piloto, depois do fato, quando o processo está nela ou numa etapa depois dela no catálogo: nunca no futuro, e a plataforma não guarda data agendada. Opcional, uma por processo. Um encontro que trata vários processos é registrado em cada um. Não move o processo nem muda a etiqueta. Participantes, local e anotações do encontro ficam fora: o que for preciso registrar vai nas Anotações do processo.
+_Avoid_: data agendada, reunião, data da reunião, encontro, agenda, oficina
 
 ## Documentos
 

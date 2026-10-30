@@ -22,7 +22,7 @@ type SecaoDeVersoesProps = {
 }
 
 /**
- * Seção "Arquivos" do verso (as versões do processo e do subprocesso): a mais recente em destaque e as anteriores
+ * Seção "Documentos do Mapeamento" do verso (as versões do processo e do subprocesso): a mais recente em destaque e as anteriores
  * recolhidas. O envio de versão que cabe na etapa atual (histórica, piloto ou em sequência), o relatório (sozinho, na técnica e
  * na Revisão interna) e acrescentar o .png ou o .bpmn só para Administrador e Integrante com o processo em andamento;
  * esconder o botão é conveniência, quem recusa é a função do servidor e o banco.
@@ -54,7 +54,7 @@ export function SecaoDeVersoes({ versoes, processo, podeAlterar, aoAlterarVersoe
 function TituloDosArquivos({ id, children }: { id: string; children?: ReactNode }) {
   return (
     <div className="secao-de-versoes-titulo">
-      <h3 id={id} className="painel-subtitulo">Arquivos</h3>
+      <h3 id={id} className="painel-subtitulo">Documentos do Mapeamento</h3>
       {children}
     </div>
   )

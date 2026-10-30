@@ -42,7 +42,7 @@ export function AreaDeAdministracao({ usuario, acesso, processos, planilhas }: A
         ))}
       </div>
       {aba === 'usuarios' && <AreaDeUsuarios acesso={acesso} />}
-      {aba === 'catalogo' && <CatalogoDeEtapas catalogo={processos.catalogo} />}
+      {aba === 'catalogo' && <CatalogoDeEtapas catalogo={processos.catalogo} responsaveis={processos} />}
       {aba === 'planilhas' && <AreaDasPlanilhas planilhas={planilhas} />}
     </>
   )

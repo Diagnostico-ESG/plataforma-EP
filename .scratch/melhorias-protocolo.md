@@ -1054,3 +1054,50 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Branch nova por ticket.** Esperado: criar a branch no passo 2. Aconteceu: `git switch -c repositorio-de-processos` a partir da `main`, marco `marco/2026-10-29-inicio-repositorio-de-processos-05` criado e enviado ao GitHub.
 - **Pre-commit lento.** O pre-commit roda a suíte inteira (cerca de 3,5 minutos por commit) e já barrou um commit por complexidade acima de 10 (`lerEnderecoDosProcessos`, corrigido). Sugestão: no `/executar-complexo`, juntar as tarefas pequenas em menos commits, ou rodar `npx eslint src` antes de cada commit.
 - **Revisão final inline.** O `executing-plans` pede um revisor independente no fim; sem autorização para subagente, fiz autorrevisão e registrei no `desvios.md`.
+
+## 2026-10-29 — /demanda (enxugar-cartao-e-cadastro)
+
+- **Perguntas antes de classificar.** Esperado: no máximo duas. Aconteceu: nenhuma; a descrição bastou.
+- **Classificação.** Demanda com itens de três tipos (ajustes pequenos, um bug e mudança com migração). Esperado: o tipo mais rigoroso. Aconteceu: mudança em funcionalidade existente; o bug foi oferecido à parte ou dentro do `/planejar`, e o usuário escolheu dentro (como ticket). Sugestão: o `/demanda` dizer o que fazer com um bug que chega junto de uma mudança maior na mesma tela.
+
+## 2026-10-29 — /executar-complexo (enxugar-cartao-e-cadastro, ticket 04)
+
+- **TDD de políticas e testes por perfil.** Esperado: teste de banco antes da migração, com Administrador, Integrante, Consulta, desativado e visitante. Aconteceu: teste 71 escrito antes da migração e atualizado o 50 (limite novo); a prova de "falha antes" não foi vista (sem Docker), só o verde no workflow (50: 57 ok; 71: 17 ok).
+- **Docker.** Esperado (Ajustes do projeto): pgTAP no banco local. Aconteceu: o Docker Desktop não sobe (WSL não instalado), então o `supabase test db` local não rodou; valeu o workflow "Testes de banco", que ensaia a migração pendente antes de testar.
+- **Migração aplicada no remoto de desenvolvimento.** Pelo workflow "Migrar banco de desenvolvimento" (não `db push`), com sucesso.
+- **Branch comum, `plano-04.md`, linha `Concluído em`.** Branch criada, plano salvo, merge na `main` e branch apagada com `-d` sem recusa.
+- **Erro do plano.** Marquei as caixas do plano como feitas antes de executar; corrigi depois, deixando 1.3 e 1.5 abertas com o motivo.
+
+## 2026-10-29 — /executar-complexo (enxugar-cartao-e-cadastro, ticket 05)
+
+- **TDD de banco e testes por perfil.** Esperado: teste de banco antes da migração, com cada perfil, desativado e visitante. Aconteceu: teste 72 e ajustes nos 17, 44, 50 e 53 escritos antes da migração; a falha prévia não foi vista (sem Docker). O primeiro run do workflow acusou erro de SQL no meu teste (`security_invoker`); corrigido e o segundo ficou 59 de 59.
+- **Docker.** Esperado (Ajustes do projeto): pgTAP local. Aconteceu: não sobe (sem WSL); valeu o workflow "Testes de banco", que ensaia a migração pendente.
+- **Migração no remoto de desenvolvimento.** Pelo workflow "Migrar banco de desenvolvimento", com sucesso; `npm run db:types` depois não mudou o `database.ts` (já editado à mão antes).
+- **Pre-commit exige typecheck verde.** Esperado: migração, testes e tipos no mesmo commit. Aconteceu: o commit do banco foi barrado até as telas compilarem, então banco e telas foram num commit só.
+- **Trava de git.** Dois lotes de `sed` com várias expressões foram barrados como "pasta .git" (falso alarme); refiz as edições com a ferramenta de edição, sem contornar a trava.
+- **Branch comum, `plano-05.md`, linha `Concluído em`.** Branch criada, merge (avanço rápido) na `main`, branch apagada com `-d` sem recusa.
+- **Erro do plano.** O plano prometia testes de tela antes da implementação; na prática os testes foram ajustados depois de tirar os campos.
+
+## 2026-10-30 — /planejar, modo curto (lista-por-setor)
+
+- **Classificação de tamanho e modo curto.** Esperado: demanda vinda do `/demanda` como pequena dispensa a proposta de modo. Aconteceu: segui direto para o modo curto, com três perguntas, uma de cada vez.
+- **Entregas anteriores e `Em revisão desde`.** Esperado: conferir a linha `Entregue em` de cada spec e acrescentar `Em revisão desde` às specs alteradas. Aconteceu: todas entregues; a linha entrou em `processos-etapas` e `repositorio-de-processos`.
+- **Nome da funcionalidade em `projeto.md`.** Esperado: anotar entre parênteses na lista. Aconteceu: item 16 `lista-por-setor` acrescentado.
+- **Spec com critério `[visual]` e seção Modelo de dados.** Esperado: seção presente mesmo sem banco. Aconteceu: seção escrita dizendo "nenhum"; critério 10 marcado `[visual]`.
+- **Pre-commit.** Esperado: rodar a bateria e liberar o commit de documentação. Aconteceu: levou mais de 2 minutos e o comando foi para segundo plano; o commit saiu só com os 5 arquivos do `/planejar`.
+
+## 2026-10-30 — /executar-simples e /polir (lista-por-setor)
+
+- **`/implement` e `code-review` em dois agentes.** Esperado: revisão de padrões e de spec em paralelo. Aconteceu: as duas rodaram e voltaram sem erro, só julgamentos menores; as alterações foram para o commit de outra sessão (`dcbb176`) porque o `git commit` encontrou a árvore já comitada por ela, e a mensagem do meu commit se perdeu.
+- **Marca `Implementado em`.** Esperado: hash do commit da implementação. Aconteceu: gravei o hash do commit que absorveu o código (`dcbb176`).
+- **Auditoria visual sem login.** Esperado: abrir a Lista no navegador. Aconteceu: o app real pede conta institucional, que não posso usar; montei uma página temporária com os módulos falsos, tirei capturas e apaguei os arquivos.
+- **`/impeccable polish`.** Esperado: rodar depois da auditoria. Aconteceu: a auditoria não achou nada a corrigir, então não rodei o `polish`.
+
+## 2026-10-30 — /planejar, modo completo (responsavel-inicial-por-etapa)
+
+- **Conferência de entregas anteriores e `Em revisão desde`.** Esperado: conferir `Entregue em` de cada spec anterior e marcar a spec alterada. Aconteceu: todas entregues; `Em revisão desde 2026-10-30` entrou em `processos-etapas`, no commit da spec.
+- **Nome da funcionalidade em `projeto.md`.** Aconteceu: item 17 `responsavel-inicial-por-etapa` acrescentado.
+- **Leitura de `.claude/regras/banco.md` antes de planejar migração.** Aconteceu: lido inteiro antes da sabatina.
+- **Spec com Modelo de dados, "quem pode o quê", regras de estado e `[visual]`.** Aconteceu: seção nova na spec existente, com a tabela por perfil (inclusive inativo e visitante), as três chegadas impostas pelo banco e o critério 11 marcado `[visual]`. Brainstorming pulado (solução definida pelo usuário).
+- **Pasta dos ADRs.** Aconteceu: ADR 0036 em `docs/adr/`, junto dos anteriores.
+- **Melhoria: duas sessões comitando na mesma pasta.** Esperado: cada commit levar só os arquivos da sua etapa. Aconteceu: duas vezes nesta sessão o commit de uma sessão levou arquivos que a outra tinha preparado (o `203c7bf` da análise de design levou o `CONTEXT.md` e o ADR 0036; o `2358a0d` desta spec levou duas imagens das propostas visuais), porque a área de preparação do git é uma só por pasta e o pre-commit leva mais de 2 minutos. Sugestão: o protocolo dizer que sessões simultâneas na mesma pasta não comitam ao mesmo tempo, ou que a segunda trabalha numa worktree própria.

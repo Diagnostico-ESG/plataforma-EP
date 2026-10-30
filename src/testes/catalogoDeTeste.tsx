@@ -46,5 +46,6 @@ export async function abrirCatalogo() {
 /** O texto de cada linha da tabela do catálogo, sem o cabeçalho. */
 export async function linhasDoCatalogo(secao: ReturnType<typeof within>): Promise<string[]> {
   const linhas = await secao.findAllByRole('row')
-  return linhas.slice(1).map((linha: HTMLElement) => linha.textContent ?? '')
+  // Sem a terceira célula (a caixa do responsável inicial): o texto das opções entraria no textContent.
+  return linhas.slice(1).map((linha: HTMLElement) => [...linha.querySelectorAll('td')].filter((_, posicao) => posicao !== 2).map((celula) => celula.textContent ?? '').join(''))
 }

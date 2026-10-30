@@ -10,6 +10,8 @@ type RespostaDaGravacao = { data: { id: string }[] | null; error: ErroDoBanco | 
 /** O que a gravação levou (nome e código, para a frase da repetição) e a ação, para a frase da etapa com processos. */
 type ValoresGravados = ContextoDaRecusa & { nome?: string; codigo?: string }
 
+const COLUNAS_DA_ETAPA = 'id, codigo, nome, ordem, fase, ativa, responsavel_inicial:usuarios!responsavel_inicial_id(id, nome, foto_url, ativo, perfil)'
+
 // As recusas chegam de fora (as de processos), como em situacaoSupabase.
 export function criarCatalogoSupabase(cliente: ClienteSupabase, recusas: RecusasDoModulo): ModuloDoCatalogo {
   const mudar = (id: string, mudanca: MudancaDaEtapa, valores: ValoresGravados = {}) => mudarEtapa(cliente, id, mudanca, recusas, valores)
@@ -19,6 +21,7 @@ export function criarCatalogoSupabase(cliente: ClienteSupabase, recusas: Recusas
     editarEtapa: (id, { nome, fase }) => mudar(id, { nome, fase }, { nome }),
     desativarEtapa: (id) => mudar(id, { ativa: false }, { acao: 'desativar' }),
     reativarEtapa: (id) => mudar(id, { ativa: true }),
+    definirResponsavelInicial: (id, usuarioId) => mudar(id, { responsavel_inicial_id: usuarioId }),
     moverEtapa: async (id, sentido) => {
       const { error } = await cliente.rpc('mover_etapa', { p_etapa: id, p_sentido: sentido })
       if (error) throw falhaDoCatalogo(error, recusas, {})
@@ -31,9 +34,12 @@ export function criarCatalogoSupabase(cliente: ClienteSupabase, recusas: Recusas
 }
 
 async function listarCatalogo(cliente: ClienteSupabase): Promise<EtapaNoCatalogo[]> {
-  const { data, error } = await cliente.from('etapas').select('id, codigo, nome, ordem, fase, ativa').order('ordem')
+  const { data, error } = await cliente.from('etapas').select(COLUNAS_DA_ETAPA).order('ordem')
   if (error) throw new Error(`Falha ao ler o catálogo de etapas: ${error.message}`)
-  return data
+  return data.map(({ responsavel_inicial: inicial, ...etapa }) => ({
+    ...etapa,
+    responsavelInicial: inicial && { id: inicial.id, nome: inicial.nome, fotoUrl: inicial.foto_url, ativo: inicial.ativo, perfil: inicial.perfil },
+  }))
 }
 
 async function acrescentarEtapa(cliente: ClienteSupabase, etapa: EtapaNova, recusas: RecusasDoModulo): Promise<void> {

@@ -24,7 +24,7 @@ afterEach(() => {
 
 // Em Relatório e modelagem técnica; a Modelagem piloto já foi visitada (de 11 a 12/10).
 const PROCESSO: ProcessoLido = umProcessoLido('Emitir Ofício', {
-  id: 'p1', tipo: 'a_classificar', origem: 'retomado', contexto: 'Contexto inventado', observacoes: 'Observação inventada',
+  id: 'p1', tipo: 'a_classificar',
   responsavel: null, entrouNaEtapaEm: '2026-10-13',
   etapasDoVerso: [{ id: 'e2', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 2, passagens: [{ entrouEm: '2026-10-11', saiuEm: '2026-10-12' }] }],
 }, 'relatorio_modelagem_tecnica')
@@ -103,12 +103,12 @@ test('pai e subprocesso abrem na mesma janela, com o endereço e o nome da janel
 
 // Cabeçalho
 
-test('cabeçalho: sigla, nome, macroprocesso e tipo em texto; sem pílula em andamento', async () => {
+test('cabeçalho: sigla e nome, sem macroprocesso nem tipo; sem pílula em andamento', async () => {
   montar()
   const cabecalho = within((await nomeDoProcesso()).closest('header') as HTMLElement)
   expect(cabecalho.getByText('TSA')).toBeTruthy()
-  expect(cabecalho.getByText('Macro de Teste')).toBeTruthy()
-  expect(cabecalho.getByText('A classificar')).toBeTruthy()
+  expect(cabecalho.queryByText('Macro de Teste')).toBeNull()
+  expect(cabecalho.queryByText('A classificar')).toBeNull()
   expect(cabecalho.queryByText('Em andamento')).toBeNull()
 })
 
@@ -230,11 +230,12 @@ test('as duas colunas: etapas e versões no trabalho; reunião, Sobre e estrutur
   expect(aberto.getByRole('region', { name: /^Subprocessos/ }).closest('.verso-contexto')).toBeTruthy()
 })
 
-test('os dados do processo aparecem no verso', async () => {
+test('os dados do processo aparecem no verso, sem Origem, Contexto nem Observações', async () => {
   montar()
   await nomeDoProcesso()
   const aberto = await versoAberto()
-  for (const texto of ['Retomado', 'Contexto inventado', 'Observação inventada']) expect(aberto.getByText(texto)).toBeTruthy()
+  for (const rotulo of ['Setor', 'Macroprocesso', 'Tipo']) expect(aberto.getByText(rotulo)).toBeTruthy()
+  for (const rotulo of ['Origem', 'Contexto', 'Observações']) expect(aberto.queryByText(rotulo)).toBeNull()
 })
 
 test('as Etapas listam todas as etapas ativas na ordem do catálogo, com a atual destacada, e as ações ficam no Agora', async () => {
@@ -282,7 +283,7 @@ test('[Cadastrar processo] abre o Novo processo na janela estreita, e Esc fecha'
   fireEvent.click(await screen.findByRole('button', { name: 'Cadastrar processo' }))
   const janela = await screen.findByRole('dialog', { name: 'Novo processo' })
   expect(janela.classList.contains('verso-estreita')).toBe(true)
-  fireEvent.keyDown(await within(janela).findByLabelText('Nome'), { key: 'Escape' })
+  fireEvent.keyDown(await within(janela).findByLabelText('Nome do Processo'), { key: 'Escape' })
   await waitFor(() => expect(window.location.hash).toBe('#/processos'))
   expect(screen.queryByRole('dialog')).toBeNull()
 })

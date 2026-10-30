@@ -32,7 +32,7 @@ function processo(nome: string, mudancas: Partial<ProcessoLido> = {}): ProcessoL
     macroprocessoNome: 'Macro de Teste', situacao: 'em_andamento',
     etapaAtual: { codigo: MODELAGEM.codigo, nome: MODELAGEM.nome, ordem: MODELAGEM.ordem, id: 'e', posicao: 1, total: 1 },
     processoPaiId: null, processoPai: null, subprocessos: [],
-    responsavel: null, origem: 'novo', contexto: null, observacoes: null, motivoDaSituacao: null,
+    responsavel: null, motivoDaSituacao: null,
     dataDaModelagemPiloto: null, ultimaVersao: null, etapasDoVerso: [], ...mudancas,
   }
 }

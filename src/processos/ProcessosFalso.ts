@@ -8,6 +8,7 @@ import {
   conferirEtapaAtiva, conferirEtiquetaMutavel, etapaAtualNoCatalogo, etapasDoVersoDe, publicacaoDaChegada, publicacaoDaSaida,
   registrarPassagem,
 } from './movimentoFalso'
+import { responsavelInicialValido } from './responsavelInicial'
 import { registrarPublicacao } from './publicacaoFalso'
 import { tirarDoQuadro, voltarAoQuadro } from './tirarDoQuadroFalso'
 import { travasQueFaltam } from './travaDeArquivos'
@@ -15,6 +16,8 @@ import {
   conferirPai, conferirSemSubprocessos, estruturaDoProcesso, levarMacroprocessoAosFilhos, macroprocessoDo, reclassificar,
 } from './reclassificacaoFalso'
 import { conferirProcessoEmAndamento, mudarSituacao } from './situacaoFalso'
+import { hojeEmBrasilia } from '../lib/datas'
+import { fraseDaModelagemNoFuturo } from './frasesDaModelagemPiloto'
 import { hojeLocal } from './textoDaModelagemPiloto'
 import type {
   DadosDaChegada, DadosDoProcesso, EtapaDoCatalogo, EtiquetaDaEtapa, ListaDeProcessos, ModuloDeProcessos, ProcessoLido,
@@ -35,8 +38,6 @@ export class ProcessosFalso implements ModuloDeProcessos {
   chamadas: ChamadaDeProcesso[] = []
   /** Quem pode ser escolhido como responsável do processo (ativos, Administrador ou Integrante). */
   usuariosPossiveis: UsuarioResponsavel[] = []
-  /** Quem está na tela: ao mover, esta pessoa vira o responsável (como `auth.uid()` no banco). */
-  quemChama: UsuarioResponsavel = { id: 'usuario-de-teste', nome: 'Pessoa de Teste' }
   /** Os processos cadastrados; a lista e a leitura partem daqui. */
   processos: ProcessoLido[] = []
   /** As etapas do catálogo, na ordem dele (as colunas do Quadro). */
@@ -176,13 +177,14 @@ export class ProcessosFalso implements ModuloDeProcessos {
     return [...(this.historicoDosProcessos[id] ?? [])]
   }
 
-  async criarProcesso(dados: DadosDoProcesso): Promise<string> {
+  async criarProcesso({ anotacoes, ...dados }: DadosDoProcesso): Promise<string> {
     this.conferirGravacao()
     this.conferirNomeNovo(dados)
     // Como o gatilho do banco: o subprocesso tem pai do tipo Processo e adota o macroprocesso dele.
     const macroprocesso = dados.tipo === 'subprocesso' ? macroprocessoDo(conferirPai(this.processos, dados.processoPaiId)) : {}
     const novo = { ...this.processoNovo(dados), ...macroprocesso }
     this.processos = [...this.processos, novo]
+    this.anotacoes.gravarNoCadastro(novo.id, anotacoes)
     return novo.id
   }
 
@@ -194,7 +196,7 @@ export class ProcessosFalso implements ModuloDeProcessos {
     const campos: Partial<DadosDoProcesso> = { ...dados }
     delete campos.tipo
     delete campos.processoPaiId
-    delete campos.dataDaModelagemPiloto
+    delete campos.anotacoes
     const pai = this.processos.find((processo) => processo.id === atual.processoPaiId)
     const editado = { ...atual, ...this.nomesDoCartao(dados), ...campos, ...(pai ? macroprocessoDo(pai) : {}) }
     this.processos = levarMacroprocessoAosFilhos(this.processos.map((processo) => (processo.id === id ? editado : processo)), editado)
@@ -204,6 +206,8 @@ export class ProcessosFalso implements ModuloDeProcessos {
   async marcarDataDaModelagemPiloto(id: string, data: string | null): Promise<void> {
     this.conferirGravacao()
     this.acharProcesso(id)
+    // Como o banco: só a realização, nunca depois de hoje em Brasília.
+    if (data !== null && data > hojeEmBrasilia()) throw new TravaDoBanco(fraseDaModelagemNoFuturo(data, hojeEmBrasilia()))
     this.chamadas.push(data === null ? { acao: 'data_da_modelagem_piloto', id } : { acao: 'data_da_modelagem_piloto', id, nota: data })
     this.processos = this.processos.map((processo) => (processo.id === id ? { ...processo, dataDaModelagemPiloto: data } : processo))
   }
@@ -239,15 +243,17 @@ export class ProcessosFalso implements ModuloDeProcessos {
     return id
   }
 
-  // O processo novo entra em Não iniciados, com A fazer e sem responsável (cadastrar não é mover).
+  // O processo novo entra em Não iniciados, com A fazer e o responsável inicial dela, se houver (cadastrar não é mover).
   private processoNovo(dados: DadosDoProcesso): ProcessoLido {
     const entrada = this.etapasDoCatalogo.find((etapa) => etapa.codigo === CODIGO_NAO_INICIADOS)
       ?? this.etapasDoCatalogo.find((etapa) => etapa.ativa)
+    const inicial = entrada ? this.responsavelInicialDe(entrada) : null
     return {
       ...dados, ...this.nomesDoCartao(dados), id: this.idLivreDeProcesso(), situacao: 'em_andamento',
       etapaAtual: entrada ? etapaAtualNoCatalogo(entrada, this.etapasDoCatalogo) : null, etiqueta: 'a_fazer',
-      entrouNaEtapaEm: hojeLocal(), responsavel: null, motivoDaSituacao: null, processoPai: null, subprocessos: [],
-      etapasDoVerso: [], ultimaVersao: null, dataDaModelagemPiloto: dados.dataDaModelagemPiloto ?? null,
+      entrouNaEtapaEm: hojeLocal(), responsavel: inicial && { id: inicial.id, nome: inicial.nome, fotoUrl: inicial.fotoUrl ?? null },
+      motivoDaSituacao: null, processoPai: null, subprocessos: [],
+      etapasDoVerso: [], ultimaVersao: null, dataDaModelagemPiloto: null,
     }
   }
 
@@ -269,12 +275,27 @@ export class ProcessosFalso implements ModuloDeProcessos {
     const origem = processo.etapaAtual?.codigo ?? ''
     const etapasDoVerso = registrarPassagem(etapasDoVersoDe(processo, this.etapasDoCatalogo, hoje), origem, destino.codigo, hoje)
     return {
-      ...processo, ...publicacao, ...this.comResponsavel(processo, this.quemChama), etapasDoVerso,
+      ...processo, ...publicacao, ...this.comResponsavel(processo, this.responsavelInicialDe(destino)), etapasDoVerso,
       etapaAtual: etapaAtualNoCatalogo(destino, this.etapasDoCatalogo), etiqueta: emConcluidos ? 'concluido' : 'a_fazer',
       entrouNaEtapaEm: hoje, situacao: emConcluidos ? 'concluido' : 'em_andamento',
       // Sair de Concluídos e voltar devolve o cartão ao Quadro (a marca fica antes da entrada nova).
       ...(emConcluidos && { noQuadro: true }),
     }
+  }
+
+  // Como responsavel_inicial_valido: o responsável inicial da etapa, se ainda vale; ninguém em Concluídos. A etapa vem do
+  // catálogo do falso, e sem ela ninguém.
+  private responsavelInicialDe(etapa: EtapaDoCatalogo): UsuarioResponsavel | null {
+    const inicial = responsavelInicialValido({
+      codigo: etapa.codigo, responsavelInicial: this.catalogo.etapas.find((outra) => outra.id === etapa.id)?.responsavelInicial,
+    })
+    return inicial && { id: inicial.id, nome: inicial.nome, fotoUrl: inicial.fotoUrl }
+  }
+
+  // Retomar é como chegar de novo à etapa em que o processo está.
+  private comResponsavelNaChegada(processo: ProcessoLido): ProcessoLido {
+    const etapa = this.etapasDoCatalogo.find((outra) => outra.codigo === processo.etapaAtual?.codigo)
+    return etapa ? { ...processo, ...this.comResponsavel(processo, this.responsavelInicialDe(etapa)) } : processo
   }
 
   private comResponsavel(processo: ProcessoLido, usuario: UsuarioResponsavel | null): Partial<ProcessoLido> {
@@ -284,7 +305,8 @@ export class ProcessosFalso implements ModuloDeProcessos {
 
   private mudarSituacaoDoProcesso(id: string, nova: 'em_andamento' | 'suspenso' | 'cancelado', motivo: string): void {
     this.conferirGravacao()
-    const mudado = mudarSituacao(this.acharProcesso(id), nova, motivo)
+    const situado = mudarSituacao(this.acharProcesso(id), nova, motivo)
+    const mudado = nova === 'em_andamento' ? this.comResponsavelNaChegada(situado) : situado
     this.processos = this.processos.map((processo) => (processo.id === id ? mudado : processo))
   }
 

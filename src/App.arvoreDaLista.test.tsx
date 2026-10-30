@@ -27,8 +27,8 @@ function processo(id: string, nome: string, mudancas: Partial<ProcessoLido> = {}
   return {
     id, nome, tipo: 'processo', setorId: 's1', setorSigla: 'TSA', macroprocessoId: 'm1', macroprocessoNome: 'Macro Um',
     situacao: 'em_andamento', etapaAtual: naEtapa(MODELAGEM),
-    processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null, origem: 'novo',
-    contexto: null, observacoes: null, motivoDaSituacao: null, dataDaModelagemPiloto: null, ultimaVersao: null, etapasDoVerso: [], ...mudancas,
+    processoPaiId: null, processoPai: null, subprocessos: [], responsavel: null,
+    motivoDaSituacao: null, dataDaModelagemPiloto: null, ultimaVersao: null, etapasDoVerso: [], ...mudancas,
   }
 }
 
@@ -134,8 +134,8 @@ test('a seta abre a linha dos arquivos: Carregando, depois a versão, o selo Apr
   expect(await screen.findByText('V7')).toBeTruthy()
   expect(screen.getByText('Aprovada')).toBeTruthy()
   const linha = document.querySelector('.linha-dos-arquivos') as HTMLElement
-  expect(within(linha).getAllByRole('link').map((link) => link.textContent)).toEqual(['Imagem .png', 'Fluxograma .bpm', 'Relatório V2'])
-  fireEvent.click(within(linha).getByRole('link', { name: /Baixar Relatório V2/ }))
+  expect(within(linha).getAllByRole('link').map((link) => link.textContent)).toEqual(['fluxo.png', 'fluxo.bpm', 'relatorio.docx'])
+  fireEvent.click(within(linha).getByRole('link', { name: 'relatorio.docx' }))
   await waitFor(() => expect(versoes.baixados).toEqual(['a3']))
   expect(ler.mock.calls.map(([id]) => id)).toEqual(['p1'])
   fireEvent.click(seta('Cadastrar Bem'))
@@ -196,6 +196,6 @@ test('a Consulta vê a árvore e abre os arquivos, sem o botão de cadastrar', a
   await macro('Macro Um')
   expect(screen.queryByRole('button', { name: 'Cadastrar processo' })).toBeNull()
   fireEvent.click(seta('Pagar Diária'))
-  fireEvent.click(await screen.findByRole('link', { name: /Baixar Imagem/ }))
+  fireEvent.click(await screen.findByRole('link', { name: 'fluxo.png' }))
   await waitFor(() => expect(versoes.baixados).toEqual(['a1']))
 })

@@ -41,7 +41,7 @@ const comUmaVersao = { ajustarVersoes: (falso: VersoesFalso) => { falso.versoes.
 
 const secao = async () => {
   const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-  return within(await painel.findByRole('region', { name: 'Arquivos' }))
+  return within(await painel.findByRole('region', { name: 'Documentos do Mapeamento' }))
 }
 
 test.each(['administrador', 'integrante_ep', 'consulta'] as const)('o perfil %s vê cada arquivo como link, com o nome no title', async (perfil) => {

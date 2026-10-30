@@ -93,48 +93,48 @@ insert into _tap (linha) select lives_ok(
 insert into _tap (linha) select is(pg_temp.data('Proc Data'), null::date, 'a data foi removida');
 insert into _tap (linha) select is(pg_temp.eventos_antigos(), 1::bigint, 'integrante lê o evento antigo de reunião');
 
--- Data futura em processo cancelado.
+-- Data passada em processo cancelado (a futura é recusada: teste 70).
 select public.cancelar_processo(pg_temp.processo('Proc Cancelado'), 'Cancelado no teste');
 insert into _tap (linha) select lives_ok(
-  $sql$update public.processos set data_da_modelagem_piloto = '2027-01-15' where nome = 'Proc Cancelado'$sql$,
-  'data futura em processo cancelado é aceita');
-insert into _tap (linha) select is(pg_temp.data('Proc Cancelado'), '2027-01-15'::date, 'o cancelado ficou com a data');
+  $sql$update public.processos set data_da_modelagem_piloto = '2026-10-05' where nome = 'Proc Cancelado'$sql$,
+  'data passada em processo cancelado é aceita');
+insert into _tap (linha) select is(pg_temp.data('Proc Cancelado'), '2026-10-05'::date, 'o cancelado ficou com a data');
 
 -- Processo com data se exclui e troca de setor.
 insert into _tap (linha) select lives_ok(
   $sql$delete from public.processos where nome = 'Proc Excluir'$sql$, 'processo com data se exclui');
 insert into _tap (linha) select is(pg_temp.processo('Proc Excluir'), null::uuid, 'o processo com data foi excluído');
-update public.processos set data_da_modelagem_piloto = '2026-11-05' where nome = 'Proc Data';
+update public.processos set data_da_modelagem_piloto = '2026-10-06' where nome = 'Proc Data';
 insert into _tap (linha) select lives_ok(
   $sql$update public.processos set setor_id = '5f000000-0000-0000-0000-0000000000d2' where nome = 'Proc Data'$sql$,
   'processo com data troca de setor');
 insert into _tap (linha) select is(
   (select setor_id from public.processos where nome = 'Proc Data'), '5f000000-0000-0000-0000-0000000000d2'::uuid,
   'o processo passou ao outro setor');
-insert into _tap (linha) select is(pg_temp.data('Proc Data'), '2026-11-05'::date, 'a data acompanha a troca de setor');
+insert into _tap (linha) select is(pg_temp.data('Proc Data'), '2026-10-06'::date, 'a data acompanha a troca de setor');
 
 -- Consulta não muda a data, mas lê o processo e o evento antigo.
 reset role;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a3","role":"authenticated"}', true);
 set local role authenticated;
-update public.processos set data_da_modelagem_piloto = '2030-01-01' where nome = 'Proc Data';
-insert into _tap (linha) select is(pg_temp.data('Proc Data'), '2026-11-05'::date, 'Consulta não muda a data');
+update public.processos set data_da_modelagem_piloto = '2026-10-02' where nome = 'Proc Data';
+insert into _tap (linha) select is(pg_temp.data('Proc Data'), '2026-10-06'::date, 'Consulta não muda a data');
 insert into _tap (linha) select is(pg_temp.eventos_antigos(), 1::bigint, 'Consulta lê o evento antigo de reunião');
 
 -- Inativo não muda nem lê.
 reset role;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a4","role":"authenticated"}', true);
 set local role authenticated;
-update public.processos set data_da_modelagem_piloto = '2030-01-01' where nome = 'Proc Data';
+update public.processos set data_da_modelagem_piloto = '2026-10-02' where nome = 'Proc Data';
 insert into _tap (linha) select is(pg_temp.eventos_antigos(), 0::bigint, 'inativo não lê o evento antigo de reunião');
 reset role;
-insert into _tap (linha) select is(pg_temp.data('Proc Data'), '2026-11-05'::date, 'inativo não muda a data');
+insert into _tap (linha) select is(pg_temp.data('Proc Data'), '2026-10-06'::date, 'inativo não muda a data');
 
 -- Visitante não chega à tabela nem aos eventos.
 select set_config('request.jwt.claims', '{"role":"anon"}', true);
 set local role anon;
 insert into _tap (linha) select throws_ok(
-  $sql$update public.processos set data_da_modelagem_piloto = '2030-01-01'$sql$, '42501', null, 'visitante não muda a data');
+  $sql$update public.processos set data_da_modelagem_piloto = '2026-10-02'$sql$, '42501', null, 'visitante não muda a data');
 insert into _tap (linha) select throws_ok(
   $sql$select 1 from public.eventos where entidade = 'reuniao'$sql$, '42501', null, 'visitante não lê os eventos de reunião');
 reset role;

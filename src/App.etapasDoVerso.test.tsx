@@ -46,10 +46,14 @@ test('a etapa desativada não aparece', async () => {
   expect(nomes).toHaveLength(7)
 })
 
+// As linhas das etapas, sem o botão da data que a Modelagem piloto traz (ticket 03 de enxugar-cartao-e-cadastro).
+const cabecasDasEtapas = (etapas: Awaited<ReturnType<typeof etapasDoVerso>>) =>
+  etapas.getAllByRole('button').filter((botao) => botao.classList.contains('etapa-cabeca'))
+
 test('cada linha diz se é a atual, uma etapa visitada (com a data da última saída) ou uma que o processo nunca visitou', async () => {
   montar()
   const etapas = await etapasDoVerso()
-  expect(etapas.getAllByRole('button').map((linha) => linha.getAttribute('aria-label'))).toEqual([
+  expect(cabecasDasEtapas(etapas).map((linha) => linha.getAttribute('aria-label'))).toEqual([
     'Não iniciados: visitada', 'Modelagem piloto: visitada', 'Relatório e modelagem técnica: visitada', 'Revisão interna: atual',
     'Validação com o setor: ainda não visitada', 'Aprovação pelo setor: ainda não visitada', 'Publicação: ainda não visitada',
     'Concluídos: ainda não visitada',
@@ -119,7 +123,7 @@ test('a Consulta e o suspenso leem as mesmas gavetas', async () => {
 
 test('cada linha é um botão nativo, que abre e fecha pelo teclado (Enter e Espaço) com o estado anunciado', async () => {
   montar()
-  const linhas = (await etapasDoVerso()).getAllByRole('button')
+  const linhas = cabecasDasEtapas(await etapasDoVerso())
   expect(linhas).toHaveLength(8)
   for (const linha of linhas) {
     expect(linha.tagName).toBe('BUTTON')

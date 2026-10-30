@@ -1,16 +1,18 @@
 import './ArvoreDaLista.css'
 import { COLUNAS_DA_LISTA } from '../../processos/colunasDaLista'
-import type { MacroDaArvore, SetorDaArvore } from '../../processos/arvoreDaLista'
 import { SeloDoSetor } from '../SeloDoSetor'
 
 const plural = (quantos: number) => `${quantos} ${quantos === 1 ? 'processo' : 'processos'}`
 
-type GrupoProps = { aberto: boolean; aoAlternar: () => void }
+/** `raiz`: a linha é o primeiro nível da árvore (o macroprocesso na árvore por Macroprocesso, o setor na por Setor); senão vem recuada. */
+type GrupoProps = { aberto: boolean; aoAlternar: () => void; raiz?: boolean }
+
+const classeDoGrupo = (tipo: 'macro' | 'setor', raiz: boolean | undefined) => `linha-de-${tipo} ${raiz ? 'grupo-raiz' : 'grupo-filho'}`
 
 /** A linha do macroprocesso: nome, quantos processos tem e a seta que abre e fecha o ramo. */
-export function LinhaDoMacro({ macro, aberto, aoAlternar }: GrupoProps & { macro: MacroDaArvore }) {
+export function LinhaDoMacro({ macro, aberto, aoAlternar, raiz }: GrupoProps & { macro: { nome: string; total: number } }) {
   return (
-    <tr className="linha-de-macro">
+    <tr className={classeDoGrupo('macro', raiz)}>
       <th scope="rowgroup" colSpan={COLUNAS_DA_LISTA.length}>
         <button type="button" className="botao-do-grupo" aria-expanded={aberto} aria-label={`${macro.nome}, ${plural(macro.total)}`} onClick={aoAlternar}>
           <span aria-hidden="true">{aberto ? '▾' : '▸'}</span>
@@ -22,17 +24,17 @@ export function LinhaDoMacro({ macro, aberto, aoAlternar }: GrupoProps & { macro
   )
 }
 
-/** A linha do setor dentro do macroprocesso: selo da sigla, nome e quantos processos tem. */
-export function LinhaDoSetor({ setor, aberto, aoAlternar }: GrupoProps & { setor: SetorDaArvore }) {
+/** A linha do setor: selo da sigla, nome e quantos processos tem. */
+export function LinhaDoSetor({ setor, total, aberto, aoAlternar, raiz }: GrupoProps & { setor: { sigla: string; nome: string; cor: number }; total: number }) {
   return (
-    <tr className="linha-de-setor">
+    <tr className={classeDoGrupo('setor', raiz)}>
       <th scope="rowgroup" colSpan={COLUNAS_DA_LISTA.length}>
-        <button type="button" className="botao-do-grupo" aria-expanded={aberto} aria-label={`${setor.sigla} ${setor.nome}, ${plural(setor.itens.length)}`}
+        <button type="button" className="botao-do-grupo" aria-expanded={aberto} aria-label={`${setor.sigla} ${setor.nome}, ${plural(total)}`}
           onClick={aoAlternar}>
           <span aria-hidden="true">{aberto ? '▾' : '▸'}</span>
           <SeloDoSetor sigla={setor.sigla} cor={setor.cor} />
           <span className="nome-do-grupo" aria-hidden="true">{setor.nome}</span>
-          <span className="contagem-do-grupo" aria-hidden="true">{setor.itens.length}</span>
+          <span className="contagem-do-grupo" aria-hidden="true">{total}</span>
         </button>
       </th>
     </tr>

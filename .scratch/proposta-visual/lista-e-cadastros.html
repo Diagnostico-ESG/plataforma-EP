@@ -1,0 +1,237 @@
+<!doctype html>
+<!-- Protótipo descartável (2026-10-30): Lista e cadastros no estilo da proposta visual 6. Dados inventados.
+     Visões: #lista, #lista-setor, #lista-macro, #setores, #setor, #novo-setor, #macro, #historico -->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Lista e cadastros</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--azul:#3a5afe;--azul-claro:#e8edff;--azul-escuro:#2a44c9;--lateral:#252b36;--lateral-2:#9aa3b2;--fundo:#f3f4f7;--linha:#e3e6ec;--texto:#1d2330;--texto-2:#5f6776;--inativo:#9098a6;
+--atraso:#d1293d;--vence:#c2620a;--mono:'IBM Plex Mono',Consolas,monospace}
+*{box-sizing:border-box;margin:0}
+body{font:13px/1.45 'Source Sans 3',system-ui,sans-serif;color:var(--texto);background:var(--fundo);height:100vh;display:grid;grid-template:52px 56px 1fr/56px 1fr;overflow:hidden}
+svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.lateral{grid-row:1/4;background:var(--lateral);padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.lateral b{background:var(--azul);color:#fff;border-radius:6px;width:32px;height:32px;display:grid;place-items:center;font-size:13px;margin-bottom:18px}
+.lateral .item{width:40px;height:40px;border-radius:6px;display:grid;place-items:center;color:var(--lateral-2)}.lateral .item svg{width:20px;height:20px}
+.lateral .ativo{background:var(--azul-claro);color:var(--azul)}.lateral .fim{margin-top:auto}
+.topo{background:#fff;display:flex;align-items:center;gap:10px;padding:0 24px}
+.topo h1{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px}.topo h1 svg{width:20px;height:20px;color:var(--azul)}.topo h1 .mig{color:var(--inativo);font-weight:600}
+.topo .dir{margin-left:auto;display:flex;align-items:center;gap:16px;color:var(--texto-2)}
+.av{width:24px;height:24px;border-radius:50%;background:#e9ecf1;color:#4a5163;font:600 10px/24px 'Source Sans 3';text-align:center;flex:none;display:inline-block}.av.eu{background:var(--azul-claro);color:var(--azul-escuro)}.av.g{width:32px;height:32px;line-height:32px;font-size:12px}
+.av.vazio{background:none;border:1px dashed #c3cad8}
+.barra{background:#fff;border-bottom:1px solid var(--linha);display:flex;align-items:center;gap:10px;padding:0 24px}
+.btn{border:1px solid var(--linha);background:#fff;font:600 13px 'Source Sans 3';color:var(--texto);height:34px;padding:0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn.prim{background:var(--azul);border-color:var(--azul);color:#fff}.btn.leve{border-color:transparent;color:var(--texto-2);background:none}.btn.on{background:var(--azul-claro);border-color:transparent;color:var(--azul-escuro)}
+.btn em{font:500 11px var(--mono);font-style:normal;background:#fff;color:var(--azul-escuro);border-radius:999px;padding:0 6px}
+.btn.icone{width:34px;padding:0;justify-content:center}
+.sep{width:1px;height:22px;background:var(--linha)}
+.rot{font-size:12px;color:var(--texto-2)}
+.seg{display:inline-flex;background:var(--fundo);border:1px solid var(--linha);border-radius:6px;padding:2px}
+.seg button{border:0;background:none;font:600 12px 'Source Sans 3';color:var(--texto-2);padding:5px 10px;border-radius:4px;white-space:nowrap}.seg .sim{background:var(--azul-claro);color:var(--azul-escuro)}
+.dir-barra{margin-left:auto;display:flex;align-items:center;gap:10px}
+.busca{display:inline-flex;align-items:center;gap:8px;height:34px;width:260px;border:1px solid var(--linha);border-radius:6px;padding:0 10px;color:var(--inativo);font-size:13px}
+.area{overflow:hidden;padding:18px 24px}
+.setor{font:700 11px 'Source Sans 3';letter-spacing:.3px;color:#fff;border-radius:4px;padding:1px 7px;display:inline-block}
+.tag{white-space:nowrap;display:inline-block;font:600 11px 'Source Sans 3';border-radius:4px;padding:1px 6px;background:#eef0f4;color:#4a5163}
+.mono{font-family:var(--mono);font-size:12px}
+/* Tabela */
+.tab{background:#fff;border:1px solid var(--linha);border-radius:8px;overflow:hidden;width:100%;border-collapse:separate;border-spacing:0}
+.tab th{position:sticky;top:0;background:#fafbfc;text-align:left;font-size:12px;font-weight:700;color:var(--texto-2);padding:10px 12px;border-bottom:1px solid var(--linha);white-space:nowrap}
+.tab th .i{width:12px;height:12px;vertical-align:-2px;color:var(--inativo)}.tab th.filtrada{color:var(--azul-escuro)}.tab th.filtrada .i{color:var(--azul)}
+.tab td{padding:9px 12px;border-bottom:1px solid #eef0f4;vertical-align:middle;white-space:nowrap}
+.tab tr:last-child td{border-bottom:0}.tab td:first-child{white-space:normal;max-width:300px}
+.nome{font-weight:600;font-size:13.5px;color:var(--texto)}
+.muted{color:var(--inativo)}
+.etapa{display:flex;flex-direction:column;gap:5px;min-width:210px}.etapa .t{display:flex;align-items:center;gap:6px;font-size:12.5px}.etapa .t svg{color:var(--texto-2)}
+.trilha{display:flex;gap:3px}.trilha i{width:22px;height:4px;border-radius:2px;background:#e3e6ec}.trilha i.f{background:#6b7a99}.trilha i.a{background:var(--azul)}
+.pessoa{display:inline-flex;align-items:center;gap:8px}
+.ind{display:inline-flex;align-items:center;gap:5px;font:500 12px var(--mono);color:var(--texto-2)}.ind.atraso{color:var(--atraso)}.ind.vence{color:var(--vence)}.ind svg{width:14px;height:14px}
+.st svg{width:18px;height:18px;display:block}
+.sit{display:inline-flex;align-items:center;gap:5px;font:600 12px 'Source Sans 3';border-radius:4px;padding:2px 8px}.sit svg{width:13px;height:13px}
+.sit-suspenso{background:#eef0f4;color:#4a5163}.sit-concluido{background:#e6f4ef;color:#166a4d}.sit-cancelado{background:#f3f4f6;color:var(--inativo)}
+.grupo td{background:#f6f7f9;font-weight:700;font-size:13.5px;padding:10px 12px}
+.grupo .c{display:flex;align-items:center;gap:8px}.grupo .n{font:500 12px var(--mono);color:var(--texto-2);font-weight:500}
+.sub td{font-weight:600;color:var(--texto-2);padding:8px 12px 8px 40px;font-size:12.5px}
+.rec1 td:first-child{padding-left:40px}.rec2 td:first-child{padding-left:64px}
+.pe-tab{padding:10px 2px;color:var(--texto-2);font-size:12px}
+/* Páginas de cadastro */
+.pagina{max-width:1100px}
+.cab{display:flex;align-items:center;gap:12px;margin-bottom:16px}.cab h2{font-size:20px;font-weight:700}.cab .acoes{margin-left:auto;display:flex;gap:8px;position:relative}
+.voltar{width:34px;height:34px;border-radius:6px;border:1px solid var(--linha);background:#fff;display:grid;place-items:center;color:var(--texto-2)}
+.bloco{background:#fff;border:1px solid var(--linha);border-radius:8px;padding:18px 20px;margin-bottom:16px}
+.bloco h3{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}.bloco h3 small{font:500 12px var(--mono);color:var(--texto-2)}
+.campos{display:grid;grid-template-columns:2fr 1fr;gap:12px 16px}.campos .todo{grid-column:1/-1}
+.campo label{display:block;font-size:12px;font-weight:600;color:var(--texto-2);margin-bottom:4px}.campo label i{color:var(--atraso);font-style:normal}
+.entrada{height:34px;border:1px solid var(--linha);border-radius:6px;padding:0 10px;display:flex;align-items:center;font-size:13px;background:#fff}.entrada.alta{height:64px;align-items:flex-start;padding-top:8px;color:var(--inativo)}
+.entrada.sel{justify-content:space-between}
+.cores{display:flex;gap:10px;flex-wrap:wrap}.cor{display:flex;flex-direction:column;align-items:center;gap:3px;font:500 10px var(--mono);color:var(--inativo)}
+.cor span{width:34px;height:24px;border-radius:5px;display:block}.cor.sim span{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--azul)}
+.dica{font-size:12px;color:var(--texto-2);margin-top:8px}
+.menu{position:absolute;top:40px;right:0;background:#fff;border:1px solid var(--linha);border-radius:8px;box-shadow:0 8px 24px rgb(29 35 48/.12),0 2px 6px rgb(29 35 48/.08);padding:4px;width:200px;z-index:2}
+.menu div{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;font-size:13px}.menu .perigo{color:var(--atraso)}.menu hr{border:0;border-top:1px solid var(--linha);margin:4px 0}
+.salvo{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#16a34a}
+.obs{border:1px solid var(--linha);border-radius:6px;height:30px;padding:0 8px;display:flex;align-items:center;justify-content:space-between;min-width:320px}
+.veu{position:fixed;inset:0;background:rgb(29 35 48/.35);display:grid;place-items:center;z-index:5}
+.janela{background:#fff;border-radius:10px;width:520px;box-shadow:0 20px 50px rgb(29 35 48/.25)}
+.janela .t{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid var(--linha);font-size:16px;font-weight:700}.janela .t svg{margin-left:auto;color:var(--texto-2)}
+.janela .c{padding:18px 20px;display:grid;gap:14px}.janela .r{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--linha)}
+.evento{display:grid;grid-template-columns:140px 180px 1fr;gap:16px;padding:12px 16px;border-bottom:1px solid #eef0f4;align-items:start}
+.evento .tipo{display:inline-flex;align-items:center;gap:6px;font-weight:700}.evento .tipo svg{color:var(--texto-2)}
+.mud{margin-top:4px;font-size:12.5px;color:var(--texto-2)}.mud s{color:var(--inativo)}.mud b{color:var(--texto)}
+</style>
+</head>
+<body>
+<svg style="display:none">
+<symbol id="quadro" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/></symbol>
+<symbol id="lista" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></symbol>
+<symbol id="predio" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 7h1M14 7h1M9 11h1M14 11h1M9 15h1M14 15h1M10 21v-3h4v3"/></symbol>
+<symbol id="grafico" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+<symbol id="ajustes" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></symbol>
+<symbol id="ajuda" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01"/></symbol>
+<symbol id="filtro" viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4-2v-4z"/></symbol>
+<symbol id="pessoa" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+<symbol id="doc" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+<symbol id="relogio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+<symbol id="mais" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="pontos" viewBox="0 0 24 24"><circle cx="5" cy="12" r=".8"/><circle cx="12" cy="12" r=".8"/><circle cx="19" cy="12" r=".8"/></symbol>
+<symbol id="seta" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+<symbol id="dir" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+<symbol id="esq" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+<symbol id="ordem" viewBox="0 0 24 24"><path d="M8 9l4-4 4 4M8 15l4 4 4-4"/></symbol>
+<symbol id="busca" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol>
+<symbol id="sino" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></symbol>
+<symbol id="x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="lixo" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+<symbol id="pausa" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/></symbol>
+<symbol id="ok" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
+<symbol id="camadas" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></symbol>
+<symbol id="historico" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></symbol>
+<symbol id="e0" viewBox="0 0 24 24"><path d="M3 13l2.5-7.5A2 2 0 0 1 7.4 4h9.2a2 2 0 0 1 1.9 1.5L21 13v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 13h5l1.5 2.5h5L16 13h5"/></symbol>
+<symbol id="e1" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+<symbol id="e2" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></symbol>
+<symbol id="e3" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8.5 11l2 2 3.5-3.5"/></symbol>
+<symbol id="e4" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></symbol>
+<symbol id="e6" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></symbol>
+<symbol id="e7" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+<symbol id="bandeira" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+<symbol id="e5" viewBox="0 0 24 24"><path d="M12 3l2.4 1.8 3-.2.9 2.9 2.5 1.7-1 2.8 1 2.8-2.5 1.7-.9 2.9-3-.2L12 21l-2.4-1.8-3 .2-.9-2.9L3.2 14.8l1-2.8-1-2.8 2.5-1.7.9-2.9 3 .2z"/><path d="M8.5 12l2.3 2.3 4.7-4.6"/></symbol>
+</svg>
+<aside class="lateral" id="lateral"></aside>
+<header class="topo" id="topo"></header>
+<div class="barra" id="barra"></div>
+<main class="area" id="area"></main>
+<script>
+const ETAPAS=['Não iniciados','Modelagem piloto','Relatório e modelagem técnica','Revisão interna','Validação com o setor','Aprovação pelo setor','Publicação','Concluídos']
+// Situação do processo (CONTEXT.md): em andamento, suspenso, cancelado ou concluído; não confundir com a etiqueta da etapa (A fazer, Iniciado, Finalizado).
+const SITUACAO={andamento:['Em andamento',''],suspenso:['Suspenso','pausa'],cancelado:['Cancelado','x'],concluido:['Concluído','bandeira']}
+const situacao=s=>s==='andamento'?'<span class="muted">Em andamento</span>':`<span class="sit sit-${s}">${ic(SITUACAO[s][1])}${SITUACAO[s][0]}</span>`
+// Paleta viva só para os selos de setor (a mesma da proposta 6).
+const SETORES={SGA:['Secretaria de Gestão Administrativa','#7c3aed'],CDI:['Coordenadoria de Documentação e Informação','#0891b2'],OUV:['Ouvidoria Geral','#db2777'],
+PLN:['Diretoria de Planejamento','#9333ea'],JUR:['Assessoria Jurídica','#4f46e5'],TEC:['Diretoria de Tecnologia','#0f766e'],COM:['Assessoria de Comunicação','#c026d3']}
+const PESSOAS={AL:'Ana Lima',BR:'Bruno Reis',CN:'Carla Nunes'}
+// [nome, setor, etapa, situação, responsável, versão, dias, prazo, macroprocesso, tipo]
+const P=[['Solicitação de diárias e passagens','SGA',0,'a','',null,4,null,'Gestão de pessoas'],['Protocolo de correspondências recebidas','CDI',0,'a','BR',null,9,null,'Gestão documental'],
+['Atendimento de manifestações do cidadão','OUV',0,'a','',null,2,null,'A definir','A classificar'],['Elaboração do plano anual de compras','PLN',1,'i','AL','V1',6,null,'A definir'],
+['Contratação de estagiários','SGA',1,'a','CN',null,1,null,'Gestão de pessoas'],['Emissão de pareceres jurídicos','JUR',2,'a','AL','V1',3,null,'A definir'],
+['Gestão de acessos aos sistemas','TEC',2,'i','AL','V2',15,['atraso','27/10 · há 3 dias'],'A definir'],['Publicação de atos no diário oficial','CDI',2,'a','BR','V1',5,null,'Gestão documental'],
+['Arquivamento de processos encerrados','CDI',2,'i','AL','V3',8,null,'A definir'],['Divulgação de campanhas institucionais','COM',3,'f','AL','V4',2,null,'Comunicação institucional'],
+['Controle de bens patrimoniais','SGA',3,'i','CN','V2',11,null,'A definir',null,'suspenso'],['Gestão da frequência de servidores','SGA',7,null,'CN','V3F',null,null,'Gestão de pessoas',null,'concluido'],['Monitoramento de indicadores','PLN',4,'a','BR','V4F',3,['vence','01/11 · em 2 dias'],'A definir'],
+['Revisão de contratos de serviços','JUR',5,'i','CN','V5',7,null,'A definir']]
+const ROT={a:'A fazer',i:'Iniciado',f:'Finalizado'}
+const ST={a:'<circle cx="12" cy="12" r="8" fill="none" stroke="#9098a6" stroke-width="2"/>',i:'<circle cx="12" cy="12" r="8" fill="none" stroke="#3a5afe" stroke-width="2"/><path d="M12 4a8 8 0 0 1 0 16z" fill="#3a5afe"/>',
+f:'<circle cx="12" cy="12" r="9" fill="#16a34a"/><path d="M8 12.2l2.8 2.8 5.2-5.4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'}
+const ic=n=>`<svg class="i"><use href="#${n}"/></svg>`
+const st=s=>`<span class="st" title="${ROT[s]}"><svg viewBox="0 0 24 24">${ST[s]}</svg></span>`
+const selo=s=>`<span class="setor" style="background:${SETORES[s][1]}" title="${SETORES[s][0]}">${s}</span>`
+const pessoa=r=>r?`<span class="pessoa"><span class="av ${r==='AL'?'eu':''}">${r}</span>${r==='AL'?'Você':PESSOAS[r]}</span>`:'<span class="pessoa muted"><span class="av vazio"></span>Sem responsável</span>'
+const trilha=e=>`<div class="trilha">${Array.from({length:8},(_,k)=>`<i class="${k<e?'f':k===e?'a':''}"></i>`).join('')}</div>`
+const etapa=e=>`<div class="etapa"><span class="t">${ic('e'+e)}${ETAPAS[e]} <span class="muted mono">${e+1}/8</span></span>${trilha(e)}</div>`
+const visao=location.hash.slice(1)||'lista'
+
+function moldura(area,titulo,icone){
+ const itens=[['quadro','processos'],['predio','setores'],['grafico',''],['ajustes','']]
+ document.getElementById('lateral').innerHTML=`<b>EP</b>${itens.map(([i,a])=>`<div class="item ${a===area?'ativo':''}">${ic(i)}</div>`).join('')}<div class="item fim">${ic('ajuda')}</div>`
+ document.getElementById('topo').innerHTML=`<h1>${ic(icone)}${titulo}</h1><div class="dir">${ic('busca')}${ic('sino')}<span class="av eu g">AL</span></div>`}
+
+// ---------- Lista ----------
+function barraDaLista(agrupar){document.getElementById('barra').innerHTML=`<button class="btn prim">${ic('mais')}Cadastrar processo</button>
+ <button class="btn">${ic('lista')}Lista${ic('seta')}</button><span class="sep"></span>
+ <span class="rot">Agrupar</span><span class="seg">${['Nenhum','Setor','Macroprocesso'].map(o=>`<button class="${o===agrupar?'sim':''}">${o}</button>`).join('')}</span>
+ <span class="rot">Situação</span><span class="seg">${['Todos','Em andamento','Suspensos','Concluídos','Cancelados'].map((o,i)=>`<button class="${i===0?'sim':''}">${o}</button>`).join('')}</span>
+ <span class="dir-barra">${agrupar==='Nenhum'?'':`<button class="btn leve icone" title="Abrir todos">${ic('camadas')}</button>`}<button class="btn on">${ic('filtro')}Filtros <em>1</em></button><button class="btn leve">${ic('pessoa')}Destacar os meus</button></span>`}
+// 'setor' esconde as colunas Setor e Macroprocesso (o grupo e o subgrupo já dizem); 'macro' esconde só Macroprocesso.
+const cabecalho=esconder=>`<tr><th>Processo ${ic('ordem')}</th>${esconder==='setor'?'':`<th class="filtrada">Setor ${ic('filtro')}</th>`}${esconder?'':`<th>Macroprocesso ${ic('seta')}</th>`}<th>Situação ${ic('seta')}</th><th>Etapa ${ic('seta')}</th><th>Etiqueta</th><th>Responsável ${ic('seta')}</th><th>Indicadores</th></tr>`
+function linha(p,esconder,rec=''){const[n,s,e,sit,r,v,d,pz,m,tipo,situ='andamento']=p
+ return `<tr class="${rec}"><td><span class="nome">${n}</span>${tipo?` <span class="tag">${tipo}</span>`:''}</td>${esconder==='setor'?'':`<td>${selo(s)}</td>`}${esconder?'':`<td class="${m==='A definir'?'muted':''}">${m}</td>`}
+ <td>${situacao(situ)}</td><td>${etapa(e)}</td><td>${sit?st(sit):'<span class="muted">—</span>'}</td><td>${pessoa(r)}</td><td><span style="display:flex;gap:12px">${v?`<span class="ind">${ic('doc')}${v}</span>`:''}${d?`<span class="ind">${ic('relogio')}${d}d</span>`:''}${pz?`<span class="ind ${pz[0]}">${ic('cal')}${pz[1]}</span>`:''}</span></td></tr>`}
+const nCols=esconder=>esconder==='setor'?6:esconder?7:8
+const grupo=(conteudo,n,esconder)=>`<tr class="grupo"><td colspan="${nCols(esconder)}"><span class="c">${ic('seta')}${conteudo}<span class="n">${n}</span></span></td></tr>`
+function lista(){barraDaLista('Nenhum');return `<table class="tab">${cabecalho('')}${P.slice(0,12).map(p=>linha(p,'')).join('')}</table>`}
+// Setor com um só macroprocesso pula o nível; com vários, mostra os subgrupos.
+function listaPorSetor(){barraDaLista('Setor');let h=cabecalho('setor')
+ Object.entries(SETORES).slice(0,5).forEach(([s,[nm]])=>{const ps=P.filter(p=>p[1]===s);const macros=[...new Set(ps.map(p=>p[8]))]
+  h+=grupo(`${selo(s)}${nm}${macros.length===1?` <span class="muted" style="font-weight:600">· ${macros[0]}</span>`:''}`,ps.length,'setor')
+  if(macros.length===1){h+=ps.map(p=>linha(p,'setor','rec1')).join('');return}
+  macros.forEach(m=>{const pm=ps.filter(p=>p[8]===m);h+=`<tr class="sub"><td colspan="6">${m} <span class="mono muted">${pm.length}</span></td></tr>`+pm.map(p=>linha(p,'setor','rec2')).join('')})})
+ return `<table class="tab">${h}</table>`}
+function listaPorMacro(){barraDaLista('Macroprocesso');let h=cabecalho('macro')
+ const cat={'Gestão de pessoas':'Apoio','Gestão documental':'Apoio','Comunicação institucional':'Gerencial','A definir':''}
+ Object.keys(cat).forEach(m=>{const ps=P.filter(p=>p[8]===m).slice(0,m==='A definir'?4:9)
+  h+=grupo(`${m}${cat[m]?` <span class="tag">${cat[m]}</span>`:''}`,P.filter(p=>p[8]===m).length,'macro')+ps.map(p=>linha(p,'macro','rec1')).join('')})
+ return `<table class="tab">${h}</table>`}
+
+// ---------- Cadastros ----------
+function barraDosCadastros(aba,acoes){document.getElementById('barra').innerHTML=`<span class="seg">${['Setores','Macroprocessos','Histórico'].map(o=>`<button class="${o===aba?'sim':''}">${o}</button>`).join('')}</span><span class="sep"></span>${acoes}`}
+function setores(){barraDosCadastros('Setores',`<button class="btn prim">${ic('mais')}Novo setor</button><span class="busca">${ic('busca')}Buscar por sigla ou nome</span><span class="dir-barra"><button class="btn leve">${ic('pausa')}Mostrar inativos</button></span>`)
+ const linhas=Object.entries(SETORES).map(([s,[nm]],k)=>{const n=P.filter(p=>p[1]===s).length;return `<tr><td>${selo(s)}</td><td class="nome">${nm}</td><td class="mono">${[1,2,1,1,1,0,1][k]}</td><td class="mono">${n}</td><td style="text-align:right;color:var(--inativo)">${ic('dir')}</td></tr>`}).join('')
+ return `<div class="pagina"><table class="tab"><tr><th>Sigla ${ic('ordem')}</th><th>Nome ${ic('ordem')}</th><th>Macroprocessos</th><th>Processos</th><th></th></tr>${linhas}</table><div class="pe-tab">7 setores ativos</div></div>`}
+function coresDoSetor(escolhida,livre){const cs=['#7c3aed','#0891b2','#db2777','#9333ea','#4f46e5','#0f766e','#c026d3','#475569','#0e7490','#6d28d9']
+ const usadas=['SGA','CDI','OUV','PLN','JUR','TEC','COM']
+ return `<div class="cores">${cs.map((c,i)=>`<span class="cor ${i===escolhida?'sim':''}"><span style="background:${c}"></span>${i<7?usadas[i]:i===escolhida?'sugerida':'livre'}</span>`).join('')}</div>
+ <div class="dica">${livre?'Sugerida a próxima cor livre. ':''}A sigla embaixo mostra quem já usa a cor; repetir é permitido.</div>`}
+function setorAberto(){moldura('setores','Setores','predio');document.getElementById('topo').querySelector('h1').innerHTML=`${ic('predio')}<span class="mig">Setores</span>${ic('dir')}CDI`
+ barraDosCadastros('Setores','')
+ const ps=P.filter(p=>p[1]==='CDI')
+ return `<div class="pagina"><div class="cab"><span class="voltar">${ic('esq')}</span>${selo('CDI')}<h2>Coordenadoria de Documentação e Informação</h2>
+ <div class="acoes"><button class="btn prim">Salvar</button><button class="btn icone">${ic('pontos')}</button>
+ <div class="menu"><div>${ic('pausa')}Desativar setor</div><hr><div class="perigo">${ic('lixo')}Excluir setor…</div></div></div></div>
+ <div class="bloco"><h3>Dados do setor</h3><div class="campos"><div class="campo"><label>Nome <i>*</i></label><div class="entrada">Coordenadoria de Documentação e Informação</div></div>
+ <div class="campo"><label>Sigla <i>*</i></label><div class="entrada">CDI</div></div><div class="campo todo"><label>Cor do selo</label>${coresDoSetor(1)}</div>
+ <div class="campo todo"><label>Observações</label><div class="entrada alta">Opcional</div></div></div></div>
+ <div class="bloco"><h3>Processos do setor <small>${ps.length}</small></h3><table class="tab" style="border:0">${'<tr><th>Processo</th><th>Etapa</th><th>Etiqueta</th><th>Responsável</th></tr>'+ps.map(p=>`<tr><td class="nome">${p[0]}</td><td>${etapa(p[2])}</td><td>${st(p[3])}</td><td>${pessoa(p[4])}</td></tr>`).join('')}</table></div></div>`}
+function novoSetor(){const fundo=setores()
+ return fundo+`<div class="veu"><div class="janela"><div class="t">Novo setor${ic('x')}</div><div class="c">
+ <div class="campos"><div class="campo"><label>Nome <i>*</i></label><div class="entrada"></div></div><div class="campo"><label>Sigla <i>*</i></label><div class="entrada"></div></div></div>
+ <div class="campo"><label>Cor do selo</label>${coresDoSetor(7,true)}</div><div class="campo"><label>Observações</label><div class="entrada alta">Opcional</div></div></div>
+ <div class="r"><button class="btn">Cancelar</button><button class="btn prim">Cadastrar setor</button></div></div></div>`}
+function macroAberto(){moldura('setores','Setores','predio');document.getElementById('topo').querySelector('h1').innerHTML=`${ic('predio')}<span class="mig">Macroprocessos</span>${ic('dir')}Gestão documental`
+ barraDosCadastros('Macroprocessos','')
+ const env=[['CDI','Responsável pelo arquivo central',true],['SGA','',false],['JUR','Consultado nos prazos de guarda',true]]
+ return `<div class="pagina"><div class="cab"><span class="voltar">${ic('esq')}</span><h2>Gestão documental</h2><span class="tag">Apoio</span>
+ <div class="acoes"><button class="btn prim">Salvar</button><button class="btn icone">${ic('pontos')}</button></div></div>
+ <div class="bloco"><h3>Dados do macroprocesso</h3><div class="campos"><div class="campo"><label>Nome <i>*</i></label><div class="entrada">Gestão documental</div></div>
+ <div class="campo"><label>Categoria</label><div class="entrada sel">Apoio ${ic('seta')}</div></div><div class="campo"><label>Código</label><div class="entrada muted">Opcional</div></div>
+ <div class="campo todo"><label>Descrição</label><div class="entrada alta">Opcional</div></div></div></div>
+ <div class="bloco"><h3>Setores envolvidos <small>${env.length}</small></h3><table class="tab" style="border:0"><tr><th>Setor</th><th>Observação</th><th></th></tr>
+ ${env.map(([s,o,salvo])=>`<tr><td><span class="pessoa">${selo(s)}${SETORES[s][0]}</span></td><td><div class="obs"><span class="${o?'':'muted'}">${o||'Opcional'}</span>${salvo?`<span class="salvo">${ic('ok')}Salvo</span>`:''}</div></td><td style="text-align:right"><button class="btn leve">${ic('x')}Tirar</button></td></tr>`).join('')}</table>
+ <div style="display:flex;gap:8px;margin-top:12px"><div class="entrada sel" style="width:280px;color:var(--inativo)">Escolha um setor ${ic('seta')}</div><button class="btn">${ic('mais')}Adicionar setor</button></div></div></div>`}
+function historico(){barraDosCadastros('Histórico',`<span class="rot">Mostrar</span><span class="seg">${['Tudo','Processos','Setores','Macroprocessos'].map((o,i)=>`<button class="${i===0?'sim':''}">${o}</button>`).join('')}</span><span class="busca">${ic('busca')}Buscar no histórico</span>`)
+ const ev=[['30/10/2026 12:48','AL','lista','Processo','Mudou o responsável','Gestão de acessos aos sistemas',[['Responsável','Bruno Reis','Você']]],
+ ['30/10/2026 11:02','CN','predio','Setor','Mudou a cor','CDI · Coordenadoria de Documentação e Informação',[['Cor','violeta','ciano']]],
+ ['29/10/2026 17:39','AL','lista','Processo','Criou','Monitoramento de indicadores',[['Setor','','PLN'],['Etapa','','Não iniciados']]],
+ ['29/10/2026 16:20','BR','camadas','Macroprocesso','Pôs o setor','Gestão documental',[['Setores envolvidos','CDI, SGA','CDI, SGA, JUR']]],
+ ['28/10/2026 09:15','AL','lista','Processo','Mudou de etapa','Revisão de contratos de serviços',[['Etapa','Validação com o setor','Aprovação pelo setor']]]]
+ return `<div class="pagina"><div class="bloco" style="padding:0">${ev.map(([q,r,i,t,acao,alvo,m])=>`<div class="evento"><span class="mono muted">${q}</span><span>${pessoa(r)}</span>
+ <div><span class="tipo">${ic(i)}${acao}</span> <span class="muted">${t.toLowerCase()}</span> ${alvo}${m.map(([c,a,d])=>`<div class="mud">${c}: ${a?`<s>${a}</s> → `:''}<b>${d}</b></div>`).join('')}</div></div>`).join('')}</div></div>`}
+
+const TELAS={lista:['processos','Processos','lista',lista],'lista-setor':['processos','Processos','lista',listaPorSetor],'lista-macro':['processos','Processos','lista',listaPorMacro],
+setores:['setores','Setores','predio',setores],setor:[null,0,0,setorAberto],'novo-setor':['setores','Setores','predio',novoSetor],macro:[null,0,0,macroAberto],historico:['setores','Setores','predio',historico]}
+const [area,titulo,icone,montar]=TELAS[visao]
+if(area)moldura(area,titulo,icone)
+document.getElementById('area').innerHTML=montar()
+</script>
+</body>
+</html>

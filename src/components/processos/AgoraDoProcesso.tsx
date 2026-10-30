@@ -3,8 +3,7 @@ import { useState } from 'react'
 import type { MovimentoDoProcessoEmUso } from '../../hooks/useMovimentoDoProcesso'
 import type { RegistrosDoProcesso } from '../../hooks/useRegistrosDoProcesso'
 import type { Executar } from '../../hooks/useGravacaoComFalha'
-import { fraseDaConsulta, rotuloDoAgora } from '../../processos/agoraDoProcesso'
-import { diasDoProcessoNaEtapa, passouDoLimite } from '../../processos/diasNaEtapa'
+import { fraseDaSituacaoParada, nomeDoResponsavel, ondeEstaOProcesso, rotuloDoAgora } from '../../processos/agoraDoProcesso'
 import type { PedidoDeSituacao } from '../../processos/pedidosDeSituacao'
 import { ROTULO_DA_SITUACAO } from '../../processos/rotulos'
 import { textoDaPublicacaoNoAgora } from '../../processos/publicacao'
@@ -14,8 +13,7 @@ import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { JanelaDeSituacao } from './AcoesDeSituacao'
 import { LinhaDaPublicacao } from './AgoraDaPublicacao'
-import { CorpoDoAgora } from './CorpoDoAgora'
-import { DiasNaEtapa } from './DiasNaEtapa'
+import { CorpoDoAgora, FotoDoResponsavel, SeloDeParadoNoAgora } from './CorpoDoAgora'
 import { RegistrosDoAgora } from './RegistrosDoAgora'
 
 type AgoraDoProcessoProps = {
@@ -86,7 +84,7 @@ function SituacaoParada({ processo, podeAlterar, aoRetomar }: SituacaoParadaProp
     <>
       <p className="agora-rotulo">Agora</p>
       <p className="agora-situacao">{processo.motivoDaSituacao ? `${rotulo}: ${processo.motivoDaSituacao}` : rotulo}</p>
-      <p className="agora-linha-de-texto">{fraseDaConsulta(processo, hojeEmBrasilia())}</p>
+      <p className="agora-linha-de-texto">{fraseDaSituacaoParada(processo, hojeEmBrasilia())}</p>
       <p className="agora-explicacao">Retome o processo para mudar a etapa, a etiqueta ou o responsável.</p>
       {podeAlterar && (
         <div className="agora-botoes">
@@ -97,18 +95,20 @@ function SituacaoParada({ processo, podeAlterar, aoRetomar }: SituacaoParadaProp
   )
 }
 
-// A Consulta só lê: a frase com a etapa, a etiqueta e o responsável, e o selo vermelho quando o processo está parado.
+// A Consulta só lê: a etapa e a etiqueta, a foto e o nome do responsável em texto (nada sem ninguém) e o selo vermelho
+// quando o processo está parado.
 type AgoraDaConsultaProps = Pick<AgoraDoProcessoProps, 'processo' | 'revisoes' | 'versoes' | 'registros' | 'usuarioId'> & { rotulo: string }
 
 function AgoraDaConsulta({ processo, rotulo, revisoes, versoes, registros, usuarioId }: AgoraDaConsultaProps) {
-  const dias = diasDoProcessoNaEtapa(processo, hojeEmBrasilia())
   const publicacao = textoDaPublicacaoNoAgora(processo)
+  const nome = nomeDoResponsavel(processo)
   return (
     <>
       <p className="agora-rotulo">{rotulo}</p>
+      <p className="agora-linha-de-texto">{ondeEstaOProcesso(processo)}</p>
       <p className="agora-responsavel">
-        <span>{fraseDaConsulta(processo, hojeEmBrasilia())}</span>
-        {dias !== null && passouDoLimite(dias) && <DiasNaEtapa dias={dias} />}
+        {nome && <><FotoDoResponsavel processo={processo} /><span>{nome}</span></>}
+        <SeloDeParadoNoAgora processo={processo} />
       </p>
       {publicacao && <LinhaDaPublicacao texto={publicacao} link={processo.linkDaPublicacao} />}
       <RegistrosDoAgora processo={processo} revisoes={revisoes} versoes={versoes} registros={registros} usuarioId={usuarioId} podeAlterar={false}

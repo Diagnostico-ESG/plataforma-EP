@@ -28,7 +28,7 @@ const versoes = (aprovada = false) => ({
 async function abrirJanela(rotulo: string, montagem = versoes()) {
   const falso = montarNosCadastros(montagem)
   const painel = within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
-  const secao = within(await painel.findByRole('region', { name: 'Arquivos' }))
+  const secao = within(await painel.findByRole('region', { name: 'Documentos do Mapeamento' }))
   if (rotulo !== 'V4') fireEvent.click(await secao.findByText(/Versões anteriores/))
   await escolherNoMenu(`Ações da ${rotulo}`, 'Editar número')
   const janela = within(await screen.findByRole('dialog', { name: `Editar número da ${rotulo}` }))

@@ -156,16 +156,9 @@ describe('validarPacote', () => {
     )
   })
 
-  it('recusa observações que não são texto nem nulo', () => {
-    expect(recusa((p) => { p.processos[0].observacoes = 12345 })).toContain(
-      'campo processos[0].observacoes: esperado texto ou nulo, recebido number',
-    )
-  })
-
-  it('não repete nome de processo nem observação em nenhuma mensagem', () => {
+  it('não repete nome de processo em nenhuma mensagem', () => {
     const mensagem = recusa((p) => {
       p.processos[0].nome = 'Nome Secreto Inventado'
-      p.processos[0].observacoes = 'Observação Secreta Inventada'
       p.processos[0].tipo = 'outro'
     })
     expect(mensagem).not.toContain('Secreto')

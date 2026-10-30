@@ -81,6 +81,9 @@ create function pg_temp.nome(usuario text) returns text
 language sql stable as $$ select nome from public.usuarios where id = ('00000000-0000-0000-0000-0000000000' || usuario)::uuid $$;
 grant execute on function pg_temp.nome(text) to authenticated;
 
+-- Regra de responsável inicial (ADR 0036): quem move não vira responsável; a Modelagem tem o a2 como responsável inicial, para estes
+-- processos entrarem nela com o a2, como o teste sempre supôs.
+update public.etapas set responsavel_inicial_id = '00000000-0000-0000-0000-0000000000a2' where codigo = 'modelagem';
 set local role authenticated;
 select pg_temp.claims('a2');
 select pg_temp.mover_sem_trava(pg_temp.processo(nome), pg_temp.etapa('modelagem'))
@@ -157,7 +160,7 @@ select pg_temp.responsavel('Responsavel', '00000000-0000-0000-0000-0000000000a1'
 reset role;
 update public.usuarios set ativo = false where id = '00000000-0000-0000-0000-0000000000a1';
 set local role authenticated;
-insert into _tap (linha) select lives_ok($sql$update public.processos set observacoes = 'Outra' where id = pg_temp.processo('Responsavel')$sql$,
+insert into _tap (linha) select lives_ok($sql$update public.processos set nome = 'Outra' where id = pg_temp.processo('Responsavel')$sql$,
   'o responsável desativado depois continua no processo, e a edição é aceita');
 
 -- ===== Suspenso e cancelado congelam; o concluído segue as regras de Concluídos =====
@@ -181,7 +184,7 @@ insert into _tap (linha) select results_eq(
   $sql$select etapa_atual_codigo, etiqueta::text, responsavel_id::text from public.processos_com_andamento
     where id = pg_temp.processo('Suspenso')$sql$,
   $sql$values ('modelagem', 'a_fazer', '00000000-0000-0000-0000-0000000000a2')$sql$,
-  'o processo retomado continua com a etapa, a etiqueta e o responsável de antes');
+  'o processo retomado continua com a etapa, a etiqueta e o responsável (o inicial da etapa, o mesmo de antes)');
 insert into _tap (linha) select lives_ok($sql$select pg_temp.etiquetar('Suspenso', 'em_andamento')$sql$,
   'e volta a mudar a etiqueta');
 insert into _tap (linha) select * from finish();

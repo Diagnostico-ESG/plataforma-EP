@@ -3,9 +3,9 @@ import type { AnotacoesLidas } from './tipos'
 /** As regras das Anotações do processo que não dependem da tela (spec, "Anotações do processo"; ADR 0021). */
 /** O processo que nunca teve anotação gravada. */
 export const SEM_ANOTACOES: AnotacoesLidas = { texto: null, alteradoPor: null, alteradoEm: null }
-export const LIMITE_DAS_ANOTACOES = 2000
+export const LIMITE_DAS_ANOTACOES = 8000
 export const PAUSA_DA_GRAVACAO_MS = 1000
-const CONTAGEM_A_PARTIR_DE = 1800
+const CONTAGEM_A_PARTIR_DE = 7800
 
 const FORMATO_DO_DIA_E_DA_HORA = new Intl.DateTimeFormat('pt-BR', {
   day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'America/Sao_Paulo',
@@ -21,7 +21,7 @@ export function precisaGravar(texto: string, gravado: string | null): boolean {
   return textoParaGravar(texto) !== gravado
 }
 
-/** "1.800 de 2.000" a partir de 1.800 caracteres; antes disso nada, para o bloco ficar limpo no uso comum. */
+/** "7.800 de 8.000" a partir de 7.800 caracteres; antes disso nada, para o bloco ficar limpo no uso comum. */
 export function contagemDasAnotacoes(texto: string): string | null {
   if (texto.length < CONTAGEM_A_PARTIR_DE) return null
   return `${texto.length.toLocaleString('pt-BR')} de ${LIMITE_DAS_ANOTACOES.toLocaleString('pt-BR')}`

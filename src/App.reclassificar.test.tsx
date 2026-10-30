@@ -24,7 +24,7 @@ function processo({ id, nome, tipo, macro, pai = null }: Item): ProcessoLido {
   return {
     id, nome, tipo, setorId: 's1', setorSigla: 'TSA', macroprocessoId: macro,
     macroprocessoNome: macro === 'm1' ? 'Macro A' : 'Macro B', processoPaiId: pai, situacao: 'em_andamento',
-    etapaAtual: null, responsavel: null, origem: 'novo', contexto: null, observacoes: null,
+    etapaAtual: null, responsavel: null,
     motivoDaSituacao: null, processoPai: null, subprocessos: [], dataDaModelagemPiloto: null, ultimaVersao: null, etapasDoVerso: [],
   }
 }
@@ -51,7 +51,8 @@ function montar({ id, perfil = 'integrante_ep', ajustar }: Montagem) {
 const painel = async () => within(await screen.findByRole('dialog', { name: /^Processo( |$)/ }))
 const opcoes = (seletor: HTMLElement) => Array.from((seletor as HTMLSelectElement).options).map((opcao) => opcao.textContent)
 // O cabeçalho do verso: título, macroprocesso, tipo e a pílula de situação.
-const cabecalho = (aberto: ReturnType<typeof within>) => within(aberto.getByRole('heading', { level: 2 }).closest('header') as HTMLElement)
+// Macroprocesso e tipo ficam no "Sobre" do verso (o topo mostra só o nome).
+const sobre = (aberto: ReturnType<typeof within>) => within(aberto.getByRole('region', { name: 'Sobre' }))
 const escrever = (campo: HTMLElement, valor: string) => fireEvent.change(campo, { target: { value: valor } })
 
 async function abrirJanela(nome: string) {
@@ -116,12 +117,12 @@ test('o aviso de macroprocesso aparece só quando o macroprocesso muda', async (
   expect(janela.getByText('O item passa do macroprocesso Macro B para Macro A, o do processo pai.')).toBeTruthy()
 })
 
-test('"a classificar" vira processo: a pílula do tipo muda no painel', async () => {
+test('"a classificar" vira processo: o tipo muda no Sobre do painel', async () => {
   const falso = montar({ id: 'p2' })
   confirmar(await abrirJanela('Solto'), 'É um processo')
   await waitFor(() => expect(falso.processos[1].tipo).toBe('processo'))
   const aberto = await painel()
-  await waitFor(() => expect(cabecalho(aberto).getByText('Processo')).toBeTruthy())
+  await waitFor(() => expect(sobre(aberto).getByText('Processo')).toBeTruthy())
 })
 
 test('processo vira subprocesso: passa ao macroprocesso do pai e o painel mostra o pai', async () => {
@@ -132,7 +133,7 @@ test('processo vira subprocesso: passa ao macroprocesso do pai e o painel mostra
   await waitFor(() => expect(falso.processos[3]).toMatchObject({ tipo: 'subprocesso', processoPaiId: 'p1', macroprocessoId: 'm1' }))
   const aberto = await painel()
   expect(await aberto.findByRole('link', { name: 'Emitir Ofício' })).toBeTruthy()
-  expect(cabecalho(aberto).getByText('Macro A')).toBeTruthy()
+  expect(sobre(aberto).getByText('Macro A')).toBeTruthy()
 })
 
 test('subprocesso vira processo: o pai some do painel', async () => {

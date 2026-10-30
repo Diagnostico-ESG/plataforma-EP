@@ -335,11 +335,6 @@ td .barra-etapa {
   font-family: var(--fonte-mono);
 }
 
-.selo-modelagem {
-  padding-left: var(--esp-1);
-  border-left: 3px solid var(--tipo-modelagem);
-}
-
 .cartao-rodape {
   display: flex;
   align-items: center;
@@ -404,18 +399,12 @@ td .barra-etapa {
   margin-right: auto;
 }
 
-.busca-da-lista {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-/* Na Lista, a barra de cima tem só a busca, Todos | Concluídos e Limpar filtros, à esquerda; [Cadastrar processo] fica à direita. */
-.quadro-barra:has(> .busca-da-lista) {
+/* Na Lista, a barra de cima tem só Agrupar por, Todos | Concluídos e Limpar filtros, à esquerda; [Cadastrar processo] fica à direita. */
+.quadro-barra-da-lista {
   justify-content: flex-start;
 }
 
-.quadro-barra:has(> .busca-da-lista) > .botao-principal {
+.quadro-barra-da-lista > .botao-principal {
   margin-left: auto;
 }
 
@@ -446,9 +435,13 @@ td .barra-etapa {
   font-weight: normal;
 }
 
-/* O sentido da ordenação, menor que o texto, para não disputar com o nome da coluna. */
+/* A marca da coluna, menor que o texto, para não disputar com o nome: a ▾ (abre o menu) é apagada; ▲ ▼ (a coluna que ordena) ficam mais fortes. */
 .cabecalho-da-lista-sentido {
   font-size: 0.7em;
+  color: var(--icone-inativo);
+}
+
+.cabecalho-da-lista-sentido[data-ordena='true'] {
   color: var(--texto-2);
 }
 
@@ -458,42 +451,6 @@ td .barra-etapa {
   height: 6px;
   border-radius: 50%;
   background: var(--azul);
-}
-
-.busca-lupa {
-  position: absolute;
-  left: var(--esp-2);
-  display: flex;
-  color: var(--icone-inativo);
-  pointer-events: none;
-}
-
-.busca-campo {
-  width: 220px;
-  min-height: 30px;
-  padding: var(--esp-1) 28px var(--esp-1) 30px;
-  border: 1px solid var(--linha);
-  border-radius: var(--canto);
-  background: var(--folha);
-  color: var(--texto);
-  font: inherit;
-  font-size: var(--tam-secundario);
-}
-
-.busca-limpar {
-  position: absolute;
-  right: var(--esp-1);
-  display: flex;
-  padding: var(--esp-1);
-  border: 0;
-  background: none;
-  color: var(--texto-2);
-  cursor: pointer;
-}
-
-.cadastros-abrir mark {
-  background: var(--busca-marca);
-  color: inherit;
 }
 
 .filtro {
@@ -508,7 +465,7 @@ td .barra-etapa {
 
 .filtro-seletor {
   min-width: 140px;
-  /* Com o Avatar de 20px na caixa fechada (filtro Responsável) a altura passava de 29 para 30px: fixa a menor altura, igual à da busca. */
+  /* Com o Avatar de 20px na caixa fechada (filtro Responsável) a altura passava de 29 para 30px: fixa a menor altura. */
   min-height: 30px;
   padding: var(--esp-1) var(--esp-2);
   border: 1px solid var(--linha);
