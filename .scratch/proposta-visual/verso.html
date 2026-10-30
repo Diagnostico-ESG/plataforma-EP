@@ -1,0 +1,172 @@
+<!doctype html>
+<!-- Protótipo descartável (2026-10-30): verso do cartão no estilo da proposta visual 6. Dados inventados. Visões: #geral, #documentos, #historico -->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Verso do cartão</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--azul:#3a5afe;--azul-claro:#e8edff;--azul-escuro:#2a44c9;--lateral:#252b36;--fundo:#f3f4f7;--linha:#e3e6ec;--texto:#1d2330;--texto-2:#5f6776;--inativo:#9098a6;
+--atraso:#d1293d;--atraso-f:#fdecee;--vence:#c2620a;--aviso-f:#fff6e5;--aviso-b:#f3d28f;--mono:'IBM Plex Mono',Consolas,monospace}
+*{box-sizing:border-box;margin:0}
+body{font:13px/1.45 'Source Sans 3',system-ui,sans-serif;color:var(--texto);background:var(--fundo);height:100vh;overflow:hidden}
+svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+/* Fundo: a moldura da proposta 6, esmaecida atrás da janela */
+.moldura{position:fixed;inset:0;display:grid;grid-template:52px 56px 1fr/56px 1fr}
+.moldura .l{grid-row:1/4;background:var(--lateral)}.moldura .t{background:#fff}.moldura .b{background:#fff;border-bottom:1px solid var(--linha)}
+.veu{position:fixed;inset:0;background:rgb(29 35 48/.45);display:grid;place-items:center}
+.janela{background:#fff;border-radius:12px;width:1180px;height:830px;box-shadow:0 24px 60px rgb(29 35 48/.3);display:flex;flex-direction:column;overflow:hidden}
+.cab{display:flex;align-items:center;gap:12px;padding:16px 24px 12px}
+.cab h1{font-size:20px;font-weight:700}.cab .dir{margin-left:auto;display:flex;gap:8px;align-items:center}
+.setor{font:700 11px 'Source Sans 3';letter-spacing:.3px;color:#fff;border-radius:4px;padding:2px 7px}
+.btn{border:1px solid var(--linha);background:#fff;font:600 13px 'Source Sans 3';color:var(--texto);height:34px;padding:0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn.prim{background:var(--azul);border-color:var(--azul);color:#fff}.btn.leve{border-color:transparent;background:none;color:var(--texto-2)}.btn.icone{width:34px;padding:0;justify-content:center}
+.btn.peq{height:28px;font-size:12px;padding:0 10px}
+/* Trilha das etapas */
+.trilha{display:flex;align-items:flex-start;padding:4px 24px 14px;gap:0}
+.passo{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;font-size:11.5px;color:var(--texto-2);text-align:center}
+.passo::before{content:'';position:absolute;top:15px;left:-50%;right:50%;height:2px;background:#d5dbe7;z-index:0}.passo:first-child::before{display:none}
+.passo.feito::before,.passo.atual::before{background:#6b7a99}
+.bola{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#fff;border:1.5px solid #d5dbe7;color:var(--inativo);position:relative;z-index:1}
+.feito .bola{background:#eef0f4;border-color:#eef0f4;color:#4a5163}.atual .bola{background:var(--azul-claro);border-color:var(--azul);color:var(--azul)}
+.atual{color:var(--azul-escuro);font-weight:700}.passo small{font:400 10.5px var(--mono);color:var(--inativo)}.atual small{color:var(--azul-escuro)}
+/* Abas */
+.abas{display:flex;gap:4px;padding:0 24px;border-bottom:1px solid var(--linha)}
+.aba{padding:9px 12px;font-weight:600;color:var(--texto-2);display:inline-flex;gap:6px;align-items:center;border-radius:6px 6px 0 0;margin-bottom:-1px}
+.aba.sim{background:var(--azul-claro);color:var(--azul-escuro)}.aba em{font:500 11px var(--mono);font-style:normal;color:var(--inativo)}
+.corpo{flex:1;overflow:hidden;padding:18px 24px;background:#fafbfc}
+.grade{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;align-items:start}
+.bloco{background:#fff;border:1px solid var(--linha);border-radius:10px;padding:16px 18px;margin-bottom:16px}
+.bloco h3{font-size:13px;font-weight:700;color:var(--texto-2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px;display:flex;align-items:center;gap:8px}.bloco h3 .dir{margin-left:auto;text-transform:none;letter-spacing:0}
+.linha-c{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid #f0f2f5}.linha-c:last-child{border-bottom:0}
+.linha-c .r{font-size:12px;color:var(--texto-2);font-weight:600}.linha-c .v{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.seg{display:inline-flex;background:var(--fundo);border:1px solid var(--linha);border-radius:6px;padding:2px}
+.seg button{border:0;background:none;font:600 12px 'Source Sans 3';color:var(--texto-2);padding:5px 10px;border-radius:4px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.seg .sim{background:var(--azul-claro);color:var(--azul-escuro)}
+.av{width:26px;height:26px;border-radius:50%;background:#e9ecf1;color:#4a5163;font:600 10px/26px 'Source Sans 3';text-align:center;display:inline-block;flex:none}.av.eu{background:var(--azul-claro);color:var(--azul-escuro)}
+.alerta{display:flex;gap:10px;align-items:flex-start;border-radius:8px;padding:10px 12px;font-size:12.5px;margin-top:10px}
+.alerta.aviso{background:var(--aviso-f);border:1px solid var(--aviso-b)}.alerta.aviso svg{color:var(--vence)}
+.alerta.atraso{background:var(--atraso-f);border:1px solid #f5c2c9}.alerta.atraso svg{color:var(--atraso)}
+.mono{font:500 12px var(--mono)}.muted{color:var(--inativo)}
+.vermelho{color:var(--atraso);font-weight:600}
+.texto{font-size:13px;line-height:1.55}
+.miniatura{border:1px solid var(--linha);border-radius:8px;background:#fbfcfe;display:grid;place-items:center;overflow:hidden}
+.arq{display:grid;grid-template-columns:30px 1fr auto auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #f0f2f5}.arq:last-child{border-bottom:0}
+.tipo{width:30px;height:30px;border-radius:6px;display:grid;place-items:center;font:700 8.5px var(--mono);color:#fff}
+.arq .nome{font-weight:600}.arq .meta{font-size:11.5px;color:var(--texto-2)}
+.falta .nome{color:var(--inativo);font-weight:400}
+.ver-tag{font:700 12px var(--mono);background:var(--azul-claro);color:var(--azul-escuro);border-radius:4px;padding:1px 6px}
+.ver-tag.cinza{background:#eef0f4;color:#4a5163}
+table{width:100%;border-collapse:collapse}th{text-align:left;font-size:12px;color:var(--texto-2);padding:6px 8px;border-bottom:1px solid var(--linha)}td{padding:8px;border-bottom:1px solid #f0f2f5;font-size:12.5px}
+tr:last-child td{border-bottom:0}
+.evento{display:grid;grid-template-columns:56px 30px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid #f0f2f5;align-items:start}
+.evento .tipo-ev{display:inline-flex;align-items:center;gap:6px;font-weight:700}.evento .tipo-ev svg{color:var(--texto-2)}
+.mud{font-size:12.5px;color:var(--texto-2);margin-top:3px}.mud s{color:var(--inativo)}.mud b{color:var(--texto)}
+.dia{font:600 12px 'Source Sans 3';color:var(--texto-2);padding:12px 0 2px;text-transform:uppercase;letter-spacing:.4px}
+</style>
+</head>
+<body>
+<svg style="display:none">
+<symbol id="x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="pontos" viewBox="0 0 24 24"><circle cx="5" cy="12" r=".8"/><circle cx="12" cy="12" r=".8"/><circle cx="19" cy="12" r=".8"/></symbol>
+<symbol id="seta" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+<symbol id="ok" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
+<symbol id="baixar" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></symbol>
+<symbol id="mais" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="alerta" viewBox="0 0 24 24"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17.5h.01"/></symbol>
+<symbol id="cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+<symbol id="relogio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="cadeado" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="doc" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+<symbol id="mover" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="pessoa" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+<symbol id="etiqueta" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8" r="1"/></symbol>
+<symbol id="clipe" viewBox="0 0 24 24"><path d="M21 11.5l-8.5 8.5a5 5 0 0 1-7-7L14 4.5a3.3 3.3 0 0 1 4.7 4.7L10.2 17.7a1.7 1.7 0 0 1-2.4-2.4L15.5 7.6"/></symbol>
+<symbol id="e0" viewBox="0 0 24 24"><path d="M3 13l2.5-7.5A2 2 0 0 1 7.4 4h9.2a2 2 0 0 1 1.9 1.5L21 13v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 13h5l1.5 2.5h5L16 13h5"/></symbol>
+<symbol id="e1" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+<symbol id="e2" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></symbol>
+<symbol id="e3" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8.5 11l2 2 3.5-3.5"/></symbol>
+<symbol id="e4" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></symbol>
+<symbol id="e5" viewBox="0 0 24 24"><path d="M12 3l2.4 1.8 3-.2.9 2.9 2.5 1.7-1 2.8 1 2.8-2.5 1.7-.9 2.9-3-.2L12 21l-2.4-1.8-3 .2-.9-2.9L3.2 14.8l1-2.8-1-2.8 2.5-1.7.9-2.9 3 .2z"/><path d="M8.5 12l2.3 2.3 4.7-4.6"/></symbol>
+<symbol id="e6" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></symbol>
+<symbol id="e7" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+</svg>
+<div class="moldura"><div class="l"></div><div class="t"></div><div class="b"></div></div>
+<div class="veu"><div class="janela" id="janela"></div></div>
+<script>
+const ic=n=>`<svg class="i"><use href="#${n}"/></svg>`
+const ETAPAS=[['Não iniciados','14/10'],['Modelagem piloto','16/10'],['Relatório e modelagem técnica','21/10'],['Revisão interna','28/10'],['Validação com o setor'],['Aprovação pelo setor'],['Publicação'],['Concluídos']]
+const ATUAL=3
+const ST={a:'<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/>',i:'<circle cx="12" cy="12" r="8" fill="none" stroke="#3a5afe" stroke-width="2"/><path d="M12 4a8 8 0 0 1 0 16z" fill="#3a5afe"/>',
+f:'<circle cx="12" cy="12" r="9" fill="#16a34a"/><path d="M8 12.2l2.8 2.8 5.2-5.4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'}
+const visao=location.hash.slice(1)||'geral'
+
+const cabecalho=`<div class="cab"><span class="setor" style="background:#0f766e" title="Diretoria de Tecnologia">TEC</span><h1>Gestão de acessos aos sistemas</h1>
+ <div class="dir"><button class="btn prim">${ic('e3')}Registrar revisão</button><button class="btn icone">${ic('pontos')}</button><button class="btn icone leve">${ic('x')}</button></div></div>`
+const trilha=`<div class="trilha">${ETAPAS.map(([e,d],i)=>`<div class="passo ${i<ATUAL?'feito':i===ATUAL?'atual':''}"><span class="bola">${i<ATUAL?ic('ok'):ic('e'+i)}</span>${e}${i<ATUAL?`<small>${d}</small>`:i===ATUAL?'<small>desde 28/10 · 2 dias</small>':''}</div>`).join('')}</div>`
+const abas=`<div class="abas">${[['geral','Visão geral',''],['documentos','Documentos','6'],['revisoes','Revisões','1'],['historico','Histórico','']].map(([k,n,c])=>`<span class="aba ${k===visao?'sim':''}">${n}${c?` <em>${c}</em>`:''}</span>`).join('')}</div>`
+
+// Desenho simples de um fluxograma, só para a miniatura
+const fluxo=(w,h)=>`<svg viewBox="0 0 300 150" width="${w}" height="${h}" fill="none" stroke="#6b7a99" stroke-width="1.5"><rect x="4" y="4" width="292" height="142" rx="4" stroke="#d5dbe7"/>
+ <line x1="4" y1="52" x2="296" y2="52" stroke="#e3e6ec"/><line x1="4" y1="100" x2="296" y2="100" stroke="#e3e6ec"/>
+ <circle cx="26" cy="28" r="8"/><rect x="46" y="18" width="50" height="20" rx="4"/><path d="M34 28h12M96 28h16"/><rect x="112" y="18" width="50" height="20" rx="4"/>
+ <path d="M137 38v26"/><path d="M137 64l10 10-10 10-10-10z"/><path d="M147 74h22"/><rect x="169" y="64" width="50" height="20" rx="4"/><path d="M137 84v30"/><rect x="112" y="114" width="50" height="20" rx="4"/>
+ <path d="M219 74h22"/><rect x="241" y="64" width="44" height="20" rx="4"/><circle cx="263" cy="124" r="8" stroke-width="2.5"/><path d="M263 84v32"/></svg>`
+
+function geral(){return `<div class="grade"><div>
+ <div class="bloco" style="border-color:#c9d3ff;box-shadow:inset 0 2px 0 var(--azul)"><h3>Agora</h3>
+  <div class="linha-c"><span class="r">Etapa</span><span class="v">${ic('e3')}<b>Revisão interna</b><span class="muted mono">4 de 8</span><button class="btn peq" style="margin-left:auto">${ic('mover')}Mover para${ic('seta')}</button></span></div>
+  <div class="linha-c"><span class="r">Etiqueta</span><span class="v"><span class="seg">${[['a','A fazer'],['i','Iniciado'],['f','Finalizado']].map(([k,n])=>`<button class="${k==='i'?'sim':''}"><svg viewBox="0 0 24 24" width="15" height="15" style="color:#9098a6">${ST[k]}</svg>${n}</button>`).join('')}</span></span></div>
+  <div class="linha-c"><span class="r">Responsável</span><span class="v"><span class="av eu">AL</span>Você<button class="btn peq leve" style="margin-left:auto">${ic('pessoa')}Trocar</button></span></div>
+  <div class="alerta atraso">${ic('cal')}<div><b>Prazo vencido há 3 dias</b> (27/10). Revisão pendente da versão V2.</div></div>
+  <div class="alerta aviso">${ic('alerta')}<div>Você enviou a V2; a revisão interna deve ser feita por outra pessoa da equipe.</div></div></div>
+ <div class="bloco"><h3>Versão atual <span class="dir"><button class="btn peq leve">Ver documentos</button></span></h3>
+  <div style="display:grid;grid-template-columns:220px 1fr;gap:16px;align-items:center"><div class="miniatura">${fluxo(220,110)}</div>
+  <div><div style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><span class="ver-tag">V2</span><b>Fluxograma</b></div>
+  <div class="muted" style="font-size:12px">Enviada por você em 27/10 · Relatório e modelagem técnica</div>
+  <div style="display:flex;gap:6px;margin-top:10px">${tipo('BPMN','#4f46e5')}${tipo('PNG','#0891b2')}${tipo('BPM','#6b7a99')}${tipo('DOCX','#2a44c9')}</div></div></div></div>
+ </div><div>
+ <div class="bloco"><h3>Dados</h3>
+  <div class="linha-c"><span class="r">Setor</span><span class="v"><span class="setor" style="background:#0f766e">TEC</span>Diretoria de Tecnologia</span></div>
+  <div class="linha-c"><span class="r">Macroprocesso</span><span class="v muted">A definir</span></div>
+  <div class="linha-c"><span class="r">Tipo</span><span class="v">Processo</span></div>
+  <div class="linha-c"><span class="r">Prazo</span><span class="v vermelho">${ic('cal')}27/10 · há 3 dias</span></div>
+  <div class="linha-c"><span class="r">Na etapa</span><span class="v">${ic('relogio')}2 dias · no processo há 16 dias</span></div>
+  <div class="linha-c"><span class="r">E-protocolo</span><span class="v muted">Ainda não registrado</span></div>
+  <div class="linha-c"><span class="r">Situação</span><span class="v">Em andamento</span></div></div>
+ <div class="bloco"><h3>Anotações <span class="dir"><button class="btn peq leve">Editar</button></span></h3>
+  <p class="texto">Setor pediu para incluir o fluxo de acesso de terceirizados. Conferir com a equipe de segurança antes da validação.</p>
+  <p class="muted" style="font-size:12px;margin-top:8px">Carla Nunes · 29/10, 21:06</p></div>
+ </div></div>`}
+function tipo(t,c){return `<span class="tipo" style="background:${c};width:38px">${t}</span>`}
+
+function arquivo(t,c,nome,meta,falta){return `<div class="arq ${falta?'falta':''}">${falta?`<span class="tipo" style="background:none;border:1.5px dashed #c3cad8;color:var(--inativo)">${t}</span>`:`<span class="tipo" style="background:${c}">${t}</span>`}
+ <div><div class="nome">${nome}</div>${meta?`<div class="meta">${meta}</div>`:''}</div>${falta?`<button class="btn peq">${ic('mais')}Adicionar</button><span></span>`:`<button class="btn peq leve">${ic('baixar')}Baixar</button><button class="btn icone leve" style="height:28px;width:28px">${ic('pontos')}</button>`}</div>`}
+function documentos(){return `<div class="grade" style="grid-template-columns:1.4fr 1fr"><div>
+ <div class="bloco"><h3>Versão atual <span class="ver-tag" style="text-transform:none">V2</span><span class="dir"><button class="btn peq">${ic('mais')}Enviar nova versão</button></span></h3>
+  <div style="display:grid;grid-template-columns:260px 1fr;gap:18px"><div class="miniatura" style="height:150px">${fluxo(258,130)}</div><div>
+  ${arquivo('BPMN','#4f46e5','TEC_V2_Gestão de acessos aos sistemas.bpmn','Modelo editável · 48 KB')}
+  ${arquivo('PNG','#0891b2','TEC_V2_Gestão de acessos aos sistemas.png','Imagem do fluxograma · 212 KB')}
+  ${arquivo('BPM','#6b7a99','TEC_V2_Gestão de acessos aos sistemas.bpm','Arquivo do Bizagi · 96 KB')}</div></div>
+  <p class="muted" style="font-size:12px;margin-top:10px">Enviada por você em 27/10, na etapa Relatório e modelagem técnica.</p></div>
+ <div class="bloco"><h3>Relatório <span class="dir"><button class="btn peq">${ic('mais')}Enviar relatório</button></span></h3>
+  ${arquivo('DOCX','#2a44c9','TEC_V2_Gestão de acessos aos sistemas_Relatório.docx','Relatório V1 · vale para o fluxograma V2 · 1,2 MB')}</div>
+ </div><div>
+ <div class="bloco"><h3>${ic('cadeado')}Versões anteriores <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:400">somente leitura</span></h3>
+  <table><tr><th>Versão</th><th>Data</th><th>Quem</th><th>Etapa</th><th></th></tr>
+  <tr><td><span class="ver-tag cinza">V1</span> <span class="muted">piloto</span></td><td class="mono">16/10</td><td>Bruno Reis</td><td>Modelagem piloto</td><td style="text-align:right">${ic('baixar')}</td></tr></table></div>
+ <div class="bloco"><h3>Outros anexos <span class="dir"><button class="btn peq">${ic('clipe')}Enviar anexo</button></span></h3>
+  ${arquivo('EML','#c026d3','Retorno do setor sobre o piloto.eml','E-mail · 25/10 · Carla Nunes')}
+  ${arquivo('PDF','#9333ea','Lista de sistemas atendidos.pdf','PDF · 20/10 · Você')}</div>
+ </div></div>`}
+
+function historico(){const ev=[['30/10',[['10:12','AL','etiqueta','Mudou a etiqueta',[['Etiqueta','A fazer','Iniciado']]],['09:40','CN','pessoa','Trocou o responsável',[['Responsável','Bruno Reis','Você']]]]],
+ ['28/10',[['17:37','BR','mover','Moveu o processo',[['Etapa','Relatório e modelagem técnica','Revisão interna']]]]],
+ ['27/10',[['15:05','AL','doc','Enviou o relatório V1',[['Vale para','','fluxograma V2']]],['15:02','AL','doc','Enviou a versão V2',[['Arquivos','','.bpmn, .png, .bpm']]]]]]
+ return `<div style="max-width:860px"><div style="display:flex;gap:10px;align-items:center;margin-bottom:6px"><span class="muted" style="font-size:12px">Mostrar</span><span class="seg">${['Tudo','Etapas','Documentos','Responsável','Etiqueta'].map((o,i)=>`<button class="${i===0?'sim':''}">${o}</button>`).join('')}</span></div>
+ <div class="bloco" style="padding:4px 18px">${ev.map(([d,es])=>`<div class="dia">${d}</div>`+es.map(([h,r,i,acao,m])=>`<div class="evento"><span class="mono muted">${h}</span><span class="av ${r==='AL'?'eu':''}">${r}</span>
+ <div><span class="tipo-ev">${ic(i)}${acao}</span> <span class="muted">por ${r==='AL'?'você':{BR:'Bruno Reis',CN:'Carla Nunes'}[r]}</span>${m.map(([c,a,dp])=>`<div class="mud">${c}: ${a?`<s>${a}</s> → `:''}<b>${dp}</b></div>`).join('')}</div></div>`).join('')).join('')}</div></div>`}
+
+document.getElementById('janela').innerHTML=cabecalho+trilha+abas+`<div class="corpo">${{geral,documentos,historico}[visao]()}</div>`
+</script>
+</body>
+</html>
