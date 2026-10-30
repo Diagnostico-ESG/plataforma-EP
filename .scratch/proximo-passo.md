@@ -4,4 +4,6 @@
 
 **Próximo comando:** `/implementar-identidade` (Sonnet), numa sessão nova. Ela deve separar o que é só visual do que é comportamento novo (interruptor "Linhas", "Destacar os meus", "Filtros" com contador, verso enxuto com histórico no "···", janela para criar setor), que pode precisar de `/planejar` ou `/demanda`, e refazer o `DESIGN.md`.
 
-**Depende do usuário:** conferir o Catálogo de etapas com o login real e escolher o responsável inicial de cada etapa; olhar no painel do Supabase de desenvolvimento se o cadastro aberto segue como o ADR 0001 manda.
+**Também pendente:** conferir o possível defeito do histórico do processo, que não mostra a etapa de → para em "Moveu o processo" (caminho: `/demanda`). Demandas pequenas continuam pelo `/demanda`.
+
+**Depende do usuário:** conferir o Catálogo de etapas com o login real; escolher o responsável inicial de cada etapa (hoje vazias: mover e cadastrar deixam o processo sem responsável); olhar no painel do Supabase de desenvolvimento se o cadastro aberto segue como o ADR 0001 manda.
