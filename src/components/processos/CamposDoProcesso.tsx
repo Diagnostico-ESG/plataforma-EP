@@ -28,7 +28,7 @@ export function CamposDoFormulario({ campos, opcoes, cadastrando, aoMudar }: Cam
   const id = useId()
   return (
     <>
-      <label htmlFor={`${id}-nome`}>Nome</label>
+      <label htmlFor={`${id}-nome`}>Nome do Processo</label>
       <input id={`${id}-nome`} aria-required="true" value={campos.nome} maxLength={200} autoComplete="off"
         onChange={(evento) => aoMudar({ nome: evento.target.value })} />
       <label htmlFor={`${id}-setor`}>Setor</label>

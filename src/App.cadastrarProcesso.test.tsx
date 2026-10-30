@@ -94,7 +94,7 @@ test('nome, setor e macroprocesso são obrigatórios, conferidos antes de enviar
 test('a recusa aparece dentro do rodapé fixo, e os campos obrigatórios são marcados', async () => {
   montar()
   const form = await formulario()
-  for (const campo of ['Nome', 'Setor', 'Macroprocesso']) expect(form.getByLabelText(campo).getAttribute('aria-required')).toBe('true')
+  for (const campo of ['Nome do Processo', 'Setor', 'Macroprocesso']) expect(form.getByLabelText(campo).getAttribute('aria-required')).toBe('true')
   cadastrar(form)
   const alerta = await form.findByRole('alert')
   expect(alerta.closest('.formulario-do-processo-rodape')).not.toBeNull()
@@ -108,7 +108,7 @@ test('nome repetido no mesmo setor: a recusa em vermelho e os dados continuam no
   const alerta = await form.findByRole('alert')
   expect(alerta.textContent).toBe('Já existe um processo com o nome emitir ofício no setor TSA.')
   expect(alerta.classList.contains('cadastros-falha')).toBe(true)
-  expect((form.getByLabelText('Nome') as HTMLInputElement).value).toBe('emitir ofício')
+  expect((form.getByLabelText('Nome do Processo') as HTMLInputElement).value).toBe('emitir ofício')
 })
 
 test('o mesmo nome em outro setor é aceito', async () => {
@@ -127,7 +127,7 @@ test('falha de gravação: a mensagem com o motivo e os dados continuam no formu
   cadastrar(form)
   expect((await form.findByRole('alert')).textContent)
     .toBe('A alteração não foi salva: sem conexão. Seus dados continuam no formulário.')
-  expect((form.getByLabelText('Nome') as HTMLInputElement).value).toBe('Emitir Ofício')
+  expect((form.getByLabelText('Nome do Processo') as HTMLInputElement).value).toBe('Emitir Ofício')
   expect(window.location.hash).toBe('#/processos/novo')
 })
 
@@ -163,10 +163,10 @@ test('[Editar] troca os dados pelo formulário preenchido, sem o campo de tipo, 
   expect(screen.getByRole('heading', { name: 'Editar Emitir Ofício', level: 2 })).toBeTruthy()
   expect(form.queryByRole('button', { name: 'Cadastrar' })).toBeNull()
   expect(screen.getByRole('dialog', { name: 'Processo Emitir Ofício' }).classList.contains('verso-estreita')).toBe(true)
-  expect((form.getByLabelText('Nome') as HTMLInputElement).value).toBe('Emitir Ofício')
+  expect((form.getByLabelText('Nome do Processo') as HTMLInputElement).value).toBe('Emitir Ofício')
   expect((form.getByLabelText('Setor') as HTMLSelectElement).value).toBe('s1')
   for (const rotulo of ['Origem', 'Contexto', 'Observações']) expect(form.queryByLabelText(rotulo)).toBeNull()
-  escrever(form.getByLabelText('Nome'), 'Emitir Ofício Novo')
+  escrever(form.getByLabelText('Nome do Processo'), 'Emitir Ofício Novo')
   salvar(form)
   const painel = within(screen.getByRole('dialog', { name: /^Processo( |$)/ }))
   expect(await painel.findByRole('heading', { name: 'Emitir Ofício Novo' })).toBeTruthy()
@@ -177,11 +177,11 @@ test('[Editar] troca os dados pelo formulário preenchido, sem o campo de tipo, 
 test('falha ao editar mostra o motivo e mantém os dados; Cancelar volta aos dados sem gravar', async () => {
   const { falso, painel, form } = await abrirEdicao()
   falso.falhaDeGravacao = 'sem conexão'
-  escrever(form.getByLabelText('Nome'), 'Outro Nome')
+  escrever(form.getByLabelText('Nome do Processo'), 'Outro Nome')
   salvar(form)
   expect((await form.findByRole('alert')).textContent)
     .toBe('A alteração não foi salva: sem conexão. Seus dados continuam no formulário.')
-  expect((form.getByLabelText('Nome') as HTMLInputElement).value).toBe('Outro Nome')
+  expect((form.getByLabelText('Nome do Processo') as HTMLInputElement).value).toBe('Outro Nome')
   fireEvent.click(form.getByRole('button', { name: 'Cancelar' }))
   expect(await painel.findByRole('heading', { name: 'Emitir Ofício' })).toBeTruthy()
   expect(falso.processos[0].nome).toBe('Emitir Ofício')

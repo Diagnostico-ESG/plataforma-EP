@@ -98,7 +98,7 @@ test('escolher o pai fixa o macroprocesso no dele', async () => {
 test('subprocesso sem pai é recusado antes de enviar', async () => {
   const falso = montar()
   const form = await escolherSubprocesso()
-  escrever(form.getByLabelText('Nome'), 'Arquivar Ofício')
+  escrever(form.getByLabelText('Nome do Processo'), 'Arquivar Ofício')
   escrever(form.getByLabelText('Setor'), 's2')
   fireEvent.click(form.getByRole('button', { name: 'Cadastrar' }))
   expect((await form.findByRole('alert')).textContent).toBe('Escolha o processo pai.')
@@ -108,7 +108,7 @@ test('subprocesso sem pai é recusado antes de enviar', async () => {
 test('cadastrar o subprocesso grava o pai e o macroprocesso dele, e o cartão traz a pílula "Subprocesso"', async () => {
   const falso = montar()
   const form = await escolherSubprocesso()
-  escrever(form.getByLabelText('Nome'), 'Arquivar Ofício')
+  escrever(form.getByLabelText('Nome do Processo'), 'Arquivar Ofício')
   escrever(form.getByLabelText('Setor'), 's2')
   escrever(form.getByLabelText('Processo pai'), 'p1')
   fireEvent.click(form.getByRole('button', { name: 'Cadastrar' }))
@@ -124,7 +124,7 @@ test('falha ao gravar o subprocesso: a frase em vermelho e os dados continuam no
   const falso = montar()
   falso.falhaDeGravacao = 'sem conexão'
   const form = await escolherSubprocesso()
-  escrever(form.getByLabelText('Nome'), 'Arquivar Ofício')
+  escrever(form.getByLabelText('Nome do Processo'), 'Arquivar Ofício')
   escrever(form.getByLabelText('Setor'), 's2')
   escrever(form.getByLabelText('Processo pai'), 'p1')
   fireEvent.click(form.getByRole('button', { name: 'Cadastrar' }))

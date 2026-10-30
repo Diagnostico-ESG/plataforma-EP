@@ -72,16 +72,19 @@ function filtroDaColuna({ filtro }: ColunaDoCabecalho, { opcoes, filtros, mostra
   return { itens, escolhido: opcoes[filtro.opcoes].find((opcao) => opcao.valor === valor)?.rotulo ?? null }
 }
 
+// ▾ avisa que a coluna abre o menu de ordenar e filtrar; a coluna que ordena a Lista troca por ▲ ou ▼.
+const MARCA_DA_ORDEM = { nenhum: '▾', crescente: '▲', decrescente: '▼' }
+
 type ConteudoDoBotaoProps = { rotulo: string; sentido: SentidoDaOrdem | null; filtrado: string | null }
 
-// As marcas (▲ ▼ e o ponto do filtro) são para quem vê; o leitor de tela ouve o texto oculto, que começa por vírgula para o
+// As marcas (▾ ▲ ▼ e o ponto do filtro) são para quem vê; o leitor de tela ouve o texto oculto, que começa por vírgula para o
 // nome do botão ficar "Setor, filtrado: TSB, ordem crescente".
 function ConteudoDoBotao({ rotulo, sentido, filtrado }: ConteudoDoBotaoProps) {
   return (
     <>
       {rotulo}
       {filtrado && <span className="cabecalho-da-lista-filtrado" aria-hidden="true" />}
-      {sentido && <span className="cabecalho-da-lista-sentido" aria-hidden="true">{sentido === 'crescente' ? '▲' : '▼'}</span>}
+      <span className="cabecalho-da-lista-sentido" aria-hidden="true">{MARCA_DA_ORDEM[sentido ?? 'nenhum']}</span>
       {filtrado && <span className="visualmente-oculto">, filtrado: {filtrado}</span>}
       {sentido && <span className="visualmente-oculto">, ordem {sentido}</span>}
     </>

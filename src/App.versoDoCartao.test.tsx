@@ -283,7 +283,7 @@ test('[Cadastrar processo] abre o Novo processo na janela estreita, e Esc fecha'
   fireEvent.click(await screen.findByRole('button', { name: 'Cadastrar processo' }))
   const janela = await screen.findByRole('dialog', { name: 'Novo processo' })
   expect(janela.classList.contains('verso-estreita')).toBe(true)
-  fireEvent.keyDown(await within(janela).findByLabelText('Nome'), { key: 'Escape' })
+  fireEvent.keyDown(await within(janela).findByLabelText('Nome do Processo'), { key: 'Escape' })
   await waitFor(() => expect(window.location.hash).toBe('#/processos'))
   expect(screen.queryByRole('dialog')).toBeNull()
 })

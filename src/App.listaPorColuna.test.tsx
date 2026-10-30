@@ -71,6 +71,19 @@ test('a primeira coluna se chama Processo e o menu dela só ordena', async () =>
   expect(await opcoesDaColuna('Processo')).toEqual(['Crescente', 'Decrescente'])
 })
 
+test('toda coluna mostra ▾ (aria-hidden); a que ordena troca por ▲ ou ▼ e o nome do botão não muda', async () => {
+  montar()
+  const marcas = () => Array.from(document.querySelectorAll('.tabela-de-processos thead .cabecalho-da-lista-sentido'))
+  await botaoDaColuna('Processo')
+  expect(marcas().map((marca) => marca.textContent)).toEqual(['▲', '▾', '▾', '▾', '▾', '▾', '▾'])
+  expect(marcas().every((marca) => marca.getAttribute('aria-hidden') === 'true')).toBe(true)
+  await escolherNaColuna('Setor', 'Decrescente')
+  await waitFor(async () => expect((await botaoDaColuna('Setor')).textContent).toMatch(/▼/))
+  expect(marcas().map((marca) => marca.textContent)).toEqual(['▾', '▾', '▼', '▾', '▾', '▾', '▾'])
+  expect((await botaoDaColuna('Setor')).textContent).toMatch(/, ordem decrescente$/)
+  expect(await botaoDaColuna('Tipo')).toBeTruthy()
+})
+
 test('o filtro de Setor no cabeçalho troca as linhas, vai para o endereço e aparece no cabeçalho', async () => {
   montar()
   expect(await opcoesDaColuna('Setor')).toEqual(['Crescente', 'Decrescente', 'Todos', 'TSA', 'TSB'])

@@ -56,7 +56,7 @@ export async function formulario(nome = 'Cadastrar processo') {
 }
 
 export function preencher(form: ReturnType<typeof within>, campos: { nome?: string; setor?: string; macro?: string }) {
-  if (campos.nome !== undefined) escrever(form.getByLabelText('Nome'), campos.nome)
+  if (campos.nome !== undefined) escrever(form.getByLabelText('Nome do Processo'), campos.nome)
   if (campos.setor !== undefined) escrever(form.getByLabelText('Setor'), campos.setor)
   if (campos.macro !== undefined) escrever(form.getByLabelText('Macroprocesso'), campos.macro)
 }
