@@ -1,0 +1,110 @@
+<!doctype html>
+<!-- Protótipo descartável da análise de design de 2026-10-30. Dados inventados. Visões por hash: #etapas, #meus, #setores, #matriz -->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Proposta visual do Quadro</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--azul:#3a5afe;--azul-claro:#e8edff;--azul-escuro:#2a44c9;--azul-avatar:#d9dfff;--fundo:#edf1f9;--folha:#fff;--linha:#e1e6ef;--texto:#1e2433;--texto-2:#5d6577;--inativo:#8c93a3;
+--atraso-t:#a8263a;--atraso-f:#fce1e4;--vence-t:#8a5a00;--vence-f:#ffe9c7;--ok:#22703a;--mono:'IBM Plex Mono',Consolas,monospace}
+*{box-sizing:border-box;margin:0}
+q{quotes:none;display:inline-block;flex:none}
+body{font:13px/1.45 'Source Sans 3',system-ui,sans-serif;color:var(--texto);background:var(--fundo);height:100vh;display:grid;grid-template:52px 52px 1fr/56px 1fr;overflow:hidden}
+.topo{grid-column:1/-1;background:var(--azul);color:#fff;display:flex;align-items:center;gap:16px}
+.topo b{width:56px;text-align:center;font-size:16px}.topo span{font-size:14px;font-weight:600}
+.topo i{margin-left:auto;margin-right:16px;width:30px;height:30px;border-radius:50%;background:var(--azul-avatar);color:var(--azul-escuro);font:600 12px/30px 'Source Sans 3';text-align:center;font-style:normal}
+.faixa{grid-row:2/4;background:#fff;border-right:1px solid var(--linha);padding-top:12px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.faixa div{width:40px;height:40px;border-radius:6px;display:grid;place-items:center}.faixa div::after{content:'';width:16px;height:14px;border:1.75px solid var(--inativo);border-radius:3px}
+.faixa .ativo{background:var(--azul-claro)}.faixa .ativo::after{border-color:var(--azul)}
+.barra{background:#fff;border-bottom:1px solid var(--linha);display:flex;align-items:center;gap:12px;padding:0 16px}
+.seg{display:inline-flex;background:var(--fundo);border-radius:6px;padding:2px}
+.seg button{border:0;background:none;font:600 12px 'Source Sans 3';color:var(--texto-2);padding:5px 12px;border-radius:4px}
+.seg .sim{background:#fff;color:var(--texto);box-shadow:0 0 0 1px var(--linha)}
+.rot{font-size:12px;color:var(--texto-2)}.sep{width:1px;height:24px;background:var(--linha)}
+.btn{border:1px solid var(--linha);background:#fff;font:600 13px 'Source Sans 3';color:var(--texto);height:32px;padding:0 12px;border-radius:4px;display:inline-flex;align-items:center;gap:6px}
+.btn em{font:500 11px var(--mono);font-style:normal;background:var(--azul-claro);color:var(--azul-escuro);border-radius:999px;padding:0 6px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 6px 0 10px;border-radius:999px;background:var(--fundo);font-size:12px}.chip u{text-decoration:none;color:var(--inativo);font-size:14px}
+.chave{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600}.chave s{width:30px;height:18px;border-radius:9px;background:#c3cad8;position:relative}
+.chave s::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff}.chave.on s{background:var(--azul)}.chave.on s::after{left:14px}
+.principal{margin-left:auto;background:var(--azul);color:#fff;border:0}
+.area{overflow:hidden;padding:16px;display:flex;gap:12px;align-items:flex-start}
+.col{width:268px;flex:none;background:#e4e9f3;border-radius:8px;padding:0 8px 8px}
+.col h3{font-size:14px;font-weight:600;display:flex;align-items:baseline;gap:8px;padding:12px 4px 10px}.col h3 small{font:400 12px var(--mono);color:var(--texto-2)}
+.col h3 .n{font:500 11px var(--mono);color:var(--inativo)}
+.cartao{background:#fff;border:1px solid var(--linha);border-radius:6px;padding:10px 12px;margin-bottom:8px;display:grid;gap:6px}
+.cartao.outro{opacity:.4}
+.l1{display:flex;align-items:center;gap:6px;font:500 11px var(--mono);color:var(--texto-2)}.l1 q{width:8px;height:8px;border-radius:2px}
+.l1 .av,.av{margin-left:auto;width:22px;height:22px;border-radius:50%;background:#eef0f4;color:#4a5163;font:600 10px/22px 'Source Sans 3';text-align:center;flex:none}.av.eu{background:var(--azul-avatar);color:var(--azul-escuro)}
+.av.vazio{background:none;border:1px dashed #c3cad8}
+.nome{font-size:13.5px;font-weight:600;line-height:1.35}
+.l3{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--texto-2)}
+.sit{display:inline-flex;align-items:center;gap:5px;color:var(--texto)}.sit svg{width:12px;height:12px}
+.ver{font:400 11px var(--mono);color:var(--texto-2)}
+.pil{font:600 10.5px 'Source Sans 3';letter-spacing:.4px;text-transform:uppercase;border-radius:999px;padding:1px 7px}
+.p-atraso{background:var(--atraso-f);color:var(--atraso-t)}.p-vence{background:var(--vence-f);color:var(--vence-t)}.p-neutra{background:#eef0f4;color:#4a5163}
+.prog{height:4px;border-radius:2px;background:#e1e6ef}.prog i{display:block;height:100%;border-radius:2px;background:#7c8db5}
+.etapa{font-size:12px;color:var(--texto-2)}
+.cab-setor{border-top:3px solid;border-radius:8px 8px 0 0;margin:0 -8px;padding:10px 12px 10px;background:#fff;margin-bottom:8px;border-bottom:1px solid var(--linha)}
+.cab-setor .sg{font:600 14px var(--mono);display:flex;gap:8px;align-items:baseline}.cab-setor .sg small{font:400 12px var(--mono);color:var(--inativo);margin-left:auto}
+.cab-setor .nm{font-size:13px;color:var(--texto-2)}
+.matriz{overflow:hidden;padding:16px}
+.grade{display:grid;grid-template-columns:200px repeat(5,236px);gap:0;background:#fff;border:1px solid var(--linha);border-radius:8px;overflow:hidden;width:max-content}
+.grade>div{border-right:1px solid var(--linha);border-bottom:1px solid var(--linha);padding:8px}
+.gh{background:#f6f8fc;font-weight:600;font-size:13px;display:flex;gap:6px;align-items:baseline;position:sticky;top:0}.gh small{font:500 11px var(--mono);color:var(--inativo)}
+.rs{background:#f9fafd}.rs .sg{display:flex;align-items:center;gap:6px;font:600 13px var(--mono)}.rs .sg q{width:10px;height:10px;border-radius:2px}.rs .sg small{font:400 11px var(--mono);color:var(--inativo);margin-left:auto}
+.rs .nm{font-size:12px;color:var(--texto-2);margin-top:2px}.rs .sg b{color:var(--inativo);font-weight:400;font-family:'Source Sans 3'}
+.mini{background:#fff;border:1px solid var(--linha);border-radius:6px;padding:7px 9px;margin-bottom:6px;display:grid;gap:4px}.mini .nome{font-size:12.5px}
+.fechada{grid-column:1/-1;background:#f9fafd;display:flex;gap:16px;align-items:center;font-size:12px;color:var(--texto-2)}
+</style>
+</head>
+<body>
+<header class="topo"><b>EP</b><span>Processos</span><i>AL</i></header>
+<nav class="faixa"><div class="ativo"></div><div></div><div></div><div></div><div></div></nav>
+<div class="barra" id="barra"></div>
+<main id="area"></main>
+<script>
+const ETAPAS=['Não iniciados','Modelagem piloto','Relatório e modelagem técnica','Revisão interna','Validação com o setor','Aprovação pelo setor']
+const SETORES={SGA:['Secretaria de Gestão Administrativa','#4f6d8f'],CDI:['Coordenadoria de Documentação e Informação','#2e7480'],OUV:['Ouvidoria Geral','#6a5a9a'],
+PLN:['Diretoria de Planejamento','#8c4a64'],JUR:['Assessoria Jurídica','#4a55a2'],TEC:['Diretoria de Tecnologia','#5a6372'],COM:['Assessoria de Comunicação','#7a4d7a']}
+const P=[['Solicitação de diárias e passagens','SGA',0,'a',''],['Protocolo de correspondências recebidas','CDI',0,'a','BR'],['Atendimento de manifestações do cidadão','OUV',0,'a','','',['A classificar','neutra']],
+['Elaboração do plano anual de compras','PLN',1,'i','AL','Versão 1'],['Contratação de estagiários','SGA',1,'a','CN'],
+['Emissão de pareceres jurídicos','JUR',2,'a','AL','Versão 1'],['Gestão de acessos aos sistemas','TEC',2,'i','AL','Versão 2',['Atrasado há 3 dias','atraso']],
+['Publicação de atos no diário oficial','CDI',2,'a','BR','Versão 1'],['Arquivamento de processos encerrados','CDI',2,'i','AL','Versão 3'],
+['Divulgação de campanhas institucionais','COM',3,'f','AL','Versão 4',['Relatório pendente','vence']],['Controle de bens patrimoniais','SGA',3,'i','CN','Versão 2'],
+['Monitoramento de indicadores','PLN',4,'a','BR','Versão 4 final',['Vence em 2 dias','vence']],['Revisão de contratos de serviços','JUR',5,'i','CN','Versão 5']]
+const ICONE={a:['A fazer','<circle cx="6" cy="6" r="4.6" fill="none" stroke="#8c93a3" stroke-width="1.6"/>'],
+i:['Iniciado','<circle cx="6" cy="6" r="4.6" fill="none" stroke="#3a5afe" stroke-width="1.6"/><path d="M6 1.4a4.6 4.6 0 0 1 0 9.2z" fill="#3a5afe"/>'],
+f:['Finalizado','<circle cx="6" cy="6" r="5.4" fill="#22703a"/><path d="M3.6 6.1l1.7 1.7 3.1-3.3" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>']}
+const sit=s=>`<span class="sit"><svg viewBox="0 0 12 12">${ICONE[s][1]}</svg>${ICONE[s][0]}</span>`
+const av=r=>r?`<span class="av ${r==='AL'?'eu':''}" title="${r==='AL'?'Você':r}">${r}</span>`:'<span class="av vazio" title="Sem responsável"></span>'
+const pil=p=>p?`<span class="pil p-${p[1]}">${p[0]}</span>`:''
+const visao=location.hash.slice(1)||'etapas'
+function cartao(p,meus){const[n,s,e,st,r,v,x]=p
+ return `<div class="cartao ${meus&&r!=='AL'?'outro':''}"><div class="l1"><q style="background:${SETORES[s][1]}"></q>${s}${av(r)}</div>
+ <div class="nome">${n}</div><div class="l3">${sit(st)}${v?`<span class="ver">${v}</span>`:''}${pil(x)}</div></div>`}
+function cartaoDoSetor(p){const[n,s,e,st,r,v,x]=p
+ return `<div class="cartao"><div class="nome">${n}</div><div class="etapa">${ETAPAS[e]} · <span class="ver">${e+1} de 8</span></div>
+ <div class="prog"><i style="width:${(e+1)/8*100}%"></i></div><div class="l3">${sit(st)}${v?`<span class="ver">${v}</span>`:''}${pil(x)}${av(r)}</div></div>`}
+function barra(){const ag={etapas:'Etapa',meus:'Etapa',setores:'Setor',matriz:'Etapa'}[visao]
+ const linhas=visao==='matriz'?`<span class="rot">Linhas</span><span class="seg">${['Nenhuma','Setor','Responsável'].map(o=>`<button class="${o==='Setor'?'sim':''}">${o}</button>`).join('')}</span><span class="sep"></span>`:''
+ document.getElementById('barra').innerHTML=`<span class="seg"><button class="sim">Quadro</button><button>Lista</button></span><span class="sep"></span>
+ <span class="rot">${visao==='matriz'?'Colunas':'Agrupar por'}</span><span class="seg">${(visao==='matriz'?['Etapa']:['Etapa','Setor','Responsável']).map(o=>`<button class="${o===ag?'sim':''}">${o}</button>`).join('')}</span><span class="sep"></span>${linhas}
+ <button class="btn">Filtros <em>${visao==='meus'?0:1}</em></button>${visao==='meus'?'':'<span class="chip">Tipo: Processo <u>×</u></span>'}
+ <span class="chave ${visao==='meus'?'on':''}"><s></s>Destacar os meus</span><button class="btn principal">+ Cadastrar processo</button>`}
+function quadroPorEtapa(meus){return ETAPAS.map((e,i)=>{const ps=P.filter(p=>p[2]===i)
+ return `<section class="col"><h3><small>${String(i+1).padStart(2,'0')}</small>${e}<span class="n">${ps.length}</span></h3>${ps.map(p=>cartao(p,meus)).join('')}</section>`}).join('')}
+function quadroPorSetor(){return Object.entries(SETORES).map(([s,[nm,c]])=>{const ps=P.filter(p=>p[1]===s)
+ return `<section class="col"><div class="cab-setor" style="border-top-color:${c}"><div class="sg">${s}<small>${ps.length}</small></div><div class="nm">${nm}</div></div>${ps.map(cartaoDoSetor).join('')}</section>`}).join('')}
+function matriz(){const cols=ETAPAS.slice(0,5);let h=`<div class="gh">Setor</div>`+cols.map((e,i)=>`<div class="gh">${e}<small>${P.filter(p=>p[2]===i).length}</small></div>`).join('')
+ Object.entries(SETORES).forEach(([s,[nm,c]],k)=>{const ps=P.filter(p=>p[1]===s&&p[2]<5)
+  if(k===6){h+=`<div class="fechada"><span class="rs"><span class="sg"><b>▸</b><q style="background:${c}"></q>${s}</span></span>${nm} · recolhido · ${ps.length} processo</div>`;return}
+  h+=`<div class="rs"><div class="sg"><b>▾</b><q style="background:${c}"></q>${s}<small>${ps.length}</small></div><div class="nm">${nm}</div></div>`
+  h+=cols.map((e,i)=>`<div>${ps.filter(p=>p[2]===i).map(p=>`<div class="mini"><div class="nome">${p[0]}</div><div class="l3">${sit(p[3])}${pil(p[6])}${av(p[4])}</div></div>`).join('')}</div>`).join('')})
+ return `<div class="grade">${h}</div>`}
+barra()
+const area=document.getElementById('area');area.className=visao==='matriz'?'matriz':'area'
+area.innerHTML=visao==='setores'?quadroPorSetor():visao==='matriz'?matriz():quadroPorEtapa(visao==='meus')
+</script>
+</body>
+</html>
