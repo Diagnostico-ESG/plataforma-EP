@@ -115,6 +115,8 @@ O Catálogo de etapas já tem os três estados ("Carregando catálogo…", erro 
 10. Assumir e a troca manual de responsável funcionam como antes.
 11. `[visual]` A coluna Responsável inicial do Catálogo cabe na tabela em 1366×768 sem rolagem lateral, com a foto e o nome alinhados como na escolha de responsável do verso, e o aviso de inválido legível sem cor como única pista.
 
+Implementado em 2026-10-30 (commit 6cbba30)
+
 ## Ajustes do Quadro e da Lista (mudança de 2026-10-28)
 
 Demanda de 2026-10-28, planejada no `/planejar` modo curto (`ajustes-quadro-lista`); ADR 0032; acréscimo datado em `.scratch/identidade-visual.md`. Vale sobre a seção "Coluna tingida e etiquetas fortes" e o resto desta spec no que divergir. Sem mudança no banco.
