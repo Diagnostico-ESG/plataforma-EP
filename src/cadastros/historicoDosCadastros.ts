@@ -88,11 +88,12 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   comentario: 'Comentário', revisor_nome: 'Revisor', revisada_em: 'Data da revisão',
   versao: 'Versão aprovada', numero_eprotocolo: 'Número do E-protocolo', link: 'Link', aprovada_em: 'Data da aprovação',
   registrada_por_nome: 'Registrada por', publicado_em: 'Data da publicação', link_da_publicacao: 'Link da publicação',
-  explicacao_sem_publicacao: 'Explicação de concluir sem publicação',
+  explicacao_sem_publicacao: 'Explicação de concluir sem publicação', responsavel_inicial_nome: 'Responsável inicial',
 }
 
 // Os ids existem para o filtro; quem lê o histórico vê a sigla e o nome. Código e nome da etapa já estão no título.
-const CAMPOS_ESCONDIDOS = new Set(['setor_id', 'processo_id', 'macroprocesso_id', 'etapa_codigo', 'etapa_nome', 'responsavel_id', 'pdf_id'])
+const CAMPOS_ESCONDIDOS = new Set(['setor_id', 'processo_id', 'macroprocesso_id', 'etapa_codigo', 'etapa_nome', 'responsavel_id', 'pdf_id',
+  'responsavel_inicial_id'])
 
 /** O texto do evento no histórico: o da ação e, no arquivo acrescentado à versão, qual arquivo foi ("Acrescentou o .png à versão"). */
 export function textoDoEvento(evento: EventoDoCadastro): string {
@@ -236,6 +237,7 @@ const CAMPOS_DE_DATA = new Set(['data_da_modelagem_piloto', 'data_da_reuniao', '
 // Campos do processo (tipo, origem, situação, etiqueta) e da etapa do catálogo (obrigatória, ativa; o nível só nos eventos
 // antigos) pelo rótulo da tela; null se não for deles.
 function valorPorRotulo(campo: string, valor: unknown): string | null {
+  if (campo === 'responsavel_inicial_nome') return valor === null ? 'Ninguém' : texto(valor)
   const rotulos: Record<string, Record<string, string>> = {
     tipo: ROTULO_DO_TIPO, origem: ROTULO_DA_ORIGEM_ANTIGA, situacao: ROTULO_DA_SITUACAO, etiqueta: ROTULO_DA_ETIQUETA,
     nivel: { setor: 'Setor', processo: 'Processo' }, obrigatoria: { true: 'Sim', false: 'Não' },

@@ -784,7 +784,7 @@ function OpcaoDoAtual({ atual, situacao }: { atual: ResponsavelInicialDaEtapa; s
 
 **Produz:** o histórico mostra "Responsável inicial: {antes} → {depois}", com "Ninguém" para o vazio (história 7; critério 9).
 
-- [ ] **5.1 Teste (falha primeiro).** Em `src/cadastros/historicoDoCatalogo.test.ts` acrescente:
+- [x] **5.1 Teste (falha primeiro).** Em `src/cadastros/historicoDoCatalogo.test.ts` acrescente:
 
 ```ts
 test('o responsável inicial aparece pelo nome, "Ninguém" para o vazio, e o id fica escondido', () => {
@@ -796,8 +796,8 @@ test('o responsável inicial aparece pelo nome, "Ninguém" para o vazio, e o id 
 })
 ```
 
-- [ ] **5.2 Implemente** em `src/cadastros/historicoDosCadastros.ts`: `responsavel_inicial_nome: 'Responsável inicial'` em `ROTULO_DO_CAMPO`; `'responsavel_inicial_id'` em `CAMPOS_ESCONDIDOS`; em `valorLegivel`, antes de `valorPorRotulo`: `if (campo === 'responsavel_inicial_nome') return valor === null ? 'Ninguém' : texto(valor)`. Rode o teste: verde. Confira (já coberto pelo pgTAP) que a ação da troca é `editar`, cujo texto no histórico já existe.
-- [ ] **5.3** Verdes: `npm run typecheck`, `npm run lint`, `npm test`. Commit: `git add src && git commit -m "histórico do catálogo: responsável inicial"`.
+- [x] **5.2 Implemente** em `src/cadastros/historicoDosCadastros.ts`: `responsavel_inicial_nome: 'Responsável inicial'` em `ROTULO_DO_CAMPO`; `'responsavel_inicial_id'` em `CAMPOS_ESCONDIDOS`; em `valorLegivel`, antes de `valorPorRotulo`: `if (campo === 'responsavel_inicial_nome') return valor === null ? 'Ninguém' : texto(valor)`. Rode o teste: verde. Confira (já coberto pelo pgTAP) que a ação da troca é `editar`, cujo texto no histórico já existe.
+- [x] **5.3** Verdes: `npm run typecheck`, `npm run lint`, `npm test`. Commit: `git add src && git commit -m "histórico do catálogo: responsável inicial"`.
 
 ## Tarefa 6: Fecho
 
