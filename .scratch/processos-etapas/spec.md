@@ -1739,4 +1739,4 @@ Entregue em 2026-10-30 (commit 7a02d80), com ressalva: critérios [visual] 14 a 
 
 Ajuste de 2026-10-30 (sem banco): o campo "Nome" do Novo processo e do Editar passa a se chamar **Nome do Processo**; no cabeçalho da Lista, toda coluna mostra uma ▾ discreta (aria-hidden) avisando que abre o menu de ordenar e filtrar, e a coluna que ordena troca a ▾ por ▲ (crescente) ou ▼ (decrescente). O texto oculto para leitor de tela não muda; o cabeçalho de carregando segue sem menus.
 
-Em revisão desde 2026-10-30
+Entregue em 2026-10-30 (commit 2b785d5), com ressalva: critério [visual] 10 de lista-por-setor visto só em página local com módulos falsos (nada visto com o login real); revisão de segurança dispensada (a mudança só lê o parâmetro agrupar do endereço, sem login, dado pessoal, banco ou arquivos), com revisão de reserva por leitura; as ressalvas das entregas anteriores seguem valendo

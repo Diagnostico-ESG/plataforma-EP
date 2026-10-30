@@ -1,5 +1,5 @@
 # Próximo passo (2026-10-30)
 
-**Comando:** `/ship` (Sonnet; Opus só na revisão de segurança para produção), se a funcionalidade `lista-por-setor` for entregue agora.
+**Comando:** `/planejar` (Opus no modo completo, Sonnet no curto) para a próxima funcionalidade, ou `/demanda` para o que chegar fora do plano.
 
-**O que falta:** `lista-por-setor` está implementada (commit `dcbb176`) e polida (sem achados, ver `.scratch/lista-por-setor/desvios.md`). A mudança foi só de interface, sem dependência, migração, função, login, permissão ou validação de entrada, então pelas regras do `/demanda` o `/ship` pode ser dispensado; decisão do usuário.
+**O que falta:** nada em `lista-por-setor`: entregue (commit 2b785d5, com ressalva do critério visual 10, visto só em página local com módulos falsos). O marco é `marco/2026-10-30-entrega-lista-por-setor`.

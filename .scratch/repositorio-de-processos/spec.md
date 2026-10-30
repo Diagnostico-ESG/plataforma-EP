@@ -265,4 +265,4 @@ Entregue em 2026-10-29 (commit 9fc0201), com ressalva: critérios [visual] de re
 
 Entregue em 2026-10-30 (commit 7a02d80), com ressalva: critérios [visual] 14 a 17 presumidos (nada visto com o login real); revisão de segurança foi a de reserva (menos completa: o /security-review só viu documentação); conferência do cadastro aberto no painel do Supabase de desenvolvimento adiada (backlog); a Edge Function planilhas-dos-dashboards ainda precisa ser publicada de novo no desenvolvimento; pgTAP só no workflow "Testes de banco" (Docker indisponível); as ressalvas das entregas anteriores seguem valendo
 
-Em revisão desde 2026-10-30
+Entregue em 2026-10-30 (commit 2b785d5), com ressalva: critério [visual] 10 de lista-por-setor visto só em página local com módulos falsos (nada visto com o login real); revisão de segurança dispensada (a mudança só lê o parâmetro agrupar do endereço, sem login, dado pessoal, banco ou arquivos), com revisão de reserva por leitura; as ressalvas das entregas anteriores seguem valendo

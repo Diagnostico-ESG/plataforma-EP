@@ -73,3 +73,4 @@ Nenhum: não há tabela, coluna, política nem migração. A mudança é só de 
 10. [visual] A barra da Lista fica sem a Busca e com os três botões do "Agrupar por" legíveis; na árvore por Setor, as linhas de setor, macroprocesso e processo se distinguem e os subprocessos aparecem recuados.
 
 Implementado em 2026-10-30 (commit dcbb176)
+Entregue em 2026-10-30 (commit 2b785d5), com ressalva: critério [visual] 10 de lista-por-setor visto só em página local com módulos falsos (nada visto com o login real); revisão de segurança dispensada (a mudança só lê o parâmetro agrupar do endereço, sem login, dado pessoal, banco ou arquivos), com revisão de reserva por leitura; as ressalvas das entregas anteriores seguem valendo
