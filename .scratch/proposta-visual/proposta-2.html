@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Protótipo descartável, proposta 2 (2026-10-30): igual à proposta 1, só com a estrutura da plataforma de hoje (barra azul em cima e faixa de ícones à esquerda). Dados inventados. Visões: #etapas, #meus, #setores, #matriz -->
+<!-- Protótipo descartável, proposta 2 (2026-10-30): igual à proposta 1, só com a estrutura da plataforma de hoje (barra em cima e faixa estreita de ícones à esquerda), nas cores da proposta 1. Dados inventados. Visões: #etapas, #meus, #setores, #matriz -->
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
@@ -16,14 +16,13 @@ svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;str
 .item{display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:6px;color:var(--lateral-2);font-weight:600;font-size:14px}.item svg{width:18px;height:18px}
 .item.ativo{background:rgb(255 255 255/.08);color:#fff}.item.ativo svg{color:#8fa2ff}
 .lateral .fim{margin-top:auto}
-/* Estrutura de hoje: barra azul em toda a largura e faixa branca de ícones abaixo dela. */
-.lateral{grid-row:2/4;background:#fff;border-right:1px solid var(--linha);padding:12px 8px;align-items:center;gap:4px}
-.lateral .item{width:40px;height:40px;padding:0;justify-content:center;color:var(--inativo)}.lateral .item svg{width:20px;height:20px}
-.lateral .item.ativo{background:var(--azul-claro);color:var(--azul);box-shadow:inset -2px 0 0 var(--azul)}.lateral .item.ativo svg{color:var(--azul)}
-.topo{grid-column:1/-1;background:var(--azul);color:#fff;display:flex;align-items:center;gap:16px;padding:0 16px 0 0}
-.topo .ep{width:56px;text-align:center;font-weight:700;font-size:16px}
-.topo h1{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}.topo h1 svg{width:18px;height:18px}
-.topo .dir{margin-left:auto;display:flex;align-items:center;gap:16px;color:#fff}.topo .av.eu{background:#fff}
+/* Estrutura de hoje (barra em cima, faixa estreita de ícones) com as cores da proposta 1: faixa grafite e barra branca. */
+.lateral{grid-row:1/4;padding:10px 8px 14px;align-items:center;gap:4px}
+.lateral .marca{padding:0 0 18px}.lateral .marca b{width:32px;height:32px}
+.lateral .item{width:40px;height:40px;padding:0;justify-content:center}.lateral .item svg{width:20px;height:20px}
+.topo{background:#fff;display:flex;align-items:center;gap:16px;padding:0 24px}
+.topo h1{font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px}.topo h1 svg{width:20px;height:20px;color:var(--azul)}
+.topo .dir{margin-left:auto;display:flex;align-items:center;gap:16px;color:var(--texto-2)}
 .av{width:24px;height:24px;border-radius:50%;background:#e9ecf1;color:#4a5163;font:600 10px/24px 'Source Sans 3';text-align:center;flex:none}.av.eu{background:var(--azul-claro);color:var(--azul-escuro)}.av.g{width:32px;height:32px;line-height:32px;font-size:12px}
 .barra{background:#fff;border-bottom:1px solid var(--linha);display:flex;align-items:center;gap:10px;padding:0 24px}
 .btn{border:1px solid var(--linha);background:#fff;font:600 13px 'Source Sans 3';color:var(--texto);height:34px;padding:0 12px;border-radius:6px;display:inline-flex;align-items:center;gap:8px}
@@ -83,9 +82,10 @@ svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;str
 <symbol id="e4" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></symbol>
 <symbol id="e5" viewBox="0 0 24 24"><path d="M12 3l2.4 1.8 3-.2.9 2.9 2.5 1.7-1 2.8 1 2.8-2.5 1.7-.9 2.9-3-.2L12 21l-2.4-1.8-3 .2-.9-2.9L3.2 14.8l1-2.8-1-2.8 2.5-1.7.9-2.9 3 .2z"/><path d="M8.5 12l2.3 2.3 4.7-4.6"/></symbol>
 </svg>
-<header class="topo"><span class="ep">EP</span><h1><svg class="i"><use href="#quadro"/></svg>Processos</h1>
+<header class="topo"><h1><svg class="i"><use href="#quadro"/></svg>Processos</h1>
  <div class="dir"><svg class="i"><use href="#busca"/></svg><svg class="i"><use href="#sino"/></svg><span class="av eu g">AL</span></div></header>
 <aside class="lateral">
+ <div class="marca" title="Escritório de Processos"><b>EP</b></div>
  <div class="item ativo" title="Processos"><svg class="i"><use href="#quadro"/></svg></div>
  <div class="item" title="Setores"><svg class="i"><use href="#predio"/></svg></div>
  <div class="item" title="Painel"><svg class="i"><use href="#grafico"/></svg></div>
