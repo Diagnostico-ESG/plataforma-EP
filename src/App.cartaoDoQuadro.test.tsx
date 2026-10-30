@@ -67,18 +67,19 @@ test('o processo suspenso mostra a barra da etapa onde parou, com a pílula Susp
   expect(cartao.textContent).toContain('Suspenso')
 })
 
-test('a etiqueta é uma pílula com bolinha e o texto, na cor de cada valor, e o avatar do responsável do processo', async () => {
+test('a etiqueta é só o ícone, com o nome no title e no texto para leitor de tela, e a linha do responsável', async () => {
   montar([
     processo('A Fazer'), processo('Em Andamento', { processo: { etiqueta: 'em_andamento' } }),
     processo('Feita', { processo: { etiqueta: 'concluido' } }),
   ])
   for (const [nome, etiqueta, classe] of [['A Fazer', 'A fazer', 'a_fazer'], ['Em Andamento', 'Iniciado', 'em_andamento'], ['Feita', 'Finalizado', 'concluido']]) {
     const cartao = await cartaoDe(nome)
-    const pilula = cartao.querySelector('.etiqueta')
-    expect(pilula?.textContent).toBe(etiqueta)
-    expect(pilula?.className).toContain(`etiqueta-${classe}`)
-    expect(pilula?.querySelector('.etiqueta-bolinha')).not.toBeNull()
-    expect(cartao.querySelector('[role="img"][aria-label="Ana Teste"], .avatar')).not.toBeNull()
+    const icone = cartao.querySelector('.etiqueta')
+    expect(icone?.textContent).toBe(etiqueta)
+    expect(icone?.className).toContain(`etiqueta-${classe}`)
+    expect(icone?.getAttribute('title')).toBe(`Etiqueta: ${etiqueta}`)
+    expect(icone?.querySelector('svg')).not.toBeNull()
+    expect(cartao.querySelector('.cartao-responsavel')?.textContent).toBe('Ana Teste')
   }
 })
 
@@ -133,13 +134,15 @@ test('Relatório pendente: ausente antes da Revisão interna, presente da Revis�
   expect(selos(await cartaoDe('Concluído'))).toEqual(['V3'])
 })
 
-test('o cartão sem responsável não mostra selo nem foto; o com responsável mostra a foto em 24 px', async () => {
+test('o cartão sem responsável diz "Sem responsável" em cinza; o com responsável traz o nome, sem avatar', async () => {
   montar([processo('Sem Dono', { processo: { responsavel: null } }), processo('Com Dono')])
   const semDono = await cartaoDe('Sem Dono')
   expect(semDono.querySelector('.cartao-selos')).toBeNull()
   expect(semDono.querySelector('.avatar')).toBeNull()
-  expect(semDono.textContent).not.toContain('Sem responsável')
-  expect((await cartaoDe('Com Dono')).querySelector<HTMLElement>('.avatar')?.style.width).toBe('24px')
+  expect(semDono.querySelector('.cartao-responsavel-vazio')?.textContent).toBe('Sem responsável')
+  const comDono = await cartaoDe('Com Dono')
+  expect(comDono.querySelector('.avatar')).toBeNull()
+  expect(comDono.querySelector('.cartao-responsavel')?.textContent).toBe('Ana Teste')
 })
 
 test('nenhum cartão mostra a data da modelagem piloto, no passado, hoje ou no futuro', async () => {

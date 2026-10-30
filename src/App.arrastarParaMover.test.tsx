@@ -90,7 +90,7 @@ test('soltar em outra coluna move o processo na hora, sem janela: ele vai para a
   expect(screen.queryByRole('dialog')).toBeNull()
   const cartao = await cartaoDe('Emitir Ofício')
   expect(cartao.textContent).toContain('A fazer')
-  expect(within(cartao).getByRole('img', { name: USUARIO_DE_TESTE.nome })).toBeTruthy()
+  expect(within(cartao).getByText(USUARIO_DE_TESTE.nome)).toBeTruthy()
 })
 
 test('sem responsável inicial na coluna de destino, o cartão chega sem responsável e quem moveu não vira o responsável', async () => {
@@ -98,7 +98,7 @@ test('sem responsável inicial na coluna de destino, o cartão chega sem respons
   levantar(await cartaoDe('Emitir Ofício'))
   soltarEm('Publicação')
   await waitFor(() => expect(cartoesDa('Publicação')).toHaveLength(1))
-  expect(within(await cartaoDe('Emitir Ofício')).queryByRole('img', { name: USUARIO_DE_TESTE.nome })).toBeNull()
+  expect(within(await cartaoDe('Emitir Ofício')).queryByText(USUARIO_DE_TESTE.nome)).toBeNull()
 })
 
 test('para trás também vale, inclusive para Não iniciados', async () => {

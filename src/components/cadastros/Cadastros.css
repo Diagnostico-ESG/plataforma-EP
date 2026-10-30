@@ -5,31 +5,51 @@
   max-width: var(--largura-conteudo);
 }
 
+/* Abas de página: o segmento padrão (contêiner cinza, escolhida em azul-claro). */
 .cadastros-abas {
-  display: flex;
-  gap: var(--esp-2);
-  border-bottom: 1px solid var(--linha);
+  display: inline-flex;
+  justify-self: start;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--linha);
+  border-radius: var(--canto-botao);
+  background: var(--fundo);
 }
 
 .cadastros-aba {
-  padding: var(--esp-2) var(--esp-3);
+  padding: 4px var(--esp-3);
+  border-radius: var(--canto-selo);
   color: var(--texto-2);
+  font-size: var(--tam-rotulo);
+  font-weight: 600;
   text-decoration: none;
-  border-bottom: 2px solid transparent;
 }
 
 .cadastros-aba[aria-current='page'] {
-  color: var(--texto);
-  font-weight: 600;
-  border-bottom-color: var(--azul);
+  background: var(--azul-claro);
+  color: var(--azul-escuro);
 }
 
-/* Lista compacta, no padrão da lista de usuários. */
+/* Tabela branca com borda de 1px e canto de 8px, sem sombra; cabeçalho em fundo-cabecalho, divisórias leves. */
 .tabela-cadastros {
   width: 100%;
-  border-collapse: collapse;
+  border: 1px solid var(--linha);
+  border-radius: var(--canto);
+  border-collapse: separate;
+  border-spacing: 0;
   background: var(--folha);
   font-size: var(--tam-secundario);
+}
+
+.tabela-cadastros thead th {
+  background: var(--fundo-cabecalho);
+  color: var(--texto-2);
+  font-size: var(--tam-rotulo);
+  font-weight: 700;
+}
+
+.tabela-cadastros tbody tr:last-child td {
+  border-bottom: 0;
 }
 
 .tabela-cadastros caption {
@@ -41,7 +61,7 @@
 .tabela-cadastros td {
   padding: var(--esp-2) var(--esp-3);
   text-align: left;
-  border-bottom: 1px solid var(--linha);
+  border-bottom: 1px solid var(--linha-leve);
 }
 
 .form-setor {
@@ -93,11 +113,15 @@
 }
 
 /* Botão com cara de texto: a linha toda é clicável, o botão serve ao teclado. */
+.cadastros-abrir:hover {
+  text-decoration: underline;
+}
+
 .cadastros-abrir {
   padding: 0;
   border: 0;
   background: none;
-  color: var(--azul);
+  color: var(--texto);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
@@ -162,7 +186,7 @@
 .cadastros input:not([type='checkbox']),
 .cadastros select,
 .cadastros textarea {
-  min-height: 32px;
+  min-height: 34px;
   font: inherit;
   padding: var(--esp-1) var(--esp-2);
   border: 1px solid var(--linha);

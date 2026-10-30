@@ -104,7 +104,7 @@ test('o cartão traz sigla, nome, a pílula "A classificar" e o responsável, se
   expect(cartao.getByText('TSA')).toBeTruthy()
   expect(cartao.queryByText('Macro de Teste')).toBeNull()
   expect(cartao.getByText('A classificar')).toBeTruthy()
-  expect(cartao.getByRole('img', { name: 'Ana Teste' })).toBeTruthy()
+  expect(cartao.getByText('Ana Teste')).toBeTruthy()
   expect(within(screen.getByRole('link', { name: /Pagar Diária/ })).queryByText('A classificar')).toBeNull()
 })
 

@@ -1,86 +1,86 @@
 ---
 name: Plataforma do EP
-description: Quadro de etapas do Escritório de Processos, com uma única linha azul acesa no que está em foco.
+description: Quadro de etapas do Escritório de Processos, em grafite e branco, com cor viva só em pontos que carregam informação.
 colors:
+  grafite: "#252b36"
+  grafite-icone: "#9aa3b2"
+  folha: "#ffffff"
+  fundo: "#f3f4f7"
+  fundo-cabecalho: "#fafbfc"
+  fundo-grupo: "#f6f7f9"
+  linha: "#e3e6ec"
+  linha-leve: "#f0f2f5"
+  linha-tracejada: "#c3cad8"
+  texto: "#1d2330"
+  texto-2: "#5f6776"
+  icone-inativo: "#9098a6"
   azul: "#3a5afe"
   azul-claro: "#e8edff"
   azul-escuro: "#2a44c9"
-  azul-avatar: "#d9dfff"
-  fundo: "#edf1f9"
-  folha: "#ffffff"
-  linha: "#e1e6ef"
-  linha-tracejada: "#c3cad8"
-  barra-coluna-trilho: "#d5dbe7"
-  barra-coluna: "#9aa6be"
-  texto: "#1e2433"
-  texto-2: "#5d6577"
-  icone-inativo: "#8c93a3"
-  branco-sobre-azul-borda: "rgb(255 255 255 / 45%)"
-  branco-sobre-azul-hover: "rgb(255 255 255 / 16%)"
-  atraso-texto: "#a8263a"
-  atraso-fundo: "#fce1e4"
-  vencendo-texto: "#8a5a00"
-  vencendo-fundo: "#ffe9c7"
-  aprovado-texto: "#22703a"
-  aprovado-fundo: "#ddf3e1"
+  trilha-feita: "#6b7a99"
+  trilha-vazia: "#e3e6ec"
+  atraso: "#d1293d"
+  vence: "#b45309"
+  atraso-texto: "#8f1d2c"
+  atraso-fundo: "#fdecee"
+  vencendo-texto: "#7a4a00"
+  vencendo-fundo: "#fff6e5"
+  aprovado-texto: "#166a4d"
+  aprovado-fundo: "#e6f4ef"
   neutra-texto: "#4a5163"
   neutra-fundo: "#eef0f4"
-  ajuda-fundo: "#eef2ff"
-  ajuda-borda: "#c9d3ff"
-  pendencia-fundo: "#fff6e5"
-  pendencia-borda: "#f3d28f"
-  tipo-fluxograma: "#8cc4ea"
-  tipo-relatorio: "#b7a5ec"
-  tipo-reuniao: "#e9cf7a"
-  tipo-email: "#f2a08c"
-  macro-violeta: "#8e4ec6"
-  macro-ciano: "#0797b9"
-  macro-magenta: "#d6409f"
-  macro-indigo: "#5b5bd6"
-  macro-oliva: "#7a8b2e"
-  macro-cobre: "#a0663a"
-  icone-dias: "#c77700"
+  etiqueta-finalizado: "#16a34a"
 typography:
   pagina:
     fontFamily: "'Source Sans 3', system-ui, sans-serif"
-    fontSize: "20px"
+    fontSize: "21px"
     fontWeight: 700
     lineHeight: 1.45
-  painel:
+  tela:
+    fontFamily: "'Source Sans 3', system-ui, sans-serif"
+    fontSize: "18px"
+    fontWeight: 700
+    lineHeight: 1.45
+  cartao:
     fontFamily: "'Source Sans 3', system-ui, sans-serif"
     fontSize: "16px"
-    fontWeight: 700
-    lineHeight: 1.45
+    fontWeight: 600
+    lineHeight: 1.3
   coluna:
     fontFamily: "'Source Sans 3', system-ui, sans-serif"
-    fontSize: "14px"
-    fontWeight: 600
+    fontSize: "15px"
+    fontWeight: 700
     lineHeight: 1.45
   base:
     fontFamily: "'Source Sans 3', system-ui, sans-serif"
-    fontSize: "13px"
+    fontSize: "14px"
     fontWeight: 400
     lineHeight: 1.45
   secundario:
     fontFamily: "'Source Sans 3', system-ui, sans-serif"
-    fontSize: "12px"
+    fontSize: "13px"
     fontWeight: 400
     lineHeight: 1.45
   rotulo:
     fontFamily: "'Source Sans 3', system-ui, sans-serif"
-    fontSize: "11px"
+    fontSize: "12px"
     fontWeight: 600
-    lineHeight: 1.4
-    letterSpacing: "0.5px"
+    lineHeight: 1.45
+  selo:
+    fontFamily: "'Source Sans 3', system-ui, sans-serif"
+    fontSize: "11px"
+    fontWeight: 700
+    letterSpacing: "0.3px"
   mono:
     fontFamily: "'IBM Plex Mono', ui-monospace, Consolas, monospace"
     fontSize: "12px"
-    fontWeight: 400
+    fontWeight: 500
     fontFeature: "tnum"
 rounded:
-  canto: "6px"
-  canto-botao: "4px"
-  canto-macro: "2px"
+  canto: "8px"
+  canto-botao: "6px"
+  canto-selo: "4px"
+  canto-janela: "12px"
   redondo: "999px"
 spacing:
   esp-1: "4px"
@@ -97,7 +97,7 @@ components:
     typography: "{typography.base}"
     rounded: "{rounded.canto-botao}"
     padding: "0 12px"
-    height: "32px"
+    height: "34px"
   botao-principal-hover:
     backgroundColor: "{colors.azul-escuro}"
     textColor: "{colors.folha}"
@@ -107,254 +107,184 @@ components:
     typography: "{typography.base}"
     rounded: "{rounded.canto-botao}"
     padding: "0 12px"
-    height: "32px"
-  botao-icone:
-    backgroundColor: "transparent"
+    height: "34px"
+  botao-ligado:
+    backgroundColor: "{colors.azul-claro}"
+    textColor: "{colors.azul-escuro}"
+    typography: "{typography.base}"
     rounded: "{rounded.canto-botao}"
-    size: "32px"
-  pilula-atraso:
-    backgroundColor: "{colors.atraso-fundo}"
-    textColor: "{colors.atraso-texto}"
-    typography: "{typography.rotulo}"
-    rounded: "{rounded.redondo}"
-    padding: "2px 8px"
-  pilula-vencendo:
-    backgroundColor: "{colors.vencendo-fundo}"
-    textColor: "{colors.vencendo-texto}"
-    typography: "{typography.rotulo}"
-    rounded: "{rounded.redondo}"
-    padding: "2px 8px"
-  pilula-informativa:
+    height: "34px"
+  segmento-opcao-escolhida:
     backgroundColor: "{colors.azul-claro}"
     textColor: "{colors.azul-escuro}"
     typography: "{typography.rotulo}"
-    rounded: "{rounded.redondo}"
+    rounded: "{rounded.canto-selo}"
+  faixa-lateral:
+    backgroundColor: "{colors.grafite}"
+    width: "{spacing.largura-faixa}"
+  faixa-item:
+    backgroundColor: "transparent"
+    textColor: "{colors.grafite-icone}"
+    rounded: "{rounded.canto-botao}"
+    size: "40px"
+  faixa-item-ativo:
+    backgroundColor: "{colors.azul-claro}"
+    textColor: "{colors.azul}"
+  barra-superior:
+    backgroundColor: "{colors.folha}"
+    textColor: "{colors.texto}"
+    height: "52px"
+  cartao:
+    backgroundColor: "{colors.folha}"
+    textColor: "{colors.texto}"
+    rounded: "{rounded.canto}"
+    padding: "12px 14px"
+  selo-do-setor:
+    textColor: "{colors.folha}"
+    typography: "{typography.selo}"
+    rounded: "{rounded.canto-selo}"
+    padding: "1px 7px"
+  pilula-neutra:
+    backgroundColor: "{colors.neutra-fundo}"
+    textColor: "{colors.neutra-texto}"
+    typography: "{typography.rotulo}"
+    rounded: "{rounded.canto-selo}"
     padding: "2px 8px"
   pilula-aprovado:
     backgroundColor: "{colors.aprovado-fundo}"
     textColor: "{colors.aprovado-texto}"
     typography: "{typography.rotulo}"
-    rounded: "{rounded.redondo}"
+    rounded: "{rounded.canto-selo}"
     padding: "2px 8px"
-  pilula-neutra:
-    backgroundColor: "{colors.neutra-fundo}"
-    textColor: "{colors.neutra-texto}"
-    typography: "{typography.rotulo}"
-    rounded: "{rounded.redondo}"
-    padding: "2px 8px"
+  aviso-atraso:
+    backgroundColor: "{colors.atraso-fundo}"
+    textColor: "{colors.atraso-texto}"
+    typography: "{typography.secundario}"
+    rounded: "{rounded.canto-botao}"
+    padding: "7px 10px"
+  aviso-pendencia:
+    backgroundColor: "{colors.vencendo-fundo}"
+    textColor: "{colors.vencendo-texto}"
+    typography: "{typography.secundario}"
+    rounded: "{rounded.canto-botao}"
+    padding: "7px 10px"
   avatar-iniciais:
-    backgroundColor: "{colors.azul-avatar}"
+    backgroundColor: "{colors.azul-claro}"
     textColor: "{colors.azul-escuro}"
     rounded: "{rounded.redondo}"
     size: "24px"
-  barra-superior:
-    backgroundColor: "{colors.azul}"
-    textColor: "{colors.folha}"
-    height: "52px"
-  alternancia-opcao:
-    backgroundColor: "transparent"
-    textColor: "{colors.folha}"
-    typography: "{typography.secundario}"
-    rounded: "{rounded.redondo}"
-    padding: "3px 12px"
-  alternancia-opcao-ativa:
-    backgroundColor: "{colors.folha}"
-    textColor: "{colors.azul}"
-  faixa-lateral:
-    backgroundColor: "{colors.folha}"
-    width: "{spacing.largura-faixa}"
-  faixa-item:
-    backgroundColor: "transparent"
-    textColor: "{colors.icone-inativo}"
-    rounded: "{rounded.canto}"
-    size: "40px"
-  faixa-item-hover:
-    backgroundColor: "{colors.fundo}"
-    textColor: "{colors.texto-2}"
-  faixa-item-ativo:
-    backgroundColor: "{colors.azul-claro}"
-    textColor: "{colors.azul}"
-  bloco-tracejado:
-    backgroundColor: "transparent"
-    rounded: "{rounded.canto}"
-    padding: "32px 24px"
-    width: "420px"
 ---
 
 # Design System: Plataforma do EP
 
+Fonte de verdade das decisões: `.scratch/identidade-visual.md` (redesenho aprovado em 2026-10-30). Este arquivo descreve o que está em código.
+
 ## Overview
 
-**Creative North Star: "O Quadro de Etapas com Linha Acesa"**
+**Creative North Star: "O Quadro Silencioso"**
 
-Ferramenta de trabalho diário para uma equipe pequena que acompanha processos etapa por etapa. O mundo é um quadro calmo: área de trabalho azul-acinzentada clara, folhas brancas com bordas de 1px quase invisíveis e um único traço azul de 2px, a linha acesa, que marca o que está em foco ou é atual (área ativa da faixa lateral hoje; cartão escolhido, etapa atual, aba ativa e campo com foco quando essas peças existirem). Todo o resto fica quieto para que os alertas de prazo saltem.
+Ferramenta de trabalho diário para uma equipe pequena que acompanha processos etapa por etapa. A moldura é neutra: faixa lateral grafite, barra superior branca, fundo cinza-claro e cartões brancos. A cor viva aparece só em três pontos pequenos que carregam informação: o selo do setor, o ícone da etiqueta da etapa e o prazo. O olho para nesses pontos e em um único azul cheio por tela, que diz o que fazer em seguida.
 
-A densidade é de ferramenta: base de 13px, passos de espaçamento de 4 a 32px, controles de 32px de altura. A cor saturada aparece só onde carrega informação (situação, tipo de registro, macroprocesso); o azul principal fica reservado à barra superior, à ação principal e à linha acesa. Códigos que a equipe confere (siglas, versões, datas, contagens) usam fonte mono com números tabulares.
-
-A direção foi fixada pelo brief aprovado (`.scratch/identidade-visual.md`, 2026-10-07). A inspiração são editores de fluxo e quadros de processo, só em cor e forma. Recusa explícita: o painel administrativo genérico de cartões com sombra e cores espalhadas. Só tema claro.
-
-**Estado da construção.** O que já existe em código: tokens, fontes, ícones SVG próprios, botões, pílulas, avatar, moldura (faixa lateral + barra superior) e o estado vazio do Quadro. Cartões, colunas, painel de detalhe, caminho de etapas, barrinhas de tipo, quadradinhos de macroprocesso, caixas de aviso e animações estão definidos no brief e, em parte, já como tokens; nas seções abaixo aparecem marcados como **(planejado)**.
+A densidade é de ferramenta: base de 14px, passos de 4 a 32px, controles de 34px. Códigos que a equipe confere (versão, dias, prazo, datas, nomes de arquivo, contagens) usam fonte mono com números tabulares. Só tema claro, para uso em computador a partir de 1366×768; o celular funciona, sem ser o alvo.
 
 **Key Characteristics:**
-- Um único destaque azul de 2px (linha acesa) acompanha o foco; nada mais compete com ele.
-- Folhas brancas planas com borda de 1px em `linha`; sem sombra em nada que não flutue.
-- Cor saturada só com significado, e sempre acompanhada de texto ou rótulo acessível.
-- Escala de texto fechada em seis tamanhos (11 a 20px), base 13px.
-- Ícones desenhados no projeto: traço 1,75 numa grade de 24, cantos e pontas arredondados.
+- Azul com dois papéis e nenhum outro: **azul cheio** só na ação principal da tela (uma por tela) e **azul-claro com texto azul-escuro** em tudo que está escolhido ou ligado.
+- Cartões, tabelas e blocos são planos: borda de 1px em `linha`, sem sombra. Sombra só no que flutua (menus e janelas).
+- O prazo é sempre ícone de calendário mais texto; a etiqueta é ícone com nome acessível; a situação é texto. Nunca só cor.
 
 ## Colors
 
-Neutros frios azul-acinzentados com um azul elétrico como única voz, e uma família de pares texto/fundo pastel reservada às situações.
+### Neutras (a moldura)
+- **Grafite** (`#252b36`): faixa lateral. Ícones inativos em `grafite-icone` (`#9aa3b2`).
+- **Folha** (`#ffffff`): barra superior, cartões, tabelas, janelas, blocos.
+- **Fundo** (`#f3f4f7`): área do quadro e das páginas. `fundo-cabecalho` (`#fafbfc`) no cabeçalho de tabela; `fundo-grupo` (`#f6f7f9`) nas linhas de grupo.
+- **Linha** (`#e3e6ec`): bordas de 1px. `linha-leve` (`#f0f2f5`) nas divisórias internas; `linha-tracejada` (`#c3cad8`) em "sem responsável" e blocos vazios.
+- **Texto** (`#1d2330`) e **texto-2** (`#5f6776`, 5,7:1 no branco). `icone-inativo` (`#9098a6`) é só para ícones e enfeites, nunca texto.
 
-### Primary
-- **Azul Elétrico** (`azul`): barra superior, botão principal, linha acesa e contorno de foco. Branco sobre ele tem 5,2:1. Também é a cor do ícone "rodadas" no rodapé do cartão (`icone-rodadas`, planejado).
-- **Azul Névoa** (`azul-claro`): fundo do item ativo da faixa lateral, da pílula informativa e da seleção de texto.
-- **Azul Tinta** (`azul-escuro`): hover do botão principal, texto sobre `azul-claro` (6,5:1), texto da pílula informativa e iniciais do avatar.
-- **Azul Lavanda** (`azul-avatar`): fundo do avatar sem foto (iniciais em `azul-escuro`, 5,8:1).
+### Azul
+- **Azul** (`#3a5afe`): botão da ação principal, ícone do título da tela, ícone do item ativo da faixa lateral. Branco sobre ele: 5,2:1.
+- **Azul-claro** (`#e8edff`) com **azul-escuro** (`#2a44c9`, 6,5:1): segmento escolhido, filtro ativo, item da faixa lateral, opção em foco nos menus e nas caixas de seleção, avatar do usuário.
 
-### Secondary
-Pares de situação, sempre texto escuro sobre fundo pastel da mesma família, todos acima de 5:1:
-- **Atraso** (`atraso-texto` / `atraso-fundo`): prazo estourado.
-- **Vencendo** (`vencendo-texto` / `vencendo-fundo`): prazo perto do fim.
-- **Informativa** (`informativa-texto` / `informativa-fundo`, apelidos de `azul-escuro` / `azul-claro`): andamento, aguarda revisor, versão atual.
-- **Aprovado** (`aprovado-texto` / `aprovado-fundo`): concluída, aprovada. `icone-versoes` (planejado) é apelido de `aprovado-texto`.
-- **Neutra** (`neutra-texto` / `neutra-fundo`): histórica, realizada anteriormente.
+### Prazo e avisos
+- **Atraso** (`#d1293d`) e **vence** (`#b45309`): ícone e texto do prazo; "Excluir" nos menus.
+- Avisos de atraso e erro: `#8f1d2c` sobre `#fdecee`. Pendência: `#7a4a00` sobre `#fff6e5`.
 
-### Tertiary (planejado: tokens definidos, sem peça construída)
-- **Barrinha por tipo de registro** (`tipo-fluxograma`, `tipo-relatorio`, `tipo-reuniao`, `tipo-email`; `tipo-historica` é apelido de `linha-tracejada`): traço de 3px à esquerda do item; decorativa, o tipo também vem escrito ou no ícone.
-- **Macroprocessos** (`macro-violeta`, `macro-ciano`, `macro-magenta`, `macro-indigo`, `macro-oliva`, `macro-cobre`): quadradinho no cartão e etiqueta com nome, sempre com o nome como rótulo acessível.
-- **Âmbar dos dias** (`icone-dias`): ícone de relógio no rodapé do cartão, sempre com o número ao lado.
-- **Caixas de aviso** (`ajuda-fundo` + `ajuda-borda`; `pendencia-fundo` + `pendencia-borda`): texto sempre em `texto`.
+### Situação do processo
+"Em andamento" é o normal e aparece sem destaque (texto cinza). As exceções ganham selo de 4px: Suspenso e Cancelado em `#4a5163` sobre `#eef0f4`; Concluído em `#166a4d` sobre `#e6f4ef`.
 
-### Neutral
-- **Papel Frio** (`fundo`): fundo da área de trabalho e hover dos itens da faixa lateral.
-- **Folha** (`folha`): faixa lateral, botões secundários, texto sobre azul, e (planejado) cartões, painel, tabelas e formulários.
-- **Linha** (`linha`): bordas e divisórias de 1px, borda direita da faixa lateral, borda do botão secundário.
-- **Linha Tracejada** (`linha-tracejada`): borda tracejada do bloco vazio, hover da borda do botão secundário, cor da barra de rolagem.
-- **Trilho e preenchimento da coluna** (`barra-coluna-trilho`, `barra-coluna`; planejado): barrinha de proporção sob o nome da coluna.
-- **Tinta** (`texto`): texto principal.
-- **Tinta Secundária** (`texto-2`): texto secundário e hover dos ícones da faixa (5,9:1 no branco, 5,2:1 no `fundo`).
-- **Ícone em Repouso** (`icone-inativo`): ícones inativos da faixa lateral; decorativos, sempre com rótulo acessível (cerca de 3,1:1 no branco, acima do mínimo de 3:1 para elementos de interface).
-- **Branco sobre azul** (`branco-sobre-azul-borda`, `branco-sobre-azul-hover`): borda da alternância Quadro | Lista e hover dos ícones da barra.
+### Etiqueta da etapa
+Só ícone, 18px no cartão: A fazer é círculo com contorno cinza; Iniciado é círculo com a metade direita azul; Finalizado é círculo verde (`#16a34a`) com visto branco.
+
+### Cor do setor
+Selo com a sigla em branco sobre uma de **12 cores fortes**, em ciclo sobre o número de 1 a 30 que o banco guarda (`src/cadastros/corDoSetor.ts`): bordô, laranja, mostarda, oliva, verde, petróleo, azul, roxo profundo, fúcsia, ameixa, rosa e grafite quente. Todas passam de 4,5:1 com a sigla branca. A cor do setor só existe no selo e no quadradinho das caixas de seleção; coluna e cabeçalho não levam cor de setor.
 
 ### Named Rules
-**A Regra da Linha Acesa.** O traço azul de 2px (`--linha-acesa`) marca só o que está em foco ou é atual, um por região. Ele compensa o respiro para nada "pular" de lugar.
-
-**A Regra da Cor com Significado.** Cor saturada só onde diz algo: situação nas pílulas, tipo nas barrinhas, macroprocesso nos quadradinhos, contagens no rodapé do cartão. Vermelho, âmbar e verde ficam com a situação (e com os ícones de dias e versões no rodapé do cartão, que o brief liga a prazo e aprovação); por isso macroprocessos e barrinhas de tipo não usam nenhum deles. A cor nunca fala sozinha: sempre há texto ou rótulo acessível.
-
-**A Regra do Branco Translúcido.** Sobre a barra azul, branco translúcido só em borda e em hover de ícone, nunca como fundo atrás de texto: derrubaria o contraste do texto branco.
-
-**A Regra do Arquivo Único.** Códigos de cor só existem em `src/styles/tokens.css`; todo o resto usa as variáveis.
+- **Cor em ponto.** Cor viva só em selo, ícone de etiqueta e prazo. Fora disso, grafite, branco e cinza.
+- **Um azul cheio por tela.** Se há dois, um deles é secundário.
+- **Cor nunca sozinha.** Prazo, etiqueta e situação sempre trazem ícone, texto ou forma.
 
 ## Typography
 
-**Fonte da interface:** Source Sans 3 (com system-ui, sans-serif), 400 a 700, arquivo variável guardado em `public/fonts/`.
-**Fonte mono:** IBM Plex Mono (com ui-monospace, Consolas, monospace), 400 e 500, guardada em `public/fonts/`.
-
-**Character:** Uma sans humanista e legível em tamanhos pequenos para a interface densa, e uma mono técnica para tudo que a equipe confere caractere a caractere. Ambas OFL, servidas pelo próprio projeto.
+**Fonte principal:** Source Sans 3 (400, 600, 700), guardada no projeto (licença OFL). **Fonte de dados:** IBM Plex Mono (400, 500).
 
 ### Hierarchy
-- **Página** (700, 20px): título de página (setor, administração). Planejado.
-- **Painel** (700, 16px): "EP" na barra superior; título do painel de detalhe (planejado).
-- **Coluna** (600, 14px): título da barra superior, título do estado vazio; título de coluna (planejado).
-- **Base** (400 ou 600, 13px, altura de linha 1,45): texto corrente da interface e rótulo dos botões (600); nome do processo no cartão em 600 (planejado).
-- **Secundário** (400, 12px): texto secundário e metadados; as opções da alternância Quadro | Lista usam este tamanho em 600.
-- **Rótulo** (600, 11px, espaçamento 0,5px, MAIÚSCULAS): texto das pílulas (decisão do brief) e rótulo de seção, quando o rótulo é o próprio título da seção ("ETAPAS DO SETOR", planejado).
-- **Mono** (400/500, 11 a 12px, números tabulares): siglas, versões (V3, V1F), nomes de arquivo SIGLA_VERSÃO_NOME, número do E-protocolo, datas e contagens. Classe utilitária `.mono` e elemento `code`.
+- **Página** (21px, 700): título de página de cadastro. **Tela** (18px, 700): título na barra superior e de janela.
+- **Cartão** (16px, 600): nome do processo no cartão. **Coluna** (15px, 700): nome da etapa e título de bloco.
+- **Base** (14px, 400/600): interface e botões. **Secundário** (13px): responsável, metadados, itens de menu, avisos, tabelas.
+- **Rótulo** (12px, 400–700): legendas, rótulos de campo, cabeçalho de tabela, segmentos. **Selo** (11px, 700): sigla do setor.
+- **Mono** (12px, 500): rodapé do cartão, contagens, versão, dias, datas.
 
 ### Named Rules
-**A Regra da Escala Fechada.** Seis tamanhos (`--tam-rotulo` a `--tam-pagina`), nenhum fora deles. Hierarquia vem de peso e cor antes de tamanho.
-
-**A Regra do Mono para o que se Confere.** Todo código, versão, data ou contagem vai em IBM Plex Mono com números tabulares; texto corrido nunca.
+- **Nada abaixo de 11px**, exceto o selo de tipo de arquivo (9px mono, sempre com o nome ao lado).
+- **Maiúsculas só nos títulos de seção do verso.**
 
 ## Layout
 
-A moldura é uma grade de duas linhas e duas colunas: barra superior azul ocupando toda a largura (altura mínima de 52px), faixa lateral de ícones à esquerda (`largura-faixa`) e área de trabalho rolável em `fundo`. O "EP" da barra tem a mesma largura da faixa, de modo que a marca fica exatamente sobre a coluna de ícones.
-
-Na barra superior, da esquerda para a direita: marca, título da tela (corta com reticências), alternância Quadro | Lista e, empurrados para a direita, os ícones de filtro e de conta, separados por 16px. Na faixa lateral, itens de 40px empilhados com 4px de intervalo e 12px de respiro no topo.
-
-Ritmo de espaçamento em passos de 4, 8, 12, 16, 24 e 32px. Do brief (planejado): 8px entre cartões, 12px entre colunas, 8 a 10px de respiro interno de cartão, 14 a 16px no painel; o quadro rola para o lado quando há mais colunas que a tela; abaixo de 900px o painel de detalhe ocupa a tela inteira.
-
-Uso principal em computador; celular é opcional. Abaixo de 480px a barra superior aperta os intervalos para 8px e o bloco vazio passa a ter 16px de margem, sem esconder nenhum controle.
+Grade de três faixas, igual em todas as telas: **faixa lateral** de 56px (grafite, marca "EP" em quadrado azul no topo, itens de 40px só com ícone e dica); **barra superior** de 52px (ícone da tela em azul + título, conta à direita); área de trabalho em `fundo`. A faixa de controles do Quadro e da Lista é uma folha branca com borda, sem sombra. O Quadro tem colunas de 300px, 14px entre elas, 10px entre cartões, e rola para o lado. Passos de espaçamento: 4, 8, 12, 16, 24 e 32px.
 
 ## Elevation & Depth
 
-Plano por padrão. A profundidade vem de tom (folha branca sobre `fundo` azul-acinzentado) e de borda de 1px em `linha`, nunca de sombra. Nada construído até agora usa sombra.
-
-### Shadow Vocabulary
-- **Flutuante** (`--sombra-flutuante`, duas camadas suaves e baixas na cor de `texto`): só no que flutua sobre o quadro: painel de detalhe, menus, formulário de cadastro. Definida, ainda sem uso (planejado).
-
-### Named Rules
-**A Regra do Plano por Padrão.** Cartões, colunas e faixas não têm sombra. Sombra existe só em superfície que flutua sobre outra.
+Cartões, tabelas e blocos não têm sombra. Flutuam apenas:
+- **Menus e caixas abertas:** `0 8px 24px rgb(29 35 48 / 12%), 0 2px 6px rgb(29 35 48 / 8%)`.
+- **Janelas** (verso do cartão, confirmações): `0 24px 60px rgb(29 35 48 / 30%)` sobre véu `rgb(29 35 48 / 45%)`.
 
 ## Shapes
 
-Cantos discretos e hierarquizados pelo tamanho da peça: 6px (`canto`) em itens da faixa lateral, bloco vazio e, planejado, cartões, campos e painéis; 4px (`canto-botao`) em botões e, planejado, quadradinhos de sigla e caixas de aviso; 2px (`canto-macro`, planejado) nos quadradinhos de macroprocesso; totalmente redondo em pílulas, alternância e avatares.
-
-Bordas sempre de 1px: sólida em `linha` nas folhas; tracejada em `linha-tracejada` em espaço vazio que convida a uma ação (estado vazio do quadro; coluna vazia e "+ Registrar…", planejado). A linha acesa é a única borda de 2px.
-
-Os ícones seguem a mesma forma: SVG próprio em grade de 24, traço 1,75, pontas e junções arredondadas, cantos internos de 1,5 a 2, cor herdada do texto.
+Cantos de 8px em cartão, tabela, bloco e menu; 6px em botão, campo, segmento, item da faixa lateral e aviso; 4px em selo e opção de segmento; 12px nas janelas; pílulas de contador e avatares redondos. Ícones desenhados no projeto (SVG, traço 1,75, pontas redondas), sem pacote externo.
 
 ## Components
 
 ### Buttons
-Classes sobre o `<button>` nativo, firmes e compactos.
-- **Shape:** canto de 4px (`canto-botao`), altura mínima de 32px, respiro lateral de 12px, ícone e texto com 8px de intervalo; texto em 13px, 600.
-- **Principal:** fundo `azul`, texto `folha`; hover escurece para `azul-escuro`.
-- **Secundário:** fundo `folha`, borda de 1px em `linha`, texto `texto`; hover escurece a borda para `linha-tracejada`.
-- **Só ícone:** 32 × 32px, transparente, sempre com `aria-label`. O hover hoje só existe dentro da barra superior (fundo `branco-sobre-azul-hover`).
-- **Transições:** cor de fundo e de borda em 150ms com `--curva-saida`.
-- **Desativado:** opacidade 0,5 e cursor de proibido.
+34px de altura, 14px seminegrito. **Principal:** azul cheio, texto branco, um por tela. **Comum:** branco com borda `linha`. **Ligado:** `azul-claro` com texto `azul-escuro`. **Leve:** sem borda nem fundo. Só ícone: 34×34px com `aria-label`.
+
+### Segmento
+Contêiner `fundo` com borda `linha`, respiro de 2px; opções em 12px seminegrito `texto-2`; a escolhida em `azul-claro`. Serve para Quadro | Lista, "Agrupar por", "Mostrar" e as abas de página.
+
+### Cartão do Quadro
+Linha de cima com o selo do setor (ausente no Quadro por setor) e o ícone da etiqueta à direita; nome do processo; linha do responsável com ícone de pessoa ("Sem responsável" em cinza); rodapé em mono separado por `linha-leve`. O processo parado ganha borda vermelha inteira. O cartão do processo aberto leva borda azul.
+
+### Menus e caixas de seleção
+Itens de 34px, 13px; item em foco ou escolhido em `azul-claro` com `azul-escuro`; separador `linha`; ações destrutivas no fim, em `atraso`. A caixa de seleção continua o `<select>` nativo com `appearance: base-select`.
 
 ### Foco
-Contorno de 2px em `azul` com 2px de afastamento em todo elemento clicável (`:focus-visible`). **Desvio registrado:** dentro da barra superior azul o contorno vira branco (`folha`), porque azul sobre azul sumiria.
+Contorno de 2px em `azul` com 2px de afastamento, em todo elemento clicável.
 
-### Chips (pílulas de situação)
-- **Style:** totalmente redondas, 2px × 8px de respiro, texto 11px, 600, MAIÚSCULAS, espaçamento 0,5px, sem quebra de linha; cada situação com seu par texto/fundo, sem borda. **Desvio registrado:** o texto em maiúsculas segue a tabela de tipografia do brief.
-- **State:** cinco variantes (atraso, vencendo, informativa, aprovado, neutra). O texto é obrigatório no componente: a situação nunca é dita só pela cor.
+### Verso do cartão
+Janela de até 880px de largura e 740px de altura, canto de 12px, que não cresce além disso (o que sobra rola por dentro); o "Agora" é um bloco branco com borda comum e o único botão azul cheio da janela.
 
-### Alternância Quadro | Lista
-Pílula segmentada na barra superior: contorno de 1px em `branco-sobre-azul-borda` com 1px de respiro, opções transparentes em texto branco 12px, 600; a opção pressionada vira fundo `folha` com texto `azul`. Estado comunicado por `aria-pressed`.
-
-### Avatar
-- Círculo em três tamanhos: 20px (cartão), 24px (listas), 32px (cabeçalhos).
-- Com foto: recortada no círculo, nome como texto alternativo.
-- Sem foto: até duas iniciais em 600, `azul-escuro` sobre `azul-avatar`, com tamanho de 0,42 do diâmetro e o nome completo como rótulo acessível.
-- Vários no mesmo item, sobrepostos com borda branca de 2px e "+N" do quarto em diante (planejado).
-
-### Navigation
-- **Faixa lateral:** fundo `folha`, borda direita em `linha`, ícones de 20px em itens de 40px com canto de 6px. Repouso em `icone-inativo`; hover em `texto-2` sobre `fundo`; área atual em `azul` sobre `azul-claro`, com a linha acesa de 2px encostada na borda direita da faixa (8px de recuo em cima e embaixo). Cada item tem rótulo acessível e dica ao passar o mouse; a área atual leva `aria-current="page"`.
-- **Barra superior:** fundo `azul`, texto `folha`, "EP" em 16px/700, título em 14px/600. **Desvio registrado:** à direita aparece o ícone de conta no lugar do avatar do usuário logado, até existir o login (backlog).
-
-### Bloco tracejado (estado vazio)
-Bloco centralizado de até 420px, borda tracejada de 1px em `linha-tracejada`, canto de 6px, 32px × 24px de respiro, sem fundo próprio. Título em 14px/600 com quebra equilibrada, frase de orientação em `texto-2` e o botão principal da próxima ação. Textos seguem o brief: dizem o que houve e o que fazer, sem "por favor" nem exclamação.
-
-### Peças planejadas (definidas no brief, ainda não construídas)
-- **Cartão do processo:** folha branca, borda `linha`, canto 6px, sem sombra; hover escurece a borda em 150ms; escolhido ganha a linha acesa.
-- **Coluna de etapa:** nome, contagem em mono, barrinha de proporção (`barra-coluna-trilho` / `barra-coluna`); "+" circular azul só na primeira coluna; coluna vazia em bloco tracejado.
-- **Painel de detalhe:** desliza da direita em 200ms enquanto o quadro esmaece; usa `--sombra-flutuante`.
-- **Caminho de etapas:** feitas em `texto` com marca de concluída, atual em `azul` com sublinhado aceso, futuras em `texto-2`.
-- **Abas:** ativa com sublinhado aceso.
-- **Mudança de etapa:** breve brilho da linha acesa (300ms).
-
-Com `prefers-reduced-motion`, toda transição e animação vira troca instantânea (já aplicado globalmente).
+### Tabelas e Lista
+Tabela branca com borda `linha` e canto de 8px; cabeçalho em `fundo-cabecalho` (12px, 700, `texto-2`); divisórias `linha-leve`. O nome do processo é seminegrito em `texto`, sublinhado ao passar o mouse, nunca azul de link. A etapa vem com uma trilha de oito tracinhos. Linhas de grupo em `fundo-grupo`.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** usar só as variáveis de `src/styles/tokens.css`; nenhum código de cor fora dele.
-- **Do** reservar `azul` para barra superior, ação principal, linha acesa e foco.
-- **Do** marcar o que está em foco ou é atual com a linha acesa de 2px em `azul`, uma por região.
-- **Do** acompanhar toda cor de significado com texto ou rótulo acessível.
-- **Do** escrever siglas, versões, datas e contagens em IBM Plex Mono com números tabulares.
-- **Do** usar borda tracejada em `linha-tracejada` para espaço vazio que convida a uma ação.
-- **Do** desenhar ícones novos no `Icone.tsx`: SVG em grade de 24, traço 1,75, pontas arredondadas.
-- **Do** trocar o contorno de foco para branco sobre fundo `azul`.
+- Use azul cheio só na ação principal e azul-claro para tudo que está escolhido ou ligado.
+- Mostre prazo com ícone e texto; etiqueta com ícone e nome acessível.
+- Deixe a cor do setor no selo e em nenhum outro lugar.
+- Use mono para versão, dias, datas e contagens.
 
 ### Don't:
-- **Don't** pôr sombra em cartões, colunas ou faixas; sombra só no que flutua.
-- **Don't** usar vermelho, âmbar ou verde em macroprocessos, barrinhas de tipo ou decoração; esses tons dizem situação.
-- **Don't** pôr branco translúcido como fundo atrás de texto na barra azul.
-- **Don't** criar tamanhos de texto fora da escala de seis passos.
-- **Don't** usar caractere de texto como ícone (✓, →, ★); o ícone é sempre SVG do `Icone.tsx`.
-- **Don't** adicionar pacote de ícones ou de fontes sem ADR.
+- Não ponha sombra em cartão, tabela ou bloco.
+- Não use `inativo` (`#9098a6`) em texto: dá 2,9:1.
+- Não pinte coluna, cabeçalho ou faixa de cartão com cor de setor.
+- Não use borda lateral colorida como marca de destaque.

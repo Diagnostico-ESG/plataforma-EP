@@ -23,12 +23,12 @@ afterEach(() => {
 })
 
 const corClaraDaMarca = (opcao: Element | null) =>
-  (opcao?.querySelector('.opcao-cor-do-setor') as HTMLElement | null)?.style.getPropertyValue('--cor-claro')
+  (opcao?.querySelector('.opcao-cor-do-setor') as HTMLElement | null)?.style.getPropertyValue('--cor-do-setor')
 
 test('o filtro Setor mostra o quadradinho da cor do setor, sem a cor no nome da opção', async () => {
   montar([processo('Emitir Ofício', { processo: { setorSigla: 'TSA', setorCor: 13 } })])
   const opcao = within(await screen.findByLabelText('Setor')).getByRole('option', { name: 'TSA' })
-  expect(corClaraDaMarca(opcao)).toBe(corDoSetor(13).claro)
+  expect(corClaraDaMarca(opcao)).toBe(corDoSetor(13).hex)
 })
 
 test('o campo Setor do Novo processo mostra o quadradinho da cor de cada setor ativo', async () => {
@@ -43,69 +43,67 @@ test('o campo Setor do Novo processo mostra o quadradinho da cor de cada setor a
   const formulario = within(await screen.findByRole('form', { name: 'Cadastrar processo' }))
   const campo = formulario.getByLabelText('Setor')
   await waitFor(() => expect(within(campo).getAllByRole('option').length).toBeGreaterThan(1))
-  expect(corClaraDaMarca(within(campo).getByRole('option', { name: 'TSA — Setor Teste A' }))).toBe(corDoSetor(13).claro)
-  expect(corClaraDaMarca(within(campo).getByRole('option', { name: 'TSB — Setor Teste B' }))).toBe(corDoSetor(22).claro)
+  expect(corClaraDaMarca(within(campo).getByRole('option', { name: 'TSA — Setor Teste A' }))).toBe(corDoSetor(13).hex)
+  expect(corClaraDaMarca(within(campo).getByRole('option', { name: 'TSB — Setor Teste B' }))).toBe(corDoSetor(22).hex)
 })
 
-test('no agrupamento por setor, a coluna leva a cor do setor, e a coluna inativa fica cinza com a marca Inativo', async () => {
+test('no agrupamento por setor, a coluna não leva cor de setor, e a coluna inativa traz a marca Inativo', async () => {
   const ativo = umSetor('s1', 'TSA', 'Setor de Testes A', true, 13)
   const inativo = umSetor('s3', 'MNO', 'Setor Antigo', false, 22)
   montar([processo('Processo Antigo', { processo: { setorId: 's3', setorSigla: 'MNO', setorCor: 22 } })], 'integrante_ep', [], new VersoesFalso(), [ativo, inativo])
   fireEvent.click(await screen.findByRole('button', { name: 'Setor' }))
   const regiao = await screen.findByRole('region', { name: 'MNO · Setor Antigo · inativo' })
   const coluna = within(regiao)
-  const colunaDe = (sigla: string) => screen.getByRole('region', { name: new RegExp(`^${sigla} ·`) })
-  expect(colunaDe('TSA').style.getPropertyValue('--cor-claro')).toBe(corDoSetor(13).claro)
-  expect(colunaDe('TSA').className).toContain('coluna-do-setor')
-  expect(regiao.className).toContain('coluna-inativa')
-  expect(regiao.style.getPropertyValue('--cor-claro')).toBe('')
+  const colunaAtiva = screen.getByRole('region', { name: /^TSA ·/ })
+  expect(colunaAtiva.style.getPropertyValue('--cor-do-setor')).toBe('')
+  expect(regiao.style.getPropertyValue('--cor-do-setor')).toBe('')
   expect(coluna.getByText('Inativo')).toBeTruthy()
   expect(coluna.getByText('Setor Antigo')).toBeTruthy()
   expect(document.querySelector('.coluna-titulo .selo-do-setor')).toBeNull()
 })
 
-const faixaDe = (cartao: HTMLElement) => cartao.querySelector('.cartao-faixa') as HTMLElement
+const faixaDe = (cartao: HTMLElement) => cartao.querySelector('.selo-do-setor') as HTMLElement
 
-test('por etapa, a faixa traz a sigla na cor do setor e o nome do processo segue no corpo', async () => {
+test('por etapa, o selo traz a sigla na cor do setor e o nome do processo segue no corpo', async () => {
   montar([processo('Emitir Ofício', { processo: { setorSigla: 'TSA', setorCor: 13 } })])
   const cartao = await cartaoDe('Emitir Ofício')
   expect(faixaDe(cartao).textContent).toBe('TSA')
-  expect(faixaDe(cartao).style.getPropertyValue('--cor-claro')).toBe(corDoSetor(13).claro)
+  expect(faixaDe(cartao).style.getPropertyValue('--cor-do-setor')).toBe(corDoSetor(13).hex)
   expect(cartao.querySelector('.cartao-nome')?.textContent).toBe('Emitir Ofício')
 })
 
-test('por responsável a faixa também traz a sigla', async () => {
+test('por responsável o selo também traz a sigla', async () => {
   montar([processo('Emitir Ofício', { processo: { setorSigla: 'TSA', setorCor: 13 } })])
   fireEvent.click(await screen.findByRole('button', { name: 'Responsável' }))
   expect(faixaDe(await cartaoDe('Emitir Ofício')).textContent).toBe('TSA')
 })
 
-test('por setor o cartão não leva faixa: o nome do processo fica no corpo, como por etapa', async () => {
+test('por setor o cartão não leva selo: o nome do processo fica no corpo, como por etapa', async () => {
   const setor = umSetor('s1', 'TSA', 'Setor A', true, 13)
   montar([processo('Emitir Ofício', { processo: { setorId: 's1', setorSigla: 'TSA', setorCor: 13 } })], 'integrante_ep', [], new VersoesFalso(), [setor])
   fireEvent.click(await screen.findByRole('button', { name: 'Setor' }))
   const cartao = await cartaoDe('Emitir Ofício')
-  expect(cartao.querySelector('.cartao-faixa')).toBeNull()
+  expect(cartao.querySelector('.selo-do-setor')).toBeNull()
   expect(cartao.querySelector('.cartao-nome')?.textContent).toBe('Emitir Ofício')
   expect(within(cartao).getAllByText('Emitir Ofício')).toHaveLength(1)
 })
 
-test('por setor o cabeçalho da coluna traz a sigla e o nome do setor, e a coluna vazia mantém a cor e a frase', async () => {
+test('por setor o cabeçalho da coluna traz a sigla e o nome do setor, e a coluna vazia mantém a frase', async () => {
   const setor = umSetor('s1', 'TSA', 'Setor A', true, 13)
   const outro = umSetor('s2', 'TSB', 'Setor B', true, 22)
   montar([processo('Emitir Ofício', { processo: { setorId: 's2', setorSigla: 'TSB', setorCor: 22 } })], 'integrante_ep', [], new VersoesFalso(), [setor, outro])
   fireEvent.click(await screen.findByRole('button', { name: 'Setor' }))
   const regiao = await screen.findByRole('region', { name: 'TSA · Setor A' })
-  expect(regiao.style.getPropertyValue('--cor-claro')).toBe(corDoSetor(13).claro)
+  expect(regiao.style.getPropertyValue('--cor-do-setor')).toBe('')
   expect(regiao.querySelector('.coluna-titulo-principal')?.textContent).toBe('TSA')
   expect(regiao.querySelector('.coluna-titulo-nome')?.textContent).toBe('Setor A')
   expect(within(regiao).getByText('Nenhum processo deste setor no Quadro.')).toBeTruthy()
 })
 
-test('o processo de setor inativo mantém a cor na faixa, e o parado continua com a marca de parado', async () => {
+test('o processo de setor inativo mantém a cor no selo, e o parado continua com a marca de parado', async () => {
   montar([processo('Processo Parado', { processo: { setorSigla: 'MNO', setorCor: 22, entrouNaEtapaEm: dia(-30) } })])
   const cartao = await cartaoDe('Processo Parado')
-  expect(faixaDe(cartao).style.getPropertyValue('--cor-claro')).toBe(corDoSetor(22).claro)
+  expect(faixaDe(cartao).style.getPropertyValue('--cor-do-setor')).toBe(corDoSetor(22).hex)
   expect(cartao.className).toContain('cartao-parado')
 })
 
@@ -117,7 +115,7 @@ test('o cabeçalho do verso mostra o selo do setor; a seção Sobre continua com
   expect(selos).toHaveLength(1)
   expect(selos[0].closest('.verso-cabecalho')).not.toBeNull()
   expect(selos[0].textContent).toBe('TSA')
-  expect(selos[0].style.getPropertyValue('--cor-claro')).toBe(corDoSetor(13).claro)
+  expect(selos[0].style.getPropertyValue('--cor-do-setor')).toBe(corDoSetor(13).hex)
 })
 
 test('a coluna Setor da Lista mostra o selo da cor, e o nome da célula segue sendo a sigla', async () => {
@@ -126,18 +124,18 @@ test('a coluna Setor da Lista mostra o selo da cor, e o nome da célula segue se
   const celula = await screen.findByRole('cell', { name: 'TSA' })
   const selo = celula.querySelector('.selo-do-setor') as HTMLElement
   expect(selo.textContent).toBe('TSA')
-  expect(selo.style.getPropertyValue('--cor-claro')).toBe(corDoSetor(13).claro)
+  expect(selo.style.getPropertyValue('--cor-do-setor')).toBe(corDoSetor(13).hex)
 })
 
-test('trocar a cor do setor no cadastro muda a faixa do cartão na próxima vez que o Quadro carrega', async () => {
+test('trocar a cor do setor no cadastro muda o selo do cartão na próxima vez que o Quadro carrega', async () => {
   window.location.hash = '#/setores'
   montarNosCadastros()
   fireEvent.click(await screen.findByRole('button', { name: 'TSA' }))
   const grade = within(await screen.findByRole('group', { name: 'Cor do setor' }))
-  fireEvent.click(grade.getByRole('radio', { name: 'água claro' }))
+  fireEvent.click(grade.getByRole('radio', { name: 'laranja' }))
   fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
   await screen.findByRole('button', { name: 'TSB' })
   window.location.hash = '#/processos'
   const cartao = await cartaoDe('Emitir Ofício')
-  expect((cartao.querySelector('.cartao-faixa') as HTMLElement).style.getPropertyValue('--cor-claro')).toBe(corDoSetor(2).claro)
+  expect((cartao.querySelector('.selo-do-setor') as HTMLElement).style.getPropertyValue('--cor-do-setor')).toBe(corDoSetor(2).hex)
 })

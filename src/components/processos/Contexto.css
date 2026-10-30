@@ -40,7 +40,7 @@
 .modelagem-sem-data {
   margin: 0;
   padding-left: var(--esp-2);
-  border-left: 3px solid var(--tipo-modelagem);
+  border-left: 3px solid var(--linha);
 }
 
 .modelagem-data time {

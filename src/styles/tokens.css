@@ -31,7 +31,6 @@
   --azul: #3a5afe;
   --azul-claro: #e8edff;
   --azul-escuro: #2a44c9;
-  --azul-avatar: #e8edff;
 
   /* Superfícies e linhas */
   --fundo: #f3f4f7;
@@ -72,29 +71,13 @@
   --neutra-texto: #4a5163;
   --neutra-fundo: #eef0f4;
 
-  /* Etiquetas da etapa (cartão e Agora): trocadas por ícones na fase do Quadro */
-  --etiqueta-a-fazer-texto: #ffffff;
-  --etiqueta-a-fazer-fundo: #be185d;
-  --etiqueta-a-fazer-bolinha: #ffffff;
-  --etiqueta-em-andamento-texto: #451a03;
-  --etiqueta-em-andamento-fundo: #f59e0b;
-  --etiqueta-em-andamento-bolinha: #451a03;
-  --etiqueta-concluido-texto: #ffffff;
-  --etiqueta-concluido-fundo: #0f766e;
-  --etiqueta-concluido-bolinha: #ffffff;
-
-  /* Barra da etapa: trocada pela trilha de tracinhos na fase do Quadro */
-  --barra-etapa-trilho: #e3e6ec;
-  --barra-etapa-inicio: #c9d3ff;
-  --barra-etapa-fim: #2238c8;
+  /* Etiquetas da etapa, só ícone: círculo vazio, meio azul, círculo verde com visto (3,3:1, acima do mínimo gráfico de 3:1) */
+  --etiqueta-a-fazer: var(--icone-inativo);
+  --etiqueta-iniciado: var(--azul);
+  --etiqueta-finalizado: #16a34a;
 
   --pendencia-fundo: #fff6e5;
   --pendencia-borda: #f3d28f;
-
-  /* Barrinha por tipo de registro (sai com o redesenho do verso) */
-  --tipo-fluxograma: #8cc4ea;
-  --tipo-relatorio: #b7a5ec;
-  --tipo-modelagem: #e9cf7a;
 
   /* Macroprocessos (saem na fase da Lista) */
   --macro-violeta: #8e4ec6;
@@ -133,7 +116,6 @@
   --canto-selo: 4px;
   --canto-janela: 12px;
   --canto-macro: 2px;
-  --linha-acesa: 2px solid var(--azul);
   /* Sombra só no que flutua; cartões e tabelas não têm */
   --sombra-flutuante: 0 8px 24px rgb(29 35 48 / 12%), 0 2px 6px rgb(29 35 48 / 8%);
   --sombra-janela: 0 24px 60px rgb(29 35 48 / 30%);

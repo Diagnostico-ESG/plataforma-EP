@@ -207,8 +207,7 @@
 .administracao-aba {
   padding: var(--esp-3) 0;
   border: 0;
-  border-bottom: var(--linha-acesa);
-  border-bottom-color: transparent;
+  border-bottom: 2px solid transparent;
   background: transparent;
   color: var(--texto-2);
   font: inherit;

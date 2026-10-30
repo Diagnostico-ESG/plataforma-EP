@@ -1119,3 +1119,15 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 
 - **`.scratch/identidade-visual.md` entre a concepção e a implementação.** Esperado: a concepção grava a identidade completa para o `/implementar-identidade`. Aconteceu: o arquivo foi reescrito para a nova direção (a antiga ficou resumida no "Registro de mudanças"), depois de o usuário decidir cores dos setores e escala. O comando manda "partir do zero" e apresentar conceitos; o usuário pediu explicitamente para não fazer rodada de conceitos (direção já aprovada em protótipos), e valeu a instrução dele.
 - **Melhoria:** a `/concepcao-livre` não prevê o caso de redesenho com direção já escolhida em protótipos; poderia ter um modo "consolidar protótipos aprovados" que pula a rodada de conceitos e vai direto para tokens, contraste e decisões pendentes.
+
+---
+## 2026-10-30 — /implementar-identidade (redesenho "Grafite e branco, cor em ponto")
+
+- **`.scratch/identidade-visual.md` lido; marco `antes-identidade` criado antes de mexer.** Aconteceu: marco `marco/2026-10-30-antes-identidade`; os arquivos novos de `.scratch/` já estavam no git.
+- **`PRODUCT.md` × `projeto.md`.** Aconteceu: sem divergência que mude a tela; nenhuma pergunta necessária.
+- **`/impeccable shape` por `Skill`.** Aconteceu: a skill aceitou ser acionada aqui dentro; as perguntas de descoberta já estavam respondidas pela identidade, e o resumo de escopo foi confirmado pelo usuário em uma rodada.
+- **Divisão visual × comportamento novo, pedida pelo usuário antes de começar.** Aconteceu: mostrada em tabela; o usuário escolheu a opção A (só visual agora) e as 4 fases.
+- **Teste-fumaça do `/setup` reescrito.** Aconteceu: não há mais teste-fumaça com o contador do template; os testes de tela (cartão, cor do setor, tokens) foram atualizados para a nova interface. O arquivo `src/styles/etiquetasVivas.test.ts` agora confere o contraste dos novos tokens.
+- **Conferência da tela (computador e largura de celular).** Aconteceu: vitrine local (`vitrine.local`, fora do git) no navegador do app: Quadro, Lista, verso, Setores; celular em 375px sem rolagem lateral da página (só do Quadro).
+- **Melhoria:** o `/implementar-identidade` poderia mandar rodar a suíte só nos arquivos tocados enquanto trabalha e a suíte cheia uma vez no fim: o pre-commit roda a suíte inteira (cerca de 4 minutos) a cada commit.
+- **Limitação das ferramentas:** o editor de linha de comando do Windows deixa `\` virar `\` em alguns heredocs; um teste com regex quebrou por isso e foi corrigido.

@@ -15,7 +15,7 @@
 
 .menu-de-acoes-botao:hover,
 .menu-de-acoes-botao[aria-expanded='true'] {
-  background: var(--neutra-fundo);
+  background: var(--fundo);
   color: var(--texto);
 }
 
@@ -25,6 +25,7 @@
   right: 0;
   z-index: 5;
   min-width: 200px;
+  font-size: var(--tam-secundario);
   font-size: var(--tam-secundario);
   /* Lista longa (os responsáveis no cabeçalho da Lista) rola por dentro e não sai da tela em 1366×768. */
   max-height: min(60vh, 360px);
@@ -52,7 +53,7 @@
 .menu-de-acoes-item {
   display: block;
   width: 100%;
-  min-height: 32px;
+  min-height: 34px;
   padding: 0 var(--esp-4);
   border: 0;
   background: transparent;
@@ -66,6 +67,7 @@
 .menu-de-acoes-item:hover,
 .menu-de-acoes-item:focus {
   background: var(--azul-claro);
+  color: var(--azul-escuro);
 }
 
 /* O contorno do foco fica por dentro, para não ser cortado pela borda da lista. */
@@ -75,12 +77,13 @@
 
 /* Excluir: vermelho de "a ação não volta" (ADR 0003), sempre com o texto, nunca só a cor. */
 .menu-de-acoes-perigoso {
-  color: var(--atraso-texto);
+  color: var(--atraso);
 }
 
 .menu-de-acoes-perigoso:hover,
 .menu-de-acoes-perigoso:focus {
   background: var(--atraso-fundo);
+  color: var(--atraso-texto);
 }
 
 .menu-de-acoes-separador {

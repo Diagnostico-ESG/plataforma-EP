@@ -1,5 +1,3 @@
-import type { CSSProperties } from 'react'
-import { estiloDaCor } from '../../cadastros/corDoSetor'
 import type { ArrastoDoQuadro } from '../../hooks/useArrastoDoQuadro'
 import { useTirarDoQuadroDaTela } from '../../hooks/useTirarDoQuadro'
 import type { ColunaDoQuadro as Coluna } from '../../processos/colunasDoQuadro'
@@ -34,7 +32,7 @@ export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAl
   const recebe = levantado !== null && agrupar === 'etapa'
   const realce = recebe && arrasto.sobre === coluna.chave
   return (
-    <section className={classesDaColuna(coluna, realce)} style={estiloDaColuna(coluna)} aria-label={rotuloDaColuna(coluna)}
+    <section className={classesDaColuna(realce)} aria-label={rotuloDaColuna(coluna)}
       onDragEnter={() => recebe && arrasto.passarPor(coluna.chave)}
       onDragOver={(evento) => {
         if (!recebe) return
@@ -45,7 +43,7 @@ export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAl
         evento.preventDefault()
         arrasto.soltarEm(coluna.chave)
       }}>
-      <h3 className={coluna.cor === undefined ? 'coluna-titulo' : 'coluna-titulo coluna-titulo-setor'}>
+      <h3 className="coluna-titulo">
         <span className="coluna-titulo-texto">
           <span className="coluna-titulo-principal">{coluna.titulo}{coluna.inativo && <> <Pilula situacao="neutra">Inativo</Pilula></>}</span>
           {coluna.subtitulo && <span className="coluna-titulo-nome">{coluna.subtitulo}</span>}
@@ -93,17 +91,7 @@ function AvisoDaColunaVazia({ coluna, agrupar }: { coluna: Coluna; agrupar: Agru
   return null
 }
 
-// Por setor a coluna leva a cor do setor até o último cartão (ADR 0031 e 0032); vazia, só o cabeçalho é colorido. A do setor
-// inativo fica cinza, sem a cor.
-function classesDaColuna({ cor, inativo, processos }: Coluna, realce: boolean): string {
-  return [
-    'coluna',
-    realce && 'coluna-destino',
-    cor !== undefined && (inativo ? 'coluna-inativa' : 'coluna-do-setor'),
-    cor !== undefined && processos.length === 0 && 'coluna-sem-cartao',
-  ].filter(Boolean).join(' ')
-}
-
-function estiloDaColuna({ cor, inativo }: Coluna): CSSProperties | undefined {
-  return cor === undefined || inativo ? undefined : (estiloDaCor(cor) as CSSProperties)
+// A coluna só ganha o realce de destino do arrastar: a cor do setor mora no selo do cartão, nunca na coluna.
+function classesDaColuna(realce: boolean): string {
+  return realce ? 'coluna coluna-destino' : 'coluna'
 }

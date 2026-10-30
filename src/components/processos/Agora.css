@@ -1,17 +1,17 @@
-/* O cartão "Agora" (spec, "Coluna esquerda — Agora"): a única coisa acesa da janela, com a borda de 2 px em azul e o
-   único botão principal. Na Consulta a borda é cinza; suspenso, cancelado e concluído têm fundo próprio. */
+/* O cartão "Agora" (spec, "Coluna esquerda — Agora"): o bloco do que fazer em seguida, com o único botão azul cheio da janela.
+   Suspenso, cancelado e concluído têm fundo próprio. */
 .agora {
   display: flex;
   flex-direction: column;
   gap: var(--esp-2);
   padding: var(--esp-4);
-  border: var(--linha-acesa);
+  border: 1px solid var(--linha);
   border-radius: var(--canto);
   background: var(--folha);
 }
 
 .agora-leitura {
-  border: 2px solid var(--linha);
+  border: 1px solid var(--linha);
 }
 
 .agora-rotulo {

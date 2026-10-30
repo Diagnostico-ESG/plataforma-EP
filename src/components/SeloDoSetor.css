@@ -1,20 +1,13 @@
 .selo-do-setor {
-  background: var(--cor-claro);
-  color: var(--texto);
-  font-weight: 600;
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: var(--canto-selo);
+  background: var(--cor-do-setor);
+  color: var(--folha);
+  font-size: var(--tam-selo);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  line-height: 1.5;
   /* Sem isto, o modo de contraste forçado apaga a cor da identidade do setor. */
   forced-color-adjust: none;
-}
-
-.selo-do-setor-pequeno {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: var(--canto);
-}
-
-.selo-do-setor-faixa {
-  display: block;
-  padding: 6px 12px;
-  text-align: center;
-  font-size: var(--tam-painel);
 }

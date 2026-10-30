@@ -172,3 +172,20 @@ Uma linha por item: o que é e onde surgiu.
 - 2026-10-29 | /ship de enxugar-cartao-e-cadastro (code-review) | `DataDaValidacao`, `CamposDaPublicacao`, `CamposDoEProtocolo` e `ProcessosFalso` usam `hojeLocal()` (relógio da máquina), enquanto a data da modelagem usa `hojeEmBrasilia()`; juntar num só "hoje" e renomear `textoDaModelagemPiloto.ts`, que só guarda `hojeLocal`. Menores: `POR_FORMATO` em `iconeDoArquivo.ts` é nome genérico; a folha do ícone se repete 6 vezes em `Icone.tsx`; o pgTAP 72 não exercita em linhas reais a junção dos textos e o apagar das datas futuras.
 - 2026-10-30 | conversa de análise de design | Ideia para discutir: Quadro em matriz com raias (swimlanes), etapas nas colunas e setores nas linhas, raias recolhíveis e "Agrupar linhas por: Setor | Responsável | nenhum" no lugar das visões por setor e por responsável. Referências: Azure DevOps (raias por pessoa) e Linear (subagrupamento). Detalhes em `.scratch/analise-de-design-2026-10-30.md`. O usuário gostou; discutir depois de resolver cores, cartão e cabeçalho.
 - pgTAP intermitente: `passagens_saida_depois_da_entrada` falhou uma vez no Docker local (teste "o concluído tirado do Quadro volta a outra etapa", `supabase/tests`); passou na repetição sem mudança. Surgiu em responsavel-inicial-por-etapa (2026-10-30); investigar se `trocar_passagem` usa `clock_timestamp()` contra um `entrou_em` de `now()`.
+
+## Comportamento novo da identidade "Grafite e branco" (2026-10-30)
+
+Fora do `/implementar-identidade` por decisão do usuário (opção A): a aparência nova já está no código, o comportamento de hoje continua.
+- Interruptor "Linhas: Nenhuma | Setor | Responsável" no Quadro (substitui "Agrupar por" e o "Quadro por setor"; etapas sempre nas colunas) → `/planejar`.
+- Botão "Filtros" com contador e faixa de controles de altura fixa (hoje: cinco seletores soltos) → `/planejar`.
+- Verso enxuto: sem abas, miniatura grande do fluxograma, Anotações com o dobro do espaço, histórico no menu "···" com "Voltar ao processo" → `/planejar`, junto com o item acima.
+- "Destacar os meus" (esmaece os outros) no lugar de "Só os meus" (filtra) → `/demanda`.
+- "Mostrar" em um segmento só: Em andamento | Concluídos | Cancelados | Todos → `/demanda`.
+- Janela de 520px para criar setor (hoje, página de formulário) → `/demanda`.
+- Ícone por etapa do catálogo (hoje, todas iguais) → decisão no `/planejar`: o catálogo não guarda ícone.
+- Mover Quadro | Lista da barra superior para a faixa de controles e juntar os itens "Quadro" e "Lista" da faixa lateral em "Processos" → `/demanda` (a identidade tira a alternância da barra; no código ela continua lá, no desenho novo).
+- Trilha de 8 tracinhos com a etapa atual em azul e as feitas em cinza-azulado: hoje é uma barra segmentada de uma cor só → `/demanda`.
+- Etiquetas "Iniciado" e "Finalizado" da identidade: o código ainda diz "Em andamento" e "Concluído" na etiqueta → conferir com o `CONTEXT.md`.
+- Quadradinho de cor do macroprocesso (`--macro-violeta`) ainda existe nas caixas de seleção; a identidade manda tirá-lo → `/demanda`.
+- Selo de tipo de arquivo mono (BPMN, PNG, PDF…) e busca e avisos na barra superior → `/planejar`.
+- `.impeccable/design.json` (arquivo lateral do DESIGN.md) ainda descreve a identidade antiga → `/impeccable document`.

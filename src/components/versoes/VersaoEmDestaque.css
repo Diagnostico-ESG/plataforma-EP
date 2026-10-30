@@ -85,11 +85,7 @@
 }
 
 .arquivo-botao {
-  border-left: 3px solid var(--tipo-fluxograma);
-}
-
-.arquivo-relatorio .arquivo-botao {
-  border-left-color: var(--tipo-relatorio);
+  border-left: 3px solid var(--linha);
 }
 
 .arquivo-botao svg {
@@ -107,7 +103,7 @@
 /* O relatório que falta: o espaço dele, tracejado, que acrescenta ali mesmo. */
 .arquivo-que-falta {
   border: 1px dashed var(--pendencia-borda);
-  border-left: 3px dashed var(--tipo-relatorio);
+  border-left: 3px dashed var(--pendencia-borda);
   background: var(--pendencia-fundo);
   color: var(--texto);
   font: inherit;

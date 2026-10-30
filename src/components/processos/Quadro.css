@@ -8,7 +8,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--esp-3);
-  padding: var(--esp-4);
+  padding: var(--esp-4) var(--esp-5);
 }
 
 .quadro-barra {
@@ -50,7 +50,7 @@
   flex: 1;
   /* Em janela baixa a coluna não encolhe até sumir: abaixo disso a página volta a rolar. */
   min-height: 320px;
-  gap: var(--esp-3);
+  gap: 14px;
   overflow-x: auto;
   overflow-y: hidden;
   padding-bottom: var(--esp-3);
@@ -69,113 +69,38 @@
   min-height: 0;
 }
 
-/* Título centralizado em todo agrupamento (ADR 0032); a contagem fica à direita, fora do fluxo, e a folga dos lados impede o
-   título longo de passar por baixo dela. */
+/* Cabeçalho da coluna: o nome numa plaqueta branca e a contagem em mono colada. A coluna em si é o fundo; não leva cor de setor. */
 .coluna-titulo {
-  position: relative;
   display: flex;
-  justify-content: center;
+  align-items: center;
+  gap: var(--esp-2);
   margin: 0;
-  padding: 0 var(--esp-6);
-  text-align: center;
   font-size: var(--tam-coluna);
   font-weight: 700;
 }
 
-/* Por setor o título tem duas linhas: a sigla em destaque e o nome do setor, menor, abaixo. */
 .coluna-titulo-texto {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  padding: 3px var(--esp-3);
+  border: 1px solid var(--linha);
+  border-radius: var(--canto-botao);
+  background: var(--folha);
 }
 
 .coluna-titulo-nome {
   color: var(--texto-2);
-  font-size: var(--tam-secundario);
+  font-size: var(--tam-rotulo);
   font-weight: 400;
   overflow-wrap: anywhere;
 }
 
 .coluna-contagem {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: var(--esp-1);
-  /* Centrada na altura do título, qualquer que seja o número de linhas dele. */
-  display: flex;
-  align-items: center;
   color: var(--texto-2);
-  font-size: var(--tam-secundario);
-  font-weight: 600;
-}
-
-/* Por setor (ADR 0031 e 0032): a coluna ganha o tom do setor misturado com branco só até o fim do último cartão (vazia, fica só
-   o cabeçalho), e o cabeçalho é uma faixa na cor lisa do setor de lado a lado, colada no alto. Nome e contagem em `texto`: o cinza médio não tem
-   contraste AA sobre os tons médios da paleta. O setor inativo não tem cor: cabeçalho um tom acima do fundo, ambos em cinza. */
-.coluna-do-setor,
-.coluna-inativa {
-  gap: 0;
-  border-radius: var(--canto);
-  /* A cor vai só até o fim do último cartão (ADR 0032), com a folga de baixo; a rolagem continua dentro da coluna. */
-  align-self: flex-start;
-  max-height: 100%;
-  padding-bottom: var(--esp-2);
-}
-
-.coluna-do-setor {
-  background: color-mix(in srgb, var(--cor-claro) 30%, var(--folha));
-  /* Sem isto, o modo de contraste forçado apaga a cor da identidade do setor. */
-  forced-color-adjust: none;
-}
-
-.coluna-inativa {
-  background: var(--neutra-fundo);
-}
-
-.coluna-titulo-setor {
-  /* Folga dos lados para o nome do setor, centralizado, nunca passar por baixo da contagem posicionada à direita. */
-  padding: var(--esp-2) var(--esp-6);
-  border-radius: var(--canto) var(--canto) 0 0;
-  color: var(--texto);
-}
-
-/* Coluna vazia (ADR 0032): só o cabeçalho colorido; a frase fica logo abaixo, sobre o fundo da página. */
-.coluna-do-setor.coluna-sem-cartao,
-.coluna-inativa.coluna-sem-cartao {
-  background: none;
-  padding-bottom: 0;
-}
-
-.coluna-sem-cartao .coluna-titulo-setor {
-  border-radius: var(--canto);
-}
-
-.coluna-do-setor .coluna-titulo-setor {
-  background: var(--cor-claro);
-}
-
-.coluna-inativa .coluna-titulo-setor {
-  background: var(--barra-coluna-trilho);
-}
-
-.coluna-titulo-setor .coluna-titulo-texto {
-  align-items: center;
-}
-
-.coluna-titulo-setor .coluna-titulo-principal {
-  font-size: var(--tam-painel);
-}
-
-.coluna-titulo-setor .coluna-titulo-nome {
-  color: var(--texto);
-}
-
-.coluna-titulo-setor .coluna-contagem {
-  top: var(--esp-2);
-  bottom: auto;
-  display: block;
-  right: var(--esp-3);
-  color: var(--texto);
+  font-family: var(--fonte-mono);
+  font-size: var(--tam-rotulo);
+  font-weight: 500;
 }
 
 /* O respiro de 4px é para o overflow não cortar o anel de foco do teclado (2px de contorno e 2px de afastamento, em index.css). */
@@ -184,14 +109,14 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  gap: var(--esp-2);
+  gap: 10px;
   padding: var(--esp-1);
   overflow-y: auto;
 }
 
 /* Arrastar para concluir: só a coluna de destino acende; o cartão arrastado fica apagado no lugar de origem. */
-/* Fundo azul claro, borda contínua de 1px e sombra suave, tudo para dentro (box-shadow inset): a rolagem lateral cortaria o que
-   sai da coluna. A borda é sombra, não border, para a coluna não mudar de tamanho. A altura mínima dá alvo à coluna vazia.
+/* Fundo azul-claro e borda contínua de 1px, tudo para dentro (box-shadow inset): a rolagem lateral cortaria o que sai da coluna.
+   A borda é sombra, não border, para a coluna não mudar de tamanho. A altura mínima dá alvo à coluna vazia.
    A transição some com prefers-reduced-motion (regra global em index.css). */
 .coluna {
   transition:
@@ -202,9 +127,7 @@
 
 .coluna-destino {
   background: var(--azul-claro);
-  box-shadow:
-    inset 0 0 0 1px var(--azul),
-    inset 0 0 12px color-mix(in srgb, var(--azul) 20%, transparent);
+  box-shadow: inset 0 0 0 1px var(--azul);
   border-radius: var(--canto);
   min-height: 160px;
 }
@@ -232,11 +155,12 @@
   border-radius: var(--canto);
 }
 
+/* Cartão branco, sem sombra: selo do setor e etiqueta no alto, nome, responsável e rodapé em mono. */
 .cartao {
   display: flex;
   flex-direction: column;
   gap: var(--esp-2);
-  padding: var(--esp-3);
+  padding: var(--esp-3) 14px;
   border: 1px solid var(--linha);
   border-radius: var(--canto);
   background: var(--folha);
@@ -249,25 +173,48 @@
   border-color: var(--linha-tracejada);
 }
 
-/* A linha acesa acompanha o foco: o cartão do processo aberto no painel. */
+/* O cartão do processo aberto no verso. */
 .cartao[aria-current='true'] {
   border-color: var(--azul);
   box-shadow: 0 0 0 1px var(--azul);
 }
 
-/* Faixa do setor: de lado a lado no topo do cartão, por cima do padding. */
-/* O raio vale o do cartão menos a borda de 1px, para a faixa encostar no canto de dentro. */
-.cartao-faixa {
-  margin: calc(-1 * var(--esp-3)) calc(-1 * var(--esp-3)) 0;
-  border-radius: calc(var(--canto) - 1px) calc(var(--canto) - 1px) 0 0;
+.cartao-topo {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  min-height: 20px;
+}
+
+.cartao-topo .etiqueta {
+  margin-left: auto;
 }
 
 .cartao-nome {
-  font-size: var(--tam-base);
+  font-size: var(--tam-cartao);
   font-weight: 600;
+  line-height: 1.3;
 }
 
-/* Barra da etapa: o nome e a posição acima, e uma faixa lisa em degradê azul que se enche até a etapa atual. */
+.cartao-responsavel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: var(--texto);
+  font-size: var(--tam-secundario);
+}
+
+.cartao-responsavel-vazio {
+  color: var(--texto-2);
+}
+
+.cartao-responsavel svg {
+  flex: none;
+  color: var(--icone-inativo);
+}
+
+/* Barra da etapa (Quadro por responsável e por setor): o nome e a posição acima e uma faixa lisa, azul até a etapa atual. */
 .barra-etapa {
   display: flex;
   flex-direction: column;
@@ -286,18 +233,19 @@
 .barra-etapa-trilho {
   display: block;
   overflow: hidden;
-  height: 8px;
-  border-radius: 999px;
-  background: var(--barra-etapa-trilho);
+  height: 4px;
+  border-radius: 2px;
+  background: var(--trilha-vazia);
+  /* Oito tracinhos: um para cada etapa. */
+  mask: repeating-linear-gradient(to right, #000 0 calc(12.5% - 3px), transparent 0 12.5%);
 }
 
-/* O degradê cobre só o trecho preenchido: a ponta mais escura marca a etapa atual. */
 .barra-etapa-preenchida {
   display: block;
   width: var(--barra-fracao);
   height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(to right, var(--barra-etapa-inicio), var(--barra-etapa-fim));
+  border-radius: 2px;
+  background: var(--azul);
 }
 
 /* Na célula da Lista a barra não encolhe a ponto de virar risco. */
@@ -316,30 +264,23 @@ td .barra-etapa {
   }
 }
 
-/* Selos: quebram de linha sem estourar a coluna; versão e subprocessos são texto neutro, sem fundo. */
+/* Rodapé do cartão: versão, dias e alertas em mono 12px, separado por uma linha leve. */
 .cartao-selos {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--esp-1) var(--esp-2);
+  gap: var(--esp-1) var(--esp-3);
   min-width: 0;
+  padding-top: var(--esp-2);
+  border-top: 1px solid var(--linha-leve);
   overflow-wrap: anywhere;
 }
 
 .selo-texto {
   color: var(--texto-2);
-  font-size: var(--tam-rotulo);
-}
-
-.selo-versao {
   font-family: var(--fonte-mono);
-}
-
-.cartao-rodape {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--esp-2);
+  font-size: var(--tam-rotulo);
+  font-weight: 500;
 }
 
 .cartao-pilulas {
@@ -379,11 +320,16 @@ td .barra-etapa {
   background: var(--fundo-contexto);
 }
 
-/* Filtros à esquerda, numa linha que quebra quando falta espaço; [Cadastrar processo] continua à direita. */
+/* A faixa de controles é uma folha branca com borda: filtros à esquerda, numa linha que quebra quando falta espaço;
+   [Cadastrar processo] continua à direita. */
 .quadro-barra {
   flex-wrap: wrap;
   align-items: flex-end;
   gap: var(--esp-3);
+  padding: var(--esp-3) var(--esp-4);
+  border: 1px solid var(--linha);
+  border-radius: var(--canto);
+  background: var(--folha);
 }
 
 .quadro-barra > .botao,
@@ -466,10 +412,10 @@ td .barra-etapa {
 .filtro-seletor {
   min-width: 140px;
   /* Com o Avatar de 20px na caixa fechada (filtro Responsável) a altura passava de 29 para 30px: fixa a menor altura. */
-  min-height: 30px;
+  min-height: 34px;
   padding: var(--esp-1) var(--esp-2);
   border: 1px solid var(--linha);
-  border-radius: var(--canto);
+  border-radius: var(--canto-botao);
   background: var(--folha);
   color: var(--texto);
   font: inherit;
@@ -489,29 +435,10 @@ td .barra-etapa {
   gap: var(--esp-1);
 }
 
-.controle-opcoes {
-  display: flex;
-  gap: var(--esp-1);
-}
-
-/* Processo parado: faixa vermelha na borda esquerda, para achá-lo numa coluna cheia sem ler os selos. */
-/* A borda de 4px tira 3px do miolo: o padding encolhe junto, para o texto não pular de lugar. */
-.cartao-parado {
-  padding-left: calc(var(--esp-3) - 3px);
-  border-left-width: 4px;
-}
-
-/* Mais específico que o hover e o realce do painel aberto, que trocam a cor da borda toda. */
+/* Processo parado: a borda inteira muda para o vermelho do prazo (o selo com os dias diz o resto). */
 .cartao.cartao-parado,
-.cartao.cartao-parado:hover,
-.cartao.cartao-parado[aria-current='true'] {
-  border-left-color: var(--atraso-texto);
-}
-
-/* A faixa do setor recua o mesmo que o padding do parado perdeu, e a ponta esquerda fica reta junto da borda vermelha. */
-.cartao-parado .cartao-faixa {
-  margin-left: calc(-1 * (var(--esp-3) - 3px));
-  border-top-left-radius: 0;
+.cartao.cartao-parado:hover {
+  border-color: var(--atraso);
 }
 
 /* Lista: o selo de parado fica ao lado do nome. */
@@ -519,42 +446,19 @@ td .barra-etapa {
   margin-left: var(--esp-2);
 }
 
-/* Etiqueta: pílula com bolinha da cor; o texto sempre diz o valor. */
+/* Etiqueta: só o ícone no cartão (o nome vem no title e no texto oculto); nas caixas e no verso, ícone e nome lado a lado. */
 .etiqueta {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 2px var(--esp-2);
-  border-radius: 999px;
+  color: var(--texto-2);
   font-size: var(--tam-rotulo);
   font-weight: 600;
-  line-height: 1.4;
   white-space: nowrap;
 }
 
-.etiqueta-bolinha {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--bolinha, currentColor);
-}
-
-.etiqueta-a_fazer {
-  --bolinha: var(--etiqueta-a-fazer-bolinha);
-  background: var(--etiqueta-a-fazer-fundo);
-  color: var(--etiqueta-a-fazer-texto);
-}
-
-.etiqueta-em_andamento {
-  --bolinha: var(--etiqueta-em-andamento-bolinha);
-  background: var(--etiqueta-em-andamento-fundo);
-  color: var(--etiqueta-em-andamento-texto);
-}
-
-.etiqueta-concluido {
-  --bolinha: var(--etiqueta-concluido-bolinha);
-  background: var(--etiqueta-concluido-fundo);
-  color: var(--etiqueta-concluido-texto);
+.etiqueta svg {
+  flex: none;
 }
 
 /* O botão fica logo abaixo do cartão, fora do link: não disputa espaço com o nome nem com a faixa do setor. */

@@ -16,7 +16,6 @@
   max-width: 360px;
   padding: var(--esp-6) var(--esp-5);
   border: 1px solid var(--linha);
-  border-top: var(--linha-acesa);
   border-radius: var(--canto);
   background: var(--folha);
   text-align: center;

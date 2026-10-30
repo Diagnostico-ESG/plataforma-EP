@@ -56,7 +56,7 @@ test('o cartão de Concluídos mostra a etiqueta Finalizado e o responsável que
   montar([concluido('Pronto', { responsavel: EU })])
   const cartao = await cartaoDe('Pronto')
   expect(cartao.textContent).toContain('Finalizado')
-  expect(within(cartao).getByRole('img', { name: EU.nome })).toBeTruthy()
+  expect(within(cartao).getByText(EU.nome)).toBeTruthy()
 })
 
 test('o concluído sem a data da publicação tem o selo Sem publicação; o publicado, não', async () => {

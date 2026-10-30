@@ -13,15 +13,16 @@
 
 .grupo-raiz th {
   padding: var(--esp-2) var(--esp-3);
-  background: var(--azul-claro);
-  border-top: 2px solid var(--azul);
-  font-size: var(--tam-coluna);
+  background: var(--fundo-grupo);
+  font-size: var(--tam-base);
+  font-weight: 700;
 }
 
 .grupo-filho th {
   padding: var(--esp-1) var(--esp-3) var(--esp-1) calc(var(--esp-3) + var(--passo-da-arvore));
-  background: var(--fundo-contexto);
-  font-size: var(--tam-base);
+  background: var(--fundo-grupo);
+  color: var(--texto-2);
+  font-size: var(--tam-secundario);
 }
 
 .botao-do-grupo {

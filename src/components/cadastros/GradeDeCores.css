@@ -31,7 +31,7 @@
   display: block;
   height: 28px;
   border-radius: var(--canto-macro);
-  background: var(--cor-claro);
+  background: var(--cor-do-setor);
   outline: 2px solid transparent;
   outline-offset: 2px;
   /* Sem isto, o modo de contraste forçado apaga a cor, que é o que a amostra mostra. */
@@ -40,7 +40,7 @@
 
 /* Em uso por outro setor: ponto discreto no canto, sem impedir a escolha. */
 .amostra-em-uso .amostra-de-cor-tom {
-  background: radial-gradient(circle at 85% 20%, var(--texto) 0 2px, transparent 3px) var(--cor-claro);
+  background: radial-gradient(circle at 85% 20%, var(--texto) 0 2px, transparent 3px) var(--cor-do-setor);
 }
 
 .amostra-de-cor input:checked + .amostra-de-cor-tom {

@@ -40,5 +40,5 @@ test('corDoSetor põe o quadradinho na cor lisa do setor e não entra no nome da
   const opcao = screen.getByRole('option', { name: 'TSA — Setor Teste A' })
   const marca = opcao.querySelector<HTMLElement>('.opcao-cor')
   expect(marca?.getAttribute('aria-hidden')).toBe('true')
-  expect(marca?.style.getPropertyValue('--cor-claro')).toBe('#C4D9F8')
+  expect(marca?.style.getPropertyValue('--cor-do-setor')).toBe('#881337')
 })

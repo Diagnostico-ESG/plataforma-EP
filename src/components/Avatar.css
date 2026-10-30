@@ -7,7 +7,7 @@
 }
 
 .avatar-iniciais {
-  background: var(--azul-avatar);
+  background: var(--azul-claro);
   color: var(--azul-escuro);
   font-weight: 600;
   line-height: 1;

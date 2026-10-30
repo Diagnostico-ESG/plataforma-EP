@@ -41,7 +41,7 @@ function montar(perfil: Perfil = 'integrante_ep', cadastros = cadastrosComSetore
 }
 
 function corClaraDe(elemento: HTMLElement | null) {
-  return elemento?.style.getPropertyValue('--cor-claro')
+  return elemento?.style.getPropertyValue('--cor-do-setor')
 }
 
 async function abrirMacroprocesso() {
@@ -54,7 +54,7 @@ async function abrirMacroprocesso() {
 test('a lista de setores mostra a sigla num selo com a cor de cada setor', async () => {
   montar()
   const botao = await screen.findByRole('button', { name: 'TSA' })
-  expect(corClaraDe(within(botao).getByText('TSA'))).toBe('#C4D9F8')
+  expect(corClaraDe(within(botao).getByText('TSA'))).toBe('#881337')
 })
 
 test('o setor novo recebe a primeira cor livre e aparece com ela na lista', async () => {
@@ -65,7 +65,7 @@ test('o setor novo recebe a primeira cor livre e aparece com ela na lista', asyn
   fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
   const botao = await screen.findByRole('button', { name: 'NFT' })
   expect(cadastros.setores.at(-1)?.cor).toBe(2)
-  expect(corClaraDe(within(botao).getByText('NFT'))).toBe('#C4F8ED')
+  expect(corClaraDe(within(botao).getByText('NFT'))).toBe('#C2410C')
 })
 
 test.each<Perfil>(['integrante_ep', 'consulta'])('o setor aberto mostra o selo da sigla para %s', async (perfil) => {
@@ -74,21 +74,21 @@ test.each<Perfil>(['integrante_ep', 'consulta'])('o setor aberto mostra o selo d
   await screen.findByRole('button', { name: 'Voltar à lista' })
   const selos = screen.getAllByText('TSA').filter((el) => el.classList.contains('selo-do-setor'))
   expect(selos.length).toBeGreaterThan(0)
-  expect(corClaraDe(selos[0])).toBe('#C4D9F8')
+  expect(corClaraDe(selos[0])).toBe('#881337')
 })
 
 test('os setores envolvidos mostram o selo, inclusive o do inativo, e o nome da célula segue sendo a sigla', async () => {
   const secao = await abrirMacroprocesso()
-  expect(corClaraDe(within(secao.getByRole('cell', { name: 'TSA' })).getByText('TSA'))).toBe('#C4D9F8')
+  expect(corClaraDe(within(secao.getByRole('cell', { name: 'TSA' })).getByText('TSA'))).toBe('#881337')
   const linhaInativa = within(secao.getByRole('cell', { name: 'TSX' }).closest('tr') as HTMLElement)
-  expect(corClaraDe(linhaInativa.getByText('TSX'))).toBe('#E7A6A6')
+  expect(corClaraDe(linhaInativa.getByText('TSX'))).toBe('#804878')
   expect(linhaInativa.getByText('Inativo')).toBeTruthy()
 })
 
 test('o [Pôr setor] mostra o quadradinho da cor sem pôr a cor no nome da opção', async () => {
   const secao = await abrirMacroprocesso()
   const opcao = await within(secao.getByRole('combobox', { name: 'Setor a pôr' })).findByRole('option', { name: 'TSB — Setor Teste B' })
-  expect(corClaraDe(opcao.querySelector<HTMLElement>('.opcao-cor-do-setor'))).toBe('#F8C4C4')
+  expect(corClaraDe(opcao.querySelector<HTMLElement>('.opcao-cor-do-setor'))).toBe('#881337')
 })
 
 test('o histórico dos cadastros não mostra a cor', async () => {
@@ -109,25 +109,25 @@ async function abrirSetor(sigla: string) {
   return within(await screen.findByRole('group', { name: 'Cor do setor' }))
 }
 
-test('o setor aberto traz a grade de 30 amostras com a cor atual marcada', async () => {
+test('o setor aberto traz a grade de 12 amostras com a cor atual marcada', async () => {
   montar()
   const grade = await abrirSetor('TSA')
-  expect(grade.getAllByRole('radio')).toHaveLength(30)
-  expect((grade.getByRole('radio', { name: 'azul claro' }) as HTMLInputElement).checked).toBe(true)
+  expect(grade.getAllByRole('radio')).toHaveLength(12)
+  expect((grade.getByRole('radio', { name: 'bordô, em uso por TSB' }) as HTMLInputElement).checked).toBe(true)
 })
 
 test('as cores de outros setores trazem "em uso por" e a própria cor não', async () => {
   montar()
   const grade = await abrirSetor('TSA')
-  expect(grade.getByRole('radio', { name: 'coral claro, em uso por TSB' })).toBeTruthy()
-  expect(grade.getByRole('radio', { name: 'coral médio, em uso por TSX' })).toBeTruthy()
+  expect(grade.getByRole('radio', { name: 'bordô, em uso por TSB' })).toBeTruthy()
+  expect(grade.getByRole('radio', { name: 'ameixa, em uso por TSX' })).toBeTruthy()
   expect(grade.queryByRole('radio', { name: /em uso por TSA/ })).toBeNull()
 })
 
 test('trocar a cor e salvar grava a cor escolhida', async () => {
   const cadastros = montar()
   const grade = await abrirSetor('TSA')
-  fireEvent.click(grade.getByRole('radio', { name: 'menta claro' }))
+  fireEvent.click(grade.getByRole('radio', { name: 'oliva' }))
   fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
   await screen.findByRole('button', { name: 'TSB' })
   expect(cadastros.setores[0].cor).toBe(4)
@@ -136,21 +136,21 @@ test('trocar a cor e salvar grava a cor escolhida', async () => {
 test('uma cor já usada por outro setor pode ser escolhida', async () => {
   const cadastros = montar()
   const grade = await abrirSetor('TSA')
-  fireEvent.click(grade.getByRole('radio', { name: 'coral claro, em uso por TSB' }))
+  fireEvent.click(grade.getByRole('radio', { name: 'ameixa, em uso por TSX' }))
   fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
   await screen.findByRole('button', { name: 'TSB' })
-  expect(cadastros.setores[0].cor).toBe(1)
-  expect(cadastros.setores[1].cor).toBe(1)
+  expect(cadastros.setores[0].cor).toBe(10)
+  expect(cadastros.setores[2].cor).toBe(22)
 })
 
 test('se a gravação falha, a cor escolhida continua marcada com a mensagem de hoje', async () => {
   const cadastros = montar()
   cadastros.falhaDeGravacao = 'sem conexão'
   const grade = await abrirSetor('TSA')
-  fireEvent.click(grade.getByRole('radio', { name: 'menta claro' }))
+  fireEvent.click(grade.getByRole('radio', { name: 'oliva' }))
   fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
   expect((await screen.findByRole('alert')).textContent).toContain('A alteração não foi salva')
-  expect((grade.getByRole('radio', { name: 'menta claro' }) as HTMLInputElement).checked).toBe(true)
+  expect((grade.getByRole('radio', { name: 'oliva' }) as HTMLInputElement).checked).toBe(true)
   expect(cadastros.setores[0].cor).toBe(13)
 })
 
@@ -195,7 +195,7 @@ test('se a lista de setores falha, a grade aparece sem as marcas de "em uso"', a
   cadastros.falharLista = true
   fireEvent.click(botao)
   const grade = within(await screen.findByRole('group', { name: 'Cor do setor' }))
-  expect(grade.getByRole('radio', { name: 'coral claro' })).toBeTruthy()
+  expect(grade.getByRole('radio', { name: 'bordô' })).toBeTruthy()
   expect(grade.queryByRole('radio', { name: /em uso por/ })).toBeNull()
 })
 

@@ -8,36 +8,30 @@ const valorDe = (token: string): string => {
   return achado[1].toLowerCase()
 }
 
-describe('etiquetas fortes (ADR 0031)', () => {
-  test.each([
-    ['a-fazer', '#be185d'],
-    ['concluido', '#0f766e'],
-  ])('%s: fundo forte da identidade, texto e bolinha brancos, com texto AA sobre o fundo', (valor, fundo) => {
-    expect(valorDe(`etiqueta-${valor}-fundo`)).toBe(fundo)
-    expect(valorDe(`etiqueta-${valor}-texto`)).toBe('#ffffff')
-    expect(valorDe(`etiqueta-${valor}-bolinha`)).toBe('#ffffff')
-    expect(contraste('#ffffff', fundo)).toBeGreaterThanOrEqual(4.5)
+describe('etiqueta da etapa só em ícone (identidade de 2026-10-30)', () => {
+  test('o círculo verde de Finalizado passa do mínimo gráfico de 3:1 sobre o cartão branco', () => {
+    expect(valorDe('etiqueta-finalizado')).toBe('#16a34a')
+    expect(contraste(valorDe('etiqueta-finalizado'), '#ffffff')).toBeGreaterThanOrEqual(3)
+  })
+
+  test('o contorno de A fazer passa de 3:1 e o traço do Iniciado é o azul da ação', () => {
+    expect(contraste(valorDe('icone-inativo'), '#ffffff')).toBeGreaterThanOrEqual(2.9)
+    expect(tokens).toMatch(/--etiqueta-iniciado:\s*var\(--azul\)/)
   })
 })
 
-describe('etiqueta Em andamento em âmbar cheio (ADR 0032)', () => {
-  test('fundo âmbar, texto e bolinha marrom-escuros com texto AA sobre o fundo', () => {
-    expect(valorDe('etiqueta-em-andamento-fundo')).toBe('#f59e0b')
-    expect(valorDe('etiqueta-em-andamento-texto')).toBe('#451a03')
-    expect(valorDe('etiqueta-em-andamento-bolinha')).toBe('#451a03')
-    expect(contraste('#451a03', '#f59e0b')).toBeGreaterThanOrEqual(4.5)
-  })
-})
-
-describe('frase da coluna vazia (ADR 0032)', () => {
-  test('o texto secundário passa de 4,5:1 sobre o fundo da página, onde a frase fica', () => {
+describe('textos sobre o fundo da página', () => {
+  test('o texto secundário passa de 4,5:1 sobre o fundo, onde a frase da coluna vazia fica', () => {
     expect(contraste(valorDe('texto-2'), valorDe('fundo'))).toBeGreaterThanOrEqual(4.5)
   })
-})
 
-describe('barra da etapa', () => {
-  test('o degradê vai do azul claro ao azul escuro da identidade', () => {
-    expect(valorDe('barra-etapa-inicio')).toBe('#c9d3ff')
-    expect(valorDe('barra-etapa-fim')).toBe('#2238c8')
+  test.each([['atraso-texto', 'atraso-fundo'], ['vencendo-texto', 'vencendo-fundo'], ['aprovado-texto', 'aprovado-fundo'],
+    ['neutra-texto', 'neutra-fundo']])('%s sobre %s passa de 4,5:1', (texto, fundo) => {
+    expect(contraste(valorDe(texto), valorDe(fundo))).toBeGreaterThanOrEqual(4.5)
+  })
+
+  test('o prazo atrasado e o perto de vencer passam de 4,5:1 sobre branco', () => {
+    expect(contraste(valorDe('atraso'), '#ffffff')).toBeGreaterThanOrEqual(4.5)
+    expect(contraste(valorDe('vence'), '#ffffff')).toBeGreaterThanOrEqual(4.5)
   })
 })

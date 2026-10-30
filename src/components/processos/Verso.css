@@ -3,14 +3,14 @@
 .verso {
   width: min(880px, calc(100vw - 2 * var(--esp-5)));
   max-width: none;
-  max-height: 90vh;
+  max-height: min(740px, 94vh);
   padding: 0;
   overflow-y: auto;
   border: 0;
-  border-radius: var(--canto);
+  border-radius: var(--canto-janela);
   background: var(--folha);
   color: var(--texto);
-  box-shadow: var(--sombra-flutuante);
+  box-shadow: var(--sombra-janela);
   animation: verso-entra 150ms var(--curva-saida);
 }
 
@@ -22,7 +22,7 @@
 }
 
 .verso:not(.verso-estreita) {
-  min-height: min(600px, 90vh);
+  min-height: min(740px, 94vh);
 }
 
 .verso::backdrop {
@@ -101,7 +101,7 @@
 }
 
 .verso-fechar:hover {
-  background: var(--neutra-fundo);
+  background: var(--fundo);
   color: var(--texto);
 }
 
