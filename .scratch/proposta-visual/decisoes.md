@@ -47,3 +47,9 @@ Análises que justificam as escolhas:
 - **Matriz.** Etapas nas colunas e setores nas linhas: registrada no `backlog.md`. O interruptor "Linhas" da proposta 6 já é o primeiro passo dela. Tirar o "Quadro por setor" só depois de ver o uso.
 - **Possível defeito no histórico do processo:** os registros "Moveu o processo" não mostram a etapa de → para (visto em 2026-10-30, causa não investigada).
 - **DESIGN.md.** Descreve a identidade antiga (barra azul, cores pastel); precisa ser refeito para a nova direção.
+
+## Revisto na `/concepcao-livre` (2026-10-30)
+
+- **Regra 2, cores do setor:** o usuário liberou vermelho, âmbar, verde e azul para os selos. Ficaram 12 cores fortes (vermelho trocado por bordô, para não se confundir com o prazo atrasado), em ciclo sobre os números 1 a 30 do banco, sem migração.
+- **Escala:** base de 14px (os protótipos usam 13px; o app usava 15px).
+- A identidade completa está em `.scratch/identidade-visual.md`.

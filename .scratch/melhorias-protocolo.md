@@ -1113,3 +1113,9 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Sessões simultâneas na mesma branch.** Aconteceu: outra sessão (propostas visuais do verso) empurrou um commit para `origin/responsavel-inicial-por-etapa` enquanto esta executava; o `git push` foi recusado (não era fast-forward) e resolvido com `git merge origin/<branch>` (só arquivos de `.scratch/proposta-visual/`), sem `--force`.
 - **Teste pgTAP intermitente.** Aconteceu: uma rodada local falhou em `passagens_saida_depois_da_entrada` (teste "o concluído tirado do Quadro volta a outra etapa"), e a seguinte passou sem mudança: o relógio do contêiner pode andar para trás em relação ao do banco. Registrado no backlog.
 - **`/security-review`:** não rodado nesta etapa (é do `/ship`).
+
+---
+## 2026-10-30 — /concepcao-livre (redesenho)
+
+- **`.scratch/identidade-visual.md` entre a concepção e a implementação.** Esperado: a concepção grava a identidade completa para o `/implementar-identidade`. Aconteceu: o arquivo foi reescrito para a nova direção (a antiga ficou resumida no "Registro de mudanças"), depois de o usuário decidir cores dos setores e escala. O comando manda "partir do zero" e apresentar conceitos; o usuário pediu explicitamente para não fazer rodada de conceitos (direção já aprovada em protótipos), e valeu a instrução dele.
+- **Melhoria:** a `/concepcao-livre` não prevê o caso de redesenho com direção já escolhida em protótipos; poderia ter um modo "consolidar protótipos aprovados" que pula a rodada de conceitos e vai direto para tokens, contraste e decisões pendentes.
