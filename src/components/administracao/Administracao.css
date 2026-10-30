@@ -251,3 +251,10 @@
   margin: 0;
   font-size: var(--tam-secundario);
 }
+
+/* Aviso curto sob a caixa do responsável inicial: o texto diz o problema (a cor sozinha não basta). */
+.administracao-aviso {
+  margin: var(--esp-1) 0 0;
+  font-size: var(--tam-secundario);
+  color: var(--atraso-texto);
+}

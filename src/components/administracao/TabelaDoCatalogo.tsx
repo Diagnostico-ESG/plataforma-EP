@@ -1,24 +1,32 @@
 import { ehEtapaFixa } from '../../processos/codigosDasEtapas'
-import type { EtapaNoCatalogo, SentidoDaOrdem } from '../../processos/tipos'
+import type { EtapaNoCatalogo, SentidoDaOrdem, UsuarioResponsavel } from '../../processos/tipos'
 import { Pilula } from '../Pilula'
+import { CampoDoResponsavelInicial } from './CampoDoResponsavelInicial'
 
 export type AcoesDoCatalogo = {
   aoEditar: (etapa: EtapaNoCatalogo) => void
   aoMover: (etapa: EtapaNoCatalogo, sentido: SentidoDaOrdem) => void
   aoAlternarAtiva: (etapa: EtapaNoCatalogo) => void
   aoExcluir: (etapa: EtapaNoCatalogo) => void
+  aoEscolherResponsavel: (etapa: EtapaNoCatalogo, usuarioId: string | null) => void
 }
 
-type TabelaDoCatalogoProps = { etapas: EtapaNoCatalogo[]; acoes: AcoesDoCatalogo }
+type TabelaDoCatalogoProps = {
+  etapas: EtapaNoCatalogo[]
+  /** Quem pode ser escolhido como responsável inicial agora (vazio quando a leitura falhou). */
+  usuarios: UsuarioResponsavel[]
+  acoes: AcoesDoCatalogo
+}
 
-/** O catálogo em tabela: nome, fase ("—" nas duas fixas) e situação. Não iniciados e Concluídos levam o selo "Fixa" e nenhum botão. */
-export function TabelaDoCatalogo({ etapas, acoes }: TabelaDoCatalogoProps) {
+/** O catálogo em tabela: nome, fase ("—" nas duas fixas), responsável inicial e situação. Não iniciados e Concluídos levam o selo "Fixa" e nenhum botão. */
+export function TabelaDoCatalogo({ etapas, usuarios, acoes }: TabelaDoCatalogoProps) {
   if (etapas.length === 0) return <p className="cadastros-vazio">Nenhuma etapa no catálogo ainda.</p>
   return (
     <table className="tabela-cadastros">
       <thead>
         <tr>
-          <th scope="col">Etapa</th><th scope="col">Fase</th><th scope="col">Situação</th><th scope="col">Ações</th>
+          <th scope="col">Etapa</th><th scope="col">Fase</th><th scope="col">Responsável inicial</th>
+          <th scope="col">Situação</th><th scope="col">Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -26,6 +34,7 @@ export function TabelaDoCatalogo({ etapas, acoes }: TabelaDoCatalogoProps) {
           <tr key={etapa.id}>
             <td>{etapa.nome}</td>
             <td>{etapa.fase ?? '—'}</td>
+            <td><CampoDoResponsavelInicial etapa={etapa} usuarios={usuarios} aoEscolher={acoes.aoEscolherResponsavel} /></td>
             <td>{etapa.ativa ? 'Ativa' : <Pilula situacao="neutra">Inativa</Pilula>}</td>
             <td>
               {ehEtapaFixa(etapa.codigo)

@@ -46,7 +46,8 @@ test('a lista mostra as etapas em ordem, com a fase e a situação; as duas fixa
   expect(secao.getByRole('button', { name: 'Desativar Divulgação' })).toBeTruthy()
   for (const nome of ['Não iniciados', 'Concluídos']) {
     const linha = secao.getByText(nome, { selector: 'td' }).closest('tr') as HTMLElement
-    expect(within(linha).queryAllByRole('button')).toEqual([])
+    // O botão sem nome é o da caixa do responsável inicial (BotaoDaCaixa); os de ação levam aria-label.
+    expect(within(linha).queryAllByRole('button').filter((botao) => botao.hasAttribute('aria-label'))).toEqual([])
     expect(within(linha).getByText('Fixa')).toBeTruthy()
   }
 })
