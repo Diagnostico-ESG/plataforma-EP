@@ -1842,4 +1842,4 @@ Ajuste de 2026-10-30 (sem banco): o campo "Nome" do Novo processo e do Editar pa
 
 Entregue em 2026-10-30 (commit 2b785d5), com ressalva: critério [visual] 10 de lista-por-setor visto só em página local com módulos falsos (nada visto com o login real); revisão de segurança dispensada (a mudança só lê o parâmetro agrupar do endereço, sem login, dado pessoal, banco ou arquivos), com revisão de reserva por leitura; as ressalvas das entregas anteriores seguem valendo
 
-Em revisão desde 2026-10-30
+Entregue em 2026-10-30 (commit 3287d10), com ressalva: critério [visual] 11 de responsavel-inicial-por-etapa presumido (a coluna do Catálogo foi vista só na vitrine local com módulos falsos, a 1366x768; nada visto com o login real); revisão de segurança foi a de reserva por leitura (o /security-review só viu documentação); conferência do cadastro aberto no painel do Supabase de desenvolvimento adiada (backlog); as ressalvas das entregas anteriores seguem valendo
