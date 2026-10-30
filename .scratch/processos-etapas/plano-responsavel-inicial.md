@@ -442,7 +442,7 @@ export function situacaoDoResponsavelInicial(responsavel: ResponsavelInicialDaEt
 export function responsavelInicialValido(etapa: Pick<EtapaNoCatalogo, 'codigo' | 'responsavelInicial'>): ResponsavelInicialDaEtapa | null
 ```
 
-- [ ] **2.1 Teste da regra pura** (`src/processos/responsavelInicial.test.ts`, escreva antes, veja falhar por módulo inexistente):
+- [x] **2.1 Teste da regra pura** (`src/processos/responsavelInicial.test.ts`, escreva antes, veja falhar por módulo inexistente):
 
 ```ts
 import { describe, expect, test } from 'vitest'
@@ -479,7 +479,7 @@ describe('responsável inicial válido da etapa', () => {
 })
 ```
 
-- [ ] **2.2 Implemente** `src/processos/responsavelInicial.ts` (importe `CODIGO_CONCLUIDOS` de `./codigosDasEtapas`) e os tipos acima em `tipos.ts` (importe `Perfil` de `'../acesso/tipos'`):
+- [x] **2.2 Implemente** `src/processos/responsavelInicial.ts` (importe `CODIGO_CONCLUIDOS` de `./codigosDasEtapas`) e os tipos acima em `tipos.ts` (importe `Perfil` de `'../acesso/tipos'`):
 
 ```ts
 import { CODIGO_CONCLUIDOS } from './codigosDasEtapas'
@@ -502,7 +502,7 @@ export function responsavelInicialValido({ codigo, responsavelInicial }: Pick<Et
 
   Rode `npx vitest run src/processos/responsavelInicial.test.ts`: verde.
 
-- [ ] **2.3 Teste do catálogo real (falha primeiro).** Em `src/processos/catalogoSupabase.test.ts`: (a) mude o esperado de `listarCatalogo` para a coluna nova e a forma convertida (o falso devolve `responsavel_inicial` como objeto ou `null`):
+- [x] **2.3 Teste do catálogo real (falha primeiro).** Em `src/processos/catalogoSupabase.test.ts`: (a) mude o esperado de `listarCatalogo` para a coluna nova e a forma convertida (o falso devolve `responsavel_inicial` como objeto ou `null`):
 
 ```ts
 const MODELAGEM = { id: 'e4', codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, fase: 'IV' as const, ativa: true }
@@ -544,7 +544,7 @@ test('a recusa do banco chega com o nome recusado, e a de Concluídos com a fras
 
   (importe `FRASE_DO_RESPONSAVEL_EM_CONCLUIDOS` de `./frasesDoCatalogo`; o teste existente "editar, desativar…" que usa `MODELAGEM` e o `colunas` antigo não muda além do que está acima). Rode: falha por `definirResponsavelInicial` inexistente e pelo `colunas`.
 
-- [ ] **2.4 Implemente o catálogo real.** Em `frasesDoCatalogo.ts` acrescente `export const FRASE_DO_RESPONSAVEL_EM_CONCLUIDOS = 'Concluídos não tem responsável inicial: o processo concluído não tem mais quem cuide dele.'`. Em `recusasDoBanco.ts` acrescente `responsavel_inicial_em_concluidos` ao padrão (junto de `responsavel_invalido`, **antes** dele na lista para a alternância não casar o prefixo errado: o `\b…(?::(.*))?$` já exige o fim, então a ordem só importa por clareza) e `responsavel_inicial_em_concluidos: () => FRASE_DO_RESPONSAVEL_EM_CONCLUIDOS` em `FRASE_DA_RECUSA` (importe a constante). Em `catalogoSupabase.ts`:
+- [x] **2.4 Implemente o catálogo real.** Em `frasesDoCatalogo.ts` acrescente `export const FRASE_DO_RESPONSAVEL_EM_CONCLUIDOS = 'Concluídos não tem responsável inicial: o processo concluído não tem mais quem cuide dele.'`. Em `recusasDoBanco.ts` acrescente `responsavel_inicial_em_concluidos` ao padrão (junto de `responsavel_invalido`, **antes** dele na lista para a alternância não casar o prefixo errado: o `\b…(?::(.*))?$` já exige o fim, então a ordem só importa por clareza) e `responsavel_inicial_em_concluidos: () => FRASE_DO_RESPONSAVEL_EM_CONCLUIDOS` em `FRASE_DA_RECUSA` (importe a constante). Em `catalogoSupabase.ts`:
 
 ```ts
 const COLUNAS_DA_ETAPA = 'id, codigo, nome, ordem, fase, ativa, responsavel_inicial:usuarios!responsavel_inicial_id(id, nome, foto_url, ativo, perfil)'
@@ -563,7 +563,7 @@ async function listarCatalogo(cliente: ClienteSupabase): Promise<EtapaNoCatalogo
 
   Acrescente `definirResponsavelInicial` ao tipo `ModuloDoCatalogo` (com a doc: "Só o Administrador (a RLS decide); o banco recusa usuário que não seja Administrador ou Integrante ativo e qualquer valor em Concluídos"). Rode `npx vitest run src/processos/catalogoSupabase.test.ts` (verde) e `npm run typecheck` (se o supabase-js não tipar o `usuarios!responsavel_inicial_id`, troque a dica pelo nome da chave estrangeira que aparece em `src/types/database.ts`, por exemplo `usuarios!etapas_responsavel_inicial_id_fkey`, e ajuste a constante e o teste).
 
-- [ ] **2.5 Teste do catálogo falso (falha primeiro).** Em `src/processos/CatalogoFalso.test.ts` acrescente (usando `montar()` e as etapas já definidas; `falso.usuariosPossiveis` é a lista dos que podem ser responsáveis):
+- [x] **2.5 Teste do catálogo falso (falha primeiro).** Em `src/processos/CatalogoFalso.test.ts` acrescente (usando `montar()` e as etapas já definidas; `falso.usuariosPossiveis` é a lista dos que podem ser responsáveis):
 
 ```ts
 describe('responsável inicial', () => {
@@ -600,7 +600,7 @@ describe('responsável inicial', () => {
 
   (importe `FRASE_DO_RESPONSAVEL_EM_CONCLUIDOS`). Rode: falha por método inexistente.
 
-- [ ] **2.6 Implemente no `CatalogoFalso`.** O falso não conhece o perfil de quem está em `usuariosPossiveis` (todos são Administrador ou Integrante ativos por definição), então guarda `perfil: 'integrante_ep'`:
+- [x] **2.6 Implemente no `CatalogoFalso`.** O falso não conhece o perfil de quem está em `usuariosPossiveis` (todos são Administrador ou Integrante ativos por definição), então guarda `perfil: 'integrante_ep'`:
 
 ```ts
   async definirResponsavelInicial(id: string, usuarioId: string | null): Promise<void> {
@@ -618,7 +618,7 @@ describe('responsável inicial', () => {
 
   e o `DonoDoCatalogo` ganha `usuariosPossiveis: UsuarioResponsavel[]` (o `ProcessosFalso` já o tem). Atenção: `gravar()` do falso refaz `etapasDoCatalogo` só com `{id, codigo, nome, ordem, ativa}`; `etapas` guarda o responsável, e `editarEtapa` já espalha `...outra`, então o responsável sobrevive às outras gravações. Rode `npx vitest run src/processos`: verde.
 
-- [ ] **2.7** `npm run typecheck` e `npm run lint`: limpos. Commit: `git add src && git commit -m "catálogo: leitura e gravação do responsável inicial, regra pura e falso"`.
+- [x] **2.7** `npm run typecheck` e `npm run lint`: limpos. Commit: `git add src && git commit -m "catálogo: leitura e gravação do responsável inicial, regra pura e falso"`.
 
 ## Tarefa 3: Mover, cadastrar e retomar nos falsos
 

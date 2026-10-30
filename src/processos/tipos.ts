@@ -1,3 +1,4 @@
+import type { Perfil } from '../acesso/tipos'
 import type { EventoDoCadastro } from '../cadastros/tipos'
 import type { PapelDoArquivo } from '../versoes/tipos'
 import type { FaseDoRegimento } from './fasesDoRegimento'
@@ -12,8 +13,14 @@ export type SituacaoDoProcesso = 'em_andamento' | 'suspenso' | 'cancelado' | 'co
 /** Uma etapa do catálogo, como as colunas do Quadro a usam. */
 export type EtapaDoCatalogo = { id: string; codigo: string; nome: string; ordem: number; ativa: boolean }
 
-/** Uma etapa do catálogo como a Administração a mostra: ativa ou não. `fase` é nula só nas duas fixas. */
-export type EtapaNoCatalogo = EtapaDoCatalogo & { fase: FaseDoRegimento | null }
+/** O responsável inicial como a lista do catálogo o traz: o usuário e o que decide se ainda vale. */
+export type ResponsavelInicialDaEtapa = { id: string; nome: string; fotoUrl: string | null; ativo: boolean; perfil: Perfil }
+
+/**
+ * Uma etapa do catálogo como a Administração a mostra: ativa ou não. `fase` é nula só nas duas fixas.
+ * `responsavelInicial` ausente ou nulo = ninguém (opcional para não mexer em cada fixture de teste).
+ */
+export type EtapaNoCatalogo = EtapaDoCatalogo & { fase: FaseDoRegimento | null; responsavelInicial?: ResponsavelInicialDaEtapa | null }
 
 /** O que o formulário de etapa nova grava; `antesDe` null põe a etapa logo antes de Concluídos. */
 export type EtapaNova = { codigo: string; nome: string; fase: FaseDoRegimento; antesDe: string | null }
@@ -37,6 +44,8 @@ export type ModuloDoCatalogo = {
   reativarEtapa(id: string): Promise<void>
   /** Só a etapa por onde nenhum processo passou. */
   excluirEtapa(id: string): Promise<void>
+  /** Só o Administrador (a RLS decide); o banco recusa usuário que não seja Administrador ou Integrante ativo e qualquer valor em Concluídos. Null = ninguém. */
+  definirResponsavelInicial(id: string, usuarioId: string | null): Promise<void>
 }
 
 export type ResponsavelDoProcesso = { id: string; nome: string; fotoUrl: string | null }

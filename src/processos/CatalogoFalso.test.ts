@@ -3,6 +3,7 @@ import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { umProcessoLido } from '../testes/processoDaLista'
 import { ProcessosFalso } from './ProcessosFalso'
+import { FRASE_DO_RESPONSAVEL_EM_CONCLUIDOS } from './frasesDoCatalogo'
 import type { EtapaNoCatalogo, ProcessoLido } from './tipos'
 
 const NAO_INICIADOS: EtapaNoCatalogo = { id: 'e1', codigo: 'nao_iniciados', nome: 'Não iniciados', ordem: 1, fase: null, ativa: true }
@@ -194,5 +195,36 @@ describe('as seis etapas com campos próprios não se desativam nem se excluem',
     await falso.catalogo.editarEtapa('e6', { nome: 'Revisão interna (EP)', fase: 'VI' })
     await falso.catalogo.moverEtapa('e6', 'subir')
     expect(codigos(await falso.catalogo.listarCatalogo())).toEqual(['nao_iniciados', 'revisao_interna', 'modelagem', 'concluidos'])
+  })
+})
+
+describe('responsável inicial', () => {
+  const ANA = { id: 'u1', nome: 'Ana Teste', fotoUrl: null }
+
+  test('grava a escolha na etapa, inclusive em Não iniciados, e Ninguém a limpa', async () => {
+    const falso = montar()
+    falso.usuariosPossiveis = [ANA]
+    await falso.catalogo.definirResponsavelInicial('e1', 'u1')
+    await falso.catalogo.definirResponsavelInicial('e2', 'u1')
+    const lida = await falso.catalogo.listarCatalogo()
+    expect(lida.find((etapa) => etapa.id === 'e1')?.responsavelInicial).toEqual({ id: 'u1', nome: 'Ana Teste', fotoUrl: null, ativo: true, perfil: 'integrante_ep' })
+    await falso.catalogo.definirResponsavelInicial('e2', null)
+    expect((await falso.catalogo.listarCatalogo()).find((etapa) => etapa.id === 'e2')?.responsavelInicial).toBeNull()
+  })
+
+  test('recusa quem não pode ser responsável, com o nome recebido, e qualquer valor em Concluídos', async () => {
+    const falso = montar()
+    falso.usuariosPossiveis = [ANA]
+    expect(await falhaDe(falso.catalogo.definirResponsavelInicial('e2', 'u9'))).toEqual(
+      new TravaDoBanco('u9 não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP.'))
+    expect(await falhaDe(falso.catalogo.definirResponsavelInicial('e5', 'u1'))).toEqual(new TravaDoBanco(FRASE_DO_RESPONSAVEL_EM_CONCLUIDOS))
+  })
+
+  test('trocar o responsável inicial não muda os processos que já estão na etapa', async () => {
+    const falso = montar()
+    falso.usuariosPossiveis = [ANA]
+    const antes = falso.processos.map((processo) => processo.responsavel)
+    await falso.catalogo.definirResponsavelInicial('e2', 'u1')
+    expect(falso.processos.map((processo) => processo.responsavel)).toEqual(antes)
   })
 })

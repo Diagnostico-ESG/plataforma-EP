@@ -13,7 +13,9 @@ import {
 } from '../revisoes/frasesDeRevisao'
 import { fraseDasAnotacoesLongas } from './frasesDasAnotacoes'
 import { fraseDaModelagemNoFuturo } from './frasesDaModelagemPiloto'
-import { FRASE_DAS_ETAPAS_FIXAS, fraseDaEtapaComProcessos, fraseDaEtapaProtegida, fraseDaEtapaUsada } from './frasesDoCatalogo'
+import {
+  FRASE_DAS_ETAPAS_FIXAS, FRASE_DO_RESPONSAVEL_EM_CONCLUIDOS, fraseDaEtapaComProcessos, fraseDaEtapaProtegida, fraseDaEtapaUsada,
+} from './frasesDoCatalogo'
 import { FRASE_SEM_VERSAO, fraseDaVersaoIncompleta } from './frasesDaVersaoCompleta'
 import {
   FRASE_DA_CHEGADA_OBRIGATORIA, FRASE_DA_EXPLICACAO_OBRIGATORIA, FRASE_DA_ETIQUETA_FIXA, FRASE_DA_PASSAGEM_FECHADA,
@@ -34,7 +36,7 @@ export type ContextoDaRecusa = { acao?: 'desativar' | 'excluir'; data?: 'validac
 // aprovação, do arquivamento, das anotações e do Andamento livre). O motivo "motivo_obrigatorio" não tem valor; o valor
 // vai até o fim da mensagem.
 const PADRAO_DA_RECUSA = new RegExp(
-  '\\b(data_no_futuro|motivo_obrigatorio|responsavel_invalido|processo_parado'
+  '\\b(data_no_futuro|motivo_obrigatorio|responsavel_inicial_em_concluidos|responsavel_invalido|processo_parado'
   + '|situacao_invalida|processo_com_subprocessos|pai_nao_e_processo|tipo_invalido'
   + '|etapa_usada|etapa_protegida|etapa_fixa|etapas_fixas_nas_pontas|etapa_com_processos'
   + '|etapa_inativa|publicacao_ou_explicacao_obrigatoria|explicacao_obrigatoria|explicacao_longa'
@@ -67,6 +69,7 @@ const FRASE_DA_RECUSA: Record<string, FraseDaRecusa> = {
   pdf_nome_sem_versao: () => FRASE_DO_PDF_SEM_A_VERSAO,
   pdf_guardado_nao_se_altera: () => FRASE_DO_PDF_GUARDADO,
   motivo_obrigatorio: () => 'O motivo é obrigatório.',
+  responsavel_inicial_em_concluidos: () => FRASE_DO_RESPONSAVEL_EM_CONCLUIDOS,
   responsavel_invalido: (nome) =>
     `${nome} não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP.`,
   processo_parado: fraseDoProcessoParado,

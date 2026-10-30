@@ -4,6 +4,7 @@ import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { CadastroInexistente } from '../cadastros/cadastroInexistente'
 import { ClienteSupabaseFalso } from '../testes/ClienteSupabaseFalso'
 import type { Database } from '../types/database'
+import { FRASE_DO_RESPONSAVEL_EM_CONCLUIDOS } from './frasesDoCatalogo'
 import { criarProcessosSupabase } from './processosSupabase'
 
 const MODELAGEM = {
@@ -15,13 +16,39 @@ function criar(cliente: ClienteSupabaseFalso) {
   return criarProcessosSupabase(cliente as unknown as SupabaseClient<Database>).catalogo
 }
 
-test('lista o catálogo inteiro em ordem', async () => {
+const COM_RESPONSAVEL = { ...MODELAGEM, responsavel_inicial: { id: 'u1', nome: 'Ana Teste', foto_url: null, ativo: true, perfil: 'integrante_ep' as const } }
+
+test('lista o catálogo inteiro em ordem, com o responsável inicial de cada etapa', async () => {
   const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['etapas.select'] = { data: [MODELAGEM], error: null }
-  expect(await criar(cliente).listarCatalogo()).toEqual([MODELAGEM])
+  cliente.respostas['etapas.select'] = { data: [{ ...MODELAGEM, responsavel_inicial: null }, COM_RESPONSAVEL], error: null }
+  expect(await criar(cliente).listarCatalogo()).toEqual([
+    { ...MODELAGEM, responsavelInicial: null },
+    { ...MODELAGEM, responsavelInicial: { id: 'u1', nome: 'Ana Teste', fotoUrl: null, ativo: true, perfil: 'integrante_ep' } },
+  ])
   expect(cliente.pedidos[0]).toMatchObject({
-    tabela: 'etapas', colunas: 'id, codigo, nome, ordem, fase, ativa', ordem: [['ordem', true]],
+    tabela: 'etapas', ordem: [['ordem', true]],
+    colunas: 'id, codigo, nome, ordem, fase, ativa, responsavel_inicial:usuarios!responsavel_inicial_id(id, nome, foto_url, ativo, perfil)',
   })
+})
+
+test('definir o responsável inicial grava só essa coluna, e Ninguém grava nulo', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['etapas.update'] = { data: [{ id: 'e4' }], error: null }
+  await criar(cliente).definirResponsavelInicial('e4', 'u1')
+  await criar(cliente).definirResponsavelInicial('e4', null)
+  expect(cliente.pedidos).toMatchObject([
+    { operacao: 'update', valores: { responsavel_inicial_id: 'u1' }, filtro: ['id', 'e4'] },
+    { operacao: 'update', valores: { responsavel_inicial_id: null }, filtro: ['id', 'e4'] },
+  ])
+})
+
+test('a recusa do banco chega com o nome recusado, e a de Concluídos com a frase própria', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['etapas.update'] = { data: null, error: { code: 'P0001', message: 'responsavel_invalido:Bia Teste' } }
+  await expect(criar(cliente).definirResponsavelInicial('e4', 'u9')).rejects.toEqual(
+    new TravaDoBanco('Bia Teste não pode ser responsável: só usuários ativos de perfil Administrador ou Integrante do EP.'))
+  cliente.respostas['etapas.update'] = { data: null, error: { code: 'P0001', message: 'responsavel_inicial_em_concluidos' } }
+  await expect(criar(cliente).definirResponsavelInicial('e9', 'u1')).rejects.toEqual(new TravaDoBanco(FRASE_DO_RESPONSAVEL_EM_CONCLUIDOS))
 })
 
 test('falha ao ler vira erro com o motivo do banco', async () => {
