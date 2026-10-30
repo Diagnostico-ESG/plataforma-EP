@@ -1085,3 +1085,10 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Nome da funcionalidade em `projeto.md`.** Esperado: anotar entre parênteses na lista. Aconteceu: item 16 `lista-por-setor` acrescentado.
 - **Spec com critério `[visual]` e seção Modelo de dados.** Esperado: seção presente mesmo sem banco. Aconteceu: seção escrita dizendo "nenhum"; critério 10 marcado `[visual]`.
 - **Pre-commit.** Esperado: rodar a bateria e liberar o commit de documentação. Aconteceu: levou mais de 2 minutos e o comando foi para segundo plano; o commit saiu só com os 5 arquivos do `/planejar`.
+
+## 2026-10-30 — /executar-simples e /polir (lista-por-setor)
+
+- **`/implement` e `code-review` em dois agentes.** Esperado: revisão de padrões e de spec em paralelo. Aconteceu: as duas rodaram e voltaram sem erro, só julgamentos menores; as alterações foram para o commit de outra sessão (`dcbb176`) porque o `git commit` encontrou a árvore já comitada por ela, e a mensagem do meu commit se perdeu.
+- **Marca `Implementado em`.** Esperado: hash do commit da implementação. Aconteceu: gravei o hash do commit que absorveu o código (`dcbb176`).
+- **Auditoria visual sem login.** Esperado: abrir a Lista no navegador. Aconteceu: o app real pede conta institucional, que não posso usar; montei uma página temporária com os módulos falsos, tirei capturas e apaguei os arquivos.
+- **`/impeccable polish`.** Esperado: rodar depois da auditoria. Aconteceu: a auditoria não achou nada a corrigir, então não rodei o `polish`.
