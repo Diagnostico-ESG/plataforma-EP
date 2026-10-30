@@ -1,7 +1,7 @@
 .moldura {
   display: grid;
   grid-template:
-    'barra barra' auto
+    'faixa barra' auto
     'faixa trabalho' minmax(0, 1fr)
     / var(--largura-faixa) minmax(0, 1fr);
   height: 100%;
@@ -13,7 +13,7 @@
   background: var(--fundo);
 }
 
-/* Faixa lateral de ícones */
+/* Faixa lateral grafite, só com ícones */
 
 .faixa-lateral {
   display: flex;
@@ -22,20 +22,32 @@
   grid-area: faixa;
   gap: var(--esp-1);
   padding-top: var(--esp-3);
-  background: var(--folha);
-  border-right: 1px solid var(--linha);
+  background: var(--grafite);
+}
+
+.faixa-marca {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-bottom: var(--esp-3);
+  border-radius: var(--canto-botao);
+  background: var(--azul);
+  color: var(--folha);
+  font-size: var(--tam-secundario);
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .faixa-item {
-  position: relative;
   display: grid;
   place-items: center;
   width: 40px;
   height: 40px;
   border: 0;
-  border-radius: var(--canto);
+  border-radius: var(--canto-botao);
   background: transparent;
-  color: var(--icone-inativo);
+  color: var(--grafite-icone);
   cursor: pointer;
   transition:
     color 150ms var(--curva-saida),
@@ -43,78 +55,66 @@
 }
 
 .faixa-item:hover {
-  color: var(--texto-2);
-  background: var(--fundo);
+  color: var(--folha);
+  background: rgb(255 255 255 / 8%);
 }
 
+/* Item ativo: azul-claro com o ícone azul. */
 .faixa-item[aria-current='page'] {
   color: var(--azul);
   background: var(--azul-claro);
 }
 
-/* Linha acesa: a área atual ganha o traço azul na borda da faixa.
-   O recuo é o espaço entre o item e a borda de 1px (7,5px); com -8px o traço caía em meio pixel e borrava. */
-.faixa-item[aria-current='page']::after {
-  content: '';
-  position: absolute;
-  top: 8px;
-  right: calc((var(--largura-faixa) - 1px - 40px) / -2);
-  bottom: 8px;
-  border-right: var(--linha-acesa);
-}
-
-/* Barra superior */
+/* Barra superior branca: ícone da tela em azul + título, e a conta à direita. */
 
 .barra-superior {
   display: flex;
   align-items: center;
   grid-area: barra;
-  gap: var(--esp-4);
-  min-height: 52px;
-  padding-right: var(--esp-4);
-  background: var(--azul);
-  color: var(--folha);
+  gap: var(--esp-3);
+  min-height: var(--altura-barra);
+  padding: 0 var(--esp-5);
+  background: var(--folha);
+  border-bottom: 1px solid var(--linha);
 }
 
-.barra-marca {
-  /* Mesma largura da faixa lateral: o "EP" fica em cima da coluna de ícones. */
+.barra-icone {
+  display: inline-flex;
   flex: none;
-  width: var(--largura-faixa);
-  text-align: center;
-  font-size: var(--tam-painel);
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  color: var(--azul);
 }
 
 .barra-titulo {
   overflow: hidden;
-  font-size: var(--tam-coluna);
-  font-weight: 600;
+  font-size: var(--tam-tela);
+  font-weight: 700;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
+/* Quadro | Lista: o segmento padrão da identidade (contêiner cinza, escolhida em azul-claro). */
 .alternancia {
   display: inline-flex;
-  padding: 1px;
-  border-radius: 999px;
-  border: 1px solid var(--branco-sobre-azul-borda);
+  padding: 2px;
+  border: 1px solid var(--linha);
+  border-radius: var(--canto-botao);
+  background: var(--fundo);
 }
 
 .alternancia-opcao {
   padding: 3px var(--esp-3);
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--canto-selo);
   background: transparent;
-  color: var(--folha);
-  font-size: var(--tam-secundario);
+  color: var(--texto-2);
+  font-size: var(--tam-rotulo);
   font-weight: 600;
   cursor: pointer;
 }
 
 .alternancia-opcao[aria-pressed='true'] {
-  background: var(--folha);
-  color: var(--azul);
+  background: var(--azul-claro);
+  color: var(--azul-escuro);
 }
 
 /* No alto contraste do Windows o fundo some e a opção escolhida ficaria igual à outra. */
@@ -130,15 +130,10 @@
   margin-left: auto;
 }
 
-/* Na barra azul o contorno azul sumiria: o foco vira branco. */
-.barra-superior :focus-visible {
-  outline-color: var(--folha);
-}
-
 @media (max-width: 480px) {
   .barra-superior {
     gap: var(--esp-2);
-    padding-right: var(--esp-2);
+    padding: 0 var(--esp-2);
   }
 }
 
@@ -187,17 +182,12 @@
   color: var(--texto-2);
 }
 
-/* Sobre a folha branca o foco volta ao azul (na barra ele é branco). */
-.barra-superior .menu-conta-painel :focus-visible {
-  outline-color: var(--azul);
-}
-
 /* "A ação não aconteceu" (vermelho), como na Administração e na entrada. */
 .menu-conta-falha {
   max-width: 28ch;
   margin-top: var(--esp-2);
   padding: var(--esp-2) var(--esp-3);
-  border-radius: var(--canto);
+  border-radius: var(--canto-botao);
   background: var(--atraso-fundo);
   color: var(--atraso-texto);
   font-size: var(--tam-secundario);

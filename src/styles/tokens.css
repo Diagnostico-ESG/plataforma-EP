@@ -23,46 +23,56 @@
 }
 
 :root {
-  /* Cor principal e seus apoios */
+  /* Moldura neutra: grafite na faixa lateral, branco e cinza-claro no resto */
+  --grafite: #252b36;
+  --grafite-icone: #9aa3b2;
+
+  /* Azul: cheio só na ação principal; azul-claro com texto azul-escuro em tudo que está escolhido ou ligado */
   --azul: #3a5afe;
   --azul-claro: #e8edff;
   --azul-escuro: #2a44c9;
-  --azul-avatar: #d9dfff;
+  --azul-avatar: #e8edff;
 
   /* Superfícies e linhas */
-  --fundo: #edf1f9;
-  /* A coluna de contexto do verso do cartão: um cinza mais leve que o fundo da página. */
-  --fundo-contexto: #f7f8fb;
+  --fundo: #f3f4f7;
+  --fundo-cabecalho: #fafbfc;
+  --fundo-grupo: #f6f7f9;
+  --fundo-contexto: var(--fundo-cabecalho);
   --folha: #ffffff;
-  --linha: #e1e6ef;
+  --linha: #e3e6ec;
+  --linha-leve: #f0f2f5;
   --linha-tracejada: #c3cad8;
   --barra-coluna-trilho: #d5dbe7;
   --barra-coluna: #9aa6be;
 
-  /* Texto */
-  --texto: #1e2433;
-  --texto-2: #5d6577;
-  --icone-inativo: #8c93a3;
+  /* Texto; `inativo` é só para ícones e enfeites (2,9:1 não serve para texto) */
+  --texto: #1d2330;
+  --texto-2: #5f6776;
+  --icone-inativo: #9098a6;
 
-  /* Sobre a barra azul: só borda e hover, nunca fundo atrás de texto (derrubaria o contraste do texto branco). */
-  --branco-sobre-azul-borda: rgb(255 255 255 / 45%);
-  --branco-sobre-azul-hover: rgb(255 255 255 / 16%);
+  /* Trilha das 8 etapas */
+  --trilha-feita: #6b7a99;
+  --trilha-vazia: #e3e6ec;
 
-  /* Pílulas de situação: texto / fundo */
-  --atraso-texto: #a8263a;
-  --atraso-fundo: #fce1e4;
-  --vencendo-texto: #8a5a00;
-  --vencendo-fundo: #ffe9c7;
+  /* Prazo: sempre ícone de calendário + texto, nunca só cor */
+  --atraso: #d1293d;
+  --vence: #b45309;
+
+  /* Avisos (verso e formulários): texto / fundo */
+  --atraso-texto: #8f1d2c;
+  --atraso-fundo: #fdecee;
+  --vencendo-texto: #7a4a00;
+  --vencendo-fundo: #fff6e5;
+
+  /* Situação do processo (selo discreto): texto / fundo */
   --informativa-texto: var(--azul-escuro);
   --informativa-fundo: var(--azul-claro);
-  --aprovado-texto: #22703a;
-  --aprovado-fundo: #ddf3e1;
+  --aprovado-texto: #166a4d;
+  --aprovado-fundo: #e6f4ef;
   --neutra-texto: #4a5163;
   --neutra-fundo: #eef0f4;
 
-  /* Etiquetas da etapa (cartão e Agora): fundo forte com texto e bolinha a 4,5:1 ou mais (ADR 0031, 2026-10-28). Em andamento é âmbar
-     cheio com letra marrom-escura, porque o branco não tem contraste AA sobre o âmbar (ADR 0032).
-     Fora da paleta dos setores e das pílulas de prazo, para não se confundirem com elas. */
+  /* Etiquetas da etapa (cartão e Agora): trocadas por ícones na fase do Quadro */
   --etiqueta-a-fazer-texto: #ffffff;
   --etiqueta-a-fazer-fundo: #be185d;
   --etiqueta-a-fazer-bolinha: #ffffff;
@@ -73,47 +83,35 @@
   --etiqueta-concluido-fundo: #0f766e;
   --etiqueta-concluido-bolinha: #ffffff;
 
-  /* Barra da etapa: trilho cinza claro e degradê do azul claro ao azul escuro */
-  --barra-etapa-trilho: #e1e6ef;
+  /* Barra da etapa: trocada pela trilha de tracinhos na fase do Quadro */
+  --barra-etapa-trilho: #e3e6ec;
   --barra-etapa-inicio: #c9d3ff;
   --barra-etapa-fim: #2238c8;
 
-  /* Caixas de aviso */
-  --ajuda-fundo: #eef2ff;
-  --ajuda-borda: #c9d3ff;
   --pendencia-fundo: #fff6e5;
   --pendencia-borda: #f3d28f;
 
-  /* Barrinha por tipo de registro */
+  /* Barrinha por tipo de registro (sai com o redesenho do verso) */
   --tipo-fluxograma: #8cc4ea;
   --tipo-relatorio: #b7a5ec;
   --tipo-modelagem: #e9cf7a;
-  --tipo-email: #f2a08c;
-  --tipo-historica: var(--linha-tracejada);
 
-  /* Macroprocessos (sem vermelho, âmbar ou verde: essas cores já dizem situação) */
+  /* Macroprocessos (saem na fase da Lista) */
   --macro-violeta: #8e4ec6;
-  --macro-ciano: #0797b9;
-  --macro-magenta: #d6409f;
-  --macro-indigo: #5b5bd6;
-  --macro-oliva: #7a8b2e;
-  --macro-cobre: #a0663a;
 
-  /* Ícones do rodapé do cartão */
-  --icone-dias: #c77700;
-  --icone-versoes: var(--aprovado-texto);
-  --icone-rodadas: var(--azul);
-
-  /* Tipografia */
+  /* Tipografia: base 14px */
   --fonte: 'Source Sans 3', system-ui, sans-serif;
   --fonte-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+  --tam-selo: 11px;
   --tam-rotulo: 12px;
   --tam-secundario: 13px;
-  --tam-base: 15px;
-  --tam-coluna: 16px;
-  --tam-painel: 18px;
-  --tam-verso-titulo: 19px;
-  --tam-pagina: 22px;
+  --tam-base: 14px;
+  --tam-coluna: 15px;
+  --tam-cartao: 16px;
+  --tam-tela: 18px;
+  --tam-painel: var(--tam-tela);
+  --tam-verso-titulo: 20px;
+  --tam-pagina: 21px;
 
   /* Espaçamento */
   --esp-1: 4px;
@@ -123,20 +121,25 @@
   --esp-5: 24px;
   --esp-6: 32px;
 
-  /* Forma */
+  /* Forma: 8px em cartão, tabela, bloco e menu; 6px em botão, campo e aviso; 4px em selo; 12px em janela */
   --largura-faixa: 56px;
+  --altura-barra: 52px;
+  --altura-controles: 56px;
   --largura-conteudo: 1280px;
   --largura-formulario: 550px;
-  --largura-coluna-quadro: 310px;
-  --canto: 6px;
-  --canto-botao: 4px;
+  --largura-coluna-quadro: 300px;
+  --canto: 8px;
+  --canto-botao: 6px;
+  --canto-selo: 4px;
+  --canto-janela: 12px;
   --canto-macro: 2px;
   --linha-acesa: 2px solid var(--azul);
-  --sombra-flutuante: 0 4px 16px rgb(30 36 51 / 12%), 0 1px 3px rgb(30 36 51 / 8%);
+  /* Sombra só no que flutua; cartões e tabelas não têm */
+  --sombra-flutuante: 0 8px 24px rgb(29 35 48 / 12%), 0 2px 6px rgb(29 35 48 / 8%);
+  --sombra-janela: 0 24px 60px rgb(29 35 48 / 30%);
   /* Sombra na borda do Quadro que rola para o lado: avisa que há colunas fora da vista. */
-  --sombra-de-rolagem: rgb(30 36 51 / 18%);
-  /* Véu atrás da janela de confirmação: a cor de `texto` esmaece a tela sem escondê-la. */
-  --veu-janela: rgb(30 36 51 / 45%);
+  --sombra-de-rolagem: rgb(29 35 48 / 18%);
+  --veu-janela: rgb(29 35 48 / 45%);
 
   /* Movimento */
   --curva-saida: cubic-bezier(0.16, 1, 0.3, 1);

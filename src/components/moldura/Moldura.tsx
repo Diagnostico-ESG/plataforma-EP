@@ -17,7 +17,7 @@ type MolduraProps = {
 export function Moldura({ areaAtual, aoIrPara, titulo, usuario, aoSair, children }: MolduraProps) {
   return (
     <div className="moldura">
-      <BarraSuperior titulo={titulo} usuario={usuario} aoSair={aoSair}
+      <BarraSuperior titulo={titulo} icone={areaAtual} usuario={usuario} aoSair={aoSair}
         visao={ehAreaDeProcessos(areaAtual) ? areaAtual : null} aoIrPara={aoIrPara} />
       <FaixaLateral
         areaAtual={areaAtual}

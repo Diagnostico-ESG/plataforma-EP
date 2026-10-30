@@ -1,9 +1,12 @@
 import type { UsuarioAtual } from '../../acesso/tipos'
 import type { AreaComTela } from './areas'
+import { Icone, type NomeIcone } from '../Icone'
 import { MenuDaConta } from './MenuDaConta'
 
 type BarraSuperiorProps = {
   titulo: string
+  /** O ícone da tela, em azul ao lado do título. */
+  icone: NomeIcone
   usuario: UsuarioAtual
   aoSair: () => Promise<void>
   /** A visão da área de processos; null fora dela, onde o Quadro/Lista não faz sentido. */
@@ -11,10 +14,10 @@ type BarraSuperiorProps = {
   aoIrPara: (area: AreaComTela) => void
 }
 
-export function BarraSuperior({ titulo, usuario, aoSair, visao, aoIrPara }: BarraSuperiorProps) {
+export function BarraSuperior({ titulo, icone, usuario, aoSair, visao, aoIrPara }: BarraSuperiorProps) {
   return (
     <header className="barra-superior">
-      <span className="barra-marca">EP</span>
+      <span className="barra-icone"><Icone nome={icone} tamanho={20} /></span>
       <h1 className="barra-titulo">{titulo}</h1>
       {visao && (
         <div className="alternancia" role="group" aria-label="Forma de ver os processos">

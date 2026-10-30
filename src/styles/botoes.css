@@ -4,7 +4,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--esp-2);
-  min-height: 32px;
+  min-height: 34px;
   padding: 0 var(--esp-3);
   border: 1px solid transparent;
   border-radius: var(--canto-botao);
@@ -30,6 +30,23 @@
   background: var(--azul-escuro);
 }
 
+/* Ligado: o filtro ou a opção que está valendo (azul-claro, sem borda). */
+.botao-ligado {
+  background: var(--azul-claro);
+  color: var(--azul-escuro);
+}
+
+/* Leve: sem borda nem fundo, para ações discretas. */
+.botao-leve {
+  background: transparent;
+  color: var(--texto-2);
+}
+
+.botao-leve:hover:not(:disabled) {
+  background: var(--fundo);
+  color: var(--texto);
+}
+
 .botao-secundario {
   background: var(--folha);
   border-color: var(--linha);
@@ -51,4 +68,31 @@
   border-radius: var(--canto-botao);
   background: transparent;
   cursor: pointer;
+}
+
+/* Segmento (Linhas, Agrupar por, Mostrar): contêiner cinza, a opção escolhida em azul-claro. */
+.controle-opcoes {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--linha);
+  border-radius: var(--canto-botao);
+  background: var(--fundo);
+}
+
+.controle-opcoes .botao {
+  min-height: 28px;
+  padding: 0 var(--esp-3);
+  border-radius: var(--canto-selo);
+  background: transparent;
+  color: var(--texto-2);
+  font-size: var(--tam-rotulo);
+}
+
+.controle-opcoes .botao:hover:not(:disabled) {
+  color: var(--texto);
+}
+
+.controle-opcoes .botao[aria-pressed='true'] {
+  background: var(--azul-claro);
+  color: var(--azul-escuro);
 }

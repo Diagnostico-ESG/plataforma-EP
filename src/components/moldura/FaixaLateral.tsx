@@ -22,6 +22,7 @@ export function FaixaLateral({ areaAtual, mostrarAdministracao, aoIrPara }: Faix
   const itens = mostrarAdministracao ? ITENS : ITENS.filter((item) => item.area !== 'administracao')
   return (
     <nav className="faixa-lateral" aria-label="Áreas do sistema">
+      <span className="faixa-marca" aria-hidden="true">EP</span>
       {itens.map(({ area, icone, rotulo }) => (
         <button
           key={area}

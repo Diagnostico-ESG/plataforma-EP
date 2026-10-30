@@ -43,29 +43,23 @@
     display: flex;
     align-items: center;
     gap: var(--esp-2);
-    min-height: 32px;
+    min-height: 34px;
     padding: var(--esp-1) var(--esp-2);
-    /* O respiro da linha acesa fica reservado, para a opção marcada não "pular". */
-    border-left: var(--linha-acesa);
-    border-left-color: transparent;
     border-radius: var(--canto-botao);
     color: var(--texto);
     cursor: pointer;
   }
 
-  /* A marca de seleção padrão sai: a opção escolhida e o foco usam a linha acesa. */
+  /* A marca de seleção padrão sai: a opção escolhida e a em foco ficam em azul-claro com texto azul-escuro. */
   option::checkmark {
     display: none;
   }
 
   option:hover:not(:disabled),
-  option:focus {
+  option:focus,
+  option:checked {
     background: var(--azul-claro);
-  }
-
-  option:checked,
-  option:focus-visible {
-    border-left-color: var(--azul);
+    color: var(--azul-escuro);
   }
 
   option:disabled {

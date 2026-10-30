@@ -25,6 +25,7 @@
   right: 0;
   z-index: 5;
   min-width: 200px;
+  font-size: var(--tam-secundario);
   /* Lista longa (os responsáveis no cabeçalho da Lista) rola por dentro e não sai da tela em 1366×768. */
   max-height: min(60vh, 360px);
   overflow-y: auto;
