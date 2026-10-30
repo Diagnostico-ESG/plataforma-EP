@@ -1,0 +1,110 @@
+<!doctype html>
+<!-- Protótipo descartável (2026-10-30): verso do cartão enxuto (verso-2), estilo da proposta visual 6. Sem abas, uma rolagem só. Dados inventados. Visões: #fechado, #aberto -->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Verso do cartão enxuto</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--azul:#3a5afe;--azul-claro:#e8edff;--azul-escuro:#2a44c9;--lateral:#252b36;--fundo:#f3f4f7;--linha:#e3e6ec;--texto:#1d2330;--texto-2:#5f6776;--inativo:#9098a6;
+--atraso:#d1293d;--vence:#c2620a;--mono:'IBM Plex Mono',Consolas,monospace}
+*{box-sizing:border-box;margin:0}
+body{font:13px/1.45 'Source Sans 3',system-ui,sans-serif;color:var(--texto);background:var(--fundo);height:100vh;overflow:hidden}
+svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.moldura{position:fixed;inset:0;display:grid;grid-template:52px 56px 1fr/56px 1fr}
+.moldura .l{grid-row:1/4;background:var(--lateral)}.moldura .t{background:#fff}.moldura .b{background:#fff;border-bottom:1px solid var(--linha)}
+.veu{position:fixed;inset:0;background:rgb(29 35 48/.45);display:grid;place-items:center}
+.janela{background:#fff;border-radius:12px;width:760px;max-height:840px;box-shadow:0 24px 60px rgb(29 35 48/.3);display:flex;flex-direction:column;overflow:hidden}
+.cab{padding:18px 22px 0}
+.cab .l1{display:flex;align-items:center;gap:10px}
+.cab h1{font-size:19px;font-weight:700;line-height:1.25}.cab .dir{margin-left:auto;display:flex;gap:6px;align-items:center}
+.dados{margin-top:4px;font-size:12.5px;color:var(--texto-2);display:flex;gap:6px;flex-wrap:wrap}.dados span+span::before{content:'·';margin-right:6px;color:var(--inativo)}
+.setor{font:700 11px 'Source Sans 3';letter-spacing:.3px;color:#fff;border-radius:4px;padding:2px 7px}
+.btn{border:1px solid var(--linha);background:#fff;font:600 13px 'Source Sans 3';color:var(--texto);height:32px;padding:0 11px;border-radius:6px;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.btn.prim{background:var(--azul);border-color:var(--azul);color:#fff}.btn.leve{border-color:transparent;background:none;color:var(--texto-2)}.btn.icone{width:32px;padding:0;justify-content:center}
+.btn.peq{height:28px;font-size:12px;padding:0 9px}
+/* Trilha compacta: oito tracinhos, nome só da etapa atual */
+.etapa{display:flex;align-items:center;gap:12px;margin:16px 0 0;padding:12px 14px;background:#fafbfc;border:1px solid var(--linha);border-radius:10px}
+.etapa .nome{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px}.etapa .nome svg{color:var(--azul)}
+.etapa .quando{font:500 12px var(--mono);color:var(--texto-2)}
+.tracos{display:flex;gap:3px;margin-left:auto}.tracos i{width:20px;height:5px;border-radius:3px;background:#dfe3ea}.tracos i.f{background:#6b7a99}.tracos i.a{background:var(--azul)}
+.agora{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.seg{display:inline-flex;background:var(--fundo);border:1px solid var(--linha);border-radius:6px;padding:2px}
+.seg button{border:0;background:none;width:32px;height:26px;border-radius:4px;display:grid;place-items:center}.seg .sim{background:var(--azul-claro)}
+.rotulo{font-size:12px;color:var(--texto-2)}
+.pessoa{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--linha);border-radius:999px;padding:2px 10px 2px 2px;font-weight:600}
+.av{width:24px;height:24px;border-radius:50%;background:var(--azul-claro);color:var(--azul-escuro);font:600 10px/24px 'Source Sans 3';text-align:center}
+.aviso{display:flex;gap:8px;align-items:center;font-size:12.5px;padding:7px 10px;border-radius:6px;margin-top:8px}
+.aviso.atraso{background:#fdecee;color:#8f1d2c}.aviso.revisor{background:#fff6e5;color:#7a4a00}
+.corpo{padding:18px 22px 6px;overflow:hidden}
+.secao{margin-bottom:16px}
+.secao h3{font-size:12px;font-weight:700;color:var(--texto-2);text-transform:uppercase;letter-spacing:.4px;display:flex;align-items:center;gap:8px;margin-bottom:8px}.secao h3 .dir{margin-left:auto;text-transform:none;letter-spacing:0}
+.versao{display:flex;gap:14px;align-items:center;border:1px solid var(--linha);border-radius:10px;padding:10px}
+.mini{width:132px;height:74px;border:1px solid var(--linha);border-radius:6px;background:#fbfcfe;display:grid;place-items:center;flex:none}
+.versao .info{flex:1;min-width:0}.versao .t{display:flex;align-items:center;gap:8px;font-weight:700}.versao .m{font-size:12px;color:var(--texto-2);margin-top:2px}
+.arqs{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.arq{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--linha);border-radius:6px;padding:3px 8px 3px 4px;font-size:12px;font-weight:600}
+.arq b{font:700 9px var(--mono);color:#fff;border-radius:4px;padding:2px 4px}.arq svg{width:13px;height:13px;color:var(--texto-2)}
+.arq.falta{border-style:dashed;color:var(--inativo);font-weight:400}
+.ver-tag{font:700 12px var(--mono);background:var(--azul-claro);color:var(--azul-escuro);border-radius:4px;padding:1px 6px}.ver-tag.cinza{background:#eef0f4;color:#4a5163}
+.recolhe{display:flex;align-items:center;gap:8px;padding:8px 2px;border-top:1px solid #f0f2f5;color:var(--texto-2);font-weight:600}.recolhe .n{font:500 12px var(--mono);color:var(--inativo)}.recolhe svg.s{margin-left:auto}
+.lista{padding:2px 0 8px 24px}.lista div{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12.5px}.lista .m{color:var(--texto-2);font-size:12px}.lista .baixar{margin-left:auto;color:var(--texto-2)}
+.nota{font-size:13px;line-height:1.55;border-left:3px solid var(--linha);padding-left:10px}.nota small{display:block;color:var(--inativo);font-size:11.5px;margin-top:4px}
+.pe{display:flex;align-items:center;gap:8px;padding:10px 22px;border-top:1px solid var(--linha);color:var(--texto-2);font-size:12.5px}
+.pe a{color:var(--azul-escuro);font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+</style>
+</head>
+<body>
+<svg style="display:none">
+<symbol id="x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="pontos" viewBox="0 0 24 24"><circle cx="5" cy="12" r=".8"/><circle cx="12" cy="12" r=".8"/><circle cx="19" cy="12" r=".8"/></symbol>
+<symbol id="seta" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+<symbol id="dir" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+<symbol id="baixar" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></symbol>
+<symbol id="mais" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="alerta" viewBox="0 0 24 24"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17.5h.01"/></symbol>
+<symbol id="cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+<symbol id="cadeado" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="mover" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="clipe" viewBox="0 0 24 24"><path d="M21 11.5l-8.5 8.5a5 5 0 0 1-7-7L14 4.5a3.3 3.3 0 0 1 4.7 4.7L10.2 17.7a1.7 1.7 0 0 1-2.4-2.4L15.5 7.6"/></symbol>
+<symbol id="historico" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></symbol>
+<symbol id="lapis" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+<symbol id="e3" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8.5 11l2 2 3.5-3.5"/></symbol>
+</svg>
+<div class="moldura"><div class="l"></div><div class="t"></div><div class="b"></div></div>
+<div class="veu"><div class="janela" id="janela"></div></div>
+<script>
+const ic=(n,c='')=>`<svg class="i ${c}"><use href="#${n}"/></svg>`
+const ST={a:'<circle cx="12" cy="12" r="8" fill="none" stroke="#9098a6" stroke-width="2"/>',i:'<circle cx="12" cy="12" r="8" fill="none" stroke="#3a5afe" stroke-width="2"/><path d="M12 4a8 8 0 0 1 0 16z" fill="#3a5afe"/>',
+f:'<circle cx="12" cy="12" r="9" fill="#16a34a"/><path d="M8 12.2l2.8 2.8 5.2-5.4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'}
+const aberto=location.hash==='#aberto'
+const fluxo=`<svg viewBox="0 0 300 150" width="124" height="66" fill="none" stroke="#6b7a99" stroke-width="2"><circle cx="26" cy="40" r="10"/><rect x="50" y="28" width="60" height="24" rx="4"/><path d="M36 40h14M110 40h20"/><rect x="130" y="28" width="60" height="24" rx="4"/>
+ <path d="M160 52v24"/><path d="M160 76l12 12-12 12-12-12z"/><path d="M172 88h30"/><rect x="202" y="76" width="60" height="24" rx="4"/><path d="M160 100v26"/><circle cx="160" cy="134" r="8" stroke-width="3"/></svg>`
+const arq=(t,c,n)=>`<span class="arq"><b style="background:${c}">${t}</b>${n}${ic('baixar')}</span>`
+const cab=`<div class="cab"><div class="l1"><span class="setor" style="background:#0f766e" title="Diretoria de Tecnologia">TEC</span><h1>Gestão de acessos aos sistemas</h1>
+ <div class="dir"><button class="btn prim">Registrar revisão</button><button class="btn icone">${ic('pontos')}</button><button class="btn icone leve">${ic('x')}</button></div></div>
+ <div class="dados"><span>Diretoria de Tecnologia</span><span>Macroprocesso a definir</span><span>Processo</span><span>Em andamento</span></div>
+ <div class="etapa"><span class="nome">${ic('e3')}Revisão interna</span><span class="quando">4 de 8 · desde 28/10 · 2 dias</span>
+  <span class="tracos" title="Etapa 4 de 8">${Array.from({length:8},(_,k)=>`<i class="${k<3?'f':k===3?'a':''}"></i>`).join('')}</span><button class="btn peq">${ic('mover')}Mover${ic('seta')}</button></div>
+ <div class="agora"><span class="rotulo">Etiqueta</span><span class="seg">${['a','i','f'].map(k=>`<button class="${k==='i'?'sim':''}" title="${{a:'A fazer',i:'Iniciado',f:'Finalizado'}[k]}"><svg viewBox="0 0 24 24" width="16" height="16">${ST[k]}</svg></button>`).join('')}</span>
+  <span class="rotulo" style="margin-left:12px">Responsável</span><span class="pessoa"><span class="av">AL</span>Você${ic('seta')}</span></div>
+ <div class="aviso atraso">${ic('cal')}<b>Prazo vencido há 3 dias</b>&nbsp;(27/10)</div>
+ <div class="aviso revisor">${ic('alerta')}Você enviou a V2; a revisão deve ser feita por outra pessoa.</div></div>`
+const anteriores=aberto?`<div class="lista"><div>${ic('cadeado')}<span class="ver-tag cinza">V1</span>piloto<span class="m">· 16/10 · Bruno Reis · Modelagem piloto</span><span class="baixar">${ic('baixar')}</span></div></div>`:''
+const anexos=aberto?`<div class="lista"><div>${ic('clipe')}Retorno do setor sobre o piloto.eml<span class="m">· 25/10 · Carla Nunes</span><span class="baixar">${ic('baixar')}</span></div>
+ <div>${ic('clipe')}Lista de sistemas atendidos.pdf<span class="m">· 20/10 · Você</span><span class="baixar">${ic('baixar')}</span></div>
+ <div><button class="btn peq">${ic('mais')}Enviar anexo</button></div></div>`:''
+const corpo=`<div class="corpo">
+ <div class="secao"><h3>Documentos<span class="dir"><button class="btn peq">${ic('mais')}Enviar versão</button></span></h3>
+  <div class="versao"><div class="mini">${fluxo}</div><div class="info"><div class="t"><span class="ver-tag">V2</span>Versão atual</div>
+  <div class="m">27/10 por você · Relatório V1 vale para esta versão</div>
+  <div class="arqs">${arq('BPMN','#4f46e5','Fluxograma')}${arq('PNG','#0891b2','Imagem')}${arq('BPM','#6b7a99','Bizagi')}${arq('DOCX','#2a44c9','Relatório V1')}</div></div></div>
+  <div class="recolhe" style="margin-top:8px">${ic(aberto?'seta':'dir')}Versões anteriores<span class="n">1</span></div>${anteriores}
+  <div class="recolhe">${ic(aberto?'seta':'dir')}Outros anexos<span class="n">2</span></div>${anexos}</div>
+ <div class="secao"><h3>Anotações<span class="dir"><button class="btn peq leve">${ic('lapis')}Editar</button></span></h3>
+  <p class="nota">Setor pediu para incluir o fluxo de acesso de terceirizados. Conferir com a equipe de segurança antes da validação.<small>Carla Nunes · 29/10, 21:06</small></p></div></div>
+ <div class="pe">${ic('historico')}Última alteração: etiqueta para Iniciado, por você, hoje às 10:12 <a href="#" style="margin-left:auto">Ver histórico${ic('dir')}</a></div>`
+document.getElementById('janela').innerHTML=cab+corpo
+</script>
+</body>
+</html>
