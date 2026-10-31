@@ -35,3 +35,9 @@ describe('textos sobre o fundo da página', () => {
     expect(contraste(valorDe('vence'), '#ffffff')).toBeGreaterThanOrEqual(4.5)
   })
 })
+
+describe('selo do tipo de arquivo', () => {
+  test.each(['bpmn', 'png', 'bpm', 'docx', 'pdf', 'eml'])('o branco sobre a cor do %s passa de 4,5:1 (texto de 9px)', (tipo) => {
+    expect(contraste(valorDe(`tipo-${tipo}`), '#ffffff')).toBeGreaterThanOrEqual(4.5)
+  })
+})

@@ -51,3 +51,17 @@ Audit (`/impeccable audit`, só código; não olhei a tela): detector com 0 acha
 - **Ordem de leitura da descrição da coluna:** visualmente vem depois da contagem (CSS `order`), no texto vem antes; a leitura segue sigla, nome, contagem, o que é coerente.
 - **`Quadro.css` com mais de 300 linhas:** já estava no backlog (refatoração sem efeito visual).
 - **Conferência na tela:** este lote não foi visto no app rodando.
+
+## 2026-10-30 — /polir dos ajustes do passo 2 (legenda, selo do tipo, janela do Novo setor, caixas sem cor de macroprocesso)
+
+Audit: 18/20 (acessibilidade 3, desempenho 4, responsividade 4, cores e tokens 3, coerência 4). Detector sem achados.
+
+### Corrigidos
+- **Contraste do selo cinza (BPM e tipos sem cor própria):** `#6B7A99` da identidade dava 4,31:1 com o branco, abaixo do AA para texto de 9px. `--tipo-bpm` passou a `#64728F` (4,83:1), quase igual à vista. Teste de contraste das seis cores do selo em `src/styles/etiquetasVivas.test.ts`. **Desvio da identidade:** `.scratch/identidade-visual.md` ainda diz `#6B7A99`.
+- **Espaço entre os itens da legenda:** 14px (do protótipo) trocado por `--esp-3` (12px), da escala de espaçamento.
+
+### Deixados de fora, com motivo
+- **Nome da janela do Novo setor repetido** (`aria-label` na janela e título igual no formulário): o leitor de tela anuncia "Novo setor" uma vez na janela e outra no formulário; não atrapalha.
+- **Legenda antes do [Cadastrar processo], não na ponta direita:** a faixa de controles muda no passo 3, que põe a ação principal à esquerda.
+- **Selo do tipo só na Lista:** no verso entra com a lista de arquivos do verso enxuto (passo 3).
+- **Conferência na tela:** o app pede o login institucional e não há modo de demonstração; nada deste lote foi visto rodando.

@@ -52,10 +52,11 @@
   --trilha-feita: #6b7a99;
   --trilha-vazia: #e3e6ec;
 
-  /* Selo do tipo de arquivo (identidade, "Tipo de arquivo"); os tipos sem cor própria usam a do BPM */
+  /* Selo do tipo de arquivo (identidade, "Tipo de arquivo"); os tipos sem cor própria usam a do BPM.
+     O BPM é um pouco mais escuro que o #6b7a99 da identidade: com ele o branco dava 4,31:1, abaixo do AA (agora 4,83:1). */
   --tipo-bpmn: #4f46e5;
   --tipo-png: #0e7490;
-  --tipo-bpm: #6b7a99;
+  --tipo-bpm: #64728f;
   --tipo-docx: #2a44c9;
   --tipo-pdf: #881337;
   --tipo-eml: #c2410c;
