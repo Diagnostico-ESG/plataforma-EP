@@ -1,9 +1,7 @@
 # Próximo passo (2026-10-30)
 
-**Situação:** a identidade "Grafite e branco, cor em ponto" está em código e polida (`/polir` feito; achados em `.scratch/identidade-visual/desvios.md`). Marco `marco/2026-10-30-identidade`. O comportamento novo e as pendências visuais estão no `.scratch/backlog.md` (seções "Comportamento novo da identidade" e "Achados da revisão de código da identidade").
+**Situação:** a identidade "Grafite e branco, cor em ponto" está em código e polida (marco `marco/2026-10-30-identidade`). O que falta dela está num arquivo só, em ordem de execução: `.scratch/identidade-visual/pendencias.md` (as menções a "seção do backlog" no `desvios.md` de 2026-10-30 valem agora para esse arquivo).
 
-**Próximo comando:** `/demanda` (Opus para classificar), um item por vez, começando pelos pequenos (selo do setor com nome, "Destacar os meus", "Mostrar" em segmento, janela de novo setor). O interruptor "Linhas", o botão "Filtros" e o verso enxuto pedem `/planejar`. Não há `/ship` pendente: a identidade é redesenho sem ticket novo.
-
-**Também pendente:** possível defeito do histórico ("Moveu o processo" sem as etapas de → para); `.impeccable/design.json` desatualizado (`/impeccable document`).
+**Próximo comando:** `/demanda` (Opus) com o passo 1 do `pendencias.md` (itens 1 a 5, acabamento visual). Depois o passo 2 (`/demanda`) e o passo 3 (`/planejar`: Linhas, Filtros e verso enxuto).
 
 **Depende do usuário:** olhar o app com o login real; conferir o Catálogo de etapas; escolher o responsável inicial de cada etapa.
