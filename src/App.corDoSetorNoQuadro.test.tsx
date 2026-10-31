@@ -11,6 +11,7 @@ import { umSetor } from './testes/processoDaLista'
 import { montarVerso, processoLido } from './testes/processoNoVerso'
 import { montarNosCadastros } from './testes/processosNosCadastros'
 import { versoAberto } from './testes/versoDoCartao'
+import { escolherFormaDeVer } from './testes/formaDeVer'
 import { cartaoDe, dia, montar, processo } from './testes/quadroDeTeste'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
@@ -57,7 +58,7 @@ test('no agrupamento por setor, a coluna não leva cor de setor, e a coluna inat
   const ativo = umSetor('s1', 'TSA', 'Setor de Testes A', true, 13)
   const inativo = umSetor('s3', 'MNO', 'Setor Antigo', false, 22)
   montar([processo('Processo Antigo', { processo: { setorId: 's3', setorSigla: 'MNO', setorCor: 22 } })], 'integrante_ep', [], new VersoesFalso(), [ativo, inativo])
-  fireEvent.click(await screen.findByRole('button', { name: 'Setor' }))
+  await escolherFormaDeVer('Quadro por setor')
   const regiao = await screen.findByRole('region', { name: 'MNO · Setor Antigo · inativo' })
   const coluna = within(regiao)
   const colunaAtiva = screen.getByRole('region', { name: /^TSA ·/ })
@@ -80,14 +81,14 @@ test('por etapa, o selo traz a sigla na cor do setor e o nome do processo segue 
 
 test('por responsável o selo também traz a sigla', async () => {
   montar([processo('Emitir Ofício', { processo: { setorSigla: 'TSA', setorCor: 13 } })])
-  fireEvent.click(await screen.findByRole('button', { name: 'Responsável' }))
+  await escolherFormaDeVer('Quadro por responsável')
   expect(faixaDe(await cartaoDe('Emitir Ofício')).textContent).toBe('TSA')
 })
 
 test('por setor o cartão não leva selo: o nome do processo fica no corpo, como por etapa', async () => {
   const setor = umSetor('s1', 'TSA', 'Setor A', true, 13)
   montar([processo('Emitir Ofício', { processo: { setorId: 's1', setorSigla: 'TSA', setorCor: 13 } })], 'integrante_ep', [], new VersoesFalso(), [setor])
-  fireEvent.click(await screen.findByRole('button', { name: 'Setor' }))
+  await escolherFormaDeVer('Quadro por setor')
   const cartao = await cartaoDe('Emitir Ofício')
   expect(cartao.querySelector('.selo-do-setor')).toBeNull()
   expect(cartao.querySelector('.cartao-nome')?.textContent).toBe('Emitir Ofício')
@@ -98,7 +99,7 @@ test('por setor o cabeçalho da coluna traz a sigla e o nome do setor, e a colun
   const setor = umSetor('s1', 'TSA', 'Setor A', true, 13)
   const outro = umSetor('s2', 'TSB', 'Setor B', true, 22)
   montar([processo('Emitir Ofício', { processo: { setorId: 's2', setorSigla: 'TSB', setorCor: 22 } })], 'integrante_ep', [], new VersoesFalso(), [setor, outro])
-  fireEvent.click(await screen.findByRole('button', { name: 'Setor' }))
+  await escolherFormaDeVer('Quadro por setor')
   const regiao = await screen.findByRole('region', { name: 'TSA · Setor A' })
   expect(regiao.style.getPropertyValue('--cor-do-setor')).toBe('')
   expect(regiao.querySelector('.coluna-titulo-principal')?.textContent).toBe('TSA')

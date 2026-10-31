@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import { USUARIO_DE_TESTE } from './acesso/AcessoFalso'
+import { botaoDaFormaDeVer } from './testes/formaDeVer'
 import { cartaoDe, montar, processo } from './testes/quadroDeTeste'
 
 beforeEach(() => {
@@ -84,7 +85,7 @@ test('Limpar filtros desliga o Só os meus junto com os outros filtros e mantém
   fireEvent.click(screen.getByRole('button', { name: 'Limpar filtros' }))
   await waitFor(() => expect(window.location.hash).toBe('#/processos?agrupar=responsavel'))
   expect(screen.getByRole('button', { name: 'Só os meus' }).getAttribute('aria-pressed')).toBe('false')
-  expect(screen.getByRole('button', { name: 'Responsável' }).getAttribute('aria-pressed')).toBe('true')
+  expect((await botaoDaFormaDeVer()).textContent).toContain('Quadro por responsável')
   await cartaoDe('Processo Dela')
 })
 

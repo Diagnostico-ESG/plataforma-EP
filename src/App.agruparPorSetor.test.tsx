@@ -4,6 +4,7 @@ import type { Perfil } from './acesso/tipos'
 import { USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import type { ProcessoLido, SetorDoQuadro } from './processos/tipos'
 import { umSetor } from './testes/processoDaLista'
+import { botaoDaFormaDeVer, escolherFormaDeVer } from './testes/formaDeVer'
 import { cartaoDe, montar, processo } from './testes/quadroDeTeste'
 import { VersoesFalso } from './versoes/VersoesFalso'
 
@@ -26,14 +27,14 @@ const doSetor = (nome: string, { id, sigla }: SetorDoQuadro, mudancas: Partial<P
   processo(nome, { processo: { setorId: id, setorSigla: sigla, ...mudancas } })
 
 const abrir = (processos: ProcessoLido[], perfil: Perfil = 'integrante_ep') => montar(processos, perfil, [], new VersoesFalso(), SETORES)
-const trocar = async (nome: 'Etapa' | 'Setor') => fireEvent.click(await screen.findByRole('button', { name: nome }))
+const trocar = (nome: 'Etapa' | 'Setor') => escolherFormaDeVer(nome === 'Etapa' ? 'Quadro por etapa' : 'Quadro por setor')
 // Sigla, nome do setor e contagem, separados por espaço (a pílula Inativo, quando há, vai junto da sigla).
 const titulos = () => Array.from(document.querySelectorAll('.coluna-titulo')).map((titulo) => titulo.textContent?.replace(/\s+/g, ' ').trim())
 
-test('Agrupar por: Setor monta uma coluna por setor ativo em ordem de sigla, com a sigla e o nome, mesmo vazia', async () => {
+test('o Quadro por setor monta uma coluna por setor ativo em ordem de sigla, com a sigla e o nome, mesmo vazia', async () => {
   abrir([doSetor('Emitir Ofício', TSA)])
   await trocar('Setor')
-  expect((await screen.findByRole('button', { name: 'Setor' })).getAttribute('aria-pressed')).toBe('true')
+  expect((await botaoDaFormaDeVer()).textContent).toContain('Quadro por setor')
   expect(titulos()).toEqual(['TSASetor de Testes A1', 'ABCAssessoria Fictícia0'])
   const vazia = screen.getByRole('region', { name: 'ABC · Assessoria Fictícia' })
   expect(within(vazia).getByText('Nenhum processo deste setor no Quadro.')).toBeTruthy()
@@ -99,7 +100,7 @@ test('o agrupamento por setor fica no endereço, e abrir já agrupado mantém', 
   window.location.hash = '#/processos?agrupar=setor'
   abrir([doSetor('Emitir Ofício', TSA)])
   await cartaoDe('Emitir Ofício')
-  expect(screen.getByRole('button', { name: 'Setor' }).getAttribute('aria-pressed')).toBe('true')
+  expect((await botaoDaFormaDeVer()).textContent).toContain('Quadro por setor')
 })
 
 test('a Consulta também agrupa por setor e abre o cartão, sem arrastar', async () => {

@@ -1,6 +1,7 @@
-import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import type { DadosDoCartao, ResponsavelDoProcesso } from './processos/tipos'
+import { botaoDaFormaDeVer, escolherFormaDeVer } from './testes/formaDeVer'
 import { cartaoDe, montar, processo } from './testes/quadroDeTeste'
 
 beforeEach(() => {
@@ -25,17 +26,13 @@ const CAIO = de('u3', 'Caio Teste')
 const sem = (nome: string) => processo(nome, { processo: { responsavel: null } })
 // Nome da coluna e contagem, separados por espaço (a pílula Inativo, quando há, vai dentro do nome).
 const titulos = () => Array.from(document.querySelectorAll('.coluna-titulo')).map((titulo) => Array.from(titulo.children).map((parte) => parte.textContent).join(' '))
-const trocar = async (nome: 'Etapa' | 'Responsável') => fireEvent.click(await screen.findByRole('button', { name: nome }))
-const grupo = async () => within(await screen.findByRole('group', { name: 'Agrupar por' }))
+const trocar = (nome: 'Etapa' | 'Responsável') => escolherFormaDeVer(nome === 'Etapa' ? 'Quadro por etapa' : 'Quadro por responsável')
 
-test('a barra tem o Agrupar por, com Etapa escolhida, e o clique inverte os dois botões', async () => {
+test('"Quadro ▾" começa em Quadro por etapa e passa a Quadro por responsável ao escolher', async () => {
   montar([com('Emitir Ofício', ANA)])
-  const barra = await grupo()
-  expect(barra.getByRole('button', { name: 'Etapa' }).getAttribute('aria-pressed')).toBe('true')
-  expect(barra.getByRole('button', { name: 'Responsável' }).getAttribute('aria-pressed')).toBe('false')
+  expect((await botaoDaFormaDeVer()).textContent).toContain('Quadro por etapa')
   await trocar('Responsável')
-  expect(barra.getByRole('button', { name: 'Etapa' }).getAttribute('aria-pressed')).toBe('false')
-  expect(barra.getByRole('button', { name: 'Responsável' }).getAttribute('aria-pressed')).toBe('true')
+  expect((await botaoDaFormaDeVer()).textContent).toContain('Quadro por responsável')
 })
 
 test('por etapa as colunas são as etapas; por responsável, uma por pessoa em ordem de nome e Sem responsável no fim', async () => {
@@ -98,11 +95,11 @@ test('o agrupamento fica no endereço: escolher grava, voltar a Etapa limpa, e a
   window.location.hash = '#/processos?agrupar=responsavel'
   montar([com('Emitir Ofício', ANA)])
   await cartaoDe('Emitir Ofício')
-  expect((await grupo()).getByRole('button', { name: 'Responsável' }).getAttribute('aria-pressed')).toBe('true')
+  expect((await botaoDaFormaDeVer()).textContent).toContain('Quadro por responsável')
   expect(titulos()).toEqual(['Ana Teste 1'])
 })
 
-test('a Consulta também vê o Agrupar por e as colunas por pessoa', async () => {
+test('a Consulta também escolhe o Quadro por responsável e vê as colunas por pessoa', async () => {
   montar([com('Emitir Ofício', ANA)], 'consulta')
   await cartaoDe('Emitir Ofício')
   await trocar('Responsável')

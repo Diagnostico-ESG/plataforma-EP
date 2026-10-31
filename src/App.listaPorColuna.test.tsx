@@ -50,9 +50,9 @@ function montar(ajustar?: (falso: ProcessosFalso) => void) {
   render(<App acesso={AcessoFalso.logadoComo({ ...USUARIO_DE_TESTE, perfil: 'integrante_ep' })} cadastros={new CadastrosFalso()} processos={falso} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
 }
 
-const barraDeCima = () => document.querySelector('.quadro-barra') as HTMLElement
+const barraDeCima = () => screen.getByRole('group', { name: 'Controles dos processos' })
 
-test('a Lista não tem a barra de filtros nem a busca; acima da tabela ficam Agrupar por, Todos | Concluídos e, com filtro, Limpar filtros', async () => {
+test('a Lista não tem os filtros do Quadro nem a busca; na faixa ficam Agrupar por, Todos | Concluídos e, com filtro, Limpar filtros', async () => {
   montar()
   await nomesNasLinhas()
   expect(screen.queryByRole('group', { name: 'Filtros dos processos' })).toBeNull()

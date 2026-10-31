@@ -1,6 +1,6 @@
 import type { EstadoDoCarregamento } from '../../hooks/useCarregamento'
 import {
-  ehPortfolio, SEM_FILTROS, type AgruparQuadroPor, type FiltrosDosProcessos as Filtros, type MostrarNoPortfolio,
+  ehPortfolio, formaDeVer, SEM_FILTROS, type AgruparQuadroPor, type FormaDeVer, type FiltrosDosProcessos as Filtros, type MostrarNoPortfolio,
   type AgruparListaPor, type VisaoDosProcessos as Visao,
 } from '../../processos/enderecoDosProcessos'
 import { filtrarProcessos, opcoesDosFiltros, temFiltro, type OpcoesDosFiltros } from '../../processos/filtrosDosProcessos'
@@ -10,13 +10,12 @@ import { canceladosDe, visiveisNoPortfolio } from '../../processos/portfolio'
 import type { ListaDeProcessos, ModuloDeProcessos, ProcessoDaLista } from '../../processos/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
-import { Icone } from '../Icone'
 import { QuadroVazio } from '../quadro/QuadroVazio'
 import { CabecalhoDaLista } from './CabecalhoDaLista'
-import { AgruparAListaPor, AgruparPor, SoOsMeus, TodosOuConcluidos } from './ControlesDoQuadro'
+import { AgruparAListaPor, SoOsMeus, TodosOuConcluidos } from './ControlesDoQuadro'
 import { ArvoreDaLista } from './ArvoreDaLista'
+import { FaixaDeControles } from './FaixaDeControles'
 import { BotaoLimparFiltros, FiltrosDosProcessos, NenhumProcessoComFiltros, NenhumProcessoDoUsuario } from './FiltrosDosProcessos'
-import { LegendaDasEtiquetas } from './LegendaDasEtiquetas'
 import { QuadroCarregando, QuadroDeProcessos } from './QuadroDeProcessos'
 import { TabelaCarregando, TabelaDeProcessos } from './TabelaDeProcessos'
 
@@ -33,7 +32,8 @@ type VisaoDosProcessosProps = {
   aoMudarFiltros: (filtros: Filtros) => void
   /** Só no Quadro: uma coluna por etapa ou por responsável. */
   agrupar: AgruparQuadroPor
-  aoMudarAgrupar: (agrupar: AgruparQuadroPor) => void
+  /** "Quadro ▾": troca entre os três quadros e a Lista. */
+  aoMudarFormaDeVer: (forma: FormaDeVer) => void
   /** Só na Lista e no Quadro por setor (o portfólio): todos os processos ou só os concluídos. */
   mostrar: MostrarNoPortfolio
   aoMudarMostrar: (mostrar: MostrarNoPortfolio) => void
@@ -68,33 +68,32 @@ export function VisaoDosProcessos(props: VisaoDosProcessosProps) {
   const lista = { ...estado.valor, processos: filtrados }
   const opcoes = opcoesDosFiltros(estado.valor)
   return (
-    <div className="quadro">
-      <BarraDaVisao {...props} opcoes={opcoes} portfolio={portfolio} />
-      {vazio
-        ? <SemResultado filtros={filtros} usuarioId={usuarioId} aoMudarFiltros={aoMudarFiltros} aoLimparTudo={aoLimparTudo} />
-        : <ConteudoDaVisao {...props} lista={lista} visiveis={visiveis} todos={estado.valor.processos} opcoes={opcoes} />}
+    <div className="visao-dos-processos">
+      <FaixaDaVisao {...props} opcoes={opcoes} portfolio={portfolio} />
+      <div className="quadro">
+        {vazio
+          ? <SemResultado filtros={filtros} usuarioId={usuarioId} aoMudarFiltros={aoMudarFiltros} aoLimparTudo={aoLimparTudo} />
+          : <ConteudoDaVisao {...props} lista={lista} visiveis={visiveis} todos={estado.valor.processos} opcoes={opcoes} />}
+      </div>
     </div>
   )
 }
 
-type BarraDaVisaoProps = VisaoDosProcessosProps & { opcoes: OpcoesDosFiltros; portfolio: boolean }
+type FaixaDaVisaoProps = VisaoDosProcessosProps & { opcoes: OpcoesDosFiltros; portfolio: boolean }
 
-// No Quadro, os filtros e os controles dele; na Lista, o Agrupar por e o Limpar filtros (os filtros ficam no cabeçalho da tabela).
-function BarraDaVisao({ visao, opcoes, portfolio, filtros, aoMudarFiltros, mostrar, aoMudarMostrar, podeAlterar, aoCadastrar, ...props }: BarraDaVisaoProps) {
+// No Quadro, os filtros e o Só os meus; na Lista, o Agrupar por e o Limpar filtros (os filtros ficam no cabeçalho da tabela).
+// Todos | Concluídos só no portfólio (Lista e Quadro por setor).
+function FaixaDaVisao({ visao, opcoes, portfolio, filtros, aoMudarFiltros, mostrar, aoMudarMostrar, ...props }: FaixaDaVisaoProps) {
   const naLista = visao === 'lista'
   return (
-    <div className={naLista ? 'quadro-barra quadro-barra-da-lista' : 'quadro-barra'}>
+    <FaixaDeControles forma={formaDeVer({ visao, agrupar: props.agrupar })} aoEscolherForma={props.aoMudarFormaDeVer}
+      podeCadastrar={props.podeAlterar} aoCadastrar={props.aoCadastrar} desabilitada={false}>
       {!naLista && <FiltrosDosProcessos opcoes={opcoes} filtros={filtros} aoMudar={aoMudarFiltros} />}
+      {!naLista && props.podeAlterar && <SoOsMeusDoQuadro filtros={filtros} aoMudarFiltros={aoMudarFiltros} usuarioId={props.usuarioId} />}
       {naLista && <AgruparAListaPor agrupar={props.agruparLista} aoMudar={props.aoMudarAgruparLista} />}
       {portfolio && <TodosOuConcluidos mostrar={mostrar} aoMudar={aoMudarMostrar} />}
       {naLista && temFiltro(filtros) && <BotaoLimparFiltros aoLimpar={() => aoMudarFiltros(SEM_FILTROS)} />}
-      {!naLista && (
-        <ControlesDoQuadroNaBarra agrupar={props.agrupar} aoMudarAgrupar={props.aoMudarAgrupar} filtros={filtros} aoMudarFiltros={aoMudarFiltros}
-          usuarioId={props.usuarioId} podeAlterar={podeAlterar} />
-      )}
-      {!naLista && <LegendaDasEtiquetas />}
-      {podeAlterar && <BotaoCadastrar aoCadastrar={aoCadastrar} />}
-    </div>
+    </FaixaDeControles>
   )
 }
 
@@ -107,20 +106,13 @@ function oQueAVisaoMostra(processos: ProcessoDaLista[], filtros: Filtros, portfo
   return { filtrados, visiveis, vazio }
 }
 
-type ControlesNaBarraProps = {
-  agrupar: AgruparQuadroPor; aoMudarAgrupar: (agrupar: AgruparQuadroPor) => void
-  filtros: Filtros; aoMudarFiltros: (filtros: Filtros) => void; usuarioId: string; podeAlterar: boolean
-}
+type SoOsMeusDoQuadroProps = { filtros: Filtros; aoMudarFiltros: (filtros: Filtros) => void; usuarioId: string }
 
 // "Só os meus" é o filtro Responsável com o próprio id (o responsável do processo); a Consulta não tem o botão (ela não é responsável).
-function ControlesDoQuadroNaBarra({ agrupar, aoMudarAgrupar, filtros, aoMudarFiltros, usuarioId, podeAlterar }: ControlesNaBarraProps) {
+// Fica até o ticket 02 do redesenho-do-quadro, que o troca por "Destacar os meus".
+function SoOsMeusDoQuadro({ filtros, aoMudarFiltros, usuarioId }: SoOsMeusDoQuadroProps) {
   const ligado = filtros.responsavel === usuarioId
-  return (
-    <>
-      <AgruparPor agrupar={agrupar} aoMudar={aoMudarAgrupar} />
-      {podeAlterar && <SoOsMeus ligado={ligado} aoAlternar={() => aoMudarFiltros({ ...filtros, responsavel: ligado ? null : usuarioId })} />}
-    </>
-  )
+  return <SoOsMeus ligado={ligado} aoAlternar={() => aoMudarFiltros({ ...filtros, responsavel: ligado ? null : usuarioId })} />
 }
 
 type SemResultadoProps = { filtros: Filtros; usuarioId: string; aoMudarFiltros: (filtros: Filtros) => void; aoLimparTudo: () => void }
@@ -164,15 +156,6 @@ function ListaDosProcessos({ lista, visiveis, todos, idEscolhido, aoAbrir, filtr
     )
   }
   return <TabelaDeProcessos cabecalho={cabecalho} linhas={linhas} idEscolhido={idEscolhido} aoAbrir={aoAbrir} cancelados={cancelados} />
-}
-
-function BotaoCadastrar({ aoCadastrar }: { aoCadastrar: () => void }) {
-  return (
-    <button type="button" className="botao botao-principal" onClick={aoCadastrar}>
-      <Icone nome="mais" tamanho={16} />
-      Cadastrar processo
-    </button>
-  )
 }
 
 function ListaCarregando() {

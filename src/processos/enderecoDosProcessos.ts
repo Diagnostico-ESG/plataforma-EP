@@ -150,7 +150,7 @@ export const ROTULO_DA_FORMA_DE_VER: Record<FormaDeVer, string> = {
   etapa: 'Quadro por etapa', responsavel: 'Quadro por responsável', setor: 'Quadro por setor', lista: 'Lista',
 }
 
-export function formaDeVer({ visao, agrupar }: EnderecoDosProcessos): FormaDeVer {
+export function formaDeVer({ visao, agrupar }: Pick<EnderecoDosProcessos, 'visao' | 'agrupar'>): FormaDeVer {
   return visao === 'lista' ? 'lista' : agrupar
 }
 

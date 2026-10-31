@@ -1,8 +1,4 @@
-import type { AgruparListaPor, AgruparQuadroPor, MostrarNoPortfolio } from '../../processos/enderecoDosProcessos'
-
-const OPCOES: { valor: AgruparQuadroPor; rotulo: string }[] = [
-  { valor: 'etapa', rotulo: 'Etapa' }, { valor: 'responsavel', rotulo: 'Responsável' }, { valor: 'setor', rotulo: 'Setor' },
-]
+import type { AgruparListaPor, MostrarNoPortfolio } from '../../processos/enderecoDosProcessos'
 
 const OPCOES_DO_PORTFOLIO: { valor: MostrarNoPortfolio; rotulo: string }[] = [
   { valor: 'todos', rotulo: 'Todos' }, { valor: 'concluidos', rotulo: 'Concluídos' },
@@ -27,13 +23,6 @@ function ControleDeOpcoes<T extends string>({ rotulo, opcoes, escolhida, aoMudar
       </span>
     </div>
   )
-}
-
-type AgruparPorProps = { agrupar: AgruparQuadroPor; aoMudar: (agrupar: AgruparQuadroPor) => void }
-
-/** "Agrupar por: Etapa | Responsável | Setor". */
-export function AgruparPor({ agrupar, aoMudar }: AgruparPorProps) {
-  return <ControleDeOpcoes rotulo="Agrupar por" opcoes={OPCOES} escolhida={agrupar} aoMudar={aoMudar} />
 }
 
 type TodosOuConcluidosProps = { mostrar: MostrarNoPortfolio; aoMudar: (mostrar: MostrarNoPortfolio) => void }

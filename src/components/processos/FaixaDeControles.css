@@ -1,0 +1,41 @@
+/* A faixa de controles da proposta 6: branca, 56px, colada embaixo da barra de cima e separada do quadro por uma linha.
+   Nunca quebra de linha; se faltar espaço, a legenda encolhe e some antes dos controles. */
+.faixa-de-controles {
+  display: flex;
+  flex: none;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 10px;
+  height: 56px;
+  min-width: 0;
+  margin: 0;
+  padding: 0 var(--esp-5);
+  border: 0;
+  border-bottom: 1px solid var(--linha);
+  background: var(--folha);
+}
+
+.faixa-de-controles > *,
+.faixa-de-controles .botao {
+  flex: none;
+  white-space: nowrap;
+}
+
+.faixa-separador {
+  width: 1px;
+  height: 22px;
+  background: var(--linha);
+}
+
+.faixa-de-controles > .legenda-das-etiquetas {
+  flex: 0 1 auto;
+  min-width: 0;
+  margin-left: auto;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .faixa-de-controles > .legenda-das-etiquetas {
+    display: none;
+  }
+}

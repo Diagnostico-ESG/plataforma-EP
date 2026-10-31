@@ -11,10 +11,6 @@
   padding: var(--esp-4) var(--esp-5);
 }
 
-.quadro-barra {
-  display: flex;
-  justify-content: flex-end;
-}
 
 .quadro-carregando {
   margin: 0;
@@ -24,8 +20,20 @@
 /* O Quadro ocupa a altura toda da área de trabalho: a coluna recebe o cartão em qualquer altura (não só sobre o título) e a
    rolagem lateral fica na base da tela. Quem rola na vertical são os cartões, dentro de cada coluna. */
 .area-de-processos:has(.quadro-colunas),
-.quadro:has(> .quadro-colunas) {
+.visao-dos-processos:has(.quadro-colunas) {
   height: 100%;
+}
+
+/* A faixa de controles em cima, com a altura dela; o quadro (ou a Lista) fica com o resto. */
+.visao-dos-processos {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.visao-dos-processos > .quadro {
+  flex: 1;
+  min-height: 0;
 }
 
 /* Coluna flexível: o aviso de "Tirado do Quadro" (e a falha) ocupam só a própria altura e o Quadro fica com o resto. */
@@ -334,19 +342,6 @@ td .barra-etapa {
   background: var(--fundo-contexto);
 }
 
-/* A faixa de controles é uma folha branca com borda: filtros à esquerda, numa linha que quebra quando falta espaço;
-   [Cadastrar processo] continua à direita. */
-.quadro-barra {
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: var(--esp-3);
-  padding: var(--esp-3) var(--esp-4);
-  border: 1px solid var(--linha);
-  border-radius: var(--canto);
-  background: var(--folha);
-}
-
-.quadro-barra > .botao,
 .controle-opcoes .botao {
   white-space: nowrap;
 }
@@ -356,16 +351,6 @@ td .barra-etapa {
   flex-wrap: wrap;
   align-items: flex-end;
   gap: var(--esp-2);
-  margin-right: auto;
-}
-
-/* Na Lista, a barra de cima tem só Agrupar por, Todos | Concluídos e Limpar filtros, à esquerda; [Cadastrar processo] fica à direita. */
-.quadro-barra-da-lista {
-  justify-content: flex-start;
-}
-
-.quadro-barra-da-lista > .botao-principal {
-  margin-left: auto;
 }
 
 /* O cabeçalho da Lista: cada coluna é um botão discreto, no mesmo texto do cabeçalho, que abre ordenação e filtro. */

@@ -1,5 +1,6 @@
-import { cleanup, fireEvent, screen } from '@testing-library/react'
+import { cleanup, screen } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
+import { escolherFormaDeVer } from './testes/formaDeVer'
 import { umSetor } from './testes/processoDaLista'
 import { cartaoDe, dia, montar, processo } from './testes/quadroDeTeste'
 import { VersoesFalso } from './versoes/VersoesFalso'
@@ -14,7 +15,7 @@ afterEach(() => {
 
 const selos = (cartao: HTMLElement) => Array.from(cartao.querySelectorAll('.cartao-selos > *')).map((selo) => selo.textContent)
 
-const porResponsavel = async () => fireEvent.click(await screen.findByRole('button', { name: 'Responsável' }))
+const porResponsavel = () => escolherFormaDeVer('Quadro por responsável')
 const barraDe = (cartao: HTMLElement) => cartao.querySelector('.barra-etapa')
 
 const SEM_RELATORIO = { ultimaVersao: { numero: 3, historica: false, temRelatorio: false } }
@@ -52,7 +53,7 @@ test('em Concluídos o último tracinho é o atual e os outros estão feitos', a
   montar([processo('Pronto', { etapa: 'concluidos', processo: { situacao: 'concluido', etiqueta: 'concluido' } })], 'integrante_ep', [],
     new VersoesFalso(), [umSetor('s1', 'TSA', 'Setor de Testes A')])
   await cartaoDe('Pronto')
-  fireEvent.click(await screen.findByRole('button', { name: 'Setor' }))
+  await escolherFormaDeVer('Quadro por setor')
   const barra = barraDe(await cartaoDe('Pronto'))
   expect(barra?.getAttribute('aria-label')).toBe('Etapa 8 de 8: Concluídos')
   expect(tracinhosDe(barra)).toEqual(['feito', 'feito', 'feito', 'feito', 'feito', 'feito', 'feito', 'atual'])
@@ -83,11 +84,11 @@ test('a etiqueta é só o ícone, com o nome no title e no texto para leitor de 
   }
 })
 
-test('a barra do Quadro traz a legenda das etiquetas uma vez só, com ícone e nome; a Lista não', async () => {
+test('a faixa de controles do Quadro traz a legenda das etiquetas uma vez só, com ícone e nome; a Lista não', async () => {
   montar([processo('A Fazer'), processo('Outro')])
   const legenda = await screen.findByRole('list', { name: 'Legenda das etiquetas' })
   expect(screen.getAllByRole('list', { name: 'Legenda das etiquetas' })).toHaveLength(1)
-  expect(legenda.closest('.quadro-barra')).not.toBeNull()
+  expect(legenda.closest('.faixa-de-controles')).not.toBeNull()
   const itens = Array.from(legenda.querySelectorAll('li'))
   expect(itens.map((item) => item.textContent)).toEqual(['A fazer', 'Iniciado', 'Finalizado'])
   expect(itens.every((item) => item.querySelector('svg'))).toBe(true)

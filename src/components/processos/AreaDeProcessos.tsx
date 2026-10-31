@@ -5,7 +5,7 @@ import { useCarregamento } from '../../hooks/useCarregamento'
 import { useEndereco } from '../../hooks/useEndereco'
 import { ContextoDoTirarDoQuadro, useTirarDoQuadro } from '../../hooks/useTirarDoQuadro'
 import {
-  lerEnderecoDosProcessos, montarEnderecoDosProcessos, SEM_FILTROS, type EnderecoDosProcessos,
+  comFormaDeVer, lerEnderecoDosProcessos, montarEnderecoDosProcessos, SEM_FILTROS, type EnderecoDosProcessos,
 } from '../../processos/enderecoDosProcessos'
 import type { ModuloDeProcessos } from '../../processos/tipos'
 import { lembrarFormaDeVer } from '../../processos/ultimaFormaDeVer'
@@ -71,7 +71,7 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes, reviso
           aoCadastrar={() => irParaVisao({ aberto: 'novo' })} idEscolhido={idAberto}
           enderecoDoProcesso={enderecoDoProcesso} aoAbrir={(id) => irParaVisao({ aberto: id })}
           filtros={atual.filtros} aoMudarFiltros={(filtros) => irParaVisao({ filtros, aberto: null })}
-          agrupar={atual.agrupar} aoMudarAgrupar={(agrupar) => irParaVisao({ agrupar, aberto: null })}
+          agrupar={atual.agrupar} aoMudarFormaDeVer={(forma) => irPara(montarEnderecoDosProcessos(comFormaDeVer(atual, forma)))}
           enderecoDosConcluidosNaLista={enderecoDosConcluidosNaLista} mostrar={atual.mostrar} aoLimparTudo={() => irParaVisao({ filtros: SEM_FILTROS, mostrar: 'todos', aberto: null })}
           aoMudarMostrar={(mostrar) => irParaVisao({ mostrar, filtros: { ...atual.filtros, situacao: null }, aberto: null })}
           ordenacao={atual.ordenacao} aoOrdenar={(ordenacao) => irParaVisao({ ordenacao, aberto: null })}
