@@ -160,6 +160,21 @@
   opacity: 0.5;
 }
 
+/* Destacar os meus: o cartão de outra pessoa recua; ao passar o mouse volta a se ler. O leitor de tela ouve o texto escondido do cartão. */
+.cartao-esmaecido {
+  opacity: 0.5;
+}
+
+.cartao-esmaecido:hover,
+.cartao-esmaecido:focus-visible {
+  opacity: 0.85;
+}
+
+.aviso-do-destaque {
+  margin: 0 0 var(--esp-3);
+  color: var(--texto-2);
+}
+
 .coluna-fantasma {
   min-height: 180px;
   border: 1px dashed var(--linha-tracejada);

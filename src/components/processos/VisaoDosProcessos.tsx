@@ -6,17 +6,17 @@ import {
 import { filtrarProcessos, opcoesDosFiltros, temFiltro, type OpcoesDosFiltros } from '../../processos/filtrosDosProcessos'
 import { linhasDaLista } from '../../processos/linhasDaLista'
 import type { OrdenacaoDaLista } from '../../processos/ordenacaoDaLista'
-import { canceladosDe, visiveisNoPortfolio } from '../../processos/portfolio'
+import { visiveisNoPortfolio } from '../../processos/portfolio'
 import type { ListaDeProcessos, ModuloDeProcessos, ProcessoDaLista } from '../../processos/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { QuadroVazio } from '../quadro/QuadroVazio'
 import { CabecalhoDaLista } from './CabecalhoDaLista'
-import { AgruparAListaPor, SoOsMeus, TodosOuConcluidos } from './ControlesDoQuadro'
+import { AgruparAListaPor, DestacarOsMeus, SituacaoDaVisao } from './ControlesDoQuadro'
 import { ArvoreDaLista } from './ArvoreDaLista'
 import { FaixaDeControles } from './FaixaDeControles'
 import { BotaoDosFiltros } from './BotaoDosFiltros'
-import { BotaoLimparFiltros, NenhumProcessoComFiltros, NenhumProcessoDoUsuario } from './FiltrosDosProcessos'
+import { BotaoLimparFiltros, NenhumProcessoComFiltros, NenhumProcessoNaSituacao } from './FiltrosDosProcessos'
 import { QuadroCarregando, QuadroDeProcessos } from './QuadroDeProcessos'
 import { TabelaCarregando, TabelaDeProcessos } from './TabelaDeProcessos'
 
@@ -38,6 +38,9 @@ type VisaoDosProcessosProps = {
   /** Só na Lista e no Quadro por setor (o portfólio): todos os processos ou só os concluídos. */
   mostrar: MostrarNoPortfolio
   aoMudarMostrar: (mostrar: MostrarNoPortfolio) => void
+  /** Só nos quadros: esmaece os cartões em que quem está na tela não é o responsável. Já vem desligado para a Consulta. */
+  destacar: boolean
+  aoMudarDestacar: (destacar: boolean) => void
   /** Sem filtros e de volta a Todos, de uma vez só (o endereço muda uma vez). */
   aoLimparTudo: () => void
   /** Só na Lista: a tabela comum ou a árvore por macroprocesso ou por setor. */
@@ -51,7 +54,7 @@ type VisaoDosProcessosProps = {
   processos: ModuloDeProcessos
   /** A janela da trava de arquivos, no Quadro, envia as versões e o relatório. */
   versoes: ModuloDeVersoes
-  /** Quem está na tela, para o "Só os meus". */
+  /** Quem está na tela, para o "Destacar os meus". */
   usuarioId: string
   /** O Quadro mudou (um cartão foi movido): a lista de processos precisa recarregar. */
   aoMudar: () => void
@@ -77,64 +80,48 @@ export function VisaoDosProcessos(props: VisaoDosProcessosProps) {
 const SEM_OPCOES: OpcoesDosFiltros = { setores: [], macroprocessos: [], etapas: [], tipos: [], responsaveis: [], situacoes: [] }
 
 function CorpoDaVisao(props: VisaoDosProcessosProps & { opcoes: OpcoesDosFiltros }) {
-  const { visao, estado, filtros, aoMudarFiltros, usuarioId, mostrar, aoLimparTudo } = props
+  const { visao, estado, filtros, aoMudarMostrar, mostrar, aoLimparTudo } = props
   if (estado.tipo === 'carregando') return visao === 'quadro' ? <QuadroCarregando /> : <TabelaCarregando />
   if (estado.tipo === 'erro') return <ErroAoCarregar alvo="os processos" aoTentarDeNovo={props.aoTentarDeNovo} />
   const portfolio = ehPortfolio(visao, props.agrupar)
-  const { filtrados, visiveis, vazio } = oQueAVisaoMostra(estado.valor.processos, filtros, portfolio, mostrar)
-  if (vazio) return <SemResultado filtros={filtros} usuarioId={usuarioId} aoMudarFiltros={aoMudarFiltros} aoLimparTudo={aoLimparTudo} />
+  const { filtrados, visiveis, vazio, semNaSituacao } = oQueAVisaoMostra(estado.valor.processos, filtros, portfolio, mostrar)
+  if (semNaSituacao && mostrar !== 'todos') return <NenhumProcessoNaSituacao mostrar={mostrar} aoMostrarTodos={() => aoMudarMostrar('todos')} />
+  if (vazio) return <NenhumProcessoComFiltros aoLimpar={aoLimparTudo} />
   const lista = { ...estado.valor, processos: filtrados }
   return <ConteudoDaVisao {...props} lista={lista} visiveis={visiveis} todos={estado.valor.processos} />
 }
 
 type FaixaDaVisaoProps = VisaoDosProcessosProps & { opcoes: OpcoesDosFiltros; portfolio: boolean; desabilitada?: boolean }
 
-// No Quadro, os filtros e o Só os meus; na Lista, o Agrupar por e o Limpar filtros (os filtros ficam no cabeçalho da tabela).
-// Todos | Concluídos só no portfólio (Lista e Quadro por setor).
+// No Quadro, os filtros e o Destacar os meus; na Lista, o Agrupar por e o Limpar filtros (os filtros ficam no cabeçalho da tabela).
+// A Situação só no portfólio (Lista e Quadro por setor).
 function FaixaDaVisao({ visao, opcoes, portfolio, filtros, aoMudarFiltros, mostrar, aoMudarMostrar, desabilitada = false, ...props }: FaixaDaVisaoProps) {
   const naLista = visao === 'lista'
   return (
     <FaixaDeControles forma={formaDeVer({ visao, agrupar: props.agrupar })} aoEscolherForma={props.aoMudarFormaDeVer}
       podeCadastrar={props.podeAlterar} aoCadastrar={props.aoCadastrar} desabilitada={desabilitada}>
       {!naLista && <BotaoDosFiltros opcoes={opcoes} filtros={filtros} aoMudar={aoMudarFiltros} />}
-      {!naLista && props.podeAlterar && <SoOsMeusDoQuadro filtros={filtros} aoMudarFiltros={aoMudarFiltros} usuarioId={props.usuarioId} />}
+      {!naLista && props.podeAlterar && <DestacarOsMeus ligado={props.destacar} aoAlternar={() => props.aoMudarDestacar(!props.destacar)} />}
       {naLista && <AgruparAListaPor agrupar={props.agruparLista} aoMudar={props.aoMudarAgruparLista} />}
-      {portfolio && <TodosOuConcluidos mostrar={mostrar} aoMudar={aoMudarMostrar} />}
+      {portfolio && <SituacaoDaVisao mostrar={mostrar} aoMudar={aoMudarMostrar} />}
       {naLista && temFiltro(filtros) && <BotaoLimparFiltros aoLimpar={() => aoMudarFiltros(SEM_FILTROS)} />}
     </FaixaDeControles>
   )
 }
 
-// Os processos depois dos filtros e, no portfólio, depois de Todos | Concluídos. "Concluídos" sem nenhum concluído também é um
-// resultado vazio por escolha (e o Limpar filtros volta a Todos).
+// Os processos depois dos filtros e, no portfólio, depois da Situação. Uma situação sem nenhum processo (semNaSituacao, contada antes
+// dos filtros) tem a frase própria; com filtros que escondem os que existem, vale a frase dos filtros.
 function oQueAVisaoMostra(processos: ProcessoDaLista[], filtros: Filtros, portfolio: boolean, mostrar: MostrarNoPortfolio) {
   const filtrados = filtrarProcessos(processos, filtros)
   const visiveis = portfolio ? visiveisNoPortfolio(filtrados, mostrar) : filtrados
-  const vazio = visiveis.length === 0 && (temFiltro(filtros) || (portfolio && mostrar === 'concluidos'))
-  return { filtrados, visiveis, vazio }
-}
-
-type SoOsMeusDoQuadroProps = { filtros: Filtros; aoMudarFiltros: (filtros: Filtros) => void; usuarioId: string }
-
-// "Só os meus" é o filtro Responsável com o próprio id (o responsável do processo); a Consulta não tem o botão (ela não é responsável).
-// Fica até o ticket 02 do redesenho-do-quadro, que o troca por "Destacar os meus".
-function SoOsMeusDoQuadro({ filtros, aoMudarFiltros, usuarioId }: SoOsMeusDoQuadroProps) {
-  const ligado = filtros.responsavel === usuarioId
-  return <SoOsMeus ligado={ligado} aoAlternar={() => aoMudarFiltros({ ...filtros, responsavel: ligado ? null : usuarioId })} />
-}
-
-type SemResultadoProps = { filtros: Filtros; usuarioId: string; aoMudarFiltros: (filtros: Filtros) => void; aoLimparTudo: () => void }
-
-// Só o "Só os meus" ligado (sem outro filtro) tem a mensagem própria; com outros filtros vale a dos filtros.
-function SemResultado({ filtros, usuarioId, aoMudarFiltros, aoLimparTudo }: SemResultadoProps) {
-  const soOsMeus = filtros.responsavel === usuarioId && !temFiltro({ ...filtros, responsavel: null })
-  if (soOsMeus) return <NenhumProcessoDoUsuario aoVerTodos={() => aoMudarFiltros(SEM_FILTROS)} />
-  return <NenhumProcessoComFiltros aoLimpar={aoLimparTudo} />
+  const semNaSituacao = portfolio && mostrar !== 'todos' && visiveisNoPortfolio(processos, mostrar).length === 0
+  const vazio = visiveis.length === 0 && (temFiltro(filtros) || (portfolio && mostrar !== 'todos'))
+  return { filtrados, visiveis, vazio, semNaSituacao }
 }
 
 type ConteudoDaVisaoProps = VisaoDosProcessosProps & {
   lista: ListaDeProcessos; todos: ListaDeProcessos['processos']
-  /** O que o portfólio (a Lista) mostra depois de Todos | Concluídos e sem os cancelados. */
+  /** O que o portfólio (a Lista) mostra depois da Situação. */
   visiveis: ListaDeProcessos['processos']
   opcoes: OpcoesDosFiltros
 }
@@ -145,23 +132,21 @@ function ConteudoDaVisao(props: ConteudoDaVisaoProps) {
   return (
     <QuadroDeProcessos lista={lista} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso} podeAlterar={podeAlterar}
       processos={processos} versoes={versoes} aoMudar={aoMudar} agrupar={agrupar} setorFiltrado={filtros.setor} mostrar={props.mostrar}
-      enderecoDosConcluidosNaLista={props.enderecoDosConcluidosNaLista} />
+      destacarDe={props.destacar ? props.usuarioId : null} enderecoDosConcluidosNaLista={props.enderecoDosConcluidosNaLista} />
   )
 }
 
-// Os cancelados seguem a mesma ordenação, no bloco do fim.
 function ListaDosProcessos({ lista, visiveis, todos, idEscolhido, aoAbrir, filtros, mostrar, ordenacao, ...props }: ConteudoDaVisaoProps) {
   const cabecalho = (
     <CabecalhoDaLista opcoes={props.opcoes} filtros={filtros} mostrar={mostrar} ordenacao={ordenacao}
       aoMudarFiltros={props.aoMudarFiltros} aoOrdenar={props.aoOrdenar} />
   )
   const linhas = linhasDaLista(visiveis, todos, ordenacao)
-  const cancelados = mostrar === 'todos' ? linhasDaLista(canceladosDe(lista.processos), todos, ordenacao) : []
   if (props.agruparLista !== 'nenhum') {
     return (
-      <ArvoreDaLista cabecalho={cabecalho} agrupar={props.agruparLista} linhas={linhas} todos={todos} setores={lista.setores} cancelados={cancelados}
+      <ArvoreDaLista cabecalho={cabecalho} agrupar={props.agruparLista} linhas={linhas} todos={todos} setores={lista.setores}
         idEscolhido={idEscolhido} aoAbrir={aoAbrir} modulo={props.versoes} />
     )
   }
-  return <TabelaDeProcessos cabecalho={cabecalho} linhas={linhas} idEscolhido={idEscolhido} aoAbrir={aoAbrir} cancelados={cancelados} />
+  return <TabelaDeProcessos cabecalho={cabecalho} linhas={linhas} idEscolhido={idEscolhido} aoAbrir={aoAbrir} />
 }

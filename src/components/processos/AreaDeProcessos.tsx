@@ -34,6 +34,8 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes, reviso
   const [endereco, irPara] = useEndereco()
   const atual = lerEnderecoDosProcessos(endereco)
   const podeAlterar = usuario.perfil !== 'consulta'
+  // A Consulta não é responsável por processo: o parâmetro destacar do endereço é ignorado para ela.
+  const destacar = podeAlterar && atual.destacar
   const [recemCriado, setRecemCriado] = useState<string | null>(null)
   const cadastrando = podeAlterar && atual.aberto === 'novo'
   const idAberto = atual.aberto === 'novo' ? null : atual.aberto
@@ -74,6 +76,7 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes, reviso
           agrupar={atual.agrupar} aoMudarFormaDeVer={(forma) => irPara(montarEnderecoDosProcessos(comFormaDeVer(atual, forma)))}
           enderecoDosConcluidosNaLista={enderecoDosConcluidosNaLista} mostrar={atual.mostrar} aoLimparTudo={() => irParaVisao({ filtros: SEM_FILTROS, mostrar: 'todos', aberto: null })}
           aoMudarMostrar={(mostrar) => irParaVisao({ mostrar, filtros: { ...atual.filtros, situacao: null }, aberto: null })}
+          destacar={destacar} aoMudarDestacar={(ligar) => irParaVisao({ destacar: ligar, aberto: null })}
           ordenacao={atual.ordenacao} aoOrdenar={(ordenacao) => irParaVisao({ ordenacao, aberto: null })}
           agruparLista={atual.agruparLista} aoMudarAgruparLista={(agruparLista) => irParaVisao({ agruparLista, aberto: null })}
           processos={processos} versoes={versoes} usuarioId={usuario.id} aoMudar={recarregar} />

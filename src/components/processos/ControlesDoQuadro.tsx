@@ -1,7 +1,8 @@
 import type { AgruparListaPor, MostrarNoPortfolio } from '../../processos/enderecoDosProcessos'
 
-const OPCOES_DO_PORTFOLIO: { valor: MostrarNoPortfolio; rotulo: string }[] = [
-  { valor: 'todos', rotulo: 'Todos' }, { valor: 'concluidos', rotulo: 'Concluídos' },
+const OPCOES_DA_SITUACAO: { valor: MostrarNoPortfolio; rotulo: string }[] = [
+  { valor: 'todos', rotulo: 'Todos' }, { valor: 'em_andamento', rotulo: 'Em andamento' }, { valor: 'suspensos', rotulo: 'Suspensos' },
+  { valor: 'concluidos', rotulo: 'Concluídos' }, { valor: 'cancelados', rotulo: 'Cancelados' },
 ]
 
 type ControleDeOpcoesProps<T extends string> = {
@@ -25,21 +26,21 @@ function ControleDeOpcoes<T extends string>({ rotulo, opcoes, escolhida, aoMudar
   )
 }
 
-type TodosOuConcluidosProps = { mostrar: MostrarNoPortfolio; aoMudar: (mostrar: MostrarNoPortfolio) => void }
+type SituacaoDaVisaoProps = { mostrar: MostrarNoPortfolio; aoMudar: (mostrar: MostrarNoPortfolio) => void }
 
-/** "Mostrar: Todos | Concluídos", na Lista e no Quadro por setor (o portfólio). */
-export function TodosOuConcluidos({ mostrar, aoMudar }: TodosOuConcluidosProps) {
-  return <ControleDeOpcoes rotulo="Mostrar" opcoes={OPCOES_DO_PORTFOLIO} escolhida={mostrar} aoMudar={aoMudar} />
+/** "Situação: Todos | Em andamento | Suspensos | Concluídos | Cancelados", na Lista e no Quadro por setor (o portfólio). */
+export function SituacaoDaVisao({ mostrar, aoMudar }: SituacaoDaVisaoProps) {
+  return <ControleDeOpcoes rotulo="Situação" opcoes={OPCOES_DA_SITUACAO} escolhida={mostrar} aoMudar={aoMudar} />
 }
 
-type SoOsMeusProps = { ligado: boolean; aoAlternar: () => void }
+type DestacarOsMeusProps = { ligado: boolean; aoAlternar: () => void }
 
-/** "Só os meus" é o filtro Responsável com o id de quem está na tela; o botão só lê e escreve esse filtro. */
-export function SoOsMeus({ ligado, aoAlternar }: SoOsMeusProps) {
+/** "Destacar os meus" esmaece os cartões dos outros; é independente do filtro Responsável (ADR 0037). */
+export function DestacarOsMeus({ ligado, aoAlternar }: DestacarOsMeusProps) {
   return (
     <button type="button" className={ligado ? 'botao botao-ligado' : 'botao botao-secundario'} aria-pressed={ligado}
       onClick={aoAlternar}>
-      Só os meus
+      Destacar os meus
     </button>
   )
 }

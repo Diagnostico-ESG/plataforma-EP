@@ -66,7 +66,7 @@ test('o concluído sem a data da publicação tem o selo Sem publicação; o pub
   expect(within(await cartaoDe('Publicado')).queryByText('Sem publicação')).toBeNull()
 })
 
-test('"Só os meus" mantém os concluídos do responsável na coluna Concluídos, mas o agrupamento por responsável não os mostra', async () => {
+test('o filtro Responsável mantém os concluídos do responsável na coluna Concluídos, mas o agrupamento por responsável não os mostra', async () => {
   window.location.hash = `#/processos?responsavel=${EU.id}`
   montar([concluido('Pronto', { responsavel: EU }), processo('Meu', { processo: { responsavel: EU } }), concluido('De Outra', {
     responsavel: { id: 'u9', nome: 'Outra Pessoa', fotoUrl: null },

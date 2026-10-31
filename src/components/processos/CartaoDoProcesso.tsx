@@ -19,6 +19,8 @@ type CartaoDoProcessoProps = {
   arrastavel: boolean
   /** O cartão arrastado fica levemente apagado no lugar de origem. */
   apagado: boolean
+  /** O Destacar os meus ligado e o processo é de outra pessoa (ou de ninguém): só a aparência muda, o cartão abre e arrasta como sempre. */
+  esmaecido: boolean
   /**
    * O cartão não repete o que a coluna já diz: fora do Quadro por etapa traz a barra da etapa; por responsável dispensa a
    * linha do responsável; por setor dispensa o selo, porque o setor está na coluna.
@@ -33,7 +35,7 @@ type CartaoDoProcessoProps = {
 }
 
 /** O cartão do Quadro é um link: focável, e Enter abre o painel do processo. Arrastar usa o recurso nativo do navegador. */
-export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagado, agrupar, etapas, nomeDoSetor, aoLevantar, aoBaixar }: CartaoDoProcessoProps) {
+export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagado, esmaecido, agrupar, etapas, nomeDoSetor, aoLevantar, aoBaixar }: CartaoDoProcessoProps) {
   const { id, nome, tipo, situacao } = processo
   const porResponsavel = agrupar === 'responsavel'
   function comecarAArrastar(evento: DragEvent<HTMLAnchorElement>) {
@@ -44,7 +46,7 @@ export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagad
   }
   return (
     // O <a> se arrasta por padrão (leva o endereço): fora dos casos permitidos, draggable="false" a impede.
-    <a id={`cartao-${id}`} className={classesDoCartao(processo, apagado)} href={href} aria-current={escolhido ? 'true' : undefined}
+    <a id={`cartao-${id}`} className={classesDoCartao(processo, apagado, esmaecido)} href={href} aria-current={escolhido ? 'true' : undefined}
       draggable={arrastavel} onDragStart={arrastavel ? comecarAArrastar : undefined} onDragEnd={arrastavel ? aoBaixar : undefined}>
       <span className="cartao-topo">
         {agrupar !== 'setor' && <SeloDoSetor sigla={processo.setorSigla} cor={processo.setorCor ?? 1} nome={nomeDoSetor} />}
@@ -53,6 +55,7 @@ export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagad
         <EtiquetaDoProcesso etiqueta={processo.etiqueta} soIcone />
       </span>
       <span className="cartao-nome">{nome}</span>
+      <AvisoParaLeitorDeTela esmaecido={esmaecido} />
       {agrupar !== 'etapa' && <BarraDeProgresso processo={processo} />}
       {!porResponsavel && <QuemCuida responsavel={processo.responsavel} />}
       <SelosDoCartao processo={processo} hoje={hojeEmBrasilia()} etapas={etapas} />
@@ -61,10 +64,15 @@ export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagad
 }
 
 
+// A cor sozinha não diz que o cartão é de outra pessoa: o leitor de tela ouve o texto escondido.
+function AvisoParaLeitorDeTela({ esmaecido }: { esmaecido: boolean }) {
+  return esmaecido ? <span className="etapa-so-leitor">Processo de outra pessoa.</span> : null
+}
+
 /** Processo parado ganha a faixa vermelha na borda; o cartão arrastado fica apagado. */
-function classesDoCartao(processo: ProcessoDaLista, apagado: boolean): string {
+function classesDoCartao(processo: ProcessoDaLista, apagado: boolean, esmaecido: boolean): string {
   const parado = diasDoProcessoParado(processo, hojeEmBrasilia()) !== null
-  return ['cartao', apagado && 'cartao-apagado', parado && 'cartao-parado'].filter(Boolean).join(' ')
+  return ['cartao', apagado && 'cartao-apagado', esmaecido && 'cartao-esmaecido', parado && 'cartao-parado'].filter(Boolean).join(' ')
 }
 
 /** A linha de quem cuida do processo: ícone de pessoa e o nome, ou "Sem responsável" em cinza. */

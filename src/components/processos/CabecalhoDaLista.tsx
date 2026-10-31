@@ -64,7 +64,7 @@ type FiltroDaColuna = { itens: ItemDoMenu[]; escolhido: string | null }
 
 // O filtro da coluna: "Todos" e as opções, com o valor escolhido marcado; null quando a coluna não filtra.
 function filtroDaColuna({ filtro }: ColunaDoCabecalho, { opcoes, filtros, mostrar, aoMudarFiltros }: Omit<CabecalhoDaListaProps, 'ordenacao'>): FiltroDaColuna | null {
-  if (!filtro || (filtro.nome === 'situacao' && mostrar === 'concluidos')) return null
+  if (!filtro || (filtro.nome === 'situacao' && mostrar !== 'todos')) return null
   const valor = filtros[filtro.nome]
   const escolher = (novo: string | null) => () => aoMudarFiltros({ ...filtros, [filtro.nome]: novo } as Filtros)
   const daOpcao = (opcao: OpcaoDoFiltro) => ({ rotulo: opcao.rotulo, marcado: valor === opcao.valor, aoEscolher: escolher(opcao.valor) })

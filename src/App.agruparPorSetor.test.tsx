@@ -81,13 +81,15 @@ test('com o filtro Setor, só a coluna desse setor', async () => {
   expect(titulos()).toEqual(['TSASetor de Testes A1'])
 })
 
-test('com o Só os meus, as colunas dos setores ativos continuam, mesmo vazias', async () => {
+test('com o Destacar os meus, as colunas e os cartões continuam; o cartão do outro setor fica esmaecido', async () => {
   window.location.hash = '#/processos?agrupar=setor'
   abrir([doSetor('Meu Processo', TSA, { responsavel: EU }), doSetor('Processo Dela', ABC)])
   await cartaoDe('Processo Dela')
-  fireEvent.click(await screen.findByRole('button', { name: 'Só os meus' }))
-  await waitFor(() => expect(screen.queryByText('Processo Dela')).toBeNull())
-  expect(titulos()).toEqual(['TSASetor de Testes A1', 'ABCAssessoria Fictícia0'])
+  fireEvent.click(await screen.findByRole('button', { name: 'Destacar os meus' }))
+  await waitFor(() => expect(window.location.hash).toBe('#/processos?agrupar=setor&destacar=1'))
+  expect((await cartaoDe('Processo Dela')).classList).toContain('cartao-esmaecido')
+  expect((await cartaoDe('Meu Processo')).classList).not.toContain('cartao-esmaecido')
+  expect(titulos()).toEqual(['ABCAssessoria Fictícia1', 'TSASetor de Testes A1'])
 })
 
 test('o agrupamento por setor fica no endereço, e abrir já agrupado mantém', async () => {

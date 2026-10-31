@@ -8,6 +8,7 @@ import { passoDaRolagemNaBorda } from '../../processos/rolagemDoArrastar'
 import type { ListaDeProcessos, ModuloDeProcessos } from '../../processos/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { ColunaDoQuadro } from './ColunaDoQuadro'
+import { AvisoSemProcessoSeu } from './FiltrosDosProcessos'
 import { JanelasDoMovimento } from './JanelasDoMovimento'
 import './Quadro.css'
 
@@ -27,6 +28,8 @@ type QuadroDeProcessosProps = {
   setorFiltrado: string | null
   /** Só no Quadro por setor (o portfólio): todos os concluídos ou só eles. */
   mostrar: MostrarNoPortfolio
+  /** O id de quem está na tela quando o Destacar os meus está ligado: os cartões dos outros ficam esmaecidos. */
+  destacarDe: string | null
   /** A Lista em Concluídos com os filtros do Quadro: o "Ver na Lista" do pé da coluna Concluídos. */
   enderecoDosConcluidosNaLista: string
 }
@@ -42,15 +45,17 @@ function colunasDoAgrupamento(
 }
 
 export function QuadroDeProcessos(props: QuadroDeProcessosProps) {
-  const { lista, idEscolhido, enderecoDoProcesso, podeAlterar, processos, versoes, aoMudar, agrupar, setorFiltrado, mostrar, enderecoDosConcluidosNaLista } = props
+  const { lista, idEscolhido, enderecoDoProcesso, podeAlterar, processos, versoes, aoMudar, agrupar, setorFiltrado, mostrar, destacarDe, enderecoDosConcluidosNaLista } = props
   const colunas = colunasDoAgrupamento(lista, agrupar, setorFiltrado, mostrar)
   // O processo some do Quadro (excluído por outra pessoa) é o mesmo que mudou: o Quadro só recarrega.
   const movimento = useMovimentoDoProcesso(processos, lista.etapas, aoMudar, aoMudar)
   const arrasto = useArrastoDoQuadro(lista.etapas, movimento.mover)
   const nomesDosSetores = Object.fromEntries(lista.setores.map((setor) => [setor.id, setor.nome]))
   const foraDoQuadro = { quantos: quantosForaDoQuadro(lista.processos), enderecoDaLista: enderecoDosConcluidosNaLista }
+  const semProcessoSeu = destacarDe !== null && !colunas.some((coluna) => coluna.processos.some((p) => p.responsavel?.id === destacarDe))
   return (
     <>
+      {semProcessoSeu && <AvisoSemProcessoSeu />}
       <JanelasDoMovimento movimento={movimento} processos={processos} versoes={versoes} aoGravar={aoMudar} />
       {movimento.falha && <p className="cadastros-falha" role="alert">{movimento.falha}</p>}
       <div className="quadro-colunas" onDragOver={(evento) => {
@@ -60,7 +65,7 @@ export function QuadroDeProcessos(props: QuadroDeProcessosProps) {
         {colunas.map((coluna) => (
           <ColunaDoQuadro key={coluna.chave} coluna={coluna} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso}
             podeAlterar={podeAlterar && !movimento.gravando} arrasto={arrasto} agrupar={agrupar} etapas={lista.etapas}
-            foraDoQuadro={foraDoQuadro} nomesDosSetores={nomesDosSetores} />
+            foraDoQuadro={foraDoQuadro} nomesDosSetores={nomesDosSetores} destacarDe={destacarDe} />
         ))}
       </div>
     </>

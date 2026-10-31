@@ -1,6 +1,6 @@
 import { useId } from 'react'
 import { BotaoDaCaixa, OpcaoDaCaixa } from '../OpcaoDaCaixa'
-import type { FiltrosDosProcessos as Filtros } from '../../processos/enderecoDosProcessos'
+import type { FiltrosDosProcessos as Filtros, MostrarNoPortfolio } from '../../processos/enderecoDosProcessos'
 import { SEM_FILTROS } from '../../processos/enderecoDosProcessos'
 import { temFiltro, type OpcaoDoFiltro, type OpcoesDosFiltros } from '../../processos/filtrosDosProcessos'
 
@@ -65,11 +65,22 @@ export function NenhumProcessoComFiltros({ aoLimpar }: { aoLimpar: () => void })
   )
 }
 
-export function NenhumProcessoDoUsuario({ aoVerTodos }: { aoVerTodos: () => void }) {
+/** Acima do quadro (que continua na tela, esmaecido): o Destacar os meus ligado e nenhum processo da pessoa entre os que aparecem. */
+export function AvisoSemProcessoSeu() {
+  return <p className="aviso-do-destaque" role="status">Nenhum processo com você agora.</p>
+}
+
+const FRASE_DA_SITUACAO: Record<Exclude<MostrarNoPortfolio, 'todos'>, string> = {
+  em_andamento: 'Nenhum processo em andamento.', suspensos: 'Nenhum processo suspenso.',
+  concluidos: 'Nenhum processo concluído.', cancelados: 'Nenhum processo cancelado.',
+}
+
+/** A situação escolhida na Lista ou no Quadro por setor não tem processo: a frase dela, no lugar da dos filtros. */
+export function NenhumProcessoNaSituacao({ mostrar, aoMostrarTodos }: { mostrar: Exclude<MostrarNoPortfolio, 'todos'>; aoMostrarTodos: () => void }) {
   return (
     <div className="filtros-sem-resultado">
-      <p className="cadastros-vazio">Nenhum processo com você agora.</p>
-      <button type="button" className="botao botao-secundario" onClick={aoVerTodos}>Ver todos</button>
+      <p className="cadastros-vazio">{FRASE_DA_SITUACAO[mostrar]}</p>
+      <button type="button" className="botao botao-secundario" onClick={aoMostrarTodos}>Mostrar todos</button>
     </div>
   )
 }

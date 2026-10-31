@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { umProcesso } from '../testes/processoDaLista'
-import { canceladosDe, visiveisNoPortfolio } from './portfolio'
+import { visiveisNoPortfolio } from './portfolio'
 
 const PROCESSOS = [
   umProcesso('Andando', {}, 'modelagem'),
@@ -20,12 +20,13 @@ describe('visiveisNoPortfolio', () => {
     expect(nomes(visiveisNoPortfolio(PROCESSOS, 'concluidos'))).toEqual(['Pronto', 'Antigo'])
   })
 
+  test('cada situação mostra só os processos dela, inclusive os cancelados', () => {
+    expect(nomes(visiveisNoPortfolio(PROCESSOS, 'em_andamento'))).toEqual(['Andando'])
+    expect(nomes(visiveisNoPortfolio(PROCESSOS, 'suspensos'))).toEqual(['Parado'])
+    expect(nomes(visiveisNoPortfolio(PROCESSOS, 'cancelados'))).toEqual(['Desistido'])
+  })
+
   test('lista vazia continua vazia', () => {
     expect(visiveisNoPortfolio([], 'concluidos')).toEqual([])
   })
-})
-
-test('canceladosDe devolve só os cancelados', () => {
-  expect(nomes(canceladosDe(PROCESSOS))).toEqual(['Desistido'])
-  expect(canceladosDe([])).toEqual([])
 })

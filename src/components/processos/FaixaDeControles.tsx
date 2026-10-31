@@ -13,7 +13,7 @@ type FaixaDeControlesProps = {
   aoCadastrar: () => void
   /** Enquanto os processos carregam: a faixa já aparece, com os controles da visão desabilitados, para não pular. */
   desabilitada: boolean
-  /** Os controles da forma de ver, depois do separador (Filtros e Só os meus no Quadro; Agrupar por na Lista). */
+  /** Os controles da forma de ver, depois do separador (Filtros e Destacar os meus no Quadro; Agrupar por na Lista). */
   children: ReactNode
 }
 

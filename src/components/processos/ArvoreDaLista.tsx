@@ -12,7 +12,6 @@ import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { LinhaDoProcesso } from './LinhaDoProcesso'
 import { LinhaDosArquivos } from './LinhaDosArquivos'
 import { LinhaDoMacro, LinhaDoSetor } from './LinhasDeGrupo'
-import { CanceladosDaLista } from './TabelaDeProcessos'
 
 type ArvoreDaListaProps = {
   /** O cabeçalho com os menus de ordenação e filtro, o mesmo da tabela. */
@@ -23,14 +22,13 @@ type ArvoreDaListaProps = {
   linhas: LinhaDaLista[]
   todos: ProcessoDaLista[]
   setores: SetorDoQuadro[]
-  cancelados: LinhaDaLista[]
   idEscolhido: string | null
   aoAbrir: (id: string) => void
   modulo: ModuloDeVersoes
 }
 
 /** A Lista agrupada: a mesma tabela, com linhas de macroprocesso e de setor e, em cada processo, os arquivos. */
-export function ArvoreDaLista({ cabecalho, agrupar, linhas, todos, setores, cancelados, idEscolhido, aoAbrir, modulo }: ArvoreDaListaProps) {
+export function ArvoreDaLista({ cabecalho, agrupar, linhas, todos, setores, idEscolhido, aoAbrir, modulo }: ArvoreDaListaProps) {
   const porSetor = agrupar === 'setor'
   const arvorePorMacro = porSetor ? [] : montarArvore(linhas, todos, setores)
   const arvorePorSetor = porSetor ? montarArvorePorSetor(linhas, todos, setores) : []
@@ -40,7 +38,6 @@ export function ArvoreDaLista({ cabecalho, agrupar, linhas, todos, setores, canc
     if (abertos.alternarProcesso(id)) buscar([id])
   }
   const alternarTudo = () => (abertos.tudoAberto ? abertos.fecharTudo() : buscar(abertos.abrirTudo()))
-  const linhaDe = (linha: LinhaDaLista) => <LinhaDoProcesso key={linha.id} linha={linha} escolhida={linha.id === idEscolhido} aoAbrir={aoAbrir} />
   const ramo: RamoProps = { abertos, estados, alternarProcesso, buscar, modulo, idEscolhido, aoAbrir }
   return (
     <>
@@ -53,7 +50,6 @@ export function ArvoreDaLista({ cabecalho, agrupar, linhas, todos, setores, canc
           {arvorePorMacro.map((macro) => <RamoDoMacro key={macro.id} macro={macro} {...ramo} />)}
           {arvorePorSetor.map((setor) => <RamoDoSetorRaiz key={setor.id} setor={setor} {...ramo} />)}
         </tbody>
-        <CanceladosDaLista cancelados={cancelados} linhaDe={linhaDe} />
       </table>
     </>
   )

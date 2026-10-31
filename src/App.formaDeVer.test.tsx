@@ -127,12 +127,12 @@ test('ligar um filtro não muda os controles da faixa nem a ordem deles', async 
   expect(await nomesDosControles()).toEqual(antes)
 })
 
-test('a Consulta vê a faixa sem Cadastrar processo e sem Só os meus, com a forma de ver e os Filtros', async () => {
+test('a Consulta vê a faixa sem Cadastrar processo e sem Destacar os meus, com a forma de ver e os Filtros', async () => {
   montar([processo('Emitir Ofício')], 'consulta')
   await cartaoDe('Emitir Ofício')
   const nomes = await nomesDosControles()
   expect(nomes).not.toContain('Cadastrar processo')
-  expect(nomes).not.toContain('Só os meus')
+  expect(nomes).not.toContain('Destacar os meus')
   expect(nomes).toContain('Filtros')
   expect((await botaoDaFormaDeVer()).textContent).toContain('Quadro por etapa')
 })

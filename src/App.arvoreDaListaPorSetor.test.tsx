@@ -145,14 +145,14 @@ test('a seta abre a linha dos arquivos do processo; só ele é lido', async () =
   expect(ler.mock.calls.map(([id]) => id)).toEqual(['p5'])
 })
 
-test('os cancelados ficam numa lista no fim, fora dos ramos', async () => {
+test('o cancelado só aparece na árvore pela Situação Cancelados', async () => {
   montar()
   await setor('TSA Setor A')
   expect(nomes()).not.toContain('Contrato Velho')
-  fireEvent.click(screen.getByRole('button', { name: 'Mostrar cancelados (1)' }))
-  const bloco = document.querySelector('.bloco-de-cancelados') as HTMLElement
-  expect(within(bloco).getByText('Contrato Velho')).toBeTruthy()
-  expect(grupos()).toHaveLength(5)
+  expect(screen.queryByRole('button', { name: /Mostrar cancelados/ })).toBeNull()
+  fireEvent.click(screen.getByRole('button', { name: 'Cancelados' }))
+  await waitFor(() => expect(grupos()).toHaveLength(2))
+  expect(grupos()[0]).toBe('TSA Setor A, 1 processo')
 })
 
 test('o endereço antigo com busca= abre a Lista inteira, sem campo de busca e sem erro', async () => {

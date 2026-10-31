@@ -24,9 +24,11 @@ type ColunaDoQuadroProps = {
   nomesDosSetores: Record<string, string>
   /** Só a coluna Concluídos do Quadro por etapa: os concluídos fora do Quadro e a Lista que os mostra. */
   foraDoQuadro?: { quantos: number; enderecoDaLista: string }
+  /** O Destacar os meus ligado: o id de quem está na tela; o cartão de outro responsável fica esmaecido. */
+  destacarDe: string | null
 }
 
-export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAlterar, arrasto, agrupar, etapas, nomesDosSetores, foraDoQuadro }: ColunaDoQuadroProps) {
+export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAlterar, arrasto, agrupar, etapas, nomesDosSetores, foraDoQuadro, destacarDe }: ColunaDoQuadroProps) {
   const { levantado } = arrasto
   const tirar = useTirarDoQuadroDaTela()
   const dosConcluidos = agrupar === 'etapa' && coluna.chave === CHAVE_DOS_CONCLUIDOS
@@ -59,6 +61,7 @@ export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAl
             <CartaoDoProcesso key={processo.id} processo={processo} escolhido={processo.id === idEscolhido}
               href={enderecoDoProcesso(processo.id)} arrastavel={podeAlterar && agrupar === 'etapa' && podeArrastar(processo)}
               agrupar={agrupar} etapas={etapas} nomeDoSetor={nomesDosSetores[processo.setorId]} apagado={levantado?.id === processo.id}
+              esmaecido={destacarDe !== null && processo.responsavel?.id !== destacarDe}
               aoLevantar={() => arrasto.levantar(processo)} aoBaixar={arrasto.baixar} />
           )
           if (!dosConcluidos || !podeAlterar || !tirar) return cartao

@@ -3,8 +3,8 @@ import { comFormaDeVer, formaDeVer, lerEnderecoDosProcessos, montarEnderecoDosPr
 import { ORDENACAO_PADRAO } from './ordenacaoDaLista'
 
 test('o caminho dá a visão e o item aberto', () => {
-  expect(lerEnderecoDosProcessos('#/processos')).toEqual({ visao: 'quadro', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa', mostrar: 'todos', ordenacao: ORDENACAO_PADRAO, agruparLista: 'nenhum' })
-  expect(lerEnderecoDosProcessos('#/processos/lista')).toEqual({ visao: 'lista', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa', mostrar: 'todos', ordenacao: ORDENACAO_PADRAO, agruparLista: 'nenhum' })
+  expect(lerEnderecoDosProcessos('#/processos')).toEqual({ visao: 'quadro', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa', mostrar: 'todos', destacar: false, ordenacao: ORDENACAO_PADRAO, agruparLista: 'nenhum' })
+  expect(lerEnderecoDosProcessos('#/processos/lista')).toEqual({ visao: 'lista', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa', mostrar: 'todos', destacar: false, ordenacao: ORDENACAO_PADRAO, agruparLista: 'nenhum' })
   expect(lerEnderecoDosProcessos('#/processos/p1').aberto).toBe('p1')
   expect(lerEnderecoDosProcessos('#/processos/lista/p1')).toMatchObject({ visao: 'lista', aberto: 'p1' })
   expect(lerEnderecoDosProcessos('#/processos/novo').aberto).toBe('novo')
@@ -53,7 +53,7 @@ test('o parâmetro antigo "busca" de um endereço guardado é ignorado e não vo
   const filtros = { ...SEM_FILTROS, setor: 's1' }
   expect(montarEnderecoDosProcessos(lerEnderecoDosProcessos('#/processos/lista?setor=s1&busca=pagar'))).toBe('#/processos/lista?setor=s1')
   expect(lerEnderecoDosProcessos(montarEnderecoDosProcessos({ visao: 'lista', aberto: 'p1', filtros, agrupar: 'etapa' })))
-    .toEqual({ visao: 'lista', aberto: 'p1', filtros, agrupar: 'etapa', mostrar: 'todos', ordenacao: ORDENACAO_PADRAO, agruparLista: 'nenhum' })
+    .toEqual({ visao: 'lista', aberto: 'p1', filtros, agrupar: 'etapa', mostrar: 'todos', destacar: false, ordenacao: ORDENACAO_PADRAO, agruparLista: 'nenhum' })
 })
 
 test('o agrupamento do Quadro vem de agrupar=responsavel; fora do Quadro ou com outro valor é por etapa', () => {
@@ -183,4 +183,32 @@ test('trocar a forma de ver fecha o processo aberto e mantém os filtros', () =>
 test('voltar da Lista ao Quadro tira a situação, que o Quadro não tem', () => {
   const lista = lerEnderecoDosProcessos('#/processos/lista?situacao=suspenso&agrupar=macroprocesso')
   expect(montarEnderecoDosProcessos(comFormaDeVer(lista, 'etapa'))).toBe('#/processos')
+})
+
+test('mostrar aceita as cinco situações na Lista e no Quadro por setor; valor desconhecido vale Todos', () => {
+  const lido = (valor: string) => lerEnderecoDosProcessos(`#/processos/lista?mostrar=${valor}`).mostrar
+  expect(['em_andamento', 'suspensos', 'concluidos', 'cancelados', 'todos'].map(lido))
+    .toEqual(['em_andamento', 'suspensos', 'concluidos', 'cancelados', 'todos'])
+  expect(lido('suspenso')).toBe('todos')
+  expect(lerEnderecoDosProcessos('#/processos?agrupar=setor&mostrar=cancelados').mostrar).toBe('cancelados')
+  expect(lerEnderecoDosProcessos('#/processos?mostrar=cancelados').mostrar).toBe('todos')
+})
+
+test('montar grava a situação escolhida e, com ela, o filtro de situação do cabeçalho fica de fora', () => {
+  const filtros = { ...SEM_FILTROS, situacao: 'suspenso' as const }
+  expect(montarEnderecoDosProcessos({ visao: 'lista', aberto: null, filtros, agrupar: 'etapa', mostrar: 'cancelados', destacar: false }))
+    .toBe('#/processos/lista?mostrar=cancelados')
+  expect(lerEnderecoDosProcessos('#/processos/lista?situacao=suspenso&mostrar=em_andamento').filtros.situacao).toBeNull()
+})
+
+test('destacar: presença do parâmetro liga, só nos quadros; ler e montar são inversos', () => {
+  expect(lerEnderecoDosProcessos('#/processos?destacar=1').destacar).toBe(true)
+  expect(lerEnderecoDosProcessos('#/processos?agrupar=setor&destacar=1').destacar).toBe(true)
+  expect(lerEnderecoDosProcessos('#/processos').destacar).toBe(false)
+  expect(lerEnderecoDosProcessos('#/processos/lista?destacar=1').destacar).toBe(false)
+  const lido = lerEnderecoDosProcessos('#/processos?responsavel=u1&destacar=1')
+  expect(lido.filtros.responsavel).toBe('u1')
+  expect(montarEnderecoDosProcessos(lido)).toBe('#/processos?responsavel=u1&destacar=1')
+  expect(montarEnderecoDosProcessos({ ...lido, destacar: false })).toBe('#/processos?responsavel=u1')
+  expect(montarEnderecoDosProcessos({ ...lido, visao: 'lista' })).toBe('#/processos/lista?responsavel=u1')
 })

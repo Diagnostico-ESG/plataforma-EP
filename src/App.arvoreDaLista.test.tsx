@@ -169,17 +169,16 @@ test('Abrir todos abre todos os níveis e lê os arquivos de todos os processos;
   expect(screen.getByRole('button', { name: 'Abrir todos' })).toBeTruthy()
 })
 
-test('os cancelados ficam numa lista no fim, fora dos ramos, com setor e macroprocesso', async () => {
+test('o cancelado só aparece na árvore pela Situação Cancelados, no ramo do macroprocesso e do setor dele', async () => {
   montar()
   await macro('Macro Um')
   expect(nomes()).not.toContain('Contrato Velho')
-  fireEvent.click(screen.getByRole('button', { name: 'Mostrar cancelados (1)' }))
-  const bloco = document.querySelector('.bloco-de-cancelados') as HTMLElement
-  expect(within(bloco).getByText('Cancelados')).toBeTruthy()
-  const linha = within(bloco).getByText('Contrato Velho').closest('tr') as HTMLElement
-  expect(within(linha).getByText('TSA')).toBeTruthy()
-  expect(within(linha).getByText('Macro Um')).toBeTruthy()
-  expect(grupos()).toHaveLength(5)
+  expect(screen.queryByRole('button', { name: /Mostrar cancelados/ })).toBeNull()
+  fireEvent.click(screen.getByRole('button', { name: 'Cancelados' }))
+  await waitFor(() => expect(grupos()[0]).toBe('Macro Um, 1 processo'))
+  expect(grupos()).toHaveLength(2)
+  fireEvent.click(screen.getByRole('button', { name: 'Abrir todos' }))
+  expect(await screen.findByText('Contrato Velho', { selector: '.cadastros-abrir' })).toBeTruthy()
 })
 
 test('clicar no nome do processo abre o verso; a seta não abre', async () => {
