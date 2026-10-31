@@ -18,3 +18,5 @@
 - [ ] Situação vazia mostra a sua frase ("Nenhum processo cancelado.", "Nenhum processo suspenso." etc.) com [Mostrar todos].
 - [ ] Testes de tela para cada item acima; os testes de "Só os meus" (histórias 169 a 171), "Todos | Concluídos" e "Mostrar cancelados" passam para os controles novos; testes de unidade para ler `destacar` e a Situação do endereço e para o filtro por situação.
 - [ ] `[visual]` O cartão esmaecido se distingue do destacado sem depender só da cor.
+
+Concluído em 2026-10-31 (commit 904449c)

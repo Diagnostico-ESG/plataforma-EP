@@ -1151,3 +1151,4 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 ## 2026-10-31 — /executar-simples (ticket 02 de redesenho-do-quadro)
 
 - **Ocorrência: pre-commit barrou três vezes por timeout de 15 s, em testes diferentes a cada vez (1, 2 e 8 testes).** Os testes falhos passam quando rodados sozinhos; a suíte inteira passou duas vezes fora do hook, com 0 a 5 falhas de tempo. Esperado: o hook passar com a suíte verde. Aconteceu: o commit do ticket 02 ficou pendente (mudanças em stage, nada comitado). Mesma ocorrência já registrada no ticket 01 (pre-commit lento e sensível à carga).
+- **Solução que funcionou (2026-10-31):** com a máquina sobrecarregada (CPU a 87% com Docker, Zoom e Chrome abertos), o pre-commit passou ao rodar o commit com `VITEST_MAX_WORKERS=2` (variável de ambiente, sem mexer em arquivo): 3301 testes verdes. Sugestão para a cópia mestra: documentar essa variável como saída quando o hook estourar o tempo.
