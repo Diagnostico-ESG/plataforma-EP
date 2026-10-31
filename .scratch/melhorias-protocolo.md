@@ -1136,3 +1136,8 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 
 - **Classificação de pacote misto, dividido.** Esperado: o tipo mais rigoroso. Aconteceu: classificado como mudança em funcionalidade existente; com a confirmação do usuário, os ajustes visuais seguiram como ajuste pequeno (`/executar-simples`) e as duas mudanças de regra ("Destacar os meus", "Mostrar" com Cancelados) foram para o `/planejar` do passo 3, que já mexe na mesma faixa do Quadro. Sugestão: o `/demanda` prever a divisão de um pacote misto quando parte dele cabe num planejamento já previsto.
 - **Ocorrência: item da demanda já feito.** O `decisoes.md` pedia "decidir os nomes Iniciado/Finalizado", mas o código e o teste de `rotulos.ts` já os tinham desde a funcionalidade 14. Conferir no código evitou um ajuste à toa.
+
+## 2026-10-31 — /planejar (redesenho-do-quadro)
+
+- **Item não testado: passo "Iniciativa grande" recusado pelo usuário.** Esperado: propor o `wayfinder` quando a funcionalidade passa de cinco entregas ou tem várias telas. Aconteceu: proposto junto com a alternativa de seguir como uma funcionalidade (como o `decisoes.md` já previa); o usuário escolheu uma funcionalidade só, e o `to-tickets` dividiu em 5 tickets (o usuário pediu 5 no lugar dos 8 propostos).
+- **Item não testado: linha `Em revisão desde` numa spec com várias `Entregue em`.** Esperado: a linha logo abaixo da marca de entrega. Aconteceu: gravada abaixo da última `Entregue em` de `processos-etapas`, no mesmo commit da spec. A mudança foi escrita como seção nova no alto da spec, no padrão das mudanças anteriores, e não em `.scratch/redesenho-do-quadro/spec.md`; a pasta da funcionalidade guarda só a sabatina e os tickets.
