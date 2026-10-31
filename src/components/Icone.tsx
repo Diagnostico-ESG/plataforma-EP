@@ -38,6 +38,15 @@ const DESENHOS = {
     </>
   ),
   mais: <path d="M12 5v14M5 12h14" />,
+  sino: <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0" />,
+  ajuda: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01" />
+    </>
+  ),
+  filtro: <path d="M3 5h18l-7 8v6l-4-2v-4z" />,
+  seta: <path d="M6 9l6 6 6-6" />,
   fechar: <path d="M6 6l12 12M18 6L6 18" />,
   relogio: (
     <>

@@ -1,39 +1,39 @@
-import { Icone, type NomeIcone } from '../Icone'
-import { temTela, type AreaComTela, type AreaDoSistema } from './areas'
+import { Icone } from '../Icone'
+import { ICONE_DA_AREA, type AreaDoSistema } from './areas'
 
-type ItemDaFaixa = { area: AreaDoSistema; icone: NomeIcone; rotulo: string }
+type ItemDaFaixa = { area: AreaDoSistema; rotulo: string }
 
 const ITENS: ItemDaFaixa[] = [
-  { area: 'quadro', icone: 'quadro', rotulo: 'Quadro' },
-  { area: 'lista', icone: 'lista', rotulo: 'Lista' },
-  { area: 'setores', icone: 'setores', rotulo: 'Setores' },
-  { area: 'painel', icone: 'painel', rotulo: 'Painel' },
-  { area: 'administracao', icone: 'administracao', rotulo: 'Administração' },
+  { area: 'processos', rotulo: 'Processos' },
+  { area: 'setores', rotulo: 'Setores' },
+  { area: 'painel', rotulo: 'Painel' },
+  { area: 'administracao', rotulo: 'Administração' },
+  { area: 'ajuda', rotulo: 'Ajuda' },
 ]
 
 type FaixaLateralProps = {
   areaAtual: AreaDoSistema
   mostrarAdministracao: boolean
-  aoIrPara: (area: AreaComTela) => void
+  aoIrPara: (area: AreaDoSistema) => void
 }
 
-// Quadro, Lista, Setores e Administração têm tela; as outras áreas ganham tela na sua funcionalidade.
+// A Ajuda fica no pé da faixa (.faixa-item-ajuda), como na proposta 6.
 export function FaixaLateral({ areaAtual, mostrarAdministracao, aoIrPara }: FaixaLateralProps) {
   const itens = mostrarAdministracao ? ITENS : ITENS.filter((item) => item.area !== 'administracao')
   return (
     <nav className="faixa-lateral" aria-label="Áreas do sistema">
       <span className="faixa-marca" aria-hidden="true">EP</span>
-      {itens.map(({ area, icone, rotulo }) => (
+      {itens.map(({ area, rotulo }) => (
         <button
           key={area}
           type="button"
-          className="faixa-item"
+          className={area === 'ajuda' ? 'faixa-item faixa-item-ajuda' : 'faixa-item'}
           aria-label={rotulo}
           title={rotulo}
           aria-current={area === areaAtual ? 'page' : undefined}
-          onClick={temTela(area) ? () => aoIrPara(area) : undefined}
+          onClick={() => aoIrPara(area)}
         >
-          <Icone nome={icone} />
+          <Icone nome={ICONE_DA_AREA[area]} />
         </button>
       ))}
     </nav>

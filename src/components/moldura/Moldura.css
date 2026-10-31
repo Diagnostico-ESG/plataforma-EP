@@ -92,39 +92,8 @@
   text-overflow: ellipsis;
 }
 
-/* Quadro | Lista: o segmento padrão da identidade (contêiner cinza, escolhida em azul-claro). */
-.alternancia {
-  display: inline-flex;
-  padding: 2px;
-  border: 1px solid var(--linha);
-  border-radius: var(--canto-botao);
-  background: var(--fundo);
-}
-
-.alternancia-opcao {
-  padding: 3px var(--esp-3);
-  border: 0;
-  border-radius: var(--canto-selo);
-  background: transparent;
-  color: var(--texto-2);
-  font-size: var(--tam-rotulo);
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.alternancia-opcao[aria-pressed='true'] {
-  background: var(--azul-claro);
-  color: var(--azul-escuro);
-}
-
-/* No alto contraste do Windows o fundo some e a opção escolhida ficaria igual à outra. */
-@media (forced-colors: active) {
-  .alternancia-opcao[aria-pressed='true'] {
-    outline: 1px solid CanvasText;
-  }
-}
-
 .barra-acoes {
+  align-items: center;
   display: flex;
   gap: var(--esp-1);
   margin-left: auto;
@@ -191,4 +160,45 @@
   background: var(--atraso-fundo);
   color: var(--atraso-texto);
   font-size: var(--tam-secundario);
+}
+
+/* A Ajuda fica no pé da faixa lateral, como na proposta 6. */
+.faixa-item-ajuda {
+  margin-top: auto;
+  margin-bottom: var(--esp-3);
+}
+
+/* Busca e sino: botões de ícone em cinza, com o aviso "Em breve" preso embaixo. */
+.botao-em-breve {
+  position: relative;
+  display: inline-flex;
+  color: var(--texto-2);
+}
+
+.botao-em-breve-aviso {
+  position: absolute;
+  top: calc(100% + var(--esp-1));
+  right: 0;
+  z-index: 10;
+  padding: var(--esp-1) var(--esp-2);
+  border-radius: var(--canto-botao);
+  background: var(--grafite);
+  color: var(--folha);
+  font-size: var(--tam-secundario);
+  white-space: nowrap;
+}
+
+/* Painel e Ajuda, enquanto não existem: só o aviso, no recuo da área de trabalho. */
+.tela-em-breve {
+  padding: var(--esp-6) var(--esp-5);
+}
+
+.tela-em-breve-titulo {
+  font-size: var(--tam-tela);
+  font-weight: 700;
+}
+
+.tela-em-breve-texto {
+  margin-top: var(--esp-2);
+  color: var(--texto-2);
 }

@@ -131,10 +131,11 @@ test('clicar no cartão abre o painel pelo endereço; [Cadastrar processo] leva 
   await waitFor(() => expect(window.location.hash).toBe('#/processos/novo'))
 })
 
-test('o item Quadro da faixa lateral leva a #/processos', async () => {
+test('o item Processos da faixa lateral, sem forma de ver guardada, leva a #/processos', async () => {
   window.location.hash = '#/setores'
+  sessionStorage.clear()
   montar()
-  fireEvent.click(await screen.findByRole('button', { name: 'Quadro' }))
+  fireEvent.click(await screen.findByRole('button', { name: 'Processos' }))
   await waitFor(() => expect(window.location.hash).toBe('#/processos'))
   expect(await screen.findByText('Nenhum processo cadastrado ainda.')).toBeTruthy()
 })

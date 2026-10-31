@@ -59,8 +59,6 @@ async function linhas(): Promise<string[][]> {
     within(linha).queryAllByRole(linha.querySelector('th') ? 'columnheader' : 'cell').map((celula) => celula.textContent ?? ''))
 }
 
-const alternancia = () => within(screen.getByRole('group', { name: 'Forma de ver os processos' }))
-const faixa = () => within(screen.getByRole('navigation', { name: 'Áreas do sistema' }))
 
 test('as colunas, a ordem pelo nome, todas as situações e o subprocesso logo depois do pai', async () => {
   montar()
@@ -118,29 +116,6 @@ test('erro ao carregar: a mensagem e [Tentar de novo], que carrega de novo', asy
 test('vazio: o estado vazio de sempre', async () => {
   montar({ processos: [] })
   expect(await screen.findByText('Nenhum processo cadastrado ainda.')).toBeTruthy()
-})
-
-test('a alternância Quadro | Lista troca a visão e marca a escolhida', async () => {
-  window.location.hash = '#/processos'
-  montar()
-  await screen.findAllByRole('region')
-  expect(alternancia().getByRole('button', { name: 'Quadro' }).getAttribute('aria-pressed')).toBe('true')
-  fireEvent.click(alternancia().getByRole('button', { name: 'Lista' }))
-  await waitFor(() => expect(window.location.hash).toBe('#/processos/lista'))
-  expect(await screen.findByRole('table')).toBeTruthy()
-  expect(alternancia().getByRole('button', { name: 'Lista' }).getAttribute('aria-pressed')).toBe('true')
-  fireEvent.click(alternancia().getByRole('button', { name: 'Quadro' }))
-  await waitFor(() => expect(window.location.hash).toBe('#/processos'))
-})
-
-test('o item Lista da faixa lateral leva à Lista e fica marcado', async () => {
-  window.location.hash = '#/setores'
-  montar()
-  await screen.findByRole('navigation', { name: 'Áreas do sistema' })
-  fireEvent.click(faixa().getByRole('button', { name: 'Lista' }))
-  await waitFor(() => expect(window.location.hash).toBe('#/processos/lista'))
-  expect(await screen.findByRole('table')).toBeTruthy()
-  expect(faixa().getByRole('button', { name: 'Lista' }).getAttribute('aria-current')).toBe('page')
 })
 
 test('Integrante cadastra a partir da Lista; a Consulta vê a Lista sem o botão', async () => {

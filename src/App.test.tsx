@@ -15,18 +15,18 @@ async function abrirLogado() {
   await screen.findByRole('heading', { name: 'Processos' })
 }
 
-test('abre no Quadro de processos, marcado na navegação', async () => {
+test('abre em Processos, marcado na navegação', async () => {
   await abrirLogado()
   const navegacao = screen.getByRole('navigation', { name: 'Áreas do sistema' })
-  const quadro = within(navegacao).getByRole('button', { name: 'Quadro' })
+  const quadro = within(navegacao).getByRole('button', { name: 'Processos' })
   expect(quadro.getAttribute('aria-current')).toBe('page')
 })
 
-test('para quem não é administrador, a navegação tem cinco áreas, sem Administração', async () => {
+test('para quem não é administrador, a navegação não tem Administração', async () => {
   await abrirLogado()
   const navegacao = screen.getByRole('navigation', { name: 'Áreas do sistema' })
   const rotulos = Array.from(navegacao.querySelectorAll('button')).map((b) => b.getAttribute('aria-label'))
-  expect(rotulos).toEqual(['Quadro', 'Lista', 'Setores', 'Painel'])
+  expect(rotulos).toEqual(['Processos', 'Setores', 'Painel', 'Ajuda'])
 })
 
 test('sem processos, mostra o aviso de vazio com a ação de cadastrar', async () => {

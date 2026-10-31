@@ -1,12 +1,8 @@
-export type AreaDoSistema = 'quadro' | 'lista' | 'setores' | 'painel' | 'administracao'
-// As demais áreas ganham tela na sua funcionalidade; até lá o botão delas não faz nada.
-export type AreaComTela = Extract<AreaDoSistema, 'quadro' | 'lista' | 'setores' | 'administracao'>
+import type { NomeIcone } from '../Icone'
 
-export function temTela(area: AreaDoSistema): area is AreaComTela {
-  return area === 'quadro' || area === 'lista' || area === 'setores' || area === 'administracao'
-}
+/** Processos é a área do Quadro e da Lista; Painel e Ajuda têm por enquanto só a tela "Em breve". */
+export type AreaDoSistema = 'processos' | 'setores' | 'painel' | 'administracao' | 'ajuda'
 
-/** Quadro e Lista são as duas formas de ver a área de processos. */
-export function ehAreaDeProcessos(area: AreaDoSistema): area is 'quadro' | 'lista' {
-  return area === 'quadro' || area === 'lista'
+export const ICONE_DA_AREA: Record<AreaDoSistema, NomeIcone> = {
+  processos: 'quadro', setores: 'setores', painel: 'painel', administracao: 'administracao', ajuda: 'ajuda',
 }

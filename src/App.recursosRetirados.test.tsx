@@ -31,7 +31,7 @@ test.each(['#/reunioes', '#/reunioes/r1'])('o endereço antigo %s abre o Quadro'
   montarNosCadastros()
   expect(await screen.findByRole('region', { name: 'Processos' })).toBeTruthy()
   const faixa = within(screen.getByRole('navigation', { name: 'Áreas do sistema' }))
-  expect(faixa.getByRole('button', { name: 'Quadro' }).getAttribute('aria-current')).toBe('page')
+  expect(faixa.getByRole('button', { name: 'Processos' }).getAttribute('aria-current')).toBe('page')
 })
 
 test('o setor aberto não tem a seção de reuniões', async () => {

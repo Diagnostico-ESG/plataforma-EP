@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { UsuarioAtual } from '../../acesso/tipos'
 import type { ModuloDeCadastros } from '../../cadastros/tipos'
 import { useCarregamento } from '../../hooks/useCarregamento'
@@ -8,6 +8,7 @@ import {
   lerEnderecoDosProcessos, montarEnderecoDosProcessos, SEM_FILTROS, type EnderecoDosProcessos,
 } from '../../processos/enderecoDosProcessos'
 import type { ModuloDeProcessos } from '../../processos/tipos'
+import { lembrarFormaDeVer } from '../../processos/ultimaFormaDeVer'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { AvisoDoQuadro } from './AvisoDoQuadro'
@@ -43,6 +44,9 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes, reviso
     visao: 'lista', aberto: null, filtros: { ...atual.filtros, situacao: null }, agrupar: 'etapa', mostrar: 'concluidos',
   })
   const tirada = useTirarDoQuadro(processos, recarregar)
+  // O item Processos da faixa lateral volta a esta forma de ver (com os filtros), sem o processo aberto.
+  const formaDeVerAtual = montarEnderecoDosProcessos({ ...atual, aberto: null })
+  useEffect(() => lembrarFormaDeVer(formaDeVerAtual), [formaDeVerAtual])
 
   function fechar() {
     setRecemCriado(null)
