@@ -2,6 +2,8 @@
 
 Status: ready-for-agent
 
+**Redesenho do Quadro (mudança de 2026-10-31, seção abaixo).** A funcionalidade 18, `redesenho-do-quadro` (ADR 0037), deixa o Quadro igual à proposta 6 e o verso igual à verso-3: faixa de controles com "Quadro ▾", Linhas, Filtros e "Destacar os meus" (no lugar de "Só os meus"), controle Situação na Lista e no Quadro por setor, barra de cima e faixa lateral novas, ícone por etapa e verso enxuto com a miniatura do fluxograma. Onde esta spec falar de "Agrupar por" no Quadro, "Só os meus", "Todos | Concluídos", "Mostrar cancelados" ou do Quadro | Lista na barra, vale a seção "Redesenho do Quadro".
+
 **Responsável inicial por etapa (mudança de 2026-10-30, seção abaixo).** A funcionalidade 17, `responsavel-inicial-por-etapa` (ADR 0036), troca "quem move vira o responsável" pelo responsável inicial de cada etapa, definido no Catálogo de etapas. Onde esta spec disser que quem move passa a ser o responsável, vale a seção "Responsável inicial por etapa".
 
 **Lista sem busca e por Setor (mudança de 2026-10-30, spec própria).** `.scratch/lista-por-setor/spec.md` tira a busca pelo nome da Lista e acrescenta "Agrupar por: Setor" (setor → macroprocesso → processo). Onde esta spec falar da busca ou só do agrupamento por Macroprocesso, vale aquela.
@@ -17,6 +19,215 @@ Status: ready-for-agent
 **Como resolvia antes de 2026-10-23.** A equipe registrava o andamento etapa por etapa, da Modelagem piloto em diante, num caminho que o administrador configura no catálogo de etapas. A área Processos mostra o trabalho vivo num Quadro, com uma coluna por etapa, e o arquivo completo numa Lista com busca pelo nome e filtros; ao abrir um processo, o **verso do cartão**, uma janela central em duas colunas, mostra primeiro o que há para fazer agora (a etapa atual, quem cuida dela e um único botão principal), depois o caminho de etapas e os arquivos, e ao lado o contexto do processo; o que é raro (histórico, editar, reclassificar, suspender, cancelar, excluir) fica num menu. No Quadro, cada cartão mostra de relance onde o processo está (uma barra com um pedaço por etapa) e só ganha selo quando há algo a dizer (processo parado, relatório pendente, etapa sem responsável, reunião próxima, versão, subprocessos); arrastar o cartão para a coluna seguinte conclui a etapa, e a equipe pode agrupar o Quadro por responsável ou ver só os processos que estão com ela. O banco impõe a sequência das etapas, a situação do processo, as regras de reclassificação e o registro de cada mudança no histórico. As funcionalidades seguintes (reuniões, documentos, revisões, prazos e painel) se apoiam nesse andamento.
 
 Decisões de origem: `.scratch/processos-etapas/sabatina.md` (sabatina de 2026-10-13, três rodadas), `CONTEXT.md` (seções "Setores" e "Processos") e ADR 0004 (mudar o catálogo muda o caminho dos processos em andamento). Mudança de 2026-10-18 (parte 1 da iniciativa experiencia-do-quadro, `.scratch/experiencia-do-quadro/sabatina-parte-1.md`, ADR 0013): saem as etapas do setor, a coluna "Aguardando o setor", os responsáveis do setor e o nível do catálogo; a primeira etapa passa a se chamar Modelagem piloto; o processo ganha a data da reunião (spec de `reunioes`). Mudança de 2026-10-18 (parte 2, `.scratch/experiencia-do-quadro/sabatina-parte-2.md`, ADR 0014): resolver a etapa atual (concluir, dispensar ou registrar como realizada anteriormente) já **avança**, ou seja, inicia a próxima etapa pendente com o responsável escolhido na mesma janela; voltar também escolhe o responsável; [Assumir] em etapa sem responsável; quem enviou a versão mais recente não pode ser escolhido como responsável da Revisão interna. Mudança de 2026-10-19 (parte 3, "Verso do cartão", `.scratch/experiencia-do-quadro/sabatina-parte-3.md`, sem ADR nem mudança no banco): o painel lateral vira o verso do cartão, uma janela central em duas colunas com o cartão "Agora"; o Novo processo, o Editar e o Histórico abrem dentro dela; a Lista ganha busca pelo nome. Mudança de 2026-10-19 (parte 4, "Cartão do Quadro", `.scratch/experiencia-do-quadro/sabatina-parte-4.md`, sem ADR): o cartão do Quadro ganha a barra de progresso e os selos; arrastar o cartão para a coluna de destino abre a janela de avanço da parte 2; o Quadro ganha "Agrupar por: Etapa | Responsável" e "Só os meus"; a view `processos_com_andamento` ganha campos, por migração não destrutiva; `CONTEXT.md` ganha "Processo parado". Mudança de 2026-10-23 ("Anotações do processo", `.scratch/processos-etapas/sabatina-anotacoes.md`, ADR 0021): o verso ganha, no alto da coluna direita, as **Anotações**, um texto livre e único por processo, guardado sozinho enquanto se escreve, sem histórico, com recusa quando outra pessoa alterou antes; `CONTEXT.md` ganha "Anotações".
+
+## Redesenho do Quadro (mudança de 2026-10-31)
+
+Passo 3 de `.scratch/proposta-visual/decisoes.md`, planejado no `/planejar` modo completo (`redesenho-do-quadro`); decisões em `.scratch/redesenho-do-quadro/sabatina.md` e no ADR 0037 ("Destacar os meus" esmaece sem filtrar, no lugar das histórias 169 a 171 da parte 4). Referência visual: `.scratch/proposta-visual/proposta-6.html` (Quadro e moldura), `verso-3.html` (verso) e o controle Situação de `lista-e-cadastros.html`, com as medidas de `.scratch/identidade-visual.md` (base 14px). `CONTEXT.md` sem mudança. Não muda o banco. Vale sobre o resto desta spec no que divergir.
+
+**Como resolve o problema.** O Quadro de hoje se reorganiza sozinho: ligar "Só os meus" ou agrupar por setor faz aparecer controles novos, "Cadastrar processo" desce de linha e o quadro inteiro pula; os cinco filtros ficam soltos num bloco; o Quadro | Lista aparece em dois lugares; e "Só os meus" esconde o resto da equipe, tirando a vista do quadro inteiro. O verso junta muita coisa em duas colunas, sem a imagem do fluxo. Com esta mudança, os controles do Quadro ficam numa faixa de altura fixa, em que só a troca da forma de ver muda o que aparece: "Quadro ▾" escolhe entre os três quadros e a Lista, as **Linhas** separam o Quadro por etapa em faixas por setor ou por responsável, os filtros ficam atrás de um botão com contador, e **Destacar os meus** esmaece os cartões dos outros sem escondê-los. Na Lista, uma pergunta só, **Situação**, diz quais processos aparecem, inclusive os cancelados. Cada etapa ganha um ícone. O verso fica enxuto, com a miniatura do fluxograma da versão mais recente, a lista dos arquivos dela e as Anotações com o dobro do espaço, sem crescer além de 880 × 740.
+
+### O que deixa de valer no resto desta spec
+
+- "Agrupar por: Etapa | Responsável | Setor" do Quadro (histórias 164 e seguintes da parte 4 e a visualização por setores): a escolha passa para o menu "Quadro ▾"; os três quadros continuam como são.
+- "Só os meus" (histórias 169 a 171): vira "Destacar os meus" (ADR 0037). O filtro Responsável continua e deixa de ser o mesmo que o botão.
+- "Mostrar: Todos | Concluídos" (Lista e Quadro por setor) e a linha "Mostrar cancelados (N)" no pé da Lista: viram o controle Situação.
+- O Quadro | Lista da barra de cima e os ícones Quadro e Lista da faixa lateral: viram o item Processos da faixa e o menu "Quadro ▾".
+- A legenda das etiquetas na barra do Quadro (ajuste de 2026-10-30) vai para a ponta direita da faixa de controles.
+- O verso em duas colunas (trabalho à esquerda, contexto à direita): vira o verso enxuto da verso-3.
+
+### Histórias de usuário
+
+#### Faixa de controles do Quadro
+
+1. Como integrante do EP, quero os controles do Quadro numa faixa branca de 56px, colada embaixo da barra de cima e separada do quadro por uma linha, para achar tudo sempre no mesmo lugar.
+2. Como integrante do EP, quero que a faixa tenha, nesta ordem, [Cadastrar processo], "Quadro ▾", Linhas (só no Quadro por etapa), um separador, [Filtros], [Destacar os meus] e, na ponta direita, a legenda das etiquetas, para ler a faixa da ação principal até a legenda.
+3. Como integrante do EP, quero que ligar ou desligar um filtro ou "Destacar os meus" não mude a altura da faixa nem tire nenhum controle do lugar, para não clicar no botão errado depois de um pulo.
+4. Como integrante do EP, quero que [Cadastrar processo] seja o único botão em azul cheio da faixa, e que o que está ligado ou escolhido apareça em azul-claro com texto azul, para distinguir a ação principal do que está ligado.
+5. Como integrante do EP, quero que, em telas estreitas, a faixa continue com uma linha só e, se faltar espaço, a legenda saia antes dos controles, para o quadro não descer.
+
+#### Forma de ver ("Quadro ▾")
+
+6. Como integrante do EP, quero o botão "Quadro ▾", com o nome da forma de ver escolhida, que abre um menu com Quadro por etapa, Quadro por responsável, Quadro por setor e Lista, para escolher como ver os processos num lugar só.
+7. Como integrante do EP, quero que o menu marque a forma escolhida, abra e feche pelo teclado (Enter, setas e Esc) e devolva o foco ao botão ao fechar, para usá-lo sem mouse.
+8. Como integrante do EP, quero que a forma de ver continue no endereço da página, como hoje, para voltar, recarregar ou compartilhar a mesma visão.
+9. Como integrante do EP, quero que um endereço antigo, com o agrupamento de hoje, abra a mesma forma de ver, para os links já guardados continuarem valendo.
+10. Como integrante do EP, quero que o Quadro por responsável e o Quadro por setor continuem como são hoje, só escolhidos pelo menu, para não perder as visões que a equipe já usa.
+11. Como integrante do EP, quero que a Lista também mostre a faixa, com "Quadro ▾" escolhendo "Lista", e os controles próprios dela (Agrupar por, Situação), para trocar de forma de ver da mesma maneira em todas.
+
+#### Linhas
+
+12. Como integrante do EP, quero o interruptor "Linhas: Nenhuma | Setor | Responsável" no Quadro por etapa, para separar os cartões em faixas sem perder as colunas das etapas.
+13. Como integrante do EP, quero que "Nenhuma" seja o padrão e mostre o Quadro por etapa de hoje.
+14. Como integrante do EP, quero que só apareçam as linhas que têm algum cartão depois dos filtros, para não rolar por faixas vazias.
+15. Como integrante do EP, quero, nas linhas por setor, uma linha por setor em ordem de sigla, com o selo da sigla no cabeçalho (o nome do setor ao passar o mouse e para o leitor de tela) e a contagem de cartões, para ver o andamento de cada setor.
+16. Como integrante do EP, quero que, nas linhas por setor, o selo saia dos cartões, porque a linha já diz o setor.
+17. Como integrante do EP, quero, nas linhas por responsável, uma linha por pessoa em ordem alfabética, com "Sem responsável" por último, para ver o trabalho de cada um nas etapas.
+18. Como integrante do EP, quero que a minha linha se chame "Você", e que a de quem foi desativado tenha a pílula "Inativo".
+19. Como integrante do EP, quero que, nas linhas por responsável, a linha do responsável saia dos cartões, porque a linha já diz quem é.
+20. Como integrante do EP, quero recolher e abrir cada linha pela setinha do cabeçalho, para olhar só algumas; ao recarregar, todas voltam abertas.
+21. Como integrante do EP, quero que as colunas das etapas continuem alinhadas em todas as linhas, com o cabeçalho das etapas (ícone, nome e contagem) uma vez só no alto, para ler a matriz sem me perder.
+22. Como integrante do EP, quero arrastar um cartão para outra coluna da mesma linha para movê-lo, como no quadro sem linhas.
+23. Como integrante do EP, quero que soltar um cartão em outra linha não mude nada e mostre um aviso curto ("Solte o cartão na mesma linha."), para não trocar setor ou responsável sem querer.
+24. Como integrante do EP, quero que a coluna Concluídos apareça nas linhas, com a mesma regra dos 30 dias e o Tirar do Quadro.
+25. Como integrante do EP, quero que a escolha das Linhas fique no endereço da página, para voltar, recarregar ou compartilhar a mesma visão.
+26. Como integrante do EP, quero que o processo movido para outra etapa continue na mesma linha por setor e, nas linhas por responsável, vá para a linha do responsável inicial da etapa de destino (ou Sem responsável), como a regra do responsável manda.
+
+#### Filtros
+
+27. Como integrante do EP, quero o botão [Filtros] com um contador de quantos filtros estão ligados, para saber de relance que o quadro está filtrado.
+28. Como integrante do EP, quero que o botão abra um painel preso a ele com os cinco filtros de hoje (Setor, Macroprocesso, Etapa atual, Tipo, Responsável) e "Limpar filtros", para filtrar sem ocupar a faixa.
+29. Como integrante do EP, quero que o painel feche com Esc, com um clique fora ou pelo próprio botão, e que o foco volte ao botão, para usá-lo pelo teclado.
+30. Como integrante do EP, quero que o filtro se aplique assim que escolho a opção, sem botão de aplicar, como hoje.
+31. Como integrante do EP, quero que o botão fique em azul-claro quando há filtro ligado, e que sem filtro não mostre contador.
+32. Como integrante do EP, quero que os filtros continuem no endereço da página e que "Nenhum processo com estes filtros." com [Limpar filtros] continue aparecendo quando nada sobra.
+33. Como integrante do EP, quero que os filtros valham do mesmo jeito nos três quadros.
+
+#### Destacar os meus (ADR 0037)
+
+34. Como integrante do EP, quero o botão [Destacar os meus], que esmaece os cartões em que não sou o responsável do processo, sem tirá-los da tela, para ver o meu trabalho sem perder o quadro inteiro.
+35. Como integrante do EP, quero desligá-lo com outro clique, e que ligado ele apareça em azul-claro e seja anunciado como pressionado.
+36. Como integrante do EP, quero que os cartões esmaecidos continuem abrindo o verso e, quando eu puder, sendo arrastados, para não precisar desligar o destaque para mexer neles.
+37. Como integrante do EP, quero que "Destacar os meus" e o filtro Responsável sejam independentes: com o filtro em outra pessoa e o destaque ligado, todos os cartões que sobram ficam esmaecidos.
+38. Como integrante do EP, quero que, sem nenhum processo meu entre os que aparecem, todos os cartões fiquem esmaecidos e apareça o aviso curto "Nenhum processo com você agora.", para não achar que a tela quebrou.
+39. Como integrante do EP, quero que o destaque valha no Quadro por etapa (com ou sem Linhas), no Quadro por responsável e no Quadro por setor.
+40. Como integrante do EP, quero que o destaque fique no endereço da página, como os filtros.
+41. Como integrante do EP, quero que o leitor de tela diga, no cartão esmaecido, que ele é de outra pessoa (o nome do responsável já está no cartão), sem depender só da cor.
+
+#### Situação (Lista e Quadro por setor)
+
+42. Como integrante do EP, quero, na Lista, o controle "Situação: Todos | Em andamento | Suspensos | Concluídos | Cancelados", para escolher quais processos aparecem com uma pergunta só.
+43. Como integrante do EP, quero que "Todos" seja o padrão e mostre todos menos os cancelados, porque o cancelado só aparece quando pedido.
+44. Como integrante do EP, quero que "Cancelados" mostre só os cancelados, com o selo da situação em destaque, e que sai a linha "Mostrar cancelados (N)" do pé da tabela.
+45. Como integrante do EP, quero que "Em andamento", "Suspensos" e "Concluídos" mostrem só os processos dessa situação, também na árvore por macroprocesso e por setor.
+46. Como integrante do EP, quero que a escolha fique no endereço da página e que o endereço antigo com "Concluídos" continue abrindo os concluídos.
+47. Como integrante do EP, quero que uma situação sem processos mostre a frase da situação ("Nenhum processo cancelado.", "Nenhum processo suspenso." e assim por diante) com [Mostrar todos], e não a frase dos filtros.
+48. Como integrante do EP, quero que o Quadro por setor use o mesmo controle Situação no lugar de "Todos | Concluídos", com as mesmas regras.
+
+#### Ícone por etapa
+
+49. Como integrante do EP, quero que cada etapa tenha um ícone, ao lado do nome no cabeçalho da coluna, no cabeçalho das Linhas e na trilha do verso, para reconhecer a etapa de relance.
+50. Como integrante do EP, quero que as etapas fixas e as que têm campos próprios (Não iniciados, Modelagem piloto, Relatório e modelagem técnica, Revisão interna, Validação com o setor, Aprovação pelo setor, Publicação e Concluídos) tenham cada uma o seu ícone.
+51. Como Administrador, quero que uma etapa nova que eu crie no Catálogo apareça com um ícone genérico, sem eu precisar escolher nada.
+52. Como integrante do EP, quero que o ícone seja só enfeite para o leitor de tela, porque o nome da etapa já está escrito ao lado.
+
+#### Barra de cima e faixa lateral
+
+53. Como integrante do EP, quero a barra de cima branca só com o título da tela (com o ícone), a busca, o sino e o meu avatar, para a barra não repetir a escolha da forma de ver.
+54. Como integrante do EP, quero que a busca e o sino mostrem um aviso curto "Em breve" ao clicar, porque ainda não fazem nada.
+55. Como integrante do EP, quero a faixa lateral grafite com Processos, Setores, Painel e Administração, e Ajuda no pé, cada um com o nome ao passar o mouse e para o leitor de tela, e o item da tela atual marcado.
+56. Como integrante do EP, quero que Processos abra a forma de ver que eu usava por último nesta sessão (o Quadro por etapa, se nenhuma), para voltar ao meu trabalho com um clique.
+57. Como integrante do EP, quero que Painel abra uma tela simples "Em breve", dizendo que o Painel com os números do EP chega na v1.5, e que Ajuda abra uma tela simples "Em breve", para os botões nunca parecerem quebrados.
+58. Como integrante do EP ou Consulta, quero que Administração continue aparecendo só para o Administrador.
+
+#### Cartão do Quadro
+
+59. Como integrante do EP, quero que o cartão em que sou o responsável mostre "Você" no lugar do meu nome, para achar o meu trabalho mais rápido.
+60. Como integrante do EP, quero que o cartão continue sem contador de arquivos e sem prazo, como hoje.
+
+#### Verso enxuto
+
+61. Como integrante do EP, quero o verso numa janela de tamanho fixo de cerca de 880 × 740, sem abas, que não cresce com o conteúdo (o que passa rola por dentro), para ele abrir sempre igual.
+62. Como integrante do EP, quero no cabeçalho do verso o selo do setor, o nome do processo, a ação principal da etapa atual em azul, o menu "···" e o fechar, para ter o que mais uso logo à vista.
+63. Como integrante do EP, quero que a ação principal seja a da etapa atual: [Registrar revisão] na Revisão interna, [Registrar aprovação] na Aprovação pelo setor e [Registrar publicação] na Publicação (e em Concluídos sem publicação), e que nas outras etapas não haja botão azul no cabeçalho.
+64. Como integrante do EP, quero, abaixo do nome, uma linha de dados com o setor, o macroprocesso, o tipo (com o processo pai do subprocesso e os subprocessos do processo, que abrem ao clicar) e a situação.
+65. Como integrante do EP, quero a trilha horizontal das etapas com os nomes, os ícones e as datas, como hoje.
+66. Como integrante do EP, quero, numa linha só, a etiqueta em três ícones, o responsável com "Trocar" e o [Mover para], como hoje.
+67. Como integrante do EP, quero os avisos lado a lado abaixo dessa linha, como hoje.
+68. Como integrante do EP, quero os campos da etapa atual (data da modelagem piloto, data da validação, E-protocolo e os registros de revisão, aprovação e publicação) numa linha logo abaixo dos avisos, só quando a etapa os tiver.
+69. Como integrante do EP, quero, no corpo, a versão mais recente com a miniatura grande do fluxograma à esquerda e, à direita, o rótulo da versão, quem enviou e quando, o relatório que vale para ela, [Enviar versão] e os arquivos em lista vertical, cada um com o selo do tipo em mono, o nome e o tamanho, abrindo ou baixando ao clicar.
+70. Como integrante do EP, quero "Versões anteriores" e "Outros anexos" recolhidos abaixo dos arquivos, com a contagem, abrindo ao clicar, com tudo o que eles fazem hoje.
+71. Como integrante do EP, quero as Anotações ao lado da versão com o dobro da altura de hoje, escrevendo direto no campo e gravando sozinho, como hoje, sem botão "Editar".
+72. Como integrante do EP, quero que o processo sem versão mostre no lugar da miniatura "Nenhuma versão enviada ainda" com [Enviar versão] quando eu puder enviar.
+73. Como integrante do EP, quero que o Histórico continue no menu "···" e abra no lugar do processo, com [Voltar ao processo], como hoje.
+74. Como pessoa com perfil Consulta, quero ver o verso enxuto inteiro, sem ação principal, sem [Enviar versão] e com as Anotações só para ler.
+
+#### Miniatura do fluxograma
+
+75. Como integrante do EP, quero ver no verso a imagem (.png) da versão mais recente do fluxograma, para lembrar do fluxo sem abrir arquivo.
+76. Como integrante do EP, quero um quadro cinza enquanto a imagem carrega, do mesmo tamanho dela, para o verso não pular.
+77. Como integrante do EP, quero que a versão sem .png mostre um quadro com o ícone do fluxograma e "Sem imagem (.png) nesta versão".
+78. Como integrante do EP, quero que, se a imagem não carregar (inclusive sem conexão), apareça "Não foi possível carregar a imagem." no quadro, sem impedir o resto do verso.
+79. Como integrante do EP, quero que clicar na miniatura abra o .png inteiro, como o botão de abrir do arquivo faz hoje.
+80. Como integrante do EP, quero que a miniatura tenha como texto alternativo "Fluxograma {versão} de {processo}".
+
+#### Perfis
+
+81. Como pessoa com perfil Consulta, quero ver a faixa de controles com "Quadro ▾", Linhas, Filtros e a legenda, sem [Cadastrar processo] e sem [Destacar os meus], e sem arrastar cartões.
+
+### Decisões de implementação
+
+#### Interface
+
+- **Faixa de controles:** um componente para a área de processos, comum aos três quadros e à Lista, com altura fixa e os controles de cada forma de ver em lugares fixos. Os controles que dependem da forma de ver (Linhas no Quadro por etapa; Situação no Quadro por setor; Agrupar por e Situação na Lista) só mudam com a troca da forma de ver. Reaproveita o controle de opções em segmento que já existe (o mesmo de "Agrupar por"), com o escolhido em azul-claro.
+- **"Quadro ▾":** um botão com menu, no padrão do menu de ações que já existe (o "···" do verso), com as quatro formas de ver. Escolher troca a visão e o agrupamento no endereço como hoje (`visao` e `agrupar`); o endereço não muda de formato, então os endereços antigos continuam valendo.
+- **Linhas:** parâmetro novo `linhas` no endereço (`nenhuma`, `setor`, `responsavel`; ausente = nenhuma), lido só no Quadro por etapa. A matriz monta as linhas a partir dos processos já filtrados, com o cabeçalho das etapas uma vez no alto, e reaproveita a coluna, o cartão e o arrastar de hoje dentro de cada linha. O arrastar sabe a linha de origem; soltar em outra linha recusa com o aviso do Quadro que já existe para "solte na coluna". O recolhido de cada linha fica só no estado da tela.
+- **Filtros:** o painel usa o mesmo componente dos cinco seletores de hoje, dentro de um painel preso ao botão (o mesmo padrão de abrir, Esc e clique fora do menu de ações). O contador vem da mesma função que hoje decide se há filtro, contando os ligados.
+- **Destacar os meus:** parâmetro novo `destacar` no endereço (presente = ligado), separado do filtro `responsavel`. O cartão recebe a marca de esmaecido quando o responsável do processo não é quem está na tela; o esmaecido é só aparência (opacidade), sem tirar o cartão do arrastar nem do clique. O aviso "Nenhum processo com você agora." aparece acima do quadro, sem trocar o quadro por uma mensagem. O botão e o parâmetro são ignorados para Consulta. O botão "Só os meus" e a ligação dele com o filtro Responsável saem.
+- **Situação:** o parâmetro `mostrar` do endereço passa a aceitar `todos`, `em_andamento`, `suspensos`, `concluidos` e `cancelados` (ausente ou desconhecido = todos), na Lista e no Quadro por setor. A Lista filtra pela situação antes de montar a tabela ou a árvore; o bloco de cancelados do pé da tabela sai. As frases de vazio por situação entram junto das de hoje.
+- **Ícone por etapa:** um mapa do código fixo da etapa para um nome de ícone, com um ícone genérico para qualquer outro código; os desenhos novos entram no componente de ícones que já existe (os da proposta 6: bandeja, lápis, documento, lupa com marca, pessoas, selo, e os de publicação e Concluídos). Usado no cabeçalho da coluna, no cabeçalho das etapas da matriz e na trilha do verso.
+- **Moldura:** a barra de cima perde a alternância Quadro | Lista e ganha a busca e o sino como botões com o aviso "Em breve" (o aviso curto que a tela já usa). A faixa lateral troca Quadro e Lista por Processos e ganha Ajuda no pé; Painel e Ajuda passam a ter tela, uma tela simples de "Em breve" cada. Processos guarda na sessão a última forma de ver.
+- **Cartão:** o campo do responsável mostra "Você" quando o responsável é quem está na tela.
+- **Verso enxuto:** o corpo de duas colunas é refeito no desenho da verso-3: cabeçalho (selo, nome, ação principal da etapa, "···", fechar), linha de dados (setor, macroprocesso, tipo e estrutura, situação), trilha, linha do Agora (etiqueta, responsável, Mover para), avisos, linha dos campos da etapa, e o corpo com a versão (miniatura e arquivos) e as Anotações. Os blocos que já existem (Anotações, versões, anexos, registros de revisão, aprovação e publicação, datas, estrutura) são reaproveitados no lugar novo, sem mudar o que fazem; só a disposição e a ação principal mudam. A janela continua com o tamanho fixo de hoje.
+- **Miniatura:** ao abrir o verso, se a versão mais recente tem .png, a tela pede o arquivo pelo módulo de versões que já baixa arquivos (o mesmo do botão de abrir, que chama a função `arquivos-no-drive`) e mostra a imagem a partir do conteúdo recebido; o endereço temporário da imagem é liberado ao fechar o verso. Clicar abre o .png pelo caminho de abrir que já existe. Nada é guardado.
+
+#### Modelo de dados
+
+Sem mudança no banco: nenhuma tabela, coluna, política, view ou função nova. O ícone da etapa sai do código que ela já tem; os filtros, as Linhas, o destaque e a Situação são leitura dos dados que a tela já recebe. A miniatura usa a ação de baixar que a função `arquivos-no-drive` já tem, com as permissões de hoje (todo usuário ativo vê os arquivos).
+
+### Estados de tela
+
+- **Quadro (os três) e Lista:** os estados de hoje (carregando, erro com Tentar de novo, inclusive falha de conexão, e vazio) continuam; a faixa de controles aparece desde o carregamento, com os controles desabilitados até os dados chegarem, para não pular. Vazio por filtro: "Nenhum processo com estes filtros." com [Limpar filtros]. Vazio por situação: a frase da situação com [Mostrar todos]. Destaque sem processo da pessoa: o aviso acima do quadro, com o quadro esmaecido.
+- **Linhas sem cartão:** se os filtros não deixam nenhum cartão, vale o vazio por filtro, sem linhas.
+- **Painel e Ajuda:** tela estática, sem carregar dados.
+- **Verso:** os estados de hoje do verso continuam. Miniatura: carregando (quadro cinza), sem versão, sem .png, erro (inclusive falha de conexão), e a imagem.
+
+### Decisões de teste
+
+- **Ponto de teste: a tela inteira**, como a pessoa usa, nos testes de tela da aplicação com as implementações falsas (o mesmo padrão dos testes de agrupar por responsável, agrupar por setor, arrastar para mover, cartão do Quadro, árvore da Lista, arquivos do verso e baixar arquivo). Cada teste prova um comportamento visível: o que aparece, o que some, o que muda no endereço, o que acontece ao clicar ou arrastar. Nada de testar a montagem interna das linhas ou do contador.
+- Testes novos ou mudados, um por comportamento: a faixa tem os mesmos controles nos mesmos lugares antes e depois de ligar um filtro; "Quadro ▾" troca a forma de ver e o endereço, e o endereço antigo abre a mesma visão; Linhas por setor e por responsável (ordem, só linhas com cartão, "Você", "Inativo", selo ou responsável fora do cartão, recolher); arrastar na mesma linha move e em outra linha recusa com o aviso; Filtros abre, filtra, conta e fecha com Esc; Destacar os meus esmaece sem esconder, é independente do filtro Responsável, mostra o aviso sem processo próprio e não aparece para Consulta; Situação na Lista (cada opção, Todos sem cancelados, endereço antigo, frases de vazio) e no Quadro por setor; ícone genérico para etapa nova; busca e sino com "Em breve"; Painel e Ajuda abrem a tela "Em breve"; cartão com "Você"; verso com a ação principal certa em cada etapa, a linha de dados e os campos da etapa no lugar novo; miniatura nos cinco estados (o módulo falso de versões já simula baixar com sucesso, com recusa e sem conexão) e clique que abre o .png.
+- Os testes atuais de "Agrupar por" no Quadro, de "Só os meus" (histórias 169 a 171), de "Todos | Concluídos" e de "Mostrar cancelados" mudam para os controles novos; os de agrupar por responsável e por setor continuam valendo para os quadros, só com a escolha pelo menu.
+- Funções puras novas (ler `linhas`, `destacar` e a Situação do endereço; o ícone pelo código da etapa; o filtro por situação; a contagem de filtros ligados) ganham teste de unidade, no padrão dos testes do endereço dos processos.
+- Sem pgTAP: o banco não muda.
+
+### Fora do escopo
+
+- Prazo no cartão (os prazos são da v1.5) e contador de arquivos no cartão (pede mudar a view; backlog).
+- Filtro "Tudo | Etapas | Documentos | Responsável | Etiqueta" no Histórico (backlog).
+- Busca, notificações (sino), Painel e Ajuda de verdade: só os botões com "Em breve".
+- Escolher o ícone da etapa no Catálogo (coluna nova no banco).
+- Tirar o Quadro por setor ou fazer a matriz completa com setores e responsáveis ao mesmo tempo (backlog; ver o uso das Linhas antes).
+- Guardar entre sessões o recolhido das linhas ou a última forma de ver.
+- Mudar quem pode ver ou baixar arquivos.
+
+### Decisões tomadas ao escrever esta seção, a confirmar na leitura
+
+- Processos, na faixa lateral, abre a última forma de ver usada na sessão (história 56); a sabatina não tratou disso.
+- Em tela estreita, a legenda sai antes dos controles (história 5).
+- Textos novos: "Solte o cartão na mesma linha." (história 23) e as frases de vazio por situação (história 47).
+- [Registrar publicação] também é a ação principal em Concluídos sem publicação (história 63), porque registrar a publicação depois é possível ali.
+- Os controles da faixa ficam desabilitados enquanto os dados carregam (Estados de tela).
+- A Lista também passa a ter a faixa, com "Quadro ▾" em "Lista" (história 11), já que o Quadro | Lista sai da barra de cima.
+
+### Critérios de pronto
+
+1. A faixa de controles tem altura fixa e os controles na ordem da proposta 6; ligar e desligar filtros e "Destacar os meus" não muda a posição de nenhum controle nem a altura da faixa.
+2. "Quadro ▾" escolhe entre Quadro por etapa, Quadro por responsável, Quadro por setor e Lista, guarda a escolha no endereço, e os endereços antigos abrem a mesma visão; não há mais "Agrupar por" no Quadro nem Quadro | Lista na barra de cima.
+3. As Linhas por setor e por responsável separam o Quadro por etapa em faixas, só com as linhas que têm cartão, na ordem combinada, com "Você", "Inativo", o selo ou o responsável fora do cartão e o recolher pela setinha; a escolha fica no endereço.
+4. Arrastar move na mesma linha; soltar em outra linha não muda nada e mostra o aviso.
+5. [Filtros] abre o painel com os cinco filtros e "Limpar filtros", mostra quantos estão ligados, fecha com Esc e clique fora, e os filtros ficam no endereço.
+6. "Destacar os meus" esmaece os cartões dos outros sem escondê-los, é independente do filtro Responsável, mostra "Nenhum processo com você agora." sem processo próprio, fica no endereço e não aparece para Consulta.
+7. A Lista e o Quadro por setor têm "Situação: Todos | Em andamento | Suspensos | Concluídos | Cancelados", com Todos sem os cancelados; o "Mostrar cancelados (N)" saiu; cada situação vazia tem a sua frase com [Mostrar todos].
+8. Cada etapa fixa ou com campos próprios tem o seu ícone, e uma etapa nova aparece com o ícone genérico, no cabeçalho da coluna, nas Linhas e na trilha do verso.
+9. A busca e o sino mostram "Em breve"; Painel e Ajuda abrem a tela "Em breve"; Administração só aparece para o Administrador.
+10. O cartão do Quadro mostra "Você" quando o responsável é quem está na tela.
+11. O verso enxuto mostra a ação principal certa em cada etapa, a linha de dados, a trilha, o Agora, os avisos e os campos da etapa no lugar novo, a versão com os arquivos em lista com o selo do tipo, Versões anteriores e Outros anexos recolhidos e as Anotações gravando sozinhas, e tudo o que o verso fazia antes continua funcionando.
+12. A miniatura mostra o .png da versão mais recente, com os estados de carregando, sem versão, sem .png e erro, e abre o .png ao clicar.
+13. Consulta vê a faixa sem [Cadastrar processo] e sem [Destacar os meus], não arrasta, e vê o verso sem ação principal e sem [Enviar versão].
+14. `[visual]` A faixa de controles, a barra de cima branca e a faixa lateral grafite seguem a proposta 6 e as medidas de `.scratch/identidade-visual.md`, em 1366×768 e 1440×900, sem a faixa quebrar em duas linhas.
+15. `[visual]` As Linhas por setor e por responsável seguem a proposta 6: colunas alinhadas entre as linhas, cabeçalho das etapas uma vez no alto, selo ou avatar no cabeçalho da linha.
+16. `[visual]` O cartão esmaecido do "Destacar os meus" se distingue do destacado sem depender só da cor, e o painel dos Filtros não cobre a faixa.
+17. `[visual]` O verso enxuto segue a verso-3 em 880 × 740: a miniatura grande à esquerda, os arquivos em lista vertical, as Anotações com o dobro da altura de hoje, nada vazando da janela em 1366×768.
+18. `[visual]` Os ícones das etapas são legíveis no cabeçalho da coluna e na trilha, no traço dos outros ícones da identidade.
 
 ## Responsável inicial por etapa (mudança de 2026-10-30)
 
@@ -1843,3 +2054,4 @@ Ajuste de 2026-10-30 (sem banco): o campo "Nome" do Novo processo e do Editar pa
 Entregue em 2026-10-30 (commit 2b785d5), com ressalva: critério [visual] 10 de lista-por-setor visto só em página local com módulos falsos (nada visto com o login real); revisão de segurança dispensada (a mudança só lê o parâmetro agrupar do endereço, sem login, dado pessoal, banco ou arquivos), com revisão de reserva por leitura; as ressalvas das entregas anteriores seguem valendo
 
 Entregue em 2026-10-30 (commit 3287d10), com ressalva: critério [visual] 11 de responsavel-inicial-por-etapa presumido (a coluna do Catálogo foi vista só na vitrine local com módulos falsos, a 1366x768; nada visto com o login real); revisão de segurança foi a de reserva por leitura (o /security-review só viu documentação); conferência do cadastro aberto no painel do Supabase de desenvolvimento adiada (backlog); as ressalvas das entregas anteriores seguem valendo
+Em revisão desde 2026-10-31

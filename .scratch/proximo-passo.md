@@ -1,7 +1,7 @@
 # Próximo passo (2026-10-31)
 
-**Situação:** a sabatina do `redesenho-do-quadro` (funcionalidade 18, modo completo; muda a spec de processos-etapas) terminou. As decisões estão em `.scratch/redesenho-do-quadro/sabatina.md` e no ADR 0037 ("Destacar os meus" esmaece sem filtrar); o `CONTEXT.md` não mudou. Contador de arquivos e filtro do Histórico foram para o backlog.
+**Situação:** a spec do `redesenho-do-quadro` (funcionalidade 18) está escrita como a seção "Redesenho do Quadro (mudança de 2026-10-31)" de `.scratch/processos-etapas/spec.md`, com 81 histórias e 18 critérios de pronto (5 `[visual]`), e a spec ganhou `Em revisão desde 2026-10-31`. Sem mudança no banco. A seção traz "Decisões tomadas ao escrever esta seção, a confirmar na leitura" para o usuário conferir.
 
-**Próximo comando:** com Opus, `/mattpocock-skills:to-spec ponto de teste: a tela inteira (testes pela interface, como a pessoa usa)`, atualizando a spec de `.scratch/processos-etapas/spec.md` (com a linha `Em revisão desde 2026-10-31` abaixo da última `Entregue em`), a partir de `.scratch/redesenho-do-quadro/sabatina.md`. Depois, `/planejar` de novo para a conferência da spec e o `to-tickets`.
+**Próximo comando:** `/planejar` (Opus) para a conferência da spec (passo 4) e a avaliação das entregas (passo 5, provavelmente `/mattpocock-skills:to-tickets`).
 
-**Depende do usuário:** rodar o `to-spec`; olhar o app com o login real; publicar a função `arquivos-no-drive` no desenvolvimento (a miniatura do verso depende dela); conferir o Catálogo de etapas; escolher o responsável inicial de cada etapa.
+**Depende do usuário:** ler as decisões a confirmar da seção; publicar a função `arquivos-no-drive` no desenvolvimento (a miniatura depende dela); olhar o app com o login real; conferir o Catálogo de etapas; escolher o responsável inicial de cada etapa.
