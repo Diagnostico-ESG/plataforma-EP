@@ -39,3 +39,42 @@
     display: none;
   }
 }
+
+/* [Filtros n]: o contador em mono numa pílula; com filtro ligado o botão fica azul-claro e a pílula branca (proposta 6). */
+.faixa-contador {
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--azul-claro);
+  color: var(--azul-escuro);
+  font-family: var(--fonte-mono);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.botao-ligado .faixa-contador {
+  background: var(--folha);
+}
+
+/* O painel fica preso embaixo do botão, por cima do quadro e nunca da faixa. */
+.botao-dos-filtros {
+  position: relative;
+}
+
+.botao-dos-filtros-painel {
+  position: absolute;
+  top: calc(100% + 11px);
+  left: 0;
+  z-index: 5;
+  padding: var(--esp-4);
+  border: 1px solid var(--linha);
+  border-radius: var(--canto);
+  background: var(--folha);
+  box-shadow: var(--sombra-flutuante);
+}
+
+.botao-dos-filtros-painel .filtros-dos-processos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  gap: var(--esp-3);
+  width: max-content;
+}

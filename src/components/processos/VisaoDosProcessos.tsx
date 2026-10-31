@@ -15,7 +15,8 @@ import { CabecalhoDaLista } from './CabecalhoDaLista'
 import { AgruparAListaPor, SoOsMeus, TodosOuConcluidos } from './ControlesDoQuadro'
 import { ArvoreDaLista } from './ArvoreDaLista'
 import { FaixaDeControles } from './FaixaDeControles'
-import { BotaoLimparFiltros, FiltrosDosProcessos, NenhumProcessoComFiltros, NenhumProcessoDoUsuario } from './FiltrosDosProcessos'
+import { BotaoDosFiltros } from './BotaoDosFiltros'
+import { BotaoLimparFiltros, NenhumProcessoComFiltros, NenhumProcessoDoUsuario } from './FiltrosDosProcessos'
 import { QuadroCarregando, QuadroDeProcessos } from './QuadroDeProcessos'
 import { TabelaCarregando, TabelaDeProcessos } from './TabelaDeProcessos'
 
@@ -88,7 +89,7 @@ function FaixaDaVisao({ visao, opcoes, portfolio, filtros, aoMudarFiltros, mostr
   return (
     <FaixaDeControles forma={formaDeVer({ visao, agrupar: props.agrupar })} aoEscolherForma={props.aoMudarFormaDeVer}
       podeCadastrar={props.podeAlterar} aoCadastrar={props.aoCadastrar} desabilitada={false}>
-      {!naLista && <FiltrosDosProcessos opcoes={opcoes} filtros={filtros} aoMudar={aoMudarFiltros} />}
+      {!naLista && <BotaoDosFiltros opcoes={opcoes} filtros={filtros} aoMudar={aoMudarFiltros} />}
       {!naLista && props.podeAlterar && <SoOsMeusDoQuadro filtros={filtros} aoMudarFiltros={aoMudarFiltros} usuarioId={props.usuarioId} />}
       {naLista && <AgruparAListaPor agrupar={props.agruparLista} aoMudar={props.aoMudarAgruparLista} />}
       {portfolio && <TodosOuConcluidos mostrar={mostrar} aoMudar={aoMudarMostrar} />}

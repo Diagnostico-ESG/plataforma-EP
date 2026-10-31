@@ -11,6 +11,7 @@ import { umSetor } from './testes/processoDaLista'
 import { montarVerso, processoLido } from './testes/processoNoVerso'
 import { montarNosCadastros } from './testes/processosNosCadastros'
 import { versoAberto } from './testes/versoDoCartao'
+import { abrirFiltros } from './testes/filtrosDoQuadro'
 import { escolherFormaDeVer } from './testes/formaDeVer'
 import { cartaoDe, dia, montar, processo } from './testes/quadroDeTeste'
 import { VersoesFalso } from './versoes/VersoesFalso'
@@ -28,13 +29,13 @@ const corClaraDaMarca = (opcao: Element | null) =>
 
 test('o filtro Setor mostra o quadradinho da cor do setor, sem a cor no nome da opção', async () => {
   montar([processo('Emitir Ofício', { processo: { setorSigla: 'TSA', setorCor: 13 } })])
-  const opcao = within(await screen.findByLabelText('Setor')).getByRole('option', { name: 'TSA' })
+  const opcao = within(within(await abrirFiltros()).getByLabelText('Setor')).getByRole('option', { name: 'TSA' })
   expect(corClaraDaMarca(opcao)).toBe(corDoSetor(13).hex)
 })
 
 test('o filtro Macroprocesso não leva quadradinho de cor: só o setor tem cor', async () => {
   montar([processo('Emitir Ofício', { processo: { macroprocessoId: 'm1', macroprocessoNome: 'Macro Um' } })])
-  const opcao = within(await screen.findByLabelText('Macroprocesso')).getByRole('option', { name: 'Macro Um' })
+  const opcao = within(within(await abrirFiltros()).getByLabelText('Macroprocesso')).getByRole('option', { name: 'Macro Um' })
   expect(opcao.querySelector('.opcao-marca')).toBeNull()
 })
 

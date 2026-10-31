@@ -7,6 +7,7 @@ import { CadastrosFalso } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import type { EtapaDoCatalogo, ProcessoLido } from './processos/tipos'
 import { botaoDaColuna, escolherNaColuna, nomesNasLinhas, opcoesDaColuna } from './testes/cabecalhoDaLista'
+import { abrirFiltros, botaoDosFiltros, escolherNoQuadro } from './testes/filtrosDoQuadro'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
 import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
@@ -56,12 +57,69 @@ const nomesNaLista = nomesNasLinhas
 // Na Lista, os filtros ficam no cabeçalho de cada coluna (ticket 04 de repositorio-de-processos).
 const escolher = escolherNaColuna
 
-// No Quadro, a barra de filtros segue com as caixas de seleção.
-async function escolherNoQuadro(rotulo: string, opcao: string) {
-  const seletor = await screen.findByLabelText(rotulo)
-  const valor = within(seletor).getByRole('option', { name: opcao }).getAttribute('value')
-  fireEvent.change(seletor, { target: { value: valor } })
-}
+const painel = () => screen.queryByRole('dialog', { name: 'Filtros' })
+
+test('Quadro sem filtro: o botão Filtros sem contador e sem destaque, e os filtros fora da tela', async () => {
+  window.location.hash = '#/processos'
+  montar()
+  const botao = await botaoDosFiltros()
+  expect(botao.getAttribute('aria-label')).toBe('Filtros')
+  expect(botao.querySelector('.faixa-contador')).toBeNull()
+  expect(botao.classList.contains('botao-ligado')).toBe(false)
+  expect(screen.queryByRole('group', { name: 'Filtros dos processos' })).toBeNull()
+})
+
+test('o painel tem os cinco filtros, aplica ao escolher e o botão conta os ligados', async () => {
+  window.location.hash = '#/processos'
+  montar()
+  const aberto = await abrirFiltros()
+  const rotulos = within(aberto).getAllByRole('combobox').map((seletor) => seletor.getAttribute('id') && aberto.querySelector(`label[for="${seletor.id}"]`)?.textContent)
+  expect(rotulos).toEqual(['Setor', 'Macroprocesso', 'Etapa atual', 'Tipo', 'Responsável'])
+  await escolherNoQuadro('Setor', 'TSB')
+  await waitFor(() => expect(window.location.hash).toBe('#/processos?setor=s2'))
+  await waitFor(() => expect(screen.queryByRole('link', { name: /Pagar Diária/ })).toBeNull())
+  const botao = await botaoDosFiltros()
+  expect(botao.getAttribute('aria-label')).toBe('Filtros, 1 ligados')
+  expect(botao.querySelector('.faixa-contador')?.textContent).toBe('1')
+  expect(botao.classList.contains('botao-ligado')).toBe(true)
+})
+
+test('Esc com o foco num seletor fecha o painel e devolve o foco ao botão', async () => {
+  window.location.hash = '#/processos'
+  montar()
+  const seletor = within(await abrirFiltros()).getByLabelText('Tipo')
+  seletor.focus()
+  fireEvent.keyDown(seletor, { key: 'Escape' })
+  expect(painel()).toBeNull()
+  expect(document.activeElement).toBe(await botaoDosFiltros())
+})
+
+test('o painel fecha com clique fora e com um segundo clique no botão', async () => {
+  window.location.hash = '#/processos'
+  montar()
+  await abrirFiltros()
+  fireEvent.pointerDown(document.body)
+  expect(painel()).toBeNull()
+  await abrirFiltros()
+  fireEvent.click(await botaoDosFiltros())
+  expect(painel()).toBeNull()
+  expect((await botaoDosFiltros()).getAttribute('aria-expanded')).toBe('false')
+})
+
+test('Limpar filtros no painel zera os filtros', async () => {
+  window.location.hash = '#/processos?setor=s2&tipo=processo'
+  montar()
+  fireEvent.click(within(await abrirFiltros()).getByRole('button', { name: 'Limpar filtros' }))
+  await waitFor(() => expect(window.location.hash).toBe('#/processos'))
+  expect((await botaoDosFiltros()).getAttribute('aria-label')).toBe('Filtros')
+})
+
+test.each(['responsavel', 'setor'])('os filtros e o contador valem do mesmo jeito no Quadro por %s', async (agrupar) => {
+  window.location.hash = `#/processos?tipo=processo&agrupar=${agrupar}`
+  montar()
+  expect((await botaoDosFiltros()).getAttribute('aria-label')).toBe('Filtros, 1 ligados')
+  expect((within(await abrirFiltros()).getByLabelText('Tipo') as HTMLSelectElement).value).toBe('processo')
+})
 
 test('o filtro de Setor troca as linhas da Lista e vai para o endereço', async () => {
   montar()
@@ -113,7 +171,7 @@ test('recarregar com filtros no endereço: a mesma visão e os cabeçalhos marca
 test('Quadro: os filtros sem Situação; o painel e o fechar mantêm os filtros', async () => {
   window.location.hash = '#/processos'
   montar()
-  await screen.findByLabelText('Setor')
+  within(await abrirFiltros()).getByLabelText('Setor')
   expect(screen.queryByLabelText('Situação')).toBeNull()
   await escolherNoQuadro('Setor', 'TSB')
   await waitFor(() => expect(window.location.hash).toBe('#/processos?setor=s2'))
