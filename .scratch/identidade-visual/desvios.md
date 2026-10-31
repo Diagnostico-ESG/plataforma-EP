@@ -34,3 +34,20 @@ Audit (`/impeccable audit`): detector com 0 problemas e 3 avisos; nota por dimen
 - **Alvos de toque de 24 a 34px e pacote do site de 695 kB:** celular é opcional; dividir o pacote não é desta etapa.
 - **`prefers-reduced-motion` global zera as transições:** já era assim e vale para todo o app; revisar numa passada de animação.
 - **Quadro por Setor sem colunas na vitrine local:** a vitrine não tem setores cadastrados; não é defeito da tela (a suíte cobre o agrupamento).
+
+## 2026-10-30 — /polir do acabamento visual (itens 1 a 5 de `.scratch/proposta-visual/decisoes.md`)
+
+Audit (`/impeccable audit`, só código; não olhei a tela): detector com 0 achados. Contrastes conferidos pelos tokens: iniciais do avatar `#4A5163` sobre `#E9ECF1` (cerca de 6,9:1), dias parado `#8F1D2C` e relatório pendente `#7A4A00` sobre branco (acima de 8:1), todos AA.
+
+### Corrigidos
+- **Círculo "sem responsável":** a borda tracejada usava `--linha-tracejada` (`#C3CAD8`, cerca de 1,6:1 sobre branco); passou a usar `--icone-inativo` (`#9098A6`), mais visível. O significado já estava no `aria-label`.
+- (Na revisão de código, antes do polimento) trilha em contraste forçado distingue o tracinho atual dos feitos; `display` duplicado no trilho removido; comentários fora do lugar e ternário aninhado.
+
+### Deixados de fora, com motivo
+- **Prazo e contador de arquivos no rodapé do cartão:** o cartão não recebe esses dados; exige mudar a view do banco (fora do escopo "só aparência").
+- **Nome do setor no selo da Lista, do verso e das linhas de grupo:** `ProcessoDaLista` não traz o nome do setor; só o cartão do Quadro o recebe (pelo mapa dos setores da lista).
+- **"Laranja" do relatório pendente é um marrom escuro (`#7A4A00`):** é o tom de pendência documentado no `DESIGN.md`, escolhido para dar contraste AA; mudar a cor é decisão de identidade.
+- **`title` do selo só aparece com mouse:** o nome acessível (`aria-label`) cobre leitor de tela; o cartão inteiro é um link focável.
+- **Ordem de leitura da descrição da coluna:** visualmente vem depois da contagem (CSS `order`), no texto vem antes; a leitura segue sigla, nome, contagem, o que é coerente.
+- **`Quadro.css` com mais de 300 linhas:** já estava no backlog (refatoração sem efeito visual).
+- **Conferência na tela:** este lote não foi visto no app rodando.

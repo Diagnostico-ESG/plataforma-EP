@@ -24,6 +24,6 @@
 }
 
 .avatar-vazio {
-  border: 1.5px dashed var(--linha-tracejada);
+  border: 1.5px dashed var(--icone-inativo);
   box-sizing: border-box;
 }
