@@ -63,7 +63,7 @@
 
 .botao-dos-filtros-painel {
   position: absolute;
-  top: calc(100% + 11px);
+  top: calc(100% + 12px);
   left: 0;
   z-index: 5;
   padding: var(--esp-4);
@@ -83,4 +83,11 @@
 /* O fieldset só agrupa para desabilitar: não desenha borda nem caixa, e os controles seguem na linha da faixa. */
 .faixa-de-controles-da-visao {
   display: contents;
+}
+
+/* Na faixa, o rótulo das opções em segmento (Agrupar por, Mostrar) fica ao lado delas, como "Linhas" na proposta 6. */
+.faixa-de-controles .controle-do-quadro {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--esp-2);
 }
