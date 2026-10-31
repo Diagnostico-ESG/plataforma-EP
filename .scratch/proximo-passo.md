@@ -1,7 +1,7 @@
 # Próximo passo (2026-10-31)
 
-**Situação:** `/planejar` do passo 3 de `.scratch/proposta-visual/decisoes.md` começou, no modo completo, como uma funcionalidade só: `redesenho-do-quadro` (item 18 de `.scratch/projeto.md`; muda a spec de processos-etapas). Marco `marco/2026-10-31-inicio-redesenho-do-quadro` criado. Brainstorming pulado (a solução é a proposta 6).
+**Situação:** a sabatina do `redesenho-do-quadro` (funcionalidade 18, modo completo; muda a spec de processos-etapas) terminou. As decisões estão em `.scratch/redesenho-do-quadro/sabatina.md` e no ADR 0037 ("Destacar os meus" esmaece sem filtrar); o `CONTEXT.md` não mudou. Contador de arquivos e filtro do Histórico foram para o backlog.
 
-**Próximo comando:** a sabatina, com Opus: `/mattpocock-skills:grill-with-docs` com o resumo da abordagem (o comando pronto foi dado na sessão de 2026-10-31; se faltar, rodar o `/planejar` de novo com "redesenho-do-quadro, passo 2"). Depois, `to-spec` e `to-tickets`.
+**Próximo comando:** com Opus, `/mattpocock-skills:to-spec ponto de teste: a tela inteira (testes pela interface, como a pessoa usa)`, atualizando a spec de `.scratch/processos-etapas/spec.md` (com a linha `Em revisão desde 2026-10-31` abaixo da última `Entregue em`), a partir de `.scratch/redesenho-do-quadro/sabatina.md`. Depois, `/planejar` de novo para a conferência da spec e o `to-tickets`.
 
-**Depende do usuário:** responder a sabatina (inclusive se prazo e contador de arquivos entram, porque mudam a view do banco); olhar o app com o login real; conferir o Catálogo de etapas; escolher o responsável inicial de cada etapa.
+**Depende do usuário:** rodar o `to-spec`; olhar o app com o login real; publicar a função `arquivos-no-drive` no desenvolvimento (a miniatura do verso depende dela); conferir o Catálogo de etapas; escolher o responsável inicial de cada etapa.

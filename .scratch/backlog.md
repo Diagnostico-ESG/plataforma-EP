@@ -175,3 +175,5 @@ Uma linha por item: o que é e onde surgiu.
 
 - Pendências da identidade visual (redesenho de 2026-10-30): ficam em `.scratch/proposta-visual/decisoes.md` (seção "Estado de cada decisão"), fora deste backlog.
 - 2026-10-30 | /executar-simples do passo 2 do redesenho (code-review) | O "abre ao montar, foco no primeiro campo, Esc fecha" das janelas nativas se repete em JanelaComCampo, JanelaDeConfirmacao, JanelaDaConfirmacaoDeArquivos, JanelaDeEdicao e agora JanelaDoNovoSetor (`AreaDeSetores.tsx`): extrair um hook em `src/hooks/`. O `POR_FORMATO` e a folha repetida em `Icone.tsx` (item de 2026-10-29) saíram com o `iconeDoArquivo.ts`.
+- 2026-10-31 | sabatina do redesenho-do-quadro | Contador de arquivos no rodapé do cartão do Quadro (📎 n, proposta 6): exige a contagem na view dos processos (migração). Prazo no cartão entra com os prazos da v1.5.
+- 2026-10-31 | sabatina do redesenho-do-quadro | Filtro "Tudo | Etapas | Documentos | Responsável | Etiqueta" no Histórico do processo (verso-3).
