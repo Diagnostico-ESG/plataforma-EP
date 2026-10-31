@@ -142,3 +142,21 @@ function gravarOrdenacao(consulta: URLSearchParams, { coluna, sentido }: Ordenac
   if (coluna !== ORDENACAO_PADRAO.coluna) consulta.set('ordenar', coluna)
   if (sentido !== ORDENACAO_PADRAO.sentido) consulta.set('sentido', sentido)
 }
+
+/** As quatro formas de ver do menu "Quadro ▾": os três quadros (o agrupar do Quadro) e a Lista. */
+export type FormaDeVer = AgruparQuadroPor | 'lista'
+
+export const ROTULO_DA_FORMA_DE_VER: Record<FormaDeVer, string> = {
+  etapa: 'Quadro por etapa', responsavel: 'Quadro por responsável', setor: 'Quadro por setor', lista: 'Lista',
+}
+
+export function formaDeVer({ visao, agrupar }: EnderecoDosProcessos): FormaDeVer {
+  return visao === 'lista' ? 'lista' : agrupar
+}
+
+// O endereço não muda de formato (visao e agrupar, como antes do menu), então os endereços antigos continuam valendo.
+// Trocar de forma de ver fecha o processo aberto e mantém os filtros; o Quadro não tem situação.
+export function comFormaDeVer(endereco: EnderecoDosProcessos, forma: FormaDeVer): EnderecoDosProcessos {
+  if (forma === 'lista') return { ...endereco, visao: 'lista', agrupar: 'etapa', aberto: null }
+  return { ...endereco, visao: 'quadro', agrupar: forma, aberto: null, filtros: { ...endereco.filtros, situacao: null } }
+}

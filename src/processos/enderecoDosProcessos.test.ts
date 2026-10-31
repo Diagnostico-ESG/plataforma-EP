@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { lerEnderecoDosProcessos, montarEnderecoDosProcessos, SEM_FILTROS } from './enderecoDosProcessos'
+import { comFormaDeVer, formaDeVer, lerEnderecoDosProcessos, montarEnderecoDosProcessos, SEM_FILTROS } from './enderecoDosProcessos'
 import { ORDENACAO_PADRAO } from './ordenacaoDaLista'
 
 test('o caminho dá a visão e o item aberto', () => {
@@ -165,4 +165,22 @@ test('agrupar=setor agrupa a Lista por Setor, com ida e volta; no Quadro segue s
   expect(montarEnderecoDosProcessos({ ...base, visao: 'quadro', agruparLista: 'setor' })).toBe('#/processos')
   const lido = '#/processos/lista?tipo=processo&agrupar=setor'
   expect(montarEnderecoDosProcessos(lerEnderecoDosProcessos(lido))).toBe(lido)
+})
+
+test('a forma de ver sai da visão e do agrupar', () => {
+  expect(formaDeVer(lerEnderecoDosProcessos('#/processos?agrupar=setor'))).toBe('setor')
+  expect(formaDeVer(lerEnderecoDosProcessos('#/processos/lista?agrupar=setor'))).toBe('lista')
+  expect(formaDeVer(lerEnderecoDosProcessos('#/processos'))).toBe('etapa')
+})
+
+test('trocar a forma de ver fecha o processo aberto e mantém os filtros', () => {
+  const aberto = lerEnderecoDosProcessos('#/processos/p1?setor=s1')
+  expect(montarEnderecoDosProcessos(comFormaDeVer(aberto, 'responsavel'))).toBe('#/processos?setor=s1&agrupar=responsavel')
+  const porSetor = lerEnderecoDosProcessos('#/processos?agrupar=setor&tipo=processo')
+  expect(montarEnderecoDosProcessos(comFormaDeVer(porSetor, 'lista'))).toBe('#/processos/lista?tipo=processo')
+})
+
+test('voltar da Lista ao Quadro tira a situação, que o Quadro não tem', () => {
+  const lista = lerEnderecoDosProcessos('#/processos/lista?situacao=suspenso&agrupar=macroprocesso')
+  expect(montarEnderecoDosProcessos(comFormaDeVer(lista, 'etapa'))).toBe('#/processos')
 })

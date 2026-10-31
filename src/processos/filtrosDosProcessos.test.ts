@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import { SEM_FILTROS, type FiltrosDosProcessos } from './enderecoDosProcessos'
-import { filtrarProcessos, opcoesDosFiltros, temFiltro } from './filtrosDosProcessos'
+import { filtrarProcessos, opcoesDosFiltros, quantosFiltros, temFiltro } from './filtrosDosProcessos'
 import type { EtapaDoCatalogo, ProcessoDaLista } from './tipos'
 
 const MODELAGEM = { id: 'e4', codigo: 'modelagem', nome: 'Reunião de modelagem', ordem: 4, posicao: 2, total: 3 }
@@ -83,4 +83,9 @@ test('opções: sem repetição, na ordem certa; a etapa de filtro é só das at
 test('a opção do filtro Setor leva a cor do setor; sem a cor vale a 1', () => {
   const opcoes = opcoesDosFiltros({ etapas: [], processos: [processo('Um', { setorCor: 13 }), processo('Dois', { setorId: 's2', setorSigla: 'TSB' })] })
   expect(opcoes.setores).toEqual([{ valor: 's1', rotulo: 'TSA', corDoSetor: 13 }, { valor: 's2', rotulo: 'TSB', corDoSetor: 1 }])
+})
+
+test('quantosFiltros conta os filtros ligados', () => {
+  expect(quantosFiltros(SEM_FILTROS)).toBe(0)
+  expect(quantosFiltros({ ...SEM_FILTROS, setor: 's1', tipo: 'processo' })).toBe(2)
 })

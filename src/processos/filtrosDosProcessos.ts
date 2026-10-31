@@ -15,8 +15,12 @@ export type OpcoesDosFiltros = {
   situacoes: OpcaoDoFiltro[]
 }
 
+export function quantosFiltros(filtros: FiltrosDosProcessos): number {
+  return Object.values(filtros).filter((valor) => valor !== null).length
+}
+
 export function temFiltro(filtros: FiltrosDosProcessos): boolean {
-  return Object.values(filtros).some((valor) => valor !== null)
+  return quantosFiltros(filtros) > 0
 }
 
 export function filtrarProcessos(processos: ProcessoDaLista[], filtros: FiltrosDosProcessos): ProcessoDaLista[] {
