@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import { afterEach, beforeEach, expect, test } from 'vitest'
+import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import App from './App'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import type { Perfil } from './acesso/tipos'
@@ -64,7 +64,7 @@ test('Quadro sem filtro: o botão Filtros sem contador e sem destaque, e os filt
   montar()
   const botao = await botaoDosFiltros()
   expect(botao.getAttribute('aria-label')).toBe('Filtros')
-  expect(botao.querySelector('.faixa-contador')).toBeNull()
+  expect(botao.querySelector('.faixa-contador:not(.faixa-contador-vazio)')).toBeNull()
   expect(botao.classList.contains('botao-ligado')).toBe(false)
   expect(screen.queryByRole('group', { name: 'Filtros dos processos' })).toBeNull()
 })
@@ -79,7 +79,7 @@ test('o painel tem os cinco filtros, aplica ao escolher e o botão conta os liga
   await waitFor(() => expect(window.location.hash).toBe('#/processos?setor=s2'))
   await waitFor(() => expect(screen.queryByRole('link', { name: /Pagar Diária/ })).toBeNull())
   const botao = await botaoDosFiltros()
-  expect(botao.getAttribute('aria-label')).toBe('Filtros, 1 ligados')
+  expect(botao.getAttribute('aria-label')).toBe('Filtros, 1 ligado')
   expect(botao.querySelector('.faixa-contador')?.textContent).toBe('1')
   expect(botao.classList.contains('botao-ligado')).toBe(true)
 })
@@ -117,7 +117,7 @@ test('Limpar filtros no painel zera os filtros', async () => {
 test.each(['responsavel', 'setor'])('os filtros e o contador valem do mesmo jeito no Quadro por %s', async (agrupar) => {
   window.location.hash = `#/processos?tipo=processo&agrupar=${agrupar}`
   montar()
-  expect((await botaoDosFiltros()).getAttribute('aria-label')).toBe('Filtros, 1 ligados')
+  expect((await botaoDosFiltros()).getAttribute('aria-label')).toBe('Filtros, 1 ligado')
   expect((within(await abrirFiltros()).getByLabelText('Tipo') as HTMLSelectElement).value).toBe('processo')
 })
 
@@ -208,4 +208,44 @@ test('a Consulta filtra a Lista, sem [Cadastrar processo]', async () => {
   await escolher('Setor', 'TSB')
   await waitFor(async () => expect(await nomesNaLista()).toEqual(['Arquivar Pasta', 'Emitir Ofício']))
   expect(screen.queryByRole('button', { name: 'Cadastrar processo' })).toBeNull()
+})
+
+test('com dois filtros, o nome do botão vai para o plural', async () => {
+  window.location.hash = '#/processos?setor=s2&tipo=processo'
+  montar()
+  expect((await botaoDosFiltros()).getAttribute('aria-label')).toBe('Filtros, 2 ligados')
+})
+
+test('Esc com a lista de um seletor aberta fecha só a lista, não o painel', async () => {
+  window.location.hash = '#/processos'
+  montar()
+  const seletor = within(await abrirFiltros()).getByLabelText('Setor')
+  vi.spyOn(seletor, 'matches').mockImplementation((consulta: string) => consulta === ':open')
+  fireEvent.keyDown(seletor, { key: 'Escape' })
+  expect(painel()).not.toBeNull()
+})
+
+test('sair do painel com Tab fecha o painel', async () => {
+  window.location.hash = '#/processos'
+  montar()
+  const seletor = within(await abrirFiltros()).getByLabelText('Responsável')
+  fireEvent.focusOut(seletor, { relatedTarget: screen.getByRole('link', { name: /Pagar Diária/ }) })
+  expect(painel()).toBeNull()
+})
+
+test('trocar de seletor dentro do painel não o fecha', async () => {
+  window.location.hash = '#/processos'
+  montar()
+  const aberto = await abrirFiltros()
+  fireEvent.focusOut(within(aberto).getByLabelText('Setor'), { relatedTarget: within(aberto).getByLabelText('Tipo') })
+  expect(painel()).not.toBeNull()
+})
+
+test('depois de Limpar filtros no painel, o foco vai para o primeiro filtro', async () => {
+  window.location.hash = '#/processos?tipo=processo'
+  montar()
+  const aberto = await abrirFiltros()
+  fireEvent.click(within(aberto).getByRole('button', { name: 'Limpar filtros' }))
+  await waitFor(() => expect(window.location.hash).toBe('#/processos'))
+  await waitFor(() => expect(document.activeElement).toBe(within(aberto).getByLabelText('Setor')))
 })

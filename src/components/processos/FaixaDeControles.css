@@ -91,3 +91,8 @@
   align-items: center;
   gap: var(--esp-2);
 }
+
+/* Sem filtro o contador não aparece, mas guarda o lugar: o primeiro filtro não empurra os controles seguintes (história 3). */
+.faixa-contador-vazio {
+  visibility: hidden;
+}

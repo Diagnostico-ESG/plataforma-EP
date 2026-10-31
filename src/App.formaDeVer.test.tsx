@@ -95,7 +95,7 @@ test('na faixa, só Cadastrar processo é azul cheio, e ele vem antes da forma d
 })
 
 const nomesDosControles = async () => within(await faixaDeControles()).getAllByRole('button')
-  .map((botao) => (botao.getAttribute('aria-label') ?? botao.textContent ?? '').replace(/, \d+ ligados$/, ''))
+  .map((botao) => (botao.getAttribute('aria-label') ?? botao.textContent ?? '').replace(/, \d+ ligados?$/, ''))
 
 const filtrosAgora = async () => within(await faixaDeControles()).getByRole('button', { name: /^Filtros/ })
 

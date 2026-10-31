@@ -8,10 +8,12 @@ type FiltrosDosProcessosProps = {
   opcoes: OpcoesDosFiltros
   filtros: Filtros
   aoMudar: (filtros: Filtros) => void
+  /** O [Limpar filtros]; o padrão só zera os filtros (o painel dos Filtros também devolve o foco). */
+  aoLimpar?: () => void
 }
 
 /** Os filtros do Quadro, sem situação (o Quadro mostra só os vivos); a Lista filtra pelo cabeçalho (CabecalhoDaLista). */
-export function FiltrosDosProcessos({ opcoes, filtros, aoMudar }: FiltrosDosProcessosProps) {
+export function FiltrosDosProcessos({ opcoes, filtros, aoMudar, aoLimpar = () => aoMudar(SEM_FILTROS) }: FiltrosDosProcessosProps) {
   // Os valores vêm das próprias opções, então o tipo escolhido é sempre válido.
   const mudar = (nome: keyof Filtros) => (valor: string) => aoMudar({ ...filtros, [nome]: valor || null } as Filtros)
   return (
@@ -23,7 +25,7 @@ export function FiltrosDosProcessos({ opcoes, filtros, aoMudar }: FiltrosDosProc
       <SeletorDoFiltro rotulo="Tipo" todos="Todos" opcoes={opcoes.tipos} valor={filtros.tipo} aoMudar={mudar('tipo')} />
       <SeletorDoFiltro rotulo="Responsável" todos="Todos" opcoes={opcoes.responsaveis} valor={filtros.responsavel}
         aoMudar={mudar('responsavel')} />
-      {temFiltro(filtros) && <BotaoLimparFiltros aoLimpar={() => aoMudar(SEM_FILTROS)} />}
+      {temFiltro(filtros) && <BotaoLimparFiltros aoLimpar={aoLimpar} />}
     </div>
   )
 }
