@@ -81,9 +81,6 @@
   --pendencia-fundo: #fff6e5;
   --pendencia-borda: #f3d28f;
 
-  /* Macroprocessos (saem na fase da Lista) */
-  --macro-violeta: #8e4ec6;
-
   /* Tipografia: base 14px */
   --fonte: 'Source Sans 3', system-ui, sans-serif;
   --fonte-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;

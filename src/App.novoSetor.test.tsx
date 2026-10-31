@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import App from './App'
 import { AcessoFalso } from './acesso/AcessoFalso'
@@ -94,6 +94,18 @@ test('Cancelar fecha o formulário sem gravar', async () => {
   fireEvent.change(screen.getByLabelText('Nome'), { target: { value: 'Núcleo Fictício de Teste' } })
   fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
   expect(screen.queryByRole('form', { name: 'Novo setor' })).toBeNull()
+  expect(cadastros.setores).toEqual([])
+})
+
+test('o Novo setor abre numa janela de 520px com o formulário, e Esc fecha sem gravar', async () => {
+  const cadastros = await abrirFormulario()
+  const janela = screen.getByRole('dialog', { name: 'Novo setor' })
+  expect(janela.hasAttribute('open')).toBe(true)
+  expect(within(janela).getByRole('form', { name: 'Novo setor' })).toBeTruthy()
+  expect(regrasDaClasse(css, '.janela-do-setor')).toContain('520px')
+  fireEvent.change(screen.getByLabelText('Nome'), { target: { value: 'Núcleo Fictício de Teste' } })
+  fireEvent.keyDown(document, { key: 'Escape' })
+  expect(screen.queryByRole('dialog', { name: 'Novo setor' })).toBeNull()
   expect(cadastros.setores).toEqual([])
 })
 

@@ -1,11 +1,10 @@
 import type { FiltrosDosProcessos } from './enderecoDosProcessos'
 import { ROTULO_DA_SITUACAO, ROTULO_DO_TIPO } from './rotulos'
-import { corDoMacroprocesso } from './corDoMacroprocesso'
 import { pessoaDaOpcao } from './pessoaDaOpcao'
 import type { EtapaDoCatalogo, ListaDeProcessos, PessoaDaOpcao, ProcessoDaLista, ResponsavelDoProcesso } from './tipos'
 
-/** `cor` é a marca do macroprocesso; `pessoa`, o Avatar do responsável; `corDoSetor`, o número da cor do setor. As demais opções só têm o texto. */
-export type OpcaoDoFiltro = { valor: string; rotulo: string; cor?: string; pessoa?: PessoaDaOpcao; corDoSetor?: number }
+/** `pessoa` é o Avatar do responsável; `corDoSetor`, o número da cor do setor. As demais opções só têm o texto. */
+export type OpcaoDoFiltro = { valor: string; rotulo: string; pessoa?: PessoaDaOpcao; corDoSetor?: number }
 
 export type OpcoesDosFiltros = {
   setores: OpcaoDoFiltro[]
@@ -43,7 +42,7 @@ function passaNosFiltros(processo: ProcessoDaLista, filtros: FiltrosDosProcessos
 export function opcoesDosFiltros({ etapas, processos }: Pick<ListaDeProcessos, 'etapas' | 'processos'>): OpcoesDosFiltros {
   return {
     setores: semRepetir(processos.map((p) => ({ valor: p.setorId, rotulo: p.setorSigla, corDoSetor: p.setorCor ?? 1 }))),
-    macroprocessos: semRepetir(processos.map((p) => ({ valor: p.macroprocessoId, rotulo: p.macroprocessoNome, cor: corDoMacroprocesso(p.macroprocessoId) }))),
+    macroprocessos: semRepetir(processos.map((p) => ({ valor: p.macroprocessoId, rotulo: p.macroprocessoNome }))),
     etapas: opcoesDeEtapa(etapas),
     tipos: Object.entries(ROTULO_DO_TIPO).map(([valor, rotulo]) => ({ valor, rotulo })),
     responsaveis: semRepetir(processos.flatMap((p) => (p.responsavel ? [opcaoDeResponsavel(p.responsavel)] : []))),

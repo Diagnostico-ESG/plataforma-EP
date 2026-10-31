@@ -83,6 +83,16 @@
   justify-self: start;
 }
 
+/* O Novo setor numa janela de 520px (na tela estreita, até as margens); o formulário ocupa a janela toda. */
+.janela-do-setor {
+  width: min(520px, calc(100vw - 32px));
+  max-width: none;
+}
+
+.janela-do-setor .form-setor {
+  max-width: none;
+}
+
 .cadastros-secao {
   display: grid;
   gap: var(--esp-4);

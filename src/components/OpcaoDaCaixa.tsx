@@ -7,8 +7,6 @@ type OpcaoDaCaixaProps = {
   valor: string
   rotulo: string
   desabilitada?: boolean
-  /** A marca de cor do macroprocesso (a mesma do cartão). */
-  cor?: string
   /** O Avatar de quem a opção nomeia. */
   pessoa?: PessoaDaOpcao
   /** Número da cor do setor: quadradinho na cor lisa, a mesma do selo. */
@@ -16,11 +14,11 @@ type OpcaoDaCaixaProps = {
 }
 
 /**
- * Uma <option> com a marca na frente (cor ou Avatar), para a caixa de seleção personalizável do navegador
+ * Uma <option> com a marca na frente (cor do setor ou Avatar), para a caixa de seleção personalizável do navegador
  * (src/styles/caixas.css). A marca é enfeite e fica escondida da leitura de tela: o nome da opção é só o rótulo.
  * Nos navegadores sem a caixa personalizável, o <select> ignora a marca e mostra o texto.
  */
-export function OpcaoDaCaixa({ valor, rotulo, desabilitada, cor, pessoa, corDoSetor }: OpcaoDaCaixaProps) {
+export function OpcaoDaCaixa({ valor, rotulo, desabilitada, pessoa, corDoSetor }: OpcaoDaCaixaProps) {
   return (
     <option value={valor} disabled={desabilitada}>
       {pessoa && (
@@ -28,7 +26,6 @@ export function OpcaoDaCaixa({ valor, rotulo, desabilitada, cor, pessoa, corDoSe
           <Avatar nome={pessoa.nome} fotoUrl={pessoa.fotoUrl ?? undefined} tamanho={20} decorativo />
         </span>
       )}
-      {cor && <span className="opcao-marca opcao-cor" aria-hidden="true" style={{ background: cor }} />}
       {corDoSetor !== undefined && (
         <span className="opcao-marca opcao-cor opcao-cor-do-setor" aria-hidden="true"
           style={estiloDaCor(corDoSetor) as CSSProperties} />

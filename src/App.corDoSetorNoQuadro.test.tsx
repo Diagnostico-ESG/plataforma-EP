@@ -31,6 +31,12 @@ test('o filtro Setor mostra o quadradinho da cor do setor, sem a cor no nome da 
   expect(corClaraDaMarca(opcao)).toBe(corDoSetor(13).hex)
 })
 
+test('o filtro Macroprocesso não leva quadradinho de cor: só o setor tem cor', async () => {
+  montar([processo('Emitir Ofício', { processo: { macroprocessoId: 'm1', macroprocessoNome: 'Macro Um' } })])
+  const opcao = within(await screen.findByLabelText('Macroprocesso')).getByRole('option', { name: 'Macro Um' })
+  expect(opcao.querySelector('.opcao-marca')).toBeNull()
+})
+
 test('o campo Setor do Novo processo mostra o quadradinho da cor de cada setor ativo', async () => {
   window.location.hash = '#/processos/novo'
   const cadastros = new CadastrosFalso()

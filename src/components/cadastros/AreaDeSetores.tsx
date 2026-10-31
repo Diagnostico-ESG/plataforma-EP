@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { DadosDoSetor, ModuloDeCadastros } from '../../cadastros/tipos'
 import { useCarregamento } from '../../hooks/useCarregamento'
 import { useEndereco } from '../../hooks/useEndereco'
@@ -15,6 +15,23 @@ type AreaDeSetoresProps = {
 function idDoSetorNoEndereco(endereco: string): string | null {
   const trecho = endereco.split('/')[2]
   return trecho && trecho !== 'macroprocessos' && trecho !== 'historico' ? trecho : null
+}
+
+type JanelaDoNovoSetorProps = { aoSalvar: (dados: DadosDoSetor) => Promise<void>; aoCancelar: () => void }
+
+// A janela nativa, como a JanelaDeEdicao: abre ao montar, o foco vai ao Nome e Esc fecha sem gravar. O formulário é o
+// mesmo do setor aberto, com as mesmas validações; quem a monta a desmonta ao salvar ou cancelar.
+function JanelaDoNovoSetor({ aoSalvar, aoCancelar }: JanelaDoNovoSetorProps) {
+  const janela = useRef<HTMLDialogElement>(null)
+  useEffect(() => {
+    janela.current?.showModal()
+    janela.current?.querySelector<HTMLElement>('input')?.focus()
+  }, [])
+  return (
+    <dialog ref={janela} className="janela-confirmacao janela-do-setor" aria-label="Novo setor" onClose={aoCancelar}>
+      <FormularioDeSetor aoSalvar={aoSalvar} aoCancelar={aoCancelar} />
+    </dialog>
+  )
 }
 
 export function AreaDeSetores({ cadastros, processos, podeAlterar }: AreaDeSetoresProps) {
@@ -51,7 +68,7 @@ export function AreaDeSetores({ cadastros, processos, podeAlterar }: AreaDeSetor
           Novo setor
         </button>
       )}
-      {criando && <FormularioDeSetor aoSalvar={criar} aoCancelar={() => setCriando(false)} />}
+      {criando && <JanelaDoNovoSetor aoSalvar={criar} aoCancelar={() => setCriando(false)} />}
       <ListaDeSetores estado={estado} aoTentarDeNovo={tentarDeNovo} aoAbrir={setAberto} />
     </div>
   )

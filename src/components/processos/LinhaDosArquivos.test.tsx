@@ -34,15 +34,16 @@ test('carregando, erro com Tentar de novo e sem versão', () => {
   expect(screen.getByText('Sem versão ainda.')).toBeTruthy()
 })
 
-test('mostra a versão, o selo Aprovada e os arquivos em lista, com o nome completo e o ícone do tipo, e o link baixa pelo módulo', async () => {
+test('mostra a versão, o selo Aprovada e os arquivos em lista, com o selo do tipo e o nome completo, e o link baixa pelo módulo', async () => {
   const falso = montar({ tipo: 'pronto', versoes: [VERSAO] })
   expect(screen.getByText('V7')).toBeTruthy()
   expect(screen.getByText('Aprovada')).toBeTruthy()
   const itens = screen.getAllByRole('listitem')
-  expect(itens.map((item) => item.textContent)).toEqual(['fluxo.png', 'fluxo.bpm', 'relatorio.docx'])
-  expect(itens.every((item) => item.querySelector('svg'))).toBe(true)
-  const desenhos = itens.map((item) => item.querySelector('svg')?.innerHTML)
-  expect(new Set(desenhos).size).toBe(3)
+  const selos = itens.map((item) => item.querySelector('.selo-do-tipo'))
+  expect(selos.map((selo) => selo?.textContent)).toEqual(['PNG', 'BPM', 'DOCX'])
+  // O selo é enfeite: o nome do arquivo já diz o tipo, e o link se chama só pelo nome.
+  expect(selos.every((selo) => selo?.getAttribute('aria-hidden') === 'true')).toBe(true)
+  expect(selos.map((selo) => selo?.getAttribute('data-formato'))).toEqual(['png', 'bpm', 'docx'])
   fireEvent.click(screen.getByRole('link', { name: 'relatorio.docx' }))
   await waitFor(() => expect(falso.baixados).toEqual(['a3']))
 })

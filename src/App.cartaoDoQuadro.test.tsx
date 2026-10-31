@@ -83,6 +83,21 @@ test('a etiqueta é só o ícone, com o nome no title e no texto para leitor de 
   }
 })
 
+test('a barra do Quadro traz a legenda das etiquetas uma vez só, com ícone e nome; a Lista não', async () => {
+  montar([processo('A Fazer'), processo('Outro')])
+  const legenda = await screen.findByRole('list', { name: 'Legenda das etiquetas' })
+  expect(screen.getAllByRole('list', { name: 'Legenda das etiquetas' })).toHaveLength(1)
+  expect(legenda.closest('.quadro-barra')).not.toBeNull()
+  const itens = Array.from(legenda.querySelectorAll('li'))
+  expect(itens.map((item) => item.textContent)).toEqual(['A fazer', 'Iniciado', 'Finalizado'])
+  expect(itens.every((item) => item.querySelector('svg'))).toBe(true)
+  cleanup()
+  window.location.hash = '#/processos/lista'
+  montar([processo('A Fazer')])
+  await screen.findByRole('cell', { name: 'A Fazer' })
+  expect(screen.queryByRole('list', { name: 'Legenda das etiquetas' })).toBeNull()
+})
+
 // ---- Selos
 test('o selo do setor no cartão diz o nome do setor, no title e para o leitor de tela', async () => {
   montar([processo('Com Setor')], 'integrante_ep', [], new VersoesFalso(), [umSetor('s1', 'TSA', 'Setor de Testes A')])

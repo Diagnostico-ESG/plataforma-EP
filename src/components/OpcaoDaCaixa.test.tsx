@@ -20,14 +20,6 @@ test('sem foto, o Avatar cai nas iniciais', () => {
   expect(screen.getByRole('option', { name: 'Bia Teste' })).toBeTruthy()
 })
 
-test('com cor, a marca leva a cor recebida e fica escondida da leitura de tela', () => {
-  caixa(<OpcaoDaCaixa valor="m1" rotulo="Macro Um" cor="var(--macro-violeta)" />)
-  const marca = document.querySelector<HTMLElement>('option .opcao-cor')
-  expect(marca?.style.background).toBe('var(--macro-violeta)')
-  expect(marca?.getAttribute('aria-hidden')).toBe('true')
-  expect(screen.getByRole('option', { name: 'Macro Um' })).toBeTruthy()
-})
-
 test('sem marca, é só o texto; desabilitada vale como na opção comum', () => {
   caixa(<OpcaoDaCaixa valor="" rotulo="Todos" desabilitada />)
   const opcao = screen.getByRole('option', { name: 'Todos' }) as HTMLOptionElement

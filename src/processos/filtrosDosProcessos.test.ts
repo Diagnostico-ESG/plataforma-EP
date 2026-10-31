@@ -1,6 +1,5 @@
 import { expect, test } from 'vitest'
 import { SEM_FILTROS, type FiltrosDosProcessos } from './enderecoDosProcessos'
-import { corDoMacroprocesso } from './corDoMacroprocesso'
 import { filtrarProcessos, opcoesDosFiltros, temFiltro } from './filtrosDosProcessos'
 import type { EtapaDoCatalogo, ProcessoDaLista } from './tipos'
 
@@ -63,8 +62,8 @@ test('opções: sem repetição, na ordem certa; a etapa de filtro é só das at
   const opcoes = opcoesDosFiltros({ etapas, processos: [...PROCESSOS].reverse() })
   expect(opcoes.setores).toEqual([{ valor: 's1', rotulo: 'TSA', corDoSetor: 1 }, { valor: 's2', rotulo: 'TSB', corDoSetor: 1 }])
   expect(opcoes.macroprocessos).toEqual([
-    { valor: 'm2', rotulo: 'Macro Dois', cor: corDoMacroprocesso('m2') },
-    { valor: 'm1', rotulo: 'Macro Um', cor: corDoMacroprocesso('m1') },
+    { valor: 'm2', rotulo: 'Macro Dois' },
+    { valor: 'm1', rotulo: 'Macro Um' },
   ])
   expect(opcoes.etapas).toEqual([
     { valor: 'nao_iniciados', rotulo: 'Não iniciados' },

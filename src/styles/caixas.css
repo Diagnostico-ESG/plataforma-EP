@@ -82,7 +82,7 @@
   }
 }
 
-/* Marca na frente do texto de uma opção (OpcaoDaCaixa): o quadradinho do macroprocesso ou o Avatar. */
+/* Marca na frente do texto de uma opção (OpcaoDaCaixa): o quadradinho da cor do setor ou o Avatar. */
 .opcao-marca {
   display: inline-grid;
   flex: none;

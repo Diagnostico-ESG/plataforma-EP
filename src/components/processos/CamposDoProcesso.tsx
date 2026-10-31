@@ -1,7 +1,6 @@
 import { useId } from 'react'
 import type { Macroprocesso, Setor } from '../../cadastros/tipos'
 import { LIMITE_DAS_ANOTACOES } from '../../processos/anotacoes'
-import { corDoMacroprocesso } from '../../processos/corDoMacroprocesso'
 import { ROTULO_DO_TIPO } from '../../processos/rotulos'
 import type { ProcessoDaLista, TipoDeProcesso } from '../../processos/tipos'
 import type { CamposDoProcesso } from '../../processos/validacaoDoProcesso'
@@ -91,7 +90,7 @@ function CampoDoMacroprocesso({ id, campos, macroprocessos, aoMudar }: CampoDoMa
         <BotaoDaCaixa />
         <option value="">Escolha o macroprocesso</option>
         {macroprocessos.filter((macro) => macro.ativo || macro.id === campos.macroprocessoId).map((macro) => (
-          <OpcaoDaCaixa key={macro.id} valor={macro.id} rotulo={macro.nome} cor={corDoMacroprocesso(macro.id)} />
+          <OpcaoDaCaixa key={macro.id} valor={macro.id} rotulo={macro.nome} />
         ))}
       </select>
     </>

@@ -94,8 +94,9 @@
   list-style: none;
 }
 
-.arquivo-com-icone {
-  display: inline-flex;
+/* O selo do tipo à esquerda do nome do arquivo. */
+.arquivos-em-lista li {
+  display: flex;
   align-items: center;
   gap: var(--esp-2);
 }

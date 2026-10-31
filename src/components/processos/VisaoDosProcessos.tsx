@@ -16,6 +16,7 @@ import { CabecalhoDaLista } from './CabecalhoDaLista'
 import { AgruparAListaPor, AgruparPor, SoOsMeus, TodosOuConcluidos } from './ControlesDoQuadro'
 import { ArvoreDaLista } from './ArvoreDaLista'
 import { BotaoLimparFiltros, FiltrosDosProcessos, NenhumProcessoComFiltros, NenhumProcessoDoUsuario } from './FiltrosDosProcessos'
+import { LegendaDasEtiquetas } from './LegendaDasEtiquetas'
 import { QuadroCarregando, QuadroDeProcessos } from './QuadroDeProcessos'
 import { TabelaCarregando, TabelaDeProcessos } from './TabelaDeProcessos'
 
@@ -91,6 +92,7 @@ function BarraDaVisao({ visao, opcoes, portfolio, filtros, aoMudarFiltros, mostr
         <ControlesDoQuadroNaBarra agrupar={props.agrupar} aoMudarAgrupar={props.aoMudarAgrupar} filtros={filtros} aoMudarFiltros={aoMudarFiltros}
           usuarioId={props.usuarioId} podeAlterar={podeAlterar} />
       )}
+      {!naLista && <LegendaDasEtiquetas />}
       {podeAlterar && <BotaoCadastrar aoCadastrar={aoCadastrar} />}
     </div>
   )

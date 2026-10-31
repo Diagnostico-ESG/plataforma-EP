@@ -1,0 +1,13 @@
+/* À direita dos controles, antes do [Cadastrar processo]; é leitura de apoio, então sem o negrito da etiqueta. */
+.legenda-das-etiquetas {
+  display: flex;
+  gap: 14px;
+  align-self: center;
+  margin: 0 0 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.legenda-das-etiquetas .etiqueta {
+  font-weight: 400;
+}

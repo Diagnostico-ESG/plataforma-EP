@@ -4,11 +4,11 @@ import './ArvoreDaLista.css'
 import type { EstadoDosArquivos } from '../../hooks/useArquivosDosProcessos'
 import { COLUNAS_DA_LISTA } from '../../processos/colunasDaLista'
 import { arquivosDaVersaoMaisRecente } from '../../versoes/arquivosDaArvore'
-import { iconeDoArquivo } from '../../versoes/iconeDoArquivo'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { Pilula } from '../Pilula'
 import { LinkDoArquivo } from '../versoes/LinkDoArquivo'
+import { SeloDoTipoDeArquivo } from '../versoes/SeloDoTipoDeArquivo'
 
 type ConteudoProps = { estado: EstadoDosArquivos | undefined; modulo: ModuloDeVersoes; aoTentarDeNovo: () => void }
 /** `nivel` é o do processo dono dos arquivos: a linha vem um passo à frente dele. */
@@ -37,7 +37,8 @@ function ConteudoDosArquivos({ estado, modulo, aoTentarDeNovo }: ConteudoProps) 
       <ul className="arquivos-em-lista">
         {arquivos.arquivos.map(({ arquivo }) => (
           <li key={arquivo.id}>
-            <LinkDoArquivo versoes={modulo} arquivo={arquivo} icone={iconeDoArquivo(arquivo.formato)} />
+            <SeloDoTipoDeArquivo formato={arquivo.formato} />
+            <LinkDoArquivo versoes={modulo} arquivo={arquivo} />
           </li>
         ))}
       </ul>
