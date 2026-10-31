@@ -47,6 +47,7 @@ export function QuadroDeProcessos(props: QuadroDeProcessosProps) {
   // O processo some do Quadro (excluído por outra pessoa) é o mesmo que mudou: o Quadro só recarrega.
   const movimento = useMovimentoDoProcesso(processos, lista.etapas, aoMudar, aoMudar)
   const arrasto = useArrastoDoQuadro(lista.etapas, movimento.mover)
+  const nomesDosSetores = Object.fromEntries(lista.setores.map((setor) => [setor.id, setor.nome]))
   const foraDoQuadro = { quantos: quantosForaDoQuadro(lista.processos), enderecoDaLista: enderecoDosConcluidosNaLista }
   return (
     <>
@@ -59,7 +60,7 @@ export function QuadroDeProcessos(props: QuadroDeProcessosProps) {
         {colunas.map((coluna) => (
           <ColunaDoQuadro key={coluna.chave} coluna={coluna} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso}
             podeAlterar={podeAlterar && !movimento.gravando} arrasto={arrasto} agrupar={agrupar} etapas={lista.etapas}
-            foraDoQuadro={foraDoQuadro} />
+            foraDoQuadro={foraDoQuadro} nomesDosSetores={nomesDosSetores} />
         ))}
       </div>
     </>

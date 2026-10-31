@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, expect, test } from 'vitest'
-import { Avatar } from './Avatar'
+import { Avatar, AvatarVazio } from './Avatar'
 
 afterEach(cleanup)
 
@@ -25,4 +25,17 @@ test('se a foto não carrega, mostra as iniciais', () => {
   render(<Avatar nome="Pessoa de Teste" fotoUrl="/foto-quebrada.png" />)
   fireEvent.error(screen.getByRole('img', { name: 'Pessoa de Teste' }))
   expect(screen.getByRole('img', { name: 'Pessoa de Teste' }).textContent).toBe('PT')
+})
+
+test('o avatar dos outros usuários é cinza; o do próprio usuário mantém o azul', () => {
+  render(<><Avatar nome="Pessoa de Teste" /><Avatar nome="Eu Mesmo" proprio /></>)
+  expect(screen.getByRole('img', { name: 'Pessoa de Teste' }).className).not.toContain('avatar-proprio')
+  expect(screen.getByRole('img', { name: 'Eu Mesmo' }).className).toContain('avatar-proprio')
+})
+
+test('sem responsável mostra um círculo tracejado com esse nome acessível', () => {
+  render(<AvatarVazio tamanho={32} />)
+  const vazio = screen.getByRole('img', { name: 'Sem responsável' })
+  expect(vazio.className).toContain('avatar-vazio')
+  expect(vazio.style.width).toBe('32px')
 })

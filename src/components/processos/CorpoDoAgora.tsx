@@ -10,7 +10,7 @@ import { hojeEmBrasilia } from '../../lib/datas'
 import type { EtiquetaDaEtapa, ModuloDeProcessos, ProcessoLido, UsuarioResponsavel } from '../../processos/tipos'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
-import { Avatar } from '../Avatar'
+import { Avatar, AvatarVazio } from '../Avatar'
 import { PublicacaoNoAgora } from './AgoraDaPublicacao'
 import { AcoesDoConcluido } from './AgoraDoConcluido'
 import { BotaoDaCaixa } from '../OpcaoDaCaixa'
@@ -90,10 +90,11 @@ function ListasDoAgora({ processo, movimento }: Pick<CorpoDoAgoraProps, 'process
   )
 }
 
-/** A foto ao lado do nome escrito: só enfeite, para o leitor de tela não ler o nome duas vezes. */
+/** A foto ao lado do nome escrito: só enfeite, para o leitor de tela não ler o nome duas vezes. Sem responsável, o círculo tracejado diz isso. */
 export function FotoDoResponsavel({ processo }: { processo: ProcessoLido }) {
   const { responsavel } = processo
-  return responsavel && <Avatar nome={responsavel.nome} fotoUrl={responsavel.fotoUrl ?? undefined} tamanho={32} decorativo />
+  if (!responsavel) return <AvatarVazio tamanho={32} />
+  return <Avatar nome={responsavel.nome} fotoUrl={responsavel.fotoUrl ?? undefined} tamanho={32} decorativo />
 }
 
 /** Só o selo do processo parado: o tempo até 7 dias saiu da linha do responsável. */

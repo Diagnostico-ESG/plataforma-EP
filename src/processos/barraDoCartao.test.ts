@@ -11,20 +11,16 @@ function processo(posicao: number | null, total = 8, nome = 'Revisão interna'):
 }
 
 describe('barraDoCartao', () => {
-  test('a fração preenchida é a posição da etapa atual sobre o total', () => {
-    expect(barraDoCartao(processo(4))?.fracao).toBe(0.5)
+  test('a posição e o total saem da etapa atual', () => {
+    expect(barraDoCartao(processo(4))).toMatchObject({ posicao: 4, total: 8 })
   })
 
-  test('em Não iniciados só o primeiro trecho está preenchido', () => {
-    expect(barraDoCartao(processo(1))?.fracao).toBe(1 / 8)
+  test('em Concluídos a posição é a última', () => {
+    expect(barraDoCartao(processo(8, 8, 'Concluídos'))).toMatchObject({ posicao: 8, total: 8 })
   })
 
-  test('em Concluídos, a barra está cheia', () => {
-    expect(barraDoCartao(processo(8, 8, 'Concluídos'))?.fracao).toBe(1)
-  })
-
-  test('com etapa desativada no catálogo, a fração usa só as etapas ativas que restaram', () => {
-    expect(barraDoCartao(processo(3, 6))?.fracao).toBe(0.5)
+  test('com etapa desativada no catálogo, o total usa só as etapas ativas que restaram', () => {
+    expect(barraDoCartao(processo(3, 6))).toMatchObject({ posicao: 3, total: 6 })
   })
 
   test('o nome acessível diz a posição, o total e a etapa atual', () => {

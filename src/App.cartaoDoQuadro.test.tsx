@@ -26,7 +26,8 @@ test('por etapa o cartão não traz a barra; a coluna já diz a etapa', async ()
   expect(barraDe(await cartaoDe('Emitir Ofício'))).toBeNull()
 })
 
-const preenchimentoDe = (barra: Element | null) => (barra?.querySelector('.barra-etapa-preenchida') as HTMLElement | null)?.style.getPropertyValue('--barra-fracao')
+// Um tracinho por etapa: os feitos, o atual e os futuros, nesta ordem.
+const tracinhosDe = (barra: Element | null) => Array.from(barra?.querySelectorAll('.barra-etapa-tracinho') ?? []).map((tracinho) => tracinho.getAttribute('data-estado'))
 
 test('por responsável a barra diz "Nome · n de N", é uma faixa lisa preenchida até a etapa atual e tem o nome acessível', async () => {
   montar([processo('Emitir Ofício', { etapa: 'revisao_interna' })])
@@ -36,26 +37,25 @@ test('por responsável a barra diz "Nome · n de N", é uma faixa lisa preenchid
   expect(barra?.getAttribute('aria-label')).toBe('Etapa 4 de 8: Revisão interna')
   expect(barra?.querySelector('.barra-etapa-texto')?.textContent).toBe('Revisão interna · 4 de 8')
   expect(barra?.querySelectorAll('.barra-etapa-trilho')).toHaveLength(1)
-  expect(barra?.querySelector('.pedaco')).toBeNull()
-  expect(preenchimentoDe(barra)).toBe('50%')
+  expect(tracinhosDe(barra)).toEqual(['feito', 'feito', 'feito', 'atual', 'futuro', 'futuro', 'futuro', 'futuro'])
 })
 
-test('em Não iniciados só o primeiro trecho da barra está preenchido', async () => {
+test('em Não iniciados só o primeiro tracinho é o atual', async () => {
   montar([processo('Novo', { etapa: 'nao_iniciados' })])
   await cartaoDe('Novo')
   await porResponsavel()
-  expect(preenchimentoDe(barraDe(await cartaoDe('Novo')))).toBe('12.5%')
+  expect(tracinhosDe(barraDe(await cartaoDe('Novo')))).toEqual(['atual', 'futuro', 'futuro', 'futuro', 'futuro', 'futuro', 'futuro', 'futuro'])
 })
 
 // O Quadro por responsável não mostra concluídos (ticket 03 de repositorio-de-processos): a barra cheia se vê por setor.
-test('em Concluídos a barra está cheia', async () => {
+test('em Concluídos o último tracinho é o atual e os outros estão feitos', async () => {
   montar([processo('Pronto', { etapa: 'concluidos', processo: { situacao: 'concluido', etiqueta: 'concluido' } })], 'integrante_ep', [],
     new VersoesFalso(), [umSetor('s1', 'TSA', 'Setor de Testes A')])
   await cartaoDe('Pronto')
   fireEvent.click(await screen.findByRole('button', { name: 'Setor' }))
   const barra = barraDe(await cartaoDe('Pronto'))
   expect(barra?.getAttribute('aria-label')).toBe('Etapa 8 de 8: Concluídos')
-  expect(preenchimentoDe(barra)).toBe('100%')
+  expect(tracinhosDe(barra)).toEqual(['feito', 'feito', 'feito', 'feito', 'feito', 'feito', 'feito', 'atual'])
 })
 
 test('o processo suspenso mostra a barra da etapa onde parou, com a pílula Suspenso', async () => {
@@ -84,6 +84,12 @@ test('a etiqueta é só o ícone, com o nome no title e no texto para leitor de 
 })
 
 // ---- Selos
+test('o selo do setor no cartão diz o nome do setor, no title e para o leitor de tela', async () => {
+  montar([processo('Com Setor')], 'integrante_ep', [], new VersoesFalso(), [umSetor('s1', 'TSA', 'Setor de Testes A')])
+  const selo = (await cartaoDe('Com Setor')).querySelector('.selo-do-setor')
+  expect(selo?.getAttribute('title')).toBe('Setor de Testes A')
+  expect(selo?.getAttribute('aria-label')).toBe('Setor de Testes A')
+})
 
 test('dias na etapa: sem selo com 7 dias, "8 dias nesta etapa" com 8; nunca no suspenso, em Não iniciados nem em Concluídos', async () => {
   montar([
@@ -98,7 +104,9 @@ test('dias na etapa: sem selo com 7 dias, "8 dias nesta etapa" com 8; nunca no s
   expect(selos(await cartaoDe('Sete Dias'))).toEqual([])
   const oito = await cartaoDe('Oito Dias')
   expect(selos(oito)).toEqual(['8 dias nesta etapa'])
-  expect(oito.querySelector('.cartao-selos .pilula')?.className).toContain('pilula-atraso')
+  // Sem fundo: ícone e texto, em vermelho.
+  expect(oito.querySelector('.cartao-selos .pilula')).toBeNull()
+  expect(oito.querySelector('.cartao-selos .selo-atraso svg')).not.toBeNull()
   expect(oito.className).toContain('cartao-parado')
   expect((await cartaoDe('Sete Dias')).className).not.toContain('cartao-parado')
   expect(selos(await cartaoDe('Suspenso Antigo'))).toEqual([])
@@ -128,6 +136,7 @@ test('Relatório pendente: ausente antes da Revisão interna, presente da Revis�
   ])
   expect(selos(await cartaoDe('Antes da Revisão'))).toEqual(['V3'])
   expect(selos(await cartaoDe('Na Revisão'))).toEqual(['Relatório pendente', 'V3'])
+  expect((await cartaoDe('Na Revisão')).querySelector('.cartao-selos .selo-vencendo svg')).not.toBeNull()
   expect(selos(await cartaoDe('Na Publicação'))).toEqual(['Relatório pendente', 'V3'])
   expect(selos(await cartaoDe('Com Relatório'))).toEqual(['V3'])
   expect(selos(await cartaoDe('Versão Histórica'))).toEqual(['V5F'])

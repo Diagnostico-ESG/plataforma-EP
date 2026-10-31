@@ -42,7 +42,7 @@ export function MenuDaConta({ usuario, aoSair }: MenuDaContaProps) {
         aria-controls={idDoPainel}
         onClick={() => (aberto ? fechar() : setAberto(true))}
       >
-        <Avatar nome={usuario.nome} fotoUrl={usuario.fotoUrl ?? undefined} tamanho={32} />
+        <Avatar nome={usuario.nome} fotoUrl={usuario.fotoUrl ?? undefined} tamanho={32} proprio />
       </button>
       {aberto && (
         <div id={idDoPainel} className="menu-conta-painel">

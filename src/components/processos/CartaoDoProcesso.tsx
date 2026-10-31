@@ -26,12 +26,14 @@ type CartaoDoProcessoProps = {
   agrupar: AgruparQuadroPor
   /** As etapas do catálogo: o selo de relatório pendente compara a posição da etapa atual com a da Revisão interna. */
   etapas: EtapaDoCatalogo[]
+  /** O nome do setor, para o selo; ausente se a lista não o trouxe. */
+  nomeDoSetor?: string
   aoLevantar: () => void
   aoBaixar: () => void
 }
 
 /** O cartão do Quadro é um link: focável, e Enter abre o painel do processo. Arrastar usa o recurso nativo do navegador. */
-export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagado, agrupar, etapas, aoLevantar, aoBaixar }: CartaoDoProcessoProps) {
+export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagado, agrupar, etapas, nomeDoSetor, aoLevantar, aoBaixar }: CartaoDoProcessoProps) {
   const { id, nome, tipo, situacao } = processo
   const porResponsavel = agrupar === 'responsavel'
   function comecarAArrastar(evento: DragEvent<HTMLAnchorElement>) {
@@ -45,7 +47,7 @@ export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagad
     <a id={`cartao-${id}`} className={classesDoCartao(processo, apagado)} href={href} aria-current={escolhido ? 'true' : undefined}
       draggable={arrastavel} onDragStart={arrastavel ? comecarAArrastar : undefined} onDragEnd={arrastavel ? aoBaixar : undefined}>
       <span className="cartao-topo">
-        {agrupar !== 'setor' && <SeloDoSetor sigla={processo.setorSigla} cor={processo.setorCor ?? 1} />}
+        {agrupar !== 'setor' && <SeloDoSetor sigla={processo.setorSigla} cor={processo.setorCor ?? 1} nome={nomeDoSetor} />}
         {tipo !== 'processo' && <Pilula situacao="neutra">{ROTULO_DO_TIPO[tipo]}</Pilula>}
         {situacao === 'suspenso' && <Pilula situacao="neutra">Suspenso</Pilula>}
         <EtiquetaDoProcesso etiqueta={processo.etiqueta} soIcone />

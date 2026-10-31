@@ -16,3 +16,10 @@ test('o número 7 do banco e o 19 mostram a mesma cor, pelo ciclo de 12', () => 
   render(<><SeloDoSetor sigla="AAA" cor={7} /><SeloDoSetor sigla="BBB" cor={19} /></>)
   expect(screen.getByText('BBB').style.getPropertyValue('--cor-do-setor')).toBe(screen.getByText('AAA').style.getPropertyValue('--cor-do-setor'))
 })
+
+test('com o nome, o selo o mostra ao passar o mouse e o diz ao leitor de tela', () => {
+  render(<SeloDoSetor sigla="TSA" cor={1} nome="Setor de Testes A" />)
+  const selo = screen.getByRole('img', { name: 'Setor de Testes A' })
+  expect(selo.getAttribute('title')).toBe('Setor de Testes A')
+  expect(selo.textContent).toBe('TSA')
+})

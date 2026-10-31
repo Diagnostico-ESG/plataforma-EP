@@ -7,8 +7,8 @@
 }
 
 .avatar-iniciais {
-  background: var(--azul-claro);
-  color: var(--azul-escuro);
+  background: var(--avatar-fundo);
+  color: var(--avatar-texto);
   font-weight: 600;
   line-height: 1;
   user-select: none;
@@ -16,4 +16,14 @@
 
 .avatar-iniciais[data-iniciais]::before {
   content: attr(data-iniciais);
+}
+
+.avatar-proprio {
+  background: var(--azul-claro);
+  color: var(--azul-escuro);
+}
+
+.avatar-vazio {
+  border: 1.5px dashed var(--linha-tracejada);
+  box-sizing: border-box;
 }

@@ -1,18 +1,19 @@
 import { selosDoCartao, type Selo } from '../../processos/selosDoCartao'
 import type { EtapaDoCatalogo, ProcessoDaLista } from '../../processos/tipos'
-import { Pilula, type SituacaoPilula } from '../Pilula'
+import { Icone, type NomeIcone } from '../Icone'
 
-// Parado é vermelho suave, para não se confundir com o laranja da etiqueta Em andamento; o outro alerta segue âmbar.
-function situacaoDoSelo(selo: Selo): SituacaoPilula {
-  if (selo.tipo === 'dias') return 'atraso'
-  return selo.tom === 'alerta' ? 'vencendo' : 'neutra'
+const ICONE_DO_SELO: Partial<Record<Selo['tipo'], NomeIcone>> = { dias: 'relogio', relatorio: 'documento' }
+
+// Parado é vermelho; o outro alerta (relatório pendente) é laranja. Sem fundo: só ícone e texto, em mono.
+function classeDoSelo(selo: Selo): string {
+  if (selo.tipo === 'dias') return 'selo-texto selo-atraso'
+  if (selo.tom === 'alerta') return 'selo-texto selo-vencendo'
+  return selo.tipo === 'versao' ? 'selo-texto selo-versao' : 'selo-texto'
 }
 
-/** Versão e subprocessos são só texto neutro, sem fundo; os demais são pílulas (vermelha no parado, âmbar no outro alerta). */
 function SeloDoCartao({ selo }: { selo: Selo }) {
-  if (selo.tipo === 'versao') return <span className="selo-texto selo-versao">{selo.texto}</span>
-  if (selo.tipo === 'subprocessos') return <span className="selo-texto">{selo.texto}</span>
-  return <Pilula situacao={situacaoDoSelo(selo)}>{selo.texto}</Pilula>
+  const icone = ICONE_DO_SELO[selo.tipo]
+  return <span className={classeDoSelo(selo)}>{icone && <Icone nome={icone} tamanho={13} />}{selo.texto}</span>
 }
 
 type SelosDoCartaoProps = { processo: ProcessoDaLista; hoje: string; etapas: EtapaDoCatalogo[] }

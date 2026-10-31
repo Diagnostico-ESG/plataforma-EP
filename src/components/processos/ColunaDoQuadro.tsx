@@ -20,11 +20,13 @@ type ColunaDoQuadroProps = {
   agrupar: AgruparQuadroPor
   /** As etapas do catálogo: o cartão e os selos precisam delas. */
   etapas: EtapaDoCatalogo[]
+  /** Id do setor → nome, para o selo do cartão dizer o nome. */
+  nomesDosSetores: Record<string, string>
   /** Só a coluna Concluídos do Quadro por etapa: os concluídos fora do Quadro e a Lista que os mostra. */
   foraDoQuadro?: { quantos: number; enderecoDaLista: string }
 }
 
-export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAlterar, arrasto, agrupar, etapas, foraDoQuadro }: ColunaDoQuadroProps) {
+export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAlterar, arrasto, agrupar, etapas, nomesDosSetores, foraDoQuadro }: ColunaDoQuadroProps) {
   const { levantado } = arrasto
   const tirar = useTirarDoQuadroDaTela()
   const dosConcluidos = agrupar === 'etapa' && coluna.chave === CHAVE_DOS_CONCLUIDOS
@@ -46,8 +48,8 @@ export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAl
       <h3 className="coluna-titulo">
         <span className="coluna-titulo-texto">
           <span className="coluna-titulo-principal">{coluna.titulo}{coluna.inativo && <> <Pilula situacao="neutra">Inativo</Pilula></>}</span>
-          {coluna.subtitulo && <span className="coluna-titulo-nome">{coluna.subtitulo}</span>}
         </span>
+        {coluna.subtitulo && <span className="coluna-titulo-nome">{coluna.subtitulo}</span>}
         <span className="coluna-contagem">{coluna.processos.length}</span>
       </h3>
       <div className="coluna-cartoes">
@@ -56,7 +58,7 @@ export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAl
           const cartao = (
             <CartaoDoProcesso key={processo.id} processo={processo} escolhido={processo.id === idEscolhido}
               href={enderecoDoProcesso(processo.id)} arrastavel={podeAlterar && agrupar === 'etapa' && podeArrastar(processo)}
-              agrupar={agrupar} etapas={etapas} apagado={levantado?.id === processo.id}
+              agrupar={agrupar} etapas={etapas} nomeDoSetor={nomesDosSetores[processo.setorId]} apagado={levantado?.id === processo.id}
               aoLevantar={() => arrasto.levantar(processo)} aoBaixar={arrasto.baixar} />
           )
           if (!dosConcluidos || !podeAlterar || !tirar) return cartao

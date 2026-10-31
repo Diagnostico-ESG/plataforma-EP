@@ -68,6 +68,9 @@
   --aprovado-texto: #166a4d;
   --aprovado-fundo: #e6f4ef;
   --neutra-texto: #4a5163;
+  /* Avatar dos outros usuários: cinza; o do próprio usuário usa o azul. */
+  --avatar-texto: #4a5163;
+  --avatar-fundo: #e9ecf1;
   --neutra-fundo: #eef0f4;
 
   /* Etiquetas da etapa, só ícone: círculo vazio, meio azul, círculo verde com visto (3,3:1, acima do mínimo gráfico de 3:1) */

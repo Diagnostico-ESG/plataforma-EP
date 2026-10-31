@@ -72,6 +72,7 @@
 /* Cabeçalho da coluna: o nome numa plaqueta branca e a contagem em mono colada. A coluna em si é o fundo; não leva cor de setor. */
 .coluna-titulo {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--esp-2);
   margin: 0;
@@ -81,7 +82,6 @@
 
 .coluna-titulo-texto {
   display: flex;
-  flex-direction: column;
   min-width: 0;
   padding: 3px var(--esp-3);
   border: 1px solid var(--linha);
@@ -89,7 +89,10 @@
   background: var(--folha);
 }
 
+/* A descrição vem abaixo da plaqueta, em cinza, ocupando a linha inteira (order a põe depois da contagem; a leitura segue sigla, nome, contagem). */
 .coluna-titulo-nome {
+  order: 1;
+  flex-basis: 100%;
   color: var(--texto-2);
   font-size: var(--tam-rotulo);
   font-weight: 400;
@@ -231,20 +234,23 @@
 }
 
 .barra-etapa-trilho {
-  display: block;
-  overflow: hidden;
+  display: flex;
+  gap: 3px;
   height: 4px;
-  border-radius: var(--canto-macro);
-  background: var(--trilha-vazia);
-  /* Oito tracinhos: um para cada etapa. */
-  mask: repeating-linear-gradient(to right, currentColor 0 calc(12.5% - 3px), transparent 0 12.5%);
 }
 
-.barra-etapa-preenchida {
-  display: block;
-  width: var(--barra-fracao);
-  height: 100%;
+/* Um tracinho por etapa: feitos em cinza-azulado, o atual em azul, os futuros em cinza-claro. */
+.barra-etapa-tracinho {
+  flex: 1;
   border-radius: var(--canto-macro);
+  background: var(--trilha-vazia);
+}
+
+.barra-etapa-tracinho[data-estado='feito'] {
+  background: var(--trilha-feita);
+}
+
+.barra-etapa-tracinho[data-estado='atual'] {
   background: var(--azul);
 }
 
@@ -255,12 +261,17 @@ td .barra-etapa {
 
 /* Contraste forçado apaga fundos: o trilho ganha borda e o preenchimento vira CanvasText. */
 @media (forced-colors: active) {
-  .barra-etapa-trilho {
+  .barra-etapa-tracinho {
     border: 1px solid CanvasText;
   }
 
-  .barra-etapa-preenchida {
+  .barra-etapa-tracinho[data-estado='feito'] {
     background: CanvasText;
+  }
+
+  /* O atual se distingue dos feitos pela cor de destaque do sistema. */
+  .barra-etapa-tracinho[data-estado='atual'] {
+    background: Highlight;
   }
 }
 
@@ -277,6 +288,9 @@ td .barra-etapa {
 }
 
 .selo-texto {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-1);
   color: var(--texto-2);
   font-family: var(--fonte-mono);
   font-size: var(--tam-rotulo);
@@ -510,4 +524,13 @@ td .barra-etapa {
   margin: 0;
   color: var(--texto-2);
   font-size: var(--tam-secundario);
+}
+
+/* Rodapé do cartão: dias parado em vermelho, relatório pendente em laranja. */
+.selo-atraso {
+  color: var(--atraso-texto);
+}
+
+.selo-vencendo {
+  color: var(--vencendo-texto);
 }

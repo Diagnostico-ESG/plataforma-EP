@@ -63,22 +63,22 @@ Este é o **único documento** da redesenho: o que foi decidido (acima) e o que 
 | # | Decisão | Estado | O que falta |
 |---|---|---|---|
 | 1 | Moldura grafite e branca (faixa lateral escura, barra superior branca) | Feito | Barra superior só com título, busca, sino e avatar (sem Quadro \| Lista); faixa lateral com Processos, Setores, Painel, Administração e Ajuda (itens 9 e 16 abaixo) |
-| 2 | Selo do setor em branco sobre cor forte (12 cores) | Feito | Nome do setor ao passar o mouse e para o leitor de tela |
-| 2 | Prazo em vermelho (atrasado) e laranja (perto de vencer) | Falta | Hoje é pílula com fundo; vira ícone de calendário + texto na cor do prazo |
+| 2 | Selo do setor em branco sobre cor forte (12 cores) | Feito (2026-10-30) | Nome do setor ao passar o mouse e para o leitor de tela já vale no cartão do Quadro; falta na Lista, no verso e nas linhas de grupo (a lista de processos não traz o nome do setor) |
+| 2 | Prazo em vermelho (atrasado) e laranja (perto de vencer) | Parcial | Dias parado e relatório pendente já são ícone + texto sem fundo (2026-10-30). Falta o prazo em si: o cartão não recebe essa data (exige mudar a view do banco) |
 | 3 | Azul-claro para escolhido; azul cheio só na ação principal | Feito | — |
 | 4 | Etiqueta só por ícone, com legenda uma vez no cabeçalho | Parcial | Ícone feito; falta a legenda na faixa de controles e decidir os nomes "Iniciado/Finalizado" (código diz "Em andamento/Concluído") |
 | 5 | Situação em selo discreto (exceções em destaque) | Feito | — |
-| 6 | Ícones: um por etapa e um por informação do cartão | Parcial | Falta o ícone por etapa (o catálogo não guarda ícone) e os ícones do rodapé do cartão, com contador de arquivos |
+| 6 | Ícones: um por etapa e um por informação do cartão | Parcial | Ícones do rodapé do cartão (dias, relatório) feitos em 2026-10-30. Faltam o ícone por etapa (o catálogo não guarda ícone) e o contador de arquivos (o cartão não recebe a contagem; exige a view do banco) |
 | 7 | Faixa de controles de 56px com botão "Filtros" e contador | Falta | Hoje são cinco seletores soltos num bloco branco |
-| 8 | Cartão com nome em destaque e versão no rodapé | Parcial | Rodapé com ícones (ver 6); responsável como "Você" |
+| 8 | Cartão com nome em destaque e versão no rodapé | Parcial | Responsável como "Você" |
 | 8 | "Destacar os meus" (esmaece, não esconde) | Falta | Hoje "Só os meus" filtra e esconde |
 | 8 | Interruptor "Linhas: Nenhuma \| Setor \| Responsável" | Falta | Hoje "Agrupar por: Etapa \| Responsável \| Setor" troca a visão inteira |
 | 8 | Nas linhas por setor, só a sigla com nome ao passar o mouse | Falta | Depende de "Linhas" |
 | 9 | Verso: janela fixa 880 × 740, trilha de etapas, avisos lado a lado | Feito | — |
 | 9 | Verso enxuto: sem abas, miniatura grande, anotações com o dobro do espaço, histórico no "···" | Falta | Estrutura do verso ainda é a antiga |
-| — | Cabeçalho da coluna: plaqueta só com o nome, contagem, "+" e "⋮", descrição abaixo | Parcial | Falta tirar a descrição da plaqueta e o ícone da etapa |
-| — | Avatar: iniciais cinza para os outros, "sem responsável" tracejado, tamanhos 20/24/32 | Falta | — |
-| — | Trilha de 8 tracinhos (atual azul, feitas cinza-azulado) | Parcial | Hoje é uma cor só |
+| — | Cabeçalho da coluna: plaqueta só com o nome, contagem, "+" e "⋮", descrição abaixo | Parcial | Descrição fora da plaqueta feita em 2026-10-30; falta o ícone da etapa |
+| — | Avatar: iniciais cinza para os outros, "sem responsável" tracejado, tamanhos 20/24/32 | Feito (2026-10-30) | O tracejado aparece no Agora do verso; o cartão do Quadro segue com o texto "Sem responsável" (decisão da spec: cartão sem avatar) |
+| — | Trilha de 8 tracinhos (atual azul, feitas cinza-azulado) | Feito (2026-10-30) | — |
 | — | "Mostrar" num segmento (Em andamento \| Concluídos \| Cancelados \| Todos) | Falta | — |
 | — | Criar setor numa janela de 520px | Falta | Hoje é página de formulário |
 | — | Selo de tipo de arquivo em mono; quadradinho do macroprocesso sai das caixas | Falta | — |
@@ -87,7 +87,7 @@ Este é o **único documento** da redesenho: o que foi decidido (acima) e o que 
 
 ### Como seguir, nesta ordem
 
-1. **`/demanda` — acabamento visual, sem mudar regra** (em andamento): selo com nome, rodapé do cartão com ícones, avatar, cabeçalho da coluna, trilha de tracinhos.
+1. **`/demanda` — acabamento visual, sem mudar regra** (feito em 2026-10-30, salvo prazo e contador de arquivos, que dependem da view do banco): selo com nome, rodapé do cartão com ícones, avatar, cabeçalho da coluna, trilha de tracinhos.
 2. **`/demanda` — ajustes pequenos**: "Destacar os meus", "Mostrar" em segmento, janela de novo setor, nomes das etiquetas, quadradinho do macroprocesso, ícone/legenda.
 3. **`/planejar` — uma funcionalidade só, "Quadro igual à proposta 6"**: faixa de controles com "Filtros", "Linhas", barra superior e faixa lateral novas, verso enxuto, ícone por etapa. Fonte: este arquivo + `proposta-6.html`, `verso-3.html` e `.scratch/identidade-visual.md` (valem as medidas dele, base 14px).
 4. **Manutenção, sem mudança visual**: dividir o `Quadro.css` (passou de 300 linhas), ADR das 12 cores em `corDoSetor.ts`, uma função só para a conversão da cor 1–30 → 1–12, `/impeccable document`.
