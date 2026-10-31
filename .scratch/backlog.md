@@ -173,4 +173,4 @@ Uma linha por item: o que é e onde surgiu.
 - 2026-10-30 | conversa de análise de design | Ideia para discutir: Quadro em matriz com raias (swimlanes), etapas nas colunas e setores nas linhas, raias recolhíveis e "Agrupar linhas por: Setor | Responsável | nenhum" no lugar das visões por setor e por responsável. Referências: Azure DevOps (raias por pessoa) e Linear (subagrupamento). Detalhes em `.scratch/analise-de-design-2026-10-30.md`. O usuário gostou; discutir depois de resolver cores, cartão e cabeçalho.
 - pgTAP intermitente: `passagens_saida_depois_da_entrada` falhou uma vez no Docker local (teste "o concluído tirado do Quadro volta a outra etapa", `supabase/tests`); passou na repetição sem mudança. Surgiu em responsavel-inicial-por-etapa (2026-10-30); investigar se `trocar_passagem` usa `clock_timestamp()` contra um `entrou_em` de `now()`.
 
-- Pendências da identidade visual (redesenho de 2026-10-30): ficam em `.scratch/identidade-visual/pendencias.md`, fora deste backlog.
+- Pendências da identidade visual (redesenho de 2026-10-30): ficam em `.scratch/proposta-visual/decisoes.md` (seção "Estado de cada decisão"), fora deste backlog.

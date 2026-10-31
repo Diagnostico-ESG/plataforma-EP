@@ -1,6 +1,6 @@
-# Redesenho visual: decisões do usuário (2026-10-30)
+# Redesenho visual: decisões e estado (2026-10-30)
 
-Resultado da sessão de conversa de 2026-10-30. São protótipos descartáveis em HTML, com dados inventados; nada foi implementado no app. Este arquivo diz qual proposta vale e o que o usuário decidiu.
+Resultado da sessão de conversa de 2026-10-30. Os protótipos são descartáveis, em HTML, com dados inventados. **Este é o único documento do redesenho:** diz qual proposta vale, o que o usuário decidiu e, na seção "Estado de cada decisão", o que já está no app e o que falta.
 
 ## O que vale
 
@@ -46,10 +46,50 @@ Análises que justificam as escolhas:
 
 - **Matriz.** Etapas nas colunas e setores nas linhas: registrada no `backlog.md`. O interruptor "Linhas" da proposta 6 já é o primeiro passo dela. Tirar o "Quadro por setor" só depois de ver o uso.
 - **Possível defeito no histórico do processo:** os registros "Moveu o processo" não mostram a etapa de → para (visto em 2026-10-30, causa não investigada).
-- **DESIGN.md.** Descreve a identidade antiga (barra azul, cores pastel); precisa ser refeito para a nova direção.
+- **DESIGN.md.** Refeito em 2026-10-30 para a identidade nova.
 
 ## Revisto na `/concepcao-livre` (2026-10-30)
 
 - **Regra 2, cores do setor:** o usuário liberou vermelho, âmbar, verde e azul para os selos. Ficaram 12 cores fortes (vermelho trocado por bordô, para não se confundir com o prazo atrasado), em ciclo sobre os números 1 a 30 do banco, sem migração.
 - **Escala:** base de 14px (os protótipos usam 13px; o app usava 15px).
 - A identidade completa está em `.scratch/identidade-visual.md`.
+
+## Estado de cada decisão (atualizado em 2026-10-30)
+
+Este é o **único documento** da redesenho: o que foi decidido (acima) e o que já está no código ou falta (aqui). Ao concluir algo, mude a coluna "Estado" e a data. O resto do projeto fica no `backlog.md`.
+
+**Feito** = no código e conferido. **Falta** = ainda não existe na tela.
+
+| # | Decisão | Estado | O que falta |
+|---|---|---|---|
+| 1 | Moldura grafite e branca (faixa lateral escura, barra superior branca) | Feito | Barra superior só com título, busca, sino e avatar (sem Quadro \| Lista); faixa lateral com Processos, Setores, Painel, Administração e Ajuda (itens 9 e 16 abaixo) |
+| 2 | Selo do setor em branco sobre cor forte (12 cores) | Feito | Nome do setor ao passar o mouse e para o leitor de tela |
+| 2 | Prazo em vermelho (atrasado) e laranja (perto de vencer) | Falta | Hoje é pílula com fundo; vira ícone de calendário + texto na cor do prazo |
+| 3 | Azul-claro para escolhido; azul cheio só na ação principal | Feito | — |
+| 4 | Etiqueta só por ícone, com legenda uma vez no cabeçalho | Parcial | Ícone feito; falta a legenda na faixa de controles e decidir os nomes "Iniciado/Finalizado" (código diz "Em andamento/Concluído") |
+| 5 | Situação em selo discreto (exceções em destaque) | Feito | — |
+| 6 | Ícones: um por etapa e um por informação do cartão | Parcial | Falta o ícone por etapa (o catálogo não guarda ícone) e os ícones do rodapé do cartão, com contador de arquivos |
+| 7 | Faixa de controles de 56px com botão "Filtros" e contador | Falta | Hoje são cinco seletores soltos num bloco branco |
+| 8 | Cartão com nome em destaque e versão no rodapé | Parcial | Rodapé com ícones (ver 6); responsável como "Você" |
+| 8 | "Destacar os meus" (esmaece, não esconde) | Falta | Hoje "Só os meus" filtra e esconde |
+| 8 | Interruptor "Linhas: Nenhuma \| Setor \| Responsável" | Falta | Hoje "Agrupar por: Etapa \| Responsável \| Setor" troca a visão inteira |
+| 8 | Nas linhas por setor, só a sigla com nome ao passar o mouse | Falta | Depende de "Linhas" |
+| 9 | Verso: janela fixa 880 × 740, trilha de etapas, avisos lado a lado | Feito | — |
+| 9 | Verso enxuto: sem abas, miniatura grande, anotações com o dobro do espaço, histórico no "···" | Falta | Estrutura do verso ainda é a antiga |
+| — | Cabeçalho da coluna: plaqueta só com o nome, contagem, "+" e "⋮", descrição abaixo | Parcial | Falta tirar a descrição da plaqueta e o ícone da etapa |
+| — | Avatar: iniciais cinza para os outros, "sem responsável" tracejado, tamanhos 20/24/32 | Falta | — |
+| — | Trilha de 8 tracinhos (atual azul, feitas cinza-azulado) | Parcial | Hoje é uma cor só |
+| — | "Mostrar" num segmento (Em andamento \| Concluídos \| Cancelados \| Todos) | Falta | — |
+| — | Criar setor numa janela de 520px | Falta | Hoje é página de formulário |
+| — | Selo de tipo de arquivo em mono; quadradinho do macroprocesso sai das caixas | Falta | — |
+| — | Lista, cadastros e histórico (tabela, grupos, cabeçalhos) | Feito | — |
+| — | DESIGN.md refeito | Feito (2026-10-30) | `.impeccable/design.json` ainda descreve a identidade antiga (`/impeccable document`) |
+
+### Como seguir, nesta ordem
+
+1. **`/demanda` — acabamento visual, sem mudar regra** (em andamento): selo com nome, rodapé do cartão com ícones, avatar, cabeçalho da coluna, trilha de tracinhos.
+2. **`/demanda` — ajustes pequenos**: "Destacar os meus", "Mostrar" em segmento, janela de novo setor, nomes das etiquetas, quadradinho do macroprocesso, ícone/legenda.
+3. **`/planejar` — uma funcionalidade só, "Quadro igual à proposta 6"**: faixa de controles com "Filtros", "Linhas", barra superior e faixa lateral novas, verso enxuto, ícone por etapa. Fonte: este arquivo + `proposta-6.html`, `verso-3.html` e `.scratch/identidade-visual.md` (valem as medidas dele, base 14px).
+4. **Manutenção, sem mudança visual**: dividir o `Quadro.css` (passou de 300 linhas), ADR das 12 cores em `corDoSetor.ts`, uma função só para a conversão da cor 1–30 → 1–12, `/impeccable document`.
+
+**Fora do redesenho:** possível defeito no histórico ("Moveu o processo" sem as etapas de → para; `/demanda`, bug), e o que depende de você (olhar o app com o login real, conferir o Catálogo de etapas, escolher o responsável inicial de cada etapa).
