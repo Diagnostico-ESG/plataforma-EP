@@ -79,6 +79,8 @@ typography:
 rounded:
   canto: "8px"
   canto-botao: "6px"
+  canto-macro: "2px"
+  canto-amostra: "5px"
   canto-selo: "4px"
   canto-janela: "12px"
   redondo: "999px"

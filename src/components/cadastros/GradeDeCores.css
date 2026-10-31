@@ -1,6 +1,6 @@
 .grade-de-cores {
   display: grid;
-  grid-template-columns: repeat(10, minmax(0, 1fr));
+  grid-template-columns: repeat(6, 34px);
   gap: var(--esp-2);
   margin: 0;
   padding: 0;
@@ -29,8 +29,8 @@
 
 .amostra-de-cor-tom {
   display: block;
-  height: 28px;
-  border-radius: var(--canto-macro);
+  height: 24px;
+  border-radius: var(--canto-amostra);
   background: var(--cor-do-setor);
   outline: 2px solid transparent;
   outline-offset: 2px;

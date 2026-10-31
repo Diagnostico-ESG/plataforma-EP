@@ -234,17 +234,17 @@
   display: block;
   overflow: hidden;
   height: 4px;
-  border-radius: 2px;
+  border-radius: var(--canto-macro);
   background: var(--trilha-vazia);
   /* Oito tracinhos: um para cada etapa. */
-  mask: repeating-linear-gradient(to right, #000 0 calc(12.5% - 3px), transparent 0 12.5%);
+  mask: repeating-linear-gradient(to right, currentColor 0 calc(12.5% - 3px), transparent 0 12.5%);
 }
 
 .barra-etapa-preenchida {
   display: block;
   width: var(--barra-fracao);
   height: 100%;
-  border-radius: 2px;
+  border-radius: var(--canto-macro);
   background: var(--azul);
 }
 

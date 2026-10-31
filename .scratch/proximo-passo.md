@@ -1,9 +1,9 @@
 # Próximo passo (2026-10-30)
 
-**Situação:** a identidade "Grafite e branco, cor em ponto" está em código (tokens, moldura, Quadro e cartão, Lista, cadastros, verso, DESIGN.md), na opção A: só a aparência mudou; o comportamento novo (interruptor "Linhas", "Destacar os meus", "Filtros" com contador, verso enxuto, janela de novo setor e outros) está no `.scratch/backlog.md`, na seção "Comportamento novo da identidade". O marco `marco/2026-10-30-identidade` marca o fim desta etapa.
+**Situação:** a identidade "Grafite e branco, cor em ponto" está em código e polida (`/polir` feito; achados em `.scratch/identidade-visual/desvios.md`). Marco `marco/2026-10-30-identidade`. O comportamento novo e as pendências visuais estão no `.scratch/backlog.md` (seções "Comportamento novo da identidade" e "Achados da revisão de código da identidade").
 
-**Próximo comando:** `/polir` (Sonnet), num redesenho, para conferir as telas existentes. Depois, `/demanda` (Opus para classificar) para os itens de comportamento novo do backlog; o interruptor "Linhas" e o verso enxuto pedem `/planejar`.
+**Próximo comando:** `/demanda` (Opus para classificar), um item por vez, começando pelos pequenos (selo do setor com nome, "Destacar os meus", "Mostrar" em segmento, janela de novo setor). O interruptor "Linhas", o botão "Filtros" e o verso enxuto pedem `/planejar`. Não há `/ship` pendente: a identidade é redesenho sem ticket novo.
 
-**Também pendente:** possível defeito do histórico ("Moveu o processo" sem as etapas de → para); `.impeccable/design.json` desatualizado.
+**Também pendente:** possível defeito do histórico ("Moveu o processo" sem as etapas de → para); `.impeccable/design.json` desatualizado (`/impeccable document`).
 
 **Depende do usuário:** olhar o app com o login real; conferir o Catálogo de etapas; escolher o responsável inicial de cada etapa.
