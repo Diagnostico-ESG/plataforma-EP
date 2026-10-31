@@ -519,3 +519,11 @@ td .barra-etapa {
 .selo-vencendo {
   color: var(--vencendo-texto);
 }
+
+/* O fantasma do Quadro enquanto carrega, dentro do .quadro da visão (embaixo da faixa de controles). */
+.quadro-carregando-bloco {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--esp-3);
+}

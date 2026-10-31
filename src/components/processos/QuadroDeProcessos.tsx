@@ -75,7 +75,7 @@ function rolarNaBorda(quadro: HTMLElement, x: number) {
 
 export function QuadroCarregando() {
   return (
-    <div className="quadro" aria-busy="true">
+    <div className="quadro-carregando-bloco" aria-busy="true">
       <p className="quadro-carregando" role="status">Carregando processos…</p>
       <div className="quadro-colunas" aria-hidden="true">
         {COLUNAS_FANTASMA.map((coluna) => <div key={coluna} className="coluna coluna-fantasma" />)}

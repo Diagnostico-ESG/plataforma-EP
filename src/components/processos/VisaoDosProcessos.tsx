@@ -58,37 +58,44 @@ type VisaoDosProcessosProps = {
 }
 
 /** Quadro ou Lista, com os estados comuns (carregando, erro, vazio), a barra de cima e os filtros. */
+// Carregando ou com erro, a faixa já aparece com os mesmos controles, desabilitada, e é a mesma faixa quando os dados chegam
+// (nada pula nem se remonta). Sem nenhum processo cadastrado, vale só o aviso de vazio.
 export function VisaoDosProcessos(props: VisaoDosProcessosProps) {
-  const { visao, estado, aoTentarDeNovo, podeAlterar, aoCadastrar, filtros, aoMudarFiltros, agrupar, usuarioId } = props
-  const { mostrar, aoLimparTudo } = props
-  if (estado.tipo === 'carregando') return visao === 'quadro' ? <QuadroCarregando /> : <ListaCarregando />
-  if (estado.tipo === 'erro') return <ErroAoCarregar alvo="os processos" aoTentarDeNovo={aoTentarDeNovo} />
-  if (estado.valor.processos.length === 0) return <QuadroVazio podeCadastrar={podeAlterar} aoCadastrar={aoCadastrar} />
-  const portfolio = ehPortfolio(visao, agrupar)
-  const { filtrados, visiveis, vazio } = oQueAVisaoMostra(estado.valor.processos, filtros, portfolio, mostrar)
-  const lista = { ...estado.valor, processos: filtrados }
-  const opcoes = opcoesDosFiltros(estado.valor)
+  const { estado, podeAlterar, aoCadastrar } = props
+  if (estado.tipo === 'pronto' && estado.valor.processos.length === 0) return <QuadroVazio podeCadastrar={podeAlterar} aoCadastrar={aoCadastrar} />
+  const opcoes = estado.tipo === 'pronto' ? opcoesDosFiltros(estado.valor) : SEM_OPCOES
   return (
     <div className="visao-dos-processos">
-      <FaixaDaVisao {...props} opcoes={opcoes} portfolio={portfolio} />
+      <FaixaDaVisao {...props} opcoes={opcoes} portfolio={ehPortfolio(props.visao, props.agrupar)} desabilitada={estado.tipo !== 'pronto'} />
       <div className="quadro">
-        {vazio
-          ? <SemResultado filtros={filtros} usuarioId={usuarioId} aoMudarFiltros={aoMudarFiltros} aoLimparTudo={aoLimparTudo} />
-          : <ConteudoDaVisao {...props} lista={lista} visiveis={visiveis} todos={estado.valor.processos} opcoes={opcoes} />}
+        <CorpoDaVisao {...props} opcoes={opcoes} />
       </div>
     </div>
   )
 }
 
-type FaixaDaVisaoProps = VisaoDosProcessosProps & { opcoes: OpcoesDosFiltros; portfolio: boolean }
+const SEM_OPCOES: OpcoesDosFiltros = { setores: [], macroprocessos: [], etapas: [], tipos: [], responsaveis: [], situacoes: [] }
+
+function CorpoDaVisao(props: VisaoDosProcessosProps & { opcoes: OpcoesDosFiltros }) {
+  const { visao, estado, filtros, aoMudarFiltros, usuarioId, mostrar, aoLimparTudo } = props
+  if (estado.tipo === 'carregando') return visao === 'quadro' ? <QuadroCarregando /> : <TabelaCarregando />
+  if (estado.tipo === 'erro') return <ErroAoCarregar alvo="os processos" aoTentarDeNovo={props.aoTentarDeNovo} />
+  const portfolio = ehPortfolio(visao, props.agrupar)
+  const { filtrados, visiveis, vazio } = oQueAVisaoMostra(estado.valor.processos, filtros, portfolio, mostrar)
+  if (vazio) return <SemResultado filtros={filtros} usuarioId={usuarioId} aoMudarFiltros={aoMudarFiltros} aoLimparTudo={aoLimparTudo} />
+  const lista = { ...estado.valor, processos: filtrados }
+  return <ConteudoDaVisao {...props} lista={lista} visiveis={visiveis} todos={estado.valor.processos} />
+}
+
+type FaixaDaVisaoProps = VisaoDosProcessosProps & { opcoes: OpcoesDosFiltros; portfolio: boolean; desabilitada?: boolean }
 
 // No Quadro, os filtros e o Só os meus; na Lista, o Agrupar por e o Limpar filtros (os filtros ficam no cabeçalho da tabela).
 // Todos | Concluídos só no portfólio (Lista e Quadro por setor).
-function FaixaDaVisao({ visao, opcoes, portfolio, filtros, aoMudarFiltros, mostrar, aoMudarMostrar, ...props }: FaixaDaVisaoProps) {
+function FaixaDaVisao({ visao, opcoes, portfolio, filtros, aoMudarFiltros, mostrar, aoMudarMostrar, desabilitada = false, ...props }: FaixaDaVisaoProps) {
   const naLista = visao === 'lista'
   return (
     <FaixaDeControles forma={formaDeVer({ visao, agrupar: props.agrupar })} aoEscolherForma={props.aoMudarFormaDeVer}
-      podeCadastrar={props.podeAlterar} aoCadastrar={props.aoCadastrar} desabilitada={false}>
+      podeCadastrar={props.podeAlterar} aoCadastrar={props.aoCadastrar} desabilitada={desabilitada}>
       {!naLista && <BotaoDosFiltros opcoes={opcoes} filtros={filtros} aoMudar={aoMudarFiltros} />}
       {!naLista && props.podeAlterar && <SoOsMeusDoQuadro filtros={filtros} aoMudarFiltros={aoMudarFiltros} usuarioId={props.usuarioId} />}
       {naLista && <AgruparAListaPor agrupar={props.agruparLista} aoMudar={props.aoMudarAgruparLista} />}
@@ -157,8 +164,4 @@ function ListaDosProcessos({ lista, visiveis, todos, idEscolhido, aoAbrir, filtr
     )
   }
   return <TabelaDeProcessos cabecalho={cabecalho} linhas={linhas} idEscolhido={idEscolhido} aoAbrir={aoAbrir} cancelados={cancelados} />
-}
-
-function ListaCarregando() {
-  return <div className="quadro"><TabelaCarregando /></div>
 }

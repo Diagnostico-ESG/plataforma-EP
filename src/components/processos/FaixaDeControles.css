@@ -16,6 +16,7 @@
 }
 
 .faixa-de-controles > *,
+.faixa-de-controles-da-visao > *,
 .faixa-de-controles .botao {
   flex: none;
   white-space: nowrap;
@@ -77,4 +78,9 @@
   grid-template-columns: repeat(2, minmax(180px, 1fr));
   gap: var(--esp-3);
   width: max-content;
+}
+
+/* O fieldset só agrupa para desabilitar: não desenha borda nem caixa, e os controles seguem na linha da faixa. */
+.faixa-de-controles-da-visao {
+  display: contents;
 }
