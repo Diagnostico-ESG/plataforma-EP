@@ -3,6 +3,7 @@ import type { DadosDoSetor, ModuloDeCadastros } from '../../cadastros/tipos'
 import { useCarregamento } from '../../hooks/useCarregamento'
 import { useEndereco } from '../../hooks/useEndereco'
 import type { ModuloDeProcessos } from '../../processos/tipos'
+import '../JanelaDeConfirmacao.css'
 import { FormularioDeSetor } from './FormularioDeSetor'
 import { ListaDeSetores } from './ListaDeSetores'
 import { SetorAberto } from './SetorAberto'
@@ -20,12 +21,15 @@ function idDoSetorNoEndereco(endereco: string): string | null {
 type JanelaDoNovoSetorProps = { aoSalvar: (dados: DadosDoSetor) => Promise<void>; aoCancelar: () => void }
 
 // A janela nativa, como a JanelaDeEdicao: abre ao montar, o foco vai ao Nome e Esc fecha sem gravar. O formulário é o
-// mesmo do setor aberto, com as mesmas validações; quem a monta a desmonta ao salvar ou cancelar.
+// mesmo do setor aberto, com as mesmas validações; quem a monta a desmonta ao salvar ou cancelar. Desmontada, a janela
+// não devolve o foco sozinha (só o close() devolve), então ela o devolve a quem a abriu.
 function JanelaDoNovoSetor({ aoSalvar, aoCancelar }: JanelaDoNovoSetorProps) {
   const janela = useRef<HTMLDialogElement>(null)
   useEffect(() => {
+    const quemAbriu = document.activeElement as HTMLElement | null
     janela.current?.showModal()
     janela.current?.querySelector<HTMLElement>('input')?.focus()
+    return () => quemAbriu?.focus()
   }, [])
   return (
     <dialog ref={janela} className="janela-confirmacao janela-do-setor" aria-label="Novo setor" onClose={aoCancelar}>
@@ -63,7 +67,7 @@ export function AreaDeSetores({ cadastros, processos, podeAlterar }: AreaDeSetor
 
   return (
     <div className="cadastros-secao">
-      {podeAlterar && !criando && (
+      {podeAlterar && (
         <button type="button" className="botao botao-principal cadastros-novo" onClick={() => setCriando(true)}>
           Novo setor
         </button>

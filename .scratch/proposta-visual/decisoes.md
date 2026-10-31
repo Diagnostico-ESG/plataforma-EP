@@ -66,7 +66,7 @@ Este é o **único documento** da redesenho: o que foi decidido (acima) e o que 
 | 2 | Selo do setor em branco sobre cor forte (12 cores) | Feito (2026-10-30) | Nome do setor ao passar o mouse e para o leitor de tela já vale no cartão do Quadro; falta na Lista, no verso e nas linhas de grupo (a lista de processos não traz o nome do setor) |
 | 2 | Prazo em vermelho (atrasado) e laranja (perto de vencer) | Parcial | Dias parado e relatório pendente já são ícone + texto sem fundo (2026-10-30). Falta o prazo em si: o cartão não recebe essa data (exige mudar a view do banco) |
 | 3 | Azul-claro para escolhido; azul cheio só na ação principal | Feito | — |
-| 4 | Etiqueta só por ícone, com legenda uma vez no cabeçalho | Parcial | Ícone e nomes "A fazer · Iniciado · Finalizado" feitos (conferido em 2026-10-30: `rotulos.ts` e seu teste); falta a legenda no cabeçalho do Quadro (passo 2) |
+| 4 | Etiqueta só por ícone, com legenda uma vez no cabeçalho | Feito (2026-10-30) | Legenda na barra do Quadro, à direita dos controles e antes do [Cadastrar processo]; no passo 3 ela vai para a ponta direita da faixa nova |
 | 5 | Situação em selo discreto (exceções em destaque) | Feito | — |
 | 6 | Ícones: um por etapa e um por informação do cartão | Parcial | Ícones do rodapé do cartão (dias, relatório) feitos em 2026-10-30. Faltam o ícone por etapa (o catálogo não guarda ícone) e o contador de arquivos (o cartão não recebe a contagem; exige a view do banco) |
 | 7 | Faixa de controles de 56px com botão "Filtros" e contador | Falta | Hoje são cinco seletores soltos num bloco branco |
@@ -80,15 +80,15 @@ Este é o **único documento** da redesenho: o que foi decidido (acima) e o que 
 | — | Avatar: iniciais cinza para os outros, "sem responsável" tracejado, tamanhos 20/24/32 | Feito (2026-10-30) | O tracejado aparece no Agora do verso; o cartão do Quadro segue com o texto "Sem responsável" (decisão da spec: cartão sem avatar) |
 | — | Trilha de 8 tracinhos (atual azul, feitas cinza-azulado) | Feito (2026-10-30) | — |
 | — | "Mostrar" num segmento (Em andamento \| Concluídos \| Cancelados \| Todos) | Falta | Hoje "Todos \| Concluídos". "Cancelados" reabre o ADR 0034 (cancelados fora das visualizações): vai para o passo 3 |
-| — | Criar setor numa janela de 520px | Falta | Hoje é página de formulário |
-| — | Selo de tipo de arquivo em mono; quadradinho do macroprocesso sai das caixas | Falta | — |
+| — | Criar setor numa janela de 520px | Feito (2026-10-30) | — |
+| — | Selo de tipo de arquivo em mono; quadradinho do macroprocesso sai das caixas | Feito (2026-10-30) | O selo está na lista de arquivos da Lista; no verso entra com a lista de arquivos do verso enxuto (passo 3) |
 | — | Lista, cadastros e histórico (tabela, grupos, cabeçalhos) | Feito | — |
 | — | DESIGN.md refeito | Feito (2026-10-30) | `.impeccable/design.json` ainda descreve a identidade antiga (`/impeccable document`) |
 
 ### Como seguir, nesta ordem
 
 1. **`/demanda` — acabamento visual, sem mudar regra** (feito em 2026-10-30, salvo prazo e contador de arquivos, que dependem da view do banco): selo com nome, rodapé do cartão com ícones, avatar, cabeçalho da coluna, trilha de tracinhos.
-2. **`/executar-simples` — ajustes pequenos** (classificado no `/demanda` de 2026-10-30): quadradinho do macroprocesso sai das caixas, selo do tipo de arquivo em mono, legenda das etiquetas no cabeçalho do Quadro, janela de 520px para criar setor. Os nomes das etiquetas já estavam feitos.
+2. **`/executar-simples` — ajustes pequenos** (feito em 2026-10-30; classificado no `/demanda` do mesmo dia): quadradinho do macroprocesso sai das caixas, selo do tipo de arquivo em mono, legenda das etiquetas no cabeçalho do Quadro, janela de 520px para criar setor. Os nomes das etiquetas já estavam feitos.
 3. **`/planejar` — uma funcionalidade só, "Quadro igual à proposta 6"** (mudança em funcionalidade existente): faixa de controles com "Filtros", "Linhas", "Destacar os meus" (esmaecer em vez de esconder) e "Mostrar" em segmento com Cancelados (os dois mudam regra já decidida e pedem ADR novo), barra superior e faixa lateral novas, verso enxuto, ícone por etapa (exige migração no Catálogo). Fonte: este arquivo + `proposta-6.html`, `verso-3.html` e `.scratch/identidade-visual.md` (valem as medidas dele, base 14px).
 4. **Manutenção, sem mudança visual**: dividir o `Quadro.css` (passou de 300 linhas), ADR das 12 cores em `corDoSetor.ts`, uma função só para a conversão da cor 1–30 → 1–12, `/impeccable document`.
 

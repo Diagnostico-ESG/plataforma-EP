@@ -109,6 +109,15 @@ test('o Novo setor abre numa janela de 520px com o formulário, e Esc fecha sem 
   expect(cadastros.setores).toEqual([])
 })
 
+test('ao fechar a janela, o foco volta ao [Novo setor], que continua na tela', async () => {
+  await abrirFormulario()
+  const botao = screen.getByRole('button', { name: 'Novo setor' })
+  botao.focus()
+  fireEvent.click(botao)
+  fireEvent.click(within(screen.getByRole('dialog', { name: 'Novo setor' })).getByRole('button', { name: 'Cancelar' }))
+  expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Novo setor' }))
+})
+
 test('as mensagens de falha e de erro de carregamento são vermelhas no CSS', () => {
   expect(regrasDaClasse(css, '.cadastros-falha')).toContain('var(--atraso-fundo)')
   expect(regrasDaClasse(css, '.cadastros-erro')).toContain('var(--atraso-fundo)')

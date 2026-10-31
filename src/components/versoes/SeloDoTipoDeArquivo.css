@@ -1,12 +1,12 @@
 /* Selo do tipo de arquivo (identidade visual, "Tipo de arquivo"): mono 9px negrito, 38px de largura. Os tipos sem cor
-   própria (xlsx, por exemplo) ficam no cinza-azulado do BPM. */
+   própria (xlsx, jpg) ficam na cor do BPM. */
 .selo-do-tipo {
   display: inline-block;
   flex: none;
   width: 38px;
   padding: 2px 0;
   border-radius: var(--canto-selo);
-  background: #6b7a99;
+  background: var(--tipo-bpm);
   color: var(--folha);
   font: 700 9px/1.4 var(--fonte-mono);
   text-align: center;
@@ -14,10 +14,8 @@
   forced-color-adjust: none;
 }
 
-.selo-do-tipo[data-formato='bpmn'] { background: #4f46e5; }
-.selo-do-tipo[data-formato='png'],
-.selo-do-tipo[data-formato='jpg'],
-.selo-do-tipo[data-formato='jpeg'] { background: #0e7490; }
-.selo-do-tipo[data-formato='docx'] { background: #2a44c9; }
-.selo-do-tipo[data-formato='pdf'] { background: #881337; }
-.selo-do-tipo[data-formato='eml'] { background: #c2410c; }
+.selo-do-tipo[data-formato='bpmn'] { background: var(--tipo-bpmn); }
+.selo-do-tipo[data-formato='png'] { background: var(--tipo-png); }
+.selo-do-tipo[data-formato='docx'] { background: var(--tipo-docx); }
+.selo-do-tipo[data-formato='pdf'] { background: var(--tipo-pdf); }
+.selo-do-tipo[data-formato='eml'] { background: var(--tipo-eml); }
