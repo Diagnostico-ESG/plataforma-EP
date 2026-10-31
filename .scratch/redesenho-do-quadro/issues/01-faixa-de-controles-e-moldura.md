@@ -8,15 +8,17 @@
 
 **Status:** ready-for-agent
 
-- [ ] A faixa tem altura fixa e os controles na ordem da proposta 6; ligar e desligar filtros não muda a posição de nenhum controle nem a altura da faixa; [Cadastrar processo] é o único azul cheio.
-- [ ] "Quadro ▾" mostra a forma escolhida, abre o menu pelo mouse e pelo teclado (Enter, setas, Esc, foco volta ao botão) e troca a forma de ver no endereço; não há mais "Agrupar por" no Quadro.
-- [ ] Endereços antigos (com o agrupamento de hoje) abrem a mesma forma de ver.
-- [ ] A Lista também mostra a faixa, com "Quadro ▾" em "Lista" e os controles dela.
-- [ ] [Filtros] abre o painel com os cinco filtros e "Limpar filtros", aplica ao escolher, mostra o contador dos ligados (sem contador sem filtro, azul-claro com filtro), fecha com Esc, clique fora ou o botão, devolve o foco e mantém os filtros no endereço; o vazio "Nenhum processo com estes filtros." continua.
-- [ ] Em tela estreita a faixa fica numa linha, e a legenda sai antes dos controles.
-- [ ] Os controles da faixa aparecem desde o carregamento, desabilitados até os dados chegarem.
-- [ ] A barra de cima não tem mais Quadro | Lista; busca e sino mostram "Em breve".
-- [ ] A faixa lateral tem Processos (abre a última forma de ver da sessão, ou o Quadro por etapa), Setores, Painel, Administração (só para Administrador) e Ajuda no pé, com o nome ao passar o mouse e para o leitor de tela e o item atual marcado; Painel e Ajuda abrem a tela "Em breve".
-- [ ] Consulta vê a faixa sem [Cadastrar processo].
-- [ ] Testes de tela para cada item acima; os testes atuais de "Agrupar por" e do Quadro | Lista passam para os controles novos.
-- [ ] `[visual]` Faixa, barra branca e faixa lateral grafite seguem a proposta 6 e `.scratch/identidade-visual.md` em 1366×768 e 1440×900; o painel dos Filtros não cobre a faixa.
+- [x] A faixa tem altura fixa e os controles na ordem da proposta 6; ligar e desligar filtros não muda a posição de nenhum controle nem a altura da faixa; [Cadastrar processo] é o único azul cheio.
+- [x] "Quadro ▾" mostra a forma escolhida, abre o menu pelo mouse e pelo teclado (Enter, setas, Esc, foco volta ao botão) e troca a forma de ver no endereço; não há mais "Agrupar por" no Quadro.
+- [x] Endereços antigos (com o agrupamento de hoje) abrem a mesma forma de ver.
+- [x] A Lista também mostra a faixa, com "Quadro ▾" em "Lista" e os controles dela.
+- [x] [Filtros] abre o painel com os cinco filtros e "Limpar filtros", aplica ao escolher, mostra o contador dos ligados (sem contador sem filtro, azul-claro com filtro), fecha com Esc, clique fora ou o botão, devolve o foco e mantém os filtros no endereço; o vazio "Nenhum processo com estes filtros." continua.
+- [x] Em tela estreita a faixa fica numa linha, e a legenda sai antes dos controles.
+- [x] Os controles da faixa aparecem desde o carregamento, desabilitados até os dados chegarem.
+- [x] A barra de cima não tem mais Quadro | Lista; busca e sino mostram "Em breve".
+- [x] A faixa lateral tem Processos (abre a última forma de ver da sessão, ou o Quadro por etapa), Setores, Painel, Administração (só para Administrador) e Ajuda no pé, com o nome ao passar o mouse e para o leitor de tela e o item atual marcado; Painel e Ajuda abrem a tela "Em breve".
+- [x] Consulta vê a faixa sem [Cadastrar processo].
+- [x] Testes de tela para cada item acima; os testes atuais de "Agrupar por" e do Quadro | Lista passam para os controles novos.
+- [ ] `[visual]` Faixa, barra branca e faixa lateral grafite seguem a proposta 6 e `.scratch/identidade-visual.md` em 1366×768 e 1440×900; o painel dos Filtros não cobre a faixa. (Visto em 2026-10-31 só na vitrine local com módulos falsos, em 1366×768, 1440×900 e 375: faixa de 56px colada na barra, uma linha, painel abaixo da faixa; falta ver com o login real.)
+
+Concluído em 2026-10-31 (commit b6558d7)

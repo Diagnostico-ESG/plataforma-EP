@@ -41,15 +41,15 @@
 - `export const ROTULO_DA_FORMA_DE_VER: Record<FormaDeVer, string>` com os quatro textos fixos
 - `export function quantosFiltros(filtros: FiltrosDosProcessos): number` (conta os não nulos; `temFiltro` passa a ser `quantosFiltros(f) > 0`)
 
-- [ ] Passo 1: testes que falham:
+- [x] Passo 1: testes que falham:
   - `formaDeVer(lerEnderecoDosProcessos('#/processos?agrupar=setor'))` é `'setor'`; `'#/processos/lista?agrupar=setor'` é `'lista'`; `'#/processos'` é `'etapa'`.
   - `montarEnderecoDosProcessos(comFormaDeVer(lerEnderecoDosProcessos('#/processos/p1?setor=s1'), 'responsavel'))` é `'#/processos?setor=s1&agrupar=responsavel'`.
   - `comFormaDeVer(..., 'lista')` a partir de `'#/processos?agrupar=setor&tipo=processo'` monta `'#/processos/lista?tipo=processo'`.
   - `quantosFiltros(SEM_FILTROS)` é 0; com setor e tipo, 2.
-- [ ] Passo 2: `npx vitest run src/processos/enderecoDosProcessos.test.ts src/processos/filtrosDosProcessos.test.ts`. Esperado: FAIL (funções não existem).
-- [ ] Passo 3: implementar as quatro exportações.
-- [ ] Passo 4: rodar de novo. Esperado: PASS.
-- [ ] Passo 5: commit `faixa: forma de ver e contagem de filtros no endereco`.
+- [x] Passo 2: `npx vitest run src/processos/enderecoDosProcessos.test.ts src/processos/filtrosDosProcessos.test.ts`. Esperado: FAIL (funções não existem).
+- [x] Passo 3: implementar as quatro exportações.
+- [x] Passo 4: rodar de novo. Esperado: PASS.
+- [x] Passo 5: commit `faixa: forma de ver e contagem de filtros no endereco`.
 
 ### Tarefa 2: moldura (área Processos, faixa lateral, barra de cima, telas "Em breve")
 
@@ -67,15 +67,15 @@ Critérios 8 e 9 do ticket; histórias 53 a 58.
 - `BotaoEmBreve({ rotulo: string; icone: NomeIcone })`: botão de ícone com `aria-label` e `title` iguais ao rótulo. Ao clicar, mostra ao lado `<span role="status">Em breve</span>`, que some depois de 3 s (`setTimeout` limpo ao desmontar).
 - `TelaEmBreve({ titulo: string; texto: string })`: `<h2>` com o título e um parágrafo. Painel: título "Painel", texto "Em breve: o Painel com os números do EP chega na v1.5.". Ajuda: título "Ajuda", texto "Em breve: a Ajuda da plataforma.".
 
-- [ ] Passo 1: testes que falham em `src/App.moldura.test.tsx`:
+- [x] Passo 1: testes que falham em `src/App.moldura.test.tsx`:
   - A faixa (`navigation` "Áreas do sistema") tem os botões, em ordem: `['Processos', 'Setores', 'Painel', 'Administração', 'Ajuda']` para o Administrador e sem "Administração" para Integrante e Consulta; em `#/processos/lista`, Processos tem `aria-current="page"`.
   - Em `#/processos?agrupar=setor`, ir a Setores e voltar por Processos leva a `#/processos?agrupar=setor`. Sem nada guardado, leva a `#/processos`. Com o `sessionStorage.getItem` lançando erro (`vi.spyOn`), também leva a `#/processos`.
   - Painel abre a tela com "Em breve: o Painel com os números do EP chega na v1.5." e marca Painel como atual; Ajuda abre a tela da Ajuda.
   - A barra de cima não tem o grupo "Forma de ver os processos"; clicar em "Buscar" e em "Notificações" mostra um `status` "Em breve".
-- [ ] Passo 2: `npx vitest run src/App.moldura.test.tsx`. Esperado: FAIL.
-- [ ] Passo 3: implementar as interfaces acima. A barra fica com ícone e título à esquerda e, à direita (`.barra-acoes`), [Buscar] ([lupa]), [Notificações] ([sino]) e o `MenuDaConta`. A Ajuda fica no pé da faixa (`margin-top: auto`, como a `.lateral .fim` da proposta). A `.alternancia` sai do CSS.
-- [ ] Passo 4: rodar o arquivo novo e os quatro ajustados (`npx vitest run src/App.moldura.test.tsx src/App.test.tsx src/App.lista.test.tsx src/App.administracao.test.tsx src/App.recursosRetirados.test.tsx`). Nos ajustados, o item "Quadro"/"Lista" da faixa vira "Processos", e a troca Quadro ↔ Lista pela barra vira o menu "Quadro ▾", que só existe depois da Tarefa 3. Até lá, nesses testes, a troca vai pelo endereço (`window.location.hash`), e a Tarefa 3 os passa para o menu. Esperado: PASS.
-- [ ] Passo 5: commit `moldura: Processos na faixa lateral, busca e sino Em breve, telas do Painel e da Ajuda`.
+- [x] Passo 2: `npx vitest run src/App.moldura.test.tsx`. Esperado: FAIL.
+- [x] Passo 3: implementar as interfaces acima. A barra fica com ícone e título à esquerda e, à direita (`.barra-acoes`), [Buscar] ([lupa]), [Notificações] ([sino]) e o `MenuDaConta`. A Ajuda fica no pé da faixa (`margin-top: auto`, como a `.lateral .fim` da proposta). A `.alternancia` sai do CSS.
+- [x] Passo 4: rodar o arquivo novo e os quatro ajustados (`npx vitest run src/App.moldura.test.tsx src/App.test.tsx src/App.lista.test.tsx src/App.administracao.test.tsx src/App.recursosRetirados.test.tsx`). Nos ajustados, o item "Quadro"/"Lista" da faixa vira "Processos", e a troca Quadro ↔ Lista pela barra vira o menu "Quadro ▾", que só existe depois da Tarefa 3. Até lá, nesses testes, a troca vai pelo endereço (`window.location.hash`), e a Tarefa 3 os passa para o menu. Esperado: PASS.
+- [x] Passo 5: commit `moldura: Processos na faixa lateral, busca e sino Em breve, telas do Painel e da Ajuda`.
 
 ### Tarefa 3: faixa de controles com "Quadro ▾" (Quadro e Lista)
 
@@ -90,7 +90,7 @@ Critérios 1 (ordem e azul único), 2, 3 e 4 do ticket; histórias 1, 2, 4, 6 a 
 - `MenuDaFormaDeVer({ forma: FormaDeVer; aoEscolher(forma: FormaDeVer): void; desabilitado: boolean })`: reaproveita o `MenuDeAcoes` com `rotulo="Forma de ver"`, um grupo com as quatro opções (`marcado` na atual), `paraDireita` e `conteudoDoBotao` = ícone `quadro` (ou `lista` na Lista), `ROTULO_DA_FORMA_DE_VER[forma]` e ícone `seta`. O nome acessível do botão é o texto da forma escolhida. Para desabilitar, o `MenuDeAcoes` ganha a prop opcional `desabilitado?: boolean`, repassada ao `<button>`.
 - `FaixaDeControles(props)`: `<div className="faixa-de-controles" role="toolbar" aria-label="Controles dos processos">`, nesta ordem: [Cadastrar processo] (só com `podeAlterar`), `MenuDaFormaDeVer`, `<span className="faixa-separador" aria-hidden="true" />`, e então, no Quadro, [Filtros] (Tarefa 4), "Só os meus" e, no Quadro por setor, "Mostrar"; na Lista, "Agrupar por" da Lista, "Mostrar" e [Limpar filtros] quando há filtro. A legenda das etiquetas (`LegendaDasEtiquetas`) fica na ponta direita, só nos três quadros. Recebe `desabilitada: boolean` e repassa `disabled` a todos os controles.
 
-- [ ] Passo 1: testes que falham em `src/App.formaDeVer.test.tsx`:
+- [x] Passo 1: testes que falham em `src/App.formaDeVer.test.tsx`:
   - No Quadro, o botão "Quadro por etapa" tem `aria-haspopup="menu"`; ao clicar, abre o menu "Forma de ver" com os `menuitemradio` `['Quadro por etapa', 'Quadro por responsável', 'Quadro por setor', 'Lista']`, o primeiro com `aria-checked="true"`.
   - Escolher "Quadro por setor" leva o endereço a `#/processos?agrupar=setor` e o botão passa a se chamar "Quadro por setor"; escolher "Lista" leva a `#/processos/lista`.
   - Pelo teclado: Enter no botão abre o menu com o foco no primeiro item, ArrowDown passa ao segundo, Esc fecha e o foco volta ao botão.
@@ -98,10 +98,10 @@ Critérios 1 (ordem e azul único), 2, 3 e 4 do ticket; histórias 1, 2, 4, 6 a 
   - Com um processo aberto (`#/processos/p1?setor=s1`), escolher "Lista" leva a `#/processos/lista?setor=s1`.
   - Não existe grupo "Agrupar por" no Quadro; na Lista ele existe.
   - Na faixa (`toolbar` "Controles dos processos"), o único botão com a classe `botao-principal` é "Cadastrar processo", e ele vem antes do "Quadro por etapa".
-- [ ] Passo 2: `npx vitest run src/App.formaDeVer.test.tsx`. Esperado: FAIL.
-- [ ] Passo 3: implementar. CSS da faixa: `height: 56px; flex-wrap: nowrap; gap: 10px; padding: 0 24px; background: var(--folha); border-bottom: 1px solid var(--linha)`. Os botões seguem a `.btn` da proposta (34px de altura, borda `--linha`); o separador tem 1 × 22px. A faixa fica fora do recuo do `.quadro`, colada na barra de cima.
-- [ ] Passo 4: rodar o arquivo novo e passar os testes ajustados do "Agrupar por" do Quadro e da Tarefa 2 para o menu (abrir "Quadro por etapa" e escolher a opção). Esperado: PASS.
-- [ ] Passo 5: commit `faixa: controles do Quadro e da Lista numa faixa, com Quadro ▾ no lugar do Agrupar por`.
+- [x] Passo 2: `npx vitest run src/App.formaDeVer.test.tsx`. Esperado: FAIL.
+- [x] Passo 3: implementar. CSS da faixa: `height: 56px; flex-wrap: nowrap; gap: 10px; padding: 0 24px; background: var(--folha); border-bottom: 1px solid var(--linha)`. Os botões seguem a `.btn` da proposta (34px de altura, borda `--linha`); o separador tem 1 × 22px. A faixa fica fora do recuo do `.quadro`, colada na barra de cima.
+- [x] Passo 4: rodar o arquivo novo e passar os testes ajustados do "Agrupar por" do Quadro e da Tarefa 2 para o menu (abrir "Quadro por etapa" e escolher a opção). Esperado: PASS.
+- [x] Passo 5: commit `faixa: controles do Quadro e da Lista numa faixa, com Quadro ▾ no lugar do Agrupar por`.
 
 ### Tarefa 4: [Filtros n] com painel
 
@@ -115,16 +115,16 @@ Critério 5 do ticket; histórias 27 a 33.
 **Interfaces:**
 - `BotaoDosFiltros({ opcoes: OpcoesDosFiltros; filtros: FiltrosDosProcessos; aoMudar(filtros): void; desabilitado: boolean })`. Botão com ícone `filtro`, texto "Filtros" e, com `quantosFiltros(filtros) > 0`, o contador `<span className="faixa-contador">{n}</span>`; nome acessível "Filtros" sem filtro e "Filtros, {n} ligados" com filtro (`aria-label`); `aria-expanded`; classe `botao-ligado` com filtro. O painel (`role="dialog"`, `aria-label="Filtros"`, sem modal) fica preso embaixo do botão (`position: absolute; top: calc(100% + 4px)`) e abre por cima do quadro, nunca da faixa. Fecha com o botão, com Esc (no `keydown` do painel, com `stopPropagation`) e no clique fora (`useFecharAoClicarFora`). Ao fechar por Esc ou pelo botão, o foco volta ao botão.
 
-- [ ] Passo 1: testes que falham:
+- [x] Passo 1: testes que falham:
   - Sem filtro, o botão se chama "Filtros", sem contador e sem `botao-ligado`; não há grupo "Filtros dos processos" na tela.
   - Clicar abre o painel com os seletores Setor, Macroprocesso, Etapa atual, Tipo e Responsável; escolher o setor s1 aplica na hora (endereço `?setor=s1`, quadro filtrado) e o botão passa a se chamar "Filtros, 1 ligados", com `botao-ligado`.
   - Esc com o foco num seletor fecha o painel e devolve o foco ao botão; `pointerdown` no quadro fecha o painel; um segundo clique no botão fecha.
   - "Limpar filtros" no painel zera os filtros; sem resultado, aparece "Nenhum processo com estes filtros." com [Limpar filtros].
   - Os filtros valem do mesmo jeito em "Quadro por responsável" e "Quadro por setor" (mesmo endereço, mesmo contador).
-- [ ] Passo 2: `npx vitest run src/App.filtrosDosProcessos.test.tsx`. Esperado: FAIL.
-- [ ] Passo 3: implementar.
-- [ ] Passo 4: rodar de novo e os que usavam os seletores soltos. Esperado: PASS.
-- [ ] Passo 5: commit `faixa: Filtros num painel preso ao botao, com contador`.
+- [x] Passo 2: `npx vitest run src/App.filtrosDosProcessos.test.tsx`. Esperado: FAIL.
+- [x] Passo 3: implementar.
+- [x] Passo 4: rodar de novo e os que usavam os seletores soltos. Esperado: PASS.
+- [x] Passo 5: commit `faixa: Filtros num painel preso ao botao, com contador`.
 
 ### Tarefa 5: faixa estável (carregando, filtros ligados, Consulta)
 
@@ -134,14 +134,14 @@ Critérios 1 (posição fixa), 7 e 10 do ticket; histórias 3 e 81 (parte da fai
 - Alterar: `src/components/processos/VisaoDosProcessos.tsx` (a faixa desenha em `carregando` e `erro` com `desabilitada`, e no estado pronto; o vazio total, sem nenhum processo, continua só com o `QuadroVazio`), `src/components/processos/QuadroDeProcessos.tsx` (o `QuadroCarregando` deixa de ter `.quadro` próprio, se a faixa já o envolve)
 - Teste: acrescentar em `src/App.formaDeVer.test.tsx`
 
-- [ ] Passo 1: testes que falham:
+- [x] Passo 1: testes que falham:
   - Com o `listarProcessos` falso pendente, a faixa já existe e "Quadro por etapa" e "Filtros" estão `disabled`; resolvida a promessa, ficam habilitados.
   - Os nomes dos controles da faixa, em ordem (`within(faixa).getAllByRole('button').map(nome)`), são os mesmos antes e depois de escolher um filtro, tirando o texto do contador ("Filtros" → "Filtros, 1 ligados").
   - Consulta: a faixa tem "Quadro por etapa" e "Filtros", sem "Cadastrar processo" e sem "Só os meus".
-- [ ] Passo 2: rodar. Esperado: FAIL nos dois primeiros.
-- [ ] Passo 3: implementar.
-- [ ] Passo 4: rodar. Esperado: PASS.
-- [ ] Passo 5: commit `faixa: aparece desde o carregamento e nao muda com os filtros`.
+- [x] Passo 2: rodar. Esperado: FAIL nos dois primeiros.
+- [x] Passo 3: implementar.
+- [x] Passo 4: rodar. Esperado: PASS.
+- [x] Passo 5: commit `faixa: aparece desde o carregamento e nao muda com os filtros`.
 
 ### Tarefa 6: acabamento visual e tela estreita
 
@@ -149,12 +149,12 @@ Critérios 6 e `[visual]` do ticket.
 
 **Arquivos:** `FaixaDeControles.css`, `Moldura.css`, `LegendaDasEtiquetas.css`
 
-- [ ] Passo 1: a legenda encolhe primeiro (`flex: 0 1 auto; min-width: 0; overflow: hidden`), e os controles ficam `flex: none`. A faixa nunca quebra (`flex-wrap: nowrap`); abaixo de 900px, a legenda some (`display: none`).
-- [ ] Passo 2: conferir na pré-visualização (`dev`, vitrine local com os módulos falsos, como nas entregas anteriores) em 1366×768 e 1440×900: faixa de 56px colada na barra, ordem da proposta 6, só [Cadastrar processo] em azul cheio, painel dos Filtros abaixo da faixa sem cobri-la, barra branca com busca, sino e avatar, faixa lateral grafite com Ajuda no pé. Em 375px, faixa numa linha sem a legenda. Tirar captura.
-- [ ] Passo 3: commit `faixa: acabamento da proposta 6 e tela estreita`.
+- [x] Passo 1: a legenda encolhe primeiro (`flex: 0 1 auto; min-width: 0; overflow: hidden`), e os controles ficam `flex: none`. A faixa nunca quebra (`flex-wrap: nowrap`); abaixo de 900px, a legenda some (`display: none`).
+- [x] Passo 2: conferir na pré-visualização (`dev`, vitrine local com os módulos falsos, como nas entregas anteriores) em 1366×768 e 1440×900: faixa de 56px colada na barra, ordem da proposta 6, só [Cadastrar processo] em azul cheio, painel dos Filtros abaixo da faixa sem cobri-la, barra branca com busca, sino e avatar, faixa lateral grafite com Ajuda no pé. Em 375px, faixa numa linha sem a legenda. Tirar captura.
+- [x] Passo 3: commit `faixa: acabamento da proposta 6 e tela estreita`.
 
 ### Tarefa 7: conferência final
 
-- [ ] Passo 1: `npm test` (suíte inteira) verde; ajustar os testes antigos que ainda pedirem a barra antiga, sem apagar o comportamento que eles provam.
-- [ ] Passo 2: `npm run lint` e `npm run typecheck` sem erro.
-- [ ] Passo 3: marcar os critérios do ticket que foram provados e registrar o `[visual]` como visto na vitrine (sem login real).
+- [x] Passo 1: `npm test` (suíte inteira) verde; ajustar os testes antigos que ainda pedirem a barra antiga, sem apagar o comportamento que eles provam.
+- [x] Passo 2: `npm run lint` e `npm run typecheck` sem erro.
+- [x] Passo 3: marcar os critérios do ticket que foram provados e registrar o `[visual]` como visto na vitrine (sem login real).
