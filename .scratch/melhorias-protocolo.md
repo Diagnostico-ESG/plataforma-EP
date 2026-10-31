@@ -1131,3 +1131,8 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Conferência da tela (computador e largura de celular).** Aconteceu: vitrine local (`vitrine.local`, fora do git) no navegador do app: Quadro, Lista, verso, Setores; celular em 375px sem rolagem lateral da página (só do Quadro).
 - **Melhoria:** o `/implementar-identidade` poderia mandar rodar a suíte só nos arquivos tocados enquanto trabalha e a suíte cheia uma vez no fim: o pre-commit roda a suíte inteira (cerca de 4 minutos) a cada commit.
 - **Limitação das ferramentas:** o editor de linha de comando do Windows deixa `\` virar `\` em alguns heredocs; um teste com regex quebrou por isso e foi corrigido.
+
+## 2026-10-30 — /demanda (passo 2 do redesenho visual)
+
+- **Classificação de pacote misto, dividido.** Esperado: o tipo mais rigoroso. Aconteceu: classificado como mudança em funcionalidade existente; com a confirmação do usuário, os ajustes visuais seguiram como ajuste pequeno (`/executar-simples`) e as duas mudanças de regra ("Destacar os meus", "Mostrar" com Cancelados) foram para o `/planejar` do passo 3, que já mexe na mesma faixa do Quadro. Sugestão: o `/demanda` prever a divisão de um pacote misto quando parte dele cabe num planejamento já previsto.
+- **Ocorrência: item da demanda já feito.** O `decisoes.md` pedia "decidir os nomes Iniciado/Finalizado", mas o código e o teste de `rotulos.ts` já os tinham desde a funcionalidade 14. Conferir no código evitou um ajuste à toa.
