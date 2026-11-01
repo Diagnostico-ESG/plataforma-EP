@@ -20,11 +20,12 @@ afterEach(() => {
 
 const DA_BIA: AnotacoesLidas = { texto: 'Linha 1\nLinha 2', alteradoPor: 'Bia Teste', alteradoEm: '2026-10-12T15:05:00Z' }
 
-test('o bloco é o primeiro da coluna direita, com o campo "Anotações" e a dica no vazio', async () => {
+test('o bloco fica ao lado da versão, com o campo "Anotações" e a dica no vazio', async () => {
   montarVerso(processoDasAnotacoes())
   const campo = await campoDasAnotacoes()
-  const coluna = campo.closest('.verso-contexto') as HTMLElement
-  expect(coluna.firstElementChild?.querySelector('h3')?.textContent).toBe('Anotações')
+  const par = campo.closest('.verso-versao-e-notas') as HTMLElement
+  expect(par.querySelector('.verso-versao')).toBeTruthy()
+  expect((campo.closest('section') as HTMLElement).querySelector('h3')?.textContent).toBe('Anotações')
   expect(campo.getAttribute('placeholder')).toBe('Escreva aqui as anotações do processo')
 })
 

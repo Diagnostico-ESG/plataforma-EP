@@ -43,7 +43,7 @@ export function EtapasDoProcesso(props: EtapasDoProcessoProps) {
   const [aberta, setAberta] = useState<string | null>(null)
   return (
     <section className="etapas" aria-labelledby={idDoTitulo}>
-      <h3 id={idDoTitulo} className="painel-subtitulo">Etapas</h3>
+      <h3 id={idDoTitulo} className="visualmente-oculto">Etapas</h3>
       <ol className="etapas-lista">
         {props.processo.etapasDoVerso.map((etapa) => (
           <LinhaDaEtapa key={etapa.id} {...props} etapa={etapa} aberta={aberta === etapa.id}
@@ -64,11 +64,11 @@ function LinhaDaEtapa({ etapa, aberta, aoAlternar, ...resto }: LinhaDaEtapaProps
       <button type="button" className="etapa-cabeca" aria-expanded={aberta} aria-controls={aberta ? idDaGaveta : undefined}
         aria-label={`${etapa.nome}: ${ROTULO_DO_SINAL[sinal]}`} onClick={aoAlternar}>
         <span className="etapa-sinal" aria-hidden="true" />
-        <Icone nome={iconeDaEtapa(etapa.codigo)} tamanho={16} />
+        <span className="etapa-bola"><Icone nome={iconeDaEtapa(etapa.codigo)} tamanho={14} /></span>
         <span className="etapa-nome">{etapa.nome}</span>
         <span className="etapa-quando">{quandoDaEtapa(etapa, sinal)}</span>
       </button>
-      {etapa.codigo === CODIGO_DA_MODELAGEM_PILOTO && (
+      {etapa.codigo === CODIGO_DA_MODELAGEM_PILOTO && sinal !== 'atual' && (
         <DataDaModelagemPiloto processo={resto.processo} processos={resto.processos} podeAlterar={resto.podeAlterarProcesso}
           aoMudar={resto.aoMudar} aoSumir={resto.aoSumir} />
       )}

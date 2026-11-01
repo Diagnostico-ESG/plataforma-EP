@@ -133,12 +133,70 @@
 }
 
 .versoes-anteriores > summary {
-  min-height: 24px;
-  color: var(--azul);
-  font-size: var(--tam-secundario);
+  min-height: 32px;
+  padding-top: var(--esp-1);
+  border-top: 1px solid var(--linha);
+  color: var(--texto-2);
+  font-weight: 600;
   cursor: pointer;
 }
 
 .versoes-anteriores[open] > summary {
   margin-bottom: var(--esp-2);
+}
+
+/* O verso enxuto: o quadro da miniatura à esquerda (por enquanto o ícone do fluxograma; o ticket 05 põe a imagem) e, à direita,
+   a versão com os arquivos em lista vertical, cada um com o selo do tipo, o nome e o tamanho. */
+.versao-destaque {
+  grid-template-columns: 11rem minmax(0, 1fr);
+  gap: var(--esp-4);
+  padding: var(--esp-3);
+  border: 1px solid var(--linha);
+  border-radius: var(--canto);
+}
+
+.versao-destaque-miniatura {
+  display: grid;
+  place-items: center;
+  min-height: 8rem;
+  border: 1px solid var(--linha);
+  border-radius: var(--canto-botao);
+  background: var(--fundo);
+  color: var(--icone-inativo);
+}
+
+.versao-destaque-info {
+  display: grid;
+  gap: var(--esp-2);
+  min-width: 0;
+  align-content: start;
+}
+
+.versao-destaque .arquivos-do-destaque {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0;
+  border-top: 1px solid var(--linha);
+}
+
+.versao-destaque .arquivo-do-destaque {
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+  padding: var(--esp-1) 0;
+  border-bottom: 1px solid var(--linha);
+}
+
+.versao-destaque .arquivo-botao {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-weight: 600;
+}
+
+.arquivo-do-destaque-tamanho {
+  margin-left: auto;
+  color: var(--texto-2);
+  font-family: var(--fonte-mono);
+  font-size: var(--tam-rotulo);
 }

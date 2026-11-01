@@ -161,3 +161,28 @@
   flex-basis: 100%;
 }
 
+
+/* "Versões anteriores" e "Outros anexos" recolhidos no verso enxuto: uma linha com o título e a contagem, que abre ao clicar. */
+.recolhido > .recolhido-resumo {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  min-height: 32px;
+  border-top: 1px solid var(--linha);
+  color: var(--texto-2);
+  cursor: pointer;
+}
+
+.recolhido-resumo .painel-subtitulo {
+  margin: 0;
+}
+
+.recolhido-contagem {
+  color: var(--icone-inativo);
+  font-family: var(--fonte-mono);
+  font-size: var(--tam-secundario);
+}
+
+.recolhido[open] > .recolhido-resumo {
+  margin-bottom: var(--esp-2);
+}

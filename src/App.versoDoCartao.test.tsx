@@ -103,20 +103,20 @@ test('pai e subprocesso abrem na mesma janela, com o endereço e o nome da janel
 
 // Cabeçalho
 
-test('cabeçalho: sigla e nome, sem macroprocesso nem tipo; sem pílula em andamento', async () => {
+test('cabeçalho: sigla, nome e a linha de dados, sem pílula de situação', async () => {
   montar()
   const cabecalho = within((await nomeDoProcesso()).closest('header') as HTMLElement)
-  expect(cabecalho.getByText('TSA')).toBeTruthy()
-  expect(cabecalho.queryByText('Macro de Teste')).toBeNull()
-  expect(cabecalho.queryByText('A classificar')).toBeNull()
-  expect(cabecalho.queryByText('Em andamento')).toBeNull()
+  expect(cabecalho.getAllByText('TSA')).toHaveLength(2) // o selo e o Setor da linha de dados
+  expect(cabecalho.getByText('Macro de Teste')).toBeTruthy()
+  expect(cabecalho.getByText('A classificar')).toBeTruthy()
+  expect(cabecalho.getByText('Em andamento').className).not.toContain('pilula')
 })
 
 test.each<[SituacaoDoProcesso, string]>([['suspenso', 'Suspenso'], ['cancelado', 'Cancelado'], ['concluido', 'Concluído']])(
-  'cabeçalho: pílula de %s', async (situacao, texto) => {
+  'cabeçalho: a situação %s está na linha de dados', async (situacao, texto) => {
     montar({ processos: [{ ...PROCESSO, situacao, motivoDaSituacao: 'Motivo inventado' }] })
     const cabecalho = within((await nomeDoProcesso()).closest('header') as HTMLElement)
-    expect(cabecalho.getByText(texto).className).toContain('pilula')
+    expect(cabecalho.getByText(texto).tagName).toBe('DD')
   })
 
 // Menu "⋯"
@@ -220,14 +220,15 @@ test('processo que não existe mais: o aviso e [Voltar], que volta ao Quadro', a
 
 // O que continua do painel
 
-test('as duas colunas: etapas e versões no trabalho; reunião, Sobre e estrutura no contexto', async () => {
+test('o corpo rola por dentro; Sobre e estrutura ficam no cabeçalho, e a versão ao lado das Anotações', async () => {
   window.location.hash = '#/processos/p2'
   montar()
   const aberto = await versoAberto()
   const caminho = await aberto.findByRole('region', { name: 'Etapas' })
-  expect(caminho.closest('.verso-trabalho')).toBeTruthy()
-  expect(aberto.getByRole('region', { name: 'Sobre' }).closest('.verso-contexto')).toBeTruthy()
-  expect(aberto.getByRole('region', { name: /^Subprocessos/ }).closest('.verso-contexto')).toBeTruthy()
+  expect(caminho.closest('.verso-corpo')).toBeTruthy()
+  expect(aberto.getByRole('region', { name: 'Sobre' }).closest('header')).toBeTruthy()
+  expect(aberto.getByRole('region', { name: /^Subprocessos/ }).closest('header')).toBeTruthy()
+  expect(aberto.getByRole('region', { name: 'Documentos do Mapeamento' }).closest('.verso-versao-e-notas')).toBeTruthy()
 })
 
 test('os dados do processo aparecem no verso, sem Origem, Contexto nem Observações', async () => {

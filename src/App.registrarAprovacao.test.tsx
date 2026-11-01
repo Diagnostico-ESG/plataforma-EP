@@ -22,8 +22,7 @@ const APROVADA: Aprovacao = {
 const jaAprovada = ({ revisoes }: Falsos) => { revisoes.aprovacoes.p1 = APROVADA }
 
 async function abrirARegistro() {
-  const agora = await agoraDoVerso()
-  fireEvent.click(await agora.findByRole('button', { name: 'Registrar aprovação' }))
+  fireEvent.click(await (await versoAberto()).findByRole('button', { name: 'Registrar aprovação' }))
   return within(await screen.findByRole('dialog', { name: 'Registrar aprovação' }))
 }
 
@@ -34,7 +33,7 @@ test('o botão aparece só na Aprovação pelo setor', async () => {
   montar(versao(), { etapa: 'revisao_interna' })
   const agora = await agoraDoVerso()
   await waitFor(() => expect(agora.getByLabelText('Etapa')).toBeTruthy())
-  expect(agora.queryByRole('button', { name: 'Registrar aprovação' })).toBeNull()
+  expect((await versoAberto()).queryByRole('button', { name: 'Registrar aprovação' })).toBeNull()
 })
 
 test('a janela mostra a versão aprovada; registrar sem número, link e data é aceito e não move o processo', async () => {
@@ -66,7 +65,7 @@ test('com aprovação registrada, a janela avisa que a nova toma o lugar da ante
   const { revisoes } = montar(versao(), { ajustar: jaAprovada })
   const agora = await agoraDoVerso()
   expect(await agora.findByText('V7 aprovada · E-protocolo PROT-2026-0001')).toBeTruthy()
-  fireEvent.click(agora.getByRole('button', { name: 'Registrar aprovação' }))
+  fireEvent.click((await versoAberto()).getByRole('button', { name: 'Registrar aprovação' }))
   const janela = within(await screen.findByRole('dialog', { name: 'Registrar aprovação' }))
   expect(janela.getByRole('status').textContent).toBe('Esta aprovação toma o lugar da aprovação da V7, registrada em 12/10/2026.')
   expect(janela.getByText('Versão aprovada: V8')).toBeTruthy()
@@ -131,7 +130,7 @@ test('o histórico mostra "Registrou a aprovação" e, na segunda, "Substituiu a
   registrar(janela)
   const agora = await agoraDoVerso()
   await agora.findByText('V8 aprovada')
-  fireEvent.click(agora.getByRole('button', { name: 'Registrar aprovação' }))
+  fireEvent.click((await versoAberto()).getByRole('button', { name: 'Registrar aprovação' }))
   janela = within(await screen.findByRole('dialog', { name: 'Registrar aprovação' }))
   registrar(janela)
   await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Registrar aprovação' })).toBeNull())

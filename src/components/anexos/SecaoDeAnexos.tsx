@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useId, useState } from 'react'
+import { useCallback, useId, useState } from 'react'
 import { ordenarAnexos } from '../../anexos/regrasDoAnexo'
 import type { Anexo } from '../../anexos/tipos'
 import { useCarregamento } from '../../hooks/useCarregamento'
@@ -34,21 +34,25 @@ export function SecaoDeAnexos({ versoes, processo, podeAlterar }: SecaoDeAnexosP
   const podeEnviar = podeAlterar && processo.situacao === 'em_andamento'
   return (
     <section className="painel-estrutura secao-de-versoes secao-de-anexos" aria-labelledby={idDoTitulo}>
-      {estado.tipo === 'pronto'
-        ? <AnexosProntos versoes={versoes} processoId={processo.id} lidos={estado.valor} podeEnviar={podeEnviar} aoMudar={recarregar} idDoTitulo={idDoTitulo} />
-        : <TituloDosAnexos id={idDoTitulo} />}
-      {estado.tipo === 'carregando' && <p className="cadastros-vazio" role="status">Carregando…</p>}
-      {estado.tipo === 'erro' && <ErroAoCarregar alvo="os anexos" aoTentarDeNovo={tentarDeNovo} />}
+      <details className="recolhido">
+        <TituloDosAnexos id={idDoTitulo} quantos={estado.tipo === 'pronto' ? estado.valor.length : null} />
+        {estado.tipo === 'pronto' && (
+          <AnexosProntos versoes={versoes} processoId={processo.id} lidos={estado.valor} podeEnviar={podeEnviar} aoMudar={recarregar} idDoTitulo={idDoTitulo} />
+        )}
+        {estado.tipo === 'carregando' && <p className="cadastros-vazio" role="status">Carregando…</p>}
+        {estado.tipo === 'erro' && <ErroAoCarregar alvo="os anexos" aoTentarDeNovo={tentarDeNovo} />}
+      </details>
     </section>
   )
 }
 
-function TituloDosAnexos({ id, children }: { id: string; children?: ReactNode }) {
+/** O resumo da seção recolhida: o título (que recebe o foco depois de retirar um anexo) e a contagem. */
+function TituloDosAnexos({ id, quantos }: { id: string; quantos: number | null }) {
   return (
-    <div className="secao-de-versoes-titulo">
+    <summary className="recolhido-resumo">
       <h3 id={id} tabIndex={-1} className="painel-subtitulo">Outros anexos</h3>
-      {children}
-    </div>
+      {quantos !== null && <span className="recolhido-contagem">{quantos}</span>}
+    </summary>
   )
 }
 
@@ -70,13 +74,13 @@ function AnexosProntos({ versoes, processoId, lidos, podeEnviar, aoMudar, idDoTi
   const situacoes = conferencia.tipo === 'pronta' ? conferencia.situacoes : undefined
   return (
     <>
-      <TituloDosAnexos id={idDoTitulo}>
-        {podeEnviar && (
+      {podeEnviar && (
+        <div className="secao-de-versoes-acoes">
           <button type="button" className="botao botao-secundario" aria-expanded={aberto} onClick={() => setAberto(!aberto)}>
             Enviar anexo
           </button>
-        )}
-      </TituloDosAnexos>
+        </div>
+      )}
       {aberto && (
         <FormularioDeAnexo modulo={versoes.anexos} processoId={processoId} aoCancelar={() => setAberto(false)}
           aoEnviado={() => {

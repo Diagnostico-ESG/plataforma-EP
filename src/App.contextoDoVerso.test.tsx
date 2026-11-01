@@ -13,13 +13,14 @@ const regiao = async (nome: string) => within(await (await versoAberto()).findBy
 
 // Sobre
 
-test('Sobre mostra só setor, macroprocesso e tipo', async () => {
+test('Sobre mostra setor, macroprocesso, tipo e situação', async () => {
   montarVerso(processoLido())
   const sobre = await regiao('Sobre')
-  expect(sobre.getAllByRole('term').map((rotulo) => rotulo.textContent)).toEqual(['Setor', 'Macroprocesso', 'Tipo'])
+  expect(sobre.getAllByRole('term').map((rotulo) => rotulo.textContent)).toEqual(['Setor', 'Macroprocesso', 'Tipo', 'Situação'])
   expect(sobre.getByText('TSA')).toBeTruthy()
   expect(sobre.getByText('Macro de Teste')).toBeTruthy()
   expect(sobre.getByText('Processo')).toBeTruthy()
+  expect(sobre.getByText('Em andamento')).toBeTruthy()
   expect(sobre.queryByRole('button')).toBeNull()
 })
 

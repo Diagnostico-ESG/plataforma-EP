@@ -27,8 +27,7 @@ const abrir = (ultima: UltimaVersao | null, ajustar?: (falsos: Falsos) => void, 
   montar(ultima, { etapa: REVISAO_INTERNA, perfil, ajustar })
 
 async function abrirARegistro() {
-  const agora = await agoraDoVerso()
-  fireEvent.click(await agora.findByRole('button', { name: 'Registrar revisão' }))
+  fireEvent.click(await (await versoAberto()).findByRole('button', { name: 'Registrar revisão' }))
   return within(await screen.findByRole('dialog', { name: 'Registrar revisão' }))
 }
 
@@ -36,9 +35,8 @@ const registrar = (janela: ReturnType<typeof within>) => fireEvent.click(janela.
 
 test('o botão aparece só na Revisão interna (e a Aprovação tem o dela)', async () => {
   abrir(SEM_VERSAO_NA_PASSAGEM)
-  const agora = await agoraDoVerso()
-  expect(await agora.findByRole('button', { name: 'Registrar revisão' })).toBeTruthy()
-  expect(agora.queryByRole('button', { name: 'Registrar aprovação' })).toBeNull()
+  expect(await (await versoAberto()).findByRole('button', { name: 'Registrar revisão' })).toBeTruthy()
+  expect((await versoAberto()).queryByRole('button', { name: 'Registrar aprovação' })).toBeNull()
 })
 
 test('em outra etapa não há botão de revisão', async () => {
@@ -66,7 +64,7 @@ test('"sem alteração" registra na versão mais recente, mostra o resumo e o [E
   registrar(janela)
   const agora = await agoraDoVerso()
   expect(await agora.findByText(`Sem alteração · V8 · ${EU.nome}`)).toBeTruthy()
-  expect(agora.queryByRole('button', { name: 'Registrar revisão' })).toBeNull()
+  expect((await versoAberto()).queryByRole('button', { name: 'Registrar revisão' })).toBeNull()
   expect(agora.getByRole('button', { name: 'Editar revisão' })).toBeTruthy()
   expect(screen.queryByRole('dialog', { name: 'Registrar revisão' })).toBeNull()
   expect(revisoes.revisoes.p1[0]).toMatchObject({ resultado: 'sem_alteracao', versaoRevisada: 8, comentario: 'Conferi' })
@@ -165,7 +163,7 @@ test('depois de sair da Revisão interna e voltar, a passagem nova pede o regist
     }]
   })
   const agora = await agoraDoVerso()
-  expect(await agora.findByRole('button', { name: 'Registrar revisão' })).toBeTruthy()
+  expect(await (await versoAberto()).findByRole('button', { name: 'Registrar revisão' })).toBeTruthy()
   expect(agora.queryByRole('button', { name: 'Editar revisão' })).toBeNull()
   const gaveta = await gavetaDaEtapa('Revisão interna')
   expect(await gaveta.findByText(/^V7 · Bia Teste/)).toBeTruthy()

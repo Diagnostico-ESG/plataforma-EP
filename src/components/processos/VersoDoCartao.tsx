@@ -4,7 +4,7 @@ import { CadastroInexistente } from '../../cadastros/cadastroInexistente'
 import type { ModuloDeCadastros } from '../../cadastros/tipos'
 import { type EstadoDoCarregamento, useCarregamento } from '../../hooks/useCarregamento'
 import { type Executar, useGravacaoComFalha } from '../../hooks/useGravacaoComFalha'
-import { useRegistrosDoProcesso } from '../../hooks/useRegistrosDoProcesso'
+import { type RegistrosDoProcesso, useRegistrosDoProcesso } from '../../hooks/useRegistrosDoProcesso'
 import { type SaidaComAnotacoes, useSaidaComAnotacoes } from '../../hooks/useSaidaComAnotacoes'
 import type { DadosDoProcesso, ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
@@ -13,17 +13,17 @@ import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { ItemInexistente } from '../cadastros/ItemInexistente'
 import { SecaoDeAnexos } from '../anexos/SecaoDeAnexos'
 import { SecaoDeVersoes } from '../versoes/SecaoDeVersoes'
+import { AcaoPrincipalDoVerso } from './AcaoPrincipalDoVerso'
 import { AcoesDoProcesso } from './AcoesDoProcesso'
 import { BlocoDasAnotacoes } from './BlocoDasAnotacoes'
 import { BotaoFecharJanela, CabecalhoDoVerso } from './CabecalhoDoVerso'
 import { ConfirmarSaidaSemSalvar } from './ConfirmarSaidaSemSalvar'
 import { CabecalhoDoFormulario } from './CabecalhoDoFormulario'
 import { CaminhoDoProcesso } from './CaminhoDoProcesso'
-import { EstruturaDoProcesso } from './EstruturaDoProcesso'
 import { FormularioDoProcesso } from './FormularioDoProcesso'
 import { HistoricoDoProcesso } from './HistoricoDoProcesso'
 import { JanelaDoVerso } from './JanelaDoVerso'
-import { SobreDoProcesso } from './SobreDoProcesso'
+import { LinhaDeDadosDoVerso } from './LinhaDeDadosDoVerso'
 import { VersoCarregando } from './VersoCarregando'
 
 type VersoDoCartaoProps = {
@@ -128,6 +128,7 @@ type ProcessoAbertoProps = VersoDoCartaoProps & {
 function ProcessoAberto(props: ProcessoAbertoProps) {
   const { processo, processos, podeAlterar, aoFechar, aoMudar, aoAtualizar, aoSumir, modo, aoMudarModo } = props
   const titulo = useRef<HTMLHeadingElement>(null)
+  const registros = useRegistrosDoProcesso(props.revisoes, processo.id, processo.etapaAtual?.id)
   const { falha, executar } = useGravacaoComFalha(aoSumir)
   // O foco vai ao nome ao abrir, ao trocar de processo (pai, subprocesso) e ao trocar de modo, que some com o botão usado.
   // Sem rolar: o nome está no cabeçalho fixo, e o navegador rolava a janela para baixo ao focá-lo.
@@ -150,15 +151,17 @@ function ProcessoAberto(props: ProcessoAbertoProps) {
     <>
       {modo === 'editar'
         ? <CabecalhoDoFormulario titulo={`Editar ${processo.nome}`} referencia={titulo} aoFechar={aoFechar} />
-        : <CabecalhoDoVerso processo={processo} titulo={titulo} acoes={acoes} aoFechar={aoFechar} />}
+        : <CabecalhoDoVerso processo={processo} titulo={titulo} acoes={acoes} aoFechar={aoFechar}
+            acaoPrincipal={<AcaoPrincipalDoVerso {...props} registros={registros} aoMudar={aposMudar} />}
+            dados={<LinhaDeDadosDoVerso processo={processo} enderecoDoProcesso={props.enderecoDoProcesso} aoAbrir={abrirOutroProcesso(props.saida)} />} />}
       {props.aviso && modo === 'verso' && <p className="verso-aviso" role="status">{props.aviso}</p>}
       {falha && <p className="cadastros-falha verso-falha" role="alert">{falha}</p>}
-      <CorpoDoVerso {...props} executar={executar} aoVoltar={() => aoMudarModo('verso')} aposMudar={aposMudar} />
+      <CorpoDoVerso {...props} registros={registros} executar={executar} aoVoltar={() => aoMudarModo('verso')} aposMudar={aposMudar} />
     </>
   )
 }
 
-type CorpoProps = ProcessoAbertoProps & { executar: Executar; aoVoltar: () => void; aposMudar: () => void }
+type CorpoProps = ProcessoAbertoProps & { registros: RegistrosDoProcesso; executar: Executar; aoVoltar: () => void; aposMudar: () => void }
 
 function CorpoDoVerso(props: CorpoProps) {
   const { modo, processos, processo, aoVoltar } = props
@@ -199,26 +202,25 @@ function EdicaoDoProcesso({ processo, processos, cadastros, aoVoltar, aposMudar,
   )
 }
 
-/** Trabalho à esquerda (etapas e arquivos), contexto à direita (anotações, dados e estrutura). */
+// O pai e os subprocessos abrem na mesma janela, depois de conferir as anotações.
+const abrirOutroProcesso = (saida: SaidaComAnotacoes) => (endereco: string) => saida.sair(() => { window.location.hash = endereco })
+
+/** O corpo que rola por dentro da janela: trilha e Agora no alto, e embaixo a versão ao lado das Anotações. */
 function ColunasDoVerso(props: CorpoProps) {
-  const { processo, processos, versoes, revisoes, podeAlterar, usuarioId, executar, aposMudar, aoSumir, enderecoDoProcesso } = props
-  const registros = useRegistrosDoProcesso(revisoes, processo.id, processo.etapaAtual?.id)
+  const { processo, processos, versoes, revisoes, podeAlterar, usuarioId, executar, aposMudar, aoSumir, registros } = props
   // A versão aprovada ganha o selo "Aprovada": registrar ou trocar a aprovação refaz a leitura das versões.
   const versaoAprovada = registros.aprovacao.tipo === 'pronto' ? registros.aprovacao.valor?.versao ?? 0 : 0
   return (
-    <div className="verso-colunas">
-      <div className="verso-trabalho">
-        <CaminhoDoProcesso processo={processo} processos={processos} versoes={versoes} revisoes={revisoes} registros={registros} podeAlterar={podeAlterar} usuarioId={usuarioId}
-          executar={executar} aoSumir={aoSumir} aoMudar={aposMudar} />
-        <SecaoDeVersoes key={versaoAprovada} versoes={versoes} processo={processo} podeAlterar={podeAlterar} aoAlterarVersoes={aposMudar} />
-        <SecaoDeAnexos versoes={versoes} processo={processo} podeAlterar={podeAlterar} />
-      </div>
-      <div className="verso-contexto">
+    <div className="verso-corpo">
+      <CaminhoDoProcesso processo={processo} processos={processos} versoes={versoes} revisoes={revisoes} registros={registros} podeAlterar={podeAlterar} usuarioId={usuarioId}
+        executar={executar} aoSumir={aoSumir} aoMudar={aposMudar} />
+      <div className="verso-versao-e-notas">
+        <div className="verso-versao">
+          <SecaoDeVersoes key={versaoAprovada} versoes={versoes} processo={processo} podeAlterar={podeAlterar} aoAlterarVersoes={aposMudar} />
+          <SecaoDeAnexos versoes={versoes} processo={processo} podeAlterar={podeAlterar} />
+        </div>
         <BlocoDasAnotacoes key={processo.id} processo={processo} processos={processos} podeEscrever={podeAlterar}
           guardaRef={props.saida.guarda} aoSumir={aoSumir} />
-        <SobreDoProcesso processo={processo} />
-        <EstruturaDoProcesso processo={processo} enderecoDoProcesso={enderecoDoProcesso}
-          aoAbrir={(endereco) => props.saida.sair(() => { window.location.hash = endereco })} />
       </div>
     </div>
   )

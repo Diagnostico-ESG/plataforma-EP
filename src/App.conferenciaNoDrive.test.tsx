@@ -92,6 +92,6 @@ test('com tudo certo no Drive, não há marca nem aviso', async () => {
 test('processo sem versões não consulta o Drive', async () => {
   const { versoes } = montarNosCadastros()
   const secao = await secaoDeVersoes()
-  expect(await secao.findByText('Nenhuma versão enviada.')).toBeTruthy()
+  expect(await secao.findByText('Nenhuma versão enviada ainda')).toBeTruthy()
   expect(versoes.conferidos).toEqual([])
 })

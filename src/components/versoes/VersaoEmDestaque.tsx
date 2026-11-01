@@ -3,12 +3,15 @@ import { formatarMomento } from '../../acesso/historico'
 import { relatoriosDaVersao, textoDoRelatorio } from '../../versoes/relatorioQueVale'
 import { emOrdemDeExibicao, formatarDiaEMes, papeisQueSePodeAcrescentar, rotuloCurtoDoArquivo, rotuloDaVersao } from '../../versoes/rotulos'
 import type { ArquivoDaVersao, ConferenciaDosArquivos, ModuloDeVersoes, Versao } from '../../versoes/tipos'
+import { tamanhoDoArquivo } from '../../versoes/tamanhoDoArquivo'
+import { Icone } from '../Icone'
 import { Pilula } from '../Pilula'
 import { AcaoSubstituir } from './AcaoSubstituir'
 import { AcaoEditarNumero } from './AcaoEditarNumero'
 import { AcrescentarArquivo } from './AcrescentarArquivo'
 import { LinkDoArquivo } from './LinkDoArquivo'
 import { MarcaNoDrive } from './MarcaNoDrive'
+import { SeloDoTipoDeArquivo } from './SeloDoTipoDeArquivo'
 
 export type VersaoEmDestaqueProps = {
   modulo: ModuloDeVersoes
@@ -27,9 +30,12 @@ export function VersaoEmDestaque(props: VersaoEmDestaqueProps) {
   const { versao } = props
   return (
     <article className="versao-destaque" aria-label={rotuloDaVersao(versao)}>
-      <LinhaDoDestaque versao={versao} versoes={props.versoes} modulo={props.modulo} podeAlterar={props.podeAlterar} aoGravar={props.aoAlterada} />
-      <AutoriaDoDestaque versao={versao} />
-      <ArquivosDoDestaque {...props} />
+      <div className="versao-destaque-miniatura" aria-hidden="true"><Icone nome="fluxograma" tamanho={32} /></div>
+      <div className="versao-destaque-info">
+        <LinhaDoDestaque versao={versao} versoes={props.versoes} modulo={props.modulo} podeAlterar={props.podeAlterar} aoGravar={props.aoAlterada} />
+        <AutoriaDoDestaque versao={versao} />
+        <ArquivosDoDestaque {...props} />
+      </div>
     </article>
   )
 }
@@ -71,7 +77,9 @@ type ArquivoDoDestaqueProps = VersaoEmDestaqueProps & {
 function ArquivoDoDestaque({ modulo, processoId, versao, podeAlterar, situacoes, aoAlterada, arquivo, rotulo, daPropriaVersao }: ArquivoDoDestaqueProps) {
   return (
     <li className={`arquivo-do-destaque arquivo-${arquivo.papel === 'relatorio' ? 'relatorio' : 'fluxograma'}`}>
+      <SeloDoTipoDeArquivo formato={arquivo.formato} />
       <LinkDoArquivo versoes={modulo} arquivo={arquivo} rotulo={rotulo} />
+      <span className="arquivo-do-destaque-tamanho">{tamanhoDoArquivo(arquivo.tamanho)}</span>
       <MarcaNoDrive situacao={situacoes?.[arquivo.id]} />
       {podeAlterar && daPropriaVersao && !versao.historica && !versao.aprovada && (
         <AcaoSubstituir modulo={modulo} processoId={processoId} versao={versao} arquivo={arquivo} aoConcluir={aoAlterada} />

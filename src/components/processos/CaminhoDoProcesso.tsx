@@ -46,13 +46,13 @@ export function CaminhoDoProcesso({ processo, processos, versoes, revisoes, regi
   const parado = processo.situacao === 'suspenso' || processo.situacao === 'cancelado'
   return (
     <>
-      <AgoraDoProcesso processo={processo} processos={processos} usuarios={usuarios} usuarioId={usuarioId}
-        podeAlterar={podeAlterar} movimento={movimento} executar={executar} aoMudar={aoMudar} revisoes={revisoes} versoes={versoes} registros={registros} />
-      <JanelasDoMovimento movimento={movimento} processos={processos} versoes={versoes} aoGravar={aoMudar} />
-      {movimento.falha && <p className="cadastros-falha" role="alert">{movimento.falha}</p>}
       <EtapasDoProcesso processo={processo} processos={processos} revisoes={revisoes} versoes={versoes} registros={registros}
         ultimaVersao={processo.ultimaVersao} podeEditar={podeAlterar && !parado} podeAlterarProcesso={podeAlterar}
         aoMudar={aoMudar} aoSumir={aoSumir} />
+      <AgoraDoProcesso processo={processo} processos={processos} usuarios={usuarios} usuarioId={usuarioId}
+        podeAlterar={podeAlterar} movimento={movimento} executar={executar} aoMudar={aoMudar} aoSumir={aoSumir} revisoes={revisoes} versoes={versoes} registros={registros} />
+      <JanelasDoMovimento movimento={movimento} processos={processos} versoes={versoes} aoGravar={aoMudar} />
+      {movimento.falha && <p className="cadastros-falha" role="alert">{movimento.falha}</p>}
     </>
   )
 }

@@ -24,9 +24,10 @@ function montar(mudancas: Partial<ProcessoLido> = {}, etapa = 'modelagem', perfi
   return montarVerso(processoLido(mudancas, etapa), perfil)
 }
 
-/** A linha da etapa Modelagem piloto nas Etapas: a data vive ali, e não mais no lado direito do verso. */
+/** Onde a data vive: nos campos da etapa, no Agora, enquanto a Modelagem piloto é a etapa atual; senão, na linha dela na trilha. */
 async function linha() {
   const botao = await screen.findByRole('button', { name: /^Modelagem piloto:/ })
+  if (botao.getAttribute('aria-label')?.endsWith('atual')) return within(await screen.findByRole('region', { name: /^Agora/ }))
   return within(botao.closest('li') as HTMLElement)
 }
 

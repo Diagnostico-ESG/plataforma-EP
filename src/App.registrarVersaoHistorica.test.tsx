@@ -83,14 +83,14 @@ test('com versão piloto ou em sequência, o botão não aparece', async () => {
 test('fora de Não iniciados o botão não aparece, mesmo sem versão', async () => {
   montarNosCadastros()
   const secao = await secaoDeVersoes()
-  await secao.findByText('Nenhuma versão enviada.')
+  await secao.findByText('Nenhuma versão enviada ainda')
   expect(secao.queryByRole('button', { name: BOTAO })).toBeNull()
 })
 
 test('a Consulta não vê o botão', async () => {
   montar({ perfil: 'consulta' })
   const secao = await secaoDeVersoes()
-  await secao.findByText('Nenhuma versão enviada.')
+  await secao.findByText('Nenhuma versão enviada ainda')
   expect(secao.queryByRole('button', { name: BOTAO })).toBeNull()
 })
 
@@ -101,7 +101,7 @@ test.each(['suspenso', 'cancelado', 'concluido'] as const)('processo %s não mos
     },
   })
   const secao = await secaoDeVersoes()
-  await secao.findByText('Nenhuma versão enviada.')
+  await secao.findByText('Nenhuma versão enviada ainda')
   expect(secao.queryByRole('button', { name: BOTAO })).toBeNull()
 })
 

@@ -1,8 +1,6 @@
 import type { ReactNode, RefObject } from 'react'
-import { ROTULO_DA_SITUACAO } from '../../processos/rotulos'
-import type { ProcessoLido, SituacaoDoProcesso } from '../../processos/tipos'
+import type { ProcessoLido } from '../../processos/tipos'
 import { Icone } from '../Icone'
-import { Pilula, type SituacaoPilula } from '../Pilula'
 import { SeloDoSetor } from '../SeloDoSetor'
 
 type CabecalhoDoVersoProps = {
@@ -11,24 +9,23 @@ type CabecalhoDoVersoProps = {
   titulo: RefObject<HTMLHeadingElement | null>
   /** O "⋯" do processo. */
   acoes: ReactNode
+  /** A linha de dados abaixo do nome: setor, macroprocesso, tipo, situação e a estrutura (pai e subprocessos). */
+  dados?: ReactNode
+  /** O botão azul da etapa atual (registrar revisão, aprovação ou publicação); nada nas outras etapas. */
+  acaoPrincipal?: ReactNode
   aoFechar: () => void
 }
 
-// Só o que foge do normal ganha pílula (spec, "Cabeçalho"); o cancelado fica cinza no verso, sem o vermelho de falha.
-const PILULA_FORA_DO_NORMAL: Partial<Record<SituacaoDoProcesso, SituacaoPilula>> = {
-  suspenso: 'vencendo', cancelado: 'neutra', concluido: 'aprovado',
-}
-
-export function CabecalhoDoVerso({ processo, titulo, acoes, aoFechar }: CabecalhoDoVersoProps) {
-  const pilula = PILULA_FORA_DO_NORMAL[processo.situacao]
+export function CabecalhoDoVerso({ processo, titulo, acoes, acaoPrincipal, dados, aoFechar }: CabecalhoDoVersoProps) {
   return (
     <header className="verso-cabecalho">
       <SeloDoSetor sigla={processo.setorSigla} cor={processo.setorCor ?? 1} className="verso-selo-do-setor" />
       <div className="verso-identificacao">
         <h2 ref={titulo} tabIndex={-1} className="verso-titulo">{processo.nome}</h2>
+        {dados}
       </div>
       <div className="verso-ferramentas">
-        {pilula && <Pilula situacao={pilula}>{ROTULO_DA_SITUACAO[processo.situacao]}</Pilula>}
+        {acaoPrincipal}
         {acoes}
         <BotaoFecharJanela aoFechar={aoFechar} />
       </div>

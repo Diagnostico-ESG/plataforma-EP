@@ -56,6 +56,13 @@ const DESENHOS = {
   ),
   documento: <path d="M6 3h8l5 5v13H6zM14 3v5h5" />,
   baixar: <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />,
+  fluxograma: (
+    <>
+      <rect x="3" y="4" width="7" height="5" rx="1" />
+      <rect x="14" y="15" width="7" height="5" rx="1" />
+      <path d="M6.5 9v3.5a2 2 0 0 0 2 2H14" />
+    </>
+  ),
   rodadas: <path d="M4 12a8 8 0 0 1 14-5.3M18 3v4h-4M20 12a8 8 0 0 1-14 5.3M6 21v-4h4" />,
   // Um ícone por etapa (proposta 6), escolhido pelo código da etapa em processos/iconeDaEtapa.ts.
   etapaNaoIniciados: (

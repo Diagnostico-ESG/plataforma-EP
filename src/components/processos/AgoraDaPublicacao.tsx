@@ -18,16 +18,14 @@ export function LinhaDaPublicacao({ texto, link }: { texto: string; link: string
   )
 }
 
-/** [Registrar publicação] ou [Corrigir publicação], com a janela; nada quando o processo não pode (ver acaoDaPublicacao). */
+/** [Corrigir publicação], com a janela, quando já há data; registrar é a ação principal do cabeçalho do verso. */
 export function BotaoDaPublicacao({ processo, processos, aoMudar }: PublicacaoProps) {
   const [aberta, setAberta] = useState(false)
   const acao = acaoDaPublicacao(processo)
-  if (acao === null) return null
+  if (acao !== 'corrigir') return null
   return (
     <>
-      <button type="button" className="botao botao-secundario" onClick={() => setAberta(true)}>
-        {acao === 'corrigir' ? 'Corrigir publicação' : 'Registrar publicação'}
-      </button>
+      <button type="button" className="botao botao-secundario" onClick={() => setAberta(true)}>Corrigir publicação</button>
       {aberta && <JanelaDaPublicacao processo={processo} processos={processos} aoGravar={aoMudar} aoFechar={() => setAberta(false)} />}
     </>
   )

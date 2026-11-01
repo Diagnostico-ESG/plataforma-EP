@@ -18,8 +18,7 @@ const NOME_DO_PDF = 'TSA_V8_Emitir Ofício_Aprovação.pdf'
 const FRASE_DO_FORMATO = 'O .pdf da aprovação precisa ser .pdf, até 20 MB.'
 
 async function abrirARegistro() {
-  const agora = await agoraDoVerso()
-  fireEvent.click(await agora.findByRole('button', { name: 'Registrar aprovação' }))
+  fireEvent.click(await (await versoAberto()).findByRole('button', { name: 'Registrar aprovação' }))
   return within(await screen.findByRole('dialog', { name: 'Registrar aprovação' }))
 }
 
@@ -212,8 +211,7 @@ test('sem marca quando o .pdf está certo, e sem marcas quando a conferência fa
 
 test('a segunda aprovação deixa a gaveta sem .pdf atual, e o histórico baixa o .pdf guardado pelo link', async () => {
   const { versoes } = montar(versao(), { ajustar: aprovadaComPdf(true) })
-  const agora = await agoraDoVerso()
-  fireEvent.click(await agora.findByRole('button', { name: 'Registrar aprovação' }))
+  fireEvent.click(await (await versoAberto()).findByRole('button', { name: 'Registrar aprovação' }))
   const janela = within(await screen.findByRole('dialog', { name: 'Registrar aprovação' }))
   registrar(janela)
   await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Registrar aprovação' })).toBeNull())

@@ -76,10 +76,10 @@ test('o subprocesso tem a sua seção Versões', async () => {
   expect(await (await secao()).findByRole('article', { name: 'V1' })).toBeTruthy()
 })
 
-test('sem versão, a seção diz "Nenhuma versão enviada." e mostra [Enviar versão] a quem pode, na Revisão interna', async () => {
+test('sem versão, a seção diz "Nenhuma versão enviada ainda" e mostra [Enviar versão] a quem pode, na Revisão interna', async () => {
   montarNosCadastros({ ajustarProcessos: naEtapa('revisao_interna') })
   const tela = await secao()
-  expect(await tela.findByText('Nenhuma versão enviada.')).toBeTruthy()
+  expect(await tela.findByText('Nenhuma versão enviada ainda')).toBeTruthy()
   expect(tela.getByRole('button', { name: 'Enviar versão' })).toBeTruthy()
 })
 

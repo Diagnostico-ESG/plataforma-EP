@@ -52,7 +52,7 @@ test.each([
 ])('na etapa %s o verso oferece só o envio da etapa: %s', async (etapa, botao) => {
   montarNosCadastros(comVersoes(etapa, []))
   const secao = await secaoDeVersoes()
-  await secao.findByText('Nenhuma versão enviada.')
+  await secao.findByText('Nenhuma versão enviada ainda')
   expect(botoesDeEnvio(secao)).toEqual(botao ? [botao] : [])
 })
 
@@ -64,7 +64,7 @@ test('numa etapa nova do catálogo não há envio de versão', async () => {
     },
   })
   const secao = await secaoDeVersoes()
-  await secao.findByText('Nenhuma versão enviada.')
+  await secao.findByText('Nenhuma versão enviada ainda')
   expect(botoesDeEnvio(secao)).toEqual([])
 })
 
@@ -100,7 +100,7 @@ test.each([
     },
   })
   const secao = await secaoDeVersoes()
-  await secao.findByText('Nenhuma versão enviada.')
+  await secao.findByText('Nenhuma versão enviada ainda')
   expect(botoesDeEnvio(secao)).toEqual([])
 })
 

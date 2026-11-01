@@ -4,7 +4,7 @@ import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { ProcessoLido } from './processos/tipos'
 import { hojeLocal } from './processos/textoDaModelagemPiloto'
 import { montar } from './testes/aprovacaoNoVerso'
-import { agoraDoVerso } from './testes/versoDoCartao'
+import { agoraDoVerso, versoAberto } from './testes/versoDoCartao'
 
 // Registrar e corrigir a publicação (ticket 04 de publicacao-e-arquivamento, histórias 52 a 55, 57 e 63): o botão na
 // Publicação e em Concluídos (inclusive o que saiu do Quadro); a janela com a Data e o Link; o modo Corrigir publicação,
@@ -24,12 +24,12 @@ const PUBLICADO: Partial<ProcessoLido> = {
 const FORA_DO_QUADRO = { noQuadro: false, tiradoDoQuadroEm: '2026-10-12T12:00:00Z' }
 // Os botões da publicação; Trocar e Assumir (o responsável) não entram na conta.
 const DA_PUBLICACAO = ['Registrar publicação', 'Corrigir publicação']
-const botoesDoAgora = async () => (await agoraDoVerso()).getAllByRole('button')
+const botoesDoAgora = async () => (await versoAberto()).getAllByRole('button')
   .map((botao) => botao.textContent ?? '').filter((nome) => DA_PUBLICACAO.includes(nome))
 const janela = async (nome: string) => within(await screen.findByRole('dialog', { name: nome }))
 
 async function abrir(botao: string, titulo = botao) {
-  fireEvent.click((await agoraDoVerso()).getByRole('button', { name: botao }))
+  fireEvent.click(await (await versoAberto()).findByRole('button', { name: botao }))
   return janela(titulo)
 }
 

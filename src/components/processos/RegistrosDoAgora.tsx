@@ -8,8 +8,6 @@ import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { DataDaValidacao } from './DataDaValidacao'
 import { JanelaDaAprovacao } from './JanelaDaAprovacao'
 import { JanelaDaRevisao } from './JanelaDaRevisao'
-import { JanelaDeRegistroDaAprovacao } from './JanelaDeRegistroDaAprovacao'
-import { JanelaDeRegistroDaRevisao } from './JanelaDeRegistroDaRevisao'
 
 type RegistrosDoAgoraProps = {
   processo: ProcessoLido
@@ -25,7 +23,7 @@ type RegistrosDoAgoraProps = {
   aoMudar: () => void
 }
 
-type Janela = 'registrar' | 'editar' | null
+type Janela = 'editar' | null
 
 /**
  * O que o Agora acrescenta na Revisão interna, na Validação com o setor e na Aprovação pelo setor (ADR 0023): o registro da
@@ -42,7 +40,7 @@ export function RegistrosDoAgora(props: RegistrosDoAgoraProps) {
 }
 
 // A revisão da passagem aberta: o resumo com [Editar revisão], ou [Registrar revisão] enquanto não há.
-function RevisaoDoAgora({ processo, revisoes, registros, usuarioId, podeAlterar }: RegistrosDoAgoraProps) {
+function RevisaoDoAgora({ processo, revisoes, registros, podeAlterar }: RegistrosDoAgoraProps) {
   const [janela, setJanela] = useState<Janela>(null)
   if (registros.revisoes.tipo !== 'pronto') return null
   const atual = registros.revisoes.valor.find((revisao) => revisao.daPassagemAberta)
@@ -50,17 +48,10 @@ function RevisaoDoAgora({ processo, revisoes, registros, usuarioId, podeAlterar 
   return (
     <>
       {atual && <p className="agora-registro">{resumoDaRevisao(atual)}</p>}
-      {podeAlterar && (
+      {podeAlterar && atual && (
         <div className="agora-botoes">
-          <button type="button" className={`botao ${atual ? 'botao-secundario' : 'botao-principal'}`}
-            onClick={() => setJanela(atual ? 'editar' : 'registrar')}>
-            {atual ? 'Editar revisão' : 'Registrar revisão'}
-          </button>
+          <button type="button" className="botao botao-secundario" onClick={() => setJanela('editar')}>Editar revisão</button>
         </div>
-      )}
-      {janela === 'registrar' && (
-        <JanelaDeRegistroDaRevisao processoId={processo.id} ultimaVersao={processo.ultimaVersao} usuarioId={usuarioId}
-          revisoes={revisoes} aoGravar={registros.atualizar} aoFechar={fechar} />
       )}
       {janela === 'editar' && atual && (
         <JanelaDaRevisao revisao={atual} ultimaVersao={processo.ultimaVersao} revisoes={revisoes} aoGravar={registros.atualizar} aoFechar={fechar} />
@@ -69,8 +60,8 @@ function RevisaoDoAgora({ processo, revisoes, registros, usuarioId, podeAlterar 
   )
 }
 
-// A aprovação do processo: "V8 aprovada" com [Editar aprovação] quando há, e [Registrar aprovação] para uma nova.
-function AprovacaoDoAgora({ processo, revisoes, versoes, registros, podeAlterar }: RegistrosDoAgoraProps) {
+// A aprovação do processo: "V8 aprovada" com [Editar aprovação] quando há; registrar uma nova é a ação principal do cabeçalho.
+function AprovacaoDoAgora({ revisoes, registros, podeAlterar }: RegistrosDoAgoraProps) {
   const [janela, setJanela] = useState<Janela>(null)
   if (registros.aprovacao.tipo !== 'pronto') return null
   const atual = registros.aprovacao.valor
@@ -78,17 +69,10 @@ function AprovacaoDoAgora({ processo, revisoes, versoes, registros, podeAlterar 
   return (
     <>
       {atual && <p className="agora-registro">{resumoDaAprovacao(atual)}</p>}
-      {podeAlterar && (
+      {podeAlterar && atual && (
         <div className="agora-botoes">
-          {atual && <button type="button" className="botao botao-secundario" onClick={() => setJanela('editar')}>Editar aprovação</button>}
-          <button type="button" className={`botao ${atual ? 'botao-secundario' : 'botao-principal'}`} onClick={() => setJanela('registrar')}>
-            Registrar aprovação
-          </button>
+          <button type="button" className="botao botao-secundario" onClick={() => setJanela('editar')}>Editar aprovação</button>
         </div>
-      )}
-      {janela === 'registrar' && (
-        <JanelaDeRegistroDaAprovacao processo={processo} ultimaVersao={processo.ultimaVersao} anterior={atual}
-          revisoes={revisoes} versoes={versoes} aoGravar={registros.atualizar} aoFechar={fechar} />
       )}
       {janela === 'editar' && atual && (
         <JanelaDaAprovacao aprovacao={atual} revisoes={revisoes} aoGravar={registros.atualizar} aoFechar={fechar} />

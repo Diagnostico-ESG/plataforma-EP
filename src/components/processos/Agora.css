@@ -172,3 +172,37 @@
   align-items: center;
   gap: var(--esp-2) var(--esp-3);
 }
+
+/* O Agora do verso enxuto: a linha da etapa, da etiqueta e do responsável; os avisos lado a lado; e a linha dos campos da etapa. */
+.agora-linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-2) var(--esp-4);
+}
+
+.agora-linha .agora-listas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+}
+
+.agora-avisos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--esp-2);
+}
+
+.agora-campos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-2) var(--esp-4);
+  padding-top: var(--esp-2);
+  border-top: 1px solid var(--linha);
+}
+
+.agora-avisos:empty,
+.agora-campos:empty {
+  display: none;
+}

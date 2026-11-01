@@ -1,9 +1,9 @@
-/* O verso do cartão (spec, "Verso do cartão"): janela central de até cerca de 880 px, trabalho à esquerda (60%) e
-   contexto à direita (40%), uma só rolagem com o cabeçalho fixo. Abaixo de 900 px, a tela inteira em uma coluna. */
+/* O verso do cartão (spec, "Verso enxuto"): janela central de tamanho fixo, cerca de 880 × 740, que não cresce com o conteúdo:
+   o cabeçalho fica no alto e o corpo rola por dentro. Abaixo de 900 px, a tela inteira. */
 .verso {
   width: min(880px, calc(100vw - 2 * var(--esp-5)));
   max-width: none;
-  max-height: min(740px, 94vh);
+  height: min(740px, 94vh);
   padding: 0;
   overflow-y: auto;
   border: 0;
@@ -14,16 +14,13 @@
   animation: verso-entra 150ms var(--curva-saida);
 }
 
-/* Altura mínima: o carregando e o processo curto têm o mesmo tamanho, e a janela não salta quando os dados chegam.
-   Em coluna flexível, as duas colunas descem até o fim, com o fundo cinza da direita inteiro. */
+/* Altura fixa: o carregando e o processo curto têm o mesmo tamanho, e a janela não salta quando os dados chegam.
+   Em coluna flexível, o corpo toma o que sobra do cabeçalho e rola por dentro. */
 .verso[open] {
   display: flex;
   flex-direction: column;
 }
 
-.verso:not(.verso-estreita) {
-  min-height: min(740px, 94vh);
-}
 
 .verso::backdrop {
   background: var(--veu-janela);
@@ -31,6 +28,8 @@
 
 .verso-estreita {
   width: min(560px, calc(100vw - 2 * var(--esp-5)));
+  height: auto;
+  max-height: min(740px, 94vh);
 }
 
 @keyframes verso-entra {
@@ -112,25 +111,8 @@
   border-bottom: 1px solid var(--linha);
 }
 
-.verso-colunas {
-  display: grid;
-  flex: 1;
-  grid-template-columns: 3fr 2fr;
-}
 
-.verso-trabalho,
-.verso-contexto {
-  display: flex;
-  flex-direction: column;
-  gap: var(--esp-5);
-  min-width: 0;
-  padding: var(--esp-5);
-}
 
-.verso-contexto {
-  border-left: 1px solid var(--linha);
-  background: var(--fundo-contexto);
-}
 
 /* Histórico e Editar ocupam a janela inteira, numa coluna só. */
 .verso-pagina {
@@ -224,13 +206,8 @@
     border-radius: 0;
   }
 
-  .verso-colunas {
+  .verso-versao-e-notas {
     grid-template-columns: 1fr;
-  }
-
-  .verso-contexto {
-    border-top: 1px solid var(--linha);
-    border-left: 0;
   }
 }
 
@@ -248,4 +225,85 @@
   color: var(--aprovado-texto);
   font-size: var(--tam-secundario);
   font-weight: 600;
+}
+
+/* O corpo do verso: trilha, Agora e, embaixo, a versão ao lado das Anotações. Rola por dentro; o cabeçalho não sai do lugar. */
+.verso-corpo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--esp-4);
+  min-height: 0;
+  padding: var(--esp-4) var(--esp-5) var(--esp-5);
+  overflow-y: auto;
+}
+
+.verso-versao-e-notas {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: var(--esp-5);
+  align-items: start;
+}
+
+.verso-versao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+  min-width: 0;
+}
+
+/* A linha de dados abaixo do nome: Sobre (setor, macroprocesso, tipo, situação) e a estrutura (pai, subprocessos) numa linha só. */
+.verso-dados {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--esp-1) var(--esp-4);
+  color: var(--texto-2);
+  font-size: var(--tam-secundario);
+}
+
+.verso-dados .sobre-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-1) var(--esp-4);
+}
+
+.verso-dados .sobre-dado {
+  display: flex;
+  gap: var(--esp-1);
+}
+
+.verso-dados .sobre-dado dt {
+  font-size: inherit;
+}
+
+.verso-dados .sobre-dado dt::after {
+  content: ':';
+}
+
+.verso-dados .sobre-dado dd {
+  margin: 0;
+  color: var(--texto);
+  font-size: inherit;
+}
+
+.verso-dados .estrutura-lista {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--esp-1) var(--esp-3);
+}
+
+.verso-dados .estrutura-lista li {
+  flex-direction: row;
+  gap: var(--esp-1);
+}
+
+.verso-dados .contexto-secao {
+  flex-direction: row;
+  align-items: baseline;
+  gap: var(--esp-2);
+}
+
+.verso-fantasma-trilha {
+  height: 72px;
 }

@@ -1,8 +1,7 @@
 import { BotaoFecharJanela } from './CabecalhoDoVerso'
 
 /**
- * O verso enquanto o processo carrega: a janela já no tamanho final, com blocos cinza no formato do cabeçalho e das
- * duas colunas, para nada pular de lugar quando os dados chegam. O leitor de tela ouve "Carregando processo…".
+ * O verso enquanto o processo carrega: a janela já no tamanho final, com blocos cinza no formato do cabeçalho e do corpo, para nada pular de lugar quando os dados chegam. O leitor de tela ouve "Carregando processo…".
  */
 export function VersoCarregando({ aoFechar }: { aoFechar: () => void }) {
   return (
@@ -15,16 +14,10 @@ export function VersoCarregando({ aoFechar }: { aoFechar: () => void }) {
         </div>
         <div className="verso-ferramentas"><BotaoFecharJanela aoFechar={aoFechar} /></div>
       </div>
-      <div className="verso-colunas" aria-hidden="true">
-        <div className="verso-trabalho">
-          <span className="verso-fantasma verso-fantasma-bloco" />
-          <span className="verso-fantasma verso-fantasma-bloco" />
-          <span className="verso-fantasma verso-fantasma-bloco-baixo" />
-        </div>
-        <div className="verso-contexto">
-          <span className="verso-fantasma verso-fantasma-bloco-baixo" />
-          <span className="verso-fantasma verso-fantasma-bloco" />
-        </div>
+      <div className="verso-corpo" aria-hidden="true">
+        <span className="verso-fantasma verso-fantasma-trilha" />
+        <span className="verso-fantasma verso-fantasma-bloco-baixo" />
+        <span className="verso-fantasma verso-fantasma-bloco" />
       </div>
     </>
   )

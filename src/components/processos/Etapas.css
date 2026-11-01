@@ -189,3 +189,127 @@
   padding: 0 var(--esp-2) var(--esp-2) calc(var(--esp-2) + 16px + var(--esp-3));
   color: var(--texto);
 }
+
+/* A trilha do verso enxuto (spec, "Verso enxuto"): as etapas lado a lado, cada uma com a bolinha do ícone, o nome e a data. A
+   gaveta de uma etapa aberta é um painel que flutua logo abaixo da trilha, na largura dela. */
+.etapas {
+  position: relative;
+}
+
+.etapas-lista {
+  display: flex;
+  align-items: flex-start;
+  padding: var(--esp-3) var(--esp-1) var(--esp-2);
+  border: 1px solid var(--linha);
+  border-radius: var(--canto);
+  background: var(--fundo);
+}
+
+.etapa-linha {
+  flex: 1;
+  min-width: 0;
+  border-bottom: 0;
+}
+
+.etapa-cabeca {
+  position: relative;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--esp-1);
+  min-height: 0;
+  padding: 0 2px;
+  font-size: var(--tam-rotulo);
+  line-height: 1.25;
+  text-align: center;
+}
+
+.etapa-cabeca:hover {
+  background: transparent;
+}
+
+.etapa-cabeca:hover .etapa-bola {
+  border-color: var(--azul);
+}
+
+/* O traço que liga a bolinha à anterior. */
+.etapa-linha:not(:first-child) .etapa-cabeca::before {
+  content: '';
+  position: absolute;
+  top: 13px;
+  right: 50%;
+  left: -50%;
+  height: 2px;
+  background: var(--linha);
+}
+
+.etapa-visitada .etapa-cabeca::before,
+.etapa-atual .etapa-cabeca::before {
+  background: var(--icone-inativo);
+}
+
+.etapa-sinal {
+  display: none;
+}
+
+.etapa-bola {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  box-sizing: border-box;
+  border: 1.5px solid var(--linha);
+  border-radius: 50%;
+  background: var(--folha);
+  color: var(--icone-inativo);
+}
+
+.etapa-visitada .etapa-bola {
+  border-color: var(--neutra-fundo);
+  background: var(--neutra-fundo);
+  color: var(--texto-2);
+}
+
+.etapa-atual .etapa-bola {
+  border-color: var(--azul);
+  background: var(--azul-claro);
+  color: var(--azul);
+}
+
+.etapa-atual .etapa-cabeca {
+  background: transparent;
+  color: var(--azul);
+}
+
+.etapa-nome {
+  flex: none;
+}
+
+.etapa-quando {
+  font-size: 10px;
+}
+
+.etapa-quando:empty {
+  display: none;
+}
+
+.etapas .etapa-gaveta {
+  position: absolute;
+  top: calc(100% + var(--esp-1));
+  right: 0;
+  left: 0;
+  z-index: 3;
+  padding: var(--esp-3) var(--esp-4);
+  border: 1px solid var(--linha);
+  border-radius: var(--canto);
+  background: var(--folha);
+  box-shadow: var(--sombra-janela);
+  text-align: left;
+}
+
+.etapas .etapa-modelagem {
+  padding: var(--esp-1) 2px 0;
+  font-size: var(--tam-rotulo);
+  text-align: center;
+}
