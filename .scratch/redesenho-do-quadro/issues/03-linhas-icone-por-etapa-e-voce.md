@@ -20,3 +20,5 @@
 - [ ] O cartão mostra "Você" quando o responsável é quem está na tela; sem contador de arquivos e sem prazo.
 - [ ] Testes de tela para cada item acima; testes de unidade para ler `linhas` do endereço e para o ícone pelo código da etapa.
 - [ ] `[visual]` As Linhas seguem a proposta 6 (colunas alinhadas, cabeçalho das etapas uma vez no alto, selo ou avatar no cabeçalho da linha); os ícones das etapas são legíveis no cabeçalho da coluna e na trilha, no traço dos outros ícones.
+
+Concluído em 2026-10-31 (commit ad3b831)
