@@ -20,3 +20,5 @@
 - [ ] Consulta vê o verso inteiro sem ação principal, sem [Enviar versão] e com as Anotações só para ler.
 - [ ] Os testes atuais do verso continuam passando (o que o verso faz não muda); testes de tela novos para a ação principal de cada etapa, a linha de dados e a linha dos campos da etapa.
 - [ ] `[visual]` O verso segue a verso-3 em 880 × 740, com os arquivos em lista vertical e as Anotações com o dobro da altura, sem nada vazando da janela em 1366×768.
+
+Concluído em 2026-11-01 (commit 2192c35)
