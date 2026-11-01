@@ -6,4 +6,6 @@
 
 **Dica de ambiente:** com Docker, Zoom e Chrome abertos o pre-commit estoura os 15 s por teste e a suíte leva ~40 min. Feche esses programas antes de comitar, ou rode o commit com `VITEST_MAX_WORKERS=2`.
 
-**Depende do usuário:** ver as Linhas e os ícones com o login real (o `[visual]` do 03 está presumido, não conferi no navegador); ler as "Decisões a confirmar" da spec; publicar a função `arquivos-no-drive` no desenvolvimento (ticket 05); conferir o Catálogo de etapas; escolher o responsável inicial de cada etapa.
+**Depende do usuário:** ver as Linhas e os ícones com o login real (o `[visual]` do 03 está presumido, não conferi no navegador); ler as "Decisões a confirmar" da spec; conferir o Catálogo de etapas; escolher o responsável inicial de cada etapa.
+
+**Função `arquivos-no-drive`:** publicada no desenvolvimento em 2026-11-01, a partir do commit fce0d59 (registro em `supabase/AMBIENTES.md`). Se os tickets 04 ou 05 mudarem `supabase/functions/`, ela precisa ser publicada de novo.
