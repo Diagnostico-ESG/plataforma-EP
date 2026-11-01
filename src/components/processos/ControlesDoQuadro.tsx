@@ -1,4 +1,4 @@
-import type { AgruparListaPor, MostrarNoPortfolio } from '../../processos/enderecoDosProcessos'
+import type { AgruparListaPor, LinhasDoQuadro, MostrarNoPortfolio } from '../../processos/enderecoDosProcessos'
 
 const OPCOES_DA_SITUACAO: { valor: MostrarNoPortfolio; rotulo: string }[] = [
   { valor: 'todos', rotulo: 'Todos' }, { valor: 'em_andamento', rotulo: 'Em andamento' }, { valor: 'suspensos', rotulo: 'Suspensos' },
@@ -31,6 +31,17 @@ type SituacaoDaVisaoProps = { mostrar: MostrarNoPortfolio; aoMudar: (mostrar: Mo
 /** "Situação: Todos | Em andamento | Suspensos | Concluídos | Cancelados", na Lista e no Quadro por setor (o portfólio). */
 export function SituacaoDaVisao({ mostrar, aoMudar }: SituacaoDaVisaoProps) {
   return <ControleDeOpcoes rotulo="Situação" opcoes={OPCOES_DA_SITUACAO} escolhida={mostrar} aoMudar={aoMudar} />
+}
+
+const OPCOES_DAS_LINHAS: { valor: LinhasDoQuadro; rotulo: string }[] = [
+  { valor: 'nenhuma', rotulo: 'Nenhuma' }, { valor: 'setor', rotulo: 'Setor' }, { valor: 'responsavel', rotulo: 'Responsável' },
+]
+
+type LinhasDoQuadroControleProps = { linhas: LinhasDoQuadro; aoMudar: (linhas: LinhasDoQuadro) => void }
+
+/** "Linhas: Nenhuma | Setor | Responsável", só no Quadro por etapa: separa os cartões em faixas sem perder as colunas. */
+export function LinhasDoQuadroControle({ linhas, aoMudar }: LinhasDoQuadroControleProps) {
+  return <ControleDeOpcoes rotulo="Linhas" opcoes={OPCOES_DAS_LINHAS} escolhida={linhas} aoMudar={aoMudar} />
 }
 
 type DestacarOsMeusProps = { ligado: boolean; aoAlternar: () => void }

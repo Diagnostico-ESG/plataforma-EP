@@ -140,3 +140,11 @@ test('mover o processo pelo Agora atualiza a seção Etapas: a nova atual, e a a
   expect(etapas.getByRole('button', { name: 'Revisão interna: visitada' })).toBeTruthy()
   expect(screen.queryByText('Revisão interna: atual')).toBeNull()
 })
+
+test('cada etapa do verso tem o seu ícone, só enfeite para o leitor de tela', async () => {
+  montar()
+  const linhas = (await etapasDoVerso()).getAllByRole('listitem')
+  const desenhos = linhas.map((linha) => linha.querySelector('.etapa-cabeca svg'))
+  for (const desenho of desenhos) expect(desenho?.getAttribute('aria-hidden')).toBe('true')
+  expect(new Set(desenhos.map((desenho) => desenho?.innerHTML)).size).toBe(NOMES.length)
+})

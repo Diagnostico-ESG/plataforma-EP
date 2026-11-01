@@ -3,8 +3,8 @@ import { comFormaDeVer, formaDeVer, lerEnderecoDosProcessos, montarEnderecoDosPr
 import { ORDENACAO_PADRAO } from './ordenacaoDaLista'
 
 test('o caminho dá a visão e o item aberto', () => {
-  expect(lerEnderecoDosProcessos('#/processos')).toEqual({ visao: 'quadro', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa', mostrar: 'todos', destacar: false, ordenacao: ORDENACAO_PADRAO, agruparLista: 'nenhum' })
-  expect(lerEnderecoDosProcessos('#/processos/lista')).toEqual({ visao: 'lista', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa', mostrar: 'todos', destacar: false, ordenacao: ORDENACAO_PADRAO, agruparLista: 'nenhum' })
+  expect(lerEnderecoDosProcessos('#/processos')).toEqual({ visao: 'quadro', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa', mostrar: 'todos', destacar: false, linhas: 'nenhuma', ordenacao: ORDENACAO_PADRAO, agruparLista: 'nenhum' })
+  expect(lerEnderecoDosProcessos('#/processos/lista')).toEqual({ visao: 'lista', aberto: null, filtros: SEM_FILTROS, agrupar: 'etapa', mostrar: 'todos', destacar: false, linhas: 'nenhuma', ordenacao: ORDENACAO_PADRAO, agruparLista: 'nenhum' })
   expect(lerEnderecoDosProcessos('#/processos/p1').aberto).toBe('p1')
   expect(lerEnderecoDosProcessos('#/processos/lista/p1')).toMatchObject({ visao: 'lista', aberto: 'p1' })
   expect(lerEnderecoDosProcessos('#/processos/novo').aberto).toBe('novo')
@@ -53,7 +53,7 @@ test('o parâmetro antigo "busca" de um endereço guardado é ignorado e não vo
   const filtros = { ...SEM_FILTROS, setor: 's1' }
   expect(montarEnderecoDosProcessos(lerEnderecoDosProcessos('#/processos/lista?setor=s1&busca=pagar'))).toBe('#/processos/lista?setor=s1')
   expect(lerEnderecoDosProcessos(montarEnderecoDosProcessos({ visao: 'lista', aberto: 'p1', filtros, agrupar: 'etapa' })))
-    .toEqual({ visao: 'lista', aberto: 'p1', filtros, agrupar: 'etapa', mostrar: 'todos', destacar: false, ordenacao: ORDENACAO_PADRAO, agruparLista: 'nenhum' })
+    .toEqual({ visao: 'lista', aberto: 'p1', filtros, agrupar: 'etapa', mostrar: 'todos', destacar: false, linhas: 'nenhuma', ordenacao: ORDENACAO_PADRAO, agruparLista: 'nenhum' })
 })
 
 test('o agrupamento do Quadro vem de agrupar=responsavel; fora do Quadro ou com outro valor é por etapa', () => {
@@ -211,4 +211,15 @@ test('destacar: presença do parâmetro liga, só nos quadros; ler e montar são
   expect(montarEnderecoDosProcessos(lido)).toBe('#/processos?responsavel=u1&destacar=1')
   expect(montarEnderecoDosProcessos({ ...lido, destacar: false })).toBe('#/processos?responsavel=u1')
   expect(montarEnderecoDosProcessos({ ...lido, visao: 'lista' })).toBe('#/processos/lista?responsavel=u1')
+})
+
+test('linhas: setor ou responsável, só no Quadro por etapa; desconhecido vale nenhuma; ler e montar são inversos', () => {
+  expect(lerEnderecoDosProcessos('#/processos?linhas=setor').linhas).toBe('setor')
+  expect(lerEnderecoDosProcessos('#/processos?linhas=responsavel').linhas).toBe('responsavel')
+  expect(lerEnderecoDosProcessos('#/processos?linhas=outra').linhas).toBe('nenhuma')
+  expect(lerEnderecoDosProcessos('#/processos?agrupar=setor&linhas=setor').linhas).toBe('nenhuma')
+  expect(lerEnderecoDosProcessos('#/processos/lista?linhas=setor').linhas).toBe('nenhuma')
+  const endereco = '#/processos?setor=s1&linhas=responsavel&destacar=1'
+  expect(montarEnderecoDosProcessos(lerEnderecoDosProcessos(endereco))).toBe(endereco)
+  expect(montarEnderecoDosProcessos({ ...lerEnderecoDosProcessos(endereco), agrupar: 'setor' })).not.toContain('linhas')
 })

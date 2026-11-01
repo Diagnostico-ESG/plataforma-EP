@@ -2,6 +2,8 @@ import './Etapas.css'
 import { useId, useState } from 'react'
 import { formatarData } from '../../lib/datas'
 import { CODIGO_DA_MODELAGEM_PILOTO } from '../../processos/codigosDasEtapas'
+import { iconeDaEtapa } from '../../processos/iconeDaEtapa'
+import { Icone } from '../Icone'
 import type { EtapaDoVerso, ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
 import { DataDaModelagemPiloto } from './DataDaModelagemPiloto'
 import { type DadosDasEtapas, DetalheDaEtapa } from './DetalheDaEtapa'
@@ -62,6 +64,7 @@ function LinhaDaEtapa({ etapa, aberta, aoAlternar, ...resto }: LinhaDaEtapaProps
       <button type="button" className="etapa-cabeca" aria-expanded={aberta} aria-controls={aberta ? idDaGaveta : undefined}
         aria-label={`${etapa.nome}: ${ROTULO_DO_SINAL[sinal]}`} onClick={aoAlternar}>
         <span className="etapa-sinal" aria-hidden="true" />
+        <Icone nome={iconeDaEtapa(etapa.codigo)} tamanho={16} />
         <span className="etapa-nome">{etapa.nome}</span>
         <span className="etapa-quando">{quandoDaEtapa(etapa, sinal)}</span>
       </button>

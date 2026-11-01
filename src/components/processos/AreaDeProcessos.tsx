@@ -77,6 +77,7 @@ export function AreaDeProcessos({ usuario, processos, cadastros, versoes, reviso
           enderecoDosConcluidosNaLista={enderecoDosConcluidosNaLista} mostrar={atual.mostrar} aoLimparTudo={() => irParaVisao({ filtros: SEM_FILTROS, mostrar: 'todos', aberto: null })}
           aoMudarMostrar={(mostrar) => irParaVisao({ mostrar, filtros: { ...atual.filtros, situacao: null }, aberto: null })}
           destacar={destacar} aoMudarDestacar={(ligar) => irParaVisao({ destacar: ligar, aberto: null })}
+          linhas={atual.linhas} aoMudarLinhas={(linhas) => irParaVisao({ linhas, aberto: null })}
           ordenacao={atual.ordenacao} aoOrdenar={(ordenacao) => irParaVisao({ ordenacao, aberto: null })}
           agruparLista={atual.agruparLista} aoMudarAgruparLista={(agruparLista) => irParaVisao({ agruparLista, aberto: null })}
           processos={processos} versoes={versoes} usuarioId={usuario.id} aoMudar={recarregar} />

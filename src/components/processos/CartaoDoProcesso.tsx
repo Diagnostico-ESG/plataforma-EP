@@ -3,6 +3,7 @@ import { diasDoProcessoParado } from '../../processos/diasNaEtapa'
 import type { AgruparQuadroPor } from '../../processos/enderecoDosProcessos'
 import { ROTULO_DO_TIPO } from '../../processos/rotulos'
 import { hojeEmBrasilia } from '../../lib/datas'
+import type { TipoDeLinha } from '../../processos/linhasDoQuadro'
 import type { EtapaDoCatalogo, ProcessoDaLista } from '../../processos/tipos'
 import { Icone } from '../Icone'
 import { SeloDoSetor } from '../SeloDoSetor'
@@ -30,14 +31,18 @@ type CartaoDoProcessoProps = {
   etapas: EtapaDoCatalogo[]
   /** O nome do setor, para o selo; ausente se a lista não o trouxe. */
   nomeDoSetor?: string
+  /** Quem está na tela: o cartão dele diz "Você" no lugar do nome. */
+  usuarioId: string
+  /** Dentro das Linhas do Quadro por etapa, a linha já diz o setor ou o responsável: o cartão não os repete. */
+  naLinha?: TipoDeLinha
   aoLevantar: () => void
   aoBaixar: () => void
 }
 
 /** O cartão do Quadro é um link: focável, e Enter abre o painel do processo. Arrastar usa o recurso nativo do navegador. */
-export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagado, esmaecido, agrupar, etapas, nomeDoSetor, aoLevantar, aoBaixar }: CartaoDoProcessoProps) {
+export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagado, esmaecido, agrupar, etapas, nomeDoSetor, usuarioId, naLinha, aoLevantar, aoBaixar }: CartaoDoProcessoProps) {
   const { id, nome, tipo, situacao } = processo
-  const porResponsavel = agrupar === 'responsavel'
+  const { selo, responsavel } = oQueOCartaoRepete(agrupar, naLinha)
   function comecarAArrastar(evento: DragEvent<HTMLAnchorElement>) {
     // O Firefox só inicia o arrastar se houver algum dado na transferência.
     evento.dataTransfer.setData('text/plain', id)
@@ -49,7 +54,7 @@ export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagad
     <a id={`cartao-${id}`} className={classesDoCartao(processo, apagado, esmaecido)} href={href} aria-current={escolhido ? 'true' : undefined}
       draggable={arrastavel} onDragStart={arrastavel ? comecarAArrastar : undefined} onDragEnd={arrastavel ? aoBaixar : undefined}>
       <span className="cartao-topo">
-        {agrupar !== 'setor' && <SeloDoSetor sigla={processo.setorSigla} cor={processo.setorCor ?? 1} nome={nomeDoSetor} />}
+        {selo && <SeloDoSetor sigla={processo.setorSigla} cor={processo.setorCor ?? 1} nome={nomeDoSetor} />}
         {tipo !== 'processo' && <Pilula situacao="neutra">{ROTULO_DO_TIPO[tipo]}</Pilula>}
         {situacao === 'suspenso' && <Pilula situacao="neutra">Suspenso</Pilula>}
         <EtiquetaDoProcesso etiqueta={processo.etiqueta} soIcone />
@@ -57,12 +62,20 @@ export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagad
       <span className="cartao-nome">{nome}</span>
       <AvisoParaLeitorDeTela esmaecido={esmaecido} />
       {agrupar !== 'etapa' && <BarraDeProgresso processo={processo} />}
-      {!porResponsavel && <QuemCuida responsavel={processo.responsavel} />}
+      {responsavel && <QuemCuida responsavel={processo.responsavel} usuarioId={usuarioId} />}
       <SelosDoCartao processo={processo} hoje={hojeEmBrasilia()} etapas={etapas} />
     </a>
   )
 }
 
+
+// O que a coluna ou a linha já diz o cartão não repete: o setor (selo) e o responsável.
+function oQueOCartaoRepete(agrupar: AgruparQuadroPor, naLinha?: TipoDeLinha): { selo: boolean; responsavel: boolean } {
+  return {
+    selo: agrupar !== 'setor' && naLinha !== 'setor',
+    responsavel: agrupar !== 'responsavel' && naLinha !== 'responsavel',
+  }
+}
 
 // A cor sozinha não diz que o cartão é de outra pessoa: o leitor de tela ouve o texto escondido.
 function AvisoParaLeitorDeTela({ esmaecido }: { esmaecido: boolean }) {
@@ -76,11 +89,11 @@ function classesDoCartao(processo: ProcessoDaLista, apagado: boolean, esmaecido:
 }
 
 /** A linha de quem cuida do processo: ícone de pessoa e o nome, ou "Sem responsável" em cinza. */
-function QuemCuida({ responsavel }: { responsavel: ProcessoDaLista['responsavel'] }) {
+function QuemCuida({ responsavel, usuarioId }: { responsavel: ProcessoDaLista['responsavel']; usuarioId: string }) {
   return (
     <span className={responsavel ? 'cartao-responsavel' : 'cartao-responsavel cartao-responsavel-vazio'}>
       <Icone nome="conta" tamanho={13} />
-      {responsavel ? responsavel.nome : 'Sem responsável'}
+      {responsavel ? (responsavel.id === usuarioId ? 'Você' : responsavel.nome) : 'Sem responsável'}
     </span>
   )
 }

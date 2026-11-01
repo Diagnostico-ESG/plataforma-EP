@@ -1,7 +1,7 @@
 import type { EstadoDoCarregamento } from '../../hooks/useCarregamento'
 import {
   ehPortfolio, formaDeVer, SEM_FILTROS, type AgruparQuadroPor, type FormaDeVer, type FiltrosDosProcessos as Filtros, type MostrarNoPortfolio,
-  type AgruparListaPor, type VisaoDosProcessos as Visao,
+  type AgruparListaPor, type LinhasDoQuadro, type VisaoDosProcessos as Visao,
 } from '../../processos/enderecoDosProcessos'
 import { filtrarProcessos, opcoesDosFiltros, temFiltro, type OpcoesDosFiltros } from '../../processos/filtrosDosProcessos'
 import { linhasDaLista } from '../../processos/linhasDaLista'
@@ -12,7 +12,7 @@ import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
 import { QuadroVazio } from '../quadro/QuadroVazio'
 import { CabecalhoDaLista } from './CabecalhoDaLista'
-import { AgruparAListaPor, DestacarOsMeus, SituacaoDaVisao } from './ControlesDoQuadro'
+import { AgruparAListaPor, DestacarOsMeus, LinhasDoQuadroControle, SituacaoDaVisao } from './ControlesDoQuadro'
 import { ArvoreDaLista } from './ArvoreDaLista'
 import { FaixaDeControles } from './FaixaDeControles'
 import { BotaoDosFiltros } from './BotaoDosFiltros'
@@ -41,6 +41,9 @@ type VisaoDosProcessosProps = {
   /** Só nos quadros: esmaece os cartões em que quem está na tela não é o responsável. Já vem desligado para a Consulta. */
   destacar: boolean
   aoMudarDestacar: (destacar: boolean) => void
+  /** Só no Quadro por etapa: Nenhuma, por setor ou por responsável. */
+  linhas: LinhasDoQuadro
+  aoMudarLinhas: (linhas: LinhasDoQuadro) => void
   /** Sem filtros e de volta a Todos, de uma vez só (o endereço muda uma vez). */
   aoLimparTudo: () => void
   /** Só na Lista: a tabela comum ou a árvore por macroprocesso ou por setor. */
@@ -99,7 +102,8 @@ function FaixaDaVisao({ visao, opcoes, portfolio, filtros, aoMudarFiltros, mostr
   const naLista = visao === 'lista'
   return (
     <FaixaDeControles forma={formaDeVer({ visao, agrupar: props.agrupar })} aoEscolherForma={props.aoMudarFormaDeVer}
-      podeCadastrar={props.podeAlterar} aoCadastrar={props.aoCadastrar} desabilitada={desabilitada}>
+      podeCadastrar={props.podeAlterar} aoCadastrar={props.aoCadastrar} desabilitada={desabilitada}
+      linhas={<LinhasDaFaixa visao={visao} agrupar={props.agrupar} linhas={props.linhas} aoMudar={props.aoMudarLinhas} />}>
       {!naLista && <BotaoDosFiltros opcoes={opcoes} filtros={filtros} aoMudar={aoMudarFiltros} />}
       {!naLista && props.podeAlterar && <DestacarOsMeus ligado={props.destacar} aoAlternar={() => props.aoMudarDestacar(!props.destacar)} />}
       {naLista && <AgruparAListaPor agrupar={props.agruparLista} aoMudar={props.aoMudarAgruparLista} />}
@@ -107,6 +111,12 @@ function FaixaDaVisao({ visao, opcoes, portfolio, filtros, aoMudarFiltros, mostr
       {naLista && temFiltro(filtros) && <BotaoLimparFiltros aoLimpar={() => aoMudarFiltros(SEM_FILTROS)} />}
     </FaixaDeControles>
   )
+}
+
+// Linhas só no Quadro por etapa.
+function LinhasDaFaixa({ visao, agrupar, linhas, aoMudar }: { visao: Visao; agrupar: AgruparQuadroPor; linhas: LinhasDoQuadro; aoMudar: (linhas: LinhasDoQuadro) => void }) {
+  if (visao !== 'quadro' || agrupar !== 'etapa') return null
+  return <LinhasDoQuadroControle linhas={linhas} aoMudar={aoMudar} />
 }
 
 // Os processos depois dos filtros e, no portfólio, depois da Situação. Uma situação sem nenhum processo (semNaSituacao, contada antes
@@ -132,7 +142,8 @@ function ConteudoDaVisao(props: ConteudoDaVisaoProps) {
   return (
     <QuadroDeProcessos lista={lista} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso} podeAlterar={podeAlterar}
       processos={processos} versoes={versoes} aoMudar={aoMudar} agrupar={agrupar} setorFiltrado={filtros.setor} mostrar={props.mostrar}
-      destacarDe={props.destacar ? props.usuarioId : null} enderecoDosConcluidosNaLista={props.enderecoDosConcluidosNaLista} />
+      destacarDe={props.destacar ? props.usuarioId : null} linhas={props.linhas} usuarioId={props.usuarioId}
+      enderecoDosConcluidosNaLista={props.enderecoDosConcluidosNaLista} />
   )
 }
 

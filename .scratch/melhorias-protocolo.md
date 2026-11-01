@@ -1152,3 +1152,9 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 
 - **Ocorrência: pre-commit barrou três vezes por timeout de 15 s, em testes diferentes a cada vez (1, 2 e 8 testes).** Os testes falhos passam quando rodados sozinhos; a suíte inteira passou duas vezes fora do hook, com 0 a 5 falhas de tempo. Esperado: o hook passar com a suíte verde. Aconteceu: o commit do ticket 02 ficou pendente (mudanças em stage, nada comitado). Mesma ocorrência já registrada no ticket 01 (pre-commit lento e sensível à carga).
 - **Solução que funcionou (2026-10-31):** com a máquina sobrecarregada (CPU a 87% com Docker, Zoom e Chrome abertos), o pre-commit passou ao rodar o commit com `VITEST_MAX_WORKERS=2` (variável de ambiente, sem mexer em arquivo): 3301 testes verdes. Sugestão para a cópia mestra: documentar essa variável como saída quando o hook estourar o tempo.
+
+## 2026-10-31 — /executar-complexo (ticket 03 de redesenho-do-quadro)
+
+- **Itens do bloco "/executar-complexo":** branch comum `redesenho-do-quadro-03` criada com `git switch -c`; plano em `plano-03.md`; retomada com a branch aberta não aconteceu. Esperado: fluxo sem worktree. Aconteceu: sem worktree, sem incidente.
+- **Ocorrência: pre-commit barrou duas vezes.** Na primeira, com a suíte inteira em paralelo, 339 testes estouraram os 15 s (suíte levou ~40 min com Docker, Zoom e Chrome abertos); na segunda, com `VITEST_MAX_WORKERS=2`, 1 teste de 3321 falhou (provável tempo). Os arquivos que falharam na primeira passaram ao rodar com 3 processos. Mesma ocorrência dos tickets 01 e 02.
+- **Ocorrência: a trava de git bloqueou um `rm` de arquivo temporário na raiz do projeto** (falso positivo, citando a pasta `.git`) quando ele vinha junto de um `cp`/`node` no mesmo comando. Esperado: só bloquear apagar `.git`. Aconteceu: bloqueio de um comando sem relação com `.git`.

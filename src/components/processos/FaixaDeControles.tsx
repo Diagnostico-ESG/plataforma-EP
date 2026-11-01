@@ -13,6 +13,8 @@ type FaixaDeControlesProps = {
   aoCadastrar: () => void
   /** Enquanto os processos carregam: a faixa já aparece, com os controles da visão desabilitados, para não pular. */
   desabilitada: boolean
+  /** O interruptor Linhas, só no Quadro por etapa: logo depois de "Quadro ▾" e antes do separador. */
+  linhas?: ReactNode
   /** Os controles da forma de ver, depois do separador (Filtros e Destacar os meus no Quadro; Agrupar por na Lista). */
   children: ReactNode
 }
@@ -22,7 +24,7 @@ type FaixaDeControlesProps = {
  * os controles da forma de ver e, nos quadros, a legenda das etiquetas na ponta direita. O fieldset (display: contents)
  * desabilita de uma vez o que depende dos dados; [Cadastrar processo] fica fora dele, porque abrir o cadastro não depende da lista.
  */
-export function FaixaDeControles({ forma, aoEscolherForma, podeCadastrar, aoCadastrar, desabilitada, children }: FaixaDeControlesProps) {
+export function FaixaDeControles({ forma, aoEscolherForma, podeCadastrar, aoCadastrar, desabilitada, linhas, children }: FaixaDeControlesProps) {
   return (
     <div className="faixa-de-controles" role="group" aria-label="Controles dos processos">
       {podeCadastrar && (
@@ -33,6 +35,7 @@ export function FaixaDeControles({ forma, aoEscolherForma, podeCadastrar, aoCada
       )}
       <fieldset className="faixa-de-controles-da-visao" disabled={desabilitada}>
         <MenuDaFormaDeVer forma={forma} aoEscolher={aoEscolherForma} />
+        {linhas}
         <span className="faixa-separador" aria-hidden="true" />
         {children}
       </fieldset>

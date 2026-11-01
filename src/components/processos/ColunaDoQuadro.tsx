@@ -1,3 +1,4 @@
+import type { DragEvent } from 'react'
 import type { ArrastoDoQuadro } from '../../hooks/useArrastoDoQuadro'
 import { useTirarDoQuadroDaTela } from '../../hooks/useTirarDoQuadro'
 import type { ColunaDoQuadro as Coluna } from '../../processos/colunasDoQuadro'
@@ -5,6 +6,9 @@ import { podeArrastar } from '../../processos/destinoDoArrastar'
 import type { AgruparQuadroPor } from '../../processos/enderecoDosProcessos'
 import { CHAVE_DOS_CONCLUIDOS } from '../../processos/publicacao'
 import type { EtapaDoCatalogo } from '../../processos/tipos'
+import { iconeDaEtapa } from '../../processos/iconeDaEtapa'
+import { chaveDaLinha, type TipoDeLinha } from '../../processos/linhasDoQuadro'
+import { Icone } from '../Icone'
 import { Pilula } from '../Pilula'
 import { CartaoDoProcesso } from './CartaoDoProcesso'
 import { PeDaColunaDosConcluidos } from './PeDaColunaDosConcluidos'
@@ -26,41 +30,28 @@ type ColunaDoQuadroProps = {
   foraDoQuadro?: { quantos: number; enderecoDaLista: string }
   /** O Destacar os meus ligado: o id de quem está na tela; o cartão de outro responsável fica esmaecido. */
   destacarDe: string | null
+  /** Quem está na tela, para o cartão dizer "Você". */
+  usuarioId: string
+  /** Só dentro das Linhas: a célula da coluna naquela linha, sem título (o cabeçalho das etapas fica uma vez no alto). */
+  linha?: { chave: string; titulo: string; tipo: TipoDeLinha; aoSoltarFora: () => void }
 }
 
-export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAlterar, arrasto, agrupar, etapas, nomesDosSetores, foraDoQuadro, destacarDe }: ColunaDoQuadroProps) {
+export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAlterar, arrasto, agrupar, etapas, nomesDosSetores, foraDoQuadro, destacarDe, usuarioId, linha }: ColunaDoQuadroProps) {
   const { levantado } = arrasto
   const tirar = useTirarDoQuadroDaTela()
   const dosConcluidos = agrupar === 'etapa' && coluna.chave === CHAVE_DOS_CONCLUIDOS
-  // Só as colunas de etapa recebem o cartão (por responsável e por setor não se arrasta), e a coluna sob o cartão ganha o realce.
-  const recebe = levantado !== null && agrupar === 'etapa'
-  const realce = recebe && arrasto.sobre === coluna.chave
+  const { realce, aoEntrar, aoPassar, aoSoltar } = recebedorDoCartao(coluna, agrupar, arrasto, linha)
   return (
-    <section className={classesDaColuna(realce)} aria-label={rotuloDaColuna(coluna)}
-      onDragEnter={() => recebe && arrasto.passarPor(coluna.chave)}
-      onDragOver={(evento) => {
-        if (!recebe) return
-        evento.preventDefault()
-        arrasto.passarPor(coluna.chave)
-      }}
-      onDrop={(evento) => {
-        evento.preventDefault()
-        arrasto.soltarEm(coluna.chave)
-      }}>
-      <h3 className="coluna-titulo">
-        <span className="coluna-titulo-texto">
-          <span className="coluna-titulo-principal">{coluna.titulo}{coluna.inativo && <> <Pilula situacao="neutra">Inativo</Pilula></>}</span>
-        </span>
-        {coluna.subtitulo && <span className="coluna-titulo-nome">{coluna.subtitulo}</span>}
-        <span className="coluna-contagem">{coluna.processos.length}</span>
-      </h3>
+    <section className={classesDaColuna(realce)} aria-label={linha ? `${linha.titulo}: ${coluna.titulo}` : rotuloDaColuna(coluna)}
+      onDragEnter={aoEntrar} onDragOver={aoPassar} onDrop={aoSoltar}>
+      {!linha && <CabecalhoDaColuna coluna={coluna} agrupar={agrupar} />}
       <div className="coluna-cartoes">
-        <AvisoDaColunaVazia coluna={coluna} agrupar={agrupar} />
+        {!linha && <AvisoDaColunaVazia coluna={coluna} agrupar={agrupar} />}
         {coluna.processos.map((processo) => {
           const cartao = (
             <CartaoDoProcesso key={processo.id} processo={processo} escolhido={processo.id === idEscolhido}
               href={enderecoDoProcesso(processo.id)} arrastavel={podeAlterar && agrupar === 'etapa' && podeArrastar(processo)}
-              agrupar={agrupar} etapas={etapas} nomeDoSetor={nomesDosSetores[processo.setorId]} apagado={levantado?.id === processo.id}
+              agrupar={agrupar} etapas={etapas} nomeDoSetor={nomesDosSetores[processo.setorId]} usuarioId={usuarioId} naLinha={linha?.tipo} apagado={levantado?.id === processo.id}
               esmaecido={destacarDe !== null && processo.responsavel?.id !== destacarDe}
               aoLevantar={() => arrasto.levantar(processo)} aoBaixar={arrasto.baixar} />
           )
@@ -76,9 +67,51 @@ export function ColunaDoQuadro({ coluna, idEscolhido, enderecoDoProcesso, podeAl
             </div>
           )
         })}
-        {dosConcluidos && foraDoQuadro && <PeDaColunaDosConcluidos {...foraDoQuadro} />}
+        {dosConcluidos && !linha && foraDoQuadro && <PeDaColunaDosConcluidos {...foraDoQuadro} />}
       </div>
     </section>
+  )
+}
+
+/**
+ * Como a coluna (ou a célula, dentro das Linhas) recebe o cartão levantado. Só as colunas de etapa recebem (por responsável e
+ * por setor não se arrasta); nas Linhas a célula só acende para o cartão da própria linha, e soltar em outra linha só avisa.
+ */
+function recebedorDoCartao(coluna: Coluna, agrupar: AgruparQuadroPor, arrasto: ArrastoDoQuadro, linha: ColunaDoQuadroProps['linha']) {
+  const { levantado } = arrasto
+  const recebe = levantado !== null && agrupar === 'etapa'
+  const mesmaLinha = !linha || levantado === null || chaveDaLinha(linha.tipo, levantado) === linha.chave
+  const chaveDoRealce = linha ? `${linha.chave}/${coluna.chave}` : coluna.chave
+  return {
+    realce: recebe && mesmaLinha && arrasto.sobre === chaveDoRealce,
+    aoEntrar: () => { if (recebe && mesmaLinha) arrasto.passarPor(chaveDoRealce) },
+    aoPassar: (evento: DragEvent) => {
+      if (!recebe) return
+      evento.preventDefault()
+      if (mesmaLinha) arrasto.passarPor(chaveDoRealce)
+    },
+    aoSoltar: (evento: DragEvent) => {
+      evento.preventDefault()
+      if (mesmaLinha) return arrasto.soltarEm(coluna.chave)
+      arrasto.baixar()
+      linha?.aoSoltarFora()
+    },
+  }
+}
+
+/** O título da coluna: o ícone da etapa (só enfeite, o nome está ao lado), o nome, a contagem e, por setor, o nome do setor. */
+export function CabecalhoDaColuna({ coluna, agrupar }: { coluna: Coluna; agrupar: AgruparQuadroPor }) {
+  return (
+    <h3 className="coluna-titulo">
+      <span className="coluna-titulo-texto">
+        <span className="coluna-titulo-principal">
+          {agrupar === 'etapa' && <Icone nome={iconeDaEtapa(coluna.chave)} tamanho={16} />}
+          {coluna.titulo}{coluna.inativo && <> <Pilula situacao="neutra">Inativo</Pilula></>}
+        </span>
+      </span>
+      {coluna.subtitulo && <span className="coluna-titulo-nome">{coluna.subtitulo}</span>}
+      <span className="coluna-contagem">{coluna.processos.length}</span>
+    </h3>
   )
 }
 

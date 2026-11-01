@@ -1,0 +1,100 @@
+/* O Quadro por etapa com Linhas (proposta 6): uma grade com o cabeçalho das etapas uma vez no alto e uma faixa por setor ou
+   por responsável. Reaproveita .quadro-colunas (altura e rolagem), trocando o flex por grade; rola nos dois sentidos. */
+.quadro-matriz {
+  display: grid;
+  align-content: start;
+  overflow: auto;
+  gap: 0 14px;
+  background: none;
+}
+
+.coluna-titulo-principal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.coluna-titulo-principal svg {
+  flex: none;
+  color: var(--icone-inativo);
+}
+
+/* O cabeçalho das etapas fica no alto ao rolar; o canto e a faixa do nome da linha ficam à esquerda. */
+.matriz-canto,
+.matriz-cabecalho {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: var(--esp-2) 0;
+  background: var(--fundo);
+}
+
+.matriz-canto {
+  left: 0;
+  z-index: 3;
+}
+
+.matriz-linha-cabeca {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: var(--esp-3) var(--esp-2) var(--esp-3) 0;
+  border-top: 1px solid var(--linha);
+  background: var(--fundo);
+}
+
+.matriz-linha-cabeca .coluna-contagem {
+  margin-left: auto;
+}
+
+.matriz-quem {
+  font-size: var(--tam-secundario);
+}
+
+.matriz-setinha {
+  display: inline-flex;
+  padding: 2px;
+  border: 0;
+  border-radius: var(--canto-botao);
+  background: none;
+  color: var(--texto-2);
+  cursor: pointer;
+}
+
+.matriz-setinha[aria-expanded='false'] svg {
+  transform: rotate(-90deg);
+}
+
+/* Na célula a coluna não tem título nem altura própria: os cartões ficam na ordem de nome, de cima para baixo. */
+.quadro-matriz .coluna {
+  min-width: 0;
+  padding-top: var(--esp-2);
+  border-top: 1px solid var(--linha);
+}
+
+.quadro-matriz .coluna-cartoes {
+  overflow: visible;
+}
+
+.matriz-recolhida {
+  grid-column: 2 / -1;
+  margin: 0;
+  padding: var(--esp-3) 0;
+  border-top: 1px solid var(--linha);
+  color: var(--texto-2);
+  font-size: var(--tam-secundario);
+}
+
+/* Enquanto uma célula recebe o cartão, as outras esmaecem, como no quadro sem linhas. */
+.quadro-matriz:has(.coluna-destino) .coluna:not(.coluna-destino) {
+  opacity: 0.6;
+}
+
+.aviso-da-linha {
+  margin: 0 0 var(--esp-3);
+  color: var(--texto-2);
+}
