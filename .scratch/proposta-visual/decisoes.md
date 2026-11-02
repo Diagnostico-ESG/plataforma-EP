@@ -54,7 +54,7 @@ Análises que justificam as escolhas:
 - **Escala:** base de 14px (os protótipos usam 13px; o app usava 15px).
 - A identidade completa está em `.scratch/identidade-visual.md`.
 
-## Estado de cada decisão (atualizado em 2026-10-30)
+## Estado de cada decisão (atualizado em 2026-11-02)
 
 Este é o **único documento** da redesenho: o que foi decidido (acima) e o que já está no código ou falta (aqui). Ao concluir algo, mude a coluna "Estado" e a data. O resto do projeto fica no `backlog.md`.
 
@@ -62,34 +62,36 @@ Este é o **único documento** da redesenho: o que foi decidido (acima) e o que 
 
 | # | Decisão | Estado | O que falta |
 |---|---|---|---|
-| 1 | Moldura grafite e branca (faixa lateral escura, barra superior branca) | Feito | Barra superior só com título, busca, sino e avatar (sem Quadro \| Lista); faixa lateral com Processos, Setores, Painel, Administração e Ajuda (itens 9 e 16 abaixo) |
-| 2 | Selo do setor em branco sobre cor forte (12 cores) | Feito (2026-10-30) | Nome do setor ao passar o mouse e para o leitor de tela já vale no cartão do Quadro; falta na Lista, no verso e nas linhas de grupo (a lista de processos não traz o nome do setor) |
-| 2 | Prazo em vermelho (atrasado) e laranja (perto de vencer) | Parcial | Dias parado e relatório pendente já são ícone + texto sem fundo (2026-10-30). Falta o prazo em si: o cartão não recebe essa data (exige mudar a view do banco) |
+| 1 | Moldura grafite e branca (faixa lateral escura, barra superior branca) | Feito (2026-10-31) | — (barra de cima com título, busca e sino "Em breve" e avatar; faixa lateral com Processos, Setores, Painel e Ajuda "Em breve" e Administração; ticket 01 do redesenho-do-quadro) |
+| 2 | Selo do setor em branco sobre cor forte (12 cores) | Parcial | Nome do setor ao passar o mouse e para o leitor de tela vale no cartão e nas Linhas por setor; falta na Lista, no cabeçalho do verso e nas linhas de grupo (conferido no código em 2026-11-02) |
+| 2 | Prazo em vermelho (atrasado) e laranja (perto de vencer) | Parcial | Dias parado e relatório pendente já são ícone + texto sem fundo (2026-10-30). O prazo em si entra com os prazos da v1.5 (backlog) |
 | 3 | Azul-claro para escolhido; azul cheio só na ação principal | Feito | — |
-| 4 | Etiqueta só por ícone, com legenda uma vez no cabeçalho | Feito (2026-10-30) | Legenda na barra do Quadro, à direita dos controles e antes do [Cadastrar processo]; no passo 3 ela vai para a ponta direita da faixa nova |
+| 4 | Etiqueta só por ícone, com legenda uma vez no cabeçalho | Feito (2026-10-31) | — (legenda na faixa de controles, fora da Lista) |
 | 5 | Situação em selo discreto (exceções em destaque) | Feito | — |
-| 6 | Ícones: um por etapa e um por informação do cartão | Parcial | Ícones do rodapé do cartão (dias, relatório) feitos em 2026-10-30. Faltam o ícone por etapa (o catálogo não guarda ícone) e o contador de arquivos (o cartão não recebe a contagem; exige a view do banco) |
-| 7 | Faixa de controles de 56px com botão "Filtros" e contador | Falta | Hoje são cinco seletores soltos num bloco branco |
-| 8 | Cartão com nome em destaque e versão no rodapé | Parcial | Responsável como "Você" |
-| 8 | "Destacar os meus" (esmaece, não esconde) | Falta | Hoje "Só os meus" filtra e esconde. Muda regra da spec (histórias 169–171): vai para o passo 3 |
-| 8 | Interruptor "Linhas: Nenhuma \| Setor \| Responsável" | Falta | Hoje "Agrupar por: Etapa \| Responsável \| Setor" troca a visão inteira |
-| 8 | Nas linhas por setor, só a sigla com nome ao passar o mouse | Falta | Depende de "Linhas" |
+| 6 | Ícones: um por etapa e um por informação do cartão | Parcial | Ícone por etapa feito em 2026-10-31 (ticket 03). Falta o contador de arquivos (exige a contagem na view do banco; backlog, 2026-10-31) |
+| 7 | Faixa de controles de 56px com botão "Filtros" e contador | Feito (2026-10-31) | — (ticket 01) |
+| 8 | Cartão com nome em destaque e versão no rodapé | Feito (2026-10-31) | — ("Você" no cartão, ticket 03) |
+| 8 | "Destacar os meus" (esmaece, não esconde) | Feito (2026-10-31) | — (ticket 02, ADR 0037) |
+| 8 | Interruptor "Linhas: Nenhuma \| Setor \| Responsável" | Feito (2026-10-31) | — (ticket 03) |
+| 8 | Nas linhas por setor, só a sigla com nome ao passar o mouse | Feito (2026-10-31) | — (ticket 03) |
 | 9 | Verso: janela fixa 880 × 740, trilha de etapas, avisos lado a lado | Feito | — |
-| 9 | Verso enxuto: sem abas, miniatura grande, anotações com o dobro do espaço, histórico no "···" | Falta | Estrutura do verso ainda é a antiga |
-| — | Cabeçalho da coluna: plaqueta só com o nome, contagem, "+" e "⋮", descrição abaixo | Parcial | Descrição fora da plaqueta feita em 2026-10-30; falta o ícone da etapa |
+| 9 | Verso enxuto: sem abas, miniatura grande, anotações com o dobro do espaço, histórico no "···" | Feito (2026-11-02) | — (tickets 04 e 05). "Versões anteriores" e "Outros anexos" ficaram empilhados, não lado a lado como na verso-3 (backlog, 2026-11-01) |
+| — | Cabeçalho da coluna: plaqueta só com o nome, contagem, "+" e "⋮", descrição abaixo | Feito (2026-10-31) | — (ícone da etapa no ticket 03) |
 | — | Avatar: iniciais cinza para os outros, "sem responsável" tracejado, tamanhos 20/24/32 | Feito (2026-10-30) | O tracejado aparece no Agora do verso; o cartão do Quadro segue com o texto "Sem responsável" (decisão da spec: cartão sem avatar) |
 | — | Trilha de 8 tracinhos (atual azul, feitas cinza-azulado) | Feito (2026-10-30) | — |
-| — | "Mostrar" num segmento (Em andamento \| Concluídos \| Cancelados \| Todos) | Falta | Hoje "Todos \| Concluídos". "Cancelados" reabre o ADR 0034 (cancelados fora das visualizações): vai para o passo 3 |
+| — | "Mostrar" num segmento (Em andamento \| Concluídos \| Cancelados \| Todos) | Feito (2026-10-31) | — (virou o controle "Situação: Todos \| Em andamento \| Suspensos \| Concluídos \| Cancelados" na Lista e no Quadro por setor, ticket 02) |
 | — | Criar setor numa janela de 520px | Feito (2026-10-30) | — |
-| — | Selo de tipo de arquivo em mono; quadradinho do macroprocesso sai das caixas | Feito (2026-10-30) | O selo está na lista de arquivos da Lista; no verso entra com a lista de arquivos do verso enxuto (passo 3) |
+| — | Selo de tipo de arquivo em mono; quadradinho do macroprocesso sai das caixas | Feito (2026-11-01) | — (no verso, com a lista de arquivos do verso enxuto) |
 | — | Lista, cadastros e histórico (tabela, grupos, cabeçalhos) | Feito | — |
-| — | DESIGN.md refeito | Feito (2026-10-30) | `.impeccable/design.json` ainda descreve a identidade antiga (`/impeccable document`) |
+| — | DESIGN.md refeito | Parcial | `.impeccable/design.json` ainda descreve a identidade antiga (sem mudança desde 2026-10-07; falta o `/impeccable document`) |
+
+Nada da tabela foi visto com o login real: os critérios `[visual]` 14 a 18 do redesenho seguem presumidos (ressalva da entrega de 2026-11-02).
 
 ### Como seguir, nesta ordem
 
 1. **`/demanda` — acabamento visual, sem mudar regra** (feito em 2026-10-30, salvo prazo e contador de arquivos, que dependem da view do banco): selo com nome, rodapé do cartão com ícones, avatar, cabeçalho da coluna, trilha de tracinhos.
 2. **`/executar-simples` — ajustes pequenos** (feito em 2026-10-30; classificado no `/demanda` do mesmo dia): quadradinho do macroprocesso sai das caixas, selo do tipo de arquivo em mono, legenda das etiquetas no cabeçalho do Quadro, janela de 520px para criar setor. Os nomes das etiquetas já estavam feitos.
-3. **`/planejar` — uma funcionalidade só, "Quadro igual à proposta 6"** (mudança em funcionalidade existente): faixa de controles com "Filtros", "Linhas", "Destacar os meus" (esmaecer em vez de esconder) e "Mostrar" em segmento com Cancelados (os dois mudam regra já decidida e pedem ADR novo), barra superior e faixa lateral novas, verso enxuto, ícone por etapa (exige migração no Catálogo). Fonte: este arquivo + `proposta-6.html`, `verso-3.html` e `.scratch/identidade-visual.md` (valem as medidas dele, base 14px).
-4. **Manutenção, sem mudança visual**: dividir o `Quadro.css` (passou de 300 linhas), ADR das 12 cores em `corDoSetor.ts`, uma função só para a conversão da cor 1–30 → 1–12, `/impeccable document`.
+3. **`/planejar` — uma funcionalidade só, "Quadro igual à proposta 6"** (feito: funcionalidade `redesenho-do-quadro`, cinco tickets, entregue em 2026-11-02; mudança em funcionalidade existente): faixa de controles com "Filtros", "Linhas", "Destacar os meus" (esmaecer em vez de esconder) e "Mostrar" em segmento com Cancelados (os dois mudam regra já decidida e pedem ADR novo), barra superior e faixa lateral novas, verso enxuto, ícone por etapa (exige migração no Catálogo). Fonte: este arquivo + `proposta-6.html`, `verso-3.html` e `.scratch/identidade-visual.md` (valem as medidas dele, base 14px).
+4. **Manutenção, sem mudança visual** (falta, conferido em 2026-11-02): dividir o `Quadro.css` (544 linhas), ADR das 12 cores em `corDoSetor.ts` (a decisão só está em `.scratch/identidade-visual.md`), `/impeccable document`. A conversão da cor 1–30 → 1–12 já é uma função só (`corDoSetor`).
 
 **Fora do redesenho:** possível defeito no histórico ("Moveu o processo" sem as etapas de → para; `/demanda`, bug), e o que depende de você (olhar o app com o login real, conferir o Catálogo de etapas, escolher o responsável inicial de cada etapa).
