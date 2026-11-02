@@ -1,9 +1,7 @@
 # Próximo passo (2026-11-02)
 
-**Situação:** os 5 tickets do `redesenho-do-quadro` estão concluídos na `main` (ticket 05 no commit `fe9cd2c`). O verso mostra agora a imagem (.png) da versão mais recente no lugar do ícone, com os estados carregando, sem .png, erro e clique que abre o .png inteiro. A imagem é pedida ao módulo de versões ao abrir o verso, nada é guardado e o endereço temporário é liberado ao fechar. A suíte passou (263 arquivos, 3357 testes). Efeito colateral: abrir o verso agora faz um pedido a mais (o .png da miniatura); o teste de `App.baixarArquivo` foi ajustado.
+**Situação:** `redesenho-do-quadro` entregue (marca `Entregue em 2026-11-02 (commit 358bb53)` na spec de `processos-etapas`, marco `marco/2026-11-02-entrega-redesenho-do-quadro`), com ressalva: os critérios `[visual]` 14 a 18 não foram vistos com o login real, e a miniatura nunca com um .png de verdade.
 
-**Próximo comando:** `/polir` (Sonnet) na interface do redesenho, depois `/ship` (Sonnet). Ressalva para o `/ship`: a prova da miniatura com o login real depende de a função `arquivos-no-drive` estar publicada no desenvolvimento (foi em 2026-11-01).
+**Próximo comando:** nenhum obrigatório. A próxima funcionalidade começa no `/planejar` (Opus no modo completo, Sonnet no curto); demandas fora do plano entram pelo `/demanda`.
 
-**Depende do usuário:** ver o verso e a miniatura com o login real (o `[visual]` do 05 não foi visto no navegador, só por testes); ler as "Decisões a confirmar" da spec e do `plano-04.md`; ver as Linhas e os ícones com o login real; conferir o Catálogo de etapas; escolher o responsável inicial de cada etapa.
-
-**Atualização (2026-11-02, /polir):** `/polir` feito nos tickets 01 a 05 (3 ajustes pequenos, registrados em `.scratch/redesenho-do-quadro/desvios.md`). Próximo comando: `/ship` com Sonnet (revisão de segurança em Opus só se for para produção).
+**Depende do usuário:** abrir o app com o login real e ver o Quadro (faixa, Linhas, Destacar os meus), o verso com a miniatura de um .png real e os ícones; ler as "Decisões a confirmar" da spec e o `desvios.md` do redesenho; conferir o Catálogo de etapas; escolher o responsável inicial de cada etapa. Backlog: dívidas de padrão do redesenho (uma linha em `.scratch/backlog.md`).
