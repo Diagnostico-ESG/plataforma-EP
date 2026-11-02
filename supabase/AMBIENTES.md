@@ -97,3 +97,14 @@ Atualização (2026-10-29): Edge Function `arquivos-no-drive` publicada de novo 
 Atualização (2026-10-30): conferido que as migrações 20261029001211_fim_do_arquivado e 20261029021159_tirar_e_voltar_ao_quadro já estão aplicadas no desenvolvimento: `npm run db:types` contra o remoto saiu idêntico ao `src/types/database.ts` (com `tirar_do_quadro`, `voltar_ao_quadro` e `tirado_do_quadro_em`, e sem `arquivado_em` nem `arquivar_processo`). A ressalva "ainda sem aplicar" das entregas de repositorio-de-processos estava desatualizada.
 
 Atualização (2026-11-01): Edge Function `arquivos-no-drive` publicada de novo no desenvolvimento pelo usuário, a partir da `main` no commit fce0d59 (última mudança na pasta `supabase/functions`: 9db58cb), com `npx supabase functions deploy arquivos-no-drive --use-api --project-ref yclkzyoebpsxmgpbcbus`, na primeira tentativa. A CLI confirmou "Deployed Functions on project yclkzyoebpsxmgpbcbus".
+
+Atualização (2026-11-02): conferidas seis migrações que estavam aplicadas no desenvolvimento sem registro aqui. Cada uma tem uma execução do workflow "Migrar banco de desenvolvimento" que terminou com "Migração <nome> aplicada." (o script grava a versão em `supabase_migrations.schema_migrations`), e os tipos gerados do remoto (`supabase gen types --project-id yclkzyoebpsxmgpbcbus`, em arquivo temporário) saíram idênticos ao `src/types/database.ts` (com `etapas.responsavel_inicial_id` e sem `origem`, `contexto` e `observacoes` em `processos`).
+
+  - 20261027120000_confirmacao_de_arquivos (travas-em-avisos, ticket 01; execução 40550719395, branch `claude/travas-01-confirmacao-f1ca45`, 2026-10-27)
+  - 20261027160000_editar_numero_relendo_apos_a_trava (travas-em-avisos, achado do code-review; execução 40574582216, `main`, 2026-10-27)
+  - 20261029205934_data_da_modelagem_so_realizada (enxugar-cartao-e-cadastro, ticket 03; execução 40961786874, branch `enxugar-cartao-e-cadastro`, 2026-10-29)
+  - 20261029224032_anotacoes_no_cadastro (enxugar-cartao-e-cadastro, ticket 04; execução 40970306514, branch `enxugar-cartao-e-cadastro`, 2026-10-29)
+  - 20261029234503_origem_contexto_e_observacoes_saem (enxugar-cartao-e-cadastro, ticket 05; destrutiva; execução 40977307326, `main`, 2026-10-30)
+  - 20261030182657_responsavel_inicial_por_etapa (responsavel-inicial-por-etapa; execução 41114273607, branch `responsavel-inicial-por-etapa`, 2026-10-30)
+
+Com isso, todas as migrações de `supabase/migrations/` estão aplicadas no desenvolvimento.
