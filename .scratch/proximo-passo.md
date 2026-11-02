@@ -1,7 +1,7 @@
-# Próximo passo (2026-11-01)
+# Próximo passo (2026-11-02)
 
-**Situação:** tickets 01 a 04 do `redesenho-do-quadro` concluídos na `main` (commit `2192c35`). O 04 trouxe o verso enxuto: botão azul da etapa no cabeçalho, linha de dados, trilha horizontal, Agora em linhas (etapa, etiqueta, responsável, avisos lado a lado e campos da etapa), versão com arquivos em lista ao lado das Anotações (com o dobro da altura) e "Versões anteriores"/"Outros anexos" recolhidos. No lugar da miniatura há um quadro com o ícone do fluxograma. Falta o ticket 05 (miniatura do fluxograma).
+**Situação:** os 5 tickets do `redesenho-do-quadro` estão concluídos na `main` (ticket 05 no commit `fe9cd2c`). O verso mostra agora a imagem (.png) da versão mais recente no lugar do ícone, com os estados carregando, sem .png, erro e clique que abre o .png inteiro. A imagem é pedida ao módulo de versões ao abrir o verso, nada é guardado e o endereço temporário é liberado ao fechar. A suíte passou (263 arquivos, 3357 testes). Efeito colateral: abrir o verso agora faz um pedido a mais (o .png da miniatura); o teste de `App.baixarArquivo` foi ajustado.
 
-**Próximo comando:** `/executar-simples` no ticket 05 (miniatura do fluxograma), com Sonnet; depois `/polir` e então `/ship`. O ticket 05 usa a função `arquivos-no-drive` (ação baixar), já publicada no desenvolvimento em 2026-11-01.
+**Próximo comando:** `/polir` (Sonnet) na interface do redesenho, depois `/ship` (Sonnet). Ressalva para o `/ship`: a prova da miniatura com o login real depende de a função `arquivos-no-drive` estar publicada no desenvolvimento (foi em 2026-11-01).
 
-**Depende do usuário:** ver o verso novo com o login real (o `[visual]` do 04 foi visto só na vitrine local, com módulos falsos, a 1366×768); ler as "Decisões a confirmar" da spec e as decisões de `.scratch/redesenho-do-quadro/plano-04.md` (pílula de situação fora do cabeçalho, rótulo "Etapa" mantido); ver as Linhas e os ícones com o login real (o `[visual]` do 03); conferir o Catálogo de etapas; escolher o responsável inicial de cada etapa.
+**Depende do usuário:** ver o verso e a miniatura com o login real (o `[visual]` do 05 não foi visto no navegador, só por testes); ler as "Decisões a confirmar" da spec e do `plano-04.md`; ver as Linhas e os ícones com o login real; conferir o Catálogo de etapas; escolher o responsável inicial de cada etapa.

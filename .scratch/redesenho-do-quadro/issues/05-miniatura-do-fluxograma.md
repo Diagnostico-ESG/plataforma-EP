@@ -16,3 +16,5 @@
 - [ ] Texto alternativo "Fluxograma {versão} de {processo}".
 - [ ] Testes de tela dos cinco estados (sem versão, carregando, sem .png, erro e imagem) e do clique, com o módulo falso de versões.
 - [ ] Ressalva para o `/ship`: a prova com o login real depende de a função `arquivos-no-drive` estar publicada no desenvolvimento.
+
+Concluído em 2026-11-02 (commit fe9cd2c)
