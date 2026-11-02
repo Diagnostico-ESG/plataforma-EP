@@ -5,3 +5,5 @@
 **Próximo comando:** `/polir` (Sonnet) na interface do redesenho, depois `/ship` (Sonnet). Ressalva para o `/ship`: a prova da miniatura com o login real depende de a função `arquivos-no-drive` estar publicada no desenvolvimento (foi em 2026-11-01).
 
 **Depende do usuário:** ver o verso e a miniatura com o login real (o `[visual]` do 05 não foi visto no navegador, só por testes); ler as "Decisões a confirmar" da spec e do `plano-04.md`; ver as Linhas e os ícones com o login real; conferir o Catálogo de etapas; escolher o responsável inicial de cada etapa.
+
+**Atualização (2026-11-02, /polir):** `/polir` feito nos tickets 01 a 05 (3 ajustes pequenos, registrados em `.scratch/redesenho-do-quadro/desvios.md`). Próximo comando: `/ship` com Sonnet (revisão de segurança em Opus só se for para produção).

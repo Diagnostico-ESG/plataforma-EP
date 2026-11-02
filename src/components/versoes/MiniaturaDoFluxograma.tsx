@@ -33,7 +33,7 @@ function ImagemDaVersao({ modulo, png, texto }: ImagemDaVersaoProps) {
   // A aba abre dentro do clique, como no link do arquivo; o conteúdo já está aqui, então não há segundo pedido à rede.
   const abrir = () => entregarArquivo(abrirAba(png.formato), imagem.conteudo, png.nome)
   return (
-    <button type="button" className="versao-destaque-miniatura versao-destaque-miniatura-botao" onClick={abrir}>
+    <button type="button" className="versao-destaque-miniatura versao-destaque-miniatura-botao" title="Abrir o .png inteiro" onClick={abrir}>
       <img src={imagem.endereco} alt={texto} />
     </button>
   )

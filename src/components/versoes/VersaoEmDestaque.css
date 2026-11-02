@@ -176,8 +176,13 @@
   background: var(--linha);
 }
 
+/* O aviso e o texto do quadro em cinza de texto (o ícone fica no cinza claro): o cinza do ícone não tem contraste para texto. */
+.versao-destaque-miniatura span {
+  color: var(--texto-2);
+}
+
 .versao-destaque-miniatura-botao {
-  cursor: zoom-in;
+  cursor: pointer;
 }
 
 .versao-destaque-miniatura-botao img {
