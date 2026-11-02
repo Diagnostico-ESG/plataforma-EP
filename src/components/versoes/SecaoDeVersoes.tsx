@@ -91,7 +91,7 @@ function VersoesProntas({ versoes, processo, lidas, podeEnviar, aoAlterada, idDo
       {conferencia.tipo === 'falhou' && <p className="secao-de-versoes-aviso" role="status">Não foi possível conferir os arquivos no Drive.</p>}
       {!maisRecente && <p className="cadastros-vazio">Nenhuma versão enviada ainda</p>}
       {maisRecente && (
-        <VersaoEmDestaque {...comum} versao={maisRecente} versoes={lidas} />
+        <VersaoEmDestaque {...comum} nomeDoProcesso={processo.nome} versao={maisRecente} versoes={lidas} />
       )}
       {anteriores.length > 0 && (
         <details className="versoes-anteriores">

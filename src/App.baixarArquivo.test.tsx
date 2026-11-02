@@ -57,7 +57,8 @@ test('clicar num .png abre uma aba nova e a leva ao arquivo, sem baixar', async 
   const { versoes } = montarNosCadastros({ perfil: 'consulta', ...comUmaVersao })
   fireEvent.click(await (await secao()).findByRole('link', { name: comNome('TSA_V1_Emitir Ofício.png') }))
   await waitFor(() => expect(abas[0]?.location.href).toBe('blob:arquivo'))
-  expect(versoes.baixados).toEqual(['a1-png'])
+  // um pedido é o da miniatura do verso (ao abrir) e o outro é o do clique no link
+  expect(versoes.baixados).toEqual(['a1-png', 'a1-png'])
   expect(baixados).toEqual([])
 })
 

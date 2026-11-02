@@ -4,18 +4,20 @@ import { relatoriosDaVersao, textoDoRelatorio } from '../../versoes/relatorioQue
 import { emOrdemDeExibicao, formatarDiaEMes, papeisQueSePodeAcrescentar, rotuloCurtoDoArquivo, rotuloDaVersao } from '../../versoes/rotulos'
 import type { ArquivoDaVersao, ConferenciaDosArquivos, ModuloDeVersoes, Versao } from '../../versoes/tipos'
 import { tamanhoDoArquivo } from '../../versoes/tamanhoDoArquivo'
-import { Icone } from '../Icone'
 import { Pilula } from '../Pilula'
 import { AcaoSubstituir } from './AcaoSubstituir'
 import { AcaoEditarNumero } from './AcaoEditarNumero'
 import { AcrescentarArquivo } from './AcrescentarArquivo'
 import { LinkDoArquivo } from './LinkDoArquivo'
 import { MarcaNoDrive } from './MarcaNoDrive'
+import { MiniaturaDoFluxograma } from './MiniaturaDoFluxograma'
 import { SeloDoTipoDeArquivo } from './SeloDoTipoDeArquivo'
 
 export type VersaoEmDestaqueProps = {
   modulo: ModuloDeVersoes
   processoId: string
+  /** O nome do processo, para o texto alternativo da miniatura. */
+  nomeDoProcesso: string
   versao: Versao
   /** Todas as versões do processo: o relatório que vale numa versão pode ser o de uma anterior. */
   versoes: Versao[]
@@ -30,7 +32,7 @@ export function VersaoEmDestaque(props: VersaoEmDestaqueProps) {
   const { versao } = props
   return (
     <article className="versao-destaque" aria-label={rotuloDaVersao(versao)}>
-      <div className="versao-destaque-miniatura" aria-hidden="true"><Icone nome="fluxograma" tamanho={32} /></div>
+      <MiniaturaDoFluxograma modulo={props.modulo} versao={versao} nomeDoProcesso={props.nomeDoProcesso} />
       <div className="versao-destaque-info">
         <LinhaDoDestaque versao={versao} versoes={props.versoes} modulo={props.modulo} podeAlterar={props.podeAlterar} aoGravar={props.aoAlterada} />
         <AutoriaDoDestaque versao={versao} />
