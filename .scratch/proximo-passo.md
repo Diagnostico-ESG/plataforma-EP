@@ -1,7 +1,12 @@
 # Próximo passo (2026-11-02)
 
-**Situação:** `redesenho-do-quadro` entregue (marca `Entregue em 2026-11-02 (commit 358bb53)` na spec de `processos-etapas`, marco `marco/2026-11-02-entrega-redesenho-do-quadro`), com ressalva: os critérios `[visual]` 14 a 18 não foram vistos com o login real, e a miniatura nunca com um .png de verdade.
+**Situação:** todas as funcionalidades da v1 estão entregues; as seis migrações sem registro foram conferidas e registradas no `supabase/AMBIENTES.md`; a tabela de `.scratch/proposta-visual/decisoes.md` foi atualizada depois da entrega do `redesenho-do-quadro`.
 
-**Próximo comando:** nenhum obrigatório. A próxima funcionalidade começa no `/planejar` (Opus no modo completo, Sonnet no curto); demandas fora do plano entram pelo `/demanda`.
+**Próximo comando:** `/demanda` (Opus para classificar), começando pelo possível defeito do histórico: os registros "Moveu o processo" não mostram a etapa de origem e a de destino (visto em 2026-10-30, causa não investigada). Se for bug, segue em Sonnet (Opus se a causa não aparecer na primeira investigação).
 
-**Depende do usuário:** abrir o app com o login real e ver o Quadro (faixa, Linhas, Destacar os meus), o verso com a miniatura de um .png real e os ícones; ler as "Decisões a confirmar" da spec e o `desvios.md` do redesenho; conferir o Catálogo de etapas; escolher o responsável inicial de cada etapa. Backlog: dívidas de padrão do redesenho (uma linha em `.scratch/backlog.md`).
+**Depois, nesta ordem, cada um pelo `/demanda`:**
+1. Nome do setor ao passar o mouse no selo da Lista, do cabeçalho do verso e das linhas de grupo (a view dos processos não traz o nome do setor).
+2. Manutenção sem mudança visual: dividir o `Quadro.css` (544 linhas), ADR das 12 cores do setor, `/impeccable document` e as dívidas de padrão do redesenho (backlog, 2026-11-02).
+3. Contador de arquivos no cartão (exige migração; backlog). O prazo no cartão fica para a v1.5.
+
+**Depende do usuário:** abrir o app com o login real e ver o Quadro e o verso (critérios `[visual]` 14 a 18 do redesenho e a miniatura com um .png real); ler as "Decisões tomadas ao escrever esta seção, a confirmar na leitura" da seção Redesenho do Quadro da spec de `processos-etapas` e os itens "Deixado como está" do `.scratch/redesenho-do-quadro/desvios.md`; conferir o Catálogo de etapas e escolher o responsável inicial de cada etapa.
