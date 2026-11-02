@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, createEvent, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import { USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import { umSetor } from './testes/processoDaLista'
@@ -197,4 +197,19 @@ test('o cartão do processo meu diz Você; o dos outros diz o nome; sem contador
   expect(within(meu).queryByText(USUARIO_DE_TESTE.nome)).toBeNull()
   expect(within(await cartaoDe('Dela')).getByText('Ana Teste')).toBeTruthy()
   expect(meu.querySelector('.cartao-arquivos, .cartao-prazo')).toBeNull()
+})
+
+// Regressão da revisão do /ship (2026-11-02): arrastar um cartão até a borda do Quadro com Linhas também rola o Quadro.
+test('nas Linhas, arrastando o cartão até a borda direita, o Quadro rola', async () => {
+  comTresSetores()
+  fireEvent.dragStart(await cartaoDe('Do CDI'), { dataTransfer })
+  const quadro = document.querySelector('.quadro-matriz') as HTMLElement
+  quadro.getBoundingClientRect = () => ({ left: 0, right: 1000, top: 0, bottom: 600, width: 1000, height: 600 }) as DOMRect
+  let rolagem = 0
+  Object.defineProperty(quadro, 'scrollLeft', { get: () => rolagem, set: (valor: number) => { rolagem = valor } })
+  // O jsdom não tem DragEvent: o evento genérico ignora o clientX, que vai à mão.
+  const evento = createEvent.dragOver(celula('CDI', 'Publicação'), { dataTransfer })
+  Object.defineProperty(evento, 'clientX', { value: 995 })
+  fireEvent(celula('CDI', 'Publicação'), evento)
+  expect(rolagem).toBeGreaterThan(0)
 })

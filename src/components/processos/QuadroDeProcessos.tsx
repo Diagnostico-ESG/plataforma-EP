@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { type DragEvent, useEffect, useState } from 'react'
 import { useArrastoDoQuadro } from '../../hooks/useArrastoDoQuadro'
 import { useMovimentoDoProcesso } from '../../hooks/useMovimentoDoProcesso'
 import {
@@ -67,6 +67,9 @@ export function QuadroDeProcessos(props: QuadroDeProcessosProps) {
   const arrasto = { ...arrastoBase, levantar: (processo: ProcessoDaLista) => { setSoltouFora(false); arrastoBase.levantar(processo) } }
   const nomesDosSetores = Object.fromEntries(lista.setores.map((setor) => [setor.id, setor.nome]))
   const foraDoQuadro = { quantos: quantosForaDoQuadro(lista.processos), enderecoDaLista: enderecoDosConcluidosNaLista }
+  const rolarArrastando = (evento: DragEvent<HTMLElement>) => {
+    if (arrasto.levantado) rolarNaBorda(evento.currentTarget, evento.clientX)
+  }
   const semProcessoSeu = destacarDe !== null && !colunas.some((coluna) => coluna.processos.some((p) => p.responsavel?.id === destacarDe))
   return (
     <>
@@ -78,12 +81,9 @@ export function QuadroDeProcessos(props: QuadroDeProcessosProps) {
         <MatrizDoQuadro tipo={linhas} colunas={colunas} linhas={linhasDoQuadro(linhas, colunas, lista.setores, usuarioId)}
           idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso} podeAlterar={podeAlterar && !movimento.gravando}
           arrasto={arrasto} etapas={lista.etapas} nomesDosSetores={nomesDosSetores} foraDoQuadro={foraDoQuadro}
-          destacarDe={destacarDe} usuarioId={usuarioId} aoSoltarFora={() => setSoltouFora(true)} />
+          destacarDe={destacarDe} usuarioId={usuarioId} aoSoltarFora={() => setSoltouFora(true)} aoPassarArrastando={rolarArrastando} />
       ) : (
-        <div className="quadro-colunas" onDragOver={(evento) => {
-          if (!arrasto.levantado) return
-          rolarNaBorda(evento.currentTarget, evento.clientX)
-        }}>
+        <div className="quadro-colunas" onDragOver={rolarArrastando}>
           {colunas.map((coluna) => (
             <ColunaDoQuadro key={coluna.chave} coluna={coluna} idEscolhido={idEscolhido} enderecoDoProcesso={enderecoDoProcesso}
               podeAlterar={podeAlterar && !movimento.gravando} arrasto={arrasto} agrupar={agrupar} etapas={lista.etapas}

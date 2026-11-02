@@ -229,6 +229,8 @@ Sem mudança no banco: nenhuma tabela, coluna, política, view ou função nova.
 17. `[visual]` O verso enxuto segue a verso-3 em 880 × 740: a miniatura grande à esquerda, os arquivos em lista vertical, as Anotações com o dobro da altura de hoje, nada vazando da janela em 1366×768.
 18. `[visual]` Os ícones das etapas são legíveis no cabeçalho da coluna e na trilha, no traço dos outros ícones da identidade.
 
+**Como ficou construído (entrega de 2026-11-02, onde difere do texto acima).** O seletor do Agora mantém o rótulo "Etapa" (história 66); a pílula de situação não fica no cabeçalho do verso, a situação está na linha de dados (história 62); [Registrar revisão] só aparece no cabeçalho enquanto a passagem não tem revisão (história 63); sem versão, "Nenhuma versão enviada ainda" fica acima da lista e [Enviar versão] na linha do título (história 72); na Lista, o filtro da coluna Situação continua disponível quando o controle Situação está em "Todos" (história 42); o painel de Filtros também fecha ao sair dele com Tab, e a Lista tem [Limpar filtros] na faixa. Detalhes e motivos em `.scratch/redesenho-do-quadro/desvios.md`.
+
 ## Responsável inicial por etapa (mudança de 2026-10-30)
 
 Pacote 4 da demanda de 2026-10-30, planejado no `/planejar` modo completo (`responsavel-inicial-por-etapa`); sabatina nesta sessão, decisões no ADR 0036 (substitui a parte do ADR 0022 em que quem move vira o responsável) e no `CONTEXT.md` ("Responsável do processo", "Responsável inicial", "Mover", "Situação do processo"). Vale sobre o resto desta spec no que divergir.

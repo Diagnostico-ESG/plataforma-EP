@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { type DragEvent, useState } from 'react'
 import type { ArrastoDoQuadro } from '../../hooks/useArrastoDoQuadro'
 import type { ColunaDoQuadro as Coluna } from '../../processos/colunasDoQuadro'
 import { CHAVE_SEM_RESPONSAVEL, chaveDaLinha, type LinhaDoQuadro, type TipoDeLinha } from '../../processos/linhasDoQuadro'
@@ -25,6 +25,8 @@ type MatrizDoQuadroProps = {
   foraDoQuadro: { quantos: number; enderecoDaLista: string }
   destacarDe: string | null
   usuarioId: string
+  /** O cartão passa por cima do Quadro: é o que o faz rolar na borda. */
+  aoPassarArrastando: (evento: DragEvent<HTMLElement>) => void
   /** O cartão foi solto numa linha que não é a dele. */
   aoSoltarFora: () => void
 }
@@ -57,7 +59,7 @@ export function MatrizDoQuadro(props: MatrizDoQuadroProps) {
   })
   const modelo = `var(--largura-linha-quadro) repeat(${colunas.length}, var(--largura-coluna-quadro))`
   return (
-    <div className="quadro-colunas quadro-matriz" style={{ gridTemplateColumns: modelo }}>
+    <div className="quadro-colunas quadro-matriz" style={{ gridTemplateColumns: modelo }} onDragOver={props.aoPassarArrastando}>
       <div className="matriz-canto" />
       {colunas.map((coluna) => (
         <div key={coluna.chave} className="matriz-cabecalho">

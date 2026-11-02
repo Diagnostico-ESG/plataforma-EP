@@ -88,3 +88,12 @@ test('ao fechar o verso, o endereço temporário da imagem é liberado', async (
   window.location.hash = ''
   await waitFor(() => expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:miniatura'))
 })
+
+// Regressão da revisão do /ship (2026-11-02): o .png baixa mas o navegador não consegue desenhá-lo.
+test('se o navegador não consegue desenhar a imagem baixada, o quadro mostra o aviso de erro', async () => {
+  montarNosCadastros(comUmaVersao)
+  const v1 = await destaque()
+  fireEvent.error(await v1.findByRole('img', { name: 'Fluxograma V1 de Emitir Ofício' }))
+  expect(await v1.findByText('Não foi possível carregar a imagem.')).toBeTruthy()
+  expect(v1.queryByRole('img')).toBeNull()
+})

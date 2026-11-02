@@ -24,12 +24,14 @@ const ROTULO_DA_ACAO: Record<AcaoPrincipal, string> = {
   registrar_revisao: 'Registrar revisão', registrar_aprovacao: 'Registrar aprovação', registrar_publicacao: 'Registrar publicação',
 }
 
-// Enquanto os registros não chegam, o botão não aparece: a revisão da passagem decide se ele existe (como o Agora fazia).
+// Enquanto os registros não chegam (ou se a leitura falha), a revisão e a aprovação não aparecem: a revisão da passagem decide se o
+// botão existe (como o Agora fazia). Registrar a publicação não depende deles.
 function acaoDoCabecalho(props: AcaoPrincipalDoVersoProps): AcaoPrincipal | null {
   const { processo, registros, podeAlterar } = props
-  if (registros.revisoes.tipo !== 'pronto' || registros.aprovacao.tipo !== 'pronto') return null
-  const temRevisao = registros.revisoes.valor.some((revisao) => revisao.daPassagemAberta)
-  return acaoPrincipalDaEtapa(processo, podeAlterar, temRevisao)
+  const prontos = registros.revisoes.tipo === 'pronto' && registros.aprovacao.tipo === 'pronto'
+  const temRevisao = registros.revisoes.tipo === 'pronto' && registros.revisoes.valor.some((revisao) => revisao.daPassagemAberta)
+  const acao = acaoPrincipalDaEtapa(processo, podeAlterar, temRevisao)
+  return prontos || acao === 'registrar_publicacao' ? acao : null
 }
 
 /** O botão azul do cabeçalho do verso: o registro que a etapa atual pede (revisão, aprovação ou publicação), com a janela dele. */
