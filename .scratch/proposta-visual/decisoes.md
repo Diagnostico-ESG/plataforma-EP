@@ -68,7 +68,7 @@ Este é o **único documento** da redesenho: o que foi decidido (acima) e o que 
 | 3 | Azul-claro para escolhido; azul cheio só na ação principal | Feito | — |
 | 4 | Etiqueta só por ícone, com legenda uma vez no cabeçalho | Feito (2026-10-31) | — (legenda na faixa de controles, fora da Lista) |
 | 5 | Situação em selo discreto (exceções em destaque) | Feito | — |
-| 6 | Ícones: um por etapa e um por informação do cartão | Parcial | Ícone por etapa feito em 2026-10-31 (ticket 03). Falta o contador de arquivos (exige a contagem na view do banco; backlog, 2026-10-31) |
+| 6 | Ícones: um por etapa e um por informação do cartão | Feito (2026-10-31) | Ícone por etapa feito em 2026-10-31 (ticket 03). Contador de arquivos: decidido não fazer em 2026-11-02 (contando a versão mais recente, repetiria o número da versão e o selo "relatório pendente"; contando os Outros anexos, como o protótipo pretendia, o usuário também preferiu não fazer) |
 | 7 | Faixa de controles de 56px com botão "Filtros" e contador | Feito (2026-10-31) | — (ticket 01) |
 | 8 | Cartão com nome em destaque e versão no rodapé | Feito (2026-10-31) | — ("Você" no cartão, ticket 03) |
 | 8 | "Destacar os meus" (esmaece, não esconde) | Feito (2026-10-31) | — (ticket 02, ADR 0037) |
