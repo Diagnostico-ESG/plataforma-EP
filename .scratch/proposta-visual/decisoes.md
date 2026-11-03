@@ -77,7 +77,7 @@ Este é o **único documento** da redesenho: o que foi decidido (acima) e o que 
 | 9 | Verso: janela fixa 880 × 740, trilha de etapas, avisos lado a lado | Feito | — |
 | 9 | Verso enxuto: sem abas, miniatura grande, anotações com o dobro do espaço, histórico no "···" | Feito (2026-11-02) | — (tickets 04 e 05). "Versões anteriores" e "Outros anexos" ficaram empilhados, não lado a lado como na verso-3 (backlog, 2026-11-01) |
 | — | Cabeçalho da coluna: plaqueta só com o nome, contagem, "+" e "⋮", descrição abaixo | Feito (2026-10-31) | — (ícone da etapa no ticket 03) |
-| — | Avatar: iniciais cinza para os outros, "sem responsável" tracejado, tamanhos 20/24/32 | Feito (2026-10-30) | O tracejado aparece no Agora do verso; o cartão do Quadro segue com o texto "Sem responsável" (decisão da spec: cartão sem avatar) |
+| — | Avatar: iniciais cinza para os outros, "sem responsável" tracejado, tamanhos 20/24/32 | Feito (2026-10-30); no cartão e na Lista em 2026-11-03 (ADR 0039) | O cartão do Quadro e a Lista passaram a mostrar o avatar (24px); o tracejado vale também no cartão sem responsável |
 | — | Trilha de 8 tracinhos (atual azul, feitas cinza-azulado) | Feito (2026-10-30) | — |
 | — | "Mostrar" num segmento (Em andamento \| Concluídos \| Cancelados \| Todos) | Feito (2026-10-31) | — (virou o controle "Situação: Todos \| Em andamento \| Suspensos \| Concluídos \| Cancelados" na Lista e no Quadro por setor, ticket 02) |
 | — | Criar setor numa janela de 520px | Feito (2026-10-30) | — |

@@ -83,7 +83,7 @@
   --neutra-fundo: #eef0f4;
 
   /* Etiquetas da etapa, só ícone: círculo vazio, meio azul, círculo verde com visto (3,3:1, acima do mínimo gráfico de 3:1) */
-  --etiqueta-a-fazer: var(--icone-inativo);
+  --etiqueta-a-fazer: #ea580c;
   --etiqueta-iniciado: var(--azul);
   --etiqueta-finalizado: #16a34a;
 

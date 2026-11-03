@@ -78,7 +78,7 @@ test('a etiqueta é só o ícone, com o nome no title e no texto para leitor de 
     const icone = cartao.querySelector('.etiqueta')
     expect(icone?.textContent).toBe(etiqueta)
     expect(icone?.className).toContain(`etiqueta-${classe}`)
-    expect(icone?.getAttribute('title')).toBe(`Etiqueta: ${etiqueta}`)
+    expect(icone?.getAttribute('title')).toBe(`Status: ${etiqueta}`)
     expect(icone?.querySelector('svg')).not.toBeNull()
     expect(cartao.querySelector('.cartao-responsavel')?.textContent).toBe('Ana Teste')
   }
@@ -86,9 +86,11 @@ test('a etiqueta é só o ícone, com o nome no title e no texto para leitor de 
 
 test('a faixa de controles do Quadro traz a legenda das etiquetas uma vez só, com ícone e nome; a Lista não', async () => {
   montar([processo('A Fazer'), processo('Outro')])
-  const legenda = await screen.findByRole('list', { name: 'Legenda das etiquetas' })
-  expect(screen.getAllByRole('list', { name: 'Legenda das etiquetas' })).toHaveLength(1)
+  const legenda = await screen.findByRole('list', { name: 'Legenda do status' })
+  expect(screen.getAllByRole('list', { name: 'Legenda do status' })).toHaveLength(1)
   expect(legenda.closest('.faixa-de-controles')).not.toBeNull()
+  expect(legenda.parentElement?.textContent).toContain('Status')
+  expect(document.body.textContent).not.toContain('Etiqueta')
   const itens = Array.from(legenda.querySelectorAll('li'))
   expect(itens.map((item) => item.textContent)).toEqual(['A fazer', 'Iniciado', 'Finalizado'])
   expect(itens.every((item) => item.querySelector('svg'))).toBe(true)
@@ -96,7 +98,7 @@ test('a faixa de controles do Quadro traz a legenda das etiquetas uma vez só, c
   window.location.hash = '#/processos/lista'
   montar([processo('A Fazer')])
   await screen.findByRole('cell', { name: 'A Fazer' })
-  expect(screen.queryByRole('list', { name: 'Legenda das etiquetas' })).toBeNull()
+  expect(screen.queryByRole('list', { name: 'Legenda do status' })).toBeNull()
 })
 
 // ---- Selos
@@ -159,15 +161,26 @@ test('Relatório pendente: ausente antes da Revisão interna, presente da Revis�
   expect(selos(await cartaoDe('Concluído'))).toEqual(['V3'])
 })
 
-test('o cartão sem responsável diz "Sem responsável" em cinza; o com responsável traz o nome, sem avatar', async () => {
-  montar([processo('Sem Dono', { processo: { responsavel: null } }), processo('Com Dono')])
+const FOTO = 'https://fotos.exemplo/caio.png'
+
+test('o cartão com responsável mostra as iniciais (ou a foto do Google) antes do nome, sem repetir o nome para o leitor de tela', async () => {
+  montar([processo('Com Dono'), processo('Com Foto', { processo: { responsavel: { id: 'u9', nome: 'Caio Teste', fotoUrl: FOTO } } })])
+  const comDono = await cartaoDe('Com Dono')
+  expect(comDono.querySelector('.cartao-responsavel .avatar-iniciais')?.getAttribute('data-iniciais')).toBe('AT')
+  expect(comDono.querySelector('.cartao-responsavel')?.textContent).toBe('Ana Teste')
+  const comFoto = await cartaoDe('Com Foto')
+  const foto = comFoto.querySelector('.cartao-responsavel img.avatar')
+  expect(foto?.getAttribute('src')).toBe(FOTO)
+  expect(foto?.getAttribute('alt')).toBe('')
+  expect(comFoto.querySelector('.cartao-responsavel')?.textContent).toBe('Caio Teste')
+})
+
+test('o cartão sem responsável mostra o círculo tracejado e "Sem responsável" em cinza, sem o leitor de tela ouvir duas vezes', async () => {
+  montar([processo('Sem Dono', { processo: { responsavel: null } })])
   const semDono = await cartaoDe('Sem Dono')
   expect(semDono.querySelector('.cartao-selos')).toBeNull()
-  expect(semDono.querySelector('.avatar')).toBeNull()
+  expect(semDono.querySelector('.cartao-responsavel-vazio .avatar-vazio')?.getAttribute('aria-hidden')).toBe('true')
   expect(semDono.querySelector('.cartao-responsavel-vazio')?.textContent).toBe('Sem responsável')
-  const comDono = await cartaoDe('Com Dono')
-  expect(comDono.querySelector('.avatar')).toBeNull()
-  expect(comDono.querySelector('.cartao-responsavel')?.textContent).toBe('Ana Teste')
 })
 
 test('nenhum cartão mostra a data da modelagem piloto, no passado, hoje ou no futuro', async () => {

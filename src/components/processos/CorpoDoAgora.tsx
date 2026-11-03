@@ -84,12 +84,12 @@ function ListasDoAgora({ processo, movimento }: Pick<CorpoDoAgoraProps, 'process
       </select>
       {emConcluidos ? (
         <>
-          <span className="agora-campo">Etiqueta</span>
+          <span className="agora-campo">Status</span>
           <span className="agora-etiqueta">{ROTULO_DA_ETIQUETA.concluido}</span>
         </>
       ) : (
         <>
-          <label className="agora-campo" htmlFor={idDaEtiqueta}>Etiqueta</label>
+          <label className="agora-campo" htmlFor={idDaEtiqueta}>Status</label>
           <select id={idDaEtiqueta} className="agora-lista" value={etiqueta} disabled={movimento.gravando}
             onChange={(mudanca) => movimento.mudarEtiqueta(processo.id, mudanca.target.value as EtiquetaDaEtapa)}>
             <BotaoDaCaixa />

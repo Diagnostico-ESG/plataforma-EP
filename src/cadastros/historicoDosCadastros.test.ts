@@ -180,8 +180,8 @@ describe('movimento, etiqueta e responsável no histórico (Andamento livre)', (
       depois: { ...MOVIMENTO_ANTES, etiqueta: 'concluido' },
     })
     expect(tituloDoEvento(mudou)).toBe('Mudou a etiqueta')
-    expect(descreverEstadoDoCadastro(mudou.antes)).toBe('Processo: Emitir Ofício; Responsável: Ana Teste; Etiqueta: A fazer')
-    expect(descreverEstadoDoCadastro(mudou.depois)).toBe('Processo: Emitir Ofício; Responsável: Ana Teste; Etiqueta: Finalizado')
+    expect(descreverEstadoDoCadastro(mudou.antes)).toBe('Processo: Emitir Ofício; Responsável: Ana Teste; Status: A fazer')
+    expect(descreverEstadoDoCadastro(mudou.depois)).toBe('Processo: Emitir Ofício; Responsável: Ana Teste; Status: Finalizado')
   })
 
   test('mudar o responsável é do processo e mostra de quem para quem', () => {
@@ -316,7 +316,7 @@ describe('processos', () => {
 
   test('a exclusão traz a etapa atual, a etiqueta e o responsável do processo', () => {
     expect(descreverEstadoDoCadastro({ nome: 'Emitir Ofício', etapa_codigo: 'publicacao', etapa_nome: 'Publicação', etiqueta: 'em_andamento', responsavel_nome: 'Ana Teste' }))
-      .toBe('Nome: Emitir Ofício; Etiqueta: Iniciado; Responsável: Ana Teste')
+      .toBe('Nome: Emitir Ofício; Status: Iniciado; Responsável: Ana Teste')
   })
 
   test('o processo excluído continua no filtro pelo nome', () => {

@@ -248,7 +248,7 @@ test('as Etapas listam todas as etapas ativas na ordem do catálogo, com a atual
   expect(atuais.map((item) => item.querySelector('.etapa-nome')?.textContent)).toEqual(['Relatório e modelagem técnica'])
   const agora = await agoraDoVerso()
   expect(agora.getByRole('combobox', { name: 'Etapa' })).toBeTruthy()
-  expect(agora.getByRole('combobox', { name: 'Etiqueta' })).toBeTruthy()
+  expect(agora.getByRole('combobox', { name: 'Status' })).toBeTruthy()
   expect(agora.getByRole('button', { name: 'Assumir' })).toBeTruthy()
 })
 

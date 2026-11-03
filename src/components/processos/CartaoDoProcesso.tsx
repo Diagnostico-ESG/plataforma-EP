@@ -5,7 +5,7 @@ import { ROTULO_DO_TIPO } from '../../processos/rotulos'
 import { hojeEmBrasilia } from '../../lib/datas'
 import type { TipoDeLinha } from '../../processos/linhasDoQuadro'
 import type { EtapaDoCatalogo, ProcessoDaLista } from '../../processos/tipos'
-import { Icone } from '../Icone'
+import { Avatar, AvatarVazio } from '../Avatar'
 import { SeloDoSetor } from '../SeloDoSetor'
 import { Pilula } from '../Pilula'
 import { BarraDeProgresso } from './BarraDeProgresso'
@@ -24,7 +24,7 @@ type CartaoDoProcessoProps = {
   esmaecido: boolean
   /**
    * O cartão não repete o que a coluna já diz: fora do Quadro por etapa traz a barra da etapa; por responsável dispensa a
-   * linha do responsável; por setor dispensa o selo, porque o setor está na coluna.
+   * linha do responsável; só as Linhas por setor dispensam o selo, porque a linha já diz o setor (ADR 0039).
    */
   agrupar: AgruparQuadroPor
   /** As etapas do catálogo: o selo de relatório pendente compara a posição da etapa atual com a da Revisão interna. */
@@ -69,10 +69,10 @@ export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagad
 }
 
 
-// O que a coluna ou a linha já diz o cartão não repete: o setor (selo) e o responsável.
+// O que a linha ou a coluna já diz o cartão não repete: o setor (selo, só nas Linhas por setor) e o responsável.
 function oQueOCartaoRepete(agrupar: AgruparQuadroPor, naLinha?: TipoDeLinha): { selo: boolean; responsavel: boolean } {
   return {
-    selo: agrupar !== 'setor' && naLinha !== 'setor',
+    selo: naLinha !== 'setor',
     responsavel: agrupar !== 'responsavel' && naLinha !== 'responsavel',
   }
 }
@@ -88,12 +88,16 @@ function classesDoCartao(processo: ProcessoDaLista, apagado: boolean, esmaecido:
   return ['cartao', apagado && 'cartao-apagado', esmaecido && 'cartao-esmaecido', parado && 'cartao-parado'].filter(Boolean).join(' ')
 }
 
-/** A linha de quem cuida do processo: ícone de pessoa e o nome, ou "Sem responsável" em cinza. */
+/** A linha de quem cuida do processo: a foto (ou as iniciais) e o nome, "Você" para quem está na tela, ou "Sem responsável" em cinza (ADR 0039). */
 function QuemCuida({ responsavel, usuarioId }: { responsavel: ProcessoDaLista['responsavel']; usuarioId: string }) {
+  if (!responsavel) {
+    return <span className="cartao-responsavel cartao-responsavel-vazio"><AvatarVazio tamanho={24} decorativo />Sem responsável</span>
+  }
+  const proprio = responsavel.id === usuarioId
   return (
-    <span className={responsavel ? 'cartao-responsavel' : 'cartao-responsavel cartao-responsavel-vazio'}>
-      <Icone nome="conta" tamanho={13} />
-      {responsavel ? (responsavel.id === usuarioId ? 'Você' : responsavel.nome) : 'Sem responsável'}
+    <span className="cartao-responsavel">
+      <Avatar nome={responsavel.nome} fotoUrl={responsavel.fotoUrl ?? undefined} tamanho={24} decorativo proprio={proprio} />
+      {proprio ? 'Você' : responsavel.nome}
     </span>
   )
 }

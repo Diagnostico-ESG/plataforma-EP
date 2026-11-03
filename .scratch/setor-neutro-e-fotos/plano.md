@@ -89,11 +89,11 @@ Cobre: spec solução 3, história 4, critério 3.
 **Interfaces**
 - Produz: o cartão mostra `SeloDoSetor` sempre, exceto quando `naLinha === 'setor'`.
 
-- [ ] **Passo 1 (teste que falha):** em `App.agruparPorSetor.test.tsx`, trocar a expectativa "o cartão não repete a sigla" por: o cartão do processo de um setor mostra o selo com a sigla (`cartao.querySelector('.selo-do-setor')?.textContent` é a sigla). Em `App.linhasDoQuadro.test.tsx`, manter (ou acrescentar) o teste de que, com Linhas por Setor, o cartão **não** tem `.selo-do-setor`.
-- [ ] **Passo 2:** `npx vitest run src/App.agruparPorSetor.test.tsx src/App.linhasDoQuadro.test.tsx` — o primeiro falha.
-- [ ] **Passo 3:** em `oQueOCartaoRepete`, `selo: naLinha !== 'setor'` (some o `agrupar !== 'setor' &&`); atualizar o comentário da função e o da prop `agrupar` (por setor o cartão agora repete o selo; só o responsável e a barra mudam).
-- [ ] **Passo 4:** os dois arquivos passam; depois `npm test` inteiro.
-- [ ] **Passo 5 (commit):** `"setor-neutro-e-fotos: cartão do Quadro por setor mostra a sigla do setor"`.
+- [x] **Passo 1 (teste que falha):** em `App.agruparPorSetor.test.tsx`, trocar a expectativa "o cartão não repete a sigla" por: o cartão do processo de um setor mostra o selo com a sigla (`cartao.querySelector('.selo-do-setor')?.textContent` é a sigla). Em `App.linhasDoQuadro.test.tsx`, manter (ou acrescentar) o teste de que, com Linhas por Setor, o cartão **não** tem `.selo-do-setor`.
+- [x] **Passo 2:** `npx vitest run src/App.agruparPorSetor.test.tsx src/App.linhasDoQuadro.test.tsx` — o primeiro falha.
+- [x] **Passo 3:** em `oQueOCartaoRepete`, `selo: naLinha !== 'setor'` (some o `agrupar !== 'setor' &&`); atualizar o comentário da função e o da prop `agrupar` (por setor o cartão agora repete o selo; só o responsável e a barra mudam).
+- [x] **Passo 4:** os dois arquivos passam; depois `npm test` inteiro.
+- [x] **Passo 5 (commit):** `"setor-neutro-e-fotos: cartão do Quadro por setor mostra a sigla do setor"`.
 
 ---
 
@@ -107,22 +107,22 @@ Cobre: spec solução 4, histórias 5, 6 e 9, critérios 4 e 9. Ponto 2 de "Pont
 - Testar: `src/App.cartaoDoQuadro.test.tsx`, `src/App.agoraDoVerso.test.tsx`, `src/App.versoEnxuto.test.tsx`, `src/App.historicoDosCadastros.test.tsx`, e os demais `App.*.test.tsx` que citam "Etiqueta" (`grep -rln "Etiqueta" src --include=*.test.tsx`)
 - Criar/registrar: `.scratch/setor-neutro-e-fotos/desvios.md` (divergência "Iniciado" × "Em andamento")
 
-- [ ] **Passo 1 (testes que falham):**
+- [x] **Passo 1 (testes que falham):**
   - `etiquetasVivas.test.ts`: o teste do contorno de A fazer passa a conferir `valorDe('etiqueta-a-fazer')` igual a `#ea580c` e `contraste(..., '#ffffff')` ≥ 3 (mínimo gráfico); manter o do traço azul de Em andamento.
   - `App.cartaoDoQuadro.test.tsx`: o ícone da etiqueta tem `title="Status: A fazer"` e texto oculto "A fazer".
   - `App.agoraDoVerso.test.tsx` / `App.versoEnxuto.test.tsx`: o campo se chama **Status** (`getByLabelText('Status')` ou `getByText('Status')`, conforme já façam com "Etiqueta") e o grupo da legenda do Quadro tem nome "Legenda do status".
   - `App.historicoDosCadastros.test.tsx` e `historicoDosCadastros.test.ts`: a linha de mudança mostra "Status" no lugar de "Etiqueta".
-- [ ] **Passo 2:** rodar esses arquivos e conferir as falhas.
-- [ ] **Passo 3 (implementação):**
+- [x] **Passo 2:** rodar esses arquivos e conferir as falhas.
+- [x] **Passo 3 (implementação):**
   - `tokens.css`: `--etiqueta-a-fazer: #ea580c;` (deixa de apontar para `--icone-inativo`).
   - `EtiquetaDoProcesso.tsx`: ícone do cartão 18 → 22; com nome, 14 → 18; `title={`Status: ${rotulo}`}`.
   - `LegendaDasEtiquetas.tsx`: `aria-label="Legenda do status"` e, antes da lista, o rótulo visível `Status` e um `title` explicando "Status é da etapa; a Situação é do processo todo"; ajustar `.legenda-das-etiquetas` se precisar de espaço para o rótulo.
   - `CorpoDoAgora.tsx`: os dois textos "Etiqueta" viram "Status".
   - `historicoDosCadastros.ts`: `etiqueta: 'Status'`.
   - Ajustar os demais testes que procuravam o texto "Etiqueta" visível (o valor guardado e os nomes de código não mudam).
-- [ ] **Passo 4:** `desvios.md`: entrada de 2026-11-03 — "A spec fala em três valores (A fazer, Em andamento, Finalizado); o rótulo atual do segundo valor é 'Iniciado' (`rotulos.ts`). Mantido 'Iniciado'; a decisão de trocar o rótulo fica com o usuário."
-- [ ] **Passo 5:** `npm run typecheck && npm test && npm run lint` passam.
-- [ ] **Passo 6 (commit):** `"setor-neutro-e-fotos: Status no lugar de Etiqueta, ícones maiores e A fazer em laranja"`.
+- [x] **Passo 4:** `desvios.md`: entrada de 2026-11-03 — "A spec fala em três valores (A fazer, Em andamento, Finalizado); o rótulo atual do segundo valor é 'Iniciado' (`rotulos.ts`). Mantido 'Iniciado'; a decisão de trocar o rótulo fica com o usuário."
+- [x] **Passo 5:** `npm run typecheck && npm test && npm run lint` passam.
+- [x] **Passo 6 (commit):** `"setor-neutro-e-fotos: Status no lugar de Etiqueta, ícones maiores e A fazer em laranja"`.
 
 ---
 
@@ -138,12 +138,12 @@ Cobre: spec solução 5, história 7, critério 6.
 **Interfaces**
 - Produz: `PilulaDaSituacao({ situacao })` com cores: `em_andamento` → `informativa` (azul claro), `suspenso` → `vencendo` (âmbar), `cancelado` → `atraso` (vermelho claro), `concluido` → `aprovado` (verde). O texto vem de `ROTULO_DA_SITUACAO`.
 
-- [ ] **Passo 1 (teste que falha):** `PilulaDaSituacao.test.tsx` com `test.each` dos quatro valores: renderiza e confere o texto (`Em andamento`, `Suspenso`, `Cancelado`, `Concluído`) e a classe `pilula-informativa|pilula-vencendo|pilula-atraso|pilula-aprovado` (o mapa de classes é o comportamento visível acessível aos testes). Em `etiquetasVivas.test.ts`, incluir `['informativa-texto', 'informativa-fundo']` no `test.each` de contraste, se ainda não estiver.
-- [ ] **Passo 2:** `npx vitest run src/components/processos/PilulaDaSituacao.test.tsx` — falha (Em andamento ainda é `discreta`, Suspenso e Cancelado ainda `neutra`).
-- [ ] **Passo 3:** trocar o mapa `PILULA_DA_SITUACAO` como acima; conferir em `Pilula.css`/`tokens.css` que as classes e os tokens existem (se `informativa` não for azul, escolher o token azul claro já existente da identidade, sem criar paleta nova).
-- [ ] **Passo 4:** conferir os testes de tela que olham "discreta" ou a ausência de pílula para Em andamento (`App.situacao.test.tsx`, `App.lista.test.tsx`) e ajustar para a nova pílula, mantendo o que provam (texto presente). O cartão do Quadro continua só com "Suspenso" (`Pilula situacao="neutra"` no `CartaoDoProcesso`, não mudar).
-- [ ] **Passo 5:** `npm run typecheck && npm test && npm run lint` passam.
-- [ ] **Passo 6 (commit):** `"setor-neutro-e-fotos: Situação em pílulas de cor"`.
+- [x] **Passo 1 (teste que falha):** `PilulaDaSituacao.test.tsx` com `test.each` dos quatro valores: renderiza e confere o texto (`Em andamento`, `Suspenso`, `Cancelado`, `Concluído`) e a classe `pilula-informativa|pilula-vencendo|pilula-atraso|pilula-aprovado` (o mapa de classes é o comportamento visível acessível aos testes). Em `etiquetasVivas.test.ts`, incluir `['informativa-texto', 'informativa-fundo']` no `test.each` de contraste, se ainda não estiver.
+- [x] **Passo 2:** `npx vitest run src/components/processos/PilulaDaSituacao.test.tsx` — falha (Em andamento ainda é `discreta`, Suspenso e Cancelado ainda `neutra`).
+- [x] **Passo 3:** trocar o mapa `PILULA_DA_SITUACAO` como acima; conferir em `Pilula.css`/`tokens.css` que as classes e os tokens existem (se `informativa` não for azul, escolher o token azul claro já existente da identidade, sem criar paleta nova).
+- [x] **Passo 4:** conferir os testes de tela que olham "discreta" ou a ausência de pílula para Em andamento (`App.situacao.test.tsx`, `App.lista.test.tsx`) e ajustar para a nova pílula, mantendo o que provam (texto presente). O cartão do Quadro continua só com "Suspenso" (`Pilula situacao="neutra"` no `CartaoDoProcesso`, não mudar).
+- [x] **Passo 5:** `npm run typecheck && npm test && npm run lint` passam.
+- [x] **Passo 6 (commit):** `"setor-neutro-e-fotos: Situação em pílulas de cor"`.
 
 ---
 
@@ -161,26 +161,26 @@ Cobre: spec solução 6, histórias 8, 9 e 10, critérios 5 e 10, e "Registros d
 - Consome: `ProcessoDaLista.responsavel: { id, nome, fotoUrl } | null` (já traz `fotoUrl`), `usuarioId` (já passado ao cartão).
 - Produz: `QuemCuida` mostra `Avatar` 24px decorativo (foto ou iniciais) + "Você"/nome; sem responsável, `AvatarVazio` + "Sem responsável".
 
-- [ ] **Passo 1 (testes que falham):**
+- [x] **Passo 1 (testes que falham):**
   - Cartão: com responsável sem foto, o cartão tem `.avatar` (as iniciais saem por `data-iniciais`) e o texto "Ana Teste"; com `fotoUrl`, tem `img.avatar` com `alt=""`; o do usuário logado diz "Você" (o avatar `.avatar-proprio`); sem responsável, tem o círculo tracejado (o seletor que `AvatarVazio` usa; ver `Avatar.tsx`) e o texto "Sem responsável". Reescrever o teste de `App.cartaoDoQuadro.test.tsx:162` com isso.
   - Lista: a linha do processo traz o avatar (`.avatar`) antes do nome do responsável; sem responsável, "—" sem avatar.
   - Acessibilidade (história 9): o avatar no cartão é decorativo, então o nome não é lido duas vezes: `img` com `alt=""` ou `span` com `aria-hidden`.
   - Mantidos: Quadro por responsável e Linhas por responsável continuam sem a linha do responsável no cartão.
-- [ ] **Passo 2:** rodar esses arquivos e conferir as falhas.
-- [ ] **Passo 3 (implementação):**
+- [x] **Passo 2:** rodar esses arquivos e conferir as falhas.
+- [x] **Passo 3 (implementação):**
   - `QuemCuida`: trocar `<Icone nome="conta" ... />` por `responsavel ? <Avatar nome={responsavel.nome} fotoUrl={responsavel.fotoUrl ?? undefined} tamanho={24} decorativo proprio={responsavel.id === usuarioId} /> : <AvatarVazio tamanho={24} />` (conferir a assinatura de `AvatarVazio` em `Avatar.tsx`); o texto continua "Você"/nome/"Sem responsável".
   - `Quadro.css`: `.cartao-responsavel` com `display: flex; align-items: center; gap: var(--esp-2)`; remover a regra `.cartao-responsavel svg` se ficar sem uso.
   - `LinhaDoProcesso.tsx`: a célula vira `<span className="lista-responsavel">` com o `Avatar` (24px, decorativo) e o nome, ou "—"; estilo `display: inline-flex; align-items: center; gap: var(--esp-2)`. Função auxiliar `ResponsavelDaLinha` se a função crescer.
-- [ ] **Passo 4:** `npm run typecheck && npm test && npm run lint` passam.
-- [ ] **Passo 5 (registros):** acrescentar entrada datada (2026-11-03) em `.scratch/identidade-visual.md` ("Setor neutro e maior; Status com ícones maiores e A fazer laranja; Situação em pílulas de cor; avatar de 24px no cartão e na Lista, ADR 0039") e atualizar as linhas da tabela de `.scratch/proposta-visual/decisoes.md` (avatar e "cartão sem avatar").
-- [ ] **Passo 6 (verificação visual):** abrir o app (`preview_start`, se houver servidor configurado) e olhar o Quadro (por etapa e por setor), a Lista e o cadastro de setores; conferir selo, ícones, pílulas e avatar. Sem login real, o que não der para ver (foto do Google, `[visual]` 8 a 10) fica registrado como presumido para o `/ship`.
-- [ ] **Passo 7 (commit):** `"setor-neutro-e-fotos: avatar do responsável no cartão e na Lista, registros de apoio"`.
-- [ ] **Passo 8 (CONTEXT.md):** **não editar.** Propor ao usuário, na conclusão, a redação do termo "Etiqueta" (linha 111, _Avoid_ "status") como "Status (antes Etiqueta)", e aplicar só depois da confirmação.
+- [x] **Passo 4:** `npm run typecheck && npm test && npm run lint` passam.
+- [x] **Passo 5 (registros):** acrescentar entrada datada (2026-11-03) em `.scratch/identidade-visual.md` ("Setor neutro e maior; Status com ícones maiores e A fazer laranja; Situação em pílulas de cor; avatar de 24px no cartão e na Lista, ADR 0039") e atualizar as linhas da tabela de `.scratch/proposta-visual/decisoes.md` (avatar e "cartão sem avatar").
+- [x] **Passo 6 (verificação visual, não feita: o app exige o login Google institucional; `[visual]` 8 a 10 presumidos):** abrir o app (`preview_start`, se houver servidor configurado) e olhar o Quadro (por etapa e por setor), a Lista e o cadastro de setores; conferir selo, ícones, pílulas e avatar. Sem login real, o que não der para ver (foto do Google, `[visual]` 8 a 10) fica registrado como presumido para o `/ship`.
+- [x] **Passo 7 (commit):** `"setor-neutro-e-fotos: avatar do responsável no cartão e na Lista, registros de apoio"`.
+- [x] **Passo 8 (CONTEXT.md):** **não editar.** Propor ao usuário, na conclusão, a redação do termo "Etiqueta" (linha 111, _Avoid_ "status") como "Status (antes Etiqueta)", e aplicar só depois da confirmação.
 
 ---
 
 ## Conferência final (depois da Task 6)
 
-- [ ] `npm run typecheck && npm test && npm run lint && npm run check:circular` passam.
-- [ ] Cada critério da spec tem tarefa: 1 e 2 → Task 1–2; 3 → Task 3; 4 → Task 4; 5 → Task 6; 6 → Task 5; 7 → todas; 8 a 10 `[visual]` → passo visual da Task 6 (presumidos onde faltar o login real).
-- [ ] Sem referência nova a `corDoSetor`, `--cor-do-setor`, `GradeDeCores` ou `setorCor` em `src/` (fora `src/types/database.ts`).
+- [x] `npm run typecheck && npm test && npm run lint && npm run check:circular` passam.
+- [x] Cada critério da spec tem tarefa: 1 e 2 → Task 1–2; 3 → Task 3; 4 → Task 4; 5 → Task 6; 6 → Task 5; 7 → todas; 8 a 10 `[visual]` → passo visual da Task 6 (presumidos onde faltar o login real).
+- [x] Sem referência nova a `corDoSetor`, `--cor-do-setor`, `GradeDeCores` ou `setorCor` em `src/` (fora `src/types/database.ts`).

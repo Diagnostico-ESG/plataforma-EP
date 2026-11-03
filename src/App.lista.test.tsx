@@ -75,6 +75,15 @@ test('as colunas, a ordem pelo nome, todas as situações e o subprocesso logo d
   expect(within(screen.getByRole('table')).getAllByText('Concluído').some((elemento) => elemento.className.includes('pilula'))).toBe(true)
 })
 
+test('a coluna Responsável traz o avatar (as iniciais, sem repetir o nome) antes do nome, e só o traço quando não há ninguém', async () => {
+  montar()
+  const recibo = (await screen.findByRole('button', { name: 'Conferir Recibo' })).closest('tr') as HTMLElement
+  expect(recibo.querySelector('.lista-responsavel .avatar-iniciais')?.getAttribute('data-iniciais')).toBe('AT')
+  expect(recibo.querySelector('.lista-responsavel')?.textContent).toBe('Ana Teste')
+  const pasta = (await screen.findByRole('button', { name: 'Arquivar Pasta' })).closest('tr') as HTMLElement
+  expect(pasta.querySelector('.lista-responsavel')).toBeNull()
+})
+
 test('clicar na linha abre o verso com a Lista escurecida atrás; fechar volta à Lista e ao botão da linha', async () => {
   montar()
   fireEvent.click((await screen.findAllByRole('cell', { name: 'TSA' }))[0])

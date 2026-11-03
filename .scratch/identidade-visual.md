@@ -260,6 +260,8 @@ Sem "por favor", sem exclamação, sem pedir desculpa; dizer o que houve e o que
 
 ## Registro de mudanças
 
+- 2026-11-03 — **Setor neutro, Status colorido e foto no cartão** (ADR 0039, funcionalidade `setor-neutro-e-fotos`): o selo do setor usa uma cor única cinza-azulada (`--selo-do-setor`) e cresce (13px, preenchimento 3×10px), também no cartão do Quadro por setor; "Etiqueta" vira **Status** na tela, com ícones de 22px no cartão e 18px com o nome, e A fazer em laranja (`--etiqueta-a-fazer`); a Situação em pílulas de cor (azul, âmbar, vermelho e verde) na Lista, no setor e no verso; avatar de 24px (foto do Google ou iniciais, "Você" mantido) no cartão e na Lista. Revê a cor própria do setor e a regra "cartão sem avatar" desta identidade.
+
 - 2026-10-30 — **Redesenho** (`/concepcao-livre`, a partir de `.scratch/proposta-visual/decisoes.md`). Substitui a identidade de 2026-10-07 e os acréscimos abaixo: moldura grafite e branca no lugar da barra azul; azul cheio só na ação principal e azul-claro para o escolhido, no lugar da linha acesa; etiqueta só por ícone; setor em selo com 12 cores fortes (cor viva só em ponto); base 14px. Decisões do usuário nesta sessão: vermelho, âmbar, verde e azul liberados para os setores (revê a regra 2 do `decisoes.md`), com bordô no lugar do vermelho; 12 cores; base 14px (revê a escala de 2026-10-14).
 - 2026-10-28 — Cor sólida do setor (ADR 0033): cor lisa no tom claro da paleta de 30. *Substituído em 2026-10-30.*
 - 2026-10-28 — Ajustes do Quadro e da Lista (ADR 0032): etiqueta Em andamento em âmbar cheio; fundo tingido só até o último cartão. *Substituído em 2026-10-30.*

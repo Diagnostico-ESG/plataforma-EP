@@ -2,11 +2,14 @@ import { ETIQUETAS } from '../../processos/rotulos'
 import { EtiquetaDoProcesso } from './EtiquetaDoProcesso'
 import './LegendaDasEtiquetas.css'
 
-/** Uma vez só, na barra do Quadro: o cartão mostra a etiqueta só pelo ícone, e aqui cada ícone ganha o nome. */
+/** Uma vez só, na barra do Quadro: o cartão mostra o Status só pelo ícone, e aqui cada ícone ganha o nome (ADR 0039). */
 export function LegendaDasEtiquetas() {
   return (
-    <ul className="legenda-das-etiquetas" aria-label="Legenda das etiquetas">
-      {ETIQUETAS.map((etiqueta) => <li key={etiqueta}><EtiquetaDoProcesso etiqueta={etiqueta} /></li>)}
-    </ul>
+    <div className="legenda-do-status">
+      <span className="legenda-do-status-rotulo" title="Status é da etapa; a Situação é do processo todo">Status</span>
+      <ul className="legenda-das-etiquetas" aria-label="Legenda do status">
+        {ETIQUETAS.map((etiqueta) => <li key={etiqueta}><EtiquetaDoProcesso etiqueta={etiqueta} /></li>)}
+      </ul>
+    </div>
   )
 }

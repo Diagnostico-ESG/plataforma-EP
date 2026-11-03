@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import './Pilula.css'
 
-export type SituacaoPilula = 'atraso' | 'vencendo' | 'informativa' | 'aprovado' | 'neutra' | 'discreta'
+export type SituacaoPilula = 'atraso' | 'vencendo' | 'informativa' | 'aprovado' | 'neutra'
 
 type PilulaProps = {
   situacao: SituacaoPilula

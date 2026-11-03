@@ -14,8 +14,9 @@ describe('etiqueta da etapa só em ícone (identidade de 2026-10-30)', () => {
     expect(contraste(valorDe('etiqueta-finalizado'), '#ffffff')).toBeGreaterThanOrEqual(3)
   })
 
-  test('o contorno de A fazer passa de 3:1 e o traço do Iniciado é o azul da ação', () => {
-    expect(contraste(valorDe('icone-inativo'), '#ffffff')).toBeGreaterThanOrEqual(2.9)
+  test('o contorno de A fazer é laranja e passa de 3:1, e o traço do Iniciado é o azul da ação (ADR 0039)', () => {
+    expect(valorDe('etiqueta-a-fazer')).toBe('#ea580c')
+    expect(contraste(valorDe('etiqueta-a-fazer'), '#ffffff')).toBeGreaterThanOrEqual(3)
     expect(tokens).toMatch(/--etiqueta-iniciado:\s*var\(--azul\)/)
   })
 })
@@ -26,7 +27,7 @@ describe('textos sobre o fundo da página', () => {
   })
 
   test.each([['atraso-texto', 'atraso-fundo'], ['vencendo-texto', 'vencendo-fundo'], ['aprovado-texto', 'aprovado-fundo'],
-    ['neutra-texto', 'neutra-fundo']])('%s sobre %s passa de 4,5:1', (texto, fundo) => {
+    ['neutra-texto', 'neutra-fundo'], ['azul-escuro', 'azul-claro']])('%s sobre %s passa de 4,5:1', (texto, fundo) => {
     expect(contraste(valorDe(texto), valorDe(fundo))).toBeGreaterThanOrEqual(4.5)
   })
 
