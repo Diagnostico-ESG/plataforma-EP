@@ -16,3 +16,5 @@ Deixados de fora:
 - **[P2] O selo do setor, maior, deixa as linhas da Lista mais altas** (cerca de 6px por linha). É o que a spec pediu ("maior" na Lista também); a densidade de ferramenta de trabalho diário (princípio 3) pode pedir um selo menor só na Lista.
 - **[P3] Contorno tracejado do avatar sem responsável (`#9098a6`) tem cerca de 2,9:1 sobre o branco**, abaixo de 3:1 para elementos gráficos. É enfeite ao lado do texto "Sem responsável", sem informação própria.
 - Critérios `[visual]` 8 a 10 da spec seguem presumidos (foto do Google, cores e tamanhos não vistos no app real).
+
+2026-11-03 — Decisão do usuário sobre os nomes: o rótulo do segundo Status continua **Iniciado** ("Em andamento" é uma Situação do processo, não um Status). A divergência da primeira entrada deste arquivo fica resolvida a favor do código; a spec foi corrigida. O `CONTEXT.md` trocou o termo **Etiqueta** por **Status**.

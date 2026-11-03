@@ -97,7 +97,7 @@ A primeira etapa do catálogo, onde entra todo processo cadastrado e fica o que 
 _Avoid_: backlog, a fazer (para a etapa), pendentes
 
 **Fase do Regimento**:
-Cada uma das nove fases do mapeamento definidas no art. 8º do Regimento Interno do EP (I a IX), pelas quais os dashboards contam o andamento. Cada etapa do catálogo pertence a uma fase; uma fase pode juntar várias etapas (a VI junta Revisão interna, Validação com o setor e Aprovação pelo setor). As fases I a III não têm etapa, porque foram feitas fora da plataforma para todos os setores, e contam sempre como concluídas. As outras contam pela posição do processo no catálogo: concluída quando ele está numa etapa depois dela, na última etapa dela com a etiqueta Finalizado, ou em Concluídos (a VII, só com a publicação registrada); em andamento quando ele está numa etapa dela; não iniciada no resto.
+Cada uma das nove fases do mapeamento definidas no art. 8º do Regimento Interno do EP (I a IX), pelas quais os dashboards contam o andamento. Cada etapa do catálogo pertence a uma fase; uma fase pode juntar várias etapas (a VI junta Revisão interna, Validação com o setor e Aprovação pelo setor). As fases I a III não têm etapa, porque foram feitas fora da plataforma para todos os setores, e contam sempre como concluídas. As outras contam pela posição do processo no catálogo: concluída quando ele está numa etapa depois dela, na última etapa dela com o status Finalizado, ou em Concluídos (a VII, só com a publicação registrada); em andamento quando ele está numa etapa dela; não iniciada no resto.
 _Avoid_: etapa (para a fase), etapa do Regimento, macroetapa
 
 **Etapa atual**:
@@ -105,15 +105,15 @@ A etapa do catálogo em que o processo está. Todo processo está em exatamente 
 _Avoid_: etapa corrente, passo atual, status da etapa
 
 **Mover**:
-Levar o processo para qualquer etapa do catálogo, para a frente ou para trás, pela lista de etapas ou arrastando o cartão, sem motivo e sem trava de sequência. A combinação da equipe decide quando mover, não a plataforma. Ao mover, a etiqueta volta a A fazer e o responsável passa a ser o responsável inicial da etapa de destino, ou ninguém. Cada mudança fica no histórico.
+Levar o processo para qualquer etapa do catálogo, para a frente ou para trás, pela lista de etapas ou arrastando o cartão, sem motivo e sem trava de sequência. A combinação da equipe decide quando mover, não a plataforma. Ao mover, o status volta a A fazer e o responsável passa a ser o responsável inicial da etapa de destino, ou ninguém. Cada mudança fica no histórico.
 _Avoid_: avançar, voltar a uma etapa, concluir a etapa, iniciar a etapa, dispensar
 
-**Etiqueta**:
-Marca da etapa atual do processo: **A fazer**, **Iniciado** ou **Finalizado**. Finalizado quer dizer que a parte de quem estava na etapa terminou e o processo espera o próximo pegá-lo; não conclui o processo (isso é a etapa Concluídos). No banco, os valores continuam `em_andamento` (Iniciado) e `concluido` (Finalizado).
-_Avoid_: tag, status, situação (para a etiqueta), em andamento (para a etiqueta, que é a situação do processo)
+**Status**:
+Marca da etapa atual do processo (chamada de Etiqueta até 2026-11-03): **A fazer**, **Iniciado** ou **Finalizado**. Finalizado quer dizer que a parte de quem estava na etapa terminou e o processo espera o próximo pegá-lo; não conclui o processo (isso é a etapa Concluídos). No banco, os valores continuam `em_andamento` (Iniciado) e `concluido` (Finalizado).
+_Avoid_: etiqueta (nome antigo), tag, situação (para o status), em andamento (para o status: Em andamento é a situação do processo; o status da etapa é Iniciado)
 
 **Processo parado**:
-Processo em andamento que está na mesma etapa há mais de 7 dias, contados de quando entrou nela; mudar só a etiqueta não zera a contagem. Não vale em Não iniciados nem em Concluídos. A tela o destaca. O limite é um número único até os prazos por etapa.
+Processo em andamento que está na mesma etapa há mais de 7 dias, contados de quando entrou nela; mudar só o status não zera a contagem. Não vale em Não iniciados nem em Concluídos. A tela o destaca. O limite é um número único até os prazos por etapa.
 _Avoid_: atrasado, vencido, esquecido
 
 **Responsável do processo**:
@@ -125,7 +125,7 @@ Usuário (Administrador ou Integrante do EP ativo) que o Administrador define, n
 _Avoid_: responsável padrão, responsável da etapa, dono da etapa
 
 **Situação do processo**:
-Em andamento, suspenso, cancelado ou concluído. Suspender, cancelar e **retomar** exigem motivo; suspenso e cancelado congelam a etapa, a etiqueta e o responsável, e retomar devolve o processo à mesma etapa, com o responsável inicial dela, ou sem responsável. Concluído não se marca: é o processo que está em Concluídos. Suspensos e cancelados ficam fora das planilhas dos dashboards. O cancelado não aparece em nenhuma visualização, só na Lista, quando se pede para mostrar os cancelados.
+Em andamento, suspenso, cancelado ou concluído. Suspender, cancelar e **retomar** exigem motivo; suspenso e cancelado congelam a etapa, o status e o responsável, e retomar devolve o processo à mesma etapa, com o responsável inicial dela, ou sem responsável. Concluído não se marca: é o processo que está em Concluídos. Suspensos e cancelados ficam fora das planilhas dos dashboards. O cancelado não aparece em nenhuma visualização, só na Lista, quando se pede para mostrar os cancelados.
 _Avoid_: status do processo, estado
 
 **Concluídos**:
@@ -159,7 +159,7 @@ A primeira etapa de trabalho de todo processo, logo depois de Não iniciados: o 
 _Avoid_: reunião de modelagem, oficina, workshop
 
 **Data da modelagem piloto**:
-Dia em que a Modelagem piloto de um processo aconteceu, registrado na própria etapa Modelagem piloto, depois do fato, quando o processo está nela ou numa etapa depois dela no catálogo: nunca no futuro, e a plataforma não guarda data agendada. Opcional, uma por processo. Um encontro que trata vários processos é registrado em cada um. Não move o processo nem muda a etiqueta. Participantes, local e anotações do encontro ficam fora: o que for preciso registrar vai nas Anotações do processo.
+Dia em que a Modelagem piloto de um processo aconteceu, registrado na própria etapa Modelagem piloto, depois do fato, quando o processo está nela ou numa etapa depois dela no catálogo: nunca no futuro, e a plataforma não guarda data agendada. Opcional, uma por processo. Um encontro que trata vários processos é registrado em cada um. Não move o processo nem muda o status. Participantes, local e anotações do encontro ficam fora: o que for preciso registrar vai nas Anotações do processo.
 _Avoid_: data agendada, reunião, data da reunião, encontro, agenda, oficina
 
 ## Documentos
@@ -189,7 +189,7 @@ Arquivo .docx com numeração própria por processo (Relatório V1, V2…), envi
 _Avoid_: laudo, documento técnico, relatório pendente, sem alteração de conteúdo
 
 **Confirmação de arquivos**:
-A pergunta feita ao mover o processo para a frente de uma etapa, quando ele vem dela ou de antes e vai para depois dela, enquanto faltam os arquivos dela: na Modelagem piloto, uma versão piloto; na Relatório e modelagem técnica, uma versão em sequência e um relatório. Diz o que falta (numa só pergunta, se a ida passa pelas duas) e oferece enviar agora, avançar mesmo assim ou cancelar; não impede. Depois do envio, se ainda falta algo, a pergunta volta com o que sobrou. O histórico do movimento guarda o que faltava. Voltar, mudar a etiqueta e processo que já estava depois da etapa não perguntam.
+A pergunta feita ao mover o processo para a frente de uma etapa, quando ele vem dela ou de antes e vai para depois dela, enquanto faltam os arquivos dela: na Modelagem piloto, uma versão piloto; na Relatório e modelagem técnica, uma versão em sequência e um relatório. Diz o que falta (numa só pergunta, se a ida passa pelas duas) e oferece enviar agora, avançar mesmo assim ou cancelar; não impede. Depois do envio, se ainda falta algo, a pergunta volta com o que sobrou. O histórico do movimento guarda o que faltava. Voltar, mudar o status e processo que já estava depois da etapa não perguntam.
 _Avoid_: trava de arquivos, bloqueio, pré-requisito, obrigatoriedade da etapa
 
 **Substituir arquivo**:

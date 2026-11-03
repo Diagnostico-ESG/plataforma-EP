@@ -13,7 +13,7 @@ A cor própria de cada setor (12 cores fortes em ciclo sobre o número 1 a 30 gr
 1. **Setor sem cor própria.** Todo selo de setor usa uma cor só, cinza-azulado neutro (referência `#475569`, sigla em branco, contraste AA). Some a grade de cores do cadastro do setor, a escolha de cor e a regra "primeira cor livre" na tela. A coluna `cor` de `setores` continua no banco e é ignorada pela tela (sem migração; o gatilho do banco segue dando valor a setor novo). O cabeçalho da coluna no Quadro por setor deixa de ser colorido, e o fundo tingido da coluna sai; a coluna inativa continua distinguida pela pílula "Inativo".
 2. **Sigla maior.** A pílula da sigla do setor cresce (fonte de 11px para 13px, preenchimento de 1×7px para 3×10px) no cartão, na Lista, no verso e nos cadastros.
 3. **Sigla no cartão do Quadro por setor.** O cartão volta a mostrar o selo do setor também nesse quadro (hoje o omite porque a coluna o diz), para ficar igual aos outros quadros. Nas Linhas por setor do Quadro por etapa, a sigla já aparece na linha e o cartão continua sem repeti-la.
-4. **Status, e não Etiquetas.** "Etiqueta" passa a se chamar **Status** em tudo que o usuário lê (legenda do Quadro, campo do verso, `title` e texto do leitor de tela), com os mesmos três valores (A fazer, Em andamento, Finalizado). "Situação" do processo continua com esse nome; a legenda do Quadro e o campo do verso deixam claro que Status é da etapa e Situação é do processo todo. O ícone do Status cresce (de 18px para 22px no cartão, de 14px para 18px com o nome) e o de **A fazer** passa de cinza a **laranja** (`#EA580C`); Em andamento (azul) e Finalizado (verde) ficam como estão.
+4. **Status, e não Etiquetas.** "Etiqueta" passa a se chamar **Status** em tudo que o usuário lê (legenda do Quadro, campo do verso, `title` e texto do leitor de tela), com os mesmos três valores (A fazer, Iniciado, Finalizado; Em andamento é uma Situação do processo, não um Status). "Situação" do processo continua com esse nome; a legenda do Quadro e o campo do verso deixam claro que Status é da etapa e Situação é do processo todo. O ícone do Status cresce (de 18px para 22px no cartão, de 14px para 18px com o nome) e o de **A fazer** passa de cinza a **laranja** (`#EA580C`); Iniciado (azul) e Finalizado (verde) ficam como estão.
 5. **Situação em pílulas de cor.** Onde a Situação aparece como pílula (Lista, tela do setor, verso), cada valor ganha cor: Em andamento em azul claro, Suspenso em âmbar, Cancelado em vermelho claro, Concluído em verde (o que já existe). O texto continua na pílula, porque a cor sozinha não diz o valor. O cartão do Quadro não ganha pílula nova: continua mostrando só "Suspenso".
 6. **Foto do responsável no cartão e na Lista.** O cartão do Quadro mostra, na linha do responsável, a foto do Google (ou o círculo com a inicial, o `Avatar` de 24px já existente), seguida de "Você" para quem está logado ou do nome; "Sem responsável" ganha o círculo tracejado. Na Lista, a coluna do responsável ganha o mesmo avatar antes do nome. No Quadro por responsável e nas Linhas por responsável o cartão continua sem repetir o responsável.
 
@@ -24,7 +24,7 @@ A cor própria de cada setor (12 cores fortes em ciclo sobre o número 1 a 30 gr
 3. Como Integrante do EP, quero a sigla do setor em pílula maior no cartão, na Lista e no verso, para lê-la sem esforço.
 4. Como Integrante do EP, quero a sigla do setor também no cartão do Quadro por setor, para o cartão ser igual nos três quadros.
 5. Como Integrante do EP, quero ver "Status" (e não "Etiquetas") com ícones maiores, para lê-los de relance.
-6. Como Integrante do EP, quero o ícone de "A fazer" em laranja, para distingui-lo do cinza de "sem informação" e do azul de "Em andamento".
+6. Como Integrante do EP, quero o ícone de "A fazer" em laranja, para distingui-lo do cinza de "sem informação" e do azul de "Iniciado".
 7. Como Integrante do EP, quero a Situação do processo em pílula colorida (azul, âmbar, vermelho, verde), para achar de relance os suspensos e cancelados.
 8. Como Integrante do EP, quero a foto (ou a inicial) de quem cuida no cartão do Quadro e na Lista, mantendo "Você" para mim, para saber a quem o processo pertence sem ler nomes.
 9. Como pessoa que usa leitor de tela, quero que o Status e a Situação continuem sendo ditos com texto, e que a foto no cartão não faça o nome ser lido duas vezes.
@@ -56,7 +56,7 @@ A cor própria de cada setor (12 cores fortes em ciclo sobre o número 1 a 30 gr
 6. A pílula de Situação mostra o texto de cada valor, com contraste AA.
 7. `npm test`, typecheck e lint passam.
 8. `[visual]` Selo neutro e maior no cartão, na Lista, no verso e nos cadastros; cabeçalho da coluna por setor sem cor.
-9. `[visual]` Ícones do Status maiores, com "A fazer" laranja, Em andamento azul e Finalizado verde, distinguíveis de relance.
+9. `[visual]` Ícones do Status maiores, com "A fazer" laranja, Iniciado azul e Finalizado verde, distinguíveis de relance.
 10. `[visual]` Pílulas de Situação nas quatro cores; cartão com foto do Google real e "Você" no app com o login.
 
 Estados de tela: não mudam (carregando, vazio e erro seguem como estão; a foto que falha cai nas iniciais).
