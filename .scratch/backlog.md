@@ -187,3 +187,5 @@ Uma linha por item: o que é e onde surgiu.
 
 - (2026-11-03, `/ship` de setor-neutro-e-fotos) Renomear nomes de código "etiqueta" para "status" (`EtiquetaDoProcesso`, `ETIQUETAS`, `ROTULO_DA_ETIQUETA`, `LegendaDasEtiquetas`, coluna `etiqueta` do banco, só se um dia valer a migração).
 - (2026-11-03, `/ship` de setor-neutro-e-fotos) Extrair o bloco repetido `<Avatar ... fotoUrl ?? undefined decorativo />` (CartaoDoProcesso, LinhaDoProcesso, CorpoDoAgora, MenuDaConta, LinhaDaTabelaDeUsuarios, OpcaoDaCaixa).
+- (2026-11-03, revisão de setor-neutro-e-fotos, code-review) Um só ponto para "sem cor vale a 1": hoje `setorCor ?? 1` se repete em CabecalhoDoVerso, CartaoDoProcesso, LinhaDoProcesso, filtrosDosProcessos, arvoreDaLista e processoDaLinha; `SeloDoSetor` poderia aceitar `cor?` e `estiloDaCor` devolver `CSSProperties` (some o cast em SeloDoSetor e OpcaoDaCaixa).
+- (2026-11-03, revisão de setor-neutro-e-fotos) `DESIGN.md` ainda descreve o Status colorido e o `selo-do-setor` único; atualizar junto com o `/impeccable document` já adiado.
