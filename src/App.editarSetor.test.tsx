@@ -42,6 +42,15 @@ test('clicar na linha abre o setor com o formulário preenchido', async () => {
   expect((screen.getByLabelText('Observações') as HTMLTextAreaElement).value).toBe('Nota inventada')
 })
 
+test('o cadastro do setor não pede nem grava cor: o setor tem uma cor só (ADR 0039)', async () => {
+  montar()
+  await abrir('AFT')
+  await screen.findByLabelText('Nome')
+  expect(screen.queryByRole('group', { name: 'Cor do setor' })).toBeNull()
+  fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
+  await screen.findByRole('cell', { name: 'AFT' })
+})
+
 test('editar grava nome, sigla em maiúsculas e observações, volta à lista e mostra o novo valor', async () => {
   const cadastros = montar()
   await abrir('AFT')

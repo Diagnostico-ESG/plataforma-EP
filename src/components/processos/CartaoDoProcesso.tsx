@@ -54,7 +54,7 @@ export function CartaoDoProcesso({ processo, escolhido, href, arrastavel, apagad
     <a id={`cartao-${id}`} className={classesDoCartao(processo, apagado, esmaecido)} href={href} aria-current={escolhido ? 'true' : undefined}
       draggable={arrastavel} onDragStart={arrastavel ? comecarAArrastar : undefined} onDragEnd={arrastavel ? aoBaixar : undefined}>
       <span className="cartao-topo">
-        {selo && <SeloDoSetor sigla={processo.setorSigla} cor={processo.setorCor ?? 1} nome={nomeDoSetor} />}
+        {selo && <SeloDoSetor sigla={processo.setorSigla} nome={nomeDoSetor} />}
         {tipo !== 'processo' && <Pilula situacao="neutra">{ROTULO_DO_TIPO[tipo]}</Pilula>}
         {situacao === 'suspenso' && <Pilula situacao="neutra">Suspenso</Pilula>}
         <EtiquetaDoProcesso etiqueta={processo.etiqueta} soIcone />

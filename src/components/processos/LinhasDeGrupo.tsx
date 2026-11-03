@@ -32,7 +32,7 @@ export function LinhaDoSetor({ setor, total, aberto, aoAlternar, raiz }: GrupoPr
         <button type="button" className="botao-do-grupo" aria-expanded={aberto} aria-label={`${setor.sigla} ${setor.nome}, ${plural(total)}`}
           onClick={aoAlternar}>
           <span aria-hidden="true">{aberto ? '▾' : '▸'}</span>
-          <SeloDoSetor sigla={setor.sigla} cor={setor.cor} />
+          <SeloDoSetor sigla={setor.sigla} />
           <span className="nome-do-grupo" aria-hidden="true">{setor.nome}</span>
           <span className="contagem-do-grupo" aria-hidden="true">{total}</span>
         </button>

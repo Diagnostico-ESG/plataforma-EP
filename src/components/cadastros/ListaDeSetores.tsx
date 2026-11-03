@@ -57,7 +57,7 @@ function LinhaDeSetor({ setor, aoAbrir }: { setor: SetorDaLista; aoAbrir: (id: s
   return (
     <tr className="linha-clicavel" onClick={() => aoAbrir(setor.id)}>
       <td><button type="button" className="cadastros-abrir">
-        <SeloDoSetor sigla={setor.sigla} cor={setor.cor} />
+        <SeloDoSetor sigla={setor.sigla} />
       </button></td>
       <td>{setor.nome}</td>
       <td>{setor.quantidadeDeMacroprocessos}</td>

@@ -35,7 +35,7 @@ const nomeDaLinha = (linha: LinhaDoQuadro): string => (linha.voce ? 'Você' : li
 
 /** O nome da linha: a sigla no selo (por setor) ou o avatar e o nome (por responsável), "Você" para quem está na tela. */
 function RotuloDaLinha({ tipo, linha }: { tipo: TipoDeLinha; linha: LinhaDoQuadro }) {
-  if (tipo === 'setor') return <SeloDoSetor sigla={linha.titulo} cor={linha.cor ?? 1} nome={linha.nome} />
+  if (tipo === 'setor') return <SeloDoSetor sigla={linha.titulo} nome={linha.nome} />
   return (
     <>
       {linha.chave !== CHAVE_SEM_RESPONSAVEL && <Avatar nome={linha.titulo} tamanho={24} decorativo proprio={linha.voce} />}

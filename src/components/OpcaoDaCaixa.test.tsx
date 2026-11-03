@@ -26,11 +26,3 @@ test('sem marca, é só o texto; desabilitada vale como na opção comum', () =>
   expect(opcao.disabled).toBe(true)
   expect(opcao.querySelector('.opcao-marca')).toBeNull()
 })
-
-test('corDoSetor põe o quadradinho na cor lisa do setor e não entra no nome da opção', () => {
-  caixa(<OpcaoDaCaixa valor="s1" rotulo="TSA — Setor Teste A" corDoSetor={13} />)
-  const opcao = screen.getByRole('option', { name: 'TSA — Setor Teste A' })
-  const marca = opcao.querySelector<HTMLElement>('.opcao-cor')
-  expect(marca?.getAttribute('aria-hidden')).toBe('true')
-  expect(marca?.style.getPropertyValue('--cor-do-setor')).toBe('#881337')
-})
