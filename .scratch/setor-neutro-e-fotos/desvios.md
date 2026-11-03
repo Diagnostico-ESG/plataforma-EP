@@ -48,3 +48,15 @@ Deixados de fora:
 - Teste automático da regra nova: o jsdom não aplica a cascata nem `:has()`; a regra é de uma linha e foi conferida no navegador. Fica no critério `[visual]` 8.
 - Layout de celular não conferido (opcional no projeto).
 - Critérios `[visual]` 8 e 9 seguem presumidos no app real com o login.
+
+2026-11-03 — `/ship` da revisão (ADR 0040), com `/mattpocock-skills:code-review` refeito desde `marco/2026-11-03-inicio-setor-neutro-e-fotos-2` (o código mudou depois da revisão do `/implement`: o teste do "Pôr setor", o `TOTAL_DE_CORES` no falso e a regra do `/polir`).
+
+Padrões: nenhuma violação dura. Deixados de fora, todos juízo e em código restaurado tal como já tinha sido entregue antes do ADR 0039:
+- `CORES_NA_TELA = 12` escrito à mão ao lado da lista das 12 cores (o teste confere que são 12 distintas; derivar de `TONS.length` se um dia a tabela mudar).
+- Duas classes para o único quadradinho de cor (`.opcao-cor` e `.opcao-cor-do-setor`).
+- `ProcessosFalso` com duas formas de dar a cor (mapa `coresDosSetores` e função `corDoSetor`), e `CadastrosFalso` com `comCor` em vários pontos: só falsos de teste.
+- Já no backlog desde a revisão do `/implement`: `setorCor ?? 1` repetido e o cast `as CSSProperties`.
+
+Spec: nada faltando, sem excesso de escopo, nada errado; nenhuma regressão no que já estava entregue (sigla maior, Status, pílulas de Situação, foto). Observação menor sem teste: `linha.cor ?? 1` nas Linhas por setor cai na primeira cor se o setor vier sem número, o mesmo comportamento de todos os selos (número inválido cai na primeira, critério 2).
+
+Teste instável: na primeira rodada da cobertura falhou `App.publicarSemRevisoes.test.tsx` ("container null"), arquivo sem relação com a mudança; passou sozinho e nas duas rodadas seguintes da suíte inteira. Mesma família do teste instável já no backlog.
