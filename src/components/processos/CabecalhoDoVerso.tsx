@@ -19,7 +19,7 @@ type CabecalhoDoVersoProps = {
 export function CabecalhoDoVerso({ processo, titulo, acoes, acaoPrincipal, dados, aoFechar }: CabecalhoDoVersoProps) {
   return (
     <header className="verso-cabecalho">
-      <SeloDoSetor sigla={processo.setorSigla} cor={processo.setorCor ?? 1} className="verso-selo-do-setor" />
+      <SeloDoSetor sigla={processo.setorSigla} className="verso-selo-do-setor" />
       <div className="verso-identificacao">
         <h2 ref={titulo} tabIndex={-1} className="verso-titulo">{processo.nome}</h2>
         {dados}

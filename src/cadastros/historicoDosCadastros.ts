@@ -78,7 +78,7 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   categoria: 'Categoria', observacao: 'Observação', setor_sigla: 'Setor', macroprocesso_nome: 'Macroprocesso',
   macroprocessos: 'Macroprocessos', setores: 'Setores', responsaveis: 'Responsáveis',
   tipo: 'Tipo', origem: 'Origem', situacao: 'Situação', contexto: 'Contexto',
-  processo_nome: 'Processo', responsavel_nome: 'Responsável', processo_pai_nome: 'Processo pai', etiqueta: 'Etiqueta',
+  processo_nome: 'Processo', responsavel_nome: 'Responsável', processo_pai_nome: 'Processo pai', etiqueta: 'Status',
   nivel: 'Nível', obrigatoria: 'Obrigatória', fase: 'Fase', ativa: 'Situação', ordem: 'Posição',
   data_da_modelagem_piloto: 'Data da modelagem piloto', data_da_reuniao: 'Data da modelagem piloto',
   data_da_validacao: 'Data da validação', pdf_nome: '.pdf da aprovação',

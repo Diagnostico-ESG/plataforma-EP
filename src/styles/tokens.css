@@ -83,7 +83,7 @@
   --neutra-fundo: #eef0f4;
 
   /* Etiquetas da etapa, só ícone: círculo vazio, meio azul, círculo verde com visto (3,3:1, acima do mínimo gráfico de 3:1) */
-  --etiqueta-a-fazer: var(--icone-inativo);
+  --etiqueta-a-fazer: #ea580c;
   --etiqueta-iniciado: var(--azul);
   --etiqueta-finalizado: #16a34a;
 
@@ -93,7 +93,8 @@
   /* Tipografia: base 14px */
   --fonte: 'Source Sans 3', system-ui, sans-serif;
   --fonte-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
-  --tam-selo: 11px;
+  --tam-selo: 13px;
+  --selo-do-setor: #475569;
   --tam-rotulo: 12px;
   --tam-secundario: 13px;
   --tam-base: 14px;
@@ -125,7 +126,6 @@
   --canto-selo: 4px;
   --canto-janela: 12px;
   --canto-macro: 2px;
-  --canto-amostra: 5px;
   /* Sombra só no que flutua; cartões e tabelas não têm */
   --sombra-flutuante: 0 8px 24px rgb(29 35 48 / 12%), 0 2px 6px rgb(29 35 48 / 8%);
   --sombra-janela: 0 24px 60px rgb(29 35 48 / 30%);

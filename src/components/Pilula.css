@@ -29,13 +29,6 @@
   color: var(--aprovado-texto);
 }
 
-/* A situação normal ("Em andamento"): texto sem fundo, para as exceções ganharem o destaque. */
-.pilula-discreta {
-  padding: 0;
-  color: var(--texto-2);
-  font-weight: 400;
-}
-
 .pilula-neutra {
   background: var(--neutra-fundo);
   color: var(--neutra-texto);

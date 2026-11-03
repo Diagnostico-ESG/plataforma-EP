@@ -38,7 +38,7 @@ test('escolher outra etapa move na hora, sem janela: a etiqueta volta a A fazer 
   await screen.findByText('Agora · etapa 6 de 8')
   expect(falso.chamadas).toEqual([{ acao: 'mover', id: 'p1', etapaId: 'e6' }])
   expect(janelasPorCima()).toEqual([])
-  expect((await lista('Etiqueta')).value).toBe('a_fazer')
+  expect((await lista('Status')).value).toBe('a_fazer')
   expect((await agoraDoVerso()).getByText(EU.nome)).toBeTruthy()
 })
 
@@ -74,15 +74,15 @@ test('a recusa do banco aparece com a frase pronta', async () => {
 
 // Mover para Concluídos (a janela da chegada e a ida direta com a data registrada) está em App.chegadaAConcluidos.test.tsx.
 
-// ---- Etiqueta
+// ---- Status
 
-test('a lista Etiqueta tem A fazer, Iniciado e Finalizado, grava ao escolher e não mexe na etapa nem no responsável', async () => {
+test('a lista Status tem A fazer, Iniciado e Finalizado, grava ao escolher e não mexe na etapa nem no responsável', async () => {
   const falso = montarVerso(processoLido(COM_BIA))
-  const etiqueta = await lista('Etiqueta')
+  const etiqueta = await lista('Status')
   expect([...etiqueta.options].map((opcao) => opcao.textContent)).toEqual(['A fazer', 'Iniciado', 'Finalizado'])
   fireEvent.change(etiqueta, { target: { value: 'em_andamento' } })
   await waitFor(() => expect(falso.chamadas).toEqual([{ acao: 'etiqueta', id: 'p1', etiqueta: 'em_andamento' }]))
-  expect((await lista('Etiqueta')).value).toBe('em_andamento')
+  expect((await lista('Status')).value).toBe('em_andamento')
   expect((await agoraDoVerso()).getByText('Agora · etapa 4 de 8')).toBeTruthy()
   expect((await agoraDoVerso()).getByText(BIA.nome)).toBeTruthy()
 })
@@ -90,15 +90,15 @@ test('a lista Etiqueta tem A fazer, Iniciado e Finalizado, grava ao escolher e n
 test('a falha ao mudar a etiqueta aparece em vermelho e a etiqueta fica como estava', async () => {
   const falso = montarVerso(processoLido())
   falso.falhaDeGravacao = 'falha de conexão simulada'
-  fireEvent.change(await lista('Etiqueta'), { target: { value: 'concluido' } })
+  fireEvent.change(await lista('Status'), { target: { value: 'concluido' } })
   expect((await screen.findByRole('alert')).textContent).toBe('A alteração não foi salva: falha de conexão simulada.')
-  expect((await lista('Etiqueta')).value).toBe('a_fazer')
+  expect((await lista('Status')).value).toBe('a_fazer')
 })
 
 test('em Concluídos a etiqueta é só o texto "Finalizado", sem lista', async () => {
   montarVerso(processoLido({ situacao: 'concluido', etiqueta: 'concluido', publicadoEm: '2026-10-05' }, 'concluidos'))
   const agora = await agoraDoVerso()
-  expect(agora.queryByRole('combobox', { name: 'Etiqueta' })).toBeNull()
+  expect(agora.queryByRole('combobox', { name: 'Status' })).toBeNull()
   expect(agora.getByText('Finalizado', { selector: '.agora-etiqueta' })).toBeTruthy()
   expect(agora.getByRole('combobox', { name: 'Etapa' })).toBeTruthy()
 })
@@ -203,8 +203,8 @@ test('até 7 dias não há contagem; a partir do oitavo, o selo âmbar', async (
 
 test('mudar só a etiqueta não zera a contagem de dias', async () => {
   montarVerso(processoLido({ entrouNaEtapaEm: diasAtras(9) }))
-  fireEvent.change(await lista('Etiqueta'), { target: { value: 'em_andamento' } })
-  await waitFor(async () => expect((await lista('Etiqueta')).value).toBe('em_andamento'))
+  fireEvent.change(await lista('Status'), { target: { value: 'em_andamento' } })
+  await waitFor(async () => expect((await lista('Status')).value).toBe('em_andamento'))
   expect((await agoraDoVerso()).getByText('9 dias nesta etapa')).toBeTruthy()
 })
 
@@ -241,7 +241,7 @@ test('o aviso não aparece fora da Revisão interna nem quando o responsável é
 
 test('o aviso não impede de mover nem de marcar a etiqueta', async () => {
   const falso = montarVerso(processoLido({ ...COM_BIA, ultimaVersao: DE_BIA }))
-  fireEvent.change(await lista('Etiqueta'), { target: { value: 'concluido' } })
+  fireEvent.change(await lista('Status'), { target: { value: 'concluido' } })
   await waitFor(() => expect(falso.chamadas).toHaveLength(1))
 })
 

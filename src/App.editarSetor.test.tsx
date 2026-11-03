@@ -4,7 +4,8 @@ import App from './App'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { Perfil } from './acesso/tipos'
-import { CadastrosFalso, type SetorDoTeste } from './cadastros/CadastrosFalso'
+import { CadastrosFalso } from './cadastros/CadastrosFalso'
+import type { Setor } from './cadastros/tipos'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
@@ -18,7 +19,7 @@ afterEach(() => {
   window.location.hash = ''
 })
 
-const SETORES: SetorDoTeste[] = [
+const SETORES: Setor[] = [
   { id: 's1', sigla: 'AFT', nome: 'Assessoria Fictícia de Teste', observacoes: null, ativo: true },
   { id: 's2', sigla: 'CIT', nome: 'Coordenação Inventada de Teste', observacoes: 'Nota inventada', ativo: true },
 ]
@@ -40,6 +41,15 @@ test('clicar na linha abre o setor com o formulário preenchido', async () => {
   expect(((await screen.findByLabelText('Nome')) as HTMLInputElement).value).toBe('Coordenação Inventada de Teste')
   expect((screen.getByLabelText('Sigla') as HTMLInputElement).value).toBe('CIT')
   expect((screen.getByLabelText('Observações') as HTMLTextAreaElement).value).toBe('Nota inventada')
+})
+
+test('o cadastro do setor não pede nem grava cor: o setor tem uma cor só (ADR 0039)', async () => {
+  montar()
+  await abrir('AFT')
+  await screen.findByLabelText('Nome')
+  expect(screen.queryByRole('group', { name: 'Cor do setor' })).toBeNull()
+  fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
+  await screen.findByRole('cell', { name: 'AFT' })
 })
 
 test('editar grava nome, sigla em maiúsculas e observações, volta à lista e mostra o novo valor', async () => {

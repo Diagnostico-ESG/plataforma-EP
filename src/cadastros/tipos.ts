@@ -1,7 +1,5 @@
-/** `cor`: posição do setor na paleta de 30 cores (1 a 30), o número que o banco guarda. */
-export type Setor = { id: string; sigla: string; nome: string; observacoes: string | null; ativo: boolean; cor: number }
-/** `cor` só vai na troca do setor aberto; ao criar, o banco escolhe a primeira cor livre. */
-export type DadosDoSetor = { nome: string; sigla: string; observacoes: string | null; cor?: number }
+export type Setor = { id: string; sigla: string; nome: string; observacoes: string | null; ativo: boolean }
+export type DadosDoSetor = { nome: string; sigla: string; observacoes: string | null }
 
 export type CategoriaDoMacroprocesso = 'finalistico' | 'apoio' | 'gerencial'
 export type Macroprocesso = {
@@ -21,7 +19,7 @@ export type SetorComMacroprocessos = Setor & { macroprocessos: MacroprocessoDoSe
 
 /** Um setor visto do macroprocesso aberto, com a observação do papel dele ali. */
 export type SetorEnvolvido = {
-  setorId: string; sigla: string; nome: string; ativo: boolean; cor: number; observacao: string | null
+  setorId: string; sigla: string; nome: string; ativo: boolean; observacao: string | null
 }
 export type MacroprocessoDaLista = Macroprocesso & { quantidadeDeSetores: number }
 export type MacroprocessoComSetores = Macroprocesso & { setoresEnvolvidos: SetorEnvolvido[] }

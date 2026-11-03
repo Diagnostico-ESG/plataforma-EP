@@ -15,14 +15,14 @@ function criar(cliente: ClienteSupabaseFalso) {
 describe('criarCadastrosSupabase', () => {
   test('lista os setores com a quantidade de macroprocessos, pedindo ao banco a ordem pela sigla', async () => {
     const cliente = new ClienteSupabaseFalso()
-    const linha = { id: 's1', sigla: 'NFT', nome: NOVO.nome, observacoes: null, ativo: true, cor: 3 }
+    const linha = { id: 's1', sigla: 'NFT', nome: NOVO.nome, observacoes: null, ativo: true }
     const outra = { ...linha, id: 's2', sigla: 'OUT' }
     cliente.respostas['setores.select'] = { data: [
       { ...linha, setores_envolvidos: [{ count: 2 }] }, { ...outra, setores_envolvidos: [] }], error: null }
     expect(await criar(cliente).listarSetores()).toEqual([
       { ...linha, quantidadeDeMacroprocessos: 2 }, { ...outra, quantidadeDeMacroprocessos: 0 }])
     expect(cliente.pedidos[0]).toMatchObject({ tabela: 'setores',
-      colunas: 'id, sigla, nome, observacoes, ativo, cor, setores_envolvidos(count)', ordem: [['sigla', true]] })
+      colunas: 'id, sigla, nome, observacoes, ativo, setores_envolvidos(count)', ordem: [['sigla', true]] })
   })
 
   test('falha ao listar vira erro com o motivo do banco', async () => {
@@ -35,7 +35,7 @@ describe('criarCadastrosSupabase', () => {
     const cliente = new ClienteSupabaseFalso()
     await criar(cliente).criarSetor(NOVO)
     expect(cliente.pedidos[0]).toMatchObject({ tabela: 'setores', operacao: 'insert', valores: NOVO })
-    // A cor é escolhida pelo banco (gatilho da primeira cor livre).
+    // A cor não é enviada: o banco dá valor ao setor novo (ADR 0039).
     expect(cliente.pedidos[0].valores).not.toHaveProperty('cor')
   })
 
@@ -60,7 +60,7 @@ describe('criarCadastrosSupabase', () => {
     expect((falha as Error).message).toBe('erro inesperado do banco (conexão perdida)')
   })
 
-  const LINHA = { id: 's1', sigla: 'NFT', nome: NOVO.nome, observacoes: null, ativo: true, cor: 3 }
+  const LINHA = { id: 's1', sigla: 'NFT', nome: NOVO.nome, observacoes: null, ativo: true }
   const LINHA_LIDA = { ...LINHA, setores_envolvidos: [] }
   type Modulo = ReturnType<typeof criar>
 
@@ -75,7 +75,7 @@ describe('criarCadastrosSupabase', () => {
       { id: 'm2', codigo: null, nome: 'Beta Fictício', observacao: 'Papel B' },
     ] })
     expect(cliente.pedidos[0]).toMatchObject({ tabela: 'setores', filtro: ['id', 's1'],
-      colunas: 'id, sigla, nome, observacoes, ativo, cor, setores_envolvidos(observacao, macroprocessos(id, codigo, nome))' })
+      colunas: 'id, sigla, nome, observacoes, ativo, setores_envolvidos(observacao, macroprocessos(id, codigo, nome))' })
   })
 
   test('ler um setor que não existe devolve null', async () => {
@@ -97,13 +97,6 @@ describe('criarCadastrosSupabase', () => {
     cliente.respostas['setores.update'] = { data: [{ id: 's1' }], error: null }
     await chamar(criar(cliente))
     expect(cliente.pedidos[0]).toMatchObject({ tabela: 'setores', operacao: 'update', valores, filtro: ['id', 's1'] })
-  })
-
-  test('editar envia a cor escolhida junto com o resto do setor', async () => {
-    const cliente = new ClienteSupabaseFalso()
-    cliente.respostas['setores.update'] = { data: [{ id: 's1' }], error: null }
-    await criar(cliente).editarSetor('s1', { ...NOVO, cor: 7 })
-    expect(cliente.pedidos[0]).toMatchObject({ operacao: 'update', valores: { ...NOVO, cor: 7 } })
   })
 
   test('excluir apaga pelo id', async () => {

@@ -2,6 +2,8 @@ import type { CSSProperties } from 'react'
 import './ArvoreDaLista.css'
 import type { LinhaDaLista } from '../../processos/linhasDaLista'
 import { ROTULO_DO_TIPO } from '../../processos/rotulos'
+import type { ResponsavelDoProcesso } from '../../processos/tipos'
+import { Avatar } from '../Avatar'
 import { SeloDoSetor } from '../SeloDoSetor'
 import { BarraDeProgresso } from './BarraDeProgresso'
 import { PilulaDaSituacao } from './PilulaDaSituacao'
@@ -27,16 +29,27 @@ export function LinhaDoProcesso({ linha, escolhida, aoAbrir, arvore }: LinhaDoPr
         <SeloDeParado processo={linha} />
       </td>
       <td>{ROTULO_DO_TIPO[linha.tipo]}</td>
-      <td><SeloDoSetor sigla={linha.setorSigla} cor={linha.setorCor ?? 1} /></td>
+      <td><SeloDoSetor sigla={linha.setorSigla} /></td>
       <td>{linha.macroprocessoNome}</td>
       <td>{linha.etapaAtual ? <BarraDeProgresso processo={linha} /> : '—'}</td>
-      <td>{linha.responsavel?.nome ?? '—'}</td>
+      <td><ResponsavelDaLinha responsavel={linha.responsavel} /></td>
       <td>
         <span className="lista-situacao">
           <PilulaDaSituacao situacao={linha.situacao} />
         </span>
       </td>
     </tr>
+  )
+}
+
+/** O responsável da linha: a foto (ou as iniciais) antes do nome; sem ninguém, o traço (ADR 0039). */
+function ResponsavelDaLinha({ responsavel }: { responsavel: ResponsavelDoProcesso | null }) {
+  if (!responsavel) return <>—</>
+  return (
+    <span className="lista-responsavel">
+      <Avatar nome={responsavel.nome} fotoUrl={responsavel.fotoUrl ?? undefined} tamanho={24} decorativo />
+      {responsavel.nome}
+    </span>
   )
 }
 

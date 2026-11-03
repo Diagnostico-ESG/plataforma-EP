@@ -1,9 +1,22 @@
 /* À direita dos controles, antes do [Cadastrar processo]; é leitura de apoio, então sem o negrito da etiqueta. */
+.legenda-do-status {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  align-self: center;
+  margin-left: auto;
+}
+
+.legenda-do-status-rotulo {
+  color: var(--texto-2);
+  font-size: var(--tam-rotulo);
+  font-weight: 600;
+}
+
 .legenda-das-etiquetas {
   display: flex;
   gap: var(--esp-3);
-  align-self: center;
-  margin: 0 0 0 auto;
+  margin: 0;
   padding: 0;
   list-style: none;
 }

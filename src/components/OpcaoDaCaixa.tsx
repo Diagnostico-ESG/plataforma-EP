@@ -1,5 +1,3 @@
-import type { CSSProperties } from 'react'
-import { estiloDaCor } from '../cadastros/corDoSetor'
 import type { PessoaDaOpcao } from '../processos/tipos'
 import { Avatar } from './Avatar'
 
@@ -9,26 +7,20 @@ type OpcaoDaCaixaProps = {
   desabilitada?: boolean
   /** O Avatar de quem a opção nomeia. */
   pessoa?: PessoaDaOpcao
-  /** Número da cor do setor: quadradinho na cor lisa, a mesma do selo. */
-  corDoSetor?: number
 }
 
 /**
- * Uma <option> com a marca na frente (cor do setor ou Avatar), para a caixa de seleção personalizável do navegador
+ * Uma <option> com a marca na frente (Avatar), para a caixa de seleção personalizável do navegador
  * (src/styles/caixas.css). A marca é enfeite e fica escondida da leitura de tela: o nome da opção é só o rótulo.
  * Nos navegadores sem a caixa personalizável, o <select> ignora a marca e mostra o texto.
  */
-export function OpcaoDaCaixa({ valor, rotulo, desabilitada, pessoa, corDoSetor }: OpcaoDaCaixaProps) {
+export function OpcaoDaCaixa({ valor, rotulo, desabilitada, pessoa }: OpcaoDaCaixaProps) {
   return (
     <option value={valor} disabled={desabilitada}>
       {pessoa && (
         <span className="opcao-marca" aria-hidden="true">
           <Avatar nome={pessoa.nome} fotoUrl={pessoa.fotoUrl ?? undefined} tamanho={20} decorativo />
         </span>
-      )}
-      {corDoSetor !== undefined && (
-        <span className="opcao-marca opcao-cor opcao-cor-do-setor" aria-hidden="true"
-          style={estiloDaCor(corDoSetor) as CSSProperties} />
       )}
       {rotulo}
     </option>

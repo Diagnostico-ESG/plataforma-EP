@@ -50,7 +50,7 @@ test('o setor inativo só tem coluna com processo, marcada Inativo, na ordem de 
   expect(Array.from(document.querySelectorAll('.coluna-titulo-principal')).map((sigla) => sigla.textContent)).toEqual(['MNO Inativo', 'ABC', 'TSA'])
 })
 
-test('o cartão traz a barra da etapa, a etiqueta e o responsável, sem o selo da sigla, e não se arrasta', async () => {
+test('o cartão traz a barra da etapa, a etiqueta, o responsável e o selo da sigla, e não se arrasta', async () => {
   abrir([doSetor('Emitir Ofício', TSA)])
   expect((await cartaoDe('Emitir Ofício')).querySelector('.selo-do-setor')?.textContent).toBe('TSA')
   await trocar('Setor')
@@ -58,20 +58,19 @@ test('o cartão traz a barra da etapa, a etiqueta e o responsável, sem o selo d
   expect(cartao.querySelector('.barra-etapa-texto')?.textContent).toBe('Revisão interna · 4 de 8')
   expect(cartao.querySelector('.etiqueta')?.textContent).toBe('A fazer')
   expect(cartao.querySelector('.cartao-responsavel')).not.toBeNull()
-  expect(cartao.querySelector('.selo-do-setor')).toBeNull()
+  expect(cartao.querySelector('.selo-do-setor')?.textContent).toBe('TSA')
   expect(cartao.querySelector('.cartao-nome')?.textContent).toBe('Emitir Ofício')
-  expect(cartao.textContent).not.toContain('TSA')
   expect(cartao.getAttribute('draggable')).toBe('false')
 })
 
-test('o cartão não mostra o nome do macroprocesso em nenhum agrupamento, e por setor não leva o selo da sigla', async () => {
+test('o cartão não mostra o nome do macroprocesso em nenhum agrupamento, e por setor leva o selo da sigla como nos outros quadros (ADR 0039)', async () => {
   abrir([doSetor('Emitir Ofício', TSA)])
   expect((await cartaoDe('Emitir Ofício')).textContent).not.toContain('Macro de Teste')
   expect((await cartaoDe('Emitir Ofício')).querySelector('.selo-do-setor')?.textContent).toBe('TSA')
   await trocar('Setor')
   const porSetor = await cartaoDe('Emitir Ofício')
   expect(porSetor.textContent).not.toContain('Macro de Teste')
-  expect(porSetor.querySelector('.selo-do-setor')).toBeNull()
+  expect(porSetor.querySelector('.selo-do-setor')?.textContent).toBe('TSA')
 })
 
 test('com o filtro Setor, só a coluna desse setor', async () => {

@@ -35,7 +35,7 @@ export function CamposDoFormulario({ campos, opcoes, cadastrando, aoMudar }: Cam
         <BotaoDaCaixa />
         <option value="">Escolha o setor</option>
         {opcoes.setores.filter((setor) => setor.ativo || setor.id === campos.setorId).map((setor) => (
-          <OpcaoDaCaixa key={setor.id} valor={setor.id} rotulo={`${setor.sigla} — ${setor.nome}`} corDoSetor={setor.cor} />
+          <OpcaoDaCaixa key={setor.id} valor={setor.id} rotulo={`${setor.sigla} — ${setor.nome}`} />
         ))}
       </select>
       <CampoDoMacroprocesso id={id} campos={campos} macroprocessos={opcoes.macroprocessos} aoMudar={aoMudar} />

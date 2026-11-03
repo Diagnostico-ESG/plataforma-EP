@@ -37,7 +37,9 @@ export function Avatar({ nome, fotoUrl, tamanho = 24, decorativo = false, propri
   )
 }
 
-/** Sem responsável: um círculo tracejado vazio, no mesmo tamanho do avatar. */
-export function AvatarVazio({ tamanho = 24 }: { tamanho?: 20 | 24 | 32 }) {
-  return <span className="avatar avatar-vazio" style={{ width: tamanho, height: tamanho }} role="img" aria-label="Sem responsável" />
+/** Sem responsável: um círculo tracejado vazio, no mesmo tamanho do avatar; `decorativo` quando o texto "Sem responsável" já está ao lado. */
+export function AvatarVazio({ tamanho = 24, decorativo = false }: { tamanho?: 20 | 24 | 32; decorativo?: boolean }) {
+  const estilo = { width: tamanho, height: tamanho }
+  if (decorativo) return <span className="avatar avatar-vazio" style={estilo} aria-hidden="true" />
+  return <span className="avatar avatar-vazio" style={estilo} role="img" aria-label="Sem responsável" />
 }

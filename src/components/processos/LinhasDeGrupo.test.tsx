@@ -6,7 +6,7 @@ import { LinhaDoMacro, LinhaDoSetor } from './LinhasDeGrupo'
 afterEach(cleanup)
 
 const MACRO: MacroDaArvore = { id: 'm1', nome: 'Macro Um', total: 2, setores: [] }
-const SETOR: SetorDaArvore = { id: 's1', sigla: 'TSA', nome: 'Setor A', cor: 3, itens: [] }
+const SETOR: SetorDaArvore = { id: 's1', sigla: 'TSA', nome: 'Setor A', itens: [] }
 
 const dentroDaTabela = (linha: React.ReactNode) => render(<table><tbody>{linha}</tbody></table>)
 

@@ -235,11 +235,6 @@
   color: var(--texto-2);
 }
 
-.cartao-responsavel svg {
-  flex: none;
-  color: var(--icone-inativo);
-}
-
 /* Barra da etapa (Quadro por responsável e por setor): o nome e a posição acima e uma faixa lisa, azul até a etapa atual. */
 .barra-etapa {
   display: flex;
@@ -334,6 +329,12 @@ td .barra-etapa {
 }
 
 /* A situação (e o que mais vier ao lado) lado a lado, quebrando quando a coluna é estreita. */
+.lista-responsavel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-2);
+}
+
 .lista-situacao {
   display: inline-flex;
   flex-wrap: wrap;

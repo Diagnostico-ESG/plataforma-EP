@@ -37,7 +37,7 @@ export function SetoresEnvolvidos({ envolvidos, edicao }: SetoresEnvolvidosProps
 function LinhaEmLeitura({ setor }: { setor: SetorEnvolvido }) {
   return (
     <tr>
-      <td><SeloDoSetor sigla={setor.sigla} cor={setor.cor} /></td>
+      <td><SeloDoSetor sigla={setor.sigla} /></td>
       <td>{setor.nome}{!setor.ativo && <> <Pilula situacao="neutra">Inativo</Pilula></>}</td>
       <td>{setor.observacao ?? '—'}</td>
     </tr>

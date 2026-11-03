@@ -34,11 +34,11 @@ export function EtiquetaDoProcesso({ etiqueta, soIcone = false }: EtiquetaDoProc
   const rotulo = ROTULO_DA_ETIQUETA[valor]
   if (soIcone) {
     return (
-      <span className={`etiqueta etiqueta-${valor}`} title={`Etiqueta: ${rotulo}`}>
-        <Desenho valor={valor} tamanho={18} />
+      <span className={`etiqueta etiqueta-${valor}`} title={`Status: ${rotulo}`}>
+        <Desenho valor={valor} tamanho={22} />
         <span className="visualmente-oculto">{rotulo}</span>
       </span>
     )
   }
-  return <span className={`etiqueta etiqueta-${valor}`}><Desenho valor={valor} tamanho={14} />{rotulo}</span>
+  return <span className={`etiqueta etiqueta-${valor}`}><Desenho valor={valor} tamanho={18} />{rotulo}</span>
 }
