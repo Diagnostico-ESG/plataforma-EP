@@ -55,7 +55,7 @@ O identificador curto e único do setor, que entra no nome dos arquivos. Pode mu
 _Avoid_: código do setor, abreviação
 
 **Cor do setor**:
-Cor clara, escolhida numa paleta fixa, que acompanha a sigla do setor em toda a plataforma. O setor novo recebe a primeira cor ainda livre, e ela pode ser trocada no cadastro do setor. Dois setores podem ter a mesma cor, se quem cadastra escolher assim; o setor inativo continua com a sua.
+Cor forte, de uma tabela fixa de 12, que acompanha a sigla do setor em toda a plataforma. O banco dá ao setor novo um número de 1 a 30, e a cor sai desse número em ciclo; não se escolhe nem se troca no cadastro. Dois setores podem ter a mesma cor; o setor inativo continua com a sua.
 _Avoid_: cor da sigla, tema do setor
 
 **Macroprocesso**:
