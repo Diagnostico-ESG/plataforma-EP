@@ -6,7 +6,7 @@ import { consultaDePastaPorNome } from '../_shared/drive.ts'
 import { NOME_DA_SUBPASTA_DOS_ANEXOS, anexoEstaNaSubpasta, type SubpastaDosAnexos } from '../_shared/anexo.ts'
 import { limparParaNomeDeArquivo } from '../_shared/nomePadrao.ts'
 import { decidirAjusteDaPasta } from '../_shared/pasta.ts'
-import { estaSobARaiz, type LerPais } from '../_shared/raiz.ts'
+import { criarMemoriaDePastas, estaSobARaizComMemoria, type LerPais } from '../_shared/raiz.ts'
 import type { Configuracao } from './configuracao.ts'
 import { chamarDrive, lerJsonDoDrive, lerNoDriveOuNulo } from './google.ts'
 
@@ -51,14 +51,17 @@ export interface ConferidorDaRaiz {
   itemSobARaiz: (driveId: string) => Promise<boolean>
 }
 
+// Vive na instância da função, entre pedidos (ADR 0038): só as pastas confirmadas, por 5 minutos.
+const pastasConfirmadas = criarMemoriaDePastas()
+
 export function conferidorDaRaiz(contexto: ContextoDoDrive): ConferidorDaRaiz {
   const lerPais = lerPaisNoDrive(contexto.token)
   const raizId = contexto.config.raizId
   return {
-    paisSobARaiz: (pais) => estaSobARaiz(pais, raizId, lerPais),
+    paisSobARaiz: (pais) => estaSobARaizComMemoria(pais, raizId, lerPais, pastasConfirmadas),
     itemSobARaiz: async (driveId) => {
       const pais = await lerPais(driveId)
-      return pais !== null && (await estaSobARaiz(pais, raizId, lerPais))
+      return pais !== null && (await estaSobARaizComMemoria(pais, raizId, lerPais, pastasConfirmadas))
     },
   }
 }

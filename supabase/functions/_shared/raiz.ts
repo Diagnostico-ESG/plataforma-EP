@@ -21,3 +21,38 @@ export async function estaSobARaiz(
   }
   return false
 }
+
+// miniatura-rapida (ADR 0038): a conferência sobe as pastas uma chamada ao Drive por nível, em todo pedido de arquivo. A função lembra,
+// na memória da instância, as pastas que já confirmou debaixo da raiz. Só a resposta positiva é lembrada; recusa e falha nunca.
+// Efeito aceito: pasta movida para fora da raiz continua valendo até a lembrança vencer (5 minutos), naquela instância.
+const DURACAO_DA_LEMBRANCA_EM_MS = 5 * 60 * 1000
+
+export interface MemoriaDePastas {
+  confirmada: (pastaId: string) => boolean
+  lembrar: (pastaId: string) => void
+}
+
+export function criarMemoriaDePastas(agora: () => number = Date.now): MemoriaDePastas {
+  const venceEm = new Map<string, number>()
+  return {
+    confirmada: (pastaId) => (venceEm.get(pastaId) ?? 0) > agora(),
+    lembrar: (pastaId) => {
+      const hoje = agora()
+      for (const [id, vence] of venceEm) if (vence <= hoje) venceEm.delete(id)
+      venceEm.set(pastaId, hoje + DURACAO_DA_LEMBRANCA_EM_MS)
+    },
+  }
+}
+
+/** Como `estaSobARaiz`, mas pula a pasta já lembrada e lembra o pai que acabou de ser confirmado. */
+export async function estaSobARaizComMemoria(
+  pais: string[], raizId: string, lerPais: LerPais, memoria: MemoriaDePastas,
+): Promise<boolean> {
+  if (pais.includes(raizId) || pais.some(memoria.confirmada)) return true
+  for (const pai of pais) {
+    if (!(await estaSobARaiz([pai], raizId, lerPais))) continue
+    memoria.lembrar(pai)
+    return true
+  }
+  return false
+}

@@ -97,3 +97,30 @@ test('se o navegador não consegue desenhar a imagem baixada, o quadro mostra o 
   expect(await v1.findByText('Não foi possível carregar a imagem.')).toBeTruthy()
   expect(v1.queryByRole('img')).toBeNull()
 })
+
+// miniatura-rapida (ADR 0038): o conteúdo fica na memória do app até recarregar a página.
+const fecharEReabrirOVerso = async () => {
+  window.location.hash = ''
+  await waitFor(() => expect(screen.queryByRole('dialog', { name: /^Processo( |$)/ })).toBeNull())
+  window.location.hash = '#/processos/p1'
+}
+
+test('reabrir o verso mostra a imagem sem baixar o .png de novo', async () => {
+  const { versoes } = montarNosCadastros(comUmaVersao)
+  await (await destaque()).findByRole('img', { name: 'Fluxograma V1 de Emitir Ofício' })
+  await fecharEReabrirOVerso()
+  await (await destaque()).findByRole('img', { name: 'Fluxograma V1 de Emitir Ofício' })
+  expect(versoes.baixados).toEqual(['a1-png'])
+})
+
+test('uma falha no download não fica guardada: ao reabrir, o .png é pedido de novo e a imagem aparece', async () => {
+  const { versoes } = montarNosCadastros({ ajustarVersoes: (falso) => {
+    falso.versoes.p1 = [versaoDeTeste(1)]
+    falso.falharNoDownload = true
+  } })
+  expect(await (await destaque()).findByText('Não foi possível carregar a imagem.')).toBeTruthy()
+  versoes.falharNoDownload = false
+  await fecharEReabrirOVerso()
+  await (await destaque()).findByRole('img', { name: 'Fluxograma V1 de Emitir Ofício' })
+  expect(versoes.baixados).toEqual(['a1-png'])
+})

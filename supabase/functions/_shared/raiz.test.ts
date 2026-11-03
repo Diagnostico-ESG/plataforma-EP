@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { estaSobARaiz, type LerPais } from './raiz.ts'
+import { criarMemoriaDePastas, estaSobARaiz, estaSobARaizComMemoria, type LerPais } from './raiz.ts'
 
 const RAIZ = 'raiz-do-ambiente'
 
@@ -56,5 +56,73 @@ describe('estaSobARaiz', () => {
     expect(lidos.length).toBeLessThanOrEqual(2)
     const profundo: LerPais = (id) => Promise.resolve(id === 'a' ? ['b'] : id === 'b' ? ['c'] : id === 'c' ? [RAIZ] : null)
     expect(await estaSobARaiz(['a'], RAIZ, profundo)).toBe(false)
+  })
+})
+
+// miniatura-rapida (ADR 0038): a pasta conferida fica lembrada por 5 minutos; recusa e falha nunca.
+const CINCO_MINUTOS = 5 * 60 * 1000
+
+function comRelogio() {
+  let agora = 1_000_000
+  const memoria = criarMemoriaDePastas(() => agora)
+  return { memoria, passar: (ms: number) => { agora += ms } }
+}
+
+describe('estaSobARaizComMemoria', () => {
+  it('na segunda conferência da mesma pasta não lê o Drive de novo', async () => {
+    const { lerPais, lidos } = drive()
+    const { memoria } = comRelogio()
+    expect(await estaSobARaizComMemoria(['pasta-do-processo'], RAIZ, lerPais, memoria)).toBe(true)
+    expect(lidos).toEqual(['pasta-do-processo', 'pasta-do-setor'])
+    expect(await estaSobARaizComMemoria(['pasta-do-processo'], RAIZ, lerPais, memoria)).toBe(true)
+    expect(lidos).toHaveLength(2)
+  })
+
+  it('depois de 5 minutos confere o Drive de novo (e vale a resposta nova)', async () => {
+    const drivePrimeiro = drive()
+    const { memoria, passar } = comRelogio()
+    await estaSobARaizComMemoria(['pasta-do-processo'], RAIZ, drivePrimeiro.lerPais, memoria)
+    passar(CINCO_MINUTOS - 1)
+    await estaSobARaizComMemoria(['pasta-do-processo'], RAIZ, drivePrimeiro.lerPais, memoria)
+    expect(drivePrimeiro.lidos).toHaveLength(2)
+    passar(2)
+    const movida: LerPais = (id) => Promise.resolve(id === 'pasta-do-processo' ? ['pasta-solta'] : (PAIS_NO_DRIVE[id] ?? null))
+    expect(await estaSobARaizComMemoria(['pasta-do-processo'], RAIZ, movida, memoria)).toBe(false)
+  })
+
+  it('nunca lembra a pasta recusada nem a que o Drive não achou: confere de novo', async () => {
+    const { lerPais, lidos } = drive()
+    const { memoria } = comRelogio()
+    expect(await estaSobARaizComMemoria(['pasta-solta'], RAIZ, lerPais, memoria)).toBe(false)
+    const lidosNaPrimeira = lidos.length
+    expect(await estaSobARaizComMemoria(['pasta-solta'], RAIZ, lerPais, memoria)).toBe(false)
+    expect(lidos.length).toBe(lidosNaPrimeira * 2)
+    expect(await estaSobARaizComMemoria(['pasta-que-nao-existe'], RAIZ, lerPais, memoria)).toBe(false)
+  })
+
+  it('uma falha ao ler o Drive passa adiante e não deixa nada lembrado', async () => {
+    const { memoria } = comRelogio()
+    const falha: LerPais = () => Promise.reject(new Error('Drive fora do ar'))
+    await expect(estaSobARaizComMemoria(['pasta-do-processo'], RAIZ, falha, memoria)).rejects.toThrow('Drive fora do ar')
+    const { lerPais, lidos } = drive()
+    expect(await estaSobARaizComMemoria(['pasta-do-processo'], RAIZ, lerPais, memoria)).toBe(true)
+    expect(lidos).toEqual(['pasta-do-processo', 'pasta-do-setor'])
+  })
+
+  it('aceita se qualquer um dos pais leva à raiz e lembra só o pai que levou', async () => {
+    const { lerPais, lidos } = drive()
+    const { memoria } = comRelogio()
+    expect(await estaSobARaizComMemoria(['pasta-solta', 'pasta-do-processo'], RAIZ, lerPais, memoria)).toBe(true)
+    lidos.length = 0
+    expect(await estaSobARaizComMemoria(['pasta-do-processo'], RAIZ, lerPais, memoria)).toBe(true)
+    expect(await estaSobARaizComMemoria(['pasta-solta'], RAIZ, lerPais, memoria)).toBe(false)
+    expect(lidos).toContain('pasta-solta')
+    expect(lidos).not.toContain('pasta-do-processo')
+  })
+
+  it('o pai que é a própria raiz continua valendo sem ler nada', async () => {
+    const { lerPais, lidos } = drive()
+    expect(await estaSobARaizComMemoria([RAIZ], RAIZ, lerPais, comRelogio().memoria)).toBe(true)
+    expect(lidos).toEqual([])
   })
 })
