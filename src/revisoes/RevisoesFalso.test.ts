@@ -67,7 +67,7 @@ describe('editar a revisão', () => {
     processos.processos[0].situacao = 'suspenso'
     const falha = await falhaDe(revisoes.editarRevisao('r1', { resultado: 'corrigida', escopo: 'ambos', comentario: 'x' }))
     expect(falha).toBeInstanceOf(TravaDoBanco)
-    expect(falha.message).toBe('Este processo está suspenso; retome-o para mudar a etapa, a etiqueta ou o responsável.')
+    expect(falha.message).toBe('Este processo está suspenso; retome-o para mudar a etapa, o status ou o responsável.')
   })
 
   test('revisão que não existe é cadastro inexistente; falha e espera programadas valem para a edição', async () => {

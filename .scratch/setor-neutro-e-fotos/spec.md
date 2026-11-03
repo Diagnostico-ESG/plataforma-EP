@@ -36,7 +36,7 @@ A cor própria de cada setor (12 cores fortes em ciclo sobre o número 1 a 30 gr
 - **Dados:** `Setor.cor`, `DadosDoSetor.cor` e os campos `cor` dos setores envolvidos deixam de ser lidos e enviados pela tela e pelas consultas; a coluna do banco e os tipos gerados ficam como estão. Nenhuma migração; produção não é afetada.
 - **Cartão por setor:** `oQueOCartaoRepete` passa a repetir o selo sempre, exceto nas Linhas por setor. O cabeçalho da coluna deixa de ter fundo colorido; o fundo tingido da coluna sai.
 - **Avatar no cartão:** reaproveita `Avatar` (foto do Google, sem envio do referrer, círculo com iniciais quando a foto falha) e `AvatarVazio`; vale a mesma regra do verso (`FotoDoResponsavel`). Os dados do responsável do processo na lista já trazem `fotoUrl`. Nenhuma consulta nova.
-- **Textos:** a troca de "Etiqueta(s)" por "Status" inclui o valor acessível ("Status: A fazer") e a legenda ("Legenda do status"). Os nomes internos de código e o valor gravado no banco não mudam.
+- **Textos:** a troca de "Etiqueta(s)" por "Status" inclui o valor acessível ("Status: A fazer") e a legenda ("Legenda do status"). Os nomes internos de código e o valor gravado no banco não mudam. O mesmo vale para as frases escritas no código que a pessoa lê (processo parado, histórico "Mudou o status", recusas de mover): dizem "status". Mensagens escritas dentro do banco não mudam (sem migração).
 - **Registros de apoio:** acréscimo datado em `.scratch/identidade-visual.md` (setor neutro, Status, avatar no cartão) e atualização da tabela de `.scratch/proposta-visual/decisoes.md` (linha do avatar).
 
 ## Decisões de teste
@@ -69,3 +69,5 @@ Estados de tela: não mudam (carregando, vazio e erro seguem como estão; a foto
 - Os itens adiados em `.scratch/proximo-passo.md` (bug do histórico, nome do setor ao passar o mouse, divisão do `Quadro.css`).
 
 Implementado em 2026-11-03 (commit a5eba6e)
+
+Entregue em 2026-11-03 (commit 3e7aaa6), com ressalva: critérios [visual] 8 a 10 de setor-neutro-e-fotos presumidos no app real (selo neutro e maior, ícones do Status, pílulas de Situação e foto do Google no cartão não vistos com o login; só o código e os testes conferidos)

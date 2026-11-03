@@ -87,7 +87,7 @@ function SituacaoParada({ processo, podeAlterar, aoRetomar }: SituacaoParadaProp
       <p className="agora-rotulo">Agora</p>
       <p className="agora-situacao">{processo.motivoDaSituacao ? `${rotulo}: ${processo.motivoDaSituacao}` : rotulo}</p>
       <p className="agora-linha-de-texto">{fraseDaSituacaoParada(processo, hojeEmBrasilia())}</p>
-      <p className="agora-explicacao">Retome o processo para mudar a etapa, a etiqueta ou o responsável.</p>
+      <p className="agora-explicacao">Retome o processo para mudar a etapa, o status ou o responsável.</p>
       {podeAlterar && (
         <div className="agora-botoes">
           <button type="button" className="botao botao-principal" onClick={aoRetomar}>Retomar</button>

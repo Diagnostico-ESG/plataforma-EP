@@ -14,13 +14,13 @@ export function fraseDaExplicacaoLonga(tamanho: number | string): string {
   return `A explicação tem ${tamanho} caracteres; o máximo é 2.000.`
 }
 
-export const FRASE_DA_ETIQUETA_FIXA = 'Em Concluídos a etiqueta é sempre Concluído e não muda.'
+export const FRASE_DA_ETIQUETA_FIXA = 'Em Concluídos o status é sempre Finalizado e não muda.'
 
 export function fraseDaEtiquetaInexistente(valor: string): string {
-  return `A etiqueta ${valor} não existe; use A fazer, Iniciado ou Finalizado.`
+  return `O status ${valor} não existe; use A fazer, Iniciado ou Finalizado.`
 }
 
 /** A passagem que já saiu não muda, nem pela API. */
-export const FRASE_DA_PASSAGEM_FECHADA = 'Só a etapa atual do processo tem etiqueta para mudar.'
+export const FRASE_DA_PASSAGEM_FECHADA = 'Só a etapa atual do processo tem status para mudar.'
 
 export const FRASE_DA_PASSAGEM_SO_PELA_FUNCAO = 'O processo só muda de etapa pela lista Etapa ou arrastando o cartão.'

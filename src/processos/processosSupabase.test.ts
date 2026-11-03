@@ -39,8 +39,8 @@ describe('mover', () => {
   })
 
   test.each([
-    ['processo_parado:suspenso', 'Este processo está suspenso; retome-o para mudar a etapa, a etiqueta ou o responsável.'],
-    ['processo_parado:cancelado', 'Este processo está cancelado; retome-o para mudar a etapa, a etiqueta ou o responsável.'],
+    ['processo_parado:suspenso', 'Este processo está suspenso; retome-o para mudar a etapa, o status ou o responsável.'],
+    ['processo_parado:cancelado', 'Este processo está cancelado; retome-o para mudar a etapa, o status ou o responsável.'],
     ['etapa_inativa:Publicação', 'A etapa Publicação está inativa.'],
     ['publicacao_ou_explicacao_obrigatoria',
       'Para ir a Concluídos, informe a data da publicação ou conclua sem publicação.'],
@@ -83,7 +83,7 @@ describe('etiqueta', () => {
   test('em Concluídos a etiqueta é fixa: a recusa vira a frase', async () => {
     const cliente = clienteQueRecusa('passagens.update', { message: 'etiqueta_fixa_em_concluidos', code: 'P0001' })
     expect((await falhaDe(criar(cliente).mudarEtiqueta('p1', 'a_fazer'))).message)
-      .toBe('Em Concluídos a etiqueta é sempre Concluído e não muda.')
+      .toBe('Em Concluídos o status é sempre Finalizado e não muda.')
   })
 
   test('processo parado, passagem fechada e etiqueta que não existe viram frases', async () => {
@@ -93,7 +93,7 @@ describe('etiqueta', () => {
     expect(await falhaDe(criar(fechada).mudarEtiqueta('p1', 'a_fazer'))).toBeInstanceOf(TravaDoBanco)
     const invalida = clienteQueRecusa('passagens.update', { message: 'invalid input value for enum etiqueta_da_etapa: "x"', code: '22P02' })
     expect((await falhaDe(criar(invalida).mudarEtiqueta('p1', 'x' as 'a_fazer'))).message)
-      .toBe('A etiqueta x não existe; use A fazer, Iniciado ou Finalizado.')
+      .toBe('O status x não existe; use A fazer, Iniciado ou Finalizado.')
   })
 
   test('nada mudou com o processo ainda legível: a RLS recusou pelo perfil', async () => {
@@ -134,7 +134,7 @@ describe('responsável do processo', () => {
   test('processo parado vira a frase do congelamento', async () => {
     const cliente = clienteQueRecusa('processos.update', { message: 'processo_parado:cancelado', code: 'P0001' })
     expect((await falhaDe(criar(cliente).mudarResponsavel('p1', 'u1'))).message)
-      .toBe('Este processo está cancelado; retome-o para mudar a etapa, a etiqueta ou o responsável.')
+      .toBe('Este processo está cancelado; retome-o para mudar a etapa, o status ou o responsável.')
   })
 
   test('nada mudou: perfil quando o processo ainda é legível, cadastro inexistente quando sumiu', async () => {

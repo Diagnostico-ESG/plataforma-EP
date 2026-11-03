@@ -117,6 +117,6 @@ describe('o .pdf da aprovação nas falsas ligadas', () => {
     const atual = (await revisoes.lerAprovacao('p1'))?.pdf
     if (!atual) throw new Error('o .pdf deveria existir')
     const falha = await falhaDe(versoes.substituirArquivo({ processoId: 'p1', numero: 8, arquivo: atual, novo: pdf() }, () => {}))
-    expect(falha.message).toBe('Este processo está suspenso; retome-o para mudar a etapa, a etiqueta ou o responsável.')
+    expect(falha.message).toBe('Este processo está suspenso; retome-o para mudar a etapa, o status ou o responsável.')
   })
 })

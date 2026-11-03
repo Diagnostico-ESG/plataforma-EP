@@ -16,7 +16,7 @@ const TEXTO_DA_ACAO_DO_VINCULO: Record<string, string> = {
 }
 
 // A passagem é o movimento do processo entre etapas e a etiqueta da etapa atual (Andamento livre).
-const TEXTO_DA_ACAO_DA_PASSAGEM: Record<string, string> = { mover: 'Moveu o processo', mudar_etiqueta: 'Mudou a etiqueta' }
+const TEXTO_DA_ACAO_DA_PASSAGEM: Record<string, string> = { mover: 'Moveu o processo', mudar_etiqueta: 'Mudou o status' }
 
 const TEXTO_DA_ACAO_DO_PROCESSO: Record<string, string> = {
   ...TEXTO_DA_ACAO, suspender: 'Suspendeu', cancelar: 'Cancelou', retomar: 'Retomou', reclassificar: 'Reclassificou',

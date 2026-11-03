@@ -35,7 +35,7 @@ test('as recusas do banco chegam como TravaDoBanco com a frase pronta', async ()
     ['data_da_publicacao_obrigatoria', 'Informe a data da publicação.'],
     ['publicacao_antes_da_aprovacao:2026-10-01:2026-10-05', 'A data da publicação 01/10/2026 é anterior à aprovação, em 05/10/2026.'],
     ['link_invalido', 'O link do E-protocolo precisa começar com http:// ou https://.'],
-    ['processo_parado:suspenso', 'Este processo está suspenso; retome-o para mudar a etapa, a etiqueta ou o responsável.'],
+    ['processo_parado:suspenso', 'Este processo está suspenso; retome-o para mudar a etapa, o status ou o responsável.'],
   ]
   for (const [motivo, frase] of frases) {
     const falha = await falhaDe(new ClienteSupabaseFalso(), motivo)

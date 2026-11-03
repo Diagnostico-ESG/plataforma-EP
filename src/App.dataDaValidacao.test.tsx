@@ -95,11 +95,11 @@ test('a falha ao gravar aparece em vermelho e a data anterior continua valendo',
 test('uma recusa pronta do banco aparece como veio', async () => {
   const { revisoes } = montar(versao(), { etapa: 'revisao_setor' })
   const campo = await abrirOCampo()
-  revisoes.falhaNaGravacao = new TravaDoBanco('Este processo está suspenso; retome-o para mudar a etapa, a etiqueta ou o responsável.')
+  revisoes.falhaNaGravacao = new TravaDoBanco('Este processo está suspenso; retome-o para mudar a etapa, o status ou o responsável.')
   fireEvent.change(entrada(campo), { target: { value: '2026-10-10' } })
   fireEvent.click(campo.getByRole('button', { name: 'Salvar' }))
   expect((await campo.findByRole('alert')).textContent)
-    .toBe('Este processo está suspenso; retome-o para mudar a etapa, a etiqueta ou o responsável.')
+    .toBe('Este processo está suspenso; retome-o para mudar a etapa, o status ou o responsável.')
 })
 
 test('a Consulta lê a data no Agora, sem botões', async () => {

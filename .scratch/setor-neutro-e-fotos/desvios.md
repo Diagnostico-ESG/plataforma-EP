@@ -18,3 +18,18 @@ Deixados de fora:
 - Critérios `[visual]` 8 a 10 da spec seguem presumidos (foto do Google, cores e tamanhos não vistos no app real).
 
 2026-11-03 — Decisão do usuário sobre os nomes: o rótulo do segundo Status continua **Iniciado** ("Em andamento" é uma Situação do processo, não um Status). A divergência da primeira entrada deste arquivo fica resolvida a favor do código; a spec foi corrigida. O `CONTEXT.md` trocou o termo **Etiqueta** por **Status**.
+
+2026-11-03 — `/ship` (revisão do diff com `/code-review`: padrões sem violação dura; spec com achados).
+
+Corrigidos:
+- **Critério 4 da spec não cumprido:** ainda havia "etiqueta" em texto visível: a frase do processo parado ("mudar a etapa, a etiqueta ou o responsável", no verso e em `frasesDeSituacao.ts`), o registro do histórico ("Mudou a etiqueta") e as três recusas de `frasesDoMovimento.ts`. Agora dizem "status". Teste novo em `src/processos/frasesDoStatus.test.ts`.
+- Resto de CSS morto (`.opcao-cor` e `.opcao-cor-do-setor` em `caixas.css`), que o `/polir` não pegou.
+- `SetorEditavel.tsx` estava salvo sem quebra de linha final e com outro fim de linha que o resto; normalizado.
+
+Deixados de fora:
+- **Mensagens escritas dentro do banco** (nas migrações, ex.: "etiqueta é sempre Concluído") continuam com a palavra "etiqueta" quando a recusa chega por um código que a tela não conhece; a tela traduz as conhecidas. Trocar exigiria migração nova; sem urgência.
+- **O campo do verso diz só "Status"**, sem "da etapa" (a legenda do Quadro diz "Status da etapa"). Ele fica ao lado de "Etapa" no mesmo cartão; se confundir, acrescentar.
+- **Nomes de código com "etiqueta"** (`EtiquetaDoProcesso`, `ETIQUETAS`, `ROTULO_DA_ETIQUETA`, coluna do banco): renomear tudo seria uma mudança grande sem efeito para quem usa; `.scratch/backlog.md`.
+- **Repetição do bloco `<Avatar ... fotoUrl={x.fotoUrl ?? undefined} decorativo />`** em seis lugares (três deste diff): juízo de refatoração, não violação; `.scratch/backlog.md`.
+
+Verificado no `/ship`: `npm run build` ok; `npm run test:coverage`: 98,2% das instruções, 94,4% dos ramos; `npm run check:circular` sem ciclo; sem mudança em `package.json` (passo 3 pulado, `.scratch/security.md` já existe); sem login, permissão, migração ou dado novo (passos 4, 7 e 10 pulados: a mudança só reapresenta nome e foto que já apareciam).

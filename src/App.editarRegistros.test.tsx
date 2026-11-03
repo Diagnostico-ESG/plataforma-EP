@@ -67,9 +67,9 @@ test('a recusa ao gravar a revisão aparece em vermelho, sem perder o preenchido
   const { revisoes } = montar(versao(), { ajustar: comRevisao(REVISAO) })
   const { janela } = await abrirAEdicao(REVISAO_INTERNA, 'Editar a revisão da V7')
   fireEvent.change(campo(janela, /Comentário/), { target: { value: 'Novo texto' } })
-  revisoes.falhaNaGravacao = new TravaDoBanco('Este processo está suspenso; retome-o para mudar a etapa, a etiqueta ou o responsável.')
+  revisoes.falhaNaGravacao = new TravaDoBanco('Este processo está suspenso; retome-o para mudar a etapa, o status ou o responsável.')
   salvar(janela)
-  expect((await janela.findByRole('alert')).textContent).toBe('Este processo está suspenso; retome-o para mudar a etapa, a etiqueta ou o responsável.')
+  expect((await janela.findByRole('alert')).textContent).toBe('Este processo está suspenso; retome-o para mudar a etapa, o status ou o responsável.')
   expect(campo(janela, /Comentário/).value).toBe('Novo texto')
   revisoes.falhaNaGravacao = 'sem conexão'
   salvar(janela)

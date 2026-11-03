@@ -179,7 +179,7 @@ describe('movimento, etiqueta e responsável no histórico (Andamento livre)', (
       entidade: 'passagem', entidadeRef: 'p1', acao: 'mudar_etiqueta', antes: { ...MOVIMENTO_ANTES, etiqueta: 'a_fazer' },
       depois: { ...MOVIMENTO_ANTES, etiqueta: 'concluido' },
     })
-    expect(tituloDoEvento(mudou)).toBe('Mudou a etiqueta')
+    expect(tituloDoEvento(mudou)).toBe('Mudou o status')
     expect(descreverEstadoDoCadastro(mudou.antes)).toBe('Processo: Emitir Ofício; Responsável: Ana Teste; Status: A fazer')
     expect(descreverEstadoDoCadastro(mudou.depois)).toBe('Processo: Emitir Ofício; Responsável: Ana Teste; Status: Finalizado')
   })

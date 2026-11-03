@@ -100,7 +100,7 @@ test('editarAprovacao altera o número, o link e a data da aprovação pelo id',
 test.each([
   ['revisoes_internas', 'escopo_obrigatorio', 'Escolha o escopo da correção.'],
   ['revisoes_internas', 'escopo_so_na_corrigida', 'O escopo só vale na revisão corrigida.'],
-  ['revisoes_internas', 'processo_parado:suspenso', 'Este processo está suspenso; retome-o para mudar a etapa, a etiqueta ou o responsável.'],
+  ['revisoes_internas', 'processo_parado:suspenso', 'Este processo está suspenso; retome-o para mudar a etapa, o status ou o responsável.'],
   ['aprovacoes', 'link_invalido', 'O link do E-protocolo precisa começar com http:// ou https://.'],
   ['aprovacoes', 'data_no_futuro:2026-10-20', 'A data 20/10/2026 está no futuro.'],
 ] as const)('a recusa %s de %s na edição vira a frase da tela', async (tabela, codigo, frase) => {

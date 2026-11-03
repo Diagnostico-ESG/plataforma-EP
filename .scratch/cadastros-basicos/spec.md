@@ -377,4 +377,4 @@ Entregue em 2026-10-27 (commit 764e74d), com ressalva: critérios [visual] da mu
 
 Entregue em 2026-10-28 (commit 31544ac), com ressalva: critérios [visual] 5 a 7 de cor-solida-do-setor presumidos no app real (vistos só numa página de teste com as folhas de estilo reais e marcação montada à mão; a tela com o login real não foi vista); revisão de segurança dispensada (só CSS e um módulo puro de cor, sem login, dado de fora ou banco)
 
-Em revisão desde 2026-11-03 (setor-neutro-e-fotos, ADR 0039: setor sem cor própria, Status colorido, foto do responsável no cartão; vale `.scratch/setor-neutro-e-fotos/spec.md`)
+Entregue em 2026-11-03 (commit 3e7aaa6), com ressalva: critérios [visual] 8 a 10 de setor-neutro-e-fotos presumidos no app real (selo neutro e maior, ícones do Status, pílulas de Situação e foto do Google no cartão não vistos com o login; só o código e os testes conferidos)

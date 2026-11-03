@@ -254,7 +254,7 @@ test.each(['suspenso', 'cancelado'] as const)('o processo %s não tem listas: mo
   expect(agora.queryByRole('button', { name: 'Assumir' })).toBeNull()
   expect(agora.getByText(/Aguardando decisão/)).toBeTruthy()
   expect(agora.getByText('Em Revisão interna · A fazer · com Bia Teste')).toBeTruthy()
-  expect(agora.getByText(/Retome o processo para mudar a etapa, a etiqueta ou o responsável/)).toBeTruthy()
+  expect(agora.getByText(/Retome o processo para mudar a etapa, o status ou o responsável/)).toBeTruthy()
   expect(agora.getByRole('button', { name: 'Retomar' })).toBeTruthy()
 })
 

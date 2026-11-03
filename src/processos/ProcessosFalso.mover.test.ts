@@ -149,7 +149,7 @@ describe('mover', () => {
   test.each(['suspenso', 'cancelado'] as const)('o processo %s não se move', async (situacao) => {
     const modulo = falso(umProcessoLido('Emitir Ofício', { id: 'p1', situacao }))
     const erro = await falhaDe(modulo.moverProcesso('p1', idDa('modelagem')))
-    expect(erro.message).toBe(`Este processo está ${situacao}; retome-o para mudar a etapa, a etiqueta ou o responsável.`)
+    expect(erro.message).toBe(`Este processo está ${situacao}; retome-o para mudar a etapa, o status ou o responsável.`)
     expect((await lido(modulo)).etapaAtual?.codigo).toBe('revisao_interna')
   })
 
@@ -241,7 +241,7 @@ describe('etiqueta', () => {
 
   test('em Concluídos a etiqueta é fixa', async () => {
     const modulo = falso(umProcessoLido('Emitir Ofício', { id: 'p1', situacao: 'concluido', etiqueta: 'concluido' }, 'concluidos'))
-    expect((await falhaDe(modulo.mudarEtiqueta('p1', 'a_fazer'))).message).toBe('Em Concluídos a etiqueta é sempre Concluído e não muda.')
+    expect((await falhaDe(modulo.mudarEtiqueta('p1', 'a_fazer'))).message).toBe('Em Concluídos o status é sempre Finalizado e não muda.')
   })
 
   test('suspenso e cancelado congelam a etiqueta', async () => {

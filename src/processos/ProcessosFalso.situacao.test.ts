@@ -111,7 +111,7 @@ describe('recusas', () => {
 describe('congelamento', () => {
   test.each(['suspenso', 'cancelado'] as const)('com o processo %s, mover, etiqueta e responsável não gravam', async (situacao) => {
     const modulo = falso(situacao)
-    const frase = `Este processo está ${situacao}; retome-o para mudar a etapa, a etiqueta ou o responsável.`
+    const frase = `Este processo está ${situacao}; retome-o para mudar a etapa, o status ou o responsável.`
     const tentativas = [
       () => modulo.moverProcesso('p1', 'e2'), () => modulo.mudarEtiqueta('p1', 'concluido'), () => modulo.mudarResponsavel('p1', 'u1'),
     ]
