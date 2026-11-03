@@ -97,6 +97,13 @@
   background: var(--folha);
 }
 
+/* Por setor o título já é o selo na cor do setor: sem a moldura branca, que o deixaria como pílula dentro de pílula (ADR 0040). */
+.coluna-titulo-texto:has(.selo-do-setor) {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
 /* A descrição vem abaixo da plaqueta, em cinza, ocupando a linha inteira (order a põe depois da contagem; a leitura segue sigla, nome, contagem). */
 .coluna-titulo-nome {
   order: 1;

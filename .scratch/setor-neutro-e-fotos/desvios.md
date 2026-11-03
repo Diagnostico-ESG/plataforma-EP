@@ -33,3 +33,18 @@ Deixados de fora:
 - **Repetição do bloco `<Avatar ... fotoUrl={x.fotoUrl ?? undefined} decorativo />`** em seis lugares (três deste diff): juízo de refatoração, não violação; `.scratch/backlog.md`.
 
 Verificado no `/ship`: `npm run build` ok; `npm run test:coverage`: 98,2% das instruções, 94,4% dos ramos; `npm run check:circular` sem ciclo; sem mudança em `package.json` (passo 3 pulado, `.scratch/security.md` já existe); sem login, permissão, migração ou dado novo (passos 4, 7 e 10 pulados: a mudança só reapresenta nome e foto que já apareciam).
+
+2026-11-03 — `/polir` da revisão (ADR 0040) e das duas correções das Linhas do Quadro. Audit do Impeccable: 17/20 (detector sem achados nos 10 arquivos tocados). Conferido numa vitrine local com módulos falsos (`vitrine.local/cores.html`, fora do git), em 1366×768, pelos estilos calculados no navegador; a captura de tela não saiu (janela do app oculta), e nada foi visto com o login real.
+
+Corrigidos:
+- **[P2] Pílula dentro de pílula no cabeçalho do Quadro por setor.** O selo colorido (25,5px) ficava dentro da moldura branca com borda do título da coluna (33,5px). `Quadro.css`: `.coluna-titulo-texto:has(.selo-do-setor)` sem borda, fundo nem preenchimento; os cabeçalhos por etapa continuam com a moldura. Conferido: as quatro colunas por setor sem moldura, cartões começando na mesma altura (183px), por etapa sem mudança, console sem erro.
+
+Conferido sem achado:
+- Linhas por setor: selo colorido sobre o fundo, sem moldura; cartões sem repetir a sigla; a grade com 8 cabeçalhos uma vez só no alto, colunas nas mesmas posições em todas as linhas e altura igual dentro de cada linha (as duas correções de hoje seguram).
+- Selos do cartão nas cores do ciclo e ícones de Status no quase preto do texto, distintos pela forma.
+
+Deixados de fora:
+- **[P3] `DESIGN.md` desatualizado** (Status colorido, `selo-do-setor` único, `canto-amostra`): vai com o `/impeccable document` já adiado (`.scratch/backlog.md`).
+- Teste automático da regra nova: o jsdom não aplica a cascata nem `:has()`; a regra é de uma linha e foi conferida no navegador. Fica no critério `[visual]` 8.
+- Layout de celular não conferido (opcional no projeto).
+- Critérios `[visual]` 8 e 9 seguem presumidos no app real com o login.
