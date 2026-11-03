@@ -6,7 +6,7 @@ import './LegendaDasEtiquetas.css'
 export function LegendaDasEtiquetas() {
   return (
     <div className="legenda-do-status">
-      <span className="legenda-do-status-rotulo" title="Status é da etapa; a Situação é do processo todo">Status</span>
+      <span className="legenda-do-status-rotulo">Status da etapa</span>
       <ul className="legenda-das-etiquetas" aria-label="Legenda do status">
         {ETIQUETAS.map((etiqueta) => <li key={etiqueta}><EtiquetaDoProcesso etiqueta={etiqueta} /></li>)}
       </ul>

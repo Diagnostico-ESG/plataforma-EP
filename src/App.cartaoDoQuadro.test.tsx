@@ -89,7 +89,9 @@ test('a faixa de controles do Quadro traz a legenda das etiquetas uma vez só, c
   const legenda = await screen.findByRole('list', { name: 'Legenda do status' })
   expect(screen.getAllByRole('list', { name: 'Legenda do status' })).toHaveLength(1)
   expect(legenda.closest('.faixa-de-controles')).not.toBeNull()
-  expect(legenda.parentElement?.textContent).toContain('Status')
+  expect(legenda.parentElement?.textContent).toContain('Status da etapa')
+  // A folha da faixa de controles mira a legenda por este caminho (regressão: sem ele a legenda não encolhe nem some em tela estreita).
+  expect(document.querySelector('.faixa-de-controles > .legenda-do-status')).toBe(legenda.parentElement)
   expect(document.body.textContent).not.toContain('Etiqueta')
   const itens = Array.from(legenda.querySelectorAll('li'))
   expect(itens.map((item) => item.textContent)).toEqual(['A fazer', 'Iniciado', 'Finalizado'])

@@ -28,7 +28,7 @@
   background: var(--linha);
 }
 
-.faixa-de-controles > .legenda-das-etiquetas {
+.faixa-de-controles > .legenda-do-status {
   flex: 0 1 auto;
   min-width: 0;
   margin-left: auto;
@@ -36,7 +36,7 @@
 }
 
 @media (max-width: 900px) {
-  .faixa-de-controles > .legenda-das-etiquetas {
+  .faixa-de-controles > .legenda-do-status {
     display: none;
   }
 }

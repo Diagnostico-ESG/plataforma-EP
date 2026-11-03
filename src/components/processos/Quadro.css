@@ -205,11 +205,12 @@
   box-shadow: 0 0 0 1px var(--azul);
 }
 
+/* 26px: a altura do selo do setor (13px em linha de 1,5 e 3px de respiro), para o cartão sem selo (Linhas por setor) não ficar mais baixo no topo. */
 .cartao-topo {
   display: flex;
   align-items: center;
   gap: var(--esp-2);
-  min-height: 20px;
+  min-height: 26px;
 }
 
 .cartao-topo .etiqueta {
