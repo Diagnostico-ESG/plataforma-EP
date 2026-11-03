@@ -67,3 +67,5 @@ Estados de tela: não mudam (carregando, vazio e erro seguem como estão; a foto
 - Pílula de Situação no cartão do Quadro (decidido não fazer).
 - Renomear "Situação" ou os valores do Status.
 - Os itens adiados em `.scratch/proximo-passo.md` (bug do histórico, nome do setor ao passar o mouse, divisão do `Quadro.css`).
+
+Implementado em 2026-11-03 (commit a5eba6e)
