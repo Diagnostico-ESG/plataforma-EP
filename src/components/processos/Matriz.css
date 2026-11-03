@@ -1,6 +1,8 @@
 /* O Quadro por etapa com Linhas (proposta 6): uma grade com o cabeçalho das etapas uma vez no alto e uma faixa por setor ou
-   por responsável. Reaproveita .quadro-colunas (altura e rolagem), trocando o flex por grade; rola nos dois sentidos. */
-.quadro-matriz {
+   por responsável. Reaproveita .quadro-colunas (altura e rolagem), trocando o flex por grade; rola nos dois sentidos.
+   As duas classes juntas: o Quadro.css é carregado depois deste arquivo e, com .quadro-matriz sozinho, o display: flex e o
+   overflow-y: hidden dele venciam a grade e as Linhas saíam quebradas. */
+.quadro-colunas.quadro-matriz {
   display: grid;
   align-content: start;
   overflow: auto;
