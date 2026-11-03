@@ -79,6 +79,6 @@ Implementado em 2026-11-03 (commit a5eba6e)
 
 Entregue em 2026-11-03 (commit a973441), com ressalva: critérios [visual] 8 a 10 de setor-neutro-e-fotos presumidos no app real (selo neutro e maior, ícones do Status, pílulas de Situação e foto do Google no cartão não vistos com o login; só o código e os testes conferidos)
 
-Em revisão desde 2026-11-03
-
 Implementado em 2026-11-03 (commit 12d7604)
+
+Entregue em 2026-11-03 (commit e863a5c), com ressalva: critérios [visual] 8 e 9 da revisão do ADR 0040 presumidos no app real (cores dos selos, cabeçalho do Quadro por setor sem moldura e ícones de Status no quase preto vistos só numa vitrine local com módulos falsos, pelos estilos calculados, sem captura de tela e sem o login); critério [visual] 10 segue presumido; revisão de segurança dispensada (a mudança só volta a ler a coluna cor do próprio banco e muda estilos, sem login, permissão, dado pessoal, dado de fora ou migração)
