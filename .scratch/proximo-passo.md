@@ -2,6 +2,8 @@
 
 **Situação:** `miniatura-rapida` (item 19) implementada no commit 5d8a729: miniatura guardada na memória do app (`src/hooks/useImagemDoArquivo.ts`) e conferência da raiz com memória de 5 minutos na função `arquivos-no-drive` (`supabase/functions/_shared/raiz.ts`, ligada em `pastas.ts`). Spec de processos-etapas com `Em revisão desde` e `Implementado em`; ADR 0038. Falta `/polir` e `/ship`.
 
+**Aberto (backlog, 2026-11-03):** a primeira abertura da miniatura continua em cerca de 3 s; a C ficou no código e publicada, sem ganho medido; reabrir é imediato. Decisão adiada pelo usuário.
+
 **Próximo comando:** `/polir` (Sonnet; mexeu pouco na interface, só o comportamento da miniatura, então pode ser rápido) e depois `/ship` (Sonnet; Opus na revisão de segurança). O `/ship` é obrigatório: muda `supabase/functions/` e pede revisão de segurança; olhar em especial que a tolerância de 5 minutos da pasta lembrada também vale nos caminhos de escrita (renumerar, garantir pasta). A função precisa ser publicada de novo no desenvolvimento (`functions deploy --use-api`, com o vínculo conferido e a aprovação do usuário). Conferir o ganho de tempo no app, com o mesmo .png de 396 KB.
 
 **Adiados pelo usuário, cada um pelo `/demanda` quando ele pedir:**
