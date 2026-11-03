@@ -18,4 +18,12 @@ describe('Matriz.css: a grade das Linhas vence o .quadro-colunas em qualquer ord
     expect(seletor, `seletor recebido: "${seletor}"; esperado ".quadro-colunas.quadro-matriz"`)
       .toMatch(/\.quadro-colunas\.quadro-matriz|\.quadro-matriz\.quadro-colunas/)
   })
+
+  // Regressão (2026-11-03): as células têm min-height: 0 e o quadro tem altura limitada; sem isto o navegador encolhia as linhas
+  // da grade para caber, todas com a mesma altura, e os cartões transbordavam para a linha de baixo.
+  test('as linhas da grade crescem com os cartões (grid-auto-rows: max-content), sem encolher para caber no quadro', () => {
+    const regra = regraDaGrade?.[0] ?? ''
+    expect(regra, `regra da grade recebida: "${regra}"; esperado conter "grid-auto-rows: max-content"`)
+      .toMatch(/grid-auto-rows:\s*max-content/)
+  })
 })

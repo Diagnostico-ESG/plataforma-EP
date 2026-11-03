@@ -5,6 +5,9 @@
 .quadro-colunas.quadro-matriz {
   display: grid;
   align-content: start;
+  /* Cada linha tem a altura dos seus cartões: o .coluna (min-height: 0) deixava o mínimo da linha em zero e, com o quadro de altura
+     limitada, o navegador as encolhia todas para caber. */
+  grid-auto-rows: max-content;
   overflow: auto;
   gap: 0 14px;
   background: none;
