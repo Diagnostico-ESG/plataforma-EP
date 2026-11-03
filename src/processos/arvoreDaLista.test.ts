@@ -4,8 +4,8 @@ import type { LinhaDaLista } from './linhasDaLista'
 import type { SetorDoQuadro } from './tipos'
 
 const SETORES: SetorDoQuadro[] = [
-  { id: 's1', sigla: 'TSA', nome: 'Setor A', ativo: true },
-  { id: 's2', sigla: 'TSB', nome: 'Setor B', ativo: true },
+  { id: 's1', sigla: 'TSA', nome: 'Setor A', ativo: true, cor: 3 },
+  { id: 's2', sigla: 'TSB', nome: 'Setor B', ativo: true, cor: 5 },
 ]
 
 function linha(id: string, mudancas: Partial<LinhaDaLista> = {}): LinhaDaLista {
@@ -64,11 +64,11 @@ describe('montarArvore', () => {
     expect(montarArvore([], [], SETORES)).toEqual([])
   })
 
-  test('nome do setor vem da lista de setores; sem ele, a sigla', () => {
+  test('nome e cor do setor vêm da lista de setores; sem ele, a sigla e a cor 1', () => {
     const linhas = [linha('a'), linha('b', { setorId: 's9', setorSigla: 'XYZ' })]
     const { setores } = montarArvore(linhas, linhas, SETORES)[0]
-    expect(setores[0]).toMatchObject({ nome: 'Setor A' })
-    expect(setores[1]).toMatchObject({ nome: 'XYZ' })
+    expect(setores[0]).toMatchObject({ nome: 'Setor A', cor: 3 })
+    expect(setores[1]).toMatchObject({ nome: 'XYZ', cor: 1 })
   })
 })
 
@@ -120,10 +120,10 @@ describe('montarArvorePorSetor', () => {
     expect(montarArvorePorSetor([], [], SETORES)).toEqual([])
   })
 
-  test('nome do setor vem da lista de setores; sem ele, a sigla', () => {
+  test('nome e cor do setor vêm da lista de setores; sem ele, a sigla e a cor 1', () => {
     const linhas = [linha('a'), linha('b', { setorId: 's9', setorSigla: 'XYZ' })]
     const arvore = montarArvorePorSetor(linhas, linhas, SETORES)
-    expect(arvore[0]).toMatchObject({ nome: 'Setor A' })
-    expect(arvore[1]).toMatchObject({ nome: 'XYZ' })
+    expect(arvore[0]).toMatchObject({ nome: 'Setor A', cor: 3 })
+    expect(arvore[1]).toMatchObject({ nome: 'XYZ', cor: 1 })
   })
 })

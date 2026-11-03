@@ -82,11 +82,22 @@
   }
 }
 
-/* Marca na frente do texto de uma opção (OpcaoDaCaixa): o Avatar. */
+/* Marca na frente do texto de uma opção (OpcaoDaCaixa): o quadradinho da cor do setor ou o Avatar. */
 .opcao-marca {
   display: inline-grid;
   flex: none;
   place-items: center;
 }
 
+.opcao-cor {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--canto-macro);
+  /* Sem isto, o modo de contraste forçado apaga a cor, que é a única informação da marca. */
+  forced-color-adjust: none;
+}
+
+.opcao-cor-do-setor {
+  background: var(--cor-do-setor);
+}
 

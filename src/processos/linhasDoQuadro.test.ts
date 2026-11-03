@@ -16,7 +16,7 @@ test('por setor: uma linha por setor com cartão, em ordem de sigla, sem as linh
   const resultado = linhas('setor', [doSetor('s1', 'SGA'), doSetor('s2', 'CDI'), doSetor('s4', 'ANT')])
   expect(resultado.map((linha) => linha.titulo)).toEqual(['ANT', 'CDI', 'SGA'])
   expect(resultado[0].inativo).toBe(true)
-  expect(resultado[2]).toMatchObject({ chave: 's1', nome: 'Secretaria' })
+  expect(resultado[2]).toMatchObject({ chave: 's1', nome: 'Secretaria', cor: 1 })
 })
 
 test('por responsável: ordem alfabética, Sem responsável por último, Você para a própria pessoa e Inativo para o desativado', () => {

@@ -32,7 +32,7 @@ export function PorSetor({ cadastros, macroprocessoId, envolvidos, aoMudar, aoSu
         <BotaoDaCaixa />
         <option value="">Escolha um setor</option>
         {opcoes.map((setor) => (
-          <OpcaoDaCaixa key={setor.id} valor={setor.id} rotulo={`${setor.sigla} — ${setor.nome}`} />
+          <OpcaoDaCaixa key={setor.id} valor={setor.id} rotulo={`${setor.sigla} — ${setor.nome}`} corDoSetor={setor.cor} />
         ))}
       </select>
       <button type="button" className="botao botao-principal" disabled={escolhido === ''}

@@ -1,4 +1,6 @@
-export type Setor = { id: string; sigla: string; nome: string; observacoes: string | null; ativo: boolean }
+/** `cor`: o número de 1 a 30 que o gatilho do banco dá ao setor; a tela só o lê (ADR 0040). */
+export type Setor = { id: string; sigla: string; nome: string; observacoes: string | null; ativo: boolean; cor: number }
+/** Sem `cor`: a tela não escolhe nem troca a cor do setor (ADR 0040). */
 export type DadosDoSetor = { nome: string; sigla: string; observacoes: string | null }
 
 export type CategoriaDoMacroprocesso = 'finalistico' | 'apoio' | 'gerencial'
@@ -19,7 +21,7 @@ export type SetorComMacroprocessos = Setor & { macroprocessos: MacroprocessoDoSe
 
 /** Um setor visto do macroprocesso aberto, com a observação do papel dele ali. */
 export type SetorEnvolvido = {
-  setorId: string; sigla: string; nome: string; ativo: boolean; observacao: string | null
+  setorId: string; sigla: string; nome: string; ativo: boolean; cor: number; observacao: string | null
 }
 export type MacroprocessoDaLista = Macroprocesso & { quantidadeDeSetores: number }
 export type MacroprocessoComSetores = Macroprocesso & { setoresEnvolvidos: SetorEnvolvido[] }

@@ -55,7 +55,7 @@ function montar(perfil: Perfil = 'integrante_ep') {
   falso.etapasDoCatalogo = [MODELAGEM]
   falso.processos = PROCESSOS
   falso.setores = [
-    { id: 's1', sigla: 'TSA', nome: 'Setor A', ativo: true }, { id: 's2', sigla: 'TSB', nome: 'Setor B', ativo: true },
+    { id: 's1', sigla: 'TSA', nome: 'Setor A', ativo: true, cor: 3 }, { id: 's2', sigla: 'TSB', nome: 'Setor B', ativo: true, cor: 5 },
   ]
   const versoes = new VersoesFalso()
   versoes.versoes = { p1: [VERSAO_7], p5: [] }

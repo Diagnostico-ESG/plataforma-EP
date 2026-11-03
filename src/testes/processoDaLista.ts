@@ -30,8 +30,8 @@ export function umProcesso(nome = 'Emitir Ofício', mudancas: Partial<ProcessoDa
 }
 
 /** Um setor inventado para o Quadro por setor (ativo, a menos que se peça o contrário). */
-export function umSetor(id: string, sigla: string, nome: string, ativo = true): SetorDoQuadro {
-  return { id, sigla, nome, ativo }
+export function umSetor(id: string, sigla: string, nome: string, ativo = true, cor = 1): SetorDoQuadro {
+  return { id, sigla, nome, ativo, cor }
 }
 
 /** Um processo lido inventado (o verso): como `umProcesso`, mais o que só a leitura traz. */

@@ -10,7 +10,7 @@ export function SetorSomenteLeitura({ setor, aoVoltar }: SetorSomenteLeituraProp
       <h3 className="form-setor-titulo">Setor {setor.sigla}</h3>
       <dl className="setor-leitura-dados">
         <dt>Nome</dt><dd>{setor.nome}</dd>
-        <dt>Sigla</dt><dd><SeloDoSetor sigla={setor.sigla} /></dd>
+        <dt>Sigla</dt><dd><SeloDoSetor sigla={setor.sigla} cor={setor.cor} /></dd>
         <dt>Observações</dt><dd>{setor.observacoes ?? '—'}</dd>
       </dl>
       <MacroprocessosDoSetor macroprocessos={setor.macroprocessos} />

@@ -8,16 +8,13 @@ const valorDe = (token: string): string => {
   return achado[1].toLowerCase()
 }
 
-describe('etiqueta da etapa só em ícone (identidade de 2026-10-30)', () => {
-  test('o círculo verde de Finalizado passa do mínimo gráfico de 3:1 sobre o cartão branco', () => {
-    expect(valorDe('etiqueta-finalizado')).toBe('#16a34a')
-    expect(contraste(valorDe('etiqueta-finalizado'), '#ffffff')).toBeGreaterThanOrEqual(3)
+describe('Status da etapa só em ícone (ADR 0040)', () => {
+  test.each(['etiqueta-a-fazer', 'etiqueta-iniciado', 'etiqueta-finalizado'])('--%s é o quase preto do texto: só a forma distingue', (token) => {
+    expect(tokens).toMatch(new RegExp(`--${token}:\\s*var\\(--texto\\);`))
   })
 
-  test('o contorno de A fazer é laranja e passa de 3:1, e o traço do Iniciado é o azul da ação (ADR 0039)', () => {
-    expect(valorDe('etiqueta-a-fazer')).toBe('#ea580c')
-    expect(contraste(valorDe('etiqueta-a-fazer'), '#ffffff')).toBeGreaterThanOrEqual(3)
-    expect(tokens).toMatch(/--etiqueta-iniciado:\s*var\(--azul\)/)
+  test('o texto passa do mínimo gráfico de 3:1 sobre o cartão branco', () => {
+    expect(contraste(valorDe('texto'), '#ffffff')).toBeGreaterThanOrEqual(3)
   })
 })
 
@@ -37,9 +34,9 @@ describe('textos sobre o fundo da página', () => {
   })
 })
 
-describe('selo do setor (ADR 0039)', () => {
-  test('a sigla branca sobre a cor única do selo passa de 4,5:1', () => {
-    expect(contraste('#ffffff', valorDe('selo-do-setor'))).toBeGreaterThanOrEqual(4.5)
+describe('selo do setor (ADR 0040)', () => {
+  test('não há mais cor única do selo: cada setor traz a sua (o contraste das 12 está em corDoSetor.test.ts)', () => {
+    expect(tokens).not.toMatch(/--selo-do-setor:/)
   })
 })
 

@@ -10,6 +10,7 @@ import { iconeDaEtapa } from '../../processos/iconeDaEtapa'
 import { chaveDaLinha, type TipoDeLinha } from '../../processos/linhasDoQuadro'
 import { Icone } from '../Icone'
 import { Pilula } from '../Pilula'
+import { SeloDoSetor } from '../SeloDoSetor'
 import { CartaoDoProcesso } from './CartaoDoProcesso'
 import { PeDaColunaDosConcluidos } from './PeDaColunaDosConcluidos'
 
@@ -106,13 +107,19 @@ export function CabecalhoDaColuna({ coluna, agrupar }: { coluna: Coluna; agrupar
       <span className="coluna-titulo-texto">
         <span className="coluna-titulo-principal">
           {agrupar === 'etapa' && <Icone nome={iconeDaEtapa(coluna.chave)} tamanho={16} />}
-          {coluna.titulo}{coluna.inativo && <> <Pilula situacao="neutra">Inativo</Pilula></>}
+          <TituloDaColuna coluna={coluna} />{coluna.inativo && <> <Pilula situacao="neutra">Inativo</Pilula></>}
         </span>
       </span>
       {coluna.subtitulo && <span className="coluna-titulo-nome">{coluna.subtitulo}</span>}
       <span className="coluna-contagem">{coluna.processos.length}</span>
     </h3>
   )
+}
+
+// Por setor a sigla vai no selo da cor do setor, o mesmo do cartão; a coluna em si não é tingida (ADR 0040).
+function TituloDaColuna({ coluna }: { coluna: Coluna }) {
+  if (coluna.cor === undefined) return <>{coluna.titulo}</>
+  return <SeloDoSetor sigla={coluna.titulo} cor={coluna.cor} />
 }
 
 // Por setor a coluna é anunciada pela sigla, pelo nome e, no setor desativado, por "inativo": o aria-label encobre a pílula.

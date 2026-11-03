@@ -29,7 +29,7 @@ export function LinhaDoProcesso({ linha, escolhida, aoAbrir, arvore }: LinhaDoPr
         <SeloDeParado processo={linha} />
       </td>
       <td>{ROTULO_DO_TIPO[linha.tipo]}</td>
-      <td><SeloDoSetor sigla={linha.setorSigla} /></td>
+      <td><SeloDoSetor sigla={linha.setorSigla} cor={linha.setorCor ?? 1} /></td>
       <td>{linha.macroprocessoNome}</td>
       <td>{linha.etapaAtual ? <BarraDeProgresso processo={linha} /> : '—'}</td>
       <td><ResponsavelDaLinha responsavel={linha.responsavel} /></td>

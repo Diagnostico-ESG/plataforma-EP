@@ -25,7 +25,7 @@ export function LinhaDeSetorEnvolvido({ cadastros, macroprocessoId, setor, aoMud
 
   return (
     <tr>
-      <td><SeloDoSetor sigla={setor.sigla} /></td>
+      <td><SeloDoSetor sigla={setor.sigla} cor={setor.cor} /></td>
       <td>{setor.nome}{!setor.ativo && <> <Pilula situacao="neutra">Inativo</Pilula></>}</td>
       <td>
         <input className="observacao-do-setor" aria-label={`Observação de ${setor.sigla}`} value={texto}

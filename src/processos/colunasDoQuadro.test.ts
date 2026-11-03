@@ -148,6 +148,12 @@ describe('agrupado por setor', () => {
   })
 })
 
+test('a coluna por setor leva a cor do setor; as de etapa e de responsável não têm cor', () => {
+  expect(colunasPorSetor([umSetor('s1', 'TSA', 'Setor A', true, 13)], [], null)[0].cor).toBe(13)
+  expect(colunas([umProcesso()]).every((coluna) => coluna.cor === undefined)).toBe(true)
+  expect(colunasPorResponsavel([umProcesso()]).every((coluna) => coluna.cor === undefined)).toBe(true)
+})
+
 describe('quantosForaDoQuadro', () => {
   test('conta os concluídos fora do Quadro; o ausente conta como no Quadro e o resto não conta', () => {
     const processos = [

@@ -82,3 +82,8 @@ test('traduz a data da validação', () => {
   expect(processoDaLinha({ ...VAZIA, data_da_validacao: '2026-10-12' }, 8)).toMatchObject({ dataDaValidacao: '2026-10-12' })
   expect(processoDaLinha(VAZIA, 8)).toMatchObject({ dataDaValidacao: null })
 })
+
+test('traduz a cor do setor; sem ela vale a cor 1', () => {
+  expect(processoDaLinha({ ...VAZIA, setor_cor: 17 }, 8)).toMatchObject({ setorCor: 17 })
+  expect(processoDaLinha(VAZIA, 8)).toMatchObject({ setorCor: 1 })
+})

@@ -28,7 +28,7 @@ export function SetorEditavel({ cadastros, setor, aoVoltar, aoSumir, aoMudar }: 
 
   return (
     <div className="cadastros-secao">
-      <SeloDoSetor sigla={setor.sigla} />
+      <SeloDoSetor sigla={setor.sigla} cor={setor.cor} />
       <FormularioDeSetor titulo={`Setor ${setor.sigla}`} inicial={setor} rotuloDoCancelar="Voltar à lista"
         aoSalvar={salvar} aoCancelar={aoVoltar} />
       <MacroprocessosDoSetor macroprocessos={setor.macroprocessos} />

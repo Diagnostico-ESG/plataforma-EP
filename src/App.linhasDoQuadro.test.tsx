@@ -15,7 +15,7 @@ afterEach(() => {
   window.location.hash = ''
 })
 
-const SETORES = [umSetor('s1', 'SGA', 'Secretaria de Gestão'), umSetor('s2', 'CDI', 'Coordenadoria de Documentos'), umSetor('s3', 'OUV', 'Ouvidoria')]
+const SETORES = [umSetor('s1', 'SGA', 'Secretaria de Gestão', true, 3), umSetor('s2', 'CDI', 'Coordenadoria de Documentos'), umSetor('s3', 'OUV', 'Ouvidoria')]
 const ANA = { id: 'u1', nome: 'Ana Teste', fotoUrl: null }
 const BRUNO = { id: 'u2', nome: 'Bruno Teste', fotoUrl: null }
 const EU = { id: USUARIO_DE_TESTE.id, nome: USUARIO_DE_TESTE.nome, fotoUrl: null }

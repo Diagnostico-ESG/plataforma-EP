@@ -4,8 +4,7 @@ import App from './App'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { Perfil } from './acesso/tipos'
-import { CadastrosFalso } from './cadastros/CadastrosFalso'
-import type { Setor } from './cadastros/tipos'
+import { CadastrosFalso, type SetorDoTeste } from './cadastros/CadastrosFalso'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
@@ -19,8 +18,8 @@ afterEach(() => {
   window.location.hash = ''
 })
 
-const SETORES: Setor[] = [
-  { id: 's1', sigla: 'AFT', nome: 'Assessoria Fictícia de Teste', observacoes: null, ativo: true },
+const SETORES: SetorDoTeste[] = [
+  { id: 's1', sigla: 'AFT', nome: 'Assessoria Fictícia de Teste', observacoes: null, ativo: true, cor: 7 },
   { id: 's2', sigla: 'CIT', nome: 'Coordenação Inventada de Teste', observacoes: 'Nota inventada', ativo: true },
 ]
 
@@ -43,13 +42,15 @@ test('clicar na linha abre o setor com o formulário preenchido', async () => {
   expect((screen.getByLabelText('Observações') as HTMLTextAreaElement).value).toBe('Nota inventada')
 })
 
-test('o cadastro do setor não pede nem grava cor: o setor tem uma cor só (ADR 0039)', async () => {
-  montar()
+test('o cadastro do setor não pede nem troca a cor: o selo mostra a cor do número que o banco deu (ADR 0040)', async () => {
+  const cadastros = montar()
   await abrir('AFT')
   await screen.findByLabelText('Nome')
   expect(screen.queryByRole('group', { name: 'Cor do setor' })).toBeNull()
+  expect(screen.getByText('AFT', { selector: '.selo-do-setor' }).style.getPropertyValue('--cor-do-setor')).toBe('#1D4ED8')
   fireEvent.click(screen.getByRole('button', { name: 'Salvar' }))
   await screen.findByRole('cell', { name: 'AFT' })
+  expect(cadastros.setores.find((setor) => setor.id === 's1')?.cor).toBe(7)
 })
 
 test('editar grava nome, sigla em maiúsculas e observações, volta à lista e mostra o novo valor', async () => {

@@ -82,10 +82,10 @@
   --avatar-fundo: #e9ecf1;
   --neutra-fundo: #eef0f4;
 
-  /* Etiquetas da etapa, só ícone: círculo vazio, meio azul, círculo verde com visto (3,3:1, acima do mínimo gráfico de 3:1) */
-  --etiqueta-a-fazer: #ea580c;
-  --etiqueta-iniciado: var(--azul);
-  --etiqueta-finalizado: #16a34a;
+  /* Status da etapa, só ícone: círculo vazio, meio cheio, cheio com visto; os três no quase preto do texto, a forma é que distingue (ADR 0040) */
+  --etiqueta-a-fazer: var(--texto);
+  --etiqueta-iniciado: var(--texto);
+  --etiqueta-finalizado: var(--texto);
 
   --pendencia-fundo: #fff6e5;
   --pendencia-borda: #f3d28f;
@@ -94,7 +94,6 @@
   --fonte: 'Source Sans 3', system-ui, sans-serif;
   --fonte-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
   --tam-selo: 13px;
-  --selo-do-setor: #475569;
   --tam-rotulo: 12px;
   --tam-secundario: 13px;
   --tam-base: 14px;

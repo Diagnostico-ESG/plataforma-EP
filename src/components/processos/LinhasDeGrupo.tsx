@@ -25,14 +25,14 @@ export function LinhaDoMacro({ macro, aberto, aoAlternar, raiz }: GrupoProps & {
 }
 
 /** A linha do setor: selo da sigla, nome e quantos processos tem. */
-export function LinhaDoSetor({ setor, total, aberto, aoAlternar, raiz }: GrupoProps & { setor: { sigla: string; nome: string }; total: number }) {
+export function LinhaDoSetor({ setor, total, aberto, aoAlternar, raiz }: GrupoProps & { setor: { sigla: string; nome: string; cor: number }; total: number }) {
   return (
     <tr className={classeDoGrupo('setor', raiz)}>
       <th scope="rowgroup" colSpan={COLUNAS_DA_LISTA.length}>
         <button type="button" className="botao-do-grupo" aria-expanded={aberto} aria-label={`${setor.sigla} ${setor.nome}, ${plural(total)}`}
           onClick={aoAlternar}>
           <span aria-hidden="true">{aberto ? '▾' : '▸'}</span>
-          <SeloDoSetor sigla={setor.sigla} />
+          <SeloDoSetor sigla={setor.sigla} cor={setor.cor} />
           <span className="nome-do-grupo" aria-hidden="true">{setor.nome}</span>
           <span className="contagem-do-grupo" aria-hidden="true">{total}</span>
         </button>

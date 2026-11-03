@@ -9,7 +9,7 @@ export type ItemDaArvore = {
   subprocessoDe: string | null
 }
 
-export type SetorDaArvore = { id: string; sigla: string; nome: string; itens: ItemDaArvore[] }
+export type SetorDaArvore = { id: string; sigla: string; nome: string; cor: number; itens: ItemDaArvore[] }
 
 export type MacroDaArvore = { id: string; nome: string; total: number; setores: SetorDaArvore[] }
 
@@ -29,7 +29,7 @@ export function montarArvore(linhas: LinhaDaLista[], todos: ProcessoDaLista[], s
 /** O macroprocesso de um setor na árvore por Setor: só os processos daquele setor naquele macroprocesso. */
 export type MacroNoSetor = { id: string; nome: string; itens: ItemDaArvore[] }
 
-export type SetorRaizDaArvore = { id: string; sigla: string; nome: string; total: number; macros: MacroNoSetor[] }
+export type SetorRaizDaArvore = { id: string; sigla: string; nome: string; cor: number; total: number; macros: MacroNoSetor[] }
 
 /** Como `montarArvore`, mas setor → macroprocesso → processo; o subprocesso segue as mesmas regras (sob o pai, ou sozinho no ramo do próprio setor). */
 export function montarArvorePorSetor(linhas: LinhaDaLista[], todos: ProcessoDaLista[], setores: SetorDoQuadro[]): SetorRaizDaArvore[] {
@@ -96,5 +96,5 @@ function novoSetor(raiz: LinhaDaLista, setores: SetorDoQuadro[]): SetorDaArvore 
 
 function dadosDoSetor(raiz: LinhaDaLista, setores: SetorDoQuadro[]) {
   const cadastrado = setores.find((setor) => setor.id === raiz.setorId)
-  return { id: raiz.setorId, sigla: raiz.setorSigla, nome: cadastrado?.nome ?? raiz.setorSigla }
+  return { id: raiz.setorId, sigla: raiz.setorSigla, nome: cadastrado?.nome ?? raiz.setorSigla, cor: cadastrado?.cor ?? raiz.setorCor ?? 1 }
 }

@@ -1,7 +1,8 @@
 import { ROTULO_DA_ETIQUETA } from '../../processos/rotulos'
 import type { EtiquetaDaEtapa } from '../../processos/tipos'
 
-// Os três desenhos da identidade: círculo vazio, meio preenchido em azul e círculo verde com visto.
+// Os três desenhos da identidade: círculo vazio, meio preenchido e círculo cheio com visto; todos no quase preto do texto,
+// e só a forma diz o valor (ADR 0040).
 function Desenho({ valor, tamanho }: { valor: EtiquetaDaEtapa; tamanho: number }) {
   return (
     <svg width={tamanho} height={tamanho} viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">

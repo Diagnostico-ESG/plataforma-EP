@@ -36,12 +36,12 @@ async function listar(cliente: ClienteSupabase): Promise<MacroprocessoDaLista[]>
 
 type VinculoLido = {
   observacao: string | null
-  setores: { id: string; sigla: string; nome: string; ativo: boolean } | null
+  setores: { id: string; sigla: string; nome: string; ativo: boolean; cor: number } | null
 }
 
 async function ler(cliente: ClienteSupabase, id: string): Promise<MacroprocessoComSetores | null> {
   const { data, error } = await cliente.from('macroprocessos')
-    .select('id, codigo, nome, descricao, categoria, ativo, setores_envolvidos(observacao, setores(id, sigla, nome, ativo))')
+    .select('id, codigo, nome, descricao, categoria, ativo, setores_envolvidos(observacao, setores(id, sigla, nome, ativo, cor))')
     .eq('id', id)
   if (error) throw new Error(`Falha ao ler o macroprocesso: ${error.message}`)
   if (!data[0]) return null
@@ -53,7 +53,7 @@ async function ler(cliente: ClienteSupabase, id: string): Promise<MacroprocessoC
 function setoresEnvolvidos(vinculos: VinculoLido[]): SetorEnvolvido[] {
   return vinculos
     .flatMap(({ observacao, setores }) => (setores
-      ? [{ setorId: setores.id, sigla: setores.sigla, nome: setores.nome, ativo: setores.ativo, observacao }]
+      ? [{ setorId: setores.id, sigla: setores.sigla, nome: setores.nome, ativo: setores.ativo, cor: setores.cor, observacao }]
       : []))
     .sort((a, b) => a.sigla.localeCompare(b.sigla, 'pt-BR'))
 }

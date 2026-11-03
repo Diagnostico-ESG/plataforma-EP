@@ -38,7 +38,7 @@ function criarSetoresSupabase(cliente: ClienteSupabase): OperacoesDeSetor {
 
 async function listarSetores(cliente: ClienteSupabase): Promise<SetorDaLista[]> {
   const { data, error } = await cliente.from('setores')
-    .select('id, sigla, nome, observacoes, ativo, setores_envolvidos(count)').order('sigla')
+    .select('id, sigla, nome, observacoes, ativo, cor, setores_envolvidos(count)').order('sigla')
   if (error) throw new Error(`Falha ao listar os setores: ${error.message}`)
   return data.map(({ setores_envolvidos: contagem, ...setor }) => ({
     ...setor, quantidadeDeMacroprocessos: contagem[0]?.count ?? 0,
@@ -52,7 +52,7 @@ type VinculoLido = {
 
 async function lerSetor(cliente: ClienteSupabase, id: string): Promise<SetorComMacroprocessos | null> {
   const { data, error } = await cliente.from('setores')
-    .select('id, sigla, nome, observacoes, ativo, setores_envolvidos(observacao, macroprocessos(id, codigo, nome))')
+    .select('id, sigla, nome, observacoes, ativo, cor, setores_envolvidos(observacao, macroprocessos(id, codigo, nome))')
     .eq('id', id)
   if (error) throw new Error(`Falha ao ler o setor: ${error.message}`)
   if (!data[0]) return null
@@ -68,7 +68,7 @@ function macroprocessosDoSetor(vinculos: VinculoLido[]): MacroprocessoDoSetor[] 
 }
 
 async function criarSetor(cliente: ClienteSupabase, dados: DadosDoSetor): Promise<void> {
-  // A coluna `cor` não é mais enviada (ADR 0039): o gatilho do banco dá valor ao setor novo, e os tipos gerados a pedem por ser obrigatória.
+  // Sem cor: o gatilho do banco dá o número ao setor novo, e a tela só o lê (ADR 0040). Os tipos gerados a pedem porque a coluna é obrigatória.
   const { error } = await cliente.from('setores').insert(dados as TablesInsert<'setores'>)
   if (error) throw falhaDoSetor(error, dados)
 }
