@@ -2061,4 +2061,4 @@ Entregue em 2026-11-02 (commit 358bb53), com ressalva: critérios [visual] 14 a 
 Implementado em 2026-11-03 (commit 5d8a729), miniatura-rapida
 Entregue em 2026-11-03 (commit cf80e8c), com ressalva: miniatura-rapida: o ganho da primeira abertura da miniatura (parte C do ADR 0038, memória da pasta conferida na função) não foi confirmado na medição do usuário (tempo igual, no backlog), e só a reabertura imediata (parte A) foi vista no app real; revisão de segurança foi a de reserva por leitura (o /security-review não achou mudanças a revisar); as ressalvas das entregas anteriores seguem valendo
 
-Entregue em 2026-11-03 (commit 3e7aaa6), com ressalva: critérios [visual] 8 a 10 de setor-neutro-e-fotos presumidos no app real (selo neutro e maior, ícones do Status, pílulas de Situação e foto do Google no cartão não vistos com o login; só o código e os testes conferidos)
+Entregue em 2026-11-03 (commit a973441), com ressalva: critérios [visual] 8 a 10 de setor-neutro-e-fotos presumidos no app real (selo neutro e maior, ícones do Status, pílulas de Situação e foto do Google no cartão não vistos com o login; só o código e os testes conferidos)

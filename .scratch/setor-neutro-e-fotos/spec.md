@@ -70,4 +70,4 @@ Estados de tela: não mudam (carregando, vazio e erro seguem como estão; a foto
 
 Implementado em 2026-11-03 (commit a5eba6e)
 
-Entregue em 2026-11-03 (commit 3e7aaa6), com ressalva: critérios [visual] 8 a 10 de setor-neutro-e-fotos presumidos no app real (selo neutro e maior, ícones do Status, pílulas de Situação e foto do Google no cartão não vistos com o login; só o código e os testes conferidos)
+Entregue em 2026-11-03 (commit a973441), com ressalva: critérios [visual] 8 a 10 de setor-neutro-e-fotos presumidos no app real (selo neutro e maior, ícones do Status, pílulas de Situação e foto do Google no cartão não vistos com o login; só o código e os testes conferidos)
