@@ -618,3 +618,11 @@ Ponto de partida da revisão: `marco/2026-10-26-inicio-quadro-livre-parte-5`.
 ## 2026-10-31 — /executar-complexo do ticket 01 de redesenho-do-quadro (faixa de controles)
 
 - **[Cadastrar processo] habilitado durante o carregamento.** A seção "Redesenho do Quadro" (Estados de tela e "Decisões tomadas ao escrever esta seção") pede os controles da faixa desabilitados até os dados chegarem. Construído: "Quadro ▾", [Filtros], "Só os meus" e os segmentos ficam desabilitados (um `fieldset` em `FaixaDeControles.tsx`); [Cadastrar processo] fica fora dele e habilitado, porque abrir o cadastro não depende da lista. Confirmado pelo usuário em 2026-10-31 ("manter").
+
+## 2026-11-03 — /polir de miniatura-rapida (impeccable audit e polish)
+
+- **Escopo da auditoria:** `MiniaturaDoFluxograma.tsx` e `.versao-destaque-miniatura*` em `VersaoEmDestaque.css`. A mudança só alterou o comportamento (imagem guardada na memória); a interface não mudou.
+- **Detector do impeccable:** nenhum achado nos dois arquivos.
+- **Conferido sem problema:** foco do teclado no botão da miniatura pela regra global `:focus-visible` (`index.css`); texto alternativo "Fluxograma {versão} de {processo}"; quadro de carregando com `role="status"` e rótulo; texto do aviso em `--texto-2`; cores só por variáveis; `max-width`/`max-height` com `object-fit: contain`, sem largura fixa que estoure.
+- **Corrigido:** nada, porque não havia o que corrigir.
+- **Deixado de fora:** nenhum achado. O critério `[visual]` 14 a 18 do redesenho (miniatura com um .png real) segue com a ressalva da entrega anterior: depende de o usuário ver no app com o login real.
