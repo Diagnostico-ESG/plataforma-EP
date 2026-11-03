@@ -25,7 +25,7 @@ export function LinhaDoMacro({ macro, aberto, aoAlternar, raiz }: GrupoProps & {
 }
 
 /** A linha do setor: selo da sigla, nome e quantos processos tem. */
-export function LinhaDoSetor({ setor, total, aberto, aoAlternar, raiz }: GrupoProps & { setor: { sigla: string; nome: string; cor: number }; total: number }) {
+export function LinhaDoSetor({ setor, total, aberto, aoAlternar, raiz }: GrupoProps & { setor: { sigla: string; nome: string }; total: number }) {
   return (
     <tr className={classeDoGrupo('setor', raiz)}>
       <th scope="rowgroup" colSpan={COLUNAS_DA_LISTA.length}>

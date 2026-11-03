@@ -2,7 +2,8 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import App from './App'
 import { AcessoFalso } from './acesso/AcessoFalso'
-import { CadastrosFalso, type SetorDoTeste } from './cadastros/CadastrosFalso'
+import { CadastrosFalso } from './cadastros/CadastrosFalso'
+import type { Setor } from './cadastros/tipos'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
@@ -16,7 +17,7 @@ afterEach(() => {
   window.location.hash = ''
 })
 
-const SETORES: SetorDoTeste[] = [
+const SETORES: Setor[] = [
   { id: 's1', sigla: 'AFT', nome: 'Assessoria Fictícia de Teste', observacoes: null, ativo: true },
   { id: 's2', sigla: 'CIT', nome: 'Coordenação Inventada de Teste', observacoes: 'Nota inventada', ativo: true },
   { id: 's3', sigla: 'EXT', nome: 'Setor Extinto de Teste', observacoes: null, ativo: false },

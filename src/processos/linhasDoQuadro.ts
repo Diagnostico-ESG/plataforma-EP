@@ -8,9 +8,8 @@ export type LinhaDoQuadro = {
   chave: string
   /** A sigla do setor, o nome da pessoa ou "Sem responsável". */
   titulo: string
-  /** Só por setor: o nome do setor e o número da cor dele, para o selo. */
+  /** Só por setor: o nome do setor, para o selo. */
   nome?: string
-  cor?: number
   /** Só por responsável: a própria pessoa, que a tela chama de "Você". */
   voce?: boolean
   /** O setor ou a pessoa da linha foi desativado. */
@@ -33,7 +32,7 @@ function linhasPorSetor(processos: ProcessoDaLista[], setores: SetorDoQuadro[]):
   const comCartao = new Set(processos.map((processo) => processo.setorId))
   return setores
     .filter((setor) => comCartao.has(setor.id))
-    .map((setor) => ({ chave: setor.id, titulo: setor.sigla, nome: setor.nome, cor: setor.cor, inativo: !setor.ativo }))
+    .map((setor) => ({ chave: setor.id, titulo: setor.sigla, nome: setor.nome, inativo: !setor.ativo }))
     .sort(porTitulo)
 }
 

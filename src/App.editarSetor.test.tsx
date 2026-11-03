@@ -4,7 +4,8 @@ import App from './App'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { Perfil } from './acesso/tipos'
-import { CadastrosFalso, type SetorDoTeste } from './cadastros/CadastrosFalso'
+import { CadastrosFalso } from './cadastros/CadastrosFalso'
+import type { Setor } from './cadastros/tipos'
 import { ProcessosFalso } from './processos/ProcessosFalso'
 import { VersoesFalso } from './versoes/VersoesFalso'
 import { RevisoesFalso } from './revisoes/RevisoesFalso'
@@ -18,7 +19,7 @@ afterEach(() => {
   window.location.hash = ''
 })
 
-const SETORES: SetorDoTeste[] = [
+const SETORES: Setor[] = [
   { id: 's1', sigla: 'AFT', nome: 'Assessoria Fictícia de Teste', observacoes: null, ativo: true },
   { id: 's2', sigla: 'CIT', nome: 'Coordenação Inventada de Teste', observacoes: 'Nota inventada', ativo: true },
 ]

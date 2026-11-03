@@ -44,7 +44,7 @@ function montar() {
   falso.etapasDoCatalogo = [MODELAGEM]
   falso.processos = PROCESSOS
   falso.setores = [
-    { id: 's1', sigla: 'TSA', nome: 'Setor A', ativo: true, cor: 3 }, { id: 's2', sigla: 'TSB', nome: 'Setor B', ativo: true, cor: 5 },
+    { id: 's1', sigla: 'TSA', nome: 'Setor A', ativo: true }, { id: 's2', sigla: 'TSB', nome: 'Setor B', ativo: true },
   ]
   const versoes = new VersoesFalso()
   versoes.versoes = { p1: [], p5: [] }

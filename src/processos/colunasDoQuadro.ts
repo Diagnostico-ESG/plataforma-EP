@@ -6,8 +6,6 @@ export type ColunaDoQuadro = {
   chave: string; titulo: string; processos: ProcessoDaLista[]
   /** Só no Quadro por setor: o nome do setor, abaixo da sigla do título. */
   subtitulo?: string
-  /** Só no Quadro por setor: o número da cor do setor, para o selo do título. */
-  cor?: number
   /** No Quadro por responsável e por setor: a pessoa ou o setor da coluna foi desativado. */
   inativo?: boolean
 }
@@ -90,7 +88,7 @@ export function colunasPorSetor(
   const colunas = [...setores]
     .sort(porSigla)
     .map((setor) => ({
-      chave: setor.id, titulo: setor.sigla, subtitulo: setor.nome, inativo: !setor.ativo, cor: setor.cor,
+      chave: setor.id, titulo: setor.sigla, subtitulo: setor.nome, inativo: !setor.ativo,
       processos: noQuadro.filter((processo) => processo.setorId === setor.id),
     }))
     .filter((coluna) => (setorFiltrado === null ? !coluna.inativo || coluna.processos.length > 0 : coluna.chave === setorFiltrado))
