@@ -1,6 +1,6 @@
 # Próximo passo (2026-11-03)
 
-**Situação:** a correção das Linhas do Quadro (bug: grade virava fila por ordem de carregamento do CSS) está no commit `a59677c` e seguintes, na `main`, com marco `marco/2026-11-03-antes-correcao-linhas-do-quadro`. Code-review feito (padrões e spec, sem achado duro). Falta o `/polir` da interface e a sua conferência no app real: o critério `[visual]` 15 (colunas alinhadas, cabeçalho único no alto, selo no cabeçalho da linha) segue presumido.
+**Situação:** a correção das Linhas do Quadro (bug: grade virava fila por ordem de carregamento do CSS) está no commit `a59677c` e seguintes, na `main`, com marco `marco/2026-11-03-antes-correcao-linhas-do-quadro`; a segunda correção (altura das linhas: cada linha cresce com seus cartões) está nos commits `12affa2` e `f77b41c`, com marco `marco/2026-11-03-antes-correcao-altura-das-linhas`. As duas correções vieram depois da última marca de entrega (`a973441`); conferido pelo `/situação` em 2026-11-03. Code-review feito (padrões e spec, sem achado duro). Falta o `/polir` da interface e a sua conferência no app real: o critério `[visual]` 15 (colunas alinhadas, cabeçalho único no alto, selo no cabeçalho da linha) segue presumido.
 
 **Próximo comando:** `/polir` (Sonnet), se quiser; ou só abrir o app com o login e conferir o Quadro por etapa com Linhas = Setor e = Responsável. Se destoar, `/demanda`. Sessão nova começando pelo `/situação`.
 
