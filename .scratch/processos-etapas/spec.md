@@ -2059,3 +2059,4 @@ Entregue em 2026-10-30 (commit 3287d10), com ressalva: critério [visual] 11 de 
 Entregue em 2026-11-02 (commit 358bb53), com ressalva: critérios [visual] 14 a 18 de redesenho-do-quadro presumidos no app real (faixa, Linhas, Destacar os meus, verso enxuto e ícones vistos só na vitrine local com módulos falsos, a 1366×768, e a miniatura nunca vista com um .png de verdade; nada visto com o login real); revisão de segurança foi a de reserva (o /security-review não achou mudanças a revisar); as ressalvas das entregas anteriores seguem valendo
 
 Em revisão desde 2026-11-03 (miniatura-rapida, ADR 0038)
+Implementado em 2026-11-03 (commit 5d8a729), miniatura-rapida
