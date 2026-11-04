@@ -31,3 +31,8 @@
 - **Falso alarme da revisão de spec:** os arquivos de cor do setor (ADR 0040) aparecem no intervalo só porque o ponto de partida é anterior à entrega de `setor-neutro-e-fotos` (`e863a5c`, 2026-11-03), que já tem a sua marca.
 - **Spec atualizada** para o que foi construído: item 7 não feito (ADR 0043), item 10 (14 linhas), item 11 (duas colunas), critérios 5, 6, 16 e 17.
 - **Cobertura:** 98,21% das instruções, 94,44% dos ramos, 98,67% das funções, 99,19% das linhas (piso 70%). **Dependência circular:** nenhuma. `package.json` e `supabase/` não mudaram: sem auditoria de pacotes, sem revisão de segurança do código (nenhum login, dado de fora ou política novos) e sem passos de banco.
+
+## 2026-11-04 — Revisão de segurança do código (reserva, depois do /ship)
+- O `/security-review` padrão não achou diff (branch já integrada na `main`); foi feita a revisão de reserva, menos completa, por um agente que leu `src/` de `a973441` a HEAD (99 arquivos, quase só telas, CSS e testes).
+- **Resultado: nenhum achado com confiança 8 ou mais.** Sem `dangerouslySetInnerHTML`/`innerHTML`/`eval`/`window.open` novos; cor do setor entra por tabela fixa (sem injeção de CSS); nenhuma leitura nova de parâmetro de endereço; o formulário de versão só afrouxou regra da tela (servidor e banco seguem validando e aceitando .bpmn, ADR 0042); sem segredo, `localStorage` nem log com dado pessoal; única consulta nova é a coluna `cor` de `setores`, por chave publicável com RLS.
+- **Fora da revisão:** `supabase/` (RLS da coluna `cor`, função do Drive), que este `/ship` não alterou.
