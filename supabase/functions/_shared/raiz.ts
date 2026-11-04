@@ -6,10 +6,11 @@
 /** Os pais de um item do Drive; null quando o Drive não o acha. */
 export type LerPais = (id: string) => Promise<string[] | null>
 
-// Arquivo -> pasta do processo -> pasta do setor -> raiz: do pai do arquivo, só mais dois níveis.
-const NIVEIS_ACIMA_DO_PAI = 2
+// Arquivo de versão: pasta do processo -> pasta do setor -> raiz. Anexo: subpasta "Anexos" -> pasta do processo -> pasta do setor -> raiz.
+// Do pai do arquivo, o anexo precisa de três níveis acima; com dois, a prova no Drive real recusou todo anexo (2026-11-04).
+const NIVEIS_ACIMA_DO_PAI = 3
 
-/** `pais` são os pais do item. Verdadeiro se algum deles é a raiz ou chega nela em até dois níveis. */
+/** `pais` são os pais do item. Verdadeiro se algum deles é a raiz ou chega nela em até três níveis. */
 export async function estaSobARaiz(
   pais: string[], raizId: string, lerPais: LerPais, niveis: number = NIVEIS_ACIMA_DO_PAI,
 ): Promise<boolean> {

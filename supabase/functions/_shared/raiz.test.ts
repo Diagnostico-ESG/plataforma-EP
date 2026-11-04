@@ -5,6 +5,8 @@ const RAIZ = 'raiz-do-ambiente'
 
 // O Drive do teste: arquivo -> pasta do processo -> pasta do setor -> raiz; "de-fora" é outro Drive.
 const PAIS_NO_DRIVE: Record<string, string[]> = {
+  // O anexo mora uma pasta mais fundo: arquivo -> Anexos -> processo -> setor -> raiz (ADR 0027).
+  'pasta-anexos': ['pasta-do-processo'],
   'pasta-do-processo': ['pasta-do-setor'],
   'pasta-do-setor': [RAIZ],
   'pasta-solta': ['outro-drive'],
@@ -45,16 +47,21 @@ describe('estaSobARaiz', () => {
     expect(await estaSobARaiz(['pasta-que-nao-existe'], RAIZ, lerPais)).toBe(false)
   })
 
+  it('aceita o anexo: na subpasta Anexos, que está na pasta do processo, do setor, na raiz', async () => {
+    const { lerPais } = drive()
+    expect(await estaSobARaiz(['pasta-anexos'], RAIZ, lerPais)).toBe(true)
+  })
+
   it('aceita se qualquer um dos pais leva à raiz', async () => {
     const { lerPais } = drive()
     expect(await estaSobARaiz(['pasta-solta', 'pasta-do-processo'], RAIZ, lerPais)).toBe(true)
   })
 
-  it('para depois de dois níveis acima do pai (arquivo, processo, setor, raiz) e não segue ciclo', async () => {
+  it('para depois de três níveis acima do pai (anexo, Anexos, processo, setor, raiz) e não segue ciclo', async () => {
     const { lerPais, lidos } = drive()
     expect(await estaSobARaiz(['pasta-em-ciclo'], RAIZ, lerPais)).toBe(false)
-    expect(lidos.length).toBeLessThanOrEqual(2)
-    const profundo: LerPais = (id) => Promise.resolve(id === 'a' ? ['b'] : id === 'b' ? ['c'] : id === 'c' ? [RAIZ] : null)
+    expect(lidos.length).toBeLessThanOrEqual(3)
+    const profundo: LerPais = (id) => Promise.resolve(id === 'a' ? ['b'] : id === 'b' ? ['c'] : id === 'c' ? ['d'] : id === 'd' ? [RAIZ] : null)
     expect(await estaSobARaiz(['a'], RAIZ, profundo)).toBe(false)
   })
 })
@@ -69,6 +76,12 @@ function comRelogio() {
 }
 
 describe('estaSobARaizComMemoria', () => {
+  it('aceita o anexo também pela conferência com memória', async () => {
+    const { lerPais } = drive()
+    const { memoria } = comRelogio()
+    expect(await estaSobARaizComMemoria(['pasta-anexos'], RAIZ, lerPais, memoria)).toBe(true)
+  })
+
   it('na segunda conferência da mesma pasta não lê o Drive de novo', async () => {
     const { lerPais, lidos } = drive()
     const { memoria } = comRelogio()
