@@ -8,13 +8,13 @@ Nada de chave, senha ou conteúdo de `dados-reais/` na conversa. Cole só as lin
 
 | Ressalva em aberto | Passo |
 |---|---|
-| Função `arquivos-no-drive` nunca publicada a partir da `main` (várias ações novas: registrar com relatório, histórica, substituir, conferir, retirar, renumerar) | A, B |
+| Função `arquivos-no-drive` publicada em 2026-10-17 e 2026-10-20, mas depois ela mudou de novo (retirar, renumerar etc.) e a publicação a partir da `main` não foi reconferida | A, B |
 | Saída do Integrante não foi colada (tickets 01, 02, 04, 05); `files.copy` nunca apareceu numa saída | B |
 | Versão histórica e relatório sozinho: já estão no script, mas nunca rodaram numa prova com saída colada | B |
 | Troca de sigla do setor e mudança de setor (ticket 08, critérios 3 e 4) | C1, C2 |
 | Retirada de anexo manda para a lixeira do Drive (ADR 0027) | C3 |
 | Acrescentar arquivo à versão, e a recusa na versão aprovada | C4 |
-| Arrumação adiada (seção 7 do roteiro antigo) | D |
+| Arrumação adiada (seção 7 do roteiro antigo; o Email já foi desligado, o resto segue no backlog) | D |
 
 Já provados e **fora** deste roteiro: renomear processo e a pasta acompanhar (2026-10-16), marcas "Alterado fora da plataforma" e "Não encontrado" (2026-10-16), ação renumerar (2026-10-27).
 
@@ -46,7 +46,7 @@ Devem aparecer `EP_DRIVE_CONTA_JSON_BASE64`, `EP_DRIVE_RAIZ_ID` e `EP_ORIGENS_AC
 npx supabase functions deploy arquivos-no-drive --use-api --project-ref yclkzyoebpsxmgpbcbus
 ```
 
-5. Confira no painel do Supabase de desenvolvimento, em **Authentication → Sign In / Providers**, que o **Email** está ligado (a seção 7 antiga nunca foi feita, então deve estar). Confira também que os usuários `prova.integrante@ccivil.pr.gov.br` e `prova.consulta@ccivil.pr.gov.br` ainda existem e estão ativos; se foram desativados, reative na Administração. Se não existirem mais, refaça o passo 5 do roteiro antigo.
+5. Confira no painel do Supabase de desenvolvimento, em **Authentication → Sign In / Providers**, **ligue o Email** (o backlog registra que ele já foi desligado, em 2026-10-19; o script entra com e-mail e senha, então precisa dele ligado). Confira também os usuários `prova.integrante@ccivil.pr.gov.br` e `prova.consulta@ccivil.pr.gov.br`: o backlog manda desativá-los, então talvez estejam desativados. Se estiverem, reative na Administração; se não existirem mais, refaça o passo 5 do roteiro antigo (autorizar os e-mails no SQL Editor e criar os dois em Authentication → Users, com senha inventada e Auto Confirm). Todo esse passo é desfeito no D.
 6. Confira que há pelo menos um processo **em andamento** sem versão nova (a prova da versão histórica só roda nesse caso; se não houver, o passo sai como "pulado", o que é aceitável).
 
 ## B. Rodar o script
@@ -93,7 +93,7 @@ Só depois de colar tudo acima:
 
 1. No Drive "EP – desenvolvimento", apague os arquivos de teste (`_V99_` e os anexos de teste). As pastas podem ficar.
 2. Desative os dois usuários inventados na Administração.
-3. No painel do Supabase de desenvolvimento, desligue de novo o **Email** (Authentication → Sign In / Providers).
+3. No painel do Supabase de desenvolvimento, desligue de novo o **Email** (Authentication → Sign In / Providers), que o A.5 ligou.
 
 ## E. O que eu faço quando você colar
 
