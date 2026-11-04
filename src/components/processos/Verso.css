@@ -1,5 +1,5 @@
-/* O verso do cartão (spec, "Verso enxuto"): janela central de tamanho fixo, cerca de 880 × 740, que não cresce com o conteúdo:
-   o cabeçalho fica no alto e o corpo rola por dentro. Abaixo de 900 px, a tela inteira. */
+/* O verso do cartão (spec, "Verso enxuto"): janela central de tamanho fixo, cerca de 1000 × 740, que não cresce com o conteúdo:
+   o cabeçalho fica no alto e o corpo, em duas colunas (ADR 0042), rola por dentro. Abaixo de 900 px, a tela inteira. */
 .verso {
   width: min(1000px, calc(100vw - 2 * var(--esp-5)));
   max-width: none;

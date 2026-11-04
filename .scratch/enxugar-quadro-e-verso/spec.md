@@ -22,11 +22,11 @@ Funcionalidade 21 do `.scratch/projeto.md`, no modo completo do `/planejar` (202
 4. **Verso sem rótulos Etapa e Status.** O seletor de etapa e o de Status ficam sem o rótulo visível; o nome continua no rótulo de acessibilidade.
 5. **Sem [Assumir].** Pôr-se como responsável é escolher a si mesmo na seleção, em que quem está na tela aparece em primeiro lugar, como "Você". Sai também dos lugares em que o [Assumir] aparecia fora do Agora.
 6. **Sem envio de .bpmn.** Sai o campo do formulário Enviar versão (piloto e em sequência), o "+ Acrescentar .bpmn" da versão e o campo da versão histórica. A versão histórica passa a exigir o .bpm (o .png e o relatório seguem opcionais). Os .bpmn já enviados continuam na versão, para baixar e substituir.
-7. **Sem [Enviar relatório].** Sai o botão das etapas Relatório e modelagem técnica e Revisão interna. O relatório entra pelo campo do formulário Enviar versão ou pelo "+ Acrescentar relatório" da versão mais recente. O botão continua "Enviar versão" nessas etapas e "Enviar versão piloto" na Modelagem piloto. A confirmação de arquivos que oferece enviar o relatório agora passa a abrir o formulário da versão (ou o "+ Acrescentar relatório", quando a versão já existe), no lugar do formulário de relatório.
+7. **(NÃO FEITO, ADR 0043: o [Enviar relatório] fica por ora; o "+ Acrescentar relatório" que este item supõe não existe mais.)** ~~Sem [Enviar relatório].~~ Sai o botão das etapas Relatório e modelagem técnica e Revisão interna. O relatório entra pelo campo do formulário Enviar versão ou pelo "+ Acrescentar relatório" da versão mais recente. O botão continua "Enviar versão" nessas etapas e "Enviar versão piloto" na Modelagem piloto. A confirmação de arquivos que oferece enviar o relatório agora passa a abrir o formulário da versão (ou o "+ Acrescentar relatório", quando a versão já existe), no lugar do formulário de relatório.
 8. **Linha de etapas só visual.** A linha continua com os ícones (ADR 0041) e perde o "Realizada em" da Modelagem piloto.
 9. **Campo da Data da modelagem piloto.** A data ganha um campo fixo no verso, com o rótulo "Data da modelagem piloto", do processo na Modelagem piloto em diante (fora de Não iniciados); mostra a data ou "Registrar data", e quem pode alterar o processo registra ou altera ali. Sai do Agora. As regras da data não mudam (nunca no futuro, uma por processo, não move o processo).
-10. **Anotações com metade da altura.** A altura mínima do campo cai à metade.
-11. **Miniatura maior e verso rearrumado.** A miniatura do fluxograma cresce até o dobro, e os elementos do verso se reorganizam no espaço que sobrou. A arrumação é decidida numa prévia que o usuário aprova antes do código (critério 18).
+10. **Anotações menores.** A altura mínima do campo cai de 21 para 14 linhas (a spec previa 10,5; mudado a pedido do usuário), com a borda na cor `--linha`.
+11. **Miniatura maior e verso em duas colunas.** A miniatura do fluxograma cresce ao dobro (22rem × 16rem). O verso passa a ter duas colunas na janela de 1000 px: à esquerda trilha, Agora, Data da modelagem piloto e versões; à direita, em fundo mais escuro (`--fundo-faixa`), as Anotações. Abaixo de 900 px as colunas empilham. A arrumação foi proposta pelo usuário e aprovada vendo o app real (critério 18).
 12. **Lista agrupada.** Com "Agrupar por: Macroprocesso" ou "Setor", saem as colunas Macroprocesso e Setor. Em todos os agrupamentos, o atraso sai do lado do nome do processo e vai para junto da Etapa atual, como relógio e número ("🕓 8"), com o texto completo ("8 dias nesta etapa") no rótulo de acessibilidade e como dica. Em "Agrupar por: Nenhum", as colunas Macroprocesso e Setor ficam.
 13. **Prévia antes do código.** O Quadro com as faixas e o verso rearrumado são mostrados ao usuário numa prévia, que ele aprova antes de a execução mexer nas telas.
 
@@ -136,8 +136,8 @@ Nenhuma tela passa a buscar dado novo. O que já existe continua: carregando, va
 2. Os seletores de etapa e de Status do Agora não têm rótulo visível e são anunciados como "Etapa" e "Status".
 3. Nenhum campo ou botão de envio de .bpmn (Enviar versão, Enviar versão piloto, "+ Acrescentar" e versão histórica); o .bpmn já enviado aparece com link para baixar e "Substituir".
 4. A versão histórica não se registra sem o .bpm.
-5. Nenhum [Enviar relatório] nas etapas Relatório e modelagem técnica e Revisão interna; o botão diz "Enviar versão" nelas e "Enviar versão piloto" na Modelagem piloto; o "+ Acrescentar relatório" continua.
-6. A confirmação de arquivos com relatório faltando leva a um caminho de envio que existe na tela.
+5. (Não aplicável, ADR 0043.) Nenhum [Enviar relatório] nas etapas Relatório e modelagem técnica e Revisão interna; o botão diz "Enviar versão" nelas e "Enviar versão piloto" na Modelagem piloto; o "+ Acrescentar relatório" continua.
+6. (Não aplicável, ADR 0043: a confirmação continua abrindo o formulário de relatório, que existe.) A confirmação de arquivos com relatório faltando leva a um caminho de envio que existe na tela.
 7. A linha de etapas não mostra nenhuma data, nem "Realizada em".
 8. O campo "Data da modelagem piloto" aparece da Modelagem piloto em diante, não aparece em Não iniciados, registra e altera a data com as regras de hoje e é só leitura para a Consulta.
 9. A Lista agrupada por Macroprocesso ou por Setor não tem as colunas Macroprocesso e Setor; a Lista sem agrupamento tem.
@@ -147,8 +147,8 @@ Nenhuma tela passa a buscar dado novo. O que já existe continua: carregando, va
 13. `[visual]` Selo do setor menor, com a letra do mesmo tamanho, no cartão, na Lista, no verso, nos cadastros e nos cabeçalhos.
 14. `[visual]` Cada coluna do Quadro (por etapa, por responsável, por setor e nas Linhas) numa faixa de tom neutro do título ao fim, com o título dentro e alinhado à margem dos cartões; títulos sem pílula, com a quantidade em número discreto; o ícone da etapa continua no Quadro por etapa.
 15. `[visual]` Cartão parado com a borda comum.
-16. `[visual]` Anotações com metade da altura de antes.
-17. `[visual]` Miniatura do fluxograma maior (até o dobro) e verso rearrumado como na prévia aprovada, sem rolagem a mais em 1366×768.
+16. `[visual]` Anotações com 14 linhas de altura mínima (antes 21), na coluna da direita.
+17. `[visual]` Miniatura do fluxograma no dobro e verso em duas colunas como aprovado, com as Anotações sempre à vista em 1366×768.
 18. `[visual]` A prévia do Quadro com faixas e do verso rearrumado foi aprovada pelo usuário antes do código.
 19. `[visual]` Na Lista, o relógio com o número fica junto da Etapa atual e o nome do processo fica limpo.
 

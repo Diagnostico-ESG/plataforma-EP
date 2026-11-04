@@ -84,7 +84,7 @@ const SEM_OPCOES: OpcoesDosFiltros = { setores: [], macroprocessos: [], etapas: 
 
 function CorpoDaVisao(props: VisaoDosProcessosProps & { opcoes: OpcoesDosFiltros }) {
   const { visao, estado, filtros, aoMudarMostrar, mostrar, aoLimparTudo } = props
-  if (estado.tipo === 'carregando') return visao === 'quadro' ? <QuadroCarregando /> : <TabelaCarregando />
+  if (estado.tipo === 'carregando') return visao === 'quadro' ? <QuadroCarregando /> : <TabelaCarregando agrupada={props.agruparLista !== 'nenhum'} />
   if (estado.tipo === 'erro') return <ErroAoCarregar alvo="os processos" aoTentarDeNovo={props.aoTentarDeNovo} />
   const portfolio = ehPortfolio(visao, props.agrupar)
   const { filtrados, visiveis, vazio, semNaSituacao } = oQueAVisaoMostra(estado.valor.processos, filtros, portfolio, mostrar)

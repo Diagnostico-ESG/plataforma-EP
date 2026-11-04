@@ -37,7 +37,7 @@ type CorpoDoAgoraProps = {
 
 /**
  * O corpo do Agora para quem altera: a etapa e a etiqueta em listas que gravam ao escolher (sem confirmação), o
- * responsável pelo nome (que abre a troca) e [Assumir], o selo de processo parado e os avisos (revisor, chegada a Concluídos).
+ * responsável pelo nome (que abre a troca; quem está na tela é a opção "Você"), o selo de processo parado e os avisos (revisor, chegada a Concluídos).
  */
 export function CorpoDoAgora(props: CorpoDoAgoraProps) {
   const { processo, movimento, rotulo } = props

@@ -22,6 +22,9 @@ export const COLUNAS_DA_LISTA: ColunaDoCabecalho[] = [
 
 const COLUNAS_DA_ARVORE = COLUNAS_DA_LISTA.filter(({ coluna }) => coluna !== 'setor' && coluna !== 'macroprocesso')
 
+/** Quantas colunas tem a Lista agrupada: o colSpan das linhas de grupo e de arquivos. */
+export const TOTAL_DE_COLUNAS_DA_ARVORE = COLUNAS_DA_ARVORE.length
+
 /** Agrupada por Macroprocesso ou Setor, a árvore já mostra os dois: saem as colunas Setor e Macroprocesso (ADR 0042). */
 export function colunasDaLista(agrupada: boolean): ColunaDoCabecalho[] {
   return agrupada ? COLUNAS_DA_ARVORE : COLUNAS_DA_LISTA

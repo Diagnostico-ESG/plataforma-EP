@@ -1,4 +1,4 @@
-import { COLUNAS_DA_LISTA, type ColunaDoCabecalho, colunasDaLista } from '../../processos/colunasDaLista'
+import { type ColunaDoCabecalho, colunasDaLista } from '../../processos/colunasDaLista'
 import type { FiltrosDosProcessos as Filtros, MostrarNoPortfolio } from '../../processos/enderecoDosProcessos'
 import type { OpcaoDoFiltro, OpcoesDosFiltros } from '../../processos/filtrosDosProcessos'
 import type { ColunaDaLista, OrdenacaoDaLista, SentidoDaOrdem } from '../../processos/ordenacaoDaLista'
@@ -33,10 +33,10 @@ export function CabecalhoDaLista(props: CabecalhoDaListaProps) {
 }
 
 /** O cabeçalho sem menus, enquanto a Lista carrega (ainda não há opções de filtro). */
-export function CabecalhoCarregando() {
+export function CabecalhoCarregando({ agrupada = false }: { agrupada?: boolean }) {
   return (
     <thead>
-      <tr>{COLUNAS_DA_LISTA.map(({ coluna, rotulo }) => <th key={coluna} scope="col">{rotulo}</th>)}</tr>
+      <tr>{colunasDaLista(agrupada).map(({ coluna, rotulo }) => <th key={coluna} scope="col">{rotulo}</th>)}</tr>
     </thead>
   )
 }

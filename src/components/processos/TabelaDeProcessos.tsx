@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { COLUNAS_DA_LISTA } from '../../processos/colunasDaLista'
+import { colunasDaLista } from '../../processos/colunasDaLista'
 import type { LinhaDaLista } from '../../processos/linhasDaLista'
 import { LinhaFantasma } from '../cadastros/PecasDaLista'
 import { CabecalhoCarregando } from './CabecalhoDaLista'
@@ -27,13 +27,13 @@ export function TabelaDeProcessos({ cabecalho, linhas, idEscolhido, aoAbrir }: T
   )
 }
 
-export function TabelaCarregando() {
+export function TabelaCarregando({ agrupada = false }: { agrupada?: boolean }) {
   return (
     <table className="tabela-cadastros tabela-de-processos" aria-busy="true">
       <caption role="status">Carregando processos…</caption>
-      <CabecalhoCarregando />
+      <CabecalhoCarregando agrupada={agrupada} />
       <tbody>
-        {Array.from({ length: LINHAS_FANTASMA }, (_, i) => <LinhaFantasma key={i} colunas={COLUNAS_DA_LISTA.length} />)}
+        {Array.from({ length: LINHAS_FANTASMA }, (_, i) => <LinhaFantasma key={i} colunas={colunasDaLista(agrupada).length} />)}
       </tbody>
     </table>
   )

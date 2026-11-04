@@ -214,13 +214,13 @@ function ColunasDoVerso(props: CorpoProps) {
   return (
     <div className="verso-corpo">
       <div className="verso-principal">
-      <CaminhoDoProcesso processo={processo} processos={processos} versoes={versoes} revisoes={revisoes} registros={registros} podeAlterar={podeAlterar} usuarioId={usuarioId}
-        executar={executar} aoSumir={aoSumir} aoMudar={aposMudar} />
-      <DataDaModelagemPiloto processo={processo} processos={processos} podeAlterar={podeAlterar} aoMudar={aposMudar} aoSumir={aoSumir} />
-      <div className="verso-versao">
+        <CaminhoDoProcesso processo={processo} processos={processos} versoes={versoes} revisoes={revisoes} registros={registros} podeAlterar={podeAlterar}
+          usuarioId={usuarioId} executar={executar} aoSumir={aoSumir} aoMudar={aposMudar} />
+        <DataDaModelagemPiloto processo={processo} processos={processos} podeAlterar={podeAlterar} aoMudar={aposMudar} aoSumir={aoSumir} />
+        <div className="verso-versao">
           <SecaoDeVersoes key={versaoAprovada} versoes={versoes} processo={processo} podeAlterar={podeAlterar} aoAlterarVersoes={aposMudar} />
           <SecaoDeAnexos versoes={versoes} processo={processo} podeAlterar={podeAlterar} />
-      </div>
+        </div>
       </div>
       <aside className="verso-lateral">
         <BlocoDasAnotacoes key={processo.id} processo={processo} processos={processos} podeEscrever={podeAlterar}

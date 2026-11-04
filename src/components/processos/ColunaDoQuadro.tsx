@@ -106,18 +106,13 @@ export function CabecalhoDaColuna({ coluna, agrupar }: { coluna: Coluna; agrupar
       <span className="coluna-titulo-texto">
         <span className="coluna-titulo-principal">
           {agrupar === 'etapa' && <Icone nome={iconeDaEtapa(coluna.chave)} tamanho={16} />}
-          <TituloDaColuna coluna={coluna} />{coluna.inativo && <> <Pilula situacao="neutra">Inativo</Pilula></>}
+          {coluna.titulo}{coluna.inativo && <> <Pilula situacao="neutra">Inativo</Pilula></>}
         </span>
       </span>
       {coluna.subtitulo && <span className="coluna-titulo-nome">{coluna.subtitulo}</span>}
       <span className="coluna-contagem">{coluna.processos.length}</span>
     </h3>
   )
-}
-
-// Por setor a sigla é só o texto em negrito, sem a pílula: o selo da cor do setor fica no cartão (ADR 0040 e 0042).
-function TituloDaColuna({ coluna }: { coluna: Coluna }) {
-  return <>{coluna.titulo}</>
 }
 
 // Por setor a coluna é anunciada pela sigla, pelo nome e, no setor desativado, por "inativo": o aria-label encobre a pílula.
