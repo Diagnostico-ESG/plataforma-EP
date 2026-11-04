@@ -13,9 +13,9 @@
 
 **Arquivos:** criar `.scratch/enxugar-quadro-e-verso/previa-quadro.html` e `previa-verso.html` (HTML solto, dados inventados, fora do `src/`, sem dependência).
 
-- [ ] 0.1 Ler `src/components/processos/{Quadro,Painel,Etapas,Contexto}.css`, `src/components/versoes/Versoes.css`, `src/styles/tokens.css` e copiar as variáveis de cor reais para a prévia, para ela parecer o app.
-- [ ] 0.2 `previa-quadro.html`: as colunas com faixa neutra única (título dentro, alinhado à margem dos cartões) nos três quadros (etapa com ícone+nome+número cinza; setor com sigla em negrito + nome abaixo + número; responsável com avatar+nome+número), uma coluna vazia, cartão parado com borda comum e selo de dias, selo do setor menor (sem a letra mudar de 13px).
-- [ ] 0.3 `previa-verso.html`: o verso rearrumado em 1366×768 — trilha de ícones sem data, Agora (seletores sem rótulo visível, responsável sem [Assumir]), campo "Data da modelagem piloto", Documentos com a miniatura até o dobro, Anotações com metade da altura. Se houver mais de uma arrumação plausível, mostrar duas (A e B) na mesma página, com a recomendação.
+- [x] 0.1 Ler `src/components/processos/{Quadro,Painel,Etapas,Contexto}.css`, `src/components/versoes/Versoes.css`, `src/styles/tokens.css` e copiar as variáveis de cor reais para a prévia, para ela parecer o app.
+- [x] 0.2 `previa-quadro.html`: as colunas com faixa neutra única (título dentro, alinhado à margem dos cartões) nos três quadros (etapa com ícone+nome+número cinza; setor com sigla em negrito + nome abaixo + número; responsável com avatar+nome+número), uma coluna vazia, cartão parado com borda comum e selo de dias, selo do setor menor (sem a letra mudar de 13px).
+- [x] 0.3 `previa-verso.html`: o verso rearrumado em 1366×768 — trilha de ícones sem data, Agora (seletores sem rótulo visível, responsável sem [Assumir]), campo "Data da modelagem piloto", Documentos com a miniatura até o dobro, Anotações com metade da altura. Se houver mais de uma arrumação plausível, mostrar duas (A e B) na mesma página, com a recomendação.
 - [ ] 0.4 Abrir as duas no navegador do app, conferir em 1366×768 e mostrar ao usuário (captura + caminho dos arquivos). Registrar a aprovação (ou o pedido de ajuste) em `.scratch/enxugar-quadro-e-verso/desvios.md` com a data. Comitar as prévias e o registro.
 
 ## Tarefa 1 — Selo do setor menor e cartão parado sem borda (critérios 11, 13, 15)

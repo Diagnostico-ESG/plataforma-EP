@@ -1,0 +1,184 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Prévia do Quadro</title>
+<style>/* Tokens da identidade visual (fonte: .scratch/identidade-visual.md).
+   Único lugar com códigos de cor; o resto do CSS usa só estas variáveis. */
+
+@font-face {
+  font-family: 'Source Sans 3';
+  src: url('/fonts/source-sans-3-latin.woff2') format('woff2');
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('/fonts/ibm-plex-mono-400-latin.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('/fonts/ibm-plex-mono-500-latin.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+
+:root {
+  /* Moldura neutra: grafite na faixa lateral, branco e cinza-claro no resto */
+  --grafite: #252b36;
+  --grafite-icone: #9aa3b2;
+  --grafite-hover: rgb(255 255 255 / 8%);
+
+  /* Azul: cheio só na ação principal; azul-claro com texto azul-escuro em tudo que está escolhido ou ligado */
+  --azul: #3a5afe;
+  --azul-claro: #e8edff;
+  --azul-escuro: #2a44c9;
+
+  /* Superfícies e linhas */
+  --fundo: #f3f4f7;
+  --fundo-cabecalho: #fafbfc;
+  --fundo-grupo: #f6f7f9;
+  --fundo-contexto: var(--fundo-cabecalho);
+  --folha: #ffffff;
+  --linha: #e3e6ec;
+  --linha-leve: #f0f2f5;
+  --linha-tracejada: #c3cad8;
+
+  /* Texto; `inativo` é só para ícones e enfeites (2,9:1 não serve para texto) */
+  --texto: #1d2330;
+  --texto-2: #5f6776;
+  --icone-inativo: #9098a6;
+
+  /* Trilha das 8 etapas */
+  --trilha-feita: #6b7a99;
+  --trilha-vazia: #e3e6ec;
+
+  /* Selo do tipo de arquivo (identidade, "Tipo de arquivo"); os tipos sem cor própria usam a do BPM.
+     O BPM é um pouco mais escuro que o #6b7a99 da identidade: com ele o branco dava 4,31:1, abaixo do AA (agora 4,83:1). */
+  --tipo-bpmn: #4f46e5;
+  --tipo-png: #0e7490;
+  --tipo-bpm: #64728f;
+  --tipo-docx: #2a44c9;
+  --tipo-pdf: #881337;
+  --tipo-eml: #c2410c;
+
+  /* Prazo: sempre ícone de calendário + texto, nunca só cor */
+  --atraso: #d1293d;
+  --vence: #b45309;
+
+  /* Avisos (verso e formulários): texto / fundo */
+  --atraso-texto: #8f1d2c;
+  --atraso-fundo: #fdecee;
+  --vencendo-texto: #7a4a00;
+  --vencendo-fundo: #fff6e5;
+
+  /* Situação do processo (selo discreto): texto / fundo */
+  --informativa-texto: var(--azul-escuro);
+  --informativa-fundo: var(--azul-claro);
+  --aprovado-texto: #166a4d;
+  --aprovado-fundo: #e6f4ef;
+  --neutra-texto: #4a5163;
+  /* Avatar dos outros usuários: cinza; o do próprio usuário usa o azul. */
+  --avatar-texto: #4a5163;
+  --avatar-fundo: #e9ecf1;
+  --neutra-fundo: #eef0f4;
+
+  /* Status da etapa, só ícone: círculo vazio, meio cheio, cheio com visto; os três no quase preto do texto, a forma é que distingue (ADR 0040) */
+  --etiqueta-a-fazer: var(--texto);
+  --etiqueta-iniciado: var(--texto);
+  --etiqueta-finalizado: var(--texto);
+
+  --pendencia-fundo: #fff6e5;
+  --pendencia-borda: #f3d28f;
+
+  /* Tipografia: base 14px */
+  --fonte: 'Source Sans 3', system-ui, sans-serif;
+  --fonte-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+  --tam-selo: 13px;
+  --tam-rotulo: 12px;
+  --tam-secundario: 13px;
+  --tam-base: 14px;
+  --tam-coluna: 15px;
+  --tam-cartao: 16px;
+  --tam-tela: 18px;
+  --tam-painel: var(--tam-tela);
+  --tam-verso-titulo: 20px;
+  --tam-pagina: 21px;
+
+  /* Espaçamento */
+  --esp-1: 4px;
+  --esp-2: 8px;
+  --esp-3: 12px;
+  --esp-4: 16px;
+  --esp-5: 24px;
+  --esp-6: 32px;
+
+  /* Forma: 8px em cartão, tabela, bloco e menu; 6px em botão, campo e aviso; 4px em selo; 12px em janela */
+  --largura-faixa: 56px;
+  --altura-barra: 52px;
+  --altura-controles: 56px;
+  --largura-conteudo: 1280px;
+  --largura-formulario: 550px;
+  --largura-coluna-quadro: 300px;
+  --largura-linha-quadro: 150px;
+  --canto: 8px;
+  --canto-botao: 6px;
+  --canto-selo: 4px;
+  --canto-janela: 12px;
+  --canto-macro: 2px;
+  /* Sombra só no que flutua; cartões e tabelas não têm */
+  --sombra-flutuante: 0 8px 24px rgb(29 35 48 / 12%), 0 2px 6px rgb(29 35 48 / 8%);
+  --sombra-janela: 0 24px 60px rgb(29 35 48 / 30%);
+  /* Sombra na borda do Quadro que rola para o lado: avisa que há colunas fora da vista. */
+  --sombra-de-rolagem: rgb(29 35 48 / 18%);
+  --veu-janela: rgb(29 35 48 / 45%);
+
+  /* Movimento */
+  --curva-saida: cubic-bezier(0.16, 1, 0.3, 1);
+}
+</style>
+<style>
+  :root { --faixa-coluna: #e7e9ee; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--fonte); background: var(--fundo); color: var(--texto); font-size: var(--tam-base); }
+  .selo { display: inline-block; padding: 1px 6px; border-radius: 6px; background: var(--azul-claro); color: var(--azul-escuro); font-size: 13px; font-weight: 700; }
+  .num { color: var(--texto-2); font-family: var(--fonte-mono); font-size: 12px; font-weight: 500; }
+  .q { display: flex; gap: 14px; padding: 16px 24px; align-items: stretch; height: 330px; }
+  .col { flex: 0 0 300px; display: flex; flex-direction: column; background: var(--faixa-coluna); border-radius: 10px; padding: 0 12px 12px; }
+  .col h3 { margin: 0; padding: 12px 0 10px; font-size: 15px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .col h3 small { flex-basis: 100%; font-weight: 400; font-size: 12px; color: var(--texto-2); margin-top: -6px; }
+  .cards { display: flex; flex-direction: column; gap: 8px; }
+  .card { background: var(--folha); border: 1px solid var(--linha); border-radius: 8px; padding: 10px 12px; font-size: 16px; }
+  .rod { display: flex; gap: 8px; margin-top: 8px; font: 12px var(--fonte-mono); color: var(--texto-2); align-items: center; }
+  .parado { background: var(--atraso-fundo); color: var(--atraso-texto); border-radius: 6px; padding: 1px 6px; font: 600 12px var(--fonte); }
+  .av { width: 22px; height: 22px; border-radius: 50%; background: var(--avatar-fundo); display: inline-grid; place-items: center; font-size: 11px; color: var(--avatar-texto); }
+  .vazia { color: var(--texto-2); font-size: 13px; padding: 8px 0; }
+  .blk { padding: 8px 24px 0; }
+  .blk h2 { font-size: 14px; color: var(--texto-2); margin: 12px 0 0; }
+</style>
+
+<div class="blk"><h2>Quadro por etapa</h2></div>
+<div class="q">
+  <div class="col"><h3>◔ Modelagem piloto <span class="num">3</span></h3><div class="cards">
+    <div class="card">Gestão de contratos<div class="rod"><span class="selo">SEPLAN</span>v2</div></div>
+    <div class="card">Pagamento de diárias<div class="rod"><span class="selo">SEAD</span>v1 <span class="parado">🕓 12 dias nesta etapa</span></div></div>
+    <div class="card">Controle de frota<div class="rod"><span class="selo">SEGER</span>v2</div></div>
+  </div></div>
+  <div class="col"><h3>◔ Revisão interna <span class="num">1</span></h3><div class="cards">
+    <div class="card">Admissão de servidor<div class="rod"><span class="selo">SEAD</span>v3</div></div>
+  </div></div>
+  <div class="col"><h3>◔ Aprovação <span class="num">0</span></h3><div class="cards"><div class="vazia">Nenhum processo</div></div></div>
+</div>
+
+<div class="blk"><h2>Quadro por setor e por responsável (título sem pílula)</h2></div>
+<div class="q" style="height: 200px">
+  <div class="col"><h3><b>SEPLAN</b> <span class="num">2</span><small>Secretaria de Planejamento</small></h3><div class="cards">
+    <div class="card">Gestão de contratos<div class="rod"><span class="selo">SEPLAN</span>v2</div></div></div></div>
+  <div class="col"><h3><b>SEAD</b> <span class="num">2</span><small>Secretaria de Administração</small></h3><div class="cards">
+    <div class="card">Admissão de servidor<div class="rod"><span class="selo">SEAD</span>v3</div></div></div></div>
+  <div class="col"><h3><span class="av">MS</span> Maria Souza <span class="num">1</span></h3><div class="cards">
+    <div class="card">Controle de frota<div class="rod"><span class="selo">SEGER</span>v2</div></div></div></div>
+</div>
+<div class="blk"><small>Cartão parado: borda comum, só o selo de dias. Selo do setor: menos preenchimento, letra 13px. Faixa: tom neutro único, título alinhado aos cartões.</small></div>

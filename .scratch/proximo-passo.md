@@ -1,9 +1,9 @@
 # Próximo passo (2026-11-04)
 
-**Situação:** `/planejar` de `enxugar-quadro-e-verso` (funcionalidade 21) concluído no modo completo. Sabatina feita (ADR 0042, `CONTEXT.md` sem Assumir e sem envio de .bpmn), spec em `.scratch/enxugar-quadro-e-verso/spec.md`, aviso no topo das specs de `processos-etapas`, `documentos-versoes` e `repositorio-de-processos`. Por decisão do usuário, **uma entrega só**: a spec é o único ticket, sem `to-tickets`. Marco: `marco/2026-11-04-inicio-enxugar-quadro-e-verso`.
+**Situação:** `/executar-complexo` de `enxugar-quadro-e-verso` em andamento na branch `enxugar-quadro-e-verso` (marco de início: `marco/2026-11-04-inicio-enxugar-quadro-e-verso`). Plano em `.scratch/enxugar-quadro-e-verso/plano.md`. Tarefa 0 feita até a metade: as duas prévias estão em `.scratch/enxugar-quadro-e-verso/previa-quadro.html` e `previa-verso.html` (verso com duas arrumações, A e B). **Nenhum código de `src/` foi alterado.**
 
-**Próximo comando:** `/executar-complexo` com a spec de `enxugar-quadro-e-verso`, em Sonnet, numa sessão nova. A ordem importa: primeiro a prévia do Quadro com as faixas e do verso rearrumado (miniatura até o dobro, campo "Data da modelagem piloto"), aprovada pelo usuário antes de qualquer código (critério 18); depois as remoções com teste (Assumir, .bpmn, Enviar relatório, rótulos, Lista) e o visual.
+**Depende do usuário:** abrir as duas prévias, aprovar o Quadro e escolher a arrumação do verso (A, B ou ajuste). Sem esse "aprovado" a execução não passa da Tarefa 0 (critério 18 da spec).
 
-**Depende do usuário:** aprovar a prévia; ver no app real, com o login, a rolagem da coluna grande e a linha de etapas só de ícones (pendências da sessão anterior).
+**Próximo comando:** `/executar-complexo enxugar-quadro-e-verso` (retomada: `git switch enxugar-quadro-e-verso`, continuar da Tarefa 0.4, depois Tarefas 1 a 9), em Sonnet.
 
-**Pendências:** `processos-etapas` segue `Em revisão desde 2026-11-04` (ADR 0041) sem `/ship`; o `/ship` desta funcionalidade cobre as duas mudanças (backlog). Teste instável `App.relatorioDepois` barrou um commit e passou na segunda vez. Demais itens do `.scratch/backlog.md`.
+**Pendências:** as de sempre do backlog; `processos-etapas`, `documentos-versoes` e `repositorio-de-processos` seguem `Em revisão desde 2026-11-04` até o `/ship` desta funcionalidade.
