@@ -54,6 +54,9 @@
 
 /* Sombra de rolagem em CSS puro: aparece na borda onde ainda há colunas fora da vista. */
 .quadro-colunas {
+  /* Pai dos textos .visualmente-oculto dos cartões (position: absolute): sem um pai posicionado dentro da área que rola eles
+     escapam do recorte e alongam a página, que rola além do Quadro e deixa um vazio embaixo (bug de 2026-11-04). */
+  position: relative;
   display: flex;
   flex: 1;
   /* Em janela baixa a coluna não encolhe até sumir: abaixo disso a página volta a rolar. */
@@ -123,6 +126,7 @@
 
 /* O respiro de 4px é para o overflow não cortar o anel de foco do teclado (2px de contorno e 2px de afastamento, em index.css). */
 .coluna-cartoes {
+  position: relative; /* pelo mesmo motivo do .quadro-colunas */
   display: flex;
   flex-direction: column;
   flex: 1;
