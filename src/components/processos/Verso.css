@@ -206,15 +206,6 @@
     border-radius: 0;
   }
 
-  .verso-corpo {
-    display: flex;
-    overflow-y: auto;
-  }
-
-  .verso-principal,
-  .verso-lateral {
-    overflow-y: visible;
-  }
 }
 
 /* Novo processo e Editar: o cabeçalho é só o título e o fechar. */
@@ -257,6 +248,22 @@
   padding: var(--esp-4);
   overflow-y: auto;
   background: var(--fundo-faixa);
+}
+
+/* Em tela estreita as duas colunas empilham e o corpo inteiro rola. Depois das regras de cima, para valer sobre elas. */
+@media (max-width: 900px) {
+  .verso-corpo {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  /* flex: none: sem isso as colunas encolhem na pilha e a de cima fica por baixo da de baixo. */
+  .verso-principal,
+  .verso-lateral {
+    flex: none;
+    overflow-y: visible;
+  }
 }
 
 .verso-versao {

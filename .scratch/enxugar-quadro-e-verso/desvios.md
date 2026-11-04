@@ -14,3 +14,12 @@
 - Efeito colateral: com as colunas Setor e Macroprocesso fora da Lista agrupada, o filtro por setor ou macroprocesso não tem mais menu ali (vale pelo endereço ou voltando a "Agrupar por: Nenhum").
 - Os critérios `[visual]` foram conferidos só na vitrine local (módulos falsos, sem o login real); ficam presumidos no app real para o `/ship`: selo menor, faixas nas Linhas e nos quadros por responsável e por setor, cartão parado sem borda, miniatura com .png de verdade.
 - Testes instáveis vistos no pre-commit, que passaram na segunda rodada: `App.dataDaModelagemPiloto`/"Registrar data" (efeito da mudança, já corrigido) e um teste de "processo suspenso não mostra [Enviar relatório] nem [Substituir]" (instável, já no backlog).
+
+## 2026-11-04 — /polir (audit e polish do Impeccable)
+- **Detector** (`impeccable detect`) nos CSS tocados (`Verso`, `Quadro`, `Anotacoes`, `SeloDoSetor`, `VersaoEmDestaque`, `Etapas`, `tokens`): nenhum achado.
+- **Corrigido (P1, responsivo): o verso em tela estreita (até 900 px) não empilhava as duas colunas.** A regra do `@media` estava antes da regra base do `.verso-corpo` (grid) e perdia; depois de movida para depois dela, as colunas ficaram uma em cima da outra, mas a de cima encolhia por baixo da de baixo (`flex: none` resolveu). Conferido a 800 px: Documentos, anexos e Anotações empilhados, com o corpo rolando.
+- **Conferido sem achado:** faixa das colunas no Quadro por etapa a 1366 px (faixa neutra, título alinhado aos cartões, cartão parado com borda comum e selo de dias); verso a 1000 px em duas colunas; contraste do texto cinza (`--texto-2`) sobre `--fundo-faixa` ≈ 4,8:1 (passa AA); sem erro de console da tela (um 400 de recurso estático da vitrine, fora do app).
+- **Deixado de fora, com o motivo:**
+  - Borda do campo de Anotações (`--linha`) com contraste baixo de componente (WCAG 1.4.11 pede 3:1): é o mesmo padrão dos demais campos do app (`.agora-lista`) e o usuário pediu a borda mais suave; vale tratar junto para todos os campos num `/polir` do sistema.
+  - Quadro com Linhas, por setor e por responsável: a vitrine local não desenhou as linhas (dados falsos sem setor/responsável combinando), então ficam presumidos no app real para o `/ship`.
+  - Toque (gesto) e teclado das duas colunas não foram exercitados além do que os testes de tela cobrem.
