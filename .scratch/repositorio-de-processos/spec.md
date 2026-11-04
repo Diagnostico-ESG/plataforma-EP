@@ -269,4 +269,4 @@ Entregue em 2026-10-30 (commit 7a02d80), com ressalva: critérios [visual] 14 a 
 
 Entregue em 2026-10-30 (commit 2b785d5), com ressalva: critério [visual] 10 de lista-por-setor visto só em página local com módulos falsos (nada visto com o login real); revisão de segurança dispensada (a mudança só lê o parâmetro agrupar do endereço, sem login, dado pessoal, banco ou arquivos), com revisão de reserva por leitura; as ressalvas das entregas anteriores seguem valendo
 
-Em revisão desde 2026-11-04 (enxugar-quadro-e-verso, ADR 0042)
+Entregue em 2026-11-04 (commit 373c07e), com ressalva: critérios [visual] presumidos no app real (vistos só numa vitrine local com módulos falsos e dados inventados, sem o login real: selo menor, faixas nas Linhas e nos quadros por setor e por responsável, cartão parado sem borda, miniatura com .png de verdade, verso em duas colunas, atraso na Lista); item 7 da enxugar-quadro-e-verso não feito por decisão do usuário (ADR 0043); revisão de segurança dispensada (só telas e estilos, sem login, dado de fora ou banco)
