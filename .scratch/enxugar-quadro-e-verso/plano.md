@@ -81,15 +81,15 @@
 
 - [x] 8.1 Anotações: altura mínima de 21 para 10,5 linhas; guardar sozinho intacto (testes existentes verdes; o campo continua rolando/crescendo).
 - [x] 8.2 Miniatura: tamanho em `VersaoEmDestaque` até o dobro; o fallback (ícone + aviso) continua (`App.miniaturaDoFluxograma`).
-- [ ] 8.3 Disposição dos blocos exatamente como na prévia aprovada (Tarefa 0). Conferir no app (Vite) em 1366×768, sem rolagem a mais.
-- [ ] 8.4 `npm test -- anotacoesDoProcesso miniaturaDoFluxograma versoEnxuto`; commit.
+- [x] 8.3 Disposição dos blocos exatamente como na prévia aprovada (Tarefa 0). Conferir no app (Vite) em 1366×768, sem rolagem a mais.
+- [x] 8.4 `npm test -- anotacoesDoProcesso miniaturaDoFluxograma versoEnxuto`; commit.
 
 ## Tarefa 9 — Registro, conferência final e fechamento
 
-- [ ] 9.1 Acréscimo datado em `.scratch/identidade-visual.md` (selo menor, faixa das colunas, cartão parado sem borda, miniatura maior).
-- [ ] 9.2 `npm test` completo, `npx tsc --noEmit` (ou o script de typecheck do `package.json`) e `npm run lint` verdes (critério 12 de pronto). Se o teste instável `App.relatorioDepois` falhar, rodar de novo e anotar no `desvios.md`.
-- [ ] 9.3 Conferência visual no app real (Vite, 1366×768) dos critérios `[visual]` 13–19 que o login permitir; o que não for visto vai como "presumido" para o `/ship`. Registrar em `.scratch/enxugar-quadro-e-verso/desvios.md`.
-- [ ] 9.4 Marcar todas as caixas; comitar. Depois, fora deste plano: merge na `main`, `git branch -d`, linha `Implementado em` no fim da spec, `proximo-passo.md`, envio da `main` ao GitHub.
+- [x] 9.1 Acréscimo datado em `.scratch/identidade-visual.md` (selo menor, faixa das colunas, cartão parado sem borda, miniatura maior).
+- [x] 9.2 `npm test` completo, `npx tsc --noEmit` (ou o script de typecheck do `package.json`) e `npm run lint` verdes (critério 12 de pronto). Se o teste instável `App.relatorioDepois` falhar, rodar de novo e anotar no `desvios.md`.
+- [x] 9.3 Conferência visual no app real (Vite, 1366×768) dos critérios `[visual]` 13–19 que o login permitir; o que não for visto vai como "presumido" para o `/ship`. Registrar em `.scratch/enxugar-quadro-e-verso/desvios.md`.
+- [x] 9.4 Marcar todas as caixas; comitar. Depois, fora deste plano: merge na `main`, `git branch -d`, linha `Implementado em` no fim da spec, `proximo-passo.md`, envio da `main` ao GitHub.
 
 ---
 

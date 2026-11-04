@@ -206,24 +206,26 @@ function EdicaoDoProcesso({ processo, processos, cadastros, aoVoltar, aposMudar,
 // O pai e os subprocessos abrem na mesma janela, depois de conferir as anotações.
 const abrirOutroProcesso = (saida: SaidaComAnotacoes) => (endereco: string) => saida.sair(() => { window.location.hash = endereco })
 
-/** O corpo que rola por dentro da janela: trilha e Agora no alto, e embaixo a versão ao lado das Anotações. */
+/** O corpo do verso em duas colunas (ADR 0042): à esquerda trilha, Agora, data e versões; à direita, em fundo mais escuro, as Anotações. Cada coluna rola por dentro. */
 function ColunasDoVerso(props: CorpoProps) {
   const { processo, processos, versoes, revisoes, podeAlterar, usuarioId, executar, aposMudar, aoSumir, registros } = props
   // A versão aprovada ganha o selo "Aprovada": registrar ou trocar a aprovação refaz a leitura das versões.
   const versaoAprovada = registros.aprovacao.tipo === 'pronto' ? registros.aprovacao.valor?.versao ?? 0 : 0
   return (
     <div className="verso-corpo">
+      <div className="verso-principal">
       <CaminhoDoProcesso processo={processo} processos={processos} versoes={versoes} revisoes={revisoes} registros={registros} podeAlterar={podeAlterar} usuarioId={usuarioId}
         executar={executar} aoSumir={aoSumir} aoMudar={aposMudar} />
       <DataDaModelagemPiloto processo={processo} processos={processos} podeAlterar={podeAlterar} aoMudar={aposMudar} aoSumir={aoSumir} />
-      <div className="verso-versao-e-notas">
-        <div className="verso-versao">
+      <div className="verso-versao">
           <SecaoDeVersoes key={versaoAprovada} versoes={versoes} processo={processo} podeAlterar={podeAlterar} aoAlterarVersoes={aposMudar} />
           <SecaoDeAnexos versoes={versoes} processo={processo} podeAlterar={podeAlterar} />
-        </div>
+      </div>
+      </div>
+      <aside className="verso-lateral">
         <BlocoDasAnotacoes key={processo.id} processo={processo} processos={processos} podeEscrever={podeAlterar}
           guardaRef={props.saida.guarda} aoSumir={aoSumir} />
-      </div>
+      </aside>
     </div>
   )
 }

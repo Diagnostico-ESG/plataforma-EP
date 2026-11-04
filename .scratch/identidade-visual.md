@@ -270,3 +270,10 @@ Sem "por favor", sem exclamação, sem pedir desculpa; dizer o que houve e o que
 - 2026-10-27 — Caixas de seleção personalizáveis (spec `caixas-de-selecao`): `<select>` nativo com `appearance: base-select`, `OpcaoDaCaixa`, `BotaoDaCaixa`. *Continua valendo*, com a cor de foco e de escolhida revista em 2026-10-30 (seção Controles).
 - 2026-10-14 — Escala da interface: fontes +2px (base 15) e larguras +15%. *Revisto em 2026-10-30 (base 14).*
 - 2026-10-07 — Identidade inicial: "Quadro de etapas com linhas acesas" (barra azul `#3A5AFE`, linha acesa de 2px, pílulas de situação, quadradinhos de macroprocesso). *Substituída em 2026-10-30.*
+
+## Acréscimo de 2026-11-04 (enxugar-quadro-e-verso, ADR 0042)
+- **Selo do setor menor:** preenchimento de 1px 6px (antes 3px 10px); a letra segue em 13px.
+- **Faixa das colunas do Quadro:** token novo `--fundo-faixa` (#e8eaef), um pouco mais escuro que o fundo da página; a coluna inteira é a faixa, e o título, sem plaqueta nem pílula, usa o mesmo recuo lateral dos cartões. Por setor a sigla é só texto em negrito; o selo colorido fica no cartão.
+- **Cartão parado:** sem borda vermelha; só o selo "x dias nesta etapa".
+- **Verso:** janela de 1000 px (antes 880) em duas colunas. À direita, a coluna das Anotações em `--fundo-faixa`, com o campo de borda `--linha`, cantos de 6px e altura mínima de 14 linhas (antes 21; a spec previa 10,5, mudado a pedido do usuário). À esquerda, trilha, Agora, Data da modelagem piloto e versões, com a miniatura do fluxograma no dobro (22rem × 16rem). Em tela estreita (até 900 px) as colunas empilham.
+- **Lista:** o atraso é relógio + número junto da Etapa atual, em `--atraso-texto`.

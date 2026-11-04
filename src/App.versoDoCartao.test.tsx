@@ -220,7 +220,7 @@ test('processo que não existe mais: o aviso e [Voltar], que volta ao Quadro', a
 
 // O que continua do painel
 
-test('o corpo rola por dentro; Sobre e estrutura ficam no cabeçalho, e a versão ao lado das Anotações', async () => {
+test('o corpo rola por dentro; Sobre e estrutura ficam no cabeçalho, e a versão fica na coluna da esquerda, com as Anotações na da direita', async () => {
   window.location.hash = '#/processos/p2'
   montar()
   const aberto = await versoAberto()
@@ -228,7 +228,7 @@ test('o corpo rola por dentro; Sobre e estrutura ficam no cabeçalho, e a versã
   expect(caminho.closest('.verso-corpo')).toBeTruthy()
   expect(aberto.getByRole('region', { name: 'Sobre' }).closest('header')).toBeTruthy()
   expect(aberto.getByRole('region', { name: /^Subprocessos/ }).closest('header')).toBeTruthy()
-  expect(aberto.getByRole('region', { name: 'Documentos do Mapeamento' }).closest('.verso-versao-e-notas')).toBeTruthy()
+  expect(aberto.getByRole('region', { name: 'Documentos do Mapeamento' }).closest('.verso-principal')).toBeTruthy()
 })
 
 test('os dados do processo aparecem no verso, sem Origem, Contexto nem Observações', async () => {

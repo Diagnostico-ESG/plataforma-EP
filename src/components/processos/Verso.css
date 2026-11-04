@@ -1,7 +1,7 @@
 /* O verso do cartão (spec, "Verso enxuto"): janela central de tamanho fixo, cerca de 880 × 740, que não cresce com o conteúdo:
    o cabeçalho fica no alto e o corpo rola por dentro. Abaixo de 900 px, a tela inteira. */
 .verso {
-  width: min(880px, calc(100vw - 2 * var(--esp-5)));
+  width: min(1000px, calc(100vw - 2 * var(--esp-5)));
   max-width: none;
   height: min(740px, 94vh);
   padding: 0;
@@ -206,8 +206,14 @@
     border-radius: 0;
   }
 
-  .verso-versao-e-notas {
-    grid-template-columns: 1fr;
+  .verso-corpo {
+    display: flex;
+    overflow-y: auto;
+  }
+
+  .verso-principal,
+  .verso-lateral {
+    overflow-y: visible;
   }
 }
 
@@ -227,10 +233,18 @@
   font-weight: 600;
 }
 
-/* O corpo do verso: trilha, Agora e, embaixo, a versão ao lado das Anotações. Rola por dentro; o cabeçalho não sai do lugar. */
+/* O corpo do verso em duas colunas (ADR 0042): à esquerda o processo (trilha, Agora, data e versões), à direita as Anotações em fundo mais escuro.
+   Cada coluna rola por dentro; o cabeçalho não sai do lugar. */
 .verso-corpo {
-  display: flex;
+  display: grid;
   flex: 1;
+  grid-template-columns: minmax(0, 1fr) 18rem;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.verso-principal {
+  display: flex;
   flex-direction: column;
   gap: var(--esp-4);
   min-height: 0;
@@ -238,12 +252,11 @@
   overflow-y: auto;
 }
 
-.verso-versao-e-notas {
-  display: grid;
-  /* Uma coluna só (ADR 0042): com a miniatura no dobro, a versão pede a largura toda e as Anotações vêm embaixo, com metade da altura. */
-  grid-template-columns: 1fr;
-  gap: var(--esp-4);
-  align-items: start;
+.verso-lateral {
+  min-height: 0;
+  padding: var(--esp-4);
+  overflow-y: auto;
+  background: var(--fundo-faixa);
 }
 
 .verso-versao {
