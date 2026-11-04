@@ -117,8 +117,8 @@ Processo em andamento que está na mesma etapa há mais de 7 dias, contados de q
 _Avoid_: atrasado, vencido, esquecido
 
 **Responsável do processo**:
-Usuário (Administrador ou Integrante do EP) que cuida do processo agora; um só por processo, não por etapa. Ao chegar a uma etapa (no cadastro, em Não iniciados, ou ao ser movido), o processo fica com o responsável inicial dela, ou sem responsável se ela não tiver; quem move não vira responsável por mover. Depois, qualquer integrante pode trocá-lo por outro ou por ninguém, ou assumir. O histórico guarda quem esteve com o processo em cada etapa. A plataforma não guarda os contatos dos setores.
-_Avoid_: responsável da etapa, dono, executor
+Usuário (Administrador ou Integrante do EP) que cuida do processo agora; um só por processo, não por etapa. Ao chegar a uma etapa (no cadastro, em Não iniciados, ou ao ser movido), o processo fica com o responsável inicial dela, ou sem responsável se ela não tiver; quem move não vira responsável por mover. Depois, qualquer integrante pode trocá-lo por outro, por si mesmo ou por ninguém. O histórico guarda quem esteve com o processo em cada etapa. A plataforma não guarda os contatos dos setores.
+_Avoid_: responsável da etapa, dono, executor, assumir (o botão saiu em 2026-11-04: pôr-se como responsável é escolher a si mesmo)
 
 **Responsável inicial**:
 Usuário (Administrador ou Integrante do EP ativo) que o Administrador define, no Catálogo de etapas, para uma etapa: o processo que chega a ela fica com ele. Opcional; Concluídos não tem, e o processo que chega a Concluídos fica sem responsável. Se o responsável inicial deixar de estar ativo ou de ter um desses perfis, o processo que chega à etapa fica sem responsável, e o Catálogo mostra o problema para o Administrador trocá-lo.
@@ -165,7 +165,7 @@ _Avoid_: data agendada, reunião, data da reunião, encontro, agenda, oficina
 ## Documentos
 
 **Versão**:
-Conjunto de arquivos do fluxograma de um processo, numa numeração única por processo: as versões históricas (V5F) e as versões piloto (V6P) têm o número digitado, e as versões em sequência (V7, V8…) continuam a partir do maior número que já existe. Toda versão que não é histórica exige o .bpm (arquivo-fonte do Bizagi); o .png e o .bpmn são opcionais e podem ser acrescentados depois. Cada tipo de versão se envia na sua etapa e aparece em todas. Nunca se apaga, mas um arquivo dela pode ser substituído. Registra a etapa atual do processo no momento do envio, mas não move o processo. A **versão mais recente** é a de maior número, fora as históricas.
+Conjunto de arquivos do fluxograma de um processo, numa numeração única por processo: as versões históricas (V5F) e as versões piloto (V6P) têm o número digitado, e as versões em sequência (V7, V8…) continuam a partir do maior número que já existe. Toda versão que não é histórica exige o .bpm (arquivo-fonte do Bizagi); o .png é opcional e pode ser acrescentado depois. O .bpmn não se envia mais (desde 2026-11-04); os já enviados continuam na versão, para baixar. Cada tipo de versão se envia na sua etapa e aparece em todas. Nunca se apaga, mas um arquivo dela pode ser substituído. Registra a etapa atual do processo no momento do envio, mas não move o processo. A **versão mais recente** é a de maior número, fora as históricas.
 _Avoid_: documento, revisão (para versão), arquivo
 
 **Editar número da versão**:
@@ -181,7 +181,7 @@ Versão com o sufixo P (V6P), o primeiro desenho do fluxo, enviada na Modelagem 
 _Avoid_: rascunho, versão preliminar, versão zero
 
 **Versão histórica**:
-Versão da primeira etapa do trabalho, feita antes da plataforma, somente leitura, com o sufixo F no rótulo (V5F). Só se registra com o processo em Não iniciados e enquanto ele não tem versão piloto nem versão em sequência. Pode ter só o .bpm, e o relatório dela não tem número próprio.
+Versão da primeira etapa do trabalho, feita antes da plataforma, somente leitura, com o sufixo F no rótulo (V5F). Só se registra com o processo em Não iniciados e enquanto ele não tem versão piloto nem versão em sequência. Exige o .bpm (o .png e o relatório são opcionais), e o relatório dela não tem número próprio.
 _Avoid_: versão antiga, versão importada, versão final
 
 **Relatório**:
@@ -205,10 +205,6 @@ Tirar um anexo do processo, com confirmação e sem motivo, por Administrador ou
 _Avoid_: excluir, apagar, remover (para o anexo)
 
 ## Revisões e aprovação
-
-**Assumir**:
-O integrante pôr a si mesmo como responsável do processo, sem movê-lo.
-_Avoid_: capturar, pegar, puxar
 
 **Revisão interna**:
 Conferência, por um integrante diferente do autor, da última versão do processo antes de ela ir ao setor, registrada com o processo na etapa Revisão interna. O revisor corrige ele mesmo: o resultado é "sem alteração" (segue a versão revisada) ou "corrigida" (a versão enviada nessa etapa é a correção). Registrar não move o processo, e mover não exige registro; cada passagem pela etapa pode ter o seu registro.
