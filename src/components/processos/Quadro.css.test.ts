@@ -1,5 +1,8 @@
 import { describe, expect, test } from 'vitest'
-import quadro from './Quadro.css?raw'
+import quadroBruto from './Quadro.css?raw'
+
+// Sem comentários: o texto "position: relative" dentro de um comentário não pode valer como a declaração.
+const quadro = quadroBruto.replace(/\/\*[\s\S]*?\*\//g, '')
 
 /**
  * Regressão (2026-11-04): numa coluna do Quadro com muitos cartões, rolar com a roda até o fim da coluna fazia a página inteira

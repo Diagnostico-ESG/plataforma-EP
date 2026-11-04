@@ -1,9 +1,9 @@
 # Próximo passo (2026-11-04)
 
-**Situação:** a linha de etapas do verso do cartão agora mostra só o ícone (nome como dica e `aria-label`, datas só na gaveta), pelo `/demanda` (ADR 0041, spec de `processos-etapas` com `Em revisão desde 2026-11-04`). Código, CSS e testes feitos e comitados; `npm test` com 3.371 de 3.372 (o que falha é o instável `App.relatorioDepois`, registrado no backlog, que falha também sem a mudança).
+**Situação:** duas demandas do dia feitas e comitadas na `main`: (1) linha de etapas do verso só com ícones (ADR 0041, `/polir` feito, spec de `processos-etapas` com `Em revisão desde 2026-11-04`); (2) bug da rolagem do Quadro: com uma coluna grande, a roda do mouse fazia a página rolar além do Quadro e sobrava um vazio embaixo, porque o texto `.visualmente-oculto` (position: absolute) de cada cartão escapava da área que rola. Corrigido com `position: relative` em `.quadro-colunas` e `.coluna-cartoes` (commit a6ca858 e o do teste), conferido no navegador (vitrine local, janela de 700 px: página volta a ter 700 px; Linhas também) e com teste de regressão (`Quadro.css.test.ts`, que lê o CSS; o jsdom não mede altura). Marco: `marco/2026-11-04-antes-correcao-rolagem-da-coluna`.
 
-**Próximo comando:** `/polir` (Sonnet), porque a mudança é visual. Depois não precisa de `/ship` (sem `package.json`, migração, função ou login); o commit protegido pelo pre-commit basta. A spec fica com `Em revisão desde`; fechar com a marca de entrega só se eu pedir um `/ship`.
+**Próximo comando:** `/polir` (Sonnet) para a correção do Quadro (passo 5 do caminho do bug, mexeu em CSS). O `/ship` não é necessário (sem dependência, migração, função ou login).
 
-**Depende do usuário:** ver o verso com o login real (fileira de ícones sem nome, dica ao passar o mouse).
+**Depende do usuário:** ver no app real, com o login, (a) a rolagem da coluna grande sem o vazio embaixo e (b) o verso com a linha de etapas só de ícones.
 
-**Adiados:** os mesmos de antes (ver `.scratch/backlog.md`), mais o teste instável acima.
+**Adiados (cada um pelo `/demanda`):** o mesmo vazamento de `.visualmente-oculto` pode alongar a página na Lista e em outras áreas com `overflow: auto` (backlog); a solução na raiz (`position: relative` em `.area-de-trabalho`) não foi aplicada porque muda a âncora de popovers; testes instáveis (`App.relatorioDepois`, `App.substituirArquivo`, `App.publicarSemRevisoes`); demais itens do `.scratch/backlog.md`.
