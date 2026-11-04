@@ -35,9 +35,9 @@ test('o número digitado (da histórica e da piloto) é um inteiro maior que zer
   for (const texto of ['', ' 5 ', '0', '-1', '5.5', '5,5', 'abc', '05x']) expect(lerNumeroDigitado(texto)).toBeNull()
 })
 
-test('registrar a histórica pede o número e o .bpm, ou o .bpmn com o .png', () => {
+test('registrar a histórica pede o número e o .bpm; o .bpmn com o .png não basta mais (ADR 0042)', () => {
   expect(podeRegistrarHistorica({ bpm }, {}, false, 5)).toBe(true)
-  expect(podeRegistrarHistorica({ bpmn, png }, {}, false, 5)).toBe(true)
+  expect(podeRegistrarHistorica({ bpmn, png }, {}, false, 5)).toBe(false)
   expect(podeRegistrarHistorica({ bpmn, png, bpm, relatorio }, {}, false, 5)).toBe(true)
   expect(podeRegistrarHistorica({ bpmn }, {}, false, 5)).toBe(false)
   expect(podeRegistrarHistorica({ png }, {}, false, 5)).toBe(false)
@@ -93,10 +93,10 @@ test('a recusa aparece como veio; outra falha diz que a versão não foi registr
     .toBe('A versão não foi registrada: o arquivo fluxo.png não chegou ao Drive. Os arquivos escolhidos continuam no formulário.')
 })
 
-test('a piloto não tem campo de relatório; a em sequência e a histórica têm', () => {
-  expect(papeisDoFormulario({ tipo: 'piloto', numeroSugerido: 6 })).toEqual(['bpm', 'png', 'bpmn'])
-  expect(papeisDoFormulario({ tipo: 'sequencia', numero: 7, numeroDoRelatorio: 3 })).toEqual(['bpm', 'png', 'bpmn', 'relatorio'])
-  expect(papeisDoFormulario({ tipo: 'historica' })).toEqual(['bpm', 'png', 'bpmn', 'relatorio'])
+test('nenhum formulário tem campo .bpmn; a piloto não tem campo de relatório; a em sequência e a histórica têm', () => {
+  expect(papeisDoFormulario({ tipo: 'piloto', numeroSugerido: 6 })).toEqual(['bpm', 'png'])
+  expect(papeisDoFormulario({ tipo: 'sequencia', numero: 7, numeroDoRelatorio: 3 })).toEqual(['bpm', 'png', 'relatorio'])
+  expect(papeisDoFormulario({ tipo: 'historica' })).toEqual(['bpm', 'png', 'relatorio'])
 })
 
 test('enviar o relatório só se habilita com o relatório escolhido, sem recusa e sem conferência em andamento', () => {

@@ -8,12 +8,12 @@ type AcrescentarArquivoProps = {
   modulo: ModuloDeVersoes
   processoId: string
   versao: Versao
-  papel: 'png' | 'bpmn'
+  papel: 'png'
   aoConcluir: () => void
 }
 
 /**
- * O espaço tracejado do .png ou do .bpmn que a versão ainda não tem: escolher o arquivo envia ali mesmo, sem formulário.
+ * O espaço tracejado do .png que a versão ainda não tem: escolher o arquivo envia ali mesmo, sem formulário.
  * O arquivo é conferido no navegador antes de subir; na falha, a frase aparece ao lado e a versão não muda.
  */
 export function AcrescentarArquivo({ modulo, processoId, versao, papel, aoConcluir }: AcrescentarArquivoProps) {

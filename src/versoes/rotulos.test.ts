@@ -63,13 +63,13 @@ test.each([
   expect(podeEnviarRelatorioNaEtapa(etapa, versoes as Versao[])).toBe(esperado)
 })
 
-test('acrescentar .png e .bpmn só cabe na versão piloto ou em sequência, fora da aprovada, e só o que falta', () => {
+test('só o .png se acrescenta (nunca o .bpmn, ADR 0042): na versão piloto ou em sequência, fora da aprovada, e só se falta', () => {
   const arquivo = (papel: 'bpm' | 'png' | 'bpmn') => ({ id: `a-${papel}`, papel, nome: papel, formato: papel, tamanho: 1 })
   const comBpm = { ...versao(7), arquivos: [arquivo('bpm')] }
-  expect(papeisQueSePodeAcrescentar(comBpm)).toEqual(['png', 'bpmn'])
-  expect(papeisQueSePodeAcrescentar({ ...comBpm, arquivos: [arquivo('bpm'), arquivo('png')] })).toEqual(['bpmn'])
+  expect(papeisQueSePodeAcrescentar(comBpm)).toEqual(['png'])
+  expect(papeisQueSePodeAcrescentar({ ...comBpm, arquivos: [arquivo('bpm'), arquivo('png')] })).toEqual([])
   expect(papeisQueSePodeAcrescentar({ ...comBpm, arquivos: [arquivo('bpm'), arquivo('png'), arquivo('bpmn')] })).toEqual([])
-  expect(papeisQueSePodeAcrescentar({ ...versao(6, false, true), arquivos: [arquivo('bpm')] })).toEqual(['png', 'bpmn'])
+  expect(papeisQueSePodeAcrescentar({ ...versao(6, false, true), arquivos: [arquivo('bpm')] })).toEqual(['png'])
   expect(papeisQueSePodeAcrescentar({ ...comBpm, aprovada: true })).toEqual([])
   expect(papeisQueSePodeAcrescentar({ ...versao(5, true), arquivos: [arquivo('bpm')] })).toEqual([])
 })

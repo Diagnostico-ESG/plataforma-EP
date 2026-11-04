@@ -48,9 +48,9 @@
 
 **Arquivos:** `src/versoes/rotulos.ts` (`papeisQueSePodeAcrescentar` → só `png`); `src/versoes/formularioDeVersao.ts` (campos e validação, inclusive a histórica passa a exigir `.bpm`); `src/components/versoes/{FormularioDeVersao,AcrescentarArquivo,ListaDeVersoes,VersaoEmDestaque}.tsx`; testes `src/versoes/rotulos.test.ts`, `src/versoes/formularioDeVersao.test.ts`, `src/App.enviarVersao.test.tsx`, `App.versaoPiloto`, `App.registrarVersaoHistorica`, `App.acrescentarArquivo`, `App.substituirArquivo`, `App.baixarArquivo`.
 
-- [ ] 4.1 Testes que falham: `papeisQueSePodeAcrescentar` devolve só `['png']` (ou `[]` com .png presente); formulários Enviar versão (piloto e sequência) sem campo .bpmn; histórica recusa envio sem `.bpm` com mensagem que traz o valor recebido e o formato esperado (ver `recusasDeVersoes.ts`); um .bpmn já enviado continua com link para baixar e "Substituir".
-- [ ] 4.2 Implementar na tela só (a função do Drive e o banco continuam aceitando .bpmn, ADR 0042). Atualizar os testes antigos que enviavam .bpmn.
-- [ ] 4.3 `npm test -- versoes enviarVersao versaoPiloto registrarVersaoHistorica acrescentarArquivo substituirArquivo baixarArquivo`; commit.
+- [x] 4.1 Testes que falham: `papeisQueSePodeAcrescentar` devolve só `['png']` (ou `[]` com .png presente); formulários Enviar versão (piloto e sequência) sem campo .bpmn; histórica recusa envio sem `.bpm` com mensagem que traz o valor recebido e o formato esperado (ver `recusasDeVersoes.ts`); um .bpmn já enviado continua com link para baixar e "Substituir".
+- [x] 4.2 Implementar na tela só (a função do Drive e o banco continuam aceitando .bpmn, ADR 0042). Atualizar os testes antigos que enviavam .bpmn.
+- [x] 4.3 `npm test -- versoes enviarVersao versaoPiloto registrarVersaoHistorica acrescentarArquivo substituirArquivo baixarArquivo`; commit.
 
 ## Tarefa 5 — Sem [Enviar relatório]; confirmação de arquivos leva a um caminho que existe (critérios 5, 6)
 

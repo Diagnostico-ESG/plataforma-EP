@@ -37,8 +37,8 @@ const TEXTOS_DO_MODO = {
 
 const DICA_DO_MODO = {
   sequencia: null,
-  piloto: 'Só o .bpm é obrigatório; o .png e o .bpmn podem entrar agora ou depois.',
-  historica: 'Informe o .bpm, ou o .bpmn com o .png.',
+  piloto: 'Só o .bpm é obrigatório; o .png pode entrar agora ou depois.',
+  historica: 'Informe o .bpm; o .png e o relatório são opcionais.',
 }
 
 function numeroDoModo(modo: ModoDoFormulario, textoDoNumero: string): number | null {
@@ -105,7 +105,7 @@ export function FormularioDeVersao(props: FormularioDeVersaoProps) {
           const arquivo = arquivos.escolhidos[papel]
           const doRelatorio = modo.tipo === 'sequencia' && papel === 'relatorio' ? modo.numeroDoRelatorio : undefined
           return (
-            <CampoDeArquivo key={papel} papel={papel} obrigatorio={!historica && (PAPEIS_OBRIGATORIOS.includes(papel) || (relatorioObrigatorio && papel === 'relatorio'))}
+            <CampoDeArquivo key={papel} papel={papel} obrigatorio={(PAPEIS_OBRIGATORIOS.includes(papel) || (relatorioObrigatorio && papel === 'relatorio'))}
               relatorioSemNumero={historica}
               nomePrevisto={arquivo && numero !== null ? nomeNaPrevia(processo, numero, papel, arquivo, modo.tipo, doRelatorio) : null}
               recusa={arquivos.recusas[papel] ?? null} aoEscolher={(escolhido) => void arquivos.escolher(papel, escolhido)} />

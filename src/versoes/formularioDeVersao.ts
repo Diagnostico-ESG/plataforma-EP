@@ -27,9 +27,12 @@ export function modoParaEnviar(tipo: 'piloto' | 'sequencia', lidas: Versao[]): M
   return { tipo: 'sequencia', numero, numeroDoRelatorio: proximoNumeroDoRelatorio(lidas) }
 }
 
-/** Os campos de arquivo do formulário: a piloto não leva relatório (ele se envia sozinho); a histórica leva o dela, sem número. */
+/**
+ * Os campos de arquivo do formulário: nenhum leva o .bpmn (saiu da tela, ADR 0042); a piloto não leva relatório (ele se envia
+ * sozinho); a histórica leva o dela, sem número.
+ */
 export function papeisDoFormulario(modo: ModoDoFormulario): readonly PapelDoArquivo[] {
-  return modo.tipo === 'piloto' ? PAPEIS.filter((papel) => papel !== 'relatorio') : PAPEIS
+  return PAPEIS.filter((papel) => papel !== 'bpmn' && !(modo.tipo === 'piloto' && papel === 'relatorio'))
 }
 
 export function arquivosDoPedido(escolhidos: Escolhidos): ArquivoEscolhido[] {
@@ -51,14 +54,14 @@ export function lerNumeroDigitado(texto: string): number | null {
   return numero > 0 ? numero : null
 }
 
-/** A histórica basta com o .bpm, ou com o .bpmn e o .png; o relatório é opcional (o banco confere de novo). */
+/** A histórica pede o número e o .bpm; o .png e o relatório são opcionais (o banco aceita menos; a regra é só da tela, ADR 0042). */
 export function podeRegistrarHistorica(escolhidos: Escolhidos, recusas: RecusasDosCampos, conferindo: boolean,
   numero: number | null): boolean {
   if (numero === null || conferindo || Object.values(recusas).some(Boolean)) return false
-  return Boolean(escolhidos.bpm || (escolhidos.bpmn && escolhidos.png))
+  return Boolean(escolhidos.bpm)
 }
 
-/** Se o botão do formulário se habilita: a em sequência pede o .bpm, a piloto o número e o .bpm, a histórica o número e o .bpm (ou o par). */
+/** Se o botão do formulário se habilita: a em sequência pede o .bpm, a piloto o número e o .bpm, a histórica o número e o .bpm. */
 export function podeSubmeter(modo: ModoDoFormulario, arquivos: { escolhidos: Escolhidos; recusas: RecusasDosCampos; conferindo: boolean },
   numero: number | null, relatorioObrigatorio = false): boolean {
   const { escolhidos, recusas, conferindo } = arquivos

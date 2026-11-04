@@ -75,11 +75,10 @@ export function podeEnviarRelatorioNaEtapa(codigoDaEtapa: string, versoes: Pick<
   return (codigoDaEtapa === CODIGO_DA_TECNICA || codigoDaEtapa === CODIGO_DA_REVISAO_INTERNA) && versoes.some((versao) => !versao.historica)
 }
 
-/** O .png e o .bpmn que ainda se pode acrescentar: só na versão piloto ou em sequência, fora da aprovada, e só o que falta. */
-export function papeisQueSePodeAcrescentar(versao: Pick<Versao, 'historica' | 'aprovada' | 'arquivos'>): ('png' | 'bpmn')[] {
+/** O .png que ainda se pode acrescentar: só na versão piloto ou em sequência, fora da aprovada, e só se falta (o .bpmn saiu da tela, ADR 0042). */
+export function papeisQueSePodeAcrescentar(versao: Pick<Versao, 'historica' | 'aprovada' | 'arquivos'>): 'png'[] {
   if (versao.historica || versao.aprovada) return []
-  const tem = (papel: PapelDoArquivo) => versao.arquivos.some((arquivo) => arquivo.papel === papel)
-  return (['png', 'bpmn'] as const).filter((papel) => !tem(papel))
+  return versao.arquivos.some((arquivo) => arquivo.papel === 'png') ? [] : ['png']
 }
 
 /** Da mais recente (maior número) para a mais antiga. */

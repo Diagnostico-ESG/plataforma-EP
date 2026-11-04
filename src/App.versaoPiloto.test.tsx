@@ -126,7 +126,7 @@ test('o número da piloto vem preenchido com o menor aceito: depois da V5F é 6;
   expect(numero((await abrirFormularioDaPiloto()).form).value).toBe('1')
 })
 
-test('só o .bpm é exigido; o .png e o .bpmn são opcionais; os nomes têm o P', async () => {
+test('só o .bpm é exigido; o .png é opcional e não há campo .bpmn; os nomes têm o P', async () => {
   montarNosCadastros(comVersoes('modelagem', [historica(5)]))
   const { form } = await abrirFormularioDaPiloto()
   expect(botaoEnviar(form).disabled).toBe(true)
@@ -134,7 +134,7 @@ test('só o .bpm é exigido; o .png e o .bpmn são opcionais; os nomes têm o P'
   expect(await form.findByText('Será gravado como: TSA_V6P_Emitir Ofício.bpm')).toBeTruthy()
   await waitFor(() => expect(botaoEnviar(form).disabled).toBe(false))
   expect(form.getByLabelText('Imagem do fluxo (.png) (opcional)')).toBeTruthy()
-  expect(form.getByLabelText('.bpmn (opcional)')).toBeTruthy()
+  expect(form.queryByLabelText(/.bpmn/)).toBeNull()
 })
 
 test('trocar o número muda o rótulo e o nome; número que não é número não habilita o envio', async () => {
@@ -234,7 +234,7 @@ test('a versão piloto enviada aparece no histórico com texto próprio e o rót
   expect(painel.getByText(/Arquivos: TSA_V6P_Emitir Ofício.bpm/)).toBeTruthy()
 })
 
-test('a piloto sem o .bpm não existe como pedido: só o .png ou só o .bpmn não habilitam o envio', async () => {
+test('a piloto sem o .bpm não existe como pedido: só o .png não habilita o envio', async () => {
   montarNosCadastros(comVersoes('modelagem', []))
   const { form } = await abrirFormularioDaPiloto()
   escolher(form, 'Imagem do fluxo (.png) (opcional)', PNG_VALIDO)

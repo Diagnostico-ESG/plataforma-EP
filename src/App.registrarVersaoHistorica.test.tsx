@@ -3,7 +3,7 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import type { SituacaoDoProcesso } from './processos/tipos'
 import { type Montagem, montarNosCadastros, naEtapa } from './testes/processosNosCadastros'
-import { BPMN_VALIDO, PNG_VALIDO, comNome, versaoDeTeste } from './testes/versoesDeTeste'
+import { PNG_VALIDO, comNome, versaoDeTeste } from './testes/versoesDeTeste'
 import type { VersoesFalso } from './versoes/VersoesFalso'
 
 beforeEach(() => {
@@ -53,7 +53,7 @@ type Form = Awaited<ReturnType<typeof abrirFormulario>>['form']
 const botaoRegistrar = (form: Form) => form.getByRole('button', { name: 'Registrar' }) as HTMLButtonElement
 const digitarNumero = (form: Form, texto: string) => fireEvent.change(form.getByLabelText('Número da versão'), { target: { value: texto } })
 const escolher = (form: Form, rotulo: string, arquivo: File) => fireEvent.change(form.getByLabelText(rotulo), { target: { files: [arquivo] } })
-const escolherBpm = (form: Form) => escolher(form, 'Fluxograma Bizagi (.bpm) (opcional)', BPM)
+const escolherBpm = (form: Form) => escolher(form, 'Fluxograma Bizagi (.bpm)', BPM)
 
 async function preencherNumeroEBpm(form: Form, numero: string) {
   digitarNumero(form, numero)
@@ -120,16 +120,17 @@ test('o botão abre e fecha o formulário, que rola até aparecer', async () => 
   expect(botao.getAttribute('aria-expanded')).toBe('false')
 })
 
-test('o formulário tem o número e os quatro campos de arquivo, sem observação, e começa sem poder registrar', async () => {
+test('o formulário tem o número e três campos de arquivo (sem .bpmn), com o .bpm obrigatório, e começa sem poder registrar', async () => {
   montar()
   const { form } = await abrirFormulario()
   expect((form.getByLabelText('Número da versão') as HTMLInputElement).value).toBe('')
-  for (const rotulo of ['.bpmn (opcional)', 'Imagem do fluxo (.png) (opcional)', 'Fluxograma Bizagi (.bpm) (opcional)',
+  expect(form.queryByLabelText(/.bpmn/)).toBeNull()
+  for (const rotulo of ['Imagem do fluxo (.png) (opcional)', 'Fluxograma Bizagi (.bpm)',
     'Relatório (.docx ou .pdf) (opcional)']) {
     expect((form.getByLabelText(rotulo) as HTMLInputElement).type).toBe('file')
   }
   expect(form.queryByLabelText('Observação (opcional)')).toBeNull()
-  expect(form.getByRole('group', { name: 'Arquivos', description: 'Informe o .bpm, ou o .bpmn com o .png.' })).toBeTruthy()
+  expect(form.getByRole('group', { name: 'Arquivos', description: 'Informe o .bpm; o .png e o relatório são opcionais.' })).toBeTruthy()
   expect(botaoRegistrar(form).disabled).toBe(true)
 })
 
@@ -138,19 +139,19 @@ test.each(['', '0', '5.5', 'abc', '-3'])('o número "%s" não habilita o botão'
   const { form } = await abrirFormulario()
   escolherBpm(form)
   digitarNumero(form, texto)
-  await waitFor(() => expect(form.getByLabelText('Fluxograma Bizagi (.bpm) (opcional)')).toBeTruthy())
+  await waitFor(() => expect(form.getByLabelText('Fluxograma Bizagi (.bpm)')).toBeTruthy())
   expect(botaoRegistrar(form).disabled).toBe(true)
   if (texto) expect(form.getByText('Digite um número inteiro maior que zero.')).toBeTruthy()
 })
 
-test('basta o .bpm; só o .bpmn ou só o .png não bastam; o par basta, com relatório opcional', async () => {
+test('sem o .bpm não se registra (só o .png não basta); com o .bpm basta, com .png e relatório opcionais', async () => {
   montar()
   const { form } = await abrirFormulario()
   digitarNumero(form, '5')
-  escolher(form, '.bpmn (opcional)', BPMN_VALIDO)
-  expect(await form.findByText('Será gravado como: TSA_V5F_Emitir Ofício.bpmn')).toBeTruthy()
-  expect(botaoRegistrar(form).disabled).toBe(true)
   escolher(form, 'Imagem do fluxo (.png) (opcional)', PNG_VALIDO)
+  expect(await form.findByText('Será gravado como: TSA_V5F_Emitir Ofício.png')).toBeTruthy()
+  expect(botaoRegistrar(form).disabled).toBe(true)
+  escolherBpm(form)
   await waitFor(() => expect(botaoRegistrar(form).disabled).toBe(false))
   escolher(form, 'Relatório (.docx ou .pdf) (opcional)', new File(['r'], 'relatorio.docx'))
   expect(await form.findByText('Será gravado como: TSA_V5F_Emitir Ofício_Relatório.docx')).toBeTruthy()

@@ -41,7 +41,7 @@ test('a versão histórica registrada aparece no histórico do processo, com tex
   fireEvent.click(await secao.findByRole('button', { name: 'Registrar versão histórica' }))
   const form = within(await secao.findByRole('form', { name: 'Registrar versão histórica' }))
   fireEvent.change(form.getByLabelText('Número da versão'), { target: { value: '5' } })
-  fireEvent.change(form.getByLabelText('Fluxograma Bizagi (.bpm) (opcional)'), { target: { files: [new File(['b'], 'fonte.bpm')] } })
+  fireEvent.change(form.getByLabelText('Fluxograma Bizagi (.bpm)'), { target: { files: [new File(['b'], 'fonte.bpm')] } })
   const registrar = form.getByRole('button', { name: 'Registrar' }) as HTMLButtonElement
   await waitFor(() => expect(registrar.disabled).toBe(false))
   fireEvent.click(registrar)

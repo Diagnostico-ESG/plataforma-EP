@@ -2,7 +2,7 @@ import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/re
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import { TravaDoBanco } from './acesso/falhasDeGravacao'
 import { montarNosCadastros, naEtapa } from './testes/processosNosCadastros'
-import { BPMN_VALIDO, BPM_VALIDO, PNG_VALIDO, versaoDeTeste } from './testes/versoesDeTeste'
+import { BPM_VALIDO, PNG_VALIDO, versaoDeTeste } from './testes/versoesDeTeste'
 import type { VersoesFalso } from './versoes/VersoesFalso'
 
 beforeEach(() => {
@@ -37,7 +37,6 @@ function escolher(form: Form, rotulo: string, arquivo: File) {
 
 const BPM = 'Fluxograma Bizagi (.bpm)'
 const PNG = 'Imagem do fluxo (.png) (opcional)'
-const BPMN = '.bpmn (opcional)'
 const RELATORIO = 'Relatório (.docx) (opcional)'
 
 const botaoEnviar = (form: Form) => form.getByRole('button', { name: 'Enviar' }) as HTMLButtonElement
@@ -48,28 +47,28 @@ async function escolherOPar(form: Form) {
   await waitFor(() => expect(botaoEnviar(form).disabled).toBe(false))
 }
 
-test('[Enviar versão] abre o formulário com os quatro campos e o número da versão, sem observação', async () => {
+test('[Enviar versão] abre o formulário com os três campos (sem .bpmn) e o número da versão, sem observação', async () => {
   montarNosCadastros(comDuasVersoes())
   const { form } = await abrirFormulario()
-  for (const rotulo of [BPM, PNG, BPMN, RELATORIO]) expect((form.getByLabelText(rotulo) as HTMLInputElement).type).toBe('file')
+  for (const rotulo of [BPM, PNG, RELATORIO]) expect((form.getByLabelText(rotulo) as HTMLInputElement).type).toBe('file')
+  expect(form.queryByLabelText(/.bpmn/)).toBeNull()
   expect(form.queryByLabelText('Observação (opcional)')).toBeNull()
   expect(form.getByText(/Esta versão será a/).textContent).toBe('Esta versão será a V3.')
   expect(botaoEnviar(form).disabled).toBe(true)
 })
 
-test('os campos vêm na ordem .bpm, .png, .bpmn e relatório', async () => {
+test('os campos vêm na ordem .bpm, .png e relatório, sem .bpmn', async () => {
   montarNosCadastros(comDuasVersoes())
   const { form } = await abrirFormulario()
   const rotulos = form.getAllByText((_texto, elemento) => elemento?.tagName === 'LABEL').map((rotulo) => rotulo.textContent)
-  expect(rotulos).toEqual([BPM, PNG, BPMN, RELATORIO])
+  expect(rotulos).toEqual([BPM, PNG, RELATORIO])
 })
 
-test('sem o .bpm o envio fica desabilitado, mesmo com o .bpmn e o .png', async () => {
+test('sem o .bpm o envio fica desabilitado, mesmo com o .png', async () => {
   montarNosCadastros(comDuasVersoes())
   const { form } = await abrirFormulario()
-  escolher(form, BPMN, BPMN_VALIDO)
   escolher(form, PNG, PNG_VALIDO)
-  expect(await form.findByText('Será gravado como: TSA_V3_Emitir Ofício.bpmn')).toBeTruthy()
+  expect(await form.findByText('Será gravado como: TSA_V3_Emitir Ofício.png')).toBeTruthy()
   expect(botaoEnviar(form).disabled).toBe(true)
 })
 
@@ -108,22 +107,19 @@ test('enviar registra a versão, fecha o formulário e a lista mostra a V3 no al
   expect(versoes.envios[0].arquivos.map((arquivo) => arquivo.papel)).toEqual(['bpm', 'png'])
 })
 
-test('o .bpmn e o relatório vão junto, na ordem do formulário', async () => {
+test('o relatório vai junto, na ordem do formulário', async () => {
   const { versoes } = montarNosCadastros(comDuasVersoes())
   const { secao, form } = await abrirFormulario()
   escolher(form, RELATORIO, new File(['r'], 'relatorio.docx'))
-  escolher(form, BPMN, BPMN_VALIDO)
   await escolherOPar(form)
   fireEvent.click(botaoEnviar(form))
   await waitFor(() => expect(secao.queryByRole('form', { name: 'Enviar versão' })).toBeNull())
-  expect(versoes.envios[0].arquivos.map((arquivo) => arquivo.papel)).toEqual(['bpm', 'png', 'bpmn', 'relatorio'])
+  expect(versoes.envios[0].arquivos.map((arquivo) => arquivo.papel)).toEqual(['bpm', 'png', 'relatorio'])
 })
 
 test.each([
-  ['extensão errada', BPMN, new File(['x'], 'fluxo.xml'), 'Escolha um arquivo .bpmn. Recebido: .xml.'],
+  ['extensão errada', BPM, new File(['x'], 'fluxo.xml'), 'Escolha um arquivo .bpm. Recebido: .xml.'],
   ['.png que não é imagem', PNG, new File(['texto'], 'fluxo.png'), 'O arquivo não é uma imagem PNG.'],
-  ['.bpmn que não é BPMN', BPMN, new File(['<outro/>'], 'fluxo.bpmn'),
-    'O arquivo não é um BPMN 2.0 (falta o elemento definitions do BPMN).'],
   ['arquivo maior que 20 MB', BPM, new File([new Uint8Array(20 * 1024 * 1024 + 1)], 'grande.bpm'),
     'O arquivo passa de 20 MB. Recebido: 20,0 MB (20971521 bytes).'],
 ])('%s: a mensagem aparece ao lado do campo e o envio fica desabilitado', async (_caso, rotulo, arquivo, mensagem) => {

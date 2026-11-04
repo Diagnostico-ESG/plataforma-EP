@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import { montarNosCadastros, naEtapa } from './testes/processosNosCadastros'
-import { BPMN_VALIDO, PNG_VALIDO, arquivoDeTeste, versaoDeTeste } from './testes/versoesDeTeste'
+import { PNG_VALIDO, arquivoDeTeste, versaoDeTeste } from './testes/versoesDeTeste'
 import { escolherNoMenuDoProcesso } from './testes/versoDoCartao'
 import type { Versao } from './versoes/tipos'
 import type { VersoesFalso } from './versoes/VersoesFalso'
@@ -39,15 +39,15 @@ async function destaqueDa(rotulo: string) {
 
 const escolher = (campo: HTMLElement, arquivo: File) => fireEvent.change(campo, { target: { files: [arquivo] } })
 
-test('a versão sem .png nem .bpmn mostra os dois no espaço tracejado, e a que os tem não mostra nenhum', async () => {
+test('a versão sem .png mostra o espaço tracejado do .png, nunca o do .bpmn; a que o tem não mostra nenhum', async () => {
   montarNosCadastros(com([versaoDeTeste(1), soBpm(2)]))
   const { secao, versao } = await destaqueDa('V2')
   expect(versao.getByLabelText(/Acrescentar .png/)).toBeTruthy()
-  expect(versao.getByLabelText(/Acrescentar .bpmn/)).toBeTruthy()
+  expect(versao.queryByLabelText(/Acrescentar .bpmn/)).toBeNull()
   secao.getByText('Versões anteriores (1)').click()
   const v1 = within(secao.getByRole('article', { name: 'V1' }))
   expect(v1.queryByLabelText(/Acrescentar .png/)).toBeNull()
-  expect(v1.getByLabelText(/Acrescentar .bpmn/)).toBeTruthy()
+  expect(v1.queryByLabelText(/Acrescentar .bpmn/)).toBeNull()
 })
 
 test('acrescentar o .png envia ali mesmo: o arquivo aparece com o nome padrão e o espaço some', async () => {
@@ -56,15 +56,14 @@ test('acrescentar o .png envia ali mesmo: o arquivo aparece com o nome padrão e
   escolher(versao.getByLabelText(/Acrescentar .png/), PNG_VALIDO)
   expect(await versao.findByRole('link', { name: (nome) => nome.includes('TSA_V7_Emitir Ofício.png') })).toBeTruthy()
   expect(versao.queryByLabelText(/Acrescentar .png/)).toBeNull()
-  expect(versao.getByLabelText(/Acrescentar .bpmn/)).toBeTruthy()
   expect(versoes.versoes.p1[0].arquivos.map((arquivo) => arquivo.papel)).toEqual(['bpm', 'png'])
 })
 
-test('acrescentar o .bpmn também; na versão piloto o nome leva o P', async () => {
+test('na versão piloto o nome do .png acrescentado leva o P', async () => {
   montarNosCadastros(com([soBpm(6, { piloto: true })], { ajustarProcessos: naEtapa('modelagem') }))
   const { versao } = await destaqueDa('V6P')
-  escolher(versao.getByLabelText(/Acrescentar .bpmn/), BPMN_VALIDO)
-  expect(await versao.findByRole('link', { name: (nome) => nome.includes('TSA_V6P_Emitir Ofício.bpmn') })).toBeTruthy()
+  escolher(versao.getByLabelText(/Acrescentar .png/), PNG_VALIDO)
+  expect(await versao.findByRole('link', { name: (nome) => nome.includes('TSA_V6P_Emitir Ofício.png') })).toBeTruthy()
 })
 
 test('vale em qualquer etapa com o processo em andamento, inclusive depois da Revisão interna', async () => {
