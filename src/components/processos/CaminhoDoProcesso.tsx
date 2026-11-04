@@ -46,9 +46,8 @@ export function CaminhoDoProcesso({ processo, processos, versoes, revisoes, regi
   const parado = processo.situacao === 'suspenso' || processo.situacao === 'cancelado'
   return (
     <>
-      <EtapasDoProcesso processo={processo} processos={processos} revisoes={revisoes} versoes={versoes} registros={registros}
-        ultimaVersao={processo.ultimaVersao} podeEditar={podeAlterar && !parado} podeAlterarProcesso={podeAlterar}
-        aoMudar={aoMudar} aoSumir={aoSumir} />
+      <EtapasDoProcesso processo={processo} revisoes={revisoes} versoes={versoes} registros={registros}
+        ultimaVersao={processo.ultimaVersao} podeEditar={podeAlterar && !parado} />
       <AgoraDoProcesso processo={processo} processos={processos} usuarios={usuarios} usuarioId={usuarioId}
         podeAlterar={podeAlterar} movimento={movimento} executar={executar} aoMudar={aoMudar} aoSumir={aoSumir} revisoes={revisoes} versoes={versoes} registros={registros} />
       <JanelasDoMovimento movimento={movimento} processos={processos} versoes={versoes} aoGravar={aoMudar} />

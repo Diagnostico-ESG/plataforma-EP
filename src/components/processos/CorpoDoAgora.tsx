@@ -2,7 +2,7 @@ import type { MovimentoDoProcessoEmUso } from '../../hooks/useMovimentoDoProcess
 import type { RegistrosDoProcesso } from '../../hooks/useRegistrosDoProcesso'
 import type { Executar } from '../../hooks/useGravacaoComFalha'
 import { avisoDoRevisor, nomeDoResponsavel, opcoesDeResponsavel } from '../../processos/agoraDoProcesso'
-import { CODIGO_CONCLUIDOS, CODIGO_DA_MODELAGEM_PILOTO, CODIGO_DA_PUBLICACAO } from '../../processos/codigosDasEtapas'
+import { CODIGO_CONCLUIDOS, CODIGO_DA_PUBLICACAO } from '../../processos/codigosDasEtapas'
 import { diasDoProcessoNaEtapa, passouDoLimite } from '../../processos/diasNaEtapa'
 import { ETIQUETAS, ROTULO_DA_ETIQUETA } from '../../processos/rotulos'
 import { hojeEmBrasilia } from '../../lib/datas'
@@ -13,7 +13,6 @@ import { Avatar, AvatarVazio } from '../Avatar'
 import { PublicacaoNoAgora } from './AgoraDaPublicacao'
 import { AcoesDoConcluido } from './AgoraDoConcluido'
 import { BotaoDaCaixa } from '../OpcaoDaCaixa'
-import { DataDaModelagemPiloto } from './DataDaModelagemPiloto'
 import { DiasNaEtapa } from './DiasNaEtapa'
 import { EtiquetaDoProcesso } from './EtiquetaDoProcesso'
 import { RegistrosDoAgora } from './RegistrosDoAgora'
@@ -57,7 +56,6 @@ export function CorpoDoAgora(props: CorpoDoAgoraProps) {
       <div className="agora-campos">
         <RegistrosDoAgora processo={processo} revisoes={props.revisoes} versoes={props.versoes} registros={props.registros} usuarioId={props.usuarioId}
           podeAlterar aoMudar={props.aoMudar} />
-        <DataDaModelagemNoAgora processo={processo} processos={props.processos} podeAlterar aoMudar={props.aoMudar} aoSumir={props.aoSumir} />
         {processo.etapaAtual?.codigo === CODIGO_DA_PUBLICACAO && <PublicacaoNoAgora processo={processo} processos={props.processos} aoMudar={props.aoMudar} />}
         {processo.etapaAtual?.codigo === CODIGO_CONCLUIDOS && <AcoesDoConcluido {...props} />}
       </div>
@@ -115,10 +113,3 @@ function ResponsavelDoAgora({ processo, usuarios, usuarioId, movimento }: CorpoD
   )
 }
 
-/** A Data da modelagem piloto entre os campos da etapa atual; nas outras etapas ela fica na linha da própria Modelagem piloto, na trilha. */
-export function DataDaModelagemNoAgora({ processo, processos, podeAlterar, aoMudar, aoSumir }: DataDaModelagemNoAgoraProps) {
-  if (processo.etapaAtual?.codigo !== CODIGO_DA_MODELAGEM_PILOTO) return null
-  return <DataDaModelagemPiloto processo={processo} processos={processos} podeAlterar={podeAlterar} aoMudar={aoMudar} aoSumir={aoSumir} />
-}
-
-type DataDaModelagemNoAgoraProps = Pick<CorpoDoAgoraProps, 'processo' | 'processos' | 'aoMudar' | 'aoSumir'> & { podeAlterar: boolean }

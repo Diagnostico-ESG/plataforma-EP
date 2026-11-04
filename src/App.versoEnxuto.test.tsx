@@ -69,9 +69,11 @@ test('o subprocesso mostra o pai no cabeçalho, como link', async () => {
 
 const camposDaEtapa = async () => (await versoAberto()).findByRole('region', { name: /^Agora/ }).then((agora) => agora.querySelector('.agora-campos') as HTMLElement)
 
-test('a Modelagem piloto mostra a Data da modelagem piloto na linha dos campos', async () => {
+test('a Modelagem piloto mostra a Data da modelagem piloto no campo fixo, fora do Agora (ADR 0042)', async () => {
   montarVerso(processoLido({}, 'modelagem'))
-  expect(within(await camposDaEtapa()).getByRole('button', { name: 'Registrar data' })).toBeTruthy()
+  const campo = within(await (await versoAberto()).findByRole('group', { name: 'Data da modelagem piloto' }))
+  expect(campo.getByRole('button', { name: 'Registrar data' })).toBeTruthy()
+  expect(within(await camposDaEtapa()).queryByRole('button', { name: 'Registrar data' })).toBeNull()
 })
 
 test('a Validação com o setor mostra a data da validação na linha dos campos', async () => {

@@ -40,9 +40,9 @@
 
 **Arquivos:** `src/components/processos/DataDaModelagemPiloto.tsx` (rótulo "Realizada em" → "Data da modelagem piloto", textos); `EtapasDoProcesso.tsx` (sai a data da linha); `CorpoDoAgora.tsx` (sai `DataDaModelagemNoAgora`); `VersoDoCartao.tsx` (`ColunasDoVerso`) ou o bloco que a prévia indicar; `src/processos/dataDaModelagemPiloto.ts` (regra "da Modelagem piloto em diante", reaproveitar a que a linha de etapas usa); testes `src/App.dataDaModelagemPiloto.test.tsx`, `src/App.etapasDoVerso.test.tsx`.
 
-- [ ] 3.1 Testes que falham: campo "Data da modelagem piloto" presente na Modelagem piloto e em etapa posterior, ausente em Não iniciados; registrar/alterar com as regras de hoje (futuro recusado, uma por processo, não move o processo); Consulta só lê (e só vê se existir); a linha de etapas não contém data nem "Realizada em".
-- [ ] 3.2 Extrair a regra de visibilidade para função nomeada em `dataDaModelagemPiloto.ts` (por posição no catálogo, `etapasDoVerso`), com teste unitário.
-- [ ] 3.3 Implementar o campo fixo no lugar definido pela prévia aprovada; remover do Agora e da linha. `npm test -- dataDaModelagemPiloto etapasDoVerso agoraDoVerso`; commit.
+- [x] 3.1 Testes que falham: campo "Data da modelagem piloto" presente na Modelagem piloto e em etapa posterior, ausente em Não iniciados; registrar/alterar com as regras de hoje (futuro recusado, uma por processo, não move o processo); Consulta só lê (e só vê se existir); a linha de etapas não contém data nem "Realizada em".
+- [x] 3.2 Extrair a regra de visibilidade para função nomeada em `dataDaModelagemPiloto.ts` (por posição no catálogo, `etapasDoVerso`), com teste unitário.
+- [x] 3.3 Implementar o campo fixo no lugar definido pela prévia aprovada; remover do Agora e da linha. `npm test -- dataDaModelagemPiloto etapasDoVerso agoraDoVerso`; commit.
 
 ## Tarefa 4 — Sem envio de .bpmn (critérios 3, 4)
 

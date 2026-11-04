@@ -1,19 +1,12 @@
 import './Etapas.css'
 import { useId, useState } from 'react'
-import { CODIGO_DA_MODELAGEM_PILOTO } from '../../processos/codigosDasEtapas'
 import { iconeDaEtapa } from '../../processos/iconeDaEtapa'
 import { Icone } from '../Icone'
-import type { EtapaDoVerso, ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
-import { DataDaModelagemPiloto } from './DataDaModelagemPiloto'
+import type { EtapaDoVerso, ProcessoLido } from '../../processos/tipos'
 import { type DadosDasEtapas, DetalheDaEtapa } from './DetalheDaEtapa'
 
 type EtapasDoProcessoProps = DadosDasEtapas & {
   processo: ProcessoLido
-  processos: ModuloDeProcessos
-  /** Quem tem perfil para alterar (Administrador ou Integrante); a data da modelagem piloto ainda depende da situação e da etapa. */
-  podeAlterarProcesso: boolean
-  aoMudar: () => void
-  aoSumir: () => void
 }
 
 type SinalDaEtapa = 'atual' | 'visitada' | 'nao-visitada'
@@ -28,7 +21,7 @@ function sinalDaEtapa(etapa: EtapaDoVerso, atual: boolean): SinalDaEtapa {
 
 /**
  * As Etapas: as etapas ativas do catálogo, só leitura, só com o ícone na linha (o nome é dica e rótulo, as datas ficam
- * na gaveta; ADR 0041), com a atual destacada e as visitadas marcadas; clicar abre a
+ * na gaveta; nenhuma data na linha; ADR 0041 e 0042), com a atual destacada e as visitadas marcadas; clicar abre a
  * gaveta logo abaixo da linha, uma de cada vez, com as entradas e saídas do processo naquela etapa (spec, "Etapas do verso").
  */
 export function EtapasDoProcesso(props: EtapasDoProcessoProps) {
@@ -59,10 +52,6 @@ function LinhaDaEtapa({ etapa, aberta, aoAlternar, ...resto }: LinhaDaEtapaProps
         <span className="etapa-sinal" aria-hidden="true" />
         <span className="etapa-bola"><Icone nome={iconeDaEtapa(etapa.codigo)} tamanho={14} /></span>
       </button>
-      {etapa.codigo === CODIGO_DA_MODELAGEM_PILOTO && sinal !== 'atual' && (
-        <DataDaModelagemPiloto processo={resto.processo} processos={resto.processos} podeAlterar={resto.podeAlterarProcesso}
-          aoMudar={resto.aoMudar} aoSumir={resto.aoSumir} />
-      )}
       {aberta && <DetalheDaEtapa id={idDaGaveta} etapa={etapa} {...resto} />}
     </li>
   )

@@ -24,11 +24,9 @@ function montar(mudancas: Partial<ProcessoLido> = {}, etapa = 'modelagem', perfi
   return montarVerso(processoLido(mudancas, etapa), perfil)
 }
 
-/** Onde a data vive: nos campos da etapa, no Agora, enquanto a Modelagem piloto é a etapa atual; senão, na linha dela na trilha. */
+/** /** Onde a data vive: o campo fixo do verso, da Modelagem piloto em diante (ADR 0042); nunca na linha de etapas. */
 async function linha() {
-  const botao = await screen.findByRole('button', { name: /^Modelagem piloto:/ })
-  if (botao.getAttribute('aria-label')?.endsWith('atual')) return within(await screen.findByRole('region', { name: /^Agora/ }))
-  return within(botao.closest('li') as HTMLElement)
+  return within(await screen.findByRole('group', { name: ROTULO }))
 }
 
 type Linha = Awaited<ReturnType<typeof linha>>
@@ -46,27 +44,28 @@ function gravarData(secao: Linha, data: string) {
   fireEvent.click(secao.getByRole('button', { name: 'Salvar' }))
 }
 
-test('com data, a linha da Modelagem piloto diz "Realizada em dd/mm/aaaa" e oferece [Alterar data]', async () => {
+test('com data, o campo fixo mostra só a data e oferece [Alterar data]', async () => {
   montar({ dataDaModelagemPiloto: '2026-10-10' })
   const secao = await linha()
-  expect(secao.getByText(/Realizada em/).textContent).toBe('Realizada em 10/10/2026')
   expect(secao.getByText('10/10/2026').tagName).toBe('TIME')
+  expect(secao.queryByText(/Realizada em/)).toBeNull()
   expect(secao.getByRole('button', { name: 'Alterar data' })).toBeTruthy()
   expect(secao.queryByLabelText(ROTULO)).toBeNull()
 })
 
-test('sem data, a linha só oferece [Registrar data], sem "Ainda não marcada" nem "próxima"', async () => {
+test('sem data, o campo só oferece [Registrar data], sem "Ainda não marcada" nem "próxima"', async () => {
   montar()
   const secao = await linha()
   expect(secao.getByRole('button', { name: 'Registrar data' })).toBeTruthy()
   expect(secao.queryByText(/Ainda não marcada|próxima|Realizada em/)).toBeNull()
 })
 
-test('o lado direito do verso não tem mais a seção da data', async () => {
-  montar({ dataDaModelagemPiloto: '2026-10-10' })
-  await linha()
-  expect(screen.queryByRole('region', { name: ROTULO })).toBeNull()
-  expect(screen.queryByRole('heading', { name: ROTULO })).toBeNull()
+test('a linha de etapas não tem nenhuma data, nem "Realizada em"', async () => {
+  montar({ dataDaModelagemPiloto: '2026-10-10' }, 'revisao_interna')
+  const trilha = within(await screen.findByRole('region', { name: 'Etapas' }))
+  expect(trilha.queryByText(/Realizada em/)).toBeNull()
+  expect(trilha.queryByText('10/10/2026')).toBeNull()
+  expect(trilha.queryByRole('button', { name: /data/i })).toBeNull()
 })
 
 test('registrar: [Registrar data] abre o campo sem [Remover]; [Salvar] grava e volta à linha, sem mexer na etapa', async () => {
@@ -74,7 +73,7 @@ test('registrar: [Registrar data] abre o campo sem [Remover]; [Salvar] grava e v
   const secao = await editar()
   expect(secao.queryByRole('button', { name: 'Remover' })).toBeNull()
   gravarData(secao, '2026-10-10')
-  expect((await secao.findByText(/Realizada em/)).textContent).toBe('Realizada em 10/10/2026')
+  expect((await secao.findByText('10/10/2026')).tagName).toBe('TIME')
   expect(secao.queryByLabelText(ROTULO)).toBeNull()
   expect(falso.chamadas).toEqual([{ acao: 'data_da_modelagem_piloto', id: 'p1', nota: '2026-10-10' }])
   expect(falso.processos[0].etapaAtual?.codigo).toBe('modelagem')
@@ -86,7 +85,7 @@ test('alterar: o campo abre com a data gravada', async () => {
   const secao = await editar('Alterar data')
   expect(campo(secao).value).toBe('2026-10-08')
   gravarData(secao, '2026-10-09')
-  expect((await secao.findByText(/Realizada em/)).textContent).toBe('Realizada em 09/10/2026')
+  expect((await secao.findByText('09/10/2026')).tagName).toBe('TIME')
   expect(falso.processos[0].dataDaModelagemPiloto).toBe('2026-10-09')
 })
 
@@ -95,7 +94,7 @@ test('[Cancelar] volta à linha sem gravar', async () => {
   const secao = await editar('Alterar data')
   fireEvent.change(campo(secao), { target: { value: '2026-10-09' } })
   fireEvent.click(secao.getByRole('button', { name: 'Cancelar' }))
-  expect(secao.getByText(/Realizada em/).textContent).toBe('Realizada em 08/10/2026')
+  expect(secao.getByText('08/10/2026').tagName).toBe('TIME')
   expect(secao.queryByLabelText(ROTULO)).toBeNull()
   expect(falso.chamadas).toEqual([])
 })
@@ -136,39 +135,31 @@ test.each([['Revisão interna', 'revisao_interna'], ['Concluídos', 'concluidos'
   async (_nome, etapa) => {
     const falso = montar({ situacao: etapa === 'concluidos' ? 'concluido' : 'em_andamento' }, etapa)
     gravarData(await editar(), '2026-10-10')
-    expect((await (await linha()).findByText(/Realizada em/)).textContent).toBe('Realizada em 10/10/2026')
+    expect((await (await linha()).findByText('10/10/2026')).tagName).toBe('TIME')
     expect(falso.processos[0].dataDaModelagemPiloto).toBe('2026-10-10')
   },
 )
 
-test('em Não iniciados, a linha não oferece registrar', async () => {
-  montar({}, 'nao_iniciados')
-  const secao = await linha()
-  expect(secao.queryByRole('button', { name: /data/i })).toBeNull()
-  expect(secao.queryByText(/Realizada em/)).toBeNull()
-})
-
-test('processo que voltou para Não iniciados com data registrada continua mostrando a data, só para leitura', async () => {
-  montar({ dataDaModelagemPiloto: '2026-10-08' }, 'nao_iniciados')
-  const secao = await linha()
-  expect(secao.getByText(/Realizada em/).textContent).toBe('Realizada em 08/10/2026')
-  expect(secao.queryByRole('button', { name: /data/i })).toBeNull()
+test.each([{}, { dataDaModelagemPiloto: '2026-10-08' }])('em Não iniciados o campo não aparece, nem com data gravada', async (mudancas) => {
+  montar(mudancas, 'nao_iniciados')
+  await screen.findByRole('button', { name: /^Modelagem piloto:/ })
+  expect(screen.queryByRole('group', { name: ROTULO })).toBeNull()
 })
 
 test.each<SituacaoDoProcesso>(['suspenso', 'cancelado'])('processo %s: a data é só leitura, e sem data nada aparece', async (situacao) => {
   montar({ situacao, motivoDaSituacao: 'Motivo inventado', dataDaModelagemPiloto: '2026-10-08' }, 'revisao_interna')
   const secao = await linha()
-  expect(secao.getByText(/Realizada em/).textContent).toBe('Realizada em 08/10/2026')
+  expect(secao.getByText('08/10/2026').tagName).toBe('TIME')
   expect(secao.queryByRole('button', { name: /data/i })).toBeNull()
   cleanup()
   montar({ situacao, motivoDaSituacao: 'Motivo inventado' }, 'revisao_interna')
-  expect((await linha()).queryByText(/Realizada em/)).toBeNull()
+  expect(screen.queryByRole('group', { name: ROTULO })).toBeNull()
 })
 
 test('Consulta vê a data, sem botões; sem data, nada aparece', async () => {
   montar({ dataDaModelagemPiloto: '2026-10-08' }, 'revisao_interna', 'consulta')
   const secao = await linha()
-  expect(secao.getByText(/Realizada em/).textContent).toBe('Realizada em 08/10/2026')
+  expect(secao.getByText('08/10/2026').tagName).toBe('TIME')
   expect(secao.queryByRole('button', { name: /data/i })).toBeNull()
 })
 

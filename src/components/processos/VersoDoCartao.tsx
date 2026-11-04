@@ -20,6 +20,7 @@ import { BotaoFecharJanela, CabecalhoDoVerso } from './CabecalhoDoVerso'
 import { ConfirmarSaidaSemSalvar } from './ConfirmarSaidaSemSalvar'
 import { CabecalhoDoFormulario } from './CabecalhoDoFormulario'
 import { CaminhoDoProcesso } from './CaminhoDoProcesso'
+import { DataDaModelagemPiloto } from './DataDaModelagemPiloto'
 import { FormularioDoProcesso } from './FormularioDoProcesso'
 import { HistoricoDoProcesso } from './HistoricoDoProcesso'
 import { JanelaDoVerso } from './JanelaDoVerso'
@@ -214,6 +215,7 @@ function ColunasDoVerso(props: CorpoProps) {
     <div className="verso-corpo">
       <CaminhoDoProcesso processo={processo} processos={processos} versoes={versoes} revisoes={revisoes} registros={registros} podeAlterar={podeAlterar} usuarioId={usuarioId}
         executar={executar} aoSumir={aoSumir} aoMudar={aposMudar} />
+      <DataDaModelagemPiloto processo={processo} processos={processos} podeAlterar={podeAlterar} aoMudar={aposMudar} aoSumir={aoSumir} />
       <div className="verso-versao-e-notas">
         <div className="verso-versao">
           <SecaoDeVersoes key={versaoAprovada} versoes={versoes} processo={processo} podeAlterar={podeAlterar} aoAlterarVersoes={aposMudar} />
