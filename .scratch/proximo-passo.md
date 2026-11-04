@@ -1,9 +1,9 @@
 # Próximo passo (2026-11-04)
 
-**Situação:** `/executar-complexo` de `enxugar-quadro-e-verso` em andamento na branch `enxugar-quadro-e-verso` (marco de início: `marco/2026-11-04-inicio-enxugar-quadro-e-verso`). Plano em `.scratch/enxugar-quadro-e-verso/plano.md`. Tarefa 0 feita até a metade: as duas prévias estão em `.scratch/enxugar-quadro-e-verso/previa-quadro.html` e `previa-verso.html` (verso com duas arrumações, A e B). **Nenhum código de `src/` foi alterado.**
+**Situação:** `enxugar-quadro-e-verso` (funcionalidade 21) implementada e integrada na `main` (commit f13e03b; branch apagada). Feito: selo do setor menor, cartão parado sem borda, faixas nas colunas do Quadro, Agora sem rótulos e sem Assumir ("Você" primeiro), Data da modelagem piloto em campo fixo, sem envio de .bpmn (histórica exige o .bpm), Lista agrupada sem Setor/Macroprocesso e com o atraso junto da Etapa atual, verso em duas colunas (Anotações à direita). **Não feito:** item 7 (sem [Enviar relatório]), mantido por decisão do usuário; ver `.scratch/enxugar-quadro-e-verso/desvios.md` e o backlog.
 
-**Depende do usuário:** abrir as duas prévias, aprovar o Quadro e escolher a arrumação do verso (A, B ou ajuste). Sem esse "aprovado" a execução não passa da Tarefa 0 (critério 18 da spec).
+**Próximo comando:** `/polir` (a funcionalidade mexeu na interface), em Sonnet; depois `/ship`, que cobre também as revisões pendentes de `processos-etapas`, `documentos-versoes` e `repositorio-de-processos` (marca `Em revisão desde 2026-11-04`).
 
-**Próximo comando:** `/executar-complexo enxugar-quadro-e-verso` (retomada: `git switch enxugar-quadro-e-verso`, continuar da Tarefa 0.4, depois Tarefas 1 a 9), em Sonnet.
+**Depende do usuário:** ver no app real, com o login, o verso em duas colunas, as faixas do Quadro (incluindo Linhas e por setor/responsável), a Lista agrupada e a miniatura com .png de verdade; decidir se quer o "+ Acrescentar relatório" para poder tirar o [Enviar relatório].
 
-**Pendências:** as de sempre do backlog; `processos-etapas`, `documentos-versoes` e `repositorio-de-processos` seguem `Em revisão desde 2026-11-04` até o `/ship` desta funcionalidade.
+**Pendências:** testes instáveis já no backlog (um de "processo suspenso não mostra [Enviar relatório]" falhou uma vez no pre-commit); filtro por Setor/Macroprocesso sem menu na Lista agrupada (vale pelo endereço).

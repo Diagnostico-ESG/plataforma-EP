@@ -161,3 +161,5 @@ Nenhuma tela passa a buscar dado novo. O que já existe continua: carregando, va
 - Tirar os ícones da linha de etapas (ADR 0041 fica).
 - Renomear a Data da modelagem piloto ("Data da reunião de modelagem" foi recusado na sabatina: o glossário evita "reunião").
 - O vazamento de `.visualmente-oculto` em outras áreas que rolam e os testes instáveis já registrados no backlog.
+
+Implementado em 2026-11-04 (commit f13e03b), exceto o item 7 (sem [Enviar relatório]), mantido por decisão do usuário (ver `desvios.md`: o "+ Acrescentar relatório" que a spec supõe não existe mais). Mudanças em relação ao texto acima, a pedido do usuário: o verso ficou em duas colunas (Anotações numa coluna à direita em fundo mais escuro; janela de 1000 px; campo de 14 linhas) no lugar das arrumações A/B do item 11.
