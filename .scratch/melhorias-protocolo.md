@@ -1179,3 +1179,13 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Item não testado: spec atualizada em funcionalidade já entregue e linha `Em revisão desde`.** Esperado: linha abaixo do último `Entregue em`, no mesmo commit da spec. Aconteceu: gravada ao fim da spec de processos-etapas (2026-11-03).
 - **Item não testado: ADR no modo curto.** Esperado: ADR só se a decisão muda como outra funcionalidade é feita. Aconteceu: ADR 0038, porque duas frases da spec entregue ("Nada é guardado", "sem mudança na função") foram revistas.
 - **Ocorrência: o comando não diz como retomar um modo curto parado entre sessões.** Retomei pelo handoff e li só o começo dele; a medição que faltava estava no fim. Sugestão para a cópia mestra: o handoff deve trazer o estado atual no topo.
+
+## 2026-11-04 — /executar-complexo (enxugar-quadro-e-verso)
+
+- **Item não testado: branch comum no `/executar-complexo`.** Esperado: `git switch -c`, trabalho na pasta principal, merge e `branch -d` ao fim. Aconteceu: branch criada e integrada sem worktree; o merge foi fast-forward e o `branch -d` aceitou.
+- **Item não testado: `plano.md` único (sem tickets) e linha `Implementado em` na spec.** Esperado: plano em `.scratch/<funcionalidade>/plano.md` e a linha no fim da spec. Aconteceu: ambos gravados; a linha trouxe a ressalva do item 7 não feito e as mudanças pedidas pelo usuário.
+- **Item não testado: retomada com a branch aberta.** Não aconteceu nesta execução (a sessão não foi interrompida).
+- **Item não testado: pre-commit rodando a suíte inteira em cada commit.** Aconteceu: cada commit levou cerca de 2 minutos; dois commits foram barrados por teste que quebrou de verdade (efeito da mudança) e um por teste instável que passou na segunda rodada.
+- **Ocorrência: a spec descreveu uma tela que não existe.** O item 7 e o ADR 0042 mandam usar o "+ Acrescentar relatório", que saiu no ticket 10 de `documentos-versoes`. Só apareceu na execução, ao ler o código. Sugestão para a cópia mestra: o `/planejar`, na sabatina, conferir no código que cada controle citado como "continua" ainda existe.
+- **Ocorrência: a prévia em HTML solto não serve para aprovar o verso.** O esboço não usava os componentes reais e o usuário o recusou ("muito diferente"); o desenho foi decidido vendo o app real numa vitrine local com módulos falsos. Sugestão: no passo 13 do plano, pedir a prévia já no app real (vitrine local) para telas existentes.
+- **Ocorrência: arquivos do projeto têm CRLF.** Trocas de várias linhas por script falharam até tratar o CRLF; Python não existe na máquina (como já registrado).
