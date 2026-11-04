@@ -19,3 +19,7 @@
 **Depende do usuário, nesta ordem:** (1) publicar a função no desenvolvimento (`npx supabase functions deploy arquivos-no-drive --use-api --project-ref yclkzyoebpsxmgpbcbus`, vínculo conferido); (2) refazer o C3 e fazer o C4 do `.scratch/documentos-versoes/roteiro-prova-final.md`; (3) só então a arrumação D.
 
 **Depois:** `/ship` (mexeu em `supabase/functions/`), com a revisão de segurança para produção, e os roteiros de produção do fim dele. Produção ainda não existe (`AMBIENTES.md`). Sonnet no `/ship`; Opus na revisão de segurança para produção.
+
+## Atualização (2026-11-04, roteiro de produção)
+
+Roteiro de produção preparado em `.scratch/roteiro-producao.md`, nada executado. Decisões do usuário em aberto: hospedagem do site, fazer ou dispensar a revisão de pré-produção (recomendada: fazer) e qual projeto do Google (pessoal ou institucional) para o login. Próximo comando: `/ship` da correção do anexo (Sonnet), depois a revisão de pré-produção (Opus na parte de segurança) e os roteiros de produção do fim do `/ship`. Função `arquivos-no-drive` já publicada no desenvolvimento (c267fe3); C3, C4 e arrumação D da prova no Drive real adiados por decisão do usuário.
