@@ -37,18 +37,6 @@
   background: var(--fundo-contexto);
 }
 
-.etapa-nome {
-  flex: 1;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.etapa-quando {
-  flex: none;
-  font-family: var(--fonte-mono);
-  font-size: var(--tam-secundario);
-}
-
 .etapa-iniciais {
   flex: none;
   width: 2.2em;
@@ -280,18 +268,6 @@
 .etapa-atual .etapa-cabeca {
   background: transparent;
   color: var(--azul);
-}
-
-.etapa-nome {
-  flex: none;
-}
-
-.etapa-quando {
-  font-size: var(--tam-selo);
-}
-
-.etapa-quando:empty {
-  display: none;
 }
 
 .etapas .etapa-gaveta {

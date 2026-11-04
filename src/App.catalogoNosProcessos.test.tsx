@@ -57,7 +57,7 @@ async function acrescentarEncerramento() {
 
 async function etapasDoVerso(): Promise<string[]> {
   const lista = within(await screen.findByRole('region', { name: 'Etapas' }))
-  return lista.getAllByRole('listitem').map((item) => item.querySelector('.etapa-nome')?.textContent ?? '')
+  return lista.getAllByRole('listitem').map((item) => item.querySelector('.etapa-cabeca')?.getAttribute('title') ?? '')
 }
 
 test('etapa nova vira coluna do Quadro, entre as fixas, sem mudar a etapa de nenhum processo', async () => {

@@ -242,10 +242,10 @@ test('os dados do processo aparecem no verso, sem Origem, Contexto nem Observaç
 test('as Etapas listam todas as etapas ativas na ordem do catálogo, com a atual destacada, e as ações ficam no Agora', async () => {
   montar()
   const caminho = within(await (await versoAberto()).findByRole('region', { name: 'Etapas' }))
-  const nomes = caminho.getAllByRole('listitem').map((item) => item.querySelector('.etapa-nome')?.textContent)
+  const nomes = caminho.getAllByRole('listitem').map((item) => item.querySelector('.etapa-cabeca')?.getAttribute('title'))
   expect(nomes).toEqual(CATALOGO_DE_TESTE.map((etapa) => etapa.nome))
   const atuais = caminho.getAllByRole('listitem').filter((item) => item.getAttribute('aria-current') === 'step')
-  expect(atuais.map((item) => item.querySelector('.etapa-nome')?.textContent)).toEqual(['Relatório e modelagem técnica'])
+  expect(atuais.map((item) => item.querySelector('.etapa-cabeca')?.getAttribute('title'))).toEqual(['Relatório e modelagem técnica'])
   const agora = await agoraDoVerso()
   expect(agora.getByRole('combobox', { name: 'Etapa' })).toBeTruthy()
   expect(agora.getByRole('combobox', { name: 'Status' })).toBeTruthy()

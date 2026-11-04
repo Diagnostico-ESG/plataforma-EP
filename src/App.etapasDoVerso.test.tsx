@@ -34,14 +34,14 @@ const montar = (perfil: 'integrante_ep' | 'consulta' = 'integrante_ep', mudancas
 test('lista só as etapas ativas, na ordem do catálogo, de Não iniciados a Concluídos', async () => {
   montar()
   const linhas = (await etapasDoVerso()).getAllByRole('listitem')
-  expect(linhas.map((linha) => linha.querySelector('.etapa-nome')?.textContent)).toEqual(NOMES)
+  expect(linhas.map((linha) => linha.querySelector('.etapa-cabeca')?.getAttribute('title'))).toEqual(NOMES)
 })
 
 test('a etapa desativada não aparece', async () => {
   montarVerso(processoLido(), 'integrante_ep', [], (falso) => {
     falso.etapasDoCatalogo = CATALOGO_DE_TESTE.map((etapa) => (etapa.codigo === 'publicacao' ? { ...etapa, ativa: false } : etapa))
   })
-  const nomes = (await etapasDoVerso()).getAllByRole('listitem').map((linha) => linha.querySelector('.etapa-nome')?.textContent)
+  const nomes = (await etapasDoVerso()).getAllByRole('listitem').map((linha) => linha.querySelector('.etapa-cabeca')?.getAttribute('title'))
   expect(nomes).not.toContain('Publicação')
   expect(nomes).toHaveLength(7)
 })
@@ -50,7 +50,7 @@ test('a etapa desativada não aparece', async () => {
 const cabecasDasEtapas = (etapas: Awaited<ReturnType<typeof etapasDoVerso>>) =>
   etapas.getAllByRole('button').filter((botao) => botao.classList.contains('etapa-cabeca'))
 
-test('cada linha diz se é a atual, uma etapa visitada (com a data da última saída) ou uma que o processo nunca visitou', async () => {
+test('cada linha diz se é a atual, uma etapa visitada ou uma que o processo nunca visitou, só com o ícone', async () => {
   montar()
   const etapas = await etapasDoVerso()
   expect(cabecasDasEtapas(etapas).map((linha) => linha.getAttribute('aria-label'))).toEqual([
@@ -58,17 +58,16 @@ test('cada linha diz se é a atual, uma etapa visitada (com a data da última sa
     'Validação com o setor: ainda não visitada', 'Aprovação pelo setor: ainda não visitada', 'Publicação: ainda não visitada',
     'Concluídos: ainda não visitada',
   ])
-  const quando = (nome: string) => etapas.getByRole('button', { name: new RegExp(`^${nome}:`) }).querySelector('.etapa-quando')?.textContent
-  expect(quando('Modelagem piloto')).toBe('08/10/2026')
-  expect(quando('Não iniciados')).toBe('01/10/2026')
-  expect(quando('Revisão interna')).toBe(`desde ${formatarData(diasAtras(3))}`)
-  expect(quando('Publicação')).toBe('')
+  // Nome e data não ficam na linha: o nome é dica (title) e as datas moram na gaveta (ADR 0041).
+  expect(document.querySelector('.etapa-nome, .etapa-quando')).toBeNull()
+  expect(cabecasDasEtapas(etapas).map((linha) => linha.getAttribute('title'))).toEqual(NOMES)
+  expect(cabecasDasEtapas(etapas).every((linha) => linha.textContent === '')).toBe(true)
 })
 
 test('só a atual está marcada como passo atual', async () => {
   montar()
   const atuais = (await etapasDoVerso()).getAllByRole('listitem').filter((linha) => linha.getAttribute('aria-current') === 'step')
-  expect(atuais.map((linha) => linha.querySelector('.etapa-nome')?.textContent)).toEqual(['Revisão interna'])
+  expect(atuais.map((linha) => linha.querySelector('.etapa-cabeca')?.getAttribute('title'))).toEqual(['Revisão interna'])
 })
 
 test('a gaveta abre uma por vez, pelo botão da linha, com o estado anunciado', async () => {

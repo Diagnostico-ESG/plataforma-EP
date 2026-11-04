@@ -1,9 +1,9 @@
-# Próximo passo (2026-11-03)
+# Próximo passo (2026-11-04)
 
-**Situação:** a revisão de `setor-neutro-e-fotos` (ADR 0040) foi entregue: `Entregue em 2026-11-03 (commit e863a5c)`, com ressalva dos critérios `[visual]` (vistos só na vitrine local, sem o login), e marco `marco/2026-11-03-entrega-setor-neutro-e-fotos-2`. O `/ship` cobriu também as duas correções das Linhas do Quadro. Todas as funcionalidades da lista de `.scratch/projeto.md` estão entregues.
+**Situação:** a linha de etapas do verso do cartão agora mostra só o ícone (nome como dica e `aria-label`, datas só na gaveta), pelo `/demanda` (ADR 0041, spec de `processos-etapas` com `Em revisão desde 2026-11-04`). Código, CSS e testes feitos e comitados; `npm test` com 3.371 de 3.372 (o que falha é o instável `App.relatorioDepois`, registrado no backlog, que falha também sem a mudança).
 
-**Próximo comando:** nada planejado. Demanda nova ou ajuste entra pelo `/demanda` (Opus para classificar); funcionalidade nova pelo `/planejar`. Sessão nova começando pelo `/situação`.
+**Próximo comando:** `/polir` (Sonnet), porque a mudança é visual. Depois não precisa de `/ship` (sem `package.json`, migração, função ou login); o commit protegido pelo pre-commit basta. A spec fica com `Em revisão desde`; fechar com a marca de entrega só se eu pedir um `/ship`.
 
-**Depende do usuário:** ver o app com o login real (cores dos selos, cabeçalho do Quadro por setor, ícones de Status em quase preto, Linhas do Quadro, foto do Google e pílulas de Situação).
+**Depende do usuário:** ver o verso com o login real (fileira de ícones sem nome, dica ao passar o mouse).
 
-**Adiados (cada um pelo `/demanda`):** rolagem vertical ao arrastar cartão até a borda nas Linhas; bug do histórico "Moveu o processo" (`src/cadastros/historicoDosCadastros.ts:19`); nome do setor ao passar o mouse no selo da Lista e do verso; dividir o `Quadro.css` e `/impeccable document` (com o `DESIGN.md` desatualizado); lentidão da primeira abertura da miniatura; no `.scratch/backlog.md`: renomear "etiqueta" para "status" no código, bloco repetido do Avatar, um só ponto para "sem cor vale a 1", testes instáveis (`substituirArquivo`, `App.publicarSemRevisoes`).
+**Adiados:** os mesmos de antes (ver `.scratch/backlog.md`), mais o teste instável acima.

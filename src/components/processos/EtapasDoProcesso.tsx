@@ -1,6 +1,5 @@
 import './Etapas.css'
 import { useId, useState } from 'react'
-import { formatarData } from '../../lib/datas'
 import { CODIGO_DA_MODELAGEM_PILOTO } from '../../processos/codigosDasEtapas'
 import { iconeDaEtapa } from '../../processos/iconeDaEtapa'
 import { Icone } from '../Icone'
@@ -27,15 +26,9 @@ function sinalDaEtapa(etapa: EtapaDoVerso, atual: boolean): SinalDaEtapa {
   return etapa.passagens.some((passagem) => passagem.saiuEm !== null) ? 'visitada' : 'nao-visitada'
 }
 
-// A data à direita da linha: na atual, desde quando; nas visitadas, a da última saída; nas outras, nada.
-function quandoDaEtapa(etapa: EtapaDoVerso, sinal: SinalDaEtapa): string {
-  if (sinal === 'atual') return `desde ${formatarData(etapa.passagens.find((passagem) => passagem.saiuEm === null)?.entrouEm ?? null)}`
-  if (sinal === 'visitada') return formatarData(etapa.passagens.find((passagem) => passagem.saiuEm !== null)?.saiuEm ?? null)
-  return ''
-}
-
 /**
- * As Etapas: as etapas ativas do catálogo, só leitura, com a atual destacada e as visitadas marcadas; clicar abre a
+ * As Etapas: as etapas ativas do catálogo, só leitura, só com o ícone na linha (o nome é dica e rótulo, as datas ficam
+ * na gaveta; ADR 0041), com a atual destacada e as visitadas marcadas; clicar abre a
  * gaveta logo abaixo da linha, uma de cada vez, com as entradas e saídas do processo naquela etapa (spec, "Etapas do verso").
  */
 export function EtapasDoProcesso(props: EtapasDoProcessoProps) {
@@ -62,11 +55,9 @@ function LinhaDaEtapa({ etapa, aberta, aoAlternar, ...resto }: LinhaDaEtapaProps
   return (
     <li className={`etapa-linha etapa-${sinal}`} aria-current={sinal === 'atual' ? 'step' : undefined}>
       <button type="button" className="etapa-cabeca" aria-expanded={aberta} aria-controls={aberta ? idDaGaveta : undefined}
-        aria-label={`${etapa.nome}: ${ROTULO_DO_SINAL[sinal]}`} onClick={aoAlternar}>
+        aria-label={`${etapa.nome}: ${ROTULO_DO_SINAL[sinal]}`} title={etapa.nome} onClick={aoAlternar}>
         <span className="etapa-sinal" aria-hidden="true" />
         <span className="etapa-bola"><Icone nome={iconeDaEtapa(etapa.codigo)} tamanho={14} /></span>
-        <span className="etapa-nome">{etapa.nome}</span>
-        <span className="etapa-quando">{quandoDaEtapa(etapa, sinal)}</span>
       </button>
       {etapa.codigo === CODIGO_DA_MODELAGEM_PILOTO && sinal !== 'atual' && (
         <DataDaModelagemPiloto processo={resto.processo} processos={resto.processos} podeAlterar={resto.podeAlterarProcesso}

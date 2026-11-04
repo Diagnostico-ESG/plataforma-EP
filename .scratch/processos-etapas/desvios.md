@@ -633,3 +633,8 @@ Ponto de partida da revisão: `marco/2026-10-26-inicio-quadro-livre-parte-5`.
 - **Ganho da primeira abertura não confirmado.** O ADR 0038 esperava cerca de 1,4 s a menos na primeira abertura da miniatura; medido pelo usuário no app com a função nova publicada no desenvolvimento, o tempo ficou igual. Reabrir é imediato (a parte A funciona). Registrado no backlog, com a hipótese e o caminho de retomada; a C ficou no código e publicada.
 - **Achados do `/polir` e do detector:** nenhum (entrada de 2026-11-03, acima).
 - **Dependências circulares, migração destrutiva, tipos:** nenhum (sem migração).
+
+## 2026-11-04 — linha de etapas do verso só com ícones (ADR 0041)
+
+- **Mudança em funcionalidade existente, caminho curto.** A spec ("Etapas do verso") dizia que a linha mostrava a data da última saída; o usuário pediu para tirar nome e data da linha. Spec atualizada no lugar, com a marca `Em revisão desde 2026-11-04`; sem migração nem mudança de dado.
+- **Nome como dica.** `title` e `aria-label` na linha; testes de `etapasDoVerso`, `catalogoNosProcessos` e `versoDoCartao` leem o `title` em vez do texto de `.etapa-nome`; as datas seguem cobertas pelos testes da gaveta.
