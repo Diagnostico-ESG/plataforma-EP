@@ -648,3 +648,9 @@ Ponto de partida da revisão: `marco/2026-10-26-inicio-quadro-livre-parte-5`.
   - `.etapa-sinal` (escondido por `display: none` na trilha) e `.etapa-iniciais` (sem uso) ficaram: sobra anterior a esta mudança, fora do escopo.
   - A data da Modelagem piloto (`.etapas .etapa-modelagem`) não mudou; conferir no app real que não fica apertada sob a bolinha (critério `[visual]` presumido, sem o login).
 - **Detector do Impeccable:** sem achados nos dois arquivos.
+
+## 2026-11-04 — bug da rolagem do Quadro e /polir
+
+- **Bug corrigido (a6ca858):** com coluna grande, a página rolava além do Quadro e deixava um vazio embaixo. Causa: o texto `.visualmente-oculto` (position: absolute) de cada cartão escapava da área que rola e alongava o documento. Correção: `position: relative` em `.quadro-colunas` e `.coluna-cartoes`; teste de regressão `Quadro.css.test.ts` (lê o CSS, pois o jsdom não mede altura); conferido no navegador na vitrine local (página de 5.227 px para 700 px; Linhas por Setor também). Sem mudança de spec.
+- **Auditoria do `/polir` (só as duas regras novas):** detector do Impeccable sem achados. Conferido por leitura que o `position: relative` não cria contexto de empilhamento (não há `z-index` nas regras), não mexe nos `sticky` da Matriz (já posicionados) e não afeta o arrastar (`QuadroDeProcessos.tsx` usa `getBoundingClientRect`, relativo à janela, e não `offsetParent`). Nada a corrigir no polimento.
+- **Deixado de fora, com o motivo:** (a) o mesmo vazamento na Lista e em outras áreas com `overflow: auto` (backlog); a correção na raiz (`position: relative` em `.area-de-trabalho`) mudaria a âncora de menus suspensos e não foi medida; (b) o arrastar de cartões não foi exercitado no navegador depois da mudança; (c) nada visto com o login real (critério `[visual]` presumido).
