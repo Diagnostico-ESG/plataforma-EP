@@ -1,9 +1,9 @@
 # Próximo passo (2026-11-04)
 
-**Situação:** `enxugar-quadro-e-verso` (funcionalidade 21) implementada e integrada na `main` (commit f13e03b; branch apagada). Feito: selo do setor menor, cartão parado sem borda, faixas nas colunas do Quadro, Agora sem rótulos e sem Assumir ("Você" primeiro), Data da modelagem piloto em campo fixo, sem envio de .bpmn (histórica exige o .bpm), Lista agrupada sem Setor/Macroprocesso e com o atraso junto da Etapa atual, verso em duas colunas (Anotações à direita). **Não feito:** item 7 (sem [Enviar relatório]), mantido por decisão do usuário; ver `.scratch/enxugar-quadro-e-verso/desvios.md` e o backlog.
+**Situação:** `enxugar-quadro-e-verso` (funcionalidade 21) entregue e integrada na `main`, com marca `Entregue em 2026-11-04 (commit 373c07e)` e marco `marco/2026-11-04-entrega-enxugar-quadro-e-verso`; o mesmo `/ship` entregou `processos-etapas`, `documentos-versoes` e `repositorio-de-processos` (marcos próprios). Ressalvas: critérios `[visual]` presumidos no app real; item 7 (sem [Enviar relatório]) não feito por decisão do usuário (ADR 0043).
 
-**Próximo comando:** `/ship`, em Sonnet (o `/polir` já rodou em 2026-11-04: achados em `desvios.md`; o `/ship` cobre também as revisões pendentes de `processos-etapas`, `documentos-versoes` e `repositorio-de-processos`, marca `Em revisão desde 2026-11-04`). Nenhum ticket pendente.
+**Depende do usuário:** ver no app real, com o login, o verso em duas colunas, as faixas do Quadro (inclusive Linhas, por setor e por responsável), a Lista agrupada e a miniatura com .png de verdade; decidir se quer o "+ Acrescentar relatório" para tirar o [Enviar relatório] (backlog).
 
-**Depende do usuário:** ver no app real, com o login, o verso em duas colunas, as faixas do Quadro (incluindo Linhas e por setor/responsável), a Lista agrupada e a miniatura com .png de verdade; decidir se quer o "+ Acrescentar relatório" para poder tirar o [Enviar relatório].
+**Próximo comando:** `/planejar` para a próxima funcionalidade (modelo da tabela do Funil: Opus no modo completo, Sonnet no curto); demandas fora do plano entram pelo `/demanda`. Não há mais funcionalidade do resumo do projeto sem spec além do que o backlog lista.
 
-**Pendências:** testes instáveis já no backlog (um de "processo suspenso não mostra [Enviar relatório]" falhou uma vez no pre-commit); filtro por Setor/Macroprocesso sem menu na Lista agrupada (vale pelo endereço).
+**Pendências:** itens do `.scratch/backlog.md`, incluindo os da revisão de código deste `/ship` (default de cor do setor espalhado, `ProcessosFalso.ts` com 319 linhas, etc.); testes instáveis já registrados.
