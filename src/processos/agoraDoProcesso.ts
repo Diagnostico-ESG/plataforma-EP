@@ -32,18 +32,13 @@ function responsavelForaDaLista(processo: DadosDoResponsavel, usuarios: UsuarioR
 }
 
 /**
- * A lista da troca do responsável: quem está na tela primeiro, com "(você)"; os demais; o responsável atual que já não
+ * A lista da troca do responsável: quem está na tela primeiro, como "Você"; os demais; o responsável atual que já não
  * está na lista (desativado) e, por último, "Ninguém por enquanto" (valor "").
  */
 export function opcoesDeResponsavel(processo: DadosDoResponsavel, usuarios: UsuarioResponsavel[], usuarioId: string): OpcaoDeResponsavel[] {
-  const eu = usuarios.filter((usuario) => usuario.id === usuarioId).map((usuario) => opcaoDePessoa(usuario, `${usuario.nome} (você)`))
+  const eu = usuarios.filter((usuario) => usuario.id === usuarioId).map((usuario) => opcaoDePessoa(usuario, 'Você'))
   const outros = usuarios.filter((usuario) => usuario.id !== usuarioId).map((usuario) => opcaoDePessoa(usuario, usuario.nome))
   return [...eu, ...outros, ...responsavelForaDaLista(processo, usuarios), { valor: '', rotulo: 'Ninguém por enquanto' }]
-}
-
-/** [Assumir] aparece sempre que quem está na tela não é o responsável do processo. */
-export function podeAssumir({ responsavel }: Pick<ProcessoLido, 'responsavel'>, usuarioId: string): boolean {
-  return responsavel?.id !== usuarioId
 }
 
 /**

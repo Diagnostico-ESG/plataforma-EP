@@ -1,8 +1,7 @@
-import { useId } from 'react'
 import type { MovimentoDoProcessoEmUso } from '../../hooks/useMovimentoDoProcesso'
 import type { RegistrosDoProcesso } from '../../hooks/useRegistrosDoProcesso'
 import type { Executar } from '../../hooks/useGravacaoComFalha'
-import { avisoDoRevisor, nomeDoResponsavel, opcoesDeResponsavel, podeAssumir } from '../../processos/agoraDoProcesso'
+import { avisoDoRevisor, nomeDoResponsavel, opcoesDeResponsavel } from '../../processos/agoraDoProcesso'
 import { CODIGO_CONCLUIDOS, CODIGO_DA_MODELAGEM_PILOTO, CODIGO_DA_PUBLICACAO } from '../../processos/codigosDasEtapas'
 import { diasDoProcessoNaEtapa, passouDoLimite } from '../../processos/diasNaEtapa'
 import { ETIQUETAS, ROTULO_DA_ETIQUETA } from '../../processos/rotulos'
@@ -67,15 +66,12 @@ export function CorpoDoAgora(props: CorpoDoAgoraProps) {
 }
 
 function ListasDoAgora({ processo, movimento }: Pick<CorpoDoAgoraProps, 'processo' | 'movimento'>) {
-  const idDaEtapa = useId()
-  const idDaEtiqueta = useId()
   const { etapaAtual } = processo
   const emConcluidos = etapaAtual?.codigo === CODIGO_CONCLUIDOS
   const etiqueta = processo.etiqueta ?? 'a_fazer'
   return (
     <div className="agora-listas">
-      <label className="agora-campo" htmlFor={idDaEtapa}>Etapa</label>
-      <select id={idDaEtapa} className="agora-lista" value={etapaAtual?.id ?? ''} disabled={movimento.gravando}
+      <select aria-label="Etapa" className="agora-lista" value={etapaAtual?.id ?? ''} disabled={movimento.gravando}
         onChange={(mudanca) => {
           const destino = processo.etapasDoVerso.find((etapa) => etapa.id === mudanca.target.value)
           if (destino) movimento.mover(processo, destino)
@@ -83,19 +79,13 @@ function ListasDoAgora({ processo, movimento }: Pick<CorpoDoAgoraProps, 'process
         {processo.etapasDoVerso.map((etapa) => <option key={etapa.id} value={etapa.id}>{etapa.nome}</option>)}
       </select>
       {emConcluidos ? (
-        <>
-          <span className="agora-campo">Status</span>
-          <span className="agora-etiqueta">{ROTULO_DA_ETIQUETA.concluido}</span>
-        </>
+        <span className="agora-etiqueta" role="img" aria-label={`Status: ${ROTULO_DA_ETIQUETA.concluido}`}>{ROTULO_DA_ETIQUETA.concluido}</span>
       ) : (
-        <>
-          <label className="agora-campo" htmlFor={idDaEtiqueta}>Status</label>
-          <select id={idDaEtiqueta} className="agora-lista" value={etiqueta} disabled={movimento.gravando}
+        <select aria-label="Status" className="agora-lista" value={etiqueta} disabled={movimento.gravando}
             onChange={(mudanca) => movimento.mudarEtiqueta(processo.id, mudanca.target.value as EtiquetaDaEtapa)}>
             <BotaoDaCaixa />
             {ETIQUETAS.map((opcao) => <option key={opcao} value={opcao}><EtiquetaDoProcesso etiqueta={opcao} /></option>)}
           </select>
-        </>
       )}
     </div>
   )
@@ -121,12 +111,6 @@ function ResponsavelDoAgora({ processo, usuarios, usuarioId, movimento }: CorpoD
       <FotoDoResponsavel processo={processo} />
       <TrocaDoResponsavel responsavelId={processo.responsavel?.id ?? null} nome={nomeDoResponsavel(processo)} opcoes={opcoes}
         desabilitada={movimento.gravando} aoEscolher={(escolhido) => movimento.mudarResponsavel(processo.id, escolhido)} />
-      {podeAssumir(processo, usuarioId) && (
-        <button type="button" className="botao botao-secundario" disabled={movimento.gravando}
-          onClick={() => movimento.mudarResponsavel(processo.id, usuarioId)}>
-          Assumir
-        </button>
-      )}
     </p>
   )
 }

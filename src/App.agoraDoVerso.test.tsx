@@ -7,7 +7,7 @@ import { comResponsavelInicial } from './testes/responsavelInicialDeTeste'
 import { agoraDoVerso, janelasPorCima } from './testes/versoDoCartao'
 
 // O cartão "Agora" do verso (ticket 25 de processos-etapas, Andamento livre): a etapa e a etiqueta com listas que gravam ao
-// escolher, o responsável pelo nome (que abre a troca) e [Assumir], o selo de processo parado e o aviso do revisor.
+// escolher, o responsável pelo nome (que abre a troca, sem [Assumir]; ADR 0042), o selo de processo parado e o aviso do revisor.
 
 afterEach(() => {
   cleanup()
@@ -16,6 +16,12 @@ afterEach(() => {
 
 const COM_EU = { responsavel: { id: EU.id, nome: EU.nome, fotoUrl: null } }
 const COM_BIA = { responsavel: { id: BIA.id, nome: BIA.nome, fotoUrl: null } }
+// A seleção do responsável: o nome abre a lista, e "Você" é quem está na tela.
+async function escolherVoce() {
+  const botao = (await agoraDoVerso()).getByRole('button', { name: /Trocar o responsável|Escolher responsável/ })
+  fireEvent.click(botao)
+  fireEvent.change((await agoraDoVerso()).getByRole('combobox', { name: 'Responsável' }), { target: { value: EU.id } })
+}
 const lista = async (nome: string) => (await agoraDoVerso()).getByRole('combobox', { name: nome }) as HTMLSelectElement
 const ETAPAS_NA_ORDEM = [
   'Não iniciados', 'Modelagem piloto', 'Relatório e modelagem técnica', 'Revisão interna', 'Validação com o setor',
@@ -105,12 +111,12 @@ test('em Concluídos a etiqueta é só o texto "Finalizado", sem lista', async (
 
 // ---- Responsável
 
-test('sem responsável: "Escolher responsável", que abre a escolha, e [Assumir]; sem "Sem responsável" nem "Trocar"', async () => {
+test('sem responsável: "Escolher responsável", que abre a escolha, sem [Assumir]; sem "Sem responsável" nem "Trocar"', async () => {
   const falso = montarVerso(processoLido())
   const agora = await agoraDoVerso()
   expect(agora.queryByText('Sem responsável')).toBeNull()
   expect(agora.queryByRole('button', { name: /^Trocar/ })).toBeNull()
-  expect(agora.getByRole('button', { name: 'Assumir' })).toBeTruthy()
+  expect(agora.queryByRole('button', { name: 'Assumir' })).toBeNull()
   fireEvent.click(agora.getByRole('button', { name: 'Escolher responsável' }))
   fireEvent.change((await agoraDoVerso()).getByRole('combobox', { name: 'Responsável' }), { target: { value: BIA.id } })
   await waitFor(() => expect(falso.chamadas).toEqual([{ acao: 'responsavel', id: 'p1', usuarioId: BIA.id }]))
@@ -136,9 +142,9 @@ test('Esc fecha só a lista do responsável e devolve o foco ao nome', async () 
   expect(screen.getByRole('dialog')).toBeTruthy()
 })
 
-test('[Assumir] põe quem está na tela como responsável sem mover o processo', async () => {
+test('escolher "Você" na lista põe quem está na tela como responsável sem mover o processo', async () => {
   const falso = montarVerso(processoLido(COM_BIA))
-  fireEvent.click((await agoraDoVerso()).getByRole('button', { name: 'Assumir' }))
+  await escolherVoce()
   await waitFor(() => expect(falso.chamadas).toEqual([{ acao: 'responsavel', id: 'p1', usuarioId: EU.id }]))
   const agora = await agoraDoVerso()
   expect(await agora.findByText(EU.nome)).toBeTruthy()
@@ -146,16 +152,25 @@ test('[Assumir] põe quem está na tela como responsável sem mover o processo',
   expect(agora.getByText('Agora · etapa 4 de 8')).toBeTruthy()
 })
 
-test('quem já é o responsável não vê [Assumir]', async () => {
-  montarVerso(processoLido(COM_EU))
+test.each([COM_EU, COM_BIA, {}])('nunca há [Assumir], com qualquer responsável', async (responsavel) => {
+  montarVerso(processoLido(responsavel))
   expect((await agoraDoVerso()).queryByRole('button', { name: 'Assumir' })).toBeNull()
 })
 
-test('o nome abre a lista com quem está na tela primeiro, "(você)", e "Ninguém por enquanto" no fim; escolher grava', async () => {
+test('os seletores Etapa e Status têm nome acessível e nenhum rótulo visível', async () => {
+  montarVerso(processoLido())
+  const agora = await agoraDoVerso()
+  expect(agora.getByRole('combobox', { name: 'Etapa' })).toBeTruthy()
+  expect(agora.getByRole('combobox', { name: 'Status' })).toBeTruthy()
+  expect(agora.queryByText('Etapa', { selector: 'label, span' })).toBeNull()
+  expect(agora.queryByText('Status', { selector: 'label, span' })).toBeNull()
+})
+
+test('o nome abre a lista com quem está na tela primeiro, como "Você", e "Ninguém por enquanto" no fim; escolher grava', async () => {
   const falso = montarVerso(processoLido(COM_BIA))
   fireEvent.click((await agoraDoVerso()).getByRole('button', { name: `Trocar o responsável: ${BIA.nome}` }))
   const troca = (await agoraDoVerso()).getByRole('combobox', { name: 'Responsável' }) as HTMLSelectElement
-  expect([...troca.options].map((opcao) => opcao.textContent)).toEqual([`${EU.nome} (você)`, BIA.nome, 'Ninguém por enquanto'])
+  expect([...troca.options].map((opcao) => opcao.textContent)).toEqual(['Você', BIA.nome, 'Ninguém por enquanto'])
   fireEvent.change(troca, { target: { value: EU.id } })
   await waitFor(() => expect(falso.chamadas).toEqual([{ acao: 'responsavel', id: 'p1', usuarioId: EU.id }]))
 })
@@ -227,7 +242,7 @@ test('na Revisão interna, o aviso amarelo aparece quando o responsável é quem
   montarVerso(processoLido({ ...COM_BIA, ultimaVersao: DE_BIA }))
   const agora = await agoraDoVerso()
   expect(agora.getByText('Bia Teste enviou a V4; a revisão interna deveria ser de outra pessoa.')).toBeTruthy()
-  fireEvent.click(agora.getByRole('button', { name: 'Assumir' }))
+  await escolherVoce()
   await waitFor(async () => expect((await agoraDoVerso()).queryByText(/deveria ser de outra pessoa/)).toBeNull())
 })
 

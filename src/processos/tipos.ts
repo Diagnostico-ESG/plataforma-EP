@@ -216,7 +216,7 @@ export type ModuloDeProcessos = {
   moverProcesso(id: string, etapaId: string, chegada?: DadosDaChegada): Promise<void>
   /** Muda a etiqueta da etapa atual; em Concluídos ela é fixa. */
   mudarEtiqueta(id: string, etiqueta: EtiquetaDaEtapa): Promise<void>
-  /** Troca o responsável do processo; null tira o responsável. [Assumir] é mudar para si mesmo. */
+  /** Troca o responsável do processo; null tira o responsável. Mudar para si mesmo é escolher "Você" na lista. */
   mudarResponsavel(id: string, usuarioId: string | null): Promise<void>
   /** Suspender, cancelar e retomar pedem motivo; com o processo parado, a etapa, a etiqueta e o responsável não mudam. */
   suspenderProcesso(id: string, motivo: string): Promise<void>

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { etapaAtualDe } from '../testes/processoDaLista'
-import { avisoDoRevisor, fraseDaSituacaoParada, nomeDoResponsavel, ondeEstaOProcesso, opcoesDeResponsavel, podeAssumir, rotuloDoAgora } from './agoraDoProcesso'
+import { avisoDoRevisor, fraseDaSituacaoParada, nomeDoResponsavel, ondeEstaOProcesso, opcoesDeResponsavel, rotuloDoAgora } from './agoraDoProcesso'
 import type { ProcessoLido, UltimaVersao, UsuarioResponsavel } from './tipos'
 
 const ANA: UsuarioResponsavel = { id: 'u1', nome: 'Ana Teste', fotoUrl: 'https://fotos.exemplo/ana.png' }
@@ -23,13 +23,13 @@ test('o rótulo do Agora diz a posição entre as etapas ativas', () => {
 })
 
 describe('opcoesDeResponsavel', () => {
-  test('quem está na tela primeiro, com "(você)"; os demais; Ninguém por último', () => {
+  test('quem está na tela primeiro, como "Você"; os demais; Ninguém por último', () => {
     const opcoes = opcoesDeResponsavel(lido(), [ANA, BIA], 'u2')
-    expect(opcoes.map((opcao) => opcao.rotulo)).toEqual(['Bia Teste (você)', 'Ana Teste', 'Ninguém por enquanto'])
+    expect(opcoes.map((opcao) => opcao.rotulo)).toEqual(['Você', 'Ana Teste', 'Ninguém por enquanto'])
     expect(opcoes.at(-1)?.valor).toBe('')
   })
 
-  test('cada pessoa leva o nome sem o "(você)" e a foto para o Avatar; Ninguém não leva', () => {
+  test('cada pessoa leva o nome próprio (mesmo a de "Você") e a foto para o Avatar; Ninguém não leva', () => {
     const opcoes = opcoesDeResponsavel(lido(), [ANA, BIA], 'u1')
     expect(opcoes[0].pessoa).toEqual({ nome: 'Ana Teste', fotoUrl: 'https://fotos.exemplo/ana.png' })
     expect(opcoes[1].pessoa).toEqual({ nome: 'Bia Teste', fotoUrl: null })
@@ -45,12 +45,6 @@ describe('opcoesDeResponsavel', () => {
   test('sem responsável não há opção extra', () => {
     expect(opcoesDeResponsavel(lido({ responsavel: null }), [ANA], 'u1')).toHaveLength(2)
   })
-})
-
-test('[Assumir] aparece sempre que quem está na tela não é o responsável', () => {
-  expect(podeAssumir(lido(), 'u2')).toBe(true)
-  expect(podeAssumir(lido({ responsavel: null }), 'u1')).toBe(true)
-  expect(podeAssumir(lido(), 'u1')).toBe(false)
 })
 
 describe('avisoDoRevisor', () => {

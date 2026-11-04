@@ -31,10 +31,10 @@
 
 **Arquivos:** `src/components/processos/CorpoDoAgora.tsx` (`ListasDoAgora`, `ResponsavelDoAgora`); `src/processos/agoraDoProcesso.ts` (`podeAssumir`, `opcoesDeResponsavel`); `src/components/processos/Agora.css`; testes `src/App.agoraDoVerso.test.tsx`, `src/processos/agoraDoProcesso.test.ts`, `src/App.responsavelInicial.test.tsx` (e qualquer outro que o grep de "Assumir" achar).
 
-- [ ] 2.1 Rodar `grep -rn "Assumir" src` e listar todos os lugares (spec: "sai também dos lugares fora do Agora").
-- [ ] 2.2 Testes que falham: (a) nenhum botão "Assumir" no verso; (b) a seleção de responsável lista "Você" em primeiro lugar e escolhê-lo grava o usuário da tela; (c) escolher a si mesmo na Revisão interna sendo o autor da versão mostra o aviso do revisor sem impedir (critério 1); (d) os seletores respondem a `getByRole('combobox', { name: 'Etapa' })` e `'Status'` e não há texto visível "Etapa"/"Status" como rótulo (o `<label>` vira `aria-label`); (e) Consulta continua sem poder trocar o responsável.
-- [ ] 2.3 Implementar: trocar `<label>`/`<span className="agora-campo">` por `aria-label` nos dois seletores (em Concluídos, o Status fixo também sem rótulo visível, com nome acessível); apagar o botão e `podeAssumir` (e o teste unitário dele) se ninguém mais o usa; garantir "Você" no topo em `opcoesDeResponsavel`.
-- [ ] 2.4 Ajustar os testes antigos de Assumir para provar a ausência; `npm test -- agoraDoVerso agoraDoProcesso responsavelInicial` verde; commit.
+- [x] 2.1 Rodar `grep -rn "Assumir" src` e listar todos os lugares (spec: "sai também dos lugares fora do Agora").
+- [x] 2.2 Testes que falham: (a) nenhum botão "Assumir" no verso; (b) a seleção de responsável lista "Você" em primeiro lugar e escolhê-lo grava o usuário da tela; (c) escolher a si mesmo na Revisão interna sendo o autor da versão mostra o aviso do revisor sem impedir (critério 1); (d) os seletores respondem a `getByRole('combobox', { name: 'Etapa' })` e `'Status'` e não há texto visível "Etapa"/"Status" como rótulo (o `<label>` vira `aria-label`); (e) Consulta continua sem poder trocar o responsável.
+- [x] 2.3 Implementar: trocar `<label>`/`<span className="agora-campo">` por `aria-label` nos dois seletores (em Concluídos, o Status fixo também sem rótulo visível, com nome acessível); apagar o botão e `podeAssumir` (e o teste unitário dele) se ninguém mais o usa; garantir "Você" no topo em `opcoesDeResponsavel`.
+- [x] 2.4 Ajustar os testes antigos de Assumir para provar a ausência; `npm test -- agoraDoVerso agoraDoProcesso responsavelInicial` verde; commit.
 
 ## Tarefa 3 — Data da modelagem piloto em campo fixo; linha de etapas só visual (critérios 7, 8)
 

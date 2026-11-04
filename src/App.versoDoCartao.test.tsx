@@ -249,7 +249,7 @@ test('as Etapas listam todas as etapas ativas na ordem do catálogo, com a atual
   const agora = await agoraDoVerso()
   expect(agora.getByRole('combobox', { name: 'Etapa' })).toBeTruthy()
   expect(agora.getByRole('combobox', { name: 'Status' })).toBeTruthy()
-  expect(agora.getByRole('button', { name: 'Assumir' })).toBeTruthy()
+  expect(agora.queryByRole('button', { name: 'Assumir' })).toBeNull()
 })
 
 test('a gaveta mostra as entradas e saídas do processo na etapa, ou que ainda não passou por ela', async () => {

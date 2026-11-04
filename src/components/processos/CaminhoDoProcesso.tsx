@@ -19,7 +19,7 @@ type CaminhoDoProcessoProps = {
   /** As revisões e a aprovação lidas pelo verso: o Agora registra e a gaveta lista. */
   registros: RegistrosDoProcesso
   podeAlterar: boolean
-  /** Quem está na tela, para o [Assumir] e o "(você)" da lista de responsáveis. */
+  /** Quem está na tela, para o "Você" da lista de responsáveis. */
   usuarioId: string
   /** Grava a situação (Retomar do Agora) e o arquivamento, e guarda a falha para o verso mostrar. */
   executar: Executar
