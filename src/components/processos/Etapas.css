@@ -178,7 +178,8 @@
   color: var(--texto);
 }
 
-/* A trilha do verso enxuto (spec, "Verso enxuto"): as etapas lado a lado, cada uma com a bolinha do ícone, o nome e a data. A
+/* A trilha do verso enxuto (spec, "Verso enxuto"): as etapas lado a lado, cada uma só com a bolinha do ícone (o nome vai na dica e no
+   rótulo de acessibilidade; as datas, na gaveta; ADR 0041). A
    gaveta de uma etapa aberta é um painel que flutua logo abaixo da trilha, na largura dela. */
 .etapas {
   position: relative;
@@ -206,8 +207,6 @@
   gap: var(--esp-1);
   min-height: 0;
   padding: 0 2px;
-  font-size: var(--tam-rotulo);
-  line-height: 1.25;
   text-align: center;
 }
 

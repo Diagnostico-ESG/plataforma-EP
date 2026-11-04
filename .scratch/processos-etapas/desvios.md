@@ -638,3 +638,13 @@ Ponto de partida da revisão: `marco/2026-10-26-inicio-quadro-livre-parte-5`.
 
 - **Mudança em funcionalidade existente, caminho curto.** A spec ("Etapas do verso") dizia que a linha mostrava a data da última saída; o usuário pediu para tirar nome e data da linha. Spec atualizada no lugar, com a marca `Em revisão desde 2026-11-04`; sem migração nem mudança de dado.
 - **Nome como dica.** `title` e `aria-label` na linha; testes de `etapasDoVerso`, `catalogoNosProcessos` e `versoDoCartao` leem o `title` em vez do texto de `.etapa-nome`; as datas seguem cobertas pelos testes da gaveta.
+
+## 2026-11-04 — /polir da linha de etapas só com ícones (ADR 0041)
+
+- **Corrigido:** em `Etapas.css`, `font-size` e `line-height` da `.etapa-cabeca` na trilha (sem texto na linha) e o comentário da trilha, que ainda falava em nome e data.
+- **Deixado de fora, com o motivo:**
+  - O nome só aparece ao passar o mouse (`title`): não aparece em toque nem no foco do teclado. Foi a escolha do usuário (ícones, nome na dica); o uso é em computador, e o `aria-label` cobre leitor de tela. Se incomodar, pedir um rótulo no foco pelo `/demanda`.
+  - Visitada e nunca visitada se distinguem pelo preenchimento da bolinha e pelo traço de ligação, além da cor; sem texto. Aceito, pela mesma escolha.
+  - `.etapa-sinal` (escondido por `display: none` na trilha) e `.etapa-iniciais` (sem uso) ficaram: sobra anterior a esta mudança, fora do escopo.
+  - A data da Modelagem piloto (`.etapas .etapa-modelagem`) não mudou; conferir no app real que não fica apertada sob a bolinha (critério `[visual]` presumido, sem o login).
+- **Detector do Impeccable:** sem achados nos dois arquivos.
