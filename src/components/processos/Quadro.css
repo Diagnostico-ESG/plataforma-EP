@@ -462,12 +462,6 @@ td .barra-etapa {
   gap: var(--esp-1);
 }
 
-/* Processo parado: a borda inteira muda para o vermelho do prazo (o selo com os dias diz o resto). */
-.cartao.cartao-parado,
-.cartao.cartao-parado:hover {
-  border-color: var(--atraso);
-}
-
 /* Lista: o selo de parado fica ao lado do nome. */
 .lista-parado {
   margin-left: var(--esp-2);

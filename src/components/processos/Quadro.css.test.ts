@@ -21,3 +21,9 @@ describe('Quadro.css: o texto oculto dos cartões fica preso à área que rola',
     expect(corpo, `regra de ${seletor} recebida: "${corpo}"; esperado conter "position: relative"`).toMatch(/position:\s*relative/)
   })
 })
+
+describe('Quadro.css: o cartão parado não tem borda vermelha (ADR 0042)', () => {
+  test('nenhuma regra muda a borda de .cartao-parado', () => {
+    expect(quadro, 'recebido CSS com .cartao-parado; esperado nenhuma regra para essa classe').not.toMatch(/cartao-parado/)
+  })
+})

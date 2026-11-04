@@ -22,10 +22,10 @@
 
 **Arquivos:** `src/components/SeloDoSetor.css`; `src/components/processos/Quadro.css` (regra `.cartao.cartao-parado`, ~linha 465); teste `src/components/processos/Quadro.css.test.ts`.
 
-- [ ] 1.1 Teste novo em `Quadro.css.test.ts`: o CSS não tem regra de borda para `.cartao-parado` (falha hoje).
-- [ ] 1.2 Remover a regra; conferir com grep se a classe `cartao-parado` é usada por outro estilo ou teste (`grep -rn cartao-parado src`), e deixar a classe só se algo depender dela. O selo de dias (`selosDoCartao`) não muda.
-- [ ] 1.3 `SeloDoSetor.css`: diminuir só o preenchimento (altura e largura), letra de 13px intacta. Sem teste (visual).
-- [ ] 1.4 `npm test -- Quadro.css cartaoDoQuadro SeloDoSetor` verde; commit.
+- [x] 1.1 Teste novo em `Quadro.css.test.ts`: o CSS não tem regra de borda para `.cartao-parado` (falha hoje).
+- [x] 1.2 Remover a regra; conferir com grep se a classe `cartao-parado` é usada por outro estilo ou teste (`grep -rn cartao-parado src`), e deixar a classe só se algo depender dela. O selo de dias (`selosDoCartao`) não muda.
+- [x] 1.3 `SeloDoSetor.css`: diminuir só o preenchimento (altura e largura), letra de 13px intacta. Sem teste (visual).
+- [x] 1.4 `npm test -- Quadro.css cartaoDoQuadro SeloDoSetor` verde; commit.
 
 ## Tarefa 2 — Agora: sem rótulos "Etapa"/"Status" e sem [Assumir] (critérios 1, 2)
 

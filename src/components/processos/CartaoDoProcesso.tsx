@@ -82,7 +82,7 @@ function AvisoParaLeitorDeTela({ esmaecido }: { esmaecido: boolean }) {
   return esmaecido ? <span className="etapa-so-leitor">Processo de outra pessoa.</span> : null
 }
 
-/** Processo parado ganha a faixa vermelha na borda; o cartão arrastado fica apagado. */
+/** Processo parado leva a classe cartao-parado (marca para teste e leitura; a borda é a comum, o selo de dias diz o resto); o cartão arrastado fica apagado. */
 function classesDoCartao(processo: ProcessoDaLista, apagado: boolean, esmaecido: boolean): string {
   const parado = diasDoProcessoParado(processo, hojeEmBrasilia()) !== null
   return ['cartao', apagado && 'cartao-apagado', esmaecido && 'cartao-esmaecido', parado && 'cartao-parado'].filter(Boolean).join(' ')
