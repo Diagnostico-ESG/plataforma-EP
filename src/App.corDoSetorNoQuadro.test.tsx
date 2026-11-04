@@ -54,7 +54,7 @@ test('o campo Setor do Novo processo mostra o quadradinho da cor de cada setor a
   expect(corClaraDaMarca(within(campo).getByRole('option', { name: 'TSB — Setor Teste B' }))).toBe(corDoSetor(22).hex)
 })
 
-test('no agrupamento por setor, a coluna não é tingida, o cabeçalho traz o selo na cor do setor e a coluna inativa traz a marca Inativo', async () => {
+test('no agrupamento por setor, a coluna não é tingida, o cabeçalho traz só a sigla, sem selo, e a coluna inativa traz a marca Inativo', async () => {
   const ativo = umSetor('s1', 'TSA', 'Setor de Testes A', true, 13)
   const inativo = umSetor('s3', 'MNO', 'Setor Antigo', false, 22)
   montar([processo('Processo Antigo', { processo: { setorId: 's3', setorSigla: 'MNO', setorCor: 22 } })], 'integrante_ep', [], new VersoesFalso(), [ativo, inativo])
@@ -66,9 +66,9 @@ test('no agrupamento por setor, a coluna não é tingida, o cabeçalho traz o se
   expect(regiao.style.getPropertyValue('--cor-do-setor')).toBe('')
   expect(coluna.getByText('Inativo')).toBeTruthy()
   expect(coluna.getByText('Setor Antigo')).toBeTruthy()
-  const selo = regiao.querySelector('.coluna-titulo .selo-do-setor') as HTMLElement
-  expect(selo.textContent).toBe('MNO')
-  expect(selo.style.getPropertyValue('--cor-do-setor')).toBe(corDoSetor(22).hex)
+  // O título é a sigla em texto, sem a pílula na cor do setor (ADR 0042); o selo fica no cartão.
+  expect(regiao.querySelector('.coluna-titulo .selo-do-setor')).toBeNull()
+  expect(regiao.querySelector('.coluna-titulo-principal')?.textContent).toContain('MNO')
 })
 
 const faixaDe = (cartao: HTMLElement) => cartao.querySelector('.selo-do-setor') as HTMLElement
@@ -97,7 +97,7 @@ test('por setor o cartão também leva o selo na cor do setor (ADR 0039 e 0040),
   expect(within(cartao).getAllByText('Emitir Ofício')).toHaveLength(1)
 })
 
-test('por setor o cabeçalho da coluna traz a sigla no selo da cor e o nome do setor, e a coluna vazia mantém a frase', async () => {
+test('por setor o cabeçalho da coluna traz a sigla (sem selo) e o nome do setor, e a coluna vazia mantém a frase', async () => {
   const setor = umSetor('s1', 'TSA', 'Setor A', true, 13)
   const outro = umSetor('s2', 'TSB', 'Setor B', true, 22)
   montar([processo('Emitir Ofício', { processo: { setorId: 's2', setorSigla: 'TSB', setorCor: 22 } })], 'integrante_ep', [], new VersoesFalso(), [setor, outro])
@@ -105,7 +105,7 @@ test('por setor o cabeçalho da coluna traz a sigla no selo da cor e o nome do s
   const regiao = await screen.findByRole('region', { name: 'TSA · Setor A' })
   expect(regiao.style.getPropertyValue('--cor-do-setor')).toBe('')
   expect(regiao.querySelector('.coluna-titulo-principal')?.textContent).toBe('TSA')
-  expect((regiao.querySelector('.coluna-titulo-principal .selo-do-setor') as HTMLElement).style.getPropertyValue('--cor-do-setor')).toBe(corDoSetor(13).hex)
+  expect(regiao.querySelector('.coluna-titulo-principal .selo-do-setor')).toBeNull()
   expect(regiao.querySelector('.coluna-titulo-nome')?.textContent).toBe('Setor A')
   expect(within(regiao).getByText('Nenhum processo deste setor no Quadro.')).toBeTruthy()
 })

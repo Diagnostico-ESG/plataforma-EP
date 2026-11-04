@@ -27,3 +27,15 @@ describe('Quadro.css: o cartão parado não tem borda vermelha (ADR 0042)', () =
     expect(quadro, 'recebido CSS com .cartao-parado; esperado nenhuma regra para essa classe').not.toMatch(/cartao-parado/)
   })
 })
+
+describe('Quadro.css: a coluna é uma faixa de fundo, e o título não tem plaqueta (ADR 0042)', () => {
+  test('.coluna tem o fundo da faixa e o recuo lateral igual ao dos cartões', () => {
+    const corpo = regraDe('.coluna')
+    expect(corpo, `regra de .coluna recebida: "${corpo}"; esperado conter "background: var(--fundo-faixa)"`).toMatch(/background:\s*var\(--fundo-faixa\)/)
+  })
+
+  test('o texto do título não tem borda nem fundo próprios', () => {
+    const corpo = regraDe('.coluna-titulo-texto')
+    expect(corpo, `regra de .coluna-titulo-texto recebida: "${corpo}"; esperado sem border nem background`).not.toMatch(/border|background/)
+  })
+})

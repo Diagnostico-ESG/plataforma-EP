@@ -71,9 +71,9 @@
 
 **Arquivos:** `src/components/processos/{ColunaDoQuadro,MatrizDoQuadro,LinhasDeGrupo,QuadroDeProcessos}.tsx`, `Quadro.css`, `Matriz.css`; token novo em `src/styles/tokens.css` (cor da faixa, claro e escuro); testes `App.quadro`, `App.linhasDoQuadro`, `App.corDoSetorNoQuadro`, `App.arrastarParaMover`, `Quadro.css.test.ts`, `Matriz.css.test.ts`.
 
-- [ ] 7.1 Testes que falham: título do Quadro por setor sem a pílula (sigla em negrito, nome abaixo, quantidade como texto); por etapa com ícone, nome e quantidade; por responsável com avatar, nome e quantidade; coluna vazia continua com a faixa (estrutura presente); arrastar cartão entre colunas continua movendo; `Quadro.css.test.ts` confere que `position: relative` da correção de 2026-11-04 continua.
-- [ ] 7.2 Implementar: fundo no contêiner da coluna (título e cartões dentro), mesmo recuo lateral nos dois, token novo; valer nas Linhas.
-- [ ] 7.3 `npm test -- quadro linhasDoQuadro corDoSetorNoQuadro arrastarParaMover Quadro.css Matriz.css`; commit.
+- [x] 7.1 Testes que falham: título do Quadro por setor sem a pílula (sigla em negrito, nome abaixo, quantidade como texto); por etapa com ícone, nome e quantidade; por responsável com avatar, nome e quantidade; coluna vazia continua com a faixa (estrutura presente); arrastar cartão entre colunas continua movendo; `Quadro.css.test.ts` confere que `position: relative` da correção de 2026-11-04 continua.
+- [x] 7.2 Implementar: fundo no contêiner da coluna (título e cartões dentro), mesmo recuo lateral nos dois, token novo; valer nas Linhas.
+- [x] 7.3 `npm test -- quadro linhasDoQuadro corDoSetorNoQuadro arrastarParaMover Quadro.css Matriz.css`; commit.
 
 ## Tarefa 8 — Verso rearrumado, Anotações e miniatura (critérios 16, 17)
 

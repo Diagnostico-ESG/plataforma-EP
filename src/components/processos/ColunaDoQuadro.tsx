@@ -10,7 +10,6 @@ import { iconeDaEtapa } from '../../processos/iconeDaEtapa'
 import { chaveDaLinha, type TipoDeLinha } from '../../processos/linhasDoQuadro'
 import { Icone } from '../Icone'
 import { Pilula } from '../Pilula'
-import { SeloDoSetor } from '../SeloDoSetor'
 import { CartaoDoProcesso } from './CartaoDoProcesso'
 import { PeDaColunaDosConcluidos } from './PeDaColunaDosConcluidos'
 
@@ -116,10 +115,9 @@ export function CabecalhoDaColuna({ coluna, agrupar }: { coluna: Coluna; agrupar
   )
 }
 
-// Por setor a sigla vai no selo da cor do setor, o mesmo do cartão; a coluna em si não é tingida (ADR 0040).
+// Por setor a sigla é só o texto em negrito, sem a pílula: o selo da cor do setor fica no cartão (ADR 0040 e 0042).
 function TituloDaColuna({ coluna }: { coluna: Coluna }) {
-  if (coluna.cor === undefined) return <>{coluna.titulo}</>
-  return <SeloDoSetor sigla={coluna.titulo} cor={coluna.cor} />
+  return <>{coluna.titulo}</>
 }
 
 // Por setor a coluna é anunciada pela sigla, pelo nome e, no setor desativado, por "inativo": o aria-label encobre a pílula.

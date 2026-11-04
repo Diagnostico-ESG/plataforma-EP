@@ -37,6 +37,8 @@
   --fundo: #f3f4f7;
   --fundo-cabecalho: #fafbfc;
   --fundo-grupo: #f6f7f9;
+  /* A faixa de fundo de cada coluna do Quadro: um pouco mais escura que o fundo da página (ADR 0042) */
+  --fundo-faixa: #e8eaef;
   --fundo-contexto: var(--fundo-cabecalho);
   --folha: #ffffff;
   --linha: #e3e6ec;
