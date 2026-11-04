@@ -2,6 +2,8 @@
 
 Status: ready-for-agent
 
+**Quadro, verso e Lista mais enxutos (mudança de 2026-11-04, spec própria).** A funcionalidade 21, `.scratch/enxugar-quadro-e-verso/spec.md` (ADR 0042), tira o [Assumir], o [Enviar relatório], o envio de .bpmn, os rótulos Etapa e Status do verso e as colunas Macroprocesso e Setor da Lista agrupada; a versão histórica passa a exigir o .bpm, a Data da modelagem piloto ganha um campo fixo no verso e sai da linha de etapas, e o Quadro ganha faixas de fundo nas colunas. Onde esta spec divergir, vale aquela.
+
 **Redesenho do Quadro (mudança de 2026-10-31, seção abaixo).** A funcionalidade 18, `redesenho-do-quadro` (ADR 0037), deixa o Quadro igual à proposta 6 e o verso igual à verso-3: faixa de controles com "Quadro ▾", Linhas, Filtros e "Destacar os meus" (no lugar de "Só os meus"), controle Situação na Lista e no Quadro por setor, barra de cima e faixa lateral novas, ícone por etapa e verso enxuto com a miniatura do fluxograma. Onde esta spec falar de "Agrupar por" no Quadro, "Só os meus", "Todos | Concluídos", "Mostrar cancelados" ou do Quadro | Lista na barra, vale a seção "Redesenho do Quadro".
 
 **Responsável inicial por etapa (mudança de 2026-10-30, seção abaixo).** A funcionalidade 17, `responsavel-inicial-por-etapa` (ADR 0036), troca "quem move vira o responsável" pelo responsável inicial de cada etapa, definido no Catálogo de etapas. Onde esta spec disser que quem move passa a ser o responsável, vale a seção "Responsável inicial por etapa".

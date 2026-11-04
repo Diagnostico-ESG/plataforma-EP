@@ -2,6 +2,8 @@
 
 Status: ready-for-agent
 
+**Quadro, verso e Lista mais enxutos (mudança de 2026-11-04, spec própria).** A funcionalidade 21, `.scratch/enxugar-quadro-e-verso/spec.md` (ADR 0042), tira o [Assumir], o [Enviar relatório], o envio de .bpmn, os rótulos Etapa e Status do verso e as colunas Macroprocesso e Setor da Lista agrupada; a versão histórica passa a exigir o .bpm, a Data da modelagem piloto ganha um campo fixo no verso e sai da linha de etapas, e o Quadro ganha faixas de fundo nas colunas. Onde esta spec divergir, vale aquela.
+
 **Lista sem busca e por Setor (mudança de 2026-10-30, spec própria).** `.scratch/lista-por-setor/spec.md` tira a busca pelo nome da Lista e acrescenta "Agrupar por: Setor" (setor → macroprocesso → processo). Onde esta spec falar da busca ou só do agrupamento por Macroprocesso, vale aquela.
 
 **Enxugar o cartão e o cadastro (mudança de 2026-10-29, spec própria).** A funcionalidade 15, `.scratch/enxugar-cartao-e-cadastro/spec.md` (ADR 0035), recua os níveis da árvore da Lista e lista os arquivos um abaixo do outro, com o nome completo e o ícone do tipo; também enxuga o cadastro, o cartão e o verso. Onde esta spec divergir, vale aquela.
@@ -266,3 +268,5 @@ Entregue em 2026-10-29 (commit 9fc0201), com ressalva: critérios [visual] de re
 Entregue em 2026-10-30 (commit 7a02d80), com ressalva: critérios [visual] 14 a 17 presumidos (nada visto com o login real); revisão de segurança foi a de reserva (menos completa: o /security-review só viu documentação); conferência do cadastro aberto no painel do Supabase de desenvolvimento adiada (backlog); a Edge Function planilhas-dos-dashboards ainda precisa ser publicada de novo no desenvolvimento; pgTAP só no workflow "Testes de banco" (Docker indisponível); as ressalvas das entregas anteriores seguem valendo
 
 Entregue em 2026-10-30 (commit 2b785d5), com ressalva: critério [visual] 10 de lista-por-setor visto só em página local com módulos falsos (nada visto com o login real); revisão de segurança dispensada (a mudança só lê o parâmetro agrupar do endereço, sem login, dado pessoal, banco ou arquivos), com revisão de reserva por leitura; as ressalvas das entregas anteriores seguem valendo
+
+Em revisão desde 2026-11-04 (enxugar-quadro-e-verso, ADR 0042)
