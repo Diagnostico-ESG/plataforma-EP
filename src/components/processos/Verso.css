@@ -240,8 +240,9 @@
 
 .verso-versao-e-notas {
   display: grid;
-  grid-template-columns: 3fr 2fr;
-  gap: var(--esp-5);
+  /* Uma coluna só (ADR 0042): com a miniatura no dobro, a versão pede a largura toda e as Anotações vêm embaixo, com metade da altura. */
+  grid-template-columns: 1fr;
+  gap: var(--esp-4);
   align-items: start;
 }
 

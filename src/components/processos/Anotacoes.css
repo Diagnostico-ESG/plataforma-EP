@@ -22,8 +22,8 @@
 .anotacoes-campo {
   box-sizing: border-box;
   width: 100%;
-  min-height: calc(21em + 2 * var(--esp-2));
-  /* o dobro de antes (verso enxuto): cerca de 14 linhas; passa de cerca de 24 e rola por dentro, sem empurrar a janela */
+  /* metade da altura de antes (ADR 0042: 21 para 10,5 linhas): o espaço vai para a miniatura; passa de cerca de 24 linhas e rola por dentro, sem empurrar a janela */
+  min-height: calc(10.5em + 2 * var(--esp-2));
   max-height: calc(36em + 2 * var(--esp-2));
   padding: var(--esp-2);
   overflow-y: auto;

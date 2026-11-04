@@ -79,8 +79,8 @@
 
 **Arquivos:** `src/components/processos/{VersoDoCartao,BlocoDasAnotacoes,Verso.css? (achar com grep "verso-corpo")}`, `src/components/versoes/{VersaoEmDestaque,Versoes.css}`, CSS das Anotações (`grep -rn "anotacoes-campo\|min-height" src/components/processos/*.css`); testes `App.anotacoesDoProcesso`, `App.miniaturaDoFluxograma`, `App.versoEnxuto*`.
 
-- [ ] 8.1 Anotações: altura mínima de 21 para 10,5 linhas; guardar sozinho intacto (testes existentes verdes; o campo continua rolando/crescendo).
-- [ ] 8.2 Miniatura: tamanho em `VersaoEmDestaque` até o dobro; o fallback (ícone + aviso) continua (`App.miniaturaDoFluxograma`).
+- [x] 8.1 Anotações: altura mínima de 21 para 10,5 linhas; guardar sozinho intacto (testes existentes verdes; o campo continua rolando/crescendo).
+- [x] 8.2 Miniatura: tamanho em `VersaoEmDestaque` até o dobro; o fallback (ícone + aviso) continua (`App.miniaturaDoFluxograma`).
 - [ ] 8.3 Disposição dos blocos exatamente como na prévia aprovada (Tarefa 0). Conferir no app (Vite) em 1366×768, sem rolagem a mais.
 - [ ] 8.4 `npm test -- anotacoesDoProcesso miniaturaDoFluxograma versoEnxuto`; commit.
 

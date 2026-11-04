@@ -145,10 +145,10 @@
   margin-bottom: var(--esp-2);
 }
 
-/* O verso enxuto: o quadro da miniatura à esquerda (a imagem da versão; sem .png, o ícone do fluxograma e o aviso) e, à direita,
+/* O verso enxuto: o quadro da miniatura (o dobro do tamanho de antes, ADR 0042) à esquerda (a imagem da versão; sem .png, o ícone do fluxograma e o aviso) e, à direita,
    a versão com os arquivos em lista vertical, cada um com o selo do tipo, o nome e o tamanho. */
 .versao-destaque {
-  grid-template-columns: 11rem minmax(0, 1fr);
+  grid-template-columns: 22rem minmax(0, 1fr);
   gap: var(--esp-4);
   padding: var(--esp-3);
   border: 1px solid var(--linha);
@@ -158,7 +158,7 @@
 .versao-destaque-miniatura {
   display: grid;
   place-items: center;
-  height: 8rem;
+  height: 16rem;
   padding: var(--esp-1);
   overflow: hidden;
   align-content: center;
