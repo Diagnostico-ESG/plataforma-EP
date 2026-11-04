@@ -52,7 +52,7 @@
 - [x] 4.2 Implementar na tela só (a função do Drive e o banco continuam aceitando .bpmn, ADR 0042). Atualizar os testes antigos que enviavam .bpmn.
 - [x] 4.3 `npm test -- versoes enviarVersao versaoPiloto registrarVersaoHistorica acrescentarArquivo substituirArquivo baixarArquivo`; commit.
 
-## Tarefa 5 — Sem [Enviar relatório]; confirmação de arquivos leva a um caminho que existe (critérios 5, 6)
+## Tarefa 5 — ADIADA (usuário: manter por ora; ver desvios.md) — Sem [Enviar relatório]; confirmação de arquivos leva a um caminho que existe (critérios 5, 6)
 
 **Arquivos:** `src/components/versoes/SecaoDeVersoes.tsx` (`AcoesDaSecao`, `Aberto`, `FormularioAberto`); `src/versoes/rotulos.ts` (`podeEnviarRelatorioNaEtapa`, `ROTULO_DO_ENVIO`); `src/components/versoes/FormularioDeRelatorio.tsx` (mantém só se servir o "+ Acrescentar relatório"; senão apagar com o teste); `src/components/processos/JanelaDeEnvioDeArquivos.tsx` e `JanelaDaConfirmacaoDeArquivos.tsx` + `src/processos/frasesDaConfirmacaoDeArquivos.ts`; testes `App.relatorioDepois`, `App.enviarArquivosAgora`, `App.confirmacaoDeArquivos`, `App.versoesNoProcesso`, `src/versoes/rotulos.test.ts`.
 
@@ -64,8 +64,8 @@
 
 **Arquivos:** `src/components/processos/{TabelaDeProcessos,LinhaDoProcesso,ArvoreDaLista,SeloDeParado,DiasNaEtapa}.tsx` + `Quadro.css`/`ArvoreDaLista.css` (`.lista-parado`); testes `src/App.lista.test.tsx`, `App.listaPorColuna`, `App.arvoreDaLista`, `App.arvoreDaListaPorSetor`.
 
-- [ ] 6.1 Testes que falham: com "Agrupar por: Macroprocesso" e "Setor" não há colunas Macroprocesso e Setor; com "Nenhum" há; filtro e ordenação das colunas que ficam seguem iguais; processo parado: na célula da Etapa atual há relógio + número ("8"), com `aria-label` e `title` "8 dias nesta etapa", e o nome do processo não traz mais o selo.
-- [ ] 6.2 Implementar (versão compacta do selo: relógio + número; reusar `diasDoProcessoParado`). `npm test -- lista arvoreDaLista listaPorColuna`; commit.
+- [x] 6.1 Testes que falham: com "Agrupar por: Macroprocesso" e "Setor" não há colunas Macroprocesso e Setor; com "Nenhum" há; filtro e ordenação das colunas que ficam seguem iguais; processo parado: na célula da Etapa atual há relógio + número ("8"), com `aria-label` e `title` "8 dias nesta etapa", e o nome do processo não traz mais o selo.
+- [x] 6.2 Implementar (versão compacta do selo: relógio + número; reusar `diasDoProcessoParado`). `npm test -- lista arvoreDaLista listaPorColuna`; commit.
 
 ## Tarefa 7 — Quadro: faixas de fundo e títulos sem pílula (critérios 14, 12 do visual)
 

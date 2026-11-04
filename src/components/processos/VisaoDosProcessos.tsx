@@ -150,7 +150,7 @@ function ConteudoDaVisao(props: ConteudoDaVisaoProps) {
 function ListaDosProcessos({ lista, visiveis, todos, idEscolhido, aoAbrir, filtros, mostrar, ordenacao, ...props }: ConteudoDaVisaoProps) {
   const cabecalho = (
     <CabecalhoDaLista opcoes={props.opcoes} filtros={filtros} mostrar={mostrar} ordenacao={ordenacao}
-      aoMudarFiltros={props.aoMudarFiltros} aoOrdenar={props.aoOrdenar} />
+      aoMudarFiltros={props.aoMudarFiltros} aoOrdenar={props.aoOrdenar} agrupada={props.agruparLista !== 'nenhum'} />
   )
   const linhas = linhasDaLista(visiveis, todos, ordenacao)
   if (props.agruparLista !== 'nenhum') {

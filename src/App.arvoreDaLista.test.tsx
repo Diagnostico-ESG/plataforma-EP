@@ -69,6 +69,15 @@ const nomes = () => Array.from(document.querySelectorAll('.tabela-de-processos t
 const grupos = () => Array.from(document.querySelectorAll('.botao-do-grupo')).map((botao) => botao.getAttribute('aria-label'))
 const seta = (nome: string) => screen.getByRole('button', { name: `Abrir arquivos de ${nome}` })
 
+test('agrupada, a Lista não tem as colunas Setor e Macroprocesso; sem agrupar, tem (ADR 0042)', async () => {
+  montar()
+  await macro('Macro Um')
+  const colunas = () => Array.from(document.querySelectorAll('.tabela-de-processos thead th')).map((th) => (th.textContent ?? '').replace(/[▲▼▾,].*$/, ''))
+  expect(colunas()).toEqual(['Processo', 'Tipo', 'Etapa atual', 'Responsável', 'Situação'])
+  fireEvent.click(within(screen.getByRole('group', { name: 'Agrupar por' })).getByRole('button', { name: 'Nenhum' }))
+  await waitFor(() => expect(colunas()).toEqual(['Processo', 'Tipo', 'Setor', 'Macroprocesso', 'Etapa atual', 'Responsável', 'Situação']))
+})
+
 test('Agrupar por Macroprocesso mostra macro, setor e processos com as contagens; Nenhum volta à tabela', async () => {
   montar()
   await macro('Macro Um')
@@ -85,19 +94,19 @@ test('Agrupar por Macroprocesso mostra macro, setor e processos com as contagens
   await waitFor(() => expect(window.location.hash).toBe('#/processos/lista?agrupar=macroprocesso'))
 })
 
-test('o subprocesso de outro setor vem recuado sob o pai, com o selo do setor dele', async () => {
+test('o subprocesso de outro setor vem recuado sob o pai', async () => {
   montar()
   await macro('Macro Um')
   const linha = screen.getByText('Conferir Recibo').closest('tr') as HTMLElement
   expect(linha.querySelector('td')?.classList.contains('processo-recuado')).toBe(true)
-  expect(within(linha).getByText('TSB')).toBeTruthy()
   expect(within(linha).queryByText(/subprocesso de/)).toBeNull()
 })
 
 test('o subprocesso cujo pai foi filtrado vem sob o próprio setor, no macroprocesso do pai, com "subprocesso de"', async () => {
+  // Agrupada, a Lista não tem a coluna Setor: o filtro vem do endereço (o menu da coluna está na Lista sem agrupar).
+  window.location.hash = '#/processos/lista?agrupar=macroprocesso&setor=s2'
   montar()
   await macro('Macro Um')
-  await escolherNaColuna('Setor', 'TSB')
   await waitFor(() => expect(grupos()).toEqual(['Macro Dois, 1 processo', 'TSB Setor B, 1 processo', 'Macro Um, 2 processos', 'TSB Setor B, 2 processos']))
   const linha = screen.getByText('Conferir Recibo').closest('tr') as HTMLElement
   expect(within(linha).getByText('subprocesso de Pagar Diária')).toBeTruthy()

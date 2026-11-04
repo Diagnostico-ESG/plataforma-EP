@@ -26,12 +26,14 @@ export function LinhaDoProcesso({ linha, escolhida, aoAbrir, arvore }: LinhaDoPr
           {linha.nome}
         </button>
         <IndicacaoDoPai linha={linha} arvore={arvore} />
-        <SeloDeParado processo={linha} />
       </td>
       <td>{ROTULO_DO_TIPO[linha.tipo]}</td>
-      <td><SeloDoSetor sigla={linha.setorSigla} cor={linha.setorCor ?? 1} /></td>
-      <td>{linha.macroprocessoNome}</td>
-      <td>{linha.etapaAtual ? <BarraDeProgresso processo={linha} /> : '—'}</td>
+      {!arvore && <td><SeloDoSetor sigla={linha.setorSigla} cor={linha.setorCor ?? 1} /></td>}
+      {!arvore && <td>{linha.macroprocessoNome}</td>}
+      <td>
+        {linha.etapaAtual ? <BarraDeProgresso processo={linha} /> : '—'}
+        <SeloDeParado processo={linha} />
+      </td>
       <td><ResponsavelDaLinha responsavel={linha.responsavel} /></td>
       <td>
         <span className="lista-situacao">

@@ -151,7 +151,7 @@ test('a coluna Etapa atual traz a barra com o nome acessível "Etapa n de N: nom
   expect(linha.querySelector('.etiqueta')).toBeNull()
 })
 
-test('o selo de parado aparece ao lado do nome com 8 dias na etapa e não com 7, nem em processo concluído', async () => {
+test('o atraso (relógio e número) fica junto da Etapa atual com 8 dias, não com 7, nem em processo concluído; o nome fica limpo', async () => {
   montar({
     processos: [
       processo('p1', 'Oito Dias', { entrouNaEtapaEm: diaDeslocado(-8) }),
@@ -160,8 +160,12 @@ test('o selo de parado aparece ao lado do nome com 8 dias na etapa e não com 7,
     ],
   })
   const selo = async (nome: string) => ((await screen.findByRole('button', { name: nome })).closest('tr') as HTMLElement).querySelector('.lista-parado')
-  expect((await selo('Oito Dias'))?.textContent).toBe('8 dias nesta etapa')
-  expect((await selo('Oito Dias'))?.querySelector('.pilula-atraso')).not.toBeNull()
+  const oito = await selo('Oito Dias')
+  expect(oito?.textContent).toBe('8')
+  expect(oito?.getAttribute('aria-label')).toBe('8 dias nesta etapa')
+  expect(oito?.getAttribute('title')).toBe('8 dias nesta etapa')
+  expect(oito?.closest('td')?.textContent).toContain('Reunião de modelagem')
+  expect(((await screen.findByRole('button', { name: 'Oito Dias' })).closest('td') as HTMLElement).querySelector('.lista-parado')).toBeNull()
   expect(await selo('Sete Dias')).toBeNull()
   expect(await selo('Concluído Antigo')).toBeNull()
 })

@@ -84,19 +84,19 @@ test('o setor é a linha de cima e o macroprocesso vem recuado abaixo dele', asy
   expect(within(linhas[0] as HTMLElement).getByText('TSA')).toBeTruthy()
 })
 
-test('o subprocesso de outro setor vem recuado sob o pai, com o selo do setor dele', async () => {
+test('o subprocesso de outro setor vem recuado sob o pai', async () => {
   montar()
   await setor('TSA Setor A')
   const linha = screen.getByText('Conferir Recibo').closest('tr') as HTMLElement
   expect(linha.querySelector('td')?.classList.contains('processo-recuado')).toBe(true)
-  expect(within(linha).getByText('TSB')).toBeTruthy()
   expect(within(linha).queryByText(/subprocesso de/)).toBeNull()
 })
 
 test('o subprocesso cujo pai foi filtrado vem sozinho no próprio setor, no macroprocesso do pai, com "subprocesso de"', async () => {
+  // Agrupada, a Lista não tem a coluna Setor: o filtro vem do endereço.
+  window.location.hash = '#/processos/lista?agrupar=setor&setor=s2'
   montar()
-  await setor('TSA Setor A')
-  await escolherNaColuna('Setor', 'TSB')
+  await setor('TSB Setor B')
   await waitFor(() => expect(grupos()).toEqual(['TSB Setor B, 3 processos', 'Macro Dois, 1 processo', 'Macro Um, 2 processos']))
   const linha = screen.getByText('Conferir Recibo').closest('tr') as HTMLElement
   expect(within(linha).getByText('subprocesso de Pagar Diária')).toBeTruthy()

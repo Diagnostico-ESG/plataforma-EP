@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react'
 import '../versoes/VersaoEmDestaque.css'
 import './ArvoreDaLista.css'
 import type { EstadoDosArquivos } from '../../hooks/useArquivosDosProcessos'
-import { COLUNAS_DA_LISTA } from '../../processos/colunasDaLista'
+import { colunasDaLista } from '../../processos/colunasDaLista'
 import { arquivosDaVersaoMaisRecente } from '../../versoes/arquivosDaArvore'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { ErroAoCarregar } from '../cadastros/ErroAoCarregar'
@@ -18,7 +18,7 @@ type LinhaDosArquivosProps = ConteudoProps & { nivel: number }
 export function LinhaDosArquivos({ nivel, ...conteudo }: LinhaDosArquivosProps) {
   return (
     <tr className="linha-dos-arquivos">
-      <td colSpan={COLUNAS_DA_LISTA.length} style={{ '--nivel': nivel } as CSSProperties}>
+      <td colSpan={colunasDaLista(true).length} style={{ '--nivel': nivel } as CSSProperties}>
         <ConteudoDosArquivos {...conteudo} />
       </td>
     </tr>

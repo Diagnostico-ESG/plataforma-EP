@@ -462,9 +462,15 @@ td .barra-etapa {
   gap: var(--esp-1);
 }
 
-/* Lista: o selo de parado fica ao lado do nome. */
+/* Lista: o atraso (relógio e número) fica junto da Etapa atual. */
 .lista-parado {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-1);
   margin-left: var(--esp-2);
+  color: var(--atraso-texto);
+  font-size: var(--tam-secundario);
+  font-weight: 600;
 }
 
 /* Etiqueta: só o ícone no cartão (o nome vem no title e no texto oculto); nas caixas e no verso, ícone e nome lado a lado. */

@@ -1,4 +1,4 @@
-import { COLUNAS_DA_LISTA, type ColunaDoCabecalho } from '../../processos/colunasDaLista'
+import { COLUNAS_DA_LISTA, type ColunaDoCabecalho, colunasDaLista } from '../../processos/colunasDaLista'
 import type { FiltrosDosProcessos as Filtros, MostrarNoPortfolio } from '../../processos/enderecoDosProcessos'
 import type { OpcaoDoFiltro, OpcoesDosFiltros } from '../../processos/filtrosDosProcessos'
 import type { ColunaDaLista, OrdenacaoDaLista, SentidoDaOrdem } from '../../processos/ordenacaoDaLista'
@@ -15,6 +15,8 @@ type CabecalhoDaListaProps = {
   ordenacao: OrdenacaoDaLista
   aoMudarFiltros: (filtros: Filtros) => void
   aoOrdenar: (ordenacao: OrdenacaoDaLista) => void
+  /** Agrupada por Macroprocesso ou Setor: sem as colunas Setor e Macroprocesso. */
+  agrupada: boolean
 }
 
 /** O cabeçalho da Lista: cada coluna é um botão com o menu de ordenação e (menos Processo) de filtro, como numa planilha. */
@@ -22,7 +24,7 @@ export function CabecalhoDaLista(props: CabecalhoDaListaProps) {
   return (
     <thead>
       <tr>
-        {COLUNAS_DA_LISTA.map((coluna, indice) => (
+        {colunasDaLista(props.agrupada).map((coluna, indice) => (
           <CelulaDoCabecalho key={coluna.coluna} {...props} coluna={coluna} paraDireita={indice < ABREM_PARA_DIREITA} />
         ))}
       </tr>
@@ -63,7 +65,7 @@ function itensDeOrdenar(coluna: ColunaDaLista, sentido: SentidoDaOrdem | null, a
 type FiltroDaColuna = { itens: ItemDoMenu[]; escolhido: string | null }
 
 // O filtro da coluna: "Todos" e as opções, com o valor escolhido marcado; null quando a coluna não filtra.
-function filtroDaColuna({ filtro }: ColunaDoCabecalho, { opcoes, filtros, mostrar, aoMudarFiltros }: Omit<CabecalhoDaListaProps, 'ordenacao'>): FiltroDaColuna | null {
+function filtroDaColuna({ filtro }: ColunaDoCabecalho, { opcoes, filtros, mostrar, aoMudarFiltros }: Omit<CabecalhoDaListaProps, 'ordenacao' | 'agrupada'>): FiltroDaColuna | null {
   if (!filtro || (filtro.nome === 'situacao' && mostrar !== 'todos')) return null
   const valor = filtros[filtro.nome]
   const escolher = (novo: string | null) => () => aoMudarFiltros({ ...filtros, [filtro.nome]: novo } as Filtros)

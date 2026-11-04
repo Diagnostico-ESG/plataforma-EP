@@ -9,7 +9,7 @@ export type ColunaDoCabecalho = {
   filtro: { nome: keyof FiltrosDosProcessos; opcoes: keyof OpcoesDosFiltros; todos: string } | null
 }
 
-/** As colunas da Lista, na ordem da tabela. */
+/** As colunas da Lista sem agrupamento, na ordem da tabela. */
 export const COLUNAS_DA_LISTA: ColunaDoCabecalho[] = [
   { coluna: 'processo', rotulo: 'Processo', filtro: null },
   { coluna: 'tipo', rotulo: 'Tipo', filtro: { nome: 'tipo', opcoes: 'tipos', todos: 'Todos' } },
@@ -19,3 +19,10 @@ export const COLUNAS_DA_LISTA: ColunaDoCabecalho[] = [
   { coluna: 'responsavel', rotulo: 'Responsável', filtro: { nome: 'responsavel', opcoes: 'responsaveis', todos: 'Todos' } },
   { coluna: 'situacao', rotulo: 'Situação', filtro: { nome: 'situacao', opcoes: 'situacoes', todos: 'Todas' } },
 ]
+
+const COLUNAS_DA_ARVORE = COLUNAS_DA_LISTA.filter(({ coluna }) => coluna !== 'setor' && coluna !== 'macroprocesso')
+
+/** Agrupada por Macroprocesso ou Setor, a árvore já mostra os dois: saem as colunas Setor e Macroprocesso (ADR 0042). */
+export function colunasDaLista(agrupada: boolean): ColunaDoCabecalho[] {
+  return agrupada ? COLUNAS_DA_ARVORE : COLUNAS_DA_LISTA
+}
