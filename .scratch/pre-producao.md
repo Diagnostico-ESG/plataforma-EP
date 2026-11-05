@@ -33,3 +33,12 @@ Revisão de segurança para produção (roteiro do `/ship`), iniciada em 2026-11
 2. **Passo 4, painel de produção** e **passo 5, hospedagem:** ficam para o roteiro de publicação, porque a produção e o site ainda não existem.
 3. **Passo 6, script por perfil pela API:** não escrevi. Os testes de banco já tentam, com um usuário de cada perfil e um visitante, as ações proibidas, e o teste 46 confere permissões de visitante; o script repetiria isso pelo caminho HTTP. Posso escrevê-lo se você quiser essa prova a mais (pede usuários de teste no desenvolvimento).
 4. **`/security-review` completo (passo 7):** só você pode digitá-lo; como a `main` já tem tudo, ele provavelmente dirá que não há mudanças. Decida se quer tentar.
+
+## Fechamento (2026-11-05)
+
+- **Consulta do catálogo no desenvolvimento (passo 2):** rodada pelo usuário no SQL Editor; resposta "Success" (relatada, sem colar a saída), entendida como nenhuma linha: nenhuma tabela sem RLS, view sem `security_invoker`, função `security definer` fora da exceção, bucket nem permissão de visitante em tabela. Rodar a mesma consulta na produção depois do `db push` (roteiro "Publicar no banco de produção").
+- **Não feitos, por decisão de seguir a recomendação (o usuário não pediu):** script por perfil pela API (passo 6) e `/security-review` completo (passo 7). Continuam disponíveis a pedido.
+- **Para o roteiro de publicação:** painel de produção (passo 4), hospedagem Netlify (passo 5), `.env` no `.gitignore` (backlog), decisões de LGPD do `.scratch/lgpd-inventario.md` com o encarregado, o jurídico e a TI.
+- Sem achado que bloqueie a publicação.
+
+Revisão de pré-produção em 2026-11-05 (commit b0213d7) (com banco)
