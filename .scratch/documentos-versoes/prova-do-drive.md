@@ -38,3 +38,13 @@ OK      depois da troca, o arquivo segue ok (o banco guarda o MD5 novo) (situaç
 
 - Seção 7 do roteiro (arrumação): adiada pelo usuário em 2026-10-16, registrada no `.scratch/backlog.md` para antes do `/ship`.
 - Fecho: Tarefa 9 do `plano-01.md` e o `Concluído em` dos tickets 01 a 08, conferindo esta saída contra os critérios de prova de cada um.
+
+## Prova final, 2026-11-04 e 2026-11-05 (roteiro-prova-final.md)
+
+Feita pelo usuário no desenvolvimento, com a função `arquivos-no-drive` publicada a partir da `main` (commit c267fe3 na segunda publicação, depois da correção do anexo).
+
+- **B, `scripts/prova-do-drive.mjs`:** todas as linhas coladas saíram OK, inclusive Integrante (envio de .bpmn, .png e .bpm, registro, download, conferência), versão histórica (V3F), consulta recusada no envio, recusas sem login, arquivo inexistente e troca por outro tipo, e substituição com o mesmo identificador. As duas linhas do relatório sozinho ("integrante envia o relatório sozinho" e "relatório .pdf é recusado") não apareceram na colagem; não foram conferidas por consulta ao banco.
+- **C1, troca de sigla (ticket 08, critério 3):** provado. A pasta do setor só é renomeada no envio seguinte à troca (a função renomeia a cada envio), e voltou ao nome original com mais um envio.
+- **C2, mudança de setor (critério 4):** provado. A pasta do processo foi para a pasta do novo setor, sem duplicar.
+- **C3, anexo:** a primeira tentativa falhou (anexo recusado com `arquivo_fora_da_pasta`, arquivo solto no Drive): defeito do limite de níveis em `raiz.ts`, corrigido em 9ae4820. Depois da correção e da publicação, o anexo foi gravado e a retirada pela tela mandou o arquivo à lixeira do Drive. O usuário restaurou o arquivo pela lixeira do Drive e ele **não voltou à lista de anexos**: é o desenho do ADR 0027 (a retirada apaga a linha do banco; a lixeira só guarda o arquivo por 30 dias para quem precisar reenviá-lo).
+- **C4 (acrescentar arquivo à versão e recusa na versão aprovada) e D (arrumação):** adiados por decisão do usuário.
