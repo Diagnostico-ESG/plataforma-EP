@@ -1,0 +1,43 @@
+# Aplica no banco de PRODUÇÃO (plataforma-ep-prod) as migrações que ainda não foram aplicadas.
+# Só roda por "Run workflow", sempre a partir da main, e só se o campo de confirmação for PRODUCAO.
+# Criado a pedido do usuário em 2026-11-05, porque a porta 5432 fica fechada na rede do escritório.
+# A cadeia do Session pooler do projeto de produção fica no segredo SUPABASE_DB_URL_PRODUCAO (distinto do de desenvolvimento).
+# Cada disparo continua precisando da aprovação do usuário no momento (CLAUDE.md, "Banco de Dados").
+name: Migrar banco de produção
+
+on:
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: 'listar = só mostra o que está pendente; aplicar = aplica de verdade'
+        type: choice
+        options: [listar, aplicar]
+        default: listar
+      confirmar:
+        description: 'Digite PRODUCAO (em maiúsculas, sem acento) para confirmar que o alvo é a produção'
+        required: true
+
+permissions:
+  contents: read
+
+# Nunca duas execuções de produção ao mesmo tempo.
+concurrency:
+  group: migrar-producao
+  cancel-in-progress: false
+
+jobs:
+  migrar:
+    if: github.ref == 'refs/heads/main' && inputs.confirmar == 'PRODUCAO'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: node scripts/aplicar-migracoes-producao.mjs shiummttjxncahitrjwe "$MODO"
+        env:
+          SUPABASE_DB_URL_PRODUCAO: ${{ secrets.SUPABASE_DB_URL_PRODUCAO }}
+          MODO: ${{ inputs.modo }}

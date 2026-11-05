@@ -20,3 +20,9 @@ test.each([
   expect(() => conferirProjeto(url, REF)).toThrow(`projeto de desenvolvimento (${REF})`)
   expect(() => conferirProjeto(url, REF)).not.toThrow(/senha|isto não/)
 })
+
+test('a mensagem cita o ambiente informado (produção), sem mostrar a cadeia', () => {
+  const url = `postgresql://postgres.outroprojetoxxxxxxxx:senha@aws-0-sa-east-1.pooler.supabase.com:5432/postgres`
+  expect(() => conferirProjeto(url, REF, 'produção')).toThrow(`projeto de produção (${REF})`)
+  expect(() => conferirProjeto(url, REF, 'produção')).not.toThrow(/senha/)
+})

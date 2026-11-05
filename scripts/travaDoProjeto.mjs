@@ -2,10 +2,10 @@
 // O ref tem de estar no usuário da cadeia do Session pooler (postgres.<ref>) ou no host da conexão
 // direta (db.<ref>.supabase.co); achar o ref em qualquer ponto do texto deixava passar um banco
 // de outro projeto cujo nome de banco ou senha trouxesse o ref.
-export function conferirProjeto(url, ref) {
+export function conferirProjeto(url, ref, ambiente = 'desenvolvimento') {
   if (!cadeiaEhDoProjeto(url, ref)) {
     // A mensagem nunca traz a cadeia: ela contém a senha do banco.
-    throw new Error(`A cadeia de conexão não é do projeto de desenvolvimento (${ref}). Esperado: usuário postgres.${ref} ou host db.${ref}.supabase.co. Nada foi executado.`)
+    throw new Error(`A cadeia de conexão não é do projeto de ${ambiente} (${ref}). Esperado: usuário postgres.${ref} ou host db.${ref}.supabase.co. Nada foi executado.`)
   }
 }
 

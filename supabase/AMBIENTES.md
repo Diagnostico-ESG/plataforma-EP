@@ -1,8 +1,8 @@
 # Ambientes do banco
 
 - desenvolvimento: remoto, projeto plataforma-ep-dev (ref yclkzyoebpsxmgpbcbus), região sa-east-1
-- produção: ainda não criado
-- vínculo atual: yclkzyoebpsxmgpbcbus
+- produção: remoto, projeto plataforma-ep-prod (ref shiummttjxncahitrjwe), região sa-east-1; criado em 2026-11-05 com Data API ligada e exposição automática de tabelas ligada (mesmo modo do desenvolvimento); nenhuma migração, segredo ou função publicados ainda; itens do painel (cadastro aberto, Email, SMTP, redirecionamentos, plano) em conferência
+- vínculo atual: yclkzyoebpsxmgpbcbus (continua o de desenvolvimento: a publicação do banco de produção vai pelo workflow "Migrar banco de produção" do GitHub Actions, sem `supabase link`, porque a porta 5432 fecha na rede do escritório; aprovado pelo usuário em 2026-11-05)
 - última migração publicada em produção: nenhuma
 - último backup de produção: nenhum
 - último teste de restauração: nenhum

@@ -42,3 +42,17 @@ Revisão de segurança para produção (roteiro do `/ship`), iniciada em 2026-11
 - Sem achado que bloqueie a publicação.
 
 Revisão de pré-produção em 2026-11-05 (commit b0213d7) (com banco)
+
+## Painel de produção (2026-11-05, projeto plataforma-ep-prod, ref shiummttjxncahitrjwe)
+
+Conferido item a item com o usuário, antes de qualquer `db push`. Valores relatados pelo usuário, não vistos por mim.
+
+- **Data API e exposição automática de tabelas:** ligadas (mesmo modo do desenvolvimento). Conferir as permissões de `anon` com a consulta do catálogo depois do `db push`.
+- **Cadastro aberto:** desligado. **Email:** desligado. **Google:** desligado até o passo de login.
+- **SMTP próprio:** não se aplica, a produção não envia e-mail (login só pelo Google, Email desligado). Volta a valer se o login por e-mail voltar.
+- **Site URL:** `http://localhost:3000` (padrão do projeto novo). **Redirect URLs:** vazio. **Pendente para o passo 8:** trocar o Site URL e incluir em Redirect URLs o endereço da Netlify quando existir.
+- **Região:** sa-east-1 (São Paulo).
+- **Plano:** Free, sem backup automático e com pausa por inatividade. **Decisão do usuário (2026-11-05):** seguir no Free, **com dado real**. A condição "dado inventado até passar ao Pro" que o assistente tinha escrito aqui não foi decisão do usuário e foi retirada. Riscos aceitos pelo usuário: sem backup automático, pausa do projeto após cerca de uma semana sem uso, limites menores. O backup e o teste de restauração do passo 9 continuam no roteiro, por backup manual.
+- **Equipe com acesso:** só o usuário (relatado por ele, 2026-11-05).
+
+Painel de produção conferido, sem pendência além do endereço da Netlify (passo 8).

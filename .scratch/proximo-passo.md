@@ -1,25 +1,14 @@
-# Próximo passo (2026-11-04)
+# Próximo passo (2026-11-05)
 
-**Situação:** `enxugar-quadro-e-verso` (funcionalidade 21) entregue e integrada na `main`, com marca `Entregue em 2026-11-04 (commit 373c07e)` e marco `marco/2026-11-04-entrega-enxugar-quadro-e-verso`; o mesmo `/ship` entregou `processos-etapas`, `documentos-versoes` e `repositorio-de-processos` (marcos próprios). Ressalvas: critérios `[visual]` presumidos no app real; item 7 (sem [Enviar relatório]) não feito por decisão do usuário (ADR 0043).
+**Onde estamos:** produção (Supabase `plataforma-ep-prod`, ref shiummttjxncahitrjwe) criada e painel conferido (`.scratch/pre-producao.md`). Plano Free com dado real, decisão do usuário. Workflow "Migrar banco de produção" criado (`.github/workflows/migrar-producao.yml`), ainda sem o segredo.
 
-**Depende do usuário:** ver no app real, com o login, o verso em duas colunas, as faixas do Quadro (inclusive Linhas, por setor e por responsável), a Lista agrupada e a miniatura com .png de verdade; decidir se quer o "+ Acrescentar relatório" para tirar o [Enviar relatório] (backlog).
+**Faltam, nesta ordem (passo 5 de `.scratch/roteiro-producao.md`):**
+1. Usuário cria o segredo `SUPABASE_DB_URL_PRODUCAO` no GitHub (Session pooler da produção, com a senha do banco), sem mostrar o valor na conversa.
+2. Disparar o workflow com `modo = listar` e `confirmar = PRODUCAO`; conferir as 78 pendentes.
+3. Com aprovação do usuário no momento, disparar com `modo = aplicar`.
+4. Rodar a consulta do catálogo na produção (RLS, views, funções, permissões de `anon`).
+5. Passos 6 a 10 do roteiro (segredos e funções, login, site na Netlify, backup manual por GitHub Actions + teste de restauração, primeira conferência).
 
-**Próximo comando:** `/planejar` para a próxima funcionalidade (modelo da tabela do Funil: Opus no modo completo, Sonnet no curto); demandas fora do plano entram pelo `/demanda`. Não há mais funcionalidade do resumo do projeto sem spec além do que o backlog lista.
+**Abertos:** endereço da Netlify; projeto do Google no login; `.env` no `.gitignore` (backlog); decisões de LGPD.
 
-**Pendências:** itens do `.scratch/backlog.md`, incluindo os da revisão de código deste `/ship` (default de cor do setor espalhado, `ProcessosFalso.ts` com 319 linhas, etc.); testes instáveis já registrados.
-
-## Atualização (2026-11-04, /situação)
-
-**Prova no Drive real pendente:** o roteiro está em `.scratch/documentos-versoes/roteiro-prova-final.md` (publicar a função a partir da `main`, rodar `scripts/prova-do-drive.mjs`, conferências à mão de sigla, mudança de setor, retirada de anexo e acrescentar arquivo, e a arrumação). É passo do usuário, no terminal dele; depois ele cola a saída e uma sessão em Sonnet confere contra os tickets e grava em `prova-do-drive.md` e `desvios.md`. Não bloqueia o `/planejar` da próxima funcionalidade; precisa estar feita antes do primeiro `/ship` para produção.
-
-## Atualização (2026-11-04, bug do anexo)
-
-**Corrigido (commit 9ae4820, marco `marco/2026-11-04-antes-correcao-anexo-fora-da-pasta`):** `NIVEIS_ACIMA_DO_PAI` em `supabase/functions/_shared/raiz.ts` passou de 2 para 3, porque o anexo mora em arquivo → "Anexos" → processo → setor → raiz. Teste de regressão em `raiz.test.ts` (falhou antes, passa depois; suíte inteira verde). Revisão feita por leitura direta do diff (26 linhas), sem subagentes.
-
-**Depende do usuário, nesta ordem:** (1) publicar a função no desenvolvimento (`npx supabase functions deploy arquivos-no-drive --use-api --project-ref yclkzyoebpsxmgpbcbus`, vínculo conferido); (2) refazer o C3 e fazer o C4 do `.scratch/documentos-versoes/roteiro-prova-final.md`; (3) só então a arrumação D.
-
-**Depois:** `/ship` (mexeu em `supabase/functions/`), com a revisão de segurança para produção, e os roteiros de produção do fim dele. Produção ainda não existe (`AMBIENTES.md`). Sonnet no `/ship`; Opus na revisão de segurança para produção.
-
-## Atualização (2026-11-04, roteiro de produção)
-
-Roteiro de produção preparado em `.scratch/roteiro-producao.md`, nada executado. Decisões do usuário em aberto: hospedagem do site, fazer ou dispensar a revisão de pré-produção (recomendada: fazer) e qual projeto do Google (pessoal ou institucional) para o login. Próximo comando: `/ship` da correção do anexo (Sonnet), depois a revisão de pré-produção (Opus na parte de segurança) e os roteiros de produção do fim do `/ship`. Função `arquivos-no-drive` já publicada no desenvolvimento (c267fe3); C3, C4 e arrumação D da prova no Drive real adiados por decisão do usuário.
+Comando e modelo: continuar nesta mesma conversa ou `/situação` em sessão Sonnet.
