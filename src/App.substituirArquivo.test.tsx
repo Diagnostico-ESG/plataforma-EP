@@ -2,7 +2,7 @@ import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/re
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import type { SituacaoDoProcesso } from './processos/tipos'
 import { montarNosCadastros } from './testes/processosNosCadastros'
-import { arquivoDeTeste, comNome, PNG_VALIDO, versaoDeTeste } from './testes/versoesDeTeste'
+import { arquivoDeTeste, botoesQueAlteram, comNome, PNG_VALIDO, versaoDeTeste } from './testes/versoesDeTeste'
 import { falhaDaFuncao } from './versoes/recusasDeVersoes'
 import type { VersoesFalso } from './versoes/VersoesFalso'
 import { escolherNoMenu, escolherNoMenuDoProcesso, janelasPorCima } from './testes/versoDoCartao'
@@ -81,7 +81,7 @@ test('a Consulta vê os links dos arquivos, sem [Substituir]', async () => {
   montarNosCadastros({ ...COM_VERSOES, perfil: 'consulta' })
   const secao = await secaoDeVersoes()
   expect(await secao.findByRole('link', { name: comNome(PNG_V3) })).toBeTruthy()
-  expect(secao.queryByRole('button')).toBeNull()
+  expect(botoesQueAlteram(secao)).toEqual([])
 })
 
 test.each(['suspenso', 'cancelado', 'concluido'] as const)('processo %s não mostra [Substituir]', async (situacao: SituacaoDoProcesso) => {

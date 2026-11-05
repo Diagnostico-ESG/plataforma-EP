@@ -26,6 +26,11 @@ export const BPM_VALIDO = new File(['b'], 'fluxo.bpm')
 export const PNG_VALIDO =new File([new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0])], 'fluxo.png')
 
 /** Para achar um arquivo pelo nome dentro do nome acessível do botão ("Baixar Imagem .png (TSA_V1_...png)"). */
+// A miniatura do fluxograma é um botão só de leitura e carrega por conta própria (miniatura-rapida, ADR 0038): contá-la como botão
+// de alteração faz o teste passar ou falhar conforme a hora em que ela termina de carregar.
+export const botoesQueAlteram = (secao: { queryAllByRole: (papel: 'button') => HTMLElement[] }): string[] =>
+  secao.queryAllByRole('button').filter((botao) => !botao.classList.contains('versao-destaque-miniatura-botao')).map((botao) => botao.textContent ?? '')
+
 export const comNome = (trecho: string) => (nome: string) => nome.includes(trecho)
 
 /** O relatório numerado (Relatório V2) ligado à versão `numeroDaVersao`: o .docx que o relatório novo sempre é. */

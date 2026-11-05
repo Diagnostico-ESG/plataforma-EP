@@ -2,7 +2,7 @@ import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/re
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import type { SituacaoDoProcesso } from './processos/tipos'
 import { type Montagem, montarNosCadastros, naEtapa } from './testes/processosNosCadastros'
-import { BPM_VALIDO, comNome, relatorioNumeradoDeTeste, versaoDeTeste } from './testes/versoesDeTeste'
+import { BPM_VALIDO, botoesQueAlteram, comNome, relatorioNumeradoDeTeste, versaoDeTeste } from './testes/versoesDeTeste'
 import { escolherNoMenuDoProcesso } from './testes/versoDoCartao'
 import { falhaDaFuncao } from './versoes/recusasDeVersoes'
 import type { VersoesFalso } from './versoes/VersoesFalso'
@@ -103,7 +103,7 @@ test('a Consulta vê os relatórios e baixa, sem nenhum botão de alteração', 
   montarNosCadastros(montagem('relatorio_modelagem_tecnica', { perfil: 'consulta' }))
   const secao = await secaoDeVersoes()
   await secao.findByRole('article', { name: 'V8' })
-  expect(secao.queryByRole('button')).toBeNull()
+  expect(botoesQueAlteram(secao)).toEqual([])
   expect(secao.getByRole('link', { name: comNome('Relatório V1') })).toBeTruthy()
 })
 
@@ -115,7 +115,7 @@ test.each(['suspenso', 'cancelado', 'concluido'] as const)('processo %s não mos
   }))
   const secao = await secaoDeVersoes()
   await secao.findByRole('article', { name: 'V8' })
-  expect(secao.queryByRole('button')).toBeNull()
+  expect(botoesQueAlteram(secao)).toEqual([])
 })
 
 test('nada de pendência: sem a marca "falta relatório", sem "Relatório pendente" e sem [Sem alteração de conteúdo] nem [Acrescentar relatório]', async () => {
