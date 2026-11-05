@@ -1,0 +1,59 @@
+# Backup do banco de PRODUÇÃO (plataforma-ep-prod), pelo GitHub porque a porta 5432 fecha na rede do escritório.
+# Só roda por "Run workflow", a partir da main. Só LÊ o banco: não altera nada.
+# Gera os três arquivos do roteiro de docs/manutencao/03-backup-e-restauracao.md (papéis, estrutura, dados),
+# compacta e CRIPTOGRAFA com a senha do segredo BACKUP_SENHA_PRODUCAO antes de guardar, porque os dados são reais.
+# O arquivo criptografado fica 30 dias como "artefato" da execução; o usuário baixa e guarda no local definido pela instituição.
+# Segredos do repositório: SUPABASE_DB_URL_PRODUCAO (Session pooler da produção) e BACKUP_SENHA_PRODUCAO (senha do arquivo).
+name: Backup do banco de produção
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backup-producao
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SUPABASE_DB_URL_PRODUCAO: ${{ secrets.SUPABASE_DB_URL_PRODUCAO }}
+      BACKUP_SENHA_PRODUCAO: ${{ secrets.BACKUP_SENHA_PRODUCAO }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Conferir segredos e que a cadeia é da produção
+        run: |
+          [ -n "$BACKUP_SENHA_PRODUCAO" ] || { echo "Faltou o segredo BACKUP_SENHA_PRODUCAO."; exit 1; }
+          case "$SUPABASE_DB_URL_PRODUCAO" in
+            postgresql://postgres.shiummttjxncahitrjwe:*) ;;
+            *) echo "A cadeia SUPABASE_DB_URL_PRODUCAO não é do projeto de produção (shiummttjxncahitrjwe). Nada foi feito."; exit 1 ;;
+          esac
+      - name: Gerar papéis, estrutura e dados
+        run: |
+          mkdir backup
+          npx supabase db dump --db-url "$SUPABASE_DB_URL_PRODUCAO" --role-only -f backup/papeis.sql
+          npx supabase db dump --db-url "$SUPABASE_DB_URL_PRODUCAO" -f backup/estrutura.sql
+          npx supabase db dump --db-url "$SUPABASE_DB_URL_PRODUCAO" --data-only -f backup/dados.sql
+      - name: Compactar e criptografar
+        run: |
+          DATA=$(date -u +%Y-%m-%d-%H%M)
+          tar -czf "backup-producao-$DATA.tar.gz" -C backup .
+          printf '%s' "$BACKUP_SENHA_PRODUCAO" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --symmetric --cipher-algo AES256 -o "backup-producao-$DATA.tar.gz.gpg" "backup-producao-$DATA.tar.gz"
+          rm -rf backup "backup-producao-$DATA.tar.gz"
+          ls -l backup-producao-*.gpg
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: backup-producao
+          path: backup-producao-*.gpg
+          retention-days: 30
+          if-no-files-found: error

@@ -30,7 +30,19 @@ Os arquivos do backup têm **dado real** (nomes e e-mails de servidores): guarde
 
 Faça antes de aplicar uma migração destrutiva em produção e em intervalos que a instituição definir.
 
-Há dois caminhos. Use o primeiro se o seu computador tem **Docker**; o segundo não precisa de Docker.
+### Produção: workflow "Backup do banco de produção" (desde 2026-11-05)
+
+A produção existe (plano Free, sem backup automático) e a rede do escritório bloqueia a porta do banco, então o backup dela vai pelo GitHub Actions. O workflow só **lê** o banco e gera `papeis.sql`, `estrutura.sql` e `dados.sql`, como nos caminhos abaixo.
+
+1. Uma vez, no GitHub (**Settings → Secrets and variables → Actions**), crie o segredo `BACKUP_SENHA_PRODUCAO` com uma senha longa e **guarde essa mesma senha no seu gerenciador de senhas**: sem ela o backup não abre. O segredo `SUPABASE_DB_URL_PRODUCAO` já existe.
+2. **Actions → Backup do banco de produção → Run workflow** (branch `main`).
+3. Ao terminar, abra a execução e baixe o artefato `backup-producao`: é um `.tar.gz.gpg`, **criptografado**. Ele fica 30 dias no GitHub. Guarde a cópia baixada em local definido pela instituição, fora do repositório e fora da pasta do projeto.
+4. Para abrir (num computador com o GnuPG, `gpg`): `gpg -d backup-producao-<data>.tar.gz.gpg > backup.tar.gz`. Ele pede a senha. O dado é real: não abra em chat.
+5. Atualize "último backup de produção" em `supabase/AMBIENTES.md`.
+
+Há dado pessoal real passando pelo GitHub (nos servidores deles, mesmo criptografado). Isso entra nas decisões de nuvem externa de `.scratch/lgpd-inventario.md`.
+
+Há dois caminhos manuais, para quem tem acesso à porta do banco. Use o primeiro se o seu computador tem **Docker**; o segundo não precisa de Docker.
 
 ### Caminho 1: com Docker (`supabase db dump`)
 
