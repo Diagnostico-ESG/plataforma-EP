@@ -13,7 +13,7 @@ Segue o `/ship` (roteiros "Publicar no banco de produção", "Publicar o site", 
 
 ## Decisões suas antes de começar
 
-1. **Hospedagem do site** (Netlify, Vercel ou outra) e o endereço. Precisa atender à exigência de região ou nuvem do `.scratch/projeto.md`, que o jurídico e a TI ainda não validaram (backlog).
+1. ~~Hospedagem do site~~ **Decidido em 2026-11-05: Netlify.** Falta o endereço do site (necessário para os segredos e os redirecionamentos do login). Precisa atender à exigência de região ou nuvem do `.scratch/projeto.md`, que o jurídico e a TI ainda não validaram (backlog).
 2. **Revisão de segurança para produção:** o `/ship` exige para a primeira publicação. Dispensar só por decisão sua explícita, que eu registro em `.scratch/pre-producao.md` como "Publicação sem revisão decidida em AAAA-MM-DD". Recomendo fazer, porque o projeto tem dado pessoal (LGPD) e login.
 3. **Login em produção:** o cliente OAuth do Google hoje está num projeto pessoal ("arranjo provisório", `docs/implantacao-login.md`). Decida se produção sai com ele ou com um projeto institucional.
 
@@ -51,7 +51,7 @@ Segredos de produção (`npx supabase secrets set ... --project-ref <ref-produca
 - `EP_ORIGENS_ACEITAS` (o endereço do site publicado, não `localhost`);
 - `EP_PLANILHAS_SENHA` e `EP_CHAVE_PUBLICAVEL` (a função das planilhas; ver `docs/planilhas-publicar-a-funcao.md` e `docs/planilhas-cofre-do-banco.md`, que repetem os passos em produção, com os ids das duas planilhas de produção).
 
-Depois, `npx supabase functions deploy arquivos-no-drive --use-api --project-ref <ref-producao>` e o mesmo para `planilhas-dos-dashboards`. Cada função ganha um teste de recusa para usuário sem permissão (entrego o comando).
+Depois, `npx supabase functions deploy arquivos-no-drive --use-api --project-ref <ref-producao>` e `npx supabase functions deploy planilhas-dos-dashboards --use-api --no-verify-jwt --project-ref <ref-producao>` (o `--no-verify-jwt` é de propósito: quem chama é o banco, sem login, e a função confere a senha interna). Cada função ganha um teste de recusa para usuário sem permissão (entrego o comando).
 
 ### 7. Login e primeiro administrador [você]
 Segue `docs/implantacao-login.md` para produção: cliente OAuth do Google com o endereço de redirecionamento de produção, Authentication → Providers → Google no painel, gancho de autorização e o SQL do primeiro administrador (eu entrego com marcador no lugar do e-mail). Confira entrar e sair.
