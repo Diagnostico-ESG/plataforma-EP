@@ -56,3 +56,10 @@ Conferido item a item com o usuário, antes de qualquer `db push`. Valores relat
 - **Equipe com acesso:** só o usuário (relatado por ele, 2026-11-05).
 
 Painel de produção conferido, sem pendência além do endereço da Netlify (passo 8).
+
+## Banco de produção publicado (2026-11-05)
+
+- **Publicação:** workflow "Migrar banco de produção" (criado em cb47757 porque a porta 5432 fecha na rede do escritório). `listar` mostrou 78 pendentes; o usuário disparou `aplicar` e relatou conclusão (saída não colada).
+- **Consulta do catálogo na produção (SQL Editor, rodada pelo usuário):** problemas (tabela sem RLS, view sem `security_invoker`, função executável por visitante, `security definer` em `public` fora da exceção, permissão de visitante em tabela ou view, bucket no Storage): **"Success", nenhuma linha**.
+- **Segredos e função (2026-11-05):** segredos `EP_DRIVE_CONTA_JSON_BASE64`, `EP_DRIVE_RAIZ_ID` (Drive de produção) e `EP_ORIGENS_ACEITAS` (`https://epccivil.netlify.app`) gravados pelo usuário; `secrets list` mostrou só esses três nomes. `arquivos-no-drive` publicada em produção pelo assistente, com aprovação do usuário, a partir da `main` (cb47757). Teste de recusa pelo assistente: sem login e com token falso, 401 `sem_login`; origem de fora recebeu a resposta do OPTIONS sem `access-control-allow-origin`. `planilhas-dos-dashboards` e o cofre ficam para depois, por decisão do usuário.
+- **Contagem:** 78 migrações registradas, 18 tabelas e 2 views em `public`. As 18 conferem com as migrações (24 criadas menos 6 apagadas: as 4 de reunião, `responsaveis_do_setor` e o `andamentos` do modelo anterior). A exposição automática de tabelas ligada não deixou nada aberto ao visitante.
