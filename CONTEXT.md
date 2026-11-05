@@ -152,6 +152,10 @@ _Avoid_: observações, contexto, notas, comentários
 Mudança do tipo de um item (processo, subprocesso ou a classificar), com motivo, que preserva o mesmo item com tudo o que ele já tem.
 _Avoid_: conversão, migração, recriação
 
+**Importação dos dados atuais**:
+Carga única, feita pelo Administrador, dos setores, macroprocessos, processos e versões que existiam antes da plataforma, a partir da planilha de controle e da pasta de documentos. O processo importado tem um único registro no histórico, "importado da planilha", e entra na etapa correspondente à última fase concluída na planilha. Nunca altera o que já está na plataforma.
+_Avoid_: migração, carga inicial
+
 ## Modelagem piloto
 
 **Modelagem piloto**:
