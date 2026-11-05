@@ -50,3 +50,5 @@ Feita pelo usuário no desenvolvimento, com a função `arquivos-no-drive` publi
 - **C4 (acrescentar arquivo à versão e recusa na versão aprovada) e D (arrumação):** adiados por decisão do usuário.
 
 - **C4, acrescentar arquivo à versão (2026-11-05):** provado pelo usuário, que relatou "tudo certo" sem detalhar cada passo. O que o roteiro pedia: acrescentar .png ou .bpmn a uma versão sem aprovação (entra na lista e no Drive, na pasta do processo) e confirmar que, na versão aprovada, a tela não oferece o campo. A recusa do banco na versão aprovada segue provada só pelo teste automático, porque a tela esconde o campo. Resta a arrumação D.
+
+- **D, arrumação (2026-11-05):** feita pelo usuário (arquivos de teste apagados no Drive "EP – desenvolvimento", usuários inventados `prova.integrante` e `prova.consulta` desativados e provedor Email desligado no painel do desenvolvimento), sem detalhar cada item. Com isso, a prova no Drive real de `documentos-versoes` está concluída; fica só a lacuna das duas linhas do relatório sozinho (não colagem) e a recusa do banco na versão aprovada provada só por teste.
