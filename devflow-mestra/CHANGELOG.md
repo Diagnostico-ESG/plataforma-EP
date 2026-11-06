@@ -2,6 +2,15 @@
 
 Uma entrada por versão, da mais recente para a mais antiga. Entradas antigas nunca são editadas. O histórico das versões 1.x (até a v1.9) está em `CHANGELOG-v1.md`.
 
+## v3.5 — 2026-11-06 (/situação passa a se chamar /stc)
+
+**Motivo.** Pedido do usuário: um nome curto, sem acento, mais rápido de digitar no começo de cada sessão.
+
+**Mudou**
+- `.claude/commands/situação.md` renomeado para `.claude/commands/stc.md`, sem mudança no conteúdo.
+- Todas as menções a `/situação` no `CLAUDE.md`, nos comandos, nas regras, no README e no glossário trocadas por `/stc`. A tabela do funil diz "`/stc` (situação: onde o projeto está)".
+- README, seção 6: como renomear num projeto existente.
+
 ## v3.4 — 2026-11-06 (/situação sem ler o registro de melhorias)
 
 **Motivo.** O `/situação` lia o `.scratch/melhorias-protocolo.md` inteiro (261 KB e 1.234 linhas no projeto de origem, o maior arquivo da retomada) só para avisar se havia melhorias ainda não levadas à cópia mestra.

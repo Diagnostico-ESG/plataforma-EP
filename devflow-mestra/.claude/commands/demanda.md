@@ -5,7 +5,7 @@ description: Porta de entrada para qualquer demanda depois da primeira versão o
 Com base na demanda que descrevi nesta conversa (e em `.scratch/backlog.md`, se eu pedir para puxar algo de lá), faça o seguinte, sem executar nada antes da minha confirmação:
 
 1. **Se a descrição não bastar para classificar**, faça no máximo duas perguntas antes, uma de cada vez. Casos particulares:
-   - **Sem descrição nenhuma:** use o próximo passo apontado pelo `/situação` (`.scratch/proximo-passo.md`) e diga a suposição.
+   - **Sem descrição nenhuma:** use o próximo passo apontado pelo `/stc` (`.scratch/proximo-passo.md`) e diga a suposição.
    - **Quero explorar a ideia antes de classificar:** converse livremente; o limite de duas perguntas só conta a partir de quando a demanda estiver fechada. Se a exploração virar planejamento, mande-a para o `/planejar`.
    - **Uma lista de itens:** classifique cada item, agrupe os que pedem a mesma decisão ou a mesma tela, e proponha a ordem.
    - **Mais de um candidato** (a conversa já trouxe duas causas ou duas soluções): liste-os, diga o que cada um muda e pergunte qual seguir.

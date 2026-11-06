@@ -1,4 +1,4 @@
-# Glossário — DevFlow v3.4
+# Glossário — DevFlow v3.5
 
 Termos técnicos explicados em linguagem simples, conforme foram surgindo nas conversas sobre o protocolo. Atualizar conforme novos termos aparecerem.
 
@@ -12,7 +12,7 @@ Termos técnicos explicados em linguagem simples, conforme foram surgindo nas co
 
 **Marco (tag)** — um nome fixo dado a um ponto do histórico do Git (ex.: `marco/2026-10-02-inicio-formulario-contato`). Funciona como um marcador de página: permite voltar exatamente àquele estado depois, sem precisar achar o código do commit.
 
-**Marca de entrega** — a linha `Entregue em AAAA-MM-DD (commit ...)` que o `/ship` grava no fim da spec de uma funcionalidade, junto com um marco `entrega-<funcionalidade>`. Mostra que a funcionalidade passou pela revisão final. O `/planejar` e o `/situação` usam a marca para avisar quando uma funcionalidade ficou sem `/ship`. Se a funcionalidade volta a mudar depois de entregue, ganha abaixo a linha `Em revisão desde`, até o próximo `/ship`.
+**Marca de entrega** — a linha `Entregue em AAAA-MM-DD (commit ...)` que o `/ship` grava no fim da spec de uma funcionalidade, junto com um marco `entrega-<funcionalidade>`. Mostra que a funcionalidade passou pela revisão final. O `/planejar` e o `/stc` usam a marca para avisar quando uma funcionalidade ficou sem `/ship`. Se a funcionalidade volta a mudar depois de entregue, ganha abaixo a linha `Em revisão desde`, até o próximo `/ship`.
 
 **Diff** — o que mudou entre duas versões do código, linha a linha. É sobre o diff de uma funcionalidade que o `code-review` trabalha.
 
@@ -119,7 +119,7 @@ Termos técnicos explicados em linguagem simples, conforme foram surgindo nas co
 
 **Cache de prompt** — memória de curto prazo do servidor que evita reprocessar, a cada mensagem, a parte da conversa que não mudou. Deixa as respostas mais rápidas e baratas. É perdido quando se troca de modelo ou se edita o `CLAUDE.md` no meio de uma sessão.
 
-**Handoff** — documento curto que passa o estado de uma sessão para a próxima. No DevFlow, leva só o que os arquivos do projeto não guardam (uma decisão em aberto, o raciocínio de uma tarefa pela metade) e é salvo em `.scratch/`. O estado em si é lido pelo `/situação`.
+**Handoff** — documento curto que passa o estado de uma sessão para a próxima. No DevFlow, leva só o que os arquivos do projeto não guardam (uma decisão em aberto, o raciocínio de uma tarefa pela metade) e é salvo em `.scratch/`. O estado em si é lido pelo `/stc`.
 
 ## Banco de dados
 

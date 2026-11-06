@@ -1,4 +1,4 @@
-# Receitas de execução — DevFlow v3.4
+# Receitas de execução — DevFlow v3.5
 
 Leia quando o comando mandar ("receitas de execução") ou quando topar com um destes casos. São práticas que já falharam em projeto real. Ambiente padrão: Windows.
 

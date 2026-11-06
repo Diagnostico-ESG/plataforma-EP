@@ -1,4 +1,4 @@
-# Regras de interface — DevFlow v3.4
+# Regras de interface — DevFlow v3.5
 
 Vale para todo projeto. Leia antes de propor identidade (`/concepcao-*`), de planejar ou executar tela e de polir. Estas regras decidem o que vai na tela; a identidade visual (`.scratch/identidade-visual.md`) decide como ela se parece.
 

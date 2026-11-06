@@ -1,12 +1,12 @@
-# Itens ainda não testados num projeto real — DevFlow v3.4
+# Itens ainda não testados num projeto real — DevFlow v3.5
 
 Como usar: ao terminar um comando, leia o bloco dele e o bloco "Qualquer momento". Para cada item que aconteceu nesta execução e ainda não tem entrada em `.scratch/melhorias-protocolo.md`, acrescente uma entrada com a data, o item, o que era esperado e o que aconteceu. Quem avalia se funcionou sou eu.
 
 Os itens da v1.x que um projeto real já exercitou (trava de git, funil de planejamento e execução, regras de banco com login, perfis e arquivos, `/ship` com os passos de revisão) saíram desta lista na v2.0. Ficaram os que continuam sem evidência e todo o que a v2.0 acrescentou.
 
-O `/situação` só lê e não registra nada.
+O `/stc` só lê e não registra nada.
 
-## /situação (v3.3)
+## /stc (v3.3)
 
 - Testes só com mudança não comitada (e a linha dizendo que não rodaram); backlog só contado, sem leitura.
 - Registro de melhorias só contado (entradas depois da data da versão do `CLAUDE.md`), sem leitura (v3.4).
@@ -16,8 +16,8 @@ O `/situação` só lê e não registra nada.
 - Custo desligado por padrão e "Custo ligado" na seção de ajustes do projeto.
 - `.claude/regras/execucao.md` e `.claude/regras/interface.md` lidos quando o comando manda.
 - Commit por caminho (`git add <arquivos>`) com duas sessões na mesma pasta.
-- `.scratch/proximo-passo.md` gravado ao fim de cada etapa e lido pelo `/situação`.
-- Comando pronto para copiar ao pedir sessão nova: `/situação` e o comando da etapa, cada um num bloco, com o modelo, e o mesmo texto no `proximo-passo.md`.
+- `.scratch/proximo-passo.md` gravado ao fim de cada etapa e lido pelo `/stc`.
+- Comando pronto para copiar ao pedir sessão nova: `/stc` e o comando da etapa, cada um num bloco, com o modelo, e o mesmo texto no `proximo-passo.md`.
 
 ## /projeto
 
@@ -72,7 +72,7 @@ O `/situação` só lê e não registra nada.
 - TDD pela regra de `tdd.md` (ver o teste falhar) sem o `/implement`; convivência com as skills de TDD de terceiros, que continuam ativas.
 - Uma só revisão de código; marca `Entregue em` e marco de entrega sem passar pelo `/ship`; tempo medido contra a estimativa de 25 a 35 minutos.
 
-## /demanda, /voltar e /situação
+## /demanda, /voltar e /stc
 
 - `/demanda`: lista de itens, exploração livre, pacote misto, infraestrutura e ferramentas, teste instável.
 - `/voltar`: sem confirmação nesta lista, nem em projeto sem banco.
@@ -80,7 +80,7 @@ O `/situação` só lê e não registra nada.
 ## /ship e /setup (v3.0)
 
 - Auditoria de pacotes do passo 3 do `/ship` feita com `npm audit --json` e `npm audit --omit=dev --json`, sem a skill `security-auditor`: relatório por severidade, separação entre produção e desenvolvimento, `fixAvailable` e `isSemVerMajor`.
-- Projeto sem claude-mem do começo ao fim: continuidade só pelos arquivos de `.scratch/` e pelo `/situação`; handoff só nos três casos do `CLAUDE.md`.
+- Projeto sem claude-mem do começo ao fim: continuidade só pelos arquivos de `.scratch/` e pelo `/stc`; handoff só nos três casos do `CLAUDE.md`.
 
 ## /planejar, /executar-simples e /ship (v3.1)
 

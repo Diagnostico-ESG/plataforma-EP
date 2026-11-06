@@ -1,4 +1,4 @@
-# DevFlow — v3.4 (2026-11-06)
+# DevFlow — v3.5 (2026-11-06)
 
 *Antigo Protocolo Alex Macedo. O histórico das versões 1.x está em `CHANGELOG-v1.md`; o desta versão, em `CHANGELOG.md`.*
 
@@ -7,7 +7,7 @@ Funil de desenvolvimento para Claude Code, com skills e plugins de terceiros orq
 ## 1. Arquivos deste pacote
 
 - `CLAUDE.md` — regras que valem em qualquer momento e a tabela do funil, com o modelo de cada etapa. Lido pelo Claude Code em toda mensagem. Vai na raiz do projeto.
-- `.claude/commands/*.md` — os treze comandos. Funil: `projeto`, `setup`, `concepcao-livre`, `implementar-identidade`, `planejar`, `executar-simples`, `executar-complexo`, `polir`, `ship`. Apoio: `demanda`, `rapido`, `voltar`, `situação`.
+- `.claude/commands/*.md` — os treze comandos. Funil: `projeto`, `setup`, `concepcao-livre`, `implementar-identidade`, `planejar`, `executar-simples`, `executar-complexo`, `polir`, `ship`. Apoio: `demanda`, `rapido`, `voltar`, `stc`.
 - `.claude/regras/` — regras consultadas sob demanda, para o `CLAUDE.md` e os comandos ficarem curtos:
   - `interface.md`: princípios de interface e a vitrine (app com dados falsos);
   - `execucao.md`: receitas de execução no Windows (scripts, git, workflows do GitHub, ciclo do banco);
@@ -44,7 +44,7 @@ Instale uma vez, na sua conta; valem para qualquer projeto. O `/setup` confere q
 
 Notas: as skills de invocação direta que o funil ainda usa (`grill-with-docs` e `wayfinder`) só rodam digitadas por você e podem nem aparecer na lista do Claude; o comando delas volta pronto para você rodar. Spec, tickets, implementação do `/executar-simples` e revisão de segurança do `/ship` são regras do próprio DevFlow, e o Claude as segue sem parar; as skills `to-spec`, `to-tickets` e `implement` podem continuar instaladas, sem uso pelo funil. A auditoria de pacotes de terceiros não precisa de skill: o passo 3 do `/ship` roda `npm audit --json` e monta o relatório. Se a instalação oficial falhar por rede, use a seção 8.
 
-**Memória entre sessões.** O DevFlow não usa plugin de memória. A continuidade fica nos arquivos de `.scratch/` (spec, tickets, `proximo-passo.md`, handoff), lidos pelo `/situação`.
+**Memória entre sessões.** O DevFlow não usa plugin de memória. A continuidade fica nos arquivos de `.scratch/` (spec, tickets, `proximo-passo.md`, handoff), lidos pelo `/stc`.
 
 **`gh`** (linha de comando do GitHub, recomendada): dispara workflows e lê o resultado sem navegador. Instale e rode `gh auth login` no seu terminal.
 
@@ -62,27 +62,31 @@ O hook `bloquear-git-destrutivo.mjs` lê cada comando que o Claude vai rodar e c
 2. Crie a pasta do projeto e copie para ela, desta pasta: `CLAUDE.md`, `README.md`, `GLOSSARIO.md`, `.gitattributes`, `.claude/` inteira, `docs/agents/` e `.scratch/melhorias-protocolo.md`.
 3. Abra o Claude Code nela e rode `/projeto`. O resultado fica em `.scratch/projeto.md`. Se você já tem uma especificação, anexe-a.
 4. Rode `/setup`. Ele conduz o scaffold, as ferramentas, o banco (se o projeto precisar), o git, o pre-commit e a trava.
-5. Siga o funil: `/concepcao-livre`, `/implementar-identidade`, e então `/planejar`, `/executar-*`, `/polir`, `/ship`, funcionalidade por funcionalidade. O que chega depois entra pelo `/demanda`. Para retomar numa sessão nova: `/situação`.
+5. Siga o funil: `/concepcao-livre`, `/implementar-identidade`, e então `/planejar`, `/executar-*`, `/polir`, `/ship`, funcionalidade por funcionalidade. O que chega depois entra pelo `/demanda`. Para retomar numa sessão nova: `/stc`.
 
 **Custo.** Desligado por padrão. Para medir, escreva "Custo ligado." na seção "Ajustes deste Projeto" do `CLAUDE.md` do projeto: os comandos passam a pedir o `/cost` e a gravar `.scratch/custos.md`.
 
-**Modelo por etapa.** A tabela do Funil de Trabalho, no `CLAUDE.md`, diz o modelo de cada comando (Opus para conversa e decisão, Sonnet para o resto). Trocar de modelo abre uma sessão nova; o que a etapa produziu já está em arquivo, e a sessão nova começa pelo `/situação`.
+**Modelo por etapa.** A tabela do Funil de Trabalho, no `CLAUDE.md`, diz o modelo de cada comando (Opus para conversa e decisão, Sonnet para o resto). Trocar de modelo abre uma sessão nova; o que a etapa produziu já está em arquivo, e a sessão nova começa pelo `/stc`.
 
 ## 5. Uso em projeto institucional
 
 Antes de usar o protocolo com dados de terceiros ou em trabalho oficial: verifique as normas sobre uso de IA e sobre proteção de dados pessoais (incluindo as internas do órgão); consulte a TI e o encarregado de dados sobre o envio do conteúdo do projeto à API da Anthropic e sobre plugins aceitos; confirme se a conta pode ser pessoal. Em projeto com banco, confirme onde os dados podem ficar (conta, região, dado pessoal real) e decida com o jurídico se é preciso registrar quem **leu** cada dado e como conciliar um histórico que não se altera com um pedido de eliminação de dados. A carga de dados reais é sempre sua, fora da sessão, com arquivos fora da pasta do projeto ou em `dados-reais/` (ignorada pelo git e nunca lida pelo Claude).
 
-## 6. Atualizar um projeto antigo para a v3.4
+## 6. Atualizar um projeto antigo para a v3.5
 
 Troque os arquivos do protocolo pelos desta versão, preservando a seção "Ajustes deste Projeto" do `CLAUDE.md` (copie-a para o arquivo novo). Depois:
 
-**Vindo da v3.3**
+**Vindo da v3.4**
 
-- Só o `/situação` mudou (registro de melhorias contado, sem leitura).
+- O `/situação` passou a se chamar `/stc`: copie `.claude/commands/stc.md`, apague `.claude/commands/situação.md` e troque `/situação` por `/stc` na seção "Ajustes deste Projeto" do `CLAUDE.md`, se ela citar o comando.
+
+**Vindo da v3.3, além do que está acima**
+
+- Só o `/stc` mudou (registro de melhorias contado, sem leitura).
 
 **Vindo da v3.2, além do que está acima**
 
-- Só o `/situação` mudou (testes só com mudança não comitada; backlog contado, sem leitura).
+- Só o `/stc` mudou (testes só com mudança não comitada; backlog contado, sem leitura).
 
 **Vindo da v3.1, além do que está acima**
 
@@ -107,7 +111,7 @@ Troque os arquivos do protocolo pelos desta versão, preservando a seção "Ajus
 - **`.gitattributes`:** acrescente e deixe o Git normalizar (um commit só para isso).
 - **Skills do Matt Pocock:** o bloco "Agent skills" e `docs/agents/` já vêm no pacote; se o projeto tinha o bloco em "Ajustes deste Projeto", mantenha o dele.
 - **`FLUXO.md`:** foi retirado do pacote (repetia os comandos e envelhecia); apague-o do projeto. Os comandos são a fonte.
-- **`/status`:** o comando se chama `/situação` desde a v1.9 (o nome antigo colidia com o comando nativo do Claude Code).
+- **`/status` e `/situação`:** o comando de retomada se chama `/stc` desde a v3.5 (antes, `/situação`, que substituiu o `/status` na v1.9 porque este colidia com o comando nativo do Claude Code). Apague `.claude/commands/situação.md` do projeto.
 
 ## 7. Skills instaladas que o funil não usa de propósito
 
@@ -135,7 +139,7 @@ Em rede corporativa com proxy, `npm`, `git` e o login do Claude Code falham com 
 ## 9. Versionamento e manutenção
 
 - **Cópia mestra.** Esta pasta, com git, fora de qualquer projeto. É dela que cada projeto copia os arquivos, e é nela que as mudanças são feitas.
-- **Versões.** Versão nova inteira (v4.0) quando o funil muda; v3.5 quando entra uma regra nova; v3.4.1 para correção de texto. O número fica no topo do `CLAUDE.md`, deste README, do `GLOSSARIO.md` e dos arquivos de `.claude/regras/`; cada versão ganha uma entrada no `CHANGELOG.md`, e entradas antigas não se editam.
+- **Versões.** Versão nova inteira (v4.0) quando o funil muda; v3.6 quando entra uma regra nova; v3.5.1 para correção de texto. O número fica no topo do `CLAUDE.md`, deste README, do `GLOSSARIO.md` e dos arquivos de `.claude/regras/`; cada versão ganha uma entrada no `CHANGELOG.md`, e entradas antigas não se editam.
 - **Melhorias descobertas num projeto.** O Claude registra em `.scratch/melhorias-protocolo.md` e avisa você. Periodicamente, leve os registros para esta pasta, decida o que muda e gere uma versão nova. Só entra o que valeria para qualquer projeto.
 - **Documentos sincronizados.** Quando o funil, um comando ou uma regra mudar, atualize junto o `GLOSSARIO.md` (termos novos), `.claude/regras/nao-testados.md`, este README e o `CHANGELOG.md`.
 - **Pacotes de terceiros.** Atualizar um plugin é decisão deliberada, registrada no `CHANGELOG.md`.
