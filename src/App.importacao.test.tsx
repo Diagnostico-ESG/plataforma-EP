@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import { afterEach, beforeEach, expect, test } from 'vitest'
+import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import App from './App'
 import { AcessoFalso, USUARIO_DE_TESTE } from './acesso/AcessoFalso'
 import type { Perfil } from './acesso/tipos'
@@ -16,17 +16,22 @@ import {
 import { VersoesFalso } from './versoes/VersoesFalso'
 
 beforeEach(() => {
+  // Só o relógio do Date é falso: "hoje" fixo para a data usada no lugar da que falta, sem parar os timers da tela.
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date(2026, 10, 6, 12))
   window.location.hash = '#/administracao'
 })
 afterEach(() => {
   cleanup()
+  vi.useRealTimers()
   window.location.hash = ''
 })
 
 const ADMINISTRADOR = { ...USUARIO_DE_TESTE, perfil: 'administrador' as Perfil }
 const TODAS_AS_ETAPAS = { mp: 'Concluído', mt: 'Concluído', ri: 'Concluído', rp: 'Concluído', vi: 'Concluído', vii: 'Concluído' }
 
-// Linha 4: Alfa em Modelagem piloto; 5: Beta em Não iniciados; 6: Gama em Concluídos; 7: Delta em Publicação (VII sem data, com aviso).
+// Linha 4: Alfa em Modelagem piloto; 5: Beta em Não iniciados; 6: Gama em Concluídos; 7: Delta em Concluídos (VII sem data).
+// Alfa, Gama e Delta não têm data do piloto e Delta não tem a da publicação: a data de hoje entra, com aviso (4 avisos).
 const LINHAS: ParteDaLinha[] = [
   { nome: 'Exemplo Alfa', mp: 'Concluído', obs: 'Falta o fluxo' },
   { nome: 'Exemplo Beta' },
@@ -90,10 +95,10 @@ test('a prévia mostra as contagens, a etapa de cada processo, o que já existe 
     'XYZGestão de exemplosExemplo AlfaModelagem pilotoNovo',
     'XYZGestão de exemplosExemplo BetaNão iniciadosJá existia',
     'ABCOrçamentárioExemplo GamaConcluídosNovo',
-    'ABCOrçamentárioExemplo DeltaPublicaçãoNovo',
+    'ABCOrçamentárioExemplo DeltaConcluídosNovo',
   ])
-  expect(screen.getByRole('heading', { name: '1 aviso' })).toBeTruthy()
-  expect(screen.getByText(/Linha 7, Exemplo Delta: VII - Publicação concluída sem Data da Publicação/)).toBeTruthy()
+  expect(screen.getByRole('heading', { name: '4 avisos' })).toBeTruthy()
+  expect(screen.getByText('Linha 7, Exemplo Delta: VII - Publicação concluída sem Data da Publicação: usada a data de hoje.')).toBeTruthy()
   expect(importacao.gravados).toEqual([])
 })
 
@@ -123,11 +128,11 @@ test('confirmar grava só o que é novo, na ordem da planilha, e mostra o resumo
   fireEvent.click(await screen.findByRole('button', { name: 'Confirmar importação' }))
   await ate('Importação concluída')
   expect(screen.getByText('3 processos criados, 1 pulado.')).toBeTruthy()
-  expect(screen.getByRole('heading', { name: '1 aviso' })).toBeTruthy()
+  expect(screen.getByRole('heading', { name: '4 avisos' })).toBeTruthy()
   expect(importacao.gravados.map((p) => [p.nome, p.etapaCodigo, p.dataDaPublicacao, p.anotacoes])).toEqual([
     ['Exemplo Alfa', 'modelagem', null, 'Falta o fluxo'],
     ['Exemplo Gama', 'concluidos', '2026-10-16', null],
-    ['Exemplo Delta', 'publicacao', null, null],
+    ['Exemplo Delta', 'concluidos', '2026-11-06', null],
   ])
 })
 
@@ -180,4 +185,59 @@ test('os processos importados aparecem no Quadro, na etapa certa', async () => {
   const modelagem = await screen.findByRole('region', { name: 'Modelagem piloto' })
   await waitFor(() => { expect(within(modelagem).getByText('Exemplo Alfa')).toBeTruthy() })
   expect(within(screen.getByRole('region', { name: 'Não iniciados' })).getByText('Exemplo Beta')).toBeTruthy()
+})
+
+async function gravarPelaTela(linhas: ParteDaLinha[], importacao = montar()) {
+  await abrirImportacao()
+  await escolher(planilha(linhas))
+  fireEvent.click(await screen.findByRole('button', { name: 'Confirmar importação' }))
+  await ate('Importação concluída')
+  return importacao
+}
+
+function aviso(linha: number, nome: string, texto: string) {
+  return screen.getByText(`Linha ${String(linha)}, ${nome}: ${texto}`)
+}
+
+test('a VII concluída com Data da Publicação ilegível vai a Concluídos com a data de hoje, com aviso', async () => {
+  const importacao = await gravarPelaTela([{ nome: 'Exemplo Gama', ...TODAS_AS_ETAPAS, dmp: '01/09/2026', dp: 'outubro' }])
+  expect(importacao.gravados.map((p) => [p.etapaCodigo, p.dataDaPublicacao])).toEqual([['concluidos', '2026-11-06']])
+  expect(aviso(4, 'Exemplo Gama', 'Data da Publicação ilegível: usada a data de hoje.')).toBeTruthy()
+})
+
+test('a data do piloto que falta ou está ilegível vira a de hoje fora de Não iniciados; as outras regras seguem', async () => {
+  const importacao = await gravarPelaTela([
+    { nome: 'Exemplo Alfa', mp: 'Concluído' },
+    { nome: 'Exemplo Beta', mp: 'Concluído', ri: 'Concluído', rp: 'Concluído', mt: 'Concluído', dmp: '31/02/2026' },
+    { nome: 'Exemplo Gama', mp: 'Concluído', dmp: '01/09/2026' },
+    { nome: 'Exemplo Delta', mp: 'Concluído', dmp: '01/01/2030' },
+    { nome: 'Exemplo Épsilon', dmp: '01/09/2026', dp: '16 10 2026' },
+  ])
+  expect(importacao.gravados.map((p) => [p.nome, p.dataDaModelagemPiloto, p.dataDaPublicacao])).toEqual([
+    ['Exemplo Alfa', '2026-11-06', null],
+    ['Exemplo Beta', '2026-11-06', null],
+    ['Exemplo Gama', '2026-09-01', null],
+    ['Exemplo Delta', null, null],
+    ['Exemplo Épsilon', null, null],
+  ])
+  expect(aviso(4, 'Exemplo Alfa', 'Modelagem Piloto sem data: usada a data de hoje.')).toBeTruthy()
+  expect(aviso(5, 'Exemplo Beta', 'Data da Modelagem Piloto ilegível: usada a data de hoje.')).toBeTruthy()
+  expect(aviso(7, 'Exemplo Delta', 'Data da Modelagem Piloto no futuro: ignorada.')).toBeTruthy()
+  expect(aviso(8, 'Exemplo Épsilon', 'Data da Modelagem Piloto em processo Não iniciado: ignorada.')).toBeTruthy()
+  expect(aviso(8, 'Exemplo Épsilon', 'Data da Publicação sem a VII - Publicação concluída: ignorada.')).toBeTruthy()
+})
+
+test('a sigla com barra entra com hífen e conta como o mesmo setor', async () => {
+  const importacao = montar()
+  importacao.existentes = { setores: ['DAE-CTL'], macroprocessos: [], processos: [chaveDoProcesso('DAE-CTL', 'Exemplo Beta')] }
+  await abrirImportacao()
+  await escolher(planilha([
+    { area: 'DAE/CTL', nome: 'Exemplo Alfa' },
+    { area: 'dae / ctl', nome: 'Exemplo Beta' },
+    { area: 'DAE-CTL', nome: 'Exemplo Alfa' },
+  ]))
+  await ate(/Vão entrar 1 processo, 0 setores novos/)
+  const linhas = within(screen.getByRole('table')).getAllByRole('row').slice(1).map((l) => l.textContent)
+  expect(linhas).toEqual(['DAE-CTLGestão de exemplosExemplo AlfaNão iniciadosNovo', 'DAE-CTLGestão de exemplosExemplo BetaNão iniciadosJá existia'])
+  expect(screen.getByText('Linha 6, DAE-CTL · exemplo alfa: repetido na planilha; vale a primeira linha.')).toBeTruthy()
 })

@@ -2,7 +2,7 @@ import {
   type ChaveDaColuna, type PosicoesDasColunas, NOME_DA_ETAPA, SEQUENCIA_DE_ETAPAS, estaConcluida, localizarCabecalho, normalizar,
 } from './colunasDaPlanilha'
 import { lerCsv } from './csv'
-import { ehFutura, lerData } from './datasDaPlanilha'
+import { ehFutura, isoDoDia, lerData } from './datasDaPlanilha'
 
 export type ProcessoLido = {
   /** A posição da linha na planilha (a primeira linha de dados do arquivo conta como a seguinte ao cabeçalho). */
@@ -12,9 +12,9 @@ export type ProcessoLido = {
   nome: string
   etapaCodigo: string
   etapaNome: string
-  /** aaaa-mm-dd; só em Concluídos. */
+  /** aaaa-mm-dd; só em Concluídos (a de hoje se a planilha não tem uma utilizável). */
   dataDaPublicacao: string | null
-  /** aaaa-mm-dd; só quando o piloto foi feito e a data já passou. */
+  /** aaaa-mm-dd; só fora de Não iniciados (a de hoje se a planilha não tem uma utilizável; nula se está no futuro). */
   dataDaModelagemPiloto: string | null
   anotacoes: string | null
 }
@@ -56,27 +56,44 @@ function etapaPelaUltimaConcluida(celula: Celula, avisar: Avisar): string {
   return SEQUENCIA_DE_ETAPAS[ultima].codigo
 }
 
-function dataDoPiloto(celula: Celula, etapa: string, hoje: Date, avisar: Avisar): string | null {
-  const { iso, ilegivel } = lerData(celula('dataDoPiloto'))
-  if (ilegivel) avisar('Data da Modelagem Piloto ilegível: ignorada.')
-  if (!iso) return null
-  if (etapa === 'nao_iniciados') avisar('Data da Modelagem Piloto em processo Não iniciado: ignorada.')
-  else if (ehFutura(iso, hoje)) avisar('Data da Modelagem Piloto no futuro: ignorada.')
-  else return iso
+// Em Não iniciados o piloto não foi feito: a data da planilha é ignorada, com aviso.
+function avisarDataDoPilotoIgnorada(iso: string | null, ilegivel: boolean, avisar: Avisar): null {
+  if (iso) avisar('Data da Modelagem Piloto em processo Não iniciado: ignorada.')
+  else if (ilegivel) avisar('Data da Modelagem Piloto ilegível: ignorada.')
   return null
 }
 
-// VII concluída sem data utilizável fica em Publicação (Finalizado) para o usuário decidir depois.
-function publicacaoDaLinha(celula: Celula, etapa: string, avisar: Avisar): { etapa: string; data: string | null } {
+// Fora de Não iniciados o piloto foi feito: sem data utilizável, entra a de hoje, com aviso para a equipe corrigir depois
+// (ajuste de 2026-11-06). A data no futuro continua ignorada, porque a data do piloto só existe como realização.
+function dataDoPiloto(celula: Celula, etapa: string, hoje: Date, avisar: Avisar): string | null {
+  const { iso, ilegivel } = lerData(celula('dataDoPiloto'))
+  if (etapa === 'nao_iniciados') return avisarDataDoPilotoIgnorada(iso, ilegivel, avisar)
+  if (iso && !ehFutura(iso, hoje)) return iso
+  if (iso) {
+    avisar('Data da Modelagem Piloto no futuro: ignorada.')
+    return null
+  }
+  avisar(ilegivel ? 'Data da Modelagem Piloto ilegível: usada a data de hoje.' : 'Modelagem Piloto sem data: usada a data de hoje.')
+  return isoDoDia(hoje)
+}
+
+// VII concluída sem data utilizável entra em Concluídos com a data de hoje, com aviso (ajuste de 2026-11-06).
+function dataDaPublicacao(celula: Celula, etapa: string, hoje: Date, avisar: Avisar): string | null {
   const { iso, ilegivel } = lerData(celula('dataDaPublicacao'))
-  if (ilegivel) avisar('Data da Publicação ilegível: ignorada.')
   if (etapa !== 'concluidos') {
     if (iso) avisar('Data da Publicação sem a VII - Publicação concluída: ignorada.')
-    return { etapa, data: null }
+    else if (ilegivel) avisar('Data da Publicação ilegível: ignorada.')
+    return null
   }
-  if (iso) return { etapa, data: iso }
-  if (!ilegivel) avisar('VII - Publicação concluída sem Data da Publicação: o processo ficou em Publicação, Finalizado.')
-  return { etapa: 'publicacao', data: null }
+  if (iso) return iso
+  avisar(ilegivel ? 'Data da Publicação ilegível: usada a data de hoje.'
+    : 'VII - Publicação concluída sem Data da Publicação: usada a data de hoje.')
+  return isoDoDia(hoje)
+}
+
+// O banco só aceita letras, números e hífen na sigla; a planilha escreve "DAE/CTL" (às vezes "DAE / CTL").
+function siglaDe(area: string): string {
+  return area.toUpperCase().replace(/\s*\/\s*/g, '-')
 }
 
 function anotacoesDe(celula: Celula, avisar: Avisar): string | null {
@@ -88,12 +105,11 @@ function anotacoesDe(celula: Celula, avisar: Avisar): string | null {
 }
 
 function processoDaLinha(linha: number, celula: Celula, hoje: Date, avisar: Avisar): ProcessoLido {
-  const etapaDaColuna = etapaPelaUltimaConcluida(celula, avisar)
-  const dataDoPilotoLida = dataDoPiloto(celula, etapaDaColuna, hoje, avisar)
-  const publicacao = publicacaoDaLinha(celula, etapaDaColuna, avisar)
+  const etapa = etapaPelaUltimaConcluida(celula, avisar)
+  const dataDoPilotoLida = dataDoPiloto(celula, etapa, hoje, avisar)
   return {
-    linha, setor: celula('area').toUpperCase(), macroprocesso: macroprocessoDe(celula('macros')), nome: celula('processo'),
-    etapaCodigo: publicacao.etapa, etapaNome: NOME_DA_ETAPA[publicacao.etapa], dataDaPublicacao: publicacao.data,
+    linha, setor: siglaDe(celula('area')), macroprocesso: macroprocessoDe(celula('macros')), nome: celula('processo'),
+    etapaCodigo: etapa, etapaNome: NOME_DA_ETAPA[etapa], dataDaPublicacao: dataDaPublicacao(celula, etapa, hoje, avisar),
     dataDaModelagemPiloto: dataDoPilotoLida, anotacoes: anotacoesDe(celula, avisar),
   }
 }
@@ -120,7 +136,7 @@ export function lerPlanilha(texto: string, hoje: Date): PlanilhaLida {
 }
 
 function lerLinhaDeDados(lida: PlanilhaLida, vistos: Set<string>, numero: number, celula: Celula, hoje: Date): void {
-  const setor = celula('area').toUpperCase()
+  const setor = siglaDe(celula('area'))
   const avisar: Avisar = (texto) => lida.avisos.push({ linha: numero, nome: celula('processo') || '(sem nome)', texto })
   if (setor === '' || celula('processo') === '') return avisar('Linha sem Área ou sem nome de processo: ignorada.')
   const chave = `${setor}|${celula('processo').toLowerCase()}`

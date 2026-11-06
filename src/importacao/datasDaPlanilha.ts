@@ -19,6 +19,10 @@ export function lerData(valor: string): DataLida {
 
 /** Data ISO (aaaa-mm-dd) depois de hoje; a data da modelagem piloto só existe como realização. */
 export function ehFutura(iso: string, hoje: Date): boolean {
-  const hojeIso = `${String(hoje.getFullYear())}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`
-  return iso > hojeIso
+  return iso > isoDoDia(hoje)
+}
+
+/** O dia (no fuso do navegador) em aaaa-mm-dd; é a data usada quando a planilha não tem uma utilizável. */
+export function isoDoDia(dia: Date): string {
+  return `${String(dia.getFullYear())}-${String(dia.getMonth() + 1).padStart(2, '0')}-${String(dia.getDate()).padStart(2, '0')}`
 }

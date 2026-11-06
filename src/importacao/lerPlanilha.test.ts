@@ -30,7 +30,7 @@ describe('etapa pela última coluna Concluído', () => {
   })
 
   test('um Concluído depois de coluna vazia vale como a última e gera aviso', () => {
-    const lida = ler({ mp: 'Concluído', ri: 'Concluído' })
+    const lida = ler({ mp: 'Concluído', dmp: '01/09/2026', ri: 'Concluído' })
     expect(lida.processos[0].etapaCodigo).toBe('revisao_interna')
     expect(lida.avisos).toHaveLength(1)
     expect(lida.avisos[0]).toMatchObject({ linha: 4, nome: 'Exemplo Alfa' })
@@ -38,36 +38,44 @@ describe('etapa pela última coluna Concluído', () => {
 })
 
 describe('Concluídos e datas', () => {
-  const ATE_VI = { mp: 'Concluído', mt: 'Concluído', ri: 'Concluído', rp: 'Concluído', vi: 'Concluído', vii: 'Concluído' }
+  const ATE_VI = { mp: 'Concluído', dmp: '01/09/2026', mt: 'Concluído', ri: 'Concluído', rp: 'Concluído', vi: 'Concluído', vii: 'Concluído' }
 
   test('a Data da Publicação em dia mês ano com espaços e com barras vale', () => {
     expect(ler({ ...ATE_VI, dp: '16 10 2026' }).processos[0].dataDaPublicacao).toBe('2026-10-16')
     expect(ler({ ...ATE_VI, dp: '01/09/2026' }).processos[0].dataDaPublicacao).toBe('2026-09-01')
   })
 
-  test('VII concluída sem data entra em Publicação, com aviso', () => {
+  test('VII concluída sem data entra em Concluídos com a data de hoje, com aviso', () => {
     const lida = ler(ATE_VI)
-    expect(lida.processos[0]).toMatchObject({ etapaCodigo: 'publicacao', dataDaPublicacao: null })
+    expect(lida.processos[0]).toMatchObject({ etapaCodigo: 'concluidos', dataDaPublicacao: '2026-11-05' })
     expect(lida.avisos).toHaveLength(1)
   })
 
-  test('data ilegível da publicação conta como sem data e avisa', () => {
+  test('data ilegível da publicação também usa a data de hoje e avisa', () => {
     const lida = ler({ ...ATE_VI, dp: 'outubro' })
-    expect(lida.processos[0].etapaCodigo).toBe('publicacao')
+    expect(lida.processos[0]).toMatchObject({ etapaCodigo: 'concluidos', dataDaPublicacao: '2026-11-05' })
     expect(lida.avisos).toHaveLength(1)
   })
 
-  test('a data do piloto vale quando o piloto foi feito; ilegível, futura ou em Não iniciados é ignorada com aviso', () => {
+  test('a data do piloto vale quando o piloto foi feito; futura ou em Não iniciados é ignorada com aviso', () => {
     expect(ler({ mp: 'Concluído', dmp: '01/09/2026' }).processos[0].dataDaModelagemPiloto).toBe('2026-09-01')
-    for (const p of [{ mp: 'Concluído', dmp: '31/02/2026' }, { mp: 'Concluído', dmp: '01/01/2030' }, { dmp: '01/09/2026' }]) {
+    for (const p of [{ mp: 'Concluído', dmp: '01/01/2030' }, { dmp: '01/09/2026' }, { dmp: '31/02/2026' }]) {
       const lida = ler(p)
       expect(lida.processos[0].dataDaModelagemPiloto).toBeNull()
       expect(lida.avisos).toHaveLength(1)
     }
   })
 
+  test('fora de Não iniciados, a data do piloto que falta ou está ilegível vira a de hoje, com aviso', () => {
+    for (const p of [{ mp: 'Concluído' }, { mp: 'Concluído', dmp: '31/02/2026' }, { mp: 'Concluído', ri: 'Concluído', dmp: 'set' }]) {
+      const lida = ler(p)
+      expect(lida.processos[0].dataDaModelagemPiloto).toBe('2026-11-05')
+      expect(lida.avisos.at(-1)?.texto).toMatch(/usada a data de hoje\.$/)
+    }
+  })
+
   test('data da publicação sem VII concluída é ignorada com aviso', () => {
-    const lida = ler({ mp: 'Concluído', dp: '16 10 2026' })
+    const lida = ler({ mp: 'Concluído', dmp: '01/09/2026', dp: '16 10 2026' })
     expect(lida.processos[0].dataDaPublicacao).toBeNull()
     expect(lida.avisos).toHaveLength(1)
   })
