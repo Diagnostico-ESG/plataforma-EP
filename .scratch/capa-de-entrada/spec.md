@@ -54,3 +54,5 @@ A tela não busca dados no banco. Os estados são os de hoje, sem mudança: veri
 Spec de origem da tela: `.scratch/login-perfis/spec.md`, seção "Tela de entrada" (nota de 2026-11-06 aponta para esta spec).
 
 Implementado em 2026-11-06 (commit e76b6a3)
+
+Implementado em 2026-11-06 (commit 7b585ad), variante M
