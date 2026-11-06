@@ -9,11 +9,13 @@ type Status = 'vazio' | 'meio' | 'cheio'
 type Pilula = 'neutra' | 'atraso' | 'vence' | 'aprovado' | 'informativa'
 type CartaoMudo = { status: Status; pilula: Pilula; meu?: boolean; destaque?: boolean }
 
+const VAZIO: CartaoMudo = { status: 'vazio', pilula: 'neutra' }
+
 // Desenho fixo da capa (prévia B aprovada): a tela de entrada é vista antes do login, então nada vem do banco.
 const COLUNAS: { etapa: string; cartoes: CartaoMudo[] }[] = [
-  { etapa: CODIGO_NAO_INICIADOS, cartoes: [{ status: 'vazio', pilula: 'neutra' }, { status: 'vazio', pilula: 'neutra' }, { status: 'vazio', pilula: 'neutra' }] },
-  { etapa: CODIGO_DA_MODELAGEM_PILOTO, cartoes: [{ status: 'meio', pilula: 'vence', meu: true, destaque: true }, { status: 'vazio', pilula: 'neutra' }] },
-  { etapa: CODIGO_DA_TECNICA, cartoes: [{ status: 'meio', pilula: 'neutra' }, { status: 'cheio', pilula: 'atraso' }, { status: 'vazio', pilula: 'neutra' }] },
+  { etapa: CODIGO_NAO_INICIADOS, cartoes: [VAZIO, VAZIO, VAZIO] },
+  { etapa: CODIGO_DA_MODELAGEM_PILOTO, cartoes: [{ status: 'meio', pilula: 'vence', meu: true, destaque: true }, VAZIO] },
+  { etapa: CODIGO_DA_TECNICA, cartoes: [{ status: 'meio', pilula: 'neutra' }, { status: 'cheio', pilula: 'atraso' }, VAZIO] },
   { etapa: CODIGO_DA_REVISAO_INTERNA, cartoes: [{ status: 'meio', pilula: 'informativa' }] },
   { etapa: CODIGO_DA_VALIDACAO, cartoes: [{ status: 'vazio', pilula: 'neutra', meu: true }, { status: 'meio', pilula: 'vence' }] },
   { etapa: CODIGO_DA_APROVACAO, cartoes: [{ status: 'meio', pilula: 'neutra' }] },

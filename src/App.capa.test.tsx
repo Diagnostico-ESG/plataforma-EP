@@ -11,8 +11,8 @@ import { PlanilhasFalso } from './planilhas/PlanilhasFalso'
 afterEach(cleanup)
 
 // Capa da tela de entrada (.scratch/capa-de-entrada/spec.md): textos na coluna do login, ilustração só decorativa.
-function abrirEntrada(): void {
-  render(<App acesso={new AcessoFalso()} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
+function abrirEntrada(acesso = new AcessoFalso()): void {
+  render(<App acesso={acesso} cadastros={new CadastrosFalso()} processos={new ProcessosFalso()} versoes={new VersoesFalso()} revisoes={new RevisoesFalso()} planilhas={new PlanilhasFalso()} />)
 }
 
 test('a capa mostra o órgão, o título e a frase da plataforma acima do botão', async () => {
@@ -22,9 +22,10 @@ test('a capa mostra o órgão, o título e a frase da plataforma acima do botão
   expect(titulo.textContent).toBe('Escritório de Processos')
   const orgao = screen.getByText('Centro Estadual de Desburocratização (CED)')
   const frase = screen.getByText('Gestão das tarefas e dos documentos do mapeamento de processos da Casa Civil do Paraná.')
-  const emOrdem = [orgao, titulo, frase, botao].every((atual, i, todos) =>
+  const selo = screen.getByText('EP')
+  const emOrdem = [selo, orgao, titulo, frase, botao].every((atual, i, todos) =>
     i === 0 || Boolean(todos[i - 1].compareDocumentPosition(atual) & Node.DOCUMENT_POSITION_FOLLOWING))
-  expect(emOrdem, 'esperado: órgão, título, frase e botão, nesta ordem').toBe(true)
+  expect(emOrdem, 'esperado: selo EP, órgão, título, frase e botão, nesta ordem').toBe(true)
 })
 
 test('a ilustração do Quadro tem as 8 etapas, fica fora do leitor de tela e não tem texto nem foco', async () => {
@@ -36,4 +37,13 @@ test('a ilustração do Quadro tem as 8 etapas, fica fora do leitor de tela e n�
   expect(ilustracao?.querySelectorAll('.capa-coluna')).toHaveLength(8)
   expect(ilustracao?.textContent?.trim(), 'a ilustração não leva texto').toBe('')
   expect(ilustracao?.querySelectorAll('button, a, input, [tabindex]')).toHaveLength(0)
+})
+
+test('a mensagem de falha de conexão aparece na coluna do login, junto do botão', async () => {
+  const acesso = new AcessoFalso()
+  acesso.falharConexao = true
+  abrirEntrada(acesso)
+  const alerta = await screen.findByRole('alert')
+  expect(alerta.textContent).toContain('Não foi possível conectar.')
+  expect(alerta.closest('.entrada-login'), 'esperado o alerta dentro da coluna do login').not.toBeNull()
 })

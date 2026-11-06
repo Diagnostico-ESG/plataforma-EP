@@ -91,7 +91,7 @@
 
   /* Ilustração da capa de entrada (capa-de-entrada): traços e superfícies claras sobre o grafite */
   --capa-pontos: rgb(255 255 255 / 6%);
-  --capa-brilho: rgb(58 90 254 / 18%);
+  --capa-brilho: color-mix(in srgb, var(--azul) 18%, transparent);
   --capa-traco: rgb(255 255 255 / 16%);
   --capa-ponta: rgb(255 255 255 / 30%);
   --capa-coluna: rgb(255 255 255 / 6%);
@@ -116,6 +116,9 @@
   --tam-painel: var(--tam-tela);
   --tam-verso-titulo: 20px;
   --tam-pagina: 21px;
+  /* Só a capa de entrada: título e frase maiores que os das telas de dentro */
+  --tam-capa-titulo: 34px;
+  --tam-capa-frase: 17px;
 
   /* Espaçamento */
   --esp-1: 4px;

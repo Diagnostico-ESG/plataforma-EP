@@ -41,7 +41,7 @@
 /* A largura em "ch" quebra o título em duas linhas, como na prévia, sem <br> no texto. */
 .entrada-titulo {
   max-width: 12ch;
-  font-size: 34px;
+  font-size: var(--tam-capa-titulo);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.01em;
@@ -51,7 +51,7 @@
   max-width: 34ch;
   margin-top: var(--esp-3);
   color: var(--texto-2);
-  font-size: 17px;
+  font-size: var(--tam-capa-frase);
   line-height: 1.45;
   text-wrap: pretty;
 }
@@ -110,6 +110,10 @@
 
 .capa-ponta {
   fill: var(--capa-ponta);
+}
+
+.capa-ponta-azul {
+  fill: var(--azul);
 }
 
 .capa-caminho {
@@ -265,8 +269,4 @@
   .capa-ilustracao {
     display: none;
   }
-}
-
-.capa-ponta-azul {
-  fill: var(--azul);
 }
