@@ -21,6 +21,7 @@ const TEXTO_DA_ACAO_DA_PASSAGEM: Record<string, string> = { mover: 'Moveu o proc
 const TEXTO_DA_ACAO_DO_PROCESSO: Record<string, string> = {
   ...TEXTO_DA_ACAO, suspender: 'Suspendeu', cancelar: 'Cancelou', retomar: 'Retomou', reclassificar: 'Reclassificou',
   mudar_responsavel: 'Mudou o responsável',
+  importar: 'Importou da planilha',
   arquivar: 'Arquivou o processo',
   desarquivar: 'Desarquivou o processo',
   registrar_publicacao: 'Registrou a publicação',
@@ -180,6 +181,9 @@ export function tituloDoEvento(evento: EventoDoCadastro): string {
     const semArquivos = textoDoQueFaltou(depois.sem_arquivos)
     if (semArquivos) return `Moveu para ${texto(depois.etapa_nome)} ${semArquivos}`
     return `Moveu de ${texto(registro(evento.antes).etapa_nome)} para ${texto(depois.etapa_nome)}`
+  }
+  if (evento.entidade === 'processo' && evento.acao === 'importar') {
+    return `Importou da planilha para ${texto(registro(evento.depois).etapa_nome)}`
   }
   return textoDaAcaoDoCadastro(evento.acao, evento.entidade)
 }

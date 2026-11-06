@@ -7,7 +7,7 @@ create extension if not exists pgtap with schema extensions;
 create temp table _tap (n serial, linha text);
 grant all on _tap to anon, authenticated;
 grant all on sequence _tap_n_seq to anon, authenticated;
-insert into _tap (linha) select plan(50);
+insert into _tap (linha) select plan(51);
 
 -- Usuários inventados: a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo.
 insert into public.autorizacoes (email, perfil) values
@@ -98,14 +98,12 @@ insert into _tap (linha) select is((pg_temp.linha('ABC', 'Exemplo Gama')).public
 insert into _tap (linha) select is((pg_temp.linha('ABC', 'Exemplo Gama')).responsavel_id, null::uuid, 'sem responsável');
 insert into _tap (linha) select is((pg_temp.linha('ABC', 'Exemplo Gama')).no_quadro, false, 'e já fora do Quadro');
 insert into _tap (linha) select isnt((pg_temp.linha('ABC', 'Exemplo Gama')).tirado_do_quadro_em, null::timestamptz, 'com a marca de tirado do Quadro');
-insert into _tap (linha) select is(
-  (select pg_temp.importar('ABC', 'Orçamentário', 'Exemplo Delta', 'aprovacao_setor') is not null and
-    (pg_temp.linha('ABC', 'Exemplo Delta')).responsavel_id = '00000000-0000-0000-0000-0000000000a1'::uuid), true,
+select pg_temp.importar('ABC', 'Orçamentário', 'Exemplo Delta', 'aprovacao_setor');
+insert into _tap (linha) select is((pg_temp.linha('ABC', 'Exemplo Delta')).responsavel_id, '00000000-0000-0000-0000-0000000000a1'::uuid,
   'Aprovação pelo setor leva o responsável inicial dela');
-insert into _tap (linha) select is(
-  (select pg_temp.importar('ABC', 'Orçamentário', 'Exemplo Epsilon', 'publicacao') is not null and
-    (pg_temp.linha('ABC', 'Exemplo Epsilon')).publicado_em is null), true,
-  'Publicação sem data entra sem Data da Publicação');
+select pg_temp.importar('ABC', 'Orçamentário', 'Exemplo Epsilon', 'publicacao');
+insert into _tap (linha) select is((pg_temp.linha('ABC', 'Exemplo Epsilon')).etapa_atual_codigo, 'publicacao', 'Publicação sem data entra na etapa Publicação');
+insert into _tap (linha) select is((pg_temp.linha('ABC', 'Exemplo Epsilon')).publicado_em, null::date, 'e sem Data da Publicação');
 
 -- ===== O que já existe não muda =====
 insert into _tap (linha) select is(pg_temp.importar('exi', 'macro existente', '  já existe ', 'revisao_interna'), 'ja_existia',

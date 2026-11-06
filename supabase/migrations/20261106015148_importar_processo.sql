@@ -127,7 +127,8 @@ end $$;
 
 -- A de public só repassa, sem security definer: a conferência de perfil está na privada.
 create function public.importar_processo(p_setor text, p_macroprocesso text, p_nome text, p_etapa text,
-  p_data_da_publicacao date, p_data_da_modelagem_piloto date, p_anotacoes text) returns text
+  p_data_da_publicacao date default null, p_data_da_modelagem_piloto date default null, p_anotacoes text default null)
+  returns text
 language sql set search_path = ''
 as $$ select private.importar_processo(p_setor, p_macroprocesso, p_nome, p_etapa, p_data_da_publicacao,
   p_data_da_modelagem_piloto, p_anotacoes) $$;
