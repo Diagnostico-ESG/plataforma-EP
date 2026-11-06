@@ -2,6 +2,14 @@
 
 Uma entrada por versão, da mais recente para a mais antiga. Entradas antigas nunca são editadas. O histórico das versões 1.x (até a v1.9) está em `CHANGELOG-v1.md`.
 
+## v3.4 — 2026-11-06 (/situação sem ler o registro de melhorias)
+
+**Motivo.** O `/situação` lia o `.scratch/melhorias-protocolo.md` inteiro (261 KB e 1.234 linhas no projeto de origem, o maior arquivo da retomada) só para avisar se havia melhorias ainda não levadas à cópia mestra.
+
+**Mudou**
+- `/situação`: o registro de melhorias não é lido. Conta-se, por busca, as entradas com data posterior à da versão no topo do `CLAUDE.md`, e o aviso traz só esse número. A leitura fica a pedido do usuário.
+- `nao-testados.md`: item atualizado.
+
 ## v3.3 — 2026-11-06 (/situação mais leve)
 
 **Motivo.** No projeto de origem, o `/situação` passou a demorar: a bateria tinha 3.793 testes em 283 arquivos (cerca de 2 minutos em 4 processadores, mais no Windows), e ele ainda lia o backlog inteiro (72 KB) só para dizer quantos itens havia.

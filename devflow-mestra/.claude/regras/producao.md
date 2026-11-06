@@ -1,4 +1,4 @@
-# Roteiros de produção — DevFlow v3.3
+# Roteiros de produção — DevFlow v3.4
 
 Só quando eu pedir, depois de um `/ship` concluído. Leia o roteiro certo quando o pedido chegar; o `/ship` apenas aponta para cá. Roteiros: publicar no banco, publicar o site, backup e restauração, revisão de segurança para produção e operação depois da publicação. Os roteiros de banco valem só em projeto com a pasta `supabase/`; os de site, backup e revisão valem em qualquer projeto. Produção e o `migration repair` nunca passam por aqui sem minha aprovação no momento.
 

@@ -182,4 +182,4 @@ Decidido em 2026-10-24. O Docker funciona nesta máquina. Durante o desenvolvime
 
 ### /situação mais leve
 
-Decidido em 2026-11-06. No `/situação`, o `npm test` só roda se houver mudança não comitada; sem mudança, não rode e diga em uma linha que o último commit passou pelo pre-commit (que neste projeto roda a bateria inteira, cerca de 2 minutos em 3.793 testes). O `.scratch/backlog.md` não é lido no `/situação`: conte só os itens (linhas que começam com `- `); eu peço a leitura quando quiser.
+Decidido em 2026-11-06. No `/situação`, o `npm test` só roda se houver mudança não comitada; sem mudança, não rode e diga em uma linha que o último commit passou pelo pre-commit (que neste projeto roda a bateria inteira, cerca de 2 minutos em 3.793 testes). O `.scratch/backlog.md` não é lido no `/situação`: conte só os itens (linhas que começam com `- `); eu peço a leitura quando quiser. O mesmo vale para o `.scratch/melhorias-protocolo.md`: não é lido; conte por busca as entradas com data posterior à da versão no topo deste `CLAUDE.md` e diga só o número.

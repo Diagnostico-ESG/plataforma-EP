@@ -1,4 +1,4 @@
-# Auditoria de prontidão — RASCUNHO — DevFlow v3.3
+# Auditoria de prontidão — RASCUNHO — DevFlow v3.4
 
 **Rascunho, não testado, não ligado a nenhum comando.** Só roda quando eu pedir ("faça a auditoria de prontidão"), antes de colocar o sistema na frente de usuários de verdade e depois de mudanças grandes. Vem do material "111 conceitos de engenharia", cortado para os pontos que se aplicam a Vite + React + Supabase e a sistema pequeno; o que o `/ship` e `producao.md` já cobrem é apontado, não repetido.
 
