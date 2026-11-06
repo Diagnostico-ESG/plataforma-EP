@@ -159,3 +159,5 @@ Critérios de pronto:
 - [x] Testes pela tela (`App.*.test.tsx`, .csv inventado) para cada critério acima; os testes que provavam a regra antiga (VII sem data em Publicação) são atualizados.
 
 Implementado em 2026-11-06 (commit fbb2957)
+
+Entregue em 2026-11-06 (commit ec2b9d0), com ressalva: [visual] da primeira entrega visto só na vitrine local com módulos falsos
