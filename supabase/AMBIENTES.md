@@ -3,7 +3,7 @@
 - desenvolvimento: remoto, projeto plataforma-ep-dev (ref yclkzyoebpsxmgpbcbus), região sa-east-1
 - produção: remoto, projeto plataforma-ep-prod (ref shiummttjxncahitrjwe), região sa-east-1; criado em 2026-11-05 com Data API ligada e exposição automática de tabelas ligada (mesmo modo do desenvolvimento); nenhuma migração, segredo ou função publicados ainda; itens do painel (cadastro aberto, Email, SMTP, redirecionamentos, plano) em conferência
 - vínculo atual: yclkzyoebpsxmgpbcbus (continua o de desenvolvimento: a publicação do banco de produção vai pelo workflow "Migrar banco de produção" do GitHub Actions, sem `supabase link`, porque a porta 5432 fecha na rede do escritório; aprovado pelo usuário em 2026-11-05)
-- última migração publicada em produção: 20261030182657_responsavel_inicial_por_etapa (2026-11-05; as 78 migrações, pelo workflow "Migrar banco de produção", modo aplicar, disparado pelo usuário; conclusão relatada por ele, sem colar a saída)
+- última migração publicada em produção: 20261106015148_importar_processo (2026-11-06; pelo workflow "Migrar banco de produção", disparado por `gh workflow run` com aprovação do usuário no momento: listar (run 42285969994, 1 pendente) e aplicar (run 42286438513, "Aplicada"); backup dispensado porque a produção ainda não tinha dado real, informado pelo usuário)
 - último backup de produção: nenhum
 - último teste de restauração: nenhum
 
