@@ -23,3 +23,13 @@ Conferido: 1440×900 igual à prévia `capa-b.png`; 390px sem rolagem lateral, c
 
 - Por decisão do usuário, depois de ver o resultado no app, a ilustração da capa troca da variante B (Quadro inclinado com as 8 etapas em ícone) pela M: fluxograma em marca d'água ocupando o painel (alto, meio e baixo), linha azul tracejada e três colunas de frente, com 3, 2 e 1 cartões, cada uma terminando no último cartão, cabeçalho liso sem ícone e fundo opaco com sombra. A spec foi atualizada no mesmo arquivo; a prévia aprovada passa a ser `capa-m.png`. Variantes vistas e recusadas no caminho: F a L (`previa.html?v=f` a `?v=l`).
 - A coluna do login, os textos, o botão e as mensagens não mudam. A linha `Implementado em` anterior (commit e76b6a3) vale para a variante B; a nova implementação grava a sua.
+
+## 2026-11-06 — /polir da variante M (audit 18/20 e polish)
+
+Corrigido:
+- [P2] Entre 900 e cerca de 1100px de largura de janela, o quadro de três colunas encostava nas bordas do painel da ilustração (a 920px, 2px de folga). Abaixo de 1100px ele passa a `scale(0.9)`: a 920px, 50px de folga de cada lado (medido no navegador).
+
+Deixado de fora:
+- [P3] Cabeçalho das colunas com 30px de altura, fora da escala de espaçamento: é a medida da prévia aprovada e só existe na ilustração.
+
+Conferido: 1440×900 e 1366×768 iguais a `capa-m.png`; 920×640 e 1280×600 sem corte nem rolagem lateral. Presumido (continua): as mensagens de recusa e de falha vistas na tela a 1366×768.

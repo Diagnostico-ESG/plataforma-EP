@@ -231,6 +231,13 @@
   background: var(--azul);
 }
 
+/* Painel estreito (janela entre 900 e 1100px): o quadro diminui para não encostar nas bordas da ilustração. */
+@media (max-width: 1100px) {
+  .capa-quadro {
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+
 /* Janela estreita: fica só o login, centralizado. */
 @media (max-width: 900px) {
   .entrada {
