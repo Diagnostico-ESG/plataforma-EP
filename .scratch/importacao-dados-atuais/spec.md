@@ -76,13 +76,17 @@ O Administrador abre **Administração → Importação**, escolhe a planilha (p
 ### Segunda entrega: arquivos das versões
 
 41. Como Administrador, quero escolher a pasta DOCUMENTOS MAPEAMENTO no meu computador, para os arquivos irem direto de lá ao Drive sem passar por outro lugar.
-42. Como Administrador, quero que as colunas V1 a V8 da planilha (o rótulo completo "V5F", "V6P", "V7" escrito na coluna do número) digam quais versões cada processo tem, e que o importador as confira com os arquivos da pasta.
-43. Como Administrador, quero ser avisado de que versão 9 ou maior exige coluna nova na planilha, para não perder versões em silêncio.
+42. Como Administrador, quero que a pasta decida quais versões cada processo tem, pelo nome dos arquivos (`SIGLA_V<número><letra>_<Nome do processo>[_Relatório].<extensão>`), e que as colunas V1 a V8 da planilha só sirvam de comparação no relatório final, para carregar o que existe de fato.
+43. Como Administrador, quero que a letra do nome diga o tipo da versão (F, histórica, em Versões históricas; P, piloto; sem letra, em sequência), com o número único por processo qualquer que seja a letra, e que um processo possa ter várias versões históricas.
+43a. Como Administrador, quero que o arquivo da mesma versão com letra diferente da do .bpm (por exemplo `V1F.bpm` com `V1_Relatório.docx`) entre na versão do .bpm, com a letra dela, e apareça como aviso no relatório final, porque a letra diferente é erro de digitação.
 44. Como Administrador, quero ver na prévia, por processo, as versões que vão entrar, os relatórios ligados a elas e o que está faltando ou sobrando.
-45. Como Administrador, quero que a versão da planilha sem .bpm na pasta seja listada e não entre, e que as outras versões do processo entrem, para não perder tudo por causa de um arquivo.
+45. Como Administrador, quero que a versão da pasta sem .bpm seja listada e não entre, e que as outras versões do processo entrem, para não perder tudo por causa de um arquivo.
 46. Como Administrador, quero que .png ou relatório ausentes não gerem aviso, para não ver ruído de coisa opcional.
-47. Como Administrador, quero que o arquivo sem versão na planilha, de processo inexistente ou com nome fora do padrão não entre e seja listado, para saber o que sobrou na pasta.
-48. Como Administrador, quero que o relatório entre como o nome indica: com número, ligado à versão do nome; .pdf antigo sem número entra sem número próprio.
+47. Como Administrador, quero que o arquivo de processo inexistente (sigla e nome que não batem com um processo da plataforma) ou com nome fora do padrão não entre e seja listado, para saber o que sobrou na pasta.
+48. Como Administrador, quero que o .docx de relatório entre como o relatório da versão do nome (na versão histórica, sem número próprio, como na plataforma), e que o .pdf de relatório da mesma versão entre nos Outros anexos do processo.
+48a. Como Administrador, quero que a versão com dois .docx de relatório fique sem relatório (os dois de fora e listados), entrando com os outros arquivos, para eu escolher depois qual vale.
+48b. Como Administrador, quero que a pasta dentro da pasta do setor seja lida também, com os arquivos ligados ao processo pela sigla e pelo nome, e que o processo ganhe nas Anotações uma linha com o nome dessa subpasta, para saber de onde vieram.
+48c. Como Administrador, quero ver no relatório final: os buracos na numeração (por exemplo V1 e V3 sem V2), as versões sem .bpm, os relatórios duplicados, os arquivos sem processo correspondente e a diferença entre a pasta e as colunas V1 a V8 da planilha (versão na pasta e não na planilha, e o contrário), para corrigir depois.
 49. Como Administrador, quero que a versão marcada com a etapa do processo no momento da importação, para o histórico fazer sentido.
 50. Como Administrador, quero que as travas de etapa do envio de versões (histórica só em Não iniciados, piloto só na Modelagem piloto, em sequência só nas suas etapas) fiquem de lado só na importação, para versões antigas entrarem em qualquer processo, e que o número único por processo e o .bpm obrigatório continuem valendo.
 51. Como Administrador, quero que a versão que já existe (mesmo processo e número) seja pulada e listada, e que nenhum arquivo seja substituído, para rodar de novo sem medo.
@@ -109,8 +113,8 @@ O Administrador abre **Administração → Importação**, escolhe a planilha (p
 - **Identidade do item.** Processo existente = mesmo setor e mesmo nome (comparação sem diferença de caixa e espaços nas pontas); versão existente = mesmo processo e mesmo número. Linha repetida na planilha: vale a primeira.
 - **Reaproveitamento de "A definir".** Um macroprocesso comum com esse nome por setor, criado pela importação; nenhuma regra especial no resto da plataforma.
 - **Falha no meio.** A gravação dos cadastros é por processo, de forma que cada processo é inteiro ou não entra; o resumo conta o que entrou. A segunda entrega envia arquivo a arquivo e mostra o andamento; repetir completa o que faltou.
-- **Pendência da segunda entrega.** O desenho exato da pasta DOCUMENTOS MAPEAMENTO (subpastas e padrão de nome dos arquivos) ainda não foi registrado em `amostra/`; o ticket da entrega 2 começa por registrar essa amostra, sem nomes reais.
-- **Sem alterar o que existe.** Nenhuma operação da importação faz alteração ou exclusão sobre dados já presentes.
+- **Desenho da pasta.** Registrado em `.scratch/importacao-dados-atuais/amostra/pasta.md` (nomes inventados, contagens reais), com as decisões do usuário de 2026-11-06. A seção 2 pede, além da pasta, o mesmo .csv da seção 1, só para a comparação com V1 a V8 no relatório final.
+- **Sem alterar o que existe.** Nenhuma operação da importação faz alteração ou exclusão sobre dados já presentes. A única exceção é a linha da subpasta nas Anotações (história 48b), que só se acrescenta ao fim do texto e não se repete se a importação rodar de novo.
 - **Limites da leitura.** As Observações acima de 8000 caracteres entram cortadas, com aviso; a linha sem Área ou sem nome de processo é ignorada, com aviso; a linha repetida aparece com o nome como está na planilha.
 
 ## Testing Decisions
@@ -125,10 +129,10 @@ O Administrador abre **Administração → Importação**, escolhe a planilha (p
 ## Out of Scope
 
 - Importar .xlsx direto, ler a planilha pelo Google Drive ou por link.
-- Colunas I, II e III (ficam fora do que decide etapa), D (oculta), VIII e IX (nenhum processo chegou lá) e V9 em diante (exige coluna nova).
+- Colunas I, II e III (ficam fora do que decide etapa), D (oculta), VIII e IX (nenhum processo chegou lá). Na segunda entrega, a versão vem do nome do arquivo, sem limite de número; as colunas V1 a V8 só entram na comparação.
 - Subprocessos (todos entram como processo) e reclassificação automática de "A definir".
 - Alterar, atualizar ou apagar dado que já existe na plataforma; importação incremental inteligente.
-- Importar e-mails .eml, outros anexos avulsos, anotações além das Observações, usuários ou responsáveis por nome.
+- Importar e-mails .eml, anexos avulsos além do .pdf de relatório (história 48), anotações além das Observações, usuários ou responsáveis por nome.
 - Um workflow do GitHub Actions ou script local com senha (ADR 0044).
 - Importar o histórico detalhado de cada etapa (só o registro único "importado da planilha").
 - Desfazer a importação em bloco (reversão fica por exclusão normal dos cadastros ou por restauração do backup).
