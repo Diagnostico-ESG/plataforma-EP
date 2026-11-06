@@ -18,3 +18,8 @@ Deixados de fora:
 - [P3] Em janelas com menos de cerca de 700px de altura, o Quadro da ilustração fica mais cortado embaixo (posição fixa). É decorativo e não atrapalha o login.
 
 Conferido: 1440×900 igual à prévia `capa-b.png`; 390px sem rolagem lateral, com a ilustração escondida (medido no navegador). Presumido: as mensagens de recusa e de falha vistas na tela a 1366×768 (só pelo teste da tela, que confere a falha dentro da coluna do login; sem login real não dá para provocá-las no app).
+
+## 2026-11-06 — troca da ilustração (variante M), depois do /polir
+
+- Por decisão do usuário, depois de ver o resultado no app, a ilustração da capa troca da variante B (Quadro inclinado com as 8 etapas em ícone) pela M: fluxograma em marca d'água ocupando o painel (alto, meio e baixo), linha azul tracejada e três colunas de frente, com 3, 2 e 1 cartões, cada uma terminando no último cartão, cabeçalho liso sem ícone e fundo opaco com sombra. A spec foi atualizada no mesmo arquivo; a prévia aprovada passa a ser `capa-m.png`. Variantes vistas e recusadas no caminho: F a L (`previa.html?v=f` a `?v=l`).
+- A coluna do login, os textos, o botão e as mensagens não mudam. A linha `Implementado em` anterior (commit e76b6a3) vale para a variante B; a nova implementação grava a sua.

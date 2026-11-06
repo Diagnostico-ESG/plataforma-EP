@@ -35,7 +35,7 @@
   .fluxo .acesa { fill: none; stroke: var(--azul); stroke-width: 2.5; stroke-dasharray: 6 7; marker-end: url(#ponta-azul); }
 
   .quadro { position: absolute; top: 250px; left: 70px; display: flex; gap: 14px;
-            transform: perspective(1800px) rotateX(12deg) rotateY(-10deg) rotateZ(-4deg) scale(.92); transform-origin: 0 0; }
+            transform: perspective(1800px) rotateX(12deg) rotateY(-10deg) rotateZ(-4deg) scale(.7); transform-origin: 0 0; }
   .coluna { width: 152px; padding: 10px; border-radius: 10px; background: rgb(255 255 255 / 6%); display: flex; flex-direction: column; gap: 10px; }
   .cabeca { display: flex; align-items: center; gap: 7px; padding: 7px 9px; border-radius: 6px; background: rgb(255 255 255 / 10%); color: #dfe3ea; font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .cabeca svg { flex: none; width: 16px; height: 16px; }
@@ -51,6 +51,134 @@
   .relevo .selo, .relevo .pilula { box-shadow: inset 0 -2px 0 rgb(0 0 0 / 18%); }
   /* Variante E: o relevo da D com um giro leve (bem menor que o da B) */
   .relevo.giro-leve .quadro { transform: perspective(2000px) rotateX(7deg) rotateY(-6deg) rotateZ(-2deg); }
+  /* Variante F: mais fluxograma, menos quadro. O fluxo BPMN com as etapas reais é o protagonista; o Quadro vira um fragmento no canto. */
+  .fluxo-f { display: none; position: absolute; inset: 0; width: 100%; height: 100%; }
+  .mais-fluxo .fluxo { display: none; }
+  .mais-fluxo .fluxo-f { display: block; }
+  .mais-fluxo .quadro { top: 650px; left: 420px; opacity: .9; transform: perspective(1800px) rotateX(14deg) rotateY(-12deg) rotateZ(-5deg) scale(.58); }
+  .fluxo-f .tarefa { fill: rgb(255 255 255 / 5%); stroke: rgb(255 255 255 / 28%); stroke-width: 1.5; }
+  .fluxo-f .tarefa.feita { fill: rgb(255 255 255 / 12%); stroke: rgb(255 255 255 / 40%); }
+  .fluxo-f .tarefa.atual { fill: #fff; stroke: var(--azul); stroke-width: 2.5; }
+  .fluxo-f .icone { color: #dfe3ea; }
+  .fluxo-f .icone.atual { color: var(--texto); }
+  .fluxo-f .icone.futura { color: rgb(255 255 255 / 45%); }
+  .fluxo-f .aresta { fill: none; stroke: rgb(255 255 255 / 26%); stroke-width: 1.5; marker-end: url(#f-ponta); }
+  .fluxo-f .aresta.feita { stroke: var(--azul); stroke-width: 2.5; stroke-dasharray: 6 7; marker-end: url(#f-ponta-azul); }
+  .fluxo-f .volta { fill: none; stroke: rgb(255 255 255 / 20%); stroke-width: 1.5; stroke-dasharray: 3 5; marker-end: url(#f-ponta); }
+  .fluxo-f .evento { fill: none; stroke: rgb(255 255 255 / 45%); stroke-width: 1.75; }
+  .fluxo-f .evento.fim { stroke-width: 4.5; }
+  .fluxo-f .decisao { fill: rgb(255 255 255 / 5%); stroke: rgb(255 255 255 / 35%); stroke-width: 1.5; }
+  .fluxo-f .x { stroke: rgb(255 255 255 / 45%); stroke-width: 1.6; stroke-linecap: round; }
+  .fluxo-f .feito-marca { fill: #fff; }
+  .fluxo-f .feito-visto { fill: none; stroke: var(--grafite); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  /* Variante G: a proposta da F em raias (EP e setor), inclinada como a B, com um único cartão preso à tarefa atual. */
+  .fluxo-g { display: none; position: absolute; top: 60px; left: 0; width: 104%; height: 84%;
+    transform: perspective(1800px) rotateX(12deg) rotateY(-8deg) rotateZ(-4deg); transform-origin: 40% 50%; }
+  .raias .fluxo, .raias .quadro { display: none; }
+  .raias .fluxo-g { display: block; }
+  .fluxo-g .piscina { fill: rgb(255 255 255 / 3%); stroke: rgb(255 255 255 / 22%); stroke-width: 1.5; }
+  .fluxo-g .cabeca-raia { fill: rgb(255 255 255 / 7%); }
+  .fluxo-g .divisa { stroke: rgb(255 255 255 / 16%); stroke-width: 1.5; }
+  .fluxo-g .icone-raia { color: rgb(255 255 255 / 55%); }
+  .fluxo-g .tarefa { fill: #2c3341; stroke: rgb(255 255 255 / 30%); stroke-width: 1.5; filter: drop-shadow(0 6px 10px rgb(0 0 0 / 35%)); }
+  .fluxo-g .tarefa.feita { fill: #343c4c; stroke: rgb(255 255 255 / 45%); }
+  .fluxo-g .tarefa.atual { fill: #fff; stroke: var(--azul); stroke-width: 2.5; }
+  .fluxo-g .icone { color: #dfe3ea; }
+  .fluxo-g .icone.atual { color: var(--texto); }
+  .fluxo-g .icone.futura { color: rgb(255 255 255 / 50%); }
+  .fluxo-g .aresta { fill: none; stroke: rgb(255 255 255 / 30%); stroke-width: 1.5; marker-end: url(#g-ponta); }
+  .fluxo-g .aresta.feita { stroke: var(--azul); stroke-width: 2.5; stroke-dasharray: 6 7; marker-end: url(#g-ponta-azul); }
+  .fluxo-g .volta { fill: none; stroke: rgb(255 255 255 / 24%); stroke-width: 1.5; stroke-dasharray: 3 5; marker-end: url(#g-ponta); }
+  .fluxo-g .evento { fill: #2c3341; stroke: rgb(255 255 255 / 50%); stroke-width: 1.75; }
+  .fluxo-g .evento.fim { stroke-width: 4.5; }
+  .fluxo-g .decisao { fill: #2c3341; stroke: rgb(255 255 255 / 40%); stroke-width: 1.5; }
+  .fluxo-g .x { stroke: rgb(255 255 255 / 50%); stroke-width: 1.6; stroke-linecap: round; }
+  .fluxo-g .feito-marca { fill: #fff; }
+  .fluxo-g .feito-visto { fill: none; stroke: var(--grafite); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .fluxo-g .cartao-g { fill: #fff; filter: drop-shadow(0 10px 16px rgb(0 0 0 / 45%)); }
+  .fluxo-g .cartao-g-borda { fill: none; stroke: var(--azul); stroke-width: 2; }
+  .so-fluxo .cartao-grupo { display: none; }
+  .so-fluxo .fluxo-g { top: 20px; left: 36px; width: 100%; height: 100%; }
+  .fluxo-g .elo { stroke: var(--azul); stroke-width: 1.75; stroke-dasharray: 2 4; }
+  /* Variante I: a arte da B refeita com fluxograma. Mesmo plano inclinado, peças brancas com sombra; as tarefas são as etapas. */
+  .fluxo-i { display: none; position: absolute; top: 225px; left: 40px; width: 1600px; height: 560px;
+    transform: perspective(1800px) rotateX(12deg) rotateY(-10deg) rotateZ(-4deg) scale(.7); transform-origin: 0 0; }
+  .so-fluxo-b .quadro { display: none; }
+  .so-fluxo-b .fluxo-i { display: block; }
+  .fluxo-i svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .fluxo-i .ligacao { fill: none; stroke: rgb(255 255 255 / 42%); stroke-width: 2; marker-end: url(#i-ponta); }
+  .fluxo-i .ligacao.feita { stroke: var(--azul); stroke-width: 3; stroke-dasharray: 7 7; marker-end: url(#i-ponta-azul); }
+  .fluxo-i .retorno { fill: none; stroke: rgb(255 255 255 / 30%); stroke-width: 2; stroke-dasharray: 3 6; marker-end: url(#i-ponta); }
+  .fluxo-i .peca { position: absolute; width: 170px; height: 120px; padding: 12px; border-radius: 10px; background: #fff;
+    box-shadow: 0 8px 20px rgb(0 0 0 / 32%); display: grid; grid-template-rows: auto 1fr auto; gap: 10px; }
+  .fluxo-i .peca.atual { outline: 2px solid var(--azul); outline-offset: 3px; box-shadow: 0 14px 30px rgb(0 0 0 / 40%); }
+  .fluxo-i .peca.futura { background: #eef0f4; }
+  .fluxo-i .topo { display: flex; align-items: center; gap: 9px; }
+  .fluxo-i .icone { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: var(--grafite); color: #dfe3ea; }
+  .fluxo-i .peca.atual .icone { background: var(--azul); color: #fff; }
+  .fluxo-i .icone svg { position: static; width: 20px; height: 20px; }
+  .fluxo-i .barras { display: grid; gap: 6px; flex: 1; }
+  .fluxo-i .barra { height: 7px; border-radius: 4px; background: #d9dde5; }
+  .fluxo-i .barra.curta { width: 60%; }
+  .fluxo-i .base { display: flex; align-items: center; gap: 7px; padding-top: 8px; border-top: 1px solid var(--linha-leve); }
+  .fluxo-i .selo { width: 30px; height: 12px; border-radius: 4px; background: #6b7a99; }
+  .fluxo-i .avatar { width: 16px; height: 16px; border-radius: 50%; background: var(--avatar-fundo); margin-left: auto; }
+  .fluxo-i .avatar.eu { background: var(--azul-claro); box-shadow: inset 0 0 0 2px var(--azul); }
+  .fluxo-i .pilula { width: 24px; height: 9px; border-radius: 5px; background: var(--linha); }
+  .fluxo-i .pilula.vence { background: var(--vence); }
+  .fluxo-i .pilula.ok { background: #166a4d; }
+  .fluxo-i .evento { position: absolute; width: 44px; height: 44px; border-radius: 50%; background: #fff; box-shadow: 0 8px 20px rgb(0 0 0 / 32%); border: 3px solid #fff; }
+  .fluxo-i .evento::after { content: ''; position: absolute; inset: 5px; border-radius: 50%; border: 2px solid var(--texto); }
+  .fluxo-i .evento.fim::after { border-width: 5px; }
+  .fluxo-i .decisao { position: absolute; width: 62px; height: 62px; border-radius: 8px; background: #fff; transform: rotate(45deg); box-shadow: 0 8px 20px rgb(0 0 0 / 32%); }
+  .fluxo-i .decisao::before, .fluxo-i .decisao::after { content: ''; position: absolute; left: 50%; top: 50%; width: 26px; height: 3px; border-radius: 2px; background: var(--texto); }
+  .fluxo-i .decisao::before { transform: translate(-50%, -50%); }
+  .fluxo-i .decisao::after { transform: translate(-50%, -50%) rotate(90deg); }
+  /* Variante J: a B sem o quadro, com o miolo em fluxograma de marca d'água */
+  .miolo-fluxo { display: none; }
+  .sem-quadro .miolo-fluxo { display: inline; }
+  .sem-quadro .quadro { display: none; }
+  /* Variante K: a J com um quadro novo por cima, de frente, menor, como uma janela do Quadro flutuando sobre o fluxograma. */
+  .quadro-k { display: none; position: absolute; top: 50%; left: 50%; width: 600px; transform: translate(-46%, -52%);
+    padding: 14px; border-radius: 14px; background: var(--fundo); box-shadow: 0 30px 70px rgb(0 0 0 / 50%), 0 0 0 1px rgb(255 255 255 / 6%); }
+  .quadro-novo .quadro-k { display: block; }
+  .quadro-k .barra-k { display: flex; align-items: center; gap: 8px; padding: 2px 4px 12px; }
+  .quadro-k .titulo-k { width: 120px; height: 9px; border-radius: 5px; background: #c9cfd9; }
+  .quadro-k .filtro-k { width: 54px; height: 20px; border-radius: 6px; background: #fff; border: 1px solid var(--linha); }
+  .quadro-k .filtro-k.ligado { background: var(--azul-claro); border-color: transparent; }
+  .quadro-k .grupo-k { display: flex; margin-left: auto; }
+  .quadro-k .grupo-k span { width: 20px; height: 20px; border-radius: 50%; background: var(--avatar-fundo); border: 2px solid var(--fundo); margin-left: -6px; }
+  .quadro-k .grupo-k span:last-child { background: var(--azul-claro); box-shadow: inset 0 0 0 2px var(--azul); }
+  .quadro-k .colunas-k { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .quadro-k .coluna-k { display: flex; flex-direction: column; gap: 8px; padding: 8px; border-radius: 8px; background: var(--fundo-faixa); min-height: 250px; }
+  .quadro-k .cabeca-k { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 6px; background: #fff; border: 1px solid var(--linha); color: var(--texto); }
+  .quadro-k .cabeca-k svg { width: 15px; height: 15px; flex: none; }
+  .quadro-k .cabeca-k .nome-k { flex: 1; height: 7px; border-radius: 4px; background: #c9cfd9; }
+  .quadro-k .cabeca-k .conta-k { width: 14px; height: 7px; border-radius: 4px; background: #dfe3ea; }
+  .quadro-k .cartao-k { display: grid; gap: 7px; padding: 9px; border-radius: 7px; background: #fff; border: 1px solid var(--linha); }
+  .quadro-k .cartao-k.ativo { border-color: transparent; outline: 2px solid var(--azul); box-shadow: 0 8px 18px rgb(29 35 48 / 18%); }
+  .quadro-k .l1 { display: flex; justify-content: space-between; align-items: center; }
+  .quadro-k .selo-k { width: 28px; height: 11px; border-radius: 3px; background: #6b7a99; }
+  .quadro-k .l1 svg { width: 15px; height: 15px; }
+  .quadro-k .b { height: 6px; border-radius: 3px; background: #d9dde5; }
+  .quadro-k .b.curta { width: 58%; }
+  .quadro-k .rodape-k { display: flex; align-items: center; gap: 6px; padding-top: 6px; border-top: 1px solid var(--linha-leve); }
+  .quadro-k .av-k { width: 14px; height: 14px; border-radius: 50%; background: var(--avatar-fundo); }
+  .quadro-k .av-k.eu { background: var(--azul-claro); box-shadow: inset 0 0 0 2px var(--azul); }
+  .quadro-k .p-k { margin-left: auto; width: 22px; height: 8px; border-radius: 4px; background: var(--linha); }
+  .quadro-k .p-k.vence { background: var(--vence); }
+  .quadro-k .p-k.atraso { background: var(--atraso); }
+  .quadro-k .p-k.ok { background: #166a4d; }
+  .quadro-k .p-k.info { background: var(--azul); }
+  /* Variante L: o fundo da J com o quadro no padrão da B, de frente, menor e inteiro (as 8 etapas). */
+  .quadro-reto-menor .miolo-fluxo { display: inline; }
+  .quadro-reto-menor .quadro { top: 50%; left: 50%; transform: translate(-50%, -50%) scale(.64); transform-origin: center;
+    padding: 18px; border-radius: 18px; background: var(--grafite); box-shadow: 0 40px 90px rgb(0 0 0 / 55%), 0 0 0 1.5px rgb(255 255 255 / 9%); }
+  /* Variante M: 3 colunas, cada uma do tamanho dos seus cartões (3, 2 e 1, como o ícone do Quadro), sem ícone no cabeçalho. */
+  .quadro-m .miolo-fluxo { display: inline; }
+  .quadro-m .quadro { top: 50%; left: 50%; transform: translate(-50%, -50%) scale(1.1); transform-origin: center; align-items: flex-start; gap: 16px; }
+  .quadro-m .coluna { background: #2d3441; box-shadow: 0 24px 50px rgb(0 0 0 / 45%), 0 0 0 1px rgb(255 255 255 / 8%); }
+  .quadro-m .cabeca { height: 30px; }
   .so-icones .cabeca { justify-content: center; }
   .so-icones .cabeca span { display: none; }
   .so-icones .cabeca svg { width: 20px; height: 20px; }
@@ -110,9 +238,47 @@
       <path class="seta" d="M856 796H930"/>
       <circle class="forma" cx="70" cy="830" r="20"/>
       <path class="seta" d="M90 830H600"/>
+      <!-- Variante J: o miolo, onde ficava o quadro, recebe mais fluxograma no mesmo traço de marca d'água -->
+      <g class="miolo-fluxo">
+        <circle class="forma" cx="120" cy="300" r="20"/>
+        <path class="seta" d="M140 300H210"/>
+        <rect class="forma" x="212" y="274" width="130" height="52" rx="10"/>
+        <path class="seta" d="M342 300H422"/>
+        <path class="forma" d="M460 264L496 300L460 336L424 300Z"/>
+        <path class="seta" d="M496 300H580"/>
+        <rect class="forma" x="582" y="274" width="130" height="52" rx="10"/>
+        <path class="seta" d="M712 300H790"/>
+        <rect class="forma" x="792" y="274" width="130" height="52" rx="10"/>
+        <path class="seta" d="M460 336V420H580"/>
+        <rect class="forma" x="582" y="394" width="130" height="52" rx="10"/>
+        <path class="seta" d="M712 420H857V328"/>
+        <g transform="translate(0 70)">
+        <rect class="forma" x="40" y="494" width="130" height="52" rx="10"/>
+        <path class="seta" d="M170 520H252"/>
+        <path class="forma" d="M290 484L326 520L290 556L254 520Z"/>
+        <path class="forma" d="M290 504V536M274 520H306"/>
+        <path class="seta" d="M290 484V470H378"/>
+        <rect class="forma" x="380" y="444" width="130" height="52" rx="10"/>
+        <path class="seta" d="M290 556V586H378"/>
+        <rect class="forma" x="380" y="560" width="130" height="52" rx="10"/>
+        <path class="seta" d="M510 470H600V482"/>
+        <path class="seta" d="M510 586H600V558"/>
+        <path class="forma" d="M600 484L636 520L600 556L564 520Z"/>
+        <path class="forma" d="M600 504V536M584 520H616"/>
+        <path class="seta" d="M636 520H720"/>
+        <circle class="forma" cx="744" cy="520" r="22"/>
+        <circle class="forma" cx="744" cy="520" r="17"/>
+        <path class="seta" d="M766 520H850"/>
+        <rect class="forma" x="852" y="494" width="130" height="52" rx="10"/>
+        </g>
+      </g>
       <!-- Caminho aceso: o processo atravessando o quadro -->
       <path class="acesa" d="M20 600C220 510 330 700 500 620S760 500 950 580"/>
     </svg>
+    <svg class="fluxo-f" id="fluxo-f" viewBox="0 0 960 900" preserveAspectRatio="xMidYMid slice"></svg>
+    <svg class="fluxo-g" id="fluxo-g" viewBox="0 0 1130 760" preserveAspectRatio="xMinYMid meet"></svg>
+    <div class="fluxo-i" id="fluxo-i"></div>
+    <div class="quadro-k" id="quadro-k"></div>
     <div class="quadro" id="quadro"></div>
   </section>
 </main>
@@ -150,9 +316,123 @@
   document.getElementById('quadro').innerHTML = ETAPAS.map(([nome, d], i) =>
     `<div class="coluna"><div class="cabeca">${svg(d)}<span>${nome}</span></div>${CARTOES[i].map(cartao).join('')}</div>`).join('')
   if (location.search.includes('v=b')) document.body.classList.add('so-icones')
+  if (location.search.includes('v=j')) document.body.classList.add('sem-quadro')
+  if (location.search.includes('v=m')) {
+    document.body.classList.add('quadro-m')
+    const CARTOES_M = [[['', '', 0], ['meio', 'vence', 1, 1], ['', '', 0]], [['meio', 'atraso', 0], ['cheio', 'ok', 0]], [['meio', 'info', 0]]]
+    document.getElementById('quadro').innerHTML = CARTOES_M.map((cartoes) =>
+      '<div class="coluna"><div class="cabeca"></div>' + cartoes.map(cartao).join('') + '</div>').join('')
+  }
+  if (location.search.includes('v=l')) document.body.classList.add('quadro-reto-menor', 'so-icones')
   if (location.search.includes('v=c')) document.body.classList.add('reto')
   if (location.search.includes('v=d')) document.body.classList.add('relevo', 'so-icones')
   if (location.search.includes('v=e')) document.body.classList.add('relevo', 'so-icones', 'giro-leve')
+  // Variante F: o fluxo das 8 etapas como tarefas BPMN, em serpentina; a Modelagem piloto é a tarefa atual.
+  function desenharFluxoF() {
+    const W = 132, H = 72
+    const T = [[130,150],[320,150],[510,150],[700,150],[600,330],[250,330],[250,510],[450,510]]
+    const estado = (i) => i < 1 ? 'feita' : i === 1 ? 'atual' : 'futura'
+    const visto = (x, y) => '<circle class="feito-marca" cx="' + (x + W - 4) + '" cy="' + (y + 4) + '" r="10"/>'
+      + '<path class="feito-visto" d="M' + (x + W - 9) + ' ' + (y + 4) + 'l3.5 3.5 6-6.5"/>'
+    const tarefa = ([x, y], i) => '<rect class="tarefa ' + estado(i) + '" x="' + x + '" y="' + y + '" width="' + W + '" height="' + H + '" rx="12"/>'
+      + '<g class="icone ' + estado(i) + '" transform="translate(' + (x + W / 2 - 14) + ' ' + (y + H / 2 - 14) + ') scale(1.17)" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + ETAPAS[i][1] + '</g>'
+      + (estado(i) === 'feita' ? visto(x, y) : '')
+    const arestas = [
+      ['M90 186H128', 'feita'], ['M262 186H318', 'feita'], ['M452 186H508', ''], ['M642 186H698', ''],
+      ['M766 222V276H666V328', ''], ['M600 366H518', ''], ['M444 366H384', ''], ['M316 402V508', ''],
+      ['M382 546H448', ''], ['M582 546H626', ''],
+    ].map(([d, c]) => '<path class="aresta ' + c + '" d="' + d + '"/>').join('')
+    document.getElementById('fluxo-f').innerHTML = document.querySelector('.fluxo defs').outerHTML.replace(/id="ponta/g, 'id="f-ponta') + arestas
+      + '<path class="volta" d="M480 402V446H666V404"/>'
+      + '<circle class="evento" cx="70" cy="186" r="20"/>'
+      + '<path class="decisao" d="M480 330L516 366L480 402L444 366Z"/><path class="x" d="M470 356l20 20M490 356l-20 20"/>'
+      + '<circle class="evento fim" cx="650" cy="546" r="22"/>'
+      + T.map(tarefa).join('')
+  }
+  if (location.search.includes('v=f')) { document.body.classList.add('mais-fluxo', 'so-icones'); desenharFluxoF() }
+  // Variante G: raia do EP em cima (preparo, revisão e publicação) e raia do setor embaixo (validação e aprovação).
+  function desenharFluxoG() {
+    const W = 104, H = 66, CIMA = 250, BAIXO = 470
+    const T = [[110,CIMA],[244,CIMA],[378,CIMA],[512,CIMA],[600,BAIXO],[808,BAIXO],[808,CIMA],[942,CIMA]]
+    const estado = (i) => i < 1 ? 'feita' : i === 1 ? 'atual' : 'futura'
+    const icone = (d, x, y, k, classe) => '<g class="' + classe + '" transform="translate(' + x + ' ' + y + ') scale(' + k + ')" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + d + '</g>'
+    const visto = (x, y) => '<circle class="feito-marca" cx="' + (x + W - 4) + '" cy="' + (y + 4) + '" r="10"/><path class="feito-visto" d="M' + (x + W - 9) + ' ' + (y + 4) + 'l3.5 3.5 6-6.5"/>'
+    const tarefa = ([x, y], i) => '<rect class="tarefa ' + estado(i) + '" x="' + x + '" y="' + y + '" width="' + W + '" height="' + H + '" rx="12"/>'
+      + icone(ETAPAS[i][1], x + W / 2 - 14, y + H / 2 - 14, 1.17, 'icone ' + estado(i)) + (estado(i) === 'feita' ? visto(x, y) : '')
+    const meio = CIMA + H / 2, meioB = BAIXO + H / 2
+    const arestas = [
+      ['M82 ' + meio + 'H108', 'feita'], ['M214 ' + meio + 'H242', 'feita'], ['M348 ' + meio + 'H376', ''], ['M482 ' + meio + 'H510', ''],
+      ['M564 ' + (CIMA + H) + 'V400H652V' + (BAIXO - 2), ''], ['M704 ' + meioB + 'H730', ''], ['M790 ' + meioB + 'H806', ''],
+      ['M860 ' + BAIXO + 'V' + (CIMA + H + 2), ''], ['M912 ' + meio + 'H940', ''], ['M1046 ' + meio + 'H1071', ''],
+    ].map(([d, c]) => '<path class="aresta ' + c + '" d="' + d + '"/>').join('')
+    const PESSOAS = '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/>'
+    const PREDIO = '<rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 7.5h1M14 7.5h1M9 11.5h1M14 11.5h1M10 21v-4h4v4"/>'
+    // Cartão do processo preso à tarefa atual: o Quadro reduzido a um único cartão, sem texto.
+    const cx = 220, cy = 92
+    const cartao = '<g class="cartao-grupo"><rect class="cartao-g" x="' + cx + '" y="' + cy + '" width="152" height="96" rx="9"/><rect class="cartao-g-borda" x="' + (cx - 3) + '" y="' + (cy - 3) + '" width="158" height="102" rx="11"/>'
+      + '<rect x="' + (cx + 12) + '" y="' + (cy + 12) + '" width="34" height="14" rx="4" fill="#6b7a99"/>'
+      + '<circle cx="' + (cx + 134) + '" cy="' + (cy + 19) + '" r="7" fill="none" stroke="#1d2330" stroke-width="2"/><path d="M' + (cx + 134) + ' ' + (cy + 12) + 'a7 7 0 0 1 0 14z" fill="#1d2330"/>'
+      + '<rect x="' + (cx + 12) + '" y="' + (cy + 36) + '" width="128" height="7" rx="3.5" fill="#d9dde5"/><rect x="' + (cx + 12) + '" y="' + (cy + 50) + '" width="80" height="7" rx="3.5" fill="#d9dde5"/>'
+      + '<path d="M' + (cx + 12) + ' ' + (cy + 68) + 'H' + (cx + 140) + '" stroke="#f0f2f5"/>'
+      + '<circle cx="' + (cx + 21) + '" cy="' + (cy + 82) + '" r="8" fill="#e8edff" stroke="#3a5afe" stroke-width="2"/><rect x="' + (cx + 112) + '" y="' + (cy + 77) + '" width="28" height="10" rx="5" fill="#b45309"/>'
+      + '<path class="elo" d="M296 ' + (cy + 102) + 'V' + (CIMA - 4) + '"/></g>'
+    document.getElementById('fluxo-g').innerHTML = document.querySelector('.fluxo defs').outerHTML.replace(/id="ponta/g, 'id="g-ponta')
+      + '<rect class="piscina" x="10" y="200" width="1110" height="360" rx="10"/>'
+      + '<path class="cabeca-raia" d="M20 200H52V560H20A10 10 0 0 1 10 550V210A10 10 0 0 1 20 200Z"/>'
+      + '<path class="divisa" d="M10 410H1120M52 200V560"/>'
+      + icone(PESSOAS, 17, 290, 0.8, 'icone-raia') + icone(PREDIO, 17, 470, 0.8, 'icone-raia')
+      + '<circle class="evento fim" cx="1090" cy="' + meio + '" r="17"/>'
+      + arestas + '<path class="volta" d="M760 ' + (meioB + 30) + 'V552H652V' + (BAIXO + H + 2) + '"/>'
+      + '<circle class="evento" cx="70" cy="' + meio + '" r="13"/>'
+      + '<path class="decisao" d="M760 ' + (meioB - 30) + 'L790 ' + meioB + 'L760 ' + (meioB + 30) + 'L730 ' + meioB + 'Z"/><path class="x" d="M751 ' + (meioB - 9) + 'l18 18M769 ' + (meioB - 9) + 'l-18 18"/>'
+      + T.map(tarefa).join('') + cartao
+  }
+  if (location.search.includes('v=g')) { document.body.classList.add('raias'); desenharFluxoG() }
+  // Variante H: só o fluxograma em raias, sem cartão nem quadro, mais centralizado.
+  if (location.search.includes('v=h')) { document.body.classList.add('raias', 'so-fluxo'); desenharFluxoG() }
+  // Variante I: o fluxo das etapas em degrau (preparo em cima, setor e publicação embaixo), com as peças no estilo dos cartões da B.
+  function desenharFluxoI() {
+    const W = 170, H = 120
+    // [índice da etapa, x, y, estado, pílula, é o meu?]
+    const PECAS = [[0, 70, 40, 'feita', 'ok'], [1, 280, 40, 'atual', 'vence', true], [2, 490, 40, 'futura'], [3, 700, 40, 'futura'],
+      [4, 760, 300, 'futura'], [5, 1110, 300, 'futura'], [6, 1320, 300, 'futura'], [7, 1530, 300, 'futura']]
+    const peca = ([i, x, y, estado, pilula, eu]) => '<div class="peca ' + estado + '" style="left:' + x + 'px;top:' + y + 'px">'
+      + '<div class="topo"><span class="icone">' + svg(ETAPAS[i][1]) + '</span><span class="barras"><span class="barra"></span><span class="barra curta"></span></span></div>'
+      + '<span></span><div class="base"><span class="selo"></span><span class="pilula ' + (pilula || '') + '"></span><span class="avatar' + (eu ? ' eu' : '') + '"></span></div></div>'
+    const meio1 = 40 + H / 2, meio2 = 300 + H / 2
+    const ligacoes = [
+      ['M44 ' + meio1 + 'H68', 'feita'], ['M240 ' + meio1 + 'H278', 'feita'], ['M450 ' + meio1 + 'H488', ''], ['M660 ' + meio1 + 'H698', ''],
+      ['M785 ' + (40 + H) + 'V230H845V298', ''], ['M930 ' + meio2 + 'H984', ''], ['M1074 ' + meio2 + 'H1108', ''],
+      ['M1280 ' + meio2 + 'H1318', ''], ['M1490 ' + meio2 + 'H1528', ''],
+    ].map(([d, c]) => '<path class="ligacao ' + c + '" d="' + d + '"/>').join('')
+    const defs = document.querySelector('.fluxo defs').outerHTML.replace(/id="ponta/g, 'id="i-ponta')
+    document.getElementById('fluxo-i').innerHTML = '<svg>' + defs + ligacoes
+      + '<path class="retorno" d="M1029 ' + (meio2 + 44) + 'V470H845V' + (300 + H + 4) + '"/></svg>'
+      + '<span class="evento" style="left:0;top:' + (meio1 - 22) + 'px"></span>'
+      + '<span class="decisao" style="left:998px;top:' + (meio2 - 31) + 'px"></span>'
+      + PECAS.map(peca).join('')
+  }
+  if (location.search.includes('v=i')) { document.body.classList.add('so-fluxo-b'); desenharFluxoI() }
+  // Variante K: quadro novo, de frente, com 4 etapas do meio do caminho e o Status com os desenhos reais da plataforma.
+  function desenharQuadroK() {
+    const STATUS = {
+      a_fazer: '<circle cx="12" cy="12" r="8.5" stroke="#1d2330" stroke-width="2" fill="none"/>',
+      em_andamento: '<path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="#1d2330"/><circle cx="12" cy="12" r="8.5" stroke="#1d2330" stroke-width="2" fill="none"/>',
+      concluido: '<circle cx="12" cy="12" r="9.5" fill="#1d2330"/><path d="M7.5 12.5l3 3 6-6.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>',
+    }
+    const COLUNAS = [
+      [1, [['em_andamento', 'vence', true, true], ['a_fazer', ''], ['em_andamento', '']]],
+      [2, [['em_andamento', 'atraso'], ['a_fazer', '']]],
+      [3, [['concluido', 'info'], ['em_andamento', ''], ['a_fazer', '', true]]],
+      [4, [['em_andamento', 'ok']]],
+    ]
+    const cartao = ([st, p, eu, ativo]) => '<div class="cartao-k' + (ativo ? ' ativo' : '') + '"><div class="l1"><span class="selo-k"></span><svg viewBox="0 0 24 24">' + STATUS[st] + '</svg></div>'
+      + '<span class="b"></span><span class="b curta"></span><div class="rodape-k"><span class="av-k' + (eu ? ' eu' : '') + '"></span><span class="p-k ' + p + '"></span></div></div>'
+    const coluna = ([i, cartoes]) => '<div class="coluna-k"><div class="cabeca-k">' + svg(ETAPAS[i][1]) + '<span class="nome-k"></span><span class="conta-k"></span></div>' + cartoes.map(cartao).join('') + '</div>'
+    document.getElementById('quadro-k').innerHTML = '<div class="barra-k"><span class="titulo-k"></span><span class="filtro-k ligado"></span><span class="filtro-k"></span><span class="grupo-k"><span></span><span></span><span></span></span></div>'
+      + '<div class="colunas-k">' + COLUNAS.map(coluna).join('') + '</div>'
+  }
+  if (location.search.includes('v=k')) { document.body.classList.add('sem-quadro', 'quadro-novo'); desenharQuadroK() }
 </script>
 </body>
 </html>
