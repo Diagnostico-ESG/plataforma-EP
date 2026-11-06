@@ -1,26 +1,27 @@
 import { Icone } from '../Icone'
+import { DesenhoDaEtiqueta } from '../processos/EtiquetaDoProcesso'
+import type { EtiquetaDaEtapa } from '../../processos/tipos'
 import { iconeDaEtapa } from '../../processos/iconeDaEtapa'
 import {
   CODIGO_CONCLUIDOS, CODIGO_DA_APROVACAO, CODIGO_DA_MODELAGEM_PILOTO, CODIGO_DA_PUBLICACAO, CODIGO_DA_REVISAO_INTERNA,
   CODIGO_DA_TECNICA, CODIGO_DA_VALIDACAO, CODIGO_NAO_INICIADOS,
 } from '../../processos/codigosDasEtapas'
 
-type Status = 'vazio' | 'meio' | 'cheio'
 type Pilula = 'neutra' | 'atraso' | 'vence' | 'aprovado' | 'informativa'
-type CartaoMudo = { status: Status; pilula: Pilula; meu?: boolean; destaque?: boolean }
+type CartaoMudo = { status: EtiquetaDaEtapa; pilula: Pilula; meu?: boolean; destaque?: boolean }
 
-const VAZIO: CartaoMudo = { status: 'vazio', pilula: 'neutra' }
+const VAZIO: CartaoMudo = { status: 'a_fazer', pilula: 'neutra' }
 
 // Desenho fixo da capa (prévia B aprovada): a tela de entrada é vista antes do login, então nada vem do banco.
 const COLUNAS: { etapa: string; cartoes: CartaoMudo[] }[] = [
   { etapa: CODIGO_NAO_INICIADOS, cartoes: [VAZIO, VAZIO, VAZIO] },
-  { etapa: CODIGO_DA_MODELAGEM_PILOTO, cartoes: [{ status: 'meio', pilula: 'vence', meu: true, destaque: true }, VAZIO] },
-  { etapa: CODIGO_DA_TECNICA, cartoes: [{ status: 'meio', pilula: 'neutra' }, { status: 'cheio', pilula: 'atraso' }, VAZIO] },
-  { etapa: CODIGO_DA_REVISAO_INTERNA, cartoes: [{ status: 'meio', pilula: 'informativa' }] },
-  { etapa: CODIGO_DA_VALIDACAO, cartoes: [{ status: 'vazio', pilula: 'neutra', meu: true }, { status: 'meio', pilula: 'vence' }] },
-  { etapa: CODIGO_DA_APROVACAO, cartoes: [{ status: 'meio', pilula: 'neutra' }] },
-  { etapa: CODIGO_DA_PUBLICACAO, cartoes: [{ status: 'cheio', pilula: 'aprovado' }, { status: 'meio', pilula: 'neutra' }] },
-  { etapa: CODIGO_CONCLUIDOS, cartoes: [{ status: 'cheio', pilula: 'aprovado' }, { status: 'cheio', pilula: 'aprovado' }, { status: 'cheio', pilula: 'aprovado' }] },
+  { etapa: CODIGO_DA_MODELAGEM_PILOTO, cartoes: [{ status: 'em_andamento', pilula: 'vence', meu: true, destaque: true }, VAZIO] },
+  { etapa: CODIGO_DA_TECNICA, cartoes: [{ status: 'em_andamento', pilula: 'neutra' }, { status: 'concluido', pilula: 'atraso' }, VAZIO] },
+  { etapa: CODIGO_DA_REVISAO_INTERNA, cartoes: [{ status: 'em_andamento', pilula: 'informativa' }] },
+  { etapa: CODIGO_DA_VALIDACAO, cartoes: [{ status: 'a_fazer', pilula: 'neutra', meu: true }, { status: 'em_andamento', pilula: 'vence' }] },
+  { etapa: CODIGO_DA_APROVACAO, cartoes: [{ status: 'em_andamento', pilula: 'neutra' }] },
+  { etapa: CODIGO_DA_PUBLICACAO, cartoes: [{ status: 'concluido', pilula: 'aprovado' }, { status: 'em_andamento', pilula: 'neutra' }] },
+  { etapa: CODIGO_CONCLUIDOS, cartoes: [{ status: 'concluido', pilula: 'aprovado' }, { status: 'concluido', pilula: 'aprovado' }, { status: 'concluido', pilula: 'aprovado' }] },
 ]
 
 /** Ilustração da capa: um Quadro inclinado com os ícones das etapas e cartões sem texto, sobre um fluxograma em traço. */
@@ -43,7 +44,7 @@ export function CapaIlustracao() {
 function CartaoDaCapa({ status, pilula, meu, destaque }: CartaoMudo) {
   return (
     <div className={destaque ? 'capa-cartao capa-cartao-destaque' : 'capa-cartao'}>
-      <div className="capa-cartao-topo"><span className="capa-selo" /><span className={`capa-status capa-status-${status}`} /></div>
+      <div className="capa-cartao-topo"><span className="capa-selo" /><DesenhoDaEtiqueta valor={status} tamanho={18} /></div>
       <span className="capa-barra" />
       <span className="capa-barra capa-barra-curta" />
       <div className="capa-cartao-rodape">

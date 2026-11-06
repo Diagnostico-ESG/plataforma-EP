@@ -3,7 +3,8 @@ import type { EtiquetaDaEtapa } from '../../processos/tipos'
 
 // Os três desenhos da identidade: círculo vazio, meio preenchido e círculo cheio com visto; todos no quase preto do texto,
 // e só a forma diz o valor (ADR 0040).
-function Desenho({ valor, tamanho }: { valor: EtiquetaDaEtapa; tamanho: number }) {
+/** Só o desenho, sem nome: também usado na ilustração da capa de entrada, que é decorativa. */
+export function DesenhoDaEtiqueta({ valor, tamanho }: { valor: EtiquetaDaEtapa; tamanho: number }) {
   return (
     <svg width={tamanho} height={tamanho} viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
       {valor === 'a_fazer' && <circle cx="12" cy="12" r="8.5" stroke="var(--etiqueta-a-fazer)" strokeWidth="2" />}
@@ -36,10 +37,10 @@ export function EtiquetaDoProcesso({ etiqueta, soIcone = false }: EtiquetaDoProc
   if (soIcone) {
     return (
       <span className={`etiqueta etiqueta-${valor}`} title={`Status: ${rotulo}`}>
-        <Desenho valor={valor} tamanho={22} />
+        <DesenhoDaEtiqueta valor={valor} tamanho={22} />
         <span className="visualmente-oculto">{rotulo}</span>
       </span>
     )
   }
-  return <span className={`etiqueta etiqueta-${valor}`}><Desenho valor={valor} tamanho={18} />{rotulo}</span>
+  return <span className={`etiqueta etiqueta-${valor}`}><DesenhoDaEtiqueta valor={valor} tamanho={18} />{rotulo}</span>
 }
