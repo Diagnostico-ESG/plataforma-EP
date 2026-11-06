@@ -1,4 +1,4 @@
-# Spec e tickets — DevFlow v3.1
+# Spec e tickets — DevFlow v3.2
 
 Usada pelo `/planejar` no modo completo, depois da sabatina. Substitui as skills `to-spec` e `to-tickets`, que paravam para eu digitar o comando: você escreve a spec e os tickets sem parar, seguindo esta regra. Foi feita a partir das duas skills mais o que um mês de uso acrescentou (seções exigidas, menos tickets, numeração depois dos concluídos).
 

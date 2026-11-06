@@ -1,4 +1,4 @@
-# Glossário — DevFlow v3.1
+# Glossário — DevFlow v3.2
 
 Termos técnicos explicados em linguagem simples, conforme foram surgindo nas conversas sobre o protocolo. Atualizar conforme novos termos aparecerem.
 

@@ -1,4 +1,4 @@
-# Itens ainda não testados num projeto real — DevFlow v3.1
+# Itens ainda não testados num projeto real — DevFlow v3.2
 
 Como usar: ao terminar um comando, leia o bloco dele e o bloco "Qualquer momento". Para cada item que aconteceu nesta execução e ainda não tem entrada em `.scratch/melhorias-protocolo.md`, acrescente uma entrada com a data, o item, o que era esperado e o que aconteceu. Quem avalia se funcionou sou eu.
 
@@ -12,6 +12,7 @@ O `/situação` só lê e não registra nada.
 - `.claude/regras/execucao.md` e `.claude/regras/interface.md` lidos quando o comando manda.
 - Commit por caminho (`git add <arquivos>`) com duas sessões na mesma pasta.
 - `.scratch/proximo-passo.md` gravado ao fim de cada etapa e lido pelo `/situação`.
+- Comando pronto para copiar ao pedir sessão nova: `/situação` e o comando da etapa, cada um num bloco, com o modelo, e o mesmo texto no `proximo-passo.md`.
 
 ## /projeto
 

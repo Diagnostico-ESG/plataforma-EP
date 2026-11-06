@@ -1,4 +1,4 @@
-# DevFlow — v3.1 (2026-11-06)
+# DevFlow — v3.2 (2026-11-06)
 
 Igual em todos os projetos; exceções de cada projeto ficam na última seção. O detalhe de cada etapa está no comando dela (`.claude/commands/`); este arquivo traz as regras que valem em qualquer momento, inclusive fora do funil. Serve a aplicações web com interface, em Vite + React + TypeScript, com ou sem banco Supabase, em Windows.
 
@@ -108,6 +108,8 @@ O Ponytail simplifica a solução e deixa o processo intacto. Spec e código div
 Cada funcionalidade nova começa no `/planejar`. Para uma iniciativa que não cabe numa sessão, o `/planejar` tem o passo "Iniciativa grande".
 
 **Ao fim de cada etapa**, diga o próximo comando e o modelo da tabela (e, com custo ligado, peça o `/cost`).
+
+**Comando pronto para copiar.** Sempre que a sessão terminar pedindo que eu abra outra, traga no fim da mensagem o texto completo de cada comando a digitar, na ordem, um por bloco de código: primeiro `/situação`, depois o comando da etapa com tudo o que ele precisar (por exemplo, o ticket ou a funcionalidade), e diga o modelo em que abrir a sessão. Nada de "rode o próximo comando" sem o texto dele. O mesmo texto vai para `.scratch/proximo-passo.md`.
 
 **Troca de sessão.** Antes de encerrar a conversa, confirme que o resultado da etapa já está em arquivo. A sessão nova, com o modelo recomendado, começa pelo `/situação`; `/clear` + `/model` na mesma sessão só quando eu pedir. Rode `/mattpocock-skills:handoff` em três casos: há algo que os arquivos não guardam (decisão em aberto, tarefa pela metade); a pausa atravessa dias ou troca de máquina; eu pedi. O handoff leva só o que não está em arquivo, com o **estado atual no topo**, e aponta os arquivos para o resto. Peça à skill que salve em `.scratch/handoff-AAAA-MM-DD.md` (o padrão dela é uma pasta temporária, fora do projeto) e, depois, apague você os handoffs anteriores.
 

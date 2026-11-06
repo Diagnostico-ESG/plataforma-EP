@@ -2,6 +2,14 @@
 
 Uma entrada por versão, da mais recente para a mais antiga. Entradas antigas nunca são editadas. O histórico das versões 1.x (até a v1.9) está em `CHANGELOG-v1.md`.
 
+## v3.2 — 2026-11-06 (comando pronto para copiar)
+
+**Motivo.** O fim de sessão dizia o próximo comando pelo nome, e o usuário tinha de montar o texto sozinho na sessão nova.
+
+**Novo**
+- `CLAUDE.md`, Funil de Trabalho: regra "Comando pronto para copiar". Ao pedir uma sessão nova, o Claude traz o texto completo de cada comando, na ordem e um por bloco de código (`/situação` primeiro, depois o da etapa, com o ticket ou a funcionalidade), diz o modelo e grava o mesmo texto em `.scratch/proximo-passo.md`.
+- `nao-testados.md`: item da regra nova.
+
 ## v3.1 — 2026-11-06 (spec, tickets, implementação e revisão de segurança como regras próprias)
 
 **Motivo.** Quatro peças faziam o funil parar para o usuário digitar um comando: `to-spec` e `to-tickets` no `/planejar` (66 paradas no projeto de origem), `implement` no `/executar-simples` (34) e `/security-review` no `/ship` (34). Nas três skills do Matt Pocock, o protocolo já acrescentava quase tudo à mão (seções exigidas na spec, pedido de menos tickets, regras de banco e vitrine no resumo do `implement`), e o texto colado no lugar do comando muitas vezes não disparava a skill. O `/security-review` chegava com diff vazio em quase toda entrega, porque o trabalho já estava na principal, e a revisão de reserva acabava fazendo o serviço. A sabatina (`grill-with-docs`) continua como skill e como parada: é a parte em que o usuário decide.

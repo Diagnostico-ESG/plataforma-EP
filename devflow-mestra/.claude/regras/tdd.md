@@ -1,4 +1,4 @@
-# Regra de TDD — DevFlow v3.1
+# Regra de TDD — DevFlow v3.2
 
 Vale para o `/rapido` e para quem a citar. É a nossa versão, feita de duas skills (`/mattpocock-skills:tdd` e `/superpowers:test-driven-development`) mais as regras do projeto. Se uma dessas skills disparar junto, valem as duas, e na dúvida vale a mais rigorosa.
 
