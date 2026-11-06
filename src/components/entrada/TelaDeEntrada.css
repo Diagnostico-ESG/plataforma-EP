@@ -1,4 +1,4 @@
-/* Capa dividida: login à esquerda, ilustração do Quadro à direita (.scratch/capa-de-entrada/spec.md, prévia capa-b.png). */
+/* Capa dividida: login à esquerda, ilustração do Quadro à direita (.scratch/capa-de-entrada/spec.md, prévia capa-m.png). */
 .entrada {
   display: grid;
   grid-template-columns: minmax(380px, 34%) 1fr;

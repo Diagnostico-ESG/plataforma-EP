@@ -37,6 +37,7 @@ test('a ilustração tem 3 colunas em degrau (3, 2 e 1 cartões) sem ícone no c
   const colunas = [...(ilustracao?.querySelectorAll('.capa-coluna') ?? [])]
   expect(colunas.map((coluna) => coluna.querySelectorAll('.capa-cartao').length)).toEqual([3, 2, 1])
   expect(ilustracao?.querySelectorAll('.capa-cabeca svg'), 'o cabeçalho das colunas é liso, sem ícone').toHaveLength(0)
+  expect(ilustracao?.querySelectorAll('.capa-fluxo .capa-forma > *').length, 'esperado o fluxograma de fundo desenhado').toBeGreaterThan(20)
   expect(ilustracao?.textContent?.trim(), 'a ilustração não leva texto').toBe('')
   expect(ilustracao?.querySelectorAll('button, a, input, [tabindex]')).toHaveLength(0)
 })
