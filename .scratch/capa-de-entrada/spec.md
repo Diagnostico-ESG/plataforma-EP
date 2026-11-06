@@ -56,3 +56,5 @@ Spec de origem da tela: `.scratch/login-perfis/spec.md`, seção "Tela de entrad
 Implementado em 2026-11-06 (commit e76b6a3)
 
 Implementado em 2026-11-06 (commit 7b585ad), variante M
+
+Entregue em 2026-11-06 (commit 6c6ea75), com ressalva: critério [visual] 7 de capa-de-entrada presumido (as mensagens de recusa e de falha não foram vistas na tela a 1366×768, só pelo teste da tela que as põe na coluna do login); revisão de segurança dispensada (só aparência da tela de entrada, sem login, permissão, dado pessoal, dado de fora ou banco)

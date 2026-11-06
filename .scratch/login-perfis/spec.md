@@ -264,4 +264,4 @@ Entregue em 2026-10-09 (commit 2180971)
 
 Entregue em 2026-10-09 (commit 32e1b53)
 
-Em revisão desde 2026-11-06
+Entregue em 2026-11-06 (commit 6c6ea75), com ressalva: critério [visual] 7 de capa-de-entrada presumido (as mensagens de recusa e de falha não foram vistas na tela a 1366×768, só pelo teste da tela que as põe na coluna do login); revisão de segurança dispensada (só aparência da tela de entrada, sem login, permissão, dado pessoal, dado de fora ou banco); as ressalvas das entregas anteriores seguem valendo
