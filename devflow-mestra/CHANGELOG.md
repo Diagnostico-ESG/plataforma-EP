@@ -2,6 +2,15 @@
 
 Uma entrada por versão, da mais recente para a mais antiga. Entradas antigas nunca são editadas. O histórico das versões 1.x (até a v1.9) está em `CHANGELOG-v1.md`.
 
+## v3.3 — 2026-11-06 (/situação mais leve)
+
+**Motivo.** No projeto de origem, o `/situação` passou a demorar: a bateria tinha 3.793 testes em 283 arquivos (cerca de 2 minutos em 4 processadores, mais no Windows), e ele ainda lia o backlog inteiro (72 KB) só para dizer quantos itens havia.
+
+**Mudou**
+- `/situação`, passo 3: `npm test` só quando há mudança não comitada. Sem mudança, o último commit já passou pelo pre-commit e a bateria inteira roda no `/ship` e no CI.
+- `/situação`, passo 1: o backlog não é lido; conta-se só o número de itens. A leitura fica a pedido do usuário.
+- `nao-testados.md`: item das duas mudanças.
+
 ## v3.2 — 2026-11-06 (comando pronto para copiar)
 
 **Motivo.** O fim de sessão dizia o próximo comando pelo nome, e o usuário tinha de montar o texto sozinho na sessão nova.

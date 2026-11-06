@@ -1,10 +1,14 @@
-# Itens ainda não testados num projeto real — DevFlow v3.2
+# Itens ainda não testados num projeto real — DevFlow v3.3
 
 Como usar: ao terminar um comando, leia o bloco dele e o bloco "Qualquer momento". Para cada item que aconteceu nesta execução e ainda não tem entrada em `.scratch/melhorias-protocolo.md`, acrescente uma entrada com a data, o item, o que era esperado e o que aconteceu. Quem avalia se funcionou sou eu.
 
 Os itens da v1.x que um projeto real já exercitou (trava de git, funil de planejamento e execução, regras de banco com login, perfis e arquivos, `/ship` com os passos de revisão) saíram desta lista na v2.0. Ficaram os que continuam sem evidência e todo o que a v2.0 acrescentou.
 
 O `/situação` só lê e não registra nada.
+
+## /situação (v3.3)
+
+- Testes só com mudança não comitada (e a linha dizendo que não rodaram); backlog só contado, sem leitura.
 
 ## Qualquer momento
 

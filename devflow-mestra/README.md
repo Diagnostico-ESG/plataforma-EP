@@ -1,4 +1,4 @@
-# DevFlow — v3.2 (2026-11-06)
+# DevFlow — v3.3 (2026-11-06)
 
 *Antigo Protocolo Alex Macedo. O histórico das versões 1.x está em `CHANGELOG-v1.md`; o desta versão, em `CHANGELOG.md`.*
 
@@ -72,11 +72,15 @@ O hook `bloquear-git-destrutivo.mjs` lê cada comando que o Claude vai rodar e c
 
 Antes de usar o protocolo com dados de terceiros ou em trabalho oficial: verifique as normas sobre uso de IA e sobre proteção de dados pessoais (incluindo as internas do órgão); consulte a TI e o encarregado de dados sobre o envio do conteúdo do projeto à API da Anthropic e sobre plugins aceitos; confirme se a conta pode ser pessoal. Em projeto com banco, confirme onde os dados podem ficar (conta, região, dado pessoal real) e decida com o jurídico se é preciso registrar quem **leu** cada dado e como conciliar um histórico que não se altera com um pedido de eliminação de dados. A carga de dados reais é sempre sua, fora da sessão, com arquivos fora da pasta do projeto ou em `dados-reais/` (ignorada pelo git e nunca lida pelo Claude).
 
-## 6. Atualizar um projeto antigo para a v3.2
+## 6. Atualizar um projeto antigo para a v3.3
 
 Troque os arquivos do protocolo pelos desta versão, preservando a seção "Ajustes deste Projeto" do `CLAUDE.md` (copie-a para o arquivo novo). Depois:
 
-**Vindo da v3.1**
+**Vindo da v3.2**
+
+- Só o `/situação` mudou (testes só com mudança não comitada; backlog contado, sem leitura).
+
+**Vindo da v3.1, além do que está acima**
 
 - Só o `CLAUDE.md` mudou (regra "Comando pronto para copiar", em Funil de Trabalho).
 
@@ -127,7 +131,7 @@ Em rede corporativa com proxy, `npm`, `git` e o login do Claude Code falham com 
 ## 9. Versionamento e manutenção
 
 - **Cópia mestra.** Esta pasta, com git, fora de qualquer projeto. É dela que cada projeto copia os arquivos, e é nela que as mudanças são feitas.
-- **Versões.** Versão nova inteira (v4.0) quando o funil muda; v3.3 quando entra uma regra nova; v3.2.1 para correção de texto. O número fica no topo do `CLAUDE.md`, deste README, do `GLOSSARIO.md` e dos arquivos de `.claude/regras/`; cada versão ganha uma entrada no `CHANGELOG.md`, e entradas antigas não se editam.
+- **Versões.** Versão nova inteira (v4.0) quando o funil muda; v3.4 quando entra uma regra nova; v3.3.1 para correção de texto. O número fica no topo do `CLAUDE.md`, deste README, do `GLOSSARIO.md` e dos arquivos de `.claude/regras/`; cada versão ganha uma entrada no `CHANGELOG.md`, e entradas antigas não se editam.
 - **Melhorias descobertas num projeto.** O Claude registra em `.scratch/melhorias-protocolo.md` e avisa você. Periodicamente, leve os registros para esta pasta, decida o que muda e gere uma versão nova. Só entra o que valeria para qualquer projeto.
 - **Documentos sincronizados.** Quando o funil, um comando ou uma regra mudar, atualize junto o `GLOSSARIO.md` (termos novos), `.claude/regras/nao-testados.md`, este README e o `CHANGELOG.md`.
 - **Pacotes de terceiros.** Atualizar um plugin é decisão deliberada, registrada no `CHANGELOG.md`.

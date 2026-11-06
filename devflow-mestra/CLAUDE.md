@@ -1,4 +1,4 @@
-# DevFlow — v3.2 (2026-11-06)
+# DevFlow — v3.3 (2026-11-06)
 
 Igual em todos os projetos; exceções de cada projeto ficam na última seção. O detalhe de cada etapa está no comando dela (`.claude/commands/`); este arquivo traz as regras que valem em qualquer momento, inclusive fora do funil. Serve a aplicações web com interface, em Vite + React + TypeScript, com ou sem banco Supabase, em Windows.
 

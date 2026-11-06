@@ -1,4 +1,4 @@
-# Revisão de segurança do código — DevFlow v3.2
+# Revisão de segurança do código — DevFlow v3.3
 
 Usada pelo passo 4 do `/ship` e pelo passo 7 da revisão para produção (`producao.md`). Substitui o `/security-review` embutido do Claude Code como padrão. Aquele comando só eu posso digitar, compara a branch atual com a principal e, no fluxo do DevFlow, quase sempre chega com diff vazio (o trabalho já está na principal) ou parcial (vê só o que ainda não foi enviado ao GitHub); em um mês de uso, a revisão de reserva acabou fazendo o trabalho em quase todas as entregas, e o relatório do comando vinha em inglês.
 
