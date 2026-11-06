@@ -96,8 +96,9 @@ insert into _tap (linha) select is((pg_temp.linha('ABC', 'Exemplo Gama')).etapa_
 insert into _tap (linha) select is((pg_temp.linha('ABC', 'Exemplo Gama')).etiqueta::text, 'concluido', 'com o status de Concluídos');
 insert into _tap (linha) select is((pg_temp.linha('ABC', 'Exemplo Gama')).publicado_em, date '2026-10-16', 'e a Data da Publicação');
 insert into _tap (linha) select is((pg_temp.linha('ABC', 'Exemplo Gama')).responsavel_id, null::uuid, 'sem responsável');
-insert into _tap (linha) select is((pg_temp.linha('ABC', 'Exemplo Gama')).no_quadro, false, 'e já fora do Quadro');
-insert into _tap (linha) select isnt((pg_temp.linha('ABC', 'Exemplo Gama')).tirado_do_quadro_em, null::timestamptz, 'com a marca de tirado do Quadro');
+-- Ajuste de 2026-11-06 (ADR 0045): o importado em Concluídos fica no Quadro, como qualquer concluído (sai após 30 dias).
+insert into _tap (linha) select is((pg_temp.linha('ABC', 'Exemplo Gama')).no_quadro, true, 'e no Quadro');
+insert into _tap (linha) select is((pg_temp.linha('ABC', 'Exemplo Gama')).tirado_do_quadro_em, null::timestamptz, 'sem a marca de tirado do Quadro');
 select pg_temp.importar('ABC', 'Orçamentário', 'Exemplo Delta', 'aprovacao_setor');
 insert into _tap (linha) select is((pg_temp.linha('ABC', 'Exemplo Delta')).responsavel_id, '00000000-0000-0000-0000-0000000000a1'::uuid,
   'Aprovação pelo setor leva o responsável inicial dela');

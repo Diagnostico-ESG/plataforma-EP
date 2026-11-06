@@ -49,7 +49,7 @@ O Administrador abre **Administração → Importação**, escolhe a planilha (p
 22. Como Administrador, quero que as colunas I, II e III não decidam a etapa, para seguir a regra definida.
 23. Como Administrador, quero que o processo sem "Concluído" nas quatro primeiras colunas de etapa (I, II, III e Modelagem Piloto) entre em Não iniciados com status A fazer.
 24. Como Administrador, quero que "Concluído" na VII (Publicação) leve o processo a Concluídos, com a Data da Publicação da planilha, para que ele já conste como entregue.
-25. Como Administrador, quero que o processo importado em Concluídos já entre tirado do Quadro, para o Quadro não nascer lotado de processos prontos.
+25. Como Administrador, quero que o processo importado em Concluídos entre no Quadro como qualquer concluído (fica na coluna Concluídos até alguém tirá-lo ou até completar 30 dias, contados da importação), para ver todos os processos no Quadro logo depois da carga.
 26. Como Administrador, quero que a VII concluída sem data ou com data ilegível entre em Concluídos com a data de hoje e apareça na lista de avisos ("usada a data de hoje"), para que ele conste como entregue e eu possa corrigir a data depois.
 27. Como Administrador, quero que a data da modelagem piloto de um processo que ficou em Não iniciados seja ignorada e listada, para não gravar data em processo que nem fez o piloto.
 28. Como Administrador, quero que a data ilegível (formato "16 10 2026" ou "01/09/2026" aceitos; outros não) seja tratada como data em branco e listada, em vez de travar a carga toda.
@@ -105,7 +105,7 @@ O Administrador abre **Administração → Importação**, escolhe a planilha (p
 - **Lógica de leitura separada da gravação.** Um módulo transforma o conteúdo da planilha numa lista de processos com setor, macroprocesso, etapa, status, data de publicação, anotação e avisos, sem tocar em banco nem em tela. Outro faz o mesmo para a lista de arquivos da pasta cruzada com as colunas V1 a V8. A prévia mostra o resultado deles; a confirmação os grava.
 - **Gravação pelo contrato de dados que a plataforma já usa**, com o mesmo padrão de "falso" das outras áreas (contrato de importação com implementação real e implementação falsa para testes), passando pelas regras por perfil do banco. A importação de cadastros usa um conjunto de operações que reaproveita setor e macroprocesso existentes, pula o processo já existente e grava o histórico único "importado da planilha" com quem importou.
 - **Regra das travas só na importação.** O banco ganha um caminho de gravação de versão para a importação que ignora as travas de etapa do envio (ADR 0028 e ADR 0025), mantém o número único por processo e o .bpm obrigatório, e marca a versão com a etapa do processo no momento. Esse caminho só aceita o perfil Administrador.
-- **Etapas e status.** Regra única de correspondência (última coluna "Concluído", "Não realizada" conta) e três saídas: Não iniciados com A fazer, as etapas do meio com Finalizado e Concluídos (já tirado do Quadro, com a Data da Publicação). Casos fora da regra do Q9 viram avisos listados, nunca erro que derrube a carga. A data da modelagem piloto ou da publicação que falta, ou que está ilegível, num processo que deveria tê-la, recebe a data de hoje (o dia em que a planilha é lida), com aviso. A data da modelagem piloto no futuro continua ignorada, com aviso.
+- **Etapas e status.** Regra única de correspondência (última coluna "Concluído", "Não realizada" conta) e três saídas: Não iniciados com A fazer, as etapas do meio com Finalizado e Concluídos (no Quadro, com a Data da Publicação, saindo dele pela regra dos 30 dias como qualquer concluído). Casos fora da regra do Q9 viram avisos listados, nunca erro que derrube a carga. A data da modelagem piloto ou da publicação que falta, ou que está ilegível, num processo que deveria tê-la, recebe a data de hoje (o dia em que a planilha é lida), com aviso. A data da modelagem piloto no futuro continua ignorada, com aviso.
 - **Identidade do item.** Processo existente = mesmo setor e mesmo nome (comparação sem diferença de caixa e espaços nas pontas); versão existente = mesmo processo e mesmo número. Linha repetida na planilha: vale a primeira.
 - **Reaproveitamento de "A definir".** Um macroprocesso comum com esse nome por setor, criado pela importação; nenhuma regra especial no resto da plataforma.
 - **Falha no meio.** A gravação dos cadastros é por processo, de forma que cada processo é inteiro ou não entra; o resumo conta o que entrou. A segunda entrega envia arquivo a arquivo e mostra o andamento; repetir completa o que faltou.
@@ -150,7 +150,7 @@ Respostas do usuário: aviso na prévia sempre que a data de hoje for usada; dat
 
 Critérios de pronto:
 
-- [x] VII concluída sem Data da Publicação: o processo entra em Concluídos, tirado do Quadro, com a data de hoje e o aviso "VII - Publicação concluída sem Data da Publicação: usada a data de hoje."
+- [x] VII concluída sem Data da Publicação: o processo entra em Concluídos com a data de hoje e o aviso "VII - Publicação concluída sem Data da Publicação: usada a data de hoje."
 - [x] VII concluída com Data da Publicação ilegível: o mesmo, com o aviso "Data da Publicação ilegível: usada a data de hoje."
 - [x] Processo fora de Não iniciados sem data da modelagem piloto: entra com a data de hoje e o aviso "Modelagem Piloto sem data: usada a data de hoje."; com data ilegível, o mesmo, com o aviso "Data da Modelagem Piloto ilegível: usada a data de hoje."
 - [x] Continuam iguais: a data da modelagem piloto no futuro é ignorada, com aviso; a data em processo Não iniciado é ignorada, com aviso; a Data da Publicação sem a VII concluída é ignorada, com aviso.
@@ -158,6 +158,16 @@ Critérios de pronto:
 - [x] "Hoje" é a data do dia da leitura, a mesma que já serve para reconhecer a data no futuro.
 - [x] Testes pela tela (`App.*.test.tsx`, .csv inventado) para cada critério acima; os testes que provavam a regra antiga (VII sem data em Publicação) são atualizados.
 
+### Ajuste de 2026-11-06: Concluídos no Quadro
+
+Pedido do usuário depois da carga no desenvolvimento: "quero todos no quadro". Revoga a Q20 da sabatina (ADR 0045). O processo importado em Concluídos deixa de entrar tirado do Quadro e segue a regra de todo concluído: fica na coluna Concluídos do Quadro por etapa até alguém tirá-lo ou até completar 30 dias em Concluídos, contados da importação. Muda só a função `importar_processo` do banco (migração `20261106230000_importado_concluido_no_quadro`); a tela não muda.
+
+Critérios de pronto:
+
+- [x] O processo importado em Concluídos aparece no Quadro, sem a marca de tirado do Quadro (teste `74_importar_processo`).
+
 Implementado em 2026-11-06 (commit fbb2957)
 
 Entregue em 2026-11-06 (commit ec2b9d0), com ressalva: [visual] da primeira entrega visto só na vitrine local com módulos falsos
+
+Em revisão desde 2026-11-06
