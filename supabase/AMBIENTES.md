@@ -106,5 +106,6 @@ Atualização (2026-11-02): conferidas seis migrações que estavam aplicadas no
   - 20261029224032_anotacoes_no_cadastro (enxugar-cartao-e-cadastro, ticket 04; execução 40970306514, branch `enxugar-cartao-e-cadastro`, 2026-10-29)
   - 20261029234503_origem_contexto_e_observacoes_saem (enxugar-cartao-e-cadastro, ticket 05; destrutiva; execução 40977307326, `main`, 2026-10-30)
   - 20261030182657_responsavel_inicial_por_etapa (responsavel-inicial-por-etapa; execução 41114273607, branch `responsavel-inicial-por-etapa`, 2026-10-30)
+  - 20261106015148_importar_processo (importacao-dados-atuais, ticket 01; execução 42148758941, branch `importacao-dados-atuais`, 2026-11-05; os tipos gerados do remoto, depois de aplicada, saíram idênticos ao `src/types/database.ts`; NÃO publicada em produção: vai pelo roteiro do `/ship`)
 
 Com isso, todas as migrações de `supabase/migrations/` estão aplicadas no desenvolvimento.
