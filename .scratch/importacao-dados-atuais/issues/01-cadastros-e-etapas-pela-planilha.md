@@ -20,3 +20,5 @@
 - **Passo do usuário (antes da carga real):** backup do banco de produção (criar `BACKUP_SENHA_PRODUCAO`) e publicar a migração `20261106015148_importar_processo` na produção pelo roteiro do `/ship`; a carga real é dele, pela tela Administração → Importação, com o .csv exportado da aba PRODUTO 33.
 - **Testes de banco:** o Docker estava fechado; o teste `74_importar_processo` (51 verificações) foi provado no workflow "Testes de banco" (61 de 61 arquivos), vermelho antes da migração e verde depois.
 - **`[visual]`:** a tela foi vista só numa vitrine local com módulos falsos e dados inventados (prévia e resumo lidos como texto; uma captura da prévia); nada visto com o login real.
+
+Concluído em 2026-11-05 (commit 508996e)
