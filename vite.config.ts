@@ -8,8 +8,8 @@ export default defineConfig({
     environment: 'jsdom',
     // O primeiro teste de cada arquivo de interface paga a carga do App inteiro (passa de 400 ms sozinho); sob a bateria cheia, ou com outra sessão usando a máquina, estourava os 5 s padrão.
     testTimeout: 15000,
-    // Por padrão o Vitest devolve CSS vazio; estes arquivos precisam vir inteiros para os testes das cores das mensagens e das etiquetas e da grade das Linhas (Matriz.css) e a rolagem do Quadro (Quadro.css).
-    css: { include: /(Administracao|Moldura|Cadastros|JanelaDeConfirmacao|SeloDoTipoDeArquivo|tokens|Matriz|Quadro)\.css/ },
+    // Por padrão o Vitest devolve CSS vazio; estes arquivos precisam vir inteiros para os testes das cores das mensagens e das etiquetas e da grade das Linhas (Matriz.css), a rolagem do Quadro (Quadro.css) e as cores e a janela estreita da capa (TelaDeEntrada.css).
+    css: { include: /(Administracao|Moldura|Cadastros|JanelaDeConfirmacao|SeloDoTipoDeArquivo|tokens|Matriz|Quadro|TelaDeEntrada)\.css/ },
     setupFiles: ['./src/configurarTestes.ts'],
     exclude: [...configDefaults.exclude, '.claude/worktrees/**'],
     coverage: {

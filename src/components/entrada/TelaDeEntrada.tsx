@@ -1,5 +1,6 @@
 import { mensagemDaRecusa } from '../../acesso/motivos'
 import type { EstadoDaEntrada } from '../../acesso/tipos'
+import { CapaIlustracao } from './CapaIlustracao'
 import './TelaDeEntrada.css'
 
 type EstadoForaDaPlataforma = Exclude<EstadoDaEntrada, { tipo: 'dentro' }>
@@ -10,21 +11,27 @@ type TelaDeEntradaProps = {
   aoTentarDeNovo: () => void
 }
 
+// Capa dividida (.scratch/capa-de-entrada/spec.md): o login à esquerda e a ilustração do Quadro à direita.
 export function TelaDeEntrada({ estado, aoEntrar, aoTentarDeNovo }: TelaDeEntradaProps) {
   return (
     <main className="entrada">
-      <section className="entrada-cartao" aria-labelledby="entrada-titulo">
+      <section className="entrada-login" aria-labelledby="entrada-titulo">
         <span className="entrada-marca" aria-hidden="true">
           EP
         </span>
-        <h1 id="entrada-titulo" className="entrada-titulo">
-          Escritório de Processos
-        </h1>
-        <button type="button" className="botao botao-principal" onClick={aoEntrar} disabled={estado.tipo === 'verificando'}>
+        <div>
+          <p className="entrada-orgao">Centro Estadual de Desburocratização (CED)</p>
+          <h1 id="entrada-titulo" className="entrada-titulo">
+            Escritório de Processos
+          </h1>
+          <p className="entrada-frase">Gestão das tarefas e dos documentos do mapeamento de processos da Casa Civil do Paraná.</p>
+        </div>
+        <button type="button" className="botao botao-principal entrada-botao" onClick={aoEntrar} disabled={estado.tipo === 'verificando'}>
           Entrar com a conta institucional
         </button>
         <MensagemDaEntrada estado={estado} aoTentarDeNovo={aoTentarDeNovo} />
       </section>
+      <CapaIlustracao />
     </main>
   )
 }
