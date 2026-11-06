@@ -111,6 +111,7 @@ O Administrador abre **Administração → Importação**, escolhe a planilha (p
 - **Falha no meio.** A gravação dos cadastros é por processo, de forma que cada processo é inteiro ou não entra; o resumo conta o que entrou. A segunda entrega envia arquivo a arquivo e mostra o andamento; repetir completa o que faltou.
 - **Pendência da segunda entrega.** O desenho exato da pasta DOCUMENTOS MAPEAMENTO (subpastas e padrão de nome dos arquivos) ainda não foi registrado em `amostra/`; o ticket da entrega 2 começa por registrar essa amostra, sem nomes reais.
 - **Sem alterar o que existe.** Nenhuma operação da importação faz alteração ou exclusão sobre dados já presentes.
+- **Limites da leitura.** As Observações acima de 8000 caracteres entram cortadas, com aviso; a linha sem Área ou sem nome de processo é ignorada, com aviso; a linha repetida aparece com o nome como está na planilha.
 
 ## Testing Decisions
 

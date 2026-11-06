@@ -1218,3 +1218,9 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 
 - **Duas sessões comitando na mesma pasta.** Aconteceu: o pre-commit roda a suíte inteira (cerca de 4 minutos); nesse intervalo a sessão da `capa-de-entrada` comitou duas vezes, e o commit desta sessão falhou duas vezes com `cannot lock ref 'HEAD'` (na primeira, sem mensagem visível). Entrou na terceira tentativa, com `git commit -- <arquivos>` para não levar o que a outra sessão tinha preparado. Sugestão: o protocolo dizer que duas sessões que comitam vão para worktrees separados, ou que se combina quem comita primeiro.
 - **Ticket que é uma seção da spec.** O ajuste ficou numa seção da spec de uma funcionalidade que já tem tickets; o `/executar-simples` apontaria o ticket 02 (o de menor número sem `Concluído em`). Segui a instrução do usuário e gravei `Implementado em` no fim da spec, logo abaixo da seção do ajuste. Sugestão: o `/planejar` modo curto dizer onde fica a marca quando a mudança é numa funcionalidade que já tem tickets.
+
+## 2026-11-06 — /ship de importacao-dados-atuais (primeira entrega e ajuste)
+
+- **`/security-review` e revisão de reserva (item não testado).** Esperado: devolver o comando e esperar o usuário. Aconteceu: na `main`, o comando provavelmente não acharia mudanças; o usuário mandou concluir sem rodá-lo, e ficou só a revisão de reserva, registrada no `desvios.md`.
+- **Passo 7 sem Docker e com a porta 5432 fechada.** Os testes de banco rodaram pelo workflow "Testes de banco" disparado na `main` (61 arquivos, `74_importar_processo` com 51 ok); o `db:types` saiu do remoto de desenvolvimento, sem diferença.
+- **Marca com ressalva.** O critério `[visual]` do ticket 01 foi visto só numa vitrine local, com módulos falsos; a marca saiu com ressalva.
