@@ -2,6 +2,23 @@
 
 Uma entrada por versão, da mais recente para a mais antiga. Entradas antigas nunca são editadas. O histórico das versões 1.x (até a v1.9) está em `CHANGELOG-v1.md`.
 
+## v3.1 — 2026-11-06 (spec, tickets, implementação e revisão de segurança como regras próprias)
+
+**Motivo.** Quatro peças faziam o funil parar para o usuário digitar um comando: `to-spec` e `to-tickets` no `/planejar` (66 paradas no projeto de origem), `implement` no `/executar-simples` (34) e `/security-review` no `/ship` (34). Nas três skills do Matt Pocock, o protocolo já acrescentava quase tudo à mão (seções exigidas na spec, pedido de menos tickets, regras de banco e vitrine no resumo do `implement`), e o texto colado no lugar do comando muitas vezes não disparava a skill. O `/security-review` chegava com diff vazio em quase toda entrega, porque o trabalho já estava na principal, e a revisão de reserva acabava fazendo o serviço. A sabatina (`grill-with-docs`) continua como skill e como parada: é a parte em que o usuário decide.
+
+**Novo**
+- `.claude/regras/spec-e-tickets.md`: como o Claude escreve a spec depois da sabatina (sem entrevista nova, ponto de teste confirmado antes, modelo de nove seções com as exigidas pelo protocolo, numeração continuada numa spec existente, decisões novas listadas para confirmação) e os tickets (fatias verticais, refatoração larga em três tempos, primeira proposta enxuta, lista mostrada antes de gravar, numeração depois dos concluídos, conferência final).
+- `.claude/regras/revisao-seguranca.md`: revisão de segurança própria, sobre o diff desde o marco de início (ou o código inteiro, na revisão para produção), por subagente de leitura, com lista de foco, filtro de confiança 8 feito pelo Claude, correção com teste e relatório em português. O `/security-review` fica como segunda opinião opcional.
+
+**Mudou**
+- `/planejar`, modo completo: passos 3, 5 e 6 escrevem a spec e os tickets pela regra nova; a única parada para digitar comando é a sabatina.
+- `/executar-simples`: executa o ticket na mesma sessão (banco primeiro, TDD por `tdd.md`, uma revisão de código, registro de conclusão), sem devolver o `implement`.
+- `/ship`, passo 4, e `producao.md`, passo 7: revisão por `revisao-seguranca.md`, sem parar para o `/security-review`.
+- `CLAUDE.md`, parágrafo "Skills": as de invocação direta usadas pelo funil passam a ser `grill-with-docs` e `wayfinder`, e o trabalho das quatro peças retiradas é do Claude.
+- README (tabela de skills, notas, lista de regras, seção 6 com o caminho a partir da v3.0, exemplos de numeração), `GLOSSARIO.md` (PR, Skill, Spec, Ticket), `implementar-identidade.md` e `nao-testados.md`.
+
+**Fica para depois.** As skills de plano e execução do Superpowers no `/executar-complexo`, o `finishing-a-development-branch`, o `handoff` como regra e a decisão sobre o Ponytail.
+
 ## v3.0 — 2026-11-06 (retirada do claude-mem, da Apple Design Skill e do security-auditor)
 
 **Motivo.** A análise de skills e plugins do projeto de origem (228 sessões, cerca de 200 registros de melhoria) apontou três peças que custavam mais do que entregavam. O claude-mem teve 25 avisos de cota esgotada desde meados de outubro, o projeto seguiu sem ele porque os arquivos de `.scratch/` já guardavam o andamento, e ele gravou capturas com dado pessoal. A Apple Design Skill nunca foi usada: o `/concepcao-premium`, único comando que dependia dela, não rodou nenhuma vez. O `security-auditor` rodou uma vez, e o script dele falha no Windows; o `/ship` já mandava rodar `npm audit --json` direto. A versão é inteira porque o funil perde um comando.

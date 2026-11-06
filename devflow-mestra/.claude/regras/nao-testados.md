@@ -1,4 +1,4 @@
-# Itens ainda não testados num projeto real — DevFlow v3.0
+# Itens ainda não testados num projeto real — DevFlow v3.1
 
 Como usar: ao terminar um comando, leia o bloco dele e o bloco "Qualquer momento". Para cada item que aconteceu nesta execução e ainda não tem entrada em `.scratch/melhorias-protocolo.md`, acrescente uma entrada com a data, o item, o que era esperado e o que aconteceu. Quem avalia se funcionou sou eu.
 
@@ -75,3 +75,10 @@ O `/situação` só lê e não registra nada.
 
 - Auditoria de pacotes do passo 3 do `/ship` feita com `npm audit --json` e `npm audit --omit=dev --json`, sem a skill `security-auditor`: relatório por severidade, separação entre produção e desenvolvimento, `fixAvailable` e `isSemVerMajor`.
 - Projeto sem claude-mem do começo ao fim: continuidade só pelos arquivos de `.scratch/` e pelo `/situação`; handoff só nos três casos do `CLAUDE.md`.
+
+## /planejar, /executar-simples e /ship (v3.1)
+
+- `/planejar`: spec escrita pelo Claude pela regra de `spec-e-tickets.md`, sem o `to-spec` (ponto de teste confirmado antes, modelo de nove seções, numeração continuada numa spec existente, decisões novas confirmadas).
+- `/planejar`: tickets escritos pelo Claude, sem o `to-tickets` (primeira proposta enxuta, lista mostrada antes de gravar, numeração depois dos concluídos, conferência final).
+- `/executar-simples` sem o `implement`: TDD pela regra de `tdd.md`, uma revisão de código e as linhas `Concluído em` ou `Implementado em`, numa sessão só, sem parada.
+- `/ship`, passo 4, e revisão para produção, passo 7: revisão de segurança por `revisao-seguranca.md` (subagente de leitura, filtro de confiança 8, relatório em português), sem o `/security-review`.

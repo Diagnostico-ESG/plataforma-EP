@@ -1,4 +1,4 @@
-# DevFlow — v3.0 (2026-11-06)
+# DevFlow — v3.1 (2026-11-06)
 
 *Antigo Protocolo Alex Macedo. O histórico das versões 1.x está em `CHANGELOG-v1.md`; o desta versão, em `CHANGELOG.md`.*
 
@@ -13,7 +13,9 @@ Funil de desenvolvimento para Claude Code, com skills e plugins de terceiros orq
   - `execucao.md`: receitas de execução no Windows (scripts, git, workflows do GitHub, ciclo do banco);
   - `banco.md`: regras de banco Supabase (ambientes, ciclos de teste, chaves, login, Storage, Edge Functions, conferências do `/ship`);
   - `producao.md`: roteiros de produção (banco, site, backup e restauração, revisão de segurança);
-  - `tdd.md`: regra de TDD própria (usada pelo `/rapido`);
+  - `tdd.md`: regra de TDD própria (usada pelo `/rapido` e pelo `/executar-simples`);
+  - `spec-e-tickets.md`: como o Claude escreve a spec e os tickets depois da sabatina (usada pelo `/planejar`);
+  - `revisao-seguranca.md`: revisão de segurança do código (usada pelo `/ship` e pela revisão para produção);
   - `auditoria-prontidao.md`: **rascunho** de auditoria antes de pôr o sistema na frente de usuários de verdade, a pedido; ainda não ligado a nenhum comando;
   - `nao-testados.md`: o que ainda não foi testado num projeto real.
 - `.claude/modelos/` — arquivos que o `/setup` copia para o projeto: scripts de teste e migração do banco de desenvolvimento (com ensaio da migração) e workflows do GitHub Actions (`github-workflows/`).
@@ -34,13 +36,13 @@ Instale uma vez, na sua conta; valem para qualquer projeto. O `/setup` confere q
 
 | Pacote | Para quê | Instalação |
 |-|-|-|
-| Matt Pocock Skills (`/mattpocock-skills:`) | sabatina, spec, tickets, implementação, revisão de código, handoff | `/plugin marketplace add mattpocock/skills` e `/plugin install mattpocock-skills@mattpocock-skills` |
+| Matt Pocock Skills (`/mattpocock-skills:`) | sabatina, revisão de código, handoff, `wayfinder` | `/plugin marketplace add mattpocock/skills` e `/plugin install mattpocock-skills@mattpocock-skills` |
 | Superpowers (`/superpowers:`) | brainstorming, planos, execução, depuração | `/plugin marketplace add obra/superpowers-marketplace` e `/plugin install superpowers@superpowers-marketplace` |
 | Ponytail | disciplina de simplicidade (precisa de `node` no PATH) | `/plugin marketplace add DietrichGebert/ponytail` e `/plugin install ponytail@ponytail` |
 | Impeccable (`/impeccable:impeccable`) | `init`, `shape`, `audit`, `polish` | `/plugin marketplace add pbakaus/impeccable` e `/plugin install impeccable@impeccable` |
-| `frontend-design`, `code-review`, `/security-review` | já vêm com o Claude Code | nada a instalar |
+| `frontend-design`, `code-review` | já vêm com o Claude Code | nada a instalar |
 
-Notas: as skills de invocação direta (`grill-with-docs`, `to-spec`, `to-tickets`, `implement`, `wayfinder`) só rodam digitadas por você e podem nem aparecer na lista do Claude; o comando delas volta pronto para você rodar. A auditoria de pacotes de terceiros não precisa de skill: o passo 3 do `/ship` roda `npm audit --json` e monta o relatório. Se a instalação oficial falhar por rede, use a seção 8.
+Notas: as skills de invocação direta que o funil ainda usa (`grill-with-docs` e `wayfinder`) só rodam digitadas por você e podem nem aparecer na lista do Claude; o comando delas volta pronto para você rodar. Spec, tickets, implementação do `/executar-simples` e revisão de segurança do `/ship` são regras do próprio DevFlow, e o Claude as segue sem parar; as skills `to-spec`, `to-tickets` e `implement` podem continuar instaladas, sem uso pelo funil. A auditoria de pacotes de terceiros não precisa de skill: o passo 3 do `/ship` roda `npm audit --json` e monta o relatório. Se a instalação oficial falhar por rede, use a seção 8.
 
 **Memória entre sessões.** O DevFlow não usa plugin de memória. A continuidade fica nos arquivos de `.scratch/` (spec, tickets, `proximo-passo.md`, handoff), lidos pelo `/situação`.
 
@@ -70,11 +72,15 @@ O hook `bloquear-git-destrutivo.mjs` lê cada comando que o Claude vai rodar e c
 
 Antes de usar o protocolo com dados de terceiros ou em trabalho oficial: verifique as normas sobre uso de IA e sobre proteção de dados pessoais (incluindo as internas do órgão); consulte a TI e o encarregado de dados sobre o envio do conteúdo do projeto à API da Anthropic e sobre plugins aceitos; confirme se a conta pode ser pessoal. Em projeto com banco, confirme onde os dados podem ficar (conta, região, dado pessoal real) e decida com o jurídico se é preciso registrar quem **leu** cada dado e como conciliar um histórico que não se altera com um pedido de eliminação de dados. A carga de dados reais é sempre sua, fora da sessão, com arquivos fora da pasta do projeto ou em `dados-reais/` (ignorada pelo git e nunca lida pelo Claude).
 
-## 6. Atualizar um projeto antigo para a v3.0
+## 6. Atualizar um projeto antigo para a v3.1
 
 Troque os arquivos do protocolo pelos desta versão, preservando a seção "Ajustes deste Projeto" do `CLAUDE.md` (copie-a para o arquivo novo). Depois:
 
-**Vindo da v2.0.x**
+**Vindo da v3.0**
+
+- Copie os arquivos novos de `.claude/regras/` (`spec-e-tickets.md`, `revisao-seguranca.md`) e os comandos alterados. Spec, tickets e implementação já em andamento continuam valendo; só muda quem escreve os próximos.
+
+**Vindo da v2.0.x, além do que está acima**
 
 - **`/concepcao-premium`:** apague `.claude/commands/concepcao-premium.md` do projeto e desinstale a Apple Design Skill (`/plugin`), se ela não serve a outro projeto.
 - **claude-mem:** desinstale o plugin (`/plugin`) e apague a pasta de dados dele na sua pasta de usuário (`.claude-mem`). Ela guarda as capturas antigas, inclusive as que tiverem dado pessoal; apagar a pasta é com você, no seu terminal.
@@ -117,7 +123,7 @@ Em rede corporativa com proxy, `npm`, `git` e o login do Claude Code falham com 
 ## 9. Versionamento e manutenção
 
 - **Cópia mestra.** Esta pasta, com git, fora de qualquer projeto. É dela que cada projeto copia os arquivos, e é nela que as mudanças são feitas.
-- **Versões.** Versão nova inteira (v4.0) quando o funil muda; v3.1 quando entra uma regra nova; v3.0.1 para correção de texto. O número fica no topo do `CLAUDE.md`, deste README, do `GLOSSARIO.md` e dos arquivos de `.claude/regras/`; cada versão ganha uma entrada no `CHANGELOG.md`, e entradas antigas não se editam.
+- **Versões.** Versão nova inteira (v4.0) quando o funil muda; v3.2 quando entra uma regra nova; v3.1.1 para correção de texto. O número fica no topo do `CLAUDE.md`, deste README, do `GLOSSARIO.md` e dos arquivos de `.claude/regras/`; cada versão ganha uma entrada no `CHANGELOG.md`, e entradas antigas não se editam.
 - **Melhorias descobertas num projeto.** O Claude registra em `.scratch/melhorias-protocolo.md` e avisa você. Periodicamente, leve os registros para esta pasta, decida o que muda e gere uma versão nova. Só entra o que valeria para qualquer projeto.
 - **Documentos sincronizados.** Quando o funil, um comando ou uma regra mudar, atualize junto o `GLOSSARIO.md` (termos novos), `.claude/regras/nao-testados.md`, este README e o `CHANGELOG.md`.
 - **Pacotes de terceiros.** Atualizar um plugin é decisão deliberada, registrada no `CHANGELOG.md`.

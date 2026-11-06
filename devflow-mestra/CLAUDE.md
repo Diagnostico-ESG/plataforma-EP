@@ -1,4 +1,4 @@
-# DevFlow — v3.0 (2026-11-06)
+# DevFlow — v3.1 (2026-11-06)
 
 Igual em todos os projetos; exceções de cada projeto ficam na última seção. O detalhe de cada etapa está no comando dela (`.claude/commands/`); este arquivo traz as regras que valem em qualquer momento, inclusive fora do funil. Serve a aplicações web com interface, em Vite + React + TypeScript, com ou sem banco Supabase, em Windows.
 
@@ -113,7 +113,7 @@ Cada funcionalidade nova começa no `/planejar`. Para uma iniciativa que não ca
 
 **Toda mudança de código passa pelo funil**, inclusive a que parece trivial. Nunca aplique uma mudança direto; decidir pular TDD ou revisão cabe a mim.
 
-**Skills.** Toda skill que recusar ser acionada por você (as de invocação direta: `implement`, `grill-with-docs`, `to-spec`, `to-tickets`, e qualquer outra que responder assim) volta para mim como comando pronto para eu rodar; elas podem nem aparecer na lista que você enxerga, e isso não quer dizer que faltam. **Skill ou comando ausente de verdade:** peça que eu rode `/reload-skills` uma vez; se continuar ausente, pare e me mostre as opções (instalar, seguir sem ela, adiar). Substituir uma skill por outra, ou fazer o trabalho dela à mão, só com minha aprovação. A lista das skills exigidas está no `README.md`.
+**Skills.** Toda skill que recusar ser acionada por você (as de invocação direta: `grill-with-docs`, `wayfinder` e qualquer outra que responder assim) volta para mim como comando pronto para eu rodar; elas podem nem aparecer na lista que você enxerga, e isso não quer dizer que faltam. **Skill ou comando ausente de verdade:** peça que eu rode `/reload-skills` uma vez; se continuar ausente, pare e me mostre as opções (instalar, seguir sem ela, adiar). Substituir uma skill por outra, ou fazer o trabalho dela à mão, só com minha aprovação. O trabalho que era do `implement`, do `to-spec`, do `to-tickets` e do `/security-review` já é seu, pelas regras `tdd.md`, `spec-e-tickets.md` e `revisao-seguranca.md` e pelos comandos que as citam: não devolva esses comandos para eu digitar. A lista das skills exigidas está no `README.md`.
 
 ## Segurança e Recuperação
 

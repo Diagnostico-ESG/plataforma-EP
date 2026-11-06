@@ -1,4 +1,4 @@
-# Glossário — DevFlow v3.0
+# Glossário — DevFlow v3.1
 
 Termos técnicos explicados em linguagem simples, conforme foram surgindo nas conversas sobre o protocolo. Atualizar conforme novos termos aparecerem.
 
@@ -20,7 +20,7 @@ Termos técnicos explicados em linguagem simples, conforme foram surgindo nas co
 
 **Repositório (repo)** — a pasta do projeto inteira, com todo o histórico do Git. "Repositório remoto" é uma cópia dele num servidor (GitHub, por exemplo); o DevFlow funciona sem.
 
-**Pull Request (PR)** — pedido formal de revisão antes de juntar uma branch, numa plataforma como o GitHub. O DevFlow funciona sem. O `/security-review` compara a branch atual com a principal e pode não achar nada num projeto sem repositório remoto ou já integrado; nesse caso o Claude faz a revisão de reserva.
+**Pull Request (PR)** — pedido formal de revisão antes de juntar uma branch, numa plataforma como o GitHub. O DevFlow funciona sem. A revisão de segurança do `/ship` não depende de PR: o Claude revisa o diff desde o marco de início da funcionalidade (`.claude/regras/revisao-seguranca.md`).
 
 **Revert** — jeito de desfazer uma mudança no Git criando um registro novo que anula o anterior, sem apagar nada do histórico. É o oposto do `reset --hard`, que apaga o histórico e não tem volta.
 
@@ -111,7 +111,7 @@ Termos técnicos explicados em linguagem simples, conforme foram surgindo nas co
 
 **Token** — dois sentidos. Em IA, a unidade em que os modelos leem e escrevem texto, mais ou menos um pedaço de palavra; é por token que se mede o uso e se cobra o custo. Em design, um token CSS é uma variável com um valor da identidade visual (uma cor, um espaçamento), usada em todo o código.
 
-**Skill** — pacote de instruções que ensina o Claude a fazer um tipo de tarefa (sabatina, revisão de código, polimento). Algumas o Claude aciona sozinho; as de **invocação direta** só rodam quando você digita o comando, e por isso os comandos do DevFlow param e devolvem o comando pronto.
+**Skill** — pacote de instruções que ensina o Claude a fazer um tipo de tarefa (sabatina, revisão de código, polimento). Algumas o Claude aciona sozinho; as de **invocação direta** só rodam quando você digita o comando, e por isso os comandos do DevFlow param e devolvem o comando pronto. Desde a v3.1, só a sabatina (`grill-with-docs`) e o `wayfinder` param assim; spec, tickets, implementação e revisão de segurança viraram regras que o Claude segue sem parar.
 
 **Plugin** — conjunto de skills, comandos e hooks instalado de uma vez no Claude Code (Matt Pocock Skills, Superpowers, Impeccable).
 
@@ -203,7 +203,7 @@ Termos técnicos explicados em linguagem simples, conforme foram surgindo nas co
 
 **CONTEXT.md** — arquivo do projeto que guarda o contexto de domínio: termos, entidades, atores e regras de negócio fixas. Criado e atualizado pelo `grill-with-docs` durante as sabatinas do `/planejar`; fora delas, o Claude propõe a redação e grava depois que você confirma. É a fonte única desse tipo de informação; o `CLAUDE.md` só aponta para ele.
 
-**Spec (especificação)** — documento que descreve o que uma funcionalidade faz: regras, comportamentos, casos-limite. Fica em `.scratch/<funcionalidade>/spec.md`. No modo completo é gerada pelo `to-spec`; no modo curto, escrita pelo Claude. É mantida atualizada: descreve o sistema como ele é hoje. Versões anteriores ficam no histórico do Git.
+**Spec (especificação)** — documento que descreve o que uma funcionalidade faz: regras, comportamentos, casos-limite. Fica em `.scratch/<funcionalidade>/spec.md`. Escrita pelo Claude depois da sabatina, pela regra de `.claude/regras/spec-e-tickets.md` (no modo curto, numa versão enxuta). É mantida atualizada: descreve o sistema como ele é hoje. Versões anteriores ficam no histórico do Git.
 
 **Estados de tela** — o que uma tela que busca dados mostra enquanto os dados chegam (carregando), quando não há nada a mostrar (vazio) e quando algo falha (erro). Sem isso, a pessoa vê uma tela em branco e não sabe se travou, se não há dados ou se quebrou.
 
@@ -219,7 +219,7 @@ Termos técnicos explicados em linguagem simples, conforme foram surgindo nas co
 
 **Sabatina** — a conversa do `/planejar` em que o `grill-with-docs` faz perguntas ponto a ponto sobre a funcionalidade (casos-limite, riscos, decisões), sempre com uma resposta recomendada, e registra o que foi decidido.
 
-**Ticket** — unidade de trabalho gerada pelo `to-tickets`, maior que uma task. Algo que, sozinho, entrega algo demonstrável. Pode ser simples (uma task, via `/executar-simples`) ou complexo (várias tasks, via `/executar-complexo`).
+**Ticket** — unidade de trabalho escrita pelo Claude no `/planejar` (`.claude/regras/spec-e-tickets.md`), maior que uma task. Algo que, sozinho, entrega algo demonstrável. Pode ser simples (uma task, via `/executar-simples`) ou complexo (várias tasks, via `/executar-complexo`).
 
 ## Princípios de código
 
