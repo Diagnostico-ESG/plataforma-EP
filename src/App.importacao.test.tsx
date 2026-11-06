@@ -117,7 +117,8 @@ test('o que já existe na plataforma não ser lido recusa o arquivo com a frase 
   importacao.falharAoListar = true
   await abrirImportacao()
   await escolher(planilha())
-  expect((await screen.findByRole('alert')).textContent).toBe('Não foi possível ler o que já existe na plataforma. Tente de novo.')
+  expect((await screen.findByRole('alert')).textContent).toBe(
+    'Não foi possível ler o que já existe na plataforma (falha de teste ao ler o que já existe). Tente de novo.')
 })
 
 test('confirmar grava só o que é novo, na ordem da planilha, e mostra o resumo com os avisos', async () => {
@@ -234,10 +235,10 @@ test('a sigla com barra entra com hífen e conta como o mesmo setor', async () =
   await escolher(planilha([
     { area: 'DAE/CTL', nome: 'Exemplo Alfa' },
     { area: 'dae / ctl', nome: 'Exemplo Beta' },
-    { area: 'DAE-CTL', nome: 'Exemplo Alfa' },
+    { area: 'DAE-CTL', nome: 'EXEMPLO ALFA' },
   ]))
   await ate(/Vão entrar 1 processo, 0 setores novos/)
   const linhas = within(screen.getByRole('table')).getAllByRole('row').slice(1).map((l) => l.textContent)
   expect(linhas).toEqual(['DAE-CTLGestão de exemplosExemplo AlfaNão iniciadosNovo', 'DAE-CTLGestão de exemplosExemplo BetaNão iniciadosJá existia'])
-  expect(screen.getByText('Linha 6, DAE-CTL · exemplo alfa: repetido na planilha; vale a primeira linha.')).toBeTruthy()
+  expect(screen.getByText('Linha 6, DAE-CTL · EXEMPLO ALFA: repetido na planilha; vale a primeira linha.')).toBeTruthy()
 })

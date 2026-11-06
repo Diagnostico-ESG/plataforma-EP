@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { type Previa, type ResumoDaImportacao, gravarNovos, lerArquivoDaPlanilha, montarPrevia } from '../importacao/executarImportacao'
-import { FRASE_DA_FALHA_DE_LEITURA, frasesDaRecusa } from '../importacao/frasesDaImportacao'
+import { fraseDaFalhaDeLeitura, frasesDaRecusa } from '../importacao/frasesDaImportacao'
+import type { PlanilhaLida } from '../importacao/lerPlanilha'
 import type { ModuloDeImportacao } from '../importacao/tipos'
 
 export type FaseDaImportacao =
@@ -16,7 +17,7 @@ export function useImportacaoDaPlanilha(importacao: ModuloDeImportacao) {
 
   async function escolher(arquivo: File) {
     setFase({ tipo: 'lendo' })
-    let lida
+    let lida: PlanilhaLida
     try {
       lida = await lerArquivoDaPlanilha(arquivo, new Date())
     } catch (erro) {
@@ -25,8 +26,8 @@ export function useImportacaoDaPlanilha(importacao: ModuloDeImportacao) {
     }
     try {
       setFase({ tipo: 'previa', previa: montarPrevia(lida, await importacao.listarExistentes()) })
-    } catch {
-      setFase({ tipo: 'escolher', recusa: FRASE_DA_FALHA_DE_LEITURA })
+    } catch (erro) {
+      setFase({ tipo: 'escolher', recusa: fraseDaFalhaDeLeitura(erro) })
     }
   }
 

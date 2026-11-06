@@ -114,10 +114,10 @@ describe('setor, macroprocesso e nome', () => {
 describe('linhas', () => {
   test('a linha repetida vale a primeira e a segunda é listada', () => {
     const lida = lerPlanilha(csv([
-      linha({ nome: 'Exemplo Alfa', mp: 'Concluído' }), linha({ nome: ' exemplo alfa ' }), linha({ nome: 'Exemplo Beta' }),
+      linha({ nome: 'Exemplo Alfa', mp: 'Concluído' }), linha({ nome: ' EXEMPLO ALFA ' }), linha({ nome: 'Exemplo Beta' }),
     ]), HOJE)
     expect(lida.processos.map((p) => p.nome)).toEqual(['Exemplo Alfa', 'Exemplo Beta'])
-    expect(lida.repetidos).toEqual([{ linha: 5, setor: 'XYZ', nome: 'exemplo alfa' }])
+    expect(lida.repetidos).toEqual([{ linha: 5, setor: 'XYZ', nome: 'EXEMPLO ALFA' }])
   })
 
   test('o mesmo nome em outro setor não é repetição', () => {

@@ -1,6 +1,7 @@
 import {
   type ChaveDaColuna, type PosicoesDasColunas, NOME_DA_ETAPA, SEQUENCIA_DE_ETAPAS, estaConcluida, localizarCabecalho, normalizar,
 } from './colunasDaPlanilha'
+import { chaveDoProcesso } from './chaves'
 import { lerCsv } from './csv'
 import { ehFutura, isoDoDia, lerData } from './datasDaPlanilha'
 
@@ -139,9 +140,9 @@ function lerLinhaDeDados(lida: PlanilhaLida, vistos: Set<string>, numero: number
   const setor = siglaDe(celula('area'))
   const avisar: Avisar = (texto) => lida.avisos.push({ linha: numero, nome: celula('processo') || '(sem nome)', texto })
   if (setor === '' || celula('processo') === '') return avisar('Linha sem Área ou sem nome de processo: ignorada.')
-  const chave = `${setor}|${celula('processo').toLowerCase()}`
+  const chave = chaveDoProcesso(setor, celula('processo'))
   if (vistos.has(chave)) {
-    lida.repetidos.push({ linha: numero, setor, nome: celula('processo').toLowerCase() })
+    lida.repetidos.push({ linha: numero, setor, nome: celula('processo') })
     return
   }
   vistos.add(chave)

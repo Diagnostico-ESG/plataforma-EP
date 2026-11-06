@@ -13,4 +13,8 @@ export function frasesDaRecusa(erro: unknown): string {
   return `Não foi possível ler o arquivo (${motivo}). Escolha outro e tente de novo.`
 }
 
-export const FRASE_DA_FALHA_DE_LEITURA = 'Não foi possível ler o que já existe na plataforma. Tente de novo.'
+/** O banco não respondeu à leitura do que já existe; o motivo vai na frase para a pessoa poder relatá-lo. */
+export function fraseDaFalhaDeLeitura(erro: unknown): string {
+  const motivo = erro instanceof Error ? erro.message : String(erro)
+  return `Não foi possível ler o que já existe na plataforma (${motivo}). Tente de novo.`
+}
