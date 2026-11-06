@@ -4,7 +4,7 @@
 
 **Próximo:** `/executar-simples` na seção "Ajuste de 2026-11-06" da spec de `importacao-dados-atuais` (é o único ticket). Modelo: Sonnet. Depois: `/polir`, só se a tela mudar, e `/ship`. Em seguida, limpar o desenvolvimento de novo (o catálogo de etapas fica) e importar do zero.
 
-**Em outra sessão:** `capa-de-entrada` implementada em 2026-11-06 (commit e76b6a3; a spec é o único ticket). Próximo dela: `/polir` (Sonnet), depois `/ship`. Presumido até o `/polir`: as mensagens de recusa e de falha vistas na tela a 1366×768 (só testadas pela tela no Vitest).
+**Em outra sessão:** `capa-de-entrada` implementada e polida em 2026-11-06 (commit fa51ebe; a spec é o único ticket). Próximo dela: `/ship` (Sonnet). Presumido: as mensagens de recusa e de falha vistas na tela a 1366×768 (detalhe em `.scratch/capa-de-entrada/desvios.md`).
 
 **Depois (continua valendo):** ticket 02 da importação (arquivos das versões; precisa do desenho da pasta DOCUMENTOS MAPEAMENTO, sem nomes reais, em `amostra/`).
 
