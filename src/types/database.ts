@@ -1136,6 +1136,18 @@ export type Database = {
           texto: string
         }[]
       }
+      importar_processo: {
+        Args: {
+          p_anotacoes: string
+          p_data_da_modelagem_piloto: string
+          p_data_da_publicacao: string
+          p_etapa: string
+          p_macroprocesso: string
+          p_nome: string
+          p_setor: string
+        }
+        Returns: string
+      }
       links_das_planilhas: {
         Args: never
         Returns: {
