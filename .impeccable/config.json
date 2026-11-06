@@ -44,6 +44,24 @@
         "value": "sans 3",
         "createdAt": "2026-10-30T14:45:50.405Z",
         "reason": "Claude: Source Sans 3 é a fonte declarada no DESIGN.md; o detector lê o nome pela metade"
+      },
+      {
+        "rule": "all-caps-body",
+        "value": "*",
+        "files": [
+          ".scratch/capa-de-entrada/previa.html"
+        ],
+        "createdAt": "2026-11-06T15:19:32.203Z",
+        "reason": "Claude: só a linha curta do órgão (CED) em maiúsculas, um rótulo de uma linha, aprovado pelo usuário"
+      },
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          ".scratch/capa-de-entrada/previa.html"
+        ],
+        "createdAt": "2026-11-06T15:19:32.605Z",
+        "reason": "Claude: o brilho é só das variantes D e E da prévia, recusadas; a B aprovada não o usa; arquivo de prévia, não código da aplicação"
       }
     ]
   }

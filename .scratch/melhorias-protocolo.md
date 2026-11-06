@@ -1203,3 +1203,8 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 - **Item não testado: teste `00_rls_ligada`, `46_funcoes_e_views_seguras` e função `security definer` só em `private`.** Aconteceu: 61 de 61 arquivos de teste de banco passaram com a função nova.
 - **Ocorrência: o pre-commit roda a suíte inteira (mais de 2 minutos) e estoura o tempo padrão do comando.** Comitar com tempo de 10 minutos ou em segundo plano.
 - **Ocorrência: plano mais enxuto que a skill `writing-plans`.** O comando manda o plano ter só execução; a skill pede código em cada passo. Segui o comando.
+
+## 2026-11-06 — /demanda e /planejar modo curto (capa-de-entrada)
+
+- **Ocorrência: o `/demanda` e o modo curto do `/planejar` divergem sobre o ADR.** O caminho "Mudança em funcionalidade existente" do `/demanda` diz que o porquê da mudança vai para um ADR novo; o modo curto do `/planejar` só pede ADR quando a decisão muda outra funcionalidade. Segui o `/planejar` (comando da etapa) e pus o porquê no parágrafo da spec. Sugestão para a cópia mestra: o `/demanda` dizer que, no modo curto, o ADR segue a regra do `/planejar`.
+- **Ocorrência: prévia visual no modo curto.** O modo curto não prevê prévia, mas o usuário pediu imagens antes da spec; saíram cinco variantes (HTML com os tokens reais, imagem pelo Edge sem janela). Sugestão: o modo curto admitir uma prévia aprovada quando a mudança é só de aparência, guardada na pasta da funcionalidade.

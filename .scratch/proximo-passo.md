@@ -1,9 +1,11 @@
-# Próximo passo (2026-11-05)
+# Próximo passo (2026-11-06)
 
-**Feito:** `importacao-dados-atuais`, ticket 01 (cadastros e etapas pela planilha): teste de banco 74 e migração `20261106015148_importar_processo` (aplicada no desenvolvimento, ainda NÃO na produção), leitura do .csv, contrato `importacao`, aba Administração → Importação e testes pela tela.
+**Feito:** `/planejar` modo curto de `capa-de-entrada` (tela de entrada vira capa: CED, título, frase e o mesmo botão à esquerda; Quadro inclinado só com ícones das etapas e fluxograma à direita). Spec em `.scratch/capa-de-entrada/spec.md`, prévia aprovada `capa-b.png` (de `previa.html?v=b`). Spec de `login-perfis` com `Em revisão desde 2026-11-06`; item 23 em `projeto.md`.
 
-**Próximo:** `/executar-complexo` no ticket 02 (arquivos das versões da pasta). Modelo: Sonnet. Ele começa por registrar o desenho da pasta DOCUMENTOS MAPEAMENTO em `amostra/` (subpastas e padrão de nome, sem nomes reais); depende de você me passar esse desenho.
+**Próximo:** `/executar-simples` na spec de `capa-de-entrada` (é o único ticket). Modelo: Sonnet. Depois: `/polir` e `/ship`.
 
-**Antes da carga real (continua valendo):** publicar a migração `importar_processo` na produção pelo roteiro do `/ship`; backup da produção (criar `BACKUP_SENHA_PRODUCAO`); a carga real é sua, pela tela. Depois dos dois tickets: `/polir` (mexeu na interface) e `/ship`.
+**Continua pendente:** `importacao-dados-atuais`, ticket 02 (`/executar-complexo`, Sonnet), que depende de você passar o desenho da pasta DOCUMENTOS MAPEAMENTO. As duas podem ir juntas no mesmo `/ship` e na mesma publicação na Netlify.
+
+**Antes da carga real (continua valendo):** publicar a migração `importar_processo` na produção pelo roteiro do `/ship`; backup da produção (criar `BACKUP_SENHA_PRODUCAO`); a carga real é sua, pela tela.
 
 **Produção (continua valendo):** Netlify → Público quando a equipe for usar; autorizar os usuários. Abertos: `planilhas-dos-dashboards` e cofre; `.env` no `.gitignore`; decisões de LGPD.

@@ -103,7 +103,7 @@ O administrador tem a área Administração > Usuários, onde vê todos os usuá
 ### Interface
 
 - **Ponto de injeção único:** a interface fala com o Auth e com o banco por um módulo de acesso (sessão atual, entrar com o Google, sair, ler o próprio usuário, listar usuários e autorizações, autorizar, mudar perfil, desativar, reativar, corrigir nome, excluir autorização, listar histórico). O aplicativo recebe esse módulo por injeção; em produção ele usa o cliente Supabase com a chave publicável, e nos testes uma implementação falsa nomeada. É a única costura nova.
-- **Tela de entrada** com a identidade visual já implementada: marca EP, o botão "Entrar com a conta institucional" e a área de mensagem. Estados:
+- **Tela de entrada** (desde 2026-11-06, a aparência vale pela spec `.scratch/capa-de-entrada/spec.md`: capa com o órgão, a frase e a ilustração do Quadro; botão, estados e mensagens abaixo continuam valendo) com a identidade visual já implementada: marca EP, o botão "Entrar com a conta institucional" e a área de mensagem. Estados:
   - carregando: "Verificando seu acesso…";
   - conta fora do domínio: "Use sua conta @ccivil.pr.gov.br. A conta {e-mail} não é institucional.";
   - sem autorização: "A conta {e-mail} ainda não foi autorizada. Peça a um administrador.";
@@ -263,3 +263,5 @@ Aguardando primeiro acesso → (primeiro acesso) → Ativo ⇄ (desativar / reat
 Entregue em 2026-10-09 (commit 2180971)
 
 Entregue em 2026-10-09 (commit 32e1b53)
+
+Em revisão desde 2026-11-06
