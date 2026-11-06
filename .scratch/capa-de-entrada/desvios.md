@@ -33,3 +33,13 @@ Deixado de fora:
 - [P3] Cabeçalho das colunas com 30px de altura, fora da escala de espaçamento: é a medida da prévia aprovada e só existe na ilustração.
 
 Conferido: 1440×900 e 1366×768 iguais a `capa-m.png`; 920×640 e 1280×600 sem corte nem rolagem lateral. Presumido (continua): as mensagens de recusa e de falha vistas na tela a 1366×768.
+
+## 2026-11-06 — /ship
+
+- Revisão de código do diff inteiro (desde `marco/2026-11-06-inicio-capa-de-entrada`, só os arquivos da capa): sem violação dura, sem requisito faltando e sem código morto. Pontos de julgamento deixados como estão:
+  - sombra nas colunas e nos cartões da ilustração, quando a identidade diz "cartões sem sombra": é a profundidade da prévia aprovada e vale só dentro da ilustração decorativa (registrado agora em `.scratch/identidade-visual.md`);
+  - o quadro fica em `scale(1.1)` nas telas largas (medida da prévia `capa-m.png`, não citada na spec) e em `scale(0.9)` abaixo de 1100px (do `/polir`);
+  - medidas soltas que repetem tokens (15px do botão, cantos de 4px e 6px na ilustração) e a seta do alto que termina sem forma, herdada do desenho da B;
+  - os testes de CSS acham as regras por expressão regular (frágil a reformatação; aceito, porque o jsdom não calcula layout).
+- Revisão de segurança do código dispensada: a mudança é só aparência da tela de entrada (componentes de desenho e CSS), sem mexer no login, nas permissões, em dado pessoal, em dado que chega de fora nem no banco. As mensagens de recusa continuam vindo de `mensagemDaRecusa`, sem mudança.
+- `security-auditor` não rodou: `package.json` não mudou e `.scratch/security.md` existe.

@@ -45,3 +45,17 @@ Documentos Mapeamento/
 6. **Mais de uma versão `F` no mesmo processo (12 processos).**
 7. **Subpasta extra dentro do setor (1 caso).** A leitura precisa olhar um nível abaixo da pasta do setor.
 8. **O nome do processo no arquivo tem que bater com o da planilha.** Não foi conferido (a planilha não foi lida nesta sessão); diferença de acento, vírgula ou hífen vira "processo inexistente" pela regra da história 47.
+
+## Decisões do usuário (2026-11-06)
+
+Respostas dadas na conversa, a levar à spec e ao ticket 02 pelo `/planejar`. A numeração segue a da lista acima.
+
+- **Fonte das versões:** a pasta manda, não as colunas V1 a V8 da planilha. Entra o que está na pasta. A diferença entre a pasta e a planilha (arquivo sem a versão na planilha, ou versão da planilha sem arquivo) só vai para o relatório final.
+- **1. Sufixos:** `V1F` e `V1` são versões diferentes. `F` é a versão histórica e vai para Arquivos históricos na plataforma; a sem sufixo (e a `P`) é a versão comum. Os dois convivem no mesmo processo.
+- **2. `.docx` e `.pdf` na mesma versão:** o `.docx` entra como o relatório da versão; o `.pdf` entra nos outros anexos.
+- **3. Dois `.docx` de relatório na mesma versão:** fica de fora; o usuário vê depois. Listar no relatório final.
+- **4. Buracos na numeração:** fica como está; carrega só o que tem na pasta. Listar as lacunas no relatório final.
+- **5. Mais de uma versão `F`:** é assim mesmo (arquivos históricos). Todas as `F` vão para Arquivos históricos.
+- **6. Subpasta dentro do setor:** os arquivos entram no setor (pela sigla), com uma observação nas Anotações do processo dizendo o nome da subpasta.
+- **7. Nome que não bate com a planilha:** o risco foi aceito; o arquivo sem processo correspondente não entra e é listado no relatório final.
+- **8. Versões sem `.bpm`:** ficam de fora e são listadas no relatório final.
