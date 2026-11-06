@@ -1,11 +1,11 @@
 # Próximo passo (2026-11-06)
 
-**Feito:** `/planejar` modo curto de `capa-de-entrada` (tela de entrada vira capa: CED, título, frase e o mesmo botão à esquerda; Quadro inclinado só com ícones das etapas e fluxograma à direita). Spec em `.scratch/capa-de-entrada/spec.md`, prévia aprovada `capa-b.png` (de `previa.html?v=b`). Spec de `login-perfis` com `Em revisão desde 2026-11-06`; item 23 em `projeto.md`.
+**Feito:** `/planejar` (modo curto) do ajuste de `importacao-dados-atuais`. Na seção "Ajuste de 2026-11-06" da spec (`.scratch/importacao-dados-atuais/spec.md`): a Modelagem piloto ou a VII concluídas sem data, ou com data ilegível, usam a data de hoje, com aviso na prévia (a VII vai para Concluídos); a sigla "DAE/CTL" entra como "DAE-CTL". O banco não muda.
 
-**Próximo:** `/executar-simples` na spec de `capa-de-entrada` (é o único ticket). Modelo: Sonnet. Depois: `/polir` e `/ship`.
+**Próximo:** `/executar-simples` na seção "Ajuste de 2026-11-06" da spec de `importacao-dados-atuais` (é o único ticket). Modelo: Sonnet. Depois: `/polir`, só se a tela mudar, e `/ship`. Em seguida, limpar o desenvolvimento de novo (o catálogo de etapas fica) e importar do zero.
 
-**Continua pendente:** `importacao-dados-atuais`, ticket 02 (`/executar-complexo`, Sonnet), que depende de você passar o desenho da pasta DOCUMENTOS MAPEAMENTO. As duas podem ir juntas no mesmo `/ship` e na mesma publicação na Netlify.
+**Em outra sessão:** `capa-de-entrada` (login-perfis em revisão), conduzida pelo usuário.
 
-**Antes da carga real (continua valendo):** publicar a migração `importar_processo` na produção pelo roteiro do `/ship`; backup da produção (criar `BACKUP_SENHA_PRODUCAO`); a carga real é sua, pela tela.
+**Depois (continua valendo):** ticket 02 da importação (arquivos das versões; precisa do desenho da pasta DOCUMENTOS MAPEAMENTO, sem nomes reais, em `amostra/`).
 
-**Produção (continua valendo):** Netlify → Público quando a equipe for usar; autorizar os usuários. Abertos: `planilhas-dos-dashboards` e cofre; `.env` no `.gitignore`; decisões de LGPD.
+**Antes da carga real (continua valendo):** publicar a migração `importar_processo` na produção pelo roteiro do `/ship`; backup da produção (criar `BACKUP_SENHA_PRODUCAO`); a carga real é sua, pela tela. Produção: Netlify → Público quando a equipe for usar; autorizar os usuários. Abertos: `planilhas-dos-dashboards` e cofre; `.env` no `.gitignore`; decisões de LGPD.

@@ -1208,3 +1208,8 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 
 - **Ocorrência: o `/demanda` e o modo curto do `/planejar` divergem sobre o ADR.** O caminho "Mudança em funcionalidade existente" do `/demanda` diz que o porquê da mudança vai para um ADR novo; o modo curto do `/planejar` só pede ADR quando a decisão muda outra funcionalidade. Segui o `/planejar` (comando da etapa) e pus o porquê no parágrafo da spec. Sugestão para a cópia mestra: o `/demanda` dizer que, no modo curto, o ADR segue a regra do `/planejar`.
 - **Ocorrência: prévia visual no modo curto.** O modo curto não prevê prévia, mas o usuário pediu imagens antes da spec; saíram cinco variantes (HTML com os tokens reais, imagem pelo Edge sem janela). Sugestão: o modo curto admitir uma prévia aprovada quando a mudança é só de aparência, guardada na pasta da funcionalidade.
+
+## 2026-11-06 — /planejar (modo curto) do ajuste de importacao-dados-atuais
+
+- **Mudança numa funcionalidade ainda não entregue.** Esperado (pelo `proximo-passo.md` do `/demanda`): ADR novo e linha `Em revisão desde`. Aconteceu: a spec não tinha `Entregue em`, então a linha não se aplicou; no modo curto não houve ADR, porque a decisão não muda outra funcionalidade, e o motivo ficou numa seção "Ajuste de 2026-11-06" da própria spec. Sugestão: o `/demanda` só prever `Em revisão desde` quando a funcionalidade já tem `Entregue em`.
+- **Conferência de entregas anteriores com outra sessão em andamento.** Aconteceu: `login-perfis` estava "em revisão" por causa da `capa-de-entrada`, que corria em outra sessão; o usuário mandou seguir sem anotar no backlog.

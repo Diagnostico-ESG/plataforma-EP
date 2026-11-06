@@ -2,7 +2,7 @@
 
 Status: ready-for-agent
 
-Decisões de origem: sabatina de 2026-11-05 (`.scratch/importacao-dados-atuais/sabatina.md`, Q1 a Q23), regras de etapa e formato da planilha (`.scratch/importacao-dados-atuais/amostra/cabecalho.md`), ADR 0044 e o termo **Importação dos dados atuais** no `CONTEXT.md`. Valem também os ADRs 0005 a 0008 (versão com os arquivos dentro, arquivos no Drive pela função `arquivos-no-drive`) e 0028 (número da versão).
+Decisões de origem: sabatina de 2026-11-05 (`.scratch/importacao-dados-atuais/sabatina.md`, Q1 a Q23; o caso "VII sem data" e a data ilegível do Q9 mudaram no ajuste de 2026-11-06, no fim desta spec), regras de etapa e formato da planilha (`.scratch/importacao-dados-atuais/amostra/cabecalho.md`), ADR 0044 e o termo **Importação dos dados atuais** no `CONTEXT.md`. Valem também os ADRs 0005 a 0008 (versão com os arquivos dentro, arquivos no Drive pela função `arquivos-no-drive`) e 0028 (número da versão).
 
 ## Problem Statement
 
@@ -34,7 +34,7 @@ O Administrador abre **Administração → Importação**, escolhe a planilha (p
 
 ### Setores e macroprocessos
 
-13. Como Administrador, quero que cada sigla da coluna Área vire um setor cujo nome é a própria sigla, para completar o nome depois em Cadastros.
+13. Como Administrador, quero que cada sigla da coluna Área vire um setor cujo nome é a própria sigla, para completar o nome depois em Cadastros. A sigla com barra ("DAE/CTL", também com espaços em volta da barra) entra com hífen ("DAE-CTL"), porque a plataforma só aceita letras, números e hífen.
 14. Como Administrador, quero que um setor que já existe com a mesma sigla seja reaproveitado, para não duplicar setores.
 15. Como Administrador, quero que o macroprocesso entre sem o numeral romano e sem o " - " ("II - Orçamentário" vira "Orçamentário"), para seguir os nomes da plataforma.
 16. Como Administrador, quero que "Subprocesso Geral", "Subprocesso de eventos", "DL - DIRETOR LEGISLATIVO" e as células em branco entrem em **A definir**, para não inventar macroprocessos que não existem.
@@ -50,9 +50,10 @@ O Administrador abre **Administração → Importação**, escolhe a planilha (p
 23. Como Administrador, quero que o processo sem "Concluído" nas quatro primeiras colunas de etapa (I, II, III e Modelagem Piloto) entre em Não iniciados com status A fazer.
 24. Como Administrador, quero que "Concluído" na VII (Publicação) leve o processo a Concluídos, com a Data da Publicação da planilha, para que ele já conste como entregue.
 25. Como Administrador, quero que o processo importado em Concluídos já entre tirado do Quadro, para o Quadro não nascer lotado de processos prontos.
-26. Como Administrador, quero que a VII concluída sem data entre em Publicação, Finalizado, e apareça na lista de avisos, para decidir depois.
+26. Como Administrador, quero que a VII concluída sem data ou com data ilegível entre em Concluídos com a data de hoje e apareça na lista de avisos ("usada a data de hoje"), para que ele conste como entregue e eu possa corrigir a data depois.
 27. Como Administrador, quero que a data da modelagem piloto de um processo que ficou em Não iniciados seja ignorada e listada, para não gravar data em processo que nem fez o piloto.
-28. Como Administrador, quero que a data ilegível (formato "16 10 2026" ou "01/09/2026" aceitos; outros não) seja ignorada e listada, em vez de travar a carga toda.
+28. Como Administrador, quero que a data ilegível (formato "16 10 2026" ou "01/09/2026" aceitos; outros não) seja tratada como data em branco e listada, em vez de travar a carga toda.
+28a. Como Administrador, quero que o processo fora de Não iniciados sem data da modelagem piloto, ou com ela ilegível, receba a data de hoje e apareça na lista de avisos, porque, se passou do piloto, o piloto foi feito.
 29. Como Administrador, quero que um "Concluído" depois de uma coluna vazia valha pela última coluna "Concluído" e apareça como aviso, para conferir a planilha.
 30. Como Administrador, quero que o nome do processo com " - " seja tratado como nome comprido e não vire subprocesso, para seguir a regra "todos entram como processo".
 31. Como Administrador, quero que as Observações (coluna R) virem Anotações do processo, para não perder o que a equipe escreveu.
@@ -104,7 +105,7 @@ O Administrador abre **Administração → Importação**, escolhe a planilha (p
 - **Lógica de leitura separada da gravação.** Um módulo transforma o conteúdo da planilha numa lista de processos com setor, macroprocesso, etapa, status, data de publicação, anotação e avisos, sem tocar em banco nem em tela. Outro faz o mesmo para a lista de arquivos da pasta cruzada com as colunas V1 a V8. A prévia mostra o resultado deles; a confirmação os grava.
 - **Gravação pelo contrato de dados que a plataforma já usa**, com o mesmo padrão de "falso" das outras áreas (contrato de importação com implementação real e implementação falsa para testes), passando pelas regras por perfil do banco. A importação de cadastros usa um conjunto de operações que reaproveita setor e macroprocesso existentes, pula o processo já existente e grava o histórico único "importado da planilha" com quem importou.
 - **Regra das travas só na importação.** O banco ganha um caminho de gravação de versão para a importação que ignora as travas de etapa do envio (ADR 0028 e ADR 0025), mantém o número único por processo e o .bpm obrigatório, e marca a versão com a etapa do processo no momento. Esse caminho só aceita o perfil Administrador.
-- **Etapas e status.** Regra única de correspondência (última coluna "Concluído", "Não realizada" conta) e três saídas: Não iniciados com A fazer, as etapas do meio com Finalizado e Concluídos (já tirado do Quadro, com a Data da Publicação). Casos fora da regra do Q9 viram avisos listados, nunca erro que derrube a carga.
+- **Etapas e status.** Regra única de correspondência (última coluna "Concluído", "Não realizada" conta) e três saídas: Não iniciados com A fazer, as etapas do meio com Finalizado e Concluídos (já tirado do Quadro, com a Data da Publicação). Casos fora da regra do Q9 viram avisos listados, nunca erro que derrube a carga. A data da modelagem piloto ou da publicação que falta, ou que está ilegível, num processo que deveria tê-la, recebe a data de hoje (o dia em que a planilha é lida), com aviso. A data da modelagem piloto no futuro continua ignorada, com aviso.
 - **Identidade do item.** Processo existente = mesmo setor e mesmo nome (comparação sem diferença de caixa e espaços nas pontas); versão existente = mesmo processo e mesmo número. Linha repetida na planilha: vale a primeira.
 - **Reaproveitamento de "A definir".** Um macroprocesso comum com esse nome por setor, criado pela importação; nenhuma regra especial no resto da plataforma.
 - **Falha no meio.** A gravação dos cadastros é por processo, de forma que cada processo é inteiro ou não entra; o resumo conta o que entrou. A segunda entrega envia arquivo a arquivo e mostra o andamento; repetir completa o que faltou.
@@ -137,3 +138,21 @@ O Administrador abre **Administração → Importação**, escolhe a planilha (p
 - **Suposição a confirmar no ticket 1:** que o usuário consegue exportar a aba como .csv (separador e codificação a conferir com um arquivo inventado); se a exportação pelo Excel gerar acentos quebrados, tratar como ajuste de leitura.
 - **Antes da carga real na produção:** backup do banco de produção (criar `BACKUP_SENHA_PRODUCAO`), conforme `.scratch/proximo-passo.md` e o roteiro de produção.
 - **Termos:** "Importação dos dados atuais", "setor", "macroprocesso", "processo", "versão", "relatório", "etapa", "Concluídos", "A definir" seguem o `CONTEXT.md`. Termos técnicos usados só para explicar (prévia, falso) não entram na tela nem no domínio.
+
+## Ajuste de 2026-11-06
+
+Status: ready-for-agent
+
+Pedido depois da primeira tentativa de carga no desenvolvimento (`/demanda`, mudança em funcionalidade existente) e planejado no modo curto. A planilha real tem processos com o piloto ou a publicação feitos e sem a data, e siglas como "DAE/CTL", que o banco recusa. Com a data de hoje no lugar da que falta, esses processos entram na etapa certa e ficam na lista de avisos, para a equipe corrigir a data depois. A sigla passa a entrar com hífen. O banco não muda.
+
+Respostas do usuário: aviso na prévia sempre que a data de hoje for usada; data ilegível tratada como data em branco; a data de hoje vale para todo processo fora de Não iniciados, e não só para os que ficam na Modelagem piloto; a sigla que continuar inválida depois da troca segue como hoje (falha na gravação e aparece no resumo).
+
+Critérios de pronto:
+
+- [ ] VII concluída sem Data da Publicação: o processo entra em Concluídos, tirado do Quadro, com a data de hoje e o aviso "VII - Publicação concluída sem Data da Publicação: usada a data de hoje."
+- [ ] VII concluída com Data da Publicação ilegível: o mesmo, com o aviso "Data da Publicação ilegível: usada a data de hoje."
+- [ ] Processo fora de Não iniciados sem data da modelagem piloto: entra com a data de hoje e o aviso "Modelagem Piloto sem data: usada a data de hoje."; com data ilegível, o mesmo, com o aviso "Data da Modelagem Piloto ilegível: usada a data de hoje."
+- [ ] Continuam iguais: a data da modelagem piloto no futuro é ignorada, com aviso; a data em processo Não iniciado é ignorada, com aviso; a Data da Publicação sem a VII concluída é ignorada, com aviso.
+- [ ] "DAE/CTL" e "DAE / CTL" entram como o setor "DAE-CTL", reaproveitam o "DAE-CTL" que já existe e contam como o mesmo setor para "já existia" e para linha repetida.
+- [ ] "Hoje" é a data do dia da leitura, a mesma que já serve para reconhecer a data no futuro.
+- [ ] Testes pela tela (`App.*.test.tsx`, .csv inventado) para cada critério acima; os testes que provavam a regra antiga (VII sem data em Publicação) são atualizados.
