@@ -149,10 +149,12 @@ Respostas do usuário: aviso na prévia sempre que a data de hoje for usada; dat
 
 Critérios de pronto:
 
-- [ ] VII concluída sem Data da Publicação: o processo entra em Concluídos, tirado do Quadro, com a data de hoje e o aviso "VII - Publicação concluída sem Data da Publicação: usada a data de hoje."
-- [ ] VII concluída com Data da Publicação ilegível: o mesmo, com o aviso "Data da Publicação ilegível: usada a data de hoje."
-- [ ] Processo fora de Não iniciados sem data da modelagem piloto: entra com a data de hoje e o aviso "Modelagem Piloto sem data: usada a data de hoje."; com data ilegível, o mesmo, com o aviso "Data da Modelagem Piloto ilegível: usada a data de hoje."
-- [ ] Continuam iguais: a data da modelagem piloto no futuro é ignorada, com aviso; a data em processo Não iniciado é ignorada, com aviso; a Data da Publicação sem a VII concluída é ignorada, com aviso.
-- [ ] "DAE/CTL" e "DAE / CTL" entram como o setor "DAE-CTL", reaproveitam o "DAE-CTL" que já existe e contam como o mesmo setor para "já existia" e para linha repetida.
-- [ ] "Hoje" é a data do dia da leitura, a mesma que já serve para reconhecer a data no futuro.
-- [ ] Testes pela tela (`App.*.test.tsx`, .csv inventado) para cada critério acima; os testes que provavam a regra antiga (VII sem data em Publicação) são atualizados.
+- [x] VII concluída sem Data da Publicação: o processo entra em Concluídos, tirado do Quadro, com a data de hoje e o aviso "VII - Publicação concluída sem Data da Publicação: usada a data de hoje."
+- [x] VII concluída com Data da Publicação ilegível: o mesmo, com o aviso "Data da Publicação ilegível: usada a data de hoje."
+- [x] Processo fora de Não iniciados sem data da modelagem piloto: entra com a data de hoje e o aviso "Modelagem Piloto sem data: usada a data de hoje."; com data ilegível, o mesmo, com o aviso "Data da Modelagem Piloto ilegível: usada a data de hoje."
+- [x] Continuam iguais: a data da modelagem piloto no futuro é ignorada, com aviso; a data em processo Não iniciado é ignorada, com aviso; a Data da Publicação sem a VII concluída é ignorada, com aviso.
+- [x] "DAE/CTL" e "DAE / CTL" entram como o setor "DAE-CTL", reaproveitam o "DAE-CTL" que já existe e contam como o mesmo setor para "já existia" e para linha repetida.
+- [x] "Hoje" é a data do dia da leitura, a mesma que já serve para reconhecer a data no futuro.
+- [x] Testes pela tela (`App.*.test.tsx`, .csv inventado) para cada critério acima; os testes que provavam a regra antiga (VII sem data em Publicação) são atualizados.
+
+Implementado em 2026-11-06 (commit fbb2957)
