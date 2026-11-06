@@ -1,4 +1,4 @@
-# DevFlow — v2.0.2 (2026-11-06)
+# DevFlow — v3.0 (2026-11-06)
 
 *Antigo Protocolo Alex Macedo. O histórico das versões 1.x está em `CHANGELOG-v1.md`; o desta versão, em `CHANGELOG.md`.*
 
@@ -7,7 +7,7 @@ Funil de desenvolvimento para Claude Code, com skills e plugins de terceiros orq
 ## 1. Arquivos deste pacote
 
 - `CLAUDE.md` — regras que valem em qualquer momento e a tabela do funil, com o modelo de cada etapa. Lido pelo Claude Code em toda mensagem. Vai na raiz do projeto.
-- `.claude/commands/*.md` — os catorze comandos. Funil: `projeto`, `setup`, `concepcao-livre`, `concepcao-premium`, `implementar-identidade`, `planejar`, `executar-simples`, `executar-complexo`, `polir`, `ship`. Apoio: `demanda`, `rapido`, `voltar`, `situação`.
+- `.claude/commands/*.md` — os treze comandos. Funil: `projeto`, `setup`, `concepcao-livre`, `implementar-identidade`, `planejar`, `executar-simples`, `executar-complexo`, `polir`, `ship`. Apoio: `demanda`, `rapido`, `voltar`, `situação`.
 - `.claude/regras/` — regras consultadas sob demanda, para o `CLAUDE.md` e os comandos ficarem curtos:
   - `interface.md`: princípios de interface e a vitrine (app com dados falsos);
   - `execucao.md`: receitas de execução no Windows (scripts, git, workflows do GitHub, ciclo do banco);
@@ -38,13 +38,11 @@ Instale uma vez, na sua conta; valem para qualquer projeto. O `/setup` confere q
 | Superpowers (`/superpowers:`) | brainstorming, planos, execução, depuração | `/plugin marketplace add obra/superpowers-marketplace` e `/plugin install superpowers@superpowers-marketplace` |
 | Ponytail | disciplina de simplicidade (precisa de `node` no PATH) | `/plugin marketplace add DietrichGebert/ponytail` e `/plugin install ponytail@ponytail` |
 | Impeccable (`/impeccable:impeccable`) | `init`, `shape`, `audit`, `polish` | `/plugin marketplace add pbakaus/impeccable` e `/plugin install impeccable@impeccable` |
-| Apple Design Skill | só no `/concepcao-premium` | `/plugin marketplace add NutshellEngineering/apple-design-skill` e `/plugin install apple-design-skill@apple-design-skill` |
-| security-auditor | auditoria de pacotes (`npm audit`) | upload avulso em claude.ai, Configurações, Capabilities, Skills |
 | `frontend-design`, `code-review`, `/security-review` | já vêm com o Claude Code | nada a instalar |
 
-Notas: as skills de invocação direta (`grill-with-docs`, `to-spec`, `to-tickets`, `implement`, `wayfinder`) só rodam digitadas por você e podem nem aparecer na lista do Claude; o comando delas volta pronto para você rodar. O script do `security-auditor` usa `2>/dev/null`, que o Windows não entende; o `/ship` manda rodar `npm audit --json` direto. Se a instalação oficial falhar por rede, use a seção 8.
+Notas: as skills de invocação direta (`grill-with-docs`, `to-spec`, `to-tickets`, `implement`, `wayfinder`) só rodam digitadas por você e podem nem aparecer na lista do Claude; o comando delas volta pronto para você rodar. A auditoria de pacotes de terceiros não precisa de skill: o passo 3 do `/ship` roda `npm audit --json` e monta o relatório. Se a instalação oficial falhar por rede, use a seção 8.
 
-**claude-mem** (opcional, memória entre sessões): `npx claude-mem install --provider claude`. Grava observações de tudo que passa pela sessão; não use em projeto com dados pessoais ou sensíveis sem liberação de quem responde por eles. Depende de cota do provedor e pode parar de gravar sem aviso.
+**Memória entre sessões.** O DevFlow não usa plugin de memória. A continuidade fica nos arquivos de `.scratch/` (spec, tickets, `proximo-passo.md`, handoff), lidos pelo `/situação`.
 
 **`gh`** (linha de comando do GitHub, recomendada): dispara workflows e lê o resultado sem navegador. Instale e rode `gh auth login` no seu terminal.
 
@@ -62,7 +60,7 @@ O hook `bloquear-git-destrutivo.mjs` lê cada comando que o Claude vai rodar e c
 2. Crie a pasta do projeto e copie para ela, desta pasta: `CLAUDE.md`, `README.md`, `GLOSSARIO.md`, `.gitattributes`, `.claude/` inteira, `docs/agents/` e `.scratch/melhorias-protocolo.md`.
 3. Abra o Claude Code nela e rode `/projeto`. O resultado fica em `.scratch/projeto.md`. Se você já tem uma especificação, anexe-a.
 4. Rode `/setup`. Ele conduz o scaffold, as ferramentas, o banco (se o projeto precisar), o git, o pre-commit e a trava.
-5. Siga o funil: `/concepcao-livre` ou `/concepcao-premium`, `/implementar-identidade`, e então `/planejar`, `/executar-*`, `/polir`, `/ship`, funcionalidade por funcionalidade. O que chega depois entra pelo `/demanda`. Para retomar numa sessão nova: `/situação`.
+5. Siga o funil: `/concepcao-livre`, `/implementar-identidade`, e então `/planejar`, `/executar-*`, `/polir`, `/ship`, funcionalidade por funcionalidade. O que chega depois entra pelo `/demanda`. Para retomar numa sessão nova: `/situação`.
 
 **Custo.** Desligado por padrão. Para medir, escreva "Custo ligado." na seção "Ajustes deste Projeto" do `CLAUDE.md` do projeto: os comandos passam a pedir o `/cost` e a gravar `.scratch/custos.md`.
 
@@ -70,11 +68,19 @@ O hook `bloquear-git-destrutivo.mjs` lê cada comando que o Claude vai rodar e c
 
 ## 5. Uso em projeto institucional
 
-Antes de usar o protocolo com dados de terceiros ou em trabalho oficial: verifique as normas sobre uso de IA e sobre proteção de dados pessoais (incluindo as internas do órgão); consulte a TI e o encarregado de dados sobre o envio do conteúdo do projeto à API da Anthropic e sobre plugins aceitos; confirme se a conta pode ser pessoal; decida sobre o claude-mem. Em projeto com banco, confirme onde os dados podem ficar (conta, região, dado pessoal real) e decida com o jurídico se é preciso registrar quem **leu** cada dado e como conciliar um histórico que não se altera com um pedido de eliminação de dados. A carga de dados reais é sempre sua, fora da sessão, com arquivos fora da pasta do projeto ou em `dados-reais/` (ignorada pelo git e nunca lida pelo Claude).
+Antes de usar o protocolo com dados de terceiros ou em trabalho oficial: verifique as normas sobre uso de IA e sobre proteção de dados pessoais (incluindo as internas do órgão); consulte a TI e o encarregado de dados sobre o envio do conteúdo do projeto à API da Anthropic e sobre plugins aceitos; confirme se a conta pode ser pessoal. Em projeto com banco, confirme onde os dados podem ficar (conta, região, dado pessoal real) e decida com o jurídico se é preciso registrar quem **leu** cada dado e como conciliar um histórico que não se altera com um pedido de eliminação de dados. A carga de dados reais é sempre sua, fora da sessão, com arquivos fora da pasta do projeto ou em `dados-reais/` (ignorada pelo git e nunca lida pelo Claude).
 
-## 6. Atualizar um projeto antigo para a v2.0
+## 6. Atualizar um projeto antigo para a v3.0
 
 Troque os arquivos do protocolo pelos desta versão, preservando a seção "Ajustes deste Projeto" do `CLAUDE.md` (copie-a para o arquivo novo). Depois:
+
+**Vindo da v2.0.x**
+
+- **`/concepcao-premium`:** apague `.claude/commands/concepcao-premium.md` do projeto e desinstale a Apple Design Skill (`/plugin`), se ela não serve a outro projeto.
+- **claude-mem:** desinstale o plugin (`/plugin`) e apague a pasta de dados dele na sua pasta de usuário (`.claude-mem`). Ela guarda as capturas antigas, inclusive as que tiverem dado pessoal; apagar a pasta é com você, no seu terminal.
+- **security-auditor:** a skill pode ser retirada em claude.ai, Configurações, Capabilities, Skills. O `/ship` faz a auditoria de pacotes sozinho; o `.scratch/security.md` que já existe continua valendo como linha de base.
+
+**Vindo da v1.x, além do que está acima**
 
 - **Pre-commit:** troque o `npm test` do `.husky/pre-commit` pelo `vitest related` dentro do lint-staged (passo 12 do `/setup`).
 - **Vitrine:** crie o script `vitrine`, `src/vitrine/` e `src/lib/acesso.ts` (passo 6a do `/setup`) e acrescente a entrada `vitrine` ao `.claude/launch.json`.
@@ -111,12 +117,12 @@ Em rede corporativa com proxy, `npm`, `git` e o login do Claude Code falham com 
 ## 9. Versionamento e manutenção
 
 - **Cópia mestra.** Esta pasta, com git, fora de qualquer projeto. É dela que cada projeto copia os arquivos, e é nela que as mudanças são feitas.
-- **Versões.** Versão nova inteira (v3.0) quando o funil muda; v2.1 quando entra uma regra nova; v2.0.1 para correção de texto. O número fica no topo do `CLAUDE.md`, deste README, do `GLOSSARIO.md` e dos arquivos de `.claude/regras/`; cada versão ganha uma entrada no `CHANGELOG.md`, e entradas antigas não se editam.
+- **Versões.** Versão nova inteira (v4.0) quando o funil muda; v3.1 quando entra uma regra nova; v3.0.1 para correção de texto. O número fica no topo do `CLAUDE.md`, deste README, do `GLOSSARIO.md` e dos arquivos de `.claude/regras/`; cada versão ganha uma entrada no `CHANGELOG.md`, e entradas antigas não se editam.
 - **Melhorias descobertas num projeto.** O Claude registra em `.scratch/melhorias-protocolo.md` e avisa você. Periodicamente, leve os registros para esta pasta, decida o que muda e gere uma versão nova. Só entra o que valeria para qualquer projeto.
 - **Documentos sincronizados.** Quando o funil, um comando ou uma regra mudar, atualize junto o `GLOSSARIO.md` (termos novos), `.claude/regras/nao-testados.md`, este README e o `CHANGELOG.md`.
 - **Pacotes de terceiros.** Atualizar um plugin é decisão deliberada, registrada no `CHANGELOG.md`.
 
-## 10. Pendências conhecidas da v2.0
+## 10. Pendências conhecidas
 
 - **Trava de git:** os falsos positivos descritos na seção 3 ainda não foram corrigidos no hook (tem 31 KB e um arquivo de teste extenso; a correção pede um ciclo próprio, com teste do que ela deixa de bloquear). A lista de padrões problemáticos está no registro de melhorias do projeto de origem.
 - **Roteiros de produção automatizados** (workflows de backup e de migração em produção, scripts de produção): existem no projeto de origem, mas não entraram nesta versão porque dependem de segredos de produção e ainda não foram generalizados.

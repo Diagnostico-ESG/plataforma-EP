@@ -1,4 +1,4 @@
-# Glossário — DevFlow v2.0.2
+# Glossário — DevFlow v3.0
 
 Termos técnicos explicados em linguagem simples, conforme foram surgindo nas conversas sobre o protocolo. Atualizar conforme novos termos aparecerem.
 
@@ -100,9 +100,8 @@ Termos técnicos explicados em linguagem simples, conforme foram surgindo nas co
 
 **Build** — processo que transforma o código-fonte (TypeScript, JSX) em HTML/CSS/JavaScript puro que o navegador entende, otimizado e pronto para produção. Diferente de lint/typecheck/teste: confirma que o projeto está estruturalmente completo (sem import quebrado, sem arquivo faltando), não que o comportamento está certo.
 
-**Hook** — pequeno programa que roda sozinho em certos momentos, sem pedir licença. Os hooks do Git rodam a cada commit (é assim que o Husky funciona). Os hooks do Claude Code rodam no início da sessão ou antes e depois de cada ação do Claude (é assim que o Ponytail, o claude-mem e a trava de git agem "sozinhos"). Em React, "hook" é outra coisa: uma função que guarda estado ou efeitos de uma tela (`useAlgumaCoisa`), em `src/hooks/`.
+**Hook** — pequeno programa que roda sozinho em certos momentos, sem pedir licença. Os hooks do Git rodam a cada commit (é assim que o Husky funciona). Os hooks do Claude Code rodam no início da sessão ou antes e depois de cada ação do Claude (é assim que o Ponytail e a trava de git agem "sozinhos"). Em React, "hook" é outra coisa: uma função que guarda estado ou efeitos de uma tela (`useAlgumaCoisa`), em `src/hooks/`.
 
-**claude-mem** — plugin opcional que guarda um resumo das sessões passadas. Grava o que o Claude lê, por isso dado pessoal e chave nunca devem entrar na conversa.
 
 **Subagente** — outro Claude, aberto pelo principal para fazer uma parte do trabalho em paralelo (a revisão de código usa dois).
 
@@ -232,7 +231,7 @@ Termos técnicos explicados em linguagem simples, conforme foram surgindo nas co
 
 **API / endpoint** — ponto de acesso por onde um sistema conversa com outro. A interface do projeto fala com o Supabase pela API dele; endpoint é o endereço de cada ponto de acesso.
 
-**CVE** — identificador padrão de uma vulnerabilidade de segurança conhecida (ex.: CVE-2026-1234). Aparece nos relatórios do `security-auditor`.
+**CVE** — identificador padrão de uma vulnerabilidade de segurança conhecida (ex.: CVE-2026-1234). Aparece no relatório da auditoria de pacotes do `/ship` (`npm audit`).
 
 ## Novos na v2.0
 

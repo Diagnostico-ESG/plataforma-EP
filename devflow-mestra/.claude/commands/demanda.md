@@ -60,5 +60,5 @@ Com base na demanda que descrevi nesta conversa (e em `.scratch/backlog.md`, se 
 3. Segue o funil normal a partir daí. Concepção visual e implementação de identidade não se repetem: a identidade do projeto já existe.
 
 **Mudança de identidade visual**
-1. `/concepcao-livre` ou `/concepcao-premium` → `/implementar-identidade`, como no início do projeto.
+1. `/concepcao-livre` → `/implementar-identidade`, como no início do projeto.
 2. Depois, `/polir` para conferir se as telas existentes ficaram consistentes com a identidade nova. O redesenho termina aí: o `/implementar-identidade` já rodou testes e `code-review`, e o `/polir` comita e registra os achados. O `/ship` só roda se `package.json` mudou.

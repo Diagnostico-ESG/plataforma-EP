@@ -1,8 +1,8 @@
 ---
-description: Implementa em código a identidade visual proposta em /concepcao-livre ou /concepcao-premium, antes de qualquer trabalho funcional — fecha a lacuna entre proposta e código.
+description: Implementa em código a identidade visual proposta em /concepcao-livre, antes de qualquer trabalho funcional — fecha a lacuna entre proposta e código.
 ---
 
-A proposta de identidade visual aprovada fica em `.scratch/identidade-visual.md` (gravada pelo `/concepcao-livre` ou `/concepcao-premium`). Leia esse arquivo antes de tudo. Se ele não existir mas a proposta estiver nesta conversa, salve-a lá agora, mostre-me o que gravou e peça confirmação de que é a versão aprovada. Se não existir em lugar nenhum, pare e aponte o `/concepcao-livre` ou o `/concepcao-premium`.
+A proposta de identidade visual aprovada fica em `.scratch/identidade-visual.md` (gravada pelo `/concepcao-livre`). Leia esse arquivo antes de tudo. Se ele não existir mas a proposta estiver nesta conversa, salve-a lá agora, mostre-me o que gravou e peça confirmação de que é a versão aprovada. Se não existir em lugar nenhum, pare e aponte o `/concepcao-livre`.
 
 A proposta ainda não existe em código — só uma proposta não é suficiente para prosseguir.
 

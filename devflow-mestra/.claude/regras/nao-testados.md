@@ -1,4 +1,4 @@
-# Itens ainda não testados num projeto real — DevFlow v2.0.2
+# Itens ainda não testados num projeto real — DevFlow v3.0
 
 Como usar: ao terminar um comando, leia o bloco dele e o bloco "Qualquer momento". Para cada item que aconteceu nesta execução e ainda não tem entrada em `.scratch/melhorias-protocolo.md`, acrescente uma entrada com a data, o item, o que era esperado e o que aconteceu. Quem avalia se funcionou sou eu.
 
@@ -28,7 +28,7 @@ O `/situação` só lê e não registra nada.
 - Passo 10: configuração das skills do Matt Pocock pronta no pacote, sem rodar a skill de setup.
 - Passo 12: pre-commit com `vitest related` no lint-staged e sem `npm test` inteiro.
 
-## /concepcao-livre, /concepcao-premium e /implementar-identidade
+## /concepcao-livre e /implementar-identidade
 
 - Imagens de referência, limite de rodadas e quadro comparativo; modo "consolidar protótipos aprovados"; estilo dos controles na identidade.
 - Teste só dos arquivos tocados durante a implementação da identidade.
@@ -70,3 +70,8 @@ O `/situação` só lê e não registra nada.
 
 - `/demanda`: lista de itens, exploração livre, pacote misto, infraestrutura e ferramentas, teste instável.
 - `/voltar`: sem confirmação nesta lista, nem em projeto sem banco.
+
+## /ship e /setup (v3.0)
+
+- Auditoria de pacotes do passo 3 do `/ship` feita com `npm audit --json` e `npm audit --omit=dev --json`, sem a skill `security-auditor`: relatório por severidade, separação entre produção e desenvolvimento, `fixAvailable` e `isSemVerMajor`.
+- Projeto sem claude-mem do começo ao fim: continuidade só pelos arquivos de `.scratch/` e pelo `/situação`; handoff só nos três casos do `CLAUDE.md`.

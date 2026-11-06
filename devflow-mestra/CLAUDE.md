@@ -1,4 +1,4 @@
-# DevFlow — v2.0.2 (2026-11-06)
+# DevFlow — v3.0 (2026-11-06)
 
 Igual em todos os projetos; exceções de cada projeto ficam na última seção. O detalhe de cada etapa está no comando dela (`.claude/commands/`); este arquivo traz as regras que valem em qualquer momento, inclusive fora do funil. Serve a aplicações web com interface, em Vite + React + TypeScript, com ou sem banco Supabase, em Windows.
 
@@ -26,10 +26,9 @@ O resumo do projeto inteiro (o que é, para quem, funcionalidades principais em 
 
 * Testes, exemplos, fixtures e `seed.sql` usam só dados inventados. Dado pessoal real só existe em produção.
 * Nunca leia nem exiba segredos (`.env`, `.env.local`, `.env.*.local`, chaves, senhas, tokens) nem o conteúdo da pasta `dados-reais/`. Para saber quais variáveis existem, use o `.env.example`, sem valores. Se a saída de um comando trouxer uma chave, não repita o valor.
-* Ao encontrar dado pessoal ou sensível (nome completo de pessoa real, CPF, e-mail ou telefone real, dado de saúde): pare de trabalhar com ele, informe o que encontrou sem repetir os dados, pergunte se quero desativar o claude-mem e lembre que o que ele já capturou precisa ser apagado.
+* Ao encontrar dado pessoal ou sensível (nome completo de pessoa real, CPF, e-mail ou telefone real, dado de saúde): pare de trabalhar com ele e informe o que encontrou sem repetir os dados.
 * **Dados reais** (planilhas, e-mails `.eml`, documentos, bases de outros sistemas) ficam fora da sessão. A pasta `dados-reais/` (ignorada pelo git) é minha. Um importador se escreve e se testa com arquivo fictício no mesmo formato, e a carga real eu rodo no meu computador. Se eu quiser que você veja um exemplo com nome ou e-mail de pessoa, peça que eu o anonimize antes.
 * Arquivo de exemplo que entra no git (diagrama, planilha) vai sem nome de pessoa, e-mail, número de documento ou informação sigilosa da instituição. Na dúvida, pergunte antes de copiá-lo para o projeto.
-* O claude-mem pode parar de gravar sem aviso (cota esgotada do provedor). Se isso acontecer, prossiga sem ele, sem reiniciar o plugin, e me avise que a sessão não vai ficar registrada nele.
 
 ## Banco de Dados (Supabase)
 
@@ -56,7 +55,7 @@ Em conflito entre instruções, vale esta ordem:
 2. O comando da etapa atual.
 3. Este `CLAUDE.md` e os arquivos de `.claude/regras/` (entre os dois, vale a regra mais específica).
 4. Regras das skills, dentro da etapa. **Vale a mais cautelosa:** skill mais rigorosa que o protocolo prevalece; skill que afrouxaria o protocolo (pular teste, revisão ou etapa) cede.
-5. Memória de sessões passadas, inclusive a do claude-mem, é contexto. Se contradiz os arquivos atuais, valem os arquivos.
+5. Memória de sessões passadas, inclusive a memória automática do Claude Code, é contexto. Se contradiz os arquivos atuais, valem os arquivos.
 
 **Em segredos, dado pessoal, banco e comandos destrutivos, vale sempre a instrução mais cautelosa**, venha do comando, deste arquivo ou das regras; só a minha instrução explícita no momento afrouxa.
 
@@ -96,7 +95,7 @@ O Ponytail simplifica a solução e deixa o processo intacto. Spec e código div
 |Etapa|Comando|Modelo|
 |-|-|-|
 |0|`/projeto`, depois `/setup` (uma vez por projeto)|Opus no `/projeto`, Sonnet no `/setup`|
-|1|`/concepcao-livre` ou `/concepcao-premium` (uma vez, ou num redesenho)|Opus|
+|1|`/concepcao-livre` (uma vez, ou num redesenho)|Opus|
 |2|`/implementar-identidade`|Sonnet|
 |3|`/planejar`, por funcionalidade|Opus no modo completo, Sonnet no curto|
 |4|`/executar-simples` ou `/executar-complexo`, por ticket|Sonnet|
@@ -110,7 +109,7 @@ Cada funcionalidade nova começa no `/planejar`. Para uma iniciativa que não ca
 
 **Ao fim de cada etapa**, diga o próximo comando e o modelo da tabela (e, com custo ligado, peça o `/cost`).
 
-**Troca de sessão.** Antes de encerrar a conversa, confirme que o resultado da etapa já está em arquivo. A sessão nova, com o modelo recomendado, começa pelo `/situação`; `/clear` + `/model` na mesma sessão só quando eu pedir. Rode `/mattpocock-skills:handoff` em quatro casos: há algo que os arquivos não guardam (decisão em aberto, tarefa pela metade); a pausa atravessa dias ou troca de máquina; o claude-mem está indisponível; eu pedi. O handoff leva só o que não está em arquivo, com o **estado atual no topo**, e aponta os arquivos para o resto. Peça à skill que salve em `.scratch/handoff-AAAA-MM-DD.md` (o padrão dela é uma pasta temporária, fora do projeto) e, depois, apague você os handoffs anteriores.
+**Troca de sessão.** Antes de encerrar a conversa, confirme que o resultado da etapa já está em arquivo. A sessão nova, com o modelo recomendado, começa pelo `/situação`; `/clear` + `/model` na mesma sessão só quando eu pedir. Rode `/mattpocock-skills:handoff` em três casos: há algo que os arquivos não guardam (decisão em aberto, tarefa pela metade); a pausa atravessa dias ou troca de máquina; eu pedi. O handoff leva só o que não está em arquivo, com o **estado atual no topo**, e aponta os arquivos para o resto. Peça à skill que salve em `.scratch/handoff-AAAA-MM-DD.md` (o padrão dela é uma pasta temporária, fora do projeto) e, depois, apague você os handoffs anteriores.
 
 **Toda mudança de código passa pelo funil**, inclusive a que parece trivial. Nunca aplique uma mudança direto; decidir pular TDD ou revisão cabe a mim.
 

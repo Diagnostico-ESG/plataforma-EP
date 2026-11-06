@@ -2,6 +2,24 @@
 
 Uma entrada por versão, da mais recente para a mais antiga. Entradas antigas nunca são editadas. O histórico das versões 1.x (até a v1.9) está em `CHANGELOG-v1.md`.
 
+## v3.0 — 2026-11-06 (retirada do claude-mem, da Apple Design Skill e do security-auditor)
+
+**Motivo.** A análise de skills e plugins do projeto de origem (228 sessões, cerca de 200 registros de melhoria) apontou três peças que custavam mais do que entregavam. O claude-mem teve 25 avisos de cota esgotada desde meados de outubro, o projeto seguiu sem ele porque os arquivos de `.scratch/` já guardavam o andamento, e ele gravou capturas com dado pessoal. A Apple Design Skill nunca foi usada: o `/concepcao-premium`, único comando que dependia dela, não rodou nenhuma vez. O `security-auditor` rodou uma vez, e o script dele falha no Windows; o `/ship` já mandava rodar `npm audit --json` direto. A versão é inteira porque o funil perde um comando.
+
+**Saiu**
+- Comando `/concepcao-premium` e a Apple Design Skill da lista de instalação. A etapa 1 do funil passa a ser só o `/concepcao-livre`.
+- claude-mem: a regra de cota esgotada, a pergunta sobre desativá-lo ao achar dado pessoal, o caso "claude-mem indisponível" do handoff (agora são três casos), a sugestão de desativá-lo no passo 2 do `/setup`, o parágrafo de instalação e o verbete do glossário.
+- Skill `security-auditor` da lista de instalação.
+
+**Mudou**
+- `/ship`, passo 3: a auditoria de pacotes vira regra própria. Roda `npm audit --json` e `npm audit --omit=dev --json`, monta o relatório por severidade, separa produção de desenvolvimento, lê `fixAvailable` e `isSemVerMajor`, define achado real (crítica ou alta em dependência de produção) e proíbe `npm audit fix --force`. Passos 8 e 10 e o passo 7 da revisão de segurança para produção (`producao.md`) passam a falar em "auditoria de pacotes".
+- `CLAUDE.md`, Ordem de Precedência: a memória de sessões passadas citada é a memória automática do Claude Code.
+- `/setup`, passo 2: com dado pessoal no projeto, lembra a regra de "Dados e Segredos" em vez de sugerir desativar o claude-mem.
+- README: seção 6 com o caminho a partir da v2.0.x (apagar o comando, desinstalar os plugins, apagar a pasta `.claude-mem`); exemplos de numeração da seção 9 atualizados; seção 10 sem número de versão no título.
+- `nao-testados.md`: bloco novo para a auditoria de pacotes sem skill e para o projeto sem claude-mem.
+
+**Fica para depois.** As outras propostas da análise (`implement`, `writing-plans`, `executing-plans`, `finishing-a-development-branch`, `handoff` e `/security-review` como regras próprias; `to-spec` e `to-tickets` numa segunda rodada; a decisão sobre o Ponytail) não entraram nesta versão.
+
 ## v2.0.2 — 2026-11-06 (lacunas apontadas pelo material "111 conceitos de engenharia")
 
 **Motivo.** Comparação do DevFlow com uma lista de 111 conceitos de engenharia e o "top 15" do que mais derruba app em produção. Em segurança de dados o DevFlow já ia além; as lacunas estavam no que acontece depois de estar no ar e no desempenho. Entrou só o que serve a um sistema pequeno em Vite, React e Supabase. A lista dos 111 não foi copiada: cerca de 60 itens são de sistema distribuído e em escala.
