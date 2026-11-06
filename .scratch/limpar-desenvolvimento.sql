@@ -24,7 +24,7 @@ begin
   for tabela in
     select tablename from pg_tables
     where schemaname = 'public'
-      and tablename not in ('usuarios', 'usuarios_emails', 'autorizacoes')
+      and tablename not in ('usuarios', 'usuarios_emails', 'autorizacoes', 'etapas')
   loop
     execute format('truncate table public.%I restart identity cascade', tabela);
   end loop;
@@ -39,6 +39,9 @@ begin
     set criada_por = null
     where criada_por is not null
       and criada_por not in (select id from public.usuarios where perfil = 'administrador');
+  -- O catálogo de etapas é dado fixo do sistema (nasce nas migrações): fica, só perde o responsável inicial apagado.
+  update public.etapas set responsavel_inicial_id = null
+    where responsavel_inicial_id not in (select id from public.usuarios where perfil = 'administrador');
   delete from public.usuarios where perfil <> 'administrador';
   delete from auth.users where id not in (select id from public.usuarios);
 
