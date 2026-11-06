@@ -262,3 +262,38 @@
 .caixa-do-responsavel-inicial {
   min-width: 26ch;
 }
+
+/* Aba Importação: as duas etapas em sequência, cada uma com seus passos. */
+.importacao-etapa {
+  margin-top: var(--esp-5);
+  padding-top: var(--esp-4);
+  border-top: 1px solid var(--linha);
+}
+
+.importacao-etapa > h3 {
+  margin: 0 0 var(--esp-3);
+  font-size: var(--tam-coluna);
+}
+
+.importacao-subtitulo {
+  margin: 0 0 var(--esp-3);
+  font-size: var(--tam-secundario);
+  font-weight: 600;
+}
+
+.importacao-contagens {
+  margin: var(--esp-3) 0;
+  font-weight: 600;
+}
+
+.importacao-avisos ul {
+  margin: 0 0 var(--esp-3);
+  padding-left: var(--esp-5);
+}
+
+.importacao-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-3);
+  margin-top: var(--esp-4);
+}

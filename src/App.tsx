@@ -1,5 +1,6 @@
 import type { ModuloDeAcesso } from './acesso/tipos'
 import type { ModuloDeCadastros } from './cadastros/tipos'
+import type { ModuloDeImportacao } from './importacao/tipos'
 import type { ModuloDePlanilhas } from './planilhas/tipos'
 import type { ModuloDeProcessos } from './processos/tipos'
 import type { ModuloDeRevisoes } from './revisoes/tipos'
@@ -21,13 +22,15 @@ type AppProps = {
   versoes: ModuloDeVersoes
   revisoes: ModuloDeRevisoes
   planilhas: ModuloDePlanilhas
+  /** Ligado no main; os testes das outras áreas não o passam e a aba Importação some. */
+  importacao?: ModuloDeImportacao
 }
 
 const TITULO_DA_AREA: Record<AreaDoSistema, string> = {
   processos: 'Processos', setores: 'Setores', painel: 'Painel', administracao: 'Administração', ajuda: 'Ajuda',
 }
 
-function App({ acesso, cadastros, processos, versoes, revisoes, planilhas }: AppProps) {
+function App({ acesso, cadastros, processos, versoes, revisoes, planilhas, importacao }: AppProps) {
   const { estado, entrar, sair, tentarDeNovo } = useEntrada(acesso)
   const [area, irPara] = useAreaAtual()
   if (estado.tipo !== 'dentro') {
@@ -39,7 +42,7 @@ function App({ acesso, cadastros, processos, versoes, revisoes, planilhas }: App
         versoes={versoes} revisoes={revisoes} />}
       {area === 'setores' && <AreaDeCadastros usuario={estado.usuario} cadastros={cadastros} processos={processos} />}
       {area === 'administracao' && <AreaDeAdministracao usuario={estado.usuario} acesso={acesso} processos={processos}
-        planilhas={planilhas} />}
+        planilhas={planilhas} importacao={importacao} />}
       {area === 'painel' && <TelaEmBreve titulo="Painel" texto="Em breve: o Painel com os números do EP chega na v1.5." />}
       {area === 'ajuda' && <TelaEmBreve titulo="Ajuda" texto="Em breve: a Ajuda da plataforma." />}
     </Moldura>

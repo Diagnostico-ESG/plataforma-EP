@@ -4,6 +4,7 @@ import './index.css'
 import App from './App.tsx'
 import { criarAcessoSupabase } from './acesso/acessoSupabase'
 import { criarCadastrosSupabase } from './cadastros/cadastrosSupabase'
+import { criarImportacaoSupabase } from './importacao/importacaoSupabase'
 import { supabase } from './lib/supabase'
 import { criarPlanilhasSupabase } from './planilhas/planilhasSupabase'
 import { RECUSAS_DOS_PROCESSOS, criarProcessosSupabase } from './processos/processosSupabase'
@@ -18,10 +19,11 @@ const processos = criarProcessosSupabase(supabase)
 const versoes = criarVersoesSupabase(supabase)
 const revisoes = criarRevisoesSupabase(supabase, RECUSAS_DOS_PROCESSOS)
 const planilhas = criarPlanilhasSupabase(supabase)
+const importacao = criarImportacaoSupabase(supabase)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App acesso={acesso} cadastros={cadastros} processos={processos} versoes={versoes} revisoes={revisoes}
-      planilhas={planilhas} />
+      planilhas={planilhas} importacao={importacao} />
   </StrictMode>,
 )

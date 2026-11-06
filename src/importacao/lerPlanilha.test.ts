@@ -1,40 +1,8 @@
 import { describe, expect, test } from 'vitest'
+import { type ParteDaLinha as Parte, csvDaPlanilha as csv, linhaDaPlanilha as linha } from '../testes/planilhaDeTeste'
 import { ColunasFaltando, lerPlanilha } from './lerPlanilha'
 
 const HOJE = new Date(2026, 10, 5)
-const CABECALHO = [
-  'Área', 'Macros', 'Processos', '', 'I - Ident. Respons.', 'II - Reun. Sensib.', 'III - Ident. Macrop.',
-  'Modelagem Piloto', 'Data da Modelagem Piloto', 'Modelagem Técnica', 'Revisão Interna', 'V - Relatório Piloto',
-  'VI - Revisão e validação', 'VII - Publicação', 'Data da Publicação', 'VIII - Avaliação', 'IX - Remodelagem',
-  'Observações', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8',
-]
-
-type Parte = {
-  area?: string; macro?: string; nome?: string; mp?: string; dmp?: string; mt?: string; ri?: string; rp?: string
-  vi?: string; vii?: string; dp?: string; obs?: string
-}
-
-// Colunas fora das usadas ficam vazias; cada argumento é a coluna da planilha com o mesmo nome.
-const PADRAO: Required<Parte> = {
-  area: 'XYZ', macro: 'I - Gestão de exemplos', nome: 'Exemplo Alfa', mp: '', dmp: '', mt: '', ri: '', rp: '', vi: '', vii: '',
-  dp: '', obs: '',
-}
-
-function linha(parte: Parte): string[] {
-  const p = { ...PADRAO, ...parte }
-  return [
-    p.area, p.macro, p.nome, '', '', '', '', p.mp, p.dmp, p.mt, p.ri, p.rp, p.vi, p.vii, p.dp, '', '', p.obs,
-    'x', '', '', '', '', '', '', '',
-  ]
-}
-
-function csv(linhas: string[][], separador = ';'): string {
-  const titulo = ['ETAPAS DO MAPEAMENTO', ...Array(25).fill('')]
-  const subtitulo = ['', '', '', '', '', '', '', 'IV - Modelagem', ...Array(18).fill('')]
-  const todas = [titulo, subtitulo, CABECALHO, ...linhas]
-  return todas.map((l) => l.join(separador)).join('\r\n')
-}
-
 function ler(p: Parte) {
   return lerPlanilha(csv([linha(p)]), HOJE)
 }
