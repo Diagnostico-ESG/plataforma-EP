@@ -94,9 +94,9 @@
   --capa-brilho: color-mix(in srgb, var(--azul) 18%, transparent);
   --capa-traco: rgb(255 255 255 / 16%);
   --capa-ponta: rgb(255 255 255 / 30%);
-  --capa-coluna: rgb(255 255 255 / 6%);
+  --capa-coluna: #2d3441;
+  --capa-sombra-coluna: 0 24px 50px rgb(0 0 0 / 45%), 0 0 0 1px rgb(255 255 255 / 8%);
   --capa-cabeca: rgb(255 255 255 / 10%);
-  --capa-cabeca-icone: #dfe3ea;
   --capa-barra: #d9dde5;
   --capa-sombra: 0 6px 16px rgb(0 0 0 / 25%);
 

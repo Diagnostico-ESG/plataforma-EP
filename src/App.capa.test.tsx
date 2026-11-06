@@ -28,13 +28,15 @@ test('a capa mostra o órgão, o título e a frase da plataforma acima do botão
   expect(emOrdem, 'esperado: selo EP, órgão, título, frase e botão, nesta ordem').toBe(true)
 })
 
-test('a ilustração do Quadro tem as 8 etapas, fica fora do leitor de tela e não tem texto nem foco', async () => {
+test('a ilustração tem 3 colunas em degrau (3, 2 e 1 cartões) sem ícone no cabeçalho, fora do leitor de tela e sem texto nem foco', async () => {
   abrirEntrada()
   await screen.findByRole('button', { name: 'Entrar com a conta institucional' })
   const ilustracao = document.querySelector('.capa-ilustracao')
   expect(ilustracao, 'esperado um elemento .capa-ilustracao na tela de entrada').not.toBeNull()
   expect(ilustracao?.getAttribute('aria-hidden')).toBe('true')
-  expect(ilustracao?.querySelectorAll('.capa-coluna')).toHaveLength(8)
+  const colunas = [...(ilustracao?.querySelectorAll('.capa-coluna') ?? [])]
+  expect(colunas.map((coluna) => coluna.querySelectorAll('.capa-cartao').length)).toEqual([3, 2, 1])
+  expect(ilustracao?.querySelectorAll('.capa-cabeca svg'), 'o cabeçalho das colunas é liso, sem ícone').toHaveLength(0)
   expect(ilustracao?.textContent?.trim(), 'a ilustração não leva texto').toBe('')
   expect(ilustracao?.querySelectorAll('button, a, input, [tabindex]')).toHaveLength(0)
 })

@@ -123,14 +123,15 @@
   stroke-dasharray: 6 7;
 }
 
+/* Três colunas de frente, centralizadas; cada coluna termina no último cartão (flex-start), o que dá o degrau. */
 .capa-quadro {
   position: absolute;
-  top: 250px;
-  left: 70px;
+  top: 50%;
+  left: 50%;
   display: flex;
-  gap: 14px;
-  transform: perspective(1800px) rotateX(12deg) rotateY(-10deg) rotateZ(-4deg) scale(0.92);
-  transform-origin: 0 0;
+  align-items: flex-start;
+  gap: var(--esp-4);
+  transform: translate(-50%, -50%) scale(1.1);
 }
 
 .capa-coluna {
@@ -141,15 +142,14 @@
   padding: 10px;
   border-radius: var(--canto);
   background: var(--capa-coluna);
+  box-shadow: var(--capa-sombra-coluna);
 }
 
+/* Cabeçalho liso, sem ícone nem nome. */
 .capa-cabeca {
-  display: flex;
-  justify-content: center;
-  padding: 7px 9px;
+  height: 30px;
   border-radius: var(--canto-botao);
   background: var(--capa-cabeca);
-  color: var(--capa-cabeca-icone);
 }
 
 .capa-cartao {
