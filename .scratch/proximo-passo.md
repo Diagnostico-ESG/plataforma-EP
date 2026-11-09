@@ -8,3 +8,13 @@
 3. `/planejar checklist-do-cartao` (Opus, modo completo).
 
 **Em outra frente (continua valendo):** antes da carga real: backup da produção (criar `BACKUP_SENHA_PRODUCAO`) e publicar na produção a migração `20261106230000_importado_concluido_no_quadro` (ADR 0045; já aplicada no desenvolvimento) pelo roteiro de produção, a seu pedido. Limpar o banco de desenvolvimento (`.scratch/limpar-desenvolvimento.sql`) e importar a planilha real pela tela. Para a equipe usar o site: visibilidade Público na Netlify. Abertos: `planilhas-dos-dashboards` e cofre; `.env` no `.gitignore`; decisões de LGPD; pendências da atualização do DevFlow no `backlog.md`.
+
+**Para começar a sessão nova (Sonnet), digite, na ordem:**
+
+```
+/stc
+```
+
+```
+/executar-complexo .scratch/importacao-dados-atuais/issues/02-arquivos-das-versoes-da-pasta.md
+```
