@@ -1,4 +1,4 @@
-# Regras de banco de dados — DevFlow v2.0.2
+# Regras de banco de dados — DevFlow v3.5
 
 Referência para projetos com a pasta `supabase/`. O `CLAUDE.md` traz as regras curtas e aponta para cá; os comandos que mexem no banco mandam ler as seções daqui. Leia o arquivo inteiro, uma vez por sessão, antes de planejar, criar ou alterar migração, política, função, view, gatilho, bucket, login, Edge Function ou código que envia ou abre arquivos.
 

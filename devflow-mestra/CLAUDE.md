@@ -1,4 +1,4 @@
-# DevFlow — v2.0.2 (2026-11-06)
+# DevFlow — v3.5 (2026-11-06)
 
 Igual em todos os projetos; exceções de cada projeto ficam na última seção. O detalhe de cada etapa está no comando dela (`.claude/commands/`); este arquivo traz as regras que valem em qualquer momento, inclusive fora do funil. Serve a aplicações web com interface, em Vite + React + TypeScript, com ou sem banco Supabase, em Windows.
 
@@ -26,10 +26,9 @@ O resumo do projeto inteiro (o que é, para quem, funcionalidades principais em 
 
 * Testes, exemplos, fixtures e `seed.sql` usam só dados inventados. Dado pessoal real só existe em produção.
 * Nunca leia nem exiba segredos (`.env`, `.env.local`, `.env.*.local`, chaves, senhas, tokens) nem o conteúdo da pasta `dados-reais/`. Para saber quais variáveis existem, use o `.env.example`, sem valores. Se a saída de um comando trouxer uma chave, não repita o valor.
-* Ao encontrar dado pessoal ou sensível (nome completo de pessoa real, CPF, e-mail ou telefone real, dado de saúde): pare de trabalhar com ele, informe o que encontrou sem repetir os dados, pergunte se quero desativar o claude-mem e lembre que o que ele já capturou precisa ser apagado.
+* Ao encontrar dado pessoal ou sensível (nome completo de pessoa real, CPF, e-mail ou telefone real, dado de saúde): pare de trabalhar com ele e informe o que encontrou sem repetir os dados.
 * **Dados reais** (planilhas, e-mails `.eml`, documentos, bases de outros sistemas) ficam fora da sessão. A pasta `dados-reais/` (ignorada pelo git) é minha. Um importador se escreve e se testa com arquivo fictício no mesmo formato, e a carga real eu rodo no meu computador. Se eu quiser que você veja um exemplo com nome ou e-mail de pessoa, peça que eu o anonimize antes.
 * Arquivo de exemplo que entra no git (diagrama, planilha) vai sem nome de pessoa, e-mail, número de documento ou informação sigilosa da instituição. Na dúvida, pergunte antes de copiá-lo para o projeto.
-* O claude-mem pode parar de gravar sem aviso (cota esgotada do provedor). Se isso acontecer, prossiga sem ele, sem reiniciar o plugin, e me avise que a sessão não vai ficar registrada nele.
 
 ## Banco de Dados (Supabase)
 
@@ -56,7 +55,7 @@ Em conflito entre instruções, vale esta ordem:
 2. O comando da etapa atual.
 3. Este `CLAUDE.md` e os arquivos de `.claude/regras/` (entre os dois, vale a regra mais específica).
 4. Regras das skills, dentro da etapa. **Vale a mais cautelosa:** skill mais rigorosa que o protocolo prevalece; skill que afrouxaria o protocolo (pular teste, revisão ou etapa) cede.
-5. Memória de sessões passadas, inclusive a do claude-mem, é contexto. Se contradiz os arquivos atuais, valem os arquivos.
+5. Memória de sessões passadas, inclusive a memória automática do Claude Code, é contexto. Se contradiz os arquivos atuais, valem os arquivos.
 
 **Em segredos, dado pessoal, banco e comandos destrutivos, vale sempre a instrução mais cautelosa**, venha do comando, deste arquivo ou das regras; só a minha instrução explícita no momento afrouxa.
 
@@ -85,7 +84,7 @@ O Ponytail simplifica a solução e deixa o processo intacto. Spec e código div
 * **Ticket concluído** ganha, no fim do arquivo dele, a linha `Concluído em AAAA-MM-DD (commit <hash>)`, gravada pelo `/executar-*`. Funcionalidade sem tickets ganha, no fim da spec, `Implementado em AAAA-MM-DD (commit <hash>)`.
 * **Necessidade nova no meio de um ticket** vai para um ticket separado ou para `.scratch/backlog.md` (uma linha: o que é e onde surgiu), e você me avisa. Mantenha o escopo do ticket atual.
 * **Entre etapas:** tudo que uma etapa produz e a seguinte usa vai para um arquivo em `.scratch/` antes de a etapa terminar. A conversa não conta como registro.
-* **Próximo passo:** toda sessão que terminar recomendando um próximo passo (comando, modelo e o que falta) grava isso em `.scratch/proximo-passo.md` antes de encerrar, sobrescrevendo o anterior, e comita junto com o resto da etapa. O `/situação` lê esse arquivo; se divergir do git ou dos tickets, valem os arquivos e você me avisa. Vale também para sessões de conversa.
+* **Próximo passo:** toda sessão que terminar recomendando um próximo passo (comando, modelo e o que falta) grava isso em `.scratch/proximo-passo.md` antes de encerrar, sobrescrevendo o anterior, e comita junto com o resto da etapa. O `/stc` lê esse arquivo; se divergir do git ou dos tickets, valem os arquivos e você me avisa. Vale também para sessões de conversa.
 * **Marca de entrega:** o `/ship` grava no fim da spec a linha `Entregue em AAAA-MM-DD (commit <hash>)` (com `, com ressalva: <qual>` nos dois casos que o `/ship` lista) e cria o marco `marco/AAAA-MM-DD-entrega-<funcionalidade>`. Quando uma funcionalidade entregue volta a mudar, o `/planejar` acrescenta abaixo, ao alterar a spec, a linha `Em revisão desde AAAA-MM-DD`, e o próximo `/ship` grava uma marca nova. Spec ainda não executada que volta a mudar não leva `Em revisão desde`: é só editada.
 * **Custo (desligado por padrão):** só se a seção "Ajustes deste Projeto" disser "Custo ligado". Nesse caso, cada sessão acrescenta uma linha em `.scratch/custos.md`, no formato `AAAA-MM-DD | <funcionalidade ou "projeto"> | <etapa> | <valor>`, com o valor do `/cost` que eu rodo antes de fechar a sessão (ou do `/usage`, em percentual), e os comandos pedem o `/cost` ao fim. Desligado, ninguém pede `/cost` nem grava `custos.md`.
 * Mantenha o `.scratch/` versionado no git, e comite o que cada etapa grava nele antes de encerrá-la.
@@ -96,7 +95,7 @@ O Ponytail simplifica a solução e deixa o processo intacto. Spec e código div
 |Etapa|Comando|Modelo|
 |-|-|-|
 |0|`/projeto`, depois `/setup` (uma vez por projeto)|Opus no `/projeto`, Sonnet no `/setup`|
-|1|`/concepcao-livre` ou `/concepcao-premium` (uma vez, ou num redesenho)|Opus|
+|1|`/concepcao-livre` (uma vez, ou num redesenho)|Opus|
 |2|`/implementar-identidade`|Sonnet|
 |3|`/planejar`, por funcionalidade|Opus no modo completo, Sonnet no curto|
 |4|`/executar-simples` ou `/executar-complexo`, por ticket|Sonnet|
@@ -104,17 +103,19 @@ O Ponytail simplifica a solução e deixa o processo intacto. Spec e código div
 |6|`/ship`, a entrega; a pedido, os roteiros de produção (`.claude/regras/producao.md`)|Sonnet; Opus na revisão de segurança para produção|
 |apoio|`/demanda` (o que chega depois ou fora do plano)|Opus para classificar; bug em Sonnet, e em Opus se a causa não aparecer na primeira investigação|
 |apoio|`/rapido` (funcionalidade pequena, uma tela, sem regra nova nem migração, numa sessão)|Sonnet|
-|apoio|`/voltar` (desfazer) e `/situação` (onde o projeto está)|Sonnet|
+|apoio|`/voltar` (desfazer) e `/stc` (situação: onde o projeto está)|Sonnet|
 
 Cada funcionalidade nova começa no `/planejar`. Para uma iniciativa que não cabe numa sessão, o `/planejar` tem o passo "Iniciativa grande".
 
 **Ao fim de cada etapa**, diga o próximo comando e o modelo da tabela (e, com custo ligado, peça o `/cost`).
 
-**Troca de sessão.** Antes de encerrar a conversa, confirme que o resultado da etapa já está em arquivo. A sessão nova, com o modelo recomendado, começa pelo `/situação`; `/clear` + `/model` na mesma sessão só quando eu pedir. Rode `/mattpocock-skills:handoff` em quatro casos: há algo que os arquivos não guardam (decisão em aberto, tarefa pela metade); a pausa atravessa dias ou troca de máquina; o claude-mem está indisponível; eu pedi. O handoff leva só o que não está em arquivo, com o **estado atual no topo**, e aponta os arquivos para o resto. Peça à skill que salve em `.scratch/handoff-AAAA-MM-DD.md` (o padrão dela é uma pasta temporária, fora do projeto) e, depois, apague você os handoffs anteriores.
+**Comando pronto para copiar.** Sempre que a sessão terminar pedindo que eu abra outra, traga no fim da mensagem o texto completo de cada comando a digitar, na ordem, um por bloco de código: primeiro `/stc`, depois o comando da etapa com tudo o que ele precisar (por exemplo, o ticket ou a funcionalidade), e diga o modelo em que abrir a sessão. Nada de "rode o próximo comando" sem o texto dele. O mesmo texto vai para `.scratch/proximo-passo.md`.
+
+**Troca de sessão.** Antes de encerrar a conversa, confirme que o resultado da etapa já está em arquivo. A sessão nova, com o modelo recomendado, começa pelo `/stc`; `/clear` + `/model` na mesma sessão só quando eu pedir. Rode `/mattpocock-skills:handoff` em três casos: há algo que os arquivos não guardam (decisão em aberto, tarefa pela metade); a pausa atravessa dias ou troca de máquina; eu pedi. O handoff leva só o que não está em arquivo, com o **estado atual no topo**, e aponta os arquivos para o resto. Peça à skill que salve em `.scratch/handoff-AAAA-MM-DD.md` (o padrão dela é uma pasta temporária, fora do projeto) e, depois, apague você os handoffs anteriores.
 
 **Toda mudança de código passa pelo funil**, inclusive a que parece trivial. Nunca aplique uma mudança direto; decidir pular TDD ou revisão cabe a mim.
 
-**Skills.** Toda skill que recusar ser acionada por você (as de invocação direta: `implement`, `grill-with-docs`, `to-spec`, `to-tickets`, e qualquer outra que responder assim) volta para mim como comando pronto para eu rodar; elas podem nem aparecer na lista que você enxerga, e isso não quer dizer que faltam. **Skill ou comando ausente de verdade:** peça que eu rode `/reload-skills` uma vez; se continuar ausente, pare e me mostre as opções (instalar, seguir sem ela, adiar). Substituir uma skill por outra, ou fazer o trabalho dela à mão, só com minha aprovação. A lista das skills exigidas está no `README.md`.
+**Skills.** Toda skill que recusar ser acionada por você (as de invocação direta: `grill-with-docs`, `wayfinder` e qualquer outra que responder assim) volta para mim como comando pronto para eu rodar; elas podem nem aparecer na lista que você enxerga, e isso não quer dizer que faltam. **Skill ou comando ausente de verdade:** peça que eu rode `/reload-skills` uma vez; se continuar ausente, pare e me mostre as opções (instalar, seguir sem ela, adiar). Substituir uma skill por outra, ou fazer o trabalho dela à mão, só com minha aprovação. O trabalho que era do `implement`, do `to-spec`, do `to-tickets` e do `/security-review` já é seu, pelas regras `tdd.md`, `spec-e-tickets.md` e `revisao-seguranca.md` e pelos comandos que as citam: não devolva esses comandos para eu digitar. A lista das skills exigidas está no `README.md`.
 
 ## Segurança e Recuperação
 
@@ -122,7 +123,7 @@ Cada funcionalidade nova começa no `/planejar`. Para uma iniciativa que não ca
 * **Regra de parada:** depois de três tentativas sem resolver o mesmo problema, pare, explique e ofereça opções: voltar ao último marco, tentar outra abordagem ou registrar no backlog.
 * **Desfazer** sempre com `git revert`. Comandos que apagam histórico ou arquivos (`reset --hard`, `clean`, `push --force`, `branch -D`, `tag -d`, descartar mudanças não comitadas) só com minha aprovação explícita, dada no momento, e rodados por mim.
 * **Trava de git:** `.claude/settings.json` liga o hook `.claude/hooks/bloquear-git-destrutivo.mjs`, que bloqueia esses comandos antes de rodarem, nas formas mais comuns de escrevê-los, e também o commit que pula o pre-commit. Ela reduz acidentes. Script em arquivo e variável que monta o comando escapam dela, e a regra acima vale mesmo quando a trava deixa passar. Se a trava bloquear algo, aceite o bloqueio e não procure contorno: explique o que queria fazer, e eu rodo o comando no meu terminal. Para desfazer uma edição temporária sua num arquivo, guarde uma cópia antes e restaure a cópia (ou, para arquivo ainda não comitado, `git show HEAD:<arquivo>`); `git checkout <arquivo>` e `git restore` ficam bloqueados. Para trocar de ramo, use `git switch`.
-* **Retomada:** com trabalho em andamento, rode o `/situação` e continue da próxima tarefa incompleta. Se o handoff divergir dos arquivos, valem os arquivos, e você me avisa.
+* **Retomada:** com trabalho em andamento, rode o `/stc` e continue da próxima tarefa incompleta. Se o handoff divergir dos arquivos, valem os arquivos, e você me avisa.
 
 ## Itens Não Testados
 

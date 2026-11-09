@@ -1,4 +1,4 @@
-# Glossário — DevFlow v2.0.2
+# Glossário — DevFlow v3.5
 
 Termos técnicos explicados em linguagem simples, conforme foram surgindo nas conversas sobre o protocolo. Atualizar conforme novos termos aparecerem.
 
@@ -12,7 +12,7 @@ Termos técnicos explicados em linguagem simples, conforme foram surgindo nas co
 
 **Marco (tag)** — um nome fixo dado a um ponto do histórico do Git (ex.: `marco/2026-10-02-inicio-formulario-contato`). Funciona como um marcador de página: permite voltar exatamente àquele estado depois, sem precisar achar o código do commit.
 
-**Marca de entrega** — a linha `Entregue em AAAA-MM-DD (commit ...)` que o `/ship` grava no fim da spec de uma funcionalidade, junto com um marco `entrega-<funcionalidade>`. Mostra que a funcionalidade passou pela revisão final. O `/planejar` e o `/situação` usam a marca para avisar quando uma funcionalidade ficou sem `/ship`. Se a funcionalidade volta a mudar depois de entregue, ganha abaixo a linha `Em revisão desde`, até o próximo `/ship`.
+**Marca de entrega** — a linha `Entregue em AAAA-MM-DD (commit ...)` que o `/ship` grava no fim da spec de uma funcionalidade, junto com um marco `entrega-<funcionalidade>`. Mostra que a funcionalidade passou pela revisão final. O `/planejar` e o `/stc` usam a marca para avisar quando uma funcionalidade ficou sem `/ship`. Se a funcionalidade volta a mudar depois de entregue, ganha abaixo a linha `Em revisão desde`, até o próximo `/ship`.
 
 **Diff** — o que mudou entre duas versões do código, linha a linha. É sobre o diff de uma funcionalidade que o `code-review` trabalha.
 
@@ -20,7 +20,7 @@ Termos técnicos explicados em linguagem simples, conforme foram surgindo nas co
 
 **Repositório (repo)** — a pasta do projeto inteira, com todo o histórico do Git. "Repositório remoto" é uma cópia dele num servidor (GitHub, por exemplo); o DevFlow funciona sem.
 
-**Pull Request (PR)** — pedido formal de revisão antes de juntar uma branch, numa plataforma como o GitHub. O DevFlow funciona sem. O `/security-review` compara a branch atual com a principal e pode não achar nada num projeto sem repositório remoto ou já integrado; nesse caso o Claude faz a revisão de reserva.
+**Pull Request (PR)** — pedido formal de revisão antes de juntar uma branch, numa plataforma como o GitHub. O DevFlow funciona sem. A revisão de segurança do `/ship` não depende de PR: o Claude revisa o diff desde o marco de início da funcionalidade (`.claude/regras/revisao-seguranca.md`).
 
 **Revert** — jeito de desfazer uma mudança no Git criando um registro novo que anula o anterior, sem apagar nada do histórico. É o oposto do `reset --hard`, que apaga o histórico e não tem volta.
 
@@ -100,9 +100,8 @@ Termos técnicos explicados em linguagem simples, conforme foram surgindo nas co
 
 **Build** — processo que transforma o código-fonte (TypeScript, JSX) em HTML/CSS/JavaScript puro que o navegador entende, otimizado e pronto para produção. Diferente de lint/typecheck/teste: confirma que o projeto está estruturalmente completo (sem import quebrado, sem arquivo faltando), não que o comportamento está certo.
 
-**Hook** — pequeno programa que roda sozinho em certos momentos, sem pedir licença. Os hooks do Git rodam a cada commit (é assim que o Husky funciona). Os hooks do Claude Code rodam no início da sessão ou antes e depois de cada ação do Claude (é assim que o Ponytail, o claude-mem e a trava de git agem "sozinhos"). Em React, "hook" é outra coisa: uma função que guarda estado ou efeitos de uma tela (`useAlgumaCoisa`), em `src/hooks/`.
+**Hook** — pequeno programa que roda sozinho em certos momentos, sem pedir licença. Os hooks do Git rodam a cada commit (é assim que o Husky funciona). Os hooks do Claude Code rodam no início da sessão ou antes e depois de cada ação do Claude (é assim que o Ponytail e a trava de git agem "sozinhos"). Em React, "hook" é outra coisa: uma função que guarda estado ou efeitos de uma tela (`useAlgumaCoisa`), em `src/hooks/`.
 
-**claude-mem** — plugin opcional que guarda um resumo das sessões passadas. Grava o que o Claude lê, por isso dado pessoal e chave nunca devem entrar na conversa.
 
 **Subagente** — outro Claude, aberto pelo principal para fazer uma parte do trabalho em paralelo (a revisão de código usa dois).
 
@@ -112,7 +111,7 @@ Termos técnicos explicados em linguagem simples, conforme foram surgindo nas co
 
 **Token** — dois sentidos. Em IA, a unidade em que os modelos leem e escrevem texto, mais ou menos um pedaço de palavra; é por token que se mede o uso e se cobra o custo. Em design, um token CSS é uma variável com um valor da identidade visual (uma cor, um espaçamento), usada em todo o código.
 
-**Skill** — pacote de instruções que ensina o Claude a fazer um tipo de tarefa (sabatina, revisão de código, polimento). Algumas o Claude aciona sozinho; as de **invocação direta** só rodam quando você digita o comando, e por isso os comandos do DevFlow param e devolvem o comando pronto.
+**Skill** — pacote de instruções que ensina o Claude a fazer um tipo de tarefa (sabatina, revisão de código, polimento). Algumas o Claude aciona sozinho; as de **invocação direta** só rodam quando você digita o comando, e por isso os comandos do DevFlow param e devolvem o comando pronto. Desde a v3.1, só a sabatina (`grill-with-docs`) e o `wayfinder` param assim; spec, tickets, implementação e revisão de segurança viraram regras que o Claude segue sem parar.
 
 **Plugin** — conjunto de skills, comandos e hooks instalado de uma vez no Claude Code (Matt Pocock Skills, Superpowers, Impeccable).
 
@@ -120,7 +119,7 @@ Termos técnicos explicados em linguagem simples, conforme foram surgindo nas co
 
 **Cache de prompt** — memória de curto prazo do servidor que evita reprocessar, a cada mensagem, a parte da conversa que não mudou. Deixa as respostas mais rápidas e baratas. É perdido quando se troca de modelo ou se edita o `CLAUDE.md` no meio de uma sessão.
 
-**Handoff** — documento curto que passa o estado de uma sessão para a próxima. No DevFlow, leva só o que os arquivos do projeto não guardam (uma decisão em aberto, o raciocínio de uma tarefa pela metade) e é salvo em `.scratch/`. O estado em si é lido pelo `/situação`.
+**Handoff** — documento curto que passa o estado de uma sessão para a próxima. No DevFlow, leva só o que os arquivos do projeto não guardam (uma decisão em aberto, o raciocínio de uma tarefa pela metade) e é salvo em `.scratch/`. O estado em si é lido pelo `/stc`.
 
 ## Banco de dados
 
@@ -204,7 +203,7 @@ Termos técnicos explicados em linguagem simples, conforme foram surgindo nas co
 
 **CONTEXT.md** — arquivo do projeto que guarda o contexto de domínio: termos, entidades, atores e regras de negócio fixas. Criado e atualizado pelo `grill-with-docs` durante as sabatinas do `/planejar`; fora delas, o Claude propõe a redação e grava depois que você confirma. É a fonte única desse tipo de informação; o `CLAUDE.md` só aponta para ele.
 
-**Spec (especificação)** — documento que descreve o que uma funcionalidade faz: regras, comportamentos, casos-limite. Fica em `.scratch/<funcionalidade>/spec.md`. No modo completo é gerada pelo `to-spec`; no modo curto, escrita pelo Claude. É mantida atualizada: descreve o sistema como ele é hoje. Versões anteriores ficam no histórico do Git.
+**Spec (especificação)** — documento que descreve o que uma funcionalidade faz: regras, comportamentos, casos-limite. Fica em `.scratch/<funcionalidade>/spec.md`. Escrita pelo Claude depois da sabatina, pela regra de `.claude/regras/spec-e-tickets.md` (no modo curto, numa versão enxuta). É mantida atualizada: descreve o sistema como ele é hoje. Versões anteriores ficam no histórico do Git.
 
 **Estados de tela** — o que uma tela que busca dados mostra enquanto os dados chegam (carregando), quando não há nada a mostrar (vazio) e quando algo falha (erro). Sem isso, a pessoa vê uma tela em branco e não sabe se travou, se não há dados ou se quebrou.
 
@@ -220,7 +219,7 @@ Termos técnicos explicados em linguagem simples, conforme foram surgindo nas co
 
 **Sabatina** — a conversa do `/planejar` em que o `grill-with-docs` faz perguntas ponto a ponto sobre a funcionalidade (casos-limite, riscos, decisões), sempre com uma resposta recomendada, e registra o que foi decidido.
 
-**Ticket** — unidade de trabalho gerada pelo `to-tickets`, maior que uma task. Algo que, sozinho, entrega algo demonstrável. Pode ser simples (uma task, via `/executar-simples`) ou complexo (várias tasks, via `/executar-complexo`).
+**Ticket** — unidade de trabalho escrita pelo Claude no `/planejar` (`.claude/regras/spec-e-tickets.md`), maior que uma task. Algo que, sozinho, entrega algo demonstrável. Pode ser simples (uma task, via `/executar-simples`) ou complexo (várias tasks, via `/executar-complexo`).
 
 ## Princípios de código
 
@@ -232,7 +231,7 @@ Termos técnicos explicados em linguagem simples, conforme foram surgindo nas co
 
 **API / endpoint** — ponto de acesso por onde um sistema conversa com outro. A interface do projeto fala com o Supabase pela API dele; endpoint é o endereço de cada ponto de acesso.
 
-**CVE** — identificador padrão de uma vulnerabilidade de segurança conhecida (ex.: CVE-2026-1234). Aparece nos relatórios do `security-auditor`.
+**CVE** — identificador padrão de uma vulnerabilidade de segurança conhecida (ex.: CVE-2026-1234). Aparece no relatório da auditoria de pacotes do `/ship` (`npm audit`).
 
 ## Novos na v2.0
 

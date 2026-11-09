@@ -1,17 +1,23 @@
-# Itens ainda não testados num projeto real — DevFlow v2.0.2
+# Itens ainda não testados num projeto real — DevFlow v3.5
 
 Como usar: ao terminar um comando, leia o bloco dele e o bloco "Qualquer momento". Para cada item que aconteceu nesta execução e ainda não tem entrada em `.scratch/melhorias-protocolo.md`, acrescente uma entrada com a data, o item, o que era esperado e o que aconteceu. Quem avalia se funcionou sou eu.
 
 Os itens da v1.x que um projeto real já exercitou (trava de git, funil de planejamento e execução, regras de banco com login, perfis e arquivos, `/ship` com os passos de revisão) saíram desta lista na v2.0. Ficaram os que continuam sem evidência e todo o que a v2.0 acrescentou.
 
-O `/situação` só lê e não registra nada.
+O `/stc` só lê e não registra nada.
+
+## /stc (v3.3)
+
+- Testes só com mudança não comitada (e a linha dizendo que não rodaram); backlog só contado, sem leitura.
+- Registro de melhorias só contado (entradas depois da data da versão do `CLAUDE.md`), sem leitura (v3.4).
 
 ## Qualquer momento
 
 - Custo desligado por padrão e "Custo ligado" na seção de ajustes do projeto.
 - `.claude/regras/execucao.md` e `.claude/regras/interface.md` lidos quando o comando manda.
 - Commit por caminho (`git add <arquivos>`) com duas sessões na mesma pasta.
-- `.scratch/proximo-passo.md` gravado ao fim de cada etapa e lido pelo `/situação`.
+- `.scratch/proximo-passo.md` gravado ao fim de cada etapa e lido pelo `/stc`.
+- Comando pronto para copiar ao pedir sessão nova: `/stc` e o comando da etapa, cada um num bloco, com o modelo, e o mesmo texto no `proximo-passo.md`.
 
 ## /projeto
 
@@ -28,7 +34,7 @@ O `/situação` só lê e não registra nada.
 - Passo 10: configuração das skills do Matt Pocock pronta no pacote, sem rodar a skill de setup.
 - Passo 12: pre-commit com `vitest related` no lint-staged e sem `npm test` inteiro.
 
-## /concepcao-livre, /concepcao-premium e /implementar-identidade
+## /concepcao-livre e /implementar-identidade
 
 - Imagens de referência, limite de rodadas e quadro comparativo; modo "consolidar protótipos aprovados"; estilo dos controles na identidade.
 - Teste só dos arquivos tocados durante a implementação da identidade.
@@ -66,7 +72,19 @@ O `/situação` só lê e não registra nada.
 - TDD pela regra de `tdd.md` (ver o teste falhar) sem o `/implement`; convivência com as skills de TDD de terceiros, que continuam ativas.
 - Uma só revisão de código; marca `Entregue em` e marco de entrega sem passar pelo `/ship`; tempo medido contra a estimativa de 25 a 35 minutos.
 
-## /demanda, /voltar e /situação
+## /demanda, /voltar e /stc
 
 - `/demanda`: lista de itens, exploração livre, pacote misto, infraestrutura e ferramentas, teste instável.
 - `/voltar`: sem confirmação nesta lista, nem em projeto sem banco.
+
+## /ship e /setup (v3.0)
+
+- Auditoria de pacotes do passo 3 do `/ship` feita com `npm audit --json` e `npm audit --omit=dev --json`, sem a skill `security-auditor`: relatório por severidade, separação entre produção e desenvolvimento, `fixAvailable` e `isSemVerMajor`.
+- Projeto sem claude-mem do começo ao fim: continuidade só pelos arquivos de `.scratch/` e pelo `/stc`; handoff só nos três casos do `CLAUDE.md`.
+
+## /planejar, /executar-simples e /ship (v3.1)
+
+- `/planejar`: spec escrita pelo Claude pela regra de `spec-e-tickets.md`, sem o `to-spec` (ponto de teste confirmado antes, modelo de nove seções, numeração continuada numa spec existente, decisões novas confirmadas).
+- `/planejar`: tickets escritos pelo Claude, sem o `to-tickets` (primeira proposta enxuta, lista mostrada antes de gravar, numeração depois dos concluídos, conferência final).
+- `/executar-simples` sem o `implement`: TDD pela regra de `tdd.md`, uma revisão de código e as linhas `Concluído em` ou `Implementado em`, numa sessão só, sem parada.
+- `/ship`, passo 4, e revisão para produção, passo 7: revisão de segurança por `revisao-seguranca.md` (subagente de leitura, filtro de confiança 8, relatório em português), sem o `/security-review`.
