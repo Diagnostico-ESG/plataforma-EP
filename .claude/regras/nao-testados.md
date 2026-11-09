@@ -1,67 +1,90 @@
-# Itens ainda não testados num projeto real — DevFlow v1.9
+# Itens ainda não testados num projeto real — DevFlow v3.5
 
 Como usar: ao terminar um comando, leia o bloco dele e o bloco "Qualquer momento". Para cada item que aconteceu nesta execução e ainda não tem entrada em `.scratch/melhorias-protocolo.md`, acrescente uma entrada com a data, o item, o que era esperado e o que aconteceu. Quem avalia se funcionou sou eu.
 
-O `/status` só lê e não registra nada.
+Os itens da v1.x que um projeto real já exercitou (trava de git, funil de planejamento e execução, regras de banco com login, perfis e arquivos, `/ship` com os passos de revisão) saíram desta lista na v2.0. Ficaram os que continuam sem evidência e todo o que a v2.0 acrescentou.
+
+O `/stc` só lê e não registra nada.
+
+## /stc (v3.3)
+
+- Testes só com mudança não comitada (e a linha dizendo que não rodaram); backlog só contado, sem leitura.
+- Registro de melhorias só contado (entradas depois da data da versão do `CLAUDE.md`), sem leitura (v3.4).
 
 ## Qualquer momento
 
-- Regra do `--no-verify` e bloqueio do commit que pula o pre-commit.
-- Trava de git ativa dentro do Claude Code (bloqueio de `reset --hard`, checkout de arquivo, `tag -d`, pasta `.git`, evento ilegível), com o `settings.json` na forma `command` + `args`.
-- Regra de skill ausente e de skill que recusa ser acionada.
-- Handoff em `.scratch/`; troca de sessão com `/status` na retomada; `/cost` por sessão em `custos.md`, com coluna de funcionalidade.
-- Leitura de `.claude/regras/banco.md` antes de mexer no banco; conferência do alvo antes de comando de banco.
-- Dados reais: pasta `dados-reais/` nunca lida; regra de fixtures; aviso de dado pessoal com a pergunta sobre o claude-mem.
-- Sufixo `-2`, `-3` nos marcos; fechamento só em relatório técnico extenso; pasta dos ADRs.
+- Custo desligado por padrão e "Custo ligado" na seção de ajustes do projeto.
+- `.claude/regras/execucao.md` e `.claude/regras/interface.md` lidos quando o comando manda.
+- Commit por caminho (`git add <arquivos>`) com duas sessões na mesma pasta.
+- `.scratch/proximo-passo.md` gravado ao fim de cada etapa e lido pelo `/stc`.
+- Comando pronto para copiar ao pedir sessão nova: `/stc` e o comando da etapa, cada um num bloco, com o modelo, e o mesmo texto no `proximo-passo.md`.
 
 ## /projeto
 
-- Partida de uma especificação pronta; fases da especificação no backlog; pergunta sobre registro de leitura; escopo conferido antes das perguntas.
+- Pergunta "o que as pessoas usam hoje no lugar" e "dados atuais para trazer".
+- Aviso de outra pilha de front-end (Next.js, Vue, Angular).
 
 ## /setup
 
-- Passo 0 (Node); scaffold em subpasta e cópia sem sobrescrever; `--eslint`; `.npmrc`; typecheck; pre-commit; exclusão de `.claude/worktrees/`; limite de 40 linhas em hooks.
-- Passo 7: local e remoto de desenvolvimento; `AMBIENTES.md` com "vínculo atual"; `scripts/gerar-tipos.mjs`; saída do `supabase start` descartada; `login` e `link` rodados por mim; teste do cadastro fechado; nome dos testes de banco (`*.test.sql`: confirmar que `supabase test db` os recolhe); testes de banco pelo `scripts/testar-banco.mjs` contra um projeto Supabase de verdade (item j: conexão pelo "Session pooler", criação da extensão pgTAP, tipos por `--project-id` sem Docker); passo 7 reexecutado depois do setup.
-- Linha `setup concluído em`; teste ao vivo da trava.
+- Passo 0: `gh --version` e `.nvmrc`.
+- Passo 4: `test.exclude` com `.claude/modelos/**`.
+- Passo 6a: vitrine (`npm run vitrine`, `src/lib/acesso.ts`, `grep` no `dist/`).
+- Passo 7: teste da porta do banco para escolher o ciclo B ou C; item k (testes e migrações pelo GitHub Actions) do zero; modelos `migracoesPendentes`, `relatorio-tap` e `travaDoProjeto`.
+- Passo 8: `.gitattributes` e workflow `verificacao.yml`.
+- Passo 10: configuração das skills do Matt Pocock pronta no pacote, sem rodar a skill de setup.
+- Passo 12: pre-commit com `vitest related` no lint-staged e sem `npm test` inteiro.
 
-## /concepcao-livre, /concepcao-premium e /implementar-identidade
+## /concepcao-livre e /implementar-identidade
 
-- `.scratch/identidade-visual.md` entre a concepção e a implementação; teste-fumaça reescrito; marco `identidade` ao final; `/polir` depois de um redesenho.
+- Imagens de referência, limite de rodadas e quadro comparativo; modo "consolidar protótipos aprovados"; estilo dos controles na identidade.
+- Teste só dos arquivos tocados durante a implementação da identidade.
 
 ## /planejar
 
-- Classificação de tamanho e modo curto; passo "Iniciativa grande" (`wayfinder`) e a dispensa por especificação anexada.
-- Conferência de entregas anteriores; linha `Em revisão desde`; nome curto da funcionalidade anotado em `projeto.md`.
-- Spec em `.scratch/<funcionalidade>/spec.md`; seção Modelo de dados; tabela "quem pode o quê"; regras de estado; critério `[visual]`.
-- Login e perfis na spec (gatilho de perfil, primeiro administrador, usuário desativado, recuperação de senha); arquivos no Storage; regras no banco por gatilho; "Não guarde o que se calcula".
-- Amostra anonimizada antes do importador; importador entrando como administrador.
+- Caminho "spec ainda não executada que volta a mudar" e "desistir antes da spec".
+- Confirmação dos padrões e decisões antes de devolver o comando; fatias verticais e tickets enxutos; pergunta principal por tela.
 
 ## /executar-simples e /executar-complexo
 
-- TDD de políticas de RLS; teste `00_rls_ligada`; migração aplicada com `db push` no remoto de desenvolvimento; migração já enviada ao remoto corrigida por migração nova.
-- Gatilho que cria a linha de perfil; função auxiliar das políticas; testes por perfil; views com `security_invoker`; bucket privado e URL assinada.
-- Edge Function: conferência do chamador, decisão testada no Vitest, publicação no projeto de desenvolvimento.
-- Branch comum no `/executar-complexo`; retomada com a branch aberta; `plano-<número>.md`; linha `Concluído em` nos tickets e `Implementado em` na spec.
+- Envio da branch antes do `git branch -d`; versão falsa na vitrine por ticket de tela; ciclo C de banco com o workflow.
 
 ## /polir
 
-- Testes, commit e registro dos achados em `desvios.md` depois do polimento.
+- Vitrine como base da auditoria; achado que muda comportamento indo para ticket ou backlog.
 
 ## /ship
 
-- Conferência de entregas anteriores; marca de entrega e marca com ressalva; entrada por bug ou ajuste.
-- ADR de dependência de produção; `/security-review` e revisão de reserva; "verificado manualmente".
-- Passo 7: checagens de banco, de perfis e de Storage.
+- Regra de retomada; "só bloqueia o que o passo 12 lista"; revisão de reserva quando a branch já é a principal; conferência de que `dist/` não leva `src/vitrine/`.
+- Passo 7 lendo "Conferências do /ship" de `banco.md`; roteiros de produção lidos de `producao.md`.
+- Roteiros de produção (banco, site, backup e restauração, revisão para produção): sem confirmação nesta lista.
 
-## /demanda, /voltar e /status
+## Banco, /planejar e /ship (v2.0.2)
 
-- `/demanda`: perguntas, classificação, funcionalidade pequena, caminho de bug (marco, `code-review`, relatório, aviso de produção).
-- `/voltar`: volta com `git revert`, registros de `.scratch/` preservados, migração desfeita, migração já publicada, dependência com `git show`.
-- `/status`: retomada numa sessão nova; avisos de vínculo em produção, backup e revisão.
+- Seção "Desempenho e edição simultânea" de `banco.md`: índice, `select *`, N+1 e coluna `versao` com teste do conflito.
+- Checagens da interface antes do `/security-review` (passo 4 do `/ship`).
+- Pergunta de edição simultânea e de colunas de busca na seção Modelo de dados do `/planejar`.
+- Roteiro "Operação depois da publicação" (alerta de erro, quem avisa, pós-mortem de uma página).
+- `auditoria-prontidao.md`: rascunho, nunca executado.
 
-## Roteiros de produção do /ship
+## /rapido
 
-- Revisão de segurança para produção (com e sem banco) e inventário de dados pessoais; trava da primeira publicação.
-- Publicar no banco de produção: painel conferido antes do `db push`, só funcionalidades entregues, vínculo feito por mim, backup, `db push`, funções, volta ao desenvolvimento, primeiro administrador, retomada de publicação interrompida.
-- Publicar o site: build com variáveis de produção, busca em `dist/`.
-- Backup em três arquivos e teste de restauração num projeto separado.
+- Condição de entrada e saída no meio do trabalho; ficha de 10 a 15 linhas como única parada.
+- TDD pela regra de `tdd.md` (ver o teste falhar) sem o `/implement`; convivência com as skills de TDD de terceiros, que continuam ativas.
+- Uma só revisão de código; marca `Entregue em` e marco de entrega sem passar pelo `/ship`; tempo medido contra a estimativa de 25 a 35 minutos.
+
+## /demanda, /voltar e /stc
+
+- `/demanda`: lista de itens, exploração livre, pacote misto, infraestrutura e ferramentas, teste instável.
+- `/voltar`: sem confirmação nesta lista, nem em projeto sem banco.
+
+## /ship e /setup (v3.0)
+
+- Auditoria de pacotes do passo 3 do `/ship` feita com `npm audit --json` e `npm audit --omit=dev --json`, sem a skill `security-auditor`: relatório por severidade, separação entre produção e desenvolvimento, `fixAvailable` e `isSemVerMajor`.
+- Projeto sem claude-mem do começo ao fim: continuidade só pelos arquivos de `.scratch/` e pelo `/stc`; handoff só nos três casos do `CLAUDE.md`.
+
+## /planejar, /executar-simples e /ship (v3.1)
+
+- `/planejar`: spec escrita pelo Claude pela regra de `spec-e-tickets.md`, sem o `to-spec` (ponto de teste confirmado antes, modelo de nove seções, numeração continuada numa spec existente, decisões novas confirmadas).
+- `/planejar`: tickets escritos pelo Claude, sem o `to-tickets` (primeira proposta enxuta, lista mostrada antes de gravar, numeração depois dos concluídos, conferência final).
+- `/executar-simples` sem o `implement`: TDD pela regra de `tdd.md`, uma revisão de código e as linhas `Concluído em` ou `Implementado em`, numa sessão só, sem parada.
+- `/ship`, passo 4, e revisão para produção, passo 7: revisão de segurança por `revisao-seguranca.md` (subagente de leitura, filtro de confiança 8, relatório em português), sem o `/security-review`.

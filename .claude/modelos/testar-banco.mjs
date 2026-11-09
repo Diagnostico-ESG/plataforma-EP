@@ -4,12 +4,16 @@
 //
 // Uso: node scripts/testar-banco.mjs <ref-do-projeto-dev> [arquivo.test.sql ...]
 // A cadeia de conexão vem da variável SUPABASE_DB_URL, lida do arquivo .env.banco.local
-// (ignorado pelo git). O script nunca mostra a cadeia, que contém a senha do banco.
+// (ignorado pelo git) ou, no GitHub Actions, do segredo de mesmo nome. O script nunca mostra a cadeia, que contém a senha do banco.
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import pg from 'pg'
+import { comEnsaio, migracoesPendentes } from './migracoesPendentes.mjs'
+import { linhasDoRelatorio } from './relatorio-tap.mjs'
+import { conferirProjeto } from './travaDoProjeto.mjs'
 
 const PASTA = 'supabase/tests'
+const PASTA_DAS_MIGRACOES = 'supabase/migrations'
 const ARQUIVO_ENV = '.env.banco.local'
 
 function lerConfiguracao() {
@@ -17,11 +21,8 @@ function lerConfiguracao() {
   if (!ref) throw new Error('Faltou o ref do projeto de desenvolvimento. Uso: node scripts/testar-banco.mjs <ref-dev>')
   if (existsSync(ARQUIVO_ENV)) process.loadEnvFile(ARQUIVO_ENV)
   const url = process.env.SUPABASE_DB_URL
-  if (!url) throw new Error(`Faltou a variável SUPABASE_DB_URL (esperada em ${ARQUIVO_ENV}).`)
-  // Trava contra o banco errado: a cadeia precisa citar o ref do projeto de desenvolvimento.
-  if (!url.includes(ref)) {
-    throw new Error(`A cadeia de conexão não é do projeto de desenvolvimento (${ref}). Nada foi executado.`)
-  }
+  if (!url) throw new Error(`Faltou a variável SUPABASE_DB_URL (esperada em ${ARQUIVO_ENV} ou no segredo do GitHub).`)
+  conferirProjeto(url, ref)
   return { url, arquivos }
 }
 
@@ -41,19 +42,39 @@ function linhasDoTap(resultados) {
 
 const falhou = (linha) => /^not ok\b/.test(linha) || /^# Looks like/.test(linha)
 
-async function rodarArquivo(url, caminho) {
+function novoCliente(url) {
   const local = /@(localhost|127\.0\.0\.1)[:/]/.test(url) || url.includes('host=/')
-  const cliente = new pg.Client({ connectionString: url, ssl: local ? false : { rejectUnauthorized: false } })
+  return new pg.Client({ connectionString: url, ssl: local ? false : { rejectUnauthorized: false } })
+}
+
+// Migrações da branch ainda não aplicadas no banco: vão dentro da transação de cada teste (ver migracoesPendentes.mjs).
+async function lerPendentes(url) {
+  const cliente = novoCliente(url)
+  await cliente.connect()
+  try {
+    const { rows } = await cliente.query('select max(version) as ultima from supabase_migrations.schema_migrations')
+    const nomes = migracoesPendentes(readdirSync(PASTA_DAS_MIGRACOES), rows[0].ultima)
+    if (nomes.length) console.log(`Ensaio das migrações não aplicadas: ${nomes.join(', ')}\n`)
+    return nomes.map((nome) => readFileSync(join(PASTA_DAS_MIGRACOES, nome), 'utf8'))
+  } finally {
+    await cliente.end()
+  }
+}
+
+async function rodarArquivo(url, caminho, pendentes) {
+  const cliente = novoCliente(url)
   await cliente.connect()
   try {
     // O pgTAP fica no schema "extensions" do Supabase.
     await cliente.query("select set_config('search_path', current_setting('search_path') || ', extensions', false)")
-    const linhas = linhasDoTap(await cliente.query(readFileSync(caminho, 'utf8')))
+    const linhas = linhasDoTap(await cliente.query(comEnsaio(readFileSync(caminho, 'utf8'), pendentes)))
     const temPlano = linhas.some((l) => /^1\.\.\d+/.test(l))
     const falhas = linhas.filter(falhou)
     if (!temPlano) falhas.push('o arquivo não devolveu um plano de testes (falta "select plan(n)" ou "select * from finish()"?)')
     return { linhas, falhas }
   } catch (erro) {
+    const linhas = linhasDoRelatorio(erro.message)
+    if (linhas) return { linhas, falhas: linhas.filter(falhou) }
     return { linhas: [], falhas: [`erro de SQL: ${erro.message}`] }
   } finally {
     await cliente.end() // encerra a sessão; a transação aberta pelo teste é desfeita
@@ -64,9 +85,10 @@ async function principal() {
   const { url, arquivos } = lerConfiguracao()
   const testes = listarTestes(arquivos)
   if (testes.length === 0) throw new Error(`Nenhum teste encontrado em ${PASTA}.`)
+  const pendentes = await lerPendentes(url)
   let comFalha = 0
   for (const caminho of testes) {
-    const { linhas, falhas } = await rodarArquivo(url, caminho)
+    const { linhas, falhas } = await rodarArquivo(url, caminho, pendentes)
     const ok = linhas.filter((l) => /^ok\b/.test(l)).length
     const reprovados = linhas.filter((l) => /^not ok\b/.test(l)).length
     console.log(`${falhas.length ? 'FALHOU' : 'passou'}  ${caminho}  (${ok} ok, ${reprovados} reprovado(s))`)
@@ -79,6 +101,7 @@ async function principal() {
 }
 
 principal().catch((erro) => {
-  console.error(erro.message)
+  // O erro de tempo esgotado do `pg` chega com `message` vazia (porta fechada na rede): sem isto o script sairia mudo.
+  console.error(erro.message || `Falha sem mensagem (${erro.code ?? erro.name}). Se foi na conexão, a porta do banco pode estar fechada nesta rede: use o ciclo C de banco.md.`)
   process.exit(1)
 })

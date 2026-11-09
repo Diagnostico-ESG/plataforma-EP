@@ -1,4 +1,4 @@
-# Regras de banco de dados — DevFlow v1.9
+# Regras de banco de dados — DevFlow v3.5
 
 Referência para projetos com a pasta `supabase/`. O `CLAUDE.md` traz as regras curtas e aponta para cá; os comandos que mexem no banco mandam ler as seções daqui. Leia o arquivo inteiro, uma vez por sessão, antes de planejar, criar ou alterar migração, política, função, view, gatilho, bucket, login, Edge Function ou código que envia ou abre arquivos.
 
@@ -26,6 +26,13 @@ Referência para projetos com a pasta `supabase/`. O `CLAUDE.md` traz as regras 
 - Função `security definer` só em schema que a API não expõe (por exemplo `private`), com `search_path` vazio e nomes qualificados lá dentro (`public.perfis`). O uso do schema e a execução da função são concedidos só a `authenticated`.
 - **Não guarde o que se calcula.** Dado derivado de outras linhas (a etapa atual de um processo, uma contagem, um atraso) vira view ou função. Duas fontes para a mesma informação acabam divergindo. Guardar numa coluna só com ADR que diga por quê, e com um gatilho testado que mantenha as duas coerentes.
 
+## Desempenho e edição simultânea
+
+- **Índice.** Toda coluna usada em filtro, ordenação, junção ou numa política de RLS que consulta outra tabela tem índice, criado na mesma migração que a coluna ou a política. Chave estrangeira também. Com a tabela passando de alguns milhares de linhas, rode `explain` nas 5 consultas mais usadas e mostre o antes e o depois; antes disso, não otimize.
+- **Sem `select *`** nas funções de acesso: peça só as colunas que a tela usa.
+- **Sem consulta por item (N+1).** Uma lista que mostra dados de outra tabela traz tudo numa consulta só (relação embutida do cliente do Supabase ou view), nunca uma consulta por linha.
+- **Edição simultânea.** Tabela que duas pessoas podem editar ao mesmo tempo ganha uma coluna `versao` (inteiro, soma 1 a cada alteração, por gatilho). O `update` só vale se a versão ainda é a que a pessoa leu; zero linhas alteradas é conflito, e a interface avisa ("outra pessoa alterou este registro; recarregue") sem sobrescrever. Teste de banco: duas leituras, dois `update`, o segundo é recusado. Registro que só uma pessoa edita (o próprio perfil, por exemplo) dispensa. A decisão é por tabela e fica na seção Modelo de dados da spec.
+
 ## Login e perfis
 
 Vale quando o projeto tem login.
@@ -49,7 +56,7 @@ Vale quando o projeto guarda arquivos enviados.
 - A interface abre o arquivo por URL assinada de curta duração, gerada na hora. URL assinada nunca é guardada no banco.
 - O bucket tem tamanho máximo definido, e o formato é conferido no envio: arquivo enviado é dado de fora e passa por validação.
 - Versões de arquivo nunca se apagam: nenhuma política de `storage.objects` dá permissão de apagar pela interface.
-- O backup do banco não leva os arquivos do Storage. O roteiro "Backup e restauração" do `/ship` cobre os dois.
+- O backup do banco não leva os arquivos do Storage. O roteiro "Backup e restauração" de `producao.md` cobre os dois.
 
 ## Edge Functions
 
@@ -64,4 +71,29 @@ Vale só quando uma funcionalidade aprovada exige a chave secreta ou uma credenc
 
 ## Publicação
 
-Publicar no banco de produção, publicar o site e fazer backup só pelos roteiros do fim do `/ship`, com minha aprovação no momento. A primeira publicação exige antes a "Revisão de segurança para produção", também no `/ship`.
+Publicar no banco de produção, publicar o site e fazer backup só pelos roteiros de `.claude/regras/producao.md`, com minha aprovação no momento. A primeira publicação exige antes a "Revisão de segurança para produção", no mesmo arquivo.
+
+## Ciclo de teste e migração do desenvolvimento
+
+O `/setup` registra em `.scratch/inicio-projeto.md` qual dos três ciclos o projeto usa. Em todos, o teste vem antes da migração, e a migração nova leva junto, no mesmo commit, o teste de banco e os tipos atualizados.
+
+- **A. Docker local** ("banco: local"). `npx supabase start` (saída descartada), teste de banco que falha em `supabase/tests/`, migração (`npx supabase migration new`), `npm run db:reset`, `npm run test:db`, `npm run db:types`. O `supabase test db` mostra "FAIL" porque os testes devolvem o resultado como exceção (formato para o editor SQL): valem as linhas `ok` e `not ok`.
+- **B. Remoto de desenvolvimento, porta do banco aberta** ("banco: testes pelo script"). Teste que falha, migração, `npx supabase db push` (vínculo conferido), `npm run test:db` (script `scripts/testar-banco.mjs`), `npm run db:types` (por `--project-id`).
+- **C. Remoto de desenvolvimento, porta do banco fechada** ("banco: testes pelo GitHub"). A porta 5432 (e a 6543) fica bloqueada em algumas redes; o teste de banco e a migração rodam no GitHub Actions. Ordem: teste que falha, **migração (commit e push da branch)**, workflow "Migrar banco de desenvolvimento" (informe só o nome do arquivo), workflow "Testes de banco", `npm run db:types` (por `--project-id`, que fala por HTTPS) e commit. Código que lê a tabela nova só se escreve depois dos tipos. O workflow de migração para com aviso se a migração já foi aplicada e recusa banco de outro projeto. Como disparar: `execucao.md`. Sem repositório no GitHub, este ciclo não existe: use B (se a porta abre) ou aplique a migração à mão no editor SQL, rodada por mim.
+
+Migração já aplicada no remoto de desenvolvimento não se edita: o conserto é migração nova. Os arquivos do ensaio (`migracoesPendentes.mjs`, `relatorio-tap.mjs`, `travaDoProjeto.mjs`) vêm de `.claude/modelos/` e fazem o `testar-banco.mjs` rodar as migrações pendentes dentro da transação de cada teste.
+
+## Conferências do /ship (passo 7)
+
+Rode se a funcionalidade criou ou alterou arquivos em `supabase/migrations/`, `supabase/tests/` ou `supabase/functions/`. Confira em `supabase/AMBIENTES.md` (linha "vínculo atual") que o alvo é o desenvolvimento; no local, ligue o banco se estiver parado, com a saída descartada (`npx supabase start > /dev/null 2>&1`), porque ela traz a chave secreta local.
+
+- **Testes:** pelo ciclo do projeto (A, B ou C), o `npm run test:db` passa (no ciclo C, o resultado do workflow "Testes de banco" na branch, confirmado por mim, vale). O teste `00_rls_ligada` garante que nenhuma tabela ficou sem RLS.
+- **Tipos em dia:** `npm run db:types` e `git diff --exit-code src/types/database.ts`. Diferença: os tipos estavam desatualizados; comite e registre.
+- **Migração destrutiva:** procure nas migrações novas por `drop table`, `drop column`, `rename` e `alter column ... type`. Se achar, destaque no relatório e peça minha confirmação antes de concluir.
+- **Chave secreta:** procure `sb_secret_` e `service_role` em `src/`, no `.env.example` e em `supabase/functions/` (nesta pasta, só lida de variável de ambiente, nunca com o valor escrito). Qualquer outra ocorrência bloqueia a entrega.
+- **Views e funções:** `create view` sem `security_invoker = true`, e `security definer` fora de schema não exposto ou sem `search_path` vazio, bloqueiam a entrega.
+- **Funções** (`supabase/functions/`): a primeira ação é conferir quem chamou (logado, ativo, perfil exigido); a decisão tem teste no Vitest, com o chamador sem permissão; resposta e logs sem dado pessoal; ADR explicando por que a função existe; a chave só lida de variável de ambiente.
+- **Perfis** (login): cada célula da tabela "quem pode o quê" da spec tem teste em `supabase/tests/`, com um usuário de cada perfil, um desativado e um visitante. Cadastro aberto continua desligado (`enable_signup = false` em `[auth]` e `[auth.email]`; no remoto, pergunte-me se segue desligado no painel; com login por provedor externo, confira o gancho que barra a criação). O gatilho que cria a linha de perfil tem teste.
+- **Desempenho e concorrência:** coluna nova de filtro, ordenação ou junção com índice; nenhum `select *` nem consulta por item nas funções de acesso novas; tabela editável por mais de uma pessoa com `versao` e teste do conflito, ou a dispensa registrada na spec.
+- **Storage** (arquivos): `01_buckets_privados` passa; nenhum bucket público (sem ADR); políticas de `storage.objects` com teste por perfil e nenhuma permite apagar pela interface; caminhos por identificador, sem nome de pessoa; bucket com tamanho máximo.
+- **No relatório,** liste as políticas de cada tabela nova em linguagem simples, por perfil quando há login.
