@@ -192,4 +192,4 @@ Entregue em 2026-11-06 (commit ec2b9d0), com ressalva: [visual] da primeira entr
 
 Entregue em 2026-11-10 (commit 005cea9), com ressalva: [visual] da segunda entrega conferido só por medida no navegador, na vitrine local com dados falsos
 Entregue em 2026-11-10 (commit 46aedf9)
-Em revisão desde 2026-11-10
+Entregue em 2026-11-10 (commit 6fa818b)
