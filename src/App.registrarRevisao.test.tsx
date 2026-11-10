@@ -73,15 +73,16 @@ test('"sem alteração" registra na versão mais recente, mostra o resumo e o [E
   expect(await gaveta.findByText('Sem alteração')).toBeTruthy()
 })
 
-test('"Corrigida" liga a versão enviada na passagem à anterior e pede o escopo', async () => {
-  abrir(PASSAGEM_COM_VERSAO({ autorId: BIA.id, autorNome: BIA.nome }))
+// O escopo sai do que foi enviado (ADR 0046): a janela não o pede.
+test('"Corrigida" liga a versão enviada na passagem à anterior, sem pedir o escopo', async () => {
+  const { revisoes } = abrir(PASSAGEM_COM_VERSAO({ autorId: BIA.id, autorNome: BIA.nome }))
   const janela = await abrirARegistro()
-  expect(janela.queryByText('Escopo da correção')).toBeNull()
   fireEvent.click(janela.getByRole('radio', { name: 'Corrigida: a V8 corrige a V7' }))
-  expect((janela.getByRole('button', { name: 'Registrar' }) as HTMLButtonElement).disabled).toBe(true)
-  fireEvent.click(janela.getByRole('radio', { name: 'Fluxograma' }))
+  expect(janela.queryByText('Escopo da correção')).toBeNull()
+  expect((janela.getByRole('button', { name: 'Registrar' }) as HTMLButtonElement).disabled).toBe(false)
   registrar(janela)
-  expect(await (await agoraDoVerso()).findByText('Corrigida · V8 corrige a V7 · fluxograma')).toBeTruthy()
+  expect(await (await agoraDoVerso()).findByText('Corrigida · V8 corrige a V7')).toBeTruthy()
+  expect(revisoes.revisoes.p1[0]).toMatchObject({ escopo: 'fluxograma' })
 })
 
 test('"Corrigida" fica desabilitada, com o motivo, sem versão enviada na passagem', async () => {
@@ -98,7 +99,7 @@ test('quem enviou a versão revisada recebe o aviso amarelo e consegue registrar
   const janela = await abrirARegistro()
   expect(janela.queryByRole('status')).toBeNull()
   fireEvent.click(janela.getByRole('radio', { name: 'Sem alteração: vale para a V8' }))
-  expect(janela.getByRole('status').textContent).toBe('Você enviou a V8. A revisão interna deveria ser de outra pessoa.')
+  expect(janela.getByRole('status').textContent).toBe('Você enviou a V8. A revisão do fluxograma deveria ser de outra pessoa.')
   registrar(janela)
   await waitFor(() => expect(revisoes.revisoes.p1).toHaveLength(1))
 })
@@ -107,10 +108,10 @@ test('na "corrigida" o aviso é pela versão revisada (a anterior), não pela co
   abrir(PASSAGEM_COM_VERSAO({ anterior: { numero: 7, autorId: EU.id } }))
   const janela = await abrirARegistro()
   fireEvent.click(janela.getByRole('radio', { name: 'Corrigida: a V8 corrige a V7' }))
-  expect(janela.getByRole('status').textContent).toBe('Você enviou a V7. A revisão interna deveria ser de outra pessoa.')
+  expect(janela.getByRole('status').textContent).toBe('Você enviou a V7. A revisão do fluxograma deveria ser de outra pessoa.')
 })
 
-test('[Editar revisão] troca o resultado, o escopo e o comentário, e o resumo muda', async () => {
+test('[Editar revisão] troca o resultado e o comentário, e o resumo muda', async () => {
   abrir(PASSAGEM_COM_VERSAO({ autorId: BIA.id, autorNome: BIA.nome }))
   let janela = await abrirARegistro()
   fireEvent.click(janela.getByRole('radio', { name: 'Sem alteração: vale para a V8' }))
@@ -119,10 +120,9 @@ test('[Editar revisão] troca o resultado, o escopo e o comentário, e o resumo 
   fireEvent.click(await agora.findByRole('button', { name: 'Editar revisão' }))
   janela = within(await screen.findByRole('dialog', { name: 'Editar a revisão da V8' }))
   fireEvent.click(janela.getByRole('radio', { name: 'Corrigida: a V8 corrige a V7' }))
-  fireEvent.click(janela.getByRole('radio', { name: 'Relatório' }))
   fireEvent.change(janela.getByLabelText(/Comentário/), { target: { value: 'Ajustei o relatório' } })
   fireEvent.click(janela.getByRole('button', { name: 'Salvar' }))
-  expect(await agora.findByText('Corrigida · V8 corrige a V7 · relatório')).toBeTruthy()
+  expect(await agora.findByText('Corrigida · V8 corrige a V7')).toBeTruthy()
 })
 
 test('a recusa do banco aparece na janela, sem perder o preenchido, e a falha também', async () => {
@@ -169,12 +169,12 @@ test('depois de sair da Revisão do fluxograma e voltar, a passagem nova pede o 
   expect(await gaveta.findByText(/^V7 · Bia Teste/)).toBeTruthy()
 })
 
-test('o histórico mostra "Registrou a revisão"', async () => {
+test('o histórico mostra "Registrou a revisão do fluxograma"', async () => {
   abrir(PASSAGEM_COM_VERSAO({ autorId: BIA.id }))
   const janela = await abrirARegistro()
   fireEvent.click(janela.getByRole('radio', { name: 'Sem alteração: vale para a V8' }))
   registrar(janela)
   await (await agoraDoVerso()).findByText(`Sem alteração · V8 · ${EU.nome}`)
   await escolherNoMenuDoProcesso('Histórico')
-  expect(await (await versoAberto()).findByText('Registrou a revisão')).toBeTruthy()
+  expect(await (await versoAberto()).findByText('Registrou a revisão do fluxograma')).toBeTruthy()
 })

@@ -2,7 +2,8 @@ import { useState } from 'react'
 import type { RegistrosDoProcesso } from '../../hooks/useRegistrosDoProcesso'
 import { type AcaoPrincipal, acaoPrincipalDaEtapa } from '../../processos/acaoPrincipalDaEtapa'
 import type { ModuloDeProcessos, ProcessoLido } from '../../processos/tipos'
-import type { ModuloDeRevisoes } from '../../revisoes/tipos'
+import { contextoDoProcesso } from '../../revisoes/opcoesDaRevisao'
+import type { EtapaDaRevisao, ModuloDeRevisoes } from '../../revisoes/tipos'
 import type { ModuloDeVersoes } from '../../versoes/tipos'
 import { JanelaDaPublicacao } from './JanelaDaPublicacao'
 import { JanelaDeRegistroDaAprovacao } from './JanelaDeRegistroDaAprovacao'
@@ -51,7 +52,8 @@ function JanelaDaAcao({ acao, aoFechar, ...props }: AcaoPrincipalDoVersoProps & 
   const { processo, processos, revisoes, versoes, registros, usuarioId } = props
   if (acao === 'registrar_revisao') {
     return (
-      <JanelaDeRegistroDaRevisao processoId={processo.id} ultimaVersao={processo.ultimaVersao} usuarioId={usuarioId}
+      <JanelaDeRegistroDaRevisao processoId={processo.id} usuarioId={usuarioId}
+        contexto={contextoDoProcesso(processo, processo.etapaAtual?.codigo as EtapaDaRevisao)}
         revisoes={revisoes} aoGravar={registros.atualizar} aoFechar={aoFechar} />
     )
   }

@@ -40,15 +40,15 @@ const campo = (janela: ReturnType<typeof within>, nome: RegExp) => janela.getByL
 
 // ---- Revisão do fluxograma
 
-test('editar a revisão corrigida troca o escopo e o comentário na gaveta e fecha a janela', async () => {
+// O escopo é do banco (ADR 0046): a janela não o mostra, e ele fica como estava.
+test('editar a revisão corrigida troca o comentário na gaveta, sem campo de escopo, e fecha a janela', async () => {
   montar(versao(), { ajustar: comRevisao(REVISAO) })
   const { gaveta, janela } = await abrirAEdicao(REVISAO_INTERNA, 'Editar a revisão da V7')
-  expect((janela.getByRole('radio', { name: 'Fluxograma e relatório' }) as HTMLInputElement).checked).toBe(true)
+  expect(janela.queryByText('Escopo da correção')).toBeNull()
   expect(campo(janela, /Comentário/).value).toBe('Ajustei o fluxo')
-  fireEvent.click(janela.getByRole('radio', { name: 'Relatório' }))
   fireEvent.change(campo(janela, /Comentário/), { target: { value: 'Só o relatório' } })
   salvar(janela)
-  expect(await gaveta.findByText(/Corrigida, gerou a V8 · Relatório$/)).toBeTruthy()
+  expect(await gaveta.findByText(/Corrigida, gerou a V8 · Fluxograma e relatório$/)).toBeTruthy()
   expect(gaveta.getByText('Só o relatório')).toBeTruthy()
   expect(screen.queryByRole('dialog', { name: 'Editar a revisão da V7' })).toBeNull()
 })
@@ -171,7 +171,7 @@ test('sem aprovação registrada não há [Editar]; o subprocesso edita igual', 
 test('as edições aparecem no histórico do processo com o antes e o depois', async () => {
   montar(versao(), { ajustar: (falsos) => { comRevisao(REVISAO)(falsos); aprovadaCom({ numeroEprotocolo: null, aprovadaEm: '2026-10-13' })(falsos) } })
   const revisao = await abrirAEdicao(REVISAO_INTERNA, 'Editar a revisão da V7')
-  fireEvent.click(revisao.janela.getByRole('radio', { name: 'Relatório' }))
+  fireEvent.change(campo(revisao.janela, /Comentário/), { target: { value: 'Revi o texto' } })
   salvar(revisao.janela)
   await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Editar a revisão da V7' })).toBeNull())
   const aprovacao = await abrirAEdicao(APROVACAO, 'Editar a aprovação da V8')
@@ -180,9 +180,9 @@ test('as edições aparecem no histórico do processo com o antes e o depois', a
   await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Editar a aprovação da V8' })).toBeNull())
   await escolherNoMenuDoProcesso('Histórico')
   const verso = await versoAberto()
-  expect(await verso.findByText('Editou a revisão')).toBeTruthy()
-  expect(verso.getByText(/Escopo: Fluxograma e relatório/)).toBeTruthy()
-  expect(verso.getByText(/Escopo: Relatório/)).toBeTruthy()
+  expect(await verso.findByText('Editou a revisão do fluxograma')).toBeTruthy()
+  expect(verso.getByText(/Comentário: Ajustei o fluxo/)).toBeTruthy()
+  expect(verso.getByText(/Comentário: Revi o texto/)).toBeTruthy()
   expect(verso.getByText('Editou a aprovação')).toBeTruthy()
   expect(verso.getByText(/Número do E-protocolo: —/)).toBeTruthy()
   expect(verso.getByText(/Número do E-protocolo: PROT-9/)).toBeTruthy()

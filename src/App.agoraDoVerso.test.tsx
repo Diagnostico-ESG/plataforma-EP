@@ -241,7 +241,7 @@ const DE_BIA: UltimaVersao = { numero: 4, autorId: BIA.id, autorNome: BIA.nome, 
 test('na Revisão do fluxograma, o aviso amarelo aparece quando o responsável é quem enviou a versão mais recente, e some ao trocar', async () => {
   montarVerso(processoLido({ ...COM_BIA, ultimaVersao: DE_BIA }))
   const agora = await agoraDoVerso()
-  expect(agora.getByText('Bia Teste enviou a V4; a revisão interna deveria ser de outra pessoa.')).toBeTruthy()
+  expect(agora.getByText('Bia Teste enviou a V4; a revisão do fluxograma deveria ser de outra pessoa.')).toBeTruthy()
   await escolherVoce()
   await waitFor(async () => expect((await agoraDoVerso()).queryByText(/deveria ser de outra pessoa/)).toBeNull())
 })

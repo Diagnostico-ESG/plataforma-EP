@@ -11,23 +11,25 @@ function criar(cliente: ClienteSupabaseFalso) {
   return criarRevisoesSupabase(cliente as unknown as SupabaseClient<Database>, RECUSAS_DOS_PROCESSOS)
 }
 
-test('listar lê as revisões do processo, da mais recente para a mais antiga, com o revisor e as versões', async () => {
+// A etapa vem da passagem; a revisão antiga, sem passagem, é da Revisão do fluxograma (ADR 0046).
+test('listar lê as revisões do processo, da mais recente para a mais antiga, com o revisor, a etapa, as versões e os relatórios', async () => {
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas['revisoes_internas.select'] = {
     data: [
       { id: 'r2', resultado: 'corrigida', escopo: 'ambos', comentario: 'Ajustei', revisada_em: '2026-10-13',
-        revisor: { nome: 'Bia Teste' }, revisada: { numero: 7 }, corrigida: { numero: 8 }, passagem: { saiu_em: null } },
+        revisor: { nome: 'Bia Teste' }, revisada: { numero: 7 }, corrigida: { numero: 8 }, relatorio_revisado: { numero_do_relatorio: 1 },
+        relatorio_corrigido: { numero_do_relatorio: 2 }, passagem: { saiu_em: null, etapa: { codigo: 'revisao_relatorio' } } },
       { id: 'r1', resultado: 'sem_alteracao', escopo: null, comentario: null, revisada_em: '2026-10-12',
-        revisor: null, revisada: { numero: 6 }, corrigida: null, passagem: { saiu_em: '2026-10-12T15:00:00Z' } },
+        revisor: null, revisada: { numero: 6 }, corrigida: null, relatorio_revisado: null, relatorio_corrigido: null, passagem: null },
     ],
     error: null,
   }
   const revisoes = await criar(cliente).listarRevisoes('p1')
   expect(revisoes).toEqual([
-    { id: 'r2', versaoRevisada: 7, versaoCorrigida: 8, resultado: 'corrigida', escopo: 'ambos', comentario: 'Ajustei',
-      revisor: 'Bia Teste', revisadaEm: '2026-10-13', daPassagemAberta: true },
-    { id: 'r1', versaoRevisada: 6, versaoCorrigida: null, resultado: 'sem_alteracao', escopo: null, comentario: null,
-      revisor: null, revisadaEm: '2026-10-12', daPassagemAberta: false },
+    { id: 'r2', etapa: 'revisao_relatorio', versaoRevisada: 7, versaoCorrigida: 8, relatorioRevisado: 1, relatorioCorrigido: 2,
+      resultado: 'corrigida', escopo: 'ambos', comentario: 'Ajustei', revisor: 'Bia Teste', revisadaEm: '2026-10-13', daPassagemAberta: true },
+    { id: 'r1', etapa: 'revisao_interna', versaoRevisada: 6, versaoCorrigida: null, relatorioRevisado: null, relatorioCorrigido: null,
+      resultado: 'sem_alteracao', escopo: null, comentario: null, revisor: null, revisadaEm: '2026-10-12', daPassagemAberta: false },
   ])
   expect(cliente.pedidos[0]).toMatchObject({
     tabela: 'revisoes_internas', filtros: [['processo_id', 'p1']], ordem: [['registrada_em', false]],
@@ -78,11 +80,11 @@ function clienteQueRecusaAEdicao(tabela: 'revisoes_internas' | 'aprovacoes', err
   return cliente
 }
 
-test('editarRevisao altera só o escopo e o comentário da revisão pelo id', async () => {
+test('editarRevisao altera só o resultado e o comentário da revisão pelo id: o escopo é do banco', async () => {
   const cliente = clienteQueGrava('revisoes_internas')
-  await criar(cliente).editarRevisao('r1', { resultado: 'corrigida', escopo: 'relatorio', comentario: null })
+  await criar(cliente).editarRevisao('r1', { resultado: 'corrigida', comentario: null })
   expect(cliente.pedidos).toEqual([{
-    tabela: 'revisoes_internas', operacao: 'update', valores: { resultado: 'corrigida', escopo: 'relatorio', comentario: null },
+    tabela: 'revisoes_internas', operacao: 'update', valores: { resultado: 'corrigida', comentario: null },
     colunas: 'id', filtro: ['id', 'r1'], filtros: [['id', 'r1']],
   }])
 })
@@ -98,8 +100,7 @@ test('editarAprovacao altera o número, o link e a data da aprovação pelo id',
 })
 
 test.each([
-  ['revisoes_internas', 'escopo_obrigatorio', 'Escolha o escopo da correção.'],
-  ['revisoes_internas', 'escopo_so_na_corrigida', 'O escopo só vale na revisão corrigida.'],
+  ['revisoes_internas', 'corrigida_sem_envio_na_passagem', "Para 'corrigida', envie a versão ou o relatório corrigido com o processo nesta etapa."],
   ['revisoes_internas', 'processo_parado:suspenso', 'Este processo está suspenso; retome-o para mudar a etapa, o status ou o responsável.'],
   ['aprovacoes', 'link_invalido', 'O link do E-protocolo precisa começar com http:// ou https://.'],
   ['aprovacoes', 'data_no_futuro:2026-10-20', 'A data 20/10/2026 está no futuro.'],
@@ -108,7 +109,7 @@ test.each([
   const modulo = criar(cliente)
   const falha = await (tabela === 'aprovacoes'
     ? modulo.editarAprovacao('ap1', { numeroEprotocolo: null, link: null, aprovadaEm: null })
-    : modulo.editarRevisao('r1', { resultado: 'sem_alteracao', escopo: null, comentario: null })).catch((erro: unknown) => erro)
+    : modulo.editarRevisao('r1', { resultado: 'sem_alteracao', comentario: null })).catch((erro: unknown) => erro)
   expect(falha).toBeInstanceOf(TravaDoBanco)
   expect((falha as Error).message).toBe(frase)
 })
@@ -123,7 +124,7 @@ test('falta de privilégio na edição vira a frase do perfil', async () => {
 test('nenhuma linha alterada com o registro ainda legível é falta de permissão (a política filtrou)', async () => {
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas['revisoes_internas.select'] = { data: [{ id: 'r1' }], error: null }
-  const falha = await criar(cliente).editarRevisao('r1', { resultado: 'sem_alteracao', escopo: null, comentario: 'x' }).catch((erro: unknown) => erro)
+  const falha = await criar(cliente).editarRevisao('r1', { resultado: 'sem_alteracao', comentario: 'x' }).catch((erro: unknown) => erro)
   expect(falha).toBeInstanceOf(TravaDoBanco)
   expect((falha as Error).message).toBe('Seu perfil não permite alterar os processos.')
 })
@@ -134,12 +135,12 @@ test('nenhuma linha alterada e o registro ilegível é cadastro inexistente (sum
   expect(falha).toBeInstanceOf(CadastroInexistente)
 })
 
-test('registrarRevisao inclui só o processo, o resultado, o escopo e o comentário: o resto é do banco', async () => {
+test('registrarRevisao inclui só o processo, o resultado e o comentário: o resto (o escopo também) é do banco', async () => {
   const cliente = clienteQueGrava('revisoes_internas')
-  await criar(cliente).registrarRevisao('p1', { resultado: 'corrigida', escopo: 'ambos', comentario: 'Ajustei' })
+  await criar(cliente).registrarRevisao('p1', { resultado: 'corrigida', comentario: 'Ajustei' })
   expect(cliente.pedidos).toEqual([{
     tabela: 'revisoes_internas', operacao: 'insert',
-    valores: { processo_id: 'p1', resultado: 'corrigida', escopo: 'ambos', comentario: 'Ajustei' },
+    valores: { processo_id: 'p1', resultado: 'corrigida', comentario: 'Ajustei' },
   }])
 })
 
@@ -153,14 +154,15 @@ test('registrarAprovacao chama a função do banco com o processo, o número, o 
 })
 
 test.each([
-  ['revisao_fora_da_etapa', 'Registre a revisão com o processo na Revisão interna.'],
-  ['revisao_ja_registrada', 'Já há uma revisão registrada nesta passagem pela Revisão interna; edite-a.'],
-  ['corrigida_sem_versao_na_passagem', "Para 'corrigida', envie a versão corrigida com o processo na Revisão interna."],
+  ['revisao_fora_da_etapa', 'Registre a revisão com o processo na Revisão do fluxograma ou na Revisão do relatório.'],
+  ['revisao_ja_registrada', 'Já há uma revisão registrada nesta passagem; edite-a.'],
+  ['corrigida_sem_envio_na_passagem', "Para 'corrigida', envie a versão ou o relatório corrigido com o processo nesta etapa."],
+  ['sem_relatorio', 'O processo ainda não tem relatório para revisar.'],
   ['sem_versao', 'O processo ainda não tem versão.'],
 ])('a recusa %s do banco ao registrar a revisão vira a frase pronta', async (motivo, frase) => {
   const cliente = new ClienteSupabaseFalso()
   cliente.respostas['revisoes_internas.insert'] = { data: null, error: { message: motivo, code: 'P0001' } }
-  const falha = await criar(cliente).registrarRevisao('p1', { resultado: 'sem_alteracao', escopo: null, comentario: null })
+  const falha = await criar(cliente).registrarRevisao('p1', { resultado: 'sem_alteracao', comentario: null })
     .catch((erro: unknown) => erro)
   expect(falha).toBeInstanceOf(TravaDoBanco)
   expect((falha as Error).message).toBe(frase)

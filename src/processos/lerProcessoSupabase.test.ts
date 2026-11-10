@@ -220,7 +220,7 @@ test('o processo traz o relatório numerado mais recente, com o autor, o número
   }
   cliente.respostas['passagens.select'] = { data: [{ entrou_em: '2026-10-20T12:00:00Z' }], error: null }
   const lido = await criar(cliente).lerProcesso('p1')
-  expect(lido?.ultimoRelatorio).toEqual({ numero: 2, autorId: 'u2', autorNome: 'Bia Teste', anterior: 1, enviadoNestaPassagem: true })
+  expect(lido?.ultimoRelatorio).toEqual({ numero: 2, autorId: 'u2', autorNome: 'Bia Teste', anterior: { numero: 1, autorId: 'u1' }, enviadoNestaPassagem: true })
   expect(cliente.pedidos.find((pedido) => pedido.tabela === 'arquivos_da_versao')).toMatchObject({
     filtros: [['versao.processo_id', 'p1'], ['papel', 'relatorio']], ordem: [['numero_do_relatorio', false, false]], limite: 2,
   })

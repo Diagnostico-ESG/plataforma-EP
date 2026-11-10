@@ -3,12 +3,16 @@ import type { ClienteSupabase } from '../lib/supabase'
 import { falhaDoBanco } from '../processos/recusasDoBanco'
 import type { ArquivoDaVersao } from '../versoes/tipos'
 import type { Database } from '../types/database'
-import type { Aprovacao, DadosDaAprovacao, DadosDaEdicaoDaRevisao, DadosDaRevisao, ModuloDeRevisoes, RevisaoInterna } from './tipos'
+import type {
+  Aprovacao, DadosDaAprovacao, DadosDaEdicaoDaRevisao, DadosDaRevisao, EtapaDaRevisao, ModuloDeRevisoes, RevisaoInterna,
+} from './tipos'
 
-// O revisor, as duas versões (a revisada e, na "corrigida", a corrigida) e a passagem (aberta ou não) vêm junto, pelas
-// chaves estrangeiras.
+// O revisor, as duas versões (a revisada e, na "corrigida", a corrigida), os dois relatórios e a passagem (aberta ou não,
+// com a etapa, que diz de qual revisão é) vêm junto, pelas chaves estrangeiras.
 const COLUNAS = 'id, resultado, escopo, comentario, revisada_em, revisor:usuarios(nome), '
-  + 'revisada:versoes!versao_revisada_id(numero), corrigida:versoes!versao_corrigida_id(numero), passagem:passagens(saiu_em)'
+  + 'revisada:versoes!versao_revisada_id(numero), corrigida:versoes!versao_corrigida_id(numero), '
+  + 'relatorio_revisado:arquivos_da_versao!relatorio_revisado_id(numero_do_relatorio), '
+  + 'relatorio_corrigido:arquivos_da_versao!relatorio_corrigido_id(numero_do_relatorio), passagem:passagens(saiu_em, etapa:etapas(codigo))'
 
 type LinhaDaRevisao = {
   id: string
@@ -19,12 +23,27 @@ type LinhaDaRevisao = {
   revisor: { nome: string } | null
   revisada: { numero: number }
   corrigida: { numero: number } | null
-  passagem: { saiu_em: string | null } | null
+  relatorio_revisado: { numero_do_relatorio: number | null } | null
+  relatorio_corrigido: { numero_do_relatorio: number | null } | null
+  passagem: { saiu_em: string | null; etapa: { codigo: string } | null } | null
+}
+
+// A revisão antiga, sem passagem, é da Revisão do fluxograma (ADR 0046).
+function etapaDaLinha(linha: LinhaDaRevisao): EtapaDaRevisao {
+  return linha.passagem?.etapa?.codigo === 'revisao_relatorio' ? 'revisao_relatorio' : 'revisao_interna'
+}
+
+function relatoriosDaLinha(linha: LinhaDaRevisao): Pick<RevisaoInterna, 'relatorioRevisado' | 'relatorioCorrigido'> {
+  return {
+    relatorioRevisado: linha.relatorio_revisado?.numero_do_relatorio ?? null,
+    relatorioCorrigido: linha.relatorio_corrigido?.numero_do_relatorio ?? null,
+  }
 }
 
 function revisaoDaLinha(linha: LinhaDaRevisao): RevisaoInterna {
   return {
-    id: linha.id, versaoRevisada: linha.revisada.numero, versaoCorrigida: linha.corrigida?.numero ?? null,
+    id: linha.id, etapa: etapaDaLinha(linha), versaoRevisada: linha.revisada.numero, versaoCorrigida: linha.corrigida?.numero ?? null,
+    ...relatoriosDaLinha(linha),
     resultado: linha.resultado, escopo: linha.escopo, comentario: linha.comentario, revisor: linha.revisor?.nome ?? null,
     revisadaEm: linha.revisada_em, daPassagemAberta: linha.passagem?.saiu_em === null,
   }
@@ -87,8 +106,9 @@ async function lerAprovacao(cliente: ClienteSupabase, processoId: string): Promi
   return linha ? aprovacaoDaLinha(linha) : null
 }
 
-// O revisor, o dia, a passagem e as versões são do banco (colunas sem privilégio de inclusão): o gatilho decide tudo.
-type RevisaoParaIncluir = Pick<Database['public']['Tables']['revisoes_internas']['Insert'], 'processo_id' | 'resultado' | 'escopo' | 'comentario'>
+// O revisor, o dia, a passagem, as versões, os relatórios e o escopo são do banco (colunas sem privilégio de inclusão): o
+// gatilho decide tudo.
+type RevisaoParaIncluir = Pick<Database['public']['Tables']['revisoes_internas']['Insert'], 'processo_id' | 'resultado' | 'comentario'>
 
 async function registrarRevisao(
   cliente: ClienteSupabase, processoId: string, dados: DadosDaRevisao, recusas: RecusasDoModulo,
@@ -116,13 +136,13 @@ async function registrarDataDaValidacao(
   if (error) throw falhaDoBanco(error, recusas, { data: 'validacao' })
 }
 
-// O resultado, o escopo e o comentário se alteram (o resto não tem privilégio). A RLS não acusa erro ao filtrar: zero
+// O resultado e o comentário se alteram (o resto, o escopo também, não tem privilégio). A RLS não acusa erro ao filtrar: zero
 // linhas com o registro ainda legível é perfil; ilegível, o registro sumiu.
 async function editarRevisao(
   cliente: ClienteSupabase, id: string, dados: DadosDaEdicaoDaRevisao, recusas: RecusasDoModulo,
 ): Promise<void> {
   const { data, error } = await cliente.from('revisoes_internas')
-    .update({ resultado: dados.resultado, escopo: dados.escopo, comentario: dados.comentario }).eq('id', id).select('id')
+    .update({ resultado: dados.resultado, comentario: dados.comentario }).eq('id', id).select('id')
   if (error) throw falhaDoBanco(error, recusas)
   if (data.length) return
   const existe = Boolean((await cliente.from('revisoes_internas').select('id').eq('id', id)).data?.length)

@@ -56,25 +56,26 @@ function abrirAAprovacao(revisoes = new RevisoesQueGravam()) {
 
 const salvar = (janela: ReturnType<typeof within>) => fireEvent.click(janela.getByRole('button', { name: 'Salvar' }))
 
-test('a revisão corrigida abre com o escopo e o comentário gravados; salvar manda o escopo novo e o comentário aparado', async () => {
+// O escopo é do banco (ADR 0046): a janela não o mostra nem o manda.
+test('a revisão corrigida abre com o comentário gravado e sem escopo; salvar manda o resultado e o comentário aparado', async () => {
   const { revisoes, aoGravar, aoFechar, janela } = abrirARevisao(CORRIGIDA)
-  expect((janela.getByRole('radio', { name: 'Fluxograma e relatório' }) as HTMLInputElement).checked).toBe(true)
+  expect(janela.queryByRole('radio')).toBeNull()
+  expect(janela.queryByText('Escopo da correção')).toBeNull()
   expect((janela.getByLabelText('Comentário (opcional)') as HTMLTextAreaElement).value).toBe('Ajustei')
-  fireEvent.click(janela.getByRole('radio', { name: 'Relatório' }))
   fireEvent.change(janela.getByLabelText('Comentário (opcional)'), { target: { value: '  Só o relatório  ' } })
   salvar(janela)
   await waitFor(() => expect(aoFechar).toHaveBeenCalled())
-  expect(revisoes.edicoesDaRevisao).toEqual([['r1', { resultado: 'corrigida', escopo: 'relatorio', comentario: 'Só o relatório' }]])
+  expect(revisoes.edicoesDaRevisao).toEqual([['r1', { resultado: 'corrigida', comentario: 'Só o relatório' }]])
   expect(aoGravar).toHaveBeenCalled()
 })
 
-test('a revisão sem alteração não tem escopo, e o comentário só com espaços vai como null', async () => {
+test('na revisão sem alteração, o comentário só com espaços vai como null', async () => {
   const { revisoes, aoFechar, janela } = abrirARevisao(SEM_ALTERACAO)
   expect(janela.queryByRole('radio')).toBeNull()
   fireEvent.change(janela.getByLabelText('Comentário (opcional)'), { target: { value: '   ' } })
   salvar(janela)
   await waitFor(() => expect(aoFechar).toHaveBeenCalled())
-  expect(revisoes.edicoesDaRevisao).toEqual([['r2', { resultado: 'sem_alteracao', escopo: null, comentario: null }]])
+  expect(revisoes.edicoesDaRevisao).toEqual([['r2', { resultado: 'sem_alteracao', comentario: null }]])
 })
 
 test('a aprovação abre com o link e a data gravados e o número vazio; salvar acrescenta o número', async () => {
@@ -141,7 +142,8 @@ test('Cancelar e Esc fecham sem gravar', () => {
 test('na revisão da passagem aberta o resultado se troca; "corrigida" sem versão na passagem fica desabilitada', async () => {
   const revisoes = new RevisoesQueGravam()
   const ultima = { numero: 8, autorId: 'u1', autorNome: 'Ana', papeis: [], anterior: { numero: 7, autorId: 'u3' }, enviadaNestaPassagem: false }
-  render(<JanelaDaRevisao revisao={{ ...SEM_ALTERACAO, daPassagemAberta: true }} ultimaVersao={ultima} revisoes={revisoes} aoGravar={vi.fn()} aoFechar={vi.fn()} />)
+  render(<JanelaDaRevisao revisao={{ ...SEM_ALTERACAO, daPassagemAberta: true }} processo={{ ultimaVersao: ultima, ultimoRelatorio: null }}
+    revisoes={revisoes} aoGravar={vi.fn()} aoFechar={vi.fn()} />)
   const janela = within(screen.getByRole('dialog', { name: 'Editar a revisão da V7' }))
   expect((janela.getByRole('radio', { name: /^Corrigida/ }) as HTMLInputElement).disabled).toBe(true)
   expect((janela.getByRole('radio', { name: /^Sem alteração/ }) as HTMLInputElement).checked).toBe(true)

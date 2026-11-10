@@ -1,6 +1,7 @@
 import type { RegistrosDoProcesso } from '../../hooks/useRegistrosDoProcesso'
 import { formatarData } from '../../lib/datas'
-import { CODIGO_DA_APROVACAO, CODIGO_DA_REVISAO_INTERNA, CODIGO_DA_VALIDACAO } from '../../processos/codigosDasEtapas'
+import { ehEtapaDeRevisao } from '../../processos/acaoPrincipalDaEtapa'
+import { CODIGO_DA_APROVACAO, CODIGO_DA_VALIDACAO } from '../../processos/codigosDasEtapas'
 import type { EtapaDoVerso, ProcessoLido, UltimaVersao } from '../../processos/tipos'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
 import { textoDaValidacao } from '../../revisoes/textoDaValidacao'
@@ -9,7 +10,7 @@ import { AprovacaoDaEtapa } from './AprovacaoDaEtapa'
 import { RevisoesDaEtapa } from './RevisoesDaEtapa'
 
 export type DadosDasEtapas = {
-  /** O módulo de revisões e os registros lidos pelo verso: a gaveta da Revisão interna lista as revisões e a da Aprovação mostra a atual. */
+  /** O módulo de revisões e os registros lidos pelo verso: a gaveta de cada revisão lista as dela e a da Aprovação mostra a atual. */
   revisoes: ModuloDeRevisoes
   /** O módulo de versões: a gaveta da Aprovação envia, troca e baixa o .pdf protocolado por ele. */
   versoes: ModuloDeVersoes
@@ -23,7 +24,7 @@ export type DadosDasEtapas = {
 type DetalheDaEtapaProps = DadosDasEtapas & { id: string; etapa: EtapaDoVerso; processo: ProcessoLido }
 
 /**
- * A gaveta de uma etapa: as entradas e saídas do processo nela, da mais recente para a mais antiga, e, na Revisão interna, na
+ * A gaveta de uma etapa: as entradas e saídas do processo nela, da mais recente para a mais antiga, e, nas duas revisões, na
  * Validação com o setor e na Aprovação pelo setor, os registros. Só leitura: mover, etiqueta e responsável são do Agora.
  */
 export function DetalheDaEtapa(props: DetalheDaEtapaProps) {
@@ -49,12 +50,12 @@ function Passagens({ etapa }: { etapa: EtapaDoVerso }) {
   )
 }
 
-// Os registros que a gaveta mostra: as revisões na Revisão interna, a data da validação na Validação com o setor e a aprovação
+// Os registros que a gaveta mostra: as revisões de cada revisão (só as dela), a data da validação na Validação com o setor e a aprovação
 // (com o .pdf) na Aprovação pelo setor.
 function RegistrosDaEtapa({ etapa, ...props }: DetalheDaEtapaProps) {
   if (etapa.codigo === CODIGO_DA_VALIDACAO) return <p className="etapa-registros-aviso">{textoDaValidacao(props.processo.dataDaValidacao)}</p>
-  if (etapa.codigo === CODIGO_DA_REVISAO_INTERNA) {
-    return <RevisoesDaEtapa revisoes={props.revisoes} registros={props.registros} ultimaVersao={props.ultimaVersao} podeEditar={props.podeEditar} />
+  if (ehEtapaDeRevisao(etapa.codigo)) {
+    return <RevisoesDaEtapa etapa={etapa.codigo} revisoes={props.revisoes} registros={props.registros} processo={props.processo} podeEditar={props.podeEditar} />
   }
   if (etapa.codigo === CODIGO_DA_APROVACAO) {
     return (

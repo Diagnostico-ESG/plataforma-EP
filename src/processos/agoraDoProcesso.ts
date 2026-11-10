@@ -1,4 +1,4 @@
-import { CODIGO_DA_REVISAO_INTERNA } from './codigosDasEtapas'
+import { CODIGO_DA_REVISAO_DO_RELATORIO, CODIGO_DA_REVISAO_INTERNA } from './codigosDasEtapas'
 import { diasDoProcessoNaEtapa, passouDoLimite, textoDosDias } from './diasNaEtapa'
 import { ROTULO_DA_ETIQUETA } from './rotulos'
 import { pessoaDaOpcao } from './pessoaDaOpcao'
@@ -41,14 +41,19 @@ export function opcoesDeResponsavel(processo: DadosDoResponsavel, usuarios: Usua
   return [...eu, ...outros, ...responsavelForaDaLista(processo, usuarios), { valor: '', rotulo: 'Ninguém por enquanto' }]
 }
 
+type DadosDoAviso = Pick<ProcessoLido, 'etapaAtual' | 'responsavel' | 'ultimaVersao' | 'ultimoRelatorio'>
+
 /**
- * O aviso amarelo do revisor (ADR 0023): na Revisão interna, o responsável é quem enviou a versão mais recente não
- * histórica. Não impede nada; some quando a condição deixa de valer.
+ * O aviso amarelo do revisor (ADR 0023 e 0046): na Revisão do fluxograma, o responsável é quem enviou a versão mais recente
+ * não histórica; na do relatório, quem enviou o relatório mais recente. Não impede nada; some quando a condição deixa de valer.
  */
-export function avisoDoRevisor({ etapaAtual, responsavel, ultimaVersao }: Pick<ProcessoLido, 'etapaAtual' | 'responsavel' | 'ultimaVersao'>): string | null {
-  if (etapaAtual?.codigo !== CODIGO_DA_REVISAO_INTERNA || responsavel === null || ultimaVersao === null) return null
-  if (ultimaVersao.autorId !== responsavel.id) return null
-  return `${ultimaVersao.autorNome} enviou a V${ultimaVersao.numero}; a revisão interna deveria ser de outra pessoa.`
+export function avisoDoRevisor({ etapaAtual, responsavel, ultimaVersao, ultimoRelatorio }: DadosDoAviso): string | null {
+  if (responsavel === null) return null
+  if (etapaAtual?.codigo === CODIGO_DA_REVISAO_DO_RELATORIO && ultimoRelatorio?.autorId === responsavel.id) {
+    return `${ultimoRelatorio.autorNome} enviou o Relatório V${ultimoRelatorio.numero}; a revisão do relatório deveria ser de outra pessoa.`
+  }
+  if (etapaAtual?.codigo !== CODIGO_DA_REVISAO_INTERNA || ultimaVersao?.autorId !== responsavel.id) return null
+  return `${ultimaVersao.autorNome} enviou a V${ultimaVersao.numero}; a revisão do fluxograma deveria ser de outra pessoa.`
 }
 
 /** "Em {etapa} · {etiqueta}": o que a Consulta lê no Agora, acima da linha do responsável. */

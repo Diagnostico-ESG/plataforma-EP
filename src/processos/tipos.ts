@@ -144,8 +144,8 @@ export type UltimaVersao = {
  */
 export type UltimoRelatorio = {
   numero: number; autorId: string; autorNome: string
-  /** O número do relatório numerado anterior (o que o "corrigida" corrige); ausente sem anterior. */
-  anterior?: number
+  /** O relatório numerado anterior (o que o "corrigida" corrige) e quem o enviou; ausente sem anterior. */
+  anterior?: { numero: number; autorId: string }
   /** Enviado depois de o processo entrar na passagem atual (a "corrigida" só vale então). */
   enviadoNestaPassagem: boolean
 }

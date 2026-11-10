@@ -15,8 +15,11 @@ const cabecalho = async () => within((await versoAberto()).getByRole('banner'))
 const botoesDoCabecalho = async () => (await cabecalho()).queryAllByRole('button').map((botao) => botao.textContent ?? '')
 const CONCLUIDO = { situacao: 'concluido', etiqueta: 'concluido', publicadoEm: null } as const
 
+// Na revisão, com a versão a revisar (sem ela, o Agora diz "Sem versão para revisar.").
+const COM_VERSAO = { ultimaVersao: { numero: 8, autorId: 'u9', autorNome: 'Outra Pessoa', papeis: [] } }
+
 test.each([
-  ['revisao_interna', 'Registrar revisão', {}],
+  ['revisao_interna', 'Registrar revisão', COM_VERSAO],
   ['aprovacao_setor', 'Registrar aprovação', {}],
   ['publicacao', 'Registrar publicação', {}],
   ['concluidos', 'Registrar publicação', CONCLUIDO],
@@ -28,7 +31,7 @@ test.each([
 })
 
 test('o botão do cabeçalho é o azul cheio da etapa e abre a janela de registro', async () => {
-  montarVerso(processoLido({}, 'revisao_interna'))
+  montarVerso(processoLido(COM_VERSAO, 'revisao_interna'))
   const botao = await (await cabecalho()).findByRole('button', { name: 'Registrar revisão' })
   expect(botao.className).toContain('botao-principal')
 })

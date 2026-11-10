@@ -70,7 +70,7 @@ async function lerEntradaNaPassagemAberta(cliente: ClienteSupabase, id: string):
 
 type LinhaDoRelatorio = { numero_do_relatorio: number | null; enviado_por: string; enviado_em: string; autor: { nome: string } | null }
 
-// O relatório numerado de maior número e o número do anterior (ADR 0046): o aviso do revisor do relatório e as frases da
+// O relatório numerado de maior número e o anterior (ADR 0046): o aviso do revisor do relatório e as frases da
 // revisão. Nulos por último, e os sem número (o .pdf antigo e o da histórica) saem: o cliente não filtra "não nulo" no embutido.
 async function lerUltimoRelatorio(cliente: ClienteSupabase, id: string, entrada: string | null): Promise<UltimoRelatorio | null> {
   const { data, error } = await cliente.from('arquivos_da_versao')
@@ -82,7 +82,7 @@ async function lerUltimoRelatorio(cliente: ClienteSupabase, id: string, entrada:
   if (!ultimo) return null
   return {
     numero: ultimo.numero_do_relatorio as number, autorId: ultimo.enviado_por, autorNome: ultimo.autor?.nome ?? '',
-    ...(anterior && { anterior: anterior.numero_do_relatorio as number }), enviadoNestaPassagem: desde(entrada, ultimo.enviado_em),
+    ...(anterior && { anterior: { numero: anterior.numero_do_relatorio as number, autorId: anterior.enviado_por } }), enviadoNestaPassagem: desde(entrada, ultimo.enviado_em),
   }
 }
 

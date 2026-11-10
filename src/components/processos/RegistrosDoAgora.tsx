@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { RegistrosDoProcesso } from '../../hooks/useRegistrosDoProcesso'
-import { CODIGO_DA_APROVACAO, CODIGO_DA_REVISAO_INTERNA, CODIGO_DA_VALIDACAO } from '../../processos/codigosDasEtapas'
+import { ehEtapaDeRevisao, semOQueRevisar } from '../../processos/acaoPrincipalDaEtapa'
+import { CODIGO_DA_APROVACAO, CODIGO_DA_VALIDACAO } from '../../processos/codigosDasEtapas'
 import type { ProcessoLido } from '../../processos/tipos'
 import { resumoDaAprovacao, resumoDaRevisao } from '../../revisoes/opcoesDaRevisao'
 import type { ModuloDeRevisoes } from '../../revisoes/tipos'
@@ -26,7 +27,7 @@ type RegistrosDoAgoraProps = {
 type Janela = 'editar' | null
 
 /**
- * O que o Agora acrescenta na Revisão interna, na Validação com o setor e na Aprovação pelo setor (ADR 0023): o registro da
+ * O que o Agora acrescenta nas duas revisões, na Validação com o setor e na Aprovação pelo setor (ADR 0023 e 0046): o registro da
  * passagem ou da aprovação, em resumo, e os botões para registrar e editar, e a data da validação. Registrar não move o processo.
  */
 export function RegistrosDoAgora(props: RegistrosDoAgoraProps) {
@@ -34,27 +35,30 @@ export function RegistrosDoAgora(props: RegistrosDoAgoraProps) {
   if (codigo === CODIGO_DA_VALIDACAO) {
     return <DataDaValidacao processo={props.processo} revisoes={props.revisoes} podeAlterar={props.podeAlterar} aoMudar={props.aoMudar} />
   }
-  if (codigo === CODIGO_DA_REVISAO_INTERNA) return <RevisaoDoAgora {...props} />
+  if (ehEtapaDeRevisao(codigo)) return <RevisaoDoAgora {...props} />
   if (codigo === CODIGO_DA_APROVACAO) return <AprovacaoDoAgora {...props} />
   return null
 }
 
-// A revisão da passagem aberta: o resumo com [Editar revisão], ou [Registrar revisão] enquanto não há.
+// A revisão da passagem aberta: o resumo com [Editar revisão], ou [Registrar revisão] enquanto não há; sem o que revisar,
+// a frase do que falta (a ação principal passa a ser o [Enviar versão]).
 function RevisaoDoAgora({ processo, revisoes, registros, podeAlterar }: RegistrosDoAgoraProps) {
   const [janela, setJanela] = useState<Janela>(null)
   if (registros.revisoes.tipo !== 'pronto') return null
   const atual = registros.revisoes.valor.find((revisao) => revisao.daPassagemAberta)
+  const falta = atual ? null : semOQueRevisar(processo)
   const fechar = () => setJanela(null)
   return (
     <>
       {atual && <p className="agora-registro">{resumoDaRevisao(atual)}</p>}
+      {falta && <p className="agora-registro">{falta}</p>}
       {podeAlterar && atual && (
         <div className="agora-botoes">
           <button type="button" className="botao botao-secundario" onClick={() => setJanela('editar')}>Editar revisão</button>
         </div>
       )}
       {janela === 'editar' && atual && (
-        <JanelaDaRevisao revisao={atual} ultimaVersao={processo.ultimaVersao} revisoes={revisoes} aoGravar={registros.atualizar} aoFechar={fechar} />
+        <JanelaDaRevisao revisao={atual} processo={processo} revisoes={revisoes} aoGravar={registros.atualizar} aoFechar={fechar} />
       )}
     </>
   )
