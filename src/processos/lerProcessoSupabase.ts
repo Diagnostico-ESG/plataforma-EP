@@ -2,9 +2,10 @@ import { type EventoDoBanco, eventoDoCadastro } from '../cadastros/historicoSupa
 import { diaDeBrasilia } from '../lib/datas'
 import type { ClienteSupabase } from '../lib/supabase'
 import type { PapelDoArquivo } from '../versoes/tipos'
-import { CODIGO_DA_REVISAO_INTERNA } from './codigosDasEtapas'
 import { type LinhaDoProcesso, processoDaLinha } from './processoDaLinha'
-import type { EtapaDoVerso, ItemDaEstrutura, ModuloDeProcessos, ProcessoLido, SituacaoDoProcesso, UltimaVersao } from './tipos'
+import type {
+  EtapaDoVerso, ItemDaEstrutura, ModuloDeProcessos, ProcessoLido, SituacaoDoProcesso, UltimaVersao, UltimoRelatorio,
+} from './tipos'
 
 type OperacoesDeLeitura = Pick<ModuloDeProcessos, 'lerProcesso' | 'lerHistoricoDoProcesso'>
 
@@ -21,10 +22,12 @@ async function lerProcesso(cliente: ClienteSupabase, id: string): Promise<Proces
   // A linha pelo id: o cliente falso dos testes responde à leitura da estrutura (a mesma view) com a mesma lista.
   const linha = data.find((uma) => uma.id === id)
   if (!linha) return null
-  const [etapasDoVerso, estrutura, ultimaVersao] = await Promise.all([
-    lerEtapasDoVerso(cliente, id), lerEstrutura(cliente, id, linha.processo_pai_id), lerUltimaVersao(cliente, id),
+  const entrada = await lerEntradaNaPassagemAberta(cliente, id)
+  const [etapasDoVerso, estrutura, ultimaVersao, ultimoRelatorio] = await Promise.all([
+    lerEtapasDoVerso(cliente, id), lerEstrutura(cliente, id, linha.processo_pai_id),
+    lerUltimaVersao(cliente, id, { etapa: linha.etapa_atual_codigo, entrada }), lerUltimoRelatorio(cliente, id, entrada),
   ])
-  return { ...dadosDoProcesso(linha, etapasDoVerso.length), ...estrutura, etapasDoVerso, ultimaVersao }
+  return { ...dadosDoProcesso(linha, etapasDoVerso.length), ...estrutura, etapasDoVerso, ultimaVersao, ultimoRelatorio }
 }
 
 type LinhaDaUltimaVersao = {
@@ -32,10 +35,13 @@ type LinhaDaUltimaVersao = {
   arquivos: { papel: PapelDoArquivo }[]
 }
 
+/** A etapa em que o processo está e quando entrou nela (a passagem aberta): o que foi enviado desde então é "desta passagem". */
+type PassagemAberta = { etapa: string | null; entrada: string | null }
+
 // A versão não histórica de maior número e a anterior a ela: o aviso do revisor compara o responsável com quem enviou a
-// mais recente, e a revisão "corrigida" liga a mais recente à anterior quando ela foi enviada pela Revisão interna depois
+// mais recente, e a revisão "corrigida" liga a mais recente à anterior quando ela foi enviada pela etapa atual depois
 // de o processo entrar na passagem atual.
-async function lerUltimaVersao(cliente: ClienteSupabase, id: string): Promise<UltimaVersao | null> {
+async function lerUltimaVersao(cliente: ClienteSupabase, id: string, aberta: PassagemAberta): Promise<UltimaVersao | null> {
   const { data, error } = await cliente.from('versoes')
     .select('numero, enviada_por, enviada_em, autor:usuarios(nome), etapa:etapas(codigo), arquivos:arquivos_da_versao(papel)')
     .eq('processo_id', id).eq('historica', false).order('numero', { ascending: false }).limit(2)
@@ -46,17 +52,38 @@ async function lerUltimaVersao(cliente: ClienteSupabase, id: string): Promise<Ul
     numero: ultima.numero, autorId: ultima.enviada_por, autorNome: ultima.autor?.nome ?? '',
     papeis: ultima.arquivos.map((arquivo) => arquivo.papel),
     ...(anterior && { anterior: { numero: anterior.numero, autorId: anterior.enviada_por } }),
-    enviadaNestaPassagem: await enviadaNestaPassagem(cliente, id, ultima),
+    enviadaNestaPassagem: ultima.etapa?.codigo === aberta.etapa && desde(aberta.entrada, ultima.enviada_em),
   }
 }
 
-// Enviada pela Revisão interna depois da entrada na passagem aberta (que tem de ser a da Revisão interna).
-async function enviadaNestaPassagem(cliente: ClienteSupabase, id: string, versao: LinhaDaUltimaVersao): Promise<boolean> {
-  if (versao.etapa?.codigo !== CODIGO_DA_REVISAO_INTERNA) return false
+// Enviado na passagem aberta: depois (ou no instante) da entrada; sem passagem aberta, nunca.
+function desde(entrada: string | null, enviadoEm: string): boolean {
+  return entrada !== null && Date.parse(enviadoEm) >= Date.parse(entrada)
+}
+
+async function lerEntradaNaPassagemAberta(cliente: ClienteSupabase, id: string): Promise<string | null> {
   const { data, error } = await cliente.from('passagens').select('entrou_em').eq('processo_id', id).is('saiu_em', null)
   if (error) throw new Error(`Falha ao ler a passagem aberta do processo: ${error.message}`)
-  const [aberta] = data as unknown as { entrou_em: string }[]
-  return Boolean(aberta) && Date.parse(versao.enviada_em) >= Date.parse(aberta.entrou_em)
+  const [aberta] = data as unknown as { entrou_em?: string }[]
+  return aberta?.entrou_em ?? null
+}
+
+type LinhaDoRelatorio = { numero_do_relatorio: number | null; enviado_por: string; enviado_em: string; autor: { nome: string } | null }
+
+// O relatório numerado de maior número e o número do anterior (ADR 0046): o aviso do revisor do relatório e as frases da
+// revisão. Nulos por último, e os sem número (o .pdf antigo e o da histórica) saem: o cliente não filtra "não nulo" no embutido.
+async function lerUltimoRelatorio(cliente: ClienteSupabase, id: string, entrada: string | null): Promise<UltimoRelatorio | null> {
+  const { data, error } = await cliente.from('arquivos_da_versao')
+    .select('numero_do_relatorio, enviado_por, enviado_em, autor:usuarios(nome), versao:versoes!inner(processo_id)')
+    .eq('versao.processo_id', id).eq('papel', 'relatorio')
+    .order('numero_do_relatorio', { ascending: false, nullsFirst: false }).limit(2)
+  if (error) throw new Error(`Falha ao ler o relatório mais recente do processo: ${error.message}`)
+  const [ultimo, anterior] = (data as unknown as LinhaDoRelatorio[]).filter((linha) => linha.numero_do_relatorio !== null)
+  if (!ultimo) return null
+  return {
+    numero: ultimo.numero_do_relatorio as number, autorId: ultimo.enviado_por, autorNome: ultimo.autor?.nome ?? '',
+    ...(anterior && { anterior: anterior.numero_do_relatorio as number }), enviadoNestaPassagem: desde(entrada, ultimo.enviado_em),
+  }
 }
 
 type LinhaDaEstrutura = Pick<LinhaDoProcesso, 'id' | 'nome' | 'processo_pai_id' | 'situacao' | 'etapa_atual_nome'>

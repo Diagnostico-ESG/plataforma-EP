@@ -134,8 +134,20 @@ export type UltimaVersao = {
   numero: number; autorId: string; autorNome: string; papeis: PapelDoArquivo[]
   /** A não histórica de número imediatamente menor (a que a Revisão interna "corrigida" corrige); ausente sem anterior. */
   anterior?: { numero: number; autorId: string }
-  /** Verdadeiro quando esta versão foi enviada com o processo na Revisão interna, depois de ele entrar na passagem atual (a "corrigida" só vale então). */
+  /** Verdadeiro quando esta versão foi enviada pela etapa em que o processo está, depois de ele entrar na passagem atual (a "corrigida" só vale então). */
   enviadaNestaPassagem?: boolean
+}
+
+/**
+ * O relatório numerado mais recente do processo (Relatório V2) e quem o enviou: o autor não é o revisor ideal da Revisão do
+ * relatório (ADR 0046).
+ */
+export type UltimoRelatorio = {
+  numero: number; autorId: string; autorNome: string
+  /** O número do relatório numerado anterior (o que o "corrigida" corrige); ausente sem anterior. */
+  anterior?: number
+  /** Enviado depois de o processo entrar na passagem atual (a "corrigida" só vale então). */
+  enviadoNestaPassagem: boolean
 }
 
 /** Uma estadia do processo numa etapa (AAAA-MM-DD, dia de Brasília); `saiuEm` é null na passagem aberta. */
@@ -156,6 +168,8 @@ export type ProcessoLido = ProcessoDaLista & {
   dataDaModelagemPiloto: string | null
   /** Null sem versão não histórica. */
   ultimaVersao: UltimaVersao | null
+  /** Null sem relatório numerado. Ausente: quem monta o processo à mão não o informou (vale como sem). */
+  ultimoRelatorio?: UltimoRelatorio | null
 }
 
 /**

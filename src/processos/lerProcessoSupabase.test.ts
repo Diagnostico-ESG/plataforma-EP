@@ -40,7 +40,8 @@ test('lê o processo com as etapas ativas (ordem do catálogo) e as passagens de
     { id: 'e4', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 2, passagens: [{ entrouEm: '2026-10-04', saiuEm: null }] },
     { id: 'e8', codigo: 'concluidos', nome: 'Concluídos', ordem: 3, passagens: [] },
   ])
-  expect(cliente.pedidos.find((pedido) => pedido.tabela === 'passagens')).toMatchObject({
+  // A leitura das passagens com ordem (a outra é a da passagem aberta, para o que foi enviado nela).
+  expect(cliente.pedidos.find((pedido) => pedido.tabela === 'passagens' && pedido.ordem)).toMatchObject({
     filtro: ['processo_id', 'p1'], ordem: [['entrou_em', false]],
   })
   expect(cliente.pedidos.find((pedido) => pedido.tabela === 'etapas')).toMatchObject({ filtro: ['ativa', true], ordem: [['ordem', true]] })
@@ -172,14 +173,16 @@ test('com duas versões, a anterior (número e autor) vem junto, para a revisão
   })
 })
 
-// A "corrigida" só vale para a versão enviada pela Revisão interna depois da entrada na passagem aberta.
+// A "corrigida" só vale para a versão enviada pela etapa em que o processo está (uma das duas revisões), depois da entrada
+// na passagem aberta.
 test.each([
-  ['enviada pela Revisão interna depois da entrada', 'revisao_interna', '2026-10-20T15:00:00Z', true],
-  ['enviada antes da entrada na passagem', 'revisao_interna', '2026-10-20T09:00:00Z', false],
-  ['enviada por outra etapa', 'modelagem', '2026-10-20T15:00:00Z', false],
-])('a última versão %s: enviadaNestaPassagem', async (_nome, etapa, enviadaEm, esperado) => {
+  ['enviada pela Revisão do fluxograma depois da entrada', 'revisao_interna', 'revisao_interna', '2026-10-20T15:00:00Z', true],
+  ['enviada pela Revisão do relatório depois da entrada', 'revisao_relatorio', 'revisao_relatorio', '2026-10-20T15:00:00Z', true],
+  ['enviada antes da entrada na passagem', 'revisao_interna', 'revisao_interna', '2026-10-20T09:00:00Z', false],
+  ['enviada por outra etapa', 'revisao_interna', 'relatorio_modelagem_tecnica', '2026-10-20T15:00:00Z', false],
+])('a última versão %s: enviadaNestaPassagem', async (_nome, etapaAtual, etapa, enviadaEm, esperado) => {
   const cliente = new ClienteSupabaseFalso()
-  cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
+  cliente.respostas['processos_com_andamento.select'] = { data: [{ ...LINHA, etapa_atual_codigo: etapaAtual }], error: null }
   cliente.respostas['versoes.select'] = {
     data: [{ numero: 8, enviada_por: 'u1', enviada_em: enviadaEm, autor: { nome: 'Ana Teste' }, etapa: { codigo: etapa }, arquivos: [] }],
     error: null,
@@ -200,4 +203,49 @@ test('falha ao ler a versão mais recente vira erro com o motivo do banco', asyn
   cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
   cliente.respostas['versoes.select'] = { data: null, error: { message: 'sem conexão' } }
   await expect(criar(cliente).lerProcesso('p1')).rejects.toThrow('Falha ao ler a versão mais recente do processo: sem conexão')
+})
+
+// O relatório numerado mais recente (Relatório V2) e o número do anterior: o aviso do revisor do relatório e as frases da
+// revisão. Os sem número (o .pdf antigo e o da histórica) ficam de fora; enviado desde a entrada na passagem aberta conta
+// como "nesta passagem".
+const relatorio = (numero: number | null, enviadoEm: string, autor = 'u2') => ({
+  numero_do_relatorio: numero, enviado_por: autor, enviado_em: enviadoEm, autor: { nome: autor === 'u2' ? 'Bia Teste' : 'Ana Teste' },
+})
+
+test('o processo traz o relatório numerado mais recente, com o autor, o número do anterior e se veio nesta passagem', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
+  cliente.respostas['arquivos_da_versao.select'] = {
+    data: [relatorio(2, '2026-10-20T15:00:00Z'), relatorio(1, '2026-10-01T15:00:00Z', 'u1')], error: null,
+  }
+  cliente.respostas['passagens.select'] = { data: [{ entrou_em: '2026-10-20T12:00:00Z' }], error: null }
+  const lido = await criar(cliente).lerProcesso('p1')
+  expect(lido?.ultimoRelatorio).toEqual({ numero: 2, autorId: 'u2', autorNome: 'Bia Teste', anterior: 1, enviadoNestaPassagem: true })
+  expect(cliente.pedidos.find((pedido) => pedido.tabela === 'arquivos_da_versao')).toMatchObject({
+    filtros: [['versao.processo_id', 'p1'], ['papel', 'relatorio']], ordem: [['numero_do_relatorio', false, false]], limite: 2,
+  })
+})
+
+test('o relatório enviado antes da entrada na passagem não é desta passagem, e o sem anterior não traz o anterior', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
+  cliente.respostas['arquivos_da_versao.select'] = { data: [relatorio(1, '2026-10-20T09:00:00Z'), relatorio(null, '2026-09-01T09:00:00Z')], error: null }
+  cliente.respostas['passagens.select'] = { data: [{ entrou_em: '2026-10-20T12:00:00Z' }], error: null }
+  expect((await criar(cliente).lerProcesso('p1'))?.ultimoRelatorio).toEqual({
+    numero: 1, autorId: 'u2', autorNome: 'Bia Teste', enviadoNestaPassagem: false,
+  })
+})
+
+test('sem relatório numerado, o processo não tem último relatório', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
+  cliente.respostas['arquivos_da_versao.select'] = { data: [relatorio(null, '2026-09-01T09:00:00Z')], error: null }
+  expect((await criar(cliente).lerProcesso('p1'))?.ultimoRelatorio).toBeNull()
+})
+
+test('falha ao ler o relatório mais recente vira erro com o motivo do banco', async () => {
+  const cliente = new ClienteSupabaseFalso()
+  cliente.respostas['processos_com_andamento.select'] = { data: [LINHA], error: null }
+  cliente.respostas['arquivos_da_versao.select'] = { data: null, error: { message: 'sem conexão' } }
+  await expect(criar(cliente).lerProcesso('p1')).rejects.toThrow('Falha ao ler o relatório mais recente do processo: sem conexão')
 })
