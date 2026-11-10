@@ -14,7 +14,11 @@ type FormularioDeSubstituicaoProps = {
   aoCancelar: () => void
 }
 
-const AVISO_DA_TROCA = 'O arquivo anterior não fica guardado: o histórico registra a troca, mas o conteúdo que sai não pode ser recuperado.'
+// O Substituir é para o arquivo enviado por engano (ADR 0046): alteração de conteúdo é versão ou relatório novo. A perda do
+// anterior continua dita, porque é o que não se desfaz.
+const AVISO_DA_TROCA = 'Use para corrigir um arquivo enviado por engano. Para alterar o conteúdo, envie uma versão ou um relatório novo: '
+  + 'o anterior fica guardado. Aqui, o arquivo anterior não fica guardado: o histórico registra a troca, mas o conteúdo que sai não '
+  + 'pode ser recuperado.'
 
 /**
  * Troca o conteúdo de um arquivo da versão nova por outro do mesmo tipo (ADR 0007). O envio só começa depois da janela
