@@ -1251,3 +1251,24 @@ Registro de itens não testados que aconteceram numa execução real e de regras
 ## 2026-11-09 — /polir de importacao-dados-atuais
 
 - **Item não testado (/polir): vitrine como base da auditoria; achado que muda comportamento indo para ticket ou backlog.** Esperado: subir `npm run vitrine` e auditar nela; achado de comportamento vai para ticket ou backlog. Aconteceu: o projeto não tem `npm run vitrine` (vitrine própria em `vitrine.local/`, pendência da v3.5 no backlog); usei `vitrine.local/importacao.html` pelo `npm run dev` e disse isso no relatório. A captura de tela não funcionou com a janela minimizada, e a auditoria foi feita por medida no navegador (alturas, fontes, bordas, rolagem em 375 px). Nenhum achado mudou comportamento; um, o `role="status"` no resumo inteiro, ficou de fora com o motivo no `desvios.md`.
+
+## 2026-11-10 — /ship de importacao-dados-atuais (ajuste "Concluídos no Quadro" e ticket 02)
+
+- **Item não testado (/ship): regra de retomada.**
+  - Esperado: os passos já feitos valem enquanto o diff não muda.
+  - Aconteceu: a sessão caiu no meio do passo 2, com a correção dos achados ainda sem commit e com o typecheck falhando. Na retomada, o `/stc` não pôde comitar o `proximo-passo.md`, porque o pre-commit roda o typecheck do projeto inteiro e o erro da correção pendente o barrava.
+  - Sugestão para a cópia mestra: o `/stc` avisar que, com mudança não comitada que quebra o typecheck, o `proximo-passo.md` só entra no commit da retomada.
+- **Item não testado (/ship): "só bloqueia o que o passo 12 lista".**
+  - Aconteceu: o teste de banco 22 reprovava na `main` antes desta funcionalidade, por dado do banco de desenvolvimento, e não por regressão. Gravei a marca com isso registrado no `desvios.md` e no backlog, entendendo que "teste falhando" é o da funcionalidade.
+  - Sugestão: o passo 12 dizer explicitamente como tratar um teste que já falhava na principal antes da funcionalidade.
+- **Item não testado (/ship): conferência de que `dist/` não leva `src/vitrine/`.**
+  - Aconteceu: conferido (nenhum arquivo com "vitrine" no `dist/`). O projeto não tem `src/vitrine/`; a vitrine própria fica em `vitrine.local/`, fora do git.
+- **Item não testado (/ship): passo 7 lendo "Conferências do /ship" de `banco.md`.**
+  - Aconteceu: conferido item por item: testes pelo CI, tipos com `git diff --exit-code`, busca de migração destrutiva, de chave secreta e de `security definer` fora de `private`.
+  - Ficaram como presumidos o cadastro aberto no painel (o login não mudou) e o desempenho (nenhuma coluna nova; a leitura da pasta faz cinco consultas, sem uma por processo).
+- **Item não testado (v3.0): auditoria de pacotes com `npm audit --json` e `--omit=dev`.**
+  - Aconteceu: o relatório saiu por severidade, separando produção e desenvolvimento, com `fixAvailable` e `isSemVerMajor` lidos do JSON por `node`. Funcionou no Windows.
+- **Item não testado (v3.1): revisão de segurança por `revisao-seguranca.md`.**
+  - Aconteceu: um subagente de leitura e o filtro de confiança 8; nenhum achado real e três descartados com motivo. Relatório em português.
+- **Item não testado (v2.0.2): checagens da interface antes da revisão de segurança.**
+  - Aconteceu: feitas pelo subagente, sem ocorrência de `dangerouslySetInnerHTML`, `innerHTML`, `target="_blank"` nem de CORS aberto.
