@@ -22,6 +22,17 @@ export function semOQueRevisar(processo: Pick<ProcessoLido, 'etapaAtual' | 'ulti
 }
 
 /**
+ * O que o Agora diz que se revisa, antes do registro (spec, "Telas"): na Revisão do fluxograma, a versão mais recente; na
+ * do relatório, o relatório mais recente. Null fora das duas etapas ou sem o que revisar.
+ */
+export function oQueSeRevisa(processo: Pick<ProcessoLido, 'etapaAtual' | 'ultimaVersao' | 'ultimoRelatorio'>): string | null {
+  const etapa = processo.etapaAtual?.codigo
+  if (etapa === CODIGO_DA_REVISAO_INTERNA && processo.ultimaVersao) return `A revisar: V${processo.ultimaVersao.numero}`
+  if (etapa === CODIGO_DA_REVISAO_DO_RELATORIO && processo.ultimoRelatorio) return `A revisar: Relatório V${processo.ultimoRelatorio.numero}`
+  return null
+}
+
+/**
  * A ação principal da etapa atual, ou nenhuma. Quem só consulta e o processo parado não registram. Nas duas revisões ela
  * some quando a passagem já tem revisão (o [Editar revisão] fica no Agora) ou não há o que revisar; a aprovação pode ser
  * registrada de novo.

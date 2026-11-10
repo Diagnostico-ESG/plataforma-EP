@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { umProcessoLido } from '../testes/processoDaLista'
-import { acaoPrincipalDaEtapa, semOQueRevisar } from './acaoPrincipalDaEtapa'
+import { acaoPrincipalDaEtapa, oQueSeRevisa, semOQueRevisar } from './acaoPrincipalDaEtapa'
 import type { ProcessoLido } from './tipos'
 
 // Com a V8 e o Relatório V1, as duas revisões têm o que revisar.
@@ -27,6 +27,14 @@ describe('acaoPrincipalDaEtapa', () => {
     expect(semOQueRevisar(naEtapa('revisao_relatorio', { ultimoRelatorio: undefined }))).toBe('Sem relatório para revisar.')
     expect(semOQueRevisar(naEtapa('revisao_relatorio'))).toBeNull()
     expect(semOQueRevisar(naEtapa('aprovacao_setor', { ultimaVersao: null }))).toBeNull()
+  })
+
+  test('o que se revisa: a versão mais recente no fluxograma, o relatório mais recente no relatório; nada sem ele ou fora das revisões', () => {
+    expect(oQueSeRevisa(naEtapa('revisao_interna'))).toBe('A revisar: V8')
+    expect(oQueSeRevisa(naEtapa('revisao_relatorio'))).toBe('A revisar: Relatório V1')
+    expect(oQueSeRevisa(naEtapa('revisao_interna', { ultimaVersao: null }))).toBeNull()
+    expect(oQueSeRevisa(naEtapa('revisao_relatorio', { ultimoRelatorio: null }))).toBeNull()
+    expect(oQueSeRevisa(naEtapa('aprovacao_setor'))).toBeNull()
   })
 
   test('a Aprovação pelo setor sempre oferece registrar a aprovação', () => {

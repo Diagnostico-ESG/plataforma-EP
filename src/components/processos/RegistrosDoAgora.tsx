@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { RegistrosDoProcesso } from '../../hooks/useRegistrosDoProcesso'
-import { ehEtapaDeRevisao, semOQueRevisar } from '../../processos/acaoPrincipalDaEtapa'
+import { ehEtapaDeRevisao, oQueSeRevisa, semOQueRevisar } from '../../processos/acaoPrincipalDaEtapa'
 import { CODIGO_DA_APROVACAO, CODIGO_DA_VALIDACAO } from '../../processos/codigosDasEtapas'
 import type { ProcessoLido } from '../../processos/tipos'
 import { resumoDaAprovacao, resumoDaRevisao } from '../../revisoes/opcoesDaRevisao'
@@ -46,12 +46,13 @@ function RevisaoDoAgora({ processo, revisoes, registros, podeAlterar }: Registro
   const [janela, setJanela] = useState<Janela>(null)
   if (registros.revisoes.tipo !== 'pronto') return null
   const atual = registros.revisoes.valor.find((revisao) => revisao.daPassagemAberta)
-  const falta = atual ? null : semOQueRevisar(processo)
+  // Sem registro, uma frase só: o que falta para revisar ou o que se revisa.
+  const semRegistro = atual ? null : semOQueRevisar(processo) ?? oQueSeRevisa(processo)
   const fechar = () => setJanela(null)
   return (
     <>
       {atual && <p className="agora-registro">{resumoDaRevisao(atual)}</p>}
-      {falta && <p className="agora-registro">{falta}</p>}
+      {semRegistro && <p className="agora-registro">{semRegistro}</p>}
       {podeAlterar && atual && (
         <div className="agora-botoes">
           <button type="button" className="botao botao-secundario" onClick={() => setJanela('editar')}>Editar revisão</button>

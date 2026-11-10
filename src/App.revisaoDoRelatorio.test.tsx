@@ -67,6 +67,22 @@ test('quem enviou o relatório revisado recebe o aviso amarelo, no Agora e na ja
   await waitFor(() => expect(revisoes.revisoes.p1).toHaveLength(1))
 })
 
+test('antes do registro, o Agora diz qual relatório se revisa; depois, o resumo do registro fica no lugar', async () => {
+  noRelatorio(R1_DE_BIA)
+  expect(await (await agoraDoVerso()).findByText('A revisar: Relatório V1')).toBeTruthy()
+  const janela = await abrirARegistro()
+  fireEvent.click(opcao(janela, 'Sem alteração: vale para o Relatório V1'))
+  fireEvent.click(janela.getByRole('button', { name: 'Registrar' }))
+  const agora = await agoraDoVerso()
+  expect(await agora.findByText(`Sem alteração · Relatório V1 · ${EU.nome}`)).toBeTruthy()
+  expect(agora.queryByText('A revisar: Relatório V1')).toBeNull()
+})
+
+test('na Revisão do fluxograma, o Agora diz qual versão se revisa', async () => {
+  montar(V8, { etapa: 'revisao_interna' })
+  expect(await (await agoraDoVerso()).findByText('A revisar: V8')).toBeTruthy()
+})
+
 test('sem relatório numerado, o Agora diz "Sem relatório para revisar." no lugar do [Registrar revisão]', async () => {
   noRelatorio(null)
   expect(await (await agoraDoVerso()).findByText('Sem relatório para revisar.')).toBeTruthy()
