@@ -96,8 +96,9 @@ grant execute on function pg_temp.claims(text) to authenticated;
 create function pg_temp.revisar(nome_do_processo text, resultado public.resultado_da_revisao,
   escopo public.escopo_da_correcao default null, comentario text default null) returns void
 language sql as $$
-  insert into public.revisoes_internas (processo_id, resultado, escopo, comentario)
-  values (pg_temp.processo(nome_do_processo), resultado, escopo, comentario) $$;
+  -- O escopo é deduzido pelo banco (ticket 07): o parâmetro fica só para as chamadas antigas e não vai à tabela.
+  insert into public.revisoes_internas (processo_id, resultado, comentario)
+  values (pg_temp.processo(nome_do_processo), resultado, comentario) $$;
 grant execute on function pg_temp.revisar(text, public.resultado_da_revisao, public.escopo_da_correcao, text) to authenticated;
 
 create function pg_temp.revisoes(nome_do_processo text) returns bigint
@@ -146,7 +147,7 @@ select pg_temp.enviar('Corrigida');
 select pg_temp.claims('a2');
 select pg_temp.mover('Corrigida', 'revisao_interna');
 insert into _tap (linha) select throws_ok(
-  $sql$select pg_temp.revisar('Corrigida', 'corrigida', 'ambos')$sql$, 'P0001', 'corrigida_sem_versao_na_passagem',
+  $sql$select pg_temp.revisar('Corrigida', 'corrigida', 'ambos')$sql$, 'P0001', 'corrigida_sem_envio_na_passagem',
   '"corrigida" sem versão enviada desde a entrada é recusada');
 select pg_temp.enviar_na_passagem('Corrigida');
 insert into _tap (linha) select lives_ok(
@@ -157,36 +158,35 @@ insert into _tap (linha) select results_eq(
     (versao_revisada_id = (select id from public.versoes where processo_id = pg_temp.processo('Corrigida') and numero = 1)),
     (versao_corrigida_id = (select id from public.versoes where processo_id = pg_temp.processo('Corrigida') and numero = 2))
     from public.revisoes_internas where processo_id = pg_temp.processo('Corrigida')$sql$,
-  $sql$values ('corrigida', 'ambos', null::text, true, true)$sql$,
-  'a revisada é a V1, a corrigida é a V2, o escopo fica e o comentário vazio vira nulo');
+  $sql$values ('corrigida', 'fluxograma', null::text, true, true)$sql$,
+  'a revisada é a V1, a corrigida é a V2, o escopo é o deduzido (fluxograma) e o comentário vazio vira nulo');
 
 -- Uma versão só, enviada na passagem, não tem anterior a corrigir.
 select pg_temp.mover('Volta', 'revisao_interna');
 select pg_temp.enviar_na_passagem('Volta');
 insert into _tap (linha) select throws_ok(
-  $sql$select pg_temp.revisar('Volta', 'corrigida', 'fluxograma')$sql$, 'P0001', 'corrigida_sem_versao_na_passagem',
+  $sql$select pg_temp.revisar('Volta', 'corrigida', 'fluxograma')$sql$, 'P0001', 'corrigida_sem_envio_na_passagem',
   '"corrigida" sem versão anterior é recusada');
 
 -- ===== Escopo e versão =====
 insert into _tap (linha) select throws_ok(
-  $sql$select pg_temp.revisar('Volta', 'sem_alteracao', 'ambos')$sql$, 'P0001', 'escopo_so_na_corrigida',
-  '"sem alteração" com escopo é recusado');
+  $sql$insert into public.revisoes_internas (processo_id, resultado, escopo) values (pg_temp.processo('Volta'), 'sem_alteracao', 'ambos')$sql$,
+  '42501', null, 'o escopo não se escreve na inclusão: o banco o deduz');
 select pg_temp.claims('a1');
 select pg_temp.enviar_na_passagem('Volta');
 select pg_temp.claims('a2');
-insert into _tap (linha) select throws_ok(
-  $sql$select pg_temp.revisar('Volta', 'corrigida')$sql$, 'P0001', 'escopo_obrigatorio', '"corrigida" sem escopo é recusado');
+insert into _tap (linha) select lives_ok(
+  $sql$select pg_temp.revisar('Volta', 'corrigida')$sql$, '"corrigida" sem escolher o escopo é aceita: o banco o deduz');
 select pg_temp.mover('Sem Versao', 'revisao_interna');
 insert into _tap (linha) select throws_ok(
   $sql$select pg_temp.revisar('Sem Versao', 'sem_alteracao')$sql$, 'P0001', 'sem_versao', 'processo sem versão é recusado');
 
--- ===== Uma revisão por passagem: sair e voltar abre a passagem para outra =====
-select pg_temp.revisar('Volta', 'sem_alteracao');
+-- ===== Uma revisão por passagem: sair e voltar abre a passagem para outra (a desta passagem é a "corrigida" acima) =====
 select pg_temp.mover('Volta', 'aprovacao_setor');
 insert into _tap (linha) select is(pg_temp.revisoes('Volta'), 1::bigint, 'mover para a frente mantém a revisão');
 select pg_temp.mover('Volta', 'revisao_interna');
 insert into _tap (linha) select throws_ok(
-  $sql$select pg_temp.revisar('Volta', 'corrigida', 'relatorio')$sql$, 'P0001', 'corrigida_sem_versao_na_passagem',
+  $sql$select pg_temp.revisar('Volta', 'corrigida', 'relatorio')$sql$, 'P0001', 'corrigida_sem_envio_na_passagem',
   'na passagem nova, a versão enviada na anterior não vale para "corrigida"');
 insert into _tap (linha) select lives_ok(
   $sql$select pg_temp.revisar('Volta', 'sem_alteracao')$sql$, 'na passagem nova a revisão é aceita');

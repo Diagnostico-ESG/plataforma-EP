@@ -85,7 +85,7 @@ test('soltar em outra coluna move o processo na hora, sem janela: ele vai para a
   levantar(await cartaoDe('Emitir Ofício'))
   soltarEm('Publicação')
   await waitFor(() => expect(cartoesDa('Publicação')).toHaveLength(1))
-  expect(cartoesDa('Revisão interna')).toEqual([])
+  expect(cartoesDa('Revisão do fluxograma')).toEqual([])
   expect(falso.chamadas).toEqual([{ acao: 'mover', id: falso.processos[0].id, etapaId: idDaEtapa('publicacao') }])
   expect(screen.queryByRole('dialog')).toBeNull()
   const cartao = await cartaoDe('Emitir Ofício')
@@ -111,11 +111,11 @@ test('para trás também vale, inclusive para Não iniciados', async () => {
 test('soltar na própria coluna não grava nada', async () => {
   const falso = montar([processo('Emitir Ofício')])
   levantar(await cartaoDe('Emitir Ofício'))
-  soltarEm('Revisão interna')
+  soltarEm('Revisão do fluxograma')
   await Promise.resolve()
   expect(falso.chamadas).toEqual([])
   expect(colunasAcesas()).toEqual([])
-  expect(cartoesDa('Revisão interna')).toHaveLength(1)
+  expect(cartoesDa('Revisão do fluxograma')).toHaveLength(1)
 })
 
 test('soltar fora de qualquer coluna não grava nada', async () => {
@@ -132,7 +132,7 @@ test('a falha ao mover mostra a mensagem de erro de gravação e o cartão fica 
   levantar(await cartaoDe('Emitir Ofício'))
   soltarEm('Publicação')
   expect((await screen.findByRole('alert')).textContent).toBe('A alteração não foi salva: falha de conexão simulada.')
-  expect(cartoesDa('Revisão interna')).toHaveLength(1)
+  expect(cartoesDa('Revisão do fluxograma')).toHaveLength(1)
   expect(cartoesDa('Publicação')).toEqual([])
 })
 
@@ -142,7 +142,7 @@ test('a recusa do banco aparece com a frase pronta e o cartão não sai do lugar
   levantar(await cartaoDe('Emitir Ofício'))
   soltarEm('Publicação')
   expect((await screen.findByRole('alert')).textContent).toBe('A etapa Publicação está inativa.')
-  expect(cartoesDa('Revisão interna')).toHaveLength(1)
+  expect(cartoesDa('Revisão do fluxograma')).toHaveLength(1)
 })
 
 // ---- Chegada a Concluídos (a janela está em App.chegadaAConcluidos.test.tsx)

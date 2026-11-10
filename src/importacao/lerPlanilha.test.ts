@@ -11,7 +11,7 @@ describe('etapa pela última coluna Concluído', () => {
   test.each([
     [{ mp: 'Concluído' }, 'modelagem'],
     [{ mp: 'Concluído', mt: 'Concluído' }, 'relatorio_modelagem_tecnica'],
-    [{ mp: 'Concluído', mt: 'Não realizada', ri: 'Concluído' }, 'revisao_interna'],
+    [{ mp: 'Concluído', mt: 'Não realizada', ri: 'Concluído' }, 'revisao_relatorio'],
     [{ mp: 'Concluído', mt: 'Concluído', ri: 'Concluído', rp: 'Concluído' }, 'relatorio_modelagem_tecnica'],
     [{ mp: 'Concluído', mt: 'Concluído', ri: 'Concluído', rp: 'Concluído', vi: 'Concluído' }, 'aprovacao_setor'],
     [{ mp: 'Concluído', mt: 'Concluído', ri: 'Concluído', rp: 'Concluído', vi: 'Concluído', vii: 'Concluído', dp: '16 10 2026' },
@@ -31,7 +31,7 @@ describe('etapa pela última coluna Concluído', () => {
 
   test('um Concluído depois de coluna vazia vale como a última e gera aviso', () => {
     const lida = ler({ mp: 'Concluído', dmp: '01/09/2026', ri: 'Concluído' })
-    expect(lida.processos[0].etapaCodigo).toBe('revisao_interna')
+    expect(lida.processos[0].etapaCodigo).toBe('revisao_relatorio')
     expect(lida.avisos).toHaveLength(1)
     expect(lida.avisos[0]).toMatchObject({ linha: 4, nome: 'Exemplo Alfa' })
   })

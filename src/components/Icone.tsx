@@ -84,6 +84,13 @@ const DESENHOS = {
       <path d="M21 21l-4.3-4.3M8.5 11l2 2 3.5-3.5" />
     </>
   ),
+  // O relatório com a marca de conferido: a revisão do relatório, no traço dos outros ícones de etapa.
+  etapaRevisaoRelatorio: (
+    <>
+      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+      <path d="M14 3v5h5M9 14l2 2 4-4" />
+    </>
+  ),
   etapaValidacao: (
     <>
       <circle cx="9" cy="8" r="3.5" />

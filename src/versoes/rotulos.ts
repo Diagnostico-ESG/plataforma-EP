@@ -1,5 +1,5 @@
 import {
-  CODIGO_DA_MODELAGEM_PILOTO, CODIGO_DA_REVISAO_INTERNA, CODIGO_DA_TECNICA, CODIGO_NAO_INICIADOS,
+  CODIGO_DA_MODELAGEM_PILOTO, CODIGO_DA_REVISAO_DO_RELATORIO, CODIGO_DA_REVISAO_INTERNA, CODIGO_DA_TECNICA, CODIGO_NAO_INICIADOS,
 } from '../processos/codigosDasEtapas'
 import type { ArquivoDaVersao, PapelDoArquivo, Versao } from './tipos'
 
@@ -61,16 +61,17 @@ export type EnvioDaEtapa = 'historica' | 'piloto' | 'sequencia'
 
 /**
  * O único envio de versão que o verso oferece na etapa atual (ADR 0025): a histórica em Não iniciados, a piloto na Modelagem
- * piloto, a em sequência na técnica e na Revisão interna; nenhum nas outras etapas, nem nas do catálogo que forem acrescentadas.
+ * piloto, a em sequência na técnica e nas duas revisões (ADR 0046); nenhum nas outras etapas, nem nas do catálogo que forem
+ * acrescentadas.
  */
 export function envioDaEtapa(codigoDaEtapa: string, versoes: Pick<Versao, 'historica' | 'piloto'>[]): EnvioDaEtapa | null {
   if (codigoDaEtapa === CODIGO_NAO_INICIADOS) return haVersaoNova(versoes) ? null : 'historica'
   if (codigoDaEtapa === CODIGO_DA_MODELAGEM_PILOTO) return haVersaoEmSequencia(versoes) ? null : 'piloto'
-  if (codigoDaEtapa === CODIGO_DA_TECNICA || codigoDaEtapa === CODIGO_DA_REVISAO_INTERNA) return 'sequencia'
+  if ([CODIGO_DA_TECNICA, CODIGO_DA_REVISAO_INTERNA, CODIGO_DA_REVISAO_DO_RELATORIO].includes(codigoDaEtapa)) return 'sequencia'
   return null
 }
 
-/** O [Enviar relatório] aparece na técnica e na Revisão interna, quando há versão piloto ou em sequência para recebê-lo (ADR 0026). */
+/** O [Enviar relatório] aparece na técnica e na Revisão do fluxograma (na do relatório, o [Enviar versão] já o leva), quando há versão piloto ou em sequência para recebê-lo (ADR 0026). */
 export function podeEnviarRelatorioNaEtapa(codigoDaEtapa: string, versoes: Pick<Versao, 'historica'>[]): boolean {
   return (codigoDaEtapa === CODIGO_DA_TECNICA || codigoDaEtapa === CODIGO_DA_REVISAO_INTERNA) && versoes.some((versao) => !versao.historica)
 }

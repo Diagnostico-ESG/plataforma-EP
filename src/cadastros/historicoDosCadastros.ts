@@ -2,6 +2,7 @@ import { formatarData } from '../lib/datas'
 import { oQueFaltouNoHistorico } from '../processos/frasesDaConfirmacaoDeArquivos'
 import { ROTULO_DA_ETIQUETA, ROTULO_DA_SITUACAO, ROTULO_DO_TIPO } from '../processos/rotulos'
 import { ROTULO_DO_ESCOPO } from '../revisoes/frasesDeRevisao'
+import { NOME_DA_REVISAO, textoDaRevisao } from '../revisoes/textoDaRevisaoNoHistorico'
 import { rotuloDaCategoria } from './categorias'
 import type { CategoriaDoMacroprocesso, EstadoDoCadastro, EventoDoCadastro, ItemDoFiltro } from './tipos'
 
@@ -87,7 +88,8 @@ const ROTULO_DO_CAMPO: Record<string, string> = {
   rotulo: 'Versão', etapa: 'Etapa', arquivos: 'Arquivos', relatorio_de: 'Relatório copiado da versão', papel: 'Arquivo acrescentado', numero_do_relatorio: 'Número do relatório',
   hash_md5: 'Impressão digital (MD5)', formato: 'Formato',
   versao_revisada: 'Versão revisada', versao_corrigida: 'Versão corrigida', resultado: 'Resultado', escopo: 'Escopo',
-  comentario: 'Comentário', revisor_nome: 'Revisor', revisada_em: 'Data da revisão',
+  comentario: 'Comentário', revisor_nome: 'Revisor', revisada_em: 'Data da revisão', relatorio_revisado: 'Relatório revisado',
+  relatorio_corrigido: 'Relatório corrigido',
   versao: 'Versão aprovada', numero_eprotocolo: 'Número do E-protocolo', link: 'Link', aprovada_em: 'Data da aprovação',
   registrada_por_nome: 'Registrada por', publicado_em: 'Data da publicação', link_da_publicacao: 'Link da publicação',
   explicacao_sem_publicacao: 'Explicação de concluir sem publicação', responsavel_inicial_nome: 'Responsável inicial',
@@ -99,6 +101,7 @@ const CAMPOS_ESCONDIDOS = new Set(['setor_id', 'processo_id', 'macroprocesso_id'
 
 /** O texto do evento no histórico: o da ação e, no arquivo acrescentado à versão, qual arquivo foi ("Acrescentou o .png à versão"). */
 export function textoDoEvento(evento: EventoDoCadastro): string {
+  if (evento.entidade === 'revisao_interna') return textoDaRevisao(evento)
   const proprio = evento.entidade === 'anexo' ? textoDoAnexo(evento) : textoDaVersao(evento)
   return proprio ?? textoDaAcaoDoCadastro(evento.acao, evento.entidade)
 }
@@ -247,7 +250,7 @@ function valorPorRotulo(campo: string, valor: unknown): string | null {
     tipo: ROTULO_DO_TIPO, origem: ROTULO_DA_ORIGEM_ANTIGA, situacao: ROTULO_DA_SITUACAO, etiqueta: ROTULO_DA_ETIQUETA,
     nivel: { setor: 'Setor', processo: 'Processo' }, obrigatoria: { true: 'Sim', false: 'Não' },
     ativa: { true: 'Ativa', false: 'Inativa' },
-    resultado: { sem_alteracao: 'Sem alteração', corrigida: 'Corrigida' }, escopo: ROTULO_DO_ESCOPO,
+    resultado: { sem_alteracao: 'Sem alteração', corrigida: 'Corrigida' }, escopo: ROTULO_DO_ESCOPO, etapa: NOME_DA_REVISAO,
   }
   const rotulosDoCampo = rotulos[campo]
   return rotulosDoCampo ? (rotulosDoCampo[String(valor)] ?? texto(valor)) : null

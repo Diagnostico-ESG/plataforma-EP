@@ -154,6 +154,33 @@ test('modoParaEnviar prevê o número da piloto e, na em sequência, o da versã
   expect(modoParaEnviar('sequencia', [])).toEqual({ tipo: 'sequencia', numero: 1, numeroDoRelatorio: 1 })
 })
 
+// Na Revisão do relatório (ADR 0046): o relatório é obrigatório, o .bpm opcional, o .png só junto com o .bpm; sem .bpm, o
+// relatório vai sozinho para a versão mais recente que não é histórica.
+test('na Revisão do relatório, modoParaEnviar guarda a versão que recebe o relatório sozinho', () => {
+  const lidas = [versaoDeTeste(5, { historica: true }), versaoDeTeste(6, { piloto: true, arquivos: [relatorioNumeradoDeTeste(6, 2)] })]
+  expect(modoParaEnviar('sequencia', lidas, true)).toEqual({
+    tipo: 'sequencia', numero: 7, numeroDoRelatorio: 3, doRelatorio: { versaoQueRecebe: { numero: 6, piloto: true } },
+  })
+  expect(modoParaEnviar('sequencia', [], true)).toEqual({
+    tipo: 'sequencia', numero: 1, numeroDoRelatorio: 1, doRelatorio: { versaoQueRecebe: null },
+  })
+})
+
+test('na Revisão do relatório, enviar pede o relatório; o .bpm é opcional e o .png só vale com o .bpm', () => {
+  const modo = { tipo: 'sequencia', numero: 8, numeroDoRelatorio: 2, doRelatorio: { versaoQueRecebe: { numero: 7, piloto: false } } } as const
+  const sem = { recusas: {}, conferindo: false }
+  const relatorio = new File(['r'], 'relatorio.docx')
+  expect(podeSubmeter(modo, { ...sem, escolhidos: { relatorio } }, 8)).toBe(true)
+  expect(podeSubmeter(modo, { ...sem, escolhidos: { relatorio, bpm } }, 8)).toBe(true)
+  expect(podeSubmeter(modo, { ...sem, escolhidos: { relatorio, bpm, png } }, 8)).toBe(true)
+  expect(podeSubmeter(modo, { ...sem, escolhidos: { bpm } }, 8)).toBe(false)
+  expect(podeSubmeter(modo, { ...sem, escolhidos: { relatorio, png } }, 8)).toBe(false)
+  expect(podeSubmeter(modo, { recusas: { relatorio: 'não' }, conferindo: false, escolhidos: { relatorio } }, 8)).toBe(false)
+  const semVersao = { ...modo, doRelatorio: { versaoQueRecebe: null } }
+  expect(podeSubmeter(semVersao, { ...sem, escolhidos: { relatorio } }, 8)).toBe(false)
+  expect(podeSubmeter(semVersao, { ...sem, escolhidos: { relatorio, bpm } }, 8)).toBe(true)
+})
+
 test('com o relatório obrigatório, a versão em sequência só se habilita com o .bpm e o relatório', () => {
   const modo = { tipo: 'sequencia', numero: 3, numeroDoRelatorio: 1 } as const
   const sem = { recusas: {}, conferindo: false }

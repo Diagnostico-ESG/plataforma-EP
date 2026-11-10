@@ -124,6 +124,9 @@ test('Substituir pede confirmação e avisa que o arquivo anterior não fica gua
   const { form, versoes } = await abrirTroca()
   const janela = await escolherEConfirmar(form)
   expect(janela.getByText(/arquivo anterior não fica guardado/)).toBeTruthy()
+  // Desde as duas revisões (ADR 0046): o Substituir é para o arquivo enviado por engano; alteração de conteúdo é número novo.
+  expect(janela.getByText(/Use para corrigir um arquivo enviado por engano\. Para alterar o conteúdo, envie uma versão ou um relatório novo: o anterior fica guardado\./))
+    .toBeTruthy()
   fireEvent.click(janela.getByRole('button', { name: 'Cancelar' }))
   expect(janelasPorCima()).toEqual([])
   expect(tamanhoDoPngDaV3(versoes)).toBe(100)

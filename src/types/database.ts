@@ -718,6 +718,8 @@ export type Database = {
           passagem_id: string | null
           processo_id: string
           registrada_em: string
+          relatorio_corrigido_id: string | null
+          relatorio_revisado_id: string | null
           resultado: Database["public"]["Enums"]["resultado_da_revisao"]
           revisada_em: string
           revisor_id: string
@@ -731,6 +733,8 @@ export type Database = {
           passagem_id?: string | null
           processo_id: string
           registrada_em?: string
+          relatorio_corrigido_id?: string | null
+          relatorio_revisado_id?: string | null
           resultado: Database["public"]["Enums"]["resultado_da_revisao"]
           revisada_em: string
           revisor_id: string
@@ -744,6 +748,8 @@ export type Database = {
           passagem_id?: string | null
           processo_id?: string
           registrada_em?: string
+          relatorio_corrigido_id?: string | null
+          relatorio_revisado_id?: string | null
           resultado?: Database["public"]["Enums"]["resultado_da_revisao"]
           revisada_em?: string
           revisor_id?: string
@@ -770,6 +776,20 @@ export type Database = {
             columns: ["processo_id"]
             isOneToOne: false
             referencedRelation: "processos_com_andamento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "revisoes_internas_relatorio_corrigido_id_fkey"
+            columns: ["relatorio_corrigido_id"]
+            isOneToOne: false
+            referencedRelation: "arquivos_da_versao"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "revisoes_internas_relatorio_revisado_id_fkey"
+            columns: ["relatorio_revisado_id"]
+            isOneToOne: false
+            referencedRelation: "arquivos_da_versao"
             referencedColumns: ["id"]
           },
           {

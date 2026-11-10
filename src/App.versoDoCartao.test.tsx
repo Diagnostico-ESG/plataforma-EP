@@ -257,7 +257,7 @@ test('a gaveta mostra as entradas e saídas do processo na etapa, ou que ainda n
   const modelagem = await gavetaDaEtapa('Modelagem piloto')
   expect(await (await etapasDoVerso()).findByRole('button', { name: 'Modelagem piloto: visitada' })).toBeTruthy()
   expect(modelagem.getByText('Entrou em 11/10/2026 · saiu em 12/10/2026')).toBeTruthy()
-  const revisao = await gavetaDaEtapa('Revisão interna')
+  const revisao = await gavetaDaEtapa('Revisão do fluxograma')
   expect(revisao.getByText('Ainda não passou por esta etapa')).toBeTruthy()
 })
 

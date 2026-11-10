@@ -1,6 +1,7 @@
 import { type ReactNode, useCallback, useId, useState } from 'react'
 import { useCarregamento } from '../../hooks/useCarregamento'
 import { useConferenciaNoDrive } from '../../hooks/useConferenciaNoDrive'
+import { CODIGO_DA_REVISAO_DO_RELATORIO } from '../../processos/codigosDasEtapas'
 import type { ProcessoLido } from '../../processos/tipos'
 import { type ModoDoFormulario, modoParaEnviar } from '../../versoes/formularioDeVersao'
 import { type EnvioDaEtapa, envioDaEtapa, ordenarVersoes, podeEnviarRelatorioNaEtapa } from '../../versoes/rotulos'
@@ -118,8 +119,9 @@ const ROTULO_DO_ENVIO: Record<EnvioDaEtapa, string> = {
   historica: 'Registrar versão histórica', piloto: 'Enviar versão piloto', sequencia: 'Enviar versão',
 }
 
-function modoDoEnvio(envio: EnvioDaEtapa, lidas: Versao[]): ModoDoFormulario {
-  return envio === 'historica' ? { tipo: 'historica' } : modoParaEnviar(envio, lidas)
+// Na Revisão do relatório, o [Enviar versão] pede o relatório (ADR 0046).
+function modoDoEnvio(envio: EnvioDaEtapa, lidas: Versao[], codigoDaEtapa: string): ModoDoFormulario {
+  return envio === 'historica' ? { tipo: 'historica' } : modoParaEnviar(envio, lidas, codigoDaEtapa === CODIGO_DA_REVISAO_DO_RELATORIO)
 }
 
 type AcoesDaSecaoProps = {
@@ -135,7 +137,7 @@ function AcoesDaSecao({ lidas, codigoDaEtapa, aberto, aoAbrir }: AcoesDaSecaoPro
     <div className="secao-de-versoes-acoes">
       {envio && (
         <button type="button" className="botao botao-secundario" aria-expanded={aberto?.tipo === envio}
-          onClick={() => aoAbrir(aberto?.tipo === envio ? null : modoDoEnvio(envio, lidas))}>
+          onClick={() => aoAbrir(aberto?.tipo === envio ? null : modoDoEnvio(envio, lidas, codigoDaEtapa))}>
           {ROTULO_DO_ENVIO[envio]}
         </button>
       )}

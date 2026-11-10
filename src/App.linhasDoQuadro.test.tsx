@@ -38,7 +38,7 @@ test('Linhas só aparece no Quadro por etapa; Nenhuma é o padrão e mostra o qu
   const grupo = screen.getByRole('group', { name: 'Linhas' })
   expect(within(grupo).getByRole('button', { name: 'Nenhuma' }).getAttribute('aria-pressed')).toBe('true')
   expect(document.querySelector('.quadro-matriz')).toBeNull()
-  expect(screen.getByRole('region', { name: 'Revisão interna' })).toBeTruthy()
+  expect(screen.getByRole('region', { name: 'Revisão do fluxograma' })).toBeTruthy()
   cleanup()
   window.location.hash = '#/processos?agrupar=setor'
   comTresSetores()
@@ -68,7 +68,7 @@ test('por setor: uma linha por setor com cartão, em ordem de sigla, com o selo 
   await cartaoDe('Do SGA')
   expect(textosDasLinhas()).toEqual(['CDI1', 'SGA2'])
   expect(within(cabecasDasLinhas()[1] as HTMLElement).getByRole('img', { name: 'Secretaria de Gestão' })).toBeTruthy()
-  expect(nomesDaCelula('SGA', 'Revisão interna')).toEqual(['Do SGA', 'Do SGA em Publicação'])
+  expect(nomesDaCelula('SGA', 'Revisão do fluxograma')).toEqual(['Do SGA', 'Do SGA em Publicação'])
   expect(within(await cartaoDe('Do SGA')).queryByRole('img', { name: 'Secretaria de Gestão' })).toBeNull()
 })
 
@@ -145,7 +145,7 @@ test('só a célula da própria linha acende; soltar em outra linha não muda na
   soltarEm(celula('SGA', 'Publicação'))
   expect(screen.getByText('Solte o cartão na mesma linha.')).toBeTruthy()
   expect(falso.chamadas).toEqual([])
-  expect(nomesDaCelula('CDI', 'Revisão interna')).toEqual(['Do CDI'])
+  expect(nomesDaCelula('CDI', 'Revisão do fluxograma')).toEqual(['Do CDI'])
 })
 
 test('por responsável, o processo movido vai para a linha do responsável inicial da etapa de destino', async () => {

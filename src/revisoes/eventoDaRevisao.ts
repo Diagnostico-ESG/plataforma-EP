@@ -2,12 +2,16 @@ import type { EventoDoCadastro } from '../cadastros/tipos'
 import type { ProcessoLido } from '../processos/tipos'
 import type { RevisaoInterna } from './tipos'
 
-// O estado como o gatilho do banco o guarda (migração revisao_interna): as versões como "V7", o resultado, o escopo,
-// o comentário, o revisor e a data da revisão.
+const rotuloDoRelatorio = (numero: number | null | undefined) => (numero ? `Relatório V${numero}` : null)
+
+// O estado como o gatilho do banco o guarda (migrações revisao_interna e duas_revisoes_registro): a etapa, as versões como
+// "V7", os relatórios como "Relatório V2", o resultado, o escopo, o comentário, o revisor e a data da revisão.
 function estadoDaRevisao(processo: ProcessoLido, revisao: RevisaoInterna): Record<string, unknown> {
   return {
-    processo_nome: processo.nome, setor_sigla: processo.setorSigla, versao_revisada: `V${revisao.versaoRevisada}`,
-    versao_corrigida: revisao.versaoCorrigida === null ? null : `V${revisao.versaoCorrigida}`, resultado: revisao.resultado,
+    processo_nome: processo.nome, setor_sigla: processo.setorSigla, etapa: revisao.etapa ?? 'revisao_interna',
+    versao_revisada: `V${revisao.versaoRevisada}`, versao_corrigida: revisao.versaoCorrigida === null ? null : `V${revisao.versaoCorrigida}`,
+    relatorio_revisado: rotuloDoRelatorio(revisao.relatorioRevisado), relatorio_corrigido: rotuloDoRelatorio(revisao.relatorioCorrigido),
+    resultado: revisao.resultado,
     escopo: revisao.escopo, comentario: revisao.comentario, revisor_nome: revisao.revisor, revisada_em: revisao.revisadaEm,
   }
 }

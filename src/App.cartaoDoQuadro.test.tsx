@@ -35,17 +35,17 @@ test('por responsável a barra diz "Nome · n de N", é uma faixa lisa preenchid
   await cartaoDe('Emitir Ofício')
   await porResponsavel()
   const barra = barraDe(await cartaoDe('Emitir Ofício'))
-  expect(barra?.getAttribute('aria-label')).toBe('Etapa 4 de 8: Revisão interna')
-  expect(barra?.querySelector('.barra-etapa-texto')?.textContent).toBe('Revisão interna · 4 de 8')
+  expect(barra?.getAttribute('aria-label')).toBe('Etapa 4 de 9: Revisão do fluxograma')
+  expect(barra?.querySelector('.barra-etapa-texto')?.textContent).toBe('Revisão do fluxograma · 4 de 9')
   expect(barra?.querySelectorAll('.barra-etapa-trilho')).toHaveLength(1)
-  expect(tracinhosDe(barra)).toEqual(['feito', 'feito', 'feito', 'atual', 'futuro', 'futuro', 'futuro', 'futuro'])
+  expect(tracinhosDe(barra)).toEqual(['feito', 'feito', 'feito', 'atual', 'futuro', 'futuro', 'futuro', 'futuro', 'futuro'])
 })
 
 test('em Não iniciados só o primeiro tracinho é o atual', async () => {
   montar([processo('Novo', { etapa: 'nao_iniciados' })])
   await cartaoDe('Novo')
   await porResponsavel()
-  expect(tracinhosDe(barraDe(await cartaoDe('Novo')))).toEqual(['atual', 'futuro', 'futuro', 'futuro', 'futuro', 'futuro', 'futuro', 'futuro'])
+  expect(tracinhosDe(barraDe(await cartaoDe('Novo')))).toEqual(['atual', 'futuro', 'futuro', 'futuro', 'futuro', 'futuro', 'futuro', 'futuro', 'futuro'])
 })
 
 // O Quadro por responsável não mostra concluídos (ticket 03 de repositorio-de-processos): a barra cheia se vê por setor.
@@ -55,8 +55,8 @@ test('em Concluídos o último tracinho é o atual e os outros estão feitos', a
   await cartaoDe('Pronto')
   await escolherFormaDeVer('Quadro por setor')
   const barra = barraDe(await cartaoDe('Pronto'))
-  expect(barra?.getAttribute('aria-label')).toBe('Etapa 8 de 8: Concluídos')
-  expect(tracinhosDe(barra)).toEqual(['feito', 'feito', 'feito', 'feito', 'feito', 'feito', 'feito', 'atual'])
+  expect(barra?.getAttribute('aria-label')).toBe('Etapa 9 de 9: Concluídos')
+  expect(tracinhosDe(barra)).toEqual(['feito', 'feito', 'feito', 'feito', 'feito', 'feito', 'feito', 'feito', 'atual'])
 })
 
 test('o processo suspenso mostra a barra da etapa onde parou, com a pílula Suspenso', async () => {
@@ -64,7 +64,7 @@ test('o processo suspenso mostra a barra da etapa onde parou, com a pílula Susp
   await cartaoDe('Suspenso Teste')
   await porResponsavel()
   const cartao = await cartaoDe('Suspenso Teste')
-  expect(barraDe(cartao)?.getAttribute('aria-label')).toBe('Etapa 4 de 8: Revisão interna')
+  expect(barraDe(cartao)?.getAttribute('aria-label')).toBe('Etapa 4 de 9: Revisão do fluxograma')
   expect(cartao.textContent).toContain('Suspenso')
 })
 
@@ -145,7 +145,7 @@ test('Sem publicação: só em Concluídos sem a data da publicação', async ()
   expect(selos(await cartaoDe('Em Curso'))).toEqual([])
 })
 
-test('Relatório pendente: ausente antes da Revisão interna, presente da Revisão interna em diante, ausente com relatório, na versão histórica e em Concluídos', async () => {
+test('Relatório pendente: ausente antes da Revisão do fluxograma, presente da Revisão do fluxograma em diante, ausente com relatório, na versão histórica e em Concluídos', async () => {
   montar([
     processo('Antes da Revisão', { etapa: 'relatorio_modelagem_tecnica', cartao: SEM_RELATORIO }),
     processo('Na Revisão', { etapa: 'revisao_interna', cartao: SEM_RELATORIO }),

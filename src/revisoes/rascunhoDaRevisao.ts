@@ -1,20 +1,16 @@
-import type { DadosDaRevisao, EscopoDaCorrecao, ResultadoDaRevisao } from './tipos'
+import type { DadosDaRevisao, ResultadoDaRevisao } from './tipos'
 
-/** O que a pessoa preencheu na janela de concluir a Revisão interna: o escopo e o comentário são texto até confirmar. */
-export type RascunhoDaRevisao = { resultado: ResultadoDaRevisao | null; escopo: EscopoDaCorrecao | null; comentario: string }
+/** O que a pessoa preencheu na janela de registrar a revisão: o comentário é texto até confirmar. O escopo é do banco (ADR 0046). */
+export type RascunhoDaRevisao = { resultado: ResultadoDaRevisao | null; comentario: string }
 
-export const RASCUNHO_VAZIO: RascunhoDaRevisao = { resultado: null, escopo: null, comentario: '' }
+export const RASCUNHO_VAZIO: RascunhoDaRevisao = { resultado: null, comentario: '' }
 
-/** Pronto para confirmar: o resultado escolhido e, na "corrigida", o escopo. */
+/** Pronto para confirmar: o resultado escolhido. */
 export function rascunhoPronto(rascunho: RascunhoDaRevisao): boolean {
-  if (rascunho.resultado === null) return false
-  return rascunho.resultado !== 'corrigida' || rascunho.escopo !== null
+  return rascunho.resultado !== null
 }
 
-/** O que vai ao banco: o comentário aparado (vazio vira null) e o escopo só na "corrigida". */
+/** O que vai ao banco: o resultado e o comentário aparado (vazio vira null). */
 export function dadosDaRevisao(rascunho: RascunhoDaRevisao): DadosDaRevisao {
-  const resultado = rascunho.resultado ?? 'sem_alteracao'
-  return {
-    resultado, escopo: resultado === 'corrigida' ? rascunho.escopo : null, comentario: rascunho.comentario.trim() || null,
-  }
+  return { resultado: rascunho.resultado ?? 'sem_alteracao', comentario: rascunho.comentario.trim() || null }
 }

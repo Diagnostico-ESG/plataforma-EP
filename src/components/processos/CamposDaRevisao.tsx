@@ -1,13 +1,10 @@
 import { useId } from 'react'
-import { ROTULO_DO_ESCOPO } from '../../revisoes/frasesDeRevisao'
 import type { OpcaoDoResultado } from '../../revisoes/opcoesDaRevisao'
-import type { EscopoDaCorrecao, ResultadoDaRevisao } from '../../revisoes/tipos'
-
-const ESCOPOS: EscopoDaCorrecao[] = ['fluxograma', 'relatorio', 'ambos']
+import type { ResultadoDaRevisao } from '../../revisoes/tipos'
 
 type CampoDoResultadoProps = { opcoes: OpcaoDoResultado[]; valor: ResultadoDaRevisao | null; aoMudar: (resultado: ResultadoDaRevisao) => void }
 
-/** As duas opções do resultado, cada uma com a versão que cobre; a desabilitada diz o motivo ao lado. */
+/** As duas opções do resultado, cada uma com o que cobre; a desabilitada diz o motivo ao lado. O escopo é do banco (ADR 0046). */
 export function CampoDoResultado({ opcoes, valor, aoMudar }: CampoDoResultadoProps) {
   const nome = useId()
   return (
@@ -19,24 +16,6 @@ export function CampoDoResultado({ opcoes, valor, aoMudar }: CampoDoResultadoPro
             onChange={() => aoMudar(opcao.resultado)} />
           {opcao.rotulo}
           {opcao.motivo && <span className="janela-ajuda"> {opcao.motivo}</span>}
-        </label>
-      ))}
-    </fieldset>
-  )
-}
-
-type CampoDoEscopoProps = { valor: EscopoDaCorrecao | null; aoMudar: (escopo: EscopoDaCorrecao) => void }
-
-/** A escolha do escopo da correção (fluxograma, relatório ou ambos): a janela de registrar e a de editar a revisão a usam. */
-export function CampoDoEscopo({ valor, aoMudar }: CampoDoEscopoProps) {
-  const nome = useId()
-  return (
-    <fieldset className="janela-revisao">
-      <legend className="janela-escolha-pergunta">Escopo da correção</legend>
-      {ESCOPOS.map((escopo) => (
-        <label key={escopo} className="janela-escolha-opcao">
-          <input type="radio" name={nome} checked={valor === escopo} onChange={() => aoMudar(escopo)} />
-          {ROTULO_DO_ESCOPO[escopo]}
         </label>
       ))}
     </fieldset>

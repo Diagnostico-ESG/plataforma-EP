@@ -64,7 +64,7 @@ test('o cartão mostra a barra da etapa e dispensa a linha do responsável; sem 
   expect((await cartaoDe('Emitir Ofício')).querySelector('.cartao-responsavel')).not.toBeNull()
   await trocar('Responsável')
   const cartao = await cartaoDe('Emitir Ofício')
-  expect(cartao.querySelector('.barra-etapa-texto')?.textContent).toBe('Revisão interna · 4 de 8')
+  expect(cartao.querySelector('.barra-etapa-texto')?.textContent).toBe('Revisão do fluxograma · 4 de 9')
   expect(cartao.querySelector('.cartao-responsavel')).toBeNull()
   expect((await cartaoDe('Sem Dono')).querySelector('.cartao-selos')).toBeNull()
 })

@@ -27,7 +27,7 @@ select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000
 set local role authenticated;
 insert into _tap (linha) select throws_ok(
   $sql$update public.etapas set ativa = false where codigo = 'revisao_interna'$sql$,
-  'P0001', 'etapa_protegida:Revisão interna', 'desativar a Revisão interna é recusado');
+  'P0001', 'etapa_protegida:Revisão do fluxograma', 'desativar a Revisão do fluxograma é recusado');
 insert into _tap (linha) select throws_ok(
   $sql$update public.etapas set ativa = false where codigo = 'revisao_setor'$sql$,
   'P0001', 'etapa_protegida:Validação com o setor', 'desativar a Validação com o setor é recusado');
@@ -36,7 +36,7 @@ insert into _tap (linha) select throws_ok(
   'P0001', 'etapa_protegida:Aprovação pelo setor', 'desativar a Aprovação pelo setor é recusado');
 insert into _tap (linha) select throws_ok(
   $sql$delete from public.etapas where codigo = 'revisao_interna'$sql$,
-  'P0001', 'etapa_protegida:Revisão interna', 'excluir a Revisão interna é recusado');
+  'P0001', 'etapa_protegida:Revisão do fluxograma', 'excluir a Revisão do fluxograma é recusado');
 insert into _tap (linha) select throws_ok(
   $sql$delete from public.etapas where codigo = 'revisao_setor'$sql$,
   'P0001', 'etapa_protegida:Validação com o setor', 'excluir a Validação com o setor é recusado');
@@ -44,8 +44,8 @@ insert into _tap (linha) select throws_ok(
   $sql$delete from public.etapas where codigo = 'aprovacao_setor'$sql$,
   'P0001', 'etapa_protegida:Aprovação pelo setor', 'excluir a Aprovação pelo setor é recusado');
 insert into _tap (linha) select lives_ok(
-  $sql$update public.etapas set nome = 'Revisão interna (EP)' where codigo = 'revisao_interna'$sql$,
-  'renomear a Revisão interna continua aceito');
+  $sql$update public.etapas set nome = 'Revisão do fluxograma (EP)' where codigo = 'revisao_interna'$sql$,
+  'renomear a Revisão do fluxograma continua aceito');
 insert into _tap (linha) select lives_ok(
   $sql$select public.mover_etapa((select id from public.etapas where codigo = 'revisao_setor'), 'subir')$sql$,
   'mover a Validação com o setor continua aceito');
@@ -56,7 +56,7 @@ insert into _tap (linha) select is(
   (select count(*)::int from public.etapas where codigo in ('revisao_interna', 'revisao_setor', 'aprovacao_setor') and ativa), 3,
   'as três etapas continuam ativas');
 insert into _tap (linha) select lives_ok(
-  $sql$update public.etapas set nome = 'Revisão interna' where codigo = 'revisao_interna'$sql$, 'devolve o nome');
+  $sql$update public.etapas set nome = 'Revisão do fluxograma' where codigo = 'revisao_interna'$sql$, 'devolve o nome');
 
 insert into _tap (linha) select * from finish();
 do $$ begin

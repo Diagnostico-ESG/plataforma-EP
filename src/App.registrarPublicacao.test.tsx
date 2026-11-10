@@ -43,7 +43,7 @@ test('na Publicação, [Registrar publicação] abre a janela com hoje e grava a
   expect(await (await agoraDoVerso()).findByText('Publicado em 10/10/2026')).toBeTruthy()
   expect(await botoesDoAgora()).toContain('Corrigir publicação')
   expect(falso.processos[0]).toMatchObject({ publicadoEm: '2026-10-10', linkDaPublicacao: 'https://diario.exemplo/p' })
-  expect((await agoraDoVerso()).getByText('Agora · etapa 7 de 8')).toBeTruthy()
+  expect((await agoraDoVerso()).getByText('Agora · etapa 8 de 9')).toBeTruthy()
 })
 
 test('em Concluídos sem publicação: a explicação no Agora e [Registrar publicação]', async () => {

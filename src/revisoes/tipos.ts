@@ -2,26 +2,35 @@ import type { ArquivoDaVersao } from '../versoes/tipos'
 
 export type ResultadoDaRevisao = 'sem_alteracao' | 'corrigida'
 export type EscopoDaCorrecao = 'fluxograma' | 'relatorio' | 'ambos'
+/** As duas etapas de revisão (ADR 0046): a Revisão do fluxograma (código revisao_interna) e a Revisão do relatório. */
+export type EtapaDaRevisao = 'revisao_interna' | 'revisao_relatorio'
 
-/** O que a janela de registrar a revisão interna grava: o escopo só vale em "corrigida"; o comentário vem aparado (null: sem). */
-export type DadosDaRevisao = { resultado: ResultadoDaRevisao; escopo: EscopoDaCorrecao | null; comentario: string | null }
+/** O que a janela de registrar a revisão grava: o resultado e o comentário aparado (null: sem). O escopo o banco deduz. */
+export type DadosDaRevisao = { resultado: ResultadoDaRevisao; comentario: string | null }
 
-/** O que a janela de editar a revisão grava: o resultado (que recalcula as versões), o escopo só em "corrigida" e o comentário aparado. */
+/** O que a janela de editar a revisão grava: o resultado (que recalcula o que ela liga) e o comentário aparado. */
 export type DadosDaEdicaoDaRevisao = DadosDaRevisao
 
-/** Uma revisão registrada; as versões são os números (V7, V8) e `revisadaEm` é a data AAAA-MM-DD. */
+/** Uma revisão registrada; as versões e os relatórios são os números (V7, Relatório V2) e `revisadaEm` é a data AAAA-MM-DD. */
 export type RevisaoInterna = {
   id: string
+  /** De qual revisão é. Ausente: a Revisão do fluxograma (a revisão antiga, sem passagem, e as montadas à mão nos testes). */
+  etapa?: EtapaDaRevisao
   versaoRevisada: number
   /** Só em "corrigida": a versão que o revisor enviou como correção. */
   versaoCorrigida: number | null
+  /** O relatório revisado (Relatório V1); null ou ausente: nenhum (a revisão do fluxograma "sem alteração"). */
+  relatorioRevisado?: number | null
+  /** Só em "corrigida": o relatório que o revisor enviou como correção; null ou ausente: nenhum. */
+  relatorioCorrigido?: number | null
+  /** Deduzido pelo banco do que foi enviado na passagem (só na "corrigida"). */
   resultado: ResultadoDaRevisao
   escopo: EscopoDaCorrecao | null
   comentario: string | null
   /** Nome de quem revisou; null se o usuário não puder ser lido. */
   revisor: string | null
   revisadaEm: string
-  /** Verdadeiro na revisão registrada na passagem em que o processo está agora pela Revisão interna (a que ainda se edita no Agora). Ausente: não. */
+  /** Verdadeiro na revisão registrada na passagem em que o processo está agora (a que ainda se edita no Agora). Ausente: não. */
   daPassagemAberta?: boolean
 }
 
@@ -34,11 +43,11 @@ export type ModuloDeRevisoes = {
   listarRevisoes(processoId: string): Promise<RevisaoInterna[]>
   /** A aprovação do processo; null quando ainda não há. */
   lerAprovacao(processoId: string): Promise<Aprovacao | null>
-  /** Registra a revisão da passagem atual pela Revisão interna; não move o processo. O banco decide as versões e recusa fora da etapa. */
+  /** Registra a revisão da passagem atual numa das duas revisões; não move o processo. O banco decide o que ela liga e recusa fora da etapa. */
   registrarRevisao(processoId: string, dados: DadosDaRevisao): Promise<void>
   /** Registra a aprovação da versão mais recente; se já há uma, ela toma o lugar da anterior. Não move o processo. */
   registrarAprovacao(processoId: string, dados: DadosDaAprovacao): Promise<void>
-  /** Corrige o resultado (recalcula as versões), o escopo (só na "corrigida") e o comentário; o banco confere de novo e grava o antes e o depois. */
+  /** Corrige o resultado (o banco recalcula o que ela liga e o escopo) e o comentário; o banco confere de novo e grava o antes e o depois. */
   editarRevisao(revisaoId: string, dados: DadosDaEdicaoDaRevisao): Promise<void>
   /** Corrige o número, o link e a data da aprovação (inclusive acrescentando o número que chegou depois da conclusão). */
   editarAprovacao(aprovacaoId: string, dados: DadosDaAprovacao): Promise<void>

@@ -8,8 +8,8 @@ import {
   fraseDaDataNoFuturo, fraseDaVersaoAprovada,
 } from '../revisoes/frasesDeAprovacao'
 import {
-  FRASE_DA_CORRIGIDA_SEM_VERSAO_NA_PASSAGEM, FRASE_DA_REVISAO_FORA_DA_ETAPA, FRASE_DA_REVISAO_JA_REGISTRADA,
-  FRASE_DO_ESCOPO_OBRIGATORIO, FRASE_DO_ESCOPO_SO_NA_CORRIGIDA, fraseDoProcessoComRevisoes,
+  FRASE_DA_CORRIGIDA_SEM_ENVIO_NA_PASSAGEM, FRASE_DA_REVISAO_FORA_DA_ETAPA, FRASE_DA_REVISAO_JA_REGISTRADA, FRASE_SEM_RELATORIO,
+  fraseDoProcessoComRevisoes,
 } from '../revisoes/frasesDeRevisao'
 import { fraseDasAnotacoesLongas } from './frasesDasAnotacoes'
 import { fraseDaModelagemNoFuturo } from './frasesDaModelagemPiloto'
@@ -42,8 +42,8 @@ const PADRAO_DA_RECUSA = new RegExp(
   + '|etapa_inativa|publicacao_ou_explicacao_obrigatoria|explicacao_obrigatoria|explicacao_longa'
   + '|etiqueta_fixa_em_concluidos|passagem_fechada|passagem_so_pela_funcao'
   + '|processo_com_versoes|processo_com_anexos|sem_versao|versao_incompleta'
-  + '|corrigida_sem_versao_na_passagem|revisao_ja_registrada|escopo_obrigatorio'
-  + '|escopo_so_na_corrigida|revisao_fora_da_etapa|processo_com_revisoes'
+  + '|corrigida_sem_envio_na_passagem|revisao_ja_registrada|sem_relatorio'
+  + '|revisao_fora_da_etapa|processo_com_revisoes'
   + '|aprovacao_fora_da_etapa|processo_ja_aprovado|aprovacao_so_pela_funcao|link_invalido'
   + '|versao_aprovada|processo_com_aprovacao'
   + '|publicacao_fora_da_etapa|data_da_publicacao_obrigatoria|publicacao_antes_da_aprovacao'
@@ -98,10 +98,9 @@ const FRASE_DA_RECUSA: Record<string, FraseDaRecusa> = {
   processo_com_versoes: fraseDoProcessoComVersoes,
   processo_com_anexos: fraseDoProcessoComAnexos,
   sem_versao: () => FRASE_SEM_VERSAO,
-  corrigida_sem_versao_na_passagem: () => FRASE_DA_CORRIGIDA_SEM_VERSAO_NA_PASSAGEM,
+  corrigida_sem_envio_na_passagem: () => FRASE_DA_CORRIGIDA_SEM_ENVIO_NA_PASSAGEM,
   revisao_ja_registrada: () => FRASE_DA_REVISAO_JA_REGISTRADA,
-  escopo_obrigatorio: () => FRASE_DO_ESCOPO_OBRIGATORIO,
-  escopo_so_na_corrigida: () => FRASE_DO_ESCOPO_SO_NA_CORRIGIDA,
+  sem_relatorio: () => FRASE_SEM_RELATORIO,
   revisao_fora_da_etapa: () => FRASE_DA_REVISAO_FORA_DA_ETAPA,
   processo_com_revisoes: fraseDoProcessoComRevisoes,
   aprovacao_fora_da_etapa: () => FRASE_DA_APROVACAO_FORA_DA_ETAPA,

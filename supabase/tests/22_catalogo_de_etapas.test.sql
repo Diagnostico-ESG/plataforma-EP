@@ -81,10 +81,14 @@ insert into _tap (linha) select throws_ok(
   'P0001', 'registro_inexistente', 'acrescentar antes de uma etapa que não existe é recusado');
 
 -- Subir troca com a vizinha; na ponta nada muda; sentido inválido é recusado.
+-- A vizinha de cima é a que estava logo acima antes do teste (o banco de desenvolvimento pode ter etapas a mais no catálogo).
+create temp table _vizinha as select codigo from _ordens
+  where ordem < (select ordem from _ordens where codigo = 'revisao_setor') order by ordem desc limit 1;
+grant select on _vizinha to authenticated;
 select public.mover_etapa(pg_temp.etapa('revisao_setor'), 'subir');
-insert into _tap (linha) select is(pg_temp.ordem('revisao_setor'), pg_temp.ordem_antes('revisao_interna') + 1,
+insert into _tap (linha) select is(pg_temp.ordem('revisao_setor'), pg_temp.ordem_antes((select codigo from _vizinha)) + 1,
   'subir leva a etapa à posição da vizinha de cima');
-insert into _tap (linha) select is(pg_temp.ordem('revisao_interna'), pg_temp.ordem_antes('revisao_setor') + 1,
+insert into _tap (linha) select is(pg_temp.ordem((select codigo from _vizinha)), pg_temp.ordem_antes('revisao_setor') + 1,
   'a vizinha de cima desce');
 insert into _tap (linha) select lives_ok(
   $sql$select public.mover_etapa((select id from public.etapas order by ordem limit 1), 'subir')$sql$,

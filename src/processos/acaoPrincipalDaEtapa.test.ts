@@ -1,13 +1,32 @@
 import { describe, expect, test } from 'vitest'
 import { umProcessoLido } from '../testes/processoDaLista'
-import { acaoPrincipalDaEtapa } from './acaoPrincipalDaEtapa'
+import { acaoPrincipalDaEtapa, semOQueRevisar } from './acaoPrincipalDaEtapa'
+import type { ProcessoLido } from './tipos'
 
-const naEtapa = (etapa: string, mudancas = {}) => umProcessoLido('Emitir Ofício', { id: 'p1', ...mudancas }, etapa)
+// Com a V8 e o Relatório V1, as duas revisões têm o que revisar.
+const COM_O_QUE_REVISAR: Partial<ProcessoLido> = {
+  ultimaVersao: { numero: 8, autorId: 'u1', autorNome: 'Ana', papeis: [] },
+  ultimoRelatorio: { numero: 1, autorId: 'u1', autorNome: 'Ana', enviadoNestaPassagem: false },
+}
+const naEtapa = (etapa: string, mudancas: Partial<ProcessoLido> = {}) =>
+  umProcessoLido('Emitir Ofício', { id: 'p1', ...COM_O_QUE_REVISAR, ...mudancas }, etapa)
 
 describe('acaoPrincipalDaEtapa', () => {
-  test('a Revisão interna pede o registro da revisão enquanto a passagem não tem uma', () => {
-    expect(acaoPrincipalDaEtapa(naEtapa('revisao_interna'), true, false)).toBe('registrar_revisao')
-    expect(acaoPrincipalDaEtapa(naEtapa('revisao_interna'), true, true)).toBeNull()
+  test.each(['revisao_interna', 'revisao_relatorio'])('a %s pede o registro da revisão enquanto a passagem não tem uma', (etapa) => {
+    expect(acaoPrincipalDaEtapa(naEtapa(etapa), true, false)).toBe('registrar_revisao')
+    expect(acaoPrincipalDaEtapa(naEtapa(etapa), true, true)).toBeNull()
+  })
+
+  test('sem o que revisar não há [Registrar revisão], e o Agora diz o que falta', () => {
+    const semVersao = naEtapa('revisao_interna', { ultimaVersao: null })
+    const semRelatorio = naEtapa('revisao_relatorio', { ultimoRelatorio: null })
+    expect(acaoPrincipalDaEtapa(semVersao, true, false)).toBeNull()
+    expect(acaoPrincipalDaEtapa(semRelatorio, true, false)).toBeNull()
+    expect(semOQueRevisar(semVersao)).toBe('Sem versão para revisar.')
+    expect(semOQueRevisar(semRelatorio)).toBe('Sem relatório para revisar.')
+    expect(semOQueRevisar(naEtapa('revisao_relatorio', { ultimoRelatorio: undefined }))).toBe('Sem relatório para revisar.')
+    expect(semOQueRevisar(naEtapa('revisao_relatorio'))).toBeNull()
+    expect(semOQueRevisar(naEtapa('aprovacao_setor', { ultimaVersao: null }))).toBeNull()
   })
 
   test('a Aprovação pelo setor sempre oferece registrar a aprovação', () => {

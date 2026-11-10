@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { descreverEstadoDoCadastro, nomeDoItem, textoDaAcaoDoCadastro } from './historicoDosCadastros'
+import { descreverEstadoDoCadastro, nomeDoItem, textoDaAcaoDoCadastro, textoDoEvento } from './historicoDosCadastros'
 import type { EventoDoCadastro } from './tipos'
 
 // O evento que o gatilho do banco grava ao registrar a revisão (migração revisao_interna).
@@ -34,5 +34,21 @@ test('"sem alteração" não tem versão corrigida nem escopo: aparecem como "�
   expect(descreverEstadoDoCadastro(semAlteracao)).toBe(
     'Processo: Emitir Ofício; Setor: TSA; Versão revisada: V7; Versão corrigida: —; Resultado: Sem alteração; '
     + 'Escopo: —; Comentário: —; Revisor: Bia Teste; Data da revisão: 13/10/2026',
+  )
+})
+
+// Desde as duas revisões (ADR 0046) o evento guarda a etapa; o antigo, sem ela, fica com o texto de antes.
+test('o evento de revisão diz de qual revisão é', () => {
+  const doRelatorio = { ...REVISAO, depois: { ...REVISAO.depois, etapa: 'revisao_relatorio' } }
+  const doFluxograma = { ...REVISAO, acao: 'editar', depois: { ...REVISAO.depois, etapa: 'revisao_interna' } }
+  expect(textoDoEvento(doRelatorio)).toBe('Registrou a revisão do relatório')
+  expect(textoDoEvento(doFluxograma)).toBe('Editou a revisão do fluxograma')
+  expect(textoDoEvento(REVISAO)).toBe('Registrou a revisão')
+})
+
+test('o estado da revisão do relatório traz a etapa pelo nome e os relatórios', () => {
+  const estado = { processo_nome: 'Emitir Ofício', etapa: 'revisao_relatorio', relatorio_revisado: 'Relatório V1', relatorio_corrigido: 'Relatório V2' }
+  expect(descreverEstadoDoCadastro(estado)).toBe(
+    'Processo: Emitir Ofício; Etapa: Revisão do relatório; Relatório revisado: Relatório V1; Relatório corrigido: Relatório V2',
   )
 })

@@ -46,7 +46,8 @@ export function posicoesDasVersoes(cabecalho: LinhaDoCsv): number[] {
 export const SEQUENCIA_DE_ETAPAS: { chave: ChaveDaColuna; codigo: string; coluna: string }[] = [
   { chave: 'modelagemPiloto', codigo: 'modelagem', coluna: COLUNAS.modelagemPiloto },
   { chave: 'tecnica', codigo: 'relatorio_modelagem_tecnica', coluna: COLUNAS.tecnica },
-  { chave: 'revisaoInterna', codigo: 'revisao_interna', coluna: COLUNAS.revisaoInterna },
+  // A coluna "Revisão Interna" marca as duas revisões (ADR 0046): o processo entra na Revisão do relatório.
+  { chave: 'revisaoInterna', codigo: 'revisao_relatorio', coluna: COLUNAS.revisaoInterna },
   { chave: 'relatorioPiloto', codigo: 'relatorio_modelagem_tecnica', coluna: COLUNAS.relatorioPiloto },
   { chave: 'validacao', codigo: 'aprovacao_setor', coluna: COLUNAS.validacao },
   { chave: 'publicacao', codigo: 'concluidos', coluna: COLUNAS.publicacao },
@@ -54,7 +55,7 @@ export const SEQUENCIA_DE_ETAPAS: { chave: ChaveDaColuna; codigo: string; coluna
 
 export const NOME_DA_ETAPA: Record<string, string> = {
   nao_iniciados: 'Não iniciados', modelagem: 'Modelagem piloto', relatorio_modelagem_tecnica: 'Relatório e modelagem técnica',
-  revisao_interna: 'Revisão interna', aprovacao_setor: 'Aprovação pelo setor', publicacao: 'Publicação', concluidos: 'Concluídos',
+  revisao_interna: 'Revisão do fluxograma', revisao_relatorio: 'Revisão do relatório', aprovacao_setor: 'Aprovação pelo setor', publicacao: 'Publicação', concluidos: 'Concluídos',
 }
 
 /** "Não realizada" conta como "Concluído" (a época em que não se fazia a modelagem técnica). */

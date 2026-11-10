@@ -42,7 +42,7 @@ describe('cadastro', () => {
     const modulo = falso()
     const id = await modulo.criarProcesso(DADOS)
     expect(await lido(modulo, id)).toMatchObject({
-      etapaAtual: { codigo: 'nao_iniciados', posicao: 1, total: 8 }, etiqueta: 'a_fazer', responsavel: null,
+      etapaAtual: { codigo: 'nao_iniciados', posicao: 1, total: 9 }, etiqueta: 'a_fazer', responsavel: null,
       entrouNaEtapaEm: hojeLocal(), situacao: 'em_andamento',
     })
   })
@@ -91,7 +91,7 @@ describe('mover', () => {
     const modulo = falso(umProcessoLido('Emitir Ofício', { id: 'p1', etiqueta: 'concluido', responsavel: { ...ANA, fotoUrl: null } }))
     await modulo.moverProcesso('p1', idDa('aprovacao_setor'))
     expect(await lido(modulo)).toMatchObject({
-      etapaAtual: { codigo: 'aprovacao_setor', posicao: 6, total: 8 }, etiqueta: 'a_fazer',
+      etapaAtual: { codigo: 'aprovacao_setor', posicao: 7, total: 9 }, etiqueta: 'a_fazer',
       entrouNaEtapaEm: hojeLocal(),
     })
   })
@@ -106,7 +106,7 @@ describe('mover', () => {
     const modulo = falso(umProcessoLido('Emitir Ofício', { id: 'p1', entrouNaEtapaEm: '2026-10-10' }))
     await modulo.moverProcesso('p1', idDa('publicacao'))
     const etapas = (await lido(modulo)).etapasDoVerso
-    expect(etapas).toHaveLength(8)
+    expect(etapas).toHaveLength(9)
     expect(etapas.find((etapa) => etapa.codigo === 'revisao_interna')?.passagens).toEqual([{ entrouEm: '2026-10-10', saiuEm: hojeLocal() }])
     expect(etapas.find((etapa) => etapa.codigo === 'publicacao')?.passagens).toEqual([{ entrouEm: hojeLocal(), saiuEm: null }])
   })
@@ -181,7 +181,7 @@ describe('chegada a Concluídos', () => {
     const modulo = falso()
     await modulo.moverProcesso('p1', idDa('concluidos'), { ...CHEGADA_VAZIA, dataDaPublicacao: '2026-10-10' })
     expect(await lido(modulo)).toMatchObject({
-      situacao: 'concluido', etiqueta: 'concluido', publicadoEm: '2026-10-10', etapaAtual: { codigo: 'concluidos', posicao: 8 },
+      situacao: 'concluido', etiqueta: 'concluido', publicadoEm: '2026-10-10', etapaAtual: { codigo: 'concluidos', posicao: 9 },
     })
   })
 

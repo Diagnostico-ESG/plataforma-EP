@@ -24,24 +24,24 @@ async function escolherVoce() {
 }
 const lista = async (nome: string) => (await agoraDoVerso()).getByRole('combobox', { name: nome }) as HTMLSelectElement
 const ETAPAS_NA_ORDEM = [
-  'Não iniciados', 'Modelagem piloto', 'Relatório e modelagem técnica', 'Revisão interna', 'Validação com o setor',
-  'Aprovação pelo setor', 'Publicação', 'Concluídos',
+  'Não iniciados', 'Modelagem piloto', 'Relatório e modelagem técnica', 'Revisão do fluxograma', 'Revisão do relatório',
+  'Validação com o setor', 'Aprovação pelo setor', 'Publicação', 'Concluídos',
 ]
 
 test('o rótulo diz a posição entre as etapas ativas, e a lista Etapa traz todas na ordem do catálogo, na atual', async () => {
   montarVerso(processoLido())
   const agora = await agoraDoVerso()
-  expect(agora.getByText('Agora · etapa 4 de 8')).toBeTruthy()
+  expect(agora.getByText('Agora · etapa 4 de 9')).toBeTruthy()
   const etapa = await lista('Etapa')
   expect([...etapa.options].map((opcao) => opcao.textContent)).toEqual(ETAPAS_NA_ORDEM)
-  expect(etapa.selectedOptions[0].textContent).toBe('Revisão interna')
+  expect(etapa.selectedOptions[0].textContent).toBe('Revisão do fluxograma')
 })
 
 test('escolher outra etapa move na hora, sem janela: a etiqueta volta a A fazer e o responsável é o inicial da etapa nova', async () => {
   const falso = montarVerso(processoLido({ etiqueta: 'em_andamento', ...COM_BIA }))
   comResponsavelInicial(falso, 'aprovacao_setor', { ...EU, fotoUrl: null, ativo: true, perfil: 'integrante_ep' })
   fireEvent.change(await lista('Etapa'), { target: { value: 'e6' } })
-  await screen.findByText('Agora · etapa 6 de 8')
+  await screen.findByText('Agora · etapa 7 de 9')
   expect(falso.chamadas).toEqual([{ acao: 'mover', id: 'p1', etapaId: 'e6' }])
   expect(janelasPorCima()).toEqual([])
   expect((await lista('Status')).value).toBe('a_fazer')
@@ -51,7 +51,7 @@ test('escolher outra etapa move na hora, sem janela: a etiqueta volta a A fazer 
 test('mover para trás também vale, inclusive para Não iniciados', async () => {
   const falso = montarVerso(processoLido())
   fireEvent.change(await lista('Etapa'), { target: { value: 'e1' } })
-  await screen.findByText('Agora · etapa 1 de 8')
+  await screen.findByText('Agora · etapa 1 de 9')
   expect(falso.chamadas).toEqual([{ acao: 'mover', id: 'p1', etapaId: 'e1' }])
 })
 
@@ -67,8 +67,8 @@ test('a falha ao mover aparece em vermelho e o processo fica onde estava', async
   falso.falhaDeGravacao = 'falha de conexão simulada'
   fireEvent.change(await lista('Etapa'), { target: { value: 'e6' } })
   expect((await screen.findByRole('alert')).textContent).toBe('A alteração não foi salva: falha de conexão simulada.')
-  expect((await lista('Etapa')).selectedOptions[0].textContent).toBe('Revisão interna')
-  expect((await agoraDoVerso()).getByText('Agora · etapa 4 de 8')).toBeTruthy()
+  expect((await lista('Etapa')).selectedOptions[0].textContent).toBe('Revisão do fluxograma')
+  expect((await agoraDoVerso()).getByText('Agora · etapa 4 de 9')).toBeTruthy()
 })
 
 test('a recusa do banco aparece com a frase pronta', async () => {
@@ -89,7 +89,7 @@ test('a lista Status tem A fazer, Iniciado e Finalizado, grava ao escolher e nã
   fireEvent.change(etiqueta, { target: { value: 'em_andamento' } })
   await waitFor(() => expect(falso.chamadas).toEqual([{ acao: 'etiqueta', id: 'p1', etiqueta: 'em_andamento' }]))
   expect((await lista('Status')).value).toBe('em_andamento')
-  expect((await agoraDoVerso()).getByText('Agora · etapa 4 de 8')).toBeTruthy()
+  expect((await agoraDoVerso()).getByText('Agora · etapa 4 de 9')).toBeTruthy()
   expect((await agoraDoVerso()).getByText(BIA.nome)).toBeTruthy()
 })
 
@@ -149,7 +149,7 @@ test('escolher "Você" na lista põe quem está na tela como responsável sem mo
   const agora = await agoraDoVerso()
   expect(await agora.findByText(EU.nome)).toBeTruthy()
   expect(agora.queryByRole('button', { name: 'Assumir' })).toBeNull()
-  expect(agora.getByText('Agora · etapa 4 de 8')).toBeTruthy()
+  expect(agora.getByText('Agora · etapa 4 de 9')).toBeTruthy()
 })
 
 test.each([COM_EU, COM_BIA, {}])('nunca há [Assumir], com qualquer responsável', async (responsavel) => {
@@ -238,15 +238,15 @@ test('em Não iniciados e em Concluídos não há contagem de dias', async () =>
 
 const DE_BIA: UltimaVersao = { numero: 4, autorId: BIA.id, autorNome: BIA.nome, papeis: ['bpm', 'png'] }
 
-test('na Revisão interna, o aviso amarelo aparece quando o responsável é quem enviou a versão mais recente, e some ao trocar', async () => {
+test('na Revisão do fluxograma, o aviso amarelo aparece quando o responsável é quem enviou a versão mais recente, e some ao trocar', async () => {
   montarVerso(processoLido({ ...COM_BIA, ultimaVersao: DE_BIA }))
   const agora = await agoraDoVerso()
-  expect(agora.getByText('Bia Teste enviou a V4; a revisão interna deveria ser de outra pessoa.')).toBeTruthy()
+  expect(agora.getByText('Bia Teste enviou a V4; a revisão do fluxograma deveria ser de outra pessoa.')).toBeTruthy()
   await escolherVoce()
   await waitFor(async () => expect((await agoraDoVerso()).queryByText(/deveria ser de outra pessoa/)).toBeNull())
 })
 
-test('o aviso não aparece fora da Revisão interna nem quando o responsável é outro', async () => {
+test('o aviso não aparece fora da Revisão do fluxograma nem quando o responsável é outro', async () => {
   montarVerso(processoLido({ ...COM_BIA, ultimaVersao: DE_BIA }, 'modelagem'))
   expect((await agoraDoVerso()).queryByText(/deveria ser de outra pessoa/)).toBeNull()
   cleanup()
@@ -268,7 +268,7 @@ test.each(['suspenso', 'cancelado'] as const)('o processo %s não tem listas: mo
   expect(agora.queryByRole('combobox')).toBeNull()
   expect(agora.queryByRole('button', { name: 'Assumir' })).toBeNull()
   expect(agora.getByText(/Aguardando decisão/)).toBeTruthy()
-  expect(agora.getByText('Em Revisão interna · A fazer · com Bia Teste')).toBeTruthy()
+  expect(agora.getByText('Em Revisão do fluxograma · A fazer · com Bia Teste')).toBeTruthy()
   expect(agora.getByText(/Retome o processo para mudar a etapa, o status ou o responsável/)).toBeTruthy()
   expect(agora.getByRole('button', { name: 'Retomar' })).toBeTruthy()
 })
@@ -281,7 +281,7 @@ test('o suspenso não ganha o selo de dias, por mais tempo que tenha na etapa', 
 test('a Consulta vê a etapa, a etiqueta e o nome do responsável em texto, sem tempo, listas nem botões', async () => {
   montarVerso(processoLido({ ...COM_BIA, etiqueta: 'em_andamento', entrouNaEtapaEm: diasAtras(3) }), 'consulta')
   const agora = await agoraDoVerso()
-  expect(agora.getByText('Em Revisão interna · Iniciado')).toBeTruthy()
+  expect(agora.getByText('Em Revisão do fluxograma · Iniciado')).toBeTruthy()
   expect(agora.getByText(BIA.nome)).toBeTruthy()
   expect(agora.queryByText(/há 3 dias/)).toBeNull()
   expect(agora.queryByRole('combobox')).toBeNull()
@@ -291,7 +291,7 @@ test('a Consulta vê a etapa, a etiqueta e o nome do responsável em texto, sem 
 test('a Consulta, sem responsável, não vê nada do responsável', async () => {
   montarVerso(processoLido(), 'consulta')
   const agora = await agoraDoVerso()
-  expect(agora.getByText('Em Revisão interna · A fazer')).toBeTruthy()
+  expect(agora.getByText('Em Revisão do fluxograma · A fazer')).toBeTruthy()
   expect(agora.queryByText(/responsável/i)).toBeNull()
 })
 

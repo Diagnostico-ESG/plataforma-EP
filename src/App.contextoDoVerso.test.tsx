@@ -39,7 +39,7 @@ test('Subprocessos ({n}) com a etapa atual de cada um e a situação fora de em 
   const estrutura = await regiao('Subprocessos (3)')
   const itens = estrutura.getAllByRole('listitem').map((item) => item.textContent)
   expect(itens).toEqual([
-    'Arquivar OfícioRevisão interna · Suspenso', 'Conferir OfícioRevisão interna', 'Publicar OfícioConcluído',
+    'Arquivar OfícioRevisão do fluxograma · Suspenso', 'Conferir OfícioRevisão do fluxograma', 'Publicar OfícioConcluído',
   ])
 })
 
@@ -51,7 +51,7 @@ test('o link do subprocesso abre o subprocesso na mesma janela, que mostra "Faz 
   expect(await screen.findByRole('dialog', { name: 'Processo Conferir Ofício' })).toBeTruthy()
   const pai = await regiao('Faz parte de')
   expect(pai.getByRole('link', { name: 'Emitir Ofício' }).getAttribute('href')).toBe('#/processos/p1')
-  expect(pai.getByText('Revisão interna')).toBeTruthy()
+  expect(pai.getByText('Revisão do fluxograma')).toBeTruthy()
 })
 
 test('sem pai nem subprocessos, a Estrutura não aparece', async () => {

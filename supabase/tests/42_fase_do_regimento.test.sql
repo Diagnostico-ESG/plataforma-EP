@@ -51,7 +51,7 @@ insert into _tap (linha) select is((select count(*)::int from public.etapas wher
 insert into _tap (linha) select is(pg_temp.fase('modelagem'), 'IV', 'Modelagem piloto está na fase IV');
 insert into _tap (linha) select is(pg_temp.fase('relatorio_modelagem_tecnica'), 'V',
   'Relatório e modelagem técnica está na fase V');
-insert into _tap (linha) select is(pg_temp.fase('revisao_interna'), 'VI', 'Revisão interna está na fase VI');
+insert into _tap (linha) select is(pg_temp.fase('revisao_interna'), 'VI', 'Revisão do fluxograma está na fase VI');
 insert into _tap (linha) select is(pg_temp.fase('revisao_setor'), 'VI', 'Validação com o setor está na fase VI');
 insert into _tap (linha) select is(pg_temp.fase('aprovacao_setor'), 'VI', 'Aprovação pelo setor está na fase VI');
 insert into _tap (linha) select is(pg_temp.fase('publicacao'), 'VII', 'Publicação está na fase VII');

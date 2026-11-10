@@ -19,7 +19,7 @@ const FRASE_DO_CODIGO: Record<string, (valor: string) => string> = {
   piloto_depois_de_versao_em_sequencia: () =>
     'O processo já tem versão em sequência; a versão piloto só pode ser enviada antes dela.',
   piloto_fora_da_etapa: () => 'A versão piloto só pode ser enviada até a Modelagem piloto.',
-  versao_fora_da_etapa: () => 'A versão só pode ser enviada até a Revisão interna.',
+  versao_fora_da_etapa: () => 'A versão só pode ser enviada até a Revisão do relatório.',
   historica_fora_de_nao_iniciados: () => 'A versão histórica só pode ser registrada em Não iniciados.',
   arquivo_ja_existe: () => 'A versão já tem esse arquivo.',
   papel_nao_acrescentavel: () => 'Só o .png e o .bpmn podem ser acrescentados depois.',
@@ -44,7 +44,7 @@ const FRASE_DO_CODIGO: Record<string, (valor: string) => string> = {
     `Outra pessoa enviou um relatório enquanto você enviava; este seria o Relatório V${numero}. Envie de novo.`,
   relatorio_so_docx: () => 'O relatório precisa ser um arquivo .docx.',
   relatorio_sem_versao: () => 'Não há versão para receber o relatório: envie a versão piloto ou uma versão primeiro.',
-  relatorio_fora_da_etapa: () => 'O relatório só pode ser enviado até a Revisão interna.',
+  relatorio_fora_da_etapa: () => 'O relatório só pode ser enviado até a Revisão do relatório.',
   relatorio_fora_da_versao_mais_recente: () => 'O relatório precisa acompanhar a versão mais recente.',
   versao_historica_somente_leitura: () => 'A versão histórica é somente leitura: não recebe arquivos.',
   versao_aprovada: fraseDaVersaoAprovada,

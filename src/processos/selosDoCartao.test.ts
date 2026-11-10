@@ -34,7 +34,7 @@ describe('selo de dias (processo parado)', () => {
 describe('selo de Relatório pendente', () => {
   const com = (etapa: string) => umProcesso('A', { cartao: semRelatorio }, etapa)
 
-  test('ausente antes da Revisão interna, presente nela e depois, e ausente em Concluídos', () => {
+  test('ausente antes da Revisão do fluxograma, presente nela e depois, e ausente em Concluídos', () => {
     expect(tipos(com('relatorio_modelagem_tecnica'))).not.toContain('relatorio')
     expect(tipos(com('nao_iniciados'))).not.toContain('relatorio')
     expect(selos(com('revisao_interna'))[0]).toEqual({ tipo: 'relatorio', texto: 'Relatório pendente', tom: 'alerta' })
@@ -104,5 +104,5 @@ test('o processo sem cartão não tem selos de cartão', () => {
 })
 
 test('a etapa atual vem do catálogo de teste', () => {
-  expect(etapaAtualDe('concluidos').posicao).toBe(8)
+  expect(etapaAtualDe('concluidos').posicao).toBe(9)
 })

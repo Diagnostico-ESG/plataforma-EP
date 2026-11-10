@@ -17,8 +17,10 @@ export type DonoDoCatalogo = {
   usuariosPossiveis: UsuarioResponsavel[]
 }
 
-// Como o gatilho do banco: as seis etapas com campos próprios não se desativam nem se excluem.
-const PROTEGIDAS = ['modelagem', 'relatorio_modelagem_tecnica', 'revisao_interna', 'revisao_setor', 'aprovacao_setor', 'publicacao']
+// Como o gatilho do banco: as sete etapas com campos próprios não se desativam nem se excluem.
+const PROTEGIDAS = [
+  'modelagem', 'relatorio_modelagem_tecnica', 'revisao_interna', 'revisao_relatorio', 'revisao_setor', 'aprovacao_setor', 'publicacao',
+]
 
 const porOrdem = <T extends { ordem: number }>(a: T, b: T) => a.ordem - b.ordem
 
