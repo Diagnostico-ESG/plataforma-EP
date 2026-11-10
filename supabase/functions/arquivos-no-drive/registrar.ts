@@ -11,6 +11,7 @@ import {
   type EntradaRegistrar,
   type FuncaoDeRegistro,
 } from '../_shared/registro.ts'
+import { conferirPedidoDaImportacao, parametrosDaImportacao } from '../_shared/importacaoDeArquivos.ts'
 import { conferirAlvoDoRegistro, conferirVersaoDoProcesso } from '../_shared/substituicao.ts'
 import { lerAlvoPorPapel, lerProcessoDaVersao, recusaDoProcesso } from './acoes.ts'
 import { responderResultadoDoBanco } from './gravacao.ts'
@@ -43,7 +44,12 @@ function campoDoResultado(funcao: FuncaoDeRegistro): string {
   return funcao.endsWith('_pdf_da_aprovacao') ? 'pdf_id' : 'arquivo_id'
 }
 
-async function gravar(contexto: ContextoDoDrive, entrada: EntradaRegistrar, arquivos: ArquivoParaGravar[]): Promise<Response> {
+// Na importação dos dados atuais (ticket 02), a versão entra por importar_versao, que devolve "criada" ou "ja_existia".
+async function gravar(contexto: ContextoDoDrive, entrada: EntradaRegistrar, arquivos: ArquivoParaGravar[], importacao: boolean): Promise<Response> {
+  if (importacao) {
+    const resultado = await contexto.cliente.rpc('importar_versao', parametrosDaImportacao(entrada, arquivos))
+    return responderResultadoDoBanco('importar_versao', resultado, 'resultado')
+  }
   const funcao = funcaoDoBancoPara(entrada)
   const resultado = await contexto.cliente.rpc(funcao, parametrosDoBanco(entrada, arquivos))
   return responderResultadoDoBanco(funcao, resultado, campoDoResultado(funcao))
@@ -75,10 +81,11 @@ async function conferirAlvoDoPedido(contexto: ContextoDoDrive, entrada: EntradaR
   return null
 }
 
-export async function registrar(contexto: ContextoDoDrive, entrada: EntradaRegistrar): Promise<Response> {
+export async function registrar(contexto: ContextoDoDrive, entrada: EntradaRegistrar, importacao = false): Promise<Response> {
   const processo = await lerSituacao(contexto, entrada.processoId)
   if (processo === null) return responderRecusa(recusar('entrada_invalida', 'processo não encontrado'))
-  const foraDeAndamento = recusaDoProcesso(processo, entrada.arquivos[0].papel)
+  const foraDeAndamento = recusaDoProcesso(processo, entrada.arquivos[0].papel, importacao)
+    ?? (importacao ? conferirPedidoDaImportacao(entrada) : null)
   if (foraDeAndamento) return responderRecusa(foraDeAndamento)
   const recusaDoAlvo = await conferirAlvoDoPedido(contexto, entrada)
   if (recusaDoAlvo) return recusaDoAlvo
@@ -87,5 +94,5 @@ export async function registrar(contexto: ContextoDoDrive, entrada: EntradaRegis
   const lidos = await Promise.all(entrada.arquivos.map((arquivo) => lerArquivoNoDrive(contexto.token, arquivo.driveId)))
   const conferidos = conferirArquivosNoDrive(entrada.arquivos, lidos, pastaId, rotuloEsperado(entrada), entrada.numeroDoRelatorio)
   if (!conferidos.ok) return responderRecusa(conferidos.recusa)
-  return await gravar(contexto, entrada, conferidos.valor)
+  return await gravar(contexto, entrada, conferidos.valor, importacao)
 }

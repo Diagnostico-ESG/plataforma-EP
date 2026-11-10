@@ -3,7 +3,7 @@
 // entrada já foram conferidas (decisao.ts, anexo.ts, registroAnexo.ts). Nada aqui loga nem devolve o nome do anexo em erro.
 import { nomeDoAnexoNoDrive, type EntradaIniciarEnvioDoAnexo } from '../_shared/anexo.ts'
 import { recusar } from '../_shared/decisao.ts'
-import { conferirArquivosNoDrive, type ArquivoNoDrive } from '../_shared/registro.ts'
+import { conferirArquivosNoDrive, type ArquivoNoDrive, type ArquivoParaGravar } from '../_shared/registro.ts'
 import type { EntradaRegistrarAnexo } from '../_shared/registroAnexo.ts'
 import { abrirSessaoDeEnvio, lerProcesso, recusaDoProcesso } from './acoes.ts'
 import { responderResultadoDoBanco } from './gravacao.ts'
@@ -15,10 +15,11 @@ export async function iniciarEnvioDoAnexo(
   contexto: ContextoDoDrive,
   entrada: EntradaIniciarEnvioDoAnexo,
   origem: string | null,
+  importacao = false,
 ): Promise<Response> {
   const processo = await lerProcesso(contexto, entrada.processoId)
   if (!processo) return responderRecusa(recusar('entrada_invalida', 'processo não encontrado'))
-  const foraDeAndamento = recusaDoProcesso(processo, 'anexo')
+  const foraDeAndamento = recusaDoProcesso(processo, 'anexo', importacao)
   if (foraDeAndamento) return responderRecusa(foraDeAndamento)
   const pastaId = await garantirPastaDosAnexos(contexto, processo)
   const nome = nomeDoAnexoNoDrive(entrada.nomeOriginal)
@@ -31,11 +32,12 @@ function lerArquivoNoDrive(token: string, driveId: string): Promise<ArquivoNoDri
 }
 
 // O arquivo que chegou ao Drive precisa estar na subpasta do processo e debaixo da raiz do ambiente; o nome, o tamanho e o
-// formato vêm do Drive (conferirArquivosNoDrive, sem rótulo de versão). Se algo falhar, nada é gravado.
-export async function registrarAnexo(contexto: ContextoDoDrive, entrada: EntradaRegistrarAnexo): Promise<Response> {
+// formato vêm do Drive (conferirArquivosNoDrive, sem rótulo de versão). Se algo falhar, nada é gravado. Na importação dos dados
+// atuais (ticket 02), o .pdf do relatório entra por importar_anexo, que devolve "criado" ou "ja_existia".
+export async function registrarAnexo(contexto: ContextoDoDrive, entrada: EntradaRegistrarAnexo, importacao = false): Promise<Response> {
   const processo = await lerProcesso(contexto, entrada.processoId)
   if (!processo) return responderRecusa(recusar('entrada_invalida', 'processo não encontrado'))
-  const foraDeAndamento = recusaDoProcesso(processo, 'anexo')
+  const foraDeAndamento = recusaDoProcesso(processo, 'anexo', importacao)
   if (foraDeAndamento) return responderRecusa(foraDeAndamento)
   const pastaId = await lerPastaDosAnexos(contexto.cliente, entrada.processoId)
   if (!pastaId) return responderRecusa(recusar('arquivo_fora_da_pasta'))
@@ -45,6 +47,11 @@ export async function registrarAnexo(contexto: ContextoDoDrive, entrada: Entrada
   }
   const conferidos = conferirArquivosNoDrive([{ papel: 'anexo', driveId: entrada.driveId }], [lido], pastaId)
   if (!conferidos.ok) return responderRecusa(conferidos.recusa)
-  const resultado = await contexto.cliente.rpc('registrar_anexo', { p_processo: entrada.processoId, p_arquivo: conferidos.valor[0] })
-  return responderResultadoDoBanco('registrar_anexo', resultado, 'anexo_id')
+  return await gravarAnexo(contexto, entrada.processoId, conferidos.valor[0], importacao)
+}
+
+async function gravarAnexo(contexto: ContextoDoDrive, processoId: string, arquivo: ArquivoParaGravar, importacao: boolean): Promise<Response> {
+  const funcao = importacao ? 'importar_anexo' : 'registrar_anexo'
+  const resultado = await contexto.cliente.rpc(funcao, { p_processo: processoId, p_arquivo: arquivo })
+  return responderResultadoDoBanco(funcao, resultado, importacao ? 'resultado' : 'anexo_id')
 }

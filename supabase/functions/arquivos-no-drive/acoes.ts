@@ -10,6 +10,7 @@ import {
   type Recusa,
 } from '../_shared/decisao.ts'
 import { tipoMimeDaExtensao } from '../_shared/drive.ts'
+import { conferirPedidoDaImportacao, conferirProcessoDaImportacao } from '../_shared/importacaoDeArquivos.ts'
 import { nomePadrao, type PapelDoArquivo } from '../_shared/nomePadrao.ts'
 import { conferirAlvoDoEnvio, type AlvoDaSubstituicao } from '../_shared/substituicao.ts'
 import { chamarDrive } from './google.ts'
@@ -24,8 +25,12 @@ export interface ProcessoDoEnvio extends ProcessoDaPasta {
   situacao: string
 }
 
-/** A regra do processo para o papel: o .pdf da aprovação vale também concluído; os demais, só em andamento. */
-export function recusaDoProcesso(processo: Pick<ProcessoDoEnvio, 'situacao'>, papel: PapelDoArquivo): Recusa | null {
+/**
+ * A regra do processo para o papel: o .pdf da aprovação vale também concluído; os demais, só em andamento. Na importação dos
+ * dados atuais, qualquer papel vale também com o processo concluído.
+ */
+export function recusaDoProcesso(processo: Pick<ProcessoDoEnvio, 'situacao'>, papel: PapelDoArquivo, importacao = false): Recusa | null {
+  if (importacao) return conferirProcessoDaImportacao(processo.situacao)
   if (papel === 'pdf_da_aprovacao') return conferirProcessoDoPdf(processo.situacao)
   return conferirProcessoEmAndamento(processo.situacao)
 }
@@ -87,10 +92,12 @@ export async function iniciarEnvio(
   contexto: ContextoDoDrive,
   entrada: EntradaIniciarEnvio,
   origem: string | null,
+  importacao = false,
 ): Promise<Response> {
   const processo = await lerProcesso(contexto, entrada.processoId)
   if (!processo) return responderRecusa(recusar('entrada_invalida', 'processo não encontrado'))
-  const foraDeAndamento = recusaDoProcesso(processo, entrada.papel)
+  const foraDeAndamento = recusaDoProcesso(processo, entrada.papel, importacao)
+    ?? (importacao ? conferirPedidoDaImportacao({ versaoId: null, arquivoId: entrada.arquivoId }) : null)
   if (foraDeAndamento) return responderRecusa(foraDeAndamento)
   if (entrada.arquivoId !== null) return await iniciarSubstituicao(contexto, entrada, entrada.arquivoId, origem)
   const pastaId = await garantirPastaDoProcesso(contexto, processo)

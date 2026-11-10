@@ -11,6 +11,7 @@ import {
 } from '../_shared/decisao.ts'
 import { cabecalhosDeOrigem } from '../_shared/drive.ts'
 import { validarConferir } from '../_shared/conferencia.ts'
+import { lerImportacaoDoPedido } from '../_shared/importacaoDeArquivos.ts'
 import { validarRegistro } from '../_shared/registroAnexo.ts'
 import { validarRenumerar } from '../_shared/renumerar.ts'
 import { baixar, iniciarEnvio } from './acoes.ts'
@@ -55,30 +56,35 @@ async function executarRenumerar(corpo: unknown, chamador: ContextoDoChamador, c
   return await renumerarVersao({ cliente: chamador.cliente, token: await obterToken(config), config }, entrada.valor)
 }
 
-// O papel anexo tem entrada própria (sem número nem versão); o resto segue a regra de sempre.
-async function executarRegistrar(corpo: unknown, chamador: ContextoDoChamador, config: Configuracao): Promise<Response> {
+// O papel anexo tem entrada própria (sem número nem versão); o resto segue a regra de sempre. Com a marca da importação
+// (importação dos dados atuais, ticket 02), a gravação é a do banco para a importação.
+async function executarRegistrar(corpo: unknown, chamador: ContextoDoChamador, config: Configuracao, importacao: boolean): Promise<Response> {
   const pedido = validarRegistro(corpo)
   if (!pedido.ok) return responderRecusa(pedido.recusa)
   const contexto = { cliente: chamador.cliente, token: await obterToken(config), config }
-  if (pedido.valor.tipo === 'anexo') return await registrarAnexo(contexto, pedido.valor.entrada)
-  return await registrar(contexto, pedido.valor.entrada)
+  if (pedido.valor.tipo === 'anexo') return await registrarAnexo(contexto, pedido.valor.entrada, importacao)
+  return await registrar(contexto, pedido.valor.entrada, importacao)
 }
 
-async function executarIniciarEnvio(corpo: unknown, chamador: ContextoDoChamador, config: Configuracao, origem: string | null): Promise<Response> {
+async function executarIniciarEnvio(
+  corpo: unknown, chamador: ContextoDoChamador, config: Configuracao, origem: string | null, importacao: boolean,
+): Promise<Response> {
   const pedido = validarEnvio(corpo)
   if (!pedido.ok) return responderRecusa(pedido.recusa)
   const contexto = { cliente: chamador.cliente, token: await obterToken(config), config }
-  if (pedido.valor.tipo === 'anexo') return await iniciarEnvioDoAnexo(contexto, pedido.valor.entrada, origem)
-  return await iniciarEnvio(contexto, pedido.valor.entrada, origem)
+  if (pedido.valor.tipo === 'anexo') return await iniciarEnvioDoAnexo(contexto, pedido.valor.entrada, origem, importacao)
+  return await iniciarEnvio(contexto, pedido.valor.entrada, origem, importacao)
 }
 
-async function executar(acao: Acao, corpo: unknown, chamador: ContextoDoChamador, config: Configuracao, origem: string | null): Promise<Response> {
-  if (acao === 'registrar') return await executarRegistrar(corpo, chamador, config)
+async function executar(
+  acao: Acao, corpo: unknown, chamador: ContextoDoChamador, config: Configuracao, origem: string | null, importacao: boolean,
+): Promise<Response> {
+  if (acao === 'registrar') return await executarRegistrar(corpo, chamador, config, importacao)
   if (acao === 'conferir') return await executarConferir(corpo, chamador, config)
   if (acao === 'baixar') return await executarBaixar(corpo, chamador, config)
   if (acao === 'retirar') return await executarRetirar(corpo, chamador, config)
   if (acao === 'renumerar') return await executarRenumerar(corpo, chamador, config)
-  return await executarIniciarEnvio(corpo, chamador, config, origem)
+  return await executarIniciarEnvio(corpo, chamador, config, origem, importacao)
 }
 
 async function atender(req: Request, config: Configuracao): Promise<Response> {
@@ -91,7 +97,9 @@ async function atender(req: Request, config: Configuracao): Promise<Response> {
   if (!acao) return responderRecusa(recusar('entrada_invalida', 'campo acao: esperado iniciar_envio, baixar, registrar, conferir, retirar ou renumerar'))
   const recusa = conferirChamador(chamador.chamador, acao)
   if (recusa) return responderRecusa(recusa)
-  return await executar(acao, corpo, chamador, config, req.headers.get('Origin'))
+  const importacao = lerImportacaoDoPedido(corpo, chamador.chamador, acao)
+  if (!importacao.ok) return responderRecusa(importacao.recusa)
+  return await executar(acao, corpo, chamador, config, req.headers.get('Origin'), importacao.valor)
 }
 
 // O log leva só o tipo do erro: nunca e-mail, nome de processo, token ou corpo do Google.
