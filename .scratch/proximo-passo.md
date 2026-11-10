@@ -19,6 +19,11 @@ Depois vêm o `/polir` (Sonnet), com os três pontos anotados no `desvios.md`, e
 
 **Ainda pendente, a seu pedido:** publicar o site pelo roteiro "Publicar o site" de `.claude/regras/producao.md`. Com as migrações novas, o banco de produção vai primeiro.
 
+**Depois, por sua conta:**
+- A carga real pela tela: primeiro a planilha, depois a pasta.
+- Deixar a visibilidade do site como Público na Netlify.
+- Com dados na produção, criar `BACKUP_SENHA_PRODUCAO` e fazer o primeiro backup.
+
 **Para retomar numa sessão nova (Sonnet), digite, na ordem:**
 
 ```
