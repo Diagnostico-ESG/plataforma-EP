@@ -1,15 +1,15 @@
 # Próximo passo (2026-11-10)
 
 **Feito:**
-- O ticket 07 de revisoes-aprovacao (Duas revisões) está concluído e juntado à `main` (merge 12db76b; último commit do ticket 6ef0915). A branch foi apagada aqui; a remota `revisoes-aprovacao-07` ainda existe no GitHub (apagar é comando seu).
-- Testes de banco: 64 de 64 arquivos passaram na branch e de novo na `main`. As duas migrações (`20261110165927_duas_revisoes_etapas` e `20261110171004_duas_revisoes_registro`) estão aplicadas no banco de **desenvolvimento**, e os tipos saíram dele.
-- Correção avulsa, já na `main`: a importação da pasta casa o processo apesar de diferença de caixa, acento e espaço repetido.
+- `/ship` de revisoes-aprovacao, cobrindo também processos-etapas, documentos-versoes e importacao-dados-atuais (as quatro estavam "Em revisão desde" pela mesma mudança das duas revisões e pela correção do casamento da pasta). Marca nas quatro specs (commit 46aedf9) e marco `marco/2026-11-10-entrega-revisoes-aprovacao`.
+- O critério 19 estava descumprido (o Agora não dizia o que se revisa). Foi corrigido no próprio /ship: "A revisar: Relatório V1" e "A revisar: V8" (commit dbcffe2).
+- Achados menores das revisões de código e de segurança foram para o backlog. Um deles depende de você: o Substituir conta como "enviado nesta passagem".
 
-- `/polir` de revisoes-aprovacao feito (registro no `desvios.md`): o formulário de versão e o cartão da versão cabem no celular, e o relatório vem primeiro no formulário da Revisão do relatório. O Agora sem o que se revisa ficou no backlog, e a decisão é sua.
+**Próximo: publicar na produção, nesta ordem, com a sua aprovação no momento, pelos roteiros de `.claude/regras/producao.md`:**
+1. Banco de produção: as migrações `20261110165927_duas_revisoes_etapas` e `20261110171004_duas_revisoes_registro`, pelo workflow "Migrar banco de produção". Antes, confira que o Catálogo da produção não tem etapa chamada "Revisão do relatório" ou "Revisão do fluxograma" criada à mão: a migração seria recusada.
+2. Site: o build da `main` (o site no ar é o do commit `0451a0e`).
 
-**Próximo: `/ship` de revisoes-aprovacao (Sonnet).** Não há outro ticket pendente. Há migração nova, então o `/ship` roda as checagens de banco. Depois dele vêm a publicação do banco de produção e a do site.
-
-**Ainda não está na produção:** nem as duas migrações, nem o site (o site no ar é o do commit `0451a0e`, sem a seção 2 da Importação nem a correção do casamento da pasta). Depois do `/ship`, publique o banco de produção primeiro e o site depois, pelos roteiros de `.claude/regras/producao.md`, com a sua aprovação.
+Modelo: Sonnet (o roteiro de produção roda dentro do `/ship`). A revisão de segurança para produção já foi feita (2026-11-05), então não se repete.
 
 **Depois, por sua conta:**
 - A carga real pela tela: primeiro a planilha, depois a pasta.
@@ -23,5 +23,5 @@
 ```
 
 ```
-/ship revisoes-aprovacao
+/ship revisoes-aprovacao: rodar o roteiro "Publicar no banco de produção" (as duas migrações das duas revisões) e depois o "Publicar o site", de .claude/regras/producao.md
 ```
