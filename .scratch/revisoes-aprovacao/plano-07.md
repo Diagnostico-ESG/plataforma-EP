@@ -35,22 +35,22 @@ Critérios 1 e 2 (banco), 8; "Modelo de dados", itens `etapas` e "Até onde se e
 - [x] Escrever `supabase/tests/76_duas_revisoes_etapas.test.sql`, no formato do 39 (`_tap`, `plan(n)`, usuários a1 a a4 inventados), com: o nome "Revisão do fluxograma" no código `revisao_interna`; `revisao_relatorio` existe, ativa, fase VI, sem responsável inicial, com ordem = a de `revisao_interna` + 1 e menor que a de `revisao_setor`; administrador renomeia e reordena; integrante e consulta não; ninguém desativa nem exclui (`etapa_protegida`); versão em sequência e relatório aceitos com o processo na Revisão do relatório e recusados na Validação com o setor (`versao_fora_da_etapa`, `relatorio_fora_da_etapa`).
 - [x] Rodar `npx supabase test db` e ver o 76 falhar (etapa inexistente).
 - [x] `npx supabase migration new duas_revisoes_etapas`; na migração: o `update` do nome; o deslocamento das ordens maiores que a de `revisao_interna`, em ordem decrescente (o `unique (ordem)`), e o `insert` da etapa nova; `create or replace` de `private.bloquear_etapa_protegida` com `revisao_relatorio` na lista; `create or replace` de `private.conferir_onde_cabe_a_versao` igual à da `importar_versao`, trocando o limite para a ordem de `revisao_relatorio`. Comentário de topo: o que faz, ADR 0046, não destrutiva.
-- [ ] `npx supabase db reset > /dev/null` e `npx supabase test db`: o 76 passa. Corrigir os antigos que quebrarem pela etapa nova (lista da spec: 22, 54, 42, 74, 75; conferir também 20, 29, 38, 52, 53, 56, 59, 60, 73), sem mudar o que cada teste prova.
-- [ ] Bateria inteira sem `not ok`.
-- [ ] Gerar os tipos do banco local; `npm run typecheck`.
-- [ ] Commit: migração, teste 76, testes ajustados, `src/types/database.ts`, esta caixa.
+- [x] `npx supabase db reset > /dev/null` e `npx supabase test db`: o 76 passa. Corrigir os antigos que quebrarem pela etapa nova (lista da spec: 22, 54, 42, 74, 75; conferir também 20, 29, 38, 52, 53, 56, 59, 60, 73), sem mudar o que cada teste prova.
+- [x] Bateria inteira sem `not ok`.
+- [x] Gerar os tipos do banco local; `npm run typecheck`.
+- [x] Commit: migração, teste 76, testes ajustados, `src/types/database.ts`, esta caixa.
 
 ### Tarefa 2: Banco — o registro da revisão nas duas etapas
 
 Critérios 9, 10, 11 (o banco aceita o autor), 13 (as antigas contam como do fluxograma), 16 (o evento leva a etapa), 17 (suspenso e cancelado); "Modelo de dados", itens `revisoes_internas` e "O que o gatilho preenche"; as demais linhas das regras; células de `revisoes_internas`; "Decisões novas" 2, 3 e 4.
 
 - [x] Escrever `supabase/tests/77_duas_revisoes_registro.test.sql`: ler as duas revisões (administrador, integrante, consulta sim; inativo e visitante não); registrar na Revisão do relatório (administrador e integrante sim; consulta, inativo e visitante não); incluir ou alterar com `escopo` recusado por privilégio (42501); Validação com o setor recusada (`revisao_fora_da_etapa`); "sem alteração" na Revisão do relatório liga o relatório de maior número e a versão dele, e sem relatório numerado é recusada (`sem_relatorio`); "corrigida" com só relatório enviado na passagem → `relatorio`, com relatório e `.bpm` → `ambos`, só versão (na do fluxograma) → `fluxograma`, só relatório na do fluxograma → `relatorio`, nada → recusada (`corrigida_sem_envio_na_passagem`); segunda revisão na mesma passagem da Revisão do relatório recusada (`revisao_ja_registrada`); trocar o resultado pela edição recalcula escopo, versões e relatórios; o evento "registrar" e o "editar" levam `etapa` (`revisao_relatorio` ou `revisao_interna`) e os relatórios como "Relatório V2"; processo suspenso e cancelado recusados.
-- [ ] Rodar e ver o 77 falhar.
+- [x] Rodar e ver o 77 falhar. (vermelho não registrado na sessão anterior; o 77 passa no CI depois da migração)
 - [x] `npx supabase migration new duas_revisoes_registro`; na migração: colunas `relatorio_revisado_id` e `relatorio_corrigido_id` (referência a `arquivos_da_versao`, opcionais) com índice; `revoke insert, update` da tabela e `grant insert (processo_id, resultado, comentario)` e `grant update (resultado, comentario)`; a restrição `revisoes_corrigida_completa` trocada por uma que aceite a "corrigida" com versão corrigida ou relatório corrigido (a antiga sai com `drop constraint`, que não apaga dado); `private.conferir_revisao_interna_em_andamento` aceitando as duas etapas (o nome fica, com comentário); a etapa da passagem (`passagem_id` → `passagens.etapa_id`) decide as regras em `private.preparar_versoes_da_revisao`, dividida em funções pequenas (sem alteração no fluxograma, sem alteração no relatório, corrigida), que também preenchem o escopo; `private.preparar_revisao_interna` e `private.preparar_edicao_da_revisao` sem as recusas de escopo; `private.estado_da_revisao` com `etapa`, `relatorio_revisado` e `relatorio_corrigido`; o evento da edição com os relatórios de antes; o gatilho de edição disparando também quando o escopo muda pelo recálculo.
 - [x] O relatório "enviado nesta passagem" é o numerado com `enviado_em` desde `entrou_em` (spec). O Substituir regrava `enviado_em`: o caso fica como a spec diz e entra em `desvios.md` como achado (relatório substituído na passagem conta como enviado), sem regra nova.
-- [ ] Reset, bateria: o 77 passa; ajustar o 39 e o 41 (escopo deduzido em vez de gravado; frases de recusa novas), sem mudar o que provam.
-- [ ] Bateria inteira sem `not ok`; tipos; `npm run typecheck` (o `revisoesSupabase.ts` ainda manda `escopo`: o tipo de inclusão sai na Tarefa 6; se o typecheck barrar, a Tarefa 6 começa antes do commit, no mesmo commit só o necessário para compilar).
-- [ ] Commit: migração, teste 77, 39 e 41 ajustados, tipos, esta caixa.
+- [x] Reset, bateria: o 77 passa; ajustar o 39 e o 41 (escopo deduzido em vez de gravado; frases de recusa novas), sem mudar o que provam.
+- [x] Bateria inteira sem `not ok`; tipos; `npm run typecheck` (o `revisoesSupabase.ts` ainda manda `escopo`: o tipo de inclusão sai na Tarefa 6; se o typecheck barrar, a Tarefa 6 começa antes do commit, no mesmo commit só o necessário para compilar).
+- [x] Commit: migração, teste 77, 39 e 41 ajustados, tipos, esta caixa.
 
 ### Tarefa 3: Nomes, catálogo, ícone e importação
 
@@ -106,5 +106,5 @@ Critérios 18, 19 e 20 (`[visual]`) e a bateria.
 
 - [x] Vitrine (`preview_start` com `vitrine`): verso de um processo na Revisão do relatório e outro na do fluxograma, a 1366×768 e na largura de celular; Quadro com a coluna nova e o ícone; formulário de versão da Revisão do relatório sem passar da altura. Encerrar o servidor e fechar a pré-visualização.
 - [x] `npm test` inteiro, `npm run typecheck`, `npx eslint .`, `npx madge --circular` se o projeto o usa no pre-commit.
-- [ ] `git push -u origin revisoes-aprovacao-07` e o workflow "Testes de banco" na branch (`gh workflow run "Testes de banco" --ref revisoes-aprovacao-07`, `gh run watch`); ler os "N ok" de 76 e 77.
+- [x] `git push -u origin revisoes-aprovacao-07` e o workflow "Testes de banco" na branch (`gh workflow run "Testes de banco" --ref revisoes-aprovacao-07`, `gh run watch`); ler os "N ok" de 76 e 77.
 - [x] Registros: `desvios.md` (o achado do Substituir da Tarefa 2 e o que mais divergir da spec), o ticket com as caixas marcadas.
