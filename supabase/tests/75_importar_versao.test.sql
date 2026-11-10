@@ -102,7 +102,8 @@ insert into _tap (linha) select is((select count(*) from public.versoes where pr
 insert into _tap (linha) select is((select count(*) from public.eventos where entidade = 'versao' and acao = 'importar'
   and entidade_ref = pg_temp.processo('Em Revisão')::text), 2::bigint, 'um evento "importar" por versão importada');
 insert into _tap (linha) select is((select count(*) from public.eventos where entidade = 'versao' and acao = 'importar'
-  and autor_id <> '00000000-0000-0000-0000-0000000000a1'), 0::bigint, 'com quem importou');
+  and entidade_ref = pg_temp.processo('Em Revisão')::text and autor_id <> '00000000-0000-0000-0000-0000000000a1'), 0::bigint,
+  'com quem importou');
 insert into _tap (linha) select is((select count(*) from public.eventos where entidade = 'versao'
   and acao in ('enviar', 'enviar_piloto', 'registrar_historica')), 0::bigint, 'e nenhum evento de envio comum');
 
