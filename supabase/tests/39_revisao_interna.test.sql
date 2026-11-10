@@ -98,7 +98,7 @@ create function pg_temp.revisar(nome_do_processo text, resultado public.resultad
 language sql as $$
   -- O escopo é deduzido pelo banco (ticket 07): o parâmetro fica só para as chamadas antigas e não vai à tabela.
   insert into public.revisoes_internas (processo_id, resultado, comentario)
-  values (pg_temp.processo(nome_do_processo), resultado, comentario) $;
+  values (pg_temp.processo(nome_do_processo), resultado, comentario) $$;
 grant execute on function pg_temp.revisar(text, public.resultado_da_revisao, public.escopo_da_correcao, text) to authenticated;
 
 create function pg_temp.revisoes(nome_do_processo text) returns bigint
