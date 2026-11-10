@@ -40,9 +40,9 @@
 - Produz: `public.anotar_subpasta_da_importacao(p_processo uuid, p_subpasta text) returns void`.
 - Produz: o evento `acao = 'importar'`, `entidade = 'versao'`, com `estado_da_versao` no `depois`.
 
-- [ ] **Passo 1: conferir o Docker.** `docker info` responde; senão, pedir ao usuário que abra o Docker Desktop. `npx supabase start > /dev/null 2>&1`.
-- [ ] **Passo 2: procurar o que a migração muda nos testes antigos.** `grep -ln "conferir_processo_que_recebe_versao\|conferir_onde_cabe_a_versao\|preparar_versao\|numerar_relatorio_novo\|registrar_evento_da_versao" supabase/tests/` (os testes 27, 28, 56, 58, 61 e 65 precisam continuar passando).
-- [ ] **Passo 3: escrever o teste 75**, no formato do 74 (tabela `_tap`, usuários a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo, `pg_temp.claims`). Casos, um `ok`/`is`/`throws_ok` cada:
+- [x] **Passo 1: conferir o Docker.** `docker info` responde; senão, pedir ao usuário que abra o Docker Desktop. `npx supabase start > /dev/null 2>&1`. (2026-11-09: o motor do Docker não subiu; o ciclo seguiu pelo "Testes de banco" do GitHub, que ensaia a migração pendente.)
+- [x] **Passo 2: procurar o que a migração muda nos testes antigos.** `grep -ln "conferir_processo_que_recebe_versao\|conferir_onde_cabe_a_versao\|preparar_versao\|numerar_relatorio_novo\|registrar_evento_da_versao" supabase/tests/` (os testes 27, 28, 56, 58, 61 e 65 precisam continuar passando).
+- [x] **Passo 3: escrever o teste 75**, no formato do 74 (tabela `_tap`, usuários a1 administrador, a2 integrante, a3 consulta, a4 administrador inativo, `pg_temp.claims`). Casos, um `ok`/`is`/`throws_ok` cada:
   - O administrador importa a V2 em sequência num processo em Revisão interna, com `.bpm` e relatório: devolve `criada`, número 2 (não o "maior + 1"), etapa da versão = etapa atual, relatório com `numero_do_relatorio` = o dado.
   - A V1F histórica num processo em Aprovação pelo setor: `criada`, histórica, sem etapa.
   - A V3P piloto depois de uma em sequência e com número menor que o maior: `criada` (as travas de etapa e de ordem saem, ADR 0025 e 0028).
@@ -55,8 +55,8 @@
   - `importar_anexo` grava o `.pdf` num processo concluído; a segunda chamada com o mesmo nome devolve `ja_existia`.
   - `anotar_subpasta_da_importacao` acrescenta "Arquivos da subpasta Grupo X." ao fim das Anotações; a segunda chamada não repete.
   - Contar as asserções (`grep -c`) e acertar o `plan(N)`.
-- [ ] **Passo 4: rodar e ver falhar.** `npx supabase test db` → as linhas do 75 com `not ok` (função inexistente).
-- [ ] **Passo 5: escrever a migração.** Esqueleto:
+- [x] **Passo 4: rodar e ver falhar.** (Execução 42726426883: "function public.importar_versao does not exist".) `npx supabase test db` → as linhas do 75 com `not ok` (função inexistente).
+- [x] **Passo 5: escrever a migração.** Esqueleto:
 
 ```sql
 -- Importação dos dados atuais, ticket 02 (ADR 0044; ADR 0025 e 0028 afrouxadas só aqui). Não destrutiva.
@@ -116,10 +116,10 @@ end $$;
 ```
 
   `conferir_relatorio_importado` recusa `numero_do_relatorio_mudou:<dado>` quando o número dado difere do pedido (mesma regra do `registrar_versao`). O `insert (numero, historica, piloto)` em `versoes` já tem privilégio de coluna? Conferir com `grep -n "grant insert" supabase/migrations/*versoes*.sql`; se faltar `numero` para a em sequência, a marca resolve no gatilho, que mantém o número dado.
-- [ ] **Passo 6: rodar e ver passar.** `npx supabase db reset > /dev/null 2>&1` e `npx supabase test db`: o 75 inteiro com `ok`, e zero `not ok` nos outros arquivos.
-- [ ] **Passo 7: commit e push da branch** (migração + teste): `git add <os dois arquivos>`, `git commit`, `git push -u origin importacao-dados-atuais`.
-- [ ] **Passo 8: aplicar no desenvolvimento.** `gh workflow run "Migrar banco de desenvolvimento" --ref importacao-dados-atuais -f migracao=<arquivo>` (conferir o nome do campo no `.github/workflows/`), `gh run watch`. Depois, `gh workflow run "Testes de banco" --ref importacao-dados-atuais` e conferir o 75 com todos `ok`.
-- [ ] **Passo 9: tipos.** `npm run db:types`; conferir que só entraram as três funções; commit de `src/types/database.ts`.
+- [x] **Passo 6: rodar e ver passar.** `npx supabase db reset > /dev/null 2>&1` e `npx supabase test db`: o 75 inteiro com `ok`, e zero `not ok` nos outros arquivos. (Execução 42726990545 do "Testes de banco", com a migração ensaiada: 75 com 40 ok; os outros passaram, menos o 22, que já falhava na `main` desde 2026-11-09 e foi para o backlog.)
+- [x] **Passo 7: commit e push da branch** (migração + teste): `git add <os dois arquivos>`, `git commit`, `git push -u origin importacao-dados-atuais`.
+- [x] **Passo 8: aplicar no desenvolvimento.** (Execução 42727400572: "Migração 20261110000447_importar_versao.sql aplicada.") `gh workflow run "Migrar banco de desenvolvimento" --ref importacao-dados-atuais -f migracao=<arquivo>` (conferir o nome do campo no `.github/workflows/`), `gh run watch`. Depois, `gh workflow run "Testes de banco" --ref importacao-dados-atuais` e conferir o 75 com todos `ok`.
+- [x] **Passo 9: tipos.** `npm run db:types`; conferir que só entraram as três funções; commit de `src/types/database.ts`.
 
 ### Tarefa 2: Função `arquivos-no-drive` aceita a importação
 

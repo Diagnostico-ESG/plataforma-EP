@@ -1107,6 +1107,10 @@ export type Database = {
         }
         Returns: string
       }
+      anotar_subpasta_da_importacao: {
+        Args: { p_processo: string; p_subpasta: string }
+        Returns: undefined
+      }
       cancelar_processo: {
         Args: { p_motivo: string; p_processo: string }
         Returns: undefined
@@ -1136,6 +1140,10 @@ export type Database = {
           texto: string
         }[]
       }
+      importar_anexo: {
+        Args: { p_arquivo: Json; p_processo: string }
+        Returns: string
+      }
       importar_processo: {
         Args: {
           p_anotacoes?: string
@@ -1145,6 +1153,16 @@ export type Database = {
           p_macroprocesso: string
           p_nome: string
           p_setor: string
+        }
+        Returns: string
+      }
+      importar_versao: {
+        Args: {
+          p_arquivos: Json
+          p_numero: number
+          p_numero_do_relatorio?: number
+          p_processo: string
+          p_tipo: string
         }
         Returns: string
       }
