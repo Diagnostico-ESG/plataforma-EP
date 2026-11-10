@@ -294,6 +294,6 @@ Fases: escolher (a pasta e o .csv da planilha) → prévia → enviando (N de M 
 **Arquivos:**
 - Alterar: `.scratch/importacao-dados-atuais/desvios.md` (as três interpretações do topo, datadas), `.scratch/importacao-dados-atuais/issues/02-arquivos-das-versoes-da-pasta.md` (caixas)
 
-- [ ] **Passo 1:** `preview_start` com `vitrine`; abrir `#/administracao?perfil=administrador`, aba Importação; conferir a seção 2 no computador e em 375 px (texto curto, uma ação principal, nada repetido; ticket `[visual]`). Encerrar o servidor e fechar a pré-visualização.
-- [ ] **Passo 2:** registrar no `desvios.md` e marcar as caixas do ticket.
-- [ ] **Passo 3: commit.** O passo do usuário (publicar `arquivos-no-drive` de novo no desenvolvimento e, antes da carga real, o backup da produção e a publicação das migrações e da função) vai para o `proximo-passo.md` no fim do `/executar-complexo`.
+- [x] **Passo 1:** `preview_start` com `vitrine`; abrir `#/administracao?perfil=administrador`, aba Importação; conferir a seção 2 no computador e em 375 px (texto curto, uma ação principal, nada repetido; ticket `[visual]`). Encerrar o servidor e fechar a pré-visualização.
+- [x] **Passo 2:** registrar no `desvios.md` e marcar as caixas do ticket.
+- [x] **Passo 3: commit.** O passo do usuário (publicar `arquivos-no-drive` de novo no desenvolvimento e, antes da carga real, o backup da produção e a publicação das migrações e da função) vai para o `proximo-passo.md` no fim do `/executar-complexo`.

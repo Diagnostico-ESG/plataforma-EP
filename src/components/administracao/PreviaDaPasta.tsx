@@ -41,7 +41,7 @@ export function PreviaDaPasta({ previa, aoEnviar, aoEscolherOutra }: PreviaDaPas
   const fora = foraDaImportacao(previa)
   return (
     <>
-      <p className="importacao-contagens">{fraseDaPrevia(previa)}</p>
+      {previa.totalDeVersoes > 0 && <p className="importacao-contagens">{fraseDaPrevia(previa)}</p>}
       {previa.porProcesso.length > 0 && <TabelaDaPasta previa={previa} />}
       <ListaDaPasta titulo={contar(fora.length, 'fora da importação', 'fora da importação')} itens={fora} />
       <NadaAEnviar previa={previa} />
