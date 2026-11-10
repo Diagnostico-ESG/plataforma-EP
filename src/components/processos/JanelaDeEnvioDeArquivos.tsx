@@ -38,7 +38,7 @@ function FormularioDoEnvio({ falta, processo, versoes, lidas, aoEnviar, aoFechar
       <FormularioDeVersao modulo={versoes} processo={processo} modo={modoParaEnviar('sequencia', lidas)} rotuloDoEnvio={ROTULO_DO_ENVIO}
         relatorioObrigatorio={falta.falta.includes('relatorio')} aoCancelar={aoFechar}
         aoEnviada={(enviado) => aoEnviar({
-          versaoEmSequencia: true, ...(enviado.arquivos.some((arquivo) => arquivo.papel === 'relatorio') && { relatorioNumerado: true }),
+          versaoEmSequencia: true, ...(enviado?.arquivos.some((arquivo) => arquivo.papel === 'relatorio') && { relatorioNumerado: true }),
         })} />
     )
   }

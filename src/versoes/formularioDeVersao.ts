@@ -2,7 +2,7 @@ import { extensaoDoNome } from '../../supabase/functions/_shared/decisao.ts'
 import { nomePadrao } from '../../supabase/functions/_shared/nomePadrao.ts'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { proximoNumeroDoRelatorio } from './relatorioQueVale'
-import { PAPEIS, proximoNumero } from './rotulos'
+import { PAPEIS, ordenarVersoes, proximoNumero } from './rotulos'
 import type { ArquivoEscolhido, PapelDoArquivo, Versao } from './tipos'
 
 /** O arquivo escolhido em cada campo do formulário. */
@@ -16,15 +16,35 @@ export type Progresso = { enviados: number; total: number }
  * que existirem, a piloto e a em sequência, o .bpm (ADR 0025).
  */
 export type ModoDoFormulario =
-  | { tipo: 'sequencia'; numero: number; numeroDoRelatorio: number } | { tipo: 'piloto'; numeroSugerido: number } | { tipo: 'historica' }
+  | { tipo: 'sequencia'; numero: number; numeroDoRelatorio: number; doRelatorio?: EnvioDaRevisaoDoRelatorio }
+  | { tipo: 'piloto'; numeroSugerido: number } | { tipo: 'historica' }
+
+/**
+ * Na Revisão do relatório (ADR 0046) o [Enviar versão] pede o relatório; sem o .bpm, ele vai sozinho para a versão mais
+ * recente que não é histórica (null: não há, e o .bpm passa a ser preciso).
+ */
+export type EnvioDaRevisaoDoRelatorio = { versaoQueRecebe: { numero: number; piloto: boolean } | null }
 
 export const PAPEIS_OBRIGATORIOS: readonly PapelDoArquivo[] = ['bpm']
 
 /** O modo do formulário de enviar versão piloto ou em sequência, a partir das versões que o processo já tem (a prévia dos números). */
-export function modoParaEnviar(tipo: 'piloto' | 'sequencia', lidas: Versao[]): ModoDoFormulario {
+export function modoParaEnviar(tipo: 'piloto' | 'sequencia', lidas: Versao[], naRevisaoDoRelatorio = false): ModoDoFormulario {
   const numero = proximoNumero(lidas)
   if (tipo === 'piloto') return { tipo: 'piloto', numeroSugerido: numero }
-  return { tipo: 'sequencia', numero, numeroDoRelatorio: proximoNumeroDoRelatorio(lidas) }
+  const modo = { tipo: 'sequencia', numero, numeroDoRelatorio: proximoNumeroDoRelatorio(lidas) } as const
+  return naRevisaoDoRelatorio ? { ...modo, doRelatorio: { versaoQueRecebe: versaoQueRecebeORelatorio(lidas) } } : modo
+}
+
+function versaoQueRecebeORelatorio(lidas: Versao[]): { numero: number; piloto: boolean } | null {
+  const alvo = ordenarVersoes(lidas).find((versao) => !versao.historica)
+  return alvo ? { numero: alvo.numero, piloto: alvo.piloto } : null
+}
+
+/** Na Revisão do relatório: o relatório sempre; sem o .bpm, uma versão para recebê-lo e nada de .png. */
+function podeEnviarNaRevisaoDoRelatorio(doRelatorio: EnvioDaRevisaoDoRelatorio, arquivos: ArquivosDoFormulario): boolean {
+  const { escolhidos, recusas, conferindo } = arquivos
+  if (conferindo || Object.values(recusas).some(Boolean) || !escolhidos.relatorio) return false
+  return Boolean(escolhidos.bpm) || (doRelatorio.versaoQueRecebe !== null && !escolhidos.png)
 }
 
 /**
@@ -61,11 +81,16 @@ export function podeRegistrarHistorica(escolhidos: Escolhidos, recusas: RecusasD
   return Boolean(escolhidos.bpm)
 }
 
-/** Se o botão do formulário se habilita: a em sequência pede o .bpm, a piloto o número e o .bpm, a histórica o número e o .bpm. */
-export function podeSubmeter(modo: ModoDoFormulario, arquivos: { escolhidos: Escolhidos; recusas: RecusasDosCampos; conferindo: boolean },
-  numero: number | null, relatorioObrigatorio = false): boolean {
+type ArquivosDoFormulario = { escolhidos: Escolhidos; recusas: RecusasDosCampos; conferindo: boolean }
+
+/**
+ * Se o botão do formulário se habilita: a em sequência pede o .bpm (na Revisão do relatório, o relatório), a piloto o número
+ * e o .bpm, a histórica o número e o .bpm.
+ */
+export function podeSubmeter(modo: ModoDoFormulario, arquivos: ArquivosDoFormulario, numero: number | null, relatorioObrigatorio = false): boolean {
   const { escolhidos, recusas, conferindo } = arquivos
   if (modo.tipo === 'historica') return podeRegistrarHistorica(escolhidos, recusas, conferindo, numero)
+  if (modo.tipo === 'sequencia' && modo.doRelatorio) return podeEnviarNaRevisaoDoRelatorio(modo.doRelatorio, arquivos)
   if (modo.tipo === 'piloto' && numero === null) return false
   if (relatorioObrigatorio && !escolhidos.relatorio) return false
   return podeEnviar(escolhidos, recusas, conferindo)
