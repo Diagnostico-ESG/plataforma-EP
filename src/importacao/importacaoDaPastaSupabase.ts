@@ -2,7 +2,7 @@
 // `importacao: true` (só o Administrador; a função e o banco conferem de novo). Os bytes vão do navegador direto ao Google.
 import type { ClienteSupabase } from '../lib/supabase'
 import { type EnviarBytes, chamarFuncao, enviarAoDrive } from '../versoes/funcaoDoDrive'
-import { chaveDoProcesso } from './chaves'
+import { chaveDaPasta } from './chaves'
 import type { ModuloDeImportacao, PedidoDeImportacaoDeVersao, ProcessoDaPasta, ProcessosParaAPasta, ResultadoDaGravacao, ResultadoDaVersao } from './tipos'
 
 type MetodosDaPasta = Pick<ModuloDeImportacao, 'listarProcessosDaPasta' | 'importarVersao' | 'importarAnexo' | 'anotarSubpasta'>
@@ -57,7 +57,7 @@ type DoBanco = {
 function processoDaPasta(id: string, sigla: string, nome: string, doBanco: DoBanco): ProcessoDaPasta {
   const doProcesso = doBanco.relatorios.filter((r) => r.versoes?.processo_id === id).map((r) => r.numero_do_relatorio ?? 0)
   return {
-    id, chave: chaveDoProcesso(sigla, nome), nome,
+    id, chave: chaveDaPasta(sigla, nome), nome,
     versoes: doBanco.versoes.filter((v) => v.processo_id === id).map((v) => v.numero), maiorRelatorio: Math.max(0, ...doProcesso),
     anexos: doBanco.anexos.filter((a) => a.processo_id === id).map((a) => a.nome.toLowerCase()),
   }

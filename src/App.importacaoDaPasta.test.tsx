@@ -54,7 +54,7 @@ function montar(haImportado = true) {
   const importacao = new ImportacaoFalso(versoes)
   importacao.haImportado = haImportado
   importacao.processosDaPasta = [
-    { id: 'p1', chave: 'TSA|emitir ofício', nome: 'Emitir Ofício' },
+    { id: 'p1', chave: 'TSA|emitir oficio', nome: 'Emitir Ofício' },
     { id: 'p2', chave: 'TSA|exemplo alfa', nome: 'Exemplo Alfa' },
   ]
   const processos = new ProcessosFalso()

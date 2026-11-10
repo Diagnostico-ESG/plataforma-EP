@@ -15,7 +15,7 @@ export type ExistentesNaPlataforma = { setores: string[]; macroprocessos: string
 /** Um processo da plataforma, como a importação dos arquivos (ticket 02) o compara com a pasta. */
 export type ProcessoDaPasta = {
   id: string
-  /** `chaveDoProcesso(sigla, nome)`. */
+  /** `chaveDaPasta(sigla, nome)`: casa com o processo dos nomes dos arquivos. */
   chave: string
   nome: string
   /** Os números das versões que o processo já tem (as da pasta com esses números são puladas). */

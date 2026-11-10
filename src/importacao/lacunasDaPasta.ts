@@ -1,6 +1,6 @@
 // O relatório das lacunas da importação dos arquivos (ticket 02, história 48c): os buracos na numeração da pasta e a
 // diferença entre a pasta e as colunas V1 a V8 da planilha. Só comparação: nada aqui decide o que entra.
-import { chaveDoProcesso } from './chaves'
+import { chaveDaPasta } from './chaves'
 import type { PastaLida } from './lerPasta'
 import type { PlanilhaLida } from './lerPlanilha'
 
@@ -29,7 +29,7 @@ function numerosDaPasta(pasta: PastaLida): NumerosPorProcesso {
 function numerosDaPlanilha(planilha: PlanilhaLida): NumerosPorProcesso {
   const mapa: NumerosPorProcesso = new Map()
   for (const p of planilha.processos) {
-    const chave = chaveDoProcesso(p.setor, p.nome)
+    const chave = chaveDaPasta(p.setor, p.nome)
     mapa.set(chave, { nomeDoProcesso: p.nome, numeros: new Set(p.versoesNaPlanilha) })
   }
   return mapa

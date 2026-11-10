@@ -1,7 +1,7 @@
 // A pasta DOCUMENTOS MAPEAMENTO lida no navegador (importação dos dados atuais, ticket 02): a lista de arquivos vira as
 // versões de cada processo, pelo nome dos arquivos, com o que fica de fora. A pasta manda (amostra/pasta.md, decisões de
 // 2026-11-06). Sem banco nem tela: a prévia e o envio usam o resultado.
-import { chaveDoProcesso } from './chaves'
+import { chaveDaPasta } from './chaves'
 import { type LetraDaVersao, type NomeLido, type PapelNaPasta, lerNomeDoArquivo } from './nomeDoArquivoDaPasta'
 
 export { lerNomeDoArquivo }
@@ -48,7 +48,7 @@ function lerUm({ arquivo, caminho }: ArquivoDaPasta): Lido | null {
   const nome = lerNomeDoArquivo(arquivo.name)
   if (!nome) return null
   const subpasta = partes.length > 3 ? partes.slice(2, -1).join('/') : null
-  return { ...nome, arquivo, chave: chaveDoProcesso(nome.sigla, nome.nomeDoProcesso), subpasta }
+  return { ...nome, arquivo, chave: chaveDaPasta(nome.sigla, nome.nomeDoProcesso), subpasta }
 }
 
 function agrupar(lidos: Lido[]): Lido[][] {
