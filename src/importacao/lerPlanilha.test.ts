@@ -152,3 +152,14 @@ describe('formato do arquivo', () => {
     expect((erro as ColunasFaltando).faltam).toContain('Processos')
   })
 })
+
+describe('colunas V1 a V8 (comparação com a pasta, ticket 02)', () => {
+  test('o "x" de cada coluna marca a versão que a planilha diz existir', () => {
+    expect(ler({ v: [2, 5] }).processos[0].versoesNaPlanilha).toEqual([2, 5])
+  })
+
+  test('a planilha sem as colunas V é lida, sem versões marcadas', () => {
+    const semV = csv([linha({})]).replace(/;V\d/g, ';')
+    expect(lerPlanilha(semV, HOJE).processos[0].versoesNaPlanilha).toEqual([])
+  })
+})

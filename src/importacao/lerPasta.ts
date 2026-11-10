@@ -24,7 +24,7 @@ export type VersaoDaPasta = {
   letraCorrigida: boolean
 }
 
-export type VersaoDeFora = { chave: string; nomeDoProcesso: string; rotulo: string }
+export type VersaoDeFora = { chave: string; nomeDoProcesso: string; numero: number; rotulo: string }
 export type PastaLida = {
   versoes: VersaoDaPasta[]
   /** Versões sem .bpm: não entram (história 45). */
@@ -60,7 +60,8 @@ function agrupar(lidos: Lido[]): Lido[][] {
 }
 
 function deFora(grupo: Lido[], letra: LetraDaVersao): VersaoDeFora {
-  return { chave: grupo[0].chave, nomeDoProcesso: grupo[0].nomeDoProcesso, rotulo: `V${String(grupo[0].numero)}${letra}` }
+  const { chave, nomeDoProcesso, numero } = grupo[0]
+  return { chave, nomeDoProcesso, numero, rotulo: `V${String(numero)}${letra}` }
 }
 
 // Um arquivo do papel, ou nenhum; dois ou mais vão para os duplicados e nenhum entra.
@@ -80,7 +81,7 @@ function montarVersao(grupo: Lido[], lida: PastaLida): void {
   const bpm = umDoPapel(grupo, 'bpm', letra, lida)
   if (!bpm) return
   lida.versoes.push({
-    ...deFora(grupo, letra), numero: grupo[0].numero, tipo: TIPO_DA_LETRA[letra], bpm,
+    ...deFora(grupo, letra), tipo: TIPO_DA_LETRA[letra], bpm,
     png: umDoPapel(grupo, 'png', letra, lida), relatorio: umDoPapel(grupo, 'relatorio', letra, lida),
     pdfDoRelatorio: umDoPapel(grupo, 'pdf', letra, lida), letraCorrigida: grupo.some((lido) => lido.letra !== letra),
   })

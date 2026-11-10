@@ -200,11 +200,11 @@ export type Lacunas = {
 export function lacunasDaPasta(pasta: PastaLida, planilha: PlanilhaLida): Lacunas
 ```
 
-- [ ] **Passo 1: teste que falha:** V1 e V3 sem V2 dá buraco [2]; V4 na pasta sem "x" na planilha; "x" em V2 sem arquivo; a planilha sem as colunas V continua lida (V1 a V8 opcionais). Acrescentar em `lerPlanilha.test.ts` o caso do "x".
-- [ ] **Passo 2:** `npx vitest run src/importacao` → FAIL nos casos novos.
-- [ ] **Passo 3: implementar.**
-- [ ] **Passo 4:** `npx vitest run src/importacao` verde (inclusive os testes antigos da planilha).
-- [ ] **Passo 5: commit.**
+- [x] **Passo 1: teste que falha:** V1 e V3 sem V2 dá buraco [2]; V4 na pasta sem "x" na planilha; "x" em V2 sem arquivo; a planilha sem as colunas V continua lida (V1 a V8 opcionais). Acrescentar em `lerPlanilha.test.ts` o caso do "x".
+- [x] **Passo 2:** `npx vitest run src/importacao` → FAIL nos casos novos.
+- [x] **Passo 3: implementar.**
+- [x] **Passo 4:** `npx vitest run src/importacao` verde (inclusive os testes antigos da planilha).
+- [x] **Passo 5: commit.**
 
 ### Tarefa 5: Contrato, versão real e falsos
 

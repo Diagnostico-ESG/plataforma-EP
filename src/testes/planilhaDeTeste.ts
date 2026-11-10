@@ -10,20 +10,20 @@ export const CABECALHO_DA_PLANILHA = [
 export type ParteDaLinha = {
   area?: string; macro?: string; nome?: string; mp?: string; dmp?: string; mt?: string; ri?: string; rp?: string
   vi?: string; vii?: string; dp?: string; obs?: string
+  /** Os números das colunas V1 a V8 marcadas com "x" (padrão: só a V1). */
+  v?: number[]
 }
 
 const PADRAO: Required<ParteDaLinha> = {
   area: 'XYZ', macro: 'I - Gestão de exemplos', nome: 'Exemplo Alfa', mp: '', dmp: '', mt: '', ri: '', rp: '', vi: '', vii: '',
-  dp: '', obs: '',
+  dp: '', obs: '', v: [1],
 }
 
 /** Uma linha de dados: cada campo é a coluna da planilha com o mesmo nome; as colunas não usadas ficam vazias. */
 export function linhaDaPlanilha(parte: ParteDaLinha): string[] {
   const p = { ...PADRAO, ...parte }
-  return [
-    p.area, p.macro, p.nome, '', '', '', '', p.mp, p.dmp, p.mt, p.ri, p.rp, p.vi, p.vii, p.dp, '', '', p.obs,
-    'x', '', '', '', '', '', '', '',
-  ]
+  const versoes = Array.from({ length: 8 }, (_, i) => (p.v.includes(i + 1) ? 'x' : ''))
+  return [p.area, p.macro, p.nome, '', '', '', '', p.mp, p.dmp, p.mt, p.ri, p.rp, p.vi, p.vii, p.dp, '', '', p.obs, ...versoes]
 }
 
 export function csvDaPlanilha(linhas: string[][], separador = ';', cabecalho = CABECALHO_DA_PLANILHA): string {

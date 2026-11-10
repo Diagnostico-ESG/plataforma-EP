@@ -1,5 +1,6 @@
 import {
   type ChaveDaColuna, type PosicoesDasColunas, NOME_DA_ETAPA, SEQUENCIA_DE_ETAPAS, estaConcluida, localizarCabecalho, normalizar,
+  posicoesDasVersoes,
 } from './colunasDaPlanilha'
 import { chaveDoProcesso } from './chaves'
 import { lerCsv } from './csv'
@@ -18,6 +19,8 @@ export type ProcessoLido = {
   /** aaaa-mm-dd; só fora de Não iniciados (a de hoje se a planilha não tem uma utilizável; nula se está no futuro). */
   dataDaModelagemPiloto: string | null
   anotacoes: string | null
+  /** Os números das colunas V1 a V8 com "x": só para comparar com a pasta no relatório final (ticket 02). */
+  versoesNaPlanilha: number[]
 }
 export type AvisoLido = { linha: number; nome: string; texto: string }
 export type RepetidoLido = { linha: number; setor: string; nome: string }
@@ -105,7 +108,7 @@ function anotacoesDe(celula: Celula, avisar: Avisar): string | null {
   return texto.slice(0, LIMITE_DAS_ANOTACOES)
 }
 
-function processoDaLinha(linha: number, celula: Celula, hoje: Date, avisar: Avisar): ProcessoLido {
+function processoDaLinha(linha: number, celula: Celula, hoje: Date, avisar: Avisar): Omit<ProcessoLido, 'versoesNaPlanilha'> {
   const etapa = etapaPelaUltimaConcluida(celula, avisar)
   const dataDoPilotoLida = dataDoPiloto(celula, etapa, hoje, avisar)
   return {
@@ -113,6 +116,11 @@ function processoDaLinha(linha: number, celula: Celula, hoje: Date, avisar: Avis
     etapaCodigo: etapa, etapaNome: NOME_DA_ETAPA[etapa], dataDaPublicacao: dataDaPublicacao(celula, etapa, hoje, avisar),
     dataDaModelagemPiloto: dataDoPilotoLida, anotacoes: anotacoesDe(celula, avisar),
   }
+}
+
+// Qualquer texto na célula conta como marcada (a planilha usa "x"); a coluna que falta não marca nada.
+function versoesMarcadas(celulas: string[], posicoes: number[]): number[] {
+  return posicoes.flatMap((posicao, i) => (posicao >= 0 && (celulas[posicao] ?? '').trim() !== '' ? [i + 1] : []))
 }
 
 function celulaDa(celulas: string[], posicoes: PosicoesDasColunas): Celula {
@@ -129,14 +137,18 @@ export function lerPlanilha(texto: string, hoje: Date): PlanilhaLida {
   if ('faltam' in cabecalho) throw new ColunasFaltando(cabecalho.faltam)
   const lida: PlanilhaLida = { processos: [], repetidos: [], avisos: [] }
   const vistos = new Set<string>()
+  const posicoesV = posicoesDasVersoes(linhas[cabecalho.indice])
   linhas.slice(cabecalho.indice + 1).forEach((celulas, i) => {
     if (celulas.every((c) => c.trim() === '')) return
-    lerLinhaDeDados(lida, vistos, cabecalho.indice + 2 + i, celulaDa(celulas, cabecalho.posicoes), hoje)
+    const linha = { numero: cabecalho.indice + 2 + i, celula: celulaDa(celulas, cabecalho.posicoes), versoes: versoesMarcadas(celulas, posicoesV) }
+    lerLinhaDeDados(lida, vistos, linha, hoje)
   })
   return lida
 }
 
-function lerLinhaDeDados(lida: PlanilhaLida, vistos: Set<string>, numero: number, celula: Celula, hoje: Date): void {
+type LinhaDeDados = { numero: number; celula: Celula; versoes: number[] }
+
+function lerLinhaDeDados(lida: PlanilhaLida, vistos: Set<string>, { numero, celula, versoes }: LinhaDeDados, hoje: Date): void {
   const setor = siglaDe(celula('area'))
   const avisar: Avisar = (texto) => lida.avisos.push({ linha: numero, nome: celula('processo') || '(sem nome)', texto })
   if (setor === '' || celula('processo') === '') return avisar('Linha sem Área ou sem nome de processo: ignorada.')
@@ -146,5 +158,5 @@ function lerLinhaDeDados(lida: PlanilhaLida, vistos: Set<string>, numero: number
     return
   }
   vistos.add(chave)
-  lida.processos.push(processoDaLinha(numero, celula, hoje, avisar))
+  lida.processos.push({ ...processoDaLinha(numero, celula, hoje, avisar), versoesNaPlanilha: versoes })
 }

@@ -33,6 +33,15 @@ export function localizarCabecalho(linhas: LinhaDoCsv[]): Cabecalho | { faltam: 
   return { indice, posicoes: Object.fromEntries(entradas.map(([chave, posicao]) => [chave, posicao])) as PosicoesDasColunas }
 }
 
+/**
+ * As colunas V1 a V8 ficam fora de `COLUNAS` porque não são exigidas: só servem à comparação com a pasta (ticket 02). A
+ * posição de cada uma no cabeçalho, ou -1 se a planilha não a tem.
+ */
+export function posicoesDasVersoes(cabecalho: LinhaDoCsv): number[] {
+  const nomes = cabecalho.map(normalizar)
+  return Array.from({ length: 8 }, (_, i) => nomes.indexOf(`v${String(i + 1)}`))
+}
+
 /** Na ordem da planilha: a etapa da plataforma que a última coluna "Concluído" indica. */
 export const SEQUENCIA_DE_ETAPAS: { chave: ChaveDaColuna; codigo: string; coluna: string }[] = [
   { chave: 'modelagemPiloto', codigo: 'modelagem', coluna: COLUNAS.modelagemPiloto },
