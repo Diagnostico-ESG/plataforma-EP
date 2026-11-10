@@ -13,7 +13,7 @@ afterEach(() => {
   window.location.hash = ''
 })
 
-// A versão em sequência se oferece na técnica e na Revisão interna (ADR 0025): o processo p1 fica na Revisão interna.
+// A versão em sequência se oferece na técnica e na Revisão do fluxograma (ADR 0025): o processo p1 fica na Revisão do fluxograma.
 const comDuasVersoes = (ajuste?: (falso: VersoesFalso) => void) => ({
   ajustarProcessos: naEtapa('revisao_interna'),
   ajustarVersoes: (falso: VersoesFalso) => {
@@ -101,7 +101,7 @@ test('enviar registra a versão, fecha o formulário e a lista mostra a V3 no al
   fireEvent.click(botaoEnviar(form))
   const v3 = within(await secao.findByRole('article', { name: 'V3' }))
   expect(secao.getAllByRole('article', { name: /^V\d/ })[0].getAttribute('aria-label')).toBe('V3')
-  expect(v3.getByText('Revisão interna')).toBeTruthy()
+  expect(v3.getByText('Revisão do fluxograma')).toBeTruthy()
   expect(secao.queryByRole('form', { name: 'Enviar versão' })).toBeNull()
   expect(versoes.envios[0]).toMatchObject({ processoId: 'p1', numero: 3 })
   expect(versoes.envios[0].arquivos.map((arquivo) => arquivo.papel)).toEqual(['bpm', 'png'])

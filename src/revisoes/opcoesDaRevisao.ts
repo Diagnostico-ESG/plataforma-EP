@@ -4,7 +4,7 @@ import { ROTULO_DO_ESCOPO } from './frasesDeRevisao'
 import type { Aprovacao, ResultadoDaRevisao, RevisaoInterna } from './tipos'
 import { versoesDaRevisao } from './versoesDaRevisao'
 
-export const MOTIVO_SEM_VERSAO_NA_PASSAGEM = 'Nenhuma versão foi enviada desde que o processo entrou na Revisão interna.'
+export const MOTIVO_SEM_VERSAO_NA_PASSAGEM = 'Nada foi enviado desde que o processo entrou nesta etapa.'
 export const MOTIVO_SEM_VERSAO = 'O processo ainda não tem versão.'
 
 export type OpcaoDoResultado = { resultado: ResultadoDaRevisao; rotulo: string; desabilitada: boolean; motivo: string | null }

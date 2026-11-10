@@ -14,7 +14,7 @@ afterEach(() => {
   window.location.hash = ''
 })
 
-const REVISAO_INTERNA = 'Revisão interna'
+const REVISAO_INTERNA = 'Revisão do fluxograma'
 const REVISAO: RevisaoInterna = {
   id: 'r1', versaoRevisada: 7, versaoCorrigida: 8, resultado: 'corrigida', escopo: 'ambos', comentario: 'Ajustei o fluxo',
   revisor: BIA.nome, revisadaEm: '2026-10-13',
@@ -38,7 +38,7 @@ async function abrirAEdicao(etapa: string, titulo: string) {
 const salvar = (janela: ReturnType<typeof within>) => fireEvent.click(janela.getByRole('button', { name: 'Salvar' }))
 const campo = (janela: ReturnType<typeof within>, nome: RegExp) => janela.getByLabelText(nome) as HTMLInputElement
 
-// ---- Revisão interna
+// ---- Revisão do fluxograma
 
 test('editar a revisão corrigida troca o escopo e o comentário na gaveta e fecha a janela', async () => {
   montar(versao(), { ajustar: comRevisao(REVISAO) })

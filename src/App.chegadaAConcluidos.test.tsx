@@ -48,7 +48,7 @@ test('"Publicado" mostra a data (hoje) e o link, habilita o botão e grava a che
   fireEvent.change(aberta.getByLabelText('Link (opcional)'), { target: { value: 'https://diario.exemplo/1' } })
   expect(levar(aberta).disabled).toBe(false)
   fireEvent.click(levar(aberta))
-  await screen.findByText('Agora · etapa 8 de 8')
+  await screen.findByText('Agora · etapa 9 de 9')
   expect(falso.chamadas).toEqual([{
     acao: 'mover', id: 'p1', etapaId: 'e8',
     chegada: { dataDaPublicacao: hojeLocal(), linkDaPublicacao: 'https://diario.exemplo/1', explicacao: null },
@@ -68,7 +68,7 @@ test('"Concluir sem publicação" pede a explicação e só habilita o botão co
   expect(levar(aberta).disabled).toBe(true)
   fireEvent.change(explicacao, { target: { value: 'Não será divulgado' } })
   fireEvent.click(levar(aberta))
-  await screen.findByText('Agora · etapa 8 de 8')
+  await screen.findByText('Agora · etapa 9 de 9')
   expect(falso.chamadas).toEqual([{
     acao: 'mover', id: 'p1', etapaId: 'e8', chegada: { dataDaPublicacao: null, linkDaPublicacao: null, explicacao: 'Não será divulgado' },
   }])
@@ -82,7 +82,7 @@ test('Esc e [Cancelar] não gravam, o processo fica e a janela reaberta volta li
   fireEvent.keyDown(document.body, { key: 'Escape' })
   await waitFor(() => expect(screen.queryByRole('dialog', { name: TITULO })).toBeNull())
   expect(falso.chamadas).toEqual([])
-  expect(((await agoraDoVerso()).getByRole('combobox', { name: 'Etapa' }) as HTMLSelectElement).selectedOptions[0].textContent).toBe('Revisão interna')
+  expect(((await agoraDoVerso()).getByRole('combobox', { name: 'Etapa' }) as HTMLSelectElement).selectedOptions[0].textContent).toBe('Revisão do fluxograma')
   fireEvent.change((await agoraDoVerso()).getByRole('combobox', { name: 'Etapa' }), { target: { value: 'e8' } })
   aberta = await janela()
   expect((aberta.getByRole('radio', { name: 'Concluir sem publicação' }) as HTMLInputElement).checked).toBe(false)
@@ -106,7 +106,7 @@ test('a recusa aparece em vermelho e a janela mantém o preenchido', async () =>
 test('com a data da publicação já registrada o processo vai direto, sem janela', async () => {
   const falso = montarVerso(processoLido({ publicadoEm: dia(-2) }, 'publicacao'))
   fireEvent.change((await agoraDoVerso()).getByRole('combobox', { name: 'Etapa' }), { target: { value: 'e8' } })
-  await screen.findByText('Agora · etapa 8 de 8')
+  await screen.findByText('Agora · etapa 9 de 9')
   expect(falso.chamadas).toEqual([{ acao: 'mover', id: 'p1', etapaId: 'e8' }])
   expect(screen.queryByRole('dialog', { name: TITULO })).toBeNull()
 })
@@ -127,7 +127,7 @@ test('arrastar o cartão para Concluídos abre a mesma janela; Esc deixa o cart�
   fireEvent.keyDown(document.body, { key: 'Escape' })
   await waitFor(() => expect(screen.queryByRole('dialog', { name: TITULO })).toBeNull())
   expect(falso.chamadas).toEqual([])
-  expect(cartoesDa('Revisão interna')).toHaveLength(1)
+  expect(cartoesDa('Revisão do fluxograma')).toHaveLength(1)
   expect(cartoesDa('Concluídos')).toEqual([])
 })
 

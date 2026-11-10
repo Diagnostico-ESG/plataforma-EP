@@ -1,11 +1,12 @@
 import type { EtapaDoCatalogo, ProcessoDaLista, ProcessoLido, SetorDoQuadro } from '../processos/tipos'
 
-/** O catálogo de teste do Andamento livre: as duas fixas nas pontas e seis de trabalho entre elas. */
+/** O catálogo de teste do Andamento livre: as duas fixas nas pontas e sete de trabalho entre elas. */
 export const CATALOGO_DE_TESTE: EtapaDoCatalogo[] = [
   { id: 'e1', codigo: 'nao_iniciados', nome: 'Não iniciados', ordem: 1, ativa: true },
   { id: 'e2', codigo: 'modelagem', nome: 'Modelagem piloto', ordem: 2, ativa: true },
   { id: 'e3', codigo: 'relatorio_modelagem_tecnica', nome: 'Relatório e modelagem técnica', ordem: 3, ativa: true },
-  { id: 'e4', codigo: 'revisao_interna', nome: 'Revisão interna', ordem: 4, ativa: true },
+  { id: 'e4', codigo: 'revisao_interna', nome: 'Revisão do fluxograma', ordem: 4, ativa: true },
+  { id: 'e4r', codigo: 'revisao_relatorio', nome: 'Revisão do relatório', ordem: 4.5, ativa: true },
   { id: 'e5', codigo: 'revisao_setor', nome: 'Validação com o setor', ordem: 5, ativa: true },
   { id: 'e6', codigo: 'aprovacao_setor', nome: 'Aprovação pelo setor', ordem: 6, ativa: true },
   { id: 'e7', codigo: 'publicacao', nome: 'Publicação', ordem: 7, ativa: true },

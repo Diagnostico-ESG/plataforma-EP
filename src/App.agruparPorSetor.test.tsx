@@ -55,7 +55,7 @@ test('o cartão traz a barra da etapa, a etiqueta, o responsável e o selo da si
   expect((await cartaoDe('Emitir Ofício')).querySelector('.selo-do-setor')?.textContent).toBe('TSA')
   await trocar('Setor')
   const cartao = await cartaoDe('Emitir Ofício')
-  expect(cartao.querySelector('.barra-etapa-texto')?.textContent).toBe('Revisão interna · 4 de 8')
+  expect(cartao.querySelector('.barra-etapa-texto')?.textContent).toBe('Revisão do fluxograma · 4 de 9')
   expect(cartao.querySelector('.etiqueta')?.textContent).toBe('A fazer')
   expect(cartao.querySelector('.cartao-responsavel')).not.toBeNull()
   expect(cartao.querySelector('.selo-do-setor')?.textContent).toBe('TSA')

@@ -16,7 +16,7 @@ afterEach(() => {
 
 const NOMES = CATALOGO_DE_TESTE.map((etapa) => etapa.nome)
 
-// O processo está em Revisão interna desde há 3 dias; passou pela Modelagem piloto duas vezes e pelo Relatório uma vez.
+// O processo está em Revisão do fluxograma desde há 3 dias; passou pela Modelagem piloto duas vezes e pelo Relatório uma vez.
 const passagens = (): EtapaDoVerso[] => CATALOGO_DE_TESTE.map(({ id, codigo, nome, ordem }) => ({ id, codigo, nome, ordem, passagens: [] }))
   .map((etapa) => {
     if (etapa.codigo === 'nao_iniciados') return { ...etapa, passagens: [{ entrouEm: '2026-09-28', saiuEm: '2026-10-01' }] }
@@ -43,7 +43,7 @@ test('a etapa desativada não aparece', async () => {
   })
   const nomes = (await etapasDoVerso()).getAllByRole('listitem').map((linha) => linha.querySelector('.etapa-cabeca')?.getAttribute('title'))
   expect(nomes).not.toContain('Publicação')
-  expect(nomes).toHaveLength(7)
+  expect(nomes).toHaveLength(8)
 })
 
 // As linhas das etapas, sem o botão da data que a Modelagem piloto traz (ticket 03 de enxugar-cartao-e-cadastro).
@@ -54,8 +54,8 @@ test('cada linha diz se é a atual, uma etapa visitada ou uma que o processo nun
   montar()
   const etapas = await etapasDoVerso()
   expect(cabecasDasEtapas(etapas).map((linha) => linha.getAttribute('aria-label'))).toEqual([
-    'Não iniciados: visitada', 'Modelagem piloto: visitada', 'Relatório e modelagem técnica: visitada', 'Revisão interna: atual',
-    'Validação com o setor: ainda não visitada', 'Aprovação pelo setor: ainda não visitada', 'Publicação: ainda não visitada',
+    'Não iniciados: visitada', 'Modelagem piloto: visitada', 'Relatório e modelagem técnica: visitada', 'Revisão do fluxograma: atual',
+    'Revisão do relatório: ainda não visitada', 'Validação com o setor: ainda não visitada', 'Aprovação pelo setor: ainda não visitada', 'Publicação: ainda não visitada',
     'Concluídos: ainda não visitada',
   ])
   // Nome e data não ficam na linha: o nome é dica (title) e as datas moram na gaveta (ADR 0041).
@@ -67,7 +67,7 @@ test('cada linha diz se é a atual, uma etapa visitada ou uma que o processo nun
 test('só a atual está marcada como passo atual', async () => {
   montar()
   const atuais = (await etapasDoVerso()).getAllByRole('listitem').filter((linha) => linha.getAttribute('aria-current') === 'step')
-  expect(atuais.map((linha) => linha.querySelector('.etapa-cabeca')?.getAttribute('title'))).toEqual(['Revisão interna'])
+  expect(atuais.map((linha) => linha.querySelector('.etapa-cabeca')?.getAttribute('title'))).toEqual(['Revisão do fluxograma'])
 })
 
 test('a gaveta abre uma por vez, pelo botão da linha, com o estado anunciado', async () => {
@@ -96,7 +96,7 @@ test('a gaveta mostra as entradas e saídas, da mais recente para a mais antiga'
 
 test('a gaveta da etapa atual mostra a entrada e que o processo ainda está nela', async () => {
   montar()
-  const gaveta = await gavetaDaEtapa('Revisão interna')
+  const gaveta = await gavetaDaEtapa('Revisão do fluxograma')
   expect(gaveta.getByText(`Entrou em ${formatarData(diasAtras(3))} · ainda nesta etapa`)).toBeTruthy()
 })
 
@@ -123,7 +123,7 @@ test('a Consulta e o suspenso leem as mesmas gavetas', async () => {
 test('cada linha é um botão nativo, que abre e fecha pelo teclado (Enter e Espaço) com o estado anunciado', async () => {
   montar()
   const linhas = cabecasDasEtapas(await etapasDoVerso())
-  expect(linhas).toHaveLength(8)
+  expect(linhas).toHaveLength(9)
   for (const linha of linhas) {
     expect(linha.tagName).toBe('BUTTON')
     expect(linha.getAttribute('type')).toBe('button')
@@ -136,8 +136,8 @@ test('mover o processo pelo Agora atualiza a seção Etapas: a nova atual, e a a
   fireEvent.change((await agoraDoVerso()).getByRole('combobox', { name: 'Etapa' }), { target: { value: 'e6' } })
   const etapas = await etapasDoVerso()
   expect(await etapas.findByRole('button', { name: 'Aprovação pelo setor: atual' })).toBeTruthy()
-  expect(etapas.getByRole('button', { name: 'Revisão interna: visitada' })).toBeTruthy()
-  expect(screen.queryByText('Revisão interna: atual')).toBeNull()
+  expect(etapas.getByRole('button', { name: 'Revisão do fluxograma: visitada' })).toBeTruthy()
+  expect(screen.queryByText('Revisão do fluxograma: atual')).toBeNull()
 })
 
 test('cada etapa do verso tem o seu ícone, só enfeite para o leitor de tela', async () => {

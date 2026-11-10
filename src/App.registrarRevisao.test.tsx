@@ -7,7 +7,7 @@ import { montar, type Falsos } from './testes/aprovacaoNoVerso'
 import { BIA, EU } from './testes/processoNoVerso'
 
 // Registrar a revisão interna sem trava (ticket 05 de revisoes-aprovacao, histórias 32 a 39, 43 a 45, 47 e 48): o botão do
-// Agora só na Revisão interna, os dois resultados com a versão de cada um, "Corrigida" desabilitada sem versão da passagem,
+// Agora só na Revisão do fluxograma, os dois resultados com a versão de cada um, "Corrigida" desabilitada sem versão da passagem,
 // o aviso do autor, o [Editar revisão], a recusa, a Consulta sem botões e o histórico. Registrar não move o processo.
 
 afterEach(() => {
@@ -20,7 +20,7 @@ const PASSAGEM_COM_VERSAO = (mudancas: Partial<UltimaVersao> = {}): UltimaVersao
   numero: 8, autorId: EU.id, autorNome: EU.nome, papeis: ['bpm', 'png'], anterior: { numero: 7, autorId: BIA.id },
   enviadaNestaPassagem: true, ...mudancas,
 })
-// A V8 de outra pessoa, enviada antes de o processo entrar na Revisão interna: "corrigida" não vale.
+// A V8 de outra pessoa, enviada antes de o processo entrar na Revisão do fluxograma: "corrigida" não vale.
 const SEM_VERSAO_NA_PASSAGEM = PASSAGEM_COM_VERSAO({ autorId: BIA.id, autorNome: BIA.nome, enviadaNestaPassagem: false })
 
 const abrir = (ultima: UltimaVersao | null, ajustar?: (falsos: Falsos) => void, perfil: 'integrante_ep' | 'consulta' = 'integrante_ep') =>
@@ -33,7 +33,7 @@ async function abrirARegistro() {
 
 const registrar = (janela: ReturnType<typeof within>) => fireEvent.click(janela.getByRole('button', { name: 'Registrar' }))
 
-test('o botão aparece só na Revisão interna (e a Aprovação tem o dela)', async () => {
+test('o botão aparece só na Revisão do fluxograma (e a Aprovação tem o dela)', async () => {
   abrir(SEM_VERSAO_NA_PASSAGEM)
   expect(await (await versoAberto()).findByRole('button', { name: 'Registrar revisão' })).toBeTruthy()
   expect((await versoAberto()).queryByRole('button', { name: 'Registrar aprovação' })).toBeNull()
@@ -68,8 +68,8 @@ test('"sem alteração" registra na versão mais recente, mostra o resumo e o [E
   expect(agora.getByRole('button', { name: 'Editar revisão' })).toBeTruthy()
   expect(screen.queryByRole('dialog', { name: 'Registrar revisão' })).toBeNull()
   expect(revisoes.revisoes.p1[0]).toMatchObject({ resultado: 'sem_alteracao', versaoRevisada: 8, comentario: 'Conferi' })
-  expect(((agora.getByLabelText('Etapa') as HTMLSelectElement).selectedOptions[0]).textContent).toBe('Revisão interna')
-  const gaveta = await gavetaDaEtapa('Revisão interna')
+  expect(((agora.getByLabelText('Etapa') as HTMLSelectElement).selectedOptions[0]).textContent).toBe('Revisão do fluxograma')
+  const gaveta = await gavetaDaEtapa('Revisão do fluxograma')
   expect(await gaveta.findByText('Sem alteração')).toBeTruthy()
 })
 
@@ -89,7 +89,7 @@ test('"Corrigida" fica desabilitada, com o motivo, sem versão enviada na passag
   const janela = await abrirARegistro()
   const corrigida = janela.getByRole('radio', { name: /^Corrigida/ }) as HTMLInputElement
   expect(corrigida.disabled).toBe(true)
-  expect(janela.getByText('Nenhuma versão foi enviada desde que o processo entrou na Revisão interna.')).toBeTruthy()
+  expect(janela.getByText('Nada foi enviado desde que o processo entrou nesta etapa.')).toBeTruthy()
   expect((janela.getByRole('radio', { name: 'Sem alteração: vale para a V8' }) as HTMLInputElement).disabled).toBe(false)
 })
 
@@ -130,9 +130,9 @@ test('a recusa do banco aparece na janela, sem perder o preenchido, e a falha ta
   const janela = await abrirARegistro()
   fireEvent.click(janela.getByRole('radio', { name: 'Sem alteração: vale para a V8' }))
   fireEvent.change(janela.getByLabelText(/Comentário/), { target: { value: 'Meu texto' } })
-  revisoes.falhaNaGravacao = new TravaDoBanco('Já há uma revisão registrada nesta passagem pela Revisão interna; edite-a.')
+  revisoes.falhaNaGravacao = new TravaDoBanco('Já há uma revisão registrada nesta passagem pela Revisão do fluxograma; edite-a.')
   registrar(janela)
-  expect((await janela.findByRole('alert')).textContent).toBe('Já há uma revisão registrada nesta passagem pela Revisão interna; edite-a.')
+  expect((await janela.findByRole('alert')).textContent).toBe('Já há uma revisão registrada nesta passagem pela Revisão do fluxograma; edite-a.')
   expect((janela.getByLabelText(/Comentário/) as HTMLTextAreaElement).value).toBe('Meu texto')
   revisoes.falhaNaGravacao = 'sem conexão'
   registrar(janela)
@@ -150,12 +150,12 @@ test('a Consulta lê o resumo no Agora e na gaveta, sem botões', async () => {
   const agora = await agoraDoVerso()
   expect(await agora.findByText(`Sem alteração · V8 · ${BIA.nome}`)).toBeTruthy()
   expect(agora.queryByRole('button', { name: /revisão/ })).toBeNull()
-  const gaveta = await gavetaDaEtapa('Revisão interna')
+  const gaveta = await gavetaDaEtapa('Revisão do fluxograma')
   expect(await gaveta.findByText('Sem alteração')).toBeTruthy()
   expect(gaveta.queryByRole('button', { name: /Editar/ })).toBeNull()
 })
 
-test('depois de sair da Revisão interna e voltar, a passagem nova pede o registro de novo e a anterior continua na gaveta', async () => {
+test('depois de sair da Revisão do fluxograma e voltar, a passagem nova pede o registro de novo e a anterior continua na gaveta', async () => {
   abrir(PASSAGEM_COM_VERSAO({ autorId: BIA.id }), ({ revisoes }) => {
     revisoes.revisoes.p1 = [{
       id: 'r0', versaoRevisada: 7, versaoCorrigida: null, resultado: 'sem_alteracao', escopo: null, comentario: null,
@@ -165,7 +165,7 @@ test('depois de sair da Revisão interna e voltar, a passagem nova pede o regist
   const agora = await agoraDoVerso()
   expect(await (await versoAberto()).findByRole('button', { name: 'Registrar revisão' })).toBeTruthy()
   expect(agora.queryByRole('button', { name: 'Editar revisão' })).toBeNull()
-  const gaveta = await gavetaDaEtapa('Revisão interna')
+  const gaveta = await gavetaDaEtapa('Revisão do fluxograma')
   expect(await gaveta.findByText(/^V7 · Bia Teste/)).toBeTruthy()
 })
 

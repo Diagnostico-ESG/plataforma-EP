@@ -48,11 +48,11 @@ describe('opcoesDeResponsavel', () => {
 })
 
 describe('avisoDoRevisor', () => {
-  test('na Revisão interna, com o responsável que enviou a versão mais recente', () => {
+  test('na Revisão do fluxograma, com o responsável que enviou a versão mais recente', () => {
     expect(avisoDoRevisor(lido({ ultimaVersao: versao('u1') }))).toBe('Ana Teste enviou a V4; a revisão interna deveria ser de outra pessoa.')
   })
 
-  test('some quando o responsável é outro, quando não há versão ou fora da Revisão interna', () => {
+  test('some quando o responsável é outro, quando não há versão ou fora da Revisão do fluxograma', () => {
     expect(avisoDoRevisor(lido({ ultimaVersao: versao('u2') }))).toBeNull()
     expect(avisoDoRevisor(lido({ ultimaVersao: null }))).toBeNull()
     expect(avisoDoRevisor(lido({ ultimaVersao: versao('u1'), responsavel: null }))).toBeNull()
@@ -62,15 +62,15 @@ describe('avisoDoRevisor', () => {
 
 describe('fraseDaSituacaoParada', () => {
   test('etapa, etiqueta, responsável e dias', () => {
-    expect(fraseDaSituacaoParada(lido(), '2026-10-16')).toBe('Em Revisão interna · Iniciado · com Ana Teste há 6 dias')
+    expect(fraseDaSituacaoParada(lido(), '2026-10-16')).toBe('Em Revisão do fluxograma · Iniciado · com Ana Teste há 6 dias')
   })
 
   test('depois de 7 dias a frase não repete os dias (o selo âmbar os diz)', () => {
-    expect(fraseDaSituacaoParada(lido({ entrouNaEtapaEm: '2026-10-01' }), '2026-10-16')).toBe('Em Revisão interna · Iniciado · com Ana Teste')
+    expect(fraseDaSituacaoParada(lido({ entrouNaEtapaEm: '2026-10-01' }), '2026-10-16')).toBe('Em Revisão do fluxograma · Iniciado · com Ana Teste')
   })
 
   test('sem responsável', () => {
-    expect(fraseDaSituacaoParada(lido({ responsavel: null, etiqueta: 'a_fazer' }), '2026-10-16')).toBe('Em Revisão interna · A fazer · sem responsável')
+    expect(fraseDaSituacaoParada(lido({ responsavel: null, etiqueta: 'a_fazer' }), '2026-10-16')).toBe('Em Revisão do fluxograma · A fazer · sem responsável')
   })
 
   test('em Não iniciados e em Concluídos não há dias', () => {
@@ -80,8 +80,8 @@ describe('fraseDaSituacaoParada', () => {
 })
 
 test('ondeEstaOProcesso: só a etapa e a etiqueta, sem o responsável', () => {
-  expect(ondeEstaOProcesso(lido())).toBe('Em Revisão interna · Iniciado')
-  expect(ondeEstaOProcesso(lido({ etiqueta: undefined, responsavel: null }))).toBe('Em Revisão interna · A fazer')
+  expect(ondeEstaOProcesso(lido())).toBe('Em Revisão do fluxograma · Iniciado')
+  expect(ondeEstaOProcesso(lido({ etiqueta: undefined, responsavel: null }))).toBe('Em Revisão do fluxograma · A fazer')
 })
 
 describe('nomeDoResponsavel', () => {
