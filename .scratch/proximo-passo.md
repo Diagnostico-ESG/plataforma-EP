@@ -1,28 +1,30 @@
 # Próximo passo (2026-11-10)
 
-**Feito:** `importacao-dados-atuais` entregue em 2026-11-10 (commit 005cea9, marco `marco/2026-11-10-entrega-importacao-dados-atuais`), com ressalva: o `[visual]` da segunda entrega foi conferido só por medida no navegador, na vitrine local. O `/ship` achou e corrigiu dois defeitos (o `.pdf` do relatório que não voltava na segunda rodada e os avisos que faltavam na prévia). A revisão de segurança não achou nada, e a auditoria de pacotes não achou nada que vá ao navegador.
+**Feito:**
+- `importacao-dados-atuais` entregue em 2026-11-10 (commit 005cea9, marco `marco/2026-11-10-entrega-importacao-dados-atuais`), com ressalva: o `[visual]` da segunda entrega foi conferido só por medida no navegador.
+- O Checklist do cartão passou para a v1.5 por decisão do usuário em 2026-11-10 (antes do `/planejar`; registrado no `projeto.md` e no `backlog.md`).
+- Com isso, todas as funcionalidades da lista da v1 estão entregues.
 
-**Próximo:** `/planejar checklist-do-cartao` (Opus, modo completo), item 24 do `projeto.md`; perguntas da sabatina no `backlog.md` (linha de 2026-11-09). Demandas fora do plano entram pelo `/demanda` (Opus para classificar).
+**Próximo, a seu pedido: levar à produção o que falta para a carga real**, pelos roteiros de `.claude/regras/producao.md` (Sonnet), nesta ordem:
+1. Backup da produção (criar `BACKUP_SENHA_PRODUCAO`).
+2. Publicar no banco de produção as migrações `20261106230000_importado_concluido_no_quadro` e `20261110000447_importar_versao`, e a função `arquivos-no-drive`.
+3. Publicar o site.
 
-**Antes da carga real (a seu pedido, pelos roteiros de `.claude/regras/producao.md`):**
-- O backup da produção (criar `BACKUP_SENHA_PRODUCAO`).
-- A publicação na produção das migrações `20261106230000_importado_concluido_no_quadro` e `20261110000447_importar_versao` e da função `arquivos-no-drive`.
-- A publicação do site.
-- Depois, limpar o banco de desenvolvimento, se quiser (`.scratch/limpar-desenvolvimento.sql`), e importar a planilha e a pasta reais pela tela. Para a equipe usar o site, a visibilidade Público na Netlify.
+Depois disso, a carga real é sua, pela tela. Antes, você pode limpar o banco de desenvolvimento (`.scratch/limpar-desenvolvimento.sql`). Para a equipe usar o site, deixe a visibilidade como Público na Netlify.
 
-**Abertos no backlog:**
-- O teste de banco 22 (catálogo do desenvolvimento com uma etapa entre "Revisão interna" e "Validação com o setor").
-- Confirmar a versão histórica importada sem etapa (história 49).
-- As melhorias deixadas de fora pela revisão.
-- As ferramentas de desenvolvimento com vulnerabilidade.
-- Apagar a branch remota `importacao-dados-atuais` (comando seu: `git push origin --delete importacao-dados-atuais`).
+**Demandas fora do plano** entram pelo `/demanda` (Opus para classificar). No backlog estão:
+- o teste de banco 22 reprovado na `main`;
+- confirmar a versão histórica importada sem etapa;
+- as melhorias que a revisão deixou de fora;
+- as ferramentas de desenvolvimento com vulnerabilidade;
+- a branch remota `importacao-dados-atuais` a apagar (comando seu).
 
-**Para começar a sessão nova (Opus), digite, na ordem:**
+**Para começar a sessão nova (Sonnet), digite, na ordem:**
 
 ```
 /stc
 ```
 
 ```
-/planejar checklist-do-cartao
+Publique na produção, pelos roteiros de .claude/regras/producao.md: o backup, as migrações 20261106230000_importado_concluido_no_quadro e 20261110000447_importar_versao, a função arquivos-no-drive e o site.
 ```
