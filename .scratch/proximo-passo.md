@@ -2,11 +2,7 @@
 
 **Feito:** ticket 02 de `importacao-dados-atuais` (arquivos das versões da pasta), concluído no commit 8e270ef, já na `main` e no GitHub. A migração `20261110000447_importar_versao` foi aplicada no desenvolvimento. A função `arquivos-no-drive` mudou (marca da importação). Era o último ticket da funcionalidade.
 
-**Passo seu antes de testar a seção 2 no desenvolvimento:** publicar de novo a função no desenvolvimento, no seu terminal:
-
-```
-npx supabase functions deploy arquivos-no-drive --use-api --project-ref yclkzyoebpsxmgpbcbus
-```
+**Função no desenvolvimento:** `arquivos-no-drive` publicada de novo no desenvolvimento em 2026-11-09 (registro em `supabase/AMBIENTES.md`); a seção 2 já pode ser testada lá.
 
 **Próximo, nesta ordem:**
 1. `/polir` de `importacao-dados-atuais` (Sonnet, sessão nova, começando pelo `/stc`): o ticket mexeu na tela.
