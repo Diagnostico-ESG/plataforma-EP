@@ -178,4 +178,4 @@ Implementado em 2026-11-06 (commit fbb2957)
 Entregue em 2026-11-06 (commit ec2b9d0), com ressalva: [visual] da primeira entrega visto só na vitrine local com módulos falsos
 
 Entregue em 2026-11-10 (commit 005cea9), com ressalva: [visual] da segunda entrega conferido só por medida no navegador, na vitrine local com dados falsos
-Em revisão desde 2026-11-10
+Entregue em 2026-11-10 (commit 46aedf9)
