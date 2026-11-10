@@ -48,6 +48,7 @@ const TEXTO_DA_ACAO_DA_VERSAO: Record<string, string> = {
   enviar_relatorio: 'Enviou o Relatório',
   acrescentar_relatorio: 'Acrescentou o relatório à versão', sem_alteracao: 'Marcou sem alteração de conteúdo na versão',
   substituir: 'Substituiu o arquivo da versão', alterar_numero: 'Alterou o número da versão',
+  importar: 'Importou a versão',
 }
 
 const TEXTO_DA_ACAO_DO_ANEXO: Record<string, string> = { enviar: 'Enviou o anexo', retirar: 'Retirou o anexo' }

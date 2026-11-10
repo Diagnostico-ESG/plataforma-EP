@@ -235,11 +235,11 @@ anotarSubpasta(processoId: string, subpasta: string): Promise<void>
 
   `importacaoSupabase` usa `chamarFuncao` e o envio dos bytes de `src/versoes/funcaoDoDrive.ts`, com `importacao: true` em cada pedido; `listarProcessosDaPasta` faz três leituras ao todo, sem uma por processo (`processos_com_andamento`, `versoes(processo_id, numero)`, `arquivos_da_versao(numero_do_relatorio, versoes(processo_id))`), e `haImportado` lê um evento `importar` de processo (`limit 1`). O `ImportacaoFalso` recebe um `VersoesFalso` e grava nele, para a versão importada aparecer no painel do processo (história 55), com falha programável por nome de arquivo (`falharNoArquivo`).
 
-- [ ] **Passo 1: testes que falham:** `importacaoSupabase.test.ts` (cliente simulado: o corpo do `iniciar_envio` e do `registrar` leva `importacao: true`, os parâmetros do relatório, a tradução da recusa) e `ImportacaoFalso.test.ts` (versão existente devolve `ja_existia`; a falha programada lança).
-- [ ] **Passo 2:** `npx vitest run src/importacao src/cadastros/historicoDaImportacao.test.ts` → FAIL.
-- [ ] **Passo 3: implementar.**
-- [ ] **Passo 4:** a mesma linha passa; `npx tsc --noEmit -p .` sem erro.
-- [ ] **Passo 5: commit.**
+- [x] **Passo 1: testes que falham:** `importacaoSupabase.test.ts` (cliente simulado: o corpo do `iniciar_envio` e do `registrar` leva `importacao: true`, os parâmetros do relatório, a tradução da recusa) e `ImportacaoFalso.test.ts` (versão existente devolve `ja_existia`; a falha programada lança). (Feito em `importacaoDaPastaSupabase.test.ts`, módulo próprio da pasta.)
+- [x] **Passo 2:** `npx vitest run src/importacao src/cadastros/historicoDaImportacao.test.ts` → FAIL.
+- [x] **Passo 3: implementar.**
+- [x] **Passo 4:** a mesma linha passa; `npx tsc --noEmit -p .` sem erro.
+- [x] **Passo 5: commit.**
 
 ### Tarefa 6: Plano de envio e envio versão a versão
 

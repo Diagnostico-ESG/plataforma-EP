@@ -15,3 +15,8 @@ test('o título do evento diz de onde veio e em que etapa o processo entrou', ()
 test('o texto da ação, quando só ele é pedido, é "Importou da planilha"', () => {
   expect(textoDaAcaoDoCadastro('importar', 'processo')).toBe('Importou da planilha')
 })
+
+// Ticket 02: cada versão importada da pasta grava um evento "importar" de versão, com quem importou.
+test('a versão importada da pasta é "Importou a versão"', () => {
+  expect(textoDaAcaoDoCadastro('importar', 'versao')).toBe('Importou a versão')
+})

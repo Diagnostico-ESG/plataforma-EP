@@ -1,14 +1,17 @@
 import { type ErroDoBanco, TravaDoBanco } from '../acesso/falhasDeGravacao'
 import type { ClienteSupabase } from '../lib/supabase'
+import { type EnviarBytes, enviarComFetch } from '../versoes/funcaoDoDrive'
 import { chaveDoProcesso } from './chaves'
+import { criarImportacaoDaPastaSupabase } from './importacaoDaPastaSupabase'
 import type { ExistentesNaPlataforma, ModuloDeImportacao, ProcessoParaImportar, ResultadoDaGravacao } from './tipos'
 
 const FRASE_SEM_PERMISSAO = 'Só o Administrador pode importar os dados.'
 
-export function criarImportacaoSupabase(cliente: ClienteSupabase): ModuloDeImportacao {
+export function criarImportacaoSupabase(cliente: ClienteSupabase, enviarBytes: EnviarBytes = enviarComFetch): ModuloDeImportacao {
   return {
     listarExistentes: () => listarExistentes(cliente),
     gravarProcesso: (processo) => gravarProcesso(cliente, processo),
+    ...criarImportacaoDaPastaSupabase(cliente, enviarBytes),
   }
 }
 
