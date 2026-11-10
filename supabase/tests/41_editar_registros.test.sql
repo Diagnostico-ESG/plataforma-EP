@@ -119,8 +119,9 @@ begin
   perform pg_temp.mover(nome_do_processo, 'revisao_interna');
   perform pg_temp.enviar_completa(nome_do_processo);
   perform pg_temp.carimbar(nome_do_processo);
-  insert into public.revisoes_internas (processo_id, resultado, escopo, comentario)
-  values (pg_temp.processo(nome_do_processo), 'corrigida', 'fluxograma', 'Ajustei o fluxo');
+  -- O escopo (fluxograma, pela V2 enviada na passagem) é o banco que deduz.
+  insert into public.revisoes_internas (processo_id, resultado, comentario)
+  values (pg_temp.processo(nome_do_processo), 'corrigida', 'Ajustei o fluxo');
   perform pg_temp.mover(nome_do_processo, 'aprovacao_setor');
 end $$;
 grant execute on function pg_temp.ate_a_aprovacao_corrigindo(text) to authenticated;
@@ -161,18 +162,18 @@ select pg_temp.ate_a_aprovacao_revisando('Sem Alteracao');
 
 -- ===== Revisão: edições aceitas (a2 integrante, com a Revisão interna já concluída) =====
 insert into _tap (linha) select lives_ok(
-  $sql$update public.revisoes_internas set escopo = 'relatorio', comentario = '  Texto novo  '
+  $sql$update public.revisoes_internas set comentario = '  Texto novo  '
     where processo_id = pg_temp.processo('Corrigida')$sql$,
-  'integrante edita o escopo e o comentário da revisão corrigida');
+  'integrante edita o comentário da revisão corrigida');
 insert into _tap (linha) select results_eq(
   $sql$select escopo::text, comentario from public.revisoes_internas where processo_id = pg_temp.processo('Corrigida')$sql$,
-  $sql$values ('relatorio', 'Texto novo')$sql$, 'o escopo novo fica e o comentário vem aparado');
+  $sql$values ('fluxograma', 'Texto novo')$sql$, 'o escopo deduzido fica e o comentário vem aparado');
 insert into _tap (linha) select results_eq(
   $sql$select detalhes->'antes'->>'escopo', detalhes->'depois'->>'escopo', detalhes->'antes'->>'comentario',
     detalhes->'depois'->>'comentario'
     from public.eventos where entidade = 'revisao_interna' and acao = 'editar'
       and entidade_ref = pg_temp.processo('Corrigida')::text$sql$,
-  $sql$values ('fluxograma', 'relatorio', 'Ajustei o fluxo', 'Texto novo')$sql$,
+  $sql$values ('fluxograma', 'fluxograma', 'Ajustei o fluxo', 'Texto novo')$sql$,
   'um evento "editar" liga a revisão ao processo, com o escopo e o comentário de antes e de depois');
 insert into _tap (linha) select lives_ok(
   $sql$update public.revisoes_internas set comentario = '   ' where processo_id = pg_temp.processo('Corrigida')$sql$,
@@ -194,15 +195,15 @@ insert into _tap (linha) select is(pg_temp.edicoes('revisao_interna', 'Corrigida
 -- ===== Revisão: edições recusadas =====
 insert into _tap (linha) select throws_ok(
   $sql$update public.revisoes_internas set escopo = null where processo_id = pg_temp.processo('Corrigida')$sql$,
-  'P0001', 'escopo_obrigatorio', 'tirar o escopo da revisão corrigida é recusado');
+  '42501', null, 'tirar o escopo da revisão corrigida é recusado: o banco o deduz');
 insert into _tap (linha) select throws_ok(
   $sql$update public.revisoes_internas set escopo = 'ambos' where processo_id = pg_temp.processo('Sem Alteracao')$sql$,
-  'P0001', 'escopo_so_na_corrigida', 'pôr escopo na revisão sem alteração é recusado');
+  '42501', null, 'pôr escopo na revisão sem alteração é recusado: o banco o deduz');
 insert into _tap (linha) select throws_ok(
-  $sql$update public.revisoes_internas set resultado = 'corrigida', escopo = 'ambos' where processo_id = pg_temp.processo('Sem Alteracao')$sql$,
-  'P0001', 'corrigida_sem_versao_na_passagem', 'passar a "corrigida" sem versão enviada na passagem é recusado');
+  $sql$update public.revisoes_internas set resultado = 'corrigida' where processo_id = pg_temp.processo('Sem Alteracao')$sql$,
+  'P0001', 'corrigida_sem_envio_na_passagem', 'passar a "corrigida" sem versão enviada na passagem é recusado');
 insert into _tap (linha) select lives_ok(
-  $sql$update public.revisoes_internas set resultado = 'sem_alteracao', escopo = null where processo_id = pg_temp.processo('Troca')$sql$,
+  $sql$update public.revisoes_internas set resultado = 'sem_alteracao' where processo_id = pg_temp.processo('Troca')$sql$,
   'a revisão corrigida passa a "sem alteração"');
 insert into _tap (linha) select results_eq(
   $sql$select resultado::text, versao_corrigida_id is null,
@@ -210,7 +211,7 @@ insert into _tap (linha) select results_eq(
     from public.revisoes_internas where processo_id = pg_temp.processo('Troca')$sql$,
   $sql$values ('sem_alteracao', true, true)$sql$, 'as versões foram recalculadas: revisada é a mais recente, sem corrigida');
 insert into _tap (linha) select lives_ok(
-  $sql$update public.revisoes_internas set resultado = 'corrigida', escopo = 'relatorio' where processo_id = pg_temp.processo('Troca')$sql$,
+  $sql$update public.revisoes_internas set resultado = 'corrigida' where processo_id = pg_temp.processo('Troca')$sql$,
   'e volta a "corrigida"');
 insert into _tap (linha) select results_eq(
   $sql$select versao_revisada_id = (select id from public.versoes where processo_id = pg_temp.processo('Troca') and numero = 1),
