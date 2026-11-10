@@ -53,10 +53,28 @@ describe('as versões da pasta', () => {
     expect(lida.versoes[0].relatorio?.name).toBe('ABC_V1_Exemplo Alfa_Relatório.docx')
   })
 
-  test('a versão sem .bpm fica de fora e listada; as outras do processo entram', () => {
-    const lida = lerPasta(daPasta('D/ABC/ABC_V1_Exemplo Alfa_Relatório.docx', 'D/ABC/ABC_V2_Exemplo Alfa.bpm'))
-    expect(lida.versoes.map((v) => v.rotulo)).toEqual(['V2'])
-    expect(lida.semBpm).toEqual([{ chave: 'ABC|exemplo alfa', sigla: 'ABC', nomeDoProcesso: 'Exemplo Alfa', numero: 1, rotulo: 'V1' }])
+  test('a versão sem .bpm usa o .bpm da versão seguinte que tem um, e diz de qual veio', () => {
+    const lida = lerPasta(daPasta(
+      'D/ABC/ABC_V1_Exemplo Alfa_Relatório.docx', 'D/ABC/ABC_V2_Exemplo Alfa.png', 'D/ABC/ABC_V3_Exemplo Alfa.bpm',
+      'D/XYZ/XYZ_V4_Outro Processo.bpm',
+    ))
+    const doAlfa = lida.versoes.filter((v) => v.sigla === 'ABC').sort((a, b) => a.numero - b.numero)
+    expect(doAlfa.map((v) => [v.rotulo, v.bpm.name, v.bpmDaVersao])).toEqual([
+      ['V1', 'ABC_V3_Exemplo Alfa.bpm', 'V3'], ['V2', 'ABC_V3_Exemplo Alfa.bpm', 'V3'], ['V3', 'ABC_V3_Exemplo Alfa.bpm', null],
+    ])
+    expect([doAlfa[0].relatorio?.name, doAlfa[1].png?.name]).toEqual(['ABC_V1_Exemplo Alfa_Relatório.docx', 'ABC_V2_Exemplo Alfa.png'])
+    expect(lida.semBpm).toEqual([])
+  })
+
+  test('a versão sem .bpm e sem versão seguinte com .bpm fica de fora e listada; as outras do processo entram', () => {
+    const lida = lerPasta(daPasta('D/ABC/ABC_V1_Exemplo Alfa.bpm', 'D/ABC/ABC_V2_Exemplo Alfa_Relatório.docx'))
+    expect(lida.versoes.map((v) => v.rotulo)).toEqual(['V1'])
+    expect(lida.semBpm).toEqual([{ chave: 'ABC|exemplo alfa', sigla: 'ABC', nomeDoProcesso: 'Exemplo Alfa', numero: 2, rotulo: 'V2' }])
+  })
+
+  test('o .bpm de outro processo não serve: a versão fica de fora', () => {
+    const lida = lerPasta(daPasta('D/ABC/ABC_V1_Exemplo Alfa_Relatório.docx', 'D/ABC/ABC_V2_Exemplo Beta.bpm'))
+    expect(lida.semBpm.map((v) => v.rotulo)).toEqual(['V1'])
   })
 
   test('sem .png nem relatório, a versão entra sem aviso', () => {

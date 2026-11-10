@@ -21,6 +21,8 @@ export type VersaoDaPasta = {
   png: File | null
   relatorio: File | null
   pdfDoRelatorio: File | null
+  /** A versão sem .bpm próprio usa o da versão seguinte (ajuste de 2026-11-10): o rótulo dela ("V3"); null com .bpm próprio. */
+  bpmDaVersao: string | null
   /** Algum arquivo veio com letra diferente da do .bpm (história 43a): entrou na versão do .bpm, com aviso. */
   letraCorrigida: boolean
 }
@@ -28,7 +30,7 @@ export type VersaoDaPasta = {
 export type VersaoDeFora = { chave: string; sigla: string; nomeDoProcesso: string; numero: number; rotulo: string }
 export type PastaLida = {
   versoes: VersaoDaPasta[]
-  /** Versões sem .bpm: não entram (história 45). */
+  /** Versões sem .bpm e sem versão seguinte com .bpm no processo: não entram (história 45). */
   semBpm: VersaoDeFora[]
   /** Dois arquivos do mesmo papel na mesma versão: o relatório, o .png e o .pdf ficam de fora; com dois .bpm, a versão toda. */
   duplicados: (VersaoDeFora & { papel: PapelNaPasta })[]
@@ -72,15 +74,8 @@ function umDoPapel(grupo: Lido[], papel: PapelNaPasta, letra: LetraDaVersao, lid
   return doPapel.length === 1 ? doPapel[0].arquivo : null
 }
 
-function montarVersao(grupo: Lido[], lida: PastaLida): void {
-  const bpms = grupo.filter((lido) => lido.papel === 'bpm')
-  if (bpms.length === 0) {
-    lida.semBpm.push(deFora(grupo, grupo[0].letra))
-    return
-  }
-  const { letra } = bpms[0]
-  const bpm = umDoPapel(grupo, 'bpm', letra, lida)
-  if (!bpm) return
+// O arquivo que entra em cada papel; o .bpm já vem escolhido (o próprio ou o da versão seguinte).
+function acrescentarVersao(grupo: Lido[], letra: LetraDaVersao, bpm: File, bpmDaVersao: string | null, lida: PastaLida): void {
   const arquivos = {
     bpm, png: umDoPapel(grupo, 'png', letra, lida), relatorio: umDoPapel(grupo, 'relatorio', letra, lida),
     pdfDoRelatorio: umDoPapel(grupo, 'pdf', letra, lida),
@@ -88,7 +83,30 @@ function montarVersao(grupo: Lido[], lida: PastaLida): void {
   // Só conta o arquivo que entra: o duplicado que ficou de fora já tem o seu aviso.
   const entram = Object.values(arquivos)
   const letraCorrigida = grupo.some((lido) => lido.letra !== letra && entram.includes(lido.arquivo))
-  lida.versoes.push({ ...deFora(grupo, letra), tipo: TIPO_DA_LETRA[letra], ...arquivos, letraCorrigida })
+  lida.versoes.push({ ...deFora(grupo, letra), tipo: TIPO_DA_LETRA[letra], ...arquivos, bpmDaVersao, letraCorrigida })
+}
+
+// Devolve o grupo sem .bpm, que só se resolve depois de todas as versões com .bpm montadas.
+function montarVersao(grupo: Lido[], lida: PastaLida): Lido[] | null {
+  const bpms = grupo.filter((lido) => lido.papel === 'bpm')
+  if (bpms.length === 0) return grupo
+  const { letra } = bpms[0]
+  const bpm = umDoPapel(grupo, 'bpm', letra, lida)
+  if (bpm) acrescentarVersao(grupo, letra, bpm, null, lida)
+  return null
+}
+
+// As versões anteriores de um processo podem estar em abas do .bpm de uma versão mais nova (ajuste de 2026-11-10): a
+// versão sem .bpm usa o .bpm próprio da versão seguinte do mesmo processo; sem ela, fica de fora (história 45).
+function montarSemBpm(grupo: Lido[], lida: PastaLida): void {
+  const { chave, numero, letra } = grupo[0]
+  const seguinte = lida.versoes.filter((v) => v.chave === chave && v.numero > numero && v.bpmDaVersao === null)
+    .sort((a, b) => a.numero - b.numero)[0]
+  if (!seguinte) {
+    lida.semBpm.push(deFora(grupo, letra))
+    return
+  }
+  acrescentarVersao(grupo, letra, seguinte.bpm, seguinte.rotulo, lida)
 }
 
 function subpastasDosProcessos(lidos: Lido[]): PastaLida['subpastas'] {
@@ -105,7 +123,8 @@ export function lerPasta(arquivos: ArquivoDaPasta[]): PastaLida {
     if (lido) lidos.push(lido)
     else lida.foraDoPadrao.push(item.caminho)
   }
-  for (const grupo of agrupar(lidos)) montarVersao(grupo, lida)
+  const semBpm = agrupar(lidos).map((grupo) => montarVersao(grupo, lida)).filter((grupo) => grupo !== null)
+  for (const grupo of semBpm) montarSemBpm(grupo, lida)
   lida.subpastas = subpastasDosProcessos(lidos)
   return lida
 }

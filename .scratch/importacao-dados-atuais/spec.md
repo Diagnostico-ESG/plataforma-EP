@@ -175,7 +175,21 @@ Critérios de pronto:
 
 Implementado em 2026-11-06 (commit fbb2957)
 
+### Ajuste de 2026-11-10: .bpm nas abas da versão mais nova
+
+Pedido do usuário depois da carga da pasta no desenvolvimento, feito no caminho curto de ajuste. Em vários processos, as versões anteriores não têm .bpm próprio: o fluxograma delas está em outras abas do .bpm da versão mais recente. A importação apontava "sem .bpm" e deixava essas versões de fora, com o .png e o relatório delas. O banco exige um .bpm em toda versão, e a regra dele não muda.
+
+Decisão do usuário (entre usar o .bpm da mais nova, permitir versão sem .bpm por migração e só trocar o aviso): a versão sem .bpm usa uma cópia do .bpm da **versão seguinte do mesmo processo que tem .bpm próprio** (a de número maior mais próximo). O .png, o relatório e o .pdf dela entram normalmente, e o .bpm vai ao Drive com o nome padrão da versão dela. Sem versão seguinte com .bpm no processo, a versão continua de fora, como na história 45. Muda só a leitura da pasta: sem migração.
+
+Critérios de pronto:
+
+- [x] Versão sem .bpm, com versão seguinte do mesmo processo com .bpm: entra com o .bpm dela e com os próprios .png, relatório e .pdf.
+- [x] Aviso na prévia e no resumo: "{processo} V1: sem .bpm próprio; usa o .bpm da V2, que tem as versões anteriores em abas."
+- [x] Versão sem .bpm e sem versão seguinte com .bpm: continua de fora, com "sem .bpm."; o .bpm de outro processo não serve.
+- [x] Testes: `lerPasta.test.ts` e `App.importacaoDaPasta.test.tsx`.
+
 Entregue em 2026-11-06 (commit ec2b9d0), com ressalva: [visual] da primeira entrega visto só na vitrine local com módulos falsos
 
 Entregue em 2026-11-10 (commit 005cea9), com ressalva: [visual] da segunda entrega conferido só por medida no navegador, na vitrine local com dados falsos
 Entregue em 2026-11-10 (commit 46aedf9)
+Em revisão desde 2026-11-10

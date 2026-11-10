@@ -38,18 +38,20 @@ export function foraDaImportacao({ pasta, semProcesso }: PreviaDaPasta): string[
 }
 
 /**
- * Entra com ajuste: a letra corrigida, o arquivo duplicado que fica de fora e a subpasta que ganha a linha nas Anotações. O mesmo
+ * Entra com ajuste: a letra corrigida, o .bpm da versão seguinte, o arquivo duplicado que fica de fora e a subpasta que ganha a linha nas Anotações. O mesmo
  * texto na prévia (história 44) e no resumo, por isso sem tempo verbal de antes ou depois do envio.
  */
 export function avisosDaPasta({ porProcesso, pasta }: PreviaDaPasta): string[] {
   const conhecidos = new Set(porProcesso.map((p) => p.processo.chave))
   const letras = porProcesso.flatMap((p) => p.entram.filter((v) => v.letraCorrigida)
     .map((v) => `${p.processo.nome} ${v.rotulo}: arquivo com letra diferente da do .bpm, ligado à ${v.rotulo}.`))
+  const bpmDaSeguinte = porProcesso.flatMap((p) => p.entram.filter((v) => v.bpmDaVersao !== null)
+    .map((v) => `${p.processo.nome} ${v.rotulo}: sem .bpm próprio; usa o .bpm da ${String(v.bpmDaVersao)}, que tem as versões anteriores em abas.`))
   const duplicados = pasta.duplicados.filter((d) => d.papel !== 'bpm' && conhecidos.has(d.chave))
     .map((d) => `${d.nomeDoProcesso} ${d.rotulo}: dois arquivos de ${NOME_DO_PAPEL[d.papel]}; nenhum dos dois entra.`)
   const subpastas = porProcesso.filter((p) => p.subpasta !== null)
     .map((p) => `${p.processo.nome}: arquivos da subpasta ${String(p.subpasta)}, com uma linha nas Anotações.`)
-  return [...letras, ...duplicados, ...subpastas]
+  return [...letras, ...bpmDaSeguinte, ...duplicados, ...subpastas]
 }
 
 function faltam(numeros: number[]): string {

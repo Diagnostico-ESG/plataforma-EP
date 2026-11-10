@@ -205,3 +205,20 @@ test('dois relatórios na mesma versão: a versão entra sem relatório, com avi
   expect(avisos.getByRole('listitem').textContent).toBe('Emitir Ofício V1: dois arquivos de relatório .docx; nenhum dos dois entra.')
   expect(versoes.versoes.p1[0].arquivos.map((a) => a.papel)).toEqual(['bpm'])
 })
+
+test('a versão sem .bpm usa o .bpm da versão seguinte (as anteriores ficam nas abas dele), com aviso', async () => {
+  const { versoes } = montar()
+  const secao = await abrirSecao()
+  await escolherPastaEPlanilha(secao, [
+    'TSA/TSA_V1_Emitir Ofício.png', 'TSA/TSA_V1_Emitir Ofício_Relatório.docx', 'TSA/TSA_V2_Emitir Ofício.bpm',
+  ])
+  const avisos = within(await secao.findByRole('region', { name: '1 aviso' }))
+  expect(avisos.getByRole('listitem').textContent)
+    .toBe('Emitir Ofício V1: sem .bpm próprio; usa o .bpm da V2, que tem as versões anteriores em abas.')
+  fireEvent.click(secao.getByRole('button', { name: 'Enviar arquivos' }))
+  expect(await secao.findByText('Envio concluído')).toBeTruthy()
+  expect(versoes.versoes.p1.map((v) => [v.numero, v.arquivos.map((a) => a.nome)])).toEqual([
+    [1, ['TSA_V1_Emitir Ofício.bpm', 'TSA_V1_Emitir Ofício.png', 'TSA_V1_Emitir Ofício_Relatório V1.docx']],
+    [2, ['TSA_V2_Emitir Ofício.bpm']],
+  ])
+})
