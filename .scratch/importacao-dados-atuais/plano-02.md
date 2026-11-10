@@ -143,11 +143,11 @@ export function gravacaoDaImportacao(entrada: EntradaRegistrar, arquivos: Arquiv
 
 - Consome: `importar_versao` e `importar_anexo` (Tarefa 1). A resposta do `registrar` na importação é `{ resultado: 'criada' | 'ja_existia' }` (anexo: `'criado' | 'ja_existia'`).
 
-- [ ] **Passo 1: teste que falha** em `importacaoDeArquivos.test.ts`: integrante, consulta e inativo recusados; administrador passa; `concluido` e `em_andamento` aceitos, `suspenso` recusado; `importacao: 'sim'` recusado como entrada inválida; parâmetros da histórica (`p_tipo: 'historica'`, sem `p_numero_do_relatorio`), da piloto e da em sequência com relatório.
-- [ ] **Passo 2:** `npx vitest run supabase/functions/_shared/importacaoDeArquivos.test.ts` → FAIL (módulo inexistente).
-- [ ] **Passo 3: implementar o arquivo puro** e ligar: `index.ts` lê a marca depois de `conferirChamador` e, com ela, aplica `conferirChamadorDaImportacao`; `recusaDoProcesso` recebe a marca e usa `conferirProcessoDaImportacao`; `registrar.ts` e `anexos.ts` chamam `importar_versao` / `importar_anexo` com a marca. Sem a marca, nada muda.
-- [ ] **Passo 4:** a mesma linha do Passo 2 passa, e `npx vitest run supabase/functions` inteiro verde; `npx tsc --noEmit -p .` sem erro.
-- [ ] **Passo 5: commit.** Anotar para o usuário: publicar de novo `arquivos-no-drive` no desenvolvimento (`npx supabase functions deploy arquivos-no-drive --use-api --project-ref yclkzyoebpsxmgpbcbus`, comando dele).
+- [x] **Passo 1: teste que falha** em `importacaoDeArquivos.test.ts`: integrante, consulta e inativo recusados; administrador passa; `concluido` e `em_andamento` aceitos, `suspenso` recusado; `importacao: 'sim'` recusado como entrada inválida; parâmetros da histórica (`p_tipo: 'historica'`, sem `p_numero_do_relatorio`), da piloto e da em sequência com relatório.
+- [x] **Passo 2:** `npx vitest run supabase/functions/_shared/importacaoDeArquivos.test.ts` → FAIL (módulo inexistente).
+- [x] **Passo 3: implementar o arquivo puro** e ligar: `index.ts` lê a marca depois de `conferirChamador` e, com ela, aplica `conferirChamadorDaImportacao`; `recusaDoProcesso` recebe a marca e usa `conferirProcessoDaImportacao`; `registrar.ts` e `anexos.ts` chamam `importar_versao` / `importar_anexo` com a marca. Sem a marca, nada muda.
+- [x] **Passo 4:** a mesma linha do Passo 2 passa, e `npx vitest run supabase/functions` inteiro verde; `npx tsc --noEmit -p .` sem erro.
+- [x] **Passo 5: commit.** Anotar para o usuário: publicar de novo `arquivos-no-drive` no desenvolvimento (`npx supabase functions deploy arquivos-no-drive --use-api --project-ref yclkzyoebpsxmgpbcbus`, comando dele).
 
 ### Tarefa 3: Leitura da pasta
 
@@ -177,11 +177,11 @@ export function lerNomeDoArquivo(nome: string): NomeLido | null  // SIGLA_V<n><F
 export function lerPasta(arquivos: ArquivoDaPasta[]): PastaLida
 ```
 
-- [ ] **Passo 1: teste que falha**, com `File` inventado e `caminho` montado à mão, um `test` por regra do quarto item do ticket: as três letras; `V1F.bpm` com `V1_Relatório.docx` vira uma versão histórica com `letraCorrigida`; versão sem `.bpm` em `semBpm`; `.png` e relatório ausentes sem aviso; nome fora do padrão e arquivos da raiz em `foraDoPadrao`; `.pdf` de relatório em `pdfDoRelatorio`; dois `.docx` na mesma versão: `relatorio` nulo e a versão em `relatoriosDuplicados`; arquivo em `XYZ/Grupo/` entra no processo e aparece em `subpastas`; nome com acento, vírgula e " - ".
-- [ ] **Passo 2:** `npx vitest run src/importacao/lerPasta.test.ts` → FAIL.
-- [ ] **Passo 3: implementar** (expressão do nome: `/^([^_]+)_V(\d+)([FP]?)_(.+?)(_Relatório)?\.([a-z0-9]+)$/i`; a extensão em minúsculas decide o papel).
-- [ ] **Passo 4:** a mesma linha passa.
-- [ ] **Passo 5: commit.**
+- [x] **Passo 1: teste que falha**, com `File` inventado e `caminho` montado à mão, um `test` por regra do quarto item do ticket: as três letras; `V1F.bpm` com `V1_Relatório.docx` vira uma versão histórica com `letraCorrigida`; versão sem `.bpm` em `semBpm`; `.png` e relatório ausentes sem aviso; nome fora do padrão e arquivos da raiz em `foraDoPadrao`; `.pdf` de relatório em `pdfDoRelatorio`; dois `.docx` na mesma versão: `relatorio` nulo e a versão em `relatoriosDuplicados`; arquivo em `XYZ/Grupo/` entra no processo e aparece em `subpastas`; nome com acento, vírgula e " - ".
+- [x] **Passo 2:** `npx vitest run src/importacao/lerPasta.test.ts` → FAIL.
+- [x] **Passo 3: implementar** (expressão do nome: `/^([^_]+)_V(\d+)([FP]?)_(.+?)(_Relatório)?\.([a-z0-9]+)$/i`; a extensão em minúsculas decide o papel).
+- [x] **Passo 4:** a mesma linha passa.
+- [x] **Passo 5: commit.**
 
 ### Tarefa 4: Comparação com V1 a V8 e relatório das lacunas
 
