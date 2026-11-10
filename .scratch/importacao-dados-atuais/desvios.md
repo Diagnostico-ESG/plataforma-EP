@@ -32,3 +32,15 @@
 - **Duplicados:** dois `.bpm` na mesma versão (a pasta real não tem) deixam a versão de fora, listada; dois `.png` ou dois `.pdf` seguem a regra dos dois `.docx` (história 48a): a versão entra sem eles, com aviso.
 - **Ciclo de banco pelo GitHub:** o motor do Docker não subiu nesta máquina; o teste 75 falhou e depois passou no "Testes de banco" (execuções 42726426883 e 42726990545, com a migração ensaiada), e a migração foi aplicada pelo "Migrar banco de desenvolvimento" (execução 42727400572). O teste 22 já falhava na `main` desde 2026-11-09 e foi para o backlog.
 - **`[visual]`:** conferido na vitrine local (`vitrine.local/importacao.html`) pelo texto da página e por medida em 375 px (sem rolagem horizontal); a captura de tela não funcionou com a janela minimizada.
+
+## 2026-11-09 — /polir (Impeccable audit e polish) da Importação
+
+Visto na vitrine local `vitrine.local/importacao.html` (o projeto não tem `npm run vitrine`), por medida no navegador, no computador e em 375 px. Audit: 17/20; o detector não achou nada.
+
+Corrigidos (só estilo):
+- Campos de arquivo nativos das duas etapas em Arial 13px e 21px de altura: passaram à fonte da plataforma, com o botão de escolher no aspecto do botão comum e 34px de altura (princípio 10 do `interface.md`).
+- Campos da seção 2 empilhados por `<br />`: rótulo em cima e espaçamento do sistema (padrão `.campo-de-arquivo`, o mesmo das versões).
+- Rótulos das versões na tabela da prévia em fonte mono, como o DESIGN.md pede para versão.
+- Botões secundários das duas etapas ("Escolher outro arquivo", "Importar outro arquivo", "Escolher outra pasta", "Importar de novo") sem borda: passaram a `botao-secundario`, como no resto da Administração.
+
+Deixado de fora: o resumo das duas etapas fica inteiro dentro de `role="status"`, e o leitor de tela o lê todo de uma vez. É o padrão das duas seções; mudar só uma criaria diferença, e mudar as duas mexe em como a tela avisa o fim da carga. Nenhum achado mudou comportamento, então nada foi para o backlog.

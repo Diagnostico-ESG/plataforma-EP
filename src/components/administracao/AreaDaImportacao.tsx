@@ -18,8 +18,12 @@ function EscolherPlanilha({ recusa, aoEscolher }: { recusa: string | null; aoEsc
   return (
     <>
       <p>Escolha a aba PRODUTO 33 da planilha, salva como .csv. Nada é gravado antes de você confirmar.</p>
-      <label htmlFor={idDoCampo}>Planilha (.csv)</label>{' '}
-      <input id={idDoCampo} type="file" accept=".csv,text/csv" onChange={aoMudar} />
+      <div className="importacao-campos">
+        <div className="campo-de-arquivo">
+          <label htmlFor={idDoCampo}>Planilha (.csv)</label>
+          <input id={idDoCampo} type="file" accept=".csv,text/csv" onChange={aoMudar} />
+        </div>
+      </div>
       {recusa && <p className="administracao-falha" role="alert">{recusa}</p>}
     </>
   )

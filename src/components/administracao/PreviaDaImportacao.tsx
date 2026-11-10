@@ -47,7 +47,7 @@ export function PreviaDaImportacao({ previa, aoConfirmar, aoEscolherOutro }: Pre
       {semNovos && <p className="cadastros-vazio">Nada a gravar: todos os processos da planilha já existem.</p>}
       <div className="importacao-acoes">
         <button type="button" className="botao botao-principal" disabled={semNovos} onClick={aoConfirmar}>Confirmar importação</button>
-        <button type="button" className="botao" onClick={aoEscolherOutro}>Escolher outro arquivo</button>
+        <button type="button" className="botao botao-secundario" onClick={aoEscolherOutro}>Escolher outro arquivo</button>
       </div>
     </>
   )

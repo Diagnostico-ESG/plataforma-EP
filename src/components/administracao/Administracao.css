@@ -291,6 +291,38 @@
   padding-left: var(--esp-5);
 }
 
+/* Os campos de arquivo das duas etapas: rótulo em cima (o padrão .campo-de-arquivo das versões) e o botão nativo de escolher
+   com a cara do botão comum, na fonte da plataforma (princípio 10 do interface.md); o teclado segue o do navegador. */
+.importacao-campos {
+  display: grid;
+  gap: var(--esp-3);
+  margin: var(--esp-3) 0;
+}
+
+.importacao-etapa input[type='file'] {
+  font: inherit;
+  font-size: var(--tam-secundario);
+  color: var(--texto-2);
+}
+
+.importacao-etapa input[type='file']::file-selector-button {
+  min-height: 34px;
+  margin-right: var(--esp-3);
+  padding: 0 var(--esp-3);
+  border: 1px solid var(--linha);
+  border-radius: var(--canto-botao);
+  background: var(--folha);
+  color: var(--texto);
+  font: inherit;
+  font-size: var(--tam-base);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.importacao-etapa input[type='file']:hover::file-selector-button {
+  border-color: var(--linha-tracejada);
+}
+
 .importacao-acoes {
   display: flex;
   flex-wrap: wrap;

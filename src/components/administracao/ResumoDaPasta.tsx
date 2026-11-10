@@ -29,7 +29,7 @@ export function ResumoDaPasta({ resumo, aoImportarDeNovo }: ResumoDaPastaProps) 
       <ListaDaPasta titulo={contar(avisos.length, 'aviso', 'avisos')} itens={avisos} />
       <ListaDaPasta titulo={contar(lacunas.length, 'lacuna', 'lacunas')} itens={lacunas} />
       <div className="importacao-acoes">
-        <button type="button" className="botao" onClick={aoImportarDeNovo}>Importar de novo</button>
+        <button type="button" className="botao botao-secundario" onClick={aoImportarDeNovo}>Importar de novo</button>
       </div>
     </div>
   )

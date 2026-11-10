@@ -23,14 +23,19 @@ function EscolherPasta({ recusa, escolha, aoEscolher }: { recusa: string | null;
     <>
       <p>Escolha a pasta DOCUMENTOS MAPEAMENTO e o mesmo .csv da planilha, que serve só para comparar as versões. Nada é enviado
         antes de você confirmar.</p>
-      <label htmlFor={idDaPasta}>Pasta DOCUMENTOS MAPEAMENTO</label>{' '}
-      <input id={idDaPasta} type="file" multiple {...SELETOR_DE_PASTA}
-        onChange={(evento) => void aoEscolher({ pasta: arquivosDaPasta(arquivosDoCampo(evento)) })} />
-      {escolha.pasta && <span> {contar(escolha.pasta.length, 'arquivo', 'arquivos')}</span>}
-      <br />
-      <label htmlFor={idDaPlanilha}>Planilha (.csv) para comparar</label>{' '}
-      <input id={idDaPlanilha} type="file" accept=".csv,text/csv"
-        onChange={(evento) => void aoEscolher({ planilha: arquivosDoCampo(evento)[0] ?? null })} />
+      <div className="importacao-campos">
+        <div className="campo-de-arquivo">
+          <label htmlFor={idDaPasta}>Pasta DOCUMENTOS MAPEAMENTO</label>
+          <input id={idDaPasta} type="file" multiple {...SELETOR_DE_PASTA}
+            onChange={(evento) => void aoEscolher({ pasta: arquivosDaPasta(arquivosDoCampo(evento)) })} />
+          {escolha.pasta && <p className="campo-de-arquivo-nome mono">{contar(escolha.pasta.length, 'arquivo', 'arquivos')}</p>}
+        </div>
+        <div className="campo-de-arquivo">
+          <label htmlFor={idDaPlanilha}>Planilha (.csv) para comparar</label>
+          <input id={idDaPlanilha} type="file" accept=".csv,text/csv"
+            onChange={(evento) => void aoEscolher({ planilha: arquivosDoCampo(evento)[0] ?? null })} />
+        </div>
+      </div>
       {recusa && <p className="administracao-falha" role="alert">{recusa}</p>}
     </>
   )

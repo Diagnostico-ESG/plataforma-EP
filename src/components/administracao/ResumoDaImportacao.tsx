@@ -25,7 +25,7 @@ export function ResumoDaImportacao({ resumo, aoImportarOutro }: ResumoDaImportac
       <FalhaDaImportacao resumo={resumo} />
       <AvisosDaImportacao lida={resumo.lida} />
       <div className="importacao-acoes">
-        <button type="button" className="botao" onClick={aoImportarOutro}>Importar outro arquivo</button>
+        <button type="button" className="botao botao-secundario" onClick={aoImportarOutro}>Importar outro arquivo</button>
       </div>
     </div>
   )

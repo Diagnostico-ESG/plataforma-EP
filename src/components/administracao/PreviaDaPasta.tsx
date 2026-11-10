@@ -22,8 +22,8 @@ function TabelaDaPasta({ previa }: { previa: Previa }) {
       <tbody>
         {previa.porProcesso.map(({ processo, entram, puladas }) => (
           <tr key={processo.id}>
-            <td>{processo.nome}</td><td>{rotulos(entram)}</td><td>{rotulos(entram.filter((v) => v.relatorio !== null))}</td>
-            <td>{rotulos(puladas)}</td>
+            <td>{processo.nome}</td><td className="mono">{rotulos(entram)}</td>
+            <td className="mono">{rotulos(entram.filter((v) => v.relatorio !== null))}</td><td className="mono">{rotulos(puladas)}</td>
           </tr>
         ))}
       </tbody>
@@ -47,7 +47,7 @@ export function PreviaDaPasta({ previa, aoEnviar, aoEscolherOutra }: PreviaDaPas
       <NadaAEnviar previa={previa} />
       <div className="importacao-acoes">
         <button type="button" className="botao botao-principal" disabled={previa.totalDeVersoes === 0} onClick={aoEnviar}>Enviar arquivos</button>
-        <button type="button" className="botao" onClick={aoEscolherOutra}>Escolher outra pasta</button>
+        <button type="button" className="botao botao-secundario" onClick={aoEscolherOutra}>Escolher outra pasta</button>
       </div>
     </>
   )
