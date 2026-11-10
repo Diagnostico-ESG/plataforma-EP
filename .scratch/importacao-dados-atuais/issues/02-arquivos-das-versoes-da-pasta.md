@@ -16,3 +16,5 @@
 - [x] Testes pela tela com `VersoesFalso`, `importacao` falsa e pasta inventada: cada regra acima, segunda rodada, perfil sem acesso.
 - [x] `[visual]` Seção, prévia e andamento seguem o padrão da tela, sem texto redundante.
 - [x] Passo do usuário anotado: publicar de novo `arquivos-no-drive` se a função mudar; a carga real é dele, depois do backup.
+
+Concluído em 2026-11-09 (commit 8e270ef)

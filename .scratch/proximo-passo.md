@@ -1,13 +1,19 @@
 # Próximo passo (2026-11-09)
 
-**Feito:** protocolo atualizado para o DevFlow v3.5 (commits de263e6 e 7438699, marco `marco/2026-11-09-atualizacao-devflow-3-5`). Demanda nova classificada como funcionalidade nova: **checklist-do-cartao** (item 24 do `projeto.md`). O `/planejar` dela parou antes do marco: o usuário decidiu fechar antes a importação, que está "Em revisão" sem marca de entrega. Perguntas já levantadas para a sabatina no `backlog.md` (linha de 2026-11-09).
+**Feito:** ticket 02 de `importacao-dados-atuais` (arquivos das versões da pasta), concluído no commit 8e270ef, já na `main` e no GitHub. A migração `20261110000447_importar_versao` foi aplicada no desenvolvimento. A função `arquivos-no-drive` mudou (marca da importação). Era o último ticket da funcionalidade.
+
+**Passo seu antes de testar a seção 2 no desenvolvimento:** publicar de novo a função no desenvolvimento, no seu terminal:
+
+```
+npx supabase functions deploy arquivos-no-drive --use-api --project-ref yclkzyoebpsxmgpbcbus
+```
 
 **Próximo, nesta ordem:**
-1. Ticket 02 da importação (`.scratch/importacao-dados-atuais/issues/02-arquivos-das-versoes-da-pasta.md`) com `/executar-complexo` (Sonnet, sessão nova, começando pelo `/stc`).
-2. `/polir` e `/ship` de `importacao-dados-atuais` (Sonnet).
-3. `/planejar checklist-do-cartao` (Opus, modo completo).
+1. `/polir` de `importacao-dados-atuais` (Sonnet, sessão nova, começando pelo `/stc`): o ticket mexeu na tela.
+2. `/ship` de `importacao-dados-atuais` (Sonnet).
+3. `/planejar checklist-do-cartao` (Opus, modo completo), item 24 do `projeto.md`; perguntas da sabatina no `backlog.md`.
 
-**Em outra frente (continua valendo):** antes da carga real: backup da produção (criar `BACKUP_SENHA_PRODUCAO`) e publicar na produção a migração `20261106230000_importado_concluido_no_quadro` (ADR 0045; já aplicada no desenvolvimento) pelo roteiro de produção, a seu pedido. Limpar o banco de desenvolvimento (`.scratch/limpar-desenvolvimento.sql`) e importar a planilha real pela tela. Para a equipe usar o site: visibilidade Público na Netlify. Abertos: `planilhas-dos-dashboards` e cofre; `.env` no `.gitignore`; decisões de LGPD; pendências da atualização do DevFlow no `backlog.md`.
+**Em outra frente (continua valendo):** antes da carga real, o backup da produção (criar `BACKUP_SENHA_PRODUCAO`) e a publicação na produção das migrações `20261106230000_importado_concluido_no_quadro` e `20261110000447_importar_versao` e da função `arquivos-no-drive`, pelo roteiro de produção, a seu pedido. Limpar o banco de desenvolvimento (`.scratch/limpar-desenvolvimento.sql`) e importar a planilha e a pasta reais pela tela. Para a equipe usar o site: visibilidade Público na Netlify. Abertos: `planilhas-dos-dashboards` e cofre; `.env` no `.gitignore`; decisões de LGPD; pendências da atualização do DevFlow no `backlog.md`; o teste de banco 22 reprovado na `main` (backlog, `/demanda`); apagar a branch remota `importacao-dados-atuais` (`git push origin --delete importacao-dados-atuais`, comando seu).
 
 **Para começar a sessão nova (Sonnet), digite, na ordem:**
 
@@ -16,5 +22,5 @@
 ```
 
 ```
-/executar-complexo .scratch/importacao-dados-atuais/issues/02-arquivos-das-versoes-da-pasta.md
+/polir importacao-dados-atuais
 ```
