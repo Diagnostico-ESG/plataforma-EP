@@ -2,6 +2,8 @@
 
 **Em andamento: o ticket 07 de revisoes-aprovacao (Duas revisões)**, pelo `/executar-complexo`, na branch `revisoes-aprovacao-07` (já enviada ao GitHub). O plano está em `.scratch/revisoes-aprovacao/plano-07.md`, e as caixas abertas são o que falta.
 
+**Correção avulsa na `main` (2026-11-10, commits b17748d a b7d385e):** a importação da pasta casa o processo apesar de diferença de caixa, acento e espaço repetido entre o nome do arquivo e a planilha. Está na `main`, ainda não nesta branch nem no site publicado. Ela chega à branch quando o ticket 07 for juntado à `main`, e ao site no próximo "Publicar o site".
+
 **Pronto na branch:**
 - as duas migrações (`20261110165927_duas_revisoes_etapas` e `20261110171004_duas_revisoes_registro`) e os testes de banco 76 e 77, com o 22, o 38, o 39, o 41, o 42 e o 75 ajustados;
 - as telas: o formulário de versão e o registro nas duas revisões, o "Sem … para revisar.", a gaveta de cada revisão, o histórico com o nome da revisão e a confirmação do Substituir;
