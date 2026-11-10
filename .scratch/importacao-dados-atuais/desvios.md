@@ -69,3 +69,7 @@ Revisado do marco `marco/2026-11-06-entrega-importacao-dados-atuais` até o comm
   - O teste 22 (`catalogo_de_etapas`, itens 8 e 9) reprova desde 2026-11-09. Pelos valores do CI, há no banco de desenvolvimento uma etapa entre "Revisão interna" e "Validação com o setor", e o teste espera as duas vizinhas. É dado do banco, fora desta funcionalidade, e não regressão dela; os testes 74 e 75 passam.
   - A marca foi gravada com isso registrado; segue no backlog.
 - **`[visual]`:** conferido só por medida no navegador, na vitrine local com dados falsos (a captura de tela não funcionou com a janela minimizada); a marca sai com ressalva.
+
+## 2026-11-10 — casamento da pasta mais solto (bug, /demanda)
+
+Arquivos cujo nome do processo diferia da planilha caíam em "sem processo na plataforma". A caixa já era ignorada; a causa provável era acento ou espaço repetido (o usuário não pôde mandar exemplo). Agora a pasta casa o processo ignorando caixa, acento e espaço repetido (, em ); a importação da planilha segue a regra do banco (). Isso contraria o item 8 de  (acento virava processo inexistente), por instrução do usuário no momento. Risco aceito: dois processos do mesmo setor que só diferem em acento ou espaço colidiriam; está no backlog.
