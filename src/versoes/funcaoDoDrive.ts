@@ -33,11 +33,11 @@ export async function chamarFuncao<T>(cliente: ClienteSupabase, corpo: Record<st
 
 /**
  * Abre a sessão de envio na função (`corpo` é o pedido `iniciar_envio` sem a ação) e manda os bytes direto ao Google; devolve o
- * id do arquivo no Drive. Usado pela importação dos arquivos (ticket 02 da importação).
+ * id do arquivo no Drive. Usado pelas versões, pelos anexos e pela importação dos arquivos.
  */
 export async function enviarAoDrive(cliente: ClienteSupabase, enviarBytes: EnviarBytes, corpo: Record<string, unknown>,
-  arquivo: File): Promise<string> {
-  const { upload_url: endereco } = await chamarFuncao<{ upload_url: string }>(cliente, { acao: 'iniciar_envio', ...corpo })
+  arquivo: File, traduzir: TradutorDeFalha = falhaDaFuncao): Promise<string> {
+  const { upload_url: endereco } = await chamarFuncao<{ upload_url: string }>(cliente, { acao: 'iniciar_envio', ...corpo }, traduzir)
   const resposta = await enviarBytes(endereco, arquivo).catch(() => null)
   if (!resposta?.ok) throw new Error(`o arquivo ${arquivo.name} não chegou ao Drive`)
   const { id } = (await resposta.json()) as { id: string }

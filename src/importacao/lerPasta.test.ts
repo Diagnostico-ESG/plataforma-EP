@@ -56,7 +56,7 @@ describe('as versões da pasta', () => {
   test('a versão sem .bpm fica de fora e listada; as outras do processo entram', () => {
     const lida = lerPasta(daPasta('D/ABC/ABC_V1_Exemplo Alfa_Relatório.docx', 'D/ABC/ABC_V2_Exemplo Alfa.bpm'))
     expect(lida.versoes.map((v) => v.rotulo)).toEqual(['V2'])
-    expect(lida.semBpm).toEqual([{ chave: 'ABC|exemplo alfa', nomeDoProcesso: 'Exemplo Alfa', numero: 1, rotulo: 'V1' }])
+    expect(lida.semBpm).toEqual([{ chave: 'ABC|exemplo alfa', sigla: 'ABC', nomeDoProcesso: 'Exemplo Alfa', numero: 1, rotulo: 'V1' }])
   })
 
   test('sem .png nem relatório, a versão entra sem aviso', () => {
@@ -71,7 +71,7 @@ describe('as versões da pasta', () => {
     ))
     expect(lida.versoes[0].relatorio).toBeNull()
     expect(lida.duplicados).toEqual([
-      { chave: 'ABC|exemplo alfa', nomeDoProcesso: 'Exemplo Alfa', numero: 1, rotulo: 'V1F', papel: 'relatorio' },
+      { chave: 'ABC|exemplo alfa', sigla: 'ABC', nomeDoProcesso: 'Exemplo Alfa', numero: 1, rotulo: 'V1F', papel: 'relatorio' },
     ])
   })
 

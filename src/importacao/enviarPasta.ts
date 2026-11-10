@@ -1,5 +1,6 @@
 // O envio da importação dos arquivos (ticket 02): versão a versão, processo a processo. A falha de uma versão fica listada e
 // as outras seguem (história 53); a próxima rodada envia de novo só o que não entrou, porque a prévia pula o que já existe.
+import { mensagemDoErro } from './executarImportacao'
 import type { VersaoDaPasta } from './lerPasta'
 import { type PreviaDaPasta, type ProcessoNaPrevia, arquivosDaVersao } from './previaDaPasta'
 import type { ModuloDeImportacao, PedidoDeImportacaoDeVersao } from './tipos'
@@ -14,16 +15,12 @@ type Envio = {
   aoAndar: (feitos: number, total: number) => void
 }
 
-function motivo(erro: unknown): string {
-  return erro instanceof Error ? erro.message : String(erro)
-}
-
 // A falha vira uma linha do resumo, com o processo e o rótulo, e o envio segue.
 async function tentar<T>(envio: Envio, onde: string, passo: () => Promise<T>): Promise<T | null> {
   try {
     return await passo()
   } catch (erro) {
-    envio.resumo.falhas.push(`${onde}: ${motivo(erro)}`)
+    envio.resumo.falhas.push(`${onde}: ${mensagemDoErro(erro)}`)
     return null
   }
 }
@@ -51,9 +48,16 @@ async function enviarVersao(envio: Envio, item: ProcessoNaPrevia, versao: Versao
   if (resultado === 'criada') envio.resumo.criadas += 1
   if (resultado === 'criada' && numerado !== null) relatorio.maior = numerado
   if (resultado === 'ja_existia') envio.resumo.puladas += 1
-  const pdf = versao.pdfDoRelatorio
-  if (resultado && pdf) await tentar(envio, `${nome} ${versao.rotulo}`, () => envio.importacao.importarAnexo(id, pdf))
+  if (resultado) await enviarPdf(envio, item, versao)
   envio.aoAndar(envio.feitos, total)
+}
+
+// O .pdf do relatório vai aos anexos depois da versão, ou sozinho quando a versão já existia e só ele faltou; o banco pula o de
+// mesmo nome. Não conta no andamento da versão (já contou em arquivosDaVersao); o .pdf que faltou conta um arquivo.
+async function enviarPdf(envio: Envio, item: ProcessoNaPrevia, versao: VersaoDaPasta): Promise<void> {
+  const pdf = versao.pdfDoRelatorio
+  if (!pdf) return
+  await tentar(envio, `${item.processo.nome} ${versao.rotulo}`, () => envio.importacao.importarAnexo(item.processo.id, pdf))
 }
 
 async function enviarProcesso(envio: Envio, item: ProcessoNaPrevia): Promise<void> {
@@ -62,6 +66,11 @@ async function enviarProcesso(envio: Envio, item: ProcessoNaPrevia): Promise<voi
   if (subpasta) await tentar(envio, nome, () => envio.importacao.anotarSubpasta(id, subpasta))
   const relatorio = { maior: item.processo.maiorRelatorio }
   for (const versao of item.entram) await enviarVersao(envio, item, versao, relatorio)
+  for (const versao of item.pdfsQueFaltam) {
+    await enviarPdf(envio, item, versao)
+    envio.feitos += 1
+    envio.aoAndar(envio.feitos, envio.resumo.previa.totalDeArquivos)
+  }
 }
 
 export async function enviarPasta(importacao: ModuloDeImportacao, previa: PreviaDaPasta,

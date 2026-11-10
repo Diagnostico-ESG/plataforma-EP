@@ -12,6 +12,7 @@ export type ArquivoDaPasta = { arquivo: File; caminho: string }
 
 export type VersaoDaPasta = {
   chave: string
+  sigla: string
   nomeDoProcesso: string
   numero: number
   rotulo: string
@@ -24,7 +25,7 @@ export type VersaoDaPasta = {
   letraCorrigida: boolean
 }
 
-export type VersaoDeFora = { chave: string; nomeDoProcesso: string; numero: number; rotulo: string }
+export type VersaoDeFora = { chave: string; sigla: string; nomeDoProcesso: string; numero: number; rotulo: string }
 export type PastaLida = {
   versoes: VersaoDaPasta[]
   /** Versões sem .bpm: não entram (história 45). */
@@ -60,8 +61,8 @@ function agrupar(lidos: Lido[]): Lido[][] {
 }
 
 function deFora(grupo: Lido[], letra: LetraDaVersao): VersaoDeFora {
-  const { chave, nomeDoProcesso, numero } = grupo[0]
-  return { chave, nomeDoProcesso, numero, rotulo: `V${String(numero)}${letra}` }
+  const { chave, sigla, nomeDoProcesso, numero } = grupo[0]
+  return { chave, sigla, nomeDoProcesso, numero, rotulo: `V${String(numero)}${letra}` }
 }
 
 // Um arquivo do papel, ou nenhum; dois ou mais vão para os duplicados e nenhum entra.

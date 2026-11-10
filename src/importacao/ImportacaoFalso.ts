@@ -22,7 +22,7 @@ export class ImportacaoFalso implements ModuloDeImportacao {
   /** Chamado a cada processo criado, para o teste levar o processo aos outros falsos (Lista, Quadro, Cadastros). */
   aoCriar: ((processo: ProcessoParaImportar) => void) | null = null
   /** Os processos da plataforma para a pasta; as versões e o maior relatório saem do `VersoesFalso`. */
-  processosDaPasta: Omit<ProcessoDaPasta, 'versoes' | 'maiorRelatorio'>[] = []
+  processosDaPasta: Omit<ProcessoDaPasta, 'versoes' | 'maiorRelatorio' | 'anexos'>[] = []
   falharAoListarAPasta = false
   /** Já houve importação da planilha; a gravação de um processo também liga. */
   haImportado = false
@@ -65,7 +65,8 @@ export class ImportacaoFalso implements ModuloDeImportacao {
     const processos = this.processosDaPasta.map((p) => {
       const doProcesso = this.versoes.versoes[p.id] ?? []
       const relatorios = doProcesso.flatMap((v) => v.arquivos.map((a) => a.numeroDoRelatorio ?? 0))
-      return { ...p, versoes: doProcesso.map((v) => v.numero), maiorRelatorio: Math.max(0, ...relatorios) }
+      const anexos = this.anexosImportados.filter((a) => a.processoId === p.id).map((a) => a.nome.toLowerCase())
+      return { ...p, versoes: doProcesso.map((v) => v.numero), maiorRelatorio: Math.max(0, ...relatorios), anexos }
     })
     return { processos, haImportado: this.haImportado }
   }

@@ -1,7 +1,7 @@
 import { tipoMimeDaExtensao } from '../../supabase/functions/_shared/drive.ts'
 import { criarAnexosSupabase } from '../anexos/anexosSupabase'
 import type { ClienteSupabase } from '../lib/supabase'
-import { type EnviarBytes, chamarFuncao, enviarComFetch } from './funcaoDoDrive'
+import { type EnviarBytes, chamarFuncao, enviarAoDrive, enviarComFetch } from './funcaoDoDrive'
 import { falhaDoDownload } from './recusasDeVersoes'
 import type {
   ArquivoDaVersao, ArquivoEscolhido, ConferenciaDosArquivos, ModuloDeVersoes, PedidoDeAcrescimo, PedidoDePdfDaAprovacao,
@@ -37,14 +37,10 @@ async function listarVersoes(cliente: ClienteSupabase, processoId: string): Prom
 // `extras` leva o que muda o pedido da sessão (a substituição manda o `arquivo_id` do arquivo a trocar).
 async function enviarUmArquivo(cliente: ClienteSupabase, enviarBytes: EnviarBytes, pedido: PedidoDeVersao,
   { papel, arquivo }: ArquivoEscolhido, historica: boolean, extras: Record<string, unknown> = {}): Promise<string> {
-  const { upload_url: endereco } = await chamarFuncao<{ upload_url: string }>(cliente, {
-    acao: 'iniciar_envio', processo_id: pedido.processoId, papel, nome_original: arquivo.name, tamanho: arquivo.size,
+  return await enviarAoDrive(cliente, enviarBytes, {
+    processo_id: pedido.processoId, papel, nome_original: arquivo.name, tamanho: arquivo.size,
     numero: pedido.numero, historica, piloto: pedido.piloto ?? false, ...extras,
-  })
-  const resposta = await enviarBytes(endereco, arquivo).catch(() => null)
-  if (!resposta?.ok) throw new Error(`o arquivo ${arquivo.name} não chegou ao Drive`)
-  const { id } = (await resposta.json()) as { id: string }
-  return id
+  }, arquivo)
 }
 
 // Um arquivo por vez, para o progresso ser real; o registro só acontece depois que todos chegaram ao Drive. A

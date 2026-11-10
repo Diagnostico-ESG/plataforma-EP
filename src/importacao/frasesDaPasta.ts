@@ -8,12 +8,21 @@ import type { PreviaDaPasta } from './previaDaPasta'
 
 const NOME_DO_PAPEL: Record<PapelNaPasta, string> = { bpm: '.bpm', png: '.png', relatorio: 'relatório .docx', pdf: '.pdf de relatório' }
 
-export function fraseDaPrevia(previa: PreviaDaPasta): string {
+function fraseDasVersoes(previa: PreviaDaPasta): string {
   const processos = previa.porProcesso.filter((p) => p.entram.length > 0).length
   const entram = `Vão entrar ${contar(previa.totalDeVersoes, 'versão', 'versões')} de ${contar(processos, 'processo', 'processos')}`
-  const puladas = previa.totalDePuladas === 0 ? ''
-    : ` ${contar(previa.totalDePuladas, 'versão já existe e será pulada', 'versões já existem e serão puladas')}.`
-  return `${entram} (${contar(previa.totalDeArquivos, 'arquivo', 'arquivos')}).${puladas}`
+  return `${entram} (${contar(previa.arquivosDasVersoes, 'arquivo', 'arquivos')}).`
+}
+
+/** O que vai ao Drive e o que é pulado; cada parte só aparece quando tem o que contar. */
+export function fraseDaPrevia(previa: PreviaDaPasta): string {
+  const partes = [
+    previa.totalDeVersoes > 0 ? fraseDasVersoes(previa) : '',
+    previa.totalDePdfsQueFaltam > 0 ? `${contar(previa.totalDePdfsQueFaltam, '.pdf de relatório que faltou vai',
+      '.pdfs de relatório que faltaram vão')} para os Outros anexos.` : '',
+    previa.totalDePuladas > 0 ? `${contar(previa.totalDePuladas, 'versão já existe e será pulada', 'versões já existem e serão puladas')}.` : '',
+  ]
+  return partes.filter((parte) => parte !== '').join(' ')
 }
 
 /** O que não entra: versão sem .bpm, versão com dois .bpm, arquivo sem processo e arquivo fora do padrão. */
@@ -23,20 +32,23 @@ export function foraDaImportacao({ pasta, semProcesso }: PreviaDaPasta): string[
   return [
     ...doProcesso(pasta.semBpm).map((v) => `${v.nomeDoProcesso} ${v.rotulo}: sem .bpm.`),
     ...doProcesso(pasta.duplicados).filter((d) => d.papel === 'bpm').map((d) => `${d.nomeDoProcesso} ${d.rotulo}: dois arquivos .bpm.`),
-    ...semProcesso.map((s) => `${s.chave.split('|')[0]} · ${s.nomeDoProcesso} (${s.rotulos.join(', ')}): sem processo na plataforma com essa sigla e esse nome.`),
+    ...semProcesso.map((s) => `${s.sigla} · ${s.nomeDoProcesso} (${s.rotulos.join(', ')}): sem processo na plataforma com essa sigla e esse nome.`),
     ...pasta.foraDoPadrao.map((caminho) => `${caminho}: fora do padrão do nome.`),
   ]
 }
 
-/** Entrou com ajuste: a letra corrigida, o arquivo duplicado que ficou de fora e a subpasta anotada. */
+/**
+ * Entra com ajuste: a letra corrigida, o arquivo duplicado que fica de fora e a subpasta que ganha a linha nas Anotações. O mesmo
+ * texto na prévia (história 44) e no resumo, por isso sem tempo verbal de antes ou depois do envio.
+ */
 export function avisosDaPasta({ porProcesso, pasta }: PreviaDaPasta): string[] {
   const conhecidos = new Set(porProcesso.map((p) => p.processo.chave))
   const letras = porProcesso.flatMap((p) => p.entram.filter((v) => v.letraCorrigida)
-    .map((v) => `${p.processo.nome} ${v.rotulo}: arquivo com letra diferente da do .bpm; entrou na ${v.rotulo}.`))
+    .map((v) => `${p.processo.nome} ${v.rotulo}: arquivo com letra diferente da do .bpm, ligado à ${v.rotulo}.`))
   const duplicados = pasta.duplicados.filter((d) => d.papel !== 'bpm' && conhecidos.has(d.chave))
-    .map((d) => `${d.nomeDoProcesso} ${d.rotulo}: dois arquivos de ${NOME_DO_PAPEL[d.papel]}; nenhum dos dois entrou.`)
+    .map((d) => `${d.nomeDoProcesso} ${d.rotulo}: dois arquivos de ${NOME_DO_PAPEL[d.papel]}; nenhum dos dois entra.`)
   const subpastas = porProcesso.filter((p) => p.subpasta !== null)
-    .map((p) => `${p.processo.nome}: arquivos da subpasta ${String(p.subpasta)}; anotado nas Anotações.`)
+    .map((p) => `${p.processo.nome}: arquivos da subpasta ${String(p.subpasta)}, com uma linha nas Anotações.`)
   return [...letras, ...duplicados, ...subpastas]
 }
 

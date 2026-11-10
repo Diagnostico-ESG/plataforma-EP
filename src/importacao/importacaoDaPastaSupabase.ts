@@ -28,27 +28,38 @@ type LinhaDoRelatorio = { numero_do_relatorio: number | null; versoes: { process
 // ponytail: cada leitura devolve até 1000 linhas (limite do PostgREST); a pasta real tem perto de 200 versões. Passando disso, a
 // prévia deixa de marcar algumas como puladas, mas o banco confere de novo e devolve "ja_existia". Paginar se crescer.
 async function listarProcessosDaPasta(cliente: ClienteSupabase): Promise<ProcessosParaAPasta> {
-  const [processos, versoes, relatorios, importados] = await Promise.all([
+  const [processos, versoes, relatorios, anexos, importados] = await Promise.all([
     cliente.from('processos_com_andamento').select('id, setor_sigla, nome'),
     cliente.from('versoes').select('processo_id, numero'),
     cliente.from('arquivos_da_versao').select('numero_do_relatorio, versoes(processo_id)').eq('papel', 'relatorio'),
+    cliente.from('anexos').select('processo_id, nome'),
     cliente.from('eventos').select('id').eq('entidade', 'processo').eq('acao', 'importar').limit(1),
   ])
-  const numeros = linhasOuFalha(versoes as Leitura<{ processo_id: string; numero: number }>, 'as versões que já existem')
-  const doRelatorio = linhasOuFalha(relatorios as unknown as Leitura<LinhaDoRelatorio>, 'os relatórios que já existem')
+  const doBanco: DoBanco = {
+    versoes: linhasOuFalha(versoes as Leitura<LinhaDoProcesso & { numero: number }>, 'as versões que já existem'),
+    relatorios: linhasOuFalha(relatorios as unknown as Leitura<LinhaDoRelatorio>, 'os relatórios que já existem'),
+    anexos: linhasOuFalha(anexos as Leitura<LinhaDoProcesso & { nome: string }>, 'os anexos que já existem'),
+  }
   const lista = linhasOuFalha(processos as Leitura<{ id: string | null; setor_sigla: string | null; nome: string | null }>, 'os processos')
   return {
     haImportado: linhasOuFalha(importados as Leitura<{ id: number }>, 'o histórico da importação').length > 0,
-    processos: lista.map((p) => processoDaPasta(p.id ?? '', p.setor_sigla ?? '', p.nome ?? '', numeros, doRelatorio)),
+    processos: lista.map((p) => processoDaPasta(p.id ?? '', p.setor_sigla ?? '', p.nome ?? '', doBanco)),
   }
 }
 
-function processoDaPasta(id: string, sigla: string, nome: string, numeros: { processo_id: string; numero: number }[],
-  relatorios: LinhaDoRelatorio[]): ProcessoDaPasta {
-  const doProcesso = relatorios.filter((r) => r.versoes?.processo_id === id).map((r) => r.numero_do_relatorio ?? 0)
+type LinhaDoProcesso = { processo_id: string }
+type DoBanco = {
+  versoes: (LinhaDoProcesso & { numero: number })[]
+  relatorios: LinhaDoRelatorio[]
+  anexos: (LinhaDoProcesso & { nome: string })[]
+}
+
+function processoDaPasta(id: string, sigla: string, nome: string, doBanco: DoBanco): ProcessoDaPasta {
+  const doProcesso = doBanco.relatorios.filter((r) => r.versoes?.processo_id === id).map((r) => r.numero_do_relatorio ?? 0)
   return {
     id, chave: chaveDoProcesso(sigla, nome), nome,
-    versoes: numeros.filter((v) => v.processo_id === id).map((v) => v.numero), maiorRelatorio: Math.max(0, ...doProcesso),
+    versoes: doBanco.versoes.filter((v) => v.processo_id === id).map((v) => v.numero), maiorRelatorio: Math.max(0, ...doProcesso),
+    anexos: doBanco.anexos.filter((a) => a.processo_id === id).map((a) => a.nome.toLowerCase()),
   }
 }
 

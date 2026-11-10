@@ -22,6 +22,8 @@ export type ProcessoDaPasta = {
   versoes: number[]
   /** O maior número de relatório do processo (ADR 0026), ou 0: o próximo relatório importado leva o seguinte. */
   maiorRelatorio: number
+  /** Os nomes dos anexos do processo, em minúsculas: o .pdf de relatório que já está lá não é enviado de novo (história 53). */
+  anexos: string[]
 }
 export type ProcessosParaAPasta = {
   processos: ProcessoDaPasta[]

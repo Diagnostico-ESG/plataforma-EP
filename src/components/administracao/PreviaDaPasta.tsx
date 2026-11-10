@@ -1,5 +1,5 @@
 import { contar } from '../../importacao/frasesDaImportacao'
-import { foraDaImportacao, fraseDaPrevia } from '../../importacao/frasesDaPasta'
+import { avisosDaPasta, foraDaImportacao, fraseDaPrevia } from '../../importacao/frasesDaPasta'
 import type { VersaoDaPasta } from '../../importacao/lerPasta'
 import type { PreviaDaPasta as Previa } from '../../importacao/previaDaPasta'
 import { ListaDaPasta } from './ListaDaPasta'
@@ -32,21 +32,24 @@ function TabelaDaPasta({ previa }: { previa: Previa }) {
 }
 
 function NadaAEnviar({ previa }: { previa: Previa }) {
-  if (previa.totalDeVersoes > 0) return null
+  if (previa.totalDeArquivos > 0) return null
   const motivo = previa.totalDePuladas > 0 ? 'todas as versões da pasta já existem' : 'nenhuma versão da pasta é de um processo da plataforma'
   return <p className="cadastros-vazio">Nada a enviar: {motivo}.</p>
 }
 
 export function PreviaDaPasta({ previa, aoEnviar, aoEscolherOutra }: PreviaDaPastaProps) {
   const fora = foraDaImportacao(previa)
+  const avisos = avisosDaPasta(previa)
+  const temOQueEnviar = previa.totalDeArquivos > 0
   return (
     <>
-      {previa.totalDeVersoes > 0 && <p className="importacao-contagens">{fraseDaPrevia(previa)}</p>}
+      {temOQueEnviar && <p className="importacao-contagens">{fraseDaPrevia(previa)}</p>}
       {previa.porProcesso.length > 0 && <TabelaDaPasta previa={previa} />}
       <ListaDaPasta titulo={contar(fora.length, 'fora da importação', 'fora da importação')} itens={fora} />
+      <ListaDaPasta titulo={contar(avisos.length, 'aviso', 'avisos')} itens={avisos} />
       <NadaAEnviar previa={previa} />
       <div className="importacao-acoes">
-        <button type="button" className="botao botao-principal" disabled={previa.totalDeVersoes === 0} onClick={aoEnviar}>Enviar arquivos</button>
+        <button type="button" className="botao botao-principal" disabled={!temOQueEnviar} onClick={aoEnviar}>Enviar arquivos</button>
         <button type="button" className="botao botao-secundario" onClick={aoEscolherOutra}>Escolher outra pasta</button>
       </div>
     </>

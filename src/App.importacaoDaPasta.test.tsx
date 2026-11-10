@@ -39,6 +39,10 @@ const PASTA = [
   'TSA/TSA_V2_Emitir Ofício_Relatório.pdf', 'TSA/TSA_V4_Emitir Ofício_Relatório.docx',
   'TSA/Grupo/TSA_V1_Exemplo Alfa.bpm', 'TSA/TSA_V1_Processo Inexistente.bpm', 'log_renomeacao.csv',
 ]
+const AVISOS_DA_PASTA = [
+  'Emitir Ofício V1F: arquivo com letra diferente da do .bpm, ligado à V1F.',
+  'Exemplo Alfa: arquivos da subpasta Grupo, com uma linha nas Anotações.',
+]
 const LINHAS: ParteDaLinha[] = [{ area: 'TSA', nome: 'Emitir Ofício', v: [1, 2] }, { area: 'TSA', nome: 'Exemplo Alfa', v: [1] }]
 
 function planilha(): File {
@@ -90,6 +94,9 @@ test('a prévia mostra, por processo, o que entra e o que fica de fora, sem envi
     'TSA · Processo Inexistente (V1): sem processo na plataforma com essa sigla e esse nome.',
     `${RAIZ}/log_renomeacao.csv: fora do padrão do nome.`,
   ])
+  // História 44: o que entra com ajuste já aparece na prévia, antes de enviar.
+  const avisos = within(secao.getByRole('region', { name: '2 avisos' }))
+  expect(avisos.getAllByRole('listitem').map((item) => item.textContent)).toEqual(AVISOS_DA_PASTA)
   expect(versoes.versoes).toEqual({})
 })
 
@@ -101,10 +108,7 @@ test('enviar leva as versões ao processo e o resumo traz os avisos e as lacunas
   expect(await secao.findByText('Envio concluído')).toBeTruthy()
   expect(secao.getByText('3 versões criadas, 0 puladas.')).toBeTruthy()
   const avisos = within(secao.getByRole('region', { name: '2 avisos' }))
-  expect(avisos.getAllByRole('listitem').map((item) => item.textContent)).toEqual([
-    'Emitir Ofício V1F: arquivo com letra diferente da do .bpm; entrou na V1F.',
-    'Exemplo Alfa: arquivos da subpasta Grupo; anotado nas Anotações.',
-  ])
+  expect(avisos.getAllByRole('listitem').map((item) => item.textContent)).toEqual(AVISOS_DA_PASTA)
   const lacunas = within(secao.getByRole('region', { name: '2 lacunas' }))
   expect(lacunas.getAllByRole('listitem').map((item) => item.textContent)).toEqual([
     'Emitir Ofício: falta a V3 na numeração da pasta.',
@@ -133,6 +137,26 @@ test('a falha de um arquivo fica no resumo, as outras versões entram, e a segun
   expect(await secao.findByText('Vão entrar 1 versão de 1 processo (4 arquivos). 2 versões já existem e serão puladas.')).toBeTruthy()
   fireEvent.click(secao.getByRole('button', { name: 'Enviar arquivos' }))
   expect(await secao.findByText('1 versão criada, 2 puladas.')).toBeTruthy()
+})
+
+// História 53, achado do /ship: a versão entrou e só o .pdf do relatório falhou; a rodada seguinte envia o .pdf que faltou.
+test('o .pdf do relatório que falhou volta na rodada seguinte, mesmo com a versão já criada', async () => {
+  const { importacao } = montar()
+  importacao.falharNoArquivo = 'TSA_V2_Emitir Ofício_Relatório.pdf'
+  const secao = await abrirSecao()
+  await escolherPastaEPlanilha(secao)
+  fireEvent.click(await secao.findByRole('button', { name: 'Enviar arquivos' }))
+  expect(await secao.findByText('Envio com falhas')).toBeTruthy()
+  expect(secao.getByText('3 versões criadas, 0 puladas.')).toBeTruthy()
+  expect(importacao.anexosImportados).toEqual([])
+  importacao.falharNoArquivo = null
+  fireEvent.click(secao.getByRole('button', { name: 'Importar de novo' }))
+  await escolherPastaEPlanilha(secao)
+  expect(await secao.findByText('1 .pdf de relatório que faltou vai para os Outros anexos. 3 versões já existem e serão puladas.'))
+    .toBeTruthy()
+  fireEvent.click(secao.getByRole('button', { name: 'Enviar arquivos' }))
+  expect(await secao.findByText('Envio concluído')).toBeTruthy()
+  expect(importacao.anexosImportados).toEqual([{ processoId: 'p1', nome: 'TSA_V2_Emitir Ofício_Relatório.pdf' }])
 })
 
 test('com tudo já importado, não há o que enviar e a tela diz por quê', async () => {
@@ -178,6 +202,6 @@ test('dois relatórios na mesma versão: a versão entra sem relatório, com avi
   ])
   fireEvent.click(await secao.findByRole('button', { name: 'Enviar arquivos' }))
   const avisos = within(await secao.findByRole('region', { name: '1 aviso' }))
-  expect(avisos.getByRole('listitem').textContent).toBe('Emitir Ofício V1: dois arquivos de relatório .docx; nenhum dos dois entrou.')
+  expect(avisos.getByRole('listitem').textContent).toBe('Emitir Ofício V1: dois arquivos de relatório .docx; nenhum dos dois entra.')
   expect(versoes.versoes.p1[0].arquivos.map((a) => a.papel)).toEqual(['bpm'])
 })

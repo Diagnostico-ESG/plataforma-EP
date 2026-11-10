@@ -35,7 +35,7 @@ export async function lerArquivoDaPlanilha(arquivo: File, hoje: Date): Promise<P
   return lerPlanilha(decodificarArquivo(await arquivo.arrayBuffer()), hoje)
 }
 
-function mensagemDoErro(erro: unknown): string {
+export function mensagemDoErro(erro: unknown): string {
   return erro instanceof Error ? erro.message : String(erro)
 }
 

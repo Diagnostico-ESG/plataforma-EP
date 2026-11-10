@@ -1,5 +1,5 @@
 import type { ClienteSupabase } from '../lib/supabase'
-import { type EnviarBytes, chamarFuncao } from '../versoes/funcaoDoDrive'
+import { type EnviarBytes, chamarFuncao, enviarAoDrive } from '../versoes/funcaoDoDrive'
 import { falhaDaFuncaoDoAnexo, falhaDaRetiradaDoAnexo } from './recusasDeAnexos'
 import { ordenarAnexos } from './regrasDoAnexo'
 import type { Anexo, ModuloDeAnexos, PedidoDeAnexo } from './tipos'
@@ -42,12 +42,9 @@ async function listarAnexos(cliente: ClienteSupabase, processoId: string): Promi
 // o anexo não tem número, versão nem nome padrão.
 async function enviarAnexo(cliente: ClienteSupabase, enviarBytes: EnviarBytes, { processoId, arquivo }: PedidoDeAnexo,
   aoProgredir: (enviados: number, total: number) => void): Promise<void> {
-  const { upload_url: endereco } = await chamarFuncao<{ upload_url: string }>(cliente, {
-    acao: 'iniciar_envio', processo_id: processoId, papel: 'anexo', nome_original: arquivo.name, tamanho: arquivo.size,
-  }, falhaDaFuncaoDoAnexo)
-  const resposta = await enviarBytes(endereco, arquivo).catch(() => null)
-  if (!resposta?.ok) throw new Error(`o arquivo ${arquivo.name} não chegou ao Drive`)
-  const { id } = (await resposta.json()) as { id: string }
+  const id = await enviarAoDrive(cliente, enviarBytes, {
+    processo_id: processoId, papel: 'anexo', nome_original: arquivo.name, tamanho: arquivo.size,
+  }, arquivo, falhaDaFuncaoDoAnexo)
   aoProgredir(1, 1)
   await chamarFuncao(cliente, {
     acao: 'registrar', processo_id: processoId, arquivos: [{ papel: 'anexo', drive_id: id }],

@@ -92,7 +92,7 @@ describe('importarAnexo e anotarSubpasta', () => {
 })
 
 describe('listarProcessosDaPasta', () => {
-  test('junta os processos, as versões e o maior relatório, em quatro leituras', async () => {
+  test('junta os processos, as versões, o maior relatório e os anexos, em cinco leituras', async () => {
     const { cliente, modulo } = moduloComCliente()
     cliente.respostas['processos_com_andamento.select'] = {
       data: [{ id: 'p1', setor_sigla: 'XYZ', nome: 'Exemplo Alfa' }, { id: 'p2', setor_sigla: 'ABC', nome: 'Exemplo Beta' }], error: null,
@@ -102,15 +102,17 @@ describe('listarProcessosDaPasta', () => {
       data: [{ numero_do_relatorio: 2, versoes: { processo_id: 'p1' } }, { numero_do_relatorio: null, versoes: { processo_id: 'p1' } }],
       error: null,
     }
+    cliente.respostas['anexos.select'] = { data: [{ processo_id: 'p1', nome: 'XYZ_V1_Exemplo Alfa_Relatório.PDF' }], error: null }
     cliente.respostas['eventos.select'] = { data: [{ id: 9 }], error: null }
     expect(await modulo.listarProcessosDaPasta()).toEqual({
       haImportado: true,
       processos: [
-        { id: 'p1', chave: 'XYZ|exemplo alfa', nome: 'Exemplo Alfa', versoes: [1, 3], maiorRelatorio: 2 },
-        { id: 'p2', chave: 'ABC|exemplo beta', nome: 'Exemplo Beta', versoes: [], maiorRelatorio: 0 },
+        { id: 'p1', chave: 'XYZ|exemplo alfa', nome: 'Exemplo Alfa', versoes: [1, 3], maiorRelatorio: 2,
+          anexos: ['xyz_v1_exemplo alfa_relatório.pdf'] },
+        { id: 'p2', chave: 'ABC|exemplo beta', nome: 'Exemplo Beta', versoes: [], maiorRelatorio: 0, anexos: [] },
       ],
     })
-    expect(cliente.pedidos).toHaveLength(4)
+    expect(cliente.pedidos).toHaveLength(5)
   })
 
   test('sem evento de importação, a seção dos arquivos fica fechada', async () => {
