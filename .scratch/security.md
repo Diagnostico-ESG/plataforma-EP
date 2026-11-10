@@ -1,34 +1,27 @@
-# Auditoria de dependências (npm audit), 2026-11-05
+# Auditoria de dependências (npm audit), 2026-11-10
 
-Gerada na revisão de pré-produção (`/ship`, roteiro "Revisão de segurança para produção", passo 7). O script da skill `security-auditor` falha no Windows (`2>/dev/null`), então rodei `npm audit --json` direto. Sobrescreve a versão anterior.
+Gerada no `/ship` de `importacao-dados-atuais` (passo 3), com `npm audit --json` e `npm audit --omit=dev --json`. Sobrescreve a versão de 2026-11-05. O `package.json` só mudou na configuração do pre-commit (atualização do DevFlow); nenhuma dependência nova.
 
 ## Resumo
 
 - **Dependências de produção** (as que vão ao navegador: `@supabase/supabase-js`, `react`, `react-dom`): `npm audit --omit=dev` → **0 vulnerabilidades**.
-- **Projeto inteiro:** 16 achados (14 moderados, 2 altos, 0 críticos), **todos em ferramentas de desenvolvimento** (ESLint, typescript-eslint, madge e suas dependências; `undici` entra por `jsdom`, usado só nos testes; `zod` por `eslint-plugin-react-hooks`). Nada disso é empacotado no site nem roda no servidor.
-- **Altos:** `undici` (negação de serviço por memória no parser de EventSource; contorno de SRI com algoritmo em maiúsculas) e `zod` (esgotamento de memória ao validar coleções enormes). Ambos só no ambiente de desenvolvimento e de teste; correção disponível (`npm audit fix`), a aplicar quando convier, sem urgência para produção.
+- **Projeto inteiro:** 11 achados (9 moderados, 2 altos, 0 críticos), **todos em ferramentas de desenvolvimento**. `undici` entra pelo `jsdom`, usado só nos testes; `zod` entra pelo `eslint-plugin-react-hooks`; o resto vem da cadeia do `eslint` e do `typescript-eslint`. Nada disso é empacotado no site nem roda no servidor. Os achados do `madge` da linha de base anterior sumiram.
+- **Altos:**
+  - `undici` 8.11.2: negação de serviço e outros oito avisos, corrigidos na 8.12.2.
+  - `zod` 4.6.5: esgotamento de memória ao validar coleções enormes, corrigido na 4.6.6.
+  - Os dois só no ambiente de desenvolvimento e de teste, com correção disponível sem versão maior (`fixAvailable: true`).
 
-## Achados (nome do pacote, severidade, tipo)
+## Achados
 
-| Pacote | Severidade | Dependência | Título | Aviso |
-| --- | --- | --- | --- | --- |
-| @eslint/config-array | moderate | indireta | (herdada) |  |
-| @typescript-eslint/eslint-plugin | moderate | indireta | (herdada) |  |
-| @typescript-eslint/parser | moderate | indireta | (herdada) |  |
-| @typescript-eslint/type-utils | moderate | indireta | (herdada) |  |
-| @typescript-eslint/typescript-estree | moderate | indireta | (herdada) |  |
-| @typescript-eslint/utils | moderate | indireta | (herdada) |  |
-| dependency-tree | moderate | indireta | (herdada) |  |
-| detective-typescript | moderate | indireta | (herdada) |  |
-| detective-vue2 | moderate | indireta | (herdada) |  |
-| eslint | moderate | direta | (herdada) |  |
-| madge | moderate | direta | (herdada) |  |
-| minimatch | moderate | indireta | minimatch has potential denial of service via globparts amplification | https://github.com/advisories/GHSA-g3hv-75wg-m249 |
-| precinct | moderate | indireta | (herdada) |  |
-| typescript-eslint | moderate | direta | (herdada) |  |
-| undici | high | indireta | undici vulnerable to Denial of Service via unbounded memory in the Eve | https://github.com/advisories/GHSA-4qv8-2p9j-2685 |
-| zod | high | indireta | Zod can exhaust memory while validating oversized constrained collecti | https://github.com/advisories/GHSA-mrhx-c7xc-m3w5 |
+| Pacote | Severidade | Tipo | Faixa afetada | Aviso | Correção |
+| --- | --- | --- | --- | --- | --- |
+| undici | alta | desenvolvimento (indireta, `jsdom`) | 8.0.0 a 8.12.1 | GHSA-4qv8-2p9j-2685, GHSA-f72v-6w45-q472, GHSA-xjj6-f33q-929c, GHSA-4w7w-5xrc-9h26, GHSA-2m5v-pch6-74hx, GHSA-qrxm-fqhp-jwvm, GHSA-9fm3-97px-rjf6, GHSA-55wc-3pg8-jfw6 | disponível, sem versão maior |
+| zod | alta | desenvolvimento (indireta, `eslint-plugin-react-hooks`) | abaixo de 4.6.6 | GHSA-mrhx-c7xc-m3w5 | disponível, sem versão maior |
+| minimatch | moderada | desenvolvimento (indireta) | 7.0.0 a 11.0.0 | GHSA-g3hv-75wg-m249 | via `eslint` 9.39.5, versão maior |
+| eslint | moderada | desenvolvimento (direta) | 10.0.0-alpha.0 em diante | herdada de minimatch | `eslint` 9.39.5, versão maior |
+| @eslint/config-array | moderada | desenvolvimento (indireta) | 0.23.0 em diante | herdada de minimatch | disponível |
+| typescript-eslint e @typescript-eslint/* (5 pacotes) | moderada | desenvolvimento | 6.16.0 a 8.72.2 | herdada de minimatch | `typescript-eslint` 8.36.0, versão maior |
 
 ## Decisão
 
-Nenhuma correção bloqueia a produção. Atualizar as ferramentas de desenvolvimento fica no backlog (`npm audit fix` cobre os dois altos; os outros herdam de `eslint`/`madge`, que podem pedir atualização de versão maior).
+Nenhum achado real (crítico ou alto em dependência de produção). Atualizar as ferramentas de desenvolvimento fica no backlog. O `npm audit fix` sem `--force` cobre os dois altos. Os moderados pedem versão maior do `eslint` e do `typescript-eslint`, e essa troca de dependência pede marco antes.

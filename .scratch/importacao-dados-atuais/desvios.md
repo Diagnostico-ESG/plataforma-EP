@@ -44,3 +44,28 @@ Corrigidos (só estilo):
 - Botões secundários das duas etapas ("Escolher outro arquivo", "Importar outro arquivo", "Escolher outra pasta", "Importar de novo") sem borda: passaram a `botao-secundario`, como no resto da Administração.
 
 Deixado de fora: o resumo das duas etapas fica inteiro dentro de `role="status"`, e o leitor de tela o lê todo de uma vez. É o padrão das duas seções; mudar só uma criaria diferença, e mudar as duas mexe em como a tela avisa o fim da carga. Nenhum achado mudou comportamento, então nada foi para o backlog.
+
+## 2026-11-10 — /ship da importação (ajuste "Concluídos no Quadro" e ticket 02)
+
+Revisado do marco `marco/2026-11-06-entrega-importacao-dados-atuais` até o commit 57e3dbb (código em `src/` e `supabase/`; os commits da atualização do DevFlow e da capa-de-entrada ficaram fora).
+
+- **Revisão de código, eixo da spec, dois achados reais, corrigidos no commit 57e3dbb com teste que falhou antes:**
+  - **História 53:** se a versão entrava e só o `.pdf` do relatório falhava, a rodada seguinte pulava a versão e o `.pdf` nunca voltava. A prévia passou a ler os anexos do processo e envia o `.pdf` que faltou (teste "o .pdf do relatório que falhou volta na rodada seguinte").
+  - **História 44:** a prévia não mostrava a letra corrigida, os duplicados nem a subpasta. Os avisos passaram a aparecer na prévia e no resumo, com o mesmo texto.
+- **Revisão de código, eixo dos padrões, corrigidos no mesmo commit:**
+  - A lógica de envio ao Drive estava em três cópias; `versoesSupabase` e `anexosSupabase` passaram a usar `enviarAoDrive`.
+  - `motivo(erro)` repetia `mensagemDoErro`.
+  - A sigla saía da chave por `split`; virou campo próprio.
+- **Revisão de código, ficou de fora:** foi para o backlog, com o motivo em cada linha.
+- **Revisão da spec contra interpretações:** concordou com quatro das interpretações de 2026-11-09. A versão histórica sem etapa (história 49) continua como interpretação a confirmar pelo usuário; a spec foi atualizada para dizer como ficou.
+- **Testes por função:** a revisão apontou que `lerPasta`, `lacunasDaPasta` e `importacaoDaPastaSupabase` têm testes próprios, além da tela. Segui o `CLAUDE.md` ("toda função nova ganha teste"), mais cauteloso que a spec ("não por testes próprios por função").
+- **Revisão de segurança** (subagente pela `revisao-seguranca.md`): nenhum achado com confiança 8 ou mais. Descartados:
+  - O Administrador pode chamar `importar_versao` direto pela API com um `drive_id` inventado: só ele pode, e os `registrar_*` antigos têm o mesmo desenho (confiança 3).
+  - O nome vazio do anexo é barrado pela regra da tabela, e não pela função (confiança 2).
+  - O nome da subpasta aparece na mensagem de erro, só na tela do Administrador (confiança 2).
+- **Auditoria de pacotes:** produção sem vulnerabilidade. Só desenvolvimento: 2 altas (`undici` pelo `jsdom`, `zod` pelo `eslint-plugin-react-hooks`) e 9 moderadas (cadeia do `eslint`), as mesmas da linha de base de 2026-11-05; ficam no backlog.
+- **Banco:**
+  - Migrações não destrutivas; tipos em dia; `security definer` só em `private`.
+  - O teste 22 (`catalogo_de_etapas`, itens 8 e 9) reprova desde 2026-11-09. Pelos valores do CI, há no banco de desenvolvimento uma etapa entre "Revisão interna" e "Validação com o setor", e o teste espera as duas vizinhas. É dado do banco, fora desta funcionalidade, e não regressão dela; os testes 74 e 75 passam.
+  - A marca foi gravada com isso registrado; segue no backlog.
+- **`[visual]`:** conferido só por medida no navegador, na vitrine local com dados falsos (a captura de tela não funcionou com a janela minimizada); a marca sai com ressalva.
