@@ -155,6 +155,13 @@
   border-radius: var(--canto);
 }
 
+/* No celular a miniatura de 22rem não deixa espaço para os arquivos: a versão empilha, miniatura em cima. */
+@media (max-width: 600px) {
+  .versao-destaque {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .versao-destaque-miniatura {
   display: grid;
   place-items: center;

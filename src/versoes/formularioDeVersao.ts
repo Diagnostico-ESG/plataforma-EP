@@ -52,7 +52,10 @@ function podeEnviarNaRevisaoDoRelatorio(doRelatorio: EnvioDaRevisaoDoRelatorio, 
  * sozinho); a histórica leva o dela, sem número.
  */
 export function papeisDoFormulario(modo: ModoDoFormulario): readonly PapelDoArquivo[] {
-  return PAPEIS.filter((papel) => papel !== 'bpmn' && !(modo.tipo === 'piloto' && papel === 'relatorio'))
+  const papeis = PAPEIS.filter((papel) => papel !== 'bpmn' && !(modo.tipo === 'piloto' && papel === 'relatorio'))
+  // Na Revisão do relatório o obrigatório é o relatório: vem primeiro, e o .bpm e o .png opcionais depois.
+  if (modo.tipo !== 'sequencia' || !modo.doRelatorio) return papeis
+  return ['relatorio', ...papeis.filter((papel) => papel !== 'relatorio')]
 }
 
 export function arquivosDoPedido(escolhidos: Escolhidos): ArquivoEscolhido[] {

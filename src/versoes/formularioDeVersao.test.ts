@@ -99,6 +99,11 @@ test('nenhum formulário tem campo .bpmn; a piloto não tem campo de relatório;
   expect(papeisDoFormulario({ tipo: 'historica' })).toEqual(['bpm', 'png', 'relatorio'])
 })
 
+test('na Revisão do relatório o relatório, que é o obrigatório, vem primeiro', () => {
+  const modo = { tipo: 'sequencia', numero: 9, numeroDoRelatorio: 2, doRelatorio: { versaoQueRecebe: { numero: 8, piloto: false } } } as const
+  expect(papeisDoFormulario(modo)).toEqual(['relatorio', 'bpm', 'png'])
+})
+
 test('enviar o relatório só se habilita com o relatório escolhido, sem recusa e sem conferência em andamento', () => {
   expect(podeEnviarRelatorio({}, {}, false)).toBe(false)
   expect(podeEnviarRelatorio({ relatorio }, {}, false)).toBe(true)

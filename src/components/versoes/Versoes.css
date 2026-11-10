@@ -1,6 +1,8 @@
 /* Seção "Arquivos" do verso: o título com [Enviar versão] e o "⋯", o destaque e as anteriores. */
 .secao-de-versoes {
   display: grid;
+  /* Coluna presa à largura da seção: sem o minmax, o conteúdo mais largo (campo de arquivo nativo) a alargava no celular. */
+  grid-template-columns: minmax(0, 1fr);
   justify-items: start;
   gap: var(--esp-2);
 }
@@ -69,11 +71,16 @@
 /* Formulário de envio: o grupo de arquivos sem a moldura padrão do fieldset; cada campo com a prévia ou a recusa. */
 .formulario-de-versao {
   width: 100%;
+  /* Item da grade da seção de versões: sem isto a coluna cresce até a largura do campo de arquivo nativo. */
+  min-width: 0;
 }
 
 .formulario-de-versao-campos {
   display: grid;
   gap: var(--esp-2);
+  /* O fieldset nasce com largura mínima igual ao conteúdo, e o campo de arquivo nativo não encolhe: no celular o
+     formulário passava da tela (418 px em 375). */
+  min-inline-size: 0;
   margin: 0;
   padding: 0;
   border: 0;
