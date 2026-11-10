@@ -1272,3 +1272,11 @@ Registro de itens não testados que aconteceram numa execução real e de regras
   - Aconteceu: um subagente de leitura e o filtro de confiança 8; nenhum achado real e três descartados com motivo. Relatório em português.
 - **Item não testado (v2.0.2): checagens da interface antes da revisão de segurança.**
   - Aconteceu: feitas pelo subagente, sem ocorrência de `dangerouslySetInnerHTML`, `innerHTML`, `target="_blank"` nem de CORS aberto.
+
+## 2026-11-10 — /demanda e /planejar modo completo (revisoes-aprovacao, Duas revisões)
+
+- **Item não testado (/planejar): confirmação dos padrões e decisões antes de devolver o comando.** Esperado: pedir a confirmação e não tomar o seguir em frente como aceite. Aconteceu: as cinco decisões novas da spec foram listadas e o commit e o comando esperaram o "confirmo" do usuário.
+- **Item não testado (/planejar): pergunta principal por tela.** Esperado: cada tela da mudança com a sua pergunta principal. Aconteceu: a pergunta foi feita na sabatina e gravada na seção "Telas" da spec.
+- **Item não testado (v3.1): spec escrita sem o `to-spec`, com a numeração continuada numa spec existente.** Esperado: o ponto de teste confirmado antes, a seção nova na mesma spec e as decisões novas listadas. Aconteceu: o ponto de teste foi confirmado ("isso"), as histórias continuaram em 63–79 e os critérios recomeçaram em 1 dentro da seção nova, com as decisões novas confirmadas.
+- **Item não testado (v3.1): tickets escritos sem o `to-tickets`.** Esperado: uma primeira proposta enxuta, mostrada antes de gravar. Aconteceu: propus a divisão, e o usuário pediu "1 ticket só". Gravei um ticket com a ordem interna sugerida.
+- **Ocorrência: a skill `grill-with-docs` foi colada como texto.** O usuário colou o comando devolvido em vez de digitá-lo, e a skill não foi acionada. Sugestão: no passo 2, o `/planejar` lembrar que o nome da skill precisa ser digitado, e que só os argumentos podem ser colados.

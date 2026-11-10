@@ -10,6 +10,177 @@ Status: ready-for-agent
 
 Decisões de origem: sabatina de 2026-10-16 (`.scratch/revisoes-aprovacao/sabatina.md`), revista no `/to-tickets` de 2026-10-17 e no `/planejar` de 2026-10-19; `CONTEXT.md` (seções "Processos", "Documentos" e "Revisões e aprovação"); ADRs 0006 (envio não muda a etapa), 0011 (versão aprovada não tem arquivo substituído), 0012 (revisão pelo setor sem rodadas), 0013 (etapas do setor saem), 0014 (resolver avança; trava do autor na escolha) e 0015 (revisão e aprovação gravadas no Concluir; E-protocolo opcional), que substitui em parte o 0009.
 
+## Duas revisões (mudança de 2026-11-10)
+
+Demanda de 2026-11-10, sabatina na sessão do `/planejar` do mesmo dia; ADR 0046, que altera o 0023 na parte da revisão. Termos no `CONTEXT.md`: Revisão, Revisor, Versão em sequência, Relatório, Substituir arquivo, Catálogo de etapas, Fase do Regimento e Validação com o setor. Esta seção vale sobre as anteriores no que divergir. Muda também as specs de `documentos-versoes` (onde se envia versão e relatório), `processos-etapas` (catálogo e ícone) e `importacao-dados-atuais` (para onde vai a coluna "Revisão Interna"), que ganham uma nota apontando para cá.
+
+**Como resolve o problema.** No trabalho real há duas revisões, feitas por pessoas diferentes: T ou A revisa o fluxograma técnico que V fez, e depois M revisa o relatório, também de V. A plataforma tinha uma etapa só, que olhava só o fluxograma. Agora a Revisão interna passa a se chamar **Revisão do fluxograma**, e logo depois dela entra a **Revisão do relatório**. Cada uma tem o seu [Registrar revisão] e o seu [Enviar versão] completo, para que quem revisa faça ali mesmo as alterações do fluxograma e do relatório, sem mover o processo, inclusive na volta depois da Validação com o setor. Toda alteração, por menor que seja, ganha número novo (versão ou relatório), e o anterior fica guardado. O aviso do revisor compara com o autor do que se revisa em cada etapa.
+
+### O que deixa de valer no resto desta spec
+
+- "Revisão interna" como nome da etapa e do registro: passa a ser Revisão do fluxograma (a etapa) e revisão (o registro).
+- O **escopo escolhido** na revisão "corrigida" (histórias 36 e 45, em parte): o escopo passa a ser deduzido pelo banco do que foi enviado na passagem.
+- O **aviso do autor** da história 37 vale só na Revisão do fluxograma; na Revisão do relatório compara com o autor do relatório.
+- **"Corrigida" desabilitada quando nenhuma versão foi enviada na passagem** (história 35): passa a valer quando nada (nem versão, nem relatório) foi enviado.
+
+### Solução
+
+- **Etapas.** A etapa `revisao_interna` muda só de nome, para "Revisão do fluxograma"; o código interno fica. Logo depois dela, antes da Validação com o setor, entra a etapa **Revisão do relatório** (código `revisao_relatorio`): de campos próprios (renomeia e reordena, mas não se desativa nem se exclui), na fase VI do Regimento, com ícone próprio e sem responsável inicial (o Administrador define no Catálogo). As etapas seguintes descem uma posição. Incluir etapas pelo Catálogo continua como está.
+- **Envios na Revisão do fluxograma** (como hoje na Revisão interna): [Enviar versão] com .bpm obrigatório e .png e relatório opcionais; [Enviar relatório] continua.
+- **Envios na Revisão do relatório:** só [Enviar versão], cujo formulário pede o **relatório (obrigatório)**, o **.bpm (opcional)** e o **.png (opcional, só junto com o .bpm**; o campo fica desligado sem .bpm). Só com o relatório, nasce o relatório seguinte ligado à versão mais recente, sem versão nova. Com relatório e .bpm, nasce a versão em sequência seguinte, já com o relatório. O [Enviar relatório] não aparece nesta etapa.
+- **Até onde se envia:** versão em sequência e relatório se enviam da Relatório e modelagem técnica até a Revisão do relatório; da Validação com o setor em diante, o banco continua recusando.
+- **Registro da revisão nas duas etapas,** com as regras de hoje (um por passagem, [Editar revisão] depois de registrar, registro novo depois de sair e voltar, não move o processo):
+  - **Revisão do fluxograma:** "Sem alteração: vale para a V7" (a versão mais recente) ou "Corrigida", quando algo foi enviado nesta passagem: "a V8 corrige a V7" se veio versão nova, e "o Relatório V2 corrige o Relatório V1" se veio relatório novo (as duas frases, se vieram os dois).
+  - **Revisão do relatório:** "Sem alteração: vale para o Relatório V1" (o relatório mais recente) ou "Corrigida", quando algo foi enviado nesta passagem, com as mesmas frases.
+  - Sai o campo Escopo da janela: o que foi corrigido (fluxograma, relatório ou ambos) sai do que foi enviado. "Corrigida" sem nada enviado fica desabilitada, com o motivo ("Nada foi enviado desde que o processo entrou nesta etapa."). O comentário opcional continua.
+  - Sem o que revisar, o [Registrar revisão] não aparece: na Revisão do fluxograma, sem versão (não histórica); na Revisão do relatório, sem relatório numerado. No lugar, o Agora diz "Sem versão para revisar." ou "Sem relatório para revisar.", e a ação principal é o [Enviar versão].
+- **Aviso do revisor** (amarelo, sem impedir), no Agora e na janela de registrar: na Revisão do fluxograma, como hoje, quando o responsável (ou quem está na tela, na janela) é o autor da versão mais recente; na Revisão do relatório, quando é o autor do relatório mais recente ("Ana M. enviou o Relatório V1; a revisão do relatório deveria ser de outra pessoa.").
+- **Gaveta:** cada revisão mostra as suas, de todas as passagens, da mais recente para a mais antiga. As revisões registradas antes desta mudança ficam na Revisão do fluxograma.
+- **Selo "Relatório pendente"** continua da Revisão do fluxograma em diante, sem mudança.
+- **Substituir arquivo** continua como está (troca sem guardar o anterior), para o arquivo enviado por engano; a confirmação dele passa a dizer isso ("Use para corrigir um arquivo enviado por engano. Para alterar o conteúdo, envie uma versão ou um relatório novo: o anterior fica guardado.").
+- **Importação:** o processo cuja última coluna concluída na planilha é "Revisão Interna" entra na **Revisão do relatório** (a coluna marca as duas revisões).
+- **Histórico:** os eventos de revisão dizem de qual revisão são ("Registrou a revisão do relatório", "Editou a revisão do fluxograma").
+- **Subprocesso, Consulta, situação e catálogo:** as mesmas regras de hoje valem para as duas etapas.
+
+### Telas
+
+Só muda o verso do cartão, nas duas revisões (o resto do verso, o Quadro e a Lista ganham a coluna e o nome novos sem outra mudança).
+
+- **Verso na Revisão do fluxograma.** Pergunta principal: "qual versão revisar, e já está revisada?". No Agora, a versão mais recente e o [Registrar revisão] em destaque (ou o resumo do registro com [Editar revisão]); [Enviar versão] e [Enviar relatório] pesam menos. Atrás de "ver mais": a gaveta com as revisões anteriores.
+- **Verso na Revisão do relatório.** Pergunta principal: "qual relatório revisar, e já está revisado?". No Agora, o relatório mais recente e o [Registrar revisão] em destaque; [Enviar versão] pesa menos. Atrás de "ver mais": a gaveta com as revisões anteriores.
+- **Estados** (os do verso de hoje): "Carregando…" na gaveta; "Nenhuma revisão registrada." na gaveta vazia; "Sem versão para revisar." / "Sem relatório para revisar." no Agora; recusa ou falha de conexão ao gravar em vermelho na janela, sem perder o que foi preenchido, com o [Tentar de novo] que o verso já tem.
+
+### Histórias de usuário
+
+63. Como integrante do EP, quero que a etapa Revisão interna se chame Revisão do fluxograma, em todas as telas, para que o nome diga o que se revisa.
+64. Como integrante do EP, quero a etapa Revisão do relatório logo depois da Revisão do fluxograma, no Quadro, na Lista e no Catálogo, para que M revise o relatório depois que T ou A revisou o fluxograma.
+65. Como Administrador, quero ser recusado ao desativar ou excluir a Revisão do relatório, como nas outras etapas de campos próprios, e poder renomeá-la, reordená-la e definir o seu responsável inicial.
+66. Como revisor do relatório, quero enviar só o relatório corrigido pelo [Enviar versão], para criar o relatório seguinte sem mexer no número do fluxograma.
+67. Como revisor do relatório, quero enviar o relatório junto com o .bpm (e o .png, se quiser), para criar também a versão seguinte quando precisei mexer no fluxograma, sem mover o processo.
+68. Como revisor do relatório, quero que o formulário não aceite enviar sem o relatório, e que o .png só se escolha junto com o .bpm, com a frase do que falta.
+69. Como revisor do fluxograma, quero o [Enviar versão] e o [Enviar relatório] como hoje, para corrigir o fluxograma e, se preciso, o relatório na mesma etapa.
+70. Como integrante do EP, quero ser recusado ao enviar versão ou relatório da Validação com o setor em diante, mesmo fora da tela, como hoje.
+71. Como revisor, quero [Registrar revisão] nas duas revisões, com "Sem alteração" valendo para a versão mais recente (fluxograma) ou para o relatório mais recente (relatório), e "Corrigida" ligando o que enviei nesta passagem ao anterior.
+72. Como revisor, quero que o que foi corrigido (fluxograma, relatório ou ambos) saia do que enviei, sem precisar escolher, e que "Corrigida" fique desabilitada, com o motivo, quando não enviei nada nesta passagem.
+73. Como revisor do relatório, quero ser avisado, sem ser impedido, quando sou o autor do relatório mais recente, porque a revisão deveria ser de outra pessoa.
+74. Como integrante do EP, quero que, sem versão ou sem relatório para revisar, o Agora diga isso no lugar do [Registrar revisão].
+75. Como integrante do EP, quero ver na gaveta de cada revisão só as revisões dela, e as revisões antigas na Revisão do fluxograma.
+76. Como integrante do EP, quero que a confirmação do Substituir diga que ele serve para o arquivo enviado por engano e que alteração de conteúdo é versão ou relatório novo.
+77. Como Administrador, quero que a importação leve à Revisão do relatório o processo cuja última coluna concluída é "Revisão Interna".
+78. Como usuário, quero ver no histórico de qual revisão é cada evento de revisão.
+79. Como Consulta, quero ver as duas revisões e os registros, sem botões.
+
+### Decisões de implementação
+
+#### Interface
+
+- **Agora:** a escolha da ação principal passa a reconhecer as duas etapas de revisão; o resumo do registro e o [Editar revisão] valem nas duas; o aviso do revisor recebe também o autor do relatório mais recente, que a leitura do processo passa a trazer.
+- **Formulário de versão:** ganha o modo da Revisão do relatório (relatório obrigatório, .bpm opcional, .png só com .bpm). Ao confirmar, com .bpm vai pelo registro de versão de hoje (com o relatório junto); sem .bpm, vai pelo envio de relatório de hoje. Nenhum caminho novo até o Drive.
+- **Botões de envio por etapa:** o [Enviar relatório] some na Revisão do relatório.
+- **Janela de registrar e de editar a revisão:** sai o campo Escopo; as frases das opções mostram versão, relatório ou os dois.
+- **Ícone:** um ícone novo para a Revisão do relatório, no mesmo traço dos outros ícones de etapa (desenho conferido no `/polir`).
+- **Frases:** os textos que dizem "Revisão interna" ou "revisão interna" (recusas, avisos, histórico) passam aos nomes novos.
+- **Vitrine:** o catálogo falso ganha a etapa nova, e a falsa de revisões passa a tratar as duas etapas.
+
+#### Modelo de dados
+
+- **`etapas`:**
+  - `revisao_interna` muda o nome para "Revisão do fluxograma";
+  - linha nova `revisao_relatorio` ("Revisão do relatório"), fase VI, sem responsável inicial, na posição logo depois de `revisao_interna`; as etapas de ordem maior sobem uma posição, em ordem decrescente, por causa do `unique (ordem)`;
+  - a lista das etapas de campos próprios (que não se desativam nem se excluem) ganha `revisao_relatorio`.
+- **`revisoes_internas`** (o nome da tabela fica, para não renomear em toda parte):
+  - colunas novas `relatorio_revisado_id` e `relatorio_corrigido_id`: uuid, referência a `arquivos_da_versao` (o relatório numerado), opcionais, preenchidas pelo banco, com índice;
+  - `escopo` deixa de ser escrito por quem registra (sai o privilégio de inclusão e de alteração da coluna) e passa a ser preenchido pelo gatilho: `fluxograma` quando a passagem tem só versão nova, `relatorio` quando tem só relatório novo, `ambos` com os dois, vazio em "sem alteração";
+  - a etapa da revisão sai da passagem (`passagem_id` → `passagens.etapa_id`); as revisões antigas, com `passagem_id` vazia, contam como da Revisão do fluxograma;
+  - `versao_revisada_id` continua obrigatória (todo relatório pertence a uma versão).
+- **O que o gatilho preenche** (ao incluir e ao mudar o resultado):
+  - "sem alteração" na Revisão do fluxograma: versão revisada = a mais recente; relatórios vazios;
+  - "sem alteração" na Revisão do relatório: relatório revisado = o mais recente; versão revisada = a versão dele;
+  - "corrigida" (as duas etapas): se há versão em sequência enviada nesta passagem (etapa da versão = etapa da passagem, criada desde `entrou_em`), versão corrigida = a mais recente delas e revisada = a anterior a ela; se há relatório numerado enviado nesta passagem (`enviado_em` desde `entrou_em`), relatório corrigido = o mais recente deles e revisado = o anterior a ele; versão revisada, quando não veio versão nova, = a mais recente;
+  - "corrigida" sem nada enviado na passagem, recusada.
+- **Até onde se envia:** a conferência de onde cabe a versão (`sequencia` e `relatorio`) passa a usar a ordem de `revisao_relatorio` como limite, no lugar de `revisao_interna`.
+- **Relatório obrigatório no [Enviar versão] da Revisão do relatório:** imposto pelo formulário; o banco aceita versão sem relatório nesta etapa, como nas outras (ver "Decisões novas").
+- **Edição simultânea:** sem mudança (uma revisão por passagem, edição pelo [Editar], como hoje).
+- **Migração:** não destrutiva. Renomeia uma etapa, inclui outra, desloca a ordem, acrescenta duas colunas opcionais e recria as funções e os gatilhos que citam `revisao_interna` no limite de envio e no registro da revisão. As revisões existentes ficam como estão, com o escopo que já tinham. A produção não tem dados.
+
+#### Quem pode o quê (cada célula vira um teste pgTAP)
+
+| Tabela e ação | Administrador | Integrante do EP | Consulta | Inativo | Visitante |
+|---|---|---|---|---|---|
+| `revisoes_internas` ler (as duas revisões) | sim | sim | sim | não | não |
+| `revisoes_internas` registrar na Revisão do relatório e editar | sim | sim | não | não | não |
+| `revisoes_internas` escrever o escopo | não | não | não | não | não |
+| `etapas` desativar ou excluir a Revisão do relatório | não | não | não | não | não |
+| `etapas` renomear e reordenar a Revisão do relatório | sim | não | não | não | não |
+
+As células da Revisão do fluxograma continuam as da tabela da seção "Andamento livre".
+
+#### Regras que o banco impõe
+
+| Regra | Como | Caso de teste que a prova |
+|---|---|---|
+| Revisão só nas duas etapas de revisão, em andamento | gatilho antes de incluir | Validação com o setor recusada; Revisão do relatório aceita |
+| "Sem alteração" na Revisão do relatório vale para o relatório mais recente | gatilho | relatório revisado = o de maior número; sem relatório numerado, recusada |
+| "Corrigida" liga o que foi enviado na passagem ao anterior, e o escopo sai disso | gatilho | só relatório → `relatorio`; só versão → `fluxograma`; os dois → `ambos`; nada → recusada |
+| Escopo não se escreve | sem privilégio de coluna | incluir ou alterar com escopo recusado |
+| Versão em sequência e relatório até a Revisão do relatório | conferência de onde cabe a versão | aceitos na Revisão do relatório; recusados na Validação com o setor |
+| Revisão do relatório não se desativa nem se exclui | gatilho do catálogo | desativar e excluir recusados |
+| Uma revisão por passagem | índice único que já existe | segunda na mesma passagem da Revisão do relatório recusada |
+
+#### Testes de banco antigos que podem quebrar
+
+- Os que contam as etapas do catálogo ou conferem a ordem e os nomes (`22`, `54`, `42`), e os que conferem a fase de cada etapa.
+- Os da revisão que gravam o escopo pela inclusão (`39`, `41`): passam a esperar o escopo deduzido.
+- Os da importação (`74`, `75`), pela coluna "Revisão Interna" e pelo limite de envio.
+- Os das planilhas dos dashboards (`planilhasFases`), se contam as etapas da fase VI.
+
+### Decisões de teste
+
+- **Ponto de teste (combinado):** o verso do cartão nas duas revisões, testado pela interface como a pessoa usa; as regras do banco por pgTAP.
+- **Interface:** as duas etapas com o nome novo no Quadro e no verso; o [Enviar versão] da Revisão do relatório nos dois caminhos (só relatório; relatório e .bpm), a recusa sem relatório e o .png desligado sem .bpm; o [Enviar relatório] ausente na Revisão do relatório e presente na do fluxograma; o registro nas duas etapas, com "Corrigida" desabilitada sem envio e as frases de versão e de relatório; o aviso do autor do relatório; "Sem relatório para revisar."; a gaveta de cada revisão; a confirmação nova do Substituir; Consulta sem botões. Arte anterior: `App.registrarRevisao`, `App.enviarVersao`, `App.editarRegistros`, `App.agoraDoVerso`, `App.etapasDoVerso`.
+- **Funções puras:** a ação principal da etapa, as opções da revisão e o aviso do revisor nas duas etapas; o mapeamento da importação. Arte anterior: `acaoPrincipalDaEtapa`, `opcoesDaRevisao`, `agoraDoProcesso`, `colunasDaPlanilha`.
+- **Tradução:** o módulo real de revisões sem o escopo, e as frases novas. Arte anterior: `revisoesSupabase`, `frasesDeRevisao`.
+- **Banco:** pgTAP, um teste por célula e por regra, no Docker local durante o desenvolvimento e no workflow "Testes de banco" no fim.
+
+### Critérios de aceite
+
+1. A etapa `revisao_interna` aparece como "Revisão do fluxograma" no Quadro, na Lista, no verso, no Catálogo e no histórico; nenhum texto da tela diz mais "Revisão interna".
+2. A Revisão do relatório aparece logo depois da Revisão do fluxograma e antes da Validação com o setor, na fase VI, sem responsável inicial; o Catálogo recusa desativá-la e excluí-la e aceita renomeá-la e reordená-la.
+3. Na Revisão do relatório, o [Enviar versão] só com o relatório cria o relatório seguinte ligado à versão mais recente, sem versão nova.
+4. Na Revisão do relatório, o [Enviar versão] com relatório e .bpm cria a versão em sequência seguinte, com o relatório.
+5. Na Revisão do relatório, enviar sem relatório não é possível, com a frase do que falta, e o .png fica desligado sem .bpm.
+6. Na Revisão do relatório não há [Enviar relatório]; na Revisão do fluxograma e na Relatório e modelagem técnica, ele continua.
+7. Na Revisão do fluxograma, o [Enviar versão] continua com .bpm obrigatório e .png e relatório opcionais.
+8. Versão em sequência e relatório são recusados pelo banco da Validação com o setor em diante.
+9. [Registrar revisão] aparece nas duas etapas; "Sem alteração" vale para a versão mais recente na do fluxograma e para o relatório mais recente na do relatório.
+10. "Corrigida" fica desabilitada, com o motivo, quando nada foi enviado na passagem; com envio, a janela mostra "a V8 corrige a V7", "o Relatório V2 corrige o Relatório V1" ou as duas frases, e o registro guarda o escopo deduzido, sem campo de escopo na janela.
+11. Na Revisão do relatório, o aviso amarelo aparece quando o responsável (no Agora) ou quem está na tela (na janela) é o autor do relatório mais recente, e não impede.
+12. Sem versão (fluxograma) ou sem relatório numerado (relatório), o Agora diz "Sem versão para revisar." ou "Sem relatório para revisar." no lugar do [Registrar revisão].
+13. A gaveta de cada revisão mostra só as revisões dela; as revisões antigas aparecem na Revisão do fluxograma.
+14. A confirmação do Substituir diz que serve para o arquivo enviado por engano e que alteração de conteúdo é versão ou relatório novo.
+15. A importação leva à Revisão do relatório o processo cuja última coluna concluída é "Revisão Interna".
+16. Os eventos de revisão no histórico dizem de qual revisão são.
+17. A Consulta vê as duas revisões e os registros, sem botões; o processo suspenso ou cancelado não registra nem envia.
+18. `[visual]` O ícone da Revisão do relatório segue o traço dos outros ícones de etapa, no cabeçalho da coluna do Quadro e no verso.
+19. `[visual]` No Agora da Revisão do relatório, o relatório a revisar e o [Registrar revisão] ficam no topo, e o [Enviar versão] pesa menos.
+20. `[visual]` O formulário de versão da Revisão do relatório deixa claro que o relatório é obrigatório e que o .bpm e o .png são opcionais, sem passar da altura do notebook (1366×768).
+
+### Fora do escopo
+
+- Substituir guardando o arquivo anterior: recusado no ADR 0046 (toda alteração é número novo).
+- Tirar o Substituir: a equipe preferiu mantê-lo para o arquivo enviado por engano.
+- Trocar o código interno `revisao_interna` e o nome da tabela `revisoes_internas`: custo alto, sem efeito para quem usa.
+- Coluna nova nas planilhas dos dashboards: elas contam por fase, e a etapa nova entra na fase VI.
+- Mudar a Confirmação de arquivos: as revisões continuam sem perguntar nada.
+
+### Decisões novas (confirmadas pelo usuário em 2026-11-10)
+
+1. **O relatório obrigatório do [Enviar versão] da Revisão do relatório fica só no formulário,** e o banco aceita versão sem relatório nessa etapa, como nas outras. Impor no banco exigiria mudar o envio em partes (versão primeiro, arquivos depois) que a função do Drive já faz; o selo "Relatório pendente" continua cobrindo o caso. É fácil de desfazer: a trava no banco pode entrar depois.
+2. **Na Revisão do relatório, "sem alteração" exige um relatório numerado;** os relatórios .pdf antigos e o da versão histórica não contam como relatório a revisar.
+3. **Na Revisão do fluxograma, "corrigida" também vale quando só o relatório foi enviado na passagem** (pelo [Enviar relatório]), com o escopo `relatorio`.
+4. **Os eventos de revisão no histórico ganham o nome da revisão** ("Registrou a revisão do relatório"); os eventos antigos ficam como estão.
+5. **O responsável inicial da Revisão do relatório nasce vazio** em desenvolvimento e em produção; o Administrador define no Catálogo.
+
 ## Sobra da trava do autor (mudança de 2026-10-27)
 
 Demanda travas-em-avisos; ADR 0028. A trava do autor na Revisão interna já tinha saído no ADR 0023, e o aviso amarelo de hoje fica como está. Sai só a sobra: a recusa `autor_da_versao` na tradução das recusas do banco e a frase dela ("Quem enviou a versão … não pode …"), que nenhum caminho do banco devolve mais. Nenhuma tela muda. A seção "Travas em avisos" da spec de `documentos-versoes` traz a história (167) e a decisão de teste: o teste da tradução das recusas deixa de esperar o código.
@@ -571,3 +742,4 @@ Entregue em 2026-10-26 (commit d971dfc), com ressalva: critérios [visual] presu
 Entregue em 2026-10-27 (commit c2b089f), com ressalva: critérios [visual] da mudança travas-em-avisos presumidos (a pergunta da confirmação de arquivos com a lista das duas etapas e a janela "Editar número" com prévia e avisos em 1366×768 não foram vistas; o "⋯" ao lado do rótulo foi visto na tela real); revisão de segurança foi a de reserva (menos completa: o /security-review não achou mudanças a revisar), com a leitura de chamador.ts, pastas.ts e dos módulos de tela por fazer; função arquivos-no-drive (ação renumerar) provada no Drive real em 2026-10-27, mas a publicação a partir da main não foi reconferida; as ressalvas das entregas anteriores seguem valendo
 
 Entregue em 2026-10-29 (commit 9fc0201), com ressalva: critérios [visual] de repositorio-de-processos presumidos (nada visto com o login real; a árvore e o cabeçalho da Lista só na vitrine local com módulos falsos, sem captura de imagem); revisão de segurança foi a de reserva (menos completa: o /security-review não achou mudanças a revisar); migrações fim_do_arquivado e tirar_e_voltar_ao_quadro ainda sem aplicar no remoto de desenvolvimento e função arquivos-no-drive sem nova publicação; as ressalvas das entregas anteriores seguem valendo
+Em revisão desde 2026-11-10

@@ -1,5 +1,7 @@
 # Documentos e versões
 
+**Duas revisões (mudança de 2026-11-10, em `revisoes-aprovacao`).** A Revisão interna passa a se chamar Revisão do fluxograma, e a Revisão do relatório entra logo depois. Versão em sequência e relatório se enviam até a Revisão do relatório; nela, o [Enviar versão] pede o relatório e deixa o .bpm (e o .png, só com o .bpm) opcional, e o [Enviar relatório] não aparece. Toda alteração é versão ou relatório novo; o Substituir fica para o arquivo enviado por engano. Detalhe na seção "Duas revisões" de `.scratch/revisoes-aprovacao/spec.md` (ADR 0046).
+
 Status: ready-for-agent
 
 **Quadro, verso e Lista mais enxutos (mudança de 2026-11-04, spec própria).** A funcionalidade 21, `.scratch/enxugar-quadro-e-verso/spec.md` (ADR 0042), tira o [Assumir], o [Enviar relatório], o envio de .bpmn, os rótulos Etapa e Status do verso e as colunas Macroprocesso e Setor da Lista agrupada; a versão histórica passa a exigir o .bpm, a Data da modelagem piloto ganha um campo fixo no verso e sai da linha de etapas, e o Quadro ganha faixas de fundo nas colunas. Onde esta spec divergir, vale aquela.
@@ -1116,3 +1118,4 @@ Entregue em 2026-10-29 (commit 9fc0201), com ressalva: critérios [visual] de re
 Entregue em 2026-11-04 (commit 373c07e), com ressalva: critérios [visual] presumidos no app real (vistos só numa vitrine local com módulos falsos e dados inventados, sem o login real: selo menor, faixas nas Linhas e nos quadros por setor e por responsável, cartão parado sem borda, miniatura com .png de verdade, verso em duas colunas, atraso na Lista); item 7 da enxugar-quadro-e-verso não feito por decisão do usuário (ADR 0043); revisão de segurança dispensada (só telas e estilos, sem login, dado de fora ou banco)
 
 Entregue em 2026-11-04 (commit aae9254), com ressalva: a correção do anexo (raiz.ts, três níveis) foi provada só por teste automático e pelo "Testes de banco"; o anexo corrigido não foi visto no Drive real (C3 e C4 da prova adiados por decisão do usuário); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
+Em revisão desde 2026-11-10

@@ -1,5 +1,7 @@
 # Importação dos dados atuais
 
+**Duas revisões (mudança de 2026-11-10, em `revisoes-aprovacao`).** O processo cuja última coluna concluída é "Revisão Interna" passa a entrar na etapa nova Revisão do relatório (a coluna marca as duas revisões). Detalhe na seção "Duas revisões" de `.scratch/revisoes-aprovacao/spec.md`.
+
 Status: ready-for-agent
 
 Decisões de origem: sabatina de 2026-11-05 (`.scratch/importacao-dados-atuais/sabatina.md`, Q1 a Q23; o caso "VII sem data" e a data ilegível do Q9 mudaram no ajuste de 2026-11-06, no fim desta spec), regras de etapa e formato da planilha (`.scratch/importacao-dados-atuais/amostra/cabecalho.md`), ADR 0044 e o termo **Importação dos dados atuais** no `CONTEXT.md`. Valem também os ADRs 0005 a 0008 (versão com os arquivos dentro, arquivos no Drive pela função `arquivos-no-drive`) e 0028 (número da versão).
@@ -176,3 +178,4 @@ Implementado em 2026-11-06 (commit fbb2957)
 Entregue em 2026-11-06 (commit ec2b9d0), com ressalva: [visual] da primeira entrega visto só na vitrine local com módulos falsos
 
 Entregue em 2026-11-10 (commit 005cea9), com ressalva: [visual] da segunda entrega conferido só por medida no navegador, na vitrine local com dados falsos
+Em revisão desde 2026-11-10

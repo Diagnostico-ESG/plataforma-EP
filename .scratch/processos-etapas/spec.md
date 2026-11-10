@@ -1,5 +1,7 @@
 # Processos e etapas
 
+**Duas revisões (mudança de 2026-11-10, em `revisoes-aprovacao`).** O catálogo ganha a etapa Revisão do relatório, de campos próprios, na fase VI, logo depois da Revisão interna, que passa a se chamar Revisão do fluxograma; ícone próprio. Detalhe na seção "Duas revisões" de `.scratch/revisoes-aprovacao/spec.md` (ADR 0046).
+
 Status: ready-for-agent
 
 **Quadro, verso e Lista mais enxutos (mudança de 2026-11-04, spec própria).** A funcionalidade 21, `.scratch/enxugar-quadro-e-verso/spec.md` (ADR 0042), tira o [Assumir], o [Enviar relatório], o envio de .bpmn, os rótulos Etapa e Status do verso e as colunas Macroprocesso e Setor da Lista agrupada; a versão histórica passa a exigir o .bpm, a Data da modelagem piloto ganha um campo fixo no verso e sai da linha de etapas, e o Quadro ganha faixas de fundo nas colunas. Onde esta spec divergir, vale aquela.
@@ -2066,3 +2068,4 @@ Entregue em 2026-11-03 (commit cf80e8c), com ressalva: miniatura-rapida: o ganho
 Entregue em 2026-11-03 (commit a973441), com ressalva: critérios [visual] 8 a 10 de setor-neutro-e-fotos presumidos no app real (selo neutro e maior, ícones do Status, pílulas de Situação e foto do Google no cartão não vistos com o login; só o código e os testes conferidos)
 
 Entregue em 2026-11-04 (commit 373c07e), com ressalva: critérios [visual] presumidos no app real (vistos só numa vitrine local com módulos falsos e dados inventados, sem o login real: selo menor, faixas nas Linhas e nos quadros por setor e por responsável, cartão parado sem borda, miniatura com .png de verdade, verso em duas colunas, atraso na Lista); item 7 da enxugar-quadro-e-verso não feito por decisão do usuário (ADR 0043); revisão de segurança dispensada (só telas e estilos, sem login, dado de fora ou banco)
+Em revisão desde 2026-11-10

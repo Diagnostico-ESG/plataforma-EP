@@ -89,7 +89,7 @@ Tipo provisório do item identificado (ou importado) que ainda não se sabe se �
 _Avoid_: indefinido, rascunho
 
 **Catálogo de etapas**:
-A lista ordenada de etapas, mantida pelo administrador, em que o processo pode estar: começa sempre em **Não iniciados** e termina sempre em **Concluídos**, fixas no lugar e no nome; entre elas, as etapas de trabalho, da modelagem piloto em diante. A ordem não obriga ninguém a seguir a sequência. Uma etapa nova só acrescenta uma coluna, sem mexer em nenhum processo. Etapa com processo dentro não se desativa nem se exclui; etapa por onde algum processo já passou só se desativa; as etapas que têm campos próprios (Modelagem piloto, Relatório e modelagem técnica, Revisão interna, Validação com o setor, Aprovação pelo setor e Publicação) se renomeiam e se reordenam, mas não se desativam nem se excluem. Não há etapas do setor: identificação dos responsáveis, sensibilização e identificação dos processos já foram feitas para todos os setores e ficam fora da plataforma.
+A lista ordenada de etapas, mantida pelo administrador, em que o processo pode estar: começa sempre em **Não iniciados** e termina sempre em **Concluídos**, fixas no lugar e no nome; entre elas, as etapas de trabalho, da modelagem piloto em diante. A ordem não obriga ninguém a seguir a sequência. Uma etapa nova só acrescenta uma coluna, sem mexer em nenhum processo. Etapa com processo dentro não se desativa nem se exclui; etapa por onde algum processo já passou só se desativa; as etapas que têm campos próprios (Modelagem piloto, Relatório e modelagem técnica, Revisão do fluxograma, Revisão do relatório, Validação com o setor, Aprovação pelo setor e Publicação) se renomeiam e se reordenam, mas não se desativam nem se excluem. Não há etapas do setor: identificação dos responsáveis, sensibilização e identificação dos processos já foram feitas para todos os setores e ficam fora da plataforma.
 _Avoid_: workflow, fluxo de etapas, etapa do setor
 
 **Não iniciados**:
@@ -97,7 +97,7 @@ A primeira etapa do catálogo, onde entra todo processo cadastrado e fica o que 
 _Avoid_: backlog, a fazer (para a etapa), pendentes
 
 **Fase do Regimento**:
-Cada uma das nove fases do mapeamento definidas no art. 8º do Regimento Interno do EP (I a IX), pelas quais os dashboards contam o andamento. Cada etapa do catálogo pertence a uma fase; uma fase pode juntar várias etapas (a VI junta Revisão interna, Validação com o setor e Aprovação pelo setor). As fases I a III não têm etapa, porque foram feitas fora da plataforma para todos os setores, e contam sempre como concluídas. As outras contam pela posição do processo no catálogo: concluída quando ele está numa etapa depois dela, na última etapa dela com o status Finalizado, ou em Concluídos (a VII, só com a publicação registrada); em andamento quando ele está numa etapa dela; não iniciada no resto.
+Cada uma das nove fases do mapeamento definidas no art. 8º do Regimento Interno do EP (I a IX), pelas quais os dashboards contam o andamento. Cada etapa do catálogo pertence a uma fase; uma fase pode juntar várias etapas (a VI junta Revisão do fluxograma, Revisão do relatório, Validação com o setor e Aprovação pelo setor). As fases I a III não têm etapa, porque foram feitas fora da plataforma para todos os setores, e contam sempre como concluídas. As outras contam pela posição do processo no catálogo: concluída quando ele está numa etapa depois dela, na última etapa dela com o status Finalizado, ou em Concluídos (a VII, só com a publicação registrada); em andamento quando ele está numa etapa dela; não iniciada no resto.
 _Avoid_: etapa (para a fase), etapa do Regimento, macroetapa
 
 **Etapa atual**:
@@ -177,7 +177,7 @@ Trocar o número de uma versão já registrada (qualquer uma, inclusive a histó
 _Avoid_: renumerar, corrigir versão
 
 **Versão em sequência**:
-Versão sem letra (V7), enviada na Relatório e modelagem técnica ou na Revisão interna, com o número dado pela plataforma. Depois da primeira, não se registra mais versão histórica nem versão piloto.
+Versão sem letra (V7), enviada na Relatório e modelagem técnica, na Revisão do fluxograma ou na Revisão do relatório, com o número dado pela plataforma. Toda alteração do fluxograma, por menor que seja, é uma versão nova; a anterior fica guardada. Depois da primeira, não se registra mais versão histórica nem versão piloto.
 _Avoid_: versão nova, versão técnica, versão definitiva
 
 **Versão piloto**:
@@ -189,7 +189,7 @@ Versão da primeira etapa do trabalho, feita antes da plataforma, somente leitur
 _Avoid_: versão antiga, versão importada, versão final
 
 **Relatório**:
-Arquivo .docx com numeração própria por processo (Relatório V1, V2…), enviado sozinho ou junto com uma versão, na Relatório e modelagem técnica ou na Revisão interna, e ligado à versão mais recente no momento do envio. Uma versão sem relatório próprio continua valendo com o último relatório. Os relatórios .pdf antigos e o relatório da versão histórica ficam sem número próprio.
+Arquivo .docx com numeração própria por processo (Relatório V1, V2…), enviado sozinho ou junto com uma versão, na Relatório e modelagem técnica, na Revisão do fluxograma ou na Revisão do relatório, e ligado à versão mais recente no momento do envio (a que vai junto, se houver). Toda alteração do relatório, por menor que seja, é um relatório novo; o anterior fica guardado. A numeração do relatório anda separada da numeração das versões. Uma versão sem relatório próprio continua valendo com o último relatório. Os relatórios .pdf antigos e o relatório da versão histórica ficam sem número próprio.
 _Avoid_: laudo, documento técnico, relatório pendente, sem alteração de conteúdo
 
 **Confirmação de arquivos**:
@@ -197,7 +197,7 @@ A pergunta feita ao mover o processo para a frente de uma etapa, quando ele vem 
 _Avoid_: trava de arquivos, bloqueio, pré-requisito, obrigatoriedade da etapa
 
 **Substituir arquivo**:
-Trocar um arquivo de uma versão, de um relatório ou da aprovação por outro do mesmo tipo. O arquivo anterior não fica guardado; o histórico registra a troca. A versão histórica e a versão aprovada, com o relatório que a acompanha, não têm arquivo substituído.
+Trocar um arquivo de uma versão, de um relatório ou da aprovação por outro do mesmo tipo, para corrigir um arquivo enviado por engano; alteração de conteúdo é versão ou relatório novo (combinação da equipe, a plataforma não impede). O arquivo anterior não fica guardado; o histórico registra a troca. A versão histórica e a versão aprovada, com o relatório que a acompanha, não têm arquivo substituído.
 _Avoid_: corrigir versão, reenviar, atualizar arquivo
 
 **Anexo**:
@@ -210,16 +210,16 @@ _Avoid_: excluir, apagar, remover (para o anexo)
 
 ## Revisões e aprovação
 
-**Revisão interna**:
-Conferência, por um integrante diferente do autor, da última versão do processo antes de ela ir ao setor, registrada com o processo na etapa Revisão interna. O revisor corrige ele mesmo: o resultado é "sem alteração" (segue a versão revisada) ou "corrigida" (a versão enviada nessa etapa é a correção). Registrar não move o processo, e mover não exige registro; cada passagem pela etapa pode ter o seu registro.
-_Avoid_: conferência, aprovação interna
+**Revisão**:
+Conferência, por um integrante diferente do autor, do trabalho do processo antes de ele ir ao setor, em duas etapas seguidas: a **Revisão do fluxograma** (da versão mais recente) e a **Revisão do relatório** (do relatório mais recente). Cada uma é registrada com o processo na sua etapa. O revisor corrige ele mesmo, enviando versão ou relatório novo na própria etapa, e pode mexer nos dois para não precisar mover o processo: o resultado é "sem alteração" (segue o que foi revisado) ou "corrigida" (o que foi enviado nessa passagem é a correção). Registrar não move o processo, e mover não exige registro; cada passagem pela etapa pode ter o seu registro.
+_Avoid_: revisão interna (nome antigo da Revisão do fluxograma, até 2026-11-10), conferência, aprovação interna
 
 **Revisor**:
-Integrante que registra a revisão interna; não deveria ser o autor da versão revisada. A plataforma avisa, sem impedir, quando o autor da versão mais recente (fora as versões históricas) registra a revisão ou fica responsável do processo na Revisão interna.
+Integrante que registra a revisão; não deveria ser o autor do que revisa. A plataforma avisa, sem impedir, quando o responsável do processo é o autor da versão mais recente (fora as históricas) na Revisão do fluxograma, ou o autor do relatório mais recente na Revisão do relatório.
 _Avoid_: aprovador, conferente
 
 **Validação com o setor**:
-A etapa em que a versão está com o setor. Se o setor pede ajustes, o EP move o processo de volta à revisão interna, e a ida seguinte é o processo voltando a esta etapa. A plataforma não registra cada envio nem a resposta: o histórico das mudanças de etapa diz quando foi e voltou, e os e-mails ficam fora (a resposta pode vir pessoalmente). Guarda só a **data da validação**, opcional, uma por processo: o dia em que o setor validou o fluxo, diferente da data do E-protocolo na Aprovação.
+A etapa em que a versão está com o setor. Se o setor pede ajustes, o EP move o processo de volta à Revisão do fluxograma ou à Revisão do relatório, conforme o que mais muda, e a ida seguinte é o processo voltando a esta etapa. A plataforma não registra cada envio nem a resposta: o histórico das mudanças de etapa diz quando foi e voltou, e os e-mails ficam fora (a resposta pode vir pessoalmente). Guarda só a **data da validação**, opcional, uma por processo: o dia em que o setor validou o fluxo, diferente da data do E-protocolo na Aprovação.
 _Avoid_: revisão pelo setor, rodada, ciclo, envio ao setor
 
 **Aprovação**:
