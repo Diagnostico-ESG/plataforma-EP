@@ -23,10 +23,13 @@ export class ImportacaoFalso implements ModuloDeImportacao {
   aoCriar: ((processo: ProcessoParaImportar) => void) | null = null
   /** Os processos da plataforma para a pasta; as versões e o maior relatório saem do `VersoesFalso`. */
   processosDaPasta: Omit<ProcessoDaPasta, 'versoes' | 'maiorRelatorio'>[] = []
+  falharAoListarAPasta = false
   /** Já houve importação da planilha; a gravação de um processo também liga. */
   haImportado = false
   /** O nome do arquivo cujo envio falha (a versão dele não é registrada). */
   falharNoArquivo: string | null = null
+  /** O nome do arquivo depois do qual o envio fica parado (para ver o andamento na tela). */
+  segurarDepoisDe: string | null = null
   anexosImportados: { processoId: string; nome: string }[] = []
   subpastasAnotadas: { processoId: string; subpasta: string }[] = []
   readonly versoes: VersoesFalso
@@ -58,7 +61,7 @@ export class ImportacaoFalso implements ModuloDeImportacao {
   }
 
   async listarProcessosDaPasta(): Promise<ProcessosParaAPasta> {
-    if (this.falharAoListar) throw new Error('falha de teste ao ler os processos')
+    if (this.falharAoListarAPasta) throw new Error('falha de teste ao ler os processos')
     const processos = this.processosDaPasta.map((p) => {
       const doProcesso = this.versoes.versoes[p.id] ?? []
       const relatorios = doProcesso.flatMap((v) => v.arquivos.map((a) => a.numeroDoRelatorio ?? 0))
@@ -71,6 +74,7 @@ export class ImportacaoFalso implements ModuloDeImportacao {
     for (const [posicao, { arquivo }] of pedido.arquivos.entries()) {
       if (arquivo.name === this.falharNoArquivo) throw new Error(`o arquivo ${arquivo.name} não chegou ao Drive`)
       aoProgredir(posicao + 1, pedido.arquivos.length)
+      if (arquivo.name === this.segurarDepoisDe) await new Promise<never>(() => {})
     }
     const doProcesso = this.versoes.versoes[pedido.processoId] ?? []
     if (doProcesso.some((v) => v.numero === pedido.numero)) return 'ja_existia'

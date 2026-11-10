@@ -4,6 +4,7 @@ import { contar } from '../../importacao/frasesDaImportacao'
 import type { ModuloDeImportacao } from '../../importacao/tipos'
 import { PreviaDaImportacao } from './PreviaDaImportacao'
 import { ResumoDaImportacao } from './ResumoDaImportacao'
+import { SecaoDosArquivos } from './SecaoDosArquivos'
 
 type AreaDaImportacaoProps = { importacao: ModuloDeImportacao }
 
@@ -47,8 +48,8 @@ export function AreaDaImportacao({ importacao }: AreaDaImportacaoProps) {
       </section>
       <section aria-labelledby="titulo-arquivos-das-versoes" className="importacao-etapa">
         <h3 id="titulo-arquivos-das-versoes" className="importacao-subtitulo">2. Arquivos das versões</h3>
-        <p>Ainda não disponível. Vem depois da planilha.</p>
-        <button type="button" className="botao" disabled>Escolher a pasta</button>
+        {/* Monta de novo ao fim da planilha: a seção, que só abre depois de uma importação, lê de novo se já houve uma. */}
+        <SecaoDosArquivos key={passos.fase.tipo === 'resumo' ? 'depois-da-planilha' : 'antes-da-planilha'} importacao={importacao} />
       </section>
     </section>
   )

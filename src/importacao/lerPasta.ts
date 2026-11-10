@@ -80,11 +80,14 @@ function montarVersao(grupo: Lido[], lida: PastaLida): void {
   const { letra } = bpms[0]
   const bpm = umDoPapel(grupo, 'bpm', letra, lida)
   if (!bpm) return
-  lida.versoes.push({
-    ...deFora(grupo, letra), tipo: TIPO_DA_LETRA[letra], bpm,
-    png: umDoPapel(grupo, 'png', letra, lida), relatorio: umDoPapel(grupo, 'relatorio', letra, lida),
-    pdfDoRelatorio: umDoPapel(grupo, 'pdf', letra, lida), letraCorrigida: grupo.some((lido) => lido.letra !== letra),
-  })
+  const arquivos = {
+    bpm, png: umDoPapel(grupo, 'png', letra, lida), relatorio: umDoPapel(grupo, 'relatorio', letra, lida),
+    pdfDoRelatorio: umDoPapel(grupo, 'pdf', letra, lida),
+  }
+  // Só conta o arquivo que entra: o duplicado que ficou de fora já tem o seu aviso.
+  const entram = Object.values(arquivos)
+  const letraCorrigida = grupo.some((lido) => lido.letra !== letra && entram.includes(lido.arquivo))
+  lida.versoes.push({ ...deFora(grupo, letra), tipo: TIPO_DA_LETRA[letra], ...arquivos, letraCorrigida })
 }
 
 function subpastasDosProcessos(lidos: Lido[]): PastaLida['subpastas'] {

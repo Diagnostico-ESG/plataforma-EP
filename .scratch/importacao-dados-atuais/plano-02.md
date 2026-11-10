@@ -263,9 +263,9 @@ export async function enviarPasta(importacao: ModuloDeImportacao, previa: Previa
 
   O número do relatório: por processo, `maiorRelatorio + 1`, somado a cada versão que não é histórica e leva relatório, na ordem crescente do número. A falha de uma versão vai para `falhas` com o rótulo e o motivo, e o envio segue (53); o `.pdf` do relatório vai por `importarAnexo` depois da versão; a linha da subpasta, por `anotarSubpasta`, uma vez por processo.
 
-- [ ] **Passo 1: testes pela tela, na Tarefa 7** (a spec põe o ponto de teste na tela). Nesta tarefa, só `npx tsc --noEmit -p .`.
-- [ ] **Passo 2: implementar.**
-- [ ] **Passo 3: commit junto com a Tarefa 7** (código sem teste não vai sozinho).
+- [x] **Passo 1: testes pela tela, na Tarefa 7** (a spec põe o ponto de teste na tela). Nesta tarefa, só `npx tsc --noEmit -p .`.
+- [x] **Passo 2: implementar.**
+- [x] **Passo 3: commit junto com a Tarefa 7** (código sem teste não vai sozinho).
 
 ### Tarefa 7: Seção "2. Arquivos das versões"
 
@@ -276,7 +276,7 @@ export async function enviarPasta(importacao: ModuloDeImportacao, previa: Previa
 
 Fases: escolher (a pasta e o .csv da planilha) → prévia → enviando (N de M arquivos) → resumo. A seção fica desabilitada, com uma linha dizendo por quê, enquanto `haImportado` é falso.
 
-- [ ] **Passo 1: testes que falham**, um `test` por comportamento:
+- [x] **Passo 1: testes que falham**, um `test` por comportamento:
   - Seção desabilitada sem processo importado; habilitada com.
   - A prévia por processo: versões que entram, relatório ligado, o que falta (sem `.bpm`) e o que sobra (sem processo, fora do padrão); nada enviado antes de confirmar (o falso sem gravação).
   - Confirmar: andamento "N de M"; o resumo com criadas, puladas, não entradas e avisos (letra corrigida, relatório duplicado, subpasta).
@@ -284,10 +284,10 @@ Fases: escolher (a pasta e o .csv da planilha) → prévia → enviando (N de M 
   - A falha de um arquivo aparece no resumo e as outras versões entram; a segunda rodada envia só a que faltou e pula as outras.
   - A versão importada aparece no painel do processo, com o nome padrão do arquivo (`VersoesFalso`).
   - Integrante e consulta não veem a aba (já coberto em `App.importacao.test.tsx`; conferir).
-- [ ] **Passo 2:** `npx vitest run src/App.importacaoDaPasta.test.tsx` → FAIL.
-- [ ] **Passo 3: implementar** (Tarefa 6 + esta).
-- [ ] **Passo 4:** a mesma linha passa; `npx eslint src` e `npm test` verdes.
-- [ ] **Passo 5: commit** (Tarefas 6 e 7).
+- [x] **Passo 2:** `npx vitest run src/App.importacaoDaPasta.test.tsx` → FAIL.
+- [x] **Passo 3: implementar** (Tarefa 6 + esta).
+- [x] **Passo 4:** a mesma linha passa; `npx eslint src` e `npm test` verdes.
+- [x] **Passo 5: commit** (Tarefas 6 e 7).
 
 ### Tarefa 8: Conferência na vitrine e registros
 

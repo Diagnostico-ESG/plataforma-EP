@@ -81,7 +81,8 @@ test('explica as duas etapas e deixa a segunda desligada', async () => {
   expect(screen.getByText(/em duas etapas, nesta ordem: a planilha, depois os arquivos das versões/)).toBeTruthy()
   expect(screen.getByRole('heading', { name: '1. Cadastros e etapas' })).toBeTruthy()
   expect(screen.getByRole('heading', { name: '2. Arquivos das versões' })).toBeTruthy()
-  expect((screen.getByRole('button', { name: 'Escolher a pasta' }) as HTMLButtonElement).disabled).toBe(true)
+  expect(await screen.findByText('Disponível depois da importação da planilha.')).toBeTruthy()
+  expect(screen.queryByLabelText('Pasta DOCUMENTOS MAPEAMENTO')).toBeNull()
 })
 
 test('a prévia mostra as contagens, a etapa de cada processo, o que já existe e os avisos, sem gravar nada', async () => {
@@ -135,6 +136,8 @@ test('confirmar grava só o que é novo, na ordem da planilha, e mostra o resumo
     ['Exemplo Gama', 'concluidos', '2026-10-16', null],
     ['Exemplo Delta', 'concluidos', '2026-11-06', null],
   ])
+  // Com a planilha importada, a segunda etapa abre (ticket 02).
+  expect(await screen.findByLabelText('Pasta DOCUMENTOS MAPEAMENTO')).toBeTruthy()
 })
 
 test('com tudo já existente, [Confirmar importação] fica desligado e a tela diz por quê', async () => {
