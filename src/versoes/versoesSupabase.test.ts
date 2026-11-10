@@ -229,7 +229,7 @@ test('se o relatório não chega ao Drive, nada é registrado', async () => {
 test.each([
   ['numero_do_relatorio_mudou', '4', 'Outra pessoa enviou um relatório enquanto você enviava; este seria o Relatório V4. Envie de novo.'],
   ['relatorio_sem_versao', '', 'Não há versão para receber o relatório: envie a versão piloto ou uma versão primeiro.'],
-  ['relatorio_fora_da_etapa', '', 'O relatório só pode ser enviado até a Revisão interna.'],
+  ['relatorio_fora_da_etapa', '', 'O relatório só pode ser enviado até a Revisão do relatório.'],
 ])('a recusa %s do banco no relatório vira a frase da tela', async (codigo, valor, frase) => {
   const cliente = new ClienteSupabaseFalso()
   comSessoes(cliente)

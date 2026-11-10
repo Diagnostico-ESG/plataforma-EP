@@ -168,33 +168,36 @@ describe('falhas simuladas', () => {
   })
 })
 
-describe('as seis etapas com campos próprios não se desativam nem se excluem', () => {
-  const REVISAO: EtapaNoCatalogo = { id: 'e6', codigo: 'revisao_interna', nome: 'Revisão interna', ordem: 4, fase: 'VI', ativa: true }
+describe('as sete etapas com campos próprios não se desativam nem se excluem', () => {
+  const REVISAO: EtapaNoCatalogo = { id: 'e6', codigo: 'revisao_interna', nome: 'Revisão do fluxograma', ordem: 4, fase: 'VI', ativa: true }
+  const DO_RELATORIO: EtapaNoCatalogo = { id: 'e7', codigo: 'revisao_relatorio', nome: 'Revisão do relatório', ordem: 5, fase: 'VI', ativa: true }
 
   function comProtegida(): ProcessosFalso {
     const falso = montar()
-    falso.catalogo.etapas = [NAO_INICIADOS, MODELAGEM, REVISAO, CONCLUIDOS]
+    falso.catalogo.etapas = [NAO_INICIADOS, MODELAGEM, REVISAO, DO_RELATORIO, CONCLUIDOS]
     falso.processos = []
     return falso
   }
 
   test.each([
-    ['desativar a Revisão interna', (f: ProcessosFalso) => f.catalogo.desativarEtapa('e6')],
-    ['excluir a Revisão interna', (f: ProcessosFalso) => f.catalogo.excluirEtapa('e6')],
+    ['desativar a Revisão do fluxograma', (f: ProcessosFalso) => f.catalogo.desativarEtapa('e6')],
+    ['excluir a Revisão do fluxograma', (f: ProcessosFalso) => f.catalogo.excluirEtapa('e6')],
+    ['desativar a Revisão do relatório', (f: ProcessosFalso) => f.catalogo.desativarEtapa('e7')],
+    ['excluir a Revisão do relatório', (f: ProcessosFalso) => f.catalogo.excluirEtapa('e7')],
     ['desativar a Modelagem piloto', (f: ProcessosFalso) => f.catalogo.desativarEtapa('e2')],
   ])('%s é recusado e o catálogo não muda', async (_caso, tentar) => {
     const falso = comProtegida()
     const falha = await falhaDe(tentar(falso))
     expect(falha).toBeInstanceOf(TravaDoBanco)
     expect(falha.message).toMatch(/^A etapa .* tem campos próprios e não pode ser desativada nem excluída\.$/)
-    expect((await falso.catalogo.listarCatalogo()).filter((etapa) => etapa.ativa)).toHaveLength(4)
+    expect((await falso.catalogo.listarCatalogo()).filter((etapa) => etapa.ativa)).toHaveLength(5)
   })
 
   test('renomear e mover continuam aceitos', async () => {
     const falso = comProtegida()
-    await falso.catalogo.editarEtapa('e6', { nome: 'Revisão interna (EP)', fase: 'VI' })
-    await falso.catalogo.moverEtapa('e6', 'subir')
-    expect(codigos(await falso.catalogo.listarCatalogo())).toEqual(['nao_iniciados', 'revisao_interna', 'modelagem', 'concluidos'])
+    await falso.catalogo.editarEtapa('e7', { nome: 'Revisão do relatório (EP)', fase: 'VI' })
+    await falso.catalogo.moverEtapa('e7', 'subir')
+    expect(codigos(await falso.catalogo.listarCatalogo())).toEqual(['nao_iniciados', 'modelagem', 'revisao_relatorio', 'revisao_interna', 'concluidos'])
   })
 })
 
