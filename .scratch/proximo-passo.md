@@ -1,13 +1,15 @@
 # Próximo passo (2026-11-11)
 
 **Feito:**
-- As duas revisões estão publicadas na produção: o banco (runs 43041622577 e 43041839624) e o site (build `2224eee`, marco `marco/2026-11-11-publicacao`).
-- A carga real foi feita pelo usuário na produção (a planilha e a pasta), registrada em `supabase/AMBIENTES.md`. O backup e o teste de restauração ficaram adiados por decisão do usuário e estão no backlog.
+- Duas revisões publicadas na produção (banco e site, marco `marco/2026-11-11-publicacao`).
+- Carga real feita pelo usuário na produção (planilha e pasta). Backup e teste de restauração adiados por decisão do usuário (backlog).
 
-**Demanda confirmada pelo `/demanda` (2026-11-11), como mudança em funcionalidade existente (documentos-versoes):** o relatório passa a ser numerado com R em vez de V ("Relatório R2 (da V1P)") e ganha o relatório piloto (R1P). Regra nova e migração, então vai pelo `/planejar` no modo completo. Pontos para a sabatina:
-- A palavra "Revisão" já nomeia a conferência (Revisão do fluxograma, Revisão do relatório, registro da revisão). A recomendação é manter o nome "Relatório R2" na tela.
-- O R1P: em que etapa se envia (hoje não há relatório na Modelagem piloto), número digitado ou dado pela plataforma, se depois dele vem R1 ou R2, e se pode haver mais de um.
-- Produção com dado real importado: o rótulo dos relatórios atuais, o nome dos arquivos já no Drive ("Relatório V2") e os relatórios das versões piloto importadas.
+**Demanda confirmada pelo `/demanda` (2026-11-11):** o relatório passa a ser numerado com R em vez de V ("Relatório R2 (da V1P)"), **só a troca da letra**, sem relatório piloto (o R1P foi descartado pelo usuário). Tipo: mudança em funcionalidade existente (documentos-versoes, regra do ADR 0026), no modo completo do `/planejar`, porque a letra também está no banco (a função `private.rotulo_do_relatorio`, que monta o texto do histórico) e na Edge Function `arquivos-no-drive` (nome do arquivo no Drive, `_Relatório V3`, e a conferência desse nome no registro). Pede uma migração e uma nova publicação da função, as duas também na produção.
+
+Decisões para a sabatina:
+- Os arquivos que já estão no Drive com "Relatório V2" no nome (inclusive os da carga real): renomear para R ou só os novos saem com R.
+- O histórico já gravado guarda "Relatório V2" como texto e não se altera: confirmar que fica assim.
+- Lugares da tela com a letra: verso, lista de versões, Agora, ação principal da Revisão do relatório, frases e opções da revisão, histórico.
 
 **Para começar a sessão nova (Opus), digite, na ordem:**
 
@@ -16,7 +18,7 @@
 ```
 
 ```
-/planejar documentos-versoes: o relatório passa a ser numerado por R em vez de V ("Relatório R2 (da V1P)"), com relatório piloto (R1P); decidir onde e como o R1P é enviado e numerado, se a palavra exibida é "Relatório R2" ou "Revisão 2", e o que acontece com os relatórios e nomes de arquivo já importados na produção
+/planejar documentos-versoes: o relatório passa a ser numerado com R em vez de V ("Relatório R2 (da V1P)"), só a troca da letra, sem relatório piloto; a letra está também no banco (private.rotulo_do_relatorio) e na Edge Function arquivos-no-drive (nome no Drive); decidir o que acontece com os arquivos já no Drive com "Relatório V" no nome e com o histórico já gravado
 ```
 
-Depois de entregue pelo `/ship`, ainda falta a publicação na produção: o banco e o site.
+**Pendente do usuário:** primeiro backup da produção (criar `BACKUP_SENHA_PRODUCAO`) e teste de restauração; visibilidade do site como Público na Netlify.
