@@ -275,3 +275,15 @@ Alvo: `src/components/anexos/` (seção "Outros anexos", formulário, lista e co
 - **Revisão de segurança (de reserva, menos completa):** o `/security-review` compara com a `main` e a correção já está nela, então não há diff para ele. Lido o diff com foco no que o limite protege: a conferência continua exigindo que a cadeia de pastas chegue à raiz do ambiente (segredo da função); só se aceita um nível a mais de profundidade, e continua recusando arquivo fora da raiz, em outro Drive, em ciclo ou mais fundo que o limite. Sem achados.
 - **Verificado:** `npm test`, `test:coverage` (3381 testes, 99,19% de linhas), `typecheck`, `build`, `check:circular`; "Testes de banco" (GitHub Actions) verde no push da correção. A função foi publicada no desenvolvimento (commit c267fe3).
 - **Presumido:** o anexo funcionando no Drive real (C3 e C4 do roteiro de prova adiados por decisão do usuário). O "Verificação" do GitHub Actions falhou nos três pushes seguintes por testes de tela instáveis sem relação com a mudança (`App.substituirArquivo` e `App.relatorioDepois`); o `npm test` local passa inteiro.
+
+## 2026-11-13 — /polir do relatório numerado com R (ADR 0047)
+
+Escopo: os rótulos "Relatório R2" no verso e a seção "3. Relatórios com R" da aba Importação. O projeto não tem vitrine. As telas foram vistas numa vitrine local temporária (o app com os módulos falsos dos testes e dados inventados, servida pelo `npm run dev`, apagada no fim), no Chrome do painel, a 1366×768 e a 375×812.
+
+- **Auditoria do Impeccable:** nota 19/20 (Excelente). Detector sem apontamentos em `SecaoDosRelatoriosComR.tsx` e `AreaDaImportacao.tsx`.
+- **Critério 14 `[visual]`, conferido na vitrine:** a seção 3 segue o desenho das seções 1 e 2 (subtítulo, frase, botão principal azul; "Renomeando…" no cinza do "Gravando…"; falha na faixa de alerta de sempre). Não passa da altura do notebook (1366×768) com a contagem e os fora do padrão, nem no fim com falhas ("137 relatórios renomeados." e "3 não foram renomeados…"). A 375 px, sem rolagem lateral. Contraste da frase de falha: cerca de 8:1.
+- **Rótulos:** o destaque da V8 mostra "Relatório R2 (da V7)" na linha dos arquivos, sem quebrar.
+- **Corrigido (só marcação):** no fim com falhas, a frase das falhas tinha `role="alert"` dentro do bloco `role="status"`; o leitor de tela podia lê-la duas vezes. Ficou só o `status` do bloco.
+- **Deixado de fora (backlog):** ao clicar [Renomear para R] ou [Tentar de novo], o botão some e o foco do teclado volta ao início da página. As seções 1 e 2 da aba fazem o mesmo, e corrigir muda o comportamento, então a decisão é do usuário.
+- **Deixado de fora (sem mudança):** a abertura da aba diz "em duas etapas", e agora há três seções. A seção 3 não é etapa da importação, e a frase continua certa.
+- **Presumido:** a seção no app real, com o login do Administrador e os dados do desenvolvimento; o Agora da Revisão do relatório ("A revisar: Relatório R2"), que o falso de processos da vitrine não calcula (coberto pelos testes de tela).

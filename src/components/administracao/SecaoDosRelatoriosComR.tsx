@@ -29,13 +29,14 @@ function Pronto({ relatorios, aoRenomear }: { relatorios: RelatoriosComV; aoReno
   )
 }
 
+// O bloco inteiro é a região que o leitor de tela anuncia: a frase das falhas fica sem role="alert" próprio, para não ser lida duas vezes.
 function Fim({ renomeados, falhas, aoContinuar }: { renomeados: number; falhas: number; aoContinuar: () => void }) {
   return (
     <div role="status">
       <p>{fraseDoFim(renomeados)}</p>
       {falhas > 0 && (
         <>
-          <p className="administracao-falha" role="alert">{fraseDasFalhas(falhas)}</p>
+          <p className="administracao-falha">{fraseDasFalhas(falhas)}</p>
           <TentarDeNovo aoTentar={aoContinuar} />
         </>
       )}
