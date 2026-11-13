@@ -1265,6 +1265,10 @@ export type Database = {
         Args: { p_arquivos: Json; p_numero: number; p_processo: string }
         Returns: string
       }
+      renomear_relatorio_para_r: {
+        Args: { p_arquivo: string; p_nome_esperado: string }
+        Returns: string
+      }
       retomar_processo: {
         Args: { p_motivo: string; p_processo: string }
         Returns: undefined

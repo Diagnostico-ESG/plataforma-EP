@@ -36,8 +36,8 @@ Nada novo: a seção 3 usa só parágrafos e botões, sem `dialog` nem `popover`
 - Recusas: `42501` (quem não é Administrador ativo); `relatorio_fora_do_padrao:<nome>` (não é relatório numerado, ou o nome não termina em `_Relatório V<número dele>.<extensão>`); `nome_do_relatorio_alterado:<nome atual>` (o nome guardado não é o esperado).
 - Evento: `acao = 'renomear_relatorio'`, `entidade = 'versao'`, `entidade_ref = processo_id`, `detalhes = {antes: {nome}, depois: {nome}}`.
 
-- [ ] **1.1** Antes da migração: `grep -rn "Relatório V\|rotulo_do_relatorio" supabase/tests/` para achar o que muda (esperado: só o 77).
-- [ ] **1.2** Escrever o 78, um caso por regra e por célula da tabela "quem pode o quê" da spec:
+- [x] **1.1** Antes da migração: `grep -rn "Relatório V\|rotulo_do_relatorio" supabase/tests/` para achar o que muda (esperado: só o 77).
+- [x] **1.2** Escrever o 78, um caso por regra e por célula da tabela "quem pode o quê" da spec:
   - Administrador renomeia `T78_V2_Processo_Relatório V1.docx`: devolve `T78_V2_Processo_Relatório R1.docx`, o nome guardado muda, `numero_do_relatorio` fica 1;
   - um evento `renomear_relatorio` com o nome antigo e o novo; nenhum evento `substituir`;
   - Integrante, Consulta e Administrador desativado: recusados com 42501; visitante sem login (`anon`): sem permissão para executar;
@@ -48,13 +48,15 @@ Nada novo: a seção 3 usa só parágrafos e botões, sem `dialog` nem `popover`
   - versão aprovada: renomeia;
   - `update` direto do nome continua recusado (42501);
   - `private.rotulo_do_relatorio` devolve "Relatório R1" (evento de revisão gravado depois da migração).
-- [ ] **1.3** Contar as asserções (`grep -c "^insert into _tap"` ou as linhas de `select ok/is/throws`) e acertar o `plan(n)`.
-- [ ] **1.4** Rodar no Docker local e ver o 78 falhar, pela falta da função.
-- [ ] **1.5** Criar a migração: `private.rotulo_do_relatorio` recriada com `'Relatório R' || numero_do_relatorio`; `private.registrar_renomeacao_do_relatorio(p_arquivo uuid, p_antes text, p_depois text)` (`security definer`, grava o evento); `public.renomear_relatorio_para_r`. Ordem dentro da função: conferir o perfil (`private.administrador_ativo()`); ler o arquivo; se o nome já termina em `_Relatório R<n>.<ext>`, devolvê-lo; conferir o nome esperado; conferir o padrão (papel `relatorio`, número presente, `nome ~ ('_Relatório V' || n || '\.[^.]+$')`); `set_config('ep.renumerando', 'on', true)`, `update` com `regexp_replace`, `set_config(... 'off' ...)`; registrar o evento; devolver o nome novo. Revokes e grants. Comentário no topo: não destrutiva.
-- [ ] **1.6** Ajustar o 77 (o evento de revisão passa a "Relatório R…").
-- [ ] **1.7** `npx supabase db reset` local e `npx supabase test db`: 0 `not ok` em todos os arquivos.
-- [ ] **1.8** `npx supabase gen types --local` para `src/types/database.ts`; `npm run typecheck`.
-- [ ] **1.9** Commit: migração, 77, 78 e tipos.
+- [x] **1.3** Contar as asserções (`grep -c "^insert into _tap"` ou as linhas de `select ok/is/throws`) e acertar o `plan(n)`.
+- [x] **1.4** Rodar no Docker local e ver o 78 falhar, pela falta da função.
+- [x] **1.5** Criar a migração: `private.rotulo_do_relatorio` recriada com `'Relatório R' || numero_do_relatorio`; `private.registrar_renomeacao_do_relatorio(p_arquivo uuid, p_antes text, p_depois text)` (`security definer`, grava o evento); `public.renomear_relatorio_para_r`. Ordem dentro da função: conferir o perfil (`private.administrador_ativo()`); ler o arquivo; se o nome já termina em `_Relatório R<n>.<ext>`, devolvê-lo; conferir o nome esperado; conferir o padrão (papel `relatorio`, número presente, `nome ~ ('_Relatório V' || n || '\.[^.]+$')`); `set_config('ep.renumerando', 'on', true)`, `update` com `regexp_replace`, `set_config(... 'off' ...)`; registrar o evento; devolver o nome novo. Revokes e grants. Comentário no topo: não destrutiva.
+- [x] **1.6** Ajustar o 77 (o evento de revisão passa a "Relatório R…").
+- [x] **1.7** `npx supabase db reset` local e `npx supabase test db`: 0 `not ok` em todos os arquivos.
+- [x] **1.8** `npx supabase gen types --local` para `src/types/database.ts`; `npm run typecheck`.
+- [x] **1.9** Commit: migração, 77, 78 e tipos.
+
+Registro da Tarefa 1: sem Docker nesta máquina, o ciclo foi o do GitHub. O 78 falhou antes ("Testes de banco" 43462181999: a função não existe). Com a migração em ensaio, 65 de 65 arquivos (43462668721; 78: 21 ok; 77: 32 ok). A migração foi aplicada pelo "Migrar banco de desenvolvimento" (43463194248), e os tipos vieram do remoto (`db:types`). O caso da versão aprovada saiu do 78: a marca da função já libera a trava dela, e o caso pedia montar uma aprovação inteira.
 
 ### Tarefa 2: Função do servidor — decisão pura e nome padrão com R
 
