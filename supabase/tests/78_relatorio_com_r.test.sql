@@ -25,8 +25,8 @@ update public.usuarios set ativo = false where id = '00000000-0000-0000-0000-000
 
 insert into public.setores (id, sigla, nome) values ('5f000000-0000-0000-0000-000000000078', 'T78', 'Setor Relatorio R');
 insert into public.macroprocessos (id, codigo, nome) values ('af000000-0000-0000-0000-000000000078', null, 'Macro Relatorio R');
-insert into public.processos (setor_id, macroprocesso_id, nome)
-select '5f000000-0000-0000-0000-000000000078', 'af000000-0000-0000-0000-000000000078', nome
+insert into public.processos (setor_id, macroprocesso_id, nome, tipo)
+select '5f000000-0000-0000-0000-000000000078', 'af000000-0000-0000-0000-000000000078', nome, 'processo'
 from unnest(array['Emitir Oficio', 'Cancelado', 'Concluido']) as nome;
 insert into public.processos (setor_id, macroprocesso_id, nome, tipo, processo_pai_id)
 select '5f000000-0000-0000-0000-000000000078', 'af000000-0000-0000-0000-000000000078', 'Filho', 'subprocesso', id
