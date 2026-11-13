@@ -122,11 +122,11 @@ Registro da Tarefa 3: sem Deno nesta máquina, a função passou só pelo ESLint
 - Alterar: `src/components/administracao/AreaDaImportacao.tsx` (a seção 3 depois da 2)
 - Criar: `src/App.relatoriosComR.test.tsx` (a tela inteira, com o `ImportacaoFalso`)
 
-- [ ] **5.1** Vermelho, pela tela inteira: "Procurando relatórios com V no nome…"; a contagem e o [Renomear para R]; a linha dos fora do padrão; "Renomeando… N de M."; o fim sem falhas; o fim com falhas e o [Tentar de novo], que continua só os que faltam; "Todos os relatórios numerados já estão com R."; o erro na leitura com [Tentar de novo]; a seção ausente para o Integrante (a aba não aparece). Funções puras: as frases, a leitura do Supabase com um cliente falso nomeado.
-- [ ] **5.2** Rodar e ver falhar.
-- [ ] **5.3** Verde: tipos, falso, leitura do Supabase, frases, gancho, componente, lugar na aba.
-- [ ] **5.4** `npm test`, `npm run typecheck`, `npx eslint src`, `npm run check:circular`: verdes.
-- [ ] **5.5** Commit.
+- [x] **5.1** Vermelho, pela tela inteira: "Procurando relatórios com V no nome…"; a contagem e o [Renomear para R]; a linha dos fora do padrão; "Renomeando… N de M."; o fim sem falhas; o fim com falhas e o [Tentar de novo], que continua só os que faltam; "Todos os relatórios numerados já estão com R."; o erro na leitura com [Tentar de novo]; a seção ausente para o Integrante (a aba não aparece). Funções puras: as frases, a leitura do Supabase com um cliente falso nomeado.
+- [x] **5.2** Rodar e ver falhar.
+- [x] **5.3** Verde: tipos, falso, leitura do Supabase, frases, gancho, componente, lugar na aba.
+- [x] **5.4** `npm test`, `npm run typecheck`, `npx eslint src`, `npm run check:circular`: verdes.
+- [x] **5.5** Commit.
 
 ### Tarefa 6: Manual, conferência no desenvolvimento e fechamento
 

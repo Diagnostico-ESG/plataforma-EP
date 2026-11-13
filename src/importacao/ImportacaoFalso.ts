@@ -6,7 +6,7 @@ import { VersoesFalso } from '../versoes/VersoesFalso'
 import { chaveDoProcesso } from './chaves'
 import type {
   ExistentesNaPlataforma, ModuloDeImportacao, PedidoDeImportacaoDeVersao, ProcessoDaPasta, ProcessoParaImportar, ProcessosParaAPasta,
-  ResultadoDaGravacao, ResultadoDaVersao,
+  RelatorioComV, RelatoriosComV, ResultadoDaGravacao, ResultadoDaVersao,
 } from './tipos'
 
 /**
@@ -30,6 +30,17 @@ export class ImportacaoFalso implements ModuloDeImportacao {
   falharNoArquivo: string | null = null
   /** O nome do arquivo depois do qual o envio fica parado (para ver o andamento na tela). */
   segurarDepoisDe: string | null = null
+  /** Os relatórios com V no nome (ADR 0047); o renomeado sai da lista e entra em `renomeados`. */
+  relatoriosComV: RelatorioComV[] = []
+  relatoriosForaDoPadrao = 0
+  falharAoListarRelatorios = false
+  /** A leitura dos relatórios fica parada (para ver "Procurando…" na tela). */
+  segurarALeituraDosRelatorios = false
+  /** Os ids cuja renomeação falha. */
+  falharAoRenomear: string[] = []
+  /** O id cuja renomeação fica parada (para ver o andamento na tela: os anteriores já contam). */
+  segurarNoRelatorio: string | null = null
+  renomeados: string[] = []
   anexosImportados: { processoId: string; nome: string }[] = []
   subpastasAnotadas: { processoId: string; subpasta: string }[] = []
   readonly versoes: VersoesFalso
@@ -96,6 +107,19 @@ export class ImportacaoFalso implements ModuloDeImportacao {
   async anotarSubpasta(processoId: string, subpasta: string): Promise<void> {
     if (this.subpastasAnotadas.some((s) => s.processoId === processoId && s.subpasta === subpasta)) return
     this.subpastasAnotadas.push({ processoId, subpasta })
+  }
+
+  async listarRelatoriosComV(): Promise<RelatoriosComV> {
+    if (this.segurarALeituraDosRelatorios) await new Promise<never>(() => {})
+    if (this.falharAoListarRelatorios) throw new Error('falha de teste ao ler os relatórios')
+    return { aRenomear: [...this.relatoriosComV], foraDoPadrao: this.relatoriosForaDoPadrao }
+  }
+
+  async renomearRelatorio(relatorio: RelatorioComV): Promise<void> {
+    if (relatorio.arquivoId === this.segurarNoRelatorio) await new Promise<never>(() => {})
+    if (this.falharAoRenomear.includes(relatorio.arquivoId)) throw new Error(`falha de teste ao renomear ${relatorio.arquivoId}`)
+    this.relatoriosComV = this.relatoriosComV.filter((r) => r.arquivoId !== relatorio.arquivoId)
+    this.renomeados.push(relatorio.arquivoId)
   }
 
   private processoDoFalso(processoId: string): ProcessoDoFalso {

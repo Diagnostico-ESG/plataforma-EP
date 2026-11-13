@@ -41,6 +41,11 @@ export type PedidoDeImportacaoDeVersao = {
 }
 export type ResultadoDaVersao = 'criada' | 'ja_existia'
 
+/** Um relatório numerado ainda com V no nome (ADR 0047), como a seção "3. Relatórios com R" o renomeia. */
+export type RelatorioComV = { arquivoId: string; nome: string }
+/** Os relatórios a renomear e quantos relatórios numerados têm nome fora do padrão (estes ficam como estão). */
+export type RelatoriosComV = { aRenomear: RelatorioComV[]; foraDoPadrao: number }
+
 /**
  * Único ponto por onde a interface fala com o banco na importação. Recusa do banco chega como TravaDoBanco, com a frase
  * pronta; outra falha, como Error cuja mensagem é o motivo.
@@ -61,4 +66,8 @@ export type ModuloDeImportacao = {
   importarAnexo(processoId: string, arquivo: File): Promise<ResultadoDaGravacao>
   /** A linha da subpasta de onde vieram os arquivos, no fim das Anotações; não se repete (história 48b). */
   anotarSubpasta(processoId: string, subpasta: string): Promise<void>
+  /** Os relatórios numerados com V no nome e quantos fogem do padrão (ADR 0047); a renomeação confere de novo no banco. */
+  listarRelatoriosComV(): Promise<RelatoriosComV>
+  /** Um relatório por vez ganha o R, no Drive e na plataforma; o que já está com R não muda. */
+  renomearRelatorio(relatorio: RelatorioComV): Promise<void>
 }

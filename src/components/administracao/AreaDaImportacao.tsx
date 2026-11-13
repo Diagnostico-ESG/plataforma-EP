@@ -5,6 +5,7 @@ import type { ModuloDeImportacao } from '../../importacao/tipos'
 import { PreviaDaImportacao } from './PreviaDaImportacao'
 import { ResumoDaImportacao } from './ResumoDaImportacao'
 import { SecaoDosArquivos } from './SecaoDosArquivos'
+import { SecaoDosRelatoriosComR } from './SecaoDosRelatoriosComR'
 
 type AreaDaImportacaoProps = { importacao: ModuloDeImportacao }
 
@@ -54,6 +55,10 @@ export function AreaDaImportacao({ importacao }: AreaDaImportacaoProps) {
         <h3 id="titulo-arquivos-das-versoes" className="importacao-subtitulo">2. Arquivos das versões</h3>
         {/* Monta de novo ao fim da planilha: a seção, que só abre depois de uma importação, lê de novo se já houve uma. */}
         <SecaoDosArquivos key={passos.fase.tipo === 'resumo' ? 'depois-da-planilha' : 'antes-da-planilha'} importacao={importacao} />
+      </section>
+      <section aria-labelledby="titulo-relatorios-com-r" className="importacao-etapa">
+        <h3 id="titulo-relatorios-com-r" className="importacao-subtitulo">3. Relatórios com R</h3>
+        <SecaoDosRelatoriosComR importacao={importacao} />
       </section>
     </section>
   )
