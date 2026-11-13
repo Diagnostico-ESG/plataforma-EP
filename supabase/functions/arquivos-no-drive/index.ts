@@ -13,6 +13,7 @@ import { cabecalhosDeOrigem } from '../_shared/drive.ts'
 import { validarConferir } from '../_shared/conferencia.ts'
 import { lerImportacaoDoPedido } from '../_shared/importacaoDeArquivos.ts'
 import { validarRegistro } from '../_shared/registroAnexo.ts'
+import { validarRenomearRelatorio } from '../_shared/relatorioComR.ts'
 import { validarRenumerar } from '../_shared/renumerar.ts'
 import { baixar, iniciarEnvio } from './acoes.ts'
 import { iniciarEnvioDoAnexo, registrarAnexo } from './anexos.ts'
@@ -21,6 +22,7 @@ import { conferir } from './conferir.ts'
 import { lerConfiguracao, type Configuracao } from './configuracao.ts'
 import { ErroDoDrive, obterToken } from './google.ts'
 import { registrar } from './registrar.ts'
+import { renomearRelatorio } from './renomeacaoDoRelatorio.ts'
 import { renumerarVersao } from './renumeracao.ts'
 import { retirarAnexo } from './retirada.ts'
 import { comCabecalhos, responderErroInterno, responderJson, responderRecusa } from './respostas.ts'
@@ -56,6 +58,13 @@ async function executarRenumerar(corpo: unknown, chamador: ContextoDoChamador, c
   return await renumerarVersao({ cliente: chamador.cliente, token: await obterToken(config), config }, entrada.valor)
 }
 
+// Relatórios com R (ADR 0047): um relatório por chamada ganha o R no Drive e então no banco.
+async function executarRenomearRelatorio(corpo: unknown, chamador: ContextoDoChamador, config: Configuracao): Promise<Response> {
+  const entrada = validarRenomearRelatorio(corpo)
+  if (!entrada.ok) return responderRecusa(entrada.recusa)
+  return await renomearRelatorio({ cliente: chamador.cliente, token: await obterToken(config), config }, entrada.valor)
+}
+
 // O papel anexo tem entrada própria (sem número nem versão); o resto segue a regra de sempre. Com a marca da importação
 // (importação dos dados atuais, ticket 02), a gravação é a do banco para a importação.
 async function executarRegistrar(corpo: unknown, chamador: ContextoDoChamador, config: Configuracao, importacao: boolean): Promise<Response> {
@@ -84,6 +93,7 @@ async function executar(
   if (acao === 'baixar') return await executarBaixar(corpo, chamador, config)
   if (acao === 'retirar') return await executarRetirar(corpo, chamador, config)
   if (acao === 'renumerar') return await executarRenumerar(corpo, chamador, config)
+  if (acao === 'renomear_relatorio') return await executarRenomearRelatorio(corpo, chamador, config)
   return await executarIniciarEnvio(corpo, chamador, config, origem, importacao)
 }
 
@@ -94,7 +104,7 @@ async function atender(req: Request, config: Configuracao): Promise<Response> {
   if (!chamador) return responderRecusa(recusar('sem_login'))
   const corpo = await lerCorpo(req)
   const acao = lerAcao(corpo)
-  if (!acao) return responderRecusa(recusar('entrada_invalida', 'campo acao: esperado iniciar_envio, baixar, registrar, conferir, retirar ou renumerar'))
+  if (!acao) return responderRecusa(recusar('entrada_invalida', 'campo acao: esperado iniciar_envio, baixar, registrar, conferir, retirar, renumerar ou renomear_relatorio'))
   const recusa = conferirChamador(chamador.chamador, acao)
   if (recusa) return responderRecusa(recusa)
   const importacao = lerImportacaoDoPedido(corpo, chamador.chamador, acao)

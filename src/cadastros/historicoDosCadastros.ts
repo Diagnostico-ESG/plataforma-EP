@@ -1,3 +1,4 @@
+import { rotuloDoRelatorio } from '../versoes/rotuloDoRelatorio'
 import { formatarData } from '../lib/datas'
 import { oQueFaltouNoHistorico } from '../processos/frasesDaConfirmacaoDeArquivos'
 import { ROTULO_DA_ETIQUETA, ROTULO_DA_SITUACAO, ROTULO_DO_TIPO } from '../processos/rotulos'
@@ -128,6 +129,13 @@ function textoDaEdicaoDoNumero(evento: EventoDoCadastro): string | null {
   return typeof antes === 'string' && typeof depois === 'string' ? `Alterou o número da ${antes} para ${depois}` : null
 }
 
+// "Renomeou o arquivo …_Relatório V2.docx para …_Relatório R2.docx" (ADR 0047): os nomes de antes e de depois, guardados no evento.
+function textoDaRenomeacao(evento: EventoDoCadastro): string | null {
+  const antes = registro(evento.antes).nome
+  const depois = registro(evento.depois).nome
+  return typeof antes === 'string' && typeof depois === 'string' ? `Renomeou o arquivo ${antes} para ${depois}` : null
+}
+
 function textoDaVersao(evento: EventoDoCadastro): string | null {
   if (evento.entidade !== 'versao') return null
   if (evento.acao === 'acrescentar_arquivo') {
@@ -135,9 +143,10 @@ function textoDaVersao(evento: EventoDoCadastro): string | null {
     if (typeof papel === 'string' && papel !== '') return `Acrescentou o .${papel} à versão`
   }
   if (evento.acao === 'alterar_numero') return textoDaEdicaoDoNumero(evento)
+  if (evento.acao === 'renomear_relatorio') return textoDaRenomeacao(evento)
   if (evento.acao === 'enviar_relatorio') {
     const { numero_do_relatorio: numero, rotulo } = registro(evento.depois)
-    if (typeof numero === 'number' && typeof rotulo === 'string') return `Enviou o Relatório V${numero} (acompanha a ${rotulo})`
+    if (typeof numero === 'number' && typeof rotulo === 'string') return `Enviou o ${rotuloDoRelatorio(numero)} (acompanha a ${rotulo})`
   }
   return null
 }

@@ -36,7 +36,7 @@ describe('conferirAlvoDoEnvio', () => {
   })
 
   it('o relatório numerado (.docx) se substitui por outro .docx; o ligado à versão aprovada, não', () => {
-    const numerado = { ...alvo, formato: 'docx', nome: 'TSA_V3_Emitir Ofício_Relatório V2.docx' }
+    const numerado = { ...alvo, formato: 'docx', nome: 'TSA_V3_Emitir Ofício_Relatório R2.docx' }
     const novo = { ...pedidoDeEnvio, nomeOriginal: 'relatório revisado.docx' }
     expect(codigo(conferirAlvoDoEnvio(numerado, novo))).toBeNull()
     expect(codigo(conferirAlvoDoEnvio(numerado, pedidoDeEnvio))).toBe('tipo_de_arquivo_diferente')

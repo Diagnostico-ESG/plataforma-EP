@@ -11,7 +11,7 @@ export type ArquivoDaVersao = {
   nome: string
   formato: string
   tamanho: number
-  /** Só no relatório novo de versão que não é histórica (Relatório V3): o número próprio dele no processo (ADR 0026). */
+  /** Só no relatório novo de versão que não é histórica (Relatório R3): o número próprio dele no processo (ADR 0026). */
   numeroDoRelatorio?: number
 }
 

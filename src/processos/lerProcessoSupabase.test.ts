@@ -205,7 +205,7 @@ test('falha ao ler a versão mais recente vira erro com o motivo do banco', asyn
   await expect(criar(cliente).lerProcesso('p1')).rejects.toThrow('Falha ao ler a versão mais recente do processo: sem conexão')
 })
 
-// O relatório numerado mais recente (Relatório V2) e o número do anterior: o aviso do revisor do relatório e as frases da
+// O relatório numerado mais recente (Relatório R2) e o número do anterior: o aviso do revisor do relatório e as frases da
 // revisão. Os sem número (o .pdf antigo e o da histórica) ficam de fora; enviado desde a entrada na passagem aberta conta
 // como "nesta passagem".
 const relatorio = (numero: number | null, enviadoEm: string, autor = 'u2') => ({

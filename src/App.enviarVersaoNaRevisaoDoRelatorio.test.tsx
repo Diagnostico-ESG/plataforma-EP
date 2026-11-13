@@ -13,7 +13,7 @@ afterEach(() => {
 })
 
 // Na Revisão do relatório (ADR 0046) o [Enviar versão] pede o relatório; o .bpm é opcional e o .png só vai com o .bpm. O
-// processo p1 tem a V1 e a V2, esta com o Relatório V1.
+// processo p1 tem a V1 e a V2, esta com o Relatório R1.
 const noProcesso = (codigoDaEtapa: string) => ({
   ajustarProcessos: naEtapa(codigoDaEtapa),
   ajustarVersoes: (falso: VersoesFalso) => {
@@ -55,11 +55,11 @@ test('o formulário diz que o relatório é obrigatório e o .bpm e o .png opcio
   expect(botaoEnviar(form).disabled).toBe(true)
 })
 
-test('só com o relatório nasce o Relatório V2 na versão mais recente, sem versão nova', async () => {
+test('só com o relatório nasce o Relatório R2 na versão mais recente, sem versão nova', async () => {
   const { versoes } = montarNosCadastros(noProcesso('revisao_relatorio'))
   const { secao, form } = await abrirFormulario()
   escolher(form, RELATORIO, RELATORIO_VALIDO)
-  expect(await form.findByText('Relatório V2, acompanha a V2')).toBeTruthy()
+  expect(await form.findByText('Relatório R2, acompanha a V2')).toBeTruthy()
   await waitFor(() => expect(botaoEnviar(form).disabled).toBe(false))
   fireEvent.click(botaoEnviar(form))
   await waitFor(() => expect(secao.queryByRole('form', { name: 'Enviar versão' })).toBeNull())

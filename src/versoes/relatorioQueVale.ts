@@ -1,7 +1,8 @@
+import { rotuloDoRelatorio } from './rotuloDoRelatorio'
 import { rotuloCurtoDoArquivo, rotuloDaVersao } from './rotulos'
 import type { ArquivoDaVersao, Versao } from './tipos'
 
-/** Um relatório que a versão mostra: o arquivo, o nome curto ("Relatório V2") e, se é o de uma versão anterior, o rótulo dela ("V7"). */
+/** Um relatório que a versão mostra: o arquivo, o nome curto ("Relatório R2") e, se é o de uma versão anterior, o rótulo dela ("V7"). */
 export type RelatorioDaVersao = { arquivo: ArquivoDaVersao; rotulo: string; daVersao: string | null }
 
 function ehRelatorio(arquivo: ArquivoDaVersao): boolean {
@@ -13,8 +14,8 @@ function emOrdemDeNumero(arquivos: ArquivoDaVersao[]): ArquivoDaVersao[] {
   return [...arquivos].sort((a, b) => (a.numeroDoRelatorio ?? Infinity) - (b.numeroDoRelatorio ?? Infinity))
 }
 
-function rotuloDoRelatorio(arquivo: ArquivoDaVersao, versao: Versao): string {
-  if (arquivo.numeroDoRelatorio !== undefined) return `Relatório V${arquivo.numeroDoRelatorio}`
+function rotuloDoRelatorioDaVersao(arquivo: ArquivoDaVersao, versao: Versao): string {
+  if (arquivo.numeroDoRelatorio !== undefined) return rotuloDoRelatorio(arquivo.numeroDoRelatorio)
   return versao.historica ? `Relatório da ${rotuloDaVersao(versao)}` : rotuloCurtoDoArquivo(arquivo)
 }
 
@@ -28,19 +29,19 @@ function ultimoRelatorioAnterior(versao: Versao, todas: Versao[]): { arquivo: Ar
 
 /**
  * Os relatórios que a versão mostra (ADR 0026): os ligados a ela, ou, se não tem nenhum, o último numerado das versões
- * anteriores ("Relatório V2 (da V7)"). A histórica só mostra o seu; o .pdf antigo e o relatório da histórica, sem número,
+ * anteriores ("Relatório R2 (da V7)"). A histórica só mostra o seu; o .pdf antigo e o relatório da histórica, sem número,
  * não valem para as versões seguintes; antes do primeiro relatório numerado, nada.
  */
 export function relatoriosDaVersao(versao: Versao, todas: Versao[]): RelatorioDaVersao[] {
   const proprios = emOrdemDeNumero(versao.arquivos.filter(ehRelatorio))
-  if (proprios.length > 0) return proprios.map((arquivo) => ({ arquivo, rotulo: rotuloDoRelatorio(arquivo, versao), daVersao: null }))
+  if (proprios.length > 0) return proprios.map((arquivo) => ({ arquivo, rotulo: rotuloDoRelatorioDaVersao(arquivo, versao), daVersao: null }))
   if (versao.historica) return []
   const anterior = ultimoRelatorioAnterior(versao, todas)
   if (!anterior) return []
-  return [{ arquivo: anterior.arquivo, rotulo: rotuloDoRelatorio(anterior.arquivo, anterior.dono), daVersao: rotuloDaVersao(anterior.dono) }]
+  return [{ arquivo: anterior.arquivo, rotulo: rotuloDoRelatorioDaVersao(anterior.arquivo, anterior.dono), daVersao: rotuloDaVersao(anterior.dono) }]
 }
 
-/** "Relatório V2" ou "Relatório V2 (da V7)": o que a linha do relatório escreve. */
+/** "Relatório R2" ou "Relatório R2 (da V7)": o que a linha do relatório escreve. */
 export function textoDoRelatorio({ rotulo, daVersao }: RelatorioDaVersao): string {
   return daVersao ? `${rotulo} (da ${daVersao})` : rotulo
 }

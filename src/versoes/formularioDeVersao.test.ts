@@ -112,15 +112,15 @@ test('enviar o relatório só se habilita com o relatório escolhido, sem recusa
 })
 
 test('a prévia do relatório diz o número dele e a versão que ele acompanha', () => {
-  expect(previaDoRelatorio({ numeroDaVersao: 8, piloto: false, numeroDoRelatorio: 3 })).toBe('Relatório V3, acompanha a V8')
-  expect(previaDoRelatorio({ numeroDaVersao: 6, piloto: true, numeroDoRelatorio: 1 })).toBe('Relatório V1, acompanha a V6P')
+  expect(previaDoRelatorio({ numeroDaVersao: 8, piloto: false, numeroDoRelatorio: 3 })).toBe('Relatório R3, acompanha a V8')
+  expect(previaDoRelatorio({ numeroDaVersao: 6, piloto: true, numeroDoRelatorio: 1 })).toBe('Relatório R1, acompanha a V6P')
 })
 
 test('a prévia do nome do relatório numerado traz o número do relatório depois do nome do processo', () => {
   const processo = { setorSigla: 'TSA', nome: 'Emitir Ofício' }
   const docx = new File(['x'], 'relatório.docx')
-  expect(nomeNaPrevia(processo, 8, 'relatorio', docx, 'sequencia', 3)).toBe('TSA_V8_Emitir Ofício_Relatório V3.docx')
-  expect(nomeNaPrevia(processo, 6, 'relatorio', docx, 'piloto', 1)).toBe('TSA_V6P_Emitir Ofício_Relatório V1.docx')
+  expect(nomeNaPrevia(processo, 8, 'relatorio', docx, 'sequencia', 3)).toBe('TSA_V8_Emitir Ofício_Relatório R3.docx')
+  expect(nomeNaPrevia(processo, 6, 'relatorio', docx, 'piloto', 1)).toBe('TSA_V6P_Emitir Ofício_Relatório R1.docx')
 })
 
 test('a falha do relatório depois: a frase pronta da recusa, ou o motivo com o aviso do formulário', () => {

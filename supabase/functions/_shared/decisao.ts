@@ -3,7 +3,7 @@
 import { EXTENSOES_DO_ANEXO, type PapelDoArquivo } from './nomePadrao.ts'
 
 export type Perfil = 'administrador' | 'integrante_ep' | 'consulta'
-export type Acao = 'iniciar_envio' | 'baixar' | 'registrar' | 'conferir' | 'retirar' | 'renumerar'
+export type Acao = 'iniciar_envio' | 'baixar' | 'registrar' | 'conferir' | 'retirar' | 'renumerar' | 'renomear_relatorio'
 export interface Chamador {
   perfil: Perfil
   ativo: boolean
@@ -35,7 +35,7 @@ export interface EntradaIniciarEnvio {
   piloto: boolean
   /** Com o arquivo: troca o conteúdo dele (mesmo arquivo do Drive); sem: cria um arquivo novo. */
   arquivoId: string | null
-  /** Só no relatório de versão que não é histórica (Relatório V3): o número próprio dele, com que o arquivo é nomeado. */
+  /** Só no relatório de versão que não é histórica (Relatório R3): o número próprio dele, com que o arquivo é nomeado. */
   numeroDoRelatorio: number | null
 }
 export interface EntradaBaixar {
@@ -54,6 +54,8 @@ const PERFIS_POR_ACAO: Record<Acao, readonly Perfil[]> = {
   conferir: ['administrador', 'integrante_ep', 'consulta'],
   retirar: ['administrador', 'integrante_ep'],
   renumerar: ['administrador', 'integrante_ep'],
+  // Relatórios com R (ADR 0047): o botão é da aba Importação, só do Administrador.
+  renomear_relatorio: ['administrador'],
 }
 
 export const EXTENSOES_POR_PAPEL: Record<PapelDoArquivo, readonly string[]> = {
@@ -187,7 +189,7 @@ export function lerPapel(corpo: Corpo): Validacao<PapelDoArquivo> {
   return { ok: true, valor: valor as PapelDoArquivo }
 }
 
-/** O número do relatório (Relatório V3) é opcional: ausente ou nulo vale null; presente e fora do formato, recusa. */
+/** O número do relatório (Relatório R3) é opcional: ausente ou nulo vale null; presente e fora do formato, recusa. */
 export function lerNumeroDoRelatorio(corpo: Corpo): Validacao<number | null> {
   if (corpo.numero_do_relatorio === undefined || corpo.numero_do_relatorio === null) return { ok: true, valor: null }
   return lerInteiroPositivo(corpo, 'numero_do_relatorio')

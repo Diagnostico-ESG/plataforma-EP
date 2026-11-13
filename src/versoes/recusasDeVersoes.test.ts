@@ -26,7 +26,7 @@ test.each([
   ['historica_depois_de_versao_nova', '', 'O processo já tem versão nova; versões históricas só podem ser registradas antes dela.'],
   ['numero_historico_repetido', '5', 'O processo já tem a versão histórica V5F. Use outro número.'],
   ['historica_sem_arquivo_de_fluxograma', '', 'A versão histórica precisa do arquivo .bpm, ou do .bpmn com o .png.'],
-  ['numero_do_relatorio_mudou', '4', 'Outra pessoa enviou um relatório enquanto você enviava; este seria o Relatório V4. Envie de novo.'],
+  ['numero_do_relatorio_mudou', '4', 'Outra pessoa enviou um relatório enquanto você enviava; este seria o Relatório R4. Envie de novo.'],
   ['relatorio_so_docx', '', 'O relatório precisa ser um arquivo .docx.'],
   ['relatorio_sem_versao', '', 'Não há versão para receber o relatório: envie a versão piloto ou uma versão primeiro.'],
   ['relatorio_fora_da_etapa', '', 'O relatório só pode ser enviado até a Revisão do relatório.'],

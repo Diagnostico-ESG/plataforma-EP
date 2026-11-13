@@ -33,10 +33,10 @@ export const botoesQueAlteram = (secao: { queryAllByRole: (papel: 'button') => H
 
 export const comNome = (trecho: string) => (nome: string) => nome.includes(trecho)
 
-/** O relatório numerado (Relatório V2) ligado à versão `numeroDaVersao`: o .docx que o relatório novo sempre é. */
+/** O relatório numerado (Relatório R2) ligado à versão `numeroDaVersao`: o .docx que o relatório novo sempre é. */
 export function relatorioNumeradoDeTeste(numeroDaVersao: number, numeroDoRelatorio: number): ArquivoDaVersao {
   return {
-    id: `r${numeroDoRelatorio}`, papel: 'relatorio', nome: `TSA_V${numeroDaVersao}_Emitir Ofício_Relatório V${numeroDoRelatorio}.docx`,
+    id: `r${numeroDoRelatorio}`, papel: 'relatorio', nome: `TSA_V${numeroDaVersao}_Emitir Ofício_Relatório R${numeroDoRelatorio}.docx`,
     formato: 'docx', tamanho: 100, numeroDoRelatorio,
   }
 }

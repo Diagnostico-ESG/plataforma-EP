@@ -46,7 +46,8 @@ async function lerArquivosDaVersao(contexto: ContextoDoDrive, versaoId: string):
   return [...(arquivos.data as ArquivoLido[]), ...(pdfs.data as ArquivoLido[])]
 }
 
-async function renomearNoDrive(token: string, driveId: string, nome: string): Promise<void> {
+// Também usada pela renomeação dos relatórios para R (renomeacaoDoRelatorio.ts).
+export async function renomearNoDrive(token: string, driveId: string, nome: string): Promise<void> {
   await chamarDrive(token, `${API_DE_ARQUIVOS}/${encodeURIComponent(driveId)}?fields=id`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json; charset=UTF-8' },

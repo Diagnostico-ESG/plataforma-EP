@@ -3,6 +3,7 @@ import type { ClienteSupabase } from '../lib/supabase'
 import { type EnviarBytes, enviarComFetch } from '../versoes/funcaoDoDrive'
 import { chaveDoProcesso } from './chaves'
 import { criarImportacaoDaPastaSupabase } from './importacaoDaPastaSupabase'
+import { criarRelatoriosComRSupabase } from './relatoriosComRSupabase'
 import type { ExistentesNaPlataforma, ModuloDeImportacao, ProcessoParaImportar, ResultadoDaGravacao } from './tipos'
 
 const FRASE_SEM_PERMISSAO = 'Só o Administrador pode importar os dados.'
@@ -12,6 +13,7 @@ export function criarImportacaoSupabase(cliente: ClienteSupabase, enviarBytes: E
     listarExistentes: () => listarExistentes(cliente),
     gravarProcesso: (processo) => gravarProcesso(cliente, processo),
     ...criarImportacaoDaPastaSupabase(cliente, enviarBytes),
+    ...criarRelatoriosComRSupabase(cliente),
   }
 }
 

@@ -1,3 +1,4 @@
+import { rotuloDoRelatorio } from '../versoes/rotuloDoRelatorio'
 import { diaDeBrasilia, formatarData } from '../lib/datas'
 import type { ProcessoLido } from '../processos/tipos'
 import type { Aprovacao, EtapaDaRevisao, ResultadoDaRevisao, RevisaoInterna } from './tipos'
@@ -16,21 +17,21 @@ export function contextoDoProcesso(processo: Pick<ProcessoLido, 'ultimaVersao' |
 
 export type OpcaoDoResultado = { resultado: ResultadoDaRevisao; rotulo: string; desabilitada: boolean; motivo: string | null }
 
-/** "a V8 corrige a V7; o Relatório V2 corrige o Relatório V1": o que a "corrigida" liga, versão e relatório. */
+/** "a V8 corrige a V7; o Relatório R2 corrige o Relatório R1": o que a "corrigida" liga, versão e relatório. */
 function frasesDaCorrecao({ versao, relatorio }: LigacoesDaRevisao): string {
   return [
     versao?.corrigida ? `a V${versao.corrigida} corrige a V${versao.revisada}` : null,
-    relatorio?.corrigido ? `o Relatório V${relatorio.corrigido} corrige o Relatório V${relatorio.revisado}` : null,
+    relatorio?.corrigido ? `o ${rotuloDoRelatorio(relatorio.corrigido)} corrige o ${rotuloDoRelatorio(relatorio.revisado)}` : null,
   ].filter(Boolean).join('; ')
 }
 
 function alvoDaSemAlteracao({ versao, relatorio }: LigacoesDaRevisao): string {
-  return relatorio ? `o Relatório V${relatorio.revisado}` : `a V${versao?.revisada}`
+  return relatorio ? `o ${rotuloDoRelatorio(relatorio.revisado)}` : `a V${versao?.revisada}`
 }
 
 /**
  * As duas opções da janela de revisão (ADR 0046), com o que cada uma liga: "Sem alteração: vale para a V7" (fluxograma) ou
- * "… para o Relatório V1" (relatório); "Corrigida: a V8 corrige a V7", "… o Relatório V2 corrige o Relatório V1" ou as duas.
+ * "… para o Relatório R1" (relatório); "Corrigida: a V8 corrige a V7", "… o Relatório R2 corrige o Relatório R1" ou as duas.
  * "Corrigida" fica desabilitada, com o motivo, quando nada foi enviado nesta passagem.
  */
 export function opcoesDoResultado(contexto: ContextoDaRevisao): OpcaoDoResultado[] {
@@ -71,7 +72,7 @@ function avisoDaVersao({ ultimaVersao }: ContextoDaRevisao, { versao }: Ligacoes
 function avisoDoRelatorio({ ultimoRelatorio }: ContextoDaRevisao, { relatorio }: LigacoesDaRevisao, usuarioId: string): string | null {
   if (!ultimoRelatorio || relatorio === null) return null
   const autor = relatorio.corrigido ? ultimoRelatorio.anterior?.autorId : ultimoRelatorio.autorId
-  return autor === usuarioId ? `Você enviou o Relatório V${relatorio.revisado}. A revisão do relatório deveria ser de outra pessoa.` : null
+  return autor === usuarioId ? `Você enviou o ${rotuloDoRelatorio(relatorio.revisado)}. A revisão do relatório deveria ser de outra pessoa.` : null
 }
 
 /** O aviso da janela de aprovação quando já há uma: a nova toma o lugar dela (a anterior fica no histórico). */
@@ -80,27 +81,27 @@ export function avisoDaAprovacaoSubstituida(anterior: Aprovacao | null): string 
   return `Esta aprovação toma o lugar da aprovação da V${anterior.versao}, registrada em ${formatarData(diaDeBrasilia(anterior.registradaEm))}.`
 }
 
-/** O que a revisão revisou, como o Agora e a gaveta o dizem: "Relatório V1" na revisão do relatório, "V7" na do fluxograma. */
+/** O que a revisão revisou, como o Agora e a gaveta o dizem: "Relatório R1" na revisão do relatório, "V7" na do fluxograma. */
 export function alvoDaRevisao(revisao: RevisaoInterna): string {
   return revisao.etapa === 'revisao_relatorio' && revisao.relatorioRevisado
-    ? `Relatório V${revisao.relatorioRevisado}` : `V${revisao.versaoRevisada}`
+    ? `${rotuloDoRelatorio(revisao.relatorioRevisado)}` : `V${revisao.versaoRevisada}`
 }
 
-/** "Editar a revisão da V7" ou "Editar a revisão do Relatório V1": o título da janela e o nome do botão na gaveta. */
+/** "Editar a revisão da V7" ou "Editar a revisão do Relatório R1": o título da janela e o nome do botão na gaveta. */
 export function tituloDaEdicao(revisao: RevisaoInterna): string {
   const alvo = alvoDaRevisao(revisao)
   return alvo.startsWith('Relatório') ? `Editar a revisão do ${alvo}` : `Editar a revisão da ${alvo}`
 }
 
 /**
- * O resumo do registro da passagem no Agora: "Sem alteração · V7 · Ana", "Sem alteração · Relatório V1 · Ana" ou "Corrigida ·
- * V8 corrige a V7; Relatório V2 corrige o Relatório V1" (o que foi corrigido já diz o escopo).
+ * O resumo do registro da passagem no Agora: "Sem alteração · V7 · Ana", "Sem alteração · Relatório R1 · Ana" ou "Corrigida ·
+ * V8 corrige a V7; Relatório R2 corrige o Relatório R1" (o que foi corrigido já diz o escopo).
  */
 export function resumoDaRevisao(revisao: RevisaoInterna): string {
   if (revisao.resultado === 'sem_alteracao') return ['Sem alteração', alvoDaRevisao(revisao), revisao.revisor].filter(Boolean).join(' · ')
   const frases = [
     revisao.versaoCorrigida ? `V${revisao.versaoCorrigida} corrige a V${revisao.versaoRevisada}` : null,
-    revisao.relatorioCorrigido ? `Relatório V${revisao.relatorioCorrigido} corrige o Relatório V${revisao.relatorioRevisado}` : null,
+    revisao.relatorioCorrigido ? `${rotuloDoRelatorio(revisao.relatorioCorrigido)} corrige o ${rotuloDoRelatorio(`${revisao.relatorioRevisado}`)}` : null,
   ].filter(Boolean).join('; ')
   return `Corrigida · ${frases}`
 }

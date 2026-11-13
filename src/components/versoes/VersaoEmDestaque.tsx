@@ -70,7 +70,7 @@ function AutoriaDoDestaque({ versao }: { versao: Versao }) {
 
 type ArquivoDoDestaqueProps = VersaoEmDestaqueProps & {
   arquivo: ArquivoDaVersao
-  /** O texto do botão ("Fluxograma .bpm", "Relatório V2 (da V7)"). */
+  /** O texto do botão ("Fluxograma .bpm", "Relatório R2 (da V7)"). */
   rotulo: string
   /** Falso no relatório que vale por vir de outra versão: ele se substitui lá, na versão dele. */
   daPropriaVersao: boolean

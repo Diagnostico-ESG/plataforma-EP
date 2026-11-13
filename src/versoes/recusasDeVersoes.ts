@@ -1,3 +1,4 @@
+import { rotuloDoRelatorio } from './rotuloDoRelatorio'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
 import { fraseDoProcessoParado } from '../processos/frasesDeSituacao'
 import { fraseDaVersaoAprovada } from '../revisoes/frasesDeAprovacao'
@@ -41,7 +42,7 @@ const FRASE_DO_CODIGO: Record<string, (valor: string) => string> = {
   numero_historico_repetido: (numero) => `O processo já tem a versão histórica V${numero}F. Use outro número.`,
   historica_sem_arquivo_de_fluxograma: () => 'A versão histórica precisa do arquivo .bpm, ou do .bpmn com o .png.',
   numero_do_relatorio_mudou: (numero) =>
-    `Outra pessoa enviou um relatório enquanto você enviava; este seria o Relatório V${numero}. Envie de novo.`,
+    `Outra pessoa enviou um relatório enquanto você enviava; este seria o ${rotuloDoRelatorio(numero)}. Envie de novo.`,
   relatorio_so_docx: () => 'O relatório precisa ser um arquivo .docx.',
   relatorio_sem_versao: () => 'Não há versão para receber o relatório: envie a versão piloto ou uma versão primeiro.',
   relatorio_fora_da_etapa: () => 'O relatório só pode ser enviado até a Revisão do relatório.',

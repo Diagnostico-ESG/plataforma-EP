@@ -25,13 +25,22 @@ describe('eventos de versão no histórico', () => {
 
   test('o arquivo acrescentado depois diz qual é, e traz o papel no estado', () => {
     const relatorio: EventoDoCadastro = { ...ENVIO, acao: 'enviar_relatorio', depois: { ...ENVIO.depois, rotulo: 'V8', numero_do_relatorio: 3 } }
-    expect(textoDoEvento(relatorio)).toBe('Enviou o Relatório V3 (acompanha a V8)')
+    expect(textoDoEvento(relatorio)).toBe('Enviou o Relatório R3 (acompanha a V8)')
     expect(textoDaAcaoDoCadastro('acrescentar_relatorio', 'versao')).toBe('Acrescentou o relatório à versão')
     expect(textoDaAcaoDoCadastro('sem_alteracao', 'versao')).toBe('Marcou sem alteração de conteúdo na versão')
     const acrescentou: EventoDoCadastro = { ...ENVIO, acao: 'acrescentar_arquivo', depois: { ...ENVIO.depois, papel: 'png' } }
     expect(textoDoEvento(acrescentou)).toBe('Acrescentou o .png à versão')
     expect(textoDoEvento({ ...acrescentou, depois: { ...ENVIO.depois, papel: 'bpmn' } })).toBe('Acrescentou o .bpmn à versão')
     expect(textoDoEvento(ENVIO)).toBe('Enviou a versão')
+  })
+
+  test('a renomeação do relatório para R diz o nome antigo e o novo', () => {
+    const renomeou: EventoDoCadastro = {
+      ...ENVIO, acao: 'renomear_relatorio', antes: { nome: 'TSA_V8_Emitir Ofício_Relatório V3.docx' },
+      depois: { nome: 'TSA_V8_Emitir Ofício_Relatório R3.docx', processo_nome: 'Emitir Ofício', setor_sigla: 'TSA' },
+    }
+    expect(textoDoEvento(renomeou))
+      .toBe('Renomeou o arquivo TSA_V8_Emitir Ofício_Relatório V3.docx para TSA_V8_Emitir Ofício_Relatório R3.docx')
   })
 
   test('o registro da histórica tem texto próprio', () => {

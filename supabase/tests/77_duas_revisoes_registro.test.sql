@@ -191,7 +191,7 @@ insert into _tap (linha) select results_eq($sql$select * from pg_temp.ligacoes('
 insert into _tap (linha) select is(
   (select detalhes -> 'antes' ->> 'relatorio_corrigido' from public.eventos where entidade = 'revisao_interna' and acao = 'editar'
     and entidade_ref = pg_temp.processo('Rel Corr Rel')::text),
-  'Relatório V2', 'o evento da edição guarda o relatório corrigido de antes');
+  'Relatório R2', 'o evento da edição guarda o relatório corrigido de antes');
 update public.revisoes_internas set resultado = 'corrigida' where processo_id = pg_temp.processo('Rel Corr Rel');
 insert into _tap (linha) select results_eq($sql$select * from pg_temp.ligacoes('Rel Corr Rel')$sql$,
   $sql$values ('relatorio', 'V1', null::text, '1', '2')$sql$, 'voltar para "corrigida" deduz o escopo de novo');
@@ -200,7 +200,7 @@ insert into _tap (linha) select results_eq($sql$select * from pg_temp.ligacoes('
 insert into _tap (linha) select results_eq(
   $sql$select detalhes -> 'depois' ->> 'etapa', detalhes -> 'depois' ->> 'relatorio_revisado', detalhes -> 'depois' ->> 'relatorio_corrigido'
     from public.eventos where entidade = 'revisao_interna' and acao = 'registrar' and entidade_ref = pg_temp.processo('Rel Corr Ambos')::text$sql$,
-  $sql$values ('revisao_relatorio', 'Relatório V1', 'Relatório V2')$sql$,
+  $sql$values ('revisao_relatorio', 'Relatório R1', 'Relatório R2')$sql$,
   'o evento da revisão do relatório diz a etapa e os relatórios');
 insert into _tap (linha) select is(
   (select detalhes -> 'depois' ->> 'etapa' from public.eventos where entidade = 'revisao_interna' and acao = 'registrar'

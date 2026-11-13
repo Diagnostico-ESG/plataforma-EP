@@ -56,11 +56,11 @@ test('a versão mais recente em destaque: "V2 · 02/10", os botões dos arquivos
   expect(v2.getByRole('link', { name: comNome('TSA_V2_Emitir Ofício.bpm') }).textContent).toContain('Fluxograma .bpm')
 })
 
-test('a versão sem relatório próprio mostra o último, dizendo de qual versão ele é: "Relatório V1 (da V1)"', async () => {
+test('a versão sem relatório próprio mostra o último, dizendo de qual versão ele é: "Relatório R1 (da V1)"', async () => {
   const v1 = versaoDeTeste(1, { arquivos: [...versaoDeTeste(1).arquivos, relatorioNumeradoDeTeste(1, 1)] })
   montarNosCadastros(comVersoes([v1, versaoDeTeste(2)]))
   const v2 = await destaque(await arquivos(), 'V2')
-  expect(v2.getByRole('link', { name: comNome('Relatório V1 (da V1)') })).toBeTruthy()
+  expect(v2.getByRole('link', { name: comNome('Relatório R1 (da V1)') })).toBeTruthy()
   expect(v2.queryByRole('button', { name: 'Acrescentar relatório' })).toBeNull()
 })
 

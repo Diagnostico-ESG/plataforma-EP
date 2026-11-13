@@ -55,7 +55,7 @@ describe('avisoDoRevisor', () => {
   test('na Revisão do relatório, com o responsável que enviou o relatório mais recente', () => {
     const relatorio = { numero: 1, autorId: 'u1', autorNome: 'Ana M.', enviadoNestaPassagem: false }
     const naDoRelatorio = { etapaAtual: etapaAtualDe('revisao_relatorio'), ultimaVersao: versao('u2'), ultimoRelatorio: relatorio }
-    expect(avisoDoRevisor(lido(naDoRelatorio))).toBe('Ana M. enviou o Relatório V1; a revisão do relatório deveria ser de outra pessoa.')
+    expect(avisoDoRevisor(lido(naDoRelatorio))).toBe('Ana M. enviou o Relatório R1; a revisão do relatório deveria ser de outra pessoa.')
     expect(avisoDoRevisor(lido({ ...naDoRelatorio, ultimoRelatorio: { ...relatorio, autorId: 'u2' } }))).toBeNull()
     expect(avisoDoRevisor(lido({ ...naDoRelatorio, ultimoRelatorio: null }))).toBeNull()
   })

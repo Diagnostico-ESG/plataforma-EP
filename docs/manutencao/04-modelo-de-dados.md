@@ -67,7 +67,7 @@ A tabela "quem pode o quê" completa de cada funcionalidade está na spec dela, 
 | Tabela | O que guarda |
 | --- | --- |
 | `versoes` | A versão do processo: número sequencial por processo, quem enviou, em que etapa, se é histórica ou piloto (ADR 0005 e 0025). |
-| `arquivos_da_versao` | Os arquivos de cada versão: papel (`bpm`, `png`, `bpmn`, `relatorio`), nome, formato, tamanho, hash MD5 e o identificador do arquivo **no Drive**. O relatório de versão que não é histórica tem ainda o número próprio (`numero_do_relatorio`: Relatório V1, V2…, dado pelo banco, único por processo, ADR 0026). O arquivo em si não está no banco (ADR 0008). |
+| `arquivos_da_versao` | Os arquivos de cada versão: papel (`bpm`, `png`, `bpmn`, `relatorio`), nome, formato, tamanho, hash MD5 e o identificador do arquivo **no Drive**. O relatório de versão que não é histórica tem ainda o número próprio (`numero_do_relatorio`: Relatório R1, R2…, dado pelo banco, único por processo, ADRs 0026 e 0047; o nome no Drive termina em `_Relatório R2.docx`). O arquivo em si não está no banco (ADR 0008). |
 | `pastas_no_drive` | A pasta do Drive de cada processo e setor, criada no primeiro envio. |
 | `anexos` | Os arquivos avulsos do processo (migração `20261026205450_anexos`, ADR 0027): nome original, formato (`pdf`, `docx`, `xlsx`, `png`, `jpg`, `jpeg`, `eml`), tamanho (1 byte a 20 MB), MD5, identificador no Drive, a **etapa do envio** (preenchida pelo banco e nunca alterada), quem enviou e quando. Todo perfil ativo lê; Administrador e Integrante incluem pela função `registrar_anexo`; ninguém altera. Administrador e Integrante ativos **retiram** o anexo (apagam a linha; migração `20261026220736_retirar_anexo`), pela ação `retirar` da função `arquivos-no-drive`, que antes manda o arquivo para a lixeira do Drive. O arquivo está na subpasta "Anexos" da pasta do processo no Drive, cujo identificador fica em `processos.drive_pasta_dos_anexos`. |
 | `revisoes_internas` | Cada revisão interna: versão revisada, resultado (`sem_alteracao` ou `corrigida`), escopo, comentário e revisor (ADRs 0009 e 0015). |
@@ -91,7 +91,7 @@ Cada uma faz a regra inteira de uma vez: ou tudo acontece, ou nada muda.
 | --- | --- |
 | Etapas | `avancar_etapa` (resolve a atual e inicia a próxima), `voltar_a_etapa`, `mover_etapa`, `acrescentar_etapa` (catálogo; recebe a fase) |
 | Processo | `suspender_processo`, `retomar_processo`, `cancelar_processo`, `reclassificar_processo` |
-| Versões | `registrar_versao`, `registrar_versao_historica`, `enviar_relatorio`, `acrescentar_arquivo`, `substituir_arquivo` |
+| Versões | `registrar_versao`, `registrar_versao_historica`, `enviar_relatorio`, `acrescentar_arquivo`, `substituir_arquivo`, `renomear_relatorio_para_r` (só o Administrador; chamada pela ação `renomear_relatorio` da função `arquivos-no-drive`, depois de renomear no Drive; troca o `_Relatório V2` do fim do nome por `_Relatório R2` e grava o evento `renomear_relatorio`, com o nome antigo e o novo; migração `20261113161937_relatorio_com_r`, ADR 0047) |
 | Revisão e aprovação | `concluir_revisao_interna`, `concluir_aprovacao` |
 | Data da validação e .pdf da aprovação | `registrar_data_da_validacao`, `registrar_pdf_da_aprovacao`, `substituir_pdf_da_aprovacao` |
 | Planilhas | `pedir_atualizacao_das_planilhas` (botão), `links_das_planilhas`, `registrar_resultado_das_planilhas` (chamada pela função do servidor, sem login) |

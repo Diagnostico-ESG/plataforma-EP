@@ -1,3 +1,4 @@
+import { rotuloDoRelatorio } from '../versoes/rotuloDoRelatorio'
 import type { EscopoDaCorrecao, RevisaoInterna } from './tipos'
 
 export const FRASE_DA_CORRIGIDA_SEM_ENVIO_NA_PASSAGEM = "Para 'corrigida', envie a versão ou o relatório corrigido com o processo nesta etapa."
@@ -19,9 +20,9 @@ export const ROTULO_DO_ESCOPO: Record<EscopoDaCorrecao, string> = {
 
 type ResultadoNaGaveta = Pick<RevisaoInterna, 'resultado' | 'versaoCorrigida' | 'relatorioCorrigido'>
 
-/** O resultado como a gaveta o mostra: "Sem alteração", "Corrigida, gerou a V8", "… o Relatório V2" ou "… a V8 e o Relatório V2". */
+/** O resultado como a gaveta o mostra: "Sem alteração", "Corrigida, gerou a V8", "… o Relatório R2" ou "… a V8 e o Relatório R2". */
 export function rotuloDoResultado({ resultado, versaoCorrigida, relatorioCorrigido }: ResultadoNaGaveta): string {
   if (resultado === 'sem_alteracao') return 'Sem alteração'
-  const gerou = [versaoCorrigida ? `a V${versaoCorrigida}` : null, relatorioCorrigido ? `o Relatório V${relatorioCorrigido}` : null]
+  const gerou = [versaoCorrigida ? `a V${versaoCorrigida}` : null, relatorioCorrigido ? `o ${rotuloDoRelatorio(relatorioCorrigido)}` : null]
   return `Corrigida, gerou ${gerou.filter(Boolean).join(' e ')}`
 }

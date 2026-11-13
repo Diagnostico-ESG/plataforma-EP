@@ -88,8 +88,8 @@ describe('recusas da renomeação no Drive', () => {
 })
 
 describe('nome dos arquivos', () => {
-  it('troca só o primeiro rótulo, mantendo o Relatório V2 e o resto do nome', () => {
-    expect(nomeComORotuloNovo('CEE_V5_Compras_Relatório V2.docx', '_V5_', '_V7_')).toBe('CEE_V7_Compras_Relatório V2.docx')
+  it('troca só o primeiro rótulo, mantendo o Relatório R2 e o resto do nome', () => {
+    expect(nomeComORotuloNovo('CEE_V5_Compras_Relatório R2.docx', '_V5_', '_V7_')).toBe('CEE_V7_Compras_Relatório R2.docx')
   })
 
   it('deixa como está o nome sem o rótulo', () => {
@@ -106,12 +106,12 @@ describe('nome dos arquivos', () => {
     const piloto: VersaoDoProcesso = { numero: 4, historica: false, piloto: true }
     const arquivos = [
       { drive_id: 'a', nome: 'T65_V4P_Compras.bpm' },
-      { drive_id: 'b', nome: 'T65_V4P_Compras_Relatório V1.docx' },
+      { drive_id: 'b', nome: 'T65_V4P_Compras_Relatório R1.docx' },
       { drive_id: 'c', nome: 'sem-rotulo.png' },
     ]
     expect(arquivosParaRenomear(arquivos, piloto, 9)).toEqual([
       { driveId: 'a', nomeAntigo: 'T65_V4P_Compras.bpm', nomeNovo: 'T65_V9P_Compras.bpm' },
-      { driveId: 'b', nomeAntigo: 'T65_V4P_Compras_Relatório V1.docx', nomeNovo: 'T65_V9P_Compras_Relatório V1.docx' },
+      { driveId: 'b', nomeAntigo: 'T65_V4P_Compras_Relatório R1.docx', nomeNovo: 'T65_V9P_Compras_Relatório R1.docx' },
     ])
   })
 

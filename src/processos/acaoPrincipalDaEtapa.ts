@@ -1,3 +1,4 @@
+import { rotuloDoRelatorio } from '../versoes/rotuloDoRelatorio'
 import { CODIGO_DA_APROVACAO, CODIGO_DA_REVISAO_DO_RELATORIO, CODIGO_DA_REVISAO_INTERNA } from './codigosDasEtapas'
 import { acaoDaPublicacao } from './publicacao'
 import type { ProcessoLido } from './tipos'
@@ -28,7 +29,7 @@ export function semOQueRevisar(processo: Pick<ProcessoLido, 'etapaAtual' | 'ulti
 export function oQueSeRevisa(processo: Pick<ProcessoLido, 'etapaAtual' | 'ultimaVersao' | 'ultimoRelatorio'>): string | null {
   const etapa = processo.etapaAtual?.codigo
   if (etapa === CODIGO_DA_REVISAO_INTERNA && processo.ultimaVersao) return `A revisar: V${processo.ultimaVersao.numero}`
-  if (etapa === CODIGO_DA_REVISAO_DO_RELATORIO && processo.ultimoRelatorio) return `A revisar: Relatório V${processo.ultimoRelatorio.numero}`
+  if (etapa === CODIGO_DA_REVISAO_DO_RELATORIO && processo.ultimoRelatorio) return `A revisar: ${rotuloDoRelatorio(processo.ultimoRelatorio.numero)}`
   return null
 }
 

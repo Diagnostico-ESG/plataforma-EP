@@ -2,6 +2,7 @@ import {
   CODIGO_DA_MODELAGEM_PILOTO, CODIGO_DA_REVISAO_DO_RELATORIO, CODIGO_DA_REVISAO_INTERNA, CODIGO_DA_TECNICA, CODIGO_NAO_INICIADOS,
 } from '../processos/codigosDasEtapas'
 import type { ArquivoDaVersao, PapelDoArquivo, Versao } from './tipos'
+import { rotuloDoRelatorio } from './rotuloDoRelatorio'
 
 /** Os papéis na ordem do formulário: o .bpm, obrigatório, primeiro; o .png e o .bpmn opcionais; o relatório por último (ADR 0025). */
 export const PAPEIS: readonly PapelDoArquivo[] = ['bpm', 'png', 'bpmn', 'relatorio']
@@ -91,9 +92,9 @@ const NOME_CURTO_DO_PAPEL: Record<PapelDoArquivo, string> = {
   bpm: 'Fluxograma', png: 'Imagem', bpmn: 'BPMN', relatorio: 'Relatório', pdf_da_aprovacao: 'Aprovação', anexo: 'Anexo',
 }
 
-/** "Fluxograma .bpm", "Relatório V2" (o numerado), "Relatório .pdf" (o antigo): o botão do arquivo no destaque da versão. */
+/** "Fluxograma .bpm", "Relatório R2" (o numerado), "Relatório .pdf" (o antigo): o botão do arquivo no destaque da versão. */
 export function rotuloCurtoDoArquivo({ papel, formato, numeroDoRelatorio }: Pick<ArquivoDaVersao, 'papel' | 'formato' | 'numeroDoRelatorio'>): string {
-  if (numeroDoRelatorio !== undefined) return `${NOME_CURTO_DO_PAPEL[papel]} V${numeroDoRelatorio}`
+  if (numeroDoRelatorio !== undefined) return rotuloDoRelatorio(numeroDoRelatorio)
   return `${NOME_CURTO_DO_PAPEL[papel]} .${formato.toLowerCase()}`
 }
 

@@ -23,7 +23,7 @@ describe('arquivosDaVersaoMaisRecente', () => {
       versao(7, [arquivo('bpmn', 'bpmn'), arquivo('relatorio', 'docx', 2), arquivo('bpm', 'bpm'), arquivo('png', 'png')]),
     ]
     expect(arquivosDaVersaoMaisRecente(versoes)).toMatchObject({ rotulo: 'V7', aprovada: false })
-    expect(rotulos(versoes)).toEqual(['Imagem .png', 'Fluxograma .bpm', 'Relatório V2', 'BPMN .bpmn'])
+    expect(rotulos(versoes)).toEqual(['Imagem .png', 'Fluxograma .bpm', 'Relatório R2', 'BPMN .bpmn'])
   })
 
   test('aprovada, piloto e histórica levam o selo e o sufixo certos', () => {
@@ -34,7 +34,7 @@ describe('arquivosDaVersaoMaisRecente', () => {
 
   test('sem relatório próprio, vale o último numerado das versões anteriores, "da V7"', () => {
     const versoes = [versao(7, [arquivo('relatorio', 'docx', 2)]), versao(8, [arquivo('bpm', 'bpm')])]
-    expect(rotulos(versoes)).toEqual(['Fluxograma .bpm', 'Relatório V2 (da V7)'])
+    expect(rotulos(versoes)).toEqual(['Fluxograma .bpm', 'Relatório R2 (da V7)'])
   })
 
   test('o .pdf antigo sem número aparece como relatório da própria versão; o .pdf da aprovação e os anexos ficam de fora', () => {

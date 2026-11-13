@@ -162,13 +162,13 @@ test('resposta que não são bytes (texto) vira erro com o recebido e o esperado
 
 test('o número do relatório numerado vem da lista', async () => {
   const cliente = new ClienteSupabaseFalso()
-  const numerado = { id: 'a9', papel: 'relatorio', nome: 'TSA_V3_Emitir Ofício_Relatório V2.docx', formato: 'docx', tamanho: 5, numero_do_relatorio: 2 }
+  const numerado = { id: 'a9', papel: 'relatorio', nome: 'TSA_V3_Emitir Ofício_Relatório R2.docx', formato: 'docx', tamanho: 5, numero_do_relatorio: 2 }
   const antigo = { id: 'a8', papel: 'bpm', nome: 'TSA_V3_Emitir Ofício.bpm', formato: 'bpm', tamanho: 5, numero_do_relatorio: null }
   cliente.respostas['versoes.select'] = { data: [{ ...LINHA, arquivos_da_versao: [numerado, antigo] }], error: null }
   const [versao] = await criar(cliente).listarVersoes('p1')
   expect(versao.arquivos).toEqual([
     { id: 'a8', papel: 'bpm', nome: 'TSA_V3_Emitir Ofício.bpm', formato: 'bpm', tamanho: 5 },
-    { id: 'a9', papel: 'relatorio', nome: 'TSA_V3_Emitir Ofício_Relatório V2.docx', formato: 'docx', tamanho: 5, numeroDoRelatorio: 2 },
+    { id: 'a9', papel: 'relatorio', nome: 'TSA_V3_Emitir Ofício_Relatório R2.docx', formato: 'docx', tamanho: 5, numeroDoRelatorio: 2 },
   ])
 })
 
@@ -227,7 +227,7 @@ test('se o relatório não chega ao Drive, nada é registrado', async () => {
 })
 
 test.each([
-  ['numero_do_relatorio_mudou', '4', 'Outra pessoa enviou um relatório enquanto você enviava; este seria o Relatório V4. Envie de novo.'],
+  ['numero_do_relatorio_mudou', '4', 'Outra pessoa enviou um relatório enquanto você enviava; este seria o Relatório R4. Envie de novo.'],
   ['relatorio_sem_versao', '', 'Não há versão para receber o relatório: envie a versão piloto ou uma versão primeiro.'],
   ['relatorio_fora_da_etapa', '', 'O relatório só pode ser enviado até a Revisão do relatório.'],
 ])('a recusa %s do banco no relatório vira a frase da tela', async (codigo, valor, frase) => {
