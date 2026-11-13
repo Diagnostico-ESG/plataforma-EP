@@ -134,8 +134,10 @@ Registro da Tarefa 3: sem Deno nesta máquina, a função passou só pelo ESLint
 - Alterar: `docs/manutencao/04-modelo-de-dados.md` (Relatório R1, R2…; a função nova e o evento)
 
 - [x] **6.1** Manual atualizado; commit.
-- [ ] **6.2** `git push -u origin documentos-versoes`; workflow "Migrar banco de desenvolvimento" com o arquivo da migração; depois "Testes de banco" na branch. Ler o resultado (0 `not ok`).
-- [ ] **6.3** `npm run db:types` (remoto) e `git diff --exit-code src/types/database.ts`.
-- [ ] **6.4** Com a aprovação do usuário no momento: publicar `arquivos-no-drive` no desenvolvimento (`--use-api`, vínculo conferido) e conferir a recusa sem login. A ponta a ponta com o Drive (critérios 5, 7 e 8) fica para o usuário no desenvolvimento ou para o roteiro de produção.
-- [ ] **6.5** Suíte inteira (`npm test`), lint, typecheck, circular.
-- [ ] **6.6** O critério 14 (`[visual]`) fica para o `/polir`: o projeto não tem vitrine, e a aba só abre com o login do Administrador.
+- [x] **6.2** `git push -u origin documentos-versoes`; workflow "Migrar banco de desenvolvimento" com o arquivo da migração; depois "Testes de banco" na branch. Ler o resultado (0 `not ok`).
+- [x] **6.3** `npm run db:types` (remoto) e `git diff --exit-code src/types/database.ts`.
+- [x] **6.4** Com a aprovação do usuário no momento: publicar `arquivos-no-drive` no desenvolvimento (`--use-api`, vínculo conferido) e conferir a recusa sem login. A ponta a ponta com o Drive (critérios 5, 7 e 8) fica para o usuário no desenvolvimento ou para o roteiro de produção.
+- [x] **6.5** Suíte inteira (`npm test`), lint, typecheck, circular.
+- [x] **6.6** O critério 14 (`[visual]`) fica para o `/polir`: o projeto não tem vitrine, e a aba só abre com o login do Administrador.
+
+Registro da Tarefa 6: o "Testes de banco" final na branch, com a migração já aplicada, passou 65 de 65 arquivos (43468188319). O `db:types` do remoto saiu igual ao comitado. A `arquivos-no-drive` foi publicada no desenvolvimento em 2026-11-13, com a aprovação do usuário (`--use-api --project-ref yclkzyoebpsxmgpbcbus`). Pedido sem login e com token falso: 401 `sem_login`. Ficam para o usuário no desenvolvimento ou para a produção: a ponta a ponta com o Drive (critérios 5, 7 e 8) e o critério 14 (`/polir`).
