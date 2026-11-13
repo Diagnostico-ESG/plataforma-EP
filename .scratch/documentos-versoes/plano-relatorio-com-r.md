@@ -133,7 +133,7 @@ Registro da Tarefa 3: sem Deno nesta máquina, a função passou só pelo ESLint
 **Arquivos:**
 - Alterar: `docs/manutencao/04-modelo-de-dados.md` (Relatório R1, R2…; a função nova e o evento)
 
-- [ ] **6.1** Manual atualizado; commit.
+- [x] **6.1** Manual atualizado; commit.
 - [ ] **6.2** `git push -u origin documentos-versoes`; workflow "Migrar banco de desenvolvimento" com o arquivo da migração; depois "Testes de banco" na branch. Ler o resultado (0 `not ok`).
 - [ ] **6.3** `npm run db:types` (remoto) e `git diff --exit-code src/types/database.ts`.
 - [ ] **6.4** Com a aprovação do usuário no momento: publicar `arquivos-no-drive` no desenvolvimento (`--use-api`, vínculo conferido) e conferir a recusa sem login. A ponta a ponta com o Drive (critérios 5, 7 e 8) fica para o usuário no desenvolvimento ou para o roteiro de produção.
