@@ -89,9 +89,11 @@ Registro das Tarefas 2 e 4: foram juntas num commit. A troca do nome padrão que
 
 **Fluxo:** ler o arquivo pela RLS (`arquivos_da_versao`: `drive_id, nome, papel, numero_do_relatorio`). Se não aparece, `sem_permissao`. Pela `situacaoDoNomeDoRelatorio`: `com_r` devolve 200 `{ nome }` sem tocar o Drive; `fora_do_padrao` devolve `entrada_invalida`. Conferir que o arquivo está sob a raiz (`conferidorDaRaiz`), renomear no Drive e chamar `renomear_relatorio_para_r` com o nome lido como esperado. A recusa do banco sai pelo `recusaDoBanco`; a resposta é 200 `{ nome }`. Sem desfazer no Drive se o banco falhar: a spec manda deixar, e o clique seguinte conserta.
 
-- [ ] **3.1** Escrever o módulo e ligar no `index.ts`. Lógica de decisão já testada na tarefa 2; aqui só a orquestração (Deno, fora do Vitest).
-- [ ] **3.2** `npm run typecheck` e `npx eslint supabase/functions`.
-- [ ] **3.3** Commit.
+- [x] **3.1** Escrever o módulo e ligar no `index.ts`. Lógica de decisão já testada na tarefa 2; aqui só a orquestração (Deno, fora do Vitest).
+- [x] **3.2** `npm run typecheck` e `npx eslint supabase/functions`.
+- [x] **3.3** Commit.
+
+Registro da Tarefa 3: sem Deno nesta máquina, a função passou só pelo ESLint; a checagem de tipos dela fica para a publicação no desenvolvimento (6.4).
 
 ### Tarefa 4: Tela — um rótulo do relatório, com R
 
