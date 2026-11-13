@@ -1,5 +1,7 @@
 # Importação dos dados atuais
 
+**Relatório numerado com R (mudança de 2026-11-13, em `documentos-versoes`).** A aba Importação ganha a seção "3. Relatórios com R", só do Administrador, que renomeia para R os relatórios numerados com V no nome. Detalhe na seção "Relatório numerado com R" de `.scratch/documentos-versoes/spec.md` (ADR 0047).
+
 **Duas revisões (mudança de 2026-11-10, em `revisoes-aprovacao`).** O processo cuja última coluna concluída é "Revisão Interna" passa a entrar na etapa nova Revisão do relatório (a coluna marca as duas revisões). Detalhe na seção "Duas revisões" de `.scratch/revisoes-aprovacao/spec.md`.
 
 Status: ready-for-agent
@@ -193,3 +195,4 @@ Entregue em 2026-11-06 (commit ec2b9d0), com ressalva: [visual] da primeira entr
 Entregue em 2026-11-10 (commit 005cea9), com ressalva: [visual] da segunda entrega conferido só por medida no navegador, na vitrine local com dados falsos
 Entregue em 2026-11-10 (commit 46aedf9)
 Entregue em 2026-11-10 (commit 6fa818b)
+Em revisão desde 2026-11-13

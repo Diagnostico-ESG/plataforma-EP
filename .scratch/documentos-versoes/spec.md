@@ -1,5 +1,7 @@
 # Documentos e versões
 
+**Relatório numerado com R (mudança de 2026-11-13).** O número do relatório passa a usar a letra R ("Relatório R2 (da V7)", `_Relatório R2.docx` no Drive), e os relatórios numerados que já existem são renomeados para R por um botão do Administrador na aba Importação (ADR 0047, que muda o ADR 0026 só na letra). Detalhe na seção "Relatório numerado com R", logo abaixo; onde esta spec diz "Relatório V2", vale "Relatório R2".
+
 **Duas revisões (mudança de 2026-11-10, em `revisoes-aprovacao`).** A Revisão interna passa a se chamar Revisão do fluxograma, e a Revisão do relatório entra logo depois. Versão em sequência e relatório se enviam até a Revisão do relatório; nela, o [Enviar versão] pede o relatório e deixa o .bpm (e o .png, só com o .bpm) opcional, e o [Enviar relatório] não aparece. Toda alteração é versão ou relatório novo; o Substituir fica para o arquivo enviado por engano. Detalhe na seção "Duas revisões" de `.scratch/revisoes-aprovacao/spec.md` (ADR 0046).
 
 Status: ready-for-agent
@@ -17,6 +19,146 @@ Status: ready-for-agent
 **Como resolvia antes de 2026-10-26.** Hoje os fluxogramas (.bpmn, .png e o .bpm do Bizagi) e os relatórios de cada processo ficam em pastas e e-mails, sem numeração confiável, sem saber quem enviou o quê e quando, e sem ligação com o andamento do processo. Com esta funcionalidade, o painel do processo ganha a seção **Versões**: a equipe envia cada versão (V1, V2…) com o .bpm do Bizagi e o .png, o .bpmn opcional e o relatório, junto ou depois (ADR 0016: o fluxo se vê pelo .png); registra as versões históricas da primeira etapa do trabalho (V5F); acrescenta o relatório que ficou pendente ou marca "sem alteração de conteúdo"; substitui um arquivo enviado por engano; e baixa qualquer arquivo com o nome padrão (`CEE_V6_Nome do processo`). Os arquivos ficam no Drive compartilhado do CED, numa pasta aberta à equipe e organizada por setor e processo; a plataforma entra no Drive por uma conta de serviço do EP, cuja chave fica só numa função do servidor, e o banco guarda apenas os dados de cada arquivo. A plataforma avisa quando um arquivo foi alterado ou apagado direto no Drive. O banco impõe as regras (numeração, versão histórica só antes da primeira nova, processo em andamento, quem pode) e toda mudança entra no histórico do processo.
 
 Decisões de origem: sabatina de 2026-10-15 (`.scratch/documentos-versoes/sabatina.md`), `CONTEXT.md` (seção "Documentos") e ADRs 0005 (versão do processo com os arquivos dentro), 0006 (envio não muda a etapa), 0007 (arquivo se substitui sem guardar o anterior) e 0008 (arquivos no Drive compartilhado por conta de serviço). Mudança de 2026-10-20 (sabatina do visualizador, que saiu da v1): ADR 0016 (versão exige .bpm e .png; .bpmn opcional); ver a seção "Mudança de 2026-10-20".
+
+## Relatório numerado com R (mudança de 2026-11-13)
+
+Demanda de 2026-11-11 (`/demanda`), sabatina de 2026-11-13 e ADR 0047, que muda o ADR 0026 só na letra do número do relatório. Termo no `CONTEXT.md`: **Relatório** (Relatório R1, R2…). Esta seção também muda textos das specs de `revisoes-aprovacao` (Revisão do relatório) e a aba Importação de `importacao-dados-atuais`.
+
+### Como resolve
+
+Hoje o rótulo "Relatório V2 (da V7)" usa a mesma letra para duas numerações diferentes, e quem lê confunde o número do relatório com o da versão. Com esta mudança, V fica só para a versão (V7, V3P, V5F) e R para o relatório: "Relatório R2 (da V7)" em todas as telas, inclusive para os relatórios antigos, porque o texto vem do número guardado. Os arquivos novos saem no Drive com `_Relatório R2.docx`, e os que já estão lá com `_Relatório V2.docx` (inclusive os da carga real) ganham o R por um botão do Administrador, uma vez em cada ambiente, para o Drive mostrar o mesmo que a plataforma. Os relatórios sem número (.pdf antigos e o da versão histórica) e os outros anexos não mudam, e o histórico já gravado fica como está.
+
+### O que deixa de valer no resto desta spec
+
+- Todo "Relatório V1, V2…" do rótulo, das frases e do nome padrão do arquivo passa a ser "Relatório R1, R2…". O número, a ligação com a versão e as regras do relatório **não mudam**.
+- "Nomes já gravados não mudam" (seção "Nome padrão dos arquivos") deixa de valer também para a renomeação dos relatórios numerados para R.
+
+### Telas
+
+**Textos que trocam a letra** (só o texto; nenhum botão, lugar ou pergunta principal muda):
+
+- verso e "Versões anteriores": o link do relatório ("Relatório R2 (da V7)", "Relatório R2 .docx");
+- formulário de envio: "Relatório R2, acompanha a V7";
+- Revisão do relatório: a ação principal ("A revisar: Relatório R2"), o Agora, o aviso do autor ("Você enviou o Relatório R2…"), as opções e frases da revisão ("o Relatório R3 corrige o Relatório R2"), o título "Editar a revisão do Relatório R2";
+- histórico: "Enviou o Relatório R2 (acompanha a V7)" e os eventos de revisão gravados daqui em diante.
+
+**Aba Importação, seção nova "3. Relatórios com R"** (só o Administrador vê a aba).
+
+- **Pergunta principal:** "os relatórios antigos já estão com R no nome?"
+- **Ao abrir:** "Procurando relatórios com V no nome…".
+- **Com relatórios a renomear:** "N relatórios ainda têm V no nome do arquivo (Relatório V2). Renomear troca só a letra, no Drive e na plataforma." e o botão [Renomear para R], principal da seção. Se houver relatórios numerados fora do padrão, uma linha a mais: "N relatórios com nome fora do padrão ficam como estão."
+- **Renomeando:** "Renomeando… 12 de 140.", sem o botão.
+- **Ao fim:** "140 relatórios renomeados." e, se algum falhou, "3 não foram renomeados. Tente de novo para continuar os que faltam." com o botão [Tentar de novo].
+- **Sem relatórios a renomear:** "Todos os relatórios numerados já estão com R."
+- **Erro na leitura (inclusive falha de conexão):** "Não foi possível ler os relatórios. Confira a conexão e tente de novo." com [Tentar de novo].
+- Atrás de "ver mais": nada; a seção é curta.
+
+### Histórias de usuário
+
+168. Como integrante do EP, quero ver "Relatório R2 (da V7)", para não confundir o número do relatório com o da versão.
+169. Como integrante do EP, quero ver R também nos relatórios enviados antes da mudança, para não haver duas letras na plataforma.
+170. Como integrante do EP, quero que o relatório enviado depois da mudança saia no Drive como `_Relatório R2.docx`.
+171. Como revisor, quero ver "A revisar: Relatório R2" e as frases da revisão com R.
+172. Como usuário, quero que o histórico já gravado continue como foi gravado ("Relatório V2"), e que os eventos novos venham com R.
+173. Como administrador, quero ver na aba Importação quantos relatórios ainda têm V no nome e renomeá-los com um botão, para o Drive mostrar o mesmo que a plataforma.
+174. Como administrador, quero acompanhar o andamento ("12 de 140") e ver, no fim, quantos foram renomeados e quantos falharam.
+175. Como administrador, quero que, se algum falhar, os já renomeados fiquem e clicar de novo continue só os que faltam.
+176. Como administrador, quero que relatórios numerados com nome fora do padrão, relatórios sem número e outros anexos fiquem de fora, e saber quantos ficaram fora do padrão.
+177. Como usuário, quero ver no histórico do processo "Renomeou o arquivo …_Relatório V2.docx para …_Relatório R2.docx", para achar pelo nome novo um arquivo que eu conhecia pelo antigo.
+178. Como administrador, quero que o banco e a função do servidor recusem a renomeação de quem não é Administrador ativo, mesmo fora da tela.
+179. Como administrador, quero que a renomeação valha para processos em qualquer situação (em andamento, suspenso, cancelado, concluído) e para subprocessos, porque a carga real trouxe muitos concluídos.
+
+### Decisões de implementação
+
+- **Rótulo do relatório num ponto só na tela.** Uma função de rótulo do relatório ("Relatório R2") passa a ser usada por todos os textos que hoje montam "Relatório V…" à mão (versões, revisões, Agora, ação principal, histórico). A troca futura da letra fica num lugar.
+- **Nome padrão (função do servidor):** o relatório numerado novo sai com `_Relatório R<n>`; a conferência do nome no registro passa a esperar `_Relatório R<n>.`. A renumeração da versão continua trocando só o rótulo da versão, e o `_Relatório R2` do fim fica.
+- **Banco:** `private.rotulo_do_relatorio` passa a devolver "Relatório R2" (migração nova; os eventos já gravados não mudam).
+- **Renomeação, um arquivo por chamada.** A tela lê os relatórios a renomear (os numerados cujo nome termina em `_Relatório V<número>.<extensão>`, com o número igual ao guardado), e chama a função do servidor uma vez por arquivo, mostrando o andamento, como a importação da pasta faz. A ação nova `renomear_relatorio` da função confere o chamador (Administrador ativo), lê o arquivo pela RLS, renomeia no Drive e então chama a função do banco, que grava o nome novo. Uma chamada por arquivo evita o tempo-limite da função do servidor com centenas de arquivos.
+- **Ordem e conserto.** Primeiro o Drive, depois o banco. Se o banco falhar depois do Drive, o arquivo fica com R no Drive e V no banco; clicar de novo lista o arquivo outra vez (pelo nome no banco), renomeia no Drive para o mesmo nome (nada muda) e grava. Nenhum estado fica sem conserto.
+- **Fora do padrão** se conta na leitura e não vai à função.
+
+### Modelo de dados
+
+Sem tabela nem coluna nova. Muda:
+
+- `private.rotulo_do_relatorio(arquivo)`: devolve "Relatório R" || número.
+- Função nova `public.renomear_relatorio_para_r(arquivo, nome_esperado)`: só Administrador ativo; confere que o arquivo é relatório numerado e que o nome guardado ainda é o esperado (com V e o número dele); grava o nome com R pela mesma marca de função que a edição do número usa (fora da função o nome não muda); devolve o nome novo. Se o nome já está com R, devolve sem gravar nem registrar (clicar de novo e duas pessoas ao mesmo tempo não duplicam nada).
+- Evento novo `renomear_relatorio` no histórico do processo, com o nome antigo e o novo, gravado pela função.
+
+**Quem pode o quê** (cada célula vira um teste pgTAP):
+
+| Ação | Administrador | Integrante | Consulta | Desativado | Sem login |
+|-|-|-|-|-|-|
+| Renomear relatório para R (função do banco) | sim | não | não | não | não |
+| Ação `renomear_relatorio` (função do servidor) | sim | não | não | não | não |
+| Ler os relatórios a renomear | sim (já lê hoje) | sim (já lê) | sim (já lê) | não | não |
+
+**Regras que o banco impõe** (cada uma com teste):
+
+- só o Administrador ativo renomeia;
+- só relatório numerado com nome no padrão com V e o número dele; outro arquivo, relatório sem número ou nome fora do padrão é recusado;
+- o nome novo é o antigo com só o `V<n>` do fim trocado por `R<n>`;
+- nome já com R: sem gravação e sem evento;
+- vale em qualquer situação do processo e no subprocesso;
+- o nome continua não mudando fora das funções (o gatilho de hoje);
+- cada renomeação grava um evento com o antes e o depois; a troca do nome não registra substituição de arquivo.
+
+**Regras de estado:** nenhuma nova. **Edição simultânea:** a função confere o nome esperado; dispensa a coluna `versao`. **Índices:** nenhum novo (a leitura usa o papel e o número, já usados hoje). **Migração:** não destrutiva (recria uma função, cria uma função e o tipo de evento; nenhum dado é tocado pela migração).
+
+**Testes de banco antigos que podem quebrar:** o `77_duas_revisoes_registro` compara "Relatório V1"/"Relatório V2" no evento da revisão (passa a R); os que conferem a lista de funções e privilégios (`10_privilegios_padrao`, `46_funcoes_e_views_seguras`) ganham a função nova. Os nomes de arquivo com "Relatório V" nos dados dos testes (29, 65, 58) são só dados inventados e ficam.
+
+### Decisões de teste
+
+- **Ponto de teste: a tela inteira** (Vitest com Testing Library, o app com as falsas nomeadas, como nos `App.*` de hoje): o R no verso, na lista de versões, no formulário de envio, na Revisão do relatório (ação principal, Agora, aviso, opções, frases, título da edição) e no histórico; a seção "3. Relatórios com R" em cada estado (procurando, com relatórios, com fora do padrão, renomeando, fim com e sem falhas, tentar de novo, nada a renomear, erro na leitura) e ausente para quem não é Administrador. Os testes de hoje com "Relatório V" passam a R. Arte anterior: `App.arquivosDoVerso`, `App.enviarVersaoNaRevisaoDoRelatorio`, `App.importacao` e os de importação da pasta.
+- **Funções puras:** o rótulo do relatório; o reconhecimento do nome a renomear e o nome novo (fora do padrão, número diferente do guardado, já com R); as frases da seção. Arte anterior: `rotulos`, `nomePadrao.test`, `renumerar.test`.
+- **Função do servidor:** a decisão da ação `renomear_relatorio` por perfil e entradas inválidas, no Vitest; o nome padrão com R e a conferência do registro com R. A ponta a ponta se confere publicando no desenvolvimento.
+- **Banco:** pgTAP, um teste por regra e por célula da tabela, no Docker local e pelo "Testes de banco" na conferência final.
+- Dados de teste inventados.
+
+### Critérios de aceite
+
+1. O link do relatório no verso e nas "Versões anteriores" diz "Relatório R2 (da V7)" (ou "Relatório R2 .docx"), também para o relatório gravado antes da mudança.
+2. O formulário de envio diz "Relatório R2, acompanha a V7".
+3. Na Revisão do relatório, a ação principal, o Agora, o aviso do autor, as opções, as frases e o título da edição usam R.
+4. O histórico mostra "Enviou o Relatório R2 (acompanha a V7)"; os eventos de revisão gravados depois da migração dizem "Relatório R2", e os gravados antes continuam com V.
+5. O relatório numerado enviado depois da mudança tem no Drive e na plataforma o nome `…_Relatório R2.docx`, e o registro dele é aceito; a renumeração da versão mantém o `_Relatório R2`.
+6. A aba Importação tem a seção "3. Relatórios com R" com a contagem dos relatórios com V e o [Renomear para R]; com fora do padrão, a linha a mais com a contagem; sem nada a renomear, "Todos os relatórios numerados já estão com R."
+7. [Renomear para R] mostra "Renomeando… N de M." e, no fim, quantos foram renomeados e quantos falharam; [Tentar de novo] continua só os que faltam.
+8. Cada relatório renomeado fica com R no Drive e no nome guardado, e o histórico do processo dele mostra "Renomeou o arquivo … para …".
+9. Relatórios sem número, outros anexos e relatórios numerados fora do padrão não mudam de nome.
+10. A renomeação vale para processo em qualquer situação e para subprocesso.
+11. Integrante, Consulta, desativado e visitante não renomeiam (banco e função do servidor recusam), e a aba Importação só aparece ao Administrador.
+12. Renomear de novo um arquivo já com R não muda nada nem grava evento.
+13. Erro na leitura mostra a frase com [Tentar de novo].
+14. `[visual]` A seção "3. Relatórios com R" segue o desenho das seções 1 e 2 da aba Importação, sem passar da altura do notebook (1366×768) nos estados com contagem e no fim com falhas.
+
+### Fora do escopo
+
+- Renomear os outros anexos ou os relatórios sem número: não têm número de relatório.
+- Reescrever o histórico já gravado: guarda o nome da época.
+- Nome padrão completo para os fora do padrão: poderia mudar mais que a letra; o Administrador decide caso a caso.
+- Tirar o botão depois do uso: clicar de novo não estraga nada; se quiser tirar, vai ao backlog.
+- Backup antes de renomear na produção: dispensado por decisão do usuário (ADR 0047).
+- Relatório piloto: descartado pelo usuário.
+
+### Decisões tomadas ao escrever esta seção, a confirmar na leitura
+
+1. **A seção fica na aba Importação**, como "3. Relatórios com R", depois das duas etapas da importação.
+2. **Sem janela de confirmação** antes de renomear: a frase da seção já diz o que acontece, e nada se apaga.
+3. **Uma chamada da função do servidor por arquivo**, com o andamento na tela, por causa do tempo-limite da função.
+4. **"Fora do padrão"** é o relatório numerado cujo nome não termina em `_Relatório V<número>` com o número guardado (por exemplo, número do nome diferente do do banco).
+5. **O texto do histórico** é "Renomeou o arquivo <nome antigo> para <nome novo>".
+6. **Uma função de rótulo do relatório** na tela, no lugar dos textos montados à mão.
+
+### Critérios conferidos olhando a tela
+
+- `[visual]` Critério 14.
+
+### Outras specs afetadas
+
+- `revisoes-aprovacao`: os textos da Revisão do relatório passam a R (nota apontando para esta seção).
+- `importacao-dados-atuais`: a aba Importação ganha a seção "3. Relatórios com R" (nota apontando para esta seção).
+- Manual de manutenção (`docs/manutencao/04-modelo-de-dados.md`): a menção ao "Relatório V" passa a R.
 
 ## Travas em avisos (mudança de 2026-10-27)
 
@@ -1119,3 +1261,4 @@ Entregue em 2026-11-04 (commit 373c07e), com ressalva: critérios [visual] presu
 
 Entregue em 2026-11-04 (commit aae9254), com ressalva: a correção do anexo (raiz.ts, três níveis) foi provada só por teste automático e pelo "Testes de banco"; o anexo corrigido não foi visto no Drive real (C3 e C4 da prova adiados por decisão do usuário); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
 Entregue em 2026-11-10 (commit 46aedf9), com ressalva: o [Enviar versão] da Revisão do relatório e a confirmação nova do Substituir (mudança das duas revisões, em revisoes-aprovacao) vistos só na vitrine local com módulos falsos; as ressalvas das entregas anteriores seguem valendo
+Em revisão desde 2026-11-13

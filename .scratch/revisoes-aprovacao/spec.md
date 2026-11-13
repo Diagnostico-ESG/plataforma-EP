@@ -1,5 +1,7 @@
 # Revisões e aprovação
 
+**Relatório numerado com R (mudança de 2026-11-13, em `documentos-versoes`).** Os textos da Revisão do relatório passam a usar R ("A revisar: Relatório R2", "o Relatório R3 corrige o Relatório R2"). Detalhe na seção "Relatório numerado com R" de `.scratch/documentos-versoes/spec.md` (ADR 0047).
+
 Status: ready-for-agent
 
 **Repositório de processos (mudança de 2026-10-28, spec própria).** A funcionalidade 14, `.scratch/repositorio-de-processos/spec.md` (ADR 0034), acaba com o Arquivado (marca, trava, selo, filtro, Arquivar e Desarquivar): onde esta spec fala em arquivado, vale aquela. Ela também traz Tirar do Quadro, a coluna Concluídos com saída após 30 dias, Todos | Concluídos, os cancelados fora das visualizações, a Lista com filtro e ordenação por coluna e Agrupar por Macroprocesso, e a etiqueta Iniciado.
@@ -743,3 +745,4 @@ Entregue em 2026-10-27 (commit c2b089f), com ressalva: critérios [visual] da mu
 
 Entregue em 2026-10-29 (commit 9fc0201), com ressalva: critérios [visual] de repositorio-de-processos presumidos (nada visto com o login real; a árvore e o cabeçalho da Lista só na vitrine local com módulos falsos, sem captura de imagem); revisão de segurança foi a de reserva (menos completa: o /security-review não achou mudanças a revisar); migrações fim_do_arquivado e tirar_e_voltar_ao_quadro ainda sem aplicar no remoto de desenvolvimento e função arquivos-no-drive sem nova publicação; as ressalvas das entregas anteriores seguem valendo
 Entregue em 2026-11-10 (commit 46aedf9), com ressalva: critérios [visual] 18 a 20 das duas revisões vistos só na vitrine local com módulos falsos e dados inventados (19 por captura a 1366×768; 18 e 20, e o celular, por medida no navegador), não com o login real
+Em revisão desde 2026-11-13
