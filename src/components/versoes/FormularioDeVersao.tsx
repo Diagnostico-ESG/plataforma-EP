@@ -170,7 +170,7 @@ function nomeDoArquivo(processo: Pick<ProcessoDaLista, 'nome' | 'setorSigla'>, d
 
 type PreviaDoEnvioProps = { numero: number | null; historica: boolean; piloto: boolean; sozinho: RelatorioSozinho | null }
 
-// "Esta versão será a V8." ou, só com o relatório, "Relatório V2, acompanha a V7".
+// "Esta versão será a V8." ou, só com o relatório, "Relatório R2, acompanha a V7".
 function PreviaDoEnvio({ numero, historica, piloto, sozinho }: PreviaDoEnvioProps) {
   if (sozinho) return <p className="formulario-de-versao-previa"><strong>{previaDoRelatorio(sozinho)}</strong></p>
   if (numero === null) return null

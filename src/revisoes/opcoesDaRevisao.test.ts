@@ -19,14 +19,14 @@ describe('opcoesDoResultado', () => {
   })
 
   test('na Revisão do relatório, "sem alteração" vale para o relatório mais recente', () => {
-    expect(rotulos(relatorio())[0]).toEqual(['Sem alteração: vale para o Relatório V2', false])
+    expect(rotulos(relatorio())[0]).toEqual(['Sem alteração: vale para o Relatório R2', false])
   })
 
   test('"corrigida" liga o que foi enviado na passagem: a versão, o relatório ou os dois', () => {
     expect(rotulos(fluxograma({ ultimaVersao: V8 }))[1]).toEqual(['Corrigida: a V8 corrige a V7', false])
-    expect(rotulos(relatorio({ ultimoRelatorio: R2 }))[1]).toEqual(['Corrigida: o Relatório V2 corrige o Relatório V1', false])
+    expect(rotulos(relatorio({ ultimoRelatorio: R2 }))[1]).toEqual(['Corrigida: o Relatório R2 corrige o Relatório R1', false])
     expect(rotulos(relatorio({ ultimaVersao: V8, ultimoRelatorio: R2 }))[1])
-      .toEqual(['Corrigida: a V8 corrige a V7; o Relatório V2 corrige o Relatório V1', false])
+      .toEqual(['Corrigida: a V8 corrige a V7; o Relatório R2 corrige o Relatório R1', false])
   })
 
   test('"corrigida" fica desabilitada, com o motivo, quando nada foi enviado nesta passagem (ou o enviado não tem anterior)', () => {
@@ -47,9 +47,9 @@ describe('avisoDoAutorDaRevisao', () => {
 
   test('na Revisão do relatório, avisa quem enviou o relatório revisado', () => {
     expect(avisoDoAutorDaRevisao(relatorio(), 'sem_alteracao', 'u4'))
-      .toBe('Você enviou o Relatório V2. A revisão do relatório deveria ser de outra pessoa.')
+      .toBe('Você enviou o Relatório R2. A revisão do relatório deveria ser de outra pessoa.')
     expect(avisoDoAutorDaRevisao(relatorio({ ultimoRelatorio: R2 }), 'corrigida', 'u5'))
-      .toBe('Você enviou o Relatório V1. A revisão do relatório deveria ser de outra pessoa.')
+      .toBe('Você enviou o Relatório R1. A revisão do relatório deveria ser de outra pessoa.')
     expect(avisoDoAutorDaRevisao(relatorio(), 'sem_alteracao', 'u1')).toBeNull()
   })
 
@@ -77,9 +77,9 @@ describe('resumos do Agora', () => {
 
   test('revisão do relatório', () => {
     const doRelatorio = { ...base, etapa: 'revisao_relatorio', relatorioRevisado: 1 } as const
-    expect(resumoDaRevisao(doRelatorio)).toBe('Sem alteração · Relatório V1 · Ana')
+    expect(resumoDaRevisao(doRelatorio)).toBe('Sem alteração · Relatório R1 · Ana')
     expect(resumoDaRevisao({ ...doRelatorio, relatorioCorrigido: 2, versaoCorrigida: 8, resultado: 'corrigida', escopo: 'ambos' }))
-      .toBe('Corrigida · V8 corrige a V7; Relatório V2 corrige o Relatório V1')
+      .toBe('Corrigida · V8 corrige a V7; Relatório R2 corrige o Relatório R1')
   })
 
   test('aprovação, com e sem número', () => {

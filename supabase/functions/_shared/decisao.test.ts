@@ -61,6 +61,11 @@ describe('conferirChamador', () => {
     ['consulta confere', consulta, 'conferir', null],
     ['inativo não confere', inativo, 'conferir', 'usuario_inativo'],
     ['sem login não confere', null, 'conferir', 'sem_login'],
+    ['administrador renomeia o relatório', administrador, 'renomear_relatorio', null],
+    ['integrante não renomeia o relatório', integrante, 'renomear_relatorio', 'sem_permissao'],
+    ['consulta não renomeia o relatório', consulta, 'renomear_relatorio', 'sem_permissao'],
+    ['inativo não renomeia o relatório', inativo, 'renomear_relatorio', 'usuario_inativo'],
+    ['sem login não renomeia o relatório', null, 'renomear_relatorio', 'sem_login'],
   ]
 
   it.each(casos)('%s', (_nome, chamador, acao, esperado) => {

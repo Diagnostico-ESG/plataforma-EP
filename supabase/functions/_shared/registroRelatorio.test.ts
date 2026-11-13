@@ -67,18 +67,22 @@ describe('conferirArquivosNoDrive: relatório numerado', () => {
   }
 
   it('aceita o .docx cujo nome traz o número do relatório do pedido', () => {
-    expect(conferir('TSA_V8_Emitir Ofício_Relatório V3.docx', 3)).toBeNull()
+    expect(conferir('TSA_V8_Emitir Ofício_Relatório R3.docx', 3)).toBeNull()
   })
 
   it('recusa o .pdf, citando o recebido e o esperado', () => {
-    const recusa = conferir('TSA_V8_Emitir Ofício_Relatório V3.pdf', 3)
+    const recusa = conferir('TSA_V8_Emitir Ofício_Relatório R3.pdf', 3)
     expect(recusa?.codigo).toBe('extensao_nao_aceita')
     expect(recusa?.mensagem).toContain('recebido .pdf')
   })
 
+  it('recusa o nome do relatório ainda com V', () => {
+    expect(conferir('TSA_V8_Emitir Ofício_Relatório V3.docx', 3)?.codigo).toBe('arquivo_nao_chegou')
+  })
+
   it('recusa o nome com outro número de relatório', () => {
-    const recusa = conferir('TSA_V8_Emitir Ofício_Relatório V2.docx', 3)
+    const recusa = conferir('TSA_V8_Emitir Ofício_Relatório R2.docx', 3)
     expect(recusa?.codigo).toBe('arquivo_nao_chegou')
-    expect(recusa?.mensagem).toContain('esperado o relatório V3')
+    expect(recusa?.mensagem).toContain('esperado o Relatório R3')
   })
 })

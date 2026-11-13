@@ -116,7 +116,7 @@ test('enviar leva as versões ao processo e o resumo traz os avisos e as lacunas
   ])
   expect(versoes.versoes.p1.map((v) => [v.numero, v.historica, v.arquivos.map((a) => a.nome)])).toEqual([
     [1, true, ['TSA_V1F_Emitir Ofício.bpm', 'TSA_V1F_Emitir Ofício_Relatório.docx']],
-    [2, false, ['TSA_V2_Emitir Ofício.bpm', 'TSA_V2_Emitir Ofício.png', 'TSA_V2_Emitir Ofício_Relatório V1.docx']],
+    [2, false, ['TSA_V2_Emitir Ofício.bpm', 'TSA_V2_Emitir Ofício.png', 'TSA_V2_Emitir Ofício_Relatório R1.docx']],
   ])
   expect(importacao.anexosImportados).toEqual([{ processoId: 'p1', nome: 'TSA_V2_Emitir Ofício_Relatório.pdf' }])
   expect(importacao.subpastasAnotadas).toEqual([{ processoId: 'p2', subpasta: 'Grupo' }])
@@ -218,7 +218,7 @@ test('a versão sem .bpm usa o .bpm da versão seguinte (as anteriores ficam nas
   fireEvent.click(secao.getByRole('button', { name: 'Enviar arquivos' }))
   expect(await secao.findByText('Envio concluído')).toBeTruthy()
   expect(versoes.versoes.p1.map((v) => [v.numero, v.arquivos.map((a) => a.nome)])).toEqual([
-    [1, ['TSA_V1_Emitir Ofício.bpm', 'TSA_V1_Emitir Ofício.png', 'TSA_V1_Emitir Ofício_Relatório V1.docx']],
+    [1, ['TSA_V1_Emitir Ofício.bpm', 'TSA_V1_Emitir Ofício.png', 'TSA_V1_Emitir Ofício_Relatório R1.docx']],
     [2, ['TSA_V2_Emitir Ofício.bpm']],
   ])
 })

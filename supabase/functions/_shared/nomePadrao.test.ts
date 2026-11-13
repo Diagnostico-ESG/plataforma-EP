@@ -33,11 +33,11 @@ describe('nomePadrao', () => {
     )
   })
 
-  it('numera o relatório com o número do relatório, depois da versão que ele acompanha', () => {
+  it('numera o relatório com R e o número do relatório, depois da versão que ele acompanha', () => {
     const relatorio = { ...base, numero: 8, papel: 'relatorio' as const, extensao: 'docx' }
-    expect(nomePadrao({ ...relatorio, numeroDoRelatorio: 3 })).toBe('CEE_V8_Nome do processo_Relatório V3.docx')
+    expect(nomePadrao({ ...relatorio, numeroDoRelatorio: 3 })).toBe('CEE_V8_Nome do processo_Relatório R3.docx')
     expect(nomePadrao({ ...relatorio, numero: 6, piloto: true, numeroDoRelatorio: 1 })).toBe(
-      'CEE_V6P_Nome do processo_Relatório V1.docx',
+      'CEE_V6P_Nome do processo_Relatório R1.docx',
     )
   })
 

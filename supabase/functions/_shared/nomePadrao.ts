@@ -14,7 +14,7 @@ export interface DadosDoNome {
   historica: boolean
   /** Versão piloto (V6P); omitida vale falso. Nunca junto com `historica`. */
   piloto?: boolean
-  /** Só no relatório de versão que não é histórica (Relatório V3): o número próprio do relatório no processo. */
+  /** Só no relatório de versão que não é histórica (Relatório R3): o número próprio do relatório no processo. */
   numeroDoRelatorio?: number
   nomeDoProcesso: string
   papel: PapelDoArquivo
@@ -42,7 +42,7 @@ function sufixoDoPapel(dados: DadosDoNome): string {
   if (dados.papel !== 'relatorio') return ''
   if (dados.numeroDoRelatorio === undefined) return '_Relatório'
   conferirNumero(dados.numeroDoRelatorio, 'do relatório')
-  return `_Relatório V${dados.numeroDoRelatorio}`
+  return `_Relatório R${dados.numeroDoRelatorio}`
 }
 
 export function nomePadrao(dados: DadosDoNome): string {

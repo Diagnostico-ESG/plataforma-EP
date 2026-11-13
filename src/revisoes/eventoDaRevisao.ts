@@ -1,11 +1,12 @@
 import type { EventoDoCadastro } from '../cadastros/tipos'
 import type { ProcessoLido } from '../processos/tipos'
+import { rotuloDoRelatorio as rotuloDoNumero } from '../versoes/rotuloDoRelatorio'
 import type { RevisaoInterna } from './tipos'
 
-const rotuloDoRelatorio = (numero: number | null | undefined) => (numero ? `Relatório V${numero}` : null)
+const rotuloDoRelatorio = (numero: number | null | undefined) => (numero ? rotuloDoNumero(numero) : null)
 
-// O estado como o gatilho do banco o guarda (migrações revisao_interna e duas_revisoes_registro): a etapa, as versões como
-// "V7", os relatórios como "Relatório V2", o resultado, o escopo, o comentário, o revisor e a data da revisão.
+// O estado como o gatilho do banco o guarda (migrações revisao_interna, duas_revisoes_registro e relatorio_com_r): a etapa, as
+// versões como "V7", os relatórios como "Relatório R2", o resultado, o escopo, o comentário, o revisor e a data da revisão.
 function estadoDaRevisao(processo: ProcessoLido, revisao: RevisaoInterna): Record<string, unknown> {
   return {
     processo_nome: processo.nome, setor_sigla: processo.setorSigla, etapa: revisao.etapa ?? 'revisao_interna',

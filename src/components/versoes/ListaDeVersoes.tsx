@@ -45,7 +45,7 @@ function PilulasDaVersao({ versao }: { versao: Versao }) {
 
 type ArquivoDoBlocoProps = BlocoDaVersaoProps & {
   arquivo: ArquivoDaVersao
-  /** O texto do link do relatório ("Relatório V2 (da V7)"); sem ele, o link mostra o nome do arquivo. */
+  /** O texto do link do relatório ("Relatório R2 (da V7)"); sem ele, o link mostra o nome do arquivo. */
   rotulo?: string
   /** Falso no relatório que vale por vir de outra versão: ele se substitui lá, na versão dele. */
   daPropriaVersao: boolean

@@ -29,14 +29,14 @@ test('o relatório sozinho entra na versão mais recente com o próximo número,
   const progresso: string[] = []
   await versoes.enviarRelatorio(RELATORIO(), (enviados, total) => progresso.push(`${enviados}/${total}`))
   const [versao] = await versoes.listarVersoes('p1')
-  expect(versao.arquivos.at(-1)).toMatchObject({ papel: 'relatorio', nome: 'TSA_V1_Emitir Ofício_Relatório V1.docx', numeroDoRelatorio: 1 })
+  expect(versao.arquivos.at(-1)).toMatchObject({ papel: 'relatorio', nome: 'TSA_V1_Emitir Ofício_Relatório R1.docx', numeroDoRelatorio: 1 })
   expect(progresso).toEqual(['1/1'])
   expect(eventos[0]).toMatchObject({
     acao: 'enviar_relatorio', entidade: 'versao', entidadeRef: 'p1', depois: { rotulo: 'V1', numero_do_relatorio: 1 },
   })
 })
 
-test('dois relatórios na mesma versão: o segundo é o Relatório V2; a versão nova liga o seguinte a ela', async () => {
+test('dois relatórios na mesma versão: o segundo é o Relatório R2; a versão nova liga o seguinte a ela', async () => {
   const versoes = falso()
   await versoes.enviarVersao(PEDIDO, () => {})
   await versoes.enviarRelatorio(RELATORIO(), () => {})
@@ -55,7 +55,7 @@ test('o relatório que entra junto com a versão recebe o próximo número; o da
   const [nova, historica] = await versoes.listarVersoes('p1')
   expect(historica.arquivos.find((arquivo) => arquivo.papel === 'relatorio')).toMatchObject({ nome: 'TSA_V5F_Emitir Ofício_Relatório.pdf' })
   expect(historica.arquivos.find((arquivo) => arquivo.papel === 'relatorio')?.numeroDoRelatorio).toBeUndefined()
-  expect(nova.arquivos.find((arquivo) => arquivo.papel === 'relatorio')).toMatchObject({ nome: 'TSA_V6_Emitir Ofício_Relatório V1.docx', numeroDoRelatorio: 1 })
+  expect(nova.arquivos.find((arquivo) => arquivo.papel === 'relatorio')).toMatchObject({ nome: 'TSA_V6_Emitir Ofício_Relatório R1.docx', numeroDoRelatorio: 1 })
 })
 
 test('recusa o .pdf no relatório novo, sozinho ou junto', async () => {
@@ -76,7 +76,7 @@ test('recusa o relatório sem versão para recebê-lo (nem a histórica serve) e
   await expect(versoes.enviarRelatorio(RELATORIO({ numeroDaVersao: 3 }), () => {}))
     .rejects.toThrow('Outra pessoa enviou uma versão enquanto você enviava; esta seria a V6.')
   await expect(versoes.enviarRelatorio(RELATORIO({ numeroDaVersao: 6, numeroDoRelatorio: 9 }), () => {}))
-    .rejects.toThrow('este seria o Relatório V1')
+    .rejects.toThrow('este seria o Relatório R1')
 })
 
 test('o relatório pode acompanhar a versão piloto', async () => {
@@ -84,7 +84,7 @@ test('o relatório pode acompanhar a versão piloto', async () => {
   await versoes.enviarVersao({ ...PEDIDO, numero: 6, piloto: true }, () => {})
   await versoes.enviarRelatorio(RELATORIO({ numeroDaVersao: 6, piloto: true }), () => {})
   const [piloto] = await versoes.listarVersoes('p1')
-  expect(piloto.arquivos.at(-1)?.nome).toBe('TSA_V6P_Emitir Ofício_Relatório V1.docx')
+  expect(piloto.arquivos.at(-1)?.nome).toBe('TSA_V6P_Emitir Ofício_Relatório R1.docx')
 })
 
 test('as falhas programadas valem também para o relatório sozinho', async () => {

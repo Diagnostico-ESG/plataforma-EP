@@ -1,3 +1,4 @@
+import { rotuloDoRelatorio } from './rotuloDoRelatorio'
 import { extensaoDoNome } from '../../supabase/functions/_shared/decisao.ts'
 import { nomePadrao } from '../../supabase/functions/_shared/nomePadrao.ts'
 import { TravaDoBanco } from '../acesso/falhasDeGravacao'
@@ -113,9 +114,9 @@ export function nomeNaPrevia(processo: { setorSigla: string; nome: string }, num
   })
 }
 
-/** "Relatório V3, acompanha a V8": o que o formulário do relatório diz antes do envio (a versão é a mais recente que não é histórica). */
+/** "Relatório R3, acompanha a V8": o que o formulário do relatório diz antes do envio (a versão é a mais recente que não é histórica). */
 export function previaDoRelatorio({ numeroDaVersao, piloto, numeroDoRelatorio }: { numeroDaVersao: number; piloto: boolean; numeroDoRelatorio: number }): string {
-  return `Relatório V${numeroDoRelatorio}, acompanha a V${numeroDaVersao}${piloto ? 'P' : ''}`
+  return `${rotuloDoRelatorio(numeroDoRelatorio)}, acompanha a V${numeroDaVersao}${piloto ? 'P' : ''}`
 }
 
 export function textoDaFalhaDoEnvio(erro: unknown): string {

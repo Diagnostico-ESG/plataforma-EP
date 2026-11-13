@@ -1,3 +1,4 @@
+import { rotuloDoRelatorio } from '../versoes/rotuloDoRelatorio'
 import { CODIGO_DA_REVISAO_DO_RELATORIO, CODIGO_DA_REVISAO_INTERNA } from './codigosDasEtapas'
 import { diasDoProcessoNaEtapa, passouDoLimite, textoDosDias } from './diasNaEtapa'
 import { ROTULO_DA_ETIQUETA } from './rotulos'
@@ -50,7 +51,7 @@ type DadosDoAviso = Pick<ProcessoLido, 'etapaAtual' | 'responsavel' | 'ultimaVer
 export function avisoDoRevisor({ etapaAtual, responsavel, ultimaVersao, ultimoRelatorio }: DadosDoAviso): string | null {
   if (responsavel === null) return null
   if (etapaAtual?.codigo === CODIGO_DA_REVISAO_DO_RELATORIO && ultimoRelatorio?.autorId === responsavel.id) {
-    return `${ultimoRelatorio.autorNome} enviou o Relatório V${ultimoRelatorio.numero}; a revisão do relatório deveria ser de outra pessoa.`
+    return `${ultimoRelatorio.autorNome} enviou o ${rotuloDoRelatorio(ultimoRelatorio.numero)}; a revisão do relatório deveria ser de outra pessoa.`
   }
   if (etapaAtual?.codigo !== CODIGO_DA_REVISAO_INTERNA || ultimaVersao?.autorId !== responsavel.id) return null
   return `${ultimaVersao.autorNome} enviou a V${ultimaVersao.numero}; a revisão do fluxograma deveria ser de outra pessoa.`

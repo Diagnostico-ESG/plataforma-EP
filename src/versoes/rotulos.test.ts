@@ -122,7 +122,7 @@ test('o rótulo curto do arquivo diz o que ele é e a extensão', () => {
   expect(rotuloCurtoDoArquivo(arquivoCom('bpmn', 'bpmn'))).toBe('BPMN .bpmn')
   expect(rotuloCurtoDoArquivo(arquivoCom('relatorio', 'docx'))).toBe('Relatório .docx')
   expect(rotuloCurtoDoArquivo(arquivoCom('relatorio', 'PDF'))).toBe('Relatório .pdf')
-  expect(rotuloCurtoDoArquivo({ ...arquivoCom('relatorio', 'docx'), numeroDoRelatorio: 2 })).toBe('Relatório V2')
+  expect(rotuloCurtoDoArquivo({ ...arquivoCom('relatorio', 'docx'), numeroDoRelatorio: 2 })).toBe('Relatório R2')
 })
 
 test('o dia e o mês da versão saem no horário de Brasília', () => {

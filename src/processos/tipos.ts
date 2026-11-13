@@ -139,7 +139,7 @@ export type UltimaVersao = {
 }
 
 /**
- * O relatório numerado mais recente do processo (Relatório V2) e quem o enviou: o autor não é o revisor ideal da Revisão do
+ * O relatório numerado mais recente do processo (Relatório R2) e quem o enviou: o autor não é o revisor ideal da Revisão do
  * relatório (ADR 0046).
  */
 export type UltimoRelatorio = {

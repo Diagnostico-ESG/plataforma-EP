@@ -20,6 +20,6 @@ test('o resultado da corrigida cita o que ela gerou: a versão, o relatório ou 
   const sem = { versaoCorrigida: null, relatorioCorrigido: null }
   expect(rotuloDoResultado({ ...sem, resultado: 'sem_alteracao' })).toBe('Sem alteração')
   expect(rotuloDoResultado({ ...sem, resultado: 'corrigida', versaoCorrigida: 8 })).toBe('Corrigida, gerou a V8')
-  expect(rotuloDoResultado({ ...sem, resultado: 'corrigida', relatorioCorrigido: 2 })).toBe('Corrigida, gerou o Relatório V2')
-  expect(rotuloDoResultado({ resultado: 'corrigida', versaoCorrigida: 8, relatorioCorrigido: 2 })).toBe('Corrigida, gerou a V8 e o Relatório V2')
+  expect(rotuloDoResultado({ ...sem, resultado: 'corrigida', relatorioCorrigido: 2 })).toBe('Corrigida, gerou o Relatório R2')
+  expect(rotuloDoResultado({ resultado: 'corrigida', versaoCorrigida: 8, relatorioCorrigido: 2 })).toBe('Corrigida, gerou a V8 e o Relatório R2')
 })

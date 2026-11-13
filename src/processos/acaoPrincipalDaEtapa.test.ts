@@ -3,7 +3,7 @@ import { umProcessoLido } from '../testes/processoDaLista'
 import { acaoPrincipalDaEtapa, oQueSeRevisa, semOQueRevisar } from './acaoPrincipalDaEtapa'
 import type { ProcessoLido } from './tipos'
 
-// Com a V8 e o Relatório V1, as duas revisões têm o que revisar.
+// Com a V8 e o Relatório R1, as duas revisões têm o que revisar.
 const COM_O_QUE_REVISAR: Partial<ProcessoLido> = {
   ultimaVersao: { numero: 8, autorId: 'u1', autorNome: 'Ana', papeis: [] },
   ultimoRelatorio: { numero: 1, autorId: 'u1', autorNome: 'Ana', enviadoNestaPassagem: false },
@@ -31,7 +31,7 @@ describe('acaoPrincipalDaEtapa', () => {
 
   test('o que se revisa: a versão mais recente no fluxograma, o relatório mais recente no relatório; nada sem ele ou fora das revisões', () => {
     expect(oQueSeRevisa(naEtapa('revisao_interna'))).toBe('A revisar: V8')
-    expect(oQueSeRevisa(naEtapa('revisao_relatorio'))).toBe('A revisar: Relatório V1')
+    expect(oQueSeRevisa(naEtapa('revisao_relatorio'))).toBe('A revisar: Relatório R1')
     expect(oQueSeRevisa(naEtapa('revisao_interna', { ultimaVersao: null }))).toBeNull()
     expect(oQueSeRevisa(naEtapa('revisao_relatorio', { ultimoRelatorio: null }))).toBeNull()
     expect(oQueSeRevisa(naEtapa('aprovacao_setor'))).toBeNull()

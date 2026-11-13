@@ -59,7 +59,7 @@ test('no destaque, o relatório fica no lugar dele, depois do .bpm e antes do .b
   } })
   const v1 = await (await secao()).findByRole('article', { name: 'V1' })
   const texto = v1.textContent ?? ''
-  const posicoes = ['Imagem .png', 'Fluxograma .bpm', 'Relatório V1', 'BPMN .bpmn'].map((trecho) => texto.indexOf(trecho))
+  const posicoes = ['Imagem .png', 'Fluxograma .bpm', 'Relatório R1', 'BPMN .bpmn'].map((trecho) => texto.indexOf(trecho))
   expect(posicoes.every((posicao) => posicao >= 0)).toBe(true)
   expect([...posicoes].sort((a, b) => a - b)).toEqual(posicoes)
 })

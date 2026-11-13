@@ -41,7 +41,7 @@ export interface EntradaRegistrar {
   /** Com o arquivo: troca o conteúdo dele (o `arquivos` é só o arquivo novo, de qualquer papel); sem: registra. */
   arquivoId: string | null
   /**
-   * O número do relatório novo de versão que não é histórica (Relatório V3), com que o arquivo foi nomeado: o relatório
+   * O número do relatório novo de versão que não é histórica (Relatório R3), com que o arquivo foi nomeado: o relatório
    * sozinho (`numero` é então o da versão que ele acompanha) ou junto com a versão. Nulo nos outros pedidos.
    */
   numeroDoRelatorio: number | null
@@ -231,10 +231,10 @@ function conferirRotuloNoNome(nome: string, rotulo: string | null): Validacao<nu
   return falhar('arquivo_nao_chegou', `nome ${nome}; esperado o rótulo ${rotulo}`)
 }
 
-// O relatório numerado traz o seu número no nome (_Relatório V3) e só vale em .docx.
+// O relatório numerado traz o seu número no nome (_Relatório R3; ADR 0047) e só vale em .docx.
 function conferirNumeroNoNome(nome: string, numeroDoRelatorio: number): Validacao<null> {
-  if (nome.includes(`_Relatório V${numeroDoRelatorio}.`)) return { ok: true, valor: null }
-  return falhar('arquivo_nao_chegou', `nome ${nome}; esperado o relatório V${numeroDoRelatorio}`)
+  if (nome.includes(`_Relatório R${numeroDoRelatorio}.`)) return { ok: true, valor: null }
+  return falhar('arquivo_nao_chegou', `nome ${nome}; esperado o Relatório R${numeroDoRelatorio}`)
 }
 
 // O nome que a função deu ao arquivo no Drive: o rótulo da versão, o número do relatório novo (que só vale em .docx) e a

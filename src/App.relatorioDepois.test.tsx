@@ -32,7 +32,7 @@ const comRelatorios = (numero: number, ...numeros: number[]): Versao => {
   return { ...base, arquivos: [...base.arquivos, ...numeros.map((n) => relatorioNumeradoDeTeste(numero, n))] }
 }
 
-/** H5 (histórica com relatório), V6 com o Relatório V1, V7 com o Relatório V2 e V8 sem relatório: o próximo é o V3, na V8. */
+/** H5 (histórica com relatório), V6 com o Relatório R1, V7 com o Relatório R2 e V8 sem relatório: o próximo é o V3, na V8. */
 const montagem = (etapa = 'relatorio_modelagem_tecnica', mais: Montagem = {}): Montagem => ({
   ...mais,
   ajustarProcessos: (falso) => {
@@ -104,7 +104,7 @@ test('a Consulta vê os relatórios e baixa, sem nenhum botão de alteração', 
   const secao = await secaoDeVersoes()
   await secao.findByRole('article', { name: 'V8' })
   expect(botoesQueAlteram(secao)).toEqual([])
-  expect(secao.getByRole('link', { name: comNome('Relatório V1') })).toBeTruthy()
+  expect(secao.getByRole('link', { name: comNome('Relatório R1') })).toBeTruthy()
 })
 
 test.each(['suspenso', 'cancelado', 'concluido'] as const)('processo %s não mostra [Enviar relatório] nem [Substituir]', async (situacao: SituacaoDoProcesso) => {
@@ -132,9 +132,9 @@ test('cada versão mostra o relatório que vale: o seu, ou o último anterior co
   montarNosCadastros(montagem())
   const secao = await secaoDeVersoes()
   const v8 = within(await secao.findByRole('article', { name: 'V8' }))
-  expect(v8.getByRole('link', { name: comNome('Relatório V2 (da V7)') })).toBeTruthy()
-  expect(within(secao.getByRole('article', { name: 'V7' })).getByRole('link', { name: comNome('Relatório V2') })).toBeTruthy()
-  expect(within(secao.getByRole('article', { name: 'V6' })).getByRole('link', { name: comNome('Relatório V1') })).toBeTruthy()
+  expect(v8.getByRole('link', { name: comNome('Relatório R2 (da V7)') })).toBeTruthy()
+  expect(within(secao.getByRole('article', { name: 'V7' })).getByRole('link', { name: comNome('Relatório R2') })).toBeTruthy()
+  expect(within(secao.getByRole('article', { name: 'V6' })).getByRole('link', { name: comNome('Relatório R1') })).toBeTruthy()
   expect(within(secao.getByRole('article', { name: 'V5F' })).getByRole('link', { name: comNome('Relatório da V5F') })).toBeTruthy()
 })
 
@@ -153,10 +153,10 @@ test('antes do primeiro relatório numerado a versão não mostra relatório; o 
 
 test('o formulário diz o número do relatório e a versão que ele acompanha; o botão começa desabilitado', async () => {
   const { form } = await abrirFormulario()
-  expect(form.getByText('Relatório V3, acompanha a V8')).toBeTruthy()
+  expect(form.getByText('Relatório R3, acompanha a V8')).toBeTruthy()
   expect(botaoEnviar(form).disabled).toBe(true)
   escolher(form, DOCX)
-  expect(await form.findByText('Será gravado como: TSA_V8_Emitir Ofício_Relatório V3.docx')).toBeTruthy()
+  expect(await form.findByText('Será gravado como: TSA_V8_Emitir Ofício_Relatório R3.docx')).toBeTruthy()
   expect(botaoEnviar(form).disabled).toBe(false)
 })
 
@@ -171,24 +171,24 @@ test('enviar liga o relatório à V8 com o próximo número, mostra-o em vez do 
   const { secao, form, versoes } = await abrirFormulario()
   await enviarOFormulario(form)
   const v8 = within(await secao.findByRole('article', { name: 'V8' }))
-  expect(await v8.findByRole('link', { name: comNome('Relatório V3') })).toBeTruthy()
+  expect(await v8.findByRole('link', { name: comNome('Relatório R3') })).toBeTruthy()
   expect(v8.queryByRole('link', { name: comNome('(da V7)') })).toBeNull()
   expect(secao.queryByRole('form', { name: ENVIAR })).toBeNull()
   const relatorio = versoes.versoes.p1.find((versao) => versao.id === 'v8')?.arquivos.find((arquivo) => arquivo.papel === 'relatorio')
-  expect(relatorio).toMatchObject({ nome: 'TSA_V8_Emitir Ofício_Relatório V3.docx', numeroDoRelatorio: 3 })
+  expect(relatorio).toMatchObject({ nome: 'TSA_V8_Emitir Ofício_Relatório R3.docx', numeroDoRelatorio: 3 })
 })
 
-test('um segundo relatório na mesma versão é o Relatório V4, e a V8 mostra os dois', async () => {
+test('um segundo relatório na mesma versão é o Relatório R4, e a V8 mostra os dois', async () => {
   const { secao, form } = await abrirFormulario()
   await enviarOFormulario(form)
   const v8 = within(await secao.findByRole('article', { name: 'V8' }))
-  await v8.findByRole('link', { name: comNome('Relatório V3') })
+  await v8.findByRole('link', { name: comNome('Relatório R3') })
   fireEvent.click(secao.getByRole('button', { name: ENVIAR }))
   const segundo = within(await secao.findByRole('form', { name: ENVIAR }))
-  expect(segundo.getByText('Relatório V4, acompanha a V8')).toBeTruthy()
+  expect(segundo.getByText('Relatório R4, acompanha a V8')).toBeTruthy()
   await enviarOFormulario(segundo)
-  expect(await v8.findByRole('link', { name: comNome('Relatório V4') })).toBeTruthy()
-  expect(v8.getByRole('link', { name: comNome('Relatório V3') })).toBeTruthy()
+  expect(await v8.findByRole('link', { name: comNome('Relatório R4') })).toBeTruthy()
+  expect(v8.getByRole('link', { name: comNome('Relatório R3') })).toBeTruthy()
 })
 
 test('o relatório enviado junto com a versão em sequência recebe o próximo número e fica ligado a ela', async () => {
@@ -198,12 +198,12 @@ test('o relatório enviado junto com a versão em sequência recebe o próximo n
   const form = within(await secao.findByRole('form', { name: 'Enviar versão' }))
   fireEvent.change(form.getByLabelText('Fluxograma Bizagi (.bpm)'), { target: { files: [BPM_VALIDO] } })
   fireEvent.change(form.getByLabelText('Relatório (.docx) (opcional)'), { target: { files: [DOCX] } })
-  expect(await form.findByText('Será gravado como: TSA_V9_Emitir Ofício_Relatório V3.docx')).toBeTruthy()
+  expect(await form.findByText('Será gravado como: TSA_V9_Emitir Ofício_Relatório R3.docx')).toBeTruthy()
   const enviar = form.getByRole('button', { name: 'Enviar' }) as HTMLButtonElement
   await waitFor(() => expect(enviar.disabled).toBe(false))
   fireEvent.click(enviar)
   const v9 = within(await secao.findByRole('article', { name: 'V9' }))
-  expect(await v9.findByRole('link', { name: comNome('Relatório V3') })).toBeTruthy()
+  expect(await v9.findByRole('link', { name: comNome('Relatório R3') })).toBeTruthy()
 })
 
 test('a versão piloto não tem campo de relatório', async () => {
@@ -239,7 +239,7 @@ test('a recusa do servidor vira a frase da tela, com o formulário preenchido', 
   versoes.falhaNoRegistro = falhaDaFuncao('numero_do_relatorio_mudou', '4')
   await enviarOFormulario(form)
   expect((await form.findByRole('alert')).textContent)
-    .toBe('Outra pessoa enviou um relatório enquanto você enviava; este seria o Relatório V4. Envie de novo.')
+    .toBe('Outra pessoa enviou um relatório enquanto você enviava; este seria o Relatório R4. Envie de novo.')
   expect(botaoEnviar(form).disabled).toBe(false)
 })
 
@@ -261,9 +261,9 @@ test('o relatório numerado da própria versão tem [Substituir]; o de outra ver
   montarNosCadastros(montagem())
   const secao = await secaoDeVersoes()
   const v7 = within(await secao.findByRole('article', { name: 'V7' }))
-  expect(v7.getByRole('button', menuDe('TSA_V7_Emitir Ofício_Relatório V2.docx'))).toBeTruthy()
+  expect(v7.getByRole('button', menuDe('TSA_V7_Emitir Ofício_Relatório R2.docx'))).toBeTruthy()
   const v8 = within(secao.getByRole('article', { name: 'V8' }))
-  expect(v8.queryByRole('button', menuDe('TSA_V7_Emitir Ofício_Relatório V2.docx'))).toBeNull()
+  expect(v8.queryByRole('button', menuDe('TSA_V7_Emitir Ofício_Relatório R2.docx'))).toBeNull()
   expect(within(secao.getByRole('article', { name: 'V5F' })).queryByRole('button', menuDe('TSA_V5F_Emitir Ofício_Relatório.docx'))).toBeNull()
 })
 
@@ -271,7 +271,7 @@ test('substituir o relatório numerado: o formulário abre e a troca mantém o n
   const { versoes } = montarNosCadastros(montagem())
   const secao = await secaoDeVersoes()
   const v7 = within(await secao.findByRole('article', { name: 'V7' }))
-  fireEvent.click(v7.getByRole('button', menuDe('TSA_V7_Emitir Ofício_Relatório V2.docx')))
+  fireEvent.click(v7.getByRole('button', menuDe('TSA_V7_Emitir Ofício_Relatório R2.docx')))
   fireEvent.click(await screen.findByRole('menuitem', { name: 'Substituir' }))
   const form = within(await v7.findByRole('form'))
   fireEvent.change(form.getByLabelText('Relatório (.docx)'), { target: { files: [new File(['novo'], 'revisado.docx')] } })
@@ -280,7 +280,7 @@ test('substituir o relatório numerado: o formulário abre e a troca mantém o n
   fireEvent.click(within(await screen.findByRole('dialog', { name: /^Substituir TSA_V7/ })).getByRole('button', { name: 'Substituir' }))
   await waitFor(() => expect(v7.queryByRole('form')).toBeNull())
   const arquivo = versoes.versoes.p1.find((versao) => versao.id === 'v7')?.arquivos.find((outro) => outro.papel === 'relatorio')
-  expect(arquivo).toMatchObject({ numeroDoRelatorio: 2, nome: 'TSA_V7_Emitir Ofício_Relatório V2.docx' })
+  expect(arquivo).toMatchObject({ numeroDoRelatorio: 2, nome: 'TSA_V7_Emitir Ofício_Relatório R2.docx' })
 })
 
 test('o relatório ligado à versão aprovada não tem [Substituir]', async () => {
@@ -288,15 +288,15 @@ test('o relatório ligado à versão aprovada não tem [Substituir]', async () =
   const secao = await secaoDeVersoes()
   const v7 = within(await secao.findByRole('article', { name: 'V7' }))
   await v7.findByText('Aprovada')
-  expect(v7.queryByRole('button', menuDe('TSA_V7_Emitir Ofício_Relatório V2.docx'))).toBeNull()
+  expect(v7.queryByRole('button', menuDe('TSA_V7_Emitir Ofício_Relatório R2.docx'))).toBeNull()
 })
 
 test('o relatório enviado entra no histórico do processo, com a versão que ele acompanha', async () => {
   const { secao, form } = await abrirFormulario()
   await enviarOFormulario(form)
-  await within(await secao.findByRole('article', { name: 'V8' })).findByRole('link', { name: comNome('Relatório V3') })
+  await within(await secao.findByRole('article', { name: 'V8' })).findByRole('link', { name: comNome('Relatório R3') })
   const painel = within(screen.getByRole('dialog', { name: /^Processo( |$)/ }))
   await escolherNoMenuDoProcesso('Histórico')
-  const evento = await painel.findByText('Enviou o Relatório V3 (acompanha a V8)')
-  expect(evento.parentElement?.textContent).toBe('Enviou o Relatório V3 (acompanha a V8) V8 — Emitir Ofício')
+  const evento = await painel.findByText('Enviou o Relatório R3 (acompanha a V8)')
+  expect(evento.parentElement?.textContent).toBe('Enviou o Relatório R3 (acompanha a V8) V8 — Emitir Ofício')
 })

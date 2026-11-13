@@ -19,12 +19,12 @@ function textos(alvo: Versao, todas: Versao[]): string[] {
 
 test('a versão mostra o relatório que recebeu', () => {
   const v7 = versao(7, [relatorio('r2', 2)])
-  expect(textos(v7, [v7])).toEqual(['Relatório V2'])
+  expect(textos(v7, [v7])).toEqual(['Relatório R2'])
 })
 
 test('dois relatórios enviados enquanto a versão era a mais recente aparecem em ordem de número', () => {
   const v8 = versao(8, [relatorio('r3', 3), relatorio('r2', 2)])
-  expect(textos(v8, [v8])).toEqual(['Relatório V2', 'Relatório V3'])
+  expect(textos(v8, [v8])).toEqual(['Relatório R2', 'Relatório R3'])
 })
 
 test('a versão sem relatório próprio mostra o último das anteriores, dizendo de qual versão', () => {
@@ -32,15 +32,15 @@ test('a versão sem relatório próprio mostra o último das anteriores, dizendo
   const v7 = versao(7, [relatorio('r2', 2)])
   const v8 = versao(8)
   const v9 = versao(9)
-  expect(textos(v9, [v6, v7, v8, v9])).toEqual(['Relatório V2 (da V7)'])
-  expect(textos(v8, [v6, v7, v8, v9])).toEqual(['Relatório V2 (da V7)'])
+  expect(textos(v9, [v6, v7, v8, v9])).toEqual(['Relatório R2 (da V7)'])
+  expect(textos(v8, [v6, v7, v8, v9])).toEqual(['Relatório R2 (da V7)'])
 })
 
 test('o último é o de maior número entre os ligados às versões anteriores, e o ligado a uma versão posterior não vale para ela', () => {
   const v6 = versao(6, [relatorio('r1', 1), relatorio('r2', 2)])
   const v7 = versao(7)
   const v8 = versao(8, [relatorio('r3', 3)])
-  expect(textos(v7, [v6, v7, v8])).toEqual(['Relatório V2 (da V6)'])
+  expect(textos(v7, [v6, v7, v8])).toEqual(['Relatório R2 (da V6)'])
 })
 
 test('antes do primeiro relatório, nada', () => {
@@ -71,7 +71,7 @@ test('o relatório .pdf antigo, sem número, aparece como está e não vale para
 test('o relatório ligado à versão piloto vale para a versão em sequência seguinte', () => {
   const v6 = versao(6, [relatorio('r1', 1)], 'piloto')
   const v7 = versao(7)
-  expect(textos(v7, [v6, v7])).toEqual(['Relatório V1 (da V6P)'])
+  expect(textos(v7, [v6, v7])).toEqual(['Relatório R1 (da V6P)'])
 })
 
 test('cada relatório devolvido leva o arquivo, para baixar', () => {

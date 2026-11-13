@@ -72,11 +72,13 @@ Registro da Tarefa 1: sem Docker nesta máquina, o ciclo foi o do GitHub. O 78 f
 - `situacaoDoNomeDoRelatorio(nome: string, numero: number | null): SituacaoDoNome`
 - `validarRenomearRelatorio(corpo: unknown): Validacao<{ arquivoId: string }>` (campo `arquivo_id`, uuid)
 
-- [ ] **2.1** Testes vermelhos: `situacaoDoNomeDoRelatorio` (V com o número certo; número diferente do guardado; sem número; já com R; `.pdf`; "Relatório V1" no meio do nome e não no fim); `validarRenomearRelatorio` (corpo inválido, sem id, id fora do formato); `conferirChamador` com `renomear_relatorio` para os três perfis e para o desativado; nome padrão do relatório novo com R; registro que aceita `_Relatório R3.` e recusa `_Relatório V3.`.
-- [ ] **2.2** Rodar e ver falhar pela razão certa.
-- [ ] **2.3** Implementar o mínimo.
-- [ ] **2.4** `npx vitest run supabase/functions/_shared`: verde.
-- [ ] **2.5** Commit.
+- [x] **2.1** Testes vermelhos: `situacaoDoNomeDoRelatorio` (V com o número certo; número diferente do guardado; sem número; já com R; `.pdf`; "Relatório V1" no meio do nome e não no fim); `validarRenomearRelatorio` (corpo inválido, sem id, id fora do formato); `conferirChamador` com `renomear_relatorio` para os três perfis e para o desativado; nome padrão do relatório novo com R; registro que aceita `_Relatório R3.` e recusa `_Relatório V3.`.
+- [x] **2.2** Rodar e ver falhar pela razão certa.
+- [x] **2.3** Implementar o mínimo.
+- [x] **2.4** `npx vitest run supabase/functions/_shared`: verde.
+- [x] **2.5** Commit.
+
+Registro das Tarefas 2 e 4: foram juntas num commit. A troca do nome padrão quebra os testes da tela que conferem o nome gerado, e o pre-commit roda esses testes. O rótulo ficou em `src/versoes/rotuloDoRelatorio.ts` (sem importações, para não criar ciclo), e não em `rotulos.ts`. Ficam com V o histórico de revisão já gravado e os dados de entrada dos testes de renumeração.
 
 ### Tarefa 3: Função do servidor — ação `renomear_relatorio`
 
@@ -100,11 +102,11 @@ Registro da Tarefa 1: sem Docker nesta máquina, o ciclo foi o do GitHub. O 78 f
 - Alterar: `src/testes/versoesDeTeste.ts` (o nome do relatório de teste passa a `_Relatório R<n>.docx`) e o falso que monta o nome do relatório (procurar `Relatório V` em `src/versoes/*Falso*`)
 - Testes que passam a R: os listados por `grep -rln "Relatório V" src` (App.arquivosDoVerso, App.enviarVersaoNaRevisaoDoRelatorio, App.relatorioDepois, App.revisaoDoRelatorio, App.versoesNoProcesso, App.importacaoDaPasta, os de `revisoes/`, `processos/`, `versoes/` e `cadastros/`)
 
-- [ ] **4.1** Vermelho: trocar V por R nos testes (o histórico já gravado "Enviou o Relatório V2" vem do número, então também passa a R; o evento de revisão gravado antes, com o texto pronto "Relatório V2" no banco, fica V). Acrescentar o teste do `rotuloDoRelatorio` e o do "Renomeou o arquivo … para …". Rodar e ver falhar.
-- [ ] **4.2** Verde: criar `rotuloDoRelatorio` e usá-lo nos pontos acima; o texto do evento novo.
-- [ ] **4.3** `grep -rn "Relatório V" src supabase/functions --include=*.ts --include=*.tsx`: sobra só o que é histórico gravado, dado de importação (nomes da pasta antiga) ou comentário sobre o antigo.
-- [ ] **4.4** `npm test`, `npm run typecheck`, `npx eslint src`: verdes.
-- [ ] **4.5** Commit.
+- [x] **4.1** Vermelho: trocar V por R nos testes (o histórico já gravado "Enviou o Relatório V2" vem do número, então também passa a R; o evento de revisão gravado antes, com o texto pronto "Relatório V2" no banco, fica V). Acrescentar o teste do `rotuloDoRelatorio` e o do "Renomeou o arquivo … para …". Rodar e ver falhar.
+- [x] **4.2** Verde: criar `rotuloDoRelatorio` e usá-lo nos pontos acima; o texto do evento novo.
+- [x] **4.3** `grep -rn "Relatório V" src supabase/functions --include=*.ts --include=*.tsx`: sobra só o que é histórico gravado, dado de importação (nomes da pasta antiga) ou comentário sobre o antigo.
+- [x] **4.4** `npm test`, `npm run typecheck`, `npx eslint src`: verdes.
+- [x] **4.5** Commit.
 
 ### Tarefa 5: Aba Importação — seção "3. Relatórios com R"
 

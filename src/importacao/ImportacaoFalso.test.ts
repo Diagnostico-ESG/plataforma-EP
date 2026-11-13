@@ -47,7 +47,7 @@ test('a versão importada aparece nas versões do processo, com o nome padrão e
   versoes.aoRegistrar = (_processo, evento) => eventos.push(evento.acao)
   expect(await falso.importarVersao(PEDIDO, () => {})).toBe('criada')
   const [versao] = await versoes.listarVersoes('p1')
-  expect(versao.arquivos.map((a) => a.nome)).toEqual(['XYZ_V2_Exemplo Alfa.bpm', 'XYZ_V2_Exemplo Alfa_Relatório V1.docx'])
+  expect(versao.arquivos.map((a) => a.nome)).toEqual(['XYZ_V2_Exemplo Alfa.bpm', 'XYZ_V2_Exemplo Alfa_Relatório R1.docx'])
   expect(eventos).toEqual(['importar'])
   expect(await falso.importarVersao(PEDIDO, () => {})).toBe('ja_existia')
   expect((await falso.listarProcessosDaPasta()).processos[0]).toMatchObject({ versoes: [2], maiorRelatorio: 1 })

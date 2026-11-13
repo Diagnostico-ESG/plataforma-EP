@@ -11,7 +11,7 @@ export type DadosDaRevisao = { resultado: ResultadoDaRevisao; comentario: string
 /** O que a janela de editar a revisão grava: o resultado (que recalcula o que ela liga) e o comentário aparado. */
 export type DadosDaEdicaoDaRevisao = DadosDaRevisao
 
-/** Uma revisão registrada; as versões e os relatórios são os números (V7, Relatório V2) e `revisadaEm` é a data AAAA-MM-DD. */
+/** Uma revisão registrada; as versões e os relatórios são os números (V7, Relatório R2) e `revisadaEm` é a data AAAA-MM-DD. */
 export type RevisaoInterna = {
   id: string
   /** De qual revisão é. Ausente: a Revisão do fluxograma (a revisão antiga, sem passagem, e as montadas à mão nos testes). */
@@ -19,7 +19,7 @@ export type RevisaoInterna = {
   versaoRevisada: number
   /** Só em "corrigida": a versão que o revisor enviou como correção. */
   versaoCorrigida: number | null
-  /** O relatório revisado (Relatório V1); null ou ausente: nenhum (a revisão do fluxograma "sem alteração"). */
+  /** O relatório revisado (Relatório R1); null ou ausente: nenhum (a revisão do fluxograma "sem alteração"). */
   relatorioRevisado?: number | null
   /** Só em "corrigida": o relatório que o revisor enviou como correção; null ou ausente: nenhum. */
   relatorioCorrigido?: number | null
