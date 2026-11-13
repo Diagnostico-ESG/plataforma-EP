@@ -1262,3 +1262,5 @@ Entregue em 2026-11-04 (commit 373c07e), com ressalva: critérios [visual] presu
 Entregue em 2026-11-04 (commit aae9254), com ressalva: a correção do anexo (raiz.ts, três níveis) foi provada só por teste automático e pelo "Testes de banco"; o anexo corrigido não foi visto no Drive real (C3 e C4 da prova adiados por decisão do usuário); revisão de segurança foi a de reserva (menos completa); as ressalvas das entregas anteriores seguem valendo
 Entregue em 2026-11-10 (commit 46aedf9), com ressalva: o [Enviar versão] da Revisão do relatório e a confirmação nova do Substituir (mudança das duas revisões, em revisoes-aprovacao) vistos só na vitrine local com módulos falsos; as ressalvas das entregas anteriores seguem valendo
 Em revisão desde 2026-11-13
+
+Implementado em 2026-11-13 (commit 87dc328): seção "Relatório numerado com R" (ADR 0047), branch `documentos-versoes` junta à `main` em 91b2dd0.
